@@ -2,208 +2,172 @@ Return-Path: <SRS0=Eyne=7C=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 595A4C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 18:29:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D69FBC433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 19:57:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3692320671
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 18:29:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF9CB207E8
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 19:57:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="D7oPGHVD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NkuQMa3+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726939AbgETS3j (ORCPT
+        id S1728469AbgETT5R (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 May 2020 14:29:39 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:59600 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726650AbgETS3g (ORCPT
+        Wed, 20 May 2020 15:57:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51268 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728408AbgETT5E (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 May 2020 14:29:36 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04KIHaTv000885;
-        Wed, 20 May 2020 18:29:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2020-01-29; bh=jH2azHDilRy3Eymjd7YkT7wc4b3eHTRR3U5ixDSNB0U=;
- b=D7oPGHVDZIlDsTEsi2DHPv3YDdcbiQrvy1RcZyH7DNu/8USFBIkdYzxB4JBHLOhQswIS
- Bl1HC+g5Ma+05ZEllyzsYldowthCi7Upwy0bCwouq6N+Y0loFQtuLd8W7im9902U0EqA
- sAN7Dyol+855dzUiB7dbikgMrHPMG2NbGc6bfALVHj1wtGNjTNS8PY3HYVRFhmQPLRCE
- Qwd9p3EOBY2jmsn58iPOh0kzUCJevSTTVpKfROGICIy6oKIeSxqDnkKXbshHb0xLW1PM
- gJjs07jlP+TPlbtM6lHbFm1UMAI5wmZ9Lr3NZIj9WvDu7nh7s3jXH4Z7HkXl39EFTMzJ fw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 31501rb8jf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 20 May 2020 18:29:04 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04KICcee014778;
-        Wed, 20 May 2020 18:27:03 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 313gj3yt6u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 May 2020 18:27:03 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04KIQq27008059;
-        Wed, 20 May 2020 18:26:52 GMT
-Received: from localhost.localdomain (/98.229.125.203)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 20 May 2020 11:26:52 -0700
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Kirill Tkhai <ktkhai@virtuozzo.com>,
-        Michal Hocko <mhocko@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Robert Elliott <elliott@hpe.com>,
-        Shile Zhang <shile.zhang@linux.alibaba.com>,
-        Steven Sistare <steven.sistare@oracle.com>,
-        Tejun Heo <tj@kernel.org>, Zi Yan <ziy@nvidia.com>,
-        linux-crypto@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org,
-        Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [PATCH v2 0/7] padata: parallelize deferred page init
-Date:   Wed, 20 May 2020 14:26:38 -0400
-Message-Id: <20200520182645.1658949-1-daniel.m.jordan@oracle.com>
-X-Mailer: git-send-email 2.26.2
+        Wed, 20 May 2020 15:57:04 -0400
+Received: from mail-vs1-xe43.google.com (mail-vs1-xe43.google.com [IPv6:2607:f8b0:4864:20::e43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3734BC061A0E;
+        Wed, 20 May 2020 12:57:04 -0700 (PDT)
+Received: by mail-vs1-xe43.google.com with SMTP id e10so2573618vsp.12;
+        Wed, 20 May 2020 12:57:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GxUaUN6vf454eItYUVZAvSrj24SmWPAgZaZXKMh5Yug=;
+        b=NkuQMa3+qk+cwSKLMQHjDUMihNnfu8ASd4srzMFcz5fqGDfPRTQJUa2Zn1ugKnEZxU
+         4AzfewKWyjsNvvXedLrAYUPoOOsIViuodHsZy7CqXBqR84jh2LHN1tH9ioY5oFQ6HABI
+         f2NYUmC18J9NXQLJzum5m6pKOM61ONrOPNKWuUC/jYBQ3PpAHwFRLFYSO+C86QF08WmN
+         dG1IScdNzix/57AJNwkfUCfgLZWecCAoE1po9d2vZB5ziCkKW5gxOIwl2cLf96mTh0s4
+         X5/NfYNQlAbObwv1ld9ERjOQ04Ssidxz1yGeiSA+kNZ0zxomGcL2Fu42B9tcBfApb3Q4
+         JIgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GxUaUN6vf454eItYUVZAvSrj24SmWPAgZaZXKMh5Yug=;
+        b=MPco5b+pnNurwz9hEICcPLk+xySws20tUsNTvauCUJF4t5tBXcbxHoSUI4BG1YyYrE
+         sMkVU2an5G1TpA9PG7FZ+RESFRPBQYu7JJ2QzSbw6FN9nJxYHErFp50VXGgRkK6UcJoj
+         LcEfcEUojn0hPxgTFdL1XBKUT0rpojwxuM75gTh4wANH4dDoyhUaRb9njT1qhWz3sDIr
+         uAKuq9QQkhAQZYOmr8hULiYR+c6HLjb8PujFpbMKAGq7cGaQqKtdrskfi6f75bsvrGai
+         WU1/4RpEen+9TJecW6Qx2AyEf0qyrgiaUhYSe6LUoW0E4DJqgcjwgxYpIOfEFBlYBCwz
+         zE/w==
+X-Gm-Message-State: AOAM532ZEeRmUw3QvfEWeZvFZEawrZVntT7+3/guAyhkOYJ+Q/KNvZJN
+        tezXV9jdXOhDUfyx095+V1Hfg5AgwRFDk8hrE3o=
+X-Google-Smtp-Source: ABdhPJzp5CiaN6eGlE+TLMUT0TPhfpKr6Th8x2kCTQ10fToEbrGM0DUM2rRlex+18RhqrR9+garadSSMFvH8arbCtjQ=
+X-Received: by 2002:a67:1903:: with SMTP id 3mr4552339vsz.22.1590004623277;
+ Wed, 20 May 2020 12:57:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9627 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 malwarescore=0
- mlxscore=0 adultscore=0 bulkscore=0 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005200148
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9627 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 spamscore=0
- mlxlogscore=999 clxscore=1015 priorityscore=1501 cotscore=-2147483648
- impostorscore=0 bulkscore=0 adultscore=0 malwarescore=0 phishscore=0
- mlxscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2005200148
+References: <1589732796-22839-1-git-send-email-pooja.trivedi@stackpath.com>
+ <20200518155016.75be3663@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+ <CAOrEds=Mo4YHm1CPrgVmPhsJagUAQ0PzyDPk9Cq3URq-7vfCWA@mail.gmail.com> <20200519144255.3a7416c4@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+In-Reply-To: <20200519144255.3a7416c4@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+From:   Pooja Trivedi <poojatrivedi@gmail.com>
+Date:   Wed, 20 May 2020 15:56:56 -0400
+Message-ID: <CAOrEds=e62EnDiB5b-5Btukp83OASVaVgBG28GkxSBw1F8sLSQ@mail.gmail.com>
+Subject: Re: [PATCH net] net/tls(TLS_SW): Fix integrity issue with
+ non-blocking sw KTLS request
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     borisp@mellanox.com, aviadye@mellanox.com,
+        john.fastabend@gmail.com, daniel@iogearbox.net,
+        davem@davemloft.net, vakul.garg@nxp.com, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        mallesham.jatharkonda@oneconvergence.com, josh.tway@stackpath.com,
+        Pooja Trivedi <pooja.trivedi@stackpath.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Deferred struct page init is a bottleneck in kernel boot--the biggest
-for us and probably others.  Optimizing it maximizes availability for
-large-memory systems and allows spinning up short-lived VMs as needed
-without having to leave them running.  It also benefits bare metal
-machines hosting VMs that are sensitive to downtime.  In projects such
-as VMM Fast Restart[1], where guest state is preserved across kexec
-reboot, it helps prevent application and network timeouts in the guests.
+On Tue, May 19, 2020 at 5:43 PM Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Tue, 19 May 2020 13:21:56 -0400 Pooja Trivedi wrote:
+> > On Mon, May 18, 2020 at 6:50 PM Jakub Kicinski <kuba@kernel.org> wrote:
+> > > On Sun, 17 May 2020 16:26:36 +0000 Pooja Trivedi wrote:
+> > > > In pure sw ktls(AES-NI), -EAGAIN from tcp layer (do_tcp_sendpages for
+> > > > encrypted record) gets treated as error, subtracts the offset, and
+> > > > returns to application. Because of this, application sends data from
+> > > > subtracted offset, which leads to data integrity issue. Since record is
+> > > > already encrypted, ktls module marks it as partially sent and pushes the
+> > > > packet to tcp layer in the following iterations (either from bottom half
+> > > > or when pushing next chunk). So returning success in case of EAGAIN
+> > > > will fix the issue.
+> > > >
+> > > > Fixes: a42055e8d2c3 ("net/tls: Add support for async encryption")
+> > > > Signed-off-by: Pooja Trivedi <pooja.trivedi@stackpath.com>
+> > > > Reviewed-by: Mallesham Jatharkonda <mallesham.jatharkonda@oneconvergence.com>
+> > > > Reviewed-by: Josh Tway <josh.tway@stackpath.com>
+> > >
+> > > This looks reasonable, I think. Next time user space calls if no new
+> > > buffer space was made available it will get a -EAGAIN, right?
+> >
+> > Yes, this fix should only affect encrypted record. Plain text calls from
+> > user space should be unaffected.
+>
+> AFAICS if TCP layer is full next call from user space should hit
+> sk_stream_wait_memory() immediately and if it has MSG_DONTWAIT set
+> exit with EAGAIN. Which I believe to be correct behavior.
+>
 
-So, multithread deferred init to take full advantage of system memory
-bandwidth.
+The flow is tls_sw_sendmsg/tls_sw_do_sendpage --> bpf_exec_tx_verdict -->
+tls_push_record --> tls_tx_records --> tls_push_sg --> do_tcp_sendpages
 
-Extend padata, a framework that handles many parallel singlethreaded
-jobs, to handle multithreaded jobs as well by adding support for
-splitting up the work evenly, specifying a minimum amount of work that's
-appropriate for one helper thread to do, load balancing between helpers,
-and coordinating them.  More documentation in patches 4 and 7.
+do_tcp_sendpages() sends partial record, 'retry:' label is exercised wherein
+do_tcp_sendpages gets called again and returns -EAGAIN.
+tls_push_sg sets partially_sent_record/partially_sent_offset and
+returns -EAGAIN. -EAGAIN bubbles up to bpf_exec_tx_verdict.
+In bpf_exec_tx_verdict, the following code causes 'copied' variable to
+get updated to a negative value and returns -EAGAIN.
 
-This series is the first step in a project to address other memory
-proportional bottlenecks in the kernel such as pmem struct page init,
-vfio page pinning, hugetlb fallocate, and munmap.  Deferred page init
-doesn't require concurrency limits, resource control, or priority
-adjustments like these other users will because it happens during boot
-when the system is otherwise idle and waiting for page init to finish.
+                err = tls_push_record(sk, flags, record_type);
+                if (err && err != -EINPROGRESS) {
+                        *copied -= sk_msg_free(sk, msg);
+                        tls_free_open_rec(sk);
+                }
+                return err;
 
-This has been run on a variety of x86 systems and speeds up kernel boot
-by 3% to 49%, saving up to 1.6 out of 4 seconds.  Patch 5 has more
-numbers.
+-EAGAIN returned by bpf_exec_tx_verdict causes
+tls_sw_sendmsg/tls_sw_do_sendpage to 'continue' in the while loop and
+call sk_stream_wait_memory(). sk_stream_wait_memory returns -EAGAIN
+also and control reaches the 'send_end:' label. The following return
+statement causes a negative 'copied' variable value to be returned to the
+user space.
 
-Please review and test, and thanks to Alex, Andrew, Josh, and Pavel for
-their feedback in the last version.
+        return copied ? copied : ret;
 
-The powerpc and s390 lists are included in case they want to give this a
-try, they had enabled this feature when it was configured per arch.
+User space applies this negative value as offset for the next send, causing
+part of the record that was already sent to be pushed again.
 
-Series based on 5.7-rc6 plus these three from mmotm
-
-  mm-call-touch_nmi_watchdog-on-max-order-boundaries-in-deferred-init.patch
-  mm-initialize-deferred-pages-with-interrupts-enabled.patch
-  mm-call-cond_resched-from-deferred_init_memmap.patch
-
-and it's available here:
-
-  git://oss.oracle.com/git/linux-dmjordan.git padata-mt-definit-v2
-  https://oss.oracle.com/git/gitweb.cgi?p=linux-dmjordan.git;a=shortlog;h=refs/heads/padata-mt-definit-v2
-
-and the future users and related features are available as
-work-in-progress:
-
-  git://oss.oracle.com/git/linux-dmjordan.git padata-mt-wip-v0.4
-  https://oss.oracle.com/git/gitweb.cgi?p=linux-dmjordan.git;a=shortlog;h=refs/heads/padata-mt-wip-v0.4
-
-v2:
- - Improve the problem statement (Andrew, Josh, Pavel)
- - Add T-b's to unchanged patches (Josh)
- - Fully initialize max-order blocks to avoid buddy issues (Alex)
- - Parallelize on section-aligned boundaries to avoid potential
-   false sharing (Alex)
- - Return the maximum thread count from a function that architectures
-   can override, with the generic version returning 1 (current
-   behavior).  Override for x86 since that's the only arch this series
-   has been tested on so far.  Other archs can test with more threads
-   by dropping patch 6.
- - Rebase to v5.7-rc6, rerun tests
-
-RFC v4 [2] -> v1:
- - merged with padata (Peter)
- - got rid of the 'task' nomenclature (Peter, Jon)
-
-future work branch:
- - made lockdep-aware (Jason, Peter)
- - adjust workqueue worker priority with renice_or_cancel() (Tejun)
- - fixed undo problem in VFIO (Alex)
-
-The remaining feedback, mainly resource control awareness (cgroup etc),
-is TODO for later series.
-
-[1] https://static.sched.com/hosted_files/kvmforum2019/66/VMM-fast-restart_kvmforum2019.pdf
-    https://www.youtube.com/watch?v=pBsHnf93tcQ
-    https://lore.kernel.org/linux-mm/1588812129-8596-1-git-send-email-anthony.yznaga@oracle.com/
-
-[2] https://lore.kernel.org/linux-mm/20181105165558.11698-1-daniel.m.jordan@oracle.com/
-
-Daniel Jordan (7):
-  padata: remove exit routine
-  padata: initialize earlier
-  padata: allocate work structures for parallel jobs from a pool
-  padata: add basic support for multithreaded jobs
-  mm: parallelize deferred_init_memmap()
-  mm: make deferred init's max threads arch-specific
-  padata: document multithreaded jobs
-
- Documentation/core-api/padata.rst |  41 +++--
- arch/x86/mm/init_64.c             |  12 ++
- include/linux/memblock.h          |   3 +
- include/linux/padata.h            |  43 ++++-
- init/main.c                       |   2 +
- kernel/padata.c                   | 277 ++++++++++++++++++++++++------
- mm/Kconfig                        |   6 +-
- mm/page_alloc.c                   |  67 +++++++-
- 8 files changed, 373 insertions(+), 78 deletions(-)
+Hope this clarifies it.
 
 
-base-commit: b9bbe6ed63b2b9f2c9ee5cbd0f2c946a2723f4ce
-prerequisite-patch-id: 4ad522141e1119a325a9799dad2bd982fbac8b7c
-prerequisite-patch-id: 169273327e56f5461101a71dfbd6b4cfd4570cf0
-prerequisite-patch-id: 0f34692c8a9673d4c4f6a3545cf8ec3a2abf8620
--- 
-2.26.2
+>
+> > > Two questions - is there any particular application or use case that
+> > > runs into this?
+> >
+> > We are running into this case when we hit our kTLS-enabled homegrown
+> > webserver with a 'pipeline' test tool, also homegrown. The issue basically
+> > happens whenever the send buffer on the server gets full and TCP layer
+> > returns EAGAIN when attempting to TX the encrypted record. In fact, we
+> > are also able to reproduce the issue by using a simple wget with a large
+> > file, if/when sndbuf fills up.
+>
+> I see just a coincidence, then, no worries.
+>
+> > > Seems a bit surprising to see a patch from Vadim and
+> > > you guys come at the same time.
+> >
+> > Not familiar with Vadim or her/his patch. Could you please point me to it?
+>
+> http://patchwork.ozlabs.org/project/netdev/patch/20200517014451.954F05026DE@novek.ru/
+>
 
+Ah, looks like Vadim ran into the exact issue!
+
+>
+> > > Could you also add test for this bug?
+> > > In tools/testing/selftests/net/tls.c
+> > >
+> >
+> > Sure, yes. Let me look into this.
+>
+> Thanks!
