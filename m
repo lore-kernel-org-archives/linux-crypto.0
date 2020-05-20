@@ -2,88 +2,121 @@ Return-Path: <SRS0=Eyne=7C=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE98C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 13:31:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF23AC433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 14:28:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 47E5420748
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 13:31:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8955D205CB
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 14:28:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726443AbgETNbH (ORCPT
+        id S1727799AbgETO2O (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 May 2020 09:31:07 -0400
-Received: from spam.zju.edu.cn ([61.164.42.155]:14870 "EHLO zju.edu.cn"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726436AbgETNbH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 May 2020 09:31:07 -0400
-Received: from localhost.localdomain (unknown [222.205.77.158])
-        by mail-app2 (Coremail) with SMTP id by_KCgC3npHWMMVeZ3qOAQ--.58332S4;
-        Wed, 20 May 2020 21:30:02 +0800 (CST)
-From:   Dinghao Liu <dinghao.liu@zju.edu.cn>
-To:     dinghao.liu@zju.edu.cn, kjlu@umn.edu
-Cc:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ben Dooks <ben.dooks@codethink.co.uk>,
-        Richard Fontana <rfontana@redhat.com>,
-        Alexander Sverdlin <alexander.sverdlin@nokia.com>,
-        Allison Randal <allison@lohutok.net>,
-        YueHaibing <yuehaibing@huawei.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] hwrng: ks-sa - fix runtime pm imbalance on error
-Date:   Wed, 20 May 2020 21:29:55 +0800
-Message-Id: <20200520132957.18776-1-dinghao.liu@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: by_KCgC3npHWMMVeZ3qOAQ--.58332S4
-X-Coremail-Antispam: 1UD129KBjvdXoWrKrWrZF15CFyUGr4xXF1UKFg_yoW3KrX_uw
-        17AF4xur1Sgw47Xw47Zw15ZryFgFZ8WF4vgFn2v3W3K3yIvFWqgryDZrn5Aw47urWkXr9r
-        tay7XF1xCryqkjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbTxFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AK
-        wVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20x
-        vE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E
-        87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-        8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_
-        JrylYx0Ex4A2jsIE14v26F4j6r4UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
-        vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkIecxE
-        wVAFwVW5GwCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26r4fKr1UJr1l4I8I3I
-        0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWU
-        GVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI
-        0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0
-        rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r
-        4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VUb_gA7UUUUU==
-X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/
+        Wed, 20 May 2020 10:28:14 -0400
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:32858 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726916AbgETOWZ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 May 2020 10:22:25 -0400
+Received: from [192.168.4.242] (helo=deadeye)
+        by shadbolt.decadent.org.uk with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <ben@decadent.org.uk>)
+        id 1jbPbu-00035K-Vi; Wed, 20 May 2020 15:22:19 +0100
+Received: from ben by deadeye with local (Exim 4.93)
+        (envelope-from <ben@decadent.org.uk>)
+        id 1jbPbu-007DP2-77; Wed, 20 May 2020 15:22:18 +0100
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+From:   Ben Hutchings <ben@decadent.org.uk>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+CC:     akpm@linux-foundation.org, Denis Kirjanov <kda@linux-powerpc.org>,
+        "Steffen Klassert" <steffen.klassert@secunet.com>,
+        "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+        "Herbert Xu" <herbert@gondor.apana.org.au>,
+        "Daniel Jordan" <daniel.m.jordan@oracle.com>
+Date:   Wed, 20 May 2020 15:13:43 +0100
+Message-ID: <lsq.1589984008.683956171@decadent.org.uk>
+X-Mailer: LinuxStableQueue (scripts by bwh)
+X-Patchwork-Hint: ignore
+Subject: [PATCH 3.16 15/99] padata: always acquire cpu_hotplug_lock before
+ pinst->lock
+In-Reply-To: <lsq.1589984008.673931885@decadent.org.uk>
+X-SA-Exim-Connect-IP: 192.168.4.242
+X-SA-Exim-Mail-From: ben@decadent.org.uk
+X-SA-Exim-Scanned: No (on shadbolt.decadent.org.uk); SAEximRunCond expanded to false
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-pm_runtime_get_sync() increments the runtime PM usage counter even
-the call returns an error code. Thus a pairing decrement is needed
-on the error handling path to keep the counter balanced.
+3.16.84-rc1 review patch.  If anyone has any objections, please let me know.
 
-Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
+------------------
+
+From: Daniel Jordan <daniel.m.jordan@oracle.com>
+
+commit 38228e8848cd7dd86ccb90406af32de0cad24be3 upstream.
+
+lockdep complains when padata's paths to update cpumasks via CPU hotplug
+and sysfs are both taken:
+
+  # echo 0 > /sys/devices/system/cpu/cpu1/online
+  # echo ff > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
+
+  ======================================================
+  WARNING: possible circular locking dependency detected
+  5.4.0-rc8-padata-cpuhp-v3+ #1 Not tainted
+  ------------------------------------------------------
+  bash/205 is trying to acquire lock:
+  ffffffff8286bcd0 (cpu_hotplug_lock.rw_sem){++++}, at: padata_set_cpumask+0x2b/0x120
+
+  but task is already holding lock:
+  ffff8880001abfa0 (&pinst->lock){+.+.}, at: padata_set_cpumask+0x26/0x120
+
+  which lock already depends on the new lock.
+
+padata doesn't take cpu_hotplug_lock and pinst->lock in a consistent
+order.  Which should be first?  CPU hotplug calls into padata with
+cpu_hotplug_lock already held, so it should have priority.
+
+Fixes: 6751fb3c0e0c ("padata: Use get_online_cpus/put_online_cpus")
+Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
 ---
- drivers/char/hw_random/ks-sa-rng.c | 1 +
- 1 file changed, 1 insertion(+)
+ kernel/padata.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/char/hw_random/ks-sa-rng.c b/drivers/char/hw_random/ks-sa-rng.c
-index e2330e757f1f..85c81da4a8af 100644
---- a/drivers/char/hw_random/ks-sa-rng.c
-+++ b/drivers/char/hw_random/ks-sa-rng.c
-@@ -244,6 +244,7 @@ static int ks_sa_rng_probe(struct platform_device *pdev)
- 	ret = pm_runtime_get_sync(dev);
- 	if (ret < 0) {
- 		dev_err(dev, "Failed to enable SA power-domain\n");
-+		pm_runtime_put_sync(dev);
- 		pm_runtime_disable(dev);
- 		return ret;
- 	}
--- 
-2.17.1
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -614,8 +614,8 @@ int padata_set_cpumask(struct padata_ins
+ 	struct cpumask *serial_mask, *parallel_mask;
+ 	int err = -EINVAL;
+ 
+-	mutex_lock(&pinst->lock);
+ 	get_online_cpus();
++	mutex_lock(&pinst->lock);
+ 
+ 	switch (cpumask_type) {
+ 	case PADATA_CPU_PARALLEL:
+@@ -633,8 +633,8 @@ int padata_set_cpumask(struct padata_ins
+ 	err =  __padata_set_cpumasks(pinst, parallel_mask, serial_mask);
+ 
+ out:
+-	put_online_cpus();
+ 	mutex_unlock(&pinst->lock);
++	put_online_cpus();
+ 
+ 	return err;
+ }
 
