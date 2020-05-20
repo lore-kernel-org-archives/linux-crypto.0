@@ -2,148 +2,112 @@ Return-Path: <SRS0=Eyne=7C=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF554C433E1
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 03:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 891DEC433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 06:03:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9D2A2204EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 03:16:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 673222084C
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 06:03:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pVrZ/6JY"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="J+O4RxtH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728415AbgETDQu (ORCPT
+        id S1726468AbgETGDg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 May 2020 23:16:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35882 "EHLO
+        Wed, 20 May 2020 02:03:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728129AbgETDQu (ORCPT
+        with ESMTP id S1725998AbgETGDf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 May 2020 23:16:50 -0400
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41D5EC061A0E;
-        Tue, 19 May 2020 20:16:50 -0700 (PDT)
-Received: by mail-wm1-x341.google.com with SMTP id u1so1190769wmn.3;
-        Tue, 19 May 2020 20:16:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=2nEgJxLKt7sGcW4byyIraWO1xaiKoTWBDlRHFJajGbA=;
-        b=pVrZ/6JYUCpdV2hhkhm7yrMiS01LBziQOrCkZ6n0GgF/zakoeC3l8pUyrUqJQSnpr5
-         CJWskLnBBEGyi+WQU6/AKHCItey6jDnYeEC6yEUHqUncP3LgVUErZdFoItEOxfC9O3gD
-         OARa/Ia9GOS3xcjEeOOis//2hccJ/63PkdQqXnSphetieu/le6wV3X3ZA9zMM1WqH7KT
-         FwnMJKe/v+GNdlPE4T5KcOCGHOU94BUjWa28lktuvIdHSf0tPCD7eAey47N5DvdvSbFB
-         2Nxkiqifr7JEgNuIOFkREHViK0S3cxUjcej+1WtMfP9bT4BRUB4LeBRt6gRZx4HOavtn
-         zrDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=2nEgJxLKt7sGcW4byyIraWO1xaiKoTWBDlRHFJajGbA=;
-        b=hD5UVDpjsx6EZpp3tAY7g5RSOskM0LnBzn+cqwRoMrWe257pI6V4dZ5kIMpFOPULIJ
-         CFba0Ex8VEr5vR/FBXt6/MoZvSvoWsINKyurIhMdQa3xq99psWdwrwvFQeqhBxXeDbmo
-         1CVEe9Xi2WPPWCTvyVCCYcQM3vgEs3bPk2XBsQ5COh+74K6cTD3ceENYq8ZymkJkSPHE
-         pTtc38uUgOGAcp7SRX2rGdLXzrTfxo12rmKLIlXlYkosXOdqvS5+xbLTdDWUF7L6oRMj
-         uPumfnieARCgtDOx1tX0FAN1VrrQShu/zw7Z7DyDE1kwksPgO1/NCF2dE2YhR1wurKdl
-         m0og==
-X-Gm-Message-State: AOAM530YKos5Jv8anRLVBsAlMQoTIuDT717aZehuyKzulQpA4dhSnM2u
-        SHbJwubFmtI/it4P9+C1+3aMDp9JlMZI9nVKSBo=
-X-Google-Smtp-Source: ABdhPJyorx9rIYjwfGWs5c/+/DTWQX+XeyqUNrSLPfIgnzjXlY3Gkag4N7ICwQCMyFJikPmFhna+ncTjCURuT8j3rrU=
-X-Received: by 2002:a7b:c413:: with SMTP id k19mr2459883wmi.124.1589944608931;
- Tue, 19 May 2020 20:16:48 -0700 (PDT)
+        Wed, 20 May 2020 02:03:35 -0400
+Received: from mo6-p00-ob.smtp.rzone.de (mo6-p00-ob.smtp.rzone.de [IPv6:2a01:238:20a:202:5300::5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40115C061A0E
+        for <linux-crypto@vger.kernel.org>; Tue, 19 May 2020 23:03:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1589954611;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=pSXXxnX23N+Cj33l5NV3fLExfRAIBDF1x9HdRtzBo2c=;
+        b=J+O4RxtHqpvIs7iECE4B+Ox7vZhLKEQpNkRoAq/cYrDtakmiEvnxdkNQ04pK/aAwA+
+        CnTrvXaPmU8NhSr1O9Pbne7eXAiNtahdt3itsEqWmc8uZs7Fo6rgX/WEi+eTyuDyJBhG
+        oDkT87ESOOdJ734tHYR40HS9wx0xRjigJHsiKCdSGHmG86BqB7AXP1rPNNWiaD6SdKUp
+        gRoxSXdmBg51FWECaJ33hzDG9boK0PMkR8yPUDC+dk7ppWJRw1TsRgLA5vMaycjDXyiB
+        Rm+BgKz+DzndOzP6ivT5ndaBm91G3Z4kYJ1XEqC5QMtI4hhAJrD9s92sdrnSTNDQ1KTG
+        B8Dw==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbI/Sc5g=="
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 46.7.0 DYNA|AUTH)
+        with ESMTPSA id k09005w4K63O2y2
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Wed, 20 May 2020 08:03:24 +0200 (CEST)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        ebiggers@kernel.org
+Subject: Re: [RFC/RFT PATCH 0/2] crypto: add CTS output IVs for arm64 and testmgr
+Date:   Wed, 20 May 2020 08:03:23 +0200
+Message-ID: <16565072.6IxHkjxkAd@tauon.chronox.de>
+In-Reply-To: <20200519190211.76855-1-ardb@kernel.org>
+References: <20200519190211.76855-1-ardb@kernel.org>
 MIME-Version: 1.0
-References: <20200516042303.6070-1-andrew.smirnov@gmail.com> <befcc520-6556-b09b-0464-fe0b5f28cf1e@nxp.com>
-In-Reply-To: <befcc520-6556-b09b-0464-fe0b5f28cf1e@nxp.com>
-From:   Andrey Smirnov <andrew.smirnov@gmail.com>
-Date:   Wed, 20 May 2020 03:16:37 +0000
-Message-ID: <CAHQ1cqHWGJgZUf0zpPt9oX7hbokkwXf7gFGwbgtGSPTRpvNvaQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: caam - make soc match data optional
-To:     =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Chris Healy <cphealy@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Fabio Estevam <festevam@gmail.com>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 18, 2020 at 6:59 PM Horia Geant=C4=83 <horia.geanta@nxp.com> wr=
-ote:
->
-> On 5/16/2020 7:23 AM, Andrey Smirnov wrote:
-> > Vyrbrid devices don't have any clock that need to be taken care of, so
-> > make clock data optional on i.MX.
-> >
-> Vybrid Security RM states that IPG clock used by CAAM
-> can be gated by CCM_CCGR11[CG176].
->
+Am Dienstag, 19. Mai 2020, 21:02:09 CEST schrieb Ard Biesheuvel:
 
-Cool, looks like I missed this when I was looking through RM.
+Hi Ard,
 
-> Clock driver needs to be updated accordingly,
-> and so will CAAM driver and DT node.
->
-> I don't have a board at hand, so patch below is not tested.
->
+> Stephan reports that the arm64 implementation of cts(cbc(aes)) deviates
+> from the generic implementation in what it returns as the output IV. So
+> fix this, and add some test vectors to catch other non-compliant
+> implementations.
+> 
+> Stephan, could you provide a reference for the NIST validation tool and
+> how it flags this behaviour as non-compliant? Thanks.
 
-I'll take it from here and test/submit appropriate patches. Thanks!
+The test definition that identified the inconsistent behavior is specified 
+with [1]. Note, this testing is intended to become an RFC standard.
 
-> Horia
->
-> ------ >8 ------
->
-> Subject: [PATCH] clk: imx: vf610: add CAAM clock
->
-> According to Vybrid Security RM, CCM_CCGR11[CG176] can be used to
-> gate CAAM ipg clock.
->
-> Signed-off-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
-> ---
->  drivers/clk/imx/clk-vf610.c             | 2 ++
->  include/dt-bindings/clock/vf610-clock.h | 3 ++-
->  2 files changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/clk/imx/clk-vf610.c b/drivers/clk/imx/clk-vf610.c
-> index cd04e7dc1878..4f3066cf1b89 100644
-> --- a/drivers/clk/imx/clk-vf610.c
-> +++ b/drivers/clk/imx/clk-vf610.c
-> @@ -439,6 +439,8 @@ static void __init vf610_clocks_init(struct device_no=
-de *ccm_node)
->         clk[VF610_CLK_DAP] =3D imx_clk_gate("dap", "platform_bus", CCM_CC=
-SR, 24);
->         clk[VF610_CLK_OCOTP] =3D imx_clk_gate("ocotp", "ipg_bus", CCM_CCG=
-R6, CCM_CCGRx_CGn(5));
->
-> +       clk[VF610_CLK_CAAM] =3D imx_clk_gate2("caam", "ipg_bus", CCM_CCGR=
-11, CCM_CCGRx_CGn(0));
-> +
->         imx_check_clocks(clk, ARRAY_SIZE(clk));
->
->         clk_set_parent(clk[VF610_CLK_QSPI0_SEL], clk[VF610_CLK_PLL1_PFD4]=
-);
-> diff --git a/include/dt-bindings/clock/vf610-clock.h b/include/dt-binding=
-s/clock/vf610-clock.h
-> index 95394f35a74a..0f2d60e884dc 100644
-> --- a/include/dt-bindings/clock/vf610-clock.h
-> +++ b/include/dt-bindings/clock/vf610-clock.h
-> @@ -195,6 +195,7 @@
->  #define VF610_CLK_WKPU                 186
->  #define VF610_CLK_TCON0                        187
->  #define VF610_CLK_TCON1                        188
-> -#define VF610_CLK_END                  189
-> +#define VF610_CLK_CAAM                 189
-> +#define VF610_CLK_END                  190
->
->  #endif /* __DT_BINDINGS_CLOCK_VF610_H */
-> --
-> 2.17.1
+To facilitate that testing, NIST offers an internet service, the ACVP server, 
+that allows obtaining test vectors and uploading responses. You see the large 
+number of concluded testing with [2]. A particular completion of the CTS 
+testing I finished yesterday is given in [3]. That particular testing was also 
+performed on an ARM system with CE where the issue was detected.
+
+I am performing the testing with [4] that has an extension to test the kernel 
+crypto API.
+
+[1] https://github.com/usnistgov/ACVP/blob/master/artifacts/draft-celi-acvp-block-ciph-00.txt#L366
+
+[2] https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/
+validation-search?searchMode=validation&family=1&productType=-1&ipp=25
+
+[3] https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/
+details?validation=32608
+
+[4] https://github.com/smuellerDD/acvpparser
+> 
+> Cc: Stephan Mueller <smueller@chronox.de>
+> 
+> Ard Biesheuvel (2):
+>   crypto: arm64/aes - align output IV with generic CBC-CTS driver
+>   crypto: testmgr - add output IVs for AES-CBC with ciphertext stealing
+> 
+>  arch/arm64/crypto/aes-modes.S |  2 ++
+>  crypto/testmgr.h              | 12 ++++++++++++
+>  2 files changed, 14 insertions(+)
+
+
+Ciao
+Stephan
+
+
