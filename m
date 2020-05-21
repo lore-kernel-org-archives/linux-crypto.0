@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3BA0C433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 May 2020 20:43:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EC55C433E1
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 May 2020 20:47:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B24AC20874
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 May 2020 20:43:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4EBE9207F9
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 May 2020 20:47:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XrV+YCVm"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="GZFHsNYl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728996AbgEUUnV (ORCPT
+        id S1729693AbgEUUrS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 May 2020 16:43:21 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:58536 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728547AbgEUUnV (ORCPT
+        Thu, 21 May 2020 16:47:18 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:48608 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726858AbgEUUrS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 May 2020 16:43:21 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04LKfWwv111166;
-        Thu, 21 May 2020 20:43:00 GMT
+        Thu, 21 May 2020 16:47:18 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04LKfpfp113288;
+        Thu, 21 May 2020 20:47:07 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2020-01-29;
- bh=O2Rb4G05GHKpw4BdRRx8tzqBwdu9RDoYJEASuKBzZnk=;
- b=XrV+YCVml3R7mjomPf40ukEYwEs9triP4gR3O6ut7dmzSHBfQpq8q6Z/GyTHHgDy2Rpq
- JxD7KdCYrtEVx9c/e82hL1riBmkteV3kuffCVYN+IEZexgCwD8dIqeTnangFRYv9Vdh9
- Fo5HnSBk+kIQcIysLbR0L+X5thjR8LOWLtAp9WnBR92tDv+arPm0ZiysU2E0QNUZB+ou
- kXfH7RVDSgfXXWGna5oirQ/QwvI6+H8Djjpg5vH9axwzHjmEniZeYQuHNq19XrY+Rj3G
- A6xwhIZQTHxjXvxb3iTyZFvTqgoW3G/1farwTMaExgRSrrI9BcZQVPZAm/HRt5yyQL1c rw== 
+ bh=CF6OJe7RZ0iClgY/Wfc9jssg1+Q4GlwmBjUzdYqjt78=;
+ b=GZFHsNYlIssNKG14BkO40S6CX4BiJexQKNec/4QjG4DlEcKQmork/ywiUASMWteYBj53
+ B+ESkCNzLSkVqoENR/w7ahCY22OM7hMchKJNwA8/H0o3K3hQ8CFZBiis4/zhF7ZU6oC+
+ h0TyZMSHrSDVYn/QtffmLy+m8gRiMoCJzemCQkmAfLi2ZjneyBCjYvMHO/bcEb7hdiRx
+ gMl9sdHscols6x3Xr6Nf1HmDusGAwUnWNOtpvQqp1SPwebogmAmlHOuin+eBpckUuiKx
+ QQ+q+74m5tPzbwPPqze+UQsghEVcLEaS9ijEpQQkT5H5RHD3XXTXrtK77ZKeZt57Ix8P vQ== 
 Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 31501rh5y8-1
+        by aserp2120.oracle.com with ESMTP id 31284map0g-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 21 May 2020 20:43:00 +0000
+        Thu, 21 May 2020 20:47:07 +0000
 Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04LKYWIl010776;
-        Thu, 21 May 2020 20:41:00 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 314gm9wjfy-1
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04LKiXxb046437;
+        Thu, 21 May 2020 20:47:06 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 314gm9wtg7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 May 2020 20:40:59 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04LKevft029901;
-        Thu, 21 May 2020 20:40:57 GMT
+        Thu, 21 May 2020 20:47:06 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04LKl52F022361;
+        Thu, 21 May 2020 20:47:05 GMT
 Received: from localhost.localdomain (/98.229.125.203)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 21 May 2020 13:40:57 -0700
+        with ESMTP ; Thu, 21 May 2020 13:47:04 -0700
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Sasha Levin <sashal@kernel.org>
 Cc:     Ben Hutchings <ben@decadent.org.uk>,
         Herbert Xu <herbert@gondor.apana.org.au>,
+        Mathias Krause <minipli@googlemail.com>,
         Steffen Klassert <steffen.klassert@secunet.com>,
         stable@vger.kernel.org, linux-crypto@vger.kernel.org,
         Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [stable-4.19 2/3] padata: initialize pd->cpu with effective cpumask
-Date:   Thu, 21 May 2020 16:40:50 -0400
-Message-Id: <20200521204051.1952184-2-daniel.m.jordan@oracle.com>
+Subject: [stable-4.14 3/4] padata: initialize pd->cpu with effective cpumask
+Date:   Thu, 21 May 2020 16:46:57 -0400
+Message-Id: <20200521204658.1952777-3-daniel.m.jordan@oracle.com>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200521204051.1952184-1-daniel.m.jordan@oracle.com>
-References: <20200521204051.1952184-1-daniel.m.jordan@oracle.com>
+In-Reply-To: <20200521204658.1952777-1-daniel.m.jordan@oracle.com>
+References: <20200521204658.1952777-1-daniel.m.jordan@oracle.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9628 signatures=668686
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=999
  adultscore=0 phishscore=0 mlxscore=0 spamscore=0 suspectscore=0
  bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2005210152
+ engine=8.12.0-2004280000 definitions=main-2005210154
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9628 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 spamscore=0
- mlxlogscore=999 clxscore=1015 priorityscore=1501 cotscore=-2147483648
- impostorscore=0 bulkscore=0 adultscore=0 malwarescore=0 phishscore=0
- mlxscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2005210153
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0
+ cotscore=-2147483648 impostorscore=0 malwarescore=0 mlxlogscore=999
+ lowpriorityscore=0 phishscore=0 spamscore=0 bulkscore=0 adultscore=0
+ priorityscore=1501 clxscore=1011 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005210153
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -137,10 +138,10 @@ Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/kernel/padata.c b/kernel/padata.c
-index 47dc31ce15ac..e9b8d517fd4b 100644
+index 66d96ed62286..6d0cdee9d321 100644
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
-@@ -451,7 +451,7 @@ static struct parallel_data *padata_alloc_pd(struct padata_instance *pinst,
+@@ -450,7 +450,7 @@ static struct parallel_data *padata_alloc_pd(struct padata_instance *pinst,
  	atomic_set(&pd->refcnt, 1);
  	pd->pinst = pinst;
  	spin_lock_init(&pd->lock);
