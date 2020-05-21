@@ -2,116 +2,102 @@ Return-Path: <SRS0=cmAM=7D=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C39ABC433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 May 2020 13:23:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48BC6C433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 May 2020 13:32:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94CF020671
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 May 2020 13:23:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590067434;
-	bh=RheZr/ACF50PLrTLkwoyqU2PDIsZGaDPXMpYDueZCDU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=Kvi2dnDs5YrRgTm7AZ4sKmUvBEhEDb+Lg6rmdi7sjSGzETv9w6cqOmGn38+GvjV5b
-	 kSYNAcYbulsf9qGV8TfuaPHzrsSqlR3/sjWEbPKGwEGO3cn8t3K4gpVahy0LcrkPjw
-	 SWa99TGxpwrJJm8P3EUJQr/8tlrEF3oNxe2e+p9I=
+	by mail.kernel.org (Postfix) with ESMTP id 128B52078B
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 May 2020 13:32:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sHEHaPj5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729372AbgEUNXy (ORCPT
+        id S1729450AbgEUNcB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 May 2020 09:23:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:32822 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729352AbgEUNXx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 May 2020 09:23:53 -0400
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D3646207F9
-        for <linux-crypto@vger.kernel.org>; Thu, 21 May 2020 13:23:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590067432;
-        bh=RheZr/ACF50PLrTLkwoyqU2PDIsZGaDPXMpYDueZCDU=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=fsUEuLUMqHtuRSm/PyyGYHOzY1/CvCuc1NTmkHUzg5VCgrJTLSjC6XkJMic3/S3U/
-         ZdihNuqxFeF0qLkJ0xxQz0dStFzD4nrNsIi9R0H1hKyGIk9JjHNN+1NOR9nYe2AiyO
-         d47LTKjkWBXyyd6YWUl0f8f65tb1iTVqlrEfPRlw=
-Received: by mail-io1-f51.google.com with SMTP id e18so7364329iog.9
-        for <linux-crypto@vger.kernel.org>; Thu, 21 May 2020 06:23:52 -0700 (PDT)
-X-Gm-Message-State: AOAM531fPkT8qVi1gQ+KUK+QOem7VbNzWsomgyuPapWZDFDNLg4bl3nh
-        H8u6mgrn3kbLPWfEZNK+/X+iVXB5c1CjvS1VBM8=
-X-Google-Smtp-Source: ABdhPJwaIQMUfYp1lPhoz8vPxi1MQQFHmLWewLp0OWy6/cyhVbyU0V/aHNV2+SpXxkAeotpL1k1aqpoqE45s6N8cffQ=
-X-Received: by 2002:a05:6638:dc3:: with SMTP id m3mr3675051jaj.98.1590067432179;
- Thu, 21 May 2020 06:23:52 -0700 (PDT)
+        Thu, 21 May 2020 09:32:01 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:36370 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729448AbgEUNcB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 21 May 2020 09:32:01 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04LDRKP6170852;
+        Thu, 21 May 2020 13:31:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=GjO090cWDER39JcJyP9Sclz0pjBt+/gcXOCebGP4+78=;
+ b=sHEHaPj5llNQrgSNHrEf7GW/SGrLZ5x9Yx415lk3x/zKGvuOYtE9uMzFIDB23wQegMHR
+ vP/vLCJws66shbrPpIkCA7Q723+3jevq+xOHH+9XlkGMXULEYlivKYW57y4OscEhORgS
+ s2CupOdfxWgW2eq3QMNZS5TB2FAgQM9IzYjq/9TaqrDeCVVKLNZSxlxfV1eJNuq7Fel8
+ rfK19ZNg3TnFn/sW5dHLkDLQMC9ZvRKf1n4dUtj11zMWFqwNpzlttDM2RYFT9Ob6Lr/v
+ QkSBBBItL3HIJ6FL0NA3vCem7pKrSFAKhlahcVCQ7x8UtUZf6EPi7xZFwjjSqMvCFBFS Rw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 3127krghcj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 21 May 2020 13:31:40 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04LDSfgp045941;
+        Thu, 21 May 2020 13:31:39 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 313gj5k5x3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 21 May 2020 13:31:39 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04LDVaD7027451;
+        Thu, 21 May 2020 13:31:38 GMT
+Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 21 May 2020 06:31:36 -0700
+Date:   Thu, 21 May 2020 09:32:00 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Ben Hutchings <ben@decadent.org.uk>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Sasha Levin <sashal@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, stable <stable@vger.kernel.org>
+Subject: Re: Backporting "padata: Remove broken queue flushing"
+Message-ID: <20200521133200.xposxym3x3zylfd7@ca-dmjordan1.us.oracle.com>
+References: <0b158b60fe621552c327e9d822bc3245591a4bd6.camel@decadent.org.uk>
+ <20200519200018.5vuyuxmjy5ypgi3w@ca-dmjordan1.us.oracle.com>
+ <87267d7217e4a3d58440079c16d313e411eab004.camel@decadent.org.uk>
+ <20200521080046.GA2615557@kroah.com>
 MIME-Version: 1.0
-References: <20200519190211.76855-1-ardb@kernel.org> <16394356.0UTfFWEGjO@tauon.chronox.de>
- <CAMj1kXF=Duh1AsAQy+aLWMcJPQ4RFL5p9-Mnmn-XAiCkzyGFbg@mail.gmail.com>
- <2010567.jSmZeKYv2B@tauon.chronox.de> <CAMj1kXGNqo=d-hgK=0zBZCoJYgSxxhhm=Jdk2gAGXPo1-KSCgA@mail.gmail.com>
- <CAOtvUMc8PhToLDVO+Y4NVhVkA6B7yndp3gbaeaQZJtrW_NSzaw@mail.gmail.com>
-In-Reply-To: <CAOtvUMc8PhToLDVO+Y4NVhVkA6B7yndp3gbaeaQZJtrW_NSzaw@mail.gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 21 May 2020 15:23:41 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFJJcg-YeSw+_FDfyOvjQTJ6w1YyKqWaxCWSjDhRLEDoA@mail.gmail.com>
-Message-ID: <CAMj1kXFJJcg-YeSw+_FDfyOvjQTJ6w1YyKqWaxCWSjDhRLEDoA@mail.gmail.com>
-Subject: Re: [RFC/RFT PATCH 0/2] crypto: add CTS output IVs for arm64 and testmgr
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     Stephan Mueller <smueller@chronox.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Eric Biggers <ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200521080046.GA2615557@kroah.com>
+User-Agent: NeoMutt/20180716
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9627 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 malwarescore=0
+ mlxscore=0 adultscore=0 bulkscore=0 suspectscore=0 mlxlogscore=940
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005210100
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9627 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 spamscore=0
+ bulkscore=0 clxscore=1015 priorityscore=1501 mlxscore=0 impostorscore=0
+ suspectscore=0 mlxlogscore=965 malwarescore=0 cotscore=-2147483648
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2005210100
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 21 May 2020 at 15:01, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
->
-> Hi Ard,
->
-> Thank you for looping me in.
->
-> On Wed, May 20, 2020 at 10:09 AM Ard Biesheuvel <ardb@kernel.org> wrote:
-> >
-> > On Wed, 20 May 2020 at 09:01, Stephan Mueller <smueller@chronox.de> wrote:
-> > >
-> > > Am Mittwoch, 20. Mai 2020, 08:54:10 CEST schrieb Ard Biesheuvel:
-> > >
-> > > Hi Ard,
-> > >
-> > > > On Wed, 20 May 2020 at 08:47, Stephan Mueller <smueller@chronox.de> wrote:
-> > ...
-> > > > > The state of all block chaining modes we currently have is defined with
-> > > > > the
-> > > > > IV. That is the reason why I mentioned it can be implemented stateless
-> > > > > when I am able to get the IV output from the previous operation.
-> > > >
-> > > > But it is simply the same as the penultimate block of ciphertext. So
-> > > > you can simply capture it after encrypt, or before decrypt. There is
-> > > > really no need to rely on the CTS transformation to pass it back to
-> > > > you via the buffer that is only specified to provide an input to the
-> > > > CTS transform.
-> > >
-> > > Let me recheck that as I am not fully sure on that one. But if it can be
-> > > handled that way, it would make life easier.
-> >
-> > Please refer to patch 2. The .iv_out test vectors were all simply
-> > copied from the appropriate offset into the associated .ctext member.
->
-> Not surprisingly since to the best of my understanding this behaviour
-> is not strictly specified, ccree currently fails the IV output check
-> with the 2nd version of the patch.
->
+On Thu, May 21, 2020 at 10:00:46AM +0200, Greg Kroah-Hartman wrote:
+> but these:
+> 
+> > [3.16-4.19] 6fc4dbcf0276 padata: Replace delayed timer with immediate workqueue in padata_reorder
+> > [3.16-4.19] ec9c7d19336e padata: initialize pd->cpu with effective cpumask
+> > [3.16-4.19] 065cf577135a padata: purge get_cpu and reorder_via_wq from padata_do_serial
+> 
+> Need some non-trivial backporting.  Can you, or someone else do it so I
+> can queue them up?  I don't have the free time at the moment, sorry.
 
-That is what I suspected, hence the cc:
+Sure, I'll do these three.
 
-> If I understand you correctly, the expected output IV is simply the
-> next to last block of the ciphertext?
-
-Yes. But this happens to work for the generic case because the CTS
-driver itself requires the encapsulated CBC mode to return the output
-IV, which is simply passed through back to the caller. CTS mode itself
-does not specify any kind of output IV, so we should not rely on this
-behavior.
+Daniel
