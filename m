@@ -5,53 +5,53 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79985C433E7
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 May 2020 20:49:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4656CC433E8
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 May 2020 20:49:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5968F20759
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 May 2020 20:49:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10B8E20759
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 May 2020 20:49:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="p3wf8Pt8"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="CRIal4mA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730129AbgEUUtG (ORCPT
+        id S1730442AbgEUUtW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 May 2020 16:49:06 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:49828 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730104AbgEUUtF (ORCPT
+        Thu, 21 May 2020 16:49:22 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:56372 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730382AbgEUUtV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 May 2020 16:49:05 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04LKlpJE118259;
-        Thu, 21 May 2020 20:48:55 GMT
+        Thu, 21 May 2020 16:49:21 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04LKlgsv143463;
+        Thu, 21 May 2020 20:49:05 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2020-01-29;
- bh=5RF03mLVfv2mJ4q7F1rX4ONplJwlTy9QEH6IhworlEA=;
- b=p3wf8Pt8hp7ruhAl4oQFe4jIjwkFr+7SxhsiP5pMgkj95BVD/2FPmaXJURTW/h2mI1M1
- uE5veQKTfNFceAEjZW8KeHxBDd9AjFw1paN3tIsEcRFOoA8NvjuKeCvqjPiH4gbxsf/7
- WBJrWVzUAhz6hshTTU7r85zU2bCtzqalSR7ZdvYYsufYj9hS3GMwyi2wWFHys/Gflb/h
- fPq1Gh9LPfMqIj60GUicmdItnk7/VbKRSa6KJSaQwHAoFhrXCoJ5vywRO4+MbM+wCznN
- pLiSUjpXUva6VOFVufPDCca+JB2vGcUAdcfPJAW2nsirTfgr+riIQS5Y5i1FVIB39RPc 3g== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 31284map6e-1
+ bh=3ahmSjfe7WVPI6VDs9i1PKjTTWGYd1+9zkUws2yrtXE=;
+ b=CRIal4mAhqvTjVvw6oRvcfH8qq2VJAwq5bovIXm93AUY207dpcaBHGqpSdaYuxr7DshJ
+ Uq9GwbrfdXhup8TwpRO/PM7QcCLEMoUleH9XgYksJRoiwlcCtJS4TTmJ+8pCw6LuFVz3
+ k9XUNFoSX5msgFkHo6yhT0B2CNsD4hWEbGSYDcMcXZ8m05KCc7okrWBLtRE70Z9hvvnn
+ 3o1XSGMdNutlAFviFn8kLcHnVf8kmsArM7S9ZPS+0RKmX0OM/ZNa4jM/NzIgVQWwMtTv
+ XcipwWv8DAdkw6QuMplY61TpP0m6OzZIoHd5Xp4YOBTb1FZVNko5kqoXg2SDr8cqtE7C cA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 3127krjq62-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 21 May 2020 20:48:55 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04LKhGJq073002;
-        Thu, 21 May 2020 20:48:54 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 312t3capsj-1
+        Thu, 21 May 2020 20:49:05 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04LKhHb3018174;
+        Thu, 21 May 2020 20:47:05 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 31502343aw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 May 2020 20:48:54 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04LKmrmE017531;
-        Thu, 21 May 2020 20:48:53 GMT
+        Thu, 21 May 2020 20:47:05 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04LKl3xX022334;
+        Thu, 21 May 2020 20:47:03 GMT
 Received: from localhost.localdomain (/98.229.125.203)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 21 May 2020 13:48:52 -0700
+        with ESMTP ; Thu, 21 May 2020 13:47:03 -0700
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Sasha Levin <sashal@kernel.org>
@@ -61,25 +61,25 @@ Cc:     Ben Hutchings <ben@decadent.org.uk>,
         Steffen Klassert <steffen.klassert@secunet.com>,
         stable@vger.kernel.org, linux-crypto@vger.kernel.org,
         Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [stable-4.9 2/4] padata: Replace delayed timer with immediate workqueue in padata_reorder
-Date:   Thu, 21 May 2020 16:48:45 -0400
-Message-Id: <20200521204847.1953064-2-daniel.m.jordan@oracle.com>
+Subject: [stable-4.14 2/4] padata: Replace delayed timer with immediate workqueue in padata_reorder
+Date:   Thu, 21 May 2020 16:46:56 -0400
+Message-Id: <20200521204658.1952777-2-daniel.m.jordan@oracle.com>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200521204847.1953064-1-daniel.m.jordan@oracle.com>
-References: <20200521204847.1953064-1-daniel.m.jordan@oracle.com>
+In-Reply-To: <20200521204658.1952777-1-daniel.m.jordan@oracle.com>
+References: <20200521204658.1952777-1-daniel.m.jordan@oracle.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9628 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 mlxlogscore=999
- phishscore=0 mlxscore=0 malwarescore=0 suspectscore=0 adultscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 bulkscore=0 suspectscore=0 phishscore=0 malwarescore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
  definitions=main-2005210153
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9628 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0
- cotscore=-2147483648 impostorscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 phishscore=0 spamscore=0 bulkscore=0 adultscore=0
- priorityscore=1501 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005210154
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 spamscore=0
+ bulkscore=0 clxscore=1015 priorityscore=1501 mlxscore=0 impostorscore=0
+ suspectscore=0 mlxlogscore=999 malwarescore=0 cotscore=-2147483648
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2005210154
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -114,7 +114,7 @@ Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 [dj: - adjust context
      - corrected setup_timer -> timer_setup to delete hunk
      - skip padata_flush_queues() hunk, function already removed
-       in 4.9]
+       in 4.14]
 Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
 ---
  include/linux/padata.h | 13 ++----
@@ -122,7 +122,7 @@ Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
  2 files changed, 22 insertions(+), 86 deletions(-)
 
 diff --git a/include/linux/padata.h b/include/linux/padata.h
-index 86c885f90878..3afa17ed59da 100644
+index 5d13d25da2c8..d803397a28f7 100644
 --- a/include/linux/padata.h
 +++ b/include/linux/padata.h
 @@ -24,7 +24,6 @@
@@ -179,7 +179,7 @@ index 86c885f90878..3afa17ed59da 100644
  
  /**
 diff --git a/kernel/padata.c b/kernel/padata.c
-index 52a1d3fd13b5..0b9c39730d6d 100644
+index 858e82179744..66d96ed62286 100644
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
 @@ -166,23 +166,12 @@ EXPORT_SYMBOL(padata_do_parallel);
