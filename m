@@ -2,104 +2,201 @@ Return-Path: <SRS0=VFM7=7E=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E49B2C433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 May 2020 03:20:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1073CC433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 May 2020 09:07:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8761D207E8
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 May 2020 03:20:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C957E207FB
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 May 2020 09:07:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=hp.com header.i=@hp.com header.b="Wfi9oRA1"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="pDqHzZ2N"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727812AbgEVDUx (ORCPT
+        id S1729348AbgEVJHk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 May 2020 23:20:53 -0400
-Received: from us-smtp-delivery-162.mimecast.com ([216.205.24.162]:55297 "EHLO
-        us-smtp-delivery-162.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727779AbgEVDUx (ORCPT
+        Fri, 22 May 2020 05:07:40 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:49890 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728424AbgEVJHj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 May 2020 23:20:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hp.com; s=mimecast20180716;
-        t=1590117651;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0IbnyWKJpnzWMST2DcvORWBehlncGDgYvCxJg+y1ea0=;
-        b=Wfi9oRA1LdC6KyGXY5NlfJCftg2E1cTkiMCNlCi+W47cSbop8TmJczU6glXwGHuoJmHppF
-        grvmpT77fIIE363ZbFVUzbu/34ksMQ3HYsRsxONiqDn3AKGDGggWq0dehVUXZMESMOc0Pg
-        4Xvi1mol2E7YyqM61ZVYzGhZGu0mRRs=
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com
- (mail-bn8nam12lp2177.outbound.protection.outlook.com [104.47.55.177])
- (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65-ge51-xN_NqKYTwZqZlXl3g-1; Thu, 21 May 2020 23:20:50 -0400
-X-MC-Unique: ge51-xN_NqKYTwZqZlXl3g-1
-Received: from TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM
- (2a01:111:e400:770b::13) by TU4PR8401MB1296.NAMPRD84.PROD.OUTLOOK.COM
- (2a01:111:e400:7709::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.24; Fri, 22 May
- 2020 03:20:49 +0000
-Received: from TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::fc7d:9cd:f9db:cfbf]) by TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::fc7d:9cd:f9db:cfbf%12]) with mapi id 15.20.3021.027; Fri, 22 May 2020
- 03:20:49 +0000
-From:   "Bhat, Jayalakshmi Manjunath" <jayalakshmi.bhat@hp.com>
-To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: Monte Carlo Test (MCT) for AES
-Thread-Topic: Monte Carlo Test (MCT) for AES
-Thread-Index: AdYv5DokmuoSohTcS6aV9BTI5pb2mgAA7F8w
-Date:   Fri, 22 May 2020 03:20:49 +0000
-Message-ID: <TU4PR8401MB054452A7CD9FF3A50F994C4DF6B40@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
-References: <TU4PR8401MB0544BD5EDA39A5E1E3388940F6B40@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
-In-Reply-To: <TU4PR8401MB0544BD5EDA39A5E1E3388940F6B40@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [106.51.106.205]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 03e810c8-27c5-429c-f988-08d7fdff2051
-x-ms-traffictypediagnostic: TU4PR8401MB1296:
-x-microsoft-antispam-prvs: <TU4PR8401MB1296DC4526CEA236DC082903F6B40@TU4PR8401MB1296.NAMPRD84.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:4303;
-x-forefront-prvs: 04111BAC64
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: repbVzOzdO87ZMQUd9OZlq3XViiYUsAKCr2DDpcJKUi0wWpIGwiVhrJKzP1SuUzFsUno8DKBf+7M2E4fMkWi+dcz4NoKtvPXb05Efpz612e/PERVebm8z70IKFduGO4SYmg1a3fpwM7zPWkh8edhisqCe0flGh4My3uEL4V5epGxQBzhTnn7su/SYsRgUzOnxVKRkbynHcU55gXTxsiknAOwEtDGI6IP9Fid2xGc7HuiBI1tGut1PLi3uHaZPvgbSc2xXuXviHxIgIppZkqpVrlwVS2HRPndatSfBK1tVSp5UOxtlYsaprn+RiubuUeIX1FsmC0G992Y8Xep2XDCIK2wxQdQQdT2Uk2TUZ105qWxac4xcgEo/xZ+X+wCTIEZa30et7nQCjWGDRNPmd5SHLFno7nPseEsZvDtlTVbLfA2tACbwjecGPznPGXT6CaA
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFTY:;SFS:(136003)(376002)(396003)(346002)(39860400002)(366004)(76116006)(66446008)(66476007)(66556008)(9686003)(86362001)(64756008)(52536014)(6916009)(71200400001)(478600001)(55016002)(5660300002)(55236004)(8936002)(2940100002)(186003)(66946007)(6506007)(8676002)(7696005)(2906002)(4744005)(26005)(316002)(4743002)(33656002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: wsVZ+VJuApEFEQZBIKoKZ7NFBR9A7veeHK5P1l9vU3oW41jlE1nzcpSX9vjd7DpZUdnUiVhMVCBu0AXwRARkYIi+vfxuYVBrNK5TN9sH+HQu20qujRJud/IAzE+qxhZk6/z0JzpMwtmSQDmvbjA8bamMz4jEcpqPMpSd0pSzbEBi7fvNtX4A1WvBArWd9rktml6JUSjosz+VH3ZZp46RMRfclfUmHmjKc/dEn8/fR9cu9QO0fh/A5vG69CxFPRFz5c3MUEa2CvXX869qDXSqOMIzwWddCa8H68voIOasB9luFfc7TFif7xAoDib+NpcWN1pIYVqnxTLN3IuLmtcnu3ShOhNb2k+Bbg9/uFxwkUMMY2CXhJi+XiJG6xtnEbX8J3n0HEYw5f/fvN5Bc9+A1k4jaGBhCTugwdpH4XSzqqPd+psV+uXVjsVkgro5Cl4UJZU610KAejXHYre1aP3/6JFoJbU7Uyw4vgYI5eZC7+keNWaSpkUx/CcdkB68M0JC
-x-ms-exchange-transport-forked: True
+        Fri, 22 May 2020 05:07:39 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20200522090737euoutp02fcebc4052c828f10adfaae263e9083eb~RToCAmEDm3252632526euoutp02d;
+        Fri, 22 May 2020 09:07:37 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20200522090737euoutp02fcebc4052c828f10adfaae263e9083eb~RToCAmEDm3252632526euoutp02d
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1590138457;
+        bh=LAJlAB+Cl4QZToEXloGJT78LJ66J5myMnOOW1nh9Qhc=;
+        h=From:To:Cc:Subject:In-Reply-To:Date:References:From;
+        b=pDqHzZ2NDNTjaklpjSTBfU3XfCScZa2fXfsVH/Pc2664IlhWOH1JsRFI3QsCiBq5l
+         kNuEBXuUu0bW0McSY1RMSng7Vy8wzGnjjBeSnp87PnhOemjePd18OXaXwG49IcXXrY
+         DyA6rSNSafwsrgJq7GaWEzOaVTwfo3qT0VzvTICQ=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20200522090737eucas1p163e418a4d66ff2b5eb8f7f071ca46d89~RToByECRN2903729037eucas1p1F;
+        Fri, 22 May 2020 09:07:37 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 6B.36.60679.85697CE5; Fri, 22
+        May 2020 10:07:36 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20200522090736eucas1p1ad308b9b37d50d9243f0fbeeeb3eab0a~RToBeOF0B0435204352eucas1p1N;
+        Fri, 22 May 2020 09:07:36 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20200522090736eusmtrp1121791b9d914631c03aaf13a893bde84~RToBdcSaz1310913109eusmtrp1U;
+        Fri, 22 May 2020 09:07:36 +0000 (GMT)
+X-AuditID: cbfec7f4-0cbff7000001ed07-02-5ec79658ba3d
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 90.46.08375.85697CE5; Fri, 22
+        May 2020 10:07:36 +0100 (BST)
+Received: from localhost (unknown [106.120.51.46]) by eusmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20200522090736eusmtip269ccc5281a270cb5335b0ae711f262b7~RToBSCf9a1808618086eusmtip2X;
+        Fri, 22 May 2020 09:07:36 +0000 (GMT)
+From:   Lukasz Stelmach <l.stelmach@samsung.com>
+To:     Dinghao Liu <dinghao.liu@zju.edu.cn>
+Cc:     kjlu@umn.edu, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Subject: Re: [PATCH] [v2] hwrng: exynos - Fix runtime PM imbalance on error
+In-Reply-To: <20200522011659.26727-1-dinghao.liu@zju.edu.cn> (Dinghao Liu's
+        message of "Fri, 22 May 2020 09:16:59 +0800")
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+Date:   Fri, 22 May 2020 11:07:11 +0200
+Message-ID: <dleftj1rncz6bk.fsf%l.stelmach@samsung.com>
 MIME-Version: 1.0
-X-OriginatorOrg: hp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 03e810c8-27c5-429c-f988-08d7fdff2051
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 May 2020 03:20:49.5486
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: ca7981a2-785a-463d-b82a-3db87dfc3ce6
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: q+6aM/NpuLQeQORhC9Y/47gQog9yrv1POxM+YoaVU/47PXr4djtCHTBtiRCL0pJqlErINwfrEoI7WR/KP7ZXqA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TU4PR8401MB1296
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: hp.com
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="=-=-="; micalg="pgp-sha256";
+        protocol="application/pgp-signature"
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SWUwTQRiAM93t7lIsDgXlDyIxDRqPiGd0CXglPqz64iOaiFbdAJEW0gUU
+        CQGPEC5Bi3IFD44oR4GCtZpqUGoEBWzrhUZRpCByWE0QUwVBKVsT377/+uafyTCEwiUNZGI1
+        ibxWo4pTUjLS1P7LtjqyqCNq7a3BcHZa106zzSVNUva26xTJnqlqotjc0SC2YGCMYB9feUqz
+        NpuBZlsGeqRs34dfEvaFuZxiS2ytEvaaKR9tl3NTkzrEmR4s5Vrqsinu/mU9zd2sTufyjXWI
+        yx8xIO5VxWma+94SzGWbndRe2X5ZxFE+LjaZ167ZekgWk/lymEwYU5zIsmZJMtBZnIO8GMAb
+        oWfiGZ2DZIwC1yAw2nM9wQSC6UmrJ/iOYHC6gfg3kj3+DImFGwj0w31SMfiMoDO3XpKDGIbC
+        odDQEOke8MfL4e6n03MmArcR4LxqmTP54T2gsw9K3eyFU8H8egi5eQEOA+NwH+32kHgptFb7
+        u9NyvBnOVBZKRPaFJ6WDpJsJrIZS25e5hQCXMmD6Ou7ZdCd0l9R62A9GO4y0yEHQVZhHuv2A
+        06FQt0mczUNgKv9Jij3h0GudpETeAWUOIyH2+8Abp694rg/oTMWetByyMhVidwg0FtzzWALh
+        3GgNEpmD5k6X56kKEHy88JY+j5aU/Xedsv+uUzarJfAKaDKvEdOr4HrFGCHyFmhs/EZeQ9I6
+        FMAnCepoXliv4Y+HCiq1kKSJDj0Sr25Bs1+wa6Zj4g4y/z5sQZhBynnyj0faoxRSVbKQorag
+        kFmTw1BvR4GkJl7DK/3lFfMfRSnkR1UpJ3lt/EFtUhwvWNAihlQGyDdUjhxQ4GhVIn+M5xN4
+        7b+qhPEKzEAXVbt3D/Rus0tGpoIeGnwuDdVIq7am67vsSfuyau1h3vpkRwDrndG/yjGTZk3r
+        K4g9+yjjcnxC+HyXEKzt77eSC7ctswgR27udcRfIIf3hVGVu9nuq/vafjm86g5DqLHY0bNiV
+        aXGlPn6ODxb9aAv9TIQtfqAceuntNFLvbJVKUohRrVtJaAXVX9WfYm2KAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrHIsWRmVeSWpSXmKPExsVy+t/xe7oR047HGbz5omLxd9IxdouNM9az
+        Wmz/3shi0bx4PZtF9ysZi/7Hr5ktTsw7y25x/vwGdotNj6+xWty/95PJ4vKuOWwWM87vY7JY
+        sK2P0YHX4/evSYwe2w6oemxa1cnmsX/uGnaPzUvqPfq2rGL06Hu5gdHj6sImdo/Pm+Q8One9
+        ZQvgitKzKcovLUlVyMgvLrFVija0MNIztLTQMzKx1DM0No+1MjJV0rezSUnNySxLLdK3S9DL
+        aLvygqXgtVBFx7kOpgbGFoEuRk4OCQETic5PFxm7GLk4hASWMkpcnruVuYuRAyghJbFybjpE
+        jbDEn2tdbBA1Txkltv/8CFbDJqAnsXZtBEiNiICGxO6nTewgNcwCW5kl3n74yQqSEBbwlph0
+        4QmYzSlQLbHr+jNGEFtIwFrizfHrzCC2qIClxJYX99lBZrIIqErsWyICEuYVMJdoXjSZCcIW
+        lDg58wkLiM0skC3xdfVz5gmMArOQpGYhSc0CmsQsoCmxfpc+RFhbYtnC18wQtq3EunXvWRYw
+        sq5iFEktLc5Nzy021CtOzC0uzUvXS87P3cQIjN9tx35u3sF4aWPwIUYBDkYlHt4HycfihFgT
+        y4orcw8xqgCNebRh9QVGKZa8/LxUJRHehfxH44R4UxIrq1KL8uOLSnNSiw8xmgK9M5FZSjQ5
+        H5hy8kriDU0NzS0sDc2NzY3NLJTEeTsEDsYICaQnlqRmp6YWpBbB9DFxcEo1MKZv/el+h6lV
+        VmQLV9n0xlcb1ubKXi56OneChkGp3sUtNift5Ze6C+XEREW98/6TmzSZxevR0fStJ2odO2tz
+        P6sE/bGRv7I/lOtwkOavnCk59gyhGe1patGLWnZo7ra69mdbYZsQo1iy4mVXBr+wx8ckHsyM
+        YtJJPfKz30fy1Ya+i4tqQx8eU2Ipzkg01GIuKk4EAGVzO/UBAwAA
+X-CMS-MailID: 20200522090736eucas1p1ad308b9b37d50d9243f0fbeeeb3eab0a
+X-Msg-Generator: CA
+X-RootMTR: 20200522090736eucas1p1ad308b9b37d50d9243f0fbeeeb3eab0a
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20200522090736eucas1p1ad308b9b37d50d9243f0fbeeeb3eab0a
+References: <20200522011659.26727-1-dinghao.liu@zju.edu.cn>
+        <CGME20200522090736eucas1p1ad308b9b37d50d9243f0fbeeeb3eab0a@eucas1p1.samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi All,
+--=-=-=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-We are using libkcapi for CAVS vectors verification on our Linux kernel. Ou=
-r Linux kernel version is 4.14.=A0 Monte Carlo Test (MCT) for SHA worked fi=
-ne using libkcapi. We are trying to perform Monte Carlo Test (MCT) for AES =
-using libkcapi.
-We not able to get the result successfully. Is it possible to use libkcapi =
-to achieve AES MCT?
+It was <2020-05-22 pi=C4=85 09:16>, when Dinghao Liu wrote:
+> pm_runtime_get_sync() increments the runtime PM usage counter even
+> when it returns an error code. Thus a pairing decrement is needed on
+> the error handling path to keep the counter balanced.
+>
+> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
+> ---
+>
+> Changelog:
+>
+> v2: -- Remove unnecessary 'err_clock' label
+> ---
+>  drivers/char/hw_random/exynos-trng.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
+>
 
-Regards,
-Jayalakshmi
+Reviewed-by: Lukasz Stelmach <l.stelmach@samsung.com>
 
+
+Thank you.
+
+> diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_rando=
+m/exynos-trng.c
+> index 8e1fe3f8dd2d..8393b898a50e 100644
+> --- a/drivers/char/hw_random/exynos-trng.c
+> +++ b/drivers/char/hw_random/exynos-trng.c
+> @@ -142,13 +142,13 @@ static int exynos_trng_probe(struct platform_device=
+ *pdev)
+>  	if (IS_ERR(trng->clk)) {
+>  		ret =3D PTR_ERR(trng->clk);
+>  		dev_err(&pdev->dev, "Could not get clock.\n");
+> -		goto err_clock;
+> +		goto err_pm_get;
+>  	}
+>=20=20
+>  	ret =3D clk_prepare_enable(trng->clk);
+>  	if (ret) {
+>  		dev_err(&pdev->dev, "Could not enable the clk.\n");
+> -		goto err_clock;
+> +		goto err_pm_get;
+>  	}
+>=20=20
+>  	ret =3D devm_hwrng_register(&pdev->dev, &trng->rng);
+> @@ -164,10 +164,8 @@ static int exynos_trng_probe(struct platform_device =
+*pdev)
+>  err_register:
+>  	clk_disable_unprepare(trng->clk);
+>=20=20
+> -err_clock:
+> -	pm_runtime_put_sync(&pdev->dev);
+> -
+>  err_pm_get:
+> +	pm_runtime_put_sync(&pdev->dev);
+>  	pm_runtime_disable(&pdev->dev);
+>=20=20
+>  	return ret;
+
+=2D-=20
+=C5=81ukasz Stelmach
+Samsung R&D Institute Poland
+Samsung Electronics
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEXpuyqjq9kGEVr9UQsK4enJilgBAFAl7Hlj8ACgkQsK4enJil
+gBDRDgf/QL0m9IpHrTs4brf2dXxQomAaGUw4FEMmyibxtjTI29tkohcH6FEiXj6f
+rsGopDupsB84vj4FRgBSTmOff68IzK754VUKTUO7PQIKO/nqnjcI6SnqJW0BcmQ5
+7ufw3mcrIYdKzjHZJjepq71BWcxBe3rYhKO78Hi9QuMojn9M42bp/54EwYJ36ODR
+Thvt66oRP3ktSqqjBBrsd+suPYn/Zr4eW553GsA/08EsV6PONcRx34NPdLwEd8oB
+z/5TBNIdOHBwWLHjc+AOPhsPEQ+OZLw06++C4PnFKlkBX/RU7HZy5CTVQS3eyak/
+0Rah/S9PSELxLUl6kBvYX/D5HrPpZA==
+=9roz
+-----END PGP SIGNATURE-----
+--=-=-=--
