@@ -2,86 +2,85 @@ Return-Path: <SRS0=VFM7=7E=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58CC5C433E1
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 May 2020 13:13:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF868C433DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 May 2020 14:13:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 398AA20759
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 May 2020 13:13:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C715622226
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 May 2020 14:13:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729838AbgEVNNL (ORCPT
+        id S1729700AbgEVON3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 May 2020 09:13:11 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:39262 "EHLO fornost.hmeau.com"
+        Fri, 22 May 2020 10:13:29 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:39526 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729334AbgEVNNL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 May 2020 09:13:11 -0400
+        id S1729399AbgEVON3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 May 2020 10:13:29 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jc7Tj-0007Pz-B1; Fri, 22 May 2020 23:12:48 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 May 2020 23:12:47 +1000
-Date:   Fri, 22 May 2020 23:12:47 +1000
+        id 1jc8QK-0008Fp-S8; Sat, 23 May 2020 00:13:22 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 23 May 2020 00:13:20 +1000
+Date:   Sat, 23 May 2020 00:13:20 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tero Kristo <t-kristo@ti.com>
+To:     Shukun Tan <tanshukun1@huawei.com>
 Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-omap@vger.kernel.org, Tejun Heo <tj@kernel.org>
-Subject: Re: [PATCHv2 3/7] crypto: omap-crypto: fix userspace copied buffer
- access
-Message-ID: <20200522131247.GA27255@gondor.apana.org.au>
-References: <20200511111913.26541-1-t-kristo@ti.com>
- <20200511111913.26541-4-t-kristo@ti.com>
+        xuzaibo@huawei.com, wangzhou1@hisilicon.com
+Subject: Re: [PATCH 0/7] crypto: hisilicon - add debugfs for DFX
+Message-ID: <20200522141320.GB859@gondor.apana.org.au>
+References: <1589534040-50725-1-git-send-email-tanshukun1@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200511111913.26541-4-t-kristo@ti.com>
+In-Reply-To: <1589534040-50725-1-git-send-email-tanshukun1@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 11, 2020 at 02:19:09PM +0300, Tero Kristo wrote:
-> In case buffers are copied from userspace, directly accessing the page
-> will most likely fail because it hasn't been mapped into the kernel
-> memory space. Fix the issue by forcing a kmap / kunmap within the
-> cleanup functionality.
+On Fri, May 15, 2020 at 05:13:53PM +0800, Shukun Tan wrote:
+> In order to quickly locate bugs of the accelerator driver, this series
+> add some DebugFS files.
 > 
-> Signed-off-by: Tero Kristo <t-kristo@ti.com>
-> ---
->  drivers/crypto/omap-crypto.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+> Add counters for accelerator's IO operation path, count all normal IO
+> operations and error IO operations. Add dump information of QM state
+> and SQC/CQC/EQC/AEQC/SQE/CQE/EQE/AEQE.
 > 
-> diff --git a/drivers/crypto/omap-crypto.c b/drivers/crypto/omap-crypto.c
-> index cc88b7362bc2..31bdb1d76d11 100644
-> --- a/drivers/crypto/omap-crypto.c
-> +++ b/drivers/crypto/omap-crypto.c
-> @@ -178,11 +178,16 @@ static void omap_crypto_copy_data(struct scatterlist *src,
->  		amt = min(src->length - srco, dst->length - dsto);
->  		amt = min(len, amt);
->  
-> -		srcb = sg_virt(src) + srco;
-> -		dstb = sg_virt(dst) + dsto;
-> +		srcb = kmap_atomic(sg_page(src)) + srco + src->offset;
-> +		dstb = kmap_atomic(sg_page(dst)) + dsto + dst->offset;
->  
->  		memcpy(dstb, srcb, amt);
->  
-> +		flush_dcache_page(sg_page(dst));
+> Hui Tang (1):
+>   crypto: hisilicon/hpre - add debugfs for Hisilicon HPRE
+> 
+> Kai Ye (1):
+>   crypto: hisilicon/sec2 - add debugfs for Hisilicon SEC
+> 
+> Longfang Liu (3):
+>   crypto: hisilicon/qm - add debugfs for QM
+>   crypto: hisilicon/qm - add debugfs to the QM state machine
+>   crypto: hisilicon/zip - add debugfs for Hisilicon ZIP
+> 
+> Shukun Tan (2):
+>   crypto: hisilicon/qm - add DebugFS for xQC and xQE dump
+>   crypto: hisilicon/qm - change debugfs file name from qm_regs to regs
+> 
+>  Documentation/ABI/testing/debugfs-hisi-hpre |  89 ++++-
+>  Documentation/ABI/testing/debugfs-hisi-sec  |  94 ++++-
+>  Documentation/ABI/testing/debugfs-hisi-zip  |  70 +++-
+>  drivers/crypto/hisilicon/hpre/hpre.h        |  17 +
+>  drivers/crypto/hisilicon/hpre/hpre_crypto.c |  99 ++++-
+>  drivers/crypto/hisilicon/hpre/hpre_main.c   |  60 +++
+>  drivers/crypto/hisilicon/qm.c               | 598 ++++++++++++++++++++++++++--
+>  drivers/crypto/hisilicon/qm.h               |  11 +
+>  drivers/crypto/hisilicon/sec2/sec.h         |   4 +
+>  drivers/crypto/hisilicon/sec2/sec_crypto.c  |  15 +-
+>  drivers/crypto/hisilicon/sec2/sec_main.c    |  49 ++-
+>  drivers/crypto/hisilicon/zip/zip.h          |   8 +
+>  drivers/crypto/hisilicon/zip/zip_crypto.c   |   9 +-
+>  drivers/crypto/hisilicon/zip/zip_main.c     |  58 +++
+>  14 files changed, 1097 insertions(+), 84 deletions(-)
 
-You need to check !PageSlab as it's illegal to call it on a kernel
-page.  Also you should be using flush_kernel_dcache_page.  scatterwalk
-uses flush_dcache_page only because when it was created the other
-function didn't exist.
-
-Would it be possible to use the sg_miter interface to do the copy?
-In fact your function could possibly be added to lib/scatterlist.c
-as it seems to be quite generic.
-
-Thanks,
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
