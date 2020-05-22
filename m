@@ -2,152 +2,104 @@ Return-Path: <SRS0=VFM7=7E=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2464C433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 May 2020 02:13:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E49B2C433DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 May 2020 03:20:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 69AE92083E
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 May 2020 02:13:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8761D207E8
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 May 2020 03:20:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lelQxwbz"
+	dkim=pass (1024-bit key) header.d=hp.com header.i=@hp.com header.b="Wfi9oRA1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727041AbgEVCNo (ORCPT
+        id S1727812AbgEVDUx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 May 2020 22:13:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52356 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726335AbgEVCNo (ORCPT
+        Thu, 21 May 2020 23:20:53 -0400
+Received: from us-smtp-delivery-162.mimecast.com ([216.205.24.162]:55297 "EHLO
+        us-smtp-delivery-162.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727779AbgEVDUx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 May 2020 22:13:44 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3D7EC061A0E
-        for <linux-crypto@vger.kernel.org>; Thu, 21 May 2020 19:13:43 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id p30so4246711pgl.11
-        for <linux-crypto@vger.kernel.org>; Thu, 21 May 2020 19:13:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=HANfjGaXtL4q1FSiLdXuotCYBYmAdZjgvWQJr0H9YMg=;
-        b=lelQxwbz5KvLR8BmclI8jocAnat7kuQ1eoRzL4S3qO9Am83e3fverb4PWKqs6DEOyV
-         NCdrcMPKKWM2WpSrCYZ8JIgZVhlby1jGUdTgnc5paxcSO+yOhjHZ0waaLltp5qtM79Ir
-         7cVjPp9/qLsXl1tg2uYAOzrV72+cuggHGqg4L3wQxpNUiWn39K2jb05JVfUJ+E/EZ+ad
-         tnxMBzEG/SPmbLbYrXFMbKdRrE9cidfG4wyUFnoPSK0Eyss0/H/7RVn/PUEBUQJcz/Ti
-         /GBlephoJpBLfGqCBvjK2aMoFrvN0D/c7fg7WlMhF+ZE3/QFFcrN31nexgxv+NnNa+Mo
-         Qptg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=HANfjGaXtL4q1FSiLdXuotCYBYmAdZjgvWQJr0H9YMg=;
-        b=ML6q+aG/ozqwYmcI7/dUKvJPF3lKBlm806hGUC6cmb7YunhG5sBejnP2EV0cmtBnO7
-         OKHwmGIzOlEWLionjeWTpP886DIV15BvkWJkzExvmSGhniIPajoitRI0CycSM9lyhAyO
-         BnLbAlXjuZEyB5CmHZP6AmvLnutO2SXJk05uh9R7jG9Wqb3r2rjDNicBNvDK+x0PFZlP
-         VpjONYKO2bTnEABBY/q3h/xGXrLxoRdQ/wUcus4QsqBdDpGJoovGnmQlWh8OH0RPXaaI
-         5BRumNgtGmxuoZzEsoA+xNPZs0StYskNV7nxU7CrjjDz9HGrBtMYVMI4K2Rpf5tGO7E2
-         ho6Q==
-X-Gm-Message-State: AOAM533lOz1C5me5JRA/4iGetmWj1MOt/UFMhkXRF+3iMiHYYKtotIMc
-        8LAOk500/E4CObpwG4Aza0SzOQ==
-X-Google-Smtp-Source: ABdhPJxh64wrCE5tLGl7klLmD3mr5bD+4uqj8uhZIjERdP/SqzgqKR0fB/XxlGgIJJR01XokaX+kyA==
-X-Received: by 2002:a63:c58:: with SMTP id 24mr11923950pgm.246.1590113623304;
-        Thu, 21 May 2020 19:13:43 -0700 (PDT)
-Received: from [10.191.1.102] ([45.135.186.71])
-        by smtp.gmail.com with ESMTPSA id y5sm5043843pge.50.2020.05.21.19.13.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 May 2020 19:13:42 -0700 (PDT)
-Subject: Re: [PATCH 0/2] Let pci_fixup_final access iommu_fwnode
-To:     Joerg Roedel <joro@8bytes.org>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Hanjun Guo <guohanjun@huawei.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-References: <1589256511-12446-1-git-send-email-zhangfei.gao@linaro.org>
-From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-Message-ID: <631857df-8e70-88e3-9959-1a750faf4f85@linaro.org>
-Date:   Fri, 22 May 2020 10:13:11 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <1589256511-12446-1-git-send-email-zhangfei.gao@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Thu, 21 May 2020 23:20:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hp.com; s=mimecast20180716;
+        t=1590117651;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0IbnyWKJpnzWMST2DcvORWBehlncGDgYvCxJg+y1ea0=;
+        b=Wfi9oRA1LdC6KyGXY5NlfJCftg2E1cTkiMCNlCi+W47cSbop8TmJczU6glXwGHuoJmHppF
+        grvmpT77fIIE363ZbFVUzbu/34ksMQ3HYsRsxONiqDn3AKGDGggWq0dehVUXZMESMOc0Pg
+        4Xvi1mol2E7YyqM61ZVYzGhZGu0mRRs=
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com
+ (mail-bn8nam12lp2177.outbound.protection.outlook.com [104.47.55.177])
+ (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-65-ge51-xN_NqKYTwZqZlXl3g-1; Thu, 21 May 2020 23:20:50 -0400
+X-MC-Unique: ge51-xN_NqKYTwZqZlXl3g-1
+Received: from TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM
+ (2a01:111:e400:770b::13) by TU4PR8401MB1296.NAMPRD84.PROD.OUTLOOK.COM
+ (2a01:111:e400:7709::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.24; Fri, 22 May
+ 2020 03:20:49 +0000
+Received: from TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::fc7d:9cd:f9db:cfbf]) by TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::fc7d:9cd:f9db:cfbf%12]) with mapi id 15.20.3021.027; Fri, 22 May 2020
+ 03:20:49 +0000
+From:   "Bhat, Jayalakshmi Manjunath" <jayalakshmi.bhat@hp.com>
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Monte Carlo Test (MCT) for AES
+Thread-Topic: Monte Carlo Test (MCT) for AES
+Thread-Index: AdYv5DokmuoSohTcS6aV9BTI5pb2mgAA7F8w
+Date:   Fri, 22 May 2020 03:20:49 +0000
+Message-ID: <TU4PR8401MB054452A7CD9FF3A50F994C4DF6B40@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
+References: <TU4PR8401MB0544BD5EDA39A5E1E3388940F6B40@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
+In-Reply-To: <TU4PR8401MB0544BD5EDA39A5E1E3388940F6B40@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
+Accept-Language: en-US
 Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [106.51.106.205]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 03e810c8-27c5-429c-f988-08d7fdff2051
+x-ms-traffictypediagnostic: TU4PR8401MB1296:
+x-microsoft-antispam-prvs: <TU4PR8401MB1296DC4526CEA236DC082903F6B40@TU4PR8401MB1296.NAMPRD84.PROD.OUTLOOK.COM>
+x-ms-oob-tlc-oobclassifiers: OLM:4303;
+x-forefront-prvs: 04111BAC64
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: repbVzOzdO87ZMQUd9OZlq3XViiYUsAKCr2DDpcJKUi0wWpIGwiVhrJKzP1SuUzFsUno8DKBf+7M2E4fMkWi+dcz4NoKtvPXb05Efpz612e/PERVebm8z70IKFduGO4SYmg1a3fpwM7zPWkh8edhisqCe0flGh4My3uEL4V5epGxQBzhTnn7su/SYsRgUzOnxVKRkbynHcU55gXTxsiknAOwEtDGI6IP9Fid2xGc7HuiBI1tGut1PLi3uHaZPvgbSc2xXuXviHxIgIppZkqpVrlwVS2HRPndatSfBK1tVSp5UOxtlYsaprn+RiubuUeIX1FsmC0G992Y8Xep2XDCIK2wxQdQQdT2Uk2TUZ105qWxac4xcgEo/xZ+X+wCTIEZa30et7nQCjWGDRNPmd5SHLFno7nPseEsZvDtlTVbLfA2tACbwjecGPznPGXT6CaA
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFTY:;SFS:(136003)(376002)(396003)(346002)(39860400002)(366004)(76116006)(66446008)(66476007)(66556008)(9686003)(86362001)(64756008)(52536014)(6916009)(71200400001)(478600001)(55016002)(5660300002)(55236004)(8936002)(2940100002)(186003)(66946007)(6506007)(8676002)(7696005)(2906002)(4744005)(26005)(316002)(4743002)(33656002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: wsVZ+VJuApEFEQZBIKoKZ7NFBR9A7veeHK5P1l9vU3oW41jlE1nzcpSX9vjd7DpZUdnUiVhMVCBu0AXwRARkYIi+vfxuYVBrNK5TN9sH+HQu20qujRJud/IAzE+qxhZk6/z0JzpMwtmSQDmvbjA8bamMz4jEcpqPMpSd0pSzbEBi7fvNtX4A1WvBArWd9rktml6JUSjosz+VH3ZZp46RMRfclfUmHmjKc/dEn8/fR9cu9QO0fh/A5vG69CxFPRFz5c3MUEa2CvXX869qDXSqOMIzwWddCa8H68voIOasB9luFfc7TFif7xAoDib+NpcWN1pIYVqnxTLN3IuLmtcnu3ShOhNb2k+Bbg9/uFxwkUMMY2CXhJi+XiJG6xtnEbX8J3n0HEYw5f/fvN5Bc9+A1k4jaGBhCTugwdpH4XSzqqPd+psV+uXVjsVkgro5Cl4UJZU610KAejXHYre1aP3/6JFoJbU7Uyw4vgYI5eZC7+keNWaSpkUx/CcdkB68M0JC
+x-ms-exchange-transport-forked: True
+MIME-Version: 1.0
+X-OriginatorOrg: hp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 03e810c8-27c5-429c-f988-08d7fdff2051
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 May 2020 03:20:49.5486
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: ca7981a2-785a-463d-b82a-3db87dfc3ce6
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: q+6aM/NpuLQeQORhC9Y/47gQog9yrv1POxM+YoaVU/47PXr4djtCHTBtiRCL0pJqlErINwfrEoI7WR/KP7ZXqA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TU4PR8401MB1296
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: hp.com
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi, Joerg
+Hi All,
 
-On 2020/5/12 下午12:08, Zhangfei Gao wrote:
-> Some platform devices appear as PCI but are
-> actually on the AMBA bus, and they need fixup in
-> drivers/pci/quirks.c handling iommu_fwnode.
-> So calling pci_fixup_final after iommu_fwnode is allocated.
->
-> For example:
-> Hisilicon platform device need fixup in
-> drivers/pci/quirks.c
->
-> +static void quirk_huawei_pcie_sva(struct pci_dev *pdev)
-> +{
-> +	struct iommu_fwspec *fwspec;
-> +
-> +	pdev->eetlp_prefix_path = 1;
-> +	fwspec = dev_iommu_fwspec_get(&pdev->dev);
-> +	if (fwspec)
-> +		fwspec->can_stall = 1;
-> +}
-> +
-> +DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_HUAWEI, 0xa250, quirk_huawei_pcie_sva);
-> +DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_HUAWEI, 0xa251, quirk_huawei_pcie_sva);
->   
->
-> Zhangfei Gao (2):
->    iommu/of: Let pci_fixup_final access iommu_fwnode
->    ACPI/IORT: Let pci_fixup_final access iommu_fwnode
->
->   drivers/acpi/arm64/iort.c | 1 +
->   drivers/iommu/of_iommu.c  | 1 +
->   2 files changed, 2 insertions(+)
->
-Would you mind give any suggestion?
+We are using libkcapi for CAVS vectors verification on our Linux kernel. Ou=
+r Linux kernel version is 4.14.=A0 Monte Carlo Test (MCT) for SHA worked fi=
+ne using libkcapi. We are trying to perform Monte Carlo Test (MCT) for AES =
+using libkcapi.
+We not able to get the result successfully. Is it possible to use libkcapi =
+to achieve AES MCT?
 
-We need access fwspec->can_stall describing the platform device (a fake 
-pcie) can support stall feature.
-can_stall will be used arm_smmu_add_device [1].
-And stall is not a pci feature, so no such member in struct pci_dev.
-
-iommu_fwnode is allocated in iommu_fwspec_init, from of_pci_iommu_init 
-or iort_pci_iommu_init.
-The pci_fixup_device(pci_fixup_final, dev) in pci_bus_add_device is too 
-early that  iommu_fwnode
-is not allocated.
-The pci_fixup_device(pci_fixup_enable, dev) in do_pci_enable_device is 
-too late after
-
-arm_smmu_add_device.
-
-
-So the idea here is calling pci_fixup_device(pci_fixup_final) after
-of_pci_iommu_init and iort_pci_iommu_init, where iommu_fwnode is allocated.
-
-
-
-[1] https://www.spinics.net/lists/linux-pci/msg94559.html
-
-Thanks
+Regards,
+Jayalakshmi
 
