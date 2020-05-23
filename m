@@ -1,78 +1,99 @@
-Return-Path: <SRS0=VFM7=7E=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=aEsr=7F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFBA4C433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 May 2020 22:11:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB0DC433E0
+	for <linux-crypto@archiver.kernel.org>; Sat, 23 May 2020 18:43:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7683120738
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 May 2020 22:11:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590185508;
-	bh=mOwJAU1r/D6//NmALGJ6aaEGSLyr181z6TL5Wf0ek5w=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=Z6i3fkFWFPwFDurOtxfulJsZN/c1U7S9uL9TQxdsH4ihXkRC0g8iLH8O97P+joMVq
-	 iZGqMlGae8OtGQ2cxxkmVlv1WrrGjOK5KGWttKIl+YuzUQ77LV3o6wraVMKfaDt68A
-	 a8Fbn8We6PMCRZoF+R13/ks7eoE2OJjNAQB5no+o=
+	by mail.kernel.org (Postfix) with ESMTP id DD7D620787
+	for <linux-crypto@archiver.kernel.org>; Sat, 23 May 2020 18:43:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="i2Hhj9bE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731083AbgEVWLr (ORCPT
+        id S1726868AbgEWSnr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 May 2020 18:11:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43980 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726563AbgEVWLr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 May 2020 18:11:47 -0400
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2617120738
-        for <linux-crypto@vger.kernel.org>; Fri, 22 May 2020 22:11:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590185507;
-        bh=mOwJAU1r/D6//NmALGJ6aaEGSLyr181z6TL5Wf0ek5w=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=NPXuESXVc61ahLr0707l46Zq5YiDkfLjchizDLdMIAKMUl75+lnN/ld/VA3/DeV/z
-         vp+xxfxdgTYIGzX433g6vZ0k4DRR1cTF/ydAsdGvPJWiq8tRQPVc8jFw17FjjsyGKm
-         olSH3PNbhUoA5M2X/UDuvx4NAul17HxqXZPzULF8=
-Received: by mail-io1-f47.google.com with SMTP id f4so13033931iov.11
-        for <linux-crypto@vger.kernel.org>; Fri, 22 May 2020 15:11:47 -0700 (PDT)
-X-Gm-Message-State: AOAM530VIVzQpTFqOVbp53eYpwuJogIxxvAj30eWdbUylkZvju26vgoc
-        YEsmfaR9twCGUoJSXCTXLLoRURg3e1U4z1HBuz4=
-X-Google-Smtp-Source: ABdhPJxS5RREkjMwK5XieCff4s6bBX3yY5OMaPNbwUG7PyFrqvNz/5QF0zY3ujJagdSP5fWD9ocDqFp9Ffw6Ub8JYXY=
-X-Received: by 2002:a05:6638:dc3:: with SMTP id m3mr10039530jaj.98.1590185506589;
- Fri, 22 May 2020 15:11:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <TU4PR8401MB0544BD5EDA39A5E1E3388940F6B40@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
- <TU4PR8401MB054452A7CD9FF3A50F994C4DF6B40@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
-In-Reply-To: <TU4PR8401MB054452A7CD9FF3A50F994C4DF6B40@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Sat, 23 May 2020 00:11:35 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFa3V1o5Djrqa0XV5HvBqLjFvWqnNLRteiZo+dbhy=Tnw@mail.gmail.com>
-Message-ID: <CAMj1kXFa3V1o5Djrqa0XV5HvBqLjFvWqnNLRteiZo+dbhy=Tnw@mail.gmail.com>
-Subject: Re: Monte Carlo Test (MCT) for AES
+        Sat, 23 May 2020 14:43:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34320 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726790AbgEWSnq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 23 May 2020 14:43:46 -0400
+Received: from mo6-p00-ob.smtp.rzone.de (mo6-p00-ob.smtp.rzone.de [IPv6:2a01:238:20a:202:5300::4])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF3D3C061A0E
+        for <linux-crypto@vger.kernel.org>; Sat, 23 May 2020 11:43:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1590259424;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=iGthswHfJP7AAhV1YdJnpKloyw5KYC0F3KhDn/onUZU=;
+        b=i2Hhj9bEWz6tQdEvx0VflzYRbt2CbcoYCFNz0/bzpFEnuaYuzGLFa1IUpNg+oZWr0B
+        Rns791HQnpNJiy8Dj8F10FcIGywf53XCeQ3xrW9JPohCNhhv2scqR9/Ps9cpuuKyKzuW
+        fZqsqXXatOxx4FhjfrgP/9g6hwrnUOH6JnZ/1wHPiTfN+sSlRiESOosjO8ab14OSFhkf
+        qwRHR81dzU1+5VnMWSgrTkWDPpVXsr/v1d562hzvXXi0YF+Lrmc55rLYp2ozUr5hoM+4
+        8v4ioEyhk/yWsTG2TI2CGTzWWJAnyUO9KMK0DXgJJVVuEmyPZ0EY0GZ0V5or+udN5lFt
+        4VoA==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbJ/SdwHc="
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+        by smtp.strato.de (RZmta 46.7.0 DYNA|AUTH)
+        with ESMTPSA id k09005w4NIhhI0v
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Sat, 23 May 2020 20:43:43 +0200 (CEST)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     "Bhat, Jayalakshmi Manjunath" <jayalakshmi.bhat@hp.com>,
-        Stephan Mueller <smueller@chronox.de>
+        Ard Biesheuvel <ardb@kernel.org>
 Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: Monte Carlo Test (MCT) for AES
+Date:   Sat, 23 May 2020 20:43:43 +0200
+Message-ID: <12555443.uLZWGnKmhe@positron.chronox.de>
+In-Reply-To: <CAMj1kXFa3V1o5Djrqa0XV5HvBqLjFvWqnNLRteiZo+dbhy=Tnw@mail.gmail.com>
+References: <TU4PR8401MB0544BD5EDA39A5E1E3388940F6B40@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM> <TU4PR8401MB054452A7CD9FF3A50F994C4DF6B40@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM> <CAMj1kXFa3V1o5Djrqa0XV5HvBqLjFvWqnNLRteiZo+dbhy=Tnw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-(+ Stephan)
+Am Samstag, 23. Mai 2020, 00:11:35 CEST schrieb Ard Biesheuvel:
 
-On Fri, 22 May 2020 at 05:20, Bhat, Jayalakshmi Manjunath
-<jayalakshmi.bhat@hp.com> wrote:
->
-> Hi All,
->
-> We are using libkcapi for CAVS vectors verification on our Linux kernel. Our Linux kernel version is 4.14.  Monte Carlo Test (MCT) for SHA worked fine using libkcapi. We are trying to perform Monte Carlo Test (MCT) for AES using libkcapi.
-> We not able to get the result successfully. Is it possible to use libkcapi to achieve AES MCT?
->
-> Regards,
-> Jayalakshmi
->
+Hi Ard,
+
+> (+ Stephan)
+> 
+> On Fri, 22 May 2020 at 05:20, Bhat, Jayalakshmi Manjunath
+> 
+> <jayalakshmi.bhat@hp.com> wrote:
+> > Hi All,
+> > 
+> > We are using libkcapi for CAVS vectors verification on our Linux kernel.
+> > Our Linux kernel version is 4.14.  Monte Carlo Test (MCT) for SHA worked
+> > fine using libkcapi. We are trying to perform Monte Carlo Test (MCT) for
+> > AES using libkcapi. We not able to get the result successfully. Is it
+> > possible to use libkcapi to achieve AES MCT?
+
+Yes, it is possible. I have the ACVP testing implemented completely for AES 
+(ECB, CBC, CFB8, CFB128, CTR, XTS, GCM internal and external IV generation, 
+CCM), TDES (ECB, CTR, CBC), SHA, HMAC, CMAC (AES and TDES). I did not yet try 
+TDES CFB8 and CFB64 through, but it should work out of the box.
+
+AES-KW is the only one that cannot be tested through libkcapi as AF_ALG has 
+one shortcoming preventing this test.
+
+The testing is implemented with [1] but the libkcapi test backend is not 
+public. The public code in [1] already implements the MCT. So, if you want to 
+use [1], all you need to implement is a libkcapi backend that just invokes the 
+ciphers as defined by the API in [1].
+
+[1] https://github.com/smuellerDD/acvpparser
+
+Ciao
+Stephan
+
+
