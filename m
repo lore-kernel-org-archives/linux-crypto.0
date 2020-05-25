@@ -2,203 +2,153 @@ Return-Path: <SRS0=4LZm=7H=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE408C433DF
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 07:24:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80886C433DF
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 07:36:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B9F6320812
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 07:24:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 542502073B
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 07:36:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="V1tL8NZb"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="LOONeXda"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389017AbgEYHY4 (ORCPT
+        id S2389060AbgEYHgu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 May 2020 03:24:56 -0400
-Received: from mx07-00178001.pphosted.com ([62.209.51.94]:23972 "EHLO
-        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2388948AbgEYHY4 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 May 2020 03:24:56 -0400
-Received: from pps.filterd (m0046668.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04P7LmsH031192;
-        Mon, 25 May 2020 09:24:23 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=st.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=STMicroelectronics;
- bh=uJWboNdI9Fne2EVmQsnu0M7tiRztbcc/DAD3CUCrI1E=;
- b=V1tL8NZbHOPYl3mFUWuhdBS7MK53SFZjDpkz9Eto8ynpMZpAQZehDjokkDTos5+A9ByT
- mHObntfUKYfsziwO6WHJXizLTUfMJkk6yWT8/rp8Ec+0HDBDL92VNcWncSwvdEDXdmmO
- D3A3ABrx0VwMfDJiVut6Yx0C6wDEHR4q78GRYsH67aiwMhva+/bd+8RN1uAnsVw/TZby
- vjsDlWp5q8z1xExWCvPnc9HsQBceuZuJeh/STJYPImiqhOLJ6BCqrlcJTndT9C3v31YO
- lDD2muSk+a7KxnL4yZVUqE3d6pEMIpJzKSuDy/s8HR8junwSf5dgHyCDH/ZHjQigmZ1y Qg== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com with ESMTP id 316sa1s0gm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 May 2020 09:24:23 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 8E03610002A;
-        Mon, 25 May 2020 09:24:19 +0200 (CEST)
-Received: from Webmail-eu.st.com (sfhdag3node1.st.com [10.75.127.7])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 4086E206038;
-        Mon, 25 May 2020 09:24:19 +0200 (CEST)
-Received: from SFHDAG6NODE1.st.com (10.75.127.16) by SFHDAG3NODE1.st.com
- (10.75.127.7) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 25 May
- 2020 09:24:18 +0200
-Received: from SFHDAG6NODE1.st.com ([fe80::8d96:4406:44e3:eb27]) by
- SFHDAG6NODE1.st.com ([fe80::8d96:4406:44e3:eb27%20]) with mapi id
- 15.00.1473.003; Mon, 25 May 2020 09:24:18 +0200
-From:   Nicolas TOROMANOFF <nicolas.toromanoff@st.com>
-To:     Ard Biesheuvel <ardb@kernel.org>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        "Alexandre TORGUE" <alexandre.torgue@st.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "linux-stm32@st-md-mailman.stormreply.com" 
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH 5/5] crypto: stm32/crc: protect from concurrent accesses
-Thread-Topic: [PATCH 5/5] crypto: stm32/crc: protect from concurrent accesses
-Thread-Index: AQHWKGdMVH9jV+o/X0uyAZQ0uxDfN6i0NRcAgAQ4E3A=
-Date:   Mon, 25 May 2020 07:24:18 +0000
-Message-ID: <67c25d90d9714a85b52f3d9c2070af88@SFHDAG6NODE1.st.com>
-References: <20200512141113.18972-1-nicolas.toromanoff@st.com>
- <20200512141113.18972-6-nicolas.toromanoff@st.com>
- <CAMj1kXGs6UgkKb5+tH2B-+26=tbjHq3UUY2gxfcRfMb1nGVuFA@mail.gmail.com>
-In-Reply-To: <CAMj1kXGs6UgkKb5+tH2B-+26=tbjHq3UUY2gxfcRfMb1nGVuFA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.75.127.44]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Mon, 25 May 2020 03:36:50 -0400
+Received: from mout.web.de ([212.227.15.14]:54773 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388947AbgEYHgu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 25 May 2020 03:36:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+        s=dbaedf251592; t=1590392175;
+        bh=iT/gUwaQaqpVOkJUsfa0h7grUSdC7vPh/BmrUkNL7Co=;
+        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
+        b=LOONeXdasncb8scIBtkcSCT49xRV/hWYYO9JGEHy59O3ErTo5pPykSN7K1YUUAbZc
+         g0/6lCo81+PNU1BMWzRRFl20tcOH6z1use2DAwSlUDkPkxHcSCtKB0bmAyUdjTX11u
+         PqtFowuKV9ifpV+fbOM8laWJppXsg8D01f7fM6Q8=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.2] ([93.135.186.124]) by smtp.web.de (mrweb001
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MbQbk-1jMYAt00gO-00IhhJ; Mon, 25
+ May 2020 09:36:15 +0200
+Subject: Re: [2/2] crypto: virtio: Fix use-after-free in
+ virtio_crypto_skcipher_finalize_req()
+To:     Longpeng <longpeng2@huawei.com>, linux-crypto@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Cc:     Arei Gonglei <arei.gonglei@huawei.com>,
+        Corentin Labbe <clabbe@baylibre.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
+References: <a5ef5d51-e35c-983f-8e7f-5f19552abe9e@web.de>
+ <a17850bb-f70d-1f77-3823-afd70816ce57@huawei.com>
+From:   Markus Elfring <Markus.Elfring@web.de>
+Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
+ 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 FEE=
+Message-ID: <cbd8ab27-71c3-2fb0-2fa3-263901596773@web.de>
+Date:   Mon, 25 May 2020 09:36:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
- definitions=2020-05-25_02:2020-05-22,2020-05-25 signatures=0
+In-Reply-To: <a17850bb-f70d-1f77-3823-afd70816ce57@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:oTWbkHStfC2cQW/NMtlSYrAIONHigj1GRezaeL0VyuGZM4c5DhR
+ PL9U+RZp/dcuvYFPKJFdyHAAhPXtGy818oxHL5G7hTudw3qG2MKlNXvn/dDsB0gTm1AHvM5
+ kwDkwgzL4U+2GrfVckrD+n5SmC6pHOXX37tEjZJV9AHBwcyvDEdMgsPVD4CteMol35wyjQS
+ 2T2I2Nw/fTyET5zcGDcnw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Fpy6EEp9PD8=:OpUONRHDhGJHD1KUkD1WA5
+ xTv8DmFKxjW4LQA1UvGmvOAkCaO/IXOyy/TyDITCf0XSxqrZpe8IkrZ20CPJwBDspAQmstX93
+ VT7/6vdcOcYAYVLxBWPm2uEihYaYjgKMA0wlKb4LTvvbFX7qGS/JN/I+0BaUVYytGQrIr2uLr
+ YsrafNumODuzhBoue8C3a0ZCSMSQifxgxDVAk9Q7e4dIpodeK4gJikK9KbjNaYYdmonhk6NgA
+ M8ivym1tpR1TvsK5+Nj/UgH09taZPCOaWh4MsOI5ub6eUA1fwTAyuL6WJaQRVGrMwDjxbUrMn
+ 4PviEFSGRtcvYMHA8StTanbr0HX1YbyHIBpu3v/4hZDF0vOpf11XiTvIKMtsBPl/VXcRB/byt
+ QTzQ5uPrTvZ5dy+RIb+s7hJzuZJNM6Ud9HKCPYA40/vluC2nlXulr5cav1bqrHjROKWSY6fF7
+ u/QcBvCJHgkWEkte/nYf7g/cyVVTg7t9KB7NFPQAKiqdFmfqGRbEOlJoXaT1PxdeY80KSyqFC
+ OTviKY5gqYkF2Z+++oIJsFTcKPHI6EXhRfHy5EbHWGt80b+VwJBvQX7B+f7nPvkX2oLnO6olH
+ EWC2XMxjJ/qoctwDhtW9FUwIQSdyglQofUlDiZG2cXMJmd5WCL/Rxl8fsALY5JhPz+Lv4InuS
+ k0nZd35K+m1AB8mHnu59I7ZSJGy1HGcEulKjQS3H7nd6xU69ZHclmQJS/ZNigx1j0gO2WCmYK
+ pYh5zMvY7j8oSRx9pQUtP4SzZfLuSXl+u7zWX2CJ08pcEtavUgwgh1qxbVPE5V9DIjrXxh+tT
+ tdKC43grpeQYy7vtwnBriy2JGA9cL/iSLJLZSnGogGg9vg4BPW6gZjYZAOXsLJqpaZPd1uA+W
+ ijemlewkADX5ckaeivQ0Qa3DMr2tGNlTgRiJStyYRcErJirbp1ssNvJ8lzCiDgr5u5XxsKzQQ
+ IS6oOqAzpPf/pJEPxb7En1Zio/ezILLIWuwsWRw/q23dy0aw2HSOz+2z0+Chx1JHMfuXE7hFi
+ apxUkYnDwM03BP1dgQFn8UgGSuW/935wB5ufgi93qkFmFbE67e0TAmVDw25PJsUyyMCR1TGjX
+ xMmqdO5H8xT4AVNDRpc0uhKJgyBWoTsxlbByB9jiRttnqF4EjB9bD5NZdjYHjqm9+6OFijMls
+ OXFkRp1NEy7vpMx7JAvFuTS/SWpjPU5Fwxm38kXGMSDGedwZYiQWJycydO3GceBcqCe1SQbBj
+ +8PIcK21kKAE/0cfs
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SGVsbG8sDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQXJkIEJpZXNo
-ZXV2ZWwgPGFyZGJAa2VybmVsLm9yZz4NCj4gU2VudDogRnJpZGF5LCBNYXkgMjIsIDIwMjAgNjox
-MiBQTT4gDQo+IE9uIFR1ZSwgMTIgTWF5IDIwMjAgYXQgMTY6MTMsIE5pY29sYXMgVG9yb21hbm9m
-Zg0KPiA8bmljb2xhcy50b3JvbWFub2ZmQHN0LmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBQcm90ZWN0
-IFNUTTMyIENSQyBkZXZpY2UgZnJvbSBjb25jdXJyZW50IGFjY2Vzc2VzLg0KPiA+DQo+ID4gQXMg
-d2UgY3JlYXRlIGEgc3BpbmxvY2tlZCBzZWN0aW9uIHRoYXQgaW5jcmVhc2Ugd2l0aCBidWZmZXIg
-c2l6ZSwgd2UNCj4gPiBwcm92aWRlIGEgbW9kdWxlIHBhcmFtZXRlciB0byByZWxlYXNlIHRoZSBw
-cmVzc3VyZSBieSBzcGxpdHRpbmcNCj4gPiBjcml0aWNhbCBzZWN0aW9uIGluIGNodW5rcy4NCj4g
-Pg0KPiA+IFNpemUgb2YgZWFjaCBjaHVuayBpcyBkZWZpbmVkIGluIGJ1cnN0X3NpemUgbW9kdWxl
-IHBhcmFtZXRlci4NCj4gPiBCeSBkZWZhdWx0IGJ1cnN0X3NpemU9MCwgaS5lLiBkb24ndCBzcGxp
-dCBpbmNvbWluZyBidWZmZXIuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBOaWNvbGFzIFRvcm9t
-YW5vZmYgPG5pY29sYXMudG9yb21hbm9mZkBzdC5jb20+DQo+IA0KPiBXb3VsZCB5b3UgbWluZCBl
-eHBsYWluaW5nIHRoZSB1c2FnZSBtb2RlbCBoZXJlPyBJdCBsb29rcyBsaWtlIHlvdSBhcmUgc2hh
-cmluZyBhDQo+IENSQyBoYXJkd2FyZSBhY2NlbGVyYXRvciB3aXRoIGEgc3luY2hyb25vdXMgaW50
-ZXJmYWNlIGJldHdlZW4gZGlmZmVyZW50IHVzZXJzDQo+IGJ5IHVzaW5nIHNwaW5sb2Nrcz8gWW91
-IGFyZSBhd2FyZSB0aGF0IHRoaXMgd2lsbCB0aWUgdXAgdGhlIHdhaXRpbmcgQ1BVcw0KPiBjb21w
-bGV0ZWx5IGR1cmluZyB0aGlzIHRpbWUsIHJpZ2h0PyBTbyBpdCB3b3VsZCBiZSBtdWNoIGJldHRl
-ciB0byB1c2UgYSBtdXRleA0KPiBoZXJlLiBPciBwZXJoYXBzIGl0IHdvdWxkIG1ha2UgbW9yZSBz
-ZW5zZSB0byBmYWxsIGJhY2sgdG8gYSBzL3cgYmFzZWQgQ1JDDQo+IHJvdXRpbmUgaWYgdGhlIGgv
-dyBpcyB0aWVkIHVwIHdvcmtpbmcgZm9yIGFub3RoZXIgdGFzaz8NCg0KSSBrbm93IG11dGV4IGFy
-ZSBtb3JlIGFjY2VwdGFibGUgaGVyZSwgYnV0IHNoYXNoIF91cGRhdGUoKSBhbmQgX2luaXQoKSBt
-YXkgYmUgY2FsbCANCmZyb20gYW55IGNvbnRleHQsIGFuZCBzbyBJIGNhbm5vdCB0YWtlIGEgbXV0
-ZXguDQpBbmQgdG8gcHJvdGVjdCBteSBjb25jdXJyZW50IEhXIGFjY2VzcyBJIG9ubHkgdGhvdWdo
-IGFib3V0IHNwaW5sb2NrLiBEdWUgdG8gcG9zc2libGUNCmNvbnN0cmFpbnQgb24gQ1BVcywgSSBh
-ZGQgYSBidXJzdF9zaXplIG9wdGlvbiB0byBmb3JjZSBzbGl0dGluZyBsb25nIGJ1ZmZlciBpbnRv
-IHNtYWxsZXIgb25lLA0KYW5kIHNvIGRlY3JlYXNlIHRpbWUgd2UgdGFrZSB0aGUgbG9jay4NCkJ1
-dCBJIGRpZG4ndCB0aG91Z2ggdG8gZmFsbGJhY2sgdG8gc29mdHdhcmUgQ1JDLg0KDQpJJ2xsIGRv
-IGEgcGF0Y2ggb24gdG9wLg0KSW4gaW4gdGhlIGJ1cnN0X3VwZGF0ZSgpIGZ1bmN0aW9uIEknbGwg
-dXNlIGEgc3Bpbl90cnlsb2NrX2lycXNhdmUoKSBhbmQgdXNlIHNvZnR3YXJlIENSQzMyIGlmIEhX
-IGlzIGFscmVhZHkgaW4gdXNlLg0KDQpUaGFua3MgYW5kIHJlZ2FyZHMsDQpOaWNvbGFzLg0KDQo+
-IFVzaW5nIHNwaW5sb2NrcyBmb3IgdGhpcyBpcyByZWFsbHkgbm90IGFjY2VwdGFibGUuDQo+IA0K
-PiANCj4gDQo+ID4gLS0tDQo+ID4gIGRyaXZlcnMvY3J5cHRvL3N0bTMyL3N0bTMyLWNyYzMyLmMg
-fCA0Nw0KPiA+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKystLQ0KPiA+ICAxIGZpbGUgY2hh
-bmdlZCwgNDUgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1n
-aXQgYS9kcml2ZXJzL2NyeXB0by9zdG0zMi9zdG0zMi1jcmMzMi5jDQo+ID4gYi9kcml2ZXJzL2Ny
-eXB0by9zdG0zMi9zdG0zMi1jcmMzMi5jDQo+ID4gaW5kZXggNDEzNDE1YzIxNmVmLi4zYmE0MTE0
-OGMyYTQgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9jcnlwdG8vc3RtMzIvc3RtMzItY3JjMzIu
-Yw0KPiA+ICsrKyBiL2RyaXZlcnMvY3J5cHRvL3N0bTMyL3N0bTMyLWNyYzMyLmMNCj4gPiBAQCAt
-MzUsMTEgKzM1LDE2IEBADQo+ID4NCj4gPiAgI2RlZmluZSBDUkNfQVVUT1NVU1BFTkRfREVMQVkg
-IDUwDQo+ID4NCj4gPiArc3RhdGljIHVuc2lnbmVkIGludCBidXJzdF9zaXplOw0KPiA+ICttb2R1
-bGVfcGFyYW0oYnVyc3Rfc2l6ZSwgdWludCwgMDY0NCk7IE1PRFVMRV9QQVJNX0RFU0MoYnVyc3Rf
-c2l6ZSwNCj4gPiArIlNlbGVjdCBidXJzdCBieXRlIHNpemUgKDAgdW5saW1pdGVkKSIpOw0KPiA+
-ICsNCj4gPiAgc3RydWN0IHN0bTMyX2NyYyB7DQo+ID4gICAgICAgICBzdHJ1Y3QgbGlzdF9oZWFk
-IGxpc3Q7DQo+ID4gICAgICAgICBzdHJ1Y3QgZGV2aWNlICAgICpkZXY7DQo+ID4gICAgICAgICB2
-b2lkIF9faW9tZW0gICAgICpyZWdzOw0KPiA+ICAgICAgICAgc3RydWN0IGNsayAgICAgICAqY2xr
-Ow0KPiA+ICsgICAgICAgc3BpbmxvY2tfdCAgICAgICBsb2NrOw0KPiA+ICB9Ow0KPiA+DQo+ID4g
-IHN0cnVjdCBzdG0zMl9jcmNfbGlzdCB7DQo+ID4gQEAgLTEwOSw2ICsxMTQsNyBAQCBzdGF0aWMg
-aW50IHN0bTMyX2NyY19pbml0KHN0cnVjdCBzaGFzaF9kZXNjICpkZXNjKQ0KPiA+ICAgICAgICAg
-c3RydWN0IHN0bTMyX2NyY19kZXNjX2N0eCAqY3R4ID0gc2hhc2hfZGVzY19jdHgoZGVzYyk7DQo+
-ID4gICAgICAgICBzdHJ1Y3Qgc3RtMzJfY3JjX2N0eCAqbWN0eCA9IGNyeXB0b19zaGFzaF9jdHgo
-ZGVzYy0+dGZtKTsNCj4gPiAgICAgICAgIHN0cnVjdCBzdG0zMl9jcmMgKmNyYzsNCj4gPiArICAg
-ICAgIHVuc2lnbmVkIGxvbmcgZmxhZ3M7DQo+ID4NCj4gPiAgICAgICAgIGNyYyA9IHN0bTMyX2Ny
-Y19nZXRfbmV4dF9jcmMoKTsNCj4gPiAgICAgICAgIGlmICghY3JjKQ0KPiA+IEBAIC0xMTYsNiAr
-MTIyLDggQEAgc3RhdGljIGludCBzdG0zMl9jcmNfaW5pdChzdHJ1Y3Qgc2hhc2hfZGVzYyAqZGVz
-YykNCj4gPg0KPiA+ICAgICAgICAgcG1fcnVudGltZV9nZXRfc3luYyhjcmMtPmRldik7DQo+ID4N
-Cj4gPiArICAgICAgIHNwaW5fbG9ja19pcnFzYXZlKCZjcmMtPmxvY2ssIGZsYWdzKTsNCj4gPiAr
-DQo+ID4gICAgICAgICAvKiBSZXNldCwgc2V0IGtleSwgcG9seSBhbmQgY29uZmlndXJlIGluIGJp
-dCByZXZlcnNlIG1vZGUgKi8NCj4gPiAgICAgICAgIHdyaXRlbF9yZWxheGVkKGJpdHJldjMyKG1j
-dHgtPmtleSksIGNyYy0+cmVncyArIENSQ19JTklUKTsNCj4gPiAgICAgICAgIHdyaXRlbF9yZWxh
-eGVkKGJpdHJldjMyKG1jdHgtPnBvbHkpLCBjcmMtPnJlZ3MgKyBDUkNfUE9MKTsgQEANCj4gPiAt
-MTI1LDE4ICsxMzMsMjEgQEAgc3RhdGljIGludCBzdG0zMl9jcmNfaW5pdChzdHJ1Y3Qgc2hhc2hf
-ZGVzYyAqZGVzYykNCj4gPiAgICAgICAgIC8qIFN0b3JlIHBhcnRpYWwgcmVzdWx0ICovDQo+ID4g
-ICAgICAgICBjdHgtPnBhcnRpYWwgPSByZWFkbF9yZWxheGVkKGNyYy0+cmVncyArIENSQ19EUik7
-DQo+ID4NCj4gPiArICAgICAgIHNwaW5fdW5sb2NrX2lycXJlc3RvcmUoJmNyYy0+bG9jaywgZmxh
-Z3MpOw0KPiA+ICsNCj4gPiAgICAgICAgIHBtX3J1bnRpbWVfbWFya19sYXN0X2J1c3koY3JjLT5k
-ZXYpOw0KPiA+ICAgICAgICAgcG1fcnVudGltZV9wdXRfYXV0b3N1c3BlbmQoY3JjLT5kZXYpOw0K
-PiA+DQo+ID4gICAgICAgICByZXR1cm4gMDsNCj4gPiAgfQ0KPiA+DQo+ID4gLXN0YXRpYyBpbnQg
-c3RtMzJfY3JjX3VwZGF0ZShzdHJ1Y3Qgc2hhc2hfZGVzYyAqZGVzYywgY29uc3QgdTggKmQ4LA0K
-PiA+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICB1bnNpZ25lZCBpbnQgbGVuZ3RoKQ0KPiA+
-ICtzdGF0aWMgaW50IGJ1cnN0X3VwZGF0ZShzdHJ1Y3Qgc2hhc2hfZGVzYyAqZGVzYywgY29uc3Qg
-dTggKmQ4LA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIHNpemVfdCBsZW5ndGgpDQo+ID4g
-IHsNCj4gPiAgICAgICAgIHN0cnVjdCBzdG0zMl9jcmNfZGVzY19jdHggKmN0eCA9IHNoYXNoX2Rl
-c2NfY3R4KGRlc2MpOw0KPiA+ICAgICAgICAgc3RydWN0IHN0bTMyX2NyY19jdHggKm1jdHggPSBj
-cnlwdG9fc2hhc2hfY3R4KGRlc2MtPnRmbSk7DQo+ID4gICAgICAgICBzdHJ1Y3Qgc3RtMzJfY3Jj
-ICpjcmM7DQo+ID4gKyAgICAgICB1bnNpZ25lZCBsb25nIGZsYWdzOw0KPiA+DQo+ID4gICAgICAg
-ICBjcmMgPSBzdG0zMl9jcmNfZ2V0X25leHRfY3JjKCk7DQo+ID4gICAgICAgICBpZiAoIWNyYykN
-Cj4gPiBAQCAtMTQ0LDYgKzE1NSw4IEBAIHN0YXRpYyBpbnQgc3RtMzJfY3JjX3VwZGF0ZShzdHJ1
-Y3Qgc2hhc2hfZGVzYw0KPiA+ICpkZXNjLCBjb25zdCB1OCAqZDgsDQo+ID4NCj4gPiAgICAgICAg
-IHBtX3J1bnRpbWVfZ2V0X3N5bmMoY3JjLT5kZXYpOw0KPiA+DQo+ID4gKyAgICAgICBzcGluX2xv
-Y2tfaXJxc2F2ZSgmY3JjLT5sb2NrLCBmbGFncyk7DQo+ID4gKw0KPiA+ICAgICAgICAgLyoNCj4g
-PiAgICAgICAgICAqIFJlc3RvcmUgcHJldmlvdXNseSBjYWxjdWxhdGVkIENSQyBmb3IgdGhpcyBj
-b250ZXh0IGFzIGluaXQgdmFsdWUNCj4gPiAgICAgICAgICAqIFJlc3RvcmUgcG9seW5vbWlhbCBj
-b25maWd1cmF0aW9uIEBAIC0xODIsMTIgKzE5NSw0MCBAQA0KPiA+IHN0YXRpYyBpbnQgc3RtMzJf
-Y3JjX3VwZGF0ZShzdHJ1Y3Qgc2hhc2hfZGVzYyAqZGVzYywgY29uc3QgdTggKmQ4LA0KPiA+ICAg
-ICAgICAgLyogU3RvcmUgcGFydGlhbCByZXN1bHQgKi8NCj4gPiAgICAgICAgIGN0eC0+cGFydGlh
-bCA9IHJlYWRsX3JlbGF4ZWQoY3JjLT5yZWdzICsgQ1JDX0RSKTsNCj4gPg0KPiA+ICsgICAgICAg
-c3Bpbl91bmxvY2tfaXJxcmVzdG9yZSgmY3JjLT5sb2NrLCBmbGFncyk7DQo+ID4gKw0KPiA+ICAg
-ICAgICAgcG1fcnVudGltZV9tYXJrX2xhc3RfYnVzeShjcmMtPmRldik7DQo+ID4gICAgICAgICBw
-bV9ydW50aW1lX3B1dF9hdXRvc3VzcGVuZChjcmMtPmRldik7DQo+ID4NCj4gPiAgICAgICAgIHJl
-dHVybiAwOw0KPiA+ICB9DQo+ID4NCj4gPiArc3RhdGljIGludCBzdG0zMl9jcmNfdXBkYXRlKHN0
-cnVjdCBzaGFzaF9kZXNjICpkZXNjLCBjb25zdCB1OCAqZDgsDQo+ID4gKyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHVuc2lnbmVkIGludCBsZW5ndGgpIHsNCj4gPiArICAgICAgIGNvbnN0IHVu
-c2lnbmVkIGludCBidXJzdF9zeiA9IGJ1cnN0X3NpemU7DQo+ID4gKyAgICAgICB1bnNpZ25lZCBp
-bnQgcmVtX3N6Ow0KPiA+ICsgICAgICAgY29uc3QgdTggKmN1cjsNCj4gPiArICAgICAgIHNpemVf
-dCBzaXplOw0KPiA+ICsgICAgICAgaW50IHJldDsNCj4gPiArDQo+ID4gKyAgICAgICBpZiAoIWJ1
-cnN0X3N6KQ0KPiA+ICsgICAgICAgICAgICAgICByZXR1cm4gYnVyc3RfdXBkYXRlKGRlc2MsIGQ4
-LCBsZW5ndGgpOw0KPiA+ICsNCj4gPiArICAgICAgIC8qIERpZ2VzdCBmaXJzdCBieXRlcyBub3Qg
-MzJiaXQgYWxpZ25lZCBhdCBmaXJzdCBwYXNzIGluIHRoZSBsb29wICovDQo+ID4gKyAgICAgICBz
-aXplID0gbWluKGxlbmd0aCwNCj4gPiArICAgICAgICAgICAgICAgICAgYnVyc3Rfc3ogKyAodW5z
-aWduZWQgaW50KWQ4IC0gQUxJR05fRE9XTigodW5zaWduZWQgaW50KWQ4LA0KPiA+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNpemVv
-Zih1MzIpKSk7DQo+ID4gKyAgICAgICBmb3IgKHJlbV9zeiA9IGxlbmd0aCwgY3VyID0gZDg7IHJl
-bV9zejsNCj4gPiArICAgICAgICAgICAgcmVtX3N6IC09IHNpemUsIGN1ciArPSBzaXplLCBzaXpl
-ID0gbWluKHJlbV9zeiwgYnVyc3Rfc3opKSB7DQo+ID4gKyAgICAgICAgICAgICAgIHJldCA9IGJ1
-cnN0X3VwZGF0ZShkZXNjLCBjdXIsIHNpemUpOw0KPiA+ICsgICAgICAgICAgICAgICBpZiAocmV0
-KQ0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiByZXQ7DQo+ID4gKyAgICAgICB9
-DQo+ID4gKw0KPiA+ICsgICAgICAgcmV0dXJuIDA7DQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRp
-YyBpbnQgc3RtMzJfY3JjX2ZpbmFsKHN0cnVjdCBzaGFzaF9kZXNjICpkZXNjLCB1OCAqb3V0KSAg
-ew0KPiA+ICAgICAgICAgc3RydWN0IHN0bTMyX2NyY19kZXNjX2N0eCAqY3R4ID0gc2hhc2hfZGVz
-Y19jdHgoZGVzYyk7IEBADQo+ID4gLTMwMCw2ICszNDEsOCBAQCBzdGF0aWMgaW50IHN0bTMyX2Ny
-Y19wcm9iZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KQ0KPiA+ICAgICAgICAgcG1fcnVu
-dGltZV9pcnFfc2FmZShkZXYpOw0KPiA+ICAgICAgICAgcG1fcnVudGltZV9lbmFibGUoZGV2KTsN
-Cj4gPg0KPiA+ICsgICAgICAgc3Bpbl9sb2NrX2luaXQoJmNyYy0+bG9jayk7DQo+ID4gKw0KPiA+
-ICAgICAgICAgcGxhdGZvcm1fc2V0X2RydmRhdGEocGRldiwgY3JjKTsNCj4gPg0KPiA+ICAgICAg
-ICAgc3Bpbl9sb2NrKCZjcmNfbGlzdC5sb2NrKTsNCj4gPiAtLQ0KPiA+IDIuMTcuMQ0KPiA+DQo=
+> Could you help me to make the sentence better?
+
+How do you think about a wording variant like the following?
+
+  So the system will crash when this memory will be used again.
+
+
+>> * You proposed to move a call of the function =E2=80=9Ccrypto_finalize_=
+skcipher_request=E2=80=9D.
+>>   How does this change fit to the mentioned position?
+>>
+> The resources which need to be freed is not used anymore, but the pointe=
+rs
+> of these resources may be changed in the function
+> "crypto_finalize_skcipher_request", so free these resources before call =
+the
+> function is suitable.
+
+Another alternative:
+  The resources which need to be cleaned up are not used any more.
+  But the pointers of these resources may be changed in the
+  function =E2=80=9Ccrypto_finalize_skcipher_request=E2=80=9D.
+  Thus release specific resources before calling this function.
+
+Regards,
+Markus
