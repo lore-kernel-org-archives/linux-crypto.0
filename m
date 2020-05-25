@@ -5,39 +5,39 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC4F5C433DF
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 20:07:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85753C433E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 20:07:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9885C2070A
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 20:07:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F7742071C
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 20:07:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=silexinside.onmicrosoft.com header.i=@silexinside.onmicrosoft.com header.b="dW8kg6wb"
+	dkim=pass (1024-bit key) header.d=silexinside.onmicrosoft.com header.i=@silexinside.onmicrosoft.com header.b="hFbUk1KA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390704AbgEYUHL (ORCPT
+        id S2390350AbgEYUH0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 May 2020 16:07:11 -0400
+        Mon, 25 May 2020 16:07:26 -0400
 Received: from mail-db5eur03hn2211.outbound.protection.outlook.com ([52.100.12.211]:3649
         "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2388794AbgEYUHI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 May 2020 16:07:08 -0400
+        id S2390748AbgEYUHZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 25 May 2020 16:07:25 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Bt41si0isPbvRGp5Z7q741R0EW+KsP6/oCXZqHCC3mCraj9Cg0Vv7GwwgysBg0YLxtzl6F6v4nD/3OhPUt2c3Iu8CgG+flf6GYeEU7tLxm9+KFIQuYOTsUI5hfpvTvjh1dAobxQYkZT7gykfXzDtUB9ixRWetYh8KlDdgz7FW2hueWBXh8a0aQ1nx3kQZ/CYj8yFN0mB3geINGa8iK+VpfXCncRXtKMasfLDrYSDBrs5RksNfz7gy8amOgeUDdESHAH5nVQo7OPe7SWmwsHZGzp53kooQePQo94IFHE470LA1l6Pblrwhvc9EhGkHls7nYLWDol6hPC4Sa4d/gUB1Q==
+ b=mJ8cfZR8rQZskRpVK78XdDPIU41lv+zqPEI9rcxhF+x/n8d1pIvGV71QsQXs7IdKy5Q+kt4LOQ22IkmAofjsgBHX6ArCy15BGWtblc4KljyUtYt+oj+5C1hVcBvaD/YyyzphCj0LmcYkcsafaUh/+4JcBtfN2jFJztdBd+IVZ+qhcjOc0PMh24BN5d3KSk3uCKhj6jt0bgfKx70Jv+iRbFQvj6iwZ92noYTRN/scw2LPTWYyFmppK/upgKVg9dnMH6w/2t9N1qnwcAo5VMMyQpl2Z+KNTcarCQ2/c8wRy7ulALimzoBZL+Lko3gxi3lb9s5tLtkMAz/B+qfZbHGeMg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=F/p+Tj3HYIX+MEo/f4dnNeBfUAuIsaaHRHxF5hv7Rvw=;
- b=oEHOn6CDygWkcc7pZahpGjl5W8AiB9NP1/eYhrY93/TxqAerJP2D92mMGscaxCuA1w0ZF6XCcts+qWelBzYjPrEliiOIo7XrwVjuu+RqhE/FHOvbK0u+87WdROtlcVXUpYzvZjXPLqo6uxqrrylC4VP0g3+iDhEhwfZ95tvZs8XAm2hXq06Qf72wJy9xW/LSP7pnx28zSPLlThO4FE5Z0AurMduZwXAv20OPPPQcKFPib4OBMC4dJ0Wd+sujGJ4t8IvJBd4DAp3cvXQvzKl4nB3WaIjp1o0uMZI5A/3vLQTEuxybDndAkNou9eSZjF+8LqOeAHM207cbFcVJwMczXQ==
+ bh=P3Scp1U+UH6TjxNGZ8CS1RRLgKP1gtpZRn/wGeY1I+A=;
+ b=ny0ywH5qwZat+hdu9LYAyH6ajvzbpXwM6IaJE6ccGtFVmrRY5m7V/Y+8gvCT/lh3ZnflUFmsDiuZ6ng948DgroHtU/OJiX+Ra0QotdGdWjNOgjNs4BL7Lz99KXPzdLq3wbFFvrJgepdD854LgqoQpl2LmNL3fdXcSAZVhrvPM23Di+YxKCZdACznf4JqGglhvpM+BqStliR8PDvOeUYhXR6X0wqBDj2iuBO1O/n7EMk4hA+HQHQ7a8y8qMRHaQMF8J5QGogiyteAiiQ/VGZEcM8rGyR7jcPyILZsCd36AzFCTnciCjb6AWcVBDZcVn0HLOV9bHQp+11wiuX2ieOdBw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=silexinsight.com; dmarc=pass action=none
  header.from=silexinsight.com; dkim=pass header.d=silexinsight.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=silexinside.onmicrosoft.com; s=selector2-silexinside-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=F/p+Tj3HYIX+MEo/f4dnNeBfUAuIsaaHRHxF5hv7Rvw=;
- b=dW8kg6wbm3egreBLDaLQX2Zd/m6heD2bQM9i7sWJ/04EmcDonUtIhtZih/GOD5CT0DSocbMqF8Sx0vFbs1+e3ihfGLE5uQPmiWhpUU3huMut+SjQJg1sF1n1Lj7dnXKusBbJR5+UQ/DX25saDyEjaQblo8wrw7uUDUB9/Xpobsg=
+ bh=P3Scp1U+UH6TjxNGZ8CS1RRLgKP1gtpZRn/wGeY1I+A=;
+ b=hFbUk1KA9QqjZcgOo7cN05LaQOiOdnRlJG2rILT60iDU8HEf9BHjgS+cZwzytUngazPaQ4KtpIARh5vT7s90bf/O0rHkoIdLtnsFduz9nDNWdTFfK8NH05tW+ie3rXzj7+XSoExwYm5KLsfo5+7wqcuTvonSH6XmvKpGvBH5n5g=
 Authentication-Results: selenic.com; dkim=none (message not signed)
  header.d=none;selenic.com; dmarc=none action=none
  header.from=silexinsight.com;
@@ -45,11 +45,11 @@ Received: from AM7PR09MB3621.eurprd09.prod.outlook.com (2603:10a6:20b:10d::15)
  by AM7PR09MB3735.eurprd09.prod.outlook.com (2603:10a6:20b:dc::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.27; Mon, 25 May
- 2020 20:07:00 +0000
+ 2020 20:07:01 +0000
 Received: from AM7PR09MB3621.eurprd09.prod.outlook.com
  ([fe80::e902:acdf:8750:e9e2]) by AM7PR09MB3621.eurprd09.prod.outlook.com
  ([fe80::e902:acdf:8750:e9e2%7]) with mapi id 15.20.3021.029; Mon, 25 May 2020
- 20:07:00 +0000
+ 20:07:01 +0000
 From:   Olivier Sobrie <olivier.sobrie@silexinsight.com>
 To:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -61,102 +61,342 @@ To:     Matt Mackall <mpm@selenic.com>,
 Cc:     Olivier Sobrie <olivier.sobrie@silexinsight.com>,
         Waleed Ziad <waleed94ziad@gmail.com>,
         sebastien.rabou@silexinsight.com
-Subject: [PATCH 2/3] dt-bindings: rng: document Silex Insight BA431 hwrng
-Date:   Mon, 25 May 2020 21:56:05 +0200
-Message-Id: <20200525195606.2941649-3-olivier.sobrie@silexinsight.com>
+Subject: [PATCH 3/3] hwrng: ba431-rng: add support for BA431 hwrng
+Date:   Mon, 25 May 2020 21:56:06 +0200
+Message-Id: <20200525195606.2941649-4-olivier.sobrie@silexinsight.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200525195606.2941649-1-olivier.sobrie@silexinsight.com>
 References: <20200525195606.2941649-1-olivier.sobrie@silexinsight.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: AM0PR04CA0071.eurprd04.prod.outlook.com
- (2603:10a6:208:1::48) To AM7PR09MB3621.eurprd09.prod.outlook.com
+X-ClientProxiedBy: AM3PR03CA0059.eurprd03.prod.outlook.com
+ (2603:10a6:207:5::17) To AM7PR09MB3621.eurprd09.prod.outlook.com
  (2603:10a6:20b:10d::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2a02:a03f:a7df:f300:30f9:36cf:6713:51ae) by AM0PR04CA0071.eurprd04.prod.outlook.com (2603:10a6:208:1::48) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23 via Frontend Transport; Mon, 25 May 2020 20:06:59 +0000
+Received: from localhost (2a02:a03f:a7df:f300:30f9:36cf:6713:51ae) by AM3PR03CA0059.eurprd03.prod.outlook.com (2603:10a6:207:5::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23 via Frontend Transport; Mon, 25 May 2020 20:07:00 +0000
 X-Mailer: git-send-email 2.26.2
 X-Originating-IP: [2a02:a03f:a7df:f300:30f9:36cf:6713:51ae]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d83e4426-2630-41b9-87df-08d800e72ef6
+X-MS-Office365-Filtering-Correlation-Id: e5bf6853-76a2-4f9e-cbb5-08d800e72f9d
 X-MS-TrafficTypeDiagnostic: AM7PR09MB3735:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR09MB373538E27089EF8B522D04E6F4B30@AM7PR09MB3735.eurprd09.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3631;
+X-Microsoft-Antispam-PRVS: <AM7PR09MB373526525739967DB01ECA40F4B30@AM7PR09MB3735.eurprd09.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
 X-Forefront-PRVS: 0414DF926F
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3otZcwKOQORmHTSBByxdlv7WBYhu5G42PQNQb69PyRg9PfbpxRshu36cRZMVbIK0wCQ/J8hdkWeXi6w/b8cY01Tb63OCN0+m69uiBqCU3p9YeN7Idgc0BI9oqRn9DRqc2S9uuLVZ0V9UNcU4RTndn/T9QVai1nV2Im7hl1hMihwjnBzwDIe0wJOwTF9N1zLU3FV97OwN+llEpFq8++LifTFuZIdJ+3dTK9koMCeTk80f9zzmCxJhxRFJeXGLEt8ezqF5ke70lNlvr+EDckZvKe2jOX8Q8iaVP1/f1v6AnTZ4MGR+0aJ/5Whrj5thOTaY0ijh1+JLncUhrWqXksrAAmw4HukQQxD0LIhowF/OwzxrhYyqJdcz0vLGgmo70t1Tx/58wS3ZrY/yzFHxW8VFlpM/Mt5KbuzvxDE5K3FWjxyXtI0hPBhyhyxugdfETKVaNvWHrHJ2lIWxHfy8O09KgbjJd66/lh6nODdXxSxahqbQHMu5CSn5pmCr5SH4//qQ4v4CLDL+GQXzXmSVGFLMQ8YSTmRcdBywdhJ989kEvp1ZTTNWXH8obeLAxwNsLoJRRFVGNQpEd4kCggdSI+tvY9guPq5LrxpfQs+AwMndj0kL452DeplaxHxdoCYglzs2pmmkec96yN23uwF3/RQOIU29RyEnLIdFUvkxQxmpyqbudwrqYuRNvtE2V4R+0YvsjHsAx9a1CUIPq+vu1TZBqB4Gt9ux90Au7dzhtyYaMbTGp1fU8i/VE1sx67OBDow9BzHgb44lqE4oFy6bvvUkkQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:AM7PR09MB3621.eurprd09.prod.outlook.com;PTR:;CAT:OSPM;SFTY:;SFS:(396003)(39840400004)(136003)(376002)(346002)(366004)(186003)(16526019)(66556008)(52116002)(2616005)(2906002)(66476007)(6496006)(107886003)(44832011)(66946007)(54906003)(110136005)(316002)(508600001)(6486002)(8936002)(36756003)(1076003)(966005)(6666004)(4326008)(5660300002)(8676002)(86362001)(23200700001);DIR:OUT;SFP:1501;
-X-MS-Exchange-AntiSpam-MessageData: EjXN0T7KaUtzx5ROSU8tSu12KK2sFGc81OiK6taKDSBhoEVVTwhsrXvV8OrDtbEDgEgKNUjR6zpdoQPYy9nwMBwBGIrCQwHErQsGbJPOPer6QapvacGugOiBJWsZ8vlpTCMIgCBb5XiFWqav/44MjnjHOVgzSLSe/Eao/0qNUCx+MxE1YbK8LColpMvh74U+h+/pkPfFzKWNTdbzZm3+wV8oTpU/JZ70rZeDvt95vs9RmpJi0d7fsBVD2wNeNxcfq7no3QS200htT465MLGA8AxrsCZIO6zEErUVQU/lFUm2zQHCygN9HNK14gEb1yvF0gw63qVuU+wOTr12Mw3avLv76u5YqkRv1x05xHS4ywbUf2uVBk3emnkmbR9cTQZxn/2bP0TzSzEXaYxyl5711jmRSIZHOe/fMNARJv9Ein9ohG8t7OxKCfCGsxp/rENCDt7GGTfQxr5u/FTjgAnvgzD0VxN1wOQrsuKFAL26AduTnX8PNLyIHrguk9xKjRN3N2/Nelnmq2RlZ4pgL+jGHGsv8rrjGd+acVIY6MGtD5w=
+X-Microsoft-Antispam-Message-Info: iEpyE3+7uRU8HgGfSly0ziVaRK2a4aRv7BWwUQBn/b+rivZJPfFttnEe16PenMd48QAgLHiWVUEb/paFAsIsTvME//rJ4NcKKLbY9TFqBg/8dhcyqbXyx6j6jM5LuoXf20l30tnun6EA30f8dCOyBe7v1S+T+h8Jr56DR3dX/4epLe+lbBURQumE85PNH/FjIHfWL6RVfS/4kPtLlaxFr1t9Z6chhXhkVY5fEgpmOHyxlXsb5+vLqZtsqvJEolkJAUlUg6eNaUPRIUi/+6/FH9fT52cJvREomWwX0Is/gpL00ws89L1iMPJxP/Z9ADIALDP9qLpO57WKdGJpU4KbcIb5QKIjPhei465KY2BHnGjxJsngzqmuxMdLSan17KRScaz7UjDHQxBOD8O0exJ3g5z31vJFX3c1nS1uXKrNdel+6UJ7hkBcxh2EqEYkkttEZgeklHmblS6Aiw2QN74x72AcCZSF73IOZZHoHoDbrqRiBF4bTdx0TMUAyUGNJQA+ETTNF2dAu7r7s+KJGd6rqHRWRWrv8keLofuRMq/jGzuhZNoyCAJJa5J5nJggVpoRTFG1LazmUi7yqw942Y0ARuK0BHoyQVDU0CfdEjaGOMi0WqDNWh3mQulzhs45X8cPKMBjhcdBiAdm9uJt1y00LX5fRYGILzrt+jB26choHapCryBkftQ6623tOM6Ti1dv
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:AM7PR09MB3621.eurprd09.prod.outlook.com;PTR:;CAT:OSPM;SFTY:;SFS:(396003)(39840400004)(136003)(376002)(346002)(366004)(186003)(16526019)(66556008)(52116002)(2616005)(2906002)(66476007)(6496006)(107886003)(44832011)(66946007)(54906003)(110136005)(316002)(508600001)(6486002)(8936002)(36756003)(1076003)(4326008)(5660300002)(8676002)(86362001)(23200700001);DIR:OUT;SFP:1501;
+X-MS-Exchange-AntiSpam-MessageData: WBlE+Cr83h5BgIVaotgP5mw/boJo2E20AFMCEXMJD/JILHYNvnQXQbvTZG15NIJtg8JBRqiKtMQzp87KyxLsyUPloXxiPva/7w0o6PXshkFB5EUep3sVQ+08qNBNq/vKqWKTAtpn2wswLdW/xEungTOANR7s/gAnxjnpfwjs49tUk7haprlbd2oIlAGkWi2YUkB+DTDiKzjUTiQHKA66pE4uhtLq+/4i8d/oHVrx4Y9P6LkhC5XP2Rq07uaXO/XUxLLLKm7kSsVqdimmF/in5bvPiCRIFzOF0Wn5zuyDL74Aihx6U4Uf0JpLiuU8jqVHCHtklkXTdELR29leK2wDfFZgQsMi/v0uTObcYjFRMYzgB2AxP49TEAbl0ZKih62x1Xv/i1oEdSN3byj8s9LgPl+ATk5kSu3fQ9T1h5y6qkIT2kRalFHeLUe6LqYaPzXXB3hKcV3lGPkC6U0CR7UypMRyYCk0IeSG5l4og6NlE5cNSKmAld1gRZaJK95fDyymVY3vzCnPqs7nEIJoLHZUuxpeg7A/Xzb42ROfcDROK/0=
 X-OriginatorOrg: silexinsight.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d83e4426-2630-41b9-87df-08d800e72ef6
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 May 2020 20:07:00.0091
+X-MS-Exchange-CrossTenant-Network-Message-Id: e5bf6853-76a2-4f9e-cbb5-08d800e72f9d
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 May 2020 20:07:01.0256
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: a02f6f9b-0f64-4420-b881-fca545d421d8
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CLdeH4BtaaBpYovYfkBiY/Dc9I0Y119tHYpneWvC/xu9ZFgjy2hnUKyJMwG4kZ08gZssH51QQLMIa4QA+Kuv7w==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6DRYqtDEI8xOk30caBlnV3+d4sz02hO0o4wqEUDR49nD7s8MqUlS3KBgYE3iK4Twq6v9FIHyr8wqkwZTa/+/uQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR09MB3735
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch documents the device tree bindings of the BA431 hardware
-random number generator.
+Silex insight BA431 is an IP designed to generate random numbers that
+can be integrated in various FPGA.
+This driver adds support for it through the hwrng interface.
 
-This IP is for instance present in the Viper OEM boards sold by Silex
-Insight.
+This driver is used in Silex Insight Viper OEM boards.
 
 Signed-off-by: Olivier Sobrie <olivier.sobrie@silexinsight.com>
+Signed-off-by: Waleed Ziad <waleed94ziad@gmail.com>
 ---
- .../bindings/rng/silex-insight,ba431-rng.yaml | 36 +++++++++++++++++++
- 1 file changed, 36 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/rng/silex-insight,ba431-rng.yaml
+ drivers/char/hw_random/Kconfig     |  10 ++
+ drivers/char/hw_random/Makefile    |   1 +
+ drivers/char/hw_random/ba431-rng.c | 240 +++++++++++++++++++++++++++++
+ 3 files changed, 251 insertions(+)
+ create mode 100644 drivers/char/hw_random/ba431-rng.c
 
-diff --git a/Documentation/devicetree/bindings/rng/silex-insight,ba431-rng.yaml b/Documentation/devicetree/bindings/rng/silex-insight,ba431-rng.yaml
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 9bc46da8d77a8..ef8928fc9999d 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -74,6 +74,16 @@ config HW_RANDOM_ATMEL
+ 
+ 	  If unsure, say Y.
+ 
++config HW_RANDOM_BA431
++	tristate "Silex Insight BA431 Random Number Generator support"
++	default HW_RANDOM
++	help
++	  This driver provides kernel-side support for the Random Number
++	  Generator hardware based on Silex Insight BA431 IP.
++
++	  To compile this driver as a module, choose M here: the
++	  module will be called ba431-rng
++
+ config HW_RANDOM_BCM2835
+ 	tristate "Broadcom BCM2835/BCM63xx Random Number Generator support"
+ 	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
+diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+index a7801b49ce6c0..02ccadafcca99 100644
+--- a/drivers/char/hw_random/Makefile
++++ b/drivers/char/hw_random/Makefile
+@@ -9,6 +9,7 @@ obj-$(CONFIG_HW_RANDOM_TIMERIOMEM) += timeriomem-rng.o
+ obj-$(CONFIG_HW_RANDOM_INTEL) += intel-rng.o
+ obj-$(CONFIG_HW_RANDOM_AMD) += amd-rng.o
+ obj-$(CONFIG_HW_RANDOM_ATMEL) += atmel-rng.o
++obj-$(CONFIG_HW_RANDOM_BA431) += ba431-rng.o
+ obj-$(CONFIG_HW_RANDOM_GEODE) += geode-rng.o
+ obj-$(CONFIG_HW_RANDOM_N2RNG) += n2-rng.o
+ n2-rng-y := n2-drv.o n2-asm.o
+diff --git a/drivers/char/hw_random/ba431-rng.c b/drivers/char/hw_random/ba431-rng.c
 new file mode 100644
-index 0000000000000..48ab82abf50ec
+index 0000000000000..d3bec75d405e4
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/silex-insight,ba431-rng.yaml
-@@ -0,0 +1,36 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/rng/silex-insight,ba431-rng.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
++++ b/drivers/char/hw_random/ba431-rng.c
+@@ -0,0 +1,240 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (c) 2018 Silex Insight sa.
 +
-+title: Silex Insight BA431 RNG bindings
++#include <linux/delay.h>
++#include <linux/hw_random.h>
++#include <linux/io.h>
++#include <linux/mod_devicetable.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++#include <linux/workqueue.h>
 +
-+description: |
-+  The BA431 hardware random number generator is an IP that is FIPS-140-2/3
-+  certified.
++#define BA431_RESET_DELAY			1 /* usec */
++#define BA431_RESET_READ_STATUS_RETRIES		100
++#define BA431_RESET_READ_STATUS_INTERVAL	10 /* usec */
++#define BA431_READ_RETRY_INTERVAL		1 /* usec */
 +
-+maintainers:
-+  - Olivier Sobrie <olivier.sobrie@silexinsight.com>
++#define BA431_REG_CTRL				0x00
++#define BA431_REG_FIFO_LEVEL			0x04
++#define BA431_REG_STATUS			0x30
++#define BA431_REG_FIFODATA			0x80
 +
-+properties:
-+  compatible:
-+    const: silex-insight,ba431-rng
++#define BA431_CTRL_ENABLE			BIT(0)
++#define BA431_CTRL_SOFTRESET			BIT(8)
 +
-+  reg:
-+    maxItems: 1
++#define BA431_STATUS_STATE_MASK			(BIT(1) | BIT(2) | BIT(3))
++#define BA431_STATUS_STATE_OFFSET		1
 +
-+required:
-+  - compatible
-+  - reg
++enum ba431_state {
++	BA431_STATE_RESET,
++	BA431_STATE_STARTUP,
++	BA431_STATE_FIFOFULLON,
++	BA431_STATE_FIFOFULLOFF,
++	BA431_STATE_RUNNING,
++	BA431_STATE_ERROR
++};
 +
-+additionalProperties: false
++struct ba431_trng {
++	struct device *dev;
++	void __iomem *base;
++	struct hwrng rng;
++	atomic_t reset_pending;
++	struct work_struct reset_work;
++};
 +
-+examples:
-+  - |
-+    rng@42800000 {
-+      compatible = "silex-insight,ba431-rng";
-+      reg = <0x42800000 0x1000>;
-+    };
++static inline u32 ba431_trng_read_reg(struct ba431_trng *ba431, u32 reg)
++{
++	return ioread32(ba431->base + reg);
++}
 +
-+...
++static inline void ba431_trng_write_reg(struct ba431_trng *ba431, u32 reg,
++					u32 val)
++{
++	iowrite32(val, ba431->base + reg);
++}
++
++static inline enum ba431_state ba431_trng_get_state(struct ba431_trng *ba431)
++{
++	u32 status = ba431_trng_read_reg(ba431, BA431_REG_STATUS);
++
++	return (status & BA431_STATUS_STATE_MASK) >> BA431_STATUS_STATE_OFFSET;
++}
++
++static int ba431_trng_is_in_error(struct ba431_trng *ba431)
++{
++	enum ba431_state state = ba431_trng_get_state(ba431);
++
++	if ((state < BA431_STATE_STARTUP) ||
++	    (state >= BA431_STATE_ERROR))
++		return 1;
++
++	return 0;
++}
++
++static int ba431_trng_reset(struct ba431_trng *ba431)
++{
++	unsigned int i;
++	enum ba431_state state;
++
++	/* Disable interrupts, random generation and enable the softreset */
++	ba431_trng_write_reg(ba431, BA431_REG_CTRL, BA431_CTRL_SOFTRESET);
++	udelay(BA431_RESET_DELAY);
++	ba431_trng_write_reg(ba431, BA431_REG_CTRL, BA431_CTRL_ENABLE);
++
++	/* Wait until the state changed */
++	for (i = 0; i < BA431_RESET_READ_STATUS_RETRIES; ++i) {
++		state = ba431_trng_get_state(ba431);
++		if (state >= BA431_STATE_STARTUP)
++			break;
++
++		udelay(BA431_RESET_READ_STATUS_INTERVAL);
++	}
++
++	if ((state < BA431_STATE_STARTUP) || (state >= BA431_STATE_ERROR)) {
++		dev_err(ba431->dev, "reset failed (state: %d)\n",
++			state);
++		return -1;
++	}
++
++	dev_info(ba431->dev, "reset done\n");
++
++	return 0;
++}
++
++static void ba431_trng_reset_work(struct work_struct *work)
++{
++	struct ba431_trng *ba431 = container_of(work, struct ba431_trng,
++						reset_work);
++	ba431_trng_reset(ba431);
++	atomic_set(&ba431->reset_pending, 0);
++}
++
++static void ba431_trng_schedule_reset(struct ba431_trng *ba431)
++{
++	if (atomic_cmpxchg(&ba431->reset_pending, 0, 1))
++		return;
++
++	schedule_work(&ba431->reset_work);
++}
++
++static int ba431_trng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
++{
++	struct ba431_trng *ba431 = container_of(rng, struct ba431_trng, rng);
++	u32 *data = buf;
++	unsigned int level, i;
++	int n = 0;
++
++	while (max > 0) {
++		level = ba431_trng_read_reg(ba431, BA431_REG_FIFO_LEVEL);
++		if (!level) {
++			if (ba431_trng_is_in_error(ba431)) {
++				ba431_trng_schedule_reset(ba431);
++				break;
++			}
++
++			if (!wait)
++				break;
++
++			udelay(BA431_READ_RETRY_INTERVAL);
++			continue;
++		}
++
++		i = level;
++		do {
++			data[n++] = ba431_trng_read_reg(ba431,
++							BA431_REG_FIFODATA);
++			max -= sizeof(*data);
++		} while (--i && (max > 0));
++
++		if (ba431_trng_is_in_error(ba431)) {
++			n -= (level - i);
++			ba431_trng_schedule_reset(ba431);
++			break;
++		}
++	}
++
++	n *= sizeof(data);
++	return (n || !wait) ? n : -EIO;
++}
++
++static void ba431_trng_cleanup(struct hwrng *rng)
++{
++	struct ba431_trng *ba431 = container_of(rng, struct ba431_trng, rng);
++
++	ba431_trng_write_reg(ba431, BA431_REG_CTRL, 0);
++	cancel_work_sync(&ba431->reset_work);
++}
++
++static int ba431_trng_init(struct hwrng *rng)
++{
++	struct ba431_trng *ba431 = container_of(rng, struct ba431_trng, rng);
++
++	return ba431_trng_reset(ba431);
++}
++
++static int ba431_trng_probe(struct platform_device *pdev)
++{
++	struct ba431_trng *ba431;
++	struct resource *res;
++	int ret;
++
++	ba431 = devm_kzalloc(&pdev->dev, sizeof(*ba431), GFP_KERNEL);
++	if (!ba431)
++		return -ENOMEM;
++
++	ba431->dev = &pdev->dev;
++
++	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	ba431->base = devm_ioremap_resource(&pdev->dev, res);
++	if (IS_ERR(ba431->base))
++		return PTR_ERR(ba431->base);
++
++	atomic_set(&ba431->reset_pending, 0);
++	INIT_WORK(&ba431->reset_work, ba431_trng_reset_work);
++	ba431->rng.name = pdev->name;
++	ba431->rng.init = ba431_trng_init;
++	ba431->rng.cleanup = ba431_trng_cleanup;
++	ba431->rng.read = ba431_trng_read;
++
++	platform_set_drvdata(pdev, ba431);
++
++	ret = hwrng_register(&ba431->rng);
++	if (ret) {
++		dev_err(&pdev->dev, "BA431 registration failed (%d)\n", ret);
++		return ret;
++	}
++
++	dev_info(&pdev->dev, "BA431 TRNG registered\n");
++
++	return 0;
++}
++
++static int ba431_trng_remove(struct platform_device *pdev)
++{
++	struct ba431_trng *ba431 = platform_get_drvdata(pdev);
++
++	hwrng_unregister(&ba431->rng);
++
++	return 0;
++}
++
++static const struct of_device_id ba431_trng_dt_ids[] = {
++	{ .compatible = "silex-insight,ba431-rng", .data = NULL },
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(of, ba431_trng_dt_ids);
++
++static struct platform_driver ba431_trng_driver = {
++	.driver = {
++		.name = "ba431-rng",
++		.of_match_table = ba431_trng_dt_ids,
++	},
++	.probe = ba431_trng_probe,
++	.remove = ba431_trng_remove,
++};
++
++module_platform_driver(ba431_trng_driver);
++
++MODULE_AUTHOR("Olivier Sobrie <olivier@sobrie.be>");
++MODULE_DESCRIPTION("TRNG driver for Silex Insight BA431");
++MODULE_LICENSE("GPL");
 -- 
 2.26.2
 
