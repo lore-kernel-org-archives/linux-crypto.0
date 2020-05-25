@@ -6,21 +6,21 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D72DFC433E0
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 00:56:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 174E2C433E1
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 00:56:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BCB302076C
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 00:56:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EEBE22076C
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 00:56:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387862AbgEYA4t (ORCPT
+        id S2388309AbgEYA4w (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 24 May 2020 20:56:49 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5275 "EHLO huawei.com"
+        Sun, 24 May 2020 20:56:52 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:35350 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2388303AbgEYA4s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 24 May 2020 20:56:48 -0400
+        id S2388300AbgEYA4t (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 24 May 2020 20:56:49 -0400
 Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 854FEC909179FD7431D5;
+        by Forcepoint Email with ESMTP id B2A869B05EB5BC246CD8;
         Mon, 25 May 2020 08:56:46 +0800 (CST)
 Received: from DESKTOP-27KDQMV.china.huawei.com (10.174.151.115) by
  DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
@@ -36,9 +36,9 @@ CC:     "Longpeng(Mike)" <longpeng2@huawei.com>,
         <virtualization@lists.linux-foundation.org>,
         <linux-kernel@vger.kernel.org>,
         LABBE Corentin <clabbe@baylibre.com>
-Subject: [PATCH 1/2] crypto: virtio: fix src/dst scatterlist calculation
-Date:   Mon, 25 May 2020 08:56:26 +0800
-Message-ID: <20200525005627.707-2-longpeng2@huawei.com>
+Subject: [PATCH 2/2] crypto: virtio: fix an memory use-after-free bug
+Date:   Mon, 25 May 2020 08:56:27 +0800
+Message-ID: <20200525005627.707-3-longpeng2@huawei.com>
 X-Mailer: git-send-email 2.25.0.windows.1
 In-Reply-To: <20200525005627.707-1-longpeng2@huawei.com>
 References: <20200525005627.707-1-longpeng2@huawei.com>
@@ -52,18 +52,31 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The system will crash when we insmod crypto/tcrypt.ko whit mode=38.
+The system'll crash when we insmod crypto/tcrypto.ko with mode=155.
 
-Usually the next entry of one sg will be @sg@ + 1, but if this sg element
-is part of a chained scatterlist, it could jump to the start of a new
-scatterlist array. Let's fix it by sg_next() on calculation of src/dst
-scatterlist.
+After dig into this case, I find it's caused by reuse the request
+memory.
 
-BTW I add a check for sg_nents_for_len() its return value since
-sg_nents_for_len() function could fail.
+In crypto_authenc_init_tfm, we'll set the reqsize to:
+  [PART 1]sizeof(authenc_request_ctx) +
+  [PART 2]ictx->reqoff +
+  [PART 3]MAX(ahash part, skcipher part)
+and the 'PART 3' will be used by both ahash and skcipher.
+
+When virtio_crypto driver finish skcipher req, it'll call ->complete
+callback(in crypto_finalize_skcipher_request) and then free its
+resources which pointers are recorded in 'skcipher parts'.
+
+However, the ->complete is 'crypto_authenc_encrypt_done' in this case,
+it will use the 'ahash part' of the request and change its content,
+so virtio_crypto driver will get the wrong pointer after ->complete
+finish and mistakenly free some other memory. So the system will crash
+at last when this memory be used again.
+
+We can free the resources before calling ->complete to fix this issue.
 
 Cc: Gonglei <arei.gonglei@huawei.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>                                                                                                                                                                      
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Jason Wang <jasowang@redhat.com>
 Cc: "David S. Miller" <davem@davemloft.net>
@@ -71,48 +84,29 @@ Cc: virtualization@lists.linux-foundation.org
 Cc: linux-kernel@vger.kernel.org
 
 Reported-by: LABBE Corentin <clabbe@baylibre.com>
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- drivers/crypto/virtio/virtio_crypto_algs.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ drivers/crypto/virtio/virtio_crypto_algs.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c b/drivers/crypto/virtio/virtio_crypto_algs.c
-index 372babb44112..2fa1129f96d6 100644
+index 2fa1129f96d6..3800356fb764 100644
 --- a/drivers/crypto/virtio/virtio_crypto_algs.c
 +++ b/drivers/crypto/virtio/virtio_crypto_algs.c
-@@ -359,8 +359,14 @@ __virtio_crypto_skcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
- 	unsigned int num_out = 0, num_in = 0;
- 	int sg_total;
- 	uint8_t *iv;
-+	struct scatterlist *sg;
- 
- 	src_nents = sg_nents_for_len(req->src, req->cryptlen);
-+	if (src_nents < 0) {
-+		pr_err("Invalid number of src SG.\n");
-+		return src_nents;
-+	}
+@@ -587,10 +587,11 @@ static void virtio_crypto_skcipher_finalize_req(
+ 		scatterwalk_map_and_copy(req->iv, req->dst,
+ 					 req->cryptlen - AES_BLOCK_SIZE,
+ 					 AES_BLOCK_SIZE, 0);
+-	crypto_finalize_skcipher_request(vc_sym_req->base.dataq->engine,
+-					   req, err);
+ 	kzfree(vc_sym_req->iv);
+ 	virtcrypto_clear_request(&vc_sym_req->base);
 +
- 	dst_nents = sg_nents(req->dst);
++	crypto_finalize_skcipher_request(vc_sym_req->base.dataq->engine,
++					   req, err);
+ }
  
- 	pr_debug("virtio_crypto: Number of sgs (src_nents: %d, dst_nents: %d)\n",
-@@ -446,12 +452,12 @@ __virtio_crypto_skcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
- 	vc_sym_req->iv = iv;
- 
- 	/* Source data */
--	for (i = 0; i < src_nents; i++)
--		sgs[num_out++] = &req->src[i];
-+	for (sg = req->src, i = 0; sg && i < src_nents; sg = sg_next(sg), i++)
-+		sgs[num_out++] = sg;
- 
- 	/* Destination data */
--	for (i = 0; i < dst_nents; i++)
--		sgs[num_out + num_in++] = &req->dst[i];
-+	for (sg = req->dst, i = 0; sg && i < dst_nents; sg = sg_next(sg), i++)
-+		sgs[num_out + num_in++] = sg;
- 
- 	/* Status */
- 	sg_init_one(&status_sg, &vc_req->status, sizeof(vc_req->status));
+ static struct virtio_crypto_algo virtio_crypto_algs[] = { {
 -- 
 2.17.1
 
