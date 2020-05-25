@@ -1,148 +1,118 @@
-Return-Path: <SRS0=aEsr=7F=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=4LZm=7H=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20679C433E0
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 May 2020 22:40:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D72DFC433E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 00:56:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6B4120727
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 May 2020 22:40:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590273617;
-	bh=PeI+WYnPsD7w0jwv2k/jUh8n9+ukJb90e5rZ9yP2Czs=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=SMqZqDCuYb/StU/K7bC2K/7YY79UC8UXkBlYtywLr1vv6ysHEdC/SfK2XWldz658Y
-	 o/fgvanFqWT3mOdo9mViUA5ACDTEZyy7XdeJE241f7pDRtdy0Wxr41bYhPo07mnSOM
-	 qdIQHUdrl3mDFHjCDA7VaY+7YVdVZjRRkytInZsY=
+	by mail.kernel.org (Postfix) with ESMTP id BCB302076C
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 00:56:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728414AbgEWWkR (ORCPT
+        id S2387862AbgEYA4t (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 23 May 2020 18:40:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53428 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727827AbgEWWkR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 23 May 2020 18:40:17 -0400
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7B7C720727
-        for <linux-crypto@vger.kernel.org>; Sat, 23 May 2020 22:40:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590273616;
-        bh=PeI+WYnPsD7w0jwv2k/jUh8n9+ukJb90e5rZ9yP2Czs=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=nnFvQEzMjolV/IawZclz6nakDTmydTSeo6A2kSbIydHNLPJzHOxOVzdMcM5jbI6rf
-         yf/mHWw3195y/yc0HNvl16CBQKyAE3PWGvSZ/MEofZ8cmd/7UlpVEqScL9DsSOf6EB
-         mIHvvhAFHZTo7YDZEYjYOvoMFVu4XxIvq/x8lIS4=
-Received: by mail-io1-f41.google.com with SMTP id h10so15278052iob.10
-        for <linux-crypto@vger.kernel.org>; Sat, 23 May 2020 15:40:16 -0700 (PDT)
-X-Gm-Message-State: AOAM530NVH5wzIechyhp2S8ErRND+J7jPFzLnEPbZrkw9JLXZcjBPbkC
-        0ObIMPhL4tNIopYKb32oyaf6q7dhnxciXq7yk9s=
-X-Google-Smtp-Source: ABdhPJyzVeU86GlVacAqa4xWM29EOFA4kXo723B/Wa5Uqrdl2aeZl3OjnwdRlS1pf+ifI+wzJWGqXW+iymYOfxhzfgY=
-X-Received: by 2002:a6b:5008:: with SMTP id e8mr8369503iob.161.1590273615918;
- Sat, 23 May 2020 15:40:15 -0700 (PDT)
+        Sun, 24 May 2020 20:56:49 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5275 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2388303AbgEYA4s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 24 May 2020 20:56:48 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 854FEC909179FD7431D5;
+        Mon, 25 May 2020 08:56:46 +0800 (CST)
+Received: from DESKTOP-27KDQMV.china.huawei.com (10.174.151.115) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 25 May 2020 08:56:39 +0800
+From:   "Longpeng(Mike)" <longpeng2@huawei.com>
+To:     <linux-crypto@vger.kernel.org>
+CC:     "Longpeng(Mike)" <longpeng2@huawei.com>,
+        Gonglei <arei.gonglei@huawei.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        <virtualization@lists.linux-foundation.org>,
+        <linux-kernel@vger.kernel.org>,
+        LABBE Corentin <clabbe@baylibre.com>
+Subject: [PATCH 1/2] crypto: virtio: fix src/dst scatterlist calculation
+Date:   Mon, 25 May 2020 08:56:26 +0800
+Message-ID: <20200525005627.707-2-longpeng2@huawei.com>
+X-Mailer: git-send-email 2.25.0.windows.1
+In-Reply-To: <20200525005627.707-1-longpeng2@huawei.com>
+References: <20200525005627.707-1-longpeng2@huawei.com>
 MIME-Version: 1.0
-References: <20200519190211.76855-1-ardb@kernel.org> <CAOtvUMc8PhToLDVO+Y4NVhVkA6B7yndp3gbaeaQZJtrW_NSzaw@mail.gmail.com>
- <CAMj1kXFJJcg-YeSw+_FDfyOvjQTJ6w1YyKqWaxCWSjDhRLEDoA@mail.gmail.com> <9730423.nUPlyArG6x@positron.chronox.de>
-In-Reply-To: <9730423.nUPlyArG6x@positron.chronox.de>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Sun, 24 May 2020 00:40:04 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXG2SuWWyAkinAumW=uBVSdg6BUX0zVPWDX1pnxVW8RusA@mail.gmail.com>
-Message-ID: <CAMj1kXG2SuWWyAkinAumW=uBVSdg6BUX0zVPWDX1pnxVW8RusA@mail.gmail.com>
-Subject: Re: [RFC/RFT PATCH 0/2] crypto: add CTS output IVs for arm64 and testmgr
-To:     =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
-Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Eric Biggers <ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.174.151.115]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 23 May 2020 at 20:52, Stephan M=C3=BCller <smueller@chronox.de> wro=
-te:
->
-> Am Donnerstag, 21. Mai 2020, 15:23:41 CEST schrieb Ard Biesheuvel:
->
-> Hi Ard,
->
-> > On Thu, 21 May 2020 at 15:01, Gilad Ben-Yossef <gilad@benyossef.com> wr=
-ote:
-> > > Hi Ard,
-> > >
-> > > Thank you for looping me in.
-> > >
-> > > On Wed, May 20, 2020 at 10:09 AM Ard Biesheuvel <ardb@kernel.org> wro=
-te:
-> > > > On Wed, 20 May 2020 at 09:01, Stephan Mueller <smueller@chronox.de>
-> wrote:
-> > > > > Am Mittwoch, 20. Mai 2020, 08:54:10 CEST schrieb Ard Biesheuvel:
-> > > > >
-> > > > > Hi Ard,
-> > > > >
-> > > > > > On Wed, 20 May 2020 at 08:47, Stephan Mueller <smueller@chronox=
-.de>
-> wrote:
-> > > > ...
-> > > >
-> > > > > > > The state of all block chaining modes we currently have is de=
-fined
-> > > > > > > with
-> > > > > > > the
-> > > > > > > IV. That is the reason why I mentioned it can be implemented
-> > > > > > > stateless
-> > > > > > > when I am able to get the IV output from the previous operati=
-on.
-> > > > > >
-> > > > > > But it is simply the same as the penultimate block of ciphertex=
-t. So
-> > > > > > you can simply capture it after encrypt, or before decrypt. The=
-re is
-> > > > > > really no need to rely on the CTS transformation to pass it bac=
-k to
-> > > > > > you via the buffer that is only specified to provide an input t=
-o the
-> > > > > > CTS transform.
-> > > > >
-> > > > > Let me recheck that as I am not fully sure on that one. But if it=
- can
-> > > > > be
-> > > > > handled that way, it would make life easier.
-> > > >
-> > > > Please refer to patch 2. The .iv_out test vectors were all simply
-> > > > copied from the appropriate offset into the associated .ctext membe=
-r.
-> > >
-> > > Not surprisingly since to the best of my understanding this behaviour
-> > > is not strictly specified, ccree currently fails the IV output check
-> > > with the 2nd version of the patch.
-> >
-> > That is what I suspected, hence the cc:
-> > > If I understand you correctly, the expected output IV is simply the
-> > > next to last block of the ciphertext?
-> >
-> > Yes. But this happens to work for the generic case because the CTS
-> > driver itself requires the encapsulated CBC mode to return the output
-> > IV, which is simply passed through back to the caller. CTS mode itself
-> > does not specify any kind of output IV, so we should not rely on this
-> > behavior.
->
-> Note, the update to the spec based on your suggestion is already in a mer=
-ge
-> request:
->
-> https://github.com/usnistgov/ACVP/issues/860
->
-> Thanks for your input.
->
+The system will crash when we insmod crypto/tcrypt.ko whit mode=38.
 
-Thanks for the head's up. I've left a comment there, as the proposed
-change is not equivalent to the unspecified current behavior.
+Usually the next entry of one sg will be @sg@ + 1, but if this sg element
+is part of a chained scatterlist, it could jump to the start of a new
+scatterlist array. Let's fix it by sg_next() on calculation of src/dst
+scatterlist.
+
+BTW I add a check for sg_nents_for_len() its return value since
+sg_nents_for_len() function could fail.
+
+Cc: Gonglei <arei.gonglei@huawei.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: virtualization@lists.linux-foundation.org
+Cc: linux-kernel@vger.kernel.org
+
+Reported-by: LABBE Corentin <clabbe@baylibre.com>
+Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+---
+ drivers/crypto/virtio/virtio_crypto_algs.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c b/drivers/crypto/virtio/virtio_crypto_algs.c
+index 372babb44112..2fa1129f96d6 100644
+--- a/drivers/crypto/virtio/virtio_crypto_algs.c
++++ b/drivers/crypto/virtio/virtio_crypto_algs.c
+@@ -359,8 +359,14 @@ __virtio_crypto_skcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
+ 	unsigned int num_out = 0, num_in = 0;
+ 	int sg_total;
+ 	uint8_t *iv;
++	struct scatterlist *sg;
+ 
+ 	src_nents = sg_nents_for_len(req->src, req->cryptlen);
++	if (src_nents < 0) {
++		pr_err("Invalid number of src SG.\n");
++		return src_nents;
++	}
++
+ 	dst_nents = sg_nents(req->dst);
+ 
+ 	pr_debug("virtio_crypto: Number of sgs (src_nents: %d, dst_nents: %d)\n",
+@@ -446,12 +452,12 @@ __virtio_crypto_skcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
+ 	vc_sym_req->iv = iv;
+ 
+ 	/* Source data */
+-	for (i = 0; i < src_nents; i++)
+-		sgs[num_out++] = &req->src[i];
++	for (sg = req->src, i = 0; sg && i < src_nents; sg = sg_next(sg), i++)
++		sgs[num_out++] = sg;
+ 
+ 	/* Destination data */
+-	for (i = 0; i < dst_nents; i++)
+-		sgs[num_out + num_in++] = &req->dst[i];
++	for (sg = req->dst, i = 0; sg && i < dst_nents; sg = sg_next(sg), i++)
++		sgs[num_out + num_in++] = sg;
+ 
+ 	/* Status */
+ 	sg_init_one(&status_sg, &vc_req->status, sizeof(vc_req->status));
+-- 
+2.17.1
+
