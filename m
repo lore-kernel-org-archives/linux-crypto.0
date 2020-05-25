@@ -5,46 +5,45 @@ X-Spam-Level:
 X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBA68C433E0
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 06:05:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAEE8C433DF
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 06:30:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A695B206D5
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 06:05:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0E3C207DA
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 06:30:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="jF2kJHUM"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="bYFkPCKo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388787AbgEYGFp (ORCPT
+        id S2388631AbgEYGa6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 May 2020 02:05:45 -0400
-Received: from mout.web.de ([212.227.15.4]:58789 "EHLO mout.web.de"
+        Mon, 25 May 2020 02:30:58 -0400
+Received: from mout.web.de ([212.227.15.14]:50863 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388772AbgEYGFo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 May 2020 02:05:44 -0400
+        id S1730230AbgEYGa6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 25 May 2020 02:30:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1590386713;
-        bh=AZ5lex9OczzMAvJaxc7Y2dYDY+Uz+nr3GAaKgYS5dB0=;
+        s=dbaedf251592; t=1590388230;
+        bh=/9wdd84b0g/HMv7RXAUNfPCz7+7xvBghiVydVXUx/Do=;
         h=X-UI-Sender-Class:To:Cc:Subject:From:Date;
-        b=jF2kJHUMH5XNcH2BTQVRixREFKhXdXIXCVjuPD9rbmx0bPQ8Tlhrs6WY/XaY3+uwa
-         wpvd5jPV2E5Zme4kJmJ4vAabTofaxaLMWkvuoKeQxGd4n8bQ3/PGsWAMpxf5ftI/Y4
-         UOAH53ujKJRe5Yjx/PSqoEsNOL8OlSPAwCENu9JU=
+        b=bYFkPCKohKalPBvVtSGg/IyepEKh6g87eNjk5i8Bthsxcdnuz2J3JXF3L/LuFrrx6
+         drWJgMmpdpsjGAHBMCn3/7JAF5v4iUUObHc2Pd/yOylJFMZ67Va0ef5UzGbFWVfIDF
+         l325C1PY0e2qpBxQhd73DJwRX5hHhNR7IzzP7gvU=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.2] ([93.135.186.124]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MqqPN-1jGwps0VoP-00muVI; Mon, 25
- May 2020 08:05:13 +0200
+Received: from [192.168.1.2] ([93.135.186.124]) by smtp.web.de (mrweb001
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MSav6-1jVIck20Yu-00RXNc; Mon, 25
+ May 2020 08:30:30 +0200
 To:     longpeng2@huawei.com, linux-crypto@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org,
-        Arei Gonglei <arei.gonglei@huawei.com>,
+Cc:     Arei Gonglei <arei.gonglei@huawei.com>,
         Corentin Labbe <clabbe@baylibre.com>,
         "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 1/2] crypto: virtio: Fix src/dst scatterlist calculation
- in __virtio_crypto_skcipher_do_req()
+        "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] crypto: virtio: Fix use-after-free in
+ virtio_crypto_skcipher_finalize_req()
 From:   Markus Elfring <Markus.Elfring@web.de>
 Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  mQINBFg2+xABEADBJW2hoUoFXVFWTeKbqqif8VjszdMkriilx90WB5c0ddWQX14h6w5bT/A8
@@ -89,61 +88,61 @@ Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  Z/wsLiWTgKlih2QYULvW61XU+mWsK8+ZlYUrRMpkauN4CJ5yTpvp+Orcz5KixHQmc5tbkLWf
  x0n1QFc1xxJhbzN+r9djSGGN/5IBDfUqSANC8cWzHpWaHmSuU3JSAMB/N+yQjIad2ztTckZY
  pwT6oxng29LzZspTYUEzMz3wK2jQHw+U66qBFk8whA7B2uAU1QdGyPgahLYSOa4XAEGb6wbI FEE=
-Message-ID: <21478291-9191-1da3-a7e5-65e87c743a3c@web.de>
-Date:   Mon, 25 May 2020 08:05:02 +0200
+Message-ID: <a5ef5d51-e35c-983f-8e7f-5f19552abe9e@web.de>
+Date:   Mon, 25 May 2020 08:30:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:clpeR0/szSLHOsLIRqTN3+KpiRF3FrgDoBZbzaJKXWtsidRl2Fl
- 3wNTkuW4jRB+EmQo+2Ms75Ms+AC3S25qO6W8TixoRv01KOKm5RuYyaOUHy/ScPjb4+XULNL
- Kiw81w+ibePY2W/qaJz6eNm4kWD+YQEmr6A9GBubsMBSMWa7rNmSRWS1Mza0GLH88J0ByYe
- 2WLbV2PbfJvyZFj5cw1HQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:AJM2L6DAP3k=:oRylNq+Ln1Br145F7FbeMc
- mQxLS13ky9YKkyllEeOO+UKfhHwaOfHYU7DO5GIuLsVzoEwm/DAyZNoRcscVYgiJ/QGW7EbXu
- LywQMmBl6Q6oGnqCQDg/kSA1C3WP6cANocnFToS7lFRCFAYFH6oxqy939LO/WVRh7ROda2bmu
- sqaygefyx//pqm7OtZz1Vvcb+giy8kodeP5iOnZgSA34OicYGWQG/LzLcduuU0N3HS8/5uYBW
- fmX0H763BzetkApZKn0mLJNs2ZELpHxjnkxWbNJI++251RHHN+qKEV6Gz9TUm6IXIfrditbAN
- a50k8wlOY1YUR9wPnxP8ej+soq0iG5CJ4SQmSDZ+iFRDXuoo5SOwhIHPmivvfCJHa+PmHxj6Z
- h2CwdzfF4HQRPT8+5tfBqKNbb9aO30zCrhm39emLRiAUpTETEXbNFIqp/dSBvghY4Vkm1IySl
- CjPI2YimFaZrrWp8zBVyCVihP9Ezozy6WkHw4lFaGdribciGgLljvwrjxKMJ3XOIdsS6clNvl
- moqg+ZXv8gogVuZI4zWrjjUTwj2XvRCHaqt8FpSkMTCTBzjCD6bccXNbvOxngchtX+d1+Sm85
- igj/lkJvP/Mak5Jj/RF+aybSq52R5LN7c0EVwdzPtyRH11CoY2exp1/s0UkzqtPLvU3ai+Hh5
- 8Aqobtpw4/1JBaHSruNw/N9KT1HGWfZn+w6I9MCraf5aaTPc5fkxq8pmfAPEWTfsnWZqQ4fIW
- v/+aESWd+P22NXToGKKa+qg7qgZ3znrZ+gzPueEacM9sGKhdPNXlODoXyhJ4amamDnojuu4k1
- T42CiCa0dH/3fNXZVcRuaqaNH2WXtXeNx7o8MjcAoTR4+pIzn0nq66cew7shnXHu7/hi5QwKS
- floZCJCAXUYnU70tTcTa0OzZvOKFHKfehirwgbD6W85oTs0TSPG3mFL0eWyMKZS8/zimxKvSm
- Pzpe/sLUMO/fe7qzv/vSYw2NlBDNh0+/DGKSgj90m0EDrbVoKx/g1xzneaGPTAnzTf2Nlblki
- 0htdevRiPcjg7QbmKWL6qPZ6q6vRi68/q21WLpDxmh7UEJxhOBkgeHOH4WJdhvBLoV1UehG/w
- LywVgT0v/2op0qFEObr/Fg6Sl91zGMpuqtkW8DcTkki5p50vwXLE6oTrbBeDH5NjHRbMTAjVs
- JwZZtgmzFUn8ZQyndMR7Uvv/PiGaZ0YReTcViLDnsSeuxHJsHts2ifCYZsECEf9Hw9VgAM/pE
- Hkr3tSgIsZ/QPWFgB
+X-Provags-ID: V03:K1:VpT8RmlK7bFo+DOwudvu5JNO6USiDs8hkfQYz79/Sk+bIDV6cDj
+ Dkr6wSQ0zk+ZGXLQIMD+abbTYszW6IH+nL+npKo1/eofVyPciPgMLEHbJBQOPz4KjlpL1Wj
+ Fap4Jv4Hc+CCG5C53QTK24FJ5o8tJnfpS4MVrxGcROtQim8x/PQIKmcECw2q5VuyA7+/vjs
+ Qg/TKsEOl1nN71UR9yWUg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:hDZsTX06wJ0=:QI4dWr01mdXggwDu7dDYa2
+ hysYAVgzxDRgYnwhkbsU3NsAWZlCoHgva5ooWoUtkagJo7W572O5XDH544Xwtrt4T9NQ/ctaw
+ q/2J8HY9ZDJYMNsJxa0s/DSpaAhwfcIHwAOqhmvvRUoBPkpe3l/K6j5XuuTE7Zz0vkIqUb71G
+ OjxL8UEEjKffnQ3A+S+brVKEWpOXFc+UEr55pqd3uFP+T8wO5/fv2tl2OAk6P25NtIshr7FTO
+ 04kY7b7PtSaScT3RsTB/h+r/qnFq7kA7eRSuajlm89CJbVz7v54XV1HTn1D8A4qMMvqa4Y5Kf
+ M8/D6niqRaG1jzkQV+crYyiM1KE1KA7VFAHD9lAExcWjFdAZEoO3cwAG8v6p3J6tL05bBkk7y
+ pwPjJvOJCcsKDQKp1o4H/vRyEtQxfGb3K5+UNb6/wyCwwVKB9Yx4Oj3l10goAoVQ4bXCTb7FC
+ 67rAvGa8jRbTJgyBM3qan8gmo+BAetxfzZsn5LGoCvLx5F736Y5coX+b/BL8jrX8BPtLMfzTt
+ SnT5TeVZDNFzxWzCcMXXt2JIHRem98poteEsKXfwXv9R2NMv55yKO1dE6ekdUzdwM1oY/R+Zl
+ Nc2aFkxe5rqgDJkA5Jklv0Pdv8vH0aGlyj/8dAeulb2GP8XexC1Hu6pIJ7pk/Ny3q8iQb6MKq
+ QwshlKBWhw8Ap6xqrlGeuH+3TMBBb4MOn15t4YxevwGPPk3t9jPufttuv9UOgOGNBRFHChias
+ NIrIzD8c3td5cYBsrApotu2qM/sceoTRxseIxx1egGMHFp/5v7JK5N72m9SMcC9tbAermY4IJ
+ bEHzEBAIXpiE+NIexmKUe4LQz2CXtnjDze1tCYDrWbp+D5hj+Qko+pRVwFVHOaKMk30TZIVTb
+ G2jq/7AVK6CMMskl/7Ohq2t+L4HaEft7exODTjI8tL1IkMNA0OoNs6CMaOxIegCjitdKqjOX/
+ D/2s10mfG1YyrxqI4KVI4kfQlTfb+zmp7G/xF7SgjxEiu5MhbCsQX2b5sjzDnttR8UaKqsEFA
+ 9+axxj0XtTkUfvBmgip0XyVKd5fXTUUQqV0sfq000cciFJ3fOxEQl11u9Aj95CB5HqRYJ46W9
+ TG7w2giu7IwTLaK80Hqd3EE+vX65eVpBRFHeJi6RjcX2aKN859DtBubjRSVEu+/YtziUL2n29
+ +YQ5CgUOxGZWGKvOCNlurqBB6bJQu50Z+G2/3x1in5jvMc+VNGibpajZKXKraJ0Y7+x0dmSzj
+ ngQaDTH3sEQEqy1he
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> The system will crash when we insmod crypto/tcrypt.ko whit mode=3D38.
+> =E2=80=A6 So the system will crash
+> at last when this memory be used again.
 
-* I suggest to use the word =E2=80=9Cwith=E2=80=9D in this sentence.
-
-* Will it be helpful to explain the passed mode number?
+I would prefer a wording with less typos here.
 
 
-> BTW I add a check for sg_nents_for_len() its return value since
-> sg_nents_for_len() function could fail.
+> We can free the resources before calling ->complete to fix this issue.
 
-Please reconsider also development consequences for this suggestion.
-Will a separate update step be more appropriate for the addition of
-an input parameter validation?
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/submitting-patches.rst?id=3D9cb1fd0efd195590b828b9b865=
-421ad345a4a145#n138
+* An imperative wording can be nicer.
+  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/=
+Documentation/process/submitting-patches.rst?id=3D9cb1fd0efd195590b828b9b8=
+65421ad345a4a145#n151
 
-Would you like to add the tag =E2=80=9CFixes=E2=80=9D to the commit messag=
-e?
+* You proposed to move a call of the function =E2=80=9Ccrypto_finalize_skc=
+ipher_request=E2=80=9D.
+  How does this change fit to the mentioned position?
+
+* Would you like to add the tag =E2=80=9CFixes=E2=80=9D to the commit mess=
+age?
 
 Regards,
 Markus
