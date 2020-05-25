@@ -2,84 +2,101 @@ Return-Path: <SRS0=4LZm=7H=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23ED7C433DF
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 13:43:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04AAAC433DF
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 15:33:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED8ED2073B
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 13:43:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C98B32084C
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 May 2020 15:33:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1590420815;
+	bh=/lRcApMN9bchgxQmdRuHru0M8nV62fiOyAvgNyyKOqE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=eq/fzAy7B+ktt4FFb8frlVT92xtxT64SVPEJbiwLTuaO4JIe1M08hSLz7yET+gbIu
+	 27rDcGNkrB696T8hYMqL5EwJ5T1Bszao7hLLLP6axPqxGMgrJn8RxE7thK4y07ZbiV
+	 UGcB8pz+nSKfRvurJuAuasg2E9bRxHO2la4nhK3w=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390795AbgEYNnX (ORCPT
+        id S2404113AbgEYPdf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 May 2020 09:43:23 -0400
-Received: from 8bytes.org ([81.169.241.247]:44546 "EHLO theia.8bytes.org"
+        Mon, 25 May 2020 11:33:35 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52490 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388794AbgEYNnV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 May 2020 09:43:21 -0400
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 9FEF7327; Mon, 25 May 2020 15:43:19 +0200 (CEST)
-Date:   Mon, 25 May 2020 15:43:18 +0200
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Zhangfei Gao <zhangfei.gao@linaro.org>
-Cc:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Hanjun Guo <guohanjun@huawei.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 0/2] Let pci_fixup_final access iommu_fwnode
-Message-ID: <20200525134318.GB5221@8bytes.org>
-References: <1589256511-12446-1-git-send-email-zhangfei.gao@linaro.org>
+        id S2404092AbgEYPdf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 25 May 2020 11:33:35 -0400
+Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0D41B2071A;
+        Mon, 25 May 2020 15:33:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1590420814;
+        bh=/lRcApMN9bchgxQmdRuHru0M8nV62fiOyAvgNyyKOqE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FkSvkKrkHrQNmOS5J/o9VjrQqOrK15S4n8hbD/X0fyIUhr7F42waBhGQOqj/6HAJx
+         tyzcpYbp9yyCxo7RvSbHabJpYOQEmcyfJ+E1oVol2cFd97D1c/VRNotZIGgME0uUKv
+         pVg9kv2JyeNisFfbKjtrNkuNbJM87euAu3sXNQ6I=
+Date:   Mon, 25 May 2020 08:33:20 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-fscrypt@vger.kernel.org
+Cc:     linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-mmc@vger.kernel.org, "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Satya Tangirala <satyat@google.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Paul Crowley <paulcrowley@google.com>
+Subject: Re: [PATCH] fscrypt: add support for IV_INO_LBLK_32 policies
+Message-ID: <20200525153320.GA2152@sol.localdomain>
+References: <20200515204141.251098-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1589256511-12446-1-git-send-email-zhangfei.gao@linaro.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200515204141.251098-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 12, 2020 at 12:08:29PM +0800, Zhangfei Gao wrote:
-> Some platform devices appear as PCI but are
-> actually on the AMBA bus, and they need fixup in
-> drivers/pci/quirks.c handling iommu_fwnode.
-> So calling pci_fixup_final after iommu_fwnode is allocated.
+On Fri, May 15, 2020 at 01:41:41PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> For example: 
-> Hisilicon platform device need fixup in 
-> drivers/pci/quirks.c
+> The eMMC inline crypto standard will only specify 32 DUN bits (a.k.a. IV
+> bits), unlike UFS's 64.  IV_INO_LBLK_64 is therefore not applicable, but
+> an encryption format which uses one key per policy and permits the
+> moving of encrypted file contents (as f2fs's garbage collector requires)
+> is still desirable.
 > 
-> +static void quirk_huawei_pcie_sva(struct pci_dev *pdev)
-> +{
-> +	struct iommu_fwspec *fwspec;
-> +
-> +	pdev->eetlp_prefix_path = 1;
-> +	fwspec = dev_iommu_fwspec_get(&pdev->dev);
-> +	if (fwspec)
-> +		fwspec->can_stall = 1;
-> +}
-> +
-> +DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_HUAWEI, 0xa250, quirk_huawei_pcie_sva);
-> +DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_HUAWEI, 0xa251, quirk_huawei_pcie_sva);
+> To support such hardware, add a new encryption format IV_INO_LBLK_32
+> that makes the best use of the 32 bits: the IV is set to
+> 'SipHash-2-4(inode_number) + file_logical_block_number mod 2^32', where
+> the SipHash key is derived from the fscrypt master key.  We hash only
+> the inode number and not also the block number, because we need to
+> maintain contiguity of DUNs to merge bios.
+> 
+> Unlike with IV_INO_LBLK_64, with this format IV reuse is possible; this
+> is unavoidable given the size of the DUN.  This means this format should
+> only be used where the requirements of the first paragraph apply.
+> However, the hash spreads out the IVs in the whole usable range, and the
+> use of a keyed hash makes it difficult for an attacker to determine
+> which files use which IVs.
+> 
+> Besides the above differences, this flag works like IV_INO_LBLK_64 in
+> that on ext4 it is only allowed if the stable_inodes feature has been
+> enabled to prevent inode numbers and the filesystem UUID from changing.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  Documentation/filesystems/fscrypt.rst | 33 +++++++++--
+>  fs/crypto/crypto.c                    |  6 +-
+>  fs/crypto/fscrypt_private.h           | 20 +++++--
+>  fs/crypto/keyring.c                   |  5 +-
+>  fs/crypto/keysetup.c                  | 85 +++++++++++++++++++++------
+>  fs/crypto/policy.c                    | 51 +++++++++++-----
+>  include/uapi/linux/fscrypt.h          |  3 +-
+>  7 files changed, 157 insertions(+), 46 deletions(-)
 
-I don't think it is a great idea to hook this into PCI_FIXUP_FINAL. The
-fixup list needs to be processed for every device, which will slow down
-probing.
+Applied to fscrypt.git#master for 5.8.
 
-So either we introduce something like PCI_FIXUP_IOMMU, if this is
-entirely PCI specific. If it needs to be generic we need some fixup
-infrastructure in the IOMMU code itself.
-
-Regards,
-
-	Joerg
+- Eric
