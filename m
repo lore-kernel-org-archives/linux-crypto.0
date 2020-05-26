@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F38BC433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 19:27:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73F7BC433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 19:29:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2F8C8208B6
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 19:27:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DACD20776
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 19:29:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590521266;
-	bh=UepWdnsWpDppgVk5vfkJFKBUbmMK8J+U8pMrQTMIVVo=;
+	s=default; t=1590521360;
+	bh=sBLqJNShOHXmDNNNqOoNbAAziCT3Qah9po5LF4SpzVA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=tMyVTS2XxO5agYVLIJH38dgJzn2hP9qLS+kltgpeCPMTFci5D8920fivxBVGMe9CC
-	 fbzo0EacSEdzHZaA/ucL5yYR60JAtUFtvAvY8Fpcqrt2LfxXSiYB2d+m3j34yQMiR0
-	 Dyj9WsVzqP8q86HE3f0Q6fw6gl5Yw8AfrjH6hIDg=
+	b=0YTC/UcN7Rc5Z5FChJUP7w5gXFAAWJet6qVsKfLqaQslA96SjFYfachkRKwutmWwF
+	 zuxCbj5I1mkRHTBdKytzoI0uEZXdjBonSXtn0eht28FaU0BxMiyTDI8akqyQPZr+U6
+	 Ov6fNddS66So5xynwuInPJw8PCUVa9Ld37XQcqoc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391294AbgEZTD7 (ORCPT
+        id S2391002AbgEZTBw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 May 2020 15:03:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59426 "EHLO mail.kernel.org"
+        Tue, 26 May 2020 15:01:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56442 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390518AbgEZTD6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 May 2020 15:03:58 -0400
+        id S2403807AbgEZTBw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 May 2020 15:01:52 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2C4CF20873;
-        Tue, 26 May 2020 19:03:57 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id DE8992084C;
+        Tue, 26 May 2020 19:01:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590519837;
-        bh=UepWdnsWpDppgVk5vfkJFKBUbmMK8J+U8pMrQTMIVVo=;
+        s=default; t=1590519711;
+        bh=sBLqJNShOHXmDNNNqOoNbAAziCT3Qah9po5LF4SpzVA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=h9mT6jN3zILXnD4vvt8XhHswIcGy9McAP7Jez2ru8JX/7ZIcJ2/BxHk7IqCqP3Hac
-         ULG2Uwwpnb6DeZPKH8P4HIPTAqNkHfxLKRUF1allKANbTO6ZskqQy07fQDWW43l5mF
-         nDnl4uZo78149NLWFUhMs4SLKqzF52oO+eJohnkA=
+        b=kGyyZ0/6ssFOxkUFKVWvfUKoJwbOsRwRDizfCXK5GaUiTigseJYO4IvBDRIYy2k70
+         3km5mGxI8z86tHQaqFReRY3SkYuSMsjxoDSTOwqT4zAdHKz/W6WBRaeD2+xVWUPJWZ
+         DBIAwFE2Wcq1AvYx4CzRswiHGV71/aGhd5A8av7o=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -46,12 +46,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Steffen Klassert <steffen.klassert@secunet.com>,
         linux-crypto@vger.kernel.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 4.19 36/81] padata: initialize pd->cpu with effective cpumask
-Date:   Tue, 26 May 2020 20:53:11 +0200
-Message-Id: <20200526183931.357121297@linuxfoundation.org>
+Subject: [PATCH 4.14 29/59] padata: purge get_cpu and reorder_via_wq from padata_do_serial
+Date:   Tue, 26 May 2020 20:53:14 +0200
+Message-Id: <20200526183917.791170399@linuxfoundation.org>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200526183923.108515292@linuxfoundation.org>
-References: <20200526183923.108515292@linuxfoundation.org>
+In-Reply-To: <20200526183907.123822792@linuxfoundation.org>
+References: <20200526183907.123822792@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -63,47 +63,11 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Daniel Jordan <daniel.m.jordan@oracle.com>
 
-[ Upstream commit ec9c7d19336ee98ecba8de80128aa405c45feebb ]
+[ Upstream commit 065cf577135a4977931c7a1e1edf442bfd9773dd ]
 
-Exercising CPU hotplug on a 5.2 kernel with recent padata fixes from
-cryptodev-2.6.git in an 8-CPU kvm guest...
+With the removal of the padata timer, padata_do_serial no longer
+needs special CPU handling, so remove it.
 
-    # modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
-    # echo 0 > /sys/devices/system/cpu/cpu1/online
-    # echo c > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
-    # modprobe tcrypt mode=215
-
-...caused the following crash:
-
-    BUG: kernel NULL pointer dereference, address: 0000000000000000
-    #PF: supervisor read access in kernel mode
-    #PF: error_code(0x0000) - not-present page
-    PGD 0 P4D 0
-    Oops: 0000 [#1] SMP PTI
-    CPU: 2 PID: 134 Comm: kworker/2:2 Not tainted 5.2.0-padata-base+ #7
-    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.12.0-<snip>
-    Workqueue: pencrypt padata_parallel_worker
-    RIP: 0010:padata_reorder+0xcb/0x180
-    ...
-    Call Trace:
-     padata_do_serial+0x57/0x60
-     pcrypt_aead_enc+0x3a/0x50 [pcrypt]
-     padata_parallel_worker+0x9b/0xe0
-     process_one_work+0x1b5/0x3f0
-     worker_thread+0x4a/0x3c0
-     ...
-
-In padata_alloc_pd, pd->cpu is set using the user-supplied cpumask
-instead of the effective cpumask, and in this case cpumask_first picked
-an offline CPU.
-
-The offline CPU's reorder->list.next is NULL in padata_reorder because
-the list wasn't initialized in padata_init_pqueues, which only operates
-on CPUs in the effective mask.
-
-Fix by using the effective mask in padata_alloc_pd.
-
-Fixes: 6fc4dbcf0276 ("padata: Replace delayed timer with immediate workqueue in padata_reorder")
 Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Steffen Klassert <steffen.klassert@secunet.com>
@@ -113,22 +77,50 @@ Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- kernel/padata.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ kernel/padata.c | 23 +++--------------------
+ 1 file changed, 3 insertions(+), 20 deletions(-)
 
 diff --git a/kernel/padata.c b/kernel/padata.c
-index 47dc31ce15ac..e9b8d517fd4b 100644
+index 6d0cdee9d321..f56ec63f60ba 100644
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
-@@ -451,7 +451,7 @@ static struct parallel_data *padata_alloc_pd(struct padata_instance *pinst,
- 	atomic_set(&pd->refcnt, 1);
- 	pd->pinst = pinst;
- 	spin_lock_init(&pd->lock);
--	pd->cpu = cpumask_first(pcpumask);
-+	pd->cpu = cpumask_first(pd->cpumask.pcpu);
- 	INIT_WORK(&pd->reorder_work, invoke_padata_reorder);
+@@ -323,24 +323,9 @@ static void padata_serial_worker(struct work_struct *serial_work)
+  */
+ void padata_do_serial(struct padata_priv *padata)
+ {
+-	int cpu;
+-	struct padata_parallel_queue *pqueue;
+-	struct parallel_data *pd;
+-	int reorder_via_wq = 0;
+-
+-	pd = padata->pd;
+-
+-	cpu = get_cpu();
+-
+-	/* We need to enqueue the padata object into the correct
+-	 * per-cpu queue.
+-	 */
+-	if (cpu != padata->cpu) {
+-		reorder_via_wq = 1;
+-		cpu = padata->cpu;
+-	}
+-
+-	pqueue = per_cpu_ptr(pd->pqueue, cpu);
++	struct parallel_data *pd = padata->pd;
++	struct padata_parallel_queue *pqueue = per_cpu_ptr(pd->pqueue,
++							   padata->cpu);
  
- 	return pd;
+ 	spin_lock(&pqueue->reorder.lock);
+ 	list_add_tail(&padata->list, &pqueue->reorder.list);
+@@ -354,8 +339,6 @@ void padata_do_serial(struct padata_priv *padata)
+ 	 */
+ 	smp_mb__after_atomic();
+ 
+-	put_cpu();
+-
+ 	padata_reorder(pd);
+ }
+ EXPORT_SYMBOL(padata_do_serial);
 -- 
 2.25.1
 
