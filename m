@@ -2,116 +2,141 @@ Return-Path: <SRS0=zQvQ=7I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC669C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 07:39:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B6CCC433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 08:26:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BAF6C20787
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 07:39:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A2962071A
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 08:26:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="OWDKcYBp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728284AbgEZHjF (ORCPT
+        id S1728510AbgEZI0A (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 May 2020 03:39:05 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5283 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726736AbgEZHjF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 May 2020 03:39:05 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 01741EAB2AD22967CF57;
-        Tue, 26 May 2020 15:39:02 +0800 (CST)
-Received: from [10.174.151.115] (10.174.151.115) by smtp.huawei.com
- (10.3.19.207) with Microsoft SMTP Server (TLS) id 14.3.487.0; Tue, 26 May
- 2020 15:38:53 +0800
-Subject: Re: [PATCH v2 2/2] crypto: virtio: Fix use-after-free in
- virtio_crypto_skcipher_finalize_req()
-To:     Markus Elfring <Markus.Elfring@web.de>,
-        <linux-crypto@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>
-CC:     Corentin Labbe <clabbe@baylibre.com>,
-        Gonglei <arei.gonglei@huawei.com>,
+        Tue, 26 May 2020 04:26:00 -0400
+Received: from mout.web.de ([217.72.192.78]:49005 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726926AbgEZI0A (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 May 2020 04:26:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+        s=dbaedf251592; t=1590481531;
+        bh=MHUhDhjpT9N5EskffASLpUqtZNVgU+zVvatYDdbMok8=;
+        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
+        b=OWDKcYBpVx9vdO/4uND5drEPEbg8D32sizcA+DFwW9q02Ys8Jq6PpRUKVFFB1n2OK
+         3DXRDN6HtPq4enJ6Nlbd4N4RKA/FaE01HaOtQmLv4hvPohv31z6d5vwNrdFICB0m2w
+         EA5yCkwoM9j5719GmQjz2eH8Sm49Hx2WoJ1gB71E=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.2] ([93.131.141.233]) by smtp.web.de (mrweb102
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0LbJ02-1jBLwP2kX4-00kyq7; Tue, 26
+ May 2020 10:25:31 +0200
+Subject: Re: [v2 1/2] crypto: virtio: Fix src/dst scatterlist calculation in
+ __virtio_crypto_skcipher_do_req()
+To:     "Longpeng (Mike)" <longpeng2@huawei.com>,
+        linux-crypto@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Cc:     Corentin Labbe <clabbe@baylibre.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
-        <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
+        Gonglei <arei.gonglei@huawei.com>, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
 References: <20200526031956.1897-1-longpeng2@huawei.com>
- <20200526031956.1897-3-longpeng2@huawei.com>
- <0248e0f6-7648-f08d-afa2-170ad2e724b7@web.de>
-From:   "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>
-Message-ID: <03d3387f-c886-4fb9-e6f2-9ff8dc6bb80a@huawei.com>
-Date:   Tue, 26 May 2020 15:38:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ <20200526031956.1897-2-longpeng2@huawei.com>
+ <d58a046a-e559-55be-16ba-64db43a06568@web.de>
+ <e1864c6d-6380-831f-9c2f-85611a78779b@huawei.com>
+From:   Markus Elfring <Markus.Elfring@web.de>
+Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
+ 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 FEE=
+Message-ID: <b863c03b-18f3-4942-10fd-563ab4cf5b43@web.de>
+Date:   Tue, 26 May 2020 10:25:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <0248e0f6-7648-f08d-afa2-170ad2e724b7@web.de>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.151.115]
-X-CFilter-Loop: Reflected
+In-Reply-To: <e1864c6d-6380-831f-9c2f-85611a78779b@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+X-Provags-ID: V03:K1:JjnLJNNiAAtloc2ewUlo+kpYIFI6SilE8hkaI6cJ8Hc9FAHiAeA
+ gN00egs1gacfbp5p3qshSpQFHzBxZR9MmMJuaa0Ia86oLRjtVRILtQoBnc5Zr3QzkmK+yfo
+ FAi0IUjQvNmTuEGIeFBdtQoRfG41aDCS6NAZZwu7VYpdY27PaB6Xf525YWAkugD/LaB3dmx
+ 0BsR3ShxwLH229JYYnZXA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:/ZslzTazrAM=:0HirD3ctT6bKc+8Q27dPkL
+ Ziw8eIcVFM7hE3xCyifAHxNzjU3u0ciyjOZdpYTb+38qOPGo/lNpLym38Fq97s3hab0e4L+PY
+ SwAi4z2FwxBkhkZWeNLL/P2XPqAzAZB87LDyyFFqhXVRGZ4MLd3Xh6dwwkpIpKdoisoCcnEqN
+ GymadA8bGBL/acqk6etfSnsGceUACTr1VvCa/Fg2VQ8lO/E3f+dqSXYCqPzRZxOli6govr279
+ aeCM2Cxc7AMBvrw2mJWo37FcBhAJ113CTKLn4teZI7f9lC04fVys3Yb0DeRZqhMlN9/XKsTut
+ au9VSE33w1z48sHlzFOlpwV00cXpRNMKH0UrChwvkRIXVSWlsrhr6q818vb1FAkvZMOJmlkoB
+ DXNmlQrmFQS+jyQKjBGrl5fY+rtaSVcwKBkG/NSSmzg11E6OOegTFnM9cQk5x8FUmE0RuLico
+ LmyZ+GxLSY1eRDwSnDHRDG+mwVx218XQkjZhbVdTftO3RuFkaZu1ZRrvVxS3p7g6GUnAXp4KU
+ 2a8lzcztRyEOzSX/xK9dyee02cDsdi+LNkLHVktLKzTBSIOiKGdQtUeM+pKaoSU8ve8KenGns
+ y/W4mflGpT4Fy1uzm3pi3QXZJD7i5Ufi70fvXcPTBY8PYe6WSRGlJaLvsVpiEKWJ1+hrDhOhT
+ jYuqGfhRTUSu7YPsHJXmfq1qu6ot8sx+HkLf4DPq/O9weK3K3mr9dIIthQwILpuJMFYv4FXA7
+ SHWbyX2+xnxuQmUPEcEgafFG4nzHP4V1oVHVHO9A9bqpwKF/Mva1ENGrnOB6Crug/7DoapjZ9
+ soC/7zwTKzhp90FMsy4IxXZS+79cMYc5RmsaQvQEJ6tfsQs3XISfKZapipdjTZkd7MwyB3A8A
+ UKAekou0HQd3K9Jq/M0i8uT3YXZrTe9jjVHx2IxYrzc++Z5J55VxjJSaTEjWB4o118u/2ALgC
+ WyavSl2AhdxMZDNCLyusY4GTVzg+F0Tp6o74Ew+eMwU3xSnd2EQ85Ar5F54T0S8L7ks/6nh4W
+ 3dbGXYV+vmxSKhAFwfKE9CXajZcbEgz2zATh3yY/1zEy826yhcvPjsRjQBkPOJngI1po6yROP
+ 581vGIXWYlV8t3rXTkI5CehWdjcZLCKBwSc9vtwBMDCXSiw3mV1YQVjmwBFZOED6xqQn6kRMz
+ esCa9WMtuUHgpR3iZc1zBhpu1XBgPhIP3qKXweQ4clWOnc88WaVC9A7QHDJIpbYRiZhLl+a/E
+ /L3H4rm/hAqiWB4Zm
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Markus,
+>> I suggest to move the addition of such input parameter validation
+>> to a separate update step.
+>>
+> Um...The 'src_nents' will be used as a loop condition,
+> so validate it here is needed ?
 
-On 2020/5/26 15:19, Markus Elfring wrote:
->> The system'll crash when the users insmod crypto/tcrypto.ko with mode=155
->> ( testing "authenc(hmac(sha1),cbc(aes))" ). It's caused by reuse the memory
->> of request structure.
-> 
-> Wording adjustments:
-> * … system will crash …
-> * … It is caused by reusing the …
-> 
-> 
->> when these memory will be used again.
-> 
-> when this memory …
-> 
-OK.
+Would you prefer to add such checking as the first update in
+another small patch series?
 
-> 
->> … Thus release specific resources before
-> 
-> Is there a need to improve also this information another bit?
-> 
-You mean the last two paragraph is redundant ?
-'''
-When the virtio_crypto driver finish skcipher req, it'll call ->complete
-callback(in crypto_finalize_skcipher_request) and then free its
-resources whose pointers are recorded in 'skcipher parts'.
-
-However, the ->complete is 'crypto_authenc_encrypt_done' in this case,
-it will use the 'ahash part' of the request and change its content,
-so virtio_crypto driver will get the wrong pointer after ->complete
-finish and mistakenly free some other's memory. So the system will crash
-when these memory will be used again.
-
-The resources which need to be cleaned up are not used any more. But the
-pointers of these resources may be changed in the function
-"crypto_finalize_skcipher_request". Thus release specific resources before
-calling this function.
-'''
-
-How about:
-'''
-When the virtio_crypto driver finish the skcipher request, it will call the
-function "crypto_finalize_skcipher_request()" and then free the resources whose
-pointers are stored in the 'skcipher parts', but the pointers of these resources
- may be changed in that function. Thus fix it by releasing these resources
-befored calling the function "crypto_finalize_skcipher_request()".
-'''
-
-
-> Regards,
-> Markus
-> 
----
 Regards,
-Longpeng(Mike)
+Markus
