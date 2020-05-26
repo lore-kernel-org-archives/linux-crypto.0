@@ -2,100 +2,109 @@ Return-Path: <SRS0=zQvQ=7I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30BC5C433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 14:11:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D326C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 14:21:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B3372084C
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 14:11:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590502303;
-	bh=wd1kdzjNu2wke/pcpNOmaZrZexqoLHk+Rig7xPRoVZo=;
-	h=Date:From:To:To:To:CC:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Subject:
-	 In-Reply-To:List-ID:From;
-	b=SS5pu2WtmQ7xIehn/Pbdn3nOn2ZLu3ElzC1yAidH6DMvnj/dZHp5lHktM197hIHGu
-	 61IXzm75Ut2wqeXzKG+80ZHKLndoTUmVJCEhW95qrgQ4duPcgH6Q+H3SOXB26SumHO
-	 DqNcUwlf2D6jhLygDXI5n7gsZbmZ4XJj//eE16/U=
+	by mail.kernel.org (Postfix) with ESMTP id 0C42020663
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 14:21:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="upAv+60s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728164AbgEZOLl (ORCPT
+        id S1726962AbgEZOVN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 May 2020 10:11:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47634 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726761AbgEZOLj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 May 2020 10:11:39 -0400
-Received: from localhost (unknown [137.135.114.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8410D207FB;
-        Tue, 26 May 2020 14:11:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590502298;
-        bh=wd1kdzjNu2wke/pcpNOmaZrZexqoLHk+Rig7xPRoVZo=;
-        h=Date:From:To:To:To:CC:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Subject:
-         In-Reply-To:From;
-        b=YAKDE/UROeEY6tF0J82oTKAi9+ResN3VFsHitMCrHGSSwnPlw0YT48tOSBHzs+MJz
-         RmGEuGBmSLGlVocUWguShRPvFxFhGAIlnTVFxeKmGMBaV2hxMPmWL1kePFMh5uu0CE
-         1VAnvnxcqxlqCaRMfL5KiRS7h/NQH2h0cQbofzoc=
-Date:   Tue, 26 May 2020 14:11:37 +0000
-From:   Sasha Levin <sashal@kernel.org>
-To:     Sasha Levin <sashal@kernel.org>
-To:     "Longpeng(Mike)" <longpeng2@huawei.com>
-To:     <linux-crypto@vger.kernel.org>
-CC:     "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc:     Gonglei <arei.gonglei@huawei.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>
-Cc:     "David S. Miller" <davem@davemloft.net>
-Cc:     Markus Elfring <Markus.Elfring@web.de>
-Cc:     virtualization@lists.linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] crypto: virtio: Fix use-after-free in virtio_crypto_skcipher_finalize_req()
-In-Reply-To: <20200526031956.1897-3-longpeng2@huawei.com>
-Message-Id: <20200526141138.8410D207FB@mail.kernel.org>
+        Tue, 26 May 2020 10:21:13 -0400
+Received: from fllv0016.ext.ti.com ([198.47.19.142]:56112 "EHLO
+        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726811AbgEZOVN (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 May 2020 10:21:13 -0400
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 04QEL6wc042024;
+        Tue, 26 May 2020 09:21:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1590502866;
+        bh=os45j/rYJrQJWrLHX/zyT3cvsjFLUypv+9XW8LkowNw=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References;
+        b=upAv+60s82w7RwKv/t5j6FHEIw9NLahjjFiKZ+IKxH0DVeOhPjvpP4wUVBIYgdANK
+         7khZmrxI22CnskLdHOqNTZhT4bWW2apCCnRhjxaJdCjkRW7UxziQVtKWgq84pbOBsz
+         g8J0nwQgaykfKGkz6yCNwoZcSNXMWoZ2lDMg5u7U=
+Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
+        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id 04QEL6A9050220;
+        Tue, 26 May 2020 09:21:06 -0500
+Received: from DFLE105.ent.ti.com (10.64.6.26) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Tue, 26
+ May 2020 09:21:06 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE105.ent.ti.com
+ (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
+ Frontend Transport; Tue, 26 May 2020 09:21:06 -0500
+Received: from sokoban.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 04QEL4TV121018;
+        Tue, 26 May 2020 09:21:05 -0500
+From:   Tero Kristo <t-kristo@ti.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>
+CC:     <linux-omap@vger.kernel.org>
+Subject: [PATCHv3 3/7] crypto: omap-crypto: fix userspace copied buffer access
+Date:   Tue, 26 May 2020 17:21:04 +0300
+Message-ID: <20200526142104.7362-1-t-kristo@ti.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200522131247.GA27255@gondor.apana.org.au>
+References: <20200522131247.GA27255@gondor.apana.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-<20200123101000.GB24255@Red>
-References: <20200526031956.1897-3-longpeng2@huawei.com>
-<20200123101000.GB24255@Red>
+In case buffers are copied from userspace, directly accessing the page
+will most likely fail because it hasn't been mapped into the kernel
+memory space. Fix the issue by forcing a kmap / kunmap within the
+cleanup functionality.
 
-Hi
+Signed-off-by: Tero Kristo <t-kristo@ti.com>
+---
+v3:
+  - Added PageSlab() check to the cache flushing portion, and changed
+    the used flush API to be flush_kernel_dcache_page()
 
-[This is an automated email]
+ drivers/crypto/omap-crypto.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-This commit has been processed because it contains a "Fixes:" tag
-fixing commit: dbaf0624ffa5 ("crypto: add virtio-crypto driver").
-
-The bot has tested the following trees: v5.6.14, v5.4.42, v4.19.124, v4.14.181.
-
-v5.6.14: Build OK!
-v5.4.42: Failed to apply! Possible dependencies:
-    eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
-
-v4.19.124: Failed to apply! Possible dependencies:
-    eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
-
-v4.14.181: Failed to apply! Possible dependencies:
-    500e6807ce93 ("crypto: virtio - implement missing support for output IVs")
-    67189375bb3a ("crypto: virtio - convert to new crypto engine API")
-    d0d859bb87ac ("crypto: virtio - Register an algo only if it's supported")
-    e02b8b43f55a ("crypto: virtio - pr_err() strings should end with newlines")
-    eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
-
-
-NOTE: The patch will not be queued to stable trees until it is upstream.
-
-How should we proceed with this patch?
-
+diff --git a/drivers/crypto/omap-crypto.c b/drivers/crypto/omap-crypto.c
+index cc88b7362bc2..94b2dba90f0d 100644
+--- a/drivers/crypto/omap-crypto.c
++++ b/drivers/crypto/omap-crypto.c
+@@ -178,11 +178,17 @@ static void omap_crypto_copy_data(struct scatterlist *src,
+ 		amt = min(src->length - srco, dst->length - dsto);
+ 		amt = min(len, amt);
+ 
+-		srcb = sg_virt(src) + srco;
+-		dstb = sg_virt(dst) + dsto;
++		srcb = kmap_atomic(sg_page(src)) + srco + src->offset;
++		dstb = kmap_atomic(sg_page(dst)) + dsto + dst->offset;
+ 
+ 		memcpy(dstb, srcb, amt);
+ 
++		if (!PageSlab(sg_page(dst)))
++			flush_kernel_dcache_page(sg_page(dst));
++
++		kunmap_atomic(srcb);
++		kunmap_atomic(dstb);
++
+ 		srco += amt;
+ 		dsto += amt;
+ 		len -= amt;
 -- 
-Thanks
-Sasha
+2.17.1
+
+--
+Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
