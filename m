@@ -2,150 +2,129 @@ Return-Path: <SRS0=zQvQ=7I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72B99C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 12:02:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0247DC433E1
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 12:07:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51DA92073B
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 12:02:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2DDA208B3
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 12:07:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J+ir68ua"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731733AbgEZMAn convert rfc822-to-8bit (ORCPT
+        id S1729015AbgEZMHd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 May 2020 08:00:43 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2085 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727948AbgEZMAn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 May 2020 08:00:43 -0400
-Received: from DGGEML401-HUB.china.huawei.com (unknown [172.30.72.57])
-        by Forcepoint Email with ESMTP id 8CC2A219BB824B1F228F;
-        Tue, 26 May 2020 20:00:40 +0800 (CST)
-Received: from DGGEML531-MBS.china.huawei.com ([169.254.5.130]) by
- DGGEML401-HUB.china.huawei.com ([fe80::89ed:853e:30a9:2a79%31]) with mapi id
- 14.03.0487.000; Tue, 26 May 2020 20:00:34 +0800
-From:   "Gonglei (Arei)" <arei.gonglei@huawei.com>
-To:     "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     LABBE Corentin <clabbe@baylibre.com>,
+        Tue, 26 May 2020 08:07:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52746 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727844AbgEZMHc (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 May 2020 08:07:32 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511DFC03E96D
+        for <linux-crypto@vger.kernel.org>; Tue, 26 May 2020 05:07:32 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id t8so1263089pju.3
+        for <linux-crypto@vger.kernel.org>; Tue, 26 May 2020 05:07:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=fpsA7Nq2nxropNth7zUzBAVP9PJ+/EXl3l54pU3n9ZM=;
+        b=J+ir68uaqgnC0bpUtYh7gEhKg91ecOFPaqozofq5uKsLc7Q5y3iFeqMqCZAJviMx+s
+         5ig+pjzGqwz+mFaduqg65bildjvb3DkPZio13iXEBv0mAnfqdngUZrwP8cIh8JeTUCVJ
+         gmFnjjcFBD8aNXil24SDu+Jkirv39gmumTTyj55+HgtSDlf8tVbBjh7E552efJG/Wjo8
+         EJDaQDAdQwq7KwVsaMRKey6Y7TjZsMZCOt/LAThI6/92Dp0fkT6otf1CI6seawSCUyPt
+         WoWoRsARBzdoihaCWqPAXG3jCyZxwI+pM2gsZxtGTudpYt/c710Xf3GM28FbeauVBfE6
+         ryPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=fpsA7Nq2nxropNth7zUzBAVP9PJ+/EXl3l54pU3n9ZM=;
+        b=K0exZwdUMYeGFb7kmm9e9AojZhVlAWW1Ffhcx8u/r8sMF5E27RgqsvIlQcpmUdUmPj
+         qxqX/lyx6ie8L3C2ljzCOclLdcIx+wWQZr4KxWb49V2hGNxPa+wiN6BP+K+qYy/9AO4W
+         ZYxrpZdRrb/FFbTz46xjwNF0tLb5nFFf0Xb0gKEhDDmscWsohMUc22atHMJmAGNDqbV3
+         l29uOSnJyMzQmEcsrX7qI4psRqvwNTGkLMOPG3T9WVcKfNY+WTk0NaZo9snTs9SSQdos
+         03kuyRfkPlrOhkiVwtuoolarFAe5Bcsl4ttUFPT/MowQ9e8fj+/vvRRHcq55prLJsBI9
+         OFnA==
+X-Gm-Message-State: AOAM531pmHR04Nju7mxc6yo6XVDyLXPoe+j+I50+mOtVEzYYuKtBIXT9
+        in7NSJSayFodNZbFDuI9CYXo0g==
+X-Google-Smtp-Source: ABdhPJwJC/VIL8ph3znchjMxyQibr056u3YncVEhb6v6BwGdiIO+FoFmlj/9d7sAY/kJdEg5hx2xFg==
+X-Received: by 2002:a17:902:6b02:: with SMTP id o2mr822931plk.25.1590494851770;
+        Tue, 26 May 2020 05:07:31 -0700 (PDT)
+Received: from [10.74.2.18] ([45.135.186.9])
+        by smtp.gmail.com with ESMTPSA id x132sm15300133pfd.214.2020.05.26.05.07.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 May 2020 05:07:30 -0700 (PDT)
+Subject: Re: [PATCH 0/2] Let pci_fixup_final access iommu_fwnode
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Hanjun Guo <guohanjun@huawei.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>,
+        jean-philippe <jean-philippe@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Jason Wang" <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Markus Elfring" <Markus.Elfring@web.de>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [PATCH v2 2/2] crypto: virtio: Fix use-after-free in
- virtio_crypto_skcipher_finalize_req()
-Thread-Topic: [PATCH v2 2/2] crypto: virtio: Fix use-after-free in
- virtio_crypto_skcipher_finalize_req()
-Thread-Index: AQHWMwyZcHiP+r3rKk+F0nYZAiiWqKi6Qu8g
-Date:   Tue, 26 May 2020 12:00:33 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DF5EA250@dggeml531-mbs.china.huawei.com>
-References: <20200526031956.1897-1-longpeng2@huawei.com>
- <20200526031956.1897-3-longpeng2@huawei.com>
-In-Reply-To: <20200526031956.1897-3-longpeng2@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.133.225.234]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-acpi@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+References: <1589256511-12446-1-git-send-email-zhangfei.gao@linaro.org>
+ <20200525134318.GB5221@8bytes.org>
+From:   Zhangfei Gao <zhangfei.gao@linaro.org>
+Message-ID: <7c6e9389-c34a-4d30-bc8d-572c41572d15@linaro.org>
+Date:   Tue, 26 May 2020 20:07:01 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200525134318.GB5221@8bytes.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-> -----Original Message-----
-> From: Longpeng (Mike, Cloud Infrastructure Service Product Dept.)
-> Sent: Tuesday, May 26, 2020 11:20 AM
-> To: linux-crypto@vger.kernel.org
-> Cc: Longpeng (Mike, Cloud Infrastructure Service Product Dept.)
-> <longpeng2@huawei.com>; LABBE Corentin <clabbe@baylibre.com>; Gonglei
-> (Arei) <arei.gonglei@huawei.com>; Herbert Xu
-> <herbert@gondor.apana.org.au>; Michael S. Tsirkin <mst@redhat.com>; Jason
-> Wang <jasowang@redhat.com>; David S. Miller <davem@davemloft.net>;
-> Markus Elfring <Markus.Elfring@web.de>;
-> virtualization@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
-> stable@vger.kernel.org
-> Subject: [PATCH v2 2/2] crypto: virtio: Fix use-after-free in
-> virtio_crypto_skcipher_finalize_req()
-> 
-> The system'll crash when the users insmod crypto/tcrypto.ko with mode=155
-> ( testing "authenc(hmac(sha1),cbc(aes))" ). It's caused by reuse the memory of
-> request structure.
-> 
-> In crypto_authenc_init_tfm(), the reqsize is set to:
->   [PART 1] sizeof(authenc_request_ctx) +
->   [PART 2] ictx->reqoff +
->   [PART 3] MAX(ahash part, skcipher part) and the 'PART 3' is used by both
-> ahash and skcipher in turn.
-> 
-> When the virtio_crypto driver finish skcipher req, it'll call ->complete callback(in
-> crypto_finalize_skcipher_request) and then free its resources whose pointers
-> are recorded in 'skcipher parts'.
-> 
-> However, the ->complete is 'crypto_authenc_encrypt_done' in this case, it will
-> use the 'ahash part' of the request and change its content, so virtio_crypto
-> driver will get the wrong pointer after ->complete finish and mistakenly free
-> some other's memory. So the system will crash when these memory will be used
-> again.
-> 
-> The resources which need to be cleaned up are not used any more. But the
-> pointers of these resources may be changed in the function
-> "crypto_finalize_skcipher_request". Thus release specific resources before
-> calling this function.
-> 
-> Fixes: dbaf0624ffa5 ("crypto: add virtio-crypto driver")
-> Reported-by: LABBE Corentin <clabbe@baylibre.com>
-> Cc: Gonglei <arei.gonglei@huawei.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Markus Elfring <Markus.Elfring@web.de>
-> Cc: virtualization@lists.linux-foundation.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: stable@vger.kernel.org
-> Message-Id: <20200123101000.GB24255@Red>
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-> ---
 
-Acked-by: Gonglei <arei.gonglei@huawei.com>
+On 2020/5/25 下午9:43, Joerg Roedel wrote:
+> On Tue, May 12, 2020 at 12:08:29PM +0800, Zhangfei Gao wrote:
+>> Some platform devices appear as PCI but are
+>> actually on the AMBA bus, and they need fixup in
+>> drivers/pci/quirks.c handling iommu_fwnode.
+>> So calling pci_fixup_final after iommu_fwnode is allocated.
+>>
+>> For example:
+>> Hisilicon platform device need fixup in
+>> drivers/pci/quirks.c
+>>
+>> +static void quirk_huawei_pcie_sva(struct pci_dev *pdev)
+>> +{
+>> +	struct iommu_fwspec *fwspec;
+>> +
+>> +	pdev->eetlp_prefix_path = 1;
+>> +	fwspec = dev_iommu_fwspec_get(&pdev->dev);
+>> +	if (fwspec)
+>> +		fwspec->can_stall = 1;
+>> +}
+>> +
+>> +DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_HUAWEI, 0xa250, quirk_huawei_pcie_sva);
+>> +DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_HUAWEI, 0xa251, quirk_huawei_pcie_sva);
+> I don't think it is a great idea to hook this into PCI_FIXUP_FINAL. The
+> fixup list needs to be processed for every device, which will slow down
+> probing.
+>
+> So either we introduce something like PCI_FIXUP_IOMMU, if this is
+> entirely PCI specific. If it needs to be generic we need some fixup
+> infrastructure in the IOMMU code itself.
 
-Regards,
--Gonglei
+Thanks Joerg for the good suggestion.
+I am trying to introduce PCI_FIXUP_IOMMU in
+https://lkml.org/lkml/2020/5/26/366
 
->  drivers/crypto/virtio/virtio_crypto_algs.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c
-> b/drivers/crypto/virtio/virtio_crypto_algs.c
-> index 5f8243563009..52261b6c247e 100644
-> --- a/drivers/crypto/virtio/virtio_crypto_algs.c
-> +++ b/drivers/crypto/virtio/virtio_crypto_algs.c
-> @@ -582,10 +582,11 @@ static void virtio_crypto_skcipher_finalize_req(
->  		scatterwalk_map_and_copy(req->iv, req->dst,
->  					 req->cryptlen - AES_BLOCK_SIZE,
->  					 AES_BLOCK_SIZE, 0);
-> -	crypto_finalize_skcipher_request(vc_sym_req->base.dataq->engine,
-> -					   req, err);
->  	kzfree(vc_sym_req->iv);
->  	virtcrypto_clear_request(&vc_sym_req->base);
-> +
-> +	crypto_finalize_skcipher_request(vc_sym_req->base.dataq->engine,
-> +					   req, err);
->  }
-> 
->  static struct virtio_crypto_algo virtio_crypto_algs[] = { {
-> --
-> 2.23.0
-
+Thanks
