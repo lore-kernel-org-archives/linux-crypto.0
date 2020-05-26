@@ -2,104 +2,151 @@ Return-Path: <SRS0=zQvQ=7I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBE16C433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 07:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA795C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 07:19:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C8B220888
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 07:18:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B367C2053B
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 07:19:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CedWHmXc"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="N5taJhvt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726181AbgEZHSL (ORCPT
+        id S1731444AbgEZHTr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 May 2020 03:18:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36216 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726211AbgEZHSK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 May 2020 03:18:10 -0400
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58721C03E97E
-        for <linux-crypto@vger.kernel.org>; Tue, 26 May 2020 00:18:10 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id f5so2181618wmh.2
-        for <linux-crypto@vger.kernel.org>; Tue, 26 May 2020 00:18:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=GEr8mOSqsPFk72RdWe7hixeBbOnS/tMn2BfamP39YnY=;
-        b=CedWHmXcVkIPLH/3Uv1GkRSuMN/LpNS14R7z7qv+ppNpt6xge0H4bYOXcnH/VirYNq
-         qqTwfApelcNdbe0qwST9693eBpim6OaGF3roLWEaj88v1n+u7gAu3bFFcF+HkEC1UYC3
-         ECnpv+qb64f2W1lEgQJEfaekJ2e0i1mV+KTh122d1h6y0GvPenECxur0JRMdQ7rjM6an
-         2+XDdLiyW7bRYCWI579xTLOKQhG688lYHscYoxnJ7L1E08x6C9HbUnll3XZuDfsL1Dmu
-         KnstMOGZVeSaSC6a4S59o2Ub08OMLiWqZ6M4LtmcjufPMCcI+LTSkQxE+1RA3zWyWJqj
-         TvJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=GEr8mOSqsPFk72RdWe7hixeBbOnS/tMn2BfamP39YnY=;
-        b=Md69TpGYSvtOQINsU3Jxn7G+5b9a5EPzoDpdqQAepS+w1QSjFYqFKpeZRVHyAn2g83
-         mxP2vvFESJKxUaugQXVDUyNLDLFlXzq1SpGaSYYxhZuXMUVl28vLnQDxC4RgTNDt0u/+
-         1D8MseC4bOWsE/ETpZUTXh3FbTsayMGUj0/dzMz+gfFpucaq9aXNQFIv7CmqtvID5vYk
-         edNiCJY4NB0aON3jpIQ/TLL+9BmG8t+S6kCn2fp969WH8G6c31uwcVb4F+rCyiMI7eMf
-         XTnN6iblh5uj5XhHHB6ftoZTy1IWycjpQE6PGALAjSPVSdItZvNHziGG++SEwSA24Olt
-         eVpA==
-X-Gm-Message-State: AOAM532FCCzGCR8MncrZuVXUYCHh2VypMdjMMHbcpHdts6lwJie0jeex
-        OtpiZioiTxSuRigo0ljxUxh36DG29iNO7J4efRGG8fwh
-X-Google-Smtp-Source: ABdhPJzD6rUCCBIyzqUDNHfEDbuhI0Rsb4NsYajQyQG+unHNfVb6pbIbDt2weTe6wUoNq7M6h6VKIrRwY+bZv2GHlN0=
-X-Received: by 2002:a1c:6042:: with SMTP id u63mr15834wmb.65.1590477488747;
- Tue, 26 May 2020 00:18:08 -0700 (PDT)
+        Tue, 26 May 2020 03:19:47 -0400
+Received: from mout.web.de ([212.227.17.11]:58605 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731378AbgEZHTq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 May 2020 03:19:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+        s=dbaedf251592; t=1590477559;
+        bh=vtLybQWULEnc8jc79o+HmD2pb8+JhjoASvv07l4WYQ8=;
+        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
+        b=N5taJhvtt0lwyIvI4zJOY7FizucmQbTAjNvwFgBUxG+mvDSmR2D068HvZeWmcYv9g
+         IHt1Hkvb8PFrovQy53HeCJju/SDlZrMWSyP4gzQmmNHop+efAqS3TE7YcRwdaIpwDm
+         oSsKqYh7VGQGNg4PK1bt6WVZEPin3VqETOrrzv5c=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.2] ([93.131.141.233]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1M2Phc-1jak2r2Baw-0041o5; Tue, 26
+ May 2020 09:19:19 +0200
+Subject: Re: [PATCH v2 2/2] crypto: virtio: Fix use-after-free in
+ virtio_crypto_skcipher_finalize_req()
+To:     "Longpeng(Mike)" <longpeng2@huawei.com>,
+        linux-crypto@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Cc:     Corentin Labbe <clabbe@baylibre.com>,
+        Gonglei <arei.gonglei@huawei.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20200526031956.1897-1-longpeng2@huawei.com>
+ <20200526031956.1897-3-longpeng2@huawei.com>
+From:   Markus Elfring <Markus.Elfring@web.de>
+Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
+ 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 FEE=
+Message-ID: <0248e0f6-7648-f08d-afa2-170ad2e724b7@web.de>
+Date:   Tue, 26 May 2020 09:19:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <CANpvso4V67SBKn9+SXc+H=r-H-up+GWt77K4jH5HJx9k+sR+hA@mail.gmail.com>
-In-Reply-To: <CANpvso4V67SBKn9+SXc+H=r-H-up+GWt77K4jH5HJx9k+sR+hA@mail.gmail.com>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Tue, 26 May 2020 15:17:54 +0800
-Message-ID: <CACXcFmkYtSeRMNTr=NXGK06MUyEnvaFqe_9Q11kWZq=f1ZdE_A@mail.gmail.com>
-Subject: Re: Looking for an open-source thesis idea
-To:     Eric Curtin <ericcurtin17@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200526031956.1897-3-longpeng2@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:1H4SgTlabezxCxmUggdffuSxcW9wuad3DGOuq62XhzX/LihUvRN
+ Fm1SNiPf/T25mWSUgVS7iGIKVZJsi0oSHVkX87rEbNbkB5MvIE8kxAyed3JcOOSpp3X0UuT
+ Qntg7LPjM6FyIhOd+Wd6MCDUCxeaSWN4awvI1LrZnAwWqWTOyVfuJWY1NIXgpGMTYD0ynUp
+ KhgbkqGb+tizpl6aJiwjA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:4m1VkoStH1g=:b/G5ZvXncX3Tycc3rm4s5k
+ U39rtVZ9kv3Kh2u01hmuRJz7ebZqZUb73vHX3MCvbCRpxck6WWL4PTrsC/XaiZEc7yzTP5b6Y
+ aowvBhAJhhJp6jUxd7Q7wtoDEPIt9Mig6kRZmuMN9FkBWRzOZX/ORzc/S7NmSmAtTOKYp6tRg
+ e+7la2RywZcBEGbdstATmPljHE3PHzV03jcgqGkj1gRibVSV/UuUYbOmMQrw9qw+6wRUKk/9U
+ c3jLQTcJdyzeTTNh9vfQYlXdb7tOLMRaSjl/rG7668RwUOImm51bbAgCNp9F0jJZ7489y9NuK
+ QIFLddOz5Ka86LtNCMaVRdGV1G3qTQ6SO5cXDBrNo0bL5tbcahnKq+Y2VpJz1iBTqfQ8uGmzl
+ eKF+5G88MbFyJ/bvbi1PashS+hC8foterUJiUPBu9LnBoXHPA57U6muQxtxOY2Lzz2Ziw3Ssv
+ RMns7quvUdtdGmPro8XdnZxgrPZ334a3Kyt+RxOv9ZtC3jc7Rbe8En3Nfb27JETeCt0GReHwC
+ S/tz7QjNAX1ERlJ+ho5pUEZY5CcF2DmRxoWeEX6Lp8TyXw4H3k/Ls/2zTWIFTHPWxb/oSLtaH
+ 4Bj4WdB1gaceYUFVPxNSeB7AD9StekvttEvPfYxHXTXZJ/SyV/NdVm0Rs0d9Y0adOhj9/pFY4
+ 6V0LMyXGCDn7oG66dRlH6Qkulgxr0d9UOSAQgLofNbd8OdnUF+YpRdAa7tX9KUwFmITRbln+X
+ 1yJls1mMPe/CvHXcRTLRkwjhpj2DKQwtc29+Cgi/LgLKMBv7+kfXE/STbt0p6DlhjcLu/PMJv
+ oeM8ukm37B6jwDk2FeVYGBQWiEMuLOMdEWC78gTDzAx/XBFMLMoL5Hz+OWDOr1Hxj4Bj71GQa
+ mgmrnOj8B/KxWwUIVdzdYDqT+Gck0M+NtPtDF0PL/L5HNjstcFZCyiRXp0rQHTVOBQWFzesGe
+ 8zzFvG0/bfBD3GWLXCqWffuFFwKaVHQDG2IWBi8UBhIIK2baBPixxD/hVJJKc1cZLJgpUCeX7
+ xQKHjGtTvsxRwogRyul8C0oztfPFa3Zzd2RsdSwaTfMZBdNR8KZDCP6kZEqCYEuumDBO5d9X0
+ gO2zmGEnYbpDkuSh6T4ikOndccpCjUJ9sP0mu2NmskWMbBnHJyF2acbp12y7GUnh4bvZgPT+L
+ bzPjq6kalbPv65XczL6qShl8wy7GOFX4j0qpbH5EFCHAmUyoXqaDi2DbpFsnlyouDTSJSEmVn
+ iOjA0z2j9W3vX7Nro
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Eric Curtin <ericcurtin17@gmail.com> wrote:
+> The system'll crash when the users insmod crypto/tcrypto.ko with mode=3D=
+155
+> ( testing "authenc(hmac(sha1),cbc(aes))" ). It's caused by reuse the mem=
+ory
+> of request structure.
 
-> Hope I'm not bothering you. I'm looking for a masters thesis idea, ...
+Wording adjustments:
+* =E2=80=A6 system will crash =E2=80=A6
+* =E2=80=A6 It is caused by reusing the =E2=80=A6
 
-> I'm really liking this
-> new QUIC (UDP) protocol as an alternative to TCP over TLS. And with
-> the growth of new modern secure protocols like Wireguard. I was
-> wondering, would it be an idea to do a monolithic secure TCP protocol
-> (as an alternative to TCP over TLS) as a small thesis project or is it
-> as hard as the guys at Google make is sound?
->
-> "Because TCP is implemented in operating system kernels, and middlebox
-> firmware, making significant changes to TCP is next to impossible."
 
-I'm inclined to agree with the Google folk on that. However, what about
-IPsec? That was designed to secure anything-over-IP so it should be
-a more general solution. The FreeS/WAN project added opportunistic
-encryption for wider availability
-https://freeswan.org/freeswan_trees/freeswan-2.06/doc/intro.html#goals
+> when these memory will be used again.
 
-Today some opportunistic encryption protocols -- SMTP-over-TLS and
-HTTPS Everywhere -- are quite widespread but my impression is
-that opportunistic IPsec is not. Would adding it to an open source
-router be a thesis-sized project? Or, since routers likely have IPsec
-already, just making it easier to deploy?
+when this memory =E2=80=A6
 
-> I'm open to any other suggestions also for my thesis :)
 
-Linux's OOM killer strikes me as a spectacularly ugly kluge,
-but people who are certainly more knowledgeable and likely
-more competent seem to think it is necessary. Is there a
-thesis in examining it, looking at how other Unix-like systems
-handle the problem & perhaps implementing an alternative
-for Linux?
+> =E2=80=A6 Thus release specific resources before
+
+Is there a need to improve also this information another bit?
+
+Regards,
+Markus
