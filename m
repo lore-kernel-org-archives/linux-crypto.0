@@ -2,117 +2,162 @@ Return-Path: <SRS0=zQvQ=7I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3602C433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 15:10:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C96C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 15:46:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9AFCB2070A
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 15:10:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8387120663
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 15:46:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D+4nQ0vW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="B57VcRK1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729579AbgEZPKl (ORCPT
+        id S1728492AbgEZPqv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 May 2020 11:10:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52972 "EHLO
+        Tue, 26 May 2020 11:46:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728333AbgEZPKk (ORCPT
+        with ESMTP id S1728303AbgEZPqv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 May 2020 11:10:40 -0400
-Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81B3FC03E96E
-        for <linux-crypto@vger.kernel.org>; Tue, 26 May 2020 08:10:40 -0700 (PDT)
-Received: by mail-pj1-x1042.google.com with SMTP id a5so1546770pjh.2
-        for <linux-crypto@vger.kernel.org>; Tue, 26 May 2020 08:10:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=zuN1PH7d2dfCgGQO7mbhwyoBsWzuZEv+CGEfJv0Zw+c=;
-        b=D+4nQ0vWQOUObnvWLE2c2rqZVSpP4vHdMdjPbiYho4sYugLqtt6WRlJ+HEBBjO+1lQ
-         2eR7eboY09he7DRe3bVtn422CDYVxb587PRQ/F+XM06FycTChxmMLph4uSQfy6rrhj88
-         Uj/F+naAfokobOjg7tIBJp6aRXQKGJrWwM0M5NQhdl2IHrzkJZx4YN7V8c4YmU5AiA4m
-         2klNrqpTzCwkPVLI9ZrzKuMoCf/oP8Y0Egww1cMRgelz+NygXiJoljRrWYfv9E+KnDQ2
-         1VULYXUIQtH0XM1HRyfnK3yn7EbRcnN61uIfb9jjlWUJ7wTomFrOFYUYdUmZtFvN1GcP
-         jAQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=zuN1PH7d2dfCgGQO7mbhwyoBsWzuZEv+CGEfJv0Zw+c=;
-        b=eyHnPVcI3P6SpdZ2Eb0e8foLPi4emQM5IUrFMQyMDDmWDm4cao7ydHhvlegdivji3m
-         2DWg/PXgAOVn0kly8x11Q1RyJfD1tW04PIn9RptLNJYm/Bo6hn7iY6BfdFN38WeQPyW7
-         tCvN2qAq+shcMHo71Um4y/lTU7aCGxQnBe083dAbwTSVKjUrC+k4Wxq1e+G97ukc5B19
-         M0o6+8XKSTfM5Cq5oD9BP+FLnXGWsA4EXN+jzw73MgM7UDZN7MytDbonz+D6bn9JC7xW
-         Sig+K0t3s5yyM3MaeiK6UgUVIWbQ6XTJurtQ1t7zOk0taj7Kxe/b2Z8EUgeRwhP80a5h
-         U7RQ==
-X-Gm-Message-State: AOAM532eCqcCtLbXf2xYHS7b0fWq0Am9wXk10W6G2qa9fpaFKsmvKvxn
-        HcF0npg5e+phFp5p0kyN87hYJw==
-X-Google-Smtp-Source: ABdhPJwe+1sgmh2OwBptymAExtulFHEpnY96Q4RDulxomLppHnhiwFUYKKMDqrVR8wVFmvAPxb4eUQ==
-X-Received: by 2002:a17:90a:1a17:: with SMTP id 23mr27507707pjk.198.1590505839978;
-        Tue, 26 May 2020 08:10:39 -0700 (PDT)
-Received: from [10.140.0.202] ([45.135.186.12])
-        by smtp.gmail.com with ESMTPSA id i197sm3623225pfe.30.2020.05.26.08.10.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 May 2020 08:10:39 -0700 (PDT)
-Subject: Re: [PATCH 1/2] PCI: Introduce PCI_FIXUP_IOMMU
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Hanjun Guo <guohanjun@huawei.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-acpi@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <1590493749-13823-1-git-send-email-zhangfei.gao@linaro.org>
- <1590493749-13823-2-git-send-email-zhangfei.gao@linaro.org>
- <20200526144644.GA20784@infradead.org>
-From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-Message-ID: <39144dc0-3b04-3127-978b-bd8487dd06e0@linaro.org>
-Date:   Tue, 26 May 2020 23:09:57 +0800
+        Tue, 26 May 2020 11:46:51 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8756FC03E96D;
+        Tue, 26 May 2020 08:46:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description;
+        bh=f5trgiJH5V/8C2C/LXnwvUAj6Z8CNkwv12V2Vhc+Pn4=; b=B57VcRK1h7jmKgXnMJAs+RL/9Q
+        HL21I+jvKaM0Z6V3jxHUi2GruRwLyizy9RoGE8/ZCNHtcadJBRc0z/6UcqFgZsEE/Iz1/A3okBmy/
+        dHU9C75GHE2f8cn6DfAioBeoDy2ZVfJtJw1zC5yedsZGJUsjIhiNHLEdbiG6KZ2GF55iy+y+Tq51o
+        KnIj6SndpsBmssq20QfWfVtYhKpedxFz1WZ94oG7k0JLgEjKPhjNqUCHXTb4SjVW0cUnOFyyJqAKy
+        gC+EcvLdWl1C6dgWEQG6v227zmcgmm9ppKvgC7OZ0xTwvUlhtrpYR1SU52icI5aaLX6NMiag2HBN5
+        vQXhQyCQ==;
+Received: from [2601:1c0:6280:3f0::19c2]
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jdbn1-0003Kd-02; Tue, 26 May 2020 15:46:51 +0000
+Subject: Re: linux-next: Tree for May 26 (drivers/crypto/chelsio/chcr_ktls.c)
+To:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Ayush Sawal <ayush.sawal@chelsio.com>,
+        Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
+        Rohit Maheshwari <rohitm@chelsio.com>
+References: <20200526203932.732df7c6@canb.auug.org.au>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <ca9f612e-1cd7-d2b8-d1f0-497ffcbd5de5@infradead.org>
+Date:   Tue, 26 May 2020 08:46:49 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200526144644.GA20784@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200526203932.732df7c6@canb.auug.org.au>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi, Christoph
+On 5/26/20 3:39 AM, Stephen Rothwell wrote:
+> Hi all,
+> 
+> News: there will be no linux-next release tomorrow.
+> 
+> Changes since 20200525:
+> 
 
-On 2020/5/26 下午10:46, Christoph Hellwig wrote:
-> On Tue, May 26, 2020 at 07:49:08PM +0800, Zhangfei Gao wrote:
->> Some platform devices appear as PCI but are actually on the AMBA bus,
->> and they need fixup in drivers/pci/quirks.c handling iommu_fwnode.
->> Here introducing PCI_FIXUP_IOMMU, which is called after iommu_fwnode
->> is allocated, instead of reusing PCI_FIXUP_FINAL since it will slow
->> down iommu probing as all devices in fixup final list will be
->> reprocessed.
-> Who is going to use this?  I don't see a single user in the series.
-We will add iommu fixup in drivers/pci/quirks.c, handling
+on i386:
 
-fwspec->can_stall, which is introduced in
+when CONFIG_IPV6 is not set/enabled:
 
-https://www.spinics.net/lists/linux-pci/msg94559.html
 
-Unfortunately, the patch does not catch v5.8, so we have to wait.
-And we want to check whether this is a right method to solve this issue.
+  CC      drivers/crypto/chelsio/chcr_ktls.o
+In file included from ../include/linux/tcp.h:19:0,
+                 from ../include/net/tls.h:41,
+                 from ../drivers/crypto/chelsio/chcr_ktls.h:8,
+                 from ../drivers/crypto/chelsio/chcr_ktls.c:6:
+../drivers/crypto/chelsio/chcr_ktls.c: In function 'chcr_ktls_act_open_req6':
+../include/net/sock.h:380:37: error: 'struct sock_common' has no member named 'skc_v6_rcv_saddr'; did you mean 'skc_rcv_saddr'?
+ #define sk_v6_rcv_saddr __sk_common.skc_v6_rcv_saddr
+                                     ^
+../drivers/crypto/chelsio/chcr_ktls.c:257:37: note: in expansion of macro 'sk_v6_rcv_saddr'
+  cpl->local_ip_hi = *(__be64 *)&sk->sk_v6_rcv_saddr.in6_u.u6_addr8[0];
+                                     ^~~~~~~~~~~~~~~
+../include/net/sock.h:380:37: error: 'struct sock_common' has no member named 'skc_v6_rcv_saddr'; did you mean 'skc_rcv_saddr'?
+ #define sk_v6_rcv_saddr __sk_common.skc_v6_rcv_saddr
+                                     ^
+../drivers/crypto/chelsio/chcr_ktls.c:258:37: note: in expansion of macro 'sk_v6_rcv_saddr'
+  cpl->local_ip_lo = *(__be64 *)&sk->sk_v6_rcv_saddr.in6_u.u6_addr8[8];
+                                     ^~~~~~~~~~~~~~~
+../include/net/sock.h:379:34: error: 'struct sock_common' has no member named 'skc_v6_daddr'; did you mean 'skc_daddr'?
+ #define sk_v6_daddr  __sk_common.skc_v6_daddr
+                                  ^
+../drivers/crypto/chelsio/chcr_ktls.c:259:36: note: in expansion of macro 'sk_v6_daddr'
+  cpl->peer_ip_hi = *(__be64 *)&sk->sk_v6_daddr.in6_u.u6_addr8[0];
+                                    ^~~~~~~~~~~
+../include/net/sock.h:379:34: error: 'struct sock_common' has no member named 'skc_v6_daddr'; did you mean 'skc_daddr'?
+ #define sk_v6_daddr  __sk_common.skc_v6_daddr
+                                  ^
+../drivers/crypto/chelsio/chcr_ktls.c:260:36: note: in expansion of macro 'sk_v6_daddr'
+  cpl->peer_ip_lo = *(__be64 *)&sk->sk_v6_daddr.in6_u.u6_addr8[8];
+                                    ^~~~~~~~~~~
+../drivers/crypto/chelsio/chcr_ktls.c: In function 'chcr_setup_connection':
+../include/net/sock.h:379:34: error: 'struct sock_common' has no member named 'skc_v6_daddr'; did you mean 'skc_daddr'?
+ #define sk_v6_daddr  __sk_common.skc_v6_daddr
+                                  ^
+../drivers/crypto/chelsio/chcr_ktls.c:295:27: note: in expansion of macro 'sk_v6_daddr'
+       ipv6_addr_type(&sk->sk_v6_daddr) == IPV6_ADDR_MAPPED)) {
+                           ^~~~~~~~~~~
+../include/net/sock.h:380:37: error: 'struct sock_common' has no member named 'skc_v6_rcv_saddr'; did you mean 'skc_rcv_saddr'?
+ #define sk_v6_rcv_saddr __sk_common.skc_v6_rcv_saddr
+                                     ^
+../drivers/crypto/chelsio/chcr_ktls.c:302:29: note: in expansion of macro 'sk_v6_rcv_saddr'
+           (const u32 *)&sk->sk_v6_rcv_saddr.in6_u.u6_addr8,
+                             ^~~~~~~~~~~~~~~
+../drivers/crypto/chelsio/chcr_ktls.c: In function 'chcr_ktls_dev_del':
+../include/net/sock.h:379:34: error: 'struct sock_common' has no member named 'skc_v6_daddr'; did you mean 'skc_daddr'?
+ #define sk_v6_daddr  __sk_common.skc_v6_daddr
+                                  ^
+../drivers/crypto/chelsio/chcr_ktls.c:400:26: note: in expansion of macro 'sk_v6_daddr'
+        (const u32 *)&sk->sk_v6_daddr.in6_u.u6_addr8,
+                          ^~~~~~~~~~~
+../drivers/crypto/chelsio/chcr_ktls.c: In function 'chcr_ktls_dev_add':
+../include/net/sock.h:379:34: error: 'struct sock_common' has no member named 'skc_v6_daddr'; did you mean 'skc_daddr'?
+ #define sk_v6_daddr  __sk_common.skc_v6_daddr
+                                  ^
+../drivers/crypto/chelsio/chcr_ktls.c:494:27: note: in expansion of macro 'sk_v6_daddr'
+       ipv6_addr_type(&sk->sk_v6_daddr) == IPV6_ADDR_MAPPED)) {
+                           ^~~~~~~~~~~
+In file included from ../arch/x86/include/asm/string.h:3:0,
+                 from ../include/linux/string.h:20,
+                 from ../arch/x86/include/asm/page_32.h:35,
+                 from ../arch/x86/include/asm/page.h:14,
+                 from ../arch/x86/include/asm/thread_info.h:12,
+                 from ../include/linux/thread_info.h:38,
+                 from ../arch/x86/include/asm/preempt.h:7,
+                 from ../include/linux/preempt.h:78,
+                 from ../include/linux/spinlock.h:51,
+                 from ../include/linux/wait.h:9,
+                 from ../include/linux/wait_bit.h:8,
+                 from ../include/linux/fs.h:6,
+                 from ../include/linux/highmem.h:5,
+                 from ../drivers/crypto/chelsio/chcr_ktls.c:5:
+../include/net/sock.h:379:34: error: 'struct sock_common' has no member named 'skc_v6_daddr'; did you mean 'skc_daddr'?
+ #define sk_v6_daddr  __sk_common.skc_v6_daddr
+                                  ^
+../arch/x86/include/asm/string_32.h:182:45: note: in definition of macro 'memcpy'
+ #define memcpy(t, f, n) __builtin_memcpy(t, f, n)
+                                             ^
+../drivers/crypto/chelsio/chcr_ktls.c:497:22: note: in expansion of macro 'sk_v6_daddr'
+   memcpy(daaddr, sk->sk_v6_daddr.in6_u.u6_addr8, 16);
+                      ^~~~~~~~~~~
 
-Thanks
 
+-- 
+~Randy
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
