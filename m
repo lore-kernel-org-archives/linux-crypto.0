@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C01C433E1
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 19:29:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC77C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 19:32:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D250920721
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 19:29:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07A2120776
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 19:32:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590521377;
-	bh=5/HI5uD/MgHLguB/CuZLIgLp1pq4W0DbYO90s2eO6oQ=;
+	s=default; t=1590521525;
+	bh=mXIaFIsb6ojuU/QsDD0C6fHGfCbjjgZT0HXkmo6zXkU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=dY30vS0SR3rAXMupudhmKzRDr+PYGoaYyNcbntdU6bfT3JIXS+2F0LhLN3MpQC3ao
-	 MrSjxDgj7eOtjAyCNcMhV0GfWW0D/Y0L4tluVCTLqJXOdYeb538zvTnsak3icAlkJP
-	 MAgiNW2OdZc8Dnybasd7B8HbGk2Gjbax7Mm1lWMk=
+	b=0cJdGSXUpEOZho1qzie4H8RLYoWSsqmOvbmHH5Ky5c2vIfBaZ1XidVpUxdhX75Cem
+	 OzgkGs7WyWuM1eUPPSgbitUTC7xxCTbXgQnOslUq+tYwvVniEb3UdhQQXNzeiMxVaK
+	 KkA+vlBR+U5uL8JG6gkl3D5F9T+RvjWfk5L2YYkc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390938AbgEZTBZ (ORCPT
+        id S2390261AbgEZS6P (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 May 2020 15:01:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55650 "EHLO mail.kernel.org"
+        Tue, 26 May 2020 14:58:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51638 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389833AbgEZTBZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 May 2020 15:01:25 -0400
+        id S2390266AbgEZS6K (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 May 2020 14:58:10 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 80AFD20873;
-        Tue, 26 May 2020 19:01:23 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0D37B208B6;
+        Tue, 26 May 2020 18:58:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590519684;
-        bh=5/HI5uD/MgHLguB/CuZLIgLp1pq4W0DbYO90s2eO6oQ=;
+        s=default; t=1590519489;
+        bh=mXIaFIsb6ojuU/QsDD0C6fHGfCbjjgZT0HXkmo6zXkU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uE4xsNNMn1AweF3EREefnS/CHTQjnDJZkXyCRGR/MaptFznKMiKYWw04hrhrVadCK
-         y9forIi14BOTheDDTNBsMb/TMHeUsgeLn7deU02xoxAyViMOEnQK3OSDvuCSjMK3Vz
-         53J3SZuSbDb0BzzkdOU5ZNY6koYAbdL6aTN242Ko=
+        b=rhy0LOYFqFGkWc/06Vlv2TmnUttbQjDde9DC0FU6XBsTM7j329gI83OSKVTmNFacX
+         d1XpoZOiUkpJtT/CgzKLxI35gRvTy7hTY6dnapfAoreirUCsOOf80wdLbgh6kvPcxM
+         sKfKbYt+AZdQAQlfAhmhAOR9l5BbR1hiW5uSiuHI=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -46,12 +46,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Steffen Klassert <steffen.klassert@secunet.com>,
         linux-crypto@vger.kernel.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 4.14 28/59] padata: initialize pd->cpu with effective cpumask
-Date:   Tue, 26 May 2020 20:53:13 +0200
-Message-Id: <20200526183917.592937638@linuxfoundation.org>
+Subject: [PATCH 4.9 23/64] padata: initialize pd->cpu with effective cpumask
+Date:   Tue, 26 May 2020 20:52:52 +0200
+Message-Id: <20200526183920.243276955@linuxfoundation.org>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200526183907.123822792@linuxfoundation.org>
-References: <20200526183907.123822792@linuxfoundation.org>
+In-Reply-To: <20200526183913.064413230@linuxfoundation.org>
+References: <20200526183913.064413230@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -117,7 +117,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/kernel/padata.c b/kernel/padata.c
-index 66d96ed62286..6d0cdee9d321 100644
+index 0b9c39730d6d..1030e6cfc08c 100644
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
 @@ -450,7 +450,7 @@ static struct parallel_data *padata_alloc_pd(struct padata_instance *pinst,
