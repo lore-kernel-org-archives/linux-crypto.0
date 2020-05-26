@@ -2,129 +2,122 @@ Return-Path: <SRS0=zQvQ=7I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0247DC433E1
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 12:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9CD8C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 12:27:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2DDA208B3
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 12:07:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B982F2084C
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 May 2020 12:27:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J+ir68ua"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="dG6/9sBz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729015AbgEZMHd (ORCPT
+        id S1730436AbgEZM16 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 May 2020 08:07:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52746 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727844AbgEZMHc (ORCPT
+        Tue, 26 May 2020 08:27:58 -0400
+Received: from lelv0142.ext.ti.com ([198.47.23.249]:41572 "EHLO
+        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726437AbgEZM15 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 May 2020 08:07:32 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511DFC03E96D
-        for <linux-crypto@vger.kernel.org>; Tue, 26 May 2020 05:07:32 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id t8so1263089pju.3
-        for <linux-crypto@vger.kernel.org>; Tue, 26 May 2020 05:07:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=fpsA7Nq2nxropNth7zUzBAVP9PJ+/EXl3l54pU3n9ZM=;
-        b=J+ir68uaqgnC0bpUtYh7gEhKg91ecOFPaqozofq5uKsLc7Q5y3iFeqMqCZAJviMx+s
-         5ig+pjzGqwz+mFaduqg65bildjvb3DkPZio13iXEBv0mAnfqdngUZrwP8cIh8JeTUCVJ
-         gmFnjjcFBD8aNXil24SDu+Jkirv39gmumTTyj55+HgtSDlf8tVbBjh7E552efJG/Wjo8
-         EJDaQDAdQwq7KwVsaMRKey6Y7TjZsMZCOt/LAThI6/92Dp0fkT6otf1CI6seawSCUyPt
-         WoWoRsARBzdoihaCWqPAXG3jCyZxwI+pM2gsZxtGTudpYt/c710Xf3GM28FbeauVBfE6
-         ryPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=fpsA7Nq2nxropNth7zUzBAVP9PJ+/EXl3l54pU3n9ZM=;
-        b=K0exZwdUMYeGFb7kmm9e9AojZhVlAWW1Ffhcx8u/r8sMF5E27RgqsvIlQcpmUdUmPj
-         qxqX/lyx6ie8L3C2ljzCOclLdcIx+wWQZr4KxWb49V2hGNxPa+wiN6BP+K+qYy/9AO4W
-         ZYxrpZdRrb/FFbTz46xjwNF0tLb5nFFf0Xb0gKEhDDmscWsohMUc22atHMJmAGNDqbV3
-         l29uOSnJyMzQmEcsrX7qI4psRqvwNTGkLMOPG3T9WVcKfNY+WTk0NaZo9snTs9SSQdos
-         03kuyRfkPlrOhkiVwtuoolarFAe5Bcsl4ttUFPT/MowQ9e8fj+/vvRRHcq55prLJsBI9
-         OFnA==
-X-Gm-Message-State: AOAM531pmHR04Nju7mxc6yo6XVDyLXPoe+j+I50+mOtVEzYYuKtBIXT9
-        in7NSJSayFodNZbFDuI9CYXo0g==
-X-Google-Smtp-Source: ABdhPJwJC/VIL8ph3znchjMxyQibr056u3YncVEhb6v6BwGdiIO+FoFmlj/9d7sAY/kJdEg5hx2xFg==
-X-Received: by 2002:a17:902:6b02:: with SMTP id o2mr822931plk.25.1590494851770;
-        Tue, 26 May 2020 05:07:31 -0700 (PDT)
-Received: from [10.74.2.18] ([45.135.186.9])
-        by smtp.gmail.com with ESMTPSA id x132sm15300133pfd.214.2020.05.26.05.07.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 May 2020 05:07:30 -0700 (PDT)
-Subject: Re: [PATCH 0/2] Let pci_fixup_final access iommu_fwnode
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Hanjun Guo <guohanjun@huawei.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-References: <1589256511-12446-1-git-send-email-zhangfei.gao@linaro.org>
- <20200525134318.GB5221@8bytes.org>
-From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-Message-ID: <7c6e9389-c34a-4d30-bc8d-572c41572d15@linaro.org>
-Date:   Tue, 26 May 2020 20:07:01 +0800
+        Tue, 26 May 2020 08:27:57 -0400
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 04QCRkag123725;
+        Tue, 26 May 2020 07:27:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1590496066;
+        bh=fW4dh2RlDLtgqAe1LMh/aOIhCZSLWJb/46PvuFUCsOU=;
+        h=Subject:To:CC:References:From:Date:In-Reply-To;
+        b=dG6/9sBzee8Qvx2us5nsIDzM8Bi2JHCw/+EF8HoWm+T2bSlzEIpZjAIFZY5LQxULl
+         jPkETCCEdNotNdeYA1I4kZdVNITJr/rmcGH5fAF+ucRTQWFd/Zoey1b2BolmdxDows
+         VtJvip4t9MyvsT5poABHgqPIHHAFhxOJlavlOG5E=
+Received: from DFLE114.ent.ti.com (dfle114.ent.ti.com [10.64.6.35])
+        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 04QCRkFk047965
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 26 May 2020 07:27:46 -0500
+Received: from DFLE110.ent.ti.com (10.64.6.31) by DFLE114.ent.ti.com
+ (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Tue, 26
+ May 2020 07:27:46 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE110.ent.ti.com
+ (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
+ Frontend Transport; Tue, 26 May 2020 07:27:46 -0500
+Received: from [127.0.0.1] (ileax41-snat.itg.ti.com [10.172.224.153])
+        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 04QCRcHW085540;
+        Tue, 26 May 2020 07:27:45 -0500
+Subject: Re: [PATCHv2 3/7] crypto: omap-crypto: fix userspace copied buffer
+ access
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+        <linux-omap@vger.kernel.org>, Tejun Heo <tj@kernel.org>
+References: <20200511111913.26541-1-t-kristo@ti.com>
+ <20200511111913.26541-4-t-kristo@ti.com>
+ <20200522131247.GA27255@gondor.apana.org.au>
+From:   Tero Kristo <t-kristo@ti.com>
+Message-ID: <24092385-1348-f55d-a637-6fb2b3129f4e@ti.com>
+Date:   Tue, 26 May 2020 15:27:38 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200525134318.GB5221@8bytes.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200522131247.GA27255@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On 2020/5/25 下午9:43, Joerg Roedel wrote:
-> On Tue, May 12, 2020 at 12:08:29PM +0800, Zhangfei Gao wrote:
->> Some platform devices appear as PCI but are
->> actually on the AMBA bus, and they need fixup in
->> drivers/pci/quirks.c handling iommu_fwnode.
->> So calling pci_fixup_final after iommu_fwnode is allocated.
+On 22/05/2020 16:12, Herbert Xu wrote:
+> On Mon, May 11, 2020 at 02:19:09PM +0300, Tero Kristo wrote:
+>> In case buffers are copied from userspace, directly accessing the page
+>> will most likely fail because it hasn't been mapped into the kernel
+>> memory space. Fix the issue by forcing a kmap / kunmap within the
+>> cleanup functionality.
 >>
->> For example:
->> Hisilicon platform device need fixup in
->> drivers/pci/quirks.c
+>> Signed-off-by: Tero Kristo <t-kristo@ti.com>
+>> ---
+>>   drivers/crypto/omap-crypto.c | 9 +++++++--
+>>   1 file changed, 7 insertions(+), 2 deletions(-)
 >>
->> +static void quirk_huawei_pcie_sva(struct pci_dev *pdev)
->> +{
->> +	struct iommu_fwspec *fwspec;
->> +
->> +	pdev->eetlp_prefix_path = 1;
->> +	fwspec = dev_iommu_fwspec_get(&pdev->dev);
->> +	if (fwspec)
->> +		fwspec->can_stall = 1;
->> +}
->> +
->> +DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_HUAWEI, 0xa250, quirk_huawei_pcie_sva);
->> +DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_HUAWEI, 0xa251, quirk_huawei_pcie_sva);
-> I don't think it is a great idea to hook this into PCI_FIXUP_FINAL. The
-> fixup list needs to be processed for every device, which will slow down
-> probing.
->
-> So either we introduce something like PCI_FIXUP_IOMMU, if this is
-> entirely PCI specific. If it needs to be generic we need some fixup
-> infrastructure in the IOMMU code itself.
+>> diff --git a/drivers/crypto/omap-crypto.c b/drivers/crypto/omap-crypto.c
+>> index cc88b7362bc2..31bdb1d76d11 100644
+>> --- a/drivers/crypto/omap-crypto.c
+>> +++ b/drivers/crypto/omap-crypto.c
+>> @@ -178,11 +178,16 @@ static void omap_crypto_copy_data(struct scatterlist *src,
+>>   		amt = min(src->length - srco, dst->length - dsto);
+>>   		amt = min(len, amt);
+>>   
+>> -		srcb = sg_virt(src) + srco;
+>> -		dstb = sg_virt(dst) + dsto;
+>> +		srcb = kmap_atomic(sg_page(src)) + srco + src->offset;
+>> +		dstb = kmap_atomic(sg_page(dst)) + dsto + dst->offset;
+>>   
+>>   		memcpy(dstb, srcb, amt);
+>>   
+>> +		flush_dcache_page(sg_page(dst));
+> 
+> You need to check !PageSlab as it's illegal to call it on a kernel
+> page.  Also you should be using flush_kernel_dcache_page.  scatterwalk
+> uses flush_dcache_page only because when it was created the other
+> function didn't exist.
 
-Thanks Joerg for the good suggestion.
-I am trying to introduce PCI_FIXUP_IOMMU in
-https://lkml.org/lkml/2020/5/26/366
+Ok will fix that.
 
-Thanks
+> Would it be possible to use the sg_miter interface to do the copy?
+> In fact your function could possibly be added to lib/scatterlist.c
+> as it seems to be quite generic.
+
+I think it would make sense to use that, however as I am just fixing an 
+existing bug here, would it be ok if I just fix your above comment and 
+post v3? I can convert this later to sg_miter and take a shot at moving 
+this to lib/scatterlist.c as that seems slightly bigger effort and I 
+would not want to block this whole series because of that...
+
+-Tero
+--
+Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
