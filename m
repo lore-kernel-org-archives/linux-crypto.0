@@ -2,82 +2,95 @@ Return-Path: <SRS0=h1Lr=7J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E18C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 12:08:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC944C433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 12:24:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4B16208B6
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 12:08:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C29820873
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 12:24:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lXR1DDPL"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Qqx9rpbf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387856AbgE0MIw (ORCPT
+        id S1726965AbgE0MYn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 May 2020 08:08:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50762 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387849AbgE0MIq (ORCPT
+        Wed, 27 May 2020 08:24:43 -0400
+Received: from fllv0015.ext.ti.com ([198.47.19.141]:60650 "EHLO
+        fllv0015.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725900AbgE0MYm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 May 2020 08:08:46 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C03B7C08C5C2;
-        Wed, 27 May 2020 05:08:45 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id h4so2800117wmb.4;
-        Wed, 27 May 2020 05:08:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=KSPP+QqMImfHhwneJyxdTK+m/mWOF1LBHIEu32FlwNM=;
-        b=lXR1DDPLC4j54d7i3HvGLucspXjPrWIgYC37+qVsv+Yet05CVbTBTpoitY2h8DRNV8
-         e4tgtRP2hV2jbuhDcLHAiTXtmZs2AXI71HiyxqSaK5OCDSfAYGoLBTAnuDFhs4cyD4hf
-         KU01q4wDZkX3kyofC5oeiKZZfNJQ11IT/3icg2MlAClsX5tGhmWqQNaP4r+8zcOtFiga
-         aBDbLvSwYnf6BHOrOgXcF+GFXZWYoO4SoxgL5eLuFgfKDEp4YM2qRL/lmKjtGVknTicw
-         vMCwFPFeOlOa7x/bQk2NvLGpJj6mSCv8tCYULAehXcPjbeke62V5eKFGtokWoNW/+Cmn
-         oZgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KSPP+QqMImfHhwneJyxdTK+m/mWOF1LBHIEu32FlwNM=;
-        b=s5r6LbBkFvE2MwjOu/nARReJhkg8q71nmQm+uNpTGMFZNYFpkhYxEuNAP2rkwfdrTv
-         bquVUU2RASrfph3/hCjBQUqJ+NJgY+fFYY1HDnyv/mSxid9lp9YsY80eWbJdlmNsRnNn
-         A3dxGQoZZ5GyA/etErG0V0F13YaoSMfhfTrJ9TrK6+SrQKTuvpotymeSq7rC1ZplL6BO
-         DpkVh3lHp13L/jsGhfgIEOwDjUU8512/4uPqPbXq+JkT/DHkwC8bgl/L6PMkx9117ZsS
-         bq3RbldepedWr+E8C5QHACKPCISsWJ6Hvut1j9pH70Z11jKua3ylhjO56omjUcirVDrT
-         jlSg==
-X-Gm-Message-State: AOAM531IzkZtlwFB3zM+de5e+akKj7DV1meLTZD5ZegsiSfHERjfvFas
-        hynTlBA9X7uUeE6pDij22KJT7mAJGp7ITW8Tsge70w==
-X-Google-Smtp-Source: ABdhPJwhsWUOmQb0xFnKD3NeUS3BuEnt2AXm56FDwKy0wV647o0vzA1MpsLmMBCoGzrfWZgfGXq796sUPO39nJ56Tnw=
-X-Received: by 2002:a1c:dc05:: with SMTP id t5mr4214043wmg.112.1590581324183;
- Wed, 27 May 2020 05:08:44 -0700 (PDT)
+        Wed, 27 May 2020 08:24:42 -0400
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 04RCOb5H122837;
+        Wed, 27 May 2020 07:24:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1590582277;
+        bh=r/Z289ziuLekskSoAOTc4KuAcsPT8zHSmf/vDtvcIms=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References;
+        b=Qqx9rpbf1xnm6GVXnQ0/VlxlAaKTBAnw/IX4IQIAjOqW0D3BQfC0fYTP06CdemuqI
+         wLIQhl/RlqKwY2UCdztM6XUWfVq0BXw9uTeYhVB0P7gbdKQuPXsPhfhAM9r5W8eCww
+         IpPHq9GxPxrm3Fgdlb6JwQNdjOTInYvcu7H74VL8=
+Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
+        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 04RCObuw112736
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 27 May 2020 07:24:37 -0500
+Received: from DFLE109.ent.ti.com (10.64.6.30) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Wed, 27
+ May 2020 07:24:37 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE109.ent.ti.com
+ (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
+ Frontend Transport; Wed, 27 May 2020 07:24:37 -0500
+Received: from sokoban.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
+        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 04RCOYRe101979;
+        Wed, 27 May 2020 07:24:36 -0500
+From:   Tero Kristo <t-kristo@ti.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>
+CC:     <linux-omap@vger.kernel.org>
+Subject: [RESEND PATCHv3 1/7] crypto: omap-aes: avoid spamming console with self tests
+Date:   Wed, 27 May 2020 15:24:23 +0300
+Message-ID: <20200527122429.14888-2-t-kristo@ti.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200527122429.14888-1-t-kristo@ti.com>
+References: <20200527122429.14888-1-t-kristo@ti.com>
 MIME-Version: 1.0
-References: <CANpvso4V67SBKn9+SXc+H=r-H-up+GWt77K4jH5HJx9k+sR+hA@mail.gmail.com>
-In-Reply-To: <CANpvso4V67SBKn9+SXc+H=r-H-up+GWt77K4jH5HJx9k+sR+hA@mail.gmail.com>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Wed, 27 May 2020 20:08:03 +0800
-Message-ID: <CACXcFmkzvvXc+Zi5MBe4_oOtiukczQG+RJjDjcwtAvBbkxGTRA@mail.gmail.com>
-Subject: Re: Looking for an open-source thesis idea
-To:     Eric Curtin <ericcurtin17@gmail.com>
-Cc:     Kernel development list <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Eric Curtin <ericcurtin17@gmail.com> wrote:
+Running the self test suite for omap-aes with extra tests enabled causes
+huge spam with the tag message wrong indicators. With self tests, this
+is fine as there are some tests that purposedly pass bad data to the
+driver. Also, returning -EBADMSG from the driver is enough, so remove the
+dev_err message completely.
 
-> Hope I'm not bothering you. I'm looking for a masters thesis idea, ...
+Signed-off-by: Tero Kristo <t-kristo@ti.com>
+---
+ drivers/crypto/omap-aes-gcm.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Here's a report claiming 70% of security bugs involve memory errors.
-https://www.zdnet.com/article/chrome-70-of-all-security-bugs-are-memory-safety-issues/
-Build a tool to find or fix those?
+diff --git a/drivers/crypto/omap-aes-gcm.c b/drivers/crypto/omap-aes-gcm.c
+index 32dc00dc570b..9f937bdc53a7 100644
+--- a/drivers/crypto/omap-aes-gcm.c
++++ b/drivers/crypto/omap-aes-gcm.c
+@@ -77,7 +77,6 @@ static void omap_aes_gcm_done_task(struct omap_aes_dev *dd)
+ 		tag = (u8 *)rctx->auth_tag;
+ 		for (i = 0; i < dd->authsize; i++) {
+ 			if (tag[i]) {
+-				dev_err(dd->dev, "GCM decryption: Tag Message is wrong\n");
+ 				ret = -EBADMSG;
+ 			}
+ 		}
+-- 
+2.17.1
 
-Another report I saw on Slashdot recently said lots of web vulnerabilities
-were due to problems in widely used open source libraries.
+--
+Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
