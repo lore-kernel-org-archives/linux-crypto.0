@@ -5,54 +5,53 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B99FC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 17:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01EA9C433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 17:39:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4491E20707
+	by mail.kernel.org (Postfix) with ESMTP id D39B720707
 	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 17:39:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ONbNgPHl"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KPhP5B3V"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387902AbgE0RjC (ORCPT
+        id S2391154AbgE0RjG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 May 2020 13:39:02 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:57438 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387564AbgE0RjC (ORCPT
+        Wed, 27 May 2020 13:39:06 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:52240 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387564AbgE0RjD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 May 2020 13:39:02 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04RHbktf180268;
-        Wed, 27 May 2020 17:38:31 GMT
+        Wed, 27 May 2020 13:39:03 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04RHbsA9183555;
+        Wed, 27 May 2020 17:38:34 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2020-01-29;
- bh=YM4/U9R5Ai/FZVrK2lejcDvXTt4wGV0YuZreByw2PVw=;
- b=ONbNgPHl5oyznl61QFZsiddnJ8sk22qW/2JbG05uDr5somsFFSAgsjdvWq9e3usiIQhb
- rj0gbapNPBTdUVF8Oya7JXLlxkP2ju17Z4tpjef90YGlAxgvXVxk5LV2K4WdnyDpOVKf
- KLNtdJCAM1+6phQr2LVCmReq/HlliB/k9uLA19jDYe+pHzUgodt7jogXxQGiaiYX602i
- irtZ77Nq4sKeW7GLn4yBQmAKtInuMxF8kfeO7lRxioy0jzM6uzjSaTvEI+S+LnLulL+K
- LpI5ZT2i3s+cJsn+19Kb1mFrCoXrP+V6KkYb9uurHjBEVpGbL9ek9KYOF4pngSz5t9W6 NA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 318xbk0vds-1
+ bh=Ve6Yl+N+FKzwOLaiMokVozZ/Xsbw/tJM0PDnM1M2bLw=;
+ b=KPhP5B3VnbXMOtbNZ54G+vZILsYNlQp8UP60R5QsSphEho41GTVCzv2gZBwR3Q2cAM2J
+ jWV5TLidJNGGMhuuZbXNYktjTfecnE3t6AuUHS0yHt2nIvrD7dzijDNTOkcp/7W+jdA6
+ j1KaY+jka0JetgwQpY9rOESXuosDJIby3aijphchgW9NjJX55V10NWaCLgcN+4JXqfxn
+ tc1lix3WUIzyHqY9IMFORc4wWPPeolL6d5/WPzmfQ8oEHGMAHUuVB7u22DuirIs5o3Q9
+ C9eUmrrk0BdUi7FctPpsuUbfX/b44oUrfeS3deWK4CFXNU5WCEUZBJo/WrDTwCSB64Mu ew== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 316u8r0uaa-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 27 May 2020 17:38:31 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04RHXcrv105464;
-        Wed, 27 May 2020 17:36:30 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 317j5sfs53-1
+        Wed, 27 May 2020 17:38:34 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04RHX4l4195469;
+        Wed, 27 May 2020 17:36:34 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 317ddr6jxm-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 May 2020 17:36:30 +0000
+        Wed, 27 May 2020 17:36:34 +0000
 Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04RHaIa2012609;
-        Wed, 27 May 2020 17:36:18 GMT
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04RHaViR013711;
+        Wed, 27 May 2020 17:36:32 GMT
 Received: from localhost.localdomain (/98.229.125.203)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 27 May 2020 10:36:18 -0700
+        with ESMTP ; Wed, 27 May 2020 10:36:31 -0700
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Andrew Morton <akpm@linux-foundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -78,57 +77,112 @@ Cc:     Alex Williamson <alex.williamson@redhat.com>,
         linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org,
         Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [PATCH v3 1/8] padata: remove exit routine
-Date:   Wed, 27 May 2020 13:36:01 -0400
-Message-Id: <20200527173608.2885243-2-daniel.m.jordan@oracle.com>
+Subject: [PATCH v3 7/8] mm: make deferred init's max threads arch-specific
+Date:   Wed, 27 May 2020 13:36:07 -0400
+Message-Id: <20200527173608.2885243-8-daniel.m.jordan@oracle.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200527173608.2885243-1-daniel.m.jordan@oracle.com>
 References: <20200527173608.2885243-1-daniel.m.jordan@oracle.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9633 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 suspectscore=2
- mlxlogscore=999 mlxscore=0 adultscore=0 phishscore=0 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0 mlxscore=0
+ phishscore=0 adultscore=0 suspectscore=2 spamscore=0 malwarescore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
  definitions=main-2005270137
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9633 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 spamscore=0 mlxscore=0
- lowpriorityscore=0 priorityscore=1501 phishscore=0 cotscore=-2147483648
- suspectscore=2 bulkscore=0 clxscore=1015 impostorscore=0 malwarescore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2005270137
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0
+ priorityscore=1501 spamscore=0 cotscore=-2147483648 suspectscore=2
+ phishscore=0 clxscore=1015 mlxlogscore=999 bulkscore=0 adultscore=0
+ lowpriorityscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005270137
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-padata_driver_exit() is unnecessary because padata isn't built as a
-module and doesn't exit.
+Using padata during deferred init has only been tested on x86, so for
+now limit it to this architecture.
 
-padata's init routine will soon allocate memory, so getting rid of the
-exit function now avoids pointless code to free it.
+If another arch wants this, it can find the max thread limit that's best
+for it and override deferred_page_init_max_threads().
 
 Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
 Tested-by: Josh Triplett <josh@joshtriplett.org>
 ---
- kernel/padata.c | 6 ------
- 1 file changed, 6 deletions(-)
+ arch/x86/mm/init_64.c    | 12 ++++++++++++
+ include/linux/memblock.h |  3 +++
+ mm/page_alloc.c          | 13 ++++++++-----
+ 3 files changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index a6afa12fb75ee..835919c745266 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -1072,10 +1072,4 @@ static __init int padata_driver_init(void)
+diff --git a/arch/x86/mm/init_64.c b/arch/x86/mm/init_64.c
+index 8b5f73f5e207c..2d749ec12ea8a 100644
+--- a/arch/x86/mm/init_64.c
++++ b/arch/x86/mm/init_64.c
+@@ -1260,6 +1260,18 @@ void __init mem_init(void)
+ 	mem_init_print_info(NULL);
  }
- module_init(padata_driver_init);
  
--static __exit void padata_driver_exit(void)
--{
--	cpuhp_remove_multi_state(CPUHP_PADATA_DEAD);
--	cpuhp_remove_multi_state(hp_online);
--}
--module_exit(padata_driver_exit);
- #endif
++#ifdef CONFIG_DEFERRED_STRUCT_PAGE_INIT
++int __init deferred_page_init_max_threads(const struct cpumask *node_cpumask)
++{
++	/*
++	 * More CPUs always led to greater speedups on tested systems, up to
++	 * all the nodes' CPUs.  Use all since the system is otherwise idle
++	 * now.
++	 */
++	return max_t(int, cpumask_weight(node_cpumask), 1);
++}
++#endif
++
+ int kernel_set_to_readonly;
+ 
+ void mark_rodata_ro(void)
+diff --git a/include/linux/memblock.h b/include/linux/memblock.h
+index 6bc37a731d27b..2b289df44194f 100644
+--- a/include/linux/memblock.h
++++ b/include/linux/memblock.h
+@@ -275,6 +275,9 @@ void __next_mem_pfn_range_in_zone(u64 *idx, struct zone *zone,
+ #define for_each_free_mem_pfn_range_in_zone_from(i, zone, p_start, p_end) \
+ 	for (; i != U64_MAX;					  \
+ 	     __next_mem_pfn_range_in_zone(&i, zone, p_start, p_end))
++
++int __init deferred_page_init_max_threads(const struct cpumask *node_cpumask);
++
+ #endif /* CONFIG_DEFERRED_STRUCT_PAGE_INIT */
+ 
+ /**
+diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+index 1d47016849531..329fd1a809c59 100644
+--- a/mm/page_alloc.c
++++ b/mm/page_alloc.c
+@@ -1835,6 +1835,13 @@ deferred_init_memmap_chunk(unsigned long start_pfn, unsigned long end_pfn,
+ 	}
+ }
+ 
++/* An arch may override for more concurrency. */
++__weak int __init
++deferred_page_init_max_threads(const struct cpumask *node_cpumask)
++{
++	return 1;
++}
++
+ /* Initialise remaining memory on a node */
+ static int __init deferred_init_memmap(void *data)
+ {
+@@ -1883,11 +1890,7 @@ static int __init deferred_init_memmap(void *data)
+ 						 first_init_pfn))
+ 		goto zone_empty;
+ 
+-	/*
+-	 * More CPUs always led to greater speedups on tested systems, up to
+-	 * all the nodes' CPUs.  Use all since the system is otherwise idle now.
+-	 */
+-	max_threads = max(cpumask_weight(cpumask), 1u);
++	max_threads = deferred_page_init_max_threads(cpumask);
+ 
+ 	while (spfn < epfn) {
+ 		unsigned long epfn_align = ALIGN(epfn, PAGES_PER_SECTION);
 -- 
 2.26.2
 
