@@ -2,187 +2,119 @@ Return-Path: <SRS0=h1Lr=7J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01EA9C433E1
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 17:39:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7659DC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 18:18:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D39B720707
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 17:39:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KPhP5B3V"
+	by mail.kernel.org (Postfix) with ESMTP id 5DFFB20FC3
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 18:18:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1590603530;
+	bh=IlJRE+s/Xn0kFANnhdpCDcIhPKRLpygy8ad6xlPlHjQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:List-ID:From;
+	b=aZ1c33ly9RvA9Y+6nu8zK2nMf7z/RP26leFcPMFp0dbMDpri/L3A5HgQAWu83ZY4E
+	 yM7C4Y/7qu7TtD/QrA41/zdkBY+WQ1W0myQlICoN1Yab1TjNdSnhfrVz8OL80ZnN5j
+	 7MUjRMj4k8hLYdNlpv/iP5FK3A05fU6E+tdv+mm8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391154AbgE0RjG (ORCPT
+        id S2391935AbgE0SSp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 May 2020 13:39:06 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:52240 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387564AbgE0RjD (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 May 2020 13:39:03 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04RHbsA9183555;
-        Wed, 27 May 2020 17:38:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=Ve6Yl+N+FKzwOLaiMokVozZ/Xsbw/tJM0PDnM1M2bLw=;
- b=KPhP5B3VnbXMOtbNZ54G+vZILsYNlQp8UP60R5QsSphEho41GTVCzv2gZBwR3Q2cAM2J
- jWV5TLidJNGGMhuuZbXNYktjTfecnE3t6AuUHS0yHt2nIvrD7dzijDNTOkcp/7W+jdA6
- j1KaY+jka0JetgwQpY9rOESXuosDJIby3aijphchgW9NjJX55V10NWaCLgcN+4JXqfxn
- tc1lix3WUIzyHqY9IMFORc4wWPPeolL6d5/WPzmfQ8oEHGMAHUuVB7u22DuirIs5o3Q9
- C9eUmrrk0BdUi7FctPpsuUbfX/b44oUrfeS3deWK4CFXNU5WCEUZBJo/WrDTwCSB64Mu ew== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 316u8r0uaa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 27 May 2020 17:38:34 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04RHX4l4195469;
-        Wed, 27 May 2020 17:36:34 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3030.oracle.com with ESMTP id 317ddr6jxm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 May 2020 17:36:34 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04RHaViR013711;
-        Wed, 27 May 2020 17:36:32 GMT
-Received: from localhost.localdomain (/98.229.125.203)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 27 May 2020 10:36:31 -0700
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Andrew Morton <akpm@linux-foundation.org>,
+        Wed, 27 May 2020 14:18:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54726 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2391932AbgE0SSp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 27 May 2020 14:18:45 -0400
+Received: from localhost (mobile-166-175-190-200.mycingular.net [166.175.190.200])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3CF692075A;
+        Wed, 27 May 2020 18:18:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1590603524;
+        bh=IlJRE+s/Xn0kFANnhdpCDcIhPKRLpygy8ad6xlPlHjQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=nIx2hX8lM30uXBDTL7TuhND9kQ3G+qZ++mUq5WECUp59CfqdUpYK43QoUK7AXlVPf
+         KxTUevqFBycL9TlKq7SmWveEDn1K/rg1pDaaEGJos75PWipKFqulr3bGwuDJBHuVi1
+         7/+Jn7myhnHFa+KsZWLZ+HqvliJJB2ISAncHJDyU=
+Date:   Wed, 27 May 2020 13:18:42 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Zhangfei Gao <zhangfei.gao@linaro.org>
+Cc:     Joerg Roedel <joro@8bytes.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Hanjun Guo <guohanjun@huawei.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>,
+        jean-philippe <jean-philippe@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Kirill Tkhai <ktkhai@virtuozzo.com>,
-        Michal Hocko <mhocko@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Robert Elliott <elliott@hpe.com>,
-        Shile Zhang <shile.zhang@linux.alibaba.com>,
-        Steven Sistare <steven.sistare@oracle.com>,
-        Tejun Heo <tj@kernel.org>, Zi Yan <ziy@nvidia.com>,
-        linux-crypto@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org,
-        Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [PATCH v3 7/8] mm: make deferred init's max threads arch-specific
-Date:   Wed, 27 May 2020 13:36:07 -0400
-Message-Id: <20200527173608.2885243-8-daniel.m.jordan@oracle.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200527173608.2885243-1-daniel.m.jordan@oracle.com>
-References: <20200527173608.2885243-1-daniel.m.jordan@oracle.com>
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-acpi@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
+Message-ID: <20200527181842.GA256680@bjorn-Precision-5520>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9633 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0 mlxscore=0
- phishscore=0 adultscore=0 suspectscore=2 spamscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005270137
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9633 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0
- priorityscore=1501 spamscore=0 cotscore=-2147483648 suspectscore=2
- phishscore=0 clxscore=1015 mlxlogscore=999 bulkscore=0 adultscore=0
- lowpriorityscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005270137
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1590493749-13823-1-git-send-email-zhangfei.gao@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Using padata during deferred init has only been tested on x86, so for
-now limit it to this architecture.
+On Tue, May 26, 2020 at 07:49:07PM +0800, Zhangfei Gao wrote:
+> Some platform devices appear as PCI but are actually on the AMBA bus,
+> and they need fixup in drivers/pci/quirks.c handling iommu_fwnode.
+> Here introducing PCI_FIXUP_IOMMU, which is called after iommu_fwnode
+> is allocated, instead of reusing PCI_FIXUP_FINAL since it will slow
+> down iommu probing as all devices in fixup final list will be
+> reprocessed, suggested by Joerg, [1]
 
-If another arch wants this, it can find the max thread limit that's best
-for it and override deferred_page_init_max_threads().
+Is this slowdown significant?  We already iterate over every device
+when applying PCI_FIXUP_FINAL quirks, so if we used the existing
+PCI_FIXUP_FINAL, we wouldn't be adding a new loop.  We would only be
+adding two more iterations to the loop in pci_do_fixups() that tries
+to match quirks against the current device.  I doubt that would be a
+measurable slowdown.
 
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Tested-by: Josh Triplett <josh@joshtriplett.org>
----
- arch/x86/mm/init_64.c    | 12 ++++++++++++
- include/linux/memblock.h |  3 +++
- mm/page_alloc.c          | 13 ++++++++-----
- 3 files changed, 23 insertions(+), 5 deletions(-)
+> For example:
+> Hisilicon platform device need fixup in
+> drivers/pci/quirks.c handling fwspec->can_stall, which is introduced in [2]
+> 
+> +static void quirk_huawei_pcie_sva(struct pci_dev *pdev)
+> +{
+> +    struct iommu_fwspec *fwspec;
+> +
+> +    pdev->eetlp_prefix_path = 1;
+> +    fwspec = dev_iommu_fwspec_get(&pdev->dev);
+> +    if (fwspec)
+> +        fwspec->can_stall = 1;
+> +}
+> +
+> +DECLARE_PCI_FIXUP_IOMMU(PCI_VENDOR_ID_HUAWEI, 0xa250, quirk_huawei_pcie_sva);
+> +DECLARE_PCI_iFIXUP_IOMMU(PCI_VENDOR_ID_HUAWEI, 0xa251, quirk_huawei_pcie_sva); 
+> 
+> [1] https://www.spinics.net/lists/iommu/msg44591.html
+> [2] https://www.spinics.net/lists/linux-pci/msg94559.html
 
-diff --git a/arch/x86/mm/init_64.c b/arch/x86/mm/init_64.c
-index 8b5f73f5e207c..2d749ec12ea8a 100644
---- a/arch/x86/mm/init_64.c
-+++ b/arch/x86/mm/init_64.c
-@@ -1260,6 +1260,18 @@ void __init mem_init(void)
- 	mem_init_print_info(NULL);
- }
- 
-+#ifdef CONFIG_DEFERRED_STRUCT_PAGE_INIT
-+int __init deferred_page_init_max_threads(const struct cpumask *node_cpumask)
-+{
-+	/*
-+	 * More CPUs always led to greater speedups on tested systems, up to
-+	 * all the nodes' CPUs.  Use all since the system is otherwise idle
-+	 * now.
-+	 */
-+	return max_t(int, cpumask_weight(node_cpumask), 1);
-+}
-+#endif
-+
- int kernel_set_to_readonly;
- 
- void mark_rodata_ro(void)
-diff --git a/include/linux/memblock.h b/include/linux/memblock.h
-index 6bc37a731d27b..2b289df44194f 100644
---- a/include/linux/memblock.h
-+++ b/include/linux/memblock.h
-@@ -275,6 +275,9 @@ void __next_mem_pfn_range_in_zone(u64 *idx, struct zone *zone,
- #define for_each_free_mem_pfn_range_in_zone_from(i, zone, p_start, p_end) \
- 	for (; i != U64_MAX;					  \
- 	     __next_mem_pfn_range_in_zone(&i, zone, p_start, p_end))
-+
-+int __init deferred_page_init_max_threads(const struct cpumask *node_cpumask);
-+
- #endif /* CONFIG_DEFERRED_STRUCT_PAGE_INIT */
- 
- /**
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 1d47016849531..329fd1a809c59 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -1835,6 +1835,13 @@ deferred_init_memmap_chunk(unsigned long start_pfn, unsigned long end_pfn,
- 	}
- }
- 
-+/* An arch may override for more concurrency. */
-+__weak int __init
-+deferred_page_init_max_threads(const struct cpumask *node_cpumask)
-+{
-+	return 1;
-+}
-+
- /* Initialise remaining memory on a node */
- static int __init deferred_init_memmap(void *data)
- {
-@@ -1883,11 +1890,7 @@ static int __init deferred_init_memmap(void *data)
- 						 first_init_pfn))
- 		goto zone_empty;
- 
--	/*
--	 * More CPUs always led to greater speedups on tested systems, up to
--	 * all the nodes' CPUs.  Use all since the system is otherwise idle now.
--	 */
--	max_threads = max(cpumask_weight(cpumask), 1u);
-+	max_threads = deferred_page_init_max_threads(cpumask);
- 
- 	while (spfn < epfn) {
- 		unsigned long epfn_align = ALIGN(epfn, PAGES_PER_SECTION);
--- 
-2.26.2
+If you reference these in the commit logs, please use lore.kernel.org
+links instead of spinics.
 
+> Zhangfei Gao (2):
+>   PCI: Introduce PCI_FIXUP_IOMMU
+>   iommu: calling pci_fixup_iommu in iommu_fwspec_init
+> 
+>  drivers/iommu/iommu.c             | 4 ++++
+>  drivers/pci/quirks.c              | 7 +++++++
+>  include/asm-generic/vmlinux.lds.h | 3 +++
+>  include/linux/pci.h               | 8 ++++++++
+>  4 files changed, 22 insertions(+)
+> 
+> -- 
+> 2.7.4
+> 
