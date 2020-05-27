@@ -2,43 +2,44 @@ Return-Path: <SRS0=h1Lr=7J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE01AC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 09:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11D0CC433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 09:01:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8689C2078C
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 09:00:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDB9420723
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 09:01:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590570010;
-	bh=GzN9KZi8SIAiZv6JsaMy5rtT9c4WVtJCbDQmDejM+Rc=;
+	s=default; t=1590570085;
+	bh=WaKZbkte9zWy+gFwJcABM4VB+ItBxdRy7nyXN7rBb3o=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Hr4WrsV6G9VW2a5B+8RZ7+ni1v1Ue227JySTuPqDOnxU4bNmcgZiQOwZ9dzd1MUuu
-	 ALoULR/kqSVrIrQ6iA2j8okuui0W/8zR1zKKRGCFG/Pf/SB5sk2FgBW5KuAHF7UGgJ
-	 knId3hlWBh+adbueMIb81LJ9DOwVRCQctPhPgB7w=
+	b=GxBsYXv26NDPhbRUDm8FyjYyfJOXCIHwZSDB3+YpVERjhiy/aOP93Zwi+JdwsqzpC
+	 NWGn06HGpTl15qi3az5LXXayFNEcX6mlkbrmz7ioUSU5iuyDkTFvUgH0xjitX+f5Fd
+	 I8JfpmTior1g3ADl8K09UaK/kMuV0eKo5KQaf4w8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388361AbgE0JAK (ORCPT
+        id S2388362AbgE0JBS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 May 2020 05:00:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34660 "EHLO mail.kernel.org"
+        Wed, 27 May 2020 05:01:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35200 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388251AbgE0JAJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 May 2020 05:00:09 -0400
+        id S2388331AbgE0JBS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 27 May 2020 05:01:18 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BE06A20723;
-        Wed, 27 May 2020 09:00:08 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1184920723;
+        Wed, 27 May 2020 09:01:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590570009;
-        bh=GzN9KZi8SIAiZv6JsaMy5rtT9c4WVtJCbDQmDejM+Rc=;
+        s=default; t=1590570077;
+        bh=WaKZbkte9zWy+gFwJcABM4VB+ItBxdRy7nyXN7rBb3o=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dw8PQDiM90GK1xPK0MDmtsB/uuNO5KqcuE2U8o5Bi9m3bkWcLa2RYu4UYcftfI8gL
-         7map9j1fDgO+xHYZCtIgx1wv9/xmbcAUQMZ2V17LMke54thxct3Cz7n7lWZ60o+1Qn
-         SucOB5Se6nCwWAoR5L8bMbTnC5mBS13qfDJaL2Og=
-Date:   Wed, 27 May 2020 11:00:07 +0200
+        b=mGy3UQlKkCSG671Ydi7G9PDHAXHw3tvtIYrcoZsk94xWH7NkmD8YF+mjSEFmwocHn
+         dx9nTApSCbCQ2C0rP4Wh0RmwLgzASHW4OVNvv0tAMviYc/4qJ0+c7Nh6YkoAjWCiYF
+         MbwANd2b+y59F8114ucQHxhJVnTvz7S8zkgTDHe8=
+Date:   Wed, 27 May 2020 11:01:15 +0200
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     Zhangfei Gao <zhangfei.gao@linaro.org>
 Cc:     Joerg Roedel <joro@8bytes.org>,
@@ -55,24 +56,45 @@ Cc:     Joerg Roedel <joro@8bytes.org>,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         iommu@lists.linux-foundation.org, linux-acpi@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
-Message-ID: <20200527090007.GA179718@kroah.com>
+Subject: Re: [PATCH 2/2] iommu: calling pci_fixup_iommu in iommu_fwspec_init
+Message-ID: <20200527090115.GB179718@kroah.com>
 References: <1590493749-13823-1-git-send-email-zhangfei.gao@linaro.org>
+ <1590493749-13823-3-git-send-email-zhangfei.gao@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1590493749-13823-1-git-send-email-zhangfei.gao@linaro.org>
+In-Reply-To: <1590493749-13823-3-git-send-email-zhangfei.gao@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 26, 2020 at 07:49:07PM +0800, Zhangfei Gao wrote:
-> Some platform devices appear as PCI but are actually on the AMBA bus,
+On Tue, May 26, 2020 at 07:49:09PM +0800, Zhangfei Gao wrote:
+> Calling pci_fixup_iommu in iommu_fwspec_init, which alloc
+> iommu_fwnode. Some platform devices appear as PCI but are
+> actually on the AMBA bus, and they need fixup in
+> drivers/pci/quirks.c handling iommu_fwnode.
+> So calling pci_fixup_iommu after iommu_fwnode is allocated.
+> 
+> Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
+> ---
+>  drivers/iommu/iommu.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 7b37542..fb84c42 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -2418,6 +2418,10 @@ int iommu_fwspec_init(struct device *dev, struct fwnode_handle *iommu_fwnode,
+>  	fwspec->iommu_fwnode = iommu_fwnode;
+>  	fwspec->ops = ops;
+>  	dev_iommu_fwspec_set(dev, fwspec);
+> +
+> +	if (dev_is_pci(dev))
+> +		pci_fixup_device(pci_fixup_iommu, to_pci_dev(dev));
 
-Why would these devices not just show up on the AMBA bus and use all of
-that logic instead of being a PCI device and having to go through odd
-fixes like this?
+Why can't the caller do this as it "knows" it is a PCI device at that
+point in time, right?
 
 thanks,
 
