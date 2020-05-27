@@ -2,127 +2,158 @@ Return-Path: <SRS0=h1Lr=7J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B02C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 19:35:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DE8CC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 21:18:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C851207D3
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 19:35:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 288BC20835
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 21:18:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XYa87opw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iiQHWCci"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726459AbgE0TfB (ORCPT
+        id S2387469AbgE0VSm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 May 2020 15:35:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35798 "EHLO
+        Wed, 27 May 2020 17:18:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725872AbgE0TfA (ORCPT
+        with ESMTP id S2387412AbgE0VSm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 May 2020 15:35:00 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95FF8C05BD1E;
-        Wed, 27 May 2020 12:35:00 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id t11so12297369pgg.2;
-        Wed, 27 May 2020 12:35:00 -0700 (PDT)
+        Wed, 27 May 2020 17:18:42 -0400
+Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57F59C05BD1E;
+        Wed, 27 May 2020 14:18:42 -0700 (PDT)
+Received: by mail-io1-xd44.google.com with SMTP id s18so13769364ioe.2;
+        Wed, 27 May 2020 14:18:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=mqBj2b2oX4jL4f2LODtFXIhldQE/VACP+TTPinfd5B4=;
-        b=XYa87opwkcJuXpolq9dJgh0OhVmKRWsmyeR9kLCl1ocAkJOMKWRWnx17pNzvvkD4ce
-         GW2jPGDeJD1nNlrzQWtn7KLiHy6myBUhqx0WmP/wZ1Y5mnwLzlaXS4oO51EOR/BFkJiX
-         eeFo2dRxS/vvQZWzWwPUB6TC0lIPknYkXUdmqXETLwbS65PWL+o9x9JHngsvnyv4MVE9
-         plL9vMHrL7btfgZhyv0Fgg74fAa+Fj6dt1Uhu2tQsK5Ph5qlG0EPFLznM2cIhwzFd3p7
-         BlTBuquGLM2J4iv7wgPyWEA8VH6XmHq8qCgxh8k+HonKdA6WVWSyAKL/OTgzTilxGtiT
-         iFgw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OQpIJWMudHYzeYVJAX5TAsaN7KlVrc6tTOWAA64PC+4=;
+        b=iiQHWCciz2fx1p5e3Ax1s0ebQUYscbu3DHxh5vhMTs51fzQY4eRqWuZwLGrNVO7ljo
+         A1gz+WbDPEL/vzgBc+W1Jp+YI86kaMBy6fQ1J8oQGAYP3jx3X/dydph7LHKsjZMcKQ7p
+         GoxlqkETGVhWIfEP3XOfTHoDM1dycQWH7SGh2nDHw2hZ4d/WD1wDiygoEzVbo43AYsaX
+         R044I8YtHcLpwGMc8PsH7MgGaZPi81X/3EASGPTwdlRu5NleQ+NFU/12tPOiBYFinBga
+         kxZ0Ue9uHcBfBJCgvTaMdwt0PpfJIPmKggXfx0aGdbRw7uOtm+vbPyRzlVOr8GeX610E
+         2P4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mqBj2b2oX4jL4f2LODtFXIhldQE/VACP+TTPinfd5B4=;
-        b=O2af+WCwqUo+q0AGAj4mQ3ZJsRPsI++7TknKxGpRdlk78SjIM6nT9c0uRwd6YReAn6
-         L/8w6ZVSZgKOVl8WM4NYcWJXXuWjkF5ByM3hC1bans8g43rrQAocnLZzn8EgY31OLwsj
-         qG9nj22UUsgy1qjVoK+BRiK7S3XA/I2T/thXU8UDP11gxbBubSGxrn3u4Tj/IVjxWeWS
-         OP2Zv3SMQ1vZss7lF+OHAVJfUWCZVi1RQMamPM7pLAbdH9ne2E80qy4S5N+77smPz9Vm
-         4kF7YkG/oz3S99qFjhrI3iy7gbMOpCAe0QwgLhxcGfWlTBF9Ejb0vVpzPAFNWFpXr1No
-         aGPw==
-X-Gm-Message-State: AOAM533VFgseKAI0Fiq4+PmDe2yj4rhmiA1l1pV2H5SBGuoY6Hl1bPFa
-        2I7IEXcNqoxzaJP8saWh7xI=
-X-Google-Smtp-Source: ABdhPJxMFrP8wWxZJuJfrB1FkAK8UOxIW5bnXQDdN4A40PVkpjsvNVplJtvJAquZrTOsRf/UXK9C7g==
-X-Received: by 2002:a63:7d3:: with SMTP id 202mr5357406pgh.279.1590608099639;
-        Wed, 27 May 2020 12:34:59 -0700 (PDT)
-Received: from ubuntu-s3-xlarge-x86 ([2604:1380:4111:8b00::1])
-        by smtp.gmail.com with ESMTPSA id o15sm3181356pjq.28.2020.05.27.12.34.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 May 2020 12:34:58 -0700 (PDT)
-Date:   Wed, 27 May 2020 12:34:56 -0700
-From:   Nathan Chancellor <natechancellor@gmail.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Diab Neiroukh <officiallazerl0rd@gmail.com>
-Subject: Re: [PATCH] x86: crypto: fix building crc32c with clang ias
-Message-ID: <20200527193456.GA2141183@ubuntu-s3-xlarge-x86>
-References: <20200527141754.1850968-1-arnd@arndb.de>
- <20200527164219.GB1073507@ubuntu-s3-xlarge-x86>
- <CAK8P3a1NS3OCNzD3uCjLmJvdcfLRguaoHtuTKXEuvizmbsQYhA@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OQpIJWMudHYzeYVJAX5TAsaN7KlVrc6tTOWAA64PC+4=;
+        b=Rr/9m4tJ1eeRQn0QTSNY2bDBwpoHI9N6AnjvCC+9ehxzgPgqPHX7gxPiUXvkrJEfm8
+         jLmZTft9p4hLeLy8qzXrqEXgyqU+1100oP0IL+qMg7cMl2wCpvSlC+FnAhYBanz7SOmh
+         szdwZcRD+MWwfTD+Jv8iCIBrzQGBsjmnet9Bw3+Nwd84FFfN7pAWVsXFqzEDNQdzX39U
+         a8CM/9EEbzKJuqilEYe5JFBwaxd7sjCtWzQ7jA5EO8zDi0rnY1stRooixllSG1MpMGn7
+         3zzo6uM4SELP8qHeBYqp4kKfQHCHjBRJvB2fjy84YnOAincCCXsvzCPv0qrJgRNt1fph
+         4Hlw==
+X-Gm-Message-State: AOAM533OafVq3aIXgiuXIHBILaLoxpLAEZfLmDxGJzc0ORB0jVCzOrOX
+        Uo0LxFLXudlYEiDyzQfHelqvIQN6RaIWMj+eoeI=
+X-Google-Smtp-Source: ABdhPJzsosJVaGZxsaHbzCE+qheixFWw0db5wOKUZpRvaNa1fjVHnbvE40NI+t+uWx+U/K/yN8sWBICKzejoGyiO0mY=
+X-Received: by 2002:a6b:5f06:: with SMTP id t6mr12961446iob.88.1590614321551;
+ Wed, 27 May 2020 14:18:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK8P3a1NS3OCNzD3uCjLmJvdcfLRguaoHtuTKXEuvizmbsQYhA@mail.gmail.com>
+References: <20200527173608.2885243-1-daniel.m.jordan@oracle.com> <20200527173608.2885243-6-daniel.m.jordan@oracle.com>
+In-Reply-To: <20200527173608.2885243-6-daniel.m.jordan@oracle.com>
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+Date:   Wed, 27 May 2020 14:18:30 -0700
+Message-ID: <CAKgT0UcVRMWpaxYu9SQnTuQZm6ePBJkTStWPwekzkfRMnLvf1Q@mail.gmail.com>
+Subject: Re: [PATCH v3 5/8] mm: don't track number of pages during deferred initialization
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Kirill Tkhai <ktkhai@virtuozzo.com>,
+        Michal Hocko <mhocko@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Robert Elliott <elliott@hpe.com>,
+        Shile Zhang <shile.zhang@linux.alibaba.com>,
+        Steven Sistare <steven.sistare@oracle.com>,
+        Tejun Heo <tj@kernel.org>, Zi Yan <ziy@nvidia.com>,
+        linux-crypto@vger.kernel.org, linux-mm <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-s390@vger.kernel.org,
+        "open list:LINUX FOR POWERPC (32-BIT AND 64-BIT)" 
+        <linuxppc-dev@lists.ozlabs.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 27, 2020 at 08:24:35PM +0200, Arnd Bergmann wrote:
-> On Wed, May 27, 2020 at 6:42 PM Nathan Chancellor
-> <natechancellor@gmail.com> wrote:
-> >
-> > On Wed, May 27, 2020 at 04:17:40PM +0200, Arnd Bergmann wrote:
-> > > The clang integrated assembler complains about movzxw:
-> > >
-> > > arch/x86/crypto/crc32c-pcl-intel-asm_64.S:173:2: error: invalid instruction mnemonic 'movzxw'
-> > >
-> > > It seems that movzwq is the mnemonic that it expects instead,
-> > > and this is what objdump prints when disassembling the file.
-> > >
-> > > Fixes: 6a8ce1ef3940 ("crypto: crc32c - Optimize CRC32C calculation with PCLMULQDQ instruction")
-> > > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> >
-> > We had an identical patch pending from another contributor, see the
-> > discussion and result in the issue below.
-> >
-> > https://github.com/ClangBuiltLinux/linux/issues/1010
-> >
-> > Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-> >
-> 
-> Was the other one submitted upstream? If yes, let's use that one.
-> 
->      Arnd
+On Wed, May 27, 2020 at 10:37 AM Daniel Jordan
+<daniel.m.jordan@oracle.com> wrote:
+>
+> Deferred page init used to report the number of pages initialized:
+>
+>   node 0 initialised, 32439114 pages in 97ms
+>
+> Tracking this makes the code more complicated when using multiple
+> threads.  Given that the statistic probably has limited value,
+> especially since a zone grows on demand so that the page count can vary,
+> just remove it.
+>
+> The boot message now looks like
+>
+>   node 0 deferred pages initialised in 97ms
+>
+> Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+> Suggested-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-No, at least not that I saw. I've added Diab to CC now though to
-confirm.
+This looks good to me.
 
-Cheers,
-Nathan
+Reviewed-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+
+> ---
+>  mm/page_alloc.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> index d0c0d9364aa6d..d64f3027fdfa6 100644
+> --- a/mm/page_alloc.c
+> +++ b/mm/page_alloc.c
+> @@ -1819,7 +1819,7 @@ static int __init deferred_init_memmap(void *data)
+>  {
+>         pg_data_t *pgdat = data;
+>         const struct cpumask *cpumask = cpumask_of_node(pgdat->node_id);
+> -       unsigned long spfn = 0, epfn = 0, nr_pages = 0;
+> +       unsigned long spfn = 0, epfn = 0;
+>         unsigned long first_init_pfn, flags;
+>         unsigned long start = jiffies;
+>         struct zone *zone;
+> @@ -1868,15 +1868,15 @@ static int __init deferred_init_memmap(void *data)
+>          * allocator.
+>          */
+>         while (spfn < epfn) {
+> -               nr_pages += deferred_init_maxorder(&i, zone, &spfn, &epfn);
+> +               deferred_init_maxorder(&i, zone, &spfn, &epfn);
+>                 cond_resched();
+>         }
+>  zone_empty:
+>         /* Sanity check that the next zone really is unpopulated */
+>         WARN_ON(++zid < MAX_NR_ZONES && populated_zone(++zone));
+>
+> -       pr_info("node %d initialised, %lu pages in %ums\n",
+> -               pgdat->node_id, nr_pages, jiffies_to_msecs(jiffies - start));
+> +       pr_info("node %d deferred pages initialised in %ums\n",
+> +               pgdat->node_id, jiffies_to_msecs(jiffies - start));
+>
+>         pgdat_init_report_one_done();
+>         return 0;
+> --
+> 2.26.2
+>
+>
