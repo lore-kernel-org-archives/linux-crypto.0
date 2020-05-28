@@ -6,50 +6,59 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDEBEC433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 May 2020 07:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90C30C433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 May 2020 07:35:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C9C22088E
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 May 2020 07:34:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 721EC206B6
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 May 2020 07:35:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725811AbgE1Her (ORCPT
+        id S1725779AbgE1Hfb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 May 2020 03:34:47 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:35248 "EHLO fornost.hmeau.com"
+        Thu, 28 May 2020 03:35:31 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:35318 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726393AbgE1Heq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 May 2020 03:34:46 -0400
+        id S1725601AbgE1Hfa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 28 May 2020 03:35:30 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jeD3U-0000oY-0x; Thu, 28 May 2020 17:34:21 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 May 2020 17:34:20 +1000
-Date:   Thu, 28 May 2020 17:34:20 +1000
+        id 1jeD4T-0000qe-BJ; Thu, 28 May 2020 17:35:22 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 May 2020 17:35:21 +1000
+Date:   Thu, 28 May 2020 17:35:21 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     davem@davemloft.net, jsrikanth@marvell.com, phemadri@marvell.com,
-        gustavo@embeddedor.com, tglx@linutronix.de,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] crypto: cavium/nitrox - Fix a typo in a comment
-Message-ID: <20200528073419.GA32600@gondor.apana.org.au>
-References: <20200519203654.281351-1-christophe.jaillet@wanadoo.fr>
+To:     Shukun Tan <tanshukun1@huawei.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        xuzaibo@huawei.com, wangzhou1@hisilicon.com
+Subject: Re: [PATCH] crypto:hisilicon - fix driver compatibility issue with
+ different versions of devices
+Message-ID: <20200528073521.GC32600@gondor.apana.org.au>
+References: <1589966390-37030-1-git-send-email-tanshukun1@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200519203654.281351-1-christophe.jaillet@wanadoo.fr>
+In-Reply-To: <1589966390-37030-1-git-send-email-tanshukun1@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 19, 2020 at 10:36:54PM +0200, Christophe JAILLET wrote:
-> s/NITORX/NITROX/
+On Wed, May 20, 2020 at 05:19:50PM +0800, Shukun Tan wrote:
+> From: Weili Qian <qianweili@huawei.com>
 > 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> In order to be compatible with devices of different versions, V1 in the
+> accelerator driver is now isolated, and other versions are the previous
+> V2 processing flow.
+> 
+> Signed-off-by: Weili Qian <qianweili@huawei.com>
+> Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
+> Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 > ---
->  drivers/crypto/cavium/nitrox/nitrox_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/crypto/hisilicon/hpre/hpre_main.c | 10 +---
+>  drivers/crypto/hisilicon/qm.c             | 89 ++++++++++---------------------
+>  drivers/crypto/hisilicon/qm.h             | 13 ++---
+>  drivers/crypto/hisilicon/sec2/sec_main.c  | 19 ++-----
+>  drivers/crypto/hisilicon/zip/zip_main.c   | 20 ++-----
+>  5 files changed, 39 insertions(+), 112 deletions(-)
 
 Patch applied.  Thanks.
 -- 
