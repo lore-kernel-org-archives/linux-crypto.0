@@ -2,90 +2,142 @@ Return-Path: <SRS0=ep2G=7K=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6DCEC433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 May 2020 06:34:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4FAEC433E1
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 May 2020 06:47:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1B80207BC
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 May 2020 06:34:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B37C8207BC
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 May 2020 06:47:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i9zZJ+TN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725941AbgE1Ge3 (ORCPT
+        id S1725819AbgE1GrM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 May 2020 02:34:29 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:34684 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725601AbgE1Ge2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 May 2020 02:34:28 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jeC6w-0007mj-Vx; Thu, 28 May 2020 16:33:52 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 May 2020 16:33:50 +1000
-Date:   Thu, 28 May 2020 16:33:50 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     davem@davemloft.net, jsrikanth@marvell.com, phemadri@marvell.com,
-        gustavo@embeddedor.com, tglx@linutronix.de,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] crypto: cavium/nitrox - Fix 'nitrox_get_first_device()'
- when ndevlist is fully iterated
-Message-ID: <20200528063350.GA26818@gondor.apana.org.au>
-References: <20200519204503.281872-1-christophe.jaillet@wanadoo.fr>
+        Thu, 28 May 2020 02:47:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54928 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725601AbgE1GrL (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 28 May 2020 02:47:11 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60908C08C5C3
+        for <linux-crypto@vger.kernel.org>; Wed, 27 May 2020 23:47:10 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id i17so2620513pli.13
+        for <linux-crypto@vger.kernel.org>; Wed, 27 May 2020 23:47:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=bofUGbEFbdnCpZWFs8DHvdOjPGm9ZoW5dSffBdf+/48=;
+        b=i9zZJ+TNeNvRcNidmG6piUlVvLM12Ql3gwyE+1zs9+dJy5yzwRheejuryIIdaoZ4Oy
+         PpqV4KZbIEBAopt3QeSB7kIlzfJ/gbWqRtjQdJUqsTEvr+QSDb1MpiutTS4mt27VJCUT
+         wGolKhdBUMCO/4xP7K+wFV4wv+9gh0GtSNTZB22oVGKXEuXTwgUf3S6zOwCFXqSedPwS
+         YFXT5ssn5iSuHWecgXg/mm3uDYHzC4v6XDBneViordfQVzOqzgDXeZa++mqrl38Mj+tu
+         hrnxug4U/nOg29Qjc/NWFC05jy+tQ7In0/wAskn4wZvpS2yEdT1qW9PePMneSuSNMFTS
+         bNdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=bofUGbEFbdnCpZWFs8DHvdOjPGm9ZoW5dSffBdf+/48=;
+        b=BGgTplvXW4ckEYIhR3NYltYCeiqiBWui8Gj+zJlu7LzOHpvDU/JLzPJytvY1TqrOyH
+         LUcrzXG5lDeqinVCh8ibAEi85rB4+bmgy2crjhu5mnYBXsF1QkUF0IzoG/XaV6L5nZdo
+         RqbpQCFYOxxoIgD8sNLU3jGeM+PO+fEs1jg6dB/Pi+ZyDfc4dtwzlgpzaXzb0tQWc5Mb
+         LtNaMGKIatM+Cv/O/mewxWJ49sRvt7w5qdWKwQQvTAi7GiWIHdjpqwYueWWY5i7Lk5+G
+         NaMOLeGRty+VoxYnOnQxZCMaxh3ibbWuCdVLDm1xGZtepyPn4S5OgIHGMQ8B1eH+5XjZ
+         k5ww==
+X-Gm-Message-State: AOAM531I392ZU4FUQiAnorJ2rO33odDADLdGq1XUbkWzG5AbWJ6PHU/1
+        M0Y72AvwcZ3gPfvyp+JmKoGH3w==
+X-Google-Smtp-Source: ABdhPJxLtsDA5liLh4kIqfAgfwRAV1r9YEZbncwuClIEToyTcjpXKMtzdNc0SaVnvBbQN+Q0kn7IoQ==
+X-Received: by 2002:a17:90a:de8b:: with SMTP id n11mr2312350pjv.87.1590648429749;
+        Wed, 27 May 2020 23:47:09 -0700 (PDT)
+Received: from [10.140.6.42] ([45.135.186.12])
+        by smtp.gmail.com with ESMTPSA id 188sm3707241pfu.165.2020.05.27.23.46.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 May 2020 23:47:09 -0700 (PDT)
+Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     Joerg Roedel <joro@8bytes.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Hanjun Guo <guohanjun@huawei.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>,
+        jean-philippe <jean-philippe@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-acpi@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org
+References: <20200527181842.GA256680@bjorn-Precision-5520>
+From:   Zhangfei Gao <zhangfei.gao@linaro.org>
+Message-ID: <83bd3d72-3a0c-d9b6-54ad-5bc0dbc5be7d@linaro.org>
+Date:   Thu, 28 May 2020 14:46:54 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200519204503.281872-1-christophe.jaillet@wanadoo.fr>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200527181842.GA256680@bjorn-Precision-5520>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 19, 2020 at 10:45:03PM +0200, Christophe JAILLET wrote:
-> When a list is completely iterated with 'list_for_each_entry(x, ...)', x is
-> not NULL at the end.
-> 
-> Introduce an intermediate variable and test it instead, in order to
-> reliably know if something was found or not.
-> 
-> Fixes: f2663872f073 ("crypto: cavium - Register the CNN55XX supported crypto algorithms.")
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
->  drivers/crypto/cavium/nitrox/nitrox_main.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
-> index 788c6607078b..172cafe7c039 100644
-> --- a/drivers/crypto/cavium/nitrox/nitrox_main.c
-> +++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
-> @@ -278,15 +278,18 @@ static void nitrox_remove_from_devlist(struct nitrox_device *ndev)
->  
->  struct nitrox_device *nitrox_get_first_device(void)
->  {
-> -	struct nitrox_device *ndev = NULL;
-> +	struct nitrox_device *ndev;
-> +	bool found = false;
->  
->  	mutex_lock(&devlist_lock);
->  	list_for_each_entry(ndev, &ndevlist, list) {
-> -		if (nitrox_ready(ndev))
-> +		if (nitrox_ready(ndev)) {
-> +			found = true;
->  			break;
-> +		}
->  	}
->  	mutex_unlock(&devlist_lock);
-> -	if (!ndev)
+Hi, Bjorn
 
-Instead of adding found, you could fix this by changing the test to
+On 2020/5/28 上午2:18, Bjorn Helgaas wrote:
+> On Tue, May 26, 2020 at 07:49:07PM +0800, Zhangfei Gao wrote:
+>> Some platform devices appear as PCI but are actually on the AMBA bus,
+>> and they need fixup in drivers/pci/quirks.c handling iommu_fwnode.
+>> Here introducing PCI_FIXUP_IOMMU, which is called after iommu_fwnode
+>> is allocated, instead of reusing PCI_FIXUP_FINAL since it will slow
+>> down iommu probing as all devices in fixup final list will be
+>> reprocessed, suggested by Joerg, [1]
+> Is this slowdown significant?  We already iterate over every device
+> when applying PCI_FIXUP_FINAL quirks, so if we used the existing
+> PCI_FIXUP_FINAL, we wouldn't be adding a new loop.  We would only be
+> adding two more iterations to the loop in pci_do_fixups() that tries
+> to match quirks against the current device.  I doubt that would be a
+> measurable slowdown.
+I do not notice the difference when compared fixup_iommu and fixup_final 
+via get_jiffies_64,
+since in our platform no other pci fixup is registered.
 
-	if (&ndev->list == &nevlist)
+Here the plan is adding pci_fixup_device in iommu_fwspec_init,
+so if using fixup_final the iteration will be done again here.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>
+>> For example:
+>> Hisilicon platform device need fixup in
+>> drivers/pci/quirks.c handling fwspec->can_stall, which is introduced in [2]
+>>
+>> +static void quirk_huawei_pcie_sva(struct pci_dev *pdev)
+>> +{
+>> +    struct iommu_fwspec *fwspec;
+>> +
+>> +    pdev->eetlp_prefix_path = 1;
+>> +    fwspec = dev_iommu_fwspec_get(&pdev->dev);
+>> +    if (fwspec)
+>> +        fwspec->can_stall = 1;
+>> +}
+>> +
+>> +DECLARE_PCI_FIXUP_IOMMU(PCI_VENDOR_ID_HUAWEI, 0xa250, quirk_huawei_pcie_sva);
+>> +DECLARE_PCI_iFIXUP_IOMMU(PCI_VENDOR_ID_HUAWEI, 0xa251, quirk_huawei_pcie_sva);
+>>
+>> [1] https://www.spinics.net/lists/iommu/msg44591.html
+>> [2] https://www.spinics.net/lists/linux-pci/msg94559.html
+> If you reference these in the commit logs, please use lore.kernel.org
+> links instead of spinics.
+Got it, thanks Bjorn.
+
+
+
