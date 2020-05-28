@@ -2,65 +2,66 @@ Return-Path: <SRS0=ep2G=7K=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4FAEC433E1
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 May 2020 06:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D51F6C433E1
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 May 2020 06:53:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B37C8207BC
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 May 2020 06:47:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF8DF208E4
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 May 2020 06:53:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i9zZJ+TN"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WeIYDG9i"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725819AbgE1GrM (ORCPT
+        id S1726330AbgE1Gxf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 May 2020 02:47:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54928 "EHLO
+        Thu, 28 May 2020 02:53:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725601AbgE1GrL (ORCPT
+        with ESMTP id S1726026AbgE1Gxe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 May 2020 02:47:11 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60908C08C5C3
-        for <linux-crypto@vger.kernel.org>; Wed, 27 May 2020 23:47:10 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id i17so2620513pli.13
-        for <linux-crypto@vger.kernel.org>; Wed, 27 May 2020 23:47:10 -0700 (PDT)
+        Thu, 28 May 2020 02:53:34 -0400
+Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52F38C08C5C3
+        for <linux-crypto@vger.kernel.org>; Wed, 27 May 2020 23:53:34 -0700 (PDT)
+Received: by mail-pl1-x644.google.com with SMTP id bh7so4215388plb.11
+        for <linux-crypto@vger.kernel.org>; Wed, 27 May 2020 23:53:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=bofUGbEFbdnCpZWFs8DHvdOjPGm9ZoW5dSffBdf+/48=;
-        b=i9zZJ+TNeNvRcNidmG6piUlVvLM12Ql3gwyE+1zs9+dJy5yzwRheejuryIIdaoZ4Oy
-         PpqV4KZbIEBAopt3QeSB7kIlzfJ/gbWqRtjQdJUqsTEvr+QSDb1MpiutTS4mt27VJCUT
-         wGolKhdBUMCO/4xP7K+wFV4wv+9gh0GtSNTZB22oVGKXEuXTwgUf3S6zOwCFXqSedPwS
-         YFXT5ssn5iSuHWecgXg/mm3uDYHzC4v6XDBneViordfQVzOqzgDXeZa++mqrl38Mj+tu
-         hrnxug4U/nOg29Qjc/NWFC05jy+tQ7In0/wAskn4wZvpS2yEdT1qW9PePMneSuSNMFTS
-         bNdA==
+        bh=zbKuT3nrBchNOXLtoqggayeJJOXuYIPFyuAneEl5VZE=;
+        b=WeIYDG9i+HPcpC+T7wLyd72laBytTR0RvEwehEj45sRWw4OKQzXYNNFynXnVehee4d
+         Xz6/jjgw409iODdX8f+4nfB4ksOmJlLeRUjPatyd73dc4YdD/O6i/XN42ATrsS/CHqC2
+         Hj1KqTS/6K1rdwTjZSmW73Clu5pi1g+wvul9mqCnXjpkHb3po6GXlCny3fXX4LNkVWWh
+         +Rf0+FfG/tiIkuRFgH2XUOnYBAJUB98HYAgq5RhcSvah+qLAhflgOXk0g/sakA7NLXbh
+         qEjIntovK2YBpTUr74m+FL9V9Iy1pdy/deZKUseiSeBwZTjQlJikyz4UUCdSr+OwEHgX
+         9Dug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-transfer-encoding
          :content-language;
-        bh=bofUGbEFbdnCpZWFs8DHvdOjPGm9ZoW5dSffBdf+/48=;
-        b=BGgTplvXW4ckEYIhR3NYltYCeiqiBWui8Gj+zJlu7LzOHpvDU/JLzPJytvY1TqrOyH
-         LUcrzXG5lDeqinVCh8ibAEi85rB4+bmgy2crjhu5mnYBXsF1QkUF0IzoG/XaV6L5nZdo
-         RqbpQCFYOxxoIgD8sNLU3jGeM+PO+fEs1jg6dB/Pi+ZyDfc4dtwzlgpzaXzb0tQWc5Mb
-         LtNaMGKIatM+Cv/O/mewxWJ49sRvt7w5qdWKwQQvTAi7GiWIHdjpqwYueWWY5i7Lk5+G
-         NaMOLeGRty+VoxYnOnQxZCMaxh3ibbWuCdVLDm1xGZtepyPn4S5OgIHGMQ8B1eH+5XjZ
-         k5ww==
-X-Gm-Message-State: AOAM531I392ZU4FUQiAnorJ2rO33odDADLdGq1XUbkWzG5AbWJ6PHU/1
-        M0Y72AvwcZ3gPfvyp+JmKoGH3w==
-X-Google-Smtp-Source: ABdhPJxLtsDA5liLh4kIqfAgfwRAV1r9YEZbncwuClIEToyTcjpXKMtzdNc0SaVnvBbQN+Q0kn7IoQ==
-X-Received: by 2002:a17:90a:de8b:: with SMTP id n11mr2312350pjv.87.1590648429749;
-        Wed, 27 May 2020 23:47:09 -0700 (PDT)
+        bh=zbKuT3nrBchNOXLtoqggayeJJOXuYIPFyuAneEl5VZE=;
+        b=a3jXULvZ0pMcwIBdz/nmlhCdd/cnE3D9524NljfASwON3yr01CaqNKhY6gkK0wtqSX
+         6tUB59fxXR2ejwxDI/4hd0n4OdNlkiEwoc/a9Ivir8yQ87hpsbEltnbz6nqEdJUHuJEd
+         BExqmhncd7Ii/5wowqIwL6Wszit0i/6nFoDZG702H9dswQ6WVVeCBUwIWJPgRQKFrj/0
+         Ow5hDnG17BUwtBf3msLERN/oIddRgXHKnb6YvIh1xbFJM30djCWhuJPHNQ2ot7LU2ivr
+         00DYtAKGzFfQIzTM2QKNPD2xB6BTESbixobgJk1kutnvFTnoW/RCHTpYFPkA+L1Ryo5i
+         ZMEw==
+X-Gm-Message-State: AOAM533bbg/19TFqUoujBtjOVdZwCTNQvh/V2pTePhvycRGQiKOlfnsX
+        8tkvnvWKbKLWKdZtxIQlDq2tPw==
+X-Google-Smtp-Source: ABdhPJzZUXUIWStr7BtNwklBZN744dC8lv7AAZWH3qxAABW36QOxKh3qydTDu9mclcxQ1QgO9lDG4g==
+X-Received: by 2002:a17:90a:d317:: with SMTP id p23mr2285917pju.107.1590648813784;
+        Wed, 27 May 2020 23:53:33 -0700 (PDT)
 Received: from [10.140.6.42] ([45.135.186.12])
-        by smtp.gmail.com with ESMTPSA id 188sm3707241pfu.165.2020.05.27.23.46.58
+        by smtp.gmail.com with ESMTPSA id g18sm3799582pfq.146.2020.05.27.23.53.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 May 2020 23:47:09 -0700 (PDT)
-Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
-To:     Bjorn Helgaas <helgaas@kernel.org>
+        Wed, 27 May 2020 23:53:33 -0700 (PDT)
+Subject: Re: [PATCH 2/2] iommu: calling pci_fixup_iommu in iommu_fwspec_init
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc:     Joerg Roedel <joro@8bytes.org>,
         Bjorn Helgaas <bhelgaas@google.com>,
         Arnd Bergmann <arnd@arndb.de>,
@@ -70,20 +71,21 @@ Cc:     Joerg Roedel <joro@8bytes.org>,
         "Rafael J. Wysocki" <rjw@rjwysocki.net>,
         Len Brown <lenb@kernel.org>,
         jean-philippe <jean-philippe@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         iommu@lists.linux-foundation.org, linux-acpi@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org
-References: <20200527181842.GA256680@bjorn-Precision-5520>
+References: <1590493749-13823-1-git-send-email-zhangfei.gao@linaro.org>
+ <1590493749-13823-3-git-send-email-zhangfei.gao@linaro.org>
+ <20200527090115.GB179718@kroah.com>
 From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-Message-ID: <83bd3d72-3a0c-d9b6-54ad-5bc0dbc5be7d@linaro.org>
-Date:   Thu, 28 May 2020 14:46:54 +0800
+Message-ID: <e8293663-7fb8-ee57-0b9f-b3057b8aae7d@linaro.org>
+Date:   Thu, 28 May 2020 14:53:20 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200527181842.GA256680@bjorn-Precision-5520>
+In-Reply-To: <20200527090115.GB179718@kroah.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -92,52 +94,37 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi, Bjorn
 
-On 2020/5/28 上午2:18, Bjorn Helgaas wrote:
-> On Tue, May 26, 2020 at 07:49:07PM +0800, Zhangfei Gao wrote:
->> Some platform devices appear as PCI but are actually on the AMBA bus,
->> and they need fixup in drivers/pci/quirks.c handling iommu_fwnode.
->> Here introducing PCI_FIXUP_IOMMU, which is called after iommu_fwnode
->> is allocated, instead of reusing PCI_FIXUP_FINAL since it will slow
->> down iommu probing as all devices in fixup final list will be
->> reprocessed, suggested by Joerg, [1]
-> Is this slowdown significant?  We already iterate over every device
-> when applying PCI_FIXUP_FINAL quirks, so if we used the existing
-> PCI_FIXUP_FINAL, we wouldn't be adding a new loop.  We would only be
-> adding two more iterations to the loop in pci_do_fixups() that tries
-> to match quirks against the current device.  I doubt that would be a
-> measurable slowdown.
-I do not notice the difference when compared fixup_iommu and fixup_final 
-via get_jiffies_64,
-since in our platform no other pci fixup is registered.
 
-Here the plan is adding pci_fixup_device in iommu_fwspec_init,
-so if using fixup_final the iteration will be done again here.
-
->
->> For example:
->> Hisilicon platform device need fixup in
->> drivers/pci/quirks.c handling fwspec->can_stall, which is introduced in [2]
+On 2020/5/27 下午5:01, Greg Kroah-Hartman wrote:
+> On Tue, May 26, 2020 at 07:49:09PM +0800, Zhangfei Gao wrote:
+>> Calling pci_fixup_iommu in iommu_fwspec_init, which alloc
+>> iommu_fwnode. Some platform devices appear as PCI but are
+>> actually on the AMBA bus, and they need fixup in
+>> drivers/pci/quirks.c handling iommu_fwnode.
+>> So calling pci_fixup_iommu after iommu_fwnode is allocated.
 >>
->> +static void quirk_huawei_pcie_sva(struct pci_dev *pdev)
->> +{
->> +    struct iommu_fwspec *fwspec;
->> +
->> +    pdev->eetlp_prefix_path = 1;
->> +    fwspec = dev_iommu_fwspec_get(&pdev->dev);
->> +    if (fwspec)
->> +        fwspec->can_stall = 1;
->> +}
->> +
->> +DECLARE_PCI_FIXUP_IOMMU(PCI_VENDOR_ID_HUAWEI, 0xa250, quirk_huawei_pcie_sva);
->> +DECLARE_PCI_iFIXUP_IOMMU(PCI_VENDOR_ID_HUAWEI, 0xa251, quirk_huawei_pcie_sva);
+>> Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
+>> ---
+>>   drivers/iommu/iommu.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
 >>
->> [1] https://www.spinics.net/lists/iommu/msg44591.html
->> [2] https://www.spinics.net/lists/linux-pci/msg94559.html
-> If you reference these in the commit logs, please use lore.kernel.org
-> links instead of spinics.
-Got it, thanks Bjorn.
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index 7b37542..fb84c42 100644
+>> --- a/drivers/iommu/iommu.c
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -2418,6 +2418,10 @@ int iommu_fwspec_init(struct device *dev, struct fwnode_handle *iommu_fwnode,
+>>   	fwspec->iommu_fwnode = iommu_fwnode;
+>>   	fwspec->ops = ops;
+>>   	dev_iommu_fwspec_set(dev, fwspec);
+>> +
+>> +	if (dev_is_pci(dev))
+>> +		pci_fixup_device(pci_fixup_iommu, to_pci_dev(dev));
+> Why can't the caller do this as it "knows" it is a PCI device at that
+> point in time, right?
+Putting fixup here is because
+1. iommu_fwspec has been allocated
+2. iommu_fwspec_init will be called by of_pci_iommu_init and 
+iort_pci_iommu_init, covering both acpi and dt
 
-
-
+Thanks
