@@ -1,103 +1,91 @@
-Return-Path: <SRS0=h1Lr=7J=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=ep2G=7K=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE80AC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 22:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6DCEC433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 May 2020 06:34:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B8B5E207D8
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 May 2020 22:19:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1B80207BC
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 May 2020 06:34:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725681AbgE0WTN (ORCPT
+        id S1725941AbgE1Ge3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 May 2020 18:19:13 -0400
-Received: from mga02.intel.com ([134.134.136.20]:46044 "EHLO mga02.intel.com"
+        Thu, 28 May 2020 02:34:29 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:34684 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725385AbgE0WTM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 May 2020 18:19:12 -0400
-IronPort-SDR: j2q3Qs80feiizNk9aheku5nncnGUlayOAb0EHUAv08gw+9Tl8hfpowAGmZk8M1W85b9JsXLTfN
- 0vR9PbQ4fu8g==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2020 15:19:12 -0700
-IronPort-SDR: kkvQe6/BRtWrrUfNXpNvWwtU2TKP/4KqHaDz1To2TRLP679m/WdepqX/N9IuBRIqZOPOPtzQ+p
- Ln76wYrwdrXA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,442,1583222400"; 
-   d="scan'208";a="468903693"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
-  by fmsmga006.fm.intel.com with ESMTP; 27 May 2020 15:19:11 -0700
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - fix parameter check in aead encryption
-Date:   Wed, 27 May 2020 23:18:52 +0100
-Message-Id: <20200527221852.4942-1-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.26.2
+        id S1725601AbgE1Ge2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 28 May 2020 02:34:28 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1jeC6w-0007mj-Vx; Thu, 28 May 2020 16:33:52 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 28 May 2020 16:33:50 +1000
+Date:   Thu, 28 May 2020 16:33:50 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc:     davem@davemloft.net, jsrikanth@marvell.com, phemadri@marvell.com,
+        gustavo@embeddedor.com, tglx@linutronix.de,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] crypto: cavium/nitrox - Fix 'nitrox_get_first_device()'
+ when ndevlist is fully iterated
+Message-ID: <20200528063350.GA26818@gondor.apana.org.au>
+References: <20200519204503.281872-1-christophe.jaillet@wanadoo.fr>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200519204503.281872-1-christophe.jaillet@wanadoo.fr>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Return -EINVAL if the input digest size and/or cipher
-length is zero or the cipher length is not multiple of a block.
-These additional parameter checks prevent an undefined device behaviour.
+On Tue, May 19, 2020 at 10:45:03PM +0200, Christophe JAILLET wrote:
+> When a list is completely iterated with 'list_for_each_entry(x, ...)', x is
+> not NULL at the end.
+> 
+> Introduce an intermediate variable and test it instead, in order to
+> reliably know if something was found or not.
+> 
+> Fixes: f2663872f073 ("crypto: cavium - Register the CNN55XX supported crypto algorithms.")
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+>  drivers/crypto/cavium/nitrox/nitrox_main.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
+> index 788c6607078b..172cafe7c039 100644
+> --- a/drivers/crypto/cavium/nitrox/nitrox_main.c
+> +++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
+> @@ -278,15 +278,18 @@ static void nitrox_remove_from_devlist(struct nitrox_device *ndev)
+>  
+>  struct nitrox_device *nitrox_get_first_device(void)
+>  {
+> -	struct nitrox_device *ndev = NULL;
+> +	struct nitrox_device *ndev;
+> +	bool found = false;
+>  
+>  	mutex_lock(&devlist_lock);
+>  	list_for_each_entry(ndev, &ndevlist, list) {
+> -		if (nitrox_ready(ndev))
+> +		if (nitrox_ready(ndev)) {
+> +			found = true;
+>  			break;
+> +		}
+>  	}
+>  	mutex_unlock(&devlist_lock);
+> -	if (!ndev)
 
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_common/qat_algs.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+Instead of adding found, you could fix this by changing the test to
 
-diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
-index 9df4aebf37ca..00e10a4d578a 100644
---- a/drivers/crypto/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -825,8 +825,15 @@ static int qat_alg_aead_dec(struct aead_request *areq)
- 	struct icp_qat_fw_la_auth_req_params *auth_param;
- 	struct icp_qat_fw_la_bulk_req *msg;
- 	int digst_size = crypto_aead_authsize(aead_tfm);
-+	u32 cipher_length = areq->cryptlen - digst_size;
- 	int ret, ctr = 0;
- 
-+	if (!digst_size || !areq->cryptlen || !cipher_length)
-+		return -EINVAL;
-+
-+	if (cipher_length % AES_BLOCK_SIZE != 0)
-+		return -EINVAL;
-+
- 	ret = qat_alg_sgl_to_bufl(ctx->inst, areq->src, areq->dst, qat_req);
- 	if (unlikely(ret))
- 		return ret;
-@@ -840,7 +847,7 @@ static int qat_alg_aead_dec(struct aead_request *areq)
- 	qat_req->req.comn_mid.src_data_addr = qat_req->buf.blp;
- 	qat_req->req.comn_mid.dest_data_addr = qat_req->buf.bloutp;
- 	cipher_param = (void *)&qat_req->req.serv_specif_rqpars;
--	cipher_param->cipher_length = areq->cryptlen - digst_size;
-+	cipher_param->cipher_length = cipher_length;
- 	cipher_param->cipher_offset = areq->assoclen;
- 	memcpy(cipher_param->u.cipher_IV_array, areq->iv, AES_BLOCK_SIZE);
- 	auth_param = (void *)((uint8_t *)cipher_param + sizeof(*cipher_param));
-@@ -869,6 +876,12 @@ static int qat_alg_aead_enc(struct aead_request *areq)
- 	uint8_t *iv = areq->iv;
- 	int ret, ctr = 0;
- 
-+	if (!areq->cryptlen)
-+		return -EINVAL;
-+
-+	if (areq->cryptlen % AES_BLOCK_SIZE != 0)
-+		return -EINVAL;
-+
- 	ret = qat_alg_sgl_to_bufl(ctx->inst, areq->src, areq->dst, qat_req);
- 	if (unlikely(ret))
- 		return ret;
+	if (&ndev->list == &nevlist)
+
+Cheers,
 -- 
-2.26.2
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
