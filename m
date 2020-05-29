@@ -2,67 +2,168 @@ Return-Path: <SRS0=pw/0=7L=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB66EC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 May 2020 13:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F1ACC433E1
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 May 2020 14:23:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C0AFC207BC
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 May 2020 13:42:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 080452073B
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 May 2020 14:23:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725901AbgE2Nm0 (ORCPT
+        id S1726864AbgE2OXx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 May 2020 09:42:26 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:41034 "EHLO fornost.hmeau.com"
+        Fri, 29 May 2020 10:23:53 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:41054 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726903AbgE2Nm0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 May 2020 09:42:26 -0400
+        id S1726874AbgE2OXx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 29 May 2020 10:23:53 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jefH5-00079z-FL; Fri, 29 May 2020 23:42:16 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 May 2020 23:42:15 +1000
-Date:   Fri, 29 May 2020 23:42:15 +1000
+        id 1jefvJ-0007wl-Lw; Sat, 30 May 2020 00:23:50 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 30 May 2020 00:23:49 +1000
+Date:   Sat, 30 May 2020 00:23:49 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Eric Biggers <ebiggers@kernel.org>,
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Stephan Mueller <smueller@chronox.de>
-Subject: Re: [RFC/RFT PATCH 0/2] crypto: add CTS output IVs for arm64 and
- testmgr
-Message-ID: <20200529134215.GA9458@gondor.apana.org.au>
-References: <20200528073349.GA32566@gondor.apana.org.au>
- <CAMj1kXGkvLP1YnDimdLOM6xMXSQKXPKCEBGRCGBRsWKAQR5Stg@mail.gmail.com>
- <20200529080508.GA2880@gondor.apana.org.au>
- <CAMj1kXE43VvEXyYQF=s5HybhF6Wq23wDTrvTfNV9d4fUVZZ8aw@mail.gmail.com>
- <20200529115126.GA3573@gondor.apana.org.au>
- <CAMj1kXFFPKWwwSpLnPmNa_Up1syMb7T5STG7Tw8mRuRqSzc9vw@mail.gmail.com>
- <20200529120216.GA3752@gondor.apana.org.au>
- <CAMj1kXF2-jJ6yGh9m759V2858_c45txoUBgKirvR-4z4GOHUfQ@mail.gmail.com>
- <20200529131953.GA9187@gondor.apana.org.au>
- <CAMj1kXHnQhLWUC_dPeuscEutOZPGzW4ZGaqphT2mSExmfChtsg@mail.gmail.com>
+Subject: [v2 PATCH] crypto: algif_aead - Only wake up when ctx->more is zero
+Message-ID: <20200529142349.GA10563@gondor.apana.org.au>
+References: <20200529045443.GA475@gondor.apana.org.au>
+ <20200529124048.GA7283@gondor.apana.org.au>
+ <20200529131811.GA9137@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMj1kXHnQhLWUC_dPeuscEutOZPGzW4ZGaqphT2mSExmfChtsg@mail.gmail.com>
+In-Reply-To: <20200529131811.GA9137@gondor.apana.org.au>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 29, 2020 at 03:41:08PM +0200, Ard Biesheuvel wrote:
->
-> So what about the final request? At which point do you decide to
-> return the final chunk of data that you have been holding back in
-> order to ensure that you can perform the final processing correctly if
-> it is not being followed by a ALG_SET_IV command?
+AEAD does not support partial requests so we must not wake up
+while ctx->more is set.  In order to distinguish between the
+case of no data sent yet and a zero-length request, a new init
+flag has been added to ctx.
+    
+SKCIPHER has also been modified to ensure that at least a block
+of data is available if there is more data to come.
+    
+Fixes: 2d97591ef43d ("crypto: af_alg - consolidation of...")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-When the MORE flag is unset.
-
-Cheers,
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index b1cd3535c5256..3366a3173e733 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -639,6 +639,7 @@ void af_alg_pull_tsgl(struct sock *sk, size_t used, struct scatterlist *dst,
+ 
+ 	if (!ctx->used)
+ 		ctx->merge = 0;
++	ctx->init = ctx->more;
+ }
+ EXPORT_SYMBOL_GPL(af_alg_pull_tsgl);
+ 
+@@ -738,9 +739,10 @@ EXPORT_SYMBOL_GPL(af_alg_wmem_wakeup);
+  *
+  * @sk socket of connection to user space
+  * @flags If MSG_DONTWAIT is set, then only report if function would sleep
++ * @min Set to minimum request size if partial requests are allowed.
+  * @return 0 when writable memory is available, < 0 upon error
+  */
+-int af_alg_wait_for_data(struct sock *sk, unsigned flags)
++int af_alg_wait_for_data(struct sock *sk, unsigned flags, unsigned min)
+ {
+ 	DEFINE_WAIT_FUNC(wait, woken_wake_function);
+ 	struct alg_sock *ask = alg_sk(sk);
+@@ -758,7 +760,9 @@ int af_alg_wait_for_data(struct sock *sk, unsigned flags)
+ 		if (signal_pending(current))
+ 			break;
+ 		timeout = MAX_SCHEDULE_TIMEOUT;
+-		if (sk_wait_event(sk, &timeout, (ctx->used || !ctx->more),
++		if (sk_wait_event(sk, &timeout,
++				  ctx->init && (!ctx->more ||
++						(min && ctx->used >= min)),
+ 				  &wait)) {
+ 			err = 0;
+ 			break;
+@@ -847,7 +851,7 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 	}
+ 
+ 	lock_sock(sk);
+-	if (!ctx->more && ctx->used) {
++	if (ctx->init && (init || !ctx->more)) {
+ 		err = -EINVAL;
+ 		goto unlock;
+ 	}
+@@ -858,6 +862,7 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 			memcpy(ctx->iv, con.iv->iv, ivsize);
+ 
+ 		ctx->aead_assoclen = con.aead_assoclen;
++		ctx->init = true;
+ 	}
+ 
+ 	while (size) {
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index eb1910b6d434c..857e9598e4dc0 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -106,8 +106,8 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	size_t usedpages = 0;		/* [in]  RX bufs to be used from user */
+ 	size_t processed = 0;		/* [in]  TX bufs to be consumed */
+ 
+-	if (!ctx->used) {
+-		err = af_alg_wait_for_data(sk, flags);
++	if (!ctx->init || ctx->more) {
++		err = af_alg_wait_for_data(sk, flags, 0);
+ 		if (err)
+ 			return err;
+ 	}
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 24dd2fc2431cc..a2a588c71bdab 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -61,8 +61,8 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	int err = 0;
+ 	size_t len = 0;
+ 
+-	if (!ctx->used) {
+-		err = af_alg_wait_for_data(sk, flags);
++	if (!ctx->init || (ctx->more && ctx->used < bs)) {
++		err = af_alg_wait_for_data(sk, flags, bs);
+ 		if (err)
+ 			return err;
+ 	}
+diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+index 56527c85d1222..98fb5b3158f2a 100644
+--- a/include/crypto/if_alg.h
++++ b/include/crypto/if_alg.h
+@@ -135,6 +135,7 @@ struct af_alg_async_req {
+  *			SG?
+  * @enc:		Cryptographic operation to be performed when
+  *			recvmsg is invoked.
++ * @init:		True if metadata has been sent.
+  * @len:		Length of memory allocated for this data structure.
+  */
+ struct af_alg_ctx {
+@@ -151,6 +152,7 @@ struct af_alg_ctx {
+ 	bool more;
+ 	bool merge;
+ 	bool enc;
++	bool init;
+ 
+ 	unsigned int len;
+ };
+@@ -226,7 +228,7 @@ unsigned int af_alg_count_tsgl(struct sock *sk, size_t bytes, size_t offset);
+ void af_alg_pull_tsgl(struct sock *sk, size_t used, struct scatterlist *dst,
+ 		      size_t dst_offset);
+ void af_alg_wmem_wakeup(struct sock *sk);
+-int af_alg_wait_for_data(struct sock *sk, unsigned flags);
++int af_alg_wait_for_data(struct sock *sk, unsigned flags, unsigned min);
+ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 		   unsigned int ivsize);
+ ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
