@@ -6,117 +6,84 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E67BBC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 May 2020 17:12:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B976EC433DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 May 2020 17:12:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C3E4620814
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 May 2020 17:12:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B2AA20723
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 May 2020 17:12:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590772355;
-	bh=pWdiLQKXlqkVWGFk1vwAA7pmGBuWEqo3AyBqWZl5aR8=;
+	s=default; t=1590772378;
+	bh=aEOy+vLbpqJVkWWX3TphbGnt+pUjBcghdRQ8Nc/BFMk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=r4DY8qtUqhVnYiJw+e9Al3WIIz64w4V/cdurLHZEco2lmZILP7zx1p8kubr8gMg+q
-	 qgnnBi2qN5Ux8OU88P8Tpa48NTAGF1QeAshiu1MpCpYksBTALv5tDLxb5/LirdtyA5
-	 sPO6/liaVgzNRv914zMK3zk3A5Ys+91W2a+DBUBY=
+	b=aa+F4zGgGnmNH9vbxi3J64SrGqqYGKwF5CZ+V9BSs5UE52NmHVLjHiMJe+/37Q9sO
+	 NRUPwOg6B/qvjY33NJ5iISiXD8a8rsH28OCGXxhkISBB3lV79WrGU+nIFz84B1FmSZ
+	 JnuboYFQpsT9mmhgc9pI3cgwpag6ZCQhSIyYK6Mw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726616AbgE2RMe (ORCPT
+        id S1726966AbgE2RMz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 May 2020 13:12:34 -0400
-Received: from mail-il1-f195.google.com ([209.85.166.195]:34777 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725601AbgE2RMe (ORCPT
+        Fri, 29 May 2020 13:12:55 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:44702 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725601AbgE2RMz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 May 2020 13:12:34 -0400
-Received: by mail-il1-f195.google.com with SMTP id v11so3254165ilh.1;
-        Fri, 29 May 2020 10:12:33 -0700 (PDT)
+        Fri, 29 May 2020 13:12:55 -0400
+Received: by mail-io1-f65.google.com with SMTP id p20so85342iop.11;
+        Fri, 29 May 2020 10:12:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=bx0PYvSq6NXKj78JIhFRx0Ln0MPRytiQWRFm69j6/II=;
-        b=FibTTiAXPZA8ncGPD15f56t67fVXt50ryXvQcrpouWAHMUzjDv1nMYHkF8ZGH+wVdn
-         lP14S8UMxjKZFQGJwccUuGIXrooQgj6fpD9KP4UafcYLcp97mY6mYYWdI5D24Df24vcI
-         i2Qwc4bsxEE65hccxWAMsxMwDZSx1WWFbTQM4JlwiTcYlr6mqvk3kQWUNPeXH5xE7uPn
-         WbCSp3T2YAWb3ubnf55t0qnblXtog/VpwZjXVcH48RkZOgohLlbVNpYTDjDOPMmZ5nP6
-         OKkrSNQzNDO+fE+dCyO/4Y4IA9sIj14sKf/TR4c2OiUQ/Lew6C2gmKMddtewRzhrWPIF
-         sAkQ==
-X-Gm-Message-State: AOAM530gtSvSuqwlMUSxONSPxXWq1p9YGfgjZlaoGaEnSquTtC2pFdG+
-        mSudf7criqDAqRjS/3Gn6g==
-X-Google-Smtp-Source: ABdhPJx3pelBzqI23xyZAGyODV+mdjrDEnHa6vJcIHqwehHVDJoZHGYIfuPjm8tPctXXxT9q75pF9A==
-X-Received: by 2002:a92:5b15:: with SMTP id p21mr7028596ilb.22.1590772353030;
-        Fri, 29 May 2020 10:12:33 -0700 (PDT)
+        bh=OHboqWMkmK+OdNhD2uMZssxmLRKtctZdJ9sUpoYFPYE=;
+        b=UXvZJ+Z5MOXTkzwsmXj3ycvjVjVOSS+M0fUy7f0yXsrccufwxPHcZCNlY9aaFb+Vx0
+         3uhwYtSbJWPJP564Y1AeaZa9yWiKOfglXHA+p8t0ebram4KG0LDdq9A5WdZNrdvLriI9
+         4tmocT/GW5XM/1je7/Oo6cSR+cGKWNZjBjz5ikbkvv0W2d7BNHppBEYSJwMlU43riFPS
+         ZSDaOp+PCSALDtzW4Z4njbDca9pK95Ahd2Sd4FvdB9iRKqVJg/f4F7zUtIniBn7H7t74
+         TEE9otwjhRNAkvJCS4EJZcf/7R2MX/bXd0ls1INPxsPiwpG00q0e8WmxdaXnLsC2z8bv
+         M4Wg==
+X-Gm-Message-State: AOAM531FF2LRpa+YQTfha71O4iiZ9COawKjhI+6b0qMgCn9au7HlJjWT
+        E9qnGGpJ83/BXmx9Dtl3RQ==
+X-Google-Smtp-Source: ABdhPJwCK68hjzDmx+3jO6TN/lJaHhWps7pZAkAFpT9RDl6ItRCQdn4wbdNHxIr6BicDwl6Ya1pdUw==
+X-Received: by 2002:a5e:de03:: with SMTP id e3mr7483688iok.0.1590772373822;
+        Fri, 29 May 2020 10:12:53 -0700 (PDT)
 Received: from xps15 ([64.188.179.252])
-        by smtp.gmail.com with ESMTPSA id v13sm5199788ili.15.2020.05.29.10.12.31
+        by smtp.gmail.com with ESMTPSA id m12sm3311284ili.41.2020.05.29.10.12.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 May 2020 10:12:32 -0700 (PDT)
-Received: (nullmailer pid 2586805 invoked by uid 1000);
-        Fri, 29 May 2020 17:12:31 -0000
-Date:   Fri, 29 May 2020 11:12:31 -0600
+        Fri, 29 May 2020 10:12:53 -0700 (PDT)
+Received: (nullmailer pid 2587417 invoked by uid 1000);
+        Fri, 29 May 2020 17:12:52 -0000
+Date:   Fri, 29 May 2020 11:12:52 -0600
 From:   Rob Herring <robh@kernel.org>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Olivier Sobrie <olivier.sobrie@silexinsight.com>,
+To:     Olivier Sobrie <olivier.sobrie@silexinsight.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org, Waleed Ziad <waleed94ziad@gmail.com>,
         Matt Mackall <mpm@selenic.com>,
+        sebastien.rabou@silexinsight.com, Rob Herring <robh+dt@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, DTML <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Waleed Ziad <waleed94ziad@gmail.com>,
-        sebastien.rabou@silexinsight.com
-Subject: Re: [PATCH 3/3] hwrng: ba431-rng: add support for BA431 hwrng
-Message-ID: <20200529171231.GA2581035@bogus>
+        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH 1/3] dt-bindings: vendor-prefixes: Add Silex Insight
+ vendor prefix
+Message-ID: <20200529171252.GA2587363@bogus>
 References: <20200525195606.2941649-1-olivier.sobrie@silexinsight.com>
- <20200525195606.2941649-4-olivier.sobrie@silexinsight.com>
- <CAK8P3a3=HoQZuBoqyFgyde1X7BRfcH-GFQpu=8acOi_JhVU99g@mail.gmail.com>
+ <20200525195606.2941649-2-olivier.sobrie@silexinsight.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAK8P3a3=HoQZuBoqyFgyde1X7BRfcH-GFQpu=8acOi_JhVU99g@mail.gmail.com>
+In-Reply-To: <20200525195606.2941649-2-olivier.sobrie@silexinsight.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 25, 2020 at 10:28:46PM +0200, Arnd Bergmann wrote:
-> On Mon, May 25, 2020 at 10:07 PM Olivier Sobrie
-> <olivier.sobrie@silexinsight.com> wrote:
-> >
-> > Silex insight BA431 is an IP designed to generate random numbers that
-> > can be integrated in various FPGA.
-> > This driver adds support for it through the hwrng interface.
-> >
-> > This driver is used in Silex Insight Viper OEM boards.
-> >
-> > Signed-off-by: Olivier Sobrie <olivier.sobrie@silexinsight.com>
-> > Signed-off-by: Waleed Ziad <waleed94ziad@gmail.com>
+On Mon, 25 May 2020 21:56:04 +0200, Olivier Sobrie wrote:
+> Silex Insight is a microelectronic company whose headquarter is located
+> in Belgium.
+> Web site of the company: https://www.silexinsight.com/
 > 
-> The driver looks good to me.
+> Signed-off-by: Olivier Sobrie <olivier.sobrie@silexinsight.com>
+> ---
+>  Documentation/devicetree/bindings/vendor-prefixes.yaml | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> Acked-by: Arnd Bergmann  <arnd@arndb.de>
-> 
-> >  drivers/char/hw_random/Kconfig     |  10 ++
-> >  drivers/char/hw_random/Makefile    |   1 +
-> >  drivers/char/hw_random/ba431-rng.c | 240 +++++++++++++++++++++++++++++
-> 
-> I wonder if we should move drivers/char/hw_random to its own top-level drivers
-> subsystem outside of drivers/char. It seems to be growing steadily and is larger
-> than a lot of other subsystems with currently 34 drivers in there.
-> 
-> Not your problem though.
-> 
-> > +       /* Wait until the state changed */
-> > +       for (i = 0; i < BA431_RESET_READ_STATUS_RETRIES; ++i) {
-> > +               state = ba431_trng_get_state(ba431);
-> > +               if (state >= BA431_STATE_STARTUP)
-> > +                       break;
-> > +
-> > +               udelay(BA431_RESET_READ_STATUS_INTERVAL);
-> > +       }
-> 
-> Looking for something to improve, I noticed that this loop can take over
-> a millisecond to time out, and it always runs in non-atomic context.
-> It may be better to use usleep_range() than udelay().
 
-Or better yet, use the register polling helpers.
-
-Rob
+Applied, thanks!
