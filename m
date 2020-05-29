@@ -2,169 +2,121 @@ Return-Path: <SRS0=pw/0=7L=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F1ACC433E1
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 May 2020 14:23:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E67BBC433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 May 2020 17:12:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 080452073B
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 May 2020 14:23:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3E4620814
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 May 2020 17:12:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1590772355;
+	bh=pWdiLQKXlqkVWGFk1vwAA7pmGBuWEqo3AyBqWZl5aR8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=r4DY8qtUqhVnYiJw+e9Al3WIIz64w4V/cdurLHZEco2lmZILP7zx1p8kubr8gMg+q
+	 qgnnBi2qN5Ux8OU88P8Tpa48NTAGF1QeAshiu1MpCpYksBTALv5tDLxb5/LirdtyA5
+	 sPO6/liaVgzNRv914zMK3zk3A5Ys+91W2a+DBUBY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726864AbgE2OXx (ORCPT
+        id S1726616AbgE2RMe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 May 2020 10:23:53 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:41054 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726874AbgE2OXx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 May 2020 10:23:53 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jefvJ-0007wl-Lw; Sat, 30 May 2020 00:23:50 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 30 May 2020 00:23:49 +1000
-Date:   Sat, 30 May 2020 00:23:49 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Stephan Mueller <smueller@chronox.de>
-Subject: [v2 PATCH] crypto: algif_aead - Only wake up when ctx->more is zero
-Message-ID: <20200529142349.GA10563@gondor.apana.org.au>
-References: <20200529045443.GA475@gondor.apana.org.au>
- <20200529124048.GA7283@gondor.apana.org.au>
- <20200529131811.GA9137@gondor.apana.org.au>
+        Fri, 29 May 2020 13:12:34 -0400
+Received: from mail-il1-f195.google.com ([209.85.166.195]:34777 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725601AbgE2RMe (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 29 May 2020 13:12:34 -0400
+Received: by mail-il1-f195.google.com with SMTP id v11so3254165ilh.1;
+        Fri, 29 May 2020 10:12:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=bx0PYvSq6NXKj78JIhFRx0Ln0MPRytiQWRFm69j6/II=;
+        b=FibTTiAXPZA8ncGPD15f56t67fVXt50ryXvQcrpouWAHMUzjDv1nMYHkF8ZGH+wVdn
+         lP14S8UMxjKZFQGJwccUuGIXrooQgj6fpD9KP4UafcYLcp97mY6mYYWdI5D24Df24vcI
+         i2Qwc4bsxEE65hccxWAMsxMwDZSx1WWFbTQM4JlwiTcYlr6mqvk3kQWUNPeXH5xE7uPn
+         WbCSp3T2YAWb3ubnf55t0qnblXtog/VpwZjXVcH48RkZOgohLlbVNpYTDjDOPMmZ5nP6
+         OKkrSNQzNDO+fE+dCyO/4Y4IA9sIj14sKf/TR4c2OiUQ/Lew6C2gmKMddtewRzhrWPIF
+         sAkQ==
+X-Gm-Message-State: AOAM530gtSvSuqwlMUSxONSPxXWq1p9YGfgjZlaoGaEnSquTtC2pFdG+
+        mSudf7criqDAqRjS/3Gn6g==
+X-Google-Smtp-Source: ABdhPJx3pelBzqI23xyZAGyODV+mdjrDEnHa6vJcIHqwehHVDJoZHGYIfuPjm8tPctXXxT9q75pF9A==
+X-Received: by 2002:a92:5b15:: with SMTP id p21mr7028596ilb.22.1590772353030;
+        Fri, 29 May 2020 10:12:33 -0700 (PDT)
+Received: from xps15 ([64.188.179.252])
+        by smtp.gmail.com with ESMTPSA id v13sm5199788ili.15.2020.05.29.10.12.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2020 10:12:32 -0700 (PDT)
+Received: (nullmailer pid 2586805 invoked by uid 1000);
+        Fri, 29 May 2020 17:12:31 -0000
+Date:   Fri, 29 May 2020 11:12:31 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Olivier Sobrie <olivier.sobrie@silexinsight.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, DTML <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Waleed Ziad <waleed94ziad@gmail.com>,
+        sebastien.rabou@silexinsight.com
+Subject: Re: [PATCH 3/3] hwrng: ba431-rng: add support for BA431 hwrng
+Message-ID: <20200529171231.GA2581035@bogus>
+References: <20200525195606.2941649-1-olivier.sobrie@silexinsight.com>
+ <20200525195606.2941649-4-olivier.sobrie@silexinsight.com>
+ <CAK8P3a3=HoQZuBoqyFgyde1X7BRfcH-GFQpu=8acOi_JhVU99g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200529131811.GA9137@gondor.apana.org.au>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <CAK8P3a3=HoQZuBoqyFgyde1X7BRfcH-GFQpu=8acOi_JhVU99g@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-AEAD does not support partial requests so we must not wake up
-while ctx->more is set.  In order to distinguish between the
-case of no data sent yet and a zero-length request, a new init
-flag has been added to ctx.
-    
-SKCIPHER has also been modified to ensure that at least a block
-of data is available if there is more data to come.
-    
-Fixes: 2d97591ef43d ("crypto: af_alg - consolidation of...")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+On Mon, May 25, 2020 at 10:28:46PM +0200, Arnd Bergmann wrote:
+> On Mon, May 25, 2020 at 10:07 PM Olivier Sobrie
+> <olivier.sobrie@silexinsight.com> wrote:
+> >
+> > Silex insight BA431 is an IP designed to generate random numbers that
+> > can be integrated in various FPGA.
+> > This driver adds support for it through the hwrng interface.
+> >
+> > This driver is used in Silex Insight Viper OEM boards.
+> >
+> > Signed-off-by: Olivier Sobrie <olivier.sobrie@silexinsight.com>
+> > Signed-off-by: Waleed Ziad <waleed94ziad@gmail.com>
+> 
+> The driver looks good to me.
+> 
+> Acked-by: Arnd Bergmann  <arnd@arndb.de>
+> 
+> >  drivers/char/hw_random/Kconfig     |  10 ++
+> >  drivers/char/hw_random/Makefile    |   1 +
+> >  drivers/char/hw_random/ba431-rng.c | 240 +++++++++++++++++++++++++++++
+> 
+> I wonder if we should move drivers/char/hw_random to its own top-level drivers
+> subsystem outside of drivers/char. It seems to be growing steadily and is larger
+> than a lot of other subsystems with currently 34 drivers in there.
+> 
+> Not your problem though.
+> 
+> > +       /* Wait until the state changed */
+> > +       for (i = 0; i < BA431_RESET_READ_STATUS_RETRIES; ++i) {
+> > +               state = ba431_trng_get_state(ba431);
+> > +               if (state >= BA431_STATE_STARTUP)
+> > +                       break;
+> > +
+> > +               udelay(BA431_RESET_READ_STATUS_INTERVAL);
+> > +       }
+> 
+> Looking for something to improve, I noticed that this loop can take over
+> a millisecond to time out, and it always runs in non-atomic context.
+> It may be better to use usleep_range() than udelay().
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index b1cd3535c5256..3366a3173e733 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -639,6 +639,7 @@ void af_alg_pull_tsgl(struct sock *sk, size_t used, struct scatterlist *dst,
- 
- 	if (!ctx->used)
- 		ctx->merge = 0;
-+	ctx->init = ctx->more;
- }
- EXPORT_SYMBOL_GPL(af_alg_pull_tsgl);
- 
-@@ -738,9 +739,10 @@ EXPORT_SYMBOL_GPL(af_alg_wmem_wakeup);
-  *
-  * @sk socket of connection to user space
-  * @flags If MSG_DONTWAIT is set, then only report if function would sleep
-+ * @min Set to minimum request size if partial requests are allowed.
-  * @return 0 when writable memory is available, < 0 upon error
-  */
--int af_alg_wait_for_data(struct sock *sk, unsigned flags)
-+int af_alg_wait_for_data(struct sock *sk, unsigned flags, unsigned min)
- {
- 	DEFINE_WAIT_FUNC(wait, woken_wake_function);
- 	struct alg_sock *ask = alg_sk(sk);
-@@ -758,7 +760,9 @@ int af_alg_wait_for_data(struct sock *sk, unsigned flags)
- 		if (signal_pending(current))
- 			break;
- 		timeout = MAX_SCHEDULE_TIMEOUT;
--		if (sk_wait_event(sk, &timeout, (ctx->used || !ctx->more),
-+		if (sk_wait_event(sk, &timeout,
-+				  ctx->init && (!ctx->more ||
-+						(min && ctx->used >= min)),
- 				  &wait)) {
- 			err = 0;
- 			break;
-@@ -847,7 +851,7 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- 	}
- 
- 	lock_sock(sk);
--	if (!ctx->more && ctx->used) {
-+	if (ctx->init && (init || !ctx->more)) {
- 		err = -EINVAL;
- 		goto unlock;
- 	}
-@@ -858,6 +862,7 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- 			memcpy(ctx->iv, con.iv->iv, ivsize);
- 
- 		ctx->aead_assoclen = con.aead_assoclen;
-+		ctx->init = true;
- 	}
- 
- 	while (size) {
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index eb1910b6d434c..857e9598e4dc0 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -106,8 +106,8 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 	size_t usedpages = 0;		/* [in]  RX bufs to be used from user */
- 	size_t processed = 0;		/* [in]  TX bufs to be consumed */
- 
--	if (!ctx->used) {
--		err = af_alg_wait_for_data(sk, flags);
-+	if (!ctx->init || ctx->more) {
-+		err = af_alg_wait_for_data(sk, flags, 0);
- 		if (err)
- 			return err;
- 	}
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 24dd2fc2431cc..a2a588c71bdab 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -61,8 +61,8 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 	int err = 0;
- 	size_t len = 0;
- 
--	if (!ctx->used) {
--		err = af_alg_wait_for_data(sk, flags);
-+	if (!ctx->init || (ctx->more && ctx->used < bs)) {
-+		err = af_alg_wait_for_data(sk, flags, bs);
- 		if (err)
- 			return err;
- 	}
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 56527c85d1222..98fb5b3158f2a 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -135,6 +135,7 @@ struct af_alg_async_req {
-  *			SG?
-  * @enc:		Cryptographic operation to be performed when
-  *			recvmsg is invoked.
-+ * @init:		True if metadata has been sent.
-  * @len:		Length of memory allocated for this data structure.
-  */
- struct af_alg_ctx {
-@@ -151,6 +152,7 @@ struct af_alg_ctx {
- 	bool more;
- 	bool merge;
- 	bool enc;
-+	bool init;
- 
- 	unsigned int len;
- };
-@@ -226,7 +228,7 @@ unsigned int af_alg_count_tsgl(struct sock *sk, size_t bytes, size_t offset);
- void af_alg_pull_tsgl(struct sock *sk, size_t used, struct scatterlist *dst,
- 		      size_t dst_offset);
- void af_alg_wmem_wakeup(struct sock *sk);
--int af_alg_wait_for_data(struct sock *sk, unsigned flags);
-+int af_alg_wait_for_data(struct sock *sk, unsigned flags, unsigned min);
- int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- 		   unsigned int ivsize);
- ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Or better yet, use the register polling helpers.
+
+Rob
