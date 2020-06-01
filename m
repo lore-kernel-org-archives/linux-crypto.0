@@ -2,96 +2,73 @@ Return-Path: <SRS0=veUY=7O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D8AC433E0
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Jun 2020 17:41:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A094C433DF
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Jun 2020 19:35:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22738207DA
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Jun 2020 17:41:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 457BA20776
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Jun 2020 19:35:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591033268;
-	bh=egFH6RgQ4a+4kLCfGrEDkjv5v4bJblqDQOjodPikqEM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:List-ID:From;
-	b=RIVmAK75cmgDVIrimRB4BmGk7O3SbS66iMPw95FcvdSsiFbgce8lJvgvInAPlHv6L
-	 +d8otOMUxlhOJQxpyzWtZCy1E3Q+tE53fvSpNXFo7BPEStCeTPzz233fx4dg4TmQgN
-	 OAm5+zLvsCLAX58/mq16QKb92HPBUMQP0NTVSkjc=
+	s=default; t=1591040147;
+	bh=J+cEF6NlV6FTuCyw4GSWHJsgj40PG61Pe/1hieAYRtk=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=sGBCaFmeYa1sCrQ3n+P6NDsUulMSak3C4b/ImIxIp8spzbv9bACq1a8Yfr5QGNaGh
+	 j7mI6E6i+SPjJHj9gDsxQTCjn7eaRcwiRONsrCLCuPaYVnpg2PA40JQME4cycaREVr
+	 g3WB3cLGqZz4pssplUMCFjzMivNhS9YPzCXyFOOM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727056AbgFARlH (ORCPT
+        id S1729562AbgFATfl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Jun 2020 13:41:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58534 "EHLO mail.kernel.org"
+        Mon, 1 Jun 2020 15:35:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57802 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726017AbgFARlH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Jun 2020 13:41:07 -0400
-Received: from localhost (mobile-166-175-190-200.mycingular.net [166.175.190.200])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 48FEF206A4;
-        Mon,  1 Jun 2020 17:41:06 +0000 (UTC)
+        id S1729558AbgFATfH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 1 Jun 2020 15:35:07 -0400
+Subject: Re: [GIT PULL] Crypto Update for 5.8
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591033266;
-        bh=egFH6RgQ4a+4kLCfGrEDkjv5v4bJblqDQOjodPikqEM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=PBS/XvI5mPBJhMQPW3QR/267YghZh8VBNHFVIA3y76nvmv7wSAOnIG8ZofBmrwL3W
-         hjX/e/kbh6hI/0SHMT/KsCJ3IYwK/78zwY6ZY8W6ZDDtNYI4kfbVVgq5NF84Mj/Dz5
-         u9OiYWmcq6uvLgae6Udy20G6q8HsslAkBraLQcZo=
-Date:   Mon, 1 Jun 2020 12:41:04 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     Zhangfei Gao <zhangfei.gao@linaro.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Hanjun Guo <guohanjun@huawei.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
-Message-ID: <20200601174104.GA734973@bjorn-Precision-5520>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200528073344.GO5221@8bytes.org>
+        s=default; t=1591040106;
+        bh=J+cEF6NlV6FTuCyw4GSWHJsgj40PG61Pe/1hieAYRtk=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=YKlgJNTSYsSxtqkyL+YTAfnOx9cPHu4nJApU4V8hGb2k73aVgVHgInrwuFRWE2svc
+         er1c8QtpaS5UyiiGskbtdih3b0ml0+VtkrkwH/Kuntea0QG9XK4F4NxNeLJynb5rkB
+         JJ9oSYvHaBxNWFfzIXTcam5cZUfVVW1l8sG93umM=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20200601024533.GA18937@gondor.apana.org.au>
+References: <20190916084901.GA20338@gondor.apana.org.au>
+ <20191125034536.wlgw25gpgn7y7vni@gondor.apana.org.au>
+ <20200128050326.x3cfjz3rj7ep6xr2@gondor.apana.org.au>
+ <20200401042720.GA12178@gondor.apana.org.au>
+ <20200601024533.GA18937@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20200601024533.GA18937@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+X-PR-Tracked-Commit-Id: 58ca0060ec4e51208d2eee12198fc55fd9e4feb3
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 81e8c10dac62c427b25f6bbb07936806e4dd9e8a
+Message-Id: <159104010689.18844.9017176619965025932.pr-tracker-bot@kernel.org>
+Date:   Mon, 01 Jun 2020 19:35:06 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 28, 2020 at 09:33:44AM +0200, Joerg Roedel wrote:
-> On Wed, May 27, 2020 at 01:18:42PM -0500, Bjorn Helgaas wrote:
-> > Is this slowdown significant?  We already iterate over every device
-> > when applying PCI_FIXUP_FINAL quirks, so if we used the existing
-> > PCI_FIXUP_FINAL, we wouldn't be adding a new loop.  We would only be
-> > adding two more iterations to the loop in pci_do_fixups() that tries
-> > to match quirks against the current device.  I doubt that would be a
-> > measurable slowdown.
-> 
-> I don't know how significant it is, but I remember people complaining
-> about adding new PCI quirks because it takes too long for them to run
-> them all. That was in the discussion about the quirk disabling ATS on
-> AMD Stoney systems.
-> 
-> So it probably depends on how many PCI devices are in the system whether
-> it causes any measureable slowdown.
+The pull request you sent on Mon, 1 Jun 2020 12:45:33 +1000:
 
-I found this [1] from Paul Menzel, which was a slowdown caused by
-quirk_usb_early_handoff().  I think the real problem is individual
-quirks that take a long time.
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-The PCI_FIXUP_IOMMU things we're talking about should be fast, and of
-course, they're only run for matching devices anyway.  So I'd rather
-keep them as PCI_FIXUP_FINAL than add a whole new phase.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/81e8c10dac62c427b25f6bbb07936806e4dd9e8a
 
-Bjorn
+Thank you!
 
-[1] https://lore.kernel.org/linux-pci/b1533fd5-1fae-7256-9597-36d3d5de9d2a@molgen.mpg.de/
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
