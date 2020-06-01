@@ -2,285 +2,96 @@ Return-Path: <SRS0=veUY=7O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9339C433E1
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Jun 2020 16:12:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D8AC433E0
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Jun 2020 17:41:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9FA0E2076B
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Jun 2020 16:12:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 22738207DA
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Jun 2020 17:41:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1591033268;
+	bh=egFH6RgQ4a+4kLCfGrEDkjv5v4bJblqDQOjodPikqEM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:List-ID:From;
+	b=RIVmAK75cmgDVIrimRB4BmGk7O3SbS66iMPw95FcvdSsiFbgce8lJvgvInAPlHv6L
+	 +d8otOMUxlhOJQxpyzWtZCy1E3Q+tE53fvSpNXFo7BPEStCeTPzz233fx4dg4TmQgN
+	 OAm5+zLvsCLAX58/mq16QKb92HPBUMQP0NTVSkjc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726287AbgFAQMv (ORCPT
+        id S1727056AbgFARlH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Jun 2020 12:12:51 -0400
-Received: from smtp02.tmcz.cz ([93.153.104.113]:36068 "EHLO smtp02.tmcz.cz"
+        Mon, 1 Jun 2020 13:41:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58534 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726067AbgFAQMv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Jun 2020 12:12:51 -0400
-Received: from smtp02.tmcz.cz (localhost [127.0.0.1])
-        by sagator.hkvnode045 (Postfix) with ESMTP id 8F23D94DD3B;
-        Mon,  1 Jun 2020 18:04:20 +0200 (CEST)
-X-Sagator-Scanner: 1.3.1-1 at hkvnode046;
-        log(status(custom_action(quarantine(clamd()))),
-        status(custom_action(quarantine(SpamAssassinD()))))
-X-Sagator-ID: 20200601-180420-0001-83134-Tkfubv@hkvnode046
-Received: from leontynka.twibright.com (109-183-129-149.customers.tmcz.cz [109.183.129.149])
-        by smtp02.tmcz.cz (Postfix) with ESMTPS;
-        Mon,  1 Jun 2020 18:04:20 +0200 (CEST)
-Received: from debian-a64.vm ([192.168.208.2])
-        by leontynka.twibright.com with smtp (Exim 4.92)
-        (envelope-from <mpatocka@redhat.com>)
-        id 1jfmvD-0001Vo-0i; Mon, 01 Jun 2020 18:04:20 +0200
-Received: by debian-a64.vm (sSMTP sendmail emulation); Mon, 01 Jun 2020 18:04:18 +0200
-Message-Id: <20200601160418.171851200@debian-a64.vm>
-User-Agent: quilt/0.65
-Date:   Mon, 01 Jun 2020 18:03:33 +0200
-From:   Mikulas Patocka <mpatocka@redhat.com>
-To:     Mike Snitzer <msnitzer@redhat.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        id S1726017AbgFARlH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 1 Jun 2020 13:41:07 -0400
+Received: from localhost (mobile-166-175-190-200.mycingular.net [166.175.190.200])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 48FEF206A4;
+        Mon,  1 Jun 2020 17:41:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1591033266;
+        bh=egFH6RgQ4a+4kLCfGrEDkjv5v4bJblqDQOjodPikqEM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=PBS/XvI5mPBJhMQPW3QR/267YghZh8VBNHFVIA3y76nvmv7wSAOnIG8ZofBmrwL3W
+         hjX/e/kbh6hI/0SHMT/KsCJ3IYwK/78zwY6ZY8W6ZDDtNYI4kfbVVgq5NF84Mj/Dz5
+         u9OiYWmcq6uvLgae6Udy20G6q8HsslAkBraLQcZo=
+Date:   Mon, 1 Jun 2020 12:41:04 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     Zhangfei Gao <zhangfei.gao@linaro.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Hanjun Guo <guohanjun@huawei.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>,
+        jean-philippe <jean-philippe@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Milan Broz <mbroz@redhat.com>, djeffery@redhat.com
-Cc:     dm-devel@redhat.com, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, guazhang@redhat.com,
-        jpittman@redhat.com, Mikulas Patocka <mpatocka@redhat.com>
-Subject: [PATCH 1/4] qat: fix misunderstood -EBUSY return code
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-acpi@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
+Message-ID: <20200601174104.GA734973@bjorn-Precision-5520>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline; filename=qat-fix-4.patch
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200528073344.GO5221@8bytes.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Using dm-crypt with QAT result in deadlocks.
+On Thu, May 28, 2020 at 09:33:44AM +0200, Joerg Roedel wrote:
+> On Wed, May 27, 2020 at 01:18:42PM -0500, Bjorn Helgaas wrote:
+> > Is this slowdown significant?  We already iterate over every device
+> > when applying PCI_FIXUP_FINAL quirks, so if we used the existing
+> > PCI_FIXUP_FINAL, we wouldn't be adding a new loop.  We would only be
+> > adding two more iterations to the loop in pci_do_fixups() that tries
+> > to match quirks against the current device.  I doubt that would be a
+> > measurable slowdown.
+> 
+> I don't know how significant it is, but I remember people complaining
+> about adding new PCI quirks because it takes too long for them to run
+> them all. That was in the discussion about the quirk disabling ATS on
+> AMD Stoney systems.
+> 
+> So it probably depends on how many PCI devices are in the system whether
+> it causes any measureable slowdown.
 
-If a crypto routine returns -EBUSY, it is expected that the crypto driver
-have already queued the request and the crypto API user should assume that
-this request was processed, but it should stop sending more requests. When
-an -EBUSY request is processed, the crypto driver calls the callback with
-the error code -EINPROGRESS - this means that the request is still being
-processed (i.e. the user should wait for another callback), but the user
-can start sending more requests now.
+I found this [1] from Paul Menzel, which was a slowdown caused by
+quirk_usb_early_handoff().  I think the real problem is individual
+quirks that take a long time.
 
-The QAT driver misunderstood this logic, it return -EBUSY when the queue
-was full and didn't queue the request - the request was lost and it
-resulted in a deadlock.
+The PCI_FIXUP_IOMMU things we're talking about should be fast, and of
+course, they're only run for matching devices anyway.  So I'd rather
+keep them as PCI_FIXUP_FINAL than add a whole new phase.
 
-This patch fixes busy state handling - if the queue is at least 15/16
-full, we return -EBUSY to signal to the user that no more requests should
-be sent. We remember that we returned -EBUSY (the variable backed_off) and
-if we finish the request, we return -EINPROGRESS to indicate that the user
-can send more requests.
+Bjorn
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-Cc: stable@vger.kernel.org
-
-Index: linux-2.6/drivers/crypto/qat/qat_common/qat_algs.c
-===================================================================
---- linux-2.6.orig/drivers/crypto/qat/qat_common/qat_algs.c
-+++ linux-2.6/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -826,6 +826,9 @@ static void qat_aead_alg_callback(struct
- 	qat_alg_free_bufl(inst, qat_req);
- 	if (unlikely(qat_res != ICP_QAT_FW_COMN_STATUS_FLAG_OK))
- 		res = -EBADMSG;
-+
-+	if (qat_req->backed_off)
-+		areq->base.complete(&areq->base, -EINPROGRESS);
- 	areq->base.complete(&areq->base, res);
- }
- 
-@@ -847,6 +850,8 @@ static void qat_skcipher_alg_callback(st
- 	dma_free_coherent(dev, AES_BLOCK_SIZE, qat_req->iv,
- 			  qat_req->iv_paddr);
- 
-+	if (qat_req->backed_off)
-+		sreq->base.complete(&sreq->base, -EINPROGRESS);
- 	sreq->base.complete(&sreq->base, res);
- }
- 
-@@ -869,7 +874,7 @@ static int qat_alg_aead_dec(struct aead_
- 	struct icp_qat_fw_la_auth_req_params *auth_param;
- 	struct icp_qat_fw_la_bulk_req *msg;
- 	int digst_size = crypto_aead_authsize(aead_tfm);
--	int ret, ctr = 0;
-+	int ret, backed_off;
- 
- 	ret = qat_alg_sgl_to_bufl(ctx->inst, areq->src, areq->dst, qat_req);
- 	if (unlikely(ret))
-@@ -890,15 +895,16 @@ static int qat_alg_aead_dec(struct aead_
- 	auth_param = (void *)((uint8_t *)cipher_param + sizeof(*cipher_param));
- 	auth_param->auth_off = 0;
- 	auth_param->auth_len = areq->assoclen + cipher_param->cipher_length;
--	do {
--		ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
--	} while (ret == -EAGAIN && ctr++ < 10);
- 
-+	qat_req->backed_off = backed_off = adf_should_back_off(ctx->inst->sym_tx);
-+again:
-+	ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
- 	if (ret == -EAGAIN) {
--		qat_alg_free_bufl(ctx->inst, qat_req);
--		return -EBUSY;
-+		qat_req->backed_off = backed_off = 1;
-+		cpu_relax();
-+		goto again;
- 	}
--	return -EINPROGRESS;
-+	return backed_off ? -EBUSY : -EINPROGRESS;
- }
- 
- static int qat_alg_aead_enc(struct aead_request *areq)
-@@ -911,7 +917,7 @@ static int qat_alg_aead_enc(struct aead_
- 	struct icp_qat_fw_la_auth_req_params *auth_param;
- 	struct icp_qat_fw_la_bulk_req *msg;
- 	uint8_t *iv = areq->iv;
--	int ret, ctr = 0;
-+	int ret, backed_off;
- 
- 	ret = qat_alg_sgl_to_bufl(ctx->inst, areq->src, areq->dst, qat_req);
- 	if (unlikely(ret))
-@@ -935,15 +941,15 @@ static int qat_alg_aead_enc(struct aead_
- 	auth_param->auth_off = 0;
- 	auth_param->auth_len = areq->assoclen + areq->cryptlen;
- 
--	do {
--		ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
--	} while (ret == -EAGAIN && ctr++ < 10);
--
-+	qat_req->backed_off = backed_off = adf_should_back_off(ctx->inst->sym_tx);
-+again:
-+	ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
- 	if (ret == -EAGAIN) {
--		qat_alg_free_bufl(ctx->inst, qat_req);
--		return -EBUSY;
-+		qat_req->backed_off = backed_off = 1;
-+		cpu_relax();
-+		goto again;
- 	}
--	return -EINPROGRESS;
-+	return backed_off ? -EBUSY : -EINPROGRESS;
- }
- 
- static int qat_alg_skcipher_rekey(struct qat_alg_skcipher_ctx *ctx,
-@@ -1051,7 +1057,7 @@ static int qat_alg_skcipher_encrypt(stru
- 	struct icp_qat_fw_la_cipher_req_params *cipher_param;
- 	struct icp_qat_fw_la_bulk_req *msg;
- 	struct device *dev = &GET_DEV(ctx->inst->accel_dev);
--	int ret, ctr = 0;
-+	int ret, backed_off;
- 
- 	if (req->cryptlen == 0)
- 		return 0;
-@@ -1081,17 +1087,16 @@ static int qat_alg_skcipher_encrypt(stru
- 	cipher_param->cipher_offset = 0;
- 	cipher_param->u.s.cipher_IV_ptr = qat_req->iv_paddr;
- 	memcpy(qat_req->iv, req->iv, AES_BLOCK_SIZE);
--	do {
--		ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
--	} while (ret == -EAGAIN && ctr++ < 10);
- 
-+	qat_req->backed_off = backed_off = adf_should_back_off(ctx->inst->sym_tx);
-+again:
-+	ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
- 	if (ret == -EAGAIN) {
--		qat_alg_free_bufl(ctx->inst, qat_req);
--		dma_free_coherent(dev, AES_BLOCK_SIZE, qat_req->iv,
--				  qat_req->iv_paddr);
--		return -EBUSY;
-+		qat_req->backed_off = backed_off = 1;
-+		cpu_relax();
-+		goto again;
- 	}
--	return -EINPROGRESS;
-+	return backed_off ? -EBUSY : -EINPROGRESS;
- }
- 
- static int qat_alg_skcipher_blk_encrypt(struct skcipher_request *req)
-@@ -1111,7 +1116,7 @@ static int qat_alg_skcipher_decrypt(stru
- 	struct icp_qat_fw_la_cipher_req_params *cipher_param;
- 	struct icp_qat_fw_la_bulk_req *msg;
- 	struct device *dev = &GET_DEV(ctx->inst->accel_dev);
--	int ret, ctr = 0;
-+	int ret, backed_off;
- 
- 	if (req->cryptlen == 0)
- 		return 0;
-@@ -1141,17 +1146,16 @@ static int qat_alg_skcipher_decrypt(stru
- 	cipher_param->cipher_offset = 0;
- 	cipher_param->u.s.cipher_IV_ptr = qat_req->iv_paddr;
- 	memcpy(qat_req->iv, req->iv, AES_BLOCK_SIZE);
--	do {
--		ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
--	} while (ret == -EAGAIN && ctr++ < 10);
- 
-+	qat_req->backed_off = backed_off = adf_should_back_off(ctx->inst->sym_tx);
-+again:
-+	ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
- 	if (ret == -EAGAIN) {
--		qat_alg_free_bufl(ctx->inst, qat_req);
--		dma_free_coherent(dev, AES_BLOCK_SIZE, qat_req->iv,
--				  qat_req->iv_paddr);
--		return -EBUSY;
-+		qat_req->backed_off = backed_off = 1;
-+		cpu_relax();
-+		goto again;
- 	}
--	return -EINPROGRESS;
-+	return backed_off ? -EBUSY : -EINPROGRESS;
- }
- 
- static int qat_alg_skcipher_blk_decrypt(struct skcipher_request *req)
-Index: linux-2.6/drivers/crypto/qat/qat_common/adf_transport.c
-===================================================================
---- linux-2.6.orig/drivers/crypto/qat/qat_common/adf_transport.c
-+++ linux-2.6/drivers/crypto/qat/qat_common/adf_transport.c
-@@ -114,10 +114,19 @@ static void adf_disable_ring_irq(struct
- 	WRITE_CSR_INT_COL_EN(bank->csr_addr, bank->bank_number, bank->irq_mask);
- }
- 
-+bool adf_should_back_off(struct adf_etr_ring_data *ring)
-+{
-+	return atomic_read(ring->inflights) > ADF_MAX_INFLIGHTS(ring->ring_size, ring->msg_size) * 15 / 16;
-+}
-+
- int adf_send_message(struct adf_etr_ring_data *ring, uint32_t *msg)
- {
--	if (atomic_add_return(1, ring->inflights) >
--	    ADF_MAX_INFLIGHTS(ring->ring_size, ring->msg_size)) {
-+	int limit = ADF_MAX_INFLIGHTS(ring->ring_size, ring->msg_size);
-+
-+	if (atomic_read(ring->inflights) >= limit)
-+		return -EAGAIN;
-+
-+	if (atomic_add_return(1, ring->inflights) > limit) {
- 		atomic_dec(ring->inflights);
- 		return -EAGAIN;
- 	}
-Index: linux-2.6/drivers/crypto/qat/qat_common/adf_transport.h
-===================================================================
---- linux-2.6.orig/drivers/crypto/qat/qat_common/adf_transport.h
-+++ linux-2.6/drivers/crypto/qat/qat_common/adf_transport.h
-@@ -58,6 +58,7 @@ int adf_create_ring(struct adf_accel_dev
- 		    const char *ring_name, adf_callback_fn callback,
- 		    int poll_mode, struct adf_etr_ring_data **ring_ptr);
- 
-+bool adf_should_back_off(struct adf_etr_ring_data *ring);
- int adf_send_message(struct adf_etr_ring_data *ring, uint32_t *msg);
- void adf_remove_ring(struct adf_etr_ring_data *ring);
- #endif
-Index: linux-2.6/drivers/crypto/qat/qat_common/qat_crypto.h
-===================================================================
---- linux-2.6.orig/drivers/crypto/qat/qat_common/qat_crypto.h
-+++ linux-2.6/drivers/crypto/qat/qat_common/qat_crypto.h
-@@ -90,6 +90,7 @@ struct qat_crypto_request {
- 		   struct qat_crypto_request *req);
- 	void *iv;
- 	dma_addr_t iv_paddr;
-+	int backed_off;
- };
- 
- #endif
-
+[1] https://lore.kernel.org/linux-pci/b1533fd5-1fae-7256-9597-36d3d5de9d2a@molgen.mpg.de/
