@@ -1,126 +1,132 @@
-Return-Path: <SRS0=zu7D=7N=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=veUY=7O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4596BC433E1
-	for <linux-crypto@archiver.kernel.org>; Sun, 31 May 2020 09:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 377FFC433DF
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Jun 2020 02:19:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2389B20707
-	for <linux-crypto@archiver.kernel.org>; Sun, 31 May 2020 09:21:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PCwsA+xG"
+	by mail.kernel.org (Postfix) with ESMTP id 1A7F1206A4
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Jun 2020 02:19:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726860AbgEaJV5 (ORCPT
+        id S1726943AbgFACTE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 31 May 2020 05:21:57 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55456 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725860AbgEaJV5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 31 May 2020 05:21:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590916915;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ywTf4qZlZwxY3+4hdzNIdEQ5uHrIZLnoqwJn0ChNVtk=;
-        b=PCwsA+xG8WKxm8E64o6JLhiCH5qqMmi4ft1HxNicoJI75RdxTZTpSBlv3LGdZLRSSPlw2d
-        7yABzbDVZ6tku9AcHde7k1ffxekQ1pDb7BOVo3RQ2QnFoPbXUH/11DE+ClvU9ZNwz6IBz7
-        jvLsE5ohO5sG3XNy+/4og8Av1f87Rxg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-YPV8FgZiPr6MugiN7cI5kg-1; Sun, 31 May 2020 05:21:53 -0400
-X-MC-Unique: YPV8FgZiPr6MugiN7cI5kg-1
-Received: by mail-wm1-f71.google.com with SMTP id t145so1835818wmt.2
-        for <linux-crypto@vger.kernel.org>; Sun, 31 May 2020 02:21:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ywTf4qZlZwxY3+4hdzNIdEQ5uHrIZLnoqwJn0ChNVtk=;
-        b=bsyRYvCsyrJ8ecH2NVFfwGc0dMhMYMYFjU2PBOJQPhSYWJ+2tSOsPiLKaNtq9i4gH4
-         jNACqTzhgYNoWl0AmrM/emtZGXCAAmvsVWCKZx7HUsAzi5FErKMzz7RSlTebrPu6EBKY
-         NgiczrJcEH6pmgH4nmgpjHaxuDSCLgqU36IdVgvr7IuLw0HyA+X63Zn8Ahehoic4/Q6z
-         CBkKZNqSUJa5VejLneaI4z5+Ww7b3zl9In1h+6zgRZd9DSQYADtEB8xI0ZHUntUTR4kK
-         ZPKoqKOT+2gDcpUsKlKhsk6CyxpF0//Q/mwKpTMUydwY0hlWY+ZFCx4Dkqphsok2rMLo
-         JKVA==
-X-Gm-Message-State: AOAM533x+U7kqEGHs/nySTU9AyxsUiY/ak9BhzPgrrUgUCMBqB6O8x0S
-        pR33thgMP87ogkPg61xQPG7uTnezGaIawTLzWPCnI4WN51WGIx4xNXVTAxa5yLaBvgxGuuEwnsz
-        B8ET7uL94pEbDYP3hU1rtEV79
-X-Received: by 2002:a1c:230a:: with SMTP id j10mr16369532wmj.124.1590916911666;
-        Sun, 31 May 2020 02:21:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzzcgV6CUih1OZuVP6HyzHPhx3Qo76tys5xO9OetvdQfwhqn22ihHvFUhLx7Ow9OvlukxlV9g==
-X-Received: by 2002:a1c:230a:: with SMTP id j10mr16369518wmj.124.1590916911412;
-        Sun, 31 May 2020 02:21:51 -0700 (PDT)
-Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
-        by smtp.gmail.com with ESMTPSA id 23sm7468291wmo.18.2020.05.31.02.21.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 May 2020 02:21:50 -0700 (PDT)
-Date:   Sun, 31 May 2020 05:21:48 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     "Longpeng(Mike)" <longpeng2@huawei.com>,
-        linux-crypto@vger.kernel.org, Gonglei <arei.gonglei@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jason Wang <jasowang@redhat.com>,
+        Sun, 31 May 2020 22:19:04 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2513 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726860AbgFACTE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 31 May 2020 22:19:04 -0400
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.57])
+        by Forcepoint Email with ESMTP id 9893F90A4FBC51007D1C;
+        Mon,  1 Jun 2020 10:19:01 +0800 (CST)
+Received: from dggeme762-chm.china.huawei.com (10.3.19.108) by
+ DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Mon, 1 Jun 2020 10:19:01 +0800
+Received: from [10.65.91.233] (10.65.91.233) by dggeme762-chm.china.huawei.com
+ (10.3.19.108) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1913.5; Mon, 1 Jun
+ 2020 10:19:01 +0800
+Subject: Re: [PATCH] crypto: hisilicon/qm - allow smaller reads in debugfs
+To:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Markus Elfring <Markus.Elfring@web.de>,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] crypto: virtio: Fix use-after-free in
- virtio_crypto_skcipher_finalize_req()
-Message-ID: <20200531052126-mutt-send-email-mst@kernel.org>
-References: <20200526031956.1897-3-longpeng2@huawei.com>
- <20200526141138.8410D207FB@mail.kernel.org>
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>
+References: <20200528123703.GA1219412@mwanda>
+From:   Shukun Tan <tanshukun1@huawei.com>
+Message-ID: <b6da310b-e633-9f74-f7af-7791d803aaf5@huawei.com>
+Date:   Mon, 1 Jun 2020 10:19:00 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200526141138.8410D207FB@mail.kernel.org>
+In-Reply-To: <20200528123703.GA1219412@mwanda>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.65.91.233]
+X-ClientProxiedBy: dggeme719-chm.china.huawei.com (10.1.199.115) To
+ dggeme762-chm.china.huawei.com (10.3.19.108)
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 26, 2020 at 02:11:37PM +0000, Sasha Levin wrote:
-> <20200123101000.GB24255@Red>
-> References: <20200526031956.1897-3-longpeng2@huawei.com>
-> <20200123101000.GB24255@Red>
-> 
-> Hi
-> 
-> [This is an automated email]
-> 
-> This commit has been processed because it contains a "Fixes:" tag
-> fixing commit: dbaf0624ffa5 ("crypto: add virtio-crypto driver").
-> 
-> The bot has tested the following trees: v5.6.14, v5.4.42, v4.19.124, v4.14.181.
-> 
-> v5.6.14: Build OK!
-> v5.4.42: Failed to apply! Possible dependencies:
->     eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
-> 
-> v4.19.124: Failed to apply! Possible dependencies:
->     eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
-> 
-> v4.14.181: Failed to apply! Possible dependencies:
->     500e6807ce93 ("crypto: virtio - implement missing support for output IVs")
->     67189375bb3a ("crypto: virtio - convert to new crypto engine API")
->     d0d859bb87ac ("crypto: virtio - Register an algo only if it's supported")
->     e02b8b43f55a ("crypto: virtio - pr_err() strings should end with newlines")
->     eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
-> 
-> 
-> NOTE: The patch will not be queued to stable trees until it is upstream.
-> 
-> How should we proceed with this patch?
+Hi Dan & Zhou,
 
-Mike could you comment on backporting?
+On 2020/5/28 20:37, Dan Carpenter wrote:
+> Originally this code rejected any read less than 256 bytes.  There
+> is no need for this artificial limit.
+> 
+> Also I have changed the snprintf() functions to scnprintf().  The
+> difference is that snprintf() returns the number of bytes which would
+> have been copied if there were enough space and scnprintf() returns the
+> number of bytes which were actually copied.  It doesn't matter here
+> because the strings are very short so they can't go over 256 bytes.
+> 
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> ---
+>  drivers/crypto/hisilicon/qm.c | 18 ++++++++----------
+>  1 file changed, 8 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+> index a781c02251980..9c0c9f500d91d 100644
+> --- a/drivers/crypto/hisilicon/qm.c
+> +++ b/drivers/crypto/hisilicon/qm.c
+> @@ -1076,16 +1076,15 @@ static ssize_t qm_cmd_read(struct file *filp, char __user *buffer,
+>  	if (*pos)
+>  		return 0;
+>  
+> -	if (count < QM_DBG_READ_LEN)
+> -		return -ENOSPC;
+> -
 
-> -- 
-> Thanks
-> Sasha
+I think we should keep it, maybe you are right when using 'cat', but if you use 'read'
+system call this may make the user read only part of the prompt. This may break our
+original design. :)
 
+Thanks,
+Shukun
+
+> -	len = snprintf(buf, QM_DBG_READ_LEN, "%s\n",
+> +	len = scnprintf(buf, QM_DBG_READ_LEN, "%s\n",
+>  		       "Please echo help to cmd to get help information");
+>  
+> +	len = min_t(size_t, len, count);
+>  	if (copy_to_user(buffer, buf, len))
+>  		return -EFAULT;
+>  
+> -	return (*pos = len);
+> +	*pos = len;
+> +	return len;
+>  }
+>  
+>  static void *qm_ctx_alloc(struct hisi_qm *qm, size_t ctx_size,
+> @@ -2710,19 +2709,18 @@ static ssize_t qm_status_read(struct file *filp, char __user *buffer,
+>  	if (*pos)
+>  		return 0;
+>  
+> -	if (count < QM_DBG_READ_LEN)
+> -		return -ENOSPC;
+> -
+>  	val = atomic_read(&qm->status.flags);
+> -	len = snprintf(buf, QM_DBG_READ_LEN, "%s\n", qm_s[val]);
+> +	len = scnprintf(buf, QM_DBG_READ_LEN, "%s\n", qm_s[val]);
+>  	if (!len)
+>  		return -EFAULT;
+>  
+> +	len = min_t(size_t, len, count);
+>  	cp_len = copy_to_user(buffer, buf, len);
+>  	if (cp_len)
+>  		return -EFAULT;
+>  
+> -	return (*pos = len);
+> +	*pos = len;
+> +	return len;
+>  }
+>  
+>  static const struct file_operations qm_status_fops = {
+> 
