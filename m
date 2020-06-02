@@ -2,176 +2,136 @@ Return-Path: <SRS0=vjnc=7P=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8215BC433DF
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jun 2020 08:15:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E585C433E1
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jun 2020 09:17:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E214207DA
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jun 2020 08:15:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="kK/IlOt+"
+	by mail.kernel.org (Postfix) with ESMTP id 52C262077D
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jun 2020 09:17:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726267AbgFBIPM (ORCPT
+        id S1726160AbgFBJRH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Jun 2020 04:15:12 -0400
-Received: from mailgw01.mediatek.com ([210.61.82.183]:26864 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726185AbgFBIPJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Jun 2020 04:15:09 -0400
-X-UUID: 41f700aa76014982907c2e4dcb054db8-20200602
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-        h=Content-Transfer-Encoding:Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=L04bYCk8wivAACUMFnflEPSxZwU86UwuPofSNkaCMCU=;
-        b=kK/IlOt+LmAuxs+qhSF4osH/4xMPI0ZIGCblJ1ptxihKEa55ui80wayDtP2Qm4r9TYCmY6fx4S9A4re0x8XZyBuYBBguZOwtNMeiutEo6e+0CBEjJ66dxCH06vEmALJHFOfr1vyL5mBPw7uh1kfJcM0Zd6gv59VP1S6zP+stwMM=;
-X-UUID: 41f700aa76014982907c2e4dcb054db8-20200602
-Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw01.mediatek.com
-        (envelope-from <neal.liu@mediatek.com>)
-        (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
-        with ESMTP id 1379994272; Tue, 02 Jun 2020 16:15:00 +0800
-Received: from mtkcas08.mediatek.inc (172.21.101.126) by
- mtkmbs01n2.mediatek.inc (172.21.101.79) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Tue, 2 Jun 2020 16:14:59 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas08.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Tue, 2 Jun 2020 16:14:58 +0800
-From:   Neal Liu <neal.liu@mediatek.com>
-To:     Matt Mackall <mpm@selenic.com>,
+        Tue, 2 Jun 2020 05:17:07 -0400
+Received: from mga09.intel.com ([134.134.136.24]:47446 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726139AbgFBJRH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Jun 2020 05:17:07 -0400
+IronPort-SDR: 2mN2UP+5DYwxn5upqVhb2xj1+l3/5I5dEv3Qz6GydjAMPEi0vdAQuUMo8RT+ZT+/C3OurkGVJa
+ ZXmEr/uWWLwA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2020 02:17:05 -0700
+IronPort-SDR: x/s6TqMkfFCMf6Elj0L0Y8lX5QW2JWx9MUk5QQCfVZssNH9dEg0ZyETqw7Bb3OWNT1BFwpyD/P
+ Tvjal8T4d0iQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,463,1583222400"; 
+   d="scan'208";a="416118065"
+Received: from gklab-125-110.igk.intel.com ([10.91.125.110])
+  by orsmga004.jf.intel.com with ESMTP; 02 Jun 2020 02:16:55 -0700
+From:   Piotr Stankiewicz <piotr.stankiewicz@intel.com>
+To:     Bjorn Helgaas <bhelgaas@google.com>,
+        Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+        Kurt Schwemmer <kurt.schwemmer@microsemi.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Sean Wang <sean.wang@kernel.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Gustavo Pimentel <gustavo.pimentel@synopsys.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vinod Koul <vkoul@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        David Zhou <David1.Zhou@amd.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dennis Dalessandro <dennis.dalessandro@intel.com>,
+        Mike Marciniszyn <mike.marciniszyn@intel.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
         Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC:     Neal Liu <neal.liu@mediatek.com>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-mediatek@lists.infradead.org>,
-        lkml <linux-kernel@vger.kernel.org>, <wsd_upstream@mediatek.com>,
-        Crystal Guo <Crystal.Guo@mediatek.com>
-Subject: [PATCH v6 2/2] hwrng: add sec-rng driver
-Date:   Tue, 2 Jun 2020 16:14:38 +0800
-Message-ID: <1591085678-22764-3-git-send-email-neal.liu@mediatek.com>
-X-Mailer: git-send-email 1.7.9.5
-In-Reply-To: <1591085678-22764-1-git-send-email-neal.liu@mediatek.com>
-References: <1591085678-22764-1-git-send-email-neal.liu@mediatek.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-SNTS-SMTP: 909ABA3B6E64AD00041CC4B3A9BF7D20E656DA2E14FD0DBC349B80906CF174CA2000:8
-X-MTK:  N
-Content-Transfer-Encoding: base64
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Igor Russkikh <irusskikh@marvell.com>,
+        Yisen Zhuang <yisen.zhuang@huawei.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Brian King <brking@us.ibm.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Jim Gill <jgill@vmware.com>,
+        VMware PV-Drivers <pv-drivers@vmware.com>
+Cc:     linux-pci@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mmc@vger.kernel.org, netdev@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Piotr Stankiewicz <piotr.stankiewicz@intel.com>
+Subject: [PATCH 00/15] forward MSIx vector enable error code in pci_alloc_irq_vectors_affinity
+Date:   Tue,  2 Jun 2020 11:16:17 +0200
+Message-Id: <20200602091617.31395-1-piotr.stankiewicz@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Rm9yIHNlY3VyaXR5IGF3YXJlbmVzcyBTb0NzIG9uIEFSTXY4IHdpdGggVHJ1c3Rab25lIGVuYWJs
-ZWQsDQpwZXJpcGhlcmFscyBsaWtlIGVudHJvcHkgc291cmNlcyBpcyBub3QgYWNjZXNzaWJsZSBm
-cm9tIG5vcm1hbCB3b3JsZA0KKGxpbnV4KSBhbmQgcmF0aGVyIGFjY2Vzc2libGUgZnJvbSBzZWN1
-cmUgd29ybGQgKEhZUC9BVEYvVEVFKSBvbmx5Lg0KVGhpcyBkcml2ZXIgYWltcyB0byBwcm92aWRl
-IGEgZ2VuZXJpYyBpbnRlcmZhY2UgdG8gQXJtIFRydXN0ZWQNCkZpcm13YXJlIG9yIEh5cGVydmlz
-b3Igcm5nIHNlcnZpY2UuDQoNClNpZ25lZC1vZmYtYnk6IE5lYWwgTGl1IDxuZWFsLmxpdUBtZWRp
-YXRlay5jb20+DQotLS0NCiBkcml2ZXJzL2NoYXIvaHdfcmFuZG9tL0tjb25maWcgICB8ICAgMTMg
-KysrKw0KIGRyaXZlcnMvY2hhci9od19yYW5kb20vTWFrZWZpbGUgIHwgICAgMSArDQogZHJpdmVy
-cy9jaGFyL2h3X3JhbmRvbS9zZWMtcm5nLmMgfCAgMTU1ICsrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrDQogMyBmaWxlcyBjaGFuZ2VkLCAxNjkgaW5zZXJ0aW9ucygrKQ0KIGNy
-ZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL2NoYXIvaHdfcmFuZG9tL3NlYy1ybmcuYw0KDQpkaWZm
-IC0tZ2l0IGEvZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9LY29uZmlnIGIvZHJpdmVycy9jaGFyL2h3
-X3JhbmRvbS9LY29uZmlnDQppbmRleCA5YmM0NmRhLi5jYjljOGE5IDEwMDY0NA0KLS0tIGEvZHJp
-dmVycy9jaGFyL2h3X3JhbmRvbS9LY29uZmlnDQorKysgYi9kcml2ZXJzL2NoYXIvaHdfcmFuZG9t
-L0tjb25maWcNCkBAIC00NzQsNiArNDc0LDE5IEBAIGNvbmZpZyBIV19SQU5ET01fS0VZU1RPTkUN
-CiAJaGVscA0KIAkgIFRoaXMgb3B0aW9uIGVuYWJsZXMgS2V5c3RvbmUncyBoYXJkd2FyZSByYW5k
-b20gZ2VuZXJhdG9yLg0KIA0KK2NvbmZpZyBIV19SQU5ET01fU0VDVVJFDQorCXRyaXN0YXRlICJB
-cm0gU2VjdXJpdHkgUmFuZG9tIE51bWJlciBHZW5lcmF0b3Igc3VwcG9ydCINCisJZGVwZW5kcyBv
-biBIQVZFX0FSTV9TTUNDQyB8fCBDT01QSUxFX1RFU1QNCisJZGVmYXVsdCBIV19SQU5ET00NCisJ
-aGVscA0KKwkgIFRoaXMgZHJpdmVyIHByb3ZpZGVzIGtlcm5lbC1zaWRlIHN1cHBvcnQgZm9yIHRo
-ZSBBcm0gU2VjdXJpdHkNCisJICBSYW5kb20gTnVtYmVyIEdlbmVyYXRvci4NCisNCisJICBUbyBj
-b21waWxlIHRoaXMgZHJpdmVyIGFzIGEgbW9kdWxlLCBjaG9vc2UgTSBoZXJlLiB0aGUNCisJICBt
-b2R1bGUgd2lsbCBiZSBjYWxsZWQgc2VjLXJuZy4NCisNCisJICBJZiB1bnN1cmUsIHNheSBZLg0K
-Kw0KIGVuZGlmICMgSFdfUkFORE9NDQogDQogY29uZmlnIFVNTF9SQU5ET00NCmRpZmYgLS1naXQg
-YS9kcml2ZXJzL2NoYXIvaHdfcmFuZG9tL01ha2VmaWxlIGIvZHJpdmVycy9jaGFyL2h3X3JhbmRv
-bS9NYWtlZmlsZQ0KaW5kZXggYTc4MDFiNC4uMDQ1MzNkMSAxMDA2NDQNCi0tLSBhL2RyaXZlcnMv
-Y2hhci9od19yYW5kb20vTWFrZWZpbGUNCisrKyBiL2RyaXZlcnMvY2hhci9od19yYW5kb20vTWFr
-ZWZpbGUNCkBAIC00MSwzICs0MSw0IEBAIG9iai0kKENPTkZJR19IV19SQU5ET01fUzM5MCkgKz0g
-czM5MC10cm5nLm8NCiBvYmotJChDT05GSUdfSFdfUkFORE9NX0tFWVNUT05FKSArPSBrcy1zYS1y
-bmcubw0KIG9iai0kKENPTkZJR19IV19SQU5ET01fT1BURUUpICs9IG9wdGVlLXJuZy5vDQogb2Jq
-LSQoQ09ORklHX0hXX1JBTkRPTV9OUENNKSArPSBucGNtLXJuZy5vDQorb2JqLSQoQ09ORklHX0hX
-X1JBTkRPTV9TRUNVUkUpICs9IHNlYy1ybmcubw0KZGlmZiAtLWdpdCBhL2RyaXZlcnMvY2hhci9o
-d19yYW5kb20vc2VjLXJuZy5jIGIvZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9zZWMtcm5nLmMNCm5l
-dyBmaWxlIG1vZGUgMTAwNjQ0DQppbmRleCAwMDAwMDAwLi5jNmQzODcyDQotLS0gL2Rldi9udWxs
-DQorKysgYi9kcml2ZXJzL2NoYXIvaHdfcmFuZG9tL3NlYy1ybmcuYw0KQEAgLTAsMCArMSwxNTUg
-QEANCisvLyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMA0KKy8qDQorICogQ29weXJp
-Z2h0IChDKSAyMDIwIE1lZGlhVGVrIEluYy4NCisgKi8NCisNCisjaW5jbHVkZSA8bGludXgvYXJt
-LXNtY2NjLmg+DQorI2luY2x1ZGUgPGxpbnV4L2h3X3JhbmRvbS5oPg0KKyNpbmNsdWRlIDxsaW51
-eC9tb2R1bGUuaD4NCisjaW5jbHVkZSA8bGludXgvb2YuaD4NCisjaW5jbHVkZSA8bGludXgvcGxh
-dGZvcm1fZGV2aWNlLmg+DQorDQorI2RlZmluZSBTTUNfUkVUX05VTQk0DQorI2RlZmluZSBTRUNf
-Uk5EX1NJWkUJKHNpemVvZih1MzIpICogU01DX1JFVF9OVU0pDQorDQorI2RlZmluZSBIV1JOR19T
-TUNfRkFTVF9DQUxMX1ZBTChmdW5jX251bSkgXA0KKwlBUk1fU01DQ0NfQ0FMTF9WQUwoQVJNX1NN
-Q0NDX0ZBU1RfQ0FMTCwgQVJNX1NNQ0NDX1NNQ18zMiwgXA0KKwkJCSAgIEFSTV9TTUNDQ19PV05F
-Ul9TSVAsIChmdW5jX251bSkpDQorDQorI2RlZmluZSB0b19zZWNfcm5nKHApCWNvbnRhaW5lcl9v
-ZihwLCBzdHJ1Y3Qgc2VjX3JuZ19wcml2LCBybmcpDQorDQordHlwZWRlZiB2b2lkIChzZWNfcm5n
-X2ZuKSh1bnNpZ25lZCBsb25nLCB1bnNpZ25lZCBsb25nLCB1bnNpZ25lZCBsb25nLA0KKwkJCSAg
-dW5zaWduZWQgbG9uZywgdW5zaWduZWQgbG9uZywgdW5zaWduZWQgbG9uZywNCisJCQkgIHVuc2ln
-bmVkIGxvbmcsIHVuc2lnbmVkIGxvbmcsDQorCQkJICBzdHJ1Y3QgYXJtX3NtY2NjX3JlcyAqKTsN
-CisNCitzdHJ1Y3Qgc2VjX3JuZ19wcml2IHsNCisJdTE2IGZ1bmNfbnVtOw0KKwlzZWNfcm5nX2Zu
-ICpybmdfZm47DQorCXN0cnVjdCBod3JuZyBybmc7DQorfTsNCisNCisvKiBTaW1wbGUgd3JhcHBl
-ciBmdW5jdGlvbnMgdG8gYmUgYWJsZSB0byB1c2UgYSBmdW5jdGlvbiBwb2ludGVyICovDQorc3Rh
-dGljIHZvaWQgc2VjX3JuZ19zbWModW5zaWduZWQgbG9uZyBhMCwgdW5zaWduZWQgbG9uZyBhMSwN
-CisJCQl1bnNpZ25lZCBsb25nIGEyLCB1bnNpZ25lZCBsb25nIGEzLA0KKwkJCXVuc2lnbmVkIGxv
-bmcgYTQsIHVuc2lnbmVkIGxvbmcgYTUsDQorCQkJdW5zaWduZWQgbG9uZyBhNiwgdW5zaWduZWQg
-bG9uZyBhNywNCisJCQlzdHJ1Y3QgYXJtX3NtY2NjX3JlcyAqcmVzKQ0KK3sNCisJYXJtX3NtY2Nj
-X3NtYyhhMCwgYTEsIGEyLCBhMywgYTQsIGE1LCBhNiwgYTcsIHJlcyk7DQorfQ0KKw0KK3N0YXRp
-YyB2b2lkIHNlY19ybmdfaHZjKHVuc2lnbmVkIGxvbmcgYTAsIHVuc2lnbmVkIGxvbmcgYTEsDQor
-CQkJdW5zaWduZWQgbG9uZyBhMiwgdW5zaWduZWQgbG9uZyBhMywNCisJCQl1bnNpZ25lZCBsb25n
-IGE0LCB1bnNpZ25lZCBsb25nIGE1LA0KKwkJCXVuc2lnbmVkIGxvbmcgYTYsIHVuc2lnbmVkIGxv
-bmcgYTcsDQorCQkJc3RydWN0IGFybV9zbWNjY19yZXMgKnJlcykNCit7DQorCWFybV9zbWNjY19o
-dmMoYTAsIGExLCBhMiwgYTMsIGE0LCBhNSwgYTYsIGE3LCByZXMpOw0KK30NCisNCitzdGF0aWMg
-Ym9vbCBfX3NlY19nZXRfcm5kKHN0cnVjdCBzZWNfcm5nX3ByaXYgKnByaXYsIHVpbnQzMl90ICp2
-YWwpDQorew0KKwlzdHJ1Y3QgYXJtX3NtY2NjX3JlcyByZXM7DQorDQorCXByaXYtPnJuZ19mbihI
-V1JOR19TTUNfRkFTVF9DQUxMX1ZBTChwcml2LT5mdW5jX251bSksDQorCQkJMCwgMCwgMCwgMCwg
-MCwgMCwgMCwgJnJlcyk7DQorDQorCWlmICghcmVzLmEwICYmICFyZXMuYTEgJiYgIXJlcy5hMiAm
-JiAhcmVzLmEzKQ0KKwkJcmV0dXJuIGZhbHNlOw0KKw0KKwl2YWxbMF0gPSByZXMuYTA7DQorCXZh
-bFsxXSA9IHJlcy5hMTsNCisJdmFsWzJdID0gcmVzLmEyOw0KKwl2YWxbM10gPSByZXMuYTM7DQor
-DQorCXJldHVybiB0cnVlOw0KK30NCisNCitzdGF0aWMgaW50IHNlY19ybmdfcmVhZChzdHJ1Y3Qg
-aHdybmcgKnJuZywgdm9pZCAqYnVmLCBzaXplX3QgbWF4LCBib29sIHdhaXQpDQorew0KKwlzdHJ1
-Y3Qgc2VjX3JuZ19wcml2ICpwcml2ID0gdG9fc2VjX3JuZyhybmcpOw0KKwl1MzIgdmFsWzRdID0g
-ezB9Ow0KKwlpbnQgcmV0dmFsID0gMDsNCisJaW50IGk7DQorDQorCXdoaWxlIChtYXggPj0gU0VD
-X1JORF9TSVpFKSB7DQorCQlpZiAoIV9fc2VjX2dldF9ybmQocHJpdiwgdmFsKSkNCisJCQlyZXR1
-cm4gcmV0dmFsOw0KKw0KKwkJZm9yIChpID0gMDsgaSA8IFNNQ19SRVRfTlVNOyBpKyspIHsNCisJ
-CQkqKHUzMiAqKWJ1ZiA9IHZhbFtpXTsNCisJCQlidWYgKz0gc2l6ZW9mKHUzMik7DQorCQl9DQor
-DQorCQlyZXR2YWwgKz0gU0VDX1JORF9TSVpFOw0KKwkJbWF4IC09IFNFQ19STkRfU0laRTsNCisJ
-fQ0KKw0KKwlyZXR1cm4gcmV0dmFsOw0KK30NCisNCitzdGF0aWMgaW50IHNlY19ybmdfcHJvYmUo
-c3RydWN0IHBsYXRmb3JtX2RldmljZSAqcGRldikNCit7DQorCXN0cnVjdCBzZWNfcm5nX3ByaXYg
-KnByaXY7DQorCWNvbnN0IGNoYXIgKm1ldGhvZDsNCisJaW50IHJldDsNCisNCisJcHJpdiA9IGRl
-dm1fa3phbGxvYygmcGRldi0+ZGV2LCBzaXplb2YoKnByaXYpLCBHRlBfS0VSTkVMKTsNCisJaWYg
-KCFwcml2KQ0KKwkJcmV0dXJuIC1FTk9NRU07DQorDQorCWlmIChvZl9wcm9wZXJ0eV9yZWFkX3N0
-cmluZyhwZGV2LT5kZXYub2Zfbm9kZSwgIm1ldGhvZCIsICZtZXRob2QpKQ0KKwkJcmV0dXJuIC1F
-TlhJTzsNCisNCisJaWYgKCFzdHJuY21wKCJzbWMiLCBtZXRob2QsIHN0cmxlbigic21jIikpKQ0K
-KwkJcHJpdi0+cm5nX2ZuID0gc2VjX3JuZ19zbWM7DQorCWVsc2UgaWYgKCFzdHJuY21wKCJodmMi
-LCBtZXRob2QsIHN0cmxlbigiaHZjIikpKQ0KKwkJcHJpdi0+cm5nX2ZuID0gc2VjX3JuZ19odmM7
-DQorDQorCWlmIChJU19FUlIocHJpdi0+cm5nX2ZuKSkgew0KKwkJZGV2X2VycigmcGRldi0+ZGV2
-LCAibWV0aG9kICVzIGlzIG5vdCBzdXBwb3J0ZWRcbiIsIG1ldGhvZCk7DQorCQlyZXR1cm4gLUVJ
-TlZBTDsNCisJfQ0KKw0KKwlpZiAob2ZfcHJvcGVydHlfcmVhZF91MTYocGRldi0+ZGV2Lm9mX25v
-ZGUsICJtZXRob2QtZmlkIiwNCisJCQkJICZwcml2LT5mdW5jX251bSkpDQorCQlyZXR1cm4gLUVO
-WElPOw0KKw0KKwlpZiAob2ZfcHJvcGVydHlfcmVhZF91MTYocGRldi0+ZGV2Lm9mX25vZGUsICJx
-dWFsaXR5IiwNCisJCQkJICZwcml2LT5ybmcucXVhbGl0eSkpDQorCQlyZXR1cm4gLUVOWElPOw0K
-Kw0KKwlwcml2LT5ybmcubmFtZSA9IHBkZXYtPm5hbWU7DQorCXByaXYtPnJuZy5yZWFkID0gc2Vj
-X3JuZ19yZWFkOw0KKwlwcml2LT5ybmcucHJpdiA9ICh1bnNpZ25lZCBsb25nKSZwZGV2LT5kZXY7
-DQorDQorCXJldCA9IGRldm1faHdybmdfcmVnaXN0ZXIoJnBkZXYtPmRldiwgJnByaXYtPnJuZyk7
-DQorCWlmIChyZXQpIHsNCisJCWRldl9lcnIoJnBkZXYtPmRldiwgImZhaWxlZCB0byByZWdpc3Rl
-ciBybmcgZGV2aWNlOiAlZFxuIiwgcmV0KTsNCisJCXJldHVybiByZXQ7DQorCX0NCisNCisJcmV0
-dXJuIDA7DQorfQ0KKw0KK3N0YXRpYyBjb25zdCBzdHJ1Y3Qgb2ZfZGV2aWNlX2lkIHNlY19ybmdf
-bWF0Y2hbXSA9IHsNCisJeyAuY29tcGF0aWJsZSA9ICJhcm0sc2VjLXJuZyIsIH0sDQorCXt9DQor
-fTsNCitNT0RVTEVfREVWSUNFX1RBQkxFKG9mLCBzZWNfcm5nX21hdGNoKTsNCisNCitzdGF0aWMg
-c3RydWN0IHBsYXRmb3JtX2RyaXZlciBzZWNfcm5nX2RyaXZlciA9IHsNCisJLnByb2JlID0gc2Vj
-X3JuZ19wcm9iZSwNCisJLmRyaXZlciA9IHsNCisJCS5uYW1lID0gS0JVSUxEX01PRE5BTUUsDQor
-CQkub3duZXIgPSBUSElTX01PRFVMRSwNCisJCS5vZl9tYXRjaF90YWJsZSA9IHNlY19ybmdfbWF0
-Y2gsDQorCX0sDQorfTsNCisNCittb2R1bGVfcGxhdGZvcm1fZHJpdmVyKHNlY19ybmdfZHJpdmVy
-KTsNCisNCitNT0RVTEVfREVTQ1JJUFRJT04oIlNlY3VyaXR5IFJhbmRvbSBOdW1iZXIgR2VuZXJh
-dG9yIERyaXZlciIpOw0KK01PRFVMRV9BVVRIT1IoIk5lYWwgTGl1IDxuZWFsLmxpdUBtZWRpYXRl
-ay5jb20+Iik7DQorTU9EVUxFX0xJQ0VOU0UoIkdQTCIpOw0KLS0gDQoxLjcuOS41DQo=
+The primary objective of this patch series is to change the behaviour
+of pci_alloc_irq_vectors_affinity such that it forwards the MSI-X enable
+error code when appropriate. In the process, though, it was pointed out
+that there are multiple places in the kernel which check/ask for message
+signalled interrupts (MSI or MSI-X), which spawned the first patch adding
+PCI_IRQ_MSI_TYPES. Finally the rest of the chain converts all users to
+take advantage of PCI_IRQ_MSI_TYPES or PCI_IRQ_ALL_TYPES, as
+appropriate.
+
+Piotr Stankiewicz (15):
+  PCI: add shorthand define for message signalled interrupt types
+  PCI/MSI: forward MSIx vector enable error code in
+    pci_alloc_irq_vectors_affinity
+  PCI: use PCI_IRQ_MSI_TYPES where appropriate
+  ahci: use PCI_IRQ_MSI_TYPES where appropriate
+  crypto: inside-secure - use PCI_IRQ_MSI_TYPES where appropriate
+  dmaengine: dw-edma: use PCI_IRQ_MSI_TYPES  where appropriate
+  drm/amdgpu: use PCI_IRQ_MSI_TYPES where appropriate
+  IB/qib: Use PCI_IRQ_MSI_TYPES where appropriate
+  media: ddbridge: use PCI_IRQ_MSI_TYPES where appropriate
+  vmw_vmci: use PCI_IRQ_ALL_TYPES where appropriate
+  mmc: sdhci: use PCI_IRQ_MSI_TYPES where appropriate
+  amd-xgbe: use PCI_IRQ_MSI_TYPES where appropriate
+  aquantia: atlantic: use PCI_IRQ_ALL_TYPES where appropriate
+  net: hns3: use PCI_IRQ_MSI_TYPES where appropriate
+  scsi: use PCI_IRQ_MSI_TYPES and PCI_IRQ_ALL_TYPES where appropriate
+
+ Documentation/PCI/msi-howto.rst                           | 5 +++--
+ drivers/ata/ahci.c                                        | 2 +-
+ drivers/crypto/inside-secure/safexcel.c                   | 2 +-
+ drivers/dma/dw-edma/dw-edma-pcie.c                        | 2 +-
+ drivers/gpu/drm/amd/amdgpu/amdgpu_irq.c                   | 8 ++++----
+ drivers/infiniband/hw/qib/qib_pcie.c                      | 2 +-
+ drivers/media/pci/ddbridge/ddbridge-main.c                | 2 +-
+ drivers/misc/vmw_vmci/vmci_guest.c                        | 3 +--
+ drivers/mmc/host/sdhci-pci-gli.c                          | 3 +--
+ drivers/mmc/host/sdhci-pci-o2micro.c                      | 3 +--
+ drivers/net/ethernet/amd/xgbe/xgbe-pci.c                  | 2 +-
+ drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c      | 4 +---
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c   | 3 +--
+ drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c | 2 +-
+ drivers/pci/msi.c                                         | 4 ++--
+ drivers/pci/pcie/portdrv_core.c                           | 4 ++--
+ drivers/pci/switch/switchtec.c                            | 3 +--
+ drivers/scsi/ipr.c                                        | 2 +-
+ drivers/scsi/vmw_pvscsi.c                                 | 2 +-
+ include/linux/pci.h                                       | 4 ++--
+ 20 files changed, 28 insertions(+), 34 deletions(-)
+
+-- 
+2.17.2
 
