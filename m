@@ -2,127 +2,163 @@ Return-Path: <SRS0=RCNv=7Q=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57BA1C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 11:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC436C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 11:40:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3692E2067B
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 11:12:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591182729;
-	bh=YzOMemc162MmX21grMM2woz3galEvoPugqrE5a3TFD8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=rOVDDNuZs7RKpaRRizEOMkchtuxm2V3AIC1CMFxjw9SopajzJf3iLzEFQdJ1A3Az3
-	 KA5/EvWu2PoXEXP2/0RINpS0iHXYm2PuA7XzkVSqRXmTw1Y1bweSH3vO6vL94fEsA6
-	 IJxw/JBVxrJ8JeGNcxiEhVOv81W0VSwzT7xwsY+g=
+	by mail.kernel.org (Postfix) with ESMTP id 2889620738
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 11:40:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="IdFJ2cwW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725981AbgFCLMI (ORCPT
+        id S1726123AbgFCLkz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jun 2020 07:12:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57514 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725833AbgFCLMI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jun 2020 07:12:08 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 57EA8206C3;
-        Wed,  3 Jun 2020 11:12:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591182727;
-        bh=YzOMemc162MmX21grMM2woz3galEvoPugqrE5a3TFD8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=VCecdmeYHrqT5gcinE0svjjnWovDvj6uzuTznngJAf93O0LV5n1J9DoWLJtEk9vv6
-         0JAbXLvW79Wb3/N+75QFT30BcC7kfKT3VMjSG/UnSS7QAUN3pVQpc6LlZXKzk03LyZ
-         ZetdVU8f9I1Kxws4imoEVWR93RtBzxSkFBKnQEO4=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jgRJV-00HQNN-OT; Wed, 03 Jun 2020 12:12:05 +0100
+        Wed, 3 Jun 2020 07:40:55 -0400
+Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.167]:18419 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726182AbgFCLkx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 Jun 2020 07:40:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1591184448;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=YS0Q02CwvzhXKETKCOJGeBcNkXNrzQU6s9jv8NvKqN4=;
+        b=IdFJ2cwWNd6sz+wbrgNumAN+lJPh+ulKDcJSVbVaTXN1U3agJqfG5q0aZ1Fkm42pmZ
+        EFyiw1kM+4Lyi2tWJ3dzOkI9lWQymkMVJk9NBzoqATdvcyqGM5EpVZ5yXfU7tyvWyZHj
+        KDMDAkH0ajxRXmdL5xUcYBep0XdhPf1zx2eQh+V3IHZ5AqWNuIgqXMyzbE7j/t1Ypab3
+        T/ddcFGnpOps/r3GM1dCjId/xNxE2Qq72dc3175al8m6CEFWIovjgw0zOxRF1Zeeu2Pr
+        qeXBZVSsUbA9rZk6rrz/xYrcTHy6GDPmguvgL7jWFMlXgZGosMiZXYiSdnXYFnSbkMPq
+        P5Ng==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaJPSf9iic"
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 46.9.1 DYNA|AUTH)
+        with ESMTPSA id I05374w53Bee2F8
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Wed, 3 Jun 2020 13:40:40 +0200 (CEST)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com,
+        syzbot <syzbot+2e635807decef724a1fa@syzkaller.appspotmail.com>
+Subject: Re: [PATCH] crypto: DRBG - always try to free Jitter RNG instance
+Date:   Wed, 03 Jun 2020 13:40:40 +0200
+Message-ID: <3191597.j9rW5h07Xc@tauon.chronox.de>
+In-Reply-To: <20200603110919.GK30374@kadam>
+References: <0000000000002a280b05a725cd93@google.com> <2583872.mvXUDI8C0e@positron.chronox.de> <20200603110919.GK30374@kadam>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 03 Jun 2020 12:12:05 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Neal Liu <neal.liu@mediatek.com>
-Cc:     Julius Werner <jwerner@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Sean Wang <sean.wang@kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        lkml <linux-kernel@vger.kernel.org>,
-        wsd_upstream <wsd_upstream@mediatek.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        =?UTF-8?Q?Crystal_Guo_=28=E9=83=AD?= =?UTF-8?Q?=E6=99=B6=29?= 
-        <Crystal.Guo@mediatek.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        mark.rutland@arm.com, Jose.Marinho@arm.com
-Subject: Re: Security Random Number Generator support
-In-Reply-To: <1591170857.19414.5.camel@mtkswgap22>
-References: <1591085678-22764-1-git-send-email-neal.liu@mediatek.com>
- <CAMj1kXHjAdk5=-uSh_=S9j5cz42zr3h6t+YYGy+obevuQDp0fg@mail.gmail.com>
- <85dfc0142d3879d50c0ba18bcc71e199@misterjones.org>
- <1591169342.4878.9.camel@mtkswgap22>
- <fcbe37f6f9cbcde24f9c28bc504f1f0e@kernel.org>
- <1591170857.19414.5.camel@mtkswgap22>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <e56f0f8da7fdc836e073a37c9baeda77@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: neal.liu@mediatek.com, jwerner@google.com, ardb@kernel.org, devicetree@vger.kernel.org, herbert@gondor.apana.org.au, arnd@arndb.de, gregkh@linuxfoundation.org, sean.wang@kernel.org, linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org, wsd_upstream@mediatek.com, robh+dt@kernel.org, linux-crypto@vger.kernel.org, mpm@selenic.com, matthias.bgg@gmail.com, Crystal.Guo@mediatek.com, linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com, Jose.Marinho@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2020-06-03 08:54, Neal Liu wrote:
-> On Wed, 2020-06-03 at 08:40 +0100, Marc Zyngier wrote:
->> On 2020-06-03 08:29, Neal Liu wrote:
+Am Mittwoch, 3. Juni 2020, 13:09:19 CEST schrieb Dan Carpenter:
 
-[...]
+Hi Dan,
 
->> > Could you give us a hint how to make this SMC interface more generic in
->> > addition to my approach?
->> > There is no (easy) way to get platform-independent SMC function ID,
->> > which is why we encode it into device tree, and provide a generic
->> > driver. In this way, different devices can be mapped and then get
->> > different function ID internally.
->> 
->> The idea is simply to have *one* single ID that caters for all
->> implementations, just like we did for PSCI at the time. This
->> requires ARM to edict a standard, which is what I was referring
->> to above.
->> 
->> There is zero benefit in having a platform-dependent ID. It just
->> pointlessly increases complexity, and means we cannot use the RNG
->> before the firmware tables are available (yes, we need it that
->> early).
->> 
->>          M.
-> 
-> Do you know which ARM expert could edict this standard?
-> Or is there any chance that we can make one? And be reviewed by
-> maintainers?
+> On Wed, Jun 03, 2020 at 10:08:56AM +0200, Stephan M=FCller wrote:
+> > The Jitter RNG is unconditionally allocated as a seed source follwoing
+> > the patch 97f2650e5040. Thus, the instance must always be deallocated.
+> >=20
+> > Reported-by: syzbot+2e635807decef724a1fa@syzkaller.appspotmail.com
+> > Fixes: 97f2650e5040 ("crypto: drbg - always seeded with SP800-90B ...")
+> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> > ---
+> >=20
+> >  crypto/drbg.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >=20
+> > diff --git a/crypto/drbg.c b/crypto/drbg.c
+> > index 37526eb8c5d5..33d28016da2d 100644
+> > --- a/crypto/drbg.c
+> > +++ b/crypto/drbg.c
+> > @@ -1631,6 +1631,9 @@ static int drbg_uninstantiate(struct drbg_state
+> > *drbg)>=20
+> >  	if (drbg->random_ready.func) {
+> >  =09
+> >  		del_random_ready_callback(&drbg->random_ready);
+> >  		cancel_work_sync(&drbg->seed_work);
+> >=20
+> > +	}
+> > +
+> > +	if (drbg->jent) {
+> >=20
+> >  		crypto_free_rng(drbg->jent);
+> >  		drbg->jent =3D NULL;
+> >  =09
+> >  	}
+>=20
+> free_everything functions never work.  For example, "drbg->jent" can be
+> an error pointer at this point.
+>=20
+> crypto/drbg.c
+>   1577          if (!drbg->core) {
+>   1578                  drbg->core =3D &drbg_cores[coreref];
+>   1579                  drbg->pr =3D pr;
+>   1580                  drbg->seeded =3D false;
+>   1581                  drbg->reseed_threshold =3D drbg_max_requests(drbg=
+);
+>   1582
+>   1583                  ret =3D drbg_alloc_state(drbg);
+>   1584                  if (ret)
+>   1585                          goto unlock;
+>   1586
+>   1587                  ret =3D drbg_prepare_hrng(drbg);
+>   1588                  if (ret)
+>   1589                          goto free_everything;
+>                                 ^^^^^^^^^^^^^^^^^^^^
+> If we hit two failures inside drbg_prepare_hrng() then "drbg->jent" can
+> be an error pointer.
+>=20
+>   1590
+>   1591                  if (IS_ERR(drbg->jent)) {
+>   1592                          ret =3D PTR_ERR(drbg->jent);
+>   1593                          drbg->jent =3D NULL;
+>   1594                          if (fips_enabled || ret !=3D -ENOENT)
+>   1595                                  goto free_everything;
+>   1596                          pr_info("DRBG: Continuing without Jitter
+> RNG\n"); 1597                  }
+>   1598
+>   1599                  reseed =3D false;
+>   1600          }
+>   1601
+>   1602          ret =3D drbg_seed(drbg, pers, reseed);
+>   1603
+>   1604          if (ret && !reseed)
+>   1605                  goto free_everything;
+>   1606
+>   1607          mutex_unlock(&drbg->drbg_mutex);
+>   1608          return ret;
+>   1609
+>   1610  unlock:
+>   1611          mutex_unlock(&drbg->drbg_mutex);
+>   1612          return ret;
+>   1613
+>   1614  free_everything:
+>   1615          mutex_unlock(&drbg->drbg_mutex);
+>   1616          drbg_uninstantiate(drbg);
+>                                    ^^^^
+> Leading to an Oops.
 
-Sudeep already mentioned Jose's effort to offer a standard.
-Hopefully he will *soon* be able to give us something that can be
-implemented everywhere (firmware, kernel, but also hypervisors),
-as the need exists across the whole stack.
+Thanks a lot for the hint - a version 2 should come shortly.
+>=20
+>   1617          return ret;
+>   1618  }
+>=20
+> regards,
+> dan carpenter
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+
+Ciao
+Stephan
+
+
