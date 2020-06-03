@@ -2,170 +2,204 @@ Return-Path: <SRS0=RCNv=7Q=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C43D2C433E2
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 08:32:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF7DC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 08:47:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4562204EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 08:32:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 353B420674
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 08:47:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XiXQZlQ+"
+	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="Qv8dDTxr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726262AbgFCIcD (ORCPT
+        id S1726123AbgFCIrx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jun 2020 04:32:03 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59915 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726123AbgFCIcD (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jun 2020 04:32:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591173121;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vkeVxA/zhwqG4/6AGws5hEt6QBsQvR60ExyhAzUC90U=;
-        b=XiXQZlQ+cswxAYErrqUyd2A3/xxk+eRmR+VQnS7gsVxMmtbVPN3cwabgpi4jcLqWUON6hx
-        pdUvQ175uvL39SSStNLJ2nkYOsjoa200tte0LFVl0rUng64bdLyHxwbAveqqOK42XzA3X/
-        xWh8kX5i6LDBcf/RkGWqFjjWMSozpb8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-227-wnrmj7lAO1ObML6LIFMvOw-1; Wed, 03 Jun 2020 04:31:59 -0400
-X-MC-Unique: wnrmj7lAO1ObML6LIFMvOw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 811EF107ACCA;
-        Wed,  3 Jun 2020 08:31:58 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FD2519C4F;
-        Wed,  3 Jun 2020 08:31:55 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 0538VshI016653;
-        Wed, 3 Jun 2020 04:31:54 -0400
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 0538VsTC016649;
-        Wed, 3 Jun 2020 04:31:54 -0400
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Wed, 3 Jun 2020 04:31:54 -0400 (EDT)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-cc:     Mike Snitzer <msnitzer@redhat.com>,
+        Wed, 3 Jun 2020 04:47:53 -0400
+Received: from mail-eopbgr00069.outbound.protection.outlook.com ([40.107.0.69]:4580
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726066AbgFCIrx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 Jun 2020 04:47:53 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QGnCA07kO80IOJ7Fut324LNuU8m3xBCOHzjVkyHy+fS7dhr1wUEr9b6mHAEmaKvdrs64/rKPZw6A1jciGfMmoxkxAdI+NHwfn59QXX8llj5+wlensj2M6mB+Sl0C+aE7z+duKXjuD15JsCSoTxreMnk45RStu/CbrR/nWTwbCS2/rs0BfkK1p9mamCjhgMGjKIUwXRA2pKa8jsiAgIcZCgG/R9aSJjjkO8K6GOufMRtbufoXViJX0ee54w2X5/d+6h4lr0AzwWEUtLYiq6sJNvPMWquAcVBHdnP5SsXzPjsl50kSg3Kiwl9ZWHs8MivLZpzhMK/D+6fcbyh2FnxDeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=m8oD6OfFbid7QuysL1f+Awyww+09nTWcETqpTLRYgS8=;
+ b=Ps6l+kiW9C2Hkl1wcZH/0IF/2LoBqu3137O1cph1CJz84Hu94LBiSWiYCPTiu3qWXCNlF3pCAG6/ANtDifnv5OJIu8Cf7Qet1sq8toqnlK/sd4WfN5yFwERjVY/ClmK5RWCmD6SutC/VBcylGPboigcLuijJM+pPk3Kcf7MSa0EkfWsNn+hbYUuahz6D7hTs5a0dARqBiR3DPaoZdkaH5T98tDdfI71jw7m9FLT87rnGDQW7pZjses7Z5kgDyaR9aYk3ecmjjyc1wGIY2k2YvdzkGSkuQkLdNII3HOGAtNtqoxE+5G/kGGV0L5lBBSmzLE7IT4n3a0sSHLieQ82SEA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=m8oD6OfFbid7QuysL1f+Awyww+09nTWcETqpTLRYgS8=;
+ b=Qv8dDTxrJ6q7L3GCB+sSGQGipdkYKHMQj248v4bwBQSaPVwhp3HQ5bxTUVIwb16AnsUrSKUecqVM6p1v9WfazFncY3juepIFrHvm6OC2CD9eoKb87xPb9zEeEQB/mB2Eu5DjN+Xh+uJOsw04eG7SO+RLZpKQQVSBBxzrJ76L6fY=
+Authentication-Results: nxp.com; dkim=none (message not signed)
+ header.d=none;nxp.com; dmarc=none action=none header.from=oss.nxp.com;
+Received: from VE1PR04MB6608.eurprd04.prod.outlook.com (2603:10a6:803:125::12)
+ by VE1PR04MB6542.eurprd04.prod.outlook.com (2603:10a6:803:123::32) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.21; Wed, 3 Jun
+ 2020 08:47:49 +0000
+Received: from VE1PR04MB6608.eurprd04.prod.outlook.com
+ ([fe80::282c:7a7:6583:903b]) by VE1PR04MB6608.eurprd04.prod.outlook.com
+ ([fe80::282c:7a7:6583:903b%7]) with mapi id 15.20.3045.024; Wed, 3 Jun 2020
+ 08:47:49 +0000
+From:   Andrei Botila <andrei.botila@oss.nxp.com>
+To:     Horia Geanta <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Milan Broz <mbroz@redhat.com>, djeffery@redhat.com,
-        dm-devel@redhat.com, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, guazhang@redhat.com,
-        jpittman@redhat.com
-Subject: Re: [PATCH 1/4] qat: fix misunderstood -EBUSY return code
-In-Reply-To: <20200602220516.GA20880@silpixa00400314>
-Message-ID: <alpine.LRH.2.02.2006030409520.15292@file01.intranet.prod.int.rdu2.redhat.com>
-References: <20200601160418.171851200@debian-a64.vm> <20200602220516.GA20880@silpixa00400314>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] crypto: caam/qi2 - add support for dpseci_reset()
+Date:   Wed,  3 Jun 2020 11:47:04 +0300
+Message-Id: <20200603084704.5895-1-andrei.botila@oss.nxp.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR06CA0121.eurprd06.prod.outlook.com
+ (2603:10a6:208:ab::26) To VE1PR04MB6608.eurprd04.prod.outlook.com
+ (2603:10a6:803:125::12)
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from lsv15007.swis.ro-buh01.nxp.com (83.217.231.2) by AM0PR06CA0121.eurprd06.prod.outlook.com (2603:10a6:208:ab::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18 via Frontend Transport; Wed, 3 Jun 2020 08:47:48 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [83.217.231.2]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: eddf6449-c6fe-4c99-8aaf-08d8079acb74
+X-MS-TrafficTypeDiagnostic: VE1PR04MB6542:
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VE1PR04MB65425FBD59938F90310F28EDB4880@VE1PR04MB6542.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3044;
+X-Forefront-PRVS: 04238CD941
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: PWilhAmng8OgfEADs9sI7mIFYr+LPejafXC+fFfnHp8yqiAc8id/VwsXWE7yUAcNGnaXloQtO2iD3BzLbJgLaWQJEgXGa3Ejvm7htRyY7xn2IrkLM4B1bzsWTlmHLoCgyUjN3WC+EE49KxNQdIatywCUGREVOii2JrkNeZnOvLRYkfM2XfobCMRim/A5RTkq68Jv5NPYJIvjyQmtlsua3bfTdUtfEa4ugjn3szHb1SpN4ujNtOS7RLNGwL6TiiLtcTVq2ryO6zIE5qCPXTNGUW0iXqor0cqCmRVeU88CMPGHA3ferInaAX1dRMW3iF1D
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB6608.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(396003)(376002)(366004)(39860400002)(136003)(6666004)(66556008)(52116002)(66476007)(6512007)(1076003)(66946007)(110136005)(8936002)(83380400001)(86362001)(2616005)(316002)(26005)(8676002)(5660300002)(478600001)(44832011)(956004)(186003)(4326008)(16526019)(6506007)(2906002)(6486002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: x/BLfplBIDpJYiciarxSLpa5kDkxgcAp33dvAO6XxmTkXBBL5YcMOvdlnJ+qUguuU00P6qlyu9p3nlUHlHaLIB9eWJeavmoHMUqVyiL8LvpKHBqu+frolaiYTqCMuHe67L0fJ7Aq0bj5rGrOZ1Y6RvMrzN9EhE/tXp0C4Z8OQPbOQv31/528uLranq16UtWyedrBba9GE/pw8ipNoPulp0uzZ1NwT8/7ZqExp7aKXDpyktejwI7KAnYx2Mico4WDMDn44EBBTHQi62HkUli5jRhSHLcM4bPNMBveVbFTlWdJrZrEVgQjz5o/VqinpOy0KpXMVHJu2wgdU9q+zpf2Y1cjqAxBPo/6lgMt0kuCo4XnjDemqRyB+P86sdeHFZhxiKtBkS8xop4sj/jC68yr9MwDiSjZQMkYq+RtQWqK9OvoIogozpME7FQjO7mtV+DnTs0nnDTXYitv25eCnlkhLtD658YHbGBGz28P7mCJBkE=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eddf6449-c6fe-4c99-8aaf-08d8079acb74
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2020 08:47:49.4424
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4T3LXva6wn4B8akHtoeAEfMfP+oyoI2p8l25ujhQ3+1t1CigySculRXh7ThNLzck4euvjMmEt5MyY0YFWvgpNg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB6542
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+From: Andrei Botila <andrei.botila@nxp.com>
 
+Add support for dpseci_reset() command for DPSECI objects.
+For DPSECI DPAA2 objects with version lower than v5.4 reset command
+was broken in MC f/w.
 
-On Tue, 2 Jun 2020, Giovanni Cabiddu wrote:
+Signed-off-by: Andrei Botila <andrei.botila@nxp.com>
+---
+Changes since V1:
+- added, in dpaa2_dpseci_free function an error message in case dpseci_reset() fails.
 
-> Hi Mikulas,
-> 
-> thanks for your patch. See below.
-> 
-> > +	qat_req->backed_off = backed_off = adf_should_back_off(ctx->inst->sym_tx);
-> > +again:
-> > +	ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
-> >  	if (ret == -EAGAIN) {
-> > -		qat_alg_free_bufl(ctx->inst, qat_req);
-> > -		return -EBUSY;
-> > +		qat_req->backed_off = backed_off = 1;
-> > +		cpu_relax();
-> > +		goto again;
-> >  	}
-> I am a bit concerned about this potential infinite loop.
-> If an error occurred on the device and the queue is full, we will be
-> stuck here forever.
-> Should we just retry a number of times and then fail?
+ drivers/crypto/caam/caamalg_qi2.c | 15 +++++++++++++++
+ drivers/crypto/caam/dpseci.c      | 18 ++++++++++++++++++
+ drivers/crypto/caam/dpseci.h      |  2 ++
+ drivers/crypto/caam/dpseci_cmd.h  |  1 +
+ 4 files changed, 36 insertions(+)
 
-It's better to get stuck in an infinite loop than to cause random I/O 
-errors. The infinite loop requires reboot, but it doesn't damage data on 
-disks.
-
-The proper solution would be to add the request to a queue and process the 
-queue when some other request ended - but it would need substantial 
-rewrite of the driver. Do you want to rewrite it using a queue?
-
-> Or, should we just move to the crypto-engine?
-
-What do you mean by the crypto-engine?
-
-> > -	do {
-> > -		ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
-> > -	} while (ret == -EAGAIN && ctr++ < 10);
-> > -
-> > +	qat_req->backed_off = backed_off = adf_should_back_off(ctx->inst->sym_tx);
-> checkpatch: line over 80 characters - same in every place
-> adf_should_back_off is used.
-
-Recently, Linus announced that we can have larger lines than 80 bytes.
-See bdc48fa11e46f867ea4d75fa59ee87a7f48be144
-
-> >  static int qat_alg_skcipher_blk_decrypt(struct skcipher_request *req)
-> > Index: linux-2.6/drivers/crypto/qat/qat_common/adf_transport.c
-> > ===================================================================
-> > --- linux-2.6.orig/drivers/crypto/qat/qat_common/adf_transport.c
-> > +++ linux-2.6/drivers/crypto/qat/qat_common/adf_transport.c
-> > @@ -114,10 +114,19 @@ static void adf_disable_ring_irq(struct
-> >  	WRITE_CSR_INT_COL_EN(bank->csr_addr, bank->bank_number, bank->irq_mask);
-> >  }
-> >  
-> > +bool adf_should_back_off(struct adf_etr_ring_data *ring)
-> > +{
-> > +	return atomic_read(ring->inflights) > ADF_MAX_INFLIGHTS(ring->ring_size, ring->msg_size) * 15 / 16;
-> How did you came up with 15/16?
-
-I want the sender to back off before the queue is full, to avoid 
-busy-waiting. There may be more concurrent senders, so we want to back off 
-at some point before the queue is full.
-
-> checkpatch: WARNING: line over 80 characters
-> 
-> > +}
-> > +
-> >  int adf_send_message(struct adf_etr_ring_data *ring, uint32_t *msg)
-> >  {
-> > -	if (atomic_add_return(1, ring->inflights) >
-> > -	    ADF_MAX_INFLIGHTS(ring->ring_size, ring->msg_size)) {
-> > +	int limit = ADF_MAX_INFLIGHTS(ring->ring_size, ring->msg_size);
-> > +
-> > +	if (atomic_read(ring->inflights) >= limit)
-> > +		return -EAGAIN;
-
-> Can this be removed and leave only the condition below?
-> Am I missing something here?
-
-atomic_read is light, atomic_add_return is heavy. We may be busy-waiting 
-here, so I want to use the light instruction. Spinlocks do the same - when 
-they are spinning, they use just a light "read" instruction and when the 
-"read" instruction indicates that the spinlock is free, they execute the 
-read-modify-write instruction to actually acquire the lock.
-
-> > +
-> > +	if (atomic_add_return(1, ring->inflights) > limit) {
-> >  		atomic_dec(ring->inflights);
-> >  		return -EAGAIN;
-> >  	}
-
-Mikulas
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index 28669cbecf77..35fbb3a74cb4 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -4697,6 +4697,13 @@ static void dpaa2_dpseci_free(struct dpaa2_caam_priv *priv)
+ {
+ 	struct device *dev = priv->dev;
+ 	struct fsl_mc_device *ls_dev = to_fsl_mc_device(dev);
++	int err;
++
++	if (DPSECI_VER(priv->major_ver, priv->minor_ver) > DPSECI_VER(5, 3)) {
++		err = dpseci_reset(priv->mc_io, 0, ls_dev->mc_handle);
++		if (err)
++			dev_err(dev, "dpseci_reset() failed\n");
++	}
+ 
+ 	dpaa2_dpseci_congestion_free(priv);
+ 	dpseci_close(priv->mc_io, 0, ls_dev->mc_handle);
+@@ -4894,6 +4901,14 @@ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
+ 
+ 	dev_info(dev, "dpseci v%d.%d\n", priv->major_ver, priv->minor_ver);
+ 
++	if (DPSECI_VER(priv->major_ver, priv->minor_ver) > DPSECI_VER(5, 3)) {
++		err = dpseci_reset(priv->mc_io, 0, ls_dev->mc_handle);
++		if (err) {
++			dev_err(dev, "dpseci_reset() failed\n");
++			goto err_get_vers;
++		}
++	}
++
+ 	err = dpseci_get_attributes(priv->mc_io, 0, ls_dev->mc_handle,
+ 				    &priv->dpseci_attr);
+ 	if (err) {
+diff --git a/drivers/crypto/caam/dpseci.c b/drivers/crypto/caam/dpseci.c
+index 8a68531ded0b..039df6c5790c 100644
+--- a/drivers/crypto/caam/dpseci.c
++++ b/drivers/crypto/caam/dpseci.c
+@@ -103,6 +103,24 @@ int dpseci_disable(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token)
+ 	return mc_send_command(mc_io, &cmd);
+ }
+ 
++/**
++ * dpseci_reset() - Reset the DPSECI, returns the object to initial state
++ * @mc_io:	Pointer to MC portal's I/O object
++ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
++ * @token:	Token of DPSECI object
++ *
++ * Return:	'0' on success, error code otherwise
++ */
++int dpseci_reset(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token)
++{
++	struct fsl_mc_command cmd = { 0 };
++
++	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_RESET,
++					  cmd_flags,
++					  token);
++	return mc_send_command(mc_io, &cmd);
++}
++
+ /**
+  * dpseci_is_enabled() - Check if the DPSECI is enabled.
+  * @mc_io:	Pointer to MC portal's I/O object
+diff --git a/drivers/crypto/caam/dpseci.h b/drivers/crypto/caam/dpseci.h
+index 4550e134d166..6dcd9be8144b 100644
+--- a/drivers/crypto/caam/dpseci.h
++++ b/drivers/crypto/caam/dpseci.h
+@@ -59,6 +59,8 @@ int dpseci_enable(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token);
+ 
+ int dpseci_disable(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token);
+ 
++int dpseci_reset(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token);
++
+ int dpseci_is_enabled(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
+ 		      int *en);
+ 
+diff --git a/drivers/crypto/caam/dpseci_cmd.h b/drivers/crypto/caam/dpseci_cmd.h
+index 6ab77ead6e3d..71a007c85adb 100644
+--- a/drivers/crypto/caam/dpseci_cmd.h
++++ b/drivers/crypto/caam/dpseci_cmd.h
+@@ -33,6 +33,7 @@
+ #define DPSECI_CMDID_ENABLE				DPSECI_CMD_V1(0x002)
+ #define DPSECI_CMDID_DISABLE				DPSECI_CMD_V1(0x003)
+ #define DPSECI_CMDID_GET_ATTR				DPSECI_CMD_V1(0x004)
++#define DPSECI_CMDID_RESET				DPSECI_CMD_V1(0x005)
+ #define DPSECI_CMDID_IS_ENABLED				DPSECI_CMD_V1(0x006)
+ 
+ #define DPSECI_CMDID_SET_RX_QUEUE			DPSECI_CMD_V1(0x194)
+-- 
+2.17.1
 
