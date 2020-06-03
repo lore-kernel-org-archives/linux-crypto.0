@@ -1,307 +1,157 @@
-Return-Path: <SRS0=vjnc=7P=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=RCNv=7Q=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3314CC433E0
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jun 2020 22:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC44C433DF
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 03:41:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 09AB9206E2
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jun 2020 22:05:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C2CE12074B
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 03:41:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726937AbgFBWF2 (ORCPT
+        id S1725888AbgFCDlX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Jun 2020 18:05:28 -0400
-Received: from mga18.intel.com ([134.134.136.126]:43747 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726130AbgFBWF2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Jun 2020 18:05:28 -0400
-IronPort-SDR: +9Loevk66SVoFX7aswNYhHDFJQbYMs+FPQbWcSPLmAO87R4yFYVG5T1wdXKO+oLGIq/PEoulEH
- EGGFsDhpjksg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2020 15:05:26 -0700
-IronPort-SDR: NqmMFRa8ZSSO8O9xNeDZJ5yE5ZCB0s79dca5YjmIRxoG37KxtWK1lphiKUxqkdhiRrZN+5uVjg
- fBHhsA03inXA==
-X-IronPort-AV: E=Sophos;i="5.73,466,1583222400"; 
-   d="scan'208";a="470824556"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.51])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2020 15:05:23 -0700
-Date:   Tue, 2 Jun 2020 23:05:16 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     Mike Snitzer <msnitzer@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Milan Broz <mbroz@redhat.com>, djeffery@redhat.com,
-        dm-devel@redhat.com, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, guazhang@redhat.com,
-        jpittman@redhat.com
-Subject: Re: [PATCH 1/4] qat: fix misunderstood -EBUSY return code
-Message-ID: <20200602220516.GA20880@silpixa00400314>
-References: <20200601160418.171851200@debian-a64.vm>
+        Tue, 2 Jun 2020 23:41:23 -0400
+Received: from mail-il1-f197.google.com ([209.85.166.197]:49341 "EHLO
+        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725854AbgFCDlW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Jun 2020 23:41:22 -0400
+Received: by mail-il1-f197.google.com with SMTP id p20so545260ili.16
+        for <linux-crypto@vger.kernel.org>; Tue, 02 Jun 2020 20:41:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=gXY/ZYEP3SmrwbBJcl7C6Xw3GUvmdoWZklMcqyQfDr4=;
+        b=m2X16leZz7x0cnoUCt1VvfHdB2Jcj5wjk80HAlJN4U6pLjyTlh4v4VvSmWRfyyPw1V
+         uJii5AN92zJv/U+JK9TTl1BNiYjsdrH8A7CxymhlJITUqOLGO/Uoff/E6Q4ePbV/fD/c
+         vqvFhHdGZlJiW6i6oCD9OPceIvRNhjjzpYVl2xpmGBgYrnGMAnHtfcfeLe3EFueTbJZr
+         KEI1OK6OPS6zOCieyxYc2E9/mXbU99VsBAGWEo6neixUYofI+W3KF7PhVgzLcM/7HemQ
+         pc6Gfv8Q0WEPN44ILQJhw8Ai0he+YI8a/xMBww4xOBVIABBNf0DeFMvRTVF3U3vgBaP8
+         ZO9A==
+X-Gm-Message-State: AOAM530Qe23/eqRRWnnWOXZ7fhpvoC7njESburjYIOGFo7APstpz1V/r
+        9oOcolD7kyRDLXyrQYyOJqHePQta8qquk0sXmV990LSU3MBi
+X-Google-Smtp-Source: ABdhPJxq0CtdjSAJeiL8/yVeyj9mc4ScvfYBmPSicxFf2BLe4pWWyJTMypz7bJatLdWpslCO4PVKgv07dKbKcCnMcQu200HJZv1f
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200601160418.171851200@debian-a64.vm>
+X-Received: by 2002:a92:9603:: with SMTP id g3mr2273048ilh.204.1591155681272;
+ Tue, 02 Jun 2020 20:41:21 -0700 (PDT)
+Date:   Tue, 02 Jun 2020 20:41:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000002a280b05a725cd93@google.com>
+Subject: memory leak in crypto_create_tfm
+From:   syzbot <syzbot+2e635807decef724a1fa@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Mikulas,
+Hello,
 
-thanks for your patch. See below.
+syzbot found the following crash on:
 
-On Mon, Jun 01, 2020 at 06:03:33PM +0200, Mikulas Patocka wrote:
-> Using dm-crypt with QAT result in deadlocks.
-> 
-> If a crypto routine returns -EBUSY, it is expected that the crypto driver
-> have already queued the request and the crypto API user should assume that
-> this request was processed, but it should stop sending more requests. When
-> an -EBUSY request is processed, the crypto driver calls the callback with
-> the error code -EINPROGRESS - this means that the request is still being
-> processed (i.e. the user should wait for another callback), but the user
-> can start sending more requests now.
-> 
-> The QAT driver misunderstood this logic, it return -EBUSY when the queue
-> was full and didn't queue the request - the request was lost and it
-> resulted in a deadlock.
-> 
-> This patch fixes busy state handling - if the queue is at least 15/16
-> full, we return -EBUSY to signal to the user that no more requests should
-> be sent. We remember that we returned -EBUSY (the variable backed_off) and
-> if we finish the request, we return -EINPROGRESS to indicate that the user
-> can send more requests.
-> 
-> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-> Cc: stable@vger.kernel.org
-> 
-> Index: linux-2.6/drivers/crypto/qat/qat_common/qat_algs.c
-> ===================================================================
-> --- linux-2.6.orig/drivers/crypto/qat/qat_common/qat_algs.c
-> +++ linux-2.6/drivers/crypto/qat/qat_common/qat_algs.c
-> @@ -826,6 +826,9 @@ static void qat_aead_alg_callback(struct
->  	qat_alg_free_bufl(inst, qat_req);
->  	if (unlikely(qat_res != ICP_QAT_FW_COMN_STATUS_FLAG_OK))
->  		res = -EBADMSG;
-> +
-> +	if (qat_req->backed_off)
-> +		areq->base.complete(&areq->base, -EINPROGRESS);
->  	areq->base.complete(&areq->base, res);
->  }
->  
-> @@ -847,6 +850,8 @@ static void qat_skcipher_alg_callback(st
->  	dma_free_coherent(dev, AES_BLOCK_SIZE, qat_req->iv,
->  			  qat_req->iv_paddr);
->  
-> +	if (qat_req->backed_off)
-> +		sreq->base.complete(&sreq->base, -EINPROGRESS);
->  	sreq->base.complete(&sreq->base, res);
->  }
->  
-> @@ -869,7 +874,7 @@ static int qat_alg_aead_dec(struct aead_
->  	struct icp_qat_fw_la_auth_req_params *auth_param;
->  	struct icp_qat_fw_la_bulk_req *msg;
->  	int digst_size = crypto_aead_authsize(aead_tfm);
-> -	int ret, ctr = 0;
-> +	int ret, backed_off;
->  
->  	ret = qat_alg_sgl_to_bufl(ctx->inst, areq->src, areq->dst, qat_req);
->  	if (unlikely(ret))
-> @@ -890,15 +895,16 @@ static int qat_alg_aead_dec(struct aead_
->  	auth_param = (void *)((uint8_t *)cipher_param + sizeof(*cipher_param));
->  	auth_param->auth_off = 0;
->  	auth_param->auth_len = areq->assoclen + cipher_param->cipher_length;
-> -	do {
-> -		ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
-> -	} while (ret == -EAGAIN && ctr++ < 10);
->  
-> +	qat_req->backed_off = backed_off = adf_should_back_off(ctx->inst->sym_tx);
-> +again:
-> +	ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
->  	if (ret == -EAGAIN) {
-> -		qat_alg_free_bufl(ctx->inst, qat_req);
-> -		return -EBUSY;
-> +		qat_req->backed_off = backed_off = 1;
-> +		cpu_relax();
-> +		goto again;
->  	}
-I am a bit concerned about this potential infinite loop.
-If an error occurred on the device and the queue is full, we will be
-stuck here forever.
-Should we just retry a number of times and then fail?
-Or, should we just move to the crypto-engine?
+HEAD commit:    19409891 Merge tag 'pnp-5.8-rc1' of git://git.kernel.org/p..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13165aa6100000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6d41e63a2c7e0715
+dashboard link: https://syzkaller.appspot.com/bug?extid=2e635807decef724a1fa
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17f00ef2100000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=170f2ef2100000
 
-> -	return -EINPROGRESS;
-> +	return backed_off ? -EBUSY : -EINPROGRESS;
->  }
->  
->  static int qat_alg_aead_enc(struct aead_request *areq)
-> @@ -911,7 +917,7 @@ static int qat_alg_aead_enc(struct aead_
->  	struct icp_qat_fw_la_auth_req_params *auth_param;
->  	struct icp_qat_fw_la_bulk_req *msg;
->  	uint8_t *iv = areq->iv;
-> -	int ret, ctr = 0;
-> +	int ret, backed_off;
->  
->  	ret = qat_alg_sgl_to_bufl(ctx->inst, areq->src, areq->dst, qat_req);
->  	if (unlikely(ret))
-> @@ -935,15 +941,15 @@ static int qat_alg_aead_enc(struct aead_
->  	auth_param->auth_off = 0;
->  	auth_param->auth_len = areq->assoclen + areq->cryptlen;
->  
-> -	do {
-> -		ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
-> -	} while (ret == -EAGAIN && ctr++ < 10);
-> -
-> +	qat_req->backed_off = backed_off = adf_should_back_off(ctx->inst->sym_tx);
-checkpatch: line over 80 characters - same in every place
-adf_should_back_off is used.
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+2e635807decef724a1fa@syzkaller.appspotmail.com
 
-> +again:
-> +	ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
->  	if (ret == -EAGAIN) {
-> -		qat_alg_free_bufl(ctx->inst, qat_req);
-> -		return -EBUSY;
-> +		qat_req->backed_off = backed_off = 1;
-> +		cpu_relax();
-> +		goto again;
->  	}
-> -	return -EINPROGRESS;
-> +	return backed_off ? -EBUSY : -EINPROGRESS;
->  }
->  
->  static int qat_alg_skcipher_rekey(struct qat_alg_skcipher_ctx *ctx,
-> @@ -1051,7 +1057,7 @@ static int qat_alg_skcipher_encrypt(stru
->  	struct icp_qat_fw_la_cipher_req_params *cipher_param;
->  	struct icp_qat_fw_la_bulk_req *msg;
->  	struct device *dev = &GET_DEV(ctx->inst->accel_dev);
-> -	int ret, ctr = 0;
-> +	int ret, backed_off;
->  
->  	if (req->cryptlen == 0)
->  		return 0;
-> @@ -1081,17 +1087,16 @@ static int qat_alg_skcipher_encrypt(stru
->  	cipher_param->cipher_offset = 0;
->  	cipher_param->u.s.cipher_IV_ptr = qat_req->iv_paddr;
->  	memcpy(qat_req->iv, req->iv, AES_BLOCK_SIZE);
-> -	do {
-> -		ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
-> -	} while (ret == -EAGAIN && ctr++ < 10);
->  
-> +	qat_req->backed_off = backed_off = adf_should_back_off(ctx->inst->sym_tx);
-> +again:
-> +	ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
->  	if (ret == -EAGAIN) {
-> -		qat_alg_free_bufl(ctx->inst, qat_req);
-> -		dma_free_coherent(dev, AES_BLOCK_SIZE, qat_req->iv,
-> -				  qat_req->iv_paddr);
-> -		return -EBUSY;
-> +		qat_req->backed_off = backed_off = 1;
-> +		cpu_relax();
-> +		goto again;
->  	}
-> -	return -EINPROGRESS;
-> +	return backed_off ? -EBUSY : -EINPROGRESS;
->  }
->  
->  static int qat_alg_skcipher_blk_encrypt(struct skcipher_request *req)
-> @@ -1111,7 +1116,7 @@ static int qat_alg_skcipher_decrypt(stru
->  	struct icp_qat_fw_la_cipher_req_params *cipher_param;
->  	struct icp_qat_fw_la_bulk_req *msg;
->  	struct device *dev = &GET_DEV(ctx->inst->accel_dev);
-> -	int ret, ctr = 0;
-> +	int ret, backed_off;
->  
->  	if (req->cryptlen == 0)
->  		return 0;
-> @@ -1141,17 +1146,16 @@ static int qat_alg_skcipher_decrypt(stru
->  	cipher_param->cipher_offset = 0;
->  	cipher_param->u.s.cipher_IV_ptr = qat_req->iv_paddr;
->  	memcpy(qat_req->iv, req->iv, AES_BLOCK_SIZE);
-> -	do {
-> -		ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
-> -	} while (ret == -EAGAIN && ctr++ < 10);
->  
-> +	qat_req->backed_off = backed_off = adf_should_back_off(ctx->inst->sym_tx);
-> +again:
-> +	ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
->  	if (ret == -EAGAIN) {
-> -		qat_alg_free_bufl(ctx->inst, qat_req);
-> -		dma_free_coherent(dev, AES_BLOCK_SIZE, qat_req->iv,
-> -				  qat_req->iv_paddr);
-> -		return -EBUSY;
-> +		qat_req->backed_off = backed_off = 1;
-> +		cpu_relax();
-> +		goto again;
->  	}
-> -	return -EINPROGRESS;
-> +	return backed_off ? -EBUSY : -EINPROGRESS;
->  }
->  
->  static int qat_alg_skcipher_blk_decrypt(struct skcipher_request *req)
-> Index: linux-2.6/drivers/crypto/qat/qat_common/adf_transport.c
-> ===================================================================
-> --- linux-2.6.orig/drivers/crypto/qat/qat_common/adf_transport.c
-> +++ linux-2.6/drivers/crypto/qat/qat_common/adf_transport.c
-> @@ -114,10 +114,19 @@ static void adf_disable_ring_irq(struct
->  	WRITE_CSR_INT_COL_EN(bank->csr_addr, bank->bank_number, bank->irq_mask);
->  }
->  
-> +bool adf_should_back_off(struct adf_etr_ring_data *ring)
-> +{
-> +	return atomic_read(ring->inflights) > ADF_MAX_INFLIGHTS(ring->ring_size, ring->msg_size) * 15 / 16;
-How did you came up with 15/16?
-checkpatch: WARNING: line over 80 characters
+executing program
+executing program
+BUG: memory leak
+unreferenced object 0xffff8881175bc480 (size 64):
+  comm "syz-executor064", pid 6388, jiffies 4294941622 (age 13.280s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    e0 7e 56 84 ff ff ff ff 00 00 00 00 00 00 00 00  .~V.............
+  backtrace:
+    [<0000000029c7602f>] kmalloc include/linux/slab.h:560 [inline]
+    [<0000000029c7602f>] kzalloc include/linux/slab.h:669 [inline]
+    [<0000000029c7602f>] crypto_create_tfm+0x31/0x100 crypto/api.c:448
+    [<00000000bec8cbdb>] crypto_alloc_tfm+0x79/0x1a0 crypto/api.c:527
+    [<000000002f9791ba>] drbg_prepare_hrng crypto/drbg.c:1509 [inline]
+    [<000000002f9791ba>] drbg_instantiate crypto/drbg.c:1587 [inline]
+    [<000000002f9791ba>] drbg_kcapi_seed+0x432/0x6a9 crypto/drbg.c:1980
+    [<0000000041302bb8>] crypto_rng_reset+0x35/0x1a0 crypto/rng.c:53
+    [<000000004758c3c4>] alg_setkey crypto/af_alg.c:222 [inline]
+    [<000000004758c3c4>] alg_setsockopt+0x149/0x190 crypto/af_alg.c:255
+    [<000000008bc4b5cb>] __sys_setsockopt+0x112/0x230 net/socket.c:2132
+    [<00000000cfbf30da>] __do_sys_setsockopt net/socket.c:2148 [inline]
+    [<00000000cfbf30da>] __se_sys_setsockopt net/socket.c:2145 [inline]
+    [<00000000cfbf30da>] __x64_sys_setsockopt+0x22/0x30 net/socket.c:2145
+    [<00000000fc9c2183>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:295
+    [<0000000040e080a1>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
 
-> +}
-> +
->  int adf_send_message(struct adf_etr_ring_data *ring, uint32_t *msg)
->  {
-> -	if (atomic_add_return(1, ring->inflights) >
-> -	    ADF_MAX_INFLIGHTS(ring->ring_size, ring->msg_size)) {
-> +	int limit = ADF_MAX_INFLIGHTS(ring->ring_size, ring->msg_size);
-> +
-> +	if (atomic_read(ring->inflights) >= limit)
-> +		return -EAGAIN;
-Can this be removed and leave only the condition below?
-Am I missing something here?
-> +
-> +	if (atomic_add_return(1, ring->inflights) > limit) {
->  		atomic_dec(ring->inflights);
->  		return -EAGAIN;
->  	}
-> Index: linux-2.6/drivers/crypto/qat/qat_common/adf_transport.h
-> ===================================================================
-> --- linux-2.6.orig/drivers/crypto/qat/qat_common/adf_transport.h
-> +++ linux-2.6/drivers/crypto/qat/qat_common/adf_transport.h
-> @@ -58,6 +58,7 @@ int adf_create_ring(struct adf_accel_dev
->  		    const char *ring_name, adf_callback_fn callback,
->  		    int poll_mode, struct adf_etr_ring_data **ring_ptr);
->  
-> +bool adf_should_back_off(struct adf_etr_ring_data *ring);
->  int adf_send_message(struct adf_etr_ring_data *ring, uint32_t *msg);
->  void adf_remove_ring(struct adf_etr_ring_data *ring);
->  #endif
-> Index: linux-2.6/drivers/crypto/qat/qat_common/qat_crypto.h
-> ===================================================================
-> --- linux-2.6.orig/drivers/crypto/qat/qat_common/qat_crypto.h
-> +++ linux-2.6/drivers/crypto/qat/qat_common/qat_crypto.h
-> @@ -90,6 +90,7 @@ struct qat_crypto_request {
->  		   struct qat_crypto_request *req);
->  	void *iv;
->  	dma_addr_t iv_paddr;
-> +	int backed_off;
->  };
->  
->  #endif
-> 
-Regards,
+BUG: memory leak
+unreferenced object 0xffff8881175bc040 (size 64):
+  comm "syz-executor064", pid 6389, jiffies 4294942172 (age 7.780s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    e0 7e 56 84 ff ff ff ff 00 00 00 00 00 00 00 00  .~V.............
+  backtrace:
+    [<0000000029c7602f>] kmalloc include/linux/slab.h:560 [inline]
+    [<0000000029c7602f>] kzalloc include/linux/slab.h:669 [inline]
+    [<0000000029c7602f>] crypto_create_tfm+0x31/0x100 crypto/api.c:448
+    [<00000000bec8cbdb>] crypto_alloc_tfm+0x79/0x1a0 crypto/api.c:527
+    [<000000002f9791ba>] drbg_prepare_hrng crypto/drbg.c:1509 [inline]
+    [<000000002f9791ba>] drbg_instantiate crypto/drbg.c:1587 [inline]
+    [<000000002f9791ba>] drbg_kcapi_seed+0x432/0x6a9 crypto/drbg.c:1980
+    [<0000000041302bb8>] crypto_rng_reset+0x35/0x1a0 crypto/rng.c:53
+    [<000000004758c3c4>] alg_setkey crypto/af_alg.c:222 [inline]
+    [<000000004758c3c4>] alg_setsockopt+0x149/0x190 crypto/af_alg.c:255
+    [<000000008bc4b5cb>] __sys_setsockopt+0x112/0x230 net/socket.c:2132
+    [<00000000cfbf30da>] __do_sys_setsockopt net/socket.c:2148 [inline]
+    [<00000000cfbf30da>] __se_sys_setsockopt net/socket.c:2145 [inline]
+    [<00000000cfbf30da>] __x64_sys_setsockopt+0x22/0x30 net/socket.c:2145
+    [<00000000fc9c2183>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:295
+    [<0000000040e080a1>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
 
--- 
-Giovanni
+BUG: memory leak
+unreferenced object 0xffff88811b3ca080 (size 96):
+  comm "syz-executor064", pid 6389, jiffies 4294942172 (age 7.780s)
+  hex dump (first 32 bytes):
+    89 c7 08 cb 8a 12 10 6e 00 00 00 00 00 00 00 00  .......n........
+    71 51 5a c2 1b 00 00 00 35 7d 00 00 00 00 00 00  qQZ.....5}......
+  backtrace:
+    [<000000008ec3eca0>] jent_entropy_collector_alloc+0x1b/0xf8 crypto/jitterentropy.c:662
+    [<0000000026ed401a>] jent_kcapi_init+0x17/0x40 crypto/jitterentropy-kcapi.c:119
+    [<00000000be7d6b06>] crypto_create_tfm+0x89/0x100 crypto/api.c:459
+    [<00000000bec8cbdb>] crypto_alloc_tfm+0x79/0x1a0 crypto/api.c:527
+    [<000000002f9791ba>] drbg_prepare_hrng crypto/drbg.c:1509 [inline]
+    [<000000002f9791ba>] drbg_instantiate crypto/drbg.c:1587 [inline]
+    [<000000002f9791ba>] drbg_kcapi_seed+0x432/0x6a9 crypto/drbg.c:1980
+    [<0000000041302bb8>] crypto_rng_reset+0x35/0x1a0 crypto/rng.c:53
+    [<000000004758c3c4>] alg_setkey crypto/af_alg.c:222 [inline]
+    [<000000004758c3c4>] alg_setsockopt+0x149/0x190 crypto/af_alg.c:255
+    [<000000008bc4b5cb>] __sys_setsockopt+0x112/0x230 net/socket.c:2132
+    [<00000000cfbf30da>] __do_sys_setsockopt net/socket.c:2148 [inline]
+    [<00000000cfbf30da>] __se_sys_setsockopt net/socket.c:2145 [inline]
+    [<00000000cfbf30da>] __x64_sys_setsockopt+0x22/0x30 net/socket.c:2145
+    [<00000000fc9c2183>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:295
+    [<0000000040e080a1>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
