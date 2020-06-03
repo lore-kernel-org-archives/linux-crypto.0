@@ -2,178 +2,111 @@ Return-Path: <SRS0=RCNv=7Q=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD83BC433DF
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 09:34:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C6B0C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 09:35:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A52232077D
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 09:34:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD196205CB
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 09:35:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aFWUUXJq"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="abDYLO2X"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725881AbgFCJey (ORCPT
+        id S1725877AbgFCJfs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jun 2020 05:34:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38734 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725854AbgFCJex (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jun 2020 05:34:53 -0400
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:3201:214:fdff:fe10:1be6])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5196C05BD43;
-        Wed,  3 Jun 2020 02:34:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=RCFP1A+jP0Ejskt3PALHHBHaCjZj9CjOP9H+ZUjtVwM=; b=aFWUUXJqdnK1WDUWqzRKMDXBM
-        1kVv5yXQAwa2Lb3TmbtSDvvBJ64BRFACoVB+RZ0tgL0YuklkRY/bcQdyJW2P60h1MJeiTlpxi6g9I
-        meZNBHpZMQ8WsKgm4tqAC16EYMcl/NpNGlG4fgZTNJE0RCxca/b0rSHQvJeKrbKnKWv4YWXgf58he
-        yXqLmgHCujl9SFNppMaI9CEPWAtNSvh3A3yBafP64u3ywxSGDLlNuRtysF6aLQd1qGP0SIeIHJT2Y
-        ZI/Lc0+PtL3erv1xuxcT+FQtsMq8POUrUjHA1w7xpnoTb1gNl9uRDIQuJ8AenWbYjQCTLvoKghfki
-        s4pbL54Lg==;
-Received: from shell.armlinux.org.uk ([2002:4e20:1eda:1:5054:ff:fe00:4ec]:38300)
-        by pandora.armlinux.org.uk with esmtpsa (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
-        (Exim 4.90_1)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1jgPn9-00058L-4d; Wed, 03 Jun 2020 10:34:35 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.92)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1jgPmq-0005HW-Su; Wed, 03 Jun 2020 10:34:16 +0100
-Date:   Wed, 3 Jun 2020 10:34:16 +0100
-From:   Russell King - ARM Linux admin <linux@armlinux.org.uk>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Neal Liu <neal.liu@mediatek.com>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>, Julius Werner <jwerner@google.com>,
+        Wed, 3 Jun 2020 05:35:48 -0400
+Received: from mail-eopbgr60046.outbound.protection.outlook.com ([40.107.6.46]:45688
+        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725854AbgFCJfs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 Jun 2020 05:35:48 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gCf1aGd7q5DdNiyQAdesHmiKFoEQnNf+jiiiTqvWTbsseFOVJq5L0qgGLjw3PK428UTNdKO4VRjNaHRVH3e5YR9rA1mX92ZWd+wNybsUrzZ/pD3k34gLIvxNZcN69NnZRm6AGzXdXVhvrVRYatlTSPMuQTSlsM4gk2gYRSytZu0pQQkNVtIc2zYqPOa2SrmttJzkUwaenEq47TQdibDHIPO8/Ckr2+a+GW7WorAS2QagaEvroerp6BFlw/3r68SXLyPNGCVHKhJA8m4wfQREegKYDUKWFU5WgHF8MIqP7ocA5wmHq4Mkd9mp29fjlXmwWgdjwQ1sb3MIgtCrKGu7rA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bF2cGYEiw57DjTJG4k4WBraDParV5iPqlNSFppnyJyo=;
+ b=jfZrT2u1eMZWYIC/8H37jp9qT/eVvBq0gOMJg69BRqZl5DCN5fXBuaHNtFRDZFiGmsaG1GsQsXp4sDM2yATCDYOu57Vs1DV1vKaBuxnwvzeh0RoPfx2jsMJMA7fl3Nubqu13d7aHMtp8f4Yb37Ar/JdS51IvFdBNuPKlRlZFKJ0MdY32CwlV+9X9s4frQl5kRWHYOzgKqBxbyeDP0Z4kRnKkTbenT6Ppzz0T4SH6IUvxX9ufECfNoDh8z5ymHHQcXwadIDfmK2b++aC/xL7txBqtoWezHBlkD5gSgvgH1tUCLd9ET9F20q6bjkyOpjQk7x5ZKh5HT/cFU6ABsLJwtA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bF2cGYEiw57DjTJG4k4WBraDParV5iPqlNSFppnyJyo=;
+ b=abDYLO2X/l9UQhk2iQcEsAhMvUsv9CY29JVEQb7Pnv+bUZRmfqvcz5qF6BfHIL78VxGcradMU5R5Tjw3oRcNICf7Tu86AI0K/N45DX80D4ZDY+JlIgxkBWzcAzF6xLe5uFjMhTWVe+aSsCHgNvc7wv7QkoOqwUllgHuRhsOKnj0=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=nxp.com;
+Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
+ by VI1PR04MB5022.eurprd04.prod.outlook.com (2603:10a6:803:5f::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.21; Wed, 3 Jun
+ 2020 09:35:43 +0000
+Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
+ ([fe80::4cf0:3c9c:ed2:aacd]) by VI1PR04MB4046.eurprd04.prod.outlook.com
+ ([fe80::4cf0:3c9c:ed2:aacd%4]) with mapi id 15.20.3066.018; Wed, 3 Jun 2020
+ 09:35:43 +0000
+Subject: Re: [PATCH v2] crypto: caam/qi2 - add support for dpseci_reset()
+To:     "Andrei Botila (OSS)" <andrei.botila@oss.nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Sean Wang <sean.wang@kernel.org>,
-        lkml <linux-kernel@vger.kernel.org>,
-        wsd_upstream <wsd_upstream@mediatek.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Crystal Guo =?utf-8?B?KOmDreaZtik=?= <Crystal.Guo@mediatek.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Subject: Re: Security Random Number Generator support
-Message-ID: <20200603093416.GY1551@shell.armlinux.org.uk>
-References: <1591085678-22764-1-git-send-email-neal.liu@mediatek.com>
- <CAMj1kXHjAdk5=-uSh_=S9j5cz42zr3h6t+YYGy+obevuQDp0fg@mail.gmail.com>
- <85dfc0142d3879d50c0ba18bcc71e199@misterjones.org>
- <1591169342.4878.9.camel@mtkswgap22>
- <fcbe37f6f9cbcde24f9c28bc504f1f0e@kernel.org>
+        "David S. Miller" <davem@davemloft.net>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20200603084704.5895-1-andrei.botila@oss.nxp.com>
+From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
+Message-ID: <40d8e2e6-a7c9-0132-3139-1a07a2024c18@nxp.com>
+Date:   Wed, 3 Jun 2020 12:35:40 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+In-Reply-To: <20200603084704.5895-1-andrei.botila@oss.nxp.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM0PR03CA0060.eurprd03.prod.outlook.com (2603:10a6:208::37)
+ To VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fcbe37f6f9cbcde24f9c28bc504f1f0e@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.0.129] (84.117.251.185) by AM0PR03CA0060.eurprd03.prod.outlook.com (2603:10a6:208::37) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18 via Frontend Transport; Wed, 3 Jun 2020 09:35:42 +0000
+X-Originating-IP: [84.117.251.185]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 9721aa2b-a382-4517-c771-08d807a17ca3
+X-MS-TrafficTypeDiagnostic: VI1PR04MB5022:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR04MB5022A9576CDF41AA3B15047498880@VI1PR04MB5022.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1051;
+X-Forefront-PRVS: 04238CD941
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: TPcaknMVSKimGv4sRJt2EcN4/abAi2I9S35wNn0IVUvqGLif/y+qH+q6qsbHVf919cpwrMOt+ocDX8fQsmE8iP7ddCfURVDIRWKDDFxGjvQYXnqb4Xj73CpBbpCkHvGzPEv96c3lDp1BAkUy5opZjLjPAmJ5GvQXqd4oP0IR+ZtrLIuwwuxx1n2J/YY0EqPMkR4D86VMD3oQshSWcBNcDFJ0k4y3s0JhRNn4FhcTMudOQcGMPZ9XyGwqYIofJ4ki1IIDxgv1PraXCG+leTmUS1SdbamYvK59Ik2KsvVFRO6naGGKIH+aMPLqaGoO6ZQQSkLcMrxPvtn9PW840a2Cw/sSzYIh193Np4Ja6EQGg6Kd/z0BAME1NCpIlV+wvBz4
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(396003)(366004)(39860400002)(376002)(136003)(54906003)(31696002)(316002)(5660300002)(8676002)(110136005)(2906002)(66556008)(66476007)(6486002)(16576012)(36756003)(86362001)(8936002)(66946007)(956004)(2616005)(4744005)(16526019)(53546011)(31686004)(186003)(4326008)(52116002)(26005)(478600001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: x8ts5ZYYKjrlZ+ruNFe345MqGBdiYbtZdUzM06skMNl1pepG4G3sfZ4pKhrYBVMpaE5m2ezP3NTAc3uXhD0uu8BAKGAdHmSjL/WtOSizueIymycT6/G+hrkZzhifzLWtFLi7XmX+6SlHiQ2iTxP2QjYksm0uWuKXgF1RgucDRXeX7Xsk1Rbs0gN0JrMSrtXle1ktkvZ/6MwbFWiWXSdt8VsurvndIkRn12uLQm505dNr7RCMh6ENdY/fCZy9SqlorYP9ieKB9b4ylsibVlSpQkZXaUZ2S1PYGHb1uLi1yApcA0vyL0VZGeBDOz8aDuBt6IyYQ3ZeEv3Ep3cCCBe/VfWdsrXsKf0Tq8zQEFmR36e3iyrKCKMjV8SMBWO/Ves2FudnI88noMqTHvXE7h+W8aKxzjiHWibyrxLdvAr5WznpOrIoxSIPU1JCm+nK3iKI9AlihYp5fi9SHauui8uLL1UscLEgAQ0Uj77uToL9AExBP60lN3bboJGpn/4x632I
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9721aa2b-a382-4517-c771-08d807a17ca3
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2020 09:35:43.6811
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: E0s7PaujA9HmmANZFRCJGHCkRbahuTW2DAU1J2lWUEEjY32ZU6r0Z5YmRr1N6+MKvKTxUCRsBCV3ZujJJItOWQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB5022
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 03, 2020 at 08:40:58AM +0100, Marc Zyngier wrote:
-> On 2020-06-03 08:29, Neal Liu wrote:
-> > On Tue, 2020-06-02 at 21:02 +0800, Marc Zyngier wrote:
-> > > On 2020-06-02 13:14, Ard Biesheuvel wrote:
-> > > > On Tue, 2 Jun 2020 at 10:15, Neal Liu <neal.liu@mediatek.com> wrote:
-> > > >>
-> > > >> These patch series introduce a security random number generator
-> > > >> which provides a generic interface to get hardware rnd from Secure
-> > > >> state. The Secure state can be Arm Trusted Firmware(ATF), Trusted
-> > > >> Execution Environment(TEE), or even EL2 hypervisor.
-> > > >>
-> > > >> Patch #1..2 adds sec-rng kernel driver for Trustzone based SoCs.
-> > > >> For security awareness SoCs on ARMv8 with TrustZone enabled,
-> > > >> peripherals like entropy sources is not accessible from normal world
-> > > >> (linux) and rather accessible from secure world (HYP/ATF/TEE) only.
-> > > >> This driver aims to provide a generic interface to Arm Trusted
-> > > >> Firmware or Hypervisor rng service.
-> > > >>
-> > > >>
-> > > >> changes since v1:
-> > > >> - rename mt67xx-rng to mtk-sec-rng since all MediaTek ARMv8 SoCs can
-> > > >> reuse
-> > > >>   this driver.
-> > > >>   - refine coding style and unnecessary check.
-> > > >>
-> > > >>   changes since v2:
-> > > >>   - remove unused comments.
-> > > >>   - remove redundant variable.
-> > > >>
-> > > >>   changes since v3:
-> > > >>   - add dt-bindings for MediaTek rng with TrustZone enabled.
-> > > >>   - revise HWRNG SMC call fid.
-> > > >>
-> > > >>   changes since v4:
-> > > >>   - move bindings to the arm/firmware directory.
-> > > >>   - revise driver init flow to check more property.
-> > > >>
-> > > >>   changes since v5:
-> > > >>   - refactor to more generic security rng driver which
-> > > >>     is not platform specific.
-> > > >>
-> > > >> *** BLURB HERE ***
-> > > >>
-> > > >> Neal Liu (2):
-> > > >>   dt-bindings: rng: add bindings for sec-rng
-> > > >>   hwrng: add sec-rng driver
-> > > >>
-> > > >
-> > > > There is no reason to model a SMC call as a driver, and represent it
-> > > > via a DT node like this.
-> > > 
-> > > +1.
-> > > 
-> > > > It would be much better if this SMC interface is made truly generic,
-> > > > and wired into the arch_get_random() interface, which can be used much
-> > > > earlier.
-> > > 
-> > > Wasn't there a plan to standardize a SMC call to rule them all?
-> > > 
-> > >          M.
-> > 
-> > Could you give us a hint how to make this SMC interface more generic in
-> > addition to my approach?
-> > There is no (easy) way to get platform-independent SMC function ID,
-> > which is why we encode it into device tree, and provide a generic
-> > driver. In this way, different devices can be mapped and then get
-> > different function ID internally.
+On 6/3/2020 11:47 AM, Andrei Botila (OSS) wrote:
+> From: Andrei Botila <andrei.botila@nxp.com>
 > 
-> The idea is simply to have *one* single ID that caters for all
-> implementations, just like we did for PSCI at the time. This
-> requires ARM to edict a standard, which is what I was referring
-> to above.
+> Add support for dpseci_reset() command for DPSECI objects.
+> For DPSECI DPAA2 objects with version lower than v5.4 reset command
+> was broken in MC f/w.
+> 
+> Signed-off-by: Andrei Botila <andrei.botila@nxp.com>
+Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
 
-This sounds all too familiar.
-
-This kind of thing is something that ARM have seems to shy away from
-doing - it's a point I brought up many years ago when the whole
-trustzone thing first appeared with its SMC call.  Those around the
-conference table were not interested - ARM seemed to prefer every
-vendor to do off and do their own thing with the SMC interface.
-
-Then OMAP came along with its SMC interfaces, and so did the pain of
-not having a standardised way to configure the L2C when Linux was
-running in the non-secure world, resulting in stuff like l2c_configure
-etc, where each and every implementation has to supply a function to
-call its platform specific SMC interfaces to configure a piece of
-hardware common across many different platforms.
-
-ARM have seemed reluctant to standardise on stuff like this, so
-unless someone pushes hard for it from inside ARM, I doubt it will
-ever happen.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTC for 0.8m (est. 1762m) line in suburbia: sync at 13.1Mbps down 424kbps up
+Thanks,
+Horia
