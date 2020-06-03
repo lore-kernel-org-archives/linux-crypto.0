@@ -2,159 +2,96 @@ Return-Path: <SRS0=RCNv=7Q=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CB4FC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 17:58:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED48C433DF
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 19:54:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E8F282074B
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 17:58:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 005BB2074B
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 19:54:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kw3Ae+Mu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TkN2FzRt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726354AbgFCR6t (ORCPT
+        id S1725939AbgFCTyS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jun 2020 13:58:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60720 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726350AbgFCR6t (ORCPT
+        Wed, 3 Jun 2020 15:54:18 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29510 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725821AbgFCTyS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jun 2020 13:58:49 -0400
-Received: from mail-ua1-x941.google.com (mail-ua1-x941.google.com [IPv6:2607:f8b0:4864:20::941])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F31F2C08C5C0;
-        Wed,  3 Jun 2020 10:58:48 -0700 (PDT)
-Received: by mail-ua1-x941.google.com with SMTP id v25so1152167uau.4;
-        Wed, 03 Jun 2020 10:58:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0pDojOGUS4D4qIyqhe28pfrBON35mgEAOirwpgcuob4=;
-        b=kw3Ae+Mu4UA8lpxW66uIpBN8ZvdPNyR2X5+dMfiVFr/YhceGmTLnWhnlZGRrN5Vx7t
-         sL+zbyC9n4qgD+xh7ONpjMr0/bcVoMk1rY8y4DiWu7k8oJB7YxkTQD5bcRMBkGCR1fXu
-         qKgIp/or/ebA/rj5e8l3aKISIEE1oPIpXGG/kkpJRAC3Ea+y6YmRkq1Mb28zVi2t3B0W
-         bdQtP9bJLyBiotX6j6s81wjZTeo2J5WAnRyZroidCccot56CbW+yFYKj7bP3ah2hAv2E
-         CiDNCFbQBiQdJanyVMJxHlplv8k7gqVpCrmQLIk3YXorxxJzZVQKSMAXF1Fw8/ZsoaBG
-         Z21Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0pDojOGUS4D4qIyqhe28pfrBON35mgEAOirwpgcuob4=;
-        b=oENs0JY2dP1rSVhhxN3Sl3IRz/N/nUum/MKciu5KvbCQ8Wb99U6XDUyQQAo+gXKSaz
-         i+OkMVkwXc1rOcoomEzDMe7kwi34dWIw9jO6lm/6k776EKA9j+2ppfZVTS5svYCnIsrB
-         m6a1MF09aFDzPQ4LDZP5BMA9++SQl8RwvQxQTHG+VN42capUgTCkaRTKi0wfmQLqXvaA
-         XceCzZQYE8Suw7OatRYNjkUKSQ7XzqJKEfYy29sDwy6WEGCJnTMlAb1GLBb8k1VOLTGc
-         y/38wD0Xr+mSfw25SAK8VUHUZGpT2BMS+s9zefyVJD/f6KlvFmOr0JqTGDt2hELeH3Ae
-         gBbQ==
-X-Gm-Message-State: AOAM530kaE+q1UlkJlizpuMvL1Yq/25s8JWU9L2vBdFkDBPsVgVswuPc
-        0DHIhei/Ml/BkIAlA2w+hIabN8w0MC6hgMEWhTcDESFRK4BWhQ==
-X-Google-Smtp-Source: ABdhPJwPHkM/SKJcZo99n4bb9KDNLrGxouCrLqtW1gCGGZPQyppEJ+UMXEIgEuJtSdxjXPPrjRt3B5HSopVe3SQOKYY=
-X-Received: by 2002:ab0:377c:: with SMTP id o28mr877590uat.135.1591207127894;
- Wed, 03 Jun 2020 10:58:47 -0700 (PDT)
+        Wed, 3 Jun 2020 15:54:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591214056;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=UmrhG4IpG9XYrvMtWBeioylGxVeUfvM852WdA4iW0x8=;
+        b=TkN2FzRtGdI6OnJU5KU8Ks+KjTnVUJlEApSLz2exHEJ/zCqCjhD1bZYlUVhp3+I5yL0Tl2
+        SHp9SHsJhWrQHp1J/UH89RHysQdrO87+rB5+gbii/oUYAg+ncm+H/sgJydfrq9b6WMySZU
+        4Ow10eMq4EdUEH5xOBbVe1P9LZxPDXM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-f9A2ahqWOSu050C_7RR1FQ-1; Wed, 03 Jun 2020 15:54:15 -0400
+X-MC-Unique: f9A2ahqWOSu050C_7RR1FQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8ED9107ACCD;
+        Wed,  3 Jun 2020 19:54:13 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A022419C58;
+        Wed,  3 Jun 2020 19:54:10 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 053JsAO2014032;
+        Wed, 3 Jun 2020 15:54:10 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 053Js9Us014024;
+        Wed, 3 Jun 2020 15:54:09 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Wed, 3 Jun 2020 15:54:09 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+cc:     Mike Snitzer <msnitzer@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Milan Broz <mbroz@redhat.com>, djeffery@redhat.com,
+        dm-devel@redhat.com, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, guazhang@redhat.com,
+        jpittman@redhat.com, ahsan.atta@intel.com
+Subject: Re: [PATCH 1/4] qat: fix misunderstood -EBUSY return code
+In-Reply-To: <20200603165526.GA94360@silpixa00400314>
+Message-ID: <alpine.LRH.2.02.2006031553170.9890@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20200601160418.171851200@debian-a64.vm> <20200602220516.GA20880@silpixa00400314> <alpine.LRH.2.02.2006030409520.15292@file01.intranet.prod.int.rdu2.redhat.com> <20200603165526.GA94360@silpixa00400314>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-References: <1591109785-14316-1-git-send-email-pooja.trivedi@stackpath.com> <20200602121947.40c99f51@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-In-Reply-To: <20200602121947.40c99f51@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-From:   Pooja Trivedi <poojatrivedi@gmail.com>
-Date:   Wed, 3 Jun 2020 13:58:37 -0400
-Message-ID: <CAOrEds=4XjgxPKxCk7jhZi7gMzjTLG9CAmWW2eSxA+cAgBxMKA@mail.gmail.com>
-Subject: Re: [RFC PATCH net 1/1] net/tls(TLS_SW): Add selftest for 'chunked'
- sendfile test
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 2, 2020 at 3:19 PM Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Tue,  2 Jun 2020 14:56:25 +0000 Pooja Trivedi wrote:
-> > This selftest tests for cases where sendfile's 'count'
-> > parameter is provided with a size greater than the intended
-> > file size.
-> >
-> > Motivation: When sendfile is provided with 'count' parameter
-> > value that is greater than the size of the file, kTLS example
-> > fails to send the file correctly. Last chunk of the file is
-> > not sent, and the data integrity is compromised.
-> > The reason is that the last chunk has MSG_MORE flag set
-> > because of which it gets added to pending records, but is
-> > not pushed.
-> > Note that if user space were to send SSL_shutdown control
-> > message, pending records would get flushed and the issue
-> > would not happen. So a shutdown control message following
-> > sendfile can mask the issue.
-> >
-> > Signed-off-by: Pooja Trivedi <pooja.trivedi@stackpath.com>
->
-> Looks good, thanks. Did you submit the change to splice officially?
-> We'd need to get an Ack from VFS folks on it (Al Viro, probably?)
-> or even merge it via the vfs tree.
->
 
-No, I did not submit the change to splice yet. I can do that next.
-I wanted to first run this through here and hear thoughts/suggestions.
 
-> Minor nits below.
->
+On Wed, 3 Jun 2020, Giovanni Cabiddu wrote:
 
-Will change and resubmit the selftest. Thanks.
+> > > > +bool adf_should_back_off(struct adf_etr_ring_data *ring)
+> > > > +{
+> > > > +	return atomic_read(ring->inflights) > ADF_MAX_INFLIGHTS(ring->ring_size, ring->msg_size) * 15 / 16;
+> > > How did you came up with 15/16?
+> > 
+> > I want the sender to back off before the queue is full, to avoid 
+> > busy-waiting. There may be more concurrent senders, so we want to back off 
+> > at some point before the queue is full.
+> Yes, I understood this. My question was about the actual number.
+> 93% of the depth of the queue.
 
-> > diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
-> > index 0ea44d9..f0455e6 100644
-> > --- a/tools/testing/selftests/net/tls.c
-> > +++ b/tools/testing/selftests/net/tls.c
-> > @@ -198,6 +198,64 @@
-> >       EXPECT_EQ(recv(self->cfd, buf, st.st_size, MSG_WAITALL), st.st_size);
-> >  }
-> >
-> > +static void chunked_sendfile(struct __test_metadata *_metadata,
-> > +                          struct _test_data_tls *self,
-> > +                          uint16_t chunk_size,
-> > +                          uint16_t extra_payload_size)
-> > +{
-> > +     char buf[TLS_PAYLOAD_MAX_LEN];
-> > +     uint16_t test_payload_size;
-> > +     int size = 0;
-> > +     int ret;
-> > +     char tmpfile[] = ".TMP_ktls";
->
-> Could we place the file in /tmp and use mktemp()? I sometimes run the
-> selftests from a read-only NFS mount, and trying to create a file in
-> current dir breaks that.
->
-> > +     int fd = open(tmpfile, O_RDWR | O_CREAT | O_TRUNC, 0644);
->
-> We can unlink right after we open. The file won't get removed as long
-> as we have a reference to it, and we minimize the risk of leaving it
-> behind.
->
-> > +     off_t offset = 0;
-> > +
-> > +     ASSERT_GE(fd, 0);
-> > +     EXPECT_GE(chunk_size, 1);
-> > +     test_payload_size = chunk_size + extra_payload_size;
-> > +     ASSERT_GE(TLS_PAYLOAD_MAX_LEN, test_payload_size);
-> > +     memset(buf, 1, test_payload_size);
-> > +     size = write(fd, buf, test_payload_size);
-> > +     EXPECT_EQ(size, test_payload_size);
-> > +     fsync(fd);
-> > +
-> > +     while (size > 0) {
-> > +             ret = sendfile(self->fd, fd, &offset, chunk_size);
-> > +             EXPECT_GE(ret, 0);
-> > +             size -= ret;
-> > +     }
-> > +
-> > +     EXPECT_EQ(recv(self->cfd, buf, test_payload_size, MSG_WAITALL),
-> > +               test_payload_size);
-> > +
-> > +     close(fd);
-> > +     unlink(tmpfile);
-> > +}
->
+I just guessed the value. If you have some benchmark, you can try 
+different values, to test if they perform better.
+
+Mikulas
+
