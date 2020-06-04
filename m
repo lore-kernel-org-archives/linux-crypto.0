@@ -2,86 +2,106 @@ Return-Path: <SRS0=fFzG=7R=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42EB0C433DF
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jun 2020 16:15:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4EF8C433DF
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jun 2020 18:54:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 18793207F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jun 2020 16:15:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F371207D5
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jun 2020 18:54:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591287305;
-	bh=T+Ujqj3So5mnSunqooQUIoEERMGQTbg+ImhD7uF3Tg4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=SNkdV7Sd1luxkEkechHVmnzB36ijS0vmSsqfBHfgZWuT5HMw44/+ObiZhwb5a1eEF
-	 CFvEgpgN6z1RR2BGD0nNNej0OZfZ4P3wVStJ95YjviMeP0iVHS/Jpmi3DoKD0xyGN5
-	 ZZbCg4th9AIBxfbRr30BX97B1kdtMyRHMt3nWvaw=
+	s=default; t=1591296884;
+	bh=B0Ytorsu/91zKD3BZ3pYu9U56refImH31xHXCQKGTdk=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=VaL3Nbq9/juwkcdb4LLypY9trBWyF/ya9DBR843TTsimc5jzWXzwQR7lenXcDVeRf
+	 bKRdSxHqjICV6j+XDOIbbjkFG1USbbRnuREtoep3xjlfqCblz9LSTpE688WFfdibal
+	 ptOSK62hgXsGvd1V2E6r7jGN9c1Cniu3fzeN+OEg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729709AbgFDQPE (ORCPT
+        id S1728834AbgFDSyn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Jun 2020 12:15:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43680 "EHLO mail.kernel.org"
+        Thu, 4 Jun 2020 14:54:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54958 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728972AbgFDQPE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Jun 2020 12:15:04 -0400
-Received: from gmail.com (unknown [104.132.1.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1728476AbgFDSyn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 4 Jun 2020 14:54:43 -0400
+Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B6BB620738;
-        Thu,  4 Jun 2020 16:15:03 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 516EC206C3;
+        Thu,  4 Jun 2020 18:54:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591287303;
-        bh=T+Ujqj3So5mnSunqooQUIoEERMGQTbg+ImhD7uF3Tg4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dzPBNqcBRsQT1H2CPJvGzMO8Lpdy0HNS5Xil/NnTj1VW5Ep5Wf7N7ZIjDLMPMdoW/
-         06zNrNT1jHwjKuIjvLQ4YHumz1O6zQVGpFUv3Dv3iap/FErmLci+2pCad8KO9TnovT
-         S5HlaAv1f4u5LKVBXppt8Cv9qOHwt2JtYvxq1frA=
-Date:   Thu, 4 Jun 2020 09:15:02 -0700
+        s=default; t=1591296883;
+        bh=B0Ytorsu/91zKD3BZ3pYu9U56refImH31xHXCQKGTdk=;
+        h=From:To:Cc:Subject:Date:From;
+        b=f9E269jUvQiQv5VrfRptpd2wpoHnvNTSQn4Km2pa3NPWH6MgMEHVHjrmNEuVAWBfD
+         93TWp2dE9z1NWeg20cR6gtebfJJDQER6GKIidH7vkLZilfTyCvADKn6HI4AEUUf6AK
+         AaCnX/DVNeqUHiTBascLUF1dCUH+oBoY8RmpM4IQ=
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Corentin Labbe <clabbe@baylibre.com>
-Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/3] crypto: CRYPTO_CTR no longer need CRYPTO_SEQIV
-Message-ID: <20200604161502.GA147774@gmail.com>
-References: <1587735647-17718-1-git-send-email-clabbe@baylibre.com>
- <1587735647-17718-3-git-send-email-clabbe@baylibre.com>
+To:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     stable@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Mike Gerow <gerow@google.com>
+Subject: [PATCH] crypto: algboss - don't wait during notifier callback
+Date:   Thu,  4 Jun 2020 11:52:53 -0700
+Message-Id: <20200604185253.5119-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.27.0.rc2.251.g90737beb825-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1587735647-17718-3-git-send-email-clabbe@baylibre.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 24, 2020 at 01:40:46PM +0000, Corentin Labbe wrote:
-> As comment of the v2, Herbert said: "The SEQIV select from CTR is historical
-> and no longer necessary."
-> 
-> So let's get rid of it.
-> 
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> ---
->  crypto/Kconfig | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 6d27fc6a7bf5..a5936e967fe2 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -370,7 +370,6 @@ config CRYPTO_CFB
->  config CRYPTO_CTR
->  	tristate "CTR support"
->  	select CRYPTO_SKCIPHER
-> -	select CRYPTO_SEQIV
->  	select CRYPTO_MANAGER
->  	help
->  	  CTR: Counter mode
+From: Eric Biggers <ebiggers@google.com>
 
-Shouldn't this patch also have added 'select CRYPTO_SEQIV' to INET_ESP and
-INET6_ESP?  Or is the intent to make people explicitly select CRYPTO_SEQIV?
+When a crypto template needs to be instantiated, CRYPTO_MSG_ALG_REQUEST
+is sent to crypto_chain.  cryptomgr_schedule_probe() handles this by
+starting a thread to instantiate the template, then waiting for this
+thread to complete via crypto_larval::completion.
 
-- Eric
+This can deadlock because instantiating the template may require loading
+modules, and this (apparently depending on userspace) may need to wait
+for the crc-t10dif module (lib/crc-t10dif.c) to be loaded.  But
+crc-t10dif's module_init function uses crypto_register_notifier() and
+therefore takes crypto_chain.rwsem for write.  That can't proceed until
+the notifier callback has finished, as it holds this semaphore for read.
+
+Fix this by removing the wait on crypto_larval::completion from within
+cryptomgr_schedule_probe().  It's actually unnecessary because
+crypto_alg_mod_lookup() calls crypto_larval_wait() itself after sending
+CRYPTO_MSG_ALG_REQUEST.
+
+This only actually became a problem in v4.20 due to commit b76377543b73
+("crc-t10dif: Pick better transform if one becomes available"), but the
+unnecessary wait was much older.
+
+BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=207159
+Reported-by: Mike Gerow <gerow@google.com>
+Fixes: 398710379f51 ("crypto: algapi - Move larval completion into algboss")
+Cc: <stable@vger.kernel.org> # v3.6+
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/algboss.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/crypto/algboss.c b/crypto/algboss.c
+index 535f1f87e6c1..5ebccbd6b74e 100644
+--- a/crypto/algboss.c
++++ b/crypto/algboss.c
+@@ -178,8 +178,6 @@ static int cryptomgr_schedule_probe(struct crypto_larval *larval)
+ 	if (IS_ERR(thread))
+ 		goto err_put_larval;
+ 
+-	wait_for_completion_interruptible(&larval->completion);
+-
+ 	return NOTIFY_STOP;
+ 
+ err_put_larval:
+-- 
+2.27.0.rc2.251.g90737beb825-goog
+
