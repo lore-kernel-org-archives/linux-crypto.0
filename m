@@ -1,97 +1,99 @@
-Return-Path: <SRS0=RCNv=7Q=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=fFzG=7R=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED48C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 19:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A51E5C433DF
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jun 2020 02:41:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 005BB2074B
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jun 2020 19:54:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A07620657
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jun 2020 02:41:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TkN2FzRt"
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="ZoGIw5n1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725939AbgFCTyS (ORCPT
+        id S1726328AbgFDClF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jun 2020 15:54:18 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29510 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725821AbgFCTyS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jun 2020 15:54:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591214056;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UmrhG4IpG9XYrvMtWBeioylGxVeUfvM852WdA4iW0x8=;
-        b=TkN2FzRtGdI6OnJU5KU8Ks+KjTnVUJlEApSLz2exHEJ/zCqCjhD1bZYlUVhp3+I5yL0Tl2
-        SHp9SHsJhWrQHp1J/UH89RHysQdrO87+rB5+gbii/oUYAg+ncm+H/sgJydfrq9b6WMySZU
-        4Ow10eMq4EdUEH5xOBbVe1P9LZxPDXM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-f9A2ahqWOSu050C_7RR1FQ-1; Wed, 03 Jun 2020 15:54:15 -0400
-X-MC-Unique: f9A2ahqWOSu050C_7RR1FQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8ED9107ACCD;
-        Wed,  3 Jun 2020 19:54:13 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A022419C58;
-        Wed,  3 Jun 2020 19:54:10 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 053JsAO2014032;
-        Wed, 3 Jun 2020 15:54:10 -0400
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 053Js9Us014024;
-        Wed, 3 Jun 2020 15:54:09 -0400
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Wed, 3 Jun 2020 15:54:09 -0400 (EDT)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-cc:     Mike Snitzer <msnitzer@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Milan Broz <mbroz@redhat.com>, djeffery@redhat.com,
-        dm-devel@redhat.com, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, guazhang@redhat.com,
-        jpittman@redhat.com, ahsan.atta@intel.com
-Subject: Re: [PATCH 1/4] qat: fix misunderstood -EBUSY return code
-In-Reply-To: <20200603165526.GA94360@silpixa00400314>
-Message-ID: <alpine.LRH.2.02.2006031553170.9890@file01.intranet.prod.int.rdu2.redhat.com>
-References: <20200601160418.171851200@debian-a64.vm> <20200602220516.GA20880@silpixa00400314> <alpine.LRH.2.02.2006030409520.15292@file01.intranet.prod.int.rdu2.redhat.com> <20200603165526.GA94360@silpixa00400314>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        Wed, 3 Jun 2020 22:41:05 -0400
+Received: from mout.gmx.net ([212.227.17.20]:59599 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726047AbgFDClF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 Jun 2020 22:41:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1591238420;
+        bh=rBeNnWCkETjnvDe3kdb6C2KAvfLQEEfKNU9wifTgN0k=;
+        h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
+        b=ZoGIw5n1NnxzuVY9OEPuIxnqoKo2Oq3xIwtsoprjWAwJDw38Q0zSBAg9aNtoYHwoC
+         M/9PsarM1tnVyr4QGfUWkjV3P/czxC0SI5jrWVUyI8UaKXyu5G9DQRWr7vY90QK0vJ
+         GZUgPGlcxsFo2fczRnyuzCBVGpzotFtUXZl05rLE=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from LT02.fritz.box ([88.152.145.75]) by mail.gmx.com (mrgmx104
+ [212.227.17.174]) with ESMTPSA (Nemesis) id 1MWzjt-1jRUL72wZd-00XKM4; Thu, 04
+ Jun 2020 04:40:20 +0200
+From:   Heinrich Schuchardt <xypron.glpk@gmx.de>
+To:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Heinrich Schuchardt <xypron.glpk@gmx.de>
+Subject: [PATCH 1/1] crypto: caam - fix typo
+Date:   Thu,  4 Jun 2020 04:40:13 +0200
+Message-Id: <20200604024013.5669-1-xypron.glpk@gmx.de>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:Jv9qzEZHPwAEEDZp5lJdXCBS3tYyk3aBIbv2/Enk6Bx3K0gG1Co
+ QOEs6nj/Msh7f7SSIY0VYdyanyHWF8iQTGzFrTsl0pVD4nxwNuDesFgqTNcdGd8vrGxqJWr
+ f0YIj/EuWgC3mSRRsg7ogmjgaT7wc75WXu8AR4r/eMtY1qrJ17rqiXtSFkAZbU/vGJbHz4M
+ XOa01NXQ8HtkEIH4KXDiQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:0Tw0YKok6IY=:pnp0uOOJgLNhUNhzFHp/bX
+ GBZqcUdrURimf8IGTnMcdlRSci3lPvUEfhdlYe4chHNhRnUROAnxMMS3NShgfYXBgHA7lPX2Y
+ n9Q9tk0s9KasV5q6uOTsNGBYXRUgtT7f4LLwTAzccZyaY6WgkqDOgPcMCLsQ8UOc9LDI9LImn
+ p61Yl/r1tbK5uLCPJm3JQxonLNh3NlyqmAn6y9MwBM1SV4wVzDAS7rd+HHWaulfuUEKC3KL1X
+ kI8Nx8AbH9t+/hOaFHd3Pb4QL6+yTbeVAcbApPhp4zAK52SEA7iMYLDC3bc+zNSS6/y2sMd/s
+ 35W2WIEMuJ9B1zSVpyMpaZXfecWZ3VE3keoKpYsYF3diwtBbREaKhvbECYIY4Hl769FhOjh/0
+ AjeEgFhHUU5yxRPsUVjJBhwxjl//kDR1Uy1wvuBxqspZQifbcFqpENlrKwAoZtWLsQ+ctrSvV
+ 9yLzlDP7H29LZd7RwFyGhJc/ZPmxM20k4H26jyZmcPHFp60w4/zFTlcUOFYWcYQbbknslgSfI
+ Yj02Qksvmm6tMf5ggfvU1S7O1e3BeP/pUSeUFTM5oRsUQjDUARID0A9QDfuL9ZGfwd/4l5KUc
+ 8m50sADD2OAMEGS+AC/Lqv2k1OtBsK8QCGNC7slPUGJfVFGL8BaGhqle+nC4U+B69pou14BZ8
+ PILVRFg/IxFsqVe4x2Fzy35h/ONKskYtXHuWLbpSHLguWJk+TaVIVPAM9MgogHZ+q6NoU3SOd
+ /zK3VwobtVe/pg3JkUq4iDwDky9RwfCVN06zMl/vmqRcwY9y5mw/bIDc5GKC3bTHfahKKeZUm
+ 6qHMt4ZMW4GJYM+9NMldL/FX/Rll1hUfb9q4JMHWW1f0a831m2HH0SnkX6KL/MI+Avs6l25td
+ YfbceVw+iCQMRajDRV4NmO1+kE0b3deCsK96U4Pk8ocRryg1oHJHiEpWD8ZrVwtt7jG7NVVfY
+ cUrwJ8aObM4xpIDEL+WAOmHtLiscj+KrBXmkCGGmwsaY2DJVcvWj8jX8h9uMqGE6T/5e2S10Z
+ 02wT6TFXv91NGFVHJjrv8fe0gd44HGtIg2meGRTcS5EwYys72Zgikd3L4QlViiBWST3Wo2bLW
+ QmaEaw94vDmop78a/VI9ez3cz1kx0asmz4hjcdsaOZ2DmMa5sTLuHQeXhhzTaXHF855Zg2bkV
+ sn5z2pH6wU00Pt4zUWoCUryf8XJrx55e+GUwkhhglO12IanO+OoqysD6D4SNa+97U1oBFO8xw
+ j0kC6Y4gyqlhW0kt/
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+%s/suppying/supplying/
 
+Signed-off-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
+=2D--
+ drivers/crypto/caam/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Wed, 3 Jun 2020, Giovanni Cabiddu wrote:
+diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+index a62f228be6da..bc35aa0ec07a 100644
+=2D-- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@ -147,7 +147,7 @@ config CRYPTO_DEV_FSL_CAAM_RNG_API
+ 	select HW_RANDOM
+ 	help
+ 	  Selecting this will register the SEC4 hardware rng to
+-	  the hw_random API for suppying the kernel entropy pool.
++	  the hw_random API for supplying the kernel entropy pool.
 
-> > > > +bool adf_should_back_off(struct adf_etr_ring_data *ring)
-> > > > +{
-> > > > +	return atomic_read(ring->inflights) > ADF_MAX_INFLIGHTS(ring->ring_size, ring->msg_size) * 15 / 16;
-> > > How did you came up with 15/16?
-> > 
-> > I want the sender to back off before the queue is full, to avoid 
-> > busy-waiting. There may be more concurrent senders, so we want to back off 
-> > at some point before the queue is full.
-> Yes, I understood this. My question was about the actual number.
-> 93% of the depth of the queue.
+ endif # CRYPTO_DEV_FSL_CAAM_JR
 
-I just guessed the value. If you have some benchmark, you can try 
-different values, to test if they perform better.
-
-Mikulas
+=2D-
+2.26.2
 
