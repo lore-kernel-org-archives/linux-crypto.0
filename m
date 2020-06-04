@@ -2,92 +2,119 @@ Return-Path: <SRS0=fFzG=7R=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BE90C433DF
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jun 2020 06:41:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58ADAC433DF
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jun 2020 06:44:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10C5A2074B
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jun 2020 06:41:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D8F8207DA
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jun 2020 06:44:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="KSJTEb/j"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gzRnbTkc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726364AbgFDGlK (ORCPT
+        id S1727103AbgFDGo2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Jun 2020 02:41:10 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.166]:9753 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726248AbgFDGlJ (ORCPT
+        Thu, 4 Jun 2020 02:44:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37730 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726979AbgFDGo2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Jun 2020 02:41:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1591252868;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=K/GYyFc9Tr1igeXlrtoAg6gyVmr7G7JxC+U8Lyl2kEc=;
-        b=KSJTEb/jDA+RR6z21ugaEMSAUMf5KUrY9Nh9gKfxlYrWC20dMUECM1VplbZg9qJJs4
-        tN0FHbfvenXWGFDEoaj/hIA5nqjHg3rvz6Jg02kRSkWOIyZA25knNq8gL3Jbr642wmP+
-        MFAIlwiFsRnI2d8bQGx3JpJdcD0VV25NvvII2dCMiPxvvVgejzWHNBbMbBfZ7fJMU/A8
-        T+s+LkCUY7ac8PBQhmr9FkjiVXoYdhOZRUppBYFURT4WhXMQ+H8ixKpiZlV4WJPl7qFI
-        jKqDLsVR6itooRPcVQAqmguW87RLpbOMpO++iWIhgnfOcV4dAENlCcfswnvF508h9It1
-        Ly9w==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXvdOeueZtw="
-X-RZG-CLASS-ID: mo00
-Received: from positron.chronox.de
-        by smtp.strato.de (RZmta 46.9.1 DYNA|AUTH)
-        with ESMTPSA id I05374w546f15S3
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Thu, 4 Jun 2020 08:41:01 +0200 (CEST)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        syzbot <syzbot+2e635807decef724a1fa@syzkaller.appspotmail.com>
-Subject: [PATCH v2] crypto: DRBG - always try to free Jitter RNG instance
-Date:   Thu, 04 Jun 2020 08:41:00 +0200
-Message-ID: <2551009.mvXUDI8C0e@positron.chronox.de>
-In-Reply-To: <20200603110919.GK30374@kadam>
-References: <0000000000002a280b05a725cd93@google.com> <2583872.mvXUDI8C0e@positron.chronox.de> <20200603110919.GK30374@kadam>
+        Thu, 4 Jun 2020 02:44:28 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22F34C03E96D
+        for <linux-crypto@vger.kernel.org>; Wed,  3 Jun 2020 23:44:28 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id e9so3013223pgo.9
+        for <linux-crypto@vger.kernel.org>; Wed, 03 Jun 2020 23:44:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=lQVlXH+uj/MULxrEGj2byT6IBDKh5uPIe65HnVp2khs=;
+        b=gzRnbTkcAnqvYEoVW9YseGY+0u1VoTMW/IO49nxbU4/b5h6mTCySH8tG+xs+BPJv/6
+         KRDGlwtV9Ah7167fzuEQ8xp4anjyd5TQkJJ69SvgbXyirs97ICE1UiVX3L19uqWuQjAP
+         3sot+5jrOtfXbLnpKCD/twibMkrA8D4z22h6fVm1qdzWoymfGSQkMemFvoN8iU3SWC3J
+         10VJ1+++UoYEjyFX96NS4Co2pCuWJ/3yrjzugj9djTKFrXCDsNYr3XinRwGWguYuoCwg
+         fyPAolJ41+4q6j+lvVYWBlvSj23VuYFXKER+6olegZJTTXe1Cl3lXoVoe6USONUNZocH
+         Fz9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=lQVlXH+uj/MULxrEGj2byT6IBDKh5uPIe65HnVp2khs=;
+        b=jfSZTFZh3Rqcm/Mjb6wNiVpu8rb9JDCmbw7QLK2UsW+JkmBefjECQQ7WkogzoABycn
+         9O+e+kuo8N3L0F+WieigEk5x2UtbRrwu7uuCZeAiooHF6plYYeojnlhqt4S0+SC/5PwY
+         OkLlFjFbj7a5UMk7uDrWEZayo5etp6BO+lVG6xPkjuQYPOksQejydtFou2GkAMoy9Gf6
+         bjEsHOHUNDZBcE8fakfdJ2mesfHhj6FpvjkiOCgi5EqbrmMF6lAWJjKh/lsqHym8tqjl
+         WEF+oILiAikPRv8sCzU0kTKHofDnXDwDgi9lvIHhFSQQBPPI80TizfLV6Ou6DmZfTX9Q
+         am1A==
+X-Gm-Message-State: AOAM533g7Ijrt9Fz4e03bvdfRkkVKUB/7yEsD2JlNCtBxgs8S1XSM1Tz
+        Lj3C3oZdpPMbs+oHy1Q/he1lQg==
+X-Google-Smtp-Source: ABdhPJyTNTnMWGua4MqL8tx6aHu8UCUxEO5kUDj97h0sJ9J229Uu3bn79HTRPASqqjCM+e2BTW3S9Q==
+X-Received: by 2002:a63:ad43:: with SMTP id y3mr2934343pgo.435.1591253067552;
+        Wed, 03 Jun 2020 23:44:27 -0700 (PDT)
+Received: from [10.15.1.238] ([45.135.186.21])
+        by smtp.gmail.com with ESMTPSA id b140sm3461949pfb.119.2020.06.03.23.44.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Jun 2020 23:44:27 -0700 (PDT)
+Subject: Re: [PATCH] crypto: hisilicon - fix strncpy warning with strlcpy
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        wangzhou1 <wangzhou1@hisilicon.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        kbuild-all@lists.01.org
+References: <202006032110.BEbKqovX%lkp@intel.com>
+ <1591241524-6452-1-git-send-email-zhangfei.gao@linaro.org>
+ <20200604033918.GA2286@gondor.apana.org.au>
+ <b6ad8af2-1cb7-faac-0446-5e09e97f3616@linaro.org>
+ <20200604061811.GA28759@gondor.apana.org.au>
+From:   Zhangfei Gao <zhangfei.gao@linaro.org>
+Message-ID: <b23433f8-d95d-8142-c830-fb92e5ccd4a1@linaro.org>
+Date:   Thu, 4 Jun 2020 14:44:16 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20200604061811.GA28759@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Jitter RNG is unconditionally allocated as a seed source follwoing
-the patch 97f2650e5040. Thus, the instance must always be deallocated.
-
-Reported-by: syzbot+2e635807decef724a1fa@syzkaller.appspotmail.com
-Fixes: 97f2650e5040 ("crypto: drbg - always seeded with SP800-90B ...")
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 37526eb8c5d5..8a0f16950144 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1631,6 +1631,9 @@ static int drbg_uninstantiate(struct drbg_state *drbg)
- 	if (drbg->random_ready.func) {
- 		del_random_ready_callback(&drbg->random_ready);
- 		cancel_work_sync(&drbg->seed_work);
-+	}
-+
-+	if (!IS_ERR_OR_NULL(drbg->jent)) {
- 		crypto_free_rng(drbg->jent);
- 		drbg->jent = NULL;
- 	}
--- 
-2.26.2
 
 
+On 2020/6/4 下午2:18, Herbert Xu wrote:
+> On Thu, Jun 04, 2020 at 02:10:37PM +0800, Zhangfei Gao wrote:
+>>> Should this even allow truncation? Perhaps it'd be better to fail
+>>> in case of an overrun?
+>> I think we do not need consider overrun, since it at most copy size-1 bytes
+>> to dest.
+>>  From the manual: strlcpy()
+>>         This  function  is  similar  to  strncpy(), but it copies at most
+>> size-1 bytes to dest, always adds a terminating null
+>>         byte,
+>> And simple tested with smaller SIZE of interface.name,  only SIZE-1 is
+>> copied, so it is safe.
+>> -#define UACCE_MAX_NAME_SIZE    64
+>> +#define UACCE_MAX_NAME_SIZE    4
+> That's not what I meant.  As it is if you do exceed the limit the
+> name is silently truncated.  Wouldn't it be better to fail the
+> allocation instead?
+I think it is fine.
+1. Currently the name size is 64, bigger enough.
+Simply grep in driver name, 64 should be enough.
+We can make it larger when there is a request.
+2. it does not matter what the name is, since it is just an interface.
+cat /sys/class/uacce/hisi_zip-0/flags
+cat /sys/class/uacce/his-0/flags
+should be both fine to app only they can be distinguished.
+3. It maybe a hard restriction to fail just because of a long name.
 
+What do you think.
 
+Thanks
