@@ -2,77 +2,98 @@ Return-Path: <SRS0=mFw2=7S=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 709AEC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 12:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CC2FC433E0
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 14:10:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5588A2065C
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 12:38:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18E74207D3
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 14:10:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1591366247;
+	bh=ReGIH2zYPtO8crdB0oJZXCtgGvHx/19cWKRmBr7MlhI=;
+	h=Date:From:To:To:To:CC:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Subject:In-Reply-To:
+	 List-ID:From;
+	b=RRDdO5YzvO7Dd+gzBVZVy06XtbkbBcFAK4BIE/75GICNfnL898pZKeKBaubQ4MhxP
+	 5/WSQNATgFi/SdyhUlTH9+/mieCRwNZFjWlR7iHX5GZsy/ZT/jbYOrCQ8Q561XvjaL
+	 aycswuYB8NHP4yx6anOkPqRW0tn+9HdhcvPAdKKo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726670AbgFEMid (ORCPT
+        id S1727826AbgFEOKq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Jun 2020 08:38:33 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:42256 "EHLO fornost.hmeau.com"
+        Fri, 5 Jun 2020 10:10:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41572 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726409AbgFEMid (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Jun 2020 08:38:33 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jhBc2-0006N7-UN; Fri, 05 Jun 2020 22:38:20 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 05 Jun 2020 22:38:18 +1000
-Date:   Fri, 5 Jun 2020 22:38:18 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     syzbot <syzbot+afb77bdbaca0cda9e991@syzkaller.appspotmail.com>
-Cc:     ardb@kernel.org, davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        t-kristo@ti.com
-Subject: Re: WARNING: refcount bug in crypto_mod_get
-Message-ID: <20200605123818.GA3984@gondor.apana.org.au>
-References: <00000000000004f67705a4992160@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00000000000004f67705a4992160@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1726553AbgFEOKq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 5 Jun 2020 10:10:46 -0400
+Received: from localhost (unknown [137.135.114.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 821A820663;
+        Fri,  5 Jun 2020 14:10:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1591366245;
+        bh=ReGIH2zYPtO8crdB0oJZXCtgGvHx/19cWKRmBr7MlhI=;
+        h=Date:From:To:To:To:CC:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Subject:In-Reply-To:
+         From;
+        b=Nr1x7lkCDywl07nr+6dZ/n0OvTcqnHhL6bKCKqu+6+JKy5ExE2PxQ9Pnb03LwyoFU
+         dz0OpUI8mHPEZjyQcn14AxRJ+q8Duuuy0MFGteZu3Ehn/AEwvVuUFZnXBO1Fq0xLnF
+         rP5bePwiX2Nj1G2Usa0ZvXIgPfJJllL/hz0xxSuw=
+Date:   Fri, 05 Jun 2020 14:10:44 +0000
+From:   Sasha Levin <sashal@kernel.org>
+To:     Sasha Levin <sashal@kernel.org>
+To:     "Longpeng(Mike)" <longpeng2@huawei.com>
+To:     <linux-crypto@vger.kernel.org>
+CC:     "Longpeng(Mike)" <longpeng2@huawei.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>
+Cc:     "David S. Miller" <davem@davemloft.net>
+Cc:     virtualization@lists.linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org
+Cc:     stable@vger.kernel.org
+Cc:     stable@vger.kernel.org
+Subject: Re: [PATCH v3 1/3] crypto: virtio: Fix src/dst scatterlist calculation in __virtio_crypto_skcipher_do_req()
+In-Reply-To: <20200602070501.2023-2-longpeng2@huawei.com>
+Message-Id: <20200605141045.821A820663@mail.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 01, 2020 at 10:01:14AM -0700, syzbot wrote:
->
-> ------------[ cut here ]------------
-> refcount_t: addition on 0; use-after-free.
-...
->  refcount_add include/linux/refcount.h:204 [inline]
->  refcount_inc include/linux/refcount.h:241 [inline]
->  crypto_alg_get crypto/internal.h:87 [inline]
->  crypto_mod_get+0xc6/0xf0 crypto/api.c:37
->  crypto_spawn_alg.isra.0+0xa8/0x110 crypto/algapi.c:723
->  crypto_spawn_tfm2+0x19/0xb0 crypto/algapi.c:763
->  crypto_spawn_aead include/crypto/internal/aead.h:102 [inline]
->  pcrypt_aead_init_tfm+0x144/0x273 crypto/pcrypt.c:182
->  crypto_aead_init_tfm+0x138/0x1a0 crypto/aead.c:140
->  crypto_create_tfm+0xd5/0x2f0 crypto/api.c:454
->  crypto_alloc_tfm+0x100/0x340 crypto/api.c:526
->  aead_bind+0x69/0x170 crypto/algif_aead.c:483
->  alg_bind+0x260/0x530 crypto/af_alg.c:182
->  __sys_bind+0x20e/0x250 net/socket.c:1662
->  __do_sys_bind net/socket.c:1673 [inline]
->  __se_sys_bind net/socket.c:1671 [inline]
->  __x64_sys_bind+0x6f/0xb0 net/socket.c:1671
->  do_syscall_64+0xf6/0x7d0 arch/x86/entry/common.c:295
->  entry_SYSCALL_64_after_hwframe+0x49/0xb3
+<20200123101000.GB24255@Red>
+References: <20200602070501.2023-2-longpeng2@huawei.com>
+<20200123101000.GB24255@Red>
 
-This should be fixed already:
+Hi
 
-#syz fix: crypto: api - Fix use-after-free and race in crypto_spawn_alg
+[This is an automated email]
 
-Cheers,
+This commit has been processed because it contains a "Fixes:" tag
+fixing commit: dbaf0624ffa5 ("crypto: add virtio-crypto driver").
+
+The bot has tested the following trees: v5.6.15, v5.4.43, v4.19.125, v4.14.182.
+
+v5.6.15: Build OK!
+v5.4.43: Failed to apply! Possible dependencies:
+    eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
+
+v4.19.125: Failed to apply! Possible dependencies:
+    eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
+
+v4.14.182: Failed to apply! Possible dependencies:
+    500e6807ce93 ("crypto: virtio - implement missing support for output IVs")
+    67189375bb3a ("crypto: virtio - convert to new crypto engine API")
+    d0d859bb87ac ("crypto: virtio - Register an algo only if it's supported")
+    e02b8b43f55a ("crypto: virtio - pr_err() strings should end with newlines")
+    eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
+
+
+NOTE: The patch will not be queued to stable trees until it is upstream.
+
+How should we proceed with this patch?
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks
+Sasha
