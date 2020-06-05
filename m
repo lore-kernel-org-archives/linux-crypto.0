@@ -2,135 +2,117 @@ Return-Path: <SRS0=mFw2=7S=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F4B3C433DF
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 09:27:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F5DAC433E0
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 09:34:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 472ED207D8
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 09:27:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D835C20772
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 09:34:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GWG19R4t"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tncq0J7a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726213AbgFEJ1n (ORCPT
+        id S1726271AbgFEJeo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Jun 2020 05:27:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59548 "EHLO
+        Fri, 5 Jun 2020 05:34:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726177AbgFEJ1n (ORCPT
+        with ESMTP id S1726188AbgFEJen (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Jun 2020 05:27:43 -0400
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:3201:214:fdff:fe10:1be6])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D89EC08C5C2;
-        Fri,  5 Jun 2020 02:27:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=JD+f68C2xsdIda1o1WPqknMCkMS5OJ8axT7mWVbzTRo=; b=GWG19R4tIHcgtyxteX9uf10fE
-        Z7WE2epE/MSItPTXR+xqspTQxH6YYeuyf77a9K8BzhLG1DnAAZcNcrtSQjXOoXrxOnxcz1mjFw40K
-        nSHrepHcaoQaIO8hUwaFq3LV7fOPwfekVShU8hky0XpzRdL4JR35CYeaVsIeRIxQh+OhQOmzBtgjj
-        JXUyZR1FY1SjUc+B5VpL5f96FdupwBcPTPSGW97+WWiTO0OD/KYX25FWsC82Jpmaj51svWJyJgK4h
-        uRsnY2W0Pyr8ypDvkUme5dMS8gpKoiSGoAFv9PNjSB/7k1PvVIpQZZAh/eMLnMzcPbsvhP+Ah7akZ
-        mbIqw9Ujw==;
-Received: from shell.armlinux.org.uk ([2001:4d48:ad52:3201:5054:ff:fe00:4ec]:49630)
-        by pandora.armlinux.org.uk with esmtpsa (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
-        (Exim 4.90_1)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1jh8dR-0001kC-TS; Fri, 05 Jun 2020 10:27:34 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.92)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1jh8dC-0007LF-Q0; Fri, 05 Jun 2020 10:27:18 +0100
-Date:   Fri, 5 Jun 2020 10:27:18 +0100
-From:   Russell King - ARM Linux admin <linux@armlinux.org.uk>
-To:     Neal Liu <neal.liu@mediatek.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>, Julius Werner <jwerner@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Sean Wang <sean.wang@kernel.org>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        lkml <linux-kernel@vger.kernel.org>,
-        wsd_upstream <wsd_upstream@mediatek.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Crystal Guo =?utf-8?B?KOmDreaZtik=?= <Crystal.Guo@mediatek.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Subject: Re: Security Random Number Generator support
-Message-ID: <20200605092718.GH1551@shell.armlinux.org.uk>
-References: <1591085678-22764-1-git-send-email-neal.liu@mediatek.com>
- <CAMj1kXHjAdk5=-uSh_=S9j5cz42zr3h6t+YYGy+obevuQDp0fg@mail.gmail.com>
- <85dfc0142d3879d50c0ba18bcc71e199@misterjones.org>
- <1591169342.4878.9.camel@mtkswgap22>
- <fcbe37f6f9cbcde24f9c28bc504f1f0e@kernel.org>
- <20200603093416.GY1551@shell.armlinux.org.uk>
- <1591341543.19510.4.camel@mtkswgap22>
- <20200605080905.GF1551@shell.armlinux.org.uk>
- <1591347582.21704.9.camel@mtkswgap22>
+        Fri, 5 Jun 2020 05:34:43 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBA77C08C5C2
+        for <linux-crypto@vger.kernel.org>; Fri,  5 Jun 2020 02:34:43 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id t7so3426609plr.0
+        for <linux-crypto@vger.kernel.org>; Fri, 05 Jun 2020 02:34:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=mFjpcHRNvW7jr5yAUPBmHqqZtDxdLZ2YVWSiOFI3u8k=;
+        b=tncq0J7af5auIOZilp/gB2dX3myfDONuE4xiyxtAkUZfzWxzWE+sbyTZDC5D7d7q1s
+         TkuwIFyUml77QCNoYqfDaFlrLk4gm0MIkSzkxvKksshrFIGhPlZcK+uGgVjf3YNrNvBs
+         /IdlmAr/bS9iHgPDFNQlITywQ92gob/YoVUdOMQlJvcnyH11gGeAMOvNXa0qTEO/CaSx
+         OQtFtESL2j/vqrX/mjW//eGGEEP3N8chrtrzWPlI5nbjHRbkIdx0dsxMvFWpYiBdr1VF
+         zPkTDDMmdYCw+TV8jrKyb/phZbJP1e9hp00ouOrbi+pEhIj2oQHt22pf818Fbj+1nKPt
+         b+Jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=mFjpcHRNvW7jr5yAUPBmHqqZtDxdLZ2YVWSiOFI3u8k=;
+        b=Flwq7qq5yybh9FQ21P38kQEasbq4/zu4lkCYQr3sIO99jO/UkOjE1WdCUsPFumwQsK
+         +B3J7WnG3q3oyx95k7bdetj4iQoI/MY7kh0bupYYaz4bA3izTIg0o1sGuS5faMS8kfE5
+         nK76kCl5KwDIYcXQn16iEO01J5bVS+dXsboZ5/M8TF4NQ6JJ3Jhq9qL2ruamOc8Olqx1
+         nxXe+kDT0IfTwBXRbxtAgKa5aUK98PB4iSbOhqKyxPsQvVxn+pAFcvsC3lqOtdieBMiE
+         8VT1g3aucZdryvpXQwlQi79vq9A1y9Dw9TFbMhb6KBSEazwrR0ik8HOhblH7Y8jBx6oz
+         NDVw==
+X-Gm-Message-State: AOAM533HqxEYpgrH4G3gqJmpNUjsWp9EkLkMPQpNjwMjqvLu7hqKlSNy
+        tpcUDxvOsFhi2lYMGAb/hA2Nzg==
+X-Google-Smtp-Source: ABdhPJz8GwlVCdFrI51lZNlGaMBY6pEeiVPhUYmfkc4rG2hWpbWaKWSGzMrmCUboCFdUXzYyYX6W0Q==
+X-Received: by 2002:a17:902:bd09:: with SMTP id p9mr9263783pls.214.1591349683331;
+        Fri, 05 Jun 2020 02:34:43 -0700 (PDT)
+Received: from [10.110.1.98] ([45.135.186.59])
+        by smtp.gmail.com with ESMTPSA id j8sm7453067pjw.11.2020.06.05.02.34.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Jun 2020 02:34:42 -0700 (PDT)
+Subject: Re: [PATCH] crypto: hisilicon - fix strncpy warning with strlcpy
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        wangzhou1 <wangzhou1@hisilicon.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        kbuild-all@lists.01.org
+References: <202006032110.BEbKqovX%lkp@intel.com>
+ <1591241524-6452-1-git-send-email-zhangfei.gao@linaro.org>
+ <20200604033918.GA2286@gondor.apana.org.au>
+ <b6ad8af2-1cb7-faac-0446-5e09e97f3616@linaro.org>
+ <20200604061811.GA28759@gondor.apana.org.au>
+ <b23433f8-d95d-8142-c830-fb92e5ccd4a1@linaro.org>
+ <20200604065009.GA29822@gondor.apana.org.au>
+From:   Zhangfei Gao <zhangfei.gao@linaro.org>
+Message-ID: <f8dceec5-6835-c064-bb43-fd12668c2dbb@linaro.org>
+Date:   Fri, 5 Jun 2020 17:34:32 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1591347582.21704.9.camel@mtkswgap22>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200604065009.GA29822@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 05, 2020 at 04:59:42PM +0800, Neal Liu wrote:
-> On Fri, 2020-06-05 at 09:09 +0100, Russell King - ARM Linux admin wrote:
-> > On Fri, Jun 05, 2020 at 03:19:03PM +0800, Neal Liu wrote:
-> > > On Wed, 2020-06-03 at 17:34 +0800, Russell King - ARM Linux admin wrote:
-> > > > This kind of thing is something that ARM have seems to shy away from
-> > > > doing - it's a point I brought up many years ago when the whole
-> > > > trustzone thing first appeared with its SMC call.  Those around the
-> > > > conference table were not interested - ARM seemed to prefer every
-> > > > vendor to do off and do their own thing with the SMC interface.
-> > > 
-> > > Does that mean it make sense to model a sec-rng driver, and get each
-> > > vendor's SMC function id by DT node?
-> > 
-> > _If_ vendors have already gone off and decided to use different SMC
-> > function IDs for this, while keeping the rest of the SMC interface
-> > the same, then the choice has already been made.
-> > 
-> > I know on 32-bit that some of the secure world implementations can't
-> > be changed; they're burnt into the ROM. I believe on 64-bit that isn't
-> > the case, which makes it easier to standardise.
-> > 
-> > Do you have visibility of how this SMC is implemented in the secure
-> > side?  Is it in ATF, and is it done as a vendor hack or is there an
-> > element of generic implementation to it?  Has it been submitted
-> > upstream to the main ATF repository?
-> > 
-> 
-> Take MediaTek as an example, some SoCs are implemented in ATF, some of
-> them are implemented in TEE. We have no plan to make generic
-> implementation in "secure world".
 
-I think you have your answer right there - by _not_ making the API
-generic and giving no motivation to use it, different vendors are
-going to do different things (maybe even with a different API as well)
-so there's no point the kernel driver pretending to be a generic
-driver. If the driver isn't going to be generic, I see little point in
-the SMC function number being in DT.
 
-I think that as a _whole_ is a big mistake - there should be a generic
-kernel driver for this, and there should be a standardised interface to
-it through firmware.  So, I would encourage you to try to get it
-accepted one way or another amongst vendors as a standardised
-interface.
+On 2020/6/4 下午2:50, Herbert Xu wrote:
+> On Thu, Jun 04, 2020 at 02:44:16PM +0800, Zhangfei Gao wrote:
+>> I think it is fine.
+>> 1. Currently the name size is 64, bigger enough.
+>> Simply grep in driver name, 64 should be enough.
+>> We can make it larger when there is a request.
+>> 2. it does not matter what the name is, since it is just an interface.
+>> cat /sys/class/uacce/hisi_zip-0/flags
+>> cat /sys/class/uacce/his-0/flags
+>> should be both fine to app only they can be distinguished.
+>> 3. It maybe a hard restriction to fail just because of a long name.
+> I think we should err on the side of caution.  IOW, unless you
+> know that you need it to succeed when it exceeds the limit, then
+> you should just make it fail.
+Thanks Herbert
+Will add a check after the copy.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTC for 0.8m (est. 1762m) line in suburbia: sync at 13.1Mbps down 424kbps up
+         strlcpy(interface.name, pdev->driver->name, 
+sizeof(interface.name));
+         if (strlen(pdev->driver->name) != strlen(interface.name))
+                 return -EINVAL;
+
+Will resend the fix after rc1 is open.
+
+Thanks
+
