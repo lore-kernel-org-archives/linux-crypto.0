@@ -3,49 +3,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CC2FC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 14:10:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE611C433DF
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 14:10:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 18E74207D3
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 14:10:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA61E2074B
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 14:10:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591366247;
-	bh=ReGIH2zYPtO8crdB0oJZXCtgGvHx/19cWKRmBr7MlhI=;
-	h=Date:From:To:To:To:CC:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Subject:In-Reply-To:
-	 List-ID:From;
-	b=RRDdO5YzvO7Dd+gzBVZVy06XtbkbBcFAK4BIE/75GICNfnL898pZKeKBaubQ4MhxP
-	 5/WSQNATgFi/SdyhUlTH9+/mieCRwNZFjWlR7iHX5GZsy/ZT/jbYOrCQ8Q561XvjaL
-	 aycswuYB8NHP4yx6anOkPqRW0tn+9HdhcvPAdKKo=
+	s=default; t=1591366257;
+	bh=ebgu688rDGjm6LNJM1GdCvl/C02ouX3iabU447jkzb0=;
+	h=Date:From:To:To:To:CC:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Subject:
+	 In-Reply-To:References:List-ID:From;
+	b=JNJU14ArQs+AMMVYT0ADynjmY1KnQ8h1PAFqLi+hYrbOkQ+b0Ee7XpjigFfE371Ij
+	 W9rGVw6FrDNxe520udq04oUrDcnzuWi64cH2HPU1kUiP22mztkTGzfpJsNI2B9s3s1
+	 vQIcHgGylr8Gb57+4zU0v+ORPw3Ftm0CtdDEWH8E=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727826AbgFEOKq (ORCPT
+        id S1728028AbgFEOKw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Jun 2020 10:10:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41572 "EHLO mail.kernel.org"
+        Fri, 5 Jun 2020 10:10:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41728 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726553AbgFEOKq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Jun 2020 10:10:46 -0400
+        id S1726553AbgFEOKv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 5 Jun 2020 10:10:51 -0400
 Received: from localhost (unknown [137.135.114.1])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 821A820663;
-        Fri,  5 Jun 2020 14:10:45 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id AACEA207D3;
+        Fri,  5 Jun 2020 14:10:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591366245;
-        bh=ReGIH2zYPtO8crdB0oJZXCtgGvHx/19cWKRmBr7MlhI=;
-        h=Date:From:To:To:To:CC:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Subject:In-Reply-To:
-         From;
-        b=Nr1x7lkCDywl07nr+6dZ/n0OvTcqnHhL6bKCKqu+6+JKy5ExE2PxQ9Pnb03LwyoFU
-         dz0OpUI8mHPEZjyQcn14AxRJ+q8Duuuy0MFGteZu3Ehn/AEwvVuUFZnXBO1Fq0xLnF
-         rP5bePwiX2Nj1G2Usa0ZvXIgPfJJllL/hz0xxSuw=
-Date:   Fri, 05 Jun 2020 14:10:44 +0000
+        s=default; t=1591366250;
+        bh=ebgu688rDGjm6LNJM1GdCvl/C02ouX3iabU447jkzb0=;
+        h=Date:From:To:To:To:CC:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Subject:
+         In-Reply-To:References:From;
+        b=eycV+JrDmk5b/2thl/HWl0hIocIAu1PnE/iuCoiSEzo8Zgj83uMeVpS/Tsu8gNPTn
+         Qco8edeP97vS1Box7/AEVfxcfa1dBL3TgvDLclS5rClXFvJyepmXk72zhF5Vck53PP
+         KDT05ZrNp9Nqk8H7meZ1MxPV98DG9yiNFqWbrm3M=
+Date:   Fri, 05 Jun 2020 14:10:50 +0000
 From:   Sasha Levin <sashal@kernel.org>
 To:     Sasha Levin <sashal@kernel.org>
 To:     "Longpeng(Mike)" <longpeng2@huawei.com>
 To:     <linux-crypto@vger.kernel.org>
 CC:     "Longpeng(Mike)" <longpeng2@huawei.com>
+Cc:     Gonglei <arei.gonglei@huawei.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>
 Cc:     Jason Wang <jasowang@redhat.com>
@@ -54,17 +55,14 @@ Cc:     virtualization@lists.linux-foundation.org
 Cc:     linux-kernel@vger.kernel.org
 Cc:     stable@vger.kernel.org
 Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH v3 1/3] crypto: virtio: Fix src/dst scatterlist calculation in __virtio_crypto_skcipher_do_req()
-In-Reply-To: <20200602070501.2023-2-longpeng2@huawei.com>
-Message-Id: <20200605141045.821A820663@mail.kernel.org>
+Subject: Re: [PATCH v3 3/3] crypto: virtio: Fix dest length calculation in __virtio_crypto_skcipher_do_req()
+In-Reply-To: <20200602070501.2023-4-longpeng2@huawei.com>
+References: <20200602070501.2023-4-longpeng2@huawei.com>
+Message-Id: <20200605141050.AACEA207D3@mail.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-
-<20200123101000.GB24255@Red>
-References: <20200602070501.2023-2-longpeng2@huawei.com>
-<20200123101000.GB24255@Red>
 
 Hi
 
@@ -76,18 +74,26 @@ fixing commit: dbaf0624ffa5 ("crypto: add virtio-crypto driver").
 The bot has tested the following trees: v5.6.15, v5.4.43, v4.19.125, v4.14.182.
 
 v5.6.15: Build OK!
-v5.4.43: Failed to apply! Possible dependencies:
-    eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
+v5.4.43: Build failed! Errors:
+    drivers/crypto/virtio/virtio_crypto_algs.c:408:35: error: ‘struct ablkcipher_request’ has no member named ‘cryptlen’
+    drivers/crypto/virtio/virtio_crypto_algs.c:408:35: error: ‘struct ablkcipher_request’ has no member named ‘cryptlen’
+    drivers/crypto/virtio/virtio_crypto_algs.c:408:35: error: ‘struct ablkcipher_request’ has no member named ‘cryptlen’
+    drivers/crypto/virtio/virtio_crypto_algs.c:408:35: error: ‘struct ablkcipher_request’ has no member named ‘cryptlen’
+    drivers/crypto/virtio/virtio_crypto_algs.c:408:35: error: ‘struct ablkcipher_request’ has no member named ‘cryptlen’
+    drivers/crypto/virtio/virtio_crypto_algs.c:408:35: error: ‘struct ablkcipher_request’ has no member named ‘cryptlen’
+    ./include/linux/kernel.h:866:2: error: first argument to ‘__builtin_choose_expr’ not a constant
 
-v4.19.125: Failed to apply! Possible dependencies:
-    eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
+v4.19.125: Build failed! Errors:
+    drivers/crypto/virtio/virtio_crypto_algs.c:422:35: error: ‘struct ablkcipher_request’ has no member named ‘cryptlen’
+    drivers/crypto/virtio/virtio_crypto_algs.c:422:35: error: ‘struct ablkcipher_request’ has no member named ‘cryptlen’
+    drivers/crypto/virtio/virtio_crypto_algs.c:422:35: error: ‘struct ablkcipher_request’ has no member named ‘cryptlen’
+    drivers/crypto/virtio/virtio_crypto_algs.c:422:35: error: ‘struct ablkcipher_request’ has no member named ‘cryptlen’
+    drivers/crypto/virtio/virtio_crypto_algs.c:422:35: error: ‘struct ablkcipher_request’ has no member named ‘cryptlen’
+    drivers/crypto/virtio/virtio_crypto_algs.c:422:35: error: ‘struct ablkcipher_request’ has no member named ‘cryptlen’
+    ./include/linux/kernel.h:870:2: error: first argument to ‘__builtin_choose_expr’ not a constant
 
-v4.14.182: Failed to apply! Possible dependencies:
-    500e6807ce93 ("crypto: virtio - implement missing support for output IVs")
-    67189375bb3a ("crypto: virtio - convert to new crypto engine API")
-    d0d859bb87ac ("crypto: virtio - Register an algo only if it's supported")
-    e02b8b43f55a ("crypto: virtio - pr_err() strings should end with newlines")
-    eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
+v4.14.182: Build failed! Errors:
+    drivers/crypto/virtio/virtio_crypto_algs.c:409:35: error: ‘struct ablkcipher_request’ has no member named ‘cryptlen’
 
 
 NOTE: The patch will not be queued to stable trees until it is upstream.
