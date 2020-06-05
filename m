@@ -6,63 +6,70 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDFF9C433DF
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 12:17:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 709AEC433E0
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 12:38:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B2495206A2
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 12:17:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5588A2065C
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 12:38:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726415AbgFEMR3 (ORCPT
+        id S1726670AbgFEMid (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Jun 2020 08:17:29 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:42236 "EHLO fornost.hmeau.com"
+        Fri, 5 Jun 2020 08:38:33 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:42256 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726410AbgFEMR2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Jun 2020 08:17:28 -0400
+        id S1726409AbgFEMid (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 5 Jun 2020 08:38:33 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jhBHT-0005Un-DC; Fri, 05 Jun 2020 22:17:04 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 05 Jun 2020 22:17:03 +1000
-Date:   Fri, 5 Jun 2020 22:17:03 +1000
+        id 1jhBc2-0006N7-UN; Fri, 05 Jun 2020 22:38:20 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 05 Jun 2020 22:38:18 +1000
+Date:   Fri, 5 Jun 2020 22:38:18 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Zhangfei Gao <zhangfei.gao@linaro.org>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        wangzhou1 <wangzhou1@hisilicon.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        kbuild-all@lists.01.org
-Subject: Re: [PATCH] crypto: hisilicon - fix strncpy warning with strlcpy
-Message-ID: <20200605121703.GA3792@gondor.apana.org.au>
-References: <202006032110.BEbKqovX%lkp@intel.com>
- <1591241524-6452-1-git-send-email-zhangfei.gao@linaro.org>
- <20200604033918.GA2286@gondor.apana.org.au>
- <b6ad8af2-1cb7-faac-0446-5e09e97f3616@linaro.org>
- <20200604061811.GA28759@gondor.apana.org.au>
- <b23433f8-d95d-8142-c830-fb92e5ccd4a1@linaro.org>
- <20200604065009.GA29822@gondor.apana.org.au>
- <f8dceec5-6835-c064-bb43-fd12668c2dbb@linaro.org>
+To:     syzbot <syzbot+afb77bdbaca0cda9e991@syzkaller.appspotmail.com>
+Cc:     ardb@kernel.org, davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        t-kristo@ti.com
+Subject: Re: WARNING: refcount bug in crypto_mod_get
+Message-ID: <20200605123818.GA3984@gondor.apana.org.au>
+References: <00000000000004f67705a4992160@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f8dceec5-6835-c064-bb43-fd12668c2dbb@linaro.org>
+In-Reply-To: <00000000000004f67705a4992160@google.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 05, 2020 at 05:34:32PM +0800, Zhangfei Gao wrote:
-> Will add a check after the copy.
-> 
->         strlcpy(interface.name, pdev->driver->name, sizeof(interface.name));
->         if (strlen(pdev->driver->name) != strlen(interface.name))
->                 return -EINVAL;
+On Fri, May 01, 2020 at 10:01:14AM -0700, syzbot wrote:
+>
+> ------------[ cut here ]------------
+> refcount_t: addition on 0; use-after-free.
+...
+>  refcount_add include/linux/refcount.h:204 [inline]
+>  refcount_inc include/linux/refcount.h:241 [inline]
+>  crypto_alg_get crypto/internal.h:87 [inline]
+>  crypto_mod_get+0xc6/0xf0 crypto/api.c:37
+>  crypto_spawn_alg.isra.0+0xa8/0x110 crypto/algapi.c:723
+>  crypto_spawn_tfm2+0x19/0xb0 crypto/algapi.c:763
+>  crypto_spawn_aead include/crypto/internal/aead.h:102 [inline]
+>  pcrypt_aead_init_tfm+0x144/0x273 crypto/pcrypt.c:182
+>  crypto_aead_init_tfm+0x138/0x1a0 crypto/aead.c:140
+>  crypto_create_tfm+0xd5/0x2f0 crypto/api.c:454
+>  crypto_alloc_tfm+0x100/0x340 crypto/api.c:526
+>  aead_bind+0x69/0x170 crypto/algif_aead.c:483
+>  alg_bind+0x260/0x530 crypto/af_alg.c:182
+>  __sys_bind+0x20e/0x250 net/socket.c:1662
+>  __do_sys_bind net/socket.c:1673 [inline]
+>  __se_sys_bind net/socket.c:1671 [inline]
+>  __x64_sys_bind+0x6f/0xb0 net/socket.c:1671
+>  do_syscall_64+0xf6/0x7d0 arch/x86/entry/common.c:295
+>  entry_SYSCALL_64_after_hwframe+0x49/0xb3
 
-You don't need to do strlen.  The function strlcpy returns the
-length of the source string.
+This should be fixed already:
 
-Better yet use strscpy which will even return an error for you.
+#syz fix: crypto: api - Fix use-after-free and race in crypto_spawn_alg
 
 Cheers,
 -- 
