@@ -2,116 +2,122 @@ Return-Path: <SRS0=mFw2=7S=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_2 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8373FC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 09:00:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01AA5C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 09:13:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6167A207D0
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 09:00:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8DD2207DF
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 09:13:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="ls9R6n9I"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="HOrykkGu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726062AbgFEI77 (ORCPT
+        id S1726184AbgFEJNy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Jun 2020 04:59:59 -0400
-Received: from mailgw01.mediatek.com ([210.61.82.183]:16731 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726234AbgFEI7z (ORCPT
+        Fri, 5 Jun 2020 05:13:54 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:57526 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726062AbgFEJNy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Jun 2020 04:59:55 -0400
-X-UUID: 181c308322e744dd9a70e2bccac836e6-20200605
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-        h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:In-Reply-To:Date:CC:To:From:Subject:Message-ID; bh=VjXux5WMEXt+SNJUOpjSrCg/TII0W/Rj7aI7a6xVHpE=;
-        b=ls9R6n9IGXDUKqpHS5IXQejgeStm7Hy3+RXWs4hTJ+knZzsD4Aj62NTea3yFMY7uIt/Cx9DNQ051TNBTkashYSbBdUJw9kVVg0KNw/5u0eXPOEut2d+yF3+spTGiZ6k0hKFYz/p2IE3avUG0c/DpU/75Uhtw2dsTCwaVZ+FZ+3g=;
-X-UUID: 181c308322e744dd9a70e2bccac836e6-20200605
-Received: from mtkexhb01.mediatek.inc [(172.21.101.102)] by mailgw01.mediatek.com
-        (envelope-from <neal.liu@mediatek.com>)
-        (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
-        with ESMTP id 678270201; Fri, 05 Jun 2020 16:59:50 +0800
-Received: from MTKCAS06.mediatek.inc (172.21.101.30) by
- mtkmbs01n2.mediatek.inc (172.21.101.79) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Fri, 5 Jun 2020 16:59:42 +0800
-Received: from [172.21.77.33] (172.21.77.33) by MTKCAS06.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Fri, 5 Jun 2020 16:59:42 +0800
-Message-ID: <1591347582.21704.9.camel@mtkswgap22>
-Subject: Re: Security Random Number Generator support
-From:   Neal Liu <neal.liu@mediatek.com>
-To:     Russell King - ARM Linux admin <linux@armlinux.org.uk>
-CC:     Marc Zyngier <maz@kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>, Julius Werner <jwerner@google.com>,
+        Fri, 5 Jun 2020 05:13:54 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05596psK031612;
+        Fri, 5 Jun 2020 09:13:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=Srr3x0KE0YyUtKTiuAnbJA2aIeBpytmapuzrhcjP1Tc=;
+ b=HOrykkGumjXllrp8el7dOOFrRe1ejP+/fpjzDYWcrq9HHHSseFPxRNFKVgG8yCg/voU8
+ ZspEPPA65PqQqrAShvyKQwlKePwAMDaeyXEbzV81i4ktTJYLRQjNMAz3nYQ7BTj4goB0
+ nUgHMLtQod24WnkXjvAj1bCH97hN5+Tff+8hqigRrnic6p3XjeReo2xbfVm9IPmtwShV
+ j4a1Z1yjKLvY5TTy3AkigVB0Ea7UXn3kvH+tWSlHaFv4C12Ewne11iVO2FkOf8fU6SoO
+ OyyhNFSEzooUu0ulaWEVbyqY6Rb9qE28wqRvG/B0KlFqFuNayjhYMCBoyeeKebt9sTZO 8w== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 31f91dsyed-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 05 Jun 2020 09:13:36 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05597bFn095862;
+        Fri, 5 Jun 2020 09:13:35 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 31f9255umg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 05 Jun 2020 09:13:35 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0559DVbT011015;
+        Fri, 5 Jun 2020 09:13:32 GMT
+Received: from kadam (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 05 Jun 2020 02:13:31 -0700
+Date:   Fri, 5 Jun 2020 12:13:24 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Shukun Tan <tanshukun1@huawei.com>
+Cc:     b6da310b-e633-9f74-f7af-7791d803aaf5@huawei.com,
+        Zhou Wang <wangzhou1@hisilicon.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "Arnd Bergmann" <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Sean Wang <sean.wang@kernel.org>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        lkml <linux-kernel@vger.kernel.org>,
-        wsd_upstream <wsd_upstream@mediatek.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Crystal Guo =?UTF-8?Q?=28=E9=83=AD=E6=99=B6=29?= 
-        <Crystal.Guo@mediatek.com>, "Ard Biesheuvel" <ardb@kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Date:   Fri, 5 Jun 2020 16:59:42 +0800
-In-Reply-To: <20200605080905.GF1551@shell.armlinux.org.uk>
-References: <1591085678-22764-1-git-send-email-neal.liu@mediatek.com>
-         <CAMj1kXHjAdk5=-uSh_=S9j5cz42zr3h6t+YYGy+obevuQDp0fg@mail.gmail.com>
-         <85dfc0142d3879d50c0ba18bcc71e199@misterjones.org>
-         <1591169342.4878.9.camel@mtkswgap22>
-         <fcbe37f6f9cbcde24f9c28bc504f1f0e@kernel.org>
-         <20200603093416.GY1551@shell.armlinux.org.uk>
-         <1591341543.19510.4.camel@mtkswgap22>
-         <20200605080905.GF1551@shell.armlinux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.2.3-0ubuntu6 
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: hisilicon - allow smaller reads in debugfs
+Message-ID: <20200605091324.GR30374@kadam>
+References: <20200602135409.GA59808@mwanda>
+ <3e9b204f-ef53-31c5-afcd-e0791224c2b0@huawei.com>
 MIME-Version: 1.0
-X-TM-SNTS-SMTP: 877F0A62BB37F3A937A5DF7C63E4C12D4C5FEB8F623D563618F2A16D037472AE2000:8
-X-MTK:  N
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3e9b204f-ef53-31c5-afcd-e0791224c2b0@huawei.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9642 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999
+ malwarescore=0 bulkscore=0 mlxscore=0 spamscore=0 suspectscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006050072
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9642 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 bulkscore=0
+ clxscore=1011 cotscore=-2147483648 malwarescore=0 adultscore=0
+ priorityscore=1501 suspectscore=0 phishscore=0 spamscore=0 mlxscore=0
+ impostorscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006050072
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-T24gRnJpLCAyMDIwLTA2LTA1IGF0IDA5OjA5ICswMTAwLCBSdXNzZWxsIEtpbmcgLSBBUk0gTGlu
-dXggYWRtaW4gd3JvdGU6DQo+IE9uIEZyaSwgSnVuIDA1LCAyMDIwIGF0IDAzOjE5OjAzUE0gKzA4
-MDAsIE5lYWwgTGl1IHdyb3RlOg0KPiA+IE9uIFdlZCwgMjAyMC0wNi0wMyBhdCAxNzozNCArMDgw
-MCwgUnVzc2VsbCBLaW5nIC0gQVJNIExpbnV4IGFkbWluIHdyb3RlOg0KPiA+ID4gVGhpcyBraW5k
-IG9mIHRoaW5nIGlzIHNvbWV0aGluZyB0aGF0IEFSTSBoYXZlIHNlZW1zIHRvIHNoeSBhd2F5IGZy
-b20NCj4gPiA+IGRvaW5nIC0gaXQncyBhIHBvaW50IEkgYnJvdWdodCB1cCBtYW55IHllYXJzIGFn
-byB3aGVuIHRoZSB3aG9sZQ0KPiA+ID4gdHJ1c3R6b25lIHRoaW5nIGZpcnN0IGFwcGVhcmVkIHdp
-dGggaXRzIFNNQyBjYWxsLiAgVGhvc2UgYXJvdW5kIHRoZQ0KPiA+ID4gY29uZmVyZW5jZSB0YWJs
-ZSB3ZXJlIG5vdCBpbnRlcmVzdGVkIC0gQVJNIHNlZW1lZCB0byBwcmVmZXIgZXZlcnkNCj4gPiA+
-IHZlbmRvciB0byBkbyBvZmYgYW5kIGRvIHRoZWlyIG93biB0aGluZyB3aXRoIHRoZSBTTUMgaW50
-ZXJmYWNlLg0KPiA+IA0KPiA+IERvZXMgdGhhdCBtZWFuIGl0IG1ha2Ugc2Vuc2UgdG8gbW9kZWwg
-YSBzZWMtcm5nIGRyaXZlciwgYW5kIGdldCBlYWNoDQo+ID4gdmVuZG9yJ3MgU01DIGZ1bmN0aW9u
-IGlkIGJ5IERUIG5vZGU/DQo+IA0KPiBfSWZfIHZlbmRvcnMgaGF2ZSBhbHJlYWR5IGdvbmUgb2Zm
-IGFuZCBkZWNpZGVkIHRvIHVzZSBkaWZmZXJlbnQgU01DDQo+IGZ1bmN0aW9uIElEcyBmb3IgdGhp
-cywgd2hpbGUga2VlcGluZyB0aGUgcmVzdCBvZiB0aGUgU01DIGludGVyZmFjZQ0KPiB0aGUgc2Ft
-ZSwgdGhlbiB0aGUgY2hvaWNlIGhhcyBhbHJlYWR5IGJlZW4gbWFkZS4NCj4gDQo+IEkga25vdyBv
-biAzMi1iaXQgdGhhdCBzb21lIG9mIHRoZSBzZWN1cmUgd29ybGQgaW1wbGVtZW50YXRpb25zIGNh
-bid0DQo+IGJlIGNoYW5nZWQ7IHRoZXkncmUgYnVybnQgaW50byB0aGUgUk9NLiBJIGJlbGlldmUg
-b24gNjQtYml0IHRoYXQgaXNuJ3QNCj4gdGhlIGNhc2UsIHdoaWNoIG1ha2VzIGl0IGVhc2llciB0
-byBzdGFuZGFyZGlzZS4NCj4gDQo+IERvIHlvdSBoYXZlIHZpc2liaWxpdHkgb2YgaG93IHRoaXMg
-U01DIGlzIGltcGxlbWVudGVkIGluIHRoZSBzZWN1cmUNCj4gc2lkZT8gIElzIGl0IGluIEFURiwg
-YW5kIGlzIGl0IGRvbmUgYXMgYSB2ZW5kb3IgaGFjayBvciBpcyB0aGVyZSBhbg0KPiBlbGVtZW50
-IG9mIGdlbmVyaWMgaW1wbGVtZW50YXRpb24gdG8gaXQ/ICBIYXMgaXQgYmVlbiBzdWJtaXR0ZWQN
-Cj4gdXBzdHJlYW0gdG8gdGhlIG1haW4gQVRGIHJlcG9zaXRvcnk/DQo+IA0KDQpUYWtlIE1lZGlh
-VGVrIGFzIGFuIGV4YW1wbGUsIHNvbWUgU29DcyBhcmUgaW1wbGVtZW50ZWQgaW4gQVRGLCBzb21l
-IG9mDQp0aGVtIGFyZSBpbXBsZW1lbnRlZCBpbiBURUUuIFdlIGhhdmUgbm8gcGxhbiB0byBtYWtl
-IGdlbmVyaWMNCmltcGxlbWVudGF0aW9uIGluICJzZWN1cmUgd29ybGQiLg0KDQpEdWUgdG8gdGhl
-cmUgbXVzdCBoYXZlIGRpZmZlcmVudCBpbXBsZW1lbnRhdGlvbiBpbiBzZWN1cmUgd29ybGQgZm9y
-DQp2ZW5kb3JzLCB3ZSBwbGFuIHRvIHByb3ZpZGUgYSBnZW5lcmljIFNNQyBpbnRlcmZhY2UgaW4g
-c2VjdXJlIHJuZyBrZXJuZWwNCmRyaXZlciBmb3IgbW9yZSBmbGV4aWJpbGl0eS4NCg0KVmVuZG9y
-cyBjYW4gZGVjaWRlIHdoaWNoICJzZWN1cmUgd29ybGQiIHRoZXkgd2FudCAoSFlQL0FURi9URUUp
-IGJ5DQpkaWZmZXJlbnQgc21jL2h2YyBhbmQgZGlmZmVyZW50IFNNQyBmdW5jdGlvbiBJRHMgaW4g
-RFQgbm9kZS4NCg==
+On Fri, Jun 05, 2020 at 09:19:53AM +0800, Shukun Tan wrote:
+> Hi Dan,
+> 
+> On 2020/6/2 21:54, Dan Carpenter wrote:
+> > Originally this code rejected any read less than 256 bytes.  There
+> > is no need for this artificial limit.  We should just use the normal
+> > helper functions to read a string from the kernel.
+> > 
+> > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> > ---
+> > v2: Use simple_read_from_buffer().  The v1 was slightly half arsed
+> > because I left the original check for:
+> > 
+> > 	if (*pos)
+> > 		return 0;
+> > 
+> > So it could result in partial reads.  The new code means that if you
+> > want to read the buffer one byte at a time, that's fine or if you want
+> > to read it in one 256 byte chunk that's also fine.  Plus it deletes 21
+> > lines of code and is a lot cleaner.
+> > 
+> 
+> In fact, In our original design, we do not hope the user do the partial reads.
+> Thank you for your work, but I still insist on adding this limit.
 
+This not how POSIX filesystems work...  :(  Last time you said that this
+literally breaks cat.
+
+This doesn't break anything if the user chooses not to read a single
+byte at a time.  That's obviously a crazy way to read a file.  It just
+allows them to if they want.  Or if they want to read 256 bytes at a
+time then that also works.  My patch makes *everything* work.
+
+regards,
+dan carpenter
