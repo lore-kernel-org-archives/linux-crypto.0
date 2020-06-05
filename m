@@ -2,150 +2,185 @@ Return-Path: <SRS0=mFw2=7S=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC938C433DF
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 06:53:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F98FC433DF
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 06:59:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 44FE720823
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 06:53:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="U/QQ9VZq"
+	by mail.kernel.org (Postfix) with ESMTP id 296C520823
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jun 2020 06:59:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726024AbgFEGxC (ORCPT
+        id S1726044AbgFEG7W (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Jun 2020 02:53:02 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.165]:31008 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725986AbgFEGxC (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Jun 2020 02:53:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1591339980;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=PoCqx/BPrQUxxmYNVEn+WdcUiY/cfzIG9OQ05nQcY9o=;
-        b=U/QQ9VZq+WkO1u+PT3BsZsiS+oArC0aG04yb8X0GCLefCJk2/SmrxWYWU9JcFkLmAE
-        gxJSarBf66GwWej99D8Vqxbc8POtramg3xsgratl8lo7mKPQsYYyE9Zs1oWEWF5O9sG8
-        qOoNkz1ez8GBrOS6k7qZa/yTGxCwQ2+BDGTlRGuHG3fvUF5+4bJO//J9R+5BW2aYbZEE
-        lbr8STENJcRFtD/Tv1SY5k4FxnJUQa+xEEUkoL8TaHHiKYAIpuUzP7SCn3WvMqTncmaA
-        jbDX+qsQGYNX4RYaKGLf2EIiAz/GcaMH9ckw/Q0JKehJNNdldIfneom6tYbbXaTZOJWy
-        c6Og==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXvdOeueZtw="
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.9.1 DYNA|AUTH)
-        with ESMTPSA id I05374w556qv9kf
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Fri, 5 Jun 2020 08:52:57 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>, davem@davemloft.net,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        syzbot <syzbot+2e635807decef724a1fa@syzkaller.appspotmail.com>
-Subject: Re: [PATCH v2] crypto: DRBG - always try to free Jitter RNG instance
-Date:   Fri, 05 Jun 2020 08:52:57 +0200
-Message-ID: <4575667.y41LbVH5lo@tauon.chronox.de>
-In-Reply-To: <20200605061646.GA107328@sol.localdomain>
-References: <0000000000002a280b05a725cd93@google.com> <5789529.snvNDI1NMy@tauon.chronox.de> <20200605061646.GA107328@sol.localdomain>
+        Fri, 5 Jun 2020 02:59:22 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:40946 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725986AbgFEG7W (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 5 Jun 2020 02:59:22 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1jh6Jy-0007VL-EE; Fri, 05 Jun 2020 16:59:19 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 05 Jun 2020 16:59:18 +1000
+Date:   Fri, 5 Jun 2020 16:59:18 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Eric Biggers <ebiggers@google.com>
+Subject: [v2 PATCH] crc-t10dif: Fix potential crypto notify dead-lock
+Message-ID: <20200605065918.GA813@gondor.apana.org.au>
+References: <20200604063324.GA28813@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200604063324.GA28813@gondor.apana.org.au>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Freitag, 5. Juni 2020, 08:16:46 CEST schrieb Eric Biggers:
+The crypto notify call occurs with a read mutex held so you must
+not do any substantial work directly.  In particular, you cannot
+call crypto_alloc_* as they may trigger further notifications
+which may dead-lock in the presence of another writer.
 
-Hi Eric,
+This patch fixes this by postponing the work into a work queue and
+taking the same lock in the module init function.
 
-> On Fri, Jun 05, 2020 at 07:58:15AM +0200, Stephan Mueller wrote:
-> > Am Freitag, 5. Juni 2020, 02:43:36 CEST schrieb Eric Biggers:
-> >=20
-> > Hi Eric,
-> >=20
-> > > On Thu, Jun 04, 2020 at 08:41:00AM +0200, Stephan M=FCller wrote:
-> > > > The Jitter RNG is unconditionally allocated as a seed source follwo=
-ing
-> > > > the patch 97f2650e5040. Thus, the instance must always be deallocat=
-ed.
-> > > >=20
-> > > > Reported-by: syzbot+2e635807decef724a1fa@syzkaller.appspotmail.com
-> > > > Fixes: 97f2650e5040 ("crypto: drbg - always seeded with SP800-90B
-> > > > ...")
-> > > > Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> > > > ---
-> > > >=20
-> > > >  crypto/drbg.c | 3 +++
-> > > >  1 file changed, 3 insertions(+)
-> > > >=20
-> > > > diff --git a/crypto/drbg.c b/crypto/drbg.c
-> > > > index 37526eb8c5d5..8a0f16950144 100644
-> > > > --- a/crypto/drbg.c
-> > > > +++ b/crypto/drbg.c
-> > > > @@ -1631,6 +1631,9 @@ static int drbg_uninstantiate(struct drbg_sta=
-te
-> > > > *drbg)>
-> > > >=20
-> > > >  	if (drbg->random_ready.func) {
-> > > >  =09
-> > > >  		del_random_ready_callback(&drbg->random_ready);
-> > > >  		cancel_work_sync(&drbg->seed_work);
-> > > >=20
-> > > > +	}
-> > > > +
-> > > > +	if (!IS_ERR_OR_NULL(drbg->jent)) {
-> > > >=20
-> > > >  		crypto_free_rng(drbg->jent);
-> > > >  		drbg->jent =3D NULL;
-> > > >  =09
-> > > >  	}
-> > >=20
-> > > It it okay that ->jent can be left as an ERR_PTR() value?
-> > >=20
-> > > Perhaps it should always be set to NULL?
-> >=20
-> > The error value is used in the drbg_instantiate function. There it is
-> > checked whether -ENOENT (i.e. the cipher is not available) or any other
-> > error is present. I am not sure we should move that check.
-> >=20
-> > Thanks for the review.
->=20
-> drbg_seed() and drbg_async_seed() check for drbg->jent being NULL.
->=20
-> Will that now break due it drbg->jent possibly being an ERR_PTR()?
->=20
-> Hence why I'm asking whether drbg_uninstantiate() should set it to NULL.
+While we're at it this patch also ensures that all RCU accesses are
+marked appropriately (tested with sparse).
 
-The allocation happens in drbg_prepare_hrng that is only invoked by=20
-drbg_instantiate.
+Finally this also reveals a race condition in module param show
+function as it may be called prior to the module init function.
+It's fixed by testing whether crct10dif_tfm is NULL (this is true
+iff the init function has not completed assuming fallback is false).
 
-drbg_instantiate checks for the ERR_PTR and sets it to NULL in case the err=
-or=20
-is deemed ok.
+Fixes: 11dcb1037f40 ("crc-t10dif: Allow current transform to be...")
+Fixes: b76377543b73 ("crc-t10dif: Pick better transform if one...")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Thus, any subsequent functions would see either a valid pointer or NULL. Th=
-e=20
-only exception is drbg_uninstantiate when invoked from the error case=20
-
-                ret =3D drbg_prepare_hrng(drbg);
-                if (ret)
-                        goto free_everything;
-
-Thus, I think that the two functions you mention will never see any values=
-=20
-other than NULL or a valid pointer.
-
-Thanks
-
-
-Ciao
-Stephan
-
-
+diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
+index 8cc01a603416..c9acf1c12cfc 100644
+--- a/lib/crc-t10dif.c
++++ b/lib/crc-t10dif.c
+@@ -19,39 +19,46 @@
+ static struct crypto_shash __rcu *crct10dif_tfm;
+ static struct static_key crct10dif_fallback __read_mostly;
+ static DEFINE_MUTEX(crc_t10dif_mutex);
++static struct work_struct crct10dif_rehash_work;
+ 
+-static int crc_t10dif_rehash(struct notifier_block *self, unsigned long val, void *data)
++static int crc_t10dif_notify(struct notifier_block *self, unsigned long val, void *data)
+ {
+ 	struct crypto_alg *alg = data;
+-	struct crypto_shash *new, *old;
+ 
+ 	if (val != CRYPTO_MSG_ALG_LOADED ||
+ 	    static_key_false(&crct10dif_fallback) ||
+ 	    strncmp(alg->cra_name, CRC_T10DIF_STRING, strlen(CRC_T10DIF_STRING)))
+ 		return 0;
+ 
++	schedule_work(&crct10dif_rehash_work);
++	return 0;
++}
++
++static void crc_t10dif_rehash(struct work_struct *work)
++{
++	struct crypto_shash *new, *old;
++
+ 	mutex_lock(&crc_t10dif_mutex);
+ 	old = rcu_dereference_protected(crct10dif_tfm,
+ 					lockdep_is_held(&crc_t10dif_mutex));
+ 	if (!old) {
+ 		mutex_unlock(&crc_t10dif_mutex);
+-		return 0;
++		return;
+ 	}
+ 	new = crypto_alloc_shash("crct10dif", 0, 0);
+ 	if (IS_ERR(new)) {
+ 		mutex_unlock(&crc_t10dif_mutex);
+-		return 0;
++		return;
+ 	}
+ 	rcu_assign_pointer(crct10dif_tfm, new);
+ 	mutex_unlock(&crc_t10dif_mutex);
+ 
+ 	synchronize_rcu();
+ 	crypto_free_shash(old);
+-	return 0;
+ }
+ 
+ static struct notifier_block crc_t10dif_nb = {
+-	.notifier_call = crc_t10dif_rehash,
++	.notifier_call = crc_t10dif_notify,
+ };
+ 
+ __u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
+@@ -86,19 +93,26 @@ EXPORT_SYMBOL(crc_t10dif);
+ 
+ static int __init crc_t10dif_mod_init(void)
+ {
++	struct crypto_shash *tfm;
++
++	INIT_WORK(&crct10dif_rehash_work, crc_t10dif_rehash);
+ 	crypto_register_notifier(&crc_t10dif_nb);
+-	crct10dif_tfm = crypto_alloc_shash("crct10dif", 0, 0);
+-	if (IS_ERR(crct10dif_tfm)) {
++	mutex_lock(&crc_t10dif_mutex);
++	tfm = crypto_alloc_shash("crct10dif", 0, 0);
++	if (IS_ERR(tfm)) {
+ 		static_key_slow_inc(&crct10dif_fallback);
+-		crct10dif_tfm = NULL;
++		tfm = NULL;
+ 	}
++	RCU_INIT_POINTER(crct10dif_tfm, tfm);
++	mutex_unlock(&crc_t10dif_mutex);
+ 	return 0;
+ }
+ 
+ static void __exit crc_t10dif_mod_fini(void)
+ {
+ 	crypto_unregister_notifier(&crc_t10dif_nb);
+-	crypto_free_shash(crct10dif_tfm);
++	cancel_work_sync(&crct10dif_rehash_work);
++	crypto_free_shash(rcu_dereference_protected(crct10dif_tfm, 1));
+ }
+ 
+ module_init(crc_t10dif_mod_init);
+@@ -106,11 +120,27 @@ module_exit(crc_t10dif_mod_fini);
+ 
+ static int crc_t10dif_transform_show(char *buffer, const struct kernel_param *kp)
+ {
++	struct crypto_shash *tfm;
++	const char *name;
++	int len;
++
+ 	if (static_key_false(&crct10dif_fallback))
+ 		return sprintf(buffer, "fallback\n");
+ 
+-	return sprintf(buffer, "%s\n",
+-		crypto_tfm_alg_driver_name(crypto_shash_tfm(crct10dif_tfm)));
++	rcu_read_lock();
++	tfm = rcu_dereference(crct10dif_tfm);
++	if (!tfm) {
++		len = sprintf(buffer, "init\n");
++		goto unlock;
++	}
++
++	name = crypto_tfm_alg_driver_name(crypto_shash_tfm(tfm));
++	len = sprintf(buffer, "%s\n", name);
++
++unlock:
++	rcu_read_unlock();
++
++	return len;
+ }
+ 
+ module_param_call(transform, NULL, crc_t10dif_transform_show, NULL, 0644);
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
