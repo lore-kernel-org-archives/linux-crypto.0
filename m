@@ -1,103 +1,89 @@
-Return-Path: <SRS0=oTH+=7T=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=EbYU=7U=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 013A9C433DF
-	for <linux-crypto@archiver.kernel.org>; Sat,  6 Jun 2020 08:13:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F347BC433DF
+	for <linux-crypto@archiver.kernel.org>; Sun,  7 Jun 2020 13:03:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BF7FC207DF
-	for <linux-crypto@archiver.kernel.org>; Sat,  6 Jun 2020 08:13:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6B282064C
+	for <linux-crypto@archiver.kernel.org>; Sun,  7 Jun 2020 13:03:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728573AbgFFIN2 (ORCPT
+        id S1726465AbgFGNDu convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 6 Jun 2020 04:13:28 -0400
-Received: from a.mx.secunet.com ([62.96.220.36]:46204 "EHLO a.mx.secunet.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725283AbgFFIN0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 6 Jun 2020 04:13:26 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by a.mx.secunet.com (Postfix) with ESMTP id C63C920270;
-        Sat,  6 Jun 2020 10:13:23 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id NJDh2La_7LBY; Sat,  6 Jun 2020 10:13:23 +0200 (CEST)
-Received: from mail-essen-01.secunet.de (mail-essen-01.secunet.de [10.53.40.204])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by a.mx.secunet.com (Postfix) with ESMTPS id 5D0BE200AC;
-        Sat,  6 Jun 2020 10:13:23 +0200 (CEST)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- mail-essen-01.secunet.de (10.53.40.204) with Microsoft SMTP Server (TLS) id
- 14.3.487.0; Sat, 6 Jun 2020 10:13:23 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Sat, 6 Jun 2020
- 10:13:22 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)      id 56F9C31801D7;
- Sat,  6 Jun 2020 10:13:22 +0200 (CEST)
-Date:   Sat, 6 Jun 2020 10:13:22 +0200
-From:   Steffen Klassert <steffen.klassert@secunet.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-CC:     <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        Corentin Labbe <clabbe@baylibre.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH net v2] esp: select CRYPTO_SEQIV when useful
-Message-ID: <20200606081322.GI13121@gauss3.secunet.de>
-References: <20200605064748.GA595@gondor.apana.org.au>
- <20200605173931.241085-1-ebiggers@kernel.org>
- <20200605180023.GF1373@sol.localdomain>
+        Sun, 7 Jun 2020 09:03:50 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:41682 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726474AbgFGNDu (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 7 Jun 2020 09:03:50 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-34-niSo_StSOpacK4VCKZ_DvA-1; Sun, 07 Jun 2020 14:03:46 +0100
+X-MC-Unique: niSo_StSOpacK4VCKZ_DvA-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Sun, 7 Jun 2020 14:03:45 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Sun, 7 Jun 2020 14:03:45 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Herbert Xu' <herbert@gondor.apana.org.au>,
+        Zhangfei Gao <zhangfei.gao@linaro.org>
+CC:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        wangzhou1 <wangzhou1@hisilicon.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kbuild-all@lists.01.org" <kbuild-all@lists.01.org>
+Subject: RE: [PATCH] crypto: hisilicon - fix strncpy warning with strlcpy
+Thread-Topic: [PATCH] crypto: hisilicon - fix strncpy warning with strlcpy
+Thread-Index: AQHWOzNKRLAtoxLytEmaiwfeMuNV66jNIJ6A
+Date:   Sun, 7 Jun 2020 13:03:45 +0000
+Message-ID: <8c0d8f4e21794d8b80d0a3852830debb@AcuMS.aculab.com>
+References: <202006032110.BEbKqovX%lkp@intel.com>
+ <1591241524-6452-1-git-send-email-zhangfei.gao@linaro.org>
+ <20200604033918.GA2286@gondor.apana.org.au>
+ <b6ad8af2-1cb7-faac-0446-5e09e97f3616@linaro.org>
+ <20200604061811.GA28759@gondor.apana.org.au>
+ <b23433f8-d95d-8142-c830-fb92e5ccd4a1@linaro.org>
+ <20200604065009.GA29822@gondor.apana.org.au>
+ <f8dceec5-6835-c064-bb43-fd12668c2dbb@linaro.org>
+ <20200605121703.GA3792@gondor.apana.org.au>
+In-Reply-To: <20200605121703.GA3792@gondor.apana.org.au>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200605180023.GF1373@sol.localdomain>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 05, 2020 at 11:00:23AM -0700, Eric Biggers wrote:
-> On Fri, Jun 05, 2020 at 10:39:31AM -0700, Eric Biggers wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > diff --git a/net/ipv4/Kconfig b/net/ipv4/Kconfig
-> > index 23ba5045e3d3..6520b30883cf 100644
-> > --- a/net/ipv4/Kconfig
-> > +++ b/net/ipv4/Kconfig
-> > @@ -361,6 +361,7 @@ config INET_ESP
-> >  	select CRYPTO_SHA1
-> >  	select CRYPTO_DES
-> >  	select CRYPTO_ECHAINIV
-> > +	select CRYPTO_SEQIV if CRYPTO_CTR || CRYPTO_CHACHA20POLY1305
-> >  	---help---
-> >  	  Support for IPsec ESP.
-> >  
-> 
-> Oops, this doesn't actually work:
-> 
-> scripts/kconfig/conf  --olddefconfig Kconfig
-> crypto/Kconfig:1799:error: recursive dependency detected!
-> crypto/Kconfig:1799:	symbol CRYPTO_DRBG_MENU is selected by CRYPTO_RNG_DEFAULT
-> crypto/Kconfig:83:	symbol CRYPTO_RNG_DEFAULT is selected by CRYPTO_SEQIV
-> crypto/Kconfig:330:	symbol CRYPTO_SEQIV is selected by CRYPTO_CTR
-> crypto/Kconfig:370:	symbol CRYPTO_CTR is selected by CRYPTO_DRBG_CTR
-> crypto/Kconfig:1819:	symbol CRYPTO_DRBG_CTR depends on CRYPTO_DRBG_MENU
-> For a resolution refer to Documentation/kbuild/kconfig-language.rst
-> subsection "Kconfig recursive dependency limitations"
-> 
-> 
-> I guess we need to go with v1 (which just had 'select CRYPTO_SEQIV'),
-> or else make users explicitly select CRYPTO_SEQIV?
+From: Herbert Xu
+> Sent: 05 June 2020 13:17
+...
+> Better yet use strscpy which will even return an error for you.
 
-I think we should make INET_ESP to select everything that is
-needed to instantiate the ciphers marked as 'MUST' in RFC 
-8221 and let the users explicitly select everything else.
+It really ought to return the buffer length on truncation.
+Then you can loop:
+	while(...)
+		buf += strxxxcpy(buf, src, buf_end - buf);
+and only check right at the end.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
+
