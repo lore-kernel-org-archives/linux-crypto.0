@@ -4,54 +4,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE911C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 00:42:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 211E1C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 00:48:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B166C20737
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 00:42:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE6952078C
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 00:48:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591663331;
-	bh=0f6+8/gWP04A7gXm4h6LYSgsObNR/CCROKDlx9F8Tbc=;
+	s=default; t=1591663705;
+	bh=7McYIa9P3Rh28JO6FRRv8eTfuuEGvhSv6QQoypGjkZ4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=koCRzL29zVdtYR8EnIdDvWRmQMKK8NFvV7ETnDnl0NSceEG9kfEUas/GFV0GGOKDW
-	 b46wrTvGBg8mdKvqkEfVeQM24fLDgS3n/pptROLklvZmQ+StfLYJLZK5OkGY09t7pW
-	 JZnb7ATGk0f53ep4wWXR+jOORpBwekBwRbCdCWoo=
+	b=KoPY+/XYpkuCHEmEHL/oum8/HHszjMmzp1NrDywFeLsCJeKJuN1yD2fAn90nEXjdo
+	 dvowYqAwdligodOl68o2x/fohDD/BIAFaFfAf0J1JAMEMOZ1btS5YMKZrg3WaXAHcT
+	 5nnvWrcySMEdGvxr9S2vf6ctJVPpmYgfqHSvtcd8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731251AbgFIAmJ (ORCPT
+        id S1728806AbgFHXLA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Jun 2020 20:42:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60110 "EHLO mail.kernel.org"
+        Mon, 8 Jun 2020 19:11:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57524 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729137AbgFHXMc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Jun 2020 19:12:32 -0400
+        id S1728798AbgFHXK7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 8 Jun 2020 19:10:59 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 81E4A208C3;
-        Mon,  8 Jun 2020 23:12:31 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7260F20E65;
+        Mon,  8 Jun 2020 23:10:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591657952;
-        bh=0f6+8/gWP04A7gXm4h6LYSgsObNR/CCROKDlx9F8Tbc=;
+        s=default; t=1591657859;
+        bh=7McYIa9P3Rh28JO6FRRv8eTfuuEGvhSv6QQoypGjkZ4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VyLJbuPf++DX0toDS2huR7jnyUpXSb52GKzTsDsUx4mvgI7DgMz8Df/SnjX9P326q
-         9MbXSG0hFf5fzB0s75okBfNjWdT1ekCezOb9JSf+PtWUS1ZxVdzZofs6HEra+9PuXa
-         IoJ+MoF9OHDvNAR8jifAodV6BU4BlxtoXFzLVx+o=
+        b=h5g3+OahlaK5paaudlsHuxazMgq2TiVbGAYLOZQhDW2PCsYSgfcECIY3WGPdfQKXc
+         0cFswUmyNjZNUm9PKleh0Au9atEKhaXffcdeuvtIX/rfmlAaRsZmpTktuakqt97cFO
+         Zun57MrGo6auY9G/yRRbEWtHoSVwCuIFosxUzwiY=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 017/606] gcc-10: avoid shadowing standard library 'free()' in crypto
-Date:   Mon,  8 Jun 2020 19:02:22 -0400
-Message-Id: <20200608231211.3363633-17-sashal@kernel.org>
+Cc:     Nicolas Toromanoff <nicolas.toromanoff@st.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.7 222/274] crypto: stm32/crc32 - fix multi-instance
+Date:   Mon,  8 Jun 2020 19:05:15 -0400
+Message-Id: <20200608230607.3361041-222-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200608231211.3363633-1-sashal@kernel.org>
-References: <20200608231211.3363633-1-sashal@kernel.org>
+In-Reply-To: <20200608230607.3361041-1-sashal@kernel.org>
+References: <20200608230607.3361041-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -60,88 +61,120 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Linus Torvalds <torvalds@linux-foundation.org>
+From: Nicolas Toromanoff <nicolas.toromanoff@st.com>
 
-commit 1a263ae60b04de959d9ce9caea4889385eefcc7b upstream.
+[ Upstream commit 10b89c43a64eb0d236903b79a3bc9d8f6cbfd9c7 ]
 
-gcc-10 has started warning about conflicting types for a few new
-built-in functions, particularly 'free()'.
+Ensure CRC algorithm is registered only once in crypto framework when
+there are several instances of CRC devices.
 
-This results in warnings like:
+Update the CRC device list management to avoid that only the first CRC
+instance is used.
 
-   crypto/xts.c:325:13: warning: conflicting types for built-in function ‘free’; expected ‘void(void *)’ [-Wbuiltin-declaration-mismatch]
+Fixes: b51dbe90912a ("crypto: stm32 - Support for STM32 CRC32 crypto module")
 
-because the crypto layer had its local freeing functions called
-'free()'.
-
-Gcc-10 is in the wrong here, since that function is marked 'static', and
-thus there is no chance of confusion with any standard library function
-namespace.
-
-But the simplest thing to do is to just use a different name here, and
-avoid this gcc mis-feature.
-
-[ Side note: gcc knowing about 'free()' is in itself not the
-  mis-feature: the semantics of 'free()' are special enough that a
-  compiler can validly do special things when seeing it.
-
-  So the mis-feature here is that gcc thinks that 'free()' is some
-  restricted name, and you can't shadow it as a local static function.
-
-  Making the special 'free()' semantics be a function attribute rather
-  than tied to the name would be the much better model ]
-
-Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Nicolas Toromanoff <nicolas.toromanoff@st.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/lrw.c | 4 ++--
- crypto/xts.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/crypto/stm32/stm32-crc32.c | 48 ++++++++++++++++++++++--------
+ 1 file changed, 36 insertions(+), 12 deletions(-)
 
-diff --git a/crypto/lrw.c b/crypto/lrw.c
-index 63c485c0d8a6..9b20fc4b2efb 100644
---- a/crypto/lrw.c
-+++ b/crypto/lrw.c
-@@ -287,7 +287,7 @@ static void exit_tfm(struct crypto_skcipher *tfm)
- 	crypto_free_skcipher(ctx->child);
+diff --git a/drivers/crypto/stm32/stm32-crc32.c b/drivers/crypto/stm32/stm32-crc32.c
+index 1c3e411b7acb..10304511f9b4 100644
+--- a/drivers/crypto/stm32/stm32-crc32.c
++++ b/drivers/crypto/stm32/stm32-crc32.c
+@@ -91,16 +91,29 @@ static int stm32_crc_setkey(struct crypto_shash *tfm, const u8 *key,
+ 	return 0;
  }
  
--static void free(struct skcipher_instance *inst)
-+static void free_inst(struct skcipher_instance *inst)
+-static int stm32_crc_init(struct shash_desc *desc)
++static struct stm32_crc *stm32_crc_get_next_crc(void)
  {
- 	crypto_drop_skcipher(skcipher_instance_ctx(inst));
- 	kfree(inst);
-@@ -400,7 +400,7 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.encrypt = encrypt;
- 	inst->alg.decrypt = decrypt;
+-	struct stm32_crc_desc_ctx *ctx = shash_desc_ctx(desc);
+-	struct stm32_crc_ctx *mctx = crypto_shash_ctx(desc->tfm);
+ 	struct stm32_crc *crc;
  
--	inst->free = free;
-+	inst->free = free_inst;
+ 	spin_lock_bh(&crc_list.lock);
+ 	crc = list_first_entry(&crc_list.dev_list, struct stm32_crc, list);
++	if (crc)
++		list_move_tail(&crc->list, &crc_list.dev_list);
+ 	spin_unlock_bh(&crc_list.lock);
  
- 	err = skcipher_register_instance(tmpl, inst);
- 	if (err)
-diff --git a/crypto/xts.c b/crypto/xts.c
-index 29efa15f1495..983dae2bb2db 100644
---- a/crypto/xts.c
-+++ b/crypto/xts.c
-@@ -322,7 +322,7 @@ static void exit_tfm(struct crypto_skcipher *tfm)
- 	crypto_free_cipher(ctx->tweak);
++	return crc;
++}
++
++static int stm32_crc_init(struct shash_desc *desc)
++{
++	struct stm32_crc_desc_ctx *ctx = shash_desc_ctx(desc);
++	struct stm32_crc_ctx *mctx = crypto_shash_ctx(desc->tfm);
++	struct stm32_crc *crc;
++
++	crc = stm32_crc_get_next_crc();
++	if (!crc)
++		return -ENODEV;
++
+ 	pm_runtime_get_sync(crc->dev);
+ 
+ 	/* Reset, set key, poly and configure in bit reverse mode */
+@@ -125,9 +138,9 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+ 	struct stm32_crc_ctx *mctx = crypto_shash_ctx(desc->tfm);
+ 	struct stm32_crc *crc;
+ 
+-	spin_lock_bh(&crc_list.lock);
+-	crc = list_first_entry(&crc_list.dev_list, struct stm32_crc, list);
+-	spin_unlock_bh(&crc_list.lock);
++	crc = stm32_crc_get_next_crc();
++	if (!crc)
++		return -ENODEV;
+ 
+ 	pm_runtime_get_sync(crc->dev);
+ 
+@@ -200,6 +213,8 @@ static int stm32_crc_digest(struct shash_desc *desc, const u8 *data,
+ 	return stm32_crc_init(desc) ?: stm32_crc_finup(desc, data, length, out);
  }
  
--static void free(struct skcipher_instance *inst)
-+static void free_inst(struct skcipher_instance *inst)
- {
- 	crypto_drop_skcipher(skcipher_instance_ctx(inst));
- 	kfree(inst);
-@@ -434,7 +434,7 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.encrypt = encrypt;
- 	inst->alg.decrypt = decrypt;
++static unsigned int refcnt;
++static DEFINE_MUTEX(refcnt_lock);
+ static struct shash_alg algs[] = {
+ 	/* CRC-32 */
+ 	{
+@@ -290,12 +305,18 @@ static int stm32_crc_probe(struct platform_device *pdev)
+ 	list_add(&crc->list, &crc_list.dev_list);
+ 	spin_unlock(&crc_list.lock);
  
--	inst->free = free;
-+	inst->free = free_inst;
+-	ret = crypto_register_shashes(algs, ARRAY_SIZE(algs));
+-	if (ret) {
+-		dev_err(dev, "Failed to register\n");
+-		clk_disable_unprepare(crc->clk);
+-		return ret;
++	mutex_lock(&refcnt_lock);
++	if (!refcnt) {
++		ret = crypto_register_shashes(algs, ARRAY_SIZE(algs));
++		if (ret) {
++			mutex_unlock(&refcnt_lock);
++			dev_err(dev, "Failed to register\n");
++			clk_disable_unprepare(crc->clk);
++			return ret;
++		}
+ 	}
++	refcnt++;
++	mutex_unlock(&refcnt_lock);
  
- 	err = skcipher_register_instance(tmpl, inst);
- 	if (err)
+ 	dev_info(dev, "Initialized\n");
+ 
+@@ -316,7 +337,10 @@ static int stm32_crc_remove(struct platform_device *pdev)
+ 	list_del(&crc->list);
+ 	spin_unlock(&crc_list.lock);
+ 
+-	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
++	mutex_lock(&refcnt_lock);
++	if (!--refcnt)
++		crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
++	mutex_unlock(&refcnt_lock);
+ 
+ 	pm_runtime_disable(crc->dev);
+ 	pm_runtime_put_noidle(crc->dev);
 -- 
 2.25.1
 
