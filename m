@@ -2,127 +2,240 @@ Return-Path: <SRS0=nn+h=7V=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E109C433E1
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jun 2020 21:27:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98049C433E0
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jun 2020 23:11:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 062C2206D5
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jun 2020 21:27:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gbwauFtk"
+	by mail.kernel.org (Postfix) with ESMTP id 72AA7208C3
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jun 2020 23:11:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1591657860;
+	bh=YnT7AuoKvhjR1CyujW91C6E7uatjm8YJ/uf+9+UXUxA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=LHabqfdIrBjrEDsgnxMLlqyBwjIv9X7lkbLZSeZhohP4/lqDKHURFV8qFf8Eb7eIc
+	 ExX0Wn3WaRbIHIVNDkZZCN/in5VR9VePlmx1Nk6dXudECarPz6q/g/EhJ2tfFXb01C
+	 eRN1NDn1jkKGnUTNDdUkT+I8EJq6ickdys1G0yNY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726734AbgFHV1G (ORCPT
+        id S1728099AbgFHXK7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Jun 2020 17:27:06 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:56358 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726705AbgFHV1F (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Jun 2020 17:27:05 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 058LGMcw044154;
-        Mon, 8 Jun 2020 21:26:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2020-01-29; bh=gq92GnkfEK6oGnpL0v/HMBD4QG3kwY7CAH1UUE9eQwA=;
- b=gbwauFtkftQo4WPp+JpwpP6vjKXot2jldVowtqqWifA6iDQwwLfOexTajAFj/1ATtWvA
- 84mvZx+7faLebbrqRazxKQ1LUJUvV+oWCeizq9KfWT5wQcvi54xbXCEquWGb/yPX4xWM
- v7YT/Qbz7vBivqVl+EgF5tFRmudEBesmLCvE9RfjHFKxCqHausVPUjlKRNt9lWAfluV6
- 4FVFmmFsEOkClLin3WJFNWykY0QJ6bj8XUP/sAyLxQGB4oOZ+GMuciTfCmvS6lGu8Bh6
- eKeq9Wsd4Iyz9MvlC60KEiD3fhtlqrkuVy6ca+F8K97p6EyTjszGOy0VcixPRenGc+9H NA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 31g3sms2d7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 08 Jun 2020 21:26:57 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 058LDdW2096260;
-        Mon, 8 Jun 2020 21:26:57 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 31gn2vrdft-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 08 Jun 2020 21:26:57 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 058LQuli001801;
-        Mon, 8 Jun 2020 21:26:56 GMT
-Received: from parnassus.us.oracle.com (/10.39.236.86)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 08 Jun 2020 14:26:55 -0700
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [PATCH] padata: upgrade smp_mb__after_atomic to smp_mb in padata_do_serial
-Date:   Mon,  8 Jun 2020 17:26:52 -0400
-Message-Id: <20200608212652.3469814-1-daniel.m.jordan@oracle.com>
-X-Mailer: git-send-email 2.26.2
+        Mon, 8 Jun 2020 19:10:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56988 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728792AbgFHXK5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 8 Jun 2020 19:10:57 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E9D7C208C3;
+        Mon,  8 Jun 2020 23:10:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1591657856;
+        bh=YnT7AuoKvhjR1CyujW91C6E7uatjm8YJ/uf+9+UXUxA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=mH1Sa5CY5ci70w889QBr061dnedKx02/ejvuX9rBzHRpCoQubRcW1wiJzrEwOrto+
+         +71wC90R362hKxL++tjtDdwNz+WXH1lm2IwjzvGXrK7FhilAXyEU9O8gnlmvh9zfYf
+         HQ3CeW+RUCjT2QdjVP8BUQBcvl/54FT149DUjmLE=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Nicolas Toromanoff <nicolas.toromanoff@st.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.7 220/274] crypto: stm32/crc32 - fix ext4 chksum BUG_ON()
+Date:   Mon,  8 Jun 2020 19:05:13 -0400
+Message-Id: <20200608230607.3361041-220-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200608230607.3361041-1-sashal@kernel.org>
+References: <20200608230607.3361041-1-sashal@kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9646 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 malwarescore=0
- bulkscore=0 adultscore=0 mlxlogscore=999 spamscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006080148
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9646 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 priorityscore=1501
- lowpriorityscore=0 impostorscore=0 cotscore=-2147483648 suspectscore=0
- spamscore=0 bulkscore=0 malwarescore=0 phishscore=0 mlxscore=0
- mlxlogscore=999 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006080148
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A 5.7 kernel hangs during a tcrypt test of padata that waits for an AEAD
-request to finish.  This is only seen on large machines running many
-concurrent requests.
+From: Nicolas Toromanoff <nicolas.toromanoff@st.com>
 
-The issue is that padata never serializes the request.  The removal of
-the reorder_objects atomic missed that the memory barrier in
-padata_do_serial() depends on it.
+[ Upstream commit 49c2c082e00e0bc4f5cbb7c21c7f0f873b35ab09 ]
 
-Upgrade the barrier from smp_mb__after_atomic to smp_mb to get correct
-ordering again.
+Allow use of crc_update without prior call to crc_init.
+And change (and fix) driver to use CRC device even on unaligned buffers.
 
-Fixes: 3facced7aeed1 ("padata: remove reorder_objects")
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+Fixes: b51dbe90912a ("crypto: stm32 - Support for STM32 CRC32 crypto module")
+
+Signed-off-by: Nicolas Toromanoff <nicolas.toromanoff@st.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- kernel/padata.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/stm32/stm32-crc32.c | 98 +++++++++++++++---------------
+ 1 file changed, 48 insertions(+), 50 deletions(-)
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index a6afa12fb75ee..7b701bc3e7922 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -260,7 +260,7 @@ static void padata_reorder(struct parallel_data *pd)
- 	 *
- 	 * Ensure reorder queue is read after pd->lock is dropped so we see
- 	 * new objects from another task in padata_do_serial.  Pairs with
--	 * smp_mb__after_atomic in padata_do_serial.
-+	 * smp_mb in padata_do_serial.
- 	 */
- 	smp_mb();
+diff --git a/drivers/crypto/stm32/stm32-crc32.c b/drivers/crypto/stm32/stm32-crc32.c
+index 8e92e4ac79f1..c6156bf6c603 100644
+--- a/drivers/crypto/stm32/stm32-crc32.c
++++ b/drivers/crypto/stm32/stm32-crc32.c
+@@ -28,8 +28,10 @@
  
-@@ -342,7 +342,7 @@ void padata_do_serial(struct padata_priv *padata)
- 	 * with the trylock of pd->lock in padata_reorder.  Pairs with smp_mb
- 	 * in padata_reorder.
- 	 */
--	smp_mb__after_atomic();
-+	smp_mb();
+ /* Registers values */
+ #define CRC_CR_RESET            BIT(0)
+-#define CRC_CR_REVERSE          (BIT(7) | BIT(6) | BIT(5))
+ #define CRC_INIT_DEFAULT        0xFFFFFFFF
++#define CRC_CR_REV_IN_WORD      (BIT(6) | BIT(5))
++#define CRC_CR_REV_IN_BYTE      BIT(5)
++#define CRC_CR_REV_OUT          BIT(7)
  
- 	padata_reorder(pd);
+ #define CRC_AUTOSUSPEND_DELAY	50
+ 
+@@ -38,8 +40,6 @@ struct stm32_crc {
+ 	struct device    *dev;
+ 	void __iomem     *regs;
+ 	struct clk       *clk;
+-	u8               pending_data[sizeof(u32)];
+-	size_t           nb_pending_bytes;
+ };
+ 
+ struct stm32_crc_list {
+@@ -59,7 +59,6 @@ struct stm32_crc_ctx {
+ 
+ struct stm32_crc_desc_ctx {
+ 	u32    partial; /* crc32c: partial in first 4 bytes of that struct */
+-	struct stm32_crc *crc;
+ };
+ 
+ static int stm32_crc32_cra_init(struct crypto_tfm *tfm)
+@@ -99,25 +98,22 @@ static int stm32_crc_init(struct shash_desc *desc)
+ 	struct stm32_crc *crc;
+ 
+ 	spin_lock_bh(&crc_list.lock);
+-	list_for_each_entry(crc, &crc_list.dev_list, list) {
+-		ctx->crc = crc;
+-		break;
+-	}
++	crc = list_first_entry(&crc_list.dev_list, struct stm32_crc, list);
+ 	spin_unlock_bh(&crc_list.lock);
+ 
+-	pm_runtime_get_sync(ctx->crc->dev);
++	pm_runtime_get_sync(crc->dev);
+ 
+ 	/* Reset, set key, poly and configure in bit reverse mode */
+-	writel_relaxed(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
+-	writel_relaxed(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
+-	writel_relaxed(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
++	writel_relaxed(bitrev32(mctx->key), crc->regs + CRC_INIT);
++	writel_relaxed(bitrev32(mctx->poly), crc->regs + CRC_POL);
++	writel_relaxed(CRC_CR_RESET | CRC_CR_REV_IN_WORD | CRC_CR_REV_OUT,
++		       crc->regs + CRC_CR);
+ 
+ 	/* Store partial result */
+-	ctx->partial = readl_relaxed(ctx->crc->regs + CRC_DR);
+-	ctx->crc->nb_pending_bytes = 0;
++	ctx->partial = readl_relaxed(crc->regs + CRC_DR);
+ 
+-	pm_runtime_mark_last_busy(ctx->crc->dev);
+-	pm_runtime_put_autosuspend(ctx->crc->dev);
++	pm_runtime_mark_last_busy(crc->dev);
++	pm_runtime_put_autosuspend(crc->dev);
+ 
+ 	return 0;
  }
-
-base-commit: 3d77e6a8804abcc0504c904bd6e5cdf3a5cf8162
+@@ -126,31 +122,49 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+ 			    unsigned int length)
+ {
+ 	struct stm32_crc_desc_ctx *ctx = shash_desc_ctx(desc);
+-	struct stm32_crc *crc = ctx->crc;
+-	u32 *d32;
+-	unsigned int i;
++	struct stm32_crc_ctx *mctx = crypto_shash_ctx(desc->tfm);
++	struct stm32_crc *crc;
++
++	spin_lock_bh(&crc_list.lock);
++	crc = list_first_entry(&crc_list.dev_list, struct stm32_crc, list);
++	spin_unlock_bh(&crc_list.lock);
+ 
+ 	pm_runtime_get_sync(crc->dev);
+ 
+-	if (unlikely(crc->nb_pending_bytes)) {
+-		while (crc->nb_pending_bytes != sizeof(u32) && length) {
+-			/* Fill in pending data */
+-			crc->pending_data[crc->nb_pending_bytes++] = *(d8++);
++	/*
++	 * Restore previously calculated CRC for this context as init value
++	 * Restore polynomial configuration
++	 * Configure in register for word input data,
++	 * Configure out register in reversed bit mode data.
++	 */
++	writel_relaxed(bitrev32(ctx->partial), crc->regs + CRC_INIT);
++	writel_relaxed(bitrev32(mctx->poly), crc->regs + CRC_POL);
++	writel_relaxed(CRC_CR_RESET | CRC_CR_REV_IN_WORD | CRC_CR_REV_OUT,
++		       crc->regs + CRC_CR);
++
++	if (d8 != PTR_ALIGN(d8, sizeof(u32))) {
++		/* Configure for byte data */
++		writel_relaxed(CRC_CR_REV_IN_BYTE | CRC_CR_REV_OUT,
++			       crc->regs + CRC_CR);
++		while (d8 != PTR_ALIGN(d8, sizeof(u32)) && length) {
++			writeb_relaxed(*d8++, crc->regs + CRC_DR);
+ 			length--;
+ 		}
+-
+-		if (crc->nb_pending_bytes == sizeof(u32)) {
+-			/* Process completed pending data */
+-			writel_relaxed(*(u32 *)crc->pending_data,
+-				       crc->regs + CRC_DR);
+-			crc->nb_pending_bytes = 0;
+-		}
++		/* Configure for word data */
++		writel_relaxed(CRC_CR_REV_IN_WORD | CRC_CR_REV_OUT,
++			       crc->regs + CRC_CR);
+ 	}
+ 
+-	d32 = (u32 *)d8;
+-	for (i = 0; i < length >> 2; i++)
+-		/* Process 32 bits data */
+-		writel_relaxed(*(d32++), crc->regs + CRC_DR);
++	for (; length >= sizeof(u32); d8 += sizeof(u32), length -= sizeof(u32))
++		writel_relaxed(*((u32 *)d8), crc->regs + CRC_DR);
++
++	if (length) {
++		/* Configure for byte data */
++		writel_relaxed(CRC_CR_REV_IN_BYTE | CRC_CR_REV_OUT,
++			       crc->regs + CRC_CR);
++		while (length--)
++			writeb_relaxed(*d8++, crc->regs + CRC_DR);
++	}
+ 
+ 	/* Store partial result */
+ 	ctx->partial = readl_relaxed(crc->regs + CRC_DR);
+@@ -158,22 +172,6 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+ 	pm_runtime_mark_last_busy(crc->dev);
+ 	pm_runtime_put_autosuspend(crc->dev);
+ 
+-	/* Check for pending data (non 32 bits) */
+-	length &= 3;
+-	if (likely(!length))
+-		return 0;
+-
+-	if ((crc->nb_pending_bytes + length) >= sizeof(u32)) {
+-		/* Shall not happen */
+-		dev_err(crc->dev, "Pending data overflow\n");
+-		return -EINVAL;
+-	}
+-
+-	d8 = (const u8 *)d32;
+-	for (i = 0; i < length; i++)
+-		/* Store pending data */
+-		crc->pending_data[crc->nb_pending_bytes++] = *(d8++);
+-
+ 	return 0;
+ }
+ 
 -- 
-2.26.2
+2.25.1
 
