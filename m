@@ -4,54 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2519AC433DF
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 00:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE911C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 00:42:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E3AA82085B
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 00:16:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B166C20737
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 00:42:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591661816;
-	bh=1ZqBWfgeh7FOkLqgoKPI+U9m04VMyCuq7dbiqJMlu9I=;
+	s=default; t=1591663331;
+	bh=0f6+8/gWP04A7gXm4h6LYSgsObNR/CCROKDlx9F8Tbc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Vr/hLEx7gf5GmPDyl+SpA8ETqpHUP9k6ERueyxOFqSUFLV2zaHnws6rLDsHyPCtni
-	 VFWSqutafxNBMkCTCmS+LdJ8QZXBYX3OI+c/bCl5FRlSuYUAnTKAsgjihjk7NbkT/I
-	 zIDe3WxfjtVRmFkDZg2KxbmgYiBJZGc1sffs/g40=
+	b=koCRzL29zVdtYR8EnIdDvWRmQMKK8NFvV7ETnDnl0NSceEG9kfEUas/GFV0GGOKDW
+	 b46wrTvGBg8mdKvqkEfVeQM24fLDgS3n/pptROLklvZmQ+StfLYJLZK5OkGY09t7pW
+	 JZnb7ATGk0f53ep4wWXR+jOORpBwekBwRbCdCWoo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730759AbgFIAQh (ORCPT
+        id S1731251AbgFIAmJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Jun 2020 20:16:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41612 "EHLO mail.kernel.org"
+        Mon, 8 Jun 2020 20:42:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60110 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730736AbgFHXTA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Jun 2020 19:19:00 -0400
+        id S1729137AbgFHXMc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 8 Jun 2020 19:12:32 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A3AC320872;
-        Mon,  8 Jun 2020 23:18:59 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 81E4A208C3;
+        Mon,  8 Jun 2020 23:12:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591658340;
-        bh=1ZqBWfgeh7FOkLqgoKPI+U9m04VMyCuq7dbiqJMlu9I=;
+        s=default; t=1591657952;
+        bh=0f6+8/gWP04A7gXm4h6LYSgsObNR/CCROKDlx9F8Tbc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cSo/jl9zZMj+PXdHPX9ALpvQFHBTL7j2pwLUj22wsq7g+bhxPQ9zr+0hKSZZQalUi
-         sKV4Mhi1IVXmlcGq+ILwo6Ys9XQxpaHI2ixpg49HCySneMcCcIs1YCRLUU17lMfNGb
-         Bs1z+khzCO3aBfBgBFoxALim9WPbnnWzy3BP2NDI=
+        b=VyLJbuPf++DX0toDS2huR7jnyUpXSb52GKzTsDsUx4mvgI7DgMz8Df/SnjX9P326q
+         9MbXSG0hFf5fzB0s75okBfNjWdT1ekCezOb9JSf+PtWUS1ZxVdzZofs6HEra+9PuXa
+         IoJ+MoF9OHDvNAR8jifAodV6BU4BlxtoXFzLVx+o=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 009/175] crypto: ccp -- don't "select" CONFIG_DMADEVICES
-Date:   Mon,  8 Jun 2020 19:16:02 -0400
-Message-Id: <20200608231848.3366970-9-sashal@kernel.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.6 017/606] gcc-10: avoid shadowing standard library 'free()' in crypto
+Date:   Mon,  8 Jun 2020 19:02:22 -0400
+Message-Id: <20200608231211.3363633-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200608231848.3366970-1-sashal@kernel.org>
-References: <20200608231848.3366970-1-sashal@kernel.org>
+In-Reply-To: <20200608231211.3363633-1-sashal@kernel.org>
+References: <20200608231211.3363633-1-sashal@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -60,57 +60,88 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+From: Linus Torvalds <torvalds@linux-foundation.org>
 
-[ Upstream commit eebac678556d6927f09a992872f4464cf3aecc76 ]
+commit 1a263ae60b04de959d9ce9caea4889385eefcc7b upstream.
 
-DMADEVICES is the top-level option for the slave DMA
-subsystem, and should not be selected by device drivers,
-as this can cause circular dependencies such as:
+gcc-10 has started warning about conflicting types for a few new
+built-in functions, particularly 'free()'.
 
-drivers/net/ethernet/freescale/Kconfig:6:error: recursive dependency detected!
-drivers/net/ethernet/freescale/Kconfig:6:	symbol NET_VENDOR_FREESCALE depends on PPC_BESTCOMM
-drivers/dma/bestcomm/Kconfig:6:	symbol PPC_BESTCOMM depends on DMADEVICES
-drivers/dma/Kconfig:6:	symbol DMADEVICES is selected by CRYPTO_DEV_SP_CCP
-drivers/crypto/ccp/Kconfig:10:	symbol CRYPTO_DEV_SP_CCP depends on CRYPTO
-crypto/Kconfig:16:	symbol CRYPTO is selected by LIBCRC32C
-lib/Kconfig:222:	symbol LIBCRC32C is selected by LIQUIDIO
-drivers/net/ethernet/cavium/Kconfig:65:	symbol LIQUIDIO depends on PTP_1588_CLOCK
-drivers/ptp/Kconfig:8:	symbol PTP_1588_CLOCK is implied by FEC
-drivers/net/ethernet/freescale/Kconfig:23:	symbol FEC depends on NET_VENDOR_FREESCALE
+This results in warnings like:
 
-The LIQUIDIO driver causing this problem is addressed in a
-separate patch, but this change is needed to prevent it from
-happening again.
+   crypto/xts.c:325:13: warning: conflicting types for built-in function ‘free’; expected ‘void(void *)’ [-Wbuiltin-declaration-mismatch]
 
-Using "depends on DMADEVICES" is what we do for all other
-implementations of slave DMA controllers as well.
+because the crypto layer had its local freeing functions called
+'free()'.
 
-Fixes: b3c2fee5d66b ("crypto: ccp - Ensure all dependencies are specified")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Gcc-10 is in the wrong here, since that function is marked 'static', and
+thus there is no chance of confusion with any standard library function
+namespace.
+
+But the simplest thing to do is to just use a different name here, and
+avoid this gcc mis-feature.
+
+[ Side note: gcc knowing about 'free()' is in itself not the
+  mis-feature: the semantics of 'free()' are special enough that a
+  compiler can validly do special things when seeing it.
+
+  So the mis-feature here is that gcc thinks that 'free()' is some
+  restricted name, and you can't shadow it as a local static function.
+
+  Making the special 'free()' semantics be a function attribute rather
+  than tied to the name would be the much better model ]
+
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- drivers/crypto/ccp/Kconfig | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ crypto/lrw.c | 4 ++--
+ crypto/xts.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
-index 8fec733f567f..63e227adbb13 100644
---- a/drivers/crypto/ccp/Kconfig
-+++ b/drivers/crypto/ccp/Kconfig
-@@ -10,10 +10,9 @@ config CRYPTO_DEV_CCP_DD
- config CRYPTO_DEV_SP_CCP
- 	bool "Cryptographic Coprocessor device"
- 	default y
--	depends on CRYPTO_DEV_CCP_DD
-+	depends on CRYPTO_DEV_CCP_DD && DMADEVICES
- 	select HW_RANDOM
- 	select DMA_ENGINE
--	select DMADEVICES
- 	select CRYPTO_SHA1
- 	select CRYPTO_SHA256
- 	help
+diff --git a/crypto/lrw.c b/crypto/lrw.c
+index 63c485c0d8a6..9b20fc4b2efb 100644
+--- a/crypto/lrw.c
++++ b/crypto/lrw.c
+@@ -287,7 +287,7 @@ static void exit_tfm(struct crypto_skcipher *tfm)
+ 	crypto_free_skcipher(ctx->child);
+ }
+ 
+-static void free(struct skcipher_instance *inst)
++static void free_inst(struct skcipher_instance *inst)
+ {
+ 	crypto_drop_skcipher(skcipher_instance_ctx(inst));
+ 	kfree(inst);
+@@ -400,7 +400,7 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->alg.encrypt = encrypt;
+ 	inst->alg.decrypt = decrypt;
+ 
+-	inst->free = free;
++	inst->free = free_inst;
+ 
+ 	err = skcipher_register_instance(tmpl, inst);
+ 	if (err)
+diff --git a/crypto/xts.c b/crypto/xts.c
+index 29efa15f1495..983dae2bb2db 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -322,7 +322,7 @@ static void exit_tfm(struct crypto_skcipher *tfm)
+ 	crypto_free_cipher(ctx->tweak);
+ }
+ 
+-static void free(struct skcipher_instance *inst)
++static void free_inst(struct skcipher_instance *inst)
+ {
+ 	crypto_drop_skcipher(skcipher_instance_ctx(inst));
+ 	kfree(inst);
+@@ -434,7 +434,7 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->alg.encrypt = encrypt;
+ 	inst->alg.decrypt = decrypt;
+ 
+-	inst->free = free;
++	inst->free = free_inst;
+ 
+ 	err = skcipher_register_instance(tmpl, inst);
+ 	if (err)
 -- 
 2.25.1
 
