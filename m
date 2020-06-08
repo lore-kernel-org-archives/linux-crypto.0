@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99537C433E1
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 00:48:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D08C9C433E1
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 00:50:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 79AD2207ED
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 00:48:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BCA020760
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 00:50:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591663705;
-	bh=ulf2SztqD35ITArIHACtWdmO6AcDVM1Uqldkqoc+rQg=;
+	s=default; t=1591663801;
+	bh=73KsjooSBJpJiiH+QOeAQXNpAvN1RJ9iKUFTKw70dcU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=hCTpyVIbnJs1SOdkIlkVnVvP54RQocjPsPunL6CrCThN9A3A98pNyebC/llAdkfIH
-	 m1KQMh4MUtEqfglbnr5CuMe0AVD51mzlEu2/mQ7sV75eLnO49r+BcIy8RL0fkyjF2j
-	 nxmplC1lkHe9T27WmYkgLscgUPs3RfGBCDmH0zl0=
+	b=lI4Nv6i8pOxdhwkHW180iTtiSSpBz6+jBP9FUKUpkvJjc6kSiGe/DcP2X8cKrWlyJ
+	 /7OMuRXYtSweeE5Y/j341tFvEB3DaTKYppao821ySu95kb6xtBJAmJx6loAvgU7cYE
+	 P6PvLErlSPxbaH1cruXCTe25TzYSpv0Y+dYrPeQ0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728802AbgFHXK7 (ORCPT
+        id S1728410AbgFHXKh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Jun 2020 19:10:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57320 "EHLO mail.kernel.org"
+        Mon, 8 Jun 2020 19:10:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56738 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728795AbgFHXK6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Jun 2020 19:10:58 -0400
+        id S1728703AbgFHXKg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 8 Jun 2020 19:10:36 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2DC3020CC7;
-        Mon,  8 Jun 2020 23:10:57 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 89C4F20890;
+        Mon,  8 Jun 2020 23:10:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591657858;
-        bh=ulf2SztqD35ITArIHACtWdmO6AcDVM1Uqldkqoc+rQg=;
+        s=default; t=1591657836;
+        bh=73KsjooSBJpJiiH+QOeAQXNpAvN1RJ9iKUFTKw70dcU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=De+4KpYGNwnXl/FdJsiQZUsI4wC686zjANFRFDfRkOO1SkcbUGc2QBzqfVjmkeC6u
-         JEhRlqDuz2MWW1rWE3teUJrMNrByx38Cfncn5Sl9ux3kw6AEM6S18uR5P410LtuXfX
-         xNzZol4PgvAWHb9muN396RV9Bn40AFkm5wKtkC2Q=
+        b=K0KciWcBM2kpYve8pyLzVAxScAx6+scfH6ot15zpKsh/6l2jOU5Zy6grIDlCgZ6uY
+         /ySlNXhU519zSc9a9PmiXoEZVQ1Dm4FqP0+/bKAWgGYOS7GmC6ANWt/dRhEthEHesP
+         JwBcB0a4QvEkOv7C2tTOavgkOIAb89xJgqfp9iH8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Nicolas Toromanoff <nicolas.toromanoff@st.com>,
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Nathan Chancellor <natechancellor@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 5.7 221/274] crypto: stm32/crc32 - fix run-time self test issue.
-Date:   Mon,  8 Jun 2020 19:05:14 -0400
-Message-Id: <20200608230607.3361041-221-sashal@kernel.org>
+        clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 5.7 205/274] crypto: blake2b - Fix clang optimization for ARMv7-M
+Date:   Mon,  8 Jun 2020 19:04:58 -0400
+Message-Id: <20200608230607.3361041-205-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200608230607.3361041-1-sashal@kernel.org>
 References: <20200608230607.3361041-1-sashal@kernel.org>
@@ -61,58 +61,41 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Nicolas Toromanoff <nicolas.toromanoff@st.com>
+From: Arnd Bergmann <arnd@arndb.de>
 
-[ Upstream commit a8cc3128bf2c01c4d448fe17149e87132113b445 ]
+[ Upstream commit 0c0408e86dbe8f44d4b27bf42130e8ac905361d6 ]
 
-Fix wrong crc32 initialisation value:
-"alg: shash: stm32_crc32 test failed (wrong result) on test vector 0,
-cfg="init+update+final aligned buffer"
-cra_name="crc32c" expects an init value of 0XFFFFFFFF,
-cra_name="crc32" expects an init value of 0.
+When building for ARMv7-M, clang-9 or higher tries to unroll some loops,
+which ends up confusing the register allocator to the point of generating
+rather bad code and using more than the warning limit for stack frames:
 
-Fixes: b51dbe90912a ("crypto: stm32 - Support for STM32 CRC32 crypto module")
+warning: stack frame size of 1200 bytes in function 'blake2b_compress' [-Wframe-larger-than=]
 
-Signed-off-by: Nicolas Toromanoff <nicolas.toromanoff@st.com>
+Forcing it to not unroll the final loop avoids this problem.
+
+Fixes: 91d689337fe8 ("crypto: blake2b - add blake2b generic implementation")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/stm32/stm32-crc32.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ crypto/blake2b_generic.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/stm32/stm32-crc32.c b/drivers/crypto/stm32/stm32-crc32.c
-index c6156bf6c603..1c3e411b7acb 100644
---- a/drivers/crypto/stm32/stm32-crc32.c
-+++ b/drivers/crypto/stm32/stm32-crc32.c
-@@ -28,10 +28,10 @@
- 
- /* Registers values */
- #define CRC_CR_RESET            BIT(0)
--#define CRC_INIT_DEFAULT        0xFFFFFFFF
- #define CRC_CR_REV_IN_WORD      (BIT(6) | BIT(5))
- #define CRC_CR_REV_IN_BYTE      BIT(5)
- #define CRC_CR_REV_OUT          BIT(7)
-+#define CRC32C_INIT_DEFAULT     0xFFFFFFFF
- 
- #define CRC_AUTOSUSPEND_DELAY	50
- 
-@@ -65,7 +65,7 @@ static int stm32_crc32_cra_init(struct crypto_tfm *tfm)
- {
- 	struct stm32_crc_ctx *mctx = crypto_tfm_ctx(tfm);
- 
--	mctx->key = CRC_INIT_DEFAULT;
-+	mctx->key = 0;
- 	mctx->poly = CRC32_POLY_LE;
- 	return 0;
- }
-@@ -74,7 +74,7 @@ static int stm32_crc32c_cra_init(struct crypto_tfm *tfm)
- {
- 	struct stm32_crc_ctx *mctx = crypto_tfm_ctx(tfm);
- 
--	mctx->key = CRC_INIT_DEFAULT;
-+	mctx->key = CRC32C_INIT_DEFAULT;
- 	mctx->poly = CRC32C_POLY_LE;
- 	return 0;
+diff --git a/crypto/blake2b_generic.c b/crypto/blake2b_generic.c
+index 1d262374fa4e..0ffd8d92e308 100644
+--- a/crypto/blake2b_generic.c
++++ b/crypto/blake2b_generic.c
+@@ -129,7 +129,9 @@ static void blake2b_compress(struct blake2b_state *S,
+ 	ROUND(9);
+ 	ROUND(10);
+ 	ROUND(11);
+-
++#ifdef CONFIG_CC_IS_CLANG
++#pragma nounroll /* https://bugs.llvm.org/show_bug.cgi?id=45803 */
++#endif
+ 	for (i = 0; i < 8; ++i)
+ 		S->h[i] = S->h[i] ^ v[i] ^ v[i + 8];
  }
 -- 
 2.25.1
