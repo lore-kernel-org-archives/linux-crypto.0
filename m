@@ -2,153 +2,86 @@ Return-Path: <SRS0=nn+h=7V=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF36C433E2
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jun 2020 07:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC680C433DF
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jun 2020 14:01:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 287082076A
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jun 2020 07:49:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uLi1Rmjh"
+	by mail.kernel.org (Postfix) with ESMTP id 97065206C3
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jun 2020 14:01:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729068AbgFHHtd (ORCPT
+        id S1728472AbgFHOBk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Jun 2020 03:49:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36790 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729108AbgFHHtb (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Jun 2020 03:49:31 -0400
-Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84471C08C5C3
-        for <linux-crypto@vger.kernel.org>; Mon,  8 Jun 2020 00:49:29 -0700 (PDT)
-Received: by mail-lf1-x144.google.com with SMTP id u16so9607267lfl.8
-        for <linux-crypto@vger.kernel.org>; Mon, 08 Jun 2020 00:49:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=37K4gneCiuRGulLCKf4ynFvMW4e68flpa0GiDzEnHyg=;
-        b=uLi1RmjhtH1FlDsw82tNk1UEqMah3505zWAqYW0iJnhsR3ofTEhFjqgg0bqVnddqZT
-         wAxQu3f3tLu0IjoYRj/q5xCx5ttN12X/9cS1LPWtvPhLhxvS2znXsVPeT1APIbqa6lNe
-         A4/si6/ECFxjTPLdooQi+BUYuS9FxroIrzWRnwuzUiDLj5axLDtmFK/fgmAKdII++gN0
-         8H+slUd3WPMJbncGutqkddXFKaG9mJrXn4b9AcUYLERHHIRVN1uuOFicsU96UPRjItfA
-         1eA5C+72CB02PbahRX0V2G87TOjsr01aUEtMLxh5bPLhc8KL2wa6RaC1xoAyU4lcJ6mb
-         7heQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=37K4gneCiuRGulLCKf4ynFvMW4e68flpa0GiDzEnHyg=;
-        b=ERjOcKRW+HJKau06LglOc34+k26o3nMxWppPHEcVxiYJ2P/WJWSj+ZZmtZWvH0bCJH
-         vRfc9BaE+zu2wt+Ua7A2qcc0K9BgQpi6TQjxi/i/dHCCJVQA7BoNWato0PQEtlbnLLkD
-         B1JzeiBZuKyVsjJknE21XHvFp/nZJqavrChXpk8arkzKmJbpjO1sPSVLFDqb6UHJYc0E
-         nKjP9Tb+FWV/SqiI1uOjJWD9wr3lODV3hmihvlTLoxCnW25AokubMMkKcDf1XbVPIxJb
-         mw+o+VA5u5zs6fAUxH22Xra0tt/ftSiBkyUatVaXEjEZqs6jIe4lbKDz7qqjLL7MzVzK
-         Em4w==
-X-Gm-Message-State: AOAM531l8HB0BN086StDO+fZ8QUV/sv3hsRokMjnHFyhau6AAw5XL/hS
-        dKgKnxVpMCfLCFqjgQdvRR8w4WTUHH0z0n9ERA/ZFw==
-X-Google-Smtp-Source: ABdhPJwxrOl8NL4ByK/Pfp55vHI3T08O8KOMm+uol36pOuMBluSdlFqIghiVrQxdlv6OnTL4mJMgM/2GivNrvUhScRE=
-X-Received: by 2002:ac2:5473:: with SMTP id e19mr11864445lfn.21.1591602567899;
- Mon, 08 Jun 2020 00:49:27 -0700 (PDT)
+        Mon, 8 Jun 2020 10:01:40 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5798 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726092AbgFHOBk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 8 Jun 2020 10:01:40 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 9221E5032F1536D6C2DD;
+        Mon,  8 Jun 2020 22:01:38 +0800 (CST)
+Received: from huawei.com (10.67.165.24) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Mon, 8 Jun 2020
+ 22:01:32 +0800
+From:   Longfang Liu <liulongfang@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>,
+        <kong.kongxinwei@hisilicon.com>, <ike.pan@canonical.com>
+Subject: [PATCH] crypto: hisilicon - update SEC driver module parameter
+Date:   Mon, 8 Jun 2020 22:01:11 +0800
+Message-ID: <1591624871-49173-1-git-send-email-liulongfang@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-References: <1591085678-22764-1-git-send-email-neal.liu@mediatek.com>
- <CAMj1kXHjAdk5=-uSh_=S9j5cz42zr3h6t+YYGy+obevuQDp0fg@mail.gmail.com>
- <85dfc0142d3879d50c0ba18bcc71e199@misterjones.org> <1591169342.4878.9.camel@mtkswgap22>
- <fcbe37f6f9cbcde24f9c28bc504f1f0e@kernel.org> <20200603093416.GY1551@shell.armlinux.org.uk>
- <1591341543.19510.4.camel@mtkswgap22> <20200605080905.GF1551@shell.armlinux.org.uk>
- <1591347582.21704.9.camel@mtkswgap22>
-In-Reply-To: <1591347582.21704.9.camel@mtkswgap22>
-From:   Sumit Garg <sumit.garg@linaro.org>
-Date:   Mon, 8 Jun 2020 13:19:16 +0530
-Message-ID: <CAFA6WYNqWmhiz=wvCTt1ubMtrhf+RtFSC2GiQQeteEbmrF1EnQ@mail.gmail.com>
-Subject: Re: Security Random Number Generator support
-To:     Neal Liu <neal.liu@mediatek.com>
-Cc:     Russell King - ARM Linux admin <linux@armlinux.org.uk>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>, Julius Werner <jwerner@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <maz@kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Sean Wang <sean.wang@kernel.org>,
-        lkml <linux-kernel@vger.kernel.org>,
-        wsd_upstream <wsd_upstream@mediatek.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        =?UTF-8?B?Q3J5c3RhbCBHdW8gKOmDreaZtik=?= <Crystal.Guo@mediatek.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Neal,
+As stress-ng running SEC engine on the Ubuntu OS,
+we found that SEC only supports two threads each with one TFM
+based on the default module parameter 'ctx_q_num'.
+If running more threads, stress-ng will fail since it cannot
+get more TFMs.
 
-On Fri, 5 Jun 2020 at 14:40, Neal Liu <neal.liu@mediatek.com> wrote:
->
-> On Fri, 2020-06-05 at 09:09 +0100, Russell King - ARM Linux admin wrote:
-> > On Fri, Jun 05, 2020 at 03:19:03PM +0800, Neal Liu wrote:
-> > > On Wed, 2020-06-03 at 17:34 +0800, Russell King - ARM Linux admin wrote:
-> > > > This kind of thing is something that ARM have seems to shy away from
-> > > > doing - it's a point I brought up many years ago when the whole
-> > > > trustzone thing first appeared with its SMC call.  Those around the
-> > > > conference table were not interested - ARM seemed to prefer every
-> > > > vendor to do off and do their own thing with the SMC interface.
-> > >
-> > > Does that mean it make sense to model a sec-rng driver, and get each
-> > > vendor's SMC function id by DT node?
-> >
-> > _If_ vendors have already gone off and decided to use different SMC
-> > function IDs for this, while keeping the rest of the SMC interface
-> > the same, then the choice has already been made.
-> >
-> > I know on 32-bit that some of the secure world implementations can't
-> > be changed; they're burnt into the ROM. I believe on 64-bit that isn't
-> > the case, which makes it easier to standardise.
-> >
-> > Do you have visibility of how this SMC is implemented in the secure
-> > side?  Is it in ATF, and is it done as a vendor hack or is there an
-> > element of generic implementation to it?  Has it been submitted
-> > upstream to the main ATF repository?
-> >
->
-> Take MediaTek as an example, some SoCs are implemented in ATF, some of
-> them are implemented in TEE.
+In order to fix this, we adjusted the default values
+of the module parameters to support more TFMs.
 
-In case your TEE implementation is derived from OP-TEE, then I will
-suggest you to re-use OP-TEE based RNG driver [1]. With that, you just
-need to implement an OP-TEE based pseudo trusted application (similar
-to this [2]) specific to your platform and need to extend driver UUID
-config table [3] with UUID of your platform specific pseudo TA. This
-way you can avoid using hardcoded DT based SMC approach and rather use
-auto RNG device detection provided by TEE bus.
+Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
+---
+ drivers/crypto/hisilicon/sec2/sec_main.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/char/hw_random/optee-rng.c
-[2] https://github.com/OP-TEE/optee_os/blob/master/core/arch/arm/plat-synquacer/rng_pta.c
-[3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/char/hw_random/optee-rng.c#n273
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index a4cb58b..57de51f 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -30,9 +30,9 @@
+ 
+ #define SEC_SQE_SIZE			128
+ #define SEC_SQ_SIZE			(SEC_SQE_SIZE * QM_Q_DEPTH)
+-#define SEC_PF_DEF_Q_NUM		64
++#define SEC_PF_DEF_Q_NUM		256
+ #define SEC_PF_DEF_Q_BASE		0
+-#define SEC_CTX_Q_NUM_DEF		24
++#define SEC_CTX_Q_NUM_DEF		2
+ #define SEC_CTX_Q_NUM_MAX		32
+ 
+ #define SEC_CTRL_CNT_CLR_CE		0x301120
+@@ -191,7 +191,7 @@ static const struct kernel_param_ops sec_ctx_q_num_ops = {
+ };
+ static u32 ctx_q_num = SEC_CTX_Q_NUM_DEF;
+ module_param_cb(ctx_q_num, &sec_ctx_q_num_ops, &ctx_q_num, 0444);
+-MODULE_PARM_DESC(ctx_q_num, "Queue num in ctx (24 default, 2, 4, ..., 32)");
++MODULE_PARM_DESC(ctx_q_num, "Queue num in ctx (2 default, 2, 4, ..., 32)");
+ 
+ static const struct kernel_param_ops vfs_num_ops = {
+ 	.set = vfs_num_set,
+-- 
+2.8.1
 
--Sumit
-
-> We have no plan to make generic
-> implementation in "secure world".
->
-> Due to there must have different implementation in secure world for
-> vendors, we plan to provide a generic SMC interface in secure rng kernel
-> driver for more flexibility.
->
-> Vendors can decide which "secure world" they want (HYP/ATF/TEE) by
-> different smc/hvc and different SMC function IDs in DT node.
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
