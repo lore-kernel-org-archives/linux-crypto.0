@@ -2,240 +2,153 @@ Return-Path: <SRS0=nn+h=7V=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23FA7C433DF
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jun 2020 06:48:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF36C433E2
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jun 2020 07:49:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0818C2076A
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jun 2020 06:48:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 287082076A
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jun 2020 07:49:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uLi1Rmjh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728855AbgFHGs6 (ORCPT
+        id S1729068AbgFHHtd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Jun 2020 02:48:58 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:53962 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728053AbgFHGs6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Jun 2020 02:48:58 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jiBaN-0001q9-Am; Mon, 08 Jun 2020 16:48:44 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 08 Jun 2020 16:48:43 +1000
-Date:   Mon, 8 Jun 2020 16:48:43 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Mauricio Faria de Oliveira <mfo@canonical.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [v2 PATCH] crypto: af_alg - fix use-after-free in af_alg_accept()
- due to bh_lock_sock()
-Message-ID: <20200608064843.GA22167@gondor.apana.org.au>
-References: <20200605161657.535043-1-mfo@canonical.com>
+        Mon, 8 Jun 2020 03:49:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36790 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729108AbgFHHtb (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 8 Jun 2020 03:49:31 -0400
+Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84471C08C5C3
+        for <linux-crypto@vger.kernel.org>; Mon,  8 Jun 2020 00:49:29 -0700 (PDT)
+Received: by mail-lf1-x144.google.com with SMTP id u16so9607267lfl.8
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Jun 2020 00:49:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=37K4gneCiuRGulLCKf4ynFvMW4e68flpa0GiDzEnHyg=;
+        b=uLi1RmjhtH1FlDsw82tNk1UEqMah3505zWAqYW0iJnhsR3ofTEhFjqgg0bqVnddqZT
+         wAxQu3f3tLu0IjoYRj/q5xCx5ttN12X/9cS1LPWtvPhLhxvS2znXsVPeT1APIbqa6lNe
+         A4/si6/ECFxjTPLdooQi+BUYuS9FxroIrzWRnwuzUiDLj5axLDtmFK/fgmAKdII++gN0
+         8H+slUd3WPMJbncGutqkddXFKaG9mJrXn4b9AcUYLERHHIRVN1uuOFicsU96UPRjItfA
+         1eA5C+72CB02PbahRX0V2G87TOjsr01aUEtMLxh5bPLhc8KL2wa6RaC1xoAyU4lcJ6mb
+         7heQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=37K4gneCiuRGulLCKf4ynFvMW4e68flpa0GiDzEnHyg=;
+        b=ERjOcKRW+HJKau06LglOc34+k26o3nMxWppPHEcVxiYJ2P/WJWSj+ZZmtZWvH0bCJH
+         vRfc9BaE+zu2wt+Ua7A2qcc0K9BgQpi6TQjxi/i/dHCCJVQA7BoNWato0PQEtlbnLLkD
+         B1JzeiBZuKyVsjJknE21XHvFp/nZJqavrChXpk8arkzKmJbpjO1sPSVLFDqb6UHJYc0E
+         nKjP9Tb+FWV/SqiI1uOjJWD9wr3lODV3hmihvlTLoxCnW25AokubMMkKcDf1XbVPIxJb
+         mw+o+VA5u5zs6fAUxH22Xra0tt/ftSiBkyUatVaXEjEZqs6jIe4lbKDz7qqjLL7MzVzK
+         Em4w==
+X-Gm-Message-State: AOAM531l8HB0BN086StDO+fZ8QUV/sv3hsRokMjnHFyhau6AAw5XL/hS
+        dKgKnxVpMCfLCFqjgQdvRR8w4WTUHH0z0n9ERA/ZFw==
+X-Google-Smtp-Source: ABdhPJwxrOl8NL4ByK/Pfp55vHI3T08O8KOMm+uol36pOuMBluSdlFqIghiVrQxdlv6OnTL4mJMgM/2GivNrvUhScRE=
+X-Received: by 2002:ac2:5473:: with SMTP id e19mr11864445lfn.21.1591602567899;
+ Mon, 08 Jun 2020 00:49:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200605161657.535043-1-mfo@canonical.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <1591085678-22764-1-git-send-email-neal.liu@mediatek.com>
+ <CAMj1kXHjAdk5=-uSh_=S9j5cz42zr3h6t+YYGy+obevuQDp0fg@mail.gmail.com>
+ <85dfc0142d3879d50c0ba18bcc71e199@misterjones.org> <1591169342.4878.9.camel@mtkswgap22>
+ <fcbe37f6f9cbcde24f9c28bc504f1f0e@kernel.org> <20200603093416.GY1551@shell.armlinux.org.uk>
+ <1591341543.19510.4.camel@mtkswgap22> <20200605080905.GF1551@shell.armlinux.org.uk>
+ <1591347582.21704.9.camel@mtkswgap22>
+In-Reply-To: <1591347582.21704.9.camel@mtkswgap22>
+From:   Sumit Garg <sumit.garg@linaro.org>
+Date:   Mon, 8 Jun 2020 13:19:16 +0530
+Message-ID: <CAFA6WYNqWmhiz=wvCTt1ubMtrhf+RtFSC2GiQQeteEbmrF1EnQ@mail.gmail.com>
+Subject: Re: Security Random Number Generator support
+To:     Neal Liu <neal.liu@mediatek.com>
+Cc:     Russell King - ARM Linux admin <linux@armlinux.org.uk>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>, Julius Werner <jwerner@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <maz@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Sean Wang <sean.wang@kernel.org>,
+        lkml <linux-kernel@vger.kernel.org>,
+        wsd_upstream <wsd_upstream@mediatek.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        =?UTF-8?B?Q3J5c3RhbCBHdW8gKOmDreaZtik=?= <Crystal.Guo@mediatek.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 05, 2020 at 01:16:57PM -0300, Mauricio Faria de Oliveira wrote:
-> This patch fixes a regression from commit 37f96694cf73 ("crypto: af_alg
->  - Use bh_lock_sock in sk_destruct"), which allows the critical regions
-> of af_alg_accept() and af_alg_release_parent() to run concurrently.
+Hi Neal,
 
-Thanks a lot for tracking this down.  I think we don't need something
-as complicated as backlog processing used by TCP.  We could simply
-change the ref counts to atomic_t and get rid of the locking.
+On Fri, 5 Jun 2020 at 14:40, Neal Liu <neal.liu@mediatek.com> wrote:
+>
+> On Fri, 2020-06-05 at 09:09 +0100, Russell King - ARM Linux admin wrote:
+> > On Fri, Jun 05, 2020 at 03:19:03PM +0800, Neal Liu wrote:
+> > > On Wed, 2020-06-03 at 17:34 +0800, Russell King - ARM Linux admin wrote:
+> > > > This kind of thing is something that ARM have seems to shy away from
+> > > > doing - it's a point I brought up many years ago when the whole
+> > > > trustzone thing first appeared with its SMC call.  Those around the
+> > > > conference table were not interested - ARM seemed to prefer every
+> > > > vendor to do off and do their own thing with the SMC interface.
+> > >
+> > > Does that mean it make sense to model a sec-rng driver, and get each
+> > > vendor's SMC function id by DT node?
+> >
+> > _If_ vendors have already gone off and decided to use different SMC
+> > function IDs for this, while keeping the rest of the SMC interface
+> > the same, then the choice has already been made.
+> >
+> > I know on 32-bit that some of the secure world implementations can't
+> > be changed; they're burnt into the ROM. I believe on 64-bit that isn't
+> > the case, which makes it easier to standardise.
+> >
+> > Do you have visibility of how this SMC is implemented in the secure
+> > side?  Is it in ATF, and is it done as a vendor hack or is there an
+> > element of generic implementation to it?  Has it been submitted
+> > upstream to the main ATF repository?
+> >
+>
+> Take MediaTek as an example, some SoCs are implemented in ATF, some of
+> them are implemented in TEE.
 
----8<---
-The locking in af_alg_release_parent is broken as the BH socket
-lock can only be taken if there is a code-path to handle the case
-where the lock is owned by process-context.  Instead of adding
-such handling, we can fix this by changing the ref counts to
-atomic_t.
+In case your TEE implementation is derived from OP-TEE, then I will
+suggest you to re-use OP-TEE based RNG driver [1]. With that, you just
+need to implement an OP-TEE based pseudo trusted application (similar
+to this [2]) specific to your platform and need to extend driver UUID
+config table [3] with UUID of your platform specific pseudo TA. This
+way you can avoid using hardcoded DT based SMC approach and rather use
+auto RNG device detection provided by TEE bus.
 
-This patch also modifies the main refcnt to include both normal
-and nokey sockets.  This way we don't have to fudge the nokey
-ref count when a socket changes from nokey to normal.
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/char/hw_random/optee-rng.c
+[2] https://github.com/OP-TEE/optee_os/blob/master/core/arch/arm/plat-synquacer/rng_pta.c
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/char/hw_random/optee-rng.c#n273
 
-Credits go to Mauricio Faria de Oliveira who diagnosed this bug
-and sent a patch for it:
+-Sumit
 
-https://lore.kernel.org/linux-crypto/20200605161657.535043-1-mfo@canonical.com/
-
-Reported-by: Brian Moyles <bmoyles@netflix.com>
-Reported-by: Mauricio Faria de Oliveira <mfo@canonical.com>
-Fixes: 37f96694cf73 ("crypto: af_alg - Use bh_lock_sock in...")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index b1cd3535c525..28fc323e3fe3 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -128,21 +128,15 @@ EXPORT_SYMBOL_GPL(af_alg_release);
- void af_alg_release_parent(struct sock *sk)
- {
- 	struct alg_sock *ask = alg_sk(sk);
--	unsigned int nokey = ask->nokey_refcnt;
--	bool last = nokey && !ask->refcnt;
-+	unsigned int nokey = atomic_read(&ask->nokey_refcnt);
- 
- 	sk = ask->parent;
- 	ask = alg_sk(sk);
- 
--	local_bh_disable();
--	bh_lock_sock(sk);
--	ask->nokey_refcnt -= nokey;
--	if (!last)
--		last = !--ask->refcnt;
--	bh_unlock_sock(sk);
--	local_bh_enable();
-+	if (nokey)
-+		atomic_dec(&ask->nokey_refcnt);
- 
--	if (last)
-+	if (atomic_dec_and_test(&ask->refcnt))
- 		sock_put(sk);
- }
- EXPORT_SYMBOL_GPL(af_alg_release_parent);
-@@ -187,7 +181,7 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
- 
- 	err = -EBUSY;
- 	lock_sock(sk);
--	if (ask->refcnt | ask->nokey_refcnt)
-+	if (atomic_read(&ask->refcnt))
- 		goto unlock;
- 
- 	swap(ask->type, type);
-@@ -236,7 +230,7 @@ static int alg_setsockopt(struct socket *sock, int level, int optname,
- 	int err = -EBUSY;
- 
- 	lock_sock(sk);
--	if (ask->refcnt)
-+	if (atomic_read(&ask->refcnt) != atomic_read(&ask->nokey_refcnt))
- 		goto unlock;
- 
- 	type = ask->type;
-@@ -301,12 +295,14 @@ int af_alg_accept(struct sock *sk, struct socket *newsock, bool kern)
- 	if (err)
- 		goto unlock;
- 
--	if (nokey || !ask->refcnt++)
-+	if (atomic_inc_return_relaxed(&ask->refcnt) == 1)
- 		sock_hold(sk);
--	ask->nokey_refcnt += nokey;
-+	if (nokey) {
-+		atomic_inc(&ask->nokey_refcnt);
-+		atomic_set(&alg_sk(sk2)->nokey_refcnt, 1);
-+	}
- 	alg_sk(sk2)->parent = sk;
- 	alg_sk(sk2)->type = type;
--	alg_sk(sk2)->nokey_refcnt = nokey;
- 
- 	newsock->ops = type->ops;
- 	newsock->state = SS_CONNECTED;
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index eb1910b6d434..0ae000a61c7f 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -384,7 +384,7 @@ static int aead_check_key(struct socket *sock)
- 	struct alg_sock *ask = alg_sk(sk);
- 
- 	lock_sock(sk);
--	if (ask->refcnt)
-+	if (!atomic_read(&ask->nokey_refcnt))
- 		goto unlock_child;
- 
- 	psk = ask->parent;
-@@ -396,11 +396,8 @@ static int aead_check_key(struct socket *sock)
- 	if (crypto_aead_get_flags(tfm->aead) & CRYPTO_TFM_NEED_KEY)
- 		goto unlock;
- 
--	if (!pask->refcnt++)
--		sock_hold(psk);
--
--	ask->refcnt = 1;
--	sock_put(psk);
-+	atomic_dec(&pask->nokey_refcnt);
-+	atomic_set(&ask->nokey_refcnt, 0);
- 
- 	err = 0;
- 
-diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-index da1ffa4f7f8d..e71727c25a7d 100644
---- a/crypto/algif_hash.c
-+++ b/crypto/algif_hash.c
-@@ -301,7 +301,7 @@ static int hash_check_key(struct socket *sock)
- 	struct alg_sock *ask = alg_sk(sk);
- 
- 	lock_sock(sk);
--	if (ask->refcnt)
-+	if (!atomic_read(&ask->nokey_refcnt))
- 		goto unlock_child;
- 
- 	psk = ask->parent;
-@@ -313,11 +313,8 @@ static int hash_check_key(struct socket *sock)
- 	if (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
- 		goto unlock;
- 
--	if (!pask->refcnt++)
--		sock_hold(psk);
--
--	ask->refcnt = 1;
--	sock_put(psk);
-+	atomic_dec(&pask->nokey_refcnt);
-+	atomic_set(&ask->nokey_refcnt, 0);
- 
- 	err = 0;
- 
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index e2c8ab408bed..ab97b6c7b81d 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -215,7 +215,7 @@ static int skcipher_check_key(struct socket *sock)
- 	struct alg_sock *ask = alg_sk(sk);
- 
- 	lock_sock(sk);
--	if (ask->refcnt)
-+	if (!atomic_read(&ask->nokey_refcnt))
- 		goto unlock_child;
- 
- 	psk = ask->parent;
-@@ -227,11 +227,8 @@ static int skcipher_check_key(struct socket *sock)
- 	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
- 		goto unlock;
- 
--	if (!pask->refcnt++)
--		sock_hold(psk);
--
--	ask->refcnt = 1;
--	sock_put(psk);
-+	atomic_dec(&pask->nokey_refcnt);
-+	atomic_set(&ask->nokey_refcnt, 0);
- 
- 	err = 0;
- 
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 56527c85d122..088c1ded2714 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -29,8 +29,8 @@ struct alg_sock {
- 
- 	struct sock *parent;
- 
--	unsigned int refcnt;
--	unsigned int nokey_refcnt;
-+	atomic_t refcnt;
-+	atomic_t nokey_refcnt;
- 
- 	const struct af_alg_type *type;
- 	void *private;
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> We have no plan to make generic
+> implementation in "secure world".
+>
+> Due to there must have different implementation in secure world for
+> vendors, we plan to provide a generic SMC interface in secure rng kernel
+> driver for more flexibility.
+>
+> Vendors can decide which "secure world" they want (HYP/ATF/TEE) by
+> different smc/hvc and different SMC function IDs in DT node.
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
