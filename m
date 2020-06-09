@@ -2,81 +2,109 @@ Return-Path: <SRS0=xc0K=7W=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	UNPARSEABLE_RELAY,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CC98C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 09:17:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C08C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 13:49:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 09FC620812
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 09:17:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29CAC20774
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 13:49:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728396AbgFIJRf (ORCPT
+        id S1730077AbgFINtE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Jun 2020 05:17:35 -0400
-Received: from mga17.intel.com ([192.55.52.151]:29500 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728247AbgFIJRd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Jun 2020 05:17:33 -0400
-IronPort-SDR: 3kmh86Nis7upl5xLjq5xZ7RDbyoEcoIJHjKsxU8UE2VZSJDQLDlvv5VpXj/fNkjmaPhD/c0YQt
- f8/HPzCjvocw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2020 02:17:32 -0700
-IronPort-SDR: JfF7AGgMn2eedLms7XY99tHf3FYV0HFR3OP3C7FYUcBk0W9FdhdfYKzuJ3kUbU+pIKYdq4plft
- gPeMTJ2fvskg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,491,1583222400"; 
-   d="scan'208";a="379686682"
-Received: from gklab-125-110.igk.intel.com ([10.91.125.110])
-  by fmsmga001.fm.intel.com with ESMTP; 09 Jun 2020 02:17:30 -0700
-From:   Piotr Stankiewicz <piotr.stankiewicz@intel.com>
-To:     Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org
-Cc:     Piotr Stankiewicz <piotr.stankiewicz@intel.com>,
-        Antoine Tenart <antoine.tenart@bootlin.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Pascal van Leeuwen <pascalvanl@gmail.com>,
-        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 05/15] crypto: inside-secure - Use PCI_IRQ_MSI_TYPES where appropriate
-Date:   Tue,  9 Jun 2020 11:17:26 +0200
-Message-Id: <20200609091728.973-1-piotr.stankiewicz@intel.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20200609091148.32749-1-piotr.stankiewicz@intel.com>
-References: <20200609091148.32749-1-piotr.stankiewicz@intel.com>
+        Tue, 9 Jun 2020 09:49:04 -0400
+Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:59272 "EHLO
+        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729535AbgFINtE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 9 Jun 2020 09:49:04 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01358;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0U.6I2zz_1591710537;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U.6I2zz_1591710537)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 09 Jun 2020 21:48:57 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        dhowells@redhat.com, mcoquelin.stm32@gmail.com,
+        alexandre.torgue@st.com, jmorris@namei.org, serge@hallyn.com,
+        nramas@linux.microsoft.com, tusharsu@linux.microsoft.com,
+        zohar@linux.ibm.com, gilad@benyossef.com, pvanleeuwen@rambus.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keyrings@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org,
+        linux-security-module@vger.kernel.org, zhang.jia@linux.alibaba.com,
+        tianjia.zhang@linux.alibaba.com
+Subject: [PATCH v3 1/8] crypto: sm3 - export crypto_sm3_final function
+Date:   Tue,  9 Jun 2020 21:48:48 +0800
+Message-Id: <20200609134855.21431-2-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200609134855.21431-1-tianjia.zhang@linux.alibaba.com>
+References: <20200609134855.21431-1-tianjia.zhang@linux.alibaba.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Seeing as there is shorthand available to use when asking for any type
-of interrupt, or any type of message signalled interrupt, leverage it.
+Both crypto_sm3_update and crypto_sm3_finup have been
+exported, exporting crypto_sm3_final, to avoid having to
+use crypto_sm3_finup(desc, NULL, 0, dgst) to calculate
+the hash in some cases.
 
-Signed-off-by: Piotr Stankiewicz <piotr.stankiewicz@intel.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@intel.com>
-Reviewed-by: Antoine Tenart <antoine.tenart@bootlin.com>
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 ---
- drivers/crypto/inside-secure/safexcel.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/sm3_generic.c | 7 ++++---
+ include/crypto/sm3.h | 2 ++
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 2cb53fbae841..1b2faa2a6ab0 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -1567,7 +1567,7 @@ static int safexcel_probe_generic(void *pdev,
- 		ret = pci_alloc_irq_vectors(pci_pdev,
- 					    priv->config.rings + 1,
- 					    priv->config.rings + 1,
--					    PCI_IRQ_MSI | PCI_IRQ_MSIX);
-+					    PCI_IRQ_MSI_TYPES);
- 		if (ret < 0) {
- 			dev_err(dev, "Failed to allocate PCI MSI interrupts\n");
- 			return ret;
+diff --git a/crypto/sm3_generic.c b/crypto/sm3_generic.c
+index 3468975215ca..193c4584bd00 100644
+--- a/crypto/sm3_generic.c
++++ b/crypto/sm3_generic.c
+@@ -149,17 +149,18 @@ int crypto_sm3_update(struct shash_desc *desc, const u8 *data,
+ }
+ EXPORT_SYMBOL(crypto_sm3_update);
+ 
+-static int sm3_final(struct shash_desc *desc, u8 *out)
++int crypto_sm3_final(struct shash_desc *desc, u8 *out)
+ {
+ 	sm3_base_do_finalize(desc, sm3_generic_block_fn);
+ 	return sm3_base_finish(desc, out);
+ }
++EXPORT_SYMBOL(crypto_sm3_final);
+ 
+ int crypto_sm3_finup(struct shash_desc *desc, const u8 *data,
+ 			unsigned int len, u8 *hash)
+ {
+ 	sm3_base_do_update(desc, data, len, sm3_generic_block_fn);
+-	return sm3_final(desc, hash);
++	return crypto_sm3_final(desc, hash);
+ }
+ EXPORT_SYMBOL(crypto_sm3_finup);
+ 
+@@ -167,7 +168,7 @@ static struct shash_alg sm3_alg = {
+ 	.digestsize	=	SM3_DIGEST_SIZE,
+ 	.init		=	sm3_base_init,
+ 	.update		=	crypto_sm3_update,
+-	.final		=	sm3_final,
++	.final		=	crypto_sm3_final,
+ 	.finup		=	crypto_sm3_finup,
+ 	.descsize	=	sizeof(struct sm3_state),
+ 	.base		=	{
+diff --git a/include/crypto/sm3.h b/include/crypto/sm3.h
+index 1438942dc773..42ea21289ba9 100644
+--- a/include/crypto/sm3.h
++++ b/include/crypto/sm3.h
+@@ -35,6 +35,8 @@ struct shash_desc;
+ extern int crypto_sm3_update(struct shash_desc *desc, const u8 *data,
+ 			      unsigned int len);
+ 
++extern int crypto_sm3_final(struct shash_desc *desc, u8 *out);
++
+ extern int crypto_sm3_finup(struct shash_desc *desc, const u8 *data,
+ 			     unsigned int len, u8 *hash);
+ #endif
 -- 
-2.17.2
+2.17.1
 
