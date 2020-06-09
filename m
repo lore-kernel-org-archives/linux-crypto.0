@@ -2,136 +2,141 @@ Return-Path: <SRS0=xc0K=7W=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B382DC433E2
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 09:12:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9228C433E2
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 09:15:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 972AF207ED
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 09:12:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DA78207ED
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 09:15:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728052AbgFIJM1 (ORCPT
+        id S1728153AbgFIJPa convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Jun 2020 05:12:27 -0400
-Received: from mga07.intel.com ([134.134.136.100]:64812 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726903AbgFIJMZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Jun 2020 05:12:25 -0400
-IronPort-SDR: 17jAvLCsSzqm2MnJ9js7gNER5F6PJE2PlQS20rKULSjzSybmRccHkvReEcz6+rQY6swGcBIvjd
- hOhq6pgxTIBQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2020 02:12:23 -0700
-IronPort-SDR: qGJGbkP6jIjb06yFErHeRABfowARu5mYzAUtOXYGw11Yc0sLPVFLbgrHJYpz0pR5pOnUg+Kqew
- W6B/kl9/AsNg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,491,1583222400"; 
-   d="scan'208";a="306121697"
-Received: from gklab-125-110.igk.intel.com ([10.91.125.110])
-  by fmsmga002.fm.intel.com with ESMTP; 09 Jun 2020 02:12:14 -0700
-From:   Piotr Stankiewicz <piotr.stankiewicz@intel.com>
-To:     Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org
-Cc:     Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-        Kurt Schwemmer <kurt.schwemmer@microsemi.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Antoine Tenart <antoine.tenart@bootlin.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Gustavo Pimentel <gustavo.pimentel@synopsys.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-        David Zhou <David1.Zhou@amd.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dennis Dalessandro <dennis.dalessandro@intel.com>,
-        Mike Marciniszyn <mike.marciniszyn@intel.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
+        Tue, 9 Jun 2020 05:15:30 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:55037 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726778AbgFIJP2 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 9 Jun 2020 05:15:28 -0400
+Received: from mail-qt1-f172.google.com ([209.85.160.172]) by
+ mrelayeu.kundenserver.de (mreue109 [212.227.15.145]) with ESMTPSA (Nemesis)
+ id 1N2m7O-1ixPAe2F7E-0132Hu; Tue, 09 Jun 2020 11:15:24 +0200
+Received: by mail-qt1-f172.google.com with SMTP id z1so17033042qtn.2;
+        Tue, 09 Jun 2020 02:15:24 -0700 (PDT)
+X-Gm-Message-State: AOAM530RS4NuecT0s1oQr4x5f7MC0L6huT56ymvbTGx6JeZJh5qu27pn
+        lQOZlupwS82j3k6qHBlk9tTZB4uQOL4CgcrbNuY=
+X-Google-Smtp-Source: ABdhPJwLEIiew7LT85XJ7YMwfJX7yhLUFVtBnCDqoIKOxdCKDHjqNlOaWp8DLPqmET9skm0FQ81wStwRswqY7BJG62c=
+X-Received: by 2002:ac8:4742:: with SMTP id k2mr27989059qtp.304.1591694122865;
+ Tue, 09 Jun 2020 02:15:22 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200608164148.GA1394249@bjorn-Precision-5520> <bcf0a327-87b5-01ff-2f9c-ec6a6bd6c738@linaro.org>
+In-Reply-To: <bcf0a327-87b5-01ff-2f9c-ec6a6bd6c738@linaro.org>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Tue, 9 Jun 2020 11:15:06 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a38bhE_VO_eVcsfsGKgED=gmSEntQmrhwbLkeA6Si0qaw@mail.gmail.com>
+Message-ID: <CAK8P3a38bhE_VO_eVcsfsGKgED=gmSEntQmrhwbLkeA6Si0qaw@mail.gmail.com>
+Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
+To:     Zhangfei Gao <zhangfei.gao@linaro.org>
+Cc:     Bjorn Helgaas <helgaas@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Hanjun Guo <guohanjun@huawei.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>,
+        jean-philippe <jean-philippe@linaro.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Igor Russkikh <irusskikh@marvell.com>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Brian King <brking@us.ibm.com>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Jim Gill <jgill@vmware.com>, linux-doc@vger.kernel.org,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mmc@vger.kernel.org, netdev@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Piotr Stankiewicz <piotr.stankiewicz@intel.com>
-Subject: [PATCH v3 00/15] Forward MSI-X vector enable error code in pci_alloc_irq_vectors_affinity()
-Date:   Tue,  9 Jun 2020 11:11:48 +0200
-Message-Id: <20200609091148.32749-1-piotr.stankiewicz@intel.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20200603114212.12525-1-piotr.stankiewicz@intel.com>
-References: <20200603114212.12525-1-piotr.stankiewicz@intel.com>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "open list:IOMMU DRIVERS" <iommu@lists.linux-foundation.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-pci <linux-pci@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Provags-ID: V03:K1:kGYb3jMmETbHk7ETfChJPcg/kM3FCJJZyPXx2XC8g5Ud8G3UIHU
+ xevtugFVfk44vd4itd6CeUSdhZ1TR+dMXfGOdfYN8RFRs0t2r3J7BtVJRhJasrZihguscsm
+ TtxP+C2qRGuRL/nPub9KTWp9a/JVDQqUdXz+RMVjRKDW9tPyM8C55HldJstRePmeIPeHqDO
+ A9fsJQT/cC7nc471uW3jQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:QGEsjw7JNoI=:qdRg51FIcOUv/GbrX7H8NU
+ du6LH6NLpibryVn24IY3CrezHYu8HbUwKgMnamWMKV5Ntqwy148m/mbIv8mUBPRbNlRZHf6sF
+ Qw3tYHvhV25Y99dTHUj1JrGTZj8m/Qh2kVzgMj06tPNJ4mFHKvFxGbEFEKuk/bxKZGQ4JdJzB
+ 6vBGIHT6UvmRqALLZNgfEVvAWcWHuR7fIAwcAkzSqXIPGZQNKhmnMIfltPQ5xbFz+20IMUk7T
+ E25RJNPZ1CO3+1pbZIaN8ZvcjVrjYQti647DdUfsCfboku7bJY4jFVbPD/u4mWquoz3sug7Ve
+ xFWXqGW0EvAYinaE5IdIB7dAn4Wjk3Xo6cZKPq7RPK+2WIsT1QAxQn76hUN1afVjftxFPDXFv
+ OsIveDASndAX/kKKR+nSnCSC8H65BlRrqcvNr700bS7S6wPES0bqO2FP3fVzy0/WZbE0plOE3
+ pyywpEWtC02Pdnzu3sW/ftCMaHZgDALBYj6fwh4PdwMkKL3qmxtMkJ0OIpC/DsylQQomuHTdy
+ wWgIp9BtzAQwzLAxiXBtXl07VZsjEODDFzxITnAt9JnPXI8ybZQ1GyvoYLB26rE1atxHOZA2z
+ dKIHB5i9IANvwJrgwE79cc6RBdOrvbbzxRw/sPQeZZ96Mr3g3IYnjiWEvZc0eqmKln1wNUKHC
+ dMRIVTtgnsllyrjESTy6ms3bLXh150dpetTWGamRv6aa6xNJEcEPnUlH8OdBk135xA/NKTBju
+ C1VItJ6DSwqiJDIZUO9aDZkY16oRCdMYuoErBv23z1xc0hc9mwICqf6KFawbPVpR98NDybRhF
+ 4aMjJNXE7j11IKWW8KxlBuuqgB8Xba5FMLCd/HPrSUtZy2Sklo=
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The primary objective of this patch series is to change the behaviour
-of pci_alloc_irq_vectors_affinity() such that it forwards the MSI-X enable
-error code when appropriate. In the process, though, it was pointed out
-that there are multiple places in the kernel which check/ask for message
-signalled interrupts (MSI or MSI-X), which spawned the first patch adding
-PCI_IRQ_MSI_TYPES. Finally the rest of the chain converts all users to
-take advantage of PCI_IRQ_MSI_TYPES or PCI_IRQ_ALL_TYPES, as
-appropriate.
+On Tue, Jun 9, 2020 at 6:02 AM Zhangfei Gao <zhangfei.gao@linaro.org> wrote:
+> On 2020/6/9 上午12:41, Bjorn Helgaas wrote:
+> > On Mon, Jun 08, 2020 at 10:54:15AM +0800, Zhangfei Gao wrote:
+> >> On 2020/6/6 上午7:19, Bjorn Helgaas wrote:
+> >>>> +++ b/drivers/iommu/iommu.c
+> >>>> @@ -2418,6 +2418,10 @@ int iommu_fwspec_init(struct device *dev, struct
+> >>>> fwnode_handle *iommu_fwnode,
+> >>>>           fwspec->iommu_fwnode = iommu_fwnode;
+> >>>>           fwspec->ops = ops;
+> >>>>           dev_iommu_fwspec_set(dev, fwspec);
+> >>>> +
+> >>>> +       if (dev_is_pci(dev))
+> >>>> +               pci_fixup_device(pci_fixup_final, to_pci_dev(dev));
+> >>>> +
+> >>>>
+> >>>> Then pci_fixup_final will be called twice, the first in pci_bus_add_device.
+> >>>> Here in iommu_fwspec_init is the second time, specifically for iommu_fwspec.
+> >>>> Will send this when 5.8-rc1 is open.
+> >>> Wait, this whole fixup approach seems wrong to me.  No matter how you
+> >>> do the fixup, it's still a fixup, which means it requires ongoing
+> >>> maintenance.  Surely we don't want to have to add the Vendor/Device ID
+> >>> for every new AMBA device that comes along, do we?
+> >>>
+> >> Here the fake pci device has standard PCI cfg space, but physical
+> >> implementation is base on AMBA
+> >> They can provide pasid feature.
+> >> However,
+> >> 1, does not support tlp since they are not real pci devices.
+> >> 2. does not support pri, instead support stall (provided by smmu)
+> >> And stall is not a pci feature, so it is not described in struct pci_dev,
+> >> but in struct iommu_fwspec.
+> >> So we use this fixup to tell pci system that the devices can support stall,
+> >> and hereby support pasid.
+> > This did not answer my question.  Are you proposing that we update a
+> > quirk every time a new AMBA device is released?  I don't think that
+> > would be a good model.
+>
+> Yes, you are right, but we do not have any better idea yet.
+> Currently we have three fake pci devices, which support stall and pasid.
+> We have to let pci system know the device can support pasid, because of
+> stall feature, though not support pri.
+> Do you have any other ideas?
 
-Piotr Stankiewicz (15):
-  PCI/MSI: Forward MSI-X vector enable error code in
-    pci_alloc_irq_vectors_affinity()
-  PCI: Add macro for message signalled interrupt types
-  PCI: Use PCI_IRQ_MSI_TYPES where appropriate
-  ahci: Use PCI_IRQ_MSI_TYPES where appropriate
-  crypto: inside-secure - Use PCI_IRQ_MSI_TYPES where appropriate
-  dmaengine: dw-edma: Use PCI_IRQ_MSI_TYPES  where appropriate
-  drm/amdgpu: Use PCI_IRQ_MSI_TYPES where appropriate
-  IB/qib: Use PCI_IRQ_MSI_TYPES where appropriate
-  media: ddbridge: Use PCI_IRQ_MSI_TYPES where appropriate
-  vmw_vmci: Use PCI_IRQ_ALL_TYPES where appropriate
-  mmc: sdhci: Use PCI_IRQ_MSI_TYPES where appropriate
-  amd-xgbe: Use PCI_IRQ_MSI_TYPES where appropriate
-  aquantia: atlantic: Use PCI_IRQ_ALL_TYPES where appropriate
-  net: hns3: Use PCI_IRQ_MSI_TYPES where appropriate
-  scsi: Use PCI_IRQ_MSI_TYPES and PCI_IRQ_ALL_TYPES where appropriate
+It sounds like the best way would be to allocate a PCI capability for it, so
+detection can be done through config space, at least in future devices,
+or possibly after a firmware update if the config space in your system
+is controlled by firmware somewhere.  Once there is a proper mechanism
+to do this, using fixups to detect the early devices that don't use that
+should be uncontroversial. I have no idea what the process or timeline
+is to add new capabilities into the PCIe specification, or if this one
+would be acceptable to the PCI SIG at all.
 
- Documentation/PCI/msi-howto.rst               |  5 +++--
- drivers/ata/ahci.c                            |  2 +-
- drivers/crypto/inside-secure/safexcel.c       |  2 +-
- drivers/dma/dw-edma/dw-edma-pcie.c            |  2 +-
- drivers/gpu/drm/amd/amdgpu/amdgpu_irq.c       | 11 +---------
- drivers/infiniband/hw/qib/qib_pcie.c          |  6 +++--
- drivers/media/pci/ddbridge/ddbridge-main.c    |  2 +-
- drivers/misc/vmw_vmci/vmci_guest.c            |  3 +--
- drivers/mmc/host/sdhci-pci-gli.c              |  3 +--
- drivers/mmc/host/sdhci-pci-o2micro.c          |  3 +--
- drivers/net/ethernet/amd/xgbe/xgbe-pci.c      |  2 +-
- .../ethernet/aquantia/atlantic/aq_pci_func.c  |  4 +---
- .../hisilicon/hns3/hns3pf/hclge_main.c        |  3 +--
- .../hisilicon/hns3/hns3vf/hclgevf_main.c      |  3 +--
- drivers/pci/msi.c                             | 22 ++++++++-----------
- drivers/pci/pcie/portdrv_core.c               |  4 ++--
- drivers/pci/switch/switchtec.c                |  3 +--
- drivers/scsi/ipr.c                            |  5 +++--
- drivers/scsi/vmw_pvscsi.c                     |  2 +-
- include/linux/pci.h                           |  4 ++--
- 20 files changed, 37 insertions(+), 54 deletions(-)
+If detection cannot be done through PCI config space, the next best
+alternative is to pass auxiliary data through firmware. On DT based
+machines, you can list non-hotpluggable PCIe devices and add custom
+properties that could be read during device enumeration. I assume
+ACPI has something similar, but I have not done that.
 
--- 
-2.17.2
-
+      Arnd
