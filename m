@@ -2,165 +2,136 @@ Return-Path: <SRS0=xc0K=7W=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E89C433DF
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 04:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B382DC433E2
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 09:12:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 37D4A207C3
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 04:02:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EOIGmeR3"
+	by mail.kernel.org (Postfix) with ESMTP id 972AF207ED
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jun 2020 09:12:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727018AbgFIECR (ORCPT
+        id S1728052AbgFIJM1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Jun 2020 00:02:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54794 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726286AbgFIECL (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Jun 2020 00:02:11 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4341AC03E97C
-        for <linux-crypto@vger.kernel.org>; Mon,  8 Jun 2020 21:02:11 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id n9so7520746plk.1
-        for <linux-crypto@vger.kernel.org>; Mon, 08 Jun 2020 21:02:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=HNzwmKC7EPXO6n3v52ZypjHWMqVja532n8n2Tl/XPzU=;
-        b=EOIGmeR3il5DVPJCDg4teJziBsjPIErqvQL1NApVhk0fIsJZDquLbvnv9AzOPFDTyM
-         0Td9tgAsoePC+8tWwHQb/vU9PYB6G/Oyp14FK2hqZEG9usC/15NBI+bjl7shOVkS9PTS
-         doO5YZ3ay6n1fRr9qSicgDl1sKMnJOAKnbUGeudLGxamrgFpyJqMg7/hVpo77ptwayW9
-         gKyrCeWWc3sisMbmchG7OqNyEieqbYZexGGErCFQFvIiSgU0duds+YBbyLJBINOegnCw
-         yZ0gUZKM/VpvoDsNXIFSXtVpSlXS2LMjFDE0fUXYn6WfLpaSP3YHgKbbD3TgUmNi7e1F
-         Z0fA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=HNzwmKC7EPXO6n3v52ZypjHWMqVja532n8n2Tl/XPzU=;
-        b=bUBavx7KQL9y+tKwxrkJAG5v5+K7P8kMV2s+fNVKA+mu/bdjkBKJ8zIDGw9vNIGTaa
-         FWxWkxRTvDfrdrBkvCiz/2NFg8SarVrnNOhyRYF6gmDSgs8JdZnWSplo7HHIGeVGv+fk
-         fEEMeT+bKP6PF+Bn9EVXAULmV9aGZpDVPwJOR8dLl5VwecYh/sjCKD7dYAtmSxiXG/0I
-         oSj9IRyFKbGdxHjNyz2uKoo52DAhu2lRYdQOSQ7Yp04+bMMbHMFoD65Vw1nim9kawlKW
-         rjoas4JJmPIY8+Un3iij20cMU7wvZd3fLbRSydVKKogpx8uJE/eAhpSX2O3xoGIbUsfO
-         Awvg==
-X-Gm-Message-State: AOAM530e1HF6s7GTdMyLOmnUZ0NUvyXcK04Ku+NIYLD1AfCJl3cndcsx
-        0nLx+juAI082QA92D/QbClr+4Q==
-X-Google-Smtp-Source: ABdhPJyCOlAhj/JYQL1lnU7VkdOeuU3CmI3RIp+QFxWZE3BRnL4347U0JAtJdOIRBNQs52eLSw55aw==
-X-Received: by 2002:a17:90a:36cf:: with SMTP id t73mr2680766pjb.100.1591675330529;
-        Mon, 08 Jun 2020 21:02:10 -0700 (PDT)
-Received: from [10.175.1.166] ([45.135.186.20])
-        by smtp.gmail.com with ESMTPSA id b24sm8402002pfo.112.2020.06.08.21.02.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jun 2020 21:02:09 -0700 (PDT)
-Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Hanjun Guo <guohanjun@huawei.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Tue, 9 Jun 2020 05:12:27 -0400
+Received: from mga07.intel.com ([134.134.136.100]:64812 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726903AbgFIJMZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 9 Jun 2020 05:12:25 -0400
+IronPort-SDR: 17jAvLCsSzqm2MnJ9js7gNER5F6PJE2PlQS20rKULSjzSybmRccHkvReEcz6+rQY6swGcBIvjd
+ hOhq6pgxTIBQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2020 02:12:23 -0700
+IronPort-SDR: qGJGbkP6jIjb06yFErHeRABfowARu5mYzAUtOXYGw11Yc0sLPVFLbgrHJYpz0pR5pOnUg+Kqew
+ W6B/kl9/AsNg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,491,1583222400"; 
+   d="scan'208";a="306121697"
+Received: from gklab-125-110.igk.intel.com ([10.91.125.110])
+  by fmsmga002.fm.intel.com with ESMTP; 09 Jun 2020 02:12:14 -0700
+From:   Piotr Stankiewicz <piotr.stankiewicz@intel.com>
+To:     Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org
+Cc:     Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+        Kurt Schwemmer <kurt.schwemmer@microsemi.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org
-References: <20200608164148.GA1394249@bjorn-Precision-5520>
-From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-Message-ID: <bcf0a327-87b5-01ff-2f9c-ec6a6bd6c738@linaro.org>
-Date:   Tue, 9 Jun 2020 12:01:56 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <20200608164148.GA1394249@bjorn-Precision-5520>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+        "David S . Miller" <davem@davemloft.net>,
+        Gustavo Pimentel <gustavo.pimentel@synopsys.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vinod Koul <vkoul@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        David Zhou <David1.Zhou@amd.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dennis Dalessandro <dennis.dalessandro@intel.com>,
+        Mike Marciniszyn <mike.marciniszyn@intel.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Igor Russkikh <irusskikh@marvell.com>,
+        Yisen Zhuang <yisen.zhuang@huawei.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Brian King <brking@us.ibm.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Jim Gill <jgill@vmware.com>, linux-doc@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mmc@vger.kernel.org, netdev@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Piotr Stankiewicz <piotr.stankiewicz@intel.com>
+Subject: [PATCH v3 00/15] Forward MSI-X vector enable error code in pci_alloc_irq_vectors_affinity()
+Date:   Tue,  9 Jun 2020 11:11:48 +0200
+Message-Id: <20200609091148.32749-1-piotr.stankiewicz@intel.com>
+X-Mailer: git-send-email 2.17.2
+In-Reply-To: <20200603114212.12525-1-piotr.stankiewicz@intel.com>
+References: <20200603114212.12525-1-piotr.stankiewicz@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi, Bjorn
+The primary objective of this patch series is to change the behaviour
+of pci_alloc_irq_vectors_affinity() such that it forwards the MSI-X enable
+error code when appropriate. In the process, though, it was pointed out
+that there are multiple places in the kernel which check/ask for message
+signalled interrupts (MSI or MSI-X), which spawned the first patch adding
+PCI_IRQ_MSI_TYPES. Finally the rest of the chain converts all users to
+take advantage of PCI_IRQ_MSI_TYPES or PCI_IRQ_ALL_TYPES, as
+appropriate.
 
-On 2020/6/9 上午12:41, Bjorn Helgaas wrote:
-> On Mon, Jun 08, 2020 at 10:54:15AM +0800, Zhangfei Gao wrote:
->> On 2020/6/6 上午7:19, Bjorn Helgaas wrote:
->>> On Thu, Jun 04, 2020 at 09:33:07PM +0800, Zhangfei Gao wrote:
->>>> On 2020/6/2 上午1:41, Bjorn Helgaas wrote:
->>>>> On Thu, May 28, 2020 at 09:33:44AM +0200, Joerg Roedel wrote:
->>>>>> On Wed, May 27, 2020 at 01:18:42PM -0500, Bjorn Helgaas wrote:
->>>>>>> Is this slowdown significant?  We already iterate over every device
->>>>>>> when applying PCI_FIXUP_FINAL quirks, so if we used the existing
->>>>>>> PCI_FIXUP_FINAL, we wouldn't be adding a new loop.  We would only be
->>>>>>> adding two more iterations to the loop in pci_do_fixups() that tries
->>>>>>> to match quirks against the current device.  I doubt that would be a
->>>>>>> measurable slowdown.
->>>>>> I don't know how significant it is, but I remember people complaining
->>>>>> about adding new PCI quirks because it takes too long for them to run
->>>>>> them all. That was in the discussion about the quirk disabling ATS on
->>>>>> AMD Stoney systems.
->>>>>>
->>>>>> So it probably depends on how many PCI devices are in the system whether
->>>>>> it causes any measureable slowdown.
->>>>> I found this [1] from Paul Menzel, which was a slowdown caused by
->>>>> quirk_usb_early_handoff().  I think the real problem is individual
->>>>> quirks that take a long time.
->>>>>
->>>>> The PCI_FIXUP_IOMMU things we're talking about should be fast, and of
->>>>> course, they're only run for matching devices anyway.  So I'd rather
->>>>> keep them as PCI_FIXUP_FINAL than add a whole new phase.
->>>>>
->>>> Thanks Bjorn for taking time for this.
->>>> If so, it would be much simpler.
->>>>
->>>> +++ b/drivers/iommu/iommu.c
->>>> @@ -2418,6 +2418,10 @@ int iommu_fwspec_init(struct device *dev, struct
->>>> fwnode_handle *iommu_fwnode,
->>>>           fwspec->iommu_fwnode = iommu_fwnode;
->>>>           fwspec->ops = ops;
->>>>           dev_iommu_fwspec_set(dev, fwspec);
->>>> +
->>>> +       if (dev_is_pci(dev))
->>>> +               pci_fixup_device(pci_fixup_final, to_pci_dev(dev));
->>>> +
->>>>
->>>> Then pci_fixup_final will be called twice, the first in pci_bus_add_device.
->>>> Here in iommu_fwspec_init is the second time, specifically for iommu_fwspec.
->>>> Will send this when 5.8-rc1 is open.
->>> Wait, this whole fixup approach seems wrong to me.  No matter how you
->>> do the fixup, it's still a fixup, which means it requires ongoing
->>> maintenance.  Surely we don't want to have to add the Vendor/Device ID
->>> for every new AMBA device that comes along, do we?
->>>
->> Here the fake pci device has standard PCI cfg space, but physical
->> implementation is base on AMBA
->> They can provide pasid feature.
->> However,
->> 1, does not support tlp since they are not real pci devices.
->> 2. does not support pri, instead support stall (provided by smmu)
->> And stall is not a pci feature, so it is not described in struct pci_dev,
->> but in struct iommu_fwspec.
->> So we use this fixup to tell pci system that the devices can support stall,
->> and hereby support pasid.
-> This did not answer my question.  Are you proposing that we update a
-> quirk every time a new AMBA device is released?  I don't think that
-> would be a good model.
-Yes, you are right, but we do not have any better idea yet.
-Currently we have three fake pci devices, which support stall and pasid.
-We have to let pci system know the device can support pasid, because of 
-stall feature, though not support pri.
-Do you have any other ideas?
+Piotr Stankiewicz (15):
+  PCI/MSI: Forward MSI-X vector enable error code in
+    pci_alloc_irq_vectors_affinity()
+  PCI: Add macro for message signalled interrupt types
+  PCI: Use PCI_IRQ_MSI_TYPES where appropriate
+  ahci: Use PCI_IRQ_MSI_TYPES where appropriate
+  crypto: inside-secure - Use PCI_IRQ_MSI_TYPES where appropriate
+  dmaengine: dw-edma: Use PCI_IRQ_MSI_TYPES  where appropriate
+  drm/amdgpu: Use PCI_IRQ_MSI_TYPES where appropriate
+  IB/qib: Use PCI_IRQ_MSI_TYPES where appropriate
+  media: ddbridge: Use PCI_IRQ_MSI_TYPES where appropriate
+  vmw_vmci: Use PCI_IRQ_ALL_TYPES where appropriate
+  mmc: sdhci: Use PCI_IRQ_MSI_TYPES where appropriate
+  amd-xgbe: Use PCI_IRQ_MSI_TYPES where appropriate
+  aquantia: atlantic: Use PCI_IRQ_ALL_TYPES where appropriate
+  net: hns3: Use PCI_IRQ_MSI_TYPES where appropriate
+  scsi: Use PCI_IRQ_MSI_TYPES and PCI_IRQ_ALL_TYPES where appropriate
 
-Thanks
+ Documentation/PCI/msi-howto.rst               |  5 +++--
+ drivers/ata/ahci.c                            |  2 +-
+ drivers/crypto/inside-secure/safexcel.c       |  2 +-
+ drivers/dma/dw-edma/dw-edma-pcie.c            |  2 +-
+ drivers/gpu/drm/amd/amdgpu/amdgpu_irq.c       | 11 +---------
+ drivers/infiniband/hw/qib/qib_pcie.c          |  6 +++--
+ drivers/media/pci/ddbridge/ddbridge-main.c    |  2 +-
+ drivers/misc/vmw_vmci/vmci_guest.c            |  3 +--
+ drivers/mmc/host/sdhci-pci-gli.c              |  3 +--
+ drivers/mmc/host/sdhci-pci-o2micro.c          |  3 +--
+ drivers/net/ethernet/amd/xgbe/xgbe-pci.c      |  2 +-
+ .../ethernet/aquantia/atlantic/aq_pci_func.c  |  4 +---
+ .../hisilicon/hns3/hns3pf/hclge_main.c        |  3 +--
+ .../hisilicon/hns3/hns3vf/hclgevf_main.c      |  3 +--
+ drivers/pci/msi.c                             | 22 ++++++++-----------
+ drivers/pci/pcie/portdrv_core.c               |  4 ++--
+ drivers/pci/switch/switchtec.c                |  3 +--
+ drivers/scsi/ipr.c                            |  5 +++--
+ drivers/scsi/vmw_pvscsi.c                     |  2 +-
+ include/linux/pci.h                           |  4 ++--
+ 20 files changed, 37 insertions(+), 54 deletions(-)
+
+-- 
+2.17.2
+
