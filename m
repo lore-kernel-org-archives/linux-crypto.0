@@ -2,82 +2,90 @@ Return-Path: <SRS0=fgde=7X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD7FC433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 06:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D325AC433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 06:56:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 45CDB207ED
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 06:42:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89367207ED
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 06:56:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591771359;
-	bh=VfMQMod1eLrxBAX1Hwb2cuxN/kSB9eOexl6gi2YWWmw=;
+	s=default; t=1591772163;
+	bh=5STvsVX/pI2NfrFCiamfYh+BDyGD5ZoTDgeDDX/5rC0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=RpRtpcHbDypBddfFncpAbtld8ak2DtHxCmJb1bBbFQn4EtcXHOJlesTYQsP33+sQE
-	 AkZRAI5D6TEwHmdJYXVykpprtEXsFpGRrFoPf9Gds4xjthKGfsRIp9a/b3PLgnmtS6
-	 xW7DaZHU180YlkJJ8G+KDHUrbm3EaefiuNgqPvSs=
+	b=A0k1wtkRN3Tm1lgNhCGXULnPoqRW0oOzK5LuT2whb+6tEyLIipXhLpvVFXOK6nkB5
+	 QkmQuqT6cju0FNKfjLH8qcDAZQX6IMHgpPeL576EodbxQwRMiyI6k6ocasqgN6VWVk
+	 dvdjjtfJQO0q8sHtFHLWJEt9PH3y4xfV7QuDLFYY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726081AbgFJGmi (ORCPT
+        id S1726153AbgFJG4C (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Jun 2020 02:42:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47938 "EHLO mail.kernel.org"
+        Wed, 10 Jun 2020 02:56:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50094 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726095AbgFJGmi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Jun 2020 02:42:38 -0400
+        id S1726095AbgFJG4C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Jun 2020 02:56:02 -0400
 Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 37AC82074B;
-        Wed, 10 Jun 2020 06:42:37 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id CA97720734;
+        Wed, 10 Jun 2020 06:56:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591771357;
-        bh=VfMQMod1eLrxBAX1Hwb2cuxN/kSB9eOexl6gi2YWWmw=;
+        s=default; t=1591772162;
+        bh=5STvsVX/pI2NfrFCiamfYh+BDyGD5ZoTDgeDDX/5rC0=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=rIByuRnC2GSqGfqGsM2QJdzk0f3yw6vgVkG4pO+v0xtwfWszZlnN4YKS+r9Ge2aOK
-         F2PWhC58dgDvEC75ZQE+R1RidWERFkBEzdNsCY6ML5PkAFXA/HCs1Ttc1K6GWR+FMt
-         8WcC81eiBWt9BXte9M5But1jANxIegYQnj4oQbEw=
-Date:   Tue, 9 Jun 2020 23:42:35 -0700
+        b=e0MwBkvVTHUTmDVaH2vs5miGgN/MlrVKlfR/M/NyC6z80FCNSovuYF3uG+UTFzncx
+         K0Jw9d2Q+Xdzc857h54ARg/fkhIfNgHko4RrdSNNo2BoMbGGOEBC/hqiAdlZEYOjoK
+         vbM66H6VJhracJhCR5+CRIKHf0mcX3BfwTGCSD+c=
+Date:   Tue, 9 Jun 2020 23:56:00 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [v2 PATCH] crc-t10dif: Fix potential crypto notify dead-lock
-Message-ID: <20200610064235.GB6286@sol.localdomain>
-References: <20200604063324.GA28813@gondor.apana.org.au>
- <20200605065918.GA813@gondor.apana.org.au>
+To:     David Laight <David.Laight@aculab.com>
+Cc:     'Herbert Xu' <herbert@gondor.apana.org.au>,
+        Zhangfei Gao <zhangfei.gao@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        wangzhou1 <wangzhou1@hisilicon.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kbuild-all@lists.01.org" <kbuild-all@lists.01.org>
+Subject: Re: [PATCH] crypto: hisilicon - fix strncpy warning with strlcpy
+Message-ID: <20200610065600.GC6286@sol.localdomain>
+References: <202006032110.BEbKqovX%lkp@intel.com>
+ <1591241524-6452-1-git-send-email-zhangfei.gao@linaro.org>
+ <20200604033918.GA2286@gondor.apana.org.au>
+ <b6ad8af2-1cb7-faac-0446-5e09e97f3616@linaro.org>
+ <20200604061811.GA28759@gondor.apana.org.au>
+ <b23433f8-d95d-8142-c830-fb92e5ccd4a1@linaro.org>
+ <20200604065009.GA29822@gondor.apana.org.au>
+ <f8dceec5-6835-c064-bb43-fd12668c2dbb@linaro.org>
+ <20200605121703.GA3792@gondor.apana.org.au>
+ <8c0d8f4e21794d8b80d0a3852830debb@AcuMS.aculab.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200605065918.GA813@gondor.apana.org.au>
+In-Reply-To: <8c0d8f4e21794d8b80d0a3852830debb@AcuMS.aculab.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 05, 2020 at 04:59:18PM +1000, Herbert Xu wrote:
-> The crypto notify call occurs with a read mutex held so you must
-> not do any substantial work directly.  In particular, you cannot
-> call crypto_alloc_* as they may trigger further notifications
-> which may dead-lock in the presence of another writer.
+On Sun, Jun 07, 2020 at 01:03:45PM +0000, David Laight wrote:
+> From: Herbert Xu
+> > Sent: 05 June 2020 13:17
+> ...
+> > Better yet use strscpy which will even return an error for you.
 > 
-> This patch fixes this by postponing the work into a work queue and
-> taking the same lock in the module init function.
+> It really ought to return the buffer length on truncation.
+> Then you can loop:
+> 	while(...)
+> 		buf += strxxxcpy(buf, src, buf_end - buf);
+> and only check right at the end.
 > 
-> While we're at it this patch also ensures that all RCU accesses are
-> marked appropriately (tested with sparse).
-> 
-> Finally this also reveals a race condition in module param show
-> function as it may be called prior to the module init function.
-> It's fixed by testing whether crct10dif_tfm is NULL (this is true
-> iff the init function has not completed assuming fallback is false).
-> 
-> Fixes: 11dcb1037f40 ("crc-t10dif: Allow current transform to be...")
-> Fixes: b76377543b73 ("crc-t10dif: Pick better transform if one...")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 	David
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+scnprintf() can be used for that.
+
+But that doesn't seem relevant to this patch.
 
 - Eric
