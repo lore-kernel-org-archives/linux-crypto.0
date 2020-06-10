@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0B48C433E1
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 06:41:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE8F1C433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 06:41:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9FB022081A
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 06:41:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C96C2074B
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 06:41:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591771299;
-	bh=1hpfaBML1OOWVYV6GGLZ2RGNotNScSZu4UBYbMv9bvg=;
+	s=default; t=1591771301;
+	bh=XBro1BdlKVtRYQ14k2Du4lUHyRFgnbd/U0Vngfqhlmc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=V/FIMscbDT+EgQYdicMou6YkBlCpuwHrbBlGiXfHxgjTT5RgMpT7YB6G7iESegPjl
-	 wuJbu0d5C2VM8MYRXrrhPPY2J84ervUetEvAVdqkOelqdwGjis8/awBUDBDS8/EMM+
-	 9fdn65/GxIFzCPyB7tBc4M1WQU00x8niFQlSN6+k=
+	b=FaQwUICHbvIo9bp5xC4+dJ6TKk4ZAh0EiWwXv1cFjIGZqu134w9xVjSzGMTNW30Ed
+	 hXLmBBmlmYSjDrLQPCVrl3vQG8wR+GCFW74xY9ELGVrIyqHqNppHAPZqDtD1pXTkti
+	 1RXDTz8fbYt/+HQevPMWVMiSU8iooZ/7eCwrCu5Q=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726121AbgFJGli (ORCPT
+        id S1726105AbgFJGll (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Jun 2020 02:41:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47844 "EHLO mail.kernel.org"
+        Wed, 10 Jun 2020 02:41:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47848 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726153AbgFJGli (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726119AbgFJGli (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 10 Jun 2020 02:41:38 -0400
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4600D207ED;
+        by mail.kernel.org (Postfix) with ESMTPSA id 7F44520801;
         Wed, 10 Jun 2020 06:41:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1591771297;
-        bh=1hpfaBML1OOWVYV6GGLZ2RGNotNScSZu4UBYbMv9bvg=;
+        bh=XBro1BdlKVtRYQ14k2Du4lUHyRFgnbd/U0Vngfqhlmc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XeXVlfIKHONmbrFvDPP2Yj5tDMSnhNbbkyzAOPd8FiEt1OL+vNH6cntvGzT8jIGKz
-         A00FIuUtlYCqBoGqG13Xew3nPHjrPNkVwufYhg37p/eNzZrpn+S+KriiMB9c7q+ToD
-         rXN9YTkM6fkBZ2vCwk+hQZ3O9Bbj3vtxJqXCXqU8=
+        b=whM5d22uH9TKOCIjY//5/xA8coZirvZ+A3N/bfi7lsqWKShzxtiHAjk9ts6EXK84G
+         OOnWS6AygV6kvGm+rKogcJHSVqJeuuQWKY9M+gQY3A9XNuUMkEiFG/1oc3gpN0rpDL
+         KBtHhuphg3b7HGHd5ADGrQEuyzgXUqp2Iv8aNJTQ=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH 1/2] crc-t10dif: use fallback in initial state
-Date:   Tue,  9 Jun 2020 23:39:42 -0700
-Message-Id: <20200610063943.378796-2-ebiggers@kernel.org>
+Subject: [PATCH 2/2] crc-t10dif: clean up some more things
+Date:   Tue,  9 Jun 2020 23:39:43 -0700
+Message-Id: <20200610063943.378796-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200610063943.378796-1-ebiggers@kernel.org>
 References: <20200610063943.378796-1-ebiggers@kernel.org>
@@ -57,127 +57,113 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Currently the crc-t10dif module starts out with the fallback disabled
-and crct10dif_tfm == NULL.  crc_t10dif_mod_init() tries to allocate
-crct10dif_tfm, and if it fails it enables the fallback.
+- Correctly compare the algorithm name in crc_t10dif_notify().
 
-This is backwards because it means that any call to crc_t10dif() prior
-to module_init (which could theoretically happen from built-in code)
-will crash rather than use the fallback as expected.  Also, it means
-that if the initial tfm allocation fails, then the fallback stays
-permanently enabled even if a crct10dif implementation is loaded later.
+- Use proper NOTIFY_* status codes instead of 0.
 
-Change it to use the more logical solution of starting with the fallback
-enabled, and disabling the fallback when a tfm gets allocated for the
-first time.  This change also ends up simplifying the code.
+- Consistently use CRC_T10DIF_STRING instead of "crct10dif" directly.
 
-Also take the opportunity to convert the code to use the new static_key
-API, which is much less confusing than the old and deprecated one.
+- Use a proper type for the shash_desc context.
+
+- Use crypto_shash_driver_name() instead of open-coding it.
+
+- Make crc_t10dif_transform_show() use snprintf() rather than sprintf().
+  This isn't actually necessary since the buffer has size PAGE_SIZE
+  and CRYPTO_MAX_ALG_NAME < PAGE_SIZE, but it's good practice.
+
+- Give the "transform" sysfs file mode 0444 rather than 0644,
+  since it doesn't implement a setter method.
+
+- Adjust the module description to not be the same as crct10dif-generic.
 
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- lib/crc-t10dif.c | 37 ++++++++++---------------------------
- 1 file changed, 10 insertions(+), 27 deletions(-)
+ lib/crc-t10dif.c | 24 +++++++++++-------------
+ 1 file changed, 11 insertions(+), 13 deletions(-)
 
 diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
-index c9acf1c12cfcb4..af3613367ef944 100644
+index af3613367ef944..1ed2ed4870971e 100644
 --- a/lib/crc-t10dif.c
 +++ b/lib/crc-t10dif.c
-@@ -17,7 +17,7 @@
- #include <linux/notifier.h>
- 
- static struct crypto_shash __rcu *crct10dif_tfm;
--static struct static_key crct10dif_fallback __read_mostly;
-+static DEFINE_STATIC_KEY_TRUE(crct10dif_fallback);
- static DEFINE_MUTEX(crc_t10dif_mutex);
- static struct work_struct crct10dif_rehash_work;
- 
-@@ -26,7 +26,6 @@ static int crc_t10dif_notify(struct notifier_block *self, unsigned long val, voi
+@@ -26,11 +26,11 @@ static int crc_t10dif_notify(struct notifier_block *self, unsigned long val, voi
  	struct crypto_alg *alg = data;
  
  	if (val != CRYPTO_MSG_ALG_LOADED ||
--	    static_key_false(&crct10dif_fallback) ||
- 	    strncmp(alg->cra_name, CRC_T10DIF_STRING, strlen(CRC_T10DIF_STRING)))
- 		return 0;
+-	    strncmp(alg->cra_name, CRC_T10DIF_STRING, strlen(CRC_T10DIF_STRING)))
+-		return 0;
++	    strcmp(alg->cra_name, CRC_T10DIF_STRING))
++		return NOTIFY_DONE;
  
-@@ -41,10 +40,6 @@ static void crc_t10dif_rehash(struct work_struct *work)
+ 	schedule_work(&crct10dif_rehash_work);
+-	return 0;
++	return NOTIFY_OK;
+ }
+ 
+ static void crc_t10dif_rehash(struct work_struct *work)
+@@ -40,7 +40,7 @@ static void crc_t10dif_rehash(struct work_struct *work)
  	mutex_lock(&crc_t10dif_mutex);
  	old = rcu_dereference_protected(crct10dif_tfm,
  					lockdep_is_held(&crc_t10dif_mutex));
--	if (!old) {
--		mutex_unlock(&crc_t10dif_mutex);
--		return;
--	}
- 	new = crypto_alloc_shash("crct10dif", 0, 0);
+-	new = crypto_alloc_shash("crct10dif", 0, 0);
++	new = crypto_alloc_shash(CRC_T10DIF_STRING, 0, 0);
  	if (IS_ERR(new)) {
  		mutex_unlock(&crc_t10dif_mutex);
-@@ -53,8 +48,12 @@ static void crc_t10dif_rehash(struct work_struct *work)
- 	rcu_assign_pointer(crct10dif_tfm, new);
- 	mutex_unlock(&crc_t10dif_mutex);
- 
--	synchronize_rcu();
--	crypto_free_shash(old);
-+	if (old) {
-+		synchronize_rcu();
-+		crypto_free_shash(old);
-+	} else {
-+		static_branch_disable(&crct10dif_fallback);
-+	}
- }
- 
- static struct notifier_block crc_t10dif_nb = {
-@@ -69,7 +68,7 @@ __u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
+ 		return;
+@@ -64,7 +64,7 @@ __u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
+ {
+ 	struct {
+ 		struct shash_desc shash;
+-		char ctx[2];
++		__u16 crc;
  	} desc;
  	int err;
  
--	if (static_key_false(&crct10dif_fallback))
-+	if (static_branch_unlikely(&crct10dif_fallback))
- 		return crc_t10dif_generic(crc, buffer, len);
+@@ -73,14 +73,13 @@ __u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
  
  	rcu_read_lock();
-@@ -93,18 +92,9 @@ EXPORT_SYMBOL(crc_t10dif);
- 
- static int __init crc_t10dif_mod_init(void)
- {
--	struct crypto_shash *tfm;
+ 	desc.shash.tfm = rcu_dereference(crct10dif_tfm);
+-	*(__u16 *)desc.ctx = crc;
 -
- 	INIT_WORK(&crct10dif_rehash_work, crc_t10dif_rehash);
- 	crypto_register_notifier(&crc_t10dif_nb);
--	mutex_lock(&crc_t10dif_mutex);
--	tfm = crypto_alloc_shash("crct10dif", 0, 0);
--	if (IS_ERR(tfm)) {
--		static_key_slow_inc(&crct10dif_fallback);
--		tfm = NULL;
--	}
--	RCU_INIT_POINTER(crct10dif_tfm, tfm);
--	mutex_unlock(&crc_t10dif_mutex);
-+	crc_t10dif_rehash(&crct10dif_rehash_work);
- 	return 0;
- }
++	desc.crc = crc;
+ 	err = crypto_shash_update(&desc.shash, buffer, len);
+ 	rcu_read_unlock();
  
-@@ -124,20 +114,13 @@ static int crc_t10dif_transform_show(char *buffer, const struct kernel_param *kp
- 	const char *name;
+ 	BUG_ON(err);
+ 
+-	return *(__u16 *)desc.ctx;
++	return desc.crc;
+ }
+ EXPORT_SYMBOL(crc_t10dif_update);
+ 
+@@ -111,7 +110,6 @@ module_exit(crc_t10dif_mod_fini);
+ static int crc_t10dif_transform_show(char *buffer, const struct kernel_param *kp)
+ {
+ 	struct crypto_shash *tfm;
+-	const char *name;
  	int len;
  
--	if (static_key_false(&crct10dif_fallback))
-+	if (static_branch_unlikely(&crct10dif_fallback))
- 		return sprintf(buffer, "fallback\n");
+ 	if (static_branch_unlikely(&crct10dif_fallback))
+@@ -119,15 +117,15 @@ static int crc_t10dif_transform_show(char *buffer, const struct kernel_param *kp
  
  	rcu_read_lock();
  	tfm = rcu_dereference(crct10dif_tfm);
--	if (!tfm) {
--		len = sprintf(buffer, "init\n");
--		goto unlock;
--	}
--
- 	name = crypto_tfm_alg_driver_name(crypto_shash_tfm(tfm));
- 	len = sprintf(buffer, "%s\n", name);
--
--unlock:
+-	name = crypto_tfm_alg_driver_name(crypto_shash_tfm(tfm));
+-	len = sprintf(buffer, "%s\n", name);
++	len = snprintf(buffer, PAGE_SIZE, "%s\n",
++		       crypto_shash_driver_name(tfm));
  	rcu_read_unlock();
  
  	return len;
+ }
+ 
+-module_param_call(transform, NULL, crc_t10dif_transform_show, NULL, 0644);
++module_param_call(transform, NULL, crc_t10dif_transform_show, NULL, 0444);
+ 
+-MODULE_DESCRIPTION("T10 DIF CRC calculation");
++MODULE_DESCRIPTION("T10 DIF CRC calculation (library API)");
+ MODULE_LICENSE("GPL");
+ MODULE_SOFTDEP("pre: crct10dif");
 -- 
 2.26.2
 
