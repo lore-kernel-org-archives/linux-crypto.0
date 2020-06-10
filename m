@@ -2,104 +2,100 @@ Return-Path: <SRS0=fgde=7X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 896E0C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 09:13:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A239C433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 12:02:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 631DB20760
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 09:13:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7550D2074B
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 12:02:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O0qKoJFb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726908AbgFJJNJ (ORCPT
+        id S1728908AbgFJMC4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Jun 2020 05:13:09 -0400
-Received: from sitav-80046.hsr.ch ([152.96.80.46]:41692 "EHLO
-        mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726219AbgFJJNJ (ORCPT
+        Wed, 10 Jun 2020 08:02:56 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33769 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728753AbgFJMC4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Jun 2020 05:13:09 -0400
-X-Greylist: delayed 551 seconds by postgrey-1.27 at vger.kernel.org; Wed, 10 Jun 2020 05:13:08 EDT
-Received: from [152.96.214.51] (unknown [152.96.214.51])
-        by mail.strongswan.org (Postfix) with ESMTPSA id E6BC0404F1;
-        Wed, 10 Jun 2020 11:03:55 +0200 (CEST)
-Subject: Re: [PATCH net v3 3/3] esp, ah: modernize the crypto algorithm
- selections
-To:     Eric Biggers <ebiggers@kernel.org>, netdev@vger.kernel.org
-Cc:     linux-crypto@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-References: <20200610005402.152495-1-ebiggers@kernel.org>
- <20200610005402.152495-4-ebiggers@kernel.org>
-From:   Tobias Brunner <tobias@strongswan.org>
-Autocrypt: addr=tobias@strongswan.org; prefer-encrypt=mutual; keydata=
- xsFNBFNaX0kBEADIwotwcpW3abWt4CK9QbxUuPZMoiV7UXvdgIksGA1132Z6dICEaPPn1SRd
- BnkFBms+I2mNPhZCSz409xRJffO41/S+/mYCrpxlSbCOjuG3S13ubuHdcQ3SmDF5brsOobyx
- etA5QR4arov3abanFJYhis+FTUScVrJp1eyxwdmQpk3hmstgD/8QGheSahXj8v0SYmc1705R
- fjUxmV5lTl1Fbszjyx7Er7Wt+pl+Bl9ReqtDnfBixFvDaFu4/HnGtGZ7KOeiaElRzytU24Hm
- rlW7vkWxtaHf94Qc2d2rIvTwbeAan1Hha1s2ndA6Vk7uUElT571j7OB2+j1c0VY7/wiSvYgv
- jXyS5C2tKZvJ6gI/9vALBpqypNnSfwuzKWFH37F/gww8O2cB6KwqZX5IRkhiSpBB4wtBC2/m
- IDs5VPIcYMCpMIGxinHfl7efv3+BJ1KFNEXtKjmDimu2ViIFhtOkSYeqoEcU+V0GQfn3RzGL
- 0blCFfLmmVfZ4lfLDWRPVfCP8pDifd3L2NUgekWX4Mmc5R2p91unjs6MiqFPb2V9eVcTf6In
- Dk5HfCzZKeopmz5+Ewwt+0zS1UmC3+6thTY3h66rB/asK6jQefa7l5xDg+IzBNIczuW6/YtV
- LrycjEvW98HTO4EMxqxyKAVpt33oNbNfYTEdoJH2EzGYRkyIVQARAQABzSZUb2JpYXMgQnJ1
- bm5lciA8dG9iaWFzQHN0cm9uZ3N3YW4ub3JnPsLBqAQTAQgAOwIbAwULCQgHAwUVCgkICwUW
- AgMBAAIeAQIXgBYhBBJTj49om18fFfB74XZf4mxrRnWEBQJdyUF6AhkBACEJEHZf4mxrRnWE
- FiEEElOPj2ibXx8V8Hvhdl/ibGtGdYQWaBAAk6rcpSIsUyceYhy7p6gTzfM3KfhILLwRxs9I
- hsEizE+lp6y02Cjt+SrvQ06QRW8QeQ90PGuT5BF6wMVjwuUt+TKI0JxLmnaTfjpD+laTLFfw
- 1GU0C7X16a5OFqgI6N5zGfgb5ldV9gEtUYha2jerOyDeGALPON4MnJPXVEeS8Dx/nkghVap3
- JGa1jWB4Ugg/8CkKc9m4kiHLEoX+JaStCDv0p2nlDygmF45cRVcYvwr7/XIeljqE7UH5D8TH
- HKHfB+KhQYoZqXkol9SXFc0RGKLKTwptW9NuIkrijC2/pb/zzj8nZyTu+SpmDxpBIRE4bsMk
- bjbkg0eSEnV+CWwW0KPuJHMztpQgiU55TXKodhzBROeB1w41BY3/yRYsJheo3M/cKmfmcLTO
- PE2DoUNXRtb/AHjgzTqW59/kBW/dKEAv2aByo+Gj8MfmL45Pj1AnxSX/8XCMmgJWj9ogVtGv
- WmkJaBy/cvWjGO09tE+gAsLWa/5StvIoJ8w6xzkr5tPeqMb04hiYBXKe8LvVhsB2Z1+FrhBY
- BZrJVCBUplqIxBdHobcZPGDTYO+5eOtyKq0tT9SpdaWC1CMmPyKKSYqGiHRQ4St6fRInNTs9
- BwKCu7T3CwqPpKiOThF9rd2uojpfkoUF+vQzSJtq+0qmkZwng4R0Nb2yxwyia2mREKRc/uXO
- wU0EU1pfSQEQAOFySm9/h7zyPU8AJO3Nh3L6QkkvCE4uHfv1Nfw36Vs7I06Q3r2iIqgd+jJF
- EZHPW7t7j5xooK78+uhyaAPPuggFJZHhzrxhqD1JAwUcWppyRbmli1fAVTN/jr1icAL9WcHF
- 9+SCA4JqZvO+AtzLcs3EFaLilolFIwOYSM9VY3WMvIQXgv1pvwiwDpcIP42IjOJeJz8uWv0e
- AZPaDnZx1NZCFy+3MEYPTt7sCwLdVsCXyF5qVwKjyluu/Z5cLn0w5uZn8uq5yDB5sQSAzQKm
- 15zLKllsE9JPv7b3XC+L/KIOY2vkDz6GmByvU2C5ez0g4QHLzxQ25BS7VN8xhy8PPL3sfGR8
- nTTVl7z0gm9jTexmsvS+/OEjNNdam3ec7ycYAwJ71tCnCkA2wufewEUwPvj9vT/alcoe67WO
- zARbOG9PZzw/zS87coo+HffjingjhWMM8fagIuxkoiUt4dKh9WUmteH/LzRqPGNVGOeI9pNT
- NiKGrYn3vjEDsO31kWwW1ullWor+HLwvDXzorjRr6DYFUQmRiwmwYaRzlXGpRBLoII1dzwi2
- ZsWDF+6BUXxKuNhk+t45AClg0Gvy+OGiWik6ys7vzwm9D1bkr6/zg4BBsdhH7xW9KWuJF9Im
- uO85BFuURlnYIEwuIgPUvCLm87mSdufDwl3FbiIDaD+SvbwvABEBAAHCwV8EGAEIAAkFAlNa
- X0kCGwwACgkQdl/ibGtGdYRHPg/9HZpFJ7A02gz1iKCA200kzHYAVxLgddGs7wPbqSQOVi26
- jNxCzR/FGckZ9Bnlg9mHGWrtxR3AdE0hYpGgKmltE1bwb8tx1o9kkbDcy1aPE0vx0A2Md0Cy
- mhEAJ3CeJHUoVfmhyqOTT6Y0+nJ5H0LuHxw7PAgGR62goTk9wI4Nv8E7zTZ8UMLUFidxl5Ah
- GcxaKUQKnwtvy0vFcCar0vdHhzsLMgPAxZZ84yYypmeGdUQCIf0Tg73iTAdngdYLgBhCLOqB
- 5G5hBRZbChIEDMbPNqAeDnvKzqsmLA228gLeP6u26pj0iLx6G2WIeVcyiQ4Bc+B4m6zQQeDu
- YwU3sZua+t1Mx0aF0d1336pvOG4IkEyKOzNPnGjEuWorFgf3fOzHRIcpmnrxnJklDCeLrdmo
- 3k//ijHT3wzTR5WmTLU8un2XkQGmxAf1CUar5ks4HnPFMUVO68L08L8zc6kVRd0uvvJzzcXJ
- eHlhsZU0jFHj1C/nxPVmYpz0ffgffVnopEk8aYLPJDEdhJs/0oNPhLn8PH/6JowNvUb1925I
- Gs/EghPkYSTcEqQf9KgAQWzvHGSWOWiCBd8m7Zr+oFMM83O2Jxyy9fPlc2ddGJkituk2QnyE
- TQe6raB3McL7SFYzKgE0h31zajfzLkS2+SHtdY7bJytbVSXNTMzgpXdIMsiF85Q=
-Message-ID: <c87f1edb-4130-a4a9-2915-ae5d55302f0a@strongswan.org>
-Date:   Wed, 10 Jun 2020 11:03:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        Wed, 10 Jun 2020 08:02:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591790575;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=TNsoGvRQNqCDBEQwQWNi/36A0peQaj7a5rcaN6nMm74=;
+        b=O0qKoJFbCQHlE+jEGkzuweQIFACfqUkJnE/Kv6U0Th3mvK0fTus4FqsGJyeMMhyRbSRWFF
+        K5WMU87Mm7XnUcxpPsAsR331XDPC4ailQQ6ESSNbaen77OBKi5q+R9Yav8KX4vG+w4+d/j
+        eagnXIKb8FRw7XbdPho9vSGTol9/eAQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-154-MecNFB9ROaaure0ci4G0eg-1; Wed, 10 Jun 2020 08:02:53 -0400
+X-MC-Unique: MecNFB9ROaaure0ci4G0eg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3826100A8EE;
+        Wed, 10 Jun 2020 12:02:51 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C28088FF86;
+        Wed, 10 Jun 2020 12:02:24 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 05AC2Ono028363;
+        Wed, 10 Jun 2020 08:02:24 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 05AC2OLN028359;
+        Wed, 10 Jun 2020 08:02:24 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Wed, 10 Jun 2020 08:02:23 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Mike Snitzer <msnitzer@redhat.com>,
+        Milan Broz <mbroz@redhat.com>, dm-devel@redhat.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: crypto API and GFP_ATOMIC
+In-Reply-To: <20200610010450.GA6449@gondor.apana.org.au>
+Message-ID: <alpine.LRH.2.02.2006100756270.27811@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.2006091259250.30590@file01.intranet.prod.int.rdu2.redhat.com> <20200610010450.GA6449@gondor.apana.org.au>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-In-Reply-To: <20200610005402.152495-4-ebiggers@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
 
-> +	  Note that RFC 8221 considers AH itself to be "NOT RECOMMENDED".  It is
-> +	  better to use ESP only, using an AEAD cipher such as AES-GCM.
 
-What's NOT RECOMMENDED according to the RFC is the combination of ESP+AH
-(i.e. use ESP only for confidentiality and AH for authentication), not
-AH by itself (although the RFC keeps ENCR_NULL as a MUST because ESP
-with NULL encryption is generally preferred over AH due to NATs).
+On Wed, 10 Jun 2020, Herbert Xu wrote:
 
-Regards,
-Tobias
+> On Tue, Jun 09, 2020 at 01:11:05PM -0400, Mikulas Patocka wrote:
+> >
+> > Do you have another idea how to solve this problem?
+> 
+> I think the better approach would be to modify the drivers to not
+> allocate any memory.  In general, any memory needed by the driver
+> to fulfil a request *should* be allocated within the crypto request
+> object.  That's why we have the reqsize field to indicate how much
+> memory could be needed per request.
+> 
+> Thanks,
+
+Yes, fixing the drivers would be the best - but you can hardly find any 
+person who has all the crypto hardware and who is willing to rewrite all 
+the drivers for it.
+
+Another possibility - I was thinking about setting 
+CRYPTO_TFM_REQ_MAY_SLEEP in dm-crypt and calling the crypto function under 
+memalloc_noio_save. But there are some drivers that do GFP_ATOMIC 
+allocation regardless of CRYPTO_TFM_REQ_MAY_SLEEP.
+
+Mikulas
+
