@@ -3,100 +3,103 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12267C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 07:38:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 896E0C433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 09:13:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4544207ED
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 07:38:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 631DB20760
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 09:13:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726523AbgFJHiY (ORCPT
+        id S1726908AbgFJJNJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Jun 2020 03:38:24 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5800 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726081AbgFJHiY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Jun 2020 03:38:24 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 58D9ED38125299FBE705;
-        Wed, 10 Jun 2020 15:38:21 +0800 (CST)
-Received: from [10.174.151.115] (10.174.151.115) by smtp.huawei.com
- (10.3.19.214) with Microsoft SMTP Server (TLS) id 14.3.487.0; Wed, 10 Jun
- 2020 15:38:20 +0800
-Subject: Re: [PATCH v3 1/3] crypto: virtio: Fix src/dst scatterlist
- calculation in __virtio_crypto_skcipher_do_req()
-To:     Sasha Levin <sashal@kernel.org>, <linux-crypto@vger.kernel.org>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        <virtualization@lists.linux-foundation.org>,
-        <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
-References: <20200605141045.821A820663@mail.kernel.org>
-From:   "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>
-Message-ID: <6a5b32cc-f6db-c3f6-7ae7-cf51b2893162@huawei.com>
-Date:   Wed, 10 Jun 2020 15:38:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Wed, 10 Jun 2020 05:13:09 -0400
+Received: from sitav-80046.hsr.ch ([152.96.80.46]:41692 "EHLO
+        mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726219AbgFJJNJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Jun 2020 05:13:09 -0400
+X-Greylist: delayed 551 seconds by postgrey-1.27 at vger.kernel.org; Wed, 10 Jun 2020 05:13:08 EDT
+Received: from [152.96.214.51] (unknown [152.96.214.51])
+        by mail.strongswan.org (Postfix) with ESMTPSA id E6BC0404F1;
+        Wed, 10 Jun 2020 11:03:55 +0200 (CEST)
+Subject: Re: [PATCH net v3 3/3] esp, ah: modernize the crypto algorithm
+ selections
+To:     Eric Biggers <ebiggers@kernel.org>, netdev@vger.kernel.org
+Cc:     linux-crypto@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Steffen Klassert <steffen.klassert@secunet.com>
+References: <20200610005402.152495-1-ebiggers@kernel.org>
+ <20200610005402.152495-4-ebiggers@kernel.org>
+From:   Tobias Brunner <tobias@strongswan.org>
+Autocrypt: addr=tobias@strongswan.org; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <c87f1edb-4130-a4a9-2915-ae5d55302f0a@strongswan.org>
+Date:   Wed, 10 Jun 2020 11:03:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200605141045.821A820663@mail.kernel.org>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200610005402.152495-4-ebiggers@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.151.115]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Eric,
 
+> +	  Note that RFC 8221 considers AH itself to be "NOT RECOMMENDED".  It is
+> +	  better to use ESP only, using an AEAD cipher such as AES-GCM.
 
-On 2020/6/5 22:10, Sasha Levin wrote:
-> <20200123101000.GB24255@Red>
-> References: <20200602070501.2023-2-longpeng2@huawei.com>
-> <20200123101000.GB24255@Red>
-> 
-> Hi
-> 
-> [This is an automated email]
-> 
-> This commit has been processed because it contains a "Fixes:" tag
-> fixing commit: dbaf0624ffa5 ("crypto: add virtio-crypto driver").
-> 
-> The bot has tested the following trees: v5.6.15, v5.4.43, v4.19.125, v4.14.182.
-> 
-> v5.6.15: Build OK!
-> v5.4.43: Failed to apply! Possible dependencies:
->     eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
-> 
-> v4.19.125: Failed to apply! Possible dependencies:
->     eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
-> 
-> v4.14.182: Failed to apply! Possible dependencies:
->     500e6807ce93 ("crypto: virtio - implement missing support for output IVs")
->     67189375bb3a ("crypto: virtio - convert to new crypto engine API")
->     d0d859bb87ac ("crypto: virtio - Register an algo only if it's supported")
->     e02b8b43f55a ("crypto: virtio - pr_err() strings should end with newlines")
->     eee1d6fca0a0 ("crypto: virtio - switch to skcipher API")
-> 
-> 
-> NOTE: The patch will not be queued to stable trees until it is upstream.
-> 
-> How should we proceed with this patch?
-> 
-I've tried to adapt my patch to these stable tree, but it seems there're some
-other bugs. so I think the best way to resolve these conflicts is to apply the
-dependent patches detected.
+What's NOT RECOMMENDED according to the RFC is the combination of ESP+AH
+(i.e. use ESP only for confidentiality and AH for authentication), not
+AH by itself (although the RFC keeps ENCR_NULL as a MUST because ESP
+with NULL encryption is generally preferred over AH due to NATs).
 
-If we apply these dependent patches, then the conflicts of other two patches:
- crypto: virtio: Fix use-after-free in virtio_crypto_skcipher_finalize_req
- crypto: virtio: Fix dest length calculation in __virtio_crypto_skcipher_do_req
-will also be gone.
-
----
 Regards,
-Longpeng(Mike)
+Tobias
