@@ -2,59 +2,69 @@ Return-Path: <SRS0=fgde=7X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08951C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 01:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95DD9C433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 06:41:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E06BD206C3
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 01:05:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 667742081A
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 06:41:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1591771298;
+	bh=BuAi8lTm66aXNBirKwiAWHgcpw2pfk0uDXOzJ3Yqu0U=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=XIuSzuVlXr5x2LhDZsxlevd0L/TJ60/tJQFnfdfagTsEqScI6WijkgG7IclvrdwHV
+	 xmUf/BfgDrIuSPJ8feKidhKfk6zBkQlOj5Xf1OfhCBx1kfyt79FT+dJnMVPA/5D/Wg
+	 MbENDyO8faEKMtizj9oXowq4MbDh+WGpBLQAS3Yg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726127AbgFJBE5 (ORCPT
+        id S1726157AbgFJGlh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Jun 2020 21:04:57 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:59220 "EHLO fornost.hmeau.com"
+        Wed, 10 Jun 2020 02:41:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47840 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726046AbgFJBE4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Jun 2020 21:04:56 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jipAg-0007mt-9B; Wed, 10 Jun 2020 11:04:51 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 10 Jun 2020 11:04:50 +1000
-Date:   Wed, 10 Jun 2020 11:04:50 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Mike Snitzer <msnitzer@redhat.com>,
-        Milan Broz <mbroz@redhat.com>, dm-devel@redhat.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: crypto API and GFP_ATOMIC
-Message-ID: <20200610010450.GA6449@gondor.apana.org.au>
-References: <alpine.LRH.2.02.2006091259250.30590@file01.intranet.prod.int.rdu2.redhat.com>
+        id S1726119AbgFJGlh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Jun 2020 02:41:37 -0400
+Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 03F802074B;
+        Wed, 10 Jun 2020 06:41:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1591771297;
+        bh=BuAi8lTm66aXNBirKwiAWHgcpw2pfk0uDXOzJ3Yqu0U=;
+        h=From:To:Cc:Subject:Date:From;
+        b=wjm1i6S+j8qLKjbAmm9YuWSkBdndvOOz2Lxrp74w34vc+U0tIlNHvnaYZKKErA7oE
+         EMByYIngBveZn+bGMtTnCi26zfLNmrkvrIa0WDhiAUA6DJiP8V3g5HlN7GpYyTvmcC
+         tAa8b2u1wi6iXldlNS4fcBpNCb0sHETqaka6fkSI=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH 0/2] crc-t10dif library improvements
+Date:   Tue,  9 Jun 2020 23:39:41 -0700
+Message-Id: <20200610063943.378796-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.02.2006091259250.30590@file01.intranet.prod.int.rdu2.redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 09, 2020 at 01:11:05PM -0400, Mikulas Patocka wrote:
->
-> Do you have another idea how to solve this problem?
+This series makes some more improvements to lib/crc-t10dif.c, as discussed at
+https://lkml.kernel.org/linux-crypto/20200604063324.GA28813@gondor.apana.org.au/T/#u
 
-I think the better approach would be to modify the drivers to not
-allocate any memory.  In general, any memory needed by the driver
-to fulfil a request *should* be allocated within the crypto request
-object.  That's why we have the reqsize field to indicate how much
-memory could be needed per request.
+This applies on top of Herbert's
+"[v2 PATCH] crc-t10dif: Fix potential crypto notify dead-lock".
 
-Thanks,
+Eric Biggers (2):
+  crc-t10dif: use fallback in initial state
+  crc-t10dif: clean up some more things
+
+ lib/crc-t10dif.c | 61 +++++++++++++++++-------------------------------
+ 1 file changed, 21 insertions(+), 40 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.26.2
+
