@@ -2,80 +2,83 @@ Return-Path: <SRS0=fgde=7X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDEA5C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 15:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A20C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 16:15:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9EA182070B
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 15:53:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2B642072E
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 16:15:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591804394;
-	bh=jKyRFc09U4pc6AUdaO2U2v1JesKj0Dr9snvP7EDAh0A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=vfh5E5SefBWLisIu6qEiFMSy6gfb3PLvTr8gyu3N6jO+IBU7RF8OJrg1pPrQDtUNQ
-	 7ndmjC0u69hI53hLbRrVipyGXm9tGxC0Rk6xw5tS2oenGy3TRcRq+18A54bUn8gSR8
-	 lTFhLCqF/z2IPHD0C7JColRfk2DT6NqbgXVOGAGA=
+	s=default; t=1591805714;
+	bh=NeECbS+JD2nd9m1zZ4V4IaXqINFSAhWGzBIDMBB1vD4=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=q2ibQObcNNO4yd+zTBmtk/vgTHfpp7kJlPGc8LHxe8C8z3O5KhCIBJef/o/9Z8wLt
+	 emyuv4Jr8w7TDr+FJqftQONJN3qjvx4pzRRGtEycPKf/MLxlSq/LaX5aodZe+j150A
+	 NJiudPVtIljK/wyquD9346vwh9rhi0pQzXrAtCJQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728439AbgFJPxO (ORCPT
+        id S1728126AbgFJQPO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Jun 2020 11:53:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49340 "EHLO mail.kernel.org"
+        Wed, 10 Jun 2020 12:15:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60760 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728217AbgFJPxN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Jun 2020 11:53:13 -0400
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727948AbgFJQPN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Jun 2020 12:15:13 -0400
+Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 57E37206F4;
-        Wed, 10 Jun 2020 15:53:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7B3822063A;
+        Wed, 10 Jun 2020 16:15:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591804393;
-        bh=jKyRFc09U4pc6AUdaO2U2v1JesKj0Dr9snvP7EDAh0A=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bdosIPAFrSzRJCwMhu1K7aaFtBFNSCDNT2zu6Kz4grWB28dgdF39lQvrWPn5dOyYb
-         m6JzWoWKQorB50vbPDqgyPq31E0GWkANLhQMbvP9iNKijJA8jhYrG0GFIsVIXAdPwa
-         87SarRnsucOIgiYJfTOZPuuXq8HdOJM2kkyuYFMk=
-Date:   Wed, 10 Jun 2020 08:53:12 -0700
+        s=default; t=1591805713;
+        bh=NeECbS+JD2nd9m1zZ4V4IaXqINFSAhWGzBIDMBB1vD4=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Vcqo6vNpiERFxO5VKq/sNjCiZ5r7qbZyEr1Rfk+xY8QZPHLsONvC2Jm0nEU2qsowi
+         FQlgm0h4SqDxjl1V+zPBy8+xknDZ7cM+42uef1HRPyoGwfwPmfj17j+BzgVlG9lxzp
+         tPZBvXmuC1pH6K1wbrT5CdAwNod+1pPsHZQ07iAA=
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Tobias Brunner <tobias@strongswan.org>
-Cc:     netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>,
+To:     netdev@vger.kernel.org
+Cc:     linux-crypto@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH net v3 3/3] esp, ah: modernize the crypto algorithm
- selections
-Message-ID: <20200610155312.GB1339@sol.localdomain>
-References: <20200610005402.152495-1-ebiggers@kernel.org>
- <20200610005402.152495-4-ebiggers@kernel.org>
- <c87f1edb-4130-a4a9-2915-ae5d55302f0a@strongswan.org>
+Subject: [PATCH net v4 0/3] esp, ah: improve crypto algorithm selections
+Date:   Wed, 10 Jun 2020 09:14:34 -0700
+Message-Id: <20200610161437.4290-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c87f1edb-4130-a4a9-2915-ae5d55302f0a@strongswan.org>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 10, 2020 at 11:03:55AM +0200, Tobias Brunner wrote:
-> Hi Eric,
-> 
-> > +	  Note that RFC 8221 considers AH itself to be "NOT RECOMMENDED".  It is
-> > +	  better to use ESP only, using an AEAD cipher such as AES-GCM.
-> 
-> What's NOT RECOMMENDED according to the RFC is the combination of ESP+AH
-> (i.e. use ESP only for confidentiality and AH for authentication), not
-> AH by itself (although the RFC keeps ENCR_NULL as a MUST because ESP
-> with NULL encryption is generally preferred over AH due to NATs).
-> 
-> Regards,
-> Tobias
+This series consolidates and modernizes the lists of crypto algorithms
+that are selected by the IPsec kconfig options, and adds CRYPTO_SEQIV
+since it no longer gets selected automatically by other things.
 
-Okay, I'll drop this paragraph.  I'm surprised that authentication-only is still
-considered a valid use case though.
+See previous discussion at
+https://lkml.kernel.org/netdev/20200604192322.22142-1-ebiggers@kernel.org/T/#u
 
-- Eric
+Changed v3 => v4:
+  - Don't say that AH is "NOT RECOMMENDED" by RFC 8221.
+  - Updated commit messages (added Acked-by tags, fixed a bad Fixes tag,
+    added some more explanation to patch 3).
+
+Eric Biggers (3):
+  esp, ah: consolidate the crypto algorithm selections
+  esp: select CRYPTO_SEQIV
+  esp, ah: modernize the crypto algorithm selections
+
+ net/ipv4/Kconfig | 34 ++++++++++++++++++----------------
+ net/ipv6/Kconfig | 34 ++++++++++++++++++----------------
+ net/xfrm/Kconfig | 24 ++++++++++++++++++++++++
+ 3 files changed, 60 insertions(+), 32 deletions(-)
+
+
+base-commit: 89dc68533b190117e1a2fb4298d88b96b3580abf
+-- 
+2.26.2
+
