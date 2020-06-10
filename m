@@ -2,52 +2,55 @@ Return-Path: <SRS0=fgde=7X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A20C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 16:15:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 458D7C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 16:15:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2B642072E
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 16:15:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 197C62063A
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jun 2020 16:15:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591805714;
-	bh=NeECbS+JD2nd9m1zZ4V4IaXqINFSAhWGzBIDMBB1vD4=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=q2ibQObcNNO4yd+zTBmtk/vgTHfpp7kJlPGc8LHxe8C8z3O5KhCIBJef/o/9Z8wLt
-	 emyuv4Jr8w7TDr+FJqftQONJN3qjvx4pzRRGtEycPKf/MLxlSq/LaX5aodZe+j150A
-	 NJiudPVtIljK/wyquD9346vwh9rhi0pQzXrAtCJQ=
+	s=default; t=1591805717;
+	bh=tFLtFU9slykfm4dIs2excokQc97ZcoVyyfzMpnBhZms=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=udQfAz5Sk4skjG7uxIOasAJ0u/33Qs8Wjp0/R7xsbDI8nYfTXklUq0UTvoPs9h7YS
+	 aCe6EntInHmqr1ySKlYoA8I//iO0w+Mfdz+ottB2zAqr0FxrXcG6OCvKuW+1eFD5KF
+	 zx750A86XPMmk3TgbdRZylcCY7ADpeC9aE/5224g=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728126AbgFJQPO (ORCPT
+        id S1728230AbgFJQPP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Jun 2020 12:15:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60760 "EHLO mail.kernel.org"
+        Wed, 10 Jun 2020 12:15:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60792 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727948AbgFJQPN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Jun 2020 12:15:13 -0400
+        id S1727948AbgFJQPO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Jun 2020 12:15:14 -0400
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7B3822063A;
-        Wed, 10 Jun 2020 16:15:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 315C62064C;
+        Wed, 10 Jun 2020 16:15:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591805713;
-        bh=NeECbS+JD2nd9m1zZ4V4IaXqINFSAhWGzBIDMBB1vD4=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Vcqo6vNpiERFxO5VKq/sNjCiZ5r7qbZyEr1Rfk+xY8QZPHLsONvC2Jm0nEU2qsowi
-         FQlgm0h4SqDxjl1V+zPBy8+xknDZ7cM+42uef1HRPyoGwfwPmfj17j+BzgVlG9lxzp
-         tPZBvXmuC1pH6K1wbrT5CdAwNod+1pPsHZQ07iAA=
+        s=default; t=1591805714;
+        bh=tFLtFU9slykfm4dIs2excokQc97ZcoVyyfzMpnBhZms=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=m97IPMjjux5oFq6+hsRk0IPd5o6rGePDP9300wmqcqj2+ZFQ4jrh3smM4T479iPf2
+         m1BXThEnFcxZyWxswrzzvRT6dijkgdQzNTfywscGYGCPaujosPRlJozIAt7NUbRNeY
+         VUue+2ZAoNA3FcCurG4Jqnb+UVa0emEv9Pp1Jrpg=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     netdev@vger.kernel.org
 Cc:     linux-crypto@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH net v4 0/3] esp, ah: improve crypto algorithm selections
-Date:   Wed, 10 Jun 2020 09:14:34 -0700
-Message-Id: <20200610161437.4290-1-ebiggers@kernel.org>
+Subject: [PATCH net v4 2/3] esp: select CRYPTO_SEQIV
+Date:   Wed, 10 Jun 2020 09:14:36 -0700
+Message-Id: <20200610161437.4290-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200610161437.4290-1-ebiggers@kernel.org>
+References: <20200610161437.4290-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -55,30 +58,37 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series consolidates and modernizes the lists of crypto algorithms
-that are selected by the IPsec kconfig options, and adds CRYPTO_SEQIV
-since it no longer gets selected automatically by other things.
+From: Eric Biggers <ebiggers@google.com>
 
-See previous discussion at
-https://lkml.kernel.org/netdev/20200604192322.22142-1-ebiggers@kernel.org/T/#u
+Commit f23efcbcc523 ("crypto: ctr - no longer needs CRYPTO_SEQIV") made
+CRYPTO_CTR stop selecting CRYPTO_SEQIV.  This breaks IPsec for most
+users since GCM and several other encryption algorithms require "seqiv"
+-- and RFC 8221 lists AES-GCM as "MUST" be implemented.
 
-Changed v3 => v4:
-  - Don't say that AH is "NOT RECOMMENDED" by RFC 8221.
-  - Updated commit messages (added Acked-by tags, fixed a bad Fixes tag,
-    added some more explanation to patch 3).
+Just make XFRM_ESP select CRYPTO_SEQIV.
 
-Eric Biggers (3):
-  esp, ah: consolidate the crypto algorithm selections
-  esp: select CRYPTO_SEQIV
-  esp, ah: modernize the crypto algorithm selections
+Fixes: f23efcbcc523 ("crypto: ctr - no longer needs CRYPTO_SEQIV")
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Corentin Labbe <clabbe@baylibre.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ net/xfrm/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
- net/ipv4/Kconfig | 34 ++++++++++++++++++----------------
- net/ipv6/Kconfig | 34 ++++++++++++++++++----------------
- net/xfrm/Kconfig | 24 ++++++++++++++++++++++++
- 3 files changed, 60 insertions(+), 32 deletions(-)
-
-
-base-commit: 89dc68533b190117e1a2fb4298d88b96b3580abf
+diff --git a/net/xfrm/Kconfig b/net/xfrm/Kconfig
+index 169c22140709f7..b2ff8df2c836ef 100644
+--- a/net/xfrm/Kconfig
++++ b/net/xfrm/Kconfig
+@@ -86,6 +86,7 @@ config XFRM_ESP
+ 	select CRYPTO_SHA1
+ 	select CRYPTO_DES
+ 	select CRYPTO_ECHAINIV
++	select CRYPTO_SEQIV
+ 
+ config XFRM_IPCOMP
+ 	tristate
 -- 
 2.26.2
 
