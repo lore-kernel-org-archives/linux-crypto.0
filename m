@@ -2,110 +2,131 @@ Return-Path: <SRS0=adZw=7Y=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA0DDC433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jun 2020 08:34:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D60C433E1
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jun 2020 10:08:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A45D207C3
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jun 2020 08:34:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A40F20747
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jun 2020 10:08:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="WtLg4Gcy"
+	dkim=pass (2048-bit key) header.d=cantona-net.20150623.gappssmtp.com header.i=@cantona-net.20150623.gappssmtp.com header.b="qzwmWD/9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726697AbgFKIeH (ORCPT
+        id S1727045AbgFKKIB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Jun 2020 04:34:07 -0400
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.163]:9800 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726651AbgFKIeG (ORCPT
+        Thu, 11 Jun 2020 06:08:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47326 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727025AbgFKKH6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Jun 2020 04:34:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1591864445;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=weuO0XFY/dx0FwiZnPD9oxzQ7IOVWYOP67G4Q17Dtpg=;
-        b=WtLg4GcyOYKd87Kixtck60zs+Q1yOifiNC2EL8WamFmawagYTmiEjYLTGmq8czb0Yd
-        OXIcdxcbsl3M+gr/wnHwu/MFM434JxmM9ZhG5Oye2NxNVXtxjHF6zWKWaWmPmKCTSUKO
-        fMVkBdu1ORagsWg3aXoeXDj6o1GZj1DEjzVxDbDrENN5cp3CnMA3UXSUfxdrJU4IIXe7
-        d3o382Yw1/Y25ruF7cGgJjrzzTAHX8Yp7pBxk9GwXGvN/egD2l0fa2ZN9cRH7U3w0zj4
-        kqbgHv5vLaE/QnX7PvKRy7lebedVPVLn07urCaKEvu7iIfevyJa/8YoC+dBt2p3RL5Nf
-        fWSw==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaIfSfDhz3"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.10.1 DYNA|AUTH)
-        with ESMTPSA id 6010b6w5B8Xx05J
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Thu, 11 Jun 2020 10:33:59 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Zheng Bin <zhengbin13@huawei.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: drbg - Fix memleak in drbg_prepare_hrng
-Date:   Thu, 11 Jun 2020 10:33:58 +0200
-Message-ID: <37905178.8f6zGtLfKx@tauon.chronox.de>
-In-Reply-To: <20200611083356.88600-1-zhengbin13@huawei.com>
-References: <20200611083356.88600-1-zhengbin13@huawei.com>
+        Thu, 11 Jun 2020 06:07:58 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F13AC08C5C2
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Jun 2020 03:07:58 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id p21so2332083pgm.13
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Jun 2020 03:07:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cantona-net.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=aKMw40QAEHjK+S+ezMDIXXaG/yrYUUF90WtikY/P0Os=;
+        b=qzwmWD/9k2NXJdGvmAjTf4fCY5oDmIOLmDKwSCGKedMX+n/T4yoAVsQJ8wVZdwQeNM
+         +cQnGl2w/6RhIqeqonlsqeaWAc11cVswPMC5vbgr+YyPpJnKPJ3BrZ7QW+YFJ0ublWEr
+         +QvCWWuw6v6cPzzGsBxIC9bRnpMqI294xJ84PkyFqwX6eGl5EKqsrT/ypX5NiPXNz+AG
+         JwpDfAPWllsDiGbD0BnrzFVWq0x84KkLCkt1xSzRBd/R/+TJIkhweuxWFPidLGnMzcRx
+         hZXJI2o9DJ+Oz9tXYA3dGnWKXBrQIdQqzbJeJrQtc9ittmCeoNaenb/ouNT1rTuOW+Tc
+         cl+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=aKMw40QAEHjK+S+ezMDIXXaG/yrYUUF90WtikY/P0Os=;
+        b=eP4hhcyc9wXJ06SSIb24CUc2a/FqYxaemumSRGvHZzJ5eOpeXi2403tOdqFhV++tE5
+         9TCAo+XMp+SgFWTfWRCT/+TiiXlup9jWcLBLIqiWs1/k/ecWQi4JuCdHX82rIbj9SdZO
+         YIsaTblqVPiZazl8YDA81UuOCpSkRQ09Snt2cN/1gAZY+N2h2ABM+ZXnoi6wPfFYHJ7d
+         d0s2lnARgfKh8pqq3pxlhP6aCk2Lwk2yYAKbn2Vz+eb3xurrgoVi0AnYajUnz9PGgRj6
+         2oXyluuTLz1C4lD+4DeXMzd/AK5Gri8i3pyx87A6mz5IoqpkeTBmcr7SWFIB4Bzx1qRj
+         06Tw==
+X-Gm-Message-State: AOAM531yXgAht69jvSWBnM5Zr7vMKAolyxzrjlRZaM9bAP7mUlDljN9N
+        BLdlJi4YQRKqGtNA4N1IfoyUBw==
+X-Google-Smtp-Source: ABdhPJyyilHCc9Y5Udw5M5OgruJWeqSofGNrzejr7O4RvuQ3h9eRppWd1VR/bUn4BkFPNfk/GHmgBw==
+X-Received: by 2002:a05:6a00:1342:: with SMTP id k2mr6493599pfu.32.1591870077544;
+        Thu, 11 Jun 2020 03:07:57 -0700 (PDT)
+Received: from localhost.localdomain ([116.92.204.89])
+        by smtp.googlemail.com with ESMTPSA id j1sm2251822pjv.21.2020.06.11.03.07.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jun 2020 03:07:57 -0700 (PDT)
+From:   Su Kang Yin <cantona@cantona.net>
+To:     gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
+        christophe.leroy@c-s.fr
+Cc:     Su Kang Yin <cantona@cantona.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: talitos - fix ECB and CBC algs ivsize
+Date:   Thu, 11 Jun 2020 18:07:45 +0800
+Message-Id: <20200611100745.6513-1-cantona@cantona.net>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <cantona@cantona.net>
+References: <cantona@cantona.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Donnerstag, 11. Juni 2020, 10:33:56 CEST schrieb Zheng Bin:
+Patch for 4.9 upstream:
 
-Hi Zheng,
+commit e1de42fdfc6a ("crypto: talitos - fix ECB algs ivsize")
+wrongly modified CBC algs ivsize instead of ECB aggs ivsize.
 
-Thank you for the note, but I think this is handled, albeit differently. 
-Search for patch "[PATCH v3] crypto: DRBG - always try to free Jitter RNG 
-instance" that is sent to the list (but not yet applied).
+This restore the CBC algs original ivsize of removes ECB's ones.
 
-Thanks
+Signed-off-by: Su Kang Yin <cantona@cantona.net>
+---
+ drivers/crypto/talitos.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-
-
-> drbg_prepare_hrng
->   drbg->jent = crypto_alloc_rng
->   err = add_random_ready_callback
->   default:
->     drbg->random_ready.func = NULL  -->set NULL, if fail
-> 
-> drbg_uninstantiate
->   if (drbg->random_ready.func)      -->If NULL, will not free drbg->jent
->     crypto_free_rng(drbg->jent)
-> 
-> Need to free drbg->jent if add_random_ready_callback return fail.
-> 
-> Fixes: 97f2650e5040 ("crypto: drbg - always seeded with SP800-90B compliant
-> noise source") Signed-off-by: Zheng Bin <zhengbin13@huawei.com>
-> ---
->  crypto/drbg.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/crypto/drbg.c b/crypto/drbg.c
-> index 37526eb8c5d5..a643ab7eac7a 100644
-> --- a/crypto/drbg.c
-> +++ b/crypto/drbg.c
-> @@ -1524,6 +1524,8 @@ static int drbg_prepare_hrng(struct drbg_state *drbg)
->  		/* fall through */
-> 
->  	default:
-> +		crypto_free_rng(drbg->jent);
-> +		drbg->jent = NULL;
->  		drbg->random_ready.func = NULL;
->  		return err;
->  	}
-> --
-> 2.26.0.106.g9fadedd
-
-
-Ciao
-Stephan
-
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 8b383d3d21c2..05a35ab5595b 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -2636,7 +2636,6 @@ static struct talitos_alg_template driver_algs[] = {
+ 			.cra_ablkcipher = {
+ 				.min_keysize = AES_MIN_KEY_SIZE,
+ 				.max_keysize = AES_MAX_KEY_SIZE,
+-				.ivsize = AES_BLOCK_SIZE,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2670,6 +2669,7 @@ static struct talitos_alg_template driver_algs[] = {
+ 			.cra_ablkcipher = {
+ 				.min_keysize = AES_MIN_KEY_SIZE,
+ 				.max_keysize = AES_MAX_KEY_SIZE,
++				.ivsize = AES_BLOCK_SIZE,
+ 				.setkey = ablkcipher_aes_setkey,
+ 			}
+ 		},
+@@ -2687,7 +2687,6 @@ static struct talitos_alg_template driver_algs[] = {
+ 			.cra_ablkcipher = {
+ 				.min_keysize = DES_KEY_SIZE,
+ 				.max_keysize = DES_KEY_SIZE,
+-				.ivsize = DES_BLOCK_SIZE,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2720,7 +2719,6 @@ static struct talitos_alg_template driver_algs[] = {
+ 			.cra_ablkcipher = {
+ 				.min_keysize = DES3_EDE_KEY_SIZE,
+ 				.max_keysize = DES3_EDE_KEY_SIZE,
+-				.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+-- 
+2.21.0
 
