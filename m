@@ -2,76 +2,78 @@ Return-Path: <SRS0=adZw=7Y=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC92C433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jun 2020 10:54:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E74DC433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jun 2020 11:03:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE9B9207C3
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jun 2020 10:54:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 471AA20801
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jun 2020 11:03:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591872871;
-	bh=80uubE3dNVN39nZNbsDqyk0sI6supmeMUDV8kVu2jYg=;
+	s=default; t=1591873439;
+	bh=mU4heyURLmbtomghT4H3Nqm49/LX2wthsm0zFZtXfYA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=yjw5jiwkTsAzr99JkuR2zNuyjk37D/dHSRABhQNUD2cIZx9IILXhcp3hrVQMlEF5O
-	 to8CdcGiUbt3q+47ogN+24wWJgF0NRNs+8M0tqlpL+i4tHbO2ZkXJPYd+4nHrRkq3K
-	 4hcZ8PKVZvfWtsMnbERG/Rh6MaRTUY6C4u/DhneM=
+	b=J0ilLaQQwEZe2AGQBS98D3M+AVUHKJBK3dQZjbMRQXqQPrBeFoDkn/eAAzWwGxI6U
+	 zYc96I4TF4fFw66vesG7R3Tbgs+OzNPGz4PinDV1gDcjmLZOZ8EQI+zqsVlmhUApQj
+	 y+IKDDfHoSmLliVwfMUsXidwESHqhgh9tvL+d9Ck=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727114AbgFKKya (ORCPT
+        id S1727795AbgFKLD6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Jun 2020 06:54:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38524 "EHLO mail.kernel.org"
+        Thu, 11 Jun 2020 07:03:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41304 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726407AbgFKKya (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Jun 2020 06:54:30 -0400
+        id S1727119AbgFKLD5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 11 Jun 2020 07:03:57 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 507682072F;
-        Thu, 11 Jun 2020 10:54:29 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id EFC55207C3;
+        Thu, 11 Jun 2020 11:03:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591872869;
-        bh=80uubE3dNVN39nZNbsDqyk0sI6supmeMUDV8kVu2jYg=;
+        s=default; t=1591873436;
+        bh=mU4heyURLmbtomghT4H3Nqm49/LX2wthsm0zFZtXfYA=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=S56k98nXcJaD2+CE+2qM17zrmLz3+qoUNu3luUjLD4GcrVAfUVlM8W6tkFSpmtRtH
-         FBM6sTIX3X/GUQLEh0/VCPOOKztl8AsE41tTBWmR2DoQPxSFFRWVzeieK96JK8k3y+
-         iFV/iMMx7hv6e660ViYLi5cP2ORzFUW7o6ByycqQ=
-Date:   Thu, 11 Jun 2020 12:54:23 +0200
+        b=d2qqUn7qRLb2nD/eqaJAff6iErpSyrt1meK+mYgcKFjD8bDff4z8Jd+ckFKricYpz
+         jvbNgV8mfQ6Qw/ioB2Gva04W2e4qFS/tyenhQ4fsUpo/Ttd1/jlurbhhQP3x43bpLy
+         rXVaYfYyVaHhh4q+zXhY+rAXl6M0M73Gty4MQSwY=
+Date:   Thu, 11 Jun 2020 13:03:50 +0200
 From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Su Kang Yin <cantona@cantona.net>
-Cc:     linux-crypto@vger.kernel.org, christophe.leroy@c-s.fr,
+To:     Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc:     Su Kang Yin <cantona@cantona.net>, linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] crypto: talitos - fix ECB and CBC algs ivsize
-Message-ID: <20200611105423.GB3802953@kroah.com>
+Message-ID: <20200611110350.GA3954279@kroah.com>
 References: <cantona@cantona.net>
  <20200611100745.6513-1-cantona@cantona.net>
+ <718354b4-d284-8e47-4085-f45101f9ca36@csgroup.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20200611100745.6513-1-cantona@cantona.net>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <718354b4-d284-8e47-4085-f45101f9ca36@csgroup.eu>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 11, 2020 at 06:07:45PM +0800, Su Kang Yin wrote:
-> Patch for 4.9 upstream:
+On Thu, Jun 11, 2020 at 12:50:24PM +0200, Christophe Leroy wrote:
+> Hi,
 > 
-> commit e1de42fdfc6a ("crypto: talitos - fix ECB algs ivsize")
-> wrongly modified CBC algs ivsize instead of ECB aggs ivsize.
+> Le 11/06/2020 à 12:07, Su Kang Yin a écrit :
+> > Patch for 4.9 upstream:
+> > 
+> > commit e1de42fdfc6a ("crypto: talitos - fix ECB algs ivsize")
+> > wrongly modified CBC algs ivsize instead of ECB aggs ivsize.
 > 
-> This restore the CBC algs original ivsize of removes ECB's ones.
-> 
-> Signed-off-by: Su Kang Yin <cantona@cantona.net>
-> ---
->  drivers/crypto/talitos.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+> To make it clear and avoid this problem to happen again, please generate
+> your patch with option -U8
 
-Nice catch, sorry about that, patch now queued up.
+No need, this patch should be fine as-is.
+
+thanks,
 
 greg k-h
