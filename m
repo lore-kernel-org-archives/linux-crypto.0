@@ -6,75 +6,71 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F5E5C433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 06:48:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65A28C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 06:48:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 79AD220801
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 06:48:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EDB920801
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 06:48:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726441AbgFLGsd (ORCPT
+        id S1726502AbgFLGst (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Jun 2020 02:48:33 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:38964 "EHLO fornost.hmeau.com"
+        Fri, 12 Jun 2020 02:48:49 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:38982 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726361AbgFLGsd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Jun 2020 02:48:33 -0400
+        id S1726361AbgFLGst (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Jun 2020 02:48:49 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jjdUL-0000qV-Lm; Fri, 12 Jun 2020 16:48:30 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Jun 2020 16:48:29 +1000
-Date:   Fri, 12 Jun 2020 16:48:29 +1000
+        id 1jjdUW-0000qz-65; Fri, 12 Jun 2020 16:48:41 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Jun 2020 16:48:40 +1000
+Date:   Fri, 12 Jun 2020 16:48:40 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, stable@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Mike Gerow <gerow@google.com>
-Subject: Re: [PATCH] crypto: algboss - don't wait during notifier callback
-Message-ID: <20200612064829.GD16987@gondor.apana.org.au>
-References: <20200604185253.5119-1-ebiggers@kernel.org>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Boris Brezillon <bbrezillon@kernel.org>,
+        SrujanaChalla <schalla@marvell.com>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Lukasz Bartosik <lbartosik@marvell.com>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] crypto: marvell/octeontx - Fix a potential NULL
+ dereference
+Message-ID: <20200612064840.GE16987@gondor.apana.org.au>
+References: <20200605110339.GE978434@mwanda>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200604185253.5119-1-ebiggers@kernel.org>
+In-Reply-To: <20200605110339.GE978434@mwanda>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 04, 2020 at 11:52:53AM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Fri, Jun 05, 2020 at 02:03:39PM +0300, Dan Carpenter wrote:
+> Smatch reports that:
 > 
-> When a crypto template needs to be instantiated, CRYPTO_MSG_ALG_REQUEST
-> is sent to crypto_chain.  cryptomgr_schedule_probe() handles this by
-> starting a thread to instantiate the template, then waiting for this
-> thread to complete via crypto_larval::completion.
+>     drivers/crypto/marvell/octeontx/otx_cptvf_algs.c:132 otx_cpt_aead_callback()
+>     warn: variable dereferenced before check 'cpt_info' (see line 121)
 > 
-> This can deadlock because instantiating the template may require loading
-> modules, and this (apparently depending on userspace) may need to wait
-> for the crc-t10dif module (lib/crc-t10dif.c) to be loaded.  But
-> crc-t10dif's module_init function uses crypto_register_notifier() and
-> therefore takes crypto_chain.rwsem for write.  That can't proceed until
-> the notifier callback has finished, as it holds this semaphore for read.
+> This function is called from process_pending_queue() as:
 > 
-> Fix this by removing the wait on crypto_larval::completion from within
-> cryptomgr_schedule_probe().  It's actually unnecessary because
-> crypto_alg_mod_lookup() calls crypto_larval_wait() itself after sending
-> CRYPTO_MSG_ALG_REQUEST.
+> drivers/crypto/marvell/octeontx/otx_cptvf_reqmgr.c
+>    599                  /*
+>    600                   * Call callback after current pending entry has been
+>    601                   * processed, we don't do it if the callback pointer is
+>    602                   * invalid.
+>    603                   */
+>    604                  if (callback)
+>    605                          callback(res_code, areq, cpt_info);
 > 
-> This only actually became a problem in v4.20 due to commit b76377543b73
-> ("crc-t10dif: Pick better transform if one becomes available"), but the
-> unnecessary wait was much older.
+> It does appear to me that "cpt_info" can be NULL so this could lead to
+> a NULL dereference.
 > 
-> BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=207159
-> Reported-by: Mike Gerow <gerow@google.com>
-> Fixes: 398710379f51 ("crypto: algapi - Move larval completion into algboss")
-> Cc: <stable@vger.kernel.org> # v3.6+
-> Cc: Martin K. Petersen <martin.petersen@oracle.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Fixes: 10b4f09491bf ("crypto: marvell - add the Virtual Function driver for CPT")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 > ---
->  crypto/algboss.c | 2 --
->  1 file changed, 2 deletions(-)
+>  drivers/crypto/marvell/octeontx/otx_cptvf_algs.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
 
 Patch applied.  Thanks.
 -- 
