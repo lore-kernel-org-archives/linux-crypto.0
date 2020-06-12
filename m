@@ -2,133 +2,78 @@ Return-Path: <SRS0=ESNp=7Z=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F9DC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 12:21:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7DE7C433DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 15:52:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5DBCF2081A
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 12:21:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A651C20835
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 15:52:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z+AP021v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726263AbgFLMVd (ORCPT
+        id S1726085AbgFLPwF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Jun 2020 08:21:33 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:39544 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725872AbgFLMVd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Jun 2020 08:21:33 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jjigc-0005Pu-MM; Fri, 12 Jun 2020 22:21:31 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Jun 2020 22:21:30 +1000
-From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Fri, 12 Jun 2020 22:21:30 +1000
-Subject: [v2 PATCH 3/3] crypto: cts - Add support for chaining
-References: <20200612122105.GA18892@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Stephan Mueller <smueller@chronox.de>
-Message-Id: <E1jjigc-0005Pu-MM@fornost.hmeau.com>
+        Fri, 12 Jun 2020 11:52:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40450 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726053AbgFLPwE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Jun 2020 11:52:04 -0400
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A597DC03E96F
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Jun 2020 08:52:04 -0700 (PDT)
+Received: by mail-oi1-x232.google.com with SMTP id d67so9078683oig.6
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Jun 2020 08:52:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=9kz8AERaPiTJbAZG6MShvL8NjfCcS5uVMTJomAkemfY=;
+        b=Z+AP021vDFwAnBd3I5STvHHSLsysFOzVw2FeNWsGR267xTpxswMSjufZhKkBZnpsmB
+         bnql0K0n2rh0io6c+Ag1OcCjkxb9P/4rVJ0lvLmymWjcSbfmPejWZusGoavHa/G0u/90
+         NLEQgzWIJx88M1bS5iFi+JjG6llV8rB+XYFh1dnELv9OBanzUvBGozjv//EOv83mHuvO
+         HukLZ5qgDkQlmpgoyd0VfhPkXiN5SOOfguyEY9eho7mAk6m1pQduhfM7yxcwgOmYzhMS
+         M2+FVA6RlW5Q3QuQQA8NpkFRqh9BQIkk5ul/aEeu6RN4PnwrGd69eNMSpdYukjoGwOyA
+         yJXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=9kz8AERaPiTJbAZG6MShvL8NjfCcS5uVMTJomAkemfY=;
+        b=UxL4ADanEKMgQSH6LSC62BwRptAv+A/DFZxTiEfa+z9BFlDxGTk+zNEhOQYZKNr0Ux
+         bao6DCx9B6YxJx7Z3UYpOHIZL5XR/7K5wbanE4IfeYEzmt83MNxK2TbFQ576aUjdn6MS
+         Y2+29QvtxC/Uc06f8PnR312hObxYH83iiziouYQDzM6xBblgQXoZT1ojpFfZKkGWDj77
+         hGrEnc/IWwnqh8kh1mD6VskeYkHtepJFFjo7BeSllWY4KwIBz82d5HtASqz2VYvfCPd2
+         v27Ydy2kxDZzzRCXQCH3yCNOKNXsCaKZONfSLgS31QXyyRmHXSPt0vYdb6eHJO1ZKaqz
+         iCuQ==
+X-Gm-Message-State: AOAM532nouCcisMtYoC9bbEB8JGUaWOfq6pjMvWlnwFWARhbU0XbjdjI
+        XhxJ2RRS/++eci4mjPBF6NxjwaDxIP7lIWX1IquqLg==
+X-Google-Smtp-Source: ABdhPJxmYyqfNuTTIt1ZdONPVO7IqRSVtEQbLUt3x/fCVN1t/A+vLd0ZINfs6f1lfs97FLWUyX3xJZnEOsEpZ4t7oAA=
+X-Received: by 2002:a54:4102:: with SMTP id l2mr2723497oic.29.1591977123637;
+ Fri, 12 Jun 2020 08:52:03 -0700 (PDT)
+MIME-Version: 1.0
+From:   "Peter P." <p.pan48711@gmail.com>
+Date:   Fri, 12 Jun 2020 11:51:52 -0400
+Message-ID: <CAPVaeBk1S44EzHgXh=g_1LaM+rMDd=zLPB7M=1GLoG78MvYz5g@mail.gmail.com>
+Subject: HMAC Selftests keylen in FIPS mode
+To:     linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As it stands cts cannot do chaining.  That is, it always performs
-the cipher-text stealing at the end of a request.  This patch adds
-support for chaining when the CRYPTO_TM_REQ_MORE flag is set.
+Hi,
 
-It also sets fcsize so that data can be withheld by the caller to
-enable correct processing at the true end of a request.
+According to NIST SP800-131A Table 9, HMAC generation in FIPS must
+have a keylen of 14 bytes minimum. I've noticed that in the crypto
+algorithm testing framework, the HMAC test vectors from RFC 4231 all
+have a test case that utilizes a 4 byte key.
+Is this permissible when operating the kernel in FIPS mode and if so
+how is the 14 byte minimum keysize enforced?
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+Thanks,
 
- crypto/cts.c |   19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
-
-diff --git a/crypto/cts.c b/crypto/cts.c
-index 5e005c4f02215..3cca3112e7dca 100644
---- a/crypto/cts.c
-+++ b/crypto/cts.c
-@@ -100,7 +100,7 @@ static int cts_cbc_encrypt(struct skcipher_request *req)
- 	struct crypto_cts_reqctx *rctx = skcipher_request_ctx(req);
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct skcipher_request *subreq = &rctx->subreq;
--	int bsize = crypto_skcipher_blocksize(tfm);
-+	int bsize = crypto_skcipher_chunksize(tfm);
- 	u8 d[MAX_CIPHER_BLOCKSIZE * 2] __aligned(__alignof__(u32));
- 	struct scatterlist *sg;
- 	unsigned int offset;
-@@ -146,7 +146,7 @@ static int crypto_cts_encrypt(struct skcipher_request *req)
- 	struct crypto_cts_reqctx *rctx = skcipher_request_ctx(req);
- 	struct crypto_cts_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	struct skcipher_request *subreq = &rctx->subreq;
--	int bsize = crypto_skcipher_blocksize(tfm);
-+	int bsize = crypto_skcipher_chunksize(tfm);
- 	unsigned int nbytes = req->cryptlen;
- 	unsigned int offset;
- 
-@@ -155,7 +155,7 @@ static int crypto_cts_encrypt(struct skcipher_request *req)
- 	if (nbytes < bsize)
- 		return -EINVAL;
- 
--	if (nbytes == bsize) {
-+	if (nbytes == bsize || req->base.flags & CRYPTO_TFM_REQ_MORE) {
- 		skcipher_request_set_callback(subreq, req->base.flags,
- 					      req->base.complete,
- 					      req->base.data);
-@@ -181,7 +181,7 @@ static int cts_cbc_decrypt(struct skcipher_request *req)
- 	struct crypto_cts_reqctx *rctx = skcipher_request_ctx(req);
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct skcipher_request *subreq = &rctx->subreq;
--	int bsize = crypto_skcipher_blocksize(tfm);
-+	int bsize = crypto_skcipher_chunksize(tfm);
- 	u8 d[MAX_CIPHER_BLOCKSIZE * 2] __aligned(__alignof__(u32));
- 	struct scatterlist *sg;
- 	unsigned int offset;
-@@ -240,7 +240,7 @@ static int crypto_cts_decrypt(struct skcipher_request *req)
- 	struct crypto_cts_reqctx *rctx = skcipher_request_ctx(req);
- 	struct crypto_cts_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	struct skcipher_request *subreq = &rctx->subreq;
--	int bsize = crypto_skcipher_blocksize(tfm);
-+	int bsize = crypto_skcipher_chunksize(tfm);
- 	unsigned int nbytes = req->cryptlen;
- 	unsigned int offset;
- 	u8 *space;
-@@ -250,7 +250,7 @@ static int crypto_cts_decrypt(struct skcipher_request *req)
- 	if (nbytes < bsize)
- 		return -EINVAL;
- 
--	if (nbytes == bsize) {
-+	if (nbytes == bsize || req->base.flags & CRYPTO_TFM_REQ_MORE) {
- 		skcipher_request_set_callback(subreq, req->base.flags,
- 					      req->base.complete,
- 					      req->base.data);
-@@ -297,7 +297,7 @@ static int crypto_cts_init_tfm(struct crypto_skcipher *tfm)
- 	ctx->child = cipher;
- 
- 	align = crypto_skcipher_alignmask(tfm);
--	bsize = crypto_skcipher_blocksize(cipher);
-+	bsize = crypto_skcipher_chunksize(cipher);
- 	reqsize = ALIGN(sizeof(struct crypto_cts_reqctx) +
- 			crypto_skcipher_reqsize(cipher),
- 			crypto_tfm_ctx_alignment()) +
-@@ -366,11 +366,12 @@ static int crypto_cts_create(struct crypto_template *tmpl, struct rtattr **tb)
- 
- 	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = alg->base.cra_priority;
--	inst->alg.base.cra_blocksize = alg->base.cra_blocksize;
-+	inst->alg.base.cra_blocksize = 1;
- 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
- 
- 	inst->alg.ivsize = alg->base.cra_blocksize;
--	inst->alg.chunksize = crypto_skcipher_alg_chunksize(alg);
-+	inst->alg.chunksize = alg->base.cra_blocksize;
-+	inst->alg.fcsize = inst->alg.chunksize * 2;
- 	inst->alg.min_keysize = crypto_skcipher_alg_min_keysize(alg);
- 	inst->alg.max_keysize = crypto_skcipher_alg_max_keysize(alg);
- 
+Peter
