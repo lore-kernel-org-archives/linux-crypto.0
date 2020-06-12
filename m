@@ -2,111 +2,124 @@ Return-Path: <SRS0=ESNp=7Z=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B98EBC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 16:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D897DC433DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 18:32:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90BA720835
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 16:11:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1591978270;
-	bh=mlvA3fRFJd1ofgemn9Cg88XKNtreb2StpEMQQYwXytU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=Tm4mQHiJtUP9CeDrB08zAxoi6V6biyMyHxtYdSfO0WSECh/jvVsRyovhfscSZSgHD
-	 5UwmPmwMw5HTmHdCEyvLCtcv1dfCpqQQDKccRYUlgPtW3SLC98BZ2JEw0BpTwFpEbG
-	 AzkUKp9LXZ19MG2K/qTi15V7wjzbKHvLmx2mqJ4I=
+	by mail.kernel.org (Postfix) with ESMTP id BF32B207ED
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 18:32:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726219AbgFLQLK (ORCPT
+        id S1726263AbgFLSc6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Jun 2020 12:11:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46914 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726053AbgFLQLJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Jun 2020 12:11:09 -0400
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4436F20836
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Jun 2020 16:11:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591978269;
-        bh=mlvA3fRFJd1ofgemn9Cg88XKNtreb2StpEMQQYwXytU=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=k7OjDO7VRvdqiphYLCJxzfELRv+yzdvCVHRMAgw6/yOFeKv6AdBwn7EZjkSxfgDkq
-         A+r8W3X5PHIWbRtLsbsUNBrVIJotfyXBuKt6FymLxv92wdnVU78c9Uxht39Pkry0uN
-         ZV2qLr+uGa1YxtGCQqhzvJ/4LZJ2NmijOw6qOlPo=
-Received: by mail-oo1-f49.google.com with SMTP id e12so2039277oou.2
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Jun 2020 09:11:09 -0700 (PDT)
-X-Gm-Message-State: AOAM531ONlT+hRnsfmhg8jPXgDfKajclUPBcfyWAEgz1ZwBJgrp8Zg5g
-        qpUBIJzd0OhG7YmjDZ2O6TC3WZXZSzLhr+WsshA=
-X-Google-Smtp-Source: ABdhPJxJLfbwZr+B2+AS1vnlt7Q1BxZjKGSKYx5sowtHPifpG0qEJI2KU9nKUIyFCZVtoZ9kX9vr7MuoiQ4uBLLl2/I=
-X-Received: by 2002:a4a:896e:: with SMTP id g43mr11356276ooi.13.1591978268570;
- Fri, 12 Jun 2020 09:11:08 -0700 (PDT)
+        Fri, 12 Jun 2020 14:32:58 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:45578 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726085AbgFLSc5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Jun 2020 14:32:57 -0400
+Received: from mail-ua1-f69.google.com ([209.85.222.69])
+        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <mauricio.oliveira@canonical.com>)
+        id 1jjoU3-0006lg-PL
+        for linux-crypto@vger.kernel.org; Fri, 12 Jun 2020 18:32:55 +0000
+Received: by mail-ua1-f69.google.com with SMTP id i5so3842269uae.16
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Jun 2020 11:32:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AvjpgmaIry5taYFf387w++nuMAqy1oNRAi25dBuugD8=;
+        b=Emrd5n3i/IiQmgP7qCUxitQNtJvSm/wMlTHTYWVBLut8W0TEMF6VjiShzqZILbyI6w
+         79o2hXcGgTrB4OAEB6z7+fzdocvGjhmFUOnk8trXNc8XBrYu5AAAbSLYWD4eCEJ2vDh1
+         gyu0pzmKLJYBVPdt7gy835SwwRV1BA5LJJmlmOm57GcbWhmT7c2e8Pmxw0w0iUvUqAVS
+         l3Z1niu3Fc9cG7R3RVG6A84+x3S48AiBY/FQMkSYXOt9ZLh8zmiFiLazKJ6FrvLrgiuK
+         PzqhWvaMVnYuOLItyE6wrq4TB8nV0yTxkyY47iekEpNCwkEzl/PLiUgnL5iVsU53SgbE
+         uDvA==
+X-Gm-Message-State: AOAM530cjCZNmM0v5OUyob5ExZ73TWw+3g54yP756Ouu6Vmv1eo7nOTt
+        NMj7zRct6zK6t+zByXvdhwJ0q/jJ5iB84XcdHSeemgriPJiJwayxFWeGkTQI3fnpvppCJ7Glnfo
+        7Ylg4E772cJJwBnoOOBl1GR0H31DHDK3DVAkJRY2E4PRmiDKG10xTuu5inQ==
+X-Received: by 2002:a9f:3611:: with SMTP id r17mr10611853uad.108.1591986774836;
+        Fri, 12 Jun 2020 11:32:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyZKLy16+7Aan3fNEodC/ZXB4wPFR+SYFLmfMGceH2lMSaejEeRJLFsWacnV3/vBjTNpwbzJRRXWcGhK5zI5LE=
+X-Received: by 2002:a9f:3611:: with SMTP id r17mr10611845uad.108.1591986774574;
+ Fri, 12 Jun 2020 11:32:54 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200612120643.GA15724@gondor.apana.org.au> <E1jjiTA-0005BO-9n@fornost.hmeau.com>
- <1688262.LSb4nGpegl@tauon.chronox.de> <20200612121651.GA15849@gondor.apana.org.au>
- <20200612122105.GA18892@gondor.apana.org.au>
-In-Reply-To: <20200612122105.GA18892@gondor.apana.org.au>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Fri, 12 Jun 2020 18:10:57 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGg25JL7WCrspMwB1PVPX6vx-rOCesg08a_Fy26_ET7Sg@mail.gmail.com>
-Message-ID: <CAMj1kXGg25JL7WCrspMwB1PVPX6vx-rOCesg08a_Fy26_ET7Sg@mail.gmail.com>
-Subject: Re: [v2 PATCH 0/3] crypto: skcipher - Add support for no chaining and
- partial chaining
+References: <20200605161657.535043-1-mfo@canonical.com> <20200608064843.GA22167@gondor.apana.org.au>
+ <CAO9xwp0KimEV-inWB8176Z+MyzXqO3tgNtbtYF9JnBtg07-PiA@mail.gmail.com>
+ <20200610002123.GA6230@gondor.apana.org.au> <CAO9xwp2VryJi46+3UPhbQz3npCaZBziOTWEp+Kiqd90rMhkJXQ@mail.gmail.com>
+In-Reply-To: <CAO9xwp2VryJi46+3UPhbQz3npCaZBziOTWEp+Kiqd90rMhkJXQ@mail.gmail.com>
+From:   Mauricio Faria de Oliveira <mfo@canonical.com>
+Date:   Fri, 12 Jun 2020 15:32:43 -0300
+Message-ID: <CAO9xwp1mXmS7VVau2xWcnRic1kGQO03ptjdoevAgzoCXWwuJ6A@mail.gmail.com>
+Subject: Re: [v2 PATCH] crypto: af_alg - fix use-after-free in af_alg_accept()
+ due to bh_lock_sock()
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Stephan Mueller <smueller@chronox.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 12 Jun 2020 at 14:21, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+Hi Herbert,
+
+On Wed, Jun 10, 2020 at 11:28 AM Mauricio Faria de Oliveira
+<mfo@canonical.com> wrote:
 >
-> v2
+> On Tue, Jun 9, 2020 at 9:21 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> >
+> > On Tue, Jun 09, 2020 at 12:17:32PM -0300, Mauricio Faria de Oliveira wrote:
+> > >
+> > > Per your knowledge/experience with the crypto subsystem, the changed code
+> > > paths are not hot enough to suffer from such implications?
+> >
+> > I don't think replacing a spin-lock with a pair of atomic ops is
+> > going to be too much of an issue.  We can always look at this again
+> > if someone comes up with real numbers of course.
 >
-> Fixed return type of crypto_skcipher_fcsize.
+> Right; I meant the other places as well, where atomic ops were added
+> (in addition to the existing spinlocks.)
+>
+> But indeed, real numbers would be great and tell whether or not
+> there's performance differences.
+>
+> We're working on that -- Brian (bug reporter) has access to detailed
+> metrics/stats from the workload, and kindly agreed to set up two
+> identical instances to compare the numbers.  I'll keep you posted.
+>
+
+Just wanted to let you know that the performance is really close for
+the two patches,
+both on the CPU utilization profile and also on workload results
+(#requests over time).
+
+And the tests ran for two days, so it  looks stable.
+
+Thanks!
+
+> Thank you,
+> Mauricio
+>
+>
+>
+> >
+> > Cheers,
+> > --
+> > Email: Herbert Xu <herbert@gondor.apana.org.au>
+> > Home Page: http://gondor.apana.org.au/~herbert/
+> > PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>
+>
 >
 > --
->
-> This patch-set adds support to the Crypto API and algif_skcipher
-> for algorithms that cannot be chained, as well as ones that can
-> be chained if you withhold a certain number of blocks at the end.
->
-> It only modifies one algorithm to utilise this, namely cts-generic.
-> Changing others should be fairly straightforward.  In particular,
-> we should mark all the ones that don't support chaining (e.g., most
-> stream ciphers).
->
+> Mauricio Faria de Oliveira
 
-I understand that there is an oversight here that we need to address,
-but I am not crazy about this approach, tbh.
 
-First of all, the default fcsize for all existing XTS implementations
-should be -1 as well, given that chaining is currently not supported
-at all at the sckipher interface layer for any of them (due to the
-fact that the IV gets encrypted with a different key at the start of
-the operation). This also means it is going to be rather tricky to
-implement for h/w accelerated XTS implementations, and it seems to me
-that the only way to deal with this is to decrypt the IV in software
-before chaining the next operation, which is rather horrid and needs
-to be implemented by all of them.
 
-Given that
-
-a) this is wholly an AF_ALG issue, as there are no in-kernel users
-currently suffering from this afaik,
-b) using AF_ALG to get access to software implementations is rather
-pointless in general, given that userspace can simply issue the same
-instructions directly
-c) fixing all XTS and CTS implementation on all arches and all
-accelerators is not a small task
-
-wouldn't it be better to special case XTS and CBC-CTS in
-algif_skcipher instead, rather than polluting the skipcher API this
-way?
+-- 
+Mauricio Faria de Oliveira
