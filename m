@@ -2,84 +2,149 @@ Return-Path: <SRS0=ESNp=7Z=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48072C433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 21:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC618C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 23:50:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2725420663
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 21:22:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 737882078A
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 23:50:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="P/u+yOXK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726329AbgFLVWF (ORCPT
+        id S1726368AbgFLXuF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Jun 2020 17:22:05 -0400
-Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:62953
-        "EHLO mail3-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726290AbgFLVWF (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Jun 2020 17:22:05 -0400
-X-IronPort-AV: E=Sophos;i="5.73,504,1583190000"; 
-   d="scan'208";a="351462289"
-Received: from abo-173-121-68.mrs.modulonet.fr (HELO hadrien) ([85.68.121.173])
-  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Jun 2020 23:22:02 +0200
-Date:   Fri, 12 Jun 2020 23:22:02 +0200 (CEST)
-From:   Julia Lawall <julia.lawall@inria.fr>
-X-X-Sender: jll@hadrien
-To:     Keerthy <j-keerthy@ti.com>
-cc:     Tero Kristo <t-kristo@ti.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kbuild-all@lists.01.org
-Subject: [PATCH] crypto: sa2ul: fix odd_ptr_err.cocci warnings
-Message-ID: <alpine.DEB.2.22.394.2006122320210.8158@hadrien>
-User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
+        Fri, 12 Jun 2020 19:50:05 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:58367 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726347AbgFLXuF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Jun 2020 19:50:05 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 49kHX90FPGz9sQx;
+        Sat, 13 Jun 2020 09:50:00 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1592005802;
+        bh=YaUSe/3jMjb3GMzJf2b7UpGp9KDpxGa/2D3YEl9DgQU=;
+        h=Date:From:To:Cc:Subject:From;
+        b=P/u+yOXKhtU0H5tF0mq4C8mVCAz71fx64wyR4ZNnWKfoJdt3Xca/Kjv45qug8/FBy
+         vWerKerJD09bJOwKScMN+1Cse+hV3DNo+UqJ0N1tP1tRk3CGfG97gx9A6zwYTmCluh
+         oI+HrM+mpL2DE3UBW56VQRgKhLQHPvcV05Srs3u3NwfoTv4P/5TVTTj+pigcg3IUS1
+         A0T5WkmYeH6JpL844oYUJsT/XYJFPVmEXSgc10ySrQNk7sdq8sqESfJvaI0JRqQ2NJ
+         7smWzEHf/fe2nsLbzVS1EAATgTpxiBeUwjhKnlFYgzCt5uPLZPjarqJ6FuZq8N/E0W
+         QyEYB6Pqws0Kw==
+Date:   Sat, 13 Jun 2020 09:49:59 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Subject: linux-next: manual merge of the crypto-current tree with Linus'
+ tree
+Message-ID: <20200613094959.05d121d5@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: multipart/signed; boundary="Sig_/oeTGdJte5dvEadvZ+v6GZoL";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: kernel test robot <lkp@intel.com>
+--Sig_/oeTGdJte5dvEadvZ+v6GZoL
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-PTR_ERR should normally access the value just tested by IS_ERR
+Hi all,
 
-Generated by: scripts/coccinelle/tests/odd_ptr_err.cocci
+Today's linux-next merge of the crypto-current tree got a conflict in:
 
-Fixes: 5b8516f3bedb ("crypto: sa2ul: Add crypto driver")
-CC: Keerthy <j-keerthy@ti.com>
-Signed-off-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Julia Lawall <julia.lawall@inria.fr>
----
+  drivers/crypto/ccp/sev-dev.c
 
-tree:   git://git.ti.com/ti-linux-kernel/ti-linux-kernel.git ti-linux-5.4.y
-head:   134a1b1f8814115e2dd115b67082321bf9e63cc1
-commit: 5b8516f3bedb3e1c273e7747b6e4a85c6e47907a [2369/7050] crypto: sa2ul: Add crypto driver
-:::::: branch date: 3 hours ago
-:::::: commit date: 5 months ago
+between commit:
 
- sa2ul.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+  835ae3bb530a ("drivers/crypto/ccp/sev-dev.c: get rid of pointless access_=
+ok()")
 
---- a/drivers/crypto/sa2ul.c
-+++ b/drivers/crypto/sa2ul.c
-@@ -1252,14 +1252,14 @@ static int sa_dma_init(struct sa_crypto_
- 	dd->dma_rx2 = dma_request_chan(dd->dev, "rx2");
- 	if (IS_ERR(dd->dma_rx2)) {
- 		dma_release_channel(dd->dma_rx1);
--		if (PTR_ERR(dd->dma_rx1) != -EPROBE_DEFER)
-+		if (PTR_ERR(dd->dma_rx2) != -EPROBE_DEFER)
- 			dev_err(dd->dev, "Unable to request rx2 DMA channel\n");
- 		return PTR_ERR(dd->dma_rx2);
- 	}
+from Linus' tree and commit:
 
- 	dd->dma_tx = dma_request_chan(dd->dev, "tx");
- 	if (IS_ERR(dd->dma_tx)) {
--		if (PTR_ERR(dd->dma_rx1) != -EPROBE_DEFER)
-+		if (PTR_ERR(dd->dma_tx) != -EPROBE_DEFER)
- 			dev_err(dd->dev, "Unable to request tx DMA channel\n");
- 		ret = PTR_ERR(dd->dma_tx);
- 		goto err_dma_tx;
+  832910f2e6b5 ("crypto: ccp - Fix sparse warnings in sev-dev")
+
+from the crypto-current tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/crypto/ccp/sev-dev.c
+index a2426334be61,aa576529283b..000000000000
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@@ -394,7 -395,9 +395,8 @@@ static int sev_ioctl_do_pek_csr(struct=20
+  		goto cmd;
+ =20
+  	/* allocate a physically contiguous buffer to store the CSR blob */
++ 	input_address =3D (void __user *)input.address;
+ -	if (!access_ok(input_address, input.length) ||
+ -	    input.length > SEV_FW_BLOB_MAX_SIZE) {
+ +	if (input.length > SEV_FW_BLOB_MAX_SIZE) {
+  		ret =3D -EFAULT;
+  		goto e_free;
+  	}
+@@@ -631,6 -635,13 +634,7 @@@ static int sev_ioctl_do_get_id2(struct=20
+  	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+  		return -EFAULT;
+ =20
+ -	/* Check if we have write access to the userspace buffer */
++ 	input_address =3D (void __user *)input.address;
+ -	if (input.address &&
+ -	    input.length &&
+ -	    !access_ok(input_address, input.length))
+ -		return -EFAULT;
+ -
+  	data =3D kzalloc(sizeof(*data), GFP_KERNEL);
+  	if (!data)
+  		return -ENOMEM;
+@@@ -745,8 -757,12 +750,11 @@@ static int sev_ioctl_do_pdh_export(stru
+  	    !input.cert_chain_address)
+  		goto cmd;
+ =20
++ 	input_pdh_cert_address =3D (void __user *)input.pdh_cert_address;
++ 	input_cert_chain_address =3D (void __user *)input.cert_chain_address;
++=20
+  	/* Allocate a physically contiguous buffer to store the PDH blob. */
+ -	if ((input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE) ||
+ -	    !access_ok(input_pdh_cert_address, input.pdh_cert_len)) {
+ +	if (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE) {
+  		ret =3D -EFAULT;
+  		goto e_free;
+  	}
+
+--Sig_/oeTGdJte5dvEadvZ+v6GZoL
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl7kFKcACgkQAVBC80lX
+0GwevQf9FJx6pTuxK869Sy9FWnywSAbBm+MJQGvfF+Ms/lpHMJsxRGtyVuqzpYsP
+oYFbOgvog+ojjCrrffIJEe2sa1UWTDBeVqEF8TTWjnAbYkn1up6jh4SYRm7OXWiz
+YYuB/XNjZfWwBjFEWGs4fQKJQ7PfaNEx48R8HLXR+schRXJwFWtMAEMIm7bqcYT4
+jHYuAEOIfeQezPl85Q7Ey7sE9J2l1jeBSdHKlydnaE4hxF1Ta1DtaLlHuXrzc4jE
+XeMANSlJAQqNSrFbKbIsEdwEVBsoaIz7+2HIrJBo1CQ3zE0JVt5cxLgoi1dvJ9Jr
+xNHfCM7DxPIVhEZyKWsi0lVOB7mZnw==
+=W5G7
+-----END PGP SIGNATURE-----
+
+--Sig_/oeTGdJte5dvEadvZ+v6GZoL--
