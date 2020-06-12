@@ -2,411 +2,126 @@ Return-Path: <SRS0=ESNp=7Z=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 702C8C433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 07:09:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F4DEC433DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 09:04:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 47F2420801
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 07:09:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CEBAB206D7
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jun 2020 09:04:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="LCXJlZ+f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726332AbgFLHJT (ORCPT
+        id S1726335AbgFLJEq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Jun 2020 03:09:19 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:39022 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726298AbgFLHJT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Jun 2020 03:09:19 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jjdoP-00015Z-4w; Fri, 12 Jun 2020 17:09:14 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Jun 2020 17:09:13 +1000
-Date:   Fri, 12 Jun 2020 17:09:13 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>
-Subject: [v2 PATCH] crypto: algapi - Remove skbuff.h inclusion
-Message-ID: <20200612070912.GA5893@gondor.apana.org.au>
-References: <20200611142133.GA11754@gondor.apana.org.au>
+        Fri, 12 Jun 2020 05:04:46 -0400
+Received: from mail-eopbgr60080.outbound.protection.outlook.com ([40.107.6.80]:27280
+        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726319AbgFLJEp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Jun 2020 05:04:45 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Vzou4E+u0hyFvZrYUrX41H8oiudBW5xqAPX8ba/9ugUIL7LBGpNipUxnEhgx6XcNL2B8/06gQ9M1iNJK2ZXROCRuQXhhGNMAOfT3zyxRCeyYfVxO47V4GObQ+VsWbKzQcGdtYxQKy8HH/irDgV6yIQ4mXbmjAZbM6j1NVqioUZkAe+4Wbd1D6a6MM1lPaoiqNHqjZ5+vpJqkaHCdmSIWsX70du9FyyJ9i8unxoeW8ufq/PlKerVJQoWM/prMUCVsEVaVsYTLMnZBES3XqdBV09oyMU9aA4tWC+z770SSNX98xiuxtF0hLUO4XqEexMX+9i5i3heVq4Dchil5k9wfwA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XoZArxYNLa9f5j6RLUw1gSVJH5sGQktQw726WDEXbv4=;
+ b=hYdWb+fW8nGnspd1iBvXXk32fhO9fz195pzhMX+sck+qbc8kB9gBSVm2m0zEkW364jeyNVx4HviCP1w6hqISHZ0PW3dEeH+NeXN9+VylUUTaWfWqW0QpXuf5kaU9rfm3it4C87XPsK31KW9httEb3UT827kbkcdJ6F7fA2yuecK1WZVzhK+/aHNYml2/qNBUwp0lxu7ETh/QwHtxbeJj8a8tMohRBVzVyQ5t0x/Nu33bv6ZzJ6hSVHtv86VmhBSg3UExDKnu7spBtCXkSvpdXsHWT14P25eE3ApSJdWNwaR/B5TCfBB/5lHZxHLI8eGBYZqoa8YCn4u9g1cOgMvgWQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XoZArxYNLa9f5j6RLUw1gSVJH5sGQktQw726WDEXbv4=;
+ b=LCXJlZ+fdGboIKs4kS//v7DlnZovxZBsPFW2VzS5wiNxuiuI1ePqPQP/TBcqYPq5yFddX8B0kkMaF5FSFIcQj+Sa35ZW3n+F5Wrj6fcJIRgUXza4lH719MJKWEnnri7vQOffoXlsFOWusPr7ikT3KzoscvFG2g46D9osCRnbQvI=
+Authentication-Results: nxp.com; dkim=none (message not signed)
+ header.d=none;nxp.com; dmarc=none action=none header.from=nxp.com;
+Received: from VI1PR0402MB3712.eurprd04.prod.outlook.com
+ (2603:10a6:803:1c::25) by VI1PR0402MB3741.eurprd04.prod.outlook.com
+ (2603:10a6:803:18::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.21; Fri, 12 Jun
+ 2020 09:04:41 +0000
+Received: from VI1PR0402MB3712.eurprd04.prod.outlook.com
+ ([fe80::c8c0:bf87:1424:88ae]) by VI1PR0402MB3712.eurprd04.prod.outlook.com
+ ([fe80::c8c0:bf87:1424:88ae%6]) with mapi id 15.20.3088.019; Fri, 12 Jun 2020
+ 09:04:41 +0000
+Subject: Re: crypto: caam - Fix argument type in handle_imx6_err005766
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Radu Solea <radu.solea@nxp.com>,
+        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
+References: <20200612060023.GA943@gondor.apana.org.au>
+From:   Iuliana Prodan <iuliana.prodan@nxp.com>
+Message-ID: <92f7f3ef-2477-1f38-5406-c11a5013d491@nxp.com>
+Date:   Fri, 12 Jun 2020 12:04:38 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
+In-Reply-To: <20200612060023.GA943@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM4PR07CA0005.eurprd07.prod.outlook.com
+ (2603:10a6:205:1::18) To VI1PR0402MB3712.eurprd04.prod.outlook.com
+ (2603:10a6:803:1c::25)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200611142133.GA11754@gondor.apana.org.au>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.9] (188.25.212.42) by AM4PR07CA0005.eurprd07.prod.outlook.com (2603:10a6:205:1::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.7 via Frontend Transport; Fri, 12 Jun 2020 09:04:40 +0000
+X-Originating-IP: [188.25.212.42]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: d1e1be1d-a968-4421-fb13-08d80eafa402
+X-MS-TrafficTypeDiagnostic: VI1PR0402MB3741:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR0402MB3741747BEE3F0B7633A46AEA8C810@VI1PR0402MB3741.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:529;
+X-Forefront-PRVS: 0432A04947
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: a9sqs93ra2G9LL8hoDK84KNuWrT60D4VuR2bxSM35VXgDZm4/QcosiAv9lOhKV0+wTTPjHJrINlCVz0LMH8NiK97+EbBELabS9+mgVRKBfOtX5rD5P1MjOR8XLMdbJI+ocM4pIIIO+ZqnyHX3Xj3IfgLKGEimlpGkA/TizUQs0CtBJ4nOoJyg/TW/85iSZAyb7tm5dLXvJCGZ1Bd+TZ2Ff1G4x1hLWfqvz/szkHc/V0yGWINnieofxxb48b60GnJ3Ak2fkwqpDS93JHpOsgyeks8o6LlsMmqib1162AIWzx2+KNKsXXO26RSmAEuEcQWaUECkqz33GO9IuGlGnunsSUdP4dF0hyXJ5JHO5Hy3oFvlXKWmSWlaqmAeVEyQ1VG
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3712.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(346002)(376002)(396003)(39860400002)(366004)(52116002)(16576012)(2906002)(86362001)(53546011)(31696002)(316002)(31686004)(110136005)(6486002)(66946007)(8676002)(66476007)(66556008)(478600001)(83380400001)(36756003)(5660300002)(44832011)(4744005)(26005)(186003)(956004)(16526019)(6636002)(2616005)(8936002)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: FHCbJsV0wm06nj2uFVuIyuKFMuAdPFags0pGC1P5Tt/adbAU0UFHWW/DfqVM6SFYUStZK3nwR3h6/HzNkDPAKXCgz9G7JURAP0SJwl/2HZXyjFSEfpcd4OfhnmZWBY4Laigil9gtwIckrS+5zB8J83KdavIwuxvyrFerpQ992gFl/d7la9hSJIwxOWTFN1bSbZRnzqDfCWDAdhDTnl4RXXzoQKdvQ9h1nQM7MPkEnVr9wSFciFGK8xHoYv5ovT0z7y77FpPi3chTv3xMWCJr2exRSQDQ/nogKZqv1Jw2h8r5Cqsabzhe3DfUjvYVx/vBOrDHhY3vIf0IXhzQKOepspMUyc6IEmDzx9uPY5BYjqWWZQ96Ln4B1aZnJj/k54pznySbxHgE+qYyRuizdWMmBwGYWw11Jfar1Jq3cV8+Ab58dBIoj0De4Z/ChYF6QTvgOywZuDz6nJSMOCRuJxC/0GYmo/kQVjYMKcNiVE9OBwo=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d1e1be1d-a968-4421-fb13-08d80eafa402
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2020 09:04:41.4185
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: V5EOs99hyCa/GTlPKQzYOmsoUWklvxh6Y8LqgQYPmYwfBONAgGFMis4jAbR2zVKgScLtJ+51OF8abujltUaPFg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3741
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The header file algapi.h includes skbuff.h unnecessarily since
-all we need is a forward declaration for struct sk_buff.  This
-patch removes that inclusion.
 
-Unfortunately skbuff.h pulls in a lot of things and drivers over
-the years have come to rely on it so this patch adds a lot of
-missing inclusions that result from this.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+On 6/12/2020 9:00 AM, Herbert Xu wrote:
+> The function handle_imx6_err005766 needs to take an __iomem argument
+> as otherwise sparse will generate two warnings.
+> 
+> Fixes: 33d69455e402 ("crypto: caam - limit AXI pipeline to a...")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+Reviewed-by: Iuliana Prodan <iuliana.prodan@nxp.com>
 
-diff --git a/arch/x86/crypto/curve25519-x86_64.c b/arch/x86/crypto/curve25519-x86_64.c
-index 8a17621f7d3a..e9069f14efec 100644
---- a/arch/x86/crypto/curve25519-x86_64.c
-+++ b/arch/x86/crypto/curve25519-x86_64.c
-@@ -11,6 +11,7 @@
- #include <linux/jump_label.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
-+#include <linux/scatterlist.h>
- 
- #include <asm/cpufeature.h>
- #include <asm/processor.h>
-diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
-index 3655d9d3f5df..6891f670cd3e 100644
---- a/crypto/crypto_engine.c
-+++ b/crypto/crypto_engine.c
-@@ -9,6 +9,7 @@
- 
- #include <linux/err.h>
- #include <linux/delay.h>
-+#include <linux/device.h>
- #include <crypto/engine.h>
- #include <uapi/linux/sched/types.h>
- #include "internal.h"
-diff --git a/crypto/ecrdsa.c b/crypto/ecrdsa.c
-index 887ec21aee49..6a3fd09057d0 100644
---- a/crypto/ecrdsa.c
-+++ b/crypto/ecrdsa.c
-@@ -22,6 +22,7 @@
- #include <crypto/internal/akcipher.h>
- #include <crypto/akcipher.h>
- #include <linux/oid_registry.h>
-+#include <linux/scatterlist.h>
- #include "ecrdsa_params.asn1.h"
- #include "ecrdsa_pub_key.asn1.h"
- #include "ecc.h"
-diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
-index b43684c0dade..5b94343de837 100644
---- a/crypto/jitterentropy-kcapi.c
-+++ b/crypto/jitterentropy-kcapi.c
-@@ -37,11 +37,11 @@
-  * DAMAGE.
-  */
- 
-+#include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/slab.h>
- #include <linux/fips.h>
- #include <linux/time.h>
--#include <linux/crypto.h>
- #include <crypto/internal/rng.h>
- 
- #include "jitterentropy.h"
-diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-index d31031de51bc..1e4b32a1dc30 100644
---- a/crypto/rsa-pkcs1pad.c
-+++ b/crypto/rsa-pkcs1pad.c
-@@ -14,6 +14,7 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/random.h>
-+#include <linux/scatterlist.h>
- 
- /*
-  * Hash algorithm OIDs plus ASN.1 DER wrappings [RFC4880 sec 5.2.2].
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 6863f911fcee..a75c00b8cae0 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -27,6 +27,7 @@
- #include <linux/scatterlist.h>
- #include <linux/slab.h>
- #include <linux/string.h>
-+#include <linux/uio.h>
- #include <crypto/rng.h>
- #include <crypto/drbg.h>
- #include <crypto/akcipher.h>
-diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
-index 6b6841359190..a4e25b46cd0a 100644
---- a/drivers/crypto/amcc/crypto4xx_core.h
-+++ b/drivers/crypto/amcc/crypto4xx_core.h
-@@ -15,6 +15,7 @@
- 
- #include <linux/ratelimit.h>
- #include <linux/mutex.h>
-+#include <linux/scatterlist.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/aead.h>
- #include <crypto/internal/rng.h>
-diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index 422193690fd4..409949338e85 100644
---- a/drivers/crypto/ccp/ccp-ops.c
-+++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -8,6 +8,7 @@
-  * Author: Gary R Hook <gary.hook@amd.com>
-  */
- 
-+#include <linux/dma-mapping.h>
- #include <linux/module.h>
- #include <linux/kernel.h>
- #include <linux/interrupt.h>
-diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
-index 0e25fc3087f3..ba93a76936e3 100644
---- a/drivers/crypto/img-hash.c
-+++ b/drivers/crypto/img-hash.c
-@@ -7,6 +7,7 @@
-  */
- 
- #include <linux/clk.h>
-+#include <linux/dma-mapping.h>
- #include <linux/dmaengine.h>
- #include <linux/interrupt.h>
- #include <linux/io.h>
-diff --git a/drivers/crypto/marvell/cesa/cesa.h b/drivers/crypto/marvell/cesa/cesa.h
-index e8632d5f343f..6edbe682a84f 100644
---- a/drivers/crypto/marvell/cesa/cesa.h
-+++ b/drivers/crypto/marvell/cesa/cesa.h
-@@ -2,12 +2,10 @@
- #ifndef __MARVELL_CESA_H__
- #define __MARVELL_CESA_H__
- 
--#include <crypto/algapi.h>
--#include <crypto/hash.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/skcipher.h>
- 
--#include <linux/crypto.h>
-+#include <linux/dma-direction.h>
- #include <linux/dmapool.h>
- 
- #define CESA_ENGINE_OFF(i)			(((i) * 0x2000))
-diff --git a/drivers/crypto/marvell/cesa/cipher.c b/drivers/crypto/marvell/cesa/cipher.c
-index f133c2ccb5ae..bf820a6dd695 100644
---- a/drivers/crypto/marvell/cesa/cipher.c
-+++ b/drivers/crypto/marvell/cesa/cipher.c
-@@ -11,6 +11,8 @@
- 
- #include <crypto/aes.h>
- #include <crypto/internal/des.h>
-+#include <linux/device.h>
-+#include <linux/dma-mapping.h>
- 
- #include "cesa.h"
- 
-diff --git a/drivers/crypto/marvell/cesa/hash.c b/drivers/crypto/marvell/cesa/hash.c
-index b971284332b6..ca11816c3981 100644
---- a/drivers/crypto/marvell/cesa/hash.c
-+++ b/drivers/crypto/marvell/cesa/hash.c
-@@ -12,6 +12,8 @@
- #include <crypto/hmac.h>
- #include <crypto/md5.h>
- #include <crypto/sha.h>
-+#include <linux/device.h>
-+#include <linux/dma-mapping.h>
- 
- #include "cesa.h"
- 
-diff --git a/drivers/crypto/padlock-aes.c b/drivers/crypto/padlock-aes.c
-index 62c6fe88b212..1be549a07a21 100644
---- a/drivers/crypto/padlock-aes.c
-+++ b/drivers/crypto/padlock-aes.c
-@@ -18,6 +18,7 @@
- #include <linux/errno.h>
- #include <linux/interrupt.h>
- #include <linux/kernel.h>
-+#include <linux/mm.h>
- #include <linux/percpu.h>
- #include <linux/smp.h>
- #include <linux/slab.h>
-diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-index cb6d61eb7302..ea616b7259ae 100644
---- a/drivers/crypto/qce/core.c
-+++ b/drivers/crypto/qce/core.c
-@@ -4,6 +4,7 @@
-  */
- 
- #include <linux/clk.h>
-+#include <linux/dma-mapping.h>
- #include <linux/interrupt.h>
- #include <linux/module.h>
- #include <linux/mod_devicetable.h>
-diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-index 1ab62e7d5f3c..4f78828e075e 100644
---- a/drivers/crypto/qce/sha.c
-+++ b/drivers/crypto/qce/sha.c
-@@ -4,6 +4,7 @@
-  */
- 
- #include <linux/device.h>
-+#include <linux/dma-mapping.h>
- #include <linux/interrupt.h>
- #include <crypto/internal/hash.h>
- 
-diff --git a/drivers/crypto/qce/skcipher.c b/drivers/crypto/qce/skcipher.c
-index 9412433f3b21..428080f1a385 100644
---- a/drivers/crypto/qce/skcipher.c
-+++ b/drivers/crypto/qce/skcipher.c
-@@ -4,6 +4,7 @@
-  */
- 
- #include <linux/device.h>
-+#include <linux/dma-mapping.h>
- #include <linux/interrupt.h>
- #include <linux/moduleparam.h>
- #include <linux/types.h>
-diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
-index f385587f99af..35d73061d156 100644
---- a/drivers/crypto/rockchip/rk3288_crypto.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto.c
-@@ -10,6 +10,7 @@
-  */
- 
- #include "rk3288_crypto.h"
-+#include <linux/dma-mapping.h>
- #include <linux/module.h>
- #include <linux/platform_device.h>
- #include <linux/of.h>
-diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
-index 2b49c677afdb..3db595570c9c 100644
---- a/drivers/crypto/rockchip/rk3288_crypto.h
-+++ b/drivers/crypto/rockchip/rk3288_crypto.h
-@@ -7,6 +7,7 @@
- #include <crypto/algapi.h>
- #include <linux/interrupt.h>
- #include <linux/delay.h>
-+#include <linux/scatterlist.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/skcipher.h>
- 
-diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-index 6b7ecbec092e..81befe7febaa 100644
---- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-@@ -8,6 +8,7 @@
-  *
-  * Some ideas are from marvell/cesa.c and s5p-sss.c driver.
-  */
-+#include <linux/device.h>
- #include "rk3288_crypto.h"
- 
- /*
-diff --git a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
-index 4a75c8e1fa6c..1cece1a7d3f0 100644
---- a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
-@@ -8,6 +8,7 @@
-  *
-  * Some ideas are from marvell-cesa.c and s5p-sss.c driver.
-  */
-+#include <linux/device.h>
- #include "rk3288_crypto.h"
- 
- #define RK_CRYPTO_DEC			BIT(0)
-diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
-index 466e30bd529c..138d60a841f2 100644
---- a/drivers/crypto/sahara.c
-+++ b/drivers/crypto/sahara.c
-@@ -18,7 +18,7 @@
- #include <crypto/sha.h>
- 
- #include <linux/clk.h>
--#include <linux/crypto.h>
-+#include <linux/dma-mapping.h>
- #include <linux/interrupt.h>
- #include <linux/io.h>
- #include <linux/irq.h>
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index 800dfc4d16c4..e64e764bb035 100644
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -11,7 +11,8 @@
- 
- #include <linux/clk.h>
- #include <linux/completion.h>
--#include <linux/crypto.h>
-+#include <linux/device.h>
-+#include <linux/dma-mapping.h>
- #include <linux/dmaengine.h>
- #include <linux/err.h>
- #include <linux/errno.h>
-@@ -27,7 +28,6 @@
- #include <linux/platform_data/dma-ste-dma40.h>
- 
- #include <crypto/aes.h>
--#include <crypto/algapi.h>
- #include <crypto/ctr.h>
- #include <crypto/internal/des.h>
- #include <crypto/internal/skcipher.h>
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index c24f2db8d5e8..f40fda40ee7a 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -15,6 +15,7 @@
- 
- #include <linux/clk.h>
- #include <linux/device.h>
-+#include <linux/dma-mapping.h>
- #include <linux/err.h>
- #include <linux/init.h>
- #include <linux/io.h>
-diff --git a/drivers/crypto/xilinx/zynqmp-aes-gcm.c b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-index 09f7f468eef8..ed777f40bf4f 100644
---- a/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-+++ b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-@@ -10,6 +10,7 @@
- #include <crypto/internal/aead.h>
- #include <crypto/scatterwalk.h>
- 
-+#include <linux/dma-mapping.h>
- #include <linux/module.h>
- #include <linux/of_device.h>
- #include <linux/platform_device.h>
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 00a9cf98debe..8287c7aa9fb1 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -10,7 +10,6 @@
- #include <linux/crypto.h>
- #include <linux/list.h>
- #include <linux/kernel.h>
--#include <linux/skbuff.h>
- 
- /*
-  * Maximum values for blocksize and alignmask, used to allocate
-@@ -27,6 +26,7 @@ struct crypto_instance;
- struct module;
- struct rtattr;
- struct seq_file;
-+struct sk_buff;
- 
- struct crypto_type {
- 	unsigned int (*ctxsize)(struct crypto_alg *alg, u32 type, u32 mask);
-diff --git a/arch/powerpc/crypto/crc-vpmsum_test.c b/arch/powerpc/crypto/crc-vpmsum_test.c
-index dce86e75f1a8..8014cc48b62b 100644
---- a/arch/powerpc/crypto/crc-vpmsum_test.c
-+++ b/arch/powerpc/crypto/crc-vpmsum_test.c
-@@ -9,6 +9,7 @@
- #include <crypto/internal/hash.h>
- #include <linux/init.h>
- #include <linux/module.h>
-+#include <linux/random.h>
- #include <linux/string.h>
- #include <linux/kernel.h>
- #include <linux/cpufeature.h>
-diff --git a/drivers/crypto/qcom-rng.c b/drivers/crypto/qcom-rng.c
-index 4730f84b646d..99ba8d51d102 100644
---- a/drivers/crypto/qcom-rng.c
-+++ b/drivers/crypto/qcom-rng.c
-@@ -7,6 +7,7 @@
- #include <linux/acpi.h>
- #include <linux/clk.h>
- #include <linux/crypto.h>
-+#include <linux/io.h>
- #include <linux/module.h>
- #include <linux/of.h>
- #include <linux/platform_device.h>
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks,
+Iulia
+
+> diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+> index f3d20b7645e0..8ecfa97c3188 100644
+> --- a/drivers/crypto/caam/ctrl.c
+> +++ b/drivers/crypto/caam/ctrl.c
+> @@ -469,7 +469,7 @@ static int caam_get_era(struct caam_ctrl __iomem *ctrl)
+>    * pipeline to a depth of 1 (from it's default of 4) to preclude this situation
+>    * from occurring.
+>    */
+> -static void handle_imx6_err005766(u32 *mcr)
+> +static void handle_imx6_err005766(u32 __iomem *mcr)
+>   {
+>   	if (of_machine_is_compatible("fsl,imx6q") ||
+>   	    of_machine_is_compatible("fsl,imx6dl") ||
+> 
