@@ -2,193 +2,133 @@ Return-Path: <SRS0=xpnW=72=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F18BBC433DF
-	for <linux-crypto@archiver.kernel.org>; Sat, 13 Jun 2020 14:31:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF68AC433E3
+	for <linux-crypto@archiver.kernel.org>; Sat, 13 Jun 2020 21:41:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD3B02080D
-	for <linux-crypto@archiver.kernel.org>; Sat, 13 Jun 2020 14:31:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5DA52078A
+	for <linux-crypto@archiver.kernel.org>; Sat, 13 Jun 2020 21:41:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v1phM+bu"
+	dkim=pass (2048-bit key) header.d=umn.edu header.i=@umn.edu header.b="auZktx6e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726437AbgFMObX (ORCPT
+        id S1726631AbgFMVlj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 13 Jun 2020 10:31:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50036 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726452AbgFMObT (ORCPT
+        Sat, 13 Jun 2020 17:41:39 -0400
+Received: from mta-p7.oit.umn.edu ([134.84.196.207]:42086 "EHLO
+        mta-p7.oit.umn.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726633AbgFMVli (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 13 Jun 2020 10:31:19 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBF08C03E96F
-        for <linux-crypto@vger.kernel.org>; Sat, 13 Jun 2020 07:31:17 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id 23so5681206pfw.10
-        for <linux-crypto@vger.kernel.org>; Sat, 13 Jun 2020 07:31:17 -0700 (PDT)
+        Sat, 13 Jun 2020 17:41:38 -0400
+Received: from localhost (unknown [127.0.0.1])
+        by mta-p7.oit.umn.edu (Postfix) with ESMTP id 49krdX4YYJz9vKSf
+        for <linux-crypto@vger.kernel.org>; Sat, 13 Jun 2020 21:41:36 +0000 (UTC)
+X-Virus-Scanned: amavisd-new at umn.edu
+Received: from mta-p7.oit.umn.edu ([127.0.0.1])
+        by localhost (mta-p7.oit.umn.edu [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id VlTAhXR-zVVO for <linux-crypto@vger.kernel.org>;
+        Sat, 13 Jun 2020 16:41:36 -0500 (CDT)
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mta-p7.oit.umn.edu (Postfix) with ESMTPS id 49krdX2vH0z9v8y5
+        for <linux-crypto@vger.kernel.org>; Sat, 13 Jun 2020 16:41:35 -0500 (CDT)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mta-p7.oit.umn.edu 49krdX2vH0z9v8y5
+DKIM-Filter: OpenDKIM Filter v2.11.0 mta-p7.oit.umn.edu 49krdX2vH0z9v8y5
+Received: by mail-io1-f70.google.com with SMTP id g3so8677805ioc.20
+        for <linux-crypto@vger.kernel.org>; Sat, 13 Jun 2020 14:41:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=nwRd2enOMG4jt4Uk5EPLoc0tMcEuCb0goMle7pInqTY=;
-        b=v1phM+buXJcNsgCbhY7OeaSaTKaeubsTt31NEtds009yu+XOUKHTvTIJCV+/7YcP/V
-         RRB6uQe1xI40VJj/AJw4XoZNbMCTxwJ8ojDQMjIglpRrRQfwOBEgZZHV9o2ll7pAC6EF
-         Twqy38hGUe+MkCIEi+6Hs7RN/CkIefm4ZE/k1NI45g2U9FYwv/xQDiF1rN5GZ1vjx0QH
-         1I0elXulDV4eaWIGPMLNX06hEsLSxXUX2ukHpdfI47T9c2QAPXzzsZFSmwzz03GwHY/U
-         8k624e+htQjxxyypyCK+/cSTD96gRrZIuOHcPlPDOsQXuCD+CW492fDB2SN9XKS4xal7
-         aHqg==
+        d=umn.edu; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=LSFpRsDH7hPv0sXcI0eBKridM6HBdGl5vIGKq0rJzoY=;
+        b=auZktx6ehAhBajQlNLlI3wm6+d/hAPq8yaPTIV0vlYaeRrgaW3hoVKPn9qzjsia14p
+         PiNxeKtm8fOFcqmrbG++0+2KZ2Jfx9ybuCk8eyx1je4TBejzWJzhBwHirnfDeOZNESDe
+         b6qaIEBwyW498ZP7ZKeSkzzbpNwlpEXxglPubM78kJo/euKcITeUPzisctzP3RPMwr87
+         7UoQ6m8bnLiqQBIElWMX1q7TpOHphL8f38WMAFGB2PmvGYRT1i5wA4mFRvwLyLMlR4lg
+         ZbFZc9kcFMeb0XJEv3c0fbE9WsxIcH9/sgZKUa9+qBQwJV/UP28bN7oFf/506QB9gYTZ
+         NZNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=nwRd2enOMG4jt4Uk5EPLoc0tMcEuCb0goMle7pInqTY=;
-        b=dcmGmaE5Gv9wAeUtO2/eYZYhPy520JTc755zVHV18axwitzFvGTtQMUoek5dMg787K
-         P3JCc67ggYZ7ablDzu1GULm+ermiqvWIapewh4gemVCR3FR/5p9FPYXP7CmxhBylEhZS
-         FNWlmM7GDEH3HMmGZOkS159oem0OLx8+v3Qj0qSU27EIe4XTjRTX/AjMPwu2KG0h3GY1
-         Vh0u0h/hYd3BkT5htybzPJ+3yJEJ3Rn5U2OSgEEIqgCaBy9Yysz3nj8fJ+lPZkKH2Hn0
-         j5fUy7Ncub9Bs65UkOrPuelfeNksBsn83npuEfAj6iEIJSHXcRGZii70FcMcyPdpuA4c
-         LVOQ==
-X-Gm-Message-State: AOAM532egPpdmJ5X97TDxnrzB4DxwOMG41L7VcIPqaeEEbPJiTNJGRtg
-        RcyjRqgIS0+Ty6VarkXLqTtrOQ==
-X-Google-Smtp-Source: ABdhPJxVRAOxi33M/Yo5lLiq44LB4Tmp+B+4yQr8teDhdEXqGSSr5eMFvu/Bf4aSvjnBDXFZJvwmhg==
-X-Received: by 2002:a62:7c49:: with SMTP id x70mr15175032pfc.66.1592058676966;
-        Sat, 13 Jun 2020 07:31:16 -0700 (PDT)
-Received: from [10.82.1.102] ([45.135.186.60])
-        by smtp.gmail.com with ESMTPSA id 23sm9295417pfy.199.2020.06.13.07.31.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 13 Jun 2020 07:31:16 -0700 (PDT)
-Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Joerg Roedel <joro@8bytes.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Hanjun Guo <guohanjun@huawei.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=LSFpRsDH7hPv0sXcI0eBKridM6HBdGl5vIGKq0rJzoY=;
+        b=jOtxb7HPEc2trsGc11/gOoloBWXa/nNz3xH88ZoNZjrV1c8T6uEfeWqC+EVU8F5stD
+         ox63K4ZdpU2Mfvgc1T83kkm4Qa500ZpZ7vi5OurthMQxq0zvkG4fpgTu9gfllMUa8+gr
+         2uPmFPPPhHS6jSrUK1YjX86gpjW6wbMqA23OMFuMHsZz87j6mPyXsNnkaLWZ2ktUWHBk
+         EuTbcOMupLT6ybb9aYkjktAmCuqEAmdomaLZpvP3xbxh9JIlJpgQwK+gehu7snCs7Bfd
+         kYGS3/G7XiuHyF2WOdEHo2YdS/sO1lAjhF0ArNKFdOGDyDu7EGs3e0QGBnYNMGeimYjQ
+         G4Mw==
+X-Gm-Message-State: AOAM531C2VPUbfg31GcQ3pRAhVKZih5EbWlmHQvdE0SGQDzeX5lnleKP
+        qtWyMaCZaXlp0jq/xmlyRC8XOUmbhYuVHQWLLyT4Q79hgkiBb5ViCdijHxrOt9EPVswVh4JEqYb
+        B0DVmNM5PLg4tPpsFBzQWPKZpAfe3
+X-Received: by 2002:a92:c9ce:: with SMTP id k14mr19250704ilq.250.1592084494710;
+        Sat, 13 Jun 2020 14:41:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyb26JtPoL+OYiwijo1f/aBaj8/q93A9vM3woScZqAS1tFwQgWOSDCRXrCE9R7tquWbd2eGgg==
+X-Received: by 2002:a92:c9ce:: with SMTP id k14mr19250688ilq.250.1592084494366;
+        Sat, 13 Jun 2020 14:41:34 -0700 (PDT)
+Received: from qiushi.cs.umn.edu ([2607:ea00:101:3c74:4874:45:bcb4:df60])
+        by smtp.gmail.com with ESMTPSA id d5sm5174386ioe.20.2020.06.13.14.41.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 Jun 2020 14:41:33 -0700 (PDT)
+From:   wu000273@umn.edu
+To:     kjlu@umn.edu
+Cc:     wu000273@umn.edu,
+        =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:IOMMU DRIVERS" <iommu@lists.linux-foundation.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-pci <linux-pci@vger.kernel.org>,
-        Thanu Rangarajan <Thanu.Rangarajan@arm.com>,
-        Souvik Chakravarty <Souvik.Chakravarty@arm.com>
-References: <20200611134410.GA1586057@bjorn-Precision-5520>
-From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-Message-ID: <8f9f6a77-4a65-afeb-0af9-e4868b52d7ce@linaro.org>
-Date:   Sat, 13 Jun 2020 22:30:56 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <20200611134410.GA1586057@bjorn-Precision-5520>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] char: hw_random: Fix a reference count leak.
+Date:   Sat, 13 Jun 2020 16:41:28 -0500
+Message-Id: <20200613214128.32665-1-wu000273@umn.edu>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+From: Qiushi Wu <wu000273@umn.edu>
 
+Calling pm_runtime_get_sync increments the counter even in case of
+failure, causing incorrect ref count if pm_runtime_put_sync is not
+called in error handling paths. Thus replace the jump target
+"err_pm_get" by "err_clock".
 
-On 2020/6/11 下午9:44, Bjorn Helgaas wrote:
-> +++ b/drivers/iommu/iommu.c
->>>>>>>>> @@ -2418,6 +2418,10 @@ int iommu_fwspec_init(struct device *dev, struct
->>>>>>>>> fwnode_handle *iommu_fwnode,
->>>>>>>>>             fwspec->iommu_fwnode = iommu_fwnode;
->>>>>>>>>             fwspec->ops = ops;
->>>>>>>>>             dev_iommu_fwspec_set(dev, fwspec);
->>>>>>>>> +
->>>>>>>>> +       if (dev_is_pci(dev))
->>>>>>>>> +               pci_fixup_device(pci_fixup_final, to_pci_dev(dev));
->>>>>>>>> +
->>>>>>>>>
->>>>>>>>> Then pci_fixup_final will be called twice, the first in pci_bus_add_device.
->>>>>>>>> Here in iommu_fwspec_init is the second time, specifically for iommu_fwspec.
->>>>>>>>> Will send this when 5.8-rc1 is open.
->>>>>>>> Wait, this whole fixup approach seems wrong to me.  No matter how you
->>>>>>>> do the fixup, it's still a fixup, which means it requires ongoing
->>>>>>>> maintenance.  Surely we don't want to have to add the Vendor/Device ID
->>>>>>>> for every new AMBA device that comes along, do we?
->>>>>>>>
->>>>>>> Here the fake pci device has standard PCI cfg space, but physical
->>>>>>> implementation is base on AMBA
->>>>>>> They can provide pasid feature.
->>>>>>> However,
->>>>>>> 1, does not support tlp since they are not real pci devices.
->>>>>>> 2. does not support pri, instead support stall (provided by smmu)
->>>>>>> And stall is not a pci feature, so it is not described in struct pci_dev,
->>>>>>> but in struct iommu_fwspec.
->>>>>>> So we use this fixup to tell pci system that the devices can support stall,
->>>>>>> and hereby support pasid.
->>>>>> This did not answer my question.  Are you proposing that we update a
->>>>>> quirk every time a new AMBA device is released?  I don't think that
->>>>>> would be a good model.
->>>>> Yes, you are right, but we do not have any better idea yet.
->>>>> Currently we have three fake pci devices, which support stall and pasid.
->>>>> We have to let pci system know the device can support pasid, because of
->>>>> stall feature, though not support pri.
->>>>> Do you have any other ideas?
->>>> It sounds like the best way would be to allocate a PCI capability for it, so
->>>> detection can be done through config space, at least in future devices,
->>>> or possibly after a firmware update if the config space in your system
->>>> is controlled by firmware somewhere.  Once there is a proper mechanism
->>>> to do this, using fixups to detect the early devices that don't use that
->>>> should be uncontroversial. I have no idea what the process or timeline
->>>> is to add new capabilities into the PCIe specification, or if this one
->>>> would be acceptable to the PCI SIG at all.
->>> That sounds like a possibility.  The spec already defines a
->>> Vendor-Specific Extended Capability (PCIe r5.0, sec 7.9.5) that might
->>> be a candidate.
->> Will investigate this, thanks Bjorn
-> FWIW, there's also a Vendor-Specific Capability that can appear in the
-> first 256 bytes of config space (the Vendor-Specific Extended
-> Capability must appear in the "Extended Configuration Space" from
-> 0x100-0xfff).
-Unfortunately our silicon does not have either Vendor-Specific Capability or
-Vendor-Specific Extended Capability.
+Fixes: 6cd225cc5d8a ("hwrng: exynos - add Samsung Exynos True RNG driver")
+Signed-off-by: Qiushi Wu <wu000273@umn.edu>
+---
+ drivers/char/hw_random/exynos-trng.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-Studied commit 8531e283bee66050734fb0e89d53e85fd5ce24a4
-Looks this method requires adding member (like can_stall) to struct 
-pci_dev, looks difficult.
-
->
->>>> If detection cannot be done through PCI config space, the next best
->>>> alternative is to pass auxiliary data through firmware. On DT based
->>>> machines, you can list non-hotpluggable PCIe devices and add custom
->>>> properties that could be read during device enumeration. I assume
->>>> ACPI has something similar, but I have not done that.
->> Yes, thanks Arnd
->>> ACPI has _DSM (ACPI v6.3, sec 9.1.1), which might be a candidate.  I
->>> like this better than a PCI capability because the property you need
->>> to expose is not a PCI property.
->> _DSM may not workable, since it is working in runtime.
->> We need stall information in init stage, neither too early (after allocation
->> of iommu_fwspec)
->> nor too late (before arm_smmu_add_device ).
-> I'm not aware of a restriction on when _DSM can be evaluated.  I'm
-> looking at ACPI v6.3, sec 9.1.1.  Are you seeing something different?
-DSM method seems requires vendor specific guid, and code would be vendor 
-specific.
-Except adding uuid to some spec like pci_acpi_dsm_guid.
-obj = acpi_evaluate_dsm(ACPI_HANDLE(bus->bridge), &pci_acpi_dsm_guid, 1,
-IGNORE_PCI_BOOT_CONFIG_DSM, NULL);
-
->> By the way, It would be a long time if we need modify either pcie
->> spec or acpi spec.  Can we use pci_fixup_device in iommu_fwspec_init
->> first, it is relatively simple and meet the requirement of platform
->> device using pasid, and they are already in product.
-> Neither the PCI Vendor-Specific Capability nor the ACPI _DSM requires
-> a spec change.  Both can be completely vendor-defined.
-Adding vendor-specific code to common files looks a bit ugly.
-
-Thanks
+diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
+index 8e1fe3f8dd2d..ffa7e0f061f0 100644
+--- a/drivers/char/hw_random/exynos-trng.c
++++ b/drivers/char/hw_random/exynos-trng.c
+@@ -135,7 +135,7 @@ static int exynos_trng_probe(struct platform_device *pdev)
+ 	ret = pm_runtime_get_sync(&pdev->dev);
+ 	if (ret < 0) {
+ 		dev_err(&pdev->dev, "Could not get runtime PM.\n");
+-		goto err_pm_get;
++		goto err_clock;
+ 	}
+ 
+ 	trng->clk = devm_clk_get(&pdev->dev, "secss");
+@@ -166,8 +166,6 @@ static int exynos_trng_probe(struct platform_device *pdev)
+ 
+ err_clock:
+ 	pm_runtime_put_sync(&pdev->dev);
+-
+-err_pm_get:
+ 	pm_runtime_disable(&pdev->dev);
+ 
+ 	return ret;
+-- 
+2.17.1
 
