@@ -7,51 +7,53 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B593C433E5
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 06:51:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 924BFC433E1
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 06:52:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1104720738
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 06:51:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 646852068E
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 06:52:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592203900;
-	bh=Nr7gyCmmvrTFsD6zK9qOB4wQjW53JwVjGZCuKbAPDow=;
+	s=default; t=1592203946;
+	bh=mFsV3ccwGLte6rqeu+2kL66gSjCYWrZUvDB3ORHgTcw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=hShhe317ZoQqRnuDB3lqIWs6ptQoqA6mwu6bU2VxU+Mn9Gp7IJzKEYZcHmtTTCatX
-	 y8WFi9qt2smUbM/UqwnrH//r/iED7CstA57FxbkXXbrGH2kLH9Nm1hXc9ZSFRMtcfP
-	 6P/por6fGOIULOxGzBTPlGrXU+Yz6gUaf2Wg50u8=
+	b=ajUe1CdtQo+fRAge/qPBLUrKZNKxdCOF584kZMHujOBIeoC9KzUr90UAf+Cpe3MvU
+	 zbu5yXhK4bunBMvlCOBxWcdxs8bGst1RpYyE9i0jaGTlwpTCdH/jeCQZ60C+xXHy/B
+	 CL6G0bpTYkdYJEfVUQkGuEknSb+YDMqQJQBhgVuE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728687AbgFOGvS (ORCPT
+        id S1728752AbgFOGwM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jun 2020 02:51:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36714 "EHLO mail.kernel.org"
+        Mon, 15 Jun 2020 02:52:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36376 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728565AbgFOGug (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jun 2020 02:50:36 -0400
+        id S1728491AbgFOGud (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jun 2020 02:50:33 -0400
 Received: from mail.kernel.org (ip5f5ad5c5.dynamic.kabel-deutschland.de [95.90.213.197])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 03B46207DA;
-        Mon, 15 Jun 2020 06:50:32 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D856120738;
+        Mon, 15 Jun 2020 06:50:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1592203832;
-        bh=Nr7gyCmmvrTFsD6zK9qOB4wQjW53JwVjGZCuKbAPDow=;
+        bh=mFsV3ccwGLte6rqeu+2kL66gSjCYWrZUvDB3ORHgTcw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PfhtB/R0dgKZ9uUqIMWAHi3V4w3xXMeDobdFPltap1HQdbXhLoCvkY/XpgzLkXyRX
-         F9Eq9GSAuTE3ZSszLBEb9xY3AY9sbkx7q3y4fUQAY9aw1qB+FmLeV9972YdHAq2IGp
-         WMIYF1OR3K8V1D/z5Y93r7SPqAcgGvDNHoJud3v0=
+        b=kC63JRkAuF0l6A7sMV8LX1meQ3WvIWxBbF7EfnvXjhQydfmWoYtubopgaVgFrjWzm
+         NXmT7aDUXsRoANsdV0NhQ63fS9fo5L46PcukQxa6WNksx8hCA799mt9DQLlnyuXjcw
+         NjbPNRVISSgSORp4pUOXPMcLwnFDyRecXMgKDjs4=
 Received: from mchehab by mail.kernel.org with local (Exim 4.93)
         (envelope-from <mchehab@kernel.org>)
-        id 1jkiww-009o5n-1Y; Mon, 15 Jun 2020 08:50:30 +0200
+        id 1jkiwv-009o5a-SR; Mon, 15 Jun 2020 08:50:29 +0200
 From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH 06/22] docs: crypto: descore-readme.txt: convert to ReST format
-Date:   Mon, 15 Jun 2020 08:50:11 +0200
-Message-Id: <1426be1c7758c0224418352665040220b8a31799.1592203650.git.mchehab+huawei@kernel.org>
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: [PATCH 03/22] docs: crypto: convert asymmetric-keys.txt to ReST
+Date:   Mon, 15 Jun 2020 08:50:08 +0200
+Message-Id: <c2275ea94e0507a01b020ab66dfa824d8b1c2545.1592203650.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <cover.1592203650.git.mchehab+huawei@kernel.org>
 References: <cover.1592203650.git.mchehab+huawei@kernel.org>
@@ -62,439 +64,459 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert this readme file to ReST file format, preserving its
-contents as-is as much as possible. The only changes are:
+This file is almost compatible with ReST. Just minor changes
+were needed:
 
-- Added chapter and title markups;
-- Added blank lines where needed;
-- Added list markups where needed;
-- Use a table markup;
-- replace markups like `foo' to ``foo``;
-- add one extra literal markup to avoid warnings.
+- Adjust document and titles markups;
+- Adjust numbered list markups;
+- Add a comments markup for the Contents section;
+- Add markups for literal blocks.
 
+Acked-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- ...{descore-readme.txt => descore-readme.rst} | 152 ++++++++++++------
- Documentation/crypto/index.rst                |   1 +
- 2 files changed, 108 insertions(+), 45 deletions(-)
- rename Documentation/crypto/{descore-readme.txt => descore-readme.rst} (81%)
+ ...symmetric-keys.txt => asymmetric-keys.rst} | 91 +++++++++----------
+ Documentation/crypto/index.rst                |  1 +
+ Documentation/security/keys/core.rst          |  2 +-
+ MAINTAINERS                                   |  2 +-
+ crypto/asymmetric_keys/asymmetric_type.c      |  2 +-
+ crypto/asymmetric_keys/public_key.c           |  2 +-
+ crypto/asymmetric_keys/signature.c            |  2 +-
+ include/crypto/public_key.h                   |  2 +-
+ include/keys/asymmetric-parser.h              |  2 +-
+ include/keys/asymmetric-subtype.h             |  2 +-
+ include/keys/asymmetric-type.h                |  2 +-
+ 11 files changed, 53 insertions(+), 57 deletions(-)
+ rename Documentation/crypto/{asymmetric-keys.txt => asymmetric-keys.rst} (91%)
 
-diff --git a/Documentation/crypto/descore-readme.txt b/Documentation/crypto/descore-readme.rst
-similarity index 81%
-rename from Documentation/crypto/descore-readme.txt
-rename to Documentation/crypto/descore-readme.rst
-index 16e9e6350755..45bd9c8babf4 100644
---- a/Documentation/crypto/descore-readme.txt
-+++ b/Documentation/crypto/descore-readme.rst
-@@ -1,8 +1,20 @@
--Below is the original README file from the descore.shar package.
+diff --git a/Documentation/crypto/asymmetric-keys.txt b/Documentation/crypto/asymmetric-keys.rst
+similarity index 91%
+rename from Documentation/crypto/asymmetric-keys.txt
+rename to Documentation/crypto/asymmetric-keys.rst
+index 8763866b11cf..349f44a29392 100644
+--- a/Documentation/crypto/asymmetric-keys.txt
++++ b/Documentation/crypto/asymmetric-keys.rst
+@@ -1,8 +1,10 @@
+-		=============================================
+-		ASYMMETRIC / PUBLIC-KEY CRYPTOGRAPHY KEY TYPE
+-		=============================================
 +.. SPDX-License-Identifier: GPL-2.0
-+.. include:: <isonum.txt>
-+
-+===========================================
-+Fast & Portable DES encryption & decryption
-+===========================================
-+
-+.. note::
-+
-+   Below is the original README file from the descore.shar package,
-+   converted to ReST format.
-+
- ------------------------------------------------------------------------------
  
- des - fast & portable DES encryption & decryption.
--Copyright (C) 1992  Dana L. How
-+
-+Copyright |copy| 1992  Dana L. How
- 
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU Library General Public License as published by
-@@ -20,13 +32,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- 
- Author's address: how@isl.stanford.edu
- 
--$Id: README,v 1.15 1992/05/20 00:25:32 how E $
--
--
--==>> To compile after untarring/unsharring, just `make' <<==
-+.. README,v 1.15 1992/05/20 00:25:32 how E
- 
-+==>> To compile after untarring/unsharring, just ``make`` <<==
- 
- This package was designed with the following goals:
-+
- 1.	Highest possible encryption/decryption PERFORMANCE.
- 2.	PORTABILITY to any byte-addressable host with a 32bit unsigned C type
- 3.	Plug-compatible replacement for KERBEROS's low-level routines.
-@@ -36,7 +47,7 @@ register-starved machines.  My discussions with Richard Outerbridge,
- 71755.204@compuserve.com, sparked a number of these enhancements.
- 
- To more rapidly understand the code in this package, inspect desSmallFips.i
--(created by typing `make') BEFORE you tackle desCode.h.  The latter is set
-+(created by typing ``make``) BEFORE you tackle desCode.h.  The latter is set
- up in a parameterized fashion so it can easily be modified by speed-daemon
- hackers in pursuit of that last microsecond.  You will find it more
- illuminating to inspect one specific implementation,
-@@ -47,11 +58,13 @@ performance comparison to other available des code which i could
- compile on a SPARCStation 1 (cc -O4, gcc -O2):
- 
- this code (byte-order independent):
--   30us per encryption (options: 64k tables, no IP/FP)
--   33us per encryption (options: 64k tables, FIPS standard bit ordering)
--   45us per encryption (options:  2k tables, no IP/FP)
--   48us per encryption (options:  2k tables, FIPS standard bit ordering)
--  275us to set a new key (uses 1k of key tables)
-+
-+  - 30us per encryption (options: 64k tables, no IP/FP)
-+  - 33us per encryption (options: 64k tables, FIPS standard bit ordering)
-+  - 45us per encryption (options:  2k tables, no IP/FP)
-+  - 48us per encryption (options:  2k tables, FIPS standard bit ordering)
-+  - 275us to set a new key (uses 1k of key tables)
-+
- 	this has the quickest encryption/decryption routines i've seen.
- 	since i was interested in fast des filters rather than crypt(3)
- 	and password cracking, i haven't really bothered yet to speed up
-@@ -63,15 +76,20 @@ this code (byte-order independent):
- 	are highly variable because of cache effects).
- 
- kerberos des replacement from australia (version 1.95):
--   53us per encryption (uses 2k of tables)
--   96us to set a new key (uses 2.25k of key tables)
-+
-+  - 53us per encryption (uses 2k of tables)
-+  - 96us to set a new key (uses 2.25k of key tables)
-+
- 	so despite the author's inclusion of some of the performance
- 	improvements i had suggested to him, this package's
- 	encryption/decryption is still slower on the sparc and 68000.
- 	more specifically, 19-40% slower on the 68020 and 11-35% slower
- 	on the sparc,  depending on the compiler;
- 	in full gory detail (ALT_ECB is a libdes variant):
-+
-+	===============	==============	===============	=================
- 	compiler   	machine		desCore	libdes	ALT_ECB	slower by
-+	===============	==============	===============	=================
- 	gcc 2.1 -O2	Sun 3/110	304  uS	369.5uS	461.8uS	 22%
- 	cc      -O1	Sun 3/110	336  uS	436.6uS	399.3uS	 19%
- 	cc      -O2	Sun 3/110	360  uS	532.4uS	505.1uS	 40%
-@@ -79,10 +97,15 @@ kerberos des replacement from australia (version 1.95):
- 	gcc 2.1 -O2	Sun 4/50	 48  uS	 53.4uS	 57.5uS	 11%
- 	cc      -O2	Sun 4/50	 48  uS	 64.6uS	 64.7uS	 35%
- 	cc      -O4	Sun 4/50	 48  uS	 64.7uS	 64.9uS	 35%
-+	===============	==============	===============	=================
-+
- 	(my time measurements are not as accurate as his).
-+
-    the comments in my first release of desCore on version 1.92:
--   68us per encryption (uses 2k of tables)
--   96us to set a new key (uses 2.25k of key tables)
-+
-+   - 68us per encryption (uses 2k of tables)
-+   - 96us to set a new key (uses 2.25k of key tables)
-+
- 	this is a very nice package which implements the most important
- 	of the optimizations which i did in my encryption routines.
- 	it's a bit weak on common low-level optimizations which is why
-@@ -91,48 +114,60 @@ kerberos des replacement from australia (version 1.95):
- 	speed up the key-setting routines with impressive results.
- 	(at some point i may do the same in my package).  he also implements
- 	the rest of the mit des library.
-+
- 	(code from eay@psych.psy.uq.oz.au via comp.sources.misc)
- 
- fast crypt(3) package from denmark:
-+
- 	the des routine here is buried inside a loop to do the
- 	crypt function and i didn't feel like ripping it out and measuring
- 	performance. his code takes 26 sparc instructions to compute one
- 	des iteration; above, Quick (64k) takes 21 and Small (2k) takes 37.
- 	he claims to use 280k of tables but the iteration calculation seems
- 	to use only 128k.  his tables and code are machine independent.
-+
- 	(code from glad@daimi.aau.dk via alt.sources or comp.sources.misc)
- 
- swedish reimplementation of Kerberos des library
--  108us per encryption (uses 34k worth of tables)
--  134us to set a new key (uses 32k of key tables to get this speed!)
-+
-+  - 108us per encryption (uses 34k worth of tables)
-+  - 134us to set a new key (uses 32k of key tables to get this speed!)
-+
- 	the tables used seem to be machine-independent;
- 	he seems to have included a lot of special case code
--	so that, e.g., `long' loads can be used instead of 4 `char' loads
-+	so that, e.g., ``long`` loads can be used instead of 4 ``char`` loads
- 	when the machine's architecture allows it.
-+
- 	(code obtained from chalmers.se:pub/des)
- 
- crack 3.3c package from england:
-+
- 	as in crypt above, the des routine is buried in a loop. it's
- 	also very modified for crypt.  his iteration code uses 16k
- 	of tables and appears to be slow.
-+
- 	(code obtained from aem@aber.ac.uk via alt.sources or comp.sources.misc)
- 
--``highly optimized'' and tweaked Kerberos/Athena code (byte-order dependent):
--  165us per encryption (uses 6k worth of tables)
--  478us to set a new key (uses <1k of key tables)
-+``highly optimized`` and tweaked Kerberos/Athena code (byte-order dependent):
-+
-+  - 165us per encryption (uses 6k worth of tables)
-+  - 478us to set a new key (uses <1k of key tables)
-+
- 	so despite the comments in this code, it was possible to get
- 	faster code AND smaller tables, as well as making the tables
- 	machine-independent.
- 	(code obtained from prep.ai.mit.edu)
- 
- UC Berkeley code (depends on machine-endedness):
--  226us per encryption
--10848us to set a new key
-+  -  226us per encryption
-+  - 10848us to set a new key
-+
- 	table sizes are unclear, but they don't look very small
- 	(code obtained from wuarchive.wustl.edu)
- 
- 
- motivation and history
-+======================
- 
- a while ago i wanted some des routines and the routines documented on sun's
- man pages either didn't exist or dumped core.  i had heard of kerberos,
-@@ -142,10 +177,10 @@ it was too convoluted, the code had been written without taking
- advantage of the regular structure of operations such as IP, E, and FP
- (i.e. the author didn't sit down and think before coding),
- it was excessively slow,  the author had attempted to clarify the code
--by adding MORE statements to make the data movement more `consistent'
-+by adding MORE statements to make the data movement more ``consistent``
- instead of simplifying his implementation and cutting down on all data
- movement (in particular, his use of L1, R1, L2, R2), and it was full of
--idiotic `tweaks' for particular machines which failed to deliver significant
-+idiotic ``tweaks`` for particular machines which failed to deliver significant
- speedups but which did obfuscate everything.  so i took the test data
- from his verification program and rewrote everything else.
- 
-@@ -167,12 +202,13 @@ than versions hand-written in assembly for the sparc!
- 
- 
- porting notes
-+=============
- 
- one thing i did not want to do was write an enormous mess
- which depended on endedness and other machine quirks,
- and which necessarily produced different code and different lookup tables
- for different machines.  see the kerberos code for an example
--of what i didn't want to do; all their endedness-specific `optimizations'
-+of what i didn't want to do; all their endedness-specific ``optimizations``
- obfuscate the code and in the end were slower than a simpler machine
- independent approach.  however, there are always some portability
- considerations of some kind, and i have included some options
-@@ -184,8 +220,8 @@ perhaps some will still regard the result as a mess!
-    i assume word pointers can be freely cast to and from char pointers.
-    note that 99% of C programs make these assumptions.
-    i always use unsigned char's if the high bit could be set.
--2) the typedef `word' means a 32 bit unsigned integral type.
--   if `unsigned long' is not 32 bits, change the typedef in desCore.h.
-+2) the typedef ``word`` means a 32 bit unsigned integral type.
-+   if ``unsigned long`` is not 32 bits, change the typedef in desCore.h.
-    i assume sizeof(word) == 4 EVERYWHERE.
- 
- the (worst-case) cost of my NOT doing endedness-specific optimizations
-@@ -195,40 +231,46 @@ the input and output work areas do not need to be word-aligned.
- 
- 
- OPTIONAL performance optimizations
-+==================================
- 
--1) you should define one of `i386,' `vax,' `mc68000,' or `sparc,'
-+1) you should define one of ``i386,`` ``vax,`` ``mc68000,`` or ``sparc,``
-    whichever one is closest to the capabilities of your machine.
-    see the start of desCode.h to see exactly what this selection implies.
-    note that if you select the wrong one, the des code will still work;
-    these are just performance tweaks.
--2) for those with functional `asm' keywords: you should change the
-+2) for those with functional ``asm`` keywords: you should change the
-    ROR and ROL macros to use machine rotate instructions if you have them.
-    this will save 2 instructions and a temporary per use,
-    or about 32 to 40 instructions per en/decryption.
-+
-    note that gcc is smart enough to translate the ROL/R macros into
-    machine rotates!
- 
- these optimizations are all rather persnickety, yet with them you should
- be able to get performance equal to assembly-coding, except that:
-+
- 1) with the lack of a bit rotate operator in C, rotates have to be synthesized
--   from shifts.  so access to `asm' will speed things up if your machine
-+   from shifts.  so access to ``asm`` will speed things up if your machine
-    has rotates, as explained above in (3) (not necessary if you use gcc).
- 2) if your machine has less than 12 32-bit registers i doubt your compiler will
-    generate good code.
--   `i386' tries to configure the code for a 386 by only declaring 3 registers
-+
-+   ``i386`` tries to configure the code for a 386 by only declaring 3 registers
-    (it appears that gcc can use ebx, esi and edi to hold register variables).
-    however, if you like assembly coding, the 386 does have 7 32-bit registers,
--   and if you use ALL of them, use `scaled by 8' address modes with displacement
-+   and if you use ALL of them, use ``scaled by 8`` address modes with displacement
-    and other tricks, you can get reasonable routines for DesQuickCore... with
-    about 250 instructions apiece.  For DesSmall... it will help to rearrange
-    des_keymap, i.e., now the sbox # is the high part of the index and
-    the 6 bits of data is the low part; it helps to exchange these.
-+
-    since i have no way to conveniently test it i have not provided my
-    shoehorned 386 version.  note that with this release of desCore, gcc is able
-    to put everything in registers(!), and generate about 370 instructions apiece
-    for the DesQuickCore... routines!
- 
- coding notes
-+============
- 
- the en/decryption routines each use 6 necessary register variables,
- with 4 being actively used at once during the inner iterations.
-@@ -236,15 +278,18 @@ if you don't have 4 register variables get a new machine.
- up to 8 more registers are used to hold constants in some configurations.
- 
- i assume that the use of a constant is more expensive than using a register:
-+
- a) additionally, i have tried to put the larger constants in registers.
-    registering priority was by the following:
--	anything more than 12 bits (bad for RISC and CISC)
--	greater than 127 in value (can't use movq or byte immediate on CISC)
--	9-127 (may not be able to use CISC shift immediate or add/sub quick),
--	1-8 were never registered, being the cheapest constants.
-+
-+	- anything more than 12 bits (bad for RISC and CISC)
-+	- greater than 127 in value (can't use movq or byte immediate on CISC)
-+	- 9-127 (may not be able to use CISC shift immediate or add/sub quick),
-+	- 1-8 were never registered, being the cheapest constants.
-+
- b) the compiler may be too stupid to realize table and table+256 should
-    be assigned to different constant registers and instead repetitively
--   do the arithmetic, so i assign these to explicit `m' register variables
-+   do the arithmetic, so i assign these to explicit ``m`` register variables
-    when possible and helpful.
- 
- i assume that indexing is cheaper or equivalent to auto increment/decrement,
-@@ -253,25 +298,31 @@ this assumption is reversed for 68k and vax.
- 
- i assume that addresses can be cheaply formed from two registers,
- or from a register and a small constant.
--for the 68000, the `two registers and small offset' form is used sparingly.
-+for the 68000, the ``two registers and small offset`` form is used sparingly.
- all index scaling is done explicitly - no hidden shifts by log2(sizeof).
- 
- the code is written so that even a dumb compiler
- should never need more than one hidden temporary,
- increasing the chance that everything will fit in the registers.
- KEEP THIS MORE SUBTLE POINT IN MIND IF YOU REWRITE ANYTHING.
-+
- (actually, there are some code fragments now which do require two temps,
- but fixing it would either break the structure of the macros or
- require declaring another temporary).
- 
- 
- special efficient data format
-+==============================
-+
-+bits are manipulated in this arrangement most of the time (S7 S5 S3 S1)::
- 
--bits are manipulated in this arrangement most of the time (S7 S5 S3 S1):
- 	003130292827xxxx242322212019xxxx161514131211xxxx080706050403xxxx
-+
- (the x bits are still there, i'm just emphasizing where the S boxes are).
--bits are rotated left 4 when computing S6 S4 S2 S0:
-+bits are rotated left 4 when computing S6 S4 S2 S0::
-+
- 	282726252423xxxx201918171615xxxx121110090807xxxx040302010031xxxx
-+
- the rightmost two bits are usually cleared so the lower byte can be used
- as an index into an sbox mapping table. the next two x'd bits are set
- to various values to access different parts of the tables.
-@@ -288,7 +339,7 @@ datatypes:
- 	must be long-aligned.
- 
- DesQuickInit()
--	call this before using any other routine with `Quick' in its name.
-+	call this before using any other routine with ``Quick`` in its name.
- 	it generates the special 64k table these routines need.
- DesQuickDone()
- 	frees this table
-@@ -298,6 +349,7 @@ DesMethod(m, k)
- 	which must have odd parity (or -1 is returned) and which must
- 	not be a (semi-)weak key (or -2 is returned).
- 	normally DesMethod() returns 0.
-+
- 	m is filled in from k so that when one of the routines below
- 	is called with m, the routine will act like standard des
- 	en/decryption with the key k. if you use DesMethod,
-@@ -308,19 +360,26 @@ DesMethod(m, k)
- 	will be set to magic constants which speed up the encryption/decryption
- 	on some machines.  and yes, each byte controls
- 	a specific sbox during a specific iteration.
-+
- 	you really shouldn't use the 768bit format directly;  i should
- 	provide a routine that converts 128 6-bit bytes (specified in
- 	S-box mapping order or something) into the right format for you.
- 	this would entail some byte concatenation and rotation.
- 
- Des{Small|Quick}{Fips|Core}{Encrypt|Decrypt}(d, m, s)
--	performs des on the 8 bytes at s into the 8 bytes at d. (d,s: char *).
-+	performs des on the 8 bytes at s into the 8 bytes at
-+	``d. (d,s: char *)``.
-+
- 	uses m as a 768bit key as explained above.
-+
- 	the Encrypt|Decrypt choice is obvious.
-+
- 	Fips|Core determines whether a completely standard FIPS initial
- 	and final permutation is done; if not, then the data is loaded
- 	and stored in a nonstandard bit order (FIPS w/o IP/FP).
-+
- 	Fips slows down Quick by 10%, Small by 9%.
-+
- 	Small|Quick determines whether you use the normal routine
- 	or the crazy quick one which gobbles up 64k more of memory.
- 	Small is 50% slower then Quick, but Quick needs 32 times as much
-@@ -329,15 +388,17 @@ Des{Small|Quick}{Fips|Core}{Encrypt|Decrypt}(d, m, s)
- 
- 
- Getting it to compile on your machine
-+=====================================
- 
- there are no machine-dependencies in the code (see porting),
--except perhaps the `now()' macro in desTest.c.
-+except perhaps the ``now()`` macro in desTest.c.
- ALL generated tables are machine independent.
- you should edit the Makefile with the appropriate optimization flags
- for your compiler (MAX optimization).
- 
- 
- Speeding up kerberos (and/or its des library)
+-Contents:
 +=============================================
++Asymmetric / Public-key Cryptography Key Type
++=============================================
++
++.. Contents:
  
- note that i have included a kerberos-compatible interface in desUtil.c
- through the functions des_key_sched() and des_ecb_encrypt().
-@@ -347,6 +408,7 @@ you should not need to #include desCore.h;  just include the header
- file provided with the kerberos library.
+   - Overview.
+   - Key identification.
+@@ -13,8 +15,7 @@ Contents:
+   - Keyring link restrictions.
  
- Other uses
-+==========
  
- the macros in desCode.h would be very useful for putting inline des
- functions in more complicated encryption routines.
+-========
+-OVERVIEW
++Overview
+ ========
+ 
+ The "asymmetric" key type is designed to be a container for the keys used in
+@@ -42,8 +43,7 @@ key, or it may interpret it as a reference to a key held somewhere else in the
+ system (for example, a TPM).
+ 
+ 
+-==================
+-KEY IDENTIFICATION
++Key Identification
+ ==================
+ 
+ If a key is added with an empty name, the instantiation data parsers are given
+@@ -57,49 +57,48 @@ The asymmetric key type's match function can then perform a wider range of
+ comparisons than just the straightforward comparison of the description with
+ the criterion string:
+ 
+- (1) If the criterion string is of the form "id:<hexdigits>" then the match
++  1) If the criterion string is of the form "id:<hexdigits>" then the match
+      function will examine a key's fingerprint to see if the hex digits given
+-     after the "id:" match the tail.  For instance:
++     after the "id:" match the tail.  For instance::
+ 
+ 	keyctl search @s asymmetric id:5acc2142
+ 
+-     will match a key with fingerprint:
++     will match a key with fingerprint::
+ 
+ 	1A00 2040 7601 7889 DE11  882C 3823 04AD 5ACC 2142
+ 
+- (2) If the criterion string is of the form "<subtype>:<hexdigits>" then the
++  2) If the criterion string is of the form "<subtype>:<hexdigits>" then the
+      match will match the ID as in (1), but with the added restriction that
+      only keys of the specified subtype (e.g. tpm) will be matched.  For
+-     instance:
++     instance::
+ 
+ 	keyctl search @s asymmetric tpm:5acc2142
+ 
+ Looking in /proc/keys, the last 8 hex digits of the key fingerprint are
+-displayed, along with the subtype:
++displayed, along with the subtype::
+ 
+ 	1a39e171 I-----     1 perm 3f010000     0     0 asymmetric modsign.0: DSA 5acc2142 []
+ 
+ 
+-=========================
+-ACCESSING ASYMMETRIC KEYS
++Accessing Asymmetric Keys
+ =========================
+ 
+ For general access to asymmetric keys from within the kernel, the following
+-inclusion is required:
++inclusion is required::
+ 
+ 	#include <crypto/public_key.h>
+ 
+ This gives access to functions for dealing with asymmetric / public keys.
+ Three enums are defined there for representing public-key cryptography
+-algorithms:
++algorithms::
+ 
+ 	enum pkey_algo
+ 
+-digest algorithms used by those:
++digest algorithms used by those::
+ 
+ 	enum pkey_hash_algo
+ 
+-and key identifier representations:
++and key identifier representations::
+ 
+ 	enum pkey_id_type
+ 
+@@ -110,25 +109,25 @@ PGP-specific metadata, whereas X.509 has arbitrary certificate identifiers.
+ 
+ The operations defined upon a key are:
+ 
+- (1) Signature verification.
++  1) Signature verification.
+ 
+ Other operations are possible (such as encryption) with the same key data
+ required for verification, but not currently supported, and others
+ (eg. decryption and signature generation) require extra key data.
+ 
+ 
+-SIGNATURE VERIFICATION
++Signature Verification
+ ----------------------
+ 
+ An operation is provided to perform cryptographic signature verification, using
+-an asymmetric key to provide or to provide access to the public key.
++an asymmetric key to provide or to provide access to the public key::
+ 
+ 	int verify_signature(const struct key *key,
+ 			     const struct public_key_signature *sig);
+ 
+ The caller must have already obtained the key from some source and can then use
+ it to check the signature.  The caller must have parsed the signature and
+-transferred the relevant bits to the structure pointed to by sig.
++transferred the relevant bits to the structure pointed to by sig::
+ 
+ 	struct public_key_signature {
+ 		u8 *digest;
+@@ -159,8 +158,7 @@ data; or -ENOMEM if an allocation can't be performed.  -EINVAL can be returned
+ if the key argument is the wrong type or is incompletely set up.
+ 
+ 
+-=======================
+-ASYMMETRIC KEY SUBTYPES
++Asymmetric Key Subtypes
+ =======================
+ 
+ Asymmetric keys have a subtype that defines the set of operations that can be
+@@ -171,11 +169,11 @@ The subtype is selected by the key data parser and the parser must initialise
+ the data required for it.  The asymmetric key retains a reference on the
+ subtype module.
+ 
+-The subtype definition structure can be found in:
++The subtype definition structure can be found in::
+ 
+ 	#include <keys/asymmetric-subtype.h>
+ 
+-and looks like the following:
++and looks like the following::
+ 
+ 	struct asymmetric_key_subtype {
+ 		struct module		*owner;
+@@ -198,39 +196,37 @@ the subtype.  Currently, the name is only used for print statements.
+ 
+ There are a number of operations defined by the subtype:
+ 
+- (1) describe().
++  1) describe().
+ 
+      Mandatory.  This allows the subtype to display something in /proc/keys
+      against the key.  For instance the name of the public key algorithm type
+      could be displayed.  The key type will display the tail of the key
+      identity string after this.
+ 
+- (2) destroy().
++  2) destroy().
+ 
+      Mandatory.  This should free the memory associated with the key.  The
+      asymmetric key will look after freeing the fingerprint and releasing the
+      reference on the subtype module.
+ 
+- (3) query().
++  3) query().
+ 
+      Mandatory.  This is a function for querying the capabilities of a key.
+ 
+- (4) eds_op().
++  4) eds_op().
+ 
+      Optional.  This is the entry point for the encryption, decryption and
+      signature creation operations (which are distinguished by the operation ID
+      in the parameter struct).  The subtype may do anything it likes to
+      implement an operation, including offloading to hardware.
+ 
+- (5) verify_signature().
++  5) verify_signature().
+ 
+      Optional.  This is the entry point for signature verification.  The
+      subtype may do anything it likes to implement an operation, including
+      offloading to hardware.
+ 
+-
+-==========================
+-INSTANTIATION DATA PARSERS
++Instantiation Data Parsers
+ ==========================
+ 
+ The asymmetric key type doesn't generally want to store or to deal with a raw
+@@ -254,11 +250,11 @@ Examples of blob formats for which parsers could be implemented include:
+ During key instantiation each parser in the list is tried until one doesn't
+ return -EBADMSG.
+ 
+-The parser definition structure can be found in:
++The parser definition structure can be found in::
+ 
+ 	#include <keys/asymmetric-parser.h>
+ 
+-and looks like the following:
++and looks like the following::
+ 
+ 	struct asymmetric_key_parser {
+ 		struct module	*owner;
+@@ -273,7 +269,7 @@ the parser.
+ There is currently only a single operation defined by the parser, and it is
+ mandatory:
+ 
+- (1) parse().
++  1) parse().
+ 
+      This is called to preparse the key from the key creation and update paths.
+      In particular, it is called during the key creation _before_ a key is
+@@ -282,7 +278,7 @@ mandatory:
+ 
+      The caller passes a pointer to the following struct with all of the fields
+      cleared, except for data, datalen and quotalen [see
+-     Documentation/security/keys/core.rst].
++     Documentation/security/keys/core.rst]::
+ 
+ 	struct key_preparsed_payload {
+ 		char		*description;
+@@ -321,7 +317,7 @@ mandatory:
+      public-key algorithm such as RSA and DSA this will likely be a printable
+      hex version of the key's fingerprint.
+ 
+-Functions are provided to register and unregister parsers:
++Functions are provided to register and unregister parsers::
+ 
+ 	int register_asymmetric_key_parser(struct asymmetric_key_parser *parser);
+ 	void unregister_asymmetric_key_parser(struct asymmetric_key_parser *subtype);
+@@ -330,8 +326,7 @@ Parsers may not have the same name.  The names are otherwise only used for
+ displaying in debugging messages.
+ 
+ 
+-=========================
+-KEYRING LINK RESTRICTIONS
++Keyring Link Restrictions
+ =========================
+ 
+ Keyrings created from userspace using add_key can be configured to check the
+@@ -340,7 +335,7 @@ allowed to link.
+ 
+ Several restriction methods are available:
+ 
+- (1) Restrict using the kernel builtin trusted keyring
++  1) Restrict using the kernel builtin trusted keyring
+ 
+      - Option string used with KEYCTL_RESTRICT_KEYRING:
+        - "builtin_trusted"
+@@ -350,7 +345,7 @@ Several restriction methods are available:
+      rejected.  The ca_keys kernel parameter also affects which keys are used
+      for signature verification.
+ 
+- (2) Restrict using the kernel builtin and secondary trusted keyrings
++  2) Restrict using the kernel builtin and secondary trusted keyrings
+ 
+      - Option string used with KEYCTL_RESTRICT_KEYRING:
+        - "builtin_and_secondary_trusted"
+@@ -361,7 +356,7 @@ Several restriction methods are available:
+      kernel parameter also affects which keys are used for signature
+      verification.
+ 
+- (3) Restrict using a separate key or keyring
++  3) Restrict using a separate key or keyring
+ 
+      - Option string used with KEYCTL_RESTRICT_KEYRING:
+        - "key_or_keyring:<key or keyring serial number>[:chain]"
+@@ -378,7 +373,7 @@ Several restriction methods are available:
+      certificate in order (starting closest to the root) to a keyring.  For
+      instance, one keyring can be populated with links to a set of root
+      certificates, with a separate, restricted keyring set up for each
+-     certificate chain to be validated:
++     certificate chain to be validated::
+ 
+ 	# Create and populate a keyring for root certificates
+ 	root_id=`keyctl add keyring root-certs "" @s`
+@@ -400,7 +395,7 @@ Several restriction methods are available:
+      one of the root certificates.
+ 
+      A single keyring can be used to verify a chain of signatures by
+-     restricting the keyring after linking the root certificate:
++     restricting the keyring after linking the root certificate::
+ 
+ 	# Create a keyring for the certificate chain and add the root
+ 	chain2_id=`keyctl add keyring chain2 "" @s`
 diff --git a/Documentation/crypto/index.rst b/Documentation/crypto/index.rst
-index 22a6870bf356..21338fa92642 100644
+index c4ff5d791233..2bcaf422731e 100644
 --- a/Documentation/crypto/index.rst
 +++ b/Documentation/crypto/index.rst
-@@ -27,3 +27,4 @@ for cryptographic use cases, as well as programming examples.
+@@ -18,6 +18,7 @@ for cryptographic use cases, as well as programming examples.
+ 
+    intro
+    architecture
++   asymmetric-keys
+    devel-algos
+    userspace-if
     crypto_engine
-    api
-    api-samples
-+   descore-readme
+diff --git a/Documentation/security/keys/core.rst b/Documentation/security/keys/core.rst
+index e0f1211ca843..e6522dd05037 100644
+--- a/Documentation/security/keys/core.rst
++++ b/Documentation/security/keys/core.rst
+@@ -912,7 +912,7 @@ The keyctl syscall functions are:
+ 
+      One application of restricted keyrings is to verify X.509 certificate
+      chains or individual certificate signatures using the asymmetric key type.
+-     See Documentation/crypto/asymmetric-keys.txt for specific restrictions
++     See Documentation/crypto/asymmetric-keys.rst for specific restrictions
+      applicable to the asymmetric key type.
+ 
+ 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 452904d75228..84eabb5f0a5d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2827,7 +2827,7 @@ ASYMMETRIC KEYS
+ M:	David Howells <dhowells@redhat.com>
+ L:	keyrings@vger.kernel.org
+ S:	Maintained
+-F:	Documentation/crypto/asymmetric-keys.txt
++F:	Documentation/crypto/asymmetric-keys.rst
+ F:	crypto/asymmetric_keys/
+ F:	include/crypto/pkcs7.h
+ F:	include/crypto/public_key.h
+diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
+index 6e5fc8e31f01..33e77d846caa 100644
+--- a/crypto/asymmetric_keys/asymmetric_type.c
++++ b/crypto/asymmetric_keys/asymmetric_type.c
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ /* Asymmetric public-key cryptography key type
+  *
+- * See Documentation/crypto/asymmetric-keys.txt
++ * See Documentation/crypto/asymmetric-keys.rst
+  *
+  * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
+  * Written by David Howells (dhowells@redhat.com)
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index d7f43d4ea925..da4d0b82d018 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ /* In-software asymmetric public-key crypto subtype
+  *
+- * See Documentation/crypto/asymmetric-keys.txt
++ * See Documentation/crypto/asymmetric-keys.rst
+  *
+  * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
+  * Written by David Howells (dhowells@redhat.com)
+diff --git a/crypto/asymmetric_keys/signature.c b/crypto/asymmetric_keys/signature.c
+index e24a031db1e4..4aff3eebec17 100644
+--- a/crypto/asymmetric_keys/signature.c
++++ b/crypto/asymmetric_keys/signature.c
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ /* Signature verification with an asymmetric key
+  *
+- * See Documentation/crypto/asymmetric-keys.txt
++ * See Documentation/crypto/asymmetric-keys.rst
+  *
+  * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
+  * Written by David Howells (dhowells@redhat.com)
+diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
+index 0588ef3bc6ff..11f535cfb810 100644
+--- a/include/crypto/public_key.h
++++ b/include/crypto/public_key.h
+@@ -1,7 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0-or-later */
+ /* Asymmetric public-key algorithm definitions
+  *
+- * See Documentation/crypto/asymmetric-keys.txt
++ * See Documentation/crypto/asymmetric-keys.rst
+  *
+  * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
+  * Written by David Howells (dhowells@redhat.com)
+diff --git a/include/keys/asymmetric-parser.h b/include/keys/asymmetric-parser.h
+index 8a21d6a613ab..c47dc5405f79 100644
+--- a/include/keys/asymmetric-parser.h
++++ b/include/keys/asymmetric-parser.h
+@@ -1,7 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0-or-later */
+ /* Asymmetric public-key cryptography data parser
+  *
+- * See Documentation/crypto/asymmetric-keys.txt
++ * See Documentation/crypto/asymmetric-keys.rst
+  *
+  * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
+  * Written by David Howells (dhowells@redhat.com)
+diff --git a/include/keys/asymmetric-subtype.h b/include/keys/asymmetric-subtype.h
+index 21407815d9c3..d55171f640a0 100644
+--- a/include/keys/asymmetric-subtype.h
++++ b/include/keys/asymmetric-subtype.h
+@@ -1,7 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0-or-later */
+ /* Asymmetric public-key cryptography key subtype
+  *
+- * See Documentation/crypto/asymmetric-keys.txt
++ * See Documentation/crypto/asymmetric-keys.rst
+  *
+  * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
+  * Written by David Howells (dhowells@redhat.com)
+diff --git a/include/keys/asymmetric-type.h b/include/keys/asymmetric-type.h
+index 91cfd9bd9385..a29d3ff2e7e8 100644
+--- a/include/keys/asymmetric-type.h
++++ b/include/keys/asymmetric-type.h
+@@ -1,7 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0-or-later */
+ /* Asymmetric Public-key cryptography key type interface
+  *
+- * See Documentation/crypto/asymmetric-keys.txt
++ * See Documentation/crypto/asymmetric-keys.rst
+  *
+  * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
+  * Written by David Howells (dhowells@redhat.com)
 -- 
 2.26.2
 
