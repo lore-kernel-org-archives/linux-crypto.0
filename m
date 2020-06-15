@@ -2,93 +2,85 @@ Return-Path: <SRS0=gCBe=74=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C20BCC433DF
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 19:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDFFBC433DF
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 22:14:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 38338207D3
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 19:26:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="pFlyRnk7"
+	by mail.kernel.org (Postfix) with ESMTP id B6635207D4
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 22:14:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1592259242;
+	bh=6MJX5mFFHP7pSikdN6KoDa9yAVew0bZvri+xHD1+b64=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=K8AMxKhwBRX5kZqtyJemyg0c5IkClNOY/NImdl6H3R87EykulHgcC/ciTZKBMenPF
+	 v5DX3EgtGwfOD1J6lx9gx9AlU0vrXmnFbS5quBOWGuciTDlro8rQ8FPN4x6XWQ7+pg
+	 Zgi+NDp+RmUHqZedp7zrq7zl6322BdidrLFCLIFI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729354AbgFOT0D (ORCPT
+        id S1726276AbgFOWOC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jun 2020 15:26:03 -0400
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.161]:35370 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729854AbgFOT0D (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jun 2020 15:26:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1592249161;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=wrQTq2V257VK66v6YOYTmaDSMmIDbXHY8G1KxjTD23k=;
-        b=pFlyRnk7/UBHyEUCPKzLetgTlbJ5pwCwHo6PuS5n76z6Fsic6HrTU61ZQ93Lri3DeS
-        gdiB9rEX8JB8tQeylGdDwlcLwQdgvYKrDS3mMNVWIt2rAGkadzsctT4+5XeVLpuZPbR7
-        j2OVrzU30bQzV0nDaLJQouJH+e9QQP/Y1iDEGdduGhZU3WtBLMkZnbhtGjbwLMOWyGsh
-        rmlc/RXROlvGOv4tdaYAM061aij0ryyI+r2AEFZtdNvC917WFN2w88ORi1eQeaHfZdyI
-        fr5NlzlgoPaWCwBVvcEg+cmP5UCUY5OXSW6C7xXnd9lQanKgUkVYTtdsHvLHYHfpfFXU
-        Bmqg==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaJfSc9CNS"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.10.4 DYNA|AUTH)
-        with ESMTPSA id U03fedw5FJPwCLn
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Mon, 15 Jun 2020 21:25:58 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Anshuman Gupta <anshuman.gupta@intel.com>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: [Query] RSA SHA-384 signature verification
-Date:   Mon, 15 Jun 2020 21:25:58 +0200
-Message-ID: <1730161.mygNopSbl3@tauon.chronox.de>
-In-Reply-To: <20200615170413.GF14085@intel.com>
-References: <20200615170413.GF14085@intel.com>
+        Mon, 15 Jun 2020 18:14:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36696 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726044AbgFOWOB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jun 2020 18:14:01 -0400
+Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2610F20739;
+        Mon, 15 Jun 2020 22:14:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592259241;
+        bh=6MJX5mFFHP7pSikdN6KoDa9yAVew0bZvri+xHD1+b64=;
+        h=From:To:Cc:Subject:Date:From;
+        b=IfFpeueXu+3dCu3qUU+qozsvT8FIYzxZcl6tWo15jqhtdMOdreJx5J+oObyDl6wKZ
+         q8qHsQdfVGb9h9mbg6J2/N9rKazG2P9F6rPwQiZXJR0GMITCFdmCKxthOIJwHyhC0H
+         lBjwjti4uHWuzNQ6OkDTiCKaLbKRcU8c5ieSKeRE=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     netdev@vger.kernel.org
+Cc:     linux-crypto@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Steffen Klassert <steffen.klassert@secunet.com>
+Subject: [PATCH net v5 0/3] esp, ah: improve crypto algorithm selections
+Date:   Mon, 15 Jun 2020 15:13:15 -0700
+Message-Id: <20200615221318.149558-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.27.0.290.gba653c62da-goog
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Montag, 15. Juni 2020, 19:04:14 CEST schrieb Anshuman Gupta:
+This series consolidates and modernizes the lists of crypto algorithms
+that are selected by the IPsec kconfig options, and adds CRYPTO_SEQIV
+since it no longer gets selected automatically by other things.
 
-Hi Anshuman,
+See previous discussion at
+https://lkml.kernel.org/netdev/20200604192322.22142-1-ebiggers@kernel.org/T/#u
 
-> Hi ,
-> I wanted to verify a RSA SHA-384 signature.
-> I am using crypto_alloc_shash(), crypto_shash_digest() API to extract
-> the SHA-384 digest.
-> I am having public key along with the sha-384 digest extracted from raw data
-> and signature. AFAIU understand from crypto documentation that i need to
-> verify the signature by importing public key to akcipher/skcipher API.
-> Here i am not sure which cipher API to prefer symmetric key cipher or
-> asymmetric key cipher API.
-> 
-> There are two types of API to import the key.
-> crypto_skcipher_setkey()
-> crypto_akcipher_set_pub_key()
-> 
-> Also i am not sure exactly which algo to use for RSA-SHA384 signature
-> verification.
-> 
-> Any help or inputs from crypto community will highly appreciated.
+Changed v4 => v5:
+  - Rebased onto latest net/master to resolve conflict with
+    "treewide: replace '---help---' in Kconfig files with 'help'"
 
-akcipher: asymmetric key crypto
+Changed v3 => v4:
+  - Don't say that AH is "NOT RECOMMENDED" by RFC 8221.
+  - Updated commit messages (added Acked-by tags, fixed a bad Fixes tag,
+    added some more explanation to patch 3).
 
-skcipher: symmetric key crypto
-> 
-> Thanks ,
-> Anshuman Gupta.
+Eric Biggers (3):
+  esp, ah: consolidate the crypto algorithm selections
+  esp: select CRYPTO_SEQIV
+  esp, ah: modernize the crypto algorithm selections
 
+ net/ipv4/Kconfig | 34 ++++++++++++++++++----------------
+ net/ipv6/Kconfig | 34 ++++++++++++++++++----------------
+ net/xfrm/Kconfig | 24 ++++++++++++++++++++++++
+ 3 files changed, 60 insertions(+), 32 deletions(-)
 
-Ciao
-Stephan
-
+-- 
+2.27.0.290.gba653c62da-goog
 
