@@ -6,173 +6,162 @@ X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C491C433DF
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 23:18:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44471C433DF
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 23:52:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 024B32074D
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 23:18:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2714B20714
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 23:52:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592263099;
-	bh=0lMLIkwl4w9/dfCEn9YTRLlXZ3qDJdU/d1GLx5TaHD4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=Bldhqq2YOjFTzYT1yz0ikbgxw5uypDHxGAELf9VvZpdyPqMYwOspxYzXovaShT8tv
-	 tiDwyyIPxyk6PVa8e/dFTleLSCOMGu/xFnf3QL0+LxSfsT6as1Hs7IaeMBZQWvosN1
-	 0LVeEVxMXmtnJQZECtZt1gztPgqs4TMghSqrCE3w=
+	s=default; t=1592265141;
+	bh=LAqX2guWt3SaWaTtIVptXEHktenJg7iaeDhOq75EGOc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:List-ID:From;
+	b=Ey5KGfObbq+p4A/+mcoPF0gquVv674ehx3+2sElgtWyWf1WZGKXFlHiuHUDzmKk9Q
+	 /aoXvHHtLXNVyGQlt09oYvBvZVZi1iel6UkQmngdXljtFrnyovXbsOV3uCznDSkF2T
+	 c3/lEY5ADBJQ1m3kRSBhf5eVUqhPV1sPz9FbdZ74=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726545AbgFOXSS (ORCPT
+        id S1726313AbgFOXwU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jun 2020 19:18:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39694 "EHLO mail.kernel.org"
+        Mon, 15 Jun 2020 19:52:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60958 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726452AbgFOXSQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jun 2020 19:18:16 -0400
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1725960AbgFOXwU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jun 2020 19:52:20 -0400
+Received: from localhost (mobile-166-170-222-206.mycingular.net [166.170.222.206])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4DCB32074D
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Jun 2020 23:18:15 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E6A7B2068E;
+        Mon, 15 Jun 2020 23:52:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592263095;
-        bh=0lMLIkwl4w9/dfCEn9YTRLlXZ3qDJdU/d1GLx5TaHD4=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=J8Eez3hNczkDFZt6sGTADbngomRfSk42P8tmSJ37/Z+8ixLYL7lz9VpkqxtFshUGl
-         DhDLSIi7Jzlu1lfSzPqNhHXyZMQTc3elLxsEDLPbnQRnUgukDEiiwoaqODvcrIqNRr
-         5/4bKc/rX8on0uPhgRoyznPqhXdOtAvpDuNIU4iM=
-Received: by mail-ot1-f43.google.com with SMTP id e5so14487688ote.11
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Jun 2020 16:18:15 -0700 (PDT)
-X-Gm-Message-State: AOAM530JGeJUACD6RKIe2WpPXRemF0E+SOTyjOFFyC3s6/rBKID/y/7R
-        oLbgo8iqDvzJZnW3UExoQmZlfkOcGQDaCdlzUPE=
-X-Google-Smtp-Source: ABdhPJz8VeBWh1W/iD20tHbET+xJZn0zhQ99dDqUxRvpW+FF5bGoFLVHv6i4KjWq/9i2MOOkB5xPqsuwAM4ccz2zrco=
-X-Received: by 2002:a9d:42e:: with SMTP id 43mr317576otc.108.1592263094627;
- Mon, 15 Jun 2020 16:18:14 -0700 (PDT)
+        s=default; t=1592265139;
+        bh=LAqX2guWt3SaWaTtIVptXEHktenJg7iaeDhOq75EGOc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=g2QUd2ngXMfEz2LsTipBItohXSvpmTBaOTiRrZKoSwAIbpdN01pkaTau0u7EATsXD
+         1j1XCGLhCbt/rateSDFiTc7BcQViqtV3HMRlLm5J3nOOqe69N1HGAm870H7wKJjki0
+         S+aXFOYX7SF+nnBPJxZUEPmc9FAaD8Y6tEO8/hiU=
+Date:   Mon, 15 Jun 2020 18:52:17 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Zhangfei Gao <zhangfei.gao@linaro.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Joerg Roedel <joro@8bytes.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Hanjun Guo <guohanjun@huawei.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>,
+        jean-philippe <jean-philippe@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "open list:IOMMU DRIVERS" <iommu@lists.linux-foundation.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-pci <linux-pci@vger.kernel.org>,
+        Thanu Rangarajan <Thanu.Rangarajan@arm.com>,
+        Souvik Chakravarty <Souvik.Chakravarty@arm.com>
+Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
+Message-ID: <20200615235217.GA1921846@bjorn-Precision-5520>
 MIME-Version: 1.0
-References: <20200612120643.GA15724@gondor.apana.org.au> <E1jjiTA-0005BO-9n@fornost.hmeau.com>
- <1688262.LSb4nGpegl@tauon.chronox.de> <20200612121651.GA15849@gondor.apana.org.au>
- <20200612122105.GA18892@gondor.apana.org.au> <CAMj1kXGg25JL7WCrspMwB1PVPX6vx-rOCesg08a_Fy26_ET7Sg@mail.gmail.com>
- <20200615073024.GA27015@gondor.apana.org.au> <CAMj1kXHQNHh4PTLmGKaL+sSyuU1AS4u5F=OyjV6XuAaD21e6yg@mail.gmail.com>
- <20200615185028.GB85413@gmail.com>
-In-Reply-To: <20200615185028.GB85413@gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 16 Jun 2020 01:18:03 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFJj_X2WZ_ru5j2xC4fspdH_dnwxodSF-YF5FB+gYvk1w@mail.gmail.com>
-Message-ID: <CAMj1kXFJj_X2WZ_ru5j2xC4fspdH_dnwxodSF-YF5FB+gYvk1w@mail.gmail.com>
-Subject: Re: [v2 PATCH 0/3] crypto: skcipher - Add support for no chaining and
- partial chaining
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Stephan Mueller <smueller@chronox.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8f9f6a77-4a65-afeb-0af9-e4868b52d7ce@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 15 Jun 2020 at 20:50, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Mon, Jun 15, 2020 at 09:50:50AM +0200, Ard Biesheuvel wrote:
-> > On Mon, 15 Jun 2020 at 09:30, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > >
-> > > On Fri, Jun 12, 2020 at 06:10:57PM +0200, Ard Biesheuvel wrote:
-> > > >
-> > > > First of all, the default fcsize for all existing XTS implementations
-> > > > should be -1 as well, given that chaining is currently not supported
-> > > > at all at the sckipher interface layer for any of them (due to the
-> > > > fact that the IV gets encrypted with a different key at the start of
-> > >
-> > > Sure.  I was just too lazy to actually set the -1 everywhere.  I'll
-> > > try to do that before I repost again.
-> > >
-> >
-> > Fair enough
-> >
-> > > > the operation). This also means it is going to be rather tricky to
-> > > > implement for h/w accelerated XTS implementations, and it seems to me
-> > > > that the only way to deal with this is to decrypt the IV in software
-> > > > before chaining the next operation, which is rather horrid and needs
-> > > > to be implemented by all of them.
-> > >
-> > > I don't think we should support chaining for XTS at all so I don't
-> > > see why we need to worry about the hardware accelerated XTS code.
-> > >
-> >
-> > I would prefer that. But if it is fine to disallow chaining altogether
-> > for XTS, why can't we do the same for cbc-cts? In both cases, user
-> > space cannot be relying on it today, since the output is incorrect,
-> > even for inputs that are a round multiple of the block size but are
-> > broken up and chained.
-> >
-> > > > Given that
-> > > >
-> > > > a) this is wholly an AF_ALG issue, as there are no in-kernel users
-> > > > currently suffering from this afaik,
-> > > > b) using AF_ALG to get access to software implementations is rather
-> > > > pointless in general, given that userspace can simply issue the same
-> > > > instructions directly
-> > > > c) fixing all XTS and CTS implementation on all arches and all
-> > > > accelerators is not a small task
-> > > >
-> > > > wouldn't it be better to special case XTS and CBC-CTS in
-> > > > algif_skcipher instead, rather than polluting the skipcher API this
-> > > > way?
-> > >
-> > > As I said we need to be able to differentiate between the ones
-> > > that can chain vs. the ones that can't.  Putting this knowledge
-> > > directly into algif_skcipher is just too horrid.
-> > >
-> >
-> > No disagreement on the horrid. But polluting the API for an issue that
-> > only affects AF_ALG, which can't possibly be working as expected right
-> > now is not a great thing either.
-> >
-> > > The alternative is to add this marker into the algorithms.  My
-> > > point was that if you're going to do that you might as well go
-> > > a step further and allow cts to chain as it is so straightforward.
-> > >
-> >
-> > Given the fact that algos that require chaining are broken today and
-> > nobody noticed until Stephan started relying on the skcipher request
-> > object's IV field magically retaining its value on subsequent reuse, I
-> > would prefer it if we could simply mark all of them as non-chainable
-> > and be done with it. (Note that Stephan's case was invalid to begin
-> > with)
->
-> Wouldn't it make a lot more sense to make skcipher algorithms non-chainable by
-> default, and only opt-in the ones where chaining is actually working?  At the
-> moment we only test iv_out for CBC and CTR, so we can expect that all the others
-> are broken.
->
+On Sat, Jun 13, 2020 at 10:30:56PM +0800, Zhangfei Gao wrote:
+> On 2020/6/11 下午9:44, Bjorn Helgaas wrote:
+> > +++ b/drivers/iommu/iommu.c
+> > > > > > > > > > @@ -2418,6 +2418,10 @@ int iommu_fwspec_init(struct device *dev, struct
+> > > > > > > > > > fwnode_handle *iommu_fwnode,
+> > > > > > > > > >             fwspec->iommu_fwnode = iommu_fwnode;
+> > > > > > > > > >             fwspec->ops = ops;
+> > > > > > > > > >             dev_iommu_fwspec_set(dev, fwspec);
+> > > > > > > > > > +
+> > > > > > > > > > +       if (dev_is_pci(dev))
+> > > > > > > > > > +               pci_fixup_device(pci_fixup_final, to_pci_dev(dev));
+> > > > > > > > > > +
+> > > > > > > > > > 
+> > > > > > > > > > Then pci_fixup_final will be called twice, the first in pci_bus_add_device.
+> > > > > > > > > > Here in iommu_fwspec_init is the second time, specifically for iommu_fwspec.
+> > > > > > > > > > Will send this when 5.8-rc1 is open.
+> > > > > > > > > Wait, this whole fixup approach seems wrong to me.  No matter how you
+> > > > > > > > > do the fixup, it's still a fixup, which means it requires ongoing
+> > > > > > > > > maintenance.  Surely we don't want to have to add the Vendor/Device ID
+> > > > > > > > > for every new AMBA device that comes along, do we?
+> > > > > > > > > 
+> > > > > > > > Here the fake pci device has standard PCI cfg space, but physical
+> > > > > > > > implementation is base on AMBA
+> > > > > > > > They can provide pasid feature.
+> > > > > > > > However,
+> > > > > > > > 1, does not support tlp since they are not real pci devices.
+> > > > > > > > 2. does not support pri, instead support stall (provided by smmu)
+> > > > > > > > And stall is not a pci feature, so it is not described in struct pci_dev,
+> > > > > > > > but in struct iommu_fwspec.
+> > > > > > > > So we use this fixup to tell pci system that the devices can support stall,
+> > > > > > > > and hereby support pasid.
+> > > > > > > This did not answer my question.  Are you proposing that we update a
+> > > > > > > quirk every time a new AMBA device is released?  I don't think that
+> > > > > > > would be a good model.
+> > > > > > Yes, you are right, but we do not have any better idea yet.
+> > > > > > Currently we have three fake pci devices, which support stall and pasid.
+> > > > > > We have to let pci system know the device can support pasid, because of
+> > > > > > stall feature, though not support pri.
+> > > > > > Do you have any other ideas?
+> > > > > It sounds like the best way would be to allocate a PCI capability for it, so
+> > > > > detection can be done through config space, at least in future devices,
+> > > > > or possibly after a firmware update if the config space in your system
+> > > > > is controlled by firmware somewhere.  Once there is a proper mechanism
+> > > > > to do this, using fixups to detect the early devices that don't use that
+> > > > > should be uncontroversial. I have no idea what the process or timeline
+> > > > > is to add new capabilities into the PCIe specification, or if this one
+> > > > > would be acceptable to the PCI SIG at all.
+> > > > That sounds like a possibility.  The spec already defines a
+> > > > Vendor-Specific Extended Capability (PCIe r5.0, sec 7.9.5) that might
+> > > > be a candidate.
+> > > Will investigate this, thanks Bjorn
+> > FWIW, there's also a Vendor-Specific Capability that can appear in the
+> > first 256 bytes of config space (the Vendor-Specific Extended
+> > Capability must appear in the "Extended Configuration Space" from
+> > 0x100-0xfff).
+> Unfortunately our silicon does not have either Vendor-Specific Capability or
+> Vendor-Specific Extended Capability.
+> 
+> Studied commit 8531e283bee66050734fb0e89d53e85fd5ce24a4
+> Looks this method requires adding member (like can_stall) to struct pci_dev,
+> looks difficult.
 
-Agreed. But there is a difference, though. XTS and CBC-CTS are
-guaranteed not to be used in a chaining manner today, given that there
-is no possible way you could get the right output for a AF_ALG request
-that has been split into several skcipher requests: XTS has the IV
-encryption that occurs only once, and CBC-CTS has the unconditional
-swapping of the last two blocks, which occurs even if the output is a
-whole multiple of the block size. Doing either of these more than once
-will necessarily result in corrupt output.
+The problem is that we don't want to add device IDs every time a new
+chip comes out.  Adding one or two device IDs for silicon that's
+already released is not a problem as long as you have a strategy for
+*future* devices so they don't require a quirk.
 
-For cases where chaining is more straight-forward, we may have users
-that we are unaware of, so it is trickier. But that only means that we
-may need to require iv_out support for other modes than CBC and CTR,
-not that we need to add complexity like this series is doing.
+> > > > > If detection cannot be done through PCI config space, the next best
+> > > > > alternative is to pass auxiliary data through firmware. On DT based
+> > > > > machines, you can list non-hotpluggable PCIe devices and add custom
+> > > > > properties that could be read during device enumeration. I assume
+> > > > > ACPI has something similar, but I have not done that.
+> > > Yes, thanks Arnd
+> > > > ACPI has _DSM (ACPI v6.3, sec 9.1.1), which might be a candidate.  I
+> > > > like this better than a PCI capability because the property you need
+> > > > to expose is not a PCI property.
+> > > _DSM may not workable, since it is working in runtime.
+> > > We need stall information in init stage, neither too early (after allocation
+> > > of iommu_fwspec)
+> > > nor too late (before arm_smmu_add_device ).
+> > I'm not aware of a restriction on when _DSM can be evaluated.  I'm
+> > looking at ACPI v6.3, sec 9.1.1.  Are you seeing something different?
+> DSM method seems requires vendor specific guid, and code would be vendor
+> specific.
 
-For now, I would prefer to simply introduce a 'permits chaining' flag
-that only gets set for CBC and CTR, and without any special handling
-to support chaining for modes where doing so is non-trivial and known
-to be broken and thus unused anyway. algif_skcipher can then attempt
-to allocate the skcipher with the 'permits chaining' flag, and fall
-back to allocating without, and deal with the difference accordingly.
-Then, we can start adding support for this where necessary, i.e.,
-start with any generic skcipher templates that are needed for chaining
-support, and add support to other implementations gradually. We should
-also start adding iv_out test cases and conditionalize the test on
-whether the skcipher has the 'permits chaining' flag set.
+_DSM indeed requires a vendor-specific UUID, precisely *because*
+vendors are free to define their own functionality without requiring
+changes to the ACPI spec.  From the spec (ACPI v6.3, sec 9.1.1):
 
-
-> Note that wide-block modes such as Adiantum don't support chaining either.
->
-> Also, please use a better name than "fcsize".
->
-
-I don't think we need this at all.
+  New UUIDs may also be created by OEMs and IHVs for custom devices
+  and other interface or device governing bodies (e.g. the PCI SIG),
+  as long as the UUID is different from other published UUIDs.
