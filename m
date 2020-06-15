@@ -2,147 +2,142 @@ Return-Path: <SRS0=gCBe=74=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82873C433DF
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 18:40:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FED8C433DF
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 18:50:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B154207DD
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 18:40:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qdmw/PJx"
+	by mail.kernel.org (Postfix) with ESMTP id 2FCA520768
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 18:50:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1592247031;
+	bh=5VZ0RoELgjwUgUVHWg+4fR0DHRJwgkMCxoNNz9kAxZI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=MfpoNjlLEz0Pd5FS0qL1vmAsQZ2tHzu0o0Di4bpF+/nyT3QDB85tIftT//b7kSKLg
+	 tEmddO2qiH70NhP4c7euyvq2WvOkjULZ7wblkrHe8IQhBRcP6di++hm1fpxe6/HQUG
+	 PxOqVt58+a3jjcuBP4oE1sOXrUW6rig2EEXZR8+4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731393AbgFOSkh (ORCPT
+        id S1729842AbgFOSua (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jun 2020 14:40:37 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42100 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731365AbgFOSkg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jun 2020 14:40:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592246435;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3LdVapGy9WTsAkwpfNEzCTfQe3Pij8/lM5ySXZsHExs=;
-        b=Qdmw/PJxLK31/rKmKgWbE5yAY+4i+gsfVEBtEc5ToE9B/FlegLfNgeLIEfjWVedKb+Y3z+
-        Ycm1/NjjL9Q+v0I8qj/IlOhBg48Vph4+42maRH5yobUN7AM1PVkzEfbgROmMIUaUwRj4yL
-        DHGm6MQRL2VNnBptPlwJW/1yX6HdQV8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-513-n3G_ZfGUONug8wkjJytxqA-1; Mon, 15 Jun 2020 14:40:12 -0400
-X-MC-Unique: n3G_ZfGUONug8wkjJytxqA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Mon, 15 Jun 2020 14:50:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58646 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729354AbgFOSua (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jun 2020 14:50:30 -0400
+Received: from gmail.com (unknown [104.132.1.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5F43184D144;
-        Mon, 15 Jun 2020 18:40:06 +0000 (UTC)
-Received: from llong.remote.csb (ovpn-117-41.rdu2.redhat.com [10.10.117.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3972B5D9CC;
-        Mon, 15 Jun 2020 18:40:00 +0000 (UTC)
-Subject: Re: [PATCH 1/2] mm, treewide: Rename kzfree() to kfree_sensitive()
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Joe Perches <joe@perches.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        David Rientjes <rientjes@google.com>,
-        samba-technical@lists.samba.org,
-        virtualization@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-sctp@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        devel@driverdev.osuosl.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org, x86@kernel.org,
-        kasan-dev@googlegroups.com, cocci@systeme.lip6.fr,
-        linux-wpan@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
-        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-mediatek@lists.infradead.org,
-        linux-amlogic@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-cifs@vger.kernel.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, wireguard@lists.zx2c4.com,
-        linux-ppp@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-btrfs@vger.kernel.org
-References: <20200413211550.8307-1-longman@redhat.com>
- <20200413211550.8307-2-longman@redhat.com> <20200615180753.GJ4151@kadam>
-From:   Waiman Long <longman@redhat.com>
-Organization: Red Hat
-Message-ID: <9d084be2-29a3-7757-9386-20dbaeb5fc24@redhat.com>
-Date:   Mon, 15 Jun 2020 14:39:59 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        by mail.kernel.org (Postfix) with ESMTPSA id 76946206DB;
+        Mon, 15 Jun 2020 18:50:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592247029;
+        bh=5VZ0RoELgjwUgUVHWg+4fR0DHRJwgkMCxoNNz9kAxZI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NCoD7D+oIwa8SzF95oF3jRHXOLotDA+aAhfww08vEeM77OEZLYZn6pHHfSTUIdCHr
+         3RYXDnH0L5aWNVauy/cFbxaRXx7QEpCBMVpfHlCMdQK0vHotXtI+UU4t8EO4TvPmG3
+         0hI1Gx1lqIPIKNM0KMrGBpGFKB378EQ2H3UskojM=
+Date:   Mon, 15 Jun 2020 11:50:28 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephan Mueller <smueller@chronox.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [v2 PATCH 0/3] crypto: skcipher - Add support for no chaining
+ and partial chaining
+Message-ID: <20200615185028.GB85413@gmail.com>
+References: <20200612120643.GA15724@gondor.apana.org.au>
+ <E1jjiTA-0005BO-9n@fornost.hmeau.com>
+ <1688262.LSb4nGpegl@tauon.chronox.de>
+ <20200612121651.GA15849@gondor.apana.org.au>
+ <20200612122105.GA18892@gondor.apana.org.au>
+ <CAMj1kXGg25JL7WCrspMwB1PVPX6vx-rOCesg08a_Fy26_ET7Sg@mail.gmail.com>
+ <20200615073024.GA27015@gondor.apana.org.au>
+ <CAMj1kXHQNHh4PTLmGKaL+sSyuU1AS4u5F=OyjV6XuAaD21e6yg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200615180753.GJ4151@kadam>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXHQNHh4PTLmGKaL+sSyuU1AS4u5F=OyjV6XuAaD21e6yg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/15/20 2:07 PM, Dan Carpenter wrote:
-> On Mon, Apr 13, 2020 at 05:15:49PM -0400, Waiman Long wrote:
->> diff --git a/mm/slab_common.c b/mm/slab_common.c
->> index 23c7500eea7d..c08bc7eb20bd 100644
->> --- a/mm/slab_common.c
->> +++ b/mm/slab_common.c
->> @@ -1707,17 +1707,17 @@ void *krealloc(const void *p, size_t new_size, gfp_t flags)
->>   EXPORT_SYMBOL(krealloc);
->>   
->>   /**
->> - * kzfree - like kfree but zero memory
->> + * kfree_sensitive - Clear sensitive information in memory before freeing
->>    * @p: object to free memory of
->>    *
->>    * The memory of the object @p points to is zeroed before freed.
->> - * If @p is %NULL, kzfree() does nothing.
->> + * If @p is %NULL, kfree_sensitive() does nothing.
->>    *
->>    * Note: this function zeroes the whole allocated buffer which can be a good
->>    * deal bigger than the requested buffer size passed to kmalloc(). So be
->>    * careful when using this function in performance sensitive code.
->>    */
->> -void kzfree(const void *p)
->> +void kfree_sensitive(const void *p)
->>   {
->>   	size_t ks;
->>   	void *mem = (void *)p;
->> @@ -1725,10 +1725,10 @@ void kzfree(const void *p)
->>   	if (unlikely(ZERO_OR_NULL_PTR(mem)))
->>   		return;
->>   	ks = ksize(mem);
->> -	memset(mem, 0, ks);
->> +	memzero_explicit(mem, ks);
->          ^^^^^^^^^^^^^^^^^^^^^^^^^
-> This is an unrelated bug fix.  It really needs to be pulled into a
-> separate patch by itself and back ported to stable kernels.
->
->>   	kfree(mem);
->>   }
->> -EXPORT_SYMBOL(kzfree);
->> +EXPORT_SYMBOL(kfree_sensitive);
->>   
->>   /**
->>    * ksize - get the actual amount of memory allocated for a given object
-> regards,
-> dan carpenter
->
-Thanks for the suggestion. I will break it out and post a version soon.
+On Mon, Jun 15, 2020 at 09:50:50AM +0200, Ard Biesheuvel wrote:
+> On Mon, 15 Jun 2020 at 09:30, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> >
+> > On Fri, Jun 12, 2020 at 06:10:57PM +0200, Ard Biesheuvel wrote:
+> > >
+> > > First of all, the default fcsize for all existing XTS implementations
+> > > should be -1 as well, given that chaining is currently not supported
+> > > at all at the sckipher interface layer for any of them (due to the
+> > > fact that the IV gets encrypted with a different key at the start of
+> >
+> > Sure.  I was just too lazy to actually set the -1 everywhere.  I'll
+> > try to do that before I repost again.
+> >
+> 
+> Fair enough
+> 
+> > > the operation). This also means it is going to be rather tricky to
+> > > implement for h/w accelerated XTS implementations, and it seems to me
+> > > that the only way to deal with this is to decrypt the IV in software
+> > > before chaining the next operation, which is rather horrid and needs
+> > > to be implemented by all of them.
+> >
+> > I don't think we should support chaining for XTS at all so I don't
+> > see why we need to worry about the hardware accelerated XTS code.
+> >
+> 
+> I would prefer that. But if it is fine to disallow chaining altogether
+> for XTS, why can't we do the same for cbc-cts? In both cases, user
+> space cannot be relying on it today, since the output is incorrect,
+> even for inputs that are a round multiple of the block size but are
+> broken up and chained.
+> 
+> > > Given that
+> > >
+> > > a) this is wholly an AF_ALG issue, as there are no in-kernel users
+> > > currently suffering from this afaik,
+> > > b) using AF_ALG to get access to software implementations is rather
+> > > pointless in general, given that userspace can simply issue the same
+> > > instructions directly
+> > > c) fixing all XTS and CTS implementation on all arches and all
+> > > accelerators is not a small task
+> > >
+> > > wouldn't it be better to special case XTS and CBC-CTS in
+> > > algif_skcipher instead, rather than polluting the skipcher API this
+> > > way?
+> >
+> > As I said we need to be able to differentiate between the ones
+> > that can chain vs. the ones that can't.  Putting this knowledge
+> > directly into algif_skcipher is just too horrid.
+> >
+> 
+> No disagreement on the horrid. But polluting the API for an issue that
+> only affects AF_ALG, which can't possibly be working as expected right
+> now is not a great thing either.
+> 
+> > The alternative is to add this marker into the algorithms.  My
+> > point was that if you're going to do that you might as well go
+> > a step further and allow cts to chain as it is so straightforward.
+> >
+> 
+> Given the fact that algos that require chaining are broken today and
+> nobody noticed until Stephan started relying on the skcipher request
+> object's IV field magically retaining its value on subsequent reuse, I
+> would prefer it if we could simply mark all of them as non-chainable
+> and be done with it. (Note that Stephan's case was invalid to begin
+> with)
 
-Cheers,
-Longman
+Wouldn't it make a lot more sense to make skcipher algorithms non-chainable by
+default, and only opt-in the ones where chaining is actually working?  At the
+moment we only test iv_out for CBC and CTR, so we can expect that all the others
+are broken.
 
+Note that wide-block modes such as Adiantum don't support chaining either.
+
+Also, please use a better name than "fcsize".
+
+- Eric
