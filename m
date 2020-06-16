@@ -2,227 +2,181 @@ Return-Path: <SRS0=4Aj0=75=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F10A5C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 16:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2CDEC433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 16:20:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CCC042071A
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 16:12:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kr0cwc+H"
+	by mail.kernel.org (Postfix) with ESMTP id 876A9214F1
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 16:20:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1592324412;
+	bh=nlJdig9ZgoQ+1epDga6Pnedfd5LFOzlP0peHjt3qs3c=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=iexYgU7B0KHiDI5sq6l58vZAB3+/kqVVqPGEAgEuR7wHWO1pBTjJbckocrhDGgp69
+	 M9Ln0SmYBYBo7cGKjEZOKECkyzxQiwptF+J5jOoLgmM3nbpDUA11ALFUBlpQ5O6mxM
+	 1+8mdB6BNtheM49+vV+o0UpMJiGsWZ+eoR1DbotU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731285AbgFPQMQ (ORCPT
+        id S1730055AbgFPPgs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Jun 2020 12:12:16 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37937 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731870AbgFPPn6 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Jun 2020 11:43:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592322235;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=n2vgEtySMMJw+Y6/Iz7yVj4GHK2o/g3YD4HMOMKMGxw=;
-        b=Kr0cwc+HRVHnmnKsYYV3UqzW3PHTGjd/Qb4fvvXrY9gxrA+fC4zPWzeE+63uGE7zkOtHoK
-        GfgiIfEKFyYdyuToX7/lqNCnV935c+cFQyZ7ZlZ2ZbVwnemwqwS/BOZQ2ttPGADs80G1Lz
-        Xl+sF7Gm/o42WUYge8t/5umo2Zca46c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-iVwDnxGCNeS1_dm-BMJ-EQ-1; Tue, 16 Jun 2020 11:43:51 -0400
-X-MC-Unique: iVwDnxGCNeS1_dm-BMJ-EQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Tue, 16 Jun 2020 11:36:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47750 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730027AbgFPPgr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Jun 2020 11:36:47 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A261EC1A2;
-        Tue, 16 Jun 2020 15:43:45 +0000 (UTC)
-Received: from llong.com (ovpn-114-156.rdu2.redhat.com [10.10.114.156])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 68C6460C47;
-        Tue, 16 Jun 2020 15:43:37 +0000 (UTC)
-From:   Waiman Long <longman@redhat.com>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Joe Perches <joe@perches.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        David Rientjes <rientjes@google.com>
-Cc:     Michal Hocko <mhocko@suse.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-amlogic@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
-        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        ecryptfs@vger.kernel.org, kasan-dev@googlegroups.com,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-sctp@vger.kernel.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org, Waiman Long <longman@redhat.com>
-Subject: [PATCH v5 0/2] mm, treewide: Rename kzfree() to kfree_sensitive()
-Date:   Tue, 16 Jun 2020 11:43:09 -0400
-Message-Id: <20200616154311.12314-1-longman@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+        by mail.kernel.org (Postfix) with ESMTPSA id 9CA7220E65;
+        Tue, 16 Jun 2020 15:36:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592321806;
+        bh=nlJdig9ZgoQ+1epDga6Pnedfd5LFOzlP0peHjt3qs3c=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=SBIdnB2BJOTRKy547WtHybe+ZWYDojnbycnoLtHdKWMybOgf2ikAyaMNu8Ivpg7hu
+         iCQyyyPtqizRWciJDwJavGjiBIV3eUQcN+bDjnhku09vgzDWJMV8n5o0n9LU437XMf
+         /wPax7EFoNCweItY7Zr22fYMzLZYlRU5ECEPGJqc=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.4 023/134] padata: add separate cpuhp node for CPUHP_PADATA_DEAD
+Date:   Tue, 16 Jun 2020 17:33:27 +0200
+Message-Id: <20200616153101.847913241@linuxfoundation.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200616153100.633279950@linuxfoundation.org>
+References: <20200616153100.633279950@linuxfoundation.org>
+User-Agent: quilt/0.66
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
- v5:
-  - Break the btrfs patch out as a separate patch to be processed
-    independently.
-  - Update the commit log of patch 1 to make it less scary.
-  - Add a kzfree backward compatibility macro in patch 2.
+From: Daniel Jordan <daniel.m.jordan@oracle.com>
 
- v4:
-  - Break out the memzero_explicit() change as suggested by Dan Carpenter
-    so that it can be backported to stable.
-  - Drop the "crypto: Remove unnecessary memzero_explicit()" patch for
-    now as there can be a bit more discussion on what is best. It will be
-    introduced as a separate patch later on after this one is merged.
+[ Upstream commit 3c2214b6027ff37945799de717c417212e1a8c54 ]
 
-This patchset makes a global rename of the kzfree() to kfree_sensitive()
-to highlight the fact buffer clearing is only needed if the data objects
-contain sensitive information like encrpytion key. The fact that kzfree()
-uses memset() to do the clearing isn't totally safe either as compiler
-may compile out the clearing in their optimizer especially if LTO is
-used. Instead, the new kfree_sensitive() uses memzero_explicit() which
-won't get compiled out.
+Removing the pcrypt module triggers this:
 
+  general protection fault, probably for non-canonical
+    address 0xdead000000000122
+  CPU: 5 PID: 264 Comm: modprobe Not tainted 5.6.0+ #2
+  Hardware name: QEMU Standard PC
+  RIP: 0010:__cpuhp_state_remove_instance+0xcc/0x120
+  Call Trace:
+   padata_sysfs_release+0x74/0xce
+   kobject_put+0x81/0xd0
+   padata_free+0x12/0x20
+   pcrypt_exit+0x43/0x8ee [pcrypt]
 
-Waiman Long (2):
-  mm/slab: Use memzero_explicit() in kzfree()
-  mm, treewide: Rename kzfree() to kfree_sensitive()
+padata instances wrongly use the same hlist node for the online and dead
+states, so __padata_free()'s second cpuhp remove call chokes on the node
+that the first poisoned.
 
- arch/s390/crypto/prng.c                       |  4 +--
- arch/x86/power/hibernate.c                    |  2 +-
- crypto/adiantum.c                             |  2 +-
- crypto/ahash.c                                |  4 +--
- crypto/api.c                                  |  2 +-
- crypto/asymmetric_keys/verify_pefile.c        |  4 +--
- crypto/deflate.c                              |  2 +-
- crypto/drbg.c                                 | 10 +++---
- crypto/ecc.c                                  |  8 ++---
- crypto/ecdh.c                                 |  2 +-
- crypto/gcm.c                                  |  2 +-
- crypto/gf128mul.c                             |  4 +--
- crypto/jitterentropy-kcapi.c                  |  2 +-
- crypto/rng.c                                  |  2 +-
- crypto/rsa-pkcs1pad.c                         |  6 ++--
- crypto/seqiv.c                                |  2 +-
- crypto/shash.c                                |  2 +-
- crypto/skcipher.c                             |  2 +-
- crypto/testmgr.c                              |  6 ++--
- crypto/zstd.c                                 |  2 +-
- .../allwinner/sun8i-ce/sun8i-ce-cipher.c      |  2 +-
- .../allwinner/sun8i-ss/sun8i-ss-cipher.c      |  2 +-
- drivers/crypto/amlogic/amlogic-gxl-cipher.c   |  4 +--
- drivers/crypto/atmel-ecc.c                    |  2 +-
- drivers/crypto/caam/caampkc.c                 | 28 +++++++--------
- drivers/crypto/cavium/cpt/cptvf_main.c        |  6 ++--
- drivers/crypto/cavium/cpt/cptvf_reqmanager.c  | 12 +++----
- drivers/crypto/cavium/nitrox/nitrox_lib.c     |  4 +--
- drivers/crypto/cavium/zip/zip_crypto.c        |  6 ++--
- drivers/crypto/ccp/ccp-crypto-rsa.c           |  6 ++--
- drivers/crypto/ccree/cc_aead.c                |  4 +--
- drivers/crypto/ccree/cc_buffer_mgr.c          |  4 +--
- drivers/crypto/ccree/cc_cipher.c              |  6 ++--
- drivers/crypto/ccree/cc_hash.c                |  8 ++---
- drivers/crypto/ccree/cc_request_mgr.c         |  2 +-
- drivers/crypto/marvell/cesa/hash.c            |  2 +-
- .../crypto/marvell/octeontx/otx_cptvf_main.c  |  6 ++--
- .../marvell/octeontx/otx_cptvf_reqmgr.h       |  2 +-
- drivers/crypto/mediatek/mtk-aes.c             |  2 +-
- drivers/crypto/nx/nx.c                        |  4 +--
- drivers/crypto/virtio/virtio_crypto_algs.c    | 12 +++----
- drivers/crypto/virtio/virtio_crypto_core.c    |  2 +-
- drivers/md/dm-crypt.c                         | 32 ++++++++---------
- drivers/md/dm-integrity.c                     |  6 ++--
- drivers/misc/ibmvmc.c                         |  6 ++--
- .../hisilicon/hns3/hns3pf/hclge_mbx.c         |  2 +-
- .../net/ethernet/intel/ixgbe/ixgbe_ipsec.c    |  6 ++--
- drivers/net/ppp/ppp_mppe.c                    |  6 ++--
- drivers/net/wireguard/noise.c                 |  4 +--
- drivers/net/wireguard/peer.c                  |  2 +-
- drivers/net/wireless/intel/iwlwifi/pcie/rx.c  |  2 +-
- .../net/wireless/intel/iwlwifi/pcie/tx-gen2.c |  6 ++--
- drivers/net/wireless/intel/iwlwifi/pcie/tx.c  |  6 ++--
- drivers/net/wireless/intersil/orinoco/wext.c  |  4 +--
- drivers/s390/crypto/ap_bus.h                  |  4 +--
- drivers/staging/ks7010/ks_hostif.c            |  2 +-
- drivers/staging/rtl8723bs/core/rtw_security.c |  2 +-
- drivers/staging/wlan-ng/p80211netdev.c        |  2 +-
- drivers/target/iscsi/iscsi_target_auth.c      |  2 +-
- fs/cifs/cifsencrypt.c                         |  2 +-
- fs/cifs/connect.c                             | 10 +++---
- fs/cifs/dfs_cache.c                           |  2 +-
- fs/cifs/misc.c                                |  8 ++---
- fs/crypto/keyring.c                           |  6 ++--
- fs/crypto/keysetup_v1.c                       |  4 +--
- fs/ecryptfs/keystore.c                        |  4 +--
- fs/ecryptfs/messaging.c                       |  2 +-
- include/crypto/aead.h                         |  2 +-
- include/crypto/akcipher.h                     |  2 +-
- include/crypto/gf128mul.h                     |  2 +-
- include/crypto/hash.h                         |  2 +-
- include/crypto/internal/acompress.h           |  2 +-
- include/crypto/kpp.h                          |  2 +-
- include/crypto/skcipher.h                     |  2 +-
- include/linux/slab.h                          |  4 ++-
- lib/mpi/mpiutil.c                             |  6 ++--
- lib/test_kasan.c                              |  6 ++--
- mm/slab_common.c                              | 10 +++---
- net/atm/mpoa_caches.c                         |  4 +--
- net/bluetooth/ecdh_helper.c                   |  6 ++--
- net/bluetooth/smp.c                           | 24 ++++++-------
- net/core/sock.c                               |  2 +-
- net/ipv4/tcp_fastopen.c                       |  2 +-
- net/mac80211/aead_api.c                       |  4 +--
- net/mac80211/aes_gmac.c                       |  2 +-
- net/mac80211/key.c                            |  2 +-
- net/mac802154/llsec.c                         | 20 +++++------
- net/sctp/auth.c                               |  2 +-
- net/sctp/socket.c                             |  2 +-
- net/sunrpc/auth_gss/gss_krb5_crypto.c         |  4 +--
- net/sunrpc/auth_gss/gss_krb5_keys.c           |  6 ++--
- net/sunrpc/auth_gss/gss_krb5_mech.c           |  2 +-
- net/tipc/crypto.c                             | 10 +++---
- net/wireless/core.c                           |  2 +-
- net/wireless/ibss.c                           |  4 +--
- net/wireless/lib80211_crypt_tkip.c            |  2 +-
- net/wireless/lib80211_crypt_wep.c             |  2 +-
- net/wireless/nl80211.c                        | 24 ++++++-------
- net/wireless/sme.c                            |  6 ++--
- net/wireless/util.c                           |  2 +-
- net/wireless/wext-sme.c                       |  2 +-
- scripts/coccinelle/free/devm_free.cocci       |  4 +--
- scripts/coccinelle/free/ifnullfree.cocci      |  4 +--
- scripts/coccinelle/free/kfree.cocci           |  6 ++--
- scripts/coccinelle/free/kfreeaddr.cocci       |  2 +-
- security/apparmor/domain.c                    |  4 +--
- security/apparmor/include/file.h              |  2 +-
- security/apparmor/policy.c                    | 24 ++++++-------
- security/apparmor/policy_ns.c                 |  6 ++--
- security/apparmor/policy_unpack.c             | 14 ++++----
- security/keys/big_key.c                       |  6 ++--
- security/keys/dh.c                            | 14 ++++----
- security/keys/encrypted-keys/encrypted.c      | 14 ++++----
- security/keys/trusted-keys/trusted_tpm1.c     | 34 +++++++++----------
- security/keys/user_defined.c                  |  6 ++--
- 115 files changed, 323 insertions(+), 321 deletions(-)
+cpuhp multi-instance callbacks only walk forward in cpuhp_step->list and
+the same node is linked in both the online and dead lists, so the list
+corruption that results from padata_alloc() adding the node to a second
+list without removing it from the first doesn't cause problems as long
+as no instances are freed.
 
+Avoid the issue by giving each state its own node.
+
+Fixes: 894c9ef9780c ("padata: validate cpumask without removed CPU during offline")
+Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: stable@vger.kernel.org # v5.4+
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ include/linux/padata.h |  6 ++++--
+ kernel/padata.c        | 14 ++++++++------
+ 2 files changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index cccab7a59787..fa35dcfbd13f 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -145,7 +145,8 @@ struct padata_shell {
+ /**
+  * struct padata_instance - The overall control structure.
+  *
+- * @cpu_notifier: cpu hotplug notifier.
++ * @cpu_online_node: Linkage for CPU online callback.
++ * @cpu_dead_node: Linkage for CPU offline callback.
+  * @parallel_wq: The workqueue used for parallel work.
+  * @serial_wq: The workqueue used for serial work.
+  * @pslist: List of padata_shell objects attached to this instance.
+@@ -160,7 +161,8 @@ struct padata_shell {
+  * @flags: padata flags.
+  */
+ struct padata_instance {
+-	struct hlist_node		 node;
++	struct hlist_node		cpu_online_node;
++	struct hlist_node		cpu_dead_node;
+ 	struct workqueue_struct		*parallel_wq;
+ 	struct workqueue_struct		*serial_wq;
+ 	struct list_head		pslist;
+diff --git a/kernel/padata.c b/kernel/padata.c
+index c4b774331e46..92a4867e8adc 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -782,7 +782,7 @@ static int padata_cpu_online(unsigned int cpu, struct hlist_node *node)
+ 	struct padata_instance *pinst;
+ 	int ret;
+ 
+-	pinst = hlist_entry_safe(node, struct padata_instance, node);
++	pinst = hlist_entry_safe(node, struct padata_instance, cpu_online_node);
+ 	if (!pinst_has_cpu(pinst, cpu))
+ 		return 0;
+ 
+@@ -797,7 +797,7 @@ static int padata_cpu_dead(unsigned int cpu, struct hlist_node *node)
+ 	struct padata_instance *pinst;
+ 	int ret;
+ 
+-	pinst = hlist_entry_safe(node, struct padata_instance, node);
++	pinst = hlist_entry_safe(node, struct padata_instance, cpu_dead_node);
+ 	if (!pinst_has_cpu(pinst, cpu))
+ 		return 0;
+ 
+@@ -813,8 +813,9 @@ static enum cpuhp_state hp_online;
+ static void __padata_free(struct padata_instance *pinst)
+ {
+ #ifdef CONFIG_HOTPLUG_CPU
+-	cpuhp_state_remove_instance_nocalls(CPUHP_PADATA_DEAD, &pinst->node);
+-	cpuhp_state_remove_instance_nocalls(hp_online, &pinst->node);
++	cpuhp_state_remove_instance_nocalls(CPUHP_PADATA_DEAD,
++					    &pinst->cpu_dead_node);
++	cpuhp_state_remove_instance_nocalls(hp_online, &pinst->cpu_online_node);
+ #endif
+ 
+ 	WARN_ON(!list_empty(&pinst->pslist));
+@@ -1020,9 +1021,10 @@ static struct padata_instance *padata_alloc(const char *name,
+ 	mutex_init(&pinst->lock);
+ 
+ #ifdef CONFIG_HOTPLUG_CPU
+-	cpuhp_state_add_instance_nocalls_cpuslocked(hp_online, &pinst->node);
++	cpuhp_state_add_instance_nocalls_cpuslocked(hp_online,
++						    &pinst->cpu_online_node);
+ 	cpuhp_state_add_instance_nocalls_cpuslocked(CPUHP_PADATA_DEAD,
+-						    &pinst->node);
++						    &pinst->cpu_dead_node);
+ #endif
+ 
+ 	put_online_cpus();
 -- 
-2.18.1
+2.25.1
+
+
 
