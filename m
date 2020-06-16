@@ -6,78 +6,86 @@ X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8782C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 16:51:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 851A4C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 16:53:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A803D2098B
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 16:51:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EBF6208B8
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 16:53:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592326304;
-	bh=bcTWOAf7zPCXSBV37uZcFWSbRMGaPbOWaRO9c4SVFRc=;
+	s=default; t=1592326437;
+	bh=tFeDy/AowPDI/6h9VPVfcrKUX3Hq5N8CMPLQkG2tpKU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=pPA834h6ZzjezM3FpKKIlABS22OBR0vmL0icJ/LTODQm3bxL8gI/L8mcxTHsh/ou+
-	 a1U/WzAQLeYCDR+3s9xPplIDqPNQSrOejVfv0GHLyECB4VclkIh3/8pWZFjA5If3tK
-	 EDG1lmW7SM+5r2aCBvC+4bKeWH2VZuGI8yB/UFVU=
+	b=AdtSi+1PGz01+zr+gSA40LnieCUgZAybt2xHvysKSKosVLynzfh9Ulnw1HZR6Ck8V
+	 5emMzxf39tLHpIr3KqnBs6dethaSYGIwtkbDAd0mO3Ej4WnfDxpe4WZFnkKIM78Dcx
+	 lj7B2gznqNS/amrEyyylC7cE7H4kEKzZ5AdTY3OE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730135AbgFPQvo (ORCPT
+        id S1730006AbgFPQx4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Jun 2020 12:51:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48150 "EHLO mail.kernel.org"
+        Tue, 16 Jun 2020 12:53:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49474 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730107AbgFPQvn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Jun 2020 12:51:43 -0400
+        id S1730613AbgFPQx4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Jun 2020 12:53:56 -0400
 Received: from gmail.com (unknown [104.132.1.76])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5664E208B8;
-        Tue, 16 Jun 2020 16:51:43 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id BDCB020B1F;
+        Tue, 16 Jun 2020 16:53:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592326303;
-        bh=bcTWOAf7zPCXSBV37uZcFWSbRMGaPbOWaRO9c4SVFRc=;
+        s=default; t=1592326435;
+        bh=tFeDy/AowPDI/6h9VPVfcrKUX3Hq5N8CMPLQkG2tpKU=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=BNa+go6Lc/R3sWbALlAYLKI3cUCz1oh6tfMTxaepZAQ0sWFyCQJiR+xqDIBgmz/bu
-         nBtkywDQBIqt7Ou0mazk75eDjq0TfaBkwIoA9UR9r4dwql8CmZq/ghISAmUkgwPGdO
-         m6AXu2KdTT/4Jk/F75AfzbSyTBcAA6swAjdFp65w=
-Date:   Tue, 16 Jun 2020 09:51:41 -0700
+        b=RM6CGvr1XkQ2LnbNjIj1wOU8KoGVDVuBjdG/IAi54g1MI9y7iqg8xyxSARSqMGsee
+         C0wG9HEUDW8wK4jVo3W9KMxcX+YK7i6jxm5BETAmwnUGkhoFbu6im4/zGQkr7sPNt7
+         Ai5UujxhhgH6BjAX5iR89zTKiTmIqF5+fCHYdM7g=
+Date:   Tue, 16 Jun 2020 09:53:54 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Steffen Klassert <steffen.klassert@secunet.com>
-Cc:     netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH net v5 0/3] esp, ah: improve crypto algorithm selections
-Message-ID: <20200616165141.GA40729@gmail.com>
-References: <20200615221318.149558-1-ebiggers@kernel.org>
- <20200616060257.GT19286@gauss3.secunet.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Stephan Mueller <smueller@chronox.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [v2 PATCH 0/3] crypto: skcipher - Add support for no chaining
+ and partial chaining
+Message-ID: <20200616165354.GB40729@gmail.com>
+References: <20200612120643.GA15724@gondor.apana.org.au>
+ <E1jjiTA-0005BO-9n@fornost.hmeau.com>
+ <1688262.LSb4nGpegl@tauon.chronox.de>
+ <20200612121651.GA15849@gondor.apana.org.au>
+ <20200612122105.GA18892@gondor.apana.org.au>
+ <CAMj1kXGg25JL7WCrspMwB1PVPX6vx-rOCesg08a_Fy26_ET7Sg@mail.gmail.com>
+ <20200615073024.GA27015@gondor.apana.org.au>
+ <CAMj1kXHQNHh4PTLmGKaL+sSyuU1AS4u5F=OyjV6XuAaD21e6yg@mail.gmail.com>
+ <20200615185028.GB85413@gmail.com>
+ <20200616110444.GA31608@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200616060257.GT19286@gauss3.secunet.de>
+In-Reply-To: <20200616110444.GA31608@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 16, 2020 at 08:02:58AM +0200, Steffen Klassert wrote:
-> On Mon, Jun 15, 2020 at 03:13:15PM -0700, Eric Biggers wrote:
-> > This series consolidates and modernizes the lists of crypto algorithms
-> > that are selected by the IPsec kconfig options, and adds CRYPTO_SEQIV
-> > since it no longer gets selected automatically by other things.
-> > 
-> > See previous discussion at
-> > https://lkml.kernel.org/netdev/20200604192322.22142-1-ebiggers@kernel.org/T/#u
-> > 
-> > Changed v4 => v5:
-> >   - Rebased onto latest net/master to resolve conflict with
-> >     "treewide: replace '---help---' in Kconfig files with 'help'"
+On Tue, Jun 16, 2020 at 09:04:44PM +1000, Herbert Xu wrote:
+> On Mon, Jun 15, 2020 at 11:50:28AM -0700, Eric Biggers wrote:
+> >
+> > Wouldn't it make a lot more sense to make skcipher algorithms non-chainable by
+> > default, and only opt-in the ones where chaining is actually working?  At the
+> > moment we only test iv_out for CBC and CTR, so we can expect that all the others
+> > are broken.
 > 
-> The target trees for IPsec patches is the ipsec and ipsec-next tree.
-> I have the v4 patchset already in the testing branch of the ipsec tree
-> and plan to merge it to master. This conflict has to be resolved
-> when the ipsec tree is merged into the net tree.
+> Yes, I'm working through all the algorithms marking them.  If it
+> turns out that defaulting to off would result in a smaller patch
+> then I'm certainly going to do that.
+> 
+> > Note that wide-block modes such as Adiantum don't support chaining either.
+> > 
+> > Also, please use a better name than "fcsize".
+> 
+> Any suggestions?
 > 
 
-Okay, great!  I didn't know about the ipsec tree or that you had already applied
-the patches.
+Just spelling it out as final_chunksize would be much clearer.
+But maybe there's a better name.
 
 - Eric
