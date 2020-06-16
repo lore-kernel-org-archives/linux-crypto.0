@@ -2,181 +2,125 @@ Return-Path: <SRS0=4Aj0=75=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88E19C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 16:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B9EC433E2
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 16:07:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F7B32071A
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 16:02:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592323342;
-	bh=L76k6lpG4J3TwlEea5e1sll8MrwfcXXQlPvtKlzCZ7s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=k7JeTabfP4Ss0WkmsI3qNG8qqx/cdObFjsHN/y+xRtDs4QCLhV/hgfRmIKF5+epPS
-	 rSkdH9at4uFwyGQ2DRMLbCRJU0xhu4a4Tmevx5BFTk7tBeHa1KCJgPKMl2XUqgmQqf
-	 d8BM4wcBoE2dDigX9pXnJQVLDk/gxeeeRvgYuq0E=
+	by mail.kernel.org (Postfix) with ESMTP id 6860B208B3
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 16:07:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="anxZyJva"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732210AbgFPQCS (ORCPT
+        id S1731965AbgFPPrG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Jun 2020 12:02:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48128 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732675AbgFPPvc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Jun 2020 11:51:32 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Tue, 16 Jun 2020 11:47:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44750 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1732260AbgFPPrD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Jun 2020 11:47:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592322422;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=djkgmBs6vxKrnF2svfHTCwO6iJZv0MD8YpKSjFl2MGs=;
+        b=anxZyJvaFpuLChSMwUR/a7qLSGGcT0Nzy4aiSkqCpI/xVk6zVIcE9J7iV1341dFYQpdAwe
+        QNobub7hXN4Ms1OW18fOfvph9zqDj6d3Es9xcqmAm7V7WWOGLDbJFRK2rhytEAPFfTLrAb
+        z8prG6hZN2mOJEmSXgQ9/SksTn2gcSw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-218-nWeeH7oNN9eY6skcHYs3nQ-1; Tue, 16 Jun 2020 11:46:56 -0400
+X-MC-Unique: nWeeH7oNN9eY6skcHYs3nQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1A4BF208D5;
-        Tue, 16 Jun 2020 15:51:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592322691;
-        bh=L76k6lpG4J3TwlEea5e1sll8MrwfcXXQlPvtKlzCZ7s=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=frz5NOtZbLs2nbRRwKooRzT3x9OFLBIc7bTwNhvYup/5OAb0e4V5kgC3liRktEYAP
-         UT+MKm2f3v7v2R8yQJs1WJKAMr1IgmpUn+OPwzeXmbCWqwQbDPtjfAtw4RYBZGM1E/
-         1MeVtnoabSA56ChuOXYnofmwc9G9zb/tanTaySSc=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.6 036/161] padata: add separate cpuhp node for CPUHP_PADATA_DEAD
-Date:   Tue, 16 Jun 2020 17:33:46 +0200
-Message-Id: <20200616153108.101239616@linuxfoundation.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200616153106.402291280@linuxfoundation.org>
-References: <20200616153106.402291280@linuxfoundation.org>
-User-Agent: quilt/0.66
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B3678DEEE2;
+        Tue, 16 Jun 2020 15:46:51 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-114-66.rdu2.redhat.com [10.10.114.66])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3EC3B60C05;
+        Tue, 16 Jun 2020 15:46:41 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <56c2304c-73cc-8f48-d8d0-5dd6c39f33f3@redhat.com>
+References: <56c2304c-73cc-8f48-d8d0-5dd6c39f33f3@redhat.com> <20200616015718.7812-1-longman@redhat.com> <20200616015718.7812-2-longman@redhat.com> <20200616033035.GB902@sol.localdomain>
+To:     Waiman Long <longman@redhat.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>, ebiggers@kernel.org,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Joe Perches <joe@perches.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Rientjes <rientjes@google.com>,
+        Michal Hocko <mhocko@suse.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        David Sterba <dsterba@suse.cz>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] mm/slab: Use memzero_explicit() in kzfree()
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <879078.1592322400.1@warthog.procyon.org.uk>
+Date:   Tue, 16 Jun 2020 16:46:40 +0100
+Message-ID: <879079.1592322400@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Daniel Jordan <daniel.m.jordan@oracle.com>
+Waiman Long <longman@redhat.com> wrote:
 
-[ Upstream commit 3c2214b6027ff37945799de717c417212e1a8c54 ]
+> The kzfree() function is normally used to clear some sensitive
+> information, like encryption keys, in the buffer before freeing it back
+> to the pool. Memset()
 
-Removing the pcrypt module triggers this:
+"memset()" is all lowercase.
 
-  general protection fault, probably for non-canonical
-    address 0xdead000000000122
-  CPU: 5 PID: 264 Comm: modprobe Not tainted 5.6.0+ #2
-  Hardware name: QEMU Standard PC
-  RIP: 0010:__cpuhp_state_remove_instance+0xcc/0x120
-  Call Trace:
-   padata_sysfs_release+0x74/0xce
-   kobject_put+0x81/0xd0
-   padata_free+0x12/0x20
-   pcrypt_exit+0x43/0x8ee [pcrypt]
+> is currently used for buffer clearing. However unlikely, there is still a
+> non-zero probability
 
-padata instances wrongly use the same hlist node for the online and dead
-states, so __padata_free()'s second cpuhp remove call chokes on the node
-that the first poisoned.
+I'd say "a possibility".
 
-cpuhp multi-instance callbacks only walk forward in cpuhp_step->list and
-the same node is linked in both the online and dead lists, so the list
-corruption that results from padata_alloc() adding the node to a second
-list without removing it from the first doesn't cause problems as long
-as no instances are freed.
+> that
 
-Avoid the issue by giving each state its own node.
+and I'd move "in [the] future" here.
 
-Fixes: 894c9ef9780c ("padata: validate cpumask without removed CPU during offline")
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org # v5.4+
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- include/linux/padata.h |  6 ++++--
- kernel/padata.c        | 14 ++++++++------
- 2 files changed, 12 insertions(+), 8 deletions(-)
+> the compiler may choose to optimize away the
+> memory clearing especially if LTO is being used in the future. To make sure
+> that this optimization will never happen
 
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index a0d8b41850b2..693cae9bfe66 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -139,7 +139,8 @@ struct padata_shell {
- /**
-  * struct padata_instance - The overall control structure.
-  *
-- * @node: Used by CPU hotplug.
-+ * @cpu_online_node: Linkage for CPU online callback.
-+ * @cpu_dead_node: Linkage for CPU offline callback.
-  * @parallel_wq: The workqueue used for parallel work.
-  * @serial_wq: The workqueue used for serial work.
-  * @pslist: List of padata_shell objects attached to this instance.
-@@ -150,7 +151,8 @@ struct padata_shell {
-  * @flags: padata flags.
-  */
- struct padata_instance {
--	struct hlist_node		 node;
-+	struct hlist_node		cpu_online_node;
-+	struct hlist_node		cpu_dead_node;
- 	struct workqueue_struct		*parallel_wq;
- 	struct workqueue_struct		*serial_wq;
- 	struct list_head		pslist;
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 62082597d4a2..fee14ae90d96 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -703,7 +703,7 @@ static int padata_cpu_online(unsigned int cpu, struct hlist_node *node)
- 	struct padata_instance *pinst;
- 	int ret;
- 
--	pinst = hlist_entry_safe(node, struct padata_instance, node);
-+	pinst = hlist_entry_safe(node, struct padata_instance, cpu_online_node);
- 	if (!pinst_has_cpu(pinst, cpu))
- 		return 0;
- 
-@@ -718,7 +718,7 @@ static int padata_cpu_dead(unsigned int cpu, struct hlist_node *node)
- 	struct padata_instance *pinst;
- 	int ret;
- 
--	pinst = hlist_entry_safe(node, struct padata_instance, node);
-+	pinst = hlist_entry_safe(node, struct padata_instance, cpu_dead_node);
- 	if (!pinst_has_cpu(pinst, cpu))
- 		return 0;
- 
-@@ -734,8 +734,9 @@ static enum cpuhp_state hp_online;
- static void __padata_free(struct padata_instance *pinst)
- {
- #ifdef CONFIG_HOTPLUG_CPU
--	cpuhp_state_remove_instance_nocalls(CPUHP_PADATA_DEAD, &pinst->node);
--	cpuhp_state_remove_instance_nocalls(hp_online, &pinst->node);
-+	cpuhp_state_remove_instance_nocalls(CPUHP_PADATA_DEAD,
-+					    &pinst->cpu_dead_node);
-+	cpuhp_state_remove_instance_nocalls(hp_online, &pinst->cpu_online_node);
- #endif
- 
- 	WARN_ON(!list_empty(&pinst->pslist));
-@@ -939,9 +940,10 @@ static struct padata_instance *padata_alloc(const char *name,
- 	mutex_init(&pinst->lock);
- 
- #ifdef CONFIG_HOTPLUG_CPU
--	cpuhp_state_add_instance_nocalls_cpuslocked(hp_online, &pinst->node);
-+	cpuhp_state_add_instance_nocalls_cpuslocked(hp_online,
-+						    &pinst->cpu_online_node);
- 	cpuhp_state_add_instance_nocalls_cpuslocked(CPUHP_PADATA_DEAD,
--						    &pinst->node);
-+						    &pinst->cpu_dead_node);
- #endif
- 
- 	put_online_cpus();
--- 
-2.25.1
+"in these cases"
 
+> , memzero_explicit(), which is introduced in v3.18, is now used in
 
+"instead of"?
+
+> kzfree() to future-proof it.
+
+Davod
 
