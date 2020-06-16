@@ -2,136 +2,106 @@ Return-Path: <SRS0=4Aj0=75=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4225CC433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 18:09:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 026C2C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 18:18:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 218C52080D
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 18:09:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592330988;
-	bh=EsakDvGUztRiSNfngaRB05ekQqGnOvB3NF6mY788udI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=TIWB6eyfx4aMOvYGanTY05D8II5QkBaMUKnHOmcyDN+t1a7GiwedSHZmMcNjNsS8j
-	 x2tT5yemBAtB7nPo8Gh/34XDBVI4g4DBPXBEUMhhLF44XU3Iwc8PriAHpXwF4EYDSW
-	 YEoI0FpuGGCh3W+XSZIiPAQZ4i0//OUTt4gVIpc8=
+	by mail.kernel.org (Postfix) with ESMTP id D347B208D5
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 18:18:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iycUgdDI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731608AbgFPSJr (ORCPT
+        id S1729824AbgFPSS1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Jun 2020 14:09:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44416 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727083AbgFPSJq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Jun 2020 14:09:46 -0400
-Received: from X1 (nat-ab2241.sltdut.senawave.net [162.218.216.4])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Tue, 16 Jun 2020 14:18:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41575 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726282AbgFPSSZ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Jun 2020 14:18:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592331504;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WZ+A3atMCLTtcOhNtzCpo/suKGsMEOYjZ9xu0yuFT+M=;
+        b=iycUgdDIwYNz5VHPnFphraRP/16V/9RQtXtEFLZ+Beqefn12mKaajBJjv2qfT6/Ccc9x3V
+        gNUOtx+Itdm/FlTfTTmm1iDlWV77rTpI/Ut857kUP985+cPpiYaZnR0xHgaxG6LRBxAVou
+        kcLsq3tOGIE8gFbNzfD72cifj8E+WHI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-356-wq6qM4lNPjuEKE65SHmPvg-1; Tue, 16 Jun 2020 14:18:23 -0400
+X-MC-Unique: wq6qM4lNPjuEKE65SHmPvg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B1C752082F;
-        Tue, 16 Jun 2020 18:09:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592330985;
-        bh=EsakDvGUztRiSNfngaRB05ekQqGnOvB3NF6mY788udI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=IhpS1taEKqV/HMmc2XrgBi59GfE8vYAI/pSBHLIEb5BHt2RggHWNsr0WFiFcGuzEE
-         26ygFhe/LhgEOm51069QA1LMXoAUoV3VgfH3hA2EmK0pi7/AYapihuVVI1Xsu8eHU8
-         MrJlU2uhSFUs9V1K5UBwvjYjOiJtcqNT5s8lHh0I=
-Date:   Tue, 16 Jun 2020 11:09:44 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Waiman Long <longman@redhat.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Joe Perches <joe@perches.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        David Rientjes <rientjes@google.com>,
-        Michal Hocko <mhocko@suse.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-amlogic@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
-        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        ecryptfs@vger.kernel.org, kasan-dev@googlegroups.com,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-sctp@vger.kernel.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org
-Subject: Re: [PATCH v5 2/2] mm, treewide: Rename kzfree() to
- kfree_sensitive()
-Message-Id: <20200616110944.c13f221e5c3f54e775190afe@linux-foundation.org>
-In-Reply-To: <20200616154311.12314-3-longman@redhat.com>
-References: <20200616154311.12314-1-longman@redhat.com>
-        <20200616154311.12314-3-longman@redhat.com>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC080E918;
+        Tue, 16 Jun 2020 18:18:21 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CF70679302;
+        Tue, 16 Jun 2020 18:18:18 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 05GIIIUG013314;
+        Tue, 16 Jun 2020 14:18:18 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 05GIIIQA013310;
+        Tue, 16 Jun 2020 14:18:18 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Tue, 16 Jun 2020 14:18:17 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Eric Biggers <ebiggers@kernel.org>
+cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Mike Snitzer <msnitzer@redhat.com>,
+        linux-kernel@vger.kernel.org, dm-devel@redhat.com,
+        linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Milan Broz <mbroz@redhat.com>
+Subject: Re: [dm-devel] [PATCH 4/4] crypto: fix the drivers that don't respect
+ CRYPTO_TFM_REQ_MAY_SLEEP
+In-Reply-To: <20200616175022.GD207319@gmail.com>
+Message-ID: <alpine.LRH.2.02.2006161416510.12390@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.2006091259250.30590@file01.intranet.prod.int.rdu2.redhat.com> <20200610010450.GA6449@gondor.apana.org.au> <alpine.LRH.2.02.2006100756270.27811@file01.intranet.prod.int.rdu2.redhat.com> <20200610121106.GA23137@gondor.apana.org.au>
+ <alpine.LRH.2.02.2006161052540.28052@file01.intranet.prod.int.rdu2.redhat.com> <alpine.LRH.2.02.2006161102250.28052@file01.intranet.prod.int.rdu2.redhat.com> <20200616175022.GD207319@gmail.com>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 16 Jun 2020 11:43:11 -0400 Waiman Long <longman@redhat.com> wrote:
 
-> As said by Linus:
-> 
->   A symmetric naming is only helpful if it implies symmetries in use.
->   Otherwise it's actively misleading.
-> 
->   In "kzalloc()", the z is meaningful and an important part of what the
->   caller wants.
-> 
->   In "kzfree()", the z is actively detrimental, because maybe in the
->   future we really _might_ want to use that "memfill(0xdeadbeef)" or
->   something. The "zero" part of the interface isn't even _relevant_.
-> 
-> The main reason that kzfree() exists is to clear sensitive information
-> that should not be leaked to other future users of the same memory
-> objects.
-> 
-> Rename kzfree() to kfree_sensitive() to follow the example of the
-> recently added kvfree_sensitive() and make the intention of the API
-> more explicit. In addition, memzero_explicit() is used to clear the
-> memory to make sure that it won't get optimized away by the compiler.
-> 
-> The renaming is done by using the command sequence:
-> 
->   git grep -w --name-only kzfree |\
->   xargs sed -i 's/\bkzfree\b/kfree_sensitive/'
-> 
-> followed by some editing of the kfree_sensitive() kerneldoc and adding
-> a kzfree backward compatibility macro in slab.h.
-> 
-> ...
->
-> --- a/include/linux/slab.h
-> +++ b/include/linux/slab.h
-> @@ -186,10 +186,12 @@ void memcg_deactivate_kmem_caches(struct mem_cgroup *, struct mem_cgroup *);
->   */
->  void * __must_check krealloc(const void *, size_t, gfp_t);
->  void kfree(const void *);
-> -void kzfree(const void *);
-> +void kfree_sensitive(const void *);
->  size_t __ksize(const void *);
->  size_t ksize(const void *);
->  
-> +#define kzfree(x)	kfree_sensitive(x)	/* For backward compatibility */
-> +
 
-What was the thinking here?  Is this really necessary?
+On Tue, 16 Jun 2020, Eric Biggers wrote:
 
-I suppose we could keep this around for a while to ease migration.  But
-not for too long, please.
+> On Tue, Jun 16, 2020 at 11:02:50AM -0400, Mikulas Patocka wrote:
+> > Fix the crypto drivers that don't respect CRYPTO_TFM_REQ_MAY_SLEEP. If
+> > CRYPTO_TFM_REQ_MAY_SLEEP is not set, the driver must not do allocation
+> > that sleeps.
+> > 
+> > Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+> 
+> I think you need to split this up per driver with a proper explanation and a
+> "Fixes:" tag for each driver.
+> 
+> Also, these bugs should have been detected by the crypto self-tests already,
+> since they test having preemption disabled and CRYPTO_TFM_REQ_MAY_SLEEP cleared.
+> Can you double check whether these are all valid fixes?  One thing to watch out
+> for is that CRYPTO_TFM_REQ_MAY_SLEEP only applies to the function call like
+> crypto_skcipher_encrypt() itself.  If the implementation is asynchronous and the
+> request gets processed in the background (i.e. if crypto_skcipher_encrypt()
+> returns -EINPROGRESS), the background work doesn't have to honor
+> CRYPTO_TFM_REQ_MAY_SLEEP.
+> 
+> - Eric
+
+I can only compile-test this patch. I don't have the hardware.
+
+Mikulas
+
