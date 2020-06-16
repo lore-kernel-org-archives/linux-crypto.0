@@ -1,167 +1,119 @@
-Return-Path: <SRS0=gCBe=74=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=4Aj0=75=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44471C433DF
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 23:52:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D31D9C433E2
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 01:58:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2714B20714
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jun 2020 23:52:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592265141;
-	bh=LAqX2guWt3SaWaTtIVptXEHktenJg7iaeDhOq75EGOc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:List-ID:From;
-	b=Ey5KGfObbq+p4A/+mcoPF0gquVv674ehx3+2sElgtWyWf1WZGKXFlHiuHUDzmKk9Q
-	 /aoXvHHtLXNVyGQlt09oYvBvZVZi1iel6UkQmngdXljtFrnyovXbsOV3uCznDSkF2T
-	 c3/lEY5ADBJQ1m3kRSBhf5eVUqhPV1sPz9FbdZ74=
+	by mail.kernel.org (Postfix) with ESMTP id AEAD520739
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jun 2020 01:58:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cmfbCyUD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726313AbgFOXwU (ORCPT
+        id S1726600AbgFPB6M (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jun 2020 19:52:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60958 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725960AbgFOXwU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jun 2020 19:52:20 -0400
-Received: from localhost (mobile-166-170-222-206.mycingular.net [166.170.222.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 15 Jun 2020 21:58:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25196 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726651AbgFPB6L (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jun 2020 21:58:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592272689;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
+        bh=w0ZJeQQk3EMaWCq5vRe2fLP4T7LhSgQGKZa9FTUZAA4=;
+        b=cmfbCyUDRGwKjLGBejxtzwXYJZpxYp4m4gTqt1HJSocbaTeByL2ZSn3rJ/ux/7hS8NPcJY
+        pDmzv+GqMhAOF/UyMu9ENB1TqV6U+tP0Mht2YLdiU0vgD5MEO3kgZFDGI5G30nsnTYzl6e
+        3vAL0jFWUiwI5s0OQXwAYyvRhcKeSIM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-271-siDUOdYEMkuGDz0Coifxdg-1; Mon, 15 Jun 2020 21:58:05 -0400
+X-MC-Unique: siDUOdYEMkuGDz0Coifxdg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E6A7B2068E;
-        Mon, 15 Jun 2020 23:52:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592265139;
-        bh=LAqX2guWt3SaWaTtIVptXEHktenJg7iaeDhOq75EGOc=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=g2QUd2ngXMfEz2LsTipBItohXSvpmTBaOTiRrZKoSwAIbpdN01pkaTau0u7EATsXD
-         1j1XCGLhCbt/rateSDFiTc7BcQViqtV3HMRlLm5J3nOOqe69N1HGAm870H7wKJjki0
-         S+aXFOYX7SF+nnBPJxZUEPmc9FAaD8Y6tEO8/hiU=
-Date:   Mon, 15 Jun 2020 18:52:17 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Zhangfei Gao <zhangfei.gao@linaro.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Joerg Roedel <joro@8bytes.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Hanjun Guo <guohanjun@huawei.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:IOMMU DRIVERS" <iommu@lists.linux-foundation.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-pci <linux-pci@vger.kernel.org>,
-        Thanu Rangarajan <Thanu.Rangarajan@arm.com>,
-        Souvik Chakravarty <Souvik.Chakravarty@arm.com>
-Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
-Message-ID: <20200615235217.GA1921846@bjorn-Precision-5520>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8f9f6a77-4a65-afeb-0af9-e4868b52d7ce@linaro.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6856710059B7;
+        Tue, 16 Jun 2020 01:58:00 +0000 (UTC)
+Received: from llong.com (ovpn-117-41.rdu2.redhat.com [10.10.117.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 45E126ED96;
+        Tue, 16 Jun 2020 01:57:52 +0000 (UTC)
+From:   Waiman Long <longman@redhat.com>
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Joe Perches <joe@perches.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Rientjes <rientjes@google.com>
+Cc:     Michal Hocko <mhocko@suse.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        David Sterba <dsterba@suse.cz>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org, Waiman Long <longman@redhat.com>,
+        stable@vger.kernel.org
+Subject: [PATCH v4 1/3] mm/slab: Use memzero_explicit() in kzfree()
+Date:   Mon, 15 Jun 2020 21:57:16 -0400
+Message-Id: <20200616015718.7812-2-longman@redhat.com>
+In-Reply-To: <20200616015718.7812-1-longman@redhat.com>
+References: <20200616015718.7812-1-longman@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jun 13, 2020 at 10:30:56PM +0800, Zhangfei Gao wrote:
-> On 2020/6/11 下午9:44, Bjorn Helgaas wrote:
-> > +++ b/drivers/iommu/iommu.c
-> > > > > > > > > > @@ -2418,6 +2418,10 @@ int iommu_fwspec_init(struct device *dev, struct
-> > > > > > > > > > fwnode_handle *iommu_fwnode,
-> > > > > > > > > >             fwspec->iommu_fwnode = iommu_fwnode;
-> > > > > > > > > >             fwspec->ops = ops;
-> > > > > > > > > >             dev_iommu_fwspec_set(dev, fwspec);
-> > > > > > > > > > +
-> > > > > > > > > > +       if (dev_is_pci(dev))
-> > > > > > > > > > +               pci_fixup_device(pci_fixup_final, to_pci_dev(dev));
-> > > > > > > > > > +
-> > > > > > > > > > 
-> > > > > > > > > > Then pci_fixup_final will be called twice, the first in pci_bus_add_device.
-> > > > > > > > > > Here in iommu_fwspec_init is the second time, specifically for iommu_fwspec.
-> > > > > > > > > > Will send this when 5.8-rc1 is open.
-> > > > > > > > > Wait, this whole fixup approach seems wrong to me.  No matter how you
-> > > > > > > > > do the fixup, it's still a fixup, which means it requires ongoing
-> > > > > > > > > maintenance.  Surely we don't want to have to add the Vendor/Device ID
-> > > > > > > > > for every new AMBA device that comes along, do we?
-> > > > > > > > > 
-> > > > > > > > Here the fake pci device has standard PCI cfg space, but physical
-> > > > > > > > implementation is base on AMBA
-> > > > > > > > They can provide pasid feature.
-> > > > > > > > However,
-> > > > > > > > 1, does not support tlp since they are not real pci devices.
-> > > > > > > > 2. does not support pri, instead support stall (provided by smmu)
-> > > > > > > > And stall is not a pci feature, so it is not described in struct pci_dev,
-> > > > > > > > but in struct iommu_fwspec.
-> > > > > > > > So we use this fixup to tell pci system that the devices can support stall,
-> > > > > > > > and hereby support pasid.
-> > > > > > > This did not answer my question.  Are you proposing that we update a
-> > > > > > > quirk every time a new AMBA device is released?  I don't think that
-> > > > > > > would be a good model.
-> > > > > > Yes, you are right, but we do not have any better idea yet.
-> > > > > > Currently we have three fake pci devices, which support stall and pasid.
-> > > > > > We have to let pci system know the device can support pasid, because of
-> > > > > > stall feature, though not support pri.
-> > > > > > Do you have any other ideas?
-> > > > > It sounds like the best way would be to allocate a PCI capability for it, so
-> > > > > detection can be done through config space, at least in future devices,
-> > > > > or possibly after a firmware update if the config space in your system
-> > > > > is controlled by firmware somewhere.  Once there is a proper mechanism
-> > > > > to do this, using fixups to detect the early devices that don't use that
-> > > > > should be uncontroversial. I have no idea what the process or timeline
-> > > > > is to add new capabilities into the PCIe specification, or if this one
-> > > > > would be acceptable to the PCI SIG at all.
-> > > > That sounds like a possibility.  The spec already defines a
-> > > > Vendor-Specific Extended Capability (PCIe r5.0, sec 7.9.5) that might
-> > > > be a candidate.
-> > > Will investigate this, thanks Bjorn
-> > FWIW, there's also a Vendor-Specific Capability that can appear in the
-> > first 256 bytes of config space (the Vendor-Specific Extended
-> > Capability must appear in the "Extended Configuration Space" from
-> > 0x100-0xfff).
-> Unfortunately our silicon does not have either Vendor-Specific Capability or
-> Vendor-Specific Extended Capability.
-> 
-> Studied commit 8531e283bee66050734fb0e89d53e85fd5ce24a4
-> Looks this method requires adding member (like can_stall) to struct pci_dev,
-> looks difficult.
+The kzfree() function is normally used to clear some sensitive
+information, like encryption keys, in the buffer before freeing it back
+to the pool. Memset() is currently used for the buffer clearing. However,
+it is entirely possible that the compiler may choose to optimize away the
+memory clearing especially if LTO is being used. To make sure that this
+optimization will not happen, memzero_explicit(), which is introduced
+in v3.18, is now used in kzfree() to do the clearing.
 
-The problem is that we don't want to add device IDs every time a new
-chip comes out.  Adding one or two device IDs for silicon that's
-already released is not a problem as long as you have a strategy for
-*future* devices so they don't require a quirk.
+Fixes: 3ef0e5ba4673 ("slab: introduce kzfree()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Waiman Long <longman@redhat.com>
+---
+ mm/slab_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > > > > If detection cannot be done through PCI config space, the next best
-> > > > > alternative is to pass auxiliary data through firmware. On DT based
-> > > > > machines, you can list non-hotpluggable PCIe devices and add custom
-> > > > > properties that could be read during device enumeration. I assume
-> > > > > ACPI has something similar, but I have not done that.
-> > > Yes, thanks Arnd
-> > > > ACPI has _DSM (ACPI v6.3, sec 9.1.1), which might be a candidate.  I
-> > > > like this better than a PCI capability because the property you need
-> > > > to expose is not a PCI property.
-> > > _DSM may not workable, since it is working in runtime.
-> > > We need stall information in init stage, neither too early (after allocation
-> > > of iommu_fwspec)
-> > > nor too late (before arm_smmu_add_device ).
-> > I'm not aware of a restriction on when _DSM can be evaluated.  I'm
-> > looking at ACPI v6.3, sec 9.1.1.  Are you seeing something different?
-> DSM method seems requires vendor specific guid, and code would be vendor
-> specific.
+diff --git a/mm/slab_common.c b/mm/slab_common.c
+index 9e72ba224175..37d48a56431d 100644
+--- a/mm/slab_common.c
++++ b/mm/slab_common.c
+@@ -1726,7 +1726,7 @@ void kzfree(const void *p)
+ 	if (unlikely(ZERO_OR_NULL_PTR(mem)))
+ 		return;
+ 	ks = ksize(mem);
+-	memset(mem, 0, ks);
++	memzero_explicit(mem, ks);
+ 	kfree(mem);
+ }
+ EXPORT_SYMBOL(kzfree);
+-- 
+2.18.1
 
-_DSM indeed requires a vendor-specific UUID, precisely *because*
-vendors are free to define their own functionality without requiring
-changes to the ACPI spec.  From the spec (ACPI v6.3, sec 9.1.1):
-
-  New UUIDs may also be created by OEMs and IHVs for custom devices
-  and other interface or device governing bodies (e.g. the PCI SIG),
-  as long as the UUID is different from other published UUIDs.
