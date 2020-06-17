@@ -2,108 +2,99 @@ Return-Path: <SRS0=o6su=76=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3A0CC433E1
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jun 2020 00:37:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04C05C433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jun 2020 02:01:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1EDE2098B
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jun 2020 00:37:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="n3JyTVpY"
+	by mail.kernel.org (Postfix) with ESMTP id D33E220786
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jun 2020 02:01:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726369AbgFQAh0 (ORCPT
+        id S1726634AbgFQCBP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Jun 2020 20:37:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43878 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725894AbgFQAhZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Jun 2020 20:37:25 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CCECC061573;
-        Tue, 16 Jun 2020 17:37:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:To:From:Date:Sender:Reply-To:Cc:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=wFQoXTSBvbEH49Ty46ov9C8/Nsm6g8zmno6k8zfkw2E=; b=n3JyTVpYYWBeG3//7Dbz6/D0OV
-        GzgCh3WX+b3KjXRf4Xu6V0kdWmcuZlo2UQDkR2srryX8xaDqqXUoKDJBqLY7z9Bq/HRtzigf/uuiY
-        Sd9jJpet2hC7DsxpwLEdZSe4WrbCxE6M7EuV4BE8Ch3Qujx54e7p1KIWEuHwoa8nTUBRG0qgKm3X8
-        u7bLbT0NrHrYEwM3LMHCZKB4a00yRbRrAuqtH54MqoUTLvEdaMZTkNth3X48Dr08NSer2XbXsH4Cc
-        9E/jX0kKqgw0X02KSRbK/oP/jsZWfFKLiCNdwF4MOhsJnOh7KhHW+wqMLwNoSKm5xDEvSkWRRH8mP
-        +9pgK1yg==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jlM4l-0006AH-5o; Wed, 17 Jun 2020 00:37:11 +0000
-Date:   Tue, 16 Jun 2020 17:37:11 -0700
-From:   Matthew Wilcox <willy@infradead.org>
-To:     dsterba@suse.cz, Joe Perches <joe@perches.com>,
-        Waiman Long <longman@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        David Rientjes <rientjes@google.com>,
-        Michal Hocko <mhocko@suse.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-amlogic@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
-        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
-        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org
-Subject: Re: [PATCH v4 0/3] mm, treewide: Rename kzfree() to kfree_sensitive()
-Message-ID: <20200617003711.GD8681@bombadil.infradead.org>
-References: <20200616015718.7812-1-longman@redhat.com>
- <fe3b9a437be4aeab3bac68f04193cb6daaa5bee4.camel@perches.com>
- <20200616230130.GJ27795@twin.jikos.cz>
+        Tue, 16 Jun 2020 22:01:15 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:6271 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726253AbgFQCBP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Jun 2020 22:01:15 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 01EE01E22C717AAE5C78;
+        Wed, 17 Jun 2020 10:01:14 +0800 (CST)
+Received: from [127.0.0.1] (10.67.102.118) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.487.0; Wed, 17 Jun 2020
+ 10:01:04 +0800
+Subject: Re: [PATCH] crypto: hisilicon - update SEC driver module parameter
+From:   liulongfang <liulongfang@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <kong.kongxinwei@hisilicon.com>,
+        <ike.pan@canonical.com>
+References: <1591624871-49173-1-git-send-email-liulongfang@huawei.com>
+Message-ID: <2cf1904c-0c66-e962-6b07-466a6c80451f@huawei.com>
+Date:   Wed, 17 Jun 2020 10:01:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200616230130.GJ27795@twin.jikos.cz>
+In-Reply-To: <1591624871-49173-1-git-send-email-liulongfang@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.102.118]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 17, 2020 at 01:01:30AM +0200, David Sterba wrote:
-> On Tue, Jun 16, 2020 at 11:53:50AM -0700, Joe Perches wrote:
-> > On Mon, 2020-06-15 at 21:57 -0400, Waiman Long wrote:
-> > >  v4:
-> > >   - Break out the memzero_explicit() change as suggested by Dan Carpenter
-> > >     so that it can be backported to stable.
-> > >   - Drop the "crypto: Remove unnecessary memzero_explicit()" patch for
-> > >     now as there can be a bit more discussion on what is best. It will be
-> > >     introduced as a separate patch later on after this one is merged.
-> > 
-> > To this larger audience and last week without reply:
-> > https://lore.kernel.org/lkml/573b3fbd5927c643920e1364230c296b23e7584d.camel@perches.com/
-> > 
-> > Are there _any_ fastpath uses of kfree or vfree?
-> 
-> I'd consider kfree performance critical for cases where it is called
-> under locks. If possible the kfree is moved outside of the critical
-> section, but we have rbtrees or lists that get deleted under locks and
-> restructuring the code to do eg. splice and free it outside of the lock
-> is not always possible.
+On 2020/6/8 22:01, Longfang Liu Wrote:
+> As stress-ng running SEC engine on the Ubuntu OS,
+> we found that SEC only supports two threads each with one TFM
+> based on the default module parameter 'ctx_q_num'.
+> If running more threads, stress-ng will fail since it cannot
+> get more TFMs.
+>
+> In order to fix this, we adjusted the default values
+> of the module parameters to support more TFMs.
+>
+> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+> Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
+> ---
+>  drivers/crypto/hisilicon/sec2/sec_main.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+> index a4cb58b..57de51f 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec_main.c
+> +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+> @@ -30,9 +30,9 @@
+>  
+>  #define SEC_SQE_SIZE			128
+>  #define SEC_SQ_SIZE			(SEC_SQE_SIZE * QM_Q_DEPTH)
+> -#define SEC_PF_DEF_Q_NUM		64
+> +#define SEC_PF_DEF_Q_NUM		256
+>  #define SEC_PF_DEF_Q_BASE		0
+> -#define SEC_CTX_Q_NUM_DEF		24
+> +#define SEC_CTX_Q_NUM_DEF		2
+>  #define SEC_CTX_Q_NUM_MAX		32
+>  
+>  #define SEC_CTRL_CNT_CLR_CE		0x301120
+> @@ -191,7 +191,7 @@ static const struct kernel_param_ops sec_ctx_q_num_ops = {
+>  };
+>  static u32 ctx_q_num = SEC_CTX_Q_NUM_DEF;
+>  module_param_cb(ctx_q_num, &sec_ctx_q_num_ops, &ctx_q_num, 0444);
+> -MODULE_PARM_DESC(ctx_q_num, "Queue num in ctx (24 default, 2, 4, ..., 32)");
+> +MODULE_PARM_DESC(ctx_q_num, "Queue num in ctx (2 default, 2, 4, ..., 32)");
+>  
+>  static const struct kernel_param_ops vfs_num_ops = {
+>  	.set = vfs_num_set,
 
-Not just performance critical, but correctness critical.  Since kvfree()
-may allocate from the vmalloc allocator, I really think that kvfree()
-should assert that it's !in_atomic().  Otherwise we can get into trouble
-if we end up calling vfree() and have to take the mutex.
+Hi ALL,
+
+ I'd appreciate any comments on this patch
+from crypto related people.
+
+Thanks,
+
+Longfang
+
+
