@@ -2,79 +2,130 @@ Return-Path: <SRS0=o6su=76=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E844FC433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jun 2020 05:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63C44C433E3
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jun 2020 07:12:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C2BD0207DD
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jun 2020 05:58:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 424262098B
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jun 2020 07:12:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1592377951;
+	bh=R+eM1qGvKUN1HiDySxCpFv8ACpnCrS/luvzLeM7dI8o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=rz00qJuIH+kYwjGo8Q6L7jZ1p+zKts8gozwjXtwiGcSBgAmnC/pwVK26179odhNAr
+	 cVGjYpW7zxr7fSovvOLck9srW+aWpmT85WQFYfss14YBBCRRXzuSQFAVA/b3B9/Okb
+	 iA7q4nATeLrM1yn47fO6geE5gK7huxtIbX6byleQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726702AbgFQF6e (ORCPT
+        id S1726282AbgFQHMT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Jun 2020 01:58:34 -0400
-Received: from a.mx.secunet.com ([62.96.220.36]:36274 "EHLO a.mx.secunet.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726321AbgFQF6e (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Jun 2020 01:58:34 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by a.mx.secunet.com (Postfix) with ESMTP id 8873920482;
-        Wed, 17 Jun 2020 07:58:32 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id IJzO8qhUqr4L; Wed, 17 Jun 2020 07:58:31 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (202.40.53.10.in-addr.arpa [10.53.40.202])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by a.mx.secunet.com (Postfix) with ESMTPS id 6832A20185;
-        Wed, 17 Jun 2020 07:58:31 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1979.3; Wed, 17 Jun 2020 07:58:31 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Wed, 17 Jun
- 2020 07:58:30 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-        id 87F9C31800C0; Wed, 17 Jun 2020 07:58:30 +0200 (CEST)
-Date:   Wed, 17 Jun 2020 07:58:30 +0200
-From:   Steffen Klassert <steffen.klassert@secunet.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-CC:     <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        Corentin Labbe <clabbe@baylibre.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH net v4 0/3] esp, ah: improve crypto algorithm selections
-Message-ID: <20200617055830.GV19286@gauss3.secunet.de>
-References: <20200610161437.4290-1-ebiggers@kernel.org>
+        Wed, 17 Jun 2020 03:12:19 -0400
+Received: from mail-ej1-f65.google.com ([209.85.218.65]:34229 "EHLO
+        mail-ej1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725860AbgFQHMT (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Jun 2020 03:12:19 -0400
+Received: by mail-ej1-f65.google.com with SMTP id l27so1176601ejc.1;
+        Wed, 17 Jun 2020 00:12:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=E5EcWVbc+7tsS+GAmjqiwsU8zuC9ZQ4KDsXaJSfWulo=;
+        b=hpp62K4a8CwZm2UreL6e+o7U64jJN0cGZO64x4/KaxFcj3JVTRwtGgvvphlWOGIwmB
+         mKDjFk36BUKL84X0A9sBPYLln2swyjTrxBpOKfntaidgraTsEqWSInVYjR+f229KLn86
+         JQgPgDrHQKjlcGt4G5FRUs/LnXp6LNLqNd3mRfMJQtEv721UDpyA2floMIWMSRRU63gC
+         qmC2URd5guep9hGNbmRJS4tl3WdSME9dwc9fVWomUGjNxDBIdLQAdimTtHyDG+qL4Z/x
+         N3yZtL4KoRdctI+kyJccwtPMuNdYqp+mPDxIX3roHMzcx6zoabwiEq+N3FeX8asH5wbJ
+         BPbw==
+X-Gm-Message-State: AOAM532QhxsCV6VV0nmw55nyn7fUqk+2MaOyho+lUa6ubnTkcAd2T2f0
+        jAq+dwgSw/eEUQy0iHHJ2nc=
+X-Google-Smtp-Source: ABdhPJzxXEZ/32Vk1uutSgWgDm/2Kml+FRFv6q/oUOzaHXvM3d9a7wcEm5DrSyb0iZ8v3ZPtZ+pKKg==
+X-Received: by 2002:a17:906:2581:: with SMTP id m1mr6681797ejb.89.1592377934427;
+        Wed, 17 Jun 2020 00:12:14 -0700 (PDT)
+Received: from localhost (ip-37-188-158-19.eurotel.cz. [37.188.158.19])
+        by smtp.gmail.com with ESMTPSA id g22sm12516138ejo.1.2020.06.17.00.12.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jun 2020 00:12:13 -0700 (PDT)
+Date:   Wed, 17 Jun 2020 09:12:12 +0200
+From:   Michal Hocko <mhocko@kernel.org>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     dsterba@suse.cz, Joe Perches <joe@perches.com>,
+        Waiman Long <longman@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        David Rientjes <rientjes@google.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+Subject: Re: [PATCH v4 0/3] mm, treewide: Rename kzfree() to kfree_sensitive()
+Message-ID: <20200617071212.GJ9499@dhcp22.suse.cz>
+References: <20200616015718.7812-1-longman@redhat.com>
+ <fe3b9a437be4aeab3bac68f04193cb6daaa5bee4.camel@perches.com>
+ <20200616230130.GJ27795@twin.jikos.cz>
+ <20200617003711.GD8681@bombadil.infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200610161437.4290-1-ebiggers@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+In-Reply-To: <20200617003711.GD8681@bombadil.infradead.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 10, 2020 at 09:14:34AM -0700, Eric Biggers wrote:
-> This series consolidates and modernizes the lists of crypto algorithms
-> that are selected by the IPsec kconfig options, and adds CRYPTO_SEQIV
-> since it no longer gets selected automatically by other things.
+On Tue 16-06-20 17:37:11, Matthew Wilcox wrote:
+> On Wed, Jun 17, 2020 at 01:01:30AM +0200, David Sterba wrote:
+> > On Tue, Jun 16, 2020 at 11:53:50AM -0700, Joe Perches wrote:
+> > > On Mon, 2020-06-15 at 21:57 -0400, Waiman Long wrote:
+> > > >  v4:
+> > > >   - Break out the memzero_explicit() change as suggested by Dan Carpenter
+> > > >     so that it can be backported to stable.
+> > > >   - Drop the "crypto: Remove unnecessary memzero_explicit()" patch for
+> > > >     now as there can be a bit more discussion on what is best. It will be
+> > > >     introduced as a separate patch later on after this one is merged.
+> > > 
+> > > To this larger audience and last week without reply:
+> > > https://lore.kernel.org/lkml/573b3fbd5927c643920e1364230c296b23e7584d.camel@perches.com/
+> > > 
+> > > Are there _any_ fastpath uses of kfree or vfree?
+> > 
+> > I'd consider kfree performance critical for cases where it is called
+> > under locks. If possible the kfree is moved outside of the critical
+> > section, but we have rbtrees or lists that get deleted under locks and
+> > restructuring the code to do eg. splice and free it outside of the lock
+> > is not always possible.
 > 
-> See previous discussion at
-> https://lkml.kernel.org/netdev/20200604192322.22142-1-ebiggers@kernel.org/T/#u
-> 
-> Changed v3 => v4:
->   - Don't say that AH is "NOT RECOMMENDED" by RFC 8221.
->   - Updated commit messages (added Acked-by tags, fixed a bad Fixes tag,
->     added some more explanation to patch 3).
+> Not just performance critical, but correctness critical.  Since kvfree()
+> may allocate from the vmalloc allocator, I really think that kvfree()
+> should assert that it's !in_atomic().  Otherwise we can get into trouble
+> if we end up calling vfree() and have to take the mutex.
 
-Series applied to the ipsec tree, thanks a lot Eric!
+FWIW __vfree already checks for atomic context and put the work into a
+deferred context. So this should be safe. It should be used as a last
+resort, though.
+
+-- 
+Michal Hocko
+SUSE Labs
