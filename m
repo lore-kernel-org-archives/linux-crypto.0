@@ -2,122 +2,126 @@ Return-Path: <SRS0=QxuD=77=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B04AC433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 13:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35F96C433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 13:52:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B4992073E
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 13:16:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 02A88207E8
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 13:52:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="rchpbBYb"
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="IpTq6o03"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729413AbgFRNQo (ORCPT
+        id S1730555AbgFRNwD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Jun 2020 09:16:44 -0400
-Received: from mail-eopbgr70057.outbound.protection.outlook.com ([40.107.7.57]:6083
-        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
+        Thu, 18 Jun 2020 09:52:03 -0400
+Received: from mail-bn8nam11on2083.outbound.protection.outlook.com ([40.107.236.83]:27328
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728632AbgFRNQh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jun 2020 09:16:37 -0400
+        id S1730686AbgFRNv7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jun 2020 09:51:59 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g/1+f1MMQtUbdhw2g7J/Ba/QGpgleer0e/7x7ElX1xljT1brC+6pzbHqKyRB7/jacNOjOAitXYvN8vMnChYT6FtiYdW5KjWDpem6EI+SzLoPHjQZETdwVEjFF+pVRaJJnZGw9vesCbU/KqvDdJZ5dzh3mZAi+x9aqPZF8yVOd0Uesgq4btCeGKAOc1MDnUf2lhWU7x/7vMyxHRpn+Wx2GkUsKNpdVXxkt7zd29xAIVGX8zvSy0aFZZipuRukNe3wICX45mEgatLOdmnPnejvWtN4B1E+w2OUPSUWMGd/wsJHWKsqaTdu9E49LmcEkydrCuKNRB7Dg3plObBHkWqxhA==
+ b=Bbv2utfSDe2u3DONvUOVKEFe2D60JsABlUBU7lMzNb7GagO6t1aXvi3M6bA6v7KVh6tvSkF5Ykljv+itEmg6Z0Ivh8nJWNcIke17hxhIg0xg2N7soBNhkigd7sAkIiK88eal5JE9o3a1orv7JZ4jAxrRLKWtfNVMUsRuNs0SvFT8kaQmz34SkuLeBdWP8HsClYRXOTa4ohAAAo+1hfL/nDcrTSVkRRxFjpdmFVaXt0cuUMy/Dv4IQaTbp3QtB9xtJTFQKQ/D/eJWAx07OTaV8x3J1avpSkLiu0XvoHBi1EDRKC9ZaW+dMIM60YfVBjl9Z7trSEthoSlpqFWpgDtUOA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aLIVCobv+W2l/D5MH6wzp50yQZ2+ZqMd6zZCmLl5Jlo=;
- b=bqRxfyTSiEnZQDhP9WbXoXIQAw8cHLZmezOxQO4deJ1pyeKoCEKdyKop/t/CI4cp4cIf3CDWj87kjP8v4r1n7LFUQu7YjWTpo+icydBtG3wU76qqkQvxUVBkACBhAFrx58ghBZxpnFKGYTIgiq/xUheWqD7Vuu7VumQURkkXygNWUolJuceKADKXGAkxa6XD+CN9dJgi48X2570kVfC1LfeXK6v1x/HOXLxrP2X2sgDIXirYMbWiFH3TauC9GveENUgqMhuhs1wMBe35cWc6iT+6kVm/PlDOhuwvwDPemTmr0SQwQcM8k0fmx8v4g18psr+Bt2gsDnU9Nk/QfgGjgg==
+ bh=EBOp1RIVw+1M72fxkefVlSYO8A1efQGdVEFgwlU0/ls=;
+ b=Q2cWPQNhHdBHNa3U2TsqgKWIBslStV/KWCXCsi5Ly/lwQjbXwAWapqBsl5m+cRh6iaw1Wtx28XH6cCjx/cqfrlf6QNXmX14EH8tEB7g+UYwkqU/FDr+SzcNsDi5d9jSyKT4U3UuIDM0Eysi8Lc7KJkHoEWnlz5ZGMQNl4pbZEB0poFo60AgRzgOaI5htUNKeCOQoEpJ/vAUX0qz0ayyEh+mwplWZyp7eFZGUxfBa4PZ7SxX6voj4XPjtAs+iLVaCLl65fcXNQKCQHUuSTPl6UlOiUBJS4uAbsWnYIa08d6G1ufhqL2WB94bTy1s8gnvvhSDHyJJEUP/NhkHjpAKYUA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aLIVCobv+W2l/D5MH6wzp50yQZ2+ZqMd6zZCmLl5Jlo=;
- b=rchpbBYbYkcHz8j1rtcmPVssA00tr6moAJ5leFF6I2Ot5zpGIS65WAhaDzwPFVDNQ2iWohZZPsKqNBsXqgkoeyU7p1d/t75/foOKeuJ5Q2UzKejLc5xAIgrFY5PesYr+nMAqa5Jl5CtaCvutxvsG4ut7IvhByOUq5h3QLdOmRPI=
+ bh=EBOp1RIVw+1M72fxkefVlSYO8A1efQGdVEFgwlU0/ls=;
+ b=IpTq6o03GSxgDc2o1pAtZ2/LRixsWr54vlPOHjJfSZmgF7wOYoZHKAqYg7LlyMd3+/7TE/lJi9iP9Ea1tx1Ow0snypTWOmnSssD6OwSe4GdF4LuVMmbPqkYcBBeBRgk8/EjUKliWA3+FC5tjtTHJAm3S2XOSF6viz9JJTEpA9nc=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=nxp.com;
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
- by VI1PR04MB7040.eurprd04.prod.outlook.com (2603:10a6:800:121::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.22; Thu, 18 Jun
- 2020 13:16:33 +0000
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::4cf0:3c9c:ed2:aacd]) by VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::4cf0:3c9c:ed2:aacd%4]) with mapi id 15.20.3109.021; Thu, 18 Jun 2020
- 13:16:33 +0000
-Subject: Re: [PATCH] crypto: caam/qi2: remove redundant assignment to ret
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Colin King <colin.king@canonical.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM6PR12MB3274.namprd12.prod.outlook.com (2603:10b6:5:182::25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3088.24; Thu, 18 Jun 2020 13:51:56 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::4ce1:9947:9681:c8b1]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::4ce1:9947:9681:c8b1%10]) with mapi id 15.20.3088.028; Thu, 18 Jun
+ 2020 13:51:56 +0000
+Subject: Re: [PATCH] crypto: ccp: remove redundant assignment to variable ret
+To:     Colin King <colin.king@canonical.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20200611153934.928021-1-colin.king@canonical.com>
- <8e08adcb-ef91-124d-d093-921fc97da3af@nxp.com>
- <20200618110050.GA10995@gondor.apana.org.au>
-From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
-Message-ID: <b351f9b5-940c-61d3-38f2-3654c6da55b0@nxp.com>
-Date:   Thu, 18 Jun 2020 16:16:29 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+        linux-crypto@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200618101229.11772-1-colin.king@canonical.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <dcbf3e93-b370-8190-4374-afd9cb4f87b8@amd.com>
+Date:   Thu, 18 Jun 2020 08:51:54 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
-In-Reply-To: <20200618110050.GA10995@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200618101229.11772-1-colin.king@canonical.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR10CA0102.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:e6::19) To VI1PR04MB4046.eurprd04.prod.outlook.com
- (2603:10a6:803:4d::29)
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN2PR01CA0083.prod.exchangelabs.com (2603:10b6:800::51) To
+ DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.0.129] (84.117.251.185) by AM0PR10CA0102.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:e6::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.22 via Frontend Transport; Thu, 18 Jun 2020 13:16:31 +0000
-X-Originating-IP: [84.117.251.185]
+Received: from office-linux.texastahm.com (67.79.209.213) by SN2PR01CA0083.prod.exchangelabs.com (2603:10b6:800::51) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.22 via Frontend Transport; Thu, 18 Jun 2020 13:51:55 +0000
+X-Originating-IP: [67.79.209.213]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 22df849f-a429-4a54-75fc-08d81389d206
-X-MS-TrafficTypeDiagnostic: VI1PR04MB7040:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR04MB7040263ED365BF74AB21979A989B0@VI1PR04MB7040.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Office365-Filtering-Correlation-Id: 8e084020-fe61-4c5f-c4e7-08d8138ec3a0
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3274:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB3274D06A60BA729CAD91DEDAEC9B0@DM6PR12MB3274.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:517;
 X-Forefront-PRVS: 0438F90F17
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: y/jwljeUU5gpiI4hgSV0ERaw3ACayJvfYFl21jfl+ncxqu0yZ2fY2WwTb71hBfF7LXhRU5xdC9Oh0Z9bAK3+Yn6TtdUZeOz52jkp6YhFLjotVeI+mxAM5jjGyEBG3LhIIa8fKwWOY7n2Pr2/xZnEYg6ZIzxvVjT1lf6E6JjHUreK7JbJTTU6SMAGKW1+on4aM8iy6gIuOtGCdxOkTQpZdscgdjT+ndWTCRmvuw/O0uQYb1qPUvvH9DbRnfUjBLn7yZEoCXR5X0WzZJy7l6B12X0EIyu5K5XXRVqphTrcAkQBz71KAswWtqmbc8kcxsFRdv9T7+IqW3F/00DGpbnDMPJdhrpSAmMv2M0lJ9yNxahCC2RxVdOSSjFBeod/dV+V
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(396003)(376002)(366004)(346002)(136003)(66946007)(66476007)(66556008)(52116002)(26005)(186003)(16526019)(54906003)(316002)(16576012)(956004)(2616005)(86362001)(31686004)(53546011)(31696002)(8936002)(36756003)(4744005)(6486002)(8676002)(5660300002)(2906002)(4326008)(6916009)(478600001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: VafZBJHnCWXzvotJaKGxdRQilRTRVUdBpwYhkwr4QLnKDHbtAPvkgTYCPiqdZ4rVSTDLhi6Z8cpdHmfnu7iXQSp5EzbiVubgCmD/b9+gh+9KUYYO3ITWLwkxIimY7hctQYSuCB5o+q8SCMMszxO+jMr2OcpHT645+ThgqB5NVemQpKaUVHPKJVl2G6qqlVLjsoqoKDBOk2S7lTXa1bZhxcKBccq6kcX7Wkqq0NiL8kfxfIHnCBIuYU4YEtwvPNlCmicZSdNmeT48fpi2adHVKeGHtQC1UIEit02SenVlxaIJZvM3n1wCls0J1LcR5MuVM4Qa63qfPX3Ah1mPU7nAMTB/A18ZyxY0pvoqQWY99FU2HQSKx+cYP+s+t0o5A70wrpIPELfMEomwsghie9bhF5hQoq2tAKpP9uMdM1+MHojHLv9gc6d67vtKuwnnVIuI11SYFxWr+XYrb+vcdGOyU6MGTOCHYSrEMiZOxCBFZJub8FvA67CU+6zQAw2Y6cHB
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22df849f-a429-4a54-75fc-08d81389d206
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2020 13:16:33.1559
+X-Microsoft-Antispam-Message-Info: Ape+xYpP3x7GXF8HZXReFqkUyjpyEWGYd/YLHjn0aT+JDxM0UT8Pj3sopoN5i8qBUHsmrmf4u1Cnuu08lj6FDiIO9zO1S9J0E4K/eX24geGYjT2R1qf3UWVWsj3pf3/r27kVX0n8NKiZr2vwYdXLXZkenjBzEmhX/xFrI3ddJK9kwCbZ9q6SdsOoaoX6hsJq1GSMbgXd2oTHWKrJzNK+Q+CP6xze9NGouy8Nx7+WQ7S4IgIxkk0vBM9XK9fjUbB7naoQLYixx/LZRjCyQ+aNPtxm76aaQtn67HDt5daJr7dGDD0Xaha3SQtvVZ2/0Hzx/39qRWw3g22j6NgMsoskoUauB980bi48FexdJrAeRlS3alWI52dk3+zUG4OOGdNh
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(39860400002)(376002)(396003)(366004)(346002)(31686004)(36756003)(86362001)(4744005)(5660300002)(186003)(66946007)(66556008)(53546011)(66476007)(6506007)(31696002)(16526019)(6486002)(110136005)(478600001)(8676002)(4326008)(26005)(2616005)(316002)(956004)(6512007)(83380400001)(52116002)(2906002)(8936002)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: O0W61Tk/q54Azcw7lyaKw72d+YTWHaAEslB2+f+2+UNO0wmvQ9lgNUb7I819MCLE6Q8hxyAdAdi65eGv5I/2/i2E4Rh9C8+e+pVP9IBPWiofEJpP9PXrN2j5gEr7lFRU/WYdSfvEI5ZMyaUNwz6Dk7iFKW4R9gztQByA1VWNVLDh6+u18Sw3EeNV7X1DYyihTbVHEarDjlxrWJF6KzTe+d2B8XPdYUtYO96iA5Uey82KAQdPA2iq1gLlt13xhdA/ZU6UlIyJ/u7NuQOsJAEZmx1nAXQtprKjBLgbuv0Q3QdGVdWhfCpOsqQs3bOX0rHCfm3Lrsl/fpe3nUzlmTZWr685LARpLRulyz6+9d/sMfIz9eTS1Zl5fGT8U3MsU9kUNkq62wL9yhO4N43ZT5+t1pyVSWv7e0ogD5jdomvgLpQFqgPCJBip75NhP5gOu7jtZ1/po5rrZ70BeaOpRVT4cefsQ5rH3S+r+HGJAeYcoTBjxMECu1iSUqhitXtGG6FB
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8e084020-fe61-4c5f-c4e7-08d8138ec3a0
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2020 13:51:56.4250
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KA34An8/6vT1n/5ZJ7/Sg/PLXc8ve7sVqJVUri+XCpvYWSt4yDav5f7f8KhmCwll7UzZjWeUskv6OFRwScd8ew==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7040
+X-MS-Exchange-CrossTenant-UserPrincipalName: fTe7gFhMgAmDdEPboyfmnAJtpmDjc8xqOzHDt9BUFqBgOG1QTypyFe/lzRiYtOyiJgbt8iZdfUzAr01jvmKYsQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3274
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/18/2020 2:00 PM, Herbert Xu wrote:
-> On Thu, Jun 18, 2020 at 01:54:55PM +0300, Horia Geantă wrote:
->>
->> The proper fix would be updating the ahash_finup_no_ctx() function
->> to return the specific error code:
->> 	return ret;
->> instead of returning -ENOMEM for all error cases.
->>
->> For example error code returned by dpaa2_caam_enqueue()
->> should be returned instead of -ENOMEM.
+On 6/18/20 5:12 AM, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> You can do that as a follow-up.  The patch is correct as is.
+> The variable ret is being assigned with a value that is never read
+> and it is being updated later with a new value.  The assignment is
+> redundant and can be removed.
 > 
-Just that the follow-up implies adding all the code back.
+> Addresses-Coverity: ("Unused value")
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 
-Anyway, not a big deal...
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-Thanks,
-Horia
+> ---
+>   drivers/crypto/ccp/ccp-ops.c | 1 -
+>   1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+> index 422193690fd4..d270aa792888 100644
+> --- a/drivers/crypto/ccp/ccp-ops.c
+> +++ b/drivers/crypto/ccp/ccp-ops.c
+> @@ -1308,7 +1308,6 @@ ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+>   			return -EINVAL;
+>   	}
+>   
+> -	ret = -EIO;
+>   	/* Zero out all the fields of the command desc */
+>   	memset(&op, 0, sizeof(op));
+>   
+> 
