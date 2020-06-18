@@ -1,119 +1,225 @@
-Return-Path: <SRS0=o6su=76=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=QxuD=77=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C3EBC433E2
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jun 2020 23:12:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7C7C433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 01:40:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E48A20734
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jun 2020 23:12:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8BE720FC3
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 01:40:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1592444450;
+	bh=6OPqHLKur3gEtvhg8Ujc/NSKAmxBuQ5UCEpCXrYw7F0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=JRRk19Y1+5V6FrpkUQzj6SY0FRAocjbwtAS0wsSRoQoFlTM/MeNug744BOkhW7IB5
+	 1776I3UDPK8klsT7LQjHisaIs5T5BzNs0LthrjXJXFRdLgVYMG0ZVELuANUtyD1vmb
+	 TSBEsituaw4HNBD/cphZHoYtUV7Wx/N94Uwk6zkk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726948AbgFQXMS (ORCPT
+        id S1732408AbgFRB3z (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Jun 2020 19:12:18 -0400
-Received: from smtprelay0191.hostedemail.com ([216.40.44.191]:41454 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726761AbgFQXMS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Jun 2020 19:12:18 -0400
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay07.hostedemail.com (Postfix) with ESMTP id C6BF8181D330D;
-        Wed, 17 Jun 2020 23:12:13 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-HE-Tag: anger66_3706ec726e0b
-X-Filterd-Recvd-Size: 3931
-Received: from XPS-9350.home (unknown [47.151.133.149])
-        (Authenticated sender: joe@perches.com)
-        by omf11.hostedemail.com (Postfix) with ESMTPA;
-        Wed, 17 Jun 2020 23:12:07 +0000 (UTC)
-Message-ID: <38c5745d14cff75fe264a3bc61d19fd837baf7ad.camel@perches.com>
-Subject: Re: [PATCH v4 0/3] mm, treewide: Rename kzfree() to
- kfree_sensitive()
-From:   Joe Perches <joe@perches.com>
-To:     Denis Efremov <efremov@ispras.ru>,
-        Waiman Long <longman@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        David Rientjes <rientjes@google.com>
-Cc:     Michal Hocko <mhocko@suse.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        David Sterba <dsterba@suse.cz>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-amlogic@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
-        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
-        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org
-Date:   Wed, 17 Jun 2020 16:12:06 -0700
-In-Reply-To: <17e4fede-bab0-d93c-6964-69decc889d7d@ispras.ru>
-References: <20200616015718.7812-1-longman@redhat.com>
-         <fe3b9a437be4aeab3bac68f04193cb6daaa5bee4.camel@perches.com>
-         <17e4fede-bab0-d93c-6964-69decc889d7d@ispras.ru>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.36.2-0ubuntu1 
+        Wed, 17 Jun 2020 21:29:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39574 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732405AbgFRB3z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:29:55 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A0DD922228;
+        Thu, 18 Jun 2020 01:29:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592443794;
+        bh=6OPqHLKur3gEtvhg8Ujc/NSKAmxBuQ5UCEpCXrYw7F0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=cKAyj7tuLqm/tEFDpJqKXrlgpbvOLsFFhbjB1mDSf0SOotUULQCX20l7l9Hw080rB
+         3eSZh7MvvUPAJmnhxnrgRHsJDDMlJavUVutz36W0S7C+euT71/YRw2yi8ELoMQrqak
+         yvt667JWZTublEucZTgN/R7g0LiNKFFUGV4c2x7I=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Tero Kristo <t-kristo@ti.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.9 74/80] crypto: omap-sham - add proper load balancing support for multicore
+Date:   Wed, 17 Jun 2020 21:28:13 -0400
+Message-Id: <20200618012819.609778-74-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200618012819.609778-1-sashal@kernel.org>
+References: <20200618012819.609778-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 2020-06-18 at 00:31 +0300, Denis Efremov wrote:
-> 
-> On 6/16/20 9:53 PM, Joe Perches wrote:
-> > On Mon, 2020-06-15 at 21:57 -0400, Waiman Long wrote:
-> > >  v4:
-> > >   - Break out the memzero_explicit() change as suggested by Dan Carpenter
-> > >     so that it can be backported to stable.
-> > >   - Drop the "crypto: Remove unnecessary memzero_explicit()" patch for
-> > >     now as there can be a bit more discussion on what is best. It will be
-> > >     introduced as a separate patch later on after this one is merged.
-> > 
-> > To this larger audience and last week without reply:
-> > https://lore.kernel.org/lkml/573b3fbd5927c643920e1364230c296b23e7584d.camel@perches.com/
-> > 
-> > Are there _any_ fastpath uses of kfree or vfree?
-> > 
-> > Many patches have been posted recently to fix mispairings
-> > of specific types of alloc and free functions.
-> 
-> I've prepared a coccinelle script to highlight these mispairings in a function
-> a couple of days ago: https://lkml.org/lkml/2020/6/5/953
-> I've listed all the fixes in the commit message. 
-> 
-> Not so many mispairings actually, and most of them are harmless like:
-> kmalloc(E) -> kvfree(E)
-> 
-> However, coccinelle script can't detect cross-functions mispairings, i.e.
-> allocation in one function, free in another funtion.
+From: Tero Kristo <t-kristo@ti.com>
 
-Hey Denis, thanks for those patches.
+[ Upstream commit 281c377872ff5d15d80df25fc4df02d2676c7cde ]
 
-If possible, it's probably better to not require these pairings
-and use a single standard kfree/free function.
+The current implementation of the multiple accelerator core support for
+OMAP SHA does not work properly. It always picks up the first probed
+accelerator core if this is available, and rest of the book keeping also
+gets confused if there are two cores available. Add proper load
+balancing support for SHA, and also fix any bugs related to the
+multicore support while doing it.
 
-Given the existing ifs in kfree in slab/slob/slub, it seems
-likely that adding a few more wouldn't have much impact.
+Signed-off-by: Tero Kristo <t-kristo@ti.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/crypto/omap-sham.c | 64 ++++++++++++++++++--------------------
+ 1 file changed, 31 insertions(+), 33 deletions(-)
 
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index ff6ac4e824b5..e7ca922a45e1 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -167,8 +167,6 @@ struct omap_sham_hmac_ctx {
+ };
+ 
+ struct omap_sham_ctx {
+-	struct omap_sham_dev	*dd;
+-
+ 	unsigned long		flags;
+ 
+ 	/* fallback stuff */
+@@ -915,27 +913,35 @@ static int omap_sham_update_dma_stop(struct omap_sham_dev *dd)
+ 	return 0;
+ }
+ 
++struct omap_sham_dev *omap_sham_find_dev(struct omap_sham_reqctx *ctx)
++{
++	struct omap_sham_dev *dd;
++
++	if (ctx->dd)
++		return ctx->dd;
++
++	spin_lock_bh(&sham.lock);
++	dd = list_first_entry(&sham.dev_list, struct omap_sham_dev, list);
++	list_move_tail(&dd->list, &sham.dev_list);
++	ctx->dd = dd;
++	spin_unlock_bh(&sham.lock);
++
++	return dd;
++}
++
+ static int omap_sham_init(struct ahash_request *req)
+ {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 	struct omap_sham_ctx *tctx = crypto_ahash_ctx(tfm);
+ 	struct omap_sham_reqctx *ctx = ahash_request_ctx(req);
+-	struct omap_sham_dev *dd = NULL, *tmp;
++	struct omap_sham_dev *dd;
+ 	int bs = 0;
+ 
+-	spin_lock_bh(&sham.lock);
+-	if (!tctx->dd) {
+-		list_for_each_entry(tmp, &sham.dev_list, list) {
+-			dd = tmp;
+-			break;
+-		}
+-		tctx->dd = dd;
+-	} else {
+-		dd = tctx->dd;
+-	}
+-	spin_unlock_bh(&sham.lock);
++	ctx->dd = NULL;
+ 
+-	ctx->dd = dd;
++	dd = omap_sham_find_dev(ctx);
++	if (!dd)
++		return -ENODEV;
+ 
+ 	ctx->flags = 0;
+ 
+@@ -1185,8 +1191,7 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
+ static int omap_sham_enqueue(struct ahash_request *req, unsigned int op)
+ {
+ 	struct omap_sham_reqctx *ctx = ahash_request_ctx(req);
+-	struct omap_sham_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
+-	struct omap_sham_dev *dd = tctx->dd;
++	struct omap_sham_dev *dd = ctx->dd;
+ 
+ 	ctx->op = op;
+ 
+@@ -1196,7 +1201,7 @@ static int omap_sham_enqueue(struct ahash_request *req, unsigned int op)
+ static int omap_sham_update(struct ahash_request *req)
+ {
+ 	struct omap_sham_reqctx *ctx = ahash_request_ctx(req);
+-	struct omap_sham_dev *dd = ctx->dd;
++	struct omap_sham_dev *dd = omap_sham_find_dev(ctx);
+ 
+ 	if (!req->nbytes)
+ 		return 0;
+@@ -1301,21 +1306,8 @@ static int omap_sham_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 	struct omap_sham_hmac_ctx *bctx = tctx->base;
+ 	int bs = crypto_shash_blocksize(bctx->shash);
+ 	int ds = crypto_shash_digestsize(bctx->shash);
+-	struct omap_sham_dev *dd = NULL, *tmp;
+ 	int err, i;
+ 
+-	spin_lock_bh(&sham.lock);
+-	if (!tctx->dd) {
+-		list_for_each_entry(tmp, &sham.dev_list, list) {
+-			dd = tmp;
+-			break;
+-		}
+-		tctx->dd = dd;
+-	} else {
+-		dd = tctx->dd;
+-	}
+-	spin_unlock_bh(&sham.lock);
+-
+ 	err = crypto_shash_setkey(tctx->fallback, key, keylen);
+ 	if (err)
+ 		return err;
+@@ -1333,7 +1325,7 @@ static int omap_sham_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 
+ 	memset(bctx->ipad + keylen, 0, bs - keylen);
+ 
+-	if (!test_bit(FLAGS_AUTO_XOR, &dd->flags)) {
++	if (!test_bit(FLAGS_AUTO_XOR, &sham.flags)) {
+ 		memcpy(bctx->opad, bctx->ipad, bs);
+ 
+ 		for (i = 0; i < bs; i++) {
+@@ -2072,6 +2064,7 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	dd->flags |= dd->pdata->flags;
++	sham.flags |= dd->pdata->flags;
+ 
+ 	pm_runtime_use_autosuspend(dev);
+ 	pm_runtime_set_autosuspend_delay(dev, DEFAULT_AUTOSUSPEND_DELAY);
+@@ -2097,6 +2090,9 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 	spin_unlock(&sham.lock);
+ 
+ 	for (i = 0; i < dd->pdata->algs_info_size; i++) {
++		if (dd->pdata->algs_info[i].registered)
++			break;
++
+ 		for (j = 0; j < dd->pdata->algs_info[i].size; j++) {
+ 			struct ahash_alg *alg;
+ 
+@@ -2142,9 +2138,11 @@ static int omap_sham_remove(struct platform_device *pdev)
+ 	list_del(&dd->list);
+ 	spin_unlock(&sham.lock);
+ 	for (i = dd->pdata->algs_info_size - 1; i >= 0; i--)
+-		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--)
++		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--) {
+ 			crypto_unregister_ahash(
+ 					&dd->pdata->algs_info[i].algs_list[j]);
++			dd->pdata->algs_info[i].registered--;
++		}
+ 	tasklet_kill(&dd->done_task);
+ 	pm_runtime_disable(&pdev->dev);
+ 
+-- 
+2.25.1
 
