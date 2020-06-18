@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22DC8C433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 02:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED6BC433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 02:48:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 013EC206E2
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 02:32:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4011A2083B
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 02:48:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592447539;
-	bh=sMj1a01Ly63MbfBjhXj41uQ3VY8ywzgCtKQT9UCyDRg=;
+	s=default; t=1592448496;
+	bh=BGdvKK5DrbYBFeR4C8aGl3gQsYyEsDpaxKr1dkc8478=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=it5PbRskLQEKDXp3QXym3E+CaYqA8JamDQVTjFwFikRJ12r0VbkToTcrgdsUnYv8+
-	 dmEHYeo2jYOXuef9dEvMqqyxHIUBHCUgr9HFcKMLZjTtgImI2/YWyV3Yof3fa/IYZR
-	 d3l9wpyjmkg9+RUyad6jty6byb48pezSzugG0to0=
+	b=PBO5TAXx7uAJQtV+qjELUF4N4rJUfDugE76xTUqf68SJ+/9+C4LIR9JJlOK1KSxrq
+	 /XF+62UV/NXDJAZSNbaDcSF0XMmGV+VSNXKWzb05e+Ii+80GmefF8arbB12EzmvFLW
+	 4M3FktU6UqkXZINT3Y40iAhMpWMEtPTf0s0vYpgw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731596AbgFRCb4 (ORCPT
+        id S1728393AbgFRBKG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Jun 2020 22:31:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45324 "EHLO mail.kernel.org"
+        Wed, 17 Jun 2020 21:10:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37002 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729451AbgFRBPP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:15:15 -0400
+        id S1728385AbgFRBKF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:10:05 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0B7462193E;
-        Thu, 18 Jun 2020 01:15:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D718E21D7B;
+        Thu, 18 Jun 2020 01:10:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592442914;
-        bh=sMj1a01Ly63MbfBjhXj41uQ3VY8ywzgCtKQT9UCyDRg=;
+        s=default; t=1592442605;
+        bh=BGdvKK5DrbYBFeR4C8aGl3gQsYyEsDpaxKr1dkc8478=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hJ+DSvam2KDSAydV05MN9hd3BkG8yGcXt+g4ZVmiTWOjbwIv0NtxyBw+umL8sUcy9
-         2twTmrsTVoT9sKX4I967WMQjuOUjKOPAnJR2IB1tcj659BEShQVPwn1eIR+A2my/ma
-         QlXN2XyZH9lo/rvWPIG1fk50PoKUiOB0otna2q4I=
+        b=gmiAm8sEQw9CzzdNSxIKtk1WXyp3TJProqX1txhxhLyy74xJFLlJ2iMgOluSH3WG9
+         d4Ok5VC2xZgG4Hfg+0RJKIpFYRZ3GSipsHcR9HKfmRDBg1sE83VrJYlNFMzmQ0XM5v
+         3eG4LUMz4NDH7IeOwLLyZvIKfyy+UngUgtL7Ov/I=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Tero Kristo <t-kristo@ti.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.7 332/388] crypto: omap-sham - add proper load balancing support for multicore
-Date:   Wed, 17 Jun 2020 21:07:09 -0400
-Message-Id: <20200618010805.600873-332-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.7 091/388] crypto: omap-sham - huge buffer access fixes
+Date:   Wed, 17 Jun 2020 21:03:08 -0400
+Message-Id: <20200618010805.600873-91-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200618010805.600873-1-sashal@kernel.org>
 References: <20200618010805.600873-1-sashal@kernel.org>
@@ -61,165 +61,50 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Tero Kristo <t-kristo@ti.com>
 
-[ Upstream commit 281c377872ff5d15d80df25fc4df02d2676c7cde ]
+[ Upstream commit 6395166d7a19019d5e9574eb9ecdaf0028abb887 ]
 
-The current implementation of the multiple accelerator core support for
-OMAP SHA does not work properly. It always picks up the first probed
-accelerator core if this is available, and rest of the book keeping also
-gets confused if there are two cores available. Add proper load
-balancing support for SHA, and also fix any bugs related to the
-multicore support while doing it.
+The ctx internal buffer can only hold buflen amount of data, don't try
+to copy over more than that. Also, initialize the context sg pointer
+if we only have data in the context internal buffer, this can happen
+when closing a hash with certain data amounts.
 
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/omap-sham.c | 64 ++++++++++++++++++--------------------
- 1 file changed, 31 insertions(+), 33 deletions(-)
+ drivers/crypto/omap-sham.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 0cbf9c932a0f..a82a3596dca3 100644
+index e4072cd38585..0cbf9c932a0f 100644
 --- a/drivers/crypto/omap-sham.c
 +++ b/drivers/crypto/omap-sham.c
-@@ -169,8 +169,6 @@ struct omap_sham_hmac_ctx {
- };
+@@ -751,8 +751,15 @@ static int omap_sham_align_sgs(struct scatterlist *sg,
+ 	int offset = rctx->offset;
+ 	int bufcnt = rctx->bufcnt;
  
- struct omap_sham_ctx {
--	struct omap_sham_dev	*dd;
--
- 	unsigned long		flags;
- 
- 	/* fallback stuff */
-@@ -933,27 +931,35 @@ static int omap_sham_update_dma_stop(struct omap_sham_dev *dd)
- 	return 0;
- }
- 
-+struct omap_sham_dev *omap_sham_find_dev(struct omap_sham_reqctx *ctx)
-+{
-+	struct omap_sham_dev *dd;
-+
-+	if (ctx->dd)
-+		return ctx->dd;
-+
-+	spin_lock_bh(&sham.lock);
-+	dd = list_first_entry(&sham.dev_list, struct omap_sham_dev, list);
-+	list_move_tail(&dd->list, &sham.dev_list);
-+	ctx->dd = dd;
-+	spin_unlock_bh(&sham.lock);
-+
-+	return dd;
-+}
-+
- static int omap_sham_init(struct ahash_request *req)
- {
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
- 	struct omap_sham_ctx *tctx = crypto_ahash_ctx(tfm);
- 	struct omap_sham_reqctx *ctx = ahash_request_ctx(req);
--	struct omap_sham_dev *dd = NULL, *tmp;
-+	struct omap_sham_dev *dd;
- 	int bs = 0;
- 
--	spin_lock_bh(&sham.lock);
--	if (!tctx->dd) {
--		list_for_each_entry(tmp, &sham.dev_list, list) {
--			dd = tmp;
--			break;
--		}
--		tctx->dd = dd;
--	} else {
--		dd = tctx->dd;
--	}
--	spin_unlock_bh(&sham.lock);
-+	ctx->dd = NULL;
- 
--	ctx->dd = dd;
-+	dd = omap_sham_find_dev(ctx);
-+	if (!dd)
-+		return -ENODEV;
- 
- 	ctx->flags = 0;
- 
-@@ -1223,8 +1229,7 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
- static int omap_sham_enqueue(struct ahash_request *req, unsigned int op)
- {
- 	struct omap_sham_reqctx *ctx = ahash_request_ctx(req);
--	struct omap_sham_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
--	struct omap_sham_dev *dd = tctx->dd;
-+	struct omap_sham_dev *dd = ctx->dd;
- 
- 	ctx->op = op;
- 
-@@ -1234,7 +1239,7 @@ static int omap_sham_enqueue(struct ahash_request *req, unsigned int op)
- static int omap_sham_update(struct ahash_request *req)
- {
- 	struct omap_sham_reqctx *ctx = ahash_request_ctx(req);
--	struct omap_sham_dev *dd = ctx->dd;
-+	struct omap_sham_dev *dd = omap_sham_find_dev(ctx);
- 
- 	if (!req->nbytes)
- 		return 0;
-@@ -1338,21 +1343,8 @@ static int omap_sham_setkey(struct crypto_ahash *tfm, const u8 *key,
- 	struct omap_sham_hmac_ctx *bctx = tctx->base;
- 	int bs = crypto_shash_blocksize(bctx->shash);
- 	int ds = crypto_shash_digestsize(bctx->shash);
--	struct omap_sham_dev *dd = NULL, *tmp;
- 	int err, i;
- 
--	spin_lock_bh(&sham.lock);
--	if (!tctx->dd) {
--		list_for_each_entry(tmp, &sham.dev_list, list) {
--			dd = tmp;
--			break;
--		}
--		tctx->dd = dd;
--	} else {
--		dd = tctx->dd;
--	}
--	spin_unlock_bh(&sham.lock);
--
- 	err = crypto_shash_setkey(tctx->fallback, key, keylen);
- 	if (err)
- 		return err;
-@@ -1370,7 +1362,7 @@ static int omap_sham_setkey(struct crypto_ahash *tfm, const u8 *key,
- 
- 	memset(bctx->ipad + keylen, 0, bs - keylen);
- 
--	if (!test_bit(FLAGS_AUTO_XOR, &dd->flags)) {
-+	if (!test_bit(FLAGS_AUTO_XOR, &sham.flags)) {
- 		memcpy(bctx->opad, bctx->ipad, bs);
- 
- 		for (i = 0; i < bs; i++) {
-@@ -2174,6 +2166,7 @@ static int omap_sham_probe(struct platform_device *pdev)
- 	}
- 
- 	dd->flags |= dd->pdata->flags;
-+	sham.flags |= dd->pdata->flags;
- 
- 	pm_runtime_use_autosuspend(dev);
- 	pm_runtime_set_autosuspend_delay(dev, DEFAULT_AUTOSUSPEND_DELAY);
-@@ -2201,6 +2194,9 @@ static int omap_sham_probe(struct platform_device *pdev)
- 	spin_unlock(&sham.lock);
- 
- 	for (i = 0; i < dd->pdata->algs_info_size; i++) {
-+		if (dd->pdata->algs_info[i].registered)
-+			break;
-+
- 		for (j = 0; j < dd->pdata->algs_info[i].size; j++) {
- 			struct ahash_alg *alg;
- 
-@@ -2252,9 +2248,11 @@ static int omap_sham_remove(struct platform_device *pdev)
- 	list_del(&dd->list);
- 	spin_unlock(&sham.lock);
- 	for (i = dd->pdata->algs_info_size - 1; i >= 0; i--)
--		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--)
-+		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--) {
- 			crypto_unregister_ahash(
- 					&dd->pdata->algs_info[i].algs_list[j]);
-+			dd->pdata->algs_info[i].registered--;
+-	if (!sg || !sg->length || !nbytes)
++	if (!sg || !sg->length || !nbytes) {
++		if (bufcnt) {
++			sg_init_table(rctx->sgl, 1);
++			sg_set_buf(rctx->sgl, rctx->dd->xmit_buf, bufcnt);
++			rctx->sg = rctx->sgl;
 +		}
- 	tasklet_kill(&dd->done_task);
- 	pm_runtime_disable(&pdev->dev);
++
+ 		return 0;
++	}
  
+ 	new_len = nbytes;
+ 
+@@ -896,7 +903,7 @@ static int omap_sham_prepare_request(struct ahash_request *req, bool update)
+ 	if (hash_later < 0)
+ 		hash_later = 0;
+ 
+-	if (hash_later) {
++	if (hash_later && hash_later <= rctx->buflen) {
+ 		scatterwalk_map_and_copy(rctx->buffer,
+ 					 req->src,
+ 					 req->nbytes - hash_later,
 -- 
 2.25.1
 
