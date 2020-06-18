@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34A97C433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 02:12:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22DC8C433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 02:32:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1421B20853
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 02:12:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 013EC206E2
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 02:32:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592446346;
-	bh=Hw/CESZmLD01Fy7BU8jIkBVL+QWUqIIGTNbJnoNcF00=;
+	s=default; t=1592447539;
+	bh=sMj1a01Ly63MbfBjhXj41uQ3VY8ywzgCtKQT9UCyDRg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=jw2tahJogcxbEwO72SeJ95OOdhpV7L+5u+HF6HMbpeEg525KRBqzEjpOtRAZZ29HY
-	 TS6rSYc/WvQJik5s7LLWLwSr6QTyjcJLPZqcd4ok5SITBuv8qir9dPrgNnyKa5RJqh
-	 kqUk88MUIGmxxLUOF0GkyUrClHF1NebbyJfDk9tE=
+	b=it5PbRskLQEKDXp3QXym3E+CaYqA8JamDQVTjFwFikRJ12r0VbkToTcrgdsUnYv8+
+	 dmEHYeo2jYOXuef9dEvMqqyxHIUBHCUgr9HFcKMLZjTtgImI2/YWyV3Yof3fa/IYZR
+	 d3l9wpyjmkg9+RUyad6jty6byb48pezSzugG0to0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732677AbgFRCMO (ORCPT
+        id S1731596AbgFRCb4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Jun 2020 22:12:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53860 "EHLO mail.kernel.org"
+        Wed, 17 Jun 2020 22:31:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45324 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730494AbgFRBVY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:21:24 -0400
+        id S1729451AbgFRBPP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:15:15 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5747721974;
-        Thu, 18 Jun 2020 01:21:23 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0B7462193E;
+        Thu, 18 Jun 2020 01:15:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592443284;
-        bh=Hw/CESZmLD01Fy7BU8jIkBVL+QWUqIIGTNbJnoNcF00=;
+        s=default; t=1592442914;
+        bh=sMj1a01Ly63MbfBjhXj41uQ3VY8ywzgCtKQT9UCyDRg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SJu6xZXwz26SuJAOH7uXpsKa8fO5GXh8BTbbNoJVFVpBlKtDtCm33K/eHmVKE92lT
-         0hOSzEJNbcgTZCCHYbiMLSjnH0NdfhWaU81835AF4K46GPWlMiDJJmBEQY5VVhjAtJ
-         lQrAz/0xDDBZ0liRFLlyr0qVBmJk4yTSxbfc3Tic=
+        b=hJ+DSvam2KDSAydV05MN9hd3BkG8yGcXt+g4ZVmiTWOjbwIv0NtxyBw+umL8sUcy9
+         2twTmrsTVoT9sKX4I967WMQjuOUjKOPAnJR2IB1tcj659BEShQVPwn1eIR+A2my/ma
+         QlXN2XyZH9lo/rvWPIG1fk50PoKUiOB0otna2q4I=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Tero Kristo <t-kristo@ti.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 227/266] crypto: omap-sham - add proper load balancing support for multicore
-Date:   Wed, 17 Jun 2020 21:15:52 -0400
-Message-Id: <20200618011631.604574-227-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.7 332/388] crypto: omap-sham - add proper load balancing support for multicore
+Date:   Wed, 17 Jun 2020 21:07:09 -0400
+Message-Id: <20200618010805.600873-332-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200618011631.604574-1-sashal@kernel.org>
-References: <20200618011631.604574-1-sashal@kernel.org>
+In-Reply-To: <20200618010805.600873-1-sashal@kernel.org>
+References: <20200618010805.600873-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -78,10 +78,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 31 insertions(+), 33 deletions(-)
 
 diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index ac80bc6af093..aba5db3c0588 100644
+index 0cbf9c932a0f..a82a3596dca3 100644
 --- a/drivers/crypto/omap-sham.c
 +++ b/drivers/crypto/omap-sham.c
-@@ -165,8 +165,6 @@ struct omap_sham_hmac_ctx {
+@@ -169,8 +169,6 @@ struct omap_sham_hmac_ctx {
  };
  
  struct omap_sham_ctx {
@@ -90,7 +90,7 @@ index ac80bc6af093..aba5db3c0588 100644
  	unsigned long		flags;
  
  	/* fallback stuff */
-@@ -918,27 +916,35 @@ static int omap_sham_update_dma_stop(struct omap_sham_dev *dd)
+@@ -933,27 +931,35 @@ static int omap_sham_update_dma_stop(struct omap_sham_dev *dd)
  	return 0;
  }
  
@@ -139,7 +139,7 @@ index ac80bc6af093..aba5db3c0588 100644
  
  	ctx->flags = 0;
  
-@@ -1187,8 +1193,7 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
+@@ -1223,8 +1229,7 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
  static int omap_sham_enqueue(struct ahash_request *req, unsigned int op)
  {
  	struct omap_sham_reqctx *ctx = ahash_request_ctx(req);
@@ -149,7 +149,7 @@ index ac80bc6af093..aba5db3c0588 100644
  
  	ctx->op = op;
  
-@@ -1198,7 +1203,7 @@ static int omap_sham_enqueue(struct ahash_request *req, unsigned int op)
+@@ -1234,7 +1239,7 @@ static int omap_sham_enqueue(struct ahash_request *req, unsigned int op)
  static int omap_sham_update(struct ahash_request *req)
  {
  	struct omap_sham_reqctx *ctx = ahash_request_ctx(req);
@@ -158,7 +158,7 @@ index ac80bc6af093..aba5db3c0588 100644
  
  	if (!req->nbytes)
  		return 0;
-@@ -1302,21 +1307,8 @@ static int omap_sham_setkey(struct crypto_ahash *tfm, const u8 *key,
+@@ -1338,21 +1343,8 @@ static int omap_sham_setkey(struct crypto_ahash *tfm, const u8 *key,
  	struct omap_sham_hmac_ctx *bctx = tctx->base;
  	int bs = crypto_shash_blocksize(bctx->shash);
  	int ds = crypto_shash_digestsize(bctx->shash);
@@ -180,7 +180,7 @@ index ac80bc6af093..aba5db3c0588 100644
  	err = crypto_shash_setkey(tctx->fallback, key, keylen);
  	if (err)
  		return err;
-@@ -1334,7 +1326,7 @@ static int omap_sham_setkey(struct crypto_ahash *tfm, const u8 *key,
+@@ -1370,7 +1362,7 @@ static int omap_sham_setkey(struct crypto_ahash *tfm, const u8 *key,
  
  	memset(bctx->ipad + keylen, 0, bs - keylen);
  
@@ -189,7 +189,7 @@ index ac80bc6af093..aba5db3c0588 100644
  		memcpy(bctx->opad, bctx->ipad, bs);
  
  		for (i = 0; i < bs; i++) {
-@@ -2136,6 +2128,7 @@ static int omap_sham_probe(struct platform_device *pdev)
+@@ -2174,6 +2166,7 @@ static int omap_sham_probe(struct platform_device *pdev)
  	}
  
  	dd->flags |= dd->pdata->flags;
@@ -197,7 +197,7 @@ index ac80bc6af093..aba5db3c0588 100644
  
  	pm_runtime_use_autosuspend(dev);
  	pm_runtime_set_autosuspend_delay(dev, DEFAULT_AUTOSUSPEND_DELAY);
-@@ -2163,6 +2156,9 @@ static int omap_sham_probe(struct platform_device *pdev)
+@@ -2201,6 +2194,9 @@ static int omap_sham_probe(struct platform_device *pdev)
  	spin_unlock(&sham.lock);
  
  	for (i = 0; i < dd->pdata->algs_info_size; i++) {
@@ -207,7 +207,7 @@ index ac80bc6af093..aba5db3c0588 100644
  		for (j = 0; j < dd->pdata->algs_info[i].size; j++) {
  			struct ahash_alg *alg;
  
-@@ -2214,9 +2210,11 @@ static int omap_sham_remove(struct platform_device *pdev)
+@@ -2252,9 +2248,11 @@ static int omap_sham_remove(struct platform_device *pdev)
  	list_del(&dd->list);
  	spin_unlock(&sham.lock);
  	for (i = dd->pdata->algs_info_size - 1; i >= 0; i--)
