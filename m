@@ -2,104 +2,65 @@ Return-Path: <SRS0=QxuD=77=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC4D0C433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 07:56:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE65C433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 07:56:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B221F217A0
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 07:56:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="DgKxgnHM"
+	by mail.kernel.org (Postfix) with ESMTP id BCB36208D5
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 07:56:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728210AbgFRH4j (ORCPT
+        id S1728324AbgFRH4m (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Jun 2020 03:56:39 -0400
-Received: from fllv0016.ext.ti.com ([198.47.19.142]:51330 "EHLO
-        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727964AbgFRH4h (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jun 2020 03:56:37 -0400
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 05I7uPxA010571;
-        Thu, 18 Jun 2020 02:56:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1592466985;
-        bh=M0bCT/qWUY9IWB71xhqkuPr0Ty4pb5FnPGC8OkiUvPE=;
-        h=Subject:To:CC:References:From:Date:In-Reply-To;
-        b=DgKxgnHMR6VUt/fkCayrfIotoEpku2Z6H7YkGCt0Sb7EwPV9Y4/pSvAaOoToMQ2cE
-         cl/bVG3kbU8L4o7V3734J9FkRZijWAXsGkpUFKaJWNuhzCIHlx3UNctf/ph3VO1gVX
-         zhqu9UFTxU93uY20dDxyqOY4qYCgj1nrIGL4btbg=
-Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 05I7uPxY129059
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 18 Jun 2020 02:56:25 -0500
-Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE103.ent.ti.com
- (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Thu, 18
- Jun 2020 02:56:24 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE106.ent.ti.com
- (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
- Frontend Transport; Thu, 18 Jun 2020 02:56:24 -0500
-Received: from [127.0.0.1] (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 05I7uLg8056860;
-        Thu, 18 Jun 2020 02:56:22 -0500
-Subject: Re: [PATCH] crypto: sa2ul: fix odd_ptr_err.cocci warnings
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Julia Lawall <julia.lawall@inria.fr>
-CC:     Keerthy <j-keerthy@ti.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kbuild-all@lists.01.org>
-References: <alpine.DEB.2.22.394.2006122320210.8158@hadrien>
- <20200618072838.GA5000@gondor.apana.org.au>
-From:   Tero Kristo <t-kristo@ti.com>
-Message-ID: <9041a082-b1e4-caa0-d93a-5bd4dbc997d6@ti.com>
-Date:   Thu, 18 Jun 2020 10:56:21 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Thu, 18 Jun 2020 03:56:42 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:60422 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727964AbgFRH4l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jun 2020 03:56:41 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1jlpPa-00023O-Bl; Thu, 18 Jun 2020 17:56:39 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 18 Jun 2020 17:56:38 +1000
+Date:   Thu, 18 Jun 2020 17:56:38 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, Chris Healy <cphealy@gmail.com>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Fabio Estevam <festevam@gmail.com>, linux-imx@nxp.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: caam - add clock info for VFxxx SoCs
+Message-ID: <20200618075638.GC10091@gondor.apana.org.au>
+References: <20200601230726.32328-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200618072838.GA5000@gondor.apana.org.au>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200601230726.32328-1-andrew.smirnov@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 18/06/2020 10:28, Herbert Xu wrote:
-> On Fri, Jun 12, 2020 at 11:22:02PM +0200, Julia Lawall wrote:
->> From: kernel test robot <lkp@intel.com>
->>
->> PTR_ERR should normally access the value just tested by IS_ERR
->>
->> Generated by: scripts/coccinelle/tests/odd_ptr_err.cocci
->>
->> Fixes: 5b8516f3bedb ("crypto: sa2ul: Add crypto driver")
->> CC: Keerthy <j-keerthy@ti.com>
->> Signed-off-by: kernel test robot <lkp@intel.com>
->> Signed-off-by: Julia Lawall <julia.lawall@inria.fr>
->> ---
->>
->> tree:   git://git.ti.com/ti-linux-kernel/ti-linux-kernel.git ti-linux-5.4.y
->> head:   134a1b1f8814115e2dd115b67082321bf9e63cc1
->> commit: 5b8516f3bedb3e1c273e7747b6e4a85c6e47907a [2369/7050] crypto: sa2ul: Add crypto driver
->> :::::: branch date: 3 hours ago
->> :::::: commit date: 5 months ago
->>
->>   sa2ul.c |    4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
+On Mon, Jun 01, 2020 at 04:07:26PM -0700, Andrey Smirnov wrote:
+> Add a small bit of plumbing necessary to use CAAM on VFxxx SoCs.
 > 
-> This driver does not exist in the cryptodev tree.
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> Cc: Chris Healy <cphealy@gmail.com>
+> Cc: Horia Geantă <horia.geanta@nxp.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Fabio Estevam <festevam@gmail.com>
+> Cc: linux-imx@nxp.com
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> ---
+>  drivers/crypto/caam/ctrl.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 
-Yeah, this is old codebase which only exist in TI internal tree at the 
-moment, the driver posted upstream has seen considerable evolution (and 
-is under review atm.)
-
--Tero
---
-Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
