@@ -2,110 +2,104 @@ Return-Path: <SRS0=QxuD=77=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D72B5C433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 07:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC4D0C433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 07:56:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA714217A0
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 07:56:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B221F217A0
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jun 2020 07:56:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="DgKxgnHM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728064AbgFRH4R (ORCPT
+        id S1728210AbgFRH4j (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Jun 2020 03:56:17 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:60412 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727964AbgFRH4P (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jun 2020 03:56:15 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jlpP7-00022M-WA; Thu, 18 Jun 2020 17:56:11 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 18 Jun 2020 17:56:09 +1000
-Date:   Thu, 18 Jun 2020 17:56:09 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: qat - convert to SPDX License Identifiers
-Message-ID: <20200618075609.GA10091@gondor.apana.org.au>
-References: <20200527152128.352735-1-giovanni.cabiddu@intel.com>
+        Thu, 18 Jun 2020 03:56:39 -0400
+Received: from fllv0016.ext.ti.com ([198.47.19.142]:51330 "EHLO
+        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727964AbgFRH4h (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jun 2020 03:56:37 -0400
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 05I7uPxA010571;
+        Thu, 18 Jun 2020 02:56:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1592466985;
+        bh=M0bCT/qWUY9IWB71xhqkuPr0Ty4pb5FnPGC8OkiUvPE=;
+        h=Subject:To:CC:References:From:Date:In-Reply-To;
+        b=DgKxgnHMR6VUt/fkCayrfIotoEpku2Z6H7YkGCt0Sb7EwPV9Y4/pSvAaOoToMQ2cE
+         cl/bVG3kbU8L4o7V3734J9FkRZijWAXsGkpUFKaJWNuhzCIHlx3UNctf/ph3VO1gVX
+         zhqu9UFTxU93uY20dDxyqOY4qYCgj1nrIGL4btbg=
+Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
+        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 05I7uPxY129059
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 18 Jun 2020 02:56:25 -0500
+Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE103.ent.ti.com
+ (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Thu, 18
+ Jun 2020 02:56:24 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE106.ent.ti.com
+ (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
+ Frontend Transport; Thu, 18 Jun 2020 02:56:24 -0500
+Received: from [127.0.0.1] (ileax41-snat.itg.ti.com [10.172.224.153])
+        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 05I7uLg8056860;
+        Thu, 18 Jun 2020 02:56:22 -0500
+Subject: Re: [PATCH] crypto: sa2ul: fix odd_ptr_err.cocci warnings
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Julia Lawall <julia.lawall@inria.fr>
+CC:     Keerthy <j-keerthy@ti.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <kbuild-all@lists.01.org>
+References: <alpine.DEB.2.22.394.2006122320210.8158@hadrien>
+ <20200618072838.GA5000@gondor.apana.org.au>
+From:   Tero Kristo <t-kristo@ti.com>
+Message-ID: <9041a082-b1e4-caa0-d93a-5bd4dbc997d6@ti.com>
+Date:   Thu, 18 Jun 2020 10:56:21 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200527152128.352735-1-giovanni.cabiddu@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200618072838.GA5000@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 27, 2020 at 04:21:28PM +0100, Giovanni Cabiddu wrote:
-> Replace License Headers with SPDX License Identifiers.
+On 18/06/2020 10:28, Herbert Xu wrote:
+> On Fri, Jun 12, 2020 at 11:22:02PM +0200, Julia Lawall wrote:
+>> From: kernel test robot <lkp@intel.com>
+>>
+>> PTR_ERR should normally access the value just tested by IS_ERR
+>>
+>> Generated by: scripts/coccinelle/tests/odd_ptr_err.cocci
+>>
+>> Fixes: 5b8516f3bedb ("crypto: sa2ul: Add crypto driver")
+>> CC: Keerthy <j-keerthy@ti.com>
+>> Signed-off-by: kernel test robot <lkp@intel.com>
+>> Signed-off-by: Julia Lawall <julia.lawall@inria.fr>
+>> ---
+>>
+>> tree:   git://git.ti.com/ti-linux-kernel/ti-linux-kernel.git ti-linux-5.4.y
+>> head:   134a1b1f8814115e2dd115b67082321bf9e63cc1
+>> commit: 5b8516f3bedb3e1c273e7747b6e4a85c6e47907a [2369/7050] crypto: sa2ul: Add crypto driver
+>> :::::: branch date: 3 hours ago
+>> :::::: commit date: 5 months ago
+>>
+>>   sa2ul.c |    4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> ---
->  .../crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c  | 48 +-----------------
->  .../crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.h  | 48 +-----------------
->  drivers/crypto/qat/qat_c3xxx/adf_drv.c        | 48 +-----------------
->  .../qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c     | 48 +-----------------
->  .../qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.h     | 48 +-----------------
->  drivers/crypto/qat/qat_c3xxxvf/adf_drv.c      | 48 +-----------------
->  .../crypto/qat/qat_c62x/adf_c62x_hw_data.c    | 48 +-----------------
->  .../crypto/qat/qat_c62x/adf_c62x_hw_data.h    | 48 +-----------------
->  drivers/crypto/qat/qat_c62x/adf_drv.c         | 48 +-----------------
->  .../qat/qat_c62xvf/adf_c62xvf_hw_data.c       | 48 +-----------------
->  .../qat/qat_c62xvf/adf_c62xvf_hw_data.h       | 48 +-----------------
->  drivers/crypto/qat/qat_c62xvf/adf_drv.c       | 48 +-----------------
->  .../crypto/qat/qat_common/adf_accel_devices.h | 48 +-----------------
->  .../crypto/qat/qat_common/adf_accel_engine.c  | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_admin.c     | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_aer.c       | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_cfg.c       | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_cfg.h       | 48 +-----------------
->  .../crypto/qat/qat_common/adf_cfg_common.h    | 48 +-----------------
->  .../crypto/qat/qat_common/adf_cfg_strings.h   | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_cfg_user.h  | 48 +-----------------
->  .../crypto/qat/qat_common/adf_common_drv.h    | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_ctl_drv.c   | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_dev_mgr.c   | 48 +-----------------
->  .../crypto/qat/qat_common/adf_hw_arbiter.c    | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_init.c      | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_isr.c       | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_pf2vf_msg.c | 49 +------------------
->  drivers/crypto/qat/qat_common/adf_pf2vf_msg.h | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_sriov.c     | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_transport.c | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_transport.h | 48 +-----------------
->  .../qat_common/adf_transport_access_macros.h  | 48 +-----------------
->  .../qat/qat_common/adf_transport_debug.c      | 48 +-----------------
->  .../qat/qat_common/adf_transport_internal.h   | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_vf2pf_msg.c | 48 +-----------------
->  drivers/crypto/qat/qat_common/adf_vf_isr.c    | 48 +-----------------
->  drivers/crypto/qat/qat_common/icp_qat_fw.h    | 48 +-----------------
->  .../qat/qat_common/icp_qat_fw_init_admin.h    | 48 +-----------------
->  drivers/crypto/qat/qat_common/icp_qat_fw_la.h | 48 +-----------------
->  .../qat/qat_common/icp_qat_fw_loader_handle.h | 48 +-----------------
->  .../crypto/qat/qat_common/icp_qat_fw_pke.h    | 48 +-----------------
->  drivers/crypto/qat/qat_common/icp_qat_hal.h   | 48 +-----------------
->  drivers/crypto/qat/qat_common/icp_qat_hw.h    | 48 +-----------------
->  drivers/crypto/qat/qat_common/icp_qat_uclo.h  | 48 +-----------------
->  drivers/crypto/qat/qat_common/qat_algs.c      | 48 +-----------------
->  drivers/crypto/qat/qat_common/qat_asym_algs.c | 49 +------------------
->  drivers/crypto/qat/qat_common/qat_crypto.c    | 48 +-----------------
->  drivers/crypto/qat/qat_common/qat_crypto.h    | 48 +-----------------
->  drivers/crypto/qat/qat_common/qat_hal.c       | 48 +-----------------
->  drivers/crypto/qat/qat_common/qat_uclo.c      | 48 +-----------------
->  .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   | 48 +-----------------
->  .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.h   | 48 +-----------------
->  drivers/crypto/qat/qat_dh895xcc/adf_drv.c     | 48 +-----------------
->  .../qat_dh895xccvf/adf_dh895xccvf_hw_data.c   | 48 +-----------------
->  .../qat_dh895xccvf/adf_dh895xccvf_hw_data.h   | 48 +-----------------
->  drivers/crypto/qat/qat_dh895xccvf/adf_drv.c   | 48 +-----------------
->  57 files changed, 114 insertions(+), 2624 deletions(-)
+> This driver does not exist in the cryptodev tree.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Yeah, this is old codebase which only exist in TI internal tree at the 
+moment, the driver posted upstream has seen considerable evolution (and 
+is under review atm.)
+
+-Tero
+--
+Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
