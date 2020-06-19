@@ -5,64 +5,64 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85447C433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jun 2020 21:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 649FFC433DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jun 2020 21:46:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 63755221EC
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jun 2020 21:44:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FB43221E6
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jun 2020 21:46:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Czjl8mUs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nLnUGLWA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728043AbgFSVos (ORCPT
+        id S1728048AbgFSVqS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 Jun 2020 17:44:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33524 "EHLO
+        Fri, 19 Jun 2020 17:46:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726220AbgFSVor (ORCPT
+        with ESMTP id S1728047AbgFSVqR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Jun 2020 17:44:47 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A571DC06174E;
-        Fri, 19 Jun 2020 14:44:45 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id i27so13098042ljb.12;
-        Fri, 19 Jun 2020 14:44:45 -0700 (PDT)
+        Fri, 19 Jun 2020 17:46:17 -0400
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EE87C06174E;
+        Fri, 19 Jun 2020 14:46:17 -0700 (PDT)
+Received: by mail-lf1-x141.google.com with SMTP id i8so6396411lfo.4;
+        Fri, 19 Jun 2020 14:46:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=1sgAegVrY9blSblu1TZdk7ru84pddJSX7s1mWVjCFHY=;
-        b=Czjl8mUsGQTc1lSxSGKZDq2qIkoZ6c0YedfwqNeO9/0T7FCtDoH+6WQFrBv2cBzdn+
-         cTlij+NcIB4hw/sztztKsjOJucRgSFPXQMIUqc4n5vKPHw/RW79ubQomSySgo+NcLgV7
-         aYSd0pWD9fM9pHvWiGDu/X2JWn10thzLPJ/ywt4Kr5xfTicjCy4EfEOfJ4l7T2s+12WR
-         7DYdsRHaleYRTMnzSDkHx2Bd4WaYvBuGAuHV07pIZjiBZXqrzVJ6JcamAqWj61NbgJth
-         RuR6z4fvyJrc606GLz6XhDXvx6iQY1LjQnPQEz6Ey8+H4RHrG+VTDCXPBvL8d1MtdJ49
-         53Bw==
+        bh=A2wfnvUJcArOzvROBSxEDoq/2XoIUAY6WzwwQK6XXBA=;
+        b=nLnUGLWAs48Qa1AROnzflrVrnCMRfjEeC6MyFecZs6Oasf93l21ztEgIrdY2KtNx1K
+         2p27y+xawFZoVJYq1xw2kTX2YDQQCYljEBBmVQfZxy4Wfb6FQjiixh3E3BtTEx3EaI0A
+         iGOfbOGUZXcU40AeUlMw5R8mcyRPPNrikomeI3CkDC//fMrg7nWgsMCgfUKAbTPnEfj/
+         qaFieEIEyFBb/Ihz5mu/lSzOtprP62AG9GOV4rlzVHmv/JJHEozRPeZL30wJ3s/P+5Df
+         yVP+rCkMO/3Imq4eJhTLcWxYY8SbjKHC8BlbgebI3tAj0onkSUkwcDRYHr2aKTUQrEWB
+         zYdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=1sgAegVrY9blSblu1TZdk7ru84pddJSX7s1mWVjCFHY=;
-        b=K39MV9qmMKF1ccHbxT16/RB4ZiEvMljQVWsb45xBRkWHkZZHyuMsviyjWPUZa94PRD
-         aDxin7mlOjvOGVqbmfV/K8t6PNpYm0KjZv8jAFomtC+qRRrE+ritLJrn3pjisfrTiHqJ
-         hFFwwiDXlBdiA4vNRX5/YxI9AHGqTsbCKysod7UDJjDEgJMlQcQ6DueTwzQb2MvWy9qX
-         W3itnaRL2mFe+lyai1ODfFaOpVfiZxaNhAuKEIVi18wEqq9lqK1QdfkUaR/m6RBm9B2p
-         /1uuALQIMX5epuZr14ribK+LHn6JMJsPW8/0u976xve0p13bwrTRGOxLDhOK4Qbt3Zjt
-         jsdg==
-X-Gm-Message-State: AOAM532OLzB5vuYk+ghKFvcUMlUd53/JyiQzSaerB1Hmta06Qw50slpR
-        FaOUgwSgOqPS6v2Znh5MrlrAvfF0N/KKN0euvKg=
-X-Google-Smtp-Source: ABdhPJzth0b/GB5i9sTZrVdEB33+r8JFn7mOeJFab1oUENjMBKqhM+AUuD9N/PknddsJzKwtRM4C3kCreusmjXDymdk=
-X-Received: by 2002:a05:651c:2050:: with SMTP id t16mr2568936ljo.178.1592603083925;
- Fri, 19 Jun 2020 14:44:43 -0700 (PDT)
+        bh=A2wfnvUJcArOzvROBSxEDoq/2XoIUAY6WzwwQK6XXBA=;
+        b=JdAXSE6OXNjQUJg9pBWsdUPYP+8wZH6LnZZ/+vh5utdeQ66Q5FLU/QdvQaY5UuisxP
+         RsMJx07McBPDorCZe3iaaTbScIJ2NChN84fbdxUcqZtGRQmNiTai7dGmFxBJjVlO0vy+
+         Vzo2/EZyDiF1bAQCW/GOZ+s7+Tx06Fl+L2zmYLZZ5A7o5u9Nx5Vw0IINhfKZrJdS7zoH
+         9XwqcvOEc2Y8jbBmI2v7zLRi/xF1QaHcYeEOVbJrqoQUMQY2yT14rgtZKhxN7PN4ZYh/
+         wBW414yef/vryYtrOV+JEcb4K32cI5LGd18VrZ6tI3A/ZZyu04Tso+/0ryrTLKCvHOy/
+         TWsg==
+X-Gm-Message-State: AOAM530565kZNTgZjUYSCVL8FJxbTTJFe14sgKd83pWBMk0bZ2zJYV1A
+        tUgpvCXQ9YZw99aYk+Yf/L2pzLMjHTRcgZ2Ujg0=
+X-Google-Smtp-Source: ABdhPJwWM6oTSAjc4wRs57WscBG5w+nASFiuy+YVLKsV9iMVF+FCGc49KUQHQWCk1HhyNLNvYNpZTOhdDg0A4ZqvkK4=
+X-Received: by 2002:a19:c214:: with SMTP id l20mr1072998lfc.56.1592603175449;
+ Fri, 19 Jun 2020 14:46:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200619213347.27826-1-horia.geanta@nxp.com> <20200619213347.27826-2-horia.geanta@nxp.com>
-In-Reply-To: <20200619213347.27826-2-horia.geanta@nxp.com>
+References: <20200619213347.27826-1-horia.geanta@nxp.com> <20200619213347.27826-5-horia.geanta@nxp.com>
+In-Reply-To: <20200619213347.27826-5-horia.geanta@nxp.com>
 From:   Fabio Estevam <festevam@gmail.com>
-Date:   Fri, 19 Jun 2020 18:44:32 -0300
-Message-ID: <CAOMZO5AMe-nDdaP+jVeUHEGn_FXiN9x29PsvDGzUmd9bRD3T6Q@mail.gmail.com>
-Subject: Re: [PATCH 1/4] ARM: dts: imx6sl: fix rng node
+Date:   Fri, 19 Jun 2020 18:46:04 -0300
+Message-ID: <CAOMZO5AZLUxXhX-Maop8iQc0Qan5YqH2QFXaDpYq0hL+BP-L+w@mail.gmail.com>
+Subject: Re: [PATCH 4/4] hwrng: imx-rngc: enable driver for i.MX6
 To:     =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>
 Cc:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
         Sascha Hauer <s.hauer@pengutronix.de>,
@@ -90,40 +90,44 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Horia,
-
 On Fri, Jun 19, 2020 at 6:34 PM Horia Geant=C4=83 <horia.geanta@nxp.com> wr=
 ote:
 >
-> rng DT node was added without a compatible string.
+> i.MX6 SL, SLL, ULL, ULZ SoCs have an RNGB block.
 >
-> i.MX driver for RNGC (drivers/char/hw_random/imx-rngc.c) also claims
-> support for RNGB, and is currently used for i.MX25.
+> Since imx-rngc driver supports also rngb,
+> let's enable it for these SoCs too.
 >
-> Let's used this driver also for RNGB block in i.MX6SL.
-
-"Let's use"
-
->
-> Fixes: e29fe21cff96 ("ARM: dts: add device tree source for imx6sl SoC")
 > Signed-off-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
 > ---
->  arch/arm/boot/dts/imx6sl.dtsi | 2 ++
->  1 file changed, 2 insertions(+)
+>  drivers/char/hw_random/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/arch/arm/boot/dts/imx6sl.dtsi b/arch/arm/boot/dts/imx6sl.dts=
-i
-> index 911d8cf77f2c..1f0f250ee175 100644
-> --- a/arch/arm/boot/dts/imx6sl.dtsi
-> +++ b/arch/arm/boot/dts/imx6sl.dtsi
-> @@ -939,8 +939,10 @@
->                         };
+> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kcon=
+fig
+> index 0ad17efc96df..53f6a7e4392f 100644
+> --- a/drivers/char/hw_random/Kconfig
+> +++ b/drivers/char/hw_random/Kconfig
+> @@ -245,7 +245,7 @@ config HW_RANDOM_MXC_RNGA
+>  config HW_RANDOM_IMX_RNGC
+>         tristate "Freescale i.MX RNGC Random Number Generator"
+>         depends on HAS_IOMEM && HAVE_CLK
+> -       depends on SOC_IMX25 || COMPILE_TEST
+> +       depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6UL |=
+| COMPILE_TEST
+
+If in the future more SoCs will use this IP, then we will need to keep
+extending this list over and over again.
+
+Maybe you could use:
+
+depends on MACH_IMX || COMPILE_TEST
+
+
+
+>         default HW_RANDOM
+>         help
+>           This driver provides kernel-side support for the Random Number
+> --
+> 2.17.1
 >
->                         rngb: rngb@21b4000 {
-> +                               compatible =3D "fsl,imx25-rngb";
-
-Better to use:
-
- compatible =3D "fsl,imx6sl-rngb","fsl,imx25-rngb";
-
-and document fsl,imx6sl-rngb
