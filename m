@@ -2,65 +2,91 @@ Return-Path: <SRS0=Y8jf=AA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69EA6C433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jun 2020 20:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D20C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jun 2020 21:34:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A4B620C09
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jun 2020 20:04:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8645921941
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jun 2020 21:34:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391487AbgFSUEB (ORCPT
+        id S1726882AbgFSVeW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 Jun 2020 16:04:01 -0400
-Received: from ms.lwn.net ([45.79.88.28]:55534 "EHLO ms.lwn.net"
+        Fri, 19 Jun 2020 17:34:22 -0400
+Received: from inva020.nxp.com ([92.121.34.13]:34216 "EHLO inva020.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389021AbgFSUEB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Jun 2020 16:04:01 -0400
-Received: from lwn.net (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id 888B02CD;
-        Fri, 19 Jun 2020 20:04:00 +0000 (UTC)
-Date:   Fri, 19 Jun 2020 14:03:59 -0600
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 03/22] docs: crypto: convert asymmetric-keys.txt to ReST
-Message-ID: <20200619140359.47a45e6b@lwn.net>
-In-Reply-To: <c2275ea94e0507a01b020ab66dfa824d8b1c2545.1592203650.git.mchehab+huawei@kernel.org>
-References: <cover.1592203650.git.mchehab+huawei@kernel.org>
-        <c2275ea94e0507a01b020ab66dfa824d8b1c2545.1592203650.git.mchehab+huawei@kernel.org>
-Organization: LWN.net
+        id S1725554AbgFSVeW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 19 Jun 2020 17:34:22 -0400
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 682E81A02C5;
+        Fri, 19 Jun 2020 23:34:20 +0200 (CEST)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 59E9E1A02BB;
+        Fri, 19 Jun 2020 23:34:20 +0200 (CEST)
+Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 9B9BB204B6;
+        Fri, 19 Jun 2020 23:34:19 +0200 (CEST)
+From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+To:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Martin Kaiser <martin@kaiser.cx>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/4] hwrng: add support for i.MX6 rngb
+Date:   Sat, 20 Jun 2020 00:33:43 +0300
+Message-Id: <20200619213347.27826-1-horia.geanta@nxp.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 15 Jun 2020 08:50:08 +0200
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+Add support for RNGB found in some i.MX6 SoCs (6SL, 6SLL, 6ULL, 6ULZ),
+based on RNGC driver (drivers/char/hw_random/imx-rngc.c).
 
-> This file is almost compatible with ReST. Just minor changes
-> were needed:
-> 
-> - Adjust document and titles markups;
-> - Adjust numbered list markups;
-> - Add a comments markup for the Contents section;
-> - Add markups for literal blocks.
-> 
-> Acked-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+This driver claims support also for RNGB (besides RNGC),
+and is currently used only by i.MX25.
 
-Applied, thanks.
+Note:
 
-jon
+All the i.MX6 SoCs with RNGB have a DCP (Data Co-Processor)
+crypto accelerator.
+
+Several NXP SoC from QorIQ family (P1010, P1023, P4080, P3041, P5020)
+also have a RNGB, however it's part of the CAAM
+(Cryptograhic Accelerator and Assurance Module) crypto accelerator.
+In this case, RNGB is managed in the caam driver
+(drivers/crypto/caam/), since it's tightly related to
+the caam "job ring" interface.
+
+Horia Geantă (4):
+  ARM: dts: imx6sl: fix rng node
+  ARM: dts: imx6sll: add rng
+  ARM: dts: imx6ull: add rng
+  hwrng: imx-rngc: enable driver for i.MX6
+
+ arch/arm/boot/dts/imx6sl.dtsi  | 2 ++
+ arch/arm/boot/dts/imx6sll.dtsi | 7 +++++++
+ arch/arm/boot/dts/imx6ull.dtsi | 7 +++++++
+ drivers/char/hw_random/Kconfig | 2 +-
+ 4 files changed, 17 insertions(+), 1 deletion(-)
+
+-- 
+2.17.1
+
