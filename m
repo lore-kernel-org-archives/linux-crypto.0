@@ -2,92 +2,77 @@ Return-Path: <SRS0=+94A=AC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B352C433DF
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 14:57:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 186AAC433DF
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 17:10:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 84722251E0
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 14:57:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E43B62075A
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 17:10:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1592759423;
+	bh=ocy2CBb8YSNngwrC+UysoFLpnTC1EMjS+5CRmk0QH5I=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=t1N3MqjK26gYDBw0Uf8bp4/PJXGUVkuVDXXVH8E+D9b3U7y3j/gKiz6o567dekqIc
+	 0qbD3qscipqWvpOT5gxA4XOANySsLsGxwTkBKTTt2LUBsUO6c7Ut67QdPIzB3tSVQP
+	 924ucufDbNrTAKuqKeI8G38ln0HlgpDMXRWJDPsg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730224AbgFUO5j (ORCPT
+        id S1730453AbgFURKX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Jun 2020 10:57:39 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:49112 "EHLO inva021.nxp.com"
+        Sun, 21 Jun 2020 13:10:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42126 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730154AbgFUO5T (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Jun 2020 10:57:19 -0400
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 8D20620097B;
-        Sun, 21 Jun 2020 16:57:17 +0200 (CEST)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 8065A200706;
-        Sun, 21 Jun 2020 16:57:17 +0200 (CEST)
-Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id C133C203C2;
-        Sun, 21 Jun 2020 16:57:16 +0200 (CEST)
-From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Martin Kaiser <martin@kaiser.cx>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/5] ARM: dts: imx6sl: fix rng node
-Date:   Sun, 21 Jun 2020 17:56:55 +0300
-Message-Id: <20200621145658.12528-3-horia.geanta@nxp.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200621145658.12528-1-horia.geanta@nxp.com>
-References: <20200621145658.12528-1-horia.geanta@nxp.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+        id S1730420AbgFURKX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 21 Jun 2020 13:10:23 -0400
+Subject: Re: [GIT PULL] Crypto Fixes for 5.8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592759422;
+        bh=ocy2CBb8YSNngwrC+UysoFLpnTC1EMjS+5CRmk0QH5I=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=wFvgpIu8fls5HIRTydgWsHhKblrvur6nGd5BR3SL72xIUf7Re7rmt++uiUc4xmgeP
+         jpivWUc4gpu9prCM789ZBjWuoVJDqznmilgo+v38dT2wAntGwn6SHR12A67W8gmnzV
+         xDSCnl3/8ioMbZNOAR9wifkE+uCuPwWI4Xkerqhg=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20200621082303.GA30729@gondor.apana.org.au>
+References: <20190916084901.GA20338@gondor.apana.org.au>
+ <20190923050515.GA6980@gondor.apana.org.au>
+ <20191202062017.ge4rz72ki3vczhgb@gondor.apana.org.au>
+ <20191214084749.jt5ekav5o5pd2dcp@gondor.apana.org.au>
+ <20200115150812.mo2eycc53lbsgvue@gondor.apana.org.au>
+ <20200213033231.xjwt6uf54nu26qm5@gondor.apana.org.au>
+ <20200408061513.GA23636@gondor.apana.org.au>
+ <20200611040544.GA27603@gondor.apana.org.au>
+ <20200621082303.GA30729@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20200621082303.GA30729@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+X-PR-Tracked-Commit-Id: 819966c06b759022e9932f328284314d9272b9f3
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 93bbca271a715e2730b6f4ae0be42056cdab6561
+Message-Id: <159275942265.6032.2639454929805852776.pr-tracker-bot@kernel.org>
+Date:   Sun, 21 Jun 2020 17:10:22 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-rng DT node was added without a compatible string.
+The pull request you sent on Sun, 21 Jun 2020 18:23:03 +1000:
 
-i.MX driver for RNGC (drivers/char/hw_random/imx-rngc.c) also claims
-support for RNGB, and is currently used for i.MX25.
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-Let's use this driver also for RNGB block in i.MX6SL.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/93bbca271a715e2730b6f4ae0be42056cdab6561
 
-Fixes: e29fe21cff96 ("ARM: dts: add device tree source for imx6sl SoC")
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- arch/arm/boot/dts/imx6sl.dtsi | 2 ++
- 1 file changed, 2 insertions(+)
+Thank you!
 
-diff --git a/arch/arm/boot/dts/imx6sl.dtsi b/arch/arm/boot/dts/imx6sl.dtsi
-index 911d8cf77f2c..0339a46fa71c 100644
---- a/arch/arm/boot/dts/imx6sl.dtsi
-+++ b/arch/arm/boot/dts/imx6sl.dtsi
-@@ -939,8 +939,10 @@
- 			};
- 
- 			rngb: rngb@21b4000 {
-+				compatible = "fsl,imx6sl-rngb", "fsl,imx25-rngb";
- 				reg = <0x021b4000 0x4000>;
- 				interrupts = <0 5 IRQ_TYPE_LEVEL_HIGH>;
-+				clocks = <&clks IMX6SL_CLK_DUMMY>;
- 			};
- 
- 			weim: weim@21b8000 {
 -- 
-2.17.1
-
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
