@@ -3,56 +3,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C59FC433E0
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 22:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23805C433DF
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 22:39:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 017F22405E
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 22:26:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCD6B252D1
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 22:39:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726296AbgFUW0p (ORCPT
+        id S1726335AbgFUWjP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Jun 2020 18:26:45 -0400
-Received: from mga03.intel.com ([134.134.136.65]:12274 "EHLO mga03.intel.com"
+        Sun, 21 Jun 2020 18:39:15 -0400
+Received: from mga01.intel.com ([192.55.52.88]:36237 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726101AbgFUW0o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Jun 2020 18:26:44 -0400
-IronPort-SDR: iZNEqDksh+EYiUDfY3QoAm+fqKCzEo2jQUFV9MYpZ0cFsnqIeLEIvUwdLyh4OxCTJQlbFNdJTI
- FnUew+7EshhA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9659"; a="143584436"
+        id S1726391AbgFUWjO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 21 Jun 2020 18:39:14 -0400
+IronPort-SDR: JatVqipuEtGKYN5vhqf1KDIJFiXQ6wTeiiFeXYmJXwbBplpVdnRNAyMI8ty86bNWqxI4UDfnIX
+ 6Ck8L4YM5JEg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9659"; a="161699415"
 X-IronPort-AV: E=Sophos;i="5.75,264,1589266800"; 
-   d="gz'50?scan'50,208,50";a="143584436"
+   d="gz'50?scan'50,208,50";a="161699415"
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2020 15:26:26 -0700
-IronPort-SDR: Bk4xeJTNl65u2mwRiqVkjQmH6i+vMPLXtS/70+TuxdfO2stfQOXxnW7d/Nls00IwwoAD3UBIJZ
- yIc6h89IbtXQ==
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2020 14:57:09 -0700
+IronPort-SDR: ROmFh1dIpSLPM+ZjedV9SYfhNmIQleqZ9P1N63hZsYCVWAmHVKQguo/r4VBk9na0u7LdrD8QID
+ Z0eMUQAJ2rog==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,264,1589266800"; 
-   d="gz'50?scan'50,208,50";a="353267135"
+   d="gz'50?scan'50,208,50";a="451628915"
 Received: from lkp-server02.sh.intel.com (HELO 3aa54c81372e) ([10.239.97.151])
-  by orsmga001.jf.intel.com with ESMTP; 21 Jun 2020 15:26:22 -0700
+  by orsmga005.jf.intel.com with ESMTP; 21 Jun 2020 14:57:06 -0700
 Received: from kbuild by 3aa54c81372e with local (Exim 4.92)
         (envelope-from <lkp@intel.com>)
-        id 1jn8Pt-0002tm-Ol; Sun, 21 Jun 2020 22:26:21 +0000
-Date:   Mon, 22 Jun 2020 06:26:08 +0800
+        id 1jn7xZ-0002tF-Cg; Sun, 21 Jun 2020 21:57:05 +0000
+Date:   Mon, 22 Jun 2020 05:56:39 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Corentin Labbe <clabbe@baylibre.com>, davem@davemloft.net,
         herbert@gondor.apana.org.au, mripard@kernel.org, wens@csie.org
 Cc:     kbuild-all@lists.01.org, linux-arm-kernel@lists.infradead.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-sunxi@googlegroups.com, Corentin Labbe <clabbe@baylibre.com>
-Subject: Re: [PATCH v3 14/14] crypto: sun8i-ce: Add support for the TRNG
-Message-ID: <202006220654.MXClJxqd%lkp@intel.com>
-References: <1592767867-35982-15-git-send-email-clabbe@baylibre.com>
+Subject: Re: [PATCH v3 13/14] crypto: sun8i-ce: Add support for the PRNG
+Message-ID: <202006220532.0hmVxl2d%lkp@intel.com>
+References: <1592767867-35982-14-git-send-email-clabbe@baylibre.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="uAKRQypu60I7Lcqm"
+Content-Type: multipart/mixed; boundary="T4sUOijqQbZv57TR"
 Content-Disposition: inline
-In-Reply-To: <1592767867-35982-15-git-send-email-clabbe@baylibre.com>
+In-Reply-To: <1592767867-35982-14-git-send-email-clabbe@baylibre.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
@@ -60,7 +60,7 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
---uAKRQypu60I7Lcqm
+--T4sUOijqQbZv57TR
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -90,128 +90,105 @@ Reported-by: kernel test robot <lkp@intel.com>
 
 All warnings (new ones prefixed by >>, old ones prefixed by <<):
 
->> drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c:22:5: warning: no previous prototype for 'sun8i_ce_trng_read' [-Wmissing-prototypes]
-22 | int sun8i_ce_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
-|     ^~~~~~~~~~~~~~~~~~
-drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c: In function 'sun8i_ce_hwrng_register':
->> drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c:105:24: warning: comparison is always false due to limited range of data type [-Wtype-limits]
-105 |  if (ce->variant->trng == CE_ID_NOTSUPP) {
-|                        ^~
-drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c: In function 'sun8i_ce_hwrng_unregister':
-drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c:121:24: warning: comparison is always false due to limited range of data type [-Wtype-limits]
-121 |  if (ce->variant->trng == CE_ID_NOTSUPP)
-|                        ^~
+drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c: In function 'sun8i_ce_register_algs':
+>> drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c:818:26: warning: comparison is always false due to limited range of data type [-Wtype-limits]
+818 |    if (ce->variant->prng == CE_ID_NOTSUPP) {
+|                          ^~
 
-vim +/sun8i_ce_trng_read +22 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
+vim +818 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
 
-  > 22	int sun8i_ce_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
-    23	{
-    24		struct sun8i_ce_dev *ce;
-    25		dma_addr_t dma_dst;
-    26		int err = 0;
-    27		int flow = 3;
-    28		unsigned int todo;
-    29		struct sun8i_ce_flow *chan;
-    30		struct ce_task *cet;
-    31		u32 common;
-    32		void *d;
-    33	
-    34		ce = container_of(rng, struct sun8i_ce_dev, trng);
-    35	
-    36		/* round the data length to a multiple of 32*/
-    37		todo = max + 32;
-    38		todo -= todo % 32;
-    39	
-    40		d = kzalloc(todo, GFP_KERNEL | GFP_DMA);
-    41		if (!d)
-    42			return -ENOMEM;
-    43	
-    44	#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
-    45		ce->hwrng_stat_req++;
-    46		ce->hwrng_stat_bytes += todo;
-    47	#endif
-    48	
-    49		dma_dst = dma_map_single(ce->dev, d, todo, DMA_FROM_DEVICE);
-    50		if (dma_mapping_error(ce->dev, dma_dst)) {
-    51			dev_err(ce->dev, "Cannot DMA MAP DST\n");
-    52			err = -EFAULT;
-    53			goto err_dst;
-    54		}
-    55	
-    56		err = pm_runtime_get_sync(ce->dev);
-    57		if (err < 0)
-    58			goto err_pm;
-    59	
-    60		mutex_lock(&ce->rnglock);
-    61		chan = &ce->chanlist[flow];
-    62	
-    63		cet = &chan->tl[0];
-    64		memset(cet, 0, sizeof(struct ce_task));
-    65	
-    66		cet->t_id = cpu_to_le32(flow);
-    67		common = ce->variant->trng | CE_COMM_INT;
-    68		cet->t_common_ctl = cpu_to_le32(common);
-    69	
-    70		/* recent CE (H6) need length in bytes, in word otherwise */
-    71		if (ce->variant->trng_t_dlen_in_bytes)
-    72			cet->t_dlen = cpu_to_le32(todo);
-    73		else
-    74			cet->t_dlen = cpu_to_le32(todo / 4);
-    75	
-    76		cet->t_sym_ctl = 0;
-    77		cet->t_asym_ctl = 0;
-    78	
-    79		cet->t_dst[0].addr = cpu_to_le32(dma_dst);
-    80		cet->t_dst[0].len = cpu_to_le32(todo / 4);
-    81		ce->chanlist[flow].timeout = todo;
-    82	
-    83		err = sun8i_ce_run_task(ce, 3, "TRNG");
-    84		mutex_unlock(&ce->rnglock);
-    85	
-    86		pm_runtime_put(ce->dev);
-    87	
-    88	err_pm:
-    89		dma_unmap_single(ce->dev, dma_dst, todo, DMA_FROM_DEVICE);
-    90	
-    91		if (!err) {
-    92			memcpy(data, d, max);
-    93			err = max;
-    94		}
-    95		memzero_explicit(d, todo);
-    96	err_dst:
-    97		kfree(d);
-    98		return err;
-    99	}
-   100	
-   101	int sun8i_ce_hwrng_register(struct sun8i_ce_dev *ce)
-   102	{
-   103		int ret;
-   104	
- > 105		if (ce->variant->trng == CE_ID_NOTSUPP) {
-   106			dev_info(ce->dev, "TRNG not supported\n");
-   107			return 0;
-   108		}
-   109		ce->trng.name = "sun8i Crypto Engine TRNG";
-   110		ce->trng.read = sun8i_ce_trng_read;
-   111		ce->trng.quality = 1000;
-   112	
-   113		ret = hwrng_register(&ce->trng);
-   114		if (ret)
-   115			dev_err(ce->dev, "Fail to register the TRNG\n");
-   116		return ret;
-   117	}
-   118	
+   761	
+   762	static int sun8i_ce_register_algs(struct sun8i_ce_dev *ce)
+   763	{
+   764		int ce_method, err, id, i;
+   765	
+   766		for (i = 0; i < ARRAY_SIZE(ce_algs); i++) {
+   767			ce_algs[i].ce = ce;
+   768			switch (ce_algs[i].type) {
+   769			case CRYPTO_ALG_TYPE_SKCIPHER:
+   770				id = ce_algs[i].ce_algo_id;
+   771				ce_method = ce->variant->alg_cipher[id];
+   772				if (ce_method == CE_ID_NOTSUPP) {
+   773					dev_dbg(ce->dev,
+   774						"DEBUG: Algo of %s not supported\n",
+   775						ce_algs[i].alg.skcipher.base.cra_name);
+   776					ce_algs[i].ce = NULL;
+   777					break;
+   778				}
+   779				id = ce_algs[i].ce_blockmode;
+   780				ce_method = ce->variant->op_mode[id];
+   781				if (ce_method == CE_ID_NOTSUPP) {
+   782					dev_dbg(ce->dev, "DEBUG: Blockmode of %s not supported\n",
+   783						ce_algs[i].alg.skcipher.base.cra_name);
+   784					ce_algs[i].ce = NULL;
+   785					break;
+   786				}
+   787				dev_info(ce->dev, "Register %s\n",
+   788					 ce_algs[i].alg.skcipher.base.cra_name);
+   789				err = crypto_register_skcipher(&ce_algs[i].alg.skcipher);
+   790				if (err) {
+   791					dev_err(ce->dev, "ERROR: Fail to register %s\n",
+   792						ce_algs[i].alg.skcipher.base.cra_name);
+   793					ce_algs[i].ce = NULL;
+   794					return err;
+   795				}
+   796				break;
+   797			case CRYPTO_ALG_TYPE_AHASH:
+   798				id = ce_algs[i].ce_algo_id;
+   799				ce_method = ce->variant->alg_hash[id];
+   800				if (ce_method == CE_ID_NOTSUPP) {
+   801					dev_info(ce->dev,
+   802						 "DEBUG: Algo of %s not supported\n",
+   803						 ce_algs[i].alg.hash.halg.base.cra_name);
+   804					ce_algs[i].ce = NULL;
+   805					break;
+   806				}
+   807				dev_info(ce->dev, "Register %s\n",
+   808					 ce_algs[i].alg.hash.halg.base.cra_name);
+   809				err = crypto_register_ahash(&ce_algs[i].alg.hash);
+   810				if (err) {
+   811					dev_err(ce->dev, "ERROR: Fail to register %s\n",
+   812						ce_algs[i].alg.hash.halg.base.cra_name);
+   813					ce_algs[i].ce = NULL;
+   814					return err;
+   815				}
+   816				break;
+   817			case CRYPTO_ALG_TYPE_RNG:
+ > 818				if (ce->variant->prng == CE_ID_NOTSUPP) {
+   819					dev_info(ce->dev,
+   820						 "DEBUG: Algo of %s not supported\n",
+   821						 ce_algs[i].alg.rng.base.cra_name);
+   822					ce_algs[i].ce = NULL;
+   823					break;
+   824				}
+   825				dev_info(ce->dev, "Register %s\n",
+   826					 ce_algs[i].alg.rng.base.cra_name);
+   827				err = crypto_register_rng(&ce_algs[i].alg.rng);
+   828				if (err) {
+   829					dev_err(ce->dev, "Fail to register %s\n",
+   830						ce_algs[i].alg.rng.base.cra_name);
+   831					ce_algs[i].ce = NULL;
+   832				}
+   833				break;
+   834			default:
+   835				ce_algs[i].ce = NULL;
+   836				dev_err(ce->dev, "ERROR: tried to register an unknown algo\n");
+   837			}
+   838		}
+   839		return 0;
+   840	}
+   841	
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
 https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
---uAKRQypu60I7Lcqm
+--T4sUOijqQbZv57TR
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICJfY714AAy5jb25maWcAjFxbc9u2tn7vr9CkL+3MSSvZjpPsM3oASVBCRRIMAeriF45i
+H4sICGTP714AAy5jb25maWcAjFxbc9u2tn7vr9CkL+3MSSvZjpPsM3oASVBCRRIMAeriF45i
 K4mntuUjyd3Nvz9rgTcABCl1OtPy+xbuC1gXQP71l19H5O20f96eHu+3T08/R993L7vD9rR7
 GH17fNr97yjgo4TLEQ2Y/AOEo8eXt3//PP4Yffjj4x/j94f7yWixO7zsnkb+/uXb4/c3KPu4
 f/nl11/g318BfH6Fag7/GR1/3Lx/wsLvv9/fj36b+f7vo89/XP8xBjmfJyGbFb5fMFEAM/1Z
@@ -1171,62 +1148,62 @@ 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
-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
+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
 
---uAKRQypu60I7Lcqm--
+--T4sUOijqQbZv57TR--
