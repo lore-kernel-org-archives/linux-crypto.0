@@ -2,47 +2,46 @@ Return-Path: <SRS0=+94A=AC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A247BC433E0
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 13:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC7A0C433DF
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 13:15:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 793C1248B7
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 13:07:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B5AF206F1
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 13:15:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="a2cM1tpY"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="Q+6/+Ny6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730081AbgFUNHd (ORCPT
+        id S1730092AbgFUNPm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Jun 2020 09:07:33 -0400
-Received: from mout.web.de ([212.227.15.14]:59377 "EHLO mout.web.de"
+        Sun, 21 Jun 2020 09:15:42 -0400
+Received: from mout.web.de ([212.227.15.14]:59859 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730071AbgFUNHd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Jun 2020 09:07:33 -0400
+        id S1730071AbgFUNPl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 21 Jun 2020 09:15:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1592744840;
-        bh=1fOvdKU1y/7Wg6u4feDGuogF/GhU4lysF1Rov6meshg=;
+        s=dbaedf251592; t=1592745328;
+        bh=kNDqV4Y9iwk4ngQtcCZhjKxwK0e3ASAnQOTNbokvWxQ=;
         h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=a2cM1tpYA6V0KAr5I86Xg+e14fq50/5IwB4YCYMlz7n6xKseRaXiGOMevz5tn97A3
-         YwFLPyEn3QjfRmymhzVzGsqJyIRTi3iFDzosbzUT2EHbbfcrjrnQ7SSbEvueNpaIrK
-         ngtszMxdG3FLHFfaDSvc6niGMZ1DuBDxXdQqQKgw=
+        b=Q+6/+Ny6ZDNhNNPgf2vFDkPjfLDo+5bgIUEGoAYtTFueHi2vI9LuNfUOJG4hRVJUd
+         4ivLvFVUluq9fNZ8DRgCH1/m+T5/uERQZu/9mTty1PkTb1toxjM9r9NAnRpOaJjtG8
+         Bnaiz5T8pagQy1vimZmpTlM+2PB9y/4ntT2pCWKc=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.2] ([93.131.145.213]) by smtp.web.de (mrweb003
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0MGRYe-1jibzE2N7o-00DGO1; Sun, 21
- Jun 2020 15:07:20 +0200
-Subject: Re: [PATCH v2 1/3] crypto: ccree: fix resource leak on error path
+Received: from [192.168.1.2] ([93.131.145.213]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1M1aE3-1jjxoh31jv-0038HX; Sun, 21
+ Jun 2020 15:15:28 +0200
+Subject: Re: [PATCH v2 2/3] crypto: ccree: adapt ccree essiv support to kcapi
 To:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        linux-crypto@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Ofir Drang <ofir.drang@arm.com>
+        Libo Wang <libo.wang@arm.com>, Ofir Drang <ofir.drang@arm.com>
 References: <20200621112000.31495-1-gilad@benyossef.com>
- <20200621112000.31495-2-gilad@benyossef.com>
+ <20200621112000.31495-3-gilad@benyossef.com>
 From:   Markus Elfring <Markus.Elfring@web.de>
 Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  mQINBFg2+xABEADBJW2hoUoFXVFWTeKbqqif8VjszdMkriilx90WB5c0ddWQX14h6w5bT/A8
@@ -87,50 +86,52 @@ Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  Z/wsLiWTgKlih2QYULvW61XU+mWsK8+ZlYUrRMpkauN4CJ5yTpvp+Orcz5KixHQmc5tbkLWf
  x0n1QFc1xxJhbzN+r9djSGGN/5IBDfUqSANC8cWzHpWaHmSuU3JSAMB/N+yQjIad2ztTckZY
  pwT6oxng29LzZspTYUEzMz3wK2jQHw+U66qBFk8whA7B2uAU1QdGyPgahLYSOa4XAEGb6wbI FEE=
-Message-ID: <2857f54e-e752-0555-f43a-a451f64f6302@web.de>
-Date:   Sun, 21 Jun 2020 15:07:16 +0200
+Message-ID: <53ec2baa-eada-0fa4-2c91-082ab4a21901@web.de>
+Date:   Sun, 21 Jun 2020 15:15:24 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200621112000.31495-2-gilad@benyossef.com>
+In-Reply-To: <20200621112000.31495-3-gilad@benyossef.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
-X-Provags-ID: V03:K1:Q7nxQhQsjIzL6bqtptpKlBMFW5EjfsNZNMQeoTa/VD544fKjmZr
- bWjBv9I9r+syVjsTGyr2HjiiyqZtDVPbMw47Oy159Zv+V4bD+Xl/p8YQcNJmp84F2fkUnBl
- +jIyp1XfWzHMEkyqy8dVd6glW6aUW9PQbMUeZ4VOvjoTdY7KY42abzKb3WSE4OAFVXxeH7L
- R7SJuROc0UVHnSteT3ouA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:difWGw/0RXY=:W+eBOyqREq3Z8+kK1x1gvA
- fpR+ZtUMfNELxxXvzZd/jgGKXq7FRxVR2eiTs4qVpyASYdZBpHWK291z1FHQ1Xy+Iq0FK1W+H
- FlQ1pIhZtx5lodxCs371pG1adeQo3+EPBnz4rXgPCdGbnCw97exUdz3WvD82PikC5jjgKbnmg
- ES/xt9kXspd0CTPgaaGgISbGLzoAnLufKavoF42qhxeGsCpzpE1johUgd+C41OAWU8X/eaZSH
- S5OC28clidR9JYGn52SJdMJVnKAG7fxWr2cuqO5duwY/muf6izbs+5CiZnvwHsVUROvE2xpb6
- nxf7JHc3L5lIa4DUgLjSTwq4OlXXZPCVT/wc4RWjJ6nCT+CK4Q90rxgA7LuB/7aMyZj0QbJu2
- U7nuaaynByDyZFHdHRUH6dvIhcx9OILHYZ1/of8zrkzslaH9Z/+qa25imbbATHzyjtPP+lDQQ
- 3T3LMLVfO8fem7+ispNpBjRksLpwu9acRy+HljgfTjuPVKDWoVhOA8bUYus5Vih/l4mmzlCm9
- WlYhYC3UwBHLCiGKpoloAYujm5yxsEvoA29/jkFcATSQQCjjssvwXaM2W/j30QyWHQIon8Ic4
- leLgQ6YvcI+oryaSwm4KfmEK/XqvBLevbiLEwY83hlXs6jJTmMDMzl3yYkff7WSQ4d6/+LQux
- UdgjJrVM0jzHt+4LNDb8dV86sUc446q6ECgYRRuxt9iU0u9v+1p6vwxJs4WKwep9iKoyfp7nd
- P6QTeEmQZPuyXWcv6jDv2p3xuKZTVWjJRBHdjJksKzUtxx6i7ytDSOliBq5TSXhaEiC0w9no6
- FaOGbnYXXBPNfiAmUXSfyb35sYLJQzG+kCc9WzQONLGHUeVBz+g/+JK+ndaZ+/1nZgDC8ddiB
- 7gtiOcYmbdek8vQkf3SFXJfZFhH/Ls7UKtDaDa1JqdHUn4bfuSpdQGP3gDtXGU2bagHL5bu5b
- sBhA5pr4TWis8ZPTyUgKX7krKWfUaGD/udte+M9dECx5AzAbmMNiROwcAbMOnRSVuk8sPTdLk
- AW9NMZFxmE6TdlO3atJDx60Qrxlu8AUwqC/iD+rLkoKykAACXq+bOL4yOmj+XiMXOa6bClVTN
- ZW73dU51DMfskuqCVWHUmUkriWhLOLQgq8TzXXCdqK7XIypMXnAsh+lRGg8D1xVS5PAoROtbn
- n75gjLTvCPZMUpPT/Q36KQvO+d7waPbPcq6bjKUkVqzghjynMkwVFY3X64cAM+13B3asCL4Xb
- nSq82XavpOoLr5yww
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:uuR1KvMfvfSyH1HhtsetqM565HoIkSTeUhdS0WdiuNe1xk4l8pe
+ X1lp3B7wrpf6SFS3eEInpxfW5BAq1hOQjciut/3m9X8dnu7rDJivyfYPvVQxg94rN4sfCb+
+ imqdiXiOEWGe/JtKTGTuPjJe8hLTb2liYiMYpT1SY19omRKiQNl9LKzGRa9EdpPX0Q2YUUC
+ mhyfvMRVADCFlSVNvScgQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:RFOvZ8fLRTY=:kC7WzlDTyP39ml6reA9Zxv
+ VtuNkIu5bH/tZbFsDx+gkpu8PwwiDHag3IC6kXkZK1UgBV6BNN0BL4eX3ftv9AYJsK4RqYsML
+ VFBNIW2ZIu3QVJtIPGyfPE8kHlk7pp5MzZ88kLrX51oH6vwqpy3ip384fpONIzZPBKEOe7STL
+ khcKiYG2mZr6h5ejEByQRlPVTV+NcenYoLE0gAy5+RKa2W1BvWvr1u7TEyH3ePuhaBpQ9QaXv
+ ZaGTd4gdsaPrxdMg2ZZXtGCNaXbGU0WjvIQD0CtuvwWcKr1mrnYdxGKmGBzwVw+xAFEpXQtBO
+ W+ddKGslhh+I7lrYch3irPivOkmfcBowoVZck3kb2R/QEJTZAtAEtd5w+KoTLK5z1m93wtqWg
+ gjMfF4z42E3b7rjP/zwn0wScojyAIKrxzCL9sT3BxAeQyi08Oxc4i5phVpWImy/pYt7oDksZW
+ va1jioWTga9K8zZgtqwVQoK2QHHkMhjE5FoOrzexUkqsF8rSBAtsDXBBcLsIpOuMikxG6CU7u
+ FCvMo7RPs18JPANbEtKUiY37wLiDItc54R0Zyw4kC3DlCTy6eVqWHh+musdad4jF8t+axZYpH
+ tMRJBZDoqpqIfcXpZddCcye5IASgkLyaBr3vd7i0+NZCajs8uD+Xy7pZOm6VfVau0sk+wieyZ
+ IwdCzLadYNnKqk8SKLe4raztji0m7MgXD+ez12HiUVqNaCP7K/cGIhRt/kg4L35b6DWQWMlij
+ b2XQx6CE+IKkCkvRIFnCtndEd4Ea8qx8YL4UyWGZPwNOs5okUPLdpnbRyP++sVsLGZ4MEnchb
+ eKZNlB9f7y8I2FNRk731S1Fp9h2KByn24a0mRd/dEyb7jYmoAkMt6Ytchs5y3jna7ROyu8ggi
+ fPucRwFopuZkcVThXIIOuNEU6jgZSkZqvubBvJigFEGwa7kjfFmil4I6bgFV7rEsDZQkPDbYw
+ 36DbN6K3P7q6oALr/6oxwjwSy8v8WW17cEHVigfd27fxkZ6FClz5YSi+TuNSnsqLafBmHmDd4
+ aF2CAgopvHZ5zkAT8K65hBk7KgsOscI/aMRd2ZOdfSoPg0hu56Vx+4kYLaW1IUyVOPt3ImlU2
+ CeYhiP8MuqQ3ubrJEBiiRDGUehFSga27N+6M0x2WCzk01rHTWSm674esWZl/LhdnoKO2X2MWB
+ r60E81xpwpgLsMUb1+PwgtLBv+B1uxwYSs4NfxUL41A4LSUMuXdU0LlpAYX/tdOriuPBqpKZ/
+ scJ9uOo9m6URm41pk
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> Fix a small resource leak on the error path of cipher processing.
+> Brings the ccree essiv interface =E2=80=A6
 
-I find it more appropriate to resend this patch series with a cover letter
-together with all update steps.
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?id=64677779e8962c20b580b471790fe42367750599#n785
+Wording adjustments:
+Bring the =E2=80=A6
 
 
-Where would you like to put the patch version descriptions?
+> also use a fallback if requested a smaller key size.
+
+=E2=80=A6 fallback if a smaller key size was requested.
 
 Regards,
 Markus
