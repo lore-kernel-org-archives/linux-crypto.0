@@ -2,384 +2,144 @@ Return-Path: <SRS0=+94A=AC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BA82C433DF
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 09:08:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8C11C433DF
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 09:28:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB1E124896
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 09:08:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D6542489F
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 09:28:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="IRjtq/gY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729637AbgFUJID (ORCPT
+        id S1729588AbgFUJ2T (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Jun 2020 05:08:03 -0400
-Received: from foss.arm.com ([217.140.110.172]:47906 "EHLO foss.arm.com"
+        Sun, 21 Jun 2020 05:28:19 -0400
+Received: from mout.web.de ([212.227.15.3]:44297 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727119AbgFUJIC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Jun 2020 05:08:02 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DED14101E;
-        Sun, 21 Jun 2020 02:08:00 -0700 (PDT)
-Received: from e110176-lin.arm.com (E113494.Arm.com [10.50.66.186])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F11103F6CF;
-        Sun, 21 Jun 2020 02:07:58 -0700 (PDT)
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Ofir Drang <ofir.drang@arm.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Libo Wang <libo.wang@arm.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/3] crypto: ccree: adapt ccree essiv supprot to kcapi
-Date:   Sun, 21 Jun 2020 12:07:47 +0300
-Message-Id: <20200621090748.18464-3-gilad@benyossef.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200621090748.18464-1-gilad@benyossef.com>
-References: <20200621090748.18464-1-gilad@benyossef.com>
+        id S1729573AbgFUJ2S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 21 Jun 2020 05:28:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+        s=dbaedf251592; t=1592731683;
+        bh=k+nctZszWHVXTeaUOOM+Rahgb3xT+byFYUzyhWax3Cw=;
+        h=X-UI-Sender-Class:To:Cc:Subject:From:Date;
+        b=IRjtq/gYBdYyfuU4dzz3mCe28n3PsSfu5gpxO4+sVFyO281SOJlHeehwFsSCH09+9
+         MYNtEY7BvHSl/cxgVTUL+iB0FL5jiV6jwHW4tYR/6sNx6NfUSrUL7skHByO3kSTE7H
+         GBHBPesLKkCCkSkfs0Gf9UV0Jp3XmbDrmsZ3wQZ0=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.2] ([93.131.145.213]) by smtp.web.de (mrweb001
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MLy84-1jo3Gp0Tm8-007kPu; Sun, 21
+ Jun 2020 11:28:03 +0200
+To:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        linux-crypto@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ofir Drang <ofir.drang@arm.com>
+Subject: Re: [PATCH 1/3] crypto: ccree: fix resource leak on error path
+From:   Markus Elfring <Markus.Elfring@web.de>
+Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
+ 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 FEE=
+Message-ID: <3a4ddd15-e8a9-33fb-007a-d50137c378a6@web.de>
+Date:   Sun, 21 Jun 2020 11:28:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:PWH2kdPCZGr0dW4y2otajdtaVleRJFwuONJz6E9A9XAm1HlWaA/
+ O9k+IrMPeCCFulq/nPs5jdz0+mN6AIaXjc6u2KcQ3FbwVyiH9Khz8NrEbm8l85sZonp7CnT
+ gstlo9YnSRDpfj5/ifoNsHlgNkFPYIiVBwy+0WTMWpPz5695RLFAN16rwh/yMbLnp1+k2gK
+ syVzyeHrEPn/+bg61tboA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ufOXC5f9xU8=:I7FPBQZcQI5QAON2XgyAd4
+ 3TX1JHZPSnQ7F7UWWCu+pTk81oz+LAdE9nI4IKqfyTjPY4RhPSLAraHhNnS7fmoyBiU8TwvZb
+ u3Zt+STPHWCpamkONnymZh/2Peb7t+weXVYXoirTRc/7YMdEJ7bLx0Rt/AToXNOX+DRXneVAo
+ PGNDlKMaZRoqPTSd+iHaiJ0mf1avzGbsF0nJhbyYmr8dsb6Ns7VNiFBJ2Ad2OXqpcgRTUvh88
+ oB0cXMP6dr5GCRPF0y7Rw1DYbuXPC2lGcJuFwT3+ll+VscGZc2rdHVDpt0IV7KMf6Of5uO5vf
+ atY+BMv0quOb+CHDWkw3yoixGfBo8uUl7yVOFfUEwdPkD8t2faA9kywG8d4JxmWtcM9zqYye4
+ nhgfUEH47/ilscWp9ey0K6LQwKOBWxoE2hJw66pgWw9iqiFyifOqD6cwBDbHdUSdd9kAaAoMm
+ XcAx7lhMV446JtQVDzEq3Ta1G6Je4sddh3QzAnvgxb1lz7/vHYy+KL8D+UYX6lh4dlMD2FWx2
+ vN+FRfB1k6oN1KhqDY9C6JOe/+xDj7fr/0OWe8wY4h1iTeJSeSlDIExMj+Sn8wvPBMKl22+oG
+ gWdJP/YKwsPLCmFKsSPO8iTX5pc+syJdPRAxZdb6eNn3CHezOG4utYAoScQ4737ur8FVHNdIw
+ 2w1UsF/2uJaaef/qnAxV+efcz5Vt9hBGYjPBAP0c88dj9wPU84tFBYum30F4FIMucnlmV8r8g
+ Wnid6uf4O10AeRnj0E4/c4W/K4f3ZviLYGf8Sm36RfJwUX1ZLKy66BpBoNFj/XQqctKF4E7fr
+ Zpb+8qQHZmt+CbXzPziHMu66J7pargah1mznq0VaCBosO0tpdiP4Y1rVaYNuBYoHw+GA1yGEj
+ wpHY4LpGUTjWXEMyuTCz67RnquW7cirN1SrD3c40uIz1ziy805ZCkRCkqIMMRYTkRc48At/Ue
+ KQWA/qFVAPViZG6wkJnsdk1Hv8/X5TYv9hEtJswUr2z9NI89T3T5JbjlKRyN6ZY9LJBnNpCvq
+ fQBv6SARVSaMuxjQaK1cg4e+mbFN3+sAmKUz7l/GE1iCf71QBScqjkGfI1Ykhloa8ytx4/SxS
+ r3UHJ26zau3cxCqzgr9IlPx8HXYaajgk4kxnSl5bs48WoxBNCAkn25KL1lY3JnqfP22jZOYXd
+ YKkduy5t5fLb3ZKLWC6mSr6nD/yrXrpLdsCBLBmvaCgn2RcLlsXjpz+fiComRcN/y2vtDbKTm
+ mUim32+wdeddm4bJg
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The ESSIV support in ccree was added before the kernel
-generic support and using a slightly different API.
+> Fix a small resource leak on the error path of cipher processing.
 
-This patch brings the ccree essiv interface into
-compliance with kernel crypto api one.
+Would you like to add the tag =E2=80=9CFixes=E2=80=9D to the commit messag=
+e?
 
-Since CryptoCell only support 256 bit AES key for ESSIV,
-also use a fallback if requested a smaller key size.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Libo Wang <libo.wang@arm.com>
----
- drivers/crypto/ccree/cc_cipher.c | 124 +++++++++++++++++++++++--------
- 1 file changed, 93 insertions(+), 31 deletions(-)
+=E2=80=A6
+> +++ b/drivers/crypto/ccree/cc_cipher.c
+=E2=80=A6
+> @@ -190,21 +198,19 @@  static int cc_cipher_init(struct crypto_tfm *tfm)
+=E2=80=A6
+> -	return rc;
+> +out_key:
+> +	kfree(ctx_p->user.key);
+> +out_shash:
+> +	crypto_free_shash(ctx_p->shash_tfm);
+=E2=80=A6
 
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index e61f35ca9945..6575e216262b 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -60,6 +60,8 @@ struct cc_cipher_ctx {
- 		struct cc_cpp_key_info cpp;
- 	};
- 	struct crypto_shash *shash_tfm;
-+	struct crypto_skcipher *fallback_tfm;
-+	bool fallback_on;
- };
- 
- static void cc_cipher_complete(struct device *dev, void *cc_req, int err);
-@@ -79,7 +81,6 @@ static int validate_keys_sizes(struct cc_cipher_ctx *ctx_p, u32 size)
- 		case CC_AES_128_BIT_KEY_SIZE:
- 		case CC_AES_192_BIT_KEY_SIZE:
- 			if (ctx_p->cipher_mode != DRV_CIPHER_XTS &&
--			    ctx_p->cipher_mode != DRV_CIPHER_ESSIV &&
- 			    ctx_p->cipher_mode != DRV_CIPHER_BITLOCKER)
- 				return 0;
- 			break;
-@@ -163,30 +164,49 @@ static int cc_cipher_init(struct crypto_tfm *tfm)
- 				     skcipher_alg.base);
- 	struct device *dev = drvdata_to_dev(cc_alg->drvdata);
- 	unsigned int max_key_buf_size = cc_alg->skcipher_alg.max_keysize;
-+	unsigned int fallback_req_size = 0;
- 
- 	dev_dbg(dev, "Initializing context @%p for %s\n", ctx_p,
- 		crypto_tfm_alg_name(tfm));
- 
--	crypto_skcipher_set_reqsize(__crypto_skcipher_cast(tfm),
--				    sizeof(struct cipher_req_ctx));
--
- 	ctx_p->cipher_mode = cc_alg->cipher_mode;
- 	ctx_p->flow_mode = cc_alg->flow_mode;
- 	ctx_p->drvdata = cc_alg->drvdata;
- 
- 	if (ctx_p->cipher_mode == DRV_CIPHER_ESSIV) {
-+		const char *name = crypto_tfm_alg_name(tfm);
-+
- 		/* Alloc hash tfm for essiv */
--		ctx_p->shash_tfm = crypto_alloc_shash("sha256-generic", 0, 0);
-+		ctx_p->shash_tfm = crypto_alloc_shash("sha256", 0, 0);
- 		if (IS_ERR(ctx_p->shash_tfm)) {
- 			dev_err(dev, "Error allocating hash tfm for ESSIV.\n");
- 			return PTR_ERR(ctx_p->shash_tfm);
- 		}
-+		max_key_buf_size <<= 1;
-+
-+		/* Alloc fallabck tfm or essiv when key size != 256 bit */
-+		ctx_p->fallback_tfm =
-+			crypto_alloc_skcipher(name, 0, CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC);
-+
-+		if (IS_ERR(ctx_p->fallback_tfm)) {
-+			/* Note we're still allowing registration with no fallback since it's
-+			 * better to have most modes supported than none at all.
-+			 */
-+			dev_warn(dev, "Error allocating fallback algo %s. Some modes may be available.\n",
-+			       name);
-+			ctx_p->fallback_tfm = NULL;
-+		} else {
-+			fallback_req_size = crypto_skcipher_reqsize(ctx_p->fallback_tfm);
-+		}
- 	}
- 
-+	crypto_skcipher_set_reqsize(__crypto_skcipher_cast(tfm),
-+				    sizeof(struct cipher_req_ctx) + fallback_req_size);
-+
- 	/* Allocate key buffer, cache line aligned */
--	ctx_p->user.key = kmalloc(max_key_buf_size, GFP_KERNEL);
-+	ctx_p->user.key = kzalloc(max_key_buf_size, GFP_KERNEL);
- 	if (!ctx_p->user.key)
--		goto out_shash;
-+		goto out_fallback;
- 
- 	dev_dbg(dev, "Allocated key buffer in context. key=@%p\n",
- 		ctx_p->user.key);
-@@ -207,7 +227,8 @@ static int cc_cipher_init(struct crypto_tfm *tfm)
- 
- out_key:
- 	kfree(ctx_p->user.key);
--out_shash:
-+out_fallback:
-+	crypto_free_skcipher(ctx_p->fallback_tfm);
- 	crypto_free_shash(ctx_p->shash_tfm);
- 
- 	return -ENOMEM;
-@@ -230,6 +251,8 @@ static void cc_cipher_exit(struct crypto_tfm *tfm)
- 		/* Free hash tfm for essiv */
- 		crypto_free_shash(ctx_p->shash_tfm);
- 		ctx_p->shash_tfm = NULL;
-+		crypto_free_skcipher(ctx_p->fallback_tfm);
-+		ctx_p->fallback_tfm = NULL;
- 	}
- 
- 	/* Unmap key buffer */
-@@ -313,6 +336,7 @@ static int cc_cipher_sethkey(struct crypto_skcipher *sktfm, const u8 *key,
- 	}
- 
- 	ctx_p->keylen = keylen;
-+	ctx_p->fallback_on = false;
- 
- 	switch (cc_slot_to_key_type(hki.hw_key1)) {
- 	case CC_HW_PROTECTED_KEY:
-@@ -398,10 +422,33 @@ static int cc_cipher_setkey(struct crypto_skcipher *sktfm, const u8 *key,
- 	/* STAT_PHASE_0: Init and sanity checks */
- 
- 	if (validate_keys_sizes(ctx_p, keylen)) {
--		dev_dbg(dev, "Unsupported key size %d.\n", keylen);
-+		dev_dbg(dev, "Invalid key size %d.\n", keylen);
- 		return -EINVAL;
- 	}
- 
-+	if (ctx_p->cipher_mode == DRV_CIPHER_ESSIV) {
-+
-+		/* We only support 256 bit ESSIV-CBC-AES keys */
-+		if (keylen != AES_KEYSIZE_256)  {
-+			unsigned int flags = crypto_tfm_get_flags(tfm) & CRYPTO_TFM_REQ_MASK;
-+
-+			if (likely(ctx_p->fallback_tfm)) {
-+				ctx_p->fallback_on = true;
-+				crypto_skcipher_clear_flags(ctx_p->fallback_tfm,
-+							    CRYPTO_TFM_REQ_MASK);
-+				crypto_skcipher_clear_flags(ctx_p->fallback_tfm, flags);
-+				return crypto_skcipher_setkey(ctx_p->fallback_tfm, key, keylen);
-+			}
-+
-+			dev_dbg(dev, "Unsupported key size %d and no fallback.\n", keylen);
-+			return -EINVAL;
-+		}
-+
-+		/* Internal ESSIV key buffer is double sized */
-+		max_key_buf_size <<= 1;
-+	}
-+
-+	ctx_p->fallback_on = false;
- 	ctx_p->key_type = CC_UNPROTECTED_KEY;
- 
- 	/*
-@@ -429,24 +476,23 @@ static int cc_cipher_setkey(struct crypto_skcipher *sktfm, const u8 *key,
- 				max_key_buf_size, DMA_TO_DEVICE);
- 
- 	memcpy(ctx_p->user.key, key, keylen);
--	if (keylen == 24)
--		memset(ctx_p->user.key + 24, 0, CC_AES_KEY_SIZE_MAX - 24);
- 
- 	if (ctx_p->cipher_mode == DRV_CIPHER_ESSIV) {
- 		/* sha256 for key2 - use sw implementation */
--		int key_len = keylen >> 1;
- 		int err;
- 
- 		SHASH_DESC_ON_STACK(desc, ctx_p->shash_tfm);
- 
- 		desc->tfm = ctx_p->shash_tfm;
- 
--		err = crypto_shash_digest(desc, ctx_p->user.key, key_len,
--					  ctx_p->user.key + key_len);
-+		err = crypto_shash_digest(desc, ctx_p->user.key, keylen,
-+					  ctx_p->user.key + keylen);
- 		if (err) {
- 			dev_err(dev, "Failed to hash ESSIV key.\n");
- 			return err;
- 		}
-+
-+		keylen <<= 1;
- 	}
- 	dma_sync_single_for_device(dev, ctx_p->user.key_dma_addr,
- 				   max_key_buf_size, DMA_TO_DEVICE);
-@@ -584,9 +630,10 @@ static void cc_setup_xex_state_desc(struct crypto_tfm *tfm,
- 	int flow_mode = ctx_p->flow_mode;
- 	int direction = req_ctx->gen_ctx.op_type;
- 	dma_addr_t key_dma_addr = ctx_p->user.key_dma_addr;
--	unsigned int key_len = ctx_p->keylen;
-+	unsigned int key_len = (ctx_p->keylen / 2);
- 	dma_addr_t iv_dma_addr = req_ctx->gen_ctx.iv_dma_addr;
- 	unsigned int du_size = nbytes;
-+	unsigned int key_offset = key_len;
- 
- 	struct cc_crypto_alg *cc_alg =
- 		container_of(tfm->__crt_alg, struct cc_crypto_alg,
-@@ -606,6 +653,10 @@ static void cc_setup_xex_state_desc(struct crypto_tfm *tfm,
- 	case DRV_CIPHER_XTS:
- 	case DRV_CIPHER_ESSIV:
- 	case DRV_CIPHER_BITLOCKER:
-+
-+		if (cipher_mode == DRV_CIPHER_ESSIV)
-+			key_len = SHA256_DIGEST_SIZE;
-+
- 		/* load XEX key */
- 		hw_desc_init(&desc[*seq_size]);
- 		set_cipher_mode(&desc[*seq_size], cipher_mode);
-@@ -615,12 +666,12 @@ static void cc_setup_xex_state_desc(struct crypto_tfm *tfm,
- 					  ctx_p->hw.key2_slot);
- 		} else {
- 			set_din_type(&desc[*seq_size], DMA_DLLI,
--				     (key_dma_addr + (key_len / 2)),
--				     (key_len / 2), NS_BIT);
-+				     (key_dma_addr + key_offset),
-+				     key_len, NS_BIT);
- 		}
- 		set_xex_data_unit_size(&desc[*seq_size], du_size);
- 		set_flow_mode(&desc[*seq_size], S_DIN_to_AES2);
--		set_key_size_aes(&desc[*seq_size], (key_len / 2));
-+		set_key_size_aes(&desc[*seq_size], key_len);
- 		set_setup_mode(&desc[*seq_size], SETUP_LOAD_XEX_KEY);
- 		(*seq_size)++;
- 
-@@ -629,7 +680,7 @@ static void cc_setup_xex_state_desc(struct crypto_tfm *tfm,
- 		set_setup_mode(&desc[*seq_size], SETUP_LOAD_STATE1);
- 		set_cipher_mode(&desc[*seq_size], cipher_mode);
- 		set_cipher_config0(&desc[*seq_size], direction);
--		set_key_size_aes(&desc[*seq_size], (key_len / 2));
-+		set_key_size_aes(&desc[*seq_size], key_len);
- 		set_flow_mode(&desc[*seq_size], flow_mode);
- 		set_din_type(&desc[*seq_size], DMA_DLLI, iv_dma_addr,
- 			     CC_AES_BLOCK_SIZE, NS_BIT);
-@@ -880,6 +931,17 @@ static int cc_cipher_process(struct skcipher_request *req,
- 		goto exit_process;
- 	}
- 
-+	if (ctx_p->fallback_on) {
-+		struct skcipher_request *subreq = skcipher_request_ctx(req);
-+
-+		*subreq = *req;
-+		skcipher_request_set_tfm(subreq, ctx_p->fallback_tfm);
-+		if (direction == DRV_CRYPTO_DIRECTION_ENCRYPT)
-+			return crypto_skcipher_encrypt(subreq);
-+		else
-+			return crypto_skcipher_decrypt(subreq);
-+	}
-+
- 	/* The IV we are handed may be allocted from the stack so
- 	 * we must copy it to a DMAable buffer before use.
- 	 */
-@@ -1023,7 +1085,7 @@ static const struct cc_alg_template skcipher_algs[] = {
- 		.sec_func = true,
- 	},
- 	{
--		.name = "essiv(paes)",
-+		.name = "essiv(cbc(paes),sha256)",
- 		.driver_name = "essiv-paes-ccree",
- 		.blocksize = AES_BLOCK_SIZE,
- 		.template_skcipher = {
-@@ -1041,7 +1103,7 @@ static const struct cc_alg_template skcipher_algs[] = {
- 		.sec_func = true,
- 	},
- 	{
--		.name = "essiv512(paes)",
-+		.name = "essiv512(cbc(paes),sha256)",
- 		.driver_name = "essiv-paes-du512-ccree",
- 		.blocksize = AES_BLOCK_SIZE,
- 		.template_skcipher = {
-@@ -1060,7 +1122,7 @@ static const struct cc_alg_template skcipher_algs[] = {
- 		.sec_func = true,
- 	},
- 	{
--		.name = "essiv4096(paes)",
-+		.name = "essiv4096(cbc(paes),sha256)",
- 		.driver_name = "essiv-paes-du4096-ccree",
- 		.blocksize = AES_BLOCK_SIZE,
- 		.template_skcipher = {
-@@ -1282,15 +1344,15 @@ static const struct cc_alg_template skcipher_algs[] = {
- 		.std_body = CC_STD_NIST,
- 	},
- 	{
--		.name = "essiv(aes)",
-+		.name = "essiv(cbc(aes),sha256)",
- 		.driver_name = "essiv-aes-ccree",
- 		.blocksize = AES_BLOCK_SIZE,
- 		.template_skcipher = {
- 			.setkey = cc_cipher_setkey,
- 			.encrypt = cc_cipher_encrypt,
- 			.decrypt = cc_cipher_decrypt,
--			.min_keysize = AES_MIN_KEY_SIZE * 2,
--			.max_keysize = AES_MAX_KEY_SIZE * 2,
-+			.min_keysize = AES_MIN_KEY_SIZE,
-+			.max_keysize = AES_MAX_KEY_SIZE,
- 			.ivsize = AES_BLOCK_SIZE,
- 			},
- 		.cipher_mode = DRV_CIPHER_ESSIV,
-@@ -1299,15 +1361,15 @@ static const struct cc_alg_template skcipher_algs[] = {
- 		.std_body = CC_STD_NIST,
- 	},
- 	{
--		.name = "essiv512(aes)",
-+		.name = "essiv512(cbc(aes),sha256)",
- 		.driver_name = "essiv-aes-du512-ccree",
- 		.blocksize = AES_BLOCK_SIZE,
- 		.template_skcipher = {
- 			.setkey = cc_cipher_setkey,
- 			.encrypt = cc_cipher_encrypt,
- 			.decrypt = cc_cipher_decrypt,
--			.min_keysize = AES_MIN_KEY_SIZE * 2,
--			.max_keysize = AES_MAX_KEY_SIZE * 2,
-+			.min_keysize = AES_MIN_KEY_SIZE,
-+			.max_keysize = AES_MAX_KEY_SIZE,
- 			.ivsize = AES_BLOCK_SIZE,
- 			},
- 		.cipher_mode = DRV_CIPHER_ESSIV,
-@@ -1317,15 +1379,15 @@ static const struct cc_alg_template skcipher_algs[] = {
- 		.std_body = CC_STD_NIST,
- 	},
- 	{
--		.name = "essiv4096(aes)",
-+		.name = "essiv4096(cbc(aes),sha256)",
- 		.driver_name = "essiv-aes-du4096-ccree",
- 		.blocksize = AES_BLOCK_SIZE,
- 		.template_skcipher = {
- 			.setkey = cc_cipher_setkey,
- 			.encrypt = cc_cipher_encrypt,
- 			.decrypt = cc_cipher_decrypt,
--			.min_keysize = AES_MIN_KEY_SIZE * 2,
--			.max_keysize = AES_MAX_KEY_SIZE * 2,
-+			.min_keysize = AES_MIN_KEY_SIZE,
-+			.max_keysize = AES_MAX_KEY_SIZE,
- 			.ivsize = AES_BLOCK_SIZE,
- 			},
- 		.cipher_mode = DRV_CIPHER_ESSIV,
--- 
-2.27.0
+How do you think about to replace the prefix =E2=80=9Cout=E2=80=9D by =E2=
+=80=9Cfree=E2=80=9D in these labels?
 
+Regards,
+Markus
