@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 169EFC433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C27DC433E0
 	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 14:57:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB84824740
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 14:57:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6554624740
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 14:57:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730322AbgFUO5W (ORCPT
+        id S1730327AbgFUO5X (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Jun 2020 10:57:22 -0400
-Received: from inva020.nxp.com ([92.121.34.13]:53654 "EHLO inva020.nxp.com"
+        Sun, 21 Jun 2020 10:57:23 -0400
+Received: from inva021.nxp.com ([92.121.34.21]:49210 "EHLO inva021.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730279AbgFUO5U (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Jun 2020 10:57:20 -0400
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 26CB01A0750;
+        id S1730257AbgFUO5W (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 21 Jun 2020 10:57:22 -0400
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id E0F642015E5;
         Sun, 21 Jun 2020 16:57:19 +0200 (CEST)
 Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 1AA961A0744;
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id D340E2004E6;
         Sun, 21 Jun 2020 16:57:19 +0200 (CEST)
 Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 5CC81203C2;
-        Sun, 21 Jun 2020 16:57:18 +0200 (CEST)
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 2B35F203C2;
+        Sun, 21 Jun 2020 16:57:19 +0200 (CEST)
 From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
 To:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
         Sascha Hauer <s.hauer@pengutronix.de>,
@@ -45,9 +45,9 @@ Cc:     Pengutronix Kernel Team <kernel@pengutronix.de>,
         Iuliana Prodan <iuliana.prodan@nxp.com>,
         Silvano Di Ninno <silvano.dininno@nxp.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/5] ARM: dts: imx6ull: add rng
-Date:   Sun, 21 Jun 2020 17:56:57 +0300
-Message-Id: <20200621145658.12528-5-horia.geanta@nxp.com>
+Subject: [PATCH v2 5/5] hwrng: imx-rngc: enable driver for i.MX6
+Date:   Sun, 21 Jun 2020 17:56:58 +0300
+Message-Id: <20200621145658.12528-6-horia.geanta@nxp.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200621145658.12528-1-horia.geanta@nxp.com>
 References: <20200621145658.12528-1-horia.geanta@nxp.com>
@@ -60,31 +60,44 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add node for the RNGB block.
+i.MX6 SL, SLL, ULL, ULZ SoCs have an RNGB block.
+
+Since imx-rngc driver supports also rngb,
+let's enable it for these SoCs too.
 
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- arch/arm/boot/dts/imx6ull.dtsi | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/char/hw_random/Kconfig    | 2 +-
+ drivers/char/hw_random/imx-rngc.c | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/boot/dts/imx6ull.dtsi b/arch/arm/boot/dts/imx6ull.dtsi
-index fcde7f77ae42..9bf67490ac49 100644
---- a/arch/arm/boot/dts/imx6ull.dtsi
-+++ b/arch/arm/boot/dts/imx6ull.dtsi
-@@ -68,6 +68,13 @@
- 				clock-names = "dcp";
- 			};
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 0ad17efc96df..53f6a7e4392f 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -245,7 +245,7 @@ config HW_RANDOM_MXC_RNGA
+ config HW_RANDOM_IMX_RNGC
+ 	tristate "Freescale i.MX RNGC Random Number Generator"
+ 	depends on HAS_IOMEM && HAVE_CLK
+-	depends on SOC_IMX25 || COMPILE_TEST
++	depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6UL || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
+index 9c47e431ce90..84576d2fbf8c 100644
+--- a/drivers/char/hw_random/imx-rngc.c
++++ b/drivers/char/hw_random/imx-rngc.c
+@@ -350,6 +350,9 @@ static SIMPLE_DEV_PM_OPS(imx_rngc_pm_ops, imx_rngc_suspend, imx_rngc_resume);
  
-+			rngb: rng@2284000 {
-+				compatible = "fsl,imx6ull-rngb", "fsl,imx25-rngb";
-+				reg = <0x02284000 0x4000>;
-+				interrupts = <GIC_SPI 6 IRQ_TYPE_LEVEL_HIGH>;
-+				clocks = <&clks IMX6UL_CLK_DUMMY>;
-+			};
-+
- 			iomuxc_snvs: iomuxc-snvs@2290000 {
- 				compatible = "fsl,imx6ull-iomuxc-snvs";
- 				reg = <0x02290000 0x4000>;
+ static const struct of_device_id imx_rngc_dt_ids[] = {
+ 	{ .compatible = "fsl,imx25-rngb", .data = NULL, },
++	{ .compatible = "fsl,imx6sl-rngb", .data = NULL, },
++	{ .compatible = "fsl,imx6sll-rngb", .data = NULL, },
++	{ .compatible = "fsl,imx6ull-rngb", .data = NULL, },
+ 	{ /* sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(of, imx_rngc_dt_ids);
 -- 
 2.17.1
 
