@@ -3,56 +3,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BBBAC433E0
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 22:01:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C59FC433E0
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 22:26:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3CC0D248BC
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 22:01:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 017F22405E
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 22:26:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726385AbgFUWBt (ORCPT
+        id S1726296AbgFUW0p (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Jun 2020 18:01:49 -0400
-Received: from mga12.intel.com ([192.55.52.136]:39367 "EHLO mga12.intel.com"
+        Sun, 21 Jun 2020 18:26:45 -0400
+Received: from mga03.intel.com ([134.134.136.65]:12274 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730740AbgFUWBt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Jun 2020 18:01:49 -0400
-IronPort-SDR: Xj1gm72cJv+Qh6ZsGN0FN/JV1HlvhyvPxzZ+ToH2TvLJeb2j9ICULdJV1ypfBw/0vpojyv/C7Y
- cBEKsIXIGMqw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9659"; a="123269479"
+        id S1726101AbgFUW0o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 21 Jun 2020 18:26:44 -0400
+IronPort-SDR: iZNEqDksh+EYiUDfY3QoAm+fqKCzEo2jQUFV9MYpZ0cFsnqIeLEIvUwdLyh4OxCTJQlbFNdJTI
+ FnUew+7EshhA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9659"; a="143584436"
 X-IronPort-AV: E=Sophos;i="5.75,264,1589266800"; 
-   d="gz'50?scan'50,208,50";a="123269479"
+   d="gz'50?scan'50,208,50";a="143584436"
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2020 14:08:46 -0700
-IronPort-SDR: Qg8HnXS4YdKF00ADo+NuBOCkLtmVl3xl9rhRh9PY4JZHqULJcvHRoyeZoPPd42xzUFfhihP5FU
- bOBw0u98KnDA==
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2020 15:26:26 -0700
+IronPort-SDR: Bk4xeJTNl65u2mwRiqVkjQmH6i+vMPLXtS/70+TuxdfO2stfQOXxnW7d/Nls00IwwoAD3UBIJZ
+ yIc6h89IbtXQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,264,1589266800"; 
-   d="gz'50?scan'50,208,50";a="451622297"
+   d="gz'50?scan'50,208,50";a="353267135"
 Received: from lkp-server02.sh.intel.com (HELO 3aa54c81372e) ([10.239.97.151])
-  by orsmga005.jf.intel.com with ESMTP; 21 Jun 2020 14:08:42 -0700
+  by orsmga001.jf.intel.com with ESMTP; 21 Jun 2020 15:26:22 -0700
 Received: from kbuild by 3aa54c81372e with local (Exim 4.92)
         (envelope-from <lkp@intel.com>)
-        id 1jn7Ck-0002sE-0P; Sun, 21 Jun 2020 21:08:42 +0000
-Date:   Mon, 22 Jun 2020 05:07:50 +0800
+        id 1jn8Pt-0002tm-Ol; Sun, 21 Jun 2020 22:26:21 +0000
+Date:   Mon, 22 Jun 2020 06:26:08 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Corentin Labbe <clabbe@baylibre.com>, davem@davemloft.net,
         herbert@gondor.apana.org.au, mripard@kernel.org, wens@csie.org
 Cc:     kbuild-all@lists.01.org, linux-arm-kernel@lists.infradead.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-sunxi@googlegroups.com, Corentin Labbe <clabbe@baylibre.com>
-Subject: Re: [PATCH v3 11/14] crypto: sun8i-ce: support hash algorithms
-Message-ID: <202006220446.OS3SW48d%lkp@intel.com>
-References: <1592767867-35982-12-git-send-email-clabbe@baylibre.com>
+Subject: Re: [PATCH v3 14/14] crypto: sun8i-ce: Add support for the TRNG
+Message-ID: <202006220654.MXClJxqd%lkp@intel.com>
+References: <1592767867-35982-15-git-send-email-clabbe@baylibre.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="OXfL5xGRrasGEqWY"
+Content-Type: multipart/mixed; boundary="uAKRQypu60I7Lcqm"
 Content-Disposition: inline
-In-Reply-To: <1592767867-35982-12-git-send-email-clabbe@baylibre.com>
+In-Reply-To: <1592767867-35982-15-git-send-email-clabbe@baylibre.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
@@ -60,7 +60,7 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
---OXfL5xGRrasGEqWY
+--uAKRQypu60I7Lcqm
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -90,159 +90,128 @@ Reported-by: kernel test robot <lkp@intel.com>
 
 All warnings (new ones prefixed by >>, old ones prefixed by <<):
 
-drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c: In function 'sun8i_ce_hash_init':
->> drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c:76:32: warning: variable 'algt' set but not used [-Wunused-but-set-variable]
-76 |  struct sun8i_ce_alg_template *algt;
-|                                ^~~~
-drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c: At top level:
->> drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c:175:5: warning: no previous prototype for 'sun8i_ce_hash_digest_fb' [-Wmissing-prototypes]
-175 | int sun8i_ce_hash_digest_fb(struct ahash_request *areq)
-|     ^~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c:22:5: warning: no previous prototype for 'sun8i_ce_trng_read' [-Wmissing-prototypes]
+22 | int sun8i_ce_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+|     ^~~~~~~~~~~~~~~~~~
+drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c: In function 'sun8i_ce_hwrng_register':
+>> drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c:105:24: warning: comparison is always false due to limited range of data type [-Wtype-limits]
+105 |  if (ce->variant->trng == CE_ID_NOTSUPP) {
+|                        ^~
+drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c: In function 'sun8i_ce_hwrng_unregister':
+drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c:121:24: warning: comparison is always false due to limited range of data type [-Wtype-limits]
+121 |  if (ce->variant->trng == CE_ID_NOTSUPP)
+|                        ^~
 
-vim +/algt +76 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+vim +/sun8i_ce_trng_read +22 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
 
+  > 22	int sun8i_ce_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+    23	{
+    24		struct sun8i_ce_dev *ce;
+    25		dma_addr_t dma_dst;
+    26		int err = 0;
+    27		int flow = 3;
+    28		unsigned int todo;
+    29		struct sun8i_ce_flow *chan;
+    30		struct ce_task *cet;
+    31		u32 common;
+    32		void *d;
+    33	
+    34		ce = container_of(rng, struct sun8i_ce_dev, trng);
+    35	
+    36		/* round the data length to a multiple of 32*/
+    37		todo = max + 32;
+    38		todo -= todo % 32;
+    39	
+    40		d = kzalloc(todo, GFP_KERNEL | GFP_DMA);
+    41		if (!d)
+    42			return -ENOMEM;
+    43	
+    44	#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+    45		ce->hwrng_stat_req++;
+    46		ce->hwrng_stat_bytes += todo;
+    47	#endif
+    48	
+    49		dma_dst = dma_map_single(ce->dev, d, todo, DMA_FROM_DEVICE);
+    50		if (dma_mapping_error(ce->dev, dma_dst)) {
+    51			dev_err(ce->dev, "Cannot DMA MAP DST\n");
+    52			err = -EFAULT;
+    53			goto err_dst;
+    54		}
+    55	
+    56		err = pm_runtime_get_sync(ce->dev);
+    57		if (err < 0)
+    58			goto err_pm;
+    59	
+    60		mutex_lock(&ce->rnglock);
+    61		chan = &ce->chanlist[flow];
+    62	
+    63		cet = &chan->tl[0];
+    64		memset(cet, 0, sizeof(struct ce_task));
+    65	
+    66		cet->t_id = cpu_to_le32(flow);
+    67		common = ce->variant->trng | CE_COMM_INT;
+    68		cet->t_common_ctl = cpu_to_le32(common);
     69	
-    70	int sun8i_ce_hash_init(struct ahash_request *areq)
-    71	{
-    72		struct sun8i_ce_hash_reqctx *rctx = ahash_request_ctx(areq);
-    73		struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-    74		struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
-    75		struct ahash_alg *alg = __crypto_ahash_alg(tfm->base.__crt_alg);
-  > 76		struct sun8i_ce_alg_template *algt;
-    77	
-    78		memset(rctx, 0, sizeof(struct sun8i_ce_hash_reqctx));
-    79	
-    80		algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash);
-    81	
-    82		ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
-    83		rctx->fallback_req.base.flags = areq->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
-    84	
-    85		return crypto_ahash_init(&rctx->fallback_req);
-    86	}
+    70		/* recent CE (H6) need length in bytes, in word otherwise */
+    71		if (ce->variant->trng_t_dlen_in_bytes)
+    72			cet->t_dlen = cpu_to_le32(todo);
+    73		else
+    74			cet->t_dlen = cpu_to_le32(todo / 4);
+    75	
+    76		cet->t_sym_ctl = 0;
+    77		cet->t_asym_ctl = 0;
+    78	
+    79		cet->t_dst[0].addr = cpu_to_le32(dma_dst);
+    80		cet->t_dst[0].len = cpu_to_le32(todo / 4);
+    81		ce->chanlist[flow].timeout = todo;
+    82	
+    83		err = sun8i_ce_run_task(ce, 3, "TRNG");
+    84		mutex_unlock(&ce->rnglock);
+    85	
+    86		pm_runtime_put(ce->dev);
     87	
-    88	int sun8i_ce_hash_export(struct ahash_request *areq, void *out)
-    89	{
-    90		struct sun8i_ce_hash_reqctx *rctx = ahash_request_ctx(areq);
-    91		struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-    92		struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
-    93	
-    94		ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
-    95		rctx->fallback_req.base.flags = areq->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
-    96	
-    97		return crypto_ahash_export(&rctx->fallback_req, out);
-    98	}
-    99	
-   100	int sun8i_ce_hash_import(struct ahash_request *areq, const void *in)
-   101	{
-   102		struct sun8i_ce_hash_reqctx *rctx = ahash_request_ctx(areq);
-   103		struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-   104		struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
-   105	
-   106		ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
-   107		rctx->fallback_req.base.flags = areq->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
-   108	
-   109		return crypto_ahash_import(&rctx->fallback_req, in);
-   110	}
-   111	
-   112	int sun8i_ce_hash_final(struct ahash_request *areq)
-   113	{
-   114		struct sun8i_ce_hash_reqctx *rctx = ahash_request_ctx(areq);
-   115		struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-   116		struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
-   117	#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
-   118		struct ahash_alg *alg = __crypto_ahash_alg(tfm->base.__crt_alg);
-   119		struct sun8i_ce_alg_template *algt;
-   120	#endif
-   121	
-   122		ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
-   123		rctx->fallback_req.base.flags = areq->base.flags &
-   124						CRYPTO_TFM_REQ_MAY_SLEEP;
-   125		rctx->fallback_req.result = areq->result;
-   126	
-   127	#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
-   128		algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash);
-   129		algt->stat_fb++;
-   130	#endif
-   131	
-   132		return crypto_ahash_final(&rctx->fallback_req);
-   133	}
-   134	
-   135	int sun8i_ce_hash_update(struct ahash_request *areq)
-   136	{
-   137		struct sun8i_ce_hash_reqctx *rctx = ahash_request_ctx(areq);
-   138		struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-   139		struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
-   140	
-   141		ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
-   142		rctx->fallback_req.base.flags = areq->base.flags &
-   143						CRYPTO_TFM_REQ_MAY_SLEEP;
-   144		rctx->fallback_req.nbytes = areq->nbytes;
-   145		rctx->fallback_req.src = areq->src;
-   146	
-   147		return crypto_ahash_update(&rctx->fallback_req);
-   148	}
-   149	
-   150	int sun8i_ce_hash_finup(struct ahash_request *areq)
-   151	{
-   152		struct sun8i_ce_hash_reqctx *rctx = ahash_request_ctx(areq);
-   153		struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-   154		struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
-   155	#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
-   156		struct ahash_alg *alg = __crypto_ahash_alg(tfm->base.__crt_alg);
-   157		struct sun8i_ce_alg_template *algt;
-   158	#endif
-   159	
-   160		ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
-   161		rctx->fallback_req.base.flags = areq->base.flags &
-   162						CRYPTO_TFM_REQ_MAY_SLEEP;
-   163	
-   164		rctx->fallback_req.nbytes = areq->nbytes;
-   165		rctx->fallback_req.src = areq->src;
-   166		rctx->fallback_req.result = areq->result;
-   167	#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
-   168		algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash);
-   169		algt->stat_fb++;
-   170	#endif
-   171	
-   172		return crypto_ahash_finup(&rctx->fallback_req);
-   173	}
-   174	
- > 175	int sun8i_ce_hash_digest_fb(struct ahash_request *areq)
-   176	{
-   177		struct sun8i_ce_hash_reqctx *rctx = ahash_request_ctx(areq);
-   178		struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-   179		struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
-   180	#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
-   181		struct ahash_alg *alg = __crypto_ahash_alg(tfm->base.__crt_alg);
-   182		struct sun8i_ce_alg_template *algt;
-   183	#endif
-   184	
-   185		ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
-   186		rctx->fallback_req.base.flags = areq->base.flags &
-   187						CRYPTO_TFM_REQ_MAY_SLEEP;
-   188	
-   189		rctx->fallback_req.nbytes = areq->nbytes;
-   190		rctx->fallback_req.src = areq->src;
-   191		rctx->fallback_req.result = areq->result;
-   192	#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
-   193		algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash);
-   194		algt->stat_fb++;
-   195	#endif
-   196	
-   197		return crypto_ahash_digest(&rctx->fallback_req);
-   198	}
-   199	
+    88	err_pm:
+    89		dma_unmap_single(ce->dev, dma_dst, todo, DMA_FROM_DEVICE);
+    90	
+    91		if (!err) {
+    92			memcpy(data, d, max);
+    93			err = max;
+    94		}
+    95		memzero_explicit(d, todo);
+    96	err_dst:
+    97		kfree(d);
+    98		return err;
+    99	}
+   100	
+   101	int sun8i_ce_hwrng_register(struct sun8i_ce_dev *ce)
+   102	{
+   103		int ret;
+   104	
+ > 105		if (ce->variant->trng == CE_ID_NOTSUPP) {
+   106			dev_info(ce->dev, "TRNG not supported\n");
+   107			return 0;
+   108		}
+   109		ce->trng.name = "sun8i Crypto Engine TRNG";
+   110		ce->trng.read = sun8i_ce_trng_read;
+   111		ce->trng.quality = 1000;
+   112	
+   113		ret = hwrng_register(&ce->trng);
+   114		if (ret)
+   115			dev_err(ce->dev, "Fail to register the TRNG\n");
+   116		return ret;
+   117	}
+   118	
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
 https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
---OXfL5xGRrasGEqWY
+--uAKRQypu60I7Lcqm
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICPm/714AAy5jb25maWcAjFxbc9u2tn7vr9CkL+3MSSvZjpPsM3oASVBCRRIMAeriF45i
+H4sICJfY714AAy5jb25maWcAjFxbc9u2tn7vr9CkL+3MSSvZjpPsM3oASVBCRRIMAeriF45i
 K4mntuUjyd3Nvz9rgTcABCl1OtPy+xbuC1gXQP71l19H5O20f96eHu+3T08/R993L7vD9rR7
 GH17fNr97yjgo4TLEQ2Y/AOEo8eXt3//PP4Yffjj4x/j94f7yWixO7zsnkb+/uXb4/c3KPu4
 f/nl11/g318BfH6Fag7/GR1/3Lx/wsLvv9/fj36b+f7vo89/XP8xBjmfJyGbFb5fMFEAM/1Z
@@ -1202,62 +1171,62 @@ dtujviq8DWzxvqlM9z89PKP7XSZOdy2ildbc9fWmcLDlzB1nqMXpwXbuTNTqmrZE1e3jp6eH
 s/zbw1+nlzb+kq94Qa6SJiyr3B34UbXWkUP3fop3GTUUnxioKWHtSk5IcL7wManrGP15VQUV
 1olM1QSlO4laQuNdBztqJ9oOcvjaoyN6hWhxRU+E39b+lkr1X+//ermF49DL07e3+0fPzoVR
 Unyrh8Z9a4IOq2I2jNYl33s8XpqZY+8mNyx+UieJvZ8DFdhcsm8FQbzdxECuxGeI8Xss731+
-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
+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
 
---OXfL5xGRrasGEqWY--
+--uAKRQypu60I7Lcqm--
