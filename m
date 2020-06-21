@@ -3,43 +3,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 965B4C433DF
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 21:08:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E21C433E0
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 21:33:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51C1F25293
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 21:08:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 541D82529E
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jun 2020 21:33:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730720AbgFUVId (ORCPT
+        id S1730606AbgFUVdI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Jun 2020 17:08:33 -0400
-Received: from mga07.intel.com ([134.134.136.100]:4497 "EHLO mga07.intel.com"
+        Sun, 21 Jun 2020 17:33:08 -0400
+Received: from mga09.intel.com ([134.134.136.24]:22483 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730718AbgFUVId (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Jun 2020 17:08:33 -0400
-IronPort-SDR: NQdvCSoiKubuZ3g9P/wDDrDdnLNHhtAQvmkN3lHDQYs1X8+5lii1zh/7JToQnnu+kXPsuaVXg7
- IQFqLiEeHTpQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9659"; a="208810575"
+        id S1728928AbgFUVdI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 21 Jun 2020 17:33:08 -0400
+IronPort-SDR: DzgK0kaDsUmcExoFBoGN32B2VWALdk8BS/p+4beg96NMv8lTmYGVAM+5rXUiZF1j81HmYXt2Jr
+ x0gi/hgkW5fA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9659"; a="145124048"
 X-IronPort-AV: E=Sophos;i="5.75,264,1589266800"; 
-   d="gz'50?scan'50,208,50";a="208810575"
+   d="gz'50?scan'50,208,50";a="145124048"
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2020 14:07:45 -0700
-IronPort-SDR: C9nDLTUa6+qluXWlZ3EMqO7g04HKKnf88yjtZ9XPKdxuA5MNq43UPT+MqeCBLxDPKFjP/ZKRrM
- WVM+4WbihHYQ==
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2020 14:32:57 -0700
+IronPort-SDR: GWgNQfqdoyhsY+ptAjz4Bn+Xu62ES7Bnyik4guQcqZjAgaFrmASsGGhw8NMYHQyM3/3lxbPG0L
+ aIpfmhfD/tlg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,264,1589266800"; 
-   d="gz'50?scan'50,208,50";a="262801433"
+   d="gz'50?scan'50,208,50";a="451625993"
 Received: from lkp-server02.sh.intel.com (HELO 3aa54c81372e) ([10.239.97.151])
-  by fmsmga007.fm.intel.com with ESMTP; 21 Jun 2020 14:07:41 -0700
+  by orsmga005.jf.intel.com with ESMTP; 21 Jun 2020 14:32:53 -0700
 Received: from kbuild by 3aa54c81372e with local (Exim 4.92)
         (envelope-from <lkp@intel.com>)
-        id 1jn7Bk-0002s8-U1; Sun, 21 Jun 2020 21:07:40 +0000
-Date:   Mon, 22 Jun 2020 05:06:52 +0800
+        id 1jn7a8-0002sr-Rt; Sun, 21 Jun 2020 21:32:52 +0000
+Date:   Mon, 22 Jun 2020 05:32:46 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Corentin Labbe <clabbe@baylibre.com>, davem@davemloft.net,
         herbert@gondor.apana.org.au, mripard@kernel.org, wens@csie.org
@@ -47,13 +47,14 @@ Cc:     kbuild-all@lists.01.org, clang-built-linux@googlegroups.com,
         linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
         Corentin Labbe <clabbe@baylibre.com>
-Subject: Re: [PATCH v3 03/14] crypto: sun8i-ss: support hash algorithms
-Message-ID: <202006220551.SPEvim2w%lkp@intel.com>
-References: <1592767867-35982-4-git-send-email-clabbe@baylibre.com>
+Subject: Re: [PATCH v3 08/14] crypto: sun8i-ce: split into
+ prepare/run/unprepare
+Message-ID: <202006220542.bYzSCKAB%lkp@intel.com>
+References: <1592767867-35982-9-git-send-email-clabbe@baylibre.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="sm4nu43k4a2Rpi4c"
+Content-Type: multipart/mixed; boundary="BXVAT5kNtrzKuDFl"
 Content-Disposition: inline
-In-Reply-To: <1592767867-35982-4-git-send-email-clabbe@baylibre.com>
+In-Reply-To: <1592767867-35982-9-git-send-email-clabbe@baylibre.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
@@ -61,7 +62,7 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
---sm4nu43k4a2Rpi4c
+--BXVAT5kNtrzKuDFl
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -70,7 +71,8 @@ Hi Corentin,
 I love your patch! Perhaps something to improve:
 
 [auto build test WARNING on sunxi/sunxi/for-next]
-[also build test WARNING on cryptodev/master crypto/master v5.8-rc1 next-20200621]
+[also build test WARNING on cryptodev/master crypto/master v5.8-rc1]
+[cannot apply to next-20200621]
 [If your patch is applied to the wrong git tree, kindly drop us a note.
 And when submitting patch, we suggest to use  as documented in
 https://git-scm.com/docs/git-format-patch]
@@ -92,54 +94,44 @@ Reported-by: kernel test robot <lkp@intel.com>
 
 All warnings (new ones prefixed by >>, old ones prefixed by <<):
 
->> drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c:175:5: warning: no previous prototype for function 'sun8i_ss_hash_digest_fb' [-Wmissing-prototypes]
-int sun8i_ss_hash_digest_fb(struct ahash_request *areq)
+>> drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c:277:5: warning: no previous prototype for function 'sun8i_ce_cipher_run' [-Wmissing-prototypes]
+int sun8i_ce_cipher_run(struct crypto_engine *engine, void *areq)
 ^
-drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c:175:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-int sun8i_ss_hash_digest_fb(struct ahash_request *areq)
+drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c:277:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+int sun8i_ce_cipher_run(struct crypto_engine *engine, void *areq)
 ^
 static
 1 warning generated.
 
-vim +/sun8i_ss_hash_digest_fb +175 drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
+vim +/sun8i_ce_cipher_run +277 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
 
-   174	
- > 175	int sun8i_ss_hash_digest_fb(struct ahash_request *areq)
-   176	{
-   177		struct sun8i_ss_hash_reqctx *rctx = ahash_request_ctx(areq);
-   178		struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-   179		struct sun8i_ss_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
-   180	#ifdef CONFIG_CRYPTO_DEV_SUN8I_SS_DEBUG
-   181		struct ahash_alg *alg = __crypto_ahash_alg(tfm->base.__crt_alg);
-   182		struct sun8i_ss_alg_template *algt;
-   183	#endif
-   184	
-   185		ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
-   186		rctx->fallback_req.base.flags = areq->base.flags &
-   187						CRYPTO_TFM_REQ_MAY_SLEEP;
-   188	
-   189		rctx->fallback_req.nbytes = areq->nbytes;
-   190		rctx->fallback_req.src = areq->src;
-   191		rctx->fallback_req.result = areq->result;
-   192	#ifdef CONFIG_CRYPTO_DEV_SUN8I_SS_DEBUG
-   193		algt = container_of(alg, struct sun8i_ss_alg_template, alg.hash);
-   194		algt->stat_fb++;
-   195	#endif
-   196	
-   197		return crypto_ahash_digest(&rctx->fallback_req);
-   198	}
-   199	
+   276	
+ > 277	int sun8i_ce_cipher_run(struct crypto_engine *engine, void *areq)
+   278	{
+   279		struct skcipher_request *breq = container_of(areq, struct skcipher_request, base);
+   280		struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(breq);
+   281		struct sun8i_cipher_tfm_ctx *op = crypto_skcipher_ctx(tfm);
+   282		struct sun8i_ce_dev *ce = op->ce;
+   283		struct sun8i_cipher_req_ctx *rctx = skcipher_request_ctx(breq);
+   284		int flow, err;
+   285	
+   286		flow = rctx->flow;
+   287		err = sun8i_ce_run_task(ce, flow, crypto_tfm_alg_name(breq->base.tfm));
+   288		crypto_finalize_skcipher_request(engine, breq, err);
+   289		return 0;
+   290	}
+   291	
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
 https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
---sm4nu43k4a2Rpi4c
+--BXVAT5kNtrzKuDFl
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICHfD714AAy5jb25maWcAlDxbd9s2k+/fr9BpX9qHppbjuOm3Jw8gCUqISIIFQFnKC47r
+H4sICIvH714AAy5jb25maWcAlDxbd9s2k+/fr9BpX9qHppbjuOm3Jw8gCUqISIIFQFnKC47r
 yKl3HTvrS7/k3+8MwMsAhNxsTk8TzuA6GMwd+vFfPy7Y89P958unm6vL29tvi0+Hu8PD5dPh
 4+L65vbwX4tCLhppFrwQ5hU0rm7unr/++vXtuT0/W7x59durk18erpaLzeHh7nC7yO/vrm8+
 PUP/m/u7f/34L/jvRwB+/gJDPfx7cXV7efdp8ffh4RHQi+Xy1cmrk8VPn26e/v3rr/D/zzcP
@@ -1511,4 +1503,4 @@ hi6SY8MrpD1h56japCvf1xwHNVUiaLS/ydQV1vZIU5bp0CxOXRHTtY4rZf+IaKj6t1Ps6rcE
 DoKugTAdMb2vHGir9xC8GhdJFgio53pHz7kw8WGjJMdBHG3DXBlf8KykbU9bGDxPjKz5HCbW
 rRGv4OYaRva2FR2fyDHPyZXOcrbHn0yoc0IVmxt9rmW+Elo4f/4fgSnr40m9BAA=
 
---sm4nu43k4a2Rpi4c--
+--BXVAT5kNtrzKuDFl--
