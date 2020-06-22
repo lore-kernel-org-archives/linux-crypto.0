@@ -7,34 +7,37 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6250C433E1
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jun 2020 02:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE395C433E1
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jun 2020 02:51:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D4C322210
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jun 2020 02:50:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 979FA22210
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jun 2020 02:51:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731083AbgFVCu5 (ORCPT
+        id S1731082AbgFVCvC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Jun 2020 22:50:57 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:58034 "EHLO huawei.com"
+        Sun, 21 Jun 2020 22:51:02 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:55942 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726699AbgFVCu5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Jun 2020 22:50:57 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 6A22DBA775458BE50315;
-        Mon, 22 Jun 2020 10:50:55 +0800 (CST)
+        id S1726699AbgFVCvC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 21 Jun 2020 22:51:02 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 50DD9814332985B8E437;
+        Mon, 22 Jun 2020 10:51:00 +0800 (CST)
 Received: from SWX921481.china.huawei.com (10.126.201.106) by
  DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 22 Jun 2020 10:50:47 +0800
+ 14.3.487.0; Mon, 22 Jun 2020 10:50:50 +0800
 From:   Barry Song <song.bao.hua@hisilicon.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <wangzhou1@hisilicon.com>, <akpm@linux-foundation.org>,
         <linux-crypto@vger.kernel.org>, <linux-mm@kvack.org>,
         <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
-        Barry Song <song.bao.hua@hisilicon.com>
-Subject: [PATCH 2/3] crypto: hisilicon/zip - permit users to specify NUMA node
-Date:   Mon, 22 Jun 2020 14:49:00 +1200
-Message-ID: <20200622024901.12632-3-song.bao.hua@hisilicon.com>
+        Barry Song <song.bao.hua@hisilicon.com>,
+        Seth Jennings <sjenning@redhat.com>,
+        "Dan Streetman" <ddstreet@ieee.org>,
+        Vitaly Wool <vitaly.wool@konsulko.com>
+Subject: [PATCH 3/3] mm/zswap: specify the NUMA node of acomp to use local compressors
+Date:   Mon, 22 Jun 2020 14:49:01 +1200
+Message-ID: <20200622024901.12632-4-song.bao.hua@hisilicon.com>
 X-Mailer: git-send-email 2.21.0.windows.1
 In-Reply-To: <20200622024901.12632-1-song.bao.hua@hisilicon.com>
 References: <20200622024901.12632-1-song.bao.hua@hisilicon.com>
@@ -48,77 +51,35 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If users don't specify NUMA node, the driver will use the ZIP module near
-the CPU allocating acomp. Otherwise, it uses the ZIP module according to
-the requirement of users.
+zswap_cpu_comp_prepare() is called on a different CPU with the CPU which
+will really send acomp_req. In order to use the right local compressors,
+this patch specifies the NUMA node to which the CPU sending acomp_req
+belongs.
 
-Cc: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: Seth Jennings <sjenning@redhat.com>
+Cc: Dan Streetman <ddstreet@ieee.org>
+Cc: Vitaly Wool <vitaly.wool@konsulko.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David S. Miller" <davem@davemloft.net>
+Cc: Andrew Morton <akpm@linux-foundation.org>
 Signed-off-by: Barry Song <song.bao.hua@hisilicon.com>
 ---
- drivers/crypto/hisilicon/zip/zip.h        | 2 +-
- drivers/crypto/hisilicon/zip/zip_crypto.c | 6 +++---
- drivers/crypto/hisilicon/zip/zip_main.c   | 5 +++--
- 3 files changed, 7 insertions(+), 6 deletions(-)
+ mm/zswap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/hisilicon/zip/zip.h b/drivers/crypto/hisilicon/zip/zip.h
-index f3ed4c0e5493..4484be13812b 100644
---- a/drivers/crypto/hisilicon/zip/zip.h
-+++ b/drivers/crypto/hisilicon/zip/zip.h
-@@ -76,7 +76,7 @@ struct hisi_zip_sqe {
- 	u32 rsvd1[4];
- };
- 
--int zip_create_qps(struct hisi_qp **qps, int ctx_num);
-+int zip_create_qps(struct hisi_qp **qps, int ctx_num, int node);
- int hisi_zip_register_to_crypto(void);
- void hisi_zip_unregister_from_crypto(void);
- #endif
-diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-index c73707c2e539..01fd6a78111d 100644
---- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-+++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-@@ -158,13 +158,13 @@ static void hisi_zip_release_qp(struct hisi_zip_qp_ctx *ctx)
- 	hisi_qm_release_qp(ctx->qp);
- }
- 
--static int hisi_zip_ctx_init(struct hisi_zip_ctx *hisi_zip_ctx, u8 req_type)
-+static int hisi_zip_ctx_init(struct hisi_zip_ctx *hisi_zip_ctx, u8 req_type, int node)
- {
- 	struct hisi_qp *qps[HZIP_CTX_Q_NUM] = { NULL };
- 	struct hisi_zip *hisi_zip;
- 	int ret, i, j;
- 
--	ret = zip_create_qps(qps, HZIP_CTX_Q_NUM);
-+	ret = zip_create_qps(qps, HZIP_CTX_Q_NUM, node);
- 	if (ret) {
- 		pr_err("Can not create zip qps!\n");
- 		return -ENODEV;
-@@ -379,7 +379,7 @@ static int hisi_zip_acomp_init(struct crypto_acomp *tfm)
- 	struct hisi_zip_ctx *ctx = crypto_tfm_ctx(&tfm->base);
- 	int ret;
- 
--	ret = hisi_zip_ctx_init(ctx, COMP_NAME_TO_TYPE(alg_name));
-+	ret = hisi_zip_ctx_init(ctx, COMP_NAME_TO_TYPE(alg_name), tfm->base.node);
- 	if (ret)
- 		return ret;
- 
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 2229a21ae7c8..e2845b2c963d 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -234,9 +234,10 @@ static const struct pci_device_id hisi_zip_dev_ids[] = {
- };
- MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
- 
--int zip_create_qps(struct hisi_qp **qps, int qp_num)
-+int zip_create_qps(struct hisi_qp **qps, int qp_num, int node)
- {
--	int node = cpu_to_node(smp_processor_id());
-+	if (node == NUMA_NO_NODE)
-+		node = cpu_to_node(smp_processor_id());
- 
- 	return hisi_qm_alloc_qps_node(&zip_devices, qp_num, 0, node, qps);
- }
+diff --git a/mm/zswap.c b/mm/zswap.c
+index 0d914ba6b4a0..9b1aa477022e 100644
+--- a/mm/zswap.c
++++ b/mm/zswap.c
+@@ -437,7 +437,7 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
+ 		pr_err("Could not initialize acomp_ctx\n");
+ 		return -ENOMEM;
+ 	}
+-	acomp = crypto_alloc_acomp(pool->tfm_name, 0, 0);
++	acomp = crypto_alloc_acomp_node(pool->tfm_name, 0, 0, cpu_to_node(cpu));
+ 	if (IS_ERR_OR_NULL(acomp)) {
+ 		pr_err("could not alloc crypto acomp %s : %ld\n",
+ 				pool->tfm_name, PTR_ERR(acomp));
 -- 
 2.27.0
 
