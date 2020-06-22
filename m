@@ -2,266 +2,305 @@ Return-Path: <SRS0=/YgZ=AD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2CEFC433E0
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jun 2020 20:25:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A13C433E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jun 2020 20:33:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA5C92076A
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jun 2020 20:25:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6867F20732
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jun 2020 20:33:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="tx7Dvff7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W+1ZUaKx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728532AbgFVUZT (ORCPT
+        id S1728519AbgFVUdH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Jun 2020 16:25:19 -0400
-Received: from mail-eopbgr760089.outbound.protection.outlook.com ([40.107.76.89]:20006
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728443AbgFVUZS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Jun 2020 16:25:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J+RKJyqSVLy3eaEvRt3IjvFyPm47MyJSeziPBEM2h4QKSR51QXNOihcAyNZDmbVErm7ggpL2E3Kn2uSJFcet+4juMs8QOm6/uYXD6wmnzgSpTe1qroY2C6/uTKyZkKNiLXZydJgShZTNYAm4euiZa47pe4f8TYRETzcpSFgFeldhD8f48YLbeO2y18QA1zRHFnOyrVRCYI2/xWD5IsktnfpRQ7M9jqpEdFLQ68u3fyRjV8tUqX0AmQyG3ca+By+BSzf0ZW/D/hOHLpCUc3aix+X/6luNNUs69kgKP+Yyi72IsqG0mDjJTeb+GfrnkQayGiEbY/ooPqAsYMsaUT93AQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8jchcwRejZk/OQvDQPkbaFjKKCr3OO0jYkDFQbCT8NM=;
- b=D7tXdC3T08m2rFky8j7OhpAY+Drg5xikg57RyT4JXCmb4oTyBYOcrg7jVhxTVxURYBY63zNl1dpI2qlEbwcCjapYj7MfX6o2A+5wcnaEojUHS5tl1NeTivzlp2uXKn5Iblp6NG1+a4FxbWKkpwa1+JzMDm+sJelsSa3Ve0tHk4Yr77/OGDoAM7puowlwGbrulSnHciCzvBnMXIT5imsPskRwzKaSIPydHKKXuD4eJnrFKSG+0PjKNn2rcgRL/nHomXgOG7N+d4aLFEG4rnre3032A5vPWgysIu10wQdT/LkcL57shQQkrN5z08rCtkg42TCJ1+26KpYS8FwE6un6pw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        Mon, 22 Jun 2020 16:33:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57380 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728386AbgFVUdF (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Jun 2020 16:33:05 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03DCFC061573
+        for <linux-crypto@vger.kernel.org>; Mon, 22 Jun 2020 13:33:04 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id h95so425650pje.4
+        for <linux-crypto@vger.kernel.org>; Mon, 22 Jun 2020 13:33:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8jchcwRejZk/OQvDQPkbaFjKKCr3OO0jYkDFQbCT8NM=;
- b=tx7Dvff7PmwYYk2BT7YGUcX7h9GF9U35t1FQbGo7llLRAB1ZqCA32vh09NceGgX7GFjc/esB5KqDsqE3z+scPp1KoZFPep3LRVgO8/hPkJoM3gDhgT+x6KjCV1OvmWy5SsTac7tl04sGfNfpdFh+Y61zifp5KplskDaSVpI4HTw=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2590.namprd12.prod.outlook.com (2603:10b6:802:2e::17)
- by SA0PR12MB4526.namprd12.prod.outlook.com (2603:10b6:806:98::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.22; Mon, 22 Jun
- 2020 20:25:15 +0000
-Received: from SN1PR12MB2590.namprd12.prod.outlook.com
- ([fe80::c179:ec27:4476:8e05]) by SN1PR12MB2590.namprd12.prod.outlook.com
- ([fe80::c179:ec27:4476:8e05%7]) with mapi id 15.20.3109.027; Mon, 22 Jun 2020
- 20:25:15 +0000
-From:   John Allen <john.allen@amd.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, bp@suse.de, linux-kernel@vger.kernel.org,
-        John Allen <john.allen@amd.com>, stable@vger.kernel.org
-Subject: [PATCH] crypto: ccp - Fix use of merged scatterlists
-Date:   Mon, 22 Jun 2020 15:24:02 -0500
-Message-Id: <20200622202402.360064-1-john.allen@amd.com>
-X-Mailer: git-send-email 2.26.2
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SN6PR16CA0047.namprd16.prod.outlook.com
- (2603:10b6:805:ca::24) To SN1PR12MB2590.namprd12.prod.outlook.com
- (2603:10b6:802:2e::17)
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=A2m6zwHdBGgWBUHw1PDnYO97YjGBdtbP9S09Wu+FkWc=;
+        b=W+1ZUaKxyA2ifRGS31NPPTIqHq/lxxTEjxlKorJiGCvb5PBkgVy7RXRg6THMD6JsZl
+         SK32eEgM/CEIWVjIVjQS71F19C8h8bp612aXxob43c9i0FyOZkPHoLVf/Iij705WMoBo
+         nIGc1V4n+S3ecWAIwS0P8RWIpMlsuyCWwALnDRIHxrXlCPHx+u7PzQ0FIdqrtlSIqBUp
+         76zh70M+72ah/zHNm1HioolzrE8Mx5gPAYALXp3oJVDj2MHh7fg60qEKSHBtwjxgGmdz
+         i4i31U03thQkCoZnU/gHmQQZRbvhaK1cwQXDf+o7bWXYpM1puGMeslG4Vh44U1AoGKKu
+         Jb9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=A2m6zwHdBGgWBUHw1PDnYO97YjGBdtbP9S09Wu+FkWc=;
+        b=F1fBFzOip/ogvF1NBvgctNew1i8cIpk3oMghiUYYgOkRXmqZwv4Iem90Pmm49coI7D
+         lLdEUMaT8wEEVESQOfDjQosIk5XWt9YHvIa6fia7rBRgrE1+f4ELCjgzJfPSXQdYlEB2
+         gZryWQB1QHRpRlJ1tmAxLX+sk9ZtOilAxVo+UmCqKIke7OkvDwZJncgvjqU6jvIWbQpQ
+         cqr/ixn6B3WhIh/uheNcKSp7Q88bG1kcHKiUgcftZ3aLClT8GfTYTeU7OomITyiM74a/
+         kLMDKcE+HFLHPOG5eShm/zZz3V5AVePaz8GKcDjX/oTyaNGHkZBvHNSE0cK2pKzAcOlO
+         U9Cg==
+X-Gm-Message-State: AOAM532Or7FvwWUTF+5NVYfo2U2GFSfyDN2GlukTgUKVuCwNcyd9P5OK
+        Aq73Y3oqHnuGPRq3XtMmWqr1xudj5XMj32OeqKFdCw==
+X-Google-Smtp-Source: ABdhPJwcfXlHyZGx74Iz/dvwQbQJkK5Lk7EoH7Yk0loLpokFU0HPOsOSzp3h+2Ae7TXuNPraDv8zENmndIu+CR+kVm4=
+X-Received: by 2002:a17:90b:949:: with SMTP id dw9mr20662415pjb.101.1592857983236;
+ Mon, 22 Jun 2020 13:33:03 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mojo.amd.com (165.204.77.1) by SN6PR16CA0047.namprd16.prod.outlook.com (2603:10b6:805:ca::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3109.21 via Frontend Transport; Mon, 22 Jun 2020 20:25:14 +0000
-X-Mailer: git-send-email 2.26.2
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 6b450702-1cbb-44b5-556c-08d816ea5f06
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4526:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4526BD4F53A220941DC5484E9A970@SA0PR12MB4526.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
-X-Forefront-PRVS: 0442E569BC
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +iEBAqfzLBFKhEJbyIRbIpJMfKVdX/TOT1szJ8S8PQBhkFLomx+uIc2njN70nFnwJ3FElZbdhqQHICIqTNHq4NU51r+fsz//yXADeun8kDvYcPMFPHqbz/6Azra7QMske/QlCL1elmDoty4ktF2n6m3qqleToT+ubJl2jviNFfj6EYfJ+jI0eIvfWe9qLDqYQLoVj1kAfGWoseA5Cu//jEUYH/eGYh2UJ9Lf4zS/ukEbtmaqkxAAVCwNdYxfpqY/xgYyBlzvqRa7NyOvEMKPxvurb9rYqklu5Wk3u2DLm3UeucTqAbGeX3Gy///K6xINimxuQ54me7xy5q2ZgdCroQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2590.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(136003)(39860400002)(376002)(346002)(366004)(8936002)(26005)(5660300002)(8676002)(2906002)(86362001)(16526019)(66556008)(66946007)(1076003)(186003)(66476007)(6916009)(36756003)(6666004)(4326008)(44832011)(2616005)(956004)(478600001)(83380400001)(7696005)(316002)(52116002)(6486002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: NAzZjxjGnPxATXeDndCSWGJdYrSV8CVdvbbCBKltvIkD9B424VY2t8CwjcK2aeVutTkSCsIcjicmGHqdCXeW0+DkT8NsSeaLQMaEkIVpNc3BR3ip+pjCkQYmwu3mobElFApoJInXYdroLdxmWrrZVchiAwqsG/vGgqrhh/beFYnwZAyc7hey5V93in8JMUAg/72Pqg3jw3dXNnZneoXLDgvlKQmJWgzq+0qxQ/v3CMVhSpc7LP4gqdlag+Og+nrHDkP6OD4yfx+6EJCcwon7vl86zxHYOs8HXu1LrsRfkTCzDlkO8+JEPTIQ/WA0IhmP0i8I7lrSPyZMe91oQAxHeNuvgEuGvaes37rblumH7ShjU7izpftQY4/uU0fALHigW6TuMZpiLYrO6GjD8jDXqHKmSBmdLPh7+SJHQRswWkpfBBsVZ2rLQsg8AZ27KjkIztzmrDU6IS5B6Kk+aQ21CwyiUJr7OlrWHyyt9ia0a4A=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b450702-1cbb-44b5-556c-08d816ea5f06
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2020 20:25:14.8432
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zKg2jxG/DrKjrGd1s+d1ZxKAW4NeQSunZXP7RieCRTZ+iasoVMZJZOkoXuEOKcJFntuXAK8Fw1WdushOU+KRfA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4526
+References: <20200622155018.6043-1-sedat.dilek@gmail.com>
+In-Reply-To: <20200622155018.6043-1-sedat.dilek@gmail.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon, 22 Jun 2020 13:32:51 -0700
+Message-ID: <CAKwvOdn0EnKnGToVC1Bw5di6ucSFkKNOUko1yekkcVhw5nzXZg@mail.gmail.com>
+Subject: Re: [PATCH 5.7] x86/crypto: aesni: Fix build with LLVM_IAS=1
+To:     Sedat Dilek <sedat.dilek@gmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Craig Topper <craig.topper@intel.com>,
+        Craig Topper <craig.topper@gmail.com>,
+        Jian Cai <jiancai@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Running the crypto manager self tests with
-CONFIG_CRYPTO_MANAGER_EXTRA_TESTS may result in several types of errors
-when using the ccp-crypto driver:
+On Mon, Jun 22, 2020 at 8:50 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+>
+> When building with LLVM_IAS=1 means using Clang's Integrated Assembly (IAS)
+> from LLVM/Clang >= v10.0.1-rc1+ instead of GNU/as from GNU/binutils
+> I see the following breakage in Debian/testing AMD64:
+>
+> <instantiation>:15:74: error: too many positional arguments
+>  PRECOMPUTE 8*3+8(%rsp), %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
+>                                                                          ^
+>  arch/x86/crypto/aesni-intel_asm.S:1598:2: note: while in macro instantiation
+>  GCM_INIT %r9, 8*3 +8(%rsp), 8*3 +16(%rsp), 8*3 +24(%rsp)
+>  ^
+> <instantiation>:47:2: error: unknown use of instruction mnemonic without a size suffix
+>  GHASH_4_ENCRYPT_4_PARALLEL_dec %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14, %xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7, %xmm8, enc
+>  ^
+> arch/x86/crypto/aesni-intel_asm.S:1599:2: note: while in macro instantiation
+>  GCM_ENC_DEC dec
+>  ^
+> <instantiation>:15:74: error: too many positional arguments
+>  PRECOMPUTE 8*3+8(%rsp), %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
+>                                                                          ^
+> arch/x86/crypto/aesni-intel_asm.S:1686:2: note: while in macro instantiation
+>  GCM_INIT %r9, 8*3 +8(%rsp), 8*3 +16(%rsp), 8*3 +24(%rsp)
+>  ^
+> <instantiation>:47:2: error: unknown use of instruction mnemonic without a size suffix
+>  GHASH_4_ENCRYPT_4_PARALLEL_enc %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14, %xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7, %xmm8, enc
+>  ^
+> arch/x86/crypto/aesni-intel_asm.S:1687:2: note: while in macro instantiation
+>  GCM_ENC_DEC enc
 
-alg: skcipher: cbc-des3-ccp encryption failed on test vector 0; expected_error=0, actual_error=-5 ...
+=== I think from here to...
 
-alg: skcipher: ctr-aes-ccp decryption overran dst buffer on test vector 0 ...
 
-alg: ahash: sha224-ccp test failed (wrong result) on test vector ...
+>
+> Craig Topper suggested me in ClangBuiltLinux issue #1050:
+>
+> > I think the "too many positional arguments" is because the parser isn't able
+> > to handle the trailing commas.
+> >
+> > The "unknown use of instruction mnemonic" is because the macro was named
+> > GHASH_4_ENCRYPT_4_PARALLEL_DEC but its being instantiated with
+> > GHASH_4_ENCRYPT_4_PARALLEL_dec I guess gas ignores case on the
+> > macro instantiation, but llvm doesn't.
 
-These errors are the result of improper processing of scatterlists mapped
-for DMA.
+Yep, see also:
+commit 6f5459da2b87 ("arm64: alternative: fix build with clang
+integrated assembler")
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6f5459da2b8736720afdbd67c4bd2d1edba7d0e3
 
-Given a scatterlist in which entries are merged as part of mapping the
-scatterlist for DMA, the DMA length of a merged entry will reflect the
-combined length of the entries that were merged. The subsequent
-scatterlist entry will contain DMA information for the scatterlist entry
-after the last merged entry, but the non-DMA information will be that of
-the first merged entry.
+>
+> First, I removed the trailing comma in the PRECOMPUTE line.
+>
+> Second, I substituted:
+> 1. GCM_ENC_DEC dec -> GCM_ENC_DEC DEC
+> 2. GCM_ENC_DEC enc -> GCM_ENC_DEC ENC
+>
+> With these changes I was able to build with LLVM_IAS=1 and boot on bare metal.
+>
+> As llvm-toolchain I used v10.0.1-rc1+ and v11.0.0-git pre-releases:
+> 1. release/10.x Git: 2dc664d578f0e9c8ea5975eed745e322fa77bffe
+> 2.       master Git: 8da5b9083691b557f50f72ab099598bb291aec5f (default)
+>
+> Just for the sake of completeness:
+> 1. CONFIG_DEBUG_INFO_DWARF4=y
+> 2. OBJDUMP=llvm-objdump (passed to my make-line)
+>
+> Please have a look into "llvm.rst" kernel-doc for further informations and
+> how to pass LLVM kbuild-options to your make-line.
+>
+> I confirmed that this works with Linux-kernel v5.7.3 and v5.7.5 final.
+>
+> NOTE: This patch is on top of Linux v5.7 final.
+>
+> Thanks to Craig and the folks from the ClangBuiltLinux project.
 
-The ccp driver does not take this scatterlist merging into account. To
-address this, add a second scatterlist pointer to track the current
-position in the DMA mapped representation of the scatterlist. Both the DMA
-representation and the original representation of the scatterlist must be
-tracked as while most of the driver can use just the DMA representation,
-scatterlist_map_and_copy() must use the original representation and
-expects the scatterlist pointer to be accurate to the original
-representation.
+===...here can be cut out from the commit message.
 
-In order to properly walk the original scatterlist, the scatterlist must
-be walked until the combined lengths of the entries seen is equal to the
-DMA length of the current entry being processed in the DMA mapped
-representation.
+>
+> Cc: Craig Topper <craig.topper@intel.com>
+> Cc: Craig Topper <craig.topper@gmail.com>
 
-Fixes: 63b945091a070 ("crypto: ccp - CCP device driver and interface support")
-Signed-off-by: John Allen <john.allen@amd.com>
-Cc: stable@vger.kernel.org
----
- drivers/crypto/ccp/ccp-dev.h |  1 +
- drivers/crypto/ccp/ccp-ops.c | 37 +++++++++++++++++++++++++-----------
- 2 files changed, 27 insertions(+), 11 deletions(-)
+I'd pick one or the other email addresses, and just use that one.
+Craig seems to commit to LLVM with craig.topper@intel.com, so I
+recommend that one.
 
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index 3f68262d9ab4..87a34d91fdf7 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -469,6 +469,7 @@ struct ccp_sg_workarea {
- 	unsigned int sg_used;
- 
- 	struct scatterlist *dma_sg;
-+	struct scatterlist *dma_sg_head;
- 	struct device *dma_dev;
- 	unsigned int dma_count;
- 	enum dma_data_direction dma_dir;
-diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index 422193690fd4..64112c736810 100644
---- a/drivers/crypto/ccp/ccp-ops.c
-+++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -63,7 +63,7 @@ static u32 ccp_gen_jobid(struct ccp_device *ccp)
- static void ccp_sg_free(struct ccp_sg_workarea *wa)
- {
- 	if (wa->dma_count)
--		dma_unmap_sg(wa->dma_dev, wa->dma_sg, wa->nents, wa->dma_dir);
-+		dma_unmap_sg(wa->dma_dev, wa->dma_sg_head, wa->nents, wa->dma_dir);
- 
- 	wa->dma_count = 0;
- }
-@@ -92,6 +92,7 @@ static int ccp_init_sg_workarea(struct ccp_sg_workarea *wa, struct device *dev,
- 		return 0;
- 
- 	wa->dma_sg = sg;
-+	wa->dma_sg_head = sg;
- 	wa->dma_dev = dev;
- 	wa->dma_dir = dma_dir;
- 	wa->dma_count = dma_map_sg(dev, sg, wa->nents, dma_dir);
-@@ -104,14 +105,28 @@ static int ccp_init_sg_workarea(struct ccp_sg_workarea *wa, struct device *dev,
- static void ccp_update_sg_workarea(struct ccp_sg_workarea *wa, unsigned int len)
- {
- 	unsigned int nbytes = min_t(u64, len, wa->bytes_left);
-+	unsigned int sg_combined_len = 0;
- 
- 	if (!wa->sg)
- 		return;
- 
- 	wa->sg_used += nbytes;
- 	wa->bytes_left -= nbytes;
--	if (wa->sg_used == wa->sg->length) {
--		wa->sg = sg_next(wa->sg);
-+	if (wa->sg_used == sg_dma_len(wa->dma_sg)) {
-+		/* Advance to the next DMA scatterlist entry */
-+		wa->dma_sg = sg_next(wa->dma_sg);
-+
-+		/* In the case that the DMA mapped scatterlist has entries
-+		 * that have been merged, the non-DMA mapped scatterlist
-+		 * must be advanced multiple times for each merged entry.
-+		 * This ensures that the current non-DMA mapped entry
-+		 * corresponds to the current DMA mapped entry.
-+		 */
-+		do {
-+			sg_combined_len += wa->sg->length;
-+			wa->sg = sg_next(wa->sg);
-+		} while (wa->sg_used > sg_combined_len);
-+
- 		wa->sg_used = 0;
- 	}
- }
-@@ -299,7 +314,7 @@ static unsigned int ccp_queue_buf(struct ccp_data *data, unsigned int from)
- 	/* Update the structures and generate the count */
- 	buf_count = 0;
- 	while (sg_wa->bytes_left && (buf_count < dm_wa->length)) {
--		nbytes = min(sg_wa->sg->length - sg_wa->sg_used,
-+		nbytes = min(sg_dma_len(sg_wa->dma_sg) - sg_wa->sg_used,
- 			     dm_wa->length - buf_count);
- 		nbytes = min_t(u64, sg_wa->bytes_left, nbytes);
- 
-@@ -331,11 +346,11 @@ static void ccp_prepare_data(struct ccp_data *src, struct ccp_data *dst,
- 	 * and destination. The resulting len values will always be <= UINT_MAX
- 	 * because the dma length is an unsigned int.
- 	 */
--	sg_src_len = sg_dma_len(src->sg_wa.sg) - src->sg_wa.sg_used;
-+	sg_src_len = sg_dma_len(src->sg_wa.dma_sg) - src->sg_wa.sg_used;
- 	sg_src_len = min_t(u64, src->sg_wa.bytes_left, sg_src_len);
- 
- 	if (dst) {
--		sg_dst_len = sg_dma_len(dst->sg_wa.sg) - dst->sg_wa.sg_used;
-+		sg_dst_len = sg_dma_len(dst->sg_wa.dma_sg) - dst->sg_wa.sg_used;
- 		sg_dst_len = min_t(u64, src->sg_wa.bytes_left, sg_dst_len);
- 		op_len = min(sg_src_len, sg_dst_len);
- 	} else {
-@@ -365,7 +380,7 @@ static void ccp_prepare_data(struct ccp_data *src, struct ccp_data *dst,
- 		/* Enough data in the sg element, but we need to
- 		 * adjust for any previously copied data
- 		 */
--		op->src.u.dma.address = sg_dma_address(src->sg_wa.sg);
-+		op->src.u.dma.address = sg_dma_address(src->sg_wa.dma_sg);
- 		op->src.u.dma.offset = src->sg_wa.sg_used;
- 		op->src.u.dma.length = op_len & ~(block_size - 1);
- 
-@@ -386,7 +401,7 @@ static void ccp_prepare_data(struct ccp_data *src, struct ccp_data *dst,
- 			/* Enough room in the sg element, but we need to
- 			 * adjust for any previously used area
- 			 */
--			op->dst.u.dma.address = sg_dma_address(dst->sg_wa.sg);
-+			op->dst.u.dma.address = sg_dma_address(dst->sg_wa.dma_sg);
- 			op->dst.u.dma.offset = dst->sg_wa.sg_used;
- 			op->dst.u.dma.length = op->src.u.dma.length;
- 		}
-@@ -2028,7 +2043,7 @@ ccp_run_passthru_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	dst.sg_wa.sg_used = 0;
- 	for (i = 1; i <= src.sg_wa.dma_count; i++) {
- 		if (!dst.sg_wa.sg ||
--		    (dst.sg_wa.sg->length < src.sg_wa.sg->length)) {
-+		    (sg_dma_len(dst.sg_wa.sg) < sg_dma_len(src.sg_wa.sg))) {
- 			ret = -EINVAL;
- 			goto e_dst;
- 		}
-@@ -2054,8 +2069,8 @@ ccp_run_passthru_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 			goto e_dst;
- 		}
- 
--		dst.sg_wa.sg_used += src.sg_wa.sg->length;
--		if (dst.sg_wa.sg_used == dst.sg_wa.sg->length) {
-+		dst.sg_wa.sg_used += sg_dma_len(src.sg_wa.sg);
-+		if (dst.sg_wa.sg_used == sg_dma_len(dst.sg_wa.sg)) {
- 			dst.sg_wa.sg = sg_next(dst.sg_wa.sg);
- 			dst.sg_wa.sg_used = 0;
- 		}
+> Cc: Nick Desaulniers ndesaulniers@google.com
+
+Thanks for the explicit CC, though I do monitor the below list actively.
+
+> Cc: "ClangBuiltLinux" <clang-built-linux@googlegroups.com>
+> Link: https://github.com/ClangBuiltLinux/linux/issues/1050
+> Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/kbuild/llvm.rst
+
+^ probably don't need that link either.
+
+>
+> ---
+>  arch/x86/crypto/aesni-intel_asm.S | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
+> index cad6e1bfa7d5..983eb2eec51a 100644
+> --- a/arch/x86/crypto/aesni-intel_asm.S
+> +++ b/arch/x86/crypto/aesni-intel_asm.S
+> @@ -266,7 +266,7 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
+>         PSHUFB_XMM %xmm2, %xmm0
+>         movdqu %xmm0, CurCount(%arg2) # ctx_data.current_counter = iv
+>
+> -       PRECOMPUTE \SUBKEY, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
+> +       PRECOMPUTE \SUBKEY, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7
+>         movdqu HashKey(%arg2), %xmm13
+>
+>         CALC_AAD_HASH %xmm13, \AAD, \AADLEN, %xmm0, %xmm1, %xmm2, %xmm3, \
+
+
+There's a comparison on L386
+ 386 .ifc \operation, dec
+Also, L407, L393, L672, L808, L841, L935, L941, L947,
+
+If we change the `\operation` macro parameter to be `DEC` instead of
+`dec`, does this comparison still hold true?  I would expect not if
+LLVM's integrated assembler is case sensitive?  Otherwise we're
+probably missing instructions for the case of `DEC`.  In that case,
+that should probably get fixed.
+
+Interesting, looks like GAS *is* case sensitive for `.ifc` directives?
+```
+$ cat foo.s
+.macro foo op
+.ifc \op, dec
+  subq r8, r9
+.else
+  addq $0, r8
+.endif
+.endm
+foo DEC
+
+$ clang foo.s -c
+$ llvm-objdump -d foo.o
+...
+       0: 48 83 04 25 00 00 00 00 00    addq    $0, 0
+$ as foo.s -c
+$ llvm-objdump -d foo.o
+...
+       0: 48 83 04 25 00 00 00 00 00    addq    $0, 0
+```
+In that case, it seems that this patch probably breaks the DEC case
+for both toolchains.
+
+Just to triple check, forgetting LLVM for a minute, let's compare the
+disassembly before and after.
+
+$ make -j71 defconfig
+$ make -j71 menuconfig
+<enable CRYPTO_AES_NI_INTEL>
+$ make -j71 arch/x86/crypto/aesni-intel_asm.o
+$ llvm-objdump -dr arch/x86/crypto/aesni-intel_asm.o > prepatch.txt
+<apply your patch>
+$ make -j71 arch/x86/crypto/aesni-intel_asm.o
+$ llvm-objdump -dr arch/x86/crypto/aesni-intel_asm.o > postpatch.txt
+$ diff -u <(cat prepatch.txt | tr -s ' ' | cut -d '   ' -f 2-) <(cat
+postpatch.txt| tr -s ' ' | cut -d '      ' -f 2-) | less
+
+It's not the easiest to tell, since I should have left off `-r` for
+relocations from objdump, but you can clearly see cases of different
+disassembly.  Even the address of labels changes due to missing
+instructions.
+
+In that case, it's probably a smaller change to just renamed the macros
+GHASH_4_ENCRYPT_4_PARALLEL_ENC
+GHASH_4_ENCRYPT_4_PARALLEL_DEC
+
+to
+
+GHASH_4_ENCRYPT_4_PARALLEL_enc
+GHASH_4_ENCRYPT_4_PARALLEL_dec
+
+respectively, though using ALL CAPS is likely more consistent at the
+cost of more lines changed.  Also, sorry I didn't catch this on the
+earlier thread; my mistake.
+
+> @@ -1596,7 +1596,7 @@ SYM_FUNC_START(aesni_gcm_dec)
+>         FUNC_SAVE
+>
+>         GCM_INIT %arg6, arg7, arg8, arg9
+> -       GCM_ENC_DEC dec
+> +       GCM_ENC_DEC DEC
+>         GCM_COMPLETE arg10, arg11
+>         FUNC_RESTORE
+>         ret
+> @@ -1684,7 +1684,7 @@ SYM_FUNC_START(aesni_gcm_enc)
+>         FUNC_SAVE
+>
+>         GCM_INIT %arg6, arg7, arg8, arg9
+> -       GCM_ENC_DEC enc
+> +       GCM_ENC_DEC ENC
+>
+>         GCM_COMPLETE arg10, arg11
+>         FUNC_RESTORE
+> @@ -1719,7 +1719,7 @@ SYM_FUNC_END(aesni_gcm_init)
+>  */
+>  SYM_FUNC_START(aesni_gcm_enc_update)
+>         FUNC_SAVE
+> -       GCM_ENC_DEC enc
+> +       GCM_ENC_DEC ENC
+>         FUNC_RESTORE
+>         ret
+>  SYM_FUNC_END(aesni_gcm_enc_update)
+> @@ -1734,7 +1734,7 @@ SYM_FUNC_END(aesni_gcm_enc_update)
+>  */
+>  SYM_FUNC_START(aesni_gcm_dec_update)
+>         FUNC_SAVE
+> -       GCM_ENC_DEC dec
+> +       GCM_ENC_DEC DEC
+>         FUNC_RESTORE
+>         ret
+>  SYM_FUNC_END(aesni_gcm_dec_update)
+> --
+
 -- 
-2.18.4
-
+Thanks,
+~Nick Desaulniers
