@@ -2,103 +2,92 @@ Return-Path: <SRS0=7Iqi=AE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FED5C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 17:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEF3FC433E1
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 17:39:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C3DD20774
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 17:02:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 843C52078A
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 17:39:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592931740;
-	bh=lyjF5JCMRLkYfJgb+nOoi8e9pbWAuyRNl9vIReX7pT4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=KmvWuBhJCES5p0JCq7uYTOp/eZjZsw6pL8nfuJLOJK21yUvHokDzeSaYEOdJsppth
-	 bbxN72O520WmCz7omZaqBv/8dr03k49YcCW84SrOQgSZfuUBcNMuroYCD5UyjAu3DH
-	 AvEuOsaT55SYBXr8qI/stX8q1Smvmr4v7jvXfWpI=
+	s=default; t=1592933946;
+	bh=+fjJTwtTffvmuCdEVZGk9qwlYddz6jrFPC0zOsFVzGY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=0/fAgM5rxLiCzPK73MgA/aCiRRB1PZtz/sPcZA0pQRIRokPER3wtOk/hq0FP8z4tV
+	 blQbA5F+1fluA/kJMjH+5gMjOWlZBBsFWadO32/DzfyNmKoyGfU7AvlXPYazuQ0CKA
+	 mU2zgXEC9miBa2fhVyfJVkTvQpQ/tLr4s9tN/1Cc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732662AbgFWRCT (ORCPT
+        id S2387610AbgFWRgj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Jun 2020 13:02:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37084 "EHLO mail.kernel.org"
+        Tue, 23 Jun 2020 13:36:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34016 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728916AbgFWRCT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Jun 2020 13:02:19 -0400
-Received: from gmail.com (unknown [104.132.1.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S2387601AbgFWRgh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Jun 2020 13:36:37 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 64B1A206EB;
-        Tue, 23 Jun 2020 17:02:18 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3BA5E2078C;
+        Tue, 23 Jun 2020 17:36:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592931738;
-        bh=lyjF5JCMRLkYfJgb+nOoi8e9pbWAuyRNl9vIReX7pT4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=wnSPXYVfbyX9CmJZGaMbnvuqnseTjcR/2VLVOrOsSiykjRDpg7yS4p10BPbMNJ5H/
-         1vQQyG7aPCqvBU5TCqzOBk+czJvnU83rKvnp9S5VcUSmzMoyGe22Akxn77qHm7Oji0
-         nNFApQc1NRvwSoeFRqGXilnnJZ6QHjaOuqN3QhRA=
-Date:   Tue, 23 Jun 2020 10:02:17 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        LTP List <ltp@lists.linux.it>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        lkft-triage@lists.linaro.org, linux-crypto@vger.kernel.org,
-        Jan Stancek <jstancek@redhat.com>, chrubis <chrubis@suse.cz>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        James Morris <jmorris@namei.org>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        David Howells <dhowells@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: LTP: crypto: af_alg02 regression on linux-next 20200621 tag
-Message-ID: <20200623170217.GB150582@gmail.com>
-References: <CA+G9fYvHFs5Yx8TnT6VavtfjMN8QLPuXg6us-dXVJqUUt68adA@mail.gmail.com>
- <20200622224920.GA4332@42.do-not-panic.com>
- <CA+G9fYsXDZUspc5OyfqrGZn=k=2uRiGzWY_aPePK2C_kZ+dYGQ@mail.gmail.com>
- <20200623064056.GA8121@gondor.apana.org.au>
+        s=default; t=1592933797;
+        bh=+fjJTwtTffvmuCdEVZGk9qwlYddz6jrFPC0zOsFVzGY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=S3REjEmFIajUxlFWnP3tnutwDccoOex/uymkJ6UkSf5JvNpP3XmjwLD/tMFL6yFof
+         dCfGzKIj59LmgCRijGfXTCDE5tzxk2eMeo5Oi5Ryr4rlIX9UdG4HMVAL9MitFfFzWN
+         Wd8cZbqTSfvibwhnnDTxqbgmyhmxyTw/rh0ejZm4=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Dinghao Liu <dinghao.liu@zju.edu.cn>,
+        Alexander Sverdlin <alexander.sverdlin@nokia.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 05/15] hwrng: ks-sa - Fix runtime PM imbalance on error
+Date:   Tue, 23 Jun 2020 13:36:20 -0400
+Message-Id: <20200623173630.1355971-5-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200623173630.1355971-1-sashal@kernel.org>
+References: <20200623173630.1355971-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200623064056.GA8121@gondor.apana.org.au>
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 04:40:56PM +1000, Herbert Xu wrote:
-> On Tue, Jun 23, 2020 at 11:53:43AM +0530, Naresh Kamboju wrote:
-> >
-> > Thanks for the investigation.
-> > After reverting, two test cases got PASS out of four reported failure cases.
-> >  ltp-crypto-tests:
-> >      * af_alg02 - still failing - Hung and time out
-> >      * af_alg05 - still failing - Hung and time out
-> >   ltp-syscalls-tests:
-> >      * keyctl07 - PASS
-> >      * request_key03 - PASS
-> > 
-> > Please suggest the way to debug / fix the af_alg02 and af_alg05 failures.
-> 
-> Did you clear the MSG_MORE flag in the final send(2) call before
-> you call recv(2)?
-> 
+From: Dinghao Liu <dinghao.liu@zju.edu.cn>
 
-The source code for the two failing AF_ALG tests is here:
+[ Upstream commit 95459261c99f1621d90bc628c2a48e60b7cf9a88 ]
 
-https://github.com/linux-test-project/ltp/blob/master/testcases/kernel/crypto/af_alg02.c
-https://github.com/linux-test-project/ltp/blob/master/testcases/kernel/crypto/af_alg05.c
+pm_runtime_get_sync() increments the runtime PM usage counter even
+the call returns an error code. Thus a pairing decrement is needed
+on the error handling path to keep the counter balanced.
 
-They use read() and write(), not send() and recv().
+Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
+Reviewed-by: Alexander Sverdlin <alexander.sverdlin@nokia.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/char/hw_random/ks-sa-rng.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-af_alg02 uses read() to read from a "salsa20" request socket without writing
-anything to it.  It is expected that this returns 0, i.e. that behaves like
-encrypting an empty message.
+diff --git a/drivers/char/hw_random/ks-sa-rng.c b/drivers/char/hw_random/ks-sa-rng.c
+index 62c6696c1dbd8..b6d7db362b217 100644
+--- a/drivers/char/hw_random/ks-sa-rng.c
++++ b/drivers/char/hw_random/ks-sa-rng.c
+@@ -216,6 +216,7 @@ static int ks_sa_rng_probe(struct platform_device *pdev)
+ 	ret = pm_runtime_get_sync(dev);
+ 	if (ret < 0) {
+ 		dev_err(dev, "Failed to enable SA power-domain\n");
++		pm_runtime_put_noidle(dev);
+ 		pm_runtime_disable(dev);
+ 		return ret;
+ 	}
+-- 
+2.25.1
 
-af_alg05 uses write() to write 15 bytes to a "cbc(aes-generic)" request socket,
-then read() to read 15 bytes.  It is expected that this fails with EINVAL, since
-the length is not aligned to the AES block size (16 bytes).
-
-- Eric
