@@ -2,39 +2,45 @@ Return-Path: <SRS0=7Iqi=AE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B17BC433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 04:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE132C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 04:18:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 448372065D
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 04:18:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A93AA20724
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 04:18:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728421AbgFWESH (ORCPT
+        id S1728548AbgFWESL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Jun 2020 00:18:07 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:54054 "EHLO huawei.com"
+        Tue, 23 Jun 2020 00:18:11 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:54186 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726054AbgFWESH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Jun 2020 00:18:07 -0400
+        id S1726054AbgFWESJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Jun 2020 00:18:09 -0400
 Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id F0189263844760CFAACA;
-        Tue, 23 Jun 2020 12:18:01 +0800 (CST)
+        by Forcepoint Email with ESMTP id 156AEECCF39F4B0542A0;
+        Tue, 23 Jun 2020 12:18:07 +0800 (CST)
 Received: from SWX921481.china.huawei.com (10.126.200.72) by
  DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 23 Jun 2020 12:17:53 +0800
+ 14.3.487.0; Tue, 23 Jun 2020 12:17:56 +0800
 From:   Barry Song <song.bao.hua@hisilicon.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <wangzhou1@hisilicon.com>, <jonathan.cameron@huawei.com>,
         <akpm@linux-foundation.org>, <linux-crypto@vger.kernel.org>,
         <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
-        <linuxarm@huawei.com>, Barry Song <song.bao.hua@hisilicon.com>
-Subject: [PATCH v2 0/3] crypto: allow users to specify acomp hardware from a desired NUMA node
-Date:   Tue, 23 Jun 2020 16:16:07 +1200
-Message-ID: <20200623041610.7620-1-song.bao.hua@hisilicon.com>
+        <linuxarm@huawei.com>, Barry Song <song.bao.hua@hisilicon.com>,
+        Seth Jennings <sjenning@redhat.com>,
+        Dan Streetman <ddstreet@ieee.org>,
+        Vitaly Wool <vitaly.wool@konsulko.com>
+Subject: [PATCH v2 1/3] crypto: permit users to specify numa node of acomp hardware
+Date:   Tue, 23 Jun 2020 16:16:08 +1200
+Message-ID: <20200623041610.7620-2-song.bao.hua@hisilicon.com>
 X-Mailer: git-send-email 2.21.0.windows.1
+In-Reply-To: <20200623041610.7620-1-song.bao.hua@hisilicon.com>
+References: <20200623041610.7620-1-song.bao.hua@hisilicon.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
@@ -45,36 +51,209 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-For a typical Linux server, probably there are several hardware modules.
-For example, numa node0 has a compressor, numa node2 has a same module.
-Some drivers are automatically using the module near the CPU calling
-acomp_alloc.
-But it isn't necessarily correct. Just like memory allocation API like
-kmalloc and kmalloc_node. Similar optimization may be done for crypto.
+For a Linux server with NUMA, there are possibly multiple (de)compressors
+which are either local or remote to some NUMA node. Some drivers will
+automatically use the (de)compressor near the CPU calling acomp_alloc().
+However, it is not necessarily correct because users who send acomp_req
+could be from different NUMA node with the CPU which allocates acomp.
 
--v2:
-  * fix kern-doc and some codingstyle issues according to Jonathan's comment
-  * patch 3/3 is rebased againest "[PATCH] mm/zswap: careful error path
-    implementation in comp_prepare"[1]
+Just like kernel has kmalloc() and kmalloc_node(), here crypto can have
+same support.
 
-[1] https://lkml.org/lkml/2020/6/22/347
+Cc: Jonathan Cameron <jonathan.cameron@huawei.com>
+Cc: Seth Jennings <sjenning@redhat.com>
+Cc: Dan Streetman <ddstreet@ieee.org>
+Cc: Vitaly Wool <vitaly.wool@konsulko.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Barry Song <song.bao.hua@hisilicon.com>
+---
+ -v2:
+   * fix kern-doc and some codingstyle issues according to Jonathan's comment
 
-Barry Song (3):
-  crypto: permit users to specify numa node of acomp hardware
-  crypto: hisilicon/zip - permit users to specify NUMA node
-  mm/zswap: allocate acomp on the numa node committing acomp_req
+ crypto/acompress.c         |  8 ++++++++
+ crypto/api.c               | 22 ++++++++++++++--------
+ crypto/internal.h          | 23 +++++++++++++++++++----
+ include/crypto/acompress.h | 18 ++++++++++++++++++
+ include/linux/crypto.h     |  2 ++
+ 5 files changed, 61 insertions(+), 12 deletions(-)
 
- crypto/acompress.c                        |  8 ++++++++
- crypto/api.c                              | 22 ++++++++++++++--------
- crypto/internal.h                         | 23 +++++++++++++++++++----
- drivers/crypto/hisilicon/zip/zip.h        |  2 +-
- drivers/crypto/hisilicon/zip/zip_crypto.c |  6 +++---
- drivers/crypto/hisilicon/zip/zip_main.c   |  5 +++--
- include/crypto/acompress.h                | 18 ++++++++++++++++++
- include/linux/crypto.h                    |  2 ++
- mm/zswap.c                                |  2 +-
- 9 files changed, 69 insertions(+), 19 deletions(-)
-
+diff --git a/crypto/acompress.c b/crypto/acompress.c
+index 84a76723e851..c32c72048a1c 100644
+--- a/crypto/acompress.c
++++ b/crypto/acompress.c
+@@ -109,6 +109,14 @@ struct crypto_acomp *crypto_alloc_acomp(const char *alg_name, u32 type,
+ }
+ EXPORT_SYMBOL_GPL(crypto_alloc_acomp);
+ 
++struct crypto_acomp *crypto_alloc_acomp_node(const char *alg_name, u32 type,
++					u32 mask, int node)
++{
++	return crypto_alloc_tfm_node(alg_name, &crypto_acomp_type, type, mask,
++				node);
++}
++EXPORT_SYMBOL_GPL(crypto_alloc_acomp_node);
++
+ struct acomp_req *acomp_request_alloc(struct crypto_acomp *acomp)
+ {
+ 	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp);
+diff --git a/crypto/api.c b/crypto/api.c
+index edcf690800d4..4ecf712286af 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -433,8 +433,9 @@ struct crypto_tfm *crypto_alloc_base(const char *alg_name, u32 type, u32 mask)
+ }
+ EXPORT_SYMBOL_GPL(crypto_alloc_base);
+ 
+-void *crypto_create_tfm(struct crypto_alg *alg,
+-			const struct crypto_type *frontend)
++void *crypto_create_tfm_node(struct crypto_alg *alg,
++			const struct crypto_type *frontend,
++			int node)
+ {
+ 	char *mem;
+ 	struct crypto_tfm *tfm = NULL;
+@@ -451,6 +452,7 @@ void *crypto_create_tfm(struct crypto_alg *alg,
+ 
+ 	tfm = (struct crypto_tfm *)(mem + tfmsize);
+ 	tfm->__crt_alg = alg;
++	tfm->node = node;
+ 
+ 	err = frontend->init_tfm(tfm);
+ 	if (err)
+@@ -472,7 +474,7 @@ void *crypto_create_tfm(struct crypto_alg *alg,
+ out:
+ 	return mem;
+ }
+-EXPORT_SYMBOL_GPL(crypto_create_tfm);
++EXPORT_SYMBOL_GPL(crypto_create_tfm_node);
+ 
+ struct crypto_alg *crypto_find_alg(const char *alg_name,
+ 				   const struct crypto_type *frontend,
+@@ -490,11 +492,13 @@ struct crypto_alg *crypto_find_alg(const char *alg_name,
+ EXPORT_SYMBOL_GPL(crypto_find_alg);
+ 
+ /*
+- *	crypto_alloc_tfm - Locate algorithm and allocate transform
++ *	crypto_alloc_tfm_node - Locate algorithm and allocate transform
+  *	@alg_name: Name of algorithm
+  *	@frontend: Frontend algorithm type
+  *	@type: Type of algorithm
+  *	@mask: Mask for type comparison
++ *	@node: NUMA node in which users desire to put requests, if node is
++ *		NUMA_NO_NODE, it means users have no special requirement.
+  *
+  *	crypto_alloc_tfm() will first attempt to locate an already loaded
+  *	algorithm.  If that fails and the kernel supports dynamically loadable
+@@ -509,8 +513,10 @@ EXPORT_SYMBOL_GPL(crypto_find_alg);
+  *
+  *	In case of error the return value is an error pointer.
+  */
+-void *crypto_alloc_tfm(const char *alg_name,
+-		       const struct crypto_type *frontend, u32 type, u32 mask)
++
++void *crypto_alloc_tfm_node(const char *alg_name,
++		       const struct crypto_type *frontend, u32 type, u32 mask,
++		       int node)
+ {
+ 	void *tfm;
+ 	int err;
+@@ -524,7 +530,7 @@ void *crypto_alloc_tfm(const char *alg_name,
+ 			goto err;
+ 		}
+ 
+-		tfm = crypto_create_tfm(alg, frontend);
++		tfm = crypto_create_tfm_node(alg, frontend, node);
+ 		if (!IS_ERR(tfm))
+ 			return tfm;
+ 
+@@ -542,7 +548,7 @@ void *crypto_alloc_tfm(const char *alg_name,
+ 
+ 	return ERR_PTR(err);
+ }
+-EXPORT_SYMBOL_GPL(crypto_alloc_tfm);
++EXPORT_SYMBOL_GPL(crypto_alloc_tfm_node);
+ 
+ /*
+  *	crypto_destroy_tfm - Free crypto transform
+diff --git a/crypto/internal.h b/crypto/internal.h
+index ff06a3bd1ca1..1b92a5a61852 100644
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -68,13 +68,28 @@ void crypto_remove_final(struct list_head *list);
+ void crypto_shoot_alg(struct crypto_alg *alg);
+ struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg, u32 type,
+ 				      u32 mask);
+-void *crypto_create_tfm(struct crypto_alg *alg,
+-			const struct crypto_type *frontend);
++void *crypto_create_tfm_node(struct crypto_alg *alg,
++			const struct crypto_type *frontend, int node);
++
++static inline void *crypto_create_tfm(struct crypto_alg *alg,
++			const struct crypto_type *frontend)
++{
++	return crypto_create_tfm_node(alg, frontend, NUMA_NO_NODE);
++}
++
+ struct crypto_alg *crypto_find_alg(const char *alg_name,
+ 				   const struct crypto_type *frontend,
+ 				   u32 type, u32 mask);
+-void *crypto_alloc_tfm(const char *alg_name,
+-		       const struct crypto_type *frontend, u32 type, u32 mask);
++
++void *crypto_alloc_tfm_node(const char *alg_name,
++		       const struct crypto_type *frontend, u32 type, u32 mask,
++		       int node);
++
++static inline void *crypto_alloc_tfm(const char *alg_name,
++		       const struct crypto_type *frontend, u32 type, u32 mask)
++{
++	return crypto_alloc_tfm_node(alg_name, frontend, type, mask, NUMA_NO_NODE);
++}
+ 
+ int crypto_probing_notify(unsigned long val, void *v);
+ 
+diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
+index 2b4d2b06ccbd..fcde59c65a81 100644
+--- a/include/crypto/acompress.h
++++ b/include/crypto/acompress.h
+@@ -106,6 +106,24 @@ struct acomp_alg {
+  */
+ struct crypto_acomp *crypto_alloc_acomp(const char *alg_name, u32 type,
+ 					u32 mask);
++/**
++ * crypto_alloc_acomp_node() -- allocate ACOMPRESS tfm handle with desired NUMA node
++ * @alg_name:	is the cra_name / name or cra_driver_name / driver name of the
++ *		compression algorithm e.g. "deflate"
++ * @type:	specifies the type of the algorithm
++ * @mask:	specifies the mask for the algorithm
++ * @node:	specifies the NUMA node the ZIP hardware belongs to
++ *
++ * Allocate a handle for a compression algorithm. Drivers should try to use
++ * (de)compressors on the specified NUMA node.
++ * The returned struct crypto_acomp is the handle that is required for any
++ * subsequent API invocation for the compression operations.
++ *
++ * Return:	allocated handle in case of success; IS_ERR() is true in case
++ *		of an error, PTR_ERR() returns the error code.
++ */
++struct crypto_acomp *crypto_alloc_acomp_node(const char *alg_name, u32 type,
++					u32 mask, int node);
+ 
+ static inline struct crypto_tfm *crypto_acomp_tfm(struct crypto_acomp *tfm)
+ {
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 763863dbc079..ce144dfc2edc 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -595,6 +595,8 @@ int crypto_has_alg(const char *name, u32 type, u32 mask);
+ struct crypto_tfm {
+ 
+ 	u32 crt_flags;
++
++	int node;
+ 	
+ 	void (*exit)(struct crypto_tfm *tfm);
+ 	
 -- 
 2.27.0
 
