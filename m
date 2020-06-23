@@ -8,58 +8,58 @@ X-Spam-Status: No, score=-15.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A5A3C433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 02:56:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CF55C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 03:06:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 312B82076A
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 02:56:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58739207DD
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 03:06:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vEQ7YxmZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XqiDAsWS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731740AbgFWC4p (ORCPT
+        id S1731955AbgFWDGI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Jun 2020 22:56:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60336 "EHLO
+        Mon, 22 Jun 2020 23:06:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731690AbgFWC4p (ORCPT
+        with ESMTP id S1731930AbgFWDGI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Jun 2020 22:56:45 -0400
-Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 884FFC061573;
-        Mon, 22 Jun 2020 19:56:43 -0700 (PDT)
-Received: by mail-wr1-x444.google.com with SMTP id o11so11168550wrv.9;
-        Mon, 22 Jun 2020 19:56:43 -0700 (PDT)
+        Mon, 22 Jun 2020 23:06:08 -0400
+Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDEB1C061573;
+        Mon, 22 Jun 2020 20:06:07 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id c3so18849085wru.12;
+        Mon, 22 Jun 2020 20:06:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=q/BofogEfeQVfNgtBmc2nr4iEEvcla131+c62MG7kwA=;
-        b=vEQ7YxmZkw4i1jY213l04Kxe69/SGvtG7G1SdY0lGUgr1i3qDNKysprhO8yJW95q6h
-         /AFhvX7Tz6x021sCBU0fMGqllc41TuMYfOfAOnfZRpSQCwCNXV2wnwLKRVas/9lWBWO7
-         J39PpL8d1yUZBmmDC22LFutwTCGgmW1BH3MnbJPVNV5+8w3u7ijU21w9J3aY4vyOT9+E
-         yh2Q5SQulHZspuajvuStFl1TQ9slXhoIQxuHeJg566dBLkDWRDs8qrN8t6HH5yqzWM7D
-         VTkK2489DIP2hf0I8KFbgWdVZ/qVEnT5w/dVjJE0bnDuf4Ydg8KIbZG6iQxPN8yGBtfb
-         +YlA==
+        bh=gDFZJhziI4bx1fhA+zo/2xzJxyNJbKp5Ip/Ak0hTxhc=;
+        b=XqiDAsWSH4MmergmVnRepCwJ0PEuawbL4vKowTIW/VoGYyHWpe07dLkBayIjWb+ky8
+         oQhCNL0GJUJKwDKDlPB7fz703Ny0LbgefaUPFdE52ZwwPx+LdANFNvpuI0yMFdsuKHZI
+         Xdwq5ywzYjmYUXZiXJbpVaaGkaYd0k6b9/77OfELV4WtnHIaLdflxZy8RN92Zlld5rbl
+         wrASZscCdn4MB1+H5nEZH4ohTojaSdKLnfxUcVnsTEhp7swpRgqkPvERiBBYvgtjQf/9
+         frL8Z1lBJAckmfRVam3jUlid85tSZAMs+ew4RTmW7coa54L+5qo95hNf7cI9qgPu2tct
+         oR0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=q/BofogEfeQVfNgtBmc2nr4iEEvcla131+c62MG7kwA=;
-        b=eBst1pD0TUntMElowW69paWP0DU5d/GE/Vzbm16lZZ8HhD+FsMSSdN4iEXeQh4RcdB
-         cHsF2pJESNNApfiJ6DkIrfYAE3ofoMvP+TqMpOTDsBOcHPi4yUV48PRQal5oLGMrtd2+
-         XW1UbKV/KK11pxrksdLHNja3MOsVTfZ8BXZw1Jfg3VgiNRu1fIaqsmwG9wTCUNuIOEqT
-         SfiglW4JqTzIGaCnuNKOgWfRkmUYut7sVg1j0Ewad8gC0noFAyg88ML0G9rSUFUhsbiG
-         QINV02zGk/eOrmA+CqeoBcFBwb4ImmV/H3Gx1sq73F8ZlRpLeFQBT8elB7ufRNED57eH
-         AKvA==
-X-Gm-Message-State: AOAM532VoPV8J88HPQ8d4PGvTQBB8kZf7IMo0djD9YAikgc5rVYslErR
-        lAWmn35o0rYv+fuRWmboHhY=
-X-Google-Smtp-Source: ABdhPJzgLhWjEMhIWXiGtmsAzMyIqNAW/sVxTbrAeW80IdtGbxc/Xvke7jLJdg3Bk0+zP6wy2rtilg==
-X-Received: by 2002:a5d:5191:: with SMTP id k17mr14638169wrv.20.1592881002258;
-        Mon, 22 Jun 2020 19:56:42 -0700 (PDT)
+        bh=gDFZJhziI4bx1fhA+zo/2xzJxyNJbKp5Ip/Ak0hTxhc=;
+        b=JkrKpXko1OrU/nt85F6nA+/tsdM4/l6eZJ6nYXZjEK87B4LWNw1aYKrCWl53RcMo+V
+         MGl3yVtduHFWFIFYBJgdLzSnrlBVMFVberIVR7YRVFoRqW5bA6XuEEFN0ceuBOM+4Li8
+         UxAZzxr7b/AJWRWaQn7qPH+cdd8OXI+dkq5i12GFuyXTt62C7uczCMpoQFtPXOpsbH43
+         iiv3ph3yiskEDoDxN7oR6IMTCREFx+OZ79L7GIrzX5fxKNO6gEdoLb4FM/EFUVP9MZr7
+         UiQu4JqKXEseekiaVciNrnwbcQ+u17ZQ5yyiaI3CmP6UVIwYg90egEod2HS/oHtGzA3G
+         lBFw==
+X-Gm-Message-State: AOAM531MMuAKWGGf6xo6o+8gVYGe5M5h/ql+5q5f6YmLm1Ui+CATIyHb
+        TuAscQ+oWDHX2EKr/osPcaY=
+X-Google-Smtp-Source: ABdhPJzi+Ak4Uaz0oMdndswvw8J90aq7XuDmXGHCMiENCUlGkVPbxbJ5fMVOoTv8Uk7b81TQkVZsPg==
+X-Received: by 2002:adf:ded2:: with SMTP id i18mr22937284wrn.109.1592881566579;
+        Mon, 22 Jun 2020 20:06:06 -0700 (PDT)
 Received: from localhost.localdomain ([46.114.107.138])
-        by smtp.gmail.com with ESMTPSA id 33sm14071179wri.16.2020.06.22.19.56.40
+        by smtp.gmail.com with ESMTPSA id z9sm1666015wmi.41.2020.06.22.20.06.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jun 2020 19:56:41 -0700 (PDT)
+        Mon, 22 Jun 2020 20:06:06 -0700 (PDT)
 From:   Sedat Dilek <sedat.dilek@gmail.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -71,9 +71,9 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 Cc:     Sedat Dilek <sedat.dilek@gmail.com>,
         Craig Topper <craig.topper@intel.com>,
         Craig Topper <craig.topper@gmail.com>
-Subject: [PATCH 5.7 v2] x86/crypto: aesni: Fix build with LLVM_IAS=1
-Date:   Tue, 23 Jun 2020 04:56:28 +0200
-Message-Id: <20200623025628.18467-1-sedat.dilek@gmail.com>
+Subject: [PATCH 5.7 v3] x86/crypto: aesni: Fix build with LLVM_IAS=1
+Date:   Tue, 23 Jun 2020 05:06:00 +0200
+Message-Id: <20200623030600.18848-1-sedat.dilek@gmail.com>
 X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -141,6 +141,15 @@ Cc: "ClangBuiltLinux" <clang-built-linux@googlegroups.com>
 Link: https://github.com/ClangBuiltLinux/linux/issues/1050
 Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
 ---
+Changes v2->v3:
+- Add this Changelog
+
+Changes v1->v2:
+- Replace Cc by Suggested-by for Craig
+- Replace Cc by Suggested-by for Nick (dropped Cc as desired)
+- Really follow the suggestions of Craig
+- Drop unneeded comments for my build-environment and Links
+
  arch/x86/crypto/aesni-intel_asm.S | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
