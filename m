@@ -2,127 +2,118 @@ Return-Path: <SRS0=7Iqi=AE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2C21C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 15:04:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BD04C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 16:56:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D7DA20780
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 15:04:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592924670;
-	bh=pYSmEX90OpGgB4bw3JQlLwOPKGPZt8zcCg2Jw+YWJhM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:List-ID:From;
-	b=aQYPNAZgutFbQIUDHJ7cj01i4KFwGsAjqcu0IEdNeICw8n7As6Hkbjn6yEYOklzJJ
-	 ZvCIa7eMu/m0JxMlVCs8xGMVT5C60Yyky1qnMb2URzysZO6rct52vPkQq+TJHRnvow
-	 j/wezt4HV4BmOMg9zfMeCP6RjtRbshO1IX12hqa0=
+	by mail.kernel.org (Postfix) with ESMTP id 38A242076E
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 16:56:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cerno.tech header.i=@cerno.tech header.b="PFqYvF3/";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tBPnBtyF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733004AbgFWPEa (ORCPT
+        id S1733058AbgFWQ43 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Jun 2020 11:04:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41322 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732946AbgFWPE3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Jun 2020 11:04:29 -0400
-Received: from localhost (mobile-166-170-222-206.mycingular.net [166.170.222.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 94EC420723;
-        Tue, 23 Jun 2020 15:04:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592924669;
-        bh=pYSmEX90OpGgB4bw3JQlLwOPKGPZt8zcCg2Jw+YWJhM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=uyCRgzznNIaGzwTA5WSAD0mfkUx7PWjjDA0xuNRfK8wdFyqid6COQmfVRcULXo7eB
-         x6r9H+xRROcynvqijhjGKwufYcigaaHtOMvN1NklZTodXP7DkrU83liurSsGCNLFtO
-         sRrkKEDXRbWwc9kz0no38z13LtKl0kt/Ne0JEuNE=
-Date:   Tue, 23 Jun 2020 10:04:27 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Zhangfei Gao <zhangfei.gao@linaro.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Joerg Roedel <joro@8bytes.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Hanjun Guo <guohanjun@huawei.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Tue, 23 Jun 2020 12:56:29 -0400
+Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:35861 "EHLO
+        wnew4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732416AbgFWQ4W (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Jun 2020 12:56:22 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailnew.west.internal (Postfix) with ESMTP id 7F2B69DE;
+        Tue, 23 Jun 2020 12:56:20 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Tue, 23 Jun 2020 12:56:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cerno.tech; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:content-transfer-encoding:in-reply-to; s=fm3; bh=r
+        XOFys0881hoPtvQddDik70Gqk7ZL4a631nWuDDDZ1I=; b=PFqYvF3/V3fw9s6Ec
+        8T68pPe2E60vme/LzpymHABo3wbSz/2S8vgWG0lweh28Vky31d7BFDnq4FV9KeYa
+        C7Kz/ZlYO2yBy8WauJpnWACbeXq64l2Hg7lZaoT4xUyxfNRVkRuITcVVmGAVs0Tn
+        WpawogUpkpeUGeyejBKcYQ2K54T7nxHjMaHDomMsCwo48ZgzO1BvUWLl2SFj18nt
+        jnS+bedhN2GCgE2cEXO+5zfyQnzLEP+t1OeYSHGOFvCm2JbnIN2Cn7OrRkHbUCKT
+        gzP7DENEnOVsQS4VowrD7Dc0ThWZDsJlb7mYgrAsvJoGKvD0r0ncfExPXgYQxyxj
+        F2Hfw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:content-type
+        :date:from:in-reply-to:message-id:mime-version:references
+        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm3; bh=rXOFys0881hoPtvQddDik70Gqk7ZL4a631nWuDDDZ
+        1I=; b=tBPnBtyFsmPfvutqSmQpxLJ9ooE+78MAjXS0FF5aEPgpEakX4/TUdFgBp
+        UJhfzpjoHcerxVVobqO1FqmXpEEVHqr9ZE5nK7Sh72TUosBHZE9gsy9CqrqlDa1V
+        1jQcIqTlVxOM2878UGeFbXPlaRhTBHuAW2VeKLVUYLzX1PPTrQ3PNRQ65nZqbdHa
+        ulLfIHAM5RnJFV663hQz1Cd6Hhv5Er6diLdCc7/CmSliDXQMW/a/AvIk035hjtYG
+        WPNF2CSYj54RwA7HHS3I5MYZiGRiWOY6ozT8Cb/j6G6Jlk3uAhub7Y/WPam6Fmlo
+        0XG23Pm4yIS6KdwR2lF5bdO0EUD5w==
+X-ME-Sender: <xms:MTTyXgzhD2oLsWAO__gBdGAUmkEU9buPzYFego_AB0XV6q0ZQMQfIg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrudekhedgkedtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvffukfhfgggtugfgjgesthhqredttddtjeenucfhrhhomhepofgrgihi
+    mhgvucftihhprghrugcuoehmrgigihhmvgestggvrhhnohdrthgvtghhqeenucggtffrrg
+    htthgvrhhnpefhueeggfdvieegjeeigeffudeuhfeuveeuieelgfffleelgedtiefgvdev
+    ieevvdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppeeltddrkeelrdeike
+    drjeeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhep
+    mhgrgihimhgvsegtvghrnhhordhtvggthh
+X-ME-Proxy: <xmx:MTTyXkS2-ZPryP7_3pCY0SgEKGmnEp7E6Shv1poj5LgtASWsyxM95A>
+    <xmx:MTTyXiULJFFtGvsjB4nIKOB3QHqGFPgBehWrCS5vOAwfsuiIb9dc1g>
+    <xmx:MTTyXuhoW49IbOwmvyfGT1PSRVarzdvuBcXzDMcL0XvHATi-ulFXqg>
+    <xmx:NDTyXu7UwjM8LGGqhYTjcH2uyHUIikJk-RnTCClKuAIgrS3Cdol8TzqklRg>
+Received: from localhost (lfbn-tou-1-1502-76.w90-89.abo.wanadoo.fr [90.89.68.76])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 63CA0328005A;
+        Tue, 23 Jun 2020 12:56:17 -0400 (EDT)
+Date:   Tue, 23 Jun 2020 18:56:15 +0200
+From:   Maxime Ripard <maxime@cerno.tech>
+To:     Markus Elfring <Markus.Elfring@web.de>
+Cc:     Dinghao Liu <dinghao.liu@zju.edu.cn>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        Aditya Pakki <pakki001@umn.edu>,
+        Navid Emamdoost <emamd001@umn.edu>, Kangjie Lu <kjlu@umn.edu>,
+        Qiushi Wu <wu000273@umn.edu>, linux-kernel@vger.kernel.org,
+        YueHaibing <yuehaibing@huawei.com>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:IOMMU DRIVERS" <iommu@lists.linux-foundation.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-pci <linux-pci@vger.kernel.org>,
-        Thanu Rangarajan <Thanu.Rangarajan@arm.com>,
-        Souvik Chakravarty <Souvik.Chakravarty@arm.com>,
-        wanghuiqiang <wanghuiqiang@huawei.com>
-Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
-Message-ID: <20200623150427.GA2403606@bjorn-Precision-5520>
+        Eric Biggers <ebiggers@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Chen-Yu Tsai <wens@csie.org>
+Subject: Re: [PATCH] crypto: sun8i-ce - Fix runtime PM imbalance in
+ sun8i_ce_cipher_init
+Message-ID: <20200623165615.i7iphakzjeu2d3fq@gilmour.lan>
+References: <265c3a75-f8ce-fb34-d559-39e58a4dfb4f@web.de>
+ <20200623134442.wj4i3r3dlp6rtpaq@gilmour.lan>
+ <16341716-aeb6-febc-441c-c1826da8c4d3@web.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c5d7b2f1-6b32-d965-3b60-eb70a26e02b4@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <16341716-aeb6-febc-441c-c1826da8c4d3@web.de>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 19, 2020 at 10:26:54AM +0800, Zhangfei Gao wrote:
-> Have studied _DSM method, two issues we met comparing using quirk.
-> 
-> 1. Need change definition of either pci_host_bridge or pci_dev, like adding
-> member can_stall,
-> while pci system does not know stall now.
-> 
-> a, pci devices do not have uuid: uuid need be described in dsdt, while pci
-> devices are not defined in dsdt.
->     so we have to use host bridge.
+On Tue, Jun 23, 2020 at 05:00:32PM +0200, Markus Elfring wrote:
+> >>> Fix this by =E2=80=A6
+> >>
+> >> Please replace the beginning of this sentence with the tag =E2=80=9CFi=
+xes=E2=80=9D.
+> >> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tre=
+e/Documentation/process/submitting-patches.rst?id=3D625d3449788f85569096780=
+592549d0340e9c0c7#n183
+> >
+> > No, not really. The comment you (partially) quoted explains how the
+> > issue is fixed, your suggestion explains what commit introduced the fix
+> > in the first place. They are both beneficial, but there's strictly no
+> > reason to remove the former for the latter.
+>=20
+> Do you care to improve this change description another bit?
 
-PCI devices *can* be described in the DSDT.  IIUC these particular
-devices are hardwired (not plug-in cards), so platform firmware can
-know about them and could describe them in the DSDT.
+I'm not sure which change description you're talking about?
 
-> b,  Parsing dsdt is in in pci subsystem.
-> Like drivers/acpi/pci_root.c:
->        obj = acpi_evaluate_dsm(ACPI_HANDLE(bus->bridge), &pci_acpi_dsm_guid,
-> 1,
->                                 IGNORE_PCI_BOOT_CONFIG_DSM, NULL);
-> 
-> After parsing DSM in pci, we need record this info.
-> Currently, can_stall info is recorded in iommu_fwspec,
-> which is allocated in iommu_fwspec_init and called by iort_iommu_configure
-> for uefi.
-
-You can look for a _DSM wherever it is convenient for you.  It could
-be in an AMBA shim layer.
-
-> 2. Guest kernel also need support sva.
-> Using quirk, the guest can boot with sva enabled, since quirk is
-> self-contained by kernel.
-> If using  _DSM, a specific uefi or dtb has to be provided,
-> currently we can useQEMU_EFI.fd from apt install qemu-efi
-
-I don't quite understand what this means, but as I mentioned before, a
-quirk for a *limited* number of devices is OK, as long as there is a
-plan that removes the need for a quirk for future devices.
-
-E.g., if the next platform version ships with a DTB or firmware with a
-_DSM or other mechanism that enables the kernel to discover this
-information without a kernel change, it's fine to use a quirk to cover
-the early platform.
-
-The principles are:
-
-  - I don't want to have to update a quirk for every new Device ID
-    that needs this.
-
-  - I don't really want to have to manage non-PCI information in the
-    struct pci_dev.  If this is AMBA- or IOMMU-related, it should be
-    stored in a structure related to AMBA or the IOMMU.
+Maxime
