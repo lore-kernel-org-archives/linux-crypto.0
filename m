@@ -2,133 +2,112 @@ Return-Path: <SRS0=7Iqi=AE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D078C433E1
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 07:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BC17C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 13:44:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 59AE92073E
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 07:48:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7546A20738
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 13:44:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dvb9jWrW"
+	dkim=pass (2048-bit key) header.d=cerno.tech header.i=@cerno.tech header.b="LwF6LgBL";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="aYj0nDqL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731522AbgFWHsu (ORCPT
+        id S1729504AbgFWNou (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Jun 2020 03:48:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48692 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731588AbgFWHst (ORCPT
+        Tue, 23 Jun 2020 09:44:50 -0400
+Received: from wnew3-smtp.messagingengine.com ([64.147.123.17]:53717 "EHLO
+        wnew3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732689AbgFWNou (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Jun 2020 03:48:49 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEC29C061796
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Jun 2020 00:48:49 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id b5so9479830pgm.8
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Jun 2020 00:48:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=iXMHLbguntKcuTgr1nAq0fpxZctLmOVLPocRZ01HV1s=;
-        b=Dvb9jWrWxYf0cUS7+mre8Ce7N6LCPCbgM4TfzIgO9x/j/Sz44QbFtHYcBvV6YcHykC
-         /UOjUDAlRBaipXGhgPtfj5VOhd0MjmoLTxYmHS14ROKFa4k7B6adT6mjHgV2lQZYAb2L
-         9lBtnjHKiulqZ7h6mF5QFFytTHA5SEJIAChcsfvKC0+xwvXLEhh4oJ/sXC4FDnOEad0q
-         wFvAaXsf3se/vnfb3bW1sYXvPN+QVKdtP6yU8qG9ZHjQx6589ayIzIweyVGj7eNLSCdB
-         qISGLxSJaNs+JUUvbM8FXzy2OTirEzU1whLCBwbJsuBLePOiMyrCufoYlY4bb/bJX8TB
-         Kruw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=iXMHLbguntKcuTgr1nAq0fpxZctLmOVLPocRZ01HV1s=;
-        b=bGVswk8V9vhIE2g62iRYeeLzhJBZgrs2ouacEH+gkfm/3fT3ZJpNppuKMYYeYZ6o3m
-         naM0UXF1nRKiqpQhR/9NONCUj8lKuk9TGQto8T1ZczeI9quUzBcw9v3UZQl0MfqWwcl8
-         vets8nCfk8F5sJ9lpl0x2/jPRr3atNURTzGL7ApoLfgo7WheVMCWPitz/DlvANUzFuJn
-         r0HMkGvnXHIARGg3PcXRphV7LSijBM3Uyw5W5g1uYPvICQ7YcOvwYkYwD35v9N3YkS9v
-         BypQE1PcsnvcrNe+OvQ9ezFxWOyVfvPnzOyH+zhYkgrMmc50FlTa30yRKAoSEDsMjWv7
-         VdBQ==
-X-Gm-Message-State: AOAM530mg27VAZLYmZcdK2mOZzaxsMOSnL9oQ9Peo+gqySlXenb3D+NX
-        PhX5c8HqQYwq6f1UBr1UJQS5Ww==
-X-Google-Smtp-Source: ABdhPJxwJ+AW8uQAXY8Win57SIEKcys5G+XsLikqbv6KNfk0Z4v0oLWW7NunPD5K78dMacn0DXTtuQ==
-X-Received: by 2002:a62:f201:: with SMTP id m1mr25533751pfh.198.1592898529334;
-        Tue, 23 Jun 2020 00:48:49 -0700 (PDT)
-Received: from [10.37.1.30] ([45.135.186.125])
-        by smtp.gmail.com with ESMTPSA id u6sm16409369pfc.83.2020.06.23.00.48.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jun 2020 00:48:48 -0700 (PDT)
-Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Hanjun Guo <guohanjun@huawei.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Tue, 23 Jun 2020 09:44:50 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailnew.west.internal (Postfix) with ESMTP id 3AF2A9D9;
+        Tue, 23 Jun 2020 09:44:48 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Tue, 23 Jun 2020 09:44:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cerno.tech; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:content-transfer-encoding:in-reply-to; s=fm3; bh=O
+        0g8wXDhwaGH3wxJIDz/XxJs/BJnWAIK7T3LcqUUYKI=; b=LwF6LgBLm/H54i4bs
+        dTm6x54o7AV9PmvS799JVOsUUj/jDz5jgfUhEon/VKaiOhJ45jyzb7ysGmYhQifi
+        KnCy+ilEbWV7JYA4wQH4EZ0wqTH/jgURP/ji6Inf2qxxeqWqPSAjKQJjw8lQFh15
+        3Xq3W6F5nAXmtNEPsRxyPGBrG4ImmPx9rS9ywI/IME7sfEvV5xUl+rYd0rraEHhV
+        T4z/KL7VleSP+aIiCb9GUK/5+KtAvAdRmrg+Rx0dqbw+qRz643ZyCFG3pWEAWoW2
+        Zr7JiO7KJ7+7rhy9EOyJNhv+ieEdsUKDsBL7B4FOgZRMKOY4hixZMB5SgENm7lae
+        q1+qQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:content-type
+        :date:from:in-reply-to:message-id:mime-version:references
+        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm3; bh=O0g8wXDhwaGH3wxJIDz/XxJs/BJnWAIK7T3LcqUUY
+        KI=; b=aYj0nDqL3IMLwvTDMgHK7kpquV6TSZk2izgJcAuo2I2h4+rTiOSYgX1Dp
+        7f7KjPVrB2d1h0aIwe1tNFQ8NzjNCU8nPbd6cJWytmh1XxBVHUUPiDOvor3Os+TD
+        iv+jotApenT6d6KjvnbxyNn88aMrqcPrOck0pfJqceD8MueyfWOaHMDsv+HnT/WQ
+        n4rKSkV4fXK1Ts4UTyNefURCxUBpCifiPhmV2/JoVcSlWV4kaKRSZZVDJuNMgtq8
+        DpdEFFfOBqz0oma6V10ax1hIU7LS/JKP+SJDeoe9DQLXoxTojCeXioOtxB2w6Wrh
+        0PgkyOyFw04OqioCMRneQGV64J+qw==
+X-ME-Sender: <xms:TQfyXgoWPKtkyOMzdHBQU4SkM1vZnLRvyEp7LiLsuAw9EfXoGrMIIA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrudekhedggedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvffukfhfgggtugfgjgesthhqredttddtjeenucfhrhhomhepofgrgihi
+    mhgvucftihhprghrugcuoehmrgigihhmvgestggvrhhnohdrthgvtghhqeenucggtffrrg
+    htthgvrhhnpefhueeggfdvieegjeeigeffudeuhfeuveeuieelgfffleelgedtiefgvdev
+    ieevvdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppeeltddrkeelrdeike
+    drjeeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhep
+    mhgrgihimhgvsegtvghrnhhordhtvggthh
+X-ME-Proxy: <xmx:TQfyXmp6kCnuarhDOFpKWBBiEDJCr6uq49ulhBBMIoLZxmMd5Zcvag>
+    <xmx:TQfyXlOzlz03GXkqCaoNFco4gwSPwQbXMKgd1Hhq5QcSpvh5gFMqIQ>
+    <xmx:TQfyXn5YGxSGoB_t0V0RPe5VDKph15fK0iJjW3HvPq1ELRhQ7iXMog>
+    <xmx:TwfyXnxxY0VIQfOKgYz-x0i5FYX_3WeZpJYYyWq7qFp7wOwcx4YPay1a4AU>
+Received: from localhost (lfbn-tou-1-1502-76.w90-89.abo.wanadoo.fr [90.89.68.76])
+        by mail.messagingengine.com (Postfix) with ESMTPA id B3A7E3280063;
+        Tue, 23 Jun 2020 09:44:44 -0400 (EDT)
+Date:   Tue, 23 Jun 2020 15:44:42 +0200
+From:   Maxime Ripard <maxime@cerno.tech>
+To:     Markus Elfring <Markus.Elfring@web.de>
+Cc:     Dinghao Liu <dinghao.liu@zju.edu.cn>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        Aditya Pakki <pakki001@umn.edu>,
+        Navid Emamdoost <emamd001@umn.edu>, Kangjie Lu <kjlu@umn.edu>,
+        Qiushi Wu <wu000273@umn.edu>, linux-kernel@vger.kernel.org,
+        YueHaibing <yuehaibing@huawei.com>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org
-References: <20200601174104.GA734973@bjorn-Precision-5520>
- <779f4044-cf6a-b0d3-916f-0274450c07d3@linaro.org>
- <20200622115536.GH3701@8bytes.org>
-From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-Message-ID: <d007cbea-85c0-6c75-fc4a-e2872ff59ea4@linaro.org>
-Date:   Tue, 23 Jun 2020 15:48:25 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Eric Biggers <ebiggers@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Chen-Yu Tsai <wens@csie.org>
+Subject: Re: [PATCH] crypto: sun8i-ce - Fix runtime PM imbalance in
+ sun8i_ce_cipher_init
+Message-ID: <20200623134442.wj4i3r3dlp6rtpaq@gilmour.lan>
+References: <265c3a75-f8ce-fb34-d559-39e58a4dfb4f@web.de>
 MIME-Version: 1.0
-In-Reply-To: <20200622115536.GH3701@8bytes.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <265c3a75-f8ce-fb34-d559-39e58a4dfb4f@web.de>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi, Joerg
+On Mon, Jun 22, 2020 at 07:50:08PM +0200, Markus Elfring wrote:
+> > Fix this by =E2=80=A6
+>=20
+> Please replace the beginning of this sentence with the tag =E2=80=9CFixes=
+=E2=80=9D.
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/D=
+ocumentation/process/submitting-patches.rst?id=3D625d3449788f85569096780592=
+549d0340e9c0c7#n183
 
-On 2020/6/22 下午7:55, Joerg Roedel wrote:
-> On Thu, Jun 04, 2020 at 09:33:07PM +0800, Zhangfei Gao wrote:
->> +++ b/drivers/iommu/iommu.c
->> @@ -2418,6 +2418,10 @@ int iommu_fwspec_init(struct device *dev, struct
->> fwnode_handle *iommu_fwnode,
->>          fwspec->iommu_fwnode = iommu_fwnode;
->>          fwspec->ops = ops;
->>          dev_iommu_fwspec_set(dev, fwspec);
->> +
->> +       if (dev_is_pci(dev))
->> +               pci_fixup_device(pci_fixup_final, to_pci_dev(dev));
->> +
-> That's not going to fly, I don't think we should run the fixups twice,
-> and they should not be run from IOMMU code. Is the only reason for this
-> second pass that iommu_fwspec is not yet allocated when it runs the
-> first time? I ask because it might be easier to just allocate the struct
-> earlier then.
-Thanks for looking this.
+No, not really. The comment you (partially) quoted explains how the
+issue is fixed, your suggestion explains what commit introduced the fix
+in the first place. They are both beneficial, but there's strictly no
+reason to remove the former for the latter.
 
-Yes, it is the only reason calling fixup secondly after iommu_fwspec is 
-allocated.
-
-The first time fixup final is very early in pci_bus_add_device.
-If allocating iommu_fwspec earlier, it maybe in pci_alloc_dev.
-And assigning ops still in iommu_fwspec_init.
-Have tested it works.
-Not sure is it acceptable?
-
-Alternatively, adding can_stall to struct pci_dev is simple but ugly too,
-since pci does not know stall now.
-
-
-Thanks
-
-
-
+Maxime
