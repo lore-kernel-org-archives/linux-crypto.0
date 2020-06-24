@@ -1,205 +1,80 @@
-Return-Path: <SRS0=7Iqi=AE=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=lcHd=AF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 707D8C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 18:44:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F4BC433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Jun 2020 00:23:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C38B207D0
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jun 2020 18:44:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EEtuDPY1"
+	by mail.kernel.org (Postfix) with ESMTP id B981220C09
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Jun 2020 00:23:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733248AbgFWSoK (ORCPT
+        id S2387839AbgFXAXw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Jun 2020 14:44:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37476 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733170AbgFWSoK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Jun 2020 14:44:10 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4BDBC061755
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Jun 2020 11:44:09 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id bh7so9472246plb.11
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Jun 2020 11:44:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tVAIyD3Q99J/GMICmIeAkqQ2ozy/kJogio/DjqwTxd4=;
-        b=EEtuDPY1GbikBTAidPmbruDGK25MoKvifRm2YmKNSvVSMvFkFGfcPTszizFx2ZO3Uc
-         VNDcm8tXj7W4BZ67+zXiWFMUJeQMWwX7CJ+SmVkQwAhpSmSqz6RooI3VNHZvSI22AX4q
-         GhueAACCOt8kapWjNle+aPk73Tv67szjODnpgYlgly1k0XkWlFEdJ9aQe3UQcXyAYIQh
-         7VkjMTQXs7Cq3aiwm6zuFGGWz71MaoIv056BfM1iILj/PYWhcssB1XpQB4SaQ0PCgmKd
-         pZUCqmFogFjudphRkRaHEekSJo8uPDk6HpzBuBQexLeH10hIbWEbGvUBi0Fd7ag2gRP3
-         CX8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tVAIyD3Q99J/GMICmIeAkqQ2ozy/kJogio/DjqwTxd4=;
-        b=N+wfPcGn0AZPyY8+I70JIYnnRKGs16FoEMMvYIdLxD+DmDGNnNynGgS9P/XSMp1qC9
-         AHrOfWTgP+fOYvIbtyi12RozX8FMK5ZGLz5fcp0gzyotZ6BqINkIxi6nGrFtvfI+cYfF
-         4wh/mthdOSH83RdxEs0V3N1BJh12TRxrtK/j8rQlwZ1SS5MNtU733kI2tbTd0rr2GVFv
-         YXffY4DYwSvsM7S0YxYhIfSj1M/cbFqzL5q7rkqq6az9yAyWHWknfLj3OZJRGLearmz/
-         TrFZAJWfPYNKxrNLSlay0moosbmQSWpoXB96m2A9fGXcfwocU9h/N9mmL3XmoB95JEoi
-         QjNQ==
-X-Gm-Message-State: AOAM530pRFMMYGIZgPpJpayiJojgvoIOFkFM9pmdws0mxBxB4QVmzFk6
-        qxwa4MHr8/VmCbEb0KnHJgeqD+jU04V7Pd3TElqOHQ==
-X-Google-Smtp-Source: ABdhPJxkTZ8OklVq6XLVRvsgjCCRCx7YdX1c5S+WBmUv2yWaRyLG3XJ1oou4wB7ZHPrctcGYyTcpwJZg9kPeBehN0TY=
-X-Received: by 2002:a17:90b:949:: with SMTP id dw9mr25483894pjb.101.1592937848930;
- Tue, 23 Jun 2020 11:44:08 -0700 (PDT)
+        Tue, 23 Jun 2020 20:23:52 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:47142 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387764AbgFXAXv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Jun 2020 20:23:51 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1jntCR-0007XQ-Sx; Wed, 24 Jun 2020 10:23:36 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 24 Jun 2020 10:23:35 +1000
+Date:   Wed, 24 Jun 2020 10:23:35 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        LTP List <ltp@lists.linux.it>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        lkft-triage@lists.linaro.org, linux-crypto@vger.kernel.org,
+        Jan Stancek <jstancek@redhat.com>, chrubis <chrubis@suse.cz>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        James Morris <jmorris@namei.org>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        David Howells <dhowells@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: LTP: crypto: af_alg02 regression on linux-next 20200621 tag
+Message-ID: <20200624002335.GC12716@gondor.apana.org.au>
+References: <CA+G9fYvHFs5Yx8TnT6VavtfjMN8QLPuXg6us-dXVJqUUt68adA@mail.gmail.com>
+ <20200622224920.GA4332@42.do-not-panic.com>
+ <CA+G9fYsXDZUspc5OyfqrGZn=k=2uRiGzWY_aPePK2C_kZ+dYGQ@mail.gmail.com>
+ <20200623064056.GA8121@gondor.apana.org.au>
+ <20200623170217.GB150582@gmail.com>
 MIME-Version: 1.0
-References: <20200623025628.18467-1-sedat.dilek@gmail.com>
-In-Reply-To: <20200623025628.18467-1-sedat.dilek@gmail.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Tue, 23 Jun 2020 11:43:58 -0700
-Message-ID: <CAKwvOdmR10E2uzKnq2Jt0DSw9+3uvjSfqidxppCoYmhNZPLx5Q@mail.gmail.com>
-Subject: Re: [PATCH 5.7 v2] x86/crypto: aesni: Fix build with LLVM_IAS=1
-To:     Sedat Dilek <sedat.dilek@gmail.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Craig Topper <craig.topper@intel.com>,
-        Craig Topper <craig.topper@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200623170217.GB150582@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 22, 2020 at 7:56 PM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+On Tue, Jun 23, 2020 at 10:02:17AM -0700, Eric Biggers wrote:
 >
-> When building with LLVM_IAS=1 means using Clang's Integrated Assembly (IAS)
-> from LLVM/Clang >= v10.0.1-rc1+ instead of GNU/as from GNU/binutils
-> I see the following breakage in Debian/testing AMD64:
->
-> <instantiation>:15:74: error: too many positional arguments
->  PRECOMPUTE 8*3+8(%rsp), %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
->                                                                          ^
->  arch/x86/crypto/aesni-intel_asm.S:1598:2: note: while in macro instantiation
->  GCM_INIT %r9, 8*3 +8(%rsp), 8*3 +16(%rsp), 8*3 +24(%rsp)
->  ^
-> <instantiation>:47:2: error: unknown use of instruction mnemonic without a size suffix
->  GHASH_4_ENCRYPT_4_PARALLEL_dec %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14, %xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7, %xmm8, enc
->  ^
-> arch/x86/crypto/aesni-intel_asm.S:1599:2: note: while in macro instantiation
->  GCM_ENC_DEC dec
->  ^
-> <instantiation>:15:74: error: too many positional arguments
->  PRECOMPUTE 8*3+8(%rsp), %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
->                                                                          ^
-> arch/x86/crypto/aesni-intel_asm.S:1686:2: note: while in macro instantiation
->  GCM_INIT %r9, 8*3 +8(%rsp), 8*3 +16(%rsp), 8*3 +24(%rsp)
->  ^
-> <instantiation>:47:2: error: unknown use of instruction mnemonic without a size suffix
->  GHASH_4_ENCRYPT_4_PARALLEL_enc %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14, %xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7, %xmm8, enc
->  ^
-> arch/x86/crypto/aesni-intel_asm.S:1687:2: note: while in macro instantiation
->  GCM_ENC_DEC enc
->
-> Craig Topper suggested me in ClangBuiltLinux issue #1050:
->
-> > I think the "too many positional arguments" is because the parser isn't able
-> > to handle the trailing commas.
-> >
-> > The "unknown use of instruction mnemonic" is because the macro was named
-> > GHASH_4_ENCRYPT_4_PARALLEL_DEC but its being instantiated with
-> > GHASH_4_ENCRYPT_4_PARALLEL_dec I guess gas ignores case on the
-> > macro instantiation, but llvm doesn't.
->
-> First, I removed the trailing comma in the PRECOMPUTE line.
->
-> Second, I substituted:
-> 1. GHASH_4_ENCRYPT_4_PARALLEL_DEC -> GHASH_4_ENCRYPT_4_PARALLEL_dec
-> 2. GHASH_4_ENCRYPT_4_PARALLEL_ENC -> GHASH_4_ENCRYPT_4_PARALLEL_enc
->
-> With these changes I was able to build with LLVM_IAS=1 and boot on bare metal.
->
-> I confirmed that this works with Linux-kernel v5.7.5 final.
->
-> NOTE: This patch is on top of Linux v5.7 final.
+> The source code for the two failing AF_ALG tests is here:
+> 
+> https://github.com/linux-test-project/ltp/blob/master/testcases/kernel/crypto/af_alg02.c
+> https://github.com/linux-test-project/ltp/blob/master/testcases/kernel/crypto/af_alg05.c
+> 
+> They use read() and write(), not send() and recv().
+> 
+> af_alg02 uses read() to read from a "salsa20" request socket without writing
+> anything to it.  It is expected that this returns 0, i.e. that behaves like
+> encrypting an empty message.
+> 
+> af_alg05 uses write() to write 15 bytes to a "cbc(aes-generic)" request socket,
+> then read() to read 15 bytes.  It is expected that this fails with EINVAL, since
+> the length is not aligned to the AES block size (16 bytes).
 
-Thanks for the note, still applies cleanly on top of linux-next today for me.
-
->
-> Thanks to Craig and especially Nick for double-checking and his comments.
->
-> Suggested-by: Craig Topper <craig.topper@intel.com>
-> Suggested-by: Craig Topper <craig.topper@gmail.com>
-> Suggested-by: Nick Desaulniers ndesaulniers@google.com
-
-^ oh, may have missed <> around email addr.
-
-> Cc: "ClangBuiltLinux" <clang-built-linux@googlegroups.com>
-> Link: https://github.com/ClangBuiltLinux/linux/issues/1050
-> Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
-
-Following the same testing methodology from V1
-(https://lore.kernel.org/patchwork/comment/1456822/) I verified for
-GCC+GAS this is no functional change.
-
-$ wget https://lore.kernel.org/patchwork/patch/1261340/mbox/ -O sedat_v3.patch
-$ git am sedat_v3.patch
-$ make -j71 arch/x86/crypto/aesni-intel_asm.o
-$ llvm-objdump -dr arch/x86/crypto/aesni-intel_asm.o > postpatch_v3.txt
-$ diff -u <(cat prepatch.txt | tr -s ' ' | cut -d '    ' -f 2-) <(cat
-postpatch_v3.txt| tr -s ' ' | cut -d '   ' -f 2-) | less
-(no output)
-
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-
-> ---
->  arch/x86/crypto/aesni-intel_asm.S | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-> index cad6e1bfa7d5..c216de287742 100644
-> --- a/arch/x86/crypto/aesni-intel_asm.S
-> +++ b/arch/x86/crypto/aesni-intel_asm.S
-> @@ -266,7 +266,7 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
->         PSHUFB_XMM %xmm2, %xmm0
->         movdqu %xmm0, CurCount(%arg2) # ctx_data.current_counter = iv
->
-> -       PRECOMPUTE \SUBKEY, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
-> +       PRECOMPUTE \SUBKEY, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7
->         movdqu HashKey(%arg2), %xmm13
->
->         CALC_AAD_HASH %xmm13, \AAD, \AADLEN, %xmm0, %xmm1, %xmm2, %xmm3, \
-> @@ -978,7 +978,7 @@ _initial_blocks_done\@:
->  * arg1, %arg3, %arg4 are used as pointers only, not modified
->  * %r11 is the data offset value
->  */
-> -.macro GHASH_4_ENCRYPT_4_PARALLEL_ENC TMP1 TMP2 TMP3 TMP4 TMP5 \
-> +.macro GHASH_4_ENCRYPT_4_PARALLEL_enc TMP1 TMP2 TMP3 TMP4 TMP5 \
->  TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
->
->         movdqa    \XMM1, \XMM5
-> @@ -1186,7 +1186,7 @@ aes_loop_par_enc_done\@:
->  * arg1, %arg3, %arg4 are used as pointers only, not modified
->  * %r11 is the data offset value
->  */
-> -.macro GHASH_4_ENCRYPT_4_PARALLEL_DEC TMP1 TMP2 TMP3 TMP4 TMP5 \
-> +.macro GHASH_4_ENCRYPT_4_PARALLEL_dec TMP1 TMP2 TMP3 TMP4 TMP5 \
->  TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
->
->         movdqa    \XMM1, \XMM5
-> --
-
+Thanks.  Sounds like it's my introduction of the init variable that
+broke this.  Let me investigate.
 -- 
-Thanks,
-~Nick Desaulniers
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
