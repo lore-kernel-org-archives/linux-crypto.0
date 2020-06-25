@@ -2,42 +2,43 @@ Return-Path: <SRS0=hy52=AG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52E47C433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jun 2020 12:43:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7E84C433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jun 2020 12:43:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 308232082F
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jun 2020 12:43:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89B3D2088E
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jun 2020 12:43:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1593089001;
-	bh=L8fU5fAz7pCpg4HnWH2xhwqLiRr2Tw/EYLrtbhRzhMk=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=p18PYfnq8Q+VTSu+tnVoPMVO+w8nQ0cyUjOF7wT1xW9OSYDZM0WCLzGxt+S3rtzhj
-	 Vi5IjUX5p0asQxeqenHZdAWEjEeVrhGWzmR8OtqOaA50DFsc8nA8VTTE4s8OxhxcF7
-	 O/EuQP/3ODUWotnbiZF/oyHiZQKjfrqUCJIKx5rQ=
+	s=default; t=1593089004;
+	bh=c+inIYObGSZUVYp7oF5MvXqUUSrjOBVfIrZv9HY3hO8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=qmYpAcPNqhiriGPXiNygnTf86z5U5bY+TNs1LWweEt5CBJFg73P9ajuqZ8pImanja
+	 Y2tnEYg3Ze9WDuTUxi10hTacVrKIdsHoMGNJormbSBbpdSv6RVM4v6iM8CJYqINi+1
+	 JOt/lNdCb7mKUWTmHKOD7i8pXxTc19Xaj3TT/RI8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404652AbgFYMnU (ORCPT
+        id S2404780AbgFYMnX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Jun 2020 08:43:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45714 "EHLO mail.kernel.org"
+        Thu, 25 Jun 2020 08:43:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45774 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404285AbgFYMnT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Jun 2020 08:43:19 -0400
+        id S2404285AbgFYMnX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Jun 2020 08:43:23 -0400
 Received: from localhost.localdomain (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8631F206BE;
-        Thu, 25 Jun 2020 12:43:15 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9368A207E8;
+        Thu, 25 Jun 2020 12:43:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1593088999;
-        bh=L8fU5fAz7pCpg4HnWH2xhwqLiRr2Tw/EYLrtbhRzhMk=;
-        h=From:To:Cc:Subject:Date:From;
-        b=uLKslSnGx7g/s55qBe761CpJrI854/NuYwG6EgQgXUG+Nia3TSmvkIajhlbPwVPwh
-         BDsI+JcTMOAdhdz7XuMWt2k9b9IKTRGM3fyMVcUKxd+ae7hr7JxbqM6DbbNQVMVdPc
-         DqzzoonHEA1JiqOmJTfhABgOdbjp7Np/KAAZTk3M=
+        s=default; t=1593089003;
+        bh=c+inIYObGSZUVYp7oF5MvXqUUSrjOBVfIrZv9HY3hO8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=XHnxyn+umL7xjsWbcPaEEpz9fmEaU36nRZlbaYhyeyHyJ7svn/xv3pTucjhOHQT/U
+         W+0kAGtDwk48a+grcEYWi2/HaF3cgvOlAoPQtbXsUYqHoQzI1yQ8pRlCLjoSgWsjq+
+         SdGtX6T3Kq7hMNPi6uenO6mm5dmnvaEpgDvgDbdw=
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org,
@@ -59,10 +60,12 @@ Cc:     linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org,
         NXP Linux Team <linux-imx@nxp.com>,
         Jamie Iles <jamie@jamieiles.com>,
         Eric Biggers <ebiggers@google.com>
-Subject: [PATCH 00/12] crypto: permit asynchronous skciphers as driver fallbacks
-Date:   Thu, 25 Jun 2020 14:42:41 +0200
-Message-Id: <20200625124253.1906557-1-ardb@kernel.org>
+Subject: [PATCH 01/12] crypto: amlogic-gxl - default to build as module
+Date:   Thu, 25 Jun 2020 14:42:42 +0200
+Message-Id: <20200625124253.1906557-2-ardb@kernel.org>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200625124253.1906557-1-ardb@kernel.org>
+References: <20200625124253.1906557-1-ardb@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -70,83 +73,33 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The drivers for crypto accelerators in drivers/crypto all implement skciphers
-of an asynchronous nature, given that they are backed by hardware DMA that
-completes asynchronously wrt the execution flow.
+The AmLogic GXL crypto accelerator driver is built into the kernel if
+ARCH_MESON is set. However, given the single image policy of arm64, its
+defconfig enables all platforms by default, and so ARCH_MESON is usually
+enabled.
 
-However, in many cases, any fallbacks they allocate are limited to the
-synchronous variety, which rules out the use of SIMD implementations of
-AES in ECB, CBC and XTS modes, given that they are usually built on top
-of the asynchronous SIMD helper, which queues requests for asynchronous
-completion if they are issued from a context that does not permit the use
-of the SIMD register file.
+This means that the AmLogic driver causes the arm64 defconfig build to
+pull in a huge chunk of the crypto stack as a builtin as well, which is
+undesirable, so let's make the amlogic GXL driver default to 'm' instead.
 
-This may result in sub-optimal AES implementations to be selected as
-fallbacks, or even less secure ones if the only synchronous alternative
-is table based, and therefore not time invariant.
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ drivers/crypto/amlogic/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-So switch all these cases over to the asynchronous API, by moving the
-subrequest into the skcipher request context, and permitting it to
-complete asynchronously via the caller provided completion function.
-
-Patch #1 is not related, but touches the same driver as #2 so it is
-included anyway.
-
-Only OMAP was tested on actual hardware - the others are build tested only.
-
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Maxime Ripard <mripard@kernel.org>
-Cc: Chen-Yu Tsai <wens@csie.org>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Ayush Sawal <ayush.sawal@chelsio.com>
-Cc: Vinay Kumar Yadav <vinay.yadav@chelsio.com>
-Cc: Rohit Maheshwari <rohitm@chelsio.com>
-Cc: Shawn Guo <shawnguo@kernel.org>
-Cc: Sascha Hauer <s.hauer@pengutronix.de>
-Cc: Pengutronix Kernel Team <kernel@pengutronix.de>
-Cc: Fabio Estevam <festevam@gmail.com>
-Cc: NXP Linux Team <linux-imx@nxp.com>
-Cc: Jamie Iles <jamie@jamieiles.com>
-Cc: Eric Biggers <ebiggers@google.com>
-
-Ard Biesheuvel (12):
-  crypto: amlogic-gxl - default to build as module
-  crypto: amlogic-gxl - permit async skcipher as fallback
-  crypto: omap-aes - permit asynchronous skcipher as fallback
-  crypto: sun4i - permit asynchronous skcipher as fallback
-  crypto: sun8i-ce - permit asynchronous skcipher as fallback
-  crypto: sun8i-ss - permit asynchronous skcipher as fallback
-  crypto: ccp - permit asynchronous skcipher as fallback
-  crypto: chelsio - permit asynchronous skcipher as fallback
-  crypto: mxs-dcp - permit asynchronous skcipher as fallback
-  crypto: picoxcell - permit asynchronous skcipher as fallback
-  crypto: qce - permit asynchronous skcipher as fallback
-  crypto: sahara - permit asynchronous skcipher as fallback
-
- drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c | 46 +++++-----
- drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h        |  3 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 41 ++++-----
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h        |  3 +-
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 39 ++++----
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h        |  3 +-
- drivers/crypto/amlogic/Kconfig                      |  2 +-
- drivers/crypto/amlogic/amlogic-gxl-cipher.c         | 27 +++---
- drivers/crypto/amlogic/amlogic-gxl.h                |  3 +-
- drivers/crypto/ccp/ccp-crypto-aes-xts.c             | 31 +++----
- drivers/crypto/ccp/ccp-crypto.h                     |  4 +-
- drivers/crypto/chelsio/chcr_algo.c                  | 57 +++++-------
- drivers/crypto/chelsio/chcr_crypto.h                |  3 +-
- drivers/crypto/mxs-dcp.c                            | 33 +++----
- drivers/crypto/omap-aes.c                           | 35 ++++---
- drivers/crypto/omap-aes.h                           |  3 +-
- drivers/crypto/picoxcell_crypto.c                   | 34 ++++---
- drivers/crypto/qce/cipher.h                         |  3 +-
- drivers/crypto/qce/skcipher.c                       | 27 +++---
- drivers/crypto/sahara.c                             | 96 +++++++++-----------
- 20 files changed, 244 insertions(+), 249 deletions(-)
-
+diff --git a/drivers/crypto/amlogic/Kconfig b/drivers/crypto/amlogic/Kconfig
+index cf9547602670..cf2c676a7093 100644
+--- a/drivers/crypto/amlogic/Kconfig
++++ b/drivers/crypto/amlogic/Kconfig
+@@ -1,7 +1,7 @@
+ config CRYPTO_DEV_AMLOGIC_GXL
+ 	tristate "Support for amlogic cryptographic offloader"
+ 	depends on HAS_IOMEM
+-	default y if ARCH_MESON
++	default m if ARCH_MESON
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_ENGINE
+ 	select CRYPTO_ECB
 -- 
 2.27.0
 
