@@ -2,175 +2,151 @@ Return-Path: <SRS0=hy52=AG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F83CC433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jun 2020 07:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52E47C433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jun 2020 12:43:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 366AD20899
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jun 2020 07:54:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 308232082F
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jun 2020 12:43:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1593089001;
+	bh=L8fU5fAz7pCpg4HnWH2xhwqLiRr2Tw/EYLrtbhRzhMk=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=p18PYfnq8Q+VTSu+tnVoPMVO+w8nQ0cyUjOF7wT1xW9OSYDZM0WCLzGxt+S3rtzhj
+	 Vi5IjUX5p0asQxeqenHZdAWEjEeVrhGWzmR8OtqOaA50DFsc8nA8VTTE4s8OxhxcF7
+	 O/EuQP/3ODUWotnbiZF/oyHiZQKjfrqUCJIKx5rQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390450AbgFYHye convert rfc822-to-8bit (ORCPT
+        id S2404652AbgFYMnU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Jun 2020 03:54:34 -0400
-Received: from relay8-d.mail.gandi.net ([217.70.183.201]:35577 "EHLO
-        relay8-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390360AbgFYHyd (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Jun 2020 03:54:33 -0400
-X-Originating-IP: 90.76.143.236
-Received: from localhost (lfbn-tou-1-1075-236.w90-76.abo.wanadoo.fr [90.76.143.236])
-        (Authenticated sender: antoine.tenart@bootlin.com)
-        by relay8-d.mail.gandi.net (Postfix) with ESMTPSA id 2787C1BF209;
-        Thu, 25 Jun 2020 07:54:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <20200625071816.1739528-1-ardb@kernel.org>
-References: <20200625071816.1739528-1-ardb@kernel.org>
-Subject: Re: [PATCH v2] net: phy: mscc: avoid skcipher API for single block AES encryption
-Cc:     linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
+        Thu, 25 Jun 2020 08:43:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45714 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2404285AbgFYMnT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Jun 2020 08:43:19 -0400
+Received: from localhost.localdomain (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8631F206BE;
+        Thu, 25 Jun 2020 12:43:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1593088999;
+        bh=L8fU5fAz7pCpg4HnWH2xhwqLiRr2Tw/EYLrtbhRzhMk=;
+        h=From:To:Cc:Subject:Date:From;
+        b=uLKslSnGx7g/s55qBe761CpJrI854/NuYwG6EgQgXUG+Nia3TSmvkIajhlbPwVPwh
+         BDsI+JcTMOAdhdz7XuMWt2k9b9IKTRGM3fyMVcUKxd+ae7hr7JxbqM6DbbNQVMVdPc
+         DqzzoonHEA1JiqOmJTfhABgOdbjp7Np/KAAZTk3M=
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org,
+        linux-amlogic@lists.infradead.org,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, stable@vger.kernel.org,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ayush Sawal <ayush.sawal@chelsio.com>,
+        Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
+        Rohit Maheshwari <rohitm@chelsio.com>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Jamie Iles <jamie@jamieiles.com>,
         Eric Biggers <ebiggers@google.com>
-From:   Antoine Tenart <antoine.tenart@bootlin.com>
-To:     Ard Biesheuvel <ardb@kernel.org>, netdev@vger.kernel.org
-Message-ID: <159307166803.397581.14181147952249059680@kwain>
-Date:   Thu, 25 Jun 2020 09:54:28 +0200
+Subject: [PATCH 00/12] crypto: permit asynchronous skciphers as driver fallbacks
+Date:   Thu, 25 Jun 2020 14:42:41 +0200
+Message-Id: <20200625124253.1906557-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.27.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Ard,
+The drivers for crypto accelerators in drivers/crypto all implement skciphers
+of an asynchronous nature, given that they are backed by hardware DMA that
+completes asynchronously wrt the execution flow.
 
-Quoting Ard Biesheuvel (2020-06-25 09:18:16)
-> The skcipher API dynamically instantiates the transformation object
-> on request that implements the requested algorithm optimally on the
-> given platform. This notion of optimality only matters for cases like
-> bulk network or disk encryption, where performance can be a bottleneck,
-> or in cases where the algorithm itself is not known at compile time.
-> 
-> In the mscc case, we are dealing with AES encryption of a single
-> block, and so neither concern applies, and we are better off using
-> the AES library interface, which is lightweight and safe for this
-> kind of use.
-> 
-> Note that the scatterlist API does not permit references to buffers
-> that are located on the stack, so the existing code is incorrect in
-> any case, but avoiding the skcipher and scatterlist APIs entirely is
-> the most straight-forward approach to fixing this.
-> 
-> Cc: Antoine Tenart <antoine.tenart@bootlin.com>
-> Cc: Andrew Lunn <andrew@lunn.ch>
-> Cc: Florian Fainelli <f.fainelli@gmail.com>
-> Cc: Heiner Kallweit <hkallweit1@gmail.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: <stable@vger.kernel.org>
-> Fixes: 28c5107aa904e ("net: phy: mscc: macsec support")
-> Reviewed-by: Eric Biggers <ebiggers@google.com>
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+However, in many cases, any fallbacks they allocate are limited to the
+synchronous variety, which rules out the use of SIMD implementations of
+AES in ECB, CBC and XTS modes, given that they are usually built on top
+of the asynchronous SIMD helper, which queues requests for asynchronous
+completion if they are issued from a context that does not permit the use
+of the SIMD register file.
 
-Tested-by: Antoine Tenart <antoine.tenart@bootlin.com>
+This may result in sub-optimal AES implementations to be selected as
+fallbacks, or even less secure ones if the only synchronous alternative
+is table based, and therefore not time invariant.
 
-That improves and simplifies a lot the code, thank you!
-Antoine
+So switch all these cases over to the asynchronous API, by moving the
+subrequest into the skcipher request context, and permitting it to
+complete asynchronously via the caller provided completion function.
 
-> ---
-> v2:
-> - select CRYPTO_LIB_AES only if MACSEC is enabled
-> - add Eric's R-b
-> 
->  drivers/net/phy/Kconfig            |  3 +-
->  drivers/net/phy/mscc/mscc_macsec.c | 40 +++++---------------
->  2 files changed, 10 insertions(+), 33 deletions(-)
-> 
-> diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-> index f25702386d83..e351d65533aa 100644
-> --- a/drivers/net/phy/Kconfig
-> +++ b/drivers/net/phy/Kconfig
-> @@ -480,8 +480,7 @@ config MICROCHIP_T1_PHY
->  config MICROSEMI_PHY
->         tristate "Microsemi PHYs"
->         depends on MACSEC || MACSEC=n
-> -       select CRYPTO_AES
-> -       select CRYPTO_ECB
-> +       select CRYPTO_LIB_AES if MACSEC
->         help
->           Currently supports VSC8514, VSC8530, VSC8531, VSC8540 and VSC8541 PHYs
->  
-> diff --git a/drivers/net/phy/mscc/mscc_macsec.c b/drivers/net/phy/mscc/mscc_macsec.c
-> index b4d3dc4068e2..d53ca884b5c9 100644
-> --- a/drivers/net/phy/mscc/mscc_macsec.c
-> +++ b/drivers/net/phy/mscc/mscc_macsec.c
-> @@ -10,7 +10,7 @@
->  #include <linux/phy.h>
->  #include <dt-bindings/net/mscc-phy-vsc8531.h>
->  
-> -#include <crypto/skcipher.h>
-> +#include <crypto/aes.h>
->  
->  #include <net/macsec.h>
->  
-> @@ -500,39 +500,17 @@ static u32 vsc8584_macsec_flow_context_id(struct macsec_flow *flow)
->  static int vsc8584_macsec_derive_key(const u8 key[MACSEC_KEYID_LEN],
->                                      u16 key_len, u8 hkey[16])
->  {
-> -       struct crypto_skcipher *tfm = crypto_alloc_skcipher("ecb(aes)", 0, 0);
-> -       struct skcipher_request *req = NULL;
-> -       struct scatterlist src, dst;
-> -       DECLARE_CRYPTO_WAIT(wait);
-> -       u32 input[4] = {0};
-> +       const u8 input[AES_BLOCK_SIZE] = {0};
-> +       struct crypto_aes_ctx ctx;
->         int ret;
->  
-> -       if (IS_ERR(tfm))
-> -               return PTR_ERR(tfm);
-> -
-> -       req = skcipher_request_alloc(tfm, GFP_KERNEL);
-> -       if (!req) {
-> -               ret = -ENOMEM;
-> -               goto out;
-> -       }
-> -
-> -       skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
-> -                                     CRYPTO_TFM_REQ_MAY_SLEEP, crypto_req_done,
-> -                                     &wait);
-> -       ret = crypto_skcipher_setkey(tfm, key, key_len);
-> -       if (ret < 0)
-> -               goto out;
-> -
-> -       sg_init_one(&src, input, 16);
-> -       sg_init_one(&dst, hkey, 16);
-> -       skcipher_request_set_crypt(req, &src, &dst, 16, NULL);
-> -
-> -       ret = crypto_wait_req(crypto_skcipher_encrypt(req), &wait);
-> +       ret = aes_expandkey(&ctx, key, key_len);
-> +       if (ret)
-> +               return ret;
->  
-> -out:
-> -       skcipher_request_free(req);
-> -       crypto_free_skcipher(tfm);
-> -       return ret;
-> +       aes_encrypt(&ctx, hkey, input);
-> +       memzero_explicit(&ctx, sizeof(ctx));
-> +       return 0;
->  }
->  
->  static int vsc8584_macsec_transformation(struct phy_device *phydev,
-> -- 
-> 2.27.0
-> 
+Patch #1 is not related, but touches the same driver as #2 so it is
+included anyway.
+
+Only OMAP was tested on actual hardware - the others are build tested only.
+
+Cc: Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Maxime Ripard <mripard@kernel.org>
+Cc: Chen-Yu Tsai <wens@csie.org>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Ayush Sawal <ayush.sawal@chelsio.com>
+Cc: Vinay Kumar Yadav <vinay.yadav@chelsio.com>
+Cc: Rohit Maheshwari <rohitm@chelsio.com>
+Cc: Shawn Guo <shawnguo@kernel.org>
+Cc: Sascha Hauer <s.hauer@pengutronix.de>
+Cc: Pengutronix Kernel Team <kernel@pengutronix.de>
+Cc: Fabio Estevam <festevam@gmail.com>
+Cc: NXP Linux Team <linux-imx@nxp.com>
+Cc: Jamie Iles <jamie@jamieiles.com>
+Cc: Eric Biggers <ebiggers@google.com>
+
+Ard Biesheuvel (12):
+  crypto: amlogic-gxl - default to build as module
+  crypto: amlogic-gxl - permit async skcipher as fallback
+  crypto: omap-aes - permit asynchronous skcipher as fallback
+  crypto: sun4i - permit asynchronous skcipher as fallback
+  crypto: sun8i-ce - permit asynchronous skcipher as fallback
+  crypto: sun8i-ss - permit asynchronous skcipher as fallback
+  crypto: ccp - permit asynchronous skcipher as fallback
+  crypto: chelsio - permit asynchronous skcipher as fallback
+  crypto: mxs-dcp - permit asynchronous skcipher as fallback
+  crypto: picoxcell - permit asynchronous skcipher as fallback
+  crypto: qce - permit asynchronous skcipher as fallback
+  crypto: sahara - permit asynchronous skcipher as fallback
+
+ drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c | 46 +++++-----
+ drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h        |  3 +-
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 41 ++++-----
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h        |  3 +-
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 39 ++++----
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h        |  3 +-
+ drivers/crypto/amlogic/Kconfig                      |  2 +-
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c         | 27 +++---
+ drivers/crypto/amlogic/amlogic-gxl.h                |  3 +-
+ drivers/crypto/ccp/ccp-crypto-aes-xts.c             | 31 +++----
+ drivers/crypto/ccp/ccp-crypto.h                     |  4 +-
+ drivers/crypto/chelsio/chcr_algo.c                  | 57 +++++-------
+ drivers/crypto/chelsio/chcr_crypto.h                |  3 +-
+ drivers/crypto/mxs-dcp.c                            | 33 +++----
+ drivers/crypto/omap-aes.c                           | 35 ++++---
+ drivers/crypto/omap-aes.h                           |  3 +-
+ drivers/crypto/picoxcell_crypto.c                   | 34 ++++---
+ drivers/crypto/qce/cipher.h                         |  3 +-
+ drivers/crypto/qce/skcipher.c                       | 27 +++---
+ drivers/crypto/sahara.c                             | 96 +++++++++-----------
+ 20 files changed, 244 insertions(+), 249 deletions(-)
 
 -- 
-Antoine Ténart, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+2.27.0
+
