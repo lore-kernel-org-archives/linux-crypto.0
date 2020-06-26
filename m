@@ -2,271 +2,125 @@ Return-Path: <SRS0=PFiu=AH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BD45C433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 10:32:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EED5C433DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 15:18:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D72F2076E
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 10:32:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F84E20702
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 15:18:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QHSRrY0d"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727799AbgFZKcv (ORCPT
+        id S1729393AbgFZPSN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Jun 2020 06:32:51 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:6833 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727932AbgFZKcu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jun 2020 06:32:50 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 9C0B67A6A4A48521D8AC
-        for <linux-crypto@vger.kernel.org>; Fri, 26 Jun 2020 18:32:43 +0800 (CST)
-Received: from huawei.com (10.67.165.24) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Fri, 26 Jun 2020
- 18:32:39 +0800
-From:   Longfang Liu <liulongfang@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>
-Subject: [PATCH 2/5] crypto:hisilicon/sec2 - update busy processing logic
-Date:   Fri, 26 Jun 2020 18:32:06 +0800
-Message-ID: <1593167529-22463-3-git-send-email-liulongfang@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1593167529-22463-1-git-send-email-liulongfang@huawei.com>
-References: <1593167529-22463-1-git-send-email-liulongfang@huawei.com>
+        Fri, 26 Jun 2020 11:18:13 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52988 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726878AbgFZPSM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Jun 2020 11:18:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593184691;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=KhyzVywFi03LMkGFE6YU3ix+rjL9u5JtHjzF89C3iwg=;
+        b=QHSRrY0dIfJbA3UqF3cyR6vr1rgEMinv/gy5UCNg4gF7UcTdP1mGsCnFhHBgIZWODI5dn5
+        OLzjRSlmhAszCVjrvFDd3Y88pkfPoN7jaq3h+FshycLfOBEYkyfVZ0Z/bqG4IZxvGQXFtv
+        IHAhH4c78Wiee9tvkhPpvWujX7c5zxc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-BpksQRLTM9a38lmnoLB9TQ-1; Fri, 26 Jun 2020 11:18:04 -0400
+X-MC-Unique: BpksQRLTM9a38lmnoLB9TQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9775418FE866;
+        Fri, 26 Jun 2020 15:18:02 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 814FC5C557;
+        Fri, 26 Jun 2020 15:17:58 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 05QFHwaF013492;
+        Fri, 26 Jun 2020 11:17:58 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 05QFHuir013488;
+        Fri, 26 Jun 2020 11:17:56 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Fri, 26 Jun 2020 11:17:56 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+cc:     Eric Biggers <ebiggers@kernel.org>,
+        Mike Snitzer <msnitzer@redhat.com>,
+        linux-kernel@vger.kernel.org, dm-devel@redhat.com,
+        linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Milan Broz <mbroz@redhat.com>,
+        Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
+        George Cherian <gcherian@marvell.com>,
+        Wei Xu <xuwei5@hisilicon.com>, Zaibo Xu <xuzaibo@Huawei.com>
+Subject: Re: [PATCH 1/3] crypto: pass the flag CRYPTO_ALG_ALLOCATES_MEMORY
+In-Reply-To: <20200626044534.GA2870@gondor.apana.org.au>
+Message-ID: <alpine.LRH.2.02.2006261109520.11899@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.2006091259250.30590@file01.intranet.prod.int.rdu2.redhat.com> <20200610010450.GA6449@gondor.apana.org.au> <alpine.LRH.2.02.2006100756270.27811@file01.intranet.prod.int.rdu2.redhat.com> <20200610121106.GA23137@gondor.apana.org.au>
+ <alpine.LRH.2.02.2006161052540.28052@file01.intranet.prod.int.rdu2.redhat.com> <alpine.LRH.2.02.2006161101080.28052@file01.intranet.prod.int.rdu2.redhat.com> <20200616173620.GA207319@gmail.com> <alpine.LRH.2.02.2006171107220.18714@file01.intranet.prod.int.rdu2.redhat.com>
+ <alpine.LRH.2.02.2006171108440.18714@file01.intranet.prod.int.rdu2.redhat.com> <20200626044534.GA2870@gondor.apana.org.au>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Kai Ye <yekai13@huawei.com>
 
-As before, if a SEC queue is at the 'fake busy' status,
-the request with a 'fake busy' flag will be sent into hardware
-and the sending function returns busy. After the request is
-finished, SEC driver's call back will identify the 'fake busy' flag,
-and notifies the user that hardware is not busy now by calling
-user's call back function.
 
-Now, a request sent into busy hardware will be cached in the
-SEC queue's backlog, return '-EBUSY' to user.
-After the request being finished, the cached requests will
-be processed in the call back function. to notify the
-corresponding user that SEC queue can process more requests.
+On Fri, 26 Jun 2020, Herbert Xu wrote:
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
-Reviewed-by: Longfang Liu <liulongfang@huawei.com>
----
- drivers/crypto/hisilicon/sec2/sec.h        |  3 ++
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 81 +++++++++++++++++++++---------
- drivers/crypto/hisilicon/sec2/sec_main.c   |  1 +
- 3 files changed, 61 insertions(+), 24 deletions(-)
+> On Wed, Jun 17, 2020 at 11:09:28AM -0400, Mikulas Patocka wrote:
+> >
+> > Index: linux-2.6/include/linux/crypto.h
+> > ===================================================================
+> > --- linux-2.6.orig/include/linux/crypto.h
+> > +++ linux-2.6/include/linux/crypto.h
+> > @@ -97,9 +97,18 @@
+> >  #define CRYPTO_ALG_OPTIONAL_KEY		0x00004000
+> >  
+> >  /*
+> > + * The driver may allocate memory during request processing, so it shouldn't be
+> > + * used in cases where memory allocation failures aren't acceptable, such as
+> > + * during block device encryption.
+> > + */
+> > +#define CRYPTO_ALG_ALLOCATES_MEMORY	0x00008000
+> > +
+> > +/*
+> >   * Don't trigger module loading
+> >   */
+> > -#define CRYPTO_NOLOAD			0x00008000
+> > +#define CRYPTO_NOLOAD			0x00010000
+> > +
+> > +#define CRYPTO_ALG_INHERITED_FLAGS	(CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY)
+> 
+> Any reason why you need to renumber NOLOAD? If not please keep
+> the existing values.
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 7b64aca..ce91c4d 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -46,6 +46,7 @@ struct sec_req {
- 
- 	struct sec_cipher_req c_req;
- 	struct sec_aead_req aead_req;
-+	struct list_head backlog_head;
- 
- 	int err_type;
- 	int req_id;
-@@ -104,6 +105,7 @@ struct sec_qp_ctx {
- 	struct sec_alg_res res[QM_Q_DEPTH];
- 	struct sec_ctx *ctx;
- 	struct mutex req_lock;
-+	struct list_head backlog;
- 	struct hisi_acc_sgl_pool *c_in_pool;
- 	struct hisi_acc_sgl_pool *c_out_pool;
- 	atomic_t pending_reqs;
-@@ -161,6 +163,7 @@ struct sec_dfx {
- 	atomic64_t send_cnt;
- 	atomic64_t recv_cnt;
- 	atomic64_t send_busy_cnt;
-+	atomic64_t recv_busy_cnt;
- 	atomic64_t err_bd_cnt;
- 	atomic64_t invalid_req_cnt;
- 	atomic64_t done_flag_cnt;
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 64614a9..85fcb4d 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -166,6 +166,7 @@ static void sec_req_cb(struct hisi_qp *qp, void *resp)
- 	req = qp_ctx->req_list[le16_to_cpu(bd->type2.tag)];
- 	if (unlikely(!req)) {
- 		atomic64_inc(&dfx->invalid_req_cnt);
-+		atomic_inc(&qp->qp_status.used);
- 		return;
- 	}
- 	req->err_type = bd->type2.error_type;
-@@ -200,19 +201,23 @@ static int sec_bd_send(struct sec_ctx *ctx, struct sec_req *req)
- 
- 	mutex_lock(&qp_ctx->req_lock);
- 	ret = hisi_qp_send(qp_ctx->qp, &req->sec_sqe);
-+
-+	if (ctx->fake_req_limit <=
-+	    atomic_read(&qp_ctx->qp->qp_status.used) && !ret) {
-+		list_add_tail(&req->backlog_head, &qp_ctx->backlog);
-+		atomic64_inc(&ctx->sec->debug.dfx.send_cnt);
-+		atomic64_inc(&ctx->sec->debug.dfx.send_busy_cnt);
-+		mutex_unlock(&qp_ctx->req_lock);
-+		return -EBUSY;
-+	}
- 	mutex_unlock(&qp_ctx->req_lock);
--	atomic64_inc(&ctx->sec->debug.dfx.send_cnt);
- 
- 	if (unlikely(ret == -EBUSY))
- 		return -ENOBUFS;
- 
--	if (!ret) {
--		if (req->fake_busy) {
--			atomic64_inc(&ctx->sec->debug.dfx.send_busy_cnt);
--			ret = -EBUSY;
--		} else {
--			ret = -EINPROGRESS;
--		}
-+	if (likely(!ret)) {
-+		ret = -EINPROGRESS;
-+		atomic64_inc(&ctx->sec->debug.dfx.send_cnt);
- 	}
- 
- 	return ret;
-@@ -373,8 +378,8 @@ static int sec_create_qp_ctx(struct hisi_qm *qm, struct sec_ctx *ctx,
- 	qp_ctx->ctx = ctx;
- 
- 	mutex_init(&qp_ctx->req_lock);
--	atomic_set(&qp_ctx->pending_reqs, 0);
- 	idr_init(&qp_ctx->req_idr);
-+	INIT_LIST_HEAD(&qp_ctx->backlog);
- 
- 	qp_ctx->c_in_pool = hisi_acc_create_sgl_pool(dev, QM_Q_DEPTH,
- 						     SEC_SGL_SGE_NR);
-@@ -1048,21 +1053,49 @@ static void sec_update_iv(struct sec_req *req, enum sec_alg_type alg_type)
- 		dev_err(SEC_CTX_DEV(req->ctx), "copy output iv error!\n");
- }
- 
-+static struct sec_req *sec_back_req_clear(struct sec_ctx *ctx,
-+				struct sec_qp_ctx *qp_ctx)
-+{
-+	struct sec_req *backlog_req = NULL;
-+
-+	mutex_lock(&qp_ctx->req_lock);
-+	if (ctx->fake_req_limit >=
-+	    atomic_read(&qp_ctx->qp->qp_status.used) &&
-+	    !list_empty(&qp_ctx->backlog)) {
-+		backlog_req = list_first_entry(&qp_ctx->backlog,
-+				typeof(*backlog_req), backlog_head);
-+		list_del(&backlog_req->backlog_head);
-+	}
-+	mutex_unlock(&qp_ctx->req_lock);
-+
-+	return backlog_req;
-+}
-+
- static void sec_skcipher_callback(struct sec_ctx *ctx, struct sec_req *req,
- 				  int err)
- {
- 	struct skcipher_request *sk_req = req->c_req.sk_req;
- 	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
-+	struct skcipher_request *backlog_sk_req;
-+	struct sec_req *backlog_req;
- 
--	atomic_dec(&qp_ctx->pending_reqs);
- 	sec_free_req_id(req);
- 
- 	/* IV output at encrypto of CBC mode */
- 	if (!err && ctx->c_ctx.c_mode == SEC_CMODE_CBC && req->c_req.encrypt)
- 		sec_update_iv(req, SEC_SKCIPHER);
- 
--	if (req->fake_busy)
--		sk_req->base.complete(&sk_req->base, -EINPROGRESS);
-+	while (1) {
-+		backlog_req = sec_back_req_clear(ctx, qp_ctx);
-+		if (!backlog_req)
-+			break;
-+
-+		backlog_sk_req = backlog_req->c_req.sk_req;
-+		backlog_sk_req->base.complete(&backlog_sk_req->base,
-+						-EINPROGRESS);
-+		atomic64_inc(&ctx->sec->debug.dfx.recv_busy_cnt);
-+	}
-+
- 
- 	sk_req->base.complete(&sk_req->base, err);
- }
-@@ -1133,10 +1166,10 @@ static void sec_aead_callback(struct sec_ctx *c, struct sec_req *req, int err)
- 	struct sec_cipher_req *c_req = &req->c_req;
- 	size_t authsize = crypto_aead_authsize(tfm);
- 	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
-+	struct aead_request *backlog_aead_req;
-+	struct sec_req *backlog_req;
- 	size_t sz;
- 
--	atomic_dec(&qp_ctx->pending_reqs);
--
- 	if (!err && c->c_ctx.c_mode == SEC_CMODE_CBC && c_req->encrypt)
- 		sec_update_iv(req, SEC_AEAD);
- 
-@@ -1157,17 +1190,22 @@ static void sec_aead_callback(struct sec_ctx *c, struct sec_req *req, int err)
- 
- 	sec_free_req_id(req);
- 
--	if (req->fake_busy)
--		a_req->base.complete(&a_req->base, -EINPROGRESS);
-+	while (1) {
-+		backlog_req = sec_back_req_clear(c, qp_ctx);
-+		if (!backlog_req)
-+			break;
-+
-+		backlog_aead_req = backlog_req->aead_req.aead_req;
-+		backlog_aead_req->base.complete(&backlog_aead_req->base,
-+						-EINPROGRESS);
-+		atomic64_inc(&c->sec->debug.dfx.recv_busy_cnt);
-+	}
- 
- 	a_req->base.complete(&a_req->base, err);
- }
- 
- static void sec_request_uninit(struct sec_ctx *ctx, struct sec_req *req)
- {
--	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
--
--	atomic_dec(&qp_ctx->pending_reqs);
- 	sec_free_req_id(req);
- 	sec_free_queue_id(ctx, req);
- }
-@@ -1187,11 +1225,6 @@ static int sec_request_init(struct sec_ctx *ctx, struct sec_req *req)
- 		return req->req_id;
- 	}
- 
--	if (ctx->fake_req_limit <= atomic_inc_return(&qp_ctx->pending_reqs))
--		req->fake_busy = true;
--	else
--		req->fake_busy = false;
--
- 	return 0;
- }
- 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index c2567cc..f9c1b7d 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -122,6 +122,7 @@ static struct sec_dfx_item sec_dfx_labels[] = {
- 	{"send_cnt", offsetof(struct sec_dfx, send_cnt)},
- 	{"recv_cnt", offsetof(struct sec_dfx, recv_cnt)},
- 	{"send_busy_cnt", offsetof(struct sec_dfx, send_busy_cnt)},
-+	{"recv_busy_cnt", offsetof(struct sec_dfx, recv_busy_cnt)},
- 	{"err_bd_cnt", offsetof(struct sec_dfx, err_bd_cnt)},
- 	{"invalid_req_cnt", offsetof(struct sec_dfx, invalid_req_cnt)},
- 	{"done_flag_cnt", offsetof(struct sec_dfx, done_flag_cnt)},
--- 
-2.8.1
+There is no hard reason for that. CRYPTO_NOLOAD is a "virtual" flag that 
+could be only present in crypto algorithm requests and I thought that the 
+intention was that the virtual flags go after real flags. If you don't 
+want to change existing flags, there is no problem with that.
+
+Mikulas
+
+> Thanks,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> 
 
