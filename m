@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A3ABC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 06:08:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 776C2C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 06:08:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3B7C920775
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 06:08:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C5AC207E8
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 06:08:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725801AbgFZGID (ORCPT
+        id S1728260AbgFZGIJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Jun 2020 02:08:03 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:51936 "EHLO fornost.hmeau.com"
+        Fri, 26 Jun 2020 02:08:09 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:51944 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725601AbgFZGID (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jun 2020 02:08:03 -0400
+        id S1725601AbgFZGII (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Jun 2020 02:08:08 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1johWl-0004Vz-Qz; Fri, 26 Jun 2020 16:07:56 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jun 2020 16:07:55 +1000
-Date:   Fri, 26 Jun 2020 16:07:55 +1000
+        id 1johWu-0004Wr-2A; Fri, 26 Jun 2020 16:08:05 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jun 2020 16:08:04 +1000
+Date:   Fri, 26 Jun 2020 16:08:04 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Colin King <colin.king@canonical.com>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        "David S . Miller" <davem@davemloft.net>,
+Cc:     "David S . Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: ccp: remove redundant assignment to variable ret
-Message-ID: <20200626060755.GB20811@gondor.apana.org.au>
-References: <20200618101229.11772-1-colin.king@canonical.com>
+Subject: Re: [PATCH] crypto: img-hash: remove redundant initialization of
+ variable err
+Message-ID: <20200626060803.GC20811@gondor.apana.org.au>
+References: <20200618101625.11986-1-colin.king@canonical.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200618101229.11772-1-colin.king@canonical.com>
+In-Reply-To: <20200618101625.11986-1-colin.king@canonical.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 18, 2020 at 11:12:29AM +0100, Colin King wrote:
+On Thu, Jun 18, 2020 at 11:16:25AM +0100, Colin King wrote:
 > From: Colin Ian King <colin.king@canonical.com>
 > 
-> The variable ret is being assigned with a value that is never read
-> and it is being updated later with a new value.  The assignment is
+> The variable err is being initialized with a value that is never read
+> and it is being updated later with a new value.  The initialization is
 > redundant and can be removed.
 > 
 > Addresses-Coverity: ("Unused value")
 > Signed-off-by: Colin Ian King <colin.king@canonical.com>
 > ---
->  drivers/crypto/ccp/ccp-ops.c | 1 -
->  1 file changed, 1 deletion(-)
+>  drivers/crypto/img-hash.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
