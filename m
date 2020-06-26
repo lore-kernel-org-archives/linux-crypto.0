@@ -2,124 +2,129 @@ Return-Path: <SRS0=PFiu=AH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9581CC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 19:15:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B413CC433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 19:16:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 72BEA206BE
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 19:15:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 919F6206BE
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 19:16:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="tATA6D+D"
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="y7cV+Mtj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725930AbgFZTPP (ORCPT
+        id S1725781AbgFZTQG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Jun 2020 15:15:15 -0400
-Received: from mail-eopbgr770058.outbound.protection.outlook.com ([40.107.77.58]:40567
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        Fri, 26 Jun 2020 15:16:06 -0400
+Received: from mail-dm6nam12on2074.outbound.protection.outlook.com ([40.107.243.74]:11776
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725275AbgFZTPO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jun 2020 15:15:14 -0400
+        id S1725780AbgFZTQF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Jun 2020 15:16:05 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HD74S+AZOVFNbuHoxaeKDtcQdtMgQlfbTuVXO62GSJjN0co+oCnyTOwccVvST15QLcxn5NKkOgNJjK+RHwSZU9ajNXA4NHuiSUqre34D6mR+yEwvvn5jJHwdLtChe9VKCn9GZwV/K9SsqdJy80BJJRXngVPAd+4afz4w6muHcrh7uENGtDJ/RDLAxJohwgcQPPKDld8Xq46Kw1SwqsW8AyrKBEixFDW3ZcA9fIGO7/A4wzg0Nh4hc/NoiRHE1woekHGVTf83gUCQZjNN+I5G88hRxd9ROQBmjWIlr5pA+FnzEIdzxLDQYEBPm/BM65qrvJWOJKtuZBORCp9mOBfQcg==
+ b=FNFlZ7c0MW7p6XgiKhR+uwWTAZi0iEsyDOiYwYJxLxZcpEfWlBCl0g7WyFOjD88uxMooQk2cY4xGVzxZVsKgYMHc+xWbCnprNnpmCyKMfRebEYbkjD4LtYX/qUgNLhMt9Gp2EsmQ7ZOE2qWpXTt6nse9LDL0qxsupLA2vtIFAh0++qZBrOL6sCnYM8izjgwgsQlF43iiYh8tZyWe0OHAId3neXQgT4wleL1FxzcoD18ZKFBxFaxiiO49u30SQiqK2LEZOUO04x861R2nJd178lcHNTOKUBMkmhWLBdEbkVzM1OaH9EoXocv7FRqEBVo/GdRqUfe6oSAMopIVs1Lc7w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Un1lH3DlTwIdGDEFYAWzJx6J3XkaOg7zO6bQJ+uo5GM=;
- b=CKP8nkAoDMH//APUa/wA4VxmVii+Q0AEwjUTJKEfdgS4dYDy78NRuv3iFcMAaert5lI+bSkZ/NKkDSqrtb98EeECOohztF2v7pTEkiS2eUxQRmZynTLtdVXrnhsmRrhPZyvHuSbUI2gsS/5ayYCMg9eo+L4oC7wqOqR3/7tM5knjwDf3my07KbDwz1mdq2n72KXlAUaAr+iDgw2W4oIfzlw8+02QIo0LCB4YX56Tq82Qx+KzTufwZ8IK8ZGqSaxXEu5j6bheAzCq7rXczcxBF0jr/KZ7oGKv8SkCyJ+QFRDNvPCfad5mi4beHbPsWdcdOrkvZ1FRST45obs7MRs7YA==
+ bh=If13ripyUo6hq6VM2A1JQEkYuqTiRYHAeU/1oYFGGw0=;
+ b=PN+C2ixlWAzLwTQJzS28/DOaJtvUpauUVwkczaKOGl3JfZpVXdsUuWsdjbD58jf0q9FFHtK6LDiiSq6xTDGRXwSt3zCDSg//cNhUGfbpR7VyzMzyXlSaWhj2TSCjNHVdn/8rt2nSRx45uBOc0VdkoIYZQJ/7Vz0YrLtFytwUiaaJslz7Y/Bky4rtb8u6+65p/TKBK6YoWAZj95R+rwVXdoqqVx2s4QsX3WapoG5RirriD4wM8JwZYQqP+1EWR+JP4wamMWnJza/O3Tb7C44rXrPe0ZDefRZkw8eCF+iiX/WhAgGHWxgu4vpkF8i+AAoDwQ12jDjyAc67MuDF5jqRPw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Un1lH3DlTwIdGDEFYAWzJx6J3XkaOg7zO6bQJ+uo5GM=;
- b=tATA6D+D/lo5/lXkuBdYGqAlLTJdVPRYH8ucYLADvmsPCHGwUZZtNsnheXvtZgiB7tibCpwz6N84D6/43wPtesCnQU0AueCH7mDRgGXLv6UQoZo8G9NPuiPGixfFsF0YftEW9x8t+Qvk1Xj2ECetmfT+mUIQvRzxhQXpzL69QkE=
+ bh=If13ripyUo6hq6VM2A1JQEkYuqTiRYHAeU/1oYFGGw0=;
+ b=y7cV+MtjFV7WF+HrR5MLF0O/ENJi3LH5q5USuY+wFXpY5Cv+qfG04GxX6+Of8PcUsR5yS4yURI1H65gH/MqTZZWeUvgXxZ2OaEbvEwSV9ZKV5scmmlUOj8ySffQVFv+a9ai0gcBJCoN438AJXPrwplsF2l0VaLcr9+tGxPYAeFY=
 Authentication-Results: amd.com; dkim=none (message not signed)
  header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2590.namprd12.prod.outlook.com (2603:10b6:802:2e::17)
- by SN1PR12MB2589.namprd12.prod.outlook.com (2603:10b6:802:2c::32) with
+Received: from SA0PR12MB4400.namprd12.prod.outlook.com (2603:10b6:806:95::13)
+ by SA0PR12MB4542.namprd12.prod.outlook.com (2603:10b6:806:73::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.20; Fri, 26 Jun
- 2020 19:15:12 +0000
-Received: from SN1PR12MB2590.namprd12.prod.outlook.com
- ([fe80::c179:ec27:4476:8e05]) by SN1PR12MB2590.namprd12.prod.outlook.com
- ([fe80::c179:ec27:4476:8e05%7]) with mapi id 15.20.3131.021; Fri, 26 Jun 2020
- 19:15:12 +0000
-Date:   Fri, 26 Jun 2020 14:15:03 -0500
-From:   John Allen <john.allen@amd.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.21; Fri, 26 Jun
+ 2020 19:16:02 +0000
+Received: from SA0PR12MB4400.namprd12.prod.outlook.com
+ ([fe80::698e:73e7:484d:e3c9]) by SA0PR12MB4400.namprd12.prod.outlook.com
+ ([fe80::698e:73e7:484d:e3c9%4]) with mapi id 15.20.3131.025; Fri, 26 Jun 2020
+ 19:16:02 +0000
+Cc:     brijesh.singh@amd.com, Herbert Xu <herbert@gondor.apana.org.au>,
         David Miller <davem@davemloft.net>,
-        Brijesh Singh <brijesh.singh@amd.com>
+        John Allen <john.allen@amd.com>
 Subject: Re: [PATCH v2] crypto: ccp - Update CCP driver maintainer information
-Message-ID: <20200626191503.GA115589@mojo.amd.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <0a2a04b15abc35af1ec651b3f45d43365e286ac4.1593198579.git.thomas.lendacky@amd.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <dc9a5d00-fe99-3f10-d87b-2e5bdb48b2c1@amd.com>
+Date:   Fri, 26 Jun 2020 14:16:00 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
 In-Reply-To: <0a2a04b15abc35af1ec651b3f45d43365e286ac4.1593198579.git.thomas.lendacky@amd.com>
-X-ClientProxiedBy: SN2PR01CA0013.prod.exchangelabs.com (2603:10b6:804:2::23)
- To SN1PR12MB2590.namprd12.prod.outlook.com (2603:10b6:802:2e::17)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: SN6PR05CA0033.namprd05.prod.outlook.com
+ (2603:10b6:805:de::46) To SA0PR12MB4400.namprd12.prod.outlook.com
+ (2603:10b6:806:95::13)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mojo.amd.com (165.204.77.1) by SN2PR01CA0013.prod.exchangelabs.com (2603:10b6:804:2::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3131.20 via Frontend Transport; Fri, 26 Jun 2020 19:15:11 +0000
-X-Originating-IP: [165.204.77.1]
+Received: from Brijeshs-MacBook-Pro.local (165.204.77.11) by SN6PR05CA0033.namprd05.prod.outlook.com (2603:10b6:805:de::46) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.11 via Frontend Transport; Fri, 26 Jun 2020 19:16:01 +0000
+X-Originating-IP: [165.204.77.11]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: c4d8c9ee-ac2e-4710-6e7f-08d81a053fe3
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2589:
+X-MS-Office365-Filtering-Correlation-Id: e90c0209-2149-4cbb-b4bf-08d81a055ddd
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4542:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2589F0100F19E6D59D387A399A930@SN1PR12MB2589.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB454215B285438E883B41DA66E5930@SA0PR12MB4542.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
 X-Forefront-PRVS: 0446F0FCE1
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dCP1v+B+lAmXO0hdcOguhVae8LdxoAZUTCnlJ2FbXW31Aybz5trJBCWXQC5AF3WLA404S2F3WwlwvJBlsu/Vdpg3tp5USryTGxHMzJ/5xx3wx5dxPCRLeD7dc0tsGifz3Gfop3Ze5QL8IhAFEN0q8Rbx77r4+P2HX8mAt1hzoPlNRwXTN+kFGE9rRUH5L07x4VaS5I1+Rh1Rl13zVYc7weEKCZBJsrz1DdF9lwqwLp2jm87v9gvekk6vtoqKgeTV60/x45tjRMv3ThkHhdgIwrek1u/ku0M2Zwv0Ug1UbvBRMQy0Aiq+bBEzHPAvntOgbrc/GnkRJXFu7UnD5ZV86Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2590.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(366004)(39860400002)(396003)(346002)(376002)(26005)(6666004)(86362001)(66946007)(33656002)(16526019)(66476007)(186003)(5660300002)(66556008)(6636002)(4326008)(1076003)(8936002)(316002)(54906003)(55016002)(478600001)(2906002)(44832011)(52116002)(6862004)(8676002)(956004)(7696005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: 4ixqBmM4jPOMDct6iHRYG0fKHrqgtPAf43WWC0fx0z1ywnKqmUz844B4/3FssA1GCgWE1a9zp6Y83reDN88MRBxOJjlqe6iU5xKjzUdHOQlQQvifB/o7UTajv/hiVONylaiXYts0ORQJgOmRT9Q5kRDxhRL6lT1qFB6rtajbOqsNr8QqkNvRlHM9Ocy5viIubAYcuwGZIBdHrO10JrumxbAo94+sWJW3P9NUX9o/SQ1aofUlqmzykehdG+hNcexPWwWXTpPD3pzBkhDrLdfqPLUZ5QJ1SlnOtQ7k0KdARClRWkBK6ilXU8xFuVQFkuEp7IDERc1jt8j/UY12wBA6dqSU9NXSBYxufLIXXcwN/x4xVj+sVQAVtxoOLjM0dRiLKOF47HMrHZMD58E3VRABT4rM97GXCEIAt6vX9A1wPBikdP4eW6mFrkPEKmqqedjdy8VRoCuVhdGhY0T+pZMV4A0MLzuuS+cVGml0LsUqgak=
+X-Microsoft-Antispam-Message-Info: hEn6pBlx9xH4p4H6FL2nNWrRd5JtEhcl9uMAVK6mqftWqgnc7qdFGQ1CIwBGq89A2M/6aErzC5AMWTFPvAbQf02YLW6GKB9S0pduWqpVjkekftk8ROL/QsxrKKodiaE1sC4gNeysFDxQhHTrHMouEA3VXclHXQ6G9ow61CB67pKxERQKU/BGS331zTHe0WQ2mShkMteoKpOuJcXP/iEF1sXc/uGhPIP1mxG1pOC6G41ZIbWneLHVQhiZAoLE2J+k1xXJQ2Q4owKJvxznXYNJUINZKTyqlgqEcI7aEzE99wl8kYUUJ7zTRRdiQhoggg9KGEIGDD7Cq4IAnNrpT7tg4s3yX83y9pEdpxCYH0hr7lOD7I3kpmOKheBzDAKSk92A
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR12MB4400.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(396003)(346002)(366004)(376002)(136003)(16526019)(54906003)(5660300002)(316002)(66476007)(52116002)(44832011)(478600001)(66556008)(2906002)(31686004)(66946007)(8676002)(8936002)(6506007)(6486002)(6512007)(26005)(53546011)(36756003)(4326008)(31696002)(86362001)(186003)(956004)(2616005)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: Iaw+PkYqjPhxFw4rZxNpLcBJK2LqaiSYCqQmYyNVVp4wNHOsvB2+Sy3UR2fnzL96fdQ07mnP9QcJVfDDBOsG42SKCG8Dn8Vx09+rABPYNh58jGPU0ybXEUgyHlgEAwX7TGapJV0UakNHDOel6almxQLW8JZtyZ7hXziOPbpKEIbBay+PB6C/NZBVshTuFhRykGslZWkwvkkyaahykQi3xfHO004Sx0VLcEPK8EtKba78ViBvwRf63pkJRfU9dMsw0Z4VHbq7zGN76z3viEYpabgR7O0ULbkTE0/oo+1T5bfoAGsvHy7ZZ3/K9jeim8zc6jXLx9Dfshqi0c1f3AN7TjU13Bc0Um1+egj4QdfM0N6aRK7g5Plv1fS1y63iG/Id5wZXKlnBhHJtvXbl61GMvjbTfdwOhu/WIgxW++XON4RbN9M07d2SAykNcJ2//CQhUNujUW5TbM5wZi7fTp454yDFdmgtvk0siyhl4Ooh2n4=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c4d8c9ee-ac2e-4710-6e7f-08d81a053fe3
-X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2590.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e90c0209-2149-4cbb-b4bf-08d81a055ddd
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR12MB4400.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2020 19:15:12.3812
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2020 19:16:02.6507
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RdOBdrYapNjwsioCRlq2xvMtC/s/FfrVO1eHvJDiA7ingrCF4Hcx7fQzigko22CaAuhaKGiRKC2bXb0oGvVBFQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2589
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3FaL0epoin2ouXiEdZ+gJdDiSs7J0VZM0S2UF8WF+a37eThZMFejRmLMRGldA76RINrfYp4bFh5lQFxyO85UUQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4542
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 26, 2020 at 02:09:39PM -0500, Tom Lendacky wrote:
+
+On 6/26/20 2:09 PM, Tom Lendacky wrote:
 > From: Tom Lendacky <thomas.lendacky@amd.com>
-> 
+>
 > Add John Allen as a new CCP driver maintainer. Additionally, break out
 > the driver SEV support and create a new maintainer entry, with Brijesh
 > Singh and Tom Lendacky as maintainers.
-> 
+>
 > Cc: John Allen <john.allen@amd.com>
 > Cc: Brijesh Singh <brijesh.singh@amd.com>
 > Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-
-Acked-by: John Allen <john.allen@amd.com>
-
-> 
+>
 > ---
-> 
+>
 > Changes from v1:
 > - Change the email for Brijesh. The previous one is an alias, use the
 >   proper email address in case the alias is ever removed.
+
+Acked-by: Brijesh Singh <brijesh.singh@amd.com>
+
 > ---
 >  MAINTAINERS | 9 +++++++++
 >  1 file changed, 9 insertions(+)
-> 
+>
 > diff --git a/MAINTAINERS b/MAINTAINERS
 > index 68f21d46614c..de266ca5f921 100644
 > --- a/MAINTAINERS
@@ -145,6 +150,3 @@ Acked-by: John Allen <john.allen@amd.com>
 >  AMD DISPLAY CORE
 >  M:	Harry Wentland <harry.wentland@amd.com>
 >  M:	Leo Li <sunpeng.li@amd.com>
-> -- 
-> 2.27.0
-> 
