@@ -6,107 +6,84 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D40CC433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 04:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36A01C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 04:45:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 63E9C2075D
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 04:32:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1BDE22078D
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 04:45:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726643AbgFZEcT (ORCPT
+        id S1726196AbgFZEpn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Jun 2020 00:32:19 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:51738 "EHLO fornost.hmeau.com"
+        Fri, 26 Jun 2020 00:45:43 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:51750 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726607AbgFZEcT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jun 2020 00:32:19 -0400
+        id S1725306AbgFZEpn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Jun 2020 00:45:43 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jog1s-0003Vg-39; Fri, 26 Jun 2020 14:31:57 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jun 2020 14:31:56 +1000
-Date:   Fri, 26 Jun 2020 14:31:56 +1000
+        id 1jogF4-0003af-KS; Fri, 26 Jun 2020 14:45:35 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Jun 2020 14:45:34 +1000
+Date:   Fri, 26 Jun 2020 14:45:34 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tero Kristo <t-kristo@ti.com>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, j-keerthy@ti.com
-Subject: Re: [PATCHv4 3/7] crypto: sa2ul: add sha1/sha256/sha512 support
-Message-ID: <20200626043155.GA2683@gondor.apana.org.au>
-References: <20200615071452.25141-1-t-kristo@ti.com>
- <20200615071452.25141-4-t-kristo@ti.com>
+To:     Mikulas Patocka <mpatocka@redhat.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Mike Snitzer <msnitzer@redhat.com>,
+        linux-kernel@vger.kernel.org, dm-devel@redhat.com,
+        linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Milan Broz <mbroz@redhat.com>,
+        Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
+        George Cherian <gcherian@marvell.com>,
+        Wei Xu <xuwei5@hisilicon.com>, Zaibo Xu <xuzaibo@Huawei.com>
+Subject: Re: [PATCH 1/3] crypto: pass the flag CRYPTO_ALG_ALLOCATES_MEMORY
+Message-ID: <20200626044534.GA2870@gondor.apana.org.au>
+References: <alpine.LRH.2.02.2006091259250.30590@file01.intranet.prod.int.rdu2.redhat.com>
+ <20200610010450.GA6449@gondor.apana.org.au>
+ <alpine.LRH.2.02.2006100756270.27811@file01.intranet.prod.int.rdu2.redhat.com>
+ <20200610121106.GA23137@gondor.apana.org.au>
+ <alpine.LRH.2.02.2006161052540.28052@file01.intranet.prod.int.rdu2.redhat.com>
+ <alpine.LRH.2.02.2006161101080.28052@file01.intranet.prod.int.rdu2.redhat.com>
+ <20200616173620.GA207319@gmail.com>
+ <alpine.LRH.2.02.2006171107220.18714@file01.intranet.prod.int.rdu2.redhat.com>
+ <alpine.LRH.2.02.2006171108440.18714@file01.intranet.prod.int.rdu2.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200615071452.25141-4-t-kristo@ti.com>
+In-Reply-To: <alpine.LRH.2.02.2006171108440.18714@file01.intranet.prod.int.rdu2.redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 15, 2020 at 10:14:48AM +0300, Tero Kristo wrote:
+On Wed, Jun 17, 2020 at 11:09:28AM -0400, Mikulas Patocka wrote:
 >
-> +static int sa_sha_update(struct ahash_request *req)
-> +{
-> +	struct sa_sha_req_ctx *rctx = ahash_request_ctx(req);
-> +	struct scatterlist *sg;
-> +	void *buf;
-> +	int pages;
-> +	struct page *pg;
+> Index: linux-2.6/include/linux/crypto.h
+> ===================================================================
+> --- linux-2.6.orig/include/linux/crypto.h
+> +++ linux-2.6/include/linux/crypto.h
+> @@ -97,9 +97,18 @@
+>  #define CRYPTO_ALG_OPTIONAL_KEY		0x00004000
+>  
+>  /*
+> + * The driver may allocate memory during request processing, so it shouldn't be
+> + * used in cases where memory allocation failures aren't acceptable, such as
+> + * during block device encryption.
+> + */
+> +#define CRYPTO_ALG_ALLOCATES_MEMORY	0x00008000
 > +
-> +	if (!req->nbytes)
-> +		return 0;
+> +/*
+>   * Don't trigger module loading
+>   */
+> -#define CRYPTO_NOLOAD			0x00008000
+> +#define CRYPTO_NOLOAD			0x00010000
 > +
-> +	if (rctx->buf_free >= req->nbytes) {
-> +		pg = sg_page(rctx->sg_next);
-> +		buf = kmap_atomic(pg);
-> +		scatterwalk_map_and_copy(buf + rctx->offset, req->src, 0,
-> +					 req->nbytes, 0);
-> +		kunmap_atomic(buf);
-> +		rctx->buf_free -= req->nbytes;
-> +		rctx->sg_next->length += req->nbytes;
-> +		rctx->offset += req->nbytes;
-> +	} else {
-> +		pages = get_order(req->nbytes);
-> +		buf = (void *)__get_free_pages(GFP_ATOMIC, pages);
-> +		if (!buf)
-> +			return -ENOMEM;
-> +
-> +		sg = kzalloc(sizeof(*sg) * 2, GFP_KERNEL);
-> +		if (!sg)
-> +			return -ENOMEM;
-> +
-> +		sg_init_table(sg, 1);
-> +		sg_set_buf(sg, buf, req->nbytes);
-> +		scatterwalk_map_and_copy(buf, req->src, 0, req->nbytes, 0);
-> +
-> +		rctx->buf_free = (PAGE_SIZE << pages) - req->nbytes;
-> +
-> +		if (rctx->sg_next) {
-> +			sg_unmark_end(rctx->sg_next);
-> +			sg_chain(rctx->sg_next, 2, sg);
-> +		} else {
-> +			rctx->src = sg;
-> +		}
-> +
-> +		rctx->sg_next = sg;
-> +		rctx->src_nents++;
-> +
-> +		rctx->offset = req->nbytes;
-> +	}
-> +
-> +	rctx->len += req->nbytes;
-> +
-> +	return 0;
-> +}
+> +#define CRYPTO_ALG_INHERITED_FLAGS	(CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY)
 
-This is not how it's supposed to work.  To support the partial
-hashing interface, you must actually hash the data and not just
-save it in your context.  Otherwise your export is completely
-meaningless.
+Any reason why you need to renumber NOLOAD? If not please keep
+the existing values.
 
-If your hardware cannot export partially hashed state, then you
-should use a software fallback for everything but digest.
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
