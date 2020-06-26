@@ -2,206 +2,148 @@ Return-Path: <SRS0=PFiu=AH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB095C433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 08:04:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AB5CC433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 09:16:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D499A20836
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 08:04:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71DB620EDD
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jun 2020 09:16:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="vGAa71h9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728930AbgFZIE4 (ORCPT
+        id S1725971AbgFZJQg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Jun 2020 04:04:56 -0400
-Received: from mga09.intel.com ([134.134.136.24]:37504 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728911AbgFZIEz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jun 2020 04:04:55 -0400
-IronPort-SDR: 0K29QDJslnfQ4xWQBkYN3PVT2roEjLbfZpVo75nZKrpPIzvbeyzu3YpaUg6bF+BmQmSiDNco5S
- jq/oarwLZ/Fw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9663"; a="146739892"
-X-IronPort-AV: E=Sophos;i="5.75,282,1589266800"; 
-   d="scan'208";a="146739892"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2020 01:04:54 -0700
-IronPort-SDR: T7YRg61mKIwqXHEC+54FWsqsPdNsVzN/MB+UUCRQ6S8pF9H3i4tw1pjCBPAIm1Yu/m5+iYswtC
- Diei718BrNvQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,282,1589266800"; 
-   d="scan'208";a="479756359"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
-  by fmsmga006.fm.intel.com with ESMTP; 26 Jun 2020 01:04:53 -0700
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v2 4/4] crypto: qat - fallback for xts with 192 bit keys
-Date:   Fri, 26 Jun 2020 09:04:29 +0100
-Message-Id: <20200626080429.155450-5-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200626080429.155450-1-giovanni.cabiddu@intel.com>
-References: <20200626080429.155450-1-giovanni.cabiddu@intel.com>
+        Fri, 26 Jun 2020 05:16:36 -0400
+Received: from lelv0142.ext.ti.com ([198.47.23.249]:42284 "EHLO
+        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725820AbgFZJQf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Jun 2020 05:16:35 -0400
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 05Q9FkLI001185;
+        Fri, 26 Jun 2020 04:15:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1593162946;
+        bh=2NIvKg6o9HQpxqVdkiZ19PgyBblsdU+mdkzmqdMlpKM=;
+        h=Subject:To:CC:References:From:Date:In-Reply-To;
+        b=vGAa71h90Bq6lyBT88zwPXrBkDjwjGkf4Z3rFGn9/6m2rQiOr5LFuJPG84MN+9R5j
+         1ca35m/q+q3AAhV6fyh9+771vDbbM3A+2AIY4Eart+PqXIMBAiq5kJDBYLvVzx0AkI
+         /G4TcSwfn8x/c1M11CZ8gKFJIuxOWCxSLJFfdyy0=
+Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
+        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 05Q9FkaF085758
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 26 Jun 2020 04:15:46 -0500
+Received: from DFLE106.ent.ti.com (10.64.6.27) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Fri, 26
+ Jun 2020 04:15:46 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE106.ent.ti.com
+ (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
+ Frontend Transport; Fri, 26 Jun 2020 04:15:46 -0500
+Received: from [127.0.0.1] (ileax41-snat.itg.ti.com [10.172.224.153])
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 05Q9Fhl6058791;
+        Fri, 26 Jun 2020 04:15:45 -0500
+Subject: Re: [PATCHv4 3/7] crypto: sa2ul: add sha1/sha256/sha512 support
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <j-keerthy@ti.com>
+References: <20200615071452.25141-1-t-kristo@ti.com>
+ <20200615071452.25141-4-t-kristo@ti.com>
+ <20200626043155.GA2683@gondor.apana.org.au>
+From:   Tero Kristo <t-kristo@ti.com>
+Message-ID: <2a89ea86-3b9e-06b5-fa8e-9dc6e5ad9aeb@ti.com>
+Date:   Fri, 26 Jun 2020 12:15:42 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200626043155.GA2683@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Forward requests to another provider if the key length is 192 bits as
-this is not supported by the QAT accelerators.
+On 26/06/2020 07:31, Herbert Xu wrote:
+> On Mon, Jun 15, 2020 at 10:14:48AM +0300, Tero Kristo wrote:
+>>
+>> +static int sa_sha_update(struct ahash_request *req)
+>> +{
+>> +	struct sa_sha_req_ctx *rctx = ahash_request_ctx(req);
+>> +	struct scatterlist *sg;
+>> +	void *buf;
+>> +	int pages;
+>> +	struct page *pg;
+>> +
+>> +	if (!req->nbytes)
+>> +		return 0;
+>> +
+>> +	if (rctx->buf_free >= req->nbytes) {
+>> +		pg = sg_page(rctx->sg_next);
+>> +		buf = kmap_atomic(pg);
+>> +		scatterwalk_map_and_copy(buf + rctx->offset, req->src, 0,
+>> +					 req->nbytes, 0);
+>> +		kunmap_atomic(buf);
+>> +		rctx->buf_free -= req->nbytes;
+>> +		rctx->sg_next->length += req->nbytes;
+>> +		rctx->offset += req->nbytes;
+>> +	} else {
+>> +		pages = get_order(req->nbytes);
+>> +		buf = (void *)__get_free_pages(GFP_ATOMIC, pages);
+>> +		if (!buf)
+>> +			return -ENOMEM;
+>> +
+>> +		sg = kzalloc(sizeof(*sg) * 2, GFP_KERNEL);
+>> +		if (!sg)
+>> +			return -ENOMEM;
+>> +
+>> +		sg_init_table(sg, 1);
+>> +		sg_set_buf(sg, buf, req->nbytes);
+>> +		scatterwalk_map_and_copy(buf, req->src, 0, req->nbytes, 0);
+>> +
+>> +		rctx->buf_free = (PAGE_SIZE << pages) - req->nbytes;
+>> +
+>> +		if (rctx->sg_next) {
+>> +			sg_unmark_end(rctx->sg_next);
+>> +			sg_chain(rctx->sg_next, 2, sg);
+>> +		} else {
+>> +			rctx->src = sg;
+>> +		}
+>> +
+>> +		rctx->sg_next = sg;
+>> +		rctx->src_nents++;
+>> +
+>> +		rctx->offset = req->nbytes;
+>> +	}
+>> +
+>> +	rctx->len += req->nbytes;
+>> +
+>> +	return 0;
+>> +}
+> 
+> This is not how it's supposed to work.  To support the partial
+> hashing interface, you must actually hash the data and not just
+> save it in your context.  Otherwise your export is completely
+> meaningless.
 
-This fixes the following issue reported by the extra self test:
-alg: skcipher: qat_aes_xts setkey failed on test vector "random: len=3204
-klen=48"; expected_error=0, actual_error=-22, flags=0x1
+I have been experimenting with an alternate approach, where I have a 
+small buffer within the context, this would be more like the way other 
+drivers do this. If the buffer is closed before running out of space, I 
+can push this to be processed by HW, otherwise I must fallback to SW. 
+Does this sound like a better approach?
 
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_common/qat_algs.c | 67 ++++++++++++++++++++++--
- 1 file changed, 64 insertions(+), 3 deletions(-)
+> If your hardware cannot export partially hashed state, then you
+> should use a software fallback for everything but digest.
 
-diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
-index 77bdff0118f7..5e8c0b6f2834 100644
---- a/drivers/crypto/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -88,6 +88,8 @@ struct qat_alg_skcipher_ctx {
- 	struct icp_qat_fw_la_bulk_req enc_fw_req;
- 	struct icp_qat_fw_la_bulk_req dec_fw_req;
- 	struct qat_crypto_instance *inst;
-+	struct crypto_skcipher *ftfm;
-+	bool fallback;
- };
- 
- static int qat_get_inter_state_size(enum icp_qat_hw_auth_algo qat_hash_alg)
-@@ -994,12 +996,25 @@ static int qat_alg_skcipher_ctr_setkey(struct crypto_skcipher *tfm,
- static int qat_alg_skcipher_xts_setkey(struct crypto_skcipher *tfm,
- 				       const u8 *key, unsigned int keylen)
- {
-+	struct qat_alg_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int ret;
- 
- 	ret = xts_verify_key(tfm, key, keylen);
- 	if (ret)
- 		return ret;
- 
-+	if (keylen >> 1 == AES_KEYSIZE_192) {
-+		ret = crypto_skcipher_setkey(ctx->ftfm, key, keylen);
-+		if (ret)
-+			return ret;
-+
-+		ctx->fallback = true;
-+
-+		return 0;
-+	}
-+
-+	ctx->fallback = false;
-+
- 	return qat_alg_skcipher_setkey(tfm, key, keylen,
- 				       ICP_QAT_HW_CIPHER_XTS_MODE);
- }
-@@ -1066,9 +1081,19 @@ static int qat_alg_skcipher_blk_encrypt(struct skcipher_request *req)
- 
- static int qat_alg_skcipher_xts_encrypt(struct skcipher_request *req)
- {
-+	struct crypto_skcipher *stfm = crypto_skcipher_reqtfm(req);
-+	struct qat_alg_skcipher_ctx *ctx = crypto_skcipher_ctx(stfm);
-+	struct skcipher_request *nreq = skcipher_request_ctx(req);
-+
- 	if (req->cryptlen < XTS_BLOCK_SIZE)
- 		return -EINVAL;
- 
-+	if (ctx->fallback) {
-+		memcpy(nreq, req, sizeof(*req));
-+		skcipher_request_set_tfm(nreq, ctx->ftfm);
-+		return crypto_skcipher_encrypt(nreq);
-+	}
-+
- 	return qat_alg_skcipher_encrypt(req);
- }
- 
-@@ -1134,9 +1159,19 @@ static int qat_alg_skcipher_blk_decrypt(struct skcipher_request *req)
- 
- static int qat_alg_skcipher_xts_decrypt(struct skcipher_request *req)
- {
-+	struct crypto_skcipher *stfm = crypto_skcipher_reqtfm(req);
-+	struct qat_alg_skcipher_ctx *ctx = crypto_skcipher_ctx(stfm);
-+	struct skcipher_request *nreq = skcipher_request_ctx(req);
-+
- 	if (req->cryptlen < XTS_BLOCK_SIZE)
- 		return -EINVAL;
- 
-+	if (ctx->fallback) {
-+		memcpy(nreq, req, sizeof(*req));
-+		skcipher_request_set_tfm(nreq, ctx->ftfm);
-+		return crypto_skcipher_decrypt(nreq);
-+	}
-+
- 	return qat_alg_skcipher_decrypt(req);
- }
- 
-@@ -1200,6 +1235,23 @@ static int qat_alg_skcipher_init_tfm(struct crypto_skcipher *tfm)
- 	return 0;
- }
- 
-+static int qat_alg_skcipher_init_xts_tfm(struct crypto_skcipher *tfm)
-+{
-+	struct qat_alg_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	int reqsize;
-+
-+	ctx->ftfm = crypto_alloc_skcipher("xts(aes)", 0, CRYPTO_ALG_ASYNC);
-+	if (IS_ERR(ctx->ftfm))
-+		return PTR_ERR(ctx->ftfm);
-+
-+	reqsize = max(sizeof(struct qat_crypto_request),
-+		      sizeof(struct skcipher_request) +
-+		      crypto_skcipher_reqsize(ctx->ftfm));
-+	crypto_skcipher_set_reqsize(tfm, reqsize);
-+
-+	return 0;
-+}
-+
- static void qat_alg_skcipher_exit_tfm(struct crypto_skcipher *tfm)
- {
- 	struct qat_alg_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-@@ -1227,6 +1279,15 @@ static void qat_alg_skcipher_exit_tfm(struct crypto_skcipher *tfm)
- 	qat_crypto_put_instance(inst);
- }
- 
-+static void qat_alg_skcipher_exit_xts_tfm(struct crypto_skcipher *tfm)
-+{
-+	struct qat_alg_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+
-+	if (ctx->ftfm)
-+		crypto_free_skcipher(ctx->ftfm);
-+
-+	qat_alg_skcipher_exit_tfm(tfm);
-+}
- 
- static struct aead_alg qat_aeads[] = { {
- 	.base = {
-@@ -1321,14 +1382,14 @@ static struct skcipher_alg qat_skciphers[] = { {
- 	.base.cra_name = "xts(aes)",
- 	.base.cra_driver_name = "qat_aes_xts",
- 	.base.cra_priority = 4001,
--	.base.cra_flags = CRYPTO_ALG_ASYNC,
-+	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
- 	.base.cra_blocksize = AES_BLOCK_SIZE,
- 	.base.cra_ctxsize = sizeof(struct qat_alg_skcipher_ctx),
- 	.base.cra_alignmask = 0,
- 	.base.cra_module = THIS_MODULE,
- 
--	.init = qat_alg_skcipher_init_tfm,
--	.exit = qat_alg_skcipher_exit_tfm,
-+	.init = qat_alg_skcipher_init_xts_tfm,
-+	.exit = qat_alg_skcipher_exit_xts_tfm,
- 	.setkey = qat_alg_skcipher_xts_setkey,
- 	.decrypt = qat_alg_skcipher_xts_decrypt,
- 	.encrypt = qat_alg_skcipher_xts_encrypt,
--- 
-2.26.2
+Yea, HW can't support partial hashes.
 
+-Tero
+--
+Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
