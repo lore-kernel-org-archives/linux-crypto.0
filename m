@@ -1,221 +1,186 @@
-Return-Path: <SRS0=VaZj=AI=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=vlpe=AJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3964C433E2
-	for <linux-crypto@archiver.kernel.org>; Sat, 27 Jun 2020 08:37:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FBE4C433DF
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Jun 2020 19:04:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4378212CC
-	for <linux-crypto@archiver.kernel.org>; Sat, 27 Jun 2020 08:37:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1593247054;
-	bh=zjbLkDlwCXNIbtATEiNU0StbDpQpMVzWqLK75QxxG/c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=v+JkBTV1cPjiyHU57IlgnEBnAP9MFN0vVncYHZ5erF3+Ssury6APr9hXrexbcaq5t
-	 dBSbinD4wH0EHKTyagB2IHhFEYlrZHCmn1bIH2iQqY24qMtZrzfpeOhovgJ4PjBWYU
-	 i2n+xx3fiyEqhqVeFxT1sf/sSpDwBCnvei82fo5I=
+	by mail.kernel.org (Postfix) with ESMTP id 54428206C0
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Jun 2020 19:04:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DqNG5xJc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726443AbgF0Ihe (ORCPT
+        id S1726654AbgF1TEk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 27 Jun 2020 04:37:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33612 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726086AbgF0Ihd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 27 Jun 2020 04:37:33 -0400
-Received: from dogfood.home (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        Sun, 28 Jun 2020 15:04:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31304 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726635AbgF1TEj (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 28 Jun 2020 15:04:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593371077;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qdgR0RgpHkxJCEWnlf/pJrRhdiwOUw/TUdJvr42dJW0=;
+        b=DqNG5xJc9bKE9vBJ/CQPQf/rh5oPBK+e5rK0j/Ov9R3SHp0p1eZfvaqkV01bjBix+wCYjH
+        vnaKFt1cBxOH17NMLY0c5hRdM0fH5QUKQvRdaBVIOmKN+7bYki5C55O9X62npwGtfhNib8
+        uaddQHZR/i3VMZCbSlvEC+AJ72ZxmUw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-488-t_7acUYtP1WmQtIZ867Pvw-1; Sun, 28 Jun 2020 15:04:33 -0400
+X-MC-Unique: t_7acUYtP1WmQtIZ867Pvw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7A1202088E;
-        Sat, 27 Jun 2020 08:37:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1593247053;
-        bh=zjbLkDlwCXNIbtATEiNU0StbDpQpMVzWqLK75QxxG/c=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=tChlkpS2IZp2KSfyxBkAGl1w2bjXvp7Og3a2jpgn2f0cYCmTNe5yV02fWcVAsYGqd
-         8d6NLDuF1hX8C0c4eBP9z4LwQWazC9hHpHLzU9a6mJ7nNfhyRzhXi6Hpq0fW4/mChO
-         C8VEqFA/cNoH6xF2wul2e05fVmZQcU8aCN1kIT5E=
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org,
-        linux-amlogic@lists.infradead.org,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9CDA802ED4;
+        Sun, 28 Jun 2020 19:04:31 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E0E5B96B62;
+        Sun, 28 Jun 2020 19:04:24 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 05SJ4OPC003566;
+        Sun, 28 Jun 2020 15:04:24 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 05SJ4M56003562;
+        Sun, 28 Jun 2020 15:04:22 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Sun, 28 Jun 2020 15:04:22 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Eric Biggers <ebiggers@kernel.org>
+cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Mike Snitzer <msnitzer@redhat.com>,
+        linux-kernel@vger.kernel.org, dm-devel@redhat.com,
+        linux-crypto@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ayush Sawal <ayush.sawal@chelsio.com>,
-        Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
-        Rohit Maheshwari <rohitm@chelsio.com>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Jamie Iles <jamie@jamieiles.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Tero Kristo <t-kristo@ti.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>
-Subject: [PATCH v2 13/13] crypto: mediatek - use AES library for GCM key derivation
-Date:   Sat, 27 Jun 2020 10:36:23 +0200
-Message-Id: <20200627083623.2428333-14-ardb@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200627083623.2428333-1-ardb@kernel.org>
-References: <20200627083623.2428333-1-ardb@kernel.org>
+        Milan Broz <mbroz@redhat.com>,
+        Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
+        George Cherian <gcherian@marvell.com>,
+        Wei Xu <xuwei5@hisilicon.com>, Zaibo Xu <xuzaibo@Huawei.com>
+Subject: Re: [PATCH 1/3 v2] crypto: introduce the flag
+ CRYPTO_ALG_ALLOCATES_MEMORY
+In-Reply-To: <20200626164617.GA211634@gmail.com>
+Message-ID: <alpine.LRH.2.02.2006281501230.347@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.2006100756270.27811@file01.intranet.prod.int.rdu2.redhat.com> <20200610121106.GA23137@gondor.apana.org.au> <alpine.LRH.2.02.2006161052540.28052@file01.intranet.prod.int.rdu2.redhat.com> <alpine.LRH.2.02.2006161101080.28052@file01.intranet.prod.int.rdu2.redhat.com>
+ <20200616173620.GA207319@gmail.com> <alpine.LRH.2.02.2006171107220.18714@file01.intranet.prod.int.rdu2.redhat.com> <alpine.LRH.2.02.2006171108440.18714@file01.intranet.prod.int.rdu2.redhat.com> <20200626044534.GA2870@gondor.apana.org.au>
+ <alpine.LRH.2.02.2006261109520.11899@file01.intranet.prod.int.rdu2.redhat.com> <alpine.LRH.2.02.2006261215480.13882@file01.intranet.prod.int.rdu2.redhat.com> <20200626164617.GA211634@gmail.com>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Mediatek accelerator driver calls into a dynamically allocated
-skcipher of the ctr(aes) variety to perform GCM key derivation, which
-involves AES encryption of a single block consisting of NUL bytes.
 
-There is no point in using the skcipher API for this, so use the AES
-library interface instead.
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- drivers/crypto/Kconfig            |  3 +-
- drivers/crypto/mediatek/mtk-aes.c | 63 +++-----------------
- 2 files changed, 9 insertions(+), 57 deletions(-)
+On Fri, 26 Jun 2020, Eric Biggers wrote:
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 802b9ada4e9e..c8c3ebb248f8 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -756,10 +756,9 @@ config CRYPTO_DEV_ZYNQMP_AES
- config CRYPTO_DEV_MEDIATEK
- 	tristate "MediaTek's EIP97 Cryptographic Engine driver"
- 	depends on (ARM && ARCH_MEDIATEK) || COMPILE_TEST
--	select CRYPTO_AES
-+	select CRYPTO_LIB_AES
- 	select CRYPTO_AEAD
- 	select CRYPTO_SKCIPHER
--	select CRYPTO_CTR
- 	select CRYPTO_SHA1
- 	select CRYPTO_SHA256
- 	select CRYPTO_SHA512
-diff --git a/drivers/crypto/mediatek/mtk-aes.c b/drivers/crypto/mediatek/mtk-aes.c
-index 78d660d963e2..4ad3571ab6af 100644
---- a/drivers/crypto/mediatek/mtk-aes.c
-+++ b/drivers/crypto/mediatek/mtk-aes.c
-@@ -137,8 +137,6 @@ struct mtk_aes_gcm_ctx {
- 
- 	u32 authsize;
- 	size_t textlen;
--
--	struct crypto_skcipher *ctr;
- };
- 
- struct mtk_aes_drv {
-@@ -996,17 +994,8 @@ static int mtk_aes_gcm_setkey(struct crypto_aead *aead, const u8 *key,
- 			      u32 keylen)
- {
- 	struct mtk_aes_base_ctx *ctx = crypto_aead_ctx(aead);
--	struct mtk_aes_gcm_ctx *gctx = mtk_aes_gcm_ctx_cast(ctx);
--	struct crypto_skcipher *ctr = gctx->ctr;
--	struct {
--		u32 hash[4];
--		u8 iv[8];
--
--		struct crypto_wait wait;
--
--		struct scatterlist sg[1];
--		struct skcipher_request req;
--	} *data;
-+	u8 hash[AES_BLOCK_SIZE] __aligned(4) = {};
-+	struct crypto_aes_ctx aes_ctx;
- 	int err;
- 
- 	switch (keylen) {
-@@ -1026,39 +1015,18 @@ static int mtk_aes_gcm_setkey(struct crypto_aead *aead, const u8 *key,
- 
- 	ctx->keylen = SIZE_IN_WORDS(keylen);
- 
--	/* Same as crypto_gcm_setkey() from crypto/gcm.c */
--	crypto_skcipher_clear_flags(ctr, CRYPTO_TFM_REQ_MASK);
--	crypto_skcipher_set_flags(ctr, crypto_aead_get_flags(aead) &
--				  CRYPTO_TFM_REQ_MASK);
--	err = crypto_skcipher_setkey(ctr, key, keylen);
-+	err = aes_expandkey(&aes_ctx, key, keylen);
- 	if (err)
- 		return err;
- 
--	data = kzalloc(sizeof(*data) + crypto_skcipher_reqsize(ctr),
--		       GFP_KERNEL);
--	if (!data)
--		return -ENOMEM;
--
--	crypto_init_wait(&data->wait);
--	sg_init_one(data->sg, &data->hash, AES_BLOCK_SIZE);
--	skcipher_request_set_tfm(&data->req, ctr);
--	skcipher_request_set_callback(&data->req, CRYPTO_TFM_REQ_MAY_SLEEP |
--				      CRYPTO_TFM_REQ_MAY_BACKLOG,
--				      crypto_req_done, &data->wait);
--	skcipher_request_set_crypt(&data->req, data->sg, data->sg,
--				   AES_BLOCK_SIZE, data->iv);
--
--	err = crypto_wait_req(crypto_skcipher_encrypt(&data->req),
--			      &data->wait);
--	if (err)
--		goto out;
-+	aes_encrypt(&aes_ctx, hash, hash);
-+	memzero_explicit(&aes_ctx, sizeof(aes_ctx));
- 
- 	mtk_aes_write_state_le(ctx->key, (const u32 *)key, keylen);
--	mtk_aes_write_state_be(ctx->key + ctx->keylen, data->hash,
-+	mtk_aes_write_state_be(ctx->key + ctx->keylen, (const u32 *)hash,
- 			       AES_BLOCK_SIZE);
--out:
--	kzfree(data);
--	return err;
-+
-+	return 0;
- }
- 
- static int mtk_aes_gcm_setauthsize(struct crypto_aead *aead,
-@@ -1095,32 +1063,17 @@ static int mtk_aes_gcm_init(struct crypto_aead *aead)
- {
- 	struct mtk_aes_gcm_ctx *ctx = crypto_aead_ctx(aead);
- 
--	ctx->ctr = crypto_alloc_skcipher("ctr(aes)", 0,
--					 CRYPTO_ALG_ASYNC);
--	if (IS_ERR(ctx->ctr)) {
--		pr_err("Error allocating ctr(aes)\n");
--		return PTR_ERR(ctx->ctr);
--	}
--
- 	crypto_aead_set_reqsize(aead, sizeof(struct mtk_aes_reqctx));
- 	ctx->base.start = mtk_aes_gcm_start;
- 	return 0;
- }
- 
--static void mtk_aes_gcm_exit(struct crypto_aead *aead)
--{
--	struct mtk_aes_gcm_ctx *ctx = crypto_aead_ctx(aead);
--
--	crypto_free_skcipher(ctx->ctr);
--}
--
- static struct aead_alg aes_gcm_alg = {
- 	.setkey		= mtk_aes_gcm_setkey,
- 	.setauthsize	= mtk_aes_gcm_setauthsize,
- 	.encrypt	= mtk_aes_gcm_encrypt,
- 	.decrypt	= mtk_aes_gcm_decrypt,
- 	.init		= mtk_aes_gcm_init,
--	.exit		= mtk_aes_gcm_exit,
- 	.ivsize		= GCM_AES_IV_SIZE,
- 	.maxauthsize	= AES_BLOCK_SIZE,
- 
--- 
-2.27.0
+> On Fri, Jun 26, 2020 at 12:16:33PM -0400, Mikulas Patocka wrote:
+> > +/*
+> > + * Pass these flags down through the crypto API.
+> > + */
+> > +#define CRYPTO_ALG_INHERITED_FLAGS	(CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY)
+> 
+> This comment is useless.  How about:
+> 
+> /*
+>  * When an algorithm uses another algorithm (e.g., if it's an instance of a
+>  * template), these are the flags that always get set on the "outer" algorithm
+>  * if any "inner" algorithm has them set.  In some cases other flags are
+>  * inherited too; these are just the flags that are *always* inherited.
+>  */
+> #define CRYPTO_ALG_INHERITED_FLAGS	(CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY)
+> 
+> Also I wonder about the case where the inner algorithm is a fallback rather than
+> part of a template instance.  This patch only handles templates, not fallbacks.
+> Is that intentional?  Isn't that technically a bug?
+
+I'm not an expert in crypto internals, so I don't know. I'll send version 
+3 of this patch and I'd like to ask you or Herbert to fix it.
+
+> > +
+> > +/*
+> >   * Transform masks and values (for crt_flags).
+> >   */
+> >  #define CRYPTO_TFM_NEED_KEY		0x00000001
+> > Index: linux-2.6/crypto/authenc.c
+> > ===================================================================
+> > --- linux-2.6.orig/crypto/authenc.c	2020-06-26 17:24:03.566417000 +0200
+> > +++ linux-2.6/crypto/authenc.c	2020-06-26 17:24:03.566417000 +0200
+> > @@ -388,7 +388,8 @@ static int crypto_authenc_create(struct
+> >  	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
+> >  		return -EINVAL;
+> >  
+> > -	mask = crypto_requires_sync(algt->type, algt->mask);
+> > +	mask = crypto_requires_sync(algt->type, algt->mask) |
+> > +	       crypto_requires_nomem(algt->type, algt->mask);
+> 
+> As I suggested earlier, shouldn't there be a function that returns the mask for
+> all inherited flags, rather than handling each flag individually?
+
+Yes - I've created crypto_requires_inherited for this purpose.
+
+> >  
+> >  	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
+> >  	if (!inst)
+> > @@ -424,7 +425,7 @@ static int crypto_authenc_create(struct
+> >  		goto err_free_inst;
+> >  
+> >  	inst->alg.base.cra_flags = (auth_base->cra_flags |
+> > -				    enc->base.cra_flags) & CRYPTO_ALG_ASYNC;
+> > +			enc->base.cra_flags) & CRYPTO_ALG_INHERITED_FLAGS;
+> 
+> Strange indentation here.  Likewise in most of the other files.
+
+I was told that the code should be 80-characters wide.
+
+> > Index: linux-2.6/crypto/xts.c
+> > ===================================================================
+> > --- linux-2.6.orig/crypto/xts.c	2020-06-26 17:24:03.566417000 +0200
+> > +++ linux-2.6/crypto/xts.c	2020-06-26 17:24:03.566417000 +0200
+> > @@ -415,7 +415,7 @@ static int create(struct crypto_template
+> >  	} else
+> >  		goto err_free_inst;
+> >  
+> > -	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
+> > +	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_INHERITED_FLAGS;
+> >  	inst->alg.base.cra_priority = alg->base.cra_priority;
+> >  	inst->alg.base.cra_blocksize = XTS_BLOCK_SIZE;
+> >  	inst->alg.base.cra_alignmask = alg->base.cra_alignmask |
+> 
+> Need to set the mask correctly in this file.
+
+I don't know what do you mean.
+
+> > Index: linux-2.6/crypto/adiantum.c
+> > ===================================================================
+> > --- linux-2.6.orig/crypto/adiantum.c	2020-06-26 17:24:03.566417000 +0200
+> > +++ linux-2.6/crypto/adiantum.c	2020-06-26 17:24:03.566417000 +0200
+> > @@ -507,7 +507,8 @@ static int adiantum_create(struct crypto
+> >  	if ((algt->type ^ CRYPTO_ALG_TYPE_SKCIPHER) & algt->mask)
+> >  		return -EINVAL;
+> >  
+> > -	mask = crypto_requires_sync(algt->type, algt->mask);
+> > +	mask = crypto_requires_sync(algt->type, algt->mask) |
+> > +	       crypto_requires_nomem(algt->type, algt->mask);
+> >  
+> >  	inst = kzalloc(sizeof(*inst) + sizeof(*ictx), GFP_KERNEL);
+> >  	if (!inst)
+> 
+> Need to use CRYPTO_ALG_INHERITED_FLAGS in this file.
+
+OK.
+
+> - Eric
+
+Mikulas
 
