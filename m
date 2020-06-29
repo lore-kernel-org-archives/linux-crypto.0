@@ -2,114 +2,92 @@ Return-Path: <SRS0=qXKu=AK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D8AC433E6
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jun 2020 18:47:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEFF2C433E1
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jun 2020 18:50:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 416D6204EC
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jun 2020 18:47:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bEMO9AAn"
+	by mail.kernel.org (Postfix) with ESMTP id AC4A5204EC
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jun 2020 18:50:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727061AbgF2Sr6 (ORCPT
+        id S1726084AbgF2Sur (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Jun 2020 14:47:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39230 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729355AbgF2Srp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Jun 2020 14:47:45 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1898FC02E2C1
-        for <linux-crypto@vger.kernel.org>; Mon, 29 Jun 2020 06:58:15 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id 9so18127438ljc.8
-        for <linux-crypto@vger.kernel.org>; Mon, 29 Jun 2020 06:58:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uCQ8gnTNmCbw3Jp4/ShmxDGjAQ3pvSFd1R7iQkCtV0o=;
-        b=bEMO9AAnWp5LTsNLVdXW9Oe7mzKQhGXAj0e5OEmfEtAkG1cNaFNZSh2Qdo5mWbPuMY
-         9DiqUdT+MsXYwleFvjrGxmVJqwyvuKXhxlQUK3rtF7VdMnvX7cTOhwoxwrJJLOVzNu5i
-         2XK9FlT9eHx+sLquBViH/xZ5rB5rAhbPqcP9GuagM0OXFUt9wlcNzUKNy1aLnFdNwo+V
-         8Ruz/vdEgYh0uNq8BnFoCh6EqK2N49EfB0DJU88m7ryxOsAPu8lNbY+iq10lCSBY9Mui
-         ZPg6x5swpeRbq9anXoM2U2j46UxRzipSI496ZyBwvvY+KYVNwgj+Iwoz/AD7OkkAul0p
-         isLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uCQ8gnTNmCbw3Jp4/ShmxDGjAQ3pvSFd1R7iQkCtV0o=;
-        b=KbngNQuqzJ6EM4P1ZxMGrBcPkMMGt6wVYD/yEps9rQdKh/IZUAmC2OYK5Id8cpkS1i
-         0BkUrWxmWD1DBKiUTv2U7tw1ngKfl1dJcPxR56hK5foXPGe7V2BJ3pJY85N9G7nDjrH0
-         Zq2G7xzz0owM3wj7hhqWXh2RPG/g9OilYgu7O3zqgTstcp5DoE1T55A6/HoYXrIyVyNp
-         DOTsU4Yp/F8YVR1PbWkequQAWhUUxT1Ji04ROzd5CCanWRl00jIg8uqDR7zk8tJJyeP2
-         eaAMUsoBDsM05irWOe00wmNPLJt9HPp1GiD149kMvvVaXuFGtwdbZD0YPu6gNFYv7vuw
-         Ce4Q==
-X-Gm-Message-State: AOAM531vbglecf8QD3fQvOYS6p+taU7mHRLCv082YGdwV0Am6RkxVZX6
-        NQnrTPKqqav0ksSWNtXalXMSEbiSs+qKtmzsakvtd/HRtN0=
-X-Google-Smtp-Source: ABdhPJyszh+KKJKX6JxEpQEiu36tPTXZ+lFvnrC92R82eADyKCIBV3+TFvVd2yAYiyqz2uUbOeMX15KpV7G5lmjJkoI=
-X-Received: by 2002:a2e:3504:: with SMTP id z4mr8452019ljz.283.1593439093501;
- Mon, 29 Jun 2020 06:58:13 -0700 (PDT)
+        Mon, 29 Jun 2020 14:50:47 -0400
+Received: from mga06.intel.com ([134.134.136.31]:64953 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727090AbgF2Sun (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Jun 2020 14:50:43 -0400
+IronPort-SDR: CFxEYzUkIsoBPxzdsuvs811fhSwNNLa9MEYduw6iqsyIOKMlO+/SqjjqodwXIT6sfAowcWaAB9
+ 0lv9522/WMRA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9666"; a="207516131"
+X-IronPort-AV: E=Sophos;i="5.75,295,1589266800"; 
+   d="scan'208";a="207516131"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2020 10:04:58 -0700
+IronPort-SDR: PSh9N3OOgk5Ln16DxKMg1w0XnsqVf7kVnK+ig5FbcTBfFoCFsIx4VngYEZk+mug0y6+6IJ0MJJ
+ h4rwNEPgLHww==
+X-IronPort-AV: E=Sophos;i="5.75,295,1589266800"; 
+   d="scan'208";a="303138586"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.51])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2020 10:04:56 -0700
+Date:   Mon, 29 Jun 2020 18:04:50 +0100
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        qat-linux@intel.com
+Subject: Re: [PATCH v2 4/4] crypto: qat - fallback for xts with 192 bit keys
+Message-ID: <20200629170353.GA2750@silpixa00400314>
+References: <20200626080429.155450-1-giovanni.cabiddu@intel.com>
+ <20200626080429.155450-5-giovanni.cabiddu@intel.com>
+ <CAMj1kXGu4_Fp=0i9FUJuRUknsUrf0Ci=r9gMb5+Zf+hVXN4-rw@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200629123003.1014387-1-lee.jones@linaro.org>
-In-Reply-To: <20200629123003.1014387-1-lee.jones@linaro.org>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Mon, 29 Jun 2020 15:58:02 +0200
-Message-ID: <CACRpkdYxRsCmK+3Zu9ywMZD=Y1c4N-27gj-w4eTwpRGGd2=-hw@mail.gmail.com>
-Subject: Re: [PATCH 1/1] crypto: ux500: hash: Add namespacing to hash_init()
-To:     Lee Jones <lee.jones@linaro.org>
-Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXGu4_Fp=0i9FUJuRUknsUrf0Ci=r9gMb5+Zf+hVXN4-rw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 29, 2020 at 2:30 PM Lee Jones <lee.jones@linaro.org> wrote:
+Thanks for your feedback Ard.
 
-> A recent change to the Regulator consumer API (which this driver
-> utilises) add prototypes for the some suspend functions.  These
-> functions require including header file include/linux/suspend.h.
->
-> The following tree of includes affecting this driver will be
-> present:
->
->    In file included from include/linux/elevator.h:6,
->                     from include/linux/blkdev.h:288,
->                     from include/linux/blk-cgroup.h:23,
->                     from include/linux/writeback.h:14,
->                     from include/linux/memcontrol.h:22,
->                     from include/linux/swap.h:9,
->                     from include/linux/suspend.h:5,
->                     from include/linux/regulator/consumer.h:35,
->                     from drivers/crypto/ux500/hash/hash_core.c:28:
->
-> include/linux/elevator.h pulls in include/linux/hashtable.h which
-> contains its own version of hash_init().  This confuses the build
-> system and results in the following error (amongst others):
->
->  drivers/crypto/ux500/hash/hash_core.c:1362:19: error: passing argument 1 of '__hash_init' from incompatible pointer type [-Werror=incompatible-pointer-types]
->  1362 |  return hash_init(req);
->
-> Fix this by namespacing the local hash_init() such that the
-> source of confusion is removed.
->
-> Cc: Linus Walleij <linus.walleij@linaro.org>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
-> Signed-off-by: Lee Jones <lee.jones@linaro.org>
+On Fri, Jun 26, 2020 at 08:15:16PM +0200, Ard Biesheuvel wrote:
+> On Fri, 26 Jun 2020 at 10:04, Giovanni Cabiddu
+> <giovanni.cabiddu@intel.com> wrote:
+> >
+> > +static int qat_alg_skcipher_init_xts_tfm(struct crypto_skcipher *tfm)
+> > +{
+> > +       struct qat_alg_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
+> > +       int reqsize;
+> > +
+> > +       ctx->ftfm = crypto_alloc_skcipher("xts(aes)", 0, CRYPTO_ALG_ASYNC);
+> 
+> Why are you only permitting synchronous fallbacks? If the logic above
+> is sound, and copies the base.complete and base.data fields as well,
+> the fallback can complete asynchronously without problems.
+> Note that SIMD s/w implementations of XTS(AES) are asynchronous as
+> well, as they use the crypto_simd helper which queues requests for
+> asynchronous completion if the context from which the request was
+> issued does not permit access to the SIMD register file (e.g., softirq
+> context on some architectures, if the interrupted context is also
+> using SIMD)
+I did it this way since I though I didn't have a way to test it with an
+asynchronous sw implementation.
+I changed this line to avoid masking the asynchronous implementations
+and test it by forcing simd.c to use always cryptd (don't know if there
+is a simpler way to do it).
 
-This looks reasonable.
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Also, I added to the mask CRYPTO_ALG_NEED_FALLBACK so I don't get another
+implementation that requires a fallback.
 
-Yours,
-Linus Walleij
+I'm going to send a v3.
+
+Regards,
+
+-- 
+Giovanni
