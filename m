@@ -2,92 +2,75 @@ Return-Path: <SRS0=qXKu=AK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEFF2C433E1
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jun 2020 18:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C8BC433E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jun 2020 18:57:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC4A5204EC
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jun 2020 18:50:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D54B2067D
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jun 2020 18:57:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726084AbgF2Sur (ORCPT
+        id S1729129AbgF2S5G (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Jun 2020 14:50:47 -0400
-Received: from mga06.intel.com ([134.134.136.31]:64953 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727090AbgF2Sun (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Jun 2020 14:50:43 -0400
-IronPort-SDR: CFxEYzUkIsoBPxzdsuvs811fhSwNNLa9MEYduw6iqsyIOKMlO+/SqjjqodwXIT6sfAowcWaAB9
- 0lv9522/WMRA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9666"; a="207516131"
-X-IronPort-AV: E=Sophos;i="5.75,295,1589266800"; 
-   d="scan'208";a="207516131"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2020 10:04:58 -0700
-IronPort-SDR: PSh9N3OOgk5Ln16DxKMg1w0XnsqVf7kVnK+ig5FbcTBfFoCFsIx4VngYEZk+mug0y6+6IJ0MJJ
- h4rwNEPgLHww==
-X-IronPort-AV: E=Sophos;i="5.75,295,1589266800"; 
-   d="scan'208";a="303138586"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.51])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2020 10:04:56 -0700
-Date:   Mon, 29 Jun 2020 18:04:50 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        qat-linux@intel.com
-Subject: Re: [PATCH v2 4/4] crypto: qat - fallback for xts with 192 bit keys
-Message-ID: <20200629170353.GA2750@silpixa00400314>
-References: <20200626080429.155450-1-giovanni.cabiddu@intel.com>
- <20200626080429.155450-5-giovanni.cabiddu@intel.com>
- <CAMj1kXGu4_Fp=0i9FUJuRUknsUrf0Ci=r9gMb5+Zf+hVXN4-rw@mail.gmail.com>
+        Mon, 29 Jun 2020 14:57:06 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:59522 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726958AbgF2S5D (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Jun 2020 14:57:03 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 26E851BEE3FD16902541;
+        Mon, 29 Jun 2020 19:10:58 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 29 Jun 2020 19:10:45 +0800
+From:   Yang Shen <shenyang39@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
+        <wangzhou1@hisilicon.com>
+Subject: [PATCH 4/9] crypto: hisilicon/qm - fix judgement of queue is full
+Date:   Mon, 29 Jun 2020 19:09:03 +0800
+Message-ID: <1593428948-64634-5-git-send-email-shenyang39@huawei.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1593428948-64634-1-git-send-email-shenyang39@huawei.com>
+References: <1593428948-64634-1-git-send-email-shenyang39@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXGu4_Fp=0i9FUJuRUknsUrf0Ci=r9gMb5+Zf+hVXN4-rw@mail.gmail.com>
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thanks for your feedback Ard.
+From: Hui Tang <tanghui20@huawei.com>
 
-On Fri, Jun 26, 2020 at 08:15:16PM +0200, Ard Biesheuvel wrote:
-> On Fri, 26 Jun 2020 at 10:04, Giovanni Cabiddu
-> <giovanni.cabiddu@intel.com> wrote:
-> >
-> > +static int qat_alg_skcipher_init_xts_tfm(struct crypto_skcipher *tfm)
-> > +{
-> > +       struct qat_alg_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-> > +       int reqsize;
-> > +
-> > +       ctx->ftfm = crypto_alloc_skcipher("xts(aes)", 0, CRYPTO_ALG_ASYNC);
-> 
-> Why are you only permitting synchronous fallbacks? If the logic above
-> is sound, and copies the base.complete and base.data fields as well,
-> the fallback can complete asynchronously without problems.
-> Note that SIMD s/w implementations of XTS(AES) are asynchronous as
-> well, as they use the crypto_simd helper which queues requests for
-> asynchronous completion if the context from which the request was
-> issued does not permit access to the SIMD register file (e.g., softirq
-> context on some architectures, if the interrupted context is also
-> using SIMD)
-I did it this way since I though I didn't have a way to test it with an
-asynchronous sw implementation.
-I changed this line to avoid masking the asynchronous implementations
-and test it by forcing simd.c to use always cryptd (don't know if there
-is a simpler way to do it).
+The queue depth is 1024, so the condition for judging the queue full
+should be 1023, otherwise the hardware cannot judge whether the queue
+is empty or full.
 
-Also, I added to the mask CRYPTO_ALG_NEED_FALLBACK so I don't get another
-implementation that requires a fallback.
+Fixes: 263c9959c937("crypto: hisilicon - add queue management driver...")
+Signed-off-by: Hui Tang <tanghui20@huawei.com>
+Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
+---
+ drivers/crypto/hisilicon/qm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm going to send a v3.
-
-Regards,
-
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 095ebf0..93f443c 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -1655,7 +1655,7 @@ static void *qm_get_avail_sqe(struct hisi_qp *qp)
+ 	struct hisi_qp_status *qp_status = &qp->qp_status;
+ 	u16 sq_tail = qp_status->sq_tail;
+ 
+-	if (unlikely(atomic_read(&qp->qp_status.used) == QM_Q_DEPTH))
++	if (unlikely(atomic_read(&qp->qp_status.used) == QM_Q_DEPTH - 1))
+ 		return NULL;
+ 
+ 	return qp->sqe + sq_tail * qp->qm->sqe_size;
 -- 
-Giovanni
+2.7.4
+
