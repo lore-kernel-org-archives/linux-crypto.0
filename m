@@ -2,206 +2,558 @@ Return-Path: <SRS0=qXKu=AK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3087C433DF
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jun 2020 21:12:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17435C433E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jun 2020 21:14:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2746206F1
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jun 2020 21:12:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pRKyjljs"
+	by mail.kernel.org (Postfix) with ESMTP id E93B3206A1
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jun 2020 21:14:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388493AbgF2VMd (ORCPT
+        id S1730086AbgF2S5Q (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Jun 2020 17:12:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40922 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730150AbgF2S5o (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Jun 2020 14:57:44 -0400
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3205DC00F813
-        for <linux-crypto@vger.kernel.org>; Mon, 29 Jun 2020 05:30:17 -0700 (PDT)
-Received: by mail-wr1-x443.google.com with SMTP id j4so13902362wrp.10
-        for <linux-crypto@vger.kernel.org>; Mon, 29 Jun 2020 05:30:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=PJzVhpJJAv65Qazp2aPfqaE5/RwoX3RLz4Z8bcbSMRY=;
-        b=pRKyjljsaQEzYd/ZTriBGti7UFYvW3HNq59C0GxU7Os8zRMWbFWUMRj3M06J5MzDlV
-         vIaE8Ml1b3R2geKPTQuPHi0k8gxdJWzU/+9zRgsvtmmmql0m5TZgeU4zDB0+yx/AWOAJ
-         0AjDk8p6eJ9DH+NvXRrUP7M2kRklGw7lArXXNQhUPumIZYQQudDavWKt0u4DFSBrRT3m
-         pUhLKJwwToAo+RwJXhWKcWkk1OI119FZRjaPRJlZ9TC/zhhiTlHGsy8t33DnoHDR0qfk
-         4dXuRgRa1sUvhPZkzCVhHCY+k4jL3cExflco1rek0UXuoZA2huIC6wGPNqZKL04EAIKn
-         wBgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=PJzVhpJJAv65Qazp2aPfqaE5/RwoX3RLz4Z8bcbSMRY=;
-        b=B59ApV0x28V4owm+RTuVo+NuVzubDtugxClC8KyHKOwtt00MquGswGGjybgk8yiwCK
-         vt4fRtxfQOd5g5QTaZlRJKzsCEwjHHj/ZHO6npyYiWAdlb398fbbxRvcKuU5SvqI7mSM
-         WPBlQLdZSMtwOFw2pooUvreLQCqKWUPAKNsX6RfP0D3v8AOpHwF5SMA9nlrgeiT7zNrw
-         YcjrR6DPki6A4wRWQ9PVBaG5uwUCEoon2XJfDOko5JDX0uCrCPN/pVLy3mFEq1ww6wlO
-         Dt1tYFFkR2kLVPfrhirjM/UhWM/7KOrS9c1Mkz7/seXGycqk2l3+0G6AiK44ktVu8NcU
-         2XGw==
-X-Gm-Message-State: AOAM532SXVu7hYbEKybbIOCZz6UEw4zGwKPztWgeVVGiC9eRGSztxx/b
-        VL4YlOpX2YsqyJ8wAGKo/T4N9g==
-X-Google-Smtp-Source: ABdhPJyJCgqEzM0dRcjMBFFJyWUUkmlGDMG9BE8MzW+qrGWD2FeLjOf3tbRfUrqURp7S6UzoC8eBqg==
-X-Received: by 2002:adf:8b18:: with SMTP id n24mr17862490wra.372.1593433815872;
-        Mon, 29 Jun 2020 05:30:15 -0700 (PDT)
-Received: from localhost.localdomain ([2.27.35.144])
-        by smtp.gmail.com with ESMTPSA id g144sm32676472wme.2.2020.06.29.05.30.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2020 05:30:15 -0700 (PDT)
-From:   Lee Jones <lee.jones@linaro.org>
-To:     lee.jones@linaro.org
-Cc:     linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH 1/1] crypto: ux500: hash: Add namespacing to hash_init()
-Date:   Mon, 29 Jun 2020 13:30:03 +0100
-Message-Id: <20200629123003.1014387-1-lee.jones@linaro.org>
-X-Mailer: git-send-email 2.25.1
+        Mon, 29 Jun 2020 14:57:16 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:59612 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729055AbgF2S5J (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Jun 2020 14:57:09 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 39E5AE7E953A36D38A7B;
+        Mon, 29 Jun 2020 19:10:58 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 29 Jun 2020 19:10:47 +0800
+From:   Yang Shen <shenyang39@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
+        <wangzhou1@hisilicon.com>
+Subject: [PATCH 8/9] crypto: hisilicon/qm - fix the process of register algorithms to crypto
+Date:   Mon, 29 Jun 2020 19:09:07 +0800
+Message-ID: <1593428948-64634-9-git-send-email-shenyang39@huawei.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1593428948-64634-1-git-send-email-shenyang39@huawei.com>
+References: <1593428948-64634-1-git-send-email-shenyang39@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A recent change to the Regulator consumer API (which this driver
-utilises) add prototypes for the some suspend functions.  These
-functions require including header file include/linux/suspend.h.
+When the devices are removed or not existing, the corresponding algorithms
+which are registered by 'hisi-zip' driver can't be used.
 
-The following tree of includes affecting this driver will be
-present:
+Move 'hisi_zip_register_to_crypto' from 'hisi_zip_init' to
+'hisi_zip_probe'. The algorithms will be registered to crypto only when
+there is device bind on the driver. And when the devices are removed,
+the algorithms will be unregistered.
 
-   In file included from include/linux/elevator.h:6,
-                    from include/linux/blkdev.h:288,
-                    from include/linux/blk-cgroup.h:23,
-                    from include/linux/writeback.h:14,
-                    from include/linux/memcontrol.h:22,
-                    from include/linux/swap.h:9,
-                    from include/linux/suspend.h:5,
-                    from include/linux/regulator/consumer.h:35,
-                    from drivers/crypto/ux500/hash/hash_core.c:28:
+In the previous process, the function 'xxx_register_to_crypto' need a lock
+and a static variable to judge if the registration is the first time.
+Move this action into the function 'hisi_qm_alg_register'. Each device
+will call 'hisi_qm_alg_register' to add itself to qm list in probe process
+and registering algs when the qm list is empty.
 
-include/linux/elevator.h pulls in include/linux/hashtable.h which
-contains its own version of hash_init().  This confuses the build
-system and results in the following error (amongst others):
-
- drivers/crypto/ux500/hash/hash_core.c:1362:19: error: passing argument 1 of '__hash_init' from incompatible pointer type [-Werror=incompatible-pointer-types]
- 1362 |  return hash_init(req);
-
-Fix this by namespacing the local hash_init() such that the
-source of confusion is removed.
-
-Cc: Linus Walleij <linus.walleij@linaro.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
+Signed-off-by: Yang Shen <shenyang39@huawei.com>
 ---
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 36 ++++++--------------
+ drivers/crypto/hisilicon/hpre/hpre_main.c   | 22 ++++++------
+ drivers/crypto/hisilicon/qm.c               | 52 +++++++++++++++++++++++++++++
+ drivers/crypto/hisilicon/qm.h               | 20 +++--------
+ drivers/crypto/hisilicon/sec2/sec_crypto.c  | 35 +++++++------------
+ drivers/crypto/hisilicon/sec2/sec_main.c    | 25 +++++++-------
+ drivers/crypto/hisilicon/zip/zip_crypto.c   |  2 +-
+ drivers/crypto/hisilicon/zip/zip_main.c     | 39 ++++++++++++----------
+ 8 files changed, 126 insertions(+), 105 deletions(-)
 
-Ideally this should go into v5.8's -rcs else it runs the risk of
-breaking when Linus pulls everything in for v5.9-rc1.
-
- drivers/crypto/ux500/hash/hash_core.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index c24f2db8d5e83..a5ee8c2fb4e0b 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -545,7 +545,7 @@ static bool hash_dma_valid_data(struct scatterlist *sg, int datasize)
-  *
-  * Initialize structures.
-  */
--static int hash_init(struct ahash_request *req)
-+static int ux500_hash_init(struct ahash_request *req)
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index 7b5cb27..d685992 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -98,9 +98,6 @@ struct hpre_asym_request {
+ 	struct timespec64 req_time;
+ };
+ 
+-static DEFINE_MUTEX(hpre_alg_lock);
+-static unsigned int hpre_active_devs;
+-
+ static int hpre_alloc_req_id(struct hpre_ctx *ctx)
  {
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
- 	struct hash_ctx *ctx = crypto_ahash_ctx(tfm);
-@@ -1359,7 +1359,7 @@ static int ahash_sha1_init(struct ahash_request *req)
- 	ctx->config.oper_mode = HASH_OPER_MODE_HASH;
- 	ctx->digestsize = SHA1_DIGEST_SIZE;
+ 	unsigned long flags;
+@@ -1160,36 +1157,25 @@ static struct kpp_alg dh = {
  
--	return hash_init(req);
-+	return ux500_hash_init(req);
+ int hpre_algs_register(void)
+ {
+-	int ret = 0;
+-
+-	mutex_lock(&hpre_alg_lock);
+-	if (++hpre_active_devs == 1) {
+-		rsa.base.cra_flags = 0;
+-		ret = crypto_register_akcipher(&rsa);
+-		if (ret)
+-			goto unlock;
++	int ret;
++
++	rsa.base.cra_flags = 0;
++	ret = crypto_register_akcipher(&rsa);
++	if (ret)
++		return ret;
+ #ifdef CONFIG_CRYPTO_DH
+-		ret = crypto_register_kpp(&dh);
+-		if (ret) {
+-			crypto_unregister_akcipher(&rsa);
+-			goto unlock;
+-		}
++	ret = crypto_register_kpp(&dh);
++	if (ret)
++		crypto_unregister_akcipher(&rsa);
+ #endif
+-	}
+ 
+-unlock:
+-	mutex_unlock(&hpre_alg_lock);
+ 	return ret;
  }
  
- static int ahash_sha256_init(struct ahash_request *req)
-@@ -1372,7 +1372,7 @@ static int ahash_sha256_init(struct ahash_request *req)
- 	ctx->config.oper_mode = HASH_OPER_MODE_HASH;
- 	ctx->digestsize = SHA256_DIGEST_SIZE;
+ void hpre_algs_unregister(void)
+ {
+-	mutex_lock(&hpre_alg_lock);
+-	if (--hpre_active_devs == 0) {
+-		crypto_unregister_akcipher(&rsa);
++	crypto_unregister_akcipher(&rsa);
+ #ifdef CONFIG_CRYPTO_DH
+-		crypto_unregister_kpp(&dh);
++	crypto_unregister_kpp(&dh);
+ #endif
+-	}
+-	mutex_unlock(&hpre_alg_lock);
+ }
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index 85bdfdf..360bdb0 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -87,7 +87,6 @@
+ #define HPRE_SQE_MASK_OFFSET		8
+ #define HPRE_SQE_MASK_LEN		24
  
--	return hash_init(req);
-+	return ux500_hash_init(req);
+-static struct hisi_qm_list hpre_devices;
+ static const char hpre_name[] = "hisi_hpre";
+ static struct dentry *hpre_debugfs_root;
+ static const struct pci_device_id hpre_dev_ids[] = {
+@@ -103,6 +102,11 @@ struct hpre_hw_error {
+ 	const char *msg;
+ };
+ 
++static struct hisi_qm_list hpre_devices = {
++	.register_to_crypto	= hpre_algs_register,
++	.unregister_from_crypto	= hpre_algs_unregister,
++};
++
+ static const char * const hpre_debug_file_name[] = {
+ 	[HPRE_CURRENT_QM]   = "current_qm",
+ 	[HPRE_CLEAR_ENABLE] = "rdclr_en",
+@@ -161,6 +165,7 @@ static const struct debugfs_reg32 hpre_com_dfx_regs[] = {
+ 	{"INT_STATUS               ",  HPRE_INT_STATUS},
+ };
+ 
++
+ static const char *hpre_dfx_files[HPRE_DFX_FILE_NUM] = {
+ 	"send_cnt",
+ 	"recv_cnt",
+@@ -853,9 +858,7 @@ static int hpre_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	if (ret)
+ 		dev_warn(&pdev->dev, "init debugfs fail!\n");
+ 
+-	hisi_qm_add_to_list(qm, &hpre_devices);
+-
+-	ret = hpre_algs_register();
++	ret = hisi_qm_alg_register(qm, &hpre_devices);
+ 	if (ret < 0) {
+ 		pci_err(pdev, "fail to register algs to crypto!\n");
+ 		goto err_with_qm_start;
+@@ -864,16 +867,16 @@ static int hpre_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	if (qm->fun_type == QM_HW_PF && vfs_num) {
+ 		ret = hisi_qm_sriov_enable(pdev, vfs_num);
+ 		if (ret < 0)
+-			goto err_with_crypto_register;
++			goto err_with_alg_register;
+ 	}
+ 
+ 	return 0;
+ 
+-err_with_crypto_register:
+-	hpre_algs_unregister();
++err_with_alg_register:
++	hisi_qm_alg_unregister(qm, &hpre_devices);
+ 
+ err_with_qm_start:
+-	hisi_qm_del_from_list(qm, &hpre_devices);
++	hpre_debugfs_exit(hpre);
+ 	hisi_qm_stop(qm, QM_NORMAL);
+ 
+ err_with_err_init:
+@@ -891,8 +894,7 @@ static void hpre_remove(struct pci_dev *pdev)
+ 	struct hisi_qm *qm = &hpre->qm;
+ 	int ret;
+ 
+-	hpre_algs_unregister();
+-	hisi_qm_del_from_list(qm, &hpre_devices);
++	hisi_qm_alg_unregister(qm, &hpre_devices);
+ 	if (qm->fun_type == QM_HW_PF && qm->vfs_num) {
+ 		ret = hisi_qm_sriov_disable(pdev);
+ 		if (ret) {
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index a441b3d..8327365 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -3866,6 +3866,58 @@ static void hisi_qm_controller_reset(struct work_struct *rst_work)
  }
  
- static int ahash_sha1_digest(struct ahash_request *req)
-@@ -1425,7 +1425,7 @@ static int hmac_sha1_init(struct ahash_request *req)
- 	ctx->config.oper_mode	= HASH_OPER_MODE_HMAC;
- 	ctx->digestsize		= SHA1_DIGEST_SIZE;
+ /**
++ * hisi_qm_alg_register() - Register alg to crypto and add qm to qm_list.
++ * @qm: The qm needs add.
++ * @qm_list: The qm list.
++ *
++ * This function adds qm to qm list, and will register algorithm to
++ * crypto when the qm list is empty.
++ */
++int hisi_qm_alg_register(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
++{
++	int flag = 0;
++	int ret = 0;
++
++	mutex_lock(&qm_list->lock);
++	if (list_empty(&qm_list->list))
++		flag = 1;
++	list_add_tail(&qm->list, &qm_list->list);
++	mutex_unlock(&qm_list->lock);
++
++	if (flag) {
++		ret = qm_list->register_to_crypto();
++		if (ret) {
++			mutex_lock(&qm_list->lock);
++			list_del(&qm->list);
++			mutex_unlock(&qm_list->lock);
++		}
++	}
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(hisi_qm_alg_register);
++
++/**
++ * hisi_qm_alg_unregister() - Unregister alg from crypto and delete qm from
++ * qm list.
++ * @qm: The qm needs delete.
++ * @qm_list: The qm list.
++ *
++ * This function deletes qm from qm list, and will unregister algorithm
++ * from crypto when the qm list is empty.
++ */
++void hisi_qm_alg_unregister(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
++{
++	mutex_lock(&qm_list->lock);
++	list_del(&qm->list);
++	mutex_unlock(&qm_list->lock);
++
++	if (list_empty(&qm_list->list))
++		qm_list->unregister_from_crypto();
++}
++EXPORT_SYMBOL_GPL(hisi_qm_alg_unregister);
++
++/**
+  * hisi_qm_init() - Initialize configures about qm.
+  * @qm: The qm needing init.
+  *
+diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
+index 9d6cf1d..bd00897 100644
+--- a/drivers/crypto/hisilicon/qm.h
++++ b/drivers/crypto/hisilicon/qm.h
+@@ -193,6 +193,8 @@ struct hisi_qm_err_ini {
+ struct hisi_qm_list {
+ 	struct mutex lock;
+ 	struct list_head list;
++	int (*register_to_crypto)(void);
++	void (*unregister_from_crypto)(void);
+ };
  
--	return hash_init(req);
-+	return ux500_hash_init(req);
+ struct hisi_qm {
+@@ -336,22 +338,6 @@ static inline void hisi_qm_init_list(struct hisi_qm_list *qm_list)
+ 	mutex_init(&qm_list->lock);
  }
  
- static int hmac_sha256_init(struct ahash_request *req)
-@@ -1438,7 +1438,7 @@ static int hmac_sha256_init(struct ahash_request *req)
- 	ctx->config.oper_mode	= HASH_OPER_MODE_HMAC;
- 	ctx->digestsize		= SHA256_DIGEST_SIZE;
+-static inline void hisi_qm_add_to_list(struct hisi_qm *qm,
+-				       struct hisi_qm_list *qm_list)
+-{
+-	mutex_lock(&qm_list->lock);
+-	list_add_tail(&qm->list, &qm_list->list);
+-	mutex_unlock(&qm_list->lock);
+-}
+-
+-static inline void hisi_qm_del_from_list(struct hisi_qm *qm,
+-					 struct hisi_qm_list *qm_list)
+-{
+-	mutex_lock(&qm_list->lock);
+-	list_del(&qm->list);
+-	mutex_unlock(&qm_list->lock);
+-}
+-
+ int hisi_qm_init(struct hisi_qm *qm);
+ void hisi_qm_uninit(struct hisi_qm *qm);
+ int hisi_qm_start(struct hisi_qm *qm);
+@@ -390,4 +376,6 @@ void hisi_acc_free_sgl_pool(struct device *dev,
+ int hisi_qm_alloc_qps_node(struct hisi_qm_list *qm_list, int qp_num,
+ 			   u8 alg_type, int node, struct hisi_qp **qps);
+ void hisi_qm_free_qps(struct hisi_qp **qps, int qp_num);
++int hisi_qm_alg_register(struct hisi_qm *qm, struct hisi_qm_list *qm_list);
++void hisi_qm_alg_unregister(struct hisi_qm *qm, struct hisi_qm_list *qm_list);
+ #endif
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 85fcb4d..3c0c1d5 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -66,8 +66,6 @@
+ #define SEC_SQE_AEAD_FLAG	3
+ #define SEC_SQE_DONE		0x1
  
--	return hash_init(req);
-+	return ux500_hash_init(req);
+-static atomic_t sec_active_devs;
+-
+ /* Get an en/de-cipher queue cyclically to balance load over queues of TFM */
+ static inline int sec_alloc_queue_id(struct sec_ctx *ctx, struct sec_req *req)
+ {
+@@ -1625,33 +1623,24 @@ static struct aead_alg sec_aeads[] = {
+ 
+ int sec_register_to_crypto(void)
+ {
+-	int ret = 0;
++	int ret;
+ 
+ 	/* To avoid repeat register */
+-	if (atomic_add_return(1, &sec_active_devs) == 1) {
+-		ret = crypto_register_skciphers(sec_skciphers,
+-						ARRAY_SIZE(sec_skciphers));
+-		if (ret)
+-			return ret;
+-
+-		ret = crypto_register_aeads(sec_aeads, ARRAY_SIZE(sec_aeads));
+-		if (ret)
+-			goto reg_aead_fail;
+-	}
+-
+-	return ret;
+-
+-reg_aead_fail:
+-	crypto_unregister_skciphers(sec_skciphers, ARRAY_SIZE(sec_skciphers));
++	ret = crypto_register_skciphers(sec_skciphers,
++					ARRAY_SIZE(sec_skciphers));
++	if (ret)
++		return ret;
+ 
++	ret = crypto_register_aeads(sec_aeads, ARRAY_SIZE(sec_aeads));
++	if (ret)
++		crypto_unregister_skciphers(sec_skciphers,
++					    ARRAY_SIZE(sec_skciphers));
+ 	return ret;
  }
  
- static int hmac_sha1_digest(struct ahash_request *req)
-@@ -1515,7 +1515,7 @@ static struct hash_algo_template hash_algs[] = {
- 		.conf.algorithm = HASH_ALGO_SHA1,
- 		.conf.oper_mode = HASH_OPER_MODE_HASH,
- 		.hash = {
--			.init = hash_init,
-+			.init = ux500_hash_init,
- 			.update = ahash_update,
- 			.final = ahash_final,
- 			.digest = ahash_sha1_digest,
-@@ -1538,7 +1538,7 @@ static struct hash_algo_template hash_algs[] = {
- 		.conf.algorithm	= HASH_ALGO_SHA256,
- 		.conf.oper_mode	= HASH_OPER_MODE_HASH,
- 		.hash = {
--			.init = hash_init,
-+			.init = ux500_hash_init,
- 			.update	= ahash_update,
- 			.final = ahash_final,
- 			.digest = ahash_sha256_digest,
-@@ -1561,7 +1561,7 @@ static struct hash_algo_template hash_algs[] = {
- 		.conf.algorithm = HASH_ALGO_SHA1,
- 		.conf.oper_mode = HASH_OPER_MODE_HMAC,
- 			.hash = {
--			.init = hash_init,
-+			.init = ux500_hash_init,
- 			.update = ahash_update,
- 			.final = ahash_final,
- 			.digest = hmac_sha1_digest,
-@@ -1585,7 +1585,7 @@ static struct hash_algo_template hash_algs[] = {
- 		.conf.algorithm = HASH_ALGO_SHA256,
- 		.conf.oper_mode = HASH_OPER_MODE_HMAC,
- 		.hash = {
--			.init = hash_init,
-+			.init = ux500_hash_init,
- 			.update = ahash_update,
- 			.final = ahash_final,
- 			.digest = hmac_sha256_digest,
+ void sec_unregister_from_crypto(void)
+ {
+-	if (atomic_sub_return(1, &sec_active_devs) == 0) {
+-		crypto_unregister_skciphers(sec_skciphers,
+-					    ARRAY_SIZE(sec_skciphers));
+-		crypto_unregister_aeads(sec_aeads, ARRAY_SIZE(sec_aeads));
+-	}
++	crypto_unregister_skciphers(sec_skciphers,
++				    ARRAY_SIZE(sec_skciphers));
++	crypto_unregister_aeads(sec_aeads, ARRAY_SIZE(sec_aeads));
+ }
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index 091ba5a..d9c162d2 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -99,7 +99,11 @@ struct sec_dfx_item {
+ 
+ static const char sec_name[] = "hisi_sec2";
+ static struct dentry *sec_debugfs_root;
+-static struct hisi_qm_list sec_devices;
++
++static struct hisi_qm_list sec_devices = {
++	.register_to_crypto	= sec_register_to_crypto,
++	.unregister_from_crypto	= sec_unregister_from_crypto,
++};
+ 
+ static const struct sec_hw_error sec_hw_errors[] = {
+ 	{.int_msk = BIT(0), .msg = "sec_axi_rresp_err_rint"},
+@@ -879,27 +883,24 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	if (ret)
+ 		pci_warn(pdev, "Failed to init debugfs!\n");
+ 
+-	hisi_qm_add_to_list(qm, &sec_devices);
+-
+-	ret = sec_register_to_crypto();
++	ret = hisi_qm_alg_register(qm, &sec_devices);
+ 	if (ret < 0) {
+ 		pr_err("Failed to register driver to crypto.\n");
+-		goto err_remove_from_list;
++		goto err_qm_stop;
+ 	}
+ 
+ 	if (qm->fun_type == QM_HW_PF && vfs_num) {
+ 		ret = hisi_qm_sriov_enable(pdev, vfs_num);
+ 		if (ret < 0)
+-			goto err_crypto_unregister;
++			goto err_alg_unregister;
+ 	}
+ 
+ 	return 0;
+ 
+-err_crypto_unregister:
+-	sec_unregister_from_crypto();
++err_alg_unregister:
++	hisi_qm_alg_unregister(qm, &sec_devices);
+ 
+-err_remove_from_list:
+-	hisi_qm_del_from_list(qm, &sec_devices);
++err_qm_stop:
+ 	sec_debugfs_exit(qm);
+ 	hisi_qm_stop(qm, QM_NORMAL);
+ 
+@@ -917,9 +918,7 @@ static void sec_remove(struct pci_dev *pdev)
+ 	struct sec_dev *sec = pci_get_drvdata(pdev);
+ 	struct hisi_qm *qm = &sec->qm;
+ 
+-	sec_unregister_from_crypto();
+-
+-	hisi_qm_del_from_list(qm, &sec_devices);
++	hisi_qm_alg_unregister(qm, &sec_devices);
+ 
+ 	if (qm->fun_type == QM_HW_PF && qm->vfs_num)
+ 		hisi_qm_sriov_disable(pdev);
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+index c73707c..2ef5155 100644
+--- a/drivers/crypto/hisilicon/zip/zip_crypto.c
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -611,7 +611,7 @@ static struct acomp_alg hisi_zip_acomp_gzip = {
+ 
+ int hisi_zip_register_to_crypto(void)
+ {
+-	int ret = 0;
++	int ret;
+ 
+ 	ret = crypto_register_acomp(&hisi_zip_acomp_zlib);
+ 	if (ret) {
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index 5bf722a..72e2cc0 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -94,7 +94,6 @@
+ 
+ static const char hisi_zip_name[] = "hisi_zip";
+ static struct dentry *hzip_debugfs_root;
+-static struct hisi_qm_list zip_devices;
+ 
+ struct hisi_zip_hw_error {
+ 	u32 int_msk;
+@@ -106,6 +105,11 @@ struct zip_dfx_item {
+ 	u32 offset;
+ };
+ 
++static struct hisi_qm_list zip_devices = {
++	.register_to_crypto	= hisi_zip_register_to_crypto,
++	.unregister_from_crypto	= hisi_zip_unregister_from_crypto,
++};
++
+ static struct zip_dfx_item zip_dfx_files[] = {
+ 	{"send_cnt", offsetof(struct hisi_zip_dfx, send_cnt)},
+ 	{"recv_cnt", offsetof(struct hisi_zip_dfx, recv_cnt)},
+@@ -802,32 +806,42 @@ static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 
+ 	ret = hisi_qm_start(qm);
+ 	if (ret)
+-		goto err_qm_uninit;
++		goto err_dev_err_uninit;
+ 
+ 	ret = hisi_zip_debugfs_init(hisi_zip);
+ 	if (ret)
+ 		dev_err(&pdev->dev, "Failed to init debugfs (%d)!\n", ret);
+ 
+-	hisi_qm_add_to_list(qm, &zip_devices);
++	ret = hisi_qm_alg_register(qm, &zip_devices);
++	if (ret < 0) {
++		pci_err(pdev, "Failed to register driver to crypto.\n");
++		goto err_qm_stop;
++	}
+ 
+ 	if (qm->uacce) {
+ 		ret = uacce_register(qm->uacce);
+ 		if (ret)
+-			goto err_qm_uninit;
++			goto err_qm_alg_unregister;
+ 	}
+ 
+ 	if (qm->fun_type == QM_HW_PF && vfs_num > 0) {
+ 		ret = hisi_qm_sriov_enable(pdev, vfs_num);
+ 		if (ret < 0)
+-			goto err_remove_from_list;
++			goto err_qm_alg_unregister;
+ 	}
+ 
+ 	return 0;
+ 
+-err_remove_from_list:
+-	hisi_qm_del_from_list(qm, &zip_devices);
++err_qm_alg_unregister:
++	hisi_qm_alg_unregister(qm, &zip_devices);
++
++err_qm_stop:
+ 	hisi_zip_debugfs_exit(hisi_zip);
+ 	hisi_qm_stop(qm, QM_NORMAL);
++
++err_dev_err_uninit:
++	hisi_qm_dev_err_uninit(qm);
++
+ err_qm_uninit:
+ 	hisi_qm_uninit(qm);
+ 
+@@ -847,7 +861,7 @@ static void hisi_zip_remove(struct pci_dev *pdev)
+ 
+ 	hisi_qm_dev_err_uninit(qm);
+ 	hisi_qm_uninit(qm);
+-	hisi_qm_del_from_list(qm, &zip_devices);
++	hisi_qm_alg_unregister(qm, &zip_devices);
+ }
+ 
+ static const struct pci_error_handlers hisi_zip_err_handler = {
+@@ -893,16 +907,8 @@ static int __init hisi_zip_init(void)
+ 		goto err_pci;
+ 	}
+ 
+-	ret = hisi_zip_register_to_crypto();
+-	if (ret < 0) {
+-		pr_err("Failed to register driver to crypto.\n");
+-		goto err_crypto;
+-	}
+-
+ 	return 0;
+ 
+-err_crypto:
+-	pci_unregister_driver(&hisi_zip_pci_driver);
+ err_pci:
+ 	hisi_zip_unregister_debugfs();
+ 
+@@ -911,7 +917,6 @@ static int __init hisi_zip_init(void)
+ 
+ static void __exit hisi_zip_exit(void)
+ {
+-	hisi_zip_unregister_from_crypto();
+ 	pci_unregister_driver(&hisi_zip_pci_driver);
+ 	hisi_zip_unregister_debugfs();
+ }
 -- 
-2.25.1
+2.7.4
 
