@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 478FBC433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 12:20:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80606C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 12:20:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2060020702
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 12:20:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5ECEF20702
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 12:20:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1593519600;
-	bh=qrgEp858d6S/nsBVd7ZX2BiVRKqbjQySrsdS4UYEijM=;
+	s=default; t=1593519604;
+	bh=rg2ypLnQp5VyF0qc7FaNJ5eAd/7z9AwkuR1gPRSjTfw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=nTq1OVYFD5Sgts8Sd68t9Wf8WLeoqyWI78DB25I8xHg06t28KwOM7FCfAY/o8ROSF
-	 lfCSed2gSA7F7BNzm16iVodsIHyMWt1TdK/zT+L6Rx+ZqHWx6+D0/V1fYhFTRktTXq
-	 gTC76oJk50XKuPwpeodxy4QHnvn0fRepxqkRsKC4=
+	b=WFAtlaOhc6S654Mwl+yKajDNX98k8eaHfiB8BJJ9wNKmlDPuJyG6fAgtozX0zdRZk
+	 E3/Jwy9MIO2zOkj+BGkXwP8ENAe21zyLNjViFS6Qfst8Xvq7WFkQdw/By0Hvi4V1qN
+	 TQU1Sb/rf1oEOv5I1DfW6U1Ann5vcQPnE9Te3CZY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387645AbgF3MT7 (ORCPT
+        id S2387621AbgF3MUD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Jun 2020 08:19:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36558 "EHLO mail.kernel.org"
+        Tue, 30 Jun 2020 08:20:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36610 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732804AbgF3MT6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Jun 2020 08:19:58 -0400
+        id S1732804AbgF3MUD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Jun 2020 08:20:03 -0400
 Received: from e123331-lin.nice.arm.com (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 72DD920774;
-        Tue, 30 Jun 2020 12:19:53 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1350820780;
+        Tue, 30 Jun 2020 12:19:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1593519597;
-        bh=qrgEp858d6S/nsBVd7ZX2BiVRKqbjQySrsdS4UYEijM=;
+        s=default; t=1593519602;
+        bh=rg2ypLnQp5VyF0qc7FaNJ5eAd/7z9AwkuR1gPRSjTfw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GLMdGfwbc0kJH52vcpwUJz3QOcoEBpxN1F/q1+gpzmdPXXa/C4mXdQswIvA0LAxug
-         8F8fBd2NGkgKyqvaE7xabPdAlNU34odFq6ZKnW3xLuoRzePoLXTiVdvWzsMyqXLDq6
-         3+aqCFTKGFdLMhWy7XB1+LDp8C7UrdWUDEvo5AYc=
+        b=XKvDXvkdczzkpqFir5Cs8ulfJBXk0b6YZUwPOPAd7vVGDyDJn/B//vCJhv7u0u6ri
+         eZqLjYTVLx7Zbx4uUa9ZGNCJYWdzMxn472wNXed8dPGTwBwDbB9me4C9Wg1sFTDR0R
+         P1bAy6wJv5xfSjIvlKwj4WhcVUE/djw2Epc23LyY=
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ardb@kernel.org>,
@@ -60,9 +60,9 @@ Cc:     Ard Biesheuvel <ardb@kernel.org>,
         Eric Biggers <ebiggers@google.com>,
         Tero Kristo <t-kristo@ti.com>,
         Matthias Brugger <matthias.bgg@gmail.com>
-Subject: [PATCH v3 09/13] crypto: mxs-dcp - permit asynchronous skcipher as fallback
-Date:   Tue, 30 Jun 2020 14:19:03 +0200
-Message-Id: <20200630121907.24274-10-ardb@kernel.org>
+Subject: [PATCH v3 10/13] crypto: picoxcell - permit asynchronous skcipher as fallback
+Date:   Tue, 30 Jun 2020 14:19:04 +0200
+Message-Id: <20200630121907.24274-11-ardb@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200630121907.24274-1-ardb@kernel.org>
 References: <20200630121907.24274-1-ardb@kernel.org>
@@ -71,7 +71,7 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Even though the mxs-dcp driver implements asynchronous versions of
+Even though the picoxcell driver implements asynchronous versions of
 ecb(aes) and cbc(aes), the fallbacks it allocates are required to be
 synchronous. Given that SIMD based software implementations are usually
 asynchronous as well, even though they rarely complete asynchronously
@@ -89,100 +89,114 @@ to the outer request.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- drivers/crypto/mxs-dcp.c | 33 ++++++++++----------
- 1 file changed, 17 insertions(+), 16 deletions(-)
+ drivers/crypto/picoxcell_crypto.c | 38 +++++++++++---------
+ 1 file changed, 22 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index d84530293036..909a7eb748e3 100644
---- a/drivers/crypto/mxs-dcp.c
-+++ b/drivers/crypto/mxs-dcp.c
-@@ -97,7 +97,7 @@ struct dcp_async_ctx {
- 	unsigned int			hot:1;
- 
- 	/* Crypto-specific context */
--	struct crypto_sync_skcipher	*fallback;
-+	struct crypto_skcipher		*fallback;
- 	unsigned int			key_len;
- 	uint8_t				key[AES_KEYSIZE_128];
- };
-@@ -105,6 +105,7 @@ struct dcp_async_ctx {
- struct dcp_aes_req_ctx {
- 	unsigned int	enc:1;
- 	unsigned int	ecb:1;
-+	struct skcipher_request fallback_req;	// keep at the end
+diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
+index 7384e91c8b32..13503e16ce1d 100644
+--- a/drivers/crypto/picoxcell_crypto.c
++++ b/drivers/crypto/picoxcell_crypto.c
+@@ -86,6 +86,7 @@ struct spacc_req {
+ 	dma_addr_t			src_addr, dst_addr;
+ 	struct spacc_ddt		*src_ddt, *dst_ddt;
+ 	void				(*complete)(struct spacc_req *req);
++	struct skcipher_request		fallback_req;	// keep at the end
  };
  
- struct dcp_sha_req_ctx {
-@@ -426,21 +427,20 @@ static int dcp_chan_thread_aes(void *data)
- static int mxs_dcp_block_fallback(struct skcipher_request *req, int enc)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct dcp_aes_req_ctx *rctx = skcipher_request_ctx(req);
- 	struct dcp_async_ctx *ctx = crypto_skcipher_ctx(tfm);
--	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
- 	int ret;
+ struct spacc_aead {
+@@ -158,7 +159,7 @@ struct spacc_ablk_ctx {
+ 	 * The fallback cipher. If the operation can't be done in hardware,
+ 	 * fallback to a software version.
+ 	 */
+-	struct crypto_sync_skcipher	*sw_cipher;
++	struct crypto_skcipher		*sw_cipher;
+ };
  
--	skcipher_request_set_sync_tfm(subreq, ctx->fallback);
+ /* AEAD cipher context. */
+@@ -792,13 +793,13 @@ static int spacc_aes_setkey(struct crypto_skcipher *cipher, const u8 *key,
+ 		 * Set the fallback transform to use the same request flags as
+ 		 * the hardware transform.
+ 		 */
+-		crypto_sync_skcipher_clear_flags(ctx->sw_cipher,
++		crypto_skcipher_clear_flags(ctx->sw_cipher,
+ 					    CRYPTO_TFM_REQ_MASK);
+-		crypto_sync_skcipher_set_flags(ctx->sw_cipher,
++		crypto_skcipher_set_flags(ctx->sw_cipher,
+ 					  cipher->base.crt_flags &
+ 					  CRYPTO_TFM_REQ_MASK);
+ 
+-		err = crypto_sync_skcipher_setkey(ctx->sw_cipher, key, len);
++		err = crypto_skcipher_setkey(ctx->sw_cipher, key, len);
+ 		if (err)
+ 			goto sw_setkey_failed;
+ 	}
+@@ -900,7 +901,7 @@ static int spacc_ablk_do_fallback(struct skcipher_request *req,
+ 	struct crypto_tfm *old_tfm =
+ 	    crypto_skcipher_tfm(crypto_skcipher_reqtfm(req));
+ 	struct spacc_ablk_ctx *ctx = crypto_tfm_ctx(old_tfm);
+-	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, ctx->sw_cipher);
++	struct spacc_req *dev_req = skcipher_request_ctx(req);
+ 	int err;
+ 
+ 	/*
+@@ -908,13 +909,13 @@ static int spacc_ablk_do_fallback(struct skcipher_request *req,
+ 	 * the ciphering has completed, put the old transform back into the
+ 	 * request.
+ 	 */
+-	skcipher_request_set_sync_tfm(subreq, ctx->sw_cipher);
 -	skcipher_request_set_callback(subreq, req->base.flags, NULL, NULL);
 -	skcipher_request_set_crypt(subreq, req->src, req->dst,
-+	skcipher_request_set_tfm(&rctx->fallback_req, ctx->fallback);
-+	skcipher_request_set_callback(&rctx->fallback_req, req->base.flags,
++	skcipher_request_set_tfm(&dev_req->fallback_req, ctx->sw_cipher);
++	skcipher_request_set_callback(&dev_req->fallback_req, req->base.flags,
 +				      req->base.complete, req->base.data);
-+	skcipher_request_set_crypt(&rctx->fallback_req, req->src, req->dst,
++	skcipher_request_set_crypt(&dev_req->fallback_req, req->src, req->dst,
  				   req->cryptlen, req->iv);
- 
- 	if (enc)
--		ret = crypto_skcipher_encrypt(subreq);
-+		ret = crypto_skcipher_encrypt(&rctx->fallback_req);
- 	else
--		ret = crypto_skcipher_decrypt(subreq);
--
+-	err = is_encrypt ? crypto_skcipher_encrypt(subreq) :
+-			   crypto_skcipher_decrypt(subreq);
 -	skcipher_request_zero(subreq);
-+		ret = crypto_skcipher_decrypt(&rctx->fallback_req);
++	err = is_encrypt ? crypto_skcipher_encrypt(&dev_req->fallback_req) :
++			   crypto_skcipher_decrypt(&dev_req->fallback_req);
  
- 	return ret;
+ 	return err;
  }
-@@ -510,24 +510,25 @@ static int mxs_dcp_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 	 * but is supported by in-kernel software implementation, we use
- 	 * software fallback.
- 	 */
--	crypto_sync_skcipher_clear_flags(actx->fallback, CRYPTO_TFM_REQ_MASK);
--	crypto_sync_skcipher_set_flags(actx->fallback,
-+	crypto_skcipher_clear_flags(actx->fallback, CRYPTO_TFM_REQ_MASK);
-+	crypto_skcipher_set_flags(actx->fallback,
- 				  tfm->base.crt_flags & CRYPTO_TFM_REQ_MASK);
--	return crypto_sync_skcipher_setkey(actx->fallback, key, len);
-+	return crypto_skcipher_setkey(actx->fallback, key, len);
- }
+@@ -1007,19 +1008,24 @@ static int spacc_ablk_init_tfm(struct crypto_skcipher *tfm)
+ 	ctx->generic.flags = spacc_alg->type;
+ 	ctx->generic.engine = engine;
+ 	if (alg->base.cra_flags & CRYPTO_ALG_NEED_FALLBACK) {
+-		ctx->sw_cipher = crypto_alloc_sync_skcipher(
+-			alg->base.cra_name, 0, CRYPTO_ALG_NEED_FALLBACK);
++		ctx->sw_cipher = crypto_alloc_skcipher(alg->base.cra_name, 0,
++						       CRYPTO_ALG_NEED_FALLBACK);
+ 		if (IS_ERR(ctx->sw_cipher)) {
+ 			dev_warn(engine->dev, "failed to allocate fallback for %s\n",
+ 				 alg->base.cra_name);
+ 			return PTR_ERR(ctx->sw_cipher);
+ 		}
++		crypto_skcipher_set_reqsize(tfm, sizeof(struct spacc_req) +
++						 crypto_skcipher_reqsize(ctx->sw_cipher));
++	} else {
++		/* take the size without the fallback skcipher_request at the end */
++		crypto_skcipher_set_reqsize(tfm, offsetof(struct spacc_req,
++							  fallback_req));
+ 	}
++
+ 	ctx->generic.key_offs = spacc_alg->key_offs;
+ 	ctx->generic.iv_offs = spacc_alg->iv_offs;
  
- static int mxs_dcp_aes_fallback_init_tfm(struct crypto_skcipher *tfm)
- {
- 	const char *name = crypto_tfm_alg_name(crypto_skcipher_tfm(tfm));
- 	struct dcp_async_ctx *actx = crypto_skcipher_ctx(tfm);
--	struct crypto_sync_skcipher *blk;
-+	struct crypto_skcipher *blk;
- 
--	blk = crypto_alloc_sync_skcipher(name, 0, CRYPTO_ALG_NEED_FALLBACK);
-+	blk = crypto_alloc_skcipher(name, 0, CRYPTO_ALG_NEED_FALLBACK);
- 	if (IS_ERR(blk))
- 		return PTR_ERR(blk);
- 
- 	actx->fallback = blk;
--	crypto_skcipher_set_reqsize(tfm, sizeof(struct dcp_aes_req_ctx));
-+	crypto_skcipher_set_reqsize(tfm, sizeof(struct dcp_aes_req_ctx) +
-+					 crypto_skcipher_reqsize(blk));
+-	crypto_skcipher_set_reqsize(tfm, sizeof(struct spacc_req));
+-
  	return 0;
  }
  
-@@ -535,7 +536,7 @@ static void mxs_dcp_aes_fallback_exit_tfm(struct crypto_skcipher *tfm)
+@@ -1027,7 +1033,7 @@ static void spacc_ablk_exit_tfm(struct crypto_skcipher *tfm)
  {
- 	struct dcp_async_ctx *actx = crypto_skcipher_ctx(tfm);
+ 	struct spacc_ablk_ctx *ctx = crypto_skcipher_ctx(tfm);
  
--	crypto_free_sync_skcipher(actx->fallback);
-+	crypto_free_skcipher(actx->fallback);
+-	crypto_free_sync_skcipher(ctx->sw_cipher);
++	crypto_free_skcipher(ctx->sw_cipher);
  }
  
- /*
+ static int spacc_ablk_encrypt(struct skcipher_request *req)
 -- 
 2.17.1
 
