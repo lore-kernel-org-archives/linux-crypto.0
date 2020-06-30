@@ -2,86 +2,98 @@ Return-Path: <SRS0=XejO=AL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BD74C433E1
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 13:39:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22946C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 13:46:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 24BDA206B6
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 13:39:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2B3020675
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 13:46:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="COgivEem"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730255AbgF3Njq (ORCPT
+        id S2388374AbgF3NqZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Jun 2020 09:39:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45880 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726712AbgF3Njq (ORCPT
+        Tue, 30 Jun 2020 09:46:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53127 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726876AbgF3NqW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Jun 2020 09:39:46 -0400
-Received: from albert.telenet-ops.be (albert.telenet-ops.be [IPv6:2a02:1800:110:4::f00:1a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD077C03E979
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Jun 2020 06:39:45 -0700 (PDT)
-Received: from ramsan ([IPv6:2a02:1810:ac12:ed20:503c:ab8:1424:9638])
-        by albert.telenet-ops.be with bizsmtp
-        id xRfi2200L49uj5306Rfi1w; Tue, 30 Jun 2020 15:39:44 +0200
-Received: from rox.of.borg ([192.168.97.57])
-        by ramsan with esmtp (Exim 4.90_1)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1jqGUA-0005AS-Jj; Tue, 30 Jun 2020 15:39:42 +0200
-Received: from geert by rox.of.borg with local (Exim 4.90_1)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1jqGUA-0007Ta-F3; Tue, 30 Jun 2020 15:39:42 +0200
-From:   Geert Uytterhoeven <geert+renesas@glider.be>
-To:     Olivier Sobrie <olivier.sobrie@silexinsight.com>,
-        Waleed Ziad <waleed94ziad@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
+        Tue, 30 Jun 2020 09:46:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593524781;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1UH+55xErH58wgIIEldPnK8tt6qteH/PSC5nDDBo48w=;
+        b=COgivEemLFZRdQoRSXFayrYznzNFKGCwTeqO5MZmL01C2yWOc4Iw+q4d1bR8sPdpTBqimx
+        8ToVubYTxvqO85+Yl86JlvlBmgpboUdLOIF5LSxaVC9SMaGIJ4NwgB1bYYh5wztPSccZ4G
+        CY2693e7mdX0tbAqNxB6/VdpMp8rFRM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-204-V-cXXv4oN1e8P0ZVFAFFwA-1; Tue, 30 Jun 2020 09:46:15 -0400
+X-MC-Unique: V-cXXv4oN1e8P0ZVFAFFwA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C32C84AB68;
+        Tue, 30 Jun 2020 13:45:43 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 80B8C70126;
+        Tue, 30 Jun 2020 13:45:40 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 05UDjdto015761;
+        Tue, 30 Jun 2020 09:45:39 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 05UDjbtN015757;
+        Tue, 30 Jun 2020 09:45:37 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Tue, 30 Jun 2020 09:45:37 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Eric Biggers <ebiggers@kernel.org>
+cc:     Mike Snitzer <msnitzer@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH] hwrng: ba431 - HW_RANDOM_BA431 should not default to y
-Date:   Tue, 30 Jun 2020 15:39:41 +0200
-Message-Id: <20200630133941.28696-1-geert+renesas@glider.be>
-X-Mailer: git-send-email 2.17.1
+        Zaibo Xu <xuzaibo@huawei.com>, linux-kernel@vger.kernel.org,
+        Wei Xu <xuwei5@hisilicon.com>, dm-devel@redhat.com,
+        George Cherian <gcherian@marvell.com>,
+        linux-crypto@vger.kernel.org,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Milan Broz <mbroz@redhat.com>
+Subject: Re: [dm-devel] [PATCH 1/3 v2] crypto: introduce the flag
+ CRYPTO_ALG_ALLOCATES_MEMORY
+In-Reply-To: <alpine.LRH.2.02.2006290905340.11293@file01.intranet.prod.int.rdu2.redhat.com>
+Message-ID: <alpine.LRH.2.02.2006300944210.15237@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.2006161101080.28052@file01.intranet.prod.int.rdu2.redhat.com> <20200616173620.GA207319@gmail.com> <alpine.LRH.2.02.2006171107220.18714@file01.intranet.prod.int.rdu2.redhat.com> <alpine.LRH.2.02.2006171108440.18714@file01.intranet.prod.int.rdu2.redhat.com>
+ <20200626044534.GA2870@gondor.apana.org.au> <alpine.LRH.2.02.2006261109520.11899@file01.intranet.prod.int.rdu2.redhat.com> <alpine.LRH.2.02.2006261215480.13882@file01.intranet.prod.int.rdu2.redhat.com> <20200626164617.GA211634@gmail.com>
+ <20200626170039.GB211634@gmail.com> <alpine.LRH.2.02.2006281505530.347@file01.intranet.prod.int.rdu2.redhat.com> <20200628200022.GE11197@sol.localdomain> <alpine.LRH.2.02.2006290905340.11293@file01.intranet.prod.int.rdu2.redhat.com>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As HW_RANDOM_BA431 does not have any platform dependency, it should not
-default to enabled.
 
-Fixes: 0289e9be5dc26d84 ("hwrng: ba431 - add support for BA431 hwrng")
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- drivers/char/hw_random/Kconfig | 3 ---
- 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 7b876dfdbaafe7ad..9e91c556942b1c94 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -76,7 +76,6 @@ config HW_RANDOM_ATMEL
- 
- config HW_RANDOM_BA431
- 	tristate "Silex Insight BA431 Random Number Generator support"
--	default HW_RANDOM
- 	help
- 	  This driver provides kernel-side support for the Random Number
- 	  Generator hardware based on Silex Insight BA431 IP.
-@@ -84,8 +83,6 @@ config HW_RANDOM_BA431
- 	  To compile this driver as a module, choose M here: the
- 	  module will be called ba431-rng.
- 
--	  If unsure, say Y.
--
- config HW_RANDOM_BCM2835
- 	tristate "Broadcom BCM2835/BCM63xx Random Number Generator support"
- 	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
--- 
-2.17.1
+On Mon, 29 Jun 2020, Mikulas Patocka wrote:
+
+> On Sun, 28 Jun 2020, Eric Biggers wrote:
+> 
+> > On Sun, Jun 28, 2020 at 03:07:49PM -0400, Mikulas Patocka wrote:
+> > > > 
+> > > > cryptd_create_skcipher(), cryptd_create_hash(), cryptd_create_aead(), and
+> > > > crypto_rfc4309_create() are also missing setting the mask.
+> > > > 
+> > > > pcrypt_create_aead() is missing both setting the mask and inheriting the flags.
+
+pcrypt_create_aead doesn't use "mask" and "type" arguments at all.
+
+Mikulas
 
