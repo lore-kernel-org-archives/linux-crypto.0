@@ -2,151 +2,96 @@ Return-Path: <SRS0=XejO=AL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2144C433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 07:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1D04C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 07:20:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A201120759
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 07:07:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6794520759
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 07:20:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BhR7jMFg"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Q+cLGL1q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730581AbgF3HHc (ORCPT
+        id S1730859AbgF3HUU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Jun 2020 03:07:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41866 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730386AbgF3HHb (ORCPT
+        Tue, 30 Jun 2020 03:20:20 -0400
+Received: from lelv0142.ext.ti.com ([198.47.23.249]:46894 "EHLO
+        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730637AbgF3HUU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Jun 2020 03:07:31 -0400
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91CE8C03E979
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Jun 2020 00:07:31 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id z15so7697280wrl.8
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Jun 2020 00:07:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=cbt8RXvND2R7NfXRVkB9C3T19Zq+4hqCDYLNIwxNyiY=;
-        b=BhR7jMFgZlw5cQh00kFtL2pJSCn1hWja/Led3VfEYPsjIxBljrb+B4/CBOiQ5nnu9y
-         /znBl9lg3qENbK4iLftHtGynyuEGD/9p0+RzwEAdIG7YVwlNNqhwnSOch0u9LYPSWl+i
-         RnSks5rfX9g/xboxbo3oh2jy1jJPx9KioIBDiN4v6b7uKYm4T3FD86slPHd2xwNn6p89
-         WSFO2Acw61/widLlMELCMPCZljptKR8cZkQv1yGtMDo9tyHAsnPopvfNh3oYWY7lmlWV
-         qsQXXaa8SpcStFqpisCkb1JYs5vkb5X8dLe3xJ0X6+3n2ibWq+xQ7NhbiEikA40AKaZq
-         j05g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=cbt8RXvND2R7NfXRVkB9C3T19Zq+4hqCDYLNIwxNyiY=;
-        b=Mu1YNhi5nq93AIL1+uOn1C/uSWgBr1wjesNvP59PGdGm01QtngnkQNmW3c2cuuy5b4
-         oo0jcyJPjjOxgBmVPnBfgXGLBLrBNK3dkeLRZezTpRkJLEfDIOUalo/21YrOglXJBjxO
-         w9iigLL0G1tcPcFTGN4XoVV1NcJKx4k7a9ViYf4zy+oCQTWnhRBWlFD/w0GilLYgd/JH
-         pp9EZxIi4Caqt35QnAnjdLM1qx7FoB/jrca9lElIPNxSWnwfQg7Qc7IvZ2fq+qB8BVbg
-         5tFOCjJMkm5x9rO85vVP3G8KAGaI5EXwfa8jMEPYHxSLzBlV+WCJHEjU242I2SrElIgt
-         eXvg==
-X-Gm-Message-State: AOAM530pwi5a/Yi2+/Z2O/ndWJasVGvwRIhbwpGcT1zQigoS8rDW0AOd
-        izllK8k7eT/7cqgbK6xMMPePIA==
-X-Google-Smtp-Source: ABdhPJyIxIvJd4Ymeeq0IQ887XAPkISAZdn0OrmMLkuxYxQP44rhKLPtXjZS5XRJcNb/i1cecRL42g==
-X-Received: by 2002:adf:a396:: with SMTP id l22mr20309972wrb.24.1593500850292;
-        Tue, 30 Jun 2020 00:07:30 -0700 (PDT)
-Received: from dell ([2.27.35.144])
-        by smtp.gmail.com with ESMTPSA id e8sm2551614wrp.26.2020.06.30.00.07.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jun 2020 00:07:29 -0700 (PDT)
-Date:   Tue, 30 Jun 2020 08:07:27 +0100
-From:   Lee Jones <lee.jones@linaro.org>
+        Tue, 30 Jun 2020 03:20:20 -0400
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 05U7KAGw065349;
+        Tue, 30 Jun 2020 02:20:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1593501610;
+        bh=6Brzsw1lYCNLJ5e1uHm5326GF3+UxaADq2tLRXMYH6s=;
+        h=Subject:To:CC:References:From:Date:In-Reply-To;
+        b=Q+cLGL1qOjbbBGcSy+BwyhwyGgmmBe769tnQrKFOhh0rqVB77fyVWubnSH5mW/4xV
+         53qz6Hkk9R9LOfV+JTDGjwHpgceNasnpiYEf5B1XGcsuuvMvqyKZf0esoMZ7EtYqn8
+         caYj3gQpiMJur2rZzhPGuF7RVS6f4389eSGkII8s=
+Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
+        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 05U7KAiq091199
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 30 Jun 2020 02:20:10 -0500
+Received: from DLEE105.ent.ti.com (157.170.170.35) by DLEE105.ent.ti.com
+ (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Tue, 30
+ Jun 2020 02:20:09 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE105.ent.ti.com
+ (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
+ Frontend Transport; Tue, 30 Jun 2020 02:20:09 -0500
+Received: from [127.0.0.1] (ileax41-snat.itg.ti.com [10.172.224.153])
+        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 05U7K7LH027187;
+        Tue, 30 Jun 2020 02:20:08 -0500
+Subject: Re: [PATCHv4 3/7] crypto: sa2ul: add sha1/sha256/sha512 support
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 1/1] crypto: ux500: hash: Add namespacing to hash_init()
-Message-ID: <20200630070727.GD1179328@dell>
-References: <20200629123003.1014387-1-lee.jones@linaro.org>
- <20200630041029.GA20892@gondor.apana.org.au>
+CC:     <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <j-keerthy@ti.com>
+References: <20200615071452.25141-1-t-kristo@ti.com>
+ <20200615071452.25141-4-t-kristo@ti.com>
+ <20200626043155.GA2683@gondor.apana.org.au>
+ <2a89ea86-3b9e-06b5-fa8e-9dc6e5ad9aeb@ti.com>
+ <20200630044936.GA22565@gondor.apana.org.au>
+From:   Tero Kristo <t-kristo@ti.com>
+Message-ID: <b8c209cd-2b5d-54e4-9b64-94e5d1f0e60c@ti.com>
+Date:   Tue, 30 Jun 2020 10:20:06 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200630041029.GA20892@gondor.apana.org.au>
+In-Reply-To: <20200630044936.GA22565@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 30 Jun 2020, Herbert Xu wrote:
+On 30/06/2020 07:49, Herbert Xu wrote:
+> On Fri, Jun 26, 2020 at 12:15:42PM +0300, Tero Kristo wrote:
+>>
+>> I have been experimenting with an alternate approach, where I have a small
+>> buffer within the context, this would be more like the way other drivers do
+>> this. If the buffer is closed before running out of space, I can push this
+>> to be processed by HW, otherwise I must fallback to SW. Does this sound like
+>> a better approach?
+> 
+> You can buffer up to a block obviously.  Anything beyond that
+> should just use a fallback.
 
-> On Mon, Jun 29, 2020 at 01:30:03PM +0100, Lee Jones wrote:
-> > A recent change to the Regulator consumer API (which this driver
-> > utilises) add prototypes for the some suspend functions.  These
-> > functions require including header file include/linux/suspend.h.
-> > 
-> > The following tree of includes affecting this driver will be
-> > present:
-> > 
-> >    In file included from include/linux/elevator.h:6,
-> >                     from include/linux/blkdev.h:288,
-> >                     from include/linux/blk-cgroup.h:23,
-> >                     from include/linux/writeback.h:14,
-> >                     from include/linux/memcontrol.h:22,
-> >                     from include/linux/swap.h:9,
-> >                     from include/linux/suspend.h:5,
-> >                     from include/linux/regulator/consumer.h:35,
-> >                     from drivers/crypto/ux500/hash/hash_core.c:28:
-> > 
-> > include/linux/elevator.h pulls in include/linux/hashtable.h which
-> > contains its own version of hash_init().  This confuses the build
-> > system and results in the following error (amongst others):
-> > 
-> >  drivers/crypto/ux500/hash/hash_core.c:1362:19: error: passing argument 1 of '__hash_init' from incompatible pointer type [-Werror=incompatible-pointer-types]
-> >  1362 |  return hash_init(req);
-> > 
-> > Fix this by namespacing the local hash_init() such that the
-> > source of confusion is removed.
-> > 
-> > Cc: Linus Walleij <linus.walleij@linaro.org>
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > Cc: David S. Miller <davem@davemloft.net>
-> > Cc: linux-crypto@vger.kernel.org
-> > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > ---
-> > 
-> > Ideally this should go into v5.8's -rcs else it runs the risk of
-> > breaking when Linus pulls everything in for v5.9-rc1.
+Only up-to block size? This would limit the buffer to 64-128 bytes.
 
-[...]
+I was hoping I could cache data upto 1024 bytes at least in the context, 
+as this would allow running certain openssl cases with hw accelerated 
+crypto. Openssl speed test via cryptodev appears to do sha_init - 
+sha_update - sha_final chain with any size data.
 
-> I also dislike pulling in the kitchen sink when all you need in
-> consumer.h is the definition of suspend_state_t.  A better solution
-> would be to move the definition of suspend_state_t into linux/types.h
-> and including that instead of suspend.h in consumer.h.
-
-IMHO, including (whole) headers into source/header files is the norm.
-Even if only a small portion is actually referenced.  Very seldom do
-consumers of an API use more than a fraction of what is available.
-Whether it's a couple of function calls, a struct or a type.
-
-Pulling headers apart and placing items in more convenient places
-i.e. into headers which are more commonly included, messes with the
-compartmentalisation of subsystems and sounds like more of a hack than
-simply saying "to enable suspend functions we need to reference the
-suspend API" like we are here.
-
-> I have no objections to this patch.  However, I'd rather put
-> it on a topic branch which you could pull rather than pushing
-> it into 5.8 straight away.
-
-An immutable branch sounds like a sensible solution.  Thanks.
-
--- 
-Lee Jones [李琼斯]
-Senior Technical Lead - Developer Services
-Linaro.org │ Open source software for Arm SoCs
-Follow Linaro: Facebook | Twitter | Blog
+-Tero
+--
+Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
