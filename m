@@ -2,95 +2,91 @@ Return-Path: <SRS0=XejO=AL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-13.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE3CDC433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 04:10:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 409AEC433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 04:20:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B33EF20722
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 04:10:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 17F05206CB
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jun 2020 04:20:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725858AbgF3EK5 (ORCPT
+        id S1726371AbgF3EUt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Jun 2020 00:10:57 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:32880 "EHLO fornost.hmeau.com"
+        Tue, 30 Jun 2020 00:20:49 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:32890 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725809AbgF3EK4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Jun 2020 00:10:56 -0400
+        id S1726368AbgF3EUt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Jun 2020 00:20:49 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jq7bJ-00083u-S7; Tue, 30 Jun 2020 14:10:30 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 30 Jun 2020 14:10:29 +1000
-Date:   Tue, 30 Jun 2020 14:10:29 +1000
+        id 1jq7l7-000895-Uf; Tue, 30 Jun 2020 14:20:39 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 30 Jun 2020 14:20:37 +1000
+Date:   Tue, 30 Jun 2020 14:20:37 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Lee Jones <lee.jones@linaro.org>
-Cc:     linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 1/1] crypto: ux500: hash: Add namespacing to hash_init()
-Message-ID: <20200630041029.GA20892@gondor.apana.org.au>
-References: <20200629123003.1014387-1-lee.jones@linaro.org>
+To:     kernel test robot <lkp@intel.com>
+Cc:     Olivier Sobrie <olivier.sobrie@silexinsight.com>,
+        kbuild-all@lists.01.org, Waleed Ziad <waleed94ziad@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] hwrng: ba431 - Add dependency on HAS_IOMEM
+Message-ID: <20200630042037.GA22429@gondor.apana.org.au>
+References: <202006292036.INytijnT%lkp@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200629123003.1014387-1-lee.jones@linaro.org>
+In-Reply-To: <202006292036.INytijnT%lkp@intel.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 29, 2020 at 01:30:03PM +0100, Lee Jones wrote:
-> A recent change to the Regulator consumer API (which this driver
-> utilises) add prototypes for the some suspend functions.  These
-> functions require including header file include/linux/suspend.h.
+On Mon, Jun 29, 2020 at 08:46:38PM +0800, kernel test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+> head:   c28e58ee9dadc99f79cf16ca805221feddd432ad
+> commit: 0289e9be5dc26d84dda6fc5492f08ca1ff599744 [1846/4145] hwrng: ba431 - add support for BA431 hwrng
+> config: s390-zfcpdump_defconfig (attached as .config)
+> compiler: s390-linux-gcc (GCC) 9.3.0
+> reproduce (this is a W=1 build):
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         git checkout 0289e9be5dc26d84dda6fc5492f08ca1ff599744
+>         # save the attached .config to linux build tree
+>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-9.3.0 make.cross ARCH=s390 
 > 
-> The following tree of includes affecting this driver will be
-> present:
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
 > 
->    In file included from include/linux/elevator.h:6,
->                     from include/linux/blkdev.h:288,
->                     from include/linux/blk-cgroup.h:23,
->                     from include/linux/writeback.h:14,
->                     from include/linux/memcontrol.h:22,
->                     from include/linux/swap.h:9,
->                     from include/linux/suspend.h:5,
->                     from include/linux/regulator/consumer.h:35,
->                     from drivers/crypto/ux500/hash/hash_core.c:28:
+> All errors (new ones prefixed by >>):
 > 
-> include/linux/elevator.h pulls in include/linux/hashtable.h which
-> contains its own version of hash_init().  This confuses the build
-> system and results in the following error (amongst others):
-> 
->  drivers/crypto/ux500/hash/hash_core.c:1362:19: error: passing argument 1 of '__hash_init' from incompatible pointer type [-Werror=incompatible-pointer-types]
->  1362 |  return hash_init(req);
-> 
-> Fix this by namespacing the local hash_init() such that the
-> source of confusion is removed.
-> 
-> Cc: Linus Walleij <linus.walleij@linaro.org>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
-> Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> ---
-> 
-> Ideally this should go into v5.8's -rcs else it runs the risk of
-> breaking when Linus pulls everything in for v5.9-rc1.
+>    s390-linux-ld: drivers/char/hw_random/ba431-rng.o: in function `ba431_trng_probe':
+> >> ba431-rng.c:(.text+0xd4): undefined reference to `devm_ioremap_resource'
 
-I have no objections to this patch.  However, I'd rather put
-it on a topic branch which you could pull rather than pushing
-it into 5.8 straight away.
+This patch should fix the problem:
 
-I also dislike pulling in the kitchen sink when all you need in
-consumer.h is the definition of suspend_state_t.  A better solution
-would be to move the definition of suspend_state_t into linux/types.h
-and including that instead of suspend.h in consumer.h.
+---8<---
+The ba431 driver depends on HAS_IOMEM and this was missing from
+the Kconfig file.
 
-Cheers,
+Reported-by: kernel test robot <lkp@intel.com>
+Fixes: 0289e9be5dc2 ("hwrng: ba431 - add support for BA431 hwrng")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 7b876dfdbaaf..edbaf6154764 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -76,6 +76,7 @@ config HW_RANDOM_ATMEL
+ 
+ config HW_RANDOM_BA431
+ 	tristate "Silex Insight BA431 Random Number Generator support"
++	depends on HAS_IOMEM
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
