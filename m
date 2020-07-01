@@ -2,93 +2,69 @@ Return-Path: <SRS0=MAzA=AM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44FB8C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 11:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9DC7C433E2
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 12:42:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F76C206CB
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 11:36:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 893A320772
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 12:42:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="J0ayZmG8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730237AbgGALgW (ORCPT
+        id S1730496AbgGAMmm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Jul 2020 07:36:22 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7328 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730196AbgGALgW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Jul 2020 07:36:22 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 1D11C33996FA9CB4829A
-        for <linux-crypto@vger.kernel.org>; Wed,  1 Jul 2020 19:36:19 +0800 (CST)
-Received: from [10.63.139.185] (10.63.139.185) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 1 Jul 2020 19:36:15 +0800
-Subject: Re: [PATCH] crypto: hisilicon/qm: Change type of pasid to u32
-To:     Fenghua Yu <fenghua.yu@intel.com>, Tony Luck <tony.luck@intel.com>,
-        "Ashok Raj" <ashok.raj@intel.com>, Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ravi V Shankar <ravi.v.shankar@intel.com>
-References: <1593115632-31417-1-git-send-email-fenghua.yu@intel.com>
-CC:     <linux-crypto@vger.kernel.org>
-From:   Zhou Wang <wangzhou1@hisilicon.com>
-Message-ID: <5EFC752E.6020507@hisilicon.com>
-Date:   Wed, 1 Jul 2020 19:36:14 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.5.1
+        Wed, 1 Jul 2020 08:42:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34110 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729959AbgGAMmm (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Jul 2020 08:42:42 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7DACC03E979;
+        Wed,  1 Jul 2020 05:42:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=/dBVnFe+0QbEb6oba4YxfBL/Fq4QYPfJyj1Q8/l0EI0=; b=J0ayZmG8Qv9RcfSsyxVjvwBPQh
+        V2TSpZLiMlRjg2s9xAs+n+CxXyqz+wRIa71U1vpUYcnXMeO0H7cgq2jO7DA6KjZD6Ose8rclQ0JGK
+        BH2D9euaP50Mi1cpumhmLtAHw6cVQ2uXayDfNIxmBbQ+TJUK6Pj6CKISj2G+z+Oyg0+vjPXtQxz0P
+        TfQaIG5+hhpvBbuT6IlEYMhnSTx2dp2uQ0FtDVBPsY41IfVTlf39V9wOmfB8YSe43AHQq3fluIYd1
+        K/yXbABV6PYzPvj9RRQImmCH70W7JpYIWfuj4fSj9CNI8BPaRnrrGNugemMUuK2XAb4GvZFO+Wwgc
+        2ttWXRfQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jqc41-0003HK-2U; Wed, 01 Jul 2020 12:42:09 +0000
+Date:   Wed, 1 Jul 2020 13:42:09 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     alex.williamson@redhat.com, herbert@gondor.apana.org.au,
+        cohuck@redhat.com, nhorman@redhat.com, vdronov@redhat.com,
+        bhelgaas@google.com, mark.a.chambers@intel.com,
+        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
+        qat-linux@intel.com, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/5] vfio/pci: add blocklist and disable qat
+Message-ID: <20200701124209.GA12512@infradead.org>
+References: <20200701110302.75199-1-giovanni.cabiddu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1593115632-31417-1-git-send-email-fenghua.yu@intel.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.63.139.185]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200701110302.75199-1-giovanni.cabiddu@intel.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2020/6/26 4:07, Fenghua Yu wrote:
-> PASID is defined as "int" although it's a 20-bit value and shouldn't be
-> negative int. To be consistent with PASID type in iommu, define PASID
-> as "u32".
-> 
-> Suggested-by: Thomas Gleixner <tglx@linutronix.de>
-> Signed-off-by: Fenghua Yu <fenghua.yu@intel.com>
+On Wed, Jul 01, 2020 at 12:02:57PM +0100, Giovanni Cabiddu wrote:
+> This patchset defines a blocklist of devices in the vfio-pci module and adds
+> the current generation of Intel(R) QuickAssist devices to it as they are
+> not designed to run in an untrusted environment.
 
-Hi Fenghua,
-
-Looks good to me, thanks for fixing this.
-
-Zhou
-
-> ---
-> PASID type will be changed consistently as u32:
-> https://lore.kernel.org/patchwork/patch/1257770/
-> 
->  drivers/crypto/hisilicon/qm.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-> index 9bb263cec6c3..8697dacf926d 100644
-> --- a/drivers/crypto/hisilicon/qm.c
-> +++ b/drivers/crypto/hisilicon/qm.c
-> @@ -1741,7 +1741,7 @@ void hisi_qm_release_qp(struct hisi_qp *qp)
->  }
->  EXPORT_SYMBOL_GPL(hisi_qm_release_qp);
->  
-> -static int qm_qp_ctx_cfg(struct hisi_qp *qp, int qp_id, int pasid)
-> +static int qm_qp_ctx_cfg(struct hisi_qp *qp, int qp_id, u32 pasid)
->  {
->  	struct hisi_qm *qm = qp->qm;
->  	struct device *dev = &qm->pdev->dev;
-> @@ -1813,7 +1813,7 @@ static int qm_start_qp_nolock(struct hisi_qp *qp, unsigned long arg)
->  	struct hisi_qm *qm = qp->qm;
->  	struct device *dev = &qm->pdev->dev;
->  	int qp_id = qp->qp_id;
-> -	int pasid = arg;
-> +	u32 pasid = arg;
->  	int ret;
->  
->  	if (!qm_qp_avail_state(qm, qp, QP_START))
-> 
+How can they not be safe?  If any device is not safe to assign the
+whole vfio concept has major issues that we need to fix for real instead
+of coming up with quirk lists for specific IDs.
