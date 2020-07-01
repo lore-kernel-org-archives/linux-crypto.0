@@ -2,117 +2,96 @@ Return-Path: <SRS0=MAzA=AM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E61C433E1
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 08:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D0CFC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 11:03:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C84120775
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 08:06:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="vuLZHL9U"
+	by mail.kernel.org (Postfix) with ESMTP id 393BC20702
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 11:03:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728479AbgGAIGe (ORCPT
+        id S1730103AbgGALDd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Jul 2020 04:06:34 -0400
-Received: from lelv0142.ext.ti.com ([198.47.23.249]:44276 "EHLO
-        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728825AbgGAIGQ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Jul 2020 04:06:16 -0400
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 06186CKv081361;
-        Wed, 1 Jul 2020 03:06:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1593590772;
-        bh=QIE8W5C9WJO1iDG5yGQm6hrr3BHDjz2EK02CvJCDYDw=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=vuLZHL9UNr2Bm0/ayadTFLi3MzddxJcDIDwxthSeWqfuexCJROqMccmaj7UfRAKFj
-         QpZ7BQFL228r9uHr7e5v1/TZCo7rT7tpmP2JP9QV+yCMRumFU8djl0RDKeWq6aVq6U
-         /WoA3XCVTofzMXs3OvyukYNdhTAGpSsNwYejmiFI=
-Received: from DFLE106.ent.ti.com (dfle106.ent.ti.com [10.64.6.27])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id 06186CI9103537;
-        Wed, 1 Jul 2020 03:06:12 -0500
-Received: from DFLE113.ent.ti.com (10.64.6.34) by DFLE106.ent.ti.com
- (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Wed, 1 Jul
- 2020 03:06:11 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE113.ent.ti.com
- (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
- Frontend Transport; Wed, 1 Jul 2020 03:06:12 -0500
-Received: from sokoban.bb.dnainternet.fi (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 06185wUj078048;
-        Wed, 1 Jul 2020 03:06:10 -0500
-From:   Tero Kristo <t-kristo@ti.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>
-CC:     <j-keerthy@ti.com>
-Subject: [PATCHv5 7/7] arm64: dts: ti: k3-j721e-main: Add crypto accelerator node
-Date:   Wed, 1 Jul 2020 11:05:53 +0300
-Message-ID: <20200701080553.22604-8-t-kristo@ti.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200701080553.22604-1-t-kristo@ti.com>
-References: <20200701080553.22604-1-t-kristo@ti.com>
+        Wed, 1 Jul 2020 07:03:33 -0400
+Received: from mga17.intel.com ([192.55.52.151]:29868 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729791AbgGALDd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Jul 2020 07:03:33 -0400
+IronPort-SDR: 2KqFDk3XRgZZlWr61S3xgu2aN9/+ilol8Xfm45FnCb6JU/aW/uuyq08BbmzK4dw4x987i5G6rZ
+ YLTjJLPHKwCQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9668"; a="126632412"
+X-IronPort-AV: E=Sophos;i="5.75,300,1589266800"; 
+   d="scan'208";a="126632412"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2020 04:03:31 -0700
+IronPort-SDR: 2roBXaX2pEJg+CrG0EZQp8eMiOVysvZQbG2RrwkA6aPyCwIKeHyrtluTkyGoM5ZMVduqaSFC4U
+ OwssjGD6tfAQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,300,1589266800"; 
+   d="scan'208";a="425557243"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
+  by orsmga004.jf.intel.com with ESMTP; 01 Jul 2020 04:03:27 -0700
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     alex.williamson@redhat.com, herbert@gondor.apana.org.au
+Cc:     cohuck@redhat.com, nhorman@redhat.com, vdronov@redhat.com,
+        bhelgaas@google.com, mark.a.chambers@intel.com,
+        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
+        qat-linux@intel.com, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH 0/5] vfio/pci: add blocklist and disable qat
+Date:   Wed,  1 Jul 2020 12:02:57 +0100
+Message-Id: <20200701110302.75199-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Keerthy <j-keerthy@ti.com>
+This patchset defines a blocklist of devices in the vfio-pci module and adds
+the current generation of Intel(R) QuickAssist devices to it as they are
+not designed to run in an untrusted environment.
 
-Add crypto accelarator node for supporting hardware crypto algorithms,
-including SHA1, SHA256, SHA512, AES, 3DES, and AEAD suites.
+By default, if a device is in the blocklist, the probe of vfio-pci fails.
+If a user wants to use a device in the blocklist, he needs to disable the
+full blocklist providing the option disable_blocklist=1 at the load of
+vfio-pci or specifying that parameter in a config file in /etc/modprobe.d.
 
-Signed-off-by: Keerthy <j-keerthy@ti.com>
-[t-kristo@ti.com: Modifications based on introduction of yaml binding]
-Signed-off-by: Tero Kristo <t-kristo@ti.com>
----
- arch/arm64/boot/dts/ti/k3-j721e-main.dtsi | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+This series also moves the device ids definitions present in the qat driver
+to linux/pci_ids.h since they will be shared between the vfio-pci and the qat
+drivers and replaces the custom ADF_SYSTEM_DEVICE macro with PCI_VDEVICE.
 
-diff --git a/arch/arm64/boot/dts/ti/k3-j721e-main.dtsi b/arch/arm64/boot/dts/ti/k3-j721e-main.dtsi
-index 96c929da639d..df640680e564 100644
---- a/arch/arm64/boot/dts/ti/k3-j721e-main.dtsi
-+++ b/arch/arm64/boot/dts/ti/k3-j721e-main.dtsi
-@@ -268,6 +268,29 @@
- 		};
- 	};
- 
-+	main_crypto: crypto@4E00000 {
-+		compatible = "ti,j721e-sa2ul";
-+		reg = <0x0 0x4E00000 0x0 0x1200>;
-+		power-domains = <&k3_pds 264 TI_SCI_PD_EXCLUSIVE>;
-+		#address-cells = <2>;
-+		#size-cells = <2>;
-+		ranges = <0x0 0x04E00000 0x00 0x04E00000 0x0 0x30000>;
-+
-+		status = "okay";
-+
-+		dmas = <&main_udmap 0xc000>, <&main_udmap 0x4000>,
-+				<&main_udmap 0x4001>;
-+		dma-names = "tx", "rx1", "rx2";
-+		dma-coherent;
-+
-+		rng: rng@4e10000 {
-+			compatible = "inside-secure,safexcel-eip76";
-+			reg = <0x0 0x4e10000 0x0 0x7d>;
-+			interrupts = <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&k3_clks 264 1>;
-+		};
-+	};
-+
- 	main_pmx0: pinmux@11c000 {
- 		compatible = "pinctrl-single";
- 		/* Proxy 0 addressing */
+The series is applicable to Herbert's tree but only partially applicable to
+Alex's tree due to a merge conflict.
+
+Giovanni Cabiddu (5):
+  PCI: add Intel QuickAssist device IDs
+  vfio/pci: add device blocklist
+  vfio/pci: add qat devices to blocklist
+  crypto: qat - replace device ids defines
+  crypto: qat - use PCI_VDEVICE
+
+ drivers/crypto/qat/qat_c3xxx/adf_drv.c        | 11 ++---
+ drivers/crypto/qat/qat_c3xxxvf/adf_drv.c      | 11 ++---
+ drivers/crypto/qat/qat_c62x/adf_drv.c         | 11 ++---
+ drivers/crypto/qat/qat_c62xvf/adf_drv.c       | 11 ++---
+ .../crypto/qat/qat_common/adf_accel_devices.h |  6 ---
+ drivers/crypto/qat/qat_common/qat_hal.c       |  7 +--
+ drivers/crypto/qat/qat_common/qat_uclo.c      |  9 ++--
+ drivers/crypto/qat/qat_dh895xcc/adf_drv.c     | 11 ++---
+ drivers/crypto/qat/qat_dh895xccvf/adf_drv.c   | 11 ++---
+ drivers/vfio/pci/vfio_pci.c                   | 48 +++++++++++++++++++
+ include/linux/pci_ids.h                       |  6 +++
+ 11 files changed, 87 insertions(+), 55 deletions(-)
+
 -- 
-2.17.1
+2.26.2
 
---
-Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
