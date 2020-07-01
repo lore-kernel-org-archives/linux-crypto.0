@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19BECC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 08:06:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A111EC433DF
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 08:06:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E751A2073E
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 08:06:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B70E2073E
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 08:06:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="gVabImQs"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="L1jatucP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728580AbgGAIGL (ORCPT
+        id S1728560AbgGAIGO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Jul 2020 04:06:11 -0400
-Received: from fllv0015.ext.ti.com ([198.47.19.141]:50510 "EHLO
-        fllv0015.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728579AbgGAIGJ (ORCPT
+        Wed, 1 Jul 2020 04:06:14 -0400
+Received: from lelv0143.ext.ti.com ([198.47.23.248]:47378 "EHLO
+        lelv0143.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728593AbgGAIGN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Jul 2020 04:06:09 -0400
+        Wed, 1 Jul 2020 04:06:13 -0400
 Received: from lelv0266.itg.ti.com ([10.180.67.225])
-        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 061863Ca020483;
-        Wed, 1 Jul 2020 03:06:03 -0500
+        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 061869Fn050747;
+        Wed, 1 Jul 2020 03:06:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1593590763;
-        bh=2Ex8zWOQ9MvwkFDcxGmCY4L/ueAkXeZ/a+kFsegWaiI=;
+        s=ti-com-17Q1; t=1593590769;
+        bh=qss1T0kR8Yhb6TuZ9w3U+BLn6FFmNM3CzQg7mdrYzlk=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=gVabImQs4tijewCw+5GK26sz96ME8eReDV/Ca24M7LwSSCG3l23p+9PdRCWTQZDDB
-         NSQdr4SE2JAmukZCmvPlyi4LfAjkeJgHdZ0nNSySa2q5cf064NT0bLin/0LMdSgi3V
-         iWhTjcY1/Tv2c5xeQ2svye5aGrkakVVXNyLnZMr4=
-Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
-        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 061862FV089333
+        b=L1jatucPogf/8rTK3dCVdJNT6H1OI3P1A9THV6C103cat40b8Y7jHsZjySiY2a7Jm
+         tPzRT1E5QfiDi6aDcaCsiE/b5ruDyJbwGn+9ciCgeIoiLEokKCz8F2MIOm0Oqguc5J
+         XdzKF2Ec0/zdJQVwYqLmLMRAVuxDIcQanizNwFHo=
+Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
+        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 061869Sd089858
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 1 Jul 2020 03:06:02 -0500
-Received: from DLEE102.ent.ti.com (157.170.170.32) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
+        Wed, 1 Jul 2020 03:06:09 -0500
+Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Wed, 1 Jul
- 2020 03:06:02 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
+ 2020 03:06:08 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
- Frontend Transport; Wed, 1 Jul 2020 03:06:02 -0500
+ Frontend Transport; Wed, 1 Jul 2020 03:06:08 -0500
 Received: from sokoban.bb.dnainternet.fi (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 06185wUd078048;
-        Wed, 1 Jul 2020 03:06:01 -0500
+        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 06185wUh078048;
+        Wed, 1 Jul 2020 03:06:07 -0500
 From:   Tero Kristo <t-kristo@ti.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 CC:     <j-keerthy@ti.com>
-Subject: [PATCHv5 1/7] dt-bindings: crypto: Add TI SA2UL crypto accelerator documentation
-Date:   Wed, 1 Jul 2020 11:05:47 +0300
-Message-ID: <20200701080553.22604-2-t-kristo@ti.com>
+Subject: [PATCHv5 5/7] crypto: sa2ul: add device links to child devices
+Date:   Wed, 1 Jul 2020 11:05:51 +0300
+Message-ID: <20200701080553.22604-6-t-kristo@ti.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200701080553.22604-1-t-kristo@ti.com>
 References: <20200701080553.22604-1-t-kristo@ti.com>
@@ -66,111 +66,44 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Keerthy <j-keerthy@ti.com>
+The child devices for sa2ul (like the RNG) have hard dependency towards
+the parent, they can't function without the parent enabled. Add device
+link for this purpose so that the dependencies are taken care of properly.
 
-The Security Accelerator Ultra Lite (SA2UL) subsystem provides hardware
-cryptographic acceleration for the following use cases:
-
-* Encryption and authentication for secure boot
-* Encryption and authentication of content in applications
-  requiring DRM (digital rights management) and
-  content/asset protection
-
-SA2UL provides support for number of different cryptographic algorithms
-including SHA1, SHA256, SHA512, AES, 3DES, and various combinations of
-the previous for AEAD use.
-
-Reviewed-by: Rob Herring <robh@kernel.org>
-Signed-off-by: Keerthy <j-keerthy@ti.com>
-[t-kristo@ti.com: converted documentation to yaml]
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- .../devicetree/bindings/crypto/ti,sa2ul.yaml  | 76 +++++++++++++++++++
- 1 file changed, 76 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
+ drivers/crypto/sa2ul.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml b/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
-new file mode 100644
-index 000000000000..85ef69ffebed
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
-@@ -0,0 +1,76 @@
-+# SPDX-License-Identifier: (GPL-2.0-only or BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/crypto/ti,sa2ul.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
+index 6fc57d10e04a..aa080c65389e 100644
+--- a/drivers/crypto/sa2ul.c
++++ b/drivers/crypto/sa2ul.c
+@@ -2303,6 +2303,15 @@ static int sa_dma_init(struct sa_crypto_data *dd)
+ 	return ret;
+ }
+ 
++static int sa_link_child(struct device *dev, void *data)
++{
++	struct device *parent = data;
 +
-+title: K3 SoC SA2UL crypto module
++	device_link_add(dev, parent, DL_FLAG_AUTOPROBE_CONSUMER);
 +
-+maintainers:
-+  - Tero Kristo <t-kristo@ti.com>
++	return 0;
++}
 +
-+properties:
-+  compatible:
-+    enum:
-+      - ti,j721e-sa2ul
-+      - ti,am654-sa2ul
+ static int sa_ul_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+@@ -2353,6 +2362,8 @@ static int sa_ul_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		goto release_dma;
+ 
++	device_for_each_child(&pdev->dev, &pdev->dev, sa_link_child);
 +
-+  reg:
-+    maxItems: 1
-+
-+  power-domains:
-+    maxItems: 1
-+
-+  dmas:
-+    items:
-+      - description: TX DMA Channel
-+      - description: RX DMA Channel #1
-+      - description: RX DMA Channel #2
-+
-+  dma-names:
-+    items:
-+      - const: tx
-+      - const: rx1
-+      - const: rx2
-+
-+  dma-coherent: true
-+
-+  "#address-cells":
-+    const: 2
-+
-+  "#size-cells":
-+    const: 2
-+
-+  ranges:
-+    description:
-+      Address translation for the possible RNG child node for SA2UL
-+
-+patternProperties:
-+  "^rng@[a-f0-9]+$":
-+    type: object
-+    description:
-+      Child RNG node for SA2UL
-+
-+required:
-+  - compatible
-+  - reg
-+  - power-domains
-+  - dmas
-+  - dma-names
-+  - dma-coherent
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/soc/ti,sci_pm_domain.h>
-+
-+    main_crypto: crypto@4e00000 {
-+        compatible = "ti,j721-sa2ul";
-+        reg = <0x0 0x4e00000 0x0 0x1200>;
-+        power-domains = <&k3_pds 264 TI_SCI_PD_EXCLUSIVE>;
-+        dmas = <&main_udmap 0xc000>, <&main_udmap 0x4000>,
-+               <&main_udmap 0x4001>;
-+        dma-names = "tx", "rx1", "rx2";
-+        dma-coherent;
-+    };
+ 	return 0;
+ 
+ release_dma:
 -- 
 2.17.1
 
