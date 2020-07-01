@@ -3,110 +3,109 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14CCBC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 17:20:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B665C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 21:16:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E462A2078A
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 17:20:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dq1pa/K3"
+	by mail.kernel.org (Postfix) with ESMTP id 54A3D207CD
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 21:16:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1593638206;
+	bh=yqcCUEC8nfgHouSGRrdvAT45NLmgQ8sLV2KP9vvzvko=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:List-ID:From;
+	b=Za6lCZRbuYbljNpXFTDecALkfpBNAYKcmvPimxGv+TtXu3jj5tXBtv3ftt0ExBBAf
+	 FiN6sEqW8PblxZnGSw5ymMT9b+t6UNce3YkO7rQM64ICFgZeDZYr6sJl25sz3TRfuB
+	 RcJ07SU+saISc6wW0CcXb3Ky7XLepPU0RBLBq+Y0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726675AbgGARUw (ORCPT
+        id S1726144AbgGAVQp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Jul 2020 13:20:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42646 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726432AbgGARUv (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Jul 2020 13:20:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593624049;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=jwLHgKRr0xCpf9rk2C/KLIQVKmaCEwU7VXYHf/GlC48=;
-        b=Dq1pa/K3/t6EUJ9mofNQEnbjOP7DDgHikH7xwKElcOiP/+2s38mKZ5q+fB9Cwf+jgDe0Ct
-        vER7rm3qYyQ/C8TcSKA8XyvlfRHf4QPr8/RwwJ1QVEgMJxd5MeNTLgcvvsWAO/USpoPdGl
-        KVv5mBTE+BptMkZrsen96OZpUkfgjxg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-8w-8z3phOLOsMhUMAseRcg-1; Wed, 01 Jul 2020 13:20:46 -0400
-X-MC-Unique: 8w-8z3phOLOsMhUMAseRcg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Wed, 1 Jul 2020 17:16:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35176 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725915AbgGAVQp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Jul 2020 17:16:45 -0400
+Received: from localhost (mobile-166-175-191-139.mycingular.net [166.175.191.139])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93EDA80183C;
-        Wed,  1 Jul 2020 17:20:44 +0000 (UTC)
-Received: from npache.remote.csb (ovpn-113-77.rdu2.redhat.com [10.10.113.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A67CF100238C;
-        Wed,  1 Jul 2020 17:20:43 +0000 (UTC)
-From:   Nico Pache <npache@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
-        daniel.m.jordan@oracle.com, npache@redhat.com
-Subject: [PATCH] Remove __init from padata_do_multithreaded and padata_mt_helper
-Date:   Wed,  1 Jul 2020 13:20:26 -0400
-Message-Id: <20200701172026.14426-1-npache@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+        by mail.kernel.org (Postfix) with ESMTPSA id 942C6206DD;
+        Wed,  1 Jul 2020 21:16:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1593638204;
+        bh=yqcCUEC8nfgHouSGRrdvAT45NLmgQ8sLV2KP9vvzvko=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=qUF14IjzVJOUcBQNw2iXejzu+oMXcWIle9BD00FgE+DLF+9zFscGD8EHT/6Gi6REv
+         9X0mdNcAXiageGtlO9TCW2tBPhuWK8ckKvIyYlo+dSFFmYftmuvob2ExE9iTJ7Lvcf
+         4C4DN+LeTjCA/AkE9OKDk16dYWLVWoYGAoM81VEw=
+Date:   Wed, 1 Jul 2020 16:16:43 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     alex.williamson@redhat.com, herbert@gondor.apana.org.au,
+        cohuck@redhat.com, nhorman@redhat.com, vdronov@redhat.com,
+        bhelgaas@google.com, mark.a.chambers@intel.com,
+        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
+        qat-linux@intel.com, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/5] PCI: add Intel QuickAssist device IDs
+Message-ID: <20200701211643.GA3660000@bjorn-Precision-5520>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200701110302.75199-2-giovanni.cabiddu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Allow padata_do_multithreaded function to be called after bootstrap.
+Please follow the subject line convention, e.g.,
 
-Signed-off-by: Nico Pache <npache@redhat.com>
----
- include/linux/padata.h | 2 +-
- kernel/padata.c        | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
+  PCI: Add Intel QuickAssist Device IDs
 
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index 7302efff5..2e7d92e80 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -201,7 +201,7 @@ extern void padata_free_shell(struct padata_shell *ps);
- extern int padata_do_parallel(struct padata_shell *ps,
- 			      struct padata_priv *padata, int *cb_cpu);
- extern void padata_do_serial(struct padata_priv *padata);
--extern void __init padata_do_multithreaded(struct padata_mt_job *job);
-+extern void padata_do_multithreaded(struct padata_mt_job *job);
- extern int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
- 			      cpumask_var_t cpumask);
- extern int padata_start(struct padata_instance *pinst);
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 4373f7ada..2c0efab81 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -58,7 +58,7 @@ struct padata_mt_job_state {
- };
- 
- static void padata_free_pd(struct parallel_data *pd);
--static void __init padata_mt_helper(struct work_struct *work);
-+static void padata_mt_helper(struct work_struct *work);
- 
- static int padata_index_to_cpu(struct parallel_data *pd, int cpu_index)
- {
-@@ -463,7 +463,7 @@ static int pd_setup_cpumasks(struct parallel_data *pd,
- 	return err;
- }
- 
--static void __init padata_mt_helper(struct work_struct *w)
-+static void padata_mt_helper(struct work_struct *w)
- {
- 	struct padata_work *pw = container_of(w, struct padata_work, pw_work);
- 	struct padata_mt_job_state *ps = pw->pw_data;
-@@ -503,7 +503,7 @@ static void __init padata_mt_helper(struct work_struct *w)
-  *
-  * See the definition of struct padata_mt_job for more details.
-  */
--void __init padata_do_multithreaded(struct padata_mt_job *job)
-+void padata_do_multithreaded(struct padata_mt_job *job)
- {
- 	/* In case threads finish at different times. */
- 	static const unsigned long load_balance_factor = 4;
--- 
-2.18.1
-
+On Wed, Jul 01, 2020 at 12:02:58PM +0100, Giovanni Cabiddu wrote:
+> Add device IDs for the following Intel QuickAssist devices: DH895XCC,
+> C3XXX and C62X.
+> 
+> The defines in this patch are going to be referenced in two independent
+> drivers, qat and vfio-pci.
+> 
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> ---
+>  include/linux/pci_ids.h | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+> index 0ad57693f392..f3166b1425ca 100644
+> --- a/include/linux/pci_ids.h
+> +++ b/include/linux/pci_ids.h
+> @@ -2659,6 +2659,8 @@
+>  #define PCI_DEVICE_ID_INTEL_80332_1	0x0332
+>  #define PCI_DEVICE_ID_INTEL_80333_0	0x0370
+>  #define PCI_DEVICE_ID_INTEL_80333_1	0x0372
+> +#define PCI_DEVICE_ID_INTEL_QAT_DH895XCC	0x0435
+> +#define PCI_DEVICE_ID_INTEL_QAT_DH895XCC_VF	0x0443
+>  #define PCI_DEVICE_ID_INTEL_82375	0x0482
+>  #define PCI_DEVICE_ID_INTEL_82424	0x0483
+>  #define PCI_DEVICE_ID_INTEL_82378	0x0484
+> @@ -2708,6 +2710,8 @@
+>  #define PCI_DEVICE_ID_INTEL_ALPINE_RIDGE_4C_NHI     0x1577
+>  #define PCI_DEVICE_ID_INTEL_ALPINE_RIDGE_4C_BRIDGE  0x1578
+>  #define PCI_DEVICE_ID_INTEL_80960_RP	0x1960
+> +#define PCI_DEVICE_ID_INTEL_QAT_C3XXX	0x19e2
+> +#define PCI_DEVICE_ID_INTEL_QAT_C3XXX_VF	0x19e3
+>  #define PCI_DEVICE_ID_INTEL_82840_HB	0x1a21
+>  #define PCI_DEVICE_ID_INTEL_82845_HB	0x1a30
+>  #define PCI_DEVICE_ID_INTEL_IOAT	0x1a38
+> @@ -2924,6 +2928,8 @@
+>  #define PCI_DEVICE_ID_INTEL_IOAT_JSF7	0x3717
+>  #define PCI_DEVICE_ID_INTEL_IOAT_JSF8	0x3718
+>  #define PCI_DEVICE_ID_INTEL_IOAT_JSF9	0x3719
+> +#define PCI_DEVICE_ID_INTEL_QAT_C62X	0x37c8
+> +#define PCI_DEVICE_ID_INTEL_QAT_C62X_VF	0x37c9
+>  #define PCI_DEVICE_ID_INTEL_ICH10_0	0x3a14
+>  #define PCI_DEVICE_ID_INTEL_ICH10_1	0x3a16
+>  #define PCI_DEVICE_ID_INTEL_ICH10_2	0x3a18
+> -- 
+> 2.26.2
+> 
