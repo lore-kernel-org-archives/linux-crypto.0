@@ -2,113 +2,109 @@ Return-Path: <SRS0=MAzA=AM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC7CC433E1
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 21:48:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 606E2C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 21:52:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE64320772
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 21:48:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 336DF2077D
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 21:52:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MBnzw7FG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LmSSjKpc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726114AbgGAVs0 (ORCPT
+        id S1726469AbgGAVwm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Jul 2020 17:48:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34290 "EHLO
+        Wed, 1 Jul 2020 17:52:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726942AbgGAVsI (ORCPT
+        with ESMTP id S1726109AbgGAVwm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Jul 2020 17:48:08 -0400
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22135C08C5DB;
-        Wed,  1 Jul 2020 14:48:08 -0700 (PDT)
-Received: by mail-lj1-x241.google.com with SMTP id h19so29016780ljg.13;
-        Wed, 01 Jul 2020 14:48:08 -0700 (PDT)
+        Wed, 1 Jul 2020 17:52:42 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03C1AC08C5C1;
+        Wed,  1 Jul 2020 14:52:41 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id l2so23669180wmf.0;
+        Wed, 01 Jul 2020 14:52:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=TY+6CIVT2ufMdPHMOZOLuWUG9NLtqpkM1rBQDTAP3Eo=;
-        b=MBnzw7FG212j0CXIeBmGpDYx0R8rPY75iEQDUcb4grm2hK1zDKU/2UUdFmHtA4Qxc5
-         JOnVLYPJzA4Ie9tKbpngiF2UjfLs+AkBDS5xQkEQ5NbkD5Rq8R94yVQbr3zghYqi3hPY
-         pLVN/TaroUJFDJNoffmA5qzzwuWTGhD9IpP7r2MWl6X2J2Gi7MLnVzMOxsXEs2x2t9d8
-         jpP8wbyh9OXFF/IDhs1r/ufUxLdxf8l3RxMOY0O0T3LuUfgUSqAFO+2mVDSeSiGn9OEG
-         mZbM1Makv6Pn8e1rq+GjRnFaDxouxMKK89B0T1YUb20M6/3rNJ+SqTz6PSNXkJnTYZY3
-         qWJA==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=D29INuEoeDcyeVL/TnCmg6pQ17sEWGngSUsr5EQv9AM=;
+        b=LmSSjKpcPy4KMLL3Y6VJfnPOAIoUAyYvyzdfCIYFEbkNF8GMwQnPzsFZb2s8ah3diI
+         KOYFL1yunBIeXc9QyzINND39sVA3qee4K7y5oICJyyB6S5MjIfis8p6URwJ7NPUnARfC
+         v4IDUuR7PMzaTTtqlwfbtBdapwb9L46gZ7zqAnvLQR4ISgOJNdatiJ3K4tehnKNq0zqy
+         B+RhkI9zEeRx6NV+9MY6/6QjvI0/oJvcaWVTDCCjI8bo1xuly/oWBVBriqK4ku/wT3jz
+         uSRnOvR2qDrlI6nPTAiP9WdjFORTHynAbhmx8iUKkY+GHLvk0WTaumHx4u8/jk1Tw/7Y
+         kt+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=TY+6CIVT2ufMdPHMOZOLuWUG9NLtqpkM1rBQDTAP3Eo=;
-        b=EjK+zcGc/7YgSNBOKFDcUCOMD0abBK5rCHs4Y82NHoxfr/ViZ7DcilW0381H+r+2kj
-         ASWTUc701m3hvQ4u5PWHVZk0ZrMr3zIfYj8xUS2dvg3PJ0BEQZow2nnGE8GmmG8EGWdX
-         twEpgYAuwbtWryOkwL2iduAjgVVF7HpltOVzAG8IsL0TZkl87pt3FjfRjO64YekhODtr
-         S3JMFrPBSiwSV+0JRYRlkRmIar9wgnr8TglNb9WmUO+iL2jUenGPxM8PGXiSGOb7kOpn
-         FyZkwzmRdUh8I+zsc1emz68yjPJ8ubsAnuDzTp1+k3taHzyGdCm6+HDKYdVXW8E5qeE2
-         zIYg==
-X-Gm-Message-State: AOAM533URkDcsFhL6TGtuFvS1QtFQ91LeVascIzkysftgGqZozHMbRcp
-        ORvLsdhoh0kVknnRz3rRY7A=
-X-Google-Smtp-Source: ABdhPJwXr6Ub+mQMEQVVK/OBb2oG7XuLFWcsDZ+LBcuc1eb4ZFZBorIHRz4IMK1MXyp/31a3DZaFqg==
-X-Received: by 2002:a2e:8882:: with SMTP id k2mr5434653lji.352.1593640086594;
-        Wed, 01 Jul 2020 14:48:06 -0700 (PDT)
-Received: from localhost.localdomain (h-98-128-181-241.NA.cust.bahnhof.se. [98.128.181.241])
-        by smtp.gmail.com with ESMTPSA id d3sm2476812lfe.93.2020.07.01.14.48.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2020 14:48:06 -0700 (PDT)
-From:   Rikard Falkeborn <rikard.falkeborn@gmail.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=D29INuEoeDcyeVL/TnCmg6pQ17sEWGngSUsr5EQv9AM=;
+        b=Jh2MVl0K1u6U6Mx9eKB2dhuLbqyFN74mUtnK0TNvUq5F3MWp10VSDuyXKRmGF8Avc6
+         +3nT2yaR9GOuz3iXeBZecJB2a/LZVGVQFK+aI0iI1SbJlS0y7XFE55TKL292UQUjmmE3
+         FFI0UW1DxfR2fz8TSXwGA8fJx3cyTtU+6kvwDi2EAWPahrd1FurjRU+UqJIl4NYsCbRt
+         LUpm4mJ/4YOYXg7SSz787nm1dlhvJHRLm5hvTEA3k6qoW58/o4Gq8e3s0Ve/ohNydegx
+         lfnniCdNDltWKWvUHB1QBg9Qn/abE8IClLBcZgQEoyt9nsB43gCiF2cHV1Y9CjydvYHQ
+         JzsA==
+X-Gm-Message-State: AOAM533B/rZGYJ2fFAZySewy66dW2GAQmEWEwXnOyw1NAfeBAPvjSmKO
+        Sfo0pB2du2H4d6tvAXU+Hco=
+X-Google-Smtp-Source: ABdhPJwbmkMUHF/Nq3SKLcm6+qfW5pe6n6Br38CypA8Qt9sdK8Y9+ol3hqFgixAbHUX5NP/XzZiIHQ==
+X-Received: by 2002:a1c:80c8:: with SMTP id b191mr27052912wmd.37.1593640360581;
+        Wed, 01 Jul 2020 14:52:40 -0700 (PDT)
+Received: from [10.230.30.107] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id x18sm8562985wrq.13.2020.07.01.14.52.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Jul 2020 14:52:39 -0700 (PDT)
+Subject: Re: [PATCH 1/5] hwrng: bcm2835 - Constify bcm2835_rng_devtype[]
+To:     Rikard Falkeborn <rikard.falkeborn@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Arnd Bergmann <arnd@arndb.de>
-Cc:     Rikard Falkeborn <rikard.falkeborn@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
+Cc:     linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/5] hwrng: nomadik - Constify nmk_rng_ids[]
-Date:   Wed,  1 Jul 2020 22:09:47 +0200
-Message-Id: <20200701200950.30314-3-rikard.falkeborn@gmail.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200701200950.30314-1-rikard.falkeborn@gmail.com>
+        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org
 References: <20200701200950.30314-1-rikard.falkeborn@gmail.com>
+ <20200701200950.30314-2-rikard.falkeborn@gmail.com>
+From:   Florian Fainelli <f.fainelli@gmail.com>
+Message-ID: <83b5c8b5-484a-d688-3c22-b15e388575cd@gmail.com>
+Date:   Wed, 1 Jul 2020 14:52:36 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Firefox/68.0 Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200701200950.30314-2-rikard.falkeborn@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-nmk_rng_ids[] is not modified and can be made const to allow the
-compiler to put it in read-only memory.
 
-Before:
-   text    data     bss     dec     hex filename
-    652     216       4     872     368 drivers/char/hw_random/nomadik-rng.o
 
-After:
-   text    data     bss     dec     hex filename
-    676     192       4     872     368 drivers/char/hw_random/nomadik-rng.o
+On 7/1/2020 1:09 PM, Rikard Falkeborn wrote:
+> bcm2835_rng_devtype[] is not modified and can be made const to allow the
+> compiler to put it in read-only memory.
+> 
+> Before:
+>    text    data     bss     dec     hex filename
+>    2392     176       0    2568     a08 drivers/char/hw_random/bcm2835-rng.o
+> 
+> After:
+>    text    data     bss     dec     hex filename
+>    2464     104       0    2568     a08 drivers/char/hw_random/bcm2835-rng.o
+> 
+> Signed-off-by: Rikard Falkeborn <rikard.falkeborn@gmail.com>
 
-Signed-off-by: Rikard Falkeborn <rikard.falkeborn@gmail.com>
----
- drivers/char/hw_random/nomadik-rng.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/char/hw_random/nomadik-rng.c b/drivers/char/hw_random/nomadik-rng.c
-index 74ed29f42e4f..b0ded41eb865 100644
---- a/drivers/char/hw_random/nomadik-rng.c
-+++ b/drivers/char/hw_random/nomadik-rng.c
-@@ -76,7 +76,7 @@ static int nmk_rng_remove(struct amba_device *dev)
- 	return 0;
- }
- 
--static struct amba_id nmk_rng_ids[] = {
-+static const struct amba_id nmk_rng_ids[] = {
- 	{
- 		.id	= 0x000805e1,
- 		.mask	= 0x000fffff, /* top bits are rev and cfg: accept all */
+Acked-by: Florian Fainelli <f.fainelli@gmail.com>
 -- 
-2.27.0
-
+Florian
