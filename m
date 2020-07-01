@@ -2,104 +2,87 @@ Return-Path: <SRS0=MAzA=AM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA5C6C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 07:01:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27553C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 07:21:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B766020722
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 07:01:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB6A22070C
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 07:21:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727997AbgGAHBS (ORCPT
+        id S1728133AbgGAHVo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Jul 2020 03:01:18 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7323 "EHLO huawei.com"
+        Wed, 1 Jul 2020 03:21:44 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:57340 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727981AbgGAHBR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Jul 2020 03:01:17 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 7CD06EEF3B31F218F357;
-        Wed,  1 Jul 2020 15:01:15 +0800 (CST)
-Received: from [127.0.0.1] (10.74.173.29) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Wed, 1 Jul 2020
- 15:01:09 +0800
-Subject: Re: [PATCH 1/9] crypto: hisilicon/qm - fix wrong release after using
- strsep
+        id S1728113AbgGAHVo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Jul 2020 03:21:44 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id D0FA24A5DCD10D2318FC;
+        Wed,  1 Jul 2020 15:21:41 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.487.0; Wed, 1 Jul 2020 15:21:32 +0800
+From:   Yang Shen <shenyang39@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-References: <1593428948-64634-1-git-send-email-shenyang39@huawei.com>
- <1593428948-64634-2-git-send-email-shenyang39@huawei.com>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>
-From:   "shenyang (M)" <shenyang39@huawei.com>
-Message-ID: <5e8e524a-7670-549a-e551-7f4260f3794c@huawei.com>
-Date:   Wed, 1 Jul 2020 15:01:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+Subject: [Patch v2 7/9] crypto: hisilicon/qm - fix VF not available after PF FLR
+Date:   Wed, 1 Jul 2020 15:19:53 +0800
+Message-ID: <1593587995-7391-8-git-send-email-shenyang39@huawei.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1593587995-7391-1-git-send-email-shenyang39@huawei.com>
+References: <1593587995-7391-1-git-send-email-shenyang39@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <1593428948-64634-2-git-send-email-shenyang39@huawei.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.74.173.29]
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
 X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+From: Shukun Tan <tanshukun1@huawei.com>
 
+When PF FLR, the hardware will actively trigger the VF FLR. Configuration
+space of VF needs to be saved and restored to ensure that it is available
+after the PF FLR.
 
-On 2020/6/29 19:09, Yang Shen wrote:
-> From: Sihang Chen <chensihang1@hisilicon.com>
->
-> Save the string address before pass to strsep, release it at end.
-> Because strsep will update the string address to point after the
-> token.
->
-> Fixes: c31dc9fe165d("crypto: hisilicon/qm - add DebugFS for xQC and...")
-> Signed-off-by: Sihang Chen <chensihang1@huawei.com>
+Fixes: 7ce396fa12a9("crypto: hisilicon - add FLR support")
+Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
+Signed-off-by: Yang Shen <shenyang39@huawei.com>
+Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
+---
+ drivers/crypto/hisilicon/qm.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-I'm sorry I made mistake here of the email address.
-Soon I will fix this on v2.
-
-> Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
-> ---
->  drivers/crypto/hisilicon/qm.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-> index 9bb263c..ad0adcc 100644
-> --- a/drivers/crypto/hisilicon/qm.c
-> +++ b/drivers/crypto/hisilicon/qm.c
-> @@ -1429,16 +1429,17 @@ static int qm_dbg_help(struct hisi_qm *qm, char *s)
->  static int qm_cmd_write_dump(struct hisi_qm *qm, const char *cmd_buf)
->  {
->  	struct device *dev = &qm->pdev->dev;
-> -	char *presult, *s;
-> +	char *presult, *s, *s_tmp;
->  	int ret;
->
->  	s = kstrdup(cmd_buf, GFP_KERNEL);
->  	if (!s)
->  		return -ENOMEM;
->
-> +	s_tmp = s;
->  	presult = strsep(&s, " ");
->  	if (!presult) {
-> -		kfree(s);
-> +		kfree(s_tmp);
->  		return -EINVAL;
->  	}
->
-> @@ -1468,7 +1469,7 @@ static int qm_cmd_write_dump(struct hisi_qm *qm, const char *cmd_buf)
->  	if (ret)
->  		dev_info(dev, "Please echo help\n");
->
-> -	kfree(s);
-> +	kfree(s_tmp);
->
->  	return ret;
->  }
->
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index db816be..a441b3d 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -3334,6 +3334,9 @@ static int qm_vf_reset_prepare(struct hisi_qm *qm,
+ 			continue;
+ 
+ 		if (pci_physfn(virtfn) == pdev) {
++			/* save VFs PCIE BAR configuration */
++			pci_save_state(virtfn);
++
+ 			ret = hisi_qm_stop(vf_qm, stop_reason);
+ 			if (ret)
+ 				goto stop_fail;
+@@ -3497,6 +3500,9 @@ static int qm_vf_reset_done(struct hisi_qm *qm)
+ 			continue;
+ 
+ 		if (pci_physfn(virtfn) == pdev) {
++			/* enable VFs PCIE BAR configuration */
++			pci_restore_state(virtfn);
++
+ 			ret = qm_restart(vf_qm);
+ 			if (ret)
+ 				goto restart_fail;
+-- 
+2.7.4
 
