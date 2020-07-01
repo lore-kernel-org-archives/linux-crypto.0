@@ -8,68 +8,74 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54514C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 21:48:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8FACC433DF
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 21:48:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3354F20772
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 21:48:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2A652082F
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jul 2020 21:48:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="skRpZ6uz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cHVLargt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727099AbgGAVsL (ORCPT
+        id S1727014AbgGAVsI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Jul 2020 17:48:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34292 "EHLO
+        Wed, 1 Jul 2020 17:48:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727072AbgGAVsJ (ORCPT
+        with ESMTP id S1726114AbgGAVsH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Jul 2020 17:48:09 -0400
+        Wed, 1 Jul 2020 17:48:07 -0400
 Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 297D5C08C5C1;
-        Wed,  1 Jul 2020 14:48:09 -0700 (PDT)
-Received: by mail-lf1-x141.google.com with SMTP id k17so1828151lfg.3;
-        Wed, 01 Jul 2020 14:48:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10905C08C5C1;
+        Wed,  1 Jul 2020 14:48:07 -0700 (PDT)
+Received: by mail-lf1-x141.google.com with SMTP id m26so14590309lfo.13;
+        Wed, 01 Jul 2020 14:48:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=yx5C9IbCh6UxqSI6M2MmfQ5Bt+VI86VaCeOax5GWogk=;
-        b=skRpZ6uzAavbXXgKa5pgcDzDSscSZA2jTVS4cfKE5WMoFy5aGuZTKxxpA/efp18UVZ
-         YxDIYGnUMqpw68XqZrU4ayhCXdhE/RBAhUIIRiLZf7VuDuHG3nd29aKKfpX6eF0l7Jk7
-         mpMGks+Ic1TQ2ggwE9dD4BNJVKmQKb8MWA+KYt5dAZqkE2xisb/fdS+3b7P4v630aG7E
-         M81+/8md0B+d68rfYhd9dYoThjUMAMu174zGC8XDaIAAqQivjPTRNinxFP3AQD0e0vTy
-         FByktaFnxE2n4tUN3Nrl/ULRj5hg1CpR9XQSKa0jYdZRHbhSFSzcOnGm6sanfpe3mI9z
-         HrQg==
+        bh=VIrf36LHUGhDoMCxDA0a8b1GW5wPUKeQuj2rQuLiuEc=;
+        b=cHVLargtKOSuIVSQy/EoW0f7ezdcsv5A6YxDnv+0g14JvkY9lbcoZo3SaV3nYObVen
+         PVAvRou9QHdEtLwmWraMDwRAt/gai7M2Y/tqtqHRp+L5MXyvjCbeUP8grDjJ/mmMqjhL
+         rlYSc9Q7tm9tmg7L7dW0lcHXX2srCCav8bCm2c99dGCsJtl8NzMMtufZg8keqZq+o8or
+         iX524GSokG+N4cvWy96bFNETeDuTJD9gMd6I/AwvCpd54fATmlH5Dfs4KkemrtWCb4WC
+         qEY4i7xLcP7xw7tndEKiaorgFZK/64UaEGAv8L4gpoDDsvGnwN7Q6vXwwLYRALqqF3o4
+         +dcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=yx5C9IbCh6UxqSI6M2MmfQ5Bt+VI86VaCeOax5GWogk=;
-        b=a39OgSC7aX5pQjKtu+ziiTw5jAofwo0bKpr/mxcL5Li+7jt6yPgcgXCcABWthDvbNq
-         geQo68bn4BTiNYjx8MgSuTJgBfyp8ZaGXDuYkifSL+ZjsqU9CUMZf2UcqEwzUrUFnf5j
-         80u0jDg4ErKomqpDWyGNtzdMLkUXrfYtjXIHNUnuVugUjRgchkbm1oyP9C5ZgOOjkmMD
-         MKwNKf7x/JarHZyvVcGbTPfYkXbZBNn1LObll9QVwuaDoOa3leqymC0vwFqYcIeXVbDX
-         jvMRZpSV2xMs+ijqG6Rl/8tSSwJ/EpZEQoidtAAsmtYp/P3g8Vn6uzgbajAIC3zXh/zN
-         8ckw==
-X-Gm-Message-State: AOAM531M68MNU5fAD6DnlKXeuipCVay9mMmp/pQ15yngfuJMfhIWnzRD
-        tHq7qHrRdttw/lUMo+ilEG8=
-X-Google-Smtp-Source: ABdhPJw77kGBwg24cE7SpCT3b6UBF20pBJ8fzxNdijqMVq8hycUKWaav9wR4+veojUW9fMCE/Cjoww==
-X-Received: by 2002:a05:6512:6ca:: with SMTP id u10mr16825434lff.184.1593640087713;
-        Wed, 01 Jul 2020 14:48:07 -0700 (PDT)
+        bh=VIrf36LHUGhDoMCxDA0a8b1GW5wPUKeQuj2rQuLiuEc=;
+        b=oobL7b/lo0XKYz5yBB/CJfqJBtjTN397lRRfY7Uo39+/z2aysToWuYr3sly9iBWuWB
+         vUoqqwK7IkwcfQPr6Fs1FLvCWg3twGliH6th2jz8GfmYIsV9Lk6kh/bcLwN14W09MUdI
+         or1URUWdjpnuFun0XWXEKCBpKOyW8WvBkm6oF42Jmx7C0OYgeyifaRZESBg4jIBVoODe
+         NPu25nUpQUeK3fhg1fhVCsJXPw8rKiEoYusZOUGaLTeJmgKWDITyLeodbQQIi21A2XRD
+         4mG3q6xHQrDWhcncgymrz6SEYeF9lyvgyiowWOAXY5BJEj5oM7b2s025OI6gIg2WMk9F
+         Og+Q==
+X-Gm-Message-State: AOAM533WH1Qog397YQOW/IKEHxjiNGwYU01NizxtXmZKBZvHJfEdUaBQ
+        5niVe2EgQ+CGzCfhNH4SyA9clF10fTg=
+X-Google-Smtp-Source: ABdhPJzexXT6w7XOuAgwFHpQ0Aqq9iajCASf7I+zO/gKC7SKjv13LxECN/Alr8ZgKv7kCHsaCwb3NA==
+X-Received: by 2002:a19:48d3:: with SMTP id v202mr16627841lfa.202.1593640084785;
+        Wed, 01 Jul 2020 14:48:04 -0700 (PDT)
 Received: from localhost.localdomain (h-98-128-181-241.NA.cust.bahnhof.se. [98.128.181.241])
-        by smtp.gmail.com with ESMTPSA id d3sm2476812lfe.93.2020.07.01.14.48.06
+        by smtp.gmail.com with ESMTPSA id d3sm2476812lfe.93.2020.07.01.14.48.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2020 14:48:07 -0700 (PDT)
+        Wed, 01 Jul 2020 14:48:04 -0700 (PDT)
 From:   Rikard Falkeborn <rikard.falkeborn@gmail.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Arnd Bergmann <arnd@arndb.de>
 Cc:     Rikard Falkeborn <rikard.falkeborn@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
+        linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 3/5] hwrng: virtio - Constify id_table[]
-Date:   Wed,  1 Jul 2020 22:09:48 +0200
-Message-Id: <20200701200950.30314-4-rikard.falkeborn@gmail.com>
+        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 1/5] hwrng: bcm2835 - Constify bcm2835_rng_devtype[]
+Date:   Wed,  1 Jul 2020 22:09:46 +0200
+Message-Id: <20200701200950.30314-2-rikard.falkeborn@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200701200950.30314-1-rikard.falkeborn@gmail.com>
 References: <20200701200950.30314-1-rikard.falkeborn@gmail.com>
@@ -80,35 +86,35 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-id_table[] is not modified and an be made const to allow the compiler to
-put it in read-only memory.
+bcm2835_rng_devtype[] is not modified and can be made const to allow the
+compiler to put it in read-only memory.
 
 Before:
    text    data     bss     dec     hex filename
-   1746     192       8    1946     79a drivers/char/hw_random/virtio-rng.o
+   2392     176       0    2568     a08 drivers/char/hw_random/bcm2835-rng.o
 
 After:
    text    data     bss     dec     hex filename
-   1762     176       8    1946     79a drivers/char/hw_random/virtio-rng.o
+   2464     104       0    2568     a08 drivers/char/hw_random/bcm2835-rng.o
 
 Signed-off-by: Rikard Falkeborn <rikard.falkeborn@gmail.com>
 ---
- drivers/char/hw_random/virtio-rng.c | 2 +-
+ drivers/char/hw_random/bcm2835-rng.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
-index 79a6e47b5fbc..a90001e02bf7 100644
---- a/drivers/char/hw_random/virtio-rng.c
-+++ b/drivers/char/hw_random/virtio-rng.c
-@@ -195,7 +195,7 @@ static int virtrng_restore(struct virtio_device *vdev)
- }
- #endif
+diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+index cbf5eaea662c..0839236a6d19 100644
+--- a/drivers/char/hw_random/bcm2835-rng.c
++++ b/drivers/char/hw_random/bcm2835-rng.c
+@@ -188,7 +188,7 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
  
--static struct virtio_device_id id_table[] = {
-+static const struct virtio_device_id id_table[] = {
- 	{ VIRTIO_ID_RNG, VIRTIO_DEV_ANY_ID },
- 	{ 0 },
- };
+ MODULE_DEVICE_TABLE(of, bcm2835_rng_of_match);
+ 
+-static struct platform_device_id bcm2835_rng_devtype[] = {
++static const struct platform_device_id bcm2835_rng_devtype[] = {
+ 	{ .name = "bcm2835-rng" },
+ 	{ .name = "bcm63xx-rng" },
+ 	{ /* sentinel */ }
 -- 
 2.27.0
 
