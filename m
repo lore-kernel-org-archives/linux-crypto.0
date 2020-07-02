@@ -2,138 +2,74 @@ Return-Path: <SRS0=MdlN=AN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A9E6C433E4
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jul 2020 10:23:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 140FAC433E0
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jul 2020 10:32:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78402206DD
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jul 2020 10:23:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E27282073E
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jul 2020 10:32:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1593685389;
-	bh=h4X388artUNIVz+IWAOlQwFeJ3Od7WTT7Py6PUtGojE=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=Yfdh3fwz+jt6Ot+xp4lefl7atIoq9hkOfkjGbtEMLmmTqA9d4ra8/ToNEV+uOrhIL
-	 QQIxTttCewFTIIR1mKUD1AHDVUMJ0pkrTk+1tmuhWbeiQ2WAgH0u1gs+sGjil09uKo
-	 zhT8UhVpW5yfWLuEAEMNwXgm2MGrC/WUiaFtyw6w=
+	s=default; t=1593685951;
+	bh=3uzJdXDmT8FY4gyQ3T1UaSqZ+EEfCJDFv/7k1CeXfD8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=2s5KrGMO9/b715gWZr8HWe8L240VrfmMxHhW6WYKWvi/5wmvp9qo8ljGtNpFev15k
+	 yJGjQMFYDuqPlFiENaHXEGQ0APFej9vI201eHUVJ1TveY+w9MXFTbWvnfZDNa8ySYx
+	 AsgJxQYNY46b2voVTDOZb82W0a57Kz9WAorzDyOE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728577AbgGBKWt (ORCPT
+        id S1728355AbgGBKcZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Jul 2020 06:22:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59696 "EHLO mail.kernel.org"
+        Thu, 2 Jul 2020 06:32:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35494 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728323AbgGBKUV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Jul 2020 06:20:21 -0400
-Received: from e123331-lin.nice.arm.com (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1727900AbgGBKcY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Jul 2020 06:32:24 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BE787206DD;
-        Thu,  2 Jul 2020 10:20:17 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id A9D622073E;
+        Thu,  2 Jul 2020 10:32:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1593685220;
-        bh=h4X388artUNIVz+IWAOlQwFeJ3Od7WTT7Py6PUtGojE=;
-        h=From:To:Cc:Subject:Date:From;
-        b=A9ZkuZDHiPRmAAIULwilEVaJNM4a3NENPr7Q0BVVzdpHbUZvpJri/EOl5Mn9KzVha
-         uBVtqfVU9BlnMzB0aziUSNQnWwdkmZi9kR/dmM5ud59EX3Eqvsg+JixtTFB7diQqIK
-         tDPmsf2nmtZJ0CecESB5Z3LqUucylh19S8p7sZY4=
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        s=default; t=1593685944;
+        bh=3uzJdXDmT8FY4gyQ3T1UaSqZ+EEfCJDFv/7k1CeXfD8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=IGUBpkAPA0NkoiCzhPgZFHqDh6lfLSNQu4VZJ8IBc9WLGvJ3w8qytgEiD0tCh6YTn
+         tmEFrv2Og4IT6Zb2Jkwq0lJQtp1NTNZ66IueddDwUe78HyBiePV4Dc5He5iDLRbify
+         DT1TVhrdVF+rP3XO/V/DRmoYcLqXFNdaqYK0QSI0=
+Date:   Thu, 2 Jul 2020 12:32:27 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-nfs@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@google.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
         "J. Bruce Fields" <bfields@fieldses.org>,
         Chuck Lever <chuck.lever@oracle.com>,
-        Eric Biggers <ebiggers@google.com>,
         linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        devel@driverdev.osuosl.org, linux-nfs@vger.kernel.org
-Subject: [RFC PATCH 0/7] crypto: get rid of ecb(arc4)
-Date:   Thu,  2 Jul 2020 12:19:40 +0200
-Message-Id: <20200702101947.682-1-ardb@kernel.org>
-X-Mailer: git-send-email 2.17.1
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>
+Subject: Re: [RFC PATCH 1/7] staging/rtl8192e: switch to RC4 library interface
+Message-ID: <20200702103227.GB1238594@kroah.com>
+References: <20200702101947.682-1-ardb@kernel.org>
+ <20200702101947.682-2-ardb@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200702101947.682-2-ardb@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The RC4 algorithm does not fit the sckipher model very well: it is a stream
-cipher that combines the key and IV into a single vector, which implies that
-using the same key more than once amounts to stream cipher IV reuse, and
-therefore catastrophic failure.
+On Thu, Jul 02, 2020 at 12:19:41PM +0200, Ard Biesheuvel wrote:
+> Switch to the ARC4 library interface, to remove the pointless
+> dependency on the skcipher API, from which we will hopefully be
+> able to drop ecb(arc4) skcipher support.
+> 
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 
-So let's replace the remaining legacy users (WEP and TKIP in the staging
-tree) to the ARC4 library interface, which does not rely on the crypto API
-at all. Also, remove the obsolete RC4-HMAC-MD5 algorithm from the SUNRPC
-driver stack.
-
-NOTE: It should not be too difficult to switch the kerberos code over to
-the ARC4 library interface as well, given that much of it uses a different
-code path already. But we should only do so if we really need to keep this
-support around, and it seems that this was only ever intended as a transitional
-algorithm for Windows NT/2000 clients.
-
-That leaves no remaining users of the ecb(arc4) skcipher, so we can remove
-any implementations as well.
-
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
-Cc: Anna Schumaker <anna.schumaker@netapp.com>
-Cc: "J. Bruce Fields" <bfields@fieldses.org>
-Cc: Chuck Lever <chuck.lever@oracle.com>
-Cc: Eric Biggers <ebiggers@google.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: devel@driverdev.osuosl.org
-Cc: linux-nfs@vger.kernel.org
-
-Ard Biesheuvel (7):
-  staging/rtl8192e: switch to RC4 library interface
-  staging/rtl8192u: switch to RC4 library interface
-  SUNRPC: remove RC4-HMAC-MD5 support from KerberosV
-  crypto: remove ARC4 support from the skcipher API
-  crypto: n2 - remove ecb(arc4) support
-  crypto: bcm-iproc - remove ecb(arc4) support
-  crypto: tcrypt - remove ecb(arc4) testing/benchmarking support
-
- crypto/Kconfig                                |  12 -
- crypto/Makefile                               |   1 -
- crypto/arc4.c                                 |  76 -----
- crypto/tcrypt.c                               |  21 +-
- crypto/testmgr.c                              |   7 -
- crypto/testmgr.h                              |  62 ----
- drivers/crypto/bcm/cipher.c                   |  96 +-----
- drivers/crypto/bcm/cipher.h                   |   1 -
- drivers/crypto/bcm/spu.c                      |  23 +-
- drivers/crypto/bcm/spu.h                      |   1 -
- drivers/crypto/bcm/spu2.c                     |  12 +-
- drivers/crypto/bcm/spu2.h                     |   1 -
- drivers/crypto/n2_core.c                      |  46 ---
- drivers/net/wireless/intel/ipw2x00/Kconfig    |   1 -
- drivers/net/wireless/intersil/hostap/Kconfig  |   1 -
- drivers/staging/rtl8192e/Kconfig              |   4 +-
- drivers/staging/rtl8192e/rtllib_crypt_tkip.c  |  70 +----
- drivers/staging/rtl8192e/rtllib_crypt_wep.c   |  72 +----
- drivers/staging/rtl8192u/Kconfig              |   1 +
- .../rtl8192u/ieee80211/ieee80211_crypt_tkip.c |  82 +-----
- .../rtl8192u/ieee80211/ieee80211_crypt_wep.c  |  64 +---
- include/linux/sunrpc/gss_krb5.h               |  11 -
- include/linux/sunrpc/gss_krb5_enctypes.h      |   9 +-
- net/sunrpc/Kconfig                            |   1 -
- net/sunrpc/auth_gss/gss_krb5_crypto.c         | 276 ------------------
- net/sunrpc/auth_gss/gss_krb5_mech.c           |  95 ------
- net/sunrpc/auth_gss/gss_krb5_seal.c           |   1 -
- net/sunrpc/auth_gss/gss_krb5_seqnum.c         |  87 ------
- net/sunrpc/auth_gss/gss_krb5_unseal.c         |   1 -
- net/sunrpc/auth_gss/gss_krb5_wrap.c           |  65 +----
- 30 files changed, 78 insertions(+), 1122 deletions(-)
- delete mode 100644 crypto/arc4.c
-
--- 
-2.17.1
-
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
