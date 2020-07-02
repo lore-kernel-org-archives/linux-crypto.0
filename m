@@ -2,71 +2,130 @@ Return-Path: <SRS0=MdlN=AN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B91BAC433E1
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jul 2020 02:32:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 510D2C433E3
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jul 2020 03:33:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A30102085B
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jul 2020 02:32:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A3AF207F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jul 2020 03:33:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727814AbgGBCcB (ORCPT
+        id S1726187AbgGBDdj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Jul 2020 22:32:01 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7335 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726759AbgGBCcB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Jul 2020 22:32:01 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id D6817E359380297AD5A3;
-        Thu,  2 Jul 2020 10:31:58 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 2 Jul 2020 10:31:51 +0800
-From:   Meng Yu <yumeng18@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
-        <wangzhou1@hisilicon.com>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH 1/6] crypto: hisilicon/hpre - Init the value of current_q of debugfs
-Date:   Thu, 2 Jul 2020 10:31:14 +0800
-Message-ID: <1593657079-31990-2-git-send-email-yumeng18@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1593657079-31990-1-git-send-email-yumeng18@huawei.com>
-References: <1593657079-31990-1-git-send-email-yumeng18@huawei.com>
+        Wed, 1 Jul 2020 23:33:39 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:37150 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725857AbgGBDdi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Jul 2020 23:33:38 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1jqpxV-0008AS-FA; Thu, 02 Jul 2020 13:32:22 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 02 Jul 2020 13:32:21 +1000
+Date:   Thu, 2 Jul 2020 13:32:21 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        LTP List <ltp@lists.linux.it>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        lkft-triage@lists.linaro.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Jan Stancek <jstancek@redhat.com>, chrubis <chrubis@suse.cz>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        James Morris <jmorris@namei.org>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        David Howells <dhowells@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sachin Sant <sachinp@linux.vnet.ibm.com>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux- stable <stable@vger.kernel.org>
+Subject: [v2 PATCH] crypto: af_alg - Fix regression on empty requests
+Message-ID: <20200702033221.GA19367@gondor.apana.org.au>
+References: <CA+G9fYvHFs5Yx8TnT6VavtfjMN8QLPuXg6us-dXVJqUUt68adA@mail.gmail.com>
+ <20200622224920.GA4332@42.do-not-panic.com>
+ <CA+G9fYsXDZUspc5OyfqrGZn=k=2uRiGzWY_aPePK2C_kZ+dYGQ@mail.gmail.com>
+ <20200623064056.GA8121@gondor.apana.org.au>
+ <20200623170217.GB150582@gmail.com>
+ <20200626062948.GA25285@gondor.apana.org.au>
+ <CA+G9fYutuU55iL_6Qrk3oG3iq-37PaxvtA4KnEQHuLH9YpH-QA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+G9fYutuU55iL_6Qrk3oG3iq-37PaxvtA4KnEQHuLH9YpH-QA@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Initialize current queue number as HPRE_PF_DEF_Q_NUM, or it is zero
-and we can't set its value by "current_q_write".
+On Tue, Jun 30, 2020 at 02:18:11PM +0530, Naresh Kamboju wrote:
+> 
+> Since we are on this subject,
+> LTP af_alg02  test case fails on stable 4.9 and stable 4.4
+> This is not a regression because the test case has been failing from
+> the beginning.
+> 
+> Is this test case expected to fail on stable 4.9 and 4.4 ?
+> or any chance to fix this on these older branches ?
+> 
+> Test output:
+> af_alg02.c:52: BROK: Timed out while reading from request socket.
+> 
+> ref:
+> https://qa-reports.linaro.org/lkft/linux-stable-rc-4.9-oe/build/v4.9.228-191-g082e807235d7/testrun/2884917/suite/ltp-crypto-tests/test/af_alg02/history/
+> https://qa-reports.linaro.org/lkft/linux-stable-rc-4.9-oe/build/v4.9.228-191-g082e807235d7/testrun/2884606/suite/ltp-crypto-tests/test/af_alg02/log
 
-Signed-off-by: Meng Yu <yumeng18@huawei.com>
-Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
-Reviewed-by: Hui Tang <tanghui20@huawei.com>
----
- drivers/crypto/hisilicon/hpre/hpre_main.c | 1 +
- 1 file changed, 1 insertion(+)
+Actually this test really is broken.  Even though empty requests
+are legal, they should never be done with no write(2) at all.
+Because this fundamentally breaks the use of a blocking read(2)
+to wait for more data.
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index 52d605b..624276b 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -737,6 +737,7 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- 	if (qm->fun_type == QM_HW_PF) {
- 		qm->qp_base = HPRE_PF_DEF_Q_BASE;
- 		qm->qp_num = pf_q_num;
-+		qm->debug.curr_qm_qp_num = pf_q_num;
- 		qm->qm_list = &hpre_devices;
+Granted this has been broken since 2017 but I'm not going to
+reintroduce this just because of a broken test case.
+
+So please either remove af_alg02 or fix it by adding a control
+message through sendmsg(2).
+
+Thanks,
+
+---8<---
+Some user-space programs rely on crypto requests that have no
+control metadata.  This broke when a check was added to require
+the presence of control metadata with the ctx->init flag.
+
+This patch fixes the regression by setting ctx->init as long as
+one sendmsg(2) has been made, with or without a control message.
+
+Reported-by: Sachin Sant <sachinp@linux.vnet.ibm.com>
+Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+Fixes: f3c802a1f300 ("crypto: algif_aead - Only wake up when...")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 9fcb91ea10c41..5882ed46f1adb 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -851,6 +851,7 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 		err = -EINVAL;
+ 		goto unlock;
+ 	}
++	ctx->init = true;
+ 
+ 	if (init) {
+ 		ctx->enc = enc;
+@@ -858,7 +859,6 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 			memcpy(ctx->iv, con.iv->iv, ivsize);
+ 
+ 		ctx->aead_assoclen = con.aead_assoclen;
+-		ctx->init = true;
  	}
  
+ 	while (size) {
 -- 
-2.8.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
