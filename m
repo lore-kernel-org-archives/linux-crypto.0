@@ -6,32 +6,32 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C206FC433E0
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jul 2020 08:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9131CC433DF
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jul 2020 08:29:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1D3E20720
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jul 2020 08:28:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71016206A1
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jul 2020 08:29:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728266AbgGBI2F (ORCPT
+        id S1726042AbgGBI3E (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Jul 2020 04:28:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47756 "EHLO
+        Thu, 2 Jul 2020 04:29:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726475AbgGBI2E (ORCPT
+        with ESMTP id S1728291AbgGBI3C (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Jul 2020 04:28:04 -0400
+        Thu, 2 Jul 2020 04:29:02 -0400
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D16CC08C5C1
-        for <linux-crypto@vger.kernel.org>; Thu,  2 Jul 2020 01:28:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9E1EC08C5C1
+        for <linux-crypto@vger.kernel.org>; Thu,  2 Jul 2020 01:29:02 -0700 (PDT)
 Received: from pty.hi.pengutronix.de ([2001:67c:670:100:1d::c5])
         by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <mfe@pengutronix.de>)
-        id 1jquZQ-0006VX-Ql; Thu, 02 Jul 2020 10:27:48 +0200
+        id 1jquaR-0006dd-HM; Thu, 02 Jul 2020 10:28:51 +0200
 Received: from mfe by pty.hi.pengutronix.de with local (Exim 4.89)
         (envelope-from <mfe@pengutronix.de>)
-        id 1jquZN-0004K1-AR; Thu, 02 Jul 2020 10:27:45 +0200
-Date:   Thu, 2 Jul 2020 10:27:45 +0200
+        id 1jquaR-0004KM-38; Thu, 02 Jul 2020 10:28:51 +0200
+Date:   Thu, 2 Jul 2020 10:28:51 +0200
 From:   Marco Felsch <m.felsch@pengutronix.de>
 To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
 Cc:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
@@ -49,21 +49,21 @@ Cc:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
         Silvano Di Ninno <silvano.dininno@nxp.com>,
         Fabio Estevam <festevam@gmail.com>,
         linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 4/5] ARM: dts: imx6ull: add rng
-Message-ID: <20200702082745.gkgkjdrybbeaars4@pengutronix.de>
+Subject: Re: [PATCH v2 5/5] hwrng: imx-rngc: enable driver for i.MX6
+Message-ID: <20200702082851.cvlve35pirk3ym2k@pengutronix.de>
 References: <20200621145658.12528-1-horia.geanta@nxp.com>
- <20200621145658.12528-5-horia.geanta@nxp.com>
+ <20200621145658.12528-6-horia.geanta@nxp.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200621145658.12528-5-horia.geanta@nxp.com>
+In-Reply-To: <20200621145658.12528-6-horia.geanta@nxp.com>
 X-Sent-From: Pengutronix Hildesheim
 X-URL:  http://www.pengutronix.de/
 X-IRC:  #ptxdist @freenode
 X-Accept-Language: de,en
 X-Accept-Content-Type: text/plain
-X-Uptime: 10:27:19 up 229 days, 23:45, 232 users,  load average: 0.02, 0.10,
+X-Uptime: 10:27:55 up 229 days, 23:46, 232 users,  load average: 0.06, 0.10,
  0.08
 User-Agent: NeoMutt/20170113 (1.7.2)
 X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c5
@@ -76,7 +76,10 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 20-06-21 17:56, Horia Geantă wrote:
-> Add node for the RNGB block.
+> i.MX6 SL, SLL, ULL, ULZ SoCs have an RNGB block.
+> 
+> Since imx-rngc driver supports also rngb,
+> let's enable it for these SoCs too.
 > 
 > Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 > ---
