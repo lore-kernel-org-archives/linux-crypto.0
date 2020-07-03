@@ -2,77 +2,118 @@ Return-Path: <SRS0=tj8v=AO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E5FEC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jul 2020 13:33:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F303BC433E0
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jul 2020 13:36:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E0EA20760
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jul 2020 13:33:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U1tx+Nh2"
+	by mail.kernel.org (Postfix) with ESMTP id D3B3720782
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jul 2020 13:36:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1593783366;
+	bh=tYw1QVFf3l8wAmr8ShOa9rlUyconKQv6eBiz06jvs2Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=PZ+kTrOQ4q+aMDazHITcXJgyHF6PesaZxzHC0d/nir1d4Mo0tTxBJEFhwRh/SeaWR
+	 pWPHxbA3mwFeFDQLfdimTAL1TM2HBVYoJyDUqXqZkWXnlnOhFvNxrkGfq0FvAg7lt+
+	 EPS3VwZ3qKuXyB4YgQ2ALgExHYrDz/cZTsd2mLjA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726236AbgGCNdq (ORCPT
+        id S1726098AbgGCNgB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Jul 2020 09:33:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34516 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726022AbgGCNdq (ORCPT
+        Fri, 3 Jul 2020 09:36:01 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:43894 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726035AbgGCNgB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Jul 2020 09:33:46 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFECCC08C5C1
-        for <linux-crypto@vger.kernel.org>; Fri,  3 Jul 2020 06:33:45 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id s10so32662878wrw.12
-        for <linux-crypto@vger.kernel.org>; Fri, 03 Jul 2020 06:33:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4CUkejNQ9hzeyTgPJK7NXp6e16zz9O+Bis7lft+1r/w=;
-        b=U1tx+Nh2qb2U9GdchuUAPHPOSKiOYMS1HqF3GrtuiohOTQppEIc658msTLfkLZdcwy
-         3S1BoC9Uottsq9Ow+DuGW2/KQiDTkehFa0Iq3ET7JztxmKNzLZBGQ+Uo+qv/733+MuJm
-         336hHUy7G+CgI7/kHK+n6EcdwZTZqduTb+bB6XibsTtU9mvqkSrruFsAgCjGyq5/IA6j
-         lfgOtW33ebeJPa70APSMABByGk1eh29P9DX/vgZlbyKcpgPpKR9sih72iMbCNIiPFbru
-         px2doiiCq1gmgVpw50b/3djE947ot1sunvt1bI/9+AVzpx7wdNFxn8cXFSEzlKNgpOUJ
-         1cpg==
+        Fri, 3 Jul 2020 09:36:01 -0400
+Received: by mail-pf1-f195.google.com with SMTP id j12so13997842pfn.10;
+        Fri, 03 Jul 2020 06:36:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4CUkejNQ9hzeyTgPJK7NXp6e16zz9O+Bis7lft+1r/w=;
-        b=f7U7QH1Sa/0K25D0CvorrSOS54qKQDO411nSCbx70y958Z7e9rpyE7NpCV5iuxWSGf
-         vBOs73k0bgravfUMtarlbyPvZani+Y56dm2NvUqh1Y2tQaFE3rPc69+WgXn/puDDEbHx
-         6v/4SuBdOVKLEobnz4CfEpGwqA+1eoJJiUbifhPxdbmBP+fl1H3DHfYXZu+Mh7Kwodmw
-         6Hcf9bnIoK3RTwE+Exo0Yi+nuN5uPCMRoYuZ55e6GhSEKrekpeKyR3+P6tJ4B+7d6i+c
-         5C2/XNUludUTlmsyzzV+u53E5TvVCLdbvbrBc//1tKIwZXYG4MqlncF+E/Zi6EnX2MAv
-         l++Q==
-X-Gm-Message-State: AOAM5305GquIAoTaWV/RK+Nyd005X0MMx7ty75qWzcQ/qVpdEgC2B/NQ
-        WheqfVhcpjknzUi8d0hSNVIfdy3E/esrC65oCohT4Zuy
-X-Google-Smtp-Source: ABdhPJxdLKepDh4uwm8PTY/GF/LxpKJPEP8bPlNPiEqJLKZRHLr+Czkq+nJZr+KlFQo4TLdIO3iUm99y6+yKxOX4KeA=
-X-Received: by 2002:adf:a34a:: with SMTP id d10mr12733820wrb.59.1593783224721;
- Fri, 03 Jul 2020 06:33:44 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=T5rcVRIkgD/btpU3eP+kPgBcl/ql3dV8wsHC9ym85fc=;
+        b=dpoBSKt9u7PzGcULVVkb3BVVTC2SRONI/mFO7qKPCcsTKF4bMSB5wwEDanojpsXGUm
+         kwK2J5sW/qcLuKkg7HXJxYyiPTFgMIxbMBQ+qwzZzAGZiC64jo6gJKE9hkQjrT2ecJ8S
+         5RRKQHCIYvdyFK6p8pLC2sC1H6ozGDeuAu3brBCsqouH3ULIFK/O+oX+/om3n+zQjJdT
+         i4BI8TyxD1kr2/OzeliwlkLweUtmbWBKe/mTeTKXuzLWANMOcwJ90W02jjPdIV88+vZ1
+         rvusjmydEGS3A9de9HSIXr5ID45xehpaqNyh7fFMxO40qh2iTESR9gJnLQA82lYLFVNn
+         Gdzw==
+X-Gm-Message-State: AOAM533w9VkVaasqHDJDD2CoI2ePDu2dMzKUglzB3MmTWtQmnrjBmNQW
+        BA3i4NaqP2LGNvo4+SkpaYk=
+X-Google-Smtp-Source: ABdhPJzpEuquvHuz9dy6BTpylDSjUJQBr0XwgRqlpSIxXVt6avNzJ3DHhTKXkfB0Cil4QhB/QzoeTw==
+X-Received: by 2002:a65:640c:: with SMTP id a12mr28887324pgv.88.1593783360171;
+        Fri, 03 Jul 2020 06:36:00 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id m16sm12805082pfd.101.2020.07.03.06.35.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Jul 2020 06:35:58 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 1885F40945; Fri,  3 Jul 2020 13:35:58 +0000 (UTC)
+Date:   Fri, 3 Jul 2020 13:35:58 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        LTP List <ltp@lists.linux.it>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        lkft-triage@lists.linaro.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Jan Stancek <jstancek@redhat.com>, chrubis <chrubis@suse.cz>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        James Morris <jmorris@namei.org>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        David Howells <dhowells@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sachin Sant <sachinp@linux.vnet.ibm.com>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux- stable <stable@vger.kernel.org>
+Subject: Re: [v2 PATCH] crypto: af_alg - Fix regression on empty requests
+Message-ID: <20200703133558.GX4332@42.do-not-panic.com>
+References: <CA+G9fYvHFs5Yx8TnT6VavtfjMN8QLPuXg6us-dXVJqUUt68adA@mail.gmail.com>
+ <20200622224920.GA4332@42.do-not-panic.com>
+ <CA+G9fYsXDZUspc5OyfqrGZn=k=2uRiGzWY_aPePK2C_kZ+dYGQ@mail.gmail.com>
+ <20200623064056.GA8121@gondor.apana.org.au>
+ <20200623170217.GB150582@gmail.com>
+ <20200626062948.GA25285@gondor.apana.org.au>
+ <CA+G9fYutuU55iL_6Qrk3oG3iq-37PaxvtA4KnEQHuLH9YpH-QA@mail.gmail.com>
+ <20200702033221.GA19367@gondor.apana.org.au>
 MIME-Version: 1.0
-References: <TU4PR8401MB121625D980E4FEF13345BD12F66A0@TU4PR8401MB1216.NAMPRD84.PROD.OUTLOOK.COM>
-In-Reply-To: <TU4PR8401MB121625D980E4FEF13345BD12F66A0@TU4PR8401MB1216.NAMPRD84.PROD.OUTLOOK.COM>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Fri, 3 Jul 2020 21:33:29 +0800
-Message-ID: <CACXcFmkHJD+utZ8qKTrj7kwq6xY4M2tosFSdXX_L-2C-72OjaA@mail.gmail.com>
-Subject: Re: No ESP response
-To:     "Bhat, Jayalakshmi Manjunath" <jayalakshmi.bhat@hp.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200702033221.GA19367@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Bhat, Jayalakshmi Manjunath <jayalakshmi.bhat@hp.com> wrote:
+On Thu, Jul 02, 2020 at 01:32:21PM +1000, Herbert Xu wrote:
+> On Tue, Jun 30, 2020 at 02:18:11PM +0530, Naresh Kamboju wrote:
+> > 
+> > Since we are on this subject,
+> > LTP af_alg02  test case fails on stable 4.9 and stable 4.4
+> > This is not a regression because the test case has been failing from
+> > the beginning.
+> > 
+> > Is this test case expected to fail on stable 4.9 and 4.4 ?
+> > or any chance to fix this on these older branches ?
+> > 
+> > Test output:
+> > af_alg02.c:52: BROK: Timed out while reading from request socket.
+> > 
+> > ref:
+> > https://qa-reports.linaro.org/lkft/linux-stable-rc-4.9-oe/build/v4.9.228-191-g082e807235d7/testrun/2884917/suite/ltp-crypto-tests/test/af_alg02/history/
+> > https://qa-reports.linaro.org/lkft/linux-stable-rc-4.9-oe/build/v4.9.228-191-g082e807235d7/testrun/2884606/suite/ltp-crypto-tests/test/af_alg02/log
+> 
+> Actually this test really is broken.
 
-> We are executing a simple ping test on our device in transport mode.
+FWIW the patch "umh: fix processed error when UMH_WAIT_PROC is used" was
+dropped from linux-next for now as it was missing checking for signals.
+I'll be open coding iall checks for each UMH_WAIT_PROC callers next. Its
+not clear if this was the issue with this test case, but figured I'd let
+you know.
 
-I wrote this 20 years ago. Does it help?
-https://www.freeswan.org/freeswan_trees/freeswan-2.06/doc/faq.html#cantping
+  Luis
