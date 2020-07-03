@@ -2,80 +2,128 @@ Return-Path: <SRS0=tj8v=AO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE6B0C433E5
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jul 2020 08:18:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0311BC433E0
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jul 2020 08:36:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B738F206A1
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jul 2020 08:18:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C19AA2084C
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jul 2020 08:36:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DincemqM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726053AbgGCIS6 (ORCPT
+        id S1726053AbgGCIgz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Jul 2020 04:18:58 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:45700 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726801AbgGCIS6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Jul 2020 04:18:58 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 0C593F446943C005C098
-        for <linux-crypto@vger.kernel.org>; Fri,  3 Jul 2020 16:18:57 +0800 (CST)
-Received: from [127.0.0.1] (10.67.102.118) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Fri, 3 Jul 2020
- 16:18:54 +0800
-Subject: Re: [PATCH 2/5] crypto:hisilicon/sec2 - update busy processing logic
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>
-References: <1593167529-22463-1-git-send-email-liulongfang@huawei.com>
- <1593167529-22463-3-git-send-email-liulongfang@huawei.com>
- <20200703041440.GA7858@gondor.apana.org.au>
-From:   liulongfang <liulongfang@huawei.com>
-Message-ID: <9a1eff92-537b-60e3-c840-206915d69019@huawei.com>
-Date:   Fri, 3 Jul 2020 16:18:54 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 3 Jul 2020 04:36:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45420 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725764AbgGCIgy (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 3 Jul 2020 04:36:54 -0400
+Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC8B9C08C5C1;
+        Fri,  3 Jul 2020 01:36:54 -0700 (PDT)
+Received: by mail-io1-xd44.google.com with SMTP id v6so18024759iob.4;
+        Fri, 03 Jul 2020 01:36:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+         :subject:to:cc;
+        bh=xOHCU2+2Hl3oR9DNasCEydEOombBF0/71/PXB/IcwFo=;
+        b=DincemqMChQXOxUDF7+r9Fy4lXi9OPo+ePkk+72oe+3DtZA3I6m5QsTqaim7w/1KK7
+         3nB0v3mAAK3QxZ6bsg9tJavJTwPcpn8AsZ14VtCQXxk6odPSQfQb3qn2m4zUzxrZrlfp
+         zk0e19f3r+gQKfsWF1HlzV+s6fXaMCSllJdZh9EqQZ2/xFXAAci9RbRXtWyItIrs2/Z+
+         Q/MgfC1gvMkwpJ7dJJ/sR1uvDZ4xvq3Y0yrsqhGqyO5Y/W1PVMuTnSXf3p1Ct1kLQHzR
+         oDQj3RjcJ2MLbBjp7k4WEBQR/uzQFc+xxKtJjt9HBXrh7XZqjbbagrmRBI9m8vNIRB6/
+         Z3VA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+         :from:date:message-id:subject:to:cc;
+        bh=xOHCU2+2Hl3oR9DNasCEydEOombBF0/71/PXB/IcwFo=;
+        b=KGsd9asyRBdAbtppgvlGupN5sUiCfMzwrsyrQSca2BzclfnrxBTf38FVc75dfTaK3L
+         X1VlMhqW1KxbBpv6yHsxVdBrvAZ+8aGunsA6wvCekCJip4VSP4830efuJVBLFRFB1OLH
+         dwivWD20x6mrg5kugfJccHWFe+wxN4hb+sf5ndwv0S3Gh31gln4vP29h3ziIQSiofoQs
+         R4LDtW0WVmwEXjw+fDUyQORWuJoMAqodg0XBQyLLuV8yLK6WCIMHe+2UtymkMkFaYDwo
+         WyKpBp4pSCN6zGnwXEIDxbN49WFccx9VhFmJ6gaTRNKK07ldiwSn22xx/8LaUimuLgBD
+         JKnQ==
+X-Gm-Message-State: AOAM531ifkZJP5uiI1Ct6ZkgbntGAaCARcHxfgKlMqgS6DGOwT7FpsCo
+        fAVou6RF3jGvmra/m6iF6v8RJxQ25gDlyHQbBvA=
+X-Google-Smtp-Source: ABdhPJyK4+2ZWwxG1nidUIgEwwFwqlypgmG1fs4QgihqE9v+l2O+ktcPUYhMHnB54IgZpWPDLiBDnvfLHQSOyla2Zsc=
+X-Received: by 2002:a02:c785:: with SMTP id n5mr38854511jao.75.1593765414282;
+ Fri, 03 Jul 2020 01:36:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200703041440.GA7858@gondor.apana.org.au>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.102.118]
-X-CFilter-Loop: Reflected
+References: <20200622232434.162730-1-caij2003@gmail.com> <20200703044832.GD23200@gondor.apana.org.au>
+In-Reply-To: <20200703044832.GD23200@gondor.apana.org.au>
+Reply-To: sedat.dilek@gmail.com
+From:   Sedat Dilek <sedat.dilek@gmail.com>
+Date:   Fri, 3 Jul 2020 10:36:43 +0200
+Message-ID: <CA+icZUWwpY9rnfgyy81-78fH+PH4wmAS-+yZFBDCjBbARabQfg@mail.gmail.com>
+Subject: Re: [PATCH] crypto, x86: aesni: add compatibility with IAS
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Jian Cai <caij2003@gmail.com>, jiancai@google.com,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        manojgupta@google.com, maskray@google.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Clang-Built-Linux ML <clang-built-linux@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2020/7/3 12:14, Herbert Xu Wrote:
-> On Fri, Jun 26, 2020 at 06:32:06PM +0800, Longfang Liu wrote:
->> From: Kai Ye <yekai13@huawei.com>
->>
->> As before, if a SEC queue is at the 'fake busy' status,
->> the request with a 'fake busy' flag will be sent into hardware
->> and the sending function returns busy. After the request is
->> finished, SEC driver's call back will identify the 'fake busy' flag,
->> and notifies the user that hardware is not busy now by calling
->> user's call back function.
->>
->> Now, a request sent into busy hardware will be cached in the
->> SEC queue's backlog, return '-EBUSY' to user.
->> After the request being finished, the cached requests will
->> be processed in the call back function. to notify the
->> corresponding user that SEC queue can process more requests.
->>
->> Signed-off-by: Kai Ye <yekai13@huawei.com>
->> Reviewed-by: Longfang Liu <liulongfang@huawei.com>
-> Why does this driver not take MAY_BACKLOG into account?
+On Fri, Jul 3, 2020 at 6:49 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> Cheers,
+> On Mon, Jun 22, 2020 at 04:24:33PM -0700, Jian Cai wrote:
+> > Clang's integrated assembler complains "invalid reassignment of
+> > non-absolute variable 'var_ddq_add'" while assembling
+> > arch/x86/crypto/aes_ctrby8_avx-x86_64.S. It was because var_ddq_add was
+> > reassigned with non-absolute values several times, which IAS did not
+> > support. We can avoid the reassignment by replacing the uses of
+> > var_ddq_add with its definitions accordingly to have compatilibility
+> > with IAS.
+> >
+> > Link: https://github.com/ClangBuiltLinux/linux/issues/1008
+> > Reported-by: Sedat Dilek <sedat.dilek@gmail.com>
+> > Reported-by: Fangrui Song <maskray@google.com>
+> > Tested-by: Sedat Dilek <sedat.dilek@gmail.com> # build+boot Linux v5.7.5; clang v11.0.0-git
+> > Signed-off-by: Jian Cai <caij2003@gmail.com>
+> > ---
+> >  arch/x86/crypto/aes_ctrby8_avx-x86_64.S | 14 +++-----------
+> >  1 file changed, 3 insertions(+), 11 deletions(-)
+>
+> Patch applied.  Thanks.
 
-OK, I will apply MAY_BACKLOG in the next version soon.
+Hi Herbert,
 
-thanks,
+Can you please apply my patch, too?
 
-Longfang
+For being able to compile/assemble with LLVM_IAS=1 *both* patches are
+needed with CONFIG_CRYPTO_AES_NI_INTEL={m,y}.
 
-.
+If you do pick this up, please add a...
+
+   Link: https://bugs.llvm.org/show_bug.cgi?id=24494
+
+Thanks.
+
+Regards,
+- Sedat -
+
+[0] https://lore.kernel.org/patchwork/patch/1263102/
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=44069737ac9625a0f02f0f7f5ab96aae4cd819bc
+[2] https://bugs.llvm.org/show_bug.cgi?id=24494
 
 
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
