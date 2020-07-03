@@ -2,142 +2,90 @@ Return-Path: <SRS0=tj8v=AO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0D6C433DF
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jul 2020 04:46:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92952C433DF
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jul 2020 04:48:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F30820760
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jul 2020 04:46:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A2CF20760
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jul 2020 04:48:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725786AbgGCEq4 (ORCPT
+        id S1725786AbgGCEs2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Jul 2020 00:46:56 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:40186 "EHLO fornost.hmeau.com"
+        Fri, 3 Jul 2020 00:48:28 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:40226 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725779AbgGCEqz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Jul 2020 00:46:55 -0400
+        id S1725764AbgGCEs2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 3 Jul 2020 00:48:28 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jrDbA-0007zr-9s; Fri, 03 Jul 2020 14:46:53 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Jul 2020 14:46:52 +1000
-Date:   Fri, 3 Jul 2020 14:46:52 +1000
+        id 1jrDcc-00081K-3t; Fri, 03 Jul 2020 14:48:23 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Jul 2020 14:48:22 +1000
+Date:   Fri, 3 Jul 2020 14:48:22 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: ccp - Fix sparse warnings
-Message-ID: <20200703044652.GA23139@gondor.apana.org.au>
+To:     John Allen <john.allen@amd.com>
+Cc:     linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
+        davem@davemloft.net, bp@suse.de, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: ccp - Fix use of merged scatterlists
+Message-ID: <20200703044821.GC23200@gondor.apana.org.au>
+References: <20200622202402.360064-1-john.allen@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20200622202402.360064-1-john.allen@amd.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch fixes a number of endianness marking issues in the ccp
-driver.
+On Mon, Jun 22, 2020 at 03:24:02PM -0500, John Allen wrote:
+> Running the crypto manager self tests with
+> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS may result in several types of errors
+> when using the ccp-crypto driver:
+> 
+> alg: skcipher: cbc-des3-ccp encryption failed on test vector 0; expected_error=0, actual_error=-5 ...
+> 
+> alg: skcipher: ctr-aes-ccp decryption overran dst buffer on test vector 0 ...
+> 
+> alg: ahash: sha224-ccp test failed (wrong result) on test vector ...
+> 
+> These errors are the result of improper processing of scatterlists mapped
+> for DMA.
+> 
+> Given a scatterlist in which entries are merged as part of mapping the
+> scatterlist for DMA, the DMA length of a merged entry will reflect the
+> combined length of the entries that were merged. The subsequent
+> scatterlist entry will contain DMA information for the scatterlist entry
+> after the last merged entry, but the non-DMA information will be that of
+> the first merged entry.
+> 
+> The ccp driver does not take this scatterlist merging into account. To
+> address this, add a second scatterlist pointer to track the current
+> position in the DMA mapped representation of the scatterlist. Both the DMA
+> representation and the original representation of the scatterlist must be
+> tracked as while most of the driver can use just the DMA representation,
+> scatterlist_map_and_copy() must use the original representation and
+> expects the scatterlist pointer to be accurate to the original
+> representation.
+> 
+> In order to properly walk the original scatterlist, the scatterlist must
+> be walked until the combined lengths of the entries seen is equal to the
+> DMA length of the current entry being processed in the DMA mapped
+> representation.
+> 
+> Fixes: 63b945091a070 ("crypto: ccp - CCP device driver and interface support")
+> Signed-off-by: John Allen <john.allen@amd.com>
+> Cc: stable@vger.kernel.org
+> ---
+>  drivers/crypto/ccp/ccp-dev.h |  1 +
+>  drivers/crypto/ccp/ccp-ops.c | 37 +++++++++++++++++++++++++-----------
+>  2 files changed, 27 insertions(+), 11 deletions(-)
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index 82ac4c14c04c..7838f63bab32 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -221,8 +221,8 @@ static unsigned int ccp5_get_free_slots(struct ccp_cmd_queue *cmd_q)
- static int ccp5_do_cmd(struct ccp5_desc *desc,
- 		       struct ccp_cmd_queue *cmd_q)
- {
--	u32 *mP;
--	__le32 *dP;
-+	__le32 *mP;
-+	u32 *dP;
- 	u32 tail;
- 	int	i;
- 	int ret = 0;
-@@ -235,8 +235,8 @@ static int ccp5_do_cmd(struct ccp5_desc *desc,
- 	}
- 	mutex_lock(&cmd_q->q_mutex);
- 
--	mP = (u32 *) &cmd_q->qbase[cmd_q->qidx];
--	dP = (__le32 *) desc;
-+	mP = (__le32 *)&cmd_q->qbase[cmd_q->qidx];
-+	dP = (u32 *)desc;
- 	for (i = 0; i < 8; i++)
- 		mP[i] = cpu_to_le32(dP[i]); /* handle endianness */
- 
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index 87a34d91fdf7..a5d9123a22ea 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -597,8 +597,8 @@ struct dword3 {
- };
- 
- union dword4 {
--	__le32 dst_lo;		/* NON-SHA	*/
--	__le32 sha_len_lo;	/* SHA		*/
-+	u32 dst_lo;		/* NON-SHA	*/
-+	u32 sha_len_lo;		/* SHA		*/
- };
- 
- union dword5 {
-@@ -608,7 +608,7 @@ union dword5 {
- 		unsigned int  rsvd1:13;
- 		unsigned int  fixed:1;
- 	} fields;
--	__le32 sha_len_hi;
-+	u32 sha_len_hi;
- };
- 
- struct dword7 {
-@@ -619,12 +619,12 @@ struct dword7 {
- 
- struct ccp5_desc {
- 	struct dword0 dw0;
--	__le32 length;
--	__le32 src_lo;
-+	u32 length;
-+	u32 src_lo;
- 	struct dword3 dw3;
- 	union dword4 dw4;
- 	union dword5 dw5;
--	__le32 key_lo;
-+	u32 key_lo;
- 	struct dword7 dw7;
- };
- 
-diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index a06d20263efa..bd270e66185e 100644
---- a/drivers/crypto/ccp/ccp-ops.c
-+++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -632,13 +632,12 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 	struct ccp_data src, dst;
- 	struct ccp_data aad;
- 	struct ccp_op op;
--
--	unsigned long long *final;
- 	unsigned int dm_offset;
- 	unsigned int authsize;
- 	unsigned int jobid;
- 	unsigned int ilen;
- 	bool in_place = true; /* Default value */
-+	__be64 *final;
- 	int ret;
- 
- 	struct scatterlist *p_inp, sg_inp[2];
-@@ -840,7 +839,7 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 				   DMA_BIDIRECTIONAL);
- 	if (ret)
- 		goto e_dst;
--	final = (unsigned long long *) final_wa.address;
-+	final = (__be64 *)final_wa.address;
- 	final[0] = cpu_to_be64(aes->aad_len * 8);
- 	final[1] = cpu_to_be64(ilen * 8);
- 
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
