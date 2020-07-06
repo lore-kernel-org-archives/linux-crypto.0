@@ -2,111 +2,117 @@ Return-Path: <SRS0=JF+M=AR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 369B2C433DF
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Jul 2020 13:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD328C433E0
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Jul 2020 16:05:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0F76820724
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Jul 2020 13:43:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594042990;
-	bh=qhCTsrFH8RC+7yeFmbNJ7M71AHDtyoJeMzRWtXxIvAE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=a0sjRuzFbpl4yC2F0oASOxYpv3/l4f5VmmSjdUaI/7RuJ/sszBiffoAUXOuyjeOM0
-	 NGnKA9eJLYIGCQbeLWSbFgbp5gZ8RnqKdjuXl7fPRJ/vvmBQ+vVfgYcL/Dw9xcVbgE
-	 ri4qrNjfSfzZwWIKiSrpgWf0rYOZ2j6HipHZZL+I=
+	by mail.kernel.org (Postfix) with ESMTP id 894FA20775
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Jul 2020 16:05:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=jamieiles-com.20150623.gappssmtp.com header.i=@jamieiles-com.20150623.gappssmtp.com header.b="graI+dI9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729195AbgGFNnJ (ORCPT
+        id S1729377AbgGFQFo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Jul 2020 09:43:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33220 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729054AbgGFNnJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Jul 2020 09:43:09 -0400
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B6E6C20702
-        for <linux-crypto@vger.kernel.org>; Mon,  6 Jul 2020 13:43:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594042988;
-        bh=qhCTsrFH8RC+7yeFmbNJ7M71AHDtyoJeMzRWtXxIvAE=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=pUGJSHTNYXaLDfeq6SCZTMJgHumhhaz5mRk/hbEK5OxeWXCdSGSraECEOlQMdWt9b
-         dhtczAeIO47j90WG2/scOTecVb6KabQ1fyvB4EtHzkR+KB0640K1YbeAW95qVN9NZO
-         ssCZXu0cw3UD4KTTjl4gbpp083w9vAXE1R01ZmzI=
-Received: by mail-oo1-f50.google.com with SMTP id d125so3935218oob.0
-        for <linux-crypto@vger.kernel.org>; Mon, 06 Jul 2020 06:43:08 -0700 (PDT)
-X-Gm-Message-State: AOAM532CtemeopySr1IAjDXeAx5dM95vtmQay5ov7LLhU4wnlQYOj6zJ
-        kZN/yax+vvXwOdlomFEqn9KAxM28atkgt9PqiGA=
-X-Google-Smtp-Source: ABdhPJxB2AqBNWChFnkyHNt1KYdNotaFHn2eZAHBXz/O+Cajni1tsj6ZLGLDRjlijJ7hGJkeOGB3rsZBVEz2ITGrRxQ=
-X-Received: by 2002:a4a:de8d:: with SMTP id v13mr19810631oou.45.1594042988075;
- Mon, 06 Jul 2020 06:43:08 -0700 (PDT)
+        Mon, 6 Jul 2020 12:05:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42718 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729293AbgGFQFn (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 6 Jul 2020 12:05:43 -0400
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52DFEC061755
+        for <linux-crypto@vger.kernel.org>; Mon,  6 Jul 2020 09:05:43 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id z15so30356060wrl.8
+        for <linux-crypto@vger.kernel.org>; Mon, 06 Jul 2020 09:05:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jamieiles-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=eBPnkwcEmj4IleOIZo1SbNNrAcrM3jMcjDLqnc3mvM4=;
+        b=graI+dI9hBmdeMJXZyZgAWHjSt1hUmgm9LBS4QABqnLq8Lcgmjo8x9pfbg9lP9kf+n
+         ZRVeDcsn9hAIG0hT9rbi261Fo2WwMjWP3CXuOG/sTJb5jtvLpzgM+1S3Cpxg3XpDDmhb
+         wlFdSslM7AOFNgZWZOqoNNpUTgNxGbjoCxxtjmF5hWWpunSeKPWSKOiW9/R/dFzffatG
+         rSgvWF5ft+ujntg8tbpzDWYlk+ZKQdfpoyPltv5wCMLSmdLVvMam28GoydknZ+DjHr/b
+         n2dqdeadOzbuguOrHu+YB5et0IWZT5c2/rM9ajw4ooE6W5T4PguSYx3MknuIf1v6RPAh
+         lyPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=eBPnkwcEmj4IleOIZo1SbNNrAcrM3jMcjDLqnc3mvM4=;
+        b=JTPLJ0Zwjsk9gm7FIzI6gIdi83abMqXgyWdnzaFasf2R1rWDZnXA6LxAKNHYpJWb8o
+         bbc6qHsNubCIWoYb1lR63cz8ALC+UhTapDV/LqVkvVofwyFiyO/rqKw7dyic9YDPUygr
+         KcnUVNqGDfVW7gmuL3yzBGrpjZKpYczcPjhW+26pvm8VPVPfFmlcLlVja0fR7RVpExM3
+         NnFeuRgG4MkceaYcpmFFSRgOqdAbWnpa6Vbcf9+ckazET1Ro+z1gdRLJlPdxn0g+Kk8t
+         EQ7Z7Y0031m+RiGesBbtgMStdebdfJNvM8EWXA7HctV3Z1oo2oJWkuS+jfX0BeZEW7d4
+         bm6Q==
+X-Gm-Message-State: AOAM533guf4uviOn5S6vmB1lv6n45cZ41ATayy/B1m420yqUdWdAUT3J
+        J2wWRtpVDZ/+DuezgDuzVaXRFA==
+X-Google-Smtp-Source: ABdhPJxSC3ddxDtVfXEHhH1Pv6zygUKMZ6FqNEz/oz7ZdCCjbq9B6RkB5dxPQNsjM1llZm6UT+Tnzw==
+X-Received: by 2002:adf:f7cb:: with SMTP id a11mr46422170wrq.291.1594051542111;
+        Mon, 06 Jul 2020 09:05:42 -0700 (PDT)
+Received: from localhost ([82.38.213.95])
+        by smtp.gmail.com with ESMTPSA id e17sm24137875wrr.88.2020.07.06.09.05.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jul 2020 09:05:40 -0700 (PDT)
+Date:   Mon, 6 Jul 2020 17:05:39 +0100
+From:   Jamie Iles <jamie@jamieiles.com>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ayush Sawal <ayush.sawal@chelsio.com>,
+        Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
+        Rohit Maheshwari <rohitm@chelsio.com>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Jamie Iles <jamie@jamieiles.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Tero Kristo <t-kristo@ti.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>
+Subject: Re: [PATCH v3 10/13] crypto: picoxcell - permit asynchronous
+ skcipher as fallback
+Message-ID: <20200706160539.GE84554@willow>
+References: <20200630121907.24274-1-ardb@kernel.org>
+ <20200630121907.24274-11-ardb@kernel.org>
 MIME-Version: 1.0
-References: <20200702043648.GA21823@gondor.apana.org.au> <31734e86-951a-6063-942a-1d62abeb5490@nxp.com>
-In-Reply-To: <31734e86-951a-6063-942a-1d62abeb5490@nxp.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Mon, 6 Jul 2020 16:42:56 +0300
-X-Gmail-Original-Message-ID: <CAMj1kXGK3v+YWd6E8zNP-tKWgq+aim7X67Ze4Bxrent4hndECw@mail.gmail.com>
-Message-ID: <CAMj1kXGK3v+YWd6E8zNP-tKWgq+aim7X67Ze4Bxrent4hndECw@mail.gmail.com>
-Subject: Re: [PATCH] crypto: caam - Remove broken arc4 support
-To:     =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200630121907.24274-11-ardb@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 5 Jul 2020 at 22:11, Horia Geant=C4=83 <horia.geanta@nxp.com> wrote=
-:
->
-> On 7/2/2020 7:36 AM, Herbert Xu wrote:
-> > The arc4 algorithm requires storing state in the request context
-> > in order to allow more than one encrypt/decrypt operation.  As this
-> > driver does not seem to do that, it means that using it for more
-> > than one operation is broken.
-> >
-> The fact that smth. is broken doesn't necessarily means it has to be remo=
-ved.
->
-> Looking at the HW capabilities, I am sure the implementation could be
-> modified to save/restore the internal state to/from the request context.
->
-> Anyhow I would like to know if only the correctness is being debated,
-> or this patch should be dealt with in the larger context of
-> removing crypto API based ecb(arc4) altogether:
-> [RFC PATCH 0/7] crypto: get rid of ecb(arc4)
-> https://lore.kernel.org/linux-crypto/20200702101947.682-1-ardb@kernel.org=
-/
->
+On Tue, Jun 30, 2020 at 02:19:04PM +0200, Ard Biesheuvel wrote:
+> Even though the picoxcell driver implements asynchronous versions of
+> ecb(aes) and cbc(aes), the fallbacks it allocates are required to be
+> synchronous. Given that SIMD based software implementations are usually
+> asynchronous as well, even though they rarely complete asynchronously
+> (this typically only happens in cases where the request was made from
+> softirq context, while SIMD was already in use in the task context that
+> it interrupted), these implementations are disregarded, and either the
+> generic C version or another table based version implemented in assembler
+> is selected instead.
+> 
+> Since falling back to synchronous AES is not only a performance issue, but
+> potentially a security issue as well (due to the fact that table based AES
+> is not time invariant), let's fix this, by allocating an ordinary skcipher
+> as the fallback, and invoke it with the completion routine that was given
+> to the outer request.
+> 
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 
-The problem with 'fixing' ecb(arc4) is that it will make it less
-secure than it already is. For instance, imagine two peers using the
-generic ecb(arc4) implementation, and using a pair of skcipher TFMs to
-en/decrypt the communication between them, similar to how the WEP code
-works today. if we 'fix' the implementation, every request will be
-served from the same initial state (including the key), and therefore
-reuse the same keystream, resulting in catastrophic failure. (Of
-course, the code should set a different key for each request anyway,
-but failure to do so does not result in the same security fail with
-the current implementation)
+Thanks Ard!
 
-So the problem is really that the lack of a key vs IV distinction in
-ARC4 means that it does not fit the skcipher model cleanly, and
-issuing more than a single request without an intermediate setkey()
-operation should be forbidden in any case.
-
-The reason I suggested removing it is that we really have no use for
-it in the kernel, and the only known af_alg users are dubious as well,
-and so we'd be much better off simply getting rid of ecb(arc4)
-entirely, not because any of the implementations are flawed, but
-simply because I don't think we should waste more time on it in
-general.
+Reviewed-by: Jamie Iles <jamie@jamieiles.com>
