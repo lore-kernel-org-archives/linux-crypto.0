@@ -1,121 +1,204 @@
-Return-Path: <SRS0=i4aU=AQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=JF+M=AR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23DC6C433E0
-	for <linux-crypto@archiver.kernel.org>; Sun,  5 Jul 2020 19:11:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBB08C433DF
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Jul 2020 13:37:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 000F82074F
-	for <linux-crypto@archiver.kernel.org>; Sun,  5 Jul 2020 19:11:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="BC/CK6D+"
+	by mail.kernel.org (Postfix) with ESMTP id C1B7320715
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Jul 2020 13:37:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727823AbgGETLN (ORCPT
+        id S1729140AbgGFNhi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Jul 2020 15:11:13 -0400
-Received: from mail-eopbgr60082.outbound.protection.outlook.com ([40.107.6.82]:51751
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727781AbgGETLM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Jul 2020 15:11:12 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VvgcSEjUf/xzVqXNRiPzSpIispyX51MJSCAx492lZCTrbW3vJkWTcDaXnb2S1ISH02H/WlDCuaQDKxoetvmV+UQRQRArwNTez9mIDpuTQPvWpPlvVd4bspkDF1EsGeY+tTX8/uS73A43wyS5P/xi9dtmmV4ueMF4+omVWLvH+s6MjPVOxgLpubc2LCaaPUX6nzfskKrdItn1V/dluZ2igVb6TOX/F41SHn0o34F+yHuoVTepJ3hDMIeyNbvF67uWmsAhVnTT4wFG0pqlnnw+e3WE+O0WRgkVo5ioSGahUkR+dTX5wI3RRKV/wyPxnRjH2Tz7PjoRIf9C3KUNnwL3KQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v7nmwCoiPjaBAFbGlB1pHt+6ps2D7DzcIkYXTetOaBo=;
- b=lWY4dSe2lwNqMHekKT3BAx9zfPrWe4888aMuQ23JvBKvgGVFkTpr7T6s5nbezLoxM/QC7GLjIVj2pXvUb/aacGRi8HZmi7TB2wAQHJWr0rkWJsCi8H8b1HLOd+ez9W9YJ/pJM6Wl6+VwsYUXMKXDW/3XHPWe6b9JLsyHCHLcVOlykaF+YJsFT5HXNnVVbksFvMYjZ1As6AiPPhh5njaX4kuF8+mOmpVldcdGV25Jn0PbxoLWCDzEPc7YavXACNRwut3MAmzYYfhaRBgGEi26mG9lYlSCEbc8XZ5JYWtcEcsFcuqhqnoRAlkbOvgwGiMNKXvPLtoj5hnhy5HHI8JVwg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v7nmwCoiPjaBAFbGlB1pHt+6ps2D7DzcIkYXTetOaBo=;
- b=BC/CK6D+pdcpEnBE7nFlaRfWyvH1420BBCM+sBJNG+EVXPoXUnKoPpqDlpWuDwyW19MWGcXyhYX4/dDF+O05Bq5LyfsQFZprwhugG7BEjYgTfpgCC0AccttqggNvLeT2zaYIOr4cHsVgLVJAqknx8Hcw5WKfTfNa5+t7gyjiTR8=
-Authentication-Results: kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=none action=none header.from=nxp.com;
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
- by VI1PR04MB5583.eurprd04.prod.outlook.com (2603:10a6:803:d4::33) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.23; Sun, 5 Jul
- 2020 19:11:09 +0000
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::8459:4be8:7034:7a81]) by VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::8459:4be8:7034:7a81%6]) with mapi id 15.20.3153.029; Sun, 5 Jul 2020
- 19:11:09 +0000
-Subject: Re: [PATCH] crypto: caam - Remove broken arc4 support
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc:     Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-References: <20200702043648.GA21823@gondor.apana.org.au>
-From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
-Message-ID: <31734e86-951a-6063-942a-1d62abeb5490@nxp.com>
-Date:   Sun, 5 Jul 2020 22:11:06 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <20200702043648.GA21823@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM4P190CA0020.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:200:56::30) To VI1PR04MB4046.eurprd04.prod.outlook.com
- (2603:10a6:803:4d::29)
+        Mon, 6 Jul 2020 09:37:38 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:53676 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729125AbgGFNhi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 6 Jul 2020 09:37:38 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1jsRJO-0005mp-2w; Mon, 06 Jul 2020 23:37:35 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Jul 2020 23:37:34 +1000
+Date:   Mon, 6 Jul 2020 23:37:34 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: chacha - Add DEFINE_CHACHA_STATE macro
+Message-ID: <20200706133733.GA6479@gondor.apana.org.au>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.0.129] (84.117.251.185) by AM4P190CA0020.EURP190.PROD.OUTLOOK.COM (2603:10a6:200:56::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.20 via Frontend Transport; Sun, 5 Jul 2020 19:11:08 +0000
-X-Originating-IP: [84.117.251.185]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 45733bfe-87de-4ebe-acef-08d821172cb6
-X-MS-TrafficTypeDiagnostic: VI1PR04MB5583:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR04MB5583ECAD1B8614A69FC6555C98680@VI1PR04MB5583.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-Forefront-PRVS: 045584D28C
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Yb0jZ+nRQDg3TwSuL4PaeyT8w1bJpyYkkewT0ZVWgHBxLQ5Vh8Uy03mV11bvGzvvyvVwQzvVCmUGYTWxAknweJpene5PyLtvI46SBeePVqk9y4PYj6B3YgQJ/nDFvAwqrDFu96Ib0EPFbGXdbR0ln32DcM8MLMjpI1o6z+lDO726QkbHDqAxphGNR6Elj7hcdzL/e0Foe1Qf5cpdnv5lWGInIZ87s3+izNO0ih6YMVfxselblBCHJVKMOCgVLNDNkJnVK/dL07CsAizgHFKmMNLpwKtDUyJ1DuuIiWfVaIHnavNbme2aCagikL/1syukQyHpTxwPwZFIOYOITqY277mFi+Em3lyBkiZmPzO27LXx4r06yopNSPdTEtZt4cViQCRGGwK3z9voLyfaJW+aIfKtJRXurqg74EAg27esxyS68SMttJP35q5pqWBh2fT14BJ+w5XnWzRnaof66MLPRw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(366004)(346002)(39850400004)(396003)(136003)(4744005)(54906003)(31696002)(16576012)(316002)(110136005)(5660300002)(2616005)(66556008)(36756003)(86362001)(66476007)(66946007)(956004)(186003)(16526019)(478600001)(966005)(26005)(52116002)(53546011)(6486002)(8936002)(31686004)(4326008)(8676002)(83380400001)(2906002)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: ZQ7nQtXq5dwqHTeX317Pg9pxT8lFLzfUfAP7PEfn9j69j7UjF6+g3/hdD4kiVZQdROD7qgc3dEbGl7wd2Ezhb5e6gjR0KsgTi5QM4/4Asiho1lg1GXIuxVmngPGHs6xzudXEJnfHApA2odShMV705NLysbx551Ly8gId6Bt045SYZVofLadeatNmlBAL6J07dBpHCN7BZQfW+7x7Cx5V07MHccfbAn2muu11paWAsF6YWzr+dnTmSEzW6MiiW2nF7bC0SvK8kgcXKxgOMIMVBVDNytiTXhxnUksI7V5tT+DyKJxFw3IMXQ3Bd1+9D0Mvh2KRRcdIUlpVRxD4l7KDaPeephr8RF8DtJB0Odc+FmquO1XS0/e1+vhytk5rJz5nskbbHmWB9duxSOQjoEvtz0CJ6ubmhZQjcGUrqB6C9k0jWuXzd6nblgN3vGc0DMiW97csmJOQ+29L1mh2zzazvJ+/wyackrSHlCvCy+jY2aqWvIpxru+bRndgxKKQXU70
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 45733bfe-87de-4ebe-acef-08d821172cb6
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB4046.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2020 19:11:09.3757
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rUL9/erx8QTWY69hd594JOUp1/qWFg7QdIdICEEg9SNRjNIoZOn2gPzOuaXQmRmt9aHZcXwYh0NWr7rPB0rDUw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB5583
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/2/2020 7:36 AM, Herbert Xu wrote:
-> The arc4 algorithm requires storing state in the request context
-> in order to allow more than one encrypt/decrypt operation.  As this
-> driver does not seem to do that, it means that using it for more
-> than one operation is broken.
-> 
-The fact that smth. is broken doesn't necessarily means it has to be removed.
+As it stands the chacha state array is made 12 bytes bigger on
+x86 in order for it to be 16-byte aligned.  However, the array
+is not actually aligned until it hits the x86 code.
 
-Looking at the HW capabilities, I am sure the implementation could be
-modified to save/restore the internal state to/from the request context.
+This patch moves the alignment to where the state array is defined.
+To do so a macro DEFINE_CHACHA_STATE has been added which takes
+care of all the work to ensure that it is actually aligned on the
+stack.
 
-Anyhow I would like to know if only the correctness is being debated,
-or this patch should be dealt with in the larger context of
-removing crypto API based ecb(arc4) altogether:
-[RFC PATCH 0/7] crypto: get rid of ecb(arc4)
-https://lore.kernel.org/linux-crypto/20200702101947.682-1-ardb@kernel.org/
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Thanks,
-Horia
+diff --git a/arch/x86/crypto/chacha_glue.c b/arch/x86/crypto/chacha_glue.c
+index 22250091cdbec..20d0252f11aa5 100644
+--- a/arch/x86/crypto/chacha_glue.c
++++ b/arch/x86/crypto/chacha_glue.c
+@@ -14,8 +14,6 @@
+ #include <linux/module.h>
+ #include <asm/simd.h>
+ 
+-#define CHACHA_STATE_ALIGN 16
+-
+ asmlinkage void chacha_block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
+ 				       unsigned int len, int nrounds);
+ asmlinkage void chacha_4block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
+@@ -124,8 +122,6 @@ static void chacha_dosimd(u32 *state, u8 *dst, const u8 *src,
+ 
+ void hchacha_block_arch(const u32 *state, u32 *stream, int nrounds)
+ {
+-	state = PTR_ALIGN(state, CHACHA_STATE_ALIGN);
+-
+ 	if (!static_branch_likely(&chacha_use_simd) || !crypto_simd_usable()) {
+ 		hchacha_block_generic(state, stream, nrounds);
+ 	} else {
+@@ -138,8 +134,6 @@ EXPORT_SYMBOL(hchacha_block_arch);
+ 
+ void chacha_init_arch(u32 *state, const u32 *key, const u8 *iv)
+ {
+-	state = PTR_ALIGN(state, CHACHA_STATE_ALIGN);
+-
+ 	chacha_init_generic(state, key, iv);
+ }
+ EXPORT_SYMBOL(chacha_init_arch);
+@@ -147,8 +141,6 @@ EXPORT_SYMBOL(chacha_init_arch);
+ void chacha_crypt_arch(u32 *state, u8 *dst, const u8 *src, unsigned int bytes,
+ 		       int nrounds)
+ {
+-	state = PTR_ALIGN(state, CHACHA_STATE_ALIGN);
+-
+ 	if (!static_branch_likely(&chacha_use_simd) || !crypto_simd_usable() ||
+ 	    bytes <= CHACHA_BLOCK_SIZE)
+ 		return chacha_crypt_generic(state, dst, src, bytes, nrounds);
+@@ -170,15 +162,12 @@ EXPORT_SYMBOL(chacha_crypt_arch);
+ static int chacha_simd_stream_xor(struct skcipher_request *req,
+ 				  const struct chacha_ctx *ctx, const u8 *iv)
+ {
+-	u32 *state, state_buf[16 + 2] __aligned(8);
++	DEFINE_CHACHA_STATE(state);
+ 	struct skcipher_walk walk;
+ 	int err;
+ 
+ 	err = skcipher_walk_virt(&walk, req, false);
+ 
+-	BUILD_BUG_ON(CHACHA_STATE_ALIGN != 16);
+-	state = PTR_ALIGN(state_buf + 0, CHACHA_STATE_ALIGN);
+-
+ 	chacha_init_generic(state, ctx->key, iv);
+ 
+ 	while (walk.nbytes > 0) {
+@@ -217,12 +206,10 @@ static int xchacha_simd(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	u32 *state, state_buf[16 + 2] __aligned(8);
++	DEFINE_CHACHA_STATE(state);
+ 	struct chacha_ctx subctx;
+ 	u8 real_iv[16];
+ 
+-	BUILD_BUG_ON(CHACHA_STATE_ALIGN != 16);
+-	state = PTR_ALIGN(state_buf + 0, CHACHA_STATE_ALIGN);
+ 	chacha_init_generic(state, ctx->key, req->iv);
+ 
+ 	if (req->cryptlen > CHACHA_BLOCK_SIZE && crypto_simd_usable()) {
+diff --git a/include/crypto/chacha.h b/include/crypto/chacha.h
+index 2676f4fbd4c16..dcc8cfe2debb9 100644
+--- a/include/crypto/chacha.h
++++ b/include/crypto/chacha.h
+@@ -16,7 +16,7 @@
+ #define _CRYPTO_CHACHA_H
+ 
+ #include <asm/unaligned.h>
+-#include <linux/types.h>
++#include <linux/kernel.h>
+ 
+ /* 32-bit stream position, then 96-bit nonce (RFC7539 convention) */
+ #define CHACHA_IV_SIZE		16
+@@ -25,10 +25,14 @@
+ #define CHACHA_BLOCK_SIZE	64
+ #define CHACHAPOLY_IV_SIZE	12
+ 
++#define CHACHA_STATE_WORDS	(CHACHA_BLOCK_SIZE / sizeof(u32))
++
+ #ifdef CONFIG_X86_64
+-#define CHACHA_STATE_WORDS	((CHACHA_BLOCK_SIZE + 12) / sizeof(u32))
++#define DEFINE_CHACHA_STATE(name) \
++	u32 __##name##_buf[CHACHA_STATE_WORDS + 2] __aligned(8); \
++	u32 *name = PTR_ALIGN((u32 *)__##name##_buf, 16)
+ #else
+-#define CHACHA_STATE_WORDS	(CHACHA_BLOCK_SIZE / sizeof(u32))
++#define DEFINE_CHACHA_STATE(name) u32 name[CHACHA_STATE_WORDS]
+ #endif
+ 
+ /* 192-bit nonce, then 64-bit stream position */
+diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
+index ad0699ce702f9..1d7bb0b91b83c 100644
+--- a/lib/crypto/chacha20poly1305.c
++++ b/lib/crypto/chacha20poly1305.c
+@@ -94,7 +94,7 @@ void chacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			      const u64 nonce,
+ 			      const u8 key[CHACHA20POLY1305_KEY_SIZE])
+ {
+-	u32 chacha_state[CHACHA_STATE_WORDS];
++	DEFINE_CHACHA_STATE(chacha_state);
+ 	u32 k[CHACHA_KEY_WORDS];
+ 	__le64 iv[2];
+ 
+@@ -116,7 +116,7 @@ void xchacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			       const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
+ 			       const u8 key[CHACHA20POLY1305_KEY_SIZE])
+ {
+-	u32 chacha_state[CHACHA_STATE_WORDS];
++	DEFINE_CHACHA_STATE(chacha_state);
+ 
+ 	xchacha_init(chacha_state, key, nonce);
+ 	__chacha20poly1305_encrypt(dst, src, src_len, ad, ad_len, chacha_state);
+@@ -172,7 +172,7 @@ bool chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			      const u64 nonce,
+ 			      const u8 key[CHACHA20POLY1305_KEY_SIZE])
+ {
+-	u32 chacha_state[CHACHA_STATE_WORDS];
++	DEFINE_CHACHA_STATE(chacha_state);
+ 	u32 k[CHACHA_KEY_WORDS];
+ 	__le64 iv[2];
+ 	bool ret;
+@@ -198,7 +198,7 @@ bool xchacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 			       const u8 nonce[XCHACHA20POLY1305_NONCE_SIZE],
+ 			       const u8 key[CHACHA20POLY1305_KEY_SIZE])
+ {
+-	u32 chacha_state[CHACHA_STATE_WORDS];
++	DEFINE_CHACHA_STATE(chacha_state);
+ 
+ 	xchacha_init(chacha_state, key, nonce);
+ 	return __chacha20poly1305_decrypt(dst, src, src_len, ad, ad_len,
+@@ -216,7 +216,7 @@ bool chacha20poly1305_crypt_sg_inplace(struct scatterlist *src,
+ {
+ 	const u8 *pad0 = page_address(ZERO_PAGE(0));
+ 	struct poly1305_desc_ctx poly1305_state;
+-	u32 chacha_state[CHACHA_STATE_WORDS];
++	DEFINE_CHACHA_STATE(chacha_state);
+ 	struct sg_mapping_iter miter;
+ 	size_t partial = 0;
+ 	unsigned int flags;
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
