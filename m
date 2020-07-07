@@ -2,531 +2,424 @@ Return-Path: <SRS0=MSze=AS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73F2DC433E1
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jul 2020 09:30:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C68BC433E0
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jul 2020 12:54:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5599B2064C
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jul 2020 09:30:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594114221;
-	bh=MOSsuW4cTmJ+Hs8HPNo42LgXBjrsolwfF7jlksC2MIQ=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=xd1RfPUN23x1JXw9hz15mWQmoT8RtPtaCjIx2G41AtH5FXzfSqOCmP6Ibqtnmc3O0
-	 KuLTJTCajNcQm+56c/WBGhKFKgr9qmjL2xQrIAnHt7mo/SA32j7qNbfkLkEaVf5qGr
-	 peGwj3ckqpn0foL5AL+r2qM25WFHLBKujFwCmSEo=
+	by mail.kernel.org (Postfix) with ESMTP id 6C3AA20771
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jul 2020 12:54:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725941AbgGGJaU (ORCPT
+        id S1726805AbgGGMyW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Jul 2020 05:30:20 -0400
-Received: from condef-07.nifty.com ([202.248.20.72]:42459 "EHLO
-        condef-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725825AbgGGJaU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Jul 2020 05:30:20 -0400
-Received: from conuserg-08.nifty.com ([10.126.8.71])by condef-07.nifty.com with ESMTP id 0679Q28d008421;
-        Tue, 7 Jul 2020 18:26:17 +0900
-Received: from oscar.flets-west.jp (softbank126090202047.bbtec.net [126.90.202.47]) (authenticated)
-        by conuserg-08.nifty.com with ESMTP id 0679LLSC013006;
-        Tue, 7 Jul 2020 18:21:21 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 0679LLSC013006
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1594113683;
-        bh=im8Pzd1VP4FawMwY9ZYN303XX2s/8s2h7ZnqH1rolGw=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Rvt2rvwr7x4Cd5sUbycF1uRFKW/sqLQnQ6oqrJl8UgcHpYm+bn5K/qB8vS1eInBCM
-         1NkzZCyW0Paxl7HhjzjGXfuuR5Zf0SfgWg53mDmshGpcCnMXIKmxFmrAaie1TUHPd+
-         yQ4ApEsMwnA7ulwDgWd9wj99F1oYaRfCYfDjKtU8OvdM5kJzexVTxHdyTb2aZN0iqj
-         +SPxwVChVsSp9uHp4ngTwGO5SwWQ5aRARxZRQzepXA1hziDaxrCDW07tZXaw+6CUD/
-         NX+0FSXcwXqGW30rcVIU0dCO4Gzb2vJy9nls+RZktOKjv0NkTUaFYolydpjzsQHLOn
-         LEpver419Mrkg==
-X-Nifty-SrcIP: [126.90.202.47]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     linux-kbuild@vger.kernel.org
-Cc:     Ingo Molnar <mingo@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Brendan Higgins <brendanhiggins@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Haren Myneni <haren@us.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ingo Molnar <mingo@redhat.com>, Jiri Kosina <jikos@kernel.org>,
-        Joe Lawrence <joe.lawrence@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Paul Mackerras <paulus@samba.org>,
-        Petr Mladek <pmladek@suse.com>, Rich Felker <dalias@libc.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Tal Gilboa <talgi@mellanox.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        kunit-dev@googlegroups.com, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-sh@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        live-patching@vger.kernel.org
-Subject: [PATCH v2 1/2] kbuild: introduce ccflags-remove-y and asflags-remove-y
-Date:   Tue,  7 Jul 2020 18:21:16 +0900
-Message-Id: <20200707092117.963394-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        Tue, 7 Jul 2020 08:54:22 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:54580 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725944AbgGGMyW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 Jul 2020 08:54:22 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 6D444E3191DE9AB45A45;
+        Tue,  7 Jul 2020 20:54:15 +0800 (CST)
+Received: from SWX921481.china.huawei.com (10.126.202.73) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 7 Jul 2020 20:54:04 +0800
+From:   Barry Song <song.bao.hua@hisilicon.com>
+To:     <akpm@linux-foundation.org>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
+        Barry Song <song.bao.hua@hisilicon.com>,
+        "Luis Claudio R . Goncalves" <lgoncalv@redhat.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Mahipal Challa <mahipalreddy2006@gmail.com>,
+        Seth Jennings <sjenning@redhat.com>,
+        Dan Streetman <ddstreet@ieee.org>,
+        Vitaly Wool <vitaly.wool@konsulko.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        "Colin Ian King" <colin.king@canonical.com>
+Subject: [PATCH v4] mm/zswap: move to use crypto_acomp API for hardware acceleration
+Date:   Wed, 8 Jul 2020 00:52:10 +1200
+Message-ID: <20200707125210.33256-1-song.bao.hua@hisilicon.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.126.202.73]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CFLAGS_REMOVE_<file>.o filters out flags when compiling a particular
-object, but there is no convenient way to do that for every object in
-a directory.
+right now, all new ZIP drivers are using crypto_acomp APIs rather than
+legacy crypto_comp APIs. But zswap.c is still using the old APIs. That
+means zswap won't be able to use any new zip drivers in kernel.
 
-Add ccflags-remove-y and asflags-remove-y to make it easily.
+This patch moves to use cryto_acomp APIs to fix the problem. On the
+other hand, tradiontal compressors like lz4,lzo etc have been wrapped
+into acomp via scomp backend. So platforms without async compressors
+can fallback to use acomp via scomp backend.
 
-Use ccflags-remove-y to clean up some Makefiles.
+It is probably the first real user to use acomp but perhaps not a good
+example to demonstrate how multiple acomp requests can be executed in
+parallel in one acomp instance. frontswap is doing page load and store
+page by page. It doesn't have a queuing or buffering mechinism to permit
+multiple pages to do frontswap simultaneously in one thread.
+However this patch creates multiple acomp instances, so multiple threads
+running on multiple different cpus can actually do (de)compression
+parallelly, leveraging the power of multiple ZIP hardware queues. This
+is also consistent with frontswap's page management model.
 
-The add/remove order works as follows:
+On the other hand, the current zswap implementation has some per-cpu
+global resource like zswap_dstmem. So we create acomp instances in
+number of CPUs just like before, zswap created comp instances in number
+of CPUs.
 
- [1] KBUILD_CFLAGS specifies compiler flags used globally
-
- [2] ccflags-y adds compiler flags for all objects in the
-     current Makefile
-
- [3] ccflags-remove-y removes compiler flags for all objects in the
-     current Makefile (New feature)
-
- [4] CFLAGS_<file> adds compiler flags per file.
-
- [5] CFLAGS_REMOVE_<file> removes compiler flags per file.
-
-Having [3] before [4] allows us to remove flags from most (but not all)
-objects in the current Makefile.
-
-For example, kernel/trace/Makefile removes $(CC_FLAGS_FTRACE)
-from all objects in the directory, then adds it back to
-trace_selftest_dynamic.o and CFLAGS_trace_kprobe_selftest.o
-
-Please note ccflags-remove-y has no effect to the sub-directories.
-In contrast, the previous notation got rid of compiler flags also from
-all the sub-directories.
-
-  arch/arm/boot/compressed/
-  arch/powerpc/xmon/
-  arch/sh/
-  kernel/trace/
-
-... have no sub-directories.
-
-  lib/
-
-... has several sub-directories.
-
-To keep the behavior, I added ccflags-remove-y to all Makefiles
-in subdirectories of lib/, except:
-
-  lib/vdso/Makefile        - Kbuild does not descend into this Makefile
-  lib/raid/test/Makefile   - This is not used for the kernel build
-
-I think commit 2464a609ded0 ("ftrace: do not trace library functions")
-excluded too much. In later commit, I will try to remove ccflags-remove-y
-from sub-directory Makefiles.
-
-Suggested-by: Sami Tolvanen <samitolvanen@google.com>
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
-Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+Cc: Luis Claudio R. Goncalves <lgoncalv@redhat.com>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Mahipal Challa <mahipalreddy2006@gmail.com>
+Cc: Seth Jennings <sjenning@redhat.com>
+Cc: Dan Streetman <ddstreet@ieee.org>
+Cc: Vitaly Wool <vitaly.wool@konsulko.com>
+Cc: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: Colin Ian King <colin.king@canonical.com>
+Signed-off-by: Barry Song <song.bao.hua@hisilicon.com>
 ---
+ -v4: refine changelog and comment
 
-Changes in v2:
-  - Swap the order of [3] and [4] to keep the current behavior of
-    kernel/trace/Makefile.
-  - Add ccflags-remove-y to subdir Makefiles of lib/
+ mm/zswap.c | 177 ++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 134 insertions(+), 43 deletions(-)
 
- Documentation/kbuild/makefiles.rst | 14 ++++++++++++++
- arch/arm/boot/compressed/Makefile  |  6 +-----
- arch/powerpc/xmon/Makefile         |  3 +--
- arch/sh/boot/compressed/Makefile   |  5 +----
- kernel/trace/Makefile              |  4 ++--
- lib/842/Makefile                   |  3 +++
- lib/Makefile                       |  5 +----
- lib/crypto/Makefile                |  2 ++
- lib/dim/Makefile                   |  2 ++
- lib/fonts/Makefile                 |  2 ++
- lib/kunit/Makefile                 |  3 +++
- lib/livepatch/Makefile             |  2 ++
- lib/lz4/Makefile                   |  1 +
- lib/lzo/Makefile                   |  2 ++
- lib/math/Makefile                  |  2 ++
- lib/mpi/Makefile                   |  2 ++
- lib/raid6/Makefile                 |  3 +++
- lib/reed_solomon/Makefile          |  2 ++
- lib/xz/Makefile                    |  3 +++
- lib/zlib_deflate/Makefile          |  2 ++
- lib/zlib_dfltcc/Makefile           |  2 ++
- lib/zlib_inflate/Makefile          |  2 ++
- lib/zstd/Makefile                  |  1 +
- scripts/Makefile.lib               | 14 ++++++++------
- 24 files changed, 64 insertions(+), 23 deletions(-)
-
-diff --git a/Documentation/kbuild/makefiles.rst b/Documentation/kbuild/makefiles.rst
-index 6515ebc12b6f..14d8e7d23c04 100644
---- a/Documentation/kbuild/makefiles.rst
-+++ b/Documentation/kbuild/makefiles.rst
-@@ -368,6 +368,14 @@ more details, with real examples.
+diff --git a/mm/zswap.c b/mm/zswap.c
+index fbb782924ccc..ab73957716c3 100644
+--- a/mm/zswap.c
++++ b/mm/zswap.c
+@@ -24,8 +24,10 @@
+ #include <linux/rbtree.h>
+ #include <linux/swap.h>
+ #include <linux/crypto.h>
++#include <linux/scatterlist.h>
+ #include <linux/mempool.h>
+ #include <linux/zpool.h>
++#include <crypto/acompress.h>
  
- 		subdir-ccflags-y := -Werror
+ #include <linux/mm_types.h>
+ #include <linux/page-flags.h>
+@@ -127,9 +129,17 @@ module_param_named(same_filled_pages_enabled, zswap_same_filled_pages_enabled,
+ * data structures
+ **********************************/
  
-+    ccflags-remove-y, asflags-remove-y
-+	These flags are used to remove particular flags for the compiler,
-+	assembler invocations.
++struct crypto_acomp_ctx {
++	struct crypto_acomp *acomp;
++	struct acomp_req *req;
++	struct crypto_wait wait;
++	u8 *dstmem;
++	struct mutex mutex;
++};
 +
-+	Example::
+ struct zswap_pool {
+ 	struct zpool *zpool;
+-	struct crypto_comp * __percpu *tfm;
++	struct crypto_acomp_ctx * __percpu *acomp_ctx;
+ 	struct kref kref;
+ 	struct list_head list;
+ 	struct work_struct release_work;
+@@ -415,30 +425,73 @@ static int zswap_dstmem_dead(unsigned int cpu)
+ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
+ {
+ 	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool, node);
+-	struct crypto_comp *tfm;
++	struct crypto_acomp *acomp;
++	struct acomp_req *req;
++	struct crypto_acomp_ctx *acomp_ctx;
++	int ret;
+ 
+-	if (WARN_ON(*per_cpu_ptr(pool->tfm, cpu)))
++	if (WARN_ON(*per_cpu_ptr(pool->acomp_ctx, cpu)))
+ 		return 0;
+ 
+-	tfm = crypto_alloc_comp(pool->tfm_name, 0, 0);
+-	if (IS_ERR_OR_NULL(tfm)) {
+-		pr_err("could not alloc crypto comp %s : %ld\n",
+-		       pool->tfm_name, PTR_ERR(tfm));
++	acomp_ctx = kzalloc(sizeof(*acomp_ctx), GFP_KERNEL);
++	if (!acomp_ctx)
+ 		return -ENOMEM;
 +
-+		ccflags-remove-$(CONFIG_MCOUNT) += -pg
++	acomp = crypto_alloc_acomp(pool->tfm_name, 0, 0);
++	if (IS_ERR(acomp)) {
++		pr_err("could not alloc crypto acomp %s : %ld\n",
++				pool->tfm_name, PTR_ERR(acomp));
++		ret = PTR_ERR(acomp);
++		goto free_ctx;
+ 	}
+-	*per_cpu_ptr(pool->tfm, cpu) = tfm;
++	acomp_ctx->acomp = acomp;
 +
-     CFLAGS_$@, AFLAGS_$@
- 	CFLAGS_$@ and AFLAGS_$@ only apply to commands in current
- 	kbuild makefile.
-@@ -375,6 +383,9 @@ more details, with real examples.
- 	$(CFLAGS_$@) specifies per-file options for $(CC).  The $@
- 	part has a literal value which specifies the file that it is for.
- 
-+	CFLAGS_$@ has the higher priority than ccflags-remove-y; CFLAGS_$@
-+	can re-add compiler flags that were removed by ccflags-remove-y.
++	req = acomp_request_alloc(acomp_ctx->acomp);
++	if (!req) {
++		pr_err("could not alloc crypto acomp_request %s\n",
++		       pool->tfm_name);
++		ret = -ENOMEM;
++		goto free_acomp;
++	}
++	acomp_ctx->req = req;
 +
- 	Example::
- 
- 		# drivers/scsi/Makefile
-@@ -387,6 +398,9 @@ more details, with real examples.
- 	$(AFLAGS_$@) is a similar feature for source files in assembly
- 	languages.
- 
-+	AFLAGS_$@ has the higher priority than asflags-remove-y; AFLAGS_$@
-+	can re-add assembler flags that were removed by asflags-remove-y.
++	mutex_init(&acomp_ctx->mutex);
++	crypto_init_wait(&acomp_ctx->wait);
++	/*
++	 * if the backend of acomp is async zip, crypto_req_done() will wakeup
++	 * crypto_wait_req(); if the backend of acomp is scomp, the callback
++	 * won't be called, crypto_wait_req() will return without blocking.
++	 */
++	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				   crypto_req_done, &acomp_ctx->wait);
 +
- 	Example::
- 
- 		# arch/arm/kernel/Makefile
-diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/Makefile
-index 00602a6fba04..3d5691b23951 100644
---- a/arch/arm/boot/compressed/Makefile
-+++ b/arch/arm/boot/compressed/Makefile
-@@ -103,13 +103,9 @@ clean-files += piggy_data lib1funcs.S ashldi3.S bswapsdi2.S hyp-stub.S
- 
- KBUILD_CFLAGS += -DDISABLE_BRANCH_PROFILING
- 
--ifeq ($(CONFIG_FUNCTION_TRACER),y)
--ORIG_CFLAGS := $(KBUILD_CFLAGS)
--KBUILD_CFLAGS = $(subst -pg, , $(ORIG_CFLAGS))
--endif
--
- ccflags-y := -fpic $(call cc-option,-mno-single-pic-base,) -fno-builtin \
- 	     -I$(obj) $(DISABLE_ARM_SSP_PER_TASK_PLUGIN)
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += -pg
- asflags-y := -DZIMAGE
- 
- # Supply kernel BSS size to the decompressor via a linker symbol.
-diff --git a/arch/powerpc/xmon/Makefile b/arch/powerpc/xmon/Makefile
-index 89c76ca35640..eb25d7554ffd 100644
---- a/arch/powerpc/xmon/Makefile
-+++ b/arch/powerpc/xmon/Makefile
-@@ -7,8 +7,7 @@ UBSAN_SANITIZE := n
- KASAN_SANITIZE := n
- 
- # Disable ftrace for the entire directory
--ORIG_CFLAGS := $(KBUILD_CFLAGS)
--KBUILD_CFLAGS = $(subst $(CC_FLAGS_FTRACE),,$(ORIG_CFLAGS))
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
- 
- ifdef CONFIG_CC_IS_CLANG
- # clang stores addresses on the stack causing the frame size to blow
-diff --git a/arch/sh/boot/compressed/Makefile b/arch/sh/boot/compressed/Makefile
-index ad0e2403e56f..589d2d8a573d 100644
---- a/arch/sh/boot/compressed/Makefile
-+++ b/arch/sh/boot/compressed/Makefile
-@@ -28,10 +28,7 @@ IMAGE_OFFSET	:= $(shell /bin/bash -c 'printf "0x%08x" \
- 			$(CONFIG_BOOT_LINK_OFFSET)]')
- endif
- 
--ifeq ($(CONFIG_MCOUNT),y)
--ORIG_CFLAGS := $(KBUILD_CFLAGS)
--KBUILD_CFLAGS = $(subst -pg, , $(ORIG_CFLAGS))
--endif
-+ccflags-remove-$(CONFIG_MCOUNT) += -pg
- 
- LDFLAGS_vmlinux := --oformat $(ld-bfd) -Ttext $(IMAGE_OFFSET) -e startup \
- 		   -T $(obj)/../../kernel/vmlinux.lds
-diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
-index 6575bb0a0434..7492844a8b1b 100644
---- a/kernel/trace/Makefile
-+++ b/kernel/trace/Makefile
-@@ -2,9 +2,9 @@
- 
- # Do not instrument the tracer itself:
- 
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
++	acomp_ctx->dstmem = per_cpu(zswap_dstmem, cpu);
++	*per_cpu_ptr(pool->acomp_ctx, cpu) = acomp_ctx;
 +
- ifdef CONFIG_FUNCTION_TRACER
--ORIG_CFLAGS := $(KBUILD_CFLAGS)
--KBUILD_CFLAGS = $(subst $(CC_FLAGS_FTRACE),,$(ORIG_CFLAGS))
- 
- # Avoid recursion due to instrumentation.
- KCSAN_SANITIZE := n
-diff --git a/lib/842/Makefile b/lib/842/Makefile
-index 6f7aad269288..b815e824ae37 100644
---- a/lib/842/Makefile
-+++ b/lib/842/Makefile
-@@ -1,3 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
+ 	return 0;
 +
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
++free_acomp:
++	crypto_free_acomp(acomp_ctx->acomp);
++free_ctx:
++	kfree(acomp_ctx);
++	return ret;
+ }
+ 
+ static int zswap_cpu_comp_dead(unsigned int cpu, struct hlist_node *node)
+ {
+ 	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool, node);
+-	struct crypto_comp *tfm;
++	struct crypto_acomp_ctx *acomp_ctx;
 +
- obj-$(CONFIG_842_COMPRESS) += 842_compress.o
- obj-$(CONFIG_842_DECOMPRESS) += 842_decompress.o
-diff --git a/lib/Makefile b/lib/Makefile
-index b1c42c10073b..b2ed4beddd68 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -3,10 +3,7 @@
- # Makefile for some libs needed in the kernel.
- #
++	acomp_ctx = *per_cpu_ptr(pool->acomp_ctx, cpu);
++	if (!IS_ERR_OR_NULL(acomp_ctx)) {
++		if (!IS_ERR_OR_NULL(acomp_ctx->req))
++			acomp_request_free(acomp_ctx->req);
++		if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
++			crypto_free_acomp(acomp_ctx->acomp);
++		kfree(acomp_ctx);
++	}
++	*per_cpu_ptr(pool->acomp_ctx, cpu) = NULL;
  
--ifdef CONFIG_FUNCTION_TRACER
--ORIG_CFLAGS := $(KBUILD_CFLAGS)
--KBUILD_CFLAGS = $(subst $(CC_FLAGS_FTRACE),,$(ORIG_CFLAGS))
--endif
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-	tfm = *per_cpu_ptr(pool->tfm, cpu);
+-	if (!IS_ERR_OR_NULL(tfm))
+-		crypto_free_comp(tfm);
+-	*per_cpu_ptr(pool->tfm, cpu) = NULL;
+ 	return 0;
+ }
  
- # These files are disabled because they produce lots of non-interesting and/or
- # flaky coverage that is not a function of syscall inputs. For example,
-diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-index 3a435629d9ce..b557ef0b07c2 100644
---- a/lib/crypto/Makefile
-+++ b/lib/crypto/Makefile
-@@ -1,5 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
+@@ -561,8 +614,9 @@ static struct zswap_pool *zswap_pool_create(char *type, char *compressor)
+ 	pr_debug("using %s zpool\n", zpool_get_type(pool->zpool));
  
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+ 	strlcpy(pool->tfm_name, compressor, sizeof(pool->tfm_name));
+-	pool->tfm = alloc_percpu(struct crypto_comp *);
+-	if (!pool->tfm) {
 +
- # chacha is used by the /dev/random driver which is always builtin
- obj-y						+= chacha.o
- obj-$(CONFIG_CRYPTO_LIB_CHACHA_GENERIC)		+= libchacha.o
-diff --git a/lib/dim/Makefile b/lib/dim/Makefile
-index 1d6858a108cb..97fc3e89d34e 100644
---- a/lib/dim/Makefile
-+++ b/lib/dim/Makefile
-@@ -2,6 +2,8 @@
- # DIM Dynamic Interrupt Moderation library
- #
++	pool->acomp_ctx = alloc_percpu(struct crypto_acomp_ctx *);
++	if (!pool->acomp_ctx) {
+ 		pr_err("percpu alloc failed\n");
+ 		goto error;
+ 	}
+@@ -585,7 +639,7 @@ static struct zswap_pool *zswap_pool_create(char *type, char *compressor)
+ 	return pool;
  
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+ error:
+-	free_percpu(pool->tfm);
++	free_percpu(pool->acomp_ctx);
+ 	if (pool->zpool)
+ 		zpool_destroy_pool(pool->zpool);
+ 	kfree(pool);
+@@ -596,14 +650,14 @@ static __init struct zswap_pool *__zswap_pool_create_fallback(void)
+ {
+ 	bool has_comp, has_zpool;
+ 
+-	has_comp = crypto_has_comp(zswap_compressor, 0, 0);
++	has_comp = crypto_has_acomp(zswap_compressor, 0, 0);
+ 	if (!has_comp && strcmp(zswap_compressor,
+ 				CONFIG_ZSWAP_COMPRESSOR_DEFAULT)) {
+ 		pr_err("compressor %s not available, using default %s\n",
+ 		       zswap_compressor, CONFIG_ZSWAP_COMPRESSOR_DEFAULT);
+ 		param_free_charp(&zswap_compressor);
+ 		zswap_compressor = CONFIG_ZSWAP_COMPRESSOR_DEFAULT;
+-		has_comp = crypto_has_comp(zswap_compressor, 0, 0);
++		has_comp = crypto_has_acomp(zswap_compressor, 0, 0);
+ 	}
+ 	if (!has_comp) {
+ 		pr_err("default compressor %s not available\n",
+@@ -639,7 +693,7 @@ static void zswap_pool_destroy(struct zswap_pool *pool)
+ 	zswap_pool_debug("destroying", pool);
+ 
+ 	cpuhp_state_remove_instance(CPUHP_MM_ZSWP_POOL_PREPARE, &pool->node);
+-	free_percpu(pool->tfm);
++	free_percpu(pool->acomp_ctx);
+ 	zpool_destroy_pool(pool->zpool);
+ 	kfree(pool);
+ }
+@@ -723,7 +777,7 @@ static int __zswap_param_set(const char *val, const struct kernel_param *kp,
+ 		}
+ 		type = s;
+ 	} else if (!compressor) {
+-		if (!crypto_has_comp(s, 0, 0)) {
++		if (!crypto_has_acomp(s, 0, 0)) {
+ 			pr_err("compressor %s not available\n", s);
+ 			return -ENOENT;
+ 		}
+@@ -774,7 +828,7 @@ static int __zswap_param_set(const char *val, const struct kernel_param *kp,
+ 		 * failed, maybe both compressor and zpool params were bad.
+ 		 * Allow changing this param, so pool creation will succeed
+ 		 * when the other param is changed. We already verified this
+-		 * param is ok in the zpool_has_pool() or crypto_has_comp()
++		 * param is ok in the zpool_has_pool() or crypto_has_acomp()
+ 		 * checks above.
+ 		 */
+ 		ret = param_set_charp(s, kp);
+@@ -876,7 +930,9 @@ static int zswap_writeback_entry(struct zpool *pool, unsigned long handle)
+ 	pgoff_t offset;
+ 	struct zswap_entry *entry;
+ 	struct page *page;
+-	struct crypto_comp *tfm;
++	struct scatterlist input, output;
++	struct crypto_acomp_ctx *acomp_ctx;
 +
- obj-$(CONFIG_DIMLIB) += dim.o
+ 	u8 *src, *dst;
+ 	unsigned int dlen;
+ 	int ret;
+@@ -916,14 +972,21 @@ static int zswap_writeback_entry(struct zpool *pool, unsigned long handle)
  
- dim-y := dim.o net_dim.o rdma_dim.o
-diff --git a/lib/fonts/Makefile b/lib/fonts/Makefile
-index ed95070860de..f951750c179e 100644
---- a/lib/fonts/Makefile
-+++ b/lib/fonts/Makefile
-@@ -1,6 +1,8 @@
- # SPDX-License-Identifier: GPL-2.0
- # Font handling
- 
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+ 	case ZSWAP_SWAPCACHE_NEW: /* page is locked */
+ 		/* decompress */
++		acomp_ctx = *this_cpu_ptr(entry->pool->acomp_ctx);
 +
- font-objs := fonts.o
- 
- font-objs-$(CONFIG_FONT_SUN8x16)   += font_sun8x16.o
-diff --git a/lib/kunit/Makefile b/lib/kunit/Makefile
-index 724b94311ca3..8c847557ab24 100644
---- a/lib/kunit/Makefile
-+++ b/lib/kunit/Makefile
-@@ -1,3 +1,6 @@
+ 		dlen = PAGE_SIZE;
+ 		src = (u8 *)zhdr + sizeof(struct zswap_header);
+-		dst = kmap_atomic(page);
+-		tfm = *get_cpu_ptr(entry->pool->tfm);
+-		ret = crypto_comp_decompress(tfm, src, entry->length,
+-					     dst, &dlen);
+-		put_cpu_ptr(entry->pool->tfm);
+-		kunmap_atomic(dst);
++		dst = kmap(page);
 +
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
++		mutex_lock(&acomp_ctx->mutex);
++		sg_init_one(&input, src, entry->length);
++		sg_init_one(&output, dst, dlen);
++		acomp_request_set_params(acomp_ctx->req, &input, &output, entry->length, dlen);
++		ret = crypto_wait_req(crypto_acomp_decompress(acomp_ctx->req), &acomp_ctx->wait);
++		dlen = acomp_ctx->req->dlen;
++		mutex_unlock(&acomp_ctx->mutex);
 +
- obj-$(CONFIG_KUNIT) +=			kunit.o
++		kunmap(page);
+ 		BUG_ON(ret);
+ 		BUG_ON(dlen != PAGE_SIZE);
  
- kunit-objs +=				test.o \
-diff --git a/lib/livepatch/Makefile b/lib/livepatch/Makefile
-index 295b94bff370..9abdf615b088 100644
---- a/lib/livepatch/Makefile
-+++ b/lib/livepatch/Makefile
-@@ -2,6 +2,8 @@
- #
- # Makefile for livepatch test code.
+@@ -1004,7 +1067,8 @@ static int zswap_frontswap_store(unsigned type, pgoff_t offset,
+ {
+ 	struct zswap_tree *tree = zswap_trees[type];
+ 	struct zswap_entry *entry, *dupentry;
+-	struct crypto_comp *tfm;
++	struct scatterlist input, output;
++	struct crypto_acomp_ctx *acomp_ctx;
+ 	int ret;
+ 	unsigned int hlen, dlen = PAGE_SIZE;
+ 	unsigned long handle, value;
+@@ -1074,12 +1138,32 @@ static int zswap_frontswap_store(unsigned type, pgoff_t offset,
+ 	}
  
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+ 	/* compress */
+-	dst = get_cpu_var(zswap_dstmem);
+-	tfm = *get_cpu_ptr(entry->pool->tfm);
+-	src = kmap_atomic(page);
+-	ret = crypto_comp_compress(tfm, src, PAGE_SIZE, dst, &dlen);
+-	kunmap_atomic(src);
+-	put_cpu_ptr(entry->pool->tfm);
++	acomp_ctx = *this_cpu_ptr(entry->pool->acomp_ctx);
 +
- obj-$(CONFIG_TEST_LIVEPATCH) += test_klp_atomic_replace.o \
- 				test_klp_callbacks_demo.o \
- 				test_klp_callbacks_demo2.o \
-diff --git a/lib/lz4/Makefile b/lib/lz4/Makefile
-index 5b42242afaa2..53da4cab7015 100644
---- a/lib/lz4/Makefile
-+++ b/lib/lz4/Makefile
-@@ -1,5 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
- ccflags-y += -O3
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
- 
- obj-$(CONFIG_LZ4_COMPRESS) += lz4_compress.o
- obj-$(CONFIG_LZ4HC_COMPRESS) += lz4hc_compress.o
-diff --git a/lib/lzo/Makefile b/lib/lzo/Makefile
-index 2f58fafbbddd..9565a555275b 100644
---- a/lib/lzo/Makefile
-+++ b/lib/lzo/Makefile
-@@ -1,4 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
++	mutex_lock(&acomp_ctx->mutex);
 +
- lzo_compress-objs := lzo1x_compress.o
- lzo_decompress-objs := lzo1x_decompress_safe.o
- 
-diff --git a/lib/math/Makefile b/lib/math/Makefile
-index be6909e943bd..49aa50e28185 100644
---- a/lib/math/Makefile
-+++ b/lib/math/Makefile
-@@ -1,4 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
++	src = kmap(page);
++	dst = acomp_ctx->dstmem;
++	sg_init_one(&input, src, PAGE_SIZE);
++	/* zswap_dstmem is of size (PAGE_SIZE * 2). Reflect same in sg_list */
++	sg_init_one(&output, dst, PAGE_SIZE * 2);
++	acomp_request_set_params(acomp_ctx->req, &input, &output, PAGE_SIZE, dlen);
++	/*
++	 * it maybe looks a little bit silly that we send an asynchronous request,
++	 * then wait for its completion synchronously. This makes the process look
++	 * synchronous in fact.
++	 * Theoretically, acomp supports users send multiple acomp requests in one
++	 * acomp instance, then get those requests done simultaneously. but in this
++	 * case, frontswap actually does store and load page by page, there is no
++	 * existing method to send the second page before the first page is done
++	 * in one thread doing frontswap.
++	 * but in different threads running on different cpu, we have different
++	 * acomp instance, so multiple threads can do (de)compression in parallel.
++	 */
++	ret = crypto_wait_req(crypto_acomp_compress(acomp_ctx->req), &acomp_ctx->wait);
++	dlen = acomp_ctx->req->dlen;
++	kunmap(page);
 +
- obj-y += div64.o gcd.o lcm.o int_pow.o int_sqrt.o reciprocal_div.o
+ 	if (ret) {
+ 		ret = -EINVAL;
+ 		goto put_dstmem;
+@@ -1103,7 +1187,7 @@ static int zswap_frontswap_store(unsigned type, pgoff_t offset,
+ 	memcpy(buf, &zhdr, hlen);
+ 	memcpy(buf + hlen, dst, dlen);
+ 	zpool_unmap_handle(entry->pool->zpool, handle);
+-	put_cpu_var(zswap_dstmem);
++	mutex_unlock(&acomp_ctx->mutex);
  
- obj-$(CONFIG_CORDIC)		+= cordic.o
-diff --git a/lib/mpi/Makefile b/lib/mpi/Makefile
-index d5874a7f5ff9..df7883521619 100644
---- a/lib/mpi/Makefile
-+++ b/lib/mpi/Makefile
-@@ -3,6 +3,8 @@
- # MPI multiprecision maths library (from gpg)
- #
+ 	/* populate entry */
+ 	entry->offset = offset;
+@@ -1131,7 +1215,7 @@ static int zswap_frontswap_store(unsigned type, pgoff_t offset,
+ 	return 0;
  
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+ put_dstmem:
+-	put_cpu_var(zswap_dstmem);
++	mutex_unlock(&acomp_ctx->mutex);
+ 	zswap_pool_put(entry->pool);
+ freepage:
+ 	zswap_entry_cache_free(entry);
+@@ -1148,7 +1232,8 @@ static int zswap_frontswap_load(unsigned type, pgoff_t offset,
+ {
+ 	struct zswap_tree *tree = zswap_trees[type];
+ 	struct zswap_entry *entry;
+-	struct crypto_comp *tfm;
++	struct scatterlist input, output;
++	struct crypto_acomp_ctx *acomp_ctx;
+ 	u8 *src, *dst;
+ 	unsigned int dlen;
+ 	int ret;
+@@ -1175,11 +1260,17 @@ static int zswap_frontswap_load(unsigned type, pgoff_t offset,
+ 	src = zpool_map_handle(entry->pool->zpool, entry->handle, ZPOOL_MM_RO);
+ 	if (zpool_evictable(entry->pool->zpool))
+ 		src += sizeof(struct zswap_header);
+-	dst = kmap_atomic(page);
+-	tfm = *get_cpu_ptr(entry->pool->tfm);
+-	ret = crypto_comp_decompress(tfm, src, entry->length, dst, &dlen);
+-	put_cpu_ptr(entry->pool->tfm);
+-	kunmap_atomic(dst);
++	dst = kmap(page);
 +
- obj-$(CONFIG_MPILIB) = mpi.o
- 
- mpi-y = \
-diff --git a/lib/raid6/Makefile b/lib/raid6/Makefile
-index b4c0df6d706d..3482d6ae3f3b 100644
---- a/lib/raid6/Makefile
-+++ b/lib/raid6/Makefile
-@@ -1,4 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
++	acomp_ctx = *this_cpu_ptr(entry->pool->acomp_ctx);
++	mutex_lock(&acomp_ctx->mutex);
++	sg_init_one(&input, src, entry->length);
++	sg_init_one(&output, dst, dlen);
++	acomp_request_set_params(acomp_ctx->req, &input, &output, entry->length, dlen);
++	ret = crypto_wait_req(crypto_acomp_decompress(acomp_ctx->req), &acomp_ctx->wait);
++	mutex_unlock(&acomp_ctx->mutex);
 +
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
-+
- obj-$(CONFIG_RAID6_PQ)	+= raid6_pq.o
++	kunmap(page);
+ 	zpool_unmap_handle(entry->pool->zpool, entry->handle);
+ 	BUG_ON(ret);
  
- raid6_pq-y	+= algos.o recov.o tables.o int1.o int2.o int4.o \
-diff --git a/lib/reed_solomon/Makefile b/lib/reed_solomon/Makefile
-index 5d4fa68f26cb..a5c9defdac7f 100644
---- a/lib/reed_solomon/Makefile
-+++ b/lib/reed_solomon/Makefile
-@@ -3,5 +3,7 @@
- # This is a modified version of reed solomon lib,
- #
- 
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
-+
- obj-$(CONFIG_REED_SOLOMON) += reed_solomon.o
- obj-$(CONFIG_REED_SOLOMON_TEST) += test_rslib.o
-diff --git a/lib/xz/Makefile b/lib/xz/Makefile
-index fa6af814a8d1..fae9b6c7c389 100644
---- a/lib/xz/Makefile
-+++ b/lib/xz/Makefile
-@@ -1,4 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
-+
- obj-$(CONFIG_XZ_DEC) += xz_dec.o
- xz_dec-y := xz_dec_syms.o xz_dec_stream.o xz_dec_lzma2.o
- xz_dec-$(CONFIG_XZ_DEC_BCJ) += xz_dec_bcj.o
-diff --git a/lib/zlib_deflate/Makefile b/lib/zlib_deflate/Makefile
-index 2622e03c0b94..1fcefe73536f 100644
---- a/lib/zlib_deflate/Makefile
-+++ b/lib/zlib_deflate/Makefile
-@@ -7,6 +7,8 @@
- # decompression code.
- #
- 
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
-+
- obj-$(CONFIG_ZLIB_DEFLATE) += zlib_deflate.o
- 
- zlib_deflate-objs := deflate.o deftree.o deflate_syms.o
-diff --git a/lib/zlib_dfltcc/Makefile b/lib/zlib_dfltcc/Makefile
-index 8e4d5afbbb10..7a8067f6e772 100644
---- a/lib/zlib_dfltcc/Makefile
-+++ b/lib/zlib_dfltcc/Makefile
-@@ -6,6 +6,8 @@
- # This is the code for s390 zlib hardware support.
- #
- 
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
-+
- obj-$(CONFIG_ZLIB_DFLTCC) += zlib_dfltcc.o
- 
- zlib_dfltcc-objs := dfltcc.o dfltcc_deflate.o dfltcc_inflate.o dfltcc_syms.o
-diff --git a/lib/zlib_inflate/Makefile b/lib/zlib_inflate/Makefile
-index 27327d3e9f54..a451e96f9845 100644
---- a/lib/zlib_inflate/Makefile
-+++ b/lib/zlib_inflate/Makefile
-@@ -14,6 +14,8 @@
- # uncompression can be done without blocking on allocation).
- #
- 
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
-+
- obj-$(CONFIG_ZLIB_INFLATE) += zlib_inflate.o
- 
- zlib_inflate-objs := inffast.o inflate.o infutil.o \
-diff --git a/lib/zstd/Makefile b/lib/zstd/Makefile
-index f5d778e7e5c7..01be908a2d94 100644
---- a/lib/zstd/Makefile
-+++ b/lib/zstd/Makefile
-@@ -3,6 +3,7 @@ obj-$(CONFIG_ZSTD_COMPRESS) += zstd_compress.o
- obj-$(CONFIG_ZSTD_DECOMPRESS) += zstd_decompress.o
- 
- ccflags-y += -O3
-+ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
- 
- zstd_compress-y := fse_compress.o huf_compress.o compress.o \
- 		   entropy_common.o fse_decompress.o zstd_common.o
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 916b2f7f7098..3629f66646d7 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -111,12 +111,14 @@ basename_flags = -DKBUILD_BASENAME=$(call name-fix,$(basetarget))
- modname_flags  = -DKBUILD_MODNAME=$(call name-fix,$(modname))
- modfile_flags  = -DKBUILD_MODFILE=$(call stringify,$(modfile))
- 
--orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) \
--                 $(ccflags-y) $(CFLAGS_$(target-stem).o)
--_c_flags       = $(filter-out $(CFLAGS_REMOVE_$(target-stem).o), $(orig_c_flags))
--orig_a_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_AFLAGS) \
--                 $(asflags-y) $(AFLAGS_$(target-stem).o)
--_a_flags       = $(filter-out $(AFLAGS_REMOVE_$(target-stem).o), $(orig_a_flags))
-+_c_flags       = $(filter-out $(CFLAGS_REMOVE_$(target-stem).o), \
-+                     $(filter-out $(ccflags-remove-y), \
-+                         $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(ccflags-y)) \
-+                     $(CFLAGS_$(target-stem).o))
-+_a_flags       = $(filter-out $(AFLAGS_REMOVE_$(target-stem).o), \
-+                     $(filter-out $(asflags-remove-y), \
-+                         $(KBUILD_CPPFLAGS) $(KBUILD_AFLAGS) $(asflags-y)) \
-+                     $(AFLAGS_$(target-stem).o))
- _cpp_flags     = $(KBUILD_CPPFLAGS) $(cppflags-y) $(CPPFLAGS_$(target-stem).lds)
- 
- #
 -- 
-2.25.1
+2.27.0
+
 
