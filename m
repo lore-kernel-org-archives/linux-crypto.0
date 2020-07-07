@@ -4,41 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 493A5C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C22C4C433E0
 	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jul 2020 18:59:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21F262077D
+	by mail.kernel.org (Postfix) with ESMTP id 9C7322075B
 	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jul 2020 18:59:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1594148382;
-	bh=dYDxYvPT32BLVDMVsQAF83e+xGeSLhuqg+mfXEUM7b4=;
+	bh=EFAUE/O3NAFgFk16uIpubIyUQAmR64ga9v6sCy4aUV8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=cUGADb1Ky0ZsRedXBT9eWZJfZwXxVeGG9repqvwC4RP937gyEuYqAbPC8jDgZG1AL
-	 OeEo72Ka3gQhzWM/bIShGNksdJQ+E6L2NCoowiTLBc8UE3dByLKGobk40b6waLqEHs
-	 4HcdjEQlrtC65et63C4d8uqGzrP7d+Yf2pA++AV4=
+	b=IhsDRqPGmSWktxgLF9ly/a5MCKLgd+j1upX5S2HanWhluaCLe2S7mEoWq+cLrvYzj
+	 3TqsMawYMY65SQeBlojDHnwIWzAPW7jc5VhLr5txj1ET7XuucXmJej+G1HqPE5IHh2
+	 HPxDSgnW8pluYSG8mxC2cdpQA8FzXKpin/wJXNdI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728677AbgGGS7j (ORCPT
+        id S1728672AbgGGS7l (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Jul 2020 14:59:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36228 "EHLO mail.kernel.org"
+        Tue, 7 Jul 2020 14:59:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36250 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728653AbgGGS7i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Jul 2020 14:59:38 -0400
+        id S1728284AbgGGS7j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 Jul 2020 14:59:39 -0400
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A190C20771;
-        Tue,  7 Jul 2020 18:59:37 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C9EE7206CD;
+        Tue,  7 Jul 2020 18:59:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594148378;
-        bh=dYDxYvPT32BLVDMVsQAF83e+xGeSLhuqg+mfXEUM7b4=;
+        s=default; t=1594148379;
+        bh=EFAUE/O3NAFgFk16uIpubIyUQAmR64ga9v6sCy4aUV8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=amcogKLNwPWNZWTJA/bClGo+zbp+dlirYL+aO6XBIv774Zp+ALWBpN5UqSwBomBDc
-         Zsu72EkQYEJrg0wVmqiEn3br6EQj9S05pNcP7kK3xAH2PLZExIcsKG7YZNWfN5fcIY
-         93yfGpg/J8a8ULQTSm/FuR8M/tU+NiMa4ML6SD9I=
+        b=c9732zf5gH9kNy/qOxs8iTYY7nqaMEDN+LqFtnIDsK66oKlYDc0huOBgQasFTmiX9
+         6RR5REwpmJGjyz9yhxRabbDu0oEpD2PYmoa1biV75kcYGkeew5KY5746nv3IJ4jw54
+         vIInYsdRydl1osvc5z62Y0mYRv2uh1UeQWXsQpOo=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
@@ -46,14 +46,10 @@ Cc:     alsa-devel@alsa-project.org, Ard Biesheuvel <ardb@kernel.org>,
         Cheng-Yi Chiang <cychiang@chromium.org>,
         Enric Balletbo i Serra <enric.balletbo@collabora.com>,
         Guenter Roeck <groeck@chromium.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        linux-efi@vger.kernel.org,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        mptcp@lists.01.org, Tzung-Bi Shih <tzungbi@google.com>
-Subject: [PATCH 1/4] crypto: lib/sha256 - add sha256() function
-Date:   Tue,  7 Jul 2020 11:58:15 -0700
-Message-Id: <20200707185818.80177-2-ebiggers@kernel.org>
+        Tzung-Bi Shih <tzungbi@google.com>
+Subject: [PATCH 4/4] ASoC: cros_ec_codec: use sha256() instead of open coding
+Date:   Tue,  7 Jul 2020 11:58:18 -0700
+Message-Id: <20200707185818.80177-5-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200707185818.80177-1-ebiggers@kernel.org>
 References: <20200707185818.80177-1-ebiggers@kernel.org>
@@ -66,48 +62,69 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Add a function sha256() which computes a SHA-256 digest in one step,
-combining sha256_init() + sha256_update() + sha256_final().
+Now that there's a function that calculates the SHA-256 digest of a
+buffer in one step, use it instead of sha256_init() + sha256_update() +
+sha256_final().
 
-This is similar to how we also have blake2s().
+Also simplify the code by inlining calculate_sha256() into its caller
+and switching a debug log statement to use %*phN instead of bin2hex().
 
+Cc: alsa-devel@alsa-project.org
+Cc: Ard Biesheuvel <ardb@kernel.org>
+Cc: Cheng-Yi Chiang <cychiang@chromium.org>
+Cc: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Cc: Guenter Roeck <groeck@chromium.org>
+Cc: Tzung-Bi Shih <tzungbi@google.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- include/crypto/sha.h |  1 +
- lib/crypto/sha256.c  | 10 ++++++++++
- 2 files changed, 11 insertions(+)
+ sound/soc/codecs/cros_ec_codec.c | 27 ++-------------------------
+ 1 file changed, 2 insertions(+), 25 deletions(-)
 
-diff --git a/include/crypto/sha.h b/include/crypto/sha.h
-index 10753ff71d46..4ff3da816630 100644
---- a/include/crypto/sha.h
-+++ b/include/crypto/sha.h
-@@ -147,6 +147,7 @@ static inline void sha256_init(struct sha256_state *sctx)
+diff --git a/sound/soc/codecs/cros_ec_codec.c b/sound/soc/codecs/cros_ec_codec.c
+index 8d45c628e988..ab009c7dfdf4 100644
+--- a/sound/soc/codecs/cros_ec_codec.c
++++ b/sound/soc/codecs/cros_ec_codec.c
+@@ -103,28 +103,6 @@ static int send_ec_host_command(struct cros_ec_device *ec_dev, uint32_t cmd,
+ 	return ret;
  }
- void sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len);
- void sha256_final(struct sha256_state *sctx, u8 *out);
-+void sha256(const u8 *data, unsigned int len, u8 *out);
  
- static inline void sha224_init(struct sha256_state *sctx)
+-static int calculate_sha256(struct cros_ec_codec_priv *priv,
+-			    uint8_t *buf, uint32_t size, uint8_t *digest)
+-{
+-	struct sha256_state sctx;
+-
+-	sha256_init(&sctx);
+-	sha256_update(&sctx, buf, size);
+-	sha256_final(&sctx, digest);
+-
+-#ifdef DEBUG
+-	{
+-		char digest_str[65];
+-
+-		bin2hex(digest_str, digest, 32);
+-		digest_str[64] = 0;
+-		dev_dbg(priv->dev, "hash=%s\n", digest_str);
+-	}
+-#endif
+-
+-	return 0;
+-}
+-
+ static int dmic_get_gain(struct snd_kcontrol *kcontrol,
+ 			 struct snd_ctl_elem_value *ucontrol)
  {
-diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
-index 2e621697c5c3..2321f6cb322f 100644
---- a/lib/crypto/sha256.c
-+++ b/lib/crypto/sha256.c
-@@ -280,4 +280,14 @@ void sha224_final(struct sha256_state *sctx, u8 *out)
- }
- EXPORT_SYMBOL(sha224_final);
+@@ -782,9 +760,8 @@ static int wov_hotword_model_put(struct snd_kcontrol *kcontrol,
+ 	if (IS_ERR(buf))
+ 		return PTR_ERR(buf);
  
-+void sha256(const u8 *data, unsigned int len, u8 *out)
-+{
-+	struct sha256_state sctx;
-+
-+	sha256_init(&sctx);
-+	sha256_update(&sctx, data, len);
-+	sha256_final(&sctx, out);
-+}
-+EXPORT_SYMBOL(sha256);
-+
- MODULE_LICENSE("GPL");
+-	ret = calculate_sha256(priv, buf, size, digest);
+-	if (ret)
+-		goto leave;
++	sha256(buf, size, digest);
++	dev_dbg(priv->dev, "hash=%*phN\n", SHA256_DIGEST_SIZE, digest);
+ 
+ 	p.cmd = EC_CODEC_WOV_GET_LANG;
+ 	ret = send_ec_host_command(priv->ec_device, EC_CMD_EC_CODEC_WOV,
 -- 
 2.27.0
 
