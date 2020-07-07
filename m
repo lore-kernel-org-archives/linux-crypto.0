@@ -2,138 +2,327 @@ Return-Path: <SRS0=MSze=AS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E0EC433E0
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jul 2020 08:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07FEEC433E2
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jul 2020 09:25:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60EBF206E2
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jul 2020 08:26:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PaXUAVur"
+	by mail.kernel.org (Postfix) with ESMTP id DE22020870
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jul 2020 09:25:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1594113933;
+	bh=SFFIblF5jUq1GJjdAblyK8HQgQfUgYu08HBWCGS0bAU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=cDqxUo+9pw1Dzljn7N3PbIw02/24zY0meZqNOhnbFE+vIQjkRL/v38O91daJQINWF
+	 Y9xpdqMYKuzUwBrT+7TLbChVWYqpNKSCqhvhLrc2YJY9KvDFpNAWFyy2SCybdQjiMP
+	 agYXCMEDaQUaVa0MEQK2kwDKw+TrP/Q71X4K7lCE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727094AbgGGI0m (ORCPT
+        id S1726825AbgGGJZd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Jul 2020 04:26:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52618 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725874AbgGGI0m (ORCPT
+        Tue, 7 Jul 2020 05:25:33 -0400
+Received: from condef-01.nifty.com ([202.248.20.66]:62161 "EHLO
+        condef-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725941AbgGGJZc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Jul 2020 04:26:42 -0400
-Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CFA9C061755
-        for <linux-crypto@vger.kernel.org>; Tue,  7 Jul 2020 01:26:42 -0700 (PDT)
-Received: by mail-wr1-x444.google.com with SMTP id b6so44176820wrs.11
-        for <linux-crypto@vger.kernel.org>; Tue, 07 Jul 2020 01:26:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=qBb3tk+qoeCqQNbIgsA1YmfvrIH4bftpey+P/QTf7zU=;
-        b=PaXUAVur/LkNIIW4gTLWzRAfCMGt4wNA3wl7zLKlKGszofmFes4VRd71LrL54Zy+dv
-         12Iu2sBGHK8msYfxPRn42uhZSwljXB2iVp0h55LeZLJLJf0mUG+vJ75Hi+R/AgU3S2pO
-         igIovoWYwgP2LEPD5jKj4nKc9e3dTr/LUzMbjEJuTgtq2r4emkA7IM+GUM5eK/C9pmuP
-         Ad1g+qf7IluAps2x+j5KiK1MNTzL28VnFaS9zfYaIBrKljP9JiKlPx3mYtRgilhw5USS
-         AlgC0z9bRI6dGzw8wBwGNp2VlEwvNGzJUdV/SMTqmC90z3BY5ttiCmMwhkmcrQiPKpyz
-         TzCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=qBb3tk+qoeCqQNbIgsA1YmfvrIH4bftpey+P/QTf7zU=;
-        b=qXxotHkUDwvDsnFzjXZD3iI7rJxBcoppa8hqdgpq8dLZ6G3u/8n7xeYZkT6ccOzXA0
-         li+8UZMIUYAkRWO0HAkeLZNRD1rw1e0W19q/hC1v3fkoVWhGgTmo7BFViX/BdkAbKMdr
-         PflC/CYoEqQ2PHjVRjG7/zCdFSh2xMJ5hSmQq6vyk5/qFOHJRyE6ll3VpOgVO9Myrf3F
-         NXP4AZAhI1VaXYJUzzWL12KMqPmEOZp88hE8dqbp1f51Nt/X/Z7Zg1CtlBOihQidqmVv
-         TidQavsf3C4C7brQmYrmoUdgvuCPv/i1pEFFjoXsR7TtoTFY5nN8d96E42e/l+78GK48
-         7Zrg==
-X-Gm-Message-State: AOAM533zfuZrlCJoVL2tE8zYJDVwF7xYHLgC2IsFcHFzHw9dlGmJgWYj
-        PnTLlm5BeGnCcw8hlLjE7mBsFA==
-X-Google-Smtp-Source: ABdhPJxbXSBlQu+qcdR3pRtsP8xOQVgZTwMm3v38IA/dY0vx6B6HIdI+D2MPASrH+jGIIU4XWr3rCQ==
-X-Received: by 2002:adf:cc85:: with SMTP id p5mr51931970wrj.273.1594110400958;
-        Tue, 07 Jul 2020 01:26:40 -0700 (PDT)
-Received: from dell ([2.27.35.206])
-        by smtp.gmail.com with ESMTPSA id 207sm66552wme.13.2020.07.07.01.26.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jul 2020 01:26:40 -0700 (PDT)
-Date:   Tue, 7 Jul 2020 09:26:38 +0100
-From:   Lee Jones <lee.jones@linaro.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 1/1] crypto: ux500: hash: Add namespacing to hash_init()
-Message-ID: <20200707082638.GF3500@dell>
-References: <20200629123003.1014387-1-lee.jones@linaro.org>
- <20200630041029.GA20892@gondor.apana.org.au>
- <20200630070727.GD1179328@dell>
+        Tue, 7 Jul 2020 05:25:32 -0400
+Received: from conuserg-08.nifty.com ([10.126.8.71])by condef-01.nifty.com with ESMTP id 0679NRpL013935;
+        Tue, 7 Jul 2020 18:23:41 +0900
+Received: from oscar.flets-west.jp (softbank126090202047.bbtec.net [126.90.202.47]) (authenticated)
+        by conuserg-08.nifty.com with ESMTP id 0679LLSD013006;
+        Tue, 7 Jul 2020 18:21:23 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 0679LLSD013006
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1594113685;
+        bh=DGOsSYyty8roOyC5A5FX8LaGKLV2BgeM9zt8xr5UYM4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=JDbNjpOzvr7/x76F9KaMdoFrTKEggtICdwPlCWJ2nLX8WlTRLUc0XnIZDJhUUfr9S
+         HPlA1ubAq2lrrANKINqbMM9j0unpUpp3xeFrRD5eg57ohA0L8O3BoAhXyVbUuLIxUA
+         yg8Ai+v1KElzTAS1qarKG7CBoTSh0aX4xOlT2ZHIJ6Q/mDXkG3cs51o2Vnbz4QkX6/
+         rfBfozMdn9L0HmhH2amrvY6S+iHkOqvqOVR2u5q5aMB1pmmlhsADDBuJt6GpiLubdi
+         fybtXxsHk7w8cBGHfbU8pLSqAQavPBxRZyN7iDW+fhthgFxD3RuHOQuA+z8me3Xz1C
+         5oFmfKmhIPAaQ==
+X-Nifty-SrcIP: [126.90.202.47]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     Ingo Molnar <mingo@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Brendan Higgins <brendanhiggins@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Haren Myneni <haren@us.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jiri Kosina <jikos@kernel.org>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
+        Tal Gilboa <talgi@mellanox.com>, kunit-dev@googlegroups.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, live-patching@vger.kernel.org
+Subject: [PATCH v2 2/2] kbuild: trace functions in subdirectories of lib/
+Date:   Tue,  7 Jul 2020 18:21:17 +0900
+Message-Id: <20200707092117.963394-2-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200707092117.963394-1-masahiroy@kernel.org>
+References: <20200707092117.963394-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200630070727.GD1179328@dell>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 30 Jun 2020, Lee Jones wrote:
-> On Tue, 30 Jun 2020, Herbert Xu wrote:
-> > On Mon, Jun 29, 2020 at 01:30:03PM +0100, Lee Jones wrote:
-> > > A recent change to the Regulator consumer API (which this driver
-> > > utilises) add prototypes for the some suspend functions.  These
-> > > functions require including header file include/linux/suspend.h.
-> > > 
-> > > The following tree of includes affecting this driver will be
-> > > present:
-> > > 
-> > >    In file included from include/linux/elevator.h:6,
-> > >                     from include/linux/blkdev.h:288,
-> > >                     from include/linux/blk-cgroup.h:23,
-> > >                     from include/linux/writeback.h:14,
-> > >                     from include/linux/memcontrol.h:22,
-> > >                     from include/linux/swap.h:9,
-> > >                     from include/linux/suspend.h:5,
-> > >                     from include/linux/regulator/consumer.h:35,
-> > >                     from drivers/crypto/ux500/hash/hash_core.c:28:
-> > > 
-> > > include/linux/elevator.h pulls in include/linux/hashtable.h which
-> > > contains its own version of hash_init().  This confuses the build
-> > > system and results in the following error (amongst others):
-> > > 
-> > >  drivers/crypto/ux500/hash/hash_core.c:1362:19: error: passing argument 1 of '__hash_init' from incompatible pointer type [-Werror=incompatible-pointer-types]
-> > >  1362 |  return hash_init(req);
-> > > 
-> > > Fix this by namespacing the local hash_init() such that the
-> > > source of confusion is removed.
-> > > 
-> > > Cc: Linus Walleij <linus.walleij@linaro.org>
-> > > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > > Cc: David S. Miller <davem@davemloft.net>
-> > > Cc: linux-crypto@vger.kernel.org
-> > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > > ---
-> > > 
-> > > Ideally this should go into v5.8's -rcs else it runs the risk of
-> > > breaking when Linus pulls everything in for v5.9-rc1.
-> 
-> [...]
-> 
-> > I have no objections to this patch.  However, I'd rather put
-> > it on a topic branch which you could pull rather than pushing
-> > it into 5.8 straight away.
-> 
-> An immutable branch sounds like a sensible solution.  Thanks.
+  ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
 
-Any movement on this Herbert?
+exists here in sub-directories of lib/ to keep the behavior of
+commit 2464a609ded0 ("ftrace: do not trace library functions").
 
+Since that commit, not only the objects in lib/ but also the ones in
+the sub-directories are excluded from ftrace (although the commit
+description did not explicitly mention this).
+
+However, most of library functions in sub-directories are not so hot.
+Re-add them to ftrace.
+
+Going forward, only the objects right under lib/ will be excluded.
+
+Cc: Ingo Molnar <mingo@kernel.org>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+Changes in v2:
+  - New patch
+
+ lib/842/Makefile          | 3 ---
+ lib/crypto/Makefile       | 2 --
+ lib/dim/Makefile          | 2 --
+ lib/fonts/Makefile        | 2 --
+ lib/kunit/Makefile        | 3 ---
+ lib/livepatch/Makefile    | 2 --
+ lib/lz4/Makefile          | 1 -
+ lib/lzo/Makefile          | 2 --
+ lib/math/Makefile         | 2 --
+ lib/mpi/Makefile          | 2 --
+ lib/raid6/Makefile        | 3 ---
+ lib/reed_solomon/Makefile | 2 --
+ lib/xz/Makefile           | 3 ---
+ lib/zlib_deflate/Makefile | 2 --
+ lib/zlib_dfltcc/Makefile  | 2 --
+ lib/zlib_inflate/Makefile | 2 --
+ lib/zstd/Makefile         | 1 -
+ 17 files changed, 36 deletions(-)
+
+diff --git a/lib/842/Makefile b/lib/842/Makefile
+index b815e824ae37..6f7aad269288 100644
+--- a/lib/842/Makefile
++++ b/lib/842/Makefile
+@@ -1,6 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ obj-$(CONFIG_842_COMPRESS) += 842_compress.o
+ obj-$(CONFIG_842_DECOMPRESS) += 842_decompress.o
+diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
+index b557ef0b07c2..3a435629d9ce 100644
+--- a/lib/crypto/Makefile
++++ b/lib/crypto/Makefile
+@@ -1,7 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ # chacha is used by the /dev/random driver which is always builtin
+ obj-y						+= chacha.o
+ obj-$(CONFIG_CRYPTO_LIB_CHACHA_GENERIC)		+= libchacha.o
+diff --git a/lib/dim/Makefile b/lib/dim/Makefile
+index 97fc3e89d34e..1d6858a108cb 100644
+--- a/lib/dim/Makefile
++++ b/lib/dim/Makefile
+@@ -2,8 +2,6 @@
+ # DIM Dynamic Interrupt Moderation library
+ #
+ 
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ obj-$(CONFIG_DIMLIB) += dim.o
+ 
+ dim-y := dim.o net_dim.o rdma_dim.o
+diff --git a/lib/fonts/Makefile b/lib/fonts/Makefile
+index f951750c179e..ed95070860de 100644
+--- a/lib/fonts/Makefile
++++ b/lib/fonts/Makefile
+@@ -1,8 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ # Font handling
+ 
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ font-objs := fonts.o
+ 
+ font-objs-$(CONFIG_FONT_SUN8x16)   += font_sun8x16.o
+diff --git a/lib/kunit/Makefile b/lib/kunit/Makefile
+index 8c847557ab24..724b94311ca3 100644
+--- a/lib/kunit/Makefile
++++ b/lib/kunit/Makefile
+@@ -1,6 +1,3 @@
+-
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ obj-$(CONFIG_KUNIT) +=			kunit.o
+ 
+ kunit-objs +=				test.o \
+diff --git a/lib/livepatch/Makefile b/lib/livepatch/Makefile
+index 9abdf615b088..295b94bff370 100644
+--- a/lib/livepatch/Makefile
++++ b/lib/livepatch/Makefile
+@@ -2,8 +2,6 @@
+ #
+ # Makefile for livepatch test code.
+ 
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ obj-$(CONFIG_TEST_LIVEPATCH) += test_klp_atomic_replace.o \
+ 				test_klp_callbacks_demo.o \
+ 				test_klp_callbacks_demo2.o \
+diff --git a/lib/lz4/Makefile b/lib/lz4/Makefile
+index 53da4cab7015..5b42242afaa2 100644
+--- a/lib/lz4/Makefile
++++ b/lib/lz4/Makefile
+@@ -1,6 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ ccflags-y += -O3
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+ 
+ obj-$(CONFIG_LZ4_COMPRESS) += lz4_compress.o
+ obj-$(CONFIG_LZ4HC_COMPRESS) += lz4hc_compress.o
+diff --git a/lib/lzo/Makefile b/lib/lzo/Makefile
+index 9565a555275b..2f58fafbbddd 100644
+--- a/lib/lzo/Makefile
++++ b/lib/lzo/Makefile
+@@ -1,6 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ lzo_compress-objs := lzo1x_compress.o
+ lzo_decompress-objs := lzo1x_decompress_safe.o
+ 
+diff --git a/lib/math/Makefile b/lib/math/Makefile
+index 49aa50e28185..be6909e943bd 100644
+--- a/lib/math/Makefile
++++ b/lib/math/Makefile
+@@ -1,6 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ obj-y += div64.o gcd.o lcm.o int_pow.o int_sqrt.o reciprocal_div.o
+ 
+ obj-$(CONFIG_CORDIC)		+= cordic.o
+diff --git a/lib/mpi/Makefile b/lib/mpi/Makefile
+index df7883521619..d5874a7f5ff9 100644
+--- a/lib/mpi/Makefile
++++ b/lib/mpi/Makefile
+@@ -3,8 +3,6 @@
+ # MPI multiprecision maths library (from gpg)
+ #
+ 
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ obj-$(CONFIG_MPILIB) = mpi.o
+ 
+ mpi-y = \
+diff --git a/lib/raid6/Makefile b/lib/raid6/Makefile
+index 3482d6ae3f3b..b4c0df6d706d 100644
+--- a/lib/raid6/Makefile
++++ b/lib/raid6/Makefile
+@@ -1,7 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0
+-
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ obj-$(CONFIG_RAID6_PQ)	+= raid6_pq.o
+ 
+ raid6_pq-y	+= algos.o recov.o tables.o int1.o int2.o int4.o \
+diff --git a/lib/reed_solomon/Makefile b/lib/reed_solomon/Makefile
+index a5c9defdac7f..5d4fa68f26cb 100644
+--- a/lib/reed_solomon/Makefile
++++ b/lib/reed_solomon/Makefile
+@@ -3,7 +3,5 @@
+ # This is a modified version of reed solomon lib,
+ #
+ 
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ obj-$(CONFIG_REED_SOLOMON) += reed_solomon.o
+ obj-$(CONFIG_REED_SOLOMON_TEST) += test_rslib.o
+diff --git a/lib/xz/Makefile b/lib/xz/Makefile
+index fae9b6c7c389..fa6af814a8d1 100644
+--- a/lib/xz/Makefile
++++ b/lib/xz/Makefile
+@@ -1,7 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ obj-$(CONFIG_XZ_DEC) += xz_dec.o
+ xz_dec-y := xz_dec_syms.o xz_dec_stream.o xz_dec_lzma2.o
+ xz_dec-$(CONFIG_XZ_DEC_BCJ) += xz_dec_bcj.o
+diff --git a/lib/zlib_deflate/Makefile b/lib/zlib_deflate/Makefile
+index 1fcefe73536f..2622e03c0b94 100644
+--- a/lib/zlib_deflate/Makefile
++++ b/lib/zlib_deflate/Makefile
+@@ -7,8 +7,6 @@
+ # decompression code.
+ #
+ 
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ obj-$(CONFIG_ZLIB_DEFLATE) += zlib_deflate.o
+ 
+ zlib_deflate-objs := deflate.o deftree.o deflate_syms.o
+diff --git a/lib/zlib_dfltcc/Makefile b/lib/zlib_dfltcc/Makefile
+index 7a8067f6e772..8e4d5afbbb10 100644
+--- a/lib/zlib_dfltcc/Makefile
++++ b/lib/zlib_dfltcc/Makefile
+@@ -6,8 +6,6 @@
+ # This is the code for s390 zlib hardware support.
+ #
+ 
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ obj-$(CONFIG_ZLIB_DFLTCC) += zlib_dfltcc.o
+ 
+ zlib_dfltcc-objs := dfltcc.o dfltcc_deflate.o dfltcc_inflate.o dfltcc_syms.o
+diff --git a/lib/zlib_inflate/Makefile b/lib/zlib_inflate/Makefile
+index a451e96f9845..27327d3e9f54 100644
+--- a/lib/zlib_inflate/Makefile
++++ b/lib/zlib_inflate/Makefile
+@@ -14,8 +14,6 @@
+ # uncompression can be done without blocking on allocation).
+ #
+ 
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+-
+ obj-$(CONFIG_ZLIB_INFLATE) += zlib_inflate.o
+ 
+ zlib_inflate-objs := inffast.o inflate.o infutil.o \
+diff --git a/lib/zstd/Makefile b/lib/zstd/Makefile
+index 01be908a2d94..f5d778e7e5c7 100644
+--- a/lib/zstd/Makefile
++++ b/lib/zstd/Makefile
+@@ -3,7 +3,6 @@ obj-$(CONFIG_ZSTD_COMPRESS) += zstd_compress.o
+ obj-$(CONFIG_ZSTD_DECOMPRESS) += zstd_decompress.o
+ 
+ ccflags-y += -O3
+-ccflags-remove-$(CONFIG_FUNCTION_TRACER) += $(CC_FLAGS_FTRACE)
+ 
+ zstd_compress-y := fse_compress.o huf_compress.o compress.o \
+ 		   entropy_common.o fse_decompress.o zstd_common.o
 -- 
-Lee Jones [李琼斯]
-Senior Technical Lead - Developer Services
-Linaro.org │ Open source software for Arm SoCs
-Follow Linaro: Facebook | Twitter | Blog
+2.25.1
+
