@@ -2,129 +2,90 @@ Return-Path: <SRS0=WqbL=AT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A82C433E1
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 07:53:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2708AC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 08:28:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 763EE20672
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 07:53:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LOnG/4u/"
+	by mail.kernel.org (Postfix) with ESMTP id 1150921527
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 08:28:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727950AbgGHHxl (ORCPT
+        id S1728158AbgGHI23 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Jul 2020 03:53:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44866 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726286AbgGHHxk (ORCPT
+        Wed, 8 Jul 2020 04:28:29 -0400
+Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:57823 "EHLO
+        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727119AbgGHI23 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Jul 2020 03:53:40 -0400
-Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4220C08C5DC;
-        Wed,  8 Jul 2020 00:53:39 -0700 (PDT)
-Received: by mail-wr1-x442.google.com with SMTP id z2so25540746wrp.2;
-        Wed, 08 Jul 2020 00:53:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=z6+nuHAx7L8u/EGJ0fxzxH9P5Mn+J7bZgvUQH6/6JiE=;
-        b=LOnG/4u/IfXDoZja+V359IRXUa777GMUh6ivYJbbH4q3X71H9TB+D6+zxVOIKeAXOE
-         ysQynx6nYq1xfJZoWqOewlbDJ5HQFNvj3RoGGpPjcLqsdwC0MLehdixEZXIKMzcq448I
-         ugQptdLNzyLveI+oqu/19JPhvmlUMTSYVcSjBbswKNMchb5dnwjx6NzGdH4I2jFZ8AHb
-         SNz1Fcr3xkGONcAew1Rv2NS+JP4OnXpc4ch+v0wznqQELoUbiXnfLGSqUwz5lMgcMGMv
-         CN0rjhB+xsaK1LbugknbJn3rSDAg8qm3XoGBDAaijqJAR6QW2rrZhLG0X97m0MhYeTcv
-         h0fQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=z6+nuHAx7L8u/EGJ0fxzxH9P5Mn+J7bZgvUQH6/6JiE=;
-        b=Pew59TPA/Yz9m+Pw5JWgTuob3/3cr4GLWx74BkQtiz6depOe1/lf4Kwphi18d2J0S4
-         F/KBUnisSqrrexxdp9AGxxXj79jNkFtwmsOHX3lbwjmo8MmwNq6luqUThx5qNI8vV5PA
-         CprqkL/ffW33JoVvfEwBBv/fvAju30HQbAdwDu1+9LMiAz0wKsOKZorIzPlO69umgKVP
-         q6qzv5OXt76gcjR+2g/hKLe6zE6E7YN6D2KjYJfzEtXkKWXuQIntHp/BCNBidc5SL6xs
-         1HRhiYwIVv/I1Pm8e8yOLJE/eGlRGiB4EPQGSLop/qwtSHVYdJgjxv0kAG9pUvBzW+G/
-         GVpA==
-X-Gm-Message-State: AOAM530MqJEAZ3FJ8ZXSC6cY1Ff6YUr9HM8rXXwo0SPdgK3ElWzvW4/8
-        rgLrVQk50WFptfQisBVVNLI=
-X-Google-Smtp-Source: ABdhPJz8A2muEKNqwpqnXdusputoDmaFnzX4LyW0vTh9d2EDx90cds41auLtb5xmTsdRuQdUAC7OMQ==
-X-Received: by 2002:a5d:66ca:: with SMTP id k10mr46352817wrw.244.1594194818597;
-        Wed, 08 Jul 2020 00:53:38 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id u1sm5597306wrb.78.2020.07.08.00.53.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2020 00:53:37 -0700 (PDT)
-Date:   Wed, 8 Jul 2020 09:53:36 +0200
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Ayush Sawal <ayush.sawal@chelsio.com>,
-        Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
-        Rohit Maheshwari <rohitm@chelsio.com>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Jamie Iles <jamie@jamieiles.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Tero Kristo <t-kristo@ti.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org,
-        linux-amlogic@lists.infradead.org
-Subject: Re: [PATCH v4 05/13] crypto: sun8i-ce - permit asynchronous skcipher
- as fallback
-Message-ID: <20200708075336.GB19609@Red>
-References: <20200707063203.5018-1-ardb@kernel.org>
- <20200707063203.5018-6-ardb@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200707063203.5018-6-ardb@kernel.org>
+        Wed, 8 Jul 2020 04:28:29 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04427;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0U262FR._1594196902;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U262FR._1594196902)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 08 Jul 2020 16:28:22 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        dhowells@redhat.com, mcoquelin.stm32@gmail.com,
+        alexandre.torgue@st.com, jmorris@namei.org, serge@hallyn.com,
+        nramas@linux.microsoft.com, tusharsu@linux.microsoft.com,
+        zohar@linux.ibm.com, gilad@benyossef.com, pvanleeuwen@rambus.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keyrings@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org, zhang.jia@linux.alibaba.com,
+        tianjia.zhang@linux.alibaba.com
+Subject: [PATCH v4 5/8] crypto: testmgr - support test with different ciphertext per encryption
+Date:   Wed,  8 Jul 2020 16:28:15 +0800
+Message-Id: <20200708082818.5511-6-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200708082818.5511-1-tianjia.zhang@linux.alibaba.com>
+References: <20200708082818.5511-1-tianjia.zhang@linux.alibaba.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 07, 2020 at 09:31:55AM +0300, Ard Biesheuvel wrote:
-> Even though the sun8i-ce driver implements asynchronous versions of
-> ecb(aes) and cbc(aes), the fallbacks it allocates are required to be
-> synchronous. Given that SIMD based software implementations are usually
-> asynchronous as well, even though they rarely complete asynchronously
-> (this typically only happens in cases where the request was made from
-> softirq context, while SIMD was already in use in the task context that
-> it interrupted), these implementations are disregarded, and either the
-> generic C version or another table based version implemented in assembler
-> is selected instead.
-> 
-> Since falling back to synchronous AES is not only a performance issue, but
-> potentially a security issue as well (due to the fact that table based AES
-> is not time invariant), let's fix this, by allocating an ordinary skcipher
-> as the fallback, and invoke it with the completion routine that was given
-> to the outer request.
-> 
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-> ---
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 41 ++++++++++----------
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h        |  8 ++--
->  2 files changed, 25 insertions(+), 24 deletions(-)
-> 
+Some asymmetric algorithms will get different ciphertext after
+each encryption, such as SM2, and let testmgr support the testing
+of such algorithms.
 
-I finally took the time to rebase all my hash/xrng serie on top of this change and test this patch.
+In struct akcipher_testvec, set c and c_size to be empty, skip
+the comparison of the ciphertext, and compare the decrypted
+plaintext with m to achieve the test purpose.
 
-Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-Tested-on: sun50i-h6-pine-h64
-Tested-on: sun8i-h3-orangepi-pc
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+---
+ crypto/testmgr.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 6863f911fcee..0dc94461c437 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4025,7 +4025,7 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
+ 		pr_err("alg: akcipher: %s test failed. err %d\n", op, err);
+ 		goto free_all;
+ 	}
+-	if (!vecs->siggen_sigver_test) {
++	if (!vecs->siggen_sigver_test && c) {
+ 		if (req->dst_len != c_size) {
+ 			pr_err("alg: akcipher: %s test failed. Invalid output len\n",
+ 			       op);
+@@ -4056,6 +4056,11 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
+ 		goto free_all;
+ 	}
+ 
++	if (!vecs->siggen_sigver_test && !c) {
++		c = outbuf_enc;
++		c_size = req->dst_len;
++	}
++
+ 	op = vecs->siggen_sigver_test ? "sign" : "decrypt";
+ 	if (WARN_ON(c_size > PAGE_SIZE))
+ 		goto free_all;
+-- 
+2.17.1
+
