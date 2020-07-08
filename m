@@ -7,45 +7,49 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 324CFC433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A6EFC433E5
 	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 16:40:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 09003207D0
+	by mail.kernel.org (Postfix) with ESMTP id 7A9D8207C4
 	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 16:40:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1594226438;
-	bh=sUpB5f7/2tTS/Pxep7GYcTBxGpCFVx12p8NvO3zEd2g=;
+	bh=PtXTYUvhYp1TuGbsTeUDAcDwsA77DUzWQdDtmeDTULs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Kj/uphoJbRBV3gtdTOaeXMY1aPJ3luTiiVlPRI1gNwPAWu44xEZNu+Wssng3U1959
-	 cuzDMIok8JG5Je3qqbD3/PK8JPU9T11I/KJISHxgNGaUrYk6ijYtltq2jUn+oVnjdm
-	 akgACSLPDXs3JZt0DaNIbB5xaWHRHt8BxSTuHsAs=
+	b=g+yxCOE9XIklWjKH3UTlcszs0G1qZTSXQne/sAlS/VD4/SxhTFlynnu2uZ3CM4cd6
+	 4po9kAe106mL7Ao6K1niAke3SLmVPy+Pc8SeolssmGwqfb2Ic6cBYcb7z68zMPTHvO
+	 C8QdMUZt1mbnh9YuuJK3FJYpI59do+OIJ5wIr1fs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730737AbgGHQkf (ORCPT
+        id S1730742AbgGHQke (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Jul 2020 12:40:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54888 "EHLO mail.kernel.org"
+        Wed, 8 Jul 2020 12:40:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54940 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730730AbgGHQkc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Jul 2020 12:40:32 -0400
+        id S1730738AbgGHQke (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 8 Jul 2020 12:40:34 -0400
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E850E207F9;
-        Wed,  8 Jul 2020 16:40:31 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 87BD820857;
+        Wed,  8 Jul 2020 16:40:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594226432;
-        bh=sUpB5f7/2tTS/Pxep7GYcTBxGpCFVx12p8NvO3zEd2g=;
+        s=default; t=1594226433;
+        bh=PtXTYUvhYp1TuGbsTeUDAcDwsA77DUzWQdDtmeDTULs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VlSikpcU/re8GREdmigMjUF1bRuINgkNxcQVGBsaJ4cG8oLVQ7R6YIW3/Bx4yK8by
-         C1AlgMUKQdhYiv5pjiEyVVQP/ghcfV31ULqPmdzxTvMAj8JGpiHTRrnnO5f7J7t+Q2
-         qjl4d2Jwr5WOSgtm7dFPc0ElIQXOnRpk/SNUrG/o=
+        b=qJN66Ndye2qFIHyiJrkgTdH/ifIhiwbe6VTAXwwXDZSots17O7ZP+1npYona5La6I
+         E1LdabHsFPyNR8BUdckP4hJKQyONX/UDQSyqJXwe9Xnv6Y+u8NmH/n20ylLt/+KQD/
+         5Sdkno5gfMnXsS5w+S5mBxoiReJ9IRpAZBydLEEk=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     sparclinux@vger.kernel.org, kernel test robot <lkp@intel.com>
-Subject: [PATCH v2 1/5] crypto: sparc - rename sha256 to sha256_alg
-Date:   Wed,  8 Jul 2020 09:39:39 -0700
-Message-Id: <20200708163943.52071-2-ebiggers@kernel.org>
+Cc:     alsa-devel@alsa-project.org, Ard Biesheuvel <ardb@kernel.org>,
+        Cheng-Yi Chiang <cychiang@chromium.org>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        Guenter Roeck <groeck@chromium.org>,
+        Tzung-Bi Shih <tzungbi@google.com>
+Subject: [PATCH v2 5/5] ASoC: cros_ec_codec: use sha256() instead of open coding
+Date:   Wed,  8 Jul 2020 09:39:43 -0700
+Message-Id: <20200708163943.52071-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200708163943.52071-1-ebiggers@kernel.org>
 References: <20200708163943.52071-1-ebiggers@kernel.org>
@@ -58,67 +62,71 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-To avoid a naming collision when we add a sha256() library function,
-rename the "sha256" static variable in sha256_glue.c to "sha256_alg".
-For consistency, also rename "sha224" to "sha224_alg".
+Now that there's a function that calculates the SHA-256 digest of a
+buffer in one step, use it instead of sha256_init() + sha256_update() +
+sha256_final().
 
-Reported-by: kernel test robot <lkp@intel.com>
-Cc: sparclinux@vger.kernel.org
+Also simplify the code by inlining calculate_sha256() into its caller
+and switching a debug log statement to use %*phN instead of bin2hex().
+
+Acked-by: Tzung-Bi Shih <tzungbi@google.com>
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+Cc: alsa-devel@alsa-project.org
+Cc: Ard Biesheuvel <ardb@kernel.org>
+Cc: Cheng-Yi Chiang <cychiang@chromium.org>
+Cc: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Cc: Guenter Roeck <groeck@chromium.org>
+Cc: Tzung-Bi Shih <tzungbi@google.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/sparc/crypto/sha256_glue.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ sound/soc/codecs/cros_ec_codec.c | 27 ++-------------------------
+ 1 file changed, 2 insertions(+), 25 deletions(-)
 
-diff --git a/arch/sparc/crypto/sha256_glue.c b/arch/sparc/crypto/sha256_glue.c
-index 286bc8ecf15b..ca2547df9652 100644
---- a/arch/sparc/crypto/sha256_glue.c
-+++ b/arch/sparc/crypto/sha256_glue.c
-@@ -156,7 +156,7 @@ static int sha256_sparc64_import(struct shash_desc *desc, const void *in)
- 	return 0;
+diff --git a/sound/soc/codecs/cros_ec_codec.c b/sound/soc/codecs/cros_ec_codec.c
+index 8d45c628e988..ab009c7dfdf4 100644
+--- a/sound/soc/codecs/cros_ec_codec.c
++++ b/sound/soc/codecs/cros_ec_codec.c
+@@ -103,28 +103,6 @@ static int send_ec_host_command(struct cros_ec_device *ec_dev, uint32_t cmd,
+ 	return ret;
  }
  
--static struct shash_alg sha256 = {
-+static struct shash_alg sha256_alg = {
- 	.digestsize	=	SHA256_DIGEST_SIZE,
- 	.init		=	sha256_sparc64_init,
- 	.update		=	sha256_sparc64_update,
-@@ -174,7 +174,7 @@ static struct shash_alg sha256 = {
- 	}
- };
- 
--static struct shash_alg sha224 = {
-+static struct shash_alg sha224_alg = {
- 	.digestsize	=	SHA224_DIGEST_SIZE,
- 	.init		=	sha224_sparc64_init,
- 	.update		=	sha256_sparc64_update,
-@@ -206,13 +206,13 @@ static bool __init sparc64_has_sha256_opcode(void)
- static int __init sha256_sparc64_mod_init(void)
+-static int calculate_sha256(struct cros_ec_codec_priv *priv,
+-			    uint8_t *buf, uint32_t size, uint8_t *digest)
+-{
+-	struct sha256_state sctx;
+-
+-	sha256_init(&sctx);
+-	sha256_update(&sctx, buf, size);
+-	sha256_final(&sctx, digest);
+-
+-#ifdef DEBUG
+-	{
+-		char digest_str[65];
+-
+-		bin2hex(digest_str, digest, 32);
+-		digest_str[64] = 0;
+-		dev_dbg(priv->dev, "hash=%s\n", digest_str);
+-	}
+-#endif
+-
+-	return 0;
+-}
+-
+ static int dmic_get_gain(struct snd_kcontrol *kcontrol,
+ 			 struct snd_ctl_elem_value *ucontrol)
  {
- 	if (sparc64_has_sha256_opcode()) {
--		int ret = crypto_register_shash(&sha224);
-+		int ret = crypto_register_shash(&sha224_alg);
- 		if (ret < 0)
- 			return ret;
+@@ -782,9 +760,8 @@ static int wov_hotword_model_put(struct snd_kcontrol *kcontrol,
+ 	if (IS_ERR(buf))
+ 		return PTR_ERR(buf);
  
--		ret = crypto_register_shash(&sha256);
-+		ret = crypto_register_shash(&sha256_alg);
- 		if (ret < 0) {
--			crypto_unregister_shash(&sha224);
-+			crypto_unregister_shash(&sha224_alg);
- 			return ret;
- 		}
+-	ret = calculate_sha256(priv, buf, size, digest);
+-	if (ret)
+-		goto leave;
++	sha256(buf, size, digest);
++	dev_dbg(priv->dev, "hash=%*phN\n", SHA256_DIGEST_SIZE, digest);
  
-@@ -225,8 +225,8 @@ static int __init sha256_sparc64_mod_init(void)
- 
- static void __exit sha256_sparc64_mod_fini(void)
- {
--	crypto_unregister_shash(&sha224);
--	crypto_unregister_shash(&sha256);
-+	crypto_unregister_shash(&sha224_alg);
-+	crypto_unregister_shash(&sha256_alg);
- }
- 
- module_init(sha256_sparc64_mod_init);
+ 	p.cmd = EC_CODEC_WOV_GET_LANG;
+ 	ret = send_ec_host_command(priv->ec_device, EC_CMD_EC_CODEC_WOV,
 -- 
 2.27.0
 
