@@ -2,204 +2,151 @@ Return-Path: <SRS0=WqbL=AT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6843C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 14:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B521C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 15:06:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9496420720
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 14:59:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F17D3207C4
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 15:06:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="xQvWEvqu";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="S7NW9mWM"
+	dkim=pass (1024-bit key) header.d=voleatech.de header.i=@voleatech.de header.b="TDRFStjt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729953AbgGHO7j (ORCPT
+        id S1729206AbgGHPGL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Jul 2020 10:59:39 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:51060 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729948AbgGHO7i (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Jul 2020 10:59:38 -0400
-Date:   Wed, 8 Jul 2020 16:59:34 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1594220376;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+7JziWx8xGafb1lK96IKc6xbdLpVMYN0yIUWKgqSpO8=;
-        b=xQvWEvquy19QIrrgc5ILsPisEeMdQ6EJHAhuKxdkY6e8LDs561EpZsKyKvYoyGESPser42
-        eO/oROdh/m3nfBsDqLliSEM8ZVzLy7hyyIBdB/sXzxMpsX0Uk3nwf9W2bjFG9/qGC7hEY1
-        +M0VOTXL+zXups7BrW58O31GOQLmM+L0zDsFT2Qf7H2uzQsLPCa2CuIxvC860Ohd344eDt
-        dN2qTPB0rhQwOtExcDU0P53eQ9dfYH9Ou31kSwqjFFZjcDLyJV2KzliwQ4QAf0TpOOg4rN
-        Ef9C9r/OKy/XurDKqpi3Ac7cCgBj89uIJ4OXsM+ggMv5D0NyKqXM54N+QX4BYw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1594220376;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+7JziWx8xGafb1lK96IKc6xbdLpVMYN0yIUWKgqSpO8=;
-        b=S7NW9mWMMthgTMCxBRmNHemfR0mHU1rThQ/ENWILjzTIe/eWgPqfmCGuNboGaDicwL1F8i
-        jmmYr4ah0HkZVTBw==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     Barry Song <song.bao.hua@hisilicon.com>
-Cc:     akpm@linux-foundation.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        linuxarm@huawei.com,
-        "Luis Claudio R . Goncalves" <lgoncalv@redhat.com>,
-        Mahipal Challa <mahipalreddy2006@gmail.com>,
-        Seth Jennings <sjenning@redhat.com>,
-        Dan Streetman <ddstreet@ieee.org>,
-        Vitaly Wool <vitaly.wool@konsulko.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Colin Ian King <colin.king@canonical.com>
-Subject: Re: [PATCH v4] mm/zswap: move to use crypto_acomp API for hardware
- acceleration
-Message-ID: <20200708145934.4w3qk53mgavyyln7@linutronix.de>
-References: <20200707125210.33256-1-song.bao.hua@hisilicon.com>
+        Wed, 8 Jul 2020 11:06:11 -0400
+Received: from mail-eopbgr70093.outbound.protection.outlook.com ([40.107.7.93]:32003
+        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729022AbgGHPGL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 8 Jul 2020 11:06:11 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MCZ65RENXmGG4K/9IOaUkZPaSa5vcxij0Te49Q8EdSS04zjN4x+0Zv9SI4BOiHrXoTK+0QCrWKL8X0JdRwxfVcZI2aftHk8Rv2pfmiq8CgHjSNSovUsUz2Z43XbYgvaigxqJNfU4mP9A8ZKgdQhjey+i3MNb0BjDULvpgexqhORl0/Tewp2iCFPMP9iUayUnNpuaKY4mkEoHEaowgDZ6rH4sEfcCqesp2e9afxVbY2UPvsCQq4b5v3B7a65Vdt0iMafwqsVgoTO4waraLjBOsWOzYUM0EqHzvwFN3VULNV88r+aA1lks8Xc4AOBlP7b5v7QMBKrl7mwUw9bYQ/fzdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Bbh7sdC8gbuCXdM0oP3TS3t+Qvwo46zHyqpjfNeomh8=;
+ b=CnM3InFXZPsHwNTiTSOc9qLUS/VuFAlkyl8JzsGW5wOvuZxv0qfKPgN+o7Q+CiVufH+yh22vVpLYTQ+nxwJZAkXj9jkaX2riz5dj6UQz48ygd4yaqDkMDf/W4CUT9xh3rKOm6puxRa+dsnNoOR4dSMWJVcK4YeB1QPt8fP9lfiJ6PfOhiloak1WGy/DI+xhLhb3dsd2ejLEZK70+/q84eiZhxa4ZQqcubmA1DOj9Bau52G6GIJzfMYA6saCLq1sCKcNMxHImcoAorRGbIgDO60ej5sLmU+7RV41f/olI4XLe3ThM82rxIlVSQ8sl11zc+ANL83CpQVvfIiTS9RweOA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=voleatech.de; dmarc=pass action=none header.from=voleatech.de;
+ dkim=pass header.d=voleatech.de; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=voleatech.de;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Bbh7sdC8gbuCXdM0oP3TS3t+Qvwo46zHyqpjfNeomh8=;
+ b=TDRFStjtJe4YXsTaeJbeIb08Hj+N1tLJjTiOMhuylSV1xhlHVGKxLXYXMhuXBWbL/OUKLJgosbtymPhMoIaxN748z26Udf0sZnNwYbLXsz8h6byqmFukf+fLuBG+H6hGQBsmNQxZ2rhOv4SdmQwY1ggZJqVn8Fa83b3fj9seId0=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none
+ header.from=voleatech.de;
+Received: from AM4PR0501MB2785.eurprd05.prod.outlook.com
+ (2603:10a6:200:5d::11) by AM0PR05MB6788.eurprd05.prod.outlook.com
+ (2603:10a6:20b:152::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.20; Wed, 8 Jul
+ 2020 15:06:07 +0000
+Received: from AM4PR0501MB2785.eurprd05.prod.outlook.com
+ ([fe80::39a1:e237:5fef:6f39]) by AM4PR0501MB2785.eurprd05.prod.outlook.com
+ ([fe80::39a1:e237:5fef:6f39%11]) with mapi id 15.20.3153.030; Wed, 8 Jul 2020
+ 15:06:06 +0000
+From:   sven.auhagen@voleatech.de
+To:     linux-crypto@vger.kernel.org
+Subject: [PATCH v1] fixes
+Date:   Wed,  8 Jul 2020 17:06:05 +0200
+Message-Id: <20200708150605.60657-1-sven.auhagen@voleatech.de>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0P190CA0027.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:208:190::37) To AM4PR0501MB2785.eurprd05.prod.outlook.com
+ (2603:10a6:200:5d::11)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20200707125210.33256-1-song.bao.hua@hisilicon.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from SvensMacBookAir.sven.lan (109.193.235.168) by AM0P190CA0027.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::37) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21 via Frontend Transport; Wed, 8 Jul 2020 15:06:06 +0000
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+X-Originating-IP: [109.193.235.168]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b5c55a41-f558-4772-32d7-08d823507098
+X-MS-TrafficTypeDiagnostic: AM0PR05MB6788:
+X-Microsoft-Antispam-PRVS: <AM0PR05MB67883AE3595E8817F23D7DBEEF670@AM0PR05MB6788.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1850;
+X-Forefront-PRVS: 04583CED1A
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4u/mG6mHKZb8hvIii9UYxQyxxfCY+u9KFGpRDGE+0bSADuYC92DyqS1RdK2wS8ABSqJf/cDHoTVgGlDwGzumZKOmeDf4xPA1lKWVSKygRU2KOAZhZSXtRzZNKOMvmItUlrlpIRoGHRymT3FKJRHwHyE1aX7ns4Nbm4bVN/UjxUywXUIiPKs3/DP4mIws3f6QAGm1zRWbcr4IG0hwVh+cQSzPufFNKrRKV9f0qHtur7d1EXoUbgsKuUM8uYUar4c/fop79XGvYo+AE8kO7HRzzDu+7K7lapchNz5simMkYQ+2e8Kja0dgeNYb3D9e244e1ellPiyEIQ9R5gHqI3R8Uw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM4PR0501MB2785.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(366004)(136003)(346002)(39830400003)(376002)(6512007)(2616005)(9686003)(66556008)(66476007)(1076003)(36756003)(6486002)(86362001)(66946007)(16526019)(508600001)(186003)(956004)(26005)(2906002)(52116002)(5660300002)(83380400001)(6506007)(316002)(6916009)(8676002)(8936002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData: X2NpNk26TU4gAvyVpMI21EwR9c9yt+5O1WE8gK5E2d4GwZScXMP8v4WdhnKyhdzIlRJQS4wzpZuqz+r1FtrgCRnbZLO8jHhRHCCjnRxZrlavoa4yiatZwLZL/mvewAJlEd+XcQ1nMf44MIdGoi8ZVOJx4L6uvSUYP6iNweJdolVO+egjQhzTS+cqySjbNkPbYKS4X5jqdNl53oo4DkgYeL7h7k5MO2YaeMoPpd36Cj/ZOoDwiN62AKrUkLV0EOU2A1jQRAvZtHDfdq7K6cvdP4r9OHcl+ahOxg27MOdnep5T09f2WaLjYjC8XXXLKCwf3HuF1kZEz/QWEu8RB+MAe9rxRGwp/mv+codwb+mWeso5Y+VOOQTH9bGpG2o2Ho1n6OH5M0uevMfuFjkWyWDPqUR7fAk3SkLDJ0Iq8OfX1LXOcddQmUWzWjd40NkblzzWBtdb69BaDrZXDGaspbzreMT00J91tJ28/w1+FKcxxdK5YlVOLesAmU7dlFHYS8XZ
+X-OriginatorOrg: voleatech.de
+X-MS-Exchange-CrossTenant-Network-Message-Id: b5c55a41-f558-4772-32d7-08d823507098
+X-MS-Exchange-CrossTenant-AuthSource: AM4PR0501MB2785.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2020 15:06:06.8442
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b82a99f6-7981-4a72-9534-4d35298f847b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CdbOs6//FcQWp65GZcu9GHjlFVuqoodS2e1JlfbYf/ykx1CWMfAwYd21VgBUMZN7eQMv26bHh/dN/5cXtcypCBk6C+FkCNTwJyJjf2Az79o=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6788
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2020-07-08 00:52:10 [+1200], Barry Song wrote:
-=E2=80=A6
-> @@ -127,9 +129,17 @@ module_param_named(same_filled_pages_enabled, zswap_=
-same_filled_pages_enabled,
->  * data structures
->  **********************************/
-> =20
-> +struct crypto_acomp_ctx {
-> +	struct crypto_acomp *acomp;
-> +	struct acomp_req *req;
-> +	struct crypto_wait wait;
-> +	u8 *dstmem;
-> +	struct mutex mutex;
-> +};
-=E2=80=A6
-> @@ -561,8 +614,9 @@ static struct zswap_pool *zswap_pool_create(char *typ=
-e, char *compressor)
->  	pr_debug("using %s zpool\n", zpool_get_type(pool->zpool));
-> =20
->  	strlcpy(pool->tfm_name, compressor, sizeof(pool->tfm_name));
-> -	pool->tfm =3D alloc_percpu(struct crypto_comp *);
-> -	if (!pool->tfm) {
-> +
-> +	pool->acomp_ctx =3D alloc_percpu(struct crypto_acomp_ctx *);
+From: Sven Auhagen <Sven.Auhagen@voleatech.de>
 
-Can't you allocate the whole structure instead just a pointer to it? The
-structure looks just like bunch of pointers anyway. Less time for
-pointer chasing means more time for fun.
+---
+ drivers/crypto/inside-secure/safexcel.h        | 1 +
+ drivers/crypto/inside-secure/safexcel_cipher.c | 6 +++++-
+ drivers/crypto/inside-secure/safexcel_hash.c   | 6 ++++++
+ 3 files changed, 12 insertions(+), 1 deletion(-)
 
-> @@ -1074,12 +1138,32 @@ static int zswap_frontswap_store(unsigned type, p=
-goff_t offset,
->  	}
-> =20
->  	/* compress */
-> -	dst =3D get_cpu_var(zswap_dstmem);
-> -	tfm =3D *get_cpu_ptr(entry->pool->tfm);
-> -	src =3D kmap_atomic(page);
-> -	ret =3D crypto_comp_compress(tfm, src, PAGE_SIZE, dst, &dlen);
-> -	kunmap_atomic(src);
-> -	put_cpu_ptr(entry->pool->tfm);
-> +	acomp_ctx =3D *this_cpu_ptr(entry->pool->acomp_ctx);
-> +
-> +	mutex_lock(&acomp_ctx->mutex);
-> +
-> +	src =3D kmap(page);
-> +	dst =3D acomp_ctx->dstmem;
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index a7ab1183a723..7341f047cb2f 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -40,6 +40,7 @@
+ 
+ /* Static configuration */
+ #define EIP197_DEFAULT_RING_SIZE		400
++#define EIP197_DEFAULT_RING_ROTATE		50
+ #define EIP197_EMB_TOKENS			4 /* Pad CD to 16 dwords */
+ #define EIP197_MAX_TOKENS			16
+ #define EIP197_MAX_RINGS			4
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index 2018b7f3942d..2c4bda960ee6 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -1218,7 +1218,11 @@ static int safexcel_queue_req(struct crypto_async_request *base,
+ 
+ 	ring = ctx->base.ring;
+ 
+-	printk("Ring %d queue length %d\n", ring, priv->ring[ring].queue->qlen);
++	// Rotate ring if full
++	if (priv->ring[ring].queue.qlen > EIP197_DEFAULT_RING_ROTATE) {
++		ctx->base.ring = safexcel_select_ring(priv);
++		ring = ctx->base.ring;
++	}
+ 
+ 	spin_lock_bh(&priv->ring[ring].queue_lock);
+ 	ret = crypto_enqueue_request(&priv->ring[ring].queue, base);
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index e1d65788bf41..55a573bbb3ae 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -744,6 +744,12 @@ static int safexcel_ahash_enqueue(struct ahash_request *areq)
+ 
+ 	ring = ctx->base.ring;
+ 
++	// Rotate ring if full
++	if (priv->ring[ring].queue.qlen > EIP197_DEFAULT_RING_ROTATE) {
++		ctx->base.ring = safexcel_select_ring(priv);
++		ring = ctx->base.ring;
++	}
++
+ 	spin_lock_bh(&priv->ring[ring].queue_lock);
+ 	ret = crypto_enqueue_request(&priv->ring[ring].queue, &areq->base);
+ 	spin_unlock_bh(&priv->ring[ring].queue_lock);
+-- 
+2.24.3 (Apple Git-128)
 
-that mutex is per-CPU, per-context. The dstmem pointer is per-CPU. So if
-I read this right, you can get preempted after crypto_wait_req() and
-another context in this CPU writes its data to the same dstmem and then=E2=
-=80=A6
-
-> +	sg_init_one(&input, src, PAGE_SIZE);
-> +	/* zswap_dstmem is of size (PAGE_SIZE * 2). Reflect same in sg_list */
-> +	sg_init_one(&output, dst, PAGE_SIZE * 2);
-> +	acomp_request_set_params(acomp_ctx->req, &input, &output, PAGE_SIZE, dl=
-en);
-> +	/*
-> +	 * it maybe looks a little bit silly that we send an asynchronous reque=
-st,
-> +	 * then wait for its completion synchronously. This makes the process l=
-ook
-> +	 * synchronous in fact.
-> +	 * Theoretically, acomp supports users send multiple acomp requests in =
-one
-> +	 * acomp instance, then get those requests done simultaneously. but in =
-this
-> +	 * case, frontswap actually does store and load page by page, there is =
-no
-> +	 * existing method to send the second page before the first page is done
-> +	 * in one thread doing frontswap.
-> +	 * but in different threads running on different cpu, we have different
-> +	 * acomp instance, so multiple threads can do (de)compression in parall=
-el.
-> +	 */
-> +	ret =3D crypto_wait_req(crypto_acomp_compress(acomp_ctx->req), &acomp_c=
-tx->wait);
-> +	dlen =3D acomp_ctx->req->dlen;
-> +	kunmap(page);
-> +
->  	if (ret) {
->  		ret =3D -EINVAL;
->  		goto put_dstmem;
-
-This looks using the same synchronous mechanism around an asynchronous
-interface. It works as a PoC.
-
-As far as I remember the crypto async interface, the incoming skbs were
-fed to the async interface and returned to the caller so the NIC could
-continue allocate new RX skbs and move on. Only if the queue of requests
-was getting to long the code started to throttle. Eventually the async
-crypto code completed the decryption operation in a different context
-and fed the decrypted packet(s) into the stack.
-
-=46rom a quick view, you would have to return -EINPROGRESS here and have
-at the caller side something like that:
-
-iff --git a/mm/page_io.c b/mm/page_io.c
-index e8726f3e3820b..9d1baa46ec3ed 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -252,12 +252,15 @@ int swap_writepage(struct page *page, struct writebac=
-k_control *wbc)
-                unlock_page(page);
-                goto out;
-        }
--       if (frontswap_store(page) =3D=3D 0) {
-+       ret =3D frontswap_store(page);
-+       if (ret =3D=3D 0) {
-                set_page_writeback(page);
-                unlock_page(page);
-                end_page_writeback(page);
-                goto out;
-        }
-+       if (ret =3D -EINPROGRESS)
-+               goto out;
-        ret =3D __swap_writepage(page, wbc, end_swap_bio_write);
- out:
-        return ret;
-
-so that eventually callers like write_cache_pages() could feed all pages
-into *writepage and then wait for that bulk to finish.
-
-Having it this way would also reshape the memory allocation you have.
-You have now per-context a per-CPU crypto request and everything. With
-a 64 or 128 core I'm not sure you will use all that resources.
-With a truly async interface you would be force to have a resource pool
-or so which you would use and then only allow a certain amount of
-parallel requests.
-
-Sebastian
