@@ -2,131 +2,104 @@ Return-Path: <SRS0=WqbL=AT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A6EFC433E5
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 16:40:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 105F7C433DF
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 19:53:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A9D8207C4
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 16:40:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594226438;
-	bh=PtXTYUvhYp1TuGbsTeUDAcDwsA77DUzWQdDtmeDTULs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=g+yxCOE9XIklWjKH3UTlcszs0G1qZTSXQne/sAlS/VD4/SxhTFlynnu2uZ3CM4cd6
-	 4po9kAe106mL7Ao6K1niAke3SLmVPy+Pc8SeolssmGwqfb2Ic6cBYcb7z68zMPTHvO
-	 C8QdMUZt1mbnh9YuuJK3FJYpI59do+OIJ5wIr1fs=
+	by mail.kernel.org (Postfix) with ESMTP id E76A1206F6
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 19:53:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Ri/wpHrN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730742AbgGHQke (ORCPT
+        id S1726228AbgGHTx1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Jul 2020 12:40:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54940 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730738AbgGHQke (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Jul 2020 12:40:34 -0400
-Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 87BD820857;
-        Wed,  8 Jul 2020 16:40:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594226433;
-        bh=PtXTYUvhYp1TuGbsTeUDAcDwsA77DUzWQdDtmeDTULs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qJN66Ndye2qFIHyiJrkgTdH/ifIhiwbe6VTAXwwXDZSots17O7ZP+1npYona5La6I
-         E1LdabHsFPyNR8BUdckP4hJKQyONX/UDQSyqJXwe9Xnv6Y+u8NmH/n20ylLt/+KQD/
-         5Sdkno5gfMnXsS5w+S5mBxoiReJ9IRpAZBydLEEk=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     alsa-devel@alsa-project.org, Ard Biesheuvel <ardb@kernel.org>,
-        Cheng-Yi Chiang <cychiang@chromium.org>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        Guenter Roeck <groeck@chromium.org>,
-        Tzung-Bi Shih <tzungbi@google.com>
-Subject: [PATCH v2 5/5] ASoC: cros_ec_codec: use sha256() instead of open coding
-Date:   Wed,  8 Jul 2020 09:39:43 -0700
-Message-Id: <20200708163943.52071-6-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200708163943.52071-1-ebiggers@kernel.org>
-References: <20200708163943.52071-1-ebiggers@kernel.org>
+        Wed, 8 Jul 2020 15:53:27 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:51392 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725446AbgGHTx0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 8 Jul 2020 15:53:26 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 068Jkc4b014971;
+        Wed, 8 Jul 2020 19:53:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=l5kP04TQx9CT6XBndJoPCQt97j3az16WSIoo49ut7H0=;
+ b=Ri/wpHrNAp/87a8ITffVtp7EjnPYPzVXnf++JO8YDZ4h3h6A24ObFmeMUy2urj8JP860
+ WmPB9TfZdQNosk77pShY+mRzraYfQnC2mzkkX/cREpHlmWIkKqf/Tr7xjV8MRyWoj+Z2
+ wLpjbBtMuWD3cCt9wGtAHF2heY6wrDRZseIUIHcPlX7vJe5PzBgYgN+7YEZ1S7SKoeOJ
+ gp4IkGEbBdRa/3g7f7TB79rpRqzIHVNKQ61BW10/nglfUQup6PUM3HyD+eBt46D9wUwc
+ GoX22Ro7BQsFkpWlRO34sK2EdnbFK57XPPIq+iDQXmZaq70ldIidQxYTlN3zix8c4Se3 pw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 325k368j0e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 08 Jul 2020 19:53:15 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 068JnHUe167225;
+        Wed, 8 Jul 2020 19:51:14 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 325k3efsre-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 08 Jul 2020 19:51:14 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 068JpClo018936;
+        Wed, 8 Jul 2020 19:51:12 GMT
+Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 08 Jul 2020 12:51:12 -0700
+Date:   Wed, 8 Jul 2020 15:51:40 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Nico Pache <npache@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        steffen.klassert@secunet.com, daniel.m.jordan@oracle.com
+Subject: Re: [PATCH v2] Remove __init from padata_do_multithreaded and
+ padata_mt_helper.
+Message-ID: <20200708195140.hioiltf7pwppz6j7@ca-dmjordan1.us.oracle.com>
+References: <20200702155548.14690-1-npache@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200702155548.14690-1-npache@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9676 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ phishscore=0 adultscore=0 suspectscore=0 malwarescore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007080119
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9676 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 impostorscore=0 mlxscore=0
+ adultscore=0 spamscore=0 mlxlogscore=999 malwarescore=0 priorityscore=1501
+ suspectscore=0 lowpriorityscore=0 clxscore=1011 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007080119
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+(I was away for a while)
 
-Now that there's a function that calculates the SHA-256 digest of a
-buffer in one step, use it instead of sha256_init() + sha256_update() +
-sha256_final().
+On Thu, Jul 02, 2020 at 11:55:48AM -0400, Nico Pache wrote:
+> Allow padata_do_multithreaded function to be called after bootstrap.
 
-Also simplify the code by inlining calculate_sha256() into its caller
-and switching a debug log statement to use %*phN instead of bin2hex().
+The functions are __init because they're currently only needed during boot, and
+using __init allows the text to be freed once it's over, saving some memory.
 
-Acked-by: Tzung-Bi Shih <tzungbi@google.com>
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-Cc: alsa-devel@alsa-project.org
-Cc: Ard Biesheuvel <ardb@kernel.org>
-Cc: Cheng-Yi Chiang <cychiang@chromium.org>
-Cc: Enric Balletbo i Serra <enric.balletbo@collabora.com>
-Cc: Guenter Roeck <groeck@chromium.org>
-Cc: Tzung-Bi Shih <tzungbi@google.com>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- sound/soc/codecs/cros_ec_codec.c | 27 ++-------------------------
- 1 file changed, 2 insertions(+), 25 deletions(-)
+So this change, in isolation, doesn't make sense.  If there were an enhancement
+you were thinking of making, this patch could then be bundled with it so the
+change is made only when it's used.
 
-diff --git a/sound/soc/codecs/cros_ec_codec.c b/sound/soc/codecs/cros_ec_codec.c
-index 8d45c628e988..ab009c7dfdf4 100644
---- a/sound/soc/codecs/cros_ec_codec.c
-+++ b/sound/soc/codecs/cros_ec_codec.c
-@@ -103,28 +103,6 @@ static int send_ec_host_command(struct cros_ec_device *ec_dev, uint32_t cmd,
- 	return ret;
- }
- 
--static int calculate_sha256(struct cros_ec_codec_priv *priv,
--			    uint8_t *buf, uint32_t size, uint8_t *digest)
--{
--	struct sha256_state sctx;
--
--	sha256_init(&sctx);
--	sha256_update(&sctx, buf, size);
--	sha256_final(&sctx, digest);
--
--#ifdef DEBUG
--	{
--		char digest_str[65];
--
--		bin2hex(digest_str, digest, 32);
--		digest_str[64] = 0;
--		dev_dbg(priv->dev, "hash=%s\n", digest_str);
--	}
--#endif
--
--	return 0;
--}
--
- static int dmic_get_gain(struct snd_kcontrol *kcontrol,
- 			 struct snd_ctl_elem_value *ucontrol)
- {
-@@ -782,9 +760,8 @@ static int wov_hotword_model_put(struct snd_kcontrol *kcontrol,
- 	if (IS_ERR(buf))
- 		return PTR_ERR(buf);
- 
--	ret = calculate_sha256(priv, buf, size, digest);
--	if (ret)
--		goto leave;
-+	sha256(buf, size, digest);
-+	dev_dbg(priv->dev, "hash=%*phN\n", SHA256_DIGEST_SIZE, digest);
- 
- 	p.cmd = EC_CODEC_WOV_GET_LANG;
- 	ret = send_ec_host_command(priv->ec_device, EC_CMD_EC_CODEC_WOV,
--- 
-2.27.0
+However, there's still work that needs to be merged before
+padata_do_multithreaded can be called after boot.  See the parts about priority
+adjustments (MAX_NICE/renicing) and concurrency limits in this branch
 
+  https://oss.oracle.com/git/gitweb.cgi?p=linux-dmjordan.git;a=shortlog;h=refs/heads/padata-mt-wip-v0.5
+
+and the ktask discussions from linux-mm/lkml where concerns about these issues
+were raised.  I plan to post these parts fairly soon and can include you if you
+want.
