@@ -2,125 +2,105 @@ Return-Path: <SRS0=WqbL=AT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29C3FC433DF
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 11:01:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 199FCC433E3
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 11:22:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 09F63206E9
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 11:01:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E965820772
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 11:22:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EE3TJ5We"
+	dkim=pass (2048-bit key) header.d=tessares-net.20150623.gappssmtp.com header.i=@tessares-net.20150623.gappssmtp.com header.b="KOb2LUhR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726110AbgGHLBl (ORCPT
+        id S1728743AbgGHLWj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Jul 2020 07:01:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51013 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728385AbgGHLBk (ORCPT
+        Wed, 8 Jul 2020 07:22:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49030 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728739AbgGHLWi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Jul 2020 07:01:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594206099;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7mpwcBcVOqWo2vWhK3ZHzCBKqd/c7GeCFs8iwgkkI1Y=;
-        b=EE3TJ5WeC+RalkIyh1XUUWGBFOaeP5t/zclKYlyDQtC4lx/feGiGOcn0BmdeSgJh9iceWe
-        vrTM07rlwI/hSx9A56hCXQjtOr6rtULXDL9KvO7YPUuOYGNNpZT3ec92oOK3meDBK7svLV
-        ZEFKQYVZGW5fo2HXuGU3cOWg5k6dCek=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-nwd-k0FvP8CooNetnBce4Q-1; Wed, 08 Jul 2020 07:01:37 -0400
-X-MC-Unique: nwd-k0FvP8CooNetnBce4Q-1
-Received: by mail-ed1-f71.google.com with SMTP id v8so51861221edj.4
-        for <linux-crypto@vger.kernel.org>; Wed, 08 Jul 2020 04:01:37 -0700 (PDT)
+        Wed, 8 Jul 2020 07:22:38 -0400
+Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53094C08C5DC
+        for <linux-crypto@vger.kernel.org>; Wed,  8 Jul 2020 04:22:38 -0700 (PDT)
+Received: by mail-ed1-x542.google.com with SMTP id d16so34727820edz.12
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Jul 2020 04:22:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tessares-net.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=h/VDi0L0Er+y9QclCR5p4bjYMCfPyQVnSdjE6u0pVME=;
+        b=KOb2LUhR1PzjqmCcFbd3YvNvuCQrSNrQ+bM4m0Kw97utCLXMqh0W0nSJn2eZcLx8bH
+         sE5LiiqFE/S5jsfPsp7Vsf5pRrr9eYzUu+W+8cm7YgbkDysxiiJJPrNazochPdBK0BQ0
+         obQWewF/eF9NhZ6sI3s7N1r7e6OEzXnswlmVdixYwhhSe5Q1yHLlizho1xey2Z/bmoPj
+         6OKmz1BemLHsWFKF5LWpWR+417V5vI4cTuYuZejh24LwIxh/Fzia11HgdorM3xA2EDCf
+         lwpNGhb4IrqFbKASBBcc9YXYxZ/qE3vKrh4fdOrS87Q+zDEjFu0k7ib08WId9GuopwfI
+         o/oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=7mpwcBcVOqWo2vWhK3ZHzCBKqd/c7GeCFs8iwgkkI1Y=;
-        b=TibICvBMzOgzl3T+vGPRd8wfB7Xvou+Kv92YrlRK8oSqYFe7CgJ9ZI5y5Uc/G0w6aS
-         TwKcF63zeea/SgXtIJjRpp1ByEIS0lacLpCOXZpVyGZsLDhMkHt2OgvlKJ4e6lazxUpk
-         fuzhMvh3bwN41Nl9/5SBiSCHT6lDFut32onveIk2CDfCbuGuS2yXalAJaCREd/sblZn5
-         NmvYStwdstUXQ3zIXhNMDPts7AaWYyqXe8QIw40UjWsJVlzO6TA7gVyZffKnh9wHQxdv
-         YmKUgvZCU8yvIpTIzJuOOlSLnHYzhw/Wbq3RH1P5mMW7xb0DU2WQm8Z3KRs9cCh+CEEa
-         BoTQ==
-X-Gm-Message-State: AOAM531v8vyLgT+FjRtp4tcKhqrboum4OvF4joCnvUA4psXP0Wyn+sUP
-        nYJs4GoYlFBoLO2fCPNEjsw/4DLEAY5q9JM1BG2sQfRbjDf1ZnWzQPjPwV2qUbxETvGStUUvtrG
-        z1ufA8IK/rJM6wwRjyTW9WGDy
-X-Received: by 2002:a05:6402:543:: with SMTP id i3mr45729410edx.182.1594206096366;
-        Wed, 08 Jul 2020 04:01:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxQYOwlXd9z9b5GX8vCI0fodR5ilbW7iNNKfVwmUo6weDMlbUb4GtDXfKFHOnZT9ZrFR1YyRw==
-X-Received: by 2002:a05:6402:543:: with SMTP id i3mr45729373edx.182.1594206096112;
-        Wed, 08 Jul 2020 04:01:36 -0700 (PDT)
-Received: from x1.localdomain (2001-1c00-0c0c-fe00-d2ea-f29d-118b-24dc.cable.dynamic.v6.ziggo.nl. [2001:1c00:c0c:fe00:d2ea:f29d:118b:24dc])
-        by smtp.gmail.com with ESMTPSA id dt22sm1881261ejc.104.2020.07.08.04.01.34
+        bh=h/VDi0L0Er+y9QclCR5p4bjYMCfPyQVnSdjE6u0pVME=;
+        b=qeI0OlhHN6P2UQYOAr4BhhDNWBfCyfsb3Gk4XzVZHWB93FR1mLJJPfaw2ITSnBtucr
+         V1vY1NvuTcyTMYW/8+SFXcL1ch21v9dvCMFd5w5NP7J4AQHWrYVCjmenOJQyfHc+8Ofp
+         3zmapO0z5EW26MnnRCntUjWPwEChRnUByGftU6UzahnO/b6fV89T+Typ8Z0aweJxToN0
+         4aP2VPPQcxj112vSlhnv7l1SLA6PQOKuNvrJ3icC2NNj1JfEHer5AV77Pasp1B4D2+7P
+         ZgcAUHZFWQEMIsMJ0D5q3f8OUBSs6X3Q0bJMBSxYf8cErzwrFFdJ/86CxEZBD/YYNHRB
+         ebmQ==
+X-Gm-Message-State: AOAM533Ta/5X5CbAobSIalgw2/hvP0E4Gfjtv6TA/8819u/z9PYlRLVV
+        OQVBbtnxDTufZs3BdC312WhbhFWuwdbsRw==
+X-Google-Smtp-Source: ABdhPJxPKT5AlZ5E6geliL4zRlpJ07D1oZ+2Cv+mEKGPOO/mzcI/tb6aRKZi5x0wyBCm3k32FR10xA==
+X-Received: by 2002:a50:bf09:: with SMTP id f9mr6963961edk.249.1594207357033;
+        Wed, 08 Jul 2020 04:22:37 -0700 (PDT)
+Received: from tsr-lap-08.nix.tessares.net ([81.246.10.41])
+        by smtp.gmail.com with ESMTPSA id p18sm1845132ejm.55.2020.07.08.04.22.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jul 2020 04:01:35 -0700 (PDT)
-Subject: Re: [PATCH 0/4] crypto: add sha256() function
+        Wed, 08 Jul 2020 04:22:36 -0700 (PDT)
+Subject: Re: [PATCH 3/4] mptcp: use sha256() instead of open coding
 To:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     alsa-devel@alsa-project.org, Ard Biesheuvel <ardb@kernel.org>,
-        Cheng-Yi Chiang <cychiang@chromium.org>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        Guenter Roeck <groeck@chromium.org>, linux-efi@vger.kernel.org,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        mptcp@lists.01.org, Tzung-Bi Shih <tzungbi@google.com>
+Cc:     mptcp@lists.01.org,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>
 References: <20200707185818.80177-1-ebiggers@kernel.org>
-From:   Hans de Goede <hdegoede@redhat.com>
-Message-ID: <7b5617f4-905f-5f27-9caf-3c842cbdb0d8@redhat.com>
-Date:   Wed, 8 Jul 2020 13:01:34 +0200
+ <20200707185818.80177-4-ebiggers@kernel.org>
+From:   Matthieu Baerts <matthieu.baerts@tessares.net>
+Message-ID: <b69102bb-47a0-567b-0e02-b572a9b1bbbf@tessares.net>
+Date:   Wed, 8 Jul 2020 13:22:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200707185818.80177-1-ebiggers@kernel.org>
+In-Reply-To: <20200707185818.80177-4-ebiggers@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+Hi Eric,
 
-On 7/7/20 8:58 PM, Eric Biggers wrote:
-> This series adds a function sha256() to the sha256 library so that users
-> who want to compute a hash in one step can just call sha256() instead of
-> sha256_init() + sha256_update() + sha256_final().
+On 07/07/2020 20:58, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Patches 2-4 then convert some users to use it.
+> Now that there's a function that calculates the SHA-256 digest of a
+> buffer in one step, use it instead of sha256_init() + sha256_update() +
+> sha256_final().
 > 
-> Eric Biggers (4):
->    crypto: lib/sha256 - add sha256() function
->    efi: use sha256() instead of open coding
->    mptcp: use sha256() instead of open coding
->    ASoC: cros_ec_codec: use sha256() instead of open coding
-> 
->   drivers/firmware/efi/embedded-firmware.c |  9 +++-----
->   include/crypto/sha.h                     |  1 +
->   lib/crypto/sha256.c                      | 10 +++++++++
->   net/mptcp/crypto.c                       | 15 +++----------
->   sound/soc/codecs/cros_ec_codec.c         | 27 ++----------------------
->   5 files changed, 19 insertions(+), 43 deletions(-)
-> 
-> 
-> base-commit: 57c8aa43b9f272c382c253573c82be5cb68fe22d
+> Cc: mptcp@lists.01.org
+> Cc: Mat Martineau <mathew.j.martineau@linux.intel.com>
+> Cc: Matthieu Baerts <matthieu.baerts@tessares.net>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-I've done some quick tests on this series to make sure that
-the efi embedded-firmware support did not regress.
-That still works fine, so this series is;
+Thank you for this simplification and update MPTCP code, it's clearer!
 
-Tested-by: Hans de Goede <hdegoede@redhat.com>
+Acked-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 
-Regards,
-
-Hans
-
+Cheers,
+Matt
+-- 
+Tessares | Belgium | Hybrid Access Solutions
+www.tessares.net
