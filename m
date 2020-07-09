@@ -6,62 +6,52 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72012C433E0
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jul 2020 08:22:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19C99C433E0
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jul 2020 08:23:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4FC8C2074B
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jul 2020 08:22:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7E162074B
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jul 2020 08:23:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726247AbgGIIWE (ORCPT
+        id S1726245AbgGIIXB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Jul 2020 04:22:04 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:35076 "EHLO fornost.hmeau.com"
+        Thu, 9 Jul 2020 04:23:01 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:35082 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726215AbgGIIWE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Jul 2020 04:22:04 -0400
+        id S1726151AbgGIIXB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Jul 2020 04:23:01 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jtRoe-000729-CB; Thu, 09 Jul 2020 18:22:01 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 09 Jul 2020 18:22:00 +1000
-Date:   Thu, 9 Jul 2020 18:22:00 +1000
+        id 1jtRpa-00073J-OV; Thu, 09 Jul 2020 18:22:59 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 09 Jul 2020 18:22:58 +1000
+Date:   Thu, 9 Jul 2020 18:22:58 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Ard Biesheuvel <ardb@kernel.org>
 Cc:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 5/5] crypto: arm/ghash - use variably sized key struct
-Message-ID: <20200709082200.GA1892@gondor.apana.org.au>
+Subject: Re: [PATCH 3/5] crypto: arm64/gcm - use variably sized key struct
+Message-ID: <20200709082258.GB1892@gondor.apana.org.au>
 References: <20200629073925.127538-1-ardb@kernel.org>
- <20200629073925.127538-6-ardb@kernel.org>
+ <20200629073925.127538-4-ardb@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200629073925.127538-6-ardb@kernel.org>
+In-Reply-To: <20200629073925.127538-4-ardb@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 29, 2020 at 09:39:25AM +0200, Ard Biesheuvel wrote:
-> Of the two versions of GHASH that the ARM driver implements, only one
-> performs aggregation, and so the other one has no use for the powers
-> of H to be precomputed, or space to be allocated for them in the key
-> struct. So make the context size dependent on which version is being
-> selected, and while at it, use a static key to carry this decision,
-> and get rid of the function pointer.
+On Mon, Jun 29, 2020 at 09:39:23AM +0200, Ard Biesheuvel wrote:
+> Now that the ghash and gcm drivers are split, we no longer need to allocate
+> a key struct for the former that carries powers of H that are only used by
+> the latter. Also, take this opportunity to clean up the code a little bit.
 > 
 > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 > ---
->  arch/arm/crypto/ghash-ce-glue.c | 51 +++++++++-----------
->  1 file changed, 24 insertions(+), 27 deletions(-)
+>  arch/arm64/crypto/ghash-ce-glue.c | 49 +++++++++-----------
+>  1 file changed, 21 insertions(+), 28 deletions(-)
 
-This introduces some new sparse warnings:
-
-../arch/arm/crypto/ghash-ce-glue.c:67:65: warning: incorrect type in argument 4 (different modifiers)
-../arch/arm/crypto/ghash-ce-glue.c:67:65:    expected unsigned long long const [usertype] ( *h )[2]
-../arch/arm/crypto/ghash-ce-glue.c:67:65:    got unsigned long long [usertype] ( * )[2]
-../arch/arm/crypto/ghash-ce-glue.c:69:64: warning: incorrect type in argument 4 (different modifiers)
-../arch/arm/crypto/ghash-ce-glue.c:69:64:    expected unsigned long long const [usertype] ( *h )[2]
-../arch/arm/crypto/ghash-ce-glue.c:69:64:    got unsigned long long [usertype] ( * )[2]
+sparse doesn't like this patch either.
 
 Thanks,
 -- 
