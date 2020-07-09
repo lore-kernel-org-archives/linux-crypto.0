@@ -6,45 +6,46 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60CABC433DF
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jul 2020 07:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7072DC433E0
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jul 2020 07:39:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 39D2320674
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jul 2020 07:17:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45E612073A
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jul 2020 07:39:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ivX/wcA8";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Xr1H0has"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="eg3Q+4u1";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="KTfzcCae"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726251AbgGIHRU (ORCPT
+        id S1726194AbgGIHjJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Jul 2020 03:17:20 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:33240 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726245AbgGIHRU (ORCPT
+        Thu, 9 Jul 2020 03:39:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39648 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726006AbgGIHjJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Jul 2020 03:17:20 -0400
-Date:   Thu, 9 Jul 2020 09:17:14 +0200
+        Thu, 9 Jul 2020 03:39:09 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 131B1C061A0B;
+        Thu,  9 Jul 2020 00:39:09 -0700 (PDT)
+Date:   Thu, 9 Jul 2020 09:39:05 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1594279037;
+        s=2020; t=1594280347;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6uvYIItZIOK0R4wH3joTqVI6bbknAt5GZqDgVVXvw94=;
-        b=ivX/wcA8yl6+WDr/PSAfeuS1zFMv0eLbo59MePRqPlK2V7NvwFhv0Ro419IEM1gKsPV3XI
-        m9WBXD5kfNaivslg2UKv/BPaPI3g5H+cI8fRYI0YsAeLg+qk1FmdHkPUq8DuwnsLI45Sjo
-        LDpntlgZigKa7o6aSdaGa5ZCnrYg2znt+rPszYEk9HU7XtTEqbGrGc/w1pK2f6O1WCsGGe
-        sc1oJMLUsAHzB718sQgYlMabkOYD7pdaTG7KTrJkBRRWy1KYpEpJPvSiXiFew1l+NZHkVn
-        kDT8e/kbTu6jIvukJ35/Fcd6SGQILl3Okd4MG8OK1ZiRRkmEJJAOgxoQrxDgIQ==
+        bh=9iDuCPY5jQD/QE0vjfP0a2K9MiEkv+fafOh2l6dUgtQ=;
+        b=eg3Q+4u1Jkv/Kn5+vvvuWi/l0zsTaal1qOeVcF6HT01CBEq/I82eHHL1HpKwoLiXp+zMbJ
+        7rNCoW2CDsD2XwouMOsR/VdBNuVcabqS28PLIOigPwHkH/x09iSxxGbvF2wXqDZNoVW/7/
+        3eWIeGfBndrDJRV/fkvsn9LdoLCKO0mMPZUmzin8Sza5d+K6pBWBEnuKFBcOO3yjVqxSd1
+        19GathtpXqFwljq5K9M3aeJ2Lkro6SeRrEFKuCq5hXJcg0L8qG1K/adJyXlHIOX6s4rKXC
+        KMjl01whu/u63DVoU5bAXutnVDC8rMEDUfzAEpLy/+pYqA71+4sgLoWBK3Dibw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1594279037;
+        s=2020e; t=1594280347;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6uvYIItZIOK0R4wH3joTqVI6bbknAt5GZqDgVVXvw94=;
-        b=Xr1H0hash7LO3/io7vz4F1I6IM9WHpheIVNzUMTTxFv2OgsEZceeeIr4kkfcxWgBrGP2xW
-        6g3qguXMUqJekdCA==
+        bh=9iDuCPY5jQD/QE0vjfP0a2K9MiEkv+fafOh2l6dUgtQ=;
+        b=KTfzcCae9F6ml/fMfVsarbSqtOzXHPyKmy9J6NmM0RURPwLtWxlU3+PjTA4wqLG1EUYvJ4
+        9+z+5he+1U8aAGAQ==
 From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 To:     "Song Bao Hua (Barry Song)" <song.bao.hua@hisilicon.com>
 Cc:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
@@ -63,69 +64,70 @@ Cc:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
         Colin Ian King <colin.king@canonical.com>
 Subject: Re: [PATCH v4] mm/zswap: move to use crypto_acomp API for hardware
  acceleration
-Message-ID: <20200709071714.32m7hatmkr4pk2f4@linutronix.de>
+Message-ID: <20200709073905.lgs5kvccnz6eqsyd@linutronix.de>
 References: <20200707125210.33256-1-song.bao.hua@hisilicon.com>
  <20200708145934.4w3qk53mgavyyln7@linutronix.de>
- <B926444035E5E2439431908E3842AFD2560DE6@DGGEMI525-MBS.china.huawei.com>
+ <B926444035E5E2439431908E3842AFD25610B7@DGGEMI525-MBS.china.huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <B926444035E5E2439431908E3842AFD2560DE6@DGGEMI525-MBS.china.huawei.com>
+In-Reply-To: <B926444035E5E2439431908E3842AFD25610B7@DGGEMI525-MBS.china.huawei.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2020-07-08 21:45:47 [+0000], Song Bao Hua (Barry Song) wrote:
-> > On 2020-07-08 00:52:10 [+1200], Barry Song wrote:
-> > > @@ -127,9 +129,17 @@
-> > > +struct crypto_acomp_ctx {
-> > > +	struct crypto_acomp *acomp;
-> > > +	struct acomp_req *req;
-> > > +	struct crypto_wait wait;
-> > > +	u8 *dstmem;
-> > > +	struct mutex mutex;
-> > > +};
-> > =E2=80=A6
-> > > @@ -1074,12 +1138,32 @@ static int zswap_frontswap_store(unsigned
-> > type, pgoff_t offset,
-> > >  	}
-> > >
-> > >  	/* compress */
-> > > -	dst =3D get_cpu_var(zswap_dstmem);
-> > > -	tfm =3D *get_cpu_ptr(entry->pool->tfm);
-> > > -	src =3D kmap_atomic(page);
-> > > -	ret =3D crypto_comp_compress(tfm, src, PAGE_SIZE, dst, &dlen);
-> > > -	kunmap_atomic(src);
-> > > -	put_cpu_ptr(entry->pool->tfm);
-> > > +	acomp_ctx =3D *this_cpu_ptr(entry->pool->acomp_ctx);
-> > > +
-> > > +	mutex_lock(&acomp_ctx->mutex);
-> > > +
-> > > +	src =3D kmap(page);
-> > > +	dst =3D acomp_ctx->dstmem;
-> >=20
-> > that mutex is per-CPU, per-context. The dstmem pointer is per-CPU. So if
-> > I read this right, you can get preempted after crypto_wait_req() and
-> > another context in this CPU writes its data to the same dstmem and then=
-=E2=80=A6
-> >=20
->=20
-> This isn't true. Another thread in this cpu will be blocked by the mutex.
-> It is impossible for two threads to write the same dstmem.
-> If thread1 ran on cpu1, it held cpu1's mutex; if another thread wants to =
-run on cpu1, it is blocked.
-> If thread1 ran on cpu1 first, it held cpu1's mutex, then it migrated to c=
-pu2 (with very rare chance)
-> 	a. if another thread wants to run on cpu1, it is blocked;
+On 2020-07-09 01:32:38 [+0000], Song Bao Hua (Barry Song) wrote:
+> > This looks using the same synchronous mechanism around an asynchronous
+> > interface. It works as a PoC.
+> > 
+> > As far as I remember the crypto async interface, the incoming skbs were fed to
+> > the async interface and returned to the caller so the NIC could continue
+> > allocate new RX skbs and move on. Only if the queue of requests was getting
+> > to long the code started to throttle. Eventually the async crypto code
+> > completed the decryption operation in a different context and fed the
+> > decrypted packet(s) into the stack.
+> > 
+> > From a quick view, you would have to return -EINPROGRESS here and have at
+> > the caller side something like that:
+> > 
+> > iff --git a/mm/page_io.c b/mm/page_io.c
+> > index e8726f3e3820b..9d1baa46ec3ed 100644
+> > --- a/mm/page_io.c
+> > +++ b/mm/page_io.c
+> > @@ -252,12 +252,15 @@ int swap_writepage(struct page *page, struct
+> > writeback_control *wbc)
+> >                 unlock_page(page);
+> >                 goto out;
+> >         }
+> > -       if (frontswap_store(page) == 0) {
+> > +       ret = frontswap_store(page);
+> > +       if (ret == 0) {
+> >                 set_page_writeback(page);
+> >                 unlock_page(page);
+> >                 end_page_writeback(page);
+> >                 goto out;
+> >         }
+> > +       if (ret = -EINPROGRESS)
+> > +               goto out;
+> >         ret = __swap_writepage(page, wbc, end_swap_bio_write);
+> >  out:
+> >         return ret;
+> > 
+> Unfortunately, this is not true and things are not that simple.
+> 
+> We can't simply depend on -EINPROGRESS and go out.
+> We have to wait for the result of compression to decide if we should
+> do __swap_writepage(). As one page might be compressed into two
+> pages, in this case, we will still need to do _swap_writepage().
+> As I replied in the latest email, all of the async improvement to frontswap
+> needs very careful thinking and benchmark. It can only happen after
+> we build the base in this patch, fixing the broken connection between
+> zswap and those new zip drivers.
 
-How it is blocked? That "struct crypto_acomp_ctx" is
-"this_cpu_ptr(entry->pool->acomp_ctx)" - which is per-CPU of a pool
-which you can have multiple of. But `dstmem' you have only one per-CPU
-no matter have many pools you have.
-So pool1 on CPU1 uses the same `dstmem' as pool2 on CPU1. But pool1 and
-pool2 on CPU1 use a different mutex for protection of this `dstmem'.
+At the time the compression finishes you see what happens and based on
+the design you can either complete it immediately (the 0/error case from
+above) or forward the result to the caller and let him decide.
 
 > Thanks
 > Barry
