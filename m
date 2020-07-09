@@ -1,190 +1,65 @@
-Return-Path: <SRS0=WqbL=AT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=b7AZ=AU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1368DC433DF
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 21:45:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C93C433E0
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jul 2020 00:47:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E2A51206C3
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jul 2020 21:45:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A930C20708
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jul 2020 00:47:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725787AbgGHVp4 (ORCPT
+        id S1725982AbgGIAre (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Jul 2020 17:45:56 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2633 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725446AbgGHVp4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Jul 2020 17:45:56 -0400
-Received: from dggemi404-hub.china.huawei.com (unknown [172.30.72.53])
-        by Forcepoint Email with ESMTP id A79F09D79AE26EB6C5FD;
-        Thu,  9 Jul 2020 05:45:53 +0800 (CST)
-Received: from DGGEMI525-MBS.china.huawei.com ([169.254.6.177]) by
- dggemi404-hub.china.huawei.com ([10.3.17.142]) with mapi id 14.03.0487.000;
- Thu, 9 Jul 2020 05:45:48 +0800
-From:   "Song Bao Hua (Barry Song)" <song.bao.hua@hisilicon.com>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-CC:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        "Luis Claudio R . Goncalves" <lgoncalv@redhat.com>,
-        Mahipal Challa <mahipalreddy2006@gmail.com>,
-        Seth Jennings <sjenning@redhat.com>,
-        Dan Streetman <ddstreet@ieee.org>,
-        Vitaly Wool <vitaly.wool@konsulko.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
-        "Colin Ian King" <colin.king@canonical.com>
-Subject: RE: [PATCH v4] mm/zswap: move to use crypto_acomp API for hardware
- acceleration
-Thread-Topic: [PATCH v4] mm/zswap: move to use crypto_acomp API for hardware
- acceleration
-Thread-Index: AQHWVF24fP2q5El5/U63jMMAkQc326j9QfAAgADy42A=
-Date:   Wed, 8 Jul 2020 21:45:47 +0000
-Message-ID: <B926444035E5E2439431908E3842AFD2560DE6@DGGEMI525-MBS.china.huawei.com>
-References: <20200707125210.33256-1-song.bao.hua@hisilicon.com>
- <20200708145934.4w3qk53mgavyyln7@linutronix.de>
-In-Reply-To: <20200708145934.4w3qk53mgavyyln7@linutronix.de>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.126.202.83]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Wed, 8 Jul 2020 20:47:34 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:34418 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725903AbgGIAre (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 8 Jul 2020 20:47:34 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1jtKin-0001rg-3k; Thu, 09 Jul 2020 10:47:30 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 09 Jul 2020 10:47:29 +1000
+Date:   Thu, 9 Jul 2020 10:47:29 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Subject: Re: [PATCH] crypto: caam - Remove broken arc4 support
+Message-ID: <20200709004728.GA4492@gondor.apana.org.au>
+References: <20200702043648.GA21823@gondor.apana.org.au>
+ <31734e86-951a-6063-942a-1d62abeb5490@nxp.com>
+ <CAMj1kXGK3v+YWd6E8zNP-tKWgq+aim7X67Ze4Bxrent4hndECw@mail.gmail.com>
+ <8e974767-7aa6-c644-8562-445a90206f47@nxp.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8e974767-7aa6-c644-8562-445a90206f47@nxp.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogbGludXgtY3J5cHRvLW93
-bmVyQHZnZXIua2VybmVsLm9yZw0KPiBbbWFpbHRvOmxpbnV4LWNyeXB0by1vd25lckB2Z2VyLmtl
-cm5lbC5vcmddIE9uIEJlaGFsZiBPZiBTZWJhc3RpYW4gQW5kcnplag0KPiBTaWV3aW9yDQo+IFNl
-bnQ6IFRodXJzZGF5LCBKdWx5IDksIDIwMjAgMzowMCBBTQ0KPiBUbzogU29uZyBCYW8gSHVhIChC
-YXJyeSBTb25nKSA8c29uZy5iYW8uaHVhQGhpc2lsaWNvbi5jb20+DQo+IENjOiBha3BtQGxpbnV4
-LWZvdW5kYXRpb24ub3JnOyBoZXJiZXJ0QGdvbmRvci5hcGFuYS5vcmcuYXU7DQo+IGRhdmVtQGRh
-dmVtbG9mdC5uZXQ7IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LW1tQGt2YWNr
-Lm9yZzsNCj4gbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgTGludXhhcm0gPGxpbnV4YXJt
-QGh1YXdlaS5jb20+OyBMdWlzIENsYXVkaW8NCj4gUiAuIEdvbmNhbHZlcyA8bGdvbmNhbHZAcmVk
-aGF0LmNvbT47IE1haGlwYWwgQ2hhbGxhDQo+IDxtYWhpcGFscmVkZHkyMDA2QGdtYWlsLmNvbT47
-IFNldGggSmVubmluZ3MgPHNqZW5uaW5nQHJlZGhhdC5jb20+Ow0KPiBEYW4gU3RyZWV0bWFuIDxk
-ZHN0cmVldEBpZWVlLm9yZz47IFZpdGFseSBXb29sDQo+IDx2aXRhbHkud29vbEBrb25zdWxrby5j
-b20+OyBXYW5nemhvdSAoQikgPHdhbmd6aG91MUBoaXNpbGljb24uY29tPjsNCj4gQ29saW4gSWFu
-IEtpbmcgPGNvbGluLmtpbmdAY2Fub25pY2FsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2
-NF0gbW0venN3YXA6IG1vdmUgdG8gdXNlIGNyeXB0b19hY29tcCBBUEkgZm9yDQo+IGhhcmR3YXJl
-IGFjY2VsZXJhdGlvbg0KPiANCj4gT24gMjAyMC0wNy0wOCAwMDo1MjoxMCBbKzEyMDBdLCBCYXJy
-eSBTb25nIHdyb3RlOg0KPiDigKYNCj4gPiBAQCAtMTI3LDkgKzEyOSwxNyBAQA0KPiBtb2R1bGVf
-cGFyYW1fbmFtZWQoc2FtZV9maWxsZWRfcGFnZXNfZW5hYmxlZCwNCj4genN3YXBfc2FtZV9maWxs
-ZWRfcGFnZXNfZW5hYmxlZCwNCj4gPiAgKiBkYXRhIHN0cnVjdHVyZXMNCj4gPiAgKioqKioqKioq
-KioqKioqKioqKioqKioqKioqKioqKioqKi8NCj4gPg0KPiA+ICtzdHJ1Y3QgY3J5cHRvX2Fjb21w
-X2N0eCB7DQo+ID4gKwlzdHJ1Y3QgY3J5cHRvX2Fjb21wICphY29tcDsNCj4gPiArCXN0cnVjdCBh
-Y29tcF9yZXEgKnJlcTsNCj4gPiArCXN0cnVjdCBjcnlwdG9fd2FpdCB3YWl0Ow0KPiA+ICsJdTgg
-KmRzdG1lbTsNCj4gPiArCXN0cnVjdCBtdXRleCBtdXRleDsNCj4gPiArfTsNCj4g4oCmDQo+ID4g
-QEAgLTU2MSw4ICs2MTQsOSBAQCBzdGF0aWMgc3RydWN0IHpzd2FwX3Bvb2wgKnpzd2FwX3Bvb2xf
-Y3JlYXRlKGNoYXINCj4gKnR5cGUsIGNoYXIgKmNvbXByZXNzb3IpDQo+ID4gIAlwcl9kZWJ1Zygi
-dXNpbmcgJXMgenBvb2xcbiIsIHpwb29sX2dldF90eXBlKHBvb2wtPnpwb29sKSk7DQo+ID4NCj4g
-PiAgCXN0cmxjcHkocG9vbC0+dGZtX25hbWUsIGNvbXByZXNzb3IsIHNpemVvZihwb29sLT50Zm1f
-bmFtZSkpOw0KPiA+IC0JcG9vbC0+dGZtID0gYWxsb2NfcGVyY3B1KHN0cnVjdCBjcnlwdG9fY29t
-cCAqKTsNCj4gPiAtCWlmICghcG9vbC0+dGZtKSB7DQo+ID4gKw0KPiA+ICsJcG9vbC0+YWNvbXBf
-Y3R4ID0gYWxsb2NfcGVyY3B1KHN0cnVjdCBjcnlwdG9fYWNvbXBfY3R4ICopOw0KPiANCj4gQ2Fu
-J3QgeW91IGFsbG9jYXRlIHRoZSB3aG9sZSBzdHJ1Y3R1cmUgaW5zdGVhZCBqdXN0IGEgcG9pbnRl
-ciB0byBpdD8gVGhlDQo+IHN0cnVjdHVyZSBsb29rcyBqdXN0IGxpa2UgYnVuY2ggb2YgcG9pbnRl
-cnMgYW55d2F5LiBMZXNzIHRpbWUgZm9yDQo+IHBvaW50ZXIgY2hhc2luZyBtZWFucyBtb3JlIHRp
-bWUgZm9yIGZ1bi4NCj4gDQoNClNob3VsZCBiZSBwb3NzaWJsZS4NCg0KPiA+IEBAIC0xMDc0LDEy
-ICsxMTM4LDMyIEBAIHN0YXRpYyBpbnQgenN3YXBfZnJvbnRzd2FwX3N0b3JlKHVuc2lnbmVkDQo+
-IHR5cGUsIHBnb2ZmX3Qgb2Zmc2V0LA0KPiA+ICAJfQ0KPiA+DQo+ID4gIAkvKiBjb21wcmVzcyAq
-Lw0KPiA+IC0JZHN0ID0gZ2V0X2NwdV92YXIoenN3YXBfZHN0bWVtKTsNCj4gPiAtCXRmbSA9ICpn
-ZXRfY3B1X3B0cihlbnRyeS0+cG9vbC0+dGZtKTsNCj4gPiAtCXNyYyA9IGttYXBfYXRvbWljKHBh
-Z2UpOw0KPiA+IC0JcmV0ID0gY3J5cHRvX2NvbXBfY29tcHJlc3ModGZtLCBzcmMsIFBBR0VfU0la
-RSwgZHN0LCAmZGxlbik7DQo+ID4gLQlrdW5tYXBfYXRvbWljKHNyYyk7DQo+ID4gLQlwdXRfY3B1
-X3B0cihlbnRyeS0+cG9vbC0+dGZtKTsNCj4gPiArCWFjb21wX2N0eCA9ICp0aGlzX2NwdV9wdHIo
-ZW50cnktPnBvb2wtPmFjb21wX2N0eCk7DQo+ID4gKw0KPiA+ICsJbXV0ZXhfbG9jaygmYWNvbXBf
-Y3R4LT5tdXRleCk7DQo+ID4gKw0KPiA+ICsJc3JjID0ga21hcChwYWdlKTsNCj4gPiArCWRzdCA9
-IGFjb21wX2N0eC0+ZHN0bWVtOw0KPiANCj4gdGhhdCBtdXRleCBpcyBwZXItQ1BVLCBwZXItY29u
-dGV4dC4gVGhlIGRzdG1lbSBwb2ludGVyIGlzIHBlci1DUFUuIFNvIGlmDQo+IEkgcmVhZCB0aGlz
-IHJpZ2h0LCB5b3UgY2FuIGdldCBwcmVlbXB0ZWQgYWZ0ZXIgY3J5cHRvX3dhaXRfcmVxKCkgYW5k
-DQo+IGFub3RoZXIgY29udGV4dCBpbiB0aGlzIENQVSB3cml0ZXMgaXRzIGRhdGEgdG8gdGhlIHNh
-bWUgZHN0bWVtIGFuZCB0aGVu4oCmDQo+IA0KDQpUaGlzIGlzbid0IHRydWUuIEFub3RoZXIgdGhy
-ZWFkIGluIHRoaXMgY3B1IHdpbGwgYmUgYmxvY2tlZCBieSB0aGUgbXV0ZXguDQpJdCBpcyBpbXBv
-c3NpYmxlIGZvciB0d28gdGhyZWFkcyB0byB3cml0ZSB0aGUgc2FtZSBkc3RtZW0uDQpJZiB0aHJl
-YWQxIHJhbiBvbiBjcHUxLCBpdCBoZWxkIGNwdTEncyBtdXRleDsgaWYgYW5vdGhlciB0aHJlYWQg
-d2FudHMgdG8gcnVuIG9uIGNwdTEsIGl0IGlzIGJsb2NrZWQuDQpJZiB0aHJlYWQxIHJhbiBvbiBj
-cHUxIGZpcnN0LCBpdCBoZWxkIGNwdTEncyBtdXRleCwgdGhlbiBpdCBtaWdyYXRlZCB0byBjcHUy
-ICh3aXRoIHZlcnkgcmFyZSBjaGFuY2UpDQoJYS4gaWYgYW5vdGhlciB0aHJlYWQgd2FudHMgdG8g
-cnVuIG9uIGNwdTEsIGl0IGlzIGJsb2NrZWQ7DQoJYi4gaWYgYW5vdGhlciB0aHJlYWQgd2FudHMg
-dG8gcnVuIG9uIGNwdTIsIGl0IGlzIG5vdCBibG9ja2VkIGJ1dCBpdCB3aWxsIHdyaXRlIGNwdTIn
-cyBkc3RtZW0gbm90IGNwdTEncw0KDQo+ID4gKwlzZ19pbml0X29uZSgmaW5wdXQsIHNyYywgUEFH
-RV9TSVpFKTsNCj4gPiArCS8qIHpzd2FwX2RzdG1lbSBpcyBvZiBzaXplIChQQUdFX1NJWkUgKiAy
-KS4gUmVmbGVjdCBzYW1lIGluIHNnX2xpc3QgKi8NCj4gPiArCXNnX2luaXRfb25lKCZvdXRwdXQs
-IGRzdCwgUEFHRV9TSVpFICogMik7DQo+ID4gKwlhY29tcF9yZXF1ZXN0X3NldF9wYXJhbXMoYWNv
-bXBfY3R4LT5yZXEsICZpbnB1dCwgJm91dHB1dCwNCj4gUEFHRV9TSVpFLCBkbGVuKTsNCj4gPiAr
-CS8qDQo+ID4gKwkgKiBpdCBtYXliZSBsb29rcyBhIGxpdHRsZSBiaXQgc2lsbHkgdGhhdCB3ZSBz
-ZW5kIGFuIGFzeW5jaHJvbm91cyByZXF1ZXN0LA0KPiA+ICsJICogdGhlbiB3YWl0IGZvciBpdHMg
-Y29tcGxldGlvbiBzeW5jaHJvbm91c2x5LiBUaGlzIG1ha2VzIHRoZSBwcm9jZXNzDQo+IGxvb2sN
-Cj4gPiArCSAqIHN5bmNocm9ub3VzIGluIGZhY3QuDQo+ID4gKwkgKiBUaGVvcmV0aWNhbGx5LCBh
-Y29tcCBzdXBwb3J0cyB1c2VycyBzZW5kIG11bHRpcGxlIGFjb21wIHJlcXVlc3RzIGluDQo+IG9u
-ZQ0KPiA+ICsJICogYWNvbXAgaW5zdGFuY2UsIHRoZW4gZ2V0IHRob3NlIHJlcXVlc3RzIGRvbmUg
-c2ltdWx0YW5lb3VzbHkuIGJ1dCBpbg0KPiB0aGlzDQo+ID4gKwkgKiBjYXNlLCBmcm9udHN3YXAg
-YWN0dWFsbHkgZG9lcyBzdG9yZSBhbmQgbG9hZCBwYWdlIGJ5IHBhZ2UsIHRoZXJlIGlzIG5vDQo+
-ID4gKwkgKiBleGlzdGluZyBtZXRob2QgdG8gc2VuZCB0aGUgc2Vjb25kIHBhZ2UgYmVmb3JlIHRo
-ZSBmaXJzdCBwYWdlIGlzIGRvbmUNCj4gPiArCSAqIGluIG9uZSB0aHJlYWQgZG9pbmcgZnJvbnRz
-d2FwLg0KPiA+ICsJICogYnV0IGluIGRpZmZlcmVudCB0aHJlYWRzIHJ1bm5pbmcgb24gZGlmZmVy
-ZW50IGNwdSwgd2UgaGF2ZSBkaWZmZXJlbnQNCj4gPiArCSAqIGFjb21wIGluc3RhbmNlLCBzbyBt
-dWx0aXBsZSB0aHJlYWRzIGNhbiBkbyAoZGUpY29tcHJlc3Npb24gaW4NCj4gcGFyYWxsZWwuDQo+
-ID4gKwkgKi8NCj4gPiArCXJldCA9IGNyeXB0b193YWl0X3JlcShjcnlwdG9fYWNvbXBfY29tcHJl
-c3MoYWNvbXBfY3R4LT5yZXEpLA0KPiAmYWNvbXBfY3R4LT53YWl0KTsNCj4gPiArCWRsZW4gPSBh
-Y29tcF9jdHgtPnJlcS0+ZGxlbjsNCj4gPiArCWt1bm1hcChwYWdlKTsNCj4gPiArDQo+ID4gIAlp
-ZiAocmV0KSB7DQo+ID4gIAkJcmV0ID0gLUVJTlZBTDsNCj4gPiAgCQlnb3RvIHB1dF9kc3RtZW07
-DQo+IA0KPiBUaGlzIGxvb2tzIHVzaW5nIHRoZSBzYW1lIHN5bmNocm9ub3VzIG1lY2hhbmlzbSBh
-cm91bmQgYW4gYXN5bmNocm9ub3VzDQo+IGludGVyZmFjZS4gSXQgd29ya3MgYXMgYSBQb0MuDQo+
-IA0KPiBBcyBmYXIgYXMgSSByZW1lbWJlciB0aGUgY3J5cHRvIGFzeW5jIGludGVyZmFjZSwgdGhl
-IGluY29taW5nIHNrYnMgd2VyZQ0KPiBmZWQgdG8gdGhlIGFzeW5jIGludGVyZmFjZSBhbmQgcmV0
-dXJuZWQgdG8gdGhlIGNhbGxlciBzbyB0aGUgTklDIGNvdWxkDQo+IGNvbnRpbnVlIGFsbG9jYXRl
-IG5ldyBSWCBza2JzIGFuZCBtb3ZlIG9uLiBPbmx5IGlmIHRoZSBxdWV1ZSBvZiByZXF1ZXN0cw0K
-PiB3YXMgZ2V0dGluZyB0byBsb25nIHRoZSBjb2RlIHN0YXJ0ZWQgdG8gdGhyb3R0bGUuIEV2ZW50
-dWFsbHkgdGhlIGFzeW5jDQo+IGNyeXB0byBjb2RlIGNvbXBsZXRlZCB0aGUgZGVjcnlwdGlvbiBv
-cGVyYXRpb24gaW4gYSBkaWZmZXJlbnQgY29udGV4dA0KPiBhbmQgZmVkIHRoZSBkZWNyeXB0ZWQg
-cGFja2V0KHMpIGludG8gdGhlIHN0YWNrLg0KPiANCj4gRnJvbSBhIHF1aWNrIHZpZXcsIHlvdSB3
-b3VsZCBoYXZlIHRvIHJldHVybiAtRUlOUFJPR1JFU1MgaGVyZSBhbmQgaGF2ZQ0KPiBhdCB0aGUg
-Y2FsbGVyIHNpZGUgc29tZXRoaW5nIGxpa2UgdGhhdDoNCj4gDQo+IGlmZiAtLWdpdCBhL21tL3Bh
-Z2VfaW8uYyBiL21tL3BhZ2VfaW8uYw0KPiBpbmRleCBlODcyNmYzZTM4MjBiLi45ZDFiYWE0NmVj
-M2VkIDEwMDY0NA0KPiAtLS0gYS9tbS9wYWdlX2lvLmMNCj4gKysrIGIvbW0vcGFnZV9pby5jDQo+
-IEBAIC0yNTIsMTIgKzI1MiwxNSBAQCBpbnQgc3dhcF93cml0ZXBhZ2Uoc3RydWN0IHBhZ2UgKnBh
-Z2UsIHN0cnVjdA0KPiB3cml0ZWJhY2tfY29udHJvbCAqd2JjKQ0KPiAgICAgICAgICAgICAgICAg
-dW5sb2NrX3BhZ2UocGFnZSk7DQo+ICAgICAgICAgICAgICAgICBnb3RvIG91dDsNCj4gICAgICAg
-ICB9DQo+IC0gICAgICAgaWYgKGZyb250c3dhcF9zdG9yZShwYWdlKSA9PSAwKSB7DQo+ICsgICAg
-ICAgcmV0ID0gZnJvbnRzd2FwX3N0b3JlKHBhZ2UpOw0KPiArICAgICAgIGlmIChyZXQgPT0gMCkg
-ew0KPiAgICAgICAgICAgICAgICAgc2V0X3BhZ2Vfd3JpdGViYWNrKHBhZ2UpOw0KPiAgICAgICAg
-ICAgICAgICAgdW5sb2NrX3BhZ2UocGFnZSk7DQo+ICAgICAgICAgICAgICAgICBlbmRfcGFnZV93
-cml0ZWJhY2socGFnZSk7DQo+ICAgICAgICAgICAgICAgICBnb3RvIG91dDsNCj4gICAgICAgICB9
-DQo+ICsgICAgICAgaWYgKHJldCA9IC1FSU5QUk9HUkVTUykNCj4gKyAgICAgICAgICAgICAgIGdv
-dG8gb3V0Ow0KPiAgICAgICAgIHJldCA9IF9fc3dhcF93cml0ZXBhZ2UocGFnZSwgd2JjLCBlbmRf
-c3dhcF9iaW9fd3JpdGUpOw0KPiAgb3V0Og0KPiAgICAgICAgIHJldHVybiByZXQ7DQo+IA0KPiBz
-byB0aGF0IGV2ZW50dWFsbHkgY2FsbGVycyBsaWtlIHdyaXRlX2NhY2hlX3BhZ2VzKCkgY291bGQg
-ZmVlZCBhbGwgcGFnZXMNCj4gaW50byAqd3JpdGVwYWdlIGFuZCB0aGVuIHdhaXQgZm9yIHRoYXQg
-YnVsayB0byBmaW5pc2guDQo+IA0KPiBIYXZpbmcgaXQgdGhpcyB3YXkgd291bGQgYWxzbyByZXNo
-YXBlIHRoZSBtZW1vcnkgYWxsb2NhdGlvbiB5b3UgaGF2ZS4NCj4gWW91IGhhdmUgbm93IHBlci1j
-b250ZXh0IGEgcGVyLUNQVSBjcnlwdG8gcmVxdWVzdCBhbmQgZXZlcnl0aGluZy4gV2l0aA0KPiBh
-IDY0IG9yIDEyOCBjb3JlIEknbSBub3Qgc3VyZSB5b3Ugd2lsbCB1c2UgYWxsIHRoYXQgcmVzb3Vy
-Y2VzLg0KPiBXaXRoIGEgdHJ1bHkgYXN5bmMgaW50ZXJmYWNlIHlvdSB3b3VsZCBiZSBmb3JjZSB0
-byBoYXZlIGEgcmVzb3VyY2UgcG9vbA0KPiBvciBzbyB3aGljaCB5b3Ugd291bGQgdXNlIGFuZCB0
-aGVuIG9ubHkgYWxsb3cgYSBjZXJ0YWluIGFtb3VudCBvZg0KPiBwYXJhbGxlbCByZXF1ZXN0cy4N
-Cg0KSSBhZ3JlZSB3ZSBjYW4gb3B0aW1pemUgc3dhcCwgZnJvbnRzd2FwLCBhbmQgenN3YXAgdG8g
-bWFrZSBmcm9udHN3YXAgYXN5bmMgdG8NCmltcHJvdmUgcGVyZm9ybWFuY2UuIEJ1dCB0aGlzIG5l
-ZWRzIHZlcnkgY2FyZWZ1bCB0aGlua2luZyBhbmQgYmVuY2htYXJrLiBXZQ0KbmVlZCBiZW5jaG1h
-cmsgdG8gcHJvdmUgdGhlIHBlcmZvcm1hbmNlIGltcHJvdmVtZW50IGZvciBtYWtpbmcgdGhvc2Ug
-Y2hhbmdlcy4NCkkgYW0gdmVyeSBpbnRlcmVzdGVkIGluIGZpZ3VyaW5nIG91dCBhIHBhdGNoc2V0
-IGZvciB0aGF0LiBCdXQgZm9yIHRoZSBmaXJzdCBzdGVwLA0Kd2UgbmVlZCB0byBidWlsZCBhIGJh
-c2Ugc28gdGhhdCBldmVyeXRoaW5nIGVsc2UgY2FuIG1vdmUgYWhlYWQuIFJpZ2h0IG5vdywgenN3
-YXANCnJlYWxseSBjYW4ndCB3b3JrIG9uIG5ldyBjb21wcmVzc2lvbiBkcml2ZXJzLiBBZnRlciB3
-ZSBoYXZlIGEgYmFzZSwgd2UgY2FuIHJ1bg0KbWFueSB0aGluZ3MgaW50ZXJlc3RpbmcsIGluY2x1
-ZGluZyBtYWtpbmcgZnJvbnRzd2FwIG1vcmUgZWZmaWNpZW50Lg0KDQo+IA0KPiBTZWJhc3RpYW4N
-Cg0KVGhhbmtzDQpCYXJyeQ0KDQo=
+On Wed, Jul 08, 2020 at 07:24:08PM +0300, Horia Geantă wrote:
+> 
+> I think the commit message should be updated to reflect this logic:
+> indeed, caam's implementation of ecb(arc4) is broken,
+> but instead of fixing it, crypto API-based ecb(arc4)
+> is removed completely from the kernel (hence from caam driver)
+> due to skcipher limitations in terms of handling the keystream.
+
+Actually that's not quite true.  The reason I create this patch
+in the first place is to remove this limitation from skcipher.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
