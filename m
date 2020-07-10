@@ -2,88 +2,89 @@ Return-Path: <SRS0=tT4M=AV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6101FC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jul 2020 15:10:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B84C433E1
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jul 2020 15:37:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B862020720
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jul 2020 15:10:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="svnXObgB"
+	by mail.kernel.org (Postfix) with ESMTP id 403C120748
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jul 2020 15:37:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1594395466;
+	bh=jf8q7n27+kP9L8DDPlNvcNUJRjNvy/mml7kUbzQ89Oo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:List-ID:From;
+	b=bwEe0vE8HW79FLkIXnS73hbWGccqq9u1S8TAw4zH4KwcybXfrhWsCJWdO7jRGaG71
+	 mxmdE79HuH9qlUTx/Mrwj0ycmTdJlYZ+bfJ50mDjPtfFTw69BDXKQL+yySda9LnKnd
+	 GfYThFIsJh/itPxRpFutc+8i2LBU7l5mt8b9p7fI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726896AbgGJPKs (ORCPT
+        id S1726872AbgGJPhp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Jul 2020 11:10:48 -0400
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.216]:32864 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726496AbgGJPKq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Jul 2020 11:10:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1594393844;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=qyhKDaRFDJabGY4zMcfXyWgOvQgQ2vWqZw0NQOyZqYA=;
-        b=svnXObgBMm8Xh7Z70J3g2vKn2vkK3+hIbdzuJoruQiboDrb69uTXL09n5D+EDB4eR9
-        p5VfU/qLj7uN0IE59Ihs30xbOU4phoFLmjzSF8d/TTXM9Tsb8zcKyxAtFuJQf1IS/uFK
-        qApzsCaBo4OTjwd2f+RN5f7S4bkQciZruZ8djhNKleOali9p1rx1mn7uEYlrbotdDrKw
-        Xy21pT6oDaxGoG0KbO/m7n0F9cUTfiha9P5vU2HCFiuH/82AB/Yc0eMRSOwiqJeObBgC
-        onpJJyy7Acvgi7bTeA6n7jFy/LVlQM80PkPVaG7CUVUpPrXWg5ur7yFzN4Bpa5z3G4TG
-        +/sQ==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaIvSfHReW"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.10.5 DYNA|AUTH)
-        with ESMTPSA id y0546bw6AFADbM0
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Fri, 10 Jul 2020 17:10:13 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Marcelo Cerri <marcelo.cerri@canonical.com>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: Re: [PATCH 2/3] lib/mpi: Add mpi_sub_ui()
-Date:   Fri, 10 Jul 2020 17:10:13 +0200
-Message-ID: <3722167.kQq0lBPeGt@tauon.chronox.de>
-In-Reply-To: <CAMj1kXFjzHphXUt7Hesj_EAOJmar9Du1U6YM9X+davMOB6tcng@mail.gmail.com>
-References: <2543601.mvXUDI8C0e@positron.chronox.de> <4577235.31r3eYUQgx@positron.chronox.de> <CAMj1kXFjzHphXUt7Hesj_EAOJmar9Du1U6YM9X+davMOB6tcng@mail.gmail.com>
+        Fri, 10 Jul 2020 11:37:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55780 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726496AbgGJPhp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Jul 2020 11:37:45 -0400
+Received: from localhost (mobile-166-175-191-139.mycingular.net [166.175.191.139])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 71FFE20725;
+        Fri, 10 Jul 2020 15:37:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1594395464;
+        bh=jf8q7n27+kP9L8DDPlNvcNUJRjNvy/mml7kUbzQ89Oo=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=JE9TsAInvipOp7YWw0VDP1pE0nJXL97yW6rRV3fU0ODrQia3jRnm8KpQbpz65k91g
+         BbH3KE2h/e/wJ98jZc4PYwNWUPGw7LidXXtG3Wrob6yOfPNjaRVYwndZ+RolHXKCYo
+         UDeh75CK9hmoJvewF+McMQaCMqkfFDhFD7m4zTGs=
+Date:   Fri, 10 Jul 2020 10:37:42 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     alex.williamson@redhat.com, herbert@gondor.apana.org.au,
+        cohuck@redhat.com, nhorman@redhat.com, vdronov@redhat.com,
+        bhelgaas@google.com, mark.a.chambers@intel.com,
+        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
+        qat-linux@intel.com, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/5] vfio/pci: add qat devices to blocklist
+Message-ID: <20200710153742.GA61966@bjorn-Precision-5520>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200710150819.GA410874@silpixa00400314>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Freitag, 10. Juli 2020, 16:42:39 CEST schrieb Ard Biesheuvel:
+On Fri, Jul 10, 2020 at 04:08:19PM +0100, Giovanni Cabiddu wrote:
+> On Wed, Jul 01, 2020 at 04:28:12PM -0500, Bjorn Helgaas wrote:
+> > On Wed, Jul 01, 2020 at 12:03:00PM +0100, Giovanni Cabiddu wrote:
+> > > The current generation of Intel® QuickAssist Technology devices
+> > > are not designed to run in an untrusted environment because of the
+> > > following issues reported in the release notes in
+> > > https://01.org/intel-quickassist-technology:
+> > 
+> > It would be nice if this link were directly clickable, e.g., if there
+> > were no trailing ":" or something.
+> > 
+> > And it would be even better if it went to a specific doc that
+> > described these issues.  I assume these are errata, and it's not easy
+> > to figure out which doc mentions them.
+> Sure. I will fix the commit message in the next revision and point to the
+> actual document:
+> https://01.org/sites/default/files/downloads/336211-015-qatsoftwareforlinux-rn-hwv1.7-final.pdf
 
-Hi Ard,
+Since URLs tend to go stale, please also include the Intel document
+number and title.
 
-> On Fri, 10 Jul 2020 at 13:16, Stephan M=FCller <smueller@chronox.de> wrot=
-e:
-> > Add mpi_sub_ui() based on Gnu PG mpz_sub_ui() from mpz/aors_ui.h
-> > adapting the code to the kernel's structures and coding style and also
-> > removing the defines used to produce mpz_sub_ui() and mpz_add_ui()
-> > from the same code.
->=20
-> Isn't GnuPG GPLv3 ?
+When you update this, you might also update the subject lines.  It
+looks like the VFIO convention is "vfio/pci: <Capitalized> ...",
+based on "git log --oneline drivers/vfio/pci/".  And "QAT" should be
+capitalized also since it's not a word by itself (and to match usage
+in the spec).
 
-Thanks for pointing that out. It is actually a mix-up - the function is fro=
-m=20
-Gnu MP and not GnuPG.
-
-Gnu MP is GPLv2 and GPLv3.
-
-I will have that corrected with a 2nd patch.
-
-Thanks
-
-Ciao
-Stephan
-
-
+Bjorn
