@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6E05C433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jul 2020 06:21:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B97C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jul 2020 06:21:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1BA92072E
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jul 2020 06:21:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E0D0C2072E
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jul 2020 06:21:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594362110;
-	bh=wxEb59jp12RHv1nowhC6Rp+VV8UlTt0bI/dpPQO8vSM=;
+	s=default; t=1594362115;
+	bh=3r8B/WZovtLxujrhBO/tk89pIt1pc0KOALRbQ18xtec=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=qFuFBn3sp9N/KQ8atrAlutarNJ8IC1TVZEaIVqwsyrA6AQ3CnX9U0rDeMvOzLh/0Q
-	 drLujo56Cv1keNG8v7uyYY4qP/UZITm8TBh+zbPNQwALjEf3ofSuuZu4Lu67UjXujO
-	 20iNAKKtc9yXlch2uh7DGCpIxJqtcCYBLt+hgwRc=
+	b=mudeD4d3qc/9E2zDaYsnOioEUp5GtZHDTK7iYOFPW5N/y5bn3J5zWx40CZKA/ovhZ
+	 uLtFyw2nDUpHb5hdFeOQ5+mC3DJR2EaU/p4f1GRTfNp1kCOGGVN6AG0wV7Z+dhwNtD
+	 x85wtaA3JQeBwRiYPHpevFj2SDqpYYLNCPGIsLU0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725943AbgGJGVt (ORCPT
+        id S1727777AbgGJGVv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Jul 2020 02:21:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38986 "EHLO mail.kernel.org"
+        Fri, 10 Jul 2020 02:21:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38998 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726908AbgGJGVr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Jul 2020 02:21:47 -0400
+        id S1727873AbgGJGVu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Jul 2020 02:21:50 -0400
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C1E682078C;
-        Fri, 10 Jul 2020 06:21:45 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id A35D3207DD;
+        Fri, 10 Jul 2020 06:21:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594362105;
-        bh=wxEb59jp12RHv1nowhC6Rp+VV8UlTt0bI/dpPQO8vSM=;
+        s=default; t=1594362106;
+        bh=3r8B/WZovtLxujrhBO/tk89pIt1pc0KOALRbQ18xtec=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=MucZkCEjLIw0gQXu5l5fShQBVDp6QDLACDKPf6L4EiNnitwk3Nwc7eZ5fjd9SZJs2
-         xjSzV3E4KOvO3Zcmll4Q+aK0UqLdh/0UGV2/1agll3jW/Ibn5K7GT3c+BStkPY3W0s
-         xOSKrYSMbAUPrQ86AmNHXJ3A0gOcUcJeFfBh27Vs=
+        b=Un0+6aBfxvjesCQh8IjFRR3fQIQ7mNnwe3O/wbxkMWqOhsqDVmoa/Q1znn0l2NiPo
+         oPzn3g5vSCcCJk1SC+l/j3gzqfX7r+aArPDsjYHGMKKMpyptHH/Yb7mw3w3UVms5Ci
+         ATnQS6oTFCfSkRwaDN4dWvNHGskOPKxnZjrbaDho=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Mikulas Patocka <mpatocka@redhat.com>, linux-crypto@vger.kernel.org
 Cc:     dm-devel@redhat.com
-Subject: [PATCH v2 3/7] crypto: algapi - use common mechanism for inheriting flags
-Date:   Thu,  9 Jul 2020 23:20:38 -0700
-Message-Id: <20200710062042.113842-4-ebiggers@kernel.org>
+Subject: [PATCH v2 6/7] crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY
+Date:   Thu,  9 Jul 2020 23:20:41 -0700
+Message-Id: <20200710062042.113842-7-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200710062042.113842-1-ebiggers@kernel.org>
 References: <20200710062042.113842-1-ebiggers@kernel.org>
@@ -55,1161 +55,2385 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+From: Mikulas Patocka <mpatocka@redhat.com>
 
-The flag CRYPTO_ALG_ASYNC is "inherited" in the sense that when a
-template is instantiated, the template will have CRYPTO_ALG_ASYNC set if
-any of the algorithms it uses has CRYPTO_ALG_ASYNC set.
+Set the flag CRYPTO_ALG_ALLOCATES_MEMORY in the crypto drivers that
+allocate memory.
 
-We'd like to add a second flag (CRYPTO_ALG_ALLOCATES_MEMORY) that gets
-"inherited" in the same way.  This is difficult because the handling of
-CRYPTO_ALG_ASYNC is hardcoded everywhere.  Address this by:
+drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c: sun8i_ce_cipher
+drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c: sun8i_ss_cipher
+drivers/crypto/amlogic/amlogic-gxl-core.c: meson_cipher
+drivers/crypto/axis/artpec6_crypto.c: artpec6_crypto_common_init
+drivers/crypto/bcm/cipher.c: spu_skcipher_rx_sg_create
+drivers/crypto/caam/caamalg.c: aead_edesc_alloc
+drivers/crypto/caam/caamalg_qi.c: aead_edesc_alloc
+drivers/crypto/caam/caamalg_qi2.c: aead_edesc_alloc
+drivers/crypto/caam/caamhash.c: hash_digest_key
+drivers/crypto/cavium/cpt/cptvf_algs.c: process_request
+drivers/crypto/cavium/nitrox/nitrox_aead.c: nitrox_process_se_request
+drivers/crypto/cavium/nitrox/nitrox_skcipher.c: nitrox_process_se_request
+drivers/crypto/ccp/ccp-crypto-aes-cmac.c: ccp_do_cmac_update
+drivers/crypto/ccp/ccp-crypto-aes-galois.c: ccp_crypto_enqueue_request
+drivers/crypto/ccp/ccp-crypto-aes-xts.c: ccp_crypto_enqueue_request
+drivers/crypto/ccp/ccp-crypto-aes.c: ccp_crypto_enqueue_request
+drivers/crypto/ccp/ccp-crypto-des3.c: ccp_crypto_enqueue_request
+drivers/crypto/ccp/ccp-crypto-sha.c: ccp_crypto_enqueue_request
+drivers/crypto/chelsio/chcr_algo.c: create_cipher_wr
+drivers/crypto/hisilicon/sec/sec_algs.c: sec_alloc_and_fill_hw_sgl
+drivers/crypto/hisilicon/sec2/sec_crypto.c: sec_alloc_req_id
+drivers/crypto/inside-secure/safexcel_cipher.c: safexcel_queue_req
+drivers/crypto/inside-secure/safexcel_hash.c: safexcel_ahash_enqueue
+drivers/crypto/ixp4xx_crypto.c: ablk_perform
+drivers/crypto/marvell/cesa/cipher.c: mv_cesa_skcipher_dma_req_init
+drivers/crypto/marvell/cesa/hash.c: mv_cesa_ahash_dma_req_init
+drivers/crypto/marvell/octeontx/otx_cptvf_algs.c: create_ctx_hdr
+drivers/crypto/n2_core.c: n2_compute_chunks
+drivers/crypto/picoxcell_crypto.c: spacc_sg_to_ddt
+drivers/crypto/qat/qat_common/qat_algs.c: qat_alg_skcipher_encrypt
+drivers/crypto/qce/skcipher.c: qce_skcipher_async_req_handle
+drivers/crypto/talitos.c : talitos_edesc_alloc
+drivers/crypto/virtio/virtio_crypto_algs.c: __virtio_crypto_skcipher_do_req
+drivers/crypto/xilinx/zynqmp-aes-gcm.c: zynqmp_aes_aead_cipher
 
-  - Add CRYPTO_ALG_INHERITED_FLAGS, which contains the set of flags that
-    have these inheritance semantics.
-
-  - Add crypto_algt_inherited_mask(), for use by template ->create()
-    methods.  It returns any of these flags that the user asked to be
-    unset and thus must be passed in the 'mask' to crypto_grab_*().
-
-  - Also modify crypto_check_attr_type() to handle computing the 'mask'
-    so that most templates can just use this.
-
-  - Make crypto_grab_*() propagate these flags to the template instance
-    being created so that templates don't have to do this themselves.
-
-Make crypto/simd.c propagate these flags too, since it "wraps" another
-algorithm, similar to a template.
-
-Based on a patch by Mikulas Patocka <mpatocka@redhat.com>
-(https://lore.kernel.org/r/alpine.LRH.2.02.2006301414580.30526@file01.intranet.prod.int.rdu2.redhat.com).
-
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+[EB: avoid overly-long lines]
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/adiantum.c         | 14 ++--------
- crypto/algapi.c           | 21 +++++++++++++-
- crypto/authenc.c          | 14 ++--------
- crypto/authencesn.c       | 14 ++--------
- crypto/ccm.c              | 33 +++++++---------------
- crypto/chacha20poly1305.c | 14 ++--------
- crypto/cmac.c             |  5 ++--
- crypto/cryptd.c           | 59 ++++++++++++++++++++-------------------
- crypto/ctr.c              | 19 ++++---------
- crypto/cts.c              | 13 ++-------
- crypto/essiv.c            | 11 ++++++--
- crypto/gcm.c              | 40 ++++++--------------------
- crypto/geniv.c            | 14 ++--------
- crypto/hmac.c             |  5 ++--
- crypto/lrw.c              | 13 ++-------
- crypto/pcrypt.c           | 14 ++++------
- crypto/rsa-pkcs1pad.c     | 13 ++-------
- crypto/simd.c             |  6 ++--
- crypto/skcipher.c         | 15 ++++------
- crypto/vmac.c             |  5 ++--
- crypto/xcbc.c             |  5 ++--
- crypto/xts.c              | 17 ++++-------
- include/crypto/algapi.h   | 23 ++++++++++-----
- 23 files changed, 153 insertions(+), 234 deletions(-)
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c |  12 +-
+ .../crypto/allwinner/sun8i-ss/sun8i-ss-core.c |  12 +-
+ drivers/crypto/amlogic/amlogic-gxl-core.c     |   6 +-
+ drivers/crypto/axis/artpec6_crypto.c          |  20 ++-
+ drivers/crypto/bcm/cipher.c                   |  72 ++++++++---
+ drivers/crypto/caam/caamalg.c                 |   6 +-
+ drivers/crypto/caam/caamalg_qi.c              |   6 +-
+ drivers/crypto/caam/caamalg_qi2.c             |   8 +-
+ drivers/crypto/caam/caamhash.c                |   2 +-
+ drivers/crypto/cavium/cpt/cptvf_algs.c        |  18 ++-
+ drivers/crypto/cavium/nitrox/nitrox_aead.c    |   4 +-
+ .../crypto/cavium/nitrox/nitrox_skcipher.c    |  16 +--
+ drivers/crypto/ccp/ccp-crypto-aes-cmac.c      |   1 +
+ drivers/crypto/ccp/ccp-crypto-aes-galois.c    |   1 +
+ drivers/crypto/ccp/ccp-crypto-aes-xts.c       |   1 +
+ drivers/crypto/ccp/ccp-crypto-aes.c           |   2 +
+ drivers/crypto/ccp/ccp-crypto-des3.c          |   1 +
+ drivers/crypto/ccp/ccp-crypto-sha.c           |   1 +
+ drivers/crypto/chelsio/chcr_algo.c            |   7 +-
+ drivers/crypto/hisilicon/sec/sec_algs.c       |  24 ++--
+ drivers/crypto/hisilicon/sec2/sec_crypto.c    |   4 +-
+ .../crypto/inside-secure/safexcel_cipher.c    |  47 +++++++
+ drivers/crypto/inside-secure/safexcel_hash.c  |  18 +++
+ drivers/crypto/ixp4xx_crypto.c                |   6 +-
+ drivers/crypto/marvell/cesa/cipher.c          |  18 ++-
+ drivers/crypto/marvell/cesa/hash.c            |   6 +
+ .../crypto/marvell/octeontx/otx_cptvf_algs.c  |  30 ++---
+ drivers/crypto/n2_core.c                      |   3 +-
+ drivers/crypto/picoxcell_crypto.c             |  17 ++-
+ drivers/crypto/qat/qat_common/qat_algs.c      |  13 +-
+ drivers/crypto/qce/skcipher.c                 |   1 +
+ drivers/crypto/talitos.c                      | 117 ++++++++++++------
+ drivers/crypto/virtio/virtio_crypto_algs.c    |   3 +-
+ drivers/crypto/xilinx/zynqmp-aes-gcm.c        |   1 +
+ 34 files changed, 361 insertions(+), 143 deletions(-)
 
-diff --git a/crypto/adiantum.c b/crypto/adiantum.c
-index cf2b9f4103dd..7fbdc3270984 100644
---- a/crypto/adiantum.c
-+++ b/crypto/adiantum.c
-@@ -490,7 +490,6 @@ static bool adiantum_supported_algorithms(struct skcipher_alg *streamcipher_alg,
- 
- static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
- {
--	struct crypto_attr_type *algt;
- 	u32 mask;
- 	const char *nhpoly1305_name;
- 	struct skcipher_instance *inst;
-@@ -500,14 +499,9 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct shash_alg *hash_alg;
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_SKCIPHER) & algt->mask)
--		return -EINVAL;
--
--	mask = crypto_requires_sync(algt->type, algt->mask);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SKCIPHER, &mask);
-+	if (err)
-+		return err;
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ictx), GFP_KERNEL);
- 	if (!inst)
-@@ -565,8 +559,6 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
- 		     hash_alg->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = streamcipher_alg->base.cra_flags &
--				   CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_blocksize = BLOCKCIPHER_BLOCK_SIZE;
- 	inst->alg.base.cra_ctxsize = sizeof(struct adiantum_tfm_ctx);
- 	inst->alg.base.cra_alignmask = streamcipher_alg->base.cra_alignmask |
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 92abdf675992..fdabf2675b63 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -690,6 +690,8 @@ int crypto_grab_spawn(struct crypto_spawn *spawn, struct crypto_instance *inst,
- 		spawn->mask = mask;
- 		spawn->next = inst->spawns;
- 		inst->spawns = spawn;
-+		inst->alg.cra_flags |=
-+			(alg->cra_flags & CRYPTO_ALG_INHERITED_FLAGS);
- 		err = 0;
- 	}
- 	up_write(&crypto_alg_sem);
-@@ -816,7 +818,23 @@ struct crypto_attr_type *crypto_get_attr_type(struct rtattr **tb)
- }
- EXPORT_SYMBOL_GPL(crypto_get_attr_type);
- 
--int crypto_check_attr_type(struct rtattr **tb, u32 type)
-+/**
-+ * crypto_check_attr_type() - check algorithm type and compute inherited mask
-+ * @tb: the template parameters
-+ * @type: the algorithm type the template would be instantiated as
-+ * @mask_ret: (output) the mask that should be passed to crypto_grab_*()
-+ *	      to restrict the flags of any inner algorithms
-+ *
-+ * Validate that the algorithm type the user requested is compatible with the
-+ * one the template would actually be instantiated as.  E.g., if the user is
-+ * doing crypto_alloc_shash("cbc(aes)", ...), this would return an error because
-+ * the "cbc" template creates an "skcipher" algorithm, not an "shash" algorithm.
-+ *
-+ * Also compute the mask to use to restrict the flags of any inner algorithms.
-+ *
-+ * Return: 0 on success; -errno on failure
-+ */
-+int crypto_check_attr_type(struct rtattr **tb, u32 type, u32 *mask_ret)
- {
- 	struct crypto_attr_type *algt;
- 
-@@ -827,6 +845,7 @@ int crypto_check_attr_type(struct rtattr **tb, u32 type)
- 	if ((algt->type ^ type) & algt->mask)
- 		return -EINVAL;
- 
-+	*mask_ret = crypto_algt_inherited_mask(algt);
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(crypto_check_attr_type);
-diff --git a/crypto/authenc.c b/crypto/authenc.c
-index 775e7138fd10..670bf1a01d00 100644
---- a/crypto/authenc.c
-+++ b/crypto/authenc.c
-@@ -372,7 +372,6 @@ static void crypto_authenc_free(struct aead_instance *inst)
- static int crypto_authenc_create(struct crypto_template *tmpl,
- 				 struct rtattr **tb)
- {
--	struct crypto_attr_type *algt;
- 	u32 mask;
- 	struct aead_instance *inst;
- 	struct authenc_instance_ctx *ctx;
-@@ -381,14 +380,9 @@ static int crypto_authenc_create(struct crypto_template *tmpl,
- 	struct skcipher_alg *enc;
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
--		return -EINVAL;
--
--	mask = crypto_requires_sync(algt->type, algt->mask);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_AEAD, &mask);
-+	if (err)
-+		return err;
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
- 	if (!inst)
-@@ -423,8 +417,6 @@ static int crypto_authenc_create(struct crypto_template *tmpl,
- 		     enc->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = (auth_base->cra_flags |
--				    enc->base.cra_flags) & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = enc->base.cra_priority * 10 +
- 				      auth_base->cra_priority;
- 	inst->alg.base.cra_blocksize = enc->base.cra_blocksize;
-diff --git a/crypto/authencesn.c b/crypto/authencesn.c
-index 149b70df2a91..b60e61b1904c 100644
---- a/crypto/authencesn.c
-+++ b/crypto/authencesn.c
-@@ -390,7 +390,6 @@ static void crypto_authenc_esn_free(struct aead_instance *inst)
- static int crypto_authenc_esn_create(struct crypto_template *tmpl,
- 				     struct rtattr **tb)
- {
--	struct crypto_attr_type *algt;
- 	u32 mask;
- 	struct aead_instance *inst;
- 	struct authenc_esn_instance_ctx *ctx;
-@@ -399,14 +398,9 @@ static int crypto_authenc_esn_create(struct crypto_template *tmpl,
- 	struct skcipher_alg *enc;
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
--		return -EINVAL;
--
--	mask = crypto_requires_sync(algt->type, algt->mask);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_AEAD, &mask);
-+	if (err)
-+		return err;
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
- 	if (!inst)
-@@ -437,8 +431,6 @@ static int crypto_authenc_esn_create(struct crypto_template *tmpl,
- 		     enc->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = (auth_base->cra_flags |
--				    enc->base.cra_flags) & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = enc->base.cra_priority * 10 +
- 				      auth_base->cra_priority;
- 	inst->alg.base.cra_blocksize = enc->base.cra_blocksize;
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index d1fb01bbc814..494d70901186 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -447,7 +447,6 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
- 				    const char *ctr_name,
- 				    const char *mac_name)
- {
--	struct crypto_attr_type *algt;
- 	u32 mask;
- 	struct aead_instance *inst;
- 	struct ccm_instance_ctx *ictx;
-@@ -455,14 +454,9 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
- 	struct hash_alg_common *mac;
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
--		return -EINVAL;
--
--	mask = crypto_requires_sync(algt->type, algt->mask);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_AEAD, &mask);
-+	if (err)
-+		return err;
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ictx), GFP_KERNEL);
- 	if (!inst)
-@@ -470,7 +464,7 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
- 	ictx = aead_instance_ctx(inst);
- 
- 	err = crypto_grab_ahash(&ictx->mac, aead_crypto_instance(inst),
--				mac_name, 0, CRYPTO_ALG_ASYNC);
-+				mac_name, 0, mask | CRYPTO_ALG_ASYNC);
- 	if (err)
- 		goto err_free_inst;
- 	mac = crypto_spawn_ahash_alg(&ictx->mac);
-@@ -507,7 +501,6 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
- 		     mac->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = ctr->base.cra_flags & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = (mac->base.cra_priority +
- 				       ctr->base.cra_priority) / 2;
- 	inst->alg.base.cra_blocksize = 1;
-@@ -712,21 +705,15 @@ static void crypto_rfc4309_free(struct aead_instance *inst)
- static int crypto_rfc4309_create(struct crypto_template *tmpl,
- 				 struct rtattr **tb)
- {
--	struct crypto_attr_type *algt;
- 	u32 mask;
- 	struct aead_instance *inst;
- 	struct crypto_aead_spawn *spawn;
- 	struct aead_alg *alg;
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
--		return -EINVAL;
--
--	mask = crypto_requires_sync(algt->type, algt->mask);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_AEAD, &mask);
-+	if (err)
-+		return err;
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
- 	if (!inst)
-@@ -759,7 +746,6 @@ static int crypto_rfc4309_create(struct crypto_template *tmpl,
- 	    CRYPTO_MAX_ALG_NAME)
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = alg->base.cra_priority;
- 	inst->alg.base.cra_blocksize = 1;
- 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
-@@ -878,9 +864,10 @@ static int cbcmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct shash_instance *inst;
- 	struct crypto_cipher_spawn *spawn;
- 	struct crypto_alg *alg;
-+	u32 mask;
- 	int err;
- 
--	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SHASH);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SHASH, &mask);
- 	if (err)
- 		return err;
- 
-@@ -890,7 +877,7 @@ static int cbcmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	spawn = shash_instance_ctx(inst);
- 
- 	err = crypto_grab_cipher(spawn, shash_crypto_instance(inst),
--				 crypto_attr_alg_name(tb[1]), 0, 0);
-+				 crypto_attr_alg_name(tb[1]), 0, mask);
- 	if (err)
- 		goto err_free_inst;
- 	alg = crypto_spawn_cipher_alg(spawn);
-diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
-index ccaea5cb66d1..97bbb135e9a6 100644
---- a/crypto/chacha20poly1305.c
-+++ b/crypto/chacha20poly1305.c
-@@ -555,7 +555,6 @@ static void chachapoly_free(struct aead_instance *inst)
- static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
- 			     const char *name, unsigned int ivsize)
- {
--	struct crypto_attr_type *algt;
- 	u32 mask;
- 	struct aead_instance *inst;
- 	struct chachapoly_instance_ctx *ctx;
-@@ -566,14 +565,9 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
- 	if (ivsize > CHACHAPOLY_IV_SIZE)
- 		return -EINVAL;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
--		return -EINVAL;
--
--	mask = crypto_requires_sync(algt->type, algt->mask);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_AEAD, &mask);
-+	if (err)
-+		return err;
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
- 	if (!inst)
-@@ -613,8 +607,6 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
- 		     poly->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = (chacha->base.cra_flags |
--				    poly->base.cra_flags) & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = (chacha->base.cra_priority +
- 				       poly->base.cra_priority) / 2;
- 	inst->alg.base.cra_blocksize = 1;
-diff --git a/crypto/cmac.c b/crypto/cmac.c
-index 143a6544c873..df36be1efb81 100644
---- a/crypto/cmac.c
-+++ b/crypto/cmac.c
-@@ -225,9 +225,10 @@ static int cmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_cipher_spawn *spawn;
- 	struct crypto_alg *alg;
- 	unsigned long alignmask;
-+	u32 mask;
- 	int err;
- 
--	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SHASH);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SHASH, &mask);
- 	if (err)
- 		return err;
- 
-@@ -237,7 +238,7 @@ static int cmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	spawn = shash_instance_ctx(inst);
- 
- 	err = crypto_grab_cipher(spawn, shash_crypto_instance(inst),
--				 crypto_attr_alg_name(tb[1]), 0, 0);
-+				 crypto_attr_alg_name(tb[1]), 0, mask);
- 	if (err)
- 		goto err_free_inst;
- 	alg = crypto_spawn_cipher_alg(spawn);
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index 283212262adb..a1bea0f4baa8 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -191,17 +191,20 @@ static inline struct cryptd_queue *cryptd_get_queue(struct crypto_tfm *tfm)
- 	return ictx->queue;
- }
- 
--static inline void cryptd_check_internal(struct rtattr **tb, u32 *type,
--					 u32 *mask)
-+static void cryptd_type_and_mask(struct crypto_attr_type *algt,
-+				 u32 *type, u32 *mask)
- {
--	struct crypto_attr_type *algt;
-+	/*
-+	 * cryptd is allowed to wrap internal algorithms, but in that case the
-+	 * resulting cryptd instance will be marked as internal as well.
-+	 */
-+	*type = algt->type & CRYPTO_ALG_INTERNAL;
-+	*mask = algt->mask & CRYPTO_ALG_INTERNAL;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return;
-+	/* No point in cryptd wrapping an algorithm that's already async. */
-+	*mask |= CRYPTO_ALG_ASYNC;
- 
--	*type |= algt->type & CRYPTO_ALG_INTERNAL;
--	*mask |= algt->mask & CRYPTO_ALG_INTERNAL;
-+	*mask |= crypto_algt_inherited_mask(algt);
- }
- 
- static int cryptd_init_instance(struct crypto_instance *inst,
-@@ -364,6 +367,7 @@ static void cryptd_skcipher_free(struct skcipher_instance *inst)
- 
- static int cryptd_create_skcipher(struct crypto_template *tmpl,
- 				  struct rtattr **tb,
-+				  struct crypto_attr_type *algt,
- 				  struct cryptd_queue *queue)
- {
- 	struct skcipherd_instance_ctx *ctx;
-@@ -373,10 +377,7 @@ static int cryptd_create_skcipher(struct crypto_template *tmpl,
- 	u32 mask;
- 	int err;
- 
--	type = 0;
--	mask = CRYPTO_ALG_ASYNC;
--
--	cryptd_check_internal(tb, &type, &mask);
-+	cryptd_type_and_mask(algt, &type, &mask);
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
- 	if (!inst)
-@@ -395,9 +396,8 @@ static int cryptd_create_skcipher(struct crypto_template *tmpl,
- 	if (err)
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = CRYPTO_ALG_ASYNC |
--				   (alg->base.cra_flags & CRYPTO_ALG_INTERNAL);
--
-+	inst->alg.base.cra_flags |= CRYPTO_ALG_ASYNC |
-+		(alg->base.cra_flags & CRYPTO_ALG_INTERNAL);
- 	inst->alg.ivsize = crypto_skcipher_alg_ivsize(alg);
- 	inst->alg.chunksize = crypto_skcipher_alg_chunksize(alg);
- 	inst->alg.min_keysize = crypto_skcipher_alg_min_keysize(alg);
-@@ -633,16 +633,17 @@ static void cryptd_hash_free(struct ahash_instance *inst)
- }
- 
- static int cryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
-+			      struct crypto_attr_type *algt,
- 			      struct cryptd_queue *queue)
- {
- 	struct hashd_instance_ctx *ctx;
- 	struct ahash_instance *inst;
- 	struct shash_alg *alg;
--	u32 type = 0;
--	u32 mask = 0;
-+	u32 type;
-+	u32 mask;
- 	int err;
- 
--	cryptd_check_internal(tb, &type, &mask);
-+	cryptd_type_and_mask(algt, &type, &mask);
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
- 	if (!inst)
-@@ -661,10 +662,9 @@ static int cryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
- 	if (err)
- 		goto err_free_inst;
- 
--	inst->alg.halg.base.cra_flags = CRYPTO_ALG_ASYNC |
--		(alg->base.cra_flags & (CRYPTO_ALG_INTERNAL |
-+	inst->alg.halg.base.cra_flags |= CRYPTO_ALG_ASYNC |
-+		(alg->base.cra_flags & (CRYPTO_ALG_INTERNAL|
- 					CRYPTO_ALG_OPTIONAL_KEY));
--
- 	inst->alg.halg.digestsize = alg->digestsize;
- 	inst->alg.halg.statesize = alg->statesize;
- 	inst->alg.halg.base.cra_ctxsize = sizeof(struct cryptd_hash_ctx);
-@@ -820,16 +820,17 @@ static void cryptd_aead_free(struct aead_instance *inst)
- 
- static int cryptd_create_aead(struct crypto_template *tmpl,
- 		              struct rtattr **tb,
-+			      struct crypto_attr_type *algt,
- 			      struct cryptd_queue *queue)
- {
- 	struct aead_instance_ctx *ctx;
- 	struct aead_instance *inst;
- 	struct aead_alg *alg;
--	u32 type = 0;
--	u32 mask = CRYPTO_ALG_ASYNC;
-+	u32 type;
-+	u32 mask;
- 	int err;
- 
--	cryptd_check_internal(tb, &type, &mask);
-+	cryptd_type_and_mask(algt, &type, &mask);
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
- 	if (!inst)
-@@ -848,8 +849,8 @@ static int cryptd_create_aead(struct crypto_template *tmpl,
- 	if (err)
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = CRYPTO_ALG_ASYNC |
--				   (alg->base.cra_flags & CRYPTO_ALG_INTERNAL);
-+	inst->alg.base.cra_flags |= CRYPTO_ALG_ASYNC |
-+		(alg->base.cra_flags & CRYPTO_ALG_INTERNAL);
- 	inst->alg.base.cra_ctxsize = sizeof(struct cryptd_aead_ctx);
- 
- 	inst->alg.ivsize = crypto_aead_alg_ivsize(alg);
-@@ -884,11 +885,11 @@ static int cryptd_create(struct crypto_template *tmpl, struct rtattr **tb)
- 
- 	switch (algt->type & algt->mask & CRYPTO_ALG_TYPE_MASK) {
- 	case CRYPTO_ALG_TYPE_SKCIPHER:
--		return cryptd_create_skcipher(tmpl, tb, &queue);
-+		return cryptd_create_skcipher(tmpl, tb, algt, &queue);
- 	case CRYPTO_ALG_TYPE_HASH:
--		return cryptd_create_hash(tmpl, tb, &queue);
-+		return cryptd_create_hash(tmpl, tb, algt, &queue);
- 	case CRYPTO_ALG_TYPE_AEAD:
--		return cryptd_create_aead(tmpl, tb, &queue);
-+		return cryptd_create_aead(tmpl, tb, algt, &queue);
- 	}
- 
- 	return -EINVAL;
-diff --git a/crypto/ctr.c b/crypto/ctr.c
-index 31ac4ae598e1..ae8d88c715d6 100644
---- a/crypto/ctr.c
-+++ b/crypto/ctr.c
-@@ -256,29 +256,22 @@ static void crypto_rfc3686_free(struct skcipher_instance *inst)
- static int crypto_rfc3686_create(struct crypto_template *tmpl,
- 				 struct rtattr **tb)
- {
--	struct crypto_attr_type *algt;
- 	struct skcipher_instance *inst;
- 	struct skcipher_alg *alg;
- 	struct crypto_skcipher_spawn *spawn;
- 	u32 mask;
--
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_SKCIPHER) & algt->mask)
--		return -EINVAL;
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SKCIPHER, &mask);
-+	if (err)
-+		return err;
-+	mask |= crypto_requires_off(crypto_get_attr_type(tb),
-+				    CRYPTO_ALG_NEED_FALLBACK);
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
- 	if (!inst)
- 		return -ENOMEM;
- 
--	mask = crypto_requires_sync(algt->type, algt->mask) |
--		crypto_requires_off(algt->type, algt->mask,
--				    CRYPTO_ALG_NEED_FALLBACK);
--
- 	spawn = skcipher_instance_ctx(inst);
- 
- 	err = crypto_grab_skcipher(spawn, skcipher_crypto_instance(inst),
-@@ -310,8 +303,6 @@ static int crypto_rfc3686_create(struct crypto_template *tmpl,
- 	inst->alg.base.cra_blocksize = 1;
- 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
- 
--	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
--
- 	inst->alg.ivsize = CTR_RFC3686_IV_SIZE;
- 	inst->alg.chunksize = crypto_skcipher_alg_chunksize(alg);
- 	inst->alg.min_keysize = crypto_skcipher_alg_min_keysize(alg) +
-diff --git a/crypto/cts.c b/crypto/cts.c
-index 5e005c4f0221..3766d47ebcc0 100644
---- a/crypto/cts.c
-+++ b/crypto/cts.c
-@@ -325,19 +325,13 @@ static int crypto_cts_create(struct crypto_template *tmpl, struct rtattr **tb)
- {
- 	struct crypto_skcipher_spawn *spawn;
- 	struct skcipher_instance *inst;
--	struct crypto_attr_type *algt;
- 	struct skcipher_alg *alg;
- 	u32 mask;
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_SKCIPHER) & algt->mask)
--		return -EINVAL;
--
--	mask = crypto_requires_sync(algt->type, algt->mask);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SKCIPHER, &mask);
-+	if (err)
-+		return err;
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
- 	if (!inst)
-@@ -364,7 +358,6 @@ static int crypto_cts_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if (err)
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = alg->base.cra_priority;
- 	inst->alg.base.cra_blocksize = alg->base.cra_blocksize;
- 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
-diff --git a/crypto/essiv.c b/crypto/essiv.c
-index a7f45dbc4ee2..d012be23d496 100644
---- a/crypto/essiv.c
-+++ b/crypto/essiv.c
-@@ -466,7 +466,7 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
- 		return PTR_ERR(shash_name);
- 
- 	type = algt->type & algt->mask;
--	mask = crypto_requires_sync(algt->type, algt->mask);
-+	mask = crypto_algt_inherited_mask(algt);
- 
- 	switch (type) {
- 	case CRYPTO_ALG_TYPE_SKCIPHER:
-@@ -525,7 +525,7 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	/* Synchronous hash, e.g., "sha256" */
- 	_hash_alg = crypto_alg_mod_lookup(shash_name,
- 					  CRYPTO_ALG_TYPE_SHASH,
--					  CRYPTO_ALG_TYPE_MASK);
-+					  CRYPTO_ALG_TYPE_MASK | mask);
- 	if (IS_ERR(_hash_alg)) {
- 		err = PTR_ERR(_hash_alg);
- 		goto out_drop_skcipher;
-@@ -557,7 +557,12 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
- 		     hash_alg->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
- 		goto out_free_hash;
- 
--	base->cra_flags		= block_base->cra_flags & CRYPTO_ALG_ASYNC;
-+	/*
-+	 * hash_alg wasn't gotten via crypto_grab*(), so we need to inherit its
-+	 * flags manually.
-+	 */
-+	base->cra_flags        |= (hash_alg->base.cra_flags &
-+				   CRYPTO_ALG_INHERITED_FLAGS);
- 	base->cra_blocksize	= block_base->cra_blocksize;
- 	base->cra_ctxsize	= sizeof(struct essiv_tfm_ctx);
- 	base->cra_alignmask	= block_base->cra_alignmask;
-diff --git a/crypto/gcm.c b/crypto/gcm.c
-index 0103d28c541e..3a36a9533c96 100644
---- a/crypto/gcm.c
-+++ b/crypto/gcm.c
-@@ -578,7 +578,6 @@ static int crypto_gcm_create_common(struct crypto_template *tmpl,
- 				    const char *ctr_name,
- 				    const char *ghash_name)
- {
--	struct crypto_attr_type *algt;
- 	u32 mask;
- 	struct aead_instance *inst;
- 	struct gcm_instance_ctx *ctx;
-@@ -586,14 +585,9 @@ static int crypto_gcm_create_common(struct crypto_template *tmpl,
- 	struct hash_alg_common *ghash;
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
--		return -EINVAL;
--
--	mask = crypto_requires_sync(algt->type, algt->mask);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_AEAD, &mask);
-+	if (err)
-+		return err;
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
- 	if (!inst)
-@@ -635,8 +629,6 @@ static int crypto_gcm_create_common(struct crypto_template *tmpl,
- 	    CRYPTO_MAX_ALG_NAME)
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = (ghash->base.cra_flags |
--				    ctr->base.cra_flags) & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = (ghash->base.cra_priority +
- 				       ctr->base.cra_priority) / 2;
- 	inst->alg.base.cra_blocksize = 1;
-@@ -835,21 +827,15 @@ static void crypto_rfc4106_free(struct aead_instance *inst)
- static int crypto_rfc4106_create(struct crypto_template *tmpl,
- 				 struct rtattr **tb)
- {
--	struct crypto_attr_type *algt;
- 	u32 mask;
- 	struct aead_instance *inst;
- 	struct crypto_aead_spawn *spawn;
- 	struct aead_alg *alg;
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
--		return -EINVAL;
--
--	mask = crypto_requires_sync(algt->type, algt->mask);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_AEAD, &mask);
-+	if (err)
-+		return err;
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
- 	if (!inst)
-@@ -882,7 +868,6 @@ static int crypto_rfc4106_create(struct crypto_template *tmpl,
- 	    CRYPTO_MAX_ALG_NAME)
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = alg->base.cra_priority;
- 	inst->alg.base.cra_blocksize = 1;
- 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
-@@ -1057,21 +1042,15 @@ static void crypto_rfc4543_free(struct aead_instance *inst)
- static int crypto_rfc4543_create(struct crypto_template *tmpl,
- 				struct rtattr **tb)
- {
--	struct crypto_attr_type *algt;
- 	u32 mask;
- 	struct aead_instance *inst;
- 	struct aead_alg *alg;
- 	struct crypto_rfc4543_instance_ctx *ctx;
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
--		return -EINVAL;
--
--	mask = crypto_requires_sync(algt->type, algt->mask);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_AEAD, &mask);
-+	if (err)
-+		return err;
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
- 	if (!inst)
-@@ -1104,7 +1083,6 @@ static int crypto_rfc4543_create(struct crypto_template *tmpl,
- 	    CRYPTO_MAX_ALG_NAME)
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = alg->base.cra_priority;
- 	inst->alg.base.cra_blocksize = 1;
- 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
-diff --git a/crypto/geniv.c b/crypto/geniv.c
-index 07496c8af0ab..bee4621b4f12 100644
---- a/crypto/geniv.c
-+++ b/crypto/geniv.c
-@@ -42,7 +42,6 @@ struct aead_instance *aead_geniv_alloc(struct crypto_template *tmpl,
- 				       struct rtattr **tb)
- {
- 	struct crypto_aead_spawn *spawn;
--	struct crypto_attr_type *algt;
- 	struct aead_instance *inst;
- 	struct aead_alg *alg;
- 	unsigned int ivsize;
-@@ -50,12 +49,9 @@ struct aead_instance *aead_geniv_alloc(struct crypto_template *tmpl,
- 	u32 mask;
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return ERR_CAST(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
--		return ERR_PTR(-EINVAL);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_AEAD, &mask);
-+	if (err)
-+		return ERR_PTR(err);
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
- 	if (!inst)
-@@ -63,9 +59,6 @@ struct aead_instance *aead_geniv_alloc(struct crypto_template *tmpl,
- 
- 	spawn = aead_instance_ctx(inst);
- 
--	/* Ignore async algorithms if necessary. */
--	mask = crypto_requires_sync(algt->type, algt->mask);
--
- 	err = crypto_grab_aead(spawn, aead_crypto_instance(inst),
- 			       crypto_attr_alg_name(tb[1]), 0, mask);
- 	if (err)
-@@ -90,7 +83,6 @@ struct aead_instance *aead_geniv_alloc(struct crypto_template *tmpl,
- 	    CRYPTO_MAX_ALG_NAME)
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = alg->base.cra_priority;
- 	inst->alg.base.cra_blocksize = alg->base.cra_blocksize;
- 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
-diff --git a/crypto/hmac.c b/crypto/hmac.c
-index e38bfb948278..25856aa7ccbf 100644
---- a/crypto/hmac.c
-+++ b/crypto/hmac.c
-@@ -168,11 +168,12 @@ static int hmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_shash_spawn *spawn;
- 	struct crypto_alg *alg;
- 	struct shash_alg *salg;
-+	u32 mask;
- 	int err;
- 	int ds;
- 	int ss;
- 
--	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SHASH);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SHASH, &mask);
- 	if (err)
- 		return err;
- 
-@@ -182,7 +183,7 @@ static int hmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	spawn = shash_instance_ctx(inst);
- 
- 	err = crypto_grab_shash(spawn, shash_crypto_instance(inst),
--				crypto_attr_alg_name(tb[1]), 0, 0);
-+				crypto_attr_alg_name(tb[1]), 0, mask);
- 	if (err)
- 		goto err_free_inst;
- 	salg = crypto_spawn_shash_alg(spawn);
-diff --git a/crypto/lrw.c b/crypto/lrw.c
-index 5b07a7c09296..a709c801ee45 100644
---- a/crypto/lrw.c
-+++ b/crypto/lrw.c
-@@ -297,21 +297,15 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
- {
- 	struct crypto_skcipher_spawn *spawn;
- 	struct skcipher_instance *inst;
--	struct crypto_attr_type *algt;
- 	struct skcipher_alg *alg;
- 	const char *cipher_name;
- 	char ecb_name[CRYPTO_MAX_ALG_NAME];
- 	u32 mask;
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_SKCIPHER) & algt->mask)
--		return -EINVAL;
--
--	mask = crypto_requires_sync(algt->type, algt->mask);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SKCIPHER, &mask);
-+	if (err)
-+		return err;
- 
- 	cipher_name = crypto_attr_alg_name(tb[1]);
- 	if (IS_ERR(cipher_name))
-@@ -379,7 +373,6 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
- 	} else
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = alg->base.cra_priority;
- 	inst->alg.base.cra_blocksize = LRW_BLOCK_SIZE;
- 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask |
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index 8bddc65cd509..cbc383a1a3fe 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -226,18 +226,14 @@ static int pcrypt_init_instance(struct crypto_instance *inst,
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+index b957061424a1..138759dc8190 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+@@ -185,7 +185,8 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 			.cra_priority = 400,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER |
+-				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
++				CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++				CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_ctxsize = sizeof(struct sun8i_cipher_tfm_ctx),
+ 			.cra_module = THIS_MODULE,
+ 			.cra_alignmask = 0xf,
+@@ -211,7 +212,8 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 			.cra_priority = 400,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER |
+-				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
++				CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++				CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_ctxsize = sizeof(struct sun8i_cipher_tfm_ctx),
+ 			.cra_module = THIS_MODULE,
+ 			.cra_alignmask = 0xf,
+@@ -236,7 +238,8 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 			.cra_priority = 400,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER |
+-				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
++				CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++				CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_ctxsize = sizeof(struct sun8i_cipher_tfm_ctx),
+ 			.cra_module = THIS_MODULE,
+ 			.cra_alignmask = 0xf,
+@@ -262,7 +265,8 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 			.cra_priority = 400,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER |
+-				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
++				CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++				CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_ctxsize = sizeof(struct sun8i_cipher_tfm_ctx),
+ 			.cra_module = THIS_MODULE,
+ 			.cra_alignmask = 0xf,
+diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+index 5d9d0fedcb06..9a23515783a6 100644
+--- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
++++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+@@ -169,7 +169,8 @@ static struct sun8i_ss_alg_template ss_algs[] = {
+ 			.cra_priority = 400,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER |
+-				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
++				CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++				CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_ctxsize = sizeof(struct sun8i_cipher_tfm_ctx),
+ 			.cra_module = THIS_MODULE,
+ 			.cra_alignmask = 0xf,
+@@ -195,7 +196,8 @@ static struct sun8i_ss_alg_template ss_algs[] = {
+ 			.cra_priority = 400,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER |
+-				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
++				CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++				CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_ctxsize = sizeof(struct sun8i_cipher_tfm_ctx),
+ 			.cra_module = THIS_MODULE,
+ 			.cra_alignmask = 0xf,
+@@ -220,7 +222,8 @@ static struct sun8i_ss_alg_template ss_algs[] = {
+ 			.cra_priority = 400,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER |
+-				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
++				CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++				CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_ctxsize = sizeof(struct sun8i_cipher_tfm_ctx),
+ 			.cra_module = THIS_MODULE,
+ 			.cra_alignmask = 0xf,
+@@ -246,7 +249,8 @@ static struct sun8i_ss_alg_template ss_algs[] = {
+ 			.cra_priority = 400,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER |
+-				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
++				CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++				CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_ctxsize = sizeof(struct sun8i_cipher_tfm_ctx),
+ 			.cra_module = THIS_MODULE,
+ 			.cra_alignmask = 0xf,
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
+index 411857fad8ba..466552acbbbb 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-core.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+@@ -54,7 +54,8 @@ static struct meson_alg_template mc_algs[] = {
+ 			.cra_priority = 400,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER |
+-				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
++				CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++				CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_ctxsize = sizeof(struct meson_cipher_tfm_ctx),
+ 			.cra_module = THIS_MODULE,
+ 			.cra_alignmask = 0xf,
+@@ -79,7 +80,8 @@ static struct meson_alg_template mc_algs[] = {
+ 			.cra_priority = 400,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER |
+-				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
++				CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++				CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_ctxsize = sizeof(struct meson_cipher_tfm_ctx),
+ 			.cra_module = THIS_MODULE,
+ 			.cra_alignmask = 0xf,
+diff --git a/drivers/crypto/axis/artpec6_crypto.c b/drivers/crypto/axis/artpec6_crypto.c
+index 62ba0325a618..1a46eeddf082 100644
+--- a/drivers/crypto/axis/artpec6_crypto.c
++++ b/drivers/crypto/axis/artpec6_crypto.c
+@@ -2630,7 +2630,8 @@ static struct ahash_alg hash_algos[] = {
+ 			.cra_name = "sha1",
+ 			.cra_driver_name = "artpec-sha1",
+ 			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_ASYNC,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.cra_blocksize = SHA1_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct artpec6_hashalg_context),
+ 			.cra_alignmask = 3,
+@@ -2653,7 +2654,8 @@ static struct ahash_alg hash_algos[] = {
+ 			.cra_name = "sha256",
+ 			.cra_driver_name = "artpec-sha256",
+ 			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_ASYNC,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.cra_blocksize = SHA256_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct artpec6_hashalg_context),
+ 			.cra_alignmask = 3,
+@@ -2677,7 +2679,8 @@ static struct ahash_alg hash_algos[] = {
+ 			.cra_name = "hmac(sha256)",
+ 			.cra_driver_name = "artpec-hmac-sha256",
+ 			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_ASYNC,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.cra_blocksize = SHA256_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct artpec6_hashalg_context),
+ 			.cra_alignmask = 3,
+@@ -2696,7 +2699,8 @@ static struct skcipher_alg crypto_algos[] = {
+ 			.cra_name = "ecb(aes)",
+ 			.cra_driver_name = "artpec6-ecb-aes",
+ 			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_ASYNC,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct artpec6_cryptotfm_context),
+ 			.cra_alignmask = 3,
+@@ -2717,6 +2721,7 @@ static struct skcipher_alg crypto_algos[] = {
+ 			.cra_driver_name = "artpec6-ctr-aes",
+ 			.cra_priority = 300,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct artpec6_cryptotfm_context),
+@@ -2738,7 +2743,8 @@ static struct skcipher_alg crypto_algos[] = {
+ 			.cra_name = "cbc(aes)",
+ 			.cra_driver_name = "artpec6-cbc-aes",
+ 			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_ASYNC,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct artpec6_cryptotfm_context),
+ 			.cra_alignmask = 3,
+@@ -2759,7 +2765,8 @@ static struct skcipher_alg crypto_algos[] = {
+ 			.cra_name = "xts(aes)",
+ 			.cra_driver_name = "artpec6-xts-aes",
+ 			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_ASYNC,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct artpec6_cryptotfm_context),
+ 			.cra_alignmask = 3,
+@@ -2790,6 +2797,7 @@ static struct aead_alg aead_algos[] = {
+ 			.cra_driver_name = "artpec-gcm-aes",
+ 			.cra_priority = 300,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct artpec6_cryptotfm_context),
+diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+index a353217a0d33..8a7fa1ae1ade 100644
+--- a/drivers/crypto/bcm/cipher.c
++++ b/drivers/crypto/bcm/cipher.c
+@@ -3233,7 +3233,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(md5),cbc(aes))",
+ 			.cra_driver_name = "authenc-hmac-md5-cbc-aes-iproc",
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		.ivsize = AES_BLOCK_SIZE,
+@@ -3256,7 +3258,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(sha1),cbc(aes))",
+ 			.cra_driver_name = "authenc-hmac-sha1-cbc-aes-iproc",
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		 .ivsize = AES_BLOCK_SIZE,
+@@ -3279,7 +3283,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(sha256),cbc(aes))",
+ 			.cra_driver_name = "authenc-hmac-sha256-cbc-aes-iproc",
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		 .ivsize = AES_BLOCK_SIZE,
+@@ -3302,7 +3308,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(md5),cbc(des))",
+ 			.cra_driver_name = "authenc-hmac-md5-cbc-des-iproc",
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		 .ivsize = DES_BLOCK_SIZE,
+@@ -3325,7 +3333,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(sha1),cbc(des))",
+ 			.cra_driver_name = "authenc-hmac-sha1-cbc-des-iproc",
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		 .ivsize = DES_BLOCK_SIZE,
+@@ -3348,7 +3358,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(sha224),cbc(des))",
+ 			.cra_driver_name = "authenc-hmac-sha224-cbc-des-iproc",
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		 .ivsize = DES_BLOCK_SIZE,
+@@ -3371,7 +3383,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(sha256),cbc(des))",
+ 			.cra_driver_name = "authenc-hmac-sha256-cbc-des-iproc",
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		 .ivsize = DES_BLOCK_SIZE,
+@@ -3394,7 +3408,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(sha384),cbc(des))",
+ 			.cra_driver_name = "authenc-hmac-sha384-cbc-des-iproc",
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		 .ivsize = DES_BLOCK_SIZE,
+@@ -3417,7 +3433,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(sha512),cbc(des))",
+ 			.cra_driver_name = "authenc-hmac-sha512-cbc-des-iproc",
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		 .ivsize = DES_BLOCK_SIZE,
+@@ -3440,7 +3458,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(md5),cbc(des3_ede))",
+ 			.cra_driver_name = "authenc-hmac-md5-cbc-des3-iproc",
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		 .ivsize = DES3_EDE_BLOCK_SIZE,
+@@ -3463,7 +3483,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(sha1),cbc(des3_ede))",
+ 			.cra_driver_name = "authenc-hmac-sha1-cbc-des3-iproc",
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		 .ivsize = DES3_EDE_BLOCK_SIZE,
+@@ -3486,7 +3508,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(sha224),cbc(des3_ede))",
+ 			.cra_driver_name = "authenc-hmac-sha224-cbc-des3-iproc",
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		 .ivsize = DES3_EDE_BLOCK_SIZE,
+@@ -3509,7 +3533,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(sha256),cbc(des3_ede))",
+ 			.cra_driver_name = "authenc-hmac-sha256-cbc-des3-iproc",
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		 .ivsize = DES3_EDE_BLOCK_SIZE,
+@@ -3532,7 +3558,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(sha384),cbc(des3_ede))",
+ 			.cra_driver_name = "authenc-hmac-sha384-cbc-des3-iproc",
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		 .ivsize = DES3_EDE_BLOCK_SIZE,
+@@ -3555,7 +3583,9 @@ static struct iproc_alg_s driver_algs[] = {
+ 			.cra_name = "authenc(hmac(sha512),cbc(des3_ede))",
+ 			.cra_driver_name = "authenc-hmac-sha512-cbc-des3-iproc",
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-			.cra_flags = CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC
++			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
++				     CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY
+ 		 },
+ 		 .setkey = aead_authenc_setkey,
+ 		 .ivsize = DES3_EDE_BLOCK_SIZE,
+@@ -3811,7 +3841,8 @@ static struct iproc_alg_s driver_algs[] = {
+ 				    .cra_name = "md5",
+ 				    .cra_driver_name = "md5-iproc",
+ 				    .cra_blocksize = MD5_BLOCK_WORDS * 4,
+-				    .cra_flags = CRYPTO_ALG_ASYNC,
++				    .cra_flags = CRYPTO_ALG_ASYNC |
++						 CRYPTO_ALG_ALLOCATES_MEMORY,
+ 				}
+ 		      },
+ 	 .cipher_info = {
+@@ -4508,7 +4539,9 @@ static int spu_register_skcipher(struct iproc_alg_s *driver_alg)
+ 	crypto->base.cra_priority = cipher_pri;
+ 	crypto->base.cra_alignmask = 0;
+ 	crypto->base.cra_ctxsize = sizeof(struct iproc_ctx_s);
+-	crypto->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY;
++	crypto->base.cra_flags = CRYPTO_ALG_ASYNC |
++				 CRYPTO_ALG_ALLOCATES_MEMORY |
++				 CRYPTO_ALG_KERN_DRIVER_ONLY;
+ 
+ 	crypto->init = skcipher_init_tfm;
+ 	crypto->exit = skcipher_exit_tfm;
+@@ -4547,7 +4580,8 @@ static int spu_register_ahash(struct iproc_alg_s *driver_alg)
+ 	hash->halg.base.cra_ctxsize = sizeof(struct iproc_ctx_s);
+ 	hash->halg.base.cra_init = ahash_cra_init;
+ 	hash->halg.base.cra_exit = generic_cra_exit;
+-	hash->halg.base.cra_flags = CRYPTO_ALG_ASYNC;
++	hash->halg.base.cra_flags = CRYPTO_ALG_ASYNC |
++				    CRYPTO_ALG_ALLOCATES_MEMORY;
+ 	hash->halg.statesize = sizeof(struct spu_hash_export_s);
+ 
+ 	if (driver_alg->auth_info.mode != HASH_MODE_HMAC) {
+@@ -4591,7 +4625,7 @@ static int spu_register_aead(struct iproc_alg_s *driver_alg)
+ 	aead->base.cra_alignmask = 0;
+ 	aead->base.cra_ctxsize = sizeof(struct iproc_ctx_s);
+ 
+-	aead->base.cra_flags |= CRYPTO_ALG_ASYNC;
++	aead->base.cra_flags |= CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY;
+ 	/* setkey set in alg initialization */
+ 	aead->setauthsize = aead_setauthsize;
+ 	aead->encrypt = aead_encrypt;
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index b2f9882bc010..4e15e82cbf78 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -3433,7 +3433,8 @@ static void caam_skcipher_alg_init(struct caam_skcipher_alg *t_alg)
+ 	alg->base.cra_module = THIS_MODULE;
+ 	alg->base.cra_priority = CAAM_CRA_PRIORITY;
+ 	alg->base.cra_ctxsize = sizeof(struct caam_ctx);
+-	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY;
++	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++			      CRYPTO_ALG_KERN_DRIVER_ONLY;
+ 
+ 	alg->init = caam_cra_init;
+ 	alg->exit = caam_cra_exit;
+@@ -3446,7 +3447,8 @@ static void caam_aead_alg_init(struct caam_aead_alg *t_alg)
+ 	alg->base.cra_module = THIS_MODULE;
+ 	alg->base.cra_priority = CAAM_CRA_PRIORITY;
+ 	alg->base.cra_ctxsize = sizeof(struct caam_ctx);
+-	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY;
++	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++			      CRYPTO_ALG_KERN_DRIVER_ONLY;
+ 
+ 	alg->init = caam_aead_init;
+ 	alg->exit = caam_aead_exit;
+diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
+index 27e36bdf6163..efe8f15a4a51 100644
+--- a/drivers/crypto/caam/caamalg_qi.c
++++ b/drivers/crypto/caam/caamalg_qi.c
+@@ -2502,7 +2502,8 @@ static void caam_skcipher_alg_init(struct caam_skcipher_alg *t_alg)
+ 	alg->base.cra_module = THIS_MODULE;
+ 	alg->base.cra_priority = CAAM_CRA_PRIORITY;
+ 	alg->base.cra_ctxsize = sizeof(struct caam_ctx);
+-	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY;
++	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++			      CRYPTO_ALG_KERN_DRIVER_ONLY;
+ 
+ 	alg->init = caam_cra_init;
+ 	alg->exit = caam_cra_exit;
+@@ -2515,7 +2516,8 @@ static void caam_aead_alg_init(struct caam_aead_alg *t_alg)
+ 	alg->base.cra_module = THIS_MODULE;
+ 	alg->base.cra_priority = CAAM_CRA_PRIORITY;
+ 	alg->base.cra_ctxsize = sizeof(struct caam_ctx);
+-	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY;
++	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++			      CRYPTO_ALG_KERN_DRIVER_ONLY;
+ 
+ 	alg->init = caam_aead_init;
+ 	alg->exit = caam_aead_exit;
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index 45e9ff851e2d..1b0c28675906 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -2912,7 +2912,8 @@ static void caam_skcipher_alg_init(struct caam_skcipher_alg *t_alg)
+ 	alg->base.cra_module = THIS_MODULE;
+ 	alg->base.cra_priority = CAAM_CRA_PRIORITY;
+ 	alg->base.cra_ctxsize = sizeof(struct caam_ctx);
+-	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY;
++	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++			      CRYPTO_ALG_KERN_DRIVER_ONLY;
+ 
+ 	alg->init = caam_cra_init_skcipher;
+ 	alg->exit = caam_cra_exit;
+@@ -2925,7 +2926,8 @@ static void caam_aead_alg_init(struct caam_aead_alg *t_alg)
+ 	alg->base.cra_module = THIS_MODULE;
+ 	alg->base.cra_priority = CAAM_CRA_PRIORITY;
+ 	alg->base.cra_ctxsize = sizeof(struct caam_ctx);
+-	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY;
++	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++			      CRYPTO_ALG_KERN_DRIVER_ONLY;
+ 
+ 	alg->init = caam_cra_init_aead;
+ 	alg->exit = caam_cra_exit_aead;
+@@ -4547,7 +4549,7 @@ static struct caam_hash_alg *caam_hash_alloc(struct device *dev,
+ 	alg->cra_priority = CAAM_CRA_PRIORITY;
+ 	alg->cra_blocksize = template->blocksize;
+ 	alg->cra_alignmask = 0;
+-	alg->cra_flags = CRYPTO_ALG_ASYNC;
++	alg->cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY;
+ 
+ 	t_alg->alg_type = template->alg_type;
+ 	t_alg->dev = dev;
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 27ff4a3d037e..e8a6d8bc43b5 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -1927,7 +1927,7 @@ caam_hash_alloc(struct caam_hash_template *template,
+ 	alg->cra_priority = CAAM_CRA_PRIORITY;
+ 	alg->cra_blocksize = template->blocksize;
+ 	alg->cra_alignmask = 0;
+-	alg->cra_flags = CRYPTO_ALG_ASYNC;
++	alg->cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY;
+ 
+ 	t_alg->alg_type = template->alg_type;
+ 
+diff --git a/drivers/crypto/cavium/cpt/cptvf_algs.c b/drivers/crypto/cavium/cpt/cptvf_algs.c
+index 0f0991f9f294..5af0dc2a8909 100644
+--- a/drivers/crypto/cavium/cpt/cptvf_algs.c
++++ b/drivers/crypto/cavium/cpt/cptvf_algs.c
+@@ -341,7 +341,8 @@ static int cvm_enc_dec_init(struct crypto_skcipher *tfm)
  }
  
- static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
--			      u32 type, u32 mask)
-+			      struct crypto_attr_type *algt)
- {
- 	struct pcrypt_instance_ctx *ctx;
--	struct crypto_attr_type *algt;
- 	struct aead_instance *inst;
- 	struct aead_alg *alg;
-+	u32 mask = crypto_algt_inherited_mask(algt);
- 	int err;
+ static struct skcipher_alg algs[] = { {
+-	.base.cra_flags		= CRYPTO_ALG_ASYNC,
++	.base.cra_flags		= CRYPTO_ALG_ASYNC |
++				  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct cvm_enc_ctx),
+ 	.base.cra_alignmask	= 7,
+@@ -358,7 +359,8 @@ static struct skcipher_alg algs[] = { {
+ 	.decrypt		= cvm_decrypt,
+ 	.init			= cvm_enc_dec_init,
+ }, {
+-	.base.cra_flags		= CRYPTO_ALG_ASYNC,
++	.base.cra_flags		= CRYPTO_ALG_ASYNC |
++				  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct cvm_enc_ctx),
+ 	.base.cra_alignmask	= 7,
+@@ -375,7 +377,8 @@ static struct skcipher_alg algs[] = { {
+ 	.decrypt		= cvm_decrypt,
+ 	.init			= cvm_enc_dec_init,
+ }, {
+-	.base.cra_flags		= CRYPTO_ALG_ASYNC,
++	.base.cra_flags		= CRYPTO_ALG_ASYNC |
++				  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct cvm_enc_ctx),
+ 	.base.cra_alignmask	= 7,
+@@ -391,7 +394,8 @@ static struct skcipher_alg algs[] = { {
+ 	.decrypt		= cvm_decrypt,
+ 	.init			= cvm_enc_dec_init,
+ }, {
+-	.base.cra_flags		= CRYPTO_ALG_ASYNC,
++	.base.cra_flags		= CRYPTO_ALG_ASYNC |
++				  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct cvm_enc_ctx),
+ 	.base.cra_alignmask	= 7,
+@@ -408,7 +412,8 @@ static struct skcipher_alg algs[] = { {
+ 	.decrypt		= cvm_decrypt,
+ 	.init			= cvm_enc_dec_init,
+ }, {
+-	.base.cra_flags		= CRYPTO_ALG_ASYNC,
++	.base.cra_flags		= CRYPTO_ALG_ASYNC |
++				  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct cvm_des3_ctx),
+ 	.base.cra_alignmask	= 7,
+@@ -425,7 +430,8 @@ static struct skcipher_alg algs[] = { {
+ 	.decrypt		= cvm_decrypt,
+ 	.init			= cvm_enc_dec_init,
+ }, {
+-	.base.cra_flags		= CRYPTO_ALG_ASYNC,
++	.base.cra_flags		= CRYPTO_ALG_ASYNC |
++				  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct cvm_des3_ctx),
+ 	.base.cra_alignmask	= 7,
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_aead.c b/drivers/crypto/cavium/nitrox/nitrox_aead.c
+index dce5423a5883..1be2571363fe 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_aead.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_aead.c
+@@ -522,7 +522,7 @@ static struct aead_alg nitrox_aeads[] = { {
+ 		.cra_name = "gcm(aes)",
+ 		.cra_driver_name = "n5_aes_gcm",
+ 		.cra_priority = PRIO,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = 1,
+ 		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
+ 		.cra_alignmask = 0,
+@@ -541,7 +541,7 @@ static struct aead_alg nitrox_aeads[] = { {
+ 		.cra_name = "rfc4106(gcm(aes))",
+ 		.cra_driver_name = "n5_rfc4106",
+ 		.cra_priority = PRIO,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = 1,
+ 		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
+ 		.cra_alignmask = 0,
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_skcipher.c b/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
+index 18088b0a2257..a553ac65f324 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
+@@ -388,7 +388,7 @@ static struct skcipher_alg nitrox_skciphers[] = { {
+ 		.cra_name = "cbc(aes)",
+ 		.cra_driver_name = "n5_cbc(aes)",
+ 		.cra_priority = PRIO,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
+ 		.cra_alignmask = 0,
+@@ -407,7 +407,7 @@ static struct skcipher_alg nitrox_skciphers[] = { {
+ 		.cra_name = "ecb(aes)",
+ 		.cra_driver_name = "n5_ecb(aes)",
+ 		.cra_priority = PRIO,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
+ 		.cra_alignmask = 0,
+@@ -426,7 +426,7 @@ static struct skcipher_alg nitrox_skciphers[] = { {
+ 		.cra_name = "cfb(aes)",
+ 		.cra_driver_name = "n5_cfb(aes)",
+ 		.cra_priority = PRIO,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
+ 		.cra_alignmask = 0,
+@@ -445,7 +445,7 @@ static struct skcipher_alg nitrox_skciphers[] = { {
+ 		.cra_name = "xts(aes)",
+ 		.cra_driver_name = "n5_xts(aes)",
+ 		.cra_priority = PRIO,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
+ 		.cra_alignmask = 0,
+@@ -464,7 +464,7 @@ static struct skcipher_alg nitrox_skciphers[] = { {
+ 		.cra_name = "rfc3686(ctr(aes))",
+ 		.cra_driver_name = "n5_rfc3686(ctr(aes))",
+ 		.cra_priority = PRIO,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = 1,
+ 		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
+ 		.cra_alignmask = 0,
+@@ -483,7 +483,7 @@ static struct skcipher_alg nitrox_skciphers[] = { {
+ 		.cra_name = "cts(cbc(aes))",
+ 		.cra_driver_name = "n5_cts(cbc(aes))",
+ 		.cra_priority = PRIO,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
+ 		.cra_alignmask = 0,
+@@ -502,7 +502,7 @@ static struct skcipher_alg nitrox_skciphers[] = { {
+ 		.cra_name = "cbc(des3_ede)",
+ 		.cra_driver_name = "n5_cbc(des3_ede)",
+ 		.cra_priority = PRIO,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
+ 		.cra_alignmask = 0,
+@@ -521,7 +521,7 @@ static struct skcipher_alg nitrox_skciphers[] = { {
+ 		.cra_name = "ecb(des3_ede)",
+ 		.cra_driver_name = "n5_ecb(des3_ede)",
+ 		.cra_priority = PRIO,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
+ 		.cra_alignmask = 0,
+diff --git a/drivers/crypto/ccp/ccp-crypto-aes-cmac.c b/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
+index 5eba7ee49e81..11a305fa19e6 100644
+--- a/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
++++ b/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
+@@ -378,6 +378,7 @@ int ccp_register_aes_cmac_algs(struct list_head *head)
+ 	snprintf(base->cra_name, CRYPTO_MAX_ALG_NAME, "cmac(aes)");
+ 	snprintf(base->cra_driver_name, CRYPTO_MAX_ALG_NAME, "cmac-aes-ccp");
+ 	base->cra_flags = CRYPTO_ALG_ASYNC |
++			  CRYPTO_ALG_ALLOCATES_MEMORY |
+ 			  CRYPTO_ALG_KERN_DRIVER_ONLY |
+ 			  CRYPTO_ALG_NEED_FALLBACK;
+ 	base->cra_blocksize = AES_BLOCK_SIZE;
+diff --git a/drivers/crypto/ccp/ccp-crypto-aes-galois.c b/drivers/crypto/ccp/ccp-crypto-aes-galois.c
+index 9e8f07c1afac..1c1c939f5c39 100644
+--- a/drivers/crypto/ccp/ccp-crypto-aes-galois.c
++++ b/drivers/crypto/ccp/ccp-crypto-aes-galois.c
+@@ -172,6 +172,7 @@ static struct aead_alg ccp_aes_gcm_defaults = {
+ 	.maxauthsize = AES_BLOCK_SIZE,
+ 	.base = {
+ 		.cra_flags	= CRYPTO_ALG_ASYNC |
++				  CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				  CRYPTO_ALG_KERN_DRIVER_ONLY |
+ 				  CRYPTO_ALG_NEED_FALLBACK,
+ 		.cra_blocksize	= AES_BLOCK_SIZE,
+diff --git a/drivers/crypto/ccp/ccp-crypto-aes-xts.c b/drivers/crypto/ccp/ccp-crypto-aes-xts.c
+index 04b2517df955..8a1c4ab72daa 100644
+--- a/drivers/crypto/ccp/ccp-crypto-aes-xts.c
++++ b/drivers/crypto/ccp/ccp-crypto-aes-xts.c
+@@ -243,6 +243,7 @@ static int ccp_register_aes_xts_alg(struct list_head *head,
+ 	snprintf(alg->base.cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
+ 		 def->drv_name);
+ 	alg->base.cra_flags	= CRYPTO_ALG_ASYNC |
++				  CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				  CRYPTO_ALG_KERN_DRIVER_ONLY |
+ 				  CRYPTO_ALG_NEED_FALLBACK;
+ 	alg->base.cra_blocksize	= AES_BLOCK_SIZE;
+diff --git a/drivers/crypto/ccp/ccp-crypto-aes.c b/drivers/crypto/ccp/ccp-crypto-aes.c
+index 51e12fbd1159..e6dcd8cedd53 100644
+--- a/drivers/crypto/ccp/ccp-crypto-aes.c
++++ b/drivers/crypto/ccp/ccp-crypto-aes.c
+@@ -212,6 +212,7 @@ static const struct skcipher_alg ccp_aes_defaults = {
+ 	.init			= ccp_aes_init_tfm,
  
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
- 	if (!inst)
- 		return -ENOMEM;
-@@ -254,7 +250,7 @@ static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
- 		goto err_free_inst;
+ 	.base.cra_flags		= CRYPTO_ALG_ASYNC |
++				  CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				  CRYPTO_ALG_KERN_DRIVER_ONLY |
+ 				  CRYPTO_ALG_NEED_FALLBACK,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+@@ -229,6 +230,7 @@ static const struct skcipher_alg ccp_aes_rfc3686_defaults = {
+ 	.init			= ccp_aes_rfc3686_init_tfm,
  
- 	err = crypto_grab_aead(&ctx->spawn, aead_crypto_instance(inst),
--			       crypto_attr_alg_name(tb[1]), 0, 0);
-+			       crypto_attr_alg_name(tb[1]), 0, mask);
- 	if (err)
- 		goto err_free_inst;
+ 	.base.cra_flags		= CRYPTO_ALG_ASYNC |
++				  CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				  CRYPTO_ALG_KERN_DRIVER_ONLY |
+ 				  CRYPTO_ALG_NEED_FALLBACK,
+ 	.base.cra_blocksize	= CTR_RFC3686_BLOCK_SIZE,
+diff --git a/drivers/crypto/ccp/ccp-crypto-des3.c b/drivers/crypto/ccp/ccp-crypto-des3.c
+index 9c129defdb50..ec97daf0fcb7 100644
+--- a/drivers/crypto/ccp/ccp-crypto-des3.c
++++ b/drivers/crypto/ccp/ccp-crypto-des3.c
+@@ -136,6 +136,7 @@ static const struct skcipher_alg ccp_des3_defaults = {
+ 	.init			= ccp_des3_init_tfm,
  
-@@ -263,7 +259,7 @@ static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
- 	if (err)
- 		goto err_free_inst;
+ 	.base.cra_flags		= CRYPTO_ALG_ASYNC |
++				  CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				  CRYPTO_ALG_KERN_DRIVER_ONLY |
+ 				  CRYPTO_ALG_NEED_FALLBACK,
+ 	.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
+diff --git a/drivers/crypto/ccp/ccp-crypto-sha.c b/drivers/crypto/ccp/ccp-crypto-sha.c
+index b0cc2bd73af8..5aa1af21f69f 100644
+--- a/drivers/crypto/ccp/ccp-crypto-sha.c
++++ b/drivers/crypto/ccp/ccp-crypto-sha.c
+@@ -486,6 +486,7 @@ static int ccp_register_sha_alg(struct list_head *head,
+ 	snprintf(base->cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
+ 		 def->drv_name);
+ 	base->cra_flags = CRYPTO_ALG_ASYNC |
++			  CRYPTO_ALG_ALLOCATES_MEMORY |
+ 			  CRYPTO_ALG_KERN_DRIVER_ONLY |
+ 			  CRYPTO_ALG_NEED_FALLBACK;
+ 	base->cra_blocksize = def->block_size;
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index 4c2553672b6f..009d0d3e13b7 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -4445,6 +4445,7 @@ static int chcr_register_alg(void)
+ 			driver_algs[i].alg.skcipher.base.cra_module = THIS_MODULE;
+ 			driver_algs[i].alg.skcipher.base.cra_flags =
+ 				CRYPTO_ALG_TYPE_SKCIPHER | CRYPTO_ALG_ASYNC |
++				CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				CRYPTO_ALG_NEED_FALLBACK;
+ 			driver_algs[i].alg.skcipher.base.cra_ctxsize =
+ 				sizeof(struct chcr_context) +
+@@ -4456,7 +4457,8 @@ static int chcr_register_alg(void)
+ 			break;
+ 		case CRYPTO_ALG_TYPE_AEAD:
+ 			driver_algs[i].alg.aead.base.cra_flags =
+-				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK;
++				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK |
++				CRYPTO_ALG_ALLOCATES_MEMORY;
+ 			driver_algs[i].alg.aead.encrypt = chcr_aead_encrypt;
+ 			driver_algs[i].alg.aead.decrypt = chcr_aead_decrypt;
+ 			driver_algs[i].alg.aead.init = chcr_aead_cra_init;
+@@ -4476,7 +4478,8 @@ static int chcr_register_alg(void)
+ 			a_hash->halg.statesize = SZ_AHASH_REQ_CTX;
+ 			a_hash->halg.base.cra_priority = CHCR_CRA_PRIORITY;
+ 			a_hash->halg.base.cra_module = THIS_MODULE;
+-			a_hash->halg.base.cra_flags = CRYPTO_ALG_ASYNC;
++			a_hash->halg.base.cra_flags =
++				CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY;
+ 			a_hash->halg.base.cra_alignmask = 0;
+ 			a_hash->halg.base.cra_exit = NULL;
  
--	inst->alg.base.cra_flags = CRYPTO_ALG_ASYNC;
-+	inst->alg.base.cra_flags |= CRYPTO_ALG_ASYNC;
+diff --git a/drivers/crypto/hisilicon/sec/sec_algs.c b/drivers/crypto/hisilicon/sec/sec_algs.c
+index 4ad4ffd90cee..8ca945ac297e 100644
+--- a/drivers/crypto/hisilicon/sec/sec_algs.c
++++ b/drivers/crypto/hisilicon/sec/sec_algs.c
+@@ -934,7 +934,8 @@ static struct skcipher_alg sec_algs[] = {
+ 			.cra_name = "ecb(aes)",
+ 			.cra_driver_name = "hisi_sec_aes_ecb",
+ 			.cra_priority = 4001,
+-			.cra_flags = CRYPTO_ALG_ASYNC,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct sec_alg_tfm_ctx),
+ 			.cra_alignmask = 0,
+@@ -953,7 +954,8 @@ static struct skcipher_alg sec_algs[] = {
+ 			.cra_name = "cbc(aes)",
+ 			.cra_driver_name = "hisi_sec_aes_cbc",
+ 			.cra_priority = 4001,
+-			.cra_flags = CRYPTO_ALG_ASYNC,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct sec_alg_tfm_ctx),
+ 			.cra_alignmask = 0,
+@@ -972,7 +974,8 @@ static struct skcipher_alg sec_algs[] = {
+ 			.cra_name = "ctr(aes)",
+ 			.cra_driver_name = "hisi_sec_aes_ctr",
+ 			.cra_priority = 4001,
+-			.cra_flags = CRYPTO_ALG_ASYNC,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct sec_alg_tfm_ctx),
+ 			.cra_alignmask = 0,
+@@ -991,7 +994,8 @@ static struct skcipher_alg sec_algs[] = {
+ 			.cra_name = "xts(aes)",
+ 			.cra_driver_name = "hisi_sec_aes_xts",
+ 			.cra_priority = 4001,
+-			.cra_flags = CRYPTO_ALG_ASYNC,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct sec_alg_tfm_ctx),
+ 			.cra_alignmask = 0,
+@@ -1011,7 +1015,8 @@ static struct skcipher_alg sec_algs[] = {
+ 			.cra_name = "ecb(des)",
+ 			.cra_driver_name = "hisi_sec_des_ecb",
+ 			.cra_priority = 4001,
+-			.cra_flags = CRYPTO_ALG_ASYNC,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct sec_alg_tfm_ctx),
+ 			.cra_alignmask = 0,
+@@ -1030,7 +1035,8 @@ static struct skcipher_alg sec_algs[] = {
+ 			.cra_name = "cbc(des)",
+ 			.cra_driver_name = "hisi_sec_des_cbc",
+ 			.cra_priority = 4001,
+-			.cra_flags = CRYPTO_ALG_ASYNC,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct sec_alg_tfm_ctx),
+ 			.cra_alignmask = 0,
+@@ -1049,7 +1055,8 @@ static struct skcipher_alg sec_algs[] = {
+ 			.cra_name = "cbc(des3_ede)",
+ 			.cra_driver_name = "hisi_sec_3des_cbc",
+ 			.cra_priority = 4001,
+-			.cra_flags = CRYPTO_ALG_ASYNC,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct sec_alg_tfm_ctx),
+ 			.cra_alignmask = 0,
+@@ -1068,7 +1075,8 @@ static struct skcipher_alg sec_algs[] = {
+ 			.cra_name = "ecb(des3_ede)",
+ 			.cra_driver_name = "hisi_sec_3des_ecb",
+ 			.cra_priority = 4001,
+-			.cra_flags = CRYPTO_ALG_ASYNC,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct sec_alg_tfm_ctx),
+ 			.cra_alignmask = 0,
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 64614a9bdf21..e2074724e93d 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -1435,7 +1435,7 @@ static int sec_skcipher_decrypt(struct skcipher_request *sk_req)
+ 		.cra_name = sec_cra_name,\
+ 		.cra_driver_name = "hisi_sec_"sec_cra_name,\
+ 		.cra_priority = SEC_PRIORITY,\
+-		.cra_flags = CRYPTO_ALG_ASYNC,\
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,\
+ 		.cra_blocksize = blk_size,\
+ 		.cra_ctxsize = sizeof(struct sec_ctx),\
+ 		.cra_module = THIS_MODULE,\
+@@ -1558,7 +1558,7 @@ static int sec_aead_decrypt(struct aead_request *a_req)
+ 		.cra_name = sec_cra_name,\
+ 		.cra_driver_name = "hisi_sec_"sec_cra_name,\
+ 		.cra_priority = SEC_PRIORITY,\
+-		.cra_flags = CRYPTO_ALG_ASYNC,\
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,\
+ 		.cra_blocksize = blk_size,\
+ 		.cra_ctxsize = sizeof(struct sec_ctx),\
+ 		.cra_module = THIS_MODULE,\
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index 0c5e80c3f6e3..1ac3253b7903 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -1300,6 +1300,7 @@ struct safexcel_alg_template safexcel_alg_ecb_aes = {
+ 			.cra_driver_name = "safexcel-ecb-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1337,6 +1338,7 @@ struct safexcel_alg_template safexcel_alg_cbc_aes = {
+ 			.cra_driver_name = "safexcel-cbc-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1374,6 +1376,7 @@ struct safexcel_alg_template safexcel_alg_cfb_aes = {
+ 			.cra_driver_name = "safexcel-cfb-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1411,6 +1414,7 @@ struct safexcel_alg_template safexcel_alg_ofb_aes = {
+ 			.cra_driver_name = "safexcel-ofb-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1485,6 +1489,7 @@ struct safexcel_alg_template safexcel_alg_ctr_aes = {
+ 			.cra_driver_name = "safexcel-ctr-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1545,6 +1550,7 @@ struct safexcel_alg_template safexcel_alg_cbc_des = {
+ 			.cra_driver_name = "safexcel-cbc-des",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1582,6 +1588,7 @@ struct safexcel_alg_template safexcel_alg_ecb_des = {
+ 			.cra_driver_name = "safexcel-ecb-des",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1642,6 +1649,7 @@ struct safexcel_alg_template safexcel_alg_cbc_des3_ede = {
+ 			.cra_driver_name = "safexcel-cbc-des3_ede",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1679,6 +1687,7 @@ struct safexcel_alg_template safexcel_alg_ecb_des3_ede = {
+ 			.cra_driver_name = "safexcel-ecb-des3_ede",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1751,6 +1760,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_cbc_aes = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha1-cbc-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1786,6 +1796,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha256_cbc_aes = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha256-cbc-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1821,6 +1832,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha224_cbc_aes = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha224-cbc-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1856,6 +1868,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha512_cbc_aes = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha512-cbc-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1891,6 +1904,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha384_cbc_aes = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha384-cbc-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1927,6 +1941,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_cbc_des3_ede = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha1-cbc-des3_ede",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1963,6 +1978,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha256_cbc_des3_ede = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha256-cbc-des3_ede",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1999,6 +2015,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha224_cbc_des3_ede = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha224-cbc-des3_ede",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2035,6 +2052,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha512_cbc_des3_ede = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha512-cbc-des3_ede",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2071,6 +2089,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha384_cbc_des3_ede = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha384-cbc-des3_ede",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2107,6 +2126,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_cbc_des = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha1-cbc-des",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2143,6 +2163,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha256_cbc_des = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha256-cbc-des",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2179,6 +2200,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha224_cbc_des = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha224-cbc-des",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2215,6 +2237,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha512_cbc_des = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha512-cbc-des",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2251,6 +2274,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha384_cbc_des = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha384-cbc-des",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2285,6 +2309,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_ctr_aes = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha1-ctr-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2319,6 +2344,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha256_ctr_aes = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha256-ctr-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2353,6 +2379,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha224_ctr_aes = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha224-ctr-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2387,6 +2414,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha512_ctr_aes = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha512-ctr-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2421,6 +2449,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha384_ctr_aes = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha384-ctr-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2534,6 +2563,7 @@ struct safexcel_alg_template safexcel_alg_xts_aes = {
+ 			.cra_driver_name = "safexcel-xts-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = XTS_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2646,6 +2676,7 @@ struct safexcel_alg_template safexcel_alg_gcm = {
+ 			.cra_driver_name = "safexcel-gcm-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2769,6 +2800,7 @@ struct safexcel_alg_template safexcel_alg_ccm = {
+ 			.cra_driver_name = "safexcel-ccm-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2832,6 +2864,7 @@ struct safexcel_alg_template safexcel_alg_chacha20 = {
+ 			.cra_driver_name = "safexcel-chacha20",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -2993,6 +3026,7 @@ struct safexcel_alg_template safexcel_alg_chachapoly = {
+ 			/* +1 to put it above HW chacha + SW poly */
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY + 1,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY |
+ 				     CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_blocksize = 1,
+@@ -3032,6 +3066,7 @@ struct safexcel_alg_template safexcel_alg_chachapoly_esp = {
+ 			/* +1 to put it above HW chacha + SW poly */
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY + 1,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY |
+ 				     CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_blocksize = 1,
+@@ -3110,6 +3145,7 @@ struct safexcel_alg_template safexcel_alg_ecb_sm4 = {
+ 			.cra_driver_name = "safexcel-ecb-sm4",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = SM4_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -3147,6 +3183,7 @@ struct safexcel_alg_template safexcel_alg_cbc_sm4 = {
+ 			.cra_driver_name = "safexcel-cbc-sm4",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = SM4_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -3184,6 +3221,7 @@ struct safexcel_alg_template safexcel_alg_ofb_sm4 = {
+ 			.cra_driver_name = "safexcel-ofb-sm4",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -3221,6 +3259,7 @@ struct safexcel_alg_template safexcel_alg_cfb_sm4 = {
+ 			.cra_driver_name = "safexcel-cfb-sm4",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -3273,6 +3312,7 @@ struct safexcel_alg_template safexcel_alg_ctr_sm4 = {
+ 			.cra_driver_name = "safexcel-ctr-sm4",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -3332,6 +3372,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_cbc_sm4 = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha1-cbc-sm4",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = SM4_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -3441,6 +3482,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sm3_cbc_sm4 = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sm3-cbc-sm4",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY |
+ 				     CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_blocksize = SM4_BLOCK_SIZE,
+@@ -3476,6 +3518,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_ctr_sm4 = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sha1-ctr-sm4",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -3510,6 +3553,7 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sm3_ctr_sm4 = {
+ 			.cra_driver_name = "safexcel-authenc-hmac-sm3-ctr-sm4",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -3578,6 +3622,7 @@ struct safexcel_alg_template safexcel_alg_rfc4106_gcm = {
+ 			.cra_driver_name = "safexcel-rfc4106-gcm-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -3622,6 +3667,7 @@ struct safexcel_alg_template safexcel_alg_rfc4543_gcm = {
+ 			.cra_driver_name = "safexcel-rfc4543-gcm-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -3713,6 +3759,7 @@ struct safexcel_alg_template safexcel_alg_rfc4309_ccm = {
+ 			.cra_driver_name = "safexcel-rfc4309-ccm-aes",
+ 			.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index 43962bc709c6..16a467969d8e 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -992,6 +992,7 @@ struct safexcel_alg_template safexcel_alg_sha1 = {
+ 				.cra_driver_name = "safexcel-sha1",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = SHA1_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -1235,6 +1236,7 @@ struct safexcel_alg_template safexcel_alg_hmac_sha1 = {
+ 				.cra_driver_name = "safexcel-hmac-sha1",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = SHA1_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -1291,6 +1293,7 @@ struct safexcel_alg_template safexcel_alg_sha256 = {
+ 				.cra_driver_name = "safexcel-sha256",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = SHA256_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -1347,6 +1350,7 @@ struct safexcel_alg_template safexcel_alg_sha224 = {
+ 				.cra_driver_name = "safexcel-sha224",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = SHA224_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -1418,6 +1422,7 @@ struct safexcel_alg_template safexcel_alg_hmac_sha224 = {
+ 				.cra_driver_name = "safexcel-hmac-sha224",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = SHA224_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -1489,6 +1494,7 @@ struct safexcel_alg_template safexcel_alg_hmac_sha256 = {
+ 				.cra_driver_name = "safexcel-hmac-sha256",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = SHA256_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -1545,6 +1551,7 @@ struct safexcel_alg_template safexcel_alg_sha512 = {
+ 				.cra_driver_name = "safexcel-sha512",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = SHA512_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -1601,6 +1608,7 @@ struct safexcel_alg_template safexcel_alg_sha384 = {
+ 				.cra_driver_name = "safexcel-sha384",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = SHA384_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -1672,6 +1680,7 @@ struct safexcel_alg_template safexcel_alg_hmac_sha512 = {
+ 				.cra_driver_name = "safexcel-hmac-sha512",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = SHA512_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -1743,6 +1752,7 @@ struct safexcel_alg_template safexcel_alg_hmac_sha384 = {
+ 				.cra_driver_name = "safexcel-hmac-sha384",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = SHA384_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -1799,6 +1809,7 @@ struct safexcel_alg_template safexcel_alg_md5 = {
+ 				.cra_driver_name = "safexcel-md5",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -1871,6 +1882,7 @@ struct safexcel_alg_template safexcel_alg_hmac_md5 = {
+ 				.cra_driver_name = "safexcel-hmac-md5",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -1952,6 +1964,7 @@ struct safexcel_alg_template safexcel_alg_crc32 = {
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_OPTIONAL_KEY |
+ 					     CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = 1,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -2041,6 +2054,7 @@ struct safexcel_alg_template safexcel_alg_cbcmac = {
+ 				.cra_driver_name = "safexcel-cbcmac-aes",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = 1,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -2136,6 +2150,7 @@ struct safexcel_alg_template safexcel_alg_xcbcmac = {
+ 				.cra_driver_name = "safexcel-xcbc-aes",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -2232,6 +2247,7 @@ struct safexcel_alg_template safexcel_alg_cmac = {
+ 				.cra_driver_name = "safexcel-cmac-aes",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -2288,6 +2304,7 @@ struct safexcel_alg_template safexcel_alg_sm3 = {
+ 				.cra_driver_name = "safexcel-sm3",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = SM3_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+@@ -2359,6 +2376,7 @@ struct safexcel_alg_template safexcel_alg_hmac_sm3 = {
+ 				.cra_driver_name = "safexcel-hmac-sm3",
+ 				.cra_priority = SAFEXCEL_CRA_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = SM3_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
+diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
+index ad73fc946682..f478bb0a566a 100644
+--- a/drivers/crypto/ixp4xx_crypto.c
++++ b/drivers/crypto/ixp4xx_crypto.c
+@@ -1402,7 +1402,8 @@ static int __init ixp_module_init(void)
  
- 	inst->alg.ivsize = crypto_aead_alg_ivsize(alg);
- 	inst->alg.maxauthsize = crypto_aead_alg_maxauthsize(alg);
-@@ -298,7 +294,7 @@ static int pcrypt_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 		/* block ciphers */
+ 		cra->base.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY |
+-				      CRYPTO_ALG_ASYNC;
++				      CRYPTO_ALG_ASYNC |
++				      CRYPTO_ALG_ALLOCATES_MEMORY;
+ 		if (!cra->setkey)
+ 			cra->setkey = ablk_setkey;
+ 		if (!cra->encrypt)
+@@ -1435,7 +1436,8 @@ static int __init ixp_module_init(void)
  
- 	switch (algt->type & algt->mask & CRYPTO_ALG_TYPE_MASK) {
- 	case CRYPTO_ALG_TYPE_AEAD:
--		return pcrypt_create_aead(tmpl, tb, algt->type, algt->mask);
-+		return pcrypt_create_aead(tmpl, tb, algt);
- 	}
+ 		/* authenc */
+ 		cra->base.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY |
+-				      CRYPTO_ALG_ASYNC;
++				      CRYPTO_ALG_ASYNC |
++				      CRYPTO_ALG_ALLOCATES_MEMORY;
+ 		cra->setkey = cra->setkey ?: aead_setkey;
+ 		cra->setauthsize = aead_setauthsize;
+ 		cra->encrypt = aead_encrypt;
+diff --git a/drivers/crypto/marvell/cesa/cipher.c b/drivers/crypto/marvell/cesa/cipher.c
+index f133c2ccb5ae..45b4d7a29833 100644
+--- a/drivers/crypto/marvell/cesa/cipher.c
++++ b/drivers/crypto/marvell/cesa/cipher.c
+@@ -508,7 +508,8 @@ struct skcipher_alg mv_cesa_ecb_des_alg = {
+ 		.cra_name = "ecb(des)",
+ 		.cra_driver_name = "mv-ecb-des",
+ 		.cra_priority = 300,
+-		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC |
++			     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = DES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct mv_cesa_des_ctx),
+ 		.cra_alignmask = 0,
+@@ -558,7 +559,8 @@ struct skcipher_alg mv_cesa_cbc_des_alg = {
+ 		.cra_name = "cbc(des)",
+ 		.cra_driver_name = "mv-cbc-des",
+ 		.cra_priority = 300,
+-		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC |
++			     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = DES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct mv_cesa_des_ctx),
+ 		.cra_alignmask = 0,
+@@ -616,7 +618,8 @@ struct skcipher_alg mv_cesa_ecb_des3_ede_alg = {
+ 		.cra_name = "ecb(des3_ede)",
+ 		.cra_driver_name = "mv-ecb-des3-ede",
+ 		.cra_priority = 300,
+-		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC |
++			     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct mv_cesa_des3_ctx),
+ 		.cra_alignmask = 0,
+@@ -669,7 +672,8 @@ struct skcipher_alg mv_cesa_cbc_des3_ede_alg = {
+ 		.cra_name = "cbc(des3_ede)",
+ 		.cra_driver_name = "mv-cbc-des3-ede",
+ 		.cra_priority = 300,
+-		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC |
++			     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct mv_cesa_des3_ctx),
+ 		.cra_alignmask = 0,
+@@ -741,7 +745,8 @@ struct skcipher_alg mv_cesa_ecb_aes_alg = {
+ 		.cra_name = "ecb(aes)",
+ 		.cra_driver_name = "mv-ecb-aes",
+ 		.cra_priority = 300,
+-		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC |
++			     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct mv_cesa_aes_ctx),
+ 		.cra_alignmask = 0,
+@@ -790,7 +795,8 @@ struct skcipher_alg mv_cesa_cbc_aes_alg = {
+ 		.cra_name = "cbc(aes)",
+ 		.cra_driver_name = "mv-cbc-aes",
+ 		.cra_priority = 300,
+-		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC |
++			     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct mv_cesa_aes_ctx),
+ 		.cra_alignmask = 0,
+diff --git a/drivers/crypto/marvell/cesa/hash.c b/drivers/crypto/marvell/cesa/hash.c
+index b971284332b6..bd0bd9ffd6e9 100644
+--- a/drivers/crypto/marvell/cesa/hash.c
++++ b/drivers/crypto/marvell/cesa/hash.c
+@@ -921,6 +921,7 @@ struct ahash_alg mv_md5_alg = {
+ 			.cra_driver_name = "mv-md5",
+ 			.cra_priority = 300,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct mv_cesa_hash_ctx),
+@@ -991,6 +992,7 @@ struct ahash_alg mv_sha1_alg = {
+ 			.cra_driver_name = "mv-sha1",
+ 			.cra_priority = 300,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = SHA1_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct mv_cesa_hash_ctx),
+@@ -1064,6 +1066,7 @@ struct ahash_alg mv_sha256_alg = {
+ 			.cra_driver_name = "mv-sha256",
+ 			.cra_priority = 300,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = SHA256_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct mv_cesa_hash_ctx),
+@@ -1298,6 +1301,7 @@ struct ahash_alg mv_ahmac_md5_alg = {
+ 			.cra_driver_name = "mv-hmac-md5",
+ 			.cra_priority = 300,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct mv_cesa_hmac_ctx),
+@@ -1368,6 +1372,7 @@ struct ahash_alg mv_ahmac_sha1_alg = {
+ 			.cra_driver_name = "mv-hmac-sha1",
+ 			.cra_priority = 300,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = SHA1_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct mv_cesa_hmac_ctx),
+@@ -1438,6 +1443,7 @@ struct ahash_alg mv_ahmac_sha256_alg = {
+ 			.cra_driver_name = "mv-hmac-sha256",
+ 			.cra_priority = 300,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = SHA256_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct mv_cesa_hmac_ctx),
+diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c b/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
+index 01bf4826c03e..90bb31329d4b 100644
+--- a/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
++++ b/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
+@@ -1301,7 +1301,7 @@ static int otx_cpt_aead_null_decrypt(struct aead_request *req)
+ static struct skcipher_alg otx_cpt_skciphers[] = { {
+ 	.base.cra_name = "xts(aes)",
+ 	.base.cra_driver_name = "cpt_xts_aes",
+-	.base.cra_flags = CRYPTO_ALG_ASYNC,
++	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize = AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize = sizeof(struct otx_cpt_enc_ctx),
+ 	.base.cra_alignmask = 7,
+@@ -1318,7 +1318,7 @@ static struct skcipher_alg otx_cpt_skciphers[] = { {
+ }, {
+ 	.base.cra_name = "cbc(aes)",
+ 	.base.cra_driver_name = "cpt_cbc_aes",
+-	.base.cra_flags = CRYPTO_ALG_ASYNC,
++	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize = AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize = sizeof(struct otx_cpt_enc_ctx),
+ 	.base.cra_alignmask = 7,
+@@ -1335,7 +1335,7 @@ static struct skcipher_alg otx_cpt_skciphers[] = { {
+ }, {
+ 	.base.cra_name = "ecb(aes)",
+ 	.base.cra_driver_name = "cpt_ecb_aes",
+-	.base.cra_flags = CRYPTO_ALG_ASYNC,
++	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize = AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize = sizeof(struct otx_cpt_enc_ctx),
+ 	.base.cra_alignmask = 7,
+@@ -1352,7 +1352,7 @@ static struct skcipher_alg otx_cpt_skciphers[] = { {
+ }, {
+ 	.base.cra_name = "cfb(aes)",
+ 	.base.cra_driver_name = "cpt_cfb_aes",
+-	.base.cra_flags = CRYPTO_ALG_ASYNC,
++	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize = AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize = sizeof(struct otx_cpt_enc_ctx),
+ 	.base.cra_alignmask = 7,
+@@ -1369,7 +1369,7 @@ static struct skcipher_alg otx_cpt_skciphers[] = { {
+ }, {
+ 	.base.cra_name = "cbc(des3_ede)",
+ 	.base.cra_driver_name = "cpt_cbc_des3_ede",
+-	.base.cra_flags = CRYPTO_ALG_ASYNC,
++	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 	.base.cra_ctxsize = sizeof(struct otx_cpt_des3_ctx),
+ 	.base.cra_alignmask = 7,
+@@ -1386,7 +1386,7 @@ static struct skcipher_alg otx_cpt_skciphers[] = { {
+ }, {
+ 	.base.cra_name = "ecb(des3_ede)",
+ 	.base.cra_driver_name = "cpt_ecb_des3_ede",
+-	.base.cra_flags = CRYPTO_ALG_ASYNC,
++	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 	.base.cra_ctxsize = sizeof(struct otx_cpt_des3_ctx),
+ 	.base.cra_alignmask = 7,
+@@ -1407,7 +1407,7 @@ static struct aead_alg otx_cpt_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha1),cbc(aes))",
+ 		.cra_driver_name = "cpt_hmac_sha1_cbc_aes",
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
+ 		.cra_priority = 4001,
+ 		.cra_alignmask = 0,
+@@ -1426,7 +1426,7 @@ static struct aead_alg otx_cpt_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha256),cbc(aes))",
+ 		.cra_driver_name = "cpt_hmac_sha256_cbc_aes",
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
+ 		.cra_priority = 4001,
+ 		.cra_alignmask = 0,
+@@ -1445,7 +1445,7 @@ static struct aead_alg otx_cpt_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha384),cbc(aes))",
+ 		.cra_driver_name = "cpt_hmac_sha384_cbc_aes",
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
+ 		.cra_priority = 4001,
+ 		.cra_alignmask = 0,
+@@ -1464,7 +1464,7 @@ static struct aead_alg otx_cpt_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha512),cbc(aes))",
+ 		.cra_driver_name = "cpt_hmac_sha512_cbc_aes",
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
+ 		.cra_priority = 4001,
+ 		.cra_alignmask = 0,
+@@ -1483,7 +1483,7 @@ static struct aead_alg otx_cpt_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha1),ecb(cipher_null))",
+ 		.cra_driver_name = "cpt_hmac_sha1_ecb_null",
+ 		.cra_blocksize = 1,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
+ 		.cra_priority = 4001,
+ 		.cra_alignmask = 0,
+@@ -1502,7 +1502,7 @@ static struct aead_alg otx_cpt_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha256),ecb(cipher_null))",
+ 		.cra_driver_name = "cpt_hmac_sha256_ecb_null",
+ 		.cra_blocksize = 1,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
+ 		.cra_priority = 4001,
+ 		.cra_alignmask = 0,
+@@ -1521,7 +1521,7 @@ static struct aead_alg otx_cpt_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha384),ecb(cipher_null))",
+ 		.cra_driver_name = "cpt_hmac_sha384_ecb_null",
+ 		.cra_blocksize = 1,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
+ 		.cra_priority = 4001,
+ 		.cra_alignmask = 0,
+@@ -1540,7 +1540,7 @@ static struct aead_alg otx_cpt_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha512),ecb(cipher_null))",
+ 		.cra_driver_name = "cpt_hmac_sha512_ecb_null",
+ 		.cra_blocksize = 1,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
+ 		.cra_priority = 4001,
+ 		.cra_alignmask = 0,
+@@ -1559,7 +1559,7 @@ static struct aead_alg otx_cpt_aeads[] = { {
+ 		.cra_name = "rfc4106(gcm(aes))",
+ 		.cra_driver_name = "cpt_rfc4106_gcm_aes",
+ 		.cra_blocksize = 1,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
+ 		.cra_priority = 4001,
+ 		.cra_alignmask = 0,
+diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
+index 6a828bbecea4..d8aec5153b21 100644
+--- a/drivers/crypto/n2_core.c
++++ b/drivers/crypto/n2_core.c
+@@ -1382,7 +1382,8 @@ static int __n2_register_one_skcipher(const struct n2_skcipher_tmpl *tmpl)
+ 	snprintf(alg->base.cra_name, CRYPTO_MAX_ALG_NAME, "%s", tmpl->name);
+ 	snprintf(alg->base.cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s-n2", tmpl->drv_name);
+ 	alg->base.cra_priority = N2_CRA_PRIORITY;
+-	alg->base.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC;
++	alg->base.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC |
++			      CRYPTO_ALG_ALLOCATES_MEMORY;
+ 	alg->base.cra_blocksize = tmpl->block_size;
+ 	p->enc_type = tmpl->enc_type;
+ 	alg->base.cra_ctxsize = sizeof(struct n2_skcipher_context);
+diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
+index 7384e91c8b32..cf84768f3e6d 100644
+--- a/drivers/crypto/picoxcell_crypto.c
++++ b/drivers/crypto/picoxcell_crypto.c
+@@ -1226,6 +1226,7 @@ static struct spacc_alg ipsec_engine_algs[] = {
+ 			.base.cra_priority	= SPACC_CRYPTO_ALG_PRIORITY,
+ 			.base.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
+ 						  CRYPTO_ALG_ASYNC |
++						  CRYPTO_ALG_ALLOCATES_MEMORY |
+ 						  CRYPTO_ALG_NEED_FALLBACK,
+ 			.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 			.base.cra_ctxsize	= sizeof(struct spacc_ablk_ctx),
+@@ -1251,6 +1252,7 @@ static struct spacc_alg ipsec_engine_algs[] = {
+ 			.base.cra_priority	= SPACC_CRYPTO_ALG_PRIORITY,
+ 			.base.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
+ 						  CRYPTO_ALG_ASYNC |
++						  CRYPTO_ALG_ALLOCATES_MEMORY |
+ 						  CRYPTO_ALG_NEED_FALLBACK,
+ 			.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 			.base.cra_ctxsize	= sizeof(struct spacc_ablk_ctx),
+@@ -1274,7 +1276,8 @@ static struct spacc_alg ipsec_engine_algs[] = {
+ 			.base.cra_driver_name	= "cbc-des-picoxcell",
+ 			.base.cra_priority	= SPACC_CRYPTO_ALG_PRIORITY,
+ 			.base.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
+-						  CRYPTO_ALG_ASYNC,
++						  CRYPTO_ALG_ASYNC |
++						  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.base.cra_blocksize	= DES_BLOCK_SIZE,
+ 			.base.cra_ctxsize	= sizeof(struct spacc_ablk_ctx),
+ 			.base.cra_module	= THIS_MODULE,
+@@ -1298,7 +1301,8 @@ static struct spacc_alg ipsec_engine_algs[] = {
+ 			.base.cra_driver_name	= "ecb-des-picoxcell",
+ 			.base.cra_priority	= SPACC_CRYPTO_ALG_PRIORITY,
+ 			.base.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
+-						  CRYPTO_ALG_ASYNC,
++						  CRYPTO_ALG_ASYNC |
++						  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.base.cra_blocksize	= DES_BLOCK_SIZE,
+ 			.base.cra_ctxsize	= sizeof(struct spacc_ablk_ctx),
+ 			.base.cra_module	= THIS_MODULE,
+@@ -1321,6 +1325,7 @@ static struct spacc_alg ipsec_engine_algs[] = {
+ 			.base.cra_driver_name	= "cbc-des3-ede-picoxcell",
+ 			.base.cra_priority	= SPACC_CRYPTO_ALG_PRIORITY,
+ 			.base.cra_flags		= CRYPTO_ALG_ASYNC |
++						  CRYPTO_ALG_ALLOCATES_MEMORY |
+ 						  CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
+ 			.base.cra_ctxsize	= sizeof(struct spacc_ablk_ctx),
+@@ -1345,6 +1350,7 @@ static struct spacc_alg ipsec_engine_algs[] = {
+ 			.base.cra_driver_name	= "ecb-des3-ede-picoxcell",
+ 			.base.cra_priority	= SPACC_CRYPTO_ALG_PRIORITY,
+ 			.base.cra_flags		= CRYPTO_ALG_ASYNC |
++						  CRYPTO_ALG_ALLOCATES_MEMORY |
+ 						  CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
+ 			.base.cra_ctxsize	= sizeof(struct spacc_ablk_ctx),
+@@ -1376,6 +1382,7 @@ static struct spacc_aead ipsec_engine_aeads[] = {
+ 						   "cbc-aes-picoxcell",
+ 				.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_NEED_FALLBACK |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+@@ -1406,6 +1413,7 @@ static struct spacc_aead ipsec_engine_aeads[] = {
+ 						   "cbc-aes-picoxcell",
+ 				.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_NEED_FALLBACK |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+@@ -1436,6 +1444,7 @@ static struct spacc_aead ipsec_engine_aeads[] = {
+ 						   "cbc-aes-picoxcell",
+ 				.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_NEED_FALLBACK |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+@@ -1466,6 +1475,7 @@ static struct spacc_aead ipsec_engine_aeads[] = {
+ 						   "cbc-3des-picoxcell",
+ 				.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_NEED_FALLBACK |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+@@ -1497,6 +1507,7 @@ static struct spacc_aead ipsec_engine_aeads[] = {
+ 						   "cbc-3des-picoxcell",
+ 				.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_NEED_FALLBACK |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+@@ -1527,6 +1538,7 @@ static struct spacc_aead ipsec_engine_aeads[] = {
+ 						   "cbc-3des-picoxcell",
+ 				.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					     CRYPTO_ALG_NEED_FALLBACK |
+ 					     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+@@ -1556,6 +1568,7 @@ static struct spacc_alg l2_engine_algs[] = {
+ 			.base.cra_driver_name	= "f8-kasumi-picoxcell",
+ 			.base.cra_priority	= SPACC_CRYPTO_ALG_PRIORITY,
+ 			.base.cra_flags		= CRYPTO_ALG_ASYNC |
++						  CRYPTO_ALG_ALLOCATES_MEMORY |
+ 						  CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.base.cra_blocksize	= 8,
+ 			.base.cra_ctxsize	= sizeof(struct spacc_ablk_ctx),
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+index 2a353e249e1c..72753b84dc95 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -1295,7 +1295,7 @@ static struct aead_alg qat_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha1),cbc(aes))",
+ 		.cra_driver_name = "qat_aes_cbc_hmac_sha1",
+ 		.cra_priority = 4001,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
+ 		.cra_module = THIS_MODULE,
+@@ -1312,7 +1312,7 @@ static struct aead_alg qat_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha256),cbc(aes))",
+ 		.cra_driver_name = "qat_aes_cbc_hmac_sha256",
+ 		.cra_priority = 4001,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
+ 		.cra_module = THIS_MODULE,
+@@ -1329,7 +1329,7 @@ static struct aead_alg qat_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha512),cbc(aes))",
+ 		.cra_driver_name = "qat_aes_cbc_hmac_sha512",
+ 		.cra_priority = 4001,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
++		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
+ 		.cra_module = THIS_MODULE,
+@@ -1347,7 +1347,7 @@ static struct skcipher_alg qat_skciphers[] = { {
+ 	.base.cra_name = "cbc(aes)",
+ 	.base.cra_driver_name = "qat_aes_cbc",
+ 	.base.cra_priority = 4001,
+-	.base.cra_flags = CRYPTO_ALG_ASYNC,
++	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize = AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize = sizeof(struct qat_alg_skcipher_ctx),
+ 	.base.cra_alignmask = 0,
+@@ -1365,7 +1365,7 @@ static struct skcipher_alg qat_skciphers[] = { {
+ 	.base.cra_name = "ctr(aes)",
+ 	.base.cra_driver_name = "qat_aes_ctr",
+ 	.base.cra_priority = 4001,
+-	.base.cra_flags = CRYPTO_ALG_ASYNC,
++	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize = 1,
+ 	.base.cra_ctxsize = sizeof(struct qat_alg_skcipher_ctx),
+ 	.base.cra_alignmask = 0,
+@@ -1383,7 +1383,8 @@ static struct skcipher_alg qat_skciphers[] = { {
+ 	.base.cra_name = "xts(aes)",
+ 	.base.cra_driver_name = "qat_aes_xts",
+ 	.base.cra_priority = 4001,
+-	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
++	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK |
++			  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 	.base.cra_blocksize = AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize = sizeof(struct qat_alg_skcipher_ctx),
+ 	.base.cra_alignmask = 0,
+diff --git a/drivers/crypto/qce/skcipher.c b/drivers/crypto/qce/skcipher.c
+index 9412433f3b21..13c202ef560b 100644
+--- a/drivers/crypto/qce/skcipher.c
++++ b/drivers/crypto/qce/skcipher.c
+@@ -404,6 +404,7 @@ static int qce_skcipher_register_one(const struct qce_skcipher_def *def,
  
- 	return -EINVAL;
-diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-index d31031de51bc..4983b2b4a223 100644
---- a/crypto/rsa-pkcs1pad.c
-+++ b/crypto/rsa-pkcs1pad.c
-@@ -596,7 +596,6 @@ static void pkcs1pad_free(struct akcipher_instance *inst)
- 
- static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
- {
--	struct crypto_attr_type *algt;
- 	u32 mask;
- 	struct akcipher_instance *inst;
- 	struct pkcs1pad_inst_ctx *ctx;
-@@ -604,14 +603,9 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	const char *hash_name;
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_AKCIPHER) & algt->mask)
--		return -EINVAL;
--
--	mask = crypto_requires_sync(algt->type, algt->mask);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_AKCIPHER, &mask);
-+	if (err)
-+		return err;
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
- 	if (!inst)
-@@ -658,7 +652,6 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
- 			goto err_free_inst;
- 	}
- 
--	inst->alg.base.cra_flags = rsa_alg->base.cra_flags & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = rsa_alg->base.cra_priority;
- 	inst->alg.base.cra_ctxsize = sizeof(struct pkcs1pad_ctx);
- 
-diff --git a/crypto/simd.c b/crypto/simd.c
-index 56885af49c24..edaa479a1ec5 100644
---- a/crypto/simd.c
-+++ b/crypto/simd.c
-@@ -171,7 +171,8 @@ struct simd_skcipher_alg *simd_skcipher_create_compat(const char *algname,
- 		     drvname) >= CRYPTO_MAX_ALG_NAME)
- 		goto out_free_salg;
- 
--	alg->base.cra_flags = CRYPTO_ALG_ASYNC;
-+	alg->base.cra_flags = CRYPTO_ALG_ASYNC |
-+		(ialg->base.cra_flags & CRYPTO_ALG_INHERITED_FLAGS);
- 	alg->base.cra_priority = ialg->base.cra_priority;
- 	alg->base.cra_blocksize = ialg->base.cra_blocksize;
- 	alg->base.cra_alignmask = ialg->base.cra_alignmask;
-@@ -417,7 +418,8 @@ struct simd_aead_alg *simd_aead_create_compat(const char *algname,
- 		     drvname) >= CRYPTO_MAX_ALG_NAME)
- 		goto out_free_salg;
- 
--	alg->base.cra_flags = CRYPTO_ALG_ASYNC;
-+	alg->base.cra_flags = CRYPTO_ALG_ASYNC |
-+		(ialg->base.cra_flags & CRYPTO_ALG_INHERITED_FLAGS);
- 	alg->base.cra_priority = ialg->base.cra_priority;
- 	alg->base.cra_blocksize = ialg->base.cra_blocksize;
- 	alg->base.cra_alignmask = ialg->base.cra_alignmask;
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 7221def7b9a7..3b93a74ad124 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -934,22 +934,17 @@ static void skcipher_free_instance_simple(struct skcipher_instance *inst)
- struct skcipher_instance *skcipher_alloc_instance_simple(
- 	struct crypto_template *tmpl, struct rtattr **tb)
- {
--	struct crypto_attr_type *algt;
- 	u32 mask;
- 	struct skcipher_instance *inst;
- 	struct crypto_cipher_spawn *spawn;
- 	struct crypto_alg *cipher_alg;
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return ERR_CAST(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_SKCIPHER) & algt->mask)
--		return ERR_PTR(-EINVAL);
--
--	mask = crypto_requires_off(algt->type, algt->mask,
--				   CRYPTO_ALG_NEED_FALLBACK);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SKCIPHER, &mask);
-+	if (err)
-+		return ERR_PTR(err);
-+	mask |= crypto_requires_off(crypto_get_attr_type(tb),
-+				    CRYPTO_ALG_NEED_FALLBACK);
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
- 	if (!inst)
-diff --git a/crypto/vmac.c b/crypto/vmac.c
-index 2d906830df96..9b565d1040d6 100644
---- a/crypto/vmac.c
-+++ b/crypto/vmac.c
-@@ -620,9 +620,10 @@ static int vmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct shash_instance *inst;
- 	struct crypto_cipher_spawn *spawn;
- 	struct crypto_alg *alg;
-+	u32 mask;
- 	int err;
- 
--	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SHASH);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SHASH, &mask);
- 	if (err)
- 		return err;
- 
-@@ -632,7 +633,7 @@ static int vmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	spawn = shash_instance_ctx(inst);
- 
- 	err = crypto_grab_cipher(spawn, shash_crypto_instance(inst),
--				 crypto_attr_alg_name(tb[1]), 0, 0);
-+				 crypto_attr_alg_name(tb[1]), 0, mask);
- 	if (err)
- 		goto err_free_inst;
- 	alg = crypto_spawn_cipher_alg(spawn);
-diff --git a/crypto/xcbc.c b/crypto/xcbc.c
-index 598ec88abf0f..af3b7eb5d7c7 100644
---- a/crypto/xcbc.c
-+++ b/crypto/xcbc.c
-@@ -191,9 +191,10 @@ static int xcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_cipher_spawn *spawn;
- 	struct crypto_alg *alg;
- 	unsigned long alignmask;
-+	u32 mask;
- 	int err;
- 
--	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SHASH);
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SHASH, &mask);
- 	if (err)
- 		return err;
- 
-@@ -203,7 +204,7 @@ static int xcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	spawn = shash_instance_ctx(inst);
- 
- 	err = crypto_grab_cipher(spawn, shash_crypto_instance(inst),
--				 crypto_attr_alg_name(tb[1]), 0, 0);
-+				 crypto_attr_alg_name(tb[1]), 0, mask);
- 	if (err)
- 		goto err_free_inst;
- 	alg = crypto_spawn_cipher_alg(spawn);
-diff --git a/crypto/xts.c b/crypto/xts.c
-index 3565f3b863a6..35a30610569b 100644
---- a/crypto/xts.c
-+++ b/crypto/xts.c
-@@ -331,19 +331,17 @@ static void crypto_xts_free(struct skcipher_instance *inst)
- static int create(struct crypto_template *tmpl, struct rtattr **tb)
- {
- 	struct skcipher_instance *inst;
--	struct crypto_attr_type *algt;
- 	struct xts_instance_ctx *ctx;
- 	struct skcipher_alg *alg;
- 	const char *cipher_name;
- 	u32 mask;
- 	int err;
- 
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return PTR_ERR(algt);
--
--	if ((algt->type ^ CRYPTO_ALG_TYPE_SKCIPHER) & algt->mask)
--		return -EINVAL;
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SKCIPHER, &mask);
-+	if (err)
-+		return err;
-+	mask |= crypto_requires_off(crypto_get_attr_type(tb),
-+				    CRYPTO_ALG_NEED_FALLBACK);
- 
- 	cipher_name = crypto_attr_alg_name(tb[1]);
- 	if (IS_ERR(cipher_name))
-@@ -355,10 +353,6 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
- 
- 	ctx = skcipher_instance_ctx(inst);
- 
--	mask = crypto_requires_off(algt->type, algt->mask,
--				   CRYPTO_ALG_NEED_FALLBACK |
--				   CRYPTO_ALG_ASYNC);
--
- 	err = crypto_grab_skcipher(&ctx->spawn, skcipher_crypto_instance(inst),
- 				   cipher_name, 0, mask);
- 	if (err == -ENOENT) {
-@@ -415,7 +409,6 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
- 	} else
- 		goto err_free_inst;
- 
--	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = alg->base.cra_priority;
- 	inst->alg.base.cra_blocksize = XTS_BLOCK_SIZE;
- 	inst->alg.base.cra_alignmask = alg->base.cra_alignmask |
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 00a9cf98debe..da64c37482b4 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -116,7 +116,7 @@ struct crypto_tfm *crypto_spawn_tfm(struct crypto_spawn *spawn, u32 type,
- void *crypto_spawn_tfm2(struct crypto_spawn *spawn);
- 
- struct crypto_attr_type *crypto_get_attr_type(struct rtattr **tb);
--int crypto_check_attr_type(struct rtattr **tb, u32 type);
-+int crypto_check_attr_type(struct rtattr **tb, u32 type, u32 *mask_ret);
- const char *crypto_attr_alg_name(struct rtattr *rta);
- int crypto_attr_u32(struct rtattr *rta, u32 *num);
- int crypto_inst_setname(struct crypto_instance *inst, const char *name,
-@@ -235,18 +235,27 @@ static inline struct crypto_async_request *crypto_get_backlog(
- 	       container_of(queue->backlog, struct crypto_async_request, list);
- }
- 
--static inline int crypto_requires_off(u32 type, u32 mask, u32 off)
-+static inline u32 crypto_requires_off(struct crypto_attr_type *algt, u32 off)
- {
--	return (type ^ off) & mask & off;
-+	return (algt->type ^ off) & algt->mask & off;
- }
- 
- /*
-- * Returns CRYPTO_ALG_ASYNC if type/mask requires the use of sync algorithms.
-- * Otherwise returns zero.
-+ * When an algorithm uses another algorithm (e.g., if it's an instance of a
-+ * template), these are the flags that should always be set on the "outer"
-+ * algorithm if any "inner" algorithm has them set.
-  */
--static inline int crypto_requires_sync(u32 type, u32 mask)
-+#define CRYPTO_ALG_INHERITED_FLAGS	CRYPTO_ALG_ASYNC
-+
-+/*
-+ * Given the type and mask that specify the flags restrictions on a template
-+ * instance being created, return the mask that should be passed to
-+ * crypto_grab_*() (along with type=0) to honor any request the user made to
-+ * have any of the CRYPTO_ALG_INHERITED_FLAGS clear.
-+ */
-+static inline u32 crypto_algt_inherited_mask(struct crypto_attr_type *algt)
- {
--	return crypto_requires_off(type, mask, CRYPTO_ALG_ASYNC);
-+	return crypto_requires_off(algt, CRYPTO_ALG_INHERITED_FLAGS);
- }
- 
- noinline unsigned long __crypto_memneq(const void *a, const void *b, size_t size);
+ 	alg->base.cra_priority		= 300;
+ 	alg->base.cra_flags		= CRYPTO_ALG_ASYNC |
++					  CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					  CRYPTO_ALG_KERN_DRIVER_ONLY;
+ 	alg->base.cra_ctxsize		= sizeof(struct qce_cipher_ctx);
+ 	alg->base.cra_alignmask		= 0;
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 9c6db7f698c4..7c547352a862 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -2264,7 +2264,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha1-"
+ 						   "cbc-aes-talitos",
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.maxauthsize = SHA1_DIGEST_SIZE,
+@@ -2285,7 +2286,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha1-"
+ 						   "cbc-aes-talitos-hsna",
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.maxauthsize = SHA1_DIGEST_SIZE,
+@@ -2306,7 +2308,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha1-"
+ 						   "cbc-3des-talitos",
+ 				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = SHA1_DIGEST_SIZE,
+@@ -2330,7 +2333,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha1-"
+ 						   "cbc-3des-talitos-hsna",
+ 				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = SHA1_DIGEST_SIZE,
+@@ -2352,7 +2356,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha224-"
+ 						   "cbc-aes-talitos",
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.maxauthsize = SHA224_DIGEST_SIZE,
+@@ -2373,7 +2378,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha224-"
+ 						   "cbc-aes-talitos-hsna",
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.maxauthsize = SHA224_DIGEST_SIZE,
+@@ -2394,7 +2400,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha224-"
+ 						   "cbc-3des-talitos",
+ 				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = SHA224_DIGEST_SIZE,
+@@ -2418,7 +2425,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha224-"
+ 						   "cbc-3des-talitos-hsna",
+ 				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = SHA224_DIGEST_SIZE,
+@@ -2440,7 +2448,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha256-"
+ 						   "cbc-aes-talitos",
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.maxauthsize = SHA256_DIGEST_SIZE,
+@@ -2461,7 +2470,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha256-"
+ 						   "cbc-aes-talitos-hsna",
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.maxauthsize = SHA256_DIGEST_SIZE,
+@@ -2482,7 +2492,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha256-"
+ 						   "cbc-3des-talitos",
+ 				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = SHA256_DIGEST_SIZE,
+@@ -2506,7 +2517,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha256-"
+ 						   "cbc-3des-talitos-hsna",
+ 				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = SHA256_DIGEST_SIZE,
+@@ -2528,7 +2540,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha384-"
+ 						   "cbc-aes-talitos",
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.maxauthsize = SHA384_DIGEST_SIZE,
+@@ -2549,7 +2562,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha384-"
+ 						   "cbc-3des-talitos",
+ 				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = SHA384_DIGEST_SIZE,
+@@ -2571,7 +2585,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha512-"
+ 						   "cbc-aes-talitos",
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.maxauthsize = SHA512_DIGEST_SIZE,
+@@ -2592,7 +2607,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-sha512-"
+ 						   "cbc-3des-talitos",
+ 				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = SHA512_DIGEST_SIZE,
+@@ -2614,7 +2630,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-md5-"
+ 						   "cbc-aes-talitos",
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.maxauthsize = MD5_DIGEST_SIZE,
+@@ -2635,7 +2652,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-md5-"
+ 						   "cbc-aes-talitos-hsna",
+ 				.cra_blocksize = AES_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = AES_BLOCK_SIZE,
+ 			.maxauthsize = MD5_DIGEST_SIZE,
+@@ -2655,7 +2673,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-md5-"
+ 						   "cbc-3des-talitos",
+ 				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = MD5_DIGEST_SIZE,
+@@ -2678,7 +2697,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_driver_name = "authenc-hmac-md5-"
+ 						   "cbc-3des-talitos-hsna",
+ 				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			},
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+ 			.maxauthsize = MD5_DIGEST_SIZE,
+@@ -2699,7 +2719,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 			.base.cra_name = "ecb(aes)",
+ 			.base.cra_driver_name = "ecb-aes-talitos",
+ 			.base.cra_blocksize = AES_BLOCK_SIZE,
+-			.base.cra_flags = CRYPTO_ALG_ASYNC,
++			.base.cra_flags = CRYPTO_ALG_ASYNC |
++					  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.min_keysize = AES_MIN_KEY_SIZE,
+ 			.max_keysize = AES_MAX_KEY_SIZE,
+ 			.setkey = skcipher_aes_setkey,
+@@ -2712,7 +2733,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 			.base.cra_name = "cbc(aes)",
+ 			.base.cra_driver_name = "cbc-aes-talitos",
+ 			.base.cra_blocksize = AES_BLOCK_SIZE,
+-			.base.cra_flags = CRYPTO_ALG_ASYNC,
++			.base.cra_flags = CRYPTO_ALG_ASYNC |
++					  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.min_keysize = AES_MIN_KEY_SIZE,
+ 			.max_keysize = AES_MAX_KEY_SIZE,
+ 			.ivsize = AES_BLOCK_SIZE,
+@@ -2727,7 +2749,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 			.base.cra_name = "ctr(aes)",
+ 			.base.cra_driver_name = "ctr-aes-talitos",
+ 			.base.cra_blocksize = 1,
+-			.base.cra_flags = CRYPTO_ALG_ASYNC,
++			.base.cra_flags = CRYPTO_ALG_ASYNC |
++					  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.min_keysize = AES_MIN_KEY_SIZE,
+ 			.max_keysize = AES_MAX_KEY_SIZE,
+ 			.ivsize = AES_BLOCK_SIZE,
+@@ -2742,7 +2765,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 			.base.cra_name = "ecb(des)",
+ 			.base.cra_driver_name = "ecb-des-talitos",
+ 			.base.cra_blocksize = DES_BLOCK_SIZE,
+-			.base.cra_flags = CRYPTO_ALG_ASYNC,
++			.base.cra_flags = CRYPTO_ALG_ASYNC |
++					  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.min_keysize = DES_KEY_SIZE,
+ 			.max_keysize = DES_KEY_SIZE,
+ 			.setkey = skcipher_des_setkey,
+@@ -2755,7 +2779,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 			.base.cra_name = "cbc(des)",
+ 			.base.cra_driver_name = "cbc-des-talitos",
+ 			.base.cra_blocksize = DES_BLOCK_SIZE,
+-			.base.cra_flags = CRYPTO_ALG_ASYNC,
++			.base.cra_flags = CRYPTO_ALG_ASYNC |
++					  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.min_keysize = DES_KEY_SIZE,
+ 			.max_keysize = DES_KEY_SIZE,
+ 			.ivsize = DES_BLOCK_SIZE,
+@@ -2770,7 +2795,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 			.base.cra_name = "ecb(des3_ede)",
+ 			.base.cra_driver_name = "ecb-3des-talitos",
+ 			.base.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-			.base.cra_flags = CRYPTO_ALG_ASYNC,
++			.base.cra_flags = CRYPTO_ALG_ASYNC |
++					  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.min_keysize = DES3_EDE_KEY_SIZE,
+ 			.max_keysize = DES3_EDE_KEY_SIZE,
+ 			.setkey = skcipher_des3_setkey,
+@@ -2784,7 +2810,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 			.base.cra_name = "cbc(des3_ede)",
+ 			.base.cra_driver_name = "cbc-3des-talitos",
+ 			.base.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-			.base.cra_flags = CRYPTO_ALG_ASYNC,
++			.base.cra_flags = CRYPTO_ALG_ASYNC |
++					  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			.min_keysize = DES3_EDE_KEY_SIZE,
+ 			.max_keysize = DES3_EDE_KEY_SIZE,
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+@@ -2804,7 +2831,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "md5",
+ 				.cra_driver_name = "md5-talitos",
+ 				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2819,7 +2847,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "sha1",
+ 				.cra_driver_name = "sha1-talitos",
+ 				.cra_blocksize = SHA1_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2834,7 +2863,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "sha224",
+ 				.cra_driver_name = "sha224-talitos",
+ 				.cra_blocksize = SHA224_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2849,7 +2879,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "sha256",
+ 				.cra_driver_name = "sha256-talitos",
+ 				.cra_blocksize = SHA256_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2864,7 +2895,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "sha384",
+ 				.cra_driver_name = "sha384-talitos",
+ 				.cra_blocksize = SHA384_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2879,7 +2911,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "sha512",
+ 				.cra_driver_name = "sha512-talitos",
+ 				.cra_blocksize = SHA512_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2894,7 +2927,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "hmac(md5)",
+ 				.cra_driver_name = "hmac-md5-talitos",
+ 				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2909,7 +2943,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "hmac(sha1)",
+ 				.cra_driver_name = "hmac-sha1-talitos",
+ 				.cra_blocksize = SHA1_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2924,7 +2959,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "hmac(sha224)",
+ 				.cra_driver_name = "hmac-sha224-talitos",
+ 				.cra_blocksize = SHA224_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2939,7 +2975,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "hmac(sha256)",
+ 				.cra_driver_name = "hmac-sha256-talitos",
+ 				.cra_blocksize = SHA256_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2954,7 +2991,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "hmac(sha384)",
+ 				.cra_driver_name = "hmac-sha384-talitos",
+ 				.cra_blocksize = SHA384_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2969,7 +3007,8 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "hmac(sha512)",
+ 				.cra_driver_name = "hmac-sha512-talitos",
+ 				.cra_blocksize = SHA512_BLOCK_SIZE,
+-				.cra_flags = CRYPTO_ALG_ASYNC,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_ALLOCATES_MEMORY,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c b/drivers/crypto/virtio/virtio_crypto_algs.c
+index cb8a6ea2a4bc..b2601958282e 100644
+--- a/drivers/crypto/virtio/virtio_crypto_algs.c
++++ b/drivers/crypto/virtio/virtio_crypto_algs.c
+@@ -597,7 +597,8 @@ static struct virtio_crypto_algo virtio_crypto_algs[] = { {
+ 		.base.cra_name		= "cbc(aes)",
+ 		.base.cra_driver_name	= "virtio_crypto_aes_cbc",
+ 		.base.cra_priority	= 150,
+-		.base.cra_flags		= CRYPTO_ALG_ASYNC,
++		.base.cra_flags		= CRYPTO_ALG_ASYNC |
++					  CRYPTO_ALG_ALLOCATES_MEMORY,
+ 		.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 		.base.cra_ctxsize	= sizeof(struct virtio_crypto_skcipher_ctx),
+ 		.base.cra_module	= THIS_MODULE,
+diff --git a/drivers/crypto/xilinx/zynqmp-aes-gcm.c b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
+index cd11558893cd..27079354dbe9 100644
+--- a/drivers/crypto/xilinx/zynqmp-aes-gcm.c
++++ b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
+@@ -364,6 +364,7 @@ static struct zynqmp_aead_drv_ctx aes_drv_ctx = {
+ 		.cra_priority		= 200,
+ 		.cra_flags		= CRYPTO_ALG_TYPE_AEAD |
+ 					  CRYPTO_ALG_ASYNC |
++					  CRYPTO_ALG_ALLOCATES_MEMORY |
+ 					  CRYPTO_ALG_KERN_DRIVER_ONLY |
+ 					  CRYPTO_ALG_NEED_FALLBACK,
+ 		.cra_blocksize		= ZYNQMP_AES_BLK_SIZE,
 -- 
 2.27.0
 
