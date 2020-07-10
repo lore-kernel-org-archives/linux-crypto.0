@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44FAEC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jul 2020 06:21:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14BA9C433E2
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jul 2020 06:21:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 218E52078B
+	by mail.kernel.org (Postfix) with ESMTP id E906B2078B
 	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jul 2020 06:21:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1594362110;
-	bh=ZfGuUxZZz6RO0lR3A8MY930nkonafEsFNdUgcMffvf4=;
+	bh=V/UVllduYViFen4+Xqpx/axw9qZry+bhobeiwitli6w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Ypmd0a+cWEYtwbZD2mT5/2IdBXTpviEZ3rzmJmHZpljJk/DPBhgOeouGdlPoWLe0z
-	 OFmXdjkmp5xF3mQ+dDmduBzFME5CaV9TgOHf0uK5WtkluGq6g86cSAmmXfoxIuivjj
-	 QB644qVp7bI7SFBHiAUh5shAxf0ZedJ42ncS34yY=
+	b=OqqDCRYXjZXwg4eGEsJCjADb8dJ4XFxT/r7NMpTn/xzwVu0EPDy4tbJbLbjk1Og0T
+	 6FtAxtfIpFjKJm27U6GPUn8bdRNzeI+55tvpy2yb0uwwbbt2z0JFsfdDB6UK/mpdV8
+	 TLfcNo0RQmttJLCimjHr5v7oZl0wBTNNMFLTO2nc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725851AbgGJGVt (ORCPT
+        id S1726908AbgGJGVu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Jul 2020 02:21:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38992 "EHLO mail.kernel.org"
+        Fri, 10 Jul 2020 02:21:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38996 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725943AbgGJGVr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1727871AbgGJGVr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 10 Jul 2020 02:21:47 -0400
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 14F95207DF;
-        Fri, 10 Jul 2020 06:21:47 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5E4FF207BC;
+        Fri, 10 Jul 2020 06:21:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594362107;
-        bh=ZfGuUxZZz6RO0lR3A8MY930nkonafEsFNdUgcMffvf4=;
+        s=default; t=1594362106;
+        bh=V/UVllduYViFen4+Xqpx/axw9qZry+bhobeiwitli6w=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=wIsdsI/gGx17laq0eBSQr0FYWwfvIU0NZkm/oiDSG5KnznyM/1ezomhmzPurcAjdh
-         EL3IEZjkdrp+Gv9k9BRMv/jUqbkpNFjUH2ixOGHCOqnwlBp7u2+ZDlQgW3Rcmsri2f
-         Mp5djDLN+H2hzx1+Mg1rgMbgY5b5ot1vNT57O564=
+        b=eASACMUw6irFV6yd70BWkqu628TkiZ3l85h39RexG2Rtsss+MXOgn1krUN/BhY8fT
+         i7L/gLyNA2cXSkgc2hfO1bHr8cifx/3yUkUA5c09KHktyuPhJz25hVi3JrjKiivZO3
+         2R5r7RvlPn9ZvtkainGUi6EtgPImclThU+9U3lSc=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Mikulas Patocka <mpatocka@redhat.com>, linux-crypto@vger.kernel.org
 Cc:     dm-devel@redhat.com
-Subject: [PATCH v2 7/7] dm-crypt: don't use drivers that have CRYPTO_ALG_ALLOCATES_MEMORY
-Date:   Thu,  9 Jul 2020 23:20:42 -0700
-Message-Id: <20200710062042.113842-8-ebiggers@kernel.org>
+Subject: [PATCH v2 5/7] crypto: algapi - introduce the flag CRYPTO_ALG_ALLOCATES_MEMORY
+Date:   Thu,  9 Jul 2020 23:20:40 -0700
+Message-Id: <20200710062042.113842-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200710062042.113842-1-ebiggers@kernel.org>
 References: <20200710062042.113842-1-ebiggers@kernel.org>
@@ -55,80 +55,90 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Mikulas Patocka <mpatocka@redhat.com>
+From: Eric Biggers <ebiggers@google.com>
 
-Don't use crypto drivers that have the flag CRYPTO_ALG_ALLOCATES_MEMORY
-set. These drivers allocate memory and thus they are unsuitable for block
-I/O processing.
+Introduce a new algorithm flag CRYPTO_ALG_ALLOCATES_MEMORY.  If this
+flag is set, then the driver allocates memory in its request routine.
+Such drivers are not suitable for disk encryption because GFP_ATOMIC
+allocation can fail anytime (causing random I/O errors) and GFP_KERNEL
+allocation can recurse into the block layer, causing a deadlock.
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+For now, this flag is only implemented for some algorithm types.  We
+also assume some usage constraints for it to be meaningful, since there
+are lots of edge cases the crypto API allows (e.g., misaligned or
+fragmented scatterlists) that mean that nearly any crypto algorithm can
+allocate memory in some case.  See the comment for details.
+
+Also add this flag to CRYPTO_ALG_INHERITED_FLAGS so that when a template
+is instantiated, this flag is set on the template instance if it is set
+on any algorithm the instance uses.
+
+Based on a patch by Mikulas Patocka <mpatocka@redhat.com>
+(https://lore.kernel.org/r/alpine.LRH.2.02.2006301414580.30526@file01.intranet.prod.int.rdu2.redhat.com).
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/md/dm-crypt.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+ include/crypto/algapi.h |  3 ++-
+ include/linux/crypto.h  | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 34 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 000ddfab5ba0..7268faacbdf3 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -421,7 +421,8 @@ static int crypt_iv_lmk_ctr(struct crypt_config *cc, struct dm_target *ti,
- 		return -EINVAL;
- 	}
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 22cf4d80959f..143d884d65c7 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -246,7 +246,8 @@ static inline u32 crypto_requires_off(struct crypto_attr_type *algt, u32 off)
+  * algorithm if any "inner" algorithm has them set.
+  */
+ #define CRYPTO_ALG_INHERITED_FLAGS	\
+-	(CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK)
++	(CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK |	\
++	 CRYPTO_ALG_ALLOCATES_MEMORY)
  
--	lmk->hash_tfm = crypto_alloc_shash("md5", 0, 0);
-+	lmk->hash_tfm = crypto_alloc_shash("md5", 0,
-+					   CRYPTO_ALG_ALLOCATES_MEMORY);
- 	if (IS_ERR(lmk->hash_tfm)) {
- 		ti->error = "Error initializing LMK hash";
- 		return PTR_ERR(lmk->hash_tfm);
-@@ -583,7 +584,8 @@ static int crypt_iv_tcw_ctr(struct crypt_config *cc, struct dm_target *ti,
- 		return -EINVAL;
- 	}
+ /*
+  * Given the type and mask that specify the flags restrictions on a template
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index f73f0b51e1cd..ef90e07c9635 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -100,6 +100,38 @@
+  */
+ #define CRYPTO_NOLOAD			0x00008000
  
--	tcw->crc32_tfm = crypto_alloc_shash("crc32", 0, 0);
-+	tcw->crc32_tfm = crypto_alloc_shash("crc32", 0,
-+					    CRYPTO_ALG_ALLOCATES_MEMORY);
- 	if (IS_ERR(tcw->crc32_tfm)) {
- 		ti->error = "Error initializing CRC32 in TCW";
- 		return PTR_ERR(tcw->crc32_tfm);
-@@ -770,7 +772,8 @@ static int crypt_iv_elephant_ctr(struct crypt_config *cc, struct dm_target *ti,
- 	struct iv_elephant_private *elephant = &cc->iv_gen_private.elephant;
- 	int r;
- 
--	elephant->tfm = crypto_alloc_skcipher("ecb(aes)", 0, 0);
-+	elephant->tfm = crypto_alloc_skcipher("ecb(aes)", 0,
-+					      CRYPTO_ALG_ALLOCATES_MEMORY);
- 	if (IS_ERR(elephant->tfm)) {
- 		r = PTR_ERR(elephant->tfm);
- 		elephant->tfm = NULL;
-@@ -2090,7 +2093,8 @@ static int crypt_alloc_tfms_skcipher(struct crypt_config *cc, char *ciphermode)
- 		return -ENOMEM;
- 
- 	for (i = 0; i < cc->tfms_count; i++) {
--		cc->cipher_tfm.tfms[i] = crypto_alloc_skcipher(ciphermode, 0, 0);
-+		cc->cipher_tfm.tfms[i] = crypto_alloc_skcipher(ciphermode, 0,
-+						CRYPTO_ALG_ALLOCATES_MEMORY);
- 		if (IS_ERR(cc->cipher_tfm.tfms[i])) {
- 			err = PTR_ERR(cc->cipher_tfm.tfms[i]);
- 			crypt_free_tfms(cc);
-@@ -2116,7 +2120,8 @@ static int crypt_alloc_tfms_aead(struct crypt_config *cc, char *ciphermode)
- 	if (!cc->cipher_tfm.tfms)
- 		return -ENOMEM;
- 
--	cc->cipher_tfm.tfms_aead[0] = crypto_alloc_aead(ciphermode, 0, 0);
-+	cc->cipher_tfm.tfms_aead[0] = crypto_alloc_aead(ciphermode, 0,
-+						CRYPTO_ALG_ALLOCATES_MEMORY);
- 	if (IS_ERR(cc->cipher_tfm.tfms_aead[0])) {
- 		err = PTR_ERR(cc->cipher_tfm.tfms_aead[0]);
- 		crypt_free_tfms(cc);
-@@ -2603,7 +2608,7 @@ static int crypt_ctr_auth_cipher(struct crypt_config *cc, char *cipher_api)
- 		return -ENOMEM;
- 	strncpy(mac_alg, start, end - start);
- 
--	mac = crypto_alloc_ahash(mac_alg, 0, 0);
-+	mac = crypto_alloc_ahash(mac_alg, 0, CRYPTO_ALG_ALLOCATES_MEMORY);
- 	kfree(mac_alg);
- 
- 	if (IS_ERR(mac))
++/*
++ * The algorithm may allocate memory during request processing, i.e. during
++ * encryption, decryption, or hashing.  Users can request an algorithm with this
++ * flag unset if they can't handle memory allocation failures.
++ *
++ * This flag is currently only implemented for algorithms of type "skcipher",
++ * "aead", "ahash", "shash", and "cipher".  Algorithms of other types might not
++ * have this flag set even if they allocate memory.
++ *
++ * In some edge cases, algorithms can allocate memory regardless of this flag.
++ * To avoid these cases, users must obey the following usage constraints:
++ *    skcipher:
++ *	- The IV buffer and all scatterlist elements must be aligned to the
++ *	  algorithm's alignmask.
++ *	- If the data were to be divided into chunks of size
++ *	  crypto_skcipher_walksize() (with any remainder going at the end), no
++ *	  chunk can cross a page boundary or a scatterlist element boundary.
++ *    aead:
++ *	- The IV buffer and all scatterlist elements must be aligned to the
++ *	  algorithm's alignmask.
++ *	- The first scatterlist element must contain all the associated data,
++ *	  and its pages must be !PageHighMem.
++ *	- If the plaintext/ciphertext were to be divided into chunks of size
++ *	  crypto_aead_walksize() (with the remainder going at the end), no chunk
++ *	  can cross a page boundary or a scatterlist element boundary.
++ *    ahash:
++ *	- The result buffer must be aligned to the algorithm's alignmask.
++ *	- crypto_ahash_finup() must not be used unless the algorithm implements
++ *	  ->finup() natively.
++ */
++#define CRYPTO_ALG_ALLOCATES_MEMORY	0x00010000
++
+ /*
+  * Transform masks and values (for crt_flags).
+  */
 -- 
 2.27.0
 
