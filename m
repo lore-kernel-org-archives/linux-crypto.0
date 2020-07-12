@@ -1,400 +1,461 @@
-Return-Path: <SRS0=99oU=AW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=9w58=AX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12228C433DF
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jul 2020 03:36:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7549C433E0
+	for <linux-crypto@archiver.kernel.org>; Sun, 12 Jul 2020 13:32:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D11A020767
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jul 2020 03:36:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594438607;
-	bh=RvqC4/XHgD2elU+2iU8/tcelSOMaLT7+oK2PEqKUMW0=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=a+7E/Iaq2vPs8ME5FE0a1lxv+gLz8nWpY4M85GhmO9RbfZuYRfgbY3HQy6tr+Z7s2
-	 3gJ/Znd9UjpsEKOhu4L1wrShtFwLR4u9V3QGzuNuQd+ct3fbt6t8Shx46moWYUUnv8
-	 z0xRM/Xb5TUYVOnSIiGNCMH9jPi6+qLv7IXhk8oE=
+	by mail.kernel.org (Postfix) with ESMTP id 79BDB20702
+	for <linux-crypto@archiver.kernel.org>; Sun, 12 Jul 2020 13:32:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726709AbgGKDgr (ORCPT
+        id S1728835AbgGLNcP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Jul 2020 23:36:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33216 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726707AbgGKDgr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Jul 2020 23:36:47 -0400
-Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F2E05206F0;
-        Sat, 11 Jul 2020 03:36:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594438606;
-        bh=RvqC4/XHgD2elU+2iU8/tcelSOMaLT7+oK2PEqKUMW0=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Qc4IdFN1IO5wKzzVRFBGTnuW/W27UOtROSbR07+ATjMWAZyAUlY+BSxN05df6uAFC
-         0+BT1GCCFGclyE/mZQHmLDMVh8k2sAbbBfIbB8GshQkba7pwGTRH4UCfTth3Z6Ko+3
-         uo13lynZisoFU5MUjEU7KA2IQmOL3eQlr9uWgYD4=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] crypto: xts - prefix function and struct names with "xts"
-Date:   Fri, 10 Jul 2020 20:34:28 -0700
-Message-Id: <20200711033428.134567-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.27.0
+        Sun, 12 Jul 2020 09:32:15 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:7838 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728339AbgGLNcP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 12 Jul 2020 09:32:15 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 52547BEC9E362330CB52;
+        Sun, 12 Jul 2020 21:32:04 +0800 (CST)
+Received: from SWX921481.china.huawei.com (10.126.201.176) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.487.0; Sun, 12 Jul 2020 21:31:55 +0800
+From:   Barry Song <song.bao.hua@hisilicon.com>
+To:     <akpm@linux-foundation.org>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
+        Barry Song <song.bao.hua@hisilicon.com>,
+        "Luis Claudio R . Goncalves" <lgoncalv@redhat.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Mahipal Challa <mahipalreddy2006@gmail.com>,
+        Seth Jennings <sjenning@redhat.com>,
+        Dan Streetman <ddstreet@ieee.org>,
+        Vitaly Wool <vitaly.wool@konsulko.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        "Colin Ian King" <colin.king@canonical.com>
+Subject: [PATCH v5] mm/zswap: move to use crypto_acomp API for hardware acceleration
+Date:   Mon, 13 Jul 2020 01:29:54 +1200
+Message-ID: <20200712132954.40464-1-song.bao.hua@hisilicon.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.126.201.176]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+Right now, all new ZIP drivers are adapted to crypto_acomp APIs rather
+than legacy crypto_comp APIs. Tradiontal ZIP drivers like lz4,lzo etc
+have been also wrapped into acomp via scomp backend. But zswap.c is still
+using the old APIs. That means zswap won't be able to work on any new
+ZIP drivers in kernel.
 
-Overly-generic names can cause problems like naming collisions,
-confusing crash reports, and reduced grep-ability.  E.g. see
-commit d099ea6e6fde ("crypto - Avoid free() namespace collision").
+This patch moves to use cryto_acomp APIs to fix the disconnected bridge
+between new ZIP drivers and zswap. It is probably the first real user
+to use acomp but perhaps not a good example to demonstrate how multiple
+acomp requests can be executed in parallel in one acomp instance.
+frontswap is doing page load and store page by page synchronously.
+swap_writepage() depends on the completion of frontswap_store() to
+decide if it should call __swap_writepage() to swap to disk.
 
-Clean this up for the xts template by prefixing the names with "xts_".
+However this patch creates multiple acomp instances, so multiple threads
+running on multiple different cpus can actually do (de)compression
+parallelly, leveraging the power of multiple ZIP hardware queues. This
+is also consistent with frontswap's page management model.
 
-(I didn't use "crypto_xts_" instead because that seems overkill.)
+The old zswap code uses atomic context and avoids the race conditions
+while shared resources like zswap_dstmem are accessed. Here since acomp
+can sleep, per-cpu mutex is used to replace preemption-disable.
 
-Also constify the tfm context in a couple places, and make
-xts_free_instance() use the instance context structure so that it
-doesn't just assume the crypto_skcipher_spawn is at the beginning.
+While it is possible to make mm/page_io.c and mm/frontswap.c support
+async (de)compression in some way, the entire design requires careful
+thinking and performance evaluation. For the first step, the base with
+fixed connection between ZIP drivers and zswap should be built.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Cc: Luis Claudio R. Goncalves <lgoncalv@redhat.com>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Mahipal Challa <mahipalreddy2006@gmail.com>
+Cc: Seth Jennings <sjenning@redhat.com>
+Cc: Dan Streetman <ddstreet@ieee.org>
+Cc: Vitaly Wool <vitaly.wool@konsulko.com>
+Cc: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: Colin Ian King <colin.king@canonical.com>
+Signed-off-by: Barry Song <song.bao.hua@hisilicon.com>
 ---
- crypto/xts.c | 137 +++++++++++++++++++++++++++------------------------
- 1 file changed, 72 insertions(+), 65 deletions(-)
+ v2: address two comments from Sebastian Andrzej Siewior, thanks!
+   1. use pointer rather than pointer's pointer for acomp_ctx;
+   2. fix the race while multiple zpool exist while dynamically switching
+      comprossor and zpool type
 
-diff --git a/crypto/xts.c b/crypto/xts.c
-index 9a7adab6c3e1..3c3ed02c7663 100644
---- a/crypto/xts.c
-+++ b/crypto/xts.c
-@@ -20,7 +20,7 @@
- #include <crypto/b128ops.h>
- #include <crypto/gf128mul.h>
+ mm/zswap.c | 183 ++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 138 insertions(+), 45 deletions(-)
+
+diff --git a/mm/zswap.c b/mm/zswap.c
+index fbb782924ccc..8e9c18b6fdd9 100644
+--- a/mm/zswap.c
++++ b/mm/zswap.c
+@@ -24,8 +24,10 @@
+ #include <linux/rbtree.h>
+ #include <linux/swap.h>
+ #include <linux/crypto.h>
++#include <linux/scatterlist.h>
+ #include <linux/mempool.h>
+ #include <linux/zpool.h>
++#include <crypto/acompress.h>
  
--struct priv {
-+struct xts_tfm_ctx {
- 	struct crypto_skcipher *child;
- 	struct crypto_cipher *tweak;
- };
-@@ -30,17 +30,17 @@ struct xts_instance_ctx {
- 	char name[CRYPTO_MAX_ALG_NAME];
- };
+ #include <linux/mm_types.h>
+ #include <linux/page-flags.h>
+@@ -127,9 +129,17 @@ module_param_named(same_filled_pages_enabled, zswap_same_filled_pages_enabled,
+ * data structures
+ **********************************/
  
--struct rctx {
-+struct xts_request_ctx {
- 	le128 t;
- 	struct scatterlist *tail;
- 	struct scatterlist sg[2];
- 	struct skcipher_request subreq;
- };
- 
--static int setkey(struct crypto_skcipher *parent, const u8 *key,
--		  unsigned int keylen)
-+static int xts_setkey(struct crypto_skcipher *parent, const u8 *key,
-+		      unsigned int keylen)
- {
--	struct priv *ctx = crypto_skcipher_ctx(parent);
-+	struct xts_tfm_ctx *ctx = crypto_skcipher_ctx(parent);
- 	struct crypto_skcipher *child;
- 	struct crypto_cipher *tweak;
- 	int err;
-@@ -78,9 +78,10 @@ static int setkey(struct crypto_skcipher *parent, const u8 *key,
-  * mutliple calls to the 'ecb(..)' instance, which usually would be slower than
-  * just doing the gf128mul_x_ble() calls again.
-  */
--static int xor_tweak(struct skcipher_request *req, bool second_pass, bool enc)
-+static int xts_xor_tweak(struct skcipher_request *req, bool second_pass,
-+			 bool enc)
- {
--	struct rctx *rctx = skcipher_request_ctx(req);
-+	struct xts_request_ctx *rctx = skcipher_request_ctx(req);
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	const bool cts = (req->cryptlen % XTS_BLOCK_SIZE);
- 	const int bs = XTS_BLOCK_SIZE;
-@@ -128,23 +129,23 @@ static int xor_tweak(struct skcipher_request *req, bool second_pass, bool enc)
- 	return err;
- }
- 
--static int xor_tweak_pre(struct skcipher_request *req, bool enc)
-+static int xts_xor_tweak_pre(struct skcipher_request *req, bool enc)
- {
--	return xor_tweak(req, false, enc);
-+	return xts_xor_tweak(req, false, enc);
- }
- 
--static int xor_tweak_post(struct skcipher_request *req, bool enc)
-+static int xts_xor_tweak_post(struct skcipher_request *req, bool enc)
- {
--	return xor_tweak(req, true, enc);
-+	return xts_xor_tweak(req, true, enc);
- }
- 
--static void cts_done(struct crypto_async_request *areq, int err)
-+static void xts_cts_done(struct crypto_async_request *areq, int err)
- {
- 	struct skcipher_request *req = areq->data;
- 	le128 b;
- 
- 	if (!err) {
--		struct rctx *rctx = skcipher_request_ctx(req);
-+		struct xts_request_ctx *rctx = skcipher_request_ctx(req);
- 
- 		scatterwalk_map_and_copy(&b, rctx->tail, 0, XTS_BLOCK_SIZE, 0);
- 		le128_xor(&b, &rctx->t, &b);
-@@ -154,12 +155,13 @@ static void cts_done(struct crypto_async_request *areq, int err)
- 	skcipher_request_complete(req, err);
- }
- 
--static int cts_final(struct skcipher_request *req,
--		     int (*crypt)(struct skcipher_request *req))
-+static int xts_cts_final(struct skcipher_request *req,
-+			 int (*crypt)(struct skcipher_request *req))
- {
--	struct priv *ctx = crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
-+	const struct xts_tfm_ctx *ctx =
-+		crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
- 	int offset = req->cryptlen & ~(XTS_BLOCK_SIZE - 1);
--	struct rctx *rctx = skcipher_request_ctx(req);
-+	struct xts_request_ctx *rctx = skcipher_request_ctx(req);
- 	struct skcipher_request *subreq = &rctx->subreq;
- 	int tail = req->cryptlen % XTS_BLOCK_SIZE;
- 	le128 b[2];
-@@ -177,7 +179,8 @@ static int cts_final(struct skcipher_request *req,
- 	scatterwalk_map_and_copy(b, rctx->tail, 0, XTS_BLOCK_SIZE + tail, 1);
- 
- 	skcipher_request_set_tfm(subreq, ctx->child);
--	skcipher_request_set_callback(subreq, req->base.flags, cts_done, req);
-+	skcipher_request_set_callback(subreq, req->base.flags, xts_cts_done,
-+				      req);
- 	skcipher_request_set_crypt(subreq, rctx->tail, rctx->tail,
- 				   XTS_BLOCK_SIZE, NULL);
- 
-@@ -192,18 +195,18 @@ static int cts_final(struct skcipher_request *req,
- 	return 0;
- }
- 
--static void encrypt_done(struct crypto_async_request *areq, int err)
-+static void xts_encrypt_done(struct crypto_async_request *areq, int err)
- {
- 	struct skcipher_request *req = areq->data;
- 
- 	if (!err) {
--		struct rctx *rctx = skcipher_request_ctx(req);
-+		struct xts_request_ctx *rctx = skcipher_request_ctx(req);
- 
- 		rctx->subreq.base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
--		err = xor_tweak_post(req, true);
-+		err = xts_xor_tweak_post(req, true);
- 
- 		if (!err && unlikely(req->cryptlen % XTS_BLOCK_SIZE)) {
--			err = cts_final(req, crypto_skcipher_encrypt);
-+			err = xts_cts_final(req, crypto_skcipher_encrypt);
- 			if (err == -EINPROGRESS)
- 				return;
- 		}
-@@ -212,18 +215,18 @@ static void encrypt_done(struct crypto_async_request *areq, int err)
- 	skcipher_request_complete(req, err);
- }
- 
--static void decrypt_done(struct crypto_async_request *areq, int err)
-+static void xts_decrypt_done(struct crypto_async_request *areq, int err)
- {
- 	struct skcipher_request *req = areq->data;
- 
- 	if (!err) {
--		struct rctx *rctx = skcipher_request_ctx(req);
-+		struct xts_request_ctx *rctx = skcipher_request_ctx(req);
- 
- 		rctx->subreq.base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
--		err = xor_tweak_post(req, false);
-+		err = xts_xor_tweak_post(req, false);
- 
- 		if (!err && unlikely(req->cryptlen % XTS_BLOCK_SIZE)) {
--			err = cts_final(req, crypto_skcipher_decrypt);
-+			err = xts_cts_final(req, crypto_skcipher_decrypt);
- 			if (err == -EINPROGRESS)
- 				return;
- 		}
-@@ -232,10 +235,12 @@ static void decrypt_done(struct crypto_async_request *areq, int err)
- 	skcipher_request_complete(req, err);
- }
- 
--static int init_crypt(struct skcipher_request *req, crypto_completion_t compl)
-+static int xts_init_crypt(struct skcipher_request *req,
-+			  crypto_completion_t compl)
- {
--	struct priv *ctx = crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
--	struct rctx *rctx = skcipher_request_ctx(req);
-+	const struct xts_tfm_ctx *ctx =
-+		crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
-+	struct xts_request_ctx *rctx = skcipher_request_ctx(req);
- 	struct skcipher_request *subreq = &rctx->subreq;
- 
- 	if (req->cryptlen < XTS_BLOCK_SIZE)
-@@ -252,45 +257,45 @@ static int init_crypt(struct skcipher_request *req, crypto_completion_t compl)
- 	return 0;
- }
- 
--static int encrypt(struct skcipher_request *req)
-+static int xts_encrypt(struct skcipher_request *req)
- {
--	struct rctx *rctx = skcipher_request_ctx(req);
-+	struct xts_request_ctx *rctx = skcipher_request_ctx(req);
- 	struct skcipher_request *subreq = &rctx->subreq;
- 	int err;
- 
--	err = init_crypt(req, encrypt_done) ?:
--	      xor_tweak_pre(req, true) ?:
-+	err = xts_init_crypt(req, xts_encrypt_done) ?:
-+	      xts_xor_tweak_pre(req, true) ?:
- 	      crypto_skcipher_encrypt(subreq) ?:
--	      xor_tweak_post(req, true);
-+	      xts_xor_tweak_post(req, true);
- 
- 	if (err || likely((req->cryptlen % XTS_BLOCK_SIZE) == 0))
- 		return err;
- 
--	return cts_final(req, crypto_skcipher_encrypt);
-+	return xts_cts_final(req, crypto_skcipher_encrypt);
- }
- 
--static int decrypt(struct skcipher_request *req)
-+static int xts_decrypt(struct skcipher_request *req)
- {
--	struct rctx *rctx = skcipher_request_ctx(req);
-+	struct xts_request_ctx *rctx = skcipher_request_ctx(req);
- 	struct skcipher_request *subreq = &rctx->subreq;
- 	int err;
- 
--	err = init_crypt(req, decrypt_done) ?:
--	      xor_tweak_pre(req, false) ?:
-+	err = xts_init_crypt(req, xts_decrypt_done) ?:
-+	      xts_xor_tweak_pre(req, false) ?:
- 	      crypto_skcipher_decrypt(subreq) ?:
--	      xor_tweak_post(req, false);
-+	      xts_xor_tweak_post(req, false);
- 
- 	if (err || likely((req->cryptlen % XTS_BLOCK_SIZE) == 0))
- 		return err;
- 
--	return cts_final(req, crypto_skcipher_decrypt);
-+	return xts_cts_final(req, crypto_skcipher_decrypt);
- }
- 
--static int init_tfm(struct crypto_skcipher *tfm)
-+static int xts_init_tfm(struct crypto_skcipher *tfm)
- {
- 	struct skcipher_instance *inst = skcipher_alg_instance(tfm);
- 	struct xts_instance_ctx *ictx = skcipher_instance_ctx(inst);
--	struct priv *ctx = crypto_skcipher_ctx(tfm);
-+	struct xts_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	struct crypto_skcipher *child;
- 	struct crypto_cipher *tweak;
- 
-@@ -309,26 +314,28 @@ static int init_tfm(struct crypto_skcipher *tfm)
- 	ctx->tweak = tweak;
- 
- 	crypto_skcipher_set_reqsize(tfm, crypto_skcipher_reqsize(child) +
--					 sizeof(struct rctx));
-+					 sizeof(struct xts_request_ctx));
- 
- 	return 0;
- }
- 
--static void exit_tfm(struct crypto_skcipher *tfm)
-+static void xts_exit_tfm(struct crypto_skcipher *tfm)
- {
--	struct priv *ctx = crypto_skcipher_ctx(tfm);
-+	struct xts_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
- 
- 	crypto_free_skcipher(ctx->child);
- 	crypto_free_cipher(ctx->tweak);
- }
- 
--static void crypto_xts_free(struct skcipher_instance *inst)
-+static void xts_free_instance(struct skcipher_instance *inst)
- {
--	crypto_drop_skcipher(skcipher_instance_ctx(inst));
-+	struct xts_instance_ctx *ictx = skcipher_instance_ctx(inst);
++struct crypto_acomp_ctx {
++	struct crypto_acomp *acomp;
++	struct acomp_req *req;
++	struct crypto_wait wait;
++	u8 *dstmem;
++	struct mutex *mutex;
++};
 +
-+	crypto_drop_skcipher(&ictx->spawn);
- 	kfree(inst);
+ struct zswap_pool {
+ 	struct zpool *zpool;
+-	struct crypto_comp * __percpu *tfm;
++	struct crypto_acomp_ctx __percpu *acomp_ctx;
+ 	struct kref kref;
+ 	struct list_head list;
+ 	struct work_struct release_work;
+@@ -388,23 +398,43 @@ static struct zswap_entry *zswap_entry_find_get(struct rb_root *root,
+ * per-cpu code
+ **********************************/
+ static DEFINE_PER_CPU(u8 *, zswap_dstmem);
++/*
++ * If users dynamically change the zpool type and compressor at runtime, i.e.
++ * zswap is running, zswap can have more than one zpool on one cpu, but they
++ * are sharing dtsmem. So we need this mutex to be per-cpu.
++ */
++static DEFINE_PER_CPU(struct mutex *, zswap_mutex);
+ 
+ static int zswap_dstmem_prepare(unsigned int cpu)
+ {
++	struct mutex *mutex;
+ 	u8 *dst;
+ 
+ 	dst = kmalloc_node(PAGE_SIZE * 2, GFP_KERNEL, cpu_to_node(cpu));
+ 	if (!dst)
+ 		return -ENOMEM;
+ 
++	mutex = kmalloc_node(sizeof(*mutex), GFP_KERNEL, cpu_to_node(cpu));
++	if (!mutex) {
++		kfree(dst);
++		return -ENOMEM;
++	}
++
++	mutex_init(mutex);
+ 	per_cpu(zswap_dstmem, cpu) = dst;
++	per_cpu(zswap_mutex, cpu) = mutex;
+ 	return 0;
  }
  
--static int create(struct crypto_template *tmpl, struct rtattr **tb)
-+static int xts_create(struct crypto_template *tmpl, struct rtattr **tb)
+ static int zswap_dstmem_dead(unsigned int cpu)
  {
- 	struct skcipher_instance *inst;
- 	struct xts_instance_ctx *ctx;
-@@ -416,43 +423,43 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.min_keysize = crypto_skcipher_alg_min_keysize(alg) * 2;
- 	inst->alg.max_keysize = crypto_skcipher_alg_max_keysize(alg) * 2;
++	struct mutex *mutex;
+ 	u8 *dst;
  
--	inst->alg.base.cra_ctxsize = sizeof(struct priv);
-+	inst->alg.base.cra_ctxsize = sizeof(struct xts_tfm_ctx);
++	mutex = per_cpu(zswap_mutex, cpu);
++	kfree(mutex);
++	per_cpu(zswap_mutex, cpu) = NULL;
++
+ 	dst = per_cpu(zswap_dstmem, cpu);
+ 	kfree(dst);
+ 	per_cpu(zswap_dstmem, cpu) = NULL;
+@@ -415,30 +445,54 @@ static int zswap_dstmem_dead(unsigned int cpu)
+ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
+ {
+ 	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool, node);
+-	struct crypto_comp *tfm;
+-
+-	if (WARN_ON(*per_cpu_ptr(pool->tfm, cpu)))
+-		return 0;
++	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool->acomp_ctx, cpu);
++	struct crypto_acomp *acomp;
++	struct acomp_req *req;
++
++	acomp = crypto_alloc_acomp(pool->tfm_name, 0, 0);
++	if (IS_ERR(acomp)) {
++		pr_err("could not alloc crypto acomp %s : %ld\n",
++				pool->tfm_name, PTR_ERR(acomp));
++		return PTR_ERR(acomp);
++	}
++	acomp_ctx->acomp = acomp;
  
--	inst->alg.init = init_tfm;
--	inst->alg.exit = exit_tfm;
-+	inst->alg.init = xts_init_tfm;
-+	inst->alg.exit = xts_exit_tfm;
- 
--	inst->alg.setkey = setkey;
--	inst->alg.encrypt = encrypt;
--	inst->alg.decrypt = decrypt;
-+	inst->alg.setkey = xts_setkey;
-+	inst->alg.encrypt = xts_encrypt;
-+	inst->alg.decrypt = xts_decrypt;
- 
--	inst->free = crypto_xts_free;
-+	inst->free = xts_free_instance;
- 
- 	err = skcipher_register_instance(tmpl, inst);
- 	if (err) {
- err_free_inst:
--		crypto_xts_free(inst);
-+		xts_free_instance(inst);
+-	tfm = crypto_alloc_comp(pool->tfm_name, 0, 0);
+-	if (IS_ERR_OR_NULL(tfm)) {
+-		pr_err("could not alloc crypto comp %s : %ld\n",
+-		       pool->tfm_name, PTR_ERR(tfm));
++	req = acomp_request_alloc(acomp_ctx->acomp);
++	if (!req) {
++		pr_err("could not alloc crypto acomp_request %s\n",
++		       pool->tfm_name);
++		crypto_free_acomp(acomp_ctx->acomp);
+ 		return -ENOMEM;
  	}
- 	return err;
+-	*per_cpu_ptr(pool->tfm, cpu) = tfm;
++	acomp_ctx->req = req;
++
++	crypto_init_wait(&acomp_ctx->wait);
++	/*
++	 * if the backend of acomp is async zip, crypto_req_done() will wakeup
++	 * crypto_wait_req(); if the backend of acomp is scomp, the callback
++	 * won't be called, crypto_wait_req() will return without blocking.
++	 */
++	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				   crypto_req_done, &acomp_ctx->wait);
++
++	acomp_ctx->mutex = per_cpu(zswap_mutex, cpu);
++	acomp_ctx->dstmem = per_cpu(zswap_dstmem, cpu);
++
+ 	return 0;
  }
  
--static struct crypto_template crypto_tmpl = {
-+static struct crypto_template xts_tmpl = {
- 	.name = "xts",
--	.create = create,
-+	.create = xts_create,
- 	.module = THIS_MODULE,
- };
- 
--static int __init crypto_module_init(void)
-+static int __init xts_module_init(void)
+ static int zswap_cpu_comp_dead(unsigned int cpu, struct hlist_node *node)
  {
--	return crypto_register_template(&crypto_tmpl);
-+	return crypto_register_template(&xts_tmpl);
+ 	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool, node);
+-	struct crypto_comp *tfm;
++	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool->acomp_ctx, cpu);
++
++	if (!IS_ERR_OR_NULL(acomp_ctx)) {
++		if (!IS_ERR_OR_NULL(acomp_ctx->req))
++			acomp_request_free(acomp_ctx->req);
++		if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
++			crypto_free_acomp(acomp_ctx->acomp);
++	}
+ 
+-	tfm = *per_cpu_ptr(pool->tfm, cpu);
+-	if (!IS_ERR_OR_NULL(tfm))
+-		crypto_free_comp(tfm);
+-	*per_cpu_ptr(pool->tfm, cpu) = NULL;
+ 	return 0;
  }
  
--static void __exit crypto_module_exit(void)
-+static void __exit xts_module_exit(void)
+@@ -561,8 +615,9 @@ static struct zswap_pool *zswap_pool_create(char *type, char *compressor)
+ 	pr_debug("using %s zpool\n", zpool_get_type(pool->zpool));
+ 
+ 	strlcpy(pool->tfm_name, compressor, sizeof(pool->tfm_name));
+-	pool->tfm = alloc_percpu(struct crypto_comp *);
+-	if (!pool->tfm) {
++
++	pool->acomp_ctx = alloc_percpu(*pool->acomp_ctx);
++	if (!pool->acomp_ctx) {
+ 		pr_err("percpu alloc failed\n");
+ 		goto error;
+ 	}
+@@ -585,7 +640,8 @@ static struct zswap_pool *zswap_pool_create(char *type, char *compressor)
+ 	return pool;
+ 
+ error:
+-	free_percpu(pool->tfm);
++	if (pool->acomp_ctx)
++		free_percpu(pool->acomp_ctx);
+ 	if (pool->zpool)
+ 		zpool_destroy_pool(pool->zpool);
+ 	kfree(pool);
+@@ -596,14 +652,14 @@ static __init struct zswap_pool *__zswap_pool_create_fallback(void)
  {
--	crypto_unregister_template(&crypto_tmpl);
-+	crypto_unregister_template(&xts_tmpl);
+ 	bool has_comp, has_zpool;
+ 
+-	has_comp = crypto_has_comp(zswap_compressor, 0, 0);
++	has_comp = crypto_has_acomp(zswap_compressor, 0, 0);
+ 	if (!has_comp && strcmp(zswap_compressor,
+ 				CONFIG_ZSWAP_COMPRESSOR_DEFAULT)) {
+ 		pr_err("compressor %s not available, using default %s\n",
+ 		       zswap_compressor, CONFIG_ZSWAP_COMPRESSOR_DEFAULT);
+ 		param_free_charp(&zswap_compressor);
+ 		zswap_compressor = CONFIG_ZSWAP_COMPRESSOR_DEFAULT;
+-		has_comp = crypto_has_comp(zswap_compressor, 0, 0);
++		has_comp = crypto_has_acomp(zswap_compressor, 0, 0);
+ 	}
+ 	if (!has_comp) {
+ 		pr_err("default compressor %s not available\n",
+@@ -639,7 +695,7 @@ static void zswap_pool_destroy(struct zswap_pool *pool)
+ 	zswap_pool_debug("destroying", pool);
+ 
+ 	cpuhp_state_remove_instance(CPUHP_MM_ZSWP_POOL_PREPARE, &pool->node);
+-	free_percpu(pool->tfm);
++	free_percpu(pool->acomp_ctx);
+ 	zpool_destroy_pool(pool->zpool);
+ 	kfree(pool);
  }
+@@ -723,7 +779,7 @@ static int __zswap_param_set(const char *val, const struct kernel_param *kp,
+ 		}
+ 		type = s;
+ 	} else if (!compressor) {
+-		if (!crypto_has_comp(s, 0, 0)) {
++		if (!crypto_has_acomp(s, 0, 0)) {
+ 			pr_err("compressor %s not available\n", s);
+ 			return -ENOENT;
+ 		}
+@@ -774,7 +830,7 @@ static int __zswap_param_set(const char *val, const struct kernel_param *kp,
+ 		 * failed, maybe both compressor and zpool params were bad.
+ 		 * Allow changing this param, so pool creation will succeed
+ 		 * when the other param is changed. We already verified this
+-		 * param is ok in the zpool_has_pool() or crypto_has_comp()
++		 * param is ok in the zpool_has_pool() or crypto_has_acomp()
+ 		 * checks above.
+ 		 */
+ 		ret = param_set_charp(s, kp);
+@@ -876,7 +932,9 @@ static int zswap_writeback_entry(struct zpool *pool, unsigned long handle)
+ 	pgoff_t offset;
+ 	struct zswap_entry *entry;
+ 	struct page *page;
+-	struct crypto_comp *tfm;
++	struct scatterlist input, output;
++	struct crypto_acomp_ctx *acomp_ctx;
++
+ 	u8 *src, *dst;
+ 	unsigned int dlen;
+ 	int ret;
+@@ -916,14 +974,21 @@ static int zswap_writeback_entry(struct zpool *pool, unsigned long handle)
  
--subsys_initcall(crypto_module_init);
--module_exit(crypto_module_exit);
-+subsys_initcall(xts_module_init);
-+module_exit(xts_module_exit);
+ 	case ZSWAP_SWAPCACHE_NEW: /* page is locked */
+ 		/* decompress */
++		acomp_ctx = this_cpu_ptr(entry->pool->acomp_ctx);
++
+ 		dlen = PAGE_SIZE;
+ 		src = (u8 *)zhdr + sizeof(struct zswap_header);
+-		dst = kmap_atomic(page);
+-		tfm = *get_cpu_ptr(entry->pool->tfm);
+-		ret = crypto_comp_decompress(tfm, src, entry->length,
+-					     dst, &dlen);
+-		put_cpu_ptr(entry->pool->tfm);
+-		kunmap_atomic(dst);
++		dst = kmap(page);
++
++		mutex_lock(acomp_ctx->mutex);
++		sg_init_one(&input, src, entry->length);
++		sg_init_one(&output, dst, dlen);
++		acomp_request_set_params(acomp_ctx->req, &input, &output, entry->length, dlen);
++		ret = crypto_wait_req(crypto_acomp_decompress(acomp_ctx->req), &acomp_ctx->wait);
++		dlen = acomp_ctx->req->dlen;
++		mutex_unlock(acomp_ctx->mutex);
++
++		kunmap(page);
+ 		BUG_ON(ret);
+ 		BUG_ON(dlen != PAGE_SIZE);
  
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("XTS block cipher mode");
+@@ -1004,7 +1069,8 @@ static int zswap_frontswap_store(unsigned type, pgoff_t offset,
+ {
+ 	struct zswap_tree *tree = zswap_trees[type];
+ 	struct zswap_entry *entry, *dupentry;
+-	struct crypto_comp *tfm;
++	struct scatterlist input, output;
++	struct crypto_acomp_ctx *acomp_ctx;
+ 	int ret;
+ 	unsigned int hlen, dlen = PAGE_SIZE;
+ 	unsigned long handle, value;
+@@ -1074,12 +1140,32 @@ static int zswap_frontswap_store(unsigned type, pgoff_t offset,
+ 	}
+ 
+ 	/* compress */
+-	dst = get_cpu_var(zswap_dstmem);
+-	tfm = *get_cpu_ptr(entry->pool->tfm);
+-	src = kmap_atomic(page);
+-	ret = crypto_comp_compress(tfm, src, PAGE_SIZE, dst, &dlen);
+-	kunmap_atomic(src);
+-	put_cpu_ptr(entry->pool->tfm);
++	acomp_ctx = this_cpu_ptr(entry->pool->acomp_ctx);
++
++	mutex_lock(acomp_ctx->mutex);
++
++	src = kmap(page);
++	dst = acomp_ctx->dstmem;
++	sg_init_one(&input, src, PAGE_SIZE);
++	/* zswap_dstmem is of size (PAGE_SIZE * 2). Reflect same in sg_list */
++	sg_init_one(&output, dst, PAGE_SIZE * 2);
++	acomp_request_set_params(acomp_ctx->req, &input, &output, PAGE_SIZE, dlen);
++	/*
++	 * it maybe looks a little bit silly that we send an asynchronous request,
++	 * then wait for its completion synchronously. This makes the process look
++	 * synchronous in fact.
++	 * Theoretically, acomp supports users send multiple acomp requests in one
++	 * acomp instance, then get those requests done simultaneously. but in this
++	 * case, frontswap actually does store and load page by page, there is no
++	 * existing method to send the second page before the first page is done
++	 * in one thread doing frontswap.
++	 * but in different threads running on different cpu, we have different
++	 * acomp instance, so multiple threads can do (de)compression in parallel.
++	 */
++	ret = crypto_wait_req(crypto_acomp_compress(acomp_ctx->req), &acomp_ctx->wait);
++	dlen = acomp_ctx->req->dlen;
++	kunmap(page);
++
+ 	if (ret) {
+ 		ret = -EINVAL;
+ 		goto put_dstmem;
+@@ -1103,7 +1189,7 @@ static int zswap_frontswap_store(unsigned type, pgoff_t offset,
+ 	memcpy(buf, &zhdr, hlen);
+ 	memcpy(buf + hlen, dst, dlen);
+ 	zpool_unmap_handle(entry->pool->zpool, handle);
+-	put_cpu_var(zswap_dstmem);
++	mutex_unlock(acomp_ctx->mutex);
+ 
+ 	/* populate entry */
+ 	entry->offset = offset;
+@@ -1131,7 +1217,7 @@ static int zswap_frontswap_store(unsigned type, pgoff_t offset,
+ 	return 0;
+ 
+ put_dstmem:
+-	put_cpu_var(zswap_dstmem);
++	mutex_unlock(acomp_ctx->mutex);
+ 	zswap_pool_put(entry->pool);
+ freepage:
+ 	zswap_entry_cache_free(entry);
+@@ -1148,7 +1234,8 @@ static int zswap_frontswap_load(unsigned type, pgoff_t offset,
+ {
+ 	struct zswap_tree *tree = zswap_trees[type];
+ 	struct zswap_entry *entry;
+-	struct crypto_comp *tfm;
++	struct scatterlist input, output;
++	struct crypto_acomp_ctx *acomp_ctx;
+ 	u8 *src, *dst;
+ 	unsigned int dlen;
+ 	int ret;
+@@ -1175,11 +1262,17 @@ static int zswap_frontswap_load(unsigned type, pgoff_t offset,
+ 	src = zpool_map_handle(entry->pool->zpool, entry->handle, ZPOOL_MM_RO);
+ 	if (zpool_evictable(entry->pool->zpool))
+ 		src += sizeof(struct zswap_header);
+-	dst = kmap_atomic(page);
+-	tfm = *get_cpu_ptr(entry->pool->tfm);
+-	ret = crypto_comp_decompress(tfm, src, entry->length, dst, &dlen);
+-	put_cpu_ptr(entry->pool->tfm);
+-	kunmap_atomic(dst);
++	dst = kmap(page);
++
++	acomp_ctx = this_cpu_ptr(entry->pool->acomp_ctx);
++	mutex_lock(acomp_ctx->mutex);
++	sg_init_one(&input, src, entry->length);
++	sg_init_one(&output, dst, dlen);
++	acomp_request_set_params(acomp_ctx->req, &input, &output, entry->length, dlen);
++	ret = crypto_wait_req(crypto_acomp_decompress(acomp_ctx->req), &acomp_ctx->wait);
++	mutex_unlock(acomp_ctx->mutex);
++
++	kunmap(page);
+ 	zpool_unmap_handle(entry->pool->zpool, entry->handle);
+ 	BUG_ON(ret);
+ 
 -- 
 2.27.0
+
 
