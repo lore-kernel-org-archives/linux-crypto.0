@@ -2,45 +2,46 @@ Return-Path: <SRS0=38jD=AY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40343C433FC
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 06:40:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E55EC433F8
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 06:40:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19D1C207D4
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 06:40:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B41220791
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 06:40:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="YNnqXfp7"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="E6wh6y3X"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729119AbgGMGjr (ORCPT
+        id S1729505AbgGMGjs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Jul 2020 02:39:47 -0400
-Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.122]:36385 "EHLO
-        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727834AbgGMGjM (ORCPT
+        Mon, 13 Jul 2020 02:39:48 -0400
+Received: from mo4-p03-ob.smtp.rzone.de ([85.215.255.100]:18996 "EHLO
+        mo4-p03-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729151AbgGMGjM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 13 Jul 2020 02:39:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1594622348;
         s=strato-dkim-0002; d=chronox.de;
-        h=Message-ID:Date:Subject:Cc:To:From:X-RZG-CLASS-ID:X-RZG-AUTH:From:
-        Subject:Sender;
-        bh=aYUBjNiDRxrdFoNt5qpqED1H1eUYHW6+Yxa+sDj2Vd0=;
-        b=YNnqXfp7xy0mgKY2G9fUHz5nbjw5tQWDv+UKRCK1IL2ssr7rQP/cPEzBa7sVdD2LoB
-        M9AkxL/beR9veWwbw7HinCHu+fT6C9QWp1Z2fIUA9jOHYpCsyVCo6aXHT8aW8i3+NeZu
-        qWrcWM/B++tUiiL3ZtHOdlaNggiPlbvEhxExOKAh/UJRLkb1cN9Es2rI/TqqNgNRedrI
-        z5MIVVkZFh8gD5rf+OF8hAVbi050XN+4/dzpSY/alXvX3nXoKVrwPJzxO65f1wv7ikBD
-        XRLDYQiL7EXi3ucsEah2mQP4ky+eQOSI66QxuPlFZf/NB0PCkEZ5nOe/+cD0zsNY/+dO
-        dOsw==
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=mAXtXJcSmteCGDTK+H4Zq9zuCh4az3t8WNeV8UehO/s=;
+        b=E6wh6y3XAYTE4S2qZaEtHS5cs8xB6TXQ1s5cxLCXVstC/c8KXDDUVH9ZhZ9bujAycA
+        UibKrXNujBFdk/SC1mrWU6k08pwcyZp0XJo+ts2mrDLS75/w7FlK70Qj7NlbC8UJkpI+
+        5yJZuiur16ZLbtGkNgMqGQkt7peo+auMVTbEeAEiBtnJ7kVPwRr2T3S8E7qfnLFn7wYO
+        /KP1lJivgvmhaRrtGHaxwR8QYqvSmbl+nxDRARRwQmEBkr4Cpo8bQCzjNxzgnK3xac1c
+        YLgnArGLlFRq+wRFxl7s4DmEYIoIWLEMdU8AMktJFKgCeStIuQO5M6+RTDsLd/4Sf39H
+        A0Vg==
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaIvSfHReW"
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
         by smtp.strato.de (RZmta 46.10.5 DYNA|AUTH)
-        with ESMTPSA id y0546bw6D6c0k2V
+        with ESMTPSA id y0546bw6D6bnk2I
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-        Mon, 13 Jul 2020 08:38:00 +0200 (CEST)
+        Mon, 13 Jul 2020 08:37:49 +0200 (CEST)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Arnd Bergmann <arnd@arndb.de>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -67,9 +68,11 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Randy Dunlap <rdunlap@infradead.org>,
         Julia Lawall <julia.lawall@inria.fr>,
         Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [PATCH v31 00/12] /dev/random - a new approach with full SP800-90B
-Date:   Mon, 13 Jul 2020 08:17:26 +0200
-Message-ID: <2050754.Mh6RI2rZIc@positron.chronox.de>
+Subject: [PATCH v31 09/12] LRNG - add Jitter RNG fast noise source
+Date:   Mon, 13 Jul 2020 08:21:06 +0200
+Message-ID: <2504507.BddDVKsqQX@positron.chronox.de>
+In-Reply-To: <2050754.Mh6RI2rZIc@positron.chronox.de>
+References: <2050754.Mh6RI2rZIc@positron.chronox.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="iso-8859-1"
@@ -78,172 +81,9 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
-
-The following patch set provides a different approach to /dev/random which =
-is
-called Linux Random Number Generator (LRNG) to collect entropy within the L=
-inux
-kernel. The main improvements compared to the existing /dev/random is to pr=
-ovide
-sufficient entropy during boot time as well as in virtual environments and =
-when
-using SSDs. A secondary design goal is to limit the impact of the entropy
-collection on massive parallel systems and also allow the use accelerated
-cryptographic primitives. Also, all steps of the entropic data processing a=
-re
-testable.
-
-The LRNG patch set allows a user to select use of the existing /dev/random =
-or
-the LRNG during compile time. As the LRNG provides API and ABI compatible
-interfaces to the existing /dev/random implementation, the user can freely =
-chose
-the RNG implementation without affecting kernel or user space operations.
-
-This patch set provides early boot-time entropy which implies that no
-additional flags to the getrandom(2) system call discussed recently on
-the LKML is considered to be necessary. Yet, if additional flags are
-introduced to cover special hardware, the LRNG implementation will also
-provide them to be fully ABI and API compliant as already discussed on
-LKML.
-
-The LRNG is fully compliant to SP800-90B requirements and is shipped with a
-full SP800-90B assessment and all required test tools. The existing /dev/ra=
-ndom
-implementation on the other hand has architectural limitations which
-does not easily allow to bring the implementation in compliance with
-SP800-90B. The key statement that causes concern is SP800-90B section
-3.1.6. This section denies crediting entropy to multiple similar noise
-sources. This section explicitly references different noise sources resting
-on the timing of events and their derivatives (i.e. it is a direct complaint
-to the existing existing /dev/random implementation). Therefore, SP800-90B
-now denies the very issue mentioned in [1] with the existing /dev/random
-implementation for a long time: crediting entropy to interrupts as well as
-crediting entropy to derivatives of interrupts (HID and disk events). This =
-is
-not permissible with SP800-90B.
-
-SP800-90B specifies various requirements for the noise source(s) that seed =
-any
-DRNG including SP800-90A DRBGs. In about a year from now, SP800-90B will be
-mandated for all noise sources that provide entropy to DRBGs as part of a F=
-IPS
-140-[2|3] validation or other evaluation types. That means, if we there are=
- no
-solutions to comply with the requirements of SP800-90B found till one year
-from now, any random number generation and ciphers based on random numbers
-on Linux will be considered and treated as not applicable and delivering
-no entropy! As /dev/urandom, getrandom(2) and /dev/random are the most
-common and prevalent noise sources for DRNGs, all these DRNGs are affected.
-This applies across the board for all validations of cryptography executing=
- on
-Linux (kernel and user space modules).
-
-=46or users that are not interested in SP800-90B, the entire code for the
-compliance as well as test interfaces can be deselected at compile time.
-
-The design and implementation is driven by a set of goals described in [1]
-that the LRNG completely implements. Furthermore, [1] includes the full
-assessment of the SP800-90B compliance as well as a comparison with RNG
-design suggestions of SP800-90C, and AIS20/31.
-
-The LRNG provides a complete separation of the noise source maintenance
-and the collection of entropy into an entropy pool from the post-processing
-using a pseudo-random number generator. Different DRNGs are supported,
-including:
-
-* The LRNG can be compile-time enabled to replace the existing /dev/random
-  implementation. When not selecting the LRNG at compile time (default), the
-  existing /dev/random implementation is built.
-
-* Built-in ChaCha20 DRNG which has no dependency to other kernel
-  frameworks.
-
-* SP800-90A DRBG using the kernel crypto API including its accelerated
-  raw cipher implementations. This implies that the output of /dev/random,
-  getrandom(2), /dev/urandom or get_random_bytes is fully compliant to
-  SP800-90A.
-
-* Arbitrary DRNGs registered with the kernel crypto API
-
-* Full compliance with SP800-90B which covers the startup and runtime health
-  tests mandated by SP800-90B as well as providing the test tools and test
-  interfaces to obtain raw noise data securely. The test tools are provided=
- at
-  [1].
-
-Booting the patch with the kernel command line option
-"dyndbg=3Dfile drivers/char/lrng/* +p" generates logs indicating the operat=
-ion
-of the LRNG. Each log is pre-pended with "lrng".
-
-The LRNG has a flexible design by allowing an easy replacement of the
-deterministic random number generator component.
-
-Compared to the existing /dev/random implementation, the compiled binary
-is smaller when the LRNG is compiled with all options equal to the
-existing /dev/random (i.e. only CONFIG_LRNG is set): random.o is 52.5 kBytes
-whereas all LRNG object files are in 49 kBytes in size. The fully
-SP800-90A/SP800-90B compliant binary code (CONFIG_LRNG,
-CONFIG_LRNG_DRNG_SWITCH, CONFIG_LRNG_DRBG, CONFIG_LRNG_HEALTH_TESTS)
-uses some 61 kBytes. In addition, the LRNG is about 50% faster in the
-performance critical interrupt handler code path compared to the existing
-/dev/random implementation.
-
-=46ull SP800-90B testing is performed on the following systems - details
-are given in [2] appendix C:
-
-* x86 KVM virtualized guest 32 and 64 bit systems
-
-* x86 bare metal
-
-* older and newer ARMv7 system
-
-* ARM64
-
-* POWER7 LE and POWER 8 BE
-
-* IBM Z System mainframe
-
-* old MIPS embedded device
-
-[1] https://www.chronox.de/lrng.html - If the patch is accepted, I would
-be volunteering to convert the documentation into RST format and
-contribute it to the Linux kernel documentation directory.
-
-[2] https://www.chronox.de/lrng/doc/lrng.pdf
-
-Changes (compared to the previous patch set):
-
-* Port to v5.8-rc5 including updated initialization of static Jitter RNG
-  instance
-
-* Add latent_entropy GCC compiler plugin annotations
-
-* Add test interfaces to validate performance of interrupt handler
-  and time stamp concatenation
-
-* Fix memleak during rmmod lrng_drbg.ko which was missing deallocation
-  of cipher handles
-
-* Remove seeding from CPU noise sources for get_random_u64/u32 compliant
-  to random.c
-
-* Use of arch_get_random_seed_long_early / arch_get_random_long_early for
-  initialization of LFSR state and ChaCha20 DRNG state.
-
-As a side node: With the switchable DRNG support offered in this patch set,
-the following areas could be removed. As the existing /dev/random has no su=
-pport
-for switchable DRNGs, however, this is not yet feasible though.
-
-* remove lrng_ready_list and all code around it in lrng_interfaces.c
-
-* remove the kernel crypto API RNG API to avoid having two random number
-  providing APIs - this would imply that all RNGs developed for this API wo=
-uld
-  be converted to the LRNG interface
+The Jitter RNG fast noise source implemented as part of the kernel
+crypto API is queried for 256 bits of entropy at the time the seed
+buffer managed by the LRNG is about to be filled.
 
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
 CC: "Alexander E. Patrakov" <patrakov@gmail.com>
@@ -261,80 +101,145 @@ CC: Andy Lutomirski <luto@kernel.org>
 CC: Florian Weimer <fweimer@redhat.com>
 CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
+Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
 Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
 Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-
-Stephan Mueller (12):
-  Linux Random Number Generator
-  LRNG - allocate one DRNG instance per NUMA node
-  LRNG - sysctls and /proc interface
-  LRNG - add switchable DRNG support
-  crypto: DRBG - externalize DRBG functions for LRNG
-  LRNG - add SP800-90A DRBG extension
-  LRNG - add kernel crypto API PRNG extension
-  crypto: provide access to a static Jitter RNG state
-  LRNG - add Jitter RNG fast noise source
-  LRNG - add SP800-90B compliant health tests
-  LRNG - add interface for gathering of raw entropy
-  LRNG - add power-on and runtime self-tests
-
- MAINTAINERS                                   |   7 +
- crypto/drbg.c                                 |  16 +-
- crypto/jitterentropy-kcapi.c                  |   3 +-
- crypto/jitterentropy.c                        |  31 +-
- drivers/char/Kconfig                          |   2 +
- drivers/char/Makefile                         |   9 +-
- drivers/char/lrng/Kconfig                     | 249 +++++++
- drivers/char/lrng/Makefile                    |  19 +
- drivers/char/lrng/lrng_archrandom.c           |  93 +++
- drivers/char/lrng/lrng_aux.c                  | 136 ++++
- drivers/char/lrng/lrng_chacha20.c             | 285 ++++++++
- drivers/char/lrng/lrng_chacha20.h             |  29 +
- drivers/char/lrng/lrng_drbg.c                 | 259 +++++++
- drivers/char/lrng/lrng_drng.c                 | 409 +++++++++++
- drivers/char/lrng/lrng_health.c               | 407 +++++++++++
- drivers/char/lrng/lrng_interfaces.c           | 647 ++++++++++++++++++
- drivers/char/lrng/lrng_internal.h             | 318 +++++++++
- drivers/char/lrng/lrng_jent.c                 |  88 +++
- drivers/char/lrng/lrng_kcapi.c                | 321 +++++++++
- drivers/char/lrng/lrng_lfsr.h                 | 152 ++++
- drivers/char/lrng/lrng_numa.c                 | 101 +++
- drivers/char/lrng/lrng_pool.c                 | 589 ++++++++++++++++
- drivers/char/lrng/lrng_proc.c                 | 163 +++++
- drivers/char/lrng/lrng_selftest.c             | 437 ++++++++++++
- drivers/char/lrng/lrng_sw_noise.c             | 125 ++++
- drivers/char/lrng/lrng_sw_noise.h             |  57 ++
- drivers/char/lrng/lrng_switch.c               | 189 +++++
- drivers/char/lrng/lrng_testing.c              | 393 +++++++++++
- include/crypto/drbg.h                         |   7 +
- .../crypto/internal}/jitterentropy.h          |   3 +
- include/linux/lrng.h                          |  63 ++
- 31 files changed, 5597 insertions(+), 10 deletions(-)
- create mode 100644 drivers/char/lrng/Kconfig
- create mode 100644 drivers/char/lrng/Makefile
- create mode 100644 drivers/char/lrng/lrng_archrandom.c
- create mode 100644 drivers/char/lrng/lrng_aux.c
- create mode 100644 drivers/char/lrng/lrng_chacha20.c
- create mode 100644 drivers/char/lrng/lrng_chacha20.h
- create mode 100644 drivers/char/lrng/lrng_drbg.c
- create mode 100644 drivers/char/lrng/lrng_drng.c
- create mode 100644 drivers/char/lrng/lrng_health.c
- create mode 100644 drivers/char/lrng/lrng_interfaces.c
- create mode 100644 drivers/char/lrng/lrng_internal.h
+Tested-by: Neil Horman <nhorman@redhat.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+=2D--
+ drivers/char/lrng/Kconfig     | 12 +++++
+ drivers/char/lrng/Makefile    |  1 +
+ drivers/char/lrng/lrng_jent.c | 88 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 101 insertions(+)
  create mode 100644 drivers/char/lrng/lrng_jent.c
- create mode 100644 drivers/char/lrng/lrng_kcapi.c
- create mode 100644 drivers/char/lrng/lrng_lfsr.h
- create mode 100644 drivers/char/lrng/lrng_numa.c
- create mode 100644 drivers/char/lrng/lrng_pool.c
- create mode 100644 drivers/char/lrng/lrng_proc.c
- create mode 100644 drivers/char/lrng/lrng_selftest.c
- create mode 100644 drivers/char/lrng/lrng_sw_noise.c
- create mode 100644 drivers/char/lrng/lrng_sw_noise.h
- create mode 100644 drivers/char/lrng/lrng_switch.c
- create mode 100644 drivers/char/lrng/lrng_testing.c
- rename {crypto =3D> include/crypto/internal}/jitterentropy.h (84%)
- create mode 100644 include/linux/lrng.h
 
+diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
+index 7afc965a4d52..4684e838f011 100644
+=2D-- a/drivers/char/lrng/Kconfig
++++ b/drivers/char/lrng/Kconfig
+@@ -94,4 +94,16 @@ config LRNG_KCAPI
+ 	  provided by the selected kernel crypto API RNG.
+ endif # LRNG_DRNG_SWITCH
+=20
++config LRNG_JENT
++	bool "Enable Jitter RNG as LRNG Seed Source"
++	depends on CRYPTO
++	select CRYPTO_JITTERENTROPY
++	help
++	  The Linux RNG may use the Jitter RNG as noise source. Enabling
++	  this option enables the use of the Jitter RNG. Its default
++	  entropy level is 16 bits of entropy per 256 data bits delivered
++	  by the Jitter RNG. This entropy level can be changed at boot
++	  time or at runtime with the lrng_base.jitterrng configuration
++	  variable.
++
+ endif # LRNG
+diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
+index 94b2dfb2dfdb..4f5b6f38f0c4 100644
+=2D-- a/drivers/char/lrng/Makefile
++++ b/drivers/char/lrng/Makefile
+@@ -13,3 +13,4 @@ obj-$(CONFIG_SYSCTL)		+=3D lrng_proc.o
+ obj-$(CONFIG_LRNG_DRNG_SWITCH)	+=3D lrng_switch.o
+ obj-$(CONFIG_LRNG_DRBG)		+=3D lrng_drbg.o
+ obj-$(CONFIG_LRNG_KCAPI)	+=3D lrng_kcapi.o
++obj-$(CONFIG_LRNG_JENT)		+=3D lrng_jent.o
+diff --git a/drivers/char/lrng/lrng_jent.c b/drivers/char/lrng/lrng_jent.c
+new file mode 100644
+index 000000000000..225505271fcb
+=2D-- /dev/null
++++ b/drivers/char/lrng/lrng_jent.c
+@@ -0,0 +1,88 @@
++// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
++/*
++ * LRNG Fast Noise Source: Jitter RNG
++ *
++ * Copyright (C) 2016 - 2020, Stephan Mueller <smueller@chronox.de>
++ */
++
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
++#include <linux/types.h>
++#include <crypto/internal/jitterentropy.h>
++
++#include "lrng_internal.h"
++
++/*
++ * Estimated entropy of data is a 16th of LRNG_DRNG_SECURITY_STRENGTH_BITS.
++ * Albeit a full entropy assessment is provided for the noise source indic=
+ating
++ * that it provides high entropy rates and considering that it deactivates
++ * when it detects insufficient hardware, the chosen under estimation of
++ * entropy is considered to be acceptable to all reviewers.
++ */
++static u32 jitterrng =3D LRNG_DRNG_SECURITY_STRENGTH_BITS>>4;
++module_param(jitterrng, uint, 0644);
++MODULE_PARM_DESC(jitterrng, "Entropy in bits of 256 data bits from Jitter =
+RNG noise source");
++
++/**
++ * lrng_get_jent() - Get Jitter RNG entropy
++ *
++ * @outbuf: buffer to store entropy
++ * @outbuflen: length of buffer
++ *
++ * Return:
++ * * > 0 on success where value provides the added entropy in bits
++ * * 0 if no fast source was available
++ */
++static struct rand_data *lrng_jent_state;
++
++u32 lrng_get_jent(u8 *outbuf, unsigned int outbuflen)
++{
++	int ret;
++	u32 ent_bits =3D jitterrng;
++	unsigned long flags;
++	static DEFINE_SPINLOCK(lrng_jent_lock);
++	static int lrng_jent_initialized =3D 0;
++
++	spin_lock_irqsave(&lrng_jent_lock, flags);
++
++	if (!ent_bits || (lrng_jent_initialized =3D=3D -1)) {
++		spin_unlock_irqrestore(&lrng_jent_lock, flags);
++		return 0;
++	}
++
++	if (!lrng_jent_initialized) {
++		lrng_jent_state =3D jent_lrng_entropy_collector();
++		if (!lrng_jent_state) {
++			jitterrng =3D 0;
++			lrng_jent_initialized =3D -1;
++			spin_unlock_irqrestore(&lrng_jent_lock, flags);
++			pr_info("Jitter RNG unusable on current system\n");
++			return 0;
++		}
++		lrng_jent_initialized =3D 1;
++		pr_debug("Jitter RNG working on current system\n");
++	}
++	ret =3D jent_read_entropy(lrng_jent_state, outbuf, outbuflen);
++	spin_unlock_irqrestore(&lrng_jent_lock, flags);
++
++	if (ret) {
++		pr_debug("Jitter RNG failed with %d\n", ret);
++		return 0;
++	}
++
++	/* Obtain entropy statement */
++	if (outbuflen !=3D LRNG_DRNG_SECURITY_STRENGTH_BYTES)
++		ent_bits =3D (ent_bits * outbuflen<<3) /
++			   LRNG_DRNG_SECURITY_STRENGTH_BITS;
++	/* Cap entropy to buffer size in bits */
++	ent_bits =3D min_t(u32, ent_bits, outbuflen<<3);
++	pr_debug("obtained %u bits of entropy from Jitter RNG noise source\n",
++		 ent_bits);
++
++	return ent_bits;
++}
++
++u32 lrng_jent_entropylevel(void)
++{
++	return min_t(u32, jitterrng, LRNG_DRNG_SECURITY_STRENGTH_BITS);
++}
 =2D-=20
 2.26.2
 
