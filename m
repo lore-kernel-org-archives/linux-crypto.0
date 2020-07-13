@@ -2,125 +2,96 @@ Return-Path: <SRS0=38jD=AY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0BE0C433E0
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 16:01:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30610C433E4
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 16:49:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CB13620791
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 16:01:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594656099;
-	bh=SLSKg5ZfVBRZN+zy60+65Wjoc+mClok5dX9AYhdHw9c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=U0iooIwXYSgBsr/jJMJfcpOxbYX6jUX3llsRZtjMTZhm4PBSpTjydtx6Ouy/23Go4
-	 JYaTLsmquyAH4ZzEYFc9/Ek7djCZtME/DzEJXF+jqBeluC9Sl0qah4kavbM5lXQUlV
-	 fMX7ELQJ5ep9E34fXGWxqGNS/MK5Y8psdXMbjBxk=
+	by mail.kernel.org (Postfix) with ESMTP id 0A6C120791
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 16:49:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DlYAU7i0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729846AbgGMQBj (ORCPT
+        id S1729703AbgGMQtC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Jul 2020 12:01:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50212 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729840AbgGMQBj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Jul 2020 12:01:39 -0400
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2D2A82067D;
-        Mon, 13 Jul 2020 16:01:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594656098;
-        bh=SLSKg5ZfVBRZN+zy60+65Wjoc+mClok5dX9AYhdHw9c=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qUytuWDAPIVdL91cVJjojykh+ANO48gVRWXBsjWWpsZmxsJhLEDaf/Q8Nb4s1teVv
-         41okgjEgcAFisu1OoXG7L6OfXNnm6Yz2d8Ir0G9m2vwIIuenNQJKn2J5x/V1m0btAq
-         DWlR5ec2xZQXrRUBD4Sl8rHW1xakQeuDqy27B6WE=
-Date:   Mon, 13 Jul 2020 09:01:36 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Cc:     Mikulas Patocka <mpatocka@redhat.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>
-Subject: Re: [PATCH 5/6] crypto: set the flag CRYPTO_ALG_ALLOCATES_MEMORY
-Message-ID: <20200713160136.GA1696@sol.localdomain>
-References: <20200701045217.121126-1-ebiggers@kernel.org>
- <20200701045217.121126-6-ebiggers@kernel.org>
- <3f2d3409-2739-b121-0469-b14c86110b2d@nxp.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3f2d3409-2739-b121-0469-b14c86110b2d@nxp.com>
+        Mon, 13 Jul 2020 12:49:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51270 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729659AbgGMQtC (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 13 Jul 2020 12:49:02 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 177E7C061755
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Jul 2020 09:49:02 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id u189so14976343ybg.17
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Jul 2020 09:49:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Q4swQt+v4fyy3TMJcFGSFXeoIem3Xd+mM7FBvSMUEpo=;
+        b=DlYAU7i0wPUANloi9uSjm3sCK9o9iAe1t2uANgIzexCoThJdrZIrGmzkyCSYSETZZ3
+         PJg9Qd+ty1fzeYysPz/l9RoUbeiJoJXQRpmJtv/vooG4ryuUMBbpDx/xFWEnvjGuepIT
+         U8Ym87elsgU7p1P5OX0Dbf0BpYBdc7MZYT/120dEM43nKRdzEaSbhATClpKzmVWKc1jf
+         jxIjO5kj41fdosltFXEF2f3rQZMeReVza0sfPL7JD12oMcDxyf4BoQrdeQ1zgJqD73Rl
+         Z3gNrXOy1sg8I+6bLYl6roJIGrx8ngQGKETETvJJAclrQas8+nQ14csRNIYMn71ZVaob
+         YvNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Q4swQt+v4fyy3TMJcFGSFXeoIem3Xd+mM7FBvSMUEpo=;
+        b=N3TGkqaCxXVXtLlMbfL0/9iYx0J3++B91+6DrTQpFHfLHYM5NI9YJwJNn6ceKII1mJ
+         ZxwnXrpBxsCsfF/mE+OHQMC3cq/Ek3Qit185AFvSQ3z/HKt8JoMY7gNKnFwlM88VB4GE
+         KF1zQyvnfRfuDN/9S49j+ZcN5yw9LZuK+RCZ+xiT5dqoWkk69v1FCsXjpYYQmlSr9HVm
+         f7A8odLOIg9psaEzq32MU7q4lq02ySUWhf9Ph9a+LWJuMF43+1fhmY/yPNnl/P2ey3Xb
+         4heiq2oOUql/PL3PrGVhlsRFlAS0Gg47zh0SMw6HVZ2WYYXY13HeRXTJZLesn77sTT10
+         Xijw==
+X-Gm-Message-State: AOAM533VPVQIllD8L9lC+422u4m/DPGIIG7mFAWz0o1gOyOycUBIdCRl
+        ojJRHpt4IomEHr3j6biWkhpG7oU4vB+5+55M9kSnVBxwLY9Om97ZIhgIsd/XP4D5TDn+b/WNpPU
+        fSzyHJcFDzW04HQGnBt0IpyeoqAwcjy4Ae0Z6xnfDfV03KrCZVaxjkfCGfKeNvEaeADVXf+aN
+X-Google-Smtp-Source: ABdhPJyPh8VUwUGopNRnRGY039LZPReWXaEp73rtrAE02kk5c6cW02iED3ehsluL43hwjoxzq2Yzs37Mwp1t
+X-Received: by 2002:a25:bb0b:: with SMTP id z11mr1428406ybg.257.1594658941173;
+ Mon, 13 Jul 2020 09:49:01 -0700 (PDT)
+Date:   Mon, 13 Jul 2020 17:48:56 +0100
+Message-Id: <20200713164857.1031117-1-lenaptr@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.27.0.383.g050319c2ae-goog
+Subject: [PATCH 0/1] crypto: af_alg - add extra parameters for DRBG interface
+From:   Elena Petrova <lenaptr@google.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     Elena Petrova <lenaptr@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 13, 2020 at 06:49:00PM +0300, Horia Geantă wrote:
-> On 7/1/2020 7:52 AM, Eric Biggers wrote:
-> > From: Mikulas Patocka <mpatocka@redhat.com>
-> > 
-> > Set the flag CRYPTO_ALG_ALLOCATES_MEMORY in the crypto drivers that
-> > allocate memory.
-> > 
-> Quite a few drivers are impacted.
-> 
-> I wonder what's the proper way to address the memory allocation.
-> 
-> Herbert mentioned setting up reqsize:
-> https://lore.kernel.org/linux-crypto/20200610010450.GA6449@gondor.apana.org.au/
-> 
-> I see at least two hurdles in converting the drivers to using reqsize:
-> 
-> 1. Some drivers allocate the memory using GFP_DMA
-> 
-> reqsize does not allow drivers to control gfp allocation flags.
-> 
-> I've tried converting talitos driver (to use reqsize) at some point,
-> and in the process adding a generic CRYPTO_TFM_REQ_DMA flag:
-> https://lore.kernel.org/linux-crypto/54FD8D3B.5040409@freescale.com
-> https://lore.kernel.org/linux-crypto/1426266882-31626-1-git-send-email-horia.geanta@freescale.com
-> 
-> The flag was supposed to be transparent for the user,
-> however there were users that open-coded the request allocation,
-> for example esp_alloc_tmp() in net/ipv4/esp4.c.
-> At that time, Dave NACK-ed the change:
-> https://lore.kernel.org/linux-crypto/1426266922-31679-1-git-send-email-horia.geanta@freescale.com
-> 
-> 
-> 2. Memory requirements cannot be determined / are not known
-> at request allocation time
-> 
-> An analysis for talitos driver is here:
-> https://lore.kernel.org/linux-crypto/54F8235B.5080301@freescale.com
-> 
-> In general, drivers would be forced to ask more memory than needed,
-> to handle the "worst-case".
-> Logic will be needed to fail in case the "worst-case" isn't correctly estimated.
-> 
-> However, this is still problematic.
-> 
-> For example, a driver could set up reqsize to accommodate for 32 S/G entries
-> (in the HW S/G table). In case a dm-crypt encryption request would require more,
-> then driver's .encrypt callback would fail, possibly with -ENOMEM,
-> since there's not enough pre-allocated memory.
-> This brings us back to the same problem we're trying to solve,
-> since in this case the driver would be forced to either fail immediately or
-> to allocate memory at .encrypt/.decrypt time.
-> 
+This patch extends the userspace RNG interface to make it usable for
+CAVS testing. This is achieved by adding ALG_SET_DRBG_ENTROPY
+option to the setsockopt interface for specifying the entropy, and using
+sendmsg syscall for specifying the additional data.
 
-We have to place restrictions on what cases
-!(flags & CRYPTO_ALG_ALLOCATES_MEMORY) applies to anyway; see the patch that
-introduces it.  If needed we could add more restrictions, like limit the number
-of scatterlist elements.  If we did that, the driver could allocate memory if
-the number of scatterlist elements is large, without having to set
-CRYPTO_ALG_ALLOCATES_MEMORY.
+See libkcapi patch [1] to test the added functionality. The libkcapi
+patch is not intended for merging into libkcapi as is: it is only a
+quick plug to manually verify that the extended AF_ALG RNG interface
+generates the expected output on DRBG800-90A CAVS inputs.
 
-Also, have you considered using a mempool?  A mempool allows allocations without
-a possibility of failure, at the cost of pre-allocations.
+[1] https://github.com/Len0k/libkcapi/commit/6f095d270b982008f419078614c15caa592cb531
 
-- Eric
+Elena Petrova (1):
+  crypto: af_alg - add extra parameters for DRBG interface
+
+ Documentation/crypto/userspace-if.rst | 14 +++-
+ crypto/af_alg.c                       |  8 +++
+ crypto/algif_rng.c                    | 99 +++++++++++++++++++++++++--
+ include/crypto/if_alg.h               |  3 +-
+ include/uapi/linux/if_alg.h           |  1 +
+ 5 files changed, 115 insertions(+), 10 deletions(-)
+
+--
+2.27.0.383.g050319c2ae-goog
+
