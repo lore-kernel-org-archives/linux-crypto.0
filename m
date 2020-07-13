@@ -7,41 +7,39 @@ X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E58E7C433E3
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 19:31:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7208EC433E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 20:01:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C18BD2068F
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 19:31:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4521E20674
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 20:01:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="ExY4rOvg"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="sT/erWJm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726356AbgGMTbY (ORCPT
+        id S1726734AbgGMUBF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Jul 2020 15:31:24 -0400
-Received: from mout.web.de ([212.227.17.11]:36337 "EHLO mout.web.de"
+        Mon, 13 Jul 2020 16:01:05 -0400
+Received: from mout.web.de ([217.72.192.78]:37451 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726339AbgGMTbX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Jul 2020 15:31:23 -0400
+        id S1726599AbgGMUBE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 13 Jul 2020 16:01:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1594668656;
-        bh=gLXXElVCFe9L8OGx5jqS5sISuc3MxF1NRcjZMChZvC0=;
-        h=X-UI-Sender-Class:Cc:Subject:To:From:Date;
-        b=ExY4rOvgftQX93pChf4z21FD4zfMcbsTk7D6sTUq1EojCvWR+uu6cjgXOjknOjgJe
-         uwNVW8lNw8XXiOsrVbzlxSJNH93V1Peh5PymfYzUNbswLLkD/dXAhU6QWFe6RyiWY7
-         OTYMWI+ab/LyityibOYsSeGZw9k/bCCOHie5siTg=
+        s=dbaedf251592; t=1594670434;
+        bh=RujGpsAVt1AAWe0k3hAKmDKccNye6ezpvLYitw8/poA=;
+        h=X-UI-Sender-Class:Cc:Subject:From:To:Date;
+        b=sT/erWJm+P1PYhypKOREYCG6UGokcw7C9x66xKHzyV0e9OArJPjsDyXLXTt/R3b7i
+         nqcC7/h8T9m8+/vlRun2+os5SOMyzRoUgRQ01eBMvDGA4v1AZ1UMSEjyc45NTjvyTh
+         7d5RZQGHJ5jqQ/pTaoYD1cEseLCmIlVpG92qGBkw=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.2] ([2.243.120.168]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MZSFY-1kPKBK2bOY-00WZoV; Mon, 13
- Jul 2020 21:30:56 +0200
+Received: from [192.168.1.2] ([2.243.120.168]) by smtp.web.de (mrweb103
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0LZedc-1kZaRC1wWC-00lWWK; Mon, 13
+ Jul 2020 22:00:34 +0200
 Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
         Ayush Sawal <ayush.sawal@chelsio.com>,
         "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Rohit Maheshwari <rohitm@chelsio.com>,
         Vinay Kumar Yadav <vinay.yadav@chelsio.com>
-Subject: Re: [PATCH 1/2] Crypto/chcr: Avoid some code duplication
-To:     Christophe Jaillet <christophe.jaillet@wanadoo.fr>,
-        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 2/2] Crypto/chcr: Fix some pr_xxx messages
 From:   Markus Elfring <Markus.Elfring@web.de>
 Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  mQINBFg2+xABEADBJW2hoUoFXVFWTeKbqqif8VjszdMkriilx90WB5c0ddWQX14h6w5bT/A8
@@ -86,51 +84,65 @@ Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  Z/wsLiWTgKlih2QYULvW61XU+mWsK8+ZlYUrRMpkauN4CJ5yTpvp+Orcz5KixHQmc5tbkLWf
  x0n1QFc1xxJhbzN+r9djSGGN/5IBDfUqSANC8cWzHpWaHmSuU3JSAMB/N+yQjIad2ztTckZY
  pwT6oxng29LzZspTYUEzMz3wK2jQHw+U66qBFk8whA7B2uAU1QdGyPgahLYSOa4XAEGb6wbI FEE=
-Message-ID: <2cb65b54-5be0-7fab-546d-e7fc33621c7f@web.de>
-Date:   Mon, 13 Jul 2020 21:30:43 +0200
+To:     Christophe Jaillet <christophe.jaillet@wanadoo.fr>,
+        linux-crypto@vger.kernel.org
+Message-ID: <bc539dfe-969f-7593-81ef-56b736150e25@web.de>
+Date:   Mon, 13 Jul 2020 22:00:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
-X-Provags-ID: V03:K1:PTKt9wm2yMcV5/AP8HWn76ZSareJJunVW25ucBZFB6nhcE+VdB1
- baHLJzP2JkFhi/K+SClajPNc8ISIdCs+v++mlbbu3VJ/qSKlfoQd6nrAITt2H4As6zu6dFG
- 4WAFZVMkUEqLIXtl+ea/jFt5syc7+Msut0gqQH6zj3nqz+Y2NlA+hfEF8zXv/0ySzXnrmD8
- 0sKzp9LjLBa9Ye1gLoYTA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:juXzugf0VRE=:vGo8NVHLNhgXslwn9I1Bnt
- Z0Qyz0gfn2NXtNfBm4E39QaT2jhe9YqeAlFLi4hXZGWB6hlbazgS9+vH3f9OCXX2KrOaE7Mdg
- vKjamfuiaxJKf1KXIbeS2ATezVS9I7CdFFHyZ7VcQA1k5mBrdORccbJ9f7tnFE98YEQj515u9
- CbWWnk5s516iMThc2wfTTPSvCAejCgRCFUXxmf/pyI9NN9w97Im8T4CgAC6mthVEC9J1aeUR6
- +fz93GEytFvSHTF0q0UPUFEqoKUbYJb5IEV4Wkad1xa+k9sfikyNV3NxTozL9X+83DnKoSamF
- uLGyXz0BwMPTc40JnEk01FG5sn7W8f7DFXmbJQYZxOs7uVaANnguDazfMPH+GCgK+lyYMF8YE
- 4LrfTF8kKlaM8GSQPzJH+P9nUS4UDhsgylJtJv9Yo4v9XXNpTusMCIpHoKIi///Xqp0I7+i1o
- EDqJybcjKTKDNej/cJcmKK5OEXuQBbL9bf7NObU+n/OCky79Ql4qGuCHgguMC3Zahhoz21cWJ
- v5NHygIhEeScQicwGa9dHKHQQSKlgx5b5ZwX4frTBzL4RKpZF5SA+gHizU08A7PIzBWGLn8xh
- xth6Dq7M6P5guDk+vCnfq5LX/5r0BtIsX0QFzTuP3ijy3jEywp7+sSfJ/RqQinoRN456rRgOT
- WfAA/21lbH2fPQ8uIAUjP8IB1TtvHCbd2ZGeO8KTBRP5/5TTWvwQBm8K7kx6geR3mqrwAMP4H
- o6oc06FKIzRD5SILMDNbkDvwrTG6X9zTDDvXzFitBHdJ5tDMrHWH1zq5ZLJ50ZCxneG1ChlOK
- votd6mkbHHmuupaWb6bC+q1AezYWmRN29F4YDFWqmVcMjHKGgs0M9rTRAOikzGARXgMBZsJoX
- XlE7Q7jzm4mq17MEw/RvdmSOViarL5Icmdsk0AJWYl4DKx/LHb+01259eiCsG6YX7uaLTypg5
- f7C4SqBX8eMjQhNuevBSTbgysk5DrU0G1wgFtlFeHZSC3cYFEQlxuBnABZn0Kz6v3bDURTuuz
- hbVcvlRLBAc7e1MuqBeR37vmI+pike4ILpzb7M2R5yH+ybi8qXqA5leac0Xn9PlDJMGsdPsQM
- q6G6Mnrh/n9IPae9q2aeQF7qUN2B64Hr/ZjsF0rHZaK+dH/M9dFbY7QqBdYS2UPRWVC256KKg
- sfdZvi81cQClqdX6FBsBWArDcu2vR7EqQAWOp8f6YnmtTKOfwYgUIC6b75bSbW4iul0gEGwwe
- Xwvy//zc9rUCaahqcMI6Q8WYipUGMN0ltjPKGdQ==
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:KMLFfuAxtnx2fPMy8OvMaheZYMeyyDHD2Hl5r7sv7PtRSDYfAsO
+ QiCh2t7L1xsO2I213HvAoXjYsVzsVx8QENQJBEeAmHs7MSNffeFi0hnh6bBDgCG0PH4UY1c
+ WcscvRhKWKYBya+Js762ts1LO4fmVk1SxEoHTMdPW8PY7ArDj4I+5pw5+2Qz7NrpepNQ9qo
+ 5v96V/47NHHg+xgZD5dZg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Xgj6ChgEQrA=:mvGTuBywLgYdgrp0CGPt28
+ B8xx+IlEIg7q9+6MYynw+D9hNmAeksed/uDMRAaPnKIXrYl1Buskg7ekXz4LuGQo5Uc669pKQ
+ Aq4y6Y+7K7gxBnprSDTy7m9BynbO5TLjIoIm/nM9ee8mBOQ5el6xQaBd2RxB39zqBK/wwF9P1
+ MhXMiLufO5qTA/aJRE1uGZy2hOu9zP3WFI2pD+lA+T7Ak6icjzMoXjD7N+bkzICUvZ6F5+0Lj
+ esLcchE4//0TyUTkzB6X0G4jKvWQ43NIFK4ZMjQqrLZC0FtdalNM8D+Jjn4kfB4FekFMuengP
+ HFJX61VFdH06oo3jHD4kNBOnE1/9lCQDEBQCV75wxUxAtsIjA3cbpYQdlatxVoQfRKRDSKZZa
+ 9i7M1bG6qG51RSY4g6+aI4bcaZMcciVY+akKdItxgmPA6mMSgYEEVRxwTj7pHQ+lBkusCrqae
+ G7PNkf2MIpzLqntQJIUXHMZaJcJcf0ixh4rcb6E/0VxlMjr4O5dZHeh4lY1Qa7d5axYtTQ9RZ
+ rESmoNquJFjGv5bQ7c8bsr35o/PfRfeX0+Uy5GoBsLL9n94G7J28s4SlmxWDnpwWQyidLZJ/Z
+ p+rlHNp7WhPgJy2z+36pvmEKv5UNmZuLzdBqOjKryRgvS/x2zQJFLlo4SzCrxItZjXZSr9Hta
+ hMZu901a1RsFvQ/zUvGbojACQpRZ6SFwaqqlh7QWIEiyDxOLfVvwS1q8StgEmFuTOLVntl7Qb
+ my1Cjf5oAFMCgYawC8xPkSo4BeIO4mqCZG2VMXm7MijPDi8wxy+mPELY6Ya7fLvlIljB3CFHO
+ EqqGy9PqWcOM5mbN0k/eFyq5IqYiPh4g4JMgbPyVvf4T47vzNWGbwhZrN5uuskqsAtxHd6D6c
+ BHNKB4rF07IDTJEw8iOjTOGTYEv8NaDnSmRg/oGVTn4ZyiWwsEf/akdahi1bx1k4Qdez5hzb6
+ 6bVmXNk+qx2mmYayubms8UCvPy40QlTqs8TUMy/t+hVkHe9X8ZJC9zc2oG6ua6woXO+O1dLYX
+ yO/PvtVSUQzDY9uSTdv0gSNMf39OmzUgJL79Z20sYZtOS3vO2HNFoT4JJaEyZaIUHfG944M9U
+ EYly6VJ3JmME4P0CP5e/X4F2iL7yku3nro4bNtpwYuQcfJ7YpW7lT7Bg5ya2KM1OG5330SUEn
+ Y4CsCcIvaVMmHqQUHtRVzDRkWL7MlEz3fTkyLqa9tpkpTJ9P0X9boilbyirr1kl4Ng7iOL76k
+ Y4aBBtBsHomvoiSGBITFfRPqIteGJZ2cmgpJHTA==
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> The error handling path of 'chcr_authenc_setkey()' is the same as this
-> error handling code.
+=E2=80=A6
+> +++ b/drivers/crypto/chelsio/chcr_algo.c
+> @@ -1224,7 +1224,7 @@ static int chcr_handle_cipher_resp(struct skcipher=
+_request *req,
+>  	wrparam.bytes =3D bytes;
+>  	skb =3D create_cipher_wr(&wrparam);
+>  	if (IS_ERR(skb)) {
+> -		pr_err("chcr : %s : Failed to form WR. No memory\n", __func__);
+> +		pr_err("%s : Failed to form WR. No memory\n", __func__);
+>  		err =3D PTR_ERR(skb);
+>  		goto unmap;
+>  	}
 
-I find this change description improvable.
+I suggest to omit also a space character before the colon in such format s=
+trings.
+
++		pr_err("%s: Failed to form WR. No memory\n", __func__);
 
 
-> So just 'goto out' as done everywhere in the function to simplify the code.
-
-I propose to adjust jump targets a bit more for better exception handling
-in this function implementation.
+Would you like to apply any further fine-tuning around affected error mess=
+ages?
 
 Regards,
 Markus
