@@ -2,88 +2,229 @@ Return-Path: <SRS0=38jD=AY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44812C433E4
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 06:05:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D79DC433E2
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 06:39:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 636E820791
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 06:05:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B49C820791
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jul 2020 06:39:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="k5Q1DZsi"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="AnledLj/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726991AbgGMGFY (ORCPT
+        id S1729244AbgGMGjK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Jul 2020 02:05:24 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.51]:26243 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726571AbgGMGFY (ORCPT
+        Mon, 13 Jul 2020 02:39:10 -0400
+Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.122]:15076 "EHLO
+        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728571AbgGMGjJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Jul 2020 02:05:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1594620322;
+        Mon, 13 Jul 2020 02:39:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1594622344;
         s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:To:From:
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
         X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=mJQeMpu+X7tSZDlxg/9ft6rInml1bv2pRKLjw+QQc5M=;
-        b=k5Q1DZsiPFGRAsxNolWIMjIQqQ6b0KjrqHV383OVzqIr0D8UoptXrN7wpaHIw+pHbz
-        n6AraobmH4dAkYs1Ec9z4X4JTZtmSkE77hgM7vUFX6U7UN6xNksEerfmjPa/K7fRyaZy
-        cjHIMmysjgrXXjhsq/JhBitf6cf84zYM5wjYkTwyMze30yZ6VuisM+7jVst6t98BLe4X
-        3YiGYwYNGFRlIXwesGUG02hhgv325cDc7UU4lbabB+HF8QZwv7MlJb5RMYt24CvOgyqZ
-        joH7L3wfL0EqKlHl4oJ0ziVVBd1L+pzBNWh/T22VC5poGzrHGSHQ9F4CJgMFHYDjvpcl
-        X6Zw==
+        bh=ZvquNBrwHBAenJw013sZDX5jgj+fGLJduwwf0jGojW8=;
+        b=AnledLj/cK57Ah5xfZbF7nyvaTbV0Wm3z1NNXHcksJKZC3ztahtHEXzvsTtANSNIBE
+        1VpYR1Gnx7O7ZNs835jQ/KyrDimogpobsmibtlXbZGtmJYVIKw1WTnOQ/1wRi2BIHCC4
+        pDiCC7KAArba8X2a5DvT2btWPMJIGWSl5yJEysEitnxmC69FNFzVhtvQYRMzjHDjOvgm
+        dxCgFfjjwB/ztnDhDy8ghUpSiI8TxightLqeq1con5IiDpvba1CPCsjfV0lewUI+Utvp
+        4Zm5PiAbVO8UGASevBadbmTiUflpTIZzqm1O9AomrEhm6GWHEalLewI4iB6LBtsEvJ/Y
+        H3/w==
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaIvSfHReW"
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
         by smtp.strato.de (RZmta 46.10.5 DYNA|AUTH)
-        with ESMTPSA id y0546bw6D62kjqn
+        with ESMTPSA id y0546bw6D6bsk2M
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-        Mon, 13 Jul 2020 08:02:46 +0200 (CEST)
+        Mon, 13 Jul 2020 08:37:54 +0200 (CEST)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     Stephan Mueller <smueller@chronox.de>, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org,
-        Marcelo Cerri <marcelo.cerri@canonical.com>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        ard.biesheuvel@linaro.org, nhorman@redhat.com, simo@redhat.com
-Subject: Re: [PATCH v2 5/5] crypto: ECDH SP800-56A rev 3 local public key validation
-Date:   Mon, 13 Jul 2020 08:02:45 +0200
-Message-ID: <5631658.lOV4Wx5bFT@positron.chronox.de>
-In-Reply-To: <20200713055950.ibvzogkdwhqxcduc@altlinux.org>
-References: <2543601.mvXUDI8C0e@positron.chronox.de> <5856902.DvuYhMxLoT@tauon.chronox.de> <20200713055950.ibvzogkdwhqxcduc@altlinux.org>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-api@vger.kernel.org,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Nicolai Stange <nstange@suse.de>,
+        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Roman Drahtmueller <draht@schaltsekun.de>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [PATCH v31 05/12] crypto: DRBG - externalize DRBG functions for LRNG
+Date:   Mon, 13 Jul 2020 08:19:32 +0200
+Message-ID: <797327385.0ifERbkFSE@positron.chronox.de>
+In-Reply-To: <2050754.Mh6RI2rZIc@positron.chronox.de>
+References: <2050754.Mh6RI2rZIc@positron.chronox.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Montag, 13. Juli 2020, 07:59:50 CEST schrieb Vitaly Chikunov:
+This patch allows several DRBG functions to be called by the LRNG kernel
+code paths outside the drbg.c file.
 
-Hi Vitaly,
+CC: "Eric W. Biederman" <ebiederm@xmission.com>
+CC: "Alexander E. Patrakov" <patrakov@gmail.com>
+CC: "Ahmed S. Darwish" <darwish.07@gmail.com>
+CC: "Theodore Y. Ts'o" <tytso@mit.edu>
+CC: Willy Tarreau <w@1wt.eu>
+CC: Matthew Garrett <mjg59@srcf.ucam.org>
+CC: Vito Caputo <vcaputo@pengaru.com>
+CC: Andreas Dilger <adilger.kernel@dilger.ca>
+CC: Jan Kara <jack@suse.cz>
+CC: Ray Strode <rstrode@redhat.com>
+CC: William Jon McCann <mccann@jhu.edu>
+CC: zhangjs <zachary@baishancloud.com>
+CC: Andy Lutomirski <luto@kernel.org>
+CC: Florian Weimer <fweimer@redhat.com>
+CC: Lennart Poettering <mzxreary@0pointer.de>
+CC: Nicolai Stange <nstange@suse.de>
+Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
+Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
+Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Tested-by: Neil Horman <nhorman@redhat.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+=2D--
+ crypto/drbg.c         | 16 ++++++++++------
+ include/crypto/drbg.h |  7 +++++++
+ 2 files changed, 17 insertions(+), 6 deletions(-)
 
-> > > > +/* SP800-56A section 5.6.2.3.3 full verification */
-> > > 
-> > > Btw, 5.6.2.3.3 is partial validation, 5.6.2.3.2 is full validation
-> > > routine.
-> > 
-> > Looking at SP800-56A revision 3 from April 2018 I see:
-> > 
-> > "5.6.2.3.3 ECC Full Public-Key Validation Routine"
-> 
-> You are right. I looked at
-> 
->  
-> https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Ar2.pdf
-> 
-> which is Rev 2. And in Rev 3 they inserted `5.6.2.3.2 FFC Partial Public-Key
-> Validation Routine', so ECC paragraph numbers are shifted up.
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 8d80d93cab97..36f1fb41e85e 100644
+=2D-- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -113,7 +113,7 @@
+  * the SHA256 / AES 256 over other ciphers. Thus, the favored
+  * DRBGs are the latest entries in this array.
+  */
+=2Dstatic const struct drbg_core drbg_cores[] =3D {
++const struct drbg_core drbg_cores[] =3D {
+ #ifdef CONFIG_CRYPTO_DRBG_CTR
+ 	{
+ 		.flags =3D DRBG_CTR | DRBG_STRENGTH128,
+@@ -190,6 +190,7 @@ static const struct drbg_core drbg_cores[] =3D {
+ 	},
+ #endif /* CONFIG_CRYPTO_DRBG_HMAC */
+ };
++EXPORT_SYMBOL(drbg_cores);
+=20
+ static int drbg_uninstantiate(struct drbg_state *drbg);
+=20
+@@ -205,7 +206,7 @@ static int drbg_uninstantiate(struct drbg_state *drbg);
+  * Return: normalized strength in *bytes* value or 32 as default
+  *	   to counter programming errors
+  */
+=2Dstatic inline unsigned short drbg_sec_strength(drbg_flag_t flags)
++unsigned short drbg_sec_strength(drbg_flag_t flags)
+ {
+ 	switch (flags & DRBG_STRENGTH_MASK) {
+ 	case DRBG_STRENGTH128:
+@@ -218,6 +219,7 @@ static inline unsigned short drbg_sec_strength(drbg_fla=
+g_t flags)
+ 		return 32;
+ 	}
+ }
++EXPORT_SYMBOL(drbg_sec_strength);
+=20
+ /*
+  * FIPS 140-2 continuous self test for the noise source
+@@ -1214,7 +1216,7 @@ static int drbg_seed(struct drbg_state *drbg, struct =
+drbg_string *pers,
+ }
+=20
+ /* Free all substructures in a DRBG state without the DRBG state structure=
+ */
+=2Dstatic inline void drbg_dealloc_state(struct drbg_state *drbg)
++void drbg_dealloc_state(struct drbg_state *drbg)
+ {
+ 	if (!drbg)
+ 		return;
+@@ -1235,12 +1237,13 @@ static inline void drbg_dealloc_state(struct drbg_s=
+tate *drbg)
+ 		drbg->fips_primed =3D false;
+ 	}
+ }
++EXPORT_SYMBOL(drbg_dealloc_state);
+=20
+ /*
+  * Allocate all sub-structures for a DRBG state.
+  * The DRBG state structure must already be allocated.
+  */
+=2Dstatic inline int drbg_alloc_state(struct drbg_state *drbg)
++int drbg_alloc_state(struct drbg_state *drbg)
+ {
+ 	int ret =3D -ENOMEM;
+ 	unsigned int sb_size =3D 0;
+@@ -1321,6 +1324,7 @@ static inline int drbg_alloc_state(struct drbg_state =
+*drbg)
+ 	drbg_dealloc_state(drbg);
+ 	return ret;
+ }
++EXPORT_SYMBOL(drbg_alloc_state);
+=20
+ /*************************************************************************
+  * DRBG interface functions
+@@ -1890,8 +1894,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+  *
+  * return: flags
+  */
+=2Dstatic inline void drbg_convert_tfm_core(const char *cra_driver_name,
+=2D					 int *coreref, bool *pr)
++void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref, bool=
+ *pr)
+ {
+ 	int i =3D 0;
+ 	size_t start =3D 0;
+@@ -1918,6 +1921,7 @@ static inline void drbg_convert_tfm_core(const char *=
+cra_driver_name,
+ 		}
+ 	}
+ }
++EXPORT_SYMBOL(drbg_convert_tfm_core);
+=20
+ static int drbg_kcapi_init(struct crypto_tfm *tfm)
+ {
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index c4165126937e..71d53e028e6d 100644
+=2D-- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -278,4 +278,11 @@ enum drbg_prefixes {
+ 	DRBG_PREFIX3
+ };
+=20
++extern int drbg_alloc_state(struct drbg_state *drbg);
++extern void drbg_dealloc_state(struct drbg_state *drbg);
++extern void drbg_convert_tfm_core(const char *cra_driver_name, int *corere=
+f,
++				  bool *pr);
++extern const struct drbg_core drbg_cores[];
++extern unsigned short drbg_sec_strength(drbg_flag_t flags);
++
+ #endif /* _DRBG_H */
+=2D-=20
+2.26.2
 
-Thank you for the confirmation.
 
-Ciao
-Stephan
 
 
