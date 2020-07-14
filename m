@@ -2,130 +2,111 @@ Return-Path: <SRS0=vKog=AZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF39C433E7
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 00:04:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A3D2C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 05:17:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A818B21883
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 00:04:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594685040;
-	bh=xNYem6YA7j8MbtSO9ITmNVLbUgSZdNCAXdIewZIIF5A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Rtct+51Pae/3EtsNjJ/FOaARQn2YtBLCbmNGq4IZ/Pd2Ed3RH64PCd8GDG5G2ldLf
-	 VgtfE+ejldZDblscQN0jmA6vrdD9zSlYNXeTNQMXp4c3Bw4uVXkI6lQC/WHL+vKzAC
-	 6xv8f6HKQmzC9z3QZJYngZYxTBVuw6quWgv7y1z8=
+	by mail.kernel.org (Postfix) with ESMTP id B432A221E8
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 05:17:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="XhAH/lbZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726432AbgGNADz (ORCPT
+        id S1725793AbgGNFRa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Jul 2020 20:03:55 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:38270 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726150AbgGNADz (ORCPT
+        Tue, 14 Jul 2020 01:17:30 -0400
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.163]:11019 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725306AbgGNFR2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Jul 2020 20:03:55 -0400
-Received: by mail-io1-f68.google.com with SMTP id l1so15468236ioh.5;
-        Mon, 13 Jul 2020 17:03:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=evai81ZnlRDbfusVNXIm1GHJcQ/JXmRNmH72lDjI1z0=;
-        b=TlO/SMXf/4yISNUp8G2BSjL9ZP6T/lzVl3Y2V+DsfC2iou6GcaRFnaWPgo30db5xMt
-         SpvZOhD+oEmKU7eiQ3cw2pH8ahmdA7gdfeoF5H1WP0W27KQDIB298bQ98s780PcnqkIB
-         tDLgUx7fAON4ApLmf5Wd0EhZ4UFQPFslIBHxvwCQOi99XSql7gs/STzwf9Wj/9SS7RTn
-         V5nF/nepEKsll14WM1amacVyJMbrTJd9WlRsyjK2AH+ZxNNVtLRnJYMCgYyqPkXa4B6R
-         YS29O7H/PIelucIMTkufMEVENhi/L+QQe/FzE3s8IAtsaPZhre4aYDBxr4liblK+EVmE
-         kpLQ==
-X-Gm-Message-State: AOAM5314HLHyCLwEJSlJKpt8YPcohOIP0FgITyKGsXgTiBawM66ZSfGl
-        4Jk5R/KRx3Eaakto3gBiNg==
-X-Google-Smtp-Source: ABdhPJwmp0epEIu44qjO8H2aC4abKmodnsLUIgzBjPG6vi2TMwpK56lYVwvbS1d4waPrIsEMMIgHhA==
-X-Received: by 2002:a02:ccb3:: with SMTP id t19mr2982333jap.122.1594685034204;
-        Mon, 13 Jul 2020 17:03:54 -0700 (PDT)
-Received: from xps15 ([64.188.179.252])
-        by smtp.gmail.com with ESMTPSA id f206sm8678056ilh.75.2020.07.13.17.03.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jul 2020 17:03:53 -0700 (PDT)
-Received: (nullmailer pid 968214 invoked by uid 1000);
-        Tue, 14 Jul 2020 00:03:52 -0000
-Date:   Mon, 13 Jul 2020 18:03:52 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Cc:     Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Martin Kaiser <martin@kaiser.cx>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/5] dt-bindings: rng: add RNGB compatibles for i.MX6
- SoCs
-Message-ID: <20200714000352.GA966545@bogus>
-References: <20200621145658.12528-1-horia.geanta@nxp.com>
- <20200621145658.12528-2-horia.geanta@nxp.com>
+        Tue, 14 Jul 2020 01:17:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1594703846;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=HZATrvvag4q6gQHDw4QCFWHtrPGHPPXwIKMxcmxUGEs=;
+        b=XhAH/lbZXYZM0bVRHN7jIia1JKUO3hOS9RZJaZXEj9pGfVSKERKlkh9Zyv/YSayxnE
+        SiZ/mmCdvvkx1KOqv3VNldKHHzulLgt0tyEFz7JElr6CqWDaLvfzDTdwW54FxmgFE6dz
+        A9nkGuBjmIDRzIzwPw1MIzlBpO8mB+SD9RHsnP9vIsijXKRGUCfJV7q+81yzwwFI5zxz
+        Vr9RMkKNQGZEsnEVAxTCiH5PEQeTzTxsctFzj+WCUV96PcUGPyop2dvvkizkbk9NgN2N
+        vjIvsnIta8zY58Hq2ylb2CcjgP6nLfPawwIu2YPtWfrauiZL/92dDebVQ1+E5DMo6Cw4
+        4ptA==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaI/SfxmJ+"
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 46.10.5 DYNA|AUTH)
+        with ESMTPSA id y0546bw6E5HLpia
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Tue, 14 Jul 2020 07:17:21 +0200 (CEST)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     linux-crypto@vger.kernel.org, Elena Petrova <lenaptr@google.com>
+Cc:     Elena Petrova <lenaptr@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH 0/1] crypto: af_alg - add extra parameters for DRBG interface
+Date:   Tue, 14 Jul 2020 07:17:20 +0200
+Message-ID: <2941213.7s5MMGUR32@tauon.chronox.de>
+In-Reply-To: <20200713164857.1031117-1-lenaptr@google.com>
+References: <20200713164857.1031117-1-lenaptr@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200621145658.12528-2-horia.geanta@nxp.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Jun 21, 2020 at 05:56:54PM +0300, Horia Geantă wrote:
-> RNGB block is found in some i.MX6 SoCs - 6SL, 6SLL, 6ULL, 6ULZ.
-> Add corresponding compatible strings.
-> 
-> Note:
-> 
-> Several NXP SoC from QorIQ family (P1010, P1023, P4080, P3041, P5020)
-> also have a RNGB, however it's part of the CAAM
-> (Cryptograhic Accelerator and Assurance Module) crypto accelerator.
-> In this case, RNGB is managed in the caam driver
-> (drivers/crypto/caam/), since it's tightly related to
-> the caam "job ring" interface, not to mention CAAM internally relying on
-> RNGB as source of randomness.
-> 
-> On the other hand, the i.MX6 SoCs with RNGB have a DCP
-> (Data Co-Processor) crypto accelerator and this block and RNGB
-> are independent.
-> 
-> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
-> ---
->  Documentation/devicetree/bindings/rng/imx-rng.txt | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/rng/imx-rng.txt b/Documentation/devicetree/bindings/rng/imx-rng.txt
-> index 405c2b00ccb0..eb227db9e684 100644
-> --- a/Documentation/devicetree/bindings/rng/imx-rng.txt
-> +++ b/Documentation/devicetree/bindings/rng/imx-rng.txt
-> @@ -5,6 +5,9 @@ Required properties:
->                 "fsl,imx21-rnga"
->                 "fsl,imx31-rnga" (backward compatible with "fsl,imx21-rnga")
->                 "fsl,imx25-rngb"
-> +               "fsl,imx6sl-rngb"
-> +               "fsl,imx6sll-rngb"
-> +               "fsl,imx6ull-rngb"
+Am Montag, 13. Juli 2020, 18:48:56 CEST schrieb Elena Petrova:
 
-These are all different? IOW, no fallback compatible?
+Hi Elena,
 
->                 "fsl,imx35-rngc"
->  - reg : offset and length of the register set of this block
->  - interrupts : the interrupt number for the RNG block
-> -- 
-> 2.17.1
+> This patch extends the userspace RNG interface to make it usable for
+> CAVS testing. This is achieved by adding ALG_SET_DRBG_ENTROPY
+> option to the setsockopt interface for specifying the entropy, and using
+> sendmsg syscall for specifying the additional data.
 > 
+> See libkcapi patch [1] to test the added functionality. The libkcapi
+> patch is not intended for merging into libkcapi as is: it is only a
+> quick plug to manually verify that the extended AF_ALG RNG interface
+> generates the expected output on DRBG800-90A CAVS inputs.
+
+As I am responsible for developing such CAVS/ACVP harness as well, I played 
+with the idea of going through AF_ALG. I discarded it because I do not see the 
+benefit why we should add an interface solely for the purpose of testing. 
+Further, it is a potentially dangerous one because the created instance of the 
+DRBG is "seeded" from data provided by the caller.
+
+Thus, I do not see the benefit from adding that extension, widening a user 
+space interface solely for the purpose of CAVS testing. I would not see any 
+other benefit we have with this extension. In particular, this interface would 
+then be always there. What I could live with is an interface that can be 
+enabled at compile time for those who want it.
+
+Besides, when you want to do CAVS testing, the following ciphers are still not 
+testable and thus this patch would only be a partial solution to get the 
+testing covered:
+
+- AES KW (you cannot get the final IV out of the kernel - I played with the 
+idea to return the IV through AF_ALG, but discarded it because of the concern 
+above)
+
+- OFB/CFB MCT testing (you need the IV from the last round - same issue as for 
+AES KW)
+
+- RSA
+
+- DH
+
+- ECDH
+
+With these issues, I would assume you are better off creating your own kernel 
+module just like I did that externalizes the crypto API to user space but is 
+only available on your test kernel and will not affect all other users.
+
+Ciao
+Stephan
+
+
