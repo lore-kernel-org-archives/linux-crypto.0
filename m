@@ -2,102 +2,166 @@ Return-Path: <SRS0=vKog=AZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03CDEC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 12:48:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75607C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 13:38:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D46C022453
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 12:48:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45CCC2065D
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 13:38:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDqqD/EA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D/0uyKNX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728066AbgGNMsQ (ORCPT
+        id S1725945AbgGNNi5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jul 2020 08:48:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38412 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728049AbgGNMsP (ORCPT
+        Tue, 14 Jul 2020 09:38:57 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53052 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725906AbgGNNi5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jul 2020 08:48:15 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 240FCC061755;
-        Tue, 14 Jul 2020 05:48:15 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id f5so22439467ljj.10;
-        Tue, 14 Jul 2020 05:48:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Ou2c+Y4ocksj5FtnaDLrroq0j5xVq/IWLcnDWLiQ6Dk=;
-        b=EDqqD/EAEzPy6cYw9EYkELqFwbGBKIM0SjzVCXs0AQwKMlgaF15SI+Vg+iZ/nUvo42
-         G4p+pzGZL+B9nfhSFgpXvVcp5tJbasB+zUotfokeH0lNJNMmtePeoFMUngSohjcisPgB
-         ViZo6K12ikMU/Pmmt3v4CxoEJnFquvJ9qzEg0TmC/Q92t6EVV/2BzQY4rA0tkFPoJH8u
-         clckWvHoFtssjZ+h/Pt2UFA81QEB4JfMn2GdOYo/SF5MRm1evYu/7laqbKwPB0wb5XcE
-         QplLpvlbmO4jLD2LwH3RN3IBVBupQMVyf8G46zzGE2JRFXbkShz0Pt6rqzyUPWmavzuN
-         mazA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Ou2c+Y4ocksj5FtnaDLrroq0j5xVq/IWLcnDWLiQ6Dk=;
-        b=ExrjRMzDYGv1ViTnAdmTex/xUHgKLtJL4F6egTwXsebGxO7mxGML3v+1j3+WkxrVYq
-         2vfpT0hOJpzAT/fkdZl1z2Wvy6q5VriSYuD4eEVWb11gQkbXoqWN3z/rnSHgqaODZmmD
-         69i9J0On4TRtFjhe61vziZCy2kQJayXGCBSy52Qp2JzkcOMNqmWa7hrKIKaLdgS2X/5H
-         diaDMcff/atgnXe/6IzBrLI2jOQl38QmHkJWIlLvBbOdt4h7ODy59GqxNsDQAIsFYHBc
-         pJiCUMSVwssxNDTKMhxay6JH+NUMrOZ9swgpObYZtvXyYSlXZn4M9l3H22GFq4mVEyiK
-         ChQQ==
-X-Gm-Message-State: AOAM532z6IDt6F2XDacO1RUwszy9gDTkjgjU8BfeNp11YZIPjwNvjlEd
-        wKCUvjQmCTmz25+pOcUHj7UpFjziRJpT2WaaHNU=
-X-Google-Smtp-Source: ABdhPJwZT2oTeFEXtSJJBhdvrMRetYxl7UuILWW3tQaQRvYRjdvG7E2x8Zgbp/ce+/49J8u6kIYaiLGEtT+34l1zzew=
-X-Received: by 2002:a2e:a168:: with SMTP id u8mr2062083ljl.178.1594730893460;
- Tue, 14 Jul 2020 05:48:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200714123920.23711-1-horia.geanta@nxp.com> <20200714123920.23711-6-horia.geanta@nxp.com>
-In-Reply-To: <20200714123920.23711-6-horia.geanta@nxp.com>
-From:   Fabio Estevam <festevam@gmail.com>
-Date:   Tue, 14 Jul 2020 09:48:02 -0300
-Message-ID: <CAOMZO5DSRy7LZS_SZw2dCyxKyAq4XCdVPiS3LiuaR7oWjtG8kw@mail.gmail.com>
-Subject: Re: [PATCH v3 5/5] hwrng: imx-rngc: enable driver for i.MX6
-To:     =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>
-Cc:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Matt Mackall <mpm@selenic.com>,
+        Tue, 14 Jul 2020 09:38:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594733936;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=VIsTGGfWg9oC5ywv2DfaNcAwBqGoW6BaimgT2CXKK5Q=;
+        b=D/0uyKNXkT3uu1sIb+i37FrOsGaR9fMROgM8RzNO/vC9fiw/CQf/6XN7STECwSafTP+u6p
+        LoFabEPKAda9I6SmlXOG3PAqAiyZ5fGlitq7hodJNZglcbqQK8hXfVHfLtOQcILd5dlOKR
+        M+gnG8gG3IPeNa9rUQDzG1sGseVh8gY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-78-Ir1g84BzNpO0aWzp0JOrqQ-1; Tue, 14 Jul 2020 09:38:54 -0400
+X-MC-Unique: Ir1g84BzNpO0aWzp0JOrqQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDD931080;
+        Tue, 14 Jul 2020 13:38:50 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A926C710C8;
+        Tue, 14 Jul 2020 13:38:47 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 06EDclcC017184;
+        Tue, 14 Jul 2020 09:38:47 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 06EDciQQ017180;
+        Tue, 14 Jul 2020 09:38:44 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Tue, 14 Jul 2020 09:38:44 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     =?ISO-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+cc:     Eric Biggers <ebiggers@kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Martin Kaiser <martin@kaiser.cx>,
-        Marco Felsch <m.felsch@pengutronix.de>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        "dm-devel@redhat.com" <dm-devel@redhat.com>
+Subject: Re: [PATCH 5/6] crypto: set the flag CRYPTO_ALG_ALLOCATES_MEMORY
+In-Reply-To: <780cb500-2241-61bc-eb44-6f872ad567d3@nxp.com>
+Message-ID: <alpine.LRH.2.02.2007140937260.17016@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20200701045217.121126-1-ebiggers@kernel.org> <20200701045217.121126-6-ebiggers@kernel.org> <3f2d3409-2739-b121-0469-b14c86110b2d@nxp.com> <20200713160136.GA1696@sol.localdomain> <780cb500-2241-61bc-eb44-6f872ad567d3@nxp.com>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+MIME-Version: 1.0
+Content-Type: MULTIPART/MIXED; BOUNDARY="185206533-1492832032-1594733927=:17016"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 14, 2020 at 9:39 AM Horia Geant=C4=83 <horia.geanta@nxp.com> wr=
-ote:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
->  static const struct of_device_id imx_rngc_dt_ids[] =3D {
->         { .compatible =3D "fsl,imx25-rngb", .data =3D NULL, },
-> +       { .compatible =3D "fsl,imx6sl-rngb", .data =3D NULL, },
-> +       { .compatible =3D "fsl,imx6sll-rngb", .data =3D NULL, },
-> +       { .compatible =3D "fsl,imx6ull-rngb", .data =3D NULL, },
+--185206533-1492832032-1594733927=:17016
+Content-Type: TEXT/PLAIN; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 
-It seems that these new entries are not needed, since they fallback to
-"fsl,imx25-rngb".
+
+
+On Mon, 13 Jul 2020, Horia Geantă wrote:
+
+> On 7/13/2020 7:01 PM, Eric Biggers wrote:
+> > On Mon, Jul 13, 2020 at 06:49:00PM +0300, Horia Geantă wrote:
+> >> On 7/1/2020 7:52 AM, Eric Biggers wrote:
+> >>> From: Mikulas Patocka <mpatocka@redhat.com>
+> >>>
+> >>> Set the flag CRYPTO_ALG_ALLOCATES_MEMORY in the crypto drivers that
+> >>> allocate memory.
+> >>>
+> >> Quite a few drivers are impacted.
+> >>
+> >> I wonder what's the proper way to address the memory allocation.
+> >>
+> >> Herbert mentioned setting up reqsize:
+> >> https://lore.kernel.org/linux-crypto/20200610010450.GA6449@gondor.apana.org.au/
+> >>
+> >> I see at least two hurdles in converting the drivers to using reqsize:
+> >>
+> >> 1. Some drivers allocate the memory using GFP_DMA
+> >>
+> >> reqsize does not allow drivers to control gfp allocation flags.
+> >>
+> >> I've tried converting talitos driver (to use reqsize) at some point,
+> >> and in the process adding a generic CRYPTO_TFM_REQ_DMA flag:
+> >> https://lore.kernel.org/linux-crypto/54FD8D3B.5040409@freescale.com
+> >> https://lore.kernel.org/linux-crypto/1426266882-31626-1-git-send-email-horia.geanta@freescale.com
+> >>
+> >> The flag was supposed to be transparent for the user,
+> >> however there were users that open-coded the request allocation,
+> >> for example esp_alloc_tmp() in net/ipv4/esp4.c.
+> >> At that time, Dave NACK-ed the change:
+> >> https://lore.kernel.org/linux-crypto/1426266922-31679-1-git-send-email-horia.geanta@freescale.com
+> >>
+> >>
+> >> 2. Memory requirements cannot be determined / are not known
+> >> at request allocation time
+> >>
+> >> An analysis for talitos driver is here:
+> >> https://lore.kernel.org/linux-crypto/54F8235B.5080301@freescale.com
+> >>
+> >> In general, drivers would be forced to ask more memory than needed,
+> >> to handle the "worst-case".
+> >> Logic will be needed to fail in case the "worst-case" isn't correctly estimated.
+> >>
+> >> However, this is still problematic.
+> >>
+> >> For example, a driver could set up reqsize to accommodate for 32 S/G entries
+> >> (in the HW S/G table). In case a dm-crypt encryption request would require more,
+> >> then driver's .encrypt callback would fail, possibly with -ENOMEM,
+> >> since there's not enough pre-allocated memory.
+> >> This brings us back to the same problem we're trying to solve,
+> >> since in this case the driver would be forced to either fail immediately or
+> >> to allocate memory at .encrypt/.decrypt time.
+> >>
+> > 
+> > We have to place restrictions on what cases
+> > !(flags & CRYPTO_ALG_ALLOCATES_MEMORY) applies to anyway; see the patch that
+> > introduces it.  If needed we could add more restrictions, like limit the number
+> > of scatterlist elements.  If we did that, the driver could allocate memory if
+> > the number of scatterlist elements is large, without having to set
+> > CRYPTO_ALG_ALLOCATES_MEMORY.
+> > 
+> This sounds reasonable.
+> 
+> > Also, have you considered using a mempool?  A mempool allows allocations without
+> > a possibility of failure, at the cost of pre-allocations.
+> > 
+> Thanks for the suggestion.
+> 
+> Would this be safe for all cases, e.g. IPsec - where .encrypt/.decrypt callbacks
+> execute in (soft)IRQ context?
+> kernel-doc for mempool_alloc() mentions it could fail when called from
+> "IRQ context". 
+
+In IPsec, you can drop packets (and TCP will retransmit them), so there is 
+no problem with memory allocation failures.
+
+> Thanks,
+> Horia
+
+Mikulas
+--185206533-1492832032-1594733927=:17016--
+
