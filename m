@@ -2,205 +2,113 @@ Return-Path: <SRS0=vKog=AZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA050C433E8
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 20:16:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2602C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 21:09:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF0332084C
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 20:16:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fO88FZTn"
+	by mail.kernel.org (Postfix) with ESMTP id 9B27120658
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 21:09:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1594760993;
+	bh=ArJuSwehu3eqi2k6YsxpjQ7tdEvCHdkWkCFNGLW+GGQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=1Msy5/N39jqGICEO0N9o4OohPiUJ1UPZR8MBMDcScX9sy46uaKiq4OdwqIt5EOO5Q
+	 48fhZH99JCXzM7Yimw3Sa9N9t2SqvTZrZVxIBJHhcWcGlO4toZmaMmCNo4hkbWk6BL
+	 sUwx6wD5xdnmSF91cwhZanvet1FRhQn38m/9dpYk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730406AbgGNUQT (ORCPT
+        id S1728164AbgGNVJr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jul 2020 16:16:19 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:57984 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730057AbgGNUQJ (ORCPT
+        Tue, 14 Jul 2020 17:09:47 -0400
+Received: from mail-il1-f194.google.com ([209.85.166.194]:43510 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726750AbgGNVJr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jul 2020 16:16:09 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06EKC7lH097128;
-        Tue, 14 Jul 2020 20:16:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=VKtfSGs57quI8GvMfrjEl4/gJY9j9e0LVcZIEfEMCkY=;
- b=fO88FZTnC0d6D7+mH8OdoN+MPYDj+gRBBoXCnwZqLeG/WV9rN5rmCa51mcmqCrgvQGA4
- UDCytqrhaLMKwQUnjk/+OB3QzHv+Di9AYMDC/oCKquYAliHLeCqAcZp6/OEgR1SD9qN8
- QP+FUZPB9NLdyK7zhtg3UMkyXlSNi7ZqPebyQXryqlFHJ+fzNuzHvcyVf97seNdufCu9
- JqsS3acDIrlQA5h1sPiLB5GK9OPf1iDTdq90qSnh9VW0BxZR6yY/Nt4j3nvGWcIB4qbu
- 2iXm6sg7xRV83yAu17D69m/yFCO/jCkQ0kwMJToAOz7g/GnQvoaHiHyrVaq7DvbPhuca dA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 3274ur7q69-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 14 Jul 2020 20:16:04 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06EKDbge025130;
-        Tue, 14 Jul 2020 20:14:03 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 327q0pvn9q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 Jul 2020 20:14:03 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06EKE2Ep003960;
-        Tue, 14 Jul 2020 20:14:02 GMT
-Received: from localhost.localdomain (/98.229.125.203)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 14 Jul 2020 13:14:02 -0700
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [PATCH 5/6] padata: fold padata_alloc_possible() into padata_alloc()
-Date:   Tue, 14 Jul 2020 16:13:55 -0400
-Message-Id: <20200714201356.889176-6-daniel.m.jordan@oracle.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200714201356.889176-1-daniel.m.jordan@oracle.com>
-References: <20200714201356.889176-1-daniel.m.jordan@oracle.com>
+        Tue, 14 Jul 2020 17:09:47 -0400
+Received: by mail-il1-f194.google.com with SMTP id i18so43204ilk.10;
+        Tue, 14 Jul 2020 14:09:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=7n1eCfcIXRzp8Zf/h32IGI3ysZU8V6mXbcHVjQ48LpM=;
+        b=pyKmC1iUGPTpESp5UMsKKB8qMGHSZYTG3QAWfP9O6DfL/dhCSRBo7hYqVDFUPQLbXB
+         AwtEVltT2cRklulEZ5N08nsVNMdUmf1Y608Q0vHnEXmwsYfnUWa3a+xXiC1TJj4XNZYV
+         E53s+iO0ATpir+MMmN3vryeS8+96VWAtl/plIKUtZvHGP6ksq4E5SfaJTMQ8LxdUaHj1
+         bpFHsfLQ2v+8f4t21pg0RFTz8xIBCJ/w6xmhN69Lrc4JVbUHqg3SJDtSH0kZ6D4pUIbg
+         2sEfEl2BuFI+cqSoTEMlVSBm/HfCSBjuONy29rRbZRQzQS6seBFRKUyUb9z3EBU/0sUv
+         CkOg==
+X-Gm-Message-State: AOAM531wDsS6JMD2Ob2ASYR5HEziOU31/RMklbkWn4yEEB+LvkuVuvGl
+        4pERuDrNz5WLvxS+/7H8dh7//cK03ZTK
+X-Google-Smtp-Source: ABdhPJy2M+RM7ODxSIifUBuOn2xzZSlv5UJSECY0kHYVvd6TGRWoVCEMCkEvE+CKWf8plGmQrP4TkA==
+X-Received: by 2002:a92:6a02:: with SMTP id f2mr5984073ilc.68.1594760986430;
+        Tue, 14 Jul 2020 14:09:46 -0700 (PDT)
+Received: from xps15 ([64.188.179.252])
+        by smtp.gmail.com with ESMTPSA id x71sm57098ilk.43.2020.07.14.14.09.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jul 2020 14:09:45 -0700 (PDT)
+Received: (nullmailer pid 2921463 invoked by uid 1000);
+        Tue, 14 Jul 2020 21:09:44 -0000
+Date:   Tue, 14 Jul 2020 15:09:44 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Cc:     Franck Lenormand <franck.lenormand@nxp.com>,
+        Marco Felsch <m.felsch@pengutronix.de>,
+        Matt Mackall <mpm@selenic.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        linux-crypto@vger.kernel.org, Fabio Estevam <festevam@gmail.com>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Martin Kaiser <martin@kaiser.cx>,
+        linux-arm-kernel@lists.infradead.org,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>, devicetree@vger.kernel.org,
+        Shawn Guo <shawnguo@kernel.org>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        Sascha Hauer <s.hauer@pengutronix.de>
+Subject: Re: [PATCH v3 1/5] dt-bindings: rng: add RNGB compatibles for i.MX6
+ SoCs
+Message-ID: <20200714210944.GA2921406@bogus>
+References: <20200714123920.23711-1-horia.geanta@nxp.com>
+ <20200714123920.23711-2-horia.geanta@nxp.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9682 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 spamscore=0
- mlxlogscore=999 bulkscore=0 adultscore=0 phishscore=0 suspectscore=2
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007140141
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9682 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 impostorscore=0
- suspectscore=2 phishscore=0 spamscore=0 mlxlogscore=999 malwarescore=0
- mlxscore=0 priorityscore=1501 adultscore=0 bulkscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007140141
+In-Reply-To: <20200714123920.23711-2-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There's no reason to have two interfaces when there's only one caller.
-Removing _possible saves text and simplifies future changes.
+On Tue, 14 Jul 2020 15:39:16 +0300, Horia Geantă wrote:
+> RNGB block is found in some i.MX6 SoCs - 6SL, 6SLL, 6ULL, 6ULZ.
+> Add corresponding compatible strings.
+> 
+> Note:
+> 
+> Several NXP SoC from QorIQ family (P1010, P1023, P4080, P3041, P5020)
+> also have a RNGB, however it's part of the CAAM
+> (Cryptograhic Accelerator and Assurance Module) crypto accelerator.
+> In this case, RNGB is managed in the caam driver
+> (drivers/crypto/caam/), since it's tightly related to
+> the caam "job ring" interface, not to mention CAAM internally relying on
+> RNGB as source of randomness.
+> 
+> On the other hand, the i.MX6 SoCs with RNGB have a DCP
+> (Data Co-Processor) crypto accelerator and this block and RNGB
+> are independent.
+> 
+> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+> ---
+>  Documentation/devicetree/bindings/rng/imx-rng.txt | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
 
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
- Documentation/core-api/padata.rst |  2 +-
- crypto/pcrypt.c                   |  2 +-
- include/linux/padata.h            |  2 +-
- kernel/padata.c                   | 33 +++++--------------------------
- 4 files changed, 8 insertions(+), 31 deletions(-)
-
-diff --git a/Documentation/core-api/padata.rst b/Documentation/core-api/padata.rst
-index 771d50330e5b5..35175710b43cc 100644
---- a/Documentation/core-api/padata.rst
-+++ b/Documentation/core-api/padata.rst
-@@ -27,7 +27,7 @@ padata_instance structure for overall control of how jobs are to be run::
- 
-     #include <linux/padata.h>
- 
--    struct padata_instance *padata_alloc_possible(const char *name);
-+    struct padata_instance *padata_alloc(const char *name);
- 
- 'name' simply identifies the instance.
- 
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index 7374dfecaf70f..812892732a5e5 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -320,7 +320,7 @@ static int pcrypt_init_padata(struct padata_instance **pinst, const char *name)
- {
- 	int ret = -ENOMEM;
- 
--	*pinst = padata_alloc_possible(name);
-+	*pinst = padata_alloc(name);
- 	if (!*pinst)
- 		return ret;
- 
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index a941b96b7119e..070a7d43e8af8 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -192,7 +192,7 @@ extern void __init padata_init(void);
- static inline void __init padata_init(void) {}
- #endif
- 
--extern struct padata_instance *padata_alloc_possible(const char *name);
-+extern struct padata_instance *padata_alloc(const char *name);
- extern void padata_free(struct padata_instance *pinst);
- extern struct padata_shell *padata_alloc_shell(struct padata_instance *pinst);
- extern void padata_free_shell(struct padata_shell *ps);
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 4f0a57e5738c9..1c0b97891edb8 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -979,18 +979,12 @@ static struct kobj_type padata_attr_type = {
- };
- 
- /**
-- * padata_alloc - allocate and initialize a padata instance and specify
-- *                cpumasks for serial and parallel workers.
-- *
-+ * padata_alloc - allocate and initialize a padata instance
-  * @name: used to identify the instance
-- * @pcpumask: cpumask that will be used for padata parallelization
-- * @cbcpumask: cpumask that will be used for padata serialization
-  *
-  * Return: new instance on success, NULL on error
-  */
--static struct padata_instance *padata_alloc(const char *name,
--					    const struct cpumask *pcpumask,
--					    const struct cpumask *cbcpumask)
-+struct padata_instance *padata_alloc(const char *name)
- {
- 	struct padata_instance *pinst;
- 
-@@ -1016,14 +1010,11 @@ static struct padata_instance *padata_alloc(const char *name,
- 		free_cpumask_var(pinst->cpumask.pcpu);
- 		goto err_free_serial_wq;
- 	}
--	if (!padata_validate_cpumask(pinst, pcpumask) ||
--	    !padata_validate_cpumask(pinst, cbcpumask))
--		goto err_free_masks;
- 
- 	INIT_LIST_HEAD(&pinst->pslist);
- 
--	cpumask_copy(pinst->cpumask.pcpu, pcpumask);
--	cpumask_copy(pinst->cpumask.cbcpu, cbcpumask);
-+	cpumask_copy(pinst->cpumask.pcpu, cpu_possible_mask);
-+	cpumask_copy(pinst->cpumask.cbcpu, cpu_possible_mask);
- 
- 	if (padata_setup_cpumasks(pinst))
- 		goto err_free_masks;
-@@ -1057,21 +1048,7 @@ static struct padata_instance *padata_alloc(const char *name,
- err:
- 	return NULL;
- }
--
--/**
-- * padata_alloc_possible - Allocate and initialize padata instance.
-- *                         Use the cpu_possible_mask for serial and
-- *                         parallel workers.
-- *
-- * @name: used to identify the instance
-- *
-- * Return: new instance on success, NULL on error
-- */
--struct padata_instance *padata_alloc_possible(const char *name)
--{
--	return padata_alloc(name, cpu_possible_mask, cpu_possible_mask);
--}
--EXPORT_SYMBOL(padata_alloc_possible);
-+EXPORT_SYMBOL(padata_alloc);
- 
- /**
-  * padata_free - free a padata instance
--- 
-2.27.0
-
+Reviewed-by: Rob Herring <robh@kernel.org>
