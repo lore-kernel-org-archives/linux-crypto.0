@@ -2,166 +2,166 @@ Return-Path: <SRS0=vKog=AZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75607C433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 13:38:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2EB5C433E2
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 14:27:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 45CCC2065D
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 13:38:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BAFBE22519
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 14:27:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D/0uyKNX"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="irFkq8f9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725945AbgGNNi5 (ORCPT
+        id S1728478AbgGNO1q (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jul 2020 09:38:57 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53052 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725906AbgGNNi5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jul 2020 09:38:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594733936;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VIsTGGfWg9oC5ywv2DfaNcAwBqGoW6BaimgT2CXKK5Q=;
-        b=D/0uyKNXkT3uu1sIb+i37FrOsGaR9fMROgM8RzNO/vC9fiw/CQf/6XN7STECwSafTP+u6p
-        LoFabEPKAda9I6SmlXOG3PAqAiyZ5fGlitq7hodJNZglcbqQK8hXfVHfLtOQcILd5dlOKR
-        M+gnG8gG3IPeNa9rUQDzG1sGseVh8gY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-78-Ir1g84BzNpO0aWzp0JOrqQ-1; Tue, 14 Jul 2020 09:38:54 -0400
-X-MC-Unique: Ir1g84BzNpO0aWzp0JOrqQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDD931080;
-        Tue, 14 Jul 2020 13:38:50 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A926C710C8;
-        Tue, 14 Jul 2020 13:38:47 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 06EDclcC017184;
-        Tue, 14 Jul 2020 09:38:47 -0400
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 06EDciQQ017180;
-        Tue, 14 Jul 2020 09:38:44 -0400
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Tue, 14 Jul 2020 09:38:44 -0400 (EDT)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     =?ISO-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-cc:     Eric Biggers <ebiggers@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Tue, 14 Jul 2020 10:27:46 -0400
+Received: from mail-am6eur05on2055.outbound.protection.outlook.com ([40.107.22.55]:53280
+        "EHLO EUR05-AM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726187AbgGNO1p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 14 Jul 2020 10:27:45 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XyXXAHKnKp8mPz8LtJPAHLqlwPDHxLywuIGDTEZ0W7We3Lqh9d8mbv2vCYoWbWVy+3wUpINFUOwJyZyjtOjuroddQXpwkXQfCP3wHgU+D01dvYpyvbDGpa553GpCLo4xXMakA0pI9fa2naMFuUQE41xDoXVdFSPFAIZTlPaO3FWgRLZHpd1ODFq4F3Fy9O+cnavXLmD31l6HF/gExNusFLDYCDs2QAEhNvF5NmvRmmNJF5KIJwNYhnkB+AC3FuOxuVO9JesKODrU9JqQpF+GGZyw1eEynnxNsGZC4EcafGELgQcQVpVuVCrv4WVdqCu02K1ZfughTdybghDcTgZStA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aXPsGLyv0p8r01R6bHSA+EPNXQCzOyAKDkuBTxMhb7g=;
+ b=gqEZzvG35tsJiGWp9m7VpWfzA9k/We6pYYbm7ld3oeRUq/2DrjSNvEBcR1ELaT/N7LssG63uG3p5lkaFs2fzbAuuKzGkkh3/dzCZ04LVx33v5Elyv1bBvzcO1t9kGmDZ6Gk6p/zMtNrmhmEcwxGkEaLEbp6gpa2y8lrZR5jpdr5KwLuCL2rZyzXQSdnXsR5pg9w2vrHgWxYNswveO+1SuBTWE7UwmmFZTxrkF3oOm8oPN6c8RQ7ncpiBZ7PDqR68yZ7hg/nKFJr5jfaDnPhBIbcLYQ7ejVc2YT2QwhHXmFD1ODQII/qcWusM+hP7HmBHVBo6vaxpGcw9GoNlu5I5FQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aXPsGLyv0p8r01R6bHSA+EPNXQCzOyAKDkuBTxMhb7g=;
+ b=irFkq8f9MToq0rYssSmTrXbeBUsL34W77EnYsMh3cZoKRRiGjVkUWAeqHyeZDRWJiIonTcu3tlk/iMbfA7B9zq8xccwErXoSzyzTReQetGYbrw4fTBUE09gm2MQK5pud3oOhw8auY1pHB6Q5VpIOy2MtjY1PR/yjinOgjJba33Q=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=nxp.com;
+Received: from AM6PR04MB4038.eurprd04.prod.outlook.com (2603:10a6:209:44::24)
+ by AM6PR04MB4966.eurprd04.prod.outlook.com (2603:10a6:20b:2::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21; Tue, 14 Jul
+ 2020 14:27:42 +0000
+Received: from AM6PR04MB4038.eurprd04.prod.outlook.com
+ ([fe80::3880:77f6:c5ed:6ee2]) by AM6PR04MB4038.eurprd04.prod.outlook.com
+ ([fe80::3880:77f6:c5ed:6ee2%7]) with mapi id 15.20.3174.026; Tue, 14 Jul 2020
+ 14:27:42 +0000
+Subject: Re: [PATCH v3 5/5] hwrng: imx-rngc: enable driver for i.MX6
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>
-Subject: Re: [PATCH 5/6] crypto: set the flag CRYPTO_ALG_ALLOCATES_MEMORY
-In-Reply-To: <780cb500-2241-61bc-eb44-6f872ad567d3@nxp.com>
-Message-ID: <alpine.LRH.2.02.2007140937260.17016@file01.intranet.prod.int.rdu2.redhat.com>
-References: <20200701045217.121126-1-ebiggers@kernel.org> <20200701045217.121126-6-ebiggers@kernel.org> <3f2d3409-2739-b121-0469-b14c86110b2d@nxp.com> <20200713160136.GA1696@sol.localdomain> <780cb500-2241-61bc-eb44-6f872ad567d3@nxp.com>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        DTML <devicetree@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Martin Kaiser <martin@kaiser.cx>,
+        Marco Felsch <m.felsch@pengutronix.de>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20200714123920.23711-1-horia.geanta@nxp.com>
+ <20200714123920.23711-6-horia.geanta@nxp.com>
+ <CAK8P3a3eQ2a3QV=0XAumHAOssddAZ_sBs=Y0D736Sp7_P8Jvuw@mail.gmail.com>
+From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
+Message-ID: <dae0aa53-dd6f-0ca1-4170-908d66342eb4@nxp.com>
+Date:   Tue, 14 Jul 2020 17:27:39 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <CAK8P3a3eQ2a3QV=0XAumHAOssddAZ_sBs=Y0D736Sp7_P8Jvuw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM0PR08CA0028.eurprd08.prod.outlook.com
+ (2603:10a6:208:d2::41) To AM6PR04MB4038.eurprd04.prod.outlook.com
+ (2603:10a6:209:44::24)
 MIME-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="185206533-1492832032-1594733927=:17016"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.0.129] (84.117.251.185) by AM0PR08CA0028.eurprd08.prod.outlook.com (2603:10a6:208:d2::41) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21 via Frontend Transport; Tue, 14 Jul 2020 14:27:41 +0000
+X-Originating-IP: [84.117.251.185]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 004c405c-807e-4e0c-aea3-08d8280211ac
+X-MS-TrafficTypeDiagnostic: AM6PR04MB4966:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR04MB49665EC030DEEE847936719D98610@AM6PR04MB4966.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 3t54enaVhxe2AcXCKIUTVeHsMkfAoQBO/1J9Xf3a5MXKzqxM+1Kz0RCAG5JczvEQRQ0j9S9nLiAz2VPIys+O9S2KfW5GitA9O7+61hYeYqvrj3RPGLNZQnyNcUp278/tkPYAOrmL5/NCDagB0hY8kofwYHPsZvx7xDpHukAv9odSdOcoc1bHAGPCk/eumCdCu7pHwcz/UDGxkQREdYHtac4ABznditNoJV/DbVH/aJVWa3ZU+8HJ8EKzXwX7BBZBOdeWNvvArgBQ8Lr+iJnyWfwxNnJybcXliOMjKrXTXhdoiv9KA6axjeHz0hj0QvFXmYCsJL00Rw/9/sGd2hvgONyOdGB+AvKgCuheDbV9kGlL0Ujm6IzNUwDx3BYSzmu4cHWTS1Tm0iDtAvT0L2BwBov2IOOY+u8yXR30wLbZ6nhj6ilWxO6fadw+EwZl8nNNovcDXTexFpbKxAw/3YS77g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM6PR04MB4038.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(66946007)(36756003)(66476007)(83380400001)(66556008)(7416002)(6916009)(498600001)(966005)(6486002)(31686004)(54906003)(16576012)(53546011)(52116002)(5660300002)(31696002)(8676002)(956004)(8936002)(2616005)(186003)(26005)(86362001)(2906002)(4326008)(16526019)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: WZolsLEc9yBL4tJRlGzKcvlerB08MWApAy182WSDIpUzin/YNRDTbKkh2cISms+cXpGgNvzderUK9mJsEIjgKYizQntSYtV//shfZMUZAJNffplh6/4bL+ioDtg/qwezU03M9dMwQxIclvhQPie2QXsob/QcFvCjrG+OzAgCs6xHAlekFXsrbNKGMwC1sDH2r4dOwmkp4LKDibkHjqBsdSoatAC00FNVnWBRsE8Z8cRDCD0dkz3Sc46WE8hXSL+vZjDZT9u8P+LAzUJ8WmLkSBsigpxXn0e/kxdEMS0Gn2N24SiKxAPpq2El47bbiMwEKpbeIMuGGpJ8pcVhp4cP7OtEJI+owZAVLEMBS7dqYQ7XdG7N7DZTu2OZI5r9CiDdGrb6i/A5IemWcsmNxEyRFtE4wXJlEjmPs+o6DLkurtm9tazqZ/rfnePj2Qzu8Kn1NpbKR+oMYWriljk6qrgDVEcvHRgjP554tL1mgLXMKgWvLUWx5NbsnbPjinHVzZke
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 004c405c-807e-4e0c-aea3-08d8280211ac
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR04MB4038.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2020 14:27:42.6469
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Fw1spowGOOZJIMmS3TfZt8peAAuHb7bbEZi2O2+IqaZl091CJjH3u1Ytoma9mhMGYr3kGs1qyEoHHr43osmftg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB4966
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---185206533-1492832032-1594733927=:17016
-Content-Type: TEXT/PLAIN; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-
-
-
-On Mon, 13 Jul 2020, Horia Geantă wrote:
-
-> On 7/13/2020 7:01 PM, Eric Biggers wrote:
-> > On Mon, Jul 13, 2020 at 06:49:00PM +0300, Horia Geantă wrote:
-> >> On 7/1/2020 7:52 AM, Eric Biggers wrote:
-> >>> From: Mikulas Patocka <mpatocka@redhat.com>
-> >>>
-> >>> Set the flag CRYPTO_ALG_ALLOCATES_MEMORY in the crypto drivers that
-> >>> allocate memory.
-> >>>
-> >> Quite a few drivers are impacted.
-> >>
-> >> I wonder what's the proper way to address the memory allocation.
-> >>
-> >> Herbert mentioned setting up reqsize:
-> >> https://lore.kernel.org/linux-crypto/20200610010450.GA6449@gondor.apana.org.au/
-> >>
-> >> I see at least two hurdles in converting the drivers to using reqsize:
-> >>
-> >> 1. Some drivers allocate the memory using GFP_DMA
-> >>
-> >> reqsize does not allow drivers to control gfp allocation flags.
-> >>
-> >> I've tried converting talitos driver (to use reqsize) at some point,
-> >> and in the process adding a generic CRYPTO_TFM_REQ_DMA flag:
-> >> https://lore.kernel.org/linux-crypto/54FD8D3B.5040409@freescale.com
-> >> https://lore.kernel.org/linux-crypto/1426266882-31626-1-git-send-email-horia.geanta@freescale.com
-> >>
-> >> The flag was supposed to be transparent for the user,
-> >> however there were users that open-coded the request allocation,
-> >> for example esp_alloc_tmp() in net/ipv4/esp4.c.
-> >> At that time, Dave NACK-ed the change:
-> >> https://lore.kernel.org/linux-crypto/1426266922-31679-1-git-send-email-horia.geanta@freescale.com
-> >>
-> >>
-> >> 2. Memory requirements cannot be determined / are not known
-> >> at request allocation time
-> >>
-> >> An analysis for talitos driver is here:
-> >> https://lore.kernel.org/linux-crypto/54F8235B.5080301@freescale.com
-> >>
-> >> In general, drivers would be forced to ask more memory than needed,
-> >> to handle the "worst-case".
-> >> Logic will be needed to fail in case the "worst-case" isn't correctly estimated.
-> >>
-> >> However, this is still problematic.
-> >>
-> >> For example, a driver could set up reqsize to accommodate for 32 S/G entries
-> >> (in the HW S/G table). In case a dm-crypt encryption request would require more,
-> >> then driver's .encrypt callback would fail, possibly with -ENOMEM,
-> >> since there's not enough pre-allocated memory.
-> >> This brings us back to the same problem we're trying to solve,
-> >> since in this case the driver would be forced to either fail immediately or
-> >> to allocate memory at .encrypt/.decrypt time.
-> >>
-> > 
-> > We have to place restrictions on what cases
-> > !(flags & CRYPTO_ALG_ALLOCATES_MEMORY) applies to anyway; see the patch that
-> > introduces it.  If needed we could add more restrictions, like limit the number
-> > of scatterlist elements.  If we did that, the driver could allocate memory if
-> > the number of scatterlist elements is large, without having to set
-> > CRYPTO_ALG_ALLOCATES_MEMORY.
-> > 
-> This sounds reasonable.
+On 7/14/2020 3:48 PM, Arnd Bergmann wrote:
+> On Tue, Jul 14, 2020 at 2:39 PM Horia Geantă <horia.geanta@nxp.com> wrote:
+>> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+>> index 8478eb757f3c..98f95a09ce55 100644
+>> --- a/drivers/char/hw_random/Kconfig
+>> +++ b/drivers/char/hw_random/Kconfig
+>> @@ -255,7 +255,7 @@ config HW_RANDOM_MXC_RNGA
+>>  config HW_RANDOM_IMX_RNGC
+>>         tristate "Freescale i.MX RNGC Random Number Generator"
+>>         depends on HAS_IOMEM && HAVE_CLK
+>> -       depends on SOC_IMX25 || COMPILE_TEST
+>> +       depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6UL || COMPILE_TEST
+>>         default HW_RANDOM
 > 
-> > Also, have you considered using a mempool?  A mempool allows allocations without
-> > a possibility of failure, at the cost of pre-allocations.
-> > 
-> Thanks for the suggestion.
+> Are these the only chips that have it? If other i.MX variations have
+> the same block,
+> or might have it in the future, maybe just generialize the dependency
+> to SOC_IMX6
+> or ARCH_IMX?
 > 
-> Would this be safe for all cases, e.g. IPsec - where .encrypt/.decrypt callbacks
-> execute in (soft)IRQ context?
-> kernel-doc for mempool_alloc() mentions it could fail when called from
-> "IRQ context". 
+Fabio also suggested this during v1, see discussion here:
+https://lore.kernel.org/linux-crypto/292aafd1-7249-5b76-ccc3-77b153594ef9@nxp.com
 
-In IPsec, you can drop packets (and TCP will retransmit them), so there is 
-no problem with memory allocation failures.
+The SoC list is relatively stable, to the best of my knowledge.
 
-> Thanks,
-> Horia
+>> diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
+>> index 9c47e431ce90..84576d2fbf8c 100644
+>> --- a/drivers/char/hw_random/imx-rngc.c
+>> +++ b/drivers/char/hw_random/imx-rngc.c
+>> @@ -350,6 +350,9 @@ static SIMPLE_DEV_PM_OPS(imx_rngc_pm_ops, imx_rngc_suspend, imx_rngc_resume);
+>>
+>>  static const struct of_device_id imx_rngc_dt_ids[] = {
+>>         { .compatible = "fsl,imx25-rngb", .data = NULL, },
+>> +       { .compatible = "fsl,imx6sl-rngb", .data = NULL, },
+>> +       { .compatible = "fsl,imx6sll-rngb", .data = NULL, },
+>> +       { .compatible = "fsl,imx6ull-rngb", .data = NULL, },
+>>         { /* sentinel */ }
+> 
+> In the .dts file you describe the devices as compatible with fsl,imx25-rngb,
+> so this change is not really needed, unless you want to add non-NULL
+> .data fields in a follow-up. It is usually a good idea to have the more
+> specialized compatible strings in the DT, but the driver change won't
+> do anything here.
+> 
+Indeed, this isn't needed.
+Will remove it in v4.
 
-Mikulas
---185206533-1492832032-1594733927=:17016--
-
+Thanks,
+Horia
