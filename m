@@ -2,166 +2,167 @@ Return-Path: <SRS0=vKog=AZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2EB5C433E2
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 14:27:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74272C433E6
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 15:23:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BAFBE22519
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 14:27:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E0CB221EB
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 15:23:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="irFkq8f9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BQ1p1rfM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728478AbgGNO1q (ORCPT
+        id S1726062AbgGNPXS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jul 2020 10:27:46 -0400
-Received: from mail-am6eur05on2055.outbound.protection.outlook.com ([40.107.22.55]:53280
-        "EHLO EUR05-AM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726187AbgGNO1p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jul 2020 10:27:45 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XyXXAHKnKp8mPz8LtJPAHLqlwPDHxLywuIGDTEZ0W7We3Lqh9d8mbv2vCYoWbWVy+3wUpINFUOwJyZyjtOjuroddQXpwkXQfCP3wHgU+D01dvYpyvbDGpa553GpCLo4xXMakA0pI9fa2naMFuUQE41xDoXVdFSPFAIZTlPaO3FWgRLZHpd1ODFq4F3Fy9O+cnavXLmD31l6HF/gExNusFLDYCDs2QAEhNvF5NmvRmmNJF5KIJwNYhnkB+AC3FuOxuVO9JesKODrU9JqQpF+GGZyw1eEynnxNsGZC4EcafGELgQcQVpVuVCrv4WVdqCu02K1ZfughTdybghDcTgZStA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aXPsGLyv0p8r01R6bHSA+EPNXQCzOyAKDkuBTxMhb7g=;
- b=gqEZzvG35tsJiGWp9m7VpWfzA9k/We6pYYbm7ld3oeRUq/2DrjSNvEBcR1ELaT/N7LssG63uG3p5lkaFs2fzbAuuKzGkkh3/dzCZ04LVx33v5Elyv1bBvzcO1t9kGmDZ6Gk6p/zMtNrmhmEcwxGkEaLEbp6gpa2y8lrZR5jpdr5KwLuCL2rZyzXQSdnXsR5pg9w2vrHgWxYNswveO+1SuBTWE7UwmmFZTxrkF3oOm8oPN6c8RQ7ncpiBZ7PDqR68yZ7hg/nKFJr5jfaDnPhBIbcLYQ7ejVc2YT2QwhHXmFD1ODQII/qcWusM+hP7HmBHVBo6vaxpGcw9GoNlu5I5FQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aXPsGLyv0p8r01R6bHSA+EPNXQCzOyAKDkuBTxMhb7g=;
- b=irFkq8f9MToq0rYssSmTrXbeBUsL34W77EnYsMh3cZoKRRiGjVkUWAeqHyeZDRWJiIonTcu3tlk/iMbfA7B9zq8xccwErXoSzyzTReQetGYbrw4fTBUE09gm2MQK5pud3oOhw8auY1pHB6Q5VpIOy2MtjY1PR/yjinOgjJba33Q=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=nxp.com;
-Received: from AM6PR04MB4038.eurprd04.prod.outlook.com (2603:10a6:209:44::24)
- by AM6PR04MB4966.eurprd04.prod.outlook.com (2603:10a6:20b:2::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21; Tue, 14 Jul
- 2020 14:27:42 +0000
-Received: from AM6PR04MB4038.eurprd04.prod.outlook.com
- ([fe80::3880:77f6:c5ed:6ee2]) by AM6PR04MB4038.eurprd04.prod.outlook.com
- ([fe80::3880:77f6:c5ed:6ee2%7]) with mapi id 15.20.3174.026; Tue, 14 Jul 2020
- 14:27:42 +0000
-Subject: Re: [PATCH v3 5/5] hwrng: imx-rngc: enable driver for i.MX6
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        DTML <devicetree@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Martin Kaiser <martin@kaiser.cx>,
-        Marco Felsch <m.felsch@pengutronix.de>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20200714123920.23711-1-horia.geanta@nxp.com>
- <20200714123920.23711-6-horia.geanta@nxp.com>
- <CAK8P3a3eQ2a3QV=0XAumHAOssddAZ_sBs=Y0D736Sp7_P8Jvuw@mail.gmail.com>
-From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
-Message-ID: <dae0aa53-dd6f-0ca1-4170-908d66342eb4@nxp.com>
-Date:   Tue, 14 Jul 2020 17:27:39 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <CAK8P3a3eQ2a3QV=0XAumHAOssddAZ_sBs=Y0D736Sp7_P8Jvuw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR08CA0028.eurprd08.prod.outlook.com
- (2603:10a6:208:d2::41) To AM6PR04MB4038.eurprd04.prod.outlook.com
- (2603:10a6:209:44::24)
+        Tue, 14 Jul 2020 11:23:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34096 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725925AbgGNPXS (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 14 Jul 2020 11:23:18 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29737C061755
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Jul 2020 08:23:18 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id i4so17644992iov.11
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Jul 2020 08:23:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=aouzhcTH52EEzjSPHkmmEky38PcFMBNDQWyyTZujDlg=;
+        b=BQ1p1rfMFuv5Ae8e99XhzwstRmMwLolv/Yo50s7DfO+wQcLo7ojqCoQnNACBVOS0aH
+         Z0z8so+DvJ5GDinzLzP2YDcVyeQS0YGizqke06D1FRArSHMZPJ45+gvsKxgmWu35Od2k
+         bAX6oXCb4nnHWNT1yXmdPubF4IH7fG0SmHEZAFCZO+uH1sP34iDchavj5lJ2DSUedvUf
+         i+c7cCY9q1RRliAaR3sGRgL/C8hZMuY1iAJOnGeH2jNYR6TLFhXhf+V8aWOWYUB56C1c
+         lTx9n+sLPVWMNZCOFWHkmLWHOzVHYrJ7BwvYMuFhgTdnt9vgxASfRBCoot6H2QlbUXQw
+         OZMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aouzhcTH52EEzjSPHkmmEky38PcFMBNDQWyyTZujDlg=;
+        b=D6+ZQTPcyEicv7mS3dy7SAtMgF9LBZaDsUxDvtsPl/1hhw2Skh48wFtxtAO+jVLepw
+         ydkbuof8UriEL4QtjuuBTISzprumPUt1au7a1Zjndm6vUtQbJLzNuM4WZ8eMeYJ2Lo0k
+         ttsW1MWHqKAOSHrCCPdyoVz9JJAmkF81/ikT2ZTT/j6x0dQJ9O9MdcjmrgIzXAZ0THMV
+         UpUYvu9RDSzCuUmYcBgiNkdxuI0pSp/5CUdDw8aymEjdRh8+CgRBZSq2g/F/fWjo1+8O
+         HKwkGfVbIWsAbVVivgH5n6NpZI/PKPUFmP3l8oitxZmqJsyj/qm/27tL/qxNUBpIDiqr
+         U0Gw==
+X-Gm-Message-State: AOAM531aKyd3nFeMD4TygdCPCqhLh7y81AyfV71WmqkgFHaKaL2Qf6zu
+        jDhp8uEFdN9zS5VWyIN6hEDV/eI6Gj/zc6JsmWPoXKQBmsM=
+X-Google-Smtp-Source: ABdhPJx7QqLkc/UsbC/BcSJEl3fNzK3OM8UBh4JmUE6WJZmoVGwnh2IiJrwDlpa7Jlqc+49cM/bZXiKMu7Res2y/qXs=
+X-Received: by 2002:a6b:661a:: with SMTP id a26mr5368258ioc.197.1594740197141;
+ Tue, 14 Jul 2020 08:23:17 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.0.129] (84.117.251.185) by AM0PR08CA0028.eurprd08.prod.outlook.com (2603:10a6:208:d2::41) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21 via Frontend Transport; Tue, 14 Jul 2020 14:27:41 +0000
-X-Originating-IP: [84.117.251.185]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 004c405c-807e-4e0c-aea3-08d8280211ac
-X-MS-TrafficTypeDiagnostic: AM6PR04MB4966:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR04MB49665EC030DEEE847936719D98610@AM6PR04MB4966.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3t54enaVhxe2AcXCKIUTVeHsMkfAoQBO/1J9Xf3a5MXKzqxM+1Kz0RCAG5JczvEQRQ0j9S9nLiAz2VPIys+O9S2KfW5GitA9O7+61hYeYqvrj3RPGLNZQnyNcUp278/tkPYAOrmL5/NCDagB0hY8kofwYHPsZvx7xDpHukAv9odSdOcoc1bHAGPCk/eumCdCu7pHwcz/UDGxkQREdYHtac4ABznditNoJV/DbVH/aJVWa3ZU+8HJ8EKzXwX7BBZBOdeWNvvArgBQ8Lr+iJnyWfwxNnJybcXliOMjKrXTXhdoiv9KA6axjeHz0hj0QvFXmYCsJL00Rw/9/sGd2hvgONyOdGB+AvKgCuheDbV9kGlL0Ujm6IzNUwDx3BYSzmu4cHWTS1Tm0iDtAvT0L2BwBov2IOOY+u8yXR30wLbZ6nhj6ilWxO6fadw+EwZl8nNNovcDXTexFpbKxAw/3YS77g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM6PR04MB4038.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(66946007)(36756003)(66476007)(83380400001)(66556008)(7416002)(6916009)(498600001)(966005)(6486002)(31686004)(54906003)(16576012)(53546011)(52116002)(5660300002)(31696002)(8676002)(956004)(8936002)(2616005)(186003)(26005)(86362001)(2906002)(4326008)(16526019)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: WZolsLEc9yBL4tJRlGzKcvlerB08MWApAy182WSDIpUzin/YNRDTbKkh2cISms+cXpGgNvzderUK9mJsEIjgKYizQntSYtV//shfZMUZAJNffplh6/4bL+ioDtg/qwezU03M9dMwQxIclvhQPie2QXsob/QcFvCjrG+OzAgCs6xHAlekFXsrbNKGMwC1sDH2r4dOwmkp4LKDibkHjqBsdSoatAC00FNVnWBRsE8Z8cRDCD0dkz3Sc46WE8hXSL+vZjDZT9u8P+LAzUJ8WmLkSBsigpxXn0e/kxdEMS0Gn2N24SiKxAPpq2El47bbiMwEKpbeIMuGGpJ8pcVhp4cP7OtEJI+owZAVLEMBS7dqYQ7XdG7N7DZTu2OZI5r9CiDdGrb6i/A5IemWcsmNxEyRFtE4wXJlEjmPs+o6DLkurtm9tazqZ/rfnePj2Qzu8Kn1NpbKR+oMYWriljk6qrgDVEcvHRgjP554tL1mgLXMKgWvLUWx5NbsnbPjinHVzZke
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 004c405c-807e-4e0c-aea3-08d8280211ac
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR04MB4038.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2020 14:27:42.6469
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Fw1spowGOOZJIMmS3TfZt8peAAuHb7bbEZi2O2+IqaZl091CJjH3u1Ytoma9mhMGYr3kGs1qyEoHHr43osmftg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB4966
+References: <20200713164857.1031117-1-lenaptr@google.com> <2941213.7s5MMGUR32@tauon.chronox.de>
+In-Reply-To: <2941213.7s5MMGUR32@tauon.chronox.de>
+From:   Elena Petrova <lenaptr@google.com>
+Date:   Tue, 14 Jul 2020 16:23:05 +0100
+Message-ID: <CABvBcwauK_JyVzONdwJRGU81ZH5sYuiJSH0F2g+i5qCe363+fQ@mail.gmail.com>
+Subject: Re: [PATCH 0/1] crypto: af_alg - add extra parameters for DRBG interface
+To:     Stephan Mueller <smueller@chronox.de>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/14/2020 3:48 PM, Arnd Bergmann wrote:
-> On Tue, Jul 14, 2020 at 2:39 PM Horia Geantă <horia.geanta@nxp.com> wrote:
->> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
->> index 8478eb757f3c..98f95a09ce55 100644
->> --- a/drivers/char/hw_random/Kconfig
->> +++ b/drivers/char/hw_random/Kconfig
->> @@ -255,7 +255,7 @@ config HW_RANDOM_MXC_RNGA
->>  config HW_RANDOM_IMX_RNGC
->>         tristate "Freescale i.MX RNGC Random Number Generator"
->>         depends on HAS_IOMEM && HAVE_CLK
->> -       depends on SOC_IMX25 || COMPILE_TEST
->> +       depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6UL || COMPILE_TEST
->>         default HW_RANDOM
-> 
-> Are these the only chips that have it? If other i.MX variations have
-> the same block,
-> or might have it in the future, maybe just generialize the dependency
-> to SOC_IMX6
-> or ARCH_IMX?
-> 
-Fabio also suggested this during v1, see discussion here:
-https://lore.kernel.org/linux-crypto/292aafd1-7249-5b76-ccc3-77b153594ef9@nxp.com
+Hi Stephan,
 
-The SoC list is relatively stable, to the best of my knowledge.
+On Tue, 14 Jul 2020 at 06:17, Stephan Mueller <smueller@chronox.de> wrote:
+>
+> Am Montag, 13. Juli 2020, 18:48:56 CEST schrieb Elena Petrova:
+>
+> Hi Elena,
+>
+> > This patch extends the userspace RNG interface to make it usable for
+> > CAVS testing. This is achieved by adding ALG_SET_DRBG_ENTROPY
+> > option to the setsockopt interface for specifying the entropy, and using
+> > sendmsg syscall for specifying the additional data.
+> >
+> > See libkcapi patch [1] to test the added functionality. The libkcapi
+> > patch is not intended for merging into libkcapi as is: it is only a
+> > quick plug to manually verify that the extended AF_ALG RNG interface
+> > generates the expected output on DRBG800-90A CAVS inputs.
+>
+> As I am responsible for developing such CAVS/ACVP harness as well, I played
+> with the idea of going through AF_ALG. I discarded it because I do not see the
+> benefit why we should add an interface solely for the purpose of testing.
+> Further, it is a potentially dangerous one because the created instance of the
+> DRBG is "seeded" from data provided by the caller.
+>
+> Thus, I do not see the benefit from adding that extension, widening a user
+> space interface solely for the purpose of CAVS testing. I would not see any
+> other benefit we have with this extension. In particular, this interface would
+> then be always there. What I could live with is an interface that can be
+> enabled at compile time for those who want it.
 
->> diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
->> index 9c47e431ce90..84576d2fbf8c 100644
->> --- a/drivers/char/hw_random/imx-rngc.c
->> +++ b/drivers/char/hw_random/imx-rngc.c
->> @@ -350,6 +350,9 @@ static SIMPLE_DEV_PM_OPS(imx_rngc_pm_ops, imx_rngc_suspend, imx_rngc_resume);
->>
->>  static const struct of_device_id imx_rngc_dt_ids[] = {
->>         { .compatible = "fsl,imx25-rngb", .data = NULL, },
->> +       { .compatible = "fsl,imx6sl-rngb", .data = NULL, },
->> +       { .compatible = "fsl,imx6sll-rngb", .data = NULL, },
->> +       { .compatible = "fsl,imx6ull-rngb", .data = NULL, },
->>         { /* sentinel */ }
-> 
-> In the .dts file you describe the devices as compatible with fsl,imx25-rngb,
-> so this change is not really needed, unless you want to add non-NULL
-> .data fields in a follow-up. It is usually a good idea to have the more
-> specialized compatible strings in the DT, but the driver change won't
-> do anything here.
-> 
-Indeed, this isn't needed.
-Will remove it in v4.
+Thanks for reviewing this patch. I understand your concern about the erroneous
+use of the entropy input by non-testing applications. This was an approach that
+I had discussed with Ard. I should have included you, my apologies. I'll  post
+v2 with the CAVS testing stuff hidden under CONFIG_ option with appropriate help
+text.
+
+With regards to the usefulness, let me elaborate. This effort of extending the
+drbg interface is driven by Android needs for having the kernel crypto
+certified. I started from having an out-of-tree chrdev driver for Google Pixel
+kernels that was exposing the required crypto functionality, and it wasn't ideal
+in the following ways:
+ * it primarily consisted of copypasted code from testmgr.c
+ * it was hard for me to keep the code up to date because I'm not aware of
+   ongoing changes to crypto
+ * it is hard for other people and/or organisations to re-use it, hense a lot of
+   duplicated effort is going into CAVS: you have a private driver, I have mine,
+   Jaya from HP <jayalakshmi.bhat@hp.com>, who's been asking linux-crypto a few
+   CAVS questions, has to develop theirs...
+
+In general Android is trying to eliminate out-of-tree code. CAVS testing
+functionality in particular needs to be upstream because we are switching all
+Android devices to using a Generic Kernel Image (GKI)
+[https://lwn.net/Articles/771974/] based on the upstream kernel.
+
+> Besides, when you want to do CAVS testing, the following ciphers are still not
+> testable and thus this patch would only be a partial solution to get the
+> testing covered:
+>
+> - AES KW (you cannot get the final IV out of the kernel - I played with the
+> idea to return the IV through AF_ALG, but discarded it because of the concern
+> above)
+>
+> - OFB/CFB MCT testing (you need the IV from the last round - same issue as for
+> AES KW)
+>
+> - RSA
+>
+> - DH
+>
+> - ECDH
+
+For Android certification purposes, we only need to test the modules which are
+actually being used. In our case it's what af_alg already exposes plus DRBG.
+If, say, HP would need RSA, they could submit their own patch.
+
+As for exposing bits of the internal state for some algorithms, I hope guarding
+the testing functionality with a CONFIG_ option would solve the security part of
+the problem.
+
+> With these issues, I would assume you are better off creating your own kernel
+> module just like I did that externalizes the crypto API to user space but is
+> only available on your test kernel and will not affect all other users.
+
+I considered publishing my kernel driver on GitHub, but there appears to be a
+sufficiently large number of users to justify having this functionality
+upstream.
+
+Hope that addresses your concerns.
+
+> Ciao
+> Stephan
 
 Thanks,
-Horia
+Elena
