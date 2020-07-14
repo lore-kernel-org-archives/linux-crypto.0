@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C69CDC433E5
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 12:39:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAB41C433F2
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 12:40:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A364222453
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 12:39:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2B13224D3
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 12:40:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728345AbgGNMjk (ORCPT
+        id S1728317AbgGNMjk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Tue, 14 Jul 2020 08:39:40 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:52040 "EHLO inva021.nxp.com"
+Received: from inva021.nxp.com ([92.121.34.21]:52006 "EHLO inva021.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726041AbgGNMjh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1727772AbgGNMjh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 14 Jul 2020 08:39:37 -0400
 Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 911A1201001;
-        Tue, 14 Jul 2020 14:39:36 +0200 (CEST)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 84AE420018F;
-        Tue, 14 Jul 2020 14:39:36 +0200 (CEST)
-Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id BF7F1205A4;
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id BB6F6201005;
         Tue, 14 Jul 2020 14:39:35 +0200 (CEST)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id AEA44201001;
+        Tue, 14 Jul 2020 14:39:35 +0200 (CEST)
+Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id E9CF7205A4;
+        Tue, 14 Jul 2020 14:39:34 +0200 (CEST)
 From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
 To:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
         Sascha Hauer <s.hauer@pengutronix.de>,
@@ -46,9 +46,9 @@ Cc:     Pengutronix Kernel Team <kernel@pengutronix.de>,
         Iuliana Prodan <iuliana.prodan@nxp.com>,
         Silvano Di Ninno <silvano.dininno@nxp.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 3/5] ARM: dts: imx6sll: add rng
-Date:   Tue, 14 Jul 2020 15:39:18 +0300
-Message-Id: <20200714123920.23711-4-horia.geanta@nxp.com>
+Subject: [PATCH v3 2/5] ARM: dts: imx6sl: fix rng node
+Date:   Tue, 14 Jul 2020 15:39:17 +0300
+Message-Id: <20200714123920.23711-3-horia.geanta@nxp.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200714123920.23711-1-horia.geanta@nxp.com>
 References: <20200714123920.23711-1-horia.geanta@nxp.com>
@@ -61,31 +61,34 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add node for the RNGB block.
+rng DT node was added without a compatible string.
 
+i.MX driver for RNGC (drivers/char/hw_random/imx-rngc.c) also claims
+support for RNGB, and is currently used for i.MX25.
+
+Let's use this driver also for RNGB block in i.MX6SL.
+
+Fixes: e29fe21cff96 ("ARM: dts: add device tree source for imx6sl SoC")
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- arch/arm/boot/dts/imx6sll.dtsi | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/arm/boot/dts/imx6sl.dtsi | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm/boot/dts/imx6sll.dtsi b/arch/arm/boot/dts/imx6sll.dtsi
-index fb5d3bc50c6b..0b622201a1f3 100644
---- a/arch/arm/boot/dts/imx6sll.dtsi
-+++ b/arch/arm/boot/dts/imx6sll.dtsi
-@@ -786,6 +786,13 @@
- 				clocks = <&clks IMX6SLL_CLK_MMDC_P0_IPG>;
+diff --git a/arch/arm/boot/dts/imx6sl.dtsi b/arch/arm/boot/dts/imx6sl.dtsi
+index 1c7180f28539..91a8c54d5e11 100644
+--- a/arch/arm/boot/dts/imx6sl.dtsi
++++ b/arch/arm/boot/dts/imx6sl.dtsi
+@@ -939,8 +939,10 @@
  			};
  
-+			rngb: rng@21b4000 {
-+				compatible = "fsl,imx6sll-rngb", "fsl,imx25-rngb";
-+				reg = <0x021b4000 0x4000>;
-+				interrupts = <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>;
-+				clocks = <&clks IMX6SLL_CLK_DUMMY>;
-+			};
-+
- 			ocotp: efuse@21bc000 {
- 				#address-cells = <1>;
- 				#size-cells = <1>;
+ 			rngb: rngb@21b4000 {
++				compatible = "fsl,imx6sl-rngb", "fsl,imx25-rngb";
+ 				reg = <0x021b4000 0x4000>;
+ 				interrupts = <0 5 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&clks IMX6SL_CLK_DUMMY>;
+ 			};
+ 
+ 			weim: weim@21b8000 {
 -- 
 2.17.1
 
