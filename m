@@ -2,179 +2,156 @@ Return-Path: <SRS0=vKog=AZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D15DFC433E1
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 15:34:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7BBDC433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 20:14:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A888922285
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 15:34:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7871C212CC
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 20:14:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="Xd4LneIa"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="j7kSLWyr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726603AbgGNPeq (ORCPT
+        id S1729884AbgGNUOK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jul 2020 11:34:46 -0400
-Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.21]:29555 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725955AbgGNPep (ORCPT
+        Tue, 14 Jul 2020 16:14:10 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:57720 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728777AbgGNUOJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jul 2020 11:34:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1594740878;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=eDp1c61gODZaduiFEkah+Og1dwDcdB68lu3kdvo4BRg=;
-        b=Xd4LneIaq0VRzbgaTIe2/gkSkFvzieL48sxZ40Je4Pjxsv6TXQYd3JlO+Pc5wyAq0X
-        /JolHbqzTK5wwb+CLAVCcKslNU/mpz/lZYt6IwPaU+vazFL4YgsIl5wdFQFHC5YupFpM
-        OvVTei/HyNuY5mg2ysCR7uRbL0Pua9DeoHv1+775OKt5BTBy0+LXxdHjUXpm84QCG5ED
-        XLYJNxn7TkT92qYlbXwJiut4xtfQ8gE25F3WfzDLwV4btW/tSR3UZMzOIks90siQ/sbz
-        PYgO6qJGzL3pHav/P7Vyi5SYUkgTJfxI4PlFrHVty/PFaB95nkd0NR2bufKbe+MU92rW
-        xh0w==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaI/SfxmJ+"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.10.5 DYNA|AUTH)
-        with ESMTPSA id y0546bw6EFYZuRC
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Tue, 14 Jul 2020 17:34:35 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Elena Petrova <lenaptr@google.com>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH 0/1] crypto: af_alg - add extra parameters for DRBG interface
-Date:   Tue, 14 Jul 2020 17:34:34 +0200
-Message-ID: <3312053.iIbC2pHGDl@tauon.chronox.de>
-In-Reply-To: <CABvBcwauK_JyVzONdwJRGU81ZH5sYuiJSH0F2g+i5qCe363+fQ@mail.gmail.com>
-References: <20200713164857.1031117-1-lenaptr@google.com> <2941213.7s5MMGUR32@tauon.chronox.de> <CABvBcwauK_JyVzONdwJRGU81ZH5sYuiJSH0F2g+i5qCe363+fQ@mail.gmail.com>
+        Tue, 14 Jul 2020 16:14:09 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06EKCvQO124230;
+        Tue, 14 Jul 2020 20:14:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=ySUbA5rzTLj3gy7j3X7tOY1gfV7BfEaidIIJe3idLBY=;
+ b=j7kSLWyrEPk1ulvnKWoAYLlwAIU63uyY9e8796K2fUQJ+KLigyboCUV1DGYYTs5r7BTj
+ kY4HIhtkL2vAtxPIPRE5nj1EYd64UNpMJTft13lRDC1z1wQ4jTSYuIjOjK9gneLos1gq
+ 6cWXmX8qZfvQlOOz/kz2+r8I6Z/mMs8O0Mlqg3LNGW/pa0f4ephHcEF4FukeNNYDmFL5
+ pC4q6XyAKx+Bhqlo+B0qL5iV5XwemHl5yYUvgCJKpQLry66VGU0FVausRP4dVw76Cize
+ DF9FAtga5Q7pxaSv81FIgB3Tr8PNxATgLBPk4W5ryPAgbPLDF9ulc/o/Szct6u82CQ0w Yw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 32762nfgc2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 14 Jul 2020 20:14:03 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06EKDZ2R129793;
+        Tue, 14 Jul 2020 20:14:02 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 327qb54aa4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 Jul 2020 20:14:02 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06EKE1Hg003954;
+        Tue, 14 Jul 2020 20:14:01 GMT
+Received: from localhost.localdomain (/98.229.125.203)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 14 Jul 2020 13:14:01 -0700
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Steffen Klassert <steffen.klassert@secunet.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Daniel Jordan <daniel.m.jordan@oracle.com>
+Subject: [PATCH 3/6] padata: inline single call of pd_setup_cpumasks()
+Date:   Tue, 14 Jul 2020 16:13:53 -0400
+Message-Id: <20200714201356.889176-4-daniel.m.jordan@oracle.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200714201356.889176-1-daniel.m.jordan@oracle.com>
+References: <20200714201356.889176-1-daniel.m.jordan@oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9682 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
+ mlxscore=0 spamscore=0 phishscore=0 suspectscore=2 bulkscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007140141
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9682 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 spamscore=0
+ clxscore=1015 priorityscore=1501 mlxlogscore=999 lowpriorityscore=0
+ bulkscore=0 suspectscore=2 phishscore=0 adultscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007140141
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Dienstag, 14. Juli 2020, 17:23:05 CEST schrieb Elena Petrova:
+pd_setup_cpumasks() has only one caller.  Move its contents inline to
+prepare for the next cleanup.
 
-Hi Elena,
+Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+ kernel/padata.c | 32 +++++++++-----------------------
+ 1 file changed, 9 insertions(+), 23 deletions(-)
 
-> Hi Stephan,
-> 
-> On Tue, 14 Jul 2020 at 06:17, Stephan Mueller <smueller@chronox.de> wrote:
-> > Am Montag, 13. Juli 2020, 18:48:56 CEST schrieb Elena Petrova:
-> > 
-> > Hi Elena,
-> > 
-> > > This patch extends the userspace RNG interface to make it usable for
-> > > CAVS testing. This is achieved by adding ALG_SET_DRBG_ENTROPY
-> > > option to the setsockopt interface for specifying the entropy, and using
-> > > sendmsg syscall for specifying the additional data.
-> > > 
-> > > See libkcapi patch [1] to test the added functionality. The libkcapi
-> > > patch is not intended for merging into libkcapi as is: it is only a
-> > > quick plug to manually verify that the extended AF_ALG RNG interface
-> > > generates the expected output on DRBG800-90A CAVS inputs.
-> > 
-> > As I am responsible for developing such CAVS/ACVP harness as well, I
-> > played
-> > with the idea of going through AF_ALG. I discarded it because I do not see
-> > the benefit why we should add an interface solely for the purpose of
-> > testing. Further, it is a potentially dangerous one because the created
-> > instance of the DRBG is "seeded" from data provided by the caller.
-> > 
-> > Thus, I do not see the benefit from adding that extension, widening a user
-> > space interface solely for the purpose of CAVS testing. I would not see
-> > any
-> > other benefit we have with this extension. In particular, this interface
-> > would then be always there. What I could live with is an interface that
-> > can be enabled at compile time for those who want it.
-> 
-> Thanks for reviewing this patch. I understand your concern about the
-> erroneous use of the entropy input by non-testing applications. This was an
-> approach that I had discussed with Ard. I should have included you, my
-> apologies. I'll  post v2 with the CAVS testing stuff hidden under CONFIG_
-> option with appropriate help text.
-> 
-> With regards to the usefulness, let me elaborate. This effort of extending
-> the drbg interface is driven by Android needs for having the kernel crypto
-> certified. I started from having an out-of-tree chrdev driver for Google
-> Pixel kernels that was exposing the required crypto functionality, and it
-> wasn't ideal in the following ways:
->  * it primarily consisted of copypasted code from testmgr.c
->  * it was hard for me to keep the code up to date because I'm not aware of
->    ongoing changes to crypto
->  * it is hard for other people and/or organisations to re-use it, hense a
-> lot of duplicated effort is going into CAVS: you have a private driver, I
-> have mine, Jaya from HP <jayalakshmi.bhat@hp.com>, who's been asking
-> linux-crypto a few CAVS questions, has to develop theirs...
-> 
-> In general Android is trying to eliminate out-of-tree code. CAVS testing
-> functionality in particular needs to be upstream because we are switching
-> all Android devices to using a Generic Kernel Image (GKI)
-> [https://lwn.net/Articles/771974/] based on the upstream kernel.
-
-Thank you for the explanation.
-> 
-> > Besides, when you want to do CAVS testing, the following ciphers are still
-> > not testable and thus this patch would only be a partial solution to get
-> > the testing covered:
-> > 
-> > - AES KW (you cannot get the final IV out of the kernel - I played with
-> > the
-> > idea to return the IV through AF_ALG, but discarded it because of the
-> > concern above)
-> > 
-> > - OFB/CFB MCT testing (you need the IV from the last round - same issue as
-> > for AES KW)
-> > 
-> > - RSA
-> > 
-> > - DH
-> > 
-> > - ECDH
-> 
-> For Android certification purposes, we only need to test the modules which
-> are actually being used. In our case it's what af_alg already exposes plus
-> DRBG. If, say, HP would need RSA, they could submit their own patch.
-> 
-> As for exposing bits of the internal state for some algorithms, I hope
-> guarding the testing functionality with a CONFIG_ option would solve the
-> security part of the problem.
-
-Yes, for all other users.
-
-But if you are planning to enable this option for all Android devices across 
-the board I am not sure here. In this case, wouldn't it make sense to require 
-capable(CAP_SYS_ADMIN) for the DRBG reset operation just as an additional 
-precaution? Note, the issue with the reset is that you loose all previous 
-state (which is good for testing, but bad for security as I guess you agree 
-:-) ).
-> 
-> > With these issues, I would assume you are better off creating your own
-> > kernel module just like I did that externalizes the crypto API to user
-> > space but is only available on your test kernel and will not affect all
-> > other users.
-> I considered publishing my kernel driver on GitHub, but there appears to be
-> a sufficiently large number of users to justify having this functionality
-> upstream.
-
-So, I should then dust off my AF_ALG KPP and AF_ALG akcipher patches then? :-D
-> 
-> Hope that addresses your concerns.
-> 
-> > Ciao
-> > Stephan
-> 
-> Thanks,
-> Elena
-
-
-Ciao
-Stephan
-
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 8f55e717ba50b..27f90a3c4dc6b 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -441,28 +441,6 @@ static int padata_setup_cpumasks(struct padata_instance *pinst)
+ 	return err;
+ }
+ 
+-static int pd_setup_cpumasks(struct parallel_data *pd,
+-			     const struct cpumask *pcpumask,
+-			     const struct cpumask *cbcpumask)
+-{
+-	int err = -ENOMEM;
+-
+-	if (!alloc_cpumask_var(&pd->cpumask.pcpu, GFP_KERNEL))
+-		goto out;
+-	if (!alloc_cpumask_var(&pd->cpumask.cbcpu, GFP_KERNEL))
+-		goto free_pcpu_mask;
+-
+-	cpumask_copy(pd->cpumask.pcpu, pcpumask);
+-	cpumask_copy(pd->cpumask.cbcpu, cbcpumask);
+-
+-	return 0;
+-
+-free_pcpu_mask:
+-	free_cpumask_var(pd->cpumask.pcpu);
+-out:
+-	return err;
+-}
+-
+ static void __init padata_mt_helper(struct work_struct *w)
+ {
+ 	struct padata_work *pw = container_of(w, struct padata_work, pw_work);
+@@ -613,8 +591,14 @@ static struct parallel_data *padata_alloc_pd(struct padata_shell *ps)
+ 		goto err_free_pqueue;
+ 
+ 	pd->ps = ps;
+-	if (pd_setup_cpumasks(pd, pcpumask, cbcpumask))
++
++	if (!alloc_cpumask_var(&pd->cpumask.pcpu, GFP_KERNEL))
+ 		goto err_free_squeue;
++	if (!alloc_cpumask_var(&pd->cpumask.cbcpu, GFP_KERNEL))
++		goto err_free_pcpu;
++
++	cpumask_copy(pd->cpumask.pcpu, pcpumask);
++	cpumask_copy(pd->cpumask.cbcpu, cbcpumask);
+ 
+ 	padata_init_pqueues(pd);
+ 	padata_init_squeues(pd);
+@@ -626,6 +610,8 @@ static struct parallel_data *padata_alloc_pd(struct padata_shell *ps)
+ 
+ 	return pd;
+ 
++err_free_pcpu:
++	free_cpumask_var(pd->cpumask.pcpu);
+ err_free_squeue:
+ 	free_percpu(pd->squeue);
+ err_free_pqueue:
+-- 
+2.27.0
 
