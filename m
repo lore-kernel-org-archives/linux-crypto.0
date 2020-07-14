@@ -2,111 +2,104 @@ Return-Path: <SRS0=vKog=AZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A3D2C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 05:17:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EC28C433E4
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 06:36:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B432A221E8
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 05:17:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="XhAH/lbZ"
+	by mail.kernel.org (Postfix) with ESMTP id 5AA2E221F6
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jul 2020 06:36:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725793AbgGNFRa (ORCPT
+        id S1726425AbgGNGgp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jul 2020 01:17:30 -0400
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.163]:11019 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725306AbgGNFR2 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jul 2020 01:17:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1594703846;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=HZATrvvag4q6gQHDw4QCFWHtrPGHPPXwIKMxcmxUGEs=;
-        b=XhAH/lbZXYZM0bVRHN7jIia1JKUO3hOS9RZJaZXEj9pGfVSKERKlkh9Zyv/YSayxnE
-        SiZ/mmCdvvkx1KOqv3VNldKHHzulLgt0tyEFz7JElr6CqWDaLvfzDTdwW54FxmgFE6dz
-        A9nkGuBjmIDRzIzwPw1MIzlBpO8mB+SD9RHsnP9vIsijXKRGUCfJV7q+81yzwwFI5zxz
-        Vr9RMkKNQGZEsnEVAxTCiH5PEQeTzTxsctFzj+WCUV96PcUGPyop2dvvkizkbk9NgN2N
-        vjIvsnIta8zY58Hq2ylb2CcjgP6nLfPawwIu2YPtWfrauiZL/92dDebVQ1+E5DMo6Cw4
-        4ptA==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaI/SfxmJ+"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.10.5 DYNA|AUTH)
-        with ESMTPSA id y0546bw6E5HLpia
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Tue, 14 Jul 2020 07:17:21 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     linux-crypto@vger.kernel.org, Elena Petrova <lenaptr@google.com>
-Cc:     Elena Petrova <lenaptr@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH 0/1] crypto: af_alg - add extra parameters for DRBG interface
-Date:   Tue, 14 Jul 2020 07:17:20 +0200
-Message-ID: <2941213.7s5MMGUR32@tauon.chronox.de>
-In-Reply-To: <20200713164857.1031117-1-lenaptr@google.com>
-References: <20200713164857.1031117-1-lenaptr@google.com>
+        Tue, 14 Jul 2020 02:36:45 -0400
+Received: from mga07.intel.com ([134.134.136.100]:33942 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725306AbgGNGgp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 14 Jul 2020 02:36:45 -0400
+IronPort-SDR: 4nFB9RidGD7Uz0m6cDLSUCduwtpBoHxGYDsvrCeH0A9mbOvdAFLpvY67nMyb71JlOTZQT/2iX2
+ zWN/D9g1hG1g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9681"; a="213632484"
+X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
+   d="scan'208";a="213632484"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2020 23:36:44 -0700
+IronPort-SDR: I4HnTb5tyE8mAIwm6iR2na6s+YT52WCITvWOOvWkwf3Ls+3pP/oQYcrFJPMLlvi2DgiEpTlbw6
+ XmGqWL7XUtJQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,350,1589266800"; 
+   d="scan'208";a="299435533"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
+  by orsmga002.jf.intel.com with ESMTP; 13 Jul 2020 23:36:41 -0700
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     alex.williamson@redhat.com, herbert@gondor.apana.org.au
+Cc:     cohuck@redhat.com, nhorman@redhat.com, vdronov@redhat.com,
+        bhelgaas@google.com, mark.a.chambers@intel.com,
+        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
+        qat-linux@intel.com, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v2 1/5] PCI: Add Intel QuickAssist device IDs
+Date:   Tue, 14 Jul 2020 07:36:06 +0100
+Message-Id: <20200714063610.849858-2-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200714063610.849858-1-giovanni.cabiddu@intel.com>
+References: <20200714063610.849858-1-giovanni.cabiddu@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Montag, 13. Juli 2020, 18:48:56 CEST schrieb Elena Petrova:
+Add device IDs for the following Intel QuickAssist devices: DH895XCC,
+C3XXX and C62X.
 
-Hi Elena,
+The defines in this patch are going to be referenced in two independent
+drivers, qat and vfio-pci.
 
-> This patch extends the userspace RNG interface to make it usable for
-> CAVS testing. This is achieved by adding ALG_SET_DRBG_ENTROPY
-> option to the setsockopt interface for specifying the entropy, and using
-> sendmsg syscall for specifying the additional data.
-> 
-> See libkcapi patch [1] to test the added functionality. The libkcapi
-> patch is not intended for merging into libkcapi as is: it is only a
-> quick plug to manually verify that the extended AF_ALG RNG interface
-> generates the expected output on DRBG800-90A CAVS inputs.
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ include/linux/pci_ids.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-As I am responsible for developing such CAVS/ACVP harness as well, I played 
-with the idea of going through AF_ALG. I discarded it because I do not see the 
-benefit why we should add an interface solely for the purpose of testing. 
-Further, it is a potentially dangerous one because the created instance of the 
-DRBG is "seeded" from data provided by the caller.
-
-Thus, I do not see the benefit from adding that extension, widening a user 
-space interface solely for the purpose of CAVS testing. I would not see any 
-other benefit we have with this extension. In particular, this interface would 
-then be always there. What I could live with is an interface that can be 
-enabled at compile time for those who want it.
-
-Besides, when you want to do CAVS testing, the following ciphers are still not 
-testable and thus this patch would only be a partial solution to get the 
-testing covered:
-
-- AES KW (you cannot get the final IV out of the kernel - I played with the 
-idea to return the IV through AF_ALG, but discarded it because of the concern 
-above)
-
-- OFB/CFB MCT testing (you need the IV from the last round - same issue as for 
-AES KW)
-
-- RSA
-
-- DH
-
-- ECDH
-
-With these issues, I would assume you are better off creating your own kernel 
-module just like I did that externalizes the crypto API to user space but is 
-only available on your test kernel and will not affect all other users.
-
-Ciao
-Stephan
-
+diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+index 0ad57693f392..f3166b1425ca 100644
+--- a/include/linux/pci_ids.h
++++ b/include/linux/pci_ids.h
+@@ -2659,6 +2659,8 @@
+ #define PCI_DEVICE_ID_INTEL_80332_1	0x0332
+ #define PCI_DEVICE_ID_INTEL_80333_0	0x0370
+ #define PCI_DEVICE_ID_INTEL_80333_1	0x0372
++#define PCI_DEVICE_ID_INTEL_QAT_DH895XCC	0x0435
++#define PCI_DEVICE_ID_INTEL_QAT_DH895XCC_VF	0x0443
+ #define PCI_DEVICE_ID_INTEL_82375	0x0482
+ #define PCI_DEVICE_ID_INTEL_82424	0x0483
+ #define PCI_DEVICE_ID_INTEL_82378	0x0484
+@@ -2708,6 +2710,8 @@
+ #define PCI_DEVICE_ID_INTEL_ALPINE_RIDGE_4C_NHI     0x1577
+ #define PCI_DEVICE_ID_INTEL_ALPINE_RIDGE_4C_BRIDGE  0x1578
+ #define PCI_DEVICE_ID_INTEL_80960_RP	0x1960
++#define PCI_DEVICE_ID_INTEL_QAT_C3XXX	0x19e2
++#define PCI_DEVICE_ID_INTEL_QAT_C3XXX_VF	0x19e3
+ #define PCI_DEVICE_ID_INTEL_82840_HB	0x1a21
+ #define PCI_DEVICE_ID_INTEL_82845_HB	0x1a30
+ #define PCI_DEVICE_ID_INTEL_IOAT	0x1a38
+@@ -2924,6 +2928,8 @@
+ #define PCI_DEVICE_ID_INTEL_IOAT_JSF7	0x3717
+ #define PCI_DEVICE_ID_INTEL_IOAT_JSF8	0x3718
+ #define PCI_DEVICE_ID_INTEL_IOAT_JSF9	0x3719
++#define PCI_DEVICE_ID_INTEL_QAT_C62X	0x37c8
++#define PCI_DEVICE_ID_INTEL_QAT_C62X_VF	0x37c9
+ #define PCI_DEVICE_ID_INTEL_ICH10_0	0x3a14
+ #define PCI_DEVICE_ID_INTEL_ICH10_1	0x3a16
+ #define PCI_DEVICE_ID_INTEL_ICH10_2	0x3a18
+-- 
+2.26.2
 
