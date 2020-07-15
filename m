@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC66C433E4
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jul 2020 15:27:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49DF0C433EC
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jul 2020 15:27:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C028C20663
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jul 2020 15:27:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 257542071B
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jul 2020 15:27:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725912AbgGOP1V (ORCPT
+        id S1727030AbgGOP1a (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Jul 2020 11:27:21 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:54352 "EHLO inva021.nxp.com"
+        Wed, 15 Jul 2020 11:27:30 -0400
+Received: from inva020.nxp.com ([92.121.34.13]:33086 "EHLO inva020.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726923AbgGOP1U (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Jul 2020 11:27:20 -0400
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 76025200319;
-        Wed, 15 Jul 2020 17:27:18 +0200 (CEST)
+        id S1726335AbgGOP1S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 Jul 2020 11:27:18 -0400
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 813111A0BD9;
+        Wed, 15 Jul 2020 17:27:15 +0200 (CEST)
 Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 6759E20028E;
-        Wed, 15 Jul 2020 17:27:18 +0200 (CEST)
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 741031A048B;
+        Wed, 15 Jul 2020 17:27:15 +0200 (CEST)
 Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 868542035C;
-        Wed, 15 Jul 2020 17:27:17 +0200 (CEST)
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 97F0C2035C;
+        Wed, 15 Jul 2020 17:27:14 +0200 (CEST)
 From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
 To:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
         Sascha Hauer <s.hauer@pengutronix.de>,
@@ -46,9 +46,9 @@ Cc:     Pengutronix Kernel Team <kernel@pengutronix.de>,
         Iuliana Prodan <iuliana.prodan@nxp.com>,
         Silvano Di Ninno <silvano.dininno@nxp.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v4 4/5] ARM: dts: imx6ull: add rng
-Date:   Wed, 15 Jul 2020 18:26:03 +0300
-Message-Id: <20200715152604.10407-5-horia.geanta@nxp.com>
+Subject: [PATCH v4 1/5] dt-bindings: rng: add RNGB compatibles for i.MX6 SoCs
+Date:   Wed, 15 Jul 2020 18:26:00 +0300
+Message-Id: <20200715152604.10407-2-horia.geanta@nxp.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200715152604.10407-1-horia.geanta@nxp.com>
 References: <20200715152604.10407-1-horia.geanta@nxp.com>
@@ -61,32 +61,43 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add node for the RNGB block.
+RNGB block is found in some i.MX6 SoCs - 6SL, 6SLL, 6ULL, 6ULZ.
+Add corresponding compatible strings.
+
+Note:
+
+Several NXP SoC from QorIQ family (P1010, P1023, P4080, P3041, P5020)
+also have a RNGB, however it's part of the CAAM
+(Cryptograhic Accelerator and Assurance Module) crypto accelerator.
+In this case, RNGB is managed in the caam driver
+(drivers/crypto/caam/), since it's tightly related to
+the caam "job ring" interface, not to mention CAAM internally relying on
+RNGB as source of randomness.
+
+On the other hand, the i.MX6 SoCs with RNGB have a DCP
+(Data Co-Processor) crypto accelerator and this block and RNGB
+are independent.
 
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
-Reviewed-by: Marco Felsch <m.felsch@pengutronix.de>
+Reviewed-by: Rob Herring <robh@kernel.org>
 ---
- arch/arm/boot/dts/imx6ull.dtsi | 7 +++++++
- 1 file changed, 7 insertions(+)
+ Documentation/devicetree/bindings/rng/imx-rng.txt | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm/boot/dts/imx6ull.dtsi b/arch/arm/boot/dts/imx6ull.dtsi
-index fcde7f77ae42..9bf67490ac49 100644
---- a/arch/arm/boot/dts/imx6ull.dtsi
-+++ b/arch/arm/boot/dts/imx6ull.dtsi
-@@ -68,6 +68,13 @@
- 				clock-names = "dcp";
- 			};
- 
-+			rngb: rng@2284000 {
-+				compatible = "fsl,imx6ull-rngb", "fsl,imx25-rngb";
-+				reg = <0x02284000 0x4000>;
-+				interrupts = <GIC_SPI 6 IRQ_TYPE_LEVEL_HIGH>;
-+				clocks = <&clks IMX6UL_CLK_DUMMY>;
-+			};
-+
- 			iomuxc_snvs: iomuxc-snvs@2290000 {
- 				compatible = "fsl,imx6ull-iomuxc-snvs";
- 				reg = <0x02290000 0x4000>;
+diff --git a/Documentation/devicetree/bindings/rng/imx-rng.txt b/Documentation/devicetree/bindings/rng/imx-rng.txt
+index 405c2b00ccb0..659d4efdd664 100644
+--- a/Documentation/devicetree/bindings/rng/imx-rng.txt
++++ b/Documentation/devicetree/bindings/rng/imx-rng.txt
+@@ -5,6 +5,9 @@ Required properties:
+                "fsl,imx21-rnga"
+                "fsl,imx31-rnga" (backward compatible with "fsl,imx21-rnga")
+                "fsl,imx25-rngb"
++               "fsl,imx6sl-rngb" (backward compatible with "fsl,imx25-rngb")
++               "fsl,imx6sll-rngb" (backward compatible with "fsl,imx25-rngb")
++               "fsl,imx6ull-rngb" (backward compatible with "fsl,imx25-rngb")
+                "fsl,imx35-rngc"
+ - reg : offset and length of the register set of this block
+ - interrupts : the interrupt number for the RNG block
 -- 
 2.17.1
 
