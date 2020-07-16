@@ -2,158 +2,155 @@ Return-Path: <SRS0=7zOR=A3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D63DC433E1
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 10:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 684CEC433E2
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 10:35:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D467820760
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 10:31:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C19E2074B
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 10:35:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=voleatech.de header.i=@voleatech.de header.b="h4gvtbMz"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="BYjMww2o"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726332AbgGPKbg (ORCPT
+        id S1726239AbgGPKf6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jul 2020 06:31:36 -0400
-Received: from mail-eopbgr60122.outbound.protection.outlook.com ([40.107.6.122]:51073
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
+        Thu, 16 Jul 2020 06:35:58 -0400
+Received: from mail-eopbgr80042.outbound.protection.outlook.com ([40.107.8.42]:15526
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726190AbgGPKbf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jul 2020 06:31:35 -0400
+        id S1726190AbgGPKf5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jul 2020 06:35:57 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JSjcwaWJ8xl1Nu7+ZgXeM1rlKvb0S6EhS7krJ79VpIYVspT5yfdC8SWtXNBs+hSnOG3dggu2q51n5TkOskihKAIu8HUuy+yiOBHfs1wv3+QbzkYnjd4wQ10K1jTdhaWZu1QGDiJjrjeG/UPMKDNsmQUgC3Fp+QW+jumvzj7bhIuNIqmBxm8ca/QvS62a5yTeheosURXz6JeQSHBB6O9BtkvR5kvay1iFsa+BD2jWWGvJ6THlNczkTwXR2fwD/+cKRFqFkI0REWvIwIvueKe0+q3s+azGskJFYUR9JrPHpthzNV+lSga8NYXkVh1HrjFurPXI07Pyo3ElbJ2IIelGNg==
+ b=dcGu4nI7/dfwtWdI3zkE92R6bsMWEjaArK0Cfo2Jje7Qu9FCqStv7t875hUzliZQSTrja2MOviDgLwfDxgZUjlvQNq5aeDxyBNkV3z5QXLjPqa94Ma/yaiNEXu+lFNVNFhg4ucdhylzXEInv2Bcma5huIel0BDxw3RleuNWJuFMA52jnF0ZSeUowAWwUDjK1zFkrdPh0nHur8ofPqLjFt4l7Mol26QEUzPf513LdmOUMkUGSoJuKP/OmESQwG8cNkudxX9cVF/svb9BpUKmCxqWVIa2JrE8WKdld2Ew0pv015oZy9sCc0jgefACjseGhI2CMQ+50L1n7dZw2E7lyjQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PHeK8qQ92t9RSene+ETl/1w0hgEqAd1PVrZjgqV8Gns=;
- b=VshY8qNGF1VWVqIYdegWQb1icLKiHWy5VfK3Z0EkhLUkcX/bDREmR6iMLvImcebLCPYU/XyduN3kfliLFaBm61wk2ixHZH3c+XiLh2qcumV2NvBHLFtWYC9ucFXaimLVb9/M/Tk+6lRMkDfcIS+Gxj1O/a9VVeiVnlGTJ6Tvthx/83Y2TduDXe6VrgsHDmI6fMyFrkBy7Zh6lDsu0LUnT4ILC8d0+PRV7eU3am3It7oi6yTh72OFvMo1Hmlentrer7rSScLFnz2Pao+pqD4R3djQSvJs2Ak6y1UC5wrdt+jRheLBsjyyGteITG/0djUo7dMivLoqv7MIcNoanBTuTQ==
+ bh=SUNYenW79sckUMYV2jOPTfADp2ZUz0B/UYlcZLvbpGY=;
+ b=XTZZ/z6C2WWCLaQGnAh1Y91cOb+g+yLQ+ndpcUTaftBkGC4LTlUZh0mzXB7urco9FWfav+EoMmefjSvtM6Wl6GJNl0fAUX5uO2vBJIN4D/EAddopTeEeJd+nJqXddTI3YHgZ9ugK9syyLjx8BZ2kzwJ1wyRn72HZ5uVBLXnB00RhHePASH/uEK2MMbjUYDXvd5/RHM0mYGb8Gs5ucldY5GOlUfiHdg/AZuhiLKW7W9lZ15bdcNlS+ewF3fsu0dtbWJ3PL+XjW77mjtXTNayooqBa2y9W71zbI2yFjNcoHytFvqDT7BCVMe1f0B3Q4gXiFXBkaeIcic/ocVy6ePPjrg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=voleatech.de; dmarc=pass action=none header.from=voleatech.de;
- dkim=pass header.d=voleatech.de; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=voleatech.de;
- s=selector2;
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PHeK8qQ92t9RSene+ETl/1w0hgEqAd1PVrZjgqV8Gns=;
- b=h4gvtbMzxqmMx/tn9mOhnKml16+BdBLfdFp3g1Qzn9hCazjCVU2RgVG3dhAvNFOm25Gt1VfSBOHGRCqOPJVtU0okKeFBPnxnlajsur8EShmJU8I2W80ubzDhapVuWQkFwlULIooz4t9PD5E3fVuGOasrqOkyWnLuyJBsMkoCgtU=
-Authentication-Results: rambus.com; dkim=none (message not signed)
- header.d=none;rambus.com; dmarc=none action=none header.from=voleatech.de;
-Received: from AM4PR0501MB2785.eurprd05.prod.outlook.com
- (2603:10a6:200:5d::11) by AM0PR05MB5779.eurprd05.prod.outlook.com
- (2603:10a6:208:117::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.21; Thu, 16 Jul
- 2020 10:31:30 +0000
-Received: from AM4PR0501MB2785.eurprd05.prod.outlook.com
- ([fe80::39a1:e237:5fef:6f39]) by AM4PR0501MB2785.eurprd05.prod.outlook.com
- ([fe80::39a1:e237:5fef:6f39%11]) with mapi id 15.20.3174.027; Thu, 16 Jul
- 2020 10:31:30 +0000
-Date:   Thu, 16 Jul 2020 12:31:29 +0200
-From:   Sven Auhagen <sven.auhagen@voleatech.de>
-To:     "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 1/1] inside-secure irq balance
-Message-ID: <20200716103129.wltutfcxpwkm6cyv@SvensMacbookPro.hq.voleatech.com>
-References: <20200708150844.2626m3pgdo5oidzm@SvensMacBookAir.sven.lan>
- <20200716072133.GA28028@gondor.apana.org.au>
- <CY4PR0401MB3652C2232E0B0A7951B84596C37F0@CY4PR0401MB3652.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CY4PR0401MB3652C2232E0B0A7951B84596C37F0@CY4PR0401MB3652.namprd04.prod.outlook.com>
-X-ClientProxiedBy: AM4PR0501CA0060.eurprd05.prod.outlook.com
- (2603:10a6:200:68::28) To AM4PR0501MB2785.eurprd05.prod.outlook.com
- (2603:10a6:200:5d::11)
+ bh=SUNYenW79sckUMYV2jOPTfADp2ZUz0B/UYlcZLvbpGY=;
+ b=BYjMww2opoD8yXjaO7q0QWSQ0jEQue2KtE9eOt1NMdZDimKH7NpTAQO55j8b+5sHzxEkHTwrRdpzx77GOat22hfBfH6zxNanR30lT+Oeabk6XvMapt3oJlX8bGcFpFt3ifHFo00GnSuqxEZ0j7pQ/MB9L5lA2nDTSCr1r4Kf9kI=
+Authentication-Results: nxp.com; dkim=none (message not signed)
+ header.d=none;nxp.com; dmarc=none action=none header.from=nxp.com;
+Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
+ by VI1PR04MB7117.eurprd04.prod.outlook.com (2603:10a6:800:12f::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.17; Thu, 16 Jul
+ 2020 10:35:54 +0000
+Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
+ ([fe80::8459:4be8:7034:7a81]) by VI1PR04MB4046.eurprd04.prod.outlook.com
+ ([fe80::8459:4be8:7034:7a81%6]) with mapi id 15.20.3195.018; Thu, 16 Jul 2020
+ 10:35:54 +0000
+Subject: Re: [PATCH 2/2] crypto: caam - support tagged keys for skcipher
+ algorithms
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+References: <1594591536-531-1-git-send-email-iuliana.prodan@nxp.com>
+ <1594591536-531-3-git-send-email-iuliana.prodan@nxp.com>
+ <20200716073610.GA28215@gondor.apana.org.au>
+From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
+Message-ID: <0c818beb-05e5-a6c6-717d-782b32afff26@nxp.com>
+Date:   Thu, 16 Jul 2020 13:35:51 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <20200716073610.GA28215@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR03CA0080.eurprd03.prod.outlook.com
+ (2603:10a6:208:69::21) To VI1PR04MB4046.eurprd04.prod.outlook.com
+ (2603:10a6:803:4d::29)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from SvensMacbookPro.hq.voleatech.com (37.24.174.42) by AM4PR0501CA0060.eurprd05.prod.outlook.com (2603:10a6:200:68::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.18 via Frontend Transport; Thu, 16 Jul 2020 10:31:30 +0000
-X-Originating-IP: [37.24.174.42]
+Received: from [192.168.0.129] (84.117.251.185) by AM0PR03CA0080.eurprd03.prod.outlook.com (2603:10a6:208:69::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.17 via Frontend Transport; Thu, 16 Jul 2020 10:35:53 +0000
+X-Originating-IP: [84.117.251.185]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 15419a3f-9f2d-4c99-b978-08d82973676a
-X-MS-TrafficTypeDiagnostic: AM0PR05MB5779:
-X-Microsoft-Antispam-PRVS: <AM0PR05MB5779F6D96B69FEEB367DE757EF7F0@AM0PR05MB5779.eurprd05.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 7f19422f-9241-43e6-2308-08d8297404bd
+X-MS-TrafficTypeDiagnostic: VI1PR04MB7117:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR04MB7117E93E26C15A988E652EDE987F0@VI1PR04MB7117.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QRBaE+vhwRGDp3N3fFH3pc7CRXC9o/ZKyEK+8GNsbEyfS4qcLAV7kIBuT0xfjn0GD6V5A75ztxPFZ9NE/P8J0zRBA6jHueDiFa7CanzF2eS1IT+U+NQSAJ1xK9KEME3ectybM6FEwgbhPWJWVmBmHSSU6CqmO0fYgFkR1ydGyY+pr8uSJm8reBIXF5YFJ25+UHan6FNM0cUmZ7lPD4KsK8Y8MiVlIH0Kfevd4VOPKzF9AN2CdsbdBB0mvjf/xlU69fYTEVhJ05i/YjrGrnff38mE6icOm+DjLmKOIBNrFGYs5hB6lVLeq9vWWO+XD2FlF8sFLPrEd4qOYC8di7zqKdVZmr/fAZ7a116wCr5g/c2xTjsclcMzkk4CpbmVOeorrZQO9DntAPv35LTd7yDc1Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM4PR0501MB2785.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(396003)(136003)(366004)(346002)(39830400003)(966005)(45080400002)(83080400001)(66556008)(66476007)(4326008)(186003)(16526019)(66946007)(5660300002)(54906003)(83380400001)(44832011)(55016002)(9686003)(316002)(956004)(508600001)(26005)(8936002)(86362001)(6916009)(1076003)(53546011)(52116002)(7696005)(2906002)(6506007)(8676002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData: TTRlUNtWvKSLBMizI+T1F6VTZWuYc7Fh4yxtvDSs9gRNXPYqxV79WWjsfJfk/hGqJMg+Zoh3XzG0RVrckzwpk2e2C4QiPDPtmkXfJak4sV4oWhnA9TJm/xP/ZsQOf22oTKQV/fIC9VpDTyIKNjzVjczObmTUAf1PFPQ44gKerEbmTprMWOst/Llg8QT3leqi1fClN28hatx9sLaoaukZmPXhYeSB/jK9Yng9VA0vDR1kWbMp9iIyLKmfa6cG2T/r/g1UAyvErWrmAS5Ma0DmVMT4N9Tjs8sC+HjC8RKu/BkttobtlWvcQO4sX8KXrqPXkVusDZq5PZM0ZQTrpYbDzZ7/QWlJH/T0x+77uiphQ1lCQhAp60kM0RatZWV2BxSN8YOqoLr9KRIdt5NSOuRI7Wq/mSHelh9lPZS9o/d78ZJnO4dwVb2vz1KHUBLA5dBqN/1gf+wPj7wDPimb13RnoBMYJdYvyz9XtT++dusFqVE=
-X-OriginatorOrg: voleatech.de
-X-MS-Exchange-CrossTenant-Network-Message-Id: 15419a3f-9f2d-4c99-b978-08d82973676a
-X-MS-Exchange-CrossTenant-AuthSource: AM4PR0501MB2785.eurprd05.prod.outlook.com
+X-Microsoft-Antispam-Message-Info: P2dprMi8Oxpbif9xPIkNwekDwkPpMAoiUxKksh1B9q/5C5aMlgOqV3pxVwaM4hXKPDEgdi/3UOVcSROebBC4UfDYH42Nr4m3vU98q31AHI1q4mnyVYGFmIV69lKZhU3UBk70ym9r/9Dy6bZjxxDhiLcFLMOOh5tH+2dqrYq9TrKVv/25lCyHIxUhgWhOx6fa0Ak7r/XoqeZgmI/9dybt/t0YuWYiwd7K2yu7SNW1vpFEE7RnWygBU/IgGNlAMVbEUs2O5isfEyxpmWBPBVjbLYrjxnZdz/ezXxVNXTkct+Or1A6IUwbn1/l+9PwlrfEQvQhjqFk9/Nsi3UEJhrGZ2Od/Pzsu3zDsqysc0+Xku992OfGCQCkz2Yp2lrpxzkll
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(396003)(376002)(136003)(39860400002)(346002)(26005)(36756003)(186003)(66556008)(66476007)(86362001)(8936002)(66946007)(31686004)(16576012)(83380400001)(110136005)(54906003)(16526019)(5660300002)(316002)(31696002)(2906002)(8676002)(6636002)(53546011)(4326008)(956004)(52116002)(478600001)(2616005)(6486002)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: 6MmbxJ8LaXpL0csCoEAs9culLYJ4UbKzIKYLZRysVM3hcJjPW3ldOQu83ytgqiAJbdxc4Vfg0C0xJlMxgL+57sgVQxier39jqVSXRyQlvE1crtwAuTPO0h3XcH4xjvUo+KjamgKp++rmJFv3ABzEpxpcimIWUi8DhfPD+xpoDeQnlSEELsWNuK+3QjNuP/4kxg00MbfchKdOKfyb6GZ7Db9Qh1BHNVWvUvM0dfqWZcjjFl7qCjKG4FcRecvjKChZwO+SeXEwm7dg0qOTujAbCZjb+9DlWBGWcSJD5Qv6lsJ4be/anrnMq4DvRayUQe5vAeKPHiAYEI0RbPxJ6eLBsjg6DXuj3zKH6rMlXzOVwhxdQxOJJaqXvbW6bMiKOpCOpYuEfQptqGOXD1wxtAirLZXJcermVuOwKXoVa6eTf/nCpTuBN147GuC6rL+ZhHCRUcM4qojY2a58CeSSD4YcPkNE0avKwRPQg9r8HnqDuAw8vY1eW/rl34SCjBjkUGy5
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f19422f-9241-43e6-2308-08d8297404bd
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB4046.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2020 10:31:30.7439
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2020 10:35:54.7163
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b82a99f6-7981-4a72-9534-4d35298f847b
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MPFJylhkoMnFkauZ/Bt9sEFRFQcS0o+5q1y7CUO+wkUepCWgbTrCQbMbct35V85WbP0DQ1oH1OksbdrUteW8ogTA+KGzSYE3ItiI89aexY0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB5779
+X-MS-Exchange-CrossTenant-UserPrincipalName: ud0y18XIS4juyMt8c1Vvgdo2Pvf/plSyG70KDpxenrEJNHFxXVBvtM/iTYmviXnhRyTxYekW9r1CSJc/e9R72A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7117
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jul 16, 2020 at 08:44:23AM +0000, Van Leeuwen, Pascal wrote:
-> > -----Original Message-----
-> > From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.kernel.org> On Behalf Of Herbert Xu
-> > Sent: Thursday, July 16, 2020 9:22 AM
-> > To: Sven Auhagen <sven.auhagen@voleatech.de>
-> > Cc: linux-crypto@vger.kernel.org
-> > Subject: Re: [PATCH 1/1] inside-secure irq balance
-> >
-> > <<< External Email >>>
-> > Sven Auhagen <sven.auhagen@voleatech.de> wrote:
-> > >
-> > > +       // Set affinity
-> > > +       cpu = ring_id % num_online_cpus();
-> > > +       irq_set_affinity_hint(irq, get_cpu_mask(cpu));
-> > > +
-> >
-> > This doesn't look right.  There is no guarantee that the online
-> > CPUs are the lowest bits in the bitmask.  Also, what are you going
-> > to do when the CPUs go down (or up)?
-> >
+On 7/16/2020 10:36 AM, Herbert Xu wrote:
+> On Mon, Jul 13, 2020 at 01:05:36AM +0300, Iuliana Prodan wrote:
+>> Tagged keys are keys that contain metadata indicating what
+>> they are and how to handle them using tag_object API.
+>>
+>> Add support, for tagged keys, to skcipher algorithms by
+>> adding new transformations, with _tk_ prefix to distinguish
+>> between plaintext and tagged keys.
+>>
+>> For job descriptors a new option (key_cmd_opt) was added for KEY command.
+>> Tagged keys can be loaded using only a KEY command with ENC=1
+>> and the proper setting of the EKT bit. The EKT bit in the
+>> KEY command indicates which encryption algorithm (AES-ECB or
+>> AES-CCM) should be used to decrypt the key. These options will be kept in
+>> key_cmd_opt.
+>>
+>> The tk_ transformations can be used directly by their name:
+>> struct sockaddr_alg sa = {
+>>     .salg_family = AF_ALG,
+>>     .salg_type = "skcipher", /* this selects the symmetric cipher */
+>>     .salg_name = "tk(cbc(aes))" /* this is the cipher name */
+>> };
+>> or for dm-crypt, e.g. using dmsetup:
+>> dmsetup -v create encrypted --table "0 $(blockdev --getsz /dev/mmcblk2p10)
+>> crypt capi:tk(cbc(aes))-plain :32:logon:seckey 0 /dev/mmcblk2p10 0 1
+>> sector_size:512".
+>>
+>> Signed-off-by: Franck LENORMAND <franck.lenormand@nxp.com>
+>> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+> 
+> Can this use the existing paes name instead of tk as done in
+> other drivers?
+> 
+This patch set adds support only for some AES-based algorithms.
+However, going further the plan is to add all keyed algorithms
+supported by caam.
 
-After some further reading this is only a hint.
-If the CPU is not online a different one will be used.
-If the CPU goes offline the cpu hotplug code makes sure to move the irq
-to a different CPU or remove the hint completely.
+Thus I wouldn't tie the name to AES.
 
-This should be safe to use and btw other crypto drivers do it the same way.
-For example cavium nitrox or cavium cpt.
+Possible alternatives would be:
+pk - protected keys
+tk - with "t" standing for "trusted" instead of "tagged"
 
-Best
-Sven
+Wrt. "trusted", I am not sure this term should strictly be tied
+to a TPM or not.
 
-> 
-> Ok, I was just about to test this patch with my hardware, but I suppose I can spare myself the
-> trouble if it doesn't make sense. I already had a hunch it was too simplistic for general use.
-> However, he does get a very significant speed boost out of this, which makes sense as having
-> the interrupts properly distributed AND pinned to a fixed CPU ensures proper workload
-> distribution and cache locality. In fact, this was the whole idea behind having multiple rings
-> and interrupts.
-> 
-> So is there a better way to achieve the same goal from the driver? Or is this really something
-> you cannot fix in the crypto driver itself?
-> 
-> > Cheers,
-> > --
-> > Email: Herbert Xu <herbert@gondor.apana.org.au>
-> > Home Page: https://eur03.safelinks.protection.outlook.com/?url=http:%2F%2Fgondor.apana.org.au%2F~herbert%2F&amp;data=02%7C01%7Csven.auhagen%40voleatech.de%7C42783499b8fa4d11a9c608d8296474d2%7Cb82a99f679814a7295344d35298f847b%7C0%7C0%7C637304858734739951&amp;sdata=GNleSUVRQe56P%2BkG6OQ3JH7AkXzKve6UP6ai5dKpN0M%3D&amp;reserved=0
-> > PGP Key: https://eur03.safelinks.protection.outlook.com/?url=http:%2F%2Fgondor.apana.org.au%2F~herbert%2Fpubkey.txt&amp;data=02%7C01%7Csven.auhagen%40voleatech.de%7C42783499b8fa4d11a9c608d8296474d2%7Cb82a99f679814a7295344d35298f847b%7C0%7C0%7C637304858734739951&amp;sdata=nqUVTBAMn1ifyR6lj9nyxBFQZNR9Au8r0aUJR44ziyc%3D&amp;reserved=0
-> 
-> Regards,
-> Pascal van Leeuwen
-> Silicon IP Architect Multi-Protocol Engines, Rambus Security
-> Rambus ROTW Holding BV
-> +31-73 6581953
-> 
-> Note: The Inside Secure/Verimatrix Silicon IP team was recently acquired by Rambus.
-> Please be so kind to update your e-mail address book with my new e-mail address.
-> 
-> 
-> ** This message and any attachments are for the sole use of the intended recipient(s). It may contain information that is confidential and privileged. If you are not the intended recipient of this message, you are prohibited from printing, copying, forwarding or saving it. Please delete the message and attachments and notify the sender immediately. **
-> 
-> Rambus Inc.<https://eur03.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.rambus.com%2F&amp;data=02%7C01%7Csven.auhagen%40voleatech.de%7C42783499b8fa4d11a9c608d8296474d2%7Cb82a99f679814a7295344d35298f847b%7C0%7C0%7C637304858734739951&amp;sdata=gCBXI0rNikA%2FG2ME7RxWwwmkuUNl9wRlyQqDGbFoGHk%3D&amp;reserved=0>
+Thanks,
+Horia
