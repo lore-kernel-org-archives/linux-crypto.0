@@ -2,87 +2,81 @@ Return-Path: <SRS0=7zOR=A3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,FAKE_REPLY_C,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52BAEC433E5
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 07:23:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CD04C433E8
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 07:30:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2AC53207FB
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 07:23:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 069D22071B
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 07:30:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728281AbgGPHX0 (ORCPT
+        id S1727883AbgGPHam (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jul 2020 03:23:26 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:39596 "EHLO fornost.hmeau.com"
+        Thu, 16 Jul 2020 03:30:42 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:39686 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728277AbgGPHX0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jul 2020 03:23:26 -0400
+        id S1727768AbgGPHam (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jul 2020 03:30:42 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jvyEi-0003S3-Kq; Thu, 16 Jul 2020 17:23:21 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Jul 2020 17:23:20 +1000
-Date:   Thu, 16 Jul 2020 17:23:20 +1000
+        id 1jvyLg-0003eF-K6; Thu, 16 Jul 2020 17:30:33 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Jul 2020 17:30:32 +1000
+Date:   Thu, 16 Jul 2020 17:30:32 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Sven Auhagen <sven.auhagen@voleatech.de>
-Cc:     linux-crypto@vger.kernel.org, boris.brezillon@free-electrons.com,
-        arno@natisbad.org
-Subject: Re: [PATCH 1/1] marvell cesa irq balance
-Message-ID: <20200716072320.GA28092@gondor.apana.org.au>
+To:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc:     linux-crypto@vger.kernel.org,
+        Marcelo Cerri <marcelo.cerri@canonical.com>,
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        ard.biesheuvel@linaro.org, nhorman@redhat.com, simo@redhat.com
+Subject: Re: [PATCH v2 2/5] lib/mpi: Add mpi_sub_ui()
+Message-ID: <20200716073032.GA28173@gondor.apana.org.au>
+References: <2543601.mvXUDI8C0e@positron.chronox.de>
+ <5722559.lOV4Wx5bFT@positron.chronox.de>
+ <4650810.GXAFRqVoOG@positron.chronox.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20200709085329.z6rdmpi3i7yf7b6p@SvensMacBookAir.hq.voleatech.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4650810.GXAFRqVoOG@positron.chronox.de>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Sven Auhagen <sven.auhagen@voleatech.de> wrote:
-> Balance the irqs of the marvell cesa driver over all
-> available cpus.
-> Currently all interrupts are handled by the first CPU.
-> 
-> From my testing with IPSec AES 256 SHA256
-> on my clearfog base with 2 Cores I get a 2x speed increase:
-> 
-> Before the patch: 26.74 Kpps
-> With the patch: 56.11 Kpps
-> 
-> Signed-off-by: Sven Auhagen <sven.auhagen@voleatech.de>
-> ---
-> drivers/crypto/marvell/cesa/cesa.c | 6 +++++-
-> 1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
-> index 8a5f0b0bdf77..bf1bda2e904a 100644
-> --- a/drivers/crypto/marvell/cesa/cesa.c
-> +++ b/drivers/crypto/marvell/cesa/cesa.c
-> @@ -438,7 +438,7 @@ static int mv_cesa_probe(struct platform_device *pdev)
->        struct mv_cesa_dev *cesa;
->        struct mv_cesa_engine *engines;
->        struct resource *res;
-> -       int irq, ret, i;
-> +       int irq, ret, i, cpu;
->        u32 sram_size;
-> 
->        if (cesa_dev) {
-> @@ -548,6 +548,10 @@ static int mv_cesa_probe(struct platform_device *pdev)
->                if (ret)
->                        goto err_cleanup;
-> 
-> +               // Set affinity
-> +               cpu = engine->id % num_online_cpus();
-> +               irq_set_affinity_hint(irq, get_cpu_mask(cpu));
-> +
+On Sun, Jul 12, 2020 at 06:39:54PM +0200, Stephan Müller wrote:
+>
+> diff --git a/lib/mpi/mpi-sub-ui.c b/lib/mpi/mpi-sub-ui.c
+> new file mode 100644
+> index 000000000000..fa6b085bac36
+> --- /dev/null
+> +++ b/lib/mpi/mpi-sub-ui.c
+> @@ -0,0 +1,60 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/* mpi-sub-ui.c  -  MPI functions
+> + *      Copyright 1991, 1993, 1994, 1996, 1999-2002, 2004, 2012, 2013, 2015
+> + *      Free Software Foundation, Inc.
+> + *
+> + * This file is part of GnuPG.
+> + *
+> + * Note: This code is heavily based on the GNU MP Library.
+> + *	 Actually it's the same code with only minor changes in the
+> + *	 way the data is stored; this is to support the abstraction
+> + *	 of an optional secure memory allocation which may be used
+> + *	 to avoid revealing of sensitive data due to paging etc.
+> + *	 The GNU MP Library itself is published under the LGPL;
+> + *	 however I decided to publish this code under the plain GPL.
+> + */
 
-Same issue as the inside-secure patch.
+Hmm, you said that this code is from GNU MP.  But this notice clearly
+says that it's part of GnuPG and is under GPL.  Though it doesn't
+clarify what version of GPL it is.  Can you please clarify this with
+the author?
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
