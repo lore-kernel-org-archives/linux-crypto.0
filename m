@@ -7,33 +7,32 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0D52C433E2
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 09:00:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83778C433E3
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 09:00:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA8112074B
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 09:00:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B6B42078C
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 09:00:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728353AbgGPJAL (ORCPT
+        id S1726788AbgGPJAW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jul 2020 05:00:11 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7865 "EHLO huawei.com"
+        Thu, 16 Jul 2020 05:00:22 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:41136 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725897AbgGPJAK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jul 2020 05:00:10 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id EEC9AB6515A83DD13784;
-        Thu, 16 Jul 2020 17:00:08 +0800 (CST)
+        id S1725897AbgGPJAW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jul 2020 05:00:22 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 636564AB1B8F515119FB;
+        Thu, 16 Jul 2020 17:00:20 +0800 (CST)
 Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 16 Jul 2020 17:00:07 +0800
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 16 Jul 2020 17:00:15 +0800
 From:   Qinglang Miao <miaoqinglang@huawei.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
+        Corentin Labbe <clabbe@baylibre.com>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH -next] crypto: caam: Convert to DEFINE_SHOW_ATTRIBUTE
-Date:   Thu, 16 Jul 2020 17:04:03 +0800
-Message-ID: <20200716090403.13507-1-miaoqinglang@huawei.com>
+Subject: [PATCH -next] crypto: amlogic: Convert to DEFINE_SHOW_ATTRIBUTE
+Date:   Thu, 16 Jul 2020 17:04:11 +0800
+Message-ID: <20200716090411.13573-1-miaoqinglang@huawei.com>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
@@ -51,49 +50,42 @@ Use DEFINE_SHOW_ATTRIBUTE macro to simplify the code.
 
 Signed-off-by: Liu Shixin <liushixin2@huawei.com>
 ---
- drivers/crypto/caam/dpseci-debugfs.c | 23 ++---------------------
- 1 file changed, 2 insertions(+), 21 deletions(-)
+ drivers/crypto/amlogic/amlogic-gxl-core.c | 15 ++-------------
+ 1 file changed, 2 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/crypto/caam/dpseci-debugfs.c b/drivers/crypto/caam/dpseci-debugfs.c
-index aa10841b6..0eca8c2fd 100644
---- a/drivers/crypto/caam/dpseci-debugfs.c
-+++ b/drivers/crypto/caam/dpseci-debugfs.c
-@@ -44,33 +44,14 @@ static int dpseci_dbg_fqs_show(struct seq_file *file, void *offset)
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
+index 112be2441..c57501bfa 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-core.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+@@ -96,7 +96,7 @@ static struct meson_alg_template mc_algs[] = {
+ };
+ 
+ #ifdef CONFIG_CRYPTO_DEV_AMLOGIC_GXL_DEBUG
+-static int meson_dbgfs_read(struct seq_file *seq, void *v)
++static int meson_debugfs_show(struct seq_file *seq, void *v)
+ {
+ 	struct meson_dev *mc = seq->private;
+ 	int i;
+@@ -117,18 +117,7 @@ static int meson_dbgfs_read(struct seq_file *seq, void *v)
  	return 0;
  }
  
--static int dpseci_dbg_fqs_open(struct inode *inode, struct file *file)
+-static int meson_dbgfs_open(struct inode *inode, struct file *file)
 -{
--	int err;
--	struct dpaa2_caam_priv *priv;
--
--	priv = (struct dpaa2_caam_priv *)inode->i_private;
--
--	err = single_open(file, dpseci_dbg_fqs_show, priv);
--	if (err < 0)
--		dev_err(priv->dev, "single_open() failed\n");
--
--	return err;
+-	return single_open(file, meson_dbgfs_read, inode->i_private);
 -}
 -
--static const struct file_operations dpseci_dbg_fq_ops = {
--	.open = dpseci_dbg_fqs_open,
+-static const struct file_operations meson_debugfs_fops = {
+-	.owner = THIS_MODULE,
+-	.open = meson_dbgfs_open,
 -	.read_iter = seq_read_iter,
 -	.llseek = seq_lseek,
 -	.release = single_release,
 -};
-+DEFINE_SHOW_ATTRIBUTE(dpseci_dbg_fqs);
++DEFINE_SHOW_ATTRIBUTE(meson_debugfs);
+ #endif
  
- void dpaa2_dpseci_debugfs_init(struct dpaa2_caam_priv *priv)
- {
- 	priv->dfs_root = debugfs_create_dir(dev_name(priv->dev), NULL);
- 
- 	debugfs_create_file("fq_stats", 0444, priv->dfs_root, priv,
--			    &dpseci_dbg_fq_ops);
-+			    &dpseci_dbg_fqs_fops);
- }
- 
- void dpaa2_dpseci_debugfs_exit(struct dpaa2_caam_priv *priv)
+ static void meson_free_chanlist(struct meson_dev *mc, int i)
 -- 
 2.17.1
 
