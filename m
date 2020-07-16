@@ -2,469 +2,205 @@ Return-Path: <SRS0=7zOR=A3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D248CC433E1
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 14:37:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4BE7C433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 14:41:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A08D72065D
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 14:37:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1594910267;
-	bh=QxgGc5SJIuT7HhB1/7i7nFBsszuGtQsX9Cjh4PpaaKE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=2XPAhXkqGaLWwYPu+hDYSWwYWCZ8/C0ymy8lgWMmFAVCN4FIW3+L7CLtn1JFw3Snp
-	 VCssqMZ2OLm5ZswmNAK8zxXH6ILNyWHJ4RrXU+FK1ab2o/NnW91ipmqxhWJ3OKhKW0
-	 f9qRjv8at5yn2s6Tbo97JQvtrl2XsYOuE16kg7oA=
+	by mail.kernel.org (Postfix) with ESMTP id 8A98A206F4
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 14:41:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uuQV62WG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727844AbgGPOhr (ORCPT
+        id S1728977AbgGPOlj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jul 2020 10:37:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55454 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726963AbgGPOhq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jul 2020 10:37:46 -0400
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9975B207E8
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Jul 2020 14:37:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594910264;
-        bh=QxgGc5SJIuT7HhB1/7i7nFBsszuGtQsX9Cjh4PpaaKE=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=K8TNPHou16WxxfuUuj95O7QIhyt9+ICkDXgWGQU3gj5mlwE5pf4+O0D1l3tE+W4pQ
-         6pArV2sh80rRRBPE69lrTgPpwcmAfwSImHNCFrAz9mHaK0BTJ04d/EMxLVZ+RJZETZ
-         Y4qOaqEf259D4Qlol34wG9RHj+ygnbRc1fOjbtPQ=
-Received: by mail-oo1-f44.google.com with SMTP id d125so1222504oob.0
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Jul 2020 07:37:44 -0700 (PDT)
-X-Gm-Message-State: AOAM530H3gP6auU0rWMUIazOVcPbqzRCrj12sPS6OePTz9Xhhp0NNpvq
-        JZpVcYmMD7sA0hcLnw60xaJY5UUwMTNt8TpHNfE=
-X-Google-Smtp-Source: ABdhPJyijQhr6HgKO28MstRHfQL4n3uWUBz7BzjQwZAZr3+JVR2LtsULN0/xZXISPMWPzCvULruzHpySMm7+iaYEuR4=
-X-Received: by 2002:a4a:de8d:: with SMTP id v13mr4449136oou.45.1594910263739;
- Thu, 16 Jul 2020 07:37:43 -0700 (PDT)
+        Thu, 16 Jul 2020 10:41:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49608 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728630AbgGPOli (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jul 2020 10:41:38 -0400
+Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BED6C061755
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Jul 2020 07:41:38 -0700 (PDT)
+Received: by mail-il1-x142.google.com with SMTP id o3so5225643ilo.12
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Jul 2020 07:41:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cK8T7PxuMIyvYVXqVYJVGfYhwDrgslvyXeD+XSrTKa4=;
+        b=uuQV62WGjvWSH35xnvf3C12rcZkmT0N18cUoRC4S4ecylYWGHm176G00QUa36k+IfN
+         u2qkbhNJfQN0VZm1vOHOCR+S+pR6Fd2XbObUXE2aDbeclSy/t5OqoiJUz8Wuk94QUby6
+         IyFq/vsKwiMs5PAMLxOjy2jBAZYcUi6H+aJuZ3bXNrd64Sfpt/auqrqlrbYKraEk/ZiT
+         rBnD0BzNvlB4FBRDH4IhusRmZ6C3+WGHifra7fm7J20nIzM1no4Du+jJvY+s6MM9D+6+
+         IX5G+G8VDZyJ7BFoDXntVWZNYbblAKWF+iasD67CqAgmqMvs0nR9EJisJEgsf3I0Y32D
+         /rdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cK8T7PxuMIyvYVXqVYJVGfYhwDrgslvyXeD+XSrTKa4=;
+        b=UcOaNvBt8JDJ9YwVIvNSlDruD/o+hNsv0mrLwht1v2vCkUzAv1IsCs1CrVGgPzxQm8
+         UIH2Rh1Xt9MOw6YRRWt45Ar63kY5Y9wivVNAZ6azcDAGNotw2y/wCtPYiltF8+EKp6d5
+         ZIUhhqPHWLOVXnE7dRx6ZAO2pPO6TQZzTrEL6MDc5r/H8TZ1U5aye4YoRWwd8LLo+qMb
+         iYd8/dmRP0rHxRKpxN1mMkAp+L0g72fmxW8qb04hcF0Oyq5K0kvHX7GexdG4k9Sd4c3+
+         CRafjD/lWoNeh+tdYGKQqe5C4AW3vRdpgYo0VKY26FTsa0+OxTLhaYpSWC3GERYvHfAf
+         cmaw==
+X-Gm-Message-State: AOAM532MfDWYttWn3lUrshckQP03Izfii6LgJnS/Kj4dS8qWnOYuhRRq
+        k7McBT5+uVnvgyWiU5uihjR0NVQ+jHCfsnQ4yoYv8vczjio=
+X-Google-Smtp-Source: ABdhPJyuGLmtMSDp0U/oXHHgFChbK+LWahqAF6cDfMh/xbfS8HzrqXacqdgr/hK9oXSewx7r+v01Xief57b6DujJoGg=
+X-Received: by 2002:a92:d4cf:: with SMTP id o15mr4370857ilm.160.1594910497206;
+ Thu, 16 Jul 2020 07:41:37 -0700 (PDT)
 MIME-Version: 1.0
-References: <2543601.mvXUDI8C0e@positron.chronox.de> <5722559.lOV4Wx5bFT@positron.chronox.de>
- <4650810.GXAFRqVoOG@positron.chronox.de> <20200716073032.GA28173@gondor.apana.org.au>
- <CAMj1kXHNM5pwjSuVgxP2SA5juTnVxpj0ULUkjNWuoHqVTjuE8Q@mail.gmail.com>
- <20200716125002.oxr7yyeehz74mgq4@valinor> <CAMj1kXHBmgaQKDQoVd-wN0JpKunE53QRg6uQ=3fRZmpNw=drYg@mail.gmail.com>
- <20200716134128.7br6npd2nsck33qm@valinor> <CAMj1kXGJMBLxPX9RuHai9JK_5wQSufEzN4arHLVE_pSnsbGzuQ@mail.gmail.com>
- <20200716142345.bpnenw5j6yhrhjq5@valinor>
-In-Reply-To: <20200716142345.bpnenw5j6yhrhjq5@valinor>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 16 Jul 2020 17:37:32 +0300
-X-Gmail-Original-Message-ID: <CAMj1kXHD4_nXydFnCwsjV_fyvmiD=L8QPBVudmnQfAJYfhu82g@mail.gmail.com>
-Message-ID: <CAMj1kXHD4_nXydFnCwsjV_fyvmiD=L8QPBVudmnQfAJYfhu82g@mail.gmail.com>
-Subject: Re: [PATCH v2 2/5] lib/mpi: Add mpi_sub_ui()
-To:     Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>, nhorman@redhat.com,
-        simo@redhat.com
+References: <20200713164857.1031117-1-lenaptr@google.com> <2941213.7s5MMGUR32@tauon.chronox.de>
+ <CABvBcwauK_JyVzONdwJRGU81ZH5sYuiJSH0F2g+i5qCe363+fQ@mail.gmail.com> <3312053.iIbC2pHGDl@tauon.chronox.de>
+In-Reply-To: <3312053.iIbC2pHGDl@tauon.chronox.de>
+From:   Elena Petrova <lenaptr@google.com>
+Date:   Thu, 16 Jul 2020 15:41:26 +0100
+Message-ID: <CABvBcwaB3RLuRWEzSoeADc4Jg28fK6mqwevaywLsZhvFgBi+BA@mail.gmail.com>
+Subject: Re: [PATCH 0/1] crypto: af_alg - add extra parameters for DRBG interface
+To:     Stephan Mueller <smueller@chronox.de>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 16 Jul 2020 at 17:23, Marcelo Henrique Cerri
-<marcelo.cerri@canonical.com> wrote:
+Hi Stephan,
+
+On Tue, 14 Jul 2020 at 16:34, Stephan Mueller <smueller@chronox.de> wrote:
 >
-> On Thu, Jul 16, 2020 at 04:53:24PM +0300, Ard Biesheuvel wrote:
-> > On Thu, 16 Jul 2020 at 16:41, Marcelo Henrique Cerri
-> > <marcelo.cerri@canonical.com> wrote:
+> Am Dienstag, 14. Juli 2020, 17:23:05 CEST schrieb Elena Petrova:
+>
+> Hi Elena,
+>
+> > Hi Stephan,
+> >
+> > On Tue, 14 Jul 2020 at 06:17, Stephan Mueller <smueller@chronox.de> wrote:
+> > > Am Montag, 13. Juli 2020, 18:48:56 CEST schrieb Elena Petrova:
 > > >
-> > > On Thu, Jul 16, 2020 at 04:09:39PM +0300, Ard Biesheuvel wrote:
-> > > > On Thu, 16 Jul 2020 at 15:50, Marcelo Henrique Cerri
-> > > > <marcelo.cerri@canonical.com> wrote:
-> > > > >
-> > > > > No. The code is really based on Gnu MP. I used the header from
-> > > > > lib/mpi/mpi-pow.c as reference and that's source of the mention t=
-o
-> > > > > GnuPG that went unnoticed by me.
-> > > > >
+> > > Hi Elena,
+> > >
+> > > > This patch extends the userspace RNG interface to make it usable for
+> > > > CAVS testing. This is achieved by adding ALG_SET_DRBG_ENTROPY
+> > > > option to the setsockopt interface for specifying the entropy, and using
+> > > > sendmsg syscall for specifying the additional data.
 > > > >
-> > > > So where did the file lib/mpi/mpi-sub-ui.c come from? From GnuPG or
-> > > > from GnuMP? Did you modify the license statement? Because as propos=
-ed,
-> > > > this patch clearly is not acceptable from GPL compliance  point of
-> > > > view.
+> > > > See libkcapi patch [1] to test the added functionality. The libkcapi
+> > > > patch is not intended for merging into libkcapi as is: it is only a
+> > > > quick plug to manually verify that the extended AF_ALG RNG interface
+> > > > generates the expected output on DRBG800-90A CAVS inputs.
 > > >
-> > > Sorry for the confusion. The code is from Gnu MP (not GnuPG).
+> > > As I am responsible for developing such CAVS/ACVP harness as well, I
+> > > played
+> > > with the idea of going through AF_ALG. I discarded it because I do not see
+> > > the benefit why we should add an interface solely for the purpose of
+> > > testing. Further, it is a potentially dangerous one because the created
+> > > instance of the DRBG is "seeded" from data provided by the caller.
 > > >
-> > > Gnu MP is distributed under either LGPLv3 or later or GPLv2 or later
-> > > (check their license statement on the aors_ui.h file below).
-> > >
-> > > For mpi-sub-ui.h I added a SPDX identifier for GPLv2 or later and I
-> > > kept the FSF copyright line.
-> > >
-> > > I also used the header from mpi-powm.c as a reference basically to
-> > > inform the code was changed from its original form.
-> > >
-> > > Here lies my mistake, I didn't notice that part was referring to GnuP=
-G
-> > > instead of Gnu MP.
-> > >
-> > > So mpi-sub-ui.h header was actually intended to be:
-> > >
-> > >     // SPDX-License-Identifier: GPL-2.0-or-later
-> > >     /* mpi-sub-ui.c  -  MPI functions
-> > >      *      Copyright 1991, 1993, 1994, 1996, 1999-2002, 2004, 2012, =
-2013, 2015
-> > >      *      Free Software Foundation, Inc.
-> > >      *
-> > >      * This file is part of Gnu MP.
-> > >      *
-> > >      * Note: This code is heavily based on the GNU MP Library.
-> > >      *      Actually it's the same code with only minor changes in th=
-e
-> > >      *      way the data is stored; this is to support the abstractio=
-n
-> > >      *      of an optional secure memory allocation which may be used
-> > >      *      to avoid revealing of sensitive data due to paging etc.
-> > >      *      The GNU MP Library itself is published under the LGPL;
-> > >      *      however I decided to publish this code under the plain GP=
-L.
-> > >      */
-> > >
-> > > Or maybe instead of "This file is part of Gnu MP.", "This file is
-> > > based on Gnu MP" might be more appropriate.
-> > >
-> > > Do you have any license concerns considering this updated header?
-> > >
+> > > Thus, I do not see the benefit from adding that extension, widening a user
+> > > space interface solely for the purpose of CAVS testing. I would not see
+> > > any
+> > > other benefit we have with this extension. In particular, this interface
+> > > would then be always there. What I could live with is an interface that
+> > > can be enabled at compile time for those who want it.
 > >
-> > Yes. How can this code be both part of GnuMP *and* be heavily based on
-> > it, but with changes?
+> > Thanks for reviewing this patch. I understand your concern about the
+> > erroneous use of the entropy input by non-testing applications. This was an
+> > approach that I had discussed with Ard. I should have included you, my
+> > apologies. I'll  post v2 with the CAVS testing stuff hidden under CONFIG_
+> > option with appropriate help text.
 > >
-
-You haven't answered this question yet. I suppose you just slapped a
-different license text on this file, one that already existed in
-lib/mpi?
-
-> > Please avoid making changes to the original header, just add the SPDX
-> > header in front, and add a clear justification in the commit log where
-> > the file came from (preferably including git url and commit ID), and
-> > what you based your assertion on that its license is compatible with
-> > GPLv2.
+> > With regards to the usefulness, let me elaborate. This effort of extending
+> > the drbg interface is driven by Android needs for having the kernel crypto
+> > certified. I started from having an out-of-tree chrdev driver for Google
+> > Pixel kernels that was exposing the required crypto functionality, and it
+> > wasn't ideal in the following ways:
+> >  * it primarily consisted of copypasted code from testmgr.c
+> >  * it was hard for me to keep the code up to date because I'm not aware of
+> >    ongoing changes to crypto
+> >  * it is hard for other people and/or organisations to re-use it, hense a
+> > lot of duplicated effort is going into CAVS: you have a private driver, I
+> > have mine, Jaya from HP <jayalakshmi.bhat@hp.com>, who's been asking
+> > linux-crypto a few CAVS questions, has to develop theirs...
+> >
+> > In general Android is trying to eliminate out-of-tree code. CAVS testing
+> > functionality in particular needs to be upstream because we are switching
+> > all Android devices to using a Generic Kernel Image (GKI)
+> > [https://lwn.net/Articles/771974/] based on the upstream kernel.
 >
-> The commit message is stating the origin, but I can add a reference to
-> the mercurial repo with its corresponding id.
+> Thank you for the explanation.
+> >
+> > > Besides, when you want to do CAVS testing, the following ciphers are still
+> > > not testable and thus this patch would only be a partial solution to get
+> > > the testing covered:
+> > >
+> > > - AES KW (you cannot get the final IV out of the kernel - I played with
+> > > the
+> > > idea to return the IV through AF_ALG, but discarded it because of the
+> > > concern above)
+> > >
+> > > - OFB/CFB MCT testing (you need the IV from the last round - same issue as
+> > > for AES KW)
+> > >
+> > > - RSA
+> > >
+> > > - DH
+> > >
+> > > - ECDH
+> >
+> > For Android certification purposes, we only need to test the modules which
+> > are actually being used. In our case it's what af_alg already exposes plus
+> > DRBG. If, say, HP would need RSA, they could submit their own patch.
+> >
+> > As for exposing bits of the internal state for some algorithms, I hope
+> > guarding the testing functionality with a CONFIG_ option would solve the
+> > security part of the problem.
 >
+> Yes, for all other users.
+>
+> But if you are planning to enable this option for all Android devices across
+> the board I am not sure here. In this case, wouldn't it make sense to require
+> capable(CAP_SYS_ADMIN) for the DRBG reset operation just as an additional
+> precaution? Note, the issue with the reset is that you loose all previous
+> state (which is good for testing, but bad for security as I guess you agree
+> :-) ).
 
-Yes, please.
+I believe that for Android, since CAVS is a one-off on demand
+operation, we can create a separate build with CONFIG_CRYPTO_CAVS_DRBG
+enabled, which won't go to the users. Thanks for suggesting
+capabilities check, happy to add `capable(CAP_SYS_ADMIN)` regardless.
+
+> > > With these issues, I would assume you are better off creating your own
+> > > kernel module just like I did that externalizes the crypto API to user
+> > > space but is only available on your test kernel and will not affect all
+> > > other users.
+> > I considered publishing my kernel driver on GitHub, but there appears to be
+> > a sufficiently large number of users to justify having this functionality
+> > upstream.
+>
+> So, I should then dust off my AF_ALG KPP and AF_ALG akcipher patches then? :-D
+
+Sure :)
 
 > >
-> > Ideally, you would import the file *exactly* as it appears in the
-> > upstream in one patch (with the above justification), and apply any
-> > necessary changes in a subsequent patch, so it's  crystal clear that
-> > we are complying with the original license.
->
-> I'm not sure that's the ideal approach for this case. The logic is the
-> same but since naming convention, macros, data types and etc are
-> pretty different everything was basically re-written to fit the
-> kernel. Adding the original file and then massively changing will just
-> add unnecessary noise.
->
-
-Do any of these modifications resemble the changes made to the GnuPG
-versions of these routines?
-
-> If you agree I will update the commit message with more details about
-> the original source and then just update the comment header in
-> mpi-sub-ui.c following closely the original header with minor
-> adjustments to explain its origin and to fix some checkpatch warnings.
->
-
-That is fine, provided that none of our modifications were taken from
-the GnuPG version of this file without giving credit.
-
-
-> Something like that:
->
-> // SPDX-License-Identifier: GPL-2.0-or-later
-> /* mpi-sub-ui.c - Subtract an unsigned integer from an MPI.
->  *
->  * Copyright 1991, 1993, 1994, 1996, 1999-2002, 2004, 2012, 2013, 2015
->  * Free Software Foundation, Inc.
->  *
->  * This file was based on the GNU MP Library source file:
->  * https://gmplib.org/repo/gmp-6.2/file/tip/mpz/aors_ui.h
->  *
->  * The GNU MP Library is free software; you can redistribute it and/or mo=
-dify
->  * it under the terms of either:
->  *
->  *   * the GNU Lesser General Public License as published by the Free
->  *     Software Foundation; either version 3 of the License, or (at your
->  *     option) any later version.
->  *
->  * or
->  *
->  *   * the GNU General Public License as published by the Free Software
->  *     Foundation; either version 2 of the License, or (at your option) a=
-ny
->  *     later version.
->  *
->  * or both in parallel, as here.
->  *
->  * The GNU MP Library is distributed in the hope that it will be useful, =
-but
->  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABI=
-LITY
->  * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public Licen=
-se
->  * for more details.
->  *
->  * You should have received copies of the GNU General Public License and =
-the
->  * GNU Lesser General Public License along with the GNU MP Library.  If n=
-ot,
->  * see https://www.gnu.org/licenses/.
->  */
->
+> > Hope that addresses your concerns.
 > >
+> > > Ciao
+> > > Stephan
 > >
-> >
-> > >
-> > > >
-> > > >
-> > > >
-> > > > > You can find the original Gnu MP source that I used as reference =
-in
-> > > > > the file gmp-6.2.0/mpz/aors_ui.h from:
-> > > > >
-> > > > > https://gmplib.org/download/gmp/gmp-6.2.0.tar.lz
-> > > > >
-> > > > > I'm pasting the contents of gmp-6.2.0/mpz/aors_ui.h below for
-> > > > > reference. Do you think we should use or adapt the original heade=
-r
-> > > > > instead?
-> > > > >
-> > > > > That said, assuming the patch set submitted by Tianjia is updated=
- to
-> > > > > ensure that mpi_sub_ui() and other functions are returning alloca=
-tion
-> > > > > errors, we could drop this patch in favor of that patch set that =
-is
-> > > > > more extensive and also provides an implementation to mpi_sub_ui(=
-).
-> > > > >
-> > > > >
-> > > > > --->8---
-> > > > > /* mpz_add_ui, mpz_sub_ui -- Add or subtract an mpz_t and an unsi=
-gned
-> > > > >    one-word integer.
-> > > > >
-> > > > > Copyright 1991, 1993, 1994, 1996, 1999-2002, 2004, 2012, 2013, 20=
-15
-> > > > > Free Software Foundation, Inc.
-> > > > >
-> > >
-> > >
-> > > Gnu MP license -.
-> > >                 V
-> > >
-> > >
-> > > > > This file is part of the GNU MP Library.
-> > > > >
-> > > > > The GNU MP Library is free software; you can redistribute it and/=
-or modify
-> > > > > it under the terms of either:
-> > > > >
-> > > > >   * the GNU Lesser General Public License as published by the Fre=
-e
-> > > > >     Software Foundation; either version 3 of the License, or (at =
-your
-> > > > >     option) any later version.
-> > > > >
-> > > > > or
-> > > > >
-> > > > >   * the GNU General Public License as published by the Free Softw=
-are
-> > > > >     Foundation; either version 2 of the License, or (at your opti=
-on) any
-> > > > >     later version.
-> > > > >
-> > > > > or both in parallel, as here.
-> > > > >
-> > > > > The GNU MP Library is distributed in the hope that it will be use=
-ful, but
-> > > > > WITHOUT ANY WARRANTY; without even the implied warranty of MERCHA=
-NTABILITY
-> > > > > or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public =
-License
-> > > > > for more details.
-> > > > >
-> > > > > You should have received copies of the GNU General Public License=
- and the
-> > > > > GNU Lesser General Public License along with the GNU MP Library. =
- If not,
-> > > > > see https://www.gnu.org/licenses/.  */
-> > > > >
-> > > > > #include "gmp-impl.h"
-> > > > >
-> > > > >
-> > > > > #ifdef OPERATION_add_ui
-> > > > > #define FUNCTION          mpz_add_ui
-> > > > > #define FUNCTION2         mpz_add
-> > > > > #define VARIATION_CMP     >=3D
-> > > > > #define VARIATION_NEG
-> > > > > #define VARIATION_UNNEG   -
-> > > > > #endif
-> > > > >
-> > > > > #ifdef OPERATION_sub_ui
-> > > > > #define FUNCTION          mpz_sub_ui
-> > > > > #define FUNCTION2         mpz_sub
-> > > > > #define VARIATION_CMP     <
-> > > > > #define VARIATION_NEG     -
-> > > > > #define VARIATION_UNNEG
-> > > > > #endif
-> > > > >
-> > > > > #ifndef FUNCTION
-> > > > > Error, need OPERATION_add_ui or OPERATION_sub_ui
-> > > > > #endif
-> > > > >
-> > > > >
-> > > > > void
-> > > > > FUNCTION (mpz_ptr w, mpz_srcptr u, unsigned long int vval)
-> > > > > {
-> > > > >   mp_srcptr up;
-> > > > >   mp_ptr wp;
-> > > > >   mp_size_t usize, wsize;
-> > > > >   mp_size_t abs_usize;
-> > > > >
-> > > > > #if BITS_PER_ULONG > GMP_NUMB_BITS  /* avoid warnings about shift=
- amount */
-> > > > >   if (vval > GMP_NUMB_MAX)
-> > > > >     {
-> > > > >       mpz_t v;
-> > > > >       mp_limb_t vl[2];
-> > > > >       PTR(v) =3D vl;
-> > > > >       vl[0] =3D vval & GMP_NUMB_MASK;
-> > > > >       vl[1] =3D vval >> GMP_NUMB_BITS;
-> > > > >       SIZ(v) =3D 2;
-> > > > >       FUNCTION2 (w, u, v);
-> > > > >       return;
-> > > > >     }
-> > > > > #endif
-> > > > >
-> > > > >   usize =3D SIZ (u);
-> > > > >   if (usize =3D=3D 0)
-> > > > >     {
-> > > > >       MPZ_NEWALLOC (w, 1)[0] =3D vval;
-> > > > >       SIZ (w) =3D VARIATION_NEG (vval !=3D 0);
-> > > > >       return;
-> > > > >     }
-> > > > >
-> > > > >   abs_usize =3D ABS (usize);
-> > > > >
-> > > > >   /* If not space for W (and possible carry), increase space.  */
-> > > > >   wp =3D MPZ_REALLOC (w, abs_usize + 1);
-> > > > >
-> > > > >   /* These must be after realloc (U may be the same as W).  */
-> > > > >   up =3D PTR (u);
-> > > > >
-> > > > >   if (usize VARIATION_CMP 0)
-> > > > >     {
-> > > > >       mp_limb_t cy;
-> > > > >       cy =3D mpn_add_1 (wp, up, abs_usize, (mp_limb_t) vval);
-> > > > >       wp[abs_usize] =3D cy;
-> > > > >       wsize =3D VARIATION_NEG (abs_usize + cy);
-> > > > >     }
-> > > > >   else
-> > > > >     {
-> > > > >       /* The signs are different.  Need exact comparison to deter=
-mine
-> > > > >          which operand to subtract from which.  */
-> > > > >       if (abs_usize =3D=3D 1 && up[0] < vval)
-> > > > >         {
-> > > > >           wp[0] =3D vval - up[0];
-> > > > >           wsize =3D VARIATION_NEG 1;
-> > > > >         }
-> > > > >       else
-> > > > >         {
-> > > > >           mpn_sub_1 (wp, up, abs_usize, (mp_limb_t) vval);
-> > > > >           /* Size can decrease with at most one limb.  */
-> > > > >           wsize =3D VARIATION_UNNEG (abs_usize - (wp[abs_usize - =
-1] =3D=3D 0));
-> > > > >         }
-> > > > >     }
-> > > > >
-> > > > >   SIZ (w) =3D wsize;
-> > > > > }
-> > > > > --->*---
-> > > > >
-> > > > >
-> > > > >
-> > > > > On Thu, Jul 16, 2020 at 11:41:17AM +0300, Ard Biesheuvel wrote:
-> > > > > > On Thu, 16 Jul 2020 at 10:30, Herbert Xu <herbert@gondor.apana.=
-org.au> wrote:
-> > > > > > >
-> > > > > > > On Sun, Jul 12, 2020 at 06:39:54PM +0200, Stephan M=C3=BCller=
- wrote:
-> > > > > > > >
-> > > > > > > > diff --git a/lib/mpi/mpi-sub-ui.c b/lib/mpi/mpi-sub-ui.c
-> > > > > > > > new file mode 100644
-> > > > > > > > index 000000000000..fa6b085bac36
-> > > > > > > > --- /dev/null
-> > > > > > > > +++ b/lib/mpi/mpi-sub-ui.c
-> > > > > > > > @@ -0,0 +1,60 @@
-> > > > > > > > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > > > > > > > +/* mpi-sub-ui.c  -  MPI functions
-> > > > > > > > + *      Copyright 1991, 1993, 1994, 1996, 1999-2002, 2004,=
- 2012, 2013, 2015
-> > > > > > > > + *      Free Software Foundation, Inc.
-> > > > > > > > + *
-> > > > > > > > + * This file is part of GnuPG.
-> > > > > > > > + *
-> > > > > > > > + * Note: This code is heavily based on the GNU MP Library.
-> > > > > > > > + *    Actually it's the same code with only minor changes =
-in the
-> > > > > > > > + *    way the data is stored; this is to support the abstr=
-action
-> > > > > > > > + *    of an optional secure memory allocation which may be=
- used
-> > > > > > > > + *    to avoid revealing of sensitive data due to paging e=
-tc.
-> > > > > > > > + *    The GNU MP Library itself is published under the LGP=
-L;
-> > > > > > > > + *    however I decided to publish this code under the pla=
-in GPL.
-> > > > > > > > + */
-> > > > > > >
-> > > > > > > Hmm, you said that this code is from GNU MP.  But this notice=
- clearly
-> > > > > > > says that it's part of GnuPG and is under GPL.  Though it doe=
-sn't
-> > > > > > > clarify what version of GPL it is.  Can you please clarify th=
-is with
-> > > > > > > the author?
-> > > > > > >
-> > > > > >
-> > > > > > GnuPG was relicensed under GPLv3 in ~2007, IIRC, so given the
-> > > > > > copyright years and the explicit statements that the file is pa=
-rt of
-> > > > > > GnuPG and not under the original LGPL license, there is no way =
-we can
-> > > > > > take this code under the kernel's GPLv2 license.
-> > > > >
-> > > > > --
-> > > > > Regards,
-> > > > > Marcelo
-> > > > >
-> > >
-> > > --
-> > > Regards,
-> > > Marcelo
-> > >
+> > Thanks,
+> > Elena
 >
-> --
-> Regards,
-> Marcelo
+>
+> Ciao
+> Stephan
+>
 >
