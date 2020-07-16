@@ -2,67 +2,70 @@ Return-Path: <SRS0=7zOR=A3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B4DAC433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 11:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 656E0C433E3
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 11:54:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F68D20760
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 11:53:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 499DA20739
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 11:54:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726515AbgGPLx3 (ORCPT
+        id S1728093AbgGPLyL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jul 2020 07:53:29 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:40042 "EHLO fornost.hmeau.com"
+        Thu, 16 Jul 2020 07:54:11 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:40062 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726383AbgGPLx2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jul 2020 07:53:28 -0400
+        id S1726383AbgGPLyL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jul 2020 07:54:11 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jw2S2-0008JL-Fc; Thu, 16 Jul 2020 21:53:23 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Jul 2020 21:53:22 +1000
-Date:   Thu, 16 Jul 2020 21:53:22 +1000
+        id 1jw2Sm-0008KH-M7; Thu, 16 Jul 2020 21:54:09 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Jul 2020 21:54:08 +1000
+Date:   Thu, 16 Jul 2020 21:54:08 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Longfang Liu <liulongfang@huawei.com>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 0/5] crypto: hisilicon/sec2 - fix SEC bugs and coding
- styles
-Message-ID: <20200716115322.GA31166@gondor.apana.org.au>
-References: <1594084541-22177-1-git-send-email-liulongfang@huawei.com>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, Martin Willi <martin@strongswan.org>,
+        Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH] crypto: x86/chacha-sse3 - use unaligned loads for state
+ array
+Message-ID: <20200716115408.GC31166@gondor.apana.org.au>
+References: <20200708091118.1389-1-ardb@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1594084541-22177-1-git-send-email-liulongfang@huawei.com>
+In-Reply-To: <20200708091118.1389-1-ardb@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 07, 2020 at 09:15:36AM +0800, Longfang Liu wrote:
-> Fix some SEC driver bugs and modify some coding styles
+On Wed, Jul 08, 2020 at 12:11:18PM +0300, Ard Biesheuvel wrote:
+> Due to the fact that the x86 port does not support allocating objects
+> on the stack with an alignment that exceeds 8 bytes, we have a rather
+> ugly hack in the x86 code for ChaCha to ensure that the state array is
+> aligned to 16 bytes, allowing the SSE3 implementation of the algorithm
+> to use aligned loads.
 > 
-> Changes v1 -> v2:
-> 	- Apply MAY_BACKLOG.
+> Given that the performance benefit of using of aligned loads appears to
+> be limited (~0.25% for 1k blocks using tcrypt on a Corei7-8650U), and
+> the fact that this hack has leaked into generic ChaCha code, let's just
+> remove it.
 > 
-> Kai Ye (2):
->   crypto: hisilicon/sec2 - clear SEC debug regs
->   crypto:hisilicon/sec2 - update busy processing logic
-> 
-> Longfang Liu (3):
->   crypto: hisilicon/sec2 - update SEC initialization and reset
->   crypto: hisilicon/sec2 - update debugfs interface parameters
->   crypto: hisilicon/sec2 - fix some coding styles
-> 
->  drivers/crypto/hisilicon/qm.h              |   1 +
->  drivers/crypto/hisilicon/sec2/sec.h        |   4 +
->  drivers/crypto/hisilicon/sec2/sec_crypto.c |  91 +++++++++++++++------
->  drivers/crypto/hisilicon/sec2/sec_main.c   | 126 +++++++++++++++--------------
->  4 files changed, 138 insertions(+), 84 deletions(-)
+> Cc: Martin Willi <martin@strongswan.org>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Eric Biggers <ebiggers@kernel.org>
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> ---
+>  arch/x86/crypto/chacha-ssse3-x86_64.S | 16 ++++++++--------
+>  arch/x86/crypto/chacha_glue.c         | 17 ++---------------
+>  include/crypto/chacha.h               |  4 ----
+>  3 files changed, 10 insertions(+), 27 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
