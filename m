@@ -1,91 +1,58 @@
-Return-Path: <SRS0=MPTL=A2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=7zOR=A3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,FAKE_REPLY_C,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F05BFC433E7
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jul 2020 15:27:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CA1CC433E1
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 07:21:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE2F4206D5
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jul 2020 15:27:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B8F5206F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 07:21:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726962AbgGOP1V (ORCPT
+        id S1727850AbgGPHVi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Jul 2020 11:27:21 -0400
-Received: from inva020.nxp.com ([92.121.34.13]:33210 "EHLO inva020.nxp.com"
+        Thu, 16 Jul 2020 03:21:38 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:39588 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726936AbgGOP1U (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Jul 2020 11:27:20 -0400
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 60E981A1397;
-        Wed, 15 Jul 2020 17:27:19 +0200 (CEST)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 5456B1A128C;
-        Wed, 15 Jul 2020 17:27:19 +0200 (CEST)
-Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 781D72035C;
-        Wed, 15 Jul 2020 17:27:18 +0200 (CEST)
-From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Martin Kaiser <martin@kaiser.cx>,
-        Marco Felsch <m.felsch@pengutronix.de>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v4 5/5] hwrng: imx-rngc: enable driver for i.MX6
-Date:   Wed, 15 Jul 2020 18:26:04 +0300
-Message-Id: <20200715152604.10407-6-horia.geanta@nxp.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200715152604.10407-1-horia.geanta@nxp.com>
-References: <20200715152604.10407-1-horia.geanta@nxp.com>
+        id S1726069AbgGPHVh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jul 2020 03:21:37 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1jvyCz-0003RY-BT; Thu, 16 Jul 2020 17:21:34 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Jul 2020 17:21:33 +1000
+Date:   Thu, 16 Jul 2020 17:21:33 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Sven Auhagen <sven.auhagen@voleatech.de>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 1/1] inside-secure irq balance
+Message-ID: <20200716072133.GA28028@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200708150844.2626m3pgdo5oidzm@SvensMacBookAir.sven.lan>
+X-Newsgroups: apana.lists.os.linux.cryptoapi
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-i.MX6 SL, SLL, ULL, ULZ SoCs have an RNGB block.
+Sven Auhagen <sven.auhagen@voleatech.de> wrote:
+>
+> +       // Set affinity
+> +       cpu = ring_id % num_online_cpus();
+> +       irq_set_affinity_hint(irq, get_cpu_mask(cpu));
+> +
 
-Since imx-rngc driver supports also rngb,
-let's enable it for these SoCs too.
+This doesn't look right.  There is no guarantee that the online
+CPUs are the lowest bits in the bitmask.  Also, what are you going
+to do when the CPUs go down (or up)?
 
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
-Reviewed-by: Martin Kaiser <martin@kaiser.cx>
-Reviewed-by: Marco Felsch <m.felsch@pengutronix.de>
----
- drivers/char/hw_random/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 8478eb757f3c..98f95a09ce55 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -255,7 +255,7 @@ config HW_RANDOM_MXC_RNGA
- config HW_RANDOM_IMX_RNGC
- 	tristate "Freescale i.MX RNGC Random Number Generator"
- 	depends on HAS_IOMEM && HAVE_CLK
--	depends on SOC_IMX25 || COMPILE_TEST
-+	depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6UL || COMPILE_TEST
- 	default HW_RANDOM
- 	help
- 	  This driver provides kernel-side support for the Random Number
+Cheers,
 -- 
-2.17.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
