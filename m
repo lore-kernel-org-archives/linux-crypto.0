@@ -2,115 +2,108 @@ Return-Path: <SRS0=7zOR=A3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD349C433E2
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 08:09:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D65FFC433E3
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 08:41:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 963FE20657
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 08:09:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="O0VqiDU0"
+	by mail.kernel.org (Postfix) with ESMTP id B13DD2067D
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jul 2020 08:41:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1594888890;
+	bh=UfILHqeGuXflAqkn8DJhglwizrm3+RlAHJ5MI8iyvpk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=IbTrCE1u1dXAP9cn1dGdurNQ0qcZV0AVWDiRtjb4MrtuNswax+2Kbk2PkBRayfELo
+	 oMZJDkwaRM/pisHAUAQVQbUOtZfYcEHpF+YK9x/GFU8v1f9SJfpmGXrDtWTHW1KjE+
+	 8rIUqWslBBVqnRF5NqeZEENx6VykUFP9ZWwn/21g=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726907AbgGPIJR (ORCPT
+        id S1725921AbgGPIla (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jul 2020 04:09:17 -0400
-Received: from mail-eopbgr80087.outbound.protection.outlook.com ([40.107.8.87]:51304
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726882AbgGPIJN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jul 2020 04:09:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RovOJTDFSUOJNcja6/Vjaov82EpcJNw479M15O+xQPIug/aMR4MVwTIQ77tAV5jTP722KsTS13oM4byFLrCmUOFQGMuQM66x5SQKE6zK5vG203YJOpWOcPycYgH70HC8wbL/GBB20ZrlnVzr8vPpL0nO6UKhHk7UAkbsgwzmaZCAPXXZfa/Sfz8w7QpD803Qydwf3V3/VeH6g4z9gFeKhiQa3cbDIkLKLG+MZd/p5bktNps6niE103SWrPYiLFODm/7c1vkJiace0aq93EBa7WJ0f2C8I5Hni5bACzkdhHqmjMNwSIECihUy6ElZ3RF9CNa9FcrBTdeGeiTyuWjlDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N2QdIPcgZcmNk8BSdZ2AGgB+8u/ceNL1gm/CNqoXTM8=;
- b=Abur4fbSg9YhLtDtTpN85U5osHGJ5l56QvE/GR3aazuE2aU3aR+q/96saRCj8a+gHyX3rXzmh35aPeq8T29iG9RpNc8WcBhIss5zXKG5S7Hxt9Shp7SMVOGyQCUWHR2ZBgbLWtMST291cTM9J2UyWeW6uMDFORE2drAHo/ihGBNPg6/NZ1rOO4cHwEpFyTvKlbslKJ2kIguRgIAT5j6PV13058Ih4dFeiLzA3C/hrF4Vl890fVPQqYybsZ+0io+BuV28K/KU8ZUysdvKffXUa2iV5Lut5bUB8fM5xFyKt8aRIrPiuMpeyS/PRjOVzi1ezsVKsUS62Q8ENt9Dw9oegg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N2QdIPcgZcmNk8BSdZ2AGgB+8u/ceNL1gm/CNqoXTM8=;
- b=O0VqiDU0Z7pnPkJ2RBFB5gxrTj6IyAUXB5KqfqC9qUba1/mB+A+FtfXhgxb8AgIUIzn+wz86c7EZUwkYk3jPYEwBuMQzYGazSRWxMmHmhR6LOcsFLmhxpOGPmlGLXCKyyn1W+XEB37dbCfnMPRVifCwZFugXarUEx9haAF50st0=
-Authentication-Results: nxp.com; dkim=none (message not signed)
- header.d=none;nxp.com; dmarc=none action=none header.from=nxp.com;
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
- by VI1PR04MB5581.eurprd04.prod.outlook.com (2603:10a6:803:d2::30) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.22; Thu, 16 Jul
- 2020 08:09:11 +0000
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::8459:4be8:7034:7a81]) by VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::8459:4be8:7034:7a81%6]) with mapi id 15.20.3195.018; Thu, 16 Jul 2020
- 08:09:11 +0000
-Subject: Re: [PATCH] crypto: caam - Remove broken arc4 support
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc:     Iuliana Prodan <iuliana.prodan@nxp.com>
-References: <20200702043648.GA21823@gondor.apana.org.au>
-From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
-Message-ID: <6b810baf-9eb7-ddc3-de7e-14078ae160e0@nxp.com>
-Date:   Thu, 16 Jul 2020 11:09:08 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20200702043648.GA21823@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR01CA0123.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:168::28) To VI1PR04MB4046.eurprd04.prod.outlook.com
- (2603:10a6:803:4d::29)
+        Thu, 16 Jul 2020 04:41:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60878 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725867AbgGPIl3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jul 2020 04:41:29 -0400
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 191FB2067D
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Jul 2020 08:41:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1594888889;
+        bh=UfILHqeGuXflAqkn8DJhglwizrm3+RlAHJ5MI8iyvpk=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=zW2VpktSoGR+7NxY0amEo4JoW44caiL4fV6A13OKp8jKq5wUCuH6rypSvpnV/31mj
+         sVqhN/fmNSwtn3W5QUOo2lhjeWsImwhWupU2QaCJrNPp8WFq2yqzVD/Y/uUhKKBfPD
+         Okv7n1+Jt5SS/UdPXq2GdshCBH476OZ14XX+hjSo=
+Received: by mail-oi1-f173.google.com with SMTP id t198so4474585oie.7
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Jul 2020 01:41:29 -0700 (PDT)
+X-Gm-Message-State: AOAM530oPJRXBg+uCT/HEgVUL9+UuoKz5ogiSRmuNe1ZEqhmjmEPaSK6
+        QiLBT4ibUTJvASlk+QMHhdcVVCPR7IWecVtB51c=
+X-Google-Smtp-Source: ABdhPJwdL3O44TWYHi4nOEsqZcjAaNdMISBnmX1ZgdHqK9MLqkPGxM9Ur2EF6EGO63XipbVWStorfTj7wARhK2OCLME=
+X-Received: by 2002:aca:d643:: with SMTP id n64mr3033847oig.33.1594888888443;
+ Thu, 16 Jul 2020 01:41:28 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.0.129] (84.117.251.185) by AM0PR01CA0123.eurprd01.prod.exchangelabs.com (2603:10a6:208:168::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.18 via Frontend Transport; Thu, 16 Jul 2020 08:09:10 +0000
-X-Originating-IP: [84.117.251.185]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: da8bb99e-c179-48ab-5ff0-08d8295f8539
-X-MS-TrafficTypeDiagnostic: VI1PR04MB5581:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR04MB55813B32AE17FC19AA7C340B987F0@VI1PR04MB5581.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UJ2nr2LRotJW5hq+Xk80wcpx6bvHjnJPq/xS23FgTRuVhY1MrH4BfQ3cxzpdEHaMRKN7dJCwZZTjwSFYF78Gl9SXHoJUkjCycj6nEk7HUrh5RhdEa354mkMErPdrjH0nmL2yQAATVh8iQ6rKbTxLMjAX82NhlBY23wiHMCadLY9J/C6BECOdCgZCki0ca3WoixLsewHKVz0PQlRfh2nyF1/w0G9a4QDoHvgGyK2QmNgc6SwgWvzv3oUIqEgngq2UhKwDvZAubThehB1dyesUvtTMulQ09XBCvl1xZDkRNCjy5Bixu/HcJzZE5cmyDkXi/rdS/ORgPUwq5CVodNhZBBdY7sFFKA8slW2gZchFWeOQoyEzZvzZoQFQFGfgJHvSQGvrIr0Qfmg8Cqu2ct/LdDq1xnXdMM3OFAVKekcufdEKAa4JW7XsAjOjjX8mM/giyRyFemNawfy/rWG45rFBvg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(136003)(376002)(396003)(39860400002)(366004)(8936002)(2616005)(2906002)(4326008)(36756003)(83380400001)(16526019)(31686004)(186003)(6486002)(4744005)(53546011)(52116002)(26005)(86362001)(5660300002)(8676002)(966005)(66946007)(956004)(66476007)(478600001)(16576012)(31696002)(316002)(110136005)(66556008)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: BWPxBN8o1oBZb6WUFWYizo4SPcZjHNZKXf9zVJex0kGXbYwPsiheCYPO/kkKXhvvDiagFfCxn2RVSaRBZTKTTJVDezJSFrgquH+RIYnLZ44ll2xRjH+4ekMI9TNg7ex4ZdR5q2mjywexvAMQPpTV/Y4fg7tqAc2s0SdX7jPFwXTTOwi0JSRkzTnBuVLc3DMYRsyOCdVfStdLSwCkisrW1VY/CfFQLWKA+SQkwEEHetjM0crPh/nc2jbth4s5pU1uqEQox/+B1FjJ9RWAomWoUKpg8XeJGhDhDyERTXha0CDtSWEEXyF5CsaxOhH28SL4w7Cow/BSDuIXFeGBhhL4GpkTSYh+/641jLPftZGllrCHVYjXzeN+z0k62g0wtMlA7/n9Idowm2ep8daBf4w6Xy1uDY2KF/QFiGbshO4NgVb5c9IFoHBDmN6FSl2piJVSrWfmZ6jvtpW08jsgYZIa53PilYizm5jtzS2+jD2/EvD5bCdGncdN7Rb9rrYO+9Xy
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: da8bb99e-c179-48ab-5ff0-08d8295f8539
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB4046.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2020 08:09:11.0334
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HnVdyOeifT7K8YEyUK4GpGgIq/sdBN62Il9c36wIWqXXOPIyAv451uYo8UP/vpNi4hvFabj/vXTbsOpg4jmcZw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB5581
+References: <2543601.mvXUDI8C0e@positron.chronox.de> <5722559.lOV4Wx5bFT@positron.chronox.de>
+ <4650810.GXAFRqVoOG@positron.chronox.de> <20200716073032.GA28173@gondor.apana.org.au>
+In-Reply-To: <20200716073032.GA28173@gondor.apana.org.au>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 16 Jul 2020 11:41:17 +0300
+X-Gmail-Original-Message-ID: <CAMj1kXHNM5pwjSuVgxP2SA5juTnVxpj0ULUkjNWuoHqVTjuE8Q@mail.gmail.com>
+Message-ID: <CAMj1kXHNM5pwjSuVgxP2SA5juTnVxpj0ULUkjNWuoHqVTjuE8Q@mail.gmail.com>
+Subject: Re: [PATCH v2 2/5] lib/mpi: Add mpi_sub_ui()
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Marcelo Cerri <marcelo.cerri@canonical.com>,
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>, nhorman@redhat.com,
+        simo@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/2/2020 7:36 AM, Herbert Xu wrote:
-> The arc4 algorithm requires storing state in the request context
-> in order to allow more than one encrypt/decrypt operation.  As this
-> driver does not seem to do that, it means that using it for more
-> than one operation is broken.
-> 
-> Fixes: eaed71a44ad9 ("crypto: caam - add ecb(*) support")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Given the circumstances, it's not feasible to fix arc4 in caam.
+On Thu, 16 Jul 2020 at 10:30, Herbert Xu <herbert@gondor.apana.org.au> wrot=
+e:
+>
+> On Sun, Jul 12, 2020 at 06:39:54PM +0200, Stephan M=C3=BCller wrote:
+> >
+> > diff --git a/lib/mpi/mpi-sub-ui.c b/lib/mpi/mpi-sub-ui.c
+> > new file mode 100644
+> > index 000000000000..fa6b085bac36
+> > --- /dev/null
+> > +++ b/lib/mpi/mpi-sub-ui.c
+> > @@ -0,0 +1,60 @@
+> > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > +/* mpi-sub-ui.c  -  MPI functions
+> > + *      Copyright 1991, 1993, 1994, 1996, 1999-2002, 2004, 2012, 2013,=
+ 2015
+> > + *      Free Software Foundation, Inc.
+> > + *
+> > + * This file is part of GnuPG.
+> > + *
+> > + * Note: This code is heavily based on the GNU MP Library.
+> > + *    Actually it's the same code with only minor changes in the
+> > + *    way the data is stored; this is to support the abstraction
+> > + *    of an optional secure memory allocation which may be used
+> > + *    to avoid revealing of sensitive data due to paging etc.
+> > + *    The GNU MP Library itself is published under the LGPL;
+> > + *    however I decided to publish this code under the plain GPL.
+> > + */
+>
+> Hmm, you said that this code is from GNU MP.  But this notice clearly
+> says that it's part of GnuPG and is under GPL.  Though it doesn't
+> clarify what version of GPL it is.  Can you please clarify this with
+> the author?
+>
 
-Link: https://lore.kernel.org/linux-crypto/CAMj1kXGvMe_A_iQ43Pmygg9xaAM-RLy=_M=v+eg--8xNmv9P+w@mail.gmail.com
-Link: https://lore.kernel.org/linux-crypto/20200702101947.682-1-ardb@kernel.org
-Acked-by: Horia Geantă <horia.geanta@nxp.com>
-
-Horia
+GnuPG was relicensed under GPLv3 in ~2007, IIRC, so given the
+copyright years and the explicit statements that the file is part of
+GnuPG and not under the original LGPL license, there is no way we can
+take this code under the kernel's GPLv2 license.
