@@ -2,164 +2,130 @@ Return-Path: <SRS0=/E9c=A4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BC85C433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 07:31:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D138DC433DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 07:53:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E6E92074B
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 07:31:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7390B20704
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 07:53:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="usGsSzS0"
+	dkim=pass (1024-bit key) header.d=voleatech.de header.i=@voleatech.de header.b="GZtj9q82"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726665AbgGQHbb (ORCPT
+        id S1726113AbgGQHxk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jul 2020 03:31:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35990 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726166AbgGQHba (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jul 2020 03:31:30 -0400
-Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 632CFC061755;
-        Fri, 17 Jul 2020 00:31:30 -0700 (PDT)
-Received: by mail-qk1-x72f.google.com with SMTP id l23so139653qkk.0;
-        Fri, 17 Jul 2020 00:31:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vq/MCEaLDMDqNB59nI917ng8XcSbXSzX90eaXV2DpJU=;
-        b=usGsSzS08m5C5AxVU/aGJopD5Vyc2Yx/Mff+iNWBLBXiD1hkxvBVUEN4uQOmqdU9Ga
-         8KFSShw7fF9S6UTwlTl+a9vHmzNUT4Klk2qE2MEexn5k5obWQsul8Q/aphZU16qoZ2Kh
-         v/lqfBKEeR4Y+oY3SjYHiaI1/nzdhfIsy5Bz+FNsyScB/NW0VOwPiG8LDoeBbIz3DX0f
-         4Rwyew3qSEkl5wAyvdHjMSaUBUXOzq1wWR0LYMkxoingL1mUKZq4H7Wno8H9z2qGU7H0
-         SMb3biWmdYzq6mNGwHMi87Chfhb6uUVuLvw+HBP4q+p5+Zj/X7jZC83qO5vlBSm32t8t
-         EHcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vq/MCEaLDMDqNB59nI917ng8XcSbXSzX90eaXV2DpJU=;
-        b=hRzvwQGcrLAx9rZM16SiMEcY0ONr8M+es5KlG5WlWJjXOCrIpPGvU7L0R4TssDSJoL
-         SZssKP7GkOEMvt0/MCxm4N3nAyDDgOFv+TYMAZJiv/8E1i6wbi4SHea+DJz1y3BsCNqp
-         163yX/k4lF3UPhIQ+9+mlTGWYa5u7pmeM7nFk59XEd/rLJz4kR000zq0gsGr94RYgOzm
-         //Cp0xoD80lOPNiuviViR+ji+BBG9HtFwJF5hGPJE96dCAeOk+qwkhbXt421MvUKfVdp
-         zjLOQL8+zUa5F9QRgQs/LDh1wMsG3cwhPWzmzbY6sBI1IgqiUgETQT/Tzw7qH9z5AAeq
-         IuQg==
-X-Gm-Message-State: AOAM532DZwSRrIP+0UESfyfla48WeXI3+lBA7dHTW4pkSRcwhXgbnipB
-        4oWN64h2I+sBfgf8PzbrYqKaEtYwcsKy0PDmBr8=
-X-Google-Smtp-Source: ABdhPJwfkxIVOtKA3cqACXX8TcP92PpVg/229vALyj3mGuinOCb5bcnig4y4ziPK9PqeU08fw5qpbDm+tVJJHCWyT5A=
-X-Received: by 2002:a37:73c3:: with SMTP id o186mr7335880qkc.465.1594971089315;
- Fri, 17 Jul 2020 00:31:29 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200717144656.4bdbf81f@canb.auug.org.au> <CAFULd4Ye2d-8BY7aY+_2tYwcXsfSCe3O6aJ4LF0KhvWTjVt0rA@mail.gmail.com>
- <20200717064401.GB2504@gondor.apana.org.au>
-In-Reply-To: <20200717064401.GB2504@gondor.apana.org.au>
-From:   Uros Bizjak <ubizjak@gmail.com>
-Date:   Fri, 17 Jul 2020 09:31:18 +0200
-Message-ID: <CAFULd4b9O+KJKwjQTB1PTuxMEDSDMov0rQaE85+9pfRrd02dKw@mail.gmail.com>
-Subject: Re: linux-next: manual merge of the tip tree with the crypto tree
+        Fri, 17 Jul 2020 03:53:40 -0400
+Received: from mail-am6eur05on2119.outbound.protection.outlook.com ([40.107.22.119]:54188
+        "EHLO EUR05-AM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726101AbgGQHxj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Jul 2020 03:53:39 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dxU9Lm/+pIllsmDk5V0fsoRKa3wNZvCi+knE78wgVO3KTgzfrHLneOs/7IS+yaRnh+VapDKn3bXnHxFGlUztLcI88afQKbWL8mzNx8HYoNVDVj1pl0m5NmXrJy91rqHp9r4eSzvxulvwYOcwiR60IUrQcXcFVibcB4h4PuXtH4sVIFkfex1n4Ha8MHOHbMb7nNujV+wM2tuzxx4bWZIJlV5y4dWbpFcNuQyRH6f9lP9R4uXCVDUFmR0wqzn/Ght4malijLT2MEJ6xr1cT7L45JXkOqaK7nc6p247ogNhdu5anxfKX2FJsW+FPS/IjN0ZgD7p8OcPs9EATqRW4W/ELg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iImdz4y8O5ja1RY27OEAr85xM2sSrIOuyy764PcKfdU=;
+ b=a3y4OYc2KKpYnyUK/eykW04SEFy6q2lJlwsKba+ZBfd1u1ysRdYYzZOLM1MFZVAjHMdzGrywf0o6FNbUJxb6ooxq0W6JGEQ0XHhIJugnhW2UhXXRyMr8a2cmfsaVszP+onBAaWB7uAS98sEDb7KcBd74wNktn6tFST0epUxFMFYn/g6iXfiJPA4PdtqENAoT0JslHHh5HnQy32Oz3Ebdei+fRVni0Jb946jXCG91LSPlmjNuYeT1zOpvs560PERgNDCF0QMW7gBFqR2FI7KCBzP9nQyOwzrG3VETBRPqaJKL0+0XDD76X9RcJB5CeaoLXrSwvAipnkjz0xd/RAAFxQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=voleatech.de; dmarc=pass action=none header.from=voleatech.de;
+ dkim=pass header.d=voleatech.de; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=voleatech.de;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iImdz4y8O5ja1RY27OEAr85xM2sSrIOuyy764PcKfdU=;
+ b=GZtj9q82tfmI0XtZMxwpOTNd4aqNfU9lNIBeyBHjmYVXqzpvmp6kFCkm/CxafPHjx3oLoY2XmP60Lire/LKp6MEZiCj8awzSh7PwTjcyjhl3bOvoOi3kFHDGlmu9s9BEmbaHK3N7JowONqpHjcYW3jeNGO1T1wKm49CQk7Fcb68=
+Authentication-Results: gondor.apana.org.au; dkim=none (message not signed)
+ header.d=none;gondor.apana.org.au; dmarc=none action=none
+ header.from=voleatech.de;
+Received: from AM4PR0501MB2785.eurprd05.prod.outlook.com
+ (2603:10a6:200:5d::11) by AM0PR05MB6372.eurprd05.prod.outlook.com
+ (2603:10a6:208:13d::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.20; Fri, 17 Jul
+ 2020 07:53:35 +0000
+Received: from AM4PR0501MB2785.eurprd05.prod.outlook.com
+ ([fe80::39a1:e237:5fef:6f39]) by AM4PR0501MB2785.eurprd05.prod.outlook.com
+ ([fe80::39a1:e237:5fef:6f39%11]) with mapi id 15.20.3174.027; Fri, 17 Jul
+ 2020 07:53:35 +0000
+Date:   Fri, 17 Jul 2020 09:53:34 +0200
+From:   Sven Auhagen <sven.auhagen@voleatech.de>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@elte.hu>, "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Sasha Levin <sashal@kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000034c6c405aa9e2505"
+Cc:     "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH 1/1] inside-secure irq balance
+Message-ID: <20200717075334.vg7nvidds25f5ltb@SvensMacBookAir.hq.voleatech.com>
+References: <20200708150844.2626m3pgdo5oidzm@SvensMacBookAir.sven.lan>
+ <20200716072133.GA28028@gondor.apana.org.au>
+ <CY4PR0401MB3652C2232E0B0A7951B84596C37F0@CY4PR0401MB3652.namprd04.prod.outlook.com>
+ <20200716092136.j4xt2s4ogr7murod@SvensMacbookPro.hq.voleatech.com>
+ <20200716120420.GA31780@gondor.apana.org.au>
+ <20200717050134.dk5naairvhmyyxyu@SvensMacBookAir.sven.lan>
+ <20200717052050.GA2045@gondor.apana.org.au>
+ <20200717063504.sdmjt75oh2jp7z62@SvensMacBookAir.hq.voleatech.com>
+ <20200717065738.GC2504@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200717065738.GC2504@gondor.apana.org.au>
+X-ClientProxiedBy: AM4PR0101CA0081.eurprd01.prod.exchangelabs.com
+ (2603:10a6:200:41::49) To AM4PR0501MB2785.eurprd05.prod.outlook.com
+ (2603:10a6:200:5d::11)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from SvensMacBookAir.hq.voleatech.com (37.24.174.42) by AM4PR0101CA0081.eurprd01.prod.exchangelabs.com (2603:10a6:200:41::49) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.17 via Frontend Transport; Fri, 17 Jul 2020 07:53:35 +0000
+X-Originating-IP: [37.24.174.42]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 729fadcd-04c3-4bfe-beec-08d82a268227
+X-MS-TrafficTypeDiagnostic: AM0PR05MB6372:
+X-Microsoft-Antispam-PRVS: <AM0PR05MB6372AC3BAA471FFA40AF4713EF7C0@AM0PR05MB6372.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: VQJAcud3WgiT97r890S0YHQ714IFZ6h2szfZgNqbapt/AhrVGATYNR+R180hV/aIYlVBfzNPCtm3ZTDXUcyw3eLiqh7JTSNkCou/nDYX3268xzbulYh/F3Y+zamxCMaHDgpMqdejbeStQG+ebY6e1DrqrWWFAdvX5WvDzI/eDK2OKTLnw9tnrLtEvPxZImIgtbfVc5uVkbOgnzHXhwpoyQ02PlU5QnkKx/M+e10kft3O8a0/51O+ryZzB1RLE5QQOqSuADIoDkU8TpLTLQfYrYWH2RRKg1HUY33JYOnQ43cBfrxctEdoJp6Unh2E+O5aisuz1KEhTaRT2kgBweZDZUqvhboK4xhnzRYr84esV+wMT6s9aEwTDfm+fqmd1mTamd7ombptagn46L2qM7fLTw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM4PR0501MB2785.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(396003)(346002)(376002)(39830400003)(136003)(45080400002)(9686003)(55016002)(44832011)(956004)(186003)(316002)(16526019)(26005)(83080400001)(83380400001)(66556008)(6916009)(508600001)(5660300002)(2906002)(66476007)(8676002)(6506007)(66946007)(54906003)(8936002)(52116002)(966005)(1076003)(86362001)(7696005)(4326008);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData: 8ju1CDqd8kZVGDFQVi2SmDyIEAoo5aE4CtFULhy6iC0D+xjG6Z4huXR768e6Q/hRrD8vyyVdeCr6q/xfoDCwrZmgxxvAQH42DW2TpD20wAcCJriOyNajqZlCxSyB+0b3ZoX+lNn+pk+gK5cpNOz9u5AhpOesuvMYNlMryL1xuSfW28Zw8hARuomp/sH5UffS6IEFRdM9qj3tlmcO/fJw/3jFl4tWtiN/noyys3MSDAF/XvU2eC0xptYyb01wKZ+CZN8LKvl4bhlnJlZ7taLJk+PrYMrpwD4c621RXQCJLMrI/0C0rF09uS7Q2FY5fPartGKMWXN5qafzE9z8SvIG9qwOt4bP/jc41yg8Xy9wWcAbyMjrACkAAqbadJ9GngPutzDXsMIX5kF2BMewXf0JtZoQLuJMAQ3pOn9wyp3zP33aekQ1AzrzgRDg/AX3uU8PoGWl5t6f5XiFkNdku+hx5WUkjGpneIJ0uzArzJCZ86I=
+X-OriginatorOrg: voleatech.de
+X-MS-Exchange-CrossTenant-Network-Message-Id: 729fadcd-04c3-4bfe-beec-08d82a268227
+X-MS-Exchange-CrossTenant-AuthSource: AM4PR0501MB2785.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2020 07:53:35.5730
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b82a99f6-7981-4a72-9534-4d35298f847b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MIwTIqVDl4hZ9aZAoj9dqMQxYza1PE0tJsHkLjs0tDE9cft52y5y5DtJV7daLPcAZ4Rv24BuiBZvq5Bh20JWxLyRKqu0yfFzkCf81A/e2dw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6372
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---00000000000034c6c405aa9e2505
-Content-Type: text/plain; charset="UTF-8"
-
-Please find attached the incremental patch that puts back integer
-parts of inst.h. This resolves the conflict with the tip tree.
-
-Uros.
-
-On Fri, Jul 17, 2020 at 8:45 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Fri, Jul 17, 2020 at 08:27:27AM +0200, Uros Bizjak wrote:
+On Fri, Jul 17, 2020 at 04:57:38PM +1000, Herbert Xu wrote:
+> On Fri, Jul 17, 2020 at 08:35:04AM +0200, Sven Auhagen wrote:
 > >
-> > I will prepare a v2 that leaves needed part of inst.h.
->
-> Your patch has already been applied.  So please make it an
-> incremental patch.
->
+> > I disagree as this is common practice among other kernel drivers
+> > like ethernet.
+> > Also this is also beeing done in other crypto drivers not to say
+> > that the speed improvements are pretty significant.
+> > 
+> > irqbalance can of course also do the job but there is no downside
+> > of adding the irq hint in the driver.
+> 
+> If you're going to do this please at least use the function
+> cpumask_local_spread.
+
+I do not have access to a numa node inside the inside secure
+driver and can only use -1 as the cpumask_local_spread numa node.
+Is that what you are looking for?
+
+Best
+Sven
+
+> 
 > Thanks,
-> --
+> -- 
 > Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-
---00000000000034c6c405aa9e2505
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-crypto-x86-Put-back-integer-parts-of-include-asm-ins.patch"
-Content-Disposition: attachment; 
-	filename="0001-crypto-x86-Put-back-integer-parts-of-include-asm-ins.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kcpwl5s60>
-X-Attachment-Id: f_kcpwl5s60
-
-RnJvbSAyYWVkNmQ1YWM0YjU2MTA5MzkyMWZmYjBkMWU0YTMxZDlhZDE1ZDlkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBVcm9zIEJpemphayA8dWJpempha0BnbWFpbC5jb20+CkRhdGU6
-IEZyaSwgMTcgSnVsIDIwMjAgMDk6MjQ6NTMgKzAyMDAKU3ViamVjdDogW1BBVENIXSBjcnlwdG86
-IHg4NiAtIFB1dCBiYWNrIGludGVnZXIgcGFydHMgb2YgaW5jbHVkZS9hc20vaW5zdC5oCgpSZXNv
-bHZlcyBjb25mbGljdCB3aXRoIHRoZSB0aXAgdHJlZS4KClNpZ25lZC1vZmYtYnk6IFVyb3MgQml6
-amFrIDx1Yml6amFrQGdtYWlsLmNvbT4KLS0tCiBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9pbnN0Lmgg
-fCAxNDggKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCiAxIGZpbGUgY2hhbmdl
-ZCwgMTQ4IGluc2VydGlvbnMoKykKIGNyZWF0ZSBtb2RlIDEwMDY0NCBhcmNoL3g4Ni9pbmNsdWRl
-L2FzbS9pbnN0LmgKCmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9pbnN0LmggYi9h
-cmNoL3g4Ni9pbmNsdWRlL2FzbS9pbnN0LmgKbmV3IGZpbGUgbW9kZSAxMDA2NDQKaW5kZXggMDAw
-MDAwMDAwMDAwLi40MzhjY2Q0ZjNjYzQKLS0tIC9kZXYvbnVsbAorKysgYi9hcmNoL3g4Ni9pbmNs
-dWRlL2FzbS9pbnN0LmgKQEAgLTAsMCArMSwxNDggQEAKKy8qIFNQRFgtTGljZW5zZS1JZGVudGlm
-aWVyOiBHUEwtMi4wICovCisvKgorICogR2VuZXJhdGUgLmJ5dGUgY29kZSBmb3Igc29tZSBpbnN0
-cnVjdGlvbnMgbm90IHN1cHBvcnRlZCBieSBvbGQKKyAqIGJpbnV0aWxzLgorICovCisjaWZuZGVm
-IFg4Nl9BU01fSU5TVF9ICisjZGVmaW5lIFg4Nl9BU01fSU5TVF9ICisKKyNpZmRlZiBfX0FTU0VN
-QkxZX18KKworI2RlZmluZSBSRUdfTlVNX0lOVkFMSUQJCTEwMAorCisjZGVmaW5lIFJFR19UWVBF
-X1IzMgkJMAorI2RlZmluZSBSRUdfVFlQRV9SNjQJCTEKKyNkZWZpbmUgUkVHX1RZUEVfSU5WQUxJ
-RAkxMDAKKworCS5tYWNybyBSMzJfTlVNIG9wZCByMzIKKwlcb3BkID0gUkVHX05VTV9JTlZBTElE
-CisJLmlmYyBccjMyLCVlYXgKKwlcb3BkID0gMAorCS5lbmRpZgorCS5pZmMgXHIzMiwlZWN4CisJ
-XG9wZCA9IDEKKwkuZW5kaWYKKwkuaWZjIFxyMzIsJWVkeAorCVxvcGQgPSAyCisJLmVuZGlmCisJ
-LmlmYyBccjMyLCVlYngKKwlcb3BkID0gMworCS5lbmRpZgorCS5pZmMgXHIzMiwlZXNwCisJXG9w
-ZCA9IDQKKwkuZW5kaWYKKwkuaWZjIFxyMzIsJWVicAorCVxvcGQgPSA1CisJLmVuZGlmCisJLmlm
-YyBccjMyLCVlc2kKKwlcb3BkID0gNgorCS5lbmRpZgorCS5pZmMgXHIzMiwlZWRpCisJXG9wZCA9
-IDcKKwkuZW5kaWYKKyNpZmRlZiBDT05GSUdfWDg2XzY0CisJLmlmYyBccjMyLCVyOGQKKwlcb3Bk
-ID0gOAorCS5lbmRpZgorCS5pZmMgXHIzMiwlcjlkCisJXG9wZCA9IDkKKwkuZW5kaWYKKwkuaWZj
-IFxyMzIsJXIxMGQKKwlcb3BkID0gMTAKKwkuZW5kaWYKKwkuaWZjIFxyMzIsJXIxMWQKKwlcb3Bk
-ID0gMTEKKwkuZW5kaWYKKwkuaWZjIFxyMzIsJXIxMmQKKwlcb3BkID0gMTIKKwkuZW5kaWYKKwku
-aWZjIFxyMzIsJXIxM2QKKwlcb3BkID0gMTMKKwkuZW5kaWYKKwkuaWZjIFxyMzIsJXIxNGQKKwlc
-b3BkID0gMTQKKwkuZW5kaWYKKwkuaWZjIFxyMzIsJXIxNWQKKwlcb3BkID0gMTUKKwkuZW5kaWYK
-KyNlbmRpZgorCS5lbmRtCisKKwkubWFjcm8gUjY0X05VTSBvcGQgcjY0CisJXG9wZCA9IFJFR19O
-VU1fSU5WQUxJRAorI2lmZGVmIENPTkZJR19YODZfNjQKKwkuaWZjIFxyNjQsJXJheAorCVxvcGQg
-PSAwCisJLmVuZGlmCisJLmlmYyBccjY0LCVyY3gKKwlcb3BkID0gMQorCS5lbmRpZgorCS5pZmMg
-XHI2NCwlcmR4CisJXG9wZCA9IDIKKwkuZW5kaWYKKwkuaWZjIFxyNjQsJXJieAorCVxvcGQgPSAz
-CisJLmVuZGlmCisJLmlmYyBccjY0LCVyc3AKKwlcb3BkID0gNAorCS5lbmRpZgorCS5pZmMgXHI2
-NCwlcmJwCisJXG9wZCA9IDUKKwkuZW5kaWYKKwkuaWZjIFxyNjQsJXJzaQorCVxvcGQgPSA2CisJ
-LmVuZGlmCisJLmlmYyBccjY0LCVyZGkKKwlcb3BkID0gNworCS5lbmRpZgorCS5pZmMgXHI2NCwl
-cjgKKwlcb3BkID0gOAorCS5lbmRpZgorCS5pZmMgXHI2NCwlcjkKKwlcb3BkID0gOQorCS5lbmRp
-ZgorCS5pZmMgXHI2NCwlcjEwCisJXG9wZCA9IDEwCisJLmVuZGlmCisJLmlmYyBccjY0LCVyMTEK
-Kwlcb3BkID0gMTEKKwkuZW5kaWYKKwkuaWZjIFxyNjQsJXIxMgorCVxvcGQgPSAxMgorCS5lbmRp
-ZgorCS5pZmMgXHI2NCwlcjEzCisJXG9wZCA9IDEzCisJLmVuZGlmCisJLmlmYyBccjY0LCVyMTQK
-Kwlcb3BkID0gMTQKKwkuZW5kaWYKKwkuaWZjIFxyNjQsJXIxNQorCVxvcGQgPSAxNQorCS5lbmRp
-ZgorI2VuZGlmCisJLmVuZG0KKworCS5tYWNybyBSRUdfVFlQRSB0eXBlIHJlZworCVIzMl9OVU0g
-cmVnX3R5cGVfcjMyIFxyZWcKKwlSNjRfTlVNIHJlZ190eXBlX3I2NCBccmVnCisJLmlmIHJlZ190
-eXBlX3I2NCA8PiBSRUdfTlVNX0lOVkFMSUQKKwlcdHlwZSA9IFJFR19UWVBFX1I2NAorCS5lbHNl
-aWYgcmVnX3R5cGVfcjMyIDw+IFJFR19OVU1fSU5WQUxJRAorCVx0eXBlID0gUkVHX1RZUEVfUjMy
-CisJLmVsc2UKKwlcdHlwZSA9IFJFR19UWVBFX0lOVkFMSUQKKwkuZW5kaWYKKwkuZW5kbQorCisJ
-Lm1hY3JvIFBGWF9SRVggb3BkMSBvcGQyIFc9MAorCS5pZiAoKFxvcGQxIHwgXG9wZDIpICYgOCkg
-fHwgXFcKKwkuYnl0ZSAweDQwIHwgKChcb3BkMSAmIDgpID4+IDMpIHwgKChcb3BkMiAmIDgpID4+
-IDEpIHwgKFxXIDw8IDMpCisJLmVuZGlmCisJLmVuZG0KKworCS5tYWNybyBNT0RSTSBtb2Qgb3Bk
-MSBvcGQyCisJLmJ5dGUgXG1vZCB8IChcb3BkMSAmIDcpIHwgKChcb3BkMiAmIDcpIDw8IDMpCisJ
-LmVuZG0KKyNlbmRpZgorCisjZW5kaWYKLS0gCjIuMjYuMgoK
---00000000000034c6c405aa9e2505--
+> Home Page: https://eur03.safelinks.protection.outlook.com/?url=http:%2F%2Fgondor.apana.org.au%2F~herbert%2F&amp;data=02%7C01%7Csven.auhagen%40voleatech.de%7C11ec864588ea43cb2b5508d82a1eb424%7Cb82a99f679814a7295344d35298f847b%7C0%7C1%7C637305658666145675&amp;sdata=U0TRKq1keey2jogZyelLwvwfSpj4SavJAhumM63phs0%3D&amp;reserved=0
+> PGP Key: https://eur03.safelinks.protection.outlook.com/?url=http:%2F%2Fgondor.apana.org.au%2F~herbert%2Fpubkey.txt&amp;data=02%7C01%7Csven.auhagen%40voleatech.de%7C11ec864588ea43cb2b5508d82a1eb424%7Cb82a99f679814a7295344d35298f847b%7C0%7C1%7C637305658666155670&amp;sdata=FDSkrK3t9OMTaA%2FRxMcgKgqU4wVBx%2BomSA%2BUlZtNgBU%3D&amp;reserved=0
