@@ -4,338 +4,158 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EB57C433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 04:47:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C724AC433E8
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 05:01:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11D372071A
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 04:47:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6375C20684
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 05:01:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="iQ2hIQwV"
+	dkim=pass (1024-bit key) header.d=voleatech.de header.i=@voleatech.de header.b="EdQoDfh4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726056AbgGQErF (ORCPT
+        id S1726512AbgGQFBm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jul 2020 00:47:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39076 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725811AbgGQErF (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jul 2020 00:47:05 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72F70C061755;
-        Thu, 16 Jul 2020 21:47:04 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4B7JW62mKtz9sRW;
-        Fri, 17 Jul 2020 14:46:58 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1594961221;
-        bh=oWCQWQTnYs63n2+4mU4tRGhEi0v9vBwzy4mhYDlLzps=;
-        h=Date:From:To:Cc:Subject:From;
-        b=iQ2hIQwVLN+ppQzJbVnKC6uriZjC7QqgkxHAEoqIh0fmFFDhbtf7Jb+ol2sUiSifj
-         knTnZj110bd4oQuy/ACTs0Qt1JDInuJ0lSKNj/fh4m5H/YHs1sJpprb/uO37cdQwyT
-         ANJigPuKeyQAC3OaF5ePGeHwV2rd3FEUQbANJ+v0+kyOGsdOkXDEiYNAG5S/hntDs2
-         /Qo2918at39ql2GmR8R6IPX5f1729epafO0mmHPhCX2W+GvbMzu7npU2REoD2Yil+G
-         WW1f1xAvXW5fdHbk64OGwfvguS6S4RlFlUG1VYvBjzE3kEcGP+OhzMrNuhOpdEu4dH
-         jfQeeFS7IwjSQ==
-Date:   Fri, 17 Jul 2020 14:46:56 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@elte.hu>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Uros Bizjak <ubizjak@gmail.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Sasha Levin <sashal@kernel.org>
-Subject: linux-next: manual merge of the tip tree with the crypto tree
-Message-ID: <20200717144656.4bdbf81f@canb.auug.org.au>
+        Fri, 17 Jul 2020 01:01:42 -0400
+Received: from mail-eopbgr70105.outbound.protection.outlook.com ([40.107.7.105]:49795
+        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725811AbgGQFBk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Jul 2020 01:01:40 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NveI/2UtiMVVChMzFCJR8R/BrFvRDYKCuz5RzHp5GXP4iW0q8EOers+TdOQFBdn0j/x/wGN0Qibk9MO6MwQ7RnETrlhKsDUVClT+cGzmKlEYWJIHtrW1JD+JMEZqexR2z0vtbJPcBZGSv1nJgiE7SiwRHDpNS+HtQV7a2pV7zNFc1/Y5rd+oune4oGvzxR39VTWW1yiKcz5WMWBNYvgIUaWAZfmWkmyILflGLh2zrR+UUeO3ZBOwpHnXAebFWdB6LRb6BlBhLo9XaTLISLLhW9kSbPUFhzDeFVpYlhNzwV9v+ewMoQ5RpDHNVmdjS7H4LIh4QbJBWWEVXHD6BMf33g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H+GU1cA4ySkNeInCS4t9PBR/ZK3bF9Ao8zGMqVIPPGU=;
+ b=YY1IvKxl3wEfybLjLtvqpNrMesTkBpqSU5KuWRSpz2MqiNyZrG8pUZOQiRT4rXW+L3vXO8NHqxioBcQPzELBgyPnVvtMxDzljz+SycBKc+bT5Jj59Eto0/nYTVfkNqofy26TgPvFJGA72ykcrHi7ysASO4tJnC0gjxfimKZmf9H2honukZbHSDbxS1jD8S65DvdHRs4p0EuCqNzH0G0NqvQ4tsZqKYUUpi7nW3oOd9M7N2d5K2oBLPbqGWWRpJ2QiSRhrg0QSHlIh1DrPZWAH1pI09+4BXPEa+rrbnOmQDy1Jk2DmWErxZFPzVxEDjFea57btUAk8eruV/QquRu0ew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=voleatech.de; dmarc=pass action=none header.from=voleatech.de;
+ dkim=pass header.d=voleatech.de; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=voleatech.de;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H+GU1cA4ySkNeInCS4t9PBR/ZK3bF9Ao8zGMqVIPPGU=;
+ b=EdQoDfh4lUE5f/BrOw4v44GH5ncRA3cNppOJFElJNGvqTTYxZT0WYzuk8HDKoBxx1FLKE3K/2QOV7oNnJGIjMiioR7PQnl/XERfyHdgyZtJpUOjCPph6sv1zEcn1jvBkKx6bTppV4ykO3zEyzdu0R8D8hjh4kLQnCMiewE/VI9o=
+Authentication-Results: gondor.apana.org.au; dkim=none (message not signed)
+ header.d=none;gondor.apana.org.au; dmarc=none action=none
+ header.from=voleatech.de;
+Received: from AM4PR0501MB2785.eurprd05.prod.outlook.com
+ (2603:10a6:200:5d::11) by AM4PR05MB3396.eurprd05.prod.outlook.com
+ (2603:10a6:205:5::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.23; Fri, 17 Jul
+ 2020 05:01:35 +0000
+Received: from AM4PR0501MB2785.eurprd05.prod.outlook.com
+ ([fe80::39a1:e237:5fef:6f39]) by AM4PR0501MB2785.eurprd05.prod.outlook.com
+ ([fe80::39a1:e237:5fef:6f39%11]) with mapi id 15.20.3174.027; Fri, 17 Jul
+ 2020 05:01:35 +0000
+Date:   Fri, 17 Jul 2020 07:01:34 +0200
+From:   Sven Auhagen <sven.auhagen@voleatech.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH 1/1] inside-secure irq balance
+Message-ID: <20200717050134.dk5naairvhmyyxyu@SvensMacBookAir.sven.lan>
+References: <20200708150844.2626m3pgdo5oidzm@SvensMacBookAir.sven.lan>
+ <20200716072133.GA28028@gondor.apana.org.au>
+ <CY4PR0401MB3652C2232E0B0A7951B84596C37F0@CY4PR0401MB3652.namprd04.prod.outlook.com>
+ <20200716092136.j4xt2s4ogr7murod@SvensMacbookPro.hq.voleatech.com>
+ <20200716120420.GA31780@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200716120420.GA31780@gondor.apana.org.au>
+X-ClientProxiedBy: AM0PR03CA0086.eurprd03.prod.outlook.com
+ (2603:10a6:208:69::27) To AM4PR0501MB2785.eurprd05.prod.outlook.com
+ (2603:10a6:200:5d::11)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/qFh0fIP7XemDn+0mQcZbzqg";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from SvensMacBookAir.sven.lan (109.193.235.168) by AM0PR03CA0086.eurprd03.prod.outlook.com (2603:10a6:208:69::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.18 via Frontend Transport; Fri, 17 Jul 2020 05:01:35 +0000
+X-Originating-IP: [109.193.235.168]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d26d186e-77f3-46ab-fc17-08d82a0e7b03
+X-MS-TrafficTypeDiagnostic: AM4PR05MB3396:
+X-Microsoft-Antispam-PRVS: <AM4PR05MB3396C327F062CDDAF30191D3EF7C0@AM4PR05MB3396.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: K4uw2bBFvpzRQjHWCHXl013hiYrzKeZ3M8M5twfDfVkShHuYkGody2fG7JyKQP/Fd2wQmVqTfoJtVh/L1naWKDuPCT796ePIrxGy37iUYAeOviytZmh1WQWMIvzu7WSeh449edfuZrigAbau98Xu1gt6HbXnduQsWbT9JdahLblEk1JR9TnlstmQjB7+qEQCvN14FNWhXpJSUOhQ89/bPE++ZZEOXiSlhajwzbOZh7EmuGMxCTrlSCjYabIqEDP5W9pvf8G9MEZEB84uukcq8vbD2ShvQnLDAC768heJuZTlZbXhyS9bVkVLJXvgpZ/n98fMypUW52/DpQoyQf92ykNG+TVRY37kXBIm20M/CXaj3WBPGqcGikTmuMCkHWE6UVURgZiSBJpspmgvC1+cOw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM4PR0501MB2785.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(136003)(346002)(366004)(396003)(39830400003)(83080400001)(316002)(7696005)(86362001)(52116002)(44832011)(26005)(9686003)(54906003)(55016002)(45080400002)(966005)(508600001)(956004)(6506007)(4326008)(16526019)(66946007)(6916009)(1076003)(2906002)(66476007)(186003)(8676002)(8936002)(66556008)(5660300002)(83380400001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData: LO7pnNich7OTq/8/Px/y/fwsJ4LD2LOQVrTZfLnTzfN+gvW64VtQpXlDjDr84SrBSvwhwh1kYgvEY1UbBCsHkKTtw/xXvg1PE9Wu/b2UKJwsPA2QIC0379UyLun+Yxufvfcx01/AslAGxDYh6G0xWoGNl7M/ebgx8avfmXFf7KwaX9/dX2CsV4uw9+palTzB2ScnmyPxKwW0PgNFEK0Cw4kohPUTxTUPBSssMACj4ifJu43pYQKVCtrQCMyxZZWMioigUcjPgwL3cekVLyZd+KS/tKjZDW2SviylB77+RHfMa72w+mpfALbxGHyIypLLSCAlhVF7S9q9BLQvqwzS6NjK3haG6zXAzmpiWQfmJOvgvthpgeMK0tkdu4oZFlpMFAcl/+eaw0V39maIbdIRqOmHYU5XfRjvfjxXddb+qFEcsvQAyOTYMHuV7WOBkScVfBoGsxUajQTfzf0doIoOpAJK9oqS+r0cl3TVDnYV82NyKLwJEKgj7uYD3dYr1axH
+X-OriginatorOrg: voleatech.de
+X-MS-Exchange-CrossTenant-Network-Message-Id: d26d186e-77f3-46ab-fc17-08d82a0e7b03
+X-MS-Exchange-CrossTenant-AuthSource: AM4PR0501MB2785.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2020 05:01:35.6751
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b82a99f6-7981-4a72-9534-4d35298f847b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lkY6WfY6X+qYRaF6WY/3UTMvrGBZcuHir0jTVeb+dZQBxeWR0o1PK8AfMx6BcGybssiQ20gMx8/sXuWz5y+lILqIcs/cehkduL1JX02T8ZU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM4PR05MB3396
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/qFh0fIP7XemDn+0mQcZbzqg
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jul 16, 2020 at 10:04:20PM +1000, Herbert Xu wrote:
+> On Thu, Jul 16, 2020 at 11:21:36AM +0200, Sven Auhagen wrote:
+> >
+> > You are correct, let me have a look at how to get the cpu bit correctly.
+> > Well everything runs on the first CPU now, what do you do if that does down or up?
+> > I think there is no mechanism in general at the moment for the current or my implementation.
+> 
+> Unless the driver changed it the default affinity should be all
+> CPUs, no? In which case if the first CPU goes down it'll just move
+> to the second CPU.
 
-Hi all,
+Alright, that makes sense, thank you.
 
-Today's linux-next merge of the tip tree got a conflict in:
+As I said in my second email yesterday, it is just a hint and not binding.
+I run some tests and here is what happens when I disable CPU3 on my 4 Core MCBin:
 
-  arch/x86/include/asm/inst.h
+[641628.819934] crypto-safexcel f2800000.crypto: EIP197:241(0,1,4,4)-HIA:230(2,6,6),PE:133/332,alg:7ffdf000
+[641628.823954] crypto-safexcel f2800000.crypto: TRC init: 15360d,80a (48r,256h)
+[641628.825326] crypto-safexcel f2800000.crypto: firmware: direct-loading firmware inside-secure/eip197b/ifpp.bin
+[641628.825693] crypto-safexcel f2800000.crypto: firmware: direct-loading firmware inside-secure/eip197b/ipue.bin
+[641629.033302] alg: No test for authenc(hmac(sha224),cbc(aes)) (safexcel-authenc-hmac-sha224-cbc-aes)
+[641629.044442] alg: No test for authenc(hmac(sha384),cbc(aes)) (safexcel-authenc-hmac-sha384-cbc-aes)
+[641629.057356] alg: No test for authenc(hmac(sha224),rfc3686(ctr(aes))) (safexcel-authenc-hmac-sha224-ctr-aes)
+[641698.795895] IRQ 38: no longer affine to CPU3
+[641698.795917] IRQ 54: no longer affine to CPU3
+[641698.795928] IRQ 59: no longer affine to CPU3
+[641698.795942] IRQ69: set affinity failed(-22).
+[641698.795950] IRQ70: set affinity failed(-22).
+[641698.795959] IRQ73: set affinity failed(-22).
+[641698.795969] IRQ 77: no longer affine to CPU3
+[641698.796131] CPU3: shutdown
+[641698.796156] psci: CPU3 killed (polled 0 ms)
 
-between commit:
+74:       1363          0          0   ICU-NSR  88 Level     f2800000.crypto
+75:          0       1772          0   ICU-NSR  89 Level     f2800000.crypto
+76:          0          0       1427   ICU-NSR  90 Level     f2800000.crypto
+77:          0          0          0   ICU-NSR  91 Level     f2800000.crypto
 
-  d7866e503bdc ("crypto: x86 - Remove include/asm/inst.h")
+IRQ 77 was bound to CPU3 via the hint is no longer affine now
+and actually bound to CPU0.
 
-from the crypto tree and commit:
+When I disable CPU1 and CPU3 and load the module I get:
 
-  eaad981291ee ("x86/entry/64: Introduce the FIND_PERCPU_BASE macro")
+74:       4089          0   ICU-NSR  88 Level     f2800000.crypto
+75:       1772          0   ICU-NSR  89 Level     f2800000.crypto
+76:       1427       2854   ICU-NSR  90 Level     f2800000.crypto
+77:       2824          0   ICU-NSR  91 Level     f2800000.crypto
 
-from the tip tree.
+where you can see that the affinity hint is ignored for CPU1
+which is selected because of number of cpus online is 2 now.
 
-I fixed it up (I brought the file back but removed what the crypto tree
-no longer needed - see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
+Does that answer your question?
 
-I think if the crypto tree brought back this file as well (even without
-the RDPID macro, it would make this conflict much more manageable.
-
-/* SPDX-License-Identifier: GPL-2.0 */
-/*
- * Generate .byte code for some instructions not supported by old
- * binutils.
- */
-#ifndef X86_ASM_INST_H
-#define X86_ASM_INST_H
-
-#ifdef __ASSEMBLY__
-
-#define REG_NUM_INVALID		100
-
-#define REG_TYPE_R32		0
-#define REG_TYPE_R64		1
-#define REG_TYPE_XMM		2
-#define REG_TYPE_INVALID	100
-
-	.macro R32_NUM opd r32
-	\opd =3D REG_NUM_INVALID
-	.ifc \r32,%eax
-	\opd =3D 0
-	.endif
-	.ifc \r32,%ecx
-	\opd =3D 1
-	.endif
-	.ifc \r32,%edx
-	\opd =3D 2
-	.endif
-	.ifc \r32,%ebx
-	\opd =3D 3
-	.endif
-	.ifc \r32,%esp
-	\opd =3D 4
-	.endif
-	.ifc \r32,%ebp
-	\opd =3D 5
-	.endif
-	.ifc \r32,%esi
-	\opd =3D 6
-	.endif
-	.ifc \r32,%edi
-	\opd =3D 7
-	.endif
-#ifdef CONFIG_X86_64
-	.ifc \r32,%r8d
-	\opd =3D 8
-	.endif
-	.ifc \r32,%r9d
-	\opd =3D 9
-	.endif
-	.ifc \r32,%r10d
-	\opd =3D 10
-	.endif
-	.ifc \r32,%r11d
-	\opd =3D 11
-	.endif
-	.ifc \r32,%r12d
-	\opd =3D 12
-	.endif
-	.ifc \r32,%r13d
-	\opd =3D 13
-	.endif
-	.ifc \r32,%r14d
-	\opd =3D 14
-	.endif
-	.ifc \r32,%r15d
-	\opd =3D 15
-	.endif
-#endif
-	.endm
-
-	.macro R64_NUM opd r64
-	\opd =3D REG_NUM_INVALID
-#ifdef CONFIG_X86_64
-	.ifc \r64,%rax
-	\opd =3D 0
-	.endif
-	.ifc \r64,%rcx
-	\opd =3D 1
-	.endif
-	.ifc \r64,%rdx
-	\opd =3D 2
-	.endif
-	.ifc \r64,%rbx
-	\opd =3D 3
-	.endif
-	.ifc \r64,%rsp
-	\opd =3D 4
-	.endif
-	.ifc \r64,%rbp
-	\opd =3D 5
-	.endif
-	.ifc \r64,%rsi
-	\opd =3D 6
-	.endif
-	.ifc \r64,%rdi
-	\opd =3D 7
-	.endif
-	.ifc \r64,%r8
-	\opd =3D 8
-	.endif
-	.ifc \r64,%r9
-	\opd =3D 9
-	.endif
-	.ifc \r64,%r10
-	\opd =3D 10
-	.endif
-	.ifc \r64,%r11
-	\opd =3D 11
-	.endif
-	.ifc \r64,%r12
-	\opd =3D 12
-	.endif
-	.ifc \r64,%r13
-	\opd =3D 13
-	.endif
-	.ifc \r64,%r14
-	\opd =3D 14
-	.endif
-	.ifc \r64,%r15
-	\opd =3D 15
-	.endif
-#endif
-	.endm
-
-	.macro XMM_NUM opd xmm
-	\opd =3D REG_NUM_INVALID
-	.ifc \xmm,%xmm0
-	\opd =3D 0
-	.endif
-	.ifc \xmm,%xmm1
-	\opd =3D 1
-	.endif
-	.ifc \xmm,%xmm2
-	\opd =3D 2
-	.endif
-	.ifc \xmm,%xmm3
-	\opd =3D 3
-	.endif
-	.ifc \xmm,%xmm4
-	\opd =3D 4
-	.endif
-	.ifc \xmm,%xmm5
-	\opd =3D 5
-	.endif
-	.ifc \xmm,%xmm6
-	\opd =3D 6
-	.endif
-	.ifc \xmm,%xmm7
-	\opd =3D 7
-	.endif
-	.ifc \xmm,%xmm8
-	\opd =3D 8
-	.endif
-	.ifc \xmm,%xmm9
-	\opd =3D 9
-	.endif
-	.ifc \xmm,%xmm10
-	\opd =3D 10
-	.endif
-	.ifc \xmm,%xmm11
-	\opd =3D 11
-	.endif
-	.ifc \xmm,%xmm12
-	\opd =3D 12
-	.endif
-	.ifc \xmm,%xmm13
-	\opd =3D 13
-	.endif
-	.ifc \xmm,%xmm14
-	\opd =3D 14
-	.endif
-	.ifc \xmm,%xmm15
-	\opd =3D 15
-	.endif
-	.endm
-
-	.macro REG_TYPE type reg
-	R32_NUM reg_type_r32 \reg
-	R64_NUM reg_type_r64 \reg
-	XMM_NUM reg_type_xmm \reg
-	.if reg_type_r64 <> REG_NUM_INVALID
-	\type =3D REG_TYPE_R64
-	.elseif reg_type_r32 <> REG_NUM_INVALID
-	\type =3D REG_TYPE_R32
-	.elseif reg_type_xmm <> REG_NUM_INVALID
-	\type =3D REG_TYPE_XMM
-	.else
-	\type =3D REG_TYPE_INVALID
-	.endif
-	.endm
-
-	.macro PFX_OPD_SIZE
-	.byte 0x66
-	.endm
-
-	.macro PFX_REX opd1 opd2 W=3D0
-	.if ((\opd1 | \opd2) & 8) || \W
-	.byte 0x40 | ((\opd1 & 8) >> 3) | ((\opd2 & 8) >> 1) | (\W << 3)
-	.endif
-	.endm
-
-	.macro MODRM mod opd1 opd2
-	.byte \mod | (\opd1 & 7) | ((\opd2 & 7) << 3)
-	.endm
-
-.macro RDPID opd
-	REG_TYPE rdpid_opd_type \opd
-	.if rdpid_opd_type =3D=3D REG_TYPE_R64
-	R64_NUM rdpid_opd \opd
-	.else
-	R32_NUM rdpid_opd \opd
-	.endif
-	.byte 0xf3
-	.if rdpid_opd > 7
-	PFX_REX rdpid_opd 0
-	.endif
-	.byte 0x0f, 0xc7
-	MODRM 0xc0 rdpid_opd 0x7
-.endm
-#endif
-
-#endif
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/qFh0fIP7XemDn+0mQcZbzqg
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8RLUAACgkQAVBC80lX
-0GzX5wf/bMv33RnMLoOXbHMcGzegM54nfMV2XRxB1jQXtVhccQYfPJgPnVxePZvu
-2vsg9kX3IzyMNhH7NTWEEit5TJD7zYtjiOFT3F2GyXUXm2dRSAUrMwhInhp8pMXi
-vmjkNpqtLYTuOd8y5FdxQ63SFTzfrZYx6flm3LqijqhjeEAtPnZf7KXkgNXYc+XM
-X7AGFG5opT2Kj+XmshK+wY6a8rPMMx6ePeuDLcgcEYS4Ptci7w1vWietL4D9+OGZ
-Ap5QEep6IiNPznAme91cjpSbCRHno1U80h/To2mnIeSGZA963zyuiwex19SGh47x
-XxUh2t1mETrz5xEo6wF6+zXnH02Y2g==
-=rH1W
------END PGP SIGNATURE-----
-
---Sig_/qFh0fIP7XemDn+0mQcZbzqg--
+Best
+Sven
+> 
+> Cheers,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: https://eur03.safelinks.protection.outlook.com/?url=http:%2F%2Fgondor.apana.org.au%2F~herbert%2F&amp;data=02%7C01%7Csven.auhagen%40voleatech.de%7C0790b23c7a61493c8bfe08d82980621d%7Cb82a99f679814a7295344d35298f847b%7C0%7C1%7C637304978692090806&amp;sdata=QZUqtMuwN8vOxUK1tjFiENuwPD6gIxHpTvntLdbqTqg%3D&amp;reserved=0
+> PGP Key: https://eur03.safelinks.protection.outlook.com/?url=http:%2F%2Fgondor.apana.org.au%2F~herbert%2Fpubkey.txt&amp;data=02%7C01%7Csven.auhagen%40voleatech.de%7C0790b23c7a61493c8bfe08d82980621d%7Cb82a99f679814a7295344d35298f847b%7C0%7C1%7C637304978692090806&amp;sdata=Z3GYc1YWWeenCLYZUKXxzwWDQnrmvEuBHStIcPFcOp0%3D&amp;reserved=0
