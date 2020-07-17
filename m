@@ -3,338 +3,130 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B67FC28E89
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 06:27:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30841C433E2
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 06:35:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 072412176B
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 06:27:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4DE62071A
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 06:35:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZixpRszN"
+	dkim=pass (1024-bit key) header.d=voleatech.de header.i=@voleatech.de header.b="gVk20ptY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727833AbgGQG1l (ORCPT
+        id S1726858AbgGQGfJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jul 2020 02:27:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54466 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726962AbgGQG1j (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jul 2020 02:27:39 -0400
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754E3C061755;
-        Thu, 16 Jul 2020 23:27:39 -0700 (PDT)
-Received: by mail-qv1-xf31.google.com with SMTP id dm12so3821754qvb.9;
-        Thu, 16 Jul 2020 23:27:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=A3qqFF9yd3EKW/+nagLOaGgu79oDzMUA/VxmH16ttug=;
-        b=ZixpRszNUNTbAzJhX/ocpWCSZ9iF+5uvw17oQTar95O/SvFbUASypBidCkEVY9HMLF
-         SwkhIbNuNlOszMxEazsN/bF20wXIYRLh5nkCTA//BjMDxuqAP8oLeiSKFLnfaj4PHWUo
-         jnjLHvlOwajtqkaBjc2ET2Vns9Gm/fgMocFZI7DGd/U3sSqo+fmqVDwMWu1GxqQ+NKew
-         tRDeYwRvL4co/lxvjH/JBzB/4UMCJPi+DcmJe1vgxnmpNtyOFi6XL9WYPW/a0umAKqlq
-         9hSP7eF5XH2TM7zRdeHWoTe+1ASmGZcjkr0HI32/qFbU050sZtA9cxw34YzFDdRDeR/l
-         j2fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=A3qqFF9yd3EKW/+nagLOaGgu79oDzMUA/VxmH16ttug=;
-        b=P4gb6TFYFgJFQiXSBe1VydgUSQ1XQ+VlhZmeXUUXsI/xx43d7QxOmtVWpm81ce0oM4
-         ckG77RGv41Zc5Zssuza179KbArAOEprqQw5RULrkj0uRJILAv46uF72imI6hkB8eWhFW
-         f3D9XGH15aCLY3Vo3++2OfzLGSPiX/Zv6QLBSVXftfXyI4ATNRelT0GWEAQc1gNR/uDB
-         vv286sXOTAvbdt329fUPTq2FoBY+rbVQftWYdA0cKxe5gx19Zq2H1rIK4tjVl6l6nBkv
-         eKq+A2+UlwX0JEPR+GBqUV/9g4yC73VP2sdpTDWah7PHKg+uOBLbvgTXCjej/LvCCF1i
-         wqvw==
-X-Gm-Message-State: AOAM533zatl2Ro2odTZdzAhMfCVh53E27YL0F+uPkxPRYJdUYIB1ZC50
-        LeMycu8mFOstm/HD8qlWE3fi3qF34uRVFYOc+EjKGWIX
-X-Google-Smtp-Source: ABdhPJwZWWO4WoZvg8RmUJxWGouo5QxAZHQLboX1iGjpX0vnF24PIbk3GO27rwGBsGCQZvrN9AnVJoO4Auo5M6hOVfQ=
-X-Received: by 2002:a05:6214:1586:: with SMTP id m6mr7428351qvw.171.1594967258230;
- Thu, 16 Jul 2020 23:27:38 -0700 (PDT)
+        Fri, 17 Jul 2020 02:35:09 -0400
+Received: from mail-am6eur05on2119.outbound.protection.outlook.com ([40.107.22.119]:45824
+        "EHLO EUR05-AM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726141AbgGQGfI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Jul 2020 02:35:08 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=C1u+5Nm2tKgcDs1bWRP3cFioKBjR3D48OgriLXM8xBs5nNRYV/8XdqtGZ3+YgyuTZR+uRPZJi+2WdYKyq0cSrFbxJt9IMXPdcKgQgqczfPbNZzL7ZZ4+0PRnrjxZ9e/ieqnQEYQ6QDYMalXjV2zFW9hawidHaWGNxxARlA4MXSP8b3Iumv6xNmB1Fiso7NgYUfaVfJ/hJghze3juSY/jvaJRYFQclhCNzi6kBi7499rxJ26wL73wpMR/yy3+I6c33AaxbfT/fdyJwPTHQve6TkORGGooIMBLpTtzapoSIST/MsWNWcQe5gDOz3PBhEoW9l3w5WWtNvrtLU/jgwwxPQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/1FxIkmPd7WXxgbOU8u1skX6n9OkSsx0Z7PINYR0pEs=;
+ b=aPGC92IJBWGRxsyFkS4ZKL8o/Y7dQPRgRlannweute4Iosj4P6D79ebMBSmQ/LvMw5bh9dUHpSaLFb2HsYig/Ohz8tQUGKp86ZLAMPjHdGHezZdLAtvJPhH/d/FLR+cfKcRKYpf29kCi4N2I/8TM2Cl0Rf0WqlphxSybTTGz/8YRkQVd9nTiMPbe+GqvsuI815FF0atJWgKqhMhREBlAHw3IBGM1v0kPkNNEADmoGO1XTYY9f0kl9fMq9jAhz6yc5f96HrmflvH2KehX9W1kzhSjllCruFAXqjmdRC+FcBZDowvZMXAj3QnaRjGm7wNeeuUgZR0Q89dvtdxwgcrO9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=voleatech.de; dmarc=pass action=none header.from=voleatech.de;
+ dkim=pass header.d=voleatech.de; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=voleatech.de;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/1FxIkmPd7WXxgbOU8u1skX6n9OkSsx0Z7PINYR0pEs=;
+ b=gVk20ptYJL6CCBnU34eQCibCDIvffDilX3/UQhZbvW7xbib79GMFmTAGYF5wudcpKlERbpPQraM3EcmT4sj+Gy7v+37RKUE5VcUh5yFBNI5T95vRE72zRje2VvABNN2A2I1WYrrdvnjwje03MKrP6SgpAkRffX7bQ/yohxtt060=
+Authentication-Results: gondor.apana.org.au; dkim=none (message not signed)
+ header.d=none;gondor.apana.org.au; dmarc=none action=none
+ header.from=voleatech.de;
+Received: from AM4PR0501MB2785.eurprd05.prod.outlook.com
+ (2603:10a6:200:5d::11) by AM0PR05MB4722.eurprd05.prod.outlook.com
+ (2603:10a6:208:b8::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.24; Fri, 17 Jul
+ 2020 06:35:05 +0000
+Received: from AM4PR0501MB2785.eurprd05.prod.outlook.com
+ ([fe80::39a1:e237:5fef:6f39]) by AM4PR0501MB2785.eurprd05.prod.outlook.com
+ ([fe80::39a1:e237:5fef:6f39%11]) with mapi id 15.20.3174.027; Fri, 17 Jul
+ 2020 06:35:05 +0000
+Date:   Fri, 17 Jul 2020 08:35:04 +0200
+From:   Sven Auhagen <sven.auhagen@voleatech.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH 1/1] inside-secure irq balance
+Message-ID: <20200717063504.sdmjt75oh2jp7z62@SvensMacBookAir.hq.voleatech.com>
+References: <20200708150844.2626m3pgdo5oidzm@SvensMacBookAir.sven.lan>
+ <20200716072133.GA28028@gondor.apana.org.au>
+ <CY4PR0401MB3652C2232E0B0A7951B84596C37F0@CY4PR0401MB3652.namprd04.prod.outlook.com>
+ <20200716092136.j4xt2s4ogr7murod@SvensMacbookPro.hq.voleatech.com>
+ <20200716120420.GA31780@gondor.apana.org.au>
+ <20200717050134.dk5naairvhmyyxyu@SvensMacBookAir.sven.lan>
+ <20200717052050.GA2045@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200717052050.GA2045@gondor.apana.org.au>
+X-ClientProxiedBy: AM0PR03CA0093.eurprd03.prod.outlook.com
+ (2603:10a6:208:69::34) To AM4PR0501MB2785.eurprd05.prod.outlook.com
+ (2603:10a6:200:5d::11)
 MIME-Version: 1.0
-References: <20200717144656.4bdbf81f@canb.auug.org.au>
-In-Reply-To: <20200717144656.4bdbf81f@canb.auug.org.au>
-From:   Uros Bizjak <ubizjak@gmail.com>
-Date:   Fri, 17 Jul 2020 08:27:27 +0200
-Message-ID: <CAFULd4Ye2d-8BY7aY+_2tYwcXsfSCe3O6aJ4LF0KhvWTjVt0rA@mail.gmail.com>
-Subject: Re: linux-next: manual merge of the tip tree with the crypto tree
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@elte.hu>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Sasha Levin <sashal@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from SvensMacBookAir.hq.voleatech.com (37.24.174.42) by AM0PR03CA0093.eurprd03.prod.outlook.com (2603:10a6:208:69::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.18 via Frontend Transport; Fri, 17 Jul 2020 06:35:04 +0000
+X-Originating-IP: [37.24.174.42]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 179cab0a-a31e-41f6-dac9-08d82a1b8a9d
+X-MS-TrafficTypeDiagnostic: AM0PR05MB4722:
+X-Microsoft-Antispam-PRVS: <AM0PR05MB47228D551148B1CDDA7002ACEF7C0@AM0PR05MB4722.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: FX65HXdGDXWOgjREdH8TLrEdr/anRKckCw9CpNa+v3XfdryqQ+TUVuk29iRQL/4zF7+5bcNdysGr/UShIwqXk+VtFvdX1bE/z7hAseX+qEo1oi3myGRyW2rj4tzopbf1utcMgGjDIFwoVN+8N13HsG04hYAtJGrRByl73DzKGieBpuJJ+g6reJftme9qPrer6/Nnv6ak/YlelSBYKPWTeUMnB6pDOkclLQ/QVkJ9K4HQs8z8/mtVuCB4392gFMELs6IqHZhyHg49qoTxyIFlPkF38fWIYrzTbMZKnWBIkj1kaBCQlIivSPbeXyPmiPk1K6drPWlaUStyRShwYoNIEP3HV0l3fTEBupnjiSqAcGyyzCM8qBFVlX1zEcsJpfVNJvkSt9wiWzY2yid0aLAkwQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM4PR0501MB2785.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(39830400003)(396003)(376002)(346002)(136003)(7696005)(8676002)(54906003)(52116002)(508600001)(1076003)(16526019)(186003)(966005)(9686003)(44832011)(2906002)(8936002)(4326008)(55016002)(66946007)(6506007)(956004)(6916009)(83080400001)(316002)(26005)(66476007)(5660300002)(45080400002)(66556008)(86362001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData: gP0dABOWdQoG6jEPiDYQKcNkavKrrZ3Ucfeuu6/vfi2lt9HVFXPwgVQhnFbNQBSwElg7ROAHlZ/Awc3gl8ZB5EANYpg+ESYmpWYTQPdFu8pRsEH4iKvLFXZ52D9lgdmpiMM64JndKrsVusBAfXbjFYT8/83DhVrZrefZPPDwe3NVG8Q12gkIU4x2I4WEnrNZKCtnX40IJvq4SL3XFqjmJNRdr9mumRrP0xmFEye+tByuZaPb8/pzANJXw26jgOhk5MR5hyorkIz1BT8z/l8iry+C3qcN4YKDOueG8jVSNrXxXa5DY3zKq5weKjuLDuRevvOm+g7eY/oZE0oyrJi0BkXoIMUwwj0pS4xjTXKQv4GrnIourV/q0p4ei/bLhJ8K92JNVS6HER10ev1n3naxKmDxYa3fXjYOp077AYkRwwO1p3VDNEaBcX7+m0QgFIZatM9WWZXGoielIzzKd3hg4xoiBuYm5FkeN9ELX9/f6hY=
+X-OriginatorOrg: voleatech.de
+X-MS-Exchange-CrossTenant-Network-Message-Id: 179cab0a-a31e-41f6-dac9-08d82a1b8a9d
+X-MS-Exchange-CrossTenant-AuthSource: AM4PR0501MB2785.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2020 06:35:05.3008
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b82a99f6-7981-4a72-9534-4d35298f847b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3Kqo5Y7eJPuA4Cpjuzi+GetNjZJq9EmTrR/jely9shQSF1y0ocGPkhaRW1JyMNidM4xoCQ3fd9ADzTiglhJmqJEy/DF0Ku6PtYHaeikGsPc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB4722
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 17, 2020 at 6:47 AM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->
-> Hi all,
->
-> Today's linux-next merge of the tip tree got a conflict in:
->
->   arch/x86/include/asm/inst.h
->
-> between commit:
->
->   d7866e503bdc ("crypto: x86 - Remove include/asm/inst.h")
->
-> from the crypto tree and commit:
->
->   eaad981291ee ("x86/entry/64: Introduce the FIND_PERCPU_BASE macro")
->
-> from the tip tree.
->
-> I fixed it up (I brought the file back but removed what the crypto tree
-> no longer needed - see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
->
-> I think if the crypto tree brought back this file as well (even without
-> the RDPID macro, it would make this conflict much more manageable.
+On Fri, Jul 17, 2020 at 03:20:50PM +1000, Herbert Xu wrote:
+> On Fri, Jul 17, 2020 at 07:01:34AM +0200, Sven Auhagen wrote:
+> >
+> > Alright, that makes sense, thank you.
+> > 
+> > As I said in my second email yesterday, it is just a hint and not binding.
+> > I run some tests and here is what happens when I disable CPU3 on my 4 Core MCBin:
+> 
+> I don't think we should be adding policy logic like this into
+> individual drivers.  If the kernel should be doing this at all
+> it should be done in the IRQ layer.  The alternative is to do
+> it in user-space through irqbalance.
 
-I will prepare a v2 that leaves needed part of inst.h.
+I disagree as this is common practice among other kernel drivers
+like ethernet.
+Also this is also beeing done in other crypto drivers not to say
+that the speed improvements are pretty significant.
 
-Uros.
+irqbalance can of course also do the job but there is no downside
+of adding the irq hint in the driver.
 
-> /* SPDX-License-Identifier: GPL-2.0 */
-> /*
->  * Generate .byte code for some instructions not supported by old
->  * binutils.
->  */
-> #ifndef X86_ASM_INST_H
-> #define X86_ASM_INST_H
->
-> #ifdef __ASSEMBLY__
->
-> #define REG_NUM_INVALID         100
->
-> #define REG_TYPE_R32            0
-> #define REG_TYPE_R64            1
-> #define REG_TYPE_XMM            2
-> #define REG_TYPE_INVALID        100
->
->         .macro R32_NUM opd r32
->         \opd = REG_NUM_INVALID
->         .ifc \r32,%eax
->         \opd = 0
->         .endif
->         .ifc \r32,%ecx
->         \opd = 1
->         .endif
->         .ifc \r32,%edx
->         \opd = 2
->         .endif
->         .ifc \r32,%ebx
->         \opd = 3
->         .endif
->         .ifc \r32,%esp
->         \opd = 4
->         .endif
->         .ifc \r32,%ebp
->         \opd = 5
->         .endif
->         .ifc \r32,%esi
->         \opd = 6
->         .endif
->         .ifc \r32,%edi
->         \opd = 7
->         .endif
-> #ifdef CONFIG_X86_64
->         .ifc \r32,%r8d
->         \opd = 8
->         .endif
->         .ifc \r32,%r9d
->         \opd = 9
->         .endif
->         .ifc \r32,%r10d
->         \opd = 10
->         .endif
->         .ifc \r32,%r11d
->         \opd = 11
->         .endif
->         .ifc \r32,%r12d
->         \opd = 12
->         .endif
->         .ifc \r32,%r13d
->         \opd = 13
->         .endif
->         .ifc \r32,%r14d
->         \opd = 14
->         .endif
->         .ifc \r32,%r15d
->         \opd = 15
->         .endif
-> #endif
->         .endm
->
->         .macro R64_NUM opd r64
->         \opd = REG_NUM_INVALID
-> #ifdef CONFIG_X86_64
->         .ifc \r64,%rax
->         \opd = 0
->         .endif
->         .ifc \r64,%rcx
->         \opd = 1
->         .endif
->         .ifc \r64,%rdx
->         \opd = 2
->         .endif
->         .ifc \r64,%rbx
->         \opd = 3
->         .endif
->         .ifc \r64,%rsp
->         \opd = 4
->         .endif
->         .ifc \r64,%rbp
->         \opd = 5
->         .endif
->         .ifc \r64,%rsi
->         \opd = 6
->         .endif
->         .ifc \r64,%rdi
->         \opd = 7
->         .endif
->         .ifc \r64,%r8
->         \opd = 8
->         .endif
->         .ifc \r64,%r9
->         \opd = 9
->         .endif
->         .ifc \r64,%r10
->         \opd = 10
->         .endif
->         .ifc \r64,%r11
->         \opd = 11
->         .endif
->         .ifc \r64,%r12
->         \opd = 12
->         .endif
->         .ifc \r64,%r13
->         \opd = 13
->         .endif
->         .ifc \r64,%r14
->         \opd = 14
->         .endif
->         .ifc \r64,%r15
->         \opd = 15
->         .endif
-> #endif
->         .endm
->
->         .macro XMM_NUM opd xmm
->         \opd = REG_NUM_INVALID
->         .ifc \xmm,%xmm0
->         \opd = 0
->         .endif
->         .ifc \xmm,%xmm1
->         \opd = 1
->         .endif
->         .ifc \xmm,%xmm2
->         \opd = 2
->         .endif
->         .ifc \xmm,%xmm3
->         \opd = 3
->         .endif
->         .ifc \xmm,%xmm4
->         \opd = 4
->         .endif
->         .ifc \xmm,%xmm5
->         \opd = 5
->         .endif
->         .ifc \xmm,%xmm6
->         \opd = 6
->         .endif
->         .ifc \xmm,%xmm7
->         \opd = 7
->         .endif
->         .ifc \xmm,%xmm8
->         \opd = 8
->         .endif
->         .ifc \xmm,%xmm9
->         \opd = 9
->         .endif
->         .ifc \xmm,%xmm10
->         \opd = 10
->         .endif
->         .ifc \xmm,%xmm11
->         \opd = 11
->         .endif
->         .ifc \xmm,%xmm12
->         \opd = 12
->         .endif
->         .ifc \xmm,%xmm13
->         \opd = 13
->         .endif
->         .ifc \xmm,%xmm14
->         \opd = 14
->         .endif
->         .ifc \xmm,%xmm15
->         \opd = 15
->         .endif
->         .endm
->
->         .macro REG_TYPE type reg
->         R32_NUM reg_type_r32 \reg
->         R64_NUM reg_type_r64 \reg
->         XMM_NUM reg_type_xmm \reg
->         .if reg_type_r64 <> REG_NUM_INVALID
->         \type = REG_TYPE_R64
->         .elseif reg_type_r32 <> REG_NUM_INVALID
->         \type = REG_TYPE_R32
->         .elseif reg_type_xmm <> REG_NUM_INVALID
->         \type = REG_TYPE_XMM
->         .else
->         \type = REG_TYPE_INVALID
->         .endif
->         .endm
->
->         .macro PFX_OPD_SIZE
->         .byte 0x66
->         .endm
->
->         .macro PFX_REX opd1 opd2 W=0
->         .if ((\opd1 | \opd2) & 8) || \W
->         .byte 0x40 | ((\opd1 & 8) >> 3) | ((\opd2 & 8) >> 1) | (\W << 3)
->         .endif
->         .endm
->
->         .macro MODRM mod opd1 opd2
->         .byte \mod | (\opd1 & 7) | ((\opd2 & 7) << 3)
->         .endm
->
-> .macro RDPID opd
->         REG_TYPE rdpid_opd_type \opd
->         .if rdpid_opd_type == REG_TYPE_R64
->         R64_NUM rdpid_opd \opd
->         .else
->         R32_NUM rdpid_opd \opd
->         .endif
->         .byte 0xf3
->         .if rdpid_opd > 7
->         PFX_REX rdpid_opd 0
->         .endif
->         .byte 0x0f, 0xc7
->         MODRM 0xc0 rdpid_opd 0x7
-> .endm
-> #endif
->
-> #endif
->
-> --
+Best
+Sven
+
+> 
 > Cheers,
-> Stephen Rothwell
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: https://eur03.safelinks.protection.outlook.com/?url=http:%2F%2Fgondor.apana.org.au%2F~herbert%2F&amp;data=02%7C01%7Csven.auhagen%40voleatech.de%7C85a3fd0bef964ac07a1d08d82a112f12%7Cb82a99f679814a7295344d35298f847b%7C0%7C0%7C637305600595365880&amp;sdata=E%2FnccG%2FNnIivbW0A2mE%2B9k89tWEWA%2B%2FcljshtLi29TI%3D&amp;reserved=0
+> PGP Key: https://eur03.safelinks.protection.outlook.com/?url=http:%2F%2Fgondor.apana.org.au%2F~herbert%2Fpubkey.txt&amp;data=02%7C01%7Csven.auhagen%40voleatech.de%7C85a3fd0bef964ac07a1d08d82a112f12%7Cb82a99f679814a7295344d35298f847b%7C0%7C0%7C637305600595365880&amp;sdata=e3f%2FXrlr0k9c1Cdv5kBo6zp5gtkPtkBNMNTJhB2Dg8c%3D&amp;reserved=0
