@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95073C433E1
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 06:43:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 108DCC433E1
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 06:44:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 792272071A
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 06:43:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE25E20704
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jul 2020 06:44:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726964AbgGQGnk (ORCPT
+        id S1726603AbgGQGou (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jul 2020 02:43:40 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:42854 "EHLO fornost.hmeau.com"
+        Fri, 17 Jul 2020 02:44:50 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:42870 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726180AbgGQGnj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jul 2020 02:43:39 -0400
+        id S1726141AbgGQGou (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Jul 2020 02:44:50 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jwK5f-0005nT-RC; Fri, 17 Jul 2020 16:43:28 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Jul 2020 16:43:27 +1000
-Date:   Fri, 17 Jul 2020 16:43:27 +1000
+        id 1jwK6D-0005og-Bm; Fri, 17 Jul 2020 16:44:02 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Jul 2020 16:44:01 +1000
+Date:   Fri, 17 Jul 2020 16:44:01 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Colin King <colin.king@canonical.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: xts: use memmove to avoid overlapped memory copy
-Message-ID: <20200717064327.GA2504@gondor.apana.org.au>
-References: <20200716152900.1709694-1-colin.king@canonical.com>
- <CAMj1kXEWyweZ0E3WHthEG9oiOpOS9UxtTB7xskAsF8FeinNg9w@mail.gmail.com>
- <20200717052139.GB2045@gondor.apana.org.au>
- <CAMj1kXH9PHNNUMgwNUv8gBJDxs8w5Eta=AouKM7L=hMWNOQ=HQ@mail.gmail.com>
+To:     Uros Bizjak <ubizjak@gmail.com>
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@elte.hu>, "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Sasha Levin <sashal@kernel.org>
+Subject: Re: linux-next: manual merge of the tip tree with the crypto tree
+Message-ID: <20200717064401.GB2504@gondor.apana.org.au>
+References: <20200717144656.4bdbf81f@canb.auug.org.au>
+ <CAFULd4Ye2d-8BY7aY+_2tYwcXsfSCe3O6aJ4LF0KhvWTjVt0rA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMj1kXH9PHNNUMgwNUv8gBJDxs8w5Eta=AouKM7L=hMWNOQ=HQ@mail.gmail.com>
+In-Reply-To: <CAFULd4Ye2d-8BY7aY+_2tYwcXsfSCe3O6aJ4LF0KhvWTjVt0rA@mail.gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 17, 2020 at 08:59:54AM +0300, Ard Biesheuvel wrote:
+On Fri, Jul 17, 2020 at 08:27:27AM +0200, Uros Bizjak wrote:
 >
-> Or change it to b[1] = b[0] (assuming the compiler allows struct
-> assignment in that way). This will always copy XTS_BLOCK_SIZE bytes,
-> but we have sufficient space, and it is probably more efficient  too
-> in most cases.
+> I will prepare a v2 that leaves needed part of inst.h.
 
-Sounds good to me.
+Your patch has already been applied.  So please make it an
+incremental patch.
 
 Thanks,
 -- 
