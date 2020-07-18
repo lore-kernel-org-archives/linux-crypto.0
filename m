@@ -2,149 +2,177 @@ Return-Path: <SRS0=nnFP=A5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D4C5C433DF
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 Jul 2020 08:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17E2CC433E1
+	for <linux-crypto@archiver.kernel.org>; Sat, 18 Jul 2020 09:44:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E83232074B
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 Jul 2020 08:18:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1595060304;
-	bh=6bSnP9zSLOcQHizO1rasA7u0tKkcEq4oHRa4K8fp0g0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=k2P4u/MCTB4jIiV+DH+Km4nCJoNB5mLYGyLeEzySY3tkKiQeWtK3q9OFpKRNooi/c
-	 VVpOuyUKH1ZoTzuaBsCll5FqFC9eRQfyUWCHBGwEAuJLWnm+bjkKvOSjKr1oMp1nvz
-	 chNAM+mX7e50xADfxKr+qPghwzrt1kQLkYxhoK8c=
+	by mail.kernel.org (Postfix) with ESMTP id E463020691
+	for <linux-crypto@archiver.kernel.org>; Sat, 18 Jul 2020 09:44:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=voleatech.de header.i=@voleatech.de header.b="GG43Kw2y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729193AbgGRISY (ORCPT
+        id S1726380AbgGRJo6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 18 Jul 2020 04:18:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53966 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729127AbgGRISX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 18 Jul 2020 04:18:23 -0400
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 393D4208DB;
-        Sat, 18 Jul 2020 08:18:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595060302;
-        bh=6bSnP9zSLOcQHizO1rasA7u0tKkcEq4oHRa4K8fp0g0=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=BWpipE5K64RS2xn1Uea0NWUjuFxXgJDpLLSF5vWya/CwhsGngEZwJpRA9sNnt2G9s
-         +oIIIyfOCun0bkswzkShIbtuU04D+LseYp3GJMaovJtf+PbOogeLFZ3te/QfaC/NWr
-         s2D+3bVZkecQnoGXJ3X1Stk+y8cZQHTpCZX8Mges=
-Received: by mail-oi1-f175.google.com with SMTP id k6so10007890oij.11;
-        Sat, 18 Jul 2020 01:18:22 -0700 (PDT)
-X-Gm-Message-State: AOAM531BJ8NJ0a/6ur4x7Lwhj3gIDzusqdvii0oJ2AcBtyCAAXzxlcQG
-        3xRNTVMx45NNf/HlXcrnNvC/QChe/DRrgfZCjzw=
-X-Google-Smtp-Source: ABdhPJyrjrlpB0vjn/uMcpNBFaqc7e9Z3yQsTmVjfYCHkBVMTRH1cdDccYuf3xV53Y5h+dsSyXNDRMOBT8ZPvQoNHo4=
-X-Received: by 2002:aca:d643:: with SMTP id n64mr10510907oig.33.1595060301468;
- Sat, 18 Jul 2020 01:18:21 -0700 (PDT)
+        Sat, 18 Jul 2020 05:44:58 -0400
+Received: from mail-eopbgr80131.outbound.protection.outlook.com ([40.107.8.131]:3148
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726335AbgGRJo5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 18 Jul 2020 05:44:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Bf0yYpiNSu0ULloJyKQqpBzod+b8gR/0WXpQkAGPUjcnnCScaCXSZi/cTsfbNicvzrAEcpkVH5rp1WZnFRVSyxRWLpIuybdK8BgG9jRicYpD4EAFQfVclVp2WIUVWteUdfdX0VtWr+OPpBgAZ0ftShyS21z9feYzxHUGRbIkAVyUpACtBoTpIvMgBhSbMysa/gIqowjIXFIOOAlI8+AXjRmR67IAbORyqbPQPms7NeHBiqjx9GW7zvnu8nMJeDowo5MTmKE5AmSptZi/RhGCnAThd/wo5B7S5LSzUKS+BD2u+EHP21JN8n7qiAF3HLa+MeyZl0pAE1ndyCtyMxXRUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=O8ZSw/xrM6ZCZZnYf9Edc/M8FdPff33cKpysnhkPFp0=;
+ b=DARdxbQ+0anpZAzfYbllh5Ew3cO2+HMjxxgmnNZ35cKotYwroQsNMqGXeoKf5ui0ZnvMqCjC+T6djhs40ef+POMfusDq6qvtRR8nk3sTMyvKo+IWGWlUvI1W5gQdPtDGg4t7noPkO3tktWdBvETAtF5wQed6ULeMX7TcqI2TufieYM/L9IOLurpfqfxlsTcBRPbzUpWdC0rQF16AGoESUCUgk90UDyjBzN/mhJ9Lh4fNf7qXxmNz5/OnvjQgbJc72oJ/ldIMq3jCkyj9lZVyUjxGe9JE2EdVOoWei0cWeyf3/8lO57669sUOLYpkbj5AXdPn1MoxdoN3u/0CT3hIhw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=voleatech.de; dmarc=pass action=none header.from=voleatech.de;
+ dkim=pass header.d=voleatech.de; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=voleatech.de;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=O8ZSw/xrM6ZCZZnYf9Edc/M8FdPff33cKpysnhkPFp0=;
+ b=GG43Kw2yOsDhAvPgDcS7qZSkVnEmncOQli/KAZ3JkDsJAoDvhLGZ/wX23eGDA67aJXtIXU4IoHTDzLVvPDirvDO5s3EaTzYqLg87FngV65Os6wFLYaz8IjnvFjtYnQubfVq6ujCTfWZkZ0IIUbBAUDhL6UL5bfZxNIyZyFdGeQA=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none
+ header.from=voleatech.de;
+Received: from AM4PR0501MB2785.eurprd05.prod.outlook.com
+ (2603:10a6:200:5d::11) by AM4PR05MB3396.eurprd05.prod.outlook.com
+ (2603:10a6:205:5::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3174.23; Sat, 18 Jul
+ 2020 09:44:55 +0000
+Received: from AM4PR0501MB2785.eurprd05.prod.outlook.com
+ ([fe80::39a1:e237:5fef:6f39]) by AM4PR0501MB2785.eurprd05.prod.outlook.com
+ ([fe80::39a1:e237:5fef:6f39%11]) with mapi id 15.20.3174.027; Sat, 18 Jul
+ 2020 09:44:55 +0000
+Date:   Sat, 18 Jul 2020 11:44:53 +0200
+From:   Sven Auhagen <Sven.Auhagen@voleatech.de>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au
+Subject: [PATCH 1/1 v2] marvell cesa irq balance
+Message-ID: <20200718094453.72lpwi47jckhg4tv@SvensMacBookAir.sven.lan>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-ClientProxiedBy: AM3PR05CA0086.eurprd05.prod.outlook.com
+ (2603:10a6:207:1::12) To AM4PR0501MB2785.eurprd05.prod.outlook.com
+ (2603:10a6:200:5d::11)
 MIME-Version: 1.0
-References: <20200702101947.682-1-ardb@kernel.org> <20200702101947.682-5-ardb@kernel.org>
- <20200702175022.GA2753@sol.localdomain> <CAMj1kXFen1nickdZab0s8iY7SgauoH56VginEoPdxaAAL2qENw@mail.gmail.com>
- <CAMj1kXG7i1isB9cV57ccaOZhrG3s7x+nKGozzTewuE9uWvX_wg@mail.gmail.com>
-In-Reply-To: <CAMj1kXG7i1isB9cV57ccaOZhrG3s7x+nKGozzTewuE9uWvX_wg@mail.gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Sat, 18 Jul 2020 11:18:10 +0300
-X-Gmail-Original-Message-ID: <CAMj1kXGiu5Wr8NAACBUtiJMY8rQAGCTOcQdK1QM6jgH-0Lm=YA@mail.gmail.com>
-Message-ID: <CAMj1kXGiu5Wr8NAACBUtiJMY8rQAGCTOcQdK1QM6jgH-0Lm=YA@mail.gmail.com>
-Subject: Re: [RFC PATCH 4/7] crypto: remove ARC4 support from the skcipher API
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-wireless@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Denis Kenzior <denkenz@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        "J. Bruce Fields" <bfields@fieldses.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
-        <netdev@vger.kernel.org>, devel@driverdev.osuosl.org,
-        linux-nfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from SvensMacBookAir.sven.lan (109.193.235.168) by AM3PR05CA0086.eurprd05.prod.outlook.com (2603:10a6:207:1::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.18 via Frontend Transport; Sat, 18 Jul 2020 09:44:54 +0000
+X-Originating-IP: [109.193.235.168]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 843d7d03-3fbc-46aa-e838-08d82aff39c7
+X-MS-TrafficTypeDiagnostic: AM4PR05MB3396:
+X-Microsoft-Antispam-PRVS: <AM4PR05MB339665DFEDD010F3F176693EEF7D0@AM4PR05MB3396.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:556;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: qtn4gK3pjL1OM+j911lZwNcGKzdYmVQNIyrlQD5wkqhnxPHCRvcaVa95RTB92lX2EwtsFqIlsED0Ns27qCThgw+hPs3XLgCJQyDiXeGIjtNjuL3S6OPozl8av183JH+6eAuMd6QsrDYCwhW+S4Oh9zoRqsqqhxvpiXD10AaHj09HmYks27Fg6qhryDlBntpwhTpL/dUEDjZBgwJOWCSH5wbW+vnsY/OkdaYb41S1zXDY2Fax1+kBu1p798utp3LsYKlPiK+mbev2oGGTCv8skeYUv/4qVx1NNC4+g1j32MJJiHEurQY/aqySv1nwHhLTuxTJ21oftOFMxzIKHFlXsw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM4PR0501MB2785.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(346002)(376002)(396003)(39830400003)(136003)(316002)(5660300002)(2906002)(6916009)(66556008)(508600001)(83380400001)(8676002)(66476007)(66946007)(8936002)(6506007)(1076003)(956004)(4326008)(7696005)(16526019)(26005)(86362001)(52116002)(186003)(55016002)(9686003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData: MdCyegufhrBKlQTUTN+pbv5QacmiYdt27I9vL6qCh8LgOM4VyVuhTD4e9i334jQ6Huzw9irHXwyzHWQ9KBYPQNJ8fEZD4+Rw9LzmsLi5DnzZGwjV/scjNpbj7HVS8RuA9rlUAuGeRpe/upGsMqF9rUgtaDkDx3eijeC/eHRyG1ERFtNf9TBL4flNENeg2atZf8QA5qiSgmK1faSK2fbJX4GQQFkF8J4Zquj0Ox7nuXVgDIkKuzIwyvXtnhIc8VCPOA75M+LewAIsLPKywZyUcp06CH9//NhFS9inJPHM+hKfZD450jE2mG3CNdAzr7Ely3rhro3OeF6Ux+bK3XCfC2s54x7crN1b9+uOpMEWnoCTcUbVHQR3rIEh9A/VVUlAUhXD9gevHQlHWW56JA1BLw37oIsthQ//zBf2y/Y93d/bfVzZq4g2J69TO18sPKhWyIreHGODfsAvXjXlZ9SHR7u0Sjpne0QJOKLZF1iqAQqxzEWGimonfVVNCzQAnkxe
+X-OriginatorOrg: voleatech.de
+X-MS-Exchange-CrossTenant-Network-Message-Id: 843d7d03-3fbc-46aa-e838-08d82aff39c7
+X-MS-Exchange-CrossTenant-AuthSource: AM4PR0501MB2785.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2020 09:44:54.9673
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b82a99f6-7981-4a72-9534-4d35298f847b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: npUvLxZU4E/k4dbfPn2DHxl782DwYz3QF75jkLWNU0QZa8rYAS2A+7gwdDHc8Btr/kZG3GpxmG8v+SlVUkSEH7s1dvfNdFDJZhsoYLfywTc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM4PR05MB3396
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 3 Jul 2020 at 02:04, Ard Biesheuvel <ardb@kernel.org> wrote:
->
-> On Thu, 2 Jul 2020 at 20:21, Ard Biesheuvel <ardb@kernel.org> wrote:
-> >
-> > On Thu, 2 Jul 2020 at 19:50, Eric Biggers <ebiggers@kernel.org> wrote:
-> > >
-> > > [+linux-wireless, Marcel Holtmann, and Denis Kenzior]
-> > >
-> > > On Thu, Jul 02, 2020 at 12:19:44PM +0200, Ard Biesheuvel wrote:
-> > > > Remove the generic ecb(arc4) skcipher, which is slightly cumbersome from
-> > > > a maintenance perspective, since it does not quite behave like other
-> > > > skciphers do in terms of key vs IV lifetime. Since we are leaving the
-> > > > library interface in place, which is used by the various WEP and TKIP
-> > > > implementations we have in the tree, we can safely drop this code now
-> > > > it no longer has any users.
-> > > >
-> > > > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> > >
-> > > Last year there was a discussion where it was mentioned that iwd uses
-> > > "ecb(arc4)" via AF_ALG.  So can we really remove it yet?
-> > > See https://lkml.kernel.org/r/97BB95F6-4A4C-4984-9EAB-6069E19B4A4F@holtmann.org
-> > > Note that the code isn't in "iwd" itself but rather in "libell" which iwd
-> > > depends on: https://git.kernel.org/pub/scm/libs/ell/ell.git/
-> > >
-> > > Apparently it also uses md4 and ecb(des) too.
-> > >
-> >
-> > Ah yes, I remember now :-(
-> >
-> > > Marcel and Denis, what's your deprecation plan for these obsolete and insecure
-> > > algorithms?
-> > >
-> >
-> > Given Denis's statement:
-> >
-> >   It sounds to me like it was broken and should be fixed.  So our vote /
-> >   preference is to have ARC4 fixed to follow the proper semantics.  We
-> >   can deal with the kernel behavioral change on our end easily enough;
-> >   the required workarounds are the worse evil.
-> >
-> > I would think that an ABI break is not the end of the world for them,
-> > and given how trivial it is to implement RC4 in C, the workaround
-> > should be to simply implement RC4 in user space, and not even bother
-> > trying to use AF_ALG to get at ecb(arc4)
-> >
-> > (same applies to md4 and ecb(des) btw)
-> >
-> > There will always be a long tail of use cases, and at some point, we
-> > just have to draw the line and remove obsolete and insecure cruft,
-> > especially when it impedes progress on other fronts.
-> >
->
-> I have ported iwd to Nettle's LGPL 2.1 implementation of ARC4, and the
-> diffstat is
->
->  src/crypto.c      | 80 ++++++++++++--------
->  src/main.c        |  8 --
->  unit/test-eapol.c |  3 +-
->  3 files changed, 51 insertions(+), 40 deletions(-)
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/ardb/iwd.git/log/?h=arc4-cleanup
+Balance the irqs of the marvell cesa driver over all
+available cpus.
+Currently all interrupts are handled by the first CPU.
 
-Marcel, Denis,
+From my testing with IPSec AES 256 SHA256
+on my clearfog base with 2 Cores I get a 2x speed increase:
 
-Do you have any objections to the ecb(arc4) skcipher being dropped
-from the kernel, given the fallback i proposed above (which is a much
-better way of doing rc4 in user space anyway)?
+Before the patch: 26.74 Kpps
+With the patch: 56.11 Kpps
 
-For libell, I would suggest dropping rc4 entirely, once iwd stops
-relying on it, as using rc4 for tls is obsolete as well.
+Signed-off-by: Sven Auhagen <sven.auhagen@voleatech.de>
+---
+v2:
+* use cpumask_local_spread and remove affinity on
+  module remove
+
+ drivers/crypto/marvell/cesa/cesa.c | 11 ++++++++++-
+ drivers/crypto/marvell/cesa/cesa.h |  1 +
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
+index 8a5f0b0bdf77..c098587044a1 100644
+--- a/drivers/crypto/marvell/cesa/cesa.c
++++ b/drivers/crypto/marvell/cesa/cesa.c
+@@ -438,7 +438,7 @@ static int mv_cesa_probe(struct platform_device *pdev)
+ 	struct mv_cesa_dev *cesa;
+ 	struct mv_cesa_engine *engines;
+ 	struct resource *res;
+-	int irq, ret, i;
++	int irq, ret, i, cpu;
+ 	u32 sram_size;
+ 
+ 	if (cesa_dev) {
+@@ -505,6 +505,8 @@ static int mv_cesa_probe(struct platform_device *pdev)
+ 			goto err_cleanup;
+ 		}
+ 
++		engine->irq = irq;
++
+ 		/*
+ 		 * Not all platforms can gate the CESA clocks: do not complain
+ 		 * if the clock does not exist.
+@@ -548,6 +550,10 @@ static int mv_cesa_probe(struct platform_device *pdev)
+ 		if (ret)
+ 			goto err_cleanup;
+ 
++		// Set affinity
++		cpu = cpumask_local_spread(engine->id, -1);
++		irq_set_affinity_hint(irq, get_cpu_mask(cpu));
++
+ 		crypto_init_queue(&engine->queue, CESA_CRYPTO_DEFAULT_MAX_QLEN);
+ 		atomic_set(&engine->load, 0);
+ 		INIT_LIST_HEAD(&engine->complete_queue);
+@@ -570,6 +576,8 @@ static int mv_cesa_probe(struct platform_device *pdev)
+ 		clk_disable_unprepare(cesa->engines[i].zclk);
+ 		clk_disable_unprepare(cesa->engines[i].clk);
+ 		mv_cesa_put_sram(pdev, i);
++		if (cesa->engines[i].irq > 0)
++			irq_set_affinity_hint(cesa->engines[i].irq, NULL);
+ 	}
+ 
+ 	return ret;
+@@ -586,6 +594,7 @@ static int mv_cesa_remove(struct platform_device *pdev)
+ 		clk_disable_unprepare(cesa->engines[i].zclk);
+ 		clk_disable_unprepare(cesa->engines[i].clk);
+ 		mv_cesa_put_sram(pdev, i);
++		irq_set_affinity_hint(cesa->engines[i].irq, NULL);
+ 	}
+ 
+ 	return 0;
+diff --git a/drivers/crypto/marvell/cesa/cesa.h b/drivers/crypto/marvell/cesa/cesa.h
+index e8632d5f343f..0c9cbb681e49 100644
+--- a/drivers/crypto/marvell/cesa/cesa.h
++++ b/drivers/crypto/marvell/cesa/cesa.h
+@@ -457,6 +457,7 @@ struct mv_cesa_engine {
+ 	atomic_t load;
+ 	struct mv_cesa_tdma_chain chain;
+ 	struct list_head complete_queue;
++	int irq;
+ };
+ 
+ /**
+-- 
+2.20.1
+
