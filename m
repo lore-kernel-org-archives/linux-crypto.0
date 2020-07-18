@@ -2,151 +2,165 @@ Return-Path: <SRS0=nnFP=A5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A105C433DF
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 Jul 2020 10:40:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8243C433E0
+	for <linux-crypto@archiver.kernel.org>; Sat, 18 Jul 2020 13:25:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E36932073A
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 Jul 2020 10:40:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3E342070E
+	for <linux-crypto@archiver.kernel.org>; Sat, 18 Jul 2020 13:25:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1595078743;
+	bh=Nri1J5QNkF+cfSGKegXfslfUL7umNwUoZ7RRimI2gW4=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=YX6wR/i3mjHoJMdGvgV6wbV7OTDUevQjUEVj3PpkdXlU/JXql4l89tSmvSayCD+4d
+	 CFhPlewD2dUzTXRzlDLcGC40dOapvnm9gcxvK+0v5VMtIwivAnqrZr6y+bAA3AmeCQ
+	 1JRiVSqJZwXm4ZDviUTecEHFszemNmw3oalK11Xw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726687AbgGRKkM (ORCPT
+        id S1727032AbgGRNZn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 18 Jul 2020 06:40:12 -0400
-Received: from smtp.al2klimov.de ([78.46.175.9]:39270 "EHLO smtp.al2klimov.de"
+        Sat, 18 Jul 2020 09:25:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49038 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726490AbgGRKkM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 18 Jul 2020 06:40:12 -0400
-Received: from authenticated-user (PRIMARY_HOSTNAME [PUBLIC_IP])
-        by smtp.al2klimov.de (Postfix) with ESMTPA id 3D570BC064;
-        Sat, 18 Jul 2020 10:40:05 +0000 (UTC)
-From:   "Alexander A. Klimov" <grandmaster@al2klimov.de>
-To:     mpe@ellerman.id.au, benh@kernel.crashing.org, paulus@samba.org,
-        corbet@lwn.net, herbert@gondor.apana.org.au, davem@davemloft.net,
-        leitao@debian.org, nayna@linux.ibm.com, pfsmorigo@gmail.com,
-        grandmaster@al2klimov.de, linuxppc-dev@lists.ozlabs.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH] powerpc: Replace HTTP links with HTTPS ones
-Date:   Sat, 18 Jul 2020 12:39:58 +0200
-Message-Id: <20200718103958.5455-1-grandmaster@al2klimov.de>
+        id S1726569AbgGRNZm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 18 Jul 2020 09:25:42 -0400
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F281C2070E
+        for <linux-crypto@vger.kernel.org>; Sat, 18 Jul 2020 13:25:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1595078742;
+        bh=Nri1J5QNkF+cfSGKegXfslfUL7umNwUoZ7RRimI2gW4=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=lmbD8mYy+WPuEGugI7BypFFz9vPozTigZcnK+m72Wla4tLjSjE4GuPtuRZBusuxu/
+         JIGO1z+4WvTCbBT6aE/a3DZTNxINP057ny8RnVQ0mk2kww1SUIWrfxdef2pmQP7Mjd
+         XyGISRB9K83lulectcTC1Ro9kP+B+yzvHl8uk0qc=
+Received: by mail-ot1-f49.google.com with SMTP id n24so8879388otr.13
+        for <linux-crypto@vger.kernel.org>; Sat, 18 Jul 2020 06:25:41 -0700 (PDT)
+X-Gm-Message-State: AOAM533+j3f3tW0QZm3ZfB0CWR/kW+7nJt5YsPtA2XQrs5KJiBMV3s40
+        lswhm+BhdU6FeHdplLS7pMSOvITfyWuMNr0RsSQ=
+X-Google-Smtp-Source: ABdhPJwu7eJUHPJZxLeyR3Z2kLA3SXMNHjp1JIlqZa1hNP84TaraxLDWIMqFeKa0jg1uY/qgBYi11i/lNcicJRVDpEM=
+X-Received: by 2002:a9d:688:: with SMTP id 8mr12683938otx.108.1595078741340;
+ Sat, 18 Jul 2020 06:25:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp.al2klimov.de;
-        auth=pass smtp.auth=aklimov@al2klimov.de smtp.mailfrom=grandmaster@al2klimov.de
-X-Spamd-Bar: /
+References: <20200718094330.omshxatmro4f2hys@SvensMacBookAir.sven.lan>
+In-Reply-To: <20200718094330.omshxatmro4f2hys@SvensMacBookAir.sven.lan>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Sat, 18 Jul 2020 16:25:29 +0300
+X-Gmail-Original-Message-ID: <CAMj1kXFNFA6htycNvbMJEY6ik3o146Ac93i=kPjQSq9khqUd6A@mail.gmail.com>
+Message-ID: <CAMj1kXFNFA6htycNvbMJEY6ik3o146Ac93i=kPjQSq9khqUd6A@mail.gmail.com>
+Subject: Re: [PATCH 1/1 v2] inside-secure irq balance
+To:     Sven Auhagen <Sven.Auhagen@voleatech.de>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Rationale:
-Reduces attack surface on kernel devs opening the links for MITM
-as HTTPS traffic is much harder to manipulate.
+On Sat, 18 Jul 2020 at 12:43, Sven Auhagen <Sven.Auhagen@voleatech.de> wrote:
+>
+> Balance the irqs of the inside secure driver over all
+> available cpus.
+> Currently all interrupts are handled by the first CPU.
+>
+> From my testing with IPSec AES-GCM 256
+> on my MCbin with 4 Cores I get a 50% speed increase:
+>
+> Before the patch: 99.73 Kpps
+> With the patch: 151.25 Kpps
+>
+> Signed-off-by: Sven Auhagen <sven.auhagen@voleatech.de>
+> ---
+> v2:
+> * use cpumask_local_spread and remove affinity on
+>   module remove
+>
+>  drivers/crypto/inside-secure/safexcel.c | 13 +++++++++++--
+>  drivers/crypto/inside-secure/safexcel.h |  3 +++
+>  2 files changed, 14 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+> index 2cb53fbae841..fb8e0d8732f8 100644
+> --- a/drivers/crypto/inside-secure/safexcel.c
+> +++ b/drivers/crypto/inside-secure/safexcel.c
+> @@ -1135,11 +1135,12 @@ static irqreturn_t safexcel_irq_ring_thread(int irq, void *data)
+>
+>  static int safexcel_request_ring_irq(void *pdev, int irqid,
+>                                      int is_pci_dev,
+> +                                    int ring_id,
+>                                      irq_handler_t handler,
+>                                      irq_handler_t threaded_handler,
+>                                      struct safexcel_ring_irq_data *ring_irq_priv)
+>  {
+> -       int ret, irq;
+> +       int ret, irq, cpu;
+>         struct device *dev;
+>
+>         if (IS_ENABLED(CONFIG_PCI) && is_pci_dev) {
+> @@ -1177,6 +1178,10 @@ static int safexcel_request_ring_irq(void *pdev, int irqid,
+>                 return ret;
+>         }
+>
+> +       // Set affinity
+> +       cpu = cp = cpumask_local_spread(ring_id, -1);
 
-Deterministic algorithm:
-For each file:
-  If not .svg:
-    For each line:
-      If doesn't contain `\bxmlns\b`:
-        For each link, `\bhttp://[^# \t\r\n]*(?:\w|/)`:
-	  If neither `\bgnu\.org/license`, nor `\bmozilla\.org/MPL\b`:
-            If both the HTTP and HTTPS versions
-            return 200 OK and serve the same content:
-              Replace HTTP with HTTPS.
+Please use the symbolic constant NUMA_NO_NODE here, so it is obvious
+what the second argument means without  having to grep for it.
 
-Signed-off-by: Alexander A. Klimov <grandmaster@al2klimov.de>
----
- Continuing my work started at 93431e0607e5.
- See also: git log --oneline '--author=Alexander A. Klimov <grandmaster@al2klimov.de>' v5.7..master
-
- If there are any URLs to be removed completely
- or at least not (just) HTTPSified:
- Just clearly say so and I'll *undo my change*.
- See also: https://lkml.org/lkml/2020/6/27/64
-
- If there are any valid, but yet not changed URLs:
- See: https://lkml.org/lkml/2020/6/26/837
-
- If you apply the patch, please let me know.
-
-
- Documentation/powerpc/mpc52xx.rst       | 2 +-
- arch/powerpc/crypto/crc32-vpmsum_core.S | 2 +-
- arch/powerpc/include/asm/hydra.h        | 2 +-
- drivers/crypto/vmx/aesp8-ppc.pl         | 2 +-
- drivers/crypto/vmx/ghashp8-ppc.pl       | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/Documentation/powerpc/mpc52xx.rst b/Documentation/powerpc/mpc52xx.rst
-index 8676ac63e077..30260707c3fe 100644
---- a/Documentation/powerpc/mpc52xx.rst
-+++ b/Documentation/powerpc/mpc52xx.rst
-@@ -2,7 +2,7 @@
- Linux 2.6.x on MPC52xx family
- =============================
- 
--For the latest info, go to http://www.246tNt.com/mpc52xx/
-+For the latest info, go to https://www.246tNt.com/mpc52xx/
- 
- To compile/use :
- 
-diff --git a/arch/powerpc/crypto/crc32-vpmsum_core.S b/arch/powerpc/crypto/crc32-vpmsum_core.S
-index c3524eba4d0d..a16a717c809c 100644
---- a/arch/powerpc/crypto/crc32-vpmsum_core.S
-+++ b/arch/powerpc/crypto/crc32-vpmsum_core.S
-@@ -19,7 +19,7 @@
-  * We then use fixed point Barrett reduction to compute a mod n over GF(2)
-  * for n = CRC using POWER8 instructions. We use x = 32.
-  *
-- * http://en.wikipedia.org/wiki/Barrett_reduction
-+ * https://en.wikipedia.org/wiki/Barrett_reduction
-  *
-  * Copyright (C) 2015 Anton Blanchard <anton@au.ibm.com>, IBM
- */
-diff --git a/arch/powerpc/include/asm/hydra.h b/arch/powerpc/include/asm/hydra.h
-index b3b0f2d020f0..ae02eb53d6ef 100644
---- a/arch/powerpc/include/asm/hydra.h
-+++ b/arch/powerpc/include/asm/hydra.h
-@@ -10,7 +10,7 @@
-  *
-  *	© Copyright 1995 Apple Computer, Inc. All rights reserved.
-  *
-- *  It's available online from http://www.cpu.lu/~mlan/ftp/MacTech.pdf
-+ *  It's available online from https://www.cpu.lu/~mlan/ftp/MacTech.pdf
-  *  You can obtain paper copies of this book from computer bookstores or by
-  *  writing Morgan Kaufmann Publishers, Inc., 340 Pine Street, Sixth Floor, San
-  *  Francisco, CA 94104. Reference ISBN 1-55860-393-X.
-diff --git a/drivers/crypto/vmx/aesp8-ppc.pl b/drivers/crypto/vmx/aesp8-ppc.pl
-index db874367b602..50a0a18f35da 100644
---- a/drivers/crypto/vmx/aesp8-ppc.pl
-+++ b/drivers/crypto/vmx/aesp8-ppc.pl
-@@ -50,7 +50,7 @@
- # Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
- # project. The module is, however, dual licensed under OpenSSL and
- # CRYPTOGAMS licenses depending on where you obtain it. For further
--# details see http://www.openssl.org/~appro/cryptogams/.
-+# details see https://www.openssl.org/~appro/cryptogams/.
- # ====================================================================
- #
- # This module implements support for AES instructions as per PowerISA
-diff --git a/drivers/crypto/vmx/ghashp8-ppc.pl b/drivers/crypto/vmx/ghashp8-ppc.pl
-index 38b06503ede0..09bba1852eec 100644
---- a/drivers/crypto/vmx/ghashp8-ppc.pl
-+++ b/drivers/crypto/vmx/ghashp8-ppc.pl
-@@ -13,7 +13,7 @@
- # Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
- # project. The module is, however, dual licensed under OpenSSL and
- # CRYPTOGAMS licenses depending on where you obtain it. For further
--# details see http://www.openssl.org/~appro/cryptogams/.
-+# details see https://www.openssl.org/~appro/cryptogams/.
- # ====================================================================
- #
- # GHASH for for PowerISA v2.07.
--- 
-2.27.0
-
+> +       irq_set_affinity_hint(irq, get_cpu_mask(cpu));
+> +
+>         return irq;
+>  }
+>
+> @@ -1611,6 +1616,7 @@ static int safexcel_probe_generic(void *pdev,
+>                 irq = safexcel_request_ring_irq(pdev,
+>                                                 EIP197_IRQ_NUMBER(i, is_pci_dev),
+>                                                 is_pci_dev,
+> +                                               i,
+>                                                 safexcel_irq_ring,
+>                                                 safexcel_irq_ring_thread,
+>                                                 ring_irq);
+> @@ -1619,6 +1625,7 @@ static int safexcel_probe_generic(void *pdev,
+>                         return irq;
+>                 }
+>
+> +               priv->ring[i].irq = irq;
+>                 priv->ring[i].work_data.priv = priv;
+>                 priv->ring[i].work_data.ring = i;
+>                 INIT_WORK(&priv->ring[i].work_data.work,
+> @@ -1756,8 +1763,10 @@ static int safexcel_remove(struct platform_device *pdev)
+>         clk_disable_unprepare(priv->reg_clk);
+>         clk_disable_unprepare(priv->clk);
+>
+> -       for (i = 0; i < priv->config.rings; i++)
+> +       for (i = 0; i < priv->config.rings; i++) {
+> +               irq_set_affinity_hint(priv->ring[i].irq, NULL);
+>                 destroy_workqueue(priv->ring[i].workqueue);
+> +       }
+>
+>         return 0;
+>  }
+> diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+> index 94016c505abb..7c5fe382d272 100644
+> --- a/drivers/crypto/inside-secure/safexcel.h
+> +++ b/drivers/crypto/inside-secure/safexcel.h
+> @@ -707,6 +707,9 @@ struct safexcel_ring {
+>          */
+>         struct crypto_async_request *req;
+>         struct crypto_async_request *backlog;
+> +
+> +       /* irq of this ring */
+> +       int irq;
+>  };
+>
+>  /* EIP integration context flags */
+> --
+> 2.20.1
+>
