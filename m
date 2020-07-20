@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB3FC433F8
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jul 2020 12:49:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1866C43446
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jul 2020 12:49:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C67BD22C9C
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jul 2020 12:49:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88B7A22CB1
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jul 2020 12:49:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uWZ6jCpz"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LJuEzTHb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728688AbgGTMta (ORCPT
+        id S1729185AbgGTMty (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Jul 2020 08:49:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40634 "EHLO
+        Mon, 20 Jul 2020 08:49:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729236AbgGTMsw (ORCPT
+        with ESMTP id S1729162AbgGTMso (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Jul 2020 08:48:52 -0400
+        Mon, 20 Jul 2020 08:48:44 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4740AC061794;
-        Mon, 20 Jul 2020 05:48:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 529D9C0619D2;
+        Mon, 20 Jul 2020 05:48:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=JqWr7BncnAaw1KsTe15pYPZ3Aib5oHtxDPbe0sMml/w=; b=uWZ6jCpzKP3knqB1HbYIqdAFmE
-        JG/8kt3ysyB2oyx6jw5vOzeoluSO+BWwt8WMZAh30P3716tRc/lq2aNq+FR4nWuq5scmQO2/ZsF9y
-        CVYkp2Iu/+kj9A4Kb4LI3X/qjbklr889G2byiZTkmSQIOWbj30FBvtgbYw5bY+zCbho9KixHprDAM
-        q6OmvoWuRk884tf85LS/cT3lh+ONS4oBVU/5escrUuBJGq32mUZirYyqwG0yKxXqwnLQC1bES8v8p
-        Fr5SZi1XZZOaC5Y2wZ1QlzVqibyGLKDzTbblN474UGSM/VJ3FCsD8yLKMPVyxA0znelhoXpI5VlIZ
-        Fnf4QKzw==;
+        bh=QlF9uAsII4M+JCuvUaS+q9mzPBlfDSxuvtjJe160dNk=; b=LJuEzTHbCizIReQ+vQ6tM/yCQW
+        kGzqCUOZ35A+PNtrII7WOhLPz+10DxnasJInH0Sm2USAoyzaAXewdZ2FJxvHWuhOw4PziPZL3AbUB
+        cKMt8/u3Tlt6vvsQmEkiEHXxqrlK8jfGWfzlKyuHo2w6+jKrW8isTlY+qWPNc5BHGsJc2SZQz8izG
+        yiCcsbRejjr36L5X45bHYd2QBWULO3Uo/pXme/kHQ4/eLGLQ6Oyj1SiJhvk4qAjgHhjiDprBJ0PEI
+        SLq9SY7N1kdGtT2W6kUbfNpXS3supYKhgOR/bM1x53RY/QVHM+LFmeoeoULO3luDSJ8/COEwEstXU
+        1aYg1YaQ==;
 Received: from [2001:4bb8:105:4a81:2a8f:15b1:2c3:7be7] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jxVDh-0004dA-FX; Mon, 20 Jul 2020 12:48:38 +0000
+        id 1jxVDa-0004cL-SR; Mon, 20 Jul 2020 12:48:31 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -58,9 +58,9 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         mptcp@lists.01.org, lvs-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
         tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: [PATCH 21/24] net/udp: switch udp_lib_setsockopt to sockptr_t
-Date:   Mon, 20 Jul 2020 14:47:34 +0200
-Message-Id: <20200720124737.118617-22-hch@lst.de>
+Subject: [PATCH 18/24] net/ipv6: switch ipv6_flowlabel_opt to sockptr_t
+Date:   Mon, 20 Jul 2020 14:47:31 +0200
+Message-Id: <20200720124737.118617-19-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200720124737.118617-1-hch@lst.de>
 References: <20200720124737.118617-1-hch@lst.de>
@@ -75,72 +75,102 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 Pass a sockptr_t to prepare for set_fs-less handling of the kernel
 pointer from bpf-cgroup.
 
+Note that the get case is pretty weird in that it actually copies data
+back to userspace from setsockopt.
+
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/net/udp.h | 2 +-
- net/ipv4/udp.c    | 7 ++++---
- net/ipv6/udp.c    | 3 ++-
- 3 files changed, 7 insertions(+), 5 deletions(-)
+ include/net/ipv6.h       |  2 +-
+ net/ipv6/ip6_flowlabel.c | 16 +++++++++-------
+ net/ipv6/ipv6_sockglue.c |  2 +-
+ 3 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/include/net/udp.h b/include/net/udp.h
-index 17a9e86a807638..295d52a7359827 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -306,7 +306,7 @@ struct sk_buff *skb_udp_tunnel_segment(struct sk_buff *skb,
- int udp_lib_getsockopt(struct sock *sk, int level, int optname,
- 		       char __user *optval, int __user *optlen);
- int udp_lib_setsockopt(struct sock *sk, int level, int optname,
--		       char __user *optval, unsigned int optlen,
-+		       sockptr_t optval, unsigned int optlen,
- 		       int (*push_pending_frames)(struct sock *));
- struct sock *udp4_lib_lookup(struct net *net, __be32 saddr, __be16 sport,
- 			     __be32 daddr, __be16 dport, int dif);
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index d4be4471c424e3..641303aa17d3dd 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -2532,7 +2532,7 @@ void udp_destroy_sock(struct sock *sk)
-  *	Socket option code for UDP
-  */
- int udp_lib_setsockopt(struct sock *sk, int level, int optname,
--		       char __user *optval, unsigned int optlen,
-+		       sockptr_t optval, unsigned int optlen,
- 		       int (*push_pending_frames)(struct sock *))
- {
- 	struct udp_sock *up = udp_sk(sk);
-@@ -2543,7 +2543,7 @@ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
- 	if (optlen < sizeof(int))
- 		return -EINVAL;
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 262fc88dbd7e2f..4c9d89b5d73268 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -406,7 +406,7 @@ struct ipv6_txoptions *fl6_merge_options(struct ipv6_txoptions *opt_space,
+ 					 struct ip6_flowlabel *fl,
+ 					 struct ipv6_txoptions *fopt);
+ void fl6_free_socklist(struct sock *sk);
+-int ipv6_flowlabel_opt(struct sock *sk, char __user *optval, int optlen);
++int ipv6_flowlabel_opt(struct sock *sk, sockptr_t optval, int optlen);
+ int ipv6_flowlabel_opt_get(struct sock *sk, struct in6_flowlabel_req *freq,
+ 			   int flags);
+ int ip6_flowlabel_init(void);
+diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.c
+index 27ee6de9beffc4..6b3c315f3d461a 100644
+--- a/net/ipv6/ip6_flowlabel.c
++++ b/net/ipv6/ip6_flowlabel.c
+@@ -371,7 +371,7 @@ static int fl6_renew(struct ip6_flowlabel *fl, unsigned long linger, unsigned lo
  
--	if (get_user(val, (int __user *)optval))
-+	if (copy_from_sockptr(&val, optval, sizeof(val)))
+ static struct ip6_flowlabel *
+ fl_create(struct net *net, struct sock *sk, struct in6_flowlabel_req *freq,
+-	  char __user *optval, int optlen, int *err_p)
++	  sockptr_t optval, int optlen, int *err_p)
+ {
+ 	struct ip6_flowlabel *fl = NULL;
+ 	int olen;
+@@ -401,7 +401,8 @@ fl_create(struct net *net, struct sock *sk, struct in6_flowlabel_req *freq,
+ 		memset(fl->opt, 0, sizeof(*fl->opt));
+ 		fl->opt->tot_len = sizeof(*fl->opt) + olen;
+ 		err = -EFAULT;
+-		if (copy_from_user(fl->opt+1, optval+CMSG_ALIGN(sizeof(*freq)), olen))
++		sockptr_advance(optval, CMSG_ALIGN(sizeof(*freq)));
++		if (copy_from_sockptr(fl->opt + 1, optval, olen))
+ 			goto done;
+ 
+ 		msg.msg_controllen = olen;
+@@ -604,7 +605,7 @@ static int ipv6_flowlabel_renew(struct sock *sk, struct in6_flowlabel_req *freq)
+ }
+ 
+ static int ipv6_flowlabel_get(struct sock *sk, struct in6_flowlabel_req *freq,
+-		void __user *optval, int optlen)
++		sockptr_t optval, int optlen)
+ {
+ 	struct ipv6_fl_socklist *sfl, *sfl1 = NULL;
+ 	struct ip6_flowlabel *fl, *fl1 = NULL;
+@@ -702,8 +703,9 @@ static int ipv6_flowlabel_get(struct sock *sk, struct in6_flowlabel_req *freq,
+ 		goto recheck;
+ 
+ 	if (!freq->flr_label) {
+-		if (copy_to_user(&((struct in6_flowlabel_req __user *) optval)->flr_label,
+-				 &fl->label, sizeof(fl->label))) {
++		sockptr_advance(optval,
++				offsetof(struct in6_flowlabel_req, flr_label));
++		if (copy_to_sockptr(optval, &fl->label, sizeof(fl->label))) {
+ 			/* Intentionally ignore fault. */
+ 		}
+ 	}
+@@ -716,13 +718,13 @@ static int ipv6_flowlabel_get(struct sock *sk, struct in6_flowlabel_req *freq,
+ 	return err;
+ }
+ 
+-int ipv6_flowlabel_opt(struct sock *sk, char __user *optval, int optlen)
++int ipv6_flowlabel_opt(struct sock *sk, sockptr_t optval, int optlen)
+ {
+ 	struct in6_flowlabel_req freq;
+ 
+ 	if (optlen < sizeof(freq))
+ 		return -EINVAL;
+-	if (copy_from_user(&freq, optval, sizeof(freq)))
++	if (copy_from_sockptr(&freq, optval, sizeof(freq)))
  		return -EFAULT;
  
- 	valbool = val ? 1 : 0;
-@@ -2651,7 +2651,8 @@ int udp_setsockopt(struct sock *sk, int level, int optname,
- 		   char __user *optval, unsigned int optlen)
- {
- 	if (level == SOL_UDP  ||  level == SOL_UDPLITE)
--		return udp_lib_setsockopt(sk, level, optname, optval, optlen,
-+		return udp_lib_setsockopt(sk, level, optname,
-+					  USER_SOCKPTR(optval), optlen,
- 					  udp_push_pending_frames);
- 	return ip_setsockopt(sk, level, optname, optval, optlen);
- }
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 5aff0856a05b44..05353b31fa07bc 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -1565,7 +1565,8 @@ int udpv6_setsockopt(struct sock *sk, int level, int optname,
- 		     char __user *optval, unsigned int optlen)
- {
- 	if (level == SOL_UDP  ||  level == SOL_UDPLITE)
--		return udp_lib_setsockopt(sk, level, optname, optval, optlen,
-+		return udp_lib_setsockopt(sk, level, optname,
-+					  USER_SOCKPTR(optval), optlen,
- 					  udp_v6_push_pending_frames);
- 	return ipv6_setsockopt(sk, level, optname, optval, optlen);
- }
+ 	switch (freq.flr_action) {
+diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+index 119dfaf5f4bb26..3897fb55372d38 100644
+--- a/net/ipv6/ipv6_sockglue.c
++++ b/net/ipv6/ipv6_sockglue.c
+@@ -929,7 +929,7 @@ static int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 		retv = 0;
+ 		break;
+ 	case IPV6_FLOWLABEL_MGR:
+-		retv = ipv6_flowlabel_opt(sk, optval, optlen);
++		retv = ipv6_flowlabel_opt(sk, USER_SOCKPTR(optval), optlen);
+ 		break;
+ 	case IPV6_IPSEC_POLICY:
+ 	case IPV6_XFRM_POLICY:
 -- 
 2.27.0
 
