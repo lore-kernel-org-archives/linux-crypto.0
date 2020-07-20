@@ -2,42 +2,43 @@ Return-Path: <SRS0=2iMm=A7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 148BAC433E4
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jul 2020 12:48:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF8D7C433E6
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jul 2020 12:48:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D712322C9C
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jul 2020 12:48:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC16722C9D
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jul 2020 12:48:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="f5LLAO7/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PEIxnuYK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728803AbgGTMsL (ORCPT
+        id S1729193AbgGTMss (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Jul 2020 08:48:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40490 "EHLO
+        Mon, 20 Jul 2020 08:48:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728590AbgGTMsJ (ORCPT
+        with ESMTP id S1729189AbgGTMsq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Jul 2020 08:48:09 -0400
+        Mon, 20 Jul 2020 08:48:46 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F818C0619D5;
-        Mon, 20 Jul 2020 05:48:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72F94C061794;
+        Mon, 20 Jul 2020 05:48:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=sKdt4hAbq/6qTa3tcNwXdqjggNwHsw7uOZ08Rf6czhk=; b=f5LLAO7/F+nm+9Gl7hfXp/Kox6
-        sXYuhXb2vkgDyYkwVEurXeRexxngk9Z2EHCb20Vm6cwQC0KkAdtVybwIWUYKPlRMRbsnYlZua+VzZ
-        Flsm7I6zi4O+te18djow1qkD4y6zW7eB+vdqOWXQqe40sAYXmcza0z+HCA79DX9OmZGLOhLwGhUFN
-        CkZ0dvcn3v1XJU220Xc46sbrIANYMzqY/4cDFUBrys3agNAh/rnUNwi19G0yCy4iST/MAWBuDJTgy
-        eAg7vhunPFR2F7DJnQOtye3bthglFnmml2ORTej2iPJzY9HBiUQo5UMJaII7PCL4D2XJQPwFgvOnM
-        oJ/gmolA==;
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=mHiWtESnfpmKOGnGR9J/VvKy447qDpvbyAZDADMp9hY=; b=PEIxnuYKVsyL4VbGipt5/qeMxh
+        hdLo1McwTpyeTRwLfRW8ZgnD8c7KxJu0KZ/qM4WKOnDjX1k53poojoKl8WDY9mRYwM12pb/UJH4Ua
+        CjyNfvuUsmPtIdMkbXPySDCjC9omPKaUZTa4ecBGlbbyDsIipip7l9Xd+wV4Z2UN9foVgIgX+4hsa
+        KANIuyKJjP0qKJA+oPLGsnhL2kIOPH9R7JhwnddXENJ3aLzrcjP+UlS8SO64LU6yvSOrerU+9833A
+        Vh5Nitqyj536Ahxvaz9eEXy0pVwRw0YrrEuyg//N9bEQT+EfyRUcSOFTCy0UWfNW7ClrBPHCvB1de
+        bSeAcmkA==;
 Received: from [2001:4bb8:105:4a81:2a8f:15b1:2c3:7be7] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jxVCl-0004WH-1J; Mon, 20 Jul 2020 12:47:39 +0000
+        id 1jxVDd-0004cd-10; Mon, 20 Jul 2020 12:48:33 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -57,10 +58,12 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         mptcp@lists.01.org, lvs-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
         tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: get rid of the address_space override in setsockopt
-Date:   Mon, 20 Jul 2020 14:47:13 +0200
-Message-Id: <20200720124737.118617-1-hch@lst.de>
+Subject: [PATCH 19/24] net/ipv6: factor out a ipv6_set_opt_hdr helper
+Date:   Mon, 20 Jul 2020 14:47:32 +0200
+Message-Id: <20200720124737.118617-20-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200720124737.118617-1-hch@lst.de>
+References: <20200720124737.118617-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -69,113 +72,183 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Dave,
+Factour out a helper to set the IPv6 option headers from
+do_ipv6_setsockopt.
 
-setsockopt is the last place in architecture-independ code that still
-uses set_fs to force the uaccess routines to operate on kernel pointers.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ net/ipv6/ipv6_sockglue.c | 150 +++++++++++++++++++--------------------
+ 1 file changed, 75 insertions(+), 75 deletions(-)
 
-This series adds a new sockptr_t type that can contained either a kernel
-or user pointer, and which has accessors that do the right thing, and
-then uses it for setsockopt, starting by refactoring some low-level
-helpers and moving them over to it before finally doing the main
-setsockopt method.
+diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+index 3897fb55372d38..90442c8366dff2 100644
+--- a/net/ipv6/ipv6_sockglue.c
++++ b/net/ipv6/ipv6_sockglue.c
+@@ -315,6 +315,80 @@ static int compat_ipv6_mcast_join_leave(struct sock *sk, int optname,
+ 	return ipv6_sock_mc_drop(sk, gr32.gr_interface, &psin6->sin6_addr);
+ }
+ 
++static int ipv6_set_opt_hdr(struct sock *sk, int optname, void __user *optval,
++		int optlen)
++{
++	struct ipv6_pinfo *np = inet6_sk(sk);
++	struct ipv6_opt_hdr *new = NULL;
++	struct net *net = sock_net(sk);
++	struct ipv6_txoptions *opt;
++	int err;
++
++	/* hop-by-hop / destination options are privileged option */
++	if (optname != IPV6_RTHDR && !ns_capable(net->user_ns, CAP_NET_RAW))
++		return -EPERM;
++
++	/* remove any sticky options header with a zero option
++	 * length, per RFC3542.
++	 */
++	if (optlen > 0) {
++		if (!optval)
++			return -EINVAL;
++		if (optlen < sizeof(struct ipv6_opt_hdr) ||
++		    optlen & 0x7 ||
++		    optlen > 8 * 255)
++			return -EINVAL;
++
++		new = memdup_user(optval, optlen);
++		if (IS_ERR(new))
++			return PTR_ERR(new);
++		if (unlikely(ipv6_optlen(new) > optlen)) {
++			kfree(new);
++			return -EINVAL;
++		}
++	}
++
++	opt = rcu_dereference_protected(np->opt, lockdep_sock_is_held(sk));
++	opt = ipv6_renew_options(sk, opt, optname, new);
++	kfree(new);
++	if (IS_ERR(opt))
++		return PTR_ERR(opt);
++
++	/* routing header option needs extra check */
++	err = -EINVAL;
++	if (optname == IPV6_RTHDR && opt && opt->srcrt) {
++		struct ipv6_rt_hdr *rthdr = opt->srcrt;
++		switch (rthdr->type) {
++#if IS_ENABLED(CONFIG_IPV6_MIP6)
++		case IPV6_SRCRT_TYPE_2:
++			if (rthdr->hdrlen != 2 || rthdr->segments_left != 1)
++				goto sticky_done;
++			break;
++#endif
++		case IPV6_SRCRT_TYPE_4:
++		{
++			struct ipv6_sr_hdr *srh =
++				(struct ipv6_sr_hdr *)opt->srcrt;
++
++			if (!seg6_validate_srh(srh, optlen, false))
++				goto sticky_done;
++			break;
++		}
++		default:
++			goto sticky_done;
++		}
++	}
++
++	err = 0;
++	opt = ipv6_update_options(sk, opt);
++sticky_done:
++	if (opt) {
++		atomic_sub(opt->tot_len, &sk->sk_omem_alloc);
++		txopt_put(opt);
++	}
++	return err;
++}
++
+ static int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 		    char __user *optval, unsigned int optlen)
+ {
+@@ -580,82 +654,8 @@ static int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 	case IPV6_RTHDRDSTOPTS:
+ 	case IPV6_RTHDR:
+ 	case IPV6_DSTOPTS:
+-	{
+-		struct ipv6_txoptions *opt;
+-		struct ipv6_opt_hdr *new = NULL;
+-
+-		/* hop-by-hop / destination options are privileged option */
+-		retv = -EPERM;
+-		if (optname != IPV6_RTHDR && !ns_capable(net->user_ns, CAP_NET_RAW))
+-			break;
+-
+-		/* remove any sticky options header with a zero option
+-		 * length, per RFC3542.
+-		 */
+-		if (optlen == 0)
+-			optval = NULL;
+-		else if (!optval)
+-			goto e_inval;
+-		else if (optlen < sizeof(struct ipv6_opt_hdr) ||
+-			 optlen & 0x7 || optlen > 8 * 255)
+-			goto e_inval;
+-		else {
+-			new = memdup_user(optval, optlen);
+-			if (IS_ERR(new)) {
+-				retv = PTR_ERR(new);
+-				break;
+-			}
+-			if (unlikely(ipv6_optlen(new) > optlen)) {
+-				kfree(new);
+-				goto e_inval;
+-			}
+-		}
+-
+-		opt = rcu_dereference_protected(np->opt,
+-						lockdep_sock_is_held(sk));
+-		opt = ipv6_renew_options(sk, opt, optname, new);
+-		kfree(new);
+-		if (IS_ERR(opt)) {
+-			retv = PTR_ERR(opt);
+-			break;
+-		}
+-
+-		/* routing header option needs extra check */
+-		retv = -EINVAL;
+-		if (optname == IPV6_RTHDR && opt && opt->srcrt) {
+-			struct ipv6_rt_hdr *rthdr = opt->srcrt;
+-			switch (rthdr->type) {
+-#if IS_ENABLED(CONFIG_IPV6_MIP6)
+-			case IPV6_SRCRT_TYPE_2:
+-				if (rthdr->hdrlen != 2 ||
+-				    rthdr->segments_left != 1)
+-					goto sticky_done;
+-
+-				break;
+-#endif
+-			case IPV6_SRCRT_TYPE_4:
+-			{
+-				struct ipv6_sr_hdr *srh = (struct ipv6_sr_hdr *)
+-							  opt->srcrt;
+-
+-				if (!seg6_validate_srh(srh, optlen, false))
+-					goto sticky_done;
+-				break;
+-			}
+-			default:
+-				goto sticky_done;
+-			}
+-		}
+-
+-		retv = 0;
+-		opt = ipv6_update_options(sk, opt);
+-sticky_done:
+-		if (opt) {
+-			atomic_sub(opt->tot_len, &sk->sk_omem_alloc);
+-			txopt_put(opt);
+-		}
++		retv = ipv6_set_opt_hdr(sk, optname, optval, optlen);
+ 		break;
+-	}
+ 
+ 	case IPV6_PKTINFO:
+ 	{
+-- 
+2.27.0
 
-Note that I could not get the eBPF selftests to work, so this has been
-tested with a testing patch that always copies the data first and passes
-a kernel pointer.  This is something that works for most common sockopts
-(and is something that the ePBF support relies on), but unfortunately
-in various corner cases we either don't use the passed in length, or in
-one case actually copy data back from setsockopt, so we unfortunately
-can't just always do the copy in the highlevel code, which would have
-been much nicer.
-
-
-Diffstt:
- crypto/af_alg.c                           |    7 
- drivers/crypto/chelsio/chtls/chtls_main.c |   18 -
- drivers/isdn/mISDN/socket.c               |    4 
- include/linux/bpfilter.h                  |    6 
- include/linux/filter.h                    |    3 
- include/linux/mroute.h                    |    5 
- include/linux/mroute6.h                   |    8 
- include/linux/net.h                       |    4 
- include/linux/netfilter.h                 |    6 
- include/linux/netfilter/x_tables.h        |    4 
- include/linux/sockptr.h                   |  121 +++++++++++
- include/net/inet_connection_sock.h        |    3 
- include/net/ip.h                          |    7 
- include/net/ipv6.h                        |    6 
- include/net/sctp/structs.h                |    2 
- include/net/sock.h                        |    7 
- include/net/tcp.h                         |    6 
- include/net/udp.h                         |    2 
- include/net/xfrm.h                        |    8 
- net/atm/common.c                          |    6 
- net/atm/common.h                          |    2 
- net/atm/pvc.c                             |    2 
- net/atm/svc.c                             |    6 
- net/ax25/af_ax25.c                        |    6 
- net/bluetooth/hci_sock.c                  |    8 
- net/bluetooth/l2cap_sock.c                |   22 +-
- net/bluetooth/rfcomm/sock.c               |   12 -
- net/bluetooth/sco.c                       |    6 
- net/bpfilter/bpfilter_kern.c              |   11 -
- net/bridge/netfilter/ebtables.c           |   46 +---
- net/caif/caif_socket.c                    |    8 
- net/can/j1939/socket.c                    |   12 -
- net/can/raw.c                             |   16 -
- net/core/filter.c                         |    6 
- net/core/sock.c                           |   36 +--
- net/dccp/dccp.h                           |    2 
- net/dccp/proto.c                          |   20 -
- net/decnet/af_decnet.c                    |   13 -
- net/ieee802154/socket.c                   |    6 
- net/ipv4/bpfilter/sockopt.c               |    8 
- net/ipv4/ip_options.c                     |   43 +---
- net/ipv4/ip_sockglue.c                    |   66 +++---
- net/ipv4/ipmr.c                           |   14 -
- net/ipv4/netfilter/arp_tables.c           |   33 +--
- net/ipv4/netfilter/ip_tables.c            |   29 +-
- net/ipv4/raw.c                            |    8 
- net/ipv4/tcp.c                            |   30 +-
- net/ipv4/tcp_ipv4.c                       |    4 
- net/ipv4/udp.c                            |   11 -
- net/ipv4/udp_impl.h                       |    4 
- net/ipv6/ip6_flowlabel.c                  |  317 ++++++++++++++++--------------
- net/ipv6/ip6mr.c                          |   17 -
- net/ipv6/ipv6_sockglue.c                  |  203 +++++++++----------
- net/ipv6/netfilter/ip6_tables.c           |   28 +-
- net/ipv6/raw.c                            |   10 
- net/ipv6/tcp_ipv6.c                       |    4 
- net/ipv6/udp.c                            |    7 
- net/ipv6/udp_impl.h                       |    4 
- net/iucv/af_iucv.c                        |    4 
- net/kcm/kcmsock.c                         |    6 
- net/l2tp/l2tp_ppp.c                       |    4 
- net/llc/af_llc.c                          |    4 
- net/mptcp/protocol.c                      |   12 -
- net/netfilter/ipvs/ip_vs_ctl.c            |    4 
- net/netfilter/nf_sockopt.c                |    2 
- net/netfilter/x_tables.c                  |   20 -
- net/netlink/af_netlink.c                  |    4 
- net/netrom/af_netrom.c                    |    4 
- net/nfc/llcp_sock.c                       |    6 
- net/packet/af_packet.c                    |   39 +--
- net/phonet/pep.c                          |    4 
- net/rds/af_rds.c                          |   30 +-
- net/rds/rdma.c                            |   14 -
- net/rds/rds.h                             |    6 
- net/rose/af_rose.c                        |    4 
- net/rxrpc/af_rxrpc.c                      |    8 
- net/rxrpc/ar-internal.h                   |    4 
- net/rxrpc/key.c                           |    9 
- net/sctp/socket.c                         |    4 
- net/smc/af_smc.c                          |    4 
- net/socket.c                              |   20 -
- net/tipc/socket.c                         |    8 
- net/tls/tls_main.c                        |   17 -
- net/vmw_vsock/af_vsock.c                  |    4 
- net/x25/af_x25.c                          |    4 
- net/xdp/xsk.c                             |    8 
- net/xfrm/xfrm_state.c                     |    6 
- 87 files changed, 855 insertions(+), 721 deletions(-)
