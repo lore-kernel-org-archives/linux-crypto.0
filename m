@@ -2,184 +2,270 @@ Return-Path: <SRS0=Ahx1=BA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A34D5C433E1
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jul 2020 11:35:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC56C433E1
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jul 2020 12:34:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8AC8F2073A
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jul 2020 11:35:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3291122482
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jul 2020 12:34:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZtvX1XL/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726942AbgGULfg (ORCPT
+        id S1726919AbgGUMeU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Jul 2020 07:35:36 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:49623 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726266AbgGULff (ORCPT
+        Tue, 21 Jul 2020 08:34:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36356 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726904AbgGUMeT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Jul 2020 07:35:35 -0400
-Received: from mail-qt1-f199.google.com ([209.85.160.199])
-        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <marcelo.cerri@canonical.com>)
-        id 1jxqYW-00018l-Q8
-        for linux-crypto@vger.kernel.org; Tue, 21 Jul 2020 11:35:32 +0000
-Received: by mail-qt1-f199.google.com with SMTP id m25so14117641qtk.1
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Jul 2020 04:35:32 -0700 (PDT)
+        Tue, 21 Jul 2020 08:34:19 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC322C061794;
+        Tue, 21 Jul 2020 05:34:19 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id g67so11880881pgc.8;
+        Tue, 21 Jul 2020 05:34:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9vT+ryoFOyN/388ib3S7OpMgYYcknWATF+35KGtV21o=;
+        b=ZtvX1XL/SkA8UNSdRcB3f0x+Rls0qmqEKuSTAfTAy5km/1rJn3jjjplyp5pUSVUkR+
+         8Vi0IxKYShw0yQR/rnoS7FL5trXX9MxIZiIr1a83hjR7DL40dmNeb4F2NijKQ5pf/UeG
+         9ZnzT8V8AX7AZsZbPGmYPOu8ry0rMCtFSPp5azhoxkB2jHbs38lZMWUwM9EODYLRuaA9
+         fQzSaAvqopVELjN46xwgw1B5hhhfriyXZ07D40VhUoZFs/JzPgvhBqG30f4Cxovo041h
+         HjGl5nsGIBhOCf1ThBGR7lQatupjm4zxsH0tUdbC4x6qP/Sf5t5rPiKGtoWTC/ZUb8Qt
+         Uumg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=j1nJM1fQy7zet5k/ljBwGsBTKP8Zxzmp3fpVv8uHYCU=;
-        b=aRtHLfrWLhIkEL2fd66Ujm7b+sCKUUOEdOhdlxHLUxsOtcWi2Itqwa6E6CRIQfFRWV
-         pIey8W6x6Uhm9VEiKDYJw/1FhobXMMZBc5yWJDPXSS3xev4n3+MUFtUjJPnjO1URa0kX
-         Hmey66qA5yezVTOMvHb/11t74LdcMPMKpgTsMZGXZovlNMfXiADYWyMjggjAUNJsBBIe
-         9OIhj70SMegq3vjqLqXHEi1CfJ5UuFhyasEU4qfR/oDrE9P4OHhrwalMxcfBMlr5FaUT
-         A8xh/+RFMkTVG8BbNsrLjcoTLpNRLHTXpwpf0d6LPGdM760iqaVKYT6jUqgAN3XSNOfD
-         H8qQ==
-X-Gm-Message-State: AOAM531qXsiZEXbL6IG/wFWSfjIuVtG3P4Bl1YUnCfCvZVQwLYfMcNmU
-        YTX+4Kl2Fk+QWpZ1jdJUQTUoagZI2Ve9pDS5Ypit6wyE0ldOUJ2e64WOnz9MLr3LJBq8/AMPsqd
-        9wNlIPIl9ij7CPyvruVSr47+K56WryePzXE1p9BjR
-X-Received: by 2002:ac8:7587:: with SMTP id s7mr28797005qtq.304.1595331331740;
-        Tue, 21 Jul 2020 04:35:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz82JiiYEjOiC7ovIIPUX4RY488QkDunyVYkmiOdNA9/R17DZ7nzM5EdV/z4Zq5tP5qsbnd7Q==
-X-Received: by 2002:ac8:7587:: with SMTP id s7mr28796961qtq.304.1595331331297;
-        Tue, 21 Jul 2020 04:35:31 -0700 (PDT)
-Received: from valinor ([2804:14c:4e6:18:6044:1674:f98f:d11e])
-        by smtp.gmail.com with ESMTPSA id r35sm22223584qtb.11.2020.07.21.04.35.27
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9vT+ryoFOyN/388ib3S7OpMgYYcknWATF+35KGtV21o=;
+        b=a5f/1ZC+1gmkL2LXeLwasgBfsghK3XEHAkSusm62Ob090BLs90sNIbuubYJFr18E/Y
+         n/GOpXg3PQkpd5Y8hm464PEpbrSPRm+9oL9AP0CE9hc3nVwNjAn6d4zEOOXQYDTCdYSl
+         ctHtEyfhsw+EONDZhcWQyPzNwT5ShGcDDJzl8Ou7HvHtCXsiPfo6s+z5pS0ErEPevc7T
+         F1jeMnp8MBYWYkXzv/gZmtgov0pKETbjFFFxv1Yxjy2Y1U3iRIyMRuYnt7F9TdxOMj03
+         ys9A2KGOmi1ELsPYXXCO0JBGqhKZTNH24u7Cu526awcgui1jL8QZzNLkKMlWukiXRZ8H
+         PqRg==
+X-Gm-Message-State: AOAM532TzknuUkNXjSPiQXLiYHEGi2cHy6oY75X7YoCCevfO0d83yR4h
+        HMVLvzGDfmT9zypbRpHgcLo=
+X-Google-Smtp-Source: ABdhPJxcl0WN5ZhDqD4cKYQdyXsYpozM13cNwLYDulzs8b0p8enF59LgE5wfjKSNcwiZlpQ9Bjd8jQ==
+X-Received: by 2002:a63:f806:: with SMTP id n6mr22169429pgh.346.1595334859251;
+        Tue, 21 Jul 2020 05:34:19 -0700 (PDT)
+Received: from varodek.iballbatonwifi.com ([103.105.153.67])
+        by smtp.gmail.com with ESMTPSA id h9sm20293586pfk.155.2020.07.21.05.34.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jul 2020 04:35:29 -0700 (PDT)
-Date:   Tue, 21 Jul 2020 08:35:24 -0300
-From:   Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-To:     Stephan =?utf-8?Q?M=C3=BCller?= <smueller@chronox.de>
-Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        ard.biesheuvel@linaro.org, nhorman@redhat.com, simo@redhat.com
-Subject: Re: [PATCH v3 0/5] DH: SP800-56A rev 3 compliant validation checks
-Message-ID: <20200721113524.kdfs4nwn2oacexqx@valinor>
-References: <2543601.mvXUDI8C0e@positron.chronox.de>
- <5722559.lOV4Wx5bFT@positron.chronox.de>
- <2544426.mvXUDI8C0e@positron.chronox.de>
+        Tue, 21 Jul 2020 05:34:18 -0700 (PDT)
+From:   Vaibhav Gupta <vaibhavgupta40@gmail.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Bjorn Helgaas <bjorn@helgaas.com>,
+        Vaibhav Gupta <vaibhav.varodek@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Vaibhav Gupta <vaibhavgupta40@gmail.com>,
+        linux-kernel@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH v1] crypto: ccp: sp-pci: use generic power management
+Date:   Tue, 21 Jul 2020 18:01:47 +0530
+Message-Id: <20200721123146.81710-1-vaibhavgupta40@gmail.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="pqj4lohvsb5td2q3"
-Content-Disposition: inline
-In-Reply-To: <2544426.mvXUDI8C0e@positron.chronox.de>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Drivers using legacy power management .suspen()/.resume() callbacks
+have to manage PCI states and device's PM states themselves. They also
+need to take care of standard configuration registers.
 
---pqj4lohvsb5td2q3
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Switch to generic power management framework using a single
+"struct dev_pm_ops" variable to take the unnecessary load from the driver.
+This also avoids the need for the driver to directly call most of the PCI
+helper functions and device power state control functions as through
+the generic framework, PCI Core takes care of the necessary operations,
+and drivers are required to do only device-specific jobs.
 
-Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Signed-off-by: Vaibhav Gupta <vaibhavgupta40@gmail.com>
+---
+ drivers/crypto/ccp/ccp-dev.c     |  8 +++-----
+ drivers/crypto/ccp/sp-dev.c      |  6 ++----
+ drivers/crypto/ccp/sp-dev.h      |  6 +++---
+ drivers/crypto/ccp/sp-pci.c      | 17 ++++++-----------
+ drivers/crypto/ccp/sp-platform.c |  2 +-
+ 5 files changed, 15 insertions(+), 24 deletions(-)
 
-On Mon, Jul 20, 2020 at 07:05:45PM +0200, Stephan M=FCller wrote:
-> Hi,
->=20
-> This patch set adds the required checks to make all aspects of
-> (EC)DH compliant with SP800-56A rev 3 assuming that all keys
-> are ephemeral. The use of static keys adds yet additional
-> validations which are hard to achieve in the kernel.
->=20
-> SP800-56A rev 3 mandates various checks:
->=20
-> - validation of remote public key defined in section 5.6.2.2.2
->   is already implemented in:
->=20
->   * ECC: crypto_ecdh_shared_secret with the call of
->     ecc_is_pubkey_valid_partial
->=20
->   * FFC: dh_compute_val when the req->src is read and validated with
->     dh_is_pubkey_valid
->=20
-> - validation of generated shared secret: The patch set adds the
->   shared secret validation as defined by SP800-56A rev 3. For
->   ECDH this only implies that the validation of the shared secret
->   is moved before the shared secret is returned to the caller.
->=20
->   For DH, the validation is required to be performed against the prime
->   of the domain parameter set.
->=20
->   This patch adds the MPI library file mpi_sub_ui that is required
->   to calculate P - 1 for the DH check. It would be possible, though
->   to simply set the LSB of the prime to 0 to obtain P - 1 (since
->   P is odd per definition) which implies that mpi_sub_ui would not
->   be needed. However, this would require a copy operation from
->   the existing prime MPI value into a temporary MPI where the
->   modification can be performed. Such copy operation is not available.
->   Therefore, the solution with the addition of mpi_sub_ui was chosen.
->=20
->   NOTE: The function mpi_sub_ui is also added with the patch set
->   "[PATCH v5 2/8] lib/mpi: Extend the MPI library" currently sent
->   to the linux-crypto mailing list.
->=20
-> - validation of the generated local public key: Patches 4 and 5 of
->   this patch set adds the required checks.
->=20
-> Changes to v2:
->=20
-> - add reference to GnuMP providing the basis for patch 2 and updating
->   the copyright note in patch 2
->=20
-> Changes to v1:
->=20
-> - fix reference to Gnu MP as outlined by Ard Biesheuvel
-> - addition of patches 4 and 5
->=20
-> Marcelo Henrique Cerri (1):
->   lib/mpi: Add mpi_sub_ui()
->=20
-> Stephan Mueller (4):
->   crypto: ECDH - check validity of Z before export
->   crypto: DH - check validity of Z before export
->   crypto: DH SP800-56A rev 3 local public key validation
->   crypto: ECDH SP800-56A rev 3 local public key validation
->=20
->  crypto/dh.c          | 38 +++++++++++++++++++++
->  crypto/ecc.c         | 42 +++++++++++++++++++++---
->  crypto/ecc.h         | 14 ++++++++
->  include/linux/mpi.h  |  3 ++
->  lib/mpi/Makefile     |  1 +
->  lib/mpi/mpi-sub-ui.c | 78 ++++++++++++++++++++++++++++++++++++++++++++
->  6 files changed, 172 insertions(+), 4 deletions(-)
->  create mode 100644 lib/mpi/mpi-sub-ui.c
->=20
-> --=20
-> 2.26.2
->=20
->=20
->=20
->=20
+diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+index 19ac509ed76e..8ae26d3cffff 100644
+--- a/drivers/crypto/ccp/ccp-dev.c
++++ b/drivers/crypto/ccp/ccp-dev.c
+@@ -531,8 +531,7 @@ int ccp_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ 	return len;
+ }
+ 
+-#ifdef CONFIG_PM
+-bool ccp_queues_suspended(struct ccp_device *ccp)
++bool __maybe_unused ccp_queues_suspended(struct ccp_device *ccp)
+ {
+ 	unsigned int suspended = 0;
+ 	unsigned long flags;
+@@ -549,7 +548,7 @@ bool ccp_queues_suspended(struct ccp_device *ccp)
+ 	return ccp->cmd_q_count == suspended;
+ }
+ 
+-int ccp_dev_suspend(struct sp_device *sp, pm_message_t state)
++int __maybe_unused ccp_dev_suspend(struct sp_device *sp)
+ {
+ 	struct ccp_device *ccp = sp->ccp_data;
+ 	unsigned long flags;
+@@ -577,7 +576,7 @@ int ccp_dev_suspend(struct sp_device *sp, pm_message_t state)
+ 	return 0;
+ }
+ 
+-int ccp_dev_resume(struct sp_device *sp)
++int __maybe_unused ccp_dev_resume(struct sp_device *sp)
+ {
+ 	struct ccp_device *ccp = sp->ccp_data;
+ 	unsigned long flags;
+@@ -601,7 +600,6 @@ int ccp_dev_resume(struct sp_device *sp)
+ 
+ 	return 0;
+ }
+-#endif
+ 
+ int ccp_dev_init(struct sp_device *sp)
+ {
+diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
+index ce42675d3274..6284a15e5047 100644
+--- a/drivers/crypto/ccp/sp-dev.c
++++ b/drivers/crypto/ccp/sp-dev.c
+@@ -211,13 +211,12 @@ void sp_destroy(struct sp_device *sp)
+ 	sp_del_device(sp);
+ }
+ 
+-#ifdef CONFIG_PM
+-int sp_suspend(struct sp_device *sp, pm_message_t state)
++int sp_suspend(struct sp_device *sp)
+ {
+ 	int ret;
+ 
+ 	if (sp->dev_vdata->ccp_vdata) {
+-		ret = ccp_dev_suspend(sp, state);
++		ret = ccp_dev_suspend(sp);
+ 		if (ret)
+ 			return ret;
+ 	}
+@@ -237,7 +236,6 @@ int sp_resume(struct sp_device *sp)
+ 
+ 	return 0;
+ }
+-#endif
+ 
+ struct sp_device *sp_get_psp_master_device(void)
+ {
+diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
+index f913f1494af9..0218d0670eee 100644
+--- a/drivers/crypto/ccp/sp-dev.h
++++ b/drivers/crypto/ccp/sp-dev.h
+@@ -119,7 +119,7 @@ int sp_init(struct sp_device *sp);
+ void sp_destroy(struct sp_device *sp);
+ struct sp_device *sp_get_master(void);
+ 
+-int sp_suspend(struct sp_device *sp, pm_message_t state);
++int sp_suspend(struct sp_device *sp);
+ int sp_resume(struct sp_device *sp);
+ int sp_request_ccp_irq(struct sp_device *sp, irq_handler_t handler,
+ 		       const char *name, void *data);
+@@ -134,7 +134,7 @@ struct sp_device *sp_get_psp_master_device(void);
+ int ccp_dev_init(struct sp_device *sp);
+ void ccp_dev_destroy(struct sp_device *sp);
+ 
+-int ccp_dev_suspend(struct sp_device *sp, pm_message_t state);
++int ccp_dev_suspend(struct sp_device *sp);
+ int ccp_dev_resume(struct sp_device *sp);
+ 
+ #else	/* !CONFIG_CRYPTO_DEV_SP_CCP */
+@@ -145,7 +145,7 @@ static inline int ccp_dev_init(struct sp_device *sp)
+ }
+ static inline void ccp_dev_destroy(struct sp_device *sp) { }
+ 
+-static inline int ccp_dev_suspend(struct sp_device *sp, pm_message_t state)
++static inline int ccp_dev_suspend(struct sp_device *sp)
+ {
+ 	return 0;
+ }
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index cb6cb47053f4..f471dbaef1fb 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -252,23 +252,19 @@ static void sp_pci_remove(struct pci_dev *pdev)
+ 	sp_free_irqs(sp);
+ }
+ 
+-#ifdef CONFIG_PM
+-static int sp_pci_suspend(struct pci_dev *pdev, pm_message_t state)
++static int __maybe_unused sp_pci_suspend(struct device *dev)
+ {
+-	struct device *dev = &pdev->dev;
+ 	struct sp_device *sp = dev_get_drvdata(dev);
+ 
+-	return sp_suspend(sp, state);
++	return sp_suspend(sp);
+ }
+ 
+-static int sp_pci_resume(struct pci_dev *pdev)
++static int __maybe_unused sp_pci_resume(struct device *dev)
+ {
+-	struct device *dev = &pdev->dev;
+ 	struct sp_device *sp = dev_get_drvdata(dev);
+ 
+ 	return sp_resume(sp);
+ }
+-#endif
+ 
+ #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+ static const struct sev_vdata sevv1 = {
+@@ -365,15 +361,14 @@ static const struct pci_device_id sp_pci_table[] = {
+ };
+ MODULE_DEVICE_TABLE(pci, sp_pci_table);
+ 
++static SIMPLE_DEV_PM_OPS(sp_pci_pm_ops, sp_pci_suspend, sp_pci_resume);
++
+ static struct pci_driver sp_pci_driver = {
+ 	.name = "ccp",
+ 	.id_table = sp_pci_table,
+ 	.probe = sp_pci_probe,
+ 	.remove = sp_pci_remove,
+-#ifdef CONFIG_PM
+-	.suspend = sp_pci_suspend,
+-	.resume = sp_pci_resume,
+-#endif
++	.driver.pm = &sp_pci_pm_ops,
+ };
+ 
+ int sp_pci_init(void)
+diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
+index 831aac1393a2..9dba52fbee99 100644
+--- a/drivers/crypto/ccp/sp-platform.c
++++ b/drivers/crypto/ccp/sp-platform.c
+@@ -207,7 +207,7 @@ static int sp_platform_suspend(struct platform_device *pdev,
+ 	struct device *dev = &pdev->dev;
+ 	struct sp_device *sp = dev_get_drvdata(dev);
+ 
+-	return sp_suspend(sp, state);
++	return sp_suspend(sp);
+ }
+ 
+ static int sp_platform_resume(struct platform_device *pdev)
+-- 
+2.27.0
 
---=20
-Regards,
-Marcelo
-
-
---pqj4lohvsb5td2q3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQGzBAABCgAdFiEExJjLjAfVL0XbfEr56e82LoessAkFAl8W0vwACgkQ6e82Loes
-sAmqgAv/YksrmcmPJVLbzFQPzh2kn1HNr6uMFQ9yBP/0uyLgSuxyiwI5v1iNq3IX
-UUE8rb78JH6OtajzTRsAdqfxssiTWMW4UajWxdpLAnrO8LXHyzrqVy9szsPl6GnL
-ek7hTRROa4nSg2eKvaG216p+f8z4mbhDhb00uDJAum89l8b/Ou/gCw/058YhqaT0
-BfIvd5F+/KfxgPwJ1SrSlMl2UiaJe/auQ0UMDNf29CeKW7fxJ2SB+EQAPKEVX+CH
-V8SABJofXUAurynQnIGC8BYiZXWaEcbjyBFkRqEtmizDjtNohs7BGcfpToYp2lDe
-l3rw54fnnKS3CChyg6A5jw9lW6CDrXfDv4qvs46eBrrnoMUfbDnGTt8T2iir7nem
-Ch5h70TG71klZ99L46ems8Mw5wKz7JG+eJXbNsEuX4eCJrUwTB+HA8Kbl/iOgeiy
-Y6hBpyLku42aQU1cjDvsdmmRGrthY4vrelGZ4EotaJdV44QA7QdSURRBKB1T1ACJ
-CE35nqtN
-=8jDX
------END PGP SIGNATURE-----
-
---pqj4lohvsb5td2q3--
