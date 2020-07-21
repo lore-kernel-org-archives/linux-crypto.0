@@ -2,240 +2,190 @@ Return-Path: <SRS0=Ahx1=BA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5444DC433E7
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jul 2020 04:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79A2EC433E2
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jul 2020 04:38:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 32B3422CA1
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jul 2020 04:28:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4BA7E208E4
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jul 2020 04:38:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="kWAnq1pz"
+	dkim=pass (1024-bit key) header.d=voleatech.de header.i=@voleatech.de header.b="ko1IRxSj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726587AbgGUE2z (ORCPT
+        id S1726284AbgGUEiD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Jul 2020 00:28:55 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:38733 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725294AbgGUE2z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Jul 2020 00:28:55 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4B9lwJ1slYz9sRR;
-        Tue, 21 Jul 2020 14:28:47 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1595305730;
-        bh=91WFzPEefhKLKMfP1BJFRHM/dzkdTxB3Wion0WWI7Ro=;
-        h=Date:From:To:Cc:Subject:From;
-        b=kWAnq1pz86jpMhs5cbSPQrfSBsvbZ9gtu241uhTRsl+4ayw2wsgTFI1aBYncSXIbJ
-         Vzl+ylJVsXIc4ABwpenqnTS48xV3FTiyUEURRsuRaz1A5jsjUSRbVROCnYlIoBL5/E
-         EJ7gshfxN4B0TtZKMGV8n6Q1XfEkhlXY7QFNU86tmWtuunXJlCPr3XFOazttW0TBll
-         rYC2OqlEkucF9SpVbSwAo8hRSSsBR7Czdu4PfewIzX0Dbe2pnDxOcyksb4QqgYzHiU
-         fMNRl9B10MaMmJNlkFID2mn4/umimah8YsGU0o5/xcUVEnYJN4vCmyBNXSybUIPv8o
-         VlWlludng4YGA==
-Date:   Tue, 21 Jul 2020 14:28:45 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@elte.hu>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Sasha Levin <sashal@kernel.org>,
-        Uros Bizjak <ubizjak@gmail.com>
-Subject: linux-next: manual merge of the tip tree with the crypto tree
-Message-ID: <20200721142845.76ebea00@canb.auug.org.au>
+        Tue, 21 Jul 2020 00:38:03 -0400
+Received: from mail-eopbgr10116.outbound.protection.outlook.com ([40.107.1.116]:59270
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726254AbgGUEiD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 Jul 2020 00:38:03 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Yh33UtpqQ5QwXTDb0stmCacuOQ66ZpXGnwlKqBoORAoRFSh/P+in1adgxMZIWrFz8IAnLE/8Mpk9xM3xtcC7DXhEv+oJL6kKi6+zVNXIg+eEdd/Veih9kezBpoaZDi3VhskmXP6ixSM5MyMwyDe3FtRBNoa0NQtjNtokSLo7/3cRfF98OYAu3y6sdUmOUtiQRfEYuh/0XfxIJo1Ye3KLXWnnfaWgxwP5xlrGiph/ngB0WbjyX7sprm4jAxms/B2T4xD6LuIMCNUxfmhxmfS1ArLnf6Ubz/vsGM1zJUF986aIJCuHmBHnQwv3fWgte+CKkYJOHQHcRxpBkrjpZdqHPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=llkz4TH8+xPy1eVbbZrT1tIhwScRdM6NaN78uAoG4Cs=;
+ b=I5EsGRAo3Pv81mLuH2gKrwBWo4OmhWS6DiLjfkURueic4CCFsOvmAyu0TFeXZ4vkAL+0dxAYF95iayjEZ6qvR80kEhZfAOzArLUH+KTJuHPK+3t7cIroHIq53cQBOGeOA5RWAlc/gEpJS9WarVE2Y+mHTxC9zlKR8v1FDztAOivW0OUDvTkqBhbteZb8Ol6Un8Zz4FDNUnXzDTFFbSjGHECElIbGAAdlJPmHUKL6UAhy/9XmKk/g6lCypXC3Ghe/EzjrZ+dRGcHb6jxHF5P2QOjFXfqIztDKup7dd0+wk4hbq7gaEwfaJG22cx4oQW/4cElOPS2wJWV1B11+iN9kkA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=voleatech.de; dmarc=pass action=none header.from=voleatech.de;
+ dkim=pass header.d=voleatech.de; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=voleatech.de;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=llkz4TH8+xPy1eVbbZrT1tIhwScRdM6NaN78uAoG4Cs=;
+ b=ko1IRxSjAa/zlbP3qgO5BbwVjC82A2lBnoJbfD3bvGPpZ0CJNeuCZMDuXylO7iz0acmeHwCaijsAP5gX+tBbaftfidhmN20xfUKhdybIo6qjXX4jqWdcnqz1VFNQo7xOxMuF2CViinkv7/Lza98RGHx24zzlb4TEQnaC12eSUFQ=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none
+ header.from=voleatech.de;
+Received: from AM4PR0501MB2785.eurprd05.prod.outlook.com
+ (2603:10a6:200:5d::11) by AM4PR05MB3284.eurprd05.prod.outlook.com
+ (2603:10a6:205:4::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.24; Tue, 21 Jul
+ 2020 04:38:00 +0000
+Received: from AM4PR0501MB2785.eurprd05.prod.outlook.com
+ ([fe80::39a1:e237:5fef:6f39]) by AM4PR0501MB2785.eurprd05.prod.outlook.com
+ ([fe80::39a1:e237:5fef:6f39%11]) with mapi id 15.20.3195.026; Tue, 21 Jul
+ 2020 04:38:00 +0000
+Date:   Tue, 21 Jul 2020 06:37:59 +0200
+From:   Sven Auhagen <Sven.Auhagen@voleatech.de>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, pvanleeuwen@rambus.com,
+        antoine.tenart@bootlin.com, ardb@kernel.org
+Subject: [PATCH 1/1 v3] inside-secure irq balance
+Message-ID: <20200721043759.4tpgtxjohnhx3yuv@SvensMacBookAir.sven.lan>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-ClientProxiedBy: AM0PR03CA0086.eurprd03.prod.outlook.com
+ (2603:10a6:208:69::27) To AM4PR0501MB2785.eurprd05.prod.outlook.com
+ (2603:10a6:200:5d::11)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/.j5GyyiXptkUvHOgZllA5Tt";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from SvensMacBookAir.sven.lan (109.193.235.168) by AM0PR03CA0086.eurprd03.prod.outlook.com (2603:10a6:208:69::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.18 via Frontend Transport; Tue, 21 Jul 2020 04:38:00 +0000
+X-Originating-IP: [109.193.235.168]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 9a40ca86-1d74-4857-63a7-08d82d2fd91f
+X-MS-TrafficTypeDiagnostic: AM4PR05MB3284:
+X-Microsoft-Antispam-PRVS: <AM4PR05MB3284D638C7C7166E380C2A38EF780@AM4PR05MB3284.eurprd05.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:53;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6+bFZuEv1h9apILOft7JSbd/LLBUwmu6AYPmULYwx4bvHkHnPwBinhE/p3d1AuJmkeTeQA3wQv5hrdO3fRkiyO+ophpMPRP1rAwa4ZBDlJKXmO5f7nnCVj0UGdWg1KZapq7KyPoKtCmEbHDCQp2/fEza5yHxinD6V+L/WWFayJq4hHmMOCG2FM067Q5AQM6n9CsdEw7rASf/UY2u3oqJ/J5QnpQxbFR7J0341/19gu33B95DGfVh4MNqZ8gYGqvkyAdSGkNTMPhhSlzlKvh2ryiu4AdCt0x9ouLxCFkIwwpS2n7odPqa/96W/YwrCqyyJABN7cSNSxXqgD0SvTjnaw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM4PR0501MB2785.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39830400003)(366004)(396003)(346002)(376002)(136003)(66476007)(6506007)(66556008)(8676002)(2906002)(186003)(4326008)(508600001)(8936002)(16526019)(26005)(9686003)(52116002)(7696005)(66946007)(5660300002)(6916009)(1076003)(83380400001)(316002)(956004)(86362001)(55016002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData: ALwRvTeD8qNAzPpnGl/l5xhzP8Cydas1xr7uR3t5Rtr6idKOFcHIdQkQ0+U+b++/I2XsQaCiyWfS8VZq6ud8k5lnQd+jAhYmN5mt1lPPArSRaEjTH9vFQ7U8wsdQbtd3/SZoj7XbKKwvTCynyyPCtD57dwDtZS04mJH78cvxVhilrI1Z/braK8e3EbY10MNm5siilFPJXsi/IypU1qV1zGPwOOOyY2wDKa8MB6ELTYle+od7tzUc7CKSCWieUSuMSd+12KF/TK1jyTl07L8Dx630JfzHMTvKE4u2b3dV/xeTsYAKN7Deg5ycuOXTLXSjTTCXbofSimXu48PYPV9GM/KUgSQ1yd5gtT9UIZFdtbFgXG/Fo2D00jNcm53Vh53p4K6O3ZJWED9x3xKXVAZPseoF5VLYl5IzLHVLZwwbG2NHxmysfHBt0vWALq5wqJtbQFNkZP3tezXRqtITqWQXK+nh6SvDtEXvjfDbi/EMmaeaPmOCc2i0fHb04gCpKzYq
+X-OriginatorOrg: voleatech.de
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a40ca86-1d74-4857-63a7-08d82d2fd91f
+X-MS-Exchange-CrossTenant-AuthSource: AM4PR0501MB2785.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2020 04:38:00.4420
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b82a99f6-7981-4a72-9534-4d35298f847b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ybOGEHdeoq7TWg8ZvYaYBuK+m5Uq/rIL+8EXOmKyP4ltaitgrXhPdT2yve31zAAK6Wn3hjvIjtHwEeEMgFiYJV1FgLeV3LmJKPSX1sweIls=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM4PR05MB3284
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/.j5GyyiXptkUvHOgZllA5Tt
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Balance the irqs of the inside secure driver over all
+available cpus.
+Currently all interrupts are handled by the first CPU.
 
-Hi all,
+From my testing with IPSec AES-GCM 256
+on my MCbin with 4 Cores I get a 50% speed increase:
 
-Today's linux-next merge of the tip tree got a conflict in:
+Before the patch: 99.73 Kpps
+With the patch: 151.25 Kpps
 
-  arch/x86/include/asm/inst.h
+Signed-off-by: Sven Auhagen <sven.auhagen@voleatech.de>
+---
+v3:
+* use NUMA_NO_NODE constant
 
-between commit:
+v2:
+* use cpumask_local_spread and remove affinity on
+  module remove
 
-  d7866e503bdc ("crypto: x86 - Remove include/asm/inst.h")
-(also "crypto: x86 - Put back integer parts of include/asm/inst.h"
-which I have added to the crypto tree merge today)
+ drivers/crypto/inside-secure/safexcel.c | 13 +++++++++++--
+ drivers/crypto/inside-secure/safexcel.h |  3 +++
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
-from the crypto tree and commit:
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 2cb53fbae841..fb8e0d8732f8 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -1135,11 +1135,12 @@ static irqreturn_t safexcel_irq_ring_thread(int irq, void *data)
+ 
+ static int safexcel_request_ring_irq(void *pdev, int irqid,
+ 				     int is_pci_dev,
++				     int ring_id,
+ 				     irq_handler_t handler,
+ 				     irq_handler_t threaded_handler,
+ 				     struct safexcel_ring_irq_data *ring_irq_priv)
+ {
+-	int ret, irq;
++	int ret, irq, cpu;
+ 	struct device *dev;
+ 
+ 	if (IS_ENABLED(CONFIG_PCI) && is_pci_dev) {
+@@ -1177,6 +1178,10 @@ static int safexcel_request_ring_irq(void *pdev, int irqid,
+ 		return ret;
+ 	}
+ 
++	/* Set affinity */
++	cpu = cpumask_local_spread(ring_id, NUMA_NO_NODE);
++	irq_set_affinity_hint(irq, get_cpu_mask(cpu));
++
+ 	return irq;
+ }
+ 
+@@ -1611,6 +1616,7 @@ static int safexcel_probe_generic(void *pdev,
+ 		irq = safexcel_request_ring_irq(pdev,
+ 						EIP197_IRQ_NUMBER(i, is_pci_dev),
+ 						is_pci_dev,
++						i,
+ 						safexcel_irq_ring,
+ 						safexcel_irq_ring_thread,
+ 						ring_irq);
+@@ -1619,6 +1625,7 @@ static int safexcel_probe_generic(void *pdev,
+ 			return irq;
+ 		}
+ 
++		priv->ring[i].irq = irq;
+ 		priv->ring[i].work_data.priv = priv;
+ 		priv->ring[i].work_data.ring = i;
+ 		INIT_WORK(&priv->ring[i].work_data.work,
+@@ -1756,8 +1763,10 @@ static int safexcel_remove(struct platform_device *pdev)
+ 	clk_disable_unprepare(priv->reg_clk);
+ 	clk_disable_unprepare(priv->clk);
+ 
+-	for (i = 0; i < priv->config.rings; i++)
++	for (i = 0; i < priv->config.rings; i++) {
++		irq_set_affinity_hint(priv->ring[i].irq, NULL);
+ 		destroy_workqueue(priv->ring[i].workqueue);
++	}
+ 
+ 	return 0;
+ }
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index 94016c505abb..7c5fe382d272 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -707,6 +707,9 @@ struct safexcel_ring {
+ 	 */
+ 	struct crypto_async_request *req;
+ 	struct crypto_async_request *backlog;
++
++	/* irq of this ring */
++	int irq;
+ };
+ 
+ /* EIP integration context flags */
+-- 
+2.20.1
 
-  eaad981291ee ("x86/entry/64: Introduce the FIND_PERCPU_BASE macro")
-
-from the tip tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc arch/x86/include/asm/inst.h
-index 438ccd4f3cc4,d063841a17e3..000000000000
---- a/arch/x86/include/asm/inst.h
-+++ b/arch/x86/include/asm/inst.h
-@@@ -143,6 -203,124 +143,21 @@@
-  	.macro MODRM mod opd1 opd2
-  	.byte \mod | (\opd1 & 7) | ((\opd2 & 7) << 3)
-  	.endm
-+=20
- -	.macro PSHUFB_XMM xmm1 xmm2
- -	XMM_NUM pshufb_opd1 \xmm1
- -	XMM_NUM pshufb_opd2 \xmm2
- -	PFX_OPD_SIZE
- -	PFX_REX pshufb_opd1 pshufb_opd2
- -	.byte 0x0f, 0x38, 0x00
- -	MODRM 0xc0 pshufb_opd1 pshufb_opd2
- -	.endm
- -
- -	.macro PCLMULQDQ imm8 xmm1 xmm2
- -	XMM_NUM clmul_opd1 \xmm1
- -	XMM_NUM clmul_opd2 \xmm2
- -	PFX_OPD_SIZE
- -	PFX_REX clmul_opd1 clmul_opd2
- -	.byte 0x0f, 0x3a, 0x44
- -	MODRM 0xc0 clmul_opd1 clmul_opd2
- -	.byte \imm8
- -	.endm
- -
- -	.macro PEXTRD imm8 xmm gpr
- -	R32_NUM extrd_opd1 \gpr
- -	XMM_NUM extrd_opd2 \xmm
- -	PFX_OPD_SIZE
- -	PFX_REX extrd_opd1 extrd_opd2
- -	.byte 0x0f, 0x3a, 0x16
- -	MODRM 0xc0 extrd_opd1 extrd_opd2
- -	.byte \imm8
- -	.endm
- -
- -	.macro AESKEYGENASSIST rcon xmm1 xmm2
- -	XMM_NUM aeskeygen_opd1 \xmm1
- -	XMM_NUM aeskeygen_opd2 \xmm2
- -	PFX_OPD_SIZE
- -	PFX_REX aeskeygen_opd1 aeskeygen_opd2
- -	.byte 0x0f, 0x3a, 0xdf
- -	MODRM 0xc0 aeskeygen_opd1 aeskeygen_opd2
- -	.byte \rcon
- -	.endm
- -
- -	.macro AESIMC xmm1 xmm2
- -	XMM_NUM aesimc_opd1 \xmm1
- -	XMM_NUM aesimc_opd2 \xmm2
- -	PFX_OPD_SIZE
- -	PFX_REX aesimc_opd1 aesimc_opd2
- -	.byte 0x0f, 0x38, 0xdb
- -	MODRM 0xc0 aesimc_opd1 aesimc_opd2
- -	.endm
- -
- -	.macro AESENC xmm1 xmm2
- -	XMM_NUM aesenc_opd1 \xmm1
- -	XMM_NUM aesenc_opd2 \xmm2
- -	PFX_OPD_SIZE
- -	PFX_REX aesenc_opd1 aesenc_opd2
- -	.byte 0x0f, 0x38, 0xdc
- -	MODRM 0xc0 aesenc_opd1 aesenc_opd2
- -	.endm
- -
- -	.macro AESENCLAST xmm1 xmm2
- -	XMM_NUM aesenclast_opd1 \xmm1
- -	XMM_NUM aesenclast_opd2 \xmm2
- -	PFX_OPD_SIZE
- -	PFX_REX aesenclast_opd1 aesenclast_opd2
- -	.byte 0x0f, 0x38, 0xdd
- -	MODRM 0xc0 aesenclast_opd1 aesenclast_opd2
- -	.endm
- -
- -	.macro AESDEC xmm1 xmm2
- -	XMM_NUM aesdec_opd1 \xmm1
- -	XMM_NUM aesdec_opd2 \xmm2
- -	PFX_OPD_SIZE
- -	PFX_REX aesdec_opd1 aesdec_opd2
- -	.byte 0x0f, 0x38, 0xde
- -	MODRM 0xc0 aesdec_opd1 aesdec_opd2
- -	.endm
- -
- -	.macro AESDECLAST xmm1 xmm2
- -	XMM_NUM aesdeclast_opd1 \xmm1
- -	XMM_NUM aesdeclast_opd2 \xmm2
- -	PFX_OPD_SIZE
- -	PFX_REX aesdeclast_opd1 aesdeclast_opd2
- -	.byte 0x0f, 0x38, 0xdf
- -	MODRM 0xc0 aesdeclast_opd1 aesdeclast_opd2
- -	.endm
- -
- -	.macro MOVQ_R64_XMM opd1 opd2
- -	REG_TYPE movq_r64_xmm_opd1_type \opd1
- -	.if movq_r64_xmm_opd1_type =3D=3D REG_TYPE_XMM
- -	XMM_NUM movq_r64_xmm_opd1 \opd1
- -	R64_NUM movq_r64_xmm_opd2 \opd2
- -	.else
- -	R64_NUM movq_r64_xmm_opd1 \opd1
- -	XMM_NUM movq_r64_xmm_opd2 \opd2
- -	.endif
- -	PFX_OPD_SIZE
- -	PFX_REX movq_r64_xmm_opd1 movq_r64_xmm_opd2 1
- -	.if movq_r64_xmm_opd1_type =3D=3D REG_TYPE_XMM
- -	.byte 0x0f, 0x7e
- -	.else
- -	.byte 0x0f, 0x6e
- -	.endif
- -	MODRM 0xc0 movq_r64_xmm_opd1 movq_r64_xmm_opd2
- -	.endm
- -
-+ .macro RDPID opd
-+ 	REG_TYPE rdpid_opd_type \opd
-+ 	.if rdpid_opd_type =3D=3D REG_TYPE_R64
-+ 	R64_NUM rdpid_opd \opd
-+ 	.else
-+ 	R32_NUM rdpid_opd \opd
-+ 	.endif
-+ 	.byte 0xf3
-+ 	.if rdpid_opd > 7
-+ 	PFX_REX rdpid_opd 0
-+ 	.endif
-+ 	.byte 0x0f, 0xc7
-+ 	MODRM 0xc0 rdpid_opd 0x7
-+ .endm
-  #endif
- =20
-  #endif
-
---Sig_/.j5GyyiXptkUvHOgZllA5Tt
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8Wbv0ACgkQAVBC80lX
-0GwF9AgAoLS/9jvFh/rnKXxK4krQcPJ2szSjyyirbG93jA+Du/PmifMQbsguzz4W
-Ehn1ok5UZHDcmCeFonhvt08qaDQwCEaQh/OEgOj8bMP7XZGgWms6592/JPgEMS4y
-bNfVJEotq9GZRvqhkuzKA1SvyS27XTADciV+mDjRjkvcr0bjHCa5xLkxD7KZQAUJ
-I23GHAM1TrFNO9DRHX71z/VNptaTqFiUWRlteF3CcQj3qekg8u7HOJHdc6weUMa8
-CxS+fqtoZjvHjajDr+bkCV7Khdvzac5GMkIbl8jxx/8XtAY8NI3srEurzFEkgnoP
-dZtf54ZOgLyt2IZetl5uEvjiwpMhaA==
-=qlGn
------END PGP SIGNATURE-----
-
---Sig_/.j5GyyiXptkUvHOgZllA5Tt--
