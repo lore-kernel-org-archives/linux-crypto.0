@@ -1,99 +1,114 @@
-Return-Path: <SRS0=Ahx1=BA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=N13L=BB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 703E3C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jul 2020 21:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 651A4C433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 02:11:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5195B20717
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jul 2020 21:32:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CB1D21702
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 02:11:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1595383881;
+	bh=h159DtF8H/HlBrBOihL3MSedIBpWWvld7e60yiwJG7o=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=ZLYzg7Q0Gj72NMI1QZ5PsV5sDA9exhCZlohNnBkc20ON+wdcBUo/C9nImwT0qb9Xd
+	 Z0Wljq5ObWOxGZN4bICfZrLUSU078fShzc9vQFCo36ocrFYherz0wFxd4eOexi5P8p
+	 BOLYIVhVZ+Md0YoUfWvyqWeicnb/mM/kCVA6WSmU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730300AbgGUVcT (ORCPT
+        id S1731633AbgGVCLU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Jul 2020 17:32:19 -0400
-Received: from smtprelay0196.hostedemail.com ([216.40.44.196]:47834 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726658AbgGUVcT (ORCPT
+        Tue, 21 Jul 2020 22:11:20 -0400
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:32111 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731621AbgGVCLU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Jul 2020 17:32:19 -0400
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay06.hostedemail.com (Postfix) with ESMTP id 469E718224D68;
-        Tue, 21 Jul 2020 21:32:18 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-HE-Tag: loaf72_4608e2426f30
-X-Filterd-Recvd-Size: 2717
-Received: from XPS-9350.home (unknown [47.151.133.149])
-        (Authenticated sender: joe@perches.com)
-        by omf01.hostedemail.com (Postfix) with ESMTPA;
-        Tue, 21 Jul 2020 21:32:16 +0000 (UTC)
-Message-ID: <11ac49bc33546ef9ebc4120878206bd882667d8a.camel@perches.com>
-Subject: Re: [PATCH v4 16/17] crypto: sun8i-ce: fix comparison of integer
- expressions of different signedness
-From:   Joe Perches <joe@perches.com>
-To:     Corentin Labbe <clabbe@baylibre.com>, davem@davemloft.net,
-        herbert@gondor.apana.org.au, mripard@kernel.org, wens@csie.org
-Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Tue, 21 Jul 2020 14:32:15 -0700
-In-Reply-To: <1595358391-34525-17-git-send-email-clabbe@baylibre.com>
-References: <1595358391-34525-1-git-send-email-clabbe@baylibre.com>
-         <1595358391-34525-17-git-send-email-clabbe@baylibre.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.36.3-0ubuntu1 
+        Tue, 21 Jul 2020 22:11:20 -0400
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id 06M2AmTB032054;
+        Wed, 22 Jul 2020 11:10:49 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 06M2AmTB032054
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1595383849;
+        bh=Aih6VBubiSXnprivmgnxaVTSC58fZZfIbh+5AaCTBIM=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=EK80SaE1oXZzPoKURYSTxTH+hxVXKvKr12Tsuy/FX5trsgAahkshxC3XvvjFV8sKp
+         kvotbDYshJF+qwdVkQQYifZ3+p5XbQPCpf7NpGo6h/4SAC4fDPF0PE7zVmWgGQMSC5
+         0m3wOAfD08HO837L/IdMOPyCR2dKjbl3qXPXwhL5F0NcX88G6GCXNdaRnxw3rmBmWQ
+         0lpwHzpXbHChzvgzNs9gUkl7CDhLTAd2xKp4S7Wkpizq8GR3wjLLfzLcwl7EVGVrXO
+         PQ9Ye5lj1XuTXoMaojlnlT72b0Qcj48tzNwqpLcZdjIYZEGDOIjehke/+UON54o26F
+         j1ed1QcFQuTWg==
+X-Nifty-SrcIP: [209.85.217.44]
+Received: by mail-vs1-f44.google.com with SMTP id m6so308180vsl.12;
+        Tue, 21 Jul 2020 19:10:49 -0700 (PDT)
+X-Gm-Message-State: AOAM532hd9TXd3U8NO2/v9pvDAN9mdt0OZd3LJx5Zq7WAOv5BRj84pde
+        7NZZ1/ng5/lcAMkqR1JZfeK2M8EM97RlQlziUfo=
+X-Google-Smtp-Source: ABdhPJxePnkwQjGrTtR0b/vKzaaoGDrx5Lo9YH6/7fWyDIDmz0k8/gl81kgwfi+UC9Pxo7G80Dx5Q555MuZEA4oNWjo=
+X-Received: by 2002:a67:2e4d:: with SMTP id u74mr21559012vsu.215.1595383847947;
+ Tue, 21 Jul 2020 19:10:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+References: <20200707092117.963394-1-masahiroy@kernel.org> <20200707092117.963394-2-masahiroy@kernel.org>
+ <20200708065223.GA11164@alley> <20200708092324.GA4751@alley>
+In-Reply-To: <20200708092324.GA4751@alley>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Wed, 22 Jul 2020 11:10:10 +0900
+X-Gmail-Original-Message-ID: <CAK7LNARFTzfx772bTUnLxbN9pwyX3=H284cg-YWKc3YUY9_8KA@mail.gmail.com>
+Message-ID: <CAK7LNARFTzfx772bTUnLxbN9pwyX3=H284cg-YWKc3YUY9_8KA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] kbuild: trace functions in subdirectories of lib/
+To:     Petr Mladek <pmladek@suse.com>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Brendan Higgins <brendanhiggins@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Haren Myneni <haren@us.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jiri Kosina <jikos@kernel.org>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Tal Gilboa <talgi@mellanox.com>, kunit-dev@googlegroups.com,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>, live-patching@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 2020-07-21 at 19:06 +0000, Corentin Labbe wrote:
-> This patch fixes the warning:
-> warning: comparison of integer expressions of different signedness: 'int' and 'long unsigned int' [-Wsign-compare]
+On Wed, Jul 8, 2020 at 6:23 PM Petr Mladek <pmladek@suse.com> wrote:
+>
+> On Wed 2020-07-08 08:52:23, Petr Mladek wrote:
+> >
+> > PS: BTW: The livepatch selftests fail in Linus's master now. But it
+> > seems to be for another reason. I am going to dig into it.
+>
+> JFYI, the livepatch selftests are actually working. I have messed
+> the testing here. I am sorry for the noise.
+>
+> Best Regards,
+> Petr
 
-I think these do not really need conversion.
-Are these useful compiler warnings ?
+No worry, thank you for testing this patch.
 
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> ---
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-> index 3901e3401c6b..7b2a142c9b8d 100644
-> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-> @@ -566,7 +566,7 @@ static struct sun8i_ce_alg_template ce_algs[] = {
->  static int sun8i_ce_dbgfs_read(struct seq_file *seq, void *v)
->  {
->  	struct sun8i_ce_dev *ce = seq->private;
-> -	int i;
-> +	unsigned int i;
->  
->  	for (i = 0; i < MAXFLOW; i++)
->  		seq_printf(seq, "Channel %d: nreq %lu\n", i, ce->chanlist[i].stat_req);
-> @@ -778,7 +778,8 @@ static int sun8i_ce_get_clks(struct sun8i_ce_dev *ce)
->  
->  static int sun8i_ce_register_algs(struct sun8i_ce_dev *ce)
->  {
-> -	int ce_method, err, id, i;
-> +	int ce_method, err, id;
-> +	unsigned int i;
->  
->  	for (i = 0; i < ARRAY_SIZE(ce_algs); i++) {
->  		ce_algs[i].ce = ce;
-> @@ -858,7 +859,7 @@ static int sun8i_ce_register_algs(struct sun8i_ce_dev *ce)
->  
->  static void sun8i_ce_unregister_algs(struct sun8i_ce_dev *ce)
->  {
-> -	int i;
-> +	unsigned int i;
->  
->  	for (i = 0; i < ARRAY_SIZE(ce_algs); i++) {
->  		if (!ce_algs[i].ce)
 
+I deleted the following two lines,
+otherwise $(CC_FLAGS_FTRACE) would be added twice.
+
+# Target modules to be livepatched require CC_FLAGS_FTRACE
+CFLAGS_test_klp_callbacks_busy.o       += $(CC_FLAGS_FTRACE)
+CFLAGS_test_klp_callbacks_mod.o                += $(CC_FLAGS_FTRACE)
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
