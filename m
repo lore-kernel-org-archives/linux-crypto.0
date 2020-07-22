@@ -2,94 +2,236 @@ Return-Path: <SRS0=N13L=BB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 528AFC433E3
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 06:21:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D69C9C433EA
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 07:07:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C358207DD
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 06:21:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A508E20849
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 07:07:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="qBWKXhuB"
+	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="OSSDHRqB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728648AbgGVGVg (ORCPT
+        id S1729239AbgGVHHD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jul 2020 02:21:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60850 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727929AbgGVGVf (ORCPT
+        Wed, 22 Jul 2020 03:07:03 -0400
+Received: from mx08-00178001.pphosted.com ([91.207.212.93]:40476 "EHLO
+        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727096AbgGVHHD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jul 2020 02:21:35 -0400
-Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC305C061794
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Jul 2020 23:21:34 -0700 (PDT)
-Received: by mail-wr1-x442.google.com with SMTP id 88so700587wrh.3
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Jul 2020 23:21:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=BAzrsApk4VDHwo72IBIJNtqOrqLOrpegciq43liSn5w=;
-        b=qBWKXhuBxi4P7/ALiJhnN0/3BOb4QCSz/f3nOTO8A+Fr9K/geRWYwDfMVEIdPcLPrr
-         G+qKk0mI9DXgdJ5XsxVrHslDFH9Kptsc+1985V9JQR33yZHRD+Sh4g/uE/kAyDVfsuPk
-         kffk+OsBK+RYUlneEpTzwJXSUYMqIs1TYVymaY5gcljFptTSy5Y1/FFMKZtUJ0krvk1m
-         1+eeQ+dUz+a0Gz74wHcA0Rv3rx9sK0npYfrqUIq/IwRhcQDt1FBnW2VsoMRe+aH2gVLd
-         zPP6D4Mrt6Op/g6d1jvLt+LzkCexsrSVwrUDJUDo2zSWt9bxv2gOblwlOoKqRiCLXxrh
-         uH6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BAzrsApk4VDHwo72IBIJNtqOrqLOrpegciq43liSn5w=;
-        b=anZys42v0eklwy0R3pipvVgyGh4GqJNHB4tQjrw/D5L1UyoNN157a5u2alZ5WWIAPj
-         qggrOeRzxuArRdbg4iltOeEXoF4x54wps7rERQzNIJCsq/2yZWUH+02zkXdAlEyzAb1E
-         QjCEAZ6c4j2cVIm+hWfKgtnwEapMMGCf524w8bParKjwGMpUIvTGhgcPArXEVjvgeqMz
-         MKQyNaxPlqPMUrRd8R+qEE6u10mVhqJB3SgozaSPI/CvtXxP7HayqM7Y7wKzlqvxdbgU
-         xtA4vfffV+TUGPzQcQBCgN0uHzRfltdEt7N3gcqOhzsuRjVXMP3OIdrM3EVQvkALj2iC
-         L4gg==
-X-Gm-Message-State: AOAM533fTO2WQRTwLNBmXs+YKLnIs23aKoTUni0menjeGeroYgfO9gnE
-        MAgMDvZagMiLtON+hB9wDKgTEw==
-X-Google-Smtp-Source: ABdhPJwuEjzYobRCatFsIux9YRMMuoKkRkV6U/KMc5KHMCsjUCPkOux1K3X1tnegkZe15mFE/NVfFA==
-X-Received: by 2002:a5d:634e:: with SMTP id b14mr31237364wrw.423.1595398893567;
-        Tue, 21 Jul 2020 23:21:33 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id y11sm24709367wrs.80.2020.07.21.23.21.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jul 2020 23:21:32 -0700 (PDT)
-Date:   Wed, 22 Jul 2020 08:21:31 +0200
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Joe Perches <joe@perches.com>
-Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        mripard@kernel.org, wens@csie.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 16/17] crypto: sun8i-ce: fix comparison of integer
- expressions of different signedness
-Message-ID: <20200722062131.GA24080@Red>
-References: <1595358391-34525-1-git-send-email-clabbe@baylibre.com>
- <1595358391-34525-17-git-send-email-clabbe@baylibre.com>
- <11ac49bc33546ef9ebc4120878206bd882667d8a.camel@perches.com>
+        Wed, 22 Jul 2020 03:07:03 -0400
+Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 06M6v2Gc009722;
+        Wed, 22 Jul 2020 09:06:32 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=st.com; h=subject : to : references
+ : from : message-id : date : mime-version : in-reply-to : content-type :
+ content-transfer-encoding; s=STMicroelectronics;
+ bh=FRpQMmPFPg8ANDFOsUwPFCvonf7Q8fHnZkrh2v4evW4=;
+ b=OSSDHRqBv1Fev5CXXuLaBdca1+XIBCHALQtPyChzBheTW0qH/B48ipOs2K+uLuSx1+N0
+ kcN1xM32Ft0vogJhUdW+I/fAA8iujpEr4l0PZ4NfmEePRiZbmtCH+0au98fvwTFKmsmI
+ PNtsPC3QmffCXEqs27tG+FkEdyk1MkeT8t62EpbvT69QvG/7WgC+JxpZIOX5CGon1U79
+ J3mSD1MKd4epP/R1GHTQvwYN4nW8C3pNK0jW4ilAkefuNv0Gu23T4ZyhUIr+R+nD4E/+
+ i3rwjnBBeZs3wx22mBaTNGQShij9sS91vEnjr1293aZwbi9fJvhmiVniCAVvKUWkgNBQ QA== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com with ESMTP id 32bsah221m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 Jul 2020 09:06:32 +0200
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 5789610002A;
+        Wed, 22 Jul 2020 09:06:31 +0200 (CEST)
+Received: from Webmail-eu.st.com (sfhdag3node2.st.com [10.75.127.8])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 44D6121F676;
+        Wed, 22 Jul 2020 09:06:31 +0200 (CEST)
+Received: from lmecxl0912.lme.st.com (10.75.127.51) by SFHDAG3NODE2.st.com
+ (10.75.127.8) with Microsoft SMTP Server (TLS) id 15.0.1347.2; Wed, 22 Jul
+ 2020 09:06:30 +0200
+Subject: Re: [PATCH for v5.9] ARM: STM32: Replace HTTP links with HTTPS ones
+To:     "Alexander A. Klimov" <grandmaster@al2klimov.de>,
+        <linux@armlinux.org.uk>, <mcoquelin.stm32@gmail.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+References: <20200719094948.57487-1-grandmaster@al2klimov.de>
+ <43c11c7a-269e-cc41-6934-0d2e0dec3226@st.com>
+ <219075a0-d7cf-a699-21d7-fabc6f077f95@al2klimov.de>
+From:   Alexandre Torgue <alexandre.torgue@st.com>
+Message-ID: <55c95208-de0f-b2d3-c20c-d19f3ce34e2a@st.com>
+Date:   Wed, 22 Jul 2020 09:06:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <11ac49bc33546ef9ebc4120878206bd882667d8a.camel@perches.com>
+In-Reply-To: <219075a0-d7cf-a699-21d7-fabc6f077f95@al2klimov.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.75.127.51]
+X-ClientProxiedBy: SFHDAG7NODE2.st.com (10.75.127.20) To SFHDAG3NODE2.st.com
+ (10.75.127.8)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-22_03:2020-07-22,2020-07-22 signatures=0
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 21, 2020 at 02:32:15PM -0700, Joe Perches wrote:
-> On Tue, 2020-07-21 at 19:06 +0000, Corentin Labbe wrote:
-> > This patch fixes the warning:
-> > warning: comparison of integer expressions of different signedness: 'int' and 'long unsigned int' [-Wsign-compare]
-> 
-> I think these do not really need conversion.
-> Are these useful compiler warnings ?
-> 
 
-Since ARRAY_SIZE(ce_algs) will never greater than MAX(int), the conversion does not fix a bug.
-But at least the code is more proper.
-So I think the patch is still usefull.
 
+On 7/21/20 7:49 PM, Alexander A. Klimov wrote:
+> 
+> 
+> Am 21.07.20 um 10:49 schrieb Alexandre Torgue:
+>> Hi Alexander
+>>
+>> On 7/19/20 11:49 AM, Alexander A. Klimov wrote:
+>>> Rationale:
+>>> Reduces attack surface on kernel devs opening the links for MITM
+>>> as HTTPS traffic is much harder to manipulate.
+>>>
+>>> Deterministic algorithm:
+>>> For each file:
+>>>    If not .svg:
+>>>      For each line:
+>>>        If doesn't contain `\bxmlns\b`:
+>>>          For each link, `\bhttp://[^# \t\r\n]*(?:\w|/)`:
+>>>       If neither `\bgnu\.org/license`, nor `\bmozilla\.org/MPL\b`:
+>>>              If both the HTTP and HTTPS versions
+>>>              return 200 OK and serve the same content:
+>>>                Replace HTTP with HTTPS.
+>>>
+>>> Signed-off-by: Alexander A. Klimov <grandmaster@al2klimov.de>
+>>
+>> This patch touch 2 different subsystems. Can you please split it ?
+> I can. But don't all files belong to the subsystem this patch is for?
+> 
+> ➜  linux git:(autogen/1029) git show arch/arm/mach-stm32/Makefile.boot 
+> |perl scripts/get_maintainer.pl --nogit{,-fallback}
+> Russell King <linux@armlinux.org.uk> (odd fixer:ARM PORT)
+> Maxime Coquelin <mcoquelin.stm32@gmail.com> (maintainer:ARM/STM32 
+> ARCHITECTURE)
+> Alexandre Torgue <alexandre.torgue@st.com> (maintainer:ARM/STM32 
+> ARCHITECTURE)
+> linux-arm-kernel@lists.infradead.org (moderated list:ARM SUB-ARCHITECTURES)
+> linux-stm32@st-md-mailman.stormreply.com (moderated list:ARM/STM32 
+> ARCHITECTURE)
+> linux-kernel@vger.kernel.org (open list)
+> ➜  linux git:(autogen/1029) git show crypto/testmgr.h |perl 
+> scripts/get_maintainer.pl --nogit{,-fallback}
+> Herbert Xu <herbert@gondor.apana.org.au> (maintainer:CRYPTO API)
+> "David S. Miller" <davem@davemloft.net> (maintainer:CRYPTO API)
+> Maxime Coquelin <mcoquelin.stm32@gmail.com> (maintainer:ARM/STM32 
+> ARCHITECTURE)
+> Alexandre Torgue <alexandre.torgue@st.com> (maintainer:ARM/STM32 
+> ARCHITECTURE)
+> linux-crypto@vger.kernel.org (open list:CRYPTO API)
+> linux-stm32@st-md-mailman.stormreply.com (moderated list:ARM/STM32 
+> ARCHITECTURE)
+> linux-arm-kernel@lists.infradead.org (moderated list:ARM/STM32 
+> ARCHITECTURE)
+> linux-kernel@vger.kernel.org (open list)
+> ➜  linux git:(autogen/1029)
+
+hum, I was not aware that I could take "crypto" patches. But anyway I 
+think, the clean way (to avoid merge  issue later) is that I take 
+mach-stm32 patch and Herbert the crypto one. Except if Herbert doesn't 
+agree can you please split ?
+
+Thanks
+Alex
+
+> 
+>>
+>> Regards
+>> Alex
+>>
+>>
+>>> ---
+>>>   Continuing my work started at 93431e0607e5.
+>>>   See also: git log --oneline '--author=Alexander A. Klimov 
+>>> <grandmaster@al2klimov.de>' v5.7..master
+>>>   (Actually letting a shell for loop submit all this stuff for me.)
+>>>
+>>>   If there are any URLs to be removed completely
+>>>   or at least not (just) HTTPSified:
+>>>   Just clearly say so and I'll *undo my change*.
+>>>   See also: https://lkml.org/lkml/2020/6/27/64
+>>>
+>>>   If there are any valid, but yet not changed URLs:
+>>>   See: https://lkml.org/lkml/2020/6/26/837
+>>>
+>>>   If you apply the patch, please let me know.
+>>>
+>>>   Sorry again to all maintainers who complained about subject lines.
+>>>   Now I realized that you want an actually perfect prefixes,
+>>>   not just subsystem ones.
+>>>   I tried my best...
+>>>   And yes, *I could* (at least half-)automate it.
+>>>   Impossible is nothing! :)
+>>>
+>>>
+>>>   arch/arm/mach-stm32/Makefile.boot | 2 +-
+>>>   crypto/testmgr.h                  | 6 +++---
+>>>   2 files changed, 4 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/arch/arm/mach-stm32/Makefile.boot 
+>>> b/arch/arm/mach-stm32/Makefile.boot
+>>> index cec195d4fcba..5dde7328a7a9 100644
+>>> --- a/arch/arm/mach-stm32/Makefile.boot
+>>> +++ b/arch/arm/mach-stm32/Makefile.boot
+>>> @@ -1,4 +1,4 @@
+>>>   # SPDX-License-Identifier: GPL-2.0-only
+>>>   # Empty file waiting for deletion once Makefile.boot isn't needed 
+>>> any more.
+>>>   # Patch waits for application at
+>>> -# 
+>>> http://www.arm.linux.org.uk/developer/patches/viewpatch.php?id=7889/1 .
+>>> +# 
+>>> https://www.arm.linux.org.uk/developer/patches/viewpatch.php?id=7889/1 .
+>>> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+>>> index d29983908c38..cdcf0d2fe40d 100644
+>>> --- a/crypto/testmgr.h
+>>> +++ b/crypto/testmgr.h
+>>> @@ -16231,7 +16231,7 @@ static const struct cipher_testvec 
+>>> aes_lrw_tv_template[] = {
+>>>                 "\xe9\x5d\x48\x92\x54\x63\x4e\xb8",
+>>>           .len    = 48,
+>>>       }, {
+>>> -/* 
+>>> http://www.mail-archive.com/stds-p1619@listserv.ieee.org/msg00173.html */ 
+>>>
+>>> +/* 
+>>> https://www.mail-archive.com/stds-p1619@listserv.ieee.org/msg00173.html 
+>>> */
+>>>           .key    = "\xf8\xd4\x76\xff\xd6\x46\xee\x6c"
+>>>                 "\x23\x84\xcb\x1c\x77\xd6\x19\x5d"
+>>>                 "\xfe\xf1\xa9\xf3\x7b\xbc\x8d\x21"
+>>> @@ -21096,7 +21096,7 @@ static const struct aead_testvec 
+>>> aegis128_tv_template[] = {
+>>>   /*
+>>>    * All key wrapping test vectors taken from
+>>> - * http://csrc.nist.gov/groups/STM/cavp/documents/mac/kwtestvectors.zip
+>>> + * 
+>>> https://csrc.nist.gov/groups/STM/cavp/documents/mac/kwtestvectors.zip
+>>>    *
+>>>    * Note: as documented in keywrap.c, the ivout for encryption is 
+>>> the first
+>>>    * semiblock of the ciphertext from the test vector. For 
+>>> decryption, iv is
+>>> @@ -22825,7 +22825,7 @@ static const struct cipher_testvec 
+>>> xeta_tv_template[] = {
+>>>    * FCrypt test vectors
+>>>    */
+>>>   static const struct cipher_testvec fcrypt_pcbc_tv_template[] = {
+>>> -    { /* 
+>>> http://www.openafs.org/pipermail/openafs-devel/2000-December/005320.html 
+>>> */
+>>> +    { /* 
+>>> https://www.openafs.org/pipermail/openafs-devel/2000-December/005320.html 
+>>> */
+>>>           .key    = "\x00\x00\x00\x00\x00\x00\x00\x00",
+>>>           .klen    = 8,
+>>>           .iv    = "\x00\x00\x00\x00\x00\x00\x00\x00",
+>>>
