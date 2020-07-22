@@ -2,268 +2,112 @@ Return-Path: <SRS0=N13L=BB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21644C433E6
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 16:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 751E5C433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 17:09:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2F5F206C1
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 16:41:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51DC6207BB
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 17:09:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QbFOpYWq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730640AbgGVQlh (ORCPT
+        id S1730478AbgGVRJz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jul 2020 12:41:37 -0400
-Received: from out28-99.mail.aliyun.com ([115.124.28.99]:49793 "EHLO
-        out28-99.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726462AbgGVQlg (ORCPT
+        Wed, 22 Jul 2020 13:09:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48720 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726462AbgGVRJz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jul 2020 12:41:36 -0400
-X-Alimail-AntiSpam: AC=CONTINUE;BC=0.07436638|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_alarm|0.0284586-0.000932928-0.970609;FP=0|0|0|0|0|-1|-1|-1;HT=e01l10434;MF=zhouyanjie@wanyeetech.com;NM=1;PH=DS;RN=22;RT=22;SR=0;TI=SMTPD_---.I6-OcxX_1595436029;
-Received: from localhost.localdomain(mailfrom:zhouyanjie@wanyeetech.com fp:SMTPD_---.I6-OcxX_1595436029)
-          by smtp.aliyun-inc.com(10.147.40.200);
-          Thu, 23 Jul 2020 00:41:28 +0800
-From:   =?UTF-8?q?=E5=91=A8=E7=90=B0=E6=9D=B0=20=28Zhou=20Yanjie=29?= 
-        <zhouyanjie@wanyeetech.com>
-To:     arnd@arndb.de, gregkh@linuxfoundation.org, mpm@selenic.com,
-        herbert@gondor.apana.org.au, robh+dt@kernel.org
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, hadar.gat@arm.com,
-        prasannatsmkumar@gmail.com, krzk@kernel.org, masahiroy@kernel.org,
-        rdunlap@infradead.org, xuzaibo@huawei.com,
-        daniel.thompson@linaro.org, tmaimon77@gmail.com,
-        dongsheng.qiu@ingenic.com, aric.pzqi@ingenic.com,
-        rick.tyliu@ingenic.com, yanfei.li@ingenic.com,
-        sernia.zhou@foxmail.com, zhenwenjin@gmail.com
-Subject: [PATCH 2/2] crypto: Ingenic: Add hardware RNG for Ingenic JZ4780 and X1000.
-Date:   Thu, 23 Jul 2020 00:40:07 +0800
-Message-Id: <20200722164007.77655-3-zhouyanjie@wanyeetech.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20200722164007.77655-1-zhouyanjie@wanyeetech.com>
-References: <20200722164007.77655-1-zhouyanjie@wanyeetech.com>
+        Wed, 22 Jul 2020 13:09:55 -0400
+Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBCACC0619DC;
+        Wed, 22 Jul 2020 10:09:54 -0700 (PDT)
+Received: by mail-lj1-x241.google.com with SMTP id h19so3257561ljg.13;
+        Wed, 22 Jul 2020 10:09:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=nqelWpCqH7nOe0oSyngzrBNpGRC3PyDyz91JHpls3Xk=;
+        b=QbFOpYWq197fvdaI4E7hogiJ5z6DhlnMwFbSAyObyOYxQk/ojAWvAxU5xeCwIzRoyp
+         bGpv6okHRbaDCk3F5IJgGXS3Wesi1t0HKLxD0rWbntKFa+o4FEuZ/aNqddB2gT9rJhFi
+         ekTLt46VwAAqYYSOS+Ti6gpiM2sULyDbPlDxrV2EC1wYfvYmkCiCMfUA2sia4+eUOZSm
+         DpKqJKTrsnJtuquGnG9/42hXesw1S5DhQmqbpijEy6OLbaHF8RyBbV+paN+wC914K+DB
+         Om2JyFGEZL8bVoXG7xFZFOn3b/hxnJAALpQKOVax/+9YzLSzmIzDLinAT6/sMjMDDXxC
+         pBiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nqelWpCqH7nOe0oSyngzrBNpGRC3PyDyz91JHpls3Xk=;
+        b=k3wIByikShOaLkMc1Od1tLGwmab7hG9iKbyDULD2uOU+twM7jxZwJn7IWxMKu4MHdb
+         2Um8GRz1pnUx6Or1zrBKsXK1VsWCVoqGK+g00uoLdXwN0ZIjQs2SY1NcE1kAF8LDVTbU
+         yec/VCQcloskNDtE/ZzYq3LleNJ4xRU3nJ3wI0s/geljdUP2TUb94FrsAN6b/v2V85qz
+         Jc8CdA/0064dg3bpth9PgXEMbwg5daPhBpS5N9zJpR/T9aF3Yn/Utf8++olez5sBFyLk
+         PhS8JcXdC8vjOKTUaUQOoc6YRUqpWtVVYj0gjyhYOFPmkN984ejeamHM/Bn02+cBPon8
+         gMPw==
+X-Gm-Message-State: AOAM531Eo1Acr/3nE2b3iA/QDxbQGbfSLq/pJjtA4rrQ+YuHqM+38kBs
+        PxMKDcJqZcbVcOCj/Ts6eT4QBe1XJMs+YgpX9dqBNA==
+X-Google-Smtp-Source: ABdhPJzXtI3YBeORsJYQmEu28fVJCUtGV7rd5sI5b8tsC3G9617tl0t2hP5zU+hEdegWolMtC+F/64n4emjrett5jt8=
+X-Received: by 2002:a2e:90da:: with SMTP id o26mr95292ljg.91.1595437793253;
+ Wed, 22 Jul 2020 10:09:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20200720124737.118617-1-hch@lst.de> <20200720204756.iengwcguikj2yrxt@ast-mbp.dhcp.thefacebook.com>
+ <20200722075657.GB26554@lst.de>
+In-Reply-To: <20200722075657.GB26554@lst.de>
+From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date:   Wed, 22 Jul 2020 10:09:41 -0700
+Message-ID: <CAADnVQKy0+rsRftEzp4PvxQtj7uOwybz0Nd4_h0FR37p2Q=X4w@mail.gmail.com>
+Subject: Re: get rid of the address_space override in setsockopt
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        bpf <bpf@vger.kernel.org>,
+        netfilter-devel <netfilter-devel@vger.kernel.org>,
+        coreteam@netfilter.org, linux-sctp@vger.kernel.org,
+        linux-hams@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        "moderated list:ETHERNET BRIDGE" <bridge@lists.linux-foundation.org>,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-wpan@vger.kernel.org,
+        linux-s390 <linux-s390@vger.kernel.org>, mptcp@lists.01.org,
+        lvs-devel@vger.kernel.org, rds-devel@oss.oracle.com,
+        linux-afs@lists.infradead.org,
+        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add JZ4780 SoC and X1000 SoC random number generator driver,
-based on PrasannaKumar Muralidharan's JZ4780 RNG driver.
+On Wed, Jul 22, 2020 at 12:56 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Mon, Jul 20, 2020 at 01:47:56PM -0700, Alexei Starovoitov wrote:
+> > > a kernel pointer.  This is something that works for most common sockopts
+> > > (and is something that the ePBF support relies on), but unfortunately
+> > > in various corner cases we either don't use the passed in length, or in
+> > > one case actually copy data back from setsockopt, so we unfortunately
+> > > can't just always do the copy in the highlevel code, which would have
+> > > been much nicer.
+> >
+> > could you rebase on bpf-next tree and we can route it this way then?
+> > we'll also test the whole thing before applying.
+>
+> The bpf-next tree is missing all my previous setsockopt cleanups, so
+> there series won't apply.
 
-Tested-by: 周正 (Zhou Zheng) <sernia.zhou@foxmail.com>
-Tested-by: Mathieu Malaterre <malat@debian.org>
-Suggested-by: Jeffrey Walton <noloader@gmail.com>
-Signed-off-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Signed-off-by: 周琰杰 (Zhou Yanjie) <zhouyanjie@wanyeetech.com>
----
- drivers/char/hw_random/Kconfig       |  15 ++++
- drivers/char/hw_random/Makefile      |   1 +
- drivers/char/hw_random/ingenic-rng.c | 154 +++++++++++++++++++++++++++++++++++
- 3 files changed, 170 insertions(+)
- create mode 100644 drivers/char/hw_random/ingenic-rng.c
-
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 0ad17efc96df..fcb06027cd88 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -257,6 +257,21 @@ config HW_RANDOM_IMX_RNGC
- 
- 	  If unsure, say Y.
- 
-+config HW_RANDOM_INGENIC_RNG
-+	tristate "Ingenic Random Number Generator support"
-+	depends on HW_RANDOM
-+	depends on MACH_JZ4780 || MACH_X1000
-+	default HW_RANDOM
-+	---help---
-+	  This driver provides kernel-side support for the Random Number Generator
-+	  hardware found in ingenic JZ4780 and X1000 SoC. MIPS Creator CI20 uses
-+	  JZ4780 SoC, YSH & ATIL CU1000-Neo uses X1000 SoC.
-+
-+	  To compile this driver as a module, choose M here: the
-+	  module will be called ingenic-rng.
-+
-+	  If unsure, say Y.
-+
- config HW_RANDOM_NOMADIK
- 	tristate "ST-Ericsson Nomadik Random Number Generator support"
- 	depends on ARCH_NOMADIK
-diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-index 2c6724735345..acb1a1978d23 100644
---- a/drivers/char/hw_random/Makefile
-+++ b/drivers/char/hw_random/Makefile
-@@ -22,6 +22,7 @@ obj-$(CONFIG_HW_RANDOM_VIRTIO) += virtio-rng.o
- obj-$(CONFIG_HW_RANDOM_TX4939) += tx4939-rng.o
- obj-$(CONFIG_HW_RANDOM_MXC_RNGA) += mxc-rnga.o
- obj-$(CONFIG_HW_RANDOM_IMX_RNGC) += imx-rngc.o
-+obj-$(CONFIG_HW_RANDOM_INGENIC_RNG) += ingenic-rng.o
- obj-$(CONFIG_HW_RANDOM_OCTEON) += octeon-rng.o
- obj-$(CONFIG_HW_RANDOM_NOMADIK) += nomadik-rng.o
- obj-$(CONFIG_HW_RANDOM_PSERIES) += pseries-rng.o
-diff --git a/drivers/char/hw_random/ingenic-rng.c b/drivers/char/hw_random/ingenic-rng.c
-new file mode 100644
-index 000000000000..d704cef64b64
---- /dev/null
-+++ b/drivers/char/hw_random/ingenic-rng.c
-@@ -0,0 +1,154 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Ingenic Random Number Generator driver
-+ * Copyright (c) 2017 PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-+ * Copyright (c) 2020 周琰杰 (Zhou Yanjie) <zhouyanjie@wanyeetech.com>
-+ */
-+
-+#include <linux/err.h>
-+#include <linux/kernel.h>
-+#include <linux/hw_random.h>
-+#include <linux/io.h>
-+#include <linux/iopoll.h>
-+#include <linux/module.h>
-+#include <linux/of_device.h>
-+#include <linux/platform_device.h>
-+#include <linux/slab.h>
-+
-+/* RNG register offsets */
-+#define RNG_REG_ERNG_OFFSET		0x0
-+#define RNG_REG_RNG_OFFSET		0x4
-+
-+/* bits within the ERND register */
-+#define ERNG_READY				BIT(31)
-+#define ERNG_ENABLE				BIT(0)
-+
-+enum ingenic_rng_version {
-+	ID_JZ4780,
-+	ID_X1000,
-+};
-+
-+/* Device associated memory */
-+struct ingenic_rng {
-+	enum ingenic_rng_version version;
-+
-+	void __iomem *base;
-+	struct hwrng rng;
-+};
-+
-+static int ingenic_rng_init(struct hwrng *rng)
-+{
-+	struct ingenic_rng *priv = container_of(rng, struct ingenic_rng, rng);
-+
-+	writel(ERNG_ENABLE, priv->base + RNG_REG_ERNG_OFFSET);
-+
-+	return 0;
-+}
-+
-+static void ingenic_rng_cleanup(struct hwrng *rng)
-+{
-+	struct ingenic_rng *priv = container_of(rng, struct ingenic_rng, rng);
-+
-+	writel(0, priv->base + RNG_REG_ERNG_OFFSET);
-+}
-+
-+static int ingenic_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-+{
-+	struct ingenic_rng *priv = container_of(rng, struct ingenic_rng, rng);
-+	u32 *data = buf;
-+	u32 status;
-+	int ret;
-+
-+	if (priv->version >= ID_X1000) {
-+		ret = readl_poll_timeout(priv->base + RNG_REG_ERNG_OFFSET, status,
-+					 status & ERNG_READY, 10, 1000);
-+		if (ret == -ETIMEDOUT) {
-+			pr_err("%s: Wait for RNG data ready timeout\n", __func__);
-+			return ret;
-+		}
-+	} else {
-+		/*
-+		 * A delay is required so that the current RNG data is not bit shifted
-+		 * version of previous RNG data which could happen if random data is
-+		 * read continuously from this device.
-+		 */
-+		udelay(20);
-+	}
-+
-+	*data = readl(priv->base + RNG_REG_RNG_OFFSET);
-+
-+	return 4;
-+}
-+
-+static int ingenic_rng_probe(struct platform_device *pdev)
-+{
-+	struct ingenic_rng *priv;
-+	int ret;
-+
-+	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	priv->base = devm_platform_ioremap_resource(pdev, 0);
-+	if (IS_ERR(priv->base)) {
-+		pr_err("%s: Failed to map RNG registers\n", __func__);
-+		ret = PTR_ERR(priv->base);
-+		goto err_free_rng;
-+	}
-+
-+	priv->version = (enum ingenic_rng_version)of_device_get_match_data(&pdev->dev);
-+
-+	priv->rng.name = pdev->name;
-+	priv->rng.init = ingenic_rng_init;
-+	priv->rng.cleanup = ingenic_rng_cleanup;
-+	priv->rng.read = ingenic_rng_read;
-+
-+	ret = hwrng_register(&priv->rng);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Failed to register hwrng\n");
-+		goto err_free_rng;
-+	}
-+
-+	platform_set_drvdata(pdev, priv);
-+
-+	dev_info(&pdev->dev, "Ingenic RNG driver registered\n");
-+	return 0;
-+
-+err_free_rng:
-+	kfree(priv);
-+	return ret;
-+}
-+
-+static int ingenic_rng_remove(struct platform_device *pdev)
-+{
-+	struct ingenic_rng *priv = platform_get_drvdata(pdev);
-+
-+	hwrng_unregister(&priv->rng);
-+
-+	writel(0, priv->base + RNG_REG_ERNG_OFFSET);
-+
-+	return 0;
-+}
-+
-+static const struct of_device_id ingenic_rng_of_match[] = {
-+	{ .compatible = "ingenic,jz4780-rng", .data = (void *) ID_JZ4780 },
-+	{ .compatible = "ingenic,x1000-rng", .data = (void *) ID_X1000 },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, ingenic_rng_of_match);
-+
-+static struct platform_driver ingenic_rng_driver = {
-+	.probe		= ingenic_rng_probe,
-+	.remove		= ingenic_rng_remove,
-+	.driver		= {
-+		.name	= "ingenic-rng",
-+		.of_match_table = ingenic_rng_of_match,
-+	},
-+};
-+
-+module_platform_driver(ingenic_rng_driver);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>");
-+MODULE_AUTHOR("周琰杰 (Zhou Yanjie) <zhouyanjie@wanyeetech.com>");
-+MODULE_DESCRIPTION("Ingenic Random Number Generator driver");
--- 
-2.11.0
-
+Right. I've realized that after sending that email two days ago.
+Now bpf-next->net-next PR is pending and as soon as it's merged
+bpf-next will have all the recent bits.
