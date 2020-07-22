@@ -2,103 +2,129 @@ Return-Path: <SRS0=N13L=BB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 091CBC433E2
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 13:11:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D99B9C433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 15:59:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D88232065F
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 13:11:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B301D22CAF
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 15:59:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1595433548;
+	bh=Sik9EDg9/EYvGlKmpDWAs+el6Z98mlU2O09h3CSpS38=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=vmBC3E1zuQ2DIeWfaRYeJxeVsgWt4Nyw3PywWJ7KQGwzNXILEq6Z+xBKbFEqw4n2w
+	 fytUcWXfLWdG4w3tSpePRMZRnUYMtS6Zm6Ob7y/4uW8/6O6s4q6dImIZIikUjuObA6
+	 YHw7I0tt7uuKSZah+WTUx2dZKvuEo0+20S7BxV5M=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726241AbgGVNL2 (ORCPT
+        id S1726711AbgGVP7I (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jul 2020 09:11:28 -0400
-Received: from vmicros1.altlinux.org ([194.107.17.57]:56360 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725878AbgGVNL2 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jul 2020 09:11:28 -0400
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id AC5C872CCDC;
-        Wed, 22 Jul 2020 16:11:24 +0300 (MSK)
-Received: from altlinux.org (sole.flsd.net [185.75.180.6])
-        by imap.altlinux.org (Postfix) with ESMTPSA id 854704A4AEE;
-        Wed, 22 Jul 2020 16:11:24 +0300 (MSK)
-Date:   Wed, 22 Jul 2020 16:11:24 +0300
-From:   Vitaly Chikunov <vt@altlinux.org>
-To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        Marcelo Cerri <marcelo.cerri@canonical.com>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        ard.biesheuvel@linaro.org, nhorman@redhat.com, simo@redhat.com
-Cc:     Stephan =?utf-8?Q?M=C3=BCller?= <smueller@chronox.de>
-Subject: Re: [PATCH v3 1/5] crypto: ECDH - check validity of Z before export
-Message-ID: <20200722131124.5m2jzuuhl2jc374u@altlinux.org>
-Mail-Followup-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        Marcelo Cerri <marcelo.cerri@canonical.com>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        ard.biesheuvel@linaro.org, nhorman@redhat.com, simo@redhat.com,
-        Stephan =?utf-8?Q?M=C3=BCller?= <smueller@chronox.de>
-References: <2543601.mvXUDI8C0e@positron.chronox.de>
- <5722559.lOV4Wx5bFT@positron.chronox.de>
- <2544426.mvXUDI8C0e@positron.chronox.de>
- <1759349.tdWV9SEqCh@positron.chronox.de>
+        Wed, 22 Jul 2020 11:59:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39092 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726427AbgGVP7H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 Jul 2020 11:59:07 -0400
+Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2D38722BEF;
+        Wed, 22 Jul 2020 15:59:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1595433547;
+        bh=Sik9EDg9/EYvGlKmpDWAs+el6Z98mlU2O09h3CSpS38=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mMUZf1ITzrNrKb+ap2VL57h582o5mbchmG9R/ouX1yJK9qt+k6a1QDUWRDsJdSUZl
+         i/5JnTvC//qKR+rh0CMsUsRik53V1RHBlVErjuezOf/b7iLzZv24GKJO31z8SEIl/l
+         8f8p5o6YnaRhgOvZAcpYul2GyRlETp4Re0/w+Xtk=
+Date:   Wed, 22 Jul 2020 08:59:05 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Elena Petrova <lenaptr@google.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v2] crypto: af_alg - add extra parameters for DRBG
+ interface
+Message-ID: <20200722155905.GA789@sol.localdomain>
+References: <CABvBcwY44BPa+TaDwxWaEogpg3Kdkq8o9cR5gSqNGF-o6d3jrw@mail.gmail.com>
+ <20200716164028.1805047-1-lenaptr@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1759349.tdWV9SEqCh@positron.chronox.de>
-User-Agent: NeoMutt/20171215-106-ac61c7
+In-Reply-To: <20200716164028.1805047-1-lenaptr@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 20, 2020 at 07:07:48PM +0200, Stephan Müller wrote:
-> SP800-56A rev3 section 5.7.1.2 step 2 mandates that the validity of the
-> calculated shared secret is verified before the data is returned to the
-> caller. Thus, the export function and the validity check functions are
-> reversed. In addition, the sensitive variables of priv and rand_z are
-> zeroized.
+On Thu, Jul 16, 2020 at 05:40:28PM +0100, Elena Petrova wrote:
+> Extending the userspace RNG interface:
+>   1. adding ALG_SET_DRBG_ENTROPY setsockopt option for entropy input;
+>   2. using sendmsg syscall for specifying the additional data.
 > 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> ---
->  crypto/ecc.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+> Signed-off-by: Elena Petrova <lenaptr@google.com>
 
-This patch seems not changed from v2, thus
+Can you add more details to the commit message?  E.g. why this is needed.
 
-Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
+Also please use imperative tense, e.g. "Extend the userspace RNG interface".
 
-> 
-> diff --git a/crypto/ecc.c b/crypto/ecc.c
-> index 02d35be7702b..52e2d49262f2 100644
-> --- a/crypto/ecc.c
-> +++ b/crypto/ecc.c
-> @@ -1495,11 +1495,16 @@ int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
+>  static int rng_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>  		       int flags)
+>  {
+> @@ -65,6 +80,7 @@ static int rng_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>  	int genlen = 0;
+>  	u8 result[MAXSIZE];
 >  
->  	ecc_point_mult(product, pk, priv, rand_z, curve, ndigits);
+> +	lock_sock(sock->sk);
+>  	if (len == 0)
+>  		return 0;
+
+This returns without unlocking the socket.
+
+>  	if (len > MAXSIZE)
+> @@ -82,16 +98,45 @@ static int rng_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>  	 * seeding as they automatically seed. The X9.31 DRNG will return
+>  	 * an error if it was not seeded properly.
+>  	 */
+> -	genlen = crypto_rng_get_bytes(ctx->drng, result, len);
+> +	genlen = crypto_rng_generate(ctx->drng, ctx->addtl, ctx->addtl_len,
+> +				     result, len);
+>  	if (genlen < 0)
+>  		return genlen;
+
+Likewise.
+
 >  
-> -	ecc_swap_digits(product->x, secret, ndigits);
-> -
-> -	if (ecc_point_is_zero(product))
-> +	if (ecc_point_is_zero(product)) {
->  		ret = -EFAULT;
-> +		goto err_validity;
-> +	}
+>  	err = memcpy_to_msg(msg, result, len);
+>  	memzero_explicit(result, len);
+> +	rng_reset_addtl(ctx);
+> +	release_sock(sock->sk);
+>  
+>  	return err ? err : len;
+>  }
+>  
+> +static int rng_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+> +{
+> +	int err;
+> +	struct alg_sock *ask = alg_sk(sock->sk);
+> +	struct rng_ctx *ctx = ask->private;
 > +
-> +	ecc_swap_digits(product->x, secret, ndigits);
->  
-> +err_validity:
-> +	memzero_explicit(priv, sizeof(priv));
-> +	memzero_explicit(rand_z, sizeof(rand_z));
->  	ecc_free_point(product);
->  err_alloc_product:
->  	ecc_free_point(pk);
-> -- 
-> 2.26.2
-> 
-> 
-> 
+> +	lock_sock(sock->sk);
+> +	if (len > MAXSIZE)
+> +		len = MAXSIZE;
+> +
+> +	rng_reset_addtl(ctx);
+> +	ctx->addtl = kmalloc(len, GFP_KERNEL);
+> +	if (!ctx->addtl)
+> +		return -ENOMEM;
+
+Likewise.
+
+> +
+> +	err = memcpy_from_msg(ctx->addtl, msg, len);
+> +	if (err) {
+> +		rng_reset_addtl(ctx);
+> +		return err;
+
+Likewise.
