@@ -2,144 +2,261 @@ Return-Path: <SRS0=N13L=BB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B576C433E3
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 08:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5502C433E5
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 09:34:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1490220714
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 08:26:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 763AF2077D
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 09:34:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=tessares-net.20150623.gappssmtp.com header.i=@tessares-net.20150623.gappssmtp.com header.b="xFRbFe5e"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u4B0jnZF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728599AbgGVI0u (ORCPT
+        id S1729026AbgGVJez (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jul 2020 04:26:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51914 "EHLO
+        Wed, 22 Jul 2020 05:34:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728577AbgGVI0s (ORCPT
+        with ESMTP id S1726892AbgGVJez (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jul 2020 04:26:48 -0400
-Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E27C0619E7
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Jul 2020 01:26:46 -0700 (PDT)
-Received: by mail-ed1-x542.google.com with SMTP id b15so996045edy.7
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Jul 2020 01:26:46 -0700 (PDT)
+        Wed, 22 Jul 2020 05:34:55 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C637C0619DC;
+        Wed, 22 Jul 2020 02:34:55 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id o13so910677pgf.0;
+        Wed, 22 Jul 2020 02:34:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares-net.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ijnpSqTzlWs7OuuIHaz94zTqsgZ4TkbrlxGL7rF8SvM=;
-        b=xFRbFe5eYCppxJ62qFkLFv33fQa9ER4RHEl34g5WwIC4xdcR+4tivo7mnn1S+rNlbS
-         cMN8QwQ1eW0avv9rFxBRIQMUktSGW06zNgKrNWQvq5F25hq8QLzdYCQ1hmqL4iSIvq09
-         Szc8YdqC97qHUqKRHbhQr8/oguhWktZDZtVMGTavTEfzVAENBpjq7LQbsQSFC/Qb56AS
-         G/7MNxNktsXQmENPoH9ousqNoZVBW0eyiSYtxkhGP/mapdbBWtSCpZCTmHbB+1rtyqO0
-         wY2Oxf7ffMMplrOPj5lpx8Ya/rpegVFUOFLBmwqnjZVN6pLS4eW+iRKkCxAtMw4/FDqK
-         d09g==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=k5E+V6ct6HyLJ6yKPQ9T6SLmM+2VDiZ6UKk3SsdlnAc=;
+        b=u4B0jnZFr5l1a+refeXSmVWldsk+ZDFx993cLNpD6979m8ayY0j7qLoX0EsWyIR3gG
+         jbCgHqOXkJcmgpvaGNNy86qLHJdosY2BIJAq5MR5mZzDHfE7eVlMgTQjM8uQUqyAwXS8
+         TyW5jpySSyg25Z1CqBZn9C6ZYedNfYO/Kf/k68qMj338YZmBIoGpyEw5DQadqM+lcZpK
+         9qooTRtiLmPWJ9lZEAP80xWXlzEZEiqiXleHgx155dgKxMGPiKVAn2iTldjsEMFV2Q2p
+         sWsnf1NNJO66Jzz0tD2TltbuH24RGoLfkyp/OU0zVKU9MwNuROjUn3nj33rPWMxHe79G
+         cg3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ijnpSqTzlWs7OuuIHaz94zTqsgZ4TkbrlxGL7rF8SvM=;
-        b=P2va0wp5nSPOFT4P6E4XVuVPnyv9jWkKN36fEYJ/zPKqVfC8RtOvUIo/A/RVz30Sl3
-         X7ssRfozKEs8ZPtH9sVAIPEFNvno1z73Nun8mILTEUPv5G6PmfHlKKZDaAwVt50pweFh
-         Do/KLvUQUpmnWvNW+cMC9KhRjps43qyee7aP+9ai2N4t9Ny34JrmAf5Jp8BkuShDIviX
-         7+kum+wNAgkpUDDjUYk/oVNhQQVedfvXyJWMKzG0VslJCNmi+gPP34c6t6ri/o9Kzabh
-         xDeaAv03XMOFsO4BaCGdccEuPhUUWWys1XKdmfjEd9VsGrWLfAZNQmrbOmQGuSAoH3Qh
-         MijQ==
-X-Gm-Message-State: AOAM532KYj9MtB4+7GE6jpi/UcsCuu2bNFQoM+xyZIFN5zf4r7gIYQn7
-        dGvxgJB0hCA/ttlMWKX9v7DUOw==
-X-Google-Smtp-Source: ABdhPJxnWSvai+9iaNos8sJtXdeBHraQbZUkyduEvMUxv8nKJJQfjOWUUSDiYYhu744BzkT/PRbBSQ==
-X-Received: by 2002:aa7:d341:: with SMTP id m1mr28525320edr.50.1595406404862;
-        Wed, 22 Jul 2020 01:26:44 -0700 (PDT)
-Received: from tsr-lap-08.nix.tessares.net ([79.132.248.22])
-        by smtp.gmail.com with ESMTPSA id x16sm19025267edr.52.2020.07.22.01.26.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Jul 2020 01:26:44 -0700 (PDT)
-Subject: Re: [MPTCP] [PATCH 24/24] net: pass a sockptr_t into ->setsockopt
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Eric Dumazet <edumazet@google.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
-        linux-can@vger.kernel.org, dccp@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
-        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
-        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-References: <20200720124737.118617-1-hch@lst.de>
- <20200720124737.118617-25-hch@lst.de>
-From:   Matthieu Baerts <matthieu.baerts@tessares.net>
-Message-ID: <b3665200-2476-9d35-8dea-d5da141c6b70@tessares.net>
-Date:   Wed, 22 Jul 2020 10:26:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=k5E+V6ct6HyLJ6yKPQ9T6SLmM+2VDiZ6UKk3SsdlnAc=;
+        b=PR++eQyQqlvV9jq9yFD7koSRUQ4xbA+7RVST3aPWOziyXzg9qIKqF//XPhC5f93XhT
+         x202Yn+0/kG9cMWIxpfs7ikeivxDam/ZWt/gPnWEhq3uSQ6A0eKy1hDcfY582JW7CAcc
+         9XF+9VpdRp2P2AxLGMHe6/zSnfviecxPDfTIy2o0AyTfaC8x0Alq9rrqlvC//g31qia3
+         iJZhx3hGys3EbdaqW5jjLSFTJXD8qYRtwTJ4cF/1lf+Xx2VVwUcbBtXus7diwlx4371J
+         wP1lpjcnLBXFjKhrUsuKJaFsHarJJUtdsQ1wgzryCatbXd8jBPsehj+mGmRm139LeYUu
+         WBNA==
+X-Gm-Message-State: AOAM533+DlLdGRGbobdh3zGeCjLioTCvwtBsfiX77zfwiB/oVis+10/B
+        DjEhnn6VMluFT2dnZvFusLk=
+X-Google-Smtp-Source: ABdhPJyhAeLuCtJ1p7M4iB/fKrlUHccP0jnK2PCgVftmV1SPQBIY6yVZhi1Gkc8zmLp+iJJXr8LvdA==
+X-Received: by 2002:a05:6a00:78a:: with SMTP id g10mr28487647pfu.0.1595410494405;
+        Wed, 22 Jul 2020 02:34:54 -0700 (PDT)
+Received: from varodek.iballbatonwifi.com ([103.105.153.67])
+        by smtp.gmail.com with ESMTPSA id b22sm5775644pju.26.2020.07.22.02.34.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jul 2020 02:34:53 -0700 (PDT)
+From:   Vaibhav Gupta <vaibhavgupta40@gmail.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Bjorn Helgaas <bjorn@helgaas.com>,
+        Vaibhav Gupta <vaibhav.varodek@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Vaibhav Gupta <vaibhavgupta40@gmail.com>,
+        linux-kernel@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH v2] crypto: ccp: sp-pci: use generic power management
+Date:   Wed, 22 Jul 2020 15:00:58 +0530
+Message-Id: <20200722093057.98551-1-vaibhavgupta40@gmail.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <95db9ba2-ffbb-ca92-6a70-1ee401920eed@amd.com>
+References: <95db9ba2-ffbb-ca92-6a70-1ee401920eed@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20200720124737.118617-25-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Christoph,
+Drivers using legacy power management .suspen()/.resume() callbacks
+have to manage PCI states and device's PM states themselves. They also
+need to take care of standard configuration registers.
 
-On 20/07/2020 14:47, Christoph Hellwig wrote:
-> Rework the remaining setsockopt code to pass a sockptr_t instead of a
-> plain user pointer.  This removes the last remaining set_fs(KERNEL_DS)
-> outside of architecture specific code.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+Switch to generic power management framework using a single
+"struct dev_pm_ops" variable to take the unnecessary load from the driver.
+This also avoids the need for the driver to directly call most of the PCI
+helper functions and device power state control functions as through
+the generic framework, PCI Core takes care of the necessary operations,
+and drivers are required to do only device-specific jobs.
 
-...
-> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-> index 27b6f250b87dfd..30a8e697b9db9c 100644
-> --- a/net/mptcp/protocol.c
-> +++ b/net/mptcp/protocol.c
-> @@ -1627,7 +1627,7 @@ static void mptcp_destroy(struct sock *sk)
->   }
->   
->   static int mptcp_setsockopt_sol_socket(struct mptcp_sock *msk, int optname,
-> -				       char __user *optval, unsigned int optlen)
-> +				       sockptr_t optval, unsigned int optlen)
->   {
->   	struct sock *sk = (struct sock *)msk;
->   	struct socket *ssock;
-> @@ -1643,8 +1643,8 @@ static int mptcp_setsockopt_sol_socket(struct mptcp_sock *msk, int optname,
->   			return -EINVAL;
->   		}
->   
-> -		ret = sock_setsockopt(ssock, SOL_SOCKET, optname,
-> -				      USER_SOCKPTR(optval), optlen);
-> +		ret = sock_setsockopt(ssock, SOL_SOCKET, optname, optval,
-> +				      optlen);
+Signed-off-by: Vaibhav Gupta <vaibhavgupta40@gmail.com>
+---
+ drivers/crypto/ccp/ccp-dev.c     |  4 +---
+ drivers/crypto/ccp/sp-dev.c      |  6 ++----
+ drivers/crypto/ccp/sp-dev.h      |  6 +++---
+ drivers/crypto/ccp/sp-pci.c      | 17 ++++++-----------
+ drivers/crypto/ccp/sp-platform.c |  2 +-
+ 5 files changed, 13 insertions(+), 22 deletions(-)
 
-A very small detail related to the modifications in MPTCP code, only if 
-you have to send a v2 and if you don't mind: may you move "optlen" to 
-the previous line like it was before your patch 7/24. Same below at the 
-end of the function.
-
-That would reduce the global diff in MPTCP files to function signatures 
-only.
-
-Cheers,
-Matt
+diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+index 19ac509ed76e..0971ee60f840 100644
+--- a/drivers/crypto/ccp/ccp-dev.c
++++ b/drivers/crypto/ccp/ccp-dev.c
+@@ -531,7 +531,6 @@ int ccp_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ 	return len;
+ }
+ 
+-#ifdef CONFIG_PM
+ bool ccp_queues_suspended(struct ccp_device *ccp)
+ {
+ 	unsigned int suspended = 0;
+@@ -549,7 +548,7 @@ bool ccp_queues_suspended(struct ccp_device *ccp)
+ 	return ccp->cmd_q_count == suspended;
+ }
+ 
+-int ccp_dev_suspend(struct sp_device *sp, pm_message_t state)
++int ccp_dev_suspend(struct sp_device *sp)
+ {
+ 	struct ccp_device *ccp = sp->ccp_data;
+ 	unsigned long flags;
+@@ -601,7 +600,6 @@ int ccp_dev_resume(struct sp_device *sp)
+ 
+ 	return 0;
+ }
+-#endif
+ 
+ int ccp_dev_init(struct sp_device *sp)
+ {
+diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
+index ce42675d3274..6284a15e5047 100644
+--- a/drivers/crypto/ccp/sp-dev.c
++++ b/drivers/crypto/ccp/sp-dev.c
+@@ -211,13 +211,12 @@ void sp_destroy(struct sp_device *sp)
+ 	sp_del_device(sp);
+ }
+ 
+-#ifdef CONFIG_PM
+-int sp_suspend(struct sp_device *sp, pm_message_t state)
++int sp_suspend(struct sp_device *sp)
+ {
+ 	int ret;
+ 
+ 	if (sp->dev_vdata->ccp_vdata) {
+-		ret = ccp_dev_suspend(sp, state);
++		ret = ccp_dev_suspend(sp);
+ 		if (ret)
+ 			return ret;
+ 	}
+@@ -237,7 +236,6 @@ int sp_resume(struct sp_device *sp)
+ 
+ 	return 0;
+ }
+-#endif
+ 
+ struct sp_device *sp_get_psp_master_device(void)
+ {
+diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
+index f913f1494af9..0218d0670eee 100644
+--- a/drivers/crypto/ccp/sp-dev.h
++++ b/drivers/crypto/ccp/sp-dev.h
+@@ -119,7 +119,7 @@ int sp_init(struct sp_device *sp);
+ void sp_destroy(struct sp_device *sp);
+ struct sp_device *sp_get_master(void);
+ 
+-int sp_suspend(struct sp_device *sp, pm_message_t state);
++int sp_suspend(struct sp_device *sp);
+ int sp_resume(struct sp_device *sp);
+ int sp_request_ccp_irq(struct sp_device *sp, irq_handler_t handler,
+ 		       const char *name, void *data);
+@@ -134,7 +134,7 @@ struct sp_device *sp_get_psp_master_device(void);
+ int ccp_dev_init(struct sp_device *sp);
+ void ccp_dev_destroy(struct sp_device *sp);
+ 
+-int ccp_dev_suspend(struct sp_device *sp, pm_message_t state);
++int ccp_dev_suspend(struct sp_device *sp);
+ int ccp_dev_resume(struct sp_device *sp);
+ 
+ #else	/* !CONFIG_CRYPTO_DEV_SP_CCP */
+@@ -145,7 +145,7 @@ static inline int ccp_dev_init(struct sp_device *sp)
+ }
+ static inline void ccp_dev_destroy(struct sp_device *sp) { }
+ 
+-static inline int ccp_dev_suspend(struct sp_device *sp, pm_message_t state)
++static inline int ccp_dev_suspend(struct sp_device *sp)
+ {
+ 	return 0;
+ }
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index cb6cb47053f4..f471dbaef1fb 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -252,23 +252,19 @@ static void sp_pci_remove(struct pci_dev *pdev)
+ 	sp_free_irqs(sp);
+ }
+ 
+-#ifdef CONFIG_PM
+-static int sp_pci_suspend(struct pci_dev *pdev, pm_message_t state)
++static int __maybe_unused sp_pci_suspend(struct device *dev)
+ {
+-	struct device *dev = &pdev->dev;
+ 	struct sp_device *sp = dev_get_drvdata(dev);
+ 
+-	return sp_suspend(sp, state);
++	return sp_suspend(sp);
+ }
+ 
+-static int sp_pci_resume(struct pci_dev *pdev)
++static int __maybe_unused sp_pci_resume(struct device *dev)
+ {
+-	struct device *dev = &pdev->dev;
+ 	struct sp_device *sp = dev_get_drvdata(dev);
+ 
+ 	return sp_resume(sp);
+ }
+-#endif
+ 
+ #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+ static const struct sev_vdata sevv1 = {
+@@ -365,15 +361,14 @@ static const struct pci_device_id sp_pci_table[] = {
+ };
+ MODULE_DEVICE_TABLE(pci, sp_pci_table);
+ 
++static SIMPLE_DEV_PM_OPS(sp_pci_pm_ops, sp_pci_suspend, sp_pci_resume);
++
+ static struct pci_driver sp_pci_driver = {
+ 	.name = "ccp",
+ 	.id_table = sp_pci_table,
+ 	.probe = sp_pci_probe,
+ 	.remove = sp_pci_remove,
+-#ifdef CONFIG_PM
+-	.suspend = sp_pci_suspend,
+-	.resume = sp_pci_resume,
+-#endif
++	.driver.pm = &sp_pci_pm_ops,
+ };
+ 
+ int sp_pci_init(void)
+diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
+index 831aac1393a2..9dba52fbee99 100644
+--- a/drivers/crypto/ccp/sp-platform.c
++++ b/drivers/crypto/ccp/sp-platform.c
+@@ -207,7 +207,7 @@ static int sp_platform_suspend(struct platform_device *pdev,
+ 	struct device *dev = &pdev->dev;
+ 	struct sp_device *sp = dev_get_drvdata(dev);
+ 
+-	return sp_suspend(sp, state);
++	return sp_suspend(sp);
+ }
+ 
+ static int sp_platform_resume(struct platform_device *pdev)
 -- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+2.27.0
+
