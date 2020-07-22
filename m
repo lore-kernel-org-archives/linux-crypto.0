@@ -2,28 +2,29 @@ Return-Path: <SRS0=N13L=BB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C42C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 16:41:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D0BC433EA
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 16:41:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A26AB207CD
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 16:41:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B2FA22C7B
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 16:41:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726736AbgGVQld (ORCPT
+        id S1730292AbgGVQlg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jul 2020 12:41:33 -0400
-Received: from out28-75.mail.aliyun.com ([115.124.28.75]:38662 "EHLO
-        out28-75.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726349AbgGVQlc (ORCPT
+        Wed, 22 Jul 2020 12:41:36 -0400
+Received: from out29-2.mail.aliyun.com ([115.124.29.2]:33551 "EHLO
+        out29-2.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726564AbgGVQlf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jul 2020 12:41:32 -0400
-X-Alimail-AntiSpam: AC=CONTINUE;BC=0.3527336|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_news_journal|0.0131328-0.00532331-0.981544;FP=0|0|0|0|0|-1|-1|-1;HT=e01l04362;MF=zhouyanjie@wanyeetech.com;NM=1;PH=DS;RN=22;RT=22;SR=0;TI=SMTPD_---.I6-OcxX_1595436029;
+        Wed, 22 Jul 2020 12:41:35 -0400
+X-Alimail-AntiSpam: AC=SUSPECT;BC=0.5801765|-1;BR=01201311R181b1;CH=blue;DM=|SUSPECT|false|;DS=CONTINUE|ham_system_inform|0.0153131-0.00142576-0.983261;FP=0|0|0|0|0|-1|-1|-1;HT=e02c03297;MF=zhouyanjie@wanyeetech.com;NM=1;PH=DS;RN=22;RT=22;SR=0;TI=SMTPD_---.I6-OcxX_1595436029;
 Received: from localhost.localdomain(mailfrom:zhouyanjie@wanyeetech.com fp:SMTPD_---.I6-OcxX_1595436029)
           by smtp.aliyun-inc.com(10.147.40.200);
-          Thu, 23 Jul 2020 00:41:25 +0800
+          Thu, 23 Jul 2020 00:41:27 +0800
 From:   =?UTF-8?q?=E5=91=A8=E7=90=B0=E6=9D=B0=20=28Zhou=20Yanjie=29?= 
         <zhouyanjie@wanyeetech.com>
 To:     arnd@arndb.de, gregkh@linuxfoundation.org, mpm@selenic.com,
@@ -36,10 +37,12 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         dongsheng.qiu@ingenic.com, aric.pzqi@ingenic.com,
         rick.tyliu@ingenic.com, yanfei.li@ingenic.com,
         sernia.zhou@foxmail.com, zhenwenjin@gmail.com
-Subject: [PATCH 0/2] Add support for the RNG in Ingenic JZ4780 and X1000.
-Date:   Thu, 23 Jul 2020 00:40:05 +0800
-Message-Id: <20200722164007.77655-1-zhouyanjie@wanyeetech.com>
+Subject: [PATCH 1/2] dt-bindings: RNG: Add Ingenic RNG bindings.
+Date:   Thu, 23 Jul 2020 00:40:06 +0800
+Message-Id: <20200722164007.77655-2-zhouyanjie@wanyeetech.com>
 X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20200722164007.77655-1-zhouyanjie@wanyeetech.com>
+References: <20200722164007.77655-1-zhouyanjie@wanyeetech.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -48,23 +51,57 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-1.Add the RNG bindings for the JZ4780 SoC and the X1000 SoC
-  from Ingenic.
-2.Add JZ4780 SoC and X1000 SoC random number generator driver,
-  based on PrasannaKumar Muralidharan's JZ4780 RNG driver.
+Add the RNG bindings for the JZ4780 SoC and
+the X1000 SoC from Ingenic.
 
-周琰杰 (Zhou Yanjie) (2):
-  dt-bindings: RNG: Add Ingenic RNG bindings.
-  crypto: Ingenic: Add hardware RNG for Ingenic JZ4780 and X1000.
-
- .../devicetree/bindings/rng/ingenic,rng.yaml       |  36 +++++
- drivers/char/hw_random/Kconfig                     |  15 ++
- drivers/char/hw_random/Makefile                    |   1 +
- drivers/char/hw_random/ingenic-rng.c               | 154 +++++++++++++++++++++
- 4 files changed, 206 insertions(+)
+Signed-off-by: 周琰杰 (Zhou Yanjie) <zhouyanjie@wanyeetech.com>
+---
+ .../devicetree/bindings/rng/ingenic,rng.yaml       | 36 ++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/rng/ingenic,rng.yaml
- create mode 100644 drivers/char/hw_random/ingenic-rng.c
 
+diff --git a/Documentation/devicetree/bindings/rng/ingenic,rng.yaml b/Documentation/devicetree/bindings/rng/ingenic,rng.yaml
+new file mode 100644
+index 000000000000..b2e4a6a7f93a
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/ingenic,rng.yaml
+@@ -0,0 +1,36 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/rng/ingenic,rng.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Bindings for RNG in Ingenic SoCs
++
++maintainers:
++  - 周琰杰 (Zhou Yanjie) <zhouyanjie@wanyeetech.com>
++
++description:
++  The Random Number Generator in Ingenic SoCs.
++
++properties:
++  compatible:
++    enum:
++      - ingenic,jz4780-rng
++      - ingenic,x1000-rng
++
++  reg:
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++
++additionalProperties: false
++
++examples:
++  - |
++    rng: rng@d8 {
++        compatible = "ingenic,jz4780-rng";
++        reg = <0xd8 0x8>;
++    };
++...
 -- 
 2.11.0
 
