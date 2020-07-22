@@ -2,112 +2,120 @@ Return-Path: <SRS0=N13L=BB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 751E5C433E1
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 17:09:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64BC9C433E3
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 18:28:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51DC6207BB
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 17:09:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 464162084D
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 18:28:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QbFOpYWq"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lW5+R6aR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730478AbgGVRJz (ORCPT
+        id S1728821AbgGVS2J (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jul 2020 13:09:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48720 "EHLO
+        Wed, 22 Jul 2020 14:28:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726462AbgGVRJz (ORCPT
+        with ESMTP id S1726539AbgGVS2J (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jul 2020 13:09:55 -0400
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBCACC0619DC;
-        Wed, 22 Jul 2020 10:09:54 -0700 (PDT)
-Received: by mail-lj1-x241.google.com with SMTP id h19so3257561ljg.13;
-        Wed, 22 Jul 2020 10:09:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nqelWpCqH7nOe0oSyngzrBNpGRC3PyDyz91JHpls3Xk=;
-        b=QbFOpYWq197fvdaI4E7hogiJ5z6DhlnMwFbSAyObyOYxQk/ojAWvAxU5xeCwIzRoyp
-         bGpv6okHRbaDCk3F5IJgGXS3Wesi1t0HKLxD0rWbntKFa+o4FEuZ/aNqddB2gT9rJhFi
-         ekTLt46VwAAqYYSOS+Ti6gpiM2sULyDbPlDxrV2EC1wYfvYmkCiCMfUA2sia4+eUOZSm
-         DpKqJKTrsnJtuquGnG9/42hXesw1S5DhQmqbpijEy6OLbaHF8RyBbV+paN+wC914K+DB
-         Om2JyFGEZL8bVoXG7xFZFOn3b/hxnJAALpQKOVax/+9YzLSzmIzDLinAT6/sMjMDDXxC
-         pBiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nqelWpCqH7nOe0oSyngzrBNpGRC3PyDyz91JHpls3Xk=;
-        b=k3wIByikShOaLkMc1Od1tLGwmab7hG9iKbyDULD2uOU+twM7jxZwJn7IWxMKu4MHdb
-         2Um8GRz1pnUx6Or1zrBKsXK1VsWCVoqGK+g00uoLdXwN0ZIjQs2SY1NcE1kAF8LDVTbU
-         yec/VCQcloskNDtE/ZzYq3LleNJ4xRU3nJ3wI0s/geljdUP2TUb94FrsAN6b/v2V85qz
-         Jc8CdA/0064dg3bpth9PgXEMbwg5daPhBpS5N9zJpR/T9aF3Yn/Utf8++olez5sBFyLk
-         PhS8JcXdC8vjOKTUaUQOoc6YRUqpWtVVYj0gjyhYOFPmkN984ejeamHM/Bn02+cBPon8
-         gMPw==
-X-Gm-Message-State: AOAM531Eo1Acr/3nE2b3iA/QDxbQGbfSLq/pJjtA4rrQ+YuHqM+38kBs
-        PxMKDcJqZcbVcOCj/Ts6eT4QBe1XJMs+YgpX9dqBNA==
-X-Google-Smtp-Source: ABdhPJzXtI3YBeORsJYQmEu28fVJCUtGV7rd5sI5b8tsC3G9617tl0t2hP5zU+hEdegWolMtC+F/64n4emjrett5jt8=
-X-Received: by 2002:a2e:90da:: with SMTP id o26mr95292ljg.91.1595437793253;
- Wed, 22 Jul 2020 10:09:53 -0700 (PDT)
+        Wed, 22 Jul 2020 14:28:09 -0400
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26F8FC0619DC;
+        Wed, 22 Jul 2020 11:28:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description;
+        bh=OYSn/KpUWZQ4nMms7wrSLpPiy3w6Iv2nJw1LBl+3jF0=; b=lW5+R6aRaWcL9XzKxeo7g5Hful
+        WB3kf8WqLPpb61zWFBlp7UgSv7qpIOeGa48lURbXLzeLUsAifWGG+HFuqixLg88RFHNQU0lq+bs/H
+        3PzfQDfTGsTByGAh8tILgch4vOdKZDJENn8NKjnX0nqCrnRJNCC+VofhJPLMlfjkJW7/uWH+1lHud
+        jSAxkZtocZ/eaqN7pNp3RILjxqQ3tc/1TUZtHI1B7SvLNuhzGPsv730DR+KbCNSKR8Xw0j2G/b4EB
+        ONOnnHLQ9PNAUV8QUjQAPaxaXRqWnjt+OxdEfbV9evkI7uK//nHt4CDmfoFo/X+RtDijYKwKhf28W
+        AP/sr27g==;
+Received: from [2601:1c0:6280:3f0::19c2]
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jyJSb-0001BB-Ve; Wed, 22 Jul 2020 18:27:22 +0000
+Subject: Re: [PATCH 2/2] crypto: Ingenic: Add hardware RNG for Ingenic JZ4780
+ and X1000.
+To:     =?UTF-8?B?5ZGo55Cw5p2wIChaaG91IFlhbmppZSk=?= 
+        <zhouyanjie@wanyeetech.com>, arnd@arndb.de,
+        gregkh@linuxfoundation.org, mpm@selenic.com,
+        herbert@gondor.apana.org.au, robh+dt@kernel.org
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org, hadar.gat@arm.com,
+        prasannatsmkumar@gmail.com, krzk@kernel.org, masahiroy@kernel.org,
+        xuzaibo@huawei.com, daniel.thompson@linaro.org,
+        tmaimon77@gmail.com, dongsheng.qiu@ingenic.com,
+        aric.pzqi@ingenic.com, rick.tyliu@ingenic.com,
+        yanfei.li@ingenic.com, sernia.zhou@foxmail.com,
+        zhenwenjin@gmail.com
+References: <20200722164007.77655-1-zhouyanjie@wanyeetech.com>
+ <20200722164007.77655-3-zhouyanjie@wanyeetech.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <779949c8-8b1a-52ed-f695-7006f0045d7e@infradead.org>
+Date:   Wed, 22 Jul 2020 11:27:14 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200720124737.118617-1-hch@lst.de> <20200720204756.iengwcguikj2yrxt@ast-mbp.dhcp.thefacebook.com>
- <20200722075657.GB26554@lst.de>
-In-Reply-To: <20200722075657.GB26554@lst.de>
-From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date:   Wed, 22 Jul 2020 10:09:41 -0700
-Message-ID: <CAADnVQKy0+rsRftEzp4PvxQtj7uOwybz0Nd4_h0FR37p2Q=X4w@mail.gmail.com>
-Subject: Re: get rid of the address_space override in setsockopt
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        bpf <bpf@vger.kernel.org>,
-        netfilter-devel <netfilter-devel@vger.kernel.org>,
-        coreteam@netfilter.org, linux-sctp@vger.kernel.org,
-        linux-hams@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        "moderated list:ETHERNET BRIDGE" <bridge@lists.linux-foundation.org>,
-        linux-can@vger.kernel.org, dccp@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-wpan@vger.kernel.org,
-        linux-s390 <linux-s390@vger.kernel.org>, mptcp@lists.01.org,
-        lvs-devel@vger.kernel.org, rds-devel@oss.oracle.com,
-        linux-afs@lists.infradead.org,
-        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200722164007.77655-3-zhouyanjie@wanyeetech.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 22, 2020 at 12:56 AM Christoph Hellwig <hch@lst.de> wrote:
->
-> On Mon, Jul 20, 2020 at 01:47:56PM -0700, Alexei Starovoitov wrote:
-> > > a kernel pointer.  This is something that works for most common sockopts
-> > > (and is something that the ePBF support relies on), but unfortunately
-> > > in various corner cases we either don't use the passed in length, or in
-> > > one case actually copy data back from setsockopt, so we unfortunately
-> > > can't just always do the copy in the highlevel code, which would have
-> > > been much nicer.
-> >
-> > could you rebase on bpf-next tree and we can route it this way then?
-> > we'll also test the whole thing before applying.
->
-> The bpf-next tree is missing all my previous setsockopt cleanups, so
-> there series won't apply.
+On 7/22/20 9:40 AM, 周琰杰 (Zhou Yanjie) wrote:
+> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+> index 0ad17efc96df..fcb06027cd88 100644
+> --- a/drivers/char/hw_random/Kconfig
+> +++ b/drivers/char/hw_random/Kconfig
+> @@ -257,6 +257,21 @@ config HW_RANDOM_IMX_RNGC
+>  
+>  	  If unsure, say Y.
+>  
+> +config HW_RANDOM_INGENIC_RNG
+> +	tristate "Ingenic Random Number Generator support"
+> +	depends on HW_RANDOM
+> +	depends on MACH_JZ4780 || MACH_X1000
+> +	default HW_RANDOM
+> +	---help---
 
-Right. I've realized that after sending that email two days ago.
-Now bpf-next->net-next PR is pending and as soon as it's merged
-bpf-next will have all the recent bits.
+Just use:
+	help
+here. See this for why:
+
+commit 8f268881d7d278047b00eed54bbb9288dbd6ab23
+Author: Masahiro Yamada <masahiroy@kernel.org>
+Date:   Tue Dec 17 20:51:51 2019 +0900
+
+    kconfig: remove ---help--- from documentation
+    
+    Since commit 84af7a6194e4 ("checkpatch: kconfig: prefer 'help' over
+    '---help---'"), scripts/checkpatch.pl warns the use of ---help---.
+    
+    Kconfig still supports ---help---, but new code should avoid using it.
+    Let's stop advertising it in documentation.
+
+> +	  This driver provides kernel-side support for the Random Number Generator
+> +	  hardware found in ingenic JZ4780 and X1000 SoC. MIPS Creator CI20 uses
+> +	  JZ4780 SoC, YSH & ATIL CU1000-Neo uses X1000 SoC.
+> +
+> +	  To compile this driver as a module, choose M here: the
+> +	  module will be called ingenic-rng.
+> +
+> +	  If unsure, say Y.
+> +
+>  config HW_RANDOM_NOMADIK
+>  	tristate "ST-Ericsson Nomadik Random Number Generator support"
+>  	depends on ARCH_NOMADIK
+
+thanks.
+-- 
+~Randy
+
