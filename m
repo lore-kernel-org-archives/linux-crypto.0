@@ -2,120 +2,144 @@ Return-Path: <SRS0=N13L=BB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9931FC433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 08:21:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B576C433E3
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 08:26:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78E5320787
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 08:21:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1490220714
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 08:26:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=tessares-net.20150623.gappssmtp.com header.i=@tessares-net.20150623.gappssmtp.com header.b="xFRbFe5e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726892AbgGVIV0 convert rfc822-to-8bit (ORCPT
+        id S1728599AbgGVI0u (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jul 2020 04:21:26 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:36664 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728960AbgGVIV0 (ORCPT
+        Wed, 22 Jul 2020 04:26:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51914 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728577AbgGVI0s (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jul 2020 04:21:26 -0400
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-223-GOCHn8gEMPq2t1xF6Q8jCw-1; Wed, 22 Jul 2020 09:21:22 +0100
-X-MC-Unique: GOCHn8gEMPq2t1xF6Q8jCw-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Wed, 22 Jul 2020 09:21:21 +0100
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Wed, 22 Jul 2020 09:21:21 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Christoph Hellwig' <hch@lst.de>
-CC:     "David S. Miller" <davem@davemloft.net>,
+        Wed, 22 Jul 2020 04:26:48 -0400
+Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E27C0619E7
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Jul 2020 01:26:46 -0700 (PDT)
+Received: by mail-ed1-x542.google.com with SMTP id b15so996045edy.7
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Jul 2020 01:26:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tessares-net.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ijnpSqTzlWs7OuuIHaz94zTqsgZ4TkbrlxGL7rF8SvM=;
+        b=xFRbFe5eYCppxJ62qFkLFv33fQa9ER4RHEl34g5WwIC4xdcR+4tivo7mnn1S+rNlbS
+         cMN8QwQ1eW0avv9rFxBRIQMUktSGW06zNgKrNWQvq5F25hq8QLzdYCQ1hmqL4iSIvq09
+         Szc8YdqC97qHUqKRHbhQr8/oguhWktZDZtVMGTavTEfzVAENBpjq7LQbsQSFC/Qb56AS
+         G/7MNxNktsXQmENPoH9ousqNoZVBW0eyiSYtxkhGP/mapdbBWtSCpZCTmHbB+1rtyqO0
+         wY2Oxf7ffMMplrOPj5lpx8Ya/rpegVFUOFLBmwqnjZVN6pLS4eW+iRKkCxAtMw4/FDqK
+         d09g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ijnpSqTzlWs7OuuIHaz94zTqsgZ4TkbrlxGL7rF8SvM=;
+        b=P2va0wp5nSPOFT4P6E4XVuVPnyv9jWkKN36fEYJ/zPKqVfC8RtOvUIo/A/RVz30Sl3
+         X7ssRfozKEs8ZPtH9sVAIPEFNvno1z73Nun8mILTEUPv5G6PmfHlKKZDaAwVt50pweFh
+         Do/KLvUQUpmnWvNW+cMC9KhRjps43qyee7aP+9ai2N4t9Ny34JrmAf5Jp8BkuShDIviX
+         7+kum+wNAgkpUDDjUYk/oVNhQQVedfvXyJWMKzG0VslJCNmi+gPP34c6t6ri/o9Kzabh
+         xDeaAv03XMOFsO4BaCGdccEuPhUUWWys1XKdmfjEd9VsGrWLfAZNQmrbOmQGuSAoH3Qh
+         MijQ==
+X-Gm-Message-State: AOAM532KYj9MtB4+7GE6jpi/UcsCuu2bNFQoM+xyZIFN5zf4r7gIYQn7
+        dGvxgJB0hCA/ttlMWKX9v7DUOw==
+X-Google-Smtp-Source: ABdhPJxnWSvai+9iaNos8sJtXdeBHraQbZUkyduEvMUxv8nKJJQfjOWUUSDiYYhu744BzkT/PRbBSQ==
+X-Received: by 2002:aa7:d341:: with SMTP id m1mr28525320edr.50.1595406404862;
+        Wed, 22 Jul 2020 01:26:44 -0700 (PDT)
+Received: from tsr-lap-08.nix.tessares.net ([79.132.248.22])
+        by smtp.gmail.com with ESMTPSA id x16sm19025267edr.52.2020.07.22.01.26.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Jul 2020 01:26:44 -0700 (PDT)
+Subject: Re: [MPTCP] [PATCH 24/24] net: pass a sockptr_t into ->setsockopt
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Alexei Starovoitov <ast@kernel.org>,
         Daniel Borkmann <daniel@iogearbox.net>,
         Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
         Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
         Eric Dumazet <edumazet@google.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
-        "coreteam@netfilter.org" <coreteam@netfilter.org>,
-        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
-        "linux-hams@vger.kernel.org" <linux-hams@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "bridge@lists.linux-foundation.org" 
-        <bridge@lists.linux-foundation.org>,
-        "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
-        "dccp@vger.kernel.org" <dccp@vger.kernel.org>,
-        "linux-decnet-user@lists.sourceforge.net" 
-        <linux-decnet-user@lists.sourceforge.net>,
-        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "mptcp@lists.01.org" <mptcp@lists.01.org>,
-        "lvs-devel@vger.kernel.org" <lvs-devel@vger.kernel.org>,
-        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
-        "tipc-discussion@lists.sourceforge.net" 
-        <tipc-discussion@lists.sourceforge.net>,
-        "linux-x25@vger.kernel.org" <linux-x25@vger.kernel.org>
-Subject: RE: get rid of the address_space override in setsockopt
-Thread-Topic: get rid of the address_space override in setsockopt
-Thread-Index: AQHWXznU7Ce8ImOXV0WGgKrMes+hhakRxpwAgAFoQgCAABQIEA==
-Date:   Wed, 22 Jul 2020 08:21:21 +0000
-Message-ID: <eafa16fad33a4255a97b55a56e58ae1a@AcuMS.aculab.com>
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, bpf@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
+        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
+        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
 References: <20200720124737.118617-1-hch@lst.de>
- <60c52e31e9f240718fcda0dd5c2faeca@AcuMS.aculab.com>
- <20200722080646.GA26864@lst.de>
-In-Reply-To: <20200722080646.GA26864@lst.de>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+ <20200720124737.118617-25-hch@lst.de>
+From:   Matthieu Baerts <matthieu.baerts@tessares.net>
+Message-ID: <b3665200-2476-9d35-8dea-d5da141c6b70@tessares.net>
+Date:   Wed, 22 Jul 2020 10:26:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <20200720124737.118617-25-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: 'Christoph Hellwig'
-> Sent: 22 July 2020 09:07
-> On Tue, Jul 21, 2020 at 09:38:23AM +0000, David Laight wrote:
-> > From: Christoph Hellwig
-> > > Sent: 20 July 2020 13:47
-> > >
-> > > setsockopt is the last place in architecture-independ code that still
-> > > uses set_fs to force the uaccess routines to operate on kernel pointers.
-> > >
-> > > This series adds a new sockptr_t type that can contained either a kernel
-> > > or user pointer, and which has accessors that do the right thing, and
-> > > then uses it for setsockopt, starting by refactoring some low-level
-> > > helpers and moving them over to it before finally doing the main
-> > > setsockopt method.
-> >
-> > Are you planning to make the equivalent change to getsockopt()?
+Hi Christoph,
+
+On 20/07/2020 14:47, Christoph Hellwig wrote:
+> Rework the remaining setsockopt code to pass a sockptr_t instead of a
+> plain user pointer.  This removes the last remaining set_fs(KERNEL_DS)
+> outside of architecture specific code.
 > 
-> No.  Only setsockopt can be fed kernel addresses from bpf-cgroup.
-> There is no point in complicating the read side interface when it
-> doesn't have that problem.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 
-You realise that one of the SCTP getsockopt() is actually a command!
-It is one of the requests that changes state and should probably
-have been a separate system call.
+...
+> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+> index 27b6f250b87dfd..30a8e697b9db9c 100644
+> --- a/net/mptcp/protocol.c
+> +++ b/net/mptcp/protocol.c
+> @@ -1627,7 +1627,7 @@ static void mptcp_destroy(struct sock *sk)
+>   }
+>   
+>   static int mptcp_setsockopt_sol_socket(struct mptcp_sock *msk, int optname,
+> -				       char __user *optval, unsigned int optlen)
+> +				       sockptr_t optval, unsigned int optlen)
+>   {
+>   	struct sock *sk = (struct sock *)msk;
+>   	struct socket *ssock;
+> @@ -1643,8 +1643,8 @@ static int mptcp_setsockopt_sol_socket(struct mptcp_sock *msk, int optname,
+>   			return -EINVAL;
+>   		}
+>   
+> -		ret = sock_setsockopt(ssock, SOL_SOCKET, optname,
+> -				      USER_SOCKPTR(optval), optlen);
+> +		ret = sock_setsockopt(ssock, SOL_SOCKET, optname, optval,
+> +				      optlen);
 
-	David
+A very small detail related to the modifications in MPTCP code, only if 
+you have to send a v2 and if you don't mind: may you move "optlen" to 
+the previous line like it was before your patch 7/24. Same below at the 
+end of the function.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+That would reduce the global diff in MPTCP files to function signatures 
+only.
 
+Cheers,
+Matt
+-- 
+Tessares | Belgium | Hybrid Access Solutions
+www.tessares.net
