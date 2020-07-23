@@ -2,108 +2,103 @@ Return-Path: <SRS0=6JMd=BC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA7BC433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 10:05:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3459FC433F1
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 11:15:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 46EF02086A
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 10:05:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 13EC2208E4
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 11:15:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="WTS8+AWn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B5vDCuMK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728229AbgGWKF0 (ORCPT
+        id S1728508AbgGWLOw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jul 2020 06:05:26 -0400
-Received: from mail.zx2c4.com ([192.95.5.64]:32769 "EHLO mail.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727828AbgGWKF0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jul 2020 06:05:26 -0400
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id d336b177
-        for <linux-crypto@vger.kernel.org>;
-        Thu, 23 Jul 2020 09:42:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=RyD29gGjJDqSqVIG++m7HJT3Qu8=; b=WTS8+A
-        WnvfQ6EucnzgusWooDeiT9++F4LTn/1i1rqT9ysJoi1JWpukBNP2XVD0ItRmXoDN
-        7yFhPWdnAcxEIeziP2FNryxwY4FR4VaMbvb9BY1z8tFGkiPfsq/BiXumIP71uHMj
-        fkjnBD1igQfVJl0fmBNNFWF4vcgPMVJO2fZ/hFVjpg8NG2WF/pFu/E06Id3VZRFN
-        WJbBqngw1cZrQWaC/HNYCOUb5NS7ghhc8zZOdDDVwCshASZqOLL37nZ3e3DZSivh
-        MP6fIfLTCXbvWc6hSjoTrK4C7oZdFJDOzzWrLZjonAhSCxsQwGhriLPq7WPuBdBB
-        lSWoS/6PPiBFxoBA==
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id bbafeefb (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
-        for <linux-crypto@vger.kernel.org>;
-        Thu, 23 Jul 2020 09:42:35 +0000 (UTC)
-Received: by mail-il1-f181.google.com with SMTP id r12so3846956ilh.4
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2020 03:05:22 -0700 (PDT)
-X-Gm-Message-State: AOAM5339PtvzP/uNvitOzvzFbCoL4+5Z07gGs3zCiU0iyN8lWueHrEyX
-        GjjxqpPTDbz/Jt/CwYAXB1QQDEnhA1e7ZztU6Ds=
-X-Google-Smtp-Source: ABdhPJzv5KGCmfJkNAv11fl6B93Yls7UkGXbOnk1/+BL4vankm9f+f3QAaANL4zqqVTA/yy6b9pN+hqPbrLTqwbd3KY=
-X-Received: by 2002:a92:8585:: with SMTP id f127mr4123945ilh.207.1595498721687;
- Thu, 23 Jul 2020 03:05:21 -0700 (PDT)
+        Thu, 23 Jul 2020 07:14:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47198 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726867AbgGWLOw (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Jul 2020 07:14:52 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB255C0619DC;
+        Thu, 23 Jul 2020 04:14:51 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id y10so5980718eje.1;
+        Thu, 23 Jul 2020 04:14:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vdYyoECOJpkvRW+iDSJN0RIdv+nH41NS293U/5tTNzU=;
+        b=B5vDCuMK34uIsnpD9z3FcIKsP+ARgUC68tC2JBNii294ZVz92X5OyPMGm1cnHIYPvl
+         3DKQSNa/jdlu0biVdgVy3X/Usw30FobXy8VPbwfs9mZO4hgKFIB5Q6ou4++0iHZWcmIg
+         rfstWtDzaQOlAHrnGsoBfnDZMJ2kD6uwV1y2oKkj2sr770VnwjwNmw0Za18fcxNwyhPN
+         PX5gNfWd5bOhXJY1Kvg+SfF57+CLOAPlOGTBbqcVuFCBHygW7tXdpNSN+uznlRCislSc
+         n2D4vVeaN2C63ZjJ8LYUcP4YwR3kpvL7IT5R8VKRAe3yBJewccDUsJmVY4TugCpk7vZl
+         wX7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vdYyoECOJpkvRW+iDSJN0RIdv+nH41NS293U/5tTNzU=;
+        b=OSvvl4od8qhpj0fbhiA5979OI0+nto4RcDPfbflf+CsAatqxszOPd30p2nbgNR+IfU
+         Hd4Ap9iZqCDKpgUp/3NGF5K7lQtcFWmFg7DLFnZ6EUXBh/VXovuO6fj16efUU0UZJB56
+         /yZaiZovVILBMf1WY2kqzsc28Xlbo1UNKEuIIMVN9CcfLJ94OEb+/LRhUFn+19ynMxmr
+         k+mdHaryMe5vp8ozuKPKGl1b+kojsES1aVxBo8FD/TjgQC+XFj3r/D/vvcvm8xuVF0i+
+         9ryHfVoYSCkW38tTAwIW5BkJD0WHLiwdFF/WScJ0DlHUbTehhAEeCth11uxc5MqgI1dW
+         srSg==
+X-Gm-Message-State: AOAM530tjR5YjkGijVHLCXbqdpcgxRzpeQ+0qqsNcCysFIF6kxanE7VZ
+        6AArdUThi60tVzU3ctXj05E=
+X-Google-Smtp-Source: ABdhPJz4rM+z9eQOHfGGUF+Hj1F0q1VizoeW8bUipy1mWLCV1z/2+oZlfysZjxBFObbrbyKXQkFElw==
+X-Received: by 2002:a17:906:1187:: with SMTP id n7mr3696742eja.161.1595502890446;
+        Thu, 23 Jul 2020 04:14:50 -0700 (PDT)
+Received: from ltop.local ([2a02:a03f:a7fb:e200:f109:49dc:4e2a:ea12])
+        by smtp.gmail.com with ESMTPSA id y22sm1817552ejj.67.2020.07.23.04.14.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jul 2020 04:14:49 -0700 (PDT)
+Date:   Thu, 23 Jul 2020 13:14:47 +0200
+From:   Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Eric Dumazet <edumazet@google.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, bpf@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
+        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
+        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
+Subject: Re: [PATCH 01/26] bpfilter: fix up a sparse annotation
+Message-ID: <20200723111447.3xj7cidlsspofsja@ltop.local>
+References: <20200723060908.50081-1-hch@lst.de>
+ <20200723060908.50081-2-hch@lst.de>
 MIME-Version: 1.0
-References: <20200723075048.GA10966@gondor.apana.org.au>
-In-Reply-To: <20200723075048.GA10966@gondor.apana.org.au>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 23 Jul 2020 12:05:10 +0200
-X-Gmail-Original-Message-ID: <CAHmME9rg-_2-Zj19zSZa6sujgfJcOdm6=L1N07Dif9aWJE7eQQ@mail.gmail.com>
-Message-ID: <CAHmME9rg-_2-Zj19zSZa6sujgfJcOdm6=L1N07Dif9aWJE7eQQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: x86/curve25519 - Remove unused carry variables
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Karthik Bhargavan <karthikeyan.bhargavan@inria.fr>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200723060908.50081-2-hch@lst.de>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+On Thu, Jul 23, 2020 at 08:08:43AM +0200, Christoph Hellwig wrote:
+> The __user doesn't make sense when casting to an integer type, just
+> switch to a uintptr_t cast which also removes the need for the __force.
 
-On Thu, Jul 23, 2020 at 9:51 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> The carry variables are assigned but never used, which upsets
-> the compiler.  This patch removes them.
->
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> diff --git a/arch/x86/crypto/curve25519-x86_64.c b/arch/x86/crypto/curve25519-x86_64.c
-> index 8a17621f7d3a..8acbb6584a37 100644
-> --- a/arch/x86/crypto/curve25519-x86_64.c
-> +++ b/arch/x86/crypto/curve25519-x86_64.c
-> @@ -948,10 +948,8 @@ static void store_felem(u64 *b, u64 *f)
->  {
->         u64 f30 = f[3U];
->         u64 top_bit0 = f30 >> (u32)63U;
-> -       u64 carry0;
->         u64 f31;
->         u64 top_bit;
-> -       u64 carry;
->         u64 f0;
->         u64 f1;
->         u64 f2;
-> @@ -970,11 +968,11 @@ static void store_felem(u64 *b, u64 *f)
->         u64 o2;
->         u64 o3;
->         f[3U] = f30 & (u64)0x7fffffffffffffffU;
-> -       carry0 = add_scalar(f, f, (u64)19U * top_bit0);
-> +       add_scalar(f, f, (u64)19U * top_bit0);
->         f31 = f[3U];
->         top_bit = f31 >> (u32)63U;
->         f[3U] = f31 & (u64)0x7fffffffffffffffU;
-> -       carry = add_scalar(f, f, (u64)19U * top_bit);
-> +       add_scalar(f, f, (u64)19U * top_bit);
->         f0 = f[0U];
->         f1 = f[1U];
->         f2 = f[2U];
-> --
+Feel free to add my:
 
-That seems obvious and reasonable, and so I'm inclined to ack this,
-but I first wanted to give Karthik (CC'd) a chance to chime in here,
-as it's his HACL* project that's responsible, and he might have some
-curious insight.
+Reviewed-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
 
-Jason
+-- Luc
