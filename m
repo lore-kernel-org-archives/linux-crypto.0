@@ -2,81 +2,61 @@ Return-Path: <SRS0=6JMd=BC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93837C433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 11:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 598B4C433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 13:16:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7538B2080D
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 11:45:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EC2D20737
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 13:16:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728629AbgGWLpE (ORCPT
+        id S1729203AbgGWNQp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jul 2020 07:45:04 -0400
-Received: from verein.lst.de ([213.95.11.211]:59827 "EHLO verein.lst.de"
+        Thu, 23 Jul 2020 09:16:45 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:35898 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726109AbgGWLpE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jul 2020 07:45:04 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 82EBD68AFE; Thu, 23 Jul 2020 13:44:58 +0200 (CEST)
-Date:   Thu, 23 Jul 2020 13:44:58 +0200
-From:   'Christoph Hellwig' <hch@lst.de>
-To:     David Laight <David.Laight@ACULAB.COM>
-Cc:     'Christoph Hellwig' <hch@lst.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Eric Dumazet <edumazet@google.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
-        "coreteam@netfilter.org" <coreteam@netfilter.org>,
-        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
-        "linux-hams@vger.kernel.org" <linux-hams@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "bridge@lists.linux-foundation.org" 
-        <bridge@lists.linux-foundation.org>,
-        "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
-        "dccp@vger.kernel.org" <dccp@vger.kernel.org>,
-        "linux-decnet-user@lists.sourceforge.net" 
-        <linux-decnet-user@lists.sourceforge.net>,
-        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "mptcp@lists.01.org" <mptcp@lists.01.org>,
-        "lvs-devel@vger.kernel.org" <lvs-devel@vger.kernel.org>,
-        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
-        "tipc-discussion@lists.sourceforge.net" 
-        <tipc-discussion@lists.sourceforge.net>,
-        "linux-x25@vger.kernel.org" <linux-x25@vger.kernel.org>
-Subject: Re: [PATCH 13/26] bpfilter: switch bpfilter_ip_set_sockopt to
- sockptr_t
-Message-ID: <20200723114458.GA31363@lst.de>
-References: <20200723060908.50081-1-hch@lst.de> <20200723060908.50081-14-hch@lst.de> <621e193e4af74d8198ed87d6a9ce8260@AcuMS.aculab.com>
+        id S1729129AbgGWNQp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Jul 2020 09:16:45 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1jyb5V-0005dd-VC; Thu, 23 Jul 2020 23:16:43 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 23 Jul 2020 23:16:41 +1000
+Date:   Thu, 23 Jul 2020 23:16:41 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Tero Kristo <t-kristo@ti.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        j-keerthy@ti.com
+Subject: Re: [PATCH] crypto: sa2ul - Fix build warnings
+Message-ID: <20200723131641.GA17133@gondor.apana.org.au>
+References: <20200723074350.GA3233@gondor.apana.org.au>
+ <4e5eee05-c956-448f-10ea-06102852e979@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <621e193e4af74d8198ed87d6a9ce8260@AcuMS.aculab.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <4e5eee05-c956-448f-10ea-06102852e979@ti.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jul 23, 2020 at 11:16:16AM +0000, David Laight wrote:
-> From: Christoph Hellwig
-> > Sent: 23 July 2020 07:09
+On Thu, Jul 23, 2020 at 12:57:23PM +0300, Tero Kristo wrote:
+> On 23/07/2020 10:43, Herbert Xu wrote:
+> > This patch fixes a bunch of initialiser warnings.
 > > 
-> > This is mostly to prepare for cleaning up the callers, as bpfilter by
-> > design can't handle kernel pointers.
+> > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 > 
-> You've failed to fix the sense of the above...
+> Looks ok to me, however I never saw any build warnings with the code myself.
+> Which compiler/version produces them?
 
-The sense still is correct.
+You're right.  I was getting it due to an out-of-date version of
+sparse.  Please disregard this patch.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
