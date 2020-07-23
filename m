@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7D69C43469
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 06:13:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07278C388E6
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 06:13:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B348B22CB2
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 06:13:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB09B22CB2
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 06:13:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AHWMVgl+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LQ4n46+A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726539AbgGWGJb (ORCPT
+        id S1726994AbgGWGNe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jul 2020 02:09:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56438 "EHLO
+        Thu, 23 Jul 2020 02:13:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726522AbgGWGJb (ORCPT
+        with ESMTP id S1726304AbgGWGJa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jul 2020 02:09:31 -0400
+        Thu, 23 Jul 2020 02:09:30 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F31CEC0619E3;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45CABC0619DC;
         Wed, 22 Jul 2020 23:09:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=jnNftkdWuHutn0l5/V2Gz6Qvt1s8tXbdDMQLxkwuHBo=; b=AHWMVgl+gZI3ppeRUJG22CnuN2
-        mXsqGUtHr7hHIshIeM0BR3FDFu7P8hUJdDKWEDjaeFBPFzHAKS1/J2NqqrgVWAiWy0PDBIJV6MaAk
-        gPot77jPYt8McodlLqHe4rYj1xwXIh3dwL7d5dP2a47D69tnzjzBjxRqbyL4qtqPcLy6LsSPLTz8/
-        YOabKmimQamGM4cxDNfekHWNUuwVnDebo84hbzn4arDbH1CmgtyNxmN2OFQxyAhRHpoT37cldfrc6
-        Ax/DteamlOzerpb/bK5cMQkwL7vWGfqduGUdI9Ez5lzvt3eBZC1+o7Ayqr6UYOa2Jd5AGGDGAZ45S
-        4D3R2EfQ==;
+        bh=4ol6++ZHLzLW7TDwHlZddqUginEv5bBRSa0jVjvGkxw=; b=LQ4n46+A9hpfp8zwc4fmkS7cJo
+        d5IqR7Kl4e0TO036FT8xWuGybCPl2s2InAIro23/53LCinHbTKiq/Tnub5/sgbeB8OvtVn2Fb8T3x
+        cy//cs6JjumkNHaZgsjWuneXbSE3bV91ZNenOTCXKvvKVo3iMbNIfcuHEHy0jL/1haCANgajZtHlM
+        OmyzXP8bHeIwV24m5r6zEtVXEFNxvWUQym3x+LwR2wkRgHMMnIbpuUfNlwS4BNr+jYwxsADZ+QZcp
+        nqi2JyfZ3TNmf2p6KSTQP4wHWgQxfvy5ytYsalHed/VoVuESlHAkZj1jRhA4Bsr7iHZTdGZ+FlzSQ
+        Hvfa7s1g==;
 Received: from [2001:4bb8:18c:2acc:91df:aae8:fa3b:de9c] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jyUPo-0003jj-5f; Thu, 23 Jul 2020 06:09:12 +0000
+        id 1jyUPq-0003k4-Pf; Thu, 23 Jul 2020 06:09:15 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -58,9 +58,9 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         mptcp@lists.01.org, lvs-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
         tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: [PATCH 02/26] net/bpfilter: split __bpfilter_process_sockopt
-Date:   Thu, 23 Jul 2020 08:08:44 +0200
-Message-Id: <20200723060908.50081-3-hch@lst.de>
+Subject: [PATCH 04/26] net: add a new sockptr_t type
+Date:   Thu, 23 Jul 2020 08:08:46 +0200
+Message-Id: <20200723060908.50081-5-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200723060908.50081-1-hch@lst.de>
 References: <20200723060908.50081-1-hch@lst.de>
@@ -72,111 +72,125 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Split __bpfilter_process_sockopt into a low-level send request routine and
-the actual setsockopt hook to split the init time ping from the actual
-setsockopt processing.
+Add a uptr_t type that can hold a pointer to either a user or kernel
+memory region, and simply helpers to copy to and from it.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- net/bpfilter/bpfilter_kern.c | 51 +++++++++++++++++++-----------------
- 1 file changed, 27 insertions(+), 24 deletions(-)
+ include/linux/sockptr.h | 104 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 104 insertions(+)
+ create mode 100644 include/linux/sockptr.h
 
-diff --git a/net/bpfilter/bpfilter_kern.c b/net/bpfilter/bpfilter_kern.c
-index 3bac5820062af1..78d561f2c54da7 100644
---- a/net/bpfilter/bpfilter_kern.c
-+++ b/net/bpfilter/bpfilter_kern.c
-@@ -31,48 +31,51 @@ static void __stop_umh(void)
- 		shutdown_umh();
- }
- 
--static int __bpfilter_process_sockopt(struct sock *sk, int optname,
--				      char __user *optval,
--				      unsigned int optlen, bool is_set)
-+static int bpfilter_send_req(struct mbox_request *req)
- {
--	struct mbox_request req;
- 	struct mbox_reply reply;
- 	loff_t pos;
- 	ssize_t n;
--	int ret = -EFAULT;
- 
--	req.is_set = is_set;
--	req.pid = current->pid;
--	req.cmd = optname;
--	req.addr = (uintptr_t)optval;
--	req.len = optlen;
- 	if (!bpfilter_ops.info.tgid)
--		goto out;
-+		return -EFAULT;
- 	pos = 0;
--	n = kernel_write(bpfilter_ops.info.pipe_to_umh, &req, sizeof(req),
-+	n = kernel_write(bpfilter_ops.info.pipe_to_umh, req, sizeof(*req),
- 			   &pos);
--	if (n != sizeof(req)) {
-+	if (n != sizeof(*req)) {
- 		pr_err("write fail %zd\n", n);
--		__stop_umh();
--		ret = -EFAULT;
--		goto out;
-+		goto stop;
- 	}
- 	pos = 0;
- 	n = kernel_read(bpfilter_ops.info.pipe_from_umh, &reply, sizeof(reply),
- 			&pos);
- 	if (n != sizeof(reply)) {
- 		pr_err("read fail %zd\n", n);
--		__stop_umh();
--		ret = -EFAULT;
--		goto out;
-+		goto stop;
- 	}
--	ret = reply.status;
--out:
--	return ret;
-+	return reply.status;
-+stop:
-+	__stop_umh();
-+	return -EFAULT;
+diff --git a/include/linux/sockptr.h b/include/linux/sockptr.h
+new file mode 100644
+index 00000000000000..700856e13ea0c4
+--- /dev/null
++++ b/include/linux/sockptr.h
+@@ -0,0 +1,104 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (c) 2020 Christoph Hellwig.
++ *
++ * Support for "universal" pointers that can point to either kernel or userspace
++ * memory.
++ */
++#ifndef _LINUX_SOCKPTR_H
++#define _LINUX_SOCKPTR_H
++
++#include <linux/slab.h>
++#include <linux/uaccess.h>
++
++typedef struct {
++	union {
++		void		*kernel;
++		void __user	*user;
++	};
++	bool		is_kernel : 1;
++} sockptr_t;
++
++static inline bool sockptr_is_kernel(sockptr_t sockptr)
++{
++	return sockptr.is_kernel;
 +}
 +
-+static int bpfilter_process_sockopt(struct sock *sk, int optname,
-+				    char __user *optval, unsigned int optlen,
-+				    bool is_set)
++static inline sockptr_t KERNEL_SOCKPTR(void *p)
 +{
-+	struct mbox_request req = {
-+		.is_set		= is_set,
-+		.pid		= current->pid,
-+		.cmd		= optname,
-+		.addr		= (uintptr_t)optval,
-+		.len		= optlen,
-+	};
-+	return bpfilter_send_req(&req);
- }
- 
- static int start_umh(void)
- {
-+	struct mbox_request req = { .pid = current->pid };
- 	int err;
- 
- 	/* fork usermode process */
-@@ -82,7 +85,7 @@ static int start_umh(void)
- 	pr_info("Loaded bpfilter_umh pid %d\n", pid_nr(bpfilter_ops.info.tgid));
- 
- 	/* health check that usermode process started correctly */
--	if (__bpfilter_process_sockopt(NULL, 0, NULL, 0, 0) != 0) {
-+	if (bpfilter_send_req(&req) != 0) {
- 		shutdown_umh();
- 		return -EFAULT;
- 	}
-@@ -103,7 +106,7 @@ static int __init load_umh(void)
- 	mutex_lock(&bpfilter_ops.lock);
- 	err = start_umh();
- 	if (!err && IS_ENABLED(CONFIG_INET)) {
--		bpfilter_ops.sockopt = &__bpfilter_process_sockopt;
-+		bpfilter_ops.sockopt = &bpfilter_process_sockopt;
- 		bpfilter_ops.start = &start_umh;
- 	}
- 	mutex_unlock(&bpfilter_ops.lock);
++	return (sockptr_t) { .kernel = p, .is_kernel = true };
++}
++
++static inline sockptr_t USER_SOCKPTR(void __user *p)
++{
++	return (sockptr_t) { .user = p };
++}
++
++static inline bool sockptr_is_null(sockptr_t sockptr)
++{
++	return !sockptr.user && !sockptr.kernel;
++}
++
++static inline int copy_from_sockptr(void *dst, sockptr_t src, size_t size)
++{
++	if (!sockptr_is_kernel(src))
++		return copy_from_user(dst, src.user, size);
++	memcpy(dst, src.kernel, size);
++	return 0;
++}
++
++static inline int copy_to_sockptr(sockptr_t dst, const void *src, size_t size)
++{
++	if (!sockptr_is_kernel(dst))
++		return copy_to_user(dst.user, src, size);
++	memcpy(dst.kernel, src, size);
++	return 0;
++}
++
++static inline void *memdup_sockptr(sockptr_t src, size_t len)
++{
++	void *p = kmalloc_track_caller(len, GFP_USER | __GFP_NOWARN);
++
++	if (!p)
++		return ERR_PTR(-ENOMEM);
++	if (copy_from_sockptr(p, src, len)) {
++		kfree(p);
++		return ERR_PTR(-EFAULT);
++	}
++	return p;
++}
++
++static inline void *memdup_sockptr_nul(sockptr_t src, size_t len)
++{
++	char *p = kmalloc_track_caller(len + 1, GFP_KERNEL);
++
++	if (!p)
++		return ERR_PTR(-ENOMEM);
++	if (copy_from_sockptr(p, src, len)) {
++		kfree(p);
++		return ERR_PTR(-EFAULT);
++	}
++	p[len] = '\0';
++	return p;
++}
++
++static inline void sockptr_advance(sockptr_t sockptr, size_t len)
++{
++	if (sockptr_is_kernel(sockptr))
++		sockptr.kernel += len;
++	else
++		sockptr.user += len;
++}
++
++static inline long strncpy_from_sockptr(char *dst, sockptr_t src, size_t count)
++{
++	if (sockptr_is_kernel(src)) {
++		size_t len = min(strnlen(src.kernel, count - 1) + 1, count);
++
++		memcpy(dst, src.kernel, len);
++		return len;
++	}
++	return strncpy_from_user(dst, src.user, count);
++}
++
++#endif /* _LINUX_SOCKPTR_H */
 -- 
 2.27.0
 
