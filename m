@@ -2,107 +2,112 @@ Return-Path: <SRS0=6JMd=BC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D861C433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 07:58:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6380C433E1
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 08:18:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5DEE422B47
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 07:58:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E8692086A
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 08:18:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OsFuFLxd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727992AbgGWH6s (ORCPT
+        id S1726675AbgGWISo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jul 2020 03:58:48 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:34788 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726303AbgGWH6s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jul 2020 03:58:48 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1jyW7M-0005zW-Dk; Thu, 23 Jul 2020 17:58:17 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 23 Jul 2020 17:58:16 +1000
-Date:   Thu, 23 Jul 2020 17:58:16 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "Alexander A. Klimov" <grandmaster@al2klimov.de>
-Cc:     davem@davemloft.net, corbet@lwn.net, linux@armlinux.org.uk,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH for v5.9] crypto: Replace HTTP links with HTTPS ones
-Message-ID: <20200723075816.GG14246@gondor.apana.org.au>
-References: <20200719164959.60308-1-grandmaster@al2klimov.de>
+        Thu, 23 Jul 2020 04:18:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48206 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726330AbgGWISn (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Jul 2020 04:18:43 -0400
+Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98043C0619DC;
+        Thu, 23 Jul 2020 01:18:43 -0700 (PDT)
+Received: by mail-il1-x141.google.com with SMTP id o3so3578994ilo.12;
+        Thu, 23 Jul 2020 01:18:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+         :subject:to:cc;
+        bh=IH5nIhgYMr2jeQTF+7+IwFj00X321cLfGc0hLCqlb3E=;
+        b=OsFuFLxdpyXxkfoSlN+LN7w7Q3xAOZ7BZBrFWgVWqB/sGg1X2ze4MQ1MXrHeBmg/QY
+         4XkmKKX4IFcASGUK7NYcsE1tfwAY70+OvDS2B/nNsG69F69zdbeBhko6YBOS+UmnKLPH
+         h5A1g+wBjAHdnfDsami4JGSbMxOIwsSSE+4kUKs8C5LqEXQL4lumo6+SzzehfC+FvjFm
+         X6HYBGkNbaIsdgaKNGA+KocnzEmtVQpP7JjJTwUKCluTMCVN7WnR+RlD/eALzeWXoE+Z
+         LMRaavnYiQ3UOzEpVOV8UWLgQHqVw4UrkngWaDLnEKnB6BFxCoyNfR6mofp4eCF+ZrSi
+         m+9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+         :from:date:message-id:subject:to:cc;
+        bh=IH5nIhgYMr2jeQTF+7+IwFj00X321cLfGc0hLCqlb3E=;
+        b=UWVHHI3UPG/1HjS6WvBhThz+Crn/v+BoRVzGApyHZfHVh7pN1BH7aY2U4ipP+psrjX
+         uv4qphNdvcPumlnj7b5WFosC5sIXIBVlCz5KniNXUNfhfNnCtEZ7W+nsxt+yXXgJeq9u
+         Ad+ALdsz+JquucXYmvzTm+Lf/ZWytQVCfHJenwqabTb+7LUWMutfIwYqVd6AjTrpYrBo
+         m0eQAG24U6HAH8UCE3nKB3aF/VLZ9eBA9z3Wl618fRw2JdtAzKNrKfdP+LHVLe16gLN9
+         A1GVTzTxODy1Zuk/P6l/A1fiUWZ1oW1wLRKX0/N1F2VO9w133Ox+2TI2lzccXx1RpB9P
+         257g==
+X-Gm-Message-State: AOAM532ebVLCfZV3A1JLNnZtaG3JTpJpKQoo1q2j4aciUHK8GjgQiPnO
+        cz7mjV4EyianNxFidogP57KLtS3q8otx1fcFV/o=
+X-Google-Smtp-Source: ABdhPJyPk994azZvWyl9oZx3n8OK5HD7HeA1ROWgXndf9SLMTo4mQrIly9vdxSAaN2hhb2rUYGeLpiB7GSegZLcuZ34=
+X-Received: by 2002:a92:dc09:: with SMTP id t9mr4002418iln.226.1595492322916;
+ Thu, 23 Jul 2020 01:18:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200719164959.60308-1-grandmaster@al2klimov.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20200527141754.1850968-1-arnd@arndb.de> <20200723075612.GA14212@gondor.apana.org.au>
+In-Reply-To: <20200723075612.GA14212@gondor.apana.org.au>
+Reply-To: sedat.dilek@gmail.com
+From:   Sedat Dilek <sedat.dilek@gmail.com>
+Date:   Thu, 23 Jul 2020 10:18:30 +0200
+Message-ID: <CA+icZUWvQXUV_ibuWoAASqrCS42Q5PsQhtf1_qz_MALWcUQhiQ@mail.gmail.com>
+Subject: Re: [PATCH] x86: crypto: fix building crc32c with clang ias
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, Tim Chen <tim.c.chen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Clang-Built-Linux ML <clang-built-linux@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Jul 19, 2020 at 06:49:59PM +0200, Alexander A. Klimov wrote:
-> Rationale:
-> Reduces attack surface on kernel devs opening the links for MITM
-> as HTTPS traffic is much harder to manipulate.
-> 
-> Deterministic algorithm:
-> For each file:
->   If not .svg:
->     For each line:
->       If doesn't contain `\bxmlns\b`:
->         For each link, `\bhttp://[^# \t\r\n]*(?:\w|/)`:
-> 	  If neither `\bgnu\.org/license`, nor `\bmozilla\.org/MPL\b`:
->             If both the HTTP and HTTPS versions
->             return 200 OK and serve the same content:
->               Replace HTTP with HTTPS.
-> 
-> Signed-off-by: Alexander A. Klimov <grandmaster@al2klimov.de>
-> ---
->  Continuing my work started at 93431e0607e5.
->  See also: git log --oneline '--author=Alexander A. Klimov <grandmaster@al2klimov.de>' v5.7..master
->  (Actually letting a shell for loop submit all this stuff for me.)
-> 
->  If there are any URLs to be removed completely
->  or at least not (just) HTTPSified:
->  Just clearly say so and I'll *undo my change*.
->  See also: https://lkml.org/lkml/2020/6/27/64
-> 
->  If there are any valid, but yet not changed URLs:
->  See: https://lkml.org/lkml/2020/6/26/837
-> 
->  If you apply the patch, please let me know.
-> 
->  Sorry again to all maintainers who complained about subject lines.
->  Now I realized that you want an actually perfect prefixes,
->  not just subsystem ones.
->  I tried my best...
->  And yes, *I could* (at least half-)automate it.
->  Impossible is nothing! :)
-> 
-> 
->  Documentation/crypto/api-intro.txt    |  4 +--
->  Documentation/crypto/userspace-if.rst |  4 +--
->  arch/arm/crypto/crc32-ce-core.S       |  2 +-
->  arch/arm/crypto/sha1-armv4-large.S    |  2 +-
->  arch/arm/crypto/sha256-armv4.pl       |  2 +-
->  arch/arm/crypto/sha256-core.S_shipped |  2 +-
->  arch/arm/crypto/sha512-armv4.pl       |  4 +--
->  arch/arm/crypto/sha512-core.S_shipped |  4 +--
->  crypto/Kconfig                        | 46 +++++++++++++--------------
->  crypto/blake2b_generic.c              |  2 +-
->  crypto/camellia_generic.c             |  2 +-
->  crypto/ecc.c                          |  2 +-
->  crypto/jitterentropy.c                |  4 +--
->  crypto/lrw.c                          |  2 +-
->  crypto/salsa20_generic.c              |  4 +--
->  crypto/sha3_generic.c                 |  2 +-
->  16 files changed, 44 insertions(+), 44 deletions(-)
+On Thu, Jul 23, 2020 at 9:57 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Wed, May 27, 2020 at 04:17:40PM +0200, Arnd Bergmann wrote:
+> > The clang integrated assembler complains about movzxw:
+> >
+> > arch/x86/crypto/crc32c-pcl-intel-asm_64.S:173:2: error: invalid instruction mnemonic 'movzxw'
+> >
+> > It seems that movzwq is the mnemonic that it expects instead,
+> > and this is what objdump prints when disassembling the file.
+> >
+> > Fixes: 6a8ce1ef3940 ("crypto: crc32c - Optimize CRC32C calculation with PCLMULQDQ instruction")
+> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> > ---
+> >  arch/x86/crypto/crc32c-pcl-intel-asm_64.S | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> Patch applied.  Thanks.
+>
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks you very much.
+
+Now we have all x86/crypto patches to be able to use Clang's
+Integrated Assembler (IAS) and build with `make LLVM_IAS=1`.
+
+- Sedat -
+
+[1] https://github.com/ClangBuiltLinux/linux/issues/1049#issuecomment-662609378
