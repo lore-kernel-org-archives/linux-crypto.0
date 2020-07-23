@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3345C433F1
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 08:40:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D490CC433F7
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 08:40:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A21822080D
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 08:40:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B61982080D
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 08:40:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=tessares-net.20150623.gappssmtp.com header.i=@tessares-net.20150623.gappssmtp.com header.b="rGyvMeQ+"
+	dkim=pass (2048-bit key) header.d=tessares-net.20150623.gappssmtp.com header.i=@tessares-net.20150623.gappssmtp.com header.b="CNsYMCaC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728028AbgGWIkC (ORCPT
+        id S1725911AbgGWIkP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jul 2020 04:40:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51478 "EHLO
+        Thu, 23 Jul 2020 04:40:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727107AbgGWIkB (ORCPT
+        with ESMTP id S1726956AbgGWIjz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jul 2020 04:40:01 -0400
-Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0447FC0619E2
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2020 01:40:01 -0700 (PDT)
-Received: by mail-ej1-x641.google.com with SMTP id rk21so5514842ejb.2
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2020 01:40:00 -0700 (PDT)
+        Thu, 23 Jul 2020 04:39:55 -0400
+Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36743C0698C4
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2020 01:39:55 -0700 (PDT)
+Received: by mail-ed1-x541.google.com with SMTP id d16so3874432edz.12
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2020 01:39:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=tessares-net.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=GBFjr2NO+tPwRt48f6bV0DAq1xVraB+4JvlLFlRB/+g=;
-        b=rGyvMeQ+RAXj0neMlTzU8uPVoGP++MmPyXW9rehNveFQBhF8dyYxv6AjBxtstq4TFV
-         4fm/sT4fngoHPtNhHHFkRlNaBXaqxFcoxzVPV4jnyhOEIxpE+8WP3v6Ys+mZIZHxnElm
-         3+HlzqlN3TTCQNBXVwfzvcuNngRHeRTj8yDoqfrZmGsvdvEkoWCKJ4G7hKyFMO63jS/1
-         vJu6u48QBIkiTQUHfssZnDO3TKFO/LYe7iUYcCJScMS5N6nkTfO2ZkCaQ5+U85Bpfz5I
-         QzSiZ0n35L2/+Xm7/99AiElI31daRjEc7Mt7bFjI3zXI8qtconQ7jAfr+lIgPePAz6Ta
-         OZpQ==
+        bh=t34u4KAm1gK/f1oDA6+0ZgZ3T1IDP3Ad7b21M8jn9IE=;
+        b=CNsYMCaC5YFx1sCHrUnGTyxK55+RElxWw1Y4CgVq4WviDSpLe5tvZRQNhbw/o8NHkS
+         5lNPKTvPIJgzELza08HXzETuGDGqESAjMwaETk5Mmah7A76FYju7HEJcSxVz2Z68Ez32
+         Fe8bkyg3EIliyQfIE0WUqAFYcrQUJWfpZsNbAdl/ll0KB40GMQt1yoxZTtepzlC4KdnZ
+         GnSg5TjVpPWt7FlYOZYnnYqZEV4wmhNftYUlMk2HjS0eEZRDa0Aihb7OonspbY3XBKmu
+         gfkANWXjINxT44g2wwmEPqLtqbE4VWM7CM7H0NR7+q8PAGIse1jhucMrcCJVf3oeSFy2
+         TE7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=GBFjr2NO+tPwRt48f6bV0DAq1xVraB+4JvlLFlRB/+g=;
-        b=gKZbR35284G4k/mvFfSpzoMaZexSSZnhAKV8pXnY5bbOTTfIvRTLRvFdZ5Vl8u+1Hv
-         sICZQTB15hGG7k/6pNzIPAbuF4JJfxGI9FHyzryQnyArbO2ahIcwfdevuLXNmAtkhXY2
-         CEREAaI30bYVGR0Xuv6hnrrZtaveMiop56jvq/W89AE9HjR17UV16lTRbiMKAXQ9qxbw
-         WX4SXikjk14H53bcMe7evgttNJQlmddgxu1c6Fkiry+Etv01FGtmeXPlpcCeOjcpBkgz
-         g9Y0mgi7qTR6uzSpYfqRF0ypuEBC59VVFmv7xNTpkifS+aRYNBohSbGtik0qDqBcxIna
-         d/Zg==
-X-Gm-Message-State: AOAM532KiXW/F73QqcxpHh2SsbWGc5wtch/u6kU1Fk3sasSIW5t4+6li
-        JRitc5HndnBvJIs8l6mI1fM4kg==
-X-Google-Smtp-Source: ABdhPJxCoyR6XAi+VAaWwhsRGBR37Zk2lE1XCLCzXK9C/pnGAxIlGjt4DDu+Ll1G6Qz23LuzpAwjkw==
-X-Received: by 2002:a17:906:b0d3:: with SMTP id bk19mr3489955ejb.167.1595493599663;
-        Thu, 23 Jul 2020 01:39:59 -0700 (PDT)
+        bh=t34u4KAm1gK/f1oDA6+0ZgZ3T1IDP3Ad7b21M8jn9IE=;
+        b=tG1kxfiCVsnliA546YWQcqjzR8YQISHiMeV+y5wAyY21A6Kpz4Jcw9McQ07weQ5AhT
+         4KD+eFI3Mn3HaT6cDyeiwJrYTEzim23cXScvpIRIvkw0sSfGFC3hrXsjubgowIyWkzvR
+         em1eS1s9mXle7tHrY7dTx1Uq6f6mWOClyNHWuQFgPgRY/oz0Ic5be/6TaJkb6ROpiKzV
+         T/A6Monpm44MFd33cogdsZ8s5y/mNVE2M0HXsjyl78uLYHlBvFR7nVbbOeWLK3IHP/kl
+         JJOyDsxHRtcI9uaZ06hKUpRITJidum0uSAm+zCi/NDnMwYevsWuoT7n9YcqIQs0QRFfG
+         loDg==
+X-Gm-Message-State: AOAM531e71rYN9/xnkJZLKTxBW49kr7+JDc9e/Ndk3mBN/rHtaDPxna9
+        wXSnwju88AT8swV6zmma8f64/g==
+X-Google-Smtp-Source: ABdhPJwbyZj4th/Ks5mvB+ElB/xiz0sHXiy/UKIrJCc8QLLBnJl9HfUHFNhTU1trrZNOtrIehMUs+A==
+X-Received: by 2002:aa7:da4c:: with SMTP id w12mr3098522eds.122.1595493593384;
+        Thu, 23 Jul 2020 01:39:53 -0700 (PDT)
 Received: from tsr-lap-08.nix.tessares.net ([79.132.248.22])
-        by smtp.gmail.com with ESMTPSA id z22sm1634990edx.72.2020.07.23.01.39.57
+        by smtp.gmail.com with ESMTPSA id q7sm1560608eja.69.2020.07.23.01.39.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jul 2020 01:39:59 -0700 (PDT)
-Subject: Re: [MPTCP] [PATCH 25/26] net: pass a sockptr_t into ->setsockopt
+        Thu, 23 Jul 2020 01:39:52 -0700 (PDT)
+Subject: Re: [MPTCP] [PATCH 08/26] net: switch sock_set_timeout to sockptr_t
 To:     Christoph Hellwig <hch@lst.de>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -79,17 +79,16 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
         mptcp@lists.01.org, lvs-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
-        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org,
-        Stefan Schmidt <stefan@datenfreihafen.org>
+        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
 References: <20200723060908.50081-1-hch@lst.de>
- <20200723060908.50081-26-hch@lst.de>
+ <20200723060908.50081-9-hch@lst.de>
 From:   Matthieu Baerts <matthieu.baerts@tessares.net>
-Message-ID: <1056b902-fd25-1c13-758d-cd4341dd403b@tessares.net>
-Date:   Thu, 23 Jul 2020 10:39:57 +0200
+Message-ID: <092368db-122f-60bc-6a32-3cd5c70727da@tessares.net>
+Date:   Thu, 23 Jul 2020 10:39:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200723060908.50081-26-hch@lst.de>
+In-Reply-To: <20200723060908.50081-9-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
@@ -100,17 +99,15 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Hi Christoph,
 
-On 23/07/2020 08:09, Christoph Hellwig wrote:
-> Rework the remaining setsockopt code to pass a sockptr_t instead of a
-> plain user pointer.  This removes the last remaining set_fs(KERNEL_DS)
-> outside of architecture specific code.
+On 23/07/2020 08:08, Christoph Hellwig wrote:
+> Pass a sockptr_t to prepare for set_fs-less handling of the kernel
+> pointer from bpf-cgroup.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Acked-by: Stefan Schmidt <stefan@datenfreihafen.org> [ieee802154]
 > ---
->   net/mptcp/protocol.c                      | 12 +++----
+>   net/mptcp/protocol.c |  6 ++++--
 
-Thank you for the v2!
+Thank you for looking at that!
 
 For MPTCP-related code:
 
