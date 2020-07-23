@@ -2,123 +2,160 @@ Return-Path: <SRS0=6JMd=BC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B031CC433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 07:43:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71CA7C433E4
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 07:44:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 99D5320714
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 07:43:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 590202086A
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 07:44:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727120AbgGWHnc (ORCPT
+        id S1726109AbgGWHoM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jul 2020 03:43:32 -0400
-Received: from inva020.nxp.com ([92.121.34.13]:37046 "EHLO inva020.nxp.com"
+        Thu, 23 Jul 2020 03:44:12 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:34552 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726108AbgGWHnb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jul 2020 03:43:31 -0400
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 0B1C61A0083;
-        Thu, 23 Jul 2020 09:43:29 +0200 (CEST)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id F1AD71A007B;
-        Thu, 23 Jul 2020 09:43:28 +0200 (CEST)
-Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 593FB202B6;
-        Thu, 23 Jul 2020 09:43:28 +0200 (CEST)
-From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Shawn Guo <shawnguo@kernel.org>,
-        =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>,
-        Robin Gong <yibin.gong@nxp.com>,
-        Anson Huang <anson.huang@nxp.com>,
-        Fabio Estevam <festevam@gmail.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Adam Ford <aford173@gmail.com>, linux-input@vger.kernel.org,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>
-Subject: [PATCH v3 1/3] dt-bindings: crypto: fsl-sec4: add snvs clock to pwrkey
-Date:   Thu, 23 Jul 2020 10:43:12 +0300
-Message-Id: <20200723074314.3304-2-horia.geanta@nxp.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200723074314.3304-1-horia.geanta@nxp.com>
-References: <20200723074314.3304-1-horia.geanta@nxp.com>
+        id S1725911AbgGWHoM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Jul 2020 03:44:12 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1jyVtO-0005cV-6H; Thu, 23 Jul 2020 17:43:51 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 23 Jul 2020 17:43:50 +1000
+Date:   Thu, 23 Jul 2020 17:43:50 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Tero Kristo <t-kristo@ti.com>, j-keerthy@ti.com
+Subject: [PATCH] crypto: sa2ul - Fix build warnings
+Message-ID: <20200723074350.GA3233@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: André Draszik <git@andred.net>
+This patch fixes a bunch of initialiser warnings.
 
-On i.MX7 and i.MX8M, the SNVS requires a clock. This is similar to the
-clock bound to the SNVS RTC node, but if the SNVS RTC driver isn't
-enabled, then SNVS doesn't work, and as such the pwrkey driver doesn't
-work (i.e. hangs the kernel, as the clock isn't enabled).
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Also see commit ec2a844ef7c1
-("ARM: dts: imx7s: add snvs rtc clock")
-for a similar fix.
-
-Signed-off-by: André Draszik <git@andred.net>
-Acked-by: Rob Herring <robh@kernel.org>
-Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- .../devicetree/bindings/crypto/fsl-sec4.txt     | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
-
-diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-index 8f359f473ada..1800d57edb66 100644
---- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-+++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-@@ -449,6 +449,19 @@ System ON/OFF key driver
-       Value type: <phandle>
-       Definition: this is phandle to the register map node.
+diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
+index ebcdffcdb686..fc3a8268e2c8 100644
+--- a/drivers/crypto/sa2ul.c
++++ b/drivers/crypto/sa2ul.c
+@@ -916,7 +916,7 @@ static int sa_cipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ static int sa_aes_cbc_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			     unsigned int keylen)
+ {
+-	struct algo_data ad = { 0 };
++	struct algo_data ad = {};
+ 	/* Convert the key size (16/24/32) to the key size index (0/1/2) */
+ 	int key_idx = (keylen >> 3) - 2;
  
-+   - clocks
-+      Usage: optional, required if SNVS LP requires explicit
-+          enablement of clocks
-+      Value type: <prop_encoded-array>
-+      Definition:  a clock specifier describing the clock required for
-+          enabling and disabling SNVS LP.
-+
-+   - clock-names
-+      Usage: optional, required if SNVS LP requires explicit
-+          enablement of clocks
-+      Value type: <string>
-+      Definition: clock name string should be "snvs-pwrkey".
-+
- EXAMPLE:
- 	snvs-pwrkey@020cc000 {
- 		compatible = "fsl,sec-v4.0-pwrkey";
-@@ -456,6 +469,8 @@ EXAMPLE:
- 		interrupts = <0 4 0x4>
- 	        linux,keycode = <116>; /* KEY_POWER */
- 		wakeup-source;
-+		clocks = <&clks IMX7D_SNVS_CLK>;
-+		clock-names = "snvs-pwrkey";
- 	};
+@@ -936,7 +936,7 @@ static int sa_aes_cbc_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ static int sa_aes_ecb_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			     unsigned int keylen)
+ {
+-	struct algo_data ad = { 0 };
++	struct algo_data ad = {};
+ 	/* Convert the key size (16/24/32) to the key size index (0/1/2) */
+ 	int key_idx = (keylen >> 3) - 2;
  
- =====================================================================
-@@ -547,6 +562,8 @@ FULL EXAMPLE
- 			interrupts = <0 4 0x4>;
- 			linux,keycode = <116>; /* KEY_POWER */
- 			wakeup-source;
-+			clocks = <&clks IMX7D_SNVS_CLK>;
-+			clock-names = "snvs-pwrkey";
- 		};
- 	};
+@@ -954,7 +954,7 @@ static int sa_aes_ecb_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ static int sa_3des_cbc_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			      unsigned int keylen)
+ {
+-	struct algo_data ad = { 0 };
++	struct algo_data ad = {};
  
+ 	ad.mci_enc = mci_cbc_3des_enc_array;
+ 	ad.mci_dec = mci_cbc_3des_dec_array;
+@@ -968,7 +968,7 @@ static int sa_3des_cbc_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ static int sa_3des_ecb_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			      unsigned int keylen)
+ {
+-	struct algo_data ad = { 0 };
++	struct algo_data ad = {};
+ 
+ 	ad.mci_enc = mci_ecb_3des_enc_array;
+ 	ad.mci_dec = mci_ecb_3des_dec_array;
+@@ -1233,7 +1233,7 @@ static int sa_cipher_run(struct skcipher_request *req, u8 *iv, int enc)
+ 	struct sa_tfm_ctx *ctx =
+ 	    crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
+ 	struct crypto_alg *alg = req->base.tfm->__crt_alg;
+-	struct sa_req sa_req = { 0 };
++	struct sa_req sa_req = {};
+ 	int ret;
+ 
+ 	if (!req->cryptlen)
+@@ -1344,7 +1344,7 @@ static int sa_sha_run(struct ahash_request *req)
+ {
+ 	struct sa_tfm_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(req));
+ 	struct sa_sha_req_ctx *rctx = ahash_request_ctx(req);
+-	struct sa_req sa_req = { 0 };
++	struct sa_req sa_req = {};
+ 	size_t auth_len;
+ 
+ 	auth_len = req->nbytes;
+@@ -1566,7 +1566,7 @@ static int sa_sha_export(struct ahash_request *req, void *out)
+ 
+ static int sa_sha1_cra_init(struct crypto_tfm *tfm)
+ {
+-	struct algo_data ad = { 0 };
++	struct algo_data ad = {};
+ 	struct sa_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	sa_sha_cra_init_alg(tfm, "sha1");
+@@ -1582,7 +1582,7 @@ static int sa_sha1_cra_init(struct crypto_tfm *tfm)
+ 
+ static int sa_sha256_cra_init(struct crypto_tfm *tfm)
+ {
+-	struct algo_data ad = { 0 };
++	struct algo_data ad = {};
+ 	struct sa_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	sa_sha_cra_init_alg(tfm, "sha256");
+@@ -1598,7 +1598,7 @@ static int sa_sha256_cra_init(struct crypto_tfm *tfm)
+ 
+ static int sa_sha512_cra_init(struct crypto_tfm *tfm)
+ {
+-	struct algo_data ad = { 0 };
++	struct algo_data ad = {};
+ 	struct sa_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	sa_sha_cra_init_alg(tfm, "sha512");
+@@ -1842,7 +1842,7 @@ static int sa_aead_setauthsize(struct crypto_aead *tfm, unsigned int authsize)
+ static int sa_aead_cbc_sha1_setkey(struct crypto_aead *authenc,
+ 				   const u8 *key, unsigned int keylen)
+ {
+-	struct algo_data ad = { 0 };
++	struct algo_data ad = {};
+ 
+ 	ad.ealg_id = SA_EALG_ID_AES_CBC;
+ 	ad.aalg_id = SA_AALG_ID_HMAC_SHA1;
+@@ -1855,7 +1855,7 @@ static int sa_aead_cbc_sha1_setkey(struct crypto_aead *authenc,
+ static int sa_aead_cbc_sha256_setkey(struct crypto_aead *authenc,
+ 				     const u8 *key, unsigned int keylen)
+ {
+-	struct algo_data ad = { 0 };
++	struct algo_data ad = {};
+ 
+ 	ad.ealg_id = SA_EALG_ID_AES_CBC;
+ 	ad.aalg_id = SA_AALG_ID_HMAC_SHA2_256;
+@@ -1869,7 +1869,7 @@ static int sa_aead_run(struct aead_request *req, u8 *iv, int enc)
+ {
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	struct sa_tfm_ctx *ctx = crypto_aead_ctx(tfm);
+-	struct sa_req sa_req = { 0 };
++	struct sa_req sa_req = {};
+ 	size_t auth_size, enc_size;
+ 
+ 	enc_size = req->cryptlen;
 -- 
-2.17.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
