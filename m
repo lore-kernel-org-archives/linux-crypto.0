@@ -2,119 +2,99 @@ Return-Path: <SRS0=6JMd=BC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D490CC433F7
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 08:40:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A49ABC433E1
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 08:46:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B61982080D
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 08:40:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 843D522BEF
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 08:46:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=tessares-net.20150623.gappssmtp.com header.i=@tessares-net.20150623.gappssmtp.com header.b="CNsYMCaC"
+	dkim=pass (2048-bit key) header.d=foundries-io.20150623.gappssmtp.com header.i=@foundries-io.20150623.gappssmtp.com header.b="wNsCGurt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725911AbgGWIkP (ORCPT
+        id S1727948AbgGWIq3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jul 2020 04:40:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51454 "EHLO
+        Thu, 23 Jul 2020 04:46:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726956AbgGWIjz (ORCPT
+        with ESMTP id S1727111AbgGWIq2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jul 2020 04:39:55 -0400
-Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36743C0698C4
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2020 01:39:55 -0700 (PDT)
-Received: by mail-ed1-x541.google.com with SMTP id d16so3874432edz.12
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2020 01:39:55 -0700 (PDT)
+        Thu, 23 Jul 2020 04:46:28 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70874C0619E2
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2020 01:46:28 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id c80so4220694wme.0
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2020 01:46:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares-net.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=t34u4KAm1gK/f1oDA6+0ZgZ3T1IDP3Ad7b21M8jn9IE=;
-        b=CNsYMCaC5YFx1sCHrUnGTyxK55+RElxWw1Y4CgVq4WviDSpLe5tvZRQNhbw/o8NHkS
-         5lNPKTvPIJgzELza08HXzETuGDGqESAjMwaETk5Mmah7A76FYju7HEJcSxVz2Z68Ez32
-         Fe8bkyg3EIliyQfIE0WUqAFYcrQUJWfpZsNbAdl/ll0KB40GMQt1yoxZTtepzlC4KdnZ
-         GnSg5TjVpPWt7FlYOZYnnYqZEV4wmhNftYUlMk2HjS0eEZRDa0Aihb7OonspbY3XBKmu
-         gfkANWXjINxT44g2wwmEPqLtqbE4VWM7CM7H0NR7+q8PAGIse1jhucMrcCJVf3oeSFy2
-         TE7Q==
+        d=foundries-io.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=QHOcU/AHWfp7cpU6Aga751e/Kq9YnV85ILpM7tybMLY=;
+        b=wNsCGurt0cH0CckFhI3ZxNLC6qK7Hl9zjEhAqkJsR1WemxWbgpi1zUPeGMzCpD8yeB
+         zEEmnwD+ltTnaT75UjIouJHql6ZdkAUJgM3mGwzdvRIQhGmJeUzF8FJSURFtzXt1ucYT
+         mhPqMIpt84RKLvRlrH7LrHg+6bCMM7IKQlrpwMx5Sy/jAmA38hITTqESJTGgAZFKgFVv
+         Si530jl2cRCmYMiWwhI+fvzaCr5NYpV1bDLzk74IHc8Bo88yywQqW+IN88fV8ipl3h10
+         3gfhoFbXC2Hqp2OnBspWZIcSRwnGu+S4E8I2HKxOuiLpTm9YazRyAsDw027SZ5IYBicQ
+         is1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=t34u4KAm1gK/f1oDA6+0ZgZ3T1IDP3Ad7b21M8jn9IE=;
-        b=tG1kxfiCVsnliA546YWQcqjzR8YQISHiMeV+y5wAyY21A6Kpz4Jcw9McQ07weQ5AhT
-         4KD+eFI3Mn3HaT6cDyeiwJrYTEzim23cXScvpIRIvkw0sSfGFC3hrXsjubgowIyWkzvR
-         em1eS1s9mXle7tHrY7dTx1Uq6f6mWOClyNHWuQFgPgRY/oz0Ic5be/6TaJkb6ROpiKzV
-         T/A6Monpm44MFd33cogdsZ8s5y/mNVE2M0HXsjyl78uLYHlBvFR7nVbbOeWLK3IHP/kl
-         JJOyDsxHRtcI9uaZ06hKUpRITJidum0uSAm+zCi/NDnMwYevsWuoT7n9YcqIQs0QRFfG
-         loDg==
-X-Gm-Message-State: AOAM531e71rYN9/xnkJZLKTxBW49kr7+JDc9e/Ndk3mBN/rHtaDPxna9
-        wXSnwju88AT8swV6zmma8f64/g==
-X-Google-Smtp-Source: ABdhPJwbyZj4th/Ks5mvB+ElB/xiz0sHXiy/UKIrJCc8QLLBnJl9HfUHFNhTU1trrZNOtrIehMUs+A==
-X-Received: by 2002:aa7:da4c:: with SMTP id w12mr3098522eds.122.1595493593384;
-        Thu, 23 Jul 2020 01:39:53 -0700 (PDT)
-Received: from tsr-lap-08.nix.tessares.net ([79.132.248.22])
-        by smtp.gmail.com with ESMTPSA id q7sm1560608eja.69.2020.07.23.01.39.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jul 2020 01:39:52 -0700 (PDT)
-Subject: Re: [MPTCP] [PATCH 08/26] net: switch sock_set_timeout to sockptr_t
-To:     Christoph Hellwig <hch@lst.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Eric Dumazet <edumazet@google.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
-        linux-can@vger.kernel.org, dccp@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
-        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
-        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-References: <20200723060908.50081-1-hch@lst.de>
- <20200723060908.50081-9-hch@lst.de>
-From:   Matthieu Baerts <matthieu.baerts@tessares.net>
-Message-ID: <092368db-122f-60bc-6a32-3cd5c70727da@tessares.net>
-Date:   Thu, 23 Jul 2020 10:39:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20200723060908.50081-9-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=QHOcU/AHWfp7cpU6Aga751e/Kq9YnV85ILpM7tybMLY=;
+        b=SRV2OyKXZu+90KHM/T+1PTsK3JD3QigvgN+NtQoEmKa2/otCWy3pHNXwX65CDfU7nL
+         V+XFoYz1l8pz9SbDA1YUq3a89lkiuS/Cvs27oqKA5s3hsNTOS54jwuZn3+NDBxIrCPK5
+         t5+GKmUj6rktNjS7hun9RnIKqBUR+K8vOuzOnqxnwPklBOETpJqL7F2ELl/yk+T/AIl8
+         SQFeHoYvdiSvEUmvciW4cNa4KmeQ3V2mrJIQF0RK6X+rd0IdVLHlcLpLnuZ3KxOeNwAl
+         cA2wKtV63aIWDsxlTjBRksszuDALwoxUzkOyc4tx63CMTMQPXpRvik4ltuU+5iTELonm
+         H0Bg==
+X-Gm-Message-State: AOAM532gXg2yfBH7JVplePWkxC4TmuXP6Q7L2CkFPEVDhnVVisNtQfKl
+        ke/qy1Di5UsBRWvBwW06WeB/ZA==
+X-Google-Smtp-Source: ABdhPJz729xHjPfkTl+uBB2RMnORZGmzvSPdZUISlbC3M5uLk/4pAdXygXOPQNhUFDUoPzxgh1oh1Q==
+X-Received: by 2002:a1c:f31a:: with SMTP id q26mr3096499wmq.59.1595493987223;
+        Thu, 23 Jul 2020 01:46:27 -0700 (PDT)
+Received: from localhost.localdomain (126.red-83-36-179.dynamicip.rima-tde.net. [83.36.179.126])
+        by smtp.gmail.com with ESMTPSA id f15sm2454435wmj.44.2020.07.23.01.46.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jul 2020 01:46:26 -0700 (PDT)
+From:   Jorge Ramirez-Ortiz <jorge@foundries.io>
+To:     jorge@foundries.io, sumit.garg@linaro.org, mpm@selenic.com,
+        herbert@gondor.apana.org.au
+Cc:     jens.wiklander@linaro.org, arnd@arndb.de, ricardo@foundries.io,
+        mike@foundries.io, gregkh@linuxfoundation.org,
+        op-tee@lists.trustedfirmware.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCHv2 1/2] hwrng: optee: handle unlimited data rates
+Date:   Thu, 23 Jul 2020 10:46:21 +0200
+Message-Id: <20200723084622.31134-1-jorge@foundries.io>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Christoph,
+Data rates of MAX_UINT32 will schedule an unnecessary one jiffy
+timeout on the call to msleep. Avoid this scenario by using 0 as the
+unlimited data rate.
 
-On 23/07/2020 08:08, Christoph Hellwig wrote:
-> Pass a sockptr_t to prepare for set_fs-less handling of the kernel
-> pointer from bpf-cgroup.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   net/mptcp/protocol.c |  6 ++++--
+Signed-off-by: Jorge Ramirez-Ortiz <jorge@foundries.io>
+---
+ drivers/char/hw_random/optee-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thank you for looking at that!
-
-For MPTCP-related code:
-
-Acked-by: Matthieu Baerts <matthieu.baerts@tessares.net>
-
-Cheers,
-Matt
+diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
+index 49b2e02537dd..5bc4700c4dae 100644
+--- a/drivers/char/hw_random/optee-rng.c
++++ b/drivers/char/hw_random/optee-rng.c
+@@ -128,7 +128,7 @@ static int optee_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+ 		data += rng_size;
+ 		read += rng_size;
+ 
+-		if (wait) {
++		if (wait && pvt_data->data_rate) {
+ 			if (timeout-- == 0)
+ 				return read;
+ 			msleep((1000 * (max - read)) / pvt_data->data_rate);
 -- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+2.17.1
+
