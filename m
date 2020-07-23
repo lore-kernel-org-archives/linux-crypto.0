@@ -4,41 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36061C433E3
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 06:09:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98114C43460
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 06:10:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 14DE220825
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 06:09:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7880C2086A
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 06:10:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZjRkbKsN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GkQOrco1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726608AbgGWGJc (ORCPT
+        id S1727887AbgGWGKD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jul 2020 02:09:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56436 "EHLO
+        Thu, 23 Jul 2020 02:10:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725773AbgGWGJb (ORCPT
+        with ESMTP id S1727871AbgGWGKA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jul 2020 02:09:31 -0400
+        Thu, 23 Jul 2020 02:10:00 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFF00C0619E2;
-        Wed, 22 Jul 2020 23:09:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA58CC0619DC;
+        Wed, 22 Jul 2020 23:09:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=tMSRX19x4iZFav/RhfRomxQNPhw3MkRzM2UG4zJNYUs=; b=ZjRkbKsN32Y9td9wz3fQ2PPjcg
-        tNWB2b1T7UhAxfZr9U5bMy8pRw41tA+BEuacHybHFtOtya84/t+vp9s4fVF0g64fIHo2cAfUni18L
-        STKIAbJ+vR2wfiAkEB3Bx9u1lh4K1aKD28lXbDznVgv0IbGEm9oeUwmwmwB90s+bH3+0vjtCEYzIs
-        L9uZxeSzuaPHmKq5fGMICl8C3Ivesl8yoyuBUgcrzCB1w5Xlr7UJwTmGQINzFPF2GhqbHAE6NOOqe
-        jRg/utPjWC/MgowE0Ga66W6lNrRV1vFCriVpF7Tel/0HVKMC6xDMjjfnpYf/p9nuQBvUjarss4Xf6
-        wrY8TEmQ==;
+        bh=WZEyzaS1ykzyi+yQ2LS2wMvQkwL8k8wAtqvtWngMf9k=; b=GkQOrco1ZkuQcjMqhyS87SJRGD
+        de3B5cw7G5yO9PMtzI5w0X5s2yopJqUiVbmSr+As98wWMXn6Xl8y79CmwAlaI3j3ebpY9UAteT4Cn
+        4frKKigvk1Di9ljBzfXFKftGwds+aPPL5GLXVJjbCp6Lfwgns5RMwKcigxjHrK7cICgV+R/NKR37U
+        SMOd4Y2ouS0ew7sS3pWavsl7KIbbei8X3CRKa1fmzw0vOVSoAqB/W9Ie3NBqoKgOKk97nUpIMcDP1
+        iQ+w1wBnm6LrsYc5mEgaq6c5MgkmC+YhQvxGnziaBnG3fCFxlBnwCMxWkRXbiG0+qq3YlYZUO7b8q
+        DOf9lBbQ==;
 Received: from [2001:4bb8:18c:2acc:91df:aae8:fa3b:de9c] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jyUPt-0003ka-LB; Thu, 23 Jul 2020 06:09:18 +0000
+        id 1jyUQN-0003qJ-36; Thu, 23 Jul 2020 06:09:47 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -58,9 +58,9 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         mptcp@lists.01.org, lvs-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
         tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: [PATCH 06/26] net: switch sock_setbindtodevice to sockptr_t
-Date:   Thu, 23 Jul 2020 08:08:48 +0200
-Message-Id: <20200723060908.50081-7-hch@lst.de>
+Subject: [PATCH 26/26] net: optimize the sockptr_t for unified kernel/user address spaces
+Date:   Thu, 23 Jul 2020 08:09:08 +0200
+Message-Id: <20200723060908.50081-27-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200723060908.50081-1-hch@lst.de>
 References: <20200723060908.50081-1-hch@lst.de>
@@ -72,46 +72,131 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Pass a sockptr_t to prepare for set_fs-less handling of the kernel
-pointer from bpf-cgroup.
+For architectures like x86 and arm64 we don't need the separate bit to
+indicate that a pointer is a kernel pointer as the address spaces are
+unified.  That way the sockptr_t can be reduced to a union of two
+pointers, which leads to nicer calling conventions.
+
+The only caveat is that we need to check that users don't pass in kernel
+address and thus gain access to kernel memory.  Thus the USER_SOCKPTR
+helper is replaced with a init_user_sockptr function that does this check
+and returns an error if it fails.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- net/core/sock.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ include/linux/sockptr.h     | 32 ++++++++++++++++++++++++++++++--
+ net/ipv4/bpfilter/sockopt.c | 14 ++++++++------
+ net/socket.c                |  6 +++++-
+ 3 files changed, 43 insertions(+), 9 deletions(-)
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 71fc7e4ddd0648..5b55bc9397f282 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -609,8 +609,7 @@ int sock_bindtoindex(struct sock *sk, int ifindex, bool lock_sk)
+diff --git a/include/linux/sockptr.h b/include/linux/sockptr.h
+index 700856e13ea0c4..7d5cdb2b30b5f0 100644
+--- a/include/linux/sockptr.h
++++ b/include/linux/sockptr.h
+@@ -8,9 +8,34 @@
+ #ifndef _LINUX_SOCKPTR_H
+ #define _LINUX_SOCKPTR_H
+ 
++#include <linux/compiler.h>
+ #include <linux/slab.h>
+ #include <linux/uaccess.h>
+ 
++#ifdef CONFIG_ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE
++typedef union {
++	void		*kernel;
++	void __user	*user;
++} sockptr_t;
++
++static inline bool sockptr_is_kernel(sockptr_t sockptr)
++{
++	return (unsigned long)sockptr.kernel >= TASK_SIZE;
++}
++
++static inline sockptr_t KERNEL_SOCKPTR(void *p)
++{
++	return (sockptr_t) { .kernel = p };
++}
++
++static inline int __must_check init_user_sockptr(sockptr_t *sp, void __user *p)
++{
++	if ((unsigned long)p >= TASK_SIZE)
++		return -EFAULT;
++	sp->user = p;
++	return 0;
++}
++#else /* CONFIG_ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE */
+ typedef struct {
+ 	union {
+ 		void		*kernel;
+@@ -29,10 +54,13 @@ static inline sockptr_t KERNEL_SOCKPTR(void *p)
+ 	return (sockptr_t) { .kernel = p, .is_kernel = true };
  }
- EXPORT_SYMBOL(sock_bindtoindex);
  
--static int sock_setbindtodevice(struct sock *sk, char __user *optval,
--				int optlen)
-+static int sock_setbindtodevice(struct sock *sk, sockptr_t optval, int optlen)
+-static inline sockptr_t USER_SOCKPTR(void __user *p)
++static inline int __must_check init_user_sockptr(sockptr_t *sp, void __user *p)
  {
- 	int ret = -ENOPROTOOPT;
- #ifdef CONFIG_NETDEVICES
-@@ -632,7 +631,7 @@ static int sock_setbindtodevice(struct sock *sk, char __user *optval,
- 	memset(devname, 0, sizeof(devname));
+-	return (sockptr_t) { .user = p };
++	sp->user = p;
++	sp->is_kernel = false;
++	return 0;
+ }
++#endif /* CONFIG_ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE */
  
- 	ret = -EFAULT;
--	if (copy_from_user(devname, optval, optlen))
-+	if (copy_from_sockptr(devname, optval, optlen))
- 		goto out;
+ static inline bool sockptr_is_null(sockptr_t sockptr)
+ {
+diff --git a/net/ipv4/bpfilter/sockopt.c b/net/ipv4/bpfilter/sockopt.c
+index 1b34cb9a7708ec..94f18d2352d007 100644
+--- a/net/ipv4/bpfilter/sockopt.c
++++ b/net/ipv4/bpfilter/sockopt.c
+@@ -57,16 +57,18 @@ int bpfilter_ip_set_sockopt(struct sock *sk, int optname, sockptr_t optval,
+ 	return bpfilter_mbox_request(sk, optname, optval, optlen, true);
+ }
  
- 	index = 0;
-@@ -840,7 +839,7 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
- 	 */
+-int bpfilter_ip_get_sockopt(struct sock *sk, int optname, char __user *optval,
+-			    int __user *optlen)
++int bpfilter_ip_get_sockopt(struct sock *sk, int optname,
++			    char __user *user_optval, int __user *optlen)
+ {
+-	int len;
++	sockptr_t optval;
++	int err, len;
  
- 	if (optname == SO_BINDTODEVICE)
--		return sock_setbindtodevice(sk, optval, optlen);
-+		return sock_setbindtodevice(sk, USER_SOCKPTR(optval), optlen);
+ 	if (get_user(len, optlen))
+ 		return -EFAULT;
+-
+-	return bpfilter_mbox_request(sk, optname, USER_SOCKPTR(optval), len,
+-				     false);
++	err = init_user_sockptr(&optval, user_optval);
++	if (err)
++		return err;
++	return bpfilter_mbox_request(sk, optname, optval, len, false);
+ }
  
- 	if (optlen < sizeof(int))
+ static int __init bpfilter_sockopt_init(void)
+diff --git a/net/socket.c b/net/socket.c
+index e44b8ac47f6f46..94ca4547cd7c53 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -2097,7 +2097,7 @@ static bool sock_use_custom_sol_socket(const struct socket *sock)
+ int __sys_setsockopt(int fd, int level, int optname, char __user *user_optval,
+ 		int optlen)
+ {
+-	sockptr_t optval = USER_SOCKPTR(user_optval);
++	sockptr_t optval;
+ 	char *kernel_optval = NULL;
+ 	int err, fput_needed;
+ 	struct socket *sock;
+@@ -2105,6 +2105,10 @@ int __sys_setsockopt(int fd, int level, int optname, char __user *user_optval,
+ 	if (optlen < 0)
  		return -EINVAL;
+ 
++	err = init_user_sockptr(&optval, user_optval);
++	if (err)
++		return err;
++
+ 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
+ 	if (!sock)
+ 		return err;
 -- 
 2.27.0
 
