@@ -2,112 +2,122 @@ Return-Path: <SRS0=6JMd=BC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD30EC433EA
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 08:28:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3345C433F1
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 08:40:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8991620888
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 08:28:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A21822080D
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 08:40:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=foundries-io.20150623.gappssmtp.com header.i=@foundries-io.20150623.gappssmtp.com header.b="XWBB+39p"
+	dkim=pass (2048-bit key) header.d=tessares-net.20150623.gappssmtp.com header.i=@tessares-net.20150623.gappssmtp.com header.b="rGyvMeQ+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727111AbgGWI22 (ORCPT
+        id S1728028AbgGWIkC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jul 2020 04:28:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49682 "EHLO
+        Thu, 23 Jul 2020 04:40:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726975AbgGWI22 (ORCPT
+        with ESMTP id S1727107AbgGWIkB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jul 2020 04:28:28 -0400
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9422C0619DC
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2020 01:28:27 -0700 (PDT)
-Received: by mail-wm1-x341.google.com with SMTP id o8so4158816wmh.4
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2020 01:28:27 -0700 (PDT)
+        Thu, 23 Jul 2020 04:40:01 -0400
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0447FC0619E2
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2020 01:40:01 -0700 (PDT)
+Received: by mail-ej1-x641.google.com with SMTP id rk21so5514842ejb.2
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2020 01:40:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=foundries-io.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=pqbf/JlzmrnxTusv/MCCIfLKAll9saWvqmEUS6doAKA=;
-        b=XWBB+39pUAgBiMhoQnEPb5NISkEOeCzOjwQd7J69FxfbO32zX8yotjMJ36aZ75VE+s
-         aydG9h2pkphAtsa0wdHferuXlMfD1ed14VEOKEhXbR2iH8b/qh2UNJv5ltUCX6iAHonW
-         6ppjm11dHVvrAGhedgBVv4NqXXuzytlaMOXuf5Cvp8DAPyfJD2BKo1Mx+BFGp0VhJWCV
-         552YwVkx8Vs99u3zVR+PusZTsPGMoMZoHr5Phm/+jLF9Gmh1MusbJUoayogqEWsK2wU+
-         O0VRmSnwhoKsht4hShoOsWuwVF4hBVAUvAWZzjwopvMDSybLCJYEpQN81IQZLlHwmH1n
-         nJ4A==
+        d=tessares-net.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=GBFjr2NO+tPwRt48f6bV0DAq1xVraB+4JvlLFlRB/+g=;
+        b=rGyvMeQ+RAXj0neMlTzU8uPVoGP++MmPyXW9rehNveFQBhF8dyYxv6AjBxtstq4TFV
+         4fm/sT4fngoHPtNhHHFkRlNaBXaqxFcoxzVPV4jnyhOEIxpE+8WP3v6Ys+mZIZHxnElm
+         3+HlzqlN3TTCQNBXVwfzvcuNngRHeRTj8yDoqfrZmGsvdvEkoWCKJ4G7hKyFMO63jS/1
+         vJu6u48QBIkiTQUHfssZnDO3TKFO/LYe7iUYcCJScMS5N6nkTfO2ZkCaQ5+U85Bpfz5I
+         QzSiZ0n35L2/+Xm7/99AiElI31daRjEc7Mt7bFjI3zXI8qtconQ7jAfr+lIgPePAz6Ta
+         OZpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=pqbf/JlzmrnxTusv/MCCIfLKAll9saWvqmEUS6doAKA=;
-        b=Pd5V4UAu04RpryhLhkFfmRCTIjMisUk4WJT+X9CgcuGqLsiMwnmZyUJecrKT1hmb9M
-         0LDHfPVkgIdzls9McP6UKo1j9zVIl6bx3KHUwHlChMsHCWWSjDsHpT30hbrvqOcdG9YT
-         GbTO9OMtHgIYTYSB9i1/rCJpBusWPEpQAOPPFy2ufzvnSejCBAb6y9A0kK0efzxUKl3b
-         SruTscTqQxgXhOoUt6URl1ZYCRD+esRuUqTR0ozj4n3q58XL5VssdiCFeKKVMa3qd6dr
-         m1h8a6Ib89Hvk3qf/pukarKoPgmIhFCSLg/80RvFG7eD2+utkv7ROiUfKbyqQ+GRS0rg
-         C7pg==
-X-Gm-Message-State: AOAM533J0xnR2mrOWicYXoZgf1XHDTz+4thfkK8fD2J90AF2RHrXibxK
-        6mnsu/s7HmAdy1xgNtjQOIopWA==
-X-Google-Smtp-Source: ABdhPJws7V0YymdA86lv4N+zTX4pWZCDq6+vN6OynKbmLdt5md9K+3+DmirsDojMFHAfhro6V83r1g==
-X-Received: by 2002:a1c:2350:: with SMTP id j77mr3266459wmj.31.1595492906472;
-        Thu, 23 Jul 2020 01:28:26 -0700 (PDT)
-Received: from localhost.localdomain (126.red-83-36-179.dynamicip.rima-tde.net. [83.36.179.126])
-        by smtp.gmail.com with ESMTPSA id o2sm2879094wrj.21.2020.07.23.01.28.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jul 2020 01:28:26 -0700 (PDT)
-From:   Jorge Ramirez-Ortiz <jorge@foundries.io>
-To:     jorge@foundries.io, sumit.garg@linaro.org, mpm@selenic.com,
-        herbert@gondor.apana.org.au
-Cc:     jens.wiklander@linaro.org, arnd@arndb.de, ricardo@foundries.io,
-        mike@foundries.io, gregkh@linuxfoundation.org,
-        op-tee@lists.trustedfirmware.org, linux-crypto@vger.kernel.org
-Subject: [PATCH 2/2] hwrng: optee: fix wait use case
-Date:   Thu, 23 Jul 2020 10:28:21 +0200
-Message-Id: <20200723082821.26237-2-jorge@foundries.io>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200723082821.26237-1-jorge@foundries.io>
-References: <20200723082821.26237-1-jorge@foundries.io>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=GBFjr2NO+tPwRt48f6bV0DAq1xVraB+4JvlLFlRB/+g=;
+        b=gKZbR35284G4k/mvFfSpzoMaZexSSZnhAKV8pXnY5bbOTTfIvRTLRvFdZ5Vl8u+1Hv
+         sICZQTB15hGG7k/6pNzIPAbuF4JJfxGI9FHyzryQnyArbO2ahIcwfdevuLXNmAtkhXY2
+         CEREAaI30bYVGR0Xuv6hnrrZtaveMiop56jvq/W89AE9HjR17UV16lTRbiMKAXQ9qxbw
+         WX4SXikjk14H53bcMe7evgttNJQlmddgxu1c6Fkiry+Etv01FGtmeXPlpcCeOjcpBkgz
+         g9Y0mgi7qTR6uzSpYfqRF0ypuEBC59VVFmv7xNTpkifS+aRYNBohSbGtik0qDqBcxIna
+         d/Zg==
+X-Gm-Message-State: AOAM532KiXW/F73QqcxpHh2SsbWGc5wtch/u6kU1Fk3sasSIW5t4+6li
+        JRitc5HndnBvJIs8l6mI1fM4kg==
+X-Google-Smtp-Source: ABdhPJxCoyR6XAi+VAaWwhsRGBR37Zk2lE1XCLCzXK9C/pnGAxIlGjt4DDu+Ll1G6Qz23LuzpAwjkw==
+X-Received: by 2002:a17:906:b0d3:: with SMTP id bk19mr3489955ejb.167.1595493599663;
+        Thu, 23 Jul 2020 01:39:59 -0700 (PDT)
+Received: from tsr-lap-08.nix.tessares.net ([79.132.248.22])
+        by smtp.gmail.com with ESMTPSA id z22sm1634990edx.72.2020.07.23.01.39.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Jul 2020 01:39:59 -0700 (PDT)
+Subject: Re: [MPTCP] [PATCH 25/26] net: pass a sockptr_t into ->setsockopt
+To:     Christoph Hellwig <hch@lst.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Eric Dumazet <edumazet@google.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, bpf@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
+        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
+        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org,
+        Stefan Schmidt <stefan@datenfreihafen.org>
+References: <20200723060908.50081-1-hch@lst.de>
+ <20200723060908.50081-26-hch@lst.de>
+From:   Matthieu Baerts <matthieu.baerts@tessares.net>
+Message-ID: <1056b902-fd25-1c13-758d-cd4341dd403b@tessares.net>
+Date:   Thu, 23 Jul 2020 10:39:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20200723060908.50081-26-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The current code waits for data to be available before attempting a
-second read. However the second read would not be executed as the
-while loop exits.
+Hi Christoph,
 
-This fix does not wait if all data has been read and reads a second
-time if only partial data was retrieved on the first read.
+On 23/07/2020 08:09, Christoph Hellwig wrote:
+> Rework the remaining setsockopt code to pass a sockptr_t instead of a
+> plain user pointer.  This removes the last remaining set_fs(KERNEL_DS)
+> outside of architecture specific code.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Acked-by: Stefan Schmidt <stefan@datenfreihafen.org> [ieee802154]
+> ---
+>   net/mptcp/protocol.c                      | 12 +++----
 
-Signed-off-by: Jorge Ramirez-Ortiz <jorge@foundries.io>
----
- drivers/char/hw_random/optee-rng.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Thank you for the v2!
 
-diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
-index 5bc4700c4dae..967d58bb9fda 100644
---- a/drivers/char/hw_random/optee-rng.c
-+++ b/drivers/char/hw_random/optee-rng.c
-@@ -122,13 +122,15 @@ static int optee_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
- 	if (max > MAX_ENTROPY_REQ_SZ)
- 		max = MAX_ENTROPY_REQ_SZ;
- 
--	while (read == 0) {
-+	for (;;) {
- 		rng_size = get_optee_rng_data(pvt_data, data, (max - read));
- 
- 		data += rng_size;
- 		read += rng_size;
- 
- 		if (wait && pvt_data->data_rate) {
-+			if (read == max)
-+				return read;
- 			if (timeout-- == 0)
- 				return read;
- 			msleep((1000 * (max - read)) / pvt_data->data_rate);
+For MPTCP-related code:
+
+Acked-by: Matthieu Baerts <matthieu.baerts@tessares.net>
+
+Cheers,
+Matt
 -- 
-2.17.1
-
+Tessares | Belgium | Hybrid Access Solutions
+www.tessares.net
