@@ -2,198 +2,108 @@ Return-Path: <SRS0=6JMd=BC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49490C433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 09:57:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA7BC433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 10:05:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2149A20737
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 09:57:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46EF02086A
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 10:05:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="H9sfqFZM"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="WTS8+AWn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726982AbgGWJ5g (ORCPT
+        id S1728229AbgGWKF0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jul 2020 05:57:36 -0400
-Received: from fllv0016.ext.ti.com ([198.47.19.142]:34028 "EHLO
-        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725858AbgGWJ5g (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jul 2020 05:57:36 -0400
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 06N9vSQw125040;
-        Thu, 23 Jul 2020 04:57:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1595498248;
-        bh=fn2qvmj3CvfIk9kEzUTSBLpw6ahgDPBbLHrhRzlWNY8=;
-        h=Subject:To:References:From:Date:In-Reply-To;
-        b=H9sfqFZMjJZYVdFXFMO4lRdl7I69TcZrz15MoEggN5A+hZzCy4yO2QE1v0cmC7uAv
-         SxhfUlW+YU+pyHC4lKgJ7+7HLEkRHlgAza+Fv3zRA8J0BEegM1ByyqnWvhxvywPJOj
-         kxNbIiiFcxnLFg6we26M2oHlMPqDJpnkCDuX97Po=
-Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
-        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 06N9vSqk093293
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 23 Jul 2020 04:57:28 -0500
-Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Thu, 23
- Jul 2020 04:57:28 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
- Frontend Transport; Thu, 23 Jul 2020 04:57:28 -0500
-Received: from [127.0.0.1] (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 06N9vOnY120905;
-        Thu, 23 Jul 2020 04:57:25 -0500
-Subject: Re: [PATCH] crypto: sa2ul - Fix build warnings
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        <j-keerthy@ti.com>
-References: <20200723074350.GA3233@gondor.apana.org.au>
-From:   Tero Kristo <t-kristo@ti.com>
-Message-ID: <4e5eee05-c956-448f-10ea-06102852e979@ti.com>
-Date:   Thu, 23 Jul 2020 12:57:23 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Thu, 23 Jul 2020 06:05:26 -0400
+Received: from mail.zx2c4.com ([192.95.5.64]:32769 "EHLO mail.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727828AbgGWKF0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Jul 2020 06:05:26 -0400
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id d336b177
+        for <linux-crypto@vger.kernel.org>;
+        Thu, 23 Jul 2020 09:42:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type; s=mail; bh=RyD29gGjJDqSqVIG++m7HJT3Qu8=; b=WTS8+A
+        WnvfQ6EucnzgusWooDeiT9++F4LTn/1i1rqT9ysJoi1JWpukBNP2XVD0ItRmXoDN
+        7yFhPWdnAcxEIeziP2FNryxwY4FR4VaMbvb9BY1z8tFGkiPfsq/BiXumIP71uHMj
+        fkjnBD1igQfVJl0fmBNNFWF4vcgPMVJO2fZ/hFVjpg8NG2WF/pFu/E06Id3VZRFN
+        WJbBqngw1cZrQWaC/HNYCOUb5NS7ghhc8zZOdDDVwCshASZqOLL37nZ3e3DZSivh
+        MP6fIfLTCXbvWc6hSjoTrK4C7oZdFJDOzzWrLZjonAhSCxsQwGhriLPq7WPuBdBB
+        lSWoS/6PPiBFxoBA==
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id bbafeefb (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
+        for <linux-crypto@vger.kernel.org>;
+        Thu, 23 Jul 2020 09:42:35 +0000 (UTC)
+Received: by mail-il1-f181.google.com with SMTP id r12so3846956ilh.4
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2020 03:05:22 -0700 (PDT)
+X-Gm-Message-State: AOAM5339PtvzP/uNvitOzvzFbCoL4+5Z07gGs3zCiU0iyN8lWueHrEyX
+        GjjxqpPTDbz/Jt/CwYAXB1QQDEnhA1e7ZztU6Ds=
+X-Google-Smtp-Source: ABdhPJzv5KGCmfJkNAv11fl6B93Yls7UkGXbOnk1/+BL4vankm9f+f3QAaANL4zqqVTA/yy6b9pN+hqPbrLTqwbd3KY=
+X-Received: by 2002:a92:8585:: with SMTP id f127mr4123945ilh.207.1595498721687;
+ Thu, 23 Jul 2020 03:05:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200723074350.GA3233@gondor.apana.org.au>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+References: <20200723075048.GA10966@gondor.apana.org.au>
+In-Reply-To: <20200723075048.GA10966@gondor.apana.org.au>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Thu, 23 Jul 2020 12:05:10 +0200
+X-Gmail-Original-Message-ID: <CAHmME9rg-_2-Zj19zSZa6sujgfJcOdm6=L1N07Dif9aWJE7eQQ@mail.gmail.com>
+Message-ID: <CAHmME9rg-_2-Zj19zSZa6sujgfJcOdm6=L1N07Dif9aWJE7eQQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: x86/curve25519 - Remove unused carry variables
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Karthik Bhargavan <karthikeyan.bhargavan@inria.fr>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 23/07/2020 10:43, Herbert Xu wrote:
-> This patch fixes a bunch of initialiser warnings.
-> 
+Hi Herbert,
+
+On Thu, Jul 23, 2020 at 9:51 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> The carry variables are assigned but never used, which upsets
+> the compiler.  This patch removes them.
+>
 > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
+> diff --git a/arch/x86/crypto/curve25519-x86_64.c b/arch/x86/crypto/curve25519-x86_64.c
+> index 8a17621f7d3a..8acbb6584a37 100644
+> --- a/arch/x86/crypto/curve25519-x86_64.c
+> +++ b/arch/x86/crypto/curve25519-x86_64.c
+> @@ -948,10 +948,8 @@ static void store_felem(u64 *b, u64 *f)
+>  {
+>         u64 f30 = f[3U];
+>         u64 top_bit0 = f30 >> (u32)63U;
+> -       u64 carry0;
+>         u64 f31;
+>         u64 top_bit;
+> -       u64 carry;
+>         u64 f0;
+>         u64 f1;
+>         u64 f2;
+> @@ -970,11 +968,11 @@ static void store_felem(u64 *b, u64 *f)
+>         u64 o2;
+>         u64 o3;
+>         f[3U] = f30 & (u64)0x7fffffffffffffffU;
+> -       carry0 = add_scalar(f, f, (u64)19U * top_bit0);
+> +       add_scalar(f, f, (u64)19U * top_bit0);
+>         f31 = f[3U];
+>         top_bit = f31 >> (u32)63U;
+>         f[3U] = f31 & (u64)0x7fffffffffffffffU;
+> -       carry = add_scalar(f, f, (u64)19U * top_bit);
+> +       add_scalar(f, f, (u64)19U * top_bit);
+>         f0 = f[0U];
+>         f1 = f[1U];
+>         f2 = f[2U];
+> --
 
-Looks ok to me, however I never saw any build warnings with the code 
-myself. Which compiler/version produces them?
+That seems obvious and reasonable, and so I'm inclined to ack this,
+but I first wanted to give Karthik (CC'd) a chance to chime in here,
+as it's his HACL* project that's responsible, and he might have some
+curious insight.
 
--Tero
-
-> 
-> diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-> index ebcdffcdb686..fc3a8268e2c8 100644
-> --- a/drivers/crypto/sa2ul.c
-> +++ b/drivers/crypto/sa2ul.c
-> @@ -916,7 +916,7 @@ static int sa_cipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
->   static int sa_aes_cbc_setkey(struct crypto_skcipher *tfm, const u8 *key,
->   			     unsigned int keylen)
->   {
-> -	struct algo_data ad = { 0 };
-> +	struct algo_data ad = {};
->   	/* Convert the key size (16/24/32) to the key size index (0/1/2) */
->   	int key_idx = (keylen >> 3) - 2;
->   
-> @@ -936,7 +936,7 @@ static int sa_aes_cbc_setkey(struct crypto_skcipher *tfm, const u8 *key,
->   static int sa_aes_ecb_setkey(struct crypto_skcipher *tfm, const u8 *key,
->   			     unsigned int keylen)
->   {
-> -	struct algo_data ad = { 0 };
-> +	struct algo_data ad = {};
->   	/* Convert the key size (16/24/32) to the key size index (0/1/2) */
->   	int key_idx = (keylen >> 3) - 2;
->   
-> @@ -954,7 +954,7 @@ static int sa_aes_ecb_setkey(struct crypto_skcipher *tfm, const u8 *key,
->   static int sa_3des_cbc_setkey(struct crypto_skcipher *tfm, const u8 *key,
->   			      unsigned int keylen)
->   {
-> -	struct algo_data ad = { 0 };
-> +	struct algo_data ad = {};
->   
->   	ad.mci_enc = mci_cbc_3des_enc_array;
->   	ad.mci_dec = mci_cbc_3des_dec_array;
-> @@ -968,7 +968,7 @@ static int sa_3des_cbc_setkey(struct crypto_skcipher *tfm, const u8 *key,
->   static int sa_3des_ecb_setkey(struct crypto_skcipher *tfm, const u8 *key,
->   			      unsigned int keylen)
->   {
-> -	struct algo_data ad = { 0 };
-> +	struct algo_data ad = {};
->   
->   	ad.mci_enc = mci_ecb_3des_enc_array;
->   	ad.mci_dec = mci_ecb_3des_dec_array;
-> @@ -1233,7 +1233,7 @@ static int sa_cipher_run(struct skcipher_request *req, u8 *iv, int enc)
->   	struct sa_tfm_ctx *ctx =
->   	    crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
->   	struct crypto_alg *alg = req->base.tfm->__crt_alg;
-> -	struct sa_req sa_req = { 0 };
-> +	struct sa_req sa_req = {};
->   	int ret;
->   
->   	if (!req->cryptlen)
-> @@ -1344,7 +1344,7 @@ static int sa_sha_run(struct ahash_request *req)
->   {
->   	struct sa_tfm_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(req));
->   	struct sa_sha_req_ctx *rctx = ahash_request_ctx(req);
-> -	struct sa_req sa_req = { 0 };
-> +	struct sa_req sa_req = {};
->   	size_t auth_len;
->   
->   	auth_len = req->nbytes;
-> @@ -1566,7 +1566,7 @@ static int sa_sha_export(struct ahash_request *req, void *out)
->   
->   static int sa_sha1_cra_init(struct crypto_tfm *tfm)
->   {
-> -	struct algo_data ad = { 0 };
-> +	struct algo_data ad = {};
->   	struct sa_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
->   
->   	sa_sha_cra_init_alg(tfm, "sha1");
-> @@ -1582,7 +1582,7 @@ static int sa_sha1_cra_init(struct crypto_tfm *tfm)
->   
->   static int sa_sha256_cra_init(struct crypto_tfm *tfm)
->   {
-> -	struct algo_data ad = { 0 };
-> +	struct algo_data ad = {};
->   	struct sa_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
->   
->   	sa_sha_cra_init_alg(tfm, "sha256");
-> @@ -1598,7 +1598,7 @@ static int sa_sha256_cra_init(struct crypto_tfm *tfm)
->   
->   static int sa_sha512_cra_init(struct crypto_tfm *tfm)
->   {
-> -	struct algo_data ad = { 0 };
-> +	struct algo_data ad = {};
->   	struct sa_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
->   
->   	sa_sha_cra_init_alg(tfm, "sha512");
-> @@ -1842,7 +1842,7 @@ static int sa_aead_setauthsize(struct crypto_aead *tfm, unsigned int authsize)
->   static int sa_aead_cbc_sha1_setkey(struct crypto_aead *authenc,
->   				   const u8 *key, unsigned int keylen)
->   {
-> -	struct algo_data ad = { 0 };
-> +	struct algo_data ad = {};
->   
->   	ad.ealg_id = SA_EALG_ID_AES_CBC;
->   	ad.aalg_id = SA_AALG_ID_HMAC_SHA1;
-> @@ -1855,7 +1855,7 @@ static int sa_aead_cbc_sha1_setkey(struct crypto_aead *authenc,
->   static int sa_aead_cbc_sha256_setkey(struct crypto_aead *authenc,
->   				     const u8 *key, unsigned int keylen)
->   {
-> -	struct algo_data ad = { 0 };
-> +	struct algo_data ad = {};
->   
->   	ad.ealg_id = SA_EALG_ID_AES_CBC;
->   	ad.aalg_id = SA_AALG_ID_HMAC_SHA2_256;
-> @@ -1869,7 +1869,7 @@ static int sa_aead_run(struct aead_request *req, u8 *iv, int enc)
->   {
->   	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
->   	struct sa_tfm_ctx *ctx = crypto_aead_ctx(tfm);
-> -	struct sa_req sa_req = { 0 };
-> +	struct sa_req sa_req = {};
->   	size_t auth_size, enc_size;
->   
->   	enc_size = req->cryptlen;
-> 
-
---
-Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
+Jason
