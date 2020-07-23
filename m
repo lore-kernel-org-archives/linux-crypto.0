@@ -1,82 +1,185 @@
-Return-Path: <SRS0=N13L=BB=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=6JMd=BC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E21C1C433E1
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 20:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03627C433E4
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 05:02:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BFDEF22B43
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jul 2020 20:49:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4C2F20771
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 05:02:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LeK8RXpw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726535AbgGVUtT (ORCPT
+        id S1725857AbgGWFCT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jul 2020 16:49:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35908 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726447AbgGVUtT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jul 2020 16:49:19 -0400
-Received: from oasis.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Thu, 23 Jul 2020 01:02:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44333 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725843AbgGWFCS (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Jul 2020 01:02:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1595480536;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WQ8HFJRjSjgVFhmZYkcj0k9hnN0PLKzblt1+tXuDhM8=;
+        b=LeK8RXpwcXfg/sby/mFnkIXUMW3zwQBprvIgyoYYj53Rjv9hCNgkIt0qpsyM6m45ntG9ke
+        mKYxcMHxUClT6WhdYBW70R4Zl+6gofetef89sDz/0ix0rXmTRp7ttgz9yv4FgNrZGDsemy
+        rkUFd9c4oWzS++swLUnBbT8nFeevp4Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-143-aDaIhfkuPLWS2wb98L5psw-1; Thu, 23 Jul 2020 01:02:14 -0400
+X-MC-Unique: aDaIhfkuPLWS2wb98L5psw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1F4D7207BB;
-        Wed, 22 Jul 2020 20:49:16 +0000 (UTC)
-Date:   Wed, 22 Jul 2020 16:49:15 -0400
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Brendan Higgins <brendanhiggins@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Haren Myneni <haren@us.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jiri Kosina <jikos@kernel.org>,
-        Joe Lawrence <joe.lawrence@redhat.com>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Petr Mladek <pmladek@suse.com>,
-        Tal Gilboa <talgi@mellanox.com>, kunit-dev@googlegroups.com,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>, live-patching@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] kbuild: trace functions in subdirectories of
- lib/
-Message-ID: <20200722164915.29be42d9@oasis.local.home>
-In-Reply-To: <CAK7LNASdytWgqQWux1cyBrGJb_FvS7Ur5UqgHaA2Xf5cwfL85A@mail.gmail.com>
-References: <20200707092117.963394-1-masahiroy@kernel.org>
-        <20200707092117.963394-2-masahiroy@kernel.org>
-        <20200707120212.7010fa4f@oasis.local.home>
-        <CAK7LNASdytWgqQWux1cyBrGJb_FvS7Ur5UqgHaA2Xf5cwfL85A@mail.gmail.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94015106B245;
+        Thu, 23 Jul 2020 05:02:12 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 51CE01A888;
+        Thu, 23 Jul 2020 05:02:11 +0000 (UTC)
+Date:   Wed, 22 Jul 2020 23:02:10 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     herbert@gondor.apana.org.au, cohuck@redhat.com, nhorman@redhat.com,
+        vdronov@redhat.com, bhelgaas@google.com, mark.a.chambers@intel.com,
+        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
+        qat-linux@intel.com, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/5] vfio/pci: Add device blocklist
+Message-ID: <20200722230210.55b2d326@x1.home>
+In-Reply-To: <20200714063610.849858-3-giovanni.cabiddu@intel.com>
+References: <20200714063610.849858-1-giovanni.cabiddu@intel.com>
+        <20200714063610.849858-3-giovanni.cabiddu@intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 22 Jul 2020 11:08:51 +0900
-Masahiro Yamada <masahiroy@kernel.org> wrote:
+On Tue, 14 Jul 2020 07:36:07 +0100
+Giovanni Cabiddu <giovanni.cabiddu@intel.com> wrote:
 
-> That's why I split this into two commits
-> so that we can do git-bisect and
-> revert the second one in case of a regression.
+> Add blocklist of devices that by default are not probed by vfio-pci.
+> Devices in this list may be susceptible to untrusted application, even
+> if the IOMMU is enabled. To be accessed via vfio-pci, the user has to
+> explicitly disable the blocklist.
 > 
-> Anyway, we have some more time to test this in linux-next
-> (and somebody reports an issue, if any).
+> The blocklist can be disabled via the module parameter disable_blocklist.
 > 
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c | 33 +++++++++++++++++++++++++++++++++
+>  1 file changed, 33 insertions(+)
 
-You can add my
+Hi Giovanni,
 
-Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+I'm pretty satisfied with this series, except "blocklist" makes me
+think of block devices, ie. storage, or block chains, or building block
+types of things before I get to "block" as in a barrier.  The other
+alternative listed as a suggestion currently in linux-next is denylist,
+which is the counter to an allowlist.  I've already proposed changing
+some other terminology in vfio.c to use the term "allowed", so
+allow/deny would be my preference versus pass/block.
 
-and take it through your tree.
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 7c0779018b1b..ea5904ca6cbf 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -60,6 +60,10 @@ module_param(enable_sriov, bool, 0644);
+>  MODULE_PARM_DESC(enable_sriov, "Enable support for SR-IOV configuration.  Enabling SR-IOV on a PF typically requires support of the userspace PF driver, enabling VFs without such support may result in non-functional VFs or PF.");
+>  #endif
+>  
+> +static bool disable_blocklist;
+> +module_param(disable_blocklist, bool, 0444);
+> +MODULE_PARM_DESC(disable_blocklist, "Disable device blocklist. If set, i.e. blocklist disabled, then blocklisted devices are allowed to be probed by vfio-pci.");
 
--- Steve
+This seems a little obtuse, could we expand a bit to allow users to
+understand why a device might be on the denylist?  Ex:
+
+"Disable use of device denylist, which prevents binding to device with
+known errata that may lead to exploitable stability or security issues
+when accessed by untrusted users."
+
+I think that more properly sets expectations when a device is denied
+via this list and the admin looks to see how they might workaround it.
+
+> +
+>  static inline bool vfio_vga_disabled(void)
+>  {
+>  #ifdef CONFIG_VFIO_PCI_VGA
+> @@ -69,6 +73,29 @@ static inline bool vfio_vga_disabled(void)
+>  #endif
+>  }
+>  
+> +static bool vfio_pci_dev_in_blocklist(struct pci_dev *pdev)
+> +{
+> +	return false;
+> +}
+> +
+> +static bool vfio_pci_is_blocklisted(struct pci_dev *pdev)
+> +{
+> +	if (!vfio_pci_dev_in_blocklist(pdev))
+> +		return false;
+> +
+> +	if (disable_blocklist) {
+> +		pci_warn(pdev,
+> +			 "device blocklist disabled - allowing device %04x:%04x.\n",
+
+Here we even use "allowing" to describe what happens when the blocklist
+is disabled, "deny" is a more proper antonym of allow.
+
+> +			 pdev->vendor, pdev->device);
+> +		return false;
+> +	}
+> +
+> +	pci_warn(pdev, "%04x:%04x is blocklisted - probe will fail.\n",
+
+Perhaps "%04x:%04x exists in vfio-pci device denylist, driver probing
+disallowed.\n",...
+
+Thanks,
+Alex
+
+> +		 pdev->vendor, pdev->device);
+> +
+> +	return true;
+> +}
+> +
+>  /*
+>   * Our VGA arbiter participation is limited since we don't know anything
+>   * about the device itself.  However, if the device is the only VGA device
+> @@ -1847,6 +1874,9 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  	struct iommu_group *group;
+>  	int ret;
+>  
+> +	if (vfio_pci_is_blocklisted(pdev))
+> +		return -EINVAL;
+> +
+>  	if (pdev->hdr_type != PCI_HEADER_TYPE_NORMAL)
+>  		return -EINVAL;
+>  
+> @@ -2336,6 +2366,9 @@ static int __init vfio_pci_init(void)
+>  
+>  	vfio_pci_fill_ids();
+>  
+> +	if (disable_blocklist)
+> +		pr_warn("device blocklist disabled.\n");
+> +
+>  	return 0;
+>  
+>  out_driver:
+
