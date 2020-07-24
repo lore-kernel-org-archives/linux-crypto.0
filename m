@@ -1,164 +1,163 @@
-Return-Path: <SRS0=6JMd=BC=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=MR99=BD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EAB8C433E4
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 22:41:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D99C9C433E3
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jul 2020 03:09:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B10520792
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jul 2020 22:41:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B79A920786
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jul 2020 03:09:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aRqxl04k"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Gx0y6LVt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727087AbgGWWlf (ORCPT
+        id S1726178AbgGXDJz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jul 2020 18:41:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57247 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726368AbgGWWlf (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jul 2020 18:41:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1595544094;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JNCEKJ42TJGwyjZg08MhJL5etwaa2Ujt2TOQmqOGcgw=;
-        b=aRqxl04kevLCQea0YDh9fOe8zSvVHtj9encgI7qtN82aQlSICNb7OBQUZFfBDpuU6MXUSa
-        rDu0/MEHmjbkSimswivclv8aOt6flZyPO1JS2ERDqhq27DEvjbuuifS94/SaNGoH2uex9m
-        9sOVNWGsNplTQL6rCuMKle10Hwz2HJc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-gkvHuhYuNrKcPEkSY9pgFw-1; Thu, 23 Jul 2020 18:41:30 -0400
-X-MC-Unique: gkvHuhYuNrKcPEkSY9pgFw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Thu, 23 Jul 2020 23:09:55 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:58623 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726317AbgGXDJz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Jul 2020 23:09:55 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 860B018C63C9;
-        Thu, 23 Jul 2020 22:41:28 +0000 (UTC)
-Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ED6D274F58;
-        Thu, 23 Jul 2020 22:41:26 +0000 (UTC)
-Date:   Thu, 23 Jul 2020 16:41:26 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     herbert@gondor.apana.org.au, cohuck@redhat.com, nhorman@redhat.com,
-        vdronov@redhat.com, bhelgaas@google.com, mark.a.chambers@intel.com,
-        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
-        fiona.trahe@intel.com, qat-linux@intel.com, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/5] vfio/pci: Add device denylist
-Message-ID: <20200723164126.0249b247@w520.home>
-In-Reply-To: <20200723214705.5399-3-giovanni.cabiddu@intel.com>
-References: <20200723214705.5399-1-giovanni.cabiddu@intel.com>
-        <20200723214705.5399-3-giovanni.cabiddu@intel.com>
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4BCZ1r06q6z9sR4;
+        Fri, 24 Jul 2020 13:09:51 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1595560192;
+        bh=JMyV1D9kt2gAi4H5USAM4UKG8u63RFAYH2U6HpUh4Mg=;
+        h=Date:From:To:Cc:Subject:From;
+        b=Gx0y6LVtETGyjCBJcV5q1yxh+iieSqatCVmmFV+ILXQvZmSsQppUBEmop1NenZTVT
+         IWrtqNP0nTTFb5l4rjSmsDvMzDXLdjcJu3KVucASOm5ImanRDoFtnUuk3l5hky0VxA
+         qYZDGowCun2FnE/hhavCmhGjMj1EqGkCEtFblDh84cox4aoKz5jEGYTNJphD7dcAd5
+         eDX32HKIy6DLAy31uL9J4YrJjVi4PVGdhm1TM/VKwrg/PMPlHtdge8KLvmpnkPjl+g
+         ug1Q9+o0KlgIvlBqv+9/Q3dgu2g44iF0RnLyS3gk/dg19UFJ+HjbWDdv4SIiXwkkRb
+         q4fN7UGV7SHXw==
+Date:   Fri, 24 Jul 2020 13:09:51 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Subject: linux-next: manual merge of the crypto tree with the jc_docs tree
+Message-ID: <20200724130951.5b99a9c9@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: multipart/signed; boundary="Sig_/VIJwA+efFIsvhi_Eq.TH6uZ";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 23 Jul 2020 22:47:02 +0100
-Giovanni Cabiddu <giovanni.cabiddu@intel.com> wrote:
+--Sig_/VIJwA+efFIsvhi_Eq.TH6uZ
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> Add denylist of devices that by default are not probed by vfio-pci.
-> Devices in this list may be susceptible to untrusted application, even
-> if the IOMMU is enabled. To be accessed via vfio-pci, the user has to
-> explicitly disable the denylist.
-> 
-> The denylist can be disabled via the module parameter disable_denylist.
-> 
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> ---
->  drivers/vfio/pci/vfio_pci.c | 33 +++++++++++++++++++++++++++++++++
->  1 file changed, 33 insertions(+)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index 7c0779018b1b..673f53c4798e 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -60,6 +60,10 @@ module_param(enable_sriov, bool, 0644);
->  MODULE_PARM_DESC(enable_sriov, "Enable support for SR-IOV configuration.  Enabling SR-IOV on a PF typically requires support of the userspace PF driver, enabling VFs without such support may result in non-functional VFs or PF.");
->  #endif
->  
-> +static bool disable_denylist;
-> +module_param(disable_denylist, bool, 0444);
-> +MODULE_PARM_DESC(disable_denylist, "Disable use of device denylist. Disabling the denylist prevents binding to devices with known errata that may lead to exploitable stability or security issues when accessed by untrusted users.");
+Hi all,
 
-s/prevents/allows/
+Today's linux-next merge of the crypto tree got a conflict in:
 
-ie. the denylist prevents binding, therefore disabling the denylist
-allows binding
+  Documentation/crypto/api-intro.rst
 
-I can fix this on commit without a new version if you agree.  I also
-see that patch 1/5 didn't change since v2, so I'll transfer Bjorn's
-ack.  If that sounds good I'll queue the first 3 patches in my next
-branch for v5.9.  Thanks,
+between commit:
 
-Alex
+  5846551bb147 ("docs: crypto: convert api-intro.txt to ReST format")
 
-> +
->  static inline bool vfio_vga_disabled(void)
->  {
->  #ifdef CONFIG_VFIO_PCI_VGA
-> @@ -69,6 +73,29 @@ static inline bool vfio_vga_disabled(void)
->  #endif
->  }
->  
-> +static bool vfio_pci_dev_in_denylist(struct pci_dev *pdev)
-> +{
-> +	return false;
-> +}
-> +
-> +static bool vfio_pci_is_denylisted(struct pci_dev *pdev)
-> +{
-> +	if (!vfio_pci_dev_in_denylist(pdev))
-> +		return false;
-> +
-> +	if (disable_denylist) {
-> +		pci_warn(pdev,
-> +			 "device denylist disabled - allowing device %04x:%04x.\n",
-> +			 pdev->vendor, pdev->device);
-> +		return false;
-> +	}
-> +
-> +	pci_warn(pdev, "%04x:%04x exists in vfio-pci device denylist, driver probing disallowed.\n",
-> +		 pdev->vendor, pdev->device);
-> +
-> +	return true;
-> +}
-> +
->  /*
->   * Our VGA arbiter participation is limited since we don't know anything
->   * about the device itself.  However, if the device is the only VGA device
-> @@ -1847,6 +1874,9 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  	struct iommu_group *group;
->  	int ret;
->  
-> +	if (vfio_pci_is_denylisted(pdev))
-> +		return -EINVAL;
-> +
->  	if (pdev->hdr_type != PCI_HEADER_TYPE_NORMAL)
->  		return -EINVAL;
->  
-> @@ -2336,6 +2366,9 @@ static int __init vfio_pci_init(void)
->  
->  	vfio_pci_fill_ids();
->  
-> +	if (disable_denylist)
-> +		pr_warn("device denylist disabled.\n");
-> +
->  	return 0;
->  
->  out_driver:
+from the jc_docs tree and commit:
 
+  9332a9e73918 ("crypto: Replace HTTP links with HTTPS ones")
+
+from the crypto tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc Documentation/crypto/api-intro.rst
+index bcff47d42189,40137f93e04f..000000000000
+--- a/Documentation/crypto/api-intro.rst
++++ b/Documentation/crypto/api-intro.rst
+@@@ -159,31 -146,31 +159,31 @@@ Credit
+  The following people provided invaluable feedback during the development
+  of the API:
+ =20
+ -  Alexey Kuznetzov
+ -  Rusty Russell
+ -  Herbert Valerio Riedel
+ -  Jeff Garzik
+ -  Michael Richardson
+ -  Andrew Morton
+ -  Ingo Oeser
+ -  Christoph Hellwig
+ +  - Alexey Kuznetzov
+ +  - Rusty Russell
+ +  - Herbert Valerio Riedel
+ +  - Jeff Garzik
+ +  - Michael Richardson
+ +  - Andrew Morton
+ +  - Ingo Oeser
+ +  - Christoph Hellwig
+ =20
+  Portions of this API were derived from the following projects:
+ - =20
+ +
+    Kerneli Cryptoapi (http://www.kerneli.org/)
+ -    Alexander Kjeldaas
+ -    Herbert Valerio Riedel
+ -    Kyle McMartin
+ -    Jean-Luc Cooke
+ -    David Bryson
+ -    Clemens Fruhwirth
+ -    Tobias Ringstrom
+ -    Harald Welte
+ +   - Alexander Kjeldaas
+ +   - Herbert Valerio Riedel
+ +   - Kyle McMartin
+ +   - Jean-Luc Cooke
+ +   - David Bryson
+ +   - Clemens Fruhwirth
+ +   - Tobias Ringstrom
+ +   - Harald Welte
+ =20
+  and;
+ - =20
+ +
+-   Nettle (http://www.lysator.liu.se/~nisse/nettle/)
++   Nettle (https://www.lysator.liu.se/~nisse/nettle/)
+ -    Niels M=C3=B6ller
+ +   - Niels M=C3=B6ller
+ =20
+  Original developers of the crypto algorithms:
+ =20
+
+--Sig_/VIJwA+efFIsvhi_Eq.TH6uZ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl8aUP8ACgkQAVBC80lX
+0GwK6gf5ASvaTROcfQXXob7S7o5gNJ/nm1LtCXWpaAopVPAklGB8dQfd78C5uvgd
+bWIBve/aLsfpj7826voSRZTUBfA84SSuoRDpDZT5kxSuXdiRjDsCMMklXxWipSvw
+4XVfSY8m1RxVx7RZPzKvFyqr9TlvTH6BDDlkwycp0/AZR14IEMaA2nabpWftMfSv
+rfdUIATa3hMCpyp+9lMmvfODkqb8lSqIfSR5WByh2ek13Fcfoh12VOd7FhPAc5K2
+O0aIZO0ZPWotv876+CTtELgt8wTTfB4Y7ipuVHYimQ8m2kvUtQwTen9X+5ZfHOz/
+YYNMFSNR3yjGZ5H2PYhG3N0g9GpNSg==
+=41P1
+-----END PGP SIGNATURE-----
+
+--Sig_/VIJwA+efFIsvhi_Eq.TH6uZ--
