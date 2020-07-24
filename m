@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BCC1C433E3
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jul 2020 13:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2539C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jul 2020 13:24:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78E952074A
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jul 2020 13:22:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CCE8D206C1
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jul 2020 13:24:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zGfFL6Gm"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PioAJypK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726739AbgGXNWV (ORCPT
+        id S1726329AbgGXNYV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Jul 2020 09:22:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36470 "EHLO
+        Fri, 24 Jul 2020 09:24:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726182AbgGXNWU (ORCPT
+        with ESMTP id S1726182AbgGXNYU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Jul 2020 09:22:20 -0400
-Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A87C0619E4
-        for <linux-crypto@vger.kernel.org>; Fri, 24 Jul 2020 06:22:20 -0700 (PDT)
-Received: by mail-lf1-x141.google.com with SMTP id s9so5187815lfs.4
-        for <linux-crypto@vger.kernel.org>; Fri, 24 Jul 2020 06:22:19 -0700 (PDT)
+        Fri, 24 Jul 2020 09:24:20 -0400
+Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 490E8C0619D3
+        for <linux-crypto@vger.kernel.org>; Fri, 24 Jul 2020 06:24:20 -0700 (PDT)
+Received: by mail-lf1-x143.google.com with SMTP id k13so5203876lfo.0
+        for <linux-crypto@vger.kernel.org>; Fri, 24 Jul 2020 06:24:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=NRL0UF3/43vslaJwWgTDYbt4jG2vWByUDB6sLPDuLgg=;
-        b=zGfFL6GmKfCKONek4mgXwt+6vzxav2G7E3CLcuQNhfLYOlekFkhc+89MaxLAL7qw3X
-         HCOc3/HQHMtRl9xxbUrickjMs0ht8tRG431uD01gRfGYYmKa5xK7K9tG2cuhV8230kf6
-         TZPGub5Z/Qm6994apf7zqFR5JT7k/mmb/zuPV3EVQG2Cjy5atgiwXwuMtAegmdOyQ4Dl
-         Muy2DFwUjK8YWKAamgBp0DieYGDljuUJI9aCweRWFLKxqXIGj5zpY6kP654hi8CLwwJ2
-         kKC1ILn6FXoT+jAdBs7Q/zKSSYq0APnEvjaE2CW1f6xuz08/uOFTak44QG3iKkhJVvz/
-         izQg==
+        bh=vrNd1IsGR4tP8PBdHAFs3AhICen6bv/rNf6zgNWwFI4=;
+        b=PioAJypK5ctFm6Xpj+L40YBoTd0JCG/mujuTgjgFt5XPDhLDMYIHuNZ1Gru3Xl1cPw
+         7QsYFW1PVV5ED1ho4LpWE8uqv8Z1+5PChli2H7RVUs0JgrT8x7uwT4Lq0A3FdXAmcj44
+         +bUSSrcbH3I9fbldqLNr+s4TKMTp2PmVV8Jrmqzxhd2A7paYkowMApdmShipQCBDSvzh
+         yb0grHRbq8Nu7Q1KGGdJcrjfFpv6kx3Iw/gU5VAeYZCfsHjzBHM2vKM3zjVchhsFf+U3
+         3AOEgFQm4R6pgWiA8g7HC+rAurTwKgrRSxTtx0XunZCr3Y7toQi+k84kbOIoajdoL302
+         C/zQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=NRL0UF3/43vslaJwWgTDYbt4jG2vWByUDB6sLPDuLgg=;
-        b=lbCqdEE/gs051DnlwDGl/t+RrQA6jqBb9id368H6frQmlOUXlciHkUIt0S9RQGmqaJ
-         /P6SqYYqAmyBwj8D1301KePFOhKVMXMnghGGeaGRtF6hEiZXktAlFg5aB6BTNJKr9UoW
-         lYWEx8lVEUmCL5F9lC5elcM6VwPM1v/etLNmBtus5yeuVjgL+kjVWOAvVoXS1tw6np60
-         mOrucubNkHLxQIfa5lIcmgct/YoeoTEy+3P+fTotmWjNO6owu53xEPup+VDBL16hipjU
-         pdSIQ3eWwWaXMRTqAKqD/uPGNgZVYfWn7e4vU/wMxpxHC7f9dGC39LKBRjvjWjjN44Vz
-         WdgA==
-X-Gm-Message-State: AOAM531twL7FKPTyO7cX4NDeIQL6CRmaJe+ZHDwH7gUdFKge1b7toJc/
-        Z2UI5lOhl3dToHYMgEvRB6lA35TSRB9QaLPwvEy27A==
-X-Google-Smtp-Source: ABdhPJzdYPF+cX3QXpVzwFZNMylvbWd3csH+Sajhbs6Ro6UfJ5+mgfxTXCDTtwTUBJA9hyU4+UKjUxUTeY3InVk+/Ho=
-X-Received: by 2002:a19:86c3:: with SMTP id i186mr1625844lfd.59.1595596938380;
- Fri, 24 Jul 2020 06:22:18 -0700 (PDT)
+        bh=vrNd1IsGR4tP8PBdHAFs3AhICen6bv/rNf6zgNWwFI4=;
+        b=b55/0Tj52nirARDYipJa40MPcIq8deDOie+5Pm58DokLGPTm20bjA+Ce8QqIuY9Dw0
+         4E0KoFAPPT5AP66olvtDeISOSUCsKTiFf1Bqe/GMUurISIAO9aWzdAiJa5YaL/onCylv
+         cTCqn0yGBdxnPOBYKDusODwsM8hRDIyTM17O/EyRqHBOKtr1OoQtjYMWXGx/FPtOq3Sh
+         6c5LkgsrLAmfLplOPYYdtOOkHgQv/oObgahAM+Ua+rba576Vqk9iqp1BxKMSq+VKECu3
+         8I9tb+otVWnq8GfV4VSkaWEmpAVx7CWDhF6hngS+h0WHkVDompJ0sCFjwzEGMQ6YSt/X
+         V4Cg==
+X-Gm-Message-State: AOAM532x1pF+Zkt+QFi9faDThwaMb8rIFoK8cLRjBV/ZLFK6F41th5LJ
+        Zdmr+y5t9zh4bo0VSYUh6O5gkp8ohX8bfQq/ayZHPw==
+X-Google-Smtp-Source: ABdhPJzQ+DJRA0iFuI99YTbcfAz/FjMxLPDD4nS06PTBDi9IeLSDtUNouRu4oWlAKHjrLeLOfNOoXu4MPSQg8iNP4Jk=
+X-Received: by 2002:ac2:4d16:: with SMTP id r22mr4986311lfi.21.1595597058699;
+ Fri, 24 Jul 2020 06:24:18 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200723084622.31134-1-jorge@foundries.io> <20200723084622.31134-2-jorge@foundries.io>
-In-Reply-To: <20200723084622.31134-2-jorge@foundries.io>
+References: <20200723084622.31134-1-jorge@foundries.io>
+In-Reply-To: <20200723084622.31134-1-jorge@foundries.io>
 From:   Sumit Garg <sumit.garg@linaro.org>
-Date:   Fri, 24 Jul 2020 18:52:07 +0530
-Message-ID: <CAFA6WYPQ3GGYostoHU=6qg4c_LqoqOZVbZ8gbQbGkNfyGydQjQ@mail.gmail.com>
-Subject: Re: [PATCHv2 2/2] hwrng: optee: fix wait use case
+Date:   Fri, 24 Jul 2020 18:54:07 +0530
+Message-ID: <CAFA6WYMCs-50WnwqqhefE9b_aXaORq1e3JdZJAjb04tHKvqP0A@mail.gmail.com>
+Subject: Re: [PATCHv2 1/2] hwrng: optee: handle unlimited data rates
 To:     Jorge Ramirez-Ortiz <jorge@foundries.io>
 Cc:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -81,51 +81,35 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Thu, 23 Jul 2020 at 14:16, Jorge Ramirez-Ortiz <jorge@foundries.io> wrote:
 >
-> The current code waits for data to be available before attempting a
-> second read. However the second read would not be executed as the
-> while loop exits.
->
-> This fix does not wait if all data has been read and reads a second
-> time if only partial data was retrieved on the first read.
->
-> This fix also does not attempt to read if not data is requested.
-
-I am not sure how this is possible, can you elaborate?
-
+> Data rates of MAX_UINT32 will schedule an unnecessary one jiffy
+> timeout on the call to msleep. Avoid this scenario by using 0 as the
+> unlimited data rate.
 >
 > Signed-off-by: Jorge Ramirez-Ortiz <jorge@foundries.io>
 > ---
->  v2: tidy up the while loop to avoid reading when no data is requested
+>  drivers/char/hw_random/optee-rng.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
->  drivers/char/hw_random/optee-rng.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
-> index 5bc4700c4dae..a99d82949981 100644
-> --- a/drivers/char/hw_random/optee-rng.c
-> +++ b/drivers/char/hw_random/optee-rng.c
-> @@ -122,14 +122,14 @@ static int optee_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
->         if (max > MAX_ENTROPY_REQ_SZ)
->                 max = MAX_ENTROPY_REQ_SZ;
->
-> -       while (read == 0) {
-> +       while (read < max) {
->                 rng_size = get_optee_rng_data(pvt_data, data, (max - read));
->
->                 data += rng_size;
->                 read += rng_size;
->
->                 if (wait && pvt_data->data_rate) {
-> -                       if (timeout-- == 0)
-> +                       if ((timeout-- == 0) || (read == max))
 
-If read == max, would there be any sleep?
+Sounds good to me. FWIW:
+
+Reviewed-by: Sumit Garg <sumit.garg@linaro.org>
 
 -Sumit
 
+> diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
+> index 49b2e02537dd..5bc4700c4dae 100644
+> --- a/drivers/char/hw_random/optee-rng.c
+> +++ b/drivers/char/hw_random/optee-rng.c
+> @@ -128,7 +128,7 @@ static int optee_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+>                 data += rng_size;
+>                 read += rng_size;
+>
+> -               if (wait) {
+> +               if (wait && pvt_data->data_rate) {
+>                         if (timeout-- == 0)
 >                                 return read;
 >                         msleep((1000 * (max - read)) / pvt_data->data_rate);
->                 } else {
 > --
 > 2.17.1
 >
