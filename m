@@ -2,73 +2,153 @@ Return-Path: <SRS0=tM/H=BE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF64C433E4
-	for <linux-crypto@archiver.kernel.org>; Sat, 25 Jul 2020 06:31:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2FA9C433E1
+	for <linux-crypto@archiver.kernel.org>; Sat, 25 Jul 2020 07:06:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 329CB206F6
-	for <linux-crypto@archiver.kernel.org>; Sat, 25 Jul 2020 06:31:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E21F206E3
+	for <linux-crypto@archiver.kernel.org>; Sat, 25 Jul 2020 07:06:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1595660778;
+	bh=2CHbIxC5Kb2WtZDnEWCdd+0JKhqhPfpbvIbPs1xwH4k=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=Nv/bdsk/lz5K1iViga3rXhB084P8f5BlHSEQxa3EWSJKnV46QUwfj5+NtPApJj3Rk
+	 vRO/+7k6zhq9exekcycfEir0N3TjBcXGDp7oR3uRUlTQ+3IisgoDivb6y/XrhV3OKS
+	 z962i9YZ5Q3m64WnlHL0KDqCttxg0LF9LZ8tVErI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727008AbgGYGbS (ORCPT
+        id S1726945AbgGYHGS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 25 Jul 2020 02:31:18 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:51638 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726273AbgGYGbR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 25 Jul 2020 02:31:17 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id C09B570A2098F182DCAB;
-        Sat, 25 Jul 2020 14:31:15 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 25 Jul 2020 14:31:09 +0800
-From:   Wei Yongjun <weiyongjun1@huawei.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Keerthy <j-keerthy@ti.com>
-CC:     Wei Yongjun <weiyongjun1@huawei.com>,
-        <linux-crypto@vger.kernel.org>, <kernel-janitors@vger.kernel.org>,
-        Hulk Robot <hulkci@huawei.com>
-Subject: [PATCH -next] crypto: sa2ul - fix wrong pointer passed to PTR_ERR()
-Date:   Sat, 25 Jul 2020 06:34:40 +0000
-Message-ID: <20200725063440.172238-1-weiyongjun1@huawei.com>
-X-Mailer: git-send-email 2.20.1
+        Sat, 25 Jul 2020 03:06:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46246 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725874AbgGYHGR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 25 Jul 2020 03:06:17 -0400
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 030B5206E3;
+        Sat, 25 Jul 2020 07:06:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1595660777;
+        bh=2CHbIxC5Kb2WtZDnEWCdd+0JKhqhPfpbvIbPs1xwH4k=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=uwH6LviNKeZGE4LzNNRPr3R/92imSYJ2ZgeAEN7TOA44pZ/llpuI20rU+xXICJ5H7
+         iRnIa6vNoOk88t2s4QrIua+pndEJwCFEk40fa+C9jcg1PPzDYwO1OvKAkEcfOMT58/
+         8fGrHKhJc+pnJgAy8JiVQAJdWl7suR/I2SAQsRGo=
+Received: by mail-oi1-f172.google.com with SMTP id k4so10004727oik.2;
+        Sat, 25 Jul 2020 00:06:16 -0700 (PDT)
+X-Gm-Message-State: AOAM531RNgGdkGqdKRsLdqAQ8R6epkHCdgvLztMhWyZKeX1MEuPwOT/1
+        jKLPHNwzRiuRDl6+yLtBhV5ZEE31V3pVIgVAyJM=
+X-Google-Smtp-Source: ABdhPJzidd2j+iDxB/LYtohSgN4ly7uvOdd4MMroDSUd9hpc7Iq4dbDDtkMqbNUHllGwnfIzHzQ5G/xdxanlFrdAxEY=
+X-Received: by 2002:aca:5594:: with SMTP id j142mr280999oib.33.1595660776343;
+ Sat, 25 Jul 2020 00:06:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type:   text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+References: <20200702101947.682-1-ardb@kernel.org> <20200702101947.682-5-ardb@kernel.org>
+ <20200702175022.GA2753@sol.localdomain> <CAMj1kXFen1nickdZab0s8iY7SgauoH56VginEoPdxaAAL2qENw@mail.gmail.com>
+ <CAMj1kXG7i1isB9cV57ccaOZhrG3s7x+nKGozzTewuE9uWvX_wg@mail.gmail.com> <CAMj1kXGiu5Wr8NAACBUtiJMY8rQAGCTOcQdK1QM6jgH-0Lm=YA@mail.gmail.com>
+In-Reply-To: <CAMj1kXGiu5Wr8NAACBUtiJMY8rQAGCTOcQdK1QM6jgH-0Lm=YA@mail.gmail.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Sat, 25 Jul 2020 10:06:04 +0300
+X-Gmail-Original-Message-ID: <CAMj1kXHA2R1UDcYROwiLgUQCrOpNWxt-BAP0aBD=3RP4HbcOnA@mail.gmail.com>
+Message-ID: <CAMj1kXHA2R1UDcYROwiLgUQCrOpNWxt-BAP0aBD=3RP4HbcOnA@mail.gmail.com>
+Subject: Re: [RFC PATCH 4/7] crypto: remove ARC4 support from the skcipher API
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-wireless@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Denis Kenzior <denkenz@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        "J. Bruce Fields" <bfields@fieldses.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
+        <netdev@vger.kernel.org>, devel@driverdev.osuosl.org,
+        linux-nfs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PTR_ERR should access the value just tested by IS_ERR, otherwise
-the wrong error code will be returned.
+On Sat, 18 Jul 2020 at 11:18, Ard Biesheuvel <ardb@kernel.org> wrote:
+>
+> On Fri, 3 Jul 2020 at 02:04, Ard Biesheuvel <ardb@kernel.org> wrote:
+> >
+> > On Thu, 2 Jul 2020 at 20:21, Ard Biesheuvel <ardb@kernel.org> wrote:
+> > >
+> > > On Thu, 2 Jul 2020 at 19:50, Eric Biggers <ebiggers@kernel.org> wrote:
+> > > >
+> > > > [+linux-wireless, Marcel Holtmann, and Denis Kenzior]
+> > > >
+> > > > On Thu, Jul 02, 2020 at 12:19:44PM +0200, Ard Biesheuvel wrote:
+> > > > > Remove the generic ecb(arc4) skcipher, which is slightly cumbersome from
+> > > > > a maintenance perspective, since it does not quite behave like other
+> > > > > skciphers do in terms of key vs IV lifetime. Since we are leaving the
+> > > > > library interface in place, which is used by the various WEP and TKIP
+> > > > > implementations we have in the tree, we can safely drop this code now
+> > > > > it no longer has any users.
+> > > > >
+> > > > > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> > > >
+> > > > Last year there was a discussion where it was mentioned that iwd uses
+> > > > "ecb(arc4)" via AF_ALG.  So can we really remove it yet?
+> > > > See https://lkml.kernel.org/r/97BB95F6-4A4C-4984-9EAB-6069E19B4A4F@holtmann.org
+> > > > Note that the code isn't in "iwd" itself but rather in "libell" which iwd
+> > > > depends on: https://git.kernel.org/pub/scm/libs/ell/ell.git/
+> > > >
+> > > > Apparently it also uses md4 and ecb(des) too.
+> > > >
+> > >
+> > > Ah yes, I remember now :-(
+> > >
+> > > > Marcel and Denis, what's your deprecation plan for these obsolete and insecure
+> > > > algorithms?
+> > > >
+> > >
+> > > Given Denis's statement:
+> > >
+> > >   It sounds to me like it was broken and should be fixed.  So our vote /
+> > >   preference is to have ARC4 fixed to follow the proper semantics.  We
+> > >   can deal with the kernel behavioral change on our end easily enough;
+> > >   the required workarounds are the worse evil.
+> > >
+> > > I would think that an ABI break is not the end of the world for them,
+> > > and given how trivial it is to implement RC4 in C, the workaround
+> > > should be to simply implement RC4 in user space, and not even bother
+> > > trying to use AF_ALG to get at ecb(arc4)
+> > >
+> > > (same applies to md4 and ecb(des) btw)
+> > >
+> > > There will always be a long tail of use cases, and at some point, we
+> > > just have to draw the line and remove obsolete and insecure cruft,
+> > > especially when it impedes progress on other fronts.
+> > >
+> >
+> > I have ported iwd to Nettle's LGPL 2.1 implementation of ARC4, and the
+> > diffstat is
+> >
+> >  src/crypto.c      | 80 ++++++++++++--------
+> >  src/main.c        |  8 --
+> >  unit/test-eapol.c |  3 +-
+> >  3 files changed, 51 insertions(+), 40 deletions(-)
+> >
+> > https://git.kernel.org/pub/scm/linux/kernel/git/ardb/iwd.git/log/?h=arc4-cleanup
+>
+> Marcel, Denis,
+>
+> Do you have any objections to the ecb(arc4) skcipher being dropped
+> from the kernel, given the fallback i proposed above (which is a much
+> better way of doing rc4 in user space anyway)?
+>
+> For libell, I would suggest dropping rc4 entirely, once iwd stops
+> relying on it, as using rc4 for tls is obsolete as well.
 
-Fixes: 7694b6ca649f ("crypto: sa2ul - Add crypto driver")
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
----
- drivers/crypto/sa2ul.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-index ebcdffcdb686..5bc099052bd2 100644
---- a/drivers/crypto/sa2ul.c
-+++ b/drivers/crypto/sa2ul.c
-@@ -2259,7 +2259,7 @@ static int sa_dma_init(struct sa_crypto_data *dd)
- 
- 	dd->dma_tx = dma_request_chan(dd->dev, "tx");
- 	if (IS_ERR(dd->dma_tx)) {
--		if (PTR_ERR(dd->dma_rx1) != -EPROBE_DEFER)
-+		if (PTR_ERR(dd->dma_tx) != -EPROBE_DEFER)
- 			dev_err(dd->dev, "Unable to request tx DMA channel\n");
- 		ret = PTR_ERR(dd->dma_tx);
- 		goto err_dma_tx;
-
-
-
+Ping?
