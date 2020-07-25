@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4A8FC433E1
-	for <linux-crypto@archiver.kernel.org>; Sat, 25 Jul 2020 03:47:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B39EC43446
+	for <linux-crypto@archiver.kernel.org>; Sat, 25 Jul 2020 03:47:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE22820774
-	for <linux-crypto@archiver.kernel.org>; Sat, 25 Jul 2020 03:47:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E19F320768
+	for <linux-crypto@archiver.kernel.org>; Sat, 25 Jul 2020 03:47:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726901AbgGYDqx (ORCPT
+        id S1727775AbgGYDr0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Jul 2020 23:46:53 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:8277 "EHLO huawei.com"
+        Fri, 24 Jul 2020 23:47:26 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:8812 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726747AbgGYDqx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726736AbgGYDqx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 24 Jul 2020 23:46:53 -0400
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id F2DEFAD5A263A8BF6BA3;
+        by Forcepoint Email with ESMTP id C0E6D647128CF9C716BE;
         Sat, 25 Jul 2020 11:46:49 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 25 Jul 2020 11:46:42 +0800
+ 14.3.487.0; Sat, 25 Jul 2020 11:46:40 +0800
 From:   Yang Shen <shenyang39@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH 10/10] crypto: hisilicon/zip - fix some coding styles
-Date:   Sat, 25 Jul 2020 11:44:43 +0800
-Message-ID: <1595648683-50590-11-git-send-email-shenyang39@huawei.com>
+Subject: [PATCH 02/10] crypto: hisilicon/zip - unify naming style for functions and macros
+Date:   Sat, 25 Jul 2020 11:44:35 +0800
+Message-ID: <1595648683-50590-3-git-send-email-shenyang39@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1595648683-50590-1-git-send-email-shenyang39@huawei.com>
 References: <1595648683-50590-1-git-send-email-shenyang39@huawei.com>
@@ -45,127 +45,123 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-1.Unified alignment styles
-2.Remove unnecessary goto branch
-3.Remove address printf
+1.Add prefix 'HZIP' for some macros
+2.Add prefix 'hisi_zip' for some functions
 
 Signed-off-by: Yang Shen <shenyang39@huawei.com>
 Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 ---
- drivers/crypto/hisilicon/zip/zip_crypto.c | 13 ++++++-------
- drivers/crypto/hisilicon/zip/zip_main.c   | 16 ++++------------
- 2 files changed, 10 insertions(+), 19 deletions(-)
+ drivers/crypto/hisilicon/zip/zip_main.c | 35 +++++++++++++++++----------------
+ 1 file changed, 18 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-index 7757e33..10b7adb 100644
---- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-+++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-@@ -38,8 +38,10 @@
- #define HZIP_SGL_SGE_NR				10
-
- static const u8 zlib_head[HZIP_ZLIB_HEAD_SIZE] = {0x78, 0x9c};
--static const u8 gzip_head[HZIP_GZIP_HEAD_SIZE] = {0x1f, 0x8b, 0x08, 0x0, 0x0,
--						  0x0, 0x0, 0x0, 0x0, 0x03};
-+static const u8 gzip_head[HZIP_GZIP_HEAD_SIZE] = {
-+	0x1f, 0x8b, 0x08, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x03
-+};
-+
- enum hisi_zip_alg_type {
- 	HZIP_ALG_TYPE_COMP = 0,
- 	HZIP_ALG_TYPE_DECOMP = 1,
-@@ -359,7 +361,6 @@ static void hisi_zip_acomp_cb(struct hisi_qp *qp, void *data)
-
- 	atomic64_inc(&dfx->recv_cnt);
- 	status = sqe->dw3 & HZIP_BD_STATUS_M;
--
- 	if (status != 0 && status != HZIP_NC_ERR) {
- 		dev_err(dev, "%scompress fail in qp%u: %u, output: %u\n",
- 			(qp->alg_type == 0) ? "" : "de", qp->qp_id, status,
-@@ -520,8 +521,7 @@ static int hisi_zip_do_work(struct hisi_zip_req *req,
- 	struct hisi_acc_sgl_pool *pool = qp_ctx->sgl_pool;
- 	struct hisi_zip_dfx *dfx = &qp_ctx->zip_dev->dfx;
- 	struct hisi_zip_sqe zip_sqe;
--	dma_addr_t input;
--	dma_addr_t output;
-+	dma_addr_t input, output;
- 	int ret;
-
- 	if (!a_req->src || !a_req->slen || !a_req->dst || !a_req->dlen)
-@@ -540,9 +540,8 @@ static int hisi_zip_do_work(struct hisi_zip_req *req,
- 						    (req->req_id << 1) + 1,
- 						    &output);
- 	if (IS_ERR(req->hw_dst)) {
--		dev_err(dev, "The dst map to hw SGL failed (%ld)!\n",
--			PTR_ERR(req->hw_dst));
- 		ret = PTR_ERR(req->hw_dst);
-+		dev_err(dev, "The dst map to hw SGL failed (%d)!\n", ret);
- 		goto err_unmap_input;
- 	}
- 	req->dma_dst = output;
 diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 49fad18..8bbae28 100644
+index 445db04..058f744 100644
 --- a/drivers/crypto/hisilicon/zip/zip_main.c
 +++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -258,6 +258,7 @@ static int hisi_zip_set_user_domain_and_cache(struct hisi_qm *qm)
- 	/* qm cache */
- 	writel(AXI_M_CFG, base + QM_AXI_M_CFG);
- 	writel(AXI_M_CFG_ENABLE, base + QM_AXI_M_CFG_ENABLE);
-+
- 	/* disable FLR triggered by BME(bus master enable) */
- 	writel(PEH_AXUSER_CFG, base + QM_PEH_AXUSER_CFG);
+@@ -29,18 +29,18 @@
+ #define DECOMP3_ENABLE			BIT(5)
+ #define DECOMP4_ENABLE			BIT(6)
+ #define DECOMP5_ENABLE			BIT(7)
+-#define ALL_COMP_DECOMP_EN		(COMP0_ENABLE | COMP1_ENABLE |	\
++#define HZIP_ALL_COMP_DECOMP_EN		(COMP0_ENABLE | COMP1_ENABLE | \
+ 					 DECOMP0_ENABLE | DECOMP1_ENABLE | \
+ 					 DECOMP2_ENABLE | DECOMP3_ENABLE | \
+ 					 DECOMP4_ENABLE | DECOMP5_ENABLE)
+-#define DECOMP_CHECK_ENABLE		BIT(16)
++#define HZIP_DECOMP_CHECK_ENABLE	BIT(16)
+ #define HZIP_FSM_MAX_CNT		0x301008
+
+ #define HZIP_PORT_ARCA_CHE_0		0x301040
+ #define HZIP_PORT_ARCA_CHE_1		0x301044
+ #define HZIP_PORT_AWCA_CHE_0		0x301060
+ #define HZIP_PORT_AWCA_CHE_1		0x301064
+-#define CACHE_ALL_EN			0xffffffff
++#define HZIP_CACHE_ALL_EN		0xffffffff
+
+ #define HZIP_BD_RUSER_32_63		0x301110
+ #define HZIP_SGL_RUSER_32_63		0x30111c
+@@ -82,7 +82,7 @@
+ #define HZIP_PF_DEF_Q_BASE		0
+
+ #define HZIP_SOFT_CTRL_CNT_CLR_CE	0x301000
+-#define SOFT_CTRL_CNT_CLR_CE_BIT	BIT(0)
++#define HZIP_SOFT_CTRL_CNT_CLR_CE_BIT	BIT(0)
+ #define HZIP_SOFT_CTRL_ZIP_CONTROL	0x30100C
+ #define HZIP_AXI_SHUTDOWN_ENABLE	BIT(14)
+ #define HZIP_WR_PORT			BIT(11)
+@@ -264,10 +264,10 @@ static int hisi_zip_set_user_domain_and_cache(struct hisi_qm *qm)
  	writel(PEH_AXUSER_CFG_ENABLE, base + QM_PEH_AXUSER_CFG_ENABLE);
-@@ -311,7 +312,7 @@ static void hisi_zip_hw_error_enable(struct hisi_qm *qm)
- 	writel(0x1, qm->io_base + HZIP_CORE_INT_RAS_CE_ENB);
- 	writel(0x0, qm->io_base + HZIP_CORE_INT_RAS_FE_ENB);
- 	writel(HZIP_CORE_INT_RAS_NFE_ENABLE,
--		qm->io_base + HZIP_CORE_INT_RAS_NFE_ENB);
-+	       qm->io_base + HZIP_CORE_INT_RAS_NFE_ENB);
 
- 	/* enable ZIP hw error interrupts */
- 	writel(0, qm->io_base + HZIP_CORE_INT_MASK_REG);
-@@ -487,7 +488,6 @@ static const struct file_operations ctrl_debug_fops = {
- 	.write = hisi_zip_ctrl_debug_write,
- };
+ 	/* cache */
+-	writel(CACHE_ALL_EN, base + HZIP_PORT_ARCA_CHE_0);
+-	writel(CACHE_ALL_EN, base + HZIP_PORT_ARCA_CHE_1);
+-	writel(CACHE_ALL_EN, base + HZIP_PORT_AWCA_CHE_0);
+-	writel(CACHE_ALL_EN, base + HZIP_PORT_AWCA_CHE_1);
++	writel(HZIP_CACHE_ALL_EN, base + HZIP_PORT_ARCA_CHE_0);
++	writel(HZIP_CACHE_ALL_EN, base + HZIP_PORT_ARCA_CHE_1);
++	writel(HZIP_CACHE_ALL_EN, base + HZIP_PORT_AWCA_CHE_0);
++	writel(HZIP_CACHE_ALL_EN, base + HZIP_PORT_AWCA_CHE_1);
 
--
- static int zip_debugfs_atomic64_set(void *data, u64 val)
- {
- 	if (val)
-@@ -634,7 +634,7 @@ static void hisi_zip_log_hw_error(struct hisi_qm *qm, u32 err_sts)
- 	while (err->msg) {
- 		if (err->int_msk & err_sts) {
- 			dev_err(dev, "%s [error status=0x%x] found\n",
--				 err->msg, err->int_msk);
-+				err->msg, err->int_msk);
-
- 			if (err->int_msk & HZIP_CORE_INT_STATUS_M_ECC) {
- 				err_val = readl(qm->io_base +
-@@ -642,9 +642,6 @@ static void hisi_zip_log_hw_error(struct hisi_qm *qm, u32 err_sts)
- 				dev_err(dev, "hisi-zip multi ecc sram num=0x%x\n",
- 					((err_val >>
- 					HZIP_SRAM_ECC_ERR_NUM_SHIFT) & 0xFF));
--				dev_err(dev, "hisi-zip multi ecc sram addr=0x%x\n",
--					(err_val >>
--					HZIP_SRAM_ECC_ERR_ADDR_SHIFT));
- 			}
- 		}
- 		err++;
-@@ -904,15 +901,10 @@ static int __init hisi_zip_init(void)
-
- 	ret = pci_register_driver(&hisi_zip_pci_driver);
- 	if (ret < 0) {
-+		hisi_zip_unregister_debugfs();
- 		pr_err("Failed to register pci driver.\n");
--		goto err_pci;
+ 	/* user domain configurations */
+ 	writel(AXUSER_BASE, base + HZIP_BD_RUSER_32_63);
+@@ -283,7 +283,7 @@ static int hisi_zip_set_user_domain_and_cache(struct hisi_qm *qm)
  	}
 
--	return 0;
--
--err_pci:
--	hisi_zip_unregister_debugfs();
--
- 	return ret;
+ 	/* let's open all compression/decompression cores */
+-	writel(DECOMP_CHECK_ENABLE | ALL_COMP_DECOMP_EN,
++	writel(HZIP_DECOMP_CHECK_ENABLE | HZIP_ALL_COMP_DECOMP_EN,
+ 	       base + HZIP_CLOCK_GATE_CTRL);
+
+ 	/* enable sqc writeback */
+@@ -390,7 +390,7 @@ static u32 clear_enable_read(struct ctrl_debug_file *file)
+ 	struct hisi_qm *qm = file_to_qm(file);
+
+ 	return readl(qm->io_base + HZIP_SOFT_CTRL_CNT_CLR_CE) &
+-	       SOFT_CTRL_CNT_CLR_CE_BIT;
++		     HZIP_SOFT_CTRL_CNT_CLR_CE_BIT;
  }
+
+ static int clear_enable_write(struct ctrl_debug_file *file, u32 val)
+@@ -402,14 +402,14 @@ static int clear_enable_write(struct ctrl_debug_file *file, u32 val)
+ 		return -EINVAL;
+
+ 	tmp = (readl(qm->io_base + HZIP_SOFT_CTRL_CNT_CLR_CE) &
+-	       ~SOFT_CTRL_CNT_CLR_CE_BIT) | val;
++	       ~HZIP_SOFT_CTRL_CNT_CLR_CE_BIT) | val;
+ 	writel(tmp, qm->io_base + HZIP_SOFT_CTRL_CNT_CLR_CE);
+
+ 	return  0;
+ }
+
+-static ssize_t ctrl_debug_read(struct file *filp, char __user *buf,
+-			       size_t count, loff_t *pos)
++static ssize_t hisi_zip_ctrl_debug_read(struct file *filp, char __user *buf,
++					size_t count, loff_t *pos)
+ {
+ 	struct ctrl_debug_file *file = filp->private_data;
+ 	char tbuf[HZIP_BUF_SIZE];
+@@ -433,8 +433,9 @@ static ssize_t ctrl_debug_read(struct file *filp, char __user *buf,
+ 	return simple_read_from_buffer(buf, count, pos, tbuf, ret);
+ }
+
+-static ssize_t ctrl_debug_write(struct file *filp, const char __user *buf,
+-				size_t count, loff_t *pos)
++static ssize_t hisi_zip_ctrl_debug_write(struct file *filp,
++					 const char __user *buf,
++					 size_t count, loff_t *pos)
+ {
+ 	struct ctrl_debug_file *file = filp->private_data;
+ 	char tbuf[HZIP_BUF_SIZE];
+@@ -483,8 +484,8 @@ static ssize_t ctrl_debug_write(struct file *filp, const char __user *buf,
+ static const struct file_operations ctrl_debug_fops = {
+ 	.owner = THIS_MODULE,
+ 	.open = simple_open,
+-	.read = ctrl_debug_read,
+-	.write = ctrl_debug_write,
++	.read = hisi_zip_ctrl_debug_read,
++	.write = hisi_zip_ctrl_debug_write,
+ };
+
 
 --
 2.7.4
