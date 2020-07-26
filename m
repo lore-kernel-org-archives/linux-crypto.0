@@ -2,150 +2,97 @@ Return-Path: <SRS0=UghQ=BF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1246CC433E1
-	for <linux-crypto@archiver.kernel.org>; Sun, 26 Jul 2020 03:55:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 762D0C433E3
+	for <linux-crypto@archiver.kernel.org>; Sun, 26 Jul 2020 07:03:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D934C20674
-	for <linux-crypto@archiver.kernel.org>; Sun, 26 Jul 2020 03:55:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VZkbwqP5"
+	by mail.kernel.org (Postfix) with ESMTP id 527DF2074F
+	for <linux-crypto@archiver.kernel.org>; Sun, 26 Jul 2020 07:03:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726636AbgGZDzQ (ORCPT
+        id S1726717AbgGZHDT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 25 Jul 2020 23:55:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55660 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726467AbgGZDzP (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 25 Jul 2020 23:55:15 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2D41C0619D2;
-        Sat, 25 Jul 2020 20:55:15 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id r12so10372520ilh.4;
-        Sat, 25 Jul 2020 20:55:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=f4ct+tMXIuuwOJq/PtkUJ0Tx4NfXOW0LK1hJfV6ApAs=;
-        b=VZkbwqP5gxbMgSyvwFy6lcN6Ptj262fahi0hY5oBAs/fyMEAFIyLKi6g2kkdquHwyQ
-         8QT4S8ZmJBb2dCFKFdQq78vawYrdKSxGdeZSjBoPqIISXJBSjrCgOs+PE3TWDmcGl1LP
-         G40OdmJJCQdZkvwZ9WZ5EtnYIOo+ut6yLtiYn9n2WgT4aRsQu0KBx4+bkAjQT5+ttJtV
-         Nt2Ue5woxbDlEWbxkQcrcAqncRgcGd9EF8q+66p2eegvj4/lR2qrmx5XFrwq2gjAhXzz
-         pscSfUtpM5hyXIeRzVmwJM9gIGjzmKN3lIZwdHY9qtX2EOE3Q3wlpnBNVcW0sxSLAi5Q
-         bK3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=f4ct+tMXIuuwOJq/PtkUJ0Tx4NfXOW0LK1hJfV6ApAs=;
-        b=aPrHae67J2Hmgco37GDQoHb6VugZ2IGdKRO3BaiGPyY+lgNamwvptaxJF7gYtjLaM/
-         5OkDne0YQWZNKqPC6b4vDnH/4Bg5rcV5RjXjKjoa0IYZJ9tNxNWU+dbc3XoPHXtp2umV
-         Fz4XSyP7ktzXgXJZH/wrVk08lKJEFkJ3TuA/0guJhX7P8aWkzVLSoUOjp06F3d29mIx6
-         caeD9rUZnVzNKeuc5HT1cjeA/hdpdFERGocKQbDfGm4uDRQyg2/X4Z8MqsHIc9XxDJAG
-         jkXekFFv6qt2+RAg+py9F/Lb3GbMYKWGKEmT5jKOUPOz7Nf9JnB3eMa2iJLvagiRDTzS
-         K5hQ==
-X-Gm-Message-State: AOAM5320D4YnXpGt50qlTjSLU7H3FYXgbgPelRhOduo4i58VVtqK32Gt
-        iK0+N/IfpWQqsy44TUWY/PfMxaibho/GCmZiGUo=
-X-Google-Smtp-Source: ABdhPJyLDUR8T4sn0OFASwP3saGG0kFACx0iavj345naF7n52+Gq+PgKc486ClDeIAc0agVrz9A6+UKYhubAT7K38/w=
-X-Received: by 2002:a05:6e02:8a8:: with SMTP id a8mr18108013ilt.52.1595735714837;
- Sat, 25 Jul 2020 20:55:14 -0700 (PDT)
+        Sun, 26 Jul 2020 03:03:19 -0400
+Received: from verein.lst.de ([213.95.11.211]:39756 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725789AbgGZHDS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 26 Jul 2020 03:03:18 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 2AB2768B05; Sun, 26 Jul 2020 09:03:12 +0200 (CEST)
+Date:   Sun, 26 Jul 2020 09:03:11 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     David Miller <davem@davemloft.net>
+Cc:     hch@lst.de, kuba@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+        kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, edumazet@google.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, bpf@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
+        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
+        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
+Subject: Re: get rid of the address_space override in setsockopt v2
+Message-ID: <20200726070311.GA16687@lst.de>
+References: <20200723060908.50081-1-hch@lst.de> <20200724.154342.1433271593505001306.davem@davemloft.net>
 MIME-Version: 1.0
-References: <1595596084-29809-1-git-send-email-schalla@marvell.com>
-In-Reply-To: <1595596084-29809-1-git-send-email-schalla@marvell.com>
-From:   sundeep subbaraya <sundeep.lkml@gmail.com>
-Date:   Sun, 26 Jul 2020 09:25:03 +0530
-Message-ID: <CALHRZuonCvFSf8ANJvTdVfRVdTEH4Mzv-x0xdOfF7AGgH+vKyQ@mail.gmail.com>
-Subject: Re: [PATCH 0/4] Add Support for Marvell OcteonTX2 Cryptographic
-To:     Srujana Challa <schalla@marvell.com>
-Cc:     herbert@gondor.apana.org.au, David Miller <davem@davemloft.net>,
-        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-        schandran@marvell.com, pathreya@marvell.com, sgoutham@marvell.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200724.154342.1433271593505001306.davem@davemloft.net>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Srujana,
+On Fri, Jul 24, 2020 at 03:43:42PM -0700, David Miller wrote:
+> > Changes since v1:
+> >  - check that users don't pass in kernel addresses
+> >  - more bpfilter cleanups
+> >  - cosmetic mptcp tweak
+> 
+> Series applied to net-next, I'm build testing and will push this out when
+> that is done.
 
-On Fri, Jul 24, 2020 at 6:39 PM Srujana Challa <schalla@marvell.com> wrote:
->
-> The following series adds support for Marvell Cryptographic Acceleration
-> Unit(CPT) on OcteonTX2 CN96XX SoC.
-> This series is tested with CRYPTO_EXTRA_TESTS enabled and
-> CRYPTO_DISABLE_TESTS disabled.
->
-> Srujana Challa (4):
->   octeontx2-af: add support to manage the CPT unit
->   drivers: crypto: add support for OCTEONTX2 CPT engine
->   drivers: crypto: add the Virtual Function driver for OcteonTX2 CPT
->   crypto: marvell: enable OcteonTX2 cpt options for build
->
->  drivers/crypto/marvell/Kconfig                     |   17 +
->  drivers/crypto/marvell/Makefile                    |    1 +
->  drivers/crypto/marvell/octeontx2/Makefile          |   14 +
->  drivers/crypto/marvell/octeontx2/otx2_cpt_common.h |   53 +
->  .../crypto/marvell/octeontx2/otx2_cpt_hw_types.h   |  572 ++++++
->  .../marvell/octeontx2/otx2_cpt_mbox_common.c       |  286 +++
->  .../marvell/octeontx2/otx2_cpt_mbox_common.h       |  100 +
->  drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h |  202 ++
->  drivers/crypto/marvell/octeontx2/otx2_cptlf.h      |  370 ++++
->  drivers/crypto/marvell/octeontx2/otx2_cptlf_main.c |  964 +++++++++
->  drivers/crypto/marvell/octeontx2/otx2_cptpf.h      |   79 +
->  drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c |  599 ++++++
->  drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c |  694 +++++++
->  .../crypto/marvell/octeontx2/otx2_cptpf_ucode.c    | 2173 ++++++++++++++++++++
->  .../crypto/marvell/octeontx2/otx2_cptpf_ucode.h    |  180 ++
->  drivers/crypto/marvell/octeontx2/otx2_cptvf.h      |   29 +
->  drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c | 1708 +++++++++++++++
->  drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.h |  172 ++
->  drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c |  229 +++
->  drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c |  189 ++
->  .../crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c   |  543 +++++
->  drivers/net/ethernet/marvell/octeontx2/af/Makefile |    2 +-
->  drivers/net/ethernet/marvell/octeontx2/af/mbox.h   |   85 +
->  drivers/net/ethernet/marvell/octeontx2/af/rvu.c    |    2 +-
->  drivers/net/ethernet/marvell/octeontx2/af/rvu.h    |    7 +
->  .../net/ethernet/marvell/octeontx2/af/rvu_cpt.c    |  343 +++
->  .../ethernet/marvell/octeontx2/af/rvu_debugfs.c    |  342 +++
->  .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    |   76 +
->  .../net/ethernet/marvell/octeontx2/af/rvu_reg.h    |   65 +-
->  29 files changed, 10088 insertions(+), 8 deletions(-)
->  create mode 100644 drivers/crypto/marvell/octeontx2/Makefile
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.h
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptlf.h
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptlf_main.c
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf.h
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.h
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf.h
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.h
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
->  create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+The buildbot found one warning with the isdn debug code after a few
+days, here is what I think is the best fix:
 
-Please include everyone in
-./scripts/get_maintainer.pl drivers/net/ethernet/marvell/octeontx2/
-or atleast
-./scripts/get_maintainer.pl drivers/net/ethernet/marvell/octeontx2/af/
+---
+From 6601732f7a54db5f04efba08f7e9224e5b757112 Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Sun, 26 Jul 2020 09:00:09 +0200
+Subject: mISDN: remove a debug printk in data_sock_setsockopt
 
-Thanks,
-Sundeep
->
-> --
-> 1.9.1
->
+The %p won't work with the new sockptr_t type.  But in the times of
+ftrace, bpftrace and co these kinds of debug printks are pretty anyway,
+so just remove the whole debug printk.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/isdn/mISDN/socket.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/drivers/isdn/mISDN/socket.c b/drivers/isdn/mISDN/socket.c
+index 1b2b91479107bc..2c58a6fe6d129e 100644
+--- a/drivers/isdn/mISDN/socket.c
++++ b/drivers/isdn/mISDN/socket.c
+@@ -406,10 +406,6 @@ static int data_sock_setsockopt(struct socket *sock, int level, int optname,
+ 	struct sock *sk = sock->sk;
+ 	int err = 0, opt = 0;
+ 
+-	if (*debug & DEBUG_SOCKET)
+-		printk(KERN_DEBUG "%s(%p, %d, %x, %p, %d)\n", __func__, sock,
+-		       level, optname, optval, len);
+-
+ 	lock_sock(sk);
+ 
+ 	switch (optname) {
+-- 
+2.27.0
+
