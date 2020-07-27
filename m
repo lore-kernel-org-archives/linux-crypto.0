@@ -2,248 +2,161 @@ Return-Path: <SRS0=C5/f=BG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD3CC433E1
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 09:30:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8077FC433EA
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 09:52:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D005D2065C
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 09:30:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 621482074F
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 09:52:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728155AbgG0Jai (ORCPT
+        id S1727843AbgG0Jvw convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jul 2020 05:30:38 -0400
-Received: from smtp08.smtpout.orange.fr ([80.12.242.130]:56925 "EHLO
-        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728117AbgG0Jai (ORCPT
+        Mon, 27 Jul 2020 05:51:52 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:60687 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727823AbgG0Jvv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jul 2020 05:30:38 -0400
-Received: from localhost.localdomain ([93.23.16.147])
-        by mwinf5d31 with ME
-        id 89WV2300A3ANib9039WVhH; Mon, 27 Jul 2020 11:30:35 +0200
-X-ME-Helo: localhost.localdomain
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Mon, 27 Jul 2020 11:30:35 +0200
-X-ME-IP: 93.23.16.147
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH] crypto: hifn_795x - switch from 'pci_' to 'dma_' API
-Date:   Mon, 27 Jul 2020 11:30:27 +0200
-Message-Id: <20200727093027.46331-1-christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.25.1
+        Mon, 27 Jul 2020 05:51:51 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-157-rSG2T3OdNGGcdmdBioAAVQ-1; Mon, 27 Jul 2020 10:51:47 +0100
+X-MC-Unique: rSG2T3OdNGGcdmdBioAAVQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Mon, 27 Jul 2020 10:51:45 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Mon, 27 Jul 2020 10:51:45 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'David Miller' <davem@davemloft.net>, "hch@lst.de" <hch@lst.de>
+CC:     "kuba@kernel.org" <kuba@kernel.org>,
+        "ast@kernel.org" <ast@kernel.org>,
+        "daniel@iogearbox.net" <daniel@iogearbox.net>,
+        "kuznet@ms2.inr.ac.ru" <kuznet@ms2.inr.ac.ru>,
+        "yoshfuji@linux-ipv6.org" <yoshfuji@linux-ipv6.org>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+        "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+        "coreteam@netfilter.org" <coreteam@netfilter.org>,
+        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
+        "linux-hams@vger.kernel.org" <linux-hams@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "bridge@lists.linux-foundation.org" 
+        <bridge@lists.linux-foundation.org>,
+        "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
+        "dccp@vger.kernel.org" <dccp@vger.kernel.org>,
+        "linux-decnet-user@lists.sourceforge.net" 
+        <linux-decnet-user@lists.sourceforge.net>,
+        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "mptcp@lists.01.org" <mptcp@lists.01.org>,
+        "lvs-devel@vger.kernel.org" <lvs-devel@vger.kernel.org>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
+        "tipc-discussion@lists.sourceforge.net" 
+        <tipc-discussion@lists.sourceforge.net>,
+        "linux-x25@vger.kernel.org" <linux-x25@vger.kernel.org>
+Subject: RE: get rid of the address_space override in setsockopt v2
+Thread-Topic: get rid of the address_space override in setsockopt v2
+Thread-Index: AQHWYgvqDt5Xt3HFu0u82UKLVqcKxKkbLTEQ
+Date:   Mon, 27 Jul 2020 09:51:45 +0000
+Message-ID: <8ae792c27f144d4bb5cbea0c1cce4eed@AcuMS.aculab.com>
+References: <20200723060908.50081-1-hch@lst.de>
+ <20200724.154342.1433271593505001306.davem@davemloft.net>
+In-Reply-To: <20200724.154342.1433271593505001306.davem@davemloft.net>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The wrappers in include/linux/pci-dma-compat.h should go away.
+From: David Miller
+> Sent: 24 July 2020 23:44
+> 
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Thu, 23 Jul 2020 08:08:42 +0200
+> 
+> > setsockopt is the last place in architecture-independ code that still
+> > uses set_fs to force the uaccess routines to operate on kernel pointers.
+> >
+> > This series adds a new sockptr_t type that can contained either a kernel
+> > or user pointer, and which has accessors that do the right thing, and
+> > then uses it for setsockopt, starting by refactoring some low-level
+> > helpers and moving them over to it before finally doing the main
+> > setsockopt method.
+> >
+> > Note that apparently the eBPF selftests do not even cover this path, so
+> > the series has been tested with a testing patch that always copies the
+> > data first and passes a kernel pointer.  This is something that works for
+> > most common sockopts (and is something that the ePBF support relies on),
+> > but unfortunately in various corner cases we either don't use the passed
+> > in length, or in one case actually copy data back from setsockopt, or in
+> > case of bpfilter straight out do not work with kernel pointers at all.
+> >
+> > Against net-next/master.
+> >
+> > Changes since v1:
+> >  - check that users don't pass in kernel addresses
+> >  - more bpfilter cleanups
+> >  - cosmetic mptcp tweak
+> 
+> Series applied to net-next, I'm build testing and will push this out when
+> that is done.
 
-The patch has been generated with the coccinelle script below and has been
-hand modified to replace GFP_ with a correct flag.
-It has been compile tested.
+Hmmm... this code does:
 
-When memory is allocated in 'hifn_probe()' GFP_KERNEL can be used
-because it is a probe function and no spin_lock is taken.
+int __sys_setsockopt(int fd, int level, int optname, char __user *user_optval,
+		int optlen)
+{
+	sockptr_t optval;
+	char *kernel_optval = NULL;
+	int err, fput_needed;
+	struct socket *sock;
 
-@@
-@@
--    PCI_DMA_BIDIRECTIONAL
-+    DMA_BIDIRECTIONAL
+	if (optlen < 0)
+		return -EINVAL;
 
-@@
-@@
--    PCI_DMA_TODEVICE
-+    DMA_TO_DEVICE
+	err = init_user_sockptr(&optval, user_optval);
+	if (err)
+		return err;
 
-@@
-@@
--    PCI_DMA_FROMDEVICE
-+    DMA_FROM_DEVICE
+And the called code does:
+	if (copy_from_sockptr(&opt, optbuf, sizeof(opt)))
+		return -EFAULT;
 
-@@
-@@
--    PCI_DMA_NONE
-+    DMA_NONE
 
-@@
-expression e1, e2, e3;
-@@
--    pci_alloc_consistent(e1, e2, e3)
-+    dma_alloc_coherent(&e1->dev, e2, e3, GFP_)
+Which means that only the base of the user's buffer is checked
+for being in userspace.
 
-@@
-expression e1, e2, e3;
-@@
--    pci_zalloc_consistent(e1, e2, e3)
-+    dma_alloc_coherent(&e1->dev, e2, e3, GFP_)
+I'm sure there is code that processes options in chunks.
+This probably means it is possible to put a chunk boundary
+at the end of userspace and continue processing the very start
+of kernel memory.
 
-@@
-expression e1, e2, e3, e4;
-@@
--    pci_free_consistent(e1, e2, e3, e4)
-+    dma_free_coherent(&e1->dev, e2, e3, e4)
+At best this faults on the kernel copy code and crashes the system.
 
-@@
-expression e1, e2, e3, e4;
-@@
--    pci_map_single(e1, e2, e3, e4)
-+    dma_map_single(&e1->dev, e2, e3, e4)
+Maybe there wasn't any code that actually incremented the user address.
+But it is hardly robust.
 
-@@
-expression e1, e2, e3, e4;
-@@
--    pci_unmap_single(e1, e2, e3, e4)
-+    dma_unmap_single(&e1->dev, e2, e3, e4)
+	David
 
-@@
-expression e1, e2, e3, e4, e5;
-@@
--    pci_map_page(e1, e2, e3, e4, e5)
-+    dma_map_page(&e1->dev, e2, e3, e4, e5)
-
-@@
-expression e1, e2, e3, e4;
-@@
--    pci_unmap_page(e1, e2, e3, e4)
-+    dma_unmap_page(&e1->dev, e2, e3, e4)
-
-@@
-expression e1, e2, e3, e4;
-@@
--    pci_map_sg(e1, e2, e3, e4)
-+    dma_map_sg(&e1->dev, e2, e3, e4)
-
-@@
-expression e1, e2, e3, e4;
-@@
--    pci_unmap_sg(e1, e2, e3, e4)
-+    dma_unmap_sg(&e1->dev, e2, e3, e4)
-
-@@
-expression e1, e2, e3, e4;
-@@
--    pci_dma_sync_single_for_cpu(e1, e2, e3, e4)
-+    dma_sync_single_for_cpu(&e1->dev, e2, e3, e4)
-
-@@
-expression e1, e2, e3, e4;
-@@
--    pci_dma_sync_single_for_device(e1, e2, e3, e4)
-+    dma_sync_single_for_device(&e1->dev, e2, e3, e4)
-
-@@
-expression e1, e2, e3, e4;
-@@
--    pci_dma_sync_sg_for_cpu(e1, e2, e3, e4)
-+    dma_sync_sg_for_cpu(&e1->dev, e2, e3, e4)
-
-@@
-expression e1, e2, e3, e4;
-@@
--    pci_dma_sync_sg_for_device(e1, e2, e3, e4)
-+    dma_sync_sg_for_device(&e1->dev, e2, e3, e4)
-
-@@
-expression e1, e2;
-@@
--    pci_dma_mapping_error(e1, e2)
-+    dma_mapping_error(&e1->dev, e2)
-
-@@
-expression e1, e2;
-@@
--    pci_set_dma_mask(e1, e2)
-+    dma_set_mask(&e1->dev, e2)
-
-@@
-expression e1, e2;
-@@
--    pci_set_consistent_dma_mask(e1, e2)
-+    dma_set_coherent_mask(&e1->dev, e2)
-
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
-If needed, see post from Christoph Hellwig on the kernel-janitors ML:
-   https://marc.info/?l=kernel-janitors&m=158745678307186&w=4
----
- drivers/crypto/hifn_795x.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index 354836468c5d..3363ca4b1a98 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -1235,7 +1235,8 @@ static int hifn_setup_src_desc(struct hifn_device *dev, struct page *page,
- 	int idx;
- 	dma_addr_t addr;
- 
--	addr = pci_map_page(dev->pdev, page, offset, size, PCI_DMA_TODEVICE);
-+	addr = dma_map_page(&dev->pdev->dev, page, offset, size,
-+			    DMA_TO_DEVICE);
- 
- 	idx = dma->srci;
- 
-@@ -1293,7 +1294,8 @@ static void hifn_setup_dst_desc(struct hifn_device *dev, struct page *page,
- 	int idx;
- 	dma_addr_t addr;
- 
--	addr = pci_map_page(dev->pdev, page, offset, size, PCI_DMA_FROMDEVICE);
-+	addr = dma_map_page(&dev->pdev->dev, page, offset, size,
-+			    DMA_FROM_DEVICE);
- 
- 	idx = dma->dsti;
- 	dma->dstr[idx].p = __cpu_to_le32(addr);
-@@ -2470,7 +2472,7 @@ static int hifn_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		return err;
- 	pci_set_master(pdev);
- 
--	err = pci_set_dma_mask(pdev, DMA_BIT_MASK(32));
-+	err = dma_set_mask(&pdev->dev, DMA_BIT_MASK(32));
- 	if (err)
- 		goto err_out_disable_pci_device;
- 
-@@ -2514,8 +2516,9 @@ static int hifn_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		}
- 	}
- 
--	dev->desc_virt = pci_zalloc_consistent(pdev, sizeof(struct hifn_dma),
--					       &dev->desc_dma);
-+	dev->desc_virt = dma_alloc_coherent(&pdev->dev,
-+					    sizeof(struct hifn_dma),
-+					    &dev->desc_dma, GFP_KERNEL);
- 	if (!dev->desc_virt) {
- 		dev_err(&pdev->dev, "Failed to allocate descriptor rings.\n");
- 		err = -ENOMEM;
-@@ -2572,8 +2575,8 @@ static int hifn_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	free_irq(dev->irq, dev);
- 	tasklet_kill(&dev->tasklet);
- err_out_free_desc:
--	pci_free_consistent(pdev, sizeof(struct hifn_dma),
--			dev->desc_virt, dev->desc_dma);
-+	dma_free_coherent(&pdev->dev, sizeof(struct hifn_dma), dev->desc_virt,
-+			  dev->desc_dma);
- 
- err_out_unmap_bars:
- 	for (i = 0; i < 3; ++i)
-@@ -2610,8 +2613,8 @@ static void hifn_remove(struct pci_dev *pdev)
- 
- 		hifn_flush(dev);
- 
--		pci_free_consistent(pdev, sizeof(struct hifn_dma),
--				dev->desc_virt, dev->desc_dma);
-+		dma_free_coherent(&pdev->dev, sizeof(struct hifn_dma),
-+				  dev->desc_virt, dev->desc_dma);
- 		for (i = 0; i < 3; ++i)
- 			if (dev->bar[i])
- 				iounmap(dev->bar[i]);
--- 
-2.25.1
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
