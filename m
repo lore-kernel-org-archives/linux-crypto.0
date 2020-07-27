@@ -2,98 +2,99 @@ Return-Path: <SRS0=C5/f=BG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1078FC433E3
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 11:36:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB7E7C433E8
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 11:36:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4FA520786
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 11:36:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aGr5q/9Q"
+	by mail.kernel.org (Postfix) with ESMTP id A564D20714
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 11:36:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726873AbgG0LgY (ORCPT
+        id S1726227AbgG0Lgp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jul 2020 07:36:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39232 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726227AbgG0LgX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jul 2020 07:36:23 -0400
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42371C061794;
-        Mon, 27 Jul 2020 04:36:21 -0700 (PDT)
-Received: by mail-lj1-x241.google.com with SMTP id x9so16834226ljc.5;
-        Mon, 27 Jul 2020 04:36:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3duE7OBR2T4N2tYjRvsITkGu0zyZUrsrEinPE6byIJA=;
-        b=aGr5q/9QRAMaUt3j5VfbR3OdspD6ClP8KdgJUfmnmzsunPsBqGa5S9naW8YgBF/zwA
-         xk7mCre8gB5IbfeUa3zGFNF80ldeRdn79TISRGf+kftzYbjhBna3K5cPwBEv8QmiDqns
-         Eo1HRkKLdsARNMMznT6RAODNxdr2N0NiebCEwrOd4xHSWUDUrfiny+NM0DKHM3CxxbDA
-         4McAvoF2Ps7yD3wZq0QzvcBLQXxtVOSswIGiwuMiyQd/6e92DcK0KyXC/LN0EPpdxHHl
-         QtkCkh55wJjZ/9fPeyRlUoAaPUKJMpe917jU3ni6GSooU4CSsDX+8sMZqP9+0CW+Ttqq
-         iq+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3duE7OBR2T4N2tYjRvsITkGu0zyZUrsrEinPE6byIJA=;
-        b=SfXXH3H3WD7VWQ19KwEYH4upPiyVdgd9Eeci7v8a+Cp5KUxmC+EXzwY+yFrD47g7Jy
-         fFJKMzqZSzEjU3hnshdLqqiUBhqbUPVH2hJGACWDOJ2EFlotjFF1OYZfh3/KP8AeRUg0
-         88LPgYGKBURXWq7yfggydKyT49qTaLVmslCUX1rHhRmpzmziu2O1Vd1PPnTNGafVqYCh
-         LleLEqCRskfPVa2w+BnPG3ug+MdjskRQj3ZJxhct0oqpNOgRD7JG33YI9Tj9bj5Lp0oQ
-         DarIe2SrGLj8mm9Y4YWIsL9iDZhDh50c08qNYjss7U0xcQfs3wOn89AKapok3UY16DOR
-         OotA==
-X-Gm-Message-State: AOAM532bNfkaDlTKhhIiwZPd3XtbVh6K9rfCRt4UchO/eQof4lQTfwSo
-        z77CwDJnx2PZA3juYGmR3EspSHSBQ0G7PM1oZ2M=
-X-Google-Smtp-Source: ABdhPJySdoA0YQZX3SzX76PZs+yXIx9uSU6Htm2i166nkcxAQA1159Pl7aChK9+bUVbcPdHRJ+ZUOND1IY6QjMMDCyA=
-X-Received: by 2002:a2e:a168:: with SMTP id u8mr9049888ljl.178.1595849779599;
- Mon, 27 Jul 2020 04:36:19 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200727105718.26225-1-ceggers@arri.de> <20200727105718.26225-2-ceggers@arri.de>
-In-Reply-To: <20200727105718.26225-2-ceggers@arri.de>
-From:   Fabio Estevam <festevam@gmail.com>
-Date:   Mon, 27 Jul 2020 08:36:08 -0300
-Message-ID: <CAOMZO5ASnj7SpjjAEpWjRK-vMpFFKU00=rxKeBtaMSKE9pkX1g@mail.gmail.com>
-Subject: Re: [PATCH 1/3] ARM: dts: imx6ull: Add rngb node
-To:     Christian Eggers <ceggers@arri.de>,
-        Horia Geanta Neag <horia.geanta@nxp.com>
-Cc:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
+        Mon, 27 Jul 2020 07:36:45 -0400
+Received: from mailout06.rmx.de ([94.199.90.92]:35396 "EHLO mailout06.rmx.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726885AbgG0Lgp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Jul 2020 07:36:45 -0400
+Received: from kdin01.retarus.com (kdin01.dmz1.retloc [172.19.17.48])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mailout06.rmx.de (Postfix) with ESMTPS id 4BFcNN3p71z9w11;
+        Mon, 27 Jul 2020 13:03:00 +0200 (CEST)
+Received: from mta.arri.de (unknown [217.111.95.66])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by kdin01.retarus.com (Postfix) with ESMTPS id 4BFcLs4g65z2xDJ;
+        Mon, 27 Jul 2020 13:01:41 +0200 (CEST)
+Received: from N95HX1G2.wgnetz.xx (192.168.54.121) by mta.arri.de
+ (192.168.100.104) with Microsoft SMTP Server (TLS) id 14.3.408.0; Mon, 27 Jul
+ 2020 12:59:47 +0200
+From:   Christian Eggers <ceggers@arri.de>
+To:     Rob Herring <robh+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+        "Sascha Hauer" <s.hauer@pengutronix.de>
+CC:     Christian Eggers <ceggers@arri.de>,
         Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
         NXP Linux Team <linux-imx@nxp.com>,
         Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
         Martin Kaiser <martin@kaiser.cx>,
         PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
         Anson Huang <Anson.Huang@nxp.com>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
         <devicetree@vger.kernel.org>,
-        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" 
         <linux-arm-kernel@lists.infradead.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+Subject: [PATCH 3/3] hwrng: imx-rngc - setup default RNG quality
+Date:   Mon, 27 Jul 2020 12:57:16 +0200
+Message-ID: <20200727105718.26225-4-ceggers@arri.de>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200727105718.26225-1-ceggers@arri.de>
+References: <20200727105718.26225-1-ceggers@arri.de>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [192.168.54.121]
+X-RMX-ID: 20200727-130145-4BFcLs4g65z2xDJ-0@kdin01
+X-RMX-SOURCE: 217.111.95.66
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Christian,
+When hw_random device's quality is non-zero, it will automatically fill
+the kernel's entropy pool at boot.  For this purpose, one conservative
+quality value is being picked up as the default value.
 
-On Mon, Jul 27, 2020 at 8:00 AM Christian Eggers <ceggers@arri.de> wrote:
->
-> The RNGB block on 6ull has no major differences, but it has no
-> switchable clock.
+Signed-off-by: Christian Eggers <ceggers@arri.de>
+---
+ drivers/char/hw_random/imx-rngc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Horia has already sent a patch series that adds imx6ull rngb support:
-https://lkml.org/lkml/2020/7/23/173
+diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
+index f9c5ddd0276b..a62ff78bd7ea 100644
+--- a/drivers/char/hw_random/imx-rngc.c
++++ b/drivers/char/hw_random/imx-rngc.c
+@@ -285,6 +285,7 @@ static int imx_rngc_probe(struct platform_device *pdev)
+ 	rngc->rng.init = imx_rngc_init;
+ 	rngc->rng.read = imx_rngc_read;
+ 	rngc->rng.cleanup = imx_rngc_cleanup;
++	rngc->rng.quality = 900;
+ 
+ 	rngc->dev = &pdev->dev;
+ 	platform_set_drvdata(pdev, rngc);
+-- 
+Christian Eggers
+Embedded software developer
+
+Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
+Sitz: Muenchen - Registergericht: Amtsgericht Muenchen - Handelsregisternummer: HRA 57918
+Persoenlich haftender Gesellschafter: Arnold & Richter Cine Technik GmbH
+Sitz: Muenchen - Registergericht: Amtsgericht Muenchen - Handelsregisternummer: HRB 54477
+Geschaeftsfuehrer: Dr. Michael Neuhaeuser; Stephan Schenk; Walter Trauninger; Markus Zeiler
+
