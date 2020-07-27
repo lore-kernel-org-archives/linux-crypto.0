@@ -2,122 +2,99 @@ Return-Path: <SRS0=C5/f=BG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 202EAC433ED
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 15:06:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FDCCC433DF
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 15:08:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F3AC92064B
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 15:06:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DEBD32064B
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 15:08:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730214AbgG0PGK (ORCPT
+        id S1729551AbgG0PI3 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jul 2020 11:06:10 -0400
-Received: from verein.lst.de ([213.95.11.211]:44011 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729630AbgG0PGJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jul 2020 11:06:09 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 8445868B05; Mon, 27 Jul 2020 17:06:01 +0200 (CEST)
-Date:   Mon, 27 Jul 2020 17:06:01 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Eric Dumazet <edumazet@google.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
-        linux-can@vger.kernel.org, dccp@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
-        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
-        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: Re: [PATCH 12/26] netfilter: switch nf_setsockopt to sockptr_t
-Message-ID: <20200727150601.GA3447@lst.de>
-References: <20200723060908.50081-1-hch@lst.de> <20200723060908.50081-13-hch@lst.de> <20200727150310.GA1632472@zx2c4.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200727150310.GA1632472@zx2c4.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+        Mon, 27 Jul 2020 11:08:29 -0400
+Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:36443
+        "EHLO mail3-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729507AbgG0PI3 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Jul 2020 11:08:29 -0400
+X-IronPort-AV: E=Sophos;i="5.75,402,1589234400"; 
+   d="scan'208";a="355409930"
+Received: from 89-156-101-160.rev.numericable.fr (HELO [192.168.0.67]) ([89.156.101.160])
+  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Jul 2020 17:08:27 +0200
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH] crypto: x86/curve25519 - Remove unused carry variables
+From:   Karthik Bhargavan <karthikeyan.bhargavan@inria.fr>
+In-Reply-To: <CAHmME9rg-_2-Zj19zSZa6sujgfJcOdm6=L1N07Dif9aWJE7eQQ@mail.gmail.com>
+Date:   Mon, 27 Jul 2020 17:08:25 +0200
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <4DE9D3CD-E934-49CE-A122-F536721ADF72@inria.fr>
+References: <20200723075048.GA10966@gondor.apana.org.au>
+ <CAHmME9rg-_2-Zj19zSZa6sujgfJcOdm6=L1N07Dif9aWJE7eQQ@mail.gmail.com>
+To:     "Jason A. Donenfeld" <jason@zx2c4.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 27, 2020 at 05:03:10PM +0200, Jason A. Donenfeld wrote:
-> Hi Christoph,
-> 
-> On Thu, Jul 23, 2020 at 08:08:54AM +0200, Christoph Hellwig wrote:
-> > diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-> > index da933f99b5d517..42befbf12846c0 100644
-> > --- a/net/ipv4/ip_sockglue.c
-> > +++ b/net/ipv4/ip_sockglue.c
-> > @@ -1422,7 +1422,8 @@ int ip_setsockopt(struct sock *sk, int level,
-> >  			optname != IP_IPSEC_POLICY &&
-> >  			optname != IP_XFRM_POLICY &&
-> >  			!ip_mroute_opt(optname))
-> > -		err = nf_setsockopt(sk, PF_INET, optname, optval, optlen);
-> > +		err = nf_setsockopt(sk, PF_INET, optname, USER_SOCKPTR(optval),
-> > +				    optlen);
-> >  #endif
-> >  	return err;
-> >  }
-> > diff --git a/net/ipv4/netfilter/ip_tables.c b/net/ipv4/netfilter/ip_tables.c
-> > index 4697d09c98dc3e..f2a9680303d8c0 100644
-> > --- a/net/ipv4/netfilter/ip_tables.c
-> > +++ b/net/ipv4/netfilter/ip_tables.c
-> > @@ -1102,7 +1102,7 @@ __do_replace(struct net *net, const char *name, unsigned int valid_hooks,
-> >  }
-> >  
-> >  static int
-> > -do_replace(struct net *net, const void __user *user, unsigned int len)
-> > +do_replace(struct net *net, sockptr_t arg, unsigned int len)
-> >  {
-> >  	int ret;
-> >  	struct ipt_replace tmp;
-> > @@ -1110,7 +1110,7 @@ do_replace(struct net *net, const void __user *user, unsigned int len)
-> >  	void *loc_cpu_entry;
-> >  	struct ipt_entry *iter;
-> >  
-> > -	if (copy_from_user(&tmp, user, sizeof(tmp)) != 0)
-> > +	if (copy_from_sockptr(&tmp, arg, sizeof(tmp)) != 0)
-> >  		return -EFAULT;
-> >  
-> >  	/* overflow check */
-> > @@ -1126,8 +1126,8 @@ do_replace(struct net *net, const void __user *user, unsigned int len)
-> >  		return -ENOMEM;
-> >  
-> >  	loc_cpu_entry = newinfo->entries;
-> > -	if (copy_from_user(loc_cpu_entry, user + sizeof(tmp),
-> > -			   tmp.size) != 0) {
-> > +	sockptr_advance(arg, sizeof(tmp));
-> > +	if (copy_from_sockptr(loc_cpu_entry, arg, tmp.size) != 0) {
-> >  		ret = -EFAULT;
-> >  		goto free_newinfo;
-> >  	}
-> 
-> Something along this path seems to have broken with this patch. An
-> invocation of `iptables -A INPUT -m length --length 1360 -j DROP` now
-> fails, with
-> 
-> nf_setsockopt->do_replace->translate_table->check_entry_size_and_hooks:
->   (unsigned char *)e + e->next_offset > limit  ==>  TRUE
-> 
-> resulting in the whole call chain returning -EINVAL. It bisects back to
-> this commit. This is on net-next.
+Removing unused variables is harmless. (GCC would do this automaticelly.)
+So this change seems fine.
 
-This is another use o sockptr_advance that Ido already found a problem
-in.  I'm looking into this at the moment..
+-Karthik
+
+> On 23 Jul 2020, at 12:05, Jason A. Donenfeld <jason@zx2c4.com> wrote:
+> 
+> Hi Herbert,
+> 
+> On Thu, Jul 23, 2020 at 9:51 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>> 
+>> The carry variables are assigned but never used, which upsets
+>> the compiler.  This patch removes them.
+>> 
+>> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>> 
+>> diff --git a/arch/x86/crypto/curve25519-x86_64.c b/arch/x86/crypto/curve25519-x86_64.c
+>> index 8a17621f7d3a..8acbb6584a37 100644
+>> --- a/arch/x86/crypto/curve25519-x86_64.c
+>> +++ b/arch/x86/crypto/curve25519-x86_64.c
+>> @@ -948,10 +948,8 @@ static void store_felem(u64 *b, u64 *f)
+>> {
+>>        u64 f30 = f[3U];
+>>        u64 top_bit0 = f30 >> (u32)63U;
+>> -       u64 carry0;
+>>        u64 f31;
+>>        u64 top_bit;
+>> -       u64 carry;
+>>        u64 f0;
+>>        u64 f1;
+>>        u64 f2;
+>> @@ -970,11 +968,11 @@ static void store_felem(u64 *b, u64 *f)
+>>        u64 o2;
+>>        u64 o3;
+>>        f[3U] = f30 & (u64)0x7fffffffffffffffU;
+>> -       carry0 = add_scalar(f, f, (u64)19U * top_bit0);
+>> +       add_scalar(f, f, (u64)19U * top_bit0);
+>>        f31 = f[3U];
+>>        top_bit = f31 >> (u32)63U;
+>>        f[3U] = f31 & (u64)0x7fffffffffffffffU;
+>> -       carry = add_scalar(f, f, (u64)19U * top_bit);
+>> +       add_scalar(f, f, (u64)19U * top_bit);
+>>        f0 = f[0U];
+>>        f1 = f[1U];
+>>        f2 = f[2U];
+>> --
+> 
+> That seems obvious and reasonable, and so I'm inclined to ack this,
+> but I first wanted to give Karthik (CC'd) a chance to chime in here,
+> as it's his HACL* project that's responsible, and he might have some
+> curious insight.
+> 
+> Jason
+
