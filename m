@@ -2,106 +2,77 @@ Return-Path: <SRS0=C5/f=BG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 733C2C433E5
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 12:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53AA9C433EB
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 13:00:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4912C2074F
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 12:52:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3201F2075A
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 13:00:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728424AbgG0Mw3 (ORCPT
+        id S1728480AbgG0NAf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jul 2020 08:52:29 -0400
-Received: from mailout06.rmx.de ([94.199.90.92]:36655 "EHLO mailout06.rmx.de"
+        Mon, 27 Jul 2020 09:00:35 -0400
+Received: from verein.lst.de ([213.95.11.211]:43383 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728387AbgG0Mw3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jul 2020 08:52:29 -0400
-Received: from kdin01.retarus.com (kdin01.dmz1.retloc [172.19.17.48])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mailout06.rmx.de (Postfix) with ESMTPS id 4BFfpc4w6hz9w5h;
-        Mon, 27 Jul 2020 14:52:24 +0200 (CEST)
-Received: from mta.arri.de (unknown [217.111.95.66])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by kdin01.retarus.com (Postfix) with ESMTPS id 4BFfnb69cVz2xbN;
-        Mon, 27 Jul 2020 14:51:31 +0200 (CEST)
-Received: from N95HX1G2.wgnetz.xx (192.168.54.121) by mta.arri.de
- (192.168.100.104) with Microsoft SMTP Server (TLS) id 14.3.408.0; Mon, 27 Jul
- 2020 14:49:43 +0200
-From:   Christian Eggers <ceggers@arri.de>
-To:     Fabio Estevam <festevam@gmail.com>
-CC:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Martin Kaiser <martin@kaiser.cx>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Christian Eggers <ceggers@arri.de>
-Subject: [PATCH] hwrng: imx-rngc - setup default RNG quality
-Date:   Mon, 27 Jul 2020 14:45:53 +0200
-Message-ID: <20200727124552.4336-1-ceggers@arri.de>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <CAOMZO5ASnj7SpjjAEpWjRK-vMpFFKU00=rxKeBtaMSKE9pkX1g@mail.gmail.com>
-References: <CAOMZO5ASnj7SpjjAEpWjRK-vMpFFKU00=rxKeBtaMSKE9pkX1g@mail.gmail.com>
+        id S1728141AbgG0NAf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Jul 2020 09:00:35 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 8046868C4E; Mon, 27 Jul 2020 15:00:29 +0200 (CEST)
+Date:   Mon, 27 Jul 2020 15:00:29 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ido Schimmel <idosch@idosch.org>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Eric Dumazet <edumazet@google.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, bpf@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
+        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
+        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
+Subject: Re: [PATCH 19/26] net/ipv6: switch ipv6_flowlabel_opt to sockptr_t
+Message-ID: <20200727130029.GA26393@lst.de>
+References: <20200723060908.50081-1-hch@lst.de> <20200723060908.50081-20-hch@lst.de> <20200727121505.GA1804864@shredder>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [192.168.54.121]
-X-RMX-ID: 20200727-145137-4BFfnb69cVz2xbN-0@kdin01
-X-RMX-SOURCE: 217.111.95.66
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200727121505.GA1804864@shredder>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When hw_random device's quality is non-zero, it will automatically fill
-the kernel's entropy pool at boot.  For this purpose, one conservative
-quality value is being picked up as the default value.
+On Mon, Jul 27, 2020 at 03:15:05PM +0300, Ido Schimmel wrote:
+> I see a regression with IPv6 flowlabel that I bisected to this patch.
+> When passing '-F 0' to 'ping' the flow label should be random, yet it's
+> the same every time after this patch.
 
-Signed-off-by: Christian Eggers <ceggers@arri.de>
----
- drivers/char/hw_random/imx-rngc.c | 1 +
- 1 file changed, 1 insertion(+)
+Can you send a reproducer?
 
-diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
-index f9c5ddd0276b..a62ff78bd7ea 100644
---- a/drivers/char/hw_random/imx-rngc.c
-+++ b/drivers/char/hw_random/imx-rngc.c
-@@ -285,6 +285,7 @@ static int imx_rngc_probe(struct platform_device *pdev)
- 	rngc->rng.init = imx_rngc_init;
- 	rngc->rng.read = imx_rngc_read;
- 	rngc->rng.cleanup = imx_rngc_cleanup;
-+	rngc->rng.quality = 900;
- 
- 	rngc->dev = &pdev->dev;
- 	platform_set_drvdata(pdev, rngc);
--- 
-On Mon, Jul 27, 2020 Fabian Estevam wrote:
-> Horia has already sent a patch series that adds imx6ull rngb support:
-> https://lkml.org/lkml/2020/7/23/173
+> 
+> It seems that the pointer is never advanced after the call to
+> sockptr_advance() because it is passed by value and not by reference.
+> Even if you were to pass it by reference I think you would later need to
+> call sockptr_decrease() or something similar. Otherwise it is very
+> error-prone.
+> 
+> Maybe adding an offset to copy_to_sockptr() and copy_from_sockptr() is
+> better?
 
-That happens when patches are sent upstream one year after writing....
-
-Can you please add the third patch of the series?
-
-regards
-
-Christian Eggers
-Embedded software developer
-
-Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
-Sitz: Muenchen - Registergericht: Amtsgericht Muenchen - Handelsregisternummer: HRA 57918
-Persoenlich haftender Gesellschafter: Arnold & Richter Cine Technik GmbH
-Sitz: Muenchen - Registergericht: Amtsgericht Muenchen - Handelsregisternummer: HRB 54477
-Geschaeftsfuehrer: Dr. Michael Neuhaeuser; Stephan Schenk; Walter Trauninger; Markus Zeiler
-
+We could do that, although I wouldn't add it to the existing functions
+to avoid the churns and instead add copy_to_sockptr_offset or something
+like that.
