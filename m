@@ -2,211 +2,106 @@ Return-Path: <SRS0=C5/f=BG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6EA0C433E5
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 12:15:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 733C2C433E5
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 12:52:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1434206E7
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 12:15:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cz67FKlM"
+	by mail.kernel.org (Postfix) with ESMTP id 4912C2074F
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 12:52:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728109AbgG0MPO (ORCPT
+        id S1728424AbgG0Mw3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jul 2020 08:15:14 -0400
-Received: from new3-smtp.messagingengine.com ([66.111.4.229]:43557 "EHLO
-        new3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726555AbgG0MPN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jul 2020 08:15:13 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 858ED580626;
-        Mon, 27 Jul 2020 08:15:11 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Mon, 27 Jul 2020 08:15:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=zQ5cK+
-        UyqnfJ5Bs5mc2l5CGTYqkVGioSJ7/rqh6pAKo=; b=cz67FKlM5wTYH6ZHs8cumN
-        6Lloe5U6Wof104VdSstoZvBZVPQWGdAx/fMZfPQxIwG0p8iESwpGeuM7tUbH7y0c
-        5nwF6SEQIGjZVO/5CmL/kqzdqg9Btv1iK/m/DFBcSQvbdxe/OqRzITPeS2TcH/Y+
-        Rprx9Vp4fYTO6goik0AFPtlzp/RTh1KyjaQJAaV4CWXK+yEGSMO73vw2Bvs3jvH/
-        xn05lT9HilG+7jY3vY3UhaljUx6pT7HHVwgspZ5cqQnXh6v+NBrjfYm4b9qLqHRM
-        BmrV61GpLVJpu1JgeZoeM7zuzyCKx+b8Xqsjra7JohU70SIOprEe6DltCaWHoeSQ
-        ==
-X-ME-Sender: <xms:TcUeX_6kVxk3W7PFyY8aD2OpbpNtNrYvJvqdVELMLD3-WQTkXX8Hmg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedriedtgdehtdcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcuufgt
-    hhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrthhtvg
-    hrnheptdffkeekfeduffevgeeujeffjefhtefgueeugfevtdeiheduueeukefhudehleet
-    necukfhppeejledrudekuddrvddrudejleenucevlhhushhtvghrufhiiigvpedtnecurf
-    grrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:TcUeX06Qqy5aEJFW6Jpg_LZa1dJ4eY6nkkQcVlz4XOtHLjqmQNDxTw>
-    <xmx:TcUeX2fd-qWfehY8_YaMTYqQAxXos584gd2IyW8HI9rJNz3B9JOvMg>
-    <xmx:TcUeXwI7ksA1oOAl1pVV8mG18oLCDmnkFZDN6_zUljX6iXpa1GFghA>
-    <xmx:T8UeXw5_98Jq_Ux1_bj8TbKmStoIGlRImlxpRg8bsqiWWADoZ6hKgA>
-Received: from localhost (bzq-79-181-2-179.red.bezeqint.net [79.181.2.179])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 80C84328005D;
-        Mon, 27 Jul 2020 08:15:08 -0400 (EDT)
-Date:   Mon, 27 Jul 2020 15:15:05 +0300
-From:   Ido Schimmel <idosch@idosch.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Eric Dumazet <edumazet@google.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
-        linux-can@vger.kernel.org, dccp@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
-        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
-        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: Re: [PATCH 19/26] net/ipv6: switch ipv6_flowlabel_opt to sockptr_t
-Message-ID: <20200727121505.GA1804864@shredder>
-References: <20200723060908.50081-1-hch@lst.de>
- <20200723060908.50081-20-hch@lst.de>
+        Mon, 27 Jul 2020 08:52:29 -0400
+Received: from mailout06.rmx.de ([94.199.90.92]:36655 "EHLO mailout06.rmx.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728387AbgG0Mw3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Jul 2020 08:52:29 -0400
+Received: from kdin01.retarus.com (kdin01.dmz1.retloc [172.19.17.48])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mailout06.rmx.de (Postfix) with ESMTPS id 4BFfpc4w6hz9w5h;
+        Mon, 27 Jul 2020 14:52:24 +0200 (CEST)
+Received: from mta.arri.de (unknown [217.111.95.66])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by kdin01.retarus.com (Postfix) with ESMTPS id 4BFfnb69cVz2xbN;
+        Mon, 27 Jul 2020 14:51:31 +0200 (CEST)
+Received: from N95HX1G2.wgnetz.xx (192.168.54.121) by mta.arri.de
+ (192.168.100.104) with Microsoft SMTP Server (TLS) id 14.3.408.0; Mon, 27 Jul
+ 2020 14:49:43 +0200
+From:   Christian Eggers <ceggers@arri.de>
+To:     Fabio Estevam <festevam@gmail.com>
+CC:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Martin Kaiser <martin@kaiser.cx>,
+        <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, Christian Eggers <ceggers@arri.de>
+Subject: [PATCH] hwrng: imx-rngc - setup default RNG quality
+Date:   Mon, 27 Jul 2020 14:45:53 +0200
+Message-ID: <20200727124552.4336-1-ceggers@arri.de>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <CAOMZO5ASnj7SpjjAEpWjRK-vMpFFKU00=rxKeBtaMSKE9pkX1g@mail.gmail.com>
+References: <CAOMZO5ASnj7SpjjAEpWjRK-vMpFFKU00=rxKeBtaMSKE9pkX1g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200723060908.50081-20-hch@lst.de>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [192.168.54.121]
+X-RMX-ID: 20200727-145137-4BFfnb69cVz2xbN-0@kdin01
+X-RMX-SOURCE: 217.111.95.66
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jul 23, 2020 at 08:09:01AM +0200, Christoph Hellwig wrote:
-> Pass a sockptr_t to prepare for set_fs-less handling of the kernel
-> pointer from bpf-cgroup.
-> 
-> Note that the get case is pretty weird in that it actually copies data
-> back to userspace from setsockopt.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  include/net/ipv6.h       |  2 +-
->  net/ipv6/ip6_flowlabel.c | 16 +++++++++-------
->  net/ipv6/ipv6_sockglue.c |  2 +-
->  3 files changed, 11 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-> index 262fc88dbd7e2f..4c9d89b5d73268 100644
-> --- a/include/net/ipv6.h
-> +++ b/include/net/ipv6.h
-> @@ -406,7 +406,7 @@ struct ipv6_txoptions *fl6_merge_options(struct ipv6_txoptions *opt_space,
->  					 struct ip6_flowlabel *fl,
->  					 struct ipv6_txoptions *fopt);
->  void fl6_free_socklist(struct sock *sk);
-> -int ipv6_flowlabel_opt(struct sock *sk, char __user *optval, int optlen);
-> +int ipv6_flowlabel_opt(struct sock *sk, sockptr_t optval, int optlen);
->  int ipv6_flowlabel_opt_get(struct sock *sk, struct in6_flowlabel_req *freq,
->  			   int flags);
->  int ip6_flowlabel_init(void);
-> diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.c
-> index 27ee6de9beffc4..6b3c315f3d461a 100644
-> --- a/net/ipv6/ip6_flowlabel.c
-> +++ b/net/ipv6/ip6_flowlabel.c
-> @@ -371,7 +371,7 @@ static int fl6_renew(struct ip6_flowlabel *fl, unsigned long linger, unsigned lo
->  
->  static struct ip6_flowlabel *
->  fl_create(struct net *net, struct sock *sk, struct in6_flowlabel_req *freq,
-> -	  char __user *optval, int optlen, int *err_p)
-> +	  sockptr_t optval, int optlen, int *err_p)
->  {
->  	struct ip6_flowlabel *fl = NULL;
->  	int olen;
-> @@ -401,7 +401,8 @@ fl_create(struct net *net, struct sock *sk, struct in6_flowlabel_req *freq,
->  		memset(fl->opt, 0, sizeof(*fl->opt));
->  		fl->opt->tot_len = sizeof(*fl->opt) + olen;
->  		err = -EFAULT;
-> -		if (copy_from_user(fl->opt+1, optval+CMSG_ALIGN(sizeof(*freq)), olen))
-> +		sockptr_advance(optval, CMSG_ALIGN(sizeof(*freq)));
-> +		if (copy_from_sockptr(fl->opt + 1, optval, olen))
->  			goto done;
->  
->  		msg.msg_controllen = olen;
-> @@ -604,7 +605,7 @@ static int ipv6_flowlabel_renew(struct sock *sk, struct in6_flowlabel_req *freq)
->  }
->  
->  static int ipv6_flowlabel_get(struct sock *sk, struct in6_flowlabel_req *freq,
-> -		void __user *optval, int optlen)
-> +		sockptr_t optval, int optlen)
->  {
->  	struct ipv6_fl_socklist *sfl, *sfl1 = NULL;
->  	struct ip6_flowlabel *fl, *fl1 = NULL;
-> @@ -702,8 +703,9 @@ static int ipv6_flowlabel_get(struct sock *sk, struct in6_flowlabel_req *freq,
->  		goto recheck;
->  
->  	if (!freq->flr_label) {
-> -		if (copy_to_user(&((struct in6_flowlabel_req __user *) optval)->flr_label,
-> -				 &fl->label, sizeof(fl->label))) {
-> +		sockptr_advance(optval,
-> +				offsetof(struct in6_flowlabel_req, flr_label));
+When hw_random device's quality is non-zero, it will automatically fill
+the kernel's entropy pool at boot.  For this purpose, one conservative
+quality value is being picked up as the default value.
 
-Christoph,
+Signed-off-by: Christian Eggers <ceggers@arri.de>
+---
+ drivers/char/hw_random/imx-rngc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I see a regression with IPv6 flowlabel that I bisected to this patch.
-When passing '-F 0' to 'ping' the flow label should be random, yet it's
-the same every time after this patch.
+diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
+index f9c5ddd0276b..a62ff78bd7ea 100644
+--- a/drivers/char/hw_random/imx-rngc.c
++++ b/drivers/char/hw_random/imx-rngc.c
+@@ -285,6 +285,7 @@ static int imx_rngc_probe(struct platform_device *pdev)
+ 	rngc->rng.init = imx_rngc_init;
+ 	rngc->rng.read = imx_rngc_read;
+ 	rngc->rng.cleanup = imx_rngc_cleanup;
++	rngc->rng.quality = 900;
+ 
+ 	rngc->dev = &pdev->dev;
+ 	platform_set_drvdata(pdev, rngc);
+-- 
+On Mon, Jul 27, 2020 Fabian Estevam wrote:
+> Horia has already sent a patch series that adds imx6ull rngb support:
+> https://lkml.org/lkml/2020/7/23/173
 
-It seems that the pointer is never advanced after the call to
-sockptr_advance() because it is passed by value and not by reference.
-Even if you were to pass it by reference I think you would later need to
-call sockptr_decrease() or something similar. Otherwise it is very
-error-prone.
+That happens when patches are sent upstream one year after writing....
 
-Maybe adding an offset to copy_to_sockptr() and copy_from_sockptr() is
-better?
+Can you please add the third patch of the series?
 
-Thanks
+regards
 
-> +		if (copy_to_sockptr(optval, &fl->label, sizeof(fl->label))) {
->  			/* Intentionally ignore fault. */
->  		}
->  	}
-> @@ -716,13 +718,13 @@ static int ipv6_flowlabel_get(struct sock *sk, struct in6_flowlabel_req *freq,
->  	return err;
->  }
->  
-> -int ipv6_flowlabel_opt(struct sock *sk, char __user *optval, int optlen)
-> +int ipv6_flowlabel_opt(struct sock *sk, sockptr_t optval, int optlen)
->  {
->  	struct in6_flowlabel_req freq;
->  
->  	if (optlen < sizeof(freq))
->  		return -EINVAL;
-> -	if (copy_from_user(&freq, optval, sizeof(freq)))
-> +	if (copy_from_sockptr(&freq, optval, sizeof(freq)))
->  		return -EFAULT;
->  
->  	switch (freq.flr_action) {
-> diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
-> index 119dfaf5f4bb26..3897fb55372d38 100644
-> --- a/net/ipv6/ipv6_sockglue.c
-> +++ b/net/ipv6/ipv6_sockglue.c
-> @@ -929,7 +929,7 @@ static int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
->  		retv = 0;
->  		break;
->  	case IPV6_FLOWLABEL_MGR:
-> -		retv = ipv6_flowlabel_opt(sk, optval, optlen);
-> +		retv = ipv6_flowlabel_opt(sk, USER_SOCKPTR(optval), optlen);
->  		break;
->  	case IPV6_IPSEC_POLICY:
->  	case IPV6_XFRM_POLICY:
-> -- 
-> 2.27.0
-> 
+Christian Eggers
+Embedded software developer
+
+Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
+Sitz: Muenchen - Registergericht: Amtsgericht Muenchen - Handelsregisternummer: HRA 57918
+Persoenlich haftender Gesellschafter: Arnold & Richter Cine Technik GmbH
+Sitz: Muenchen - Registergericht: Amtsgericht Muenchen - Handelsregisternummer: HRB 54477
+Geschaeftsfuehrer: Dr. Michael Neuhaeuser; Stephan Schenk; Walter Trauninger; Markus Zeiler
+
