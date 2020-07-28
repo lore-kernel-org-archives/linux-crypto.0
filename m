@@ -2,140 +2,121 @@ Return-Path: <SRS0=t+Y3=BH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 653D2C433ED
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:48:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C2DC433EA
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 08:07:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4FF7622B3F
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:48:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FA0820656
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 08:07:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728057AbgG1Hss (ORCPT
+        id S1727970AbgG1IHS convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Jul 2020 03:48:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58346 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727871AbgG1Hsq (ORCPT
+        Tue, 28 Jul 2020 04:07:18 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:22306 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727930AbgG1IHR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Jul 2020 03:48:46 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A57A4C061794
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Jul 2020 00:48:46 -0700 (PDT)
-Received: from pty.hi.pengutronix.de ([2001:67c:670:100:1d::c5])
-        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <mfe@pengutronix.de>)
-        id 1k0KLV-0008OF-BB; Tue, 28 Jul 2020 09:48:21 +0200
-Received: from mfe by pty.hi.pengutronix.de with local (Exim 4.89)
-        (envelope-from <mfe@pengutronix.de>)
-        id 1k0KLR-0005bP-Ru; Tue, 28 Jul 2020 09:48:17 +0200
-Date:   Tue, 28 Jul 2020 09:48:17 +0200
-From:   Marco Felsch <m.felsch@pengutronix.de>
-To:     Christian Eggers <ceggers@arri.de>
-Cc:     Fabio Estevam <festevam@gmail.com>,
-        Martin Kaiser <martin@kaiser.cx>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        linux-kernel@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Matt Mackall <mpm@selenic.com>,
-        Shawn Guo <shawnguo@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] hwrng: imx-rngc - setup default RNG quality
-Message-ID: <20200728074817.hlevn7ex2hckdbvi@pengutronix.de>
-References: <CAOMZO5ASnj7SpjjAEpWjRK-vMpFFKU00=rxKeBtaMSKE9pkX1g@mail.gmail.com>
- <20200727124552.4336-1-ceggers@arri.de>
+        Tue, 28 Jul 2020 04:07:17 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-122-o5x9Q9SyNzqkeSG6S-qBgw-1; Tue, 28 Jul 2020 09:07:12 +0100
+X-MC-Unique: o5x9Q9SyNzqkeSG6S-qBgw-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Tue, 28 Jul 2020 09:07:11 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Tue, 28 Jul 2020 09:07:11 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Christoph Hellwig' <hch@lst.de>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+CC:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+        "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+        "coreteam@netfilter.org" <coreteam@netfilter.org>,
+        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
+        "linux-hams@vger.kernel.org" <linux-hams@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "bridge@lists.linux-foundation.org" 
+        <bridge@lists.linux-foundation.org>,
+        "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
+        "dccp@vger.kernel.org" <dccp@vger.kernel.org>,
+        "linux-decnet-user@lists.sourceforge.net" 
+        <linux-decnet-user@lists.sourceforge.net>,
+        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "mptcp@lists.01.org" <mptcp@lists.01.org>,
+        "lvs-devel@vger.kernel.org" <lvs-devel@vger.kernel.org>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
+        "tipc-discussion@lists.sourceforge.net" 
+        <tipc-discussion@lists.sourceforge.net>,
+        "linux-x25@vger.kernel.org" <linux-x25@vger.kernel.org>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>
+Subject: RE: [PATCH 12/26] netfilter: switch nf_setsockopt to sockptr_t
+Thread-Topic: [PATCH 12/26] netfilter: switch nf_setsockopt to sockptr_t
+Thread-Index: AQHWZDJbUYsuJ1QOc0ujZBN9RDfEqKkcofVA
+Date:   Tue, 28 Jul 2020 08:07:11 +0000
+Message-ID: <908ed73081cc42d58a5b01e0c97dbe47@AcuMS.aculab.com>
+References: <20200723060908.50081-1-hch@lst.de>
+ <20200723060908.50081-13-hch@lst.de> <20200727150310.GA1632472@zx2c4.com>
+ <20200727150601.GA3447@lst.de>
+ <CAHmME9ric=chLJayn7Erve7WBa+qCKn-+Gjri=zqydoY6623aA@mail.gmail.com>
+ <20200727162357.GA8022@lst.de>
+In-Reply-To: <20200727162357.GA8022@lst.de>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200727124552.4336-1-ceggers@arri.de>
-X-Sent-From: Pengutronix Hildesheim
-X-URL:  http://www.pengutronix.de/
-X-IRC:  #ptxdist @freenode
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-Uptime: 09:39:33 up 255 days, 22:58, 251 users,  load average: 0.09, 0.04,
- 0.04
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c5
-X-SA-Exim-Mail-From: mfe@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Christian,
+From: Christoph Hellwig
+> Sent: 27 July 2020 17:24
+> 
+> On Mon, Jul 27, 2020 at 06:16:32PM +0200, Jason A. Donenfeld wrote:
+> > Maybe sockptr_advance should have some safety checks and sometimes
+> > return -EFAULT? Or you should always use the implementation where
+> > being a kernel address is an explicit bit of sockptr_t, rather than
+> > being implicit?
+> 
+> I already have a patch to use access_ok to check the whole range in
+> init_user_sockptr.
 
-On 20-07-27 14:45, Christian Eggers wrote:
-> When hw_random device's quality is non-zero, it will automatically fill
-> the kernel's entropy pool at boot.  For this purpose, one conservative
-> quality value is being picked up as the default value.
+That doesn't make (much) difference to the code paths that ignore
+the user-supplied length.
+OTOH doing the user/kernel check on the base address (not an
+incremented one) means that the correct copy function is always
+selected.
 
-IMHO your value is not conservative enough and the commit message should
-explain why we should use 900. Unfortunately I had not enough time to
-send my patch addressing this. However please check my commit message
-why 900 is not good:
+Perhaps the functions should all be passed a 'const sockptr_t'.
+The typedef could be made 'const' - requiring non-const items
+explicitly use the union/struct itself.
 
-8<------------------------------------------------------------------------
-From 9f047eee5e4ce8353c9b764a47e7f584b2013347 Mon Sep 17 00:00:00 2001
-From: Marco Felsch <m.felsch@pengutronix.de>
-Date: Thu, 7 May 2020 12:01:28 +0200
-Subject: [PATCH] hwrng: imx-rngc - add quality to use it as kernel entropy
- pool
+	David
 
-The RM describes the RNGB as follow:
-8<----------------------------------------------------------------
-The RNGB uses the True Random Number Generator (TRNG) and a
-Pseudo-Random Number Generator (PRNG) to achieve a true randomness and
-cryptographic strength.
-8<----------------------------------------------------------------
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
-The RNGB has 3 operation modes: self-test, seed-generation and the final
-'random number generation' mode. Befor we can retrieve random numbers
-from the RNGB we need to generate the seed pool:
-8<----------------------------------------------------------------
-During the seed generation, the RNGB adds the entropy generated in the
-TRNG to the 256-bit XKEY register. The PRNG algorithm executes 20.000
-entropy samples from the TRNG to create an initial seed for the random
-number generation.
-8<----------------------------------------------------------------
-
-The RNGB can generate 2^20 words (4byte) of 'random' data after the
-seed pool was initialized. The pool needs to be reseeded if more words
-are required. The reseeding is done automatically since
-commit 3acd9ea9331c ("hwrng: imx-rngc - use automatic seeding").
-
-We can't retrieve the TRNG values directly so we need a other way to get
-the quality level. We know that the PRNG uses 20.000 entropy samples
-from the TRNG to generate 2^20 words (1MiB) and the quality level is
-defined as (in bits of entropy per 1024 bits of input). So the quality
-level can be calculated by:
-
-   20.000 * 1024
-   ------------- = ~ 19.5
-        2^20
-
-Signed-off-by: Marco Felsch <m.felsch@pengutronix.de>
----
- drivers/char/hw_random/imx-rngc.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
-index 9c47e431ce90..61c844baf26e 100644
---- a/drivers/char/hw_random/imx-rngc.c
-+++ b/drivers/char/hw_random/imx-rngc.c
-@@ -285,6 +285,7 @@ static int imx_rngc_probe(struct platform_device *pdev)
- 	rngc->rng.init = imx_rngc_init;
- 	rngc->rng.read = imx_rngc_read;
- 	rngc->rng.cleanup = imx_rngc_cleanup;
-+	rngc->rng.quality = 19;
- 
- 	rngc->dev = &pdev->dev;
- 	platform_set_drvdata(pdev, rngc);
