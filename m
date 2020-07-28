@@ -7,187 +7,94 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C9EDC433F4
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BD93C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:19:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8709B21744
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:19:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC365207E8
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:19:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727929AbgG1HTD (ORCPT
+        id S1727923AbgG1HTB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Jul 2020 03:19:03 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:54798 "EHLO fornost.hmeau.com"
+        Tue, 28 Jul 2020 03:19:01 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:54790 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727924AbgG1HTD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Jul 2020 03:19:03 -0400
+        id S1727904AbgG1HTB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Jul 2020 03:19:01 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1k0Jt6-0006MN-FB; Tue, 28 Jul 2020 17:19:01 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 28 Jul 2020 17:19:00 +1000
+        id 1k0Jt4-0006Lq-5D; Tue, 28 Jul 2020 17:18:59 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 28 Jul 2020 17:18:58 +1000
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Tue, 28 Jul 2020 17:19:00 +1000
-Subject: [v3 PATCH 10/31] crypto: chacha-generic - Add support for chaining
+Date:   Tue, 28 Jul 2020 17:18:58 +1000
+Subject: [v3 PATCH 9/31] crypto: cryptd - Add support for chaining
 References: <20200728071746.GA22352@gondor.apana.org.au>
 To:     Ard Biesheuvel <ardb@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Eric Biggers <ebiggers@kernel.org>
-Message-Id: <E1k0Jt6-0006MN-FB@fornost.hmeau.com>
+Message-Id: <E1k0Jt4-0006Lq-5D@fornost.hmeau.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As it stands chacha cannot do chaining.  That is, it has to handle
-each request as a whole.  This patch adds support for chaining when
-the CRYPTO_TFM_REQ_MORE flag is set.
-    
+This patch makes cryptd pass along the CRYPTO_TFM_REQ_MORE flag to
+its child skcipher as well as inheriting the final chunk size from
+it.
+
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/chacha_generic.c          |   43 +++++++++++++++++++++++++--------------
- include/crypto/internal/chacha.h |    8 ++++++-
- 2 files changed, 35 insertions(+), 16 deletions(-)
+ crypto/cryptd.c |   15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/chacha_generic.c b/crypto/chacha_generic.c
-index 8beea79ab1178..f74ac54d7aa5b 100644
---- a/crypto/chacha_generic.c
-+++ b/crypto/chacha_generic.c
-@@ -6,22 +6,21 @@
-  * Copyright (C) 2018 Google LLC
-  */
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index a1bea0f4baa88..510c23b320082 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -261,13 +261,16 @@ static void cryptd_skcipher_encrypt(struct crypto_async_request *base,
+ 	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	struct crypto_sync_skcipher *child = ctx->child;
+ 	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, child);
++	unsigned int flags = req->base.flags;
  
--#include <asm/unaligned.h>
--#include <crypto/algapi.h>
- #include <crypto/internal/chacha.h>
--#include <crypto/internal/skcipher.h>
-+#include <linux/kernel.h>
- #include <linux/module.h>
-+#include <linux/string.h>
+ 	if (unlikely(err == -EINPROGRESS))
+ 		goto out;
  
--static int chacha_stream_xor(struct skcipher_request *req,
--			     const struct chacha_ctx *ctx, const u8 *iv)
-+static int chacha_stream_xor(struct skcipher_request *req, int nrounds)
- {
-+	struct chacha_reqctx *rctx = skcipher_request_ctx(req);
- 	struct skcipher_walk walk;
--	u32 state[16];
-+	u32 *state = rctx->state;
- 	int err;
- 
--	err = skcipher_walk_virt(&walk, req, false);
-+	rctx->init = req->base.flags & CRYPTO_TFM_REQ_MORE;
- 
--	chacha_init_generic(state, ctx->key, iv);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
- 	while (walk.nbytes > 0) {
- 		unsigned int nbytes = walk.nbytes;
-@@ -30,7 +29,7 @@ static int chacha_stream_xor(struct skcipher_request *req,
- 			nbytes = round_down(nbytes, CHACHA_BLOCK_SIZE);
- 
- 		chacha_crypt_generic(state, walk.dst.virt.addr,
--				     walk.src.virt.addr, nbytes, ctx->nrounds);
-+				     walk.src.virt.addr, nbytes, nrounds);
- 		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
- 	}
- 
-@@ -40,30 +39,41 @@ static int chacha_stream_xor(struct skcipher_request *req,
- static int crypto_chacha_crypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct chacha_reqctx *rctx = skcipher_request_ctx(req);
- 	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
- 
--	return chacha_stream_xor(req, ctx, req->iv);
-+	if (!rctx->init)
-+		chacha_init_generic(rctx->state, ctx->key, req->iv);
++	flags &= CRYPTO_TFM_REQ_MORE;
++	flags |= CRYPTO_TFM_REQ_MAY_SLEEP;
 +
-+	return chacha_stream_xor(req, ctx->nrounds);
- }
+ 	skcipher_request_set_sync_tfm(subreq, child);
+-	skcipher_request_set_callback(subreq, CRYPTO_TFM_REQ_MAY_SLEEP,
+-				      NULL, NULL);
++	skcipher_request_set_callback(subreq, flags, NULL, NULL);
+ 	skcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
+ 				   req->iv);
  
- static int crypto_xchacha_crypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct chacha_reqctx *rctx = skcipher_request_ctx(req);
- 	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct chacha_ctx subctx;
--	u32 state[16];
-+	int nrounds = ctx->nrounds;
-+	u32 *state = rctx->state;
- 	u8 real_iv[16];
-+	u32 key[8];
+@@ -289,13 +292,16 @@ static void cryptd_skcipher_decrypt(struct crypto_async_request *base,
+ 	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	struct crypto_sync_skcipher *child = ctx->child;
+ 	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, child);
++	unsigned int flags = req->base.flags;
+ 
+ 	if (unlikely(err == -EINPROGRESS))
+ 		goto out;
+ 
++	flags &= CRYPTO_TFM_REQ_MORE;
++	flags |= CRYPTO_TFM_REQ_MAY_SLEEP;
 +
-+	if (rctx->init)
-+		goto skip_init;
+ 	skcipher_request_set_sync_tfm(subreq, child);
+-	skcipher_request_set_callback(subreq, CRYPTO_TFM_REQ_MAY_SLEEP,
+-				      NULL, NULL);
++	skcipher_request_set_callback(subreq, flags, NULL, NULL);
+ 	skcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
+ 				   req->iv);
  
- 	/* Compute the subkey given the original key and first 128 nonce bits */
- 	chacha_init_generic(state, ctx->key, req->iv);
--	hchacha_block_generic(state, subctx.key, ctx->nrounds);
--	subctx.nrounds = ctx->nrounds;
-+	hchacha_block_generic(state, key, nrounds);
+@@ -400,6 +406,7 @@ static int cryptd_create_skcipher(struct crypto_template *tmpl,
+ 		(alg->base.cra_flags & CRYPTO_ALG_INTERNAL);
+ 	inst->alg.ivsize = crypto_skcipher_alg_ivsize(alg);
+ 	inst->alg.chunksize = crypto_skcipher_alg_chunksize(alg);
++	inst->alg.final_chunksize = crypto_skcipher_alg_final_chunksize(alg);
+ 	inst->alg.min_keysize = crypto_skcipher_alg_min_keysize(alg);
+ 	inst->alg.max_keysize = crypto_skcipher_alg_max_keysize(alg);
  
- 	/* Build the real IV */
- 	memcpy(&real_iv[0], req->iv + 24, 8); /* stream position */
- 	memcpy(&real_iv[8], req->iv + 16, 8); /* remaining 64 nonce bits */
- 
-+	chacha_init_generic(state, key, real_iv);
-+
-+skip_init:
- 	/* Generate the stream and XOR it with the data */
--	return chacha_stream_xor(req, &subctx, real_iv);
-+	return chacha_stream_xor(req, nrounds);
- }
- 
- static struct skcipher_alg algs[] = {
-@@ -79,6 +89,7 @@ static struct skcipher_alg algs[] = {
- 		.max_keysize		= CHACHA_KEY_SIZE,
- 		.ivsize			= CHACHA_IV_SIZE,
- 		.chunksize		= CHACHA_BLOCK_SIZE,
-+		.reqsize		= sizeof(struct chacha_reqctx),
- 		.setkey			= chacha20_setkey,
- 		.encrypt		= crypto_chacha_crypt,
- 		.decrypt		= crypto_chacha_crypt,
-@@ -94,6 +105,7 @@ static struct skcipher_alg algs[] = {
- 		.max_keysize		= CHACHA_KEY_SIZE,
- 		.ivsize			= XCHACHA_IV_SIZE,
- 		.chunksize		= CHACHA_BLOCK_SIZE,
-+		.reqsize		= sizeof(struct chacha_reqctx),
- 		.setkey			= chacha20_setkey,
- 		.encrypt		= crypto_xchacha_crypt,
- 		.decrypt		= crypto_xchacha_crypt,
-@@ -109,6 +121,7 @@ static struct skcipher_alg algs[] = {
- 		.max_keysize		= CHACHA_KEY_SIZE,
- 		.ivsize			= XCHACHA_IV_SIZE,
- 		.chunksize		= CHACHA_BLOCK_SIZE,
-+		.reqsize		= sizeof(struct chacha_reqctx),
- 		.setkey			= chacha12_setkey,
- 		.encrypt		= crypto_xchacha_crypt,
- 		.decrypt		= crypto_xchacha_crypt,
-diff --git a/include/crypto/internal/chacha.h b/include/crypto/internal/chacha.h
-index b085dc1ac1516..149ff90fa4afd 100644
---- a/include/crypto/internal/chacha.h
-+++ b/include/crypto/internal/chacha.h
-@@ -3,15 +3,21 @@
- #ifndef _CRYPTO_INTERNAL_CHACHA_H
- #define _CRYPTO_INTERNAL_CHACHA_H
- 
-+#include <asm/unaligned.h>
- #include <crypto/chacha.h>
- #include <crypto/internal/skcipher.h>
--#include <linux/crypto.h>
-+#include <linux/kernel.h>
- 
- struct chacha_ctx {
- 	u32 key[8];
- 	int nrounds;
- };
- 
-+struct chacha_reqctx {
-+	u32 state[16];
-+	bool init;
-+};
-+
- static inline int chacha_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 				unsigned int keysize, int nrounds)
- {
