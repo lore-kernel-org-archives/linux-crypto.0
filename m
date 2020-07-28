@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CAF6C433EA
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:18:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F7EBC433EC
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:18:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E937820792
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:18:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60859207F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:18:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727906AbgG1HSw (ORCPT
+        id S1727907AbgG1HSy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Jul 2020 03:18:52 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:54758 "EHLO fornost.hmeau.com"
+        Tue, 28 Jul 2020 03:18:54 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:54764 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727904AbgG1HSw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Jul 2020 03:18:52 -0400
+        id S1727904AbgG1HSy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Jul 2020 03:18:54 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1k0Jsu-0006JL-QP; Tue, 28 Jul 2020 17:18:49 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 28 Jul 2020 17:18:48 +1000
+        id 1k0Jsx-0006Jt-2z; Tue, 28 Jul 2020 17:18:52 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 28 Jul 2020 17:18:51 +1000
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Tue, 28 Jul 2020 17:18:48 +1000
-Subject: [v3 PATCH 5/31] crypto: nitrox - Add support for chaining CTS
+Date:   Tue, 28 Jul 2020 17:18:51 +1000
+Subject: [v3 PATCH 6/31] crypto: ccree - Add support for chaining CTS
 References: <20200728071746.GA22352@gondor.apana.org.au>
 To:     Ard Biesheuvel <ardb@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Eric Biggers <ebiggers@kernel.org>
-Message-Id: <E1k0Jsu-0006JL-QP@fornost.hmeau.com>
+Message-Id: <E1k0Jsx-0006Jt-2z@fornost.hmeau.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -48,203 +48,210 @@ the caller to enable correct processing at the true end of a request.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- drivers/crypto/cavium/nitrox/nitrox_skcipher.c |  124 ++++++++++++++++++++++---
- 1 file changed, 113 insertions(+), 11 deletions(-)
+ drivers/crypto/ccree/cc_cipher.c |   72 +++++++++++++++++++++++++--------------
+ 1 file changed, 47 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_skcipher.c b/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
-index a553ac65f3249..7a159a5da30a0 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
-@@ -20,6 +20,16 @@ struct nitrox_cipher {
- 	enum flexi_cipher value;
- };
+diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
+index beeb283c3c949..83567b60d6908 100644
+--- a/drivers/crypto/ccree/cc_cipher.c
++++ b/drivers/crypto/ccree/cc_cipher.c
+@@ -61,9 +61,9 @@ struct cc_cipher_ctx {
  
-+struct nitrox_crypto_cts_ctx {
-+	struct nitrox_crypto_ctx base;
-+	union {
-+		u8 *u8p;
-+		u64 ctx_handle;
-+		struct flexi_crypto_context *fctx;
-+	} cbc;
-+	struct crypto_ctx_hdr *cbchdr;
-+};
-+
- /**
-  * supported cipher list
-  */
-@@ -105,6 +115,18 @@ static void nitrox_cbc_cipher_callback(void *arg, int err)
- 	nitrox_skcipher_callback(arg, err);
- }
+ static void cc_cipher_complete(struct device *dev, void *cc_req, int err);
  
-+static void nitrox_cts_cipher_callback(void *arg, int err)
-+{
-+	struct skcipher_request *skreq = arg;
-+
-+	if (skreq->base.flags & CRYPTO_TFM_REQ_MORE) {
-+		nitrox_cbc_cipher_callback(arg, err);
-+		return;
-+	}
-+
-+	nitrox_skcipher_callback(arg, err);
-+}
-+
- static int nitrox_skcipher_init(struct crypto_skcipher *tfm)
+-static inline enum cc_key_type cc_key_type(struct crypto_tfm *tfm)
++static inline enum cc_key_type cc_key_type(struct crypto_skcipher *tfm)
  {
- 	struct nitrox_crypto_ctx *nctx = crypto_skcipher_ctx(tfm);
-@@ -162,6 +184,42 @@ static void nitrox_skcipher_exit(struct crypto_skcipher *tfm)
- 	nctx->ndev = NULL;
+-	struct cc_cipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
++	struct cc_cipher_ctx *ctx_p = crypto_skcipher_ctx(tfm);
+ 
+ 	return ctx_p->key_type;
+ }
+@@ -105,12 +105,26 @@ static int validate_keys_sizes(struct cc_cipher_ctx *ctx_p, u32 size)
+ 	return -EINVAL;
  }
  
-+static int nitrox_cts_init(struct crypto_skcipher *tfm)
+-static int validate_data_size(struct cc_cipher_ctx *ctx_p,
++static inline int req_cipher_mode(struct skcipher_request *req)
 +{
-+	struct nitrox_crypto_cts_ctx *ctsctx = crypto_skcipher_ctx(tfm);
-+	struct nitrox_crypto_ctx *nctx = &ctsctx->base;
-+	struct crypto_ctx_hdr *chdr;
-+	int err;
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct cc_cipher_ctx *ctx_p = crypto_skcipher_ctx(tfm);
++	int cipher_mode = ctx_p->cipher_mode;
 +
-+	err = nitrox_skcipher_init(tfm);
-+	if (err)
-+		return err;
++	if (cipher_mode == DRV_CIPHER_CBC_CTS &&
++	    req->base.flags & CRYPTO_TFM_REQ_MORE)
++		cipher_mode = DRV_CIPHER_CBC;
 +
-+	chdr = crypto_alloc_context(nctx->ndev);
-+	if (!chdr) {
-+		nitrox_skcipher_exit(tfm);
-+		return -ENOMEM;
-+	}
-+
-+	ctsctx->cbchdr = chdr;
-+	ctsctx->cbc.u8p = chdr->vaddr;
-+	ctsctx->cbc.u8p += sizeof(struct ctx_hdr);
-+	nctx->callback = nitrox_cts_cipher_callback;
-+	return 0;
++	return cipher_mode;
 +}
 +
-+static void nitrox_cts_exit(struct crypto_skcipher *tfm)
-+{
-+	struct nitrox_crypto_cts_ctx *ctsctx = crypto_skcipher_ctx(tfm);
-+	struct flexi_crypto_context *fctx = ctsctx->cbc.fctx;
-+
-+	memset(&fctx->crypto, 0, sizeof(struct crypto_keys));
-+	memset(&fctx->auth, 0, sizeof(struct auth_keys));
-+	crypto_free_context(ctsctx->cbchdr);
-+
-+	nitrox_skcipher_exit(tfm);
-+}
-+
- static inline int nitrox_skcipher_setkey(struct crypto_skcipher *cipher,
- 					 int aes_keylen, const u8 *key,
- 					 unsigned int keylen)
-@@ -244,7 +302,8 @@ static int alloc_dst_sglist(struct skcipher_request *skreq, int ivsize)
- 	return 0;
- }
- 
--static int nitrox_skcipher_crypt(struct skcipher_request *skreq, bool enc)
-+static int nitrox_skcipher_crypt_handle(struct skcipher_request *skreq,
-+					bool enc, u64 handle)
++static int validate_data_size(struct skcipher_request *req,
++			      struct cc_cipher_ctx *ctx_p,
+ 			      unsigned int size)
  {
- 	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(skreq);
- 	struct nitrox_crypto_ctx *nctx = crypto_skcipher_ctx(cipher);
-@@ -269,7 +328,7 @@ static int nitrox_skcipher_crypt(struct skcipher_request *skreq, bool enc)
- 	creq->gph.param2 = cpu_to_be16(ivsize);
- 	creq->gph.param3 = 0;
- 
--	creq->ctx_handle = nctx->u.ctx_handle;
-+	creq->ctx_handle = handle;
- 	creq->ctrl.s.ctxl = sizeof(struct flexi_crypto_context);
- 
- 	ret = alloc_src_sglist(skreq, ivsize);
-@@ -287,7 +346,16 @@ static int nitrox_skcipher_crypt(struct skcipher_request *skreq, bool enc)
- 					 skreq);
+ 	switch (ctx_p->flow_mode) {
+ 	case S_DIN_to_AES:
+-		switch (ctx_p->cipher_mode) {
++		switch (req_cipher_mode(req)) {
+ 		case DRV_CIPHER_XTS:
+ 		case DRV_CIPHER_CBC_CTS:
+ 			if (size >= AES_BLOCK_SIZE)
+@@ -508,17 +522,18 @@ static int cc_out_setup_mode(struct cc_cipher_ctx *ctx_p)
+ 	}
  }
  
--static int nitrox_cbc_decrypt(struct skcipher_request *skreq)
-+static int nitrox_skcipher_crypt(struct skcipher_request *skreq, bool enc)
-+{
-+	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(skreq);
-+	struct nitrox_crypto_ctx *nctx = crypto_skcipher_ctx(cipher);
-+
-+	return nitrox_skcipher_crypt_handle(skreq, enc, nctx->u.ctx_handle);
-+}
-+
-+static int nitrox_cbc_decrypt_handle(struct skcipher_request *skreq,
-+				     u64 handle)
+-static void cc_setup_readiv_desc(struct crypto_tfm *tfm,
++static void cc_setup_readiv_desc(struct skcipher_request *req,
+ 				 struct cipher_req_ctx *req_ctx,
+ 				 unsigned int ivsize, struct cc_hw_desc desc[],
+ 				 unsigned int *seq_size)
  {
- 	struct nitrox_kcrypt_request *nkreq = skcipher_request_ctx(skreq);
- 	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(skreq);
-@@ -297,14 +365,46 @@ static int nitrox_cbc_decrypt(struct skcipher_request *skreq)
- 	unsigned int start = skreq->cryptlen - ivsize;
+-	struct cc_cipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct cc_cipher_ctx *ctx_p = crypto_skcipher_ctx(tfm);
+ 	struct device *dev = drvdata_to_dev(ctx_p->drvdata);
+-	int cipher_mode = ctx_p->cipher_mode;
+ 	int flow_mode = cc_out_setup_mode(ctx_p);
+ 	int direction = req_ctx->gen_ctx.op_type;
+ 	dma_addr_t iv_dma_addr = req_ctx->gen_ctx.iv_dma_addr;
++	int cipher_mode = req_cipher_mode(req);
  
- 	if (skreq->src != skreq->dst)
--		return nitrox_skcipher_crypt(skreq, false);
-+		return nitrox_skcipher_crypt_handle(skreq, false, handle);
- 
- 	nkreq->iv_out = kmalloc(ivsize, flags);
- 	if (!nkreq->iv_out)
- 		return -ENOMEM;
- 
- 	scatterwalk_map_and_copy(nkreq->iv_out, skreq->src, start, ivsize, 0);
--	return nitrox_skcipher_crypt(skreq, false);
-+	return nitrox_skcipher_crypt_handle(skreq, false, handle);
-+}
-+
-+static int nitrox_cbc_decrypt(struct skcipher_request *skreq)
-+{
-+	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(skreq);
-+	struct nitrox_crypto_ctx *nctx = crypto_skcipher_ctx(cipher);
-+
-+	return nitrox_cbc_decrypt_handle(skreq, nctx->u.ctx_handle);
-+}
-+
-+static int nitrox_cts_encrypt(struct skcipher_request *skreq)
-+{
-+	if (skreq->base.flags & CRYPTO_TFM_REQ_MORE) {
-+		struct nitrox_crypto_cts_ctx *ctsctx;
-+
-+		ctsctx = crypto_skcipher_ctx(crypto_skcipher_reqtfm(skreq));
-+		return nitrox_skcipher_crypt_handle(skreq, true,
-+						    ctsctx->cbc.ctx_handle);
-+	}
-+
-+	return nitrox_skcipher_crypt(skreq, true);
-+}
-+
-+static int nitrox_cts_decrypt(struct skcipher_request *skreq)
-+{
-+	struct nitrox_crypto_cts_ctx *ctsctx;
-+
-+	if (!(skreq->base.flags & CRYPTO_TFM_REQ_MORE))
-+		return nitrox_skcipher_crypt(skreq, false);
-+
-+	ctsctx = crypto_skcipher_ctx(crypto_skcipher_reqtfm(skreq));
-+	return nitrox_cbc_decrypt_handle(skreq, ctsctx->cbc.ctx_handle);
+ 	if (ctx_p->key_type == CC_POLICY_PROTECTED_KEY)
+ 		return;
+@@ -565,15 +580,16 @@ static void cc_setup_readiv_desc(struct crypto_tfm *tfm,
  }
  
- static int nitrox_aes_encrypt(struct skcipher_request *skreq)
-@@ -484,19 +584,21 @@ static struct skcipher_alg nitrox_skciphers[] = { {
- 		.cra_driver_name = "n5_cts(cbc(aes))",
- 		.cra_priority = PRIO,
- 		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
--		.cra_blocksize = AES_BLOCK_SIZE,
--		.cra_ctxsize = sizeof(struct nitrox_crypto_ctx),
-+		.cra_blocksize = 1,
-+		.cra_ctxsize = sizeof(struct nitrox_crypto_cts_ctx),
- 		.cra_alignmask = 0,
- 		.cra_module = THIS_MODULE,
- 	},
- 	.min_keysize = AES_MIN_KEY_SIZE,
- 	.max_keysize = AES_MAX_KEY_SIZE,
- 	.ivsize = AES_BLOCK_SIZE,
-+	.chunksize = AES_BLOCK_SIZE,
-+	.final_chunksize = 2 * AES_BLOCK_SIZE,
- 	.setkey = nitrox_aes_setkey,
--	.encrypt = nitrox_aes_encrypt,
--	.decrypt = nitrox_aes_decrypt,
--	.init = nitrox_skcipher_init,
--	.exit = nitrox_skcipher_exit,
-+	.encrypt = nitrox_cts_encrypt,
-+	.decrypt = nitrox_cts_decrypt,
-+	.init = nitrox_cts_init,
-+	.exit = nitrox_cts_exit,
- }, {
- 	.base = {
- 		.cra_name = "cbc(des3_ede)",
+ 
+-static void cc_setup_state_desc(struct crypto_tfm *tfm,
++static void cc_setup_state_desc(struct skcipher_request *req,
+ 				 struct cipher_req_ctx *req_ctx,
+ 				 unsigned int ivsize, unsigned int nbytes,
+ 				 struct cc_hw_desc desc[],
+ 				 unsigned int *seq_size)
+ {
+-	struct cc_cipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct cc_cipher_ctx *ctx_p = crypto_skcipher_ctx(tfm);
+ 	struct device *dev = drvdata_to_dev(ctx_p->drvdata);
+-	int cipher_mode = ctx_p->cipher_mode;
++	int cipher_mode = req_cipher_mode(req);
+ 	int flow_mode = ctx_p->flow_mode;
+ 	int direction = req_ctx->gen_ctx.op_type;
+ 	dma_addr_t iv_dma_addr = req_ctx->gen_ctx.iv_dma_addr;
+@@ -610,15 +626,16 @@ static void cc_setup_state_desc(struct crypto_tfm *tfm,
+ }
+ 
+ 
+-static void cc_setup_xex_state_desc(struct crypto_tfm *tfm,
++static void cc_setup_xex_state_desc(struct skcipher_request *req,
+ 				 struct cipher_req_ctx *req_ctx,
+ 				 unsigned int ivsize, unsigned int nbytes,
+ 				 struct cc_hw_desc desc[],
+ 				 unsigned int *seq_size)
+ {
+-	struct cc_cipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct cc_cipher_ctx *ctx_p = crypto_skcipher_ctx(tfm);
+ 	struct device *dev = drvdata_to_dev(ctx_p->drvdata);
+-	int cipher_mode = ctx_p->cipher_mode;
++	int cipher_mode = req_cipher_mode(req);
+ 	int flow_mode = ctx_p->flow_mode;
+ 	int direction = req_ctx->gen_ctx.op_type;
+ 	dma_addr_t key_dma_addr = ctx_p->user.key_dma_addr;
+@@ -628,8 +645,8 @@ static void cc_setup_xex_state_desc(struct crypto_tfm *tfm,
+ 	unsigned int key_offset = key_len;
+ 
+ 	struct cc_crypto_alg *cc_alg =
+-		container_of(tfm->__crt_alg, struct cc_crypto_alg,
+-			     skcipher_alg.base);
++		container_of(crypto_skcipher_alg(tfm), struct cc_crypto_alg,
++			     skcipher_alg);
+ 
+ 	if (cc_alg->data_unit)
+ 		du_size = cc_alg->data_unit;
+@@ -697,14 +714,15 @@ static int cc_out_flow_mode(struct cc_cipher_ctx *ctx_p)
+ 	}
+ }
+ 
+-static void cc_setup_key_desc(struct crypto_tfm *tfm,
++static void cc_setup_key_desc(struct skcipher_request *req,
+ 			      struct cipher_req_ctx *req_ctx,
+ 			      unsigned int nbytes, struct cc_hw_desc desc[],
+ 			      unsigned int *seq_size)
+ {
+-	struct cc_cipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct cc_cipher_ctx *ctx_p = crypto_skcipher_ctx(tfm);
+ 	struct device *dev = drvdata_to_dev(ctx_p->drvdata);
+-	int cipher_mode = ctx_p->cipher_mode;
++	int cipher_mode = req_cipher_mode(req);
+ 	int flow_mode = ctx_p->flow_mode;
+ 	int direction = req_ctx->gen_ctx.op_type;
+ 	dma_addr_t key_dma_addr = ctx_p->user.key_dma_addr;
+@@ -912,7 +930,7 @@ static int cc_cipher_process(struct skcipher_request *req,
+ 
+ 	/* STAT_PHASE_0: Init and sanity checks */
+ 
+-	if (validate_data_size(ctx_p, nbytes)) {
++	if (validate_data_size(req, ctx_p, nbytes)) {
+ 		dev_dbg(dev, "Unsupported data size %d.\n", nbytes);
+ 		rc = -EINVAL;
+ 		goto exit_process;
+@@ -969,17 +987,17 @@ static int cc_cipher_process(struct skcipher_request *req,
+ 	/* STAT_PHASE_2: Create sequence */
+ 
+ 	/* Setup state (IV)  */
+-	cc_setup_state_desc(tfm, req_ctx, ivsize, nbytes, desc, &seq_len);
++	cc_setup_state_desc(req, req_ctx, ivsize, nbytes, desc, &seq_len);
+ 	/* Setup MLLI line, if needed */
+ 	cc_setup_mlli_desc(tfm, req_ctx, dst, src, nbytes, req, desc, &seq_len);
+ 	/* Setup key */
+-	cc_setup_key_desc(tfm, req_ctx, nbytes, desc, &seq_len);
++	cc_setup_key_desc(req, req_ctx, nbytes, desc, &seq_len);
+ 	/* Setup state (IV and XEX key)  */
+-	cc_setup_xex_state_desc(tfm, req_ctx, ivsize, nbytes, desc, &seq_len);
++	cc_setup_xex_state_desc(req, req_ctx, ivsize, nbytes, desc, &seq_len);
+ 	/* Data processing */
+ 	cc_setup_flow_desc(tfm, req_ctx, dst, src, nbytes, desc, &seq_len);
+ 	/* Read next IV */
+-	cc_setup_readiv_desc(tfm, req_ctx, ivsize, desc, &seq_len);
++	cc_setup_readiv_desc(req, req_ctx, ivsize, desc, &seq_len);
+ 
+ 	/* STAT_PHASE_3: Lock HW and push sequence */
+ 
+@@ -1113,7 +1131,7 @@ static const struct cc_alg_template skcipher_algs[] = {
+ 	{
+ 		.name = "cts(cbc(paes))",
+ 		.driver_name = "cts-cbc-paes-ccree",
+-		.blocksize = AES_BLOCK_SIZE,
++		.blocksize = 1,
+ 		.template_skcipher = {
+ 			.setkey = cc_cipher_sethkey,
+ 			.encrypt = cc_cipher_encrypt,
+@@ -1121,6 +1139,8 @@ static const struct cc_alg_template skcipher_algs[] = {
+ 			.min_keysize = CC_HW_KEY_SIZE,
+ 			.max_keysize = CC_HW_KEY_SIZE,
+ 			.ivsize = AES_BLOCK_SIZE,
++			.chunksize = AES_BLOCK_SIZE,
++			.final_chunksize = 2 * AES_BLOCK_SIZE,
+ 			},
+ 		.cipher_mode = DRV_CIPHER_CBC_CTS,
+ 		.flow_mode = S_DIN_to_AES,
+@@ -1238,7 +1258,7 @@ static const struct cc_alg_template skcipher_algs[] = {
+ 	{
+ 		.name = "cts(cbc(aes))",
+ 		.driver_name = "cts-cbc-aes-ccree",
+-		.blocksize = AES_BLOCK_SIZE,
++		.blocksize = 1,
+ 		.template_skcipher = {
+ 			.setkey = cc_cipher_setkey,
+ 			.encrypt = cc_cipher_encrypt,
+@@ -1246,6 +1266,8 @@ static const struct cc_alg_template skcipher_algs[] = {
+ 			.min_keysize = AES_MIN_KEY_SIZE,
+ 			.max_keysize = AES_MAX_KEY_SIZE,
+ 			.ivsize = AES_BLOCK_SIZE,
++			.chunksize = AES_BLOCK_SIZE,
++			.final_chunksize = 2 * AES_BLOCK_SIZE,
+ 			},
+ 		.cipher_mode = DRV_CIPHER_CBC_CTS,
+ 		.flow_mode = S_DIN_to_AES,
