@@ -1,63 +1,339 @@
-Return-Path: <SRS0=C5/f=BG=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=t+Y3=BH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24EBDC433E0
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 19:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E67EC433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 04:04:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0725206E7
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jul 2020 19:48:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0394920775
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 04:04:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727088AbgG0TsH (ORCPT
+        id S1725967AbgG1EEv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jul 2020 15:48:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59898 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726905AbgG0TsH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jul 2020 15:48:07 -0400
-Received: from shards.monkeyblade.net (shards.monkeyblade.net [IPv6:2620:137:e000::1:9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8B6C061794;
-        Mon, 27 Jul 2020 12:48:07 -0700 (PDT)
-Received: from localhost (unknown [IPv6:2601:601:9f00:477::3d5])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id 952AE12777700;
-        Mon, 27 Jul 2020 12:31:21 -0700 (PDT)
-Date:   Mon, 27 Jul 2020 12:48:05 -0700 (PDT)
-Message-Id: <20200727.124805.2057195688758273552.davem@davemloft.net>
-To:     schalla@marvell.com
-Cc:     herbert@gondor.apana.org.au, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, schandran@marvell.com,
-        pathreya@marvell.com, sgoutham@marvell.com
-Subject: Re: [PATCH 2/4] drivers: crypto: add support for OCTEONTX2 CPT
- engine
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <BYAPR18MB2821DDBE4F651E423791C422A0720@BYAPR18MB2821.namprd18.prod.outlook.com>
-References: <1595596084-29809-3-git-send-email-schalla@marvell.com>
-        <20200724.201457.2120372254880301593.davem@davemloft.net>
-        <BYAPR18MB2821DDBE4F651E423791C422A0720@BYAPR18MB2821.namprd18.prod.outlook.com>
-X-Mailer: Mew version 6.8 on Emacs 26.3
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Mon, 27 Jul 2020 12:31:21 -0700 (PDT)
+        Tue, 28 Jul 2020 00:04:51 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:53944 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725919AbgG1EEv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Jul 2020 00:04:51 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1k0Gr8-0002DV-Tc; Tue, 28 Jul 2020 14:04:48 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 28 Jul 2020 14:04:46 +1000
+Date:   Tue, 28 Jul 2020 14:04:46 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: ccree - Delete non-standard algorithms
+Message-ID: <20200728040446.GA12763@gondor.apana.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Srujana Challa <schalla@marvell.com>
-Date: Mon, 27 Jul 2020 14:12:46 +0000
+This patch deletes non-standard algorithms such as essiv512 and
+essiv4096 which have no corresponding generic implementation.
 
-> On our test setup, the build is always successful, as we are adding
-> "af/" subdirectory in ccflags list ([PATCH 4/4] crypto: marvell:
-> enable OcteonTX2 cpt options for build).
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-A patch series must be fully bisectable, the tree must build properly
-at every step of the way.
+diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
+index f5b75b6d9ad4a..83567b60d6908 100644
+--- a/drivers/crypto/ccree/cc_cipher.c
++++ b/drivers/crypto/ccree/cc_cipher.c
+@@ -1056,44 +1056,6 @@ static const struct cc_alg_template skcipher_algs[] = {
+ 		.std_body = CC_STD_NIST,
+ 		.sec_func = true,
+ 	},
+-	{
+-		.name = "xts512(paes)",
+-		.driver_name = "xts-paes-du512-ccree",
+-		.blocksize = 1,
+-		.template_skcipher = {
+-			.setkey = cc_cipher_sethkey,
+-			.encrypt = cc_cipher_encrypt,
+-			.decrypt = cc_cipher_decrypt,
+-			.min_keysize = CC_HW_KEY_SIZE,
+-			.max_keysize = CC_HW_KEY_SIZE,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.cipher_mode = DRV_CIPHER_XTS,
+-		.flow_mode = S_DIN_to_AES,
+-		.data_unit = 512,
+-		.min_hw_rev = CC_HW_REV_712,
+-		.std_body = CC_STD_NIST,
+-		.sec_func = true,
+-	},
+-	{
+-		.name = "xts4096(paes)",
+-		.driver_name = "xts-paes-du4096-ccree",
+-		.blocksize = 1,
+-		.template_skcipher = {
+-			.setkey = cc_cipher_sethkey,
+-			.encrypt = cc_cipher_encrypt,
+-			.decrypt = cc_cipher_decrypt,
+-			.min_keysize = CC_HW_KEY_SIZE,
+-			.max_keysize = CC_HW_KEY_SIZE,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.cipher_mode = DRV_CIPHER_XTS,
+-		.flow_mode = S_DIN_to_AES,
+-		.data_unit = 4096,
+-		.min_hw_rev = CC_HW_REV_712,
+-		.std_body = CC_STD_NIST,
+-		.sec_func = true,
+-	},
+ 	{
+ 		.name = "essiv(cbc(paes),sha256)",
+ 		.driver_name = "essiv-paes-ccree",
+@@ -1112,100 +1074,6 @@ static const struct cc_alg_template skcipher_algs[] = {
+ 		.std_body = CC_STD_NIST,
+ 		.sec_func = true,
+ 	},
+-	{
+-		.name = "essiv512(cbc(paes),sha256)",
+-		.driver_name = "essiv-paes-du512-ccree",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.template_skcipher = {
+-			.setkey = cc_cipher_sethkey,
+-			.encrypt = cc_cipher_encrypt,
+-			.decrypt = cc_cipher_decrypt,
+-			.min_keysize = CC_HW_KEY_SIZE,
+-			.max_keysize = CC_HW_KEY_SIZE,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.cipher_mode = DRV_CIPHER_ESSIV,
+-		.flow_mode = S_DIN_to_AES,
+-		.data_unit = 512,
+-		.min_hw_rev = CC_HW_REV_712,
+-		.std_body = CC_STD_NIST,
+-		.sec_func = true,
+-	},
+-	{
+-		.name = "essiv4096(cbc(paes),sha256)",
+-		.driver_name = "essiv-paes-du4096-ccree",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.template_skcipher = {
+-			.setkey = cc_cipher_sethkey,
+-			.encrypt = cc_cipher_encrypt,
+-			.decrypt = cc_cipher_decrypt,
+-			.min_keysize = CC_HW_KEY_SIZE,
+-			.max_keysize = CC_HW_KEY_SIZE,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.cipher_mode = DRV_CIPHER_ESSIV,
+-		.flow_mode = S_DIN_to_AES,
+-		.data_unit = 4096,
+-		.min_hw_rev = CC_HW_REV_712,
+-		.std_body = CC_STD_NIST,
+-		.sec_func = true,
+-	},
+-	{
+-		.name = "bitlocker(paes)",
+-		.driver_name = "bitlocker-paes-ccree",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.template_skcipher = {
+-			.setkey = cc_cipher_sethkey,
+-			.encrypt = cc_cipher_encrypt,
+-			.decrypt = cc_cipher_decrypt,
+-			.min_keysize = CC_HW_KEY_SIZE,
+-			.max_keysize = CC_HW_KEY_SIZE,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.cipher_mode = DRV_CIPHER_BITLOCKER,
+-		.flow_mode = S_DIN_to_AES,
+-		.min_hw_rev = CC_HW_REV_712,
+-		.std_body = CC_STD_NIST,
+-		.sec_func = true,
+-	},
+-	{
+-		.name = "bitlocker512(paes)",
+-		.driver_name = "bitlocker-paes-du512-ccree",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.template_skcipher = {
+-			.setkey = cc_cipher_sethkey,
+-			.encrypt = cc_cipher_encrypt,
+-			.decrypt = cc_cipher_decrypt,
+-			.min_keysize = CC_HW_KEY_SIZE,
+-			.max_keysize = CC_HW_KEY_SIZE,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.cipher_mode = DRV_CIPHER_BITLOCKER,
+-		.flow_mode = S_DIN_to_AES,
+-		.data_unit = 512,
+-		.min_hw_rev = CC_HW_REV_712,
+-		.std_body = CC_STD_NIST,
+-		.sec_func = true,
+-	},
+-	{
+-		.name = "bitlocker4096(paes)",
+-		.driver_name = "bitlocker-paes-du4096-ccree",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.template_skcipher = {
+-			.setkey = cc_cipher_sethkey,
+-			.encrypt = cc_cipher_encrypt,
+-			.decrypt = cc_cipher_decrypt,
+-			.min_keysize = CC_HW_KEY_SIZE,
+-			.max_keysize =  CC_HW_KEY_SIZE,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.cipher_mode = DRV_CIPHER_BITLOCKER,
+-		.flow_mode = S_DIN_to_AES,
+-		.data_unit = 4096,
+-		.min_hw_rev = CC_HW_REV_712,
+-		.std_body = CC_STD_NIST,
+-		.sec_func = true,
+-	},
+ 	{
+ 		.name = "ecb(paes)",
+ 		.driver_name = "ecb-paes-ccree",
+@@ -1319,42 +1187,6 @@ static const struct cc_alg_template skcipher_algs[] = {
+ 		.min_hw_rev = CC_HW_REV_630,
+ 		.std_body = CC_STD_NIST,
+ 	},
+-	{
+-		.name = "xts512(aes)",
+-		.driver_name = "xts-aes-du512-ccree",
+-		.blocksize = 1,
+-		.template_skcipher = {
+-			.setkey = cc_cipher_setkey,
+-			.encrypt = cc_cipher_encrypt,
+-			.decrypt = cc_cipher_decrypt,
+-			.min_keysize = AES_MIN_KEY_SIZE * 2,
+-			.max_keysize = AES_MAX_KEY_SIZE * 2,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.cipher_mode = DRV_CIPHER_XTS,
+-		.flow_mode = S_DIN_to_AES,
+-		.data_unit = 512,
+-		.min_hw_rev = CC_HW_REV_712,
+-		.std_body = CC_STD_NIST,
+-	},
+-	{
+-		.name = "xts4096(aes)",
+-		.driver_name = "xts-aes-du4096-ccree",
+-		.blocksize = 1,
+-		.template_skcipher = {
+-			.setkey = cc_cipher_setkey,
+-			.encrypt = cc_cipher_encrypt,
+-			.decrypt = cc_cipher_decrypt,
+-			.min_keysize = AES_MIN_KEY_SIZE * 2,
+-			.max_keysize = AES_MAX_KEY_SIZE * 2,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.cipher_mode = DRV_CIPHER_XTS,
+-		.flow_mode = S_DIN_to_AES,
+-		.data_unit = 4096,
+-		.min_hw_rev = CC_HW_REV_712,
+-		.std_body = CC_STD_NIST,
+-	},
+ 	{
+ 		.name = "essiv(cbc(aes),sha256)",
+ 		.driver_name = "essiv-aes-ccree",
+@@ -1372,95 +1204,6 @@ static const struct cc_alg_template skcipher_algs[] = {
+ 		.min_hw_rev = CC_HW_REV_712,
+ 		.std_body = CC_STD_NIST,
+ 	},
+-	{
+-		.name = "essiv512(cbc(aes),sha256)",
+-		.driver_name = "essiv-aes-du512-ccree",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.template_skcipher = {
+-			.setkey = cc_cipher_setkey,
+-			.encrypt = cc_cipher_encrypt,
+-			.decrypt = cc_cipher_decrypt,
+-			.min_keysize = AES_MIN_KEY_SIZE,
+-			.max_keysize = AES_MAX_KEY_SIZE,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.cipher_mode = DRV_CIPHER_ESSIV,
+-		.flow_mode = S_DIN_to_AES,
+-		.data_unit = 512,
+-		.min_hw_rev = CC_HW_REV_712,
+-		.std_body = CC_STD_NIST,
+-	},
+-	{
+-		.name = "essiv4096(cbc(aes),sha256)",
+-		.driver_name = "essiv-aes-du4096-ccree",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.template_skcipher = {
+-			.setkey = cc_cipher_setkey,
+-			.encrypt = cc_cipher_encrypt,
+-			.decrypt = cc_cipher_decrypt,
+-			.min_keysize = AES_MIN_KEY_SIZE,
+-			.max_keysize = AES_MAX_KEY_SIZE,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.cipher_mode = DRV_CIPHER_ESSIV,
+-		.flow_mode = S_DIN_to_AES,
+-		.data_unit = 4096,
+-		.min_hw_rev = CC_HW_REV_712,
+-		.std_body = CC_STD_NIST,
+-	},
+-	{
+-		.name = "bitlocker(aes)",
+-		.driver_name = "bitlocker-aes-ccree",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.template_skcipher = {
+-			.setkey = cc_cipher_setkey,
+-			.encrypt = cc_cipher_encrypt,
+-			.decrypt = cc_cipher_decrypt,
+-			.min_keysize = AES_MIN_KEY_SIZE * 2,
+-			.max_keysize = AES_MAX_KEY_SIZE * 2,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.cipher_mode = DRV_CIPHER_BITLOCKER,
+-		.flow_mode = S_DIN_to_AES,
+-		.min_hw_rev = CC_HW_REV_712,
+-		.std_body = CC_STD_NIST,
+-	},
+-	{
+-		.name = "bitlocker512(aes)",
+-		.driver_name = "bitlocker-aes-du512-ccree",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.template_skcipher = {
+-			.setkey = cc_cipher_setkey,
+-			.encrypt = cc_cipher_encrypt,
+-			.decrypt = cc_cipher_decrypt,
+-			.min_keysize = AES_MIN_KEY_SIZE * 2,
+-			.max_keysize = AES_MAX_KEY_SIZE * 2,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.cipher_mode = DRV_CIPHER_BITLOCKER,
+-		.flow_mode = S_DIN_to_AES,
+-		.data_unit = 512,
+-		.min_hw_rev = CC_HW_REV_712,
+-		.std_body = CC_STD_NIST,
+-	},
+-	{
+-		.name = "bitlocker4096(aes)",
+-		.driver_name = "bitlocker-aes-du4096-ccree",
+-		.blocksize = AES_BLOCK_SIZE,
+-		.template_skcipher = {
+-			.setkey = cc_cipher_setkey,
+-			.encrypt = cc_cipher_encrypt,
+-			.decrypt = cc_cipher_decrypt,
+-			.min_keysize = AES_MIN_KEY_SIZE * 2,
+-			.max_keysize = AES_MAX_KEY_SIZE * 2,
+-			.ivsize = AES_BLOCK_SIZE,
+-			},
+-		.cipher_mode = DRV_CIPHER_BITLOCKER,
+-		.flow_mode = S_DIN_to_AES,
+-		.data_unit = 4096,
+-		.min_hw_rev = CC_HW_REV_712,
+-		.std_body = CC_STD_NIST,
+-	},
+ 	{
+ 		.name = "ecb(aes)",
+ 		.driver_name = "ecb-aes-ccree",
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
