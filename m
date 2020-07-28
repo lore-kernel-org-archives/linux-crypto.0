@@ -2,82 +2,64 @@ Return-Path: <SRS0=t+Y3=BH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36FAAC433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 17:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7770AC433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 17:22:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0FD3520825
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 17:19:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1595956764;
-	bh=3IPvPPUwh/V5phVrdIt3i+dOW1vDse+nM3m3QLusr8k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=a5u3BCr4MJrln/XG3AQ4znaN7Lu/rEg+EJ+fom/RrjdMLiJzDQuOYg9Pula/a7nCj
-	 oufC8H5YJZsi++4g7qa8sPtDksEUirmM8uom8bSHnzzO9DsDf8w5Q/DRcKuf7YdDJM
-	 a1Q+VH2ENjt6d0GUT6He4uV6hxczGbDMC/9nxBjs=
+	by mail.kernel.org (Postfix) with ESMTP id 5F56020786
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 17:22:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731935AbgG1RTX (ORCPT
+        id S1731779AbgG1RWs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Jul 2020 13:19:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38596 "EHLO mail.kernel.org"
+        Tue, 28 Jul 2020 13:22:48 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:56276 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731903AbgG1RTX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Jul 2020 13:19:23 -0400
-Received: from gmail.com (unknown [104.132.1.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C24F920809;
-        Tue, 28 Jul 2020 17:19:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595956762;
-        bh=3IPvPPUwh/V5phVrdIt3i+dOW1vDse+nM3m3QLusr8k=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=DIVjKZ+LWRi04DGLfkRWx9bxABM7YlvrHWgVB84qhou2jbPWp84SllEFt6R/tpisf
-         XdNgBuEtwtmU3F/rNjsrMDR7XQpqWP6TtexlrhLoy28dcenNna3jsVbfBseWwUa8el
-         NTsf6Em76wqWer3xA57PlM+UhDOHQh7gY6XtmNz0=
-Date:   Tue, 28 Jul 2020 10:19:21 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+        id S1731684AbgG1RWs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Jul 2020 13:22:48 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1k0TJH-0001fV-La; Wed, 29 Jul 2020 03:22:40 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 29 Jul 2020 03:22:39 +1000
+Date:   Wed, 29 Jul 2020 03:22:39 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     Ard Biesheuvel <ardb@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [v3 PATCH 0/31] crypto: skcipher - Add support for no chaining
- and partial chaining
-Message-ID: <20200728171921.GC4053562@gmail.com>
+Subject: Re: [v3 PATCH 1/31] crypto: skcipher - Add final chunk size field
+ for chaining
+Message-ID: <20200728172239.GA3539@gondor.apana.org.au>
 References: <20200728071746.GA22352@gondor.apana.org.au>
+ <E1k0Jsl-0006Ho-Gf@fornost.hmeau.com>
+ <20200728171512.GB4053562@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200728071746.GA22352@gondor.apana.org.au>
+In-Reply-To: <20200728171512.GB4053562@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 28, 2020 at 05:17:46PM +1000, Herbert Xu wrote:
-> This patch-set adds support to the Crypto API and algif_skcipher
-> for algorithms that cannot be chained, as well as ones that can
-> be chained if you withhold a certain number of blocks at the end.
-> 
-> The vast majority of algorithms can be chained already, e.g., cbc
-> and lrw.  Everything else can either be modified to support chaining,
-> e.g., chacha and xts, or they cannot chain at all, e.g., keywrap.
-> 
-> Some drivers that implement algorithms which can be chained with
-> modification may not be able to support chaining due to hardware
-> limitations.  For now they're treated the same way as ones that
-> cannot be chained at all.
-> 
-> The algorithm arc4 has been left out of all this owing to ongoing
-> discussions regarding its future.
-> 
+On Tue, Jul 28, 2020 at 10:15:12AM -0700, Eric Biggers wrote:
+>
+> Shouldn't chaining be disabled by default?  This is inviting bugs where drivers
+> don't implement chaining, but leave final_chunksize unset (0) which apparently
+> indicates that chaining is supported.
 
-Can you elaborate on the use case for supporting chaining on algorithms that
-don't currently support it?
+I've gone through everything and the majority of algorithms do
+support chaining so I think defaulting to on makes more sense.
 
-Also, the self-tests need to be updated to test all this.
+For now we have some algorithms that can be chained but the drivers
+do not allow it, this is not something that I'd like to see in
+new drivers.
 
-- Eric
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
