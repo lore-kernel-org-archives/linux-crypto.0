@@ -2,94 +2,111 @@ Return-Path: <SRS0=t+Y3=BH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06CC3C433E3
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 17:10:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39E57C433EA
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 17:11:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CF5AD207F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 17:10:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1AC3920825
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 17:11:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1595956238;
-	bh=mARbbccibp0w+1VVZDf+WZpyqmdv+vpiA7azcsNO8a8=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=sQZ8ogT3AstjDnTAHze8h8QP6dmwo4zWUXoLoXGISD9kHzIxEaX+g20Oo0KO0vT2O
-	 hNBGIWwxlGze9RoDaB1J1upMv72s7YAqd+xuhTjJxxaDg2gDWO1zVYIJkONhMSS6fb
-	 88vyb/kmcPVqQDjTsD3grGdbcy8JXOW6aubSr4Tk=
+	s=default; t=1595956262;
+	bh=9oxBzkq/ZEInOnc0uPmHumJaSd4D/57DBn/RH9M+6Hk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=ourQqhKQT/s1qUGzbJLggh18daP/LNLyul0TmngnzigjKXZDvCcGmKwpplRoyaI3A
+	 xV6WJ5dr3x9mjb5tmTT0l5LmqQBZRp7waCaEziY7LAvdYB7R0y6iFjxKVi7SB/34sw
+	 xwlnvfGCvwuPe2LN+P0oh2i8rfxpcfccP/Ikdr3I=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731705AbgG1RKf (ORCPT
+        id S1731673AbgG1RLB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Jul 2020 13:10:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35624 "EHLO mail.kernel.org"
+        Tue, 28 Jul 2020 13:11:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35848 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731070AbgG1RKf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Jul 2020 13:10:35 -0400
-Received: from kozik-lap.mshome.net (unknown [194.230.155.213])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1731070AbgG1RLB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Jul 2020 13:11:01 -0400
+Received: from gmail.com (unknown [104.132.1.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DAE9720786;
-        Tue, 28 Jul 2020 17:10:32 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C70AA20792;
+        Tue, 28 Jul 2020 17:11:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1595956234;
-        bh=mARbbccibp0w+1VVZDf+WZpyqmdv+vpiA7azcsNO8a8=;
-        h=From:To:Cc:Subject:Date:From;
-        b=fI3JZFQU/DE0fiQGD5XtPP7NbgOcOz4Pbe0pd7kESFcTknNCtEKsN4v7TSW7fI4Al
-         EhJHUGBwWYr4Yyp6Vh9Ts7oT7mVdGxNUBlgJkQpacyzv+lCQ/GNWlWAmLyoHij5znj
-         iak0V6ZhN+/6TAWVfMJ0/EaM0XOQUKsG1iMEMvwI=
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-To:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH] KEYS: asymmetric: Fix kerneldoc
-Date:   Tue, 28 Jul 2020 19:10:29 +0200
-Message-Id: <20200728171029.28525-1-krzk@kernel.org>
-X-Mailer: git-send-email 2.17.1
+        s=default; t=1595956260;
+        bh=9oxBzkq/ZEInOnc0uPmHumJaSd4D/57DBn/RH9M+6Hk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=EQRKg/D4BACeVW3NqOfhky6tjofxHWFF2l0D/aSaLuqoYbqFsWIp8xuI8pmykoi/g
+         DkZkDCz+hWGbaQVC+v0dof4M5np/MZmFTHb+MJiwibC2Y73miqxvnwo3Z+K9k//GlL
+         z/klIids6Ejcv34JlAqvJD/Falb6eb+TUF/g4vYY=
+Date:   Tue, 28 Jul 2020 10:10:59 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Stephan Mueller <smueller@chronox.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [v3 PATCH 8/31] crypto: skcipher - Initialise requests to zero
+Message-ID: <20200728171059.GA4053562@gmail.com>
+References: <20200728071746.GA22352@gondor.apana.org.au>
+ <E1k0Jt1-0006LB-SV@fornost.hmeau.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1k0Jt1-0006LB-SV@fornost.hmeau.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix W=1 compile warnings (invalid kerneldoc):
+On Tue, Jul 28, 2020 at 05:18:55PM +1000, Herbert Xu wrote:
+> This patch initialises skcipher requests to zero.  This allows
+> algorithms to distinguish between the first operation versus
+> subsequent ones.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+> 
+>  include/crypto/skcipher.h |   18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
+> 
+> diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+> index c46ea1c157b29..6db5f83d6e482 100644
+> --- a/include/crypto/skcipher.h
+> +++ b/include/crypto/skcipher.h
+> @@ -129,13 +129,14 @@ struct skcipher_alg {
+>   * This performs a type-check against the "tfm" argument to make sure
+>   * all users have the correct skcipher tfm for doing on-stack requests.
+>   */
+> -#define SYNC_SKCIPHER_REQUEST_ON_STACK(name, tfm) \
+> -	char __##name##_desc[sizeof(struct skcipher_request) + \
+> -			     MAX_SYNC_SKCIPHER_REQSIZE + \
+> -			     (!(sizeof((struct crypto_sync_skcipher *)1 == \
+> -				       (typeof(tfm))1))) \
+> -			    ] CRYPTO_MINALIGN_ATTR; \
+> -	struct skcipher_request *name = (void *)__##name##_desc
+> +#define SYNC_SKCIPHER_REQUEST_ON_STACK(name, sync) \
+> +	struct { \
+> +		struct skcipher_request req; \
+> +		char ext[MAX_SYNC_SKCIPHER_REQSIZE]; \
+> +	} __##name##_desc = { \
+> +		.req.base.tfm = crypto_skcipher_tfm(&sync->base), \
+> +	}; \
+> +	struct skcipher_request *name = &__##name##_desc.req
+>  
+>  /**
+>   * DOC: Symmetric Key Cipher API
+> @@ -519,8 +520,7 @@ static inline struct skcipher_request *skcipher_request_alloc(
+>  {
+>  	struct skcipher_request *req;
+>  
+> -	req = kmalloc(sizeof(struct skcipher_request) +
+> -		      crypto_skcipher_reqsize(tfm), gfp);
+> +	req = kzalloc(sizeof(*req) + crypto_skcipher_reqsize(tfm), gfp);
+>  
+>  	if (likely(req))
+>  		skcipher_request_set_tfm(req, tfm);
 
-    crypto/asymmetric_keys/asymmetric_type.c:160: warning: Function parameter or member 'kid1' not described in 'asymmetric_key_id_same'
-    crypto/asymmetric_keys/asymmetric_type.c:160: warning: Function parameter or member 'kid2' not described in 'asymmetric_key_id_same'
-    crypto/asymmetric_keys/asymmetric_type.c:160: warning: Excess function parameter 'kid_1' description in 'asymmetric_key_id_same'
-    crypto/asymmetric_keys/asymmetric_type.c:160: warning: Excess function parameter 'kid_2' description in 'asymmetric_key_id_same'
+Does this really work?  Some users allocate memory themselves without using
+*_request_alloc().
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- crypto/asymmetric_keys/asymmetric_type.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
-index 33e77d846caa..ad8af3d70ac0 100644
---- a/crypto/asymmetric_keys/asymmetric_type.c
-+++ b/crypto/asymmetric_keys/asymmetric_type.c
-@@ -152,7 +152,8 @@ EXPORT_SYMBOL_GPL(asymmetric_key_generate_id);
- 
- /**
-  * asymmetric_key_id_same - Return true if two asymmetric keys IDs are the same.
-- * @kid_1, @kid_2: The key IDs to compare
-+ * @kid1: The key ID to compare
-+ * @kid2: The key ID to compare
-  */
- bool asymmetric_key_id_same(const struct asymmetric_key_id *kid1,
- 			    const struct asymmetric_key_id *kid2)
-@@ -168,7 +169,8 @@ EXPORT_SYMBOL_GPL(asymmetric_key_id_same);
- /**
-  * asymmetric_key_id_partial - Return true if two asymmetric keys IDs
-  * partially match
-- * @kid_1, @kid_2: The key IDs to compare
-+ * @kid1: The key ID to compare
-+ * @kid2: The key ID to compare
-  */
- bool asymmetric_key_id_partial(const struct asymmetric_key_id *kid1,
- 			       const struct asymmetric_key_id *kid2)
--- 
-2.17.1
-
+- Eric
