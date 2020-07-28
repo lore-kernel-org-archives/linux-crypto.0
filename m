@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C36B1C433F7
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:19:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C9EDC433F4
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:19:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7028207E8
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:19:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8709B21744
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:19:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727849AbgG1HTG (ORCPT
+        id S1727929AbgG1HTD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Jul 2020 03:19:06 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:54804 "EHLO fornost.hmeau.com"
+        Tue, 28 Jul 2020 03:19:03 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:54798 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727852AbgG1HTF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Jul 2020 03:19:05 -0400
+        id S1727924AbgG1HTD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Jul 2020 03:19:03 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1k0Jt8-0006Mx-Tq; Tue, 28 Jul 2020 17:19:04 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 28 Jul 2020 17:19:02 +1000
+        id 1k0Jt6-0006MN-FB; Tue, 28 Jul 2020 17:19:01 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 28 Jul 2020 17:19:00 +1000
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Tue, 28 Jul 2020 17:19:02 +1000
-Subject: [v3 PATCH 11/31] crypto: arm/chacha - Add support for chaining
+Date:   Tue, 28 Jul 2020 17:19:00 +1000
+Subject: [v3 PATCH 10/31] crypto: chacha-generic - Add support for chaining
 References: <20200728071746.GA22352@gondor.apana.org.au>
 To:     Ard Biesheuvel <ardb@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Eric Biggers <ebiggers@kernel.org>
-Message-Id: <E1k0Jt8-0006Mx-Tq@fornost.hmeau.com>
+Message-Id: <E1k0Jt6-0006MN-FB@fornost.hmeau.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -45,31 +45,29 @@ the CRYPTO_TFM_REQ_MORE flag is set.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- arch/arm/crypto/chacha-glue.c |   48 ++++++++++++++++++++++++++++--------------
- 1 file changed, 32 insertions(+), 16 deletions(-)
+ crypto/chacha_generic.c          |   43 +++++++++++++++++++++++++--------------
+ include/crypto/internal/chacha.h |    8 ++++++-
+ 2 files changed, 35 insertions(+), 16 deletions(-)
 
-diff --git a/arch/arm/crypto/chacha-glue.c b/arch/arm/crypto/chacha-glue.c
-index 59da6c0b63b62..7f753fc54137a 100644
---- a/arch/arm/crypto/chacha-glue.c
-+++ b/arch/arm/crypto/chacha-glue.c
-@@ -7,10 +7,8 @@
-  * Copyright (C) 2015 Martin Willi
+diff --git a/crypto/chacha_generic.c b/crypto/chacha_generic.c
+index 8beea79ab1178..f74ac54d7aa5b 100644
+--- a/crypto/chacha_generic.c
++++ b/crypto/chacha_generic.c
+@@ -6,22 +6,21 @@
+  * Copyright (C) 2018 Google LLC
   */
  
+-#include <asm/unaligned.h>
 -#include <crypto/algapi.h>
  #include <crypto/internal/chacha.h>
- #include <crypto/internal/simd.h>
 -#include <crypto/internal/skcipher.h>
- #include <linux/jump_label.h>
- #include <linux/kernel.h>
++#include <linux/kernel.h>
  #include <linux/module.h>
-@@ -106,16 +104,16 @@ void chacha_crypt_arch(u32 *state, u8 *dst, const u8 *src, unsigned int bytes,
- EXPORT_SYMBOL(chacha_crypt_arch);
++#include <linux/string.h>
  
- static int chacha_stream_xor(struct skcipher_request *req,
--			     const struct chacha_ctx *ctx, const u8 *iv,
--			     bool neon)
-+			     int nrounds, bool neon)
+-static int chacha_stream_xor(struct skcipher_request *req,
+-			     const struct chacha_ctx *ctx, const u8 *iv)
++static int chacha_stream_xor(struct skcipher_request *req, int nrounds)
  {
 +	struct chacha_reqctx *rctx = skcipher_request_ctx(req);
  	struct skcipher_walk walk;
@@ -85,38 +83,30 @@ index 59da6c0b63b62..7f753fc54137a 100644
  
  	while (walk.nbytes > 0) {
  		unsigned int nbytes = walk.nbytes;
-@@ -125,12 +123,12 @@ static int chacha_stream_xor(struct skcipher_request *req,
+@@ -30,7 +29,7 @@ static int chacha_stream_xor(struct skcipher_request *req,
+ 			nbytes = round_down(nbytes, CHACHA_BLOCK_SIZE);
  
- 		if (!IS_ENABLED(CONFIG_KERNEL_MODE_NEON) || !neon) {
- 			chacha_doarm(walk.dst.virt.addr, walk.src.virt.addr,
--				     nbytes, state, ctx->nrounds);
-+				     nbytes, state, nrounds);
- 			state[12] += DIV_ROUND_UP(nbytes, CHACHA_BLOCK_SIZE);
- 		} else {
- 			kernel_neon_begin();
- 			chacha_doneon(state, walk.dst.virt.addr,
--				      walk.src.virt.addr, nbytes, ctx->nrounds);
-+				      walk.src.virt.addr, nbytes, nrounds);
- 			kernel_neon_end();
- 		}
+ 		chacha_crypt_generic(state, walk.dst.virt.addr,
+-				     walk.src.virt.addr, nbytes, ctx->nrounds);
++				     walk.src.virt.addr, nbytes, nrounds);
  		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
-@@ -142,9 +140,13 @@ static int chacha_stream_xor(struct skcipher_request *req,
- static int do_chacha(struct skcipher_request *req, bool neon)
+ 	}
+ 
+@@ -40,30 +39,41 @@ static int chacha_stream_xor(struct skcipher_request *req,
+ static int crypto_chacha_crypt(struct skcipher_request *req)
  {
  	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
 +	struct chacha_reqctx *rctx = skcipher_request_ctx(req);
  	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
  
--	return chacha_stream_xor(req, ctx, req->iv, neon);
+-	return chacha_stream_xor(req, ctx, req->iv);
 +	if (!rctx->init)
 +		chacha_init_generic(rctx->state, ctx->key, req->iv);
 +
-+	return chacha_stream_xor(req, ctx->nrounds, neon);
++	return chacha_stream_xor(req, ctx->nrounds);
  }
  
- static int chacha_arm(struct skcipher_request *req)
-@@ -160,25 +162,33 @@ static int chacha_neon(struct skcipher_request *req)
- static int do_xchacha(struct skcipher_request *req, bool neon)
+ static int crypto_xchacha_crypt(struct skcipher_request *req)
  {
  	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
 +	struct chacha_reqctx *rctx = skcipher_request_ctx(req);
@@ -131,75 +121,73 @@ index 59da6c0b63b62..7f753fc54137a 100644
 +	if (rctx->init)
 +		goto skip_init;
  
+ 	/* Compute the subkey given the original key and first 128 nonce bits */
  	chacha_init_generic(state, ctx->key, req->iv);
- 
- 	if (!IS_ENABLED(CONFIG_KERNEL_MODE_NEON) || !neon) {
--		hchacha_block_arm(state, subctx.key, ctx->nrounds);
-+		hchacha_block_arm(state, key, nrounds);
- 	} else {
- 		kernel_neon_begin();
--		hchacha_block_neon(state, subctx.key, ctx->nrounds);
-+		hchacha_block_neon(state, key, nrounds);
- 		kernel_neon_end();
- 	}
+-	hchacha_block_generic(state, subctx.key, ctx->nrounds);
 -	subctx.nrounds = ctx->nrounds;
++	hchacha_block_generic(state, key, nrounds);
  
- 	memcpy(&real_iv[0], req->iv + 24, 8);
- 	memcpy(&real_iv[8], req->iv + 16, 8);
--	return chacha_stream_xor(req, &subctx, real_iv, neon);
-+
+ 	/* Build the real IV */
+ 	memcpy(&real_iv[0], req->iv + 24, 8); /* stream position */
+ 	memcpy(&real_iv[8], req->iv + 16, 8); /* remaining 64 nonce bits */
+ 
 +	chacha_init_generic(state, key, real_iv);
 +
 +skip_init:
-+	return chacha_stream_xor(req, nrounds, neon);
+ 	/* Generate the stream and XOR it with the data */
+-	return chacha_stream_xor(req, &subctx, real_iv);
++	return chacha_stream_xor(req, nrounds);
  }
  
- static int xchacha_arm(struct skcipher_request *req)
-@@ -204,6 +214,7 @@ static struct skcipher_alg arm_algs[] = {
+ static struct skcipher_alg algs[] = {
+@@ -79,6 +89,7 @@ static struct skcipher_alg algs[] = {
  		.max_keysize		= CHACHA_KEY_SIZE,
  		.ivsize			= CHACHA_IV_SIZE,
  		.chunksize		= CHACHA_BLOCK_SIZE,
 +		.reqsize		= sizeof(struct chacha_reqctx),
  		.setkey			= chacha20_setkey,
- 		.encrypt		= chacha_arm,
- 		.decrypt		= chacha_arm,
-@@ -219,6 +230,7 @@ static struct skcipher_alg arm_algs[] = {
+ 		.encrypt		= crypto_chacha_crypt,
+ 		.decrypt		= crypto_chacha_crypt,
+@@ -94,6 +105,7 @@ static struct skcipher_alg algs[] = {
  		.max_keysize		= CHACHA_KEY_SIZE,
  		.ivsize			= XCHACHA_IV_SIZE,
  		.chunksize		= CHACHA_BLOCK_SIZE,
 +		.reqsize		= sizeof(struct chacha_reqctx),
  		.setkey			= chacha20_setkey,
- 		.encrypt		= xchacha_arm,
- 		.decrypt		= xchacha_arm,
-@@ -234,6 +246,7 @@ static struct skcipher_alg arm_algs[] = {
+ 		.encrypt		= crypto_xchacha_crypt,
+ 		.decrypt		= crypto_xchacha_crypt,
+@@ -109,6 +121,7 @@ static struct skcipher_alg algs[] = {
  		.max_keysize		= CHACHA_KEY_SIZE,
  		.ivsize			= XCHACHA_IV_SIZE,
  		.chunksize		= CHACHA_BLOCK_SIZE,
 +		.reqsize		= sizeof(struct chacha_reqctx),
  		.setkey			= chacha12_setkey,
- 		.encrypt		= xchacha_arm,
- 		.decrypt		= xchacha_arm,
-@@ -254,6 +267,7 @@ static struct skcipher_alg neon_algs[] = {
- 		.ivsize			= CHACHA_IV_SIZE,
- 		.chunksize		= CHACHA_BLOCK_SIZE,
- 		.walksize		= 4 * CHACHA_BLOCK_SIZE,
-+		.reqsize		= sizeof(struct chacha_reqctx),
- 		.setkey			= chacha20_setkey,
- 		.encrypt		= chacha_neon,
- 		.decrypt		= chacha_neon,
-@@ -270,6 +284,7 @@ static struct skcipher_alg neon_algs[] = {
- 		.ivsize			= XCHACHA_IV_SIZE,
- 		.chunksize		= CHACHA_BLOCK_SIZE,
- 		.walksize		= 4 * CHACHA_BLOCK_SIZE,
-+		.reqsize		= sizeof(struct chacha_reqctx),
- 		.setkey			= chacha20_setkey,
- 		.encrypt		= xchacha_neon,
- 		.decrypt		= xchacha_neon,
-@@ -286,6 +301,7 @@ static struct skcipher_alg neon_algs[] = {
- 		.ivsize			= XCHACHA_IV_SIZE,
- 		.chunksize		= CHACHA_BLOCK_SIZE,
- 		.walksize		= 4 * CHACHA_BLOCK_SIZE,
-+		.reqsize		= sizeof(struct chacha_reqctx),
- 		.setkey			= chacha12_setkey,
- 		.encrypt		= xchacha_neon,
- 		.decrypt		= xchacha_neon,
+ 		.encrypt		= crypto_xchacha_crypt,
+ 		.decrypt		= crypto_xchacha_crypt,
+diff --git a/include/crypto/internal/chacha.h b/include/crypto/internal/chacha.h
+index b085dc1ac1516..149ff90fa4afd 100644
+--- a/include/crypto/internal/chacha.h
++++ b/include/crypto/internal/chacha.h
+@@ -3,15 +3,21 @@
+ #ifndef _CRYPTO_INTERNAL_CHACHA_H
+ #define _CRYPTO_INTERNAL_CHACHA_H
+ 
++#include <asm/unaligned.h>
+ #include <crypto/chacha.h>
+ #include <crypto/internal/skcipher.h>
+-#include <linux/crypto.h>
++#include <linux/kernel.h>
+ 
+ struct chacha_ctx {
+ 	u32 key[8];
+ 	int nrounds;
+ };
+ 
++struct chacha_reqctx {
++	u32 state[16];
++	bool init;
++};
++
+ static inline int chacha_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 				unsigned int keysize, int nrounds)
+ {
