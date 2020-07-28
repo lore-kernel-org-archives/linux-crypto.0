@@ -7,97 +7,90 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BBEAC433E5
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 264B1C433ED
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:18:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 08CC7207E8
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:18:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0601320829
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jul 2020 07:18:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727776AbgG1HSt (ORCPT
+        id S1726990AbgG1HS4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Jul 2020 03:18:49 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:54750 "EHLO fornost.hmeau.com"
+        Tue, 28 Jul 2020 03:18:56 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:54774 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727072AbgG1HSt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Jul 2020 03:18:49 -0400
+        id S1727904AbgG1HS4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Jul 2020 03:18:56 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1k0Jss-0006IS-GM; Tue, 28 Jul 2020 17:18:47 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 28 Jul 2020 17:18:46 +1000
+        id 1k0Jsz-0006Ki-GN; Tue, 28 Jul 2020 17:18:54 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 28 Jul 2020 17:18:53 +1000
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Tue, 28 Jul 2020 17:18:46 +1000
-Subject: [v3 PATCH 4/31] crypto: arm64/aes-glue - Add support for chaining CTS
+Date:   Tue, 28 Jul 2020 17:18:53 +1000
+Subject: [v3 PATCH 7/31] crypto: skcipher - Add alg reqsize field
 References: <20200728071746.GA22352@gondor.apana.org.au>
 To:     Ard Biesheuvel <ardb@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Eric Biggers <ebiggers@kernel.org>
-Message-Id: <E1k0Jss-0006IS-GM@fornost.hmeau.com>
+Message-Id: <E1k0Jsz-0006Ki-GN@fornost.hmeau.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As it stands cts cannot do chaining.  That is, it always performs
-the cipher-text stealing at the end of a request.  This patch adds
-support for chaining when the CRYPTO_TM_REQ_MORE flag is set.
+As it is the reqsize field only exists on the tfm object which means
+that in order to set it you must provide an init function for the
+tfm, even if the size is actually static.
 
-It also sets the final_chunksize so that data can be withheld by
-the caller to enable correct processing at the true end of a request.
+This patch adds a reqsize field to the skcipher alg object which
+allows it to be set without having an init function.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- arch/arm64/crypto/aes-glue.c |   17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ crypto/skcipher.c         |    4 +++-
+ include/crypto/skcipher.h |    2 ++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index 395bbf64b2abb..f63feb00e354d 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -283,11 +283,15 @@ static int cts_cbc_encrypt(struct skcipher_request *req)
- 	skcipher_request_set_callback(&subreq, skcipher_request_flags(req),
- 				      NULL, NULL);
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index 467af525848a1..3bfa06fd25600 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -668,6 +668,8 @@ static int crypto_skcipher_init_tfm(struct crypto_tfm *tfm)
+ 	struct crypto_skcipher *skcipher = __crypto_skcipher_cast(tfm);
+ 	struct skcipher_alg *alg = crypto_skcipher_alg(skcipher);
  
--	if (req->cryptlen <= AES_BLOCK_SIZE) {
--		if (req->cryptlen < AES_BLOCK_SIZE)
-+	if (req->cryptlen < AES_BLOCK_SIZE)
-+		return -EINVAL;
++	skcipher->reqsize = alg->reqsize;
 +
-+	if (req->base.flags & CRYPTO_TFM_REQ_MORE) {
-+		if (req->cryptlen & (AES_BLOCK_SIZE - 1))
- 			return -EINVAL;
-+		cbc_blocks += 2;
-+	} else if (req->cryptlen == AES_BLOCK_SIZE)
- 		cbc_blocks = 1;
--	}
+ 	skcipher_set_needkey(skcipher);
  
- 	if (cbc_blocks > 0) {
- 		skcipher_request_set_crypt(&subreq, req->src, req->dst,
-@@ -299,7 +303,8 @@ static int cts_cbc_encrypt(struct skcipher_request *req)
- 		if (err)
- 			return err;
+ 	if (alg->exit)
+@@ -797,7 +799,7 @@ static int skcipher_prepare_alg(struct skcipher_alg *alg)
+ 	struct crypto_alg *base = &alg->base;
  
--		if (req->cryptlen == AES_BLOCK_SIZE)
-+		if (req->cryptlen == AES_BLOCK_SIZE ||
-+		    req->base.flags & CRYPTO_TFM_REQ_MORE)
- 			return 0;
+ 	if (alg->ivsize > PAGE_SIZE / 8 || alg->chunksize > PAGE_SIZE / 8 ||
+-	    alg->walksize > PAGE_SIZE / 8)
++	    alg->walksize > PAGE_SIZE / 8 || alg->reqsize > PAGE_SIZE / 8)
+ 		return -EINVAL;
  
- 		dst = src = scatterwalk_ffwd(sg_src, req->src, subreq.cryptlen);
-@@ -738,13 +743,15 @@ static struct skcipher_alg aes_algs[] = { {
- 		.cra_driver_name	= "__cts-cbc-aes-" MODE,
- 		.cra_priority		= PRIO,
- 		.cra_flags		= CRYPTO_ALG_INTERNAL,
--		.cra_blocksize		= AES_BLOCK_SIZE,
-+		.cra_blocksize		= 1,
- 		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
- 		.cra_module		= THIS_MODULE,
- 	},
- 	.min_keysize	= AES_MIN_KEY_SIZE,
- 	.max_keysize	= AES_MAX_KEY_SIZE,
- 	.ivsize		= AES_BLOCK_SIZE,
-+	.chunksize	= AES_BLOCK_SIZE,
-+	.final_chunksize	= 2 * AES_BLOCK_SIZE,
- 	.walksize	= 2 * AES_BLOCK_SIZE,
- 	.setkey		= skcipher_aes_setkey,
- 	.encrypt	= cts_cbc_encrypt,
+ 	if (!alg->chunksize)
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index fb90c3e1c26ba..c46ea1c157b29 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -100,6 +100,7 @@ struct crypto_sync_skcipher {
+  * @final_chunksize: Number of bytes that must be processed together
+  *		     at the end.  If set to -1 then chaining is not
+  *		     possible.
++ * @reqsize: Size of the request data structure.
+  * @base: Definition of a generic crypto algorithm.
+  *
+  * All fields except @ivsize are mandatory and must be filled.
+@@ -118,6 +119,7 @@ struct skcipher_alg {
+ 	unsigned int chunksize;
+ 	unsigned int walksize;
+ 	int final_chunksize;
++	unsigned int reqsize;
+ 
+ 	struct crypto_alg base;
+ };
