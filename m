@@ -2,63 +2,89 @@ Return-Path: <SRS0=Hj06=BI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E2F7C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jul 2020 03:40:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2734C433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jul 2020 06:07:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 046CD2074B
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jul 2020 03:40:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC5EB20786
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jul 2020 06:07:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1596002826;
+	bh=uuiZim+ifxA6Ag2XeK5X/HpYvVpSxfo8nFLbSaKmMQg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=uh7QTrDqSYs+cdSP9HmZLumWeasONMHcS8CApvNWpJlmazxYBuxe3RGY9Pzi0luJs
+	 OPTTq45zztgver/t5g5qtOFAn+hjqXoVlrzd0Vu5NcQmPj4X/bBkyMm18ibrLv2pbn
+	 RTs+yJCwAUp+JQ3SvslDV8p1J1u1HdoQ1u9aWiL8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726319AbgG2Dk4 (ORCPT
+        id S1726286AbgG2GHG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Jul 2020 23:40:56 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:58140 "EHLO fornost.hmeau.com"
+        Wed, 29 Jul 2020 02:07:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33462 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726245AbgG2Dk4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Jul 2020 23:40:56 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1k0cxX-0002FQ-R2; Wed, 29 Jul 2020 13:40:52 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 29 Jul 2020 13:40:51 +1000
-Date:   Wed, 29 Jul 2020 13:40:51 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Stephan Mueller <smueller@chronox.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [v3 PATCH 0/31] crypto: skcipher - Add support for no chaining
- and partial chaining
-Message-ID: <20200729034051.GB8440@gondor.apana.org.au>
-References: <20200728071746.GA22352@gondor.apana.org.au>
- <20200728171921.GC4053562@gmail.com>
+        id S1726047AbgG2GHF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 Jul 2020 02:07:05 -0400
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2DBEF206D4
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2020 06:07:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1596002825;
+        bh=uuiZim+ifxA6Ag2XeK5X/HpYvVpSxfo8nFLbSaKmMQg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=oi5XLH4+ThyyvJjHpSHzQM1Nt3svCEO8J/kcQ6ACSfPpxiOZ1pj0aNQXMP7zW2Tns
+         iVQU63f0XpIQrfSPJsWFCJ4spd4DAMRMz5iI97IpY2H5QlUsDQlmjnrTNINTltNkjS
+         drEzDtJszfN4rUf6EHRHuYhE/KFOxnMMFECQ6MJg=
+Received: by mail-oi1-f182.google.com with SMTP id v13so3147948oiv.13
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Jul 2020 23:07:05 -0700 (PDT)
+X-Gm-Message-State: AOAM533ZESJ32bmj0VT/GlXFsDqEaLY0WC+tpkG0XgpYDzOaN4cCHqYq
+        0zJEOXtxr5jtjUYDEy5JgHRP9tk4oRWYs8zV+aE=
+X-Google-Smtp-Source: ABdhPJy4dhxK5cPnkDu4BaYNLFZ/Odt+IdYKgXrR/MMXOuhJZvJv5OT4p4Kgta5NNQXE7tBWB4zsyjhkDGMK9hxt3zY=
+X-Received: by 2002:aca:afd0:: with SMTP id y199mr3524069oie.47.1596002824606;
+ Tue, 28 Jul 2020 23:07:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200728171921.GC4053562@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <2a55b661-512b-9479-9fff-0f2e2a581765@candelatech.com>
+In-Reply-To: <2a55b661-512b-9479-9fff-0f2e2a581765@candelatech.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 29 Jul 2020 09:06:53 +0300
+X-Gmail-Original-Message-ID: <CAMj1kXFwPPDfm1hvW+LgnfuPO-wfguTZ0NcLyeyesGeBcuDKGQ@mail.gmail.com>
+Message-ID: <CAMj1kXFwPPDfm1hvW+LgnfuPO-wfguTZ0NcLyeyesGeBcuDKGQ@mail.gmail.com>
+Subject: Re: Help getting aesni crypto patch upstream
+To:     Ben Greear <greearb@candelatech.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 28, 2020 at 10:19:21AM -0700, Eric Biggers wrote:
+On Wed, 29 Jul 2020 at 01:03, Ben Greear <greearb@candelatech.com> wrote:
 >
-> Can you elaborate on the use case for supporting chaining on algorithms that
-> don't currently support it?
+> Hello,
+>
+> As part of my wifi test tool, I need to do decrypt AES on the CPU, and the only way this
+> performs well is to use aesni.  I've been using a patch for years that does this, but
+> recently somewhere between 5.4 and 5.7, the API I've been using has been removed.
+>
+> Would anyone be interested in getting this support upstream?  I'd be happy to pay for
+> the effort.
+>
+> Here is the patch in question:
+>
+> https://github.com/greearb/linux-ct-5.7/blob/master/wip/0001-crypto-aesni-add-ccm-aes-algorithm-implementation.patch
+>
+> Please keep me in CC, I'm not subscribed to this list.
+>
 
-OK I will describe the algif issue in more detail and also add
-a mention of sunrpc.  In fact I might try to convert sunrpc to use
-this new API.
+Hi Ben,
 
-> Also, the self-tests need to be updated to test all this.
+Recently, the x86 FPU handling was improved to remove the overhead of
+preserving/restoring of the register state, so the issue that this
+patch fixes may no longer exist. Did you try?
 
-Yes.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+In any case, according to the commit log on that patch, the problem is
+in the MAC generation, so it might be better to add a cbcmac(aes)
+implementation only, and not duplicate all the CCM boilerplate.
