@@ -2,85 +2,108 @@ Return-Path: <SRS0=EYtX=BJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C8EC433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jul 2020 12:28:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7C1AC433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jul 2020 12:39:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1CA5D2074B
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jul 2020 12:28:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9857520838
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jul 2020 12:39:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726631AbgG3M2K (ORCPT
+        id S1726535AbgG3Mjj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Jul 2020 08:28:10 -0400
-Received: from mga12.intel.com ([192.55.52.136]:18766 "EHLO mga12.intel.com"
+        Thu, 30 Jul 2020 08:39:39 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:37034 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726615AbgG3M2J (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Jul 2020 08:28:09 -0400
-IronPort-SDR: tipnjiX28NsBeT5hYv0TcCpnd7amAXR+WhYngICPKer3yR18vKazCChSyM6X3eFU5prUrfXo1K
- S8xUdz6U/BeA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9697"; a="131144071"
-X-IronPort-AV: E=Sophos;i="5.75,414,1589266800"; 
-   d="scan'208";a="131144071"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2020 05:28:09 -0700
-IronPort-SDR: Yqml/qFxzpsSC8f9AXGqHo0F8GQ09AcI+3pdJ8PbkqTN5pTsJNx9G+mk32oHtY8c5eluh1w34d
- w1sh8PoBHlwg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,414,1589266800"; 
-   d="scan'208";a="286843312"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
-  by orsmga003.jf.intel.com with ESMTP; 30 Jul 2020 05:28:08 -0700
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - add delay before polling mailbox
-Date:   Thu, 30 Jul 2020 13:27:42 +0100
-Message-Id: <20200730122742.216566-1-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.26.2
+        id S1726967AbgG3Mji (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 Jul 2020 08:39:38 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1k17q5-0006OM-9k; Thu, 30 Jul 2020 22:39:14 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Jul 2020 22:39:13 +1000
+Date:   Thu, 30 Jul 2020 22:39:13 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: algapi - Move crypto_yield into internal.h
+Message-ID: <20200730123913.GA4889@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The mailbox CSR register has a write latency and requires a delay before
-being read. This patch replaces readl_poll_timeout with read_poll_timeout
-that allows to sleep before read.
-The initial sleep was removed when the mailbox poll loop was replaced with
-readl_poll_timeout.
+crypto: algapi - Move crypto_yield into internal.h
 
-Fixes: a79d471c6510 ("crypto: qat - update timeout logic in put admin msg")
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_common/adf_admin.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+This patch moves crypto_yield into internal.h as it's only used
+by internal code such as skcipher.  It also adds a missing inclusion
+of sched.h which is required for cond_resched.
 
-diff --git a/drivers/crypto/qat/qat_common/adf_admin.c b/drivers/crypto/qat/qat_common/adf_admin.c
-index 1c8ca151a963..ec9b390276d6 100644
---- a/drivers/crypto/qat/qat_common/adf_admin.c
-+++ b/drivers/crypto/qat/qat_common/adf_admin.c
-@@ -131,9 +131,10 @@ static int adf_put_admin_msg_sync(struct adf_accel_dev *accel_dev, u32 ae,
- 	memcpy(admin->virt_addr + offset, in, ADF_ADMINMSG_LEN);
- 	ADF_CSR_WR(mailbox, mb_offset, 1);
+The header files in internal.h have been cleaned up to remove some
+ancient junk and add some more specific inclusions.
+    
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/internal.h b/crypto/internal.h
+index 1b92a5a61852f..976ec9dfc76db 100644
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -10,16 +10,14 @@
  
--	ret = readl_poll_timeout(mailbox + mb_offset, status,
--				 status == 0, ADF_ADMIN_POLL_DELAY_US,
--				 ADF_ADMIN_POLL_TIMEOUT_US);
-+	ret = read_poll_timeout(ADF_CSR_RD, status, status == 0,
-+				ADF_ADMIN_POLL_DELAY_US,
-+				ADF_ADMIN_POLL_TIMEOUT_US, true,
-+				mailbox, mb_offset);
- 	if (ret < 0) {
- 		/* Response timeout */
- 		dev_err(&GET_DEV(accel_dev),
+ #include <crypto/algapi.h>
+ #include <linux/completion.h>
+-#include <linux/mm.h>
+-#include <linux/highmem.h>
+-#include <linux/interrupt.h>
+-#include <linux/init.h>
+ #include <linux/list.h>
+ #include <linux/module.h>
+-#include <linux/kernel.h>
+ #include <linux/notifier.h>
++#include <linux/numa.h>
++#include <linux/refcount.h>
+ #include <linux/rwsem.h>
+-#include <linux/slab.h>
++#include <linux/sched.h>
++#include <linux/types.h>
+ 
+ struct crypto_instance;
+ struct crypto_template;
+@@ -140,5 +138,11 @@ static inline void crypto_notify(unsigned long val, void *v)
+ 	blocking_notifier_call_chain(&crypto_chain, val, v);
+ }
+ 
++static inline void crypto_yield(u32 flags)
++{
++	if (flags & CRYPTO_TFM_REQ_MAY_SLEEP)
++		cond_resched();
++}
++
+ #endif	/* _CRYPTO_INTERNAL_H */
+ 
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 143d884d65c7a..99fcb2d7a8317 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -277,12 +277,6 @@ static inline int crypto_memneq(const void *a, const void *b, size_t size)
+ 	return __crypto_memneq(a, b, size) != 0UL ? 1 : 0;
+ }
+ 
+-static inline void crypto_yield(u32 flags)
+-{
+-	if (flags & CRYPTO_TFM_REQ_MAY_SLEEP)
+-		cond_resched();
+-}
+-
+ int crypto_register_notifier(struct notifier_block *nb);
+ int crypto_unregister_notifier(struct notifier_block *nb);
+ 
 -- 
-2.26.2
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
