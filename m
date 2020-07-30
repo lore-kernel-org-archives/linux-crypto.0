@@ -1,143 +1,220 @@
-Return-Path: <SRS0=Hj06=BI=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=EYtX=BJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19AABC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jul 2020 20:06:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E923AC433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jul 2020 06:04:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E405F20658
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jul 2020 20:06:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596053216;
-	bh=e0KNsMRF8PEhDQuCHiRqDtR1FSDwYF++FqK8GxV5J5U=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=b00JwcW5nxHmV0+TGqBRmFiOC+kddI2Cn6JD9EYUQBebD+t5RyLFa3ZEg/9+UbjTl
-	 kgqa1PQ3de8GPdch+rYj5/l69AoMSRJM8EQOoFIg7HKrw3xphzYF4xJGPMzoQlVRgO
-	 eBgIMUOsAgLxsciCLjgoxNJXZ7+2s/bwRFgJLksk=
+	by mail.kernel.org (Postfix) with ESMTP id C8B412084D
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jul 2020 06:04:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aKwkplrC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726606AbgG2UG4 (ORCPT
+        id S1726899AbgG3GEb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Jul 2020 16:06:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47738 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726560AbgG2UG4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Jul 2020 16:06:56 -0400
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4099420658
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2020 20:06:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596053215;
-        bh=e0KNsMRF8PEhDQuCHiRqDtR1FSDwYF++FqK8GxV5J5U=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=juWnMg3iFPGtQvLRVnzfiLYhsEFldz5qr1VCd08kYvKQWMYen9EVDxCmzCrhIryMX
-         6Z4vk2w4Sho7nZpJYRNZ1B6LoLXH40958p04JYdxrhxS228LPR6yEDSgq8aKtUC9um
-         WcJsA4dR6jH3uDjRcwHz2vVuvbBhsgDDsHa0dDAE=
-Received: by mail-oi1-f181.google.com with SMTP id u63so10065374oie.5
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2020 13:06:55 -0700 (PDT)
-X-Gm-Message-State: AOAM531Pq3XwK6d/CfQsJGCVYpyYrMO12AVkj33JdD+rHH+z8D75nrCQ
-        qNr/J5agYawJtyL6lZAwNOEBK2w2jZkTvLvJGUg=
-X-Google-Smtp-Source: ABdhPJz71qPqkHZdfw3HX5L22aHbLnrz3+gy6BaQSsm0sztt8RsoH0ufKGqi+IUiHq5h/CM0ZBDR4P7WC+jCUTtEtdk=
-X-Received: by 2002:aca:cc0a:: with SMTP id c10mr9550140oig.174.1596053214596;
- Wed, 29 Jul 2020 13:06:54 -0700 (PDT)
+        Thu, 30 Jul 2020 02:04:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33902 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725892AbgG3GEa (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 Jul 2020 02:04:30 -0400
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86DD9C061794;
+        Wed, 29 Jul 2020 23:04:30 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id il6so3612599pjb.0;
+        Wed, 29 Jul 2020 23:04:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=ComNkpy0mDYB1CNiEj1XOKVCQA9y437to2e9E5caCaU=;
+        b=aKwkplrCz2NPVfcK7clzI4/PBXWv8w6qJoj51ShustB+6cHEFb0N/rOPITlMtLkePA
+         7zIVKj6zdTL6qLKsOi/J60izP5mZ0e/2rt1NgsA5dn4J1HrDG4y7+d/aHOcK4K+lkuWw
+         2H6dh73jKI0k71IXu4v7SdTE0Xng/+JQsb1dY618OpgcZ+Y/mnAaWNzpoX+A0/6bIW7F
+         C8l9ceoYgVO0XlFn9XEZdH78mOWAp7BP50ncWrcfBZIC5FRTNDmw8gFwCAZi2faS3eev
+         ahgHSK3KkqFjW3ydrfOPSuNhA/vdfuBMa2X7T4/AjR/flAWG90+VPHZdrcaqV+5m196K
+         FYRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=ComNkpy0mDYB1CNiEj1XOKVCQA9y437to2e9E5caCaU=;
+        b=ExoF5K7HYHhNDCytXoPae3V2xDgRWje+/P4nZAB2hdk6ez63Yq0pmimo42m30elRGP
+         UoXnQtcqHrZZPrb95bia5SReWAUisKjmRgskOCwEmAxc6+CVqnP0XCfPVK6zbVjzo0ov
+         iC6kwQ5cZzysCRJ/spSbr0fzkIHt9Rrt9EihkmnsTEIanTqWPNOTS0/fP+/BWmHu2ipm
+         /mcJawxDV0Ijv0MRL/yfrW5mdjcEzj+YkKkjCgljaFxqXyNJC8arhKJs4/IERc5rmaB4
+         ockGSy9rP+DoLRXcIO9irL1EDm8Nui2pTyEsiqRhoek6JvGCxqjvgwfPndhEUv1EmYRR
+         +7PQ==
+X-Gm-Message-State: AOAM531g2kExJyVe/cwZqc1byIF9tR/LrTdezinTkUaY5gvsU/na+Hkc
+        XXK4cfQ7d0hU6X34dBXbH7k=
+X-Google-Smtp-Source: ABdhPJwjd5kmrY/fNgHXgOLGocoGLlKHMUrCvfqRXqmWi6QlXeg6hdGvLmTIkKPpzMEqlJtMq5t15w==
+X-Received: by 2002:a17:90b:3807:: with SMTP id mq7mr12483216pjb.221.1596089069935;
+        Wed, 29 Jul 2020 23:04:29 -0700 (PDT)
+Received: from dtor-ws ([2620:15c:202:201:a6ae:11ff:fe11:fcc3])
+        by smtp.gmail.com with ESMTPSA id 9sm4533833pfy.177.2020.07.29.23.04.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jul 2020 23:04:29 -0700 (PDT)
+Date:   Wed, 29 Jul 2020 23:04:26 -0700
+From:   Dmitry Torokhov <dmitry.torokhov@gmail.com>
+To:     Marco Felsch <m.felsch@pengutronix.de>
+Cc:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Shawn Guo <shawnguo@kernel.org>,
+        =?iso-8859-1?Q?Andr=E9?= Draszik <git@andred.net>,
+        Robin Gong <yibin.gong@nxp.com>,
+        Anson Huang <anson.huang@nxp.com>,
+        Fabio Estevam <festevam@gmail.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Adam Ford <aford173@gmail.com>, linux-input@vger.kernel.org,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>
+Subject: Re: [PATCH v3 2/3] Input: snvs_pwrkey - enable snvs clock as needed
+Message-ID: <20200730060426.GD1665100@dtor-ws>
+References: <20200723074314.3304-1-horia.geanta@nxp.com>
+ <20200723074314.3304-3-horia.geanta@nxp.com>
+ <20200729073323.pse772mh44bzgdai@pengutronix.de>
 MIME-Version: 1.0
-References: <2a55b661-512b-9479-9fff-0f2e2a581765@candelatech.com>
- <CAMj1kXFwPPDfm1hvW+LgnfuPO-wfguTZ0NcLyeyesGeBcuDKGQ@mail.gmail.com>
- <04d8e7e3-700b-44b2-e8f2-5126abf21a62@candelatech.com> <CAMj1kXFK4xkieEpjW+ekYf9am6Ob15aGsnmWJMfn=LD_4oCuXg@mail.gmail.com>
- <9e6927a6-8f70-009a-ad76-4f11a396e43a@candelatech.com>
-In-Reply-To: <9e6927a6-8f70-009a-ad76-4f11a396e43a@candelatech.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 29 Jul 2020 23:06:43 +0300
-X-Gmail-Original-Message-ID: <CAMj1kXEDBSfuTxi6CCPGdpdC6h+F18gutz3h2xJaGtdN8kS40Q@mail.gmail.com>
-Message-ID: <CAMj1kXEDBSfuTxi6CCPGdpdC6h+F18gutz3h2xJaGtdN8kS40Q@mail.gmail.com>
-Subject: Re: Help getting aesni crypto patch upstream
-To:     Ben Greear <greearb@candelatech.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200729073323.pse772mh44bzgdai@pengutronix.de>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 29 Jul 2020 at 22:29, Ben Greear <greearb@candelatech.com> wrote:
->
-> On 7/29/20 12:09 PM, Ard Biesheuvel wrote:
-> > On Wed, 29 Jul 2020 at 15:27, Ben Greear <greearb@candelatech.com> wrote:
-> >>
-> >> On 7/28/20 11:06 PM, Ard Biesheuvel wrote:
-> >>> On Wed, 29 Jul 2020 at 01:03, Ben Greear <greearb@candelatech.com> wrote:
-> >>>>
-> >>>> Hello,
-> >>>>
-> >>>> As part of my wifi test tool, I need to do decrypt AES on the CPU, and the only way this
-> >>>> performs well is to use aesni.  I've been using a patch for years that does this, but
-> >>>> recently somewhere between 5.4 and 5.7, the API I've been using has been removed.
-> >>>>
-> >>>> Would anyone be interested in getting this support upstream?  I'd be happy to pay for
-> >>>> the effort.
-> >>>>
-> >>>> Here is the patch in question:
-> >>>>
-> >>>> https://github.com/greearb/linux-ct-5.7/blob/master/wip/0001-crypto-aesni-add-ccm-aes-algorithm-implementation.patch
-> >>>>
-> >>>> Please keep me in CC, I'm not subscribed to this list.
-> >>>>
-> >>>
-> >>> Hi Ben,
-> >>>
-> >>> Recently, the x86 FPU handling was improved to remove the overhead of
-> >>> preserving/restoring of the register state, so the issue that this
-> >>> patch fixes may no longer exist. Did you try?
-> >>>
-> >>> In any case, according to the commit log on that patch, the problem is
-> >>> in the MAC generation, so it might be better to add a cbcmac(aes)
-> >>> implementation only, and not duplicate all the CCM boilerplate.
-> >>>
-> >>
-> >> Hello,
-> >>
-> >> I don't know all of the details, and do not understand the crypto subsystem,
-> >> but I am pretty sure that I need at least some of this patch.
-> >>
-> >
-> > Whether this is true is what I am trying to get clarified.
-> >
-> > Your patch works around a performance bottleneck related to the use of
-> > AES-NI instructions in the kernel, which has been addressed recently.
-> > If the issue still exists, we can attempt to devise a fix for it,
-> > which may or may not be based on this patch.
->
-> Ok, I can do the testing.  Do you expect 5.7-stable has all the needed
-> performance improvements?
->
+On Wed, Jul 29, 2020 at 09:33:23AM +0200, Marco Felsch wrote:
+> Hi,
+> 
+> On 20-07-23 10:43, Horia Geantă wrote:
+> > From: André Draszik <git@andred.net>
+> > 
+> > At the moment, enabling this driver without the SNVS RTC driver
+> > being active will hang the kernel as soon as the power button
+> > is pressed.
+> > 
+> > The reason is that in that case the SNVS isn't enabled, and
+> > any attempt to read the SNVS registers will simply hang forever.
+> > 
+> > Ensure the clock is enabled (during the interrupt handler) to
+> > make this driver work.
+> > 
+> > Also see commit 7f8993995410 ("drivers/rtc/rtc-snvs: add clock support")
+> > and commit edb190cb1734
+> > ("rtc: snvs: make sure clock is enabled for interrupt handle")
+> > for similar updates to the snvs rtc driver.
+> > 
+> > Signed-off-by: André Draszik <git@andred.net>
+> > Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+> > Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+> > ---
+> >  drivers/input/keyboard/snvs_pwrkey.c | 28 +++++++++++++++++++++++++++-
+> >  1 file changed, 27 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/input/keyboard/snvs_pwrkey.c b/drivers/input/keyboard/snvs_pwrkey.c
+> > index 2f5e3ab5ed63..382d2ae82c9b 100644
+> > --- a/drivers/input/keyboard/snvs_pwrkey.c
+> > +++ b/drivers/input/keyboard/snvs_pwrkey.c
+> > @@ -16,6 +16,7 @@
+> >  #include <linux/of_address.h>
+> >  #include <linux/platform_device.h>
+> >  #include <linux/pm_wakeirq.h>
+> > +#include <linux/clk.h>
+> >  #include <linux/mfd/syscon.h>
+> >  #include <linux/regmap.h>
+> >  
+> > @@ -38,6 +39,7 @@ struct pwrkey_drv_data {
+> >  	int wakeup;
+> >  	struct timer_list check_timer;
+> >  	struct input_dev *input;
+> > +	struct clk *clk;
+> >  	u8 minor_rev;
+> >  };
+> >  
+> > @@ -47,7 +49,10 @@ static void imx_imx_snvs_check_for_events(struct timer_list *t)
+> >  	struct input_dev *input = pdata->input;
+> >  	u32 state;
+> >  
+> > +	clk_enable(pdata->clk);
+> >  	regmap_read(pdata->snvs, SNVS_HPSR_REG, &state);
+> > +	clk_disable(pdata->clk);
+> > +
+> >  	state = state & SNVS_HPSR_BTN ? 1 : 0;
+> >  
+> >  	/* only report new event if status changed */
+> > @@ -74,11 +79,13 @@ static irqreturn_t imx_snvs_pwrkey_interrupt(int irq, void *dev_id)
+> >  
+> >  	pm_wakeup_event(input->dev.parent, 0);
+> >  
+> > +	clk_enable(pdata->clk);
+> > +
+> >  	regmap_read(pdata->snvs, SNVS_LPSR_REG, &lp_status);
+> >  	if (lp_status & SNVS_LPSR_SPO) {
+> >  		if (pdata->minor_rev == 0) {
+> >  			/*
+> > -			 * The first generation i.MX6 SoCs only sends an
+> > +			 * The first generation i.MX[6|7] SoCs only send an
+> >  			 * interrupt on button release. To mimic power-key
+> >  			 * usage, we'll prepend a press event.
+> >  			 */
+> > @@ -96,6 +103,8 @@ static irqreturn_t imx_snvs_pwrkey_interrupt(int irq, void *dev_id)
+> >  	/* clear SPO status */
+> >  	regmap_write(pdata->snvs, SNVS_LPSR_REG, SNVS_LPSR_SPO);
+> >  
+> > +	clk_disable(pdata->clk);
+> 
+> I'm not so happy about clk_enable/disable() during the interrupt
+> routine since those routines should be handled fast. Since we assume
+> that the clock is always oni
 
-Yes.
+We do? I thought that the fact that clock might be off is the root of
+the problem.
 
-> Thanks,
-> Ben
->
-> >
-> >> If you can suggest a patch to try I'll be happy to test it to see how it
-> >> performs.
-> >>
-> >
-> > Please share performance numbers of an old kernel with this patch
-> > applied, and a recent one without. If that shows there is in fact an
-> > issue, we will do something about it.
-> >
-> >>
-> >> --
-> >> Ben Greear <greearb@candelatech.com>
-> >> Candela Technologies Inc  http://www.candelatech.com
-> >
->
->
-> --
-> Ben Greear <greearb@candelatech.com>
-> Candela Technologies Inc  http://www.candelatech.com
+> I would rather call clk_prepare_enable()
+> during probe() and keep the clock on.
+
+clk_enable() must not sleep and is supposed to be lightweight. This
+interrupt I believe is supposed to be infrequent, so having it here
+should be fine and might save us some power.
+
+> 
+> > +
+> >  	return IRQ_HANDLED;
+> >  }
+> >  
+> > @@ -140,6 +149,23 @@ static int imx_snvs_pwrkey_probe(struct platform_device *pdev)
+> >  	if (pdata->irq < 0)
+> >  		return -EINVAL;
+> >  
+> > +	pdata->clk = devm_clk_get_optional(&pdev->dev, "snvs-pwrkey");
+> > +	if (IS_ERR(pdata->clk))
+> > +		return PTR_ERR(pdata->clk);
+> > +
+> > +	error = clk_prepare(pdata->clk);
+> > +	if (error) {
+> > +		dev_err(&pdev->dev, "failed to prepare the snvs clock\n");
+> > +		return error;
+> > +	}
+> > +	error = devm_add_action_or_reset(&pdev->dev,
+> > +			(void(*)(void *))clk_unprepare,
+> > +			pdata->clk);
+> 
+> I'm not a fan about those casts. However, the intentation should be
+> fixed.
+
+Yes, can we please create a proper function for this (or maybe we will
+finally get devm clk API?).
+
+Thanks.
+
+-- 
+Dmitry
