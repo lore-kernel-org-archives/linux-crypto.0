@@ -7,56 +7,65 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9290AC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jul 2020 07:29:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDFA9C433DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jul 2020 07:57:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 764E4207F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jul 2020 07:29:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1700208E4
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jul 2020 07:57:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731603AbgGaH3A (ORCPT
+        id S1731791AbgGaH5g (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 31 Jul 2020 03:29:00 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:39896 "EHLO fornost.hmeau.com"
+        Fri, 31 Jul 2020 03:57:36 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:39922 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731601AbgGaH27 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 31 Jul 2020 03:28:59 -0400
+        id S1731787AbgGaH5f (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 31 Jul 2020 03:57:35 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1k1PTI-0001Jw-Jp; Fri, 31 Jul 2020 17:28:53 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 31 Jul 2020 17:28:52 +1000
-Date:   Fri, 31 Jul 2020 17:28:52 +1000
+        id 1k1Pus-0001rJ-Mf; Fri, 31 Jul 2020 17:57:23 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 31 Jul 2020 17:57:22 +1000
+Date:   Fri, 31 Jul 2020 17:57:22 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Wei Yongjun <weiyongjun1@huawei.com>
-Cc:     Keerthy <j-keerthy@ti.com>, linux-crypto@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, Hulk Robot <hulkci@huawei.com>
-Subject: Re: [PATCH -next] crypto: sa2ul - fix wrong pointer passed to
- PTR_ERR()
-Message-ID: <20200731072852.GA17380@gondor.apana.org.au>
-References: <20200725063440.172238-1-weiyongjun1@huawei.com>
+To:     Yang Shen <shenyang39@huawei.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        xuzaibo@huawei.com, wangzhou1@hisilicon.com
+Subject: Re: [PATCH v3 08/10] crypto: hisilicon/qm - fix the process of
+ register algorithms to crypto
+Message-ID: <20200731075722.GA20350@gondor.apana.org.au>
+References: <1595488780-22085-1-git-send-email-shenyang39@huawei.com>
+ <1595488780-22085-9-git-send-email-shenyang39@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200725063440.172238-1-weiyongjun1@huawei.com>
+In-Reply-To: <1595488780-22085-9-git-send-email-shenyang39@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jul 25, 2020 at 06:34:40AM +0000, Wei Yongjun wrote:
-> PTR_ERR should access the value just tested by IS_ERR, otherwise
-> the wrong error code will be returned.
+On Thu, Jul 23, 2020 at 03:19:38PM +0800, Yang Shen wrote:
+> When the devices are removed or not existing, the corresponding algorithms
+> which are registered by 'hisi-zip' driver can't be used.
 > 
-> Fixes: 7694b6ca649f ("crypto: sa2ul - Add crypto driver")
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-> ---
->  drivers/crypto/sa2ul.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Move 'hisi_zip_register_to_crypto' from 'hisi_zip_init' to
+> 'hisi_zip_probe'. The algorithms will be registered to crypto only when
+> there is device bind on the driver. And when the devices are removed,
+> the algorithms will be unregistered.
+> 
+> In the previous process, the function 'xxx_register_to_crypto' need a lock
+> and a static variable to judge if the registration is the first time.
+> Move this action into the function 'hisi_qm_alg_register'. Each device
+> will call 'hisi_qm_alg_register' to add itself to qm list in probe process
+> and registering algs when the qm list is empty.
+> 
+> Signed-off-by: Yang Shen <shenyang39@huawei.com>
+> Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 
-Someone has sent a similar patch already.
+You still haven't resolved the issue of unregistering crypto
+algorithms that may be allocated.
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
