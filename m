@@ -2,48 +2,151 @@ Return-Path: <SRS0=j/eP=BK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AEBBC433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jul 2020 13:58:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48B11C433DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jul 2020 14:02:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5CFA222B43
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jul 2020 13:58:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2180C2083B
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jul 2020 14:02:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="VwkJLstg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730733AbgGaN6p (ORCPT
+        id S1731656AbgGaOCl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 31 Jul 2020 09:58:45 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:40684 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726058AbgGaN6p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 31 Jul 2020 09:58:45 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1k1VXz-0001wX-W9; Fri, 31 Jul 2020 23:58:09 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 31 Jul 2020 23:58:07 +1000
-Date:   Fri, 31 Jul 2020 23:58:07 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Boris Brezillon <bbrezillon@kernel.org>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Srujana Challa <schalla@marvell.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH] crypto: marvell/cesa - Fix sparse warnings
-Message-ID: <20200731135807.GA15680@gondor.apana.org.au>
-References: <20200731135540.GA15634@gondor.apana.org.au>
+        Fri, 31 Jul 2020 10:02:41 -0400
+Received: from mail2.candelatech.com ([208.74.158.173]:41738 "EHLO
+        mail3.candelatech.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731597AbgGaOCl (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 31 Jul 2020 10:02:41 -0400
+Received: from [192.168.254.5] (unknown [50.34.202.127])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail3.candelatech.com (Postfix) with ESMTPSA id BE2E013C2B0;
+        Fri, 31 Jul 2020 07:02:40 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com BE2E013C2B0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
+        s=default; t=1596204160;
+        bh=+npZ/QHlEf5PDI5xPs4OhMgSGVNT6DgowRgUqcNMrwQ=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=VwkJLstgU43hYcGDAqr/tA9MdASwAUQ+7gdYRYeCO1Bp972iVqyRKOIgsfWhLNfWq
+         Rox8j5BEpgQFlkXFlGswt1TFaBidI5irxHfTX/yMRP1bc8kuAKMaGbHATAfv4zwRVl
+         p85Vcwe0rCkL4zCFP10E1yK6xUbGqsXqHe577lXY=
+Subject: Re: Help getting aesni crypto patch upstream
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+References: <2a55b661-512b-9479-9fff-0f2e2a581765@candelatech.com>
+ <CAMj1kXFwPPDfm1hvW+LgnfuPO-wfguTZ0NcLyeyesGeBcuDKGQ@mail.gmail.com>
+ <04d8e7e3-700b-44b2-e8f2-5126abf21a62@candelatech.com>
+ <CAMj1kXFK4xkieEpjW+ekYf9am6Ob15aGsnmWJMfn=LD_4oCuXg@mail.gmail.com>
+ <9e6927a6-8f70-009a-ad76-4f11a396e43a@candelatech.com>
+ <CAMj1kXEDBSfuTxi6CCPGdpdC6h+F18gutz3h2xJaGtdN8kS40Q@mail.gmail.com>
+ <d71f2800-baef-b97f-62cb-0fbe798c35ed@candelatech.com>
+ <CAMj1kXFt5XCzJ7xGz2=pg-2dA0-zs94XTFsWoTNpSENuhdC51w@mail.gmail.com>
+From:   Ben Greear <greearb@candelatech.com>
+Organization: Candela Technologies
+Message-ID: <9ab2f706-18ee-0383-3977-8b6f41e2b4a5@candelatech.com>
+Date:   Fri, 31 Jul 2020 07:02:40 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200731135540.GA15634@gondor.apana.org.au>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <CAMj1kXFt5XCzJ7xGz2=pg-2dA0-zs94XTFsWoTNpSENuhdC51w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-MW
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Reported-by: kernel test robot <lkp@intel.com>
+On 7/31/20 3:00 AM, Ard Biesheuvel wrote:
+> On Fri, 31 Jul 2020 at 01:57, Ben Greear <greearb@candelatech.com> wrote:
+>>
+>> On 7/29/20 1:06 PM, Ard Biesheuvel wrote:
+>>> On Wed, 29 Jul 2020 at 22:29, Ben Greear <greearb@candelatech.com> wrote:
+>>>>
+>>>> On 7/29/20 12:09 PM, Ard Biesheuvel wrote:
+>>>>> On Wed, 29 Jul 2020 at 15:27, Ben Greear <greearb@candelatech.com> wrote:
+>>>>>>
+>>>>>> On 7/28/20 11:06 PM, Ard Biesheuvel wrote:
+>>>>>>> On Wed, 29 Jul 2020 at 01:03, Ben Greear <greearb@candelatech.com> wrote:
+>>>>>>>>
+>>>>>>>> Hello,
+>>>>>>>>
+>>>>>>>> As part of my wifi test tool, I need to do decrypt AES on the CPU, and the only way this
+>>>>>>>> performs well is to use aesni.  I've been using a patch for years that does this, but
+>>>>>>>> recently somewhere between 5.4 and 5.7, the API I've been using has been removed.
+>>>>>>>>
+>>>>>>>> Would anyone be interested in getting this support upstream?  I'd be happy to pay for
+>>>>>>>> the effort.
+>>>>>>>>
+>>>>>>>> Here is the patch in question:
+>>>>>>>>
+>>>>>>>> https://github.com/greearb/linux-ct-5.7/blob/master/wip/0001-crypto-aesni-add-ccm-aes-algorithm-implementation.patch
+>>>>>>>>
+>>>>>>>> Please keep me in CC, I'm not subscribed to this list.
+>>>>>>>>
+>>>>>>>
+>>>>>>> Hi Ben,
+>>>>>>>
+>>>>>>> Recently, the x86 FPU handling was improved to remove the overhead of
+>>>>>>> preserving/restoring of the register state, so the issue that this
+>>>>>>> patch fixes may no longer exist. Did you try?
+>>>>>>>
+>>>>>>> In any case, according to the commit log on that patch, the problem is
+>>>>>>> in the MAC generation, so it might be better to add a cbcmac(aes)
+>>>>>>> implementation only, and not duplicate all the CCM boilerplate.
+>>>>>>>
+>>>>>>
+>>>>>> Hello,
+>>>>>>
+>>>>>> I don't know all of the details, and do not understand the crypto subsystem,
+>>>>>> but I am pretty sure that I need at least some of this patch.
+>>>>>>
+>>>>>
+>>>>> Whether this is true is what I am trying to get clarified.
+>>>>>
+>>>>> Your patch works around a performance bottleneck related to the use of
+>>>>> AES-NI instructions in the kernel, which has been addressed recently.
+>>>>> If the issue still exists, we can attempt to devise a fix for it,
+>>>>> which may or may not be based on this patch.
+>>>>
+>>>> Ok, I can do the testing.  Do you expect 5.7-stable has all the needed
+>>>> performance improvements?
+>>>>
+>>>
+>>> Yes.
+>>
+>> It does not, as far as we can tell.
+>>
+>> We did a download test on an apu2 (small embedded AMD CPU, but with
+>> aesni support).  A WiFi station is in software-decrypt mode (ath10k-ct driver/firmware,
+>> but ath9k would be valid to reproduce the issue as well.)
+>>
+>> On our 5.4 kernel with the aesni patch applied, we get
+>> about 220Mbps wpa2 download throughput.  With open, we get about 260Mbps
+>> download throughput.
+>>
+>> On 5.7, without any aesni patch, we see about 116Mbps download wpa2 throughput,
+>> and about 265Mbps open download throughput.
+>>
+> 
+> Thanks for the excellent data. Apparently, FPU preserve/restore is
+> still prohibitively expensive on these cores.
+> 
+> I'll have a stab at implementing cbcmac(aesni) early next week: as i
+> pointed out before, we don't need all the ccm boilerplate if the ctr
+> and mac processing are still done in separate passes anyway.
+
+That will be very welcome.  We'll be happy to test.
+
+Thanks,
+Ben
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ben Greear <greearb@candelatech.com>
+Candela Technologies Inc  http://www.candelatech.com
