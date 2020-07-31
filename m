@@ -2,77 +2,72 @@ Return-Path: <SRS0=j/eP=BK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61C98C433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jul 2020 13:30:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2744CC433DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jul 2020 13:31:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 466C920656
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jul 2020 13:30:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 066EA20656
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jul 2020 13:31:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731656AbgGaNaq (ORCPT
+        id S1731291AbgGaNbb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 31 Jul 2020 09:30:46 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:40570 "EHLO fornost.hmeau.com"
+        Fri, 31 Jul 2020 09:31:31 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:40586 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731517AbgGaNaq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 31 Jul 2020 09:30:46 -0400
+        id S1731269AbgGaNbb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 31 Jul 2020 09:31:31 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1k1V6s-00016W-1p; Fri, 31 Jul 2020 23:30:07 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 31 Jul 2020 23:30:06 +1000
-Date:   Fri, 31 Jul 2020 23:30:06 +1000
+        id 1k1V7H-00018b-Id; Fri, 31 Jul 2020 23:30:32 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 31 Jul 2020 23:30:31 +1000
+Date:   Fri, 31 Jul 2020 23:30:31 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Vaibhav Gupta <vaibhavgupta40@gmail.com>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Bjorn Helgaas <bjorn@helgaas.com>,
-        Vaibhav Gupta <vaibhav.varodek@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-kernel@vger.kernel.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: ccp: sp-pci: use generic power management
-Message-ID: <20200731133005.GE14360@gondor.apana.org.au>
-References: <95db9ba2-ffbb-ca92-6a70-1ee401920eed@amd.com>
- <20200722093057.98551-1-vaibhavgupta40@gmail.com>
+To:     =?utf-8?B?5ZGo55Cw5p2wIChaaG91IFlhbmppZSk=?= 
+        <zhouyanjie@wanyeetech.com>
+Cc:     arnd@arndb.de, gregkh@linuxfoundation.org, mpm@selenic.com,
+        robh+dt@kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+        hadar.gat@arm.com, prasannatsmkumar@gmail.com, krzk@kernel.org,
+        masahiroy@kernel.org, rdunlap@infradead.org, xuzaibo@huawei.com,
+        daniel.thompson@linaro.org, tmaimon77@gmail.com,
+        dongsheng.qiu@ingenic.com, aric.pzqi@ingenic.com,
+        rick.tyliu@ingenic.com, yanfei.li@ingenic.com,
+        sernia.zhou@foxmail.com, zhenwenjin@gmail.com
+Subject: Re: [PATCH v2 0/2] Add support for the RNG in Ingenic JZ4780 and
+ X1000.
+Message-ID: <20200731133031.GG14360@gondor.apana.org.au>
+References: <20200723062446.84013-1-zhouyanjie@wanyeetech.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200722093057.98551-1-vaibhavgupta40@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200723062446.84013-1-zhouyanjie@wanyeetech.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 22, 2020 at 03:00:58PM +0530, Vaibhav Gupta wrote:
-> Drivers using legacy power management .suspen()/.resume() callbacks
-> have to manage PCI states and device's PM states themselves. They also
-> need to take care of standard configuration registers.
+On Thu, Jul 23, 2020 at 02:24:44PM +0800, 周琰杰 (Zhou Yanjie) wrote:
+> v1->v2:
+> Use "help" instead "---help---" in Kconfig.
 > 
-> Switch to generic power management framework using a single
-> "struct dev_pm_ops" variable to take the unnecessary load from the driver.
-> This also avoids the need for the driver to directly call most of the PCI
-> helper functions and device power state control functions as through
-> the generic framework, PCI Core takes care of the necessary operations,
-> and drivers are required to do only device-specific jobs.
+> 周琰杰 (Zhou Yanjie) (2):
+>   dt-bindings: RNG: Add Ingenic RNG bindings.
+>   crypto: Ingenic: Add hardware RNG for Ingenic JZ4780 and X1000.
 > 
-> Signed-off-by: Vaibhav Gupta <vaibhavgupta40@gmail.com>
-> ---
->  drivers/crypto/ccp/ccp-dev.c     |  4 +---
->  drivers/crypto/ccp/sp-dev.c      |  6 ++----
->  drivers/crypto/ccp/sp-dev.h      |  6 +++---
->  drivers/crypto/ccp/sp-pci.c      | 17 ++++++-----------
->  drivers/crypto/ccp/sp-platform.c |  2 +-
->  5 files changed, 13 insertions(+), 22 deletions(-)
+>  .../devicetree/bindings/rng/ingenic,rng.yaml       |  36 +++++
+>  drivers/char/hw_random/Kconfig                     |  15 ++
+>  drivers/char/hw_random/Makefile                    |   1 +
+>  drivers/char/hw_random/ingenic-rng.c               | 154 +++++++++++++++++++++
+>  4 files changed, 206 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/rng/ingenic,rng.yaml
+>  create mode 100644 drivers/char/hw_random/ingenic-rng.c
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
