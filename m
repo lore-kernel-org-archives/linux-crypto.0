@@ -2,126 +2,93 @@ Return-Path: <SRS0=/mkk=BM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32E75C433E4
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 Aug 2020 18:27:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 956AAC433DF
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 Aug 2020 18:29:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 157F82075B
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 Aug 2020 18:27:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA6462065E
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 Aug 2020 18:29:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YtJLT8D3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="A1AEdXZU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727026AbgHBS1g (ORCPT
+        id S1726163AbgHBS3O (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 2 Aug 2020 14:27:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46000 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726920AbgHBS1f (ORCPT
+        Sun, 2 Aug 2020 14:29:14 -0400
+Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.22]:10294 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725917AbgHBS3N (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Aug 2020 14:27:35 -0400
-Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CFDFC06174A;
-        Sun,  2 Aug 2020 11:27:35 -0700 (PDT)
-Received: by mail-ed1-x541.google.com with SMTP id v22so14915937edy.0;
-        Sun, 02 Aug 2020 11:27:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=ec+QZPQt4BI+HNScgjvbhAWx5U5Q2eYvCkS354frzh0=;
-        b=YtJLT8D3c903d3hsfGfmpRep4DyZJhzRytGWo/UssPWnsu4TDB7JZAkT1sTJMmJUH+
-         bq5rDlN4QtT+Xdj0JNzjtQ2QqTr2pVyC4JOlcnf9bRRCSyXgovVOl9FdgJQfsiPfkKzY
-         DWsX6GX1lxDOlwpnwJCtIh+GQ6RZkI/pzRvVJxUc5FGTjx+jay8s+7hZFlw796rU78Gc
-         7K1ApoysPqm8FRM+jQOGIRHengeFZ6xNP8mOw9mf8ONnQV8kOLpUVEJO7EpYgXqjQKbR
-         ZXY6Otij2DqA3PujrgbIOxTi9tcd/lHDFFPdppv1+HoL/eGjvY6ERK9eoJvC1OZ061lc
-         FmqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=ec+QZPQt4BI+HNScgjvbhAWx5U5Q2eYvCkS354frzh0=;
-        b=K83uV3irkoUMjiaYGxaIKS/7/Xhw9LmAzT7GEm14xlebX6o+ahYRqHbiMaUg91zym0
-         HOCPVuhQFvtyGr5sKMZ3VhY5avZJ3J0dVI3uEXdHfVHfig8ldeOikWvKCM8+E1bnUje6
-         G/2FKjqgmGFDuSn2GyziNsKTy4iraIy9TOXl3SKC+PujmY1oSm/6HcRfncJ6C8YW2FGY
-         Km/qhgofMmzTdBnhcOEh0R4V9pXI8vWWXUC2khNhxez7M0PSfQyiK6llzGQ952ESzuXB
-         ZusXTc+b95kxkHR72i9XG/IoQU3EUle4GttbIa1qAAdfKtjMbvTDrCQrParNiHz1fCFS
-         yGeQ==
-X-Gm-Message-State: AOAM532cCpjZiyS08P3ApXbDPMB2E+dwfN+U5Qy7ScIzWByrjx7/CRnq
-        Tr3hLoPvYHymHVvS49nNY94=
-X-Google-Smtp-Source: ABdhPJzPSVl/d4yXQb9tARqdTsGpw8tzteKDCnrRiPQdt2yWNobLwsKDJ8Loc5jmq7ZA1MaLrCqHCQ==
-X-Received: by 2002:aa7:c9c2:: with SMTP id i2mr12251380edt.326.1596392853909;
-        Sun, 02 Aug 2020 11:27:33 -0700 (PDT)
-Received: from net.saheed (95C84E0A.dsl.pool.telekom.hu. [149.200.78.10])
-        by smtp.gmail.com with ESMTPSA id b9sm2015326ejz.57.2020.08.02.11.27.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Aug 2020 11:27:33 -0700 (PDT)
-Subject: Re: [RFC PATCH 00/17] Drop uses of pci_read_config_*() return value
-To:     Borislav Petkov <bp@alien8.de>, trix@redhat.com
-Cc:     helgaas@kernel.org, Kalle Valo <kvalo@codeaurora.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Wolfgang Grandegger <wg@grandegger.com>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Joerg Roedel <joro@8bytes.org>, bjorn@helgaas.com,
-        skhan@linuxfoundation.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        linux-mtd@lists.infradead.org, iommu@lists.linux-foundation.org,
-        linux-rdma@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        linux-gpio@vger.kernel.org, linux-fpga@vger.kernel.org,
-        linux-edac@vger.kernel.org, dmaengine@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net
-References: <20200801112446.149549-1-refactormyself@gmail.com>
- <20200801125657.GA25391@nazgul.tnic>
-From:   Saheed Bolarinwa <refactormyself@gmail.com>
-Message-ID: <b720aa44-895a-203b-e220-ecdb3acd9278@gmail.com>
-Date:   Sun, 2 Aug 2020 19:28:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        Sun, 2 Aug 2020 14:29:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1596392949;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=2NEjcRTj85kAAf1x/mTVx2JMX5a/v0WFkm/vzxr7gAQ=;
+        b=A1AEdXZUxXsG+UW8F4PX+i3A7jEXyHI39SsBLIzsv9lTVr4oXF1w3XVJ0Aqk4ONuIY
+        Q2boyUqpWwNvmiKhzZeShfm1APrWvOdPr7PY20m1ODZQtLyZCxqr4ecTD2Oz5luTjYEq
+        97M/craFyHfML1DxkYGZmVOTahbYhRq3xyAgXt6W3ntNrfc9M/rOoiYJkqQfqLKZrNon
+        MQtUk7VqGbhcPj/UjUqh7AO2Cki4lIYMaU50Rij4OH5dre0cVCidygjO+fuUtwvpWbP/
+        bdIP/hWrZBQMBDdrHLVdakM3ZBZ1/Jt83C67rbbTKTCteE9flxothRnPH4ERlqOPRy+i
+        tgHg==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZJPSfIqEh"
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 46.10.5 DYNA|AUTH)
+        with ESMTPSA id y0546bw72IT6VJ4
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Sun, 2 Aug 2020 20:29:06 +0200 (CEST)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net, trix@redhat.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Tom Rix <trix@redhat.com>
+Subject: Re: [PATCH] crypto: drbg: check blocklen is non zero
+Date:   Sun, 02 Aug 2020 20:29:05 +0200
+Message-ID: <9904643.2WqB4rESCP@tauon.chronox.de>
+In-Reply-To: <20200802171247.16558-1-trix@redhat.com>
+References: <20200802171247.16558-1-trix@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200801125657.GA25391@nazgul.tnic>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Am Sonntag, 2. August 2020, 19:12:47 CEST schrieb trix@redhat.com:
 
-On 8/1/20 2:56 PM, Borislav Petkov wrote:
-> On Sat, Aug 01, 2020 at 01:24:29PM +0200, Saheed O. Bolarinwa wrote:
->> The return value of pci_read_config_*() may not indicate a device error.
->> However, the value read by these functions is more likely to indicate
->> this kind of error. This presents two overlapping ways of reporting
->> errors and complicates error checking.
-> So why isn't the *value check done in the pci_read_config_* functions
-> instead of touching gazillion callers?
-Because the value ~0 has a meaning to some drivers and only
-drivers have this knowledge. For those cases more checks will
-be needed to ensure that it is an error that has actually
-happened.
-> For example, pci_conf{1,2}_read() could check whether the u32 *value it
-> just read depending on the access method, whether that value is ~0 and
-> return proper PCIBIOS_ error in that case.
+Hi Tom,
 
-The primary goal is to make pci_config_read*() return void, so
-that there is *only* one way to check for error i.e. through the
-obtained value.
-Again, only the drivers can determine if ~0 is a valid value. This
-information is not available inside pci_config_read*().
+> From: Tom Rix <trix@redhat.com>
+> 
+> Clang static analysis reports this error
+> 
+> crypto/drbg.c:441:40: warning: Division by zero
+>         padlen = (inputlen + sizeof(L_N) + 1) % (drbg_blocklen(drbg));
+>                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+> 
+> When drbg_bocklen fails it returns 0.
+> 
+> 	if (drbg && drbg->core)
+> 		return drbg->core->blocklen_bytes;
+> 	return 0;
+> 
+> In many places in drbg_ctr_df drbg_bocklen is assumed to be non zero.
+> So turn the assumption into a check.
+> 
+> Fixes: 541af946fe13 ("crypto: drbg - SP800-90A Deterministic Random Bit
+> Generator")
+> 
+> Signed-off-by: Tom Rix <trix@redhat.com>
 
-- Saheed
+Thank you.
+
+Reviewed-by: Stephan Mueller <smueller@chronox.de>
+
+Ciao
+Stephan
+
 
