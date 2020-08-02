@@ -2,487 +2,522 @@ Return-Path: <SRS0=/mkk=BM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A8CC433E0
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 Aug 2020 09:06:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE7C1C433DF
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 Aug 2020 10:37:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC31022B43
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 Aug 2020 09:06:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596359199;
-	bh=QZmYG+I75wQk8TeIwQ9QtEV1Inen8N4wiotceX4b2mQ=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=USwTt4alXhO8JyKPJUd+ixwqH5LcsZa5/sYLGWHP4eDVA1VkmoZY4QEJa+1i0cqP1
-	 HKn5evnxbuYdJzj1yiHXZ2TirKOPzFXoeS/x0eMmJmPAgXJXMXN1R/Xt06XtWPnDJF
-	 DI4Tj1BP0Qtjf2PTOtWgJdLSl2JcRJwdSUQsjB5A=
+	by mail.kernel.org (Postfix) with ESMTP id 99EB92075A
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 Aug 2020 10:37:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725916AbgHBJGi (ORCPT
+        id S1727794AbgHBKhs convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 2 Aug 2020 05:06:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57854 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725882AbgHBJGi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Aug 2020 05:06:38 -0400
-Received: from e123331-lin.nice.arm.com (unknown [91.140.123.138])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 90739206F6;
-        Sun,  2 Aug 2020 09:06:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596359197;
-        bh=QZmYG+I75wQk8TeIwQ9QtEV1Inen8N4wiotceX4b2mQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=W5Bx4Xn6zhOn42hA5V3ypEUmqLQm/P/ofyNXy6rSyIdbXr4BC30b/VCZVDAzJLH51
-         HrG9Iq1YK4joDjCwqsuPPtgQItA0pq79D3xbIDJvlFZxRcQlODmET7BPthjqIKqCvd
-         I4tZhnuRyc/HAkNqAEfVsB7D4MflsuIF+rBkKanE=
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Ben Greear <greearb@candelatech.com>
-Subject: [PATCH] crypto: x86/aesni - implement accelerated CBCMAC, CMAC and XCBC shashes
-Date:   Sun,  2 Aug 2020 12:06:16 +0300
-Message-Id: <20200802090616.1328-1-ardb@kernel.org>
-X-Mailer: git-send-email 2.17.1
+        Sun, 2 Aug 2020 06:37:48 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:50866 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726416AbgHBKhr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 2 Aug 2020 06:37:47 -0400
+Received: from dggemi404-hub.china.huawei.com (unknown [172.30.72.53])
+        by Forcepoint Email with ESMTP id 9C018BFB75ACF4C425E0;
+        Sun,  2 Aug 2020 18:37:36 +0800 (CST)
+Received: from DGGEMI525-MBS.china.huawei.com ([169.254.6.120]) by
+ dggemi404-hub.china.huawei.com ([10.3.17.142]) with mapi id 14.03.0487.000;
+ Sun, 2 Aug 2020 18:37:26 +0800
+From:   "Song Bao Hua (Barry Song)" <song.bao.hua@hisilicon.com>
+To:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "Luis Claudio R . Goncalves" <lgoncalv@redhat.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Mahipal Challa <mahipalreddy2006@gmail.com>,
+        Seth Jennings <sjenning@redhat.com>,
+        Dan Streetman <ddstreet@ieee.org>,
+        Vitaly Wool <vitaly.wool@konsulko.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+        "fanghao (A)" <fanghao11@huawei.com>,
+        Colin Ian King <colin.king@canonical.com>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Linuxarm <linuxarm@huawei.com>
+Subject: RE: [RESEND PATCH v5] mm/zswap: move to use crypto_acomp API for
+ hardware acceleration
+Thread-Topic: [RESEND PATCH v5] mm/zswap: move to use crypto_acomp API for
+ hardware acceleration
+Thread-Index: AQHWW3hlscPSFnk0ZEalA8NonmiPz6kUr2hAgBAINjA=
+Date:   Sun, 2 Aug 2020 10:37:25 +0000
+Message-ID: <B926444035E5E2439431908E3842AFD25D4103@DGGEMI525-MBS.china.huawei.com>
+References: <20200716135038.40164-1-song.bao.hua@hisilicon.com> 
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.126.201.234]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Ben reports that CCM using AES-NI instructions performs pathologically
-poorly, which is due to the overhead of preserving/restoring the SIMD
-state, which is repeated after every 16 bytes of input when executing
-the CBCMAC portion of the algorithm.
+> > Subject: [RESEND PATCH v5] mm/zswap: move to use crypto_acomp API for
+> > hardware acceleration
+> >
+> > Right now, all new ZIP drivers are adapted to crypto_acomp APIs rather than
+> > legacy crypto_comp APIs. Tradiontal ZIP drivers like lz4,lzo etc have been also
+> > wrapped into acomp via scomp backend. But zswap.c is still using the old
+> APIs.
+> > That means zswap won't be able to work on any new ZIP drivers in kernel.
+> >
+> > This patch moves to use cryto_acomp APIs to fix the disconnected bridge
+> > between new ZIP drivers and zswap. It is probably the first real user to use
+> > acomp but perhaps not a good example to demonstrate how multiple acomp
+> > requests can be executed in parallel in one acomp instance.
+> > frontswap is doing page load and store page by page synchronously.
+> > swap_writepage() depends on the completion of frontswap_store() to decide
+> if
+> > it should call __swap_writepage() to swap to disk.
+> >
+> > However this patch creates multiple acomp instances, so multiple threads
+> > running on multiple different cpus can actually do (de)compression parallelly,
+> > leveraging the power of multiple ZIP hardware queues. This is also consistent
+> > with frontswap's page management model.
+> >
+> > The old zswap code uses atomic context and avoids the race conditions while
+> > shared resources like zswap_dstmem are accessed. Here since acomp can
+> sleep,
+> > per-cpu mutex is used to replace preemption-disable.
+> >
+> > While it is possible to make mm/page_io.c and mm/frontswap.c support
+> async
+> > (de)compression in some way, the entire design requires careful thinking and
+> > performance evaluation. For the first step, the base with fixed connection
+> > between ZIP drivers and zswap should be built.
+> >
+> > Cc: Luis Claudio R. Goncalves <lgoncalv@redhat.com>
+> > Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > Cc: Andrew Morton <akpm@linux-foundation.org>
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > Cc: David S. Miller <davem@davemloft.net>
+> > Cc: Mahipal Challa <mahipalreddy2006@gmail.com>
+> > Cc: Seth Jennings <sjenning@redhat.com>
+> > Cc: Dan Streetman <ddstreet@ieee.org>
+> > Cc: Vitaly Wool <vitaly.wool@konsulko.com>
+> > Cc: Zhou Wang <wangzhou1@hisilicon.com>
+> > Cc: Hao Fang <fanghao11@huawei.com>
+> > Cc: Colin Ian King <colin.king@canonical.com>
+> > Signed-off-by: Barry Song <song.bao.hua@hisilicon.com>
+> > ---
+> >  v5: address two comments from Sebastian Andrzej Siewior, thanks!
+> >    1. use pointer rather than pointer's pointer for acomp_ctx;
+> >    2. fix the race while multiple zpool exist while dynamically switching
+> >       comprossor and zpool type
+> 
+> Hi All,
+> Any further comments?
 
-So let's clone the arm64 implementation of cbcmac(aes), which takes
-care to only preserve/restore the SIMD state after processing the
-whole input. Since cmac(aes) and xcbc(aes) can reuse most of the code,
-let's expose those as well.
+Sorry for pinging again. Hopefully we can rebuild the connection between zswap and
+those new zip drivers using acomp framework.
 
-Cc: Ben Greear <greearb@candelatech.com>
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- arch/x86/crypto/Makefile           |   2 +-
- arch/x86/crypto/aesni-intel.h      |  39 +++
- arch/x86/crypto/aesni-intel_glue.c |  42 +---
- arch/x86/crypto/aesni-intel_mac.c  | 257 ++++++++++++++++++++
- 4 files changed, 306 insertions(+), 34 deletions(-)
+> 
+> >
+> >  mm/zswap.c | 183
+> ++++++++++++++++++++++++++++++++++++++++-------------
+> >  1 file changed, 138 insertions(+), 45 deletions(-)
+> >
+> > diff --git a/mm/zswap.c b/mm/zswap.c
+> > index fbb782924ccc..8e9c18b6fdd9 100644
+> > --- a/mm/zswap.c
+> > +++ b/mm/zswap.c
+> > @@ -24,8 +24,10 @@
+> >  #include <linux/rbtree.h>
+> >  #include <linux/swap.h>
+> >  #include <linux/crypto.h>
+> > +#include <linux/scatterlist.h>
+> >  #include <linux/mempool.h>
+> >  #include <linux/zpool.h>
+> > +#include <crypto/acompress.h>
+> >
+> >  #include <linux/mm_types.h>
+> >  #include <linux/page-flags.h>
+> > @@ -127,9 +129,17 @@
+> module_param_named(same_filled_pages_enabled,
+> > zswap_same_filled_pages_enabled,
+> >  * data structures
+> >  **********************************/
+> >
+> > +struct crypto_acomp_ctx {
+> > +	struct crypto_acomp *acomp;
+> > +	struct acomp_req *req;
+> > +	struct crypto_wait wait;
+> > +	u8 *dstmem;
+> > +	struct mutex *mutex;
+> > +};
+> > +
+> >  struct zswap_pool {
+> >  	struct zpool *zpool;
+> > -	struct crypto_comp * __percpu *tfm;
+> > +	struct crypto_acomp_ctx __percpu *acomp_ctx;
+> >  	struct kref kref;
+> >  	struct list_head list;
+> >  	struct work_struct release_work;
+> > @@ -388,23 +398,43 @@ static struct zswap_entry
+> > *zswap_entry_find_get(struct rb_root *root,
+> >  * per-cpu code
+> >  **********************************/
+> >  static DEFINE_PER_CPU(u8 *, zswap_dstmem);
+> > +/*
+> > + * If users dynamically change the zpool type and compressor at runtime,
+> i.e.
+> > + * zswap is running, zswap can have more than one zpool on one cpu, but
+> > +they
+> > + * are sharing dtsmem. So we need this mutex to be per-cpu.
+> > + */
+> > +static DEFINE_PER_CPU(struct mutex *, zswap_mutex);
+> >
+> >  static int zswap_dstmem_prepare(unsigned int cpu)  {
+> > +	struct mutex *mutex;
+> >  	u8 *dst;
+> >
+> >  	dst = kmalloc_node(PAGE_SIZE * 2, GFP_KERNEL, cpu_to_node(cpu));
+> >  	if (!dst)
+> >  		return -ENOMEM;
+> >
+> > +	mutex = kmalloc_node(sizeof(*mutex), GFP_KERNEL, cpu_to_node(cpu));
+> > +	if (!mutex) {
+> > +		kfree(dst);
+> > +		return -ENOMEM;
+> > +	}
+> > +
+> > +	mutex_init(mutex);
+> >  	per_cpu(zswap_dstmem, cpu) = dst;
+> > +	per_cpu(zswap_mutex, cpu) = mutex;
+> >  	return 0;
+> >  }
+> >
+> >  static int zswap_dstmem_dead(unsigned int cpu)  {
+> > +	struct mutex *mutex;
+> >  	u8 *dst;
+> >
+> > +	mutex = per_cpu(zswap_mutex, cpu);
+> > +	kfree(mutex);
+> > +	per_cpu(zswap_mutex, cpu) = NULL;
+> > +
+> >  	dst = per_cpu(zswap_dstmem, cpu);
+> >  	kfree(dst);
+> >  	per_cpu(zswap_dstmem, cpu) = NULL;
+> > @@ -415,30 +445,54 @@ static int zswap_dstmem_dead(unsigned int cpu)
+> > static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node
+> *node)
+> > {
+> >  	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool, node);
+> > -	struct crypto_comp *tfm;
+> > -
+> > -	if (WARN_ON(*per_cpu_ptr(pool->tfm, cpu)))
+> > -		return 0;
+> > +	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool->acomp_ctx,
+> > cpu);
+> > +	struct crypto_acomp *acomp;
+> > +	struct acomp_req *req;
+> > +
+> > +	acomp = crypto_alloc_acomp(pool->tfm_name, 0, 0);
+> > +	if (IS_ERR(acomp)) {
+> > +		pr_err("could not alloc crypto acomp %s : %ld\n",
+> > +				pool->tfm_name, PTR_ERR(acomp));
+> > +		return PTR_ERR(acomp);
+> > +	}
+> > +	acomp_ctx->acomp = acomp;
+> >
+> > -	tfm = crypto_alloc_comp(pool->tfm_name, 0, 0);
+> > -	if (IS_ERR_OR_NULL(tfm)) {
+> > -		pr_err("could not alloc crypto comp %s : %ld\n",
+> > -		       pool->tfm_name, PTR_ERR(tfm));
+> > +	req = acomp_request_alloc(acomp_ctx->acomp);
+> > +	if (!req) {
+> > +		pr_err("could not alloc crypto acomp_request %s\n",
+> > +		       pool->tfm_name);
+> > +		crypto_free_acomp(acomp_ctx->acomp);
+> >  		return -ENOMEM;
+> >  	}
+> > -	*per_cpu_ptr(pool->tfm, cpu) = tfm;
+> > +	acomp_ctx->req = req;
+> > +
+> > +	crypto_init_wait(&acomp_ctx->wait);
+> > +	/*
+> > +	 * if the backend of acomp is async zip, crypto_req_done() will wakeup
+> > +	 * crypto_wait_req(); if the backend of acomp is scomp, the callback
+> > +	 * won't be called, crypto_wait_req() will return without blocking.
+> > +	 */
+> > +	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+> > +				   crypto_req_done, &acomp_ctx->wait);
+> > +
+> > +	acomp_ctx->mutex = per_cpu(zswap_mutex, cpu);
+> > +	acomp_ctx->dstmem = per_cpu(zswap_dstmem, cpu);
+> > +
+> >  	return 0;
+> >  }
+> >
+> >  static int zswap_cpu_comp_dead(unsigned int cpu, struct hlist_node
+> *node)
+> > {
+> >  	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool, node);
+> > -	struct crypto_comp *tfm;
+> > +	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool->acomp_ctx,
+> > +cpu);
+> > +
+> > +	if (!IS_ERR_OR_NULL(acomp_ctx)) {
+> > +		if (!IS_ERR_OR_NULL(acomp_ctx->req))
+> > +			acomp_request_free(acomp_ctx->req);
+> > +		if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
+> > +			crypto_free_acomp(acomp_ctx->acomp);
+> > +	}
+> >
+> > -	tfm = *per_cpu_ptr(pool->tfm, cpu);
+> > -	if (!IS_ERR_OR_NULL(tfm))
+> > -		crypto_free_comp(tfm);
+> > -	*per_cpu_ptr(pool->tfm, cpu) = NULL;
+> >  	return 0;
+> >  }
+> >
+> > @@ -561,8 +615,9 @@ static struct zswap_pool *zswap_pool_create(char
+> > *type, char *compressor)
+> >  	pr_debug("using %s zpool\n", zpool_get_type(pool->zpool));
+> >
+> >  	strlcpy(pool->tfm_name, compressor, sizeof(pool->tfm_name));
+> > -	pool->tfm = alloc_percpu(struct crypto_comp *);
+> > -	if (!pool->tfm) {
+> > +
+> > +	pool->acomp_ctx = alloc_percpu(*pool->acomp_ctx);
+> > +	if (!pool->acomp_ctx) {
+> >  		pr_err("percpu alloc failed\n");
+> >  		goto error;
+> >  	}
+> > @@ -585,7 +640,8 @@ static struct zswap_pool *zswap_pool_create(char
+> > *type, char *compressor)
+> >  	return pool;
+> >
+> >  error:
+> > -	free_percpu(pool->tfm);
+> > +	if (pool->acomp_ctx)
+> > +		free_percpu(pool->acomp_ctx);
+> >  	if (pool->zpool)
+> >  		zpool_destroy_pool(pool->zpool);
+> >  	kfree(pool);
+> > @@ -596,14 +652,14 @@ static __init struct zswap_pool
+> > *__zswap_pool_create_fallback(void)
+> >  {
+> >  	bool has_comp, has_zpool;
+> >
+> > -	has_comp = crypto_has_comp(zswap_compressor, 0, 0);
+> > +	has_comp = crypto_has_acomp(zswap_compressor, 0, 0);
+> >  	if (!has_comp && strcmp(zswap_compressor,
+> >  				CONFIG_ZSWAP_COMPRESSOR_DEFAULT)) {
+> >  		pr_err("compressor %s not available, using default %s\n",
+> >  		       zswap_compressor,
+> > CONFIG_ZSWAP_COMPRESSOR_DEFAULT);
+> >  		param_free_charp(&zswap_compressor);
+> >  		zswap_compressor = CONFIG_ZSWAP_COMPRESSOR_DEFAULT;
+> > -		has_comp = crypto_has_comp(zswap_compressor, 0, 0);
+> > +		has_comp = crypto_has_acomp(zswap_compressor, 0, 0);
+> >  	}
+> >  	if (!has_comp) {
+> >  		pr_err("default compressor %s not available\n", @@ -639,7 +695,7
+> > @@ static void zswap_pool_destroy(struct zswap_pool *pool)
+> >  	zswap_pool_debug("destroying", pool);
+> >
+> >  	cpuhp_state_remove_instance(CPUHP_MM_ZSWP_POOL_PREPARE,
+> > &pool->node);
+> > -	free_percpu(pool->tfm);
+> > +	free_percpu(pool->acomp_ctx);
+> >  	zpool_destroy_pool(pool->zpool);
+> >  	kfree(pool);
+> >  }
+> > @@ -723,7 +779,7 @@ static int __zswap_param_set(const char *val, const
+> > struct kernel_param *kp,
+> >  		}
+> >  		type = s;
+> >  	} else if (!compressor) {
+> > -		if (!crypto_has_comp(s, 0, 0)) {
+> > +		if (!crypto_has_acomp(s, 0, 0)) {
+> >  			pr_err("compressor %s not available\n", s);
+> >  			return -ENOENT;
+> >  		}
+> > @@ -774,7 +830,7 @@ static int __zswap_param_set(const char *val, const
+> > struct kernel_param *kp,
+> >  		 * failed, maybe both compressor and zpool params were bad.
+> >  		 * Allow changing this param, so pool creation will succeed
+> >  		 * when the other param is changed. We already verified this
+> > -		 * param is ok in the zpool_has_pool() or crypto_has_comp()
+> > +		 * param is ok in the zpool_has_pool() or crypto_has_acomp()
+> >  		 * checks above.
+> >  		 */
+> >  		ret = param_set_charp(s, kp);
+> > @@ -876,7 +932,9 @@ static int zswap_writeback_entry(struct zpool *pool,
+> > unsigned long handle)
+> >  	pgoff_t offset;
+> >  	struct zswap_entry *entry;
+> >  	struct page *page;
+> > -	struct crypto_comp *tfm;
+> > +	struct scatterlist input, output;
+> > +	struct crypto_acomp_ctx *acomp_ctx;
+> > +
+> >  	u8 *src, *dst;
+> >  	unsigned int dlen;
+> >  	int ret;
+> > @@ -916,14 +974,21 @@ static int zswap_writeback_entry(struct zpool
+> *pool,
+> > unsigned long handle)
+> >
+> >  	case ZSWAP_SWAPCACHE_NEW: /* page is locked */
+> >  		/* decompress */
+> > +		acomp_ctx = this_cpu_ptr(entry->pool->acomp_ctx);
+> > +
+> >  		dlen = PAGE_SIZE;
+> >  		src = (u8 *)zhdr + sizeof(struct zswap_header);
+> > -		dst = kmap_atomic(page);
+> > -		tfm = *get_cpu_ptr(entry->pool->tfm);
+> > -		ret = crypto_comp_decompress(tfm, src, entry->length,
+> > -					     dst, &dlen);
+> > -		put_cpu_ptr(entry->pool->tfm);
+> > -		kunmap_atomic(dst);
+> > +		dst = kmap(page);
+> > +
+> > +		mutex_lock(acomp_ctx->mutex);
+> > +		sg_init_one(&input, src, entry->length);
+> > +		sg_init_one(&output, dst, dlen);
+> > +		acomp_request_set_params(acomp_ctx->req, &input, &output,
+> > entry->length, dlen);
+> > +		ret = crypto_wait_req(crypto_acomp_decompress(acomp_ctx->req),
+> > &acomp_ctx->wait);
+> > +		dlen = acomp_ctx->req->dlen;
+> > +		mutex_unlock(acomp_ctx->mutex);
+> > +
+> > +		kunmap(page);
+> >  		BUG_ON(ret);
+> >  		BUG_ON(dlen != PAGE_SIZE);
+> >
+> > @@ -1004,7 +1069,8 @@ static int zswap_frontswap_store(unsigned type,
+> > pgoff_t offset,  {
+> >  	struct zswap_tree *tree = zswap_trees[type];
+> >  	struct zswap_entry *entry, *dupentry;
+> > -	struct crypto_comp *tfm;
+> > +	struct scatterlist input, output;
+> > +	struct crypto_acomp_ctx *acomp_ctx;
+> >  	int ret;
+> >  	unsigned int hlen, dlen = PAGE_SIZE;
+> >  	unsigned long handle, value;
+> > @@ -1074,12 +1140,32 @@ static int zswap_frontswap_store(unsigned
+> type,
+> > pgoff_t offset,
+> >  	}
+> >
+> >  	/* compress */
+> > -	dst = get_cpu_var(zswap_dstmem);
+> > -	tfm = *get_cpu_ptr(entry->pool->tfm);
+> > -	src = kmap_atomic(page);
+> > -	ret = crypto_comp_compress(tfm, src, PAGE_SIZE, dst, &dlen);
+> > -	kunmap_atomic(src);
+> > -	put_cpu_ptr(entry->pool->tfm);
+> > +	acomp_ctx = this_cpu_ptr(entry->pool->acomp_ctx);
+> > +
+> > +	mutex_lock(acomp_ctx->mutex);
+> > +
+> > +	src = kmap(page);
+> > +	dst = acomp_ctx->dstmem;
+> > +	sg_init_one(&input, src, PAGE_SIZE);
+> > +	/* zswap_dstmem is of size (PAGE_SIZE * 2). Reflect same in sg_list */
+> > +	sg_init_one(&output, dst, PAGE_SIZE * 2);
+> > +	acomp_request_set_params(acomp_ctx->req, &input, &output,
+> > PAGE_SIZE, dlen);
+> > +	/*
+> > +	 * it maybe looks a little bit silly that we send an asynchronous request,
+> > +	 * then wait for its completion synchronously. This makes the process
+> > look
+> > +	 * synchronous in fact.
+> > +	 * Theoretically, acomp supports users send multiple acomp requests in
+> > one
+> > +	 * acomp instance, then get those requests done simultaneously. but in
+> > this
+> > +	 * case, frontswap actually does store and load page by page, there is no
+> > +	 * existing method to send the second page before the first page is done
+> > +	 * in one thread doing frontswap.
+> > +	 * but in different threads running on different cpu, we have different
+> > +	 * acomp instance, so multiple threads can do (de)compression in
+> > parallel.
+> > +	 */
+> > +	ret = crypto_wait_req(crypto_acomp_compress(acomp_ctx->req),
+> > &acomp_ctx->wait);
+> > +	dlen = acomp_ctx->req->dlen;
+> > +	kunmap(page);
+> > +
+> >  	if (ret) {
+> >  		ret = -EINVAL;
+> >  		goto put_dstmem;
+> > @@ -1103,7 +1189,7 @@ static int zswap_frontswap_store(unsigned type,
+> > pgoff_t offset,
+> >  	memcpy(buf, &zhdr, hlen);
+> >  	memcpy(buf + hlen, dst, dlen);
+> >  	zpool_unmap_handle(entry->pool->zpool, handle);
+> > -	put_cpu_var(zswap_dstmem);
+> > +	mutex_unlock(acomp_ctx->mutex);
+> >
+> >  	/* populate entry */
+> >  	entry->offset = offset;
+> > @@ -1131,7 +1217,7 @@ static int zswap_frontswap_store(unsigned type,
+> > pgoff_t offset,
+> >  	return 0;
+> >
+> >  put_dstmem:
+> > -	put_cpu_var(zswap_dstmem);
+> > +	mutex_unlock(acomp_ctx->mutex);
+> >  	zswap_pool_put(entry->pool);
+> >  freepage:
+> >  	zswap_entry_cache_free(entry);
+> > @@ -1148,7 +1234,8 @@ static int zswap_frontswap_load(unsigned type,
+> > pgoff_t offset,  {
+> >  	struct zswap_tree *tree = zswap_trees[type];
+> >  	struct zswap_entry *entry;
+> > -	struct crypto_comp *tfm;
+> > +	struct scatterlist input, output;
+> > +	struct crypto_acomp_ctx *acomp_ctx;
+> >  	u8 *src, *dst;
+> >  	unsigned int dlen;
+> >  	int ret;
+> > @@ -1175,11 +1262,17 @@ static int zswap_frontswap_load(unsigned
+> type,
+> > pgoff_t offset,
+> >  	src = zpool_map_handle(entry->pool->zpool, entry->handle,
+> > ZPOOL_MM_RO);
+> >  	if (zpool_evictable(entry->pool->zpool))
+> >  		src += sizeof(struct zswap_header);
+> > -	dst = kmap_atomic(page);
+> > -	tfm = *get_cpu_ptr(entry->pool->tfm);
+> > -	ret = crypto_comp_decompress(tfm, src, entry->length, dst, &dlen);
+> > -	put_cpu_ptr(entry->pool->tfm);
+> > -	kunmap_atomic(dst);
+> > +	dst = kmap(page);
+> > +
+> > +	acomp_ctx = this_cpu_ptr(entry->pool->acomp_ctx);
+> > +	mutex_lock(acomp_ctx->mutex);
+> > +	sg_init_one(&input, src, entry->length);
+> > +	sg_init_one(&output, dst, dlen);
+> > +	acomp_request_set_params(acomp_ctx->req, &input, &output,
+> > entry->length, dlen);
+> > +	ret = crypto_wait_req(crypto_acomp_decompress(acomp_ctx->req),
+> > &acomp_ctx->wait);
+> > +	mutex_unlock(acomp_ctx->mutex);
+> > +
+> > +	kunmap(page);
+> >  	zpool_unmap_handle(entry->pool->zpool, entry->handle);
+> >  	BUG_ON(ret);
+> >
+> > --
+> > 2.27.0
 
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index a31de0c6ccde..f83e162f87ad 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -51,7 +51,7 @@ chacha-x86_64-y := chacha-avx2-x86_64.o chacha-ssse3-x86_64.o chacha_glue.o
- chacha-x86_64-$(CONFIG_AS_AVX512) += chacha-avx512vl-x86_64.o
- 
- obj-$(CONFIG_CRYPTO_AES_NI_INTEL) += aesni-intel.o
--aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o
-+aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o aesni-intel_mac.o
- aesni-intel-$(CONFIG_64BIT) += aesni-intel_avx-x86_64.o aes_ctrby8_avx-x86_64.o
- 
- obj-$(CONFIG_CRYPTO_SHA1_SSSE3) += sha1-ssse3.o
-diff --git a/arch/x86/crypto/aesni-intel.h b/arch/x86/crypto/aesni-intel.h
-new file mode 100644
-index 000000000000..d9204c043184
---- /dev/null
-+++ b/arch/x86/crypto/aesni-intel.h
-@@ -0,0 +1,39 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+
-+#include <crypto/algapi.h>
-+#include <crypto/aes.h>
-+#include <crypto/internal/hash.h>
-+
-+#define AESNI_ALIGN	16
-+#define AESNI_ALIGN_ATTR __attribute__ ((__aligned__(AESNI_ALIGN)))
-+#define AES_BLOCK_MASK	(~(AES_BLOCK_SIZE - 1))
-+#define RFC4106_HASH_SUBKEY_SIZE 16
-+#define AESNI_ALIGN_EXTRA ((AESNI_ALIGN - 1) & ~(CRYPTO_MINALIGN - 1))
-+#define CRYPTO_AES_CTX_SIZE (sizeof(struct crypto_aes_ctx) + AESNI_ALIGN_EXTRA)
-+#define XTS_AES_CTX_SIZE (sizeof(struct aesni_xts_ctx) + AESNI_ALIGN_EXTRA)
-+
-+extern struct shash_alg aesni_mac_algs[];
-+extern const int aesni_num_mac_algs;
-+
-+asmlinkage int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
-+			     unsigned int key_len);
-+asmlinkage void aesni_enc(const void *ctx, u8 *out, const u8 *in);
-+asmlinkage void aesni_dec(const void *ctx, u8 *out, const u8 *in);
-+asmlinkage void aesni_ecb_enc(struct crypto_aes_ctx *ctx, u8 *out,
-+			      const u8 *in, unsigned int len);
-+asmlinkage void aesni_ecb_dec(struct crypto_aes_ctx *ctx, u8 *out,
-+			      const u8 *in, unsigned int len);
-+asmlinkage void aesni_cbc_enc(struct crypto_aes_ctx *ctx, u8 *out,
-+			      const u8 *in, unsigned int len, u8 *iv);
-+asmlinkage void aesni_cbc_dec(struct crypto_aes_ctx *ctx, u8 *out,
-+			      const u8 *in, unsigned int len, u8 *iv);
-+
-+static inline struct crypto_aes_ctx *aes_ctx(void *raw_ctx)
-+{
-+	unsigned long addr = (unsigned long)raw_ctx;
-+	unsigned long align = AESNI_ALIGN;
-+
-+	if (align <= crypto_tfm_ctx_alignment())
-+		align = 1;
-+	return (struct crypto_aes_ctx *)ALIGN(addr, align);
-+}
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index ad8a7188a2bf..bc51c5f80858 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -19,8 +19,6 @@
- #include <linux/types.h>
- #include <linux/module.h>
- #include <linux/err.h>
--#include <crypto/algapi.h>
--#include <crypto/aes.h>
- #include <crypto/ctr.h>
- #include <crypto/b128ops.h>
- #include <crypto/gcm.h>
-@@ -37,14 +35,7 @@
- #include <asm/crypto/glue_helper.h>
- #endif
- 
--
--#define AESNI_ALIGN	16
--#define AESNI_ALIGN_ATTR __attribute__ ((__aligned__(AESNI_ALIGN)))
--#define AES_BLOCK_MASK	(~(AES_BLOCK_SIZE - 1))
--#define RFC4106_HASH_SUBKEY_SIZE 16
--#define AESNI_ALIGN_EXTRA ((AESNI_ALIGN - 1) & ~(CRYPTO_MINALIGN - 1))
--#define CRYPTO_AES_CTX_SIZE (sizeof(struct crypto_aes_ctx) + AESNI_ALIGN_EXTRA)
--#define XTS_AES_CTX_SIZE (sizeof(struct aesni_xts_ctx) + AESNI_ALIGN_EXTRA)
-+#include "aesni-intel.h"
- 
- /* This data is stored at the end of the crypto_tfm struct.
-  * It's a type of per "session" data storage location.
-@@ -81,19 +72,6 @@ struct gcm_context_data {
- 	u8 hash_keys[GCM_BLOCK_LEN * 16];
- };
- 
--asmlinkage int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
--			     unsigned int key_len);
--asmlinkage void aesni_enc(const void *ctx, u8 *out, const u8 *in);
--asmlinkage void aesni_dec(const void *ctx, u8 *out, const u8 *in);
--asmlinkage void aesni_ecb_enc(struct crypto_aes_ctx *ctx, u8 *out,
--			      const u8 *in, unsigned int len);
--asmlinkage void aesni_ecb_dec(struct crypto_aes_ctx *ctx, u8 *out,
--			      const u8 *in, unsigned int len);
--asmlinkage void aesni_cbc_enc(struct crypto_aes_ctx *ctx, u8 *out,
--			      const u8 *in, unsigned int len, u8 *iv);
--asmlinkage void aesni_cbc_dec(struct crypto_aes_ctx *ctx, u8 *out,
--			      const u8 *in, unsigned int len, u8 *iv);
--
- #define AVX_GEN2_OPTSIZE 640
- #define AVX_GEN4_OPTSIZE 4096
- 
-@@ -296,16 +274,6 @@ generic_gcmaes_ctx *generic_gcmaes_ctx_get(struct crypto_aead *tfm)
- }
- #endif
- 
--static inline struct crypto_aes_ctx *aes_ctx(void *raw_ctx)
--{
--	unsigned long addr = (unsigned long)raw_ctx;
--	unsigned long align = AESNI_ALIGN;
--
--	if (align <= crypto_tfm_ctx_alignment())
--		align = 1;
--	return (struct crypto_aes_ctx *)ALIGN(addr, align);
--}
--
- static int aes_set_key_common(struct crypto_tfm *tfm, void *raw_ctx,
- 			      const u8 *in_key, unsigned int key_len)
- {
-@@ -1098,8 +1066,15 @@ static int __init aesni_init(void)
- 	if (err)
- 		goto unregister_skciphers;
- 
-+	err = crypto_register_shashes(aesni_mac_algs, aesni_num_mac_algs);
-+	if (err)
-+		goto unregister_aeads;
-+
- 	return 0;
- 
-+unregister_aeads:
-+	simd_unregister_aeads(aesni_aeads, ARRAY_SIZE(aesni_aeads),
-+			      aesni_simd_aeads);
- unregister_skciphers:
- 	simd_unregister_skciphers(aesni_skciphers, ARRAY_SIZE(aesni_skciphers),
- 				  aesni_simd_skciphers);
-@@ -1110,6 +1085,7 @@ static int __init aesni_init(void)
- 
- static void __exit aesni_exit(void)
- {
-+	crypto_unregister_shashes(aesni_mac_algs, aesni_num_mac_algs);
- 	simd_unregister_aeads(aesni_aeads, ARRAY_SIZE(aesni_aeads),
- 			      aesni_simd_aeads);
- 	simd_unregister_skciphers(aesni_skciphers, ARRAY_SIZE(aesni_skciphers),
-diff --git a/arch/x86/crypto/aesni-intel_mac.c b/arch/x86/crypto/aesni-intel_mac.c
-new file mode 100644
-index 000000000000..7d546bbf21e5
---- /dev/null
-+++ b/arch/x86/crypto/aesni-intel_mac.c
-@@ -0,0 +1,257 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Copyright (C) 2013 - 2017 Linaro Ltd <ard.biesheuvel@linaro.org>
-+ * Copyright (C) 2020 Arm Ltd <ard.biesheuvel@arm.com>
-+ */
-+
-+#include <asm/simd.h>
-+#include <crypto/b128ops.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/internal/simd.h>
-+#include <linux/module.h>
-+
-+#include "aesni-intel.h"
-+
-+MODULE_ALIAS_CRYPTO("cmac(aes)");
-+MODULE_ALIAS_CRYPTO("xcbc(aes)");
-+MODULE_ALIAS_CRYPTO("cbcmac(aes)");
-+
-+struct mac_tfm_ctx {
-+	u8 key[CRYPTO_AES_CTX_SIZE];
-+	u8 __aligned(8) consts[];
-+};
-+
-+struct mac_desc_ctx {
-+	u8 dg[AES_BLOCK_SIZE];
-+	unsigned int len;
-+};
-+
-+asmlinkage void aesni_enc(const void *ctx, u8 *out, const u8 *in);
-+asmlinkage void aesni_ecb_enc(struct crypto_aes_ctx *ctx, u8 *out,
-+			      const u8 *in, unsigned int len);
-+asmlinkage void aesni_cbc_enc(struct crypto_aes_ctx *ctx, u8 *out,
-+			      const u8 *in, unsigned int len, u8 *iv);
-+
-+static int cbcmac_setkey(struct crypto_shash *tfm, const u8 *in_key,
-+			 unsigned int key_len)
-+{
-+	struct mac_tfm_ctx *ctx = crypto_shash_ctx(tfm);
-+
-+	return aes_expandkey(aes_ctx(&ctx->key), in_key, key_len);
-+}
-+
-+static void cmac_gf128_mul_by_x(be128 *y, const be128 *x)
-+{
-+	u64 a = be64_to_cpu(x->a);
-+	u64 b = be64_to_cpu(x->b);
-+
-+	y->a = cpu_to_be64((a << 1) | (b >> 63));
-+	y->b = cpu_to_be64((b << 1) ^ ((a >> 63) ? 0x87 : 0));
-+}
-+
-+static int cmac_setkey(struct crypto_shash *tfm, const u8 *in_key,
-+		       unsigned int key_len)
-+{
-+	struct mac_tfm_ctx *ctx = crypto_shash_ctx(tfm);
-+	be128 *consts = (be128 *)ctx->consts;
-+	int err;
-+
-+	err = cbcmac_setkey(tfm, in_key, key_len);
-+	if (err)
-+		return err;
-+
-+	/* encrypt the zero vector */
-+	kernel_fpu_begin();
-+	aesni_ecb_enc(aes_ctx(&ctx->key), ctx->consts, (u8[AES_BLOCK_SIZE]){},
-+		      AES_BLOCK_SIZE);
-+	kernel_fpu_end();
-+
-+	cmac_gf128_mul_by_x(consts, consts);
-+	cmac_gf128_mul_by_x(consts + 1, consts);
-+
-+	return 0;
-+}
-+
-+static int xcbc_setkey(struct crypto_shash *tfm, const u8 *in_key,
-+		       unsigned int key_len)
-+{
-+	static u8 const ks[3][AES_BLOCK_SIZE] = {
-+		{ [0 ... AES_BLOCK_SIZE - 1] = 0x1 },
-+		{ [0 ... AES_BLOCK_SIZE - 1] = 0x2 },
-+		{ [0 ... AES_BLOCK_SIZE - 1] = 0x3 },
-+	};
-+
-+	struct mac_tfm_ctx *ctx = crypto_shash_ctx(tfm);
-+	u8 key[AES_BLOCK_SIZE];
-+	int err;
-+
-+	err = cbcmac_setkey(tfm, in_key, key_len);
-+	if (err)
-+		return err;
-+
-+	kernel_fpu_begin();
-+	aesni_ecb_enc(aes_ctx(&ctx->key), key, ks[0], AES_BLOCK_SIZE);
-+	aesni_ecb_enc(aes_ctx(&ctx->key), ctx->consts, ks[1], 2 * AES_BLOCK_SIZE);
-+	kernel_fpu_end();
-+
-+	return cbcmac_setkey(tfm, key, sizeof(key));
-+}
-+
-+static int mac_init(struct shash_desc *desc)
-+{
-+	struct mac_desc_ctx *ctx = shash_desc_ctx(desc);
-+
-+	memset(ctx->dg, 0, AES_BLOCK_SIZE);
-+	ctx->len = 0;
-+
-+	return 0;
-+}
-+
-+static void mac_do_update(struct crypto_aes_ctx *ctx, u8 const in[], int blocks,
-+			  u8 dg[], int enc_before, int enc_after)
-+{
-+	if (likely(crypto_simd_usable())) {
-+		kernel_fpu_begin();
-+		if (enc_before)
-+			aesni_enc(ctx, dg, dg);
-+
-+		while (blocks--) {
-+			if (!blocks && !enc_after) {
-+				crypto_xor(dg, in, AES_BLOCK_SIZE);
-+				break;
-+			}
-+			aesni_cbc_enc(ctx, dg, in, AES_BLOCK_SIZE, dg);
-+			in += AES_BLOCK_SIZE;
-+		}
-+		kernel_fpu_end();
-+	} else {
-+		if (enc_before)
-+			aes_encrypt(ctx, dg, dg);
-+
-+		while (blocks--) {
-+			crypto_xor(dg, in, AES_BLOCK_SIZE);
-+			in += AES_BLOCK_SIZE;
-+
-+			if (blocks || enc_after)
-+				aes_encrypt(ctx, dg, dg);
-+		}
-+	}
-+}
-+
-+static int mac_update(struct shash_desc *desc, const u8 *p, unsigned int len)
-+{
-+	struct mac_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
-+	struct mac_desc_ctx *ctx = shash_desc_ctx(desc);
-+
-+	while (len > 0) {
-+		unsigned int l;
-+
-+		if ((ctx->len % AES_BLOCK_SIZE) == 0 &&
-+		    (ctx->len + len) > AES_BLOCK_SIZE) {
-+
-+			int blocks = len / AES_BLOCK_SIZE;
-+
-+			len %= AES_BLOCK_SIZE;
-+
-+			mac_do_update(aes_ctx(&tctx->key), p, blocks, ctx->dg,
-+				      (ctx->len != 0), (len != 0));
-+
-+			p += blocks * AES_BLOCK_SIZE;
-+
-+			if (!len) {
-+				ctx->len = AES_BLOCK_SIZE;
-+				break;
-+			}
-+			ctx->len = 0;
-+		}
-+
-+		l = min(len, AES_BLOCK_SIZE - ctx->len);
-+
-+		if (l <= AES_BLOCK_SIZE) {
-+			crypto_xor(ctx->dg + ctx->len, p, l);
-+			ctx->len += l;
-+			len -= l;
-+			p += l;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static int cbcmac_final(struct shash_desc *desc, u8 *out)
-+{
-+	struct mac_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
-+	struct mac_desc_ctx *ctx = shash_desc_ctx(desc);
-+
-+	mac_do_update(aes_ctx(&tctx->key), NULL, 0, ctx->dg, (ctx->len != 0), 0);
-+
-+	memcpy(out, ctx->dg, AES_BLOCK_SIZE);
-+
-+	return 0;
-+}
-+
-+static int cmac_final(struct shash_desc *desc, u8 *out)
-+{
-+	struct mac_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
-+	struct mac_desc_ctx *ctx = shash_desc_ctx(desc);
-+	u8 *consts = tctx->consts;
-+
-+	if (ctx->len != AES_BLOCK_SIZE) {
-+		ctx->dg[ctx->len] ^= 0x80;
-+		consts += AES_BLOCK_SIZE;
-+	}
-+
-+	mac_do_update(aes_ctx(&tctx->key), consts, 1, ctx->dg, 0, 1);
-+
-+	memcpy(out, ctx->dg, AES_BLOCK_SIZE);
-+
-+	return 0;
-+}
-+
-+struct shash_alg aesni_mac_algs[] = { {
-+	.base.cra_name		= "cmac(aes)",
-+	.base.cra_driver_name	= "cmac-aes-aesni",
-+	.base.cra_priority	= 400,
-+	.base.cra_blocksize	= AES_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct mac_tfm_ctx) +
-+				  2 * AES_BLOCK_SIZE,
-+	.base.cra_module	= THIS_MODULE,
-+
-+	.digestsize		= AES_BLOCK_SIZE,
-+	.init			= mac_init,
-+	.update			= mac_update,
-+	.final			= cmac_final,
-+	.setkey			= cmac_setkey,
-+	.descsize		= sizeof(struct mac_desc_ctx),
-+}, {
-+	.base.cra_name		= "xcbc(aes)",
-+	.base.cra_driver_name	= "xcbc-aes-aesni",
-+	.base.cra_priority	= 400,
-+	.base.cra_blocksize	= AES_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct mac_tfm_ctx) +
-+				  2 * AES_BLOCK_SIZE,
-+	.base.cra_module	= THIS_MODULE,
-+
-+	.digestsize		= AES_BLOCK_SIZE,
-+	.init			= mac_init,
-+	.update			= mac_update,
-+	.final			= cmac_final,
-+	.setkey			= xcbc_setkey,
-+	.descsize		= sizeof(struct mac_desc_ctx),
-+}, {
-+	.base.cra_name		= "cbcmac(aes)",
-+	.base.cra_driver_name	= "cbcmac-aes-aesni",
-+	.base.cra_priority	= 400,
-+	.base.cra_blocksize	= 1,
-+	.base.cra_ctxsize	= sizeof(struct mac_tfm_ctx),
-+	.base.cra_module	= THIS_MODULE,
-+
-+	.digestsize		= AES_BLOCK_SIZE,
-+	.init			= mac_init,
-+	.update			= mac_update,
-+	.final			= cbcmac_final,
-+	.setkey			= cbcmac_setkey,
-+	.descsize		= sizeof(struct mac_desc_ctx),
-+} };
-+
-+const int aesni_num_mac_algs = ARRAY_SIZE(aesni_mac_algs);
--- 
-2.17.1
+Thanks
+Barry
 
