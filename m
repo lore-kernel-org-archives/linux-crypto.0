@@ -2,80 +2,132 @@ Return-Path: <SRS0=/mkk=BM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E3F0C433E0
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 Aug 2020 14:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ECC8C433EA
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 Aug 2020 14:54:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F4E12072A
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 Aug 2020 14:53:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D4382075B
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 Aug 2020 14:54:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h25uld9S"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725952AbgHBOxA (ORCPT
+        id S1726586AbgHBOyB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 2 Aug 2020 10:53:00 -0400
-Received: from zg8tmja5ljk3lje4mi4ymjia.icoremail.net ([209.97.182.222]:39368
-        "HELO zg8tmja5ljk3lje4mi4ymjia.icoremail.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with SMTP id S1725861AbgHBOxA (ORCPT
+        Sun, 2 Aug 2020 10:54:01 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57688 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726282AbgHBOxy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Aug 2020 10:53:00 -0400
-Received: from [101.5.209.60] (unknown [101.5.209.60])
-        by app-3 (Coremail) with SMTP id EQQGZQA3PiJB0yZfgSzdAw--.56560S2;
-        Sun, 02 Aug 2020 22:52:51 +0800 (CST)
-From:   Jia-Ju Bai <baijiaju@tsinghua.edu.cn>
-Subject: [BUG] crypto: hisilicon: accessing the data mapped to streaming DMA
-To:     wangzhou1@hisilicon.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <361fa200-479c-e1ef-b7d6-e666a256660f@tsinghua.edu.cn>
-Date:   Sun, 2 Aug 2020 22:52:48 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Sun, 2 Aug 2020 10:53:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596380033;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1kkoTewt7Fx4Q+2DDC1UGcR4JlqqtBcQK2oUP1r3rTc=;
+        b=h25uld9SIfoj5VjErXtMPmIqvlXPAtJ9JBM59o8fHH2lQ1S+DyLmOlX51gMTheqs8+RYFB
+        9ufHZJCdVWjJaYwpalTcdDMcE3z82dp85ISkgHWnzjWf4A5Leg2ztBE7DWr4nwgqTn9jU+
+        05CB8xgosBwf/jZez18nhURcbSzonbw=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-500-iCjnqsW2MOqOYNmIvLHkBw-1; Sun, 02 Aug 2020 10:53:51 -0400
+X-MC-Unique: iCjnqsW2MOqOYNmIvLHkBw-1
+Received: by mail-qt1-f197.google.com with SMTP id m13so6205197qth.16
+        for <linux-crypto@vger.kernel.org>; Sun, 02 Aug 2020 07:53:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=1kkoTewt7Fx4Q+2DDC1UGcR4JlqqtBcQK2oUP1r3rTc=;
+        b=nlPJXlHbwgRehUq0WyNqCO+cD5sMCuIBjFNzMlTJPBTBcs60jrEbpQsFehlGprhyFU
+         LdfYrRBBa6OX5PrToGNLyhoFQ4pRyQodWelKhQcJzK9RUME37aV/4IgVQc8tMDHIb2+1
+         1W3JPpneDwZUvF3is+cI8HGKt+e44p1+zc2IMgVRqV+OIagQrW6n+dZkNpyYU1XPgTvq
+         7dpWo0NMGe1yGMKN5BxWVgxurRleZY5z+5dSU5/QgWZylkdPh2J5rnT0nAbBtwadYMoj
+         ffPubYjYES5tCxLbhdY7rnr2K9dA5n9KPskrNwmnLnwJ6S8vd1tWnfUVAvX3y/eA4LUB
+         k0vg==
+X-Gm-Message-State: AOAM530BMaIn5jfM6qjfSgrz97jRn+jiZBySB5BLgvWmyZuc4oenMLiB
+        e0cw6vmRBWzquBJkDBcd6mRmNbQSvBnO6iEvXwxyxDWG8CnSmQG7FlrzYLnQ3FDqINfytlIAs7U
+        ee0t1fPpZbr6IT2Hcx9/Tu2LS
+X-Received: by 2002:a0c:f007:: with SMTP id z7mr12711369qvk.53.1596380031292;
+        Sun, 02 Aug 2020 07:53:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzsaj772ZR8xxDSmSbCv1i3DbzhNyKSnnIAtdh3ZvECGhzafck69cLoHqLTgfamrb5jJgzXtg==
+X-Received: by 2002:a0c:f007:: with SMTP id z7mr12711349qvk.53.1596380031093;
+        Sun, 02 Aug 2020 07:53:51 -0700 (PDT)
+Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
+        by smtp.gmail.com with ESMTPSA id t127sm16326265qkc.100.2020.08.02.07.53.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 02 Aug 2020 07:53:50 -0700 (PDT)
+Subject: Re: [RFC PATCH 00/17] Drop uses of pci_read_config_*() return value
+To:     Borislav Petkov <bp@alien8.de>,
+        "Saheed O. Bolarinwa" <refactormyself@gmail.com>
+Cc:     helgaas@kernel.org, Kalle Valo <kvalo@codeaurora.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Wolfgang Grandegger <wg@grandegger.com>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Joerg Roedel <joro@8bytes.org>, bjorn@helgaas.com,
+        skhan@linuxfoundation.org,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        linux-mtd@lists.infradead.org, iommu@lists.linux-foundation.org,
+        linux-rdma@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        linux-gpio@vger.kernel.org, linux-fpga@vger.kernel.org,
+        linux-edac@vger.kernel.org, dmaengine@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net
+References: <20200801112446.149549-1-refactormyself@gmail.com>
+ <20200801125657.GA25391@nazgul.tnic>
+From:   Tom Rix <trix@redhat.com>
+Message-ID: <6ecce8f3-350a-b5d5-82c9-4609f2298e61@redhat.com>
+Date:   Sun, 2 Aug 2020 07:53:46 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200801125657.GA25391@nazgul.tnic>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-CM-TRANSID: EQQGZQA3PiJB0yZfgSzdAw--.56560S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Xw18Gw1rKr1Duw1xWF47XFb_yoWxZrX_A3
-        y3Gw1rGFWq9an7twn7Ja15A3yaqFZrtr4qyr9ayFW8Zw17Aa1kGwn5Za18tw1Fy3Z0yFn5
-        tw13u393WF1FvjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbIkYjsxI4VWDJwAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I
-        6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM2
-        8CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0
-        cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4
-        A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IE
-        w4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMc
-        vjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67vIY487MxkI
-        ecxEwVAFwVW5XwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
-        02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_
-        Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
-        CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE
-        14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
-        9x07jorWrUUUUU=
-X-CM-SenderInfo: xedlyxhdmxq3pvlqwxlxdovvfxof0/
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In qm_qp_ctx_cfg(), "sqc" and "aeqc" are mapped to streaming DMA:
-   eqc_dma = dma_map_single(..., eqc, ...);
-   ......
-   aeqc_dma = dma_map_single(..., aeqc, ...);
 
-Then "sqc" and "aeqc" are accessed at many places, such as:
-   eqc->base_l = cpu_to_le32(lower_32_bits(qm->eqe_dma));
-   eqc->base_h = cpu_to_le32(upper_32_bits(qm->eqe_dma));
-   ......
-   aeqc->base_l = cpu_to_le32(lower_32_bits(qm->aeqe_dma));
-   aeqc->base_h = cpu_to_le32(upper_32_bits(qm->aeqe_dma));
+On 8/1/20 5:56 AM, Borislav Petkov wrote:
+> On Sat, Aug 01, 2020 at 01:24:29PM +0200, Saheed O. Bolarinwa wrote:
+>> The return value of pci_read_config_*() may not indicate a device error.
+>> However, the value read by these functions is more likely to indicate
+>> this kind of error. This presents two overlapping ways of reporting
+>> errors and complicates error checking.
+> So why isn't the *value check done in the pci_read_config_* functions
+> instead of touching gazillion callers?
+>
+> For example, pci_conf{1,2}_read() could check whether the u32 *value it
+> just read depending on the access method, whether that value is ~0 and
+> return proper PCIBIOS_ error in that case.
+>
+> The check you're replicating
+>
+> 	if (val32 == (u32)~0)
+>
+> everywhere, instead, is just ugly and tests a naked value ~0 which
+> doesn't mean anything...
+>
+I agree, if there is a change, it should be in the pci_read_* functions.
 
-These accesses may cause data inconsistency between CPU cache and hardware.
+Anything returning void should not fail and likely future users of the proposed change will not do the extra checks.
 
-I am not sure how to properly fix this problem, and thus I only report it.
-
-
-Best wishes,
-Jia-Ju Bai
+Tom
 
