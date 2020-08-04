@@ -2,95 +2,98 @@ Return-Path: <SRS0=wb3S=BO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C71C433DF
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Aug 2020 09:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15AE0C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Aug 2020 12:33:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1C4052086A
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Aug 2020 09:29:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDCF5207FC
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Aug 2020 12:33:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="R4j1Kjfj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725946AbgHDJ3h (ORCPT
+        id S1726086AbgHDMdM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Aug 2020 05:29:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39448 "EHLO
+        Tue, 4 Aug 2020 08:33:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725904AbgHDJ3h (ORCPT
+        with ESMTP id S1726198AbgHDMcx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Aug 2020 05:29:37 -0400
-Received: from andre.telenet-ops.be (andre.telenet-ops.be [IPv6:2a02:1800:120:4::f00:15])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BACD2C06174A
-        for <linux-crypto@vger.kernel.org>; Tue,  4 Aug 2020 02:29:36 -0700 (PDT)
-Received: from ramsan ([84.195.186.194])
-        by andre.telenet-ops.be with bizsmtp
-        id BMVY230074C55Sk01MVYvk; Tue, 04 Aug 2020 11:29:33 +0200
-Received: from rox.of.borg ([192.168.97.57])
-        by ramsan with esmtp (Exim 4.90_1)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1k2tGF-0005hH-WE; Tue, 04 Aug 2020 11:29:32 +0200
-Received: from geert by rox.of.borg with local (Exim 4.90_1)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1k2tGF-0001wN-Tf; Tue, 04 Aug 2020 11:29:31 +0200
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Tero Kristo <t-kristo@ti.com>, Keerthy <j-keerthy@ti.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH] crypto: sa2ul - fix pointer cast warning on 32-bit
-Date:   Tue,  4 Aug 2020 11:29:27 +0200
-Message-Id: <20200804092927.7417-1-geert@linux-m68k.org>
-X-Mailer: git-send-email 2.17.1
+        Tue, 4 Aug 2020 08:32:53 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45128C06174A
+        for <linux-crypto@vger.kernel.org>; Tue,  4 Aug 2020 05:32:52 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id p3so22008043pgh.3
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Aug 2020 05:32:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=WCt1TC78m72fl6dTikzGohA0nUGIaoTAmYoDfXqsjL4=;
+        b=R4j1Kjfj+UuaGt1OvVDZ5l1lS5Korwa1Nu6LTjNO09fiKBg1eP+86tY9rf3ph4POVE
+         9esQqoqqIUNdrK5+1pVRO7xxM8Bwpa7CsMm3bm2/6p5rcyuCniPSOaeDQ1VyqjyMBeST
+         HSIWaNPPBcoFmsSykehGO19JRb5TuzTOSKhrfWHku/QRgBU7UEvXlvfx4GEvaOmDGeh5
+         2/ZLUsJExVPF1zuTSS8pBdY6UiTqcaEf6/wNiLlUTTZA8wHi0q9qDqxmk2757knzVU+8
+         JnHEIs0IgsBn+9j4h3vk6wS25XnoATNza2oV2IZlmHmKcuOF0+fygIFAIbl+3bPD4p5M
+         b/Uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=WCt1TC78m72fl6dTikzGohA0nUGIaoTAmYoDfXqsjL4=;
+        b=IuD7DE9hMfTlLRZOz9wF4fwOC3ecjMxLbPlJSLQ0J3ocbJC1SbS202NrrgLq1PqTmh
+         TB7ogytBrMJqhUmiBRAio+1HO54FjWs+c/Msa3WN+QvAF6tlImMDvZoaDia1PQg5wEBb
+         fPOE6J4pq/7UMJb29a0Km+gzIrHtHPjcKjzKSC3Hyb9XeMlNf34VpynK8q5yN7leEY0c
+         uTOZ/WjfzfowTzKeKBk9syWTdvDtRtlkxJWA4QGyRO5wiua+NR6kFxEIavxVsLPr2Gu0
+         w15Eq0d5kRNlVatZrAoUzTulNkOka8sCC6C6M1xTUkC8ScxVo1xEXMZ/3EgeoQJYmmlA
+         bTYQ==
+X-Gm-Message-State: AOAM533wLUS/PKbmrL6rtHPhCLWUduPIEXbTqQOa/sW6IINVH9KsRElZ
+        fzeTPq/noHsf3/e1POi5twl+sVcFkK2dopSZF/KAmJiTFYg=
+X-Google-Smtp-Source: ABdhPJw7yTQvVJJn7+x3+iYxaaV72XzAhOMDsGInJUPr4UEZB2NC/tWbxM+4RNXkTfZHvMLX4J2A2eJ5ORK8+wsot9A=
+X-Received: by 2002:a62:78d6:: with SMTP id t205mr20818508pfc.68.1596544371674;
+ Tue, 04 Aug 2020 05:32:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20200728040446.GA12763@gondor.apana.org.au>
+In-Reply-To: <20200728040446.GA12763@gondor.apana.org.au>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Tue, 4 Aug 2020 15:32:40 +0300
+Message-ID: <CAOtvUMc-RnxJ2c=GaTpS5nNd0xjKqd1zyFPO=5_ANCzMYXFU1w@mail.gmail.com>
+Subject: Re: [PATCH] crypto: ccree - Delete non-standard algorithms
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 32-bit:
+On Tue, Jul 28, 2020 at 7:04 AM Herbert Xu <herbert@gondor.apana.org.au> wr=
+ote:
+>
+> This patch deletes non-standard algorithms such as essiv512 and
+> essiv4096 which have no corresponding generic implementation.
 
-    drivers/crypto/sa2ul.c: In function ‘sa_sha_init’:
-    drivers/crypto/sa2ul.c:1486:33: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
-       crypto_ahash_digestsize(tfm), (u64)rctx);
-				     ^
+Sigh... yes, these were left in because I I thought it might be
+interesting to bring support
+for these algorithms (including a generic implementation) into
+dm-crypt but alas, there seems
+to be no interest.
 
-Fix this by casting the context pointer to "unsigned long" (which is
-either 32-bit or 64-bit, just like pointers) instead of "u64", and
-update the format specifier accordingly.
-While at it, use "%u" to format unsigned int.
+If it's OK with you instead of this patch I'll send a patch series
+that also removes the support for
+these from the driver, not just the registration, as there is no point
+in carrying dead code.
 
-Fixes: 2dc53d0047458e28 ("crypto: sa2ul - add sha1/sha256/sha512 support")
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
----
-Notes:
-  1. This (still) reveals the kernel pointer value, which would be
-     obfuscated by using "%p",
-  2. Perhaps we want to use "%px" instead? But there are no users of
-     "%px" in drivers/crypto/.
----
- drivers/crypto/sa2ul.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Thanks,
+Gilad
 
-diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-index 5bc099052bd20b3c..4611ac20405a60cb 100644
---- a/drivers/crypto/sa2ul.c
-+++ b/drivers/crypto/sa2ul.c
-@@ -1482,8 +1482,8 @@ static int sa_sha_init(struct ahash_request *req)
- 	struct sa_sha_req_ctx *rctx = ahash_request_ctx(req);
- 	struct sa_tfm_ctx *ctx = crypto_ahash_ctx(tfm);
- 
--	dev_dbg(sa_k3_dev, "init: digest size: %d, rctx=%llx\n",
--		crypto_ahash_digestsize(tfm), (u64)rctx);
-+	dev_dbg(sa_k3_dev, "init: digest size: %u, rctx=%lx\n",
-+		crypto_ahash_digestsize(tfm), (unsigned long)rctx);
- 
- 	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback.ahash);
- 	rctx->fallback_req.base.flags =
--- 
-2.17.1
 
+
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
