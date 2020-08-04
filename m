@@ -7,89 +7,90 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92EAFC433DF
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Aug 2020 08:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C71C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Aug 2020 09:29:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 99FF722CA1
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Aug 2020 08:09:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C4052086A
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Aug 2020 09:29:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729781AbgHDIJD (ORCPT
+        id S1725946AbgHDJ3h (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Aug 2020 04:09:03 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:52740 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729767AbgHDIJD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Aug 2020 04:09:03 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id C1D1C28AAF784F1D2308;
-        Tue,  4 Aug 2020 16:09:00 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 4 Aug 2020 16:08:54 +0800
-From:   Wei Yongjun <weiyongjun1@huawei.com>
-To:     <mpm@selenic.com>, <herbert@gondor.apana.org.au>, <arnd@arndb.de>,
-        <gregkh@linuxfoundation.org>, <zhouyanjie@wanyeetech.com>,
-        <prasannatsmkumar@gmail.com>
-CC:     Wei Yongjun <weiyongjun1@huawei.com>,
-        <linux-crypto@vger.kernel.org>, <kernel-janitors@vger.kernel.org>,
-        Hulk Robot <hulkci@huawei.com>
-Subject: [PATCH] crypto: ingenic - Drop kfree for memory allocated with devm_kzalloc
-Date:   Tue, 4 Aug 2020 08:11:53 +0000
-Message-ID: <20200804081153.45342-1-weiyongjun1@huawei.com>
-X-Mailer: git-send-email 2.20.1
+        Tue, 4 Aug 2020 05:29:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39448 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725904AbgHDJ3h (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Aug 2020 05:29:37 -0400
+Received: from andre.telenet-ops.be (andre.telenet-ops.be [IPv6:2a02:1800:120:4::f00:15])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BACD2C06174A
+        for <linux-crypto@vger.kernel.org>; Tue,  4 Aug 2020 02:29:36 -0700 (PDT)
+Received: from ramsan ([84.195.186.194])
+        by andre.telenet-ops.be with bizsmtp
+        id BMVY230074C55Sk01MVYvk; Tue, 04 Aug 2020 11:29:33 +0200
+Received: from rox.of.borg ([192.168.97.57])
+        by ramsan with esmtp (Exim 4.90_1)
+        (envelope-from <geert@linux-m68k.org>)
+        id 1k2tGF-0005hH-WE; Tue, 04 Aug 2020 11:29:32 +0200
+Received: from geert by rox.of.borg with local (Exim 4.90_1)
+        (envelope-from <geert@linux-m68k.org>)
+        id 1k2tGF-0001wN-Tf; Tue, 04 Aug 2020 11:29:31 +0200
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Tero Kristo <t-kristo@ti.com>, Keerthy <j-keerthy@ti.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH] crypto: sa2ul - fix pointer cast warning on 32-bit
+Date:   Tue,  4 Aug 2020 11:29:27 +0200
+Message-Id: <20200804092927.7417-1-geert@linux-m68k.org>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type:   text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-It's not necessary to free memory allocated with devm_kzalloc
-and using kfree leads to a double free.
+On 32-bit:
 
-Fixes: 190873a0ea45 ("crypto: ingenic - Add hardware RNG for Ingenic JZ4780 and X1000")
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+    drivers/crypto/sa2ul.c: In function ‘sa_sha_init’:
+    drivers/crypto/sa2ul.c:1486:33: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+       crypto_ahash_digestsize(tfm), (u64)rctx);
+				     ^
+
+Fix this by casting the context pointer to "unsigned long" (which is
+either 32-bit or 64-bit, just like pointers) instead of "u64", and
+update the format specifier accordingly.
+While at it, use "%u" to format unsigned int.
+
+Fixes: 2dc53d0047458e28 ("crypto: sa2ul - add sha1/sha256/sha512 support")
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 ---
- drivers/char/hw_random/ingenic-rng.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+Notes:
+  1. This (still) reveals the kernel pointer value, which would be
+     obfuscated by using "%p",
+  2. Perhaps we want to use "%px" instead? But there are no users of
+     "%px" in drivers/crypto/.
+---
+ drivers/crypto/sa2ul.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/char/hw_random/ingenic-rng.c b/drivers/char/hw_random/ingenic-rng.c
-index d704cef64b64..055cfe59f519 100644
---- a/drivers/char/hw_random/ingenic-rng.c
-+++ b/drivers/char/hw_random/ingenic-rng.c
-@@ -92,8 +92,7 @@ static int ingenic_rng_probe(struct platform_device *pdev)
- 	priv->base = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(priv->base)) {
- 		pr_err("%s: Failed to map RNG registers\n", __func__);
--		ret = PTR_ERR(priv->base);
--		goto err_free_rng;
-+		return PTR_ERR(priv->base);
- 	}
+diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
+index 5bc099052bd20b3c..4611ac20405a60cb 100644
+--- a/drivers/crypto/sa2ul.c
++++ b/drivers/crypto/sa2ul.c
+@@ -1482,8 +1482,8 @@ static int sa_sha_init(struct ahash_request *req)
+ 	struct sa_sha_req_ctx *rctx = ahash_request_ctx(req);
+ 	struct sa_tfm_ctx *ctx = crypto_ahash_ctx(tfm);
  
- 	priv->version = (enum ingenic_rng_version)of_device_get_match_data(&pdev->dev);
-@@ -106,17 +105,13 @@ static int ingenic_rng_probe(struct platform_device *pdev)
- 	ret = hwrng_register(&priv->rng);
- 	if (ret) {
- 		dev_err(&pdev->dev, "Failed to register hwrng\n");
--		goto err_free_rng;
-+		return ret;
- 	}
+-	dev_dbg(sa_k3_dev, "init: digest size: %d, rctx=%llx\n",
+-		crypto_ahash_digestsize(tfm), (u64)rctx);
++	dev_dbg(sa_k3_dev, "init: digest size: %u, rctx=%lx\n",
++		crypto_ahash_digestsize(tfm), (unsigned long)rctx);
  
- 	platform_set_drvdata(pdev, priv);
- 
- 	dev_info(&pdev->dev, "Ingenic RNG driver registered\n");
- 	return 0;
--
--err_free_rng:
--	kfree(priv);
--	return ret;
- }
- 
- static int ingenic_rng_remove(struct platform_device *pdev)
-
-
+ 	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback.ahash);
+ 	rctx->fallback_req.base.flags =
+-- 
+2.17.1
 
