@@ -2,96 +2,80 @@ Return-Path: <SRS0=wb3S=BO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6D4CC433DF
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Aug 2020 14:05:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66091C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Aug 2020 14:34:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A37F3208A9
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Aug 2020 14:05:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CAAB22BED
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Aug 2020 14:34:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ox1fKg1v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728977AbgHDOFY (ORCPT
+        id S1726656AbgHDOdP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Aug 2020 10:05:24 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:60918 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728257AbgHDOAs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Aug 2020 10:00:48 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id B6AD29A2E8246624B350;
-        Tue,  4 Aug 2020 22:00:38 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 4 Aug 2020 22:00:29 +0800
-From:   Yang Shen <shenyang39@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH v4 01/10] crypto: hisilicon/qm - fix wrong release after using strsep
-Date:   Tue, 4 Aug 2020 21:58:21 +0800
-Message-ID: <1596549510-2373-2-git-send-email-shenyang39@huawei.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1596549510-2373-1-git-send-email-shenyang39@huawei.com>
-References: <1596549510-2373-1-git-send-email-shenyang39@huawei.com>
+        Tue, 4 Aug 2020 10:33:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41924 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729150AbgHDOcq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Aug 2020 10:32:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596551550;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Nw4Y7Dg01SFWbWmvQxGicDfAFpB/UkF2qnoLKbxXRMU=;
+        b=Ox1fKg1vs4GIEPDaEpcihM0EtPB+RTvztYAMNMFovqmEdtfLF7mPM9+refRA5pUQNcFC9s
+        Be6lNDoCYHY8DrhRj1czXYxdFZpwV8J9w0oHftWxXNYaunh/iqTcxrkbn7kJ1MsUEJS+lk
+        9s7Qe+VTzK58qZmrxl34xp89vZTrlis=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-220-KhAxT_tIMjCJ7kbSK1m4iA-1; Tue, 04 Aug 2020 10:32:28 -0400
+X-MC-Unique: KhAxT_tIMjCJ7kbSK1m4iA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67F1D10CE78B;
+        Tue,  4 Aug 2020 14:32:27 +0000 (UTC)
+Received: from gondolin (ovpn-112-169.ams2.redhat.com [10.36.112.169])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5CAB05DA76;
+        Tue,  4 Aug 2020 14:32:23 +0000 (UTC)
+Date:   Tue, 4 Aug 2020 16:32:20 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v2 08/24] virtio_crypto: correct tags for config space
+ fields
+Message-ID: <20200804163220.51081901.cohuck@redhat.com>
+In-Reply-To: <20200803205814.540410-9-mst@redhat.com>
+References: <20200803205814.540410-1-mst@redhat.com>
+        <20200803205814.540410-9-mst@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Sihang Chen <chensihang1@hisilicon.com>
+On Mon, 3 Aug 2020 16:59:09 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Save the string address before pass to strsep, release it at end.
-Because strsep will update the string address to point after the
-token.
+> Since crypto is a modern-only device,
+> tag config space fields as having little endian-ness.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  include/uapi/linux/virtio_crypto.h | 26 +++++++++++++-------------
+>  1 file changed, 13 insertions(+), 13 deletions(-)
 
-Fixes: c31dc9fe165d("crypto: hisilicon/qm - add DebugFS for xQC and...")
-Signed-off-by: Sihang Chen <chensihang1@hisilicon.com>
-Signed-off-by: Yang Shen <shenyang39@huawei.com>
-Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
----
- drivers/crypto/hisilicon/qm.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 6527c53..ffb28cc 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -1420,16 +1420,17 @@ static int qm_dbg_help(struct hisi_qm *qm, char *s)
- static int qm_cmd_write_dump(struct hisi_qm *qm, const char *cmd_buf)
- {
- 	struct device *dev = &qm->pdev->dev;
--	char *presult, *s;
-+	char *presult, *s, *s_tmp;
- 	int ret;
- 
- 	s = kstrdup(cmd_buf, GFP_KERNEL);
- 	if (!s)
- 		return -ENOMEM;
- 
-+	s_tmp = s;
- 	presult = strsep(&s, " ");
- 	if (!presult) {
--		kfree(s);
-+		kfree(s_tmp);
- 		return -EINVAL;
- 	}
- 
-@@ -1459,7 +1460,7 @@ static int qm_cmd_write_dump(struct hisi_qm *qm, const char *cmd_buf)
- 	if (ret)
- 		dev_info(dev, "Please echo help\n");
- 
--	kfree(s);
-+	kfree(s_tmp);
- 
- 	return ret;
- }
--- 
-2.7.4
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
