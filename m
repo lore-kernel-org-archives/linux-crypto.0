@@ -2,88 +2,125 @@ Return-Path: <SRS0=mrTw=BP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B588C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 01:58:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9D6CC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 02:48:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F029A208C7
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 01:58:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF64422CAE
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 02:48:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726011AbgHEB6R (ORCPT
+        id S1727807AbgHECsR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Aug 2020 21:58:17 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:50712 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725981AbgHEB6R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Aug 2020 21:58:17 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 333DC5996704AFF08E50;
-        Wed,  5 Aug 2020 09:58:10 +0800 (CST)
-Received: from [127.0.0.1] (10.74.173.29) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.487.0; Wed, 5 Aug 2020
- 09:58:00 +0800
-Subject: Re: [PATCH v4 01/10] crypto: hisilicon/qm - fix wrong release after
- using strsep
-To:     Markus Elfring <Markus.Elfring@web.de>,
-        Sihang Chen <chensihang1@hisilicon.com>,
-        <linux-crypto@vger.kernel.org>
-References: <96ffa633-dda1-7ad1-72da-5563906c1561@web.de>
-CC:     <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>
-From:   "shenyang (M)" <shenyang39@huawei.com>
-Message-ID: <425f4bdd-cf55-6537-28bf-0377564b531b@huawei.com>
-Date:   Wed, 5 Aug 2020 09:58:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
-MIME-Version: 1.0
-In-Reply-To: <96ffa633-dda1-7ad1-72da-5563906c1561@web.de>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.74.173.29]
-X-CFilter-Loop: Reflected
+        Tue, 4 Aug 2020 22:48:17 -0400
+Received: from inva021.nxp.com ([92.121.34.21]:39602 "EHLO inva021.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727109AbgHECsQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Aug 2020 22:48:16 -0400
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 6B1C920139E;
+        Wed,  5 Aug 2020 04:48:14 +0200 (CEST)
+Received: from invc005.ap-rdc01.nxp.com (invc005.ap-rdc01.nxp.com [165.114.16.14])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id BEE05201398;
+        Wed,  5 Aug 2020 04:48:08 +0200 (CEST)
+Received: from 10.192.242.69 (shlinux2.ap.freescale.net [10.192.224.44])
+        by invc005.ap-rdc01.nxp.com (Postfix) with ESMTP id E3A2740302;
+        Wed,  5 Aug 2020 04:48:01 +0200 (CEST)
+From:   Anson Huang <Anson.Huang@nxp.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        robh+dt@kernel.org, shawnguo@kernel.org, s.hauer@pengutronix.de,
+        kernel@pengutronix.de, festevam@gmail.com, marex@denx.de,
+        s.trumtrar@pengutronix.de, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc:     Linux-imx@nxp.com
+Subject: [PATCH 3/3] dt-bindings: crypto: Convert i.MX sahara to json-schema
+Date:   Wed,  5 Aug 2020 10:43:30 +0800
+Message-Id: <1596595410-26921-3-git-send-email-Anson.Huang@nxp.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1596595410-26921-1-git-send-email-Anson.Huang@nxp.com>
+References: <1596595410-26921-1-git-send-email-Anson.Huang@nxp.com>
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Convert the i.MX sahara binding to DT schema format using json-schema.
 
+Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
+---
+ .../devicetree/bindings/crypto/fsl-imx-sahara.txt  | 15 ----------
+ .../devicetree/bindings/crypto/fsl-imx-sahara.yaml | 35 ++++++++++++++++++++++
+ 2 files changed, 35 insertions(+), 15 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/crypto/fsl-imx-sahara.txt
+ create mode 100644 Documentation/devicetree/bindings/crypto/fsl-imx-sahara.yaml
 
-On 2020/8/5 2:34, Markus Elfring wrote:
-> …
->> +++ b/drivers/crypto/hisilicon/qm.c
->> @@ -1420,16 +1420,17 @@ static int qm_dbg_help(struct hisi_qm *qm, char *s)
-> …
->> +	s_tmp = s;
->>  	presult = strsep(&s, " ");
->>  	if (!presult) {
->> -		kfree(s);
->> +		kfree(s_tmp);
->>  		return -EINVAL;
->>  	}
->
-> -		kfree(s);
-> -		return -EINVAL;
-> +		ret = -EINVAL;
-> +		goto free_tmp;
->
-> I suggest to add a jump target for the desired exception handling.
->
-> Regards,
-> Markus
->
-> .
->
-
-Thanks for your review. There is only one error branch need to do
-something uninit. So I think the jump is not necessary and will
-affect code reading.:)
-
-Thanks,
-Yang
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.txt b/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.txt
+deleted file mode 100644
+index db690b1..0000000
+--- a/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.txt
++++ /dev/null
+@@ -1,15 +0,0 @@
+-Freescale SAHARA Cryptographic Accelerator included in some i.MX chips.
+-Currently only i.MX27 and i.MX53 are supported.
+-
+-Required properties:
+-- compatible : Should be "fsl,<soc>-sahara"
+-- reg : Should contain SAHARA registers location and length
+-- interrupts : Should contain SAHARA interrupt number
+-
+-Example:
+-
+-sah: crypto@10025000 {
+-	compatible = "fsl,imx27-sahara";
+-	reg = <	0x10025000 0x800>;
+-	interrupts = <75>;
+-};
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.yaml b/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.yaml
+new file mode 100644
+index 0000000..3cabc6b
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.yaml
+@@ -0,0 +1,35 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/crypto/fsl-imx-sahara.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Freescale SAHARA Cryptographic Accelerator included in some i.MX chips
++
++maintainers:
++  - Steffen Trumtrar <s.trumtrar@pengutronix.de>
++
++properties:
++  compatible:
++    enum:
++      - fsl,imx27-sahara
++      - fsl,imx53-sahara
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++  - interrupts
++
++examples:
++  - |
++    crypto@10025000 {
++        compatible = "fsl,imx27-sahara";
++        reg = < 0x10025000 0x800>;
++        interrupts = <75>;
++    };
+-- 
+2.7.4
 
