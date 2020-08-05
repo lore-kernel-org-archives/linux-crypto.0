@@ -2,140 +2,149 @@ Return-Path: <SRS0=mrTw=BP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F82FC433DF
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 02:48:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9146C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 05:57:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5141122CB2
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 02:48:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9143E20842
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 05:57:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727114AbgHECsP (ORCPT
+        id S1726232AbgHEF5L (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Aug 2020 22:48:15 -0400
-Received: from inva020.nxp.com ([92.121.34.13]:53210 "EHLO inva020.nxp.com"
+        Wed, 5 Aug 2020 01:57:11 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:57636 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725864AbgHECsO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Aug 2020 22:48:14 -0400
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 6335B1A04E6;
-        Wed,  5 Aug 2020 04:48:12 +0200 (CEST)
-Received: from invc005.ap-rdc01.nxp.com (invc005.ap-rdc01.nxp.com [165.114.16.14])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id B49B91A1487;
-        Wed,  5 Aug 2020 04:48:06 +0200 (CEST)
-Received: from 10.192.242.69 (shlinux2.ap.freescale.net [10.192.224.44])
-        by invc005.ap-rdc01.nxp.com (Postfix) with ESMTP id 4FDAD402E1;
-        Wed,  5 Aug 2020 04:47:59 +0200 (CEST)
-From:   Anson Huang <Anson.Huang@nxp.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        robh+dt@kernel.org, shawnguo@kernel.org, s.hauer@pengutronix.de,
-        kernel@pengutronix.de, festevam@gmail.com, marex@denx.de,
-        s.trumtrar@pengutronix.de, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     Linux-imx@nxp.com
-Subject: [PATCH 1/3] dt-bindings: crypto: Convert MXS DCP to json-schema
-Date:   Wed,  5 Aug 2020 10:43:28 +0800
-Message-Id: <1596595410-26921-1-git-send-email-Anson.Huang@nxp.com>
-X-Mailer: git-send-email 2.7.4
-X-Virus-Scanned: ClamAV using ClamSMTP
+        id S1725904AbgHEF5L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Aug 2020 01:57:11 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1k3CQG-0005ap-6c; Wed, 05 Aug 2020 15:57:09 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 05 Aug 2020 15:57:08 +1000
+Date:   Wed, 5 Aug 2020 15:57:08 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] tcrypt: Add support for hash speed testing with keys
+Message-ID: <20200805055707.GA2630@gondor.apana.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert the MXS DCP binding to DT schema format using json-schema.
+Currently if you speed test a hash that requires a key you'll get an
+error because tcrypt does not set a key by default.  This patch
+allows a key to be set using the new module parameter klen.
 
-Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
----
- .../devicetree/bindings/crypto/fsl-dcp.txt         | 18 --------
- .../devicetree/bindings/crypto/fsl-dcp.yaml        | 49 ++++++++++++++++++++++
- 2 files changed, 49 insertions(+), 18 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/crypto/fsl-dcp.txt
- create mode 100644 Documentation/devicetree/bindings/crypto/fsl-dcp.yaml
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/Documentation/devicetree/bindings/crypto/fsl-dcp.txt b/Documentation/devicetree/bindings/crypto/fsl-dcp.txt
-deleted file mode 100644
-index 513499f..0000000
---- a/Documentation/devicetree/bindings/crypto/fsl-dcp.txt
-+++ /dev/null
-@@ -1,18 +0,0 @@
--Freescale DCP (Data Co-Processor) found on i.MX23/i.MX28 .
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index ba0b7702f2e9..174d0911f80a 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -63,6 +63,7 @@ static u32 type;
+ static u32 mask;
+ static int mode;
+ static u32 num_mb = 8;
++static unsigned int klen;
+ static char *tvmem[TVMEMSIZE];
+ 
+ static const char *check[] = {
+@@ -864,8 +865,8 @@ static void test_mb_ahash_speed(const char *algo, unsigned int secs,
+ 			goto out;
+ 		}
+ 
+-		if (speed[i].klen)
+-			crypto_ahash_setkey(tfm, tvmem[0], speed[i].klen);
++		if (klen)
++			crypto_ahash_setkey(tfm, tvmem[0], klen);
+ 
+ 		for (k = 0; k < num_mb; k++)
+ 			ahash_request_set_crypt(data[k].req, data[k].sg,
+@@ -1099,8 +1100,8 @@ static void test_ahash_speed_common(const char *algo, unsigned int secs,
+ 			break;
+ 		}
+ 
+-		if (speed[i].klen)
+-			crypto_ahash_setkey(tfm, tvmem[0], speed[i].klen);
++		if (klen)
++			crypto_ahash_setkey(tfm, tvmem[0], klen);
+ 
+ 		pr_info("test%3u "
+ 			"(%5u byte blocks,%5u bytes per update,%4u updates): ",
+@@ -2418,7 +2419,8 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 		if (mode > 300 && mode < 400) break;
+ 		/* fall through */
+ 	case 318:
+-		test_hash_speed("ghash-generic", sec, hash_speed_template_16);
++		klen = 16;
++		test_hash_speed("ghash", sec, generic_hash_speed_template);
+ 		if (mode > 300 && mode < 400) break;
+ 		/* fall through */
+ 	case 319:
+@@ -3076,6 +3078,8 @@ MODULE_PARM_DESC(sec, "Length in seconds of speed tests "
+ 		      "(defaults to zero which uses CPU cycles instead)");
+ module_param(num_mb, uint, 0000);
+ MODULE_PARM_DESC(num_mb, "Number of concurrent requests to be used in mb speed tests (defaults to 8)");
++module_param(klen, uint, 0);
++MODULE_PARM_DESC(klen, "Key length (defaults to 0)");
+ 
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Quick & dirty crypto testing module");
+diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
+index 7e5fea811670..9f654677172a 100644
+--- a/crypto/tcrypt.h
++++ b/crypto/tcrypt.h
+@@ -25,7 +25,6 @@ struct aead_speed_template {
+ struct hash_speed {
+ 	unsigned int blen;	/* buffer length */
+ 	unsigned int plen;	/* per-update length */
+-	unsigned int klen;	/* key length */
+ };
+ 
+ /*
+@@ -97,34 +96,6 @@ static struct hash_speed generic_hash_speed_template[] = {
+ 	{  .blen = 0,	.plen = 0, }
+ };
+ 
+-static struct hash_speed hash_speed_template_16[] = {
+-	{ .blen = 16,	.plen = 16,	.klen = 16, },
+-	{ .blen = 64,	.plen = 16,	.klen = 16, },
+-	{ .blen = 64,	.plen = 64,	.klen = 16, },
+-	{ .blen = 256,	.plen = 16,	.klen = 16, },
+-	{ .blen = 256,	.plen = 64,	.klen = 16, },
+-	{ .blen = 256,	.plen = 256,	.klen = 16, },
+-	{ .blen = 1024,	.plen = 16,	.klen = 16, },
+-	{ .blen = 1024,	.plen = 256,	.klen = 16, },
+-	{ .blen = 1024,	.plen = 1024,	.klen = 16, },
+-	{ .blen = 2048,	.plen = 16,	.klen = 16, },
+-	{ .blen = 2048,	.plen = 256,	.klen = 16, },
+-	{ .blen = 2048,	.plen = 1024,	.klen = 16, },
+-	{ .blen = 2048,	.plen = 2048,	.klen = 16, },
+-	{ .blen = 4096,	.plen = 16,	.klen = 16, },
+-	{ .blen = 4096,	.plen = 256,	.klen = 16, },
+-	{ .blen = 4096,	.plen = 1024,	.klen = 16, },
+-	{ .blen = 4096,	.plen = 4096,	.klen = 16, },
+-	{ .blen = 8192,	.plen = 16,	.klen = 16, },
+-	{ .blen = 8192,	.plen = 256,	.klen = 16, },
+-	{ .blen = 8192,	.plen = 1024,	.klen = 16, },
+-	{ .blen = 8192,	.plen = 4096,	.klen = 16, },
+-	{ .blen = 8192,	.plen = 8192,	.klen = 16, },
 -
--Required properties:
--- compatible : Should be "fsl,<soc>-dcp"
--- reg : Should contain MXS DCP registers location and length
--- interrupts : Should contain MXS DCP interrupt numbers, VMI IRQ and DCP IRQ
--               must be supplied, optionally Secure IRQ can be present, but
--	       is currently not implemented and not used.
--- clocks : Clock reference (only required on some SOCs: 6ull and 6sll).
--- clock-names : Must be "dcp".
--
--Example:
--
--dcp: crypto@80028000 {
--	compatible = "fsl,imx28-dcp", "fsl,imx23-dcp";
--	reg = <0x80028000 0x2000>;
--	interrupts = <52 53>;
+-	/* End marker */
+-	{  .blen = 0,	.plen = 0,	.klen = 0, }
 -};
-diff --git a/Documentation/devicetree/bindings/crypto/fsl-dcp.yaml b/Documentation/devicetree/bindings/crypto/fsl-dcp.yaml
-new file mode 100644
-index 0000000..1ed86cd
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/fsl-dcp.yaml
-@@ -0,0 +1,49 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/crypto/fsl-dcp.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Freescale DCP (Data Co-Processor) found on i.MX23/i.MX28
-+
-+maintainers:
-+  - Marek Vasut <marex@denx.de>
-+
-+properties:
-+  compatible:
-+    enum:
-+      - fsl,imx23-dcp
-+      - fsl,imx28-dcp
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    description: Should contain MXS DCP interrupt numbers, VMI IRQ and DCP IRQ
-+      must be supplied, optionally Secure IRQ can be present, but is currently
-+      not implemented and not used.
-+    items:
-+      - description: MXS DCP VMI interrupt
-+      - description: MXS DCP DCP interrupt
-+      - description: MXS DCP secure interrupt
-+    minItems: 2
-+    maxItems: 3
-+
-+  clocks:
-+    maxItems: 1
-+
-+  clock-names:
-+    const: dcp
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+
-+examples:
-+  - |
-+    crypto@80028000 {
-+        compatible = "fsl,imx23-dcp";
-+        reg = <0x80028000 0x2000>;
-+        interrupts = <53>, <54>;
-+    };
+-
+ static struct hash_speed poly1305_speed_template[] = {
+ 	{ .blen = 96,	.plen = 16, },
+ 	{ .blen = 96,	.plen = 32, },
 -- 
-2.7.4
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
