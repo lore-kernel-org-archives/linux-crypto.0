@@ -5,72 +5,73 @@ X-Spam-Level:
 X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D19C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 17:12:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 531DBC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 17:15:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE2CB22D00
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 17:12:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18596206F6
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 17:15:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cAKB4VBi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SiS3asl9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728541AbgHERMo (ORCPT
+        id S1728597AbgHERO6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Aug 2020 13:12:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22245 "EHLO
+        Wed, 5 Aug 2020 13:14:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54425 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728578AbgHERKg (ORCPT
+        with ESMTP id S1728462AbgHERLO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Aug 2020 13:10:36 -0400
+        Wed, 5 Aug 2020 13:11:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1596647428;
+        s=mimecast20190719; t=1596647470;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=X64Xsc1z0L/QmYHsVcy3UgDLuv0e4itd0R0ewdQxVFs=;
-        b=cAKB4VBiWGsWoVdhTQEmJMGXUZaHU7yOmJB6Dj59PjBlD7drjLWv6SiBGULhdbsLekF8sL
-        Raqv9iMpJF+B55JRm1YCe90L7e1vTvbXJqCQ47xzZ4DtIH7ZjNFuOUNFU0KB9Ih73ZPf+B
-        NaiXW/IEaEXCg8qw2lk+J33HZBJivNI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-322-SL5FAO86PmSxjXitcJzeOQ-1; Wed, 05 Aug 2020 09:43:41 -0400
-X-MC-Unique: SL5FAO86PmSxjXitcJzeOQ-1
-Received: by mail-wr1-f71.google.com with SMTP id k11so13087189wrv.1
-        for <linux-crypto@vger.kernel.org>; Wed, 05 Aug 2020 06:43:40 -0700 (PDT)
+        bh=PnsUzUfj/maYqHomtkyX8zOTJsr1HA4XmfpAedp5w54=;
+        b=SiS3asl9/tCJGaOTceK+WwqQ19iOPVSqtLmY60+MV9bQ9/oYg3eYYm+hZELDbGU1pjiRNt
+        C8z7owXNwYPNc1T41B5qhBty4OzA8v7mcu9+z/ZrSDmkpOTL/XVPdH2ac67XyTU8M6jjEy
+        XOakbCIccAFRgnjQAdpnkGFJ4meffHw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-371-a6AtVRg6N3uOB97NBBCr9g-1; Wed, 05 Aug 2020 09:44:46 -0400
+X-MC-Unique: a6AtVRg6N3uOB97NBBCr9g-1
+Received: by mail-wr1-f72.google.com with SMTP id z12so13641426wrl.16
+        for <linux-crypto@vger.kernel.org>; Wed, 05 Aug 2020 06:44:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=X64Xsc1z0L/QmYHsVcy3UgDLuv0e4itd0R0ewdQxVFs=;
-        b=VoNoRyKfGxNggU/pe2lrzSClt+GlbDdiD9l75uKxc6xcr27mIy+Ln2vueB4dejNEEJ
-         SAPccVFTF6zIXGOLekB2b3CLVy//4aXcthmDvIXu5fQ6LLiuNhM8+mqk6B9qJZiPN/U5
-         OoGzdURRWEQ/IG605XafLqWhmLcn7Q7Xo/b+YfaipkV5zn8DtqEkxLJ2cxuZLFQIdWV7
-         sqz1il7j3itNjUM+MTxTJ4o9e4YF970act3uwKvXg/ABxeMY/vG5YsdsZ9tj5W+ELMzM
-         iuFTogSo1MOCUyKFrxz4tkNnzReTZwOZVWtKQ7MafdSo8iF0ZGr0ji1A4yrPtbv23zpP
-         iVhw==
-X-Gm-Message-State: AOAM530RrUgYQDDwZvkgYTDCEJ9YxMLA/OjEWM6ixIkaOzLg3R2OwocQ
-        oMQgnD463fDa1V7bxO/jXH047Bth+az7a4xzHB7SPsysQL5eMXLUG19YuWHpN5eo4t2hy7ubmKk
-        CDAO1Z/nGZSr4zkVJ1WHeK4/Z
-X-Received: by 2002:a1c:750f:: with SMTP id o15mr3524217wmc.182.1596635019133;
-        Wed, 05 Aug 2020 06:43:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx7HPK5kJbXhcBrmG1OonTHBBSwSvqaL+QYwUQafnUdvO/7RhWcIcON1LYaynur3bpXqN2OHA==
-X-Received: by 2002:a1c:750f:: with SMTP id o15mr3524205wmc.182.1596635018970;
-        Wed, 05 Aug 2020 06:43:38 -0700 (PDT)
-Received: from redhat.com (bzq-79-180-0-181.red.bezeqint.net. [79.180.0.181])
-        by smtp.gmail.com with ESMTPSA id x204sm13094657wmg.2.2020.08.05.06.43.37
+        bh=PnsUzUfj/maYqHomtkyX8zOTJsr1HA4XmfpAedp5w54=;
+        b=lUFXxaHVodC50FIWaHO6D96k4BNbMtUCa4Yr0aC+7oEF2pUnXSwX496DKZIcrtMf8Y
+         4eqg+TdBBJjnZhoNMUq8TliCpw/m2UTxRZSPHgNEADYCSiPkqo/sdVC8rdvzsLie4/TP
+         BzMo9h81a8eAiQoAojydvUpbbjxFEFP0N5x9fPKIKiRsjwlRSAl0BRT3Aqz5k4LhHO7H
+         VYmeOAajmg1zg00qf+q7mUOAFModzRl+td6NGn9AL14zpTQk7IaMTn37EtymR80wUi4q
+         b6N09GKpV7JFrf9GxprLbhQ0o6tiWgdWx7ZIJonTo2i721HUEC8h9YWcxau3iaGuXvyQ
+         hkFg==
+X-Gm-Message-State: AOAM532aTfuetRKCXci7/5c6hSJ159scGKPtLMIMx5xUiXoZ3flPhd4N
+        YW4sxtHNodnc34fZ63BgZPjziKkO+3WHR11mufxIoCcg+nwc6qHsbighNfL0PzRgoGaux9Pc+Ar
+        DYJenOz3S3O7TdHnltLMWsaxC
+X-Received: by 2002:a7b:ce83:: with SMTP id q3mr3330208wmj.5.1596635085325;
+        Wed, 05 Aug 2020 06:44:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxspf2A9DeJp/XDd6wXksBjAJ9F8IN1IMgFckmDgI4O8zQGWyVV23BOfPLRsaeXGpCTmqk5Bg==
+X-Received: by 2002:a7b:ce83:: with SMTP id q3mr3330187wmj.5.1596635085095;
+        Wed, 05 Aug 2020 06:44:45 -0700 (PDT)
+Received: from redhat.com (bzq-79-178-123-8.red.bezeqint.net. [79.178.123.8])
+        by smtp.gmail.com with ESMTPSA id l21sm2648720wmj.25.2020.08.05.06.44.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Aug 2020 06:43:38 -0700 (PDT)
-Date:   Wed, 5 Aug 2020 09:43:36 -0400
+        Wed, 05 Aug 2020 06:44:44 -0700 (PDT)
+Date:   Wed, 5 Aug 2020 09:44:42 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     linux-kernel@vger.kernel.org
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Gonglei <arei.gonglei@huawei.com>,
+Cc:     Gonglei <arei.gonglei@huawei.com>,
         Jason Wang <jasowang@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
         virtualization@lists.linux-foundation.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v3 08/38] virtio_crypto: correct tags for config space fields
-Message-ID: <20200805134226.1106164-9-mst@redhat.com>
+Subject: [PATCH v3 32/38] virtio_crypto: convert to LE accessors
+Message-ID: <20200805134226.1106164-33-mst@redhat.com>
 References: <20200805134226.1106164-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -83,66 +84,81 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since crypto is a modern-only device,
-tag config space fields as having little endian-ness.
+Virtio crypto is modern-only. Use LE accessors for config space.
 
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- include/uapi/linux/virtio_crypto.h | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ drivers/crypto/virtio/virtio_crypto_core.c | 46 +++++++++++-----------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
 
-diff --git a/include/uapi/linux/virtio_crypto.h b/include/uapi/linux/virtio_crypto.h
-index 50cdc8aebfcf..a03932f10565 100644
---- a/include/uapi/linux/virtio_crypto.h
-+++ b/include/uapi/linux/virtio_crypto.h
-@@ -414,33 +414,33 @@ struct virtio_crypto_op_data_req {
+diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
+index c8a962c62663..aeecce27fe8f 100644
+--- a/drivers/crypto/virtio/virtio_crypto_core.c
++++ b/drivers/crypto/virtio/virtio_crypto_core.c
+@@ -204,8 +204,8 @@ static int virtcrypto_update_status(struct virtio_crypto *vcrypto)
+ 	u32 status;
+ 	int err;
  
- struct virtio_crypto_config {
- 	/* See VIRTIO_CRYPTO_OP_* above */
--	__u32  status;
-+	__le32  status;
- 
- 	/*
- 	 * Maximum number of data queue
- 	 */
--	__u32  max_dataqueues;
-+	__le32  max_dataqueues;
+-	virtio_cread(vcrypto->vdev,
+-	    struct virtio_crypto_config, status, &status);
++	virtio_cread_le(vcrypto->vdev,
++			struct virtio_crypto_config, status, &status);
  
  	/*
- 	 * Specifies the services mask which the device support,
- 	 * see VIRTIO_CRYPTO_SERVICE_* above
- 	 */
--	__u32 crypto_services;
-+	__le32 crypto_services;
+ 	 * Unknown status bits would be a host error and the driver
+@@ -323,31 +323,31 @@ static int virtcrypto_probe(struct virtio_device *vdev)
+ 	if (!vcrypto)
+ 		return -ENOMEM;
  
- 	/* Detailed algorithms mask */
--	__u32 cipher_algo_l;
--	__u32 cipher_algo_h;
--	__u32 hash_algo;
--	__u32 mac_algo_l;
--	__u32 mac_algo_h;
--	__u32 aead_algo;
-+	__le32 cipher_algo_l;
-+	__le32 cipher_algo_h;
-+	__le32 hash_algo;
-+	__le32 mac_algo_l;
-+	__le32 mac_algo_h;
-+	__le32 aead_algo;
- 	/* Maximum length of cipher key */
--	__u32 max_cipher_key_len;
-+	__le32 max_cipher_key_len;
- 	/* Maximum length of authenticated key */
--	__u32 max_auth_key_len;
--	__u32 reserve;
-+	__le32 max_auth_key_len;
-+	__le32 reserve;
- 	/* Maximum size of each crypto request's content */
--	__u64 max_size;
-+	__le64 max_size;
- };
+-	virtio_cread(vdev, struct virtio_crypto_config,
++	virtio_cread_le(vdev, struct virtio_crypto_config,
+ 			max_dataqueues, &max_data_queues);
+ 	if (max_data_queues < 1)
+ 		max_data_queues = 1;
  
- struct virtio_crypto_inhdr {
+-	virtio_cread(vdev, struct virtio_crypto_config,
+-		max_cipher_key_len, &max_cipher_key_len);
+-	virtio_cread(vdev, struct virtio_crypto_config,
+-		max_auth_key_len, &max_auth_key_len);
+-	virtio_cread(vdev, struct virtio_crypto_config,
+-		max_size, &max_size);
+-	virtio_cread(vdev, struct virtio_crypto_config,
+-		crypto_services, &crypto_services);
+-	virtio_cread(vdev, struct virtio_crypto_config,
+-		cipher_algo_l, &cipher_algo_l);
+-	virtio_cread(vdev, struct virtio_crypto_config,
+-		cipher_algo_h, &cipher_algo_h);
+-	virtio_cread(vdev, struct virtio_crypto_config,
+-		hash_algo, &hash_algo);
+-	virtio_cread(vdev, struct virtio_crypto_config,
+-		mac_algo_l, &mac_algo_l);
+-	virtio_cread(vdev, struct virtio_crypto_config,
+-		mac_algo_h, &mac_algo_h);
+-	virtio_cread(vdev, struct virtio_crypto_config,
+-		aead_algo, &aead_algo);
++	virtio_cread_le(vdev, struct virtio_crypto_config,
++			max_cipher_key_len, &max_cipher_key_len);
++	virtio_cread_le(vdev, struct virtio_crypto_config,
++			max_auth_key_len, &max_auth_key_len);
++	virtio_cread_le(vdev, struct virtio_crypto_config,
++			max_size, &max_size);
++	virtio_cread_le(vdev, struct virtio_crypto_config,
++			crypto_services, &crypto_services);
++	virtio_cread_le(vdev, struct virtio_crypto_config,
++			cipher_algo_l, &cipher_algo_l);
++	virtio_cread_le(vdev, struct virtio_crypto_config,
++			cipher_algo_h, &cipher_algo_h);
++	virtio_cread_le(vdev, struct virtio_crypto_config,
++			hash_algo, &hash_algo);
++	virtio_cread_le(vdev, struct virtio_crypto_config,
++			mac_algo_l, &mac_algo_l);
++	virtio_cread_le(vdev, struct virtio_crypto_config,
++			mac_algo_h, &mac_algo_h);
++	virtio_cread_le(vdev, struct virtio_crypto_config,
++			aead_algo, &aead_algo);
+ 
+ 	/* Add virtio crypto device to global table */
+ 	err = virtcrypto_devmgr_add_dev(vcrypto);
 -- 
 MST
 
