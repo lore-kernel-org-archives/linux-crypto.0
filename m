@@ -2,192 +2,145 @@ Return-Path: <SRS0=mrTw=BP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 315DBC433E1
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 06:23:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C94C433E1
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 06:32:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 12799207FC
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 06:23:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C56D22CA0
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Aug 2020 06:32:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727120AbgHEGXV (ORCPT
+        id S1728091AbgHEGcw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Aug 2020 02:23:21 -0400
-Received: from foss.arm.com ([217.140.110.172]:54350 "EHLO foss.arm.com"
+        Wed, 5 Aug 2020 02:32:52 -0400
+Received: from inva021.nxp.com ([92.121.34.21]:35786 "EHLO inva021.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725904AbgHEGXV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Aug 2020 02:23:21 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9F0A6D6E;
-        Tue,  4 Aug 2020 23:23:20 -0700 (PDT)
-Received: from e110176-lin.kfn.arm.com (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8A5D03F718;
-        Tue,  4 Aug 2020 23:23:18 -0700 (PDT)
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] crypto: ccree: remove bitlocker cipher
-Date:   Wed,  5 Aug 2020 09:23:01 +0300
-Message-Id: <20200805062302.16569-3-gilad@benyossef.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200805062302.16569-1-gilad@benyossef.com>
-References: <20200805062302.16569-1-gilad@benyossef.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1726232AbgHEGcv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Aug 2020 02:32:51 -0400
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id C42C62010A4;
+        Wed,  5 Aug 2020 08:32:48 +0200 (CEST)
+Received: from invc005.ap-rdc01.nxp.com (invc005.ap-rdc01.nxp.com [165.114.16.14])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 17F872001B6;
+        Wed,  5 Aug 2020 08:32:43 +0200 (CEST)
+Received: from 10.192.242.69 (shlinux2.ap.freescale.net [10.192.224.44])
+        by invc005.ap-rdc01.nxp.com (Postfix) with ESMTP id D45E54024E;
+        Wed,  5 Aug 2020 08:32:35 +0200 (CEST)
+From:   Anson Huang <Anson.Huang@nxp.com>
+To:     mpm@selenic.com, herbert@gondor.apana.org.au, robh+dt@kernel.org,
+        shawnguo@kernel.org, s.hauer@pengutronix.de, kernel@pengutronix.de,
+        festevam@gmail.com, horia.geanta@nxp.com, vz@mleia.com,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc:     Linux-imx@nxp.com
+Subject: [PATCH] dt-bindings: rng: Convert i.MX to json-schema
+Date:   Wed,  5 Aug 2020 14:28:04 +0800
+Message-Id: <1596608884-13205-1-git-send-email-Anson.Huang@nxp.com>
+X-Mailer: git-send-email 2.7.4
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Remove the bitlocker cipher which is not supported by
-the kernel.
+Convert the i.MX rng binding to DT schema format using json-schema.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
 ---
- drivers/crypto/ccree/cc_cipher.c     | 49 ++--------------------------
- drivers/crypto/ccree/cc_crypto_ctx.h |  1 -
- 2 files changed, 3 insertions(+), 47 deletions(-)
+ Documentation/devicetree/bindings/rng/imx-rng.txt  | 23 ----------
+ Documentation/devicetree/bindings/rng/imx-rng.yaml | 50 ++++++++++++++++++++++
+ 2 files changed, 50 insertions(+), 23 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/rng/imx-rng.txt
+ create mode 100644 Documentation/devicetree/bindings/rng/imx-rng.yaml
 
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index 0a74f3808510..50a0cd9abd49 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -96,8 +96,7 @@ static int validate_keys_sizes(struct cc_cipher_ctx *ctx_p, u32 size)
- 		switch (size) {
- 		case CC_AES_128_BIT_KEY_SIZE:
- 		case CC_AES_192_BIT_KEY_SIZE:
--			if (ctx_p->cipher_mode != DRV_CIPHER_XTS &&
--			    ctx_p->cipher_mode != DRV_CIPHER_BITLOCKER)
-+			if (ctx_p->cipher_mode != DRV_CIPHER_XTS)
- 				return 0;
- 			break;
- 		case CC_AES_256_BIT_KEY_SIZE:
-@@ -105,8 +104,7 @@ static int validate_keys_sizes(struct cc_cipher_ctx *ctx_p, u32 size)
- 		case (CC_AES_192_BIT_KEY_SIZE * 2):
- 		case (CC_AES_256_BIT_KEY_SIZE * 2):
- 			if (ctx_p->cipher_mode == DRV_CIPHER_XTS ||
--			    ctx_p->cipher_mode == DRV_CIPHER_ESSIV ||
--			    ctx_p->cipher_mode == DRV_CIPHER_BITLOCKER)
-+			    ctx_p->cipher_mode == DRV_CIPHER_ESSIV)
- 				return 0;
- 			break;
- 		default:
-@@ -143,7 +141,6 @@ static int validate_data_size(struct cc_cipher_ctx *ctx_p,
- 		case DRV_CIPHER_ECB:
- 		case DRV_CIPHER_CBC:
- 		case DRV_CIPHER_ESSIV:
--		case DRV_CIPHER_BITLOCKER:
- 			if (IS_ALIGNED(size, AES_BLOCK_SIZE))
- 				return 0;
- 			break;
-@@ -369,8 +366,7 @@ static int cc_cipher_sethkey(struct crypto_skcipher *sktfm, const u8 *key,
- 		}
- 
- 		if (ctx_p->cipher_mode == DRV_CIPHER_XTS ||
--		    ctx_p->cipher_mode == DRV_CIPHER_ESSIV ||
--		    ctx_p->cipher_mode == DRV_CIPHER_BITLOCKER) {
-+		    ctx_p->cipher_mode == DRV_CIPHER_ESSIV) {
- 			if (hki.hw_key1 == hki.hw_key2) {
- 				dev_err(dev, "Illegal hw key numbers (%d,%d)\n",
- 					hki.hw_key1, hki.hw_key2);
-@@ -568,7 +564,6 @@ static void cc_setup_readiv_desc(struct crypto_tfm *tfm,
- 		break;
- 	case DRV_CIPHER_XTS:
- 	case DRV_CIPHER_ESSIV:
--	case DRV_CIPHER_BITLOCKER:
- 		/*  IV */
- 		hw_desc_init(&desc[*seq_size]);
- 		set_setup_mode(&desc[*seq_size], SETUP_WRITE_STATE1);
-@@ -623,7 +618,6 @@ static void cc_setup_state_desc(struct crypto_tfm *tfm,
- 		break;
- 	case DRV_CIPHER_XTS:
- 	case DRV_CIPHER_ESSIV:
--	case DRV_CIPHER_BITLOCKER:
- 		break;
- 	default:
- 		dev_err(dev, "Unsupported cipher mode (%d)\n", cipher_mode);
-@@ -657,7 +651,6 @@ static void cc_setup_xex_state_desc(struct crypto_tfm *tfm,
- 		break;
- 	case DRV_CIPHER_XTS:
- 	case DRV_CIPHER_ESSIV:
--	case DRV_CIPHER_BITLOCKER:
- 
- 		if (cipher_mode == DRV_CIPHER_ESSIV)
- 			key_len = SHA256_DIGEST_SIZE;
-@@ -771,7 +764,6 @@ static void cc_setup_key_desc(struct crypto_tfm *tfm,
- 		break;
- 	case DRV_CIPHER_XTS:
- 	case DRV_CIPHER_ESSIV:
--	case DRV_CIPHER_BITLOCKER:
- 		/* Load AES key */
- 		hw_desc_init(&desc[*seq_size]);
- 		set_cipher_mode(&desc[*seq_size], cipher_mode);
-@@ -1069,24 +1061,6 @@ static const struct cc_alg_template skcipher_algs[] = {
- 		.std_body = CC_STD_NIST,
- 		.sec_func = true,
- 	},
--	{
--		.name = "bitlocker(paes)",
--		.driver_name = "bitlocker-paes-ccree",
--		.blocksize = AES_BLOCK_SIZE,
--		.template_skcipher = {
--			.setkey = cc_cipher_sethkey,
--			.encrypt = cc_cipher_encrypt,
--			.decrypt = cc_cipher_decrypt,
--			.min_keysize = CC_HW_KEY_SIZE,
--			.max_keysize = CC_HW_KEY_SIZE,
--			.ivsize = AES_BLOCK_SIZE,
--			},
--		.cipher_mode = DRV_CIPHER_BITLOCKER,
--		.flow_mode = S_DIN_to_AES,
--		.min_hw_rev = CC_HW_REV_712,
--		.std_body = CC_STD_NIST,
--		.sec_func = true,
--	},
- 	{
- 		.name = "ecb(paes)",
- 		.driver_name = "ecb-paes-ccree",
-@@ -1215,23 +1189,6 @@ static const struct cc_alg_template skcipher_algs[] = {
- 		.min_hw_rev = CC_HW_REV_712,
- 		.std_body = CC_STD_NIST,
- 	},
--	{
--		.name = "bitlocker(aes)",
--		.driver_name = "bitlocker-aes-ccree",
--		.blocksize = AES_BLOCK_SIZE,
--		.template_skcipher = {
--			.setkey = cc_cipher_setkey,
--			.encrypt = cc_cipher_encrypt,
--			.decrypt = cc_cipher_decrypt,
--			.min_keysize = AES_MIN_KEY_SIZE * 2,
--			.max_keysize = AES_MAX_KEY_SIZE * 2,
--			.ivsize = AES_BLOCK_SIZE,
--			},
--		.cipher_mode = DRV_CIPHER_BITLOCKER,
--		.flow_mode = S_DIN_to_AES,
--		.min_hw_rev = CC_HW_REV_712,
--		.std_body = CC_STD_NIST,
--	},
- 	{
- 		.name = "ecb(aes)",
- 		.driver_name = "ecb-aes-ccree",
-diff --git a/drivers/crypto/ccree/cc_crypto_ctx.h b/drivers/crypto/ccree/cc_crypto_ctx.h
-index ccf960a0d989..bd9a1c0896b3 100644
---- a/drivers/crypto/ccree/cc_crypto_ctx.h
-+++ b/drivers/crypto/ccree/cc_crypto_ctx.h
-@@ -108,7 +108,6 @@ enum drv_cipher_mode {
- 	DRV_CIPHER_CBC_CTS = 11,
- 	DRV_CIPHER_GCTR = 12,
- 	DRV_CIPHER_ESSIV = 13,
--	DRV_CIPHER_BITLOCKER = 14,
- 	DRV_CIPHER_RESERVE32B = S32_MAX
- };
- 
+diff --git a/Documentation/devicetree/bindings/rng/imx-rng.txt b/Documentation/devicetree/bindings/rng/imx-rng.txt
+deleted file mode 100644
+index 659d4ef..0000000
+--- a/Documentation/devicetree/bindings/rng/imx-rng.txt
++++ /dev/null
+@@ -1,23 +0,0 @@
+-Freescale RNGA/RNGB/RNGC (Random Number Generator Versions A, B and C)
+-
+-Required properties:
+-- compatible : should be one of
+-               "fsl,imx21-rnga"
+-               "fsl,imx31-rnga" (backward compatible with "fsl,imx21-rnga")
+-               "fsl,imx25-rngb"
+-               "fsl,imx6sl-rngb" (backward compatible with "fsl,imx25-rngb")
+-               "fsl,imx6sll-rngb" (backward compatible with "fsl,imx25-rngb")
+-               "fsl,imx6ull-rngb" (backward compatible with "fsl,imx25-rngb")
+-               "fsl,imx35-rngc"
+-- reg : offset and length of the register set of this block
+-- interrupts : the interrupt number for the RNG block
+-- clocks : the RNG clk source
+-
+-Example:
+-
+-rng@53fb0000 {
+-	compatible = "fsl,imx25-rngb";
+-	reg = <0x53fb0000 0x4000>;
+-	interrupts = <22>;
+-	clocks = <&trng_clk>;
+-};
+diff --git a/Documentation/devicetree/bindings/rng/imx-rng.yaml b/Documentation/devicetree/bindings/rng/imx-rng.yaml
+new file mode 100644
+index 0000000..cf5b8ed
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/imx-rng.yaml
+@@ -0,0 +1,50 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/rng/imx-rng.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Freescale RNGA/RNGB/RNGC (Random Number Generator Versions A, B and C)
++
++maintainers:
++  - Vladimir Zapolskiy <vz@mleia.com>
++
++properties:
++  compatible:
++    oneOf:
++      - const: fsl,imx21-rnga
++      - const: fsl,imx25-rngb
++      - items:
++          - const: fsl,imx31-rnga
++          - const: fsl,imx21-rnga
++      - items:
++          - enum:
++            - fsl,imx6sl-rngb
++            - fsl,imx6sll-rngb
++            - fsl,imx6ull-rngb
++          - const: fsl,imx25-rngb
++      - const: fsl,imx35-rngc
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++  - interrupts
++  - clocks
++
++examples:
++  - |
++    rngb@53fb0000 {
++        compatible = "fsl,imx25-rngb";
++        reg = <0x53fb0000 0x4000>;
++        clocks = <&clks 109>;
++        interrupts = <22>;
++    };
 -- 
-2.27.0
+2.7.4
 
