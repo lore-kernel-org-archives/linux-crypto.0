@@ -2,98 +2,99 @@ Return-Path: <SRS0=prwg=BQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEBB7C433DF
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Aug 2020 16:41:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39D6DC433DF
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Aug 2020 16:46:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F3362311A
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Aug 2020 16:41:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75C5823119
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Aug 2020 16:46:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="Jy6yHHYd"
+	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="bh3odnxA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728740AbgHFQkl (ORCPT
+        id S1729332AbgHFQq1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Aug 2020 12:40:41 -0400
-Received: from mail-eopbgr20041.outbound.protection.outlook.com ([40.107.2.41]:26854
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728211AbgHFQik (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Aug 2020 12:38:40 -0400
+        Thu, 6 Aug 2020 12:46:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42554 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729247AbgHFQpo (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 6 Aug 2020 12:45:44 -0400
+Received: from EUR03-AM5-obe.outbound.protection.outlook.com (mail-am5eur03on0609.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe08::609])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63FE6C002160;
+        Thu,  6 Aug 2020 09:03:32 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HPmuvwC0Tk1nSSB2O2YKuAEr5A6U++eFK8x5qkfwS3W0EuHMzl1OGdAPXaZwA1p+XOCpC67+NO6HFUdF2wKs+nxkg2M8UawP8ZBg4TSwGmqMrrC+rmBKiLef18WQVyf/I9qq+GrU4bY2hifgYboGq8xUrXIULTSo+kSWLBp0AsY9efkZ43ttsshRHXK9f11vUFWGpECZsqgi/4Fz6hDbq9Y3cDCwa/v0xh51V8r9JWAFqsoXxNNf6v0qC5Zs+pGnFPvepHNhFrCKxxEBcF0Hyapc7ouT/UAdMfvt4xBlOi23DAXVy/I/LPUaBQ4r8j/WnMp8oiMU+B/pHrKw2wnG0A==
+ b=DOzo3G5Nutbs/ulohseR341BK8C2yMJ6sgmF1xc7xG3jK+rmMTMUVMdhCYYuYMQ4wBzHjY1yQyvq8VZO541qQBPzdRnszaC/8L9uflQKQz8ccpriYqfnP4toCyBWG7qmjMXvpZRHyR9xh4dahcaZee0SEP/JxCVML7rjxmT6u2uTAlrTE0I61G1pvepXiQAUn/HBOmf5ZizY1k8bdsbgM6l+NQuIT7xzk54JRCQQgWDtBWwaEq2kEC0As7zBWoTmq0aXpZEb3AuXGTZv0vZ7ZsvWUUbUkggR6zYkhDD9SccjMAIoi0g4Qw6kwHU+V+WeZHayx7BNaqJoQ6unCtibkA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=R6DWGyZrcAc23RA5Q5rukWQiiaO8jxUB3Q0Ppn4lOOc=;
- b=n2IuKtMHcdMT8B8m5hErMgblSlN+VnsejLZicPJVRnq4XKsWmlKQR+p+kYQDb3D+12xcXVK3zuYyMsKQpVOnnONZTBb4FLY3eqw9iYdPRLW0Rx28t58blFAblj2v+4P7R20+y8cwr5aqwOZ59CF1PBnAFMwz2VZobYfUr7qFS9A54ULTD+RA4moE0J6mnZFoNgfyzPWnjYAWQW7D6Mjz0n026vFT06l2suSgtS7Tuazw/bdOZEOb/vVfB9eXBi4AP86yF9cyudtG1a0Nau2r6BgT0DBd5kEALL+NsNabzCpVd7fHIsssqvmJNfeXQFot+o11mJc6nxZQk4+5WdQCLg==
+ bh=b+k2D6/qcFMdpyoRIaVnXgzL/A/qtdVYBZNVBR/cfX0=;
+ b=JpF0n5G+BMsTu2izhS0fRHu/brIN/Q3jujPzwPCLs9dx0p5nsYq6GzQsFLPfmXcORvHPjLFjHB4+vtWOJYIDNAk1Ci7//gvwr/NqyILO9gzpQOdB/Fx5jJ/di9isAoSeYdgePGBXfmYTjhaHYp0RJsZjF5F/2hC2Mnmlrw0QTxj8Peki9tpbCdmBiGjzM20B6uQbJHk4eKfFFKjRb8lqYgfEcwbE6eo4e+0DgDDN/2CJCwP4pyB/4EYi/djOIzSRO0IdhpVc6QgXQ2TmoxLzYidN04FSjSFcvWVp4dmMM4oO1xdHbKe/LSX9+SLzy5w1qTLYtD1Y+uOYA4dHI5jW7w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
  dkim=pass header.d=oss.nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
  s=selector2-NXP1-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=R6DWGyZrcAc23RA5Q5rukWQiiaO8jxUB3Q0Ppn4lOOc=;
- b=Jy6yHHYdLUDnUVzhL4g24prjFe0l9FQWT3/GfmWawTCJle4zgm7XuMihIte3PlTHzXzp3dhov7gGEdyHeX6Hg95gBiolTi5DFLUFqirvI5USSBsZlxfiTmk+6kX8sbJC/06C6NJXYZYJI9Mi2rGWFX7it60jVKV9yut/BsSH17A=
+ bh=b+k2D6/qcFMdpyoRIaVnXgzL/A/qtdVYBZNVBR/cfX0=;
+ b=bh3odnxA3YQGg4aZPwB7UQC1X2TxnC6rXCjEoAGLUnAQdXGNKM6ioeRKJewIF9Ge1i+sdeep7fEllaPtYxmWH7rKQKunKHBJ/ycUcfQuoCEXiewh0qCtFEt6YW3GKQ7h+RW030kl3N+aeL8bBNXlrRqMbI6GmIL4Mn51O8o5l0w=
 Authentication-Results: nxp.com; dkim=none (message not signed)
  header.d=none;nxp.com; dmarc=none action=none header.from=oss.nxp.com;
 Received: from VE1PR04MB6608.eurprd04.prod.outlook.com (2603:10a6:803:125::12)
- by VI1PR04MB4992.eurprd04.prod.outlook.com (2603:10a6:803:51::22) with
+ by VI1PR04MB3022.eurprd04.prod.outlook.com (2603:10a6:802:9::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.16; Thu, 6 Aug
- 2020 16:36:18 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.18; Thu, 6 Aug
+ 2020 11:41:44 +0000
 Received: from VE1PR04MB6608.eurprd04.prod.outlook.com
  ([fe80::a856:c104:11c7:258d]) by VE1PR04MB6608.eurprd04.prod.outlook.com
  ([fe80::a856:c104:11c7:258d%6]) with mapi id 15.20.3261.019; Thu, 6 Aug 2020
- 16:36:18 +0000
+ 11:41:44 +0000
 From:   Andrei Botila <andrei.botila@oss.nxp.com>
 To:     Horia Geanta <horia.geanta@nxp.com>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH RESEND 5/9] crypto: caam/qi - add support for more XTS key lengths
-Date:   Thu,  6 Aug 2020 19:35:47 +0300
-Message-Id: <20200806163551.14395-6-andrei.botila@oss.nxp.com>
+Subject: [PATCH 0/9] crypto: caam - xts(aes) updates
+Date:   Thu,  6 Aug 2020 14:41:18 +0300
+Message-Id: <20200806114127.8650-1-andrei.botila@oss.nxp.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200806163551.14395-1-andrei.botila@oss.nxp.com>
-References: <20200806163551.14395-1-andrei.botila@oss.nxp.com>
 Content-Type: text/plain
-X-ClientProxiedBy: AM4PR0902CA0015.eurprd09.prod.outlook.com
- (2603:10a6:200:9b::25) To VE1PR04MB6608.eurprd04.prod.outlook.com
+X-ClientProxiedBy: AM0PR06CA0101.eurprd06.prod.outlook.com
+ (2603:10a6:208:fa::42) To VE1PR04MB6608.eurprd04.prod.outlook.com
  (2603:10a6:803:125::12)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from lsv15007.swis.ro-buh01.nxp.com (83.217.231.2) by AM4PR0902CA0015.eurprd09.prod.outlook.com (2603:10a6:200:9b::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.19 via Frontend Transport; Thu, 6 Aug 2020 16:36:17 +0000
+Received: from lsv15007.swis.ro-buh01.nxp.com (83.217.231.2) by AM0PR06CA0101.eurprd06.prod.outlook.com (2603:10a6:208:fa::42) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.18 via Frontend Transport; Thu, 6 Aug 2020 11:41:43 +0000
 X-Mailer: git-send-email 2.17.1
 X-Originating-IP: [83.217.231.2]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 300b8447-c9c1-40d6-5f36-08d83a26d822
-X-MS-TrafficTypeDiagnostic: VI1PR04MB4992:
+X-MS-Office365-Filtering-Correlation-Id: 5de1b927-6578-4be9-b611-08d839fdb1b4
+X-MS-TrafficTypeDiagnostic: VI1PR04MB3022:
 X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR04MB49925CA8A111AF8725FDC0D6B4480@VI1PR04MB4992.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1824;
+X-Microsoft-Antispam-PRVS: <VI1PR04MB3022DABEED586C69715F7C2EB4480@VI1PR04MB3022.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2399;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rQR5yrT0MsZvZTk7j+hK0kq1/WtWRwAMVUpoWNYUqm3z7AN643RCjHluoLcp7XqfQe3n7Hac4QrqaZe6jT2IVvxbv+qi7oCrjqMEn+mtVIM1O+/c411bm8L0VNZ20uXRQT83vZioJuRGGYt8why95lSvJdMm6matDQminKObCymb/vzFuul5Z0jaWgEK5O/pIbWdi31JXOUGyibREiSERdf4pMum85ygKLzlNDzxOqw+g8NnlzHT8rGOW548+ceTrfturoIebFrNLsLPiKcHrsweCNn3A1Y/2E1T7YsdtJ/A7Tbk/J8lvKFwyfl9BgT95pivUoilvZBYmxCYQ8tmlw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB6608.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(396003)(366004)(376002)(136003)(346002)(66476007)(86362001)(26005)(6512007)(16526019)(186003)(66556008)(66946007)(1076003)(110136005)(8936002)(316002)(8676002)(478600001)(2906002)(6506007)(4326008)(44832011)(2616005)(956004)(83380400001)(6486002)(6666004)(52116002)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: 1H+n//K6n5Nx+I/122KVhPeLFUEtjoAjmhw75i9CpIxFXOZeFCDGEZU3qdbj31tNhUXTwi7WVlpLBHplHm75hDa3pr1PZmMHQpBBnA1mM0i7rVD1H9zoJ15zDM0V3cjW2dfUjAdHygc2DIU6gTGBVyG1bRgaVz4uLGQhnc7pWnoqvNxHTjUfYjee2lXUkxmIXJP8ltZzX6aDTimqMiXzgjXRi1tnPbeCP5NfFE0RRs7Bg5g3cRsLRdSN6sJens90UFBIAqd7d8ccsakAEQB1VlYlz+leso9J1iNcinqzTbf9Zq0pXC3E9akcFD9Ir1/6uUVU40VZr+GfrsL4Bc/6dzAMO2Ru8b8ZjCcmEpfMaRf2gusEXqv24jGdnzfwQeoSCfWgVlII14PxO42y+mFrSOfRJcioR8yH0Lst4BLqFnoM8IyR1X72yr2bmMyjdoV/nyN2Rhhjzns/mD9dfMIZKNBJN+RZZsfYwwid/y9A67YmEHQaFEyeUhdzNeTnKmzCJDPKk4am90JmOmVbbk9j8KxubbR9lMhF31AsU9vnWOCfEjewSFaQQzDVrAMfxlPLz7QqToufb6Z9DFiMnOrxry/MRFa6z6atXB1F/inDHE0WedAarQ1EoSIMdF6MnjqbV4RVGxtJrMsQu/Ypp/iHAg==
+X-Microsoft-Antispam-Message-Info: x4mogo3Ly+MWSs/3HtGylV5Xfl0dnt7+7oI4NBUxfXOtJ0yKcn/7biXVofwzqRNyWEFRVF40mWQl9x60XXMYCypXqIBfTedrG3nqBrlze/dCN09oYGZqMj0+iUrEuMOH3yf3J2khFuCcOHCoW0+qLZLTSiIiYVe8Fnbrc5yo6BUc+wvtJTlHpslbMnbb1vXVvQNiI/rxOR9v95IGu2L/YncGFbJzY4K6/iBV/e8A/YUL7UORRsYpuAft0i+7Kw4CRQUYiZTsp1soaYS/hHK7wKRK5EQPGYZf0nZuFWVjWMwvL/M1c6llgg/QL+x4COzd
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB6608.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(39860400002)(366004)(346002)(396003)(376002)(5660300002)(1076003)(478600001)(6512007)(2906002)(83380400001)(16526019)(6486002)(956004)(26005)(186003)(44832011)(2616005)(6506007)(86362001)(8676002)(316002)(66476007)(66946007)(66556008)(8936002)(4326008)(52116002)(6666004)(110136005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: pW5j9aRWBEQPKLeDDlFVtPBqe64zKOmEXh1mZ7yUzvwn0fED/G4t7NNZoVDWAabH96Y5lIdM2aMWfFSWRMxH6xKqXcfQgXi/46RkKcUbUo4qZdXb0S0KQ1mrMIJitRduTGyfbYpX7UxVf7QwfeUVtE9VKNB4OrSDhrPYOdTVFJMWM8JXk8oklLjc+fub8dKjRlFRIoQJiV0vcWQ14JTIEnKm5X2VS0XB/ua7ALIduOlzAoQ3A7BiRS9Ee1pvvD7Wh8Zl9of8oPZny2ub5q3j1ox5mGrNKEX8fxd9tvTBFRSOCjkv3LhaxBnNATjZVkleb2mTKAo7J6WekAPA240uNJe+krDgA+PGgrmlrDFV4ELdUDj8hUy/zaMQxlYh3wgt+dC0v+szAEBwN7BPncph5ltjN75M7QZpiPaRjehUHeh5QLeIkmrGKQ0rCJG6g8IkzafbAMxs0THfUrdEgwBsC65VnkQm/qvnR8p1Se4OqvXIxFc7NewqphzsQTkDFXSzAtus/D1JoH263DYkhnmTBJQgcN74e80Dbo3WTdZokp3FWGKhXqIFcnCujNYkHIBzYbIISgHp6VubxbZq54nBUAFcz9+fgT7YNrnn0BP9jj5Y7u2g8AsnGejL9+YtU9yq2lum5Qh39sjOXveBacxDKQ==
 X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 300b8447-c9c1-40d6-5f36-08d83a26d822
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5de1b927-6578-4be9-b611-08d839fdb1b4
 X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB6608.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2020 16:36:18.3553
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2020 11:41:44.5933
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7bMCyWRHXQcJKXBtmcVqQlnm0wMupvrhbIRumQmwhoYkHgngb03Z+G2ZC2nCcYq93W9Pk3jIqyTTHVJ7LkQL9A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB4992
+X-MS-Exchange-CrossTenant-UserPrincipalName: kB1MkpFYOQSRlR87Bux+pmuK5cQld9+EqPHZ+8SsTH1e7kTR2VjqjkmTwkdCP0yl38lTO7UuyGMnyOZrfOYGxA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB3022
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -101,54 +102,32 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Andrei Botila <andrei.botila@nxp.com>
 
-CAAM accelerator only supports XTS-AES-128 and XTS-AES-256 since
-it adheres strictly to the standard. All the other key lengths
-are accepted and processed through a fallback as long as they pass
-the xts_verify_key() checks.
+This patch series fixes some problems in CAAM's implementation of xts(aes):
+ - CAAM until Era 9 can't process XTS with 16B IV
+ - CAAM can only process in hardware XTS key lengths of 16B and 32B
+ - These hardware limitations are resolved through a fallback
 
-Fixes: b189817cf789 ("crypto: caam/qi - add ablkcipher and authenc algorithms")
-Cc: <stable@vger.kernel.org> # v4.12+
-Signed-off-by: Andrei Botila <andrei.botila@nxp.com>
----
- drivers/crypto/caam/caamalg_qi.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+This patch series also adds a new feature in CAAM's xts(aes):
+ - CAAM is now able to process XTS with 16B IV in HW
 
-diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
-index 05cb50561381..1d775a55fcf5 100644
---- a/drivers/crypto/caam/caamalg_qi.c
-+++ b/drivers/crypto/caam/caamalg_qi.c
-@@ -18,6 +18,7 @@
- #include "qi.h"
- #include "jr.h"
- #include "caamalg_desc.h"
-+#include <crypto/xts.h>
- #include <asm/unaligned.h>
- 
- /*
-@@ -734,9 +735,10 @@ static int xts_skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
- 	int ret = 0;
- 	int err;
- 
--	if (keylen != 2 * AES_MIN_KEY_SIZE  && keylen != 2 * AES_MAX_KEY_SIZE) {
-+	err = xts_verify_key(skcipher, key, keylen);
-+	if (err) {
- 		dev_dbg(jrdev, "key size mismatch\n");
--		return -EINVAL;
-+		return err;
- 	}
- 
- 	err = crypto_skcipher_setkey(ctx->fallback, key, keylen);
-@@ -1408,7 +1410,9 @@ static inline int skcipher_crypt(struct skcipher_request *req, bool encrypt)
- 	if (!req->cryptlen)
- 		return 0;
- 
--	if (ctx->fallback && xts_skcipher_ivsize(req)) {
-+	if (ctx->fallback && (xts_skcipher_ivsize(req) ||
-+			      (ctx->cdata.keylen != 2 * AES_KEYSIZE_128 &&
-+			       ctx->cdata.keylen != 2 * AES_KEYSIZE_256))) {
- 		struct caam_skcipher_req_ctx *rctx = skcipher_request_ctx(req);
- 
- 		skcipher_request_set_tfm(&rctx->fallback_req, ctx->fallback);
+Andrei Botila (9):
+  crypto: caam/jr - add fallback for XTS with more than 8B IV
+  crypto: caam/qi - add fallback for XTS with more than 8B IV
+  crypto: caam/qi2 - add fallback for XTS with more than 8B IV
+  crypto: caam/jr - add support for more XTS key lengths
+  crypto: caam/qi - add support for more XTS key lengths
+  crypto: caam/qi2 - add support for more XTS key lengths
+  crypto: caam/jr - add support for XTS with 16B IV
+  crypto: caam/qi - add support for XTS with 16B IV
+  crypto: caam/qi2 - add support for XTS with 16B IV
+
+ drivers/crypto/caam/caamalg.c      | 81 +++++++++++++++++++++++--
+ drivers/crypto/caam/caamalg_desc.c | 27 +++++----
+ drivers/crypto/caam/caamalg_qi.c   | 86 ++++++++++++++++++++++++---
+ drivers/crypto/caam/caamalg_qi2.c  | 95 ++++++++++++++++++++++++++++--
+ drivers/crypto/caam/caamalg_qi2.h  |  2 +
+ 5 files changed, 261 insertions(+), 30 deletions(-)
+
 -- 
 2.17.1
 
