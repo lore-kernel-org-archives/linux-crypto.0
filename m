@@ -2,128 +2,134 @@ Return-Path: <SRS0=csk9=BR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4BAAC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Aug 2020 09:18:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23B4BC433DF
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Aug 2020 14:10:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7178C20855
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Aug 2020 09:18:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9ABC22C9F
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Aug 2020 14:10:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=marvell.com header.i=@marvell.com header.b="XXapOBhB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727844AbgHGJSP (ORCPT
+        id S1726076AbgHGOKY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Aug 2020 05:18:15 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:47652 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726968AbgHGJSI (ORCPT
+        Fri, 7 Aug 2020 10:10:24 -0400
+Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:48430 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725893AbgHGOKX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Aug 2020 05:18:08 -0400
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-126-koqkZgaFNyeZIHOyATR4EA-1; Fri, 07 Aug 2020 10:18:04 +0100
-X-MC-Unique: koqkZgaFNyeZIHOyATR4EA-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Fri, 7 Aug 2020 10:18:03 +0100
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Fri, 7 Aug 2020 10:18:03 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Eric Dumazet' <eric.dumazet@gmail.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Eric Dumazet <edumazet@google.com>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
-        "coreteam@netfilter.org" <coreteam@netfilter.org>,
-        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
-        "linux-hams@vger.kernel.org" <linux-hams@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "bridge@lists.linux-foundation.org" 
-        <bridge@lists.linux-foundation.org>,
-        "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
-        "dccp@vger.kernel.org" <dccp@vger.kernel.org>,
-        "linux-decnet-user@lists.sourceforge.net" 
-        <linux-decnet-user@lists.sourceforge.net>,
-        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "mptcp@lists.01.org" <mptcp@lists.01.org>,
-        "lvs-devel@vger.kernel.org" <lvs-devel@vger.kernel.org>,
-        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
-        "tipc-discussion@lists.sourceforge.net" 
-        <tipc-discussion@lists.sourceforge.net>,
-        "linux-x25@vger.kernel.org" <linux-x25@vger.kernel.org>,
-        Stefan Schmidt <stefan@datenfreihafen.org>
-Subject: RE: [PATCH 25/26] net: pass a sockptr_t into ->setsockopt
-Thread-Topic: [PATCH 25/26] net: pass a sockptr_t into ->setsockopt
-Thread-Index: AQHWbD/ze4VO5Mh7NUG6O93LfP2Gq6ksXaow
-Date:   Fri, 7 Aug 2020 09:18:03 +0000
-Message-ID: <f21589f1262640b09ca27ed20f8e6790@AcuMS.aculab.com>
-References: <20200723060908.50081-1-hch@lst.de>
- <20200723060908.50081-26-hch@lst.de>
- <6357942b-0b6e-1901-7dce-e308c9fac347@gmail.com>
-In-Reply-To: <6357942b-0b6e-1901-7dce-e308c9fac347@gmail.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Fri, 7 Aug 2020 10:10:23 -0400
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+        by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 077EAFXQ026269;
+        Fri, 7 Aug 2020 07:10:15 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0818;
+ bh=9l8GI0v0BTOsB/VnoX64y9gXiuPeQbQGwJsVjk2zR4c=;
+ b=XXapOBhB++f2J9LBGwAiCS5tmw6TyHt/mT5clFHgAqdN1uCgYs62tho41pZbSLcdqqKm
+ bwyH1YXzvdAA3rxD4zT7YNQWMggbDyiYXBEimr1FuB9CulFHTatR1aeu+q+dMJsWuILl
+ 29t+2+VEkz7MEDIErqYHmkUhCJiVLTab0babf1AvuYIuK4qa7vnk74kCsBoynP1+EUl1
+ QKJp+mm9JgzkKBDYkM/4Q60qZYhedgFLlYe31E7J5bxTXMur+VLhcBMvo2wO9FfdQenS
+ q7cmVAh//dRqgWxqkUAuI/dGP/rKwYjaI6jBafp6bB0GSbqSPyhE0OUzOVwsUX2f2wVW 5w== 
+Received: from sc-exch04.marvell.com ([199.233.58.184])
+        by mx0b-0016f401.pphosted.com with ESMTP id 32s3c992jt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Fri, 07 Aug 2020 07:10:15 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by SC-EXCH04.marvell.com
+ (10.93.176.84) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 7 Aug
+ 2020 07:10:10 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Fri, 7 Aug 2020 07:10:10 -0700
+Received: from hyd1schalla-dt.caveonetworks.com.com (hyd1schalla-dt.marvell.com [10.29.8.39])
+        by maili.marvell.com (Postfix) with ESMTP id 493B73F7043;
+        Fri,  7 Aug 2020 07:10:07 -0700 (PDT)
+From:   Srujana Challa <schalla@marvell.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <davem@davemloft.net>, <netdev@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <schandran@marvell.com>,
+        <pathreya@marvell.com>, <sgoutham@marvell.com>,
+        <lcherian@marvell.com>, <gakula@marvell.com>, <jerinj@marvell.com>,
+        Srujana Challa <schalla@marvell.com>
+Subject: [PATCH v2 0/3] Add Support for Marvell OcteonTX2 Cryptographic
+Date:   Fri, 7 Aug 2020 19:39:17 +0530
+Message-ID: <1596809360-12597-1-git-send-email-schalla@marvell.com>
+X-Mailer: git-send-email 1.9.1
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-08-07_09:2020-08-06,2020-08-07 signatures=0
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-RnJvbTogRXJpYyBEdW1hemV0DQo+IFNlbnQ6IDA2IEF1Z3VzdCAyMDIwIDIzOjIxDQo+IA0KPiBP
-biA3LzIyLzIwIDExOjA5IFBNLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90ZToNCj4gPiBSZXdvcmsg
-dGhlIHJlbWFpbmluZyBzZXRzb2Nrb3B0IGNvZGUgdG8gcGFzcyBhIHNvY2twdHJfdCBpbnN0ZWFk
-IG9mIGENCj4gPiBwbGFpbiB1c2VyIHBvaW50ZXIuICBUaGlzIHJlbW92ZXMgdGhlIGxhc3QgcmVt
-YWluaW5nIHNldF9mcyhLRVJORUxfRFMpDQo+ID4gb3V0c2lkZSBvZiBhcmNoaXRlY3R1cmUgc3Bl
-Y2lmaWMgY29kZS4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IENocmlzdG9waCBIZWxsd2lnIDxo
-Y2hAbHN0LmRlPg0KPiA+IEFja2VkLWJ5OiBTdGVmYW4gU2NobWlkdCA8c3RlZmFuQGRhdGVuZnJl
-aWhhZmVuLm9yZz4gW2llZWU4MDIxNTRdDQo+ID4gLS0tDQo+IA0KPiANCj4gLi4uDQo+IA0KPiA+
-IGRpZmYgLS1naXQgYS9uZXQvaXB2Ni9yYXcuYyBiL25ldC9pcHY2L3Jhdy5jDQo+ID4gaW5kZXgg
-NTk0ZTAxYWQ2NzBhYTYuLjg3NGYwMWNkN2FlYzQyIDEwMDY0NA0KPiA+IC0tLSBhL25ldC9pcHY2
-L3Jhdy5jDQo+ID4gKysrIGIvbmV0L2lwdjYvcmF3LmMNCj4gPiBAQCAtOTcyLDEzICs5NzIsMTMg
-QEAgc3RhdGljIGludCByYXd2Nl9zZW5kbXNnKHN0cnVjdCBzb2NrICpzaywgc3RydWN0IG1zZ2hk
-ciAqbXNnLCBzaXplX3QgbGVuKQ0KPiA+ICB9DQo+ID4NCj4gDQo+IC4uLg0KPiANCj4gPiAgc3Rh
-dGljIGludCBkb19yYXd2Nl9zZXRzb2Nrb3B0KHN0cnVjdCBzb2NrICpzaywgaW50IGxldmVsLCBp
-bnQgb3B0bmFtZSwNCj4gPiAtCQkJICAgIGNoYXIgX191c2VyICpvcHR2YWwsIHVuc2lnbmVkIGlu
-dCBvcHRsZW4pDQo+ID4gKwkJCSAgICAgICBzb2NrcHRyX3Qgb3B0dmFsLCB1bnNpZ25lZCBpbnQg
-b3B0bGVuKQ0KPiA+ICB7DQo+ID4gIAlzdHJ1Y3QgcmF3Nl9zb2NrICpycCA9IHJhdzZfc2soc2sp
-Ow0KPiA+ICAJaW50IHZhbDsNCj4gPg0KPiA+IC0JaWYgKGdldF91c2VyKHZhbCwgKGludCBfX3Vz
-ZXIgKilvcHR2YWwpKQ0KPiA+ICsJaWYgKGNvcHlfZnJvbV9zb2NrcHRyKCZ2YWwsIG9wdHZhbCwg
-c2l6ZW9mKHZhbCkpKQ0KPiA+ICAJCXJldHVybiAtRUZBVUxUOw0KPiA+DQo+IA0KPiBjb252ZXJ0
-aW5nIGdldF91c2VyKC4uLikgICB0byAgY29weV9mcm9tX3NvY2twdHIoLi4uKSByZWFsbHkgYXNz
-dW1lZCB0aGUgb3B0bGVuDQo+IGhhcyBiZWVuIHZhbGlkYXRlZCB0byBiZSA+PSBzaXplb2YoaW50
-KSBlYXJsaWVyLg0KPiANCj4gV2hpY2ggaXMgbm90IGFsd2F5cyB0aGUgY2FzZSwgZm9yIGV4YW1w
-bGUgaGVyZS4NCj4gDQo+IFVzZXIgYXBwbGljYXRpb24gY2FuIGZvb2wgdXMgcGFzc2luZyBvcHRs
-ZW49MCwgYW5kIGEgdXNlciBwb2ludGVyIG9mIGV4YWN0bHkgVEFTS19TSVpFLTENCg0KV29uJ3Qg
-dGhlIHVzZXIgcG9pbnRlciBmb3JjZSBjb3B5X2Zyb21fc29ja3B0cigpIHRvIGNhbGwNCmNvcHlf
-ZnJvbV91c2VyKCkgd2hpY2ggd2lsbCB0aGVuIGRvIGFjY2Vzc19vaygpIG9uIHRoZSBlbnRpcmUN
-CnJhbmdlIGFuZCBzbyByZXR1cm4gLUVGQVVMVC4NCg0KVGhlIG9ubHkgcHJvYmxlbXMgYXJpc2Ug
-aWYgdGhlIGtlcm5lbCBjb2RlIGFkZHMgYW4gb2Zmc2V0IHRvIHRoZQ0KdXNlciBhZGRyZXNzLg0K
-QW5kIHRoZSBsYXRlciBwYXRjaCBhZGRlZCBhbiBvZmZzZXQgdG8gdGhlIGNvcHkgZnVuY3Rpb25z
-Lg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJv
-YWQsIE1vdW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24g
-Tm86IDEzOTczODYgKFdhbGVzKQ0K
+The following series adds support for Marvell Cryptographic Acceleration
+Unit(CPT) on OcteonTX2 CN96XX SoC.
+This series is tested with CRYPTO_EXTRA_TESTS enabled and
+CRYPTO_DISABLE_TESTS disabled.
+
+Changes since v1:
+ * Moved Makefile changes from patch4 to patch2 and patch3.
+
+Srujana Challa (3):
+  octeontx2-af: add support to manage the CPT unit
+  drivers: crypto: add support for OCTEONTX2 CPT engine
+  drivers: crypto: add the Virtual Function driver for OcteonTX2 CPT
+
+ drivers/crypto/marvell/Kconfig                     |   17 +
+ drivers/crypto/marvell/Makefile                    |    1 +
+ drivers/crypto/marvell/octeontx2/Makefile          |   10 +
+ drivers/crypto/marvell/octeontx2/otx2_cpt_common.h |   53 +
+ .../crypto/marvell/octeontx2/otx2_cpt_hw_types.h   |  572 ++++++
+ .../marvell/octeontx2/otx2_cpt_mbox_common.c       |  286 +++
+ .../marvell/octeontx2/otx2_cpt_mbox_common.h       |  100 +
+ drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h |  202 ++
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.h      |  370 ++++
+ drivers/crypto/marvell/octeontx2/otx2_cptlf_main.c |  964 +++++++++
+ drivers/crypto/marvell/octeontx2/otx2_cptpf.h      |   79 +
+ drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c |  599 ++++++
+ drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c |  694 +++++++
+ .../crypto/marvell/octeontx2/otx2_cptpf_ucode.c    | 2173 ++++++++++++++++++++
+ .../crypto/marvell/octeontx2/otx2_cptpf_ucode.h    |  180 ++
+ drivers/crypto/marvell/octeontx2/otx2_cptvf.h      |   29 +
+ drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c | 1708 +++++++++++++++
+ drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.h |  172 ++
+ drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c |  229 +++
+ drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c |  189 ++
+ .../crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c   |  536 +++++
+ drivers/net/ethernet/marvell/octeontx2/af/Makefile |    2 +-
+ drivers/net/ethernet/marvell/octeontx2/af/mbox.h   |   85 +
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c    |    2 +-
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.h    |    7 +
+ .../net/ethernet/marvell/octeontx2/af/rvu_cpt.c    |  343 +++
+ .../ethernet/marvell/octeontx2/af/rvu_debugfs.c    |  342 +++
+ .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    |   76 +
+ .../net/ethernet/marvell/octeontx2/af/rvu_reg.h    |   65 +-
+ 29 files changed, 10077 insertions(+), 8 deletions(-)
+ create mode 100644 drivers/crypto/marvell/octeontx2/Makefile
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptlf.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptlf_main.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+
+-- 
+1.9.1
 
