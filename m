@@ -2,127 +2,61 @@ Return-Path: <SRS0=csk9=BR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF7EC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Aug 2020 03:58:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66B52C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Aug 2020 04:54:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4014D2177B
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Aug 2020 03:58:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C61C221E2
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Aug 2020 04:54:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726078AbgHGD60 (ORCPT
+        id S1725287AbgHGEy3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Aug 2020 23:58:26 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:43942 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726038AbgHGD6Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Aug 2020 23:58:25 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id DF065B935D0C3FADCEE4;
-        Fri,  7 Aug 2020 11:58:23 +0800 (CST)
-Received: from [10.63.139.185] (10.63.139.185) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 7 Aug 2020 11:58:22 +0800
-Subject: Re: [BUG] crypto: hisilicon: accessing the data mapped to streaming
- DMA
-To:     Jia-Ju Bai <baijiaju@tsinghua.edu.cn>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-References: <361fa200-479c-e1ef-b7d6-e666a256660f@tsinghua.edu.cn>
- <5F276491.8060409@hisilicon.com>
- <c0001b9b-6529-27bc-2874-2a2674257507@tsinghua.edu.cn>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-From:   Zhou Wang <wangzhou1@hisilicon.com>
-Message-ID: <5F2CD15E.6060508@hisilicon.com>
-Date:   Fri, 7 Aug 2020 11:58:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.5.1
+        Fri, 7 Aug 2020 00:54:29 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:35256 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725263AbgHGEy3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 Aug 2020 00:54:29 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1k3uOe-0004FA-Kr; Fri, 07 Aug 2020 14:54:25 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 07 Aug 2020 14:54:24 +1000
+Date:   Fri, 7 Aug 2020 14:54:24 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [v3 PATCH] crypto: caam - Move debugfs fops into standalone file
+Message-ID: <20200807045424.GA24062@gondor.apana.org.au>
+References: <20200730135426.GA13682@gondor.apana.org.au>
+ <c7fa483a-8f57-ee12-3c72-68c770ba4e00@nxp.com>
+ <20200801124249.GA18580@gondor.apana.org.au>
+ <bf2588f8-95f0-dd10-cd03-25268ea68837@nxp.com>
+ <20200806221005.GA22325@gondor.apana.org.au>
 MIME-Version: 1.0
-In-Reply-To: <c0001b9b-6529-27bc-2874-2a2674257507@tsinghua.edu.cn>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.63.139.185]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200806221005.GA22325@gondor.apana.org.au>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2020/8/3 9:29, Jia-Ju Bai wrote:
+On Fri, Aug 07, 2020 at 08:10:05AM +1000, Herbert Xu wrote:
+> On Thu, Aug 06, 2020 at 09:09:49PM +0300, Horia Geantă wrote:
+> >
+> > I'd rather move these in the newly-created debugfs.c, see below v3.
 > 
-> 
-> On 2020/8/3 9:12, Zhou Wang wrote:
->> On 2020/8/2 22:52, Jia-Ju Bai wrote:
->>> In qm_qp_ctx_cfg(), "sqc" and "aeqc" are mapped to streaming DMA:
->>>    eqc_dma = dma_map_single(..., eqc, ...);
->>>    ......
->>>    aeqc_dma = dma_map_single(..., aeqc, ...);
->> Only sqc, cqc will be configured in qm_qp_ctx_cfg.
->>
->>> Then "sqc" and "aeqc" are accessed at many places, such as:
->>>    eqc->base_l = cpu_to_le32(lower_32_bits(qm->eqe_dma));
->>>    eqc->base_h = cpu_to_le32(upper_32_bits(qm->eqe_dma));
->>>    ......
->>>    aeqc->base_l = cpu_to_le32(lower_32_bits(qm->aeqe_dma));
->>>    aeqc->base_h = cpu_to_le32(upper_32_bits(qm->aeqe_dma));
->> There are sqc, cqc, eqc, aeqc, you seems misunderstand them.
->>
->>> These accesses may cause data inconsistency between CPU cache and hardware.
->>>
->>> I am not sure how to properly fix this problem, and thus I only report it.
->> In qm_qp_ctx_cfg, sqc/cqc memory will be allocated and related mailbox will be sent
->> to hardware. In qm_eq_ctx_cfg, eqc/aeqc related operations will be done.
->>
->> So there is no problem here :)
-> 
-> Ah, sorry, I misunderstood qm_eq_ctx_cfg() and qm_qp_ctx_cfg(), because their names are quite similar.
-> Now, I re-organize this report as follows:
-> 
-> In qm_eq_ctx_cfg(), "eqc" and "aeqc" are mapped to streaming DMA:
->   eqc_dma = dma_map_single(..., eqc, ...);
->   ......
->   aeqc_dma = dma_map_single(..., aeqc, ...);
-> 
-> Then "sqc" and "aeqc" are accessed at some places in qm_eq_ctx_cfg(), such as:
->   eqc->base_l = cpu_to_le32(lower_32_bits(qm->eqe_dma));
->   eqc->base_h = cpu_to_le32(upper_32_bits(qm->eqe_dma));
->   ......
->   aeqc->base_l = cpu_to_le32(lower_32_bits(qm->aeqe_dma));
->   aeqc->base_h = cpu_to_le32(upper_32_bits(qm->aeqe_dma));
-> 
-> These accesses may cause data inconsistency between CPU cache and hardware.
-> 
-> Besides, in qm_qp_ctx_cfg(), "sqc" and "cqc" are mapped to streaming DMA:
->   sqc_dma = dma_map_single(..., sqc, ...);
->   ......
->   cqc_dma = dma_map_single(..., cqc, ...);
-> 
-> 
-> Then "sqc" and "cqc" are at some places in qm_qp_ctx_cfg(), such as:
->   sqc->cq_num = cpu_to_le16(qp_id);
->   sqc->w13 = cpu_to_le16(QM_MK_SQC_W13(0, 1, qp->alg_type));
->   ......
->   cqc->dw3 = cpu_to_le32(QM_MK_CQC_DW3_V2(4));
->   cqc->w8 = 0;
-> 
-> These accesses may cause data inconsistency between CPU cache and hardware.
-> 
-> I think such problems (if they are real) can be fixed by finishing data assignment before DMA mapping.
+> I'd rather not because this creates more ifdefs.
 
-Sorry for late. I got your idea, from the semantics of dma_map_single/dma_unmap_single,
-we should not mix CPU and device DMA accessing here. The reason of working well is our
-hardware is hardware CC.
-
-Will fix this later.
+Actually I take that back.  This does seem to be nicer than my patch.
 
 Thanks,
-Zhou
-
->  
-> 
-> Best wishes,
-> Jia-Ju Bai
-> 
-> .
-> 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
