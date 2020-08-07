@@ -4,59 +4,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66B52C433E0
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Aug 2020 04:54:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 571E9C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Aug 2020 07:21:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C61C221E2
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Aug 2020 04:54:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3616122CAE
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Aug 2020 07:21:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725287AbgHGEy3 (ORCPT
+        id S1726472AbgHGHV0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Aug 2020 00:54:29 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:35256 "EHLO fornost.hmeau.com"
+        Fri, 7 Aug 2020 03:21:26 -0400
+Received: from verein.lst.de ([213.95.11.211]:52859 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725263AbgHGEy3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Aug 2020 00:54:29 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1k3uOe-0004FA-Kr; Fri, 07 Aug 2020 14:54:25 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 07 Aug 2020 14:54:24 +1000
-Date:   Fri, 7 Aug 2020 14:54:24 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [v3 PATCH] crypto: caam - Move debugfs fops into standalone file
-Message-ID: <20200807045424.GA24062@gondor.apana.org.au>
-References: <20200730135426.GA13682@gondor.apana.org.au>
- <c7fa483a-8f57-ee12-3c72-68c770ba4e00@nxp.com>
- <20200801124249.GA18580@gondor.apana.org.au>
- <bf2588f8-95f0-dd10-cd03-25268ea68837@nxp.com>
- <20200806221005.GA22325@gondor.apana.org.au>
+        id S1725805AbgHGHV0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 Aug 2020 03:21:26 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id A67A168D0F; Fri,  7 Aug 2020 09:21:20 +0200 (CEST)
+Date:   Fri, 7 Aug 2020 09:21:20 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Eric Dumazet <eric.dumazet@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Eric Dumazet <edumazet@google.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, bpf@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
+        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
+        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org,
+        Stefan Schmidt <stefan@datenfreihafen.org>
+Subject: Re: [PATCH 25/26] net: pass a sockptr_t into ->setsockopt
+Message-ID: <20200807072120.GB2086@lst.de>
+References: <20200723060908.50081-1-hch@lst.de> <20200723060908.50081-26-hch@lst.de> <6357942b-0b6e-1901-7dce-e308c9fac347@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200806221005.GA22325@gondor.apana.org.au>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <6357942b-0b6e-1901-7dce-e308c9fac347@gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 07, 2020 at 08:10:05AM +1000, Herbert Xu wrote:
-> On Thu, Aug 06, 2020 at 09:09:49PM +0300, Horia Geantă wrote:
-> >
-> > I'd rather move these in the newly-created debugfs.c, see below v3.
+On Thu, Aug 06, 2020 at 03:21:25PM -0700, Eric Dumazet wrote:
+> converting get_user(...)   to  copy_from_sockptr(...) really assumed the optlen
+> has been validated to be >= sizeof(int) earlier.
 > 
-> I'd rather not because this creates more ifdefs.
+> Which is not always the case, for example here.
 
-Actually I take that back.  This does seem to be nicer than my patch.
+Yes.  And besides the bpfilter mess the main reason I even had to add
+the sockptr vs just copying optlen in the high-level socket code.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Please take a look at the patch in the other thread to just revert to
+the "dumb" version everywhere.
