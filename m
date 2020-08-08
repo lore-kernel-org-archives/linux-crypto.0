@@ -7,48 +7,47 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7DCCC433E3
-	for <linux-crypto@archiver.kernel.org>; Sat,  8 Aug 2020 23:50:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C29D8C433DF
+	for <linux-crypto@archiver.kernel.org>; Sat,  8 Aug 2020 23:50:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 79B3A2087C
-	for <linux-crypto@archiver.kernel.org>; Sat,  8 Aug 2020 23:50:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F28920672
+	for <linux-crypto@archiver.kernel.org>; Sat,  8 Aug 2020 23:50:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596930600;
-	bh=IHgBT8Vjik3BbIgxDcxrZBpBmFQ3aLVlSzGsnPVE574=;
+	s=default; t=1596930649;
+	bh=D/f7KeSvbnpfeuO5AHy05pktd39Vhn5bLwVvks2iLkM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=DXf7R0EQC2Z8LgZg+UBA4Suxy2ayn6wbYCxAOCAs8nxg74S0rBxpcY0l/iNxXKdQW
-	 Sjo6eR0eBK8NNuYs297LhLmAH4QoCBj0sMWLKJTAlodonxYeYNyT7NEOY6BG4zPUnp
-	 ABbq/VubVUdk/2x4y2j/scjeKuQtFQKC9SkKBb20=
+	b=UdxZyaoFVB5qOsOt/0c6O6l564NL8BbMvPrPGlenyLPKBpuE/xHTfZdCuUr+5wsrU
+	 zRD+GAziKVvyPq0Amstx1MihskiaPjL7M+wR/Od2F1TXT6zq5+fmznnGqkadVarB0b
+	 x2pbwzwY9J2Js+ARIG4p068IRol+H7qAsx9kC8hI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727038AbgHHXgs (ORCPT
+        id S1726824AbgHHXgZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 8 Aug 2020 19:36:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49542 "EHLO mail.kernel.org"
+        Sat, 8 Aug 2020 19:36:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48634 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727027AbgHHXgs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 8 Aug 2020 19:36:48 -0400
+        id S1726762AbgHHXgR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 8 Aug 2020 19:36:17 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C441C20716;
-        Sat,  8 Aug 2020 23:36:46 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2754F206D8;
+        Sat,  8 Aug 2020 23:36:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596929807;
-        bh=IHgBT8Vjik3BbIgxDcxrZBpBmFQ3aLVlSzGsnPVE574=;
+        s=default; t=1596929776;
+        bh=D/f7KeSvbnpfeuO5AHy05pktd39Vhn5bLwVvks2iLkM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=yxh0eIuM3eM8/J0i6gwwopCXJ5jioROjcy5r1vXBYfanHPNSDKePjQihKlXsuQC3d
-         FfeIBWYi2Tur6i+lSc1N8cjFG5agvaEKb5yUv5dtVUkKCt3/TW2RvCgJCWBcOKCKXj
-         avwoKu2arCbl1w1U1L7KO8o6yIsCDkpopj/qyfcY=
+        b=VZkma3nj6Qj4gESbZp0bc0DmthshN/Sl/UlQt0+yhAShQw+XONLM6axOPjQRLwUz/
+         Hhg7FJlJF5CIKzCyivCM2wXYrsnQApQOB4d0Q5tH1XR74AtR7Drg3+ERQpfp7iflfH
+         0OnJ5EHlKDspqzcLelsahaFlt/WekqdYr7Re/+6k=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Nathan Chancellor <natechancellor@gmail.com>,
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: [PATCH AUTOSEL 5.8 44/72] crypto: x86/crc32c - fix building with clang ias
-Date:   Sat,  8 Aug 2020 19:35:13 -0400
-Message-Id: <20200808233542.3617339-44-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.8 26/72] crypto: qat - allow xts requests not multiple of block
+Date:   Sat,  8 Aug 2020 19:34:55 -0400
+Message-Id: <20200808233542.3617339-26-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200808233542.3617339-1-sashal@kernel.org>
 References: <20200808233542.3617339-1-sashal@kernel.org>
@@ -61,39 +60,79 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
-[ Upstream commit 44623b2818f4a442726639572f44fd9b6d0ef68c ]
+[ Upstream commit 528f776df67c440361b2847b4da400d8754bf030 ]
 
-The clang integrated assembler complains about movzxw:
+Allow AES-XTS requests that are not multiple of the block size.
+If a request is smaller than the block size, return -EINVAL.
 
-arch/x86/crypto/crc32c-pcl-intel-asm_64.S:173:2: error: invalid instruction mnemonic 'movzxw'
+This fixes the following issue reported by the crypto testmgr self-test:
 
-It seems that movzwq is the mnemonic that it expects instead,
-and this is what objdump prints when disassembling the file.
+  alg: skcipher: qat_aes_xts encryption failed on test vector "random: len=116 klen=64"; expected_error=0, actual_error=-22, cfg="random: inplace may_sleep use_finup src_divs=[<reimport>45.85%@+4077, <flush>54.15%@alignmask+18]"
 
-Fixes: 6a8ce1ef3940 ("crypto: crc32c - Optimize CRC32C calculation with PCLMULQDQ instruction")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+Fixes: 96ee111a659e ("crypto: qat - return error for block...")
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/x86/crypto/crc32c-pcl-intel-asm_64.S | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/qat/qat_common/qat_algs.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/crypto/crc32c-pcl-intel-asm_64.S b/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
-index 8501ec4532f4f..442599cbe7960 100644
---- a/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
-+++ b/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
-@@ -170,7 +170,7 @@ continue_block:
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+index e14d3dd291f09..1b050391c0c90 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -55,6 +55,7 @@
+ #include <crypto/hmac.h>
+ #include <crypto/algapi.h>
+ #include <crypto/authenc.h>
++#include <crypto/xts.h>
+ #include <linux/dma-mapping.h>
+ #include "adf_accel_devices.h"
+ #include "adf_transport.h"
+@@ -1102,6 +1103,14 @@ static int qat_alg_skcipher_blk_encrypt(struct skcipher_request *req)
+ 	return qat_alg_skcipher_encrypt(req);
+ }
  
- 	## branch into array
- 	lea	jump_table(%rip), %bufp
--	movzxw  (%bufp, %rax, 2), len
-+	movzwq  (%bufp, %rax, 2), len
- 	lea	crc_array(%rip), %bufp
- 	lea     (%bufp, len, 1), %bufp
- 	JMP_NOSPEC bufp
++static int qat_alg_skcipher_xts_encrypt(struct skcipher_request *req)
++{
++	if (req->cryptlen < XTS_BLOCK_SIZE)
++		return -EINVAL;
++
++	return qat_alg_skcipher_encrypt(req);
++}
++
+ static int qat_alg_skcipher_decrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *stfm = crypto_skcipher_reqtfm(req);
+@@ -1161,6 +1170,15 @@ static int qat_alg_skcipher_blk_decrypt(struct skcipher_request *req)
+ 
+ 	return qat_alg_skcipher_decrypt(req);
+ }
++
++static int qat_alg_skcipher_xts_decrypt(struct skcipher_request *req)
++{
++	if (req->cryptlen < XTS_BLOCK_SIZE)
++		return -EINVAL;
++
++	return qat_alg_skcipher_decrypt(req);
++}
++
+ static int qat_alg_aead_init(struct crypto_aead *tfm,
+ 			     enum icp_qat_hw_auth_algo hash,
+ 			     const char *hash_name)
+@@ -1354,8 +1372,8 @@ static struct skcipher_alg qat_skciphers[] = { {
+ 	.init = qat_alg_skcipher_init_tfm,
+ 	.exit = qat_alg_skcipher_exit_tfm,
+ 	.setkey = qat_alg_skcipher_xts_setkey,
+-	.decrypt = qat_alg_skcipher_blk_decrypt,
+-	.encrypt = qat_alg_skcipher_blk_encrypt,
++	.decrypt = qat_alg_skcipher_xts_decrypt,
++	.encrypt = qat_alg_skcipher_xts_encrypt,
+ 	.min_keysize = 2 * AES_MIN_KEY_SIZE,
+ 	.max_keysize = 2 * AES_MAX_KEY_SIZE,
+ 	.ivsize = AES_BLOCK_SIZE,
 -- 
 2.25.1
 
