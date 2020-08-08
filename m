@@ -4,53 +4,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C88EC433E1
-	for <linux-crypto@archiver.kernel.org>; Sat,  8 Aug 2020 23:37:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B71C433E0
+	for <linux-crypto@archiver.kernel.org>; Sat,  8 Aug 2020 23:39:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52483207BB
-	for <linux-crypto@archiver.kernel.org>; Sat,  8 Aug 2020 23:37:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B12E2087C
+	for <linux-crypto@archiver.kernel.org>; Sat,  8 Aug 2020 23:39:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596929873;
-	bh=pwd8sTXOmkL22U64OXCCpqiQ23X2e4TzpaRY8PfRy+M=;
+	s=default; t=1596929942;
+	bh=NoKBmNF1CPMXkPxFxDReFjhMpjaSUi0JQfGvv1WQiBM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=snQ9XgRyn1Cf5aMhDKF+xcB2tmFJdHYvipnGc9IQJkvjFW4ofV2d3NocRii3xYIzX
-	 pb1UbKpZ2eWeRyFdWSwL4vOFa8W/lIFYuuHlNECFSQ86kuC7eHLQkAUvgMW4c/axRS
-	 nAHrrbJFcaCc0Gb4TnyFePmSWXuT30Gk3tUFOrLE=
+	b=Od5udWmSBodnDADsAxVR4iP0yHps4S3rcucsYHM2RjMsew3E55cMf9TMqCSjfLLOo
+	 d+pIgabn41dUoiKjkA7ncn+yMj+xV4pcuFZzxWH78fo9EOPeaG9UzIowyEGcn865GS
+	 BN5eI5sDUzQhIhqMe3DkJuqi1Etn2Hnl8wXVDSvQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728116AbgHHXhu (ORCPT
+        id S1728449AbgHHXjB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 8 Aug 2020 19:37:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50978 "EHLO mail.kernel.org"
+        Sat, 8 Aug 2020 19:39:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53464 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728093AbgHHXhq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 8 Aug 2020 19:37:46 -0400
+        id S1726846AbgHHXjA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 8 Aug 2020 19:39:00 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 52F3F2073E;
-        Sat,  8 Aug 2020 23:37:45 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id CF9F122B49;
+        Sat,  8 Aug 2020 23:38:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596929866;
-        bh=pwd8sTXOmkL22U64OXCCpqiQ23X2e4TzpaRY8PfRy+M=;
+        s=default; t=1596929939;
+        bh=NoKBmNF1CPMXkPxFxDReFjhMpjaSUi0JQfGvv1WQiBM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TWaneOvpP8E0FeT9f+mdKj78TYLIYQ6s1VW0KQ6i4mMTXMbYLZsgrNqNkA+DL20jP
-         svqbFGmzUUKPZWm5jJ3KC28l/46iNWxhM65FOOByzBgrYbCfOcfPHNDquvgRoZF7jF
-         TUQJpz61gMkqT9sUNp03jg78f+9BvfurAb6Bxbz0=
+        b=tJANconnNCIsW/B+GBKyp/oZ7+Swe0E60pMm+lIvPvi2yge3+UlygFKSNCBUytz02
+         1Tw2r9c4zQ6tyqJKVHB+xbvI1/+dqLEh3Rdxa3S/9lGD8rGcwfCZ6e4LgdwKQXogfF
+         MzldtDcFZ4FyPrWF84/4h0QQjiS/5hERMAMiEkuc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
         Markus Elfring <Markus.Elfring@web.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.7 16/58] crypto: ccree - fix resource leak on error path
-Date:   Sat,  8 Aug 2020 19:36:42 -0400
-Message-Id: <20200808233724.3618168-16-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 11/40] crypto: ccree - fix resource leak on error path
+Date:   Sat,  8 Aug 2020 19:38:15 -0400
+Message-Id: <20200808233844.3618823-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200808233724.3618168-1-sashal@kernel.org>
-References: <20200808233724.3618168-1-sashal@kernel.org>
+In-Reply-To: <20200808233844.3618823-1-sashal@kernel.org>
+References: <20200808233844.3618823-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -76,10 +76,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 18 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index a84335328f371..89f7661f0dce8 100644
+index cd9c60268bf8d..9bf0cce578f02 100644
 --- a/drivers/crypto/ccree/cc_cipher.c
 +++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -159,7 +159,6 @@ static int cc_cipher_init(struct crypto_tfm *tfm)
+@@ -163,7 +163,6 @@ static int cc_cipher_init(struct crypto_tfm *tfm)
  				     skcipher_alg.base);
  	struct device *dev = drvdata_to_dev(cc_alg->drvdata);
  	unsigned int max_key_buf_size = cc_alg->skcipher_alg.max_keysize;
@@ -87,7 +87,7 @@ index a84335328f371..89f7661f0dce8 100644
  
  	dev_dbg(dev, "Initializing context @%p for %s\n", ctx_p,
  		crypto_tfm_alg_name(tfm));
-@@ -171,10 +170,19 @@ static int cc_cipher_init(struct crypto_tfm *tfm)
+@@ -175,10 +174,19 @@ static int cc_cipher_init(struct crypto_tfm *tfm)
  	ctx_p->flow_mode = cc_alg->flow_mode;
  	ctx_p->drvdata = cc_alg->drvdata;
  
@@ -108,7 +108,7 @@ index a84335328f371..89f7661f0dce8 100644
  
  	dev_dbg(dev, "Allocated key buffer in context. key=@%p\n",
  		ctx_p->user.key);
-@@ -186,21 +194,19 @@ static int cc_cipher_init(struct crypto_tfm *tfm)
+@@ -190,21 +198,19 @@ static int cc_cipher_init(struct crypto_tfm *tfm)
  	if (dma_mapping_error(dev, ctx_p->user.key_dma_addr)) {
  		dev_err(dev, "Mapping Key %u B at va=%pK for DMA failed\n",
  			max_key_buf_size, ctx_p->user.key);
