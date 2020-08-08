@@ -5,52 +5,52 @@ X-Spam-Level:
 X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8178C433E1
-	for <linux-crypto@archiver.kernel.org>; Sat,  8 Aug 2020 23:39:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E08BAC433DF
+	for <linux-crypto@archiver.kernel.org>; Sat,  8 Aug 2020 23:47:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 950B420855
-	for <linux-crypto@archiver.kernel.org>; Sat,  8 Aug 2020 23:39:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDAE8206C3
+	for <linux-crypto@archiver.kernel.org>; Sat,  8 Aug 2020 23:47:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596929996;
-	bh=5umpobZfU532MNHExFEMg4AwPASjY4mr8L46crhIfWk=;
+	s=default; t=1596930439;
+	bh=D/f7KeSvbnpfeuO5AHy05pktd39Vhn5bLwVvks2iLkM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=IbGNNQvfaov6G7e/O33Fr4+5zYrrDua84LqgoeAzpNA0oKy0UXnwnZtcQOCbnoKN9
-	 AOWSNf3OPL+Ij6iPDWVjiZhDaKWmsU5je2em+DImrfolf8xtJqhjFjf1m3gD0gaJEA
-	 mBVRpS435RlBglqw5nI6yWqhTTBaeft2/5ulsgys=
+	b=eA+nsrTKLsZA10hEeTGRZ9RQ6leemjwRpMhTzXgdU50B0XKibGI6CjjmxCO44h6wp
+	 +vajjak9oA5Yh0zWyajJlPGwbv6ZzOopYbniicdWHsCWWX0Jf20hu90pwIO19IcNt9
+	 aQjicp5qKQNuO9HWjzXj14hdieQTbZCv5/zODbm8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728678AbgHHXjz (ORCPT
+        id S1727839AbgHHXrR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 8 Aug 2020 19:39:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54980 "EHLO mail.kernel.org"
+        Sat, 8 Aug 2020 19:47:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51324 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728666AbgHHXjy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 8 Aug 2020 19:39:54 -0400
+        id S1728134AbgHHXhz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 8 Aug 2020 19:37:55 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7C90E208B3;
-        Sat,  8 Aug 2020 23:39:52 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id F239A207BB;
+        Sat,  8 Aug 2020 23:37:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596929993;
-        bh=5umpobZfU532MNHExFEMg4AwPASjY4mr8L46crhIfWk=;
+        s=default; t=1596929874;
+        bh=D/f7KeSvbnpfeuO5AHy05pktd39Vhn5bLwVvks2iLkM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=dYDwNuyyGg33nwfb0u4W+a7rxA0DENAEd/fT0V61KQE7DuD/V9/6WnJQ5fKwWIdwV
-         yNjTJr5qhUQ6xiRI/ofqJLujQs01kQbHQENYElkXGNy2j8YjUdKwq5xs4c6eV4THIw
-         Bpnyrcgvc14vgRs49Wc+LSEK2H3wDSv2oyodvtiE=
+        b=A5RwIr+SKqs1+/ltmxSZA6CQI0jdpmhCv2eqEkNz1ZYczYLJg+41Y3XXEb5b/SO2n
+         oUFx5LlTfmCmcYFz+or5qQGo7j2q6sjA3UybqZTA4H38jIUU/Fh2czSByI9xqVnG5B
+         0fchd5LqdG768W9m9QwDGH5ctzBunljpuvHfU5VU=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        Markus Elfring <Markus.Elfring@web.de>,
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 09/21] crypto: ccree - fix resource leak on error path
-Date:   Sat,  8 Aug 2020 19:39:29 -0400
-Message-Id: <20200808233941.3619277-9-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.7 23/58] crypto: qat - allow xts requests not multiple of block
+Date:   Sat,  8 Aug 2020 19:36:49 -0400
+Message-Id: <20200808233724.3618168-23-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200808233941.3619277-1-sashal@kernel.org>
-References: <20200808233941.3619277-1-sashal@kernel.org>
+In-Reply-To: <20200808233724.3618168-1-sashal@kernel.org>
+References: <20200808233724.3618168-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -60,84 +60,79 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Gilad Ben-Yossef <gilad@benyossef.com>
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
-[ Upstream commit 9bc6165d608d676f05d8bf156a2c9923ee38d05b ]
+[ Upstream commit 528f776df67c440361b2847b4da400d8754bf030 ]
 
-Fix a small resource leak on the error path of cipher processing.
+Allow AES-XTS requests that are not multiple of the block size.
+If a request is smaller than the block size, return -EINVAL.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Fixes: 63ee04c8b491e ("crypto: ccree - add skcipher support")
-Cc: Markus Elfring <Markus.Elfring@web.de>
+This fixes the following issue reported by the crypto testmgr self-test:
+
+  alg: skcipher: qat_aes_xts encryption failed on test vector "random: len=116 klen=64"; expected_error=0, actual_error=-22, cfg="random: inplace may_sleep use_finup src_divs=[<reimport>45.85%@+4077, <flush>54.15%@alignmask+18]"
+
+Fixes: 96ee111a659e ("crypto: qat - return error for block...")
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/ccree/cc_cipher.c | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+ drivers/crypto/qat/qat_common/qat_algs.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index 28a5b8b38fa2f..1bcb6f0157b07 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -137,7 +137,6 @@ static int cc_cipher_init(struct crypto_tfm *tfm)
- 				     skcipher_alg.base);
- 	struct device *dev = drvdata_to_dev(cc_alg->drvdata);
- 	unsigned int max_key_buf_size = cc_alg->skcipher_alg.max_keysize;
--	int rc = 0;
- 
- 	dev_dbg(dev, "Initializing context @%p for %s\n", ctx_p,
- 		crypto_tfm_alg_name(tfm));
-@@ -149,10 +148,19 @@ static int cc_cipher_init(struct crypto_tfm *tfm)
- 	ctx_p->flow_mode = cc_alg->flow_mode;
- 	ctx_p->drvdata = cc_alg->drvdata;
- 
-+	if (ctx_p->cipher_mode == DRV_CIPHER_ESSIV) {
-+		/* Alloc hash tfm for essiv */
-+		ctx_p->shash_tfm = crypto_alloc_shash("sha256-generic", 0, 0);
-+		if (IS_ERR(ctx_p->shash_tfm)) {
-+			dev_err(dev, "Error allocating hash tfm for ESSIV.\n");
-+			return PTR_ERR(ctx_p->shash_tfm);
-+		}
-+	}
-+
- 	/* Allocate key buffer, cache line aligned */
- 	ctx_p->user.key = kmalloc(max_key_buf_size, GFP_KERNEL);
- 	if (!ctx_p->user.key)
--		return -ENOMEM;
-+		goto free_shash;
- 
- 	dev_dbg(dev, "Allocated key buffer in context. key=@%p\n",
- 		ctx_p->user.key);
-@@ -164,21 +172,19 @@ static int cc_cipher_init(struct crypto_tfm *tfm)
- 	if (dma_mapping_error(dev, ctx_p->user.key_dma_addr)) {
- 		dev_err(dev, "Mapping Key %u B at va=%pK for DMA failed\n",
- 			max_key_buf_size, ctx_p->user.key);
--		return -ENOMEM;
-+		goto free_key;
- 	}
- 	dev_dbg(dev, "Mapped key %u B at va=%pK to dma=%pad\n",
- 		max_key_buf_size, ctx_p->user.key, &ctx_p->user.key_dma_addr);
- 
--	if (ctx_p->cipher_mode == DRV_CIPHER_ESSIV) {
--		/* Alloc hash tfm for essiv */
--		ctx_p->shash_tfm = crypto_alloc_shash("sha256-generic", 0, 0);
--		if (IS_ERR(ctx_p->shash_tfm)) {
--			dev_err(dev, "Error allocating hash tfm for ESSIV.\n");
--			return PTR_ERR(ctx_p->shash_tfm);
--		}
--	}
-+	return 0;
- 
--	return rc;
-+free_key:
-+	kfree(ctx_p->user.key);
-+free_shash:
-+	crypto_free_shash(ctx_p->shash_tfm);
-+
-+	return -ENOMEM;
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+index e14d3dd291f09..1b050391c0c90 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -55,6 +55,7 @@
+ #include <crypto/hmac.h>
+ #include <crypto/algapi.h>
+ #include <crypto/authenc.h>
++#include <crypto/xts.h>
+ #include <linux/dma-mapping.h>
+ #include "adf_accel_devices.h"
+ #include "adf_transport.h"
+@@ -1102,6 +1103,14 @@ static int qat_alg_skcipher_blk_encrypt(struct skcipher_request *req)
+ 	return qat_alg_skcipher_encrypt(req);
  }
  
- static void cc_cipher_exit(struct crypto_tfm *tfm)
++static int qat_alg_skcipher_xts_encrypt(struct skcipher_request *req)
++{
++	if (req->cryptlen < XTS_BLOCK_SIZE)
++		return -EINVAL;
++
++	return qat_alg_skcipher_encrypt(req);
++}
++
+ static int qat_alg_skcipher_decrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *stfm = crypto_skcipher_reqtfm(req);
+@@ -1161,6 +1170,15 @@ static int qat_alg_skcipher_blk_decrypt(struct skcipher_request *req)
+ 
+ 	return qat_alg_skcipher_decrypt(req);
+ }
++
++static int qat_alg_skcipher_xts_decrypt(struct skcipher_request *req)
++{
++	if (req->cryptlen < XTS_BLOCK_SIZE)
++		return -EINVAL;
++
++	return qat_alg_skcipher_decrypt(req);
++}
++
+ static int qat_alg_aead_init(struct crypto_aead *tfm,
+ 			     enum icp_qat_hw_auth_algo hash,
+ 			     const char *hash_name)
+@@ -1354,8 +1372,8 @@ static struct skcipher_alg qat_skciphers[] = { {
+ 	.init = qat_alg_skcipher_init_tfm,
+ 	.exit = qat_alg_skcipher_exit_tfm,
+ 	.setkey = qat_alg_skcipher_xts_setkey,
+-	.decrypt = qat_alg_skcipher_blk_decrypt,
+-	.encrypt = qat_alg_skcipher_blk_encrypt,
++	.decrypt = qat_alg_skcipher_xts_decrypt,
++	.encrypt = qat_alg_skcipher_xts_encrypt,
+ 	.min_keysize = 2 * AES_MIN_KEY_SIZE,
+ 	.max_keysize = 2 * AES_MAX_KEY_SIZE,
+ 	.ivsize = AES_BLOCK_SIZE,
 -- 
 2.25.1
 
