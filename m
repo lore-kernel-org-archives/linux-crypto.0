@@ -2,112 +2,194 @@ Return-Path: <SRS0=i+zF=BU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDCD1C433DF
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Aug 2020 15:24:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 188E6C433E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Aug 2020 16:19:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A330422BF3
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Aug 2020 15:24:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E50DA20829
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Aug 2020 16:19:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="B7xtyZiB"
+	dkim=pass (2048-bit key) header.d=scottdial.com header.i=@scottdial.com header.b="oIrrpNfK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728443AbgHJPYu (ORCPT
+        id S1727014AbgHJQTe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Aug 2020 11:24:50 -0400
-Received: from mail-eopbgr70073.outbound.protection.outlook.com ([40.107.7.73]:7046
-        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728448AbgHJPYs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Aug 2020 11:24:48 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kURN34cZDQ5gRmK5iNgmEgo9HD2p8CqiXTDrYP4M9fA7jr+Dt+xH1b/A2Hu5JjP5jxcDxm5PdWYD56YbRsf9ImH0CjUsI6tVAAgl8WNtoGl9wxSsxK5i9N+HK7ZesS34KokVsd5WQHRa6zRbj96611dmv21L/RSFFM4vd04JSrNcuR75uwMRXKSP66blojRvTj9o/0AaiB12BmL9TWXUf5z04t8FqaS/EGF45AZs2mvUuWp6xKk1ug2IezQRugjjkukqZSV3mPXbkAZ3ZXCXoOopWPmrfjXSgzN0q4HXC3PXVxJbGeIUrLD1k1An9lCCc+vqgaD7oLXx7pyG/LssHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/HvzZxaOGst5M4V8elg7uJ9zdqMATdgA16fbwdtCMhU=;
- b=QJkgr+fLiHZJ6hPI3z3qmDbgAEVpXvT04FKHKRoLerouhiErt7nlRbXrn3IsQCzgufwR7oCPp9fGDUBSj0zcjOfQvbM54q+JUg7RXXK18SyPiL1Ban9UmcmvjmqnvccqWe92w0QOc4z84JqkQoH/oYnvm+F8PYoQzCLQZRBXjkV5vm7la9sS2602QU2S0rshwVhXsiSB/2qPLJAygyAdmBU2gE6lnWANhURLcx7J9Baij3W979Y6jAH27t4imYbF4IFegxYXxkXZ30Ty6zxLSjQswaspyEIabOmGADKEt0ywUmd6Ugh0F5S+VYgX2e24yuDW8L+5ytrwjeFC1/fayA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/HvzZxaOGst5M4V8elg7uJ9zdqMATdgA16fbwdtCMhU=;
- b=B7xtyZiBEtHX19mQgbTVfR1/ykcVx08OQQ8pkBjxiEHlikVKVxG3d7fvHgGxro0Z1EHexXmaj2WAcT0nbt89wR3UzJ/WvhfBtVHQEstUWL+Rr2HOtcGSvToGuhWrtwLymkcpnenZ97PUsIB3C27lsCHCb7EHK6q6nQLFNcad8vg=
-Authentication-Results: kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=none action=none header.from=nxp.com;
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
- by VI1PR04MB5710.eurprd04.prod.outlook.com (2603:10a6:803:df::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.15; Mon, 10 Aug
- 2020 15:24:44 +0000
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::8459:4be8:7034:7a81]) by VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::8459:4be8:7034:7a81%6]) with mapi id 15.20.3261.024; Mon, 10 Aug 2020
- 15:24:44 +0000
-Subject: Re: [v3 PATCH 16/31] crypto: caam/qi2 - Set final_chunksize on chacha
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Stephan Mueller <smueller@chronox.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>
-References: <20200728071746.GA22352@gondor.apana.org.au>
- <E1k0JtK-0006QL-VA@fornost.hmeau.com>
-From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
-Message-ID: <787cfba6-e979-437b-d9b6-0afb6e6af1e1@nxp.com>
-Date:   Mon, 10 Aug 2020 18:24:42 +0300
+        Mon, 10 Aug 2020 12:19:34 -0400
+Received: from bert.scottdial.com ([104.237.142.221]:50962 "EHLO
+        bert.scottdial.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725894AbgHJQTe (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Aug 2020 12:19:34 -0400
+X-Greylist: delayed 589 seconds by postgrey-1.27 at vger.kernel.org; Mon, 10 Aug 2020 12:19:33 EDT
+Received: from mail.scottdial.com (mail.scottdial.com [10.8.0.6])
+        by bert.scottdial.com (Postfix) with ESMTP id C00E455D8E0;
+        Mon, 10 Aug 2020 12:09:43 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.scottdial.com (Postfix) with ESMTP id 5D00F111B498;
+        Mon, 10 Aug 2020 12:09:43 -0400 (EDT)
+Received: from mail.scottdial.com ([127.0.0.1])
+        by localhost (mail.scottdial.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id QqXWQqRqVMkN; Mon, 10 Aug 2020 12:09:41 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.scottdial.com (Postfix) with ESMTP id 9C219111B499;
+        Mon, 10 Aug 2020 12:09:41 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.scottdial.com 9C219111B499
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=scottdial.com;
+        s=24B7B964-7506-11E8-A7D6-CF6FBF8C6FCF; t=1597075781;
+        bh=wNy1XyhVsfquc4ctXPEuwQIkMVN0ZkmOYRWr/geGRUY=;
+        h=To:From:Message-ID:Date:MIME-Version;
+        b=oIrrpNfKNnWY1t2NsUdQW8mr3rR9Hk7hg0lAXibz7DGr0DlMkal7VWZSFAAtlJ761
+         NFu+ngM98jhXfqYSVvOzjxPqF/RZxoR/JGD6jV/uC6Qd0UDzdltUvdg1NdZGJ0gx9a
+         QQbnULYT5hSj9CWh8Sk/xncPzhkSiU90w8RycP3wyzKinFps6nnOIIjShqIXhlg+k9
+         tKRwf5kA1Q632mQ2V4jU9h/y/SRcRrdAX5tOEjBlyD4C+GvhGiotQn/eE7DLkF/Yv6
+         15DSUUGiUv4uW5TOvQubWE33cNC3IuWnkBaDg7NGPwnZrkygtohwfIvPq1Xz9t7WQ/
+         zMix+X43FiBtQ==
+X-Virus-Scanned: amavisd-new at scottdial.com
+Received: from mail.scottdial.com ([127.0.0.1])
+        by localhost (mail.scottdial.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id cAG-HUHt1Nrf; Mon, 10 Aug 2020 12:09:41 -0400 (EDT)
+Received: from [172.17.2.2] (unknown [172.17.2.2])
+        by mail.scottdial.com (Postfix) with ESMTPSA id 383D8111B498;
+        Mon, 10 Aug 2020 12:09:41 -0400 (EDT)
+Subject: Re: Severe performance regression in "net: macsec: preserve ingress
+ frame ordering"
+To:     Sabrina Dubroca <sd@queasysnail.net>
+Cc:     linux-crypto@vger.kernel.org, Ryan Cox <ryan_cox@byu.edu>,
+        netdev@vger.kernel.org, davem@davemloft.net,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        ebiggers@google.com
+References: <1b0cec71-d084-8153-2ba4-72ce71abeb65@byu.edu>
+ <a335c8eb-0450-1274-d1bf-3908dcd9b251@scottdial.com>
+ <20200810133427.GB1128331@bistromath.localdomain>
+From:   Scott Dial <scott@scottdial.com>
+Message-ID: <7663cbb1-7a55-6986-7d5d-8fab55887a80@scottdial.com>
+Date:   Mon, 10 Aug 2020 12:09:40 -0400
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <E1k0JtK-0006QL-VA@fornost.hmeau.com>
+ Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <20200810133427.GB1128331@bistromath.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR03CA0020.eurprd03.prod.outlook.com
- (2603:10a6:208:14::33) To VI1PR04MB4046.eurprd04.prod.outlook.com
- (2603:10a6:803:4d::29)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.0.129] (84.117.251.185) by AM0PR03CA0020.eurprd03.prod.outlook.com (2603:10a6:208:14::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.19 via Frontend Transport; Mon, 10 Aug 2020 15:24:43 +0000
-X-Originating-IP: [84.117.251.185]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 8bf3e9c5-be86-4c58-9508-08d83d41826a
-X-MS-TrafficTypeDiagnostic: VI1PR04MB5710:
-X-Microsoft-Antispam-PRVS: <VI1PR04MB5710161039B792EF9733E05498440@VI1PR04MB5710.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3631;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6vAC9KFoxXXGHQdyzh8y7ZlMg4CXVf5lyk2m7NvH8nH7u5GKqFhPj1trN3GSMbwjHQAM1tKwG8UGRoUaJoxGPHu02n0KSZEVmnKuituVil7fp9zKd98nRziijrYwOOHtCXca0hIpAdvnQbGfMHFeziwzZxndA4a95oIb/AxDXBpEXmGk7XLKYSs/+m1pMlDApAiWl6CoLv8AFego4oDEtI/odSTY/EN62Ydpy0OTr8yAqCyTf+fxPuSQr0Nq35hJ6t3N5eLIZo3vD2cO33zlirWvqAzb2WPITqDD+uJxOcwllKRcZv4J2vj3MvOZR9ZZAuTjFrDEVOcR+ebvJAk3/wjn9G4sdxlPgkebuELvzHhh7VpE4qp62XLrwnvVhPmN
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(39860400002)(396003)(346002)(376002)(136003)(8936002)(4744005)(31696002)(66946007)(8676002)(36756003)(66556008)(66476007)(31686004)(26005)(186003)(53546011)(5660300002)(16526019)(956004)(2616005)(52116002)(478600001)(2906002)(6486002)(110136005)(316002)(83380400001)(16576012)(86362001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: ZRq3e17+ZMtKlyEQR3AEJh74KY1Ea8R8gCW++1Dj6Uw+pw8b+bsCI0wARwbrSf4tVW1+IXw3G3TBobBR0d96Hx25urAygqXN0r2Gm1R2b/ffWR08jLoqdllX4gwt2n2h7smWpjSZdpTbAChaOzVTb4vBvyXPDsr2VO5adX5ZevQulJ6c5uBck/NfuzFxBooKm1I/03qKO8BrovP4uzgW0IeazPZuRbgMKUPEhO+yJFmV6PwMO8wjjtJzE8R070QjZGhRvzxNFQZZEcZ6iMQUVesOyqf/VEfteTnP1oYluuHh7xGrWeM0SDOxyWD5dAc5ZlJIavhyfFyHq+E+UywJ/XW8YH8EH7rIBLrRyjElYlMMzz3gUJPJRLxUFqftGExp3j3maY7ZO4k6QLp0C+6m8iH39ooFwm2Ys5BIdDJniqn4QCO4OnCEM/jsZ28GetjRvifgCX+hFtTR0KIPP+8gdAH99GuUXkS99HfVRbEBkQ12MQDlexZrLUpZ74DMtoSby7xAqJaszbK4DNtTd/+oFQr9oUtNSuy+opyWmF905qI9b/IIU8jD2Z3qoSwJ/s45Rsrw12vlMeokvvmwzXCOIyEFNCIW1yonR7lliZ4n4wLylZwYPp0j5fttQV75oyDCLRu7j9FPthPbLssVpFvaCg==
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8bf3e9c5-be86-4c58-9508-08d83d41826a
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB4046.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2020 15:24:44.6175
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Oj0XfNg3b7H9XK2RZy7yNbZccNfNPR2BKGTyVHzpDsHc+2o9R+srVvMMK1RiTwYTHym10zDaGiByNCBSFdMYOg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB5710
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/28/2020 10:19 AM, Herbert Xu wrote:
-> The chacha implementation in caam/qi2 does not support partial
-> operation and therefore this patch sets its final_chunksize to -1
-> to mark this fact.
-> 
-> This patch also sets the chunksize to the chacha block size.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+On 8/10/2020 9:34 AM, Sabrina Dubroca wrote:
+> [adding the linux-crypto list]
+>=20
+> 2020-08-06, 23:48:16 -0400, Scott Dial wrote:
+>> On 8/6/2020 5:11 PM, Ryan Cox wrote:
+>>> With 5.7 I get:
+>>> * 9.90 Gb/s with no macsec at all
+>>> * 1.80 Gb/s with macsec WITHOUT encryption
+>>> * 1.00 Gb/s (sometimes, but often less) with macsec WITH encryption
+>>>
+>>> With 5.7 but with ab046a5d4be4c90a3952a0eae75617b49c0cb01b reverted, =
+I get:
+>>> * 9.90 Gb/s with no macsec at all
+>>> * 7.33 Gb/s with macsec WITHOUT encryption
+>>> * 9.83 Gb/s with macsec WITH encryption
+>>>
+>>> On tests where performance is bad (including macsec without encryptio=
+n),
+>>> iperf3 is at 100% CPU usage.=C2=A0 I was able to run it under `perf r=
+ecord`on
+>>> iperf3 in a number of the tests but, unfortunately, I have had troubl=
+e
+>>> compiling perf for my own 5.7 compilations (definitely PEBKAC).=C2=A0=
+ If it
+>>> would be useful I can work on fixing the perf compilation issues.
+>>
+>> For certain, you are measuring the difference between AES-NI doing
+>> gcm(aes) and gcm_base(ctr(aes-aesni),ghash-generic). Specifically, the
+>> hotspot is ghash-generic's implementation of ghash_update() function.
+>> I appreciate your testing because I was limited in my ability to test
+>> beyond 1Gb/s.
+>>
+>> The aes-aesni driver is smart enough to use the FPU if it's not busy a=
+nd
+>> fallback to the CPU otherwise. Unfortunately, the ghash-clmulni driver
+>> does not have that kind of logic in it and only provides an async vers=
+ion,
+>> so we are forced to use the ghash-generic implementation, which is a p=
+ure
+>> CPU implementation. The ideal would be for aesni_intel to provide a
+>> synchronous version of gcm(aes) that fell back to the CPU if the FPU i=
+s
+>> busy.
+>> I don't know if the crypto maintainers would be open to such a change,=
+ but
+>> if the choice was between reverting and patching the crypto code, then=
+ I
+>> would work on patching the crypto code.
+>=20
+> To the crypto folks, a bit of context: Scott wrote commit ab046a5d4be4
+> ("net: macsec: preserve ingress frame ordering"), which made MACsec
+> use gcm(aes) with CRYPTO_ALG_ASYNC. This prevents out of order
+> decryption, but reduces performance. We'd like to restore performance
+> on systems where the FPU is available without breaking MACsec for
+> systems where the FPU is often busy.
+>=20
+> A quick and dirty alternative might be to let the administrator decide
+> if they're ok with some out of order. Maybe they know that their FPU
+> will be mostly idle so it won't even be an issue (or maybe the
+> opposite, ie keep the fast default and let admins fix their setups
+> with an extra flag).
 
-Thanks,
-Horia
+I can appreciate favoring performance over correctness as practical
+concern, but I'd suggest that the out-of-order decryption *is* a
+performance concern as well. We can debate realness of my workload, but
+even in Ryan's tests on an otherwise idle server, he showed 0.07% of the
+frames needed to be dispatched to cryptd, and that for whatever reason
+it's more often with encryption disabled, which correlates to his
+decrease in throughput (9.83 Gb/s to 7.33 Gb/s, and 9.19 Gb/s to 6.00
+Gb/s), perhaps causing exponential backoff from TCP retries. I can
+resurrect my test setup, but my numbers were worse than Ryan's.
+
+In any case, I counted 18 implementations of HW accelerated gcm(aes) in
+the kernel, with 3 of those implementations are in arch (x86, arm64, and
+s390) and the rest are crypto device drivers. Of all those
+implementations, the AES-NI implementation is the only one that
+dispatches to cryptd (via code in cypto/simd.c). AFAICT, every other
+implementation of gcm(aes) is synchronous, but they would require closer
+inspection to be certain. So, I'd like to focus on what we can do to
+improve crypto/simd.c to provide a synchronous implementation of
+gcm(aes) for AES-NI when possible, which is the vast majority of the time=
+.
+
+I would be interested in proposing a change to improve this issue, but
+I'm not sure the direction that the maintainers of this code would
+prefer. Since these changes to the crypto API are fairly recent, there
+may be context that I am not aware of. However, I think it would be
+straight-forward to add another API to crypto/simd.c that allocated sync
+algorithms, and I would be willing to do the work.
+
+The only challenge I see in implementing such a change is deciding how
+to select a fallback algorithm. The most flexible solution would be to
+call crypto_alloc_aead with CRYPTO_ALG_ASYNC during the init to pick the
+"best" fallback (in case there is alternative HW offloading available),
+but that would almost certainly pick itself and it's not obvious to me
+how to avoid that. On the other hand, the caller to the new API could
+explicitly declare a fallback algorithm (e.g.,
+"gcm_base(ctr(aes-aesni),ghash-generic)"), which probably is the correct
+answer anyways -- what are the chances that there is multiple HW
+offloads for gcm(aes)? In that case, a possible API would be:
+
+int simd_register_aeads_compat_sync(struct aead_alg *algs,
+                                    char **fallback_algs,
+                                    int count,
+			            struct simd_aead_alg **simd_algs);
+
+Beyond MACsec, it's worth noting that the mac80211 code for AES-GCMP and
+BIP-GMAC also use gcm(aes) in sync mode because decryption occurs in a
+softirq, however I imagine nobody has reported an issue because the link
+speed is typically slower and those encryption modes are still uncommon.
+
+--=20
+Scott Dial
+scott@scottdial.com
