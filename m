@@ -2,205 +2,133 @@ Return-Path: <SRS0=i+zF=BU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A2D7C433E0
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Aug 2020 10:20:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B971EC433E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Aug 2020 13:34:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B1E120658
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Aug 2020 10:20:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=rambus.com header.i=@rambus.com header.b="BlSMLHSe"
+	by mail.kernel.org (Postfix) with ESMTP id 903242076B
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Aug 2020 13:34:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726396AbgHJKU3 (ORCPT
+        id S1726871AbgHJNeg convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Aug 2020 06:20:29 -0400
-Received: from us-smtp-delivery-148.mimecast.com ([63.128.21.148]:43132 "EHLO
-        us-smtp-delivery-148.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725846AbgHJKU2 (ORCPT
+        Mon, 10 Aug 2020 09:34:36 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31884 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726614AbgHJNeg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Aug 2020 06:20:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rambus.com;
-        s=mimecast20161209; t=1597054825;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wdPHUdLgoITcjMmvFy6Q9J8k3dKrWILdmzSW2M8hHME=;
-        b=BlSMLHSerXaR09O9HzoNSB0dQybTTEruZ6tykaZv5i7/aNDEkxztVgs8whUu3rSuCOAqnw
-        h96bV+iAn8JLvCcfRQmbLyHTwgI7/OukG1NBk/eJvCmsQLBt4kBX98SAoNQSDTvI3YDAlR
-        traP1JZZGP4rZiLFH1r+AlCgtje/U/E=
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com
- (mail-bn1nam07lp2043.outbound.protection.outlook.com [104.47.51.43]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-TNcdsf2NPZ2mqrPq7GA2qQ-1; Mon, 10 Aug 2020 06:20:24 -0400
-X-MC-Unique: TNcdsf2NPZ2mqrPq7GA2qQ-1
-Received: from CY4PR0401MB3652.namprd04.prod.outlook.com
- (2603:10b6:910:8a::27) by CY4PR04MB0201.namprd04.prod.outlook.com
- (2603:10b6:903:39::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.22; Mon, 10 Aug
- 2020 10:20:21 +0000
-Received: from CY4PR0401MB3652.namprd04.prod.outlook.com
- ([fe80::a0ee:e26e:64fc:61b2]) by CY4PR0401MB3652.namprd04.prod.outlook.com
- ([fe80::a0ee:e26e:64fc:61b2%3]) with mapi id 15.20.3261.023; Mon, 10 Aug 2020
- 10:20:20 +0000
-From:   "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
-To:     Andrei Botila <andrei.botila@oss.nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-arm-kernel@axis.com" <linux-arm-kernel@axis.com>,
-        Andrei Botila <andrei.botila@nxp.com>,
+        Mon, 10 Aug 2020 09:34:36 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-ybAf403CPwebUdQRv3AN3A-1; Mon, 10 Aug 2020 09:34:31 -0400
+X-MC-Unique: ybAf403CPwebUdQRv3AN3A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39FBA1009610;
+        Mon, 10 Aug 2020 13:34:30 +0000 (UTC)
+Received: from bistromath.localdomain (ovpn-112-107.ams2.redhat.com [10.36.112.107])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B77C919D7E;
+        Mon, 10 Aug 2020 13:34:28 +0000 (UTC)
+Date:   Mon, 10 Aug 2020 15:34:27 +0200
+From:   Sabrina Dubroca <sd@queasysnail.net>
+To:     Scott Dial <scott@scottdial.com>
+Cc:     linux-crypto@vger.kernel.org, Ryan Cox <ryan_cox@byu.edu>,
+        netdev@vger.kernel.org, davem@davemloft.net,
         Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: RE: [PATCH 19/22] crypto: inside-secure - add check for xts input
- length equal to zero
-Thread-Topic: [PATCH 19/22] crypto: inside-secure - add check for xts input
- length equal to zero
-Thread-Index: AQHWbNc/iDlrjFSjSECEGLk+jBQoDKkxJAfg
-Date:   Mon, 10 Aug 2020 10:20:20 +0000
-Message-ID: <CY4PR0401MB36528610C3ABF802F8CBF35FC3440@CY4PR0401MB3652.namprd04.prod.outlook.com>
-References: <20200807162010.18979-1-andrei.botila@oss.nxp.com>
- <20200807162010.18979-20-andrei.botila@oss.nxp.com>
-In-Reply-To: <20200807162010.18979-20-andrei.botila@oss.nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [89.220.222.106]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 51b7fcc0-d42c-47a6-f87e-08d83d16fc79
-x-ms-traffictypediagnostic: CY4PR04MB0201:
-x-microsoft-antispam-prvs: <CY4PR04MB02010B1EC4B353D56A532A6BC3440@CY4PR04MB0201.namprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: wYycDT5wp0iUnyD4UoVeYrXm9mG5Y1ThG/tiinEkUoo//Tq22iLCiHJ7R4mDFma7LVO/xvDjyLeu6F9PhnWCeyB+jK6NYsHMs2hMUu7lLvN5YB9PpnJkxnBjs+drmvPtqQJvw/Ad9JmhPb0VT/KB5yzcP/0xBxycUIzMV8DqX9zM8EQ8xdYtYfYWF91c/so2N6Ybis2266Bl85Gll7ytTuiKIUQf+gHGq6V9SpuUlcTm+XdJBJWmPlos6OZivVQm7uDPwOdNkzByMU+HSuXSX/OOWr+aGNkob6sHGCzMACPrHBc92a89QWcvJYYuj3z5
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR0401MB3652.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(366004)(39840400004)(396003)(136003)(346002)(376002)(478600001)(66946007)(66476007)(66556008)(316002)(52536014)(54906003)(66446008)(64756008)(110136005)(83380400001)(8936002)(4326008)(7416002)(8676002)(2906002)(26005)(71200400001)(186003)(33656002)(76116006)(7696005)(55016002)(86362001)(5660300002)(53546011)(6506007)(9686003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: e3zwTi6Mbu6vPpF3rZQjQPlmoycSUXeGZ4EdQhjVGwGcqtDyYMQmfej3PpBXXqg0bCI9qWAmXVgTQbvT6pB+obPtpERAwG3ye8KCPD0QXbhDwgIN7V13O2Z6ii80Wp/AYWqTR3lr+8IHNqnSfnEXDsQvz5sukjT4Vuhe4gxs8IRlaHhGJVhLKE+z5nLl3G42UUQBKBGqFvWJy+U9QzxPLyapIBeyjwpfTDiYmxbuLt5omNtenX90ofKwnCSpNyWz0hvL1QjZkYv0j9mT25fGsRtxBWFgrSAi8FJJli46ViiZdOCtt6TW+C0SGMqhDZESBIR3E5PQ80gAZtbZa1y9oTugL5lmSbLhpIJnPGI2pzJK9CDNz0ZCFct5Pfe+nZUOV9PoJTS5t+IsYsTT9/L/dLxGWBNNiTeue8DXbxFrEiTG1nTKF7oRSe6vb0DIHiOXbFRLso2UpsHCG1uEagB4qAQIRF8MuOB3XfFi6piaSYhRFs3pjN7COKb6YpDIiWynkC3ko8yWg6IWZAOXepiLmS8/DrGb6l/oRWMza4lk4rGG/7JGDk7O7c4hlFaWhbM+Fntm+pCBDtFhAIPEx9fkfPL9QR4tOBO6FQxXSpjK6X/Hx/o4WJ+oqxqbu1RwRq8DiDwKcx1PUiJPGqMu36NWxA==
-x-ms-exchange-transport-forked: True
+Subject: Re: Severe performance regression in "net: macsec: preserve ingress
+ frame ordering"
+Message-ID: <20200810133427.GB1128331@bistromath.localdomain>
+References: <1b0cec71-d084-8153-2ba4-72ce71abeb65@byu.edu>
+ <a335c8eb-0450-1274-d1bf-3908dcd9b251@scottdial.com>
 MIME-Version: 1.0
-X-OriginatorOrg: rambus.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR0401MB3652.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 51b7fcc0-d42c-47a6-f87e-08d83d16fc79
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Aug 2020 10:20:20.4843
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bd0ba799-c2b9-413c-9c56-5d1731c4827c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2+83ez5vIVfG3scjY2OX2a+wrcfl9ARrAZXNHKbK4wcEgwyew4TnTdcG6x/Hv2DrkD8bOjunyeAzWTPH3Eq1OA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR04MB0201
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA48A24 smtp.mailfrom=pvanleeuwen@rambus.com
+In-Reply-To: <a335c8eb-0450-1274-d1bf-3908dcd9b251@scottdial.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: rambus.com
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> -----Original Message-----
-> From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.kernel.=
-org> On Behalf Of Andrei Botila
-> Sent: Friday, August 7, 2020 6:20 PM
-> To: Herbert Xu <herbert@gondor.apana.org.au>; David S. Miller <davem@dave=
-mloft.net>
-> Cc: linux-crypto@vger.kernel.org; linux-arm-kernel@lists.infradead.org; l=
-inux-kernel@vger.kernel.org; linuxppc-dev@lists.ozlabs.org;
-> linux-s390@vger.kernel.org; x86@kernel.org; linux-arm-kernel@axis.com; An=
-drei Botila <andrei.botila@nxp.com>; Antoine Tenart
-> <antoine.tenart@bootlin.com>
-> Subject: [PATCH 19/22] crypto: inside-secure - add check for xts input le=
-ngth equal to zero
->
-> <<< External Email >>>
-> From: Andrei Botila <andrei.botila@nxp.com>
->
-> Standardize the way input lengths equal to 0 are handled in all skcipher
-> algorithms. All the algorithms return 0 for input lengths equal to zero.
->
-> Cc: Antoine Tenart <antoine.tenart@bootlin.com>
-> Signed-off-by: Andrei Botila <andrei.botila@nxp.com>
-> ---
->  drivers/crypto/inside-secure/safexcel_cipher.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/cry=
-pto/inside-secure/safexcel_cipher.c
-> index 1ac3253b7903..03d06556ea98 100644
-> --- a/drivers/crypto/inside-secure/safexcel_cipher.c
-> +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-> @@ -2533,6 +2533,9 @@ static int safexcel_skcipher_aes_xts_cra_init(struc=
-t crypto_tfm *tfm)
->
->  static int safexcel_encrypt_xts(struct skcipher_request *req)
->  {
-> +if (!req->cryptlen)
-> +return 0;
-> +
->  if (req->cryptlen < XTS_BLOCK_SIZE)
->  return -EINVAL;
->  return safexcel_queue_req(&req->base, skcipher_request_ctx(req),
-> @@ -2541,6 +2544,9 @@ static int safexcel_encrypt_xts(struct skcipher_req=
-uest *req)
->
->  static int safexcel_decrypt_xts(struct skcipher_request *req)
->  {
-> +if (!req->cryptlen)
-> +return 0;
-> +
->  if (req->cryptlen < XTS_BLOCK_SIZE)
->  return -EINVAL;
->  return safexcel_queue_req(&req->base, skcipher_request_ctx(req),
-> --
-> 2.17.1
+[adding the linux-crypto list]
 
-With all due respect, but this makes no sense.
+2020-08-06, 23:48:16 -0400, Scott Dial wrote:
+> On 8/6/2020 5:11 PM, Ryan Cox wrote:
+> > With 5.7 I get:
+> > * 9.90 Gb/s with no macsec at all
+> > * 1.80 Gb/s with macsec WITHOUT encryption
+> > * 1.00 Gb/s (sometimes, but often less) with macsec WITH encryption
+> > 
+> > With 5.7 but with ab046a5d4be4c90a3952a0eae75617b49c0cb01b reverted, I get:
+> > * 9.90 Gb/s with no macsec at all
+> > * 7.33 Gb/s with macsec WITHOUT encryption
+> > * 9.83 Gb/s with macsec WITH encryption
+> > 
+> > On tests where performance is bad (including macsec without encryption),
+> > iperf3 is at 100% CPU usage.  I was able to run it under `perf record`on
+> > iperf3 in a number of the tests but, unfortunately, I have had trouble
+> > compiling perf for my own 5.7 compilations (definitely PEBKAC).  If it
+> > would be useful I can work on fixing the perf compilation issues.
+> 
+> For certain, you are measuring the difference between AES-NI doing
+> gcm(aes) and gcm_base(ctr(aes-aesni),ghash-generic). Specifically, the
+> hotspot is ghash-generic's implementation of ghash_update() function.
+> I appreciate your testing because I was limited in my ability to test
+> beyond 1Gb/s.
+> 
+> The aes-aesni driver is smart enough to use the FPU if it's not busy and
+> fallback to the CPU otherwise. Unfortunately, the ghash-clmulni driver
+> does not have that kind of logic in it and only provides an async version,
+> so we are forced to use the ghash-generic implementation, which is a pure
+> CPU implementation. The ideal would be for aesni_intel to provide a
+> synchronous version of gcm(aes) that fell back to the CPU if the FPU is
+> busy.
+> I don't know if the crypto maintainers would be open to such a change, but
+> if the choice was between reverting and patching the crypto code, then I
+> would work on patching the crypto code.
 
-For XTS, any length below 16 is illegal, as applying CTS in order to handle=
- non-cipher
-block multiples (16 bytes in case of AES) requires _more_ data than 1 ciphe=
-r block.
+To the crypto folks, a bit of context: Scott wrote commit ab046a5d4be4
+("net: macsec: preserve ingress frame ordering"), which made MACsec
+use gcm(aes) with CRYPTO_ALG_ASYNC. This prevents out of order
+decryption, but reduces performance. We'd like to restore performance
+on systems where the FPU is available without breaking MACsec for
+systems where the FPU is often busy.
 
-There is no benefit to explicitly check for zero length if there is already=
- a check for
-less-than-16. That's just wasting CPU cycles and  a branch predictor entry,=
- for no
-benefit whatsoever. (except for academic "alignment with other ciphers").
+A quick and dirty alternative might be to let the administrator decide
+if they're ok with some out of order. Maybe they know that their FPU
+will be mostly idle so it won't even be an issue (or maybe the
+opposite, ie keep the fast default and let admins fix their setups
+with an extra flag).
 
-XTS has very specific use cases. No one in their right mind would call it f=
-or a
-situation where it can't be applied in the first place, e.g. anything < 16 =
-bytes.
+> In any case, you didn't report how many packets arrived out of order, which
+> was the issue being addressed by my change. It would be helpful to get
+> the output of "ip -s macsec show" and specifically the InPktsDelayed
+> counter. Did iperf3 report out-of-order packets with the patch reverted?
+> Otherwise, if this is the only process running on your test servers,
+> then you may not be generating any contention for the FPU, which is the
+> source of the out-of-order issue. Maybe you could run prime95 to busy
+> the FPU to see the issue that I was seeing.
 
-Regards,
-Pascal van Leeuwen
-Silicon IP Architect Multi-Protocol Engines, Rambus Security
-Rambus ROTW Holding BV
-+31-73 6581953
+But that's not necessarily a realistic workload for all machines.
 
-Note: The Inside Secure/Verimatrix Silicon IP team was recently acquired by=
- Rambus.
-Please be so kind to update your e-mail address book with my new e-mail add=
-ress.
+> I have a product that is a secure router with a half-dozen MACsec
+> interfaces, boots from a LUKS-encrypted disk, and has a number of TLS
+> control and status interfaces for local devices attached to product.
+> Without this patch, the system was completely unusable due to the
+> out-of-order issue causing TCP retries and UDP out-of-order issues. I
+> have not seen any examples of this MACsec driver in the wild, so I
+> assumed nobody had noticed the out-of-order issue because of synthetic
+> testing.
 
+We have customers using MACsec, and I haven't heard of reports like
+yours.
 
-** This message and any attachments are for the sole use of the intended re=
-cipient(s). It may contain information that is confidential and privileged.=
- If you are not the intended recipient of this message, you are prohibited =
-from printing, copying, forwarding or saving it. Please delete the message =
-and attachments and notify the sender immediately. **
-
-Rambus Inc.<http://www.rambus.com>
+-- 
+Sabrina
 
