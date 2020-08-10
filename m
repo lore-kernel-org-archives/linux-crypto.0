@@ -2,59 +2,56 @@ Return-Path: <SRS0=i+zF=BU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AF29C433DF
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Aug 2020 19:25:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B701DC433E1
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Aug 2020 19:26:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 66CD122CAE
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Aug 2020 19:25:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E3A42080C
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Aug 2020 19:26:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597087527;
-	bh=4p3nu2oPiPE8Vo2908t2ftK8TP2JOed8GPvSMAzGE+c=;
+	s=default; t=1597087587;
+	bh=2K2iG1CjBSTPdSLSG5ajTMC50p1FwenSlUrZitpjRWY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=XM0HmzgynXdl9KWAIUmalnS2sIaC1VbuC8+YsXyeLcvqsRK9h0PeCwdqL0XIjioxl
-	 0vrMCH4i+JFgtt9Ggrt1rYC1G14X58AEn9rCLxvne7JBtdto9rUHOk+TfGC1ITSu0i
-	 c+LZxpwncAfZGacygm3OYdmoCle7j7S0FMupNfok=
+	b=JQjGwX15if+wtNTU6yAzaXn+3Nm3KYOfa8FIbN22jZHTN3C6pQIIap4ANBYMJoZxW
+	 8Yl1AkWJ46FOybYlg5D6JkB8AisxBWyeLWWXIO5cLf8wZQcqcsNV4Jdn/BvYKEb3Tz
+	 0hsgN9nurJrU2/h3q96W/1h3XGuDPMKW0oUo7rpA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729677AbgHJTZ0 (ORCPT
+        id S1729167AbgHJT0W (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Aug 2020 15:25:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41158 "EHLO mail.kernel.org"
+        Mon, 10 Aug 2020 15:26:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40638 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729474AbgHJTMG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Aug 2020 15:12:06 -0400
+        id S1729414AbgHJTLu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Aug 2020 15:11:50 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 44325207FF;
-        Mon, 10 Aug 2020 19:12:04 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3F1AD22BED;
+        Mon, 10 Aug 2020 19:11:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597086725;
-        bh=4p3nu2oPiPE8Vo2908t2ftK8TP2JOed8GPvSMAzGE+c=;
+        s=default; t=1597086710;
+        bh=2K2iG1CjBSTPdSLSG5ajTMC50p1FwenSlUrZitpjRWY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jDcgLwy2gqdyPn53aijGXa5MDAK97L21DKIBAAno68OKed1PX3GTdi7oe9BJ4z224
-         aFDQUrgnf5jcDzPcFDvdiWGPog2lBoTWhCWY9ETQnGbo5Vj8awoH2CNHxEsBJKIltC
-         scHmZjmr9dJbBcjfJSHwX00/Caqymmh4NJb724EU=
+        b=sASTmFKia7lY4Xrq9LIs+2PklDrutaes823Js8953dH/ujPmcaea5Dqzka1ZDBUJK
+         s9vt9kAt3fTpuM4JcOsszApmUCJ1G94xdH2kf4l367NCjRCZclFZz1wTO1HcGeHNOF
+         zYM061LoXQYFAC/WpDw8GRHxhUNgW8IY/oWfR9WA=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Sedat Dilek <sedat.dilek@gmail.com>,
-        Craig Topper <craig.topper@intel.com>,
-        Craig Topper <craig.topper@gmail.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        "ClangBuiltLinux" <clang-built-linux@googlegroups.com>,
+Cc:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 08/45] crypto: aesni - Fix build with LLVM_IAS=1
-Date:   Mon, 10 Aug 2020 15:11:16 -0400
-Message-Id: <20200810191153.3794446-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.7 59/60] crypto: caam - silence .setkey in case of bad key length
+Date:   Mon, 10 Aug 2020 15:10:27 -0400
+Message-Id: <20200810191028.3793884-59-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200810191153.3794446-1-sashal@kernel.org>
-References: <20200810191153.3794446-1-sashal@kernel.org>
+In-Reply-To: <20200810191028.3793884-1-sashal@kernel.org>
+References: <20200810191028.3793884-1-sashal@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -63,107 +60,64 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Sedat Dilek <sedat.dilek@gmail.com>
+From: Horia Geantă <horia.geanta@nxp.com>
 
-[ Upstream commit 3347c8a079d67af21760a78cc5f2abbcf06d9571 ]
+[ Upstream commit da6a66853a381864f4b040832cf11f0dbba0a097 ]
 
-When building with LLVM_IAS=1 means using Clang's Integrated Assembly (IAS)
-from LLVM/Clang >= v10.0.1-rc1+ instead of GNU/as from GNU/binutils
-I see the following breakage in Debian/testing AMD64:
+In case of bad key length, driver emits "key size mismatch" messages,
+but only for xts(aes) algorithms.
 
-<instantiation>:15:74: error: too many positional arguments
- PRECOMPUTE 8*3+8(%rsp), %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
-                                                                         ^
- arch/x86/crypto/aesni-intel_asm.S:1598:2: note: while in macro instantiation
- GCM_INIT %r9, 8*3 +8(%rsp), 8*3 +16(%rsp), 8*3 +24(%rsp)
- ^
-<instantiation>:47:2: error: unknown use of instruction mnemonic without a size suffix
- GHASH_4_ENCRYPT_4_PARALLEL_dec %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14, %xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7, %xmm8, enc
- ^
-arch/x86/crypto/aesni-intel_asm.S:1599:2: note: while in macro instantiation
- GCM_ENC_DEC dec
- ^
-<instantiation>:15:74: error: too many positional arguments
- PRECOMPUTE 8*3+8(%rsp), %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
-                                                                         ^
-arch/x86/crypto/aesni-intel_asm.S:1686:2: note: while in macro instantiation
- GCM_INIT %r9, 8*3 +8(%rsp), 8*3 +16(%rsp), 8*3 +24(%rsp)
- ^
-<instantiation>:47:2: error: unknown use of instruction mnemonic without a size suffix
- GHASH_4_ENCRYPT_4_PARALLEL_enc %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14, %xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7, %xmm8, enc
- ^
-arch/x86/crypto/aesni-intel_asm.S:1687:2: note: while in macro instantiation
- GCM_ENC_DEC enc
+Reduce verbosity by making them visible only when debugging.
+This way crypto fuzz testing log cleans up a bit.
 
-Craig Topper suggested me in ClangBuiltLinux issue #1050:
-
-> I think the "too many positional arguments" is because the parser isn't able
-> to handle the trailing commas.
->
-> The "unknown use of instruction mnemonic" is because the macro was named
-> GHASH_4_ENCRYPT_4_PARALLEL_DEC but its being instantiated with
-> GHASH_4_ENCRYPT_4_PARALLEL_dec I guess gas ignores case on the
-> macro instantiation, but llvm doesn't.
-
-First, I removed the trailing comma in the PRECOMPUTE line.
-
-Second, I substituted:
-1. GHASH_4_ENCRYPT_4_PARALLEL_DEC -> GHASH_4_ENCRYPT_4_PARALLEL_dec
-2. GHASH_4_ENCRYPT_4_PARALLEL_ENC -> GHASH_4_ENCRYPT_4_PARALLEL_enc
-
-With these changes I was able to build with LLVM_IAS=1 and boot on bare metal.
-
-I confirmed that this works with Linux-kernel v5.7.5 final.
-
-NOTE: This patch is on top of Linux v5.7 final.
-
-Thanks to Craig and especially Nick for double-checking and his comments.
-
-Suggested-by: Craig Topper <craig.topper@intel.com>
-Suggested-by: Craig Topper <craig.topper@gmail.com>
-Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Cc: "ClangBuiltLinux" <clang-built-linux@googlegroups.com>
-Link: https://github.com/ClangBuiltLinux/linux/issues/1050
-Link: https://bugs.llvm.org/show_bug.cgi?id=24494
-Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/x86/crypto/aesni-intel_asm.S | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/crypto/caam/caamalg.c     | 2 +-
+ drivers/crypto/caam/caamalg_qi.c  | 2 +-
+ drivers/crypto/caam/caamalg_qi2.c | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index e40bdf024ba76..9afeb58c910eb 100644
---- a/arch/x86/crypto/aesni-intel_asm.S
-+++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -266,7 +266,7 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
- 	PSHUFB_XMM %xmm2, %xmm0
- 	movdqu %xmm0, CurCount(%arg2) # ctx_data.current_counter = iv
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index b2f9882bc010f..bf90a4fcabd1f 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -838,7 +838,7 @@ static int xts_skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
+ 	u32 *desc;
  
--	PRECOMPUTE \SUBKEY, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
-+	PRECOMPUTE \SUBKEY, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7
- 	movdqu HashKey(%arg2), %xmm13
+ 	if (keylen != 2 * AES_MIN_KEY_SIZE  && keylen != 2 * AES_MAX_KEY_SIZE) {
+-		dev_err(jrdev, "key size mismatch\n");
++		dev_dbg(jrdev, "key size mismatch\n");
+ 		return -EINVAL;
+ 	}
  
- 	CALC_AAD_HASH %xmm13, \AAD, \AADLEN, %xmm0, %xmm1, %xmm2, %xmm3, \
-@@ -978,7 +978,7 @@ _initial_blocks_done\@:
- * arg1, %arg3, %arg4 are used as pointers only, not modified
- * %r11 is the data offset value
- */
--.macro GHASH_4_ENCRYPT_4_PARALLEL_ENC TMP1 TMP2 TMP3 TMP4 TMP5 \
-+.macro GHASH_4_ENCRYPT_4_PARALLEL_enc TMP1 TMP2 TMP3 TMP4 TMP5 \
- TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
+diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
+index 27e36bdf6163b..315d53499ce85 100644
+--- a/drivers/crypto/caam/caamalg_qi.c
++++ b/drivers/crypto/caam/caamalg_qi.c
+@@ -728,7 +728,7 @@ static int xts_skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
+ 	int ret = 0;
  
- 	movdqa	  \XMM1, \XMM5
-@@ -1186,7 +1186,7 @@ aes_loop_par_enc_done\@:
- * arg1, %arg3, %arg4 are used as pointers only, not modified
- * %r11 is the data offset value
- */
--.macro GHASH_4_ENCRYPT_4_PARALLEL_DEC TMP1 TMP2 TMP3 TMP4 TMP5 \
-+.macro GHASH_4_ENCRYPT_4_PARALLEL_dec TMP1 TMP2 TMP3 TMP4 TMP5 \
- TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
+ 	if (keylen != 2 * AES_MIN_KEY_SIZE  && keylen != 2 * AES_MAX_KEY_SIZE) {
+-		dev_err(jrdev, "key size mismatch\n");
++		dev_dbg(jrdev, "key size mismatch\n");
+ 		return -EINVAL;
+ 	}
  
- 	movdqa	  \XMM1, \XMM5
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index 28669cbecf77c..e1b6bc6ef091b 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -1058,7 +1058,7 @@ static int xts_skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
+ 	u32 *desc;
+ 
+ 	if (keylen != 2 * AES_MIN_KEY_SIZE  && keylen != 2 * AES_MAX_KEY_SIZE) {
+-		dev_err(dev, "key size mismatch\n");
++		dev_dbg(dev, "key size mismatch\n");
+ 		return -EINVAL;
+ 	}
+ 
 -- 
 2.25.1
 
