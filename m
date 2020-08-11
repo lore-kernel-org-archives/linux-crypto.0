@@ -7,42 +7,43 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33930C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB85AC433E3
 	for <linux-crypto@archiver.kernel.org>; Tue, 11 Aug 2020 00:40:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A21D20678
+	by mail.kernel.org (Postfix) with ESMTP id B0D4A20678
 	for <linux-crypto@archiver.kernel.org>; Tue, 11 Aug 2020 00:40:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727852AbgHKAkZ (ORCPT
+        id S1727837AbgHKAkZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Mon, 10 Aug 2020 20:40:25 -0400
-Received: from mga17.intel.com ([192.55.52.151]:53559 "EHLO mga17.intel.com"
+Received: from mga17.intel.com ([192.55.52.151]:53567 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726977AbgHKAkW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Aug 2020 20:40:22 -0400
-IronPort-SDR: +lbkEo8UTbqsYEy+Kx5Wkgs/IrHHvk8HhZHkpjUGC7vBPDw3W9wg7Q3TuCvbi0D3+gvX6w1BnK
- q3o2GBxcKzfQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9709"; a="133702730"
+        id S1727808AbgHKAkY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Aug 2020 20:40:24 -0400
+IronPort-SDR: bCryrOqqNguwmfVNYdxiVsTX4/nyphbZtqECNGwWFUt4Zs3BuB7jLZ0Qjx6fCrXAp/q/Q2xyQv
+ jya+0J1q93iQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9709"; a="133702733"
 X-IronPort-AV: E=Sophos;i="5.75,458,1589266800"; 
-   d="scan'208";a="133702730"
+   d="scan'208";a="133702733"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2020 17:40:22 -0700
-IronPort-SDR: 4KwrpTikzKV4zjn64At1FloqSN6qds/J4ji62sT+PCJogKM79T8JM18IrbJHXYLkr4NH8ATg14
- P3072sUllW4Q==
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2020 17:40:24 -0700
+IronPort-SDR: W//wyktk4GLZiPNyBfPhqV+3vfIepaosoAeVfjVwE914B1DnjYF1Rybq5iQ/mMxIVzMr443EzJ
+ fNOCKj/l08bA==
 X-IronPort-AV: E=Sophos;i="5.75,458,1589266800"; 
-   d="scan'208";a="494978727"
+   d="scan'208";a="317544595"
 Received: from iweiny-desk2.sc.intel.com (HELO localhost) ([10.3.52.147])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2020 17:40:21 -0700
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2020 17:40:23 -0700
 From:   ira.weiny@intel.com
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-Cc:     Ira Weiny <ira.weiny@intel.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] crypto/ux500: Fix kmap() bug
-Date:   Mon, 10 Aug 2020 17:40:14 -0700
-Message-Id: <20200811004015.2800392-2-ira.weiny@intel.com>
+Cc:     Ira Weiny <ira.weiny@intel.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] crypto: Remove unused async iterators
+Date:   Mon, 10 Aug 2020 17:40:15 -0700
+Message-Id: <20200811004015.2800392-3-ira.weiny@intel.com>
 X-Mailer: git-send-email 2.28.0.rc0.12.gb6a658bd00c9
 In-Reply-To: <20200811004015.2800392-1-ira.weiny@intel.com>
 References: <20200811004015.2800392-1-ira.weiny@intel.com>
@@ -55,94 +56,129 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Ira Weiny <ira.weiny@intel.com>
 
-Once the crypto hash walk is started by crypto_hash_walk_first()
-returning non-zero, crypto_hash_walk_done() must be called to unmap any
-memory which was mapped by *_walk_first().
+Revert "crypto: hash - Add real ahash walk interface"
+This reverts commit 75ecb231ff45b54afa9f4ec9137965c3c00868f4.
 
-Ensure crypto_hash_walk_done() is called properly by:
+The callers of the functions in this commit were removed in ab8085c130ed
 
-	1) Re-arranging the check for device data to be prior to calling
-	   *_walk_first()
-	2) on error call crypto_hash_walk_done() with an error code to
-	   allow the hash walk code to clean up.
+Remove these unused calls.
 
-While we are at it clean up the 'out' label to be more meaningful.
-
+Fixes: ab8085c130ed ("crypto: x86 - remove SHA multibuffer routines and mcryptd")
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Ira Weiny <ira.weiny@intel.com>
-
 ---
-	Not tested.
-	Found via code inspection.
----
- drivers/crypto/ux500/hash/hash_core.c | 30 ++++++++++++++++-----------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+ crypto/ahash.c                 | 41 ++++------------------------------
+ include/crypto/internal/hash.h | 13 -----------
+ 2 files changed, 4 insertions(+), 50 deletions(-)
 
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index c24f2db8d5e8..5f407a3420f8 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -1071,27 +1071,32 @@ int hash_hw_update(struct ahash_request *req)
- 	struct hash_ctx *ctx = crypto_ahash_ctx(tfm);
- 	struct hash_req_ctx *req_ctx = ahash_request_ctx(req);
- 	struct crypto_hash_walk walk;
--	int msg_length = crypto_hash_walk_first(req, &walk);
--
--	/* Empty message ("") is correct indata */
--	if (msg_length == 0)
--		return ret;
-+	int msg_length;
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 68a0f0cb75c4..9c23b606949e 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -10,7 +10,6 @@
  
- 	index = req_ctx->state.index;
- 	buffer = (u8 *)req_ctx->state.buffer;
+ #include <crypto/internal/hash.h>
+ #include <crypto/scatterwalk.h>
+-#include <linux/bug.h>
+ #include <linux/err.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+@@ -46,10 +45,7 @@ static int hash_walk_next(struct crypto_hash_walk *walk)
+ 	unsigned int nbytes = min(walk->entrylen,
+ 				  ((unsigned int)(PAGE_SIZE)) - offset);
  
-+	ret = hash_get_device_data(ctx, &device_data);
-+	if (ret)
-+		return ret;
-+
-+	msg_length = crypto_hash_walk_first(req, &walk);
-+
-+	/* Empty message ("") is correct indata */
-+	if (msg_length == 0) {
-+		ret = 0;
-+		goto release_dev;
-+	}
-+
- 	/* Check if ctx->state.length + msg_length
- 	   overflows */
- 	if (msg_length > (req_ctx->state.length.low_word + msg_length) &&
- 	    HASH_HIGH_WORD_MAX_VAL == req_ctx->state.length.high_word) {
- 		pr_err("%s: HASH_MSG_LENGTH_OVERFLOW!\n", __func__);
--		return -EPERM;
-+		ret = crypto_hash_walk_done(&walk, -EPERM);
-+		goto release_dev;
+-	if (walk->flags & CRYPTO_ALG_ASYNC)
+-		walk->data = kmap(walk->pg);
+-	else
+-		walk->data = kmap_atomic(walk->pg);
++	walk->data = kmap_atomic(walk->pg);
+ 	walk->data += offset;
+ 
+ 	if (offset & alignmask) {
+@@ -99,16 +95,8 @@ int crypto_hash_walk_done(struct crypto_hash_walk *walk, int err)
+ 		}
  	}
  
--	ret = hash_get_device_data(ctx, &device_data);
--	if (ret)
--		return ret;
+-	if (walk->flags & CRYPTO_ALG_ASYNC)
+-		kunmap(walk->pg);
+-	else {
+-		kunmap_atomic(walk->data);
+-		/*
+-		 * The may sleep test only makes sense for sync users.
+-		 * Async users don't need to sleep here anyway.
+-		 */
+-		crypto_yield(walk->flags);
+-	}
++	kunmap_atomic(walk->data);
++	crypto_yield(walk->flags);
+ 
+ 	if (err)
+ 		return err;
+@@ -140,33 +128,12 @@ int crypto_hash_walk_first(struct ahash_request *req,
+ 
+ 	walk->alignmask = crypto_ahash_alignmask(crypto_ahash_reqtfm(req));
+ 	walk->sg = req->src;
+-	walk->flags = req->base.flags & CRYPTO_TFM_REQ_MASK;
++	walk->flags = req->base.flags;
+ 
+ 	return hash_walk_new_entry(walk);
+ }
+ EXPORT_SYMBOL_GPL(crypto_hash_walk_first);
+ 
+-int crypto_ahash_walk_first(struct ahash_request *req,
+-			    struct crypto_hash_walk *walk)
+-{
+-	walk->total = req->nbytes;
 -
- 	/* Main loop */
- 	while (0 != msg_length) {
- 		data_buffer = walk.data;
-@@ -1101,7 +1106,8 @@ int hash_hw_update(struct ahash_request *req)
- 		if (ret) {
- 			dev_err(device_data->dev, "%s: hash_internal_hw_update() failed!\n",
- 				__func__);
--			goto out;
-+			crypto_hash_walk_done(&walk, ret);
-+			goto release_dev;
- 		}
+-	if (!walk->total) {
+-		walk->entrylen = 0;
+-		return 0;
+-	}
+-
+-	walk->alignmask = crypto_ahash_alignmask(crypto_ahash_reqtfm(req));
+-	walk->sg = req->src;
+-	walk->flags = req->base.flags & CRYPTO_TFM_REQ_MASK;
+-	walk->flags |= CRYPTO_ALG_ASYNC;
+-
+-	BUILD_BUG_ON(CRYPTO_TFM_REQ_MASK & CRYPTO_ALG_ASYNC);
+-
+-	return hash_walk_new_entry(walk);
+-}
+-EXPORT_SYMBOL_GPL(crypto_ahash_walk_first);
+-
+ static int ahash_setkey_unaligned(struct crypto_ahash *tfm, const u8 *key,
+ 				unsigned int keylen)
+ {
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index 89f6f46ab2b8..6d3ad5ac4d28 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -62,25 +62,12 @@ struct crypto_shash_spawn {
+ int crypto_hash_walk_done(struct crypto_hash_walk *walk, int err);
+ int crypto_hash_walk_first(struct ahash_request *req,
+ 			   struct crypto_hash_walk *walk);
+-int crypto_ahash_walk_first(struct ahash_request *req,
+-			   struct crypto_hash_walk *walk);
+-
+-static inline int crypto_ahash_walk_done(struct crypto_hash_walk *walk,
+-					 int err)
+-{
+-	return crypto_hash_walk_done(walk, err);
+-}
  
- 		msg_length = crypto_hash_walk_done(&walk, 0);
-@@ -1111,7 +1117,7 @@ int hash_hw_update(struct ahash_request *req)
- 	dev_dbg(device_data->dev, "%s: indata length=%d, bin=%d\n",
- 		__func__, req_ctx->state.index, req_ctx->state.bit_index);
+ static inline int crypto_hash_walk_last(struct crypto_hash_walk *walk)
+ {
+ 	return !(walk->entrylen | walk->total);
+ }
  
--out:
-+release_dev:
- 	release_hash_device(device_data);
- 
- 	return ret;
+-static inline int crypto_ahash_walk_last(struct crypto_hash_walk *walk)
+-{
+-	return crypto_hash_walk_last(walk);
+-}
+-
+ int crypto_register_ahash(struct ahash_alg *alg);
+ void crypto_unregister_ahash(struct ahash_alg *alg);
+ int crypto_register_ahashes(struct ahash_alg *algs, int count);
 -- 
 2.28.0.rc0.12.gb6a658bd00c9
 
