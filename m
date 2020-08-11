@@ -4,67 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B39EC433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Aug 2020 00:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4485C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Aug 2020 00:59:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A15E206C3
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Aug 2020 00:58:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B69A1206C3
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Aug 2020 00:59:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727867AbgHKA6B (ORCPT
+        id S1727065AbgHKA7L (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Aug 2020 20:58:01 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:48788 "EHLO fornost.hmeau.com"
+        Mon, 10 Aug 2020 20:59:11 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:48798 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725969AbgHKA6B (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Aug 2020 20:58:01 -0400
+        id S1725969AbgHKA7K (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Aug 2020 20:59:10 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1k5Ibw-0006Lw-6Y; Tue, 11 Aug 2020 10:57:53 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 11 Aug 2020 10:57:52 +1000
-Date:   Tue, 11 Aug 2020 10:57:52 +1000
+        id 1k5Id6-0006MR-3x; Tue, 11 Aug 2020 10:59:05 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 11 Aug 2020 10:59:04 +1000
+Date:   Tue, 11 Aug 2020 10:59:04 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
 Cc:     Ard Biesheuvel <ardb@kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [v3 PATCH 10/31] crypto: chacha-generic - Add support for
- chaining
-Message-ID: <20200811005752.GA24901@gondor.apana.org.au>
+Subject: Re: [v3 PATCH 19/31] crypto: caam - Remove rfc3686 implementations
+Message-ID: <20200811005903.GB24901@gondor.apana.org.au>
 References: <20200728071746.GA22352@gondor.apana.org.au>
- <E1k0Jt6-0006MN-FB@fornost.hmeau.com>
- <cdc28bf5-69bf-5915-db6c-92f287ef8f07@nxp.com>
+ <E1k0JtR-0006Rx-Oq@fornost.hmeau.com>
+ <92042403-0379-55ab-ccbc-4610555f0a93@nxp.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <cdc28bf5-69bf-5915-db6c-92f287ef8f07@nxp.com>
+In-Reply-To: <92042403-0379-55ab-ccbc-4610555f0a93@nxp.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 10, 2020 at 06:20:16PM +0300, Horia Geantă wrote:
-> On 7/28/2020 10:19 AM, Herbert Xu wrote:
-> > @@ -40,30 +39,41 @@ static int chacha_stream_xor(struct skcipher_request *req,
-> >  static int crypto_chacha_crypt(struct skcipher_request *req)
-> >  {
-> >  	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> > +	struct chacha_reqctx *rctx = skcipher_request_ctx(req);
-> >  	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >  
-> > -	return chacha_stream_xor(req, ctx, req->iv);
-> > +	if (!rctx->init)
-> > +		chacha_init_generic(rctx->state, ctx->key, req->iv);
-> It would probably be better to rename "init" to "no_init" or "final".
+On Mon, Aug 10, 2020 at 07:47:40PM +0300, Horia Geantă wrote:
+>
+> I would prefer keeping the caam rfc3686(ctr(aes)) implementation.
+> It's almost cost-free when compared to ctr(aes), since:
+> -there are no (accelerator-)external DMAs generated
+> -shared descriptors are constructed at .setkey time
+> -code complexity is manageable
 
-This turns out to be broken so it'll disappear anyway.  It'll
-be replaced with a request flag instead.
+The reason I'm removing it is because it doesn't support chaining.
+We could keep it by adding chaining support which should be trivial
+but it's something that I can't test.
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
