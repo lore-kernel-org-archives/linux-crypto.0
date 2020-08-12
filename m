@@ -2,116 +2,182 @@ Return-Path: <SRS0=h4Ng=BW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 226A0C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Aug 2020 09:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39F8EC433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Aug 2020 10:04:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6207207DE
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Aug 2020 09:22:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KfNPn7bD"
+	by mail.kernel.org (Postfix) with ESMTP id 16E3620639
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Aug 2020 10:04:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726618AbgHLJWx (ORCPT
+        id S1727794AbgHLKEz convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Aug 2020 05:22:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42895 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726255AbgHLJWw (ORCPT
+        Wed, 12 Aug 2020 06:04:55 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31012 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727066AbgHLKEz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Aug 2020 05:22:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597224171;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=9hlw27+QAyDvFDOZ0xuy4pyvs7jIU3OJhh819xrt9Fs=;
-        b=KfNPn7bDIA1Ff+5dhACm9mkiz7M15KaVYKF1TOQ9tn3QNjsZuNmfFJ2FO0WtQRqmM86xSD
-        pvhxJhqylbzFjfbjJjMiy6X3XL57LJlfdhEvqgaQMyrFMVjzf7Q72jAkpzlXGIl0Sf/m37
-        HAMhvX0PeiHJ0gdUXCeKFFz7PM768+Y=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-192-ShZNlexROIWGOE06zyFzYg-1; Wed, 12 Aug 2020 05:22:50 -0400
-X-MC-Unique: ShZNlexROIWGOE06zyFzYg-1
-Received: by mail-wm1-f70.google.com with SMTP id z10so658985wmi.8
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Aug 2020 02:22:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=9hlw27+QAyDvFDOZ0xuy4pyvs7jIU3OJhh819xrt9Fs=;
-        b=apqA6/3cW8jWkudGzhig2U6zxN//6YlbzO7xVL3AIu6F9U3w75BGkf1CmA7xlsHBNI
-         h2O3NvfgQ/SIzz4FouaCekux/ZDus/8ivrO0Dfu8mQPqsYSIE6K7yGvR+Ygf2s4CWH4e
-         sh7es6WinzEJag3cs5LdKLTwtlp8/D/Ds26twKWgK2lhsA3zF5Zpp6hUnvIiSM12o+8b
-         9eemyw0eMp6AK/3d0SoiOFhFp7xa9/FeJCRCpKJEiKaYqJiq8MJ48Ac7ont7nfP1eFIB
-         Rzix4U10ncKDyzrgSlscXbIoyMDZnXYbjLLtVvJQmNYkPeQZ6i/mA5U1WvWNrTjT3UPl
-         KT7w==
-X-Gm-Message-State: AOAM532QvGuxfgugD/hTrM3f2gRaBLOkcLHuuhmqXBghUzEqStzK4XdE
-        0fKDruMVfpbpkIPLVDdCKwb2DpWeabY0NsQxTQ/iAVy1548CCjJXAy08mmHH+Ntt5TE9vA8Zix/
-        m//jeYk3Lzd7+7nQlONETxoE4
-X-Received: by 2002:a1c:80c1:: with SMTP id b184mr8149183wmd.121.1597224168745;
-        Wed, 12 Aug 2020 02:22:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzODqTP/yclC7XuZOG12V+9+647wNxFqQXuseWEwOM5E+ud7pK9q/fzWlSBhsKQ2x/gXW45Tg==
-X-Received: by 2002:a1c:80c1:: with SMTP id b184mr8149159wmd.121.1597224168482;
-        Wed, 12 Aug 2020 02:22:48 -0700 (PDT)
-Received: from omos.redhat.com ([2a02:8308:b13f:2100:8a6a:ec88:3ed7:44b3])
-        by smtp.gmail.com with ESMTPSA id s19sm3668091wrb.54.2020.08.12.02.22.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Aug 2020 02:22:47 -0700 (PDT)
-From:   Ondrej Mosnacek <omosnace@redhat.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: af_alg - fix uninitialized ctx->init
-Date:   Wed, 12 Aug 2020 11:22:32 +0200
-Message-Id: <20200812092232.364991-1-omosnace@redhat.com>
-X-Mailer: git-send-email 2.26.2
+        Wed, 12 Aug 2020 06:04:55 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-Ae0TLzu7OEi0DkqR7I9Y2A-1; Wed, 12 Aug 2020 06:04:48 -0400
+X-MC-Unique: Ae0TLzu7OEi0DkqR7I9Y2A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AB031DE4;
+        Wed, 12 Aug 2020 10:04:47 +0000 (UTC)
+Received: from bistromath.localdomain (ovpn-112-107.ams2.redhat.com [10.36.112.107])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 37E495D9D7;
+        Wed, 12 Aug 2020 10:04:44 +0000 (UTC)
+Date:   Wed, 12 Aug 2020 12:04:43 +0200
+From:   Sabrina Dubroca <sd@queasysnail.net>
+To:     Scott Dial <scott@scottdial.com>
+Cc:     linux-crypto@vger.kernel.org, Ryan Cox <ryan_cox@byu.edu>,
+        netdev@vger.kernel.org, davem@davemloft.net,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        ebiggers@google.com
+Subject: Re: Severe performance regression in "net: macsec: preserve ingress
+ frame ordering"
+Message-ID: <20200812100443.GF1128331@bistromath.localdomain>
+References: <1b0cec71-d084-8153-2ba4-72ce71abeb65@byu.edu>
+ <a335c8eb-0450-1274-d1bf-3908dcd9b251@scottdial.com>
+ <20200810133427.GB1128331@bistromath.localdomain>
+ <7663cbb1-7a55-6986-7d5d-8fab55887a80@scottdial.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <7663cbb1-7a55-6986-7d5d-8fab55887a80@scottdial.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sd@queasysnail.net
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This new member of struct af_alg_ctx was not being initialized before
-use, leading to random errors. Found via libkcapi testsuite.
+2020-08-10, 12:09:40 -0400, Scott Dial wrote:
+> On 8/10/2020 9:34 AM, Sabrina Dubroca wrote:
+> > [adding the linux-crypto list]
+> > 
+> > 2020-08-06, 23:48:16 -0400, Scott Dial wrote:
+> >> On 8/6/2020 5:11 PM, Ryan Cox wrote:
+> >>> With 5.7 I get:
+> >>> * 9.90 Gb/s with no macsec at all
+> >>> * 1.80 Gb/s with macsec WITHOUT encryption
+> >>> * 1.00 Gb/s (sometimes, but often less) with macsec WITH encryption
+> >>>
+> >>> With 5.7 but with ab046a5d4be4c90a3952a0eae75617b49c0cb01b reverted, I get:
+> >>> * 9.90 Gb/s with no macsec at all
+> >>> * 7.33 Gb/s with macsec WITHOUT encryption
+> >>> * 9.83 Gb/s with macsec WITH encryption
+> >>>
+> >>> On tests where performance is bad (including macsec without encryption),
+> >>> iperf3 is at 100% CPU usage.  I was able to run it under `perf record`on
+> >>> iperf3 in a number of the tests but, unfortunately, I have had trouble
+> >>> compiling perf for my own 5.7 compilations (definitely PEBKAC).  If it
+> >>> would be useful I can work on fixing the perf compilation issues.
+> >>
+> >> For certain, you are measuring the difference between AES-NI doing
+> >> gcm(aes) and gcm_base(ctr(aes-aesni),ghash-generic). Specifically, the
+> >> hotspot is ghash-generic's implementation of ghash_update() function.
+> >> I appreciate your testing because I was limited in my ability to test
+> >> beyond 1Gb/s.
+> >>
+> >> The aes-aesni driver is smart enough to use the FPU if it's not busy and
+> >> fallback to the CPU otherwise. Unfortunately, the ghash-clmulni driver
+> >> does not have that kind of logic in it and only provides an async version,
+> >> so we are forced to use the ghash-generic implementation, which is a pure
+> >> CPU implementation. The ideal would be for aesni_intel to provide a
+> >> synchronous version of gcm(aes) that fell back to the CPU if the FPU is
+> >> busy.
+> >> I don't know if the crypto maintainers would be open to such a change, but
+> >> if the choice was between reverting and patching the crypto code, then I
+> >> would work on patching the crypto code.
+> > 
+> > To the crypto folks, a bit of context: Scott wrote commit ab046a5d4be4
+> > ("net: macsec: preserve ingress frame ordering"), which made MACsec
+> > use gcm(aes) with CRYPTO_ALG_ASYNC. This prevents out of order
+> > decryption, but reduces performance. We'd like to restore performance
+> > on systems where the FPU is available without breaking MACsec for
+> > systems where the FPU is often busy.
+> > 
+> > A quick and dirty alternative might be to let the administrator decide
+> > if they're ok with some out of order. Maybe they know that their FPU
+> > will be mostly idle so it won't even be an issue (or maybe the
+> > opposite, ie keep the fast default and let admins fix their setups
+> > with an extra flag).
+> 
+> I can appreciate favoring performance over correctness as practical
+> concern, but I'd suggest that the out-of-order decryption *is* a
+> performance concern as well. We can debate realness of my workload, but
+> even in Ryan's tests on an otherwise idle server, he showed 0.07% of the
+> frames needed to be dispatched to cryptd, and that for whatever reason
+> it's more often with encryption disabled, which correlates to his
+> decrease in throughput (9.83 Gb/s to 7.33 Gb/s, and 9.19 Gb/s to 6.00
+> Gb/s), perhaps causing exponential backoff from TCP retries. I can
+> resurrect my test setup, but my numbers were worse than Ryan's.
+> 
+> In any case, I counted 18 implementations of HW accelerated gcm(aes) in
+> the kernel, with 3 of those implementations are in arch (x86, arm64, and
+> s390) and the rest are crypto device drivers. Of all those
+> implementations, the AES-NI implementation is the only one that
+> dispatches to cryptd (via code in cypto/simd.c). AFAICT, every other
+> implementation of gcm(aes) is synchronous, but they would require closer
+> inspection to be certain.
 
-Cc: Stephan Mueller <smueller@chronox.de>
-Fixes: f3c802a1f300 ("crypto: algif_aead - Only wake up when ctx->more is zero")
-Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
----
- crypto/algif_aead.c     | 1 +
- crypto/algif_skcipher.c | 1 +
- 2 files changed, 2 insertions(+)
+I randomly picked 2 of them (chcr and inside-secure), and they both
+set CRYPTO_ALG_ASYNC, so I guess not.
 
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index d48d2156e6210..9b5bd0ff3c47d 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -563,6 +563,7 @@ static int aead_accept_parent_nokey(void *private, struct sock *sk)
- 	ctx->more = 0;
- 	ctx->merge = 0;
- 	ctx->enc = 0;
-+	ctx->init = 0;
- 	ctx->aead_assoclen = 0;
- 	crypto_init_wait(&ctx->wait);
- 
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index a51ba22fef58f..0de035b991943 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -350,6 +350,7 @@ static int skcipher_accept_parent_nokey(void *private, struct sock *sk)
- 	ctx->more = 0;
- 	ctx->merge = 0;
- 	ctx->enc = 0;
-+	ctx->init = 0;
- 	crypto_init_wait(&ctx->wait);
- 
- 	ask->private = ctx;
+> So, I'd like to focus on what we can do to
+> improve crypto/simd.c to provide a synchronous implementation of
+> gcm(aes) for AES-NI when possible, which is the vast majority of the time.
+>
+> I would be interested in proposing a change to improve this issue, but
+> I'm not sure the direction that the maintainers of this code would
+> prefer. Since these changes to the crypto API are fairly recent, there
+> may be context that I am not aware of. However, I think it would be
+> straight-forward to add another API to crypto/simd.c that allocated sync
+> algorithms, and I would be willing to do the work.
+> 
+> The only challenge I see in implementing such a change is deciding how
+> to select a fallback algorithm. The most flexible solution would be to
+> call crypto_alloc_aead with CRYPTO_ALG_ASYNC during the init to pick the
+> "best" fallback (in case there is alternative HW offloading available),
+> but that would almost certainly pick itself and it's not obvious to me
+> how to avoid that.
+
+It's probably possible to add a PURE_SOFTWARE or whatever flag and
+request one of those algorithms for the fallback.
+
+> On the other hand, the caller to the new API could
+> explicitly declare a fallback algorithm (e.g.,
+> "gcm_base(ctr(aes-aesni),ghash-generic)"), which probably is the correct
+> answer anyways --
+
+I would try to avoid that, it seems too error-prone to me.
+
+> what are the chances that there is multiple HW
+> offloads for gcm(aes)? In that case, a possible API would be:
+> int simd_register_aeads_compat_sync(struct aead_alg *algs,
+>                                     char **fallback_algs,
+>                                     int count,
+> 			            struct simd_aead_alg **simd_algs);
+> 
+> Beyond MACsec, it's worth noting that the mac80211 code for AES-GCMP and
+> BIP-GMAC also use gcm(aes) in sync mode because decryption occurs in a
+> softirq, however I imagine nobody has reported an issue because the link
+> speed is typically slower and those encryption modes are still uncommon.
+
+Decent wireless cards would do the encryption in hw, no? Also, you
+can't notice a performance regression if it's never used the fast
+implementation :)
+
 -- 
-2.26.2
+Sabrina
 
