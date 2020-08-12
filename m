@@ -2,93 +2,85 @@ Return-Path: <SRS0=h4Ng=BW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E674AC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Aug 2020 16:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79F1EC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Aug 2020 19:22:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B9B4F207DA
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Aug 2020 16:38:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 554092080C
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Aug 2020 19:22:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1597260138;
+	bh=ULs7jEwnqQuxMp4HU07afJ9qMcGLu5Ptq884Lsc5JTI=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=HG7aFOe6OaC40+3oGatCwGKhKXJvefsJtsON9JHSqgjFTalPmGEeFIIg9j/A8ivUr
+	 aeaPodKSdiVOjwyDiPA7G+cO9trqW17hekjr2gAaJYQl/Aus0H1QBFLuy1xh/vnOY4
+	 gy8fLyBkFjUVHZMXOyyYF9wtE56ifEdx06zCFeHQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726477AbgHLQiF (ORCPT
+        id S1726540AbgHLTWR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Aug 2020 12:38:05 -0400
-Received: from mga11.intel.com ([192.55.52.93]:64274 "EHLO mga11.intel.com"
+        Wed, 12 Aug 2020 15:22:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36190 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726394AbgHLQiE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Aug 2020 12:38:04 -0400
-IronPort-SDR: 6XblZFf3JnuSl4GDovexY3pUSa5iELEWrP4fWQhffo8dp25MT+xJToNGVdEnUjyh/u0Xo9bfXF
- XIPINRU/An3Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9711"; a="151658785"
-X-IronPort-AV: E=Sophos;i="5.76,304,1592895600"; 
-   d="scan'208";a="151658785"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2020 09:38:03 -0700
-IronPort-SDR: a390YBMeuM5i7xZAbQQ4UhnPUKERJ52ao3wjAL93JZmEVD0Y3/1HI2hkINV5yYgfYpn2Zk9z+6
- rEDR8xVfFhQQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,304,1592895600"; 
-   d="scan'208";a="495572232"
-Received: from marshy.an.intel.com (HELO [10.122.105.159]) ([10.122.105.159])
-  by fmsmga005.fm.intel.com with ESMTP; 12 Aug 2020 09:38:02 -0700
-Subject: Re: [PATCHv1 2/2] crypto: add Intel SoCFPGA crypto service driver
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     davem@davemloft.net, gregkh@linuxfoundation.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dinguyen@kernel.org, richard.gong@intel.com
-References: <1597154182-26970-1-git-send-email-richard.gong@linux.intel.com>
- <1597154182-26970-3-git-send-email-richard.gong@linux.intel.com>
- <20200812003418.GA4166@gondor.apana.org.au>
-From:   Richard Gong <richard.gong@linux.intel.com>
-Message-ID: <7850a3e6-1ac2-c13e-94cb-64adfb6c6898@linux.intel.com>
-Date:   Wed, 12 Aug 2020 11:52:32 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726512AbgHLTWR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Aug 2020 15:22:17 -0400
+Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2DDDD206DA;
+        Wed, 12 Aug 2020 19:22:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1597260137;
+        bh=ULs7jEwnqQuxMp4HU07afJ9qMcGLu5Ptq884Lsc5JTI=;
+        h=From:To:Cc:Subject:Date:From;
+        b=JmZ+1WBdQleMeZvO7KJk4hs19EqKPecVlSI05GmRQoYQ0dGtHJPS08MILXJaF2U14
+         dAPzUcur55qDOWpAmQSM0SpGbaO1uc2Y9lLuVDf8L0YX8LW8zHIfntVhutMjCFj4oi
+         6K9DLgZHMJLwhe42jhNoq58a3JrK+rb2fSnkeWHQ=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Gonglei <arei.gonglei@huawei.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        virtualization@lists.linux-foundation.org
+Cc:     linux-crypto@vger.kernel.org, Ram Muthiah <rammuthiah@google.com>
+Subject: [PATCH] crypto: virtio - don't use 'default m'
+Date:   Wed, 12 Aug 2020 12:20:53 -0700
+Message-Id: <20200812192053.1769235-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.28.0.236.gb10cc79966-goog
 MIME-Version: 1.0
-In-Reply-To: <20200812003418.GA4166@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+From: Ram Muthiah <rammuthiah@google.com>
 
-I will move them to drivers/misc.
+Drivers shouldn't be enabled by default unless there is a very good
+reason to do so.  There doesn't seem to be any such reason for the
+virtio crypto driver, so change it to the default of 'n'.
 
-Regards,
-Richard
+Signed-off-by: Ram Muthiah <rammuthiah@google.com>
+[EB: adjusted commit message]
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ drivers/crypto/virtio/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
 
-On 8/11/20 7:34 PM, Herbert Xu wrote:
-> On Tue, Aug 11, 2020 at 08:56:22AM -0500, richard.gong@linux.intel.com wrote:
->> From: Richard Gong <richard.gong@intel.com>
->>
->> Add Intel FPGA crypto service (FCS) driver to support new crypto services
->> on Intel SoCFPGA platforms.
->>
->> The crypto services include security certificate, image boot validation,
->> security key cancellation, get provision data, random number generation,
->> advance encrtption standard (AES) encryption and decryption services.
->>
->> To perform supporting crypto features on Intel SoCFPGA platforms, Linux
->> user-space application interacts with FPGA crypto service (FCS) driver via
->> structures defined in include/uapi/linux/intel_fcs-ioctl.h.
->>
->> The application allocates spaces for IOCTL structure to hold the contents
->> or points to the data that FCS driver needs, uses IOCTL calls to passes
->> data to kernel FCS driver for processing at low level firmware and get
->> processed data or status back form the low level firmware via FCS driver.
->>
->> The user-space application named as fcs_client is at
->> https://github.com/altera-opensource/fcs_apps/tree/fcs_client.
->>
->> Signed-off-by: Richard Gong <richard.gong@intel.com>
-> 
-> Nack.  This driver has nothing to do with the Crypto API.
-> 
+diff --git a/drivers/crypto/virtio/Kconfig b/drivers/crypto/virtio/Kconfig
+index fb294174e408..b894e3a8be4f 100644
+--- a/drivers/crypto/virtio/Kconfig
++++ b/drivers/crypto/virtio/Kconfig
+@@ -5,7 +5,6 @@ config CRYPTO_DEV_VIRTIO
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_ENGINE
+-	default m
+ 	help
+ 	  This driver provides support for virtio crypto device. If you
+ 	  choose 'M' here, this module will be called virtio_crypto.
+-- 
+2.28.0.236.gb10cc79966-goog
+
