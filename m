@@ -2,111 +2,87 @@ Return-Path: <SRS0=OEQH=B3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E015C433E1
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Aug 2020 08:07:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1256EC433E1
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Aug 2020 21:33:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2F2C22080D
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Aug 2020 08:07:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D58632065D
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Aug 2020 21:33:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597651660;
-	bh=brGKh7glX5r5oiJ5N4dduRMuN53pF28YcimSGGrgpKQ=;
+	s=default; t=1597699990;
+	bh=tvv3kaFlJ93NK3UtxjKDoSmhBbddX/0xNgSMiGn06V8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=IfGu/l2JjNhymncV1r1383kGwQCMXWqugVv+gcA/uTSatUGMsUIuNW8DOsu7Tp7t7
-	 lMPHvkxhLdepTkO9tz5Cmoo2/A57Cwp64C9cT0djvXOso5+jzSp9AjmfEZ4HBmmGI4
-	 LnH+USCSX82Y2JMALo1mnWJNbDjroYW9KLKNO3vM=
+	b=YZUyOBid/WWX1IaCvDrkGkaw+LijiJJr4OI4rb/nY2fPtM8CWVXHOEP+em907zIcs
+	 6pFHSRl/VdIYCjesDeKI7o392nb/v11PT/QX0fyGVUr/mLKbRvM507KMM5Zb9WpYdl
+	 7Q/Ign2+/VU5CjAZdKans2eT4hDNiz6HJSmodYoE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726817AbgHQIHg (ORCPT
+        id S1728411AbgHQVdE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Aug 2020 04:07:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53342 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726934AbgHQIHf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Aug 2020 04:07:35 -0400
-Received: from dragon (unknown [80.251.214.228])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 40D2720758;
-        Mon, 17 Aug 2020 08:07:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597651655;
-        bh=brGKh7glX5r5oiJ5N4dduRMuN53pF28YcimSGGrgpKQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=z9SiSTSNK4ZGq5qzaEX4UGpdRQLuI5evIPschXW1F8xJeSZfDBOKgyYOSkcv6GCGZ
-         bThQsKb6Tfdi/eQNHmA/gMjyPVVCBuAJaaKY0sybfjOmR5gAIt1FIYVETtj6zlPlyR
-         IZYI5SUsWrtU/ub0hx4bFP3T9FR8o4S4m86qE7MM=
-Date:   Mon, 17 Aug 2020 16:07:19 +0800
-From:   Shawn Guo <shawnguo@kernel.org>
-To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Martin Kaiser <martin@kaiser.cx>,
-        Marco Felsch <m.felsch@pengutronix.de>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 0/5] hwrng: add support for i.MX6 rngb
-Message-ID: <20200817080718.GD16951@dragon>
-References: <20200715152604.10407-1-horia.geanta@nxp.com>
+        Mon, 17 Aug 2020 17:33:04 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:38467 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726634AbgHQVdD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Aug 2020 17:33:03 -0400
+Received: by mail-io1-f65.google.com with SMTP id h4so19142698ioe.5;
+        Mon, 17 Aug 2020 14:33:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=LAtTEbaWNRnYp1UJl/edA6Ydg1sX3/eo18oG8QKPaWc=;
+        b=dEkgGtOqXun88BYFpCAjO69N0Tw+/UBpzkdkwJmuaBTq1Rka/Ym2VeFBTG/XD/G5k8
+         cjNgDRc7pECLHLxaSaqPxVn5fn6b/sTl0OBssaT46plEtnQ3ROxKplKVUhyUszAEQwH7
+         MAiFTPVRhjpgpLdEEeiVqDmRZjOfZvjxLhtcFLiAZfsueCvyUqIns4sCN+ixdZJ2GDI/
+         l2EaIn5/6do0pacm89nz1//kofyv0cG3rcYnFVLsCYfy9AaH419xCyvoyo5xy5tY4dbj
+         jQ1azDgLNpjr1ZhcQ4d6mUPULfqGY/Q9la4ULnk6ZqD9Ux1wWXhisN9nhvtkuYO6AO5/
+         cqGw==
+X-Gm-Message-State: AOAM532g09ofhRC5qnN1Djm0FhkHSdu+Ubd7osA9B3ZJzIRIFFFnLxcC
+        oibA0OkQgzRvy0nBD+5h9sDHAQ0flw==
+X-Google-Smtp-Source: ABdhPJzrl+0ThCRPJ+9n/OwQEnkYXK+38CFOUdv8hQyI9cW1uvcBAbrkvuKEt3H7yHqe5dXwI9x8yw==
+X-Received: by 2002:a6b:f719:: with SMTP id k25mr13744698iog.22.1597699982210;
+        Mon, 17 Aug 2020 14:33:02 -0700 (PDT)
+Received: from xps15 ([64.188.179.249])
+        by smtp.gmail.com with ESMTPSA id t26sm10529749ilb.80.2020.08.17.14.33.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Aug 2020 14:33:01 -0700 (PDT)
+Received: (nullmailer pid 1603662 invoked by uid 1000);
+        Mon, 17 Aug 2020 21:33:00 -0000
+Date:   Mon, 17 Aug 2020 15:33:00 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Anson Huang <Anson.Huang@nxp.com>
+Cc:     kernel@pengutronix.de, shawnguo@kernel.org,
+        s.trumtrar@pengutronix.de, linux-arm-kernel@lists.infradead.org,
+        Linux-imx@nxp.com, linux-kernel@vger.kernel.org,
+        s.hauer@pengutronix.de, linux-crypto@vger.kernel.org,
+        robh+dt@kernel.org, davem@davemloft.net,
+        devicetree@vger.kernel.org, marex@denx.de,
+        herbert@gondor.apana.org.au, festevam@gmail.com
+Subject: Re: [PATCH 1/3] dt-bindings: crypto: Convert MXS DCP to json-schema
+Message-ID: <20200817213300.GA1603573@bogus>
+References: <1596595410-26921-1-git-send-email-Anson.Huang@nxp.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200715152604.10407-1-horia.geanta@nxp.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <1596595410-26921-1-git-send-email-Anson.Huang@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 15, 2020 at 06:25:59PM +0300, Horia Geantă wrote:
-> Add support for RNGB found in some i.MX6 SoCs (6SL, 6SLL, 6ULL, 6ULZ),
-> based on RNGC driver (drivers/char/hw_random/imx-rngc.c).
+On Wed, 05 Aug 2020 10:43:28 +0800, Anson Huang wrote:
+> Convert the MXS DCP binding to DT schema format using json-schema.
 > 
-> This driver claims support also for RNGB (besides RNGC),
-> and is currently used only by i.MX25.
+> Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
+> ---
+>  .../devicetree/bindings/crypto/fsl-dcp.txt         | 18 --------
+>  .../devicetree/bindings/crypto/fsl-dcp.yaml        | 49 ++++++++++++++++++++++
+>  2 files changed, 49 insertions(+), 18 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/crypto/fsl-dcp.txt
+>  create mode 100644 Documentation/devicetree/bindings/crypto/fsl-dcp.yaml
 > 
-> Note:
-> 
-> Several NXP SoC from QorIQ family (P1010, P1023, P4080, P3041, P5020)
-> also have a RNGB, however it's part of the CAAM
-> (Cryptograhic Accelerator and Assurance Module) crypto accelerator.
-> In this case, RNGB is managed in the caam driver
-> (drivers/crypto/caam/), since it's tightly related to
-> the caam "job ring" interface, not to mention CAAM internally relying on
-> RNGB as source of randomness.
-> 
-> On the other hand, the i.MX6 SoCs with RNGB have a DCP
-> (Data Co-Processor) crypto accelerator and this block and RNGB
-> are independent.
-> 
-> Changelog:
-> v4
-> -remove unneeded compatible strings from the driver
-> v3
-> -mention in the DT binding the compatibility with "fsl,imx25-rngb"
-> -collected Reviewed-by
-> v2
-> -update rngb DT binding with compatible strings for i.MX6 SoCs
-> 
-> Horia Geantă (5):
-...
->   ARM: dts: imx6sl: fix rng node
->   ARM: dts: imx6sll: add rng
->   ARM: dts: imx6ull: add rng
 
-Applied these 3, thanks.
-
-Shawn
+Applied, thanks!
