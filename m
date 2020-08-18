@@ -2,80 +2,66 @@ Return-Path: <SRS0=RX8q=B4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1E09C433E1
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Aug 2020 14:00:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C92C433E1
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Aug 2020 14:05:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD7762054F
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Aug 2020 14:00:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A21D2076D
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Aug 2020 14:05:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726476AbgHROAd (ORCPT
+        id S1726605AbgHROFg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Aug 2020 10:00:33 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:36494 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726617AbgHROAO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Aug 2020 10:00:14 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 66249FFEBE769B686D95;
-        Tue, 18 Aug 2020 22:00:10 +0800 (CST)
-Received: from localhost (10.174.179.108) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.487.0; Tue, 18 Aug 2020
- 22:00:03 +0800
-From:   YueHaibing <yuehaibing@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <j-keerthy@ti.com>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH -next] crypto: sa2ul - Fix pointer-to-int-cast warning
-Date:   Tue, 18 Aug 2020 22:00:01 +0800
-Message-ID: <20200818140001.55140-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+        Tue, 18 Aug 2020 10:05:36 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:42824 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726145AbgHROFf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Aug 2020 10:05:35 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1k82F2-0006ut-AZ; Wed, 19 Aug 2020 00:05:33 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 19 Aug 2020 00:05:32 +1000
+Date:   Wed, 19 Aug 2020 00:05:32 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ben Greear <greearb@candelatech.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH 0/5] crypto: Implement cmac based on cbc skcipher
+Message-ID: <20200818140532.GA25807@gondor.apana.org.au>
+References: <20200802090616.1328-1-ardb@kernel.org>
+ <20200818082410.GA24497@gondor.apana.org.au>
+ <CAMj1kXFOZJFUR0N+6i2O4XGZ462Mcs8pq7y_MYScfLf-Tfy3QQ@mail.gmail.com>
+ <20200818135128.GA25652@gondor.apana.org.au>
+ <2aad9569-877e-4398-88ef-e40d9bbf7656@candelatech.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.179.108]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2aad9569-877e-4398-88ef-e40d9bbf7656@candelatech.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-drivers/crypto/sa2ul.c: In function ‘sa_sha_init’:
-drivers/crypto/sa2ul.c:1486:33: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
-   crypto_ahash_digestsize(tfm), (u64)rctx);
-                                 ^
-./include/linux/dev_printk.h:123:47: note: in definition of macro ‘dev_dbg’
-   dev_printk(KERN_DEBUG, dev, dev_fmt(fmt), ##__VA_ARGS__); \
-                                               ^~~~~~~~~~~
+On Tue, Aug 18, 2020 at 06:56:12AM -0700, Ben Greear wrote:
+>
+> Herbert, thanks for working on this.  If I apply the patches you posted,
+> that is expected to provide wifi aes decryption speedup similar to what
+> the original patch I sent does?  Or, are additional patches needed?
 
-Use %p to print rctx pointer.
+It depends on whether the wifi code uses the async ahash interface,
+if not it probably won't make much of an impact at all.
 
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- drivers/crypto/sa2ul.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I just checked and if the code you're using is net/mac80211/aes_cmac.c
+then it's using shash so it won't really benefit from this.  However,
+there's no reason why mac80211 can't be converted over to async as
+we did for IPsec.
 
-diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-index 5bc099052bd2..acabb8ddacb6 100644
---- a/drivers/crypto/sa2ul.c
-+++ b/drivers/crypto/sa2ul.c
-@@ -1482,8 +1482,8 @@ static int sa_sha_init(struct ahash_request *req)
- 	struct sa_sha_req_ctx *rctx = ahash_request_ctx(req);
- 	struct sa_tfm_ctx *ctx = crypto_ahash_ctx(tfm);
- 
--	dev_dbg(sa_k3_dev, "init: digest size: %d, rctx=%llx\n",
--		crypto_ahash_digestsize(tfm), (u64)rctx);
-+	dev_dbg(sa_k3_dev, "init: digest size: %u, rctx=%p\n",
-+		crypto_ahash_digestsize(tfm), rctx);
- 
- 	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback.ahash);
- 	rctx->fallback_req.base.flags =
+Cheers,
 -- 
-2.17.1
-
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
