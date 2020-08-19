@@ -6,40 +6,40 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA7CC433E3
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:57:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C8DC433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:57:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DAD2E20B1F
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:57:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8942620888
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:57:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597881453;
-	bh=HVTEyPZpbyek0U3vHgc6S4Itz0FoY3+JmQskkGie1Ok=;
+	s=default; t=1597881460;
+	bh=k/AVvnUd600jX5YYHnIljZO+eTT7xIFfD57X+RHnyC4=;
 	h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:
 	 List-ID:From;
-	b=VYHW8YMOFxle5AW3WoE46p2NTZ17qbKpF96w0BPCbpromDx2y1elJLhrRvxJICzNv
-	 lNxgoI0T20s3gKhC2McOyb+K+v/U6llrqYabJkrv9zzGeNW8Lh/mNmkBznVwnCETtF
-	 plmNg6T/LiLbrpvcuDipuAHanYFDAZUSnFHBRhW0=
+	b=AMRBFitYlpC//O2qklgrtf6otNUkyPsHMr1EC5JCgdkfOOUv+RK0GNyCUQxz1etj3
+	 a//ucfMbUNy24K4FGVM7k8OuQFxNnBRcd471uiDNhsZgmFAiz93YMfhg7xfVYv5XB/
+	 RqgVhYaF0FmOdv/bHAUWgV1wVuN5DFlL3jyfvqAo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727008AbgHSX53 (ORCPT
+        id S1727030AbgHSX5e (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Aug 2020 19:57:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53432 "EHLO mail.kernel.org"
+        Wed, 19 Aug 2020 19:57:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53250 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726967AbgHSX46 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Aug 2020 19:56:58 -0400
+        id S1726952AbgHSX4w (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Aug 2020 19:56:52 -0400
 Received: from localhost (unknown [70.37.104.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 326FB22B40;
-        Wed, 19 Aug 2020 23:56:58 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0C78420B1F;
+        Wed, 19 Aug 2020 23:56:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597881418;
-        bh=HVTEyPZpbyek0U3vHgc6S4Itz0FoY3+JmQskkGie1Ok=;
+        s=default; t=1597881412;
+        bh=k/AVvnUd600jX5YYHnIljZO+eTT7xIFfD57X+RHnyC4=;
         h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:From;
-        b=b2TU2olHoR+bqoi9LBuqidK0KZ9U783aH/w02izgqkajCDYi/CszlN3IAgfoRE6xc
-         YHYf0HGa2cYxis9nHSKdPnP8AWi6voWzDhGqwtgWkQDKpEv9ZW453Hjr/YCd/O7d5N
-         JdEF8hTGtEBsSeX6zbtWiQ+PUnl+JFlEFECLFYT4=
-Date:   Wed, 19 Aug 2020 23:56:57 +0000
+        b=PZzhOYg0eWJAHGrnPsCusNLHIEaj8kcy0f6bRFV7KTLrHxmv/TpAQ0lmUsj7TT9r6
+         v6gPWo/5YhqQZxdB8LsQfXc+y5E4zBOdtVfyjffLQ4g8M6UDiI3qJnRjv4y8tqDhpv
+         TuHXOv/5dy1K+9Ik1kplGmxQDJiZreHQbjwQ//0Q=
+Date:   Wed, 19 Aug 2020 23:56:51 +0000
 From:   Sasha Levin <sashal@kernel.org>
 To:     Sasha Levin <sashal@kernel.org>
 To:     Andrei Botila <andrei.botila@oss.nxp.com>
@@ -47,10 +47,10 @@ To:     Andrei Botila <andrei.botila@nxp.com>
 To:     Horia Geanta <horia.geanta@nxp.com>
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH RESEND 4/9] crypto: caam/jr - add support for more XTS key lengths
-In-Reply-To: <20200806163551.14395-5-andrei.botila@oss.nxp.com>
-References: <20200806163551.14395-5-andrei.botila@oss.nxp.com>
-Message-Id: <20200819235658.326FB22B40@mail.kernel.org>
+Subject: Re: [PATCH RESEND 5/9] crypto: caam/qi - add support for more XTS key lengths
+In-Reply-To: <20200806163551.14395-6-andrei.botila@oss.nxp.com>
+References: <20200806163551.14395-6-andrei.botila@oss.nxp.com>
+Message-Id: <20200819235652.0C78420B1F@mail.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -61,12 +61,12 @@ Hi
 [This is an automated email]
 
 This commit has been processed because it contains a "Fixes:" tag
-fixing commit: c6415a6016bf ("crypto: caam - add support for acipher xts(aes)").
+fixing commit: b189817cf789 ("crypto: caam/qi - add ablkcipher and authenc algorithms").
 
-The bot has tested the following trees: v5.8.1, v5.7.15, v5.4.58, v4.19.139, v4.14.193, v4.9.232, v4.4.232.
+The bot has tested the following trees: v5.8.1, v5.7.15, v5.4.58, v4.19.139, v4.14.193.
 
 v5.8.1: Failed to apply! Possible dependencies:
-    2d4d8e196706 ("crypto: caam/jr - add fallback for XTS with more than 8B IV")
+    297142490236 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
     528f776df67c ("crypto: qat - allow xts requests not multiple of block")
     a85211f36f3d ("crypto: qat - fallback for xts with 192 bit keys")
     b185a68710e0 ("crypto: qat - validate xts key")
@@ -74,7 +74,7 @@ v5.8.1: Failed to apply! Possible dependencies:
     da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
 
 v5.7.15: Failed to apply! Possible dependencies:
-    2d4d8e196706 ("crypto: caam/jr - add fallback for XTS with more than 8B IV")
+    297142490236 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
     528f776df67c ("crypto: qat - allow xts requests not multiple of block")
     a85211f36f3d ("crypto: qat - fallback for xts with 192 bit keys")
     b185a68710e0 ("crypto: qat - validate xts key")
@@ -82,51 +82,46 @@ v5.7.15: Failed to apply! Possible dependencies:
     da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
 
 v5.4.58: Failed to apply! Possible dependencies:
-    2d4d8e196706 ("crypto: caam/jr - add fallback for XTS with more than 8B IV")
-    4d370a103695 ("crypto: caam - change return code in caam_jr_enqueue function")
-    b7f17fe28144 ("crypto: caam - refactor skcipher/aead/gcm/chachapoly {en,de}crypt functions")
-    d53e44fe980b ("crypto: caam - refactor RSA private key _done callbacks")
-    ee38767f152a ("crypto: caam - support crypto_engine framework for SKCIPHER algorithms")
+    297142490236 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
+    64db5e7439fb ("crypto: sparc/aes - convert to skcipher API")
+    66d7fb94e4ff ("crypto: blake2s - generic C library implementation and selftest")
+    674f368a952c ("crypto: remove CRYPTO_TFM_RES_BAD_KEY_LEN")
+    746b2e024c67 ("crypto: lib - tidy up lib/crypto Kconfig and Makefile")
+    7988fb2c03c8 ("crypto: s390/aes - convert to skcipher API")
+    7f725f41f627 ("crypto: powerpc - convert SPE AES algorithms to skcipher API")
+    7f9b0880925f ("crypto: blake2s - implement generic shash driver")
+    91d689337fe8 ("crypto: blake2b - add blake2b generic implementation")
+    b4d0c0aad57a ("crypto: arm - use Kconfig based compiler checks for crypto opcodes")
+    b95bba5d0114 ("crypto: skcipher - rename the crypto_blkcipher module and kconfig option")
+    d00c06398154 ("crypto: s390/paes - convert to skcipher API")
+    da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
+    ed0356eda153 ("crypto: blake2s - x86_64 SIMD implementation")
 
 v4.19.139: Failed to apply! Possible dependencies:
-    0efa7579f3de ("crypto: caam - export ahash shared descriptor generation")
-    1b46c90c8e00 ("crypto: caam - convert top level drivers to libraries")
-    226853ac3ebe ("crypto: caam/qi2 - add skcipher algorithms")
-    8d818c105501 ("crypto: caam/qi2 - add DPAA2-CAAM driver")
-    94cebd9da42c ("crypto: caam - add Queue Interface v2 error codes")
-    96808c596580 ("crypto: caam/qi2 - add CONFIG_NETDEVICES dependency")
-    ee38767f152a ("crypto: caam - support crypto_engine framework for SKCIPHER algorithms")
+    0a5dff9882e5 ("crypto: arm/ghash - provide a synchronous version")
+    1ca1b917940c ("crypto: chacha20-generic - refactor to allow varying number of rounds")
+    297142490236 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
+    5ca7badb1f62 ("crypto: caam/jr - ablkcipher -> skcipher conversion")
+    674f368a952c ("crypto: remove CRYPTO_TFM_RES_BAD_KEY_LEN")
+    8a5a79d5556b ("crypto: x86/chacha20 - Add a 4-block AVX2 variant")
+    99680c5e9182 ("crypto: arm - convert to use crypto_simd_usable()")
+    9b17608f15b9 ("crypto: x86/chacha20 - Use larger block functions more aggressively")
+    9dbe3072c6b1 ("crypto: caam/qi - ablkcipher -> skcipher conversion")
+    a5dd97f86211 ("crypto: x86/chacha20 - Add a 2-block AVX2 variant")
+    aec48adce85d ("crypto: caam/qi - remove ablkcipher IV generation")
+    c3b734dd325d ("crypto: x86/chacha20 - Support partial lengths in 8-block AVX2 variant")
+    cf5448b5c3d8 ("crypto: caam/jr - remove ablkcipher IV generation")
+    da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
+    db8e15a24957 ("crypto: x86/chacha20 - Support partial lengths in 4-block SSSE3 variant")
+    e4e72063d3c0 ("crypto: x86/chacha20 - Support partial lengths in 1-block SSSE3 variant")
 
 v4.14.193: Failed to apply! Possible dependencies:
-    0efa7579f3de ("crypto: caam - export ahash shared descriptor generation")
-    1b46c90c8e00 ("crypto: caam - convert top level drivers to libraries")
-    226853ac3ebe ("crypto: caam/qi2 - add skcipher algorithms")
-    8d818c105501 ("crypto: caam/qi2 - add DPAA2-CAAM driver")
-    94cebd9da42c ("crypto: caam - add Queue Interface v2 error codes")
-    96808c596580 ("crypto: caam/qi2 - add CONFIG_NETDEVICES dependency")
-    ee38767f152a ("crypto: caam - support crypto_engine framework for SKCIPHER algorithms")
-
-v4.9.232: Failed to apply! Possible dependencies:
-    1b008eedb0af ("crypto: caam - remove unused command from aead givencrypt")
-    281669dfbabe ("crypto: caam - rewrite some generic inline append cmds")
-    4cbe79ccb523 ("crypto: caam - improve key inlining")
-    62ad8b5c0964 ("crypto: cavium - Enable CPT options crypto for build")
-    64c9295b2320 ("crypto: caam - move append_key_aead() into init_sh_desc_key_aead()")
-    8cea7b66b821 ("crypto: caam - refactor encryption descriptors generation")
-    8d818c105501 ("crypto: caam/qi2 - add DPAA2-CAAM driver")
-    db57656b0072 ("crypto: caam - group algorithm related params")
-    ee38767f152a ("crypto: caam - support crypto_engine framework for SKCIPHER algorithms")
-
-v4.4.232: Failed to apply! Possible dependencies:
-    1b008eedb0af ("crypto: caam - remove unused command from aead givencrypt")
-    4cbe79ccb523 ("crypto: caam - improve key inlining")
-    5ba1c7b5ffc1 ("crypto: caam - fix rfc3686(ctr(aes)) IV load")
-    64c9295b2320 ("crypto: caam - move append_key_aead() into init_sh_desc_key_aead()")
-    8c419778ab57 ("crypto: caam - add support for RSA algorithm")
-    8cea7b66b821 ("crypto: caam - refactor encryption descriptors generation")
-    d6e7a7d0c2c5 ("crypto: caam - Rename jump labels in ahash_setkey()")
-    db57656b0072 ("crypto: caam - group algorithm related params")
-    e11793f5dad8 ("crypto: caam - ensure descriptor buffers are cacheline aligned")
+    297142490236 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
+    5ca7badb1f62 ("crypto: caam/jr - ablkcipher -> skcipher conversion")
+    662f70ede597 ("crypto: caam - remove needless ablkcipher key copy")
+    7e0880b9fbbe ("crypto: caam - add Derived Key Protocol (DKP) support")
+    9dbe3072c6b1 ("crypto: caam/qi - ablkcipher -> skcipher conversion")
+    cf5448b5c3d8 ("crypto: caam/jr - remove ablkcipher IV generation")
 
 
 NOTE: The patch will not be queued to stable trees until it is upstream.
