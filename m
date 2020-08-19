@@ -6,40 +6,40 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C21CBC433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:56:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60147C433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:56:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9EC7921734
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:56:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33E3F21741
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:56:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597881390;
-	bh=rAUkMixEoHXPMqidT/E+A5kXiu7RBG3wyH4hmu/8B3Q=;
+	s=default; t=1597881393;
+	bh=30FnG0R0uTJZppd+GdCN9PaDYguSkAXnvSNc1Izoe7Y=;
 	h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:
 	 List-ID:From;
-	b=02Sm/E+OgUaBCuzZr1FpODXBvz6Xwp5dx+k8/jI/6TKQjbP8+UJ3tajGsJ0qfz+iI
-	 hjAHWNg7YQ5YJ/rcKVqDY1lT1bpOT92vCpt/7Vk5g5wwBtDxEsWG8ggFxfbr2TwAzv
-	 4G7xlRXque63JkVBI5IHNZls4sSg/15j3LdkMAcU=
+	b=U3LbuXZnLoz2e547yToeOGUceXQQ1ddWYvit40uFTZDfwUwpJniX51SlQ5Ry+hTBO
+	 E9Fv2tZdQrCfpbNibAHoSpqWzK3SLKRkXdAicIQcALG9KCzyyKHoGRFqypZ5edwrNa
+	 I1/2nUQottGiIUnIKM1rc5KQPhbi1CKdgPRGO/7E=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726716AbgHSX43 (ORCPT
+        id S1726786AbgHSX43 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Wed, 19 Aug 2020 19:56:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53044 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:53066 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726362AbgHSX40 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Aug 2020 19:56:26 -0400
+        id S1726435AbgHSX41 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Aug 2020 19:56:27 -0400
 Received: from localhost (unknown [70.37.104.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9A24320888;
-        Wed, 19 Aug 2020 23:56:25 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 83318208DB;
+        Wed, 19 Aug 2020 23:56:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597881385;
-        bh=rAUkMixEoHXPMqidT/E+A5kXiu7RBG3wyH4hmu/8B3Q=;
+        s=default; t=1597881386;
+        bh=30FnG0R0uTJZppd+GdCN9PaDYguSkAXnvSNc1Izoe7Y=;
         h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:From;
-        b=NpmdyagyeODOjX0cmwGNOiY7W3ZKvRBz8NcDfxU/dASWaDYV5mNfpWC/mjlAK6OVV
-         gsXAtge5tYz81Ruku/vbQ2wyPWWhsjQNgimMg3Bjd4WAtDscJCPVMOM3oyVDGmMt3m
-         ThvZbiNzLzziaSWXZNXUESgHM+DepKoZ89C2OtO8=
-Date:   Wed, 19 Aug 2020 23:56:24 +0000
+        b=oZKUVyqRcJkVFGDX2UvzvDQiJGNaNYhhouEdqWQqTaRqK73uZGXyLG7sUipb1c7h1
+         y38DvGsZm3NDcBbJBptKeUX3yXe+VMUgrW34BU5/uFfL34sDGWjXFIippHa2FK4Ygx
+         PUhuaOUTsst7OSkOkEaVDTmi31bTm+XZPcFayIVE=
+Date:   Wed, 19 Aug 2020 23:56:25 +0000
 From:   Sasha Levin <sashal@kernel.org>
 To:     Sasha Levin <sashal@kernel.org>
 To:     Andrei Botila <andrei.botila@oss.nxp.com>
@@ -47,10 +47,10 @@ To:     Andrei Botila <andrei.botila@nxp.com>
 To:     Horia Geanta <horia.geanta@nxp.com>
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH 2/9] crypto: caam/qi - add fallback for XTS with more than 8B IV
-In-Reply-To: <20200806114127.8650-3-andrei.botila@oss.nxp.com>
-References: <20200806114127.8650-3-andrei.botila@oss.nxp.com>
-Message-Id: <20200819235625.9A24320888@mail.kernel.org>
+Subject: Re: [PATCH 3/9] crypto: caam/qi2 - add fallback for XTS with more than 8B IV
+In-Reply-To: <20200806114127.8650-4-andrei.botila@oss.nxp.com>
+References: <20200806114127.8650-4-andrei.botila@oss.nxp.com>
+Message-Id: <20200819235626.83318208DB@mail.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -61,9 +61,9 @@ Hi
 [This is an automated email]
 
 This commit has been processed because it contains a "Fixes:" tag
-fixing commit: b189817cf789 ("crypto: caam/qi - add ablkcipher and authenc algorithms").
+fixing commit: 226853ac3ebe ("crypto: caam/qi2 - add skcipher algorithms").
 
-The bot has tested the following trees: v5.8.1, v5.7.15, v5.4.58, v4.19.139, v4.14.193.
+The bot has tested the following trees: v5.8.1, v5.7.15, v5.4.58.
 
 v5.8.1: Failed to apply! Possible dependencies:
     528f776df67c ("crypto: qat - allow xts requests not multiple of block")
@@ -93,31 +93,6 @@ v5.4.58: Failed to apply! Possible dependencies:
     d00c06398154 ("crypto: s390/paes - convert to skcipher API")
     da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
     ed0356eda153 ("crypto: blake2s - x86_64 SIMD implementation")
-
-v4.19.139: Failed to apply! Possible dependencies:
-    0a5dff9882e5 ("crypto: arm/ghash - provide a synchronous version")
-    1ca1b917940c ("crypto: chacha20-generic - refactor to allow varying number of rounds")
-    5ca7badb1f62 ("crypto: caam/jr - ablkcipher -> skcipher conversion")
-    674f368a952c ("crypto: remove CRYPTO_TFM_RES_BAD_KEY_LEN")
-    8a5a79d5556b ("crypto: x86/chacha20 - Add a 4-block AVX2 variant")
-    99680c5e9182 ("crypto: arm - convert to use crypto_simd_usable()")
-    9b17608f15b9 ("crypto: x86/chacha20 - Use larger block functions more aggressively")
-    9dbe3072c6b1 ("crypto: caam/qi - ablkcipher -> skcipher conversion")
-    a5dd97f86211 ("crypto: x86/chacha20 - Add a 2-block AVX2 variant")
-    aec48adce85d ("crypto: caam/qi - remove ablkcipher IV generation")
-    c3b734dd325d ("crypto: x86/chacha20 - Support partial lengths in 8-block AVX2 variant")
-    cf5448b5c3d8 ("crypto: caam/jr - remove ablkcipher IV generation")
-    da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
-    db8e15a24957 ("crypto: x86/chacha20 - Support partial lengths in 4-block SSSE3 variant")
-    e4e72063d3c0 ("crypto: x86/chacha20 - Support partial lengths in 1-block SSSE3 variant")
-
-v4.14.193: Failed to apply! Possible dependencies:
-    5ca7badb1f62 ("crypto: caam/jr - ablkcipher -> skcipher conversion")
-    662f70ede597 ("crypto: caam - remove needless ablkcipher key copy")
-    7e0880b9fbbe ("crypto: caam - add Derived Key Protocol (DKP) support")
-    87ec3a0b1c2d ("crypto: caam - prepare for gcm(aes) support over QI interface")
-    9dbe3072c6b1 ("crypto: caam/qi - ablkcipher -> skcipher conversion")
-    cf5448b5c3d8 ("crypto: caam/jr - remove ablkcipher IV generation")
 
 
 NOTE: The patch will not be queued to stable trees until it is upstream.
