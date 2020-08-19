@@ -2,102 +2,128 @@ Return-Path: <SRS0=AsAY=B5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11798C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 22:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C21CBC433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:56:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E1A89207FF
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 22:37:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EC7921734
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:56:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597876660;
-	bh=9CurXhWaSWGEy9gnoNnrjYaGBIZfnjd7kw1+vLuNXuA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=TifEJNvVIgzNzozk0QV8XDPiZIa/Z1LtV/sQSXLgA6zR1K6V2o8rV/dUZoqetorth
-	 3ZFGray2KtJl2GIRSLsHtzlTQitWTf0kCM9G7XFhH+E8PE1xwoOB5lt+hdMFe59nUc
-	 qCKB79FbKOt8Nh0Eux7jK/e5JAxtiwDjI/Lwz8Xg=
+	s=default; t=1597881390;
+	bh=rAUkMixEoHXPMqidT/E+A5kXiu7RBG3wyH4hmu/8B3Q=;
+	h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:
+	 List-ID:From;
+	b=02Sm/E+OgUaBCuzZr1FpODXBvz6Xwp5dx+k8/jI/6TKQjbP8+UJ3tajGsJ0qfz+iI
+	 hjAHWNg7YQ5YJ/rcKVqDY1lT1bpOT92vCpt/7Vk5g5wwBtDxEsWG8ggFxfbr2TwAzv
+	 4G7xlRXque63JkVBI5IHNZls4sSg/15j3LdkMAcU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726609AbgHSWhg (ORCPT
+        id S1726716AbgHSX43 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Aug 2020 18:37:36 -0400
-Received: from mail-il1-f195.google.com ([209.85.166.195]:33052 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726209AbgHSWhg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Aug 2020 18:37:36 -0400
-Received: by mail-il1-f195.google.com with SMTP id r13so172230iln.0;
-        Wed, 19 Aug 2020 15:37:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=o5qA84rWrAEOCaZMFgVyYmX8nHeEhZoBGHX1NffFCVA=;
-        b=Nc5A33IxqNjTzRl8/GxAyD/yhuouPmLLdWAxE71BKQ4+BtpAIY6MgX7cEr6sVDBgpT
-         9B7JHq/bLE6IZGrdi61vt0q4s6bZ61EMxNb35UR3smR/GFXgrMMrpmOWM40kZi6vvydA
-         CYOHnsiWAR8LPw20/WzK4ebfUa2xsr7SeY5v6F6FACYsDb3rE9CbXc0EK7Fj/HflqPzt
-         DBxamwVmTFmYNnI1tHgQ5MG5hXUdY8fFlxsyHyi6AEcEuNZbJHhZpUot967I7TJ1rEUm
-         1g2uLabSAdQN8j5pevaKSxwAEOYcAtwIhKDq9SIZY5TtsdRe3CwzauMkpK+RvO7sOpue
-         mDtA==
-X-Gm-Message-State: AOAM531W/4X0b0I6RZqTJ7DXVXhiJvtiZsYL6AVD7m22cbDJS17uKX48
-        OBSn4FZ8aDtegZ18h91RcQ==
-X-Google-Smtp-Source: ABdhPJxo7gtlvJgP9oAns2kIAfcL9UyMaa16qwyRQgiOPARY1thTlnNOXv83xs0qDABXRT29WgM76w==
-X-Received: by 2002:a92:dd8c:: with SMTP id g12mr209066iln.184.1597876655178;
-        Wed, 19 Aug 2020 15:37:35 -0700 (PDT)
-Received: from xps15 ([64.188.179.249])
-        by smtp.gmail.com with ESMTPSA id p77sm253335ill.39.2020.08.19.15.37.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Aug 2020 15:37:34 -0700 (PDT)
-Received: (nullmailer pid 2089228 invoked by uid 1000);
-        Wed, 19 Aug 2020 22:37:33 -0000
-Date:   Wed, 19 Aug 2020 16:37:33 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Atte Tommiska <atte.tommiska@xiphera.com>
-Cc:     Rob Herring <robh+dt@kernel.org>, linux-crypto@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Matt Mackall <mpm@selenic.com>, devicetree@vger.kernel.org,
-        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/3] dt-bindings: rng: add bindings for Xiphera XIP8001B
- hwnrg
-Message-ID: <20200819223733.GA2088539@bogus>
-References: <20200819122135.25316-1-atte.tommiska@xiphera.com>
- <20200819122135.25316-3-atte.tommiska@xiphera.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200819122135.25316-3-atte.tommiska@xiphera.com>
+        Wed, 19 Aug 2020 19:56:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53044 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726362AbgHSX40 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Aug 2020 19:56:26 -0400
+Received: from localhost (unknown [70.37.104.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9A24320888;
+        Wed, 19 Aug 2020 23:56:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1597881385;
+        bh=rAUkMixEoHXPMqidT/E+A5kXiu7RBG3wyH4hmu/8B3Q=;
+        h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:From;
+        b=NpmdyagyeODOjX0cmwGNOiY7W3ZKvRBz8NcDfxU/dASWaDYV5mNfpWC/mjlAK6OVV
+         gsXAtge5tYz81Ruku/vbQ2wyPWWhsjQNgimMg3Bjd4WAtDscJCPVMOM3oyVDGmMt3m
+         ThvZbiNzLzziaSWXZNXUESgHM+DepKoZ89C2OtO8=
+Date:   Wed, 19 Aug 2020 23:56:24 +0000
+From:   Sasha Levin <sashal@kernel.org>
+To:     Sasha Levin <sashal@kernel.org>
+To:     Andrei Botila <andrei.botila@oss.nxp.com>
+To:     Andrei Botila <andrei.botila@nxp.com>
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     stable@vger.kernel.org
+Subject: Re: [PATCH 2/9] crypto: caam/qi - add fallback for XTS with more than 8B IV
+In-Reply-To: <20200806114127.8650-3-andrei.botila@oss.nxp.com>
+References: <20200806114127.8650-3-andrei.botila@oss.nxp.com>
+Message-Id: <20200819235625.9A24320888@mail.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 19 Aug 2020 15:21:34 +0300, Atte Tommiska wrote:
-> Document the device tree bindings of Xiphera's XIP8001B-trng IP.
-> 
-> Signed-off-by: Atte Tommiska <atte.tommiska@xiphera.com>
-> ---
->  .../bindings/rng/xiphera,xip8001b-trng.yaml   | 30 +++++++++++++++++++
->  1 file changed, 30 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/rng/xiphera,xip8001b-trng.yaml
-> 
+Hi
+
+[This is an automated email]
+
+This commit has been processed because it contains a "Fixes:" tag
+fixing commit: b189817cf789 ("crypto: caam/qi - add ablkcipher and authenc algorithms").
+
+The bot has tested the following trees: v5.8.1, v5.7.15, v5.4.58, v4.19.139, v4.14.193.
+
+v5.8.1: Failed to apply! Possible dependencies:
+    528f776df67c ("crypto: qat - allow xts requests not multiple of block")
+    a85211f36f3d ("crypto: qat - fallback for xts with 192 bit keys")
+    b185a68710e0 ("crypto: qat - validate xts key")
+    b8aa7dc5c753 ("crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY")
+    da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
+
+v5.7.15: Failed to apply! Possible dependencies:
+    528f776df67c ("crypto: qat - allow xts requests not multiple of block")
+    a85211f36f3d ("crypto: qat - fallback for xts with 192 bit keys")
+    b185a68710e0 ("crypto: qat - validate xts key")
+    b8aa7dc5c753 ("crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY")
+    da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
+
+v5.4.58: Failed to apply! Possible dependencies:
+    64db5e7439fb ("crypto: sparc/aes - convert to skcipher API")
+    66d7fb94e4ff ("crypto: blake2s - generic C library implementation and selftest")
+    674f368a952c ("crypto: remove CRYPTO_TFM_RES_BAD_KEY_LEN")
+    746b2e024c67 ("crypto: lib - tidy up lib/crypto Kconfig and Makefile")
+    7988fb2c03c8 ("crypto: s390/aes - convert to skcipher API")
+    7f725f41f627 ("crypto: powerpc - convert SPE AES algorithms to skcipher API")
+    7f9b0880925f ("crypto: blake2s - implement generic shash driver")
+    91d689337fe8 ("crypto: blake2b - add blake2b generic implementation")
+    b4d0c0aad57a ("crypto: arm - use Kconfig based compiler checks for crypto opcodes")
+    b95bba5d0114 ("crypto: skcipher - rename the crypto_blkcipher module and kconfig option")
+    d00c06398154 ("crypto: s390/paes - convert to skcipher API")
+    da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
+    ed0356eda153 ("crypto: blake2s - x86_64 SIMD implementation")
+
+v4.19.139: Failed to apply! Possible dependencies:
+    0a5dff9882e5 ("crypto: arm/ghash - provide a synchronous version")
+    1ca1b917940c ("crypto: chacha20-generic - refactor to allow varying number of rounds")
+    5ca7badb1f62 ("crypto: caam/jr - ablkcipher -> skcipher conversion")
+    674f368a952c ("crypto: remove CRYPTO_TFM_RES_BAD_KEY_LEN")
+    8a5a79d5556b ("crypto: x86/chacha20 - Add a 4-block AVX2 variant")
+    99680c5e9182 ("crypto: arm - convert to use crypto_simd_usable()")
+    9b17608f15b9 ("crypto: x86/chacha20 - Use larger block functions more aggressively")
+    9dbe3072c6b1 ("crypto: caam/qi - ablkcipher -> skcipher conversion")
+    a5dd97f86211 ("crypto: x86/chacha20 - Add a 2-block AVX2 variant")
+    aec48adce85d ("crypto: caam/qi - remove ablkcipher IV generation")
+    c3b734dd325d ("crypto: x86/chacha20 - Support partial lengths in 8-block AVX2 variant")
+    cf5448b5c3d8 ("crypto: caam/jr - remove ablkcipher IV generation")
+    da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
+    db8e15a24957 ("crypto: x86/chacha20 - Support partial lengths in 4-block SSSE3 variant")
+    e4e72063d3c0 ("crypto: x86/chacha20 - Support partial lengths in 1-block SSSE3 variant")
+
+v4.14.193: Failed to apply! Possible dependencies:
+    5ca7badb1f62 ("crypto: caam/jr - ablkcipher -> skcipher conversion")
+    662f70ede597 ("crypto: caam - remove needless ablkcipher key copy")
+    7e0880b9fbbe ("crypto: caam - add Derived Key Protocol (DKP) support")
+    87ec3a0b1c2d ("crypto: caam - prepare for gcm(aes) support over QI interface")
+    9dbe3072c6b1 ("crypto: caam/qi - ablkcipher -> skcipher conversion")
+    cf5448b5c3d8 ("crypto: caam/jr - remove ablkcipher IV generation")
 
 
-My bot found errors running 'make dt_binding_check' on your patch:
+NOTE: The patch will not be queued to stable trees until it is upstream.
 
-/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/rng/xiphera,xip8001b-trng.yaml: 'maintainers' is a required property
-/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/rng/xiphera,xip8001b-trng.yaml: ignoring, error in schema: 
-warning: no schema found in file: ./Documentation/devicetree/bindings/rng/xiphera,xip8001b-trng.yaml
+How should we proceed with this patch?
 
-
-See https://patchwork.ozlabs.org/patch/1347768
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure dt-schema is up to date:
-
-pip3 install git+https://github.com/devicetree-org/dt-schema.git@master --upgrade
-
-Please check and re-submit.
-
+-- 
+Thanks
+Sasha
