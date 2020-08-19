@@ -6,40 +6,40 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B859C433E1
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B58C433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:58:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6FC4320888
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:58:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4E5420888
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:58:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597881482;
-	bh=30FnG0R0uTJZppd+GdCN9PaDYguSkAXnvSNc1Izoe7Y=;
+	s=default; t=1597881485;
+	bh=mZ+xjhUT11PTCiS0S8kVh706FaAhXCyVl6jXHHCd8LI=;
 	h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:
 	 List-ID:From;
-	b=JxvGdkZiWqqNwB4f6CRV80ghDW7GZAanBwFCtT/h8OfiC5joeTw98Sl2T6MItXJD0
-	 t57FhQISu4gQkRe203kdM6/Fbg5Q9ay/suCBKny34DwOvYU7OEMItfDGiYPkBTiwI8
-	 TUqwANGZZ37mMYGf7p+EVfaVFIh9Y2rKe0+xml08=
+	b=CVV16HY5X135IbDmpdNykmDUUrO/EZbzDQlr+gcvbpFRjQw25u6v0xnNeJNzrMaRC
+	 CEbT7aVcD4V6eO36Os7PiwO3D2/cwpUuQrrI8RRmC229HBeOFeFkwx98POG1g7KECR
+	 bAbgz3WcIMx46/myektD6DQUiAcKSxPZpvtQ7rJ8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726883AbgHSX54 (ORCPT
+        id S1727101AbgHSX6E (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Aug 2020 19:57:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53156 "EHLO mail.kernel.org"
+        Wed, 19 Aug 2020 19:58:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53128 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726846AbgHSX4i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Aug 2020 19:56:38 -0400
+        id S1726766AbgHSX43 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Aug 2020 19:56:29 -0400
 Received: from localhost (unknown [70.37.104.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 778572173E;
-        Wed, 19 Aug 2020 23:56:37 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4492E20FC3;
+        Wed, 19 Aug 2020 23:56:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597881397;
-        bh=30FnG0R0uTJZppd+GdCN9PaDYguSkAXnvSNc1Izoe7Y=;
+        s=default; t=1597881389;
+        bh=mZ+xjhUT11PTCiS0S8kVh706FaAhXCyVl6jXHHCd8LI=;
         h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:From;
-        b=X9CWsx1tDgl5zCSjUXhWk4rj47xKy49sf94cZW8FQ0fg2y7CtvZ6sw7/CXs31/nVT
-         rryPKVQ0ZHCxo6uz6/4r9338TKFOjUTat7kBfHG+6wXBINNmq3XUZT1xZB9U52qvzn
-         NkJbfhGH6Eo9hTVeXrfYPSfrcE3qV/E2mRP/g/eo=
-Date:   Wed, 19 Aug 2020 23:56:36 +0000
+        b=dKYJFrsHl6D5x0JvP+cHUFL9MklzSSA4QEQ+kk0g7jC5icP+LCHddK8zfuo+S1ojZ
+         0YZv/ahy77TWzxhXMwdLFUasXkj07ciXhlAjePcn/3RAgo6jqX/t8+BjDqlN7Z/u04
+         lT+QIMQKsftFt80y4sW025UdmKHQsafs5El81gpY=
+Date:   Wed, 19 Aug 2020 23:56:28 +0000
 From:   Sasha Levin <sashal@kernel.org>
 To:     Sasha Levin <sashal@kernel.org>
 To:     Andrei Botila <andrei.botila@oss.nxp.com>
@@ -47,10 +47,10 @@ To:     Andrei Botila <andrei.botila@nxp.com>
 To:     Horia Geanta <horia.geanta@nxp.com>
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH RESEND 3/9] crypto: caam/qi2 - add fallback for XTS with more than 8B IV
-In-Reply-To: <20200806163551.14395-4-andrei.botila@oss.nxp.com>
-References: <20200806163551.14395-4-andrei.botila@oss.nxp.com>
-Message-Id: <20200819235637.778572173E@mail.kernel.org>
+Subject: Re: [PATCH 6/9] crypto: caam/qi2 - add support for more XTS key lengths
+In-Reply-To: <20200806114127.8650-7-andrei.botila@oss.nxp.com>
+References: <20200806114127.8650-7-andrei.botila@oss.nxp.com>
+Message-Id: <20200819235629.4492E20FC3@mail.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -67,6 +67,7 @@ The bot has tested the following trees: v5.8.1, v5.7.15, v5.4.58.
 
 v5.8.1: Failed to apply! Possible dependencies:
     528f776df67c ("crypto: qat - allow xts requests not multiple of block")
+    93f83eb04603 ("crypto: caam/qi2 - add fallback for XTS with more than 8B IV")
     a85211f36f3d ("crypto: qat - fallback for xts with 192 bit keys")
     b185a68710e0 ("crypto: qat - validate xts key")
     b8aa7dc5c753 ("crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY")
@@ -74,6 +75,7 @@ v5.8.1: Failed to apply! Possible dependencies:
 
 v5.7.15: Failed to apply! Possible dependencies:
     528f776df67c ("crypto: qat - allow xts requests not multiple of block")
+    93f83eb04603 ("crypto: caam/qi2 - add fallback for XTS with more than 8B IV")
     a85211f36f3d ("crypto: qat - fallback for xts with 192 bit keys")
     b185a68710e0 ("crypto: qat - validate xts key")
     b8aa7dc5c753 ("crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY")
@@ -88,6 +90,7 @@ v5.4.58: Failed to apply! Possible dependencies:
     7f725f41f627 ("crypto: powerpc - convert SPE AES algorithms to skcipher API")
     7f9b0880925f ("crypto: blake2s - implement generic shash driver")
     91d689337fe8 ("crypto: blake2b - add blake2b generic implementation")
+    93f83eb04603 ("crypto: caam/qi2 - add fallback for XTS with more than 8B IV")
     b4d0c0aad57a ("crypto: arm - use Kconfig based compiler checks for crypto opcodes")
     b95bba5d0114 ("crypto: skcipher - rename the crypto_blkcipher module and kconfig option")
     d00c06398154 ("crypto: s390/paes - convert to skcipher API")
