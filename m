@@ -6,66 +6,61 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19CC8C433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Aug 2020 07:06:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CC27C433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Aug 2020 07:15:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 010C3206DA
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Aug 2020 07:06:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3390620786
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Aug 2020 07:15:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725952AbgHTHGs (ORCPT
+        id S1725798AbgHTHPs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Aug 2020 03:06:48 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:48916 "EHLO fornost.hmeau.com"
+        Thu, 20 Aug 2020 03:15:48 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:48934 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726309AbgHTHGr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Aug 2020 03:06:47 -0400
+        id S1725797AbgHTHPs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Aug 2020 03:15:48 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1k8eer-0005xd-7S; Thu, 20 Aug 2020 17:06:46 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Aug 2020 17:06:45 +1000
-Date:   Thu, 20 Aug 2020 17:06:45 +1000
+        id 1k8enC-000612-KO; Thu, 20 Aug 2020 17:15:23 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Aug 2020 17:15:22 +1000
+Date:   Thu, 20 Aug 2020 17:15:22 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Ben Greear <greearb@candelatech.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH 0/5] crypto: Implement cmac based on cbc skcipher
-Message-ID: <20200820070645.GA21395@gondor.apana.org.au>
-References: <20200818140532.GA25807@gondor.apana.org.au>
- <be188471-b75f-d2e2-d657-265a1cd9831b@candelatech.com>
- <20200818221550.GA27421@gondor.apana.org.au>
- <20200818222719.GA27622@gondor.apana.org.au>
- <bee1a9ce-25d1-2520-5f6a-3966bfa501d2@candelatech.com>
- <20200818223359.GA27712@gondor.apana.org.au>
- <8b248ef3-d4c7-43fd-6ae4-1c3381597579@candelatech.com>
- <CAMj1kXFaQsCw_7x8NKNHfMfEC=NdWCxd7V6S3VnAFdOg+-Letg@mail.gmail.com>
- <20200820070142.GA21343@gondor.apana.org.au>
- <CAMj1kXEdkQUZ_d33N5T5_ELyqRomBKF8Nn+gquo7nrVBMMP-gA@mail.gmail.com>
+To:     trix@redhat.com
+Cc:     davem@davemloft.net, smueller@chronox.de,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: drbg: check blocklen is non zero
+Message-ID: <20200820071522.GA21511@gondor.apana.org.au>
+References: <20200802171247.16558-1-trix@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMj1kXEdkQUZ_d33N5T5_ELyqRomBKF8Nn+gquo7nrVBMMP-gA@mail.gmail.com>
+In-Reply-To: <20200802171247.16558-1-trix@redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 20, 2020 at 09:04:26AM +0200, Ard Biesheuvel wrote:
->
-> I don't disagree with that, especially given all the effort that went
-> into optimizing FPU preserve/restore on both arm64 and x86. But the
-> bottom line is that this is what is causing the degradation in Ben's
-> case, so we cannot disregard it.
+On Sun, Aug 02, 2020 at 10:12:47AM -0700, trix@redhat.com wrote:
+> From: Tom Rix <trix@redhat.com>
+> 
+> Clang static analysis reports this error
+> 
+> crypto/drbg.c:441:40: warning: Division by zero
+>         padlen = (inputlen + sizeof(L_N) + 1) % (drbg_blocklen(drbg));
+>                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+> 
+> When drbg_bocklen fails it returns 0.
+> 
+> 	if (drbg && drbg->core)
+> 		return drbg->core->blocklen_bytes;
+> 	return 0;
 
-If he's having problems with the performance when SIMD is in use
-due to preserve/restore, I'd hate to see his numbers when SIMD is
-not available.
+Yes but it can only fail if the drbg is not instantiated.  If
+you're hitting the generate path with an uninstantiated drbg you've
+got bigger problems than a divide by zero.
 
-IOW if this really matters to him, then wireless code needs to switch
-over to ahash.
-
-Solving half of the problem simply makes no sense.
+So how is this even possible?
 
 Cheers,
 -- 
