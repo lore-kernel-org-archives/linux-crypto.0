@@ -1,107 +1,61 @@
-Return-Path: <SRS0=AsAY=B5=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=QJ87=B6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B58C433E1
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:58:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C14DDC433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Aug 2020 06:50:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4E5420888
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Aug 2020 23:58:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1597881485;
-	bh=mZ+xjhUT11PTCiS0S8kVh706FaAhXCyVl6jXHHCd8LI=;
-	h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:
-	 List-ID:From;
-	b=CVV16HY5X135IbDmpdNykmDUUrO/EZbzDQlr+gcvbpFRjQw25u6v0xnNeJNzrMaRC
-	 CEbT7aVcD4V6eO36Os7PiwO3D2/cwpUuQrrI8RRmC229HBeOFeFkwx98POG1g7KECR
-	 bAbgz3WcIMx46/myektD6DQUiAcKSxPZpvtQ7rJ8=
+	by mail.kernel.org (Postfix) with ESMTP id A1B25206B5
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Aug 2020 06:50:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727101AbgHSX6E (ORCPT
+        id S1725824AbgHTGum (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Aug 2020 19:58:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53128 "EHLO mail.kernel.org"
+        Thu, 20 Aug 2020 02:50:42 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:48892 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726766AbgHSX43 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Aug 2020 19:56:29 -0400
-Received: from localhost (unknown [70.37.104.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4492E20FC3;
-        Wed, 19 Aug 2020 23:56:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1597881389;
-        bh=mZ+xjhUT11PTCiS0S8kVh706FaAhXCyVl6jXHHCd8LI=;
-        h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:From;
-        b=dKYJFrsHl6D5x0JvP+cHUFL9MklzSSA4QEQ+kk0g7jC5icP+LCHddK8zfuo+S1ojZ
-         0YZv/ahy77TWzxhXMwdLFUasXkj07ciXhlAjePcn/3RAgo6jqX/t8+BjDqlN7Z/u04
-         lT+QIMQKsftFt80y4sW025UdmKHQsafs5El81gpY=
-Date:   Wed, 19 Aug 2020 23:56:28 +0000
-From:   Sasha Levin <sashal@kernel.org>
-To:     Sasha Levin <sashal@kernel.org>
-To:     Andrei Botila <andrei.botila@oss.nxp.com>
-To:     Andrei Botila <andrei.botila@nxp.com>
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH 6/9] crypto: caam/qi2 - add support for more XTS key lengths
-In-Reply-To: <20200806114127.8650-7-andrei.botila@oss.nxp.com>
-References: <20200806114127.8650-7-andrei.botila@oss.nxp.com>
-Message-Id: <20200819235629.4492E20FC3@mail.kernel.org>
+        id S1725780AbgHTGum (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Aug 2020 02:50:42 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1k8eP2-0005jN-Hc; Thu, 20 Aug 2020 16:50:25 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Aug 2020 16:50:24 +1000
+Date:   Thu, 20 Aug 2020 16:50:24 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Huang Guobin <huangguobin4@huawei.com>
+Cc:     haren@us.ibm.com, ddstreet@ieee.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] lib: Verify array index is correct before using it
+Message-ID: <20200820065024.GA21086@gondor.apana.org.au>
+References: <20200728122157.23120-1-huangguobin4@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200728122157.23120-1-huangguobin4@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi
+On Tue, Jul 28, 2020 at 08:21:57AM -0400, Huang Guobin wrote:
+> This code reads from the array before verifying that "c" is a valid
+> index. Move test array offset code before use to fix it.
+> 
+> Fixes: 2da572c959dd ("lib: add software 842 compression/decompression")
+> Signed-off-by: Huang Guobin <huangguobin4@huawei.com>
+> ---
+>  lib/842/842_compress.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 
-[This is an automated email]
+Did you check whether the out-of-bounds condition is even possible?
 
-This commit has been processed because it contains a "Fixes:" tag
-fixing commit: 226853ac3ebe ("crypto: caam/qi2 - add skcipher algorithms").
-
-The bot has tested the following trees: v5.8.1, v5.7.15, v5.4.58.
-
-v5.8.1: Failed to apply! Possible dependencies:
-    528f776df67c ("crypto: qat - allow xts requests not multiple of block")
-    93f83eb04603 ("crypto: caam/qi2 - add fallback for XTS with more than 8B IV")
-    a85211f36f3d ("crypto: qat - fallback for xts with 192 bit keys")
-    b185a68710e0 ("crypto: qat - validate xts key")
-    b8aa7dc5c753 ("crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY")
-    da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
-
-v5.7.15: Failed to apply! Possible dependencies:
-    528f776df67c ("crypto: qat - allow xts requests not multiple of block")
-    93f83eb04603 ("crypto: caam/qi2 - add fallback for XTS with more than 8B IV")
-    a85211f36f3d ("crypto: qat - fallback for xts with 192 bit keys")
-    b185a68710e0 ("crypto: qat - validate xts key")
-    b8aa7dc5c753 ("crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY")
-    da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
-
-v5.4.58: Failed to apply! Possible dependencies:
-    64db5e7439fb ("crypto: sparc/aes - convert to skcipher API")
-    66d7fb94e4ff ("crypto: blake2s - generic C library implementation and selftest")
-    674f368a952c ("crypto: remove CRYPTO_TFM_RES_BAD_KEY_LEN")
-    746b2e024c67 ("crypto: lib - tidy up lib/crypto Kconfig and Makefile")
-    7988fb2c03c8 ("crypto: s390/aes - convert to skcipher API")
-    7f725f41f627 ("crypto: powerpc - convert SPE AES algorithms to skcipher API")
-    7f9b0880925f ("crypto: blake2s - implement generic shash driver")
-    91d689337fe8 ("crypto: blake2b - add blake2b generic implementation")
-    93f83eb04603 ("crypto: caam/qi2 - add fallback for XTS with more than 8B IV")
-    b4d0c0aad57a ("crypto: arm - use Kconfig based compiler checks for crypto opcodes")
-    b95bba5d0114 ("crypto: skcipher - rename the crypto_blkcipher module and kconfig option")
-    d00c06398154 ("crypto: s390/paes - convert to skcipher API")
-    da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
-    ed0356eda153 ("crypto: blake2s - x86_64 SIMD implementation")
-
-
-NOTE: The patch will not be queued to stable trees until it is upstream.
-
-How should we proceed with this patch?
-
+Cheers,
 -- 
-Thanks
-Sasha
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
