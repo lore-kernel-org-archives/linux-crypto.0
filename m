@@ -2,46 +2,46 @@ Return-Path: <SRS0=QJ87=B6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B9D8C433E1
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Aug 2020 08:53:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7353C433E1
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Aug 2020 08:53:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6FB82206FA
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Aug 2020 08:53:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BE9822CF8
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Aug 2020 08:53:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="BmdFYWc0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="cEVHxzI/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726875AbgHTIxq (ORCPT
+        id S1726816AbgHTIxs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Aug 2020 04:53:46 -0400
-Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.176]:23399 "EHLO
+        Thu, 20 Aug 2020 04:53:48 -0400
+Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.120]:28442 "EHLO
         mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726868AbgHTIxM (ORCPT
+        with ESMTP id S1726788AbgHTIxB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Aug 2020 04:53:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1597913584;
+        Thu, 20 Aug 2020 04:53:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1597913573;
         s=strato-dkim-0002; d=chronox.de;
         h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
         X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=5dSGSAiOchgXa0bateO3AteEhDNKiuRbQ7iJbxrg0gc=;
-        b=BmdFYWc0k428IDiEJHej8BagV9U7YhYK6miMQ63LypOrFPW4DTY6TY+/FXvPr+/drI
-        Qe+yFgbjtKjePmZspIxttkZFgfMrHuDcjOeW1Bqa0swZDtSkuWp57m30rJgMPwnG0Y0s
-        GV2tDQnwPA1CG3hLl8qOxlJdgPpQ8QcyWFmSSgbj4B0JJcXYIuYvFcbIifPj7/n3M0CK
-        VnQz86q1y/3H5SSR8xb7+OVZg0Bw69he9sHpvMJ4B2UXJ/FN3oKoyeZ5zMdp2C3O1RSU
-        G5jonJK1tPJAGxUZFopsGPDJxPUASE1HmA5qNSgZfcfeae7+0kxmn6GesJ7cfRQaIX1/
-        qXlA==
+        bh=2TWzYfbKv5CeL/P1ywHw8oQlEiDCwQ1rLuujHdrVeDI=;
+        b=cEVHxzI/1CtVGJ0nRxT4NTZ8zVLhcFdC8ulvWAwFplY5smq79tdvJCnh23a7Tz+lPW
+        WDiNYlrcYI5TCzK8StqRd5WfmIMIqVrtWnjYTQyr+JJzEJw0kXzqiyYqgJSCvNzRRTa5
+        7Mz+OEoyE4EInmRBDPpOiiqo2nX9+ZUszP8CY03XFFhAjYrI4K6gnNFTO4iHdxsSl3tj
+        MM9cCYkd0zvRA5m2RWCHD4tUwAOdwI7E6EdFILsnUXP86B5G2/vClTNtI5y3duazNDHG
+        ByogwaCSaR65HoEImIuQjaN/XcalnfAG5fyRCt0p7nnvVFJhOwu4saQk9Dapy3aB05i8
+        2ZCg==
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xm0dNS3IdRAZAL+p6A=="
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
         by smtp.strato.de (RZmta 46.10.7 DYNA|AUTH)
-        with ESMTPSA id 002e9aw7K8njBSw
+        with ESMTPSA id 002e9aw7K8nbBSr
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-        Thu, 20 Aug 2020 10:49:45 +0200 (CEST)
+        Thu, 20 Aug 2020 10:49:37 +0200 (CEST)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Arnd Bergmann <arnd@arndb.de>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -68,9 +68,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Randy Dunlap <rdunlap@infradead.org>,
         Julia Lawall <julia.lawall@inria.fr>,
         Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [PATCH v32 03/12] LRNG - sysctls and /proc interface
-Date:   Thu, 20 Aug 2020 10:40:43 +0200
-Message-ID: <21893267.6Emhk5qWAg@positron.chronox.de>
+Subject: [PATCH v32 06/12] LRNG - add SP800-90A DRBG extension
+Date:   Thu, 20 Aug 2020 10:42:49 +0200
+Message-ID: <1733393.atdPhlSkOF@positron.chronox.de>
 In-Reply-To: <2544450.mvXUDI8C0e@positron.chronox.de>
 References: <2544450.mvXUDI8C0e@positron.chronox.de>
 MIME-Version: 1.0
@@ -81,36 +81,22 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The LRNG sysctl interface provides the same controls as the existing
-/dev/random implementation. These sysctls behave identically and are
-implemented identically. The goal is to allow a possible merge of the
-existing /dev/random implementation with this implementation which
-implies that this patch tries have a very close similarity. Yet, all
-sysctls are documented at [1].
+Using the LRNG switchable DRNG support, the SP800-90A DRBG extension is
+implemented.
 
-In addition, it provides the file lrng_type which provides details about
-the LRNG:
+The DRBG uses the kernel crypto API DRBG implementation. In addition, it
+uses the kernel crypto API SHASH support to provide the hashing
+operation.
 
-=2D the name of the DRNG that produces the random numbers for /dev/random,
-/dev/urandom, getrandom(2)
+The DRBG supports the choice of either a CTR DRBG using AES-256, HMAC
+DRBG with SHA-512 core or Hash DRBG with SHA-512 core. The used core can
+be selected with the module parameter lrng_drbg_type. The default is the
+CTR DRBG.
 
-=2D the hash used to produce random numbers from the entropy pool
-
-=2D the number of secondary DRNG instances
-
-=2D indicator whether the LRNG operates SP800-90B compliant
-
-=2D indicator whether a high-resolution timer is identified - only with a
-high-resolution timer the interrupt noise source will deliver sufficient
-entropy
-
-=2D indicator whether the LRNG has been minimally seeded (i.e. is the
-secondary DRNG seeded with at least 128 bits of of entropy)
-
-=2D indicator whether the LRNG has been fully seeded (i.e. is the
-secondary DRNG seeded with at least 256 bits of entropy)
-
-[1] https://www.chronox.de/lrng.html
+When compiling the DRBG extension statically, the DRBG is loaded at
+late_initcall stage which implies that with the start of user space, the
+user space interfaces of getrandom(2), /dev/random and /dev/urandom
+provide random data produced by an SP800-90A DRBG.
 
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
 CC: "Alexander E. Patrakov" <patrakov@gmail.com>
@@ -128,232 +114,325 @@ CC: Andy Lutomirski <luto@kernel.org>
 CC: Florian Weimer <fweimer@redhat.com>
 CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
-Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
 Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
 Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Tested-by: Neil Horman <nhorman@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 =2D--
- drivers/char/lrng/Makefile          |   1 +
- drivers/char/lrng/lrng_interfaces.c |   1 -
- drivers/char/lrng/lrng_internal.h   |   4 +
- drivers/char/lrng/lrng_proc.c       | 163 ++++++++++++++++++++++++++++
- 4 files changed, 168 insertions(+), 1 deletion(-)
- create mode 100644 drivers/char/lrng/lrng_proc.c
+ drivers/char/lrng/Kconfig     |  12 ++
+ drivers/char/lrng/Makefile    |   1 +
+ drivers/char/lrng/lrng_drbg.c | 259 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 272 insertions(+)
+ create mode 100644 drivers/char/lrng/lrng_drbg.c
 
+diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
+index d3138458fd8b..4ad26fdfbe7e 100644
+=2D-- a/drivers/char/lrng/Kconfig
++++ b/drivers/char/lrng/Kconfig
+@@ -72,4 +72,16 @@ menuconfig LRNG_DRNG_SWITCH
+ 	  accessible via the external interfaces. With this configuration
+ 	  option other DRNGs can be selected and loaded at runtime.
+=20
++if LRNG_DRNG_SWITCH
++config LRNG_DRBG
++	tristate "SP800-90A support for the LRNG"
++	depends on CRYPTO
++	select CRYPTO_DRBG_MENU
++	select CRYPTO_SHA512
++	help
++	  Enable the SP800-90A DRBG support for the LRNG. Once the
++	  module is loaded, output from /dev/random, /dev/urandom,
++	  getrandom(2), or get_random_bytes is provided by a DRBG.
++endif # LRNG_DRNG_SWITCH
++
+ endif # LRNG
 diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 0a32f22c2c1a..e69c176f0161 100644
+index 31cfe87c999e..0d320fcb7b9e 100644
 =2D-- a/drivers/char/lrng/Makefile
 +++ b/drivers/char/lrng/Makefile
-@@ -9,3 +9,4 @@ obj-y				+=3D lrng_pool.o lrng_aux.o \
- 				   lrng_interfaces.o \
-=20
+@@ -11,3 +11,4 @@ obj-y				+=3D lrng_pool.o lrng_aux.o \
  obj-$(CONFIG_NUMA)		+=3D lrng_numa.o
-+obj-$(CONFIG_SYSCTL)		+=3D lrng_proc.o
-diff --git a/drivers/char/lrng/lrng_interfaces.c b/drivers/char/lrng/lrng_i=
-nterfaces.c
-index 7fc04e54d834..184108b6e1cb 100644
-=2D-- a/drivers/char/lrng/lrng_interfaces.c
-+++ b/drivers/char/lrng/lrng_interfaces.c
-@@ -34,7 +34,6 @@ static DECLARE_WAIT_QUEUE_HEAD(lrng_write_wait);
- static DECLARE_WAIT_QUEUE_HEAD(lrng_init_wait);
- static struct fasync_struct *fasync;
-=20
-=2Dstruct ctl_table random_table[];
- /********************************** Helper *******************************=
-****/
-=20
- /* Is the DRNG seed level too low? */
-diff --git a/drivers/char/lrng/lrng_internal.h b/drivers/char/lrng/lrng_int=
-ernal.h
-index 495e00ae5ee1..a52c4cf367e2 100644
-=2D-- a/drivers/char/lrng/lrng_internal.h
-+++ b/drivers/char/lrng/lrng_internal.h
-@@ -117,7 +117,11 @@ void lrng_cc20_init_state_boot(struct chacha20_state *=
-state);
-=20
- /********************************** /proc ********************************=
-*****/
-=20
-+#ifdef CONFIG_SYSCTL
-+void lrng_pool_inc_numa_node(void);
-+#else
- static inline void lrng_pool_inc_numa_node(void) { }
-+#endif
-=20
- /****************************** LRNG interfaces **************************=
-*****/
-=20
-diff --git a/drivers/char/lrng/lrng_proc.c b/drivers/char/lrng/lrng_proc.c
+ obj-$(CONFIG_SYSCTL)		+=3D lrng_proc.o
+ obj-$(CONFIG_LRNG_DRNG_SWITCH)	+=3D lrng_switch.o
++obj-$(CONFIG_LRNG_DRBG)		+=3D lrng_drbg.o
+diff --git a/drivers/char/lrng/lrng_drbg.c b/drivers/char/lrng/lrng_drbg.c
 new file mode 100644
-index 000000000000..c569a269b07a
+index 000000000000..06590438f88f
 =2D-- /dev/null
-+++ b/drivers/char/lrng/lrng_proc.c
-@@ -0,0 +1,163 @@
++++ b/drivers/char/lrng/lrng_drbg.c
+@@ -0,0 +1,259 @@
 +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
 +/*
-+ * LRNG proc and sysctl interfaces
++ * Backend for the LRNG providing the cryptographic primitives using the
++ * kernel crypto API and its DRBG.
 + *
 + * Copyright (C) 2016 - 2020, Stephan Mueller <smueller@chronox.de>
 + */
 +
-+#include <linux/lrng.h>
-+#include <linux/proc_fs.h>
-+#include <linux/seq_file.h>
-+#include <linux/sysctl.h>
-+#include <linux/uuid.h>
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+#include "lrng_internal.h"
++#include <crypto/drbg.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/lrng.h>
 +
 +/*
-+ * This function is used to return both the bootid UUID, and random
-+ * UUID.  The difference is in whether table->data is NULL; if it is,
-+ * then a new UUID is generated and returned to the user.
++ * Define a DRBG plus a hash / MAC used to extract data from the entropy p=
+ool.
++ * For LRNG_HASH_NAME you can use a hash or a MAC (HMAC or CMAC) of your c=
+hoice
++ * (Note, you should use the suggested selections below -- using SHA-1 or =
+MD5
++ * is not wise). The idea is that the used cipher primitive can be selecte=
+d to
++ * be the same as used for the DRBG. I.e. the LRNG only uses one cipher
++ * primitive using the same cipher implementation with the options offered=
+ in
++ * the following. This means, if the CTR DRBG is selected and AES-NI is pr=
+esent,
++ * both the CTR DRBG and the selected cmac(aes) use AES-NI.
 + *
-+ * If the user accesses this via the proc interface, the UUID will be
-+ * returned as an ASCII string in the standard UUID format; if via the
-+ * sysctl system call, as 16 bytes of binary data.
++ * The security strengths of the DRBGs are all 256 bits according to
++ * SP800-57 section 5.6.1.
++ *
++ * This definition is allowed to be changed.
 + */
-+static int lrng_proc_do_uuid(struct ctl_table *table, int write,
-+			     void __user *buffer, size_t *lenp, loff_t *ppos)
-+{
-+	struct ctl_table fake_table;
-+	unsigned char buf[64], tmp_uuid[16], *uuid;
++#ifdef CONFIG_CRYPTO_DRBG_CTR
++static unsigned int lrng_drbg_type =3D 0;
++#elif defined CONFIG_CRYPTO_DRBG_HMAC
++static unsigned int lrng_drbg_type =3D 1;
++#elif defined CONFIG_CRYPTO_DRBG_HASH
++static unsigned int lrng_drbg_type =3D 2;
++#else
++#error "Unknown DRBG in use"
++#endif
 +
-+	uuid =3D table->data;
-+	if (!uuid) {
-+		uuid =3D tmp_uuid;
-+		generate_random_uuid(uuid);
-+	} else {
-+		static DEFINE_SPINLOCK(bootid_spinlock);
++/* The parameter must be r/o in sysfs as otherwise races appear. */
++module_param(lrng_drbg_type, uint, 0444);
++MODULE_PARM_DESC(lrng_drbg_type, "DRBG type used for LRNG (0->CTR_DRBG, 1-=
+>HMAC_DRBG, 2->Hash_DRBG)");
 +
-+		spin_lock(&bootid_spinlock);
-+		if (!uuid[8])
-+			generate_random_uuid(uuid);
-+		spin_unlock(&bootid_spinlock);
-+	}
-+
-+	sprintf(buf, "%pU", uuid);
-+
-+	fake_table.data =3D buf;
-+	fake_table.maxlen =3D sizeof(buf);
-+
-+	return proc_dostring(&fake_table, write, buffer, lenp, ppos);
-+}
-+
-+static int lrng_proc_do_entropy(struct ctl_table *table, int write,
-+				void *buffer, size_t *lenp, loff_t *ppos)
-+{
-+	struct ctl_table fake_table;
-+	int entropy_count;
-+
-+	entropy_count =3D lrng_avail_entropy();
-+
-+	fake_table.data =3D &entropy_count;
-+	fake_table.maxlen =3D sizeof(entropy_count);
-+
-+	return proc_dointvec(&fake_table, write, buffer, lenp, ppos);
-+}
-+
-+static int lrng_sysctl_poolsize =3D LRNG_POOL_SIZE_BITS;
-+static int lrng_min_write_thresh;
-+static int lrng_max_write_thresh =3D LRNG_POOL_SIZE_BITS;
-+static char lrng_sysctl_bootid[16];
-+static int lrng_drng_reseed_max_min;
-+
-+struct ctl_table random_table[] =3D {
-+	{
-+		.procname	=3D "poolsize",
-+		.data		=3D &lrng_sysctl_poolsize,
-+		.maxlen		=3D sizeof(int),
-+		.mode		=3D 0444,
-+		.proc_handler	=3D proc_dointvec,
-+	},
-+	{
-+		.procname	=3D "entropy_avail",
-+		.maxlen		=3D sizeof(int),
-+		.mode		=3D 0444,
-+		.proc_handler	=3D lrng_proc_do_entropy,
-+	},
-+	{
-+		.procname	=3D "write_wakeup_threshold",
-+		.data		=3D &lrng_write_wakeup_bits,
-+		.maxlen		=3D sizeof(int),
-+		.mode		=3D 0644,
-+		.proc_handler	=3D proc_dointvec_minmax,
-+		.extra1		=3D &lrng_min_write_thresh,
-+		.extra2		=3D &lrng_max_write_thresh,
-+	},
-+	{
-+		.procname	=3D "boot_id",
-+		.data		=3D &lrng_sysctl_bootid,
-+		.maxlen		=3D 16,
-+		.mode		=3D 0444,
-+		.proc_handler	=3D lrng_proc_do_uuid,
-+	},
-+	{
-+		.procname	=3D "uuid",
-+		.maxlen		=3D 16,
-+		.mode		=3D 0444,
-+		.proc_handler	=3D lrng_proc_do_uuid,
-+	},
-+	{
-+		.procname       =3D "urandom_min_reseed_secs",
-+		.data           =3D &lrng_drng_reseed_max_time,
-+		.maxlen         =3D sizeof(int),
-+		.mode           =3D 0644,
-+		.proc_handler   =3D proc_dointvec,
-+		.extra1		=3D &lrng_drng_reseed_max_min,
-+	},
-+	{ }
++struct lrng_drbg {
++	const char *hash_name;
++	const char *drbg_core;
 +};
 +
-+/* Number of online DRNGs */
-+static u32 numa_drngs =3D 1;
++static const struct lrng_drbg lrng_drbg_types[] =3D {
++	{	/* CTR_DRBG with AES-256 using derivation function */
++		.hash_name =3D "sha512",
++		.drbg_core =3D "drbg_nopr_ctr_aes256",
++	}, {	/* HMAC_DRBG with SHA-512 */
++		.hash_name =3D "sha512",
++		.drbg_core =3D "drbg_nopr_hmac_sha512",
++	}, {	/* Hash_DRBG with SHA-512 using derivation function */
++		.hash_name =3D "sha512",
++		.drbg_core =3D "drbg_nopr_sha512"
++	}
++};
 +
-+void lrng_pool_inc_numa_node(void)
++struct lrng_hash_info {
++	struct shash_desc shash;
++	char ctx[];
++};
++
++static int lrng_drbg_drng_seed_helper(void *drng, const u8 *inbuf, u32 inb=
+uflen)
 +{
-+	numa_drngs++;
++	struct drbg_state *drbg =3D (struct drbg_state *)drng;
++	LIST_HEAD(seedlist);
++	struct drbg_string data;
++	int ret;
++
++	drbg_string_fill(&data, inbuf, inbuflen);
++	list_add_tail(&data.list, &seedlist);
++	ret =3D drbg->d_ops->update(drbg, &seedlist, drbg->seeded);
++
++	if (ret >=3D 0)
++		drbg->seeded =3D true;
++
++	return ret;
 +}
 +
-+static int lrng_proc_type_show(struct seq_file *m, void *v)
++static int lrng_drbg_drng_generate_helper(void *drng, u8 *outbuf, u32 outb=
+uflen)
 +{
-+	struct lrng_drng *lrng_drng_init =3D lrng_drng_init_instance();
-+	unsigned long flags =3D 0;
-+	unsigned char buf[300];
++	struct drbg_state *drbg =3D (struct drbg_state *)drng;
 +
-+	lrng_drng_lock(lrng_drng_init, &flags);
-+	snprintf(buf, sizeof(buf),
-+		 "DRNG name: %s\n"
-+		 "Hash for reading entropy pool: %s\n"
-+		 "DRNG security strength: %d bits\n"
-+		 "number of DRNG instances: %u\n"
-+		 "SP800-90B compliance: %s\n"
-+		 "High-resolution timer: %s\n"
-+		 "LRNG minimally seeded: %s\n"
-+		 "LRNG fully seeded: %s\n",
-+		 lrng_drng_init->crypto_cb->lrng_drng_name(),
-+		 lrng_drng_init->crypto_cb->lrng_hash_name(),
-+		 LRNG_DRNG_SECURITY_STRENGTH_BITS, numa_drngs,
-+		 lrng_sp80090b_compliant() ? "true" : "false",
-+		 lrng_pool_highres_timer() ? "true" : "false",
-+		 lrng_state_min_seeded() ? "true" : "false",
-+		 lrng_state_fully_seeded() ? "true" : "false");
-+	lrng_drng_unlock(lrng_drng_init, &flags);
-+
-+	seq_write(m, buf, strlen(buf));
-+
-+	return 0;
++	return drbg->d_ops->generate(drbg, outbuf, outbuflen, NULL);
 +}
 +
-+static int __init lrng_proc_type_init(void)
++static void *lrng_drbg_drng_alloc(u32 sec_strength)
 +{
-+	proc_create_single("lrng_type", 0444, NULL, &lrng_proc_type_show);
-+	return 0;
++	struct drbg_state *drbg;
++	int coreref =3D -1;
++	bool pr =3D false;
++	int ret;
++
++	drbg_convert_tfm_core(lrng_drbg_types[lrng_drbg_type].drbg_core,
++			      &coreref, &pr);
++	if (coreref < 0)
++		return ERR_PTR(-EFAULT);
++
++	drbg =3D kzalloc(sizeof(struct drbg_state), GFP_KERNEL);
++	if (!drbg)
++		return ERR_PTR(-ENOMEM);
++
++	drbg->core =3D &drbg_cores[coreref];
++	drbg->seeded =3D false;
++	ret =3D drbg_alloc_state(drbg);
++	if (ret)
++		goto err;
++
++	if (sec_strength > drbg_sec_strength(drbg->core->flags)) {
++		pr_err("Security strength of DRBG (%u bits) lower than requested by LRNG=
+ (%u bits)\n",
++			drbg_sec_strength(drbg->core->flags) * 8,
++			sec_strength * 8);
++		goto dealloc;
++	}
++
++	if (sec_strength < drbg_sec_strength(drbg->core->flags))
++		pr_warn("Security strength of DRBG (%u bits) higher than requested by LR=
+NG (%u bits)\n",
++			drbg_sec_strength(drbg->core->flags) * 8,
++			sec_strength * 8);
++
++	pr_info("DRBG with %s core allocated\n", drbg->core->backend_cra_name);
++
++	return drbg;
++
++dealloc:
++	if (drbg->d_ops)
++		drbg->d_ops->crypto_fini(drbg);
++	drbg_dealloc_state(drbg);
++err:
++	kfree(drbg);
++	return ERR_PTR(-EINVAL);
 +}
 +
-+module_init(lrng_proc_type_init);
++static void lrng_drbg_drng_dealloc(void *drng)
++{
++	struct drbg_state *drbg =3D (struct drbg_state *)drng;
++
++	if (drbg && drbg->d_ops)
++		drbg->d_ops->crypto_fini(drbg);
++	drbg_dealloc_state(drbg);
++	kzfree(drbg);
++	pr_info("DRBG deallocated\n");
++}
++
++static void *lrng_drbg_hash_alloc(const u8 *key, u32 keylen)
++{
++	struct lrng_hash_info *lrng_hash;
++	struct crypto_shash *tfm;
++	int size, ret;
++
++	tfm =3D crypto_alloc_shash(lrng_drbg_types[lrng_drbg_type].hash_name,
++				 0, 0);
++	if (IS_ERR(tfm)) {
++		pr_err("could not allocate hash %s\n",
++		       lrng_drbg_types[lrng_drbg_type].hash_name);
++		return ERR_CAST(tfm);
++	}
++
++	size =3D sizeof(struct lrng_hash_info) + crypto_shash_descsize(tfm);
++	lrng_hash =3D kmalloc(size, GFP_KERNEL);
++	if (!lrng_hash) {
++		crypto_free_shash(tfm);
++		return ERR_PTR(-ENOMEM);
++	}
++
++	lrng_hash->shash.tfm =3D tfm;
++
++	/* If the used hash is no MAC, ignore the ENOSYS return code */
++	ret =3D crypto_shash_setkey(tfm, key, keylen);
++	if (ret && ret !=3D -ENOSYS) {
++		pr_err("could not set the key for MAC\n");
++		crypto_free_shash(tfm);
++		kfree(lrng_hash);
++		return ERR_PTR(ret);
++	}
++
++	pr_info("Hash %s allocated\n",
++		lrng_drbg_types[lrng_drbg_type].hash_name);
++
++	return lrng_hash;
++}
++
++static void lrng_drbg_hash_dealloc(void *hash)
++{
++	struct lrng_hash_info *lrng_hash =3D (struct lrng_hash_info *)hash;
++	struct shash_desc *shash =3D &lrng_hash->shash;
++	struct crypto_shash *tfm =3D shash->tfm;
++
++	crypto_free_shash(tfm);
++	kfree(lrng_hash);
++	pr_info("Hash deallocated\n");
++}
++
++static u32 lrng_drbg_hash_digestsize(void *hash)
++{
++	struct lrng_hash_info *lrng_hash =3D (struct lrng_hash_info *)hash;
++	struct shash_desc *shash =3D &lrng_hash->shash;
++
++	return crypto_shash_digestsize(shash->tfm);
++}
++
++static int lrng_drbg_hash_buffer(void *hash, const u8 *inbuf, u32 inbuflen,
++				 u8 *digest)
++{
++	struct lrng_hash_info *lrng_hash =3D (struct lrng_hash_info *)hash;
++	struct shash_desc *shash =3D &lrng_hash->shash;
++
++	return crypto_shash_digest(shash, inbuf, inbuflen, digest);
++}
++
++static const char *lrng_drbg_name(void)
++{
++	return lrng_drbg_types[lrng_drbg_type].drbg_core;
++}
++
++static const char *lrng_hash_name(void)
++{
++	return lrng_drbg_types[lrng_drbg_type].hash_name;
++}
++
++const static struct lrng_crypto_cb lrng_drbg_crypto_cb =3D {
++	.lrng_drng_name			=3D lrng_drbg_name,
++	.lrng_hash_name			=3D lrng_hash_name,
++	.lrng_drng_alloc		=3D lrng_drbg_drng_alloc,
++	.lrng_drng_dealloc		=3D lrng_drbg_drng_dealloc,
++	.lrng_drng_seed_helper		=3D lrng_drbg_drng_seed_helper,
++	.lrng_drng_generate_helper	=3D lrng_drbg_drng_generate_helper,
++	.lrng_hash_alloc		=3D lrng_drbg_hash_alloc,
++	.lrng_hash_dealloc		=3D lrng_drbg_hash_dealloc,
++	.lrng_hash_digestsize		=3D lrng_drbg_hash_digestsize,
++	.lrng_hash_buffer		=3D lrng_drbg_hash_buffer,
++};
++
++static int __init lrng_drbg_init(void)
++{
++	if (lrng_drbg_type >=3D ARRAY_SIZE(lrng_drbg_types)) {
++		pr_err("lrng_drbg_type parameter too large (given %u - max: %lu)",
++		       lrng_drbg_type,
++		       (unsigned long)ARRAY_SIZE(lrng_drbg_types) - 1);
++		return -EAGAIN;
++	}
++	return lrng_set_drng_cb(&lrng_drbg_crypto_cb);
++}
++
++static void __exit lrng_drbg_exit(void)
++{
++	lrng_set_drng_cb(NULL);
++}
++
++late_initcall(lrng_drbg_init);
++module_exit(lrng_drbg_exit);
++MODULE_LICENSE("Dual BSD/GPL");
++MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
++MODULE_DESCRIPTION("Linux Random Number Generator - SP800-90A DRBG backend=
+");
 =2D-=20
 2.26.2
 
