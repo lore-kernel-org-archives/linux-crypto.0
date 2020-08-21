@@ -4,178 +4,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B3DC433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 07:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF51EC433E4
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 07:55:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D8B85207DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 07:55:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 985092184D
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 07:55:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727987AbgHUHzS (ORCPT
+        id S1728227AbgHUHzY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Aug 2020 03:55:18 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:49900 "EHLO fornost.hmeau.com"
+        Fri, 21 Aug 2020 03:55:24 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:49904 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726332AbgHUHzS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726864AbgHUHzS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 21 Aug 2020 03:55:18 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1k91t9-0003tJ-GW; Fri, 21 Aug 2020 17:55:04 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Aug 2020 17:55:03 +1000
-Date:   Fri, 21 Aug 2020 17:55:03 +1000
+        id 1k91tJ-0003tm-59; Fri, 21 Aug 2020 17:55:14 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Aug 2020 17:55:13 +1000
+Date:   Fri, 21 Aug 2020 17:55:13 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] crypto: hifn_795x - switch from 'pci_' to 'dma_' API
-Message-ID: <20200821075503.GA25143@gondor.apana.org.au>
-References: <20200727093027.46331-1-christophe.jaillet@wanadoo.fr>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com
+Subject: Re: [PATCH] crypto: qat - add delay before polling mailbox
+Message-ID: <20200821075513.GB25143@gondor.apana.org.au>
+References: <20200730122742.216566-1-giovanni.cabiddu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200727093027.46331-1-christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20200730122742.216566-1-giovanni.cabiddu@intel.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 27, 2020 at 11:30:27AM +0200, Christophe JAILLET wrote:
-> The wrappers in include/linux/pci-dma-compat.h should go away.
+On Thu, Jul 30, 2020 at 01:27:42PM +0100, Giovanni Cabiddu wrote:
+> The mailbox CSR register has a write latency and requires a delay before
+> being read. This patch replaces readl_poll_timeout with read_poll_timeout
+> that allows to sleep before read.
+> The initial sleep was removed when the mailbox poll loop was replaced with
+> readl_poll_timeout.
 > 
-> The patch has been generated with the coccinelle script below and has been
-> hand modified to replace GFP_ with a correct flag.
-> It has been compile tested.
-> 
-> When memory is allocated in 'hifn_probe()' GFP_KERNEL can be used
-> because it is a probe function and no spin_lock is taken.
-> 
-> @@
-> @@
-> -    PCI_DMA_BIDIRECTIONAL
-> +    DMA_BIDIRECTIONAL
-> 
-> @@
-> @@
-> -    PCI_DMA_TODEVICE
-> +    DMA_TO_DEVICE
-> 
-> @@
-> @@
-> -    PCI_DMA_FROMDEVICE
-> +    DMA_FROM_DEVICE
-> 
-> @@
-> @@
-> -    PCI_DMA_NONE
-> +    DMA_NONE
-> 
-> @@
-> expression e1, e2, e3;
-> @@
-> -    pci_alloc_consistent(e1, e2, e3)
-> +    dma_alloc_coherent(&e1->dev, e2, e3, GFP_)
-> 
-> @@
-> expression e1, e2, e3;
-> @@
-> -    pci_zalloc_consistent(e1, e2, e3)
-> +    dma_alloc_coherent(&e1->dev, e2, e3, GFP_)
-> 
-> @@
-> expression e1, e2, e3, e4;
-> @@
-> -    pci_free_consistent(e1, e2, e3, e4)
-> +    dma_free_coherent(&e1->dev, e2, e3, e4)
-> 
-> @@
-> expression e1, e2, e3, e4;
-> @@
-> -    pci_map_single(e1, e2, e3, e4)
-> +    dma_map_single(&e1->dev, e2, e3, e4)
-> 
-> @@
-> expression e1, e2, e3, e4;
-> @@
-> -    pci_unmap_single(e1, e2, e3, e4)
-> +    dma_unmap_single(&e1->dev, e2, e3, e4)
-> 
-> @@
-> expression e1, e2, e3, e4, e5;
-> @@
-> -    pci_map_page(e1, e2, e3, e4, e5)
-> +    dma_map_page(&e1->dev, e2, e3, e4, e5)
-> 
-> @@
-> expression e1, e2, e3, e4;
-> @@
-> -    pci_unmap_page(e1, e2, e3, e4)
-> +    dma_unmap_page(&e1->dev, e2, e3, e4)
-> 
-> @@
-> expression e1, e2, e3, e4;
-> @@
-> -    pci_map_sg(e1, e2, e3, e4)
-> +    dma_map_sg(&e1->dev, e2, e3, e4)
-> 
-> @@
-> expression e1, e2, e3, e4;
-> @@
-> -    pci_unmap_sg(e1, e2, e3, e4)
-> +    dma_unmap_sg(&e1->dev, e2, e3, e4)
-> 
-> @@
-> expression e1, e2, e3, e4;
-> @@
-> -    pci_dma_sync_single_for_cpu(e1, e2, e3, e4)
-> +    dma_sync_single_for_cpu(&e1->dev, e2, e3, e4)
-> 
-> @@
-> expression e1, e2, e3, e4;
-> @@
-> -    pci_dma_sync_single_for_device(e1, e2, e3, e4)
-> +    dma_sync_single_for_device(&e1->dev, e2, e3, e4)
-> 
-> @@
-> expression e1, e2, e3, e4;
-> @@
-> -    pci_dma_sync_sg_for_cpu(e1, e2, e3, e4)
-> +    dma_sync_sg_for_cpu(&e1->dev, e2, e3, e4)
-> 
-> @@
-> expression e1, e2, e3, e4;
-> @@
-> -    pci_dma_sync_sg_for_device(e1, e2, e3, e4)
-> +    dma_sync_sg_for_device(&e1->dev, e2, e3, e4)
-> 
-> @@
-> expression e1, e2;
-> @@
-> -    pci_dma_mapping_error(e1, e2)
-> +    dma_mapping_error(&e1->dev, e2)
-> 
-> @@
-> expression e1, e2;
-> @@
-> -    pci_set_dma_mask(e1, e2)
-> +    dma_set_mask(&e1->dev, e2)
-> 
-> @@
-> expression e1, e2;
-> @@
-> -    pci_set_consistent_dma_mask(e1, e2)
-> +    dma_set_coherent_mask(&e1->dev, e2)
-> 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> Fixes: a79d471c6510 ("crypto: qat - update timeout logic in put admin msg")
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 > ---
-> If needed, see post from Christoph Hellwig on the kernel-janitors ML:
->    https://marc.info/?l=kernel-janitors&m=158745678307186&w=4
-> ---
->  drivers/crypto/hifn_795x.c | 21 ++++++++++++---------
->  1 file changed, 12 insertions(+), 9 deletions(-)
+>  drivers/crypto/qat/qat_common/adf_admin.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 
 Patch applied.  Thanks.
 -- 
