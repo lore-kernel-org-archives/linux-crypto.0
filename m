@@ -4,64 +4,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 415FFC433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 03:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A57C433E1
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 03:55:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 29A6C2076E
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 03:47:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29CD220714
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 03:55:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727864AbgHUDrt (ORCPT
+        id S1727901AbgHUDzK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Aug 2020 23:47:49 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:49744 "EHLO fornost.hmeau.com"
+        Thu, 20 Aug 2020 23:55:10 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:49752 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727859AbgHUDrt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Aug 2020 23:47:49 -0400
+        id S1727898AbgHUDzF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Aug 2020 23:55:05 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1k8y1l-0008RK-9o; Fri, 21 Aug 2020 13:47:42 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Aug 2020 13:47:41 +1000
-Date:   Fri, 21 Aug 2020 13:47:41 +1000
+        id 1k8y8l-00007s-2V; Fri, 21 Aug 2020 13:54:56 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Aug 2020 13:54:55 +1000
+Date:   Fri, 21 Aug 2020 13:54:55 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Cc:     "Andrei Botila (OSS)" <andrei.botila@oss.nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RESEND 1/9] crypto: caam/jr - add fallback for XTS with
- more than 8B IV
-Message-ID: <20200821034741.GB25442@gondor.apana.org.au>
-References: <20200806163551.14395-1-andrei.botila@oss.nxp.com>
- <20200806163551.14395-2-andrei.botila@oss.nxp.com>
- <fe251307-ba89-a4bc-23f5-205a1e1343ea@nxp.com>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Felipe Balbi <balbi@kernel.org>
+Subject: Re: [build break] aegis128-neon-inner.c fails to build on v5.9-rc1
+Message-ID: <20200821035454.GA25551@gondor.apana.org.au>
+References: <87ft8l1nuo.fsf@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fe251307-ba89-a4bc-23f5-205a1e1343ea@nxp.com>
+In-Reply-To: <87ft8l1nuo.fsf@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 11, 2020 at 05:30:41PM +0300, Horia Geantă wrote:
->
-> > +		if (IS_ERR(fallback)) {
-> > +			pr_err("Failed to allocate %s fallback: %ld\n",
-> > +			       tfm_name, PTR_ERR(fallback));
-> > +			return PTR_ERR(fallback);
-> Shouldn't error out so early. It might be that the fallback won't be needed.
-> Let's postpone this until we're sure fallback is required.
+On Mon, Aug 17, 2020 at 03:03:11PM +0300, Felipe Balbi wrote:
+> 
+> Hi,
+> 
+> I'm not sure if there's already a patch for this, but I notices arm64
+> allmodconfig fails to build with GCC 10.2 as shown below:
+> 
+> crypto/aegis128-neon-inner.c: In function 'crypto_aegis128_init_neon':
+> crypto/aegis128-neon-inner.c:151:3: error: incompatible types when initializing type 'unsigned char' using type 'uint8x16_t'
+>   151 |   k ^ vld1q_u8(const0),
+>       |   ^
+> crypto/aegis128-neon-inner.c:152:3: error: incompatible types when initializing type 'unsigned char' using type 'uint8x16_t'
+>   152 |   k ^ vld1q_u8(const1),
+>       |   ^
+> crypto/aegis128-neon-inner.c:147:29: warning: missing braces around initializer [-Wmissing-braces]
+>   147 |  struct aegis128_state st = {{
+>       |                             ^
+> ......
+>   151 |   k ^ vld1q_u8(const0),
+>       |   {
+>   152 |   k ^ vld1q_u8(const1),
+>   153 |  }};
+>       |  }
+> 
+> Confirmation of GCC version follows:
+> 
+> $ aarch64-linux-gnu-gcc --version
+> aarch64-linux-gnu-gcc (GCC) 10.2.0
+> Copyright (C) 2020 Free Software Foundation, Inc.
+> This is free software; see the source for copying conditions.  There is NO
+> warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-Why? The generic should always be there as otherwise you won't
-even pass the self-test.  If we're OOM then we should error out
-ASAP.
+Ard, can you please take a look at this?
 
-Cheers,
+Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
