@@ -2,82 +2,107 @@ Return-Path: <SRS0=Bmkv=B7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA9FC433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 08:15:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B5C2C433DF
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 10:54:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10BD32078D
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 08:15:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9D0D20656
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 10:54:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1598007273;
+	bh=icq2ihwE52D3z0yseo1An/vISRkCcLVlJ+0+3Svvd1M=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=a/spgoODAz2MlM3N8e+GleyzgjE/gzaXkcy0j5bUAavidHJ4HP1YDf4SW7dkGgjbX
+	 4ohnF5lNBcmM9sMzvSVC85XEZ8exIiegndUSuZcMyGXhADnnx20P8mCPlXwxkSPEjI
+	 xZOWmGMkceZIuWF+ZHqD8I5zMGBAuZuF3xFIJVl8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727101AbgHUIPi (ORCPT
+        id S1727103AbgHUKyd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Aug 2020 04:15:38 -0400
-Received: from spam.zju.edu.cn ([61.164.42.155]:17530 "EHLO zju.edu.cn"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725965AbgHUIPi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Aug 2020 04:15:38 -0400
-Received: by ajax-webmail-mail-app3 (Coremail) ; Fri, 21 Aug 2020 16:15:13
- +0800 (GMT+08:00)
-X-Originating-IP: [10.192.85.18]
-Date:   Fri, 21 Aug 2020 16:15:13 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From:   dinghao.liu@zju.edu.cn
-To:     dinghao.liu@zju.edu.cn, kjlu@umn.edu
-Cc:     "Gilad Ben-Yossef" <gilad@benyossef.com>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Geert Uytterhoeven" <geert+renesas@glider.be>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: ccree - fix runtime PM imbalance on error
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.12 build 20200616(0f5d8152)
- Copyright (c) 2002-2020 www.mailtech.cn zju.edu.cn
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+        Fri, 21 Aug 2020 06:54:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45864 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728114AbgHUKwu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Aug 2020 06:52:50 -0400
+Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C46F7207BB
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Aug 2020 10:52:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1598007169;
+        bh=icq2ihwE52D3z0yseo1An/vISRkCcLVlJ+0+3Svvd1M=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=kujDMC88aqWU4C0Tk0kwpnDNUKwKZBwwDmPG7B3IFHSmxEpYLwEXmqHgVxmsbbhH8
+         rgyDp12x4hYwiL66gMAvZRukU26kAKsHiE25l0ZIV5i4F6R4x7BwkfiXLeWzImQLt3
+         LxMmYLd+9xF/GtL+mBi2ufC2Q/f/t1u4RiOX/tho=
+Received: by mail-oi1-f179.google.com with SMTP id b22so1151884oic.8
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Aug 2020 03:52:49 -0700 (PDT)
+X-Gm-Message-State: AOAM5336fXD2zsxJyLSGtH8AfwDY7ariZ0i7CdW/2jfy/A+q6RgN3XIH
+        TEmIDxKfjQFtNDDOSbKv/+CYyjLNA17nvQR8gYw=
+X-Google-Smtp-Source: ABdhPJwqxKcSXGM61h08yvSgPVUe3PO1fFQINDzUR7PB/HW6ZYWjfZn8kUnDZ4JrzbagBvQRMCLLKQ5YUYTONN5BiXI=
+X-Received: by 2002:aca:d8c5:: with SMTP id p188mr1247174oig.47.1598007169142;
+ Fri, 21 Aug 2020 03:52:49 -0700 (PDT)
 MIME-Version: 1.0
-Message-ID: <5fe48e8a.e845.1741016074a.Coremail.dinghao.liu@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID: cC_KCgBH_96Rgj9fyzj9Ag--.45498W
-X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgoSBlZdtPnBhAAns4
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJTRUUUbAIS07vEb7Iv0x
-        C_Cr1lV2xY67kC6x804xWlV2xY67CY07I20VC2zVCF04k26cxKx2IYs7xG6rWj6s0DMIAI
-        bVAFxVCF77xC64kEw24lV2xY67C26IkvcIIF6IxKo4kEV4ylV2xY628lY4IE4IxF12IF4w
-        CS07vE84x0c7CEj48ve4kI8wCS07vE84ACjcxK6xIIjxv20xvE14v26w1j6s0DMIAIbVA2
-        z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UMIAIbVA2z4x0Y4vEx4A2jsIE14v26r
-        xl6s0DMIAIbVA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lV2xY62AIxVAIcxkEcVAq
-        07x20xvEncxIr21lV2xY6c02F40EFcxC0VAKzVAqx4xG6I80ewCS07vEYx0E2Ix0cI8IcV
-        AFwI0_JrI_JrylV2xY6cIj6I8E87Iv67AKxVWUJVW8JwCS07vEOx8S6xCaFVCjc4AY6r1j
-        6r4UMIAIbVACjI8F5VA0II8E6IAqYI8I648v4I1lV2xY6x02cVAKzwCS07vEc2IjII80xc
-        xEwVAKI48JMIAIbVCF04k20xvE74AGY7Cv6cx26r4fKr1UJr1lV2xY6xCjnVCjjxCrMIAI
-        bVCFx2IqxVCFs4IE7xkEbVWUJVW8JwCS07vEx2IqxVAqx4xG67AKxVWUJVWUGwCS07vEx2
-        IqxVCjr7xvwVAFwI0_JrI_JrWlV2xY6I8E67AF67kF1VAFwI0_Jw0_GFylV2xY6IIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lV2xY6IIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCS07
-        vEIxAIcVCF04k26cxKx2IYs7xG6Fyj6rWUJwCS07vEIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-        V2xY6IIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU=
+References: <87ft8l1nuo.fsf@kernel.org> <20200821035454.GA25551@gondor.apana.org.au>
+In-Reply-To: <20200821035454.GA25551@gondor.apana.org.au>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Fri, 21 Aug 2020 12:52:38 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXGwAjrhgFt7ayO=S0UMdDu2KSqv=4R22poGRj_HDhQqRw@mail.gmail.com>
+Message-ID: <CAMj1kXGwAjrhgFt7ayO=S0UMdDu2KSqv=4R22poGRj_HDhQqRw@mail.gmail.com>
+Subject: Re: [build break] aegis128-neon-inner.c fails to build on v5.9-rc1
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Felipe Balbi <balbi@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-cG1fcnVudGltZV9nZXRfc3luYygpIGluY3JlbWVudHMgdGhlIHJ1bnRpbWUgUE0gdXNhZ2UgY291
-bnRlcgpldmVuIHdoZW4gaXQgcmV0dXJucyBhbiBlcnJvciBjb2RlLiBIb3dldmVyLCB1c2VycyBv
-ZiBjY19wbV9nZXQoKSwKYSBkaXJlY3Qgd3JhcHBlciBvZiBwbV9ydW50aW1lX2dldF9zeW5jKCks
-IGFzc3VtZSB0aGF0IFBNIHVzYWdlCmNvdW50ZXIgd2lsbCBub3QgY2hhbmdlIG9uIGVycm9yLiBU
-aHVzIGEgcGFpcmluZyBkZWNyZW1lbnQgaXMgbmVlZGVkCm9uIHRoZSBlcnJvciBoYW5kbGluZyBw
-YXRoIHRvIGtlZXAgdGhlIGNvdW50ZXIgYmFsYW5jZWQuCgpGaXhlczogOGM3ODQ5YTMwMjU1YyAo
-ImNyeXB0bzogY2NyZWUgLSBzaW1wbGlmeSBSdW50aW1lIFBNIGhhbmRsaW5nIikKU2lnbmVkLW9m
-Zi1ieTogRGluZ2hhbyBMaXUgPGRpbmdoYW8ubGl1QHpqdS5lZHUuY24+Ci0tLQogZHJpdmVycy9j
-cnlwdG8vY2NyZWUvY2NfcG0uYyB8IDYgKysrKystCiAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRp
-b25zKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vY2NyZWUv
-Y2NfcG0uYyBiL2RyaXZlcnMvY3J5cHRvL2NjcmVlL2NjX3BtLmMKaW5kZXggZDM5ZTE2NjRmYzdl
-Li4zYzY1YmYwNzBjOTAgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvY3J5cHRvL2NjcmVlL2NjX3BtLmMK
-KysrIGIvZHJpdmVycy9jcnlwdG8vY2NyZWUvY2NfcG0uYwpAQCAtNjUsOCArNjUsMTIgQEAgY29u
-c3Qgc3RydWN0IGRldl9wbV9vcHMgY2NyZWVfcG0gPSB7CiBpbnQgY2NfcG1fZ2V0KHN0cnVjdCBk
-ZXZpY2UgKmRldikKIHsKIAlpbnQgcmMgPSBwbV9ydW50aW1lX2dldF9zeW5jKGRldik7CisJaWYg
-KHJjIDwgMCkgeworCQlwbV9ydW50aW1lX3B1dF9ub2lkbGUoZGV2KTsKKwkJcmV0dXJuIHJjOwor
-CX0KIAotCXJldHVybiAocmMgPT0gMSA/IDAgOiByYyk7CisJcmV0dXJuIDA7CiB9CiAKIHZvaWQg
-Y2NfcG1fcHV0X3N1c3BlbmQoc3RydWN0IGRldmljZSAqZGV2KQotLSAKMi4xNy4xCg==
+On Fri, 21 Aug 2020 at 05:55, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Mon, Aug 17, 2020 at 03:03:11PM +0300, Felipe Balbi wrote:
+> >
+> > Hi,
+> >
+> > I'm not sure if there's already a patch for this, but I notices arm64
+> > allmodconfig fails to build with GCC 10.2 as shown below:
+> >
+> > crypto/aegis128-neon-inner.c: In function 'crypto_aegis128_init_neon':
+> > crypto/aegis128-neon-inner.c:151:3: error: incompatible types when initializing type 'unsigned char' using type 'uint8x16_t'
+> >   151 |   k ^ vld1q_u8(const0),
+> >       |   ^
+> > crypto/aegis128-neon-inner.c:152:3: error: incompatible types when initializing type 'unsigned char' using type 'uint8x16_t'
+> >   152 |   k ^ vld1q_u8(const1),
+> >       |   ^
+> > crypto/aegis128-neon-inner.c:147:29: warning: missing braces around initializer [-Wmissing-braces]
+> >   147 |  struct aegis128_state st = {{
+> >       |                             ^
+> > ......
+> >   151 |   k ^ vld1q_u8(const0),
+> >       |   {
+> >   152 |   k ^ vld1q_u8(const1),
+> >   153 |  }};
+> >       |  }
+> >
+> > Confirmation of GCC version follows:
+> >
+> > $ aarch64-linux-gnu-gcc --version
+> > aarch64-linux-gnu-gcc (GCC) 10.2.0
+> > Copyright (C) 2020 Free Software Foundation, Inc.
+> > This is free software; see the source for copying conditions.  There is NO
+> > warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+>
+> Ard, can you please take a look at this?
+>
+
+This is a known regression in GCC [0] that has already been fixed. GCC
+10.3 should work fine.
+
+
+[0] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96377
