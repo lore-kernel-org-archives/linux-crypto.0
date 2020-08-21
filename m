@@ -2,66 +2,75 @@ Return-Path: <SRS0=Bmkv=B7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.2 required=3.0 tests=BAYES_50,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF5BC433E1
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 06:50:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79DBCC433E1
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 06:52:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B099E207DA
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 06:50:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AF1320748
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Aug 2020 06:52:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=217software.com header.i=@217software.com header.b="k6fSoNrr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726373AbgHUGu1 (ORCPT
+        id S1726805AbgHUGwg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Aug 2020 02:50:27 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54756 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726119AbgHUGu0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Aug 2020 02:50:26 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 6486AB663;
-        Fri, 21 Aug 2020 06:50:53 +0000 (UTC)
-Date:   Fri, 21 Aug 2020 08:50:24 +0200
-From:   Petr Vorel <pvorel@suse.cz>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     ltp@lists.linux.it, linux-crypto@vger.kernel.org
-Subject: Re: [LTP] [LTP PATCH 0/2] ltp: fix af_alg02 to specify control data
-Message-ID: <20200821065024.GA11908@dell5510>
-Reply-To: Petr Vorel <pvorel@suse.cz>
-References: <20200820181918.404758-1-ebiggers@kernel.org>
+        Fri, 21 Aug 2020 02:52:36 -0400
+Received: from namespro.ca ([176.123.3.97]:47992 "EHLO e6.217software.com"
+        rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1726119AbgHUGwg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Aug 2020 02:52:36 -0400
+X-Greylist: delayed 366 seconds by postgrey-1.27 at vger.kernel.org; Fri, 21 Aug 2020 02:52:35 EDT
+DKIM-Filter: OpenDKIM Filter v2.11.0 e6.217software.com 96582638F6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=217software.com;
+        s=e6; t=1597992384; bh=NgfoPHdq15xyg/sUzL6Zbmtg5kvjOex+vo39Hq11dek=;
+        h=Date:Subject:From:Reply-To:To:List-Unsubscribe:List-Id:From;
+        b=k6fSoNrraktyhYi6l8mFMUtW1dggUGiqBKa/jtzC7C/Dthxaxqd0Y4BUWq+YZ6a/N
+         KKhOknLr2+jQuHq544qFsgBcOe7xyrcCMo4XtJ3DkCxTHhxK5C+fdpDV/1kPn71s6x
+         e8SGP3lOzuCv7hLo82J6SNJwVvCj3sk3+aEyXZk0=
+Message-ID: <6552cfd3c99365fbf98f921739a801bc@217software.com>
+Date:   Fri, 21 Aug 2020 06:46:07 +0000
+Subject: Fwd: Re: Could You please send us hosting comparison website?
+From:   John <info@217software.com>
+Reply-To: John <info@217software.com>
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200820181918.404758-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Sender: info@217software.com
+X-Receiver: linux-crypto@vger.kernel.org
+X-Fjla-Tracking-Did: 0
+X-Fjla-Subscriber-Uid: qc480nq87bab1
+X-Fjla-Mailer: SwiftMailer - 5.4.x
+X-Fjla-Delivery-Sid: 7
+X-Fjla-Customer-Uid: gx0582et0060f
+X-Fjla-Customer-Gid: 0
+X-Fjla-Campaign-Uid: yb0822fonl9c3
+Feedback-ID: yb0822fonl9c3:qc480nq87bab1:cs4233gcj53de:gx0582et0060f
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+On 2020-08-12 13:22, John wrote:
+> Great! I am going to forward it to my =
+programmer.
+>=20
+> On 2020-08-12 13:28, Kris wrote:
+>> Hello John,
+>>=
 
-> It isn't clearly defined what happens if you read from an AF_ALG request
-> socket without previously sending the control data to begin an
-> encryption or decryption operation.  On some kernels the read will
-> return 0, while on others it will block.
-
-> Testing this corner case isn't the purpose of af_alg02; it just wants to
-> try to encrypt a zero-length message.  So, change it to explicitly send
-> a zero-length message with control data.
-
-> This fixes the test failure reported at
-> https://lkml.kernel.org/r/CA+G9fYtebf78TH-XpqArunHc1L6s9mHdLEbpY1EY9tSyDjp=sg@mail.gmail.com
-
-> Fixing the test in this way was also previously suggested at
-> https://lkml.kernel.org/r/20200702033221.GA19367@gondor.apana.org.au
-
-> Note, this patch doesn't change the fact that the read() still blocks on
-> pre-4.14 kernels (which is a kernel bug), and thus the timeout logic in
-> the test is still needed.
-
-Thanks for the fix, merged!
-
-Kind regards,
-Petr
+>> Okay, there it is- wedo.love/hostingcompare
+>>=20
+>> On 2020-08-12 =
+13:33, John wrote:
+>>> Hello Kris,
+>>>=20
+>>> We are going to start thr=
+ee php web-pages projects so we are going to need web hosting, could You pl=
+ease mail me that webhosting compare website, that You specified some time =
+ago?
+>>>=20
+>>=20
+>
