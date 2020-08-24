@@ -4,24 +4,24 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02BCDC433DF
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Aug 2020 03:15:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E397C433E1
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Aug 2020 03:15:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DBA3C20825
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Aug 2020 03:15:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E68AB2078D
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Aug 2020 03:15:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727068AbgHXDPI (ORCPT
+        id S1728057AbgHXDO2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 23 Aug 2020 23:15:08 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:43142 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726635AbgHXDO2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Sun, 23 Aug 2020 23:14:28 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:43198 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727988AbgHXDO1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 23 Aug 2020 23:14:27 -0400
 Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 9B942A25CDD7E3D71389;
+        by Forcepoint Email with ESMTP id AD08D5212EA393867AEE;
         Mon, 24 Aug 2020 11:14:24 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
@@ -30,9 +30,9 @@ From:   Yang Shen <shenyang39@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH RESEND 08/10] crypto: hisilicon/zip - move some private macros from 'zip.h' to 'zip_crypto.c'
-Date:   Mon, 24 Aug 2020 11:11:47 +0800
-Message-ID: <1598238709-58699-9-git-send-email-shenyang39@huawei.com>
+Subject: [PATCH RESEND 05/10] crypto: hisilicon/zip - use a enum parameter instead of some macros
+Date:   Mon, 24 Aug 2020 11:11:44 +0800
+Message-ID: <1598238709-58699-6-git-send-email-shenyang39@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1598238709-58699-1-git-send-email-shenyang39@huawei.com>
 References: <1598238709-58699-1-git-send-email-shenyang39@huawei.com>
@@ -45,67 +45,93 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Some macros which are defined in 'zip.h' are related to the struct
-'hisi_zip_sqe' and are only used in 'zip_crypto.c'. So move them from
-'zip.h' to 'zip_crypto.c'.
+Macros 'QPC_COMP', 'QPC_DECOMP' and 'HZIP_CTX_Q_NUM' are relative and
+incremental. So, use an enum instead.
 
 Signed-off-by: Yang Shen <shenyang39@huawei.com>
 Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 ---
- drivers/crypto/hisilicon/zip/zip.h        | 14 --------------
- drivers/crypto/hisilicon/zip/zip_crypto.c | 14 ++++++++++++++
- 2 files changed, 14 insertions(+), 14 deletions(-)
+ drivers/crypto/hisilicon/zip/zip_crypto.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/zip/zip.h b/drivers/crypto/hisilicon/zip/zip.h
-index 4b3aae8..92397f9 100644
---- a/drivers/crypto/hisilicon/zip/zip.h
-+++ b/drivers/crypto/hisilicon/zip/zip.h
-@@ -9,20 +9,6 @@
- #include <linux/list.h>
- #include "../qm.h"
- 
--/* hisi_zip_sqe dw3 */
--#define HZIP_BD_STATUS_M			GENMASK(7, 0)
--/* hisi_zip_sqe dw7 */
--#define HZIP_IN_SGE_DATA_OFFSET_M		GENMASK(23, 0)
--/* hisi_zip_sqe dw8 */
--#define HZIP_OUT_SGE_DATA_OFFSET_M		GENMASK(23, 0)
--/* hisi_zip_sqe dw9 */
--#define HZIP_REQ_TYPE_M				GENMASK(7, 0)
--#define HZIP_ALG_TYPE_ZLIB			0x02
--#define HZIP_ALG_TYPE_GZIP			0x03
--#define HZIP_BUF_TYPE_M				GENMASK(11, 8)
--#define HZIP_PBUFFER				0x0
--#define HZIP_SGL				0x1
--
- enum hisi_zip_error_type {
- 	/* negative compression */
- 	HZIP_NC_ERR = 0x0d,
 diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-index fdc5bd3..7757e33 100644
+index aba1600..c2ea849 100644
 --- a/drivers/crypto/hisilicon/zip/zip_crypto.c
 +++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-@@ -6,6 +6,20 @@
- #include <linux/scatterlist.h>
- #include "zip.h"
+@@ -19,7 +19,6 @@
+ #define GZIP_HEAD_FEXTRA_XLEN			2
+ #define GZIP_HEAD_FHCRC_SIZE			2
  
-+/* hisi_zip_sqe dw3 */
-+#define HZIP_BD_STATUS_M			GENMASK(7, 0)
-+/* hisi_zip_sqe dw7 */
-+#define HZIP_IN_SGE_DATA_OFFSET_M		GENMASK(23, 0)
-+/* hisi_zip_sqe dw8 */
-+#define HZIP_OUT_SGE_DATA_OFFSET_M		GENMASK(23, 0)
-+/* hisi_zip_sqe dw9 */
-+#define HZIP_REQ_TYPE_M				GENMASK(7, 0)
-+#define HZIP_ALG_TYPE_ZLIB			0x02
-+#define HZIP_ALG_TYPE_GZIP			0x03
-+#define HZIP_BUF_TYPE_M				GENMASK(11, 8)
-+#define HZIP_PBUFFER				0x0
-+#define HZIP_SGL				0x1
+-#define HZIP_CTX_Q_NUM				2
+ #define HZIP_GZIP_HEAD_BUF			256
+ #define HZIP_ALG_PRIORITY			300
+ #define HZIP_SGL_SGE_NR				10
+@@ -32,6 +31,12 @@ enum hisi_zip_alg_type {
+ 	HZIP_ALG_TYPE_DECOMP = 1,
+ };
+ 
++enum {
++	HZIP_QPC_COMP,
++	HZIP_QPC_DECOMP,
++	HZIP_CTX_Q_NUM
++};
 +
- #define HZIP_ZLIB_HEAD_SIZE			2
- #define HZIP_GZIP_HEAD_SIZE			10
+ #define COMP_NAME_TO_TYPE(alg_name)					\
+ 	(!strcmp((alg_name), "zlib-deflate") ? HZIP_ALG_TYPE_ZLIB :	\
+ 	 !strcmp((alg_name), "gzip") ? HZIP_ALG_TYPE_GZIP : 0)		\
+@@ -71,8 +76,6 @@ struct hisi_zip_qp_ctx {
+ };
  
+ struct hisi_zip_ctx {
+-#define QPC_COMP	0
+-#define QPC_DECOMP	1
+ 	struct hisi_zip_qp_ctx qp_ctx[HZIP_CTX_Q_NUM];
+ };
+ 
+@@ -264,11 +267,11 @@ static int hisi_zip_create_req_q(struct hisi_zip_ctx *ctx)
+ 	return 0;
+ 
+ err_free_loop1:
+-	kfree(ctx->qp_ctx[QPC_DECOMP].req_q.req_bitmap);
++	kfree(ctx->qp_ctx[HZIP_QPC_DECOMP].req_q.req_bitmap);
+ err_free_loop0:
+-	kfree(ctx->qp_ctx[QPC_COMP].req_q.q);
++	kfree(ctx->qp_ctx[HZIP_QPC_COMP].req_q.q);
+ err_free_bitmap:
+-	kfree(ctx->qp_ctx[QPC_COMP].req_q.req_bitmap);
++	kfree(ctx->qp_ctx[HZIP_QPC_COMP].req_q.req_bitmap);
+ 	return ret;
+ }
+ 
+@@ -303,8 +306,8 @@ static int hisi_zip_create_sgl_pool(struct hisi_zip_ctx *ctx)
+ 	return 0;
+ 
+ err_free_sgl_pool0:
+-	hisi_acc_free_sgl_pool(&ctx->qp_ctx[QPC_COMP].qp->qm->pdev->dev,
+-			       ctx->qp_ctx[QPC_COMP].sgl_pool);
++	hisi_acc_free_sgl_pool(&ctx->qp_ctx[HZIP_QPC_COMP].qp->qm->pdev->dev,
++			       ctx->qp_ctx[HZIP_QPC_COMP].sgl_pool);
+ 	return -ENOMEM;
+ }
+ 
+@@ -539,7 +542,7 @@ static int hisi_zip_do_work(struct hisi_zip_req *req,
+ static int hisi_zip_acompress(struct acomp_req *acomp_req)
+ {
+ 	struct hisi_zip_ctx *ctx = crypto_tfm_ctx(acomp_req->base.tfm);
+-	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[QPC_COMP];
++	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[HZIP_QPC_COMP];
+ 	struct hisi_zip_req *req;
+ 	int head_size;
+ 	int ret;
+@@ -563,7 +566,7 @@ static int hisi_zip_acompress(struct acomp_req *acomp_req)
+ static int hisi_zip_adecompress(struct acomp_req *acomp_req)
+ {
+ 	struct hisi_zip_ctx *ctx = crypto_tfm_ctx(acomp_req->base.tfm);
+-	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[QPC_DECOMP];
++	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[HZIP_QPC_DECOMP];
+ 	struct hisi_zip_req *req;
+ 	size_t head_size;
+ 	int ret;
 -- 
 2.7.4
 
