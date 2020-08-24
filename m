@@ -2,136 +2,121 @@ Return-Path: <SRS0=tkOt=CC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E397C433E1
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Aug 2020 03:15:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1023C433DF
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Aug 2020 08:29:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E68AB2078D
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Aug 2020 03:15:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B768520738
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Aug 2020 08:29:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728057AbgHXDO2 (ORCPT
+        id S1726104AbgHXI3m convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 23 Aug 2020 23:14:28 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:43198 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727988AbgHXDO1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 23 Aug 2020 23:14:27 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id AD08D5212EA393867AEE;
-        Mon, 24 Aug 2020 11:14:24 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 24 Aug 2020 11:14:15 +0800
-From:   Yang Shen <shenyang39@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH RESEND 05/10] crypto: hisilicon/zip - use a enum parameter instead of some macros
-Date:   Mon, 24 Aug 2020 11:11:44 +0800
-Message-ID: <1598238709-58699-6-git-send-email-shenyang39@huawei.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1598238709-58699-1-git-send-email-shenyang39@huawei.com>
+        Mon, 24 Aug 2020 04:29:42 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:38798 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726037AbgHXI3k (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 Aug 2020 04:29:40 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-138-5TvUt1XsPpyGpCaE1czwzg-1; Mon, 24 Aug 2020 09:29:37 +0100
+X-MC-Unique: 5TvUt1XsPpyGpCaE1czwzg-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Mon, 24 Aug 2020 09:29:36 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Mon, 24 Aug 2020 09:29:36 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Yang Shen' <shenyang39@huawei.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "xuzaibo@huawei.com" <xuzaibo@huawei.com>,
+        "wangzhou1@hisilicon.com" <wangzhou1@hisilicon.com>
+Subject: RE: [PATCH RESEND 04/10] crypto: hisilicon/zip - replace 'sprintf'
+ with 'scnprintf'
+Thread-Topic: [PATCH RESEND 04/10] crypto: hisilicon/zip - replace 'sprintf'
+ with 'scnprintf'
+Thread-Index: AQHWecS3Jx83/+rMLUuKUpSHllsCl6lG7Xzg
+Date:   Mon, 24 Aug 2020 08:29:36 +0000
+Message-ID: <d1102aca2bdc4df4acc31d8b082cacce@AcuMS.aculab.com>
 References: <1598238709-58699-1-git-send-email-shenyang39@huawei.com>
+ <1598238709-58699-5-git-send-email-shenyang39@huawei.com>
+In-Reply-To: <1598238709-58699-5-git-send-email-shenyang39@huawei.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-CFilter-Loop: Reflected
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: aculab.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Macros 'QPC_COMP', 'QPC_DECOMP' and 'HZIP_CTX_Q_NUM' are relative and
-incremental. So, use an enum instead.
+From: Yang Shen
+> Sent: 24 August 2020 04:12
+> 
+> Replace 'sprintf' with 'scnprintf' to avoid overrun.
+> 
+> Signed-off-by: Yang Shen <shenyang39@huawei.com>
+> Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
+> ---
+>  drivers/crypto/hisilicon/zip/zip_main.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+> index df1a16f..1883d1b 100644
+> --- a/drivers/crypto/hisilicon/zip/zip_main.c
+> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
+> @@ -428,7 +428,7 @@ static ssize_t hisi_zip_ctrl_debug_read(struct file *filp, char __user *buf,
+>  		return -EINVAL;
+>  	}
+>  	spin_unlock_irq(&file->lock);
+> -	ret = sprintf(tbuf, "%u\n", val);
+> +	ret = scnprintf(tbuf, HZIP_BUF_SIZE, "%u\n", val);
 
-Signed-off-by: Yang Shen <shenyang39@huawei.com>
-Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
----
- drivers/crypto/hisilicon/zip/zip_crypto.c | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
+Should that be sizeof (tbuf).
 
-diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-index aba1600..c2ea849 100644
---- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-+++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-@@ -19,7 +19,6 @@
- #define GZIP_HEAD_FEXTRA_XLEN			2
- #define GZIP_HEAD_FHCRC_SIZE			2
- 
--#define HZIP_CTX_Q_NUM				2
- #define HZIP_GZIP_HEAD_BUF			256
- #define HZIP_ALG_PRIORITY			300
- #define HZIP_SGL_SGE_NR				10
-@@ -32,6 +31,12 @@ enum hisi_zip_alg_type {
- 	HZIP_ALG_TYPE_DECOMP = 1,
- };
- 
-+enum {
-+	HZIP_QPC_COMP,
-+	HZIP_QPC_DECOMP,
-+	HZIP_CTX_Q_NUM
-+};
-+
- #define COMP_NAME_TO_TYPE(alg_name)					\
- 	(!strcmp((alg_name), "zlib-deflate") ? HZIP_ALG_TYPE_ZLIB :	\
- 	 !strcmp((alg_name), "gzip") ? HZIP_ALG_TYPE_GZIP : 0)		\
-@@ -71,8 +76,6 @@ struct hisi_zip_qp_ctx {
- };
- 
- struct hisi_zip_ctx {
--#define QPC_COMP	0
--#define QPC_DECOMP	1
- 	struct hisi_zip_qp_ctx qp_ctx[HZIP_CTX_Q_NUM];
- };
- 
-@@ -264,11 +267,11 @@ static int hisi_zip_create_req_q(struct hisi_zip_ctx *ctx)
- 	return 0;
- 
- err_free_loop1:
--	kfree(ctx->qp_ctx[QPC_DECOMP].req_q.req_bitmap);
-+	kfree(ctx->qp_ctx[HZIP_QPC_DECOMP].req_q.req_bitmap);
- err_free_loop0:
--	kfree(ctx->qp_ctx[QPC_COMP].req_q.q);
-+	kfree(ctx->qp_ctx[HZIP_QPC_COMP].req_q.q);
- err_free_bitmap:
--	kfree(ctx->qp_ctx[QPC_COMP].req_q.req_bitmap);
-+	kfree(ctx->qp_ctx[HZIP_QPC_COMP].req_q.req_bitmap);
- 	return ret;
- }
- 
-@@ -303,8 +306,8 @@ static int hisi_zip_create_sgl_pool(struct hisi_zip_ctx *ctx)
- 	return 0;
- 
- err_free_sgl_pool0:
--	hisi_acc_free_sgl_pool(&ctx->qp_ctx[QPC_COMP].qp->qm->pdev->dev,
--			       ctx->qp_ctx[QPC_COMP].sgl_pool);
-+	hisi_acc_free_sgl_pool(&ctx->qp_ctx[HZIP_QPC_COMP].qp->qm->pdev->dev,
-+			       ctx->qp_ctx[HZIP_QPC_COMP].sgl_pool);
- 	return -ENOMEM;
- }
- 
-@@ -539,7 +542,7 @@ static int hisi_zip_do_work(struct hisi_zip_req *req,
- static int hisi_zip_acompress(struct acomp_req *acomp_req)
- {
- 	struct hisi_zip_ctx *ctx = crypto_tfm_ctx(acomp_req->base.tfm);
--	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[QPC_COMP];
-+	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[HZIP_QPC_COMP];
- 	struct hisi_zip_req *req;
- 	int head_size;
- 	int ret;
-@@ -563,7 +566,7 @@ static int hisi_zip_acompress(struct acomp_req *acomp_req)
- static int hisi_zip_adecompress(struct acomp_req *acomp_req)
- {
- 	struct hisi_zip_ctx *ctx = crypto_tfm_ctx(acomp_req->base.tfm);
--	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[QPC_DECOMP];
-+	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[HZIP_QPC_DECOMP];
- 	struct hisi_zip_req *req;
- 	size_t head_size;
- 	int ret;
--- 
-2.7.4
+>  	return simple_read_from_buffer(buf, count, pos, tbuf, ret);
+>  }
+> 
+> @@ -514,13 +514,16 @@ static int hisi_zip_core_debug_init(struct hisi_qm *qm)
+>  	struct debugfs_regset32 *regset;
+>  	struct dentry *tmp_d;
+>  	char buf[HZIP_BUF_SIZE];
+> -	int i;
+> +	int i, ret;
+> 
+>  	for (i = 0; i < HZIP_CORE_NUM; i++) {
+>  		if (i < HZIP_COMP_CORE_NUM)
+> -			sprintf(buf, "comp_core%d", i);
+> +			ret = scnprintf(buf, HZIP_BUF_SIZE, "comp_core%d", i);
+>  		else
+> -			sprintf(buf, "decomp_core%d", i - HZIP_COMP_CORE_NUM);
+> +			ret = scnprintf(buf, HZIP_BUF_SIZE, "decomp_core%d",
+> +					i - HZIP_COMP_CORE_NUM);
+> +		if (!ret)
+> +			return -ENOMEM;
+
+and that is just so wrong - did you even try to test
+the 'buffer too small' code path?
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
