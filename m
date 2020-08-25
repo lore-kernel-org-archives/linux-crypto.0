@@ -2,100 +2,87 @@ Return-Path: <SRS0=bFPd=CD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE4CC433E5
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Aug 2020 14:04:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A83EC433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Aug 2020 22:31:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2ED3520786
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Aug 2020 14:04:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E0F392078A
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Aug 2020 22:31:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598364252;
-	bh=JUtbshDiaqT1abUNYm22UsrMzF65PvCYAKmKkgX37is=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=pie2QEtoW7C8ufYjk3hYyZnEdoYkVlAfTnlCCPkIRSmhofGE3IiPqRPMIVg7Xo/VM
-	 JOzfNp86x+ddNmDLovroMY2CtpoyvuNaaijqRHNulouovOdBfnZ5sFpCyWkgfSCD9L
-	 1tHKcPzIjIg4fnFTxLbRktKO+BKP/JqbYdRaLSv4=
+	s=default; t=1598394664;
+	bh=z+dW/Dk2HuqyH9YG2emBzVCYZUcjJjon+WxJrm8OBeQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Tzx6N/CfT9BWCacLkI0kDdbROZt5i+xm8CIcGGin/1zFRs81rQuZCFfLfQ57IB+PF
+	 I5/zh/0/MozUdogeAM95Qoq/4p273O3s1nUCOPYgKDqv70vgvfcZFTudgpQJvdPtc9
+	 kQ5cgz1OHIf0ItKrFqkMOzZDrQyvgx87ZF8wL8XI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726661AbgHYODl (ORCPT
+        id S1726627AbgHYWbD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Aug 2020 10:03:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42354 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726513AbgHYN71 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Aug 2020 09:59:27 -0400
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D688F2075F
-        for <linux-crypto@vger.kernel.org>; Tue, 25 Aug 2020 13:59:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598363967;
-        bh=JUtbshDiaqT1abUNYm22UsrMzF65PvCYAKmKkgX37is=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=WCXNF2cgC8BTqW48R2a4J7798vAgaKoERgWz8F6WZGl9gQ+5r+U1sfVV8p4hPzyQn
-         7CW0X5B5BAF1y9FdNQj8tbPfWByeV9zTYP/H9gDJTDWHwilLnwx+F2G0WLwBVjZ38K
-         9mfcZJhj4GJ5JuoZY+KnO/F5L9mLD36/eVKmjzrM=
-Received: by mail-oi1-f169.google.com with SMTP id b9so8239257oiy.3
-        for <linux-crypto@vger.kernel.org>; Tue, 25 Aug 2020 06:59:26 -0700 (PDT)
-X-Gm-Message-State: AOAM530mtI86sjju57GR8Fk6cl422BBa848dhf+AJHho07F5DpalB6tO
-        5QNr0szsxjuQSW9SK+9Ri4xRVIxURarDSDxUxQo=
-X-Google-Smtp-Source: ABdhPJy3nEfd6uI97/6QE72ErSZH4qiw9sQ+yjnPjzpbfrf+4FPUFC4/ZHF0KynKlWRV9NYzKr9rCOZDDvISbd4+yY0=
-X-Received: by 2002:a05:6808:b37:: with SMTP id t23mr1131302oij.174.1598363966153;
- Tue, 25 Aug 2020 06:59:26 -0700 (PDT)
+        Tue, 25 Aug 2020 18:31:03 -0400
+Received: from mail-il1-f193.google.com ([209.85.166.193]:42109 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726466AbgHYWbD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Aug 2020 18:31:03 -0400
+Received: by mail-il1-f193.google.com with SMTP id t13so129765ile.9;
+        Tue, 25 Aug 2020 15:31:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=h4tUZsr/X9gXdVhjxFy0H5zbHwJI3zcI8QcQyVbx9I0=;
+        b=BYeU26WnEyFyiEUpa1ObGVU8Cieng4GsC0PE3Edo4Nd2gxEsty8cCPUR0H6gSZeBPD
+         amQ90NYep4ca/QnCdEn9uPX7t4yh9hGR4r+xzQKVHo385fWPzaNEwcfUJJ8jpY8WGYk1
+         YXPRTYXML3yynA8/H/x3iAlTjvJGUlCz7+E1KYBjp8yYjovuRjWKTyHARFQ1smZg2JA4
+         PcOH6nbCdllOCVuK32GSZh6k8no2CK/LrphD1lEB46W4XiMVo9fSvua4KojbaqYrEGz9
+         qAH8hQmVbq+boqaWqST7GP7W0R/Rk+o/Wul1zjoOFQl0pdL+sL50woyFXIr/w31Jdd80
+         sieQ==
+X-Gm-Message-State: AOAM532jcl5534yUybbepobD5rD/EfkrIFnfHpFVeGqYlwAPun4OxSed
+        vZ3NO0KPHIku+p2fVk6gAQ==
+X-Google-Smtp-Source: ABdhPJyazsdm1gv2zMikw/TSnPVcGsz9EOATW/XvykrPwtm7YbAyy6DyuYhm/XRYFuQtuAc863QAUw==
+X-Received: by 2002:a92:d2c1:: with SMTP id w1mr9794907ilg.273.1598394662161;
+        Tue, 25 Aug 2020 15:31:02 -0700 (PDT)
+Received: from xps15 ([64.188.179.249])
+        by smtp.gmail.com with ESMTPSA id d12sm234579ilq.34.2020.08.25.15.31.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Aug 2020 15:31:01 -0700 (PDT)
+Received: (nullmailer pid 1464307 invoked by uid 1000);
+        Tue, 25 Aug 2020 22:31:00 -0000
+Date:   Tue, 25 Aug 2020 16:31:00 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Atte Tommiska <atte.tommiska@xiphera.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH v2 1/3] dt-bindings: vendor-prefixes: Add Xiphera vendor
+ prefix
+Message-ID: <20200825223100.GA1464277@bogus>
+References: <cover.1597914503.git.atte.tommiska@xiphera.com>
+ <70cc429f5e7e8f3213b86e4b97999580953db877.1597914503.git.atte.tommiska@xiphera.com>
 MIME-Version: 1.0
-References: <20200825013801.GA16040@gondor.apana.org.au>
-In-Reply-To: <20200825013801.GA16040@gondor.apana.org.au>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 25 Aug 2020 15:59:15 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXECU_-VNy0xB+ZLHpB2mLh5MJiFP62ufgKCqWg7H1iCyg@mail.gmail.com>
-Message-ID: <CAMj1kXECU_-VNy0xB+ZLHpB2mLh5MJiFP62ufgKCqWg7H1iCyg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: arm64/gcm - Fix endianness warnings
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <70cc429f5e7e8f3213b86e4b97999580953db877.1597914503.git.atte.tommiska@xiphera.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 25 Aug 2020 at 03:41, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> This patch changes a couple u128's to be128 which is the correct
-> type to use and fixes a few sparse warnings.
->
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+On Thu, 20 Aug 2020 13:51:20 +0300, Atte Tommiska wrote:
+> Xiphera is an FPGA-based cryptographic solutions provider based in
+> Finland.
+> Website of the company: https://xiphera.com/
+> 
+> Signed-off-by: Atte Tommiska <atte.tommiska@xiphera.com>
+> ---
+>  Documentation/devicetree/bindings/vendor-prefixes.yaml | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
 
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
-
->
-> diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
-> index da1034867aaa..8536008e3e35 100644
-> --- a/arch/arm64/crypto/ghash-ce-glue.c
-> +++ b/arch/arm64/crypto/ghash-ce-glue.c
-> @@ -347,7 +347,7 @@ static int gcm_encrypt(struct aead_request *req)
->         u8 buf[AES_BLOCK_SIZE];
->         u8 iv[AES_BLOCK_SIZE];
->         u64 dg[2] = {};
-> -       u128 lengths;
-> +       be128 lengths;
->         u8 *tag;
->         int err;
->
-> @@ -461,7 +461,7 @@ static int gcm_decrypt(struct aead_request *req)
->         u8 buf[AES_BLOCK_SIZE];
->         u8 iv[AES_BLOCK_SIZE];
->         u64 dg[2] = {};
-> -       u128 lengths;
-> +       be128 lengths;
->         u8 *tag;
->         int err;
->
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Acked-by: Rob Herring <robh@kernel.org>
