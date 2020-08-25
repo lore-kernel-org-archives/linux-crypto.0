@@ -2,103 +2,109 @@ Return-Path: <SRS0=bFPd=CD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD638C433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Aug 2020 13:31:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1F32C433E1
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Aug 2020 13:33:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A5527206F0
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Aug 2020 13:31:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="L4eZVYFv"
+	by mail.kernel.org (Postfix) with ESMTP id AAAAF2076C
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Aug 2020 13:33:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726186AbgHYNb2 (ORCPT
+        id S1726045AbgHYNdc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Aug 2020 09:31:28 -0400
-Received: from lelv0142.ext.ti.com ([198.47.23.249]:38578 "EHLO
-        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726230AbgHYNb0 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Aug 2020 09:31:26 -0400
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 07PDVJPZ081654;
-        Tue, 25 Aug 2020 08:31:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1598362279;
-        bh=LCD4vBAgvcIC3DKR49TzRBSosI+1bVx/jmA6X91qXXc=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=L4eZVYFv+w7m0XhVqA1XpWkpHAN9FiKsFAaMszI206O3TrL39Yq1e2TTlOexTf65p
-         /EXhZq66efxhbUHI2StuKt6WWEBIsHQ+/3jmZYoS5TAy1a9JOn/gwdURU+WuwKL5u4
-         3IFMnhd+ikvEUOZ42wJjdlKc2N6Nj7As8XizE9cA=
-Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
-        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 07PDVJYI016370
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 25 Aug 2020 08:31:19 -0500
-Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Tue, 25
- Aug 2020 08:31:19 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE106.ent.ti.com
- (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
- Frontend Transport; Tue, 25 Aug 2020 08:31:18 -0500
-Received: from sokoban.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 07PDVFrx046832;
-        Tue, 25 Aug 2020 08:31:17 -0500
-From:   Tero Kristo <t-kristo@ti.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>
-CC:     Rob Herring <robh@kernel.org>, <devicetree@vger.kernel.org>
-Subject: [PATCH 1/2] dt-bindings: crypto: sa2ul: fix a DT binding check warning
-Date:   Tue, 25 Aug 2020 16:31:05 +0300
-Message-ID: <20200825133106.21542-2-t-kristo@ti.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200825133106.21542-1-t-kristo@ti.com>
-References: <20200825133106.21542-1-t-kristo@ti.com>
+        Tue, 25 Aug 2020 09:33:32 -0400
+Received: from vps0.lunn.ch ([185.16.172.187]:49194 "EHLO vps0.lunn.ch"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726703AbgHYNdV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Aug 2020 09:33:21 -0400
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94)
+        (envelope-from <andrew@lunn.ch>)
+        id 1kAZ4V-00Bm6q-Ec; Tue, 25 Aug 2020 15:33:07 +0200
+Date:   Tue, 25 Aug 2020 15:33:07 +0200
+From:   Andrew Lunn <andrew@lunn.ch>
+To:     "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
+Cc:     Sabrina Dubroca <sd@queasysnail.net>,
+        Scott Dial <scott@scottdial.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Ryan Cox <ryan_cox@byu.edu>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        "ebiggers@google.com" <ebiggers@google.com>
+Subject: Re: Severe performance regression in "net: macsec: preserve ingress
+ frame ordering"
+Message-ID: <20200825133307.GP2588906@lunn.ch>
+References: <1b0cec71-d084-8153-2ba4-72ce71abeb65@byu.edu>
+ <a335c8eb-0450-1274-d1bf-3908dcd9b251@scottdial.com>
+ <20200810133427.GB1128331@bistromath.localdomain>
+ <7663cbb1-7a55-6986-7d5d-8fab55887a80@scottdial.com>
+ <20200812100443.GF1128331@bistromath.localdomain>
+ <CY4PR0401MB36524B348358B23A8DFB741AC3420@CY4PR0401MB3652.namprd04.prod.outlook.com>
+ <20200812124201.GF2154440@lunn.ch>
+ <CY4PR0401MB365240B04FC43F7F8AAE6A0CC3560@CY4PR0401MB3652.namprd04.prod.outlook.com>
+ <20200824130142.GN2588906@lunn.ch>
+ <CY4PR0401MB3652AB8C5DC2FEA09A6F2BECC3570@CY4PR0401MB3652.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CY4PR0401MB3652AB8C5DC2FEA09A6F2BECC3570@CY4PR0401MB3652.namprd04.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DT binding check produces a warning about bad cell size:
+On Tue, Aug 25, 2020 at 01:09:31PM +0000, Van Leeuwen, Pascal wrote:
+> > -----Original Message-----
+> > From: Andrew Lunn <andrew@lunn.ch>
+> > Sent: Monday, August 24, 2020 3:02 PM
+> > To: Van Leeuwen, Pascal <pvanleeuwen@rambus.com>
+> > Cc: Sabrina Dubroca <sd@queasysnail.net>; Scott Dial <scott@scottdial.com>; linux-crypto@vger.kernel.org; Ryan Cox
+> > <ryan_cox@byu.edu>; netdev@vger.kernel.org; davem@davemloft.net; Antoine Tenart <antoine.tenart@bootlin.com>;
+> > ebiggers@google.com
+> > Subject: Re: Severe performance regression in "net: macsec: preserve ingress frame ordering"
+> >
+> > <<< External Email >>>
+> > On Mon, Aug 24, 2020 at 09:07:26AM +0000, Van Leeuwen, Pascal wrote:
+> > > No need to point this out to me as we're the number one supplier of inline MACsec IP :-)
+> > > In fact, the Microsemi PHY solution you mention is ours, major parts of that design were
+> > > even created by these 2 hands here.
+> >
+> > Oh,  O.K.
+> >
+> > Do you know of other silicon vendors which are using the same IP?
+> >
+> I do, there are many. But unfortunately, I cannot disclose our customers unless this is already
+> public information, e.g. due to some press release or whatever.
 
-Documentation/devicetree/bindings/crypto/ti,sa2ul.example.dt.yaml: example-0: crypto@4e00000:reg:0: [0, 81788928, 0, 4608] is too long
-	From schema: python3.6/site-packages/dtschema/schemas/reg.yaml
+O.K. Maybe i should flip the question around. If somebody was to
+submit a driver, how would i quickly determine it is your IP? Any
+particularly patterns i should look for.
 
-Fix this by reducing the address sizes for the example to 1 cell from
-current 2.
+> > Maybe we can encourage them to share the driver, rather than re-invent
+> > the wheel, which often happens when nobody realises it is basically
+> > the same core with a different wrapper.
+> >
+> Yes, that could save a lot of duplication of code and effort.
 
-Fixes: 2ce9a7299bf6 ("dt-bindings: crypto: Add TI SA2UL crypto accelerator documentation")
-Reported-by: Rob Herring <robh@kernel.org>
-Cc: Rob Herring <robh@kernel.org>
-Cc: devicetree@vger.kernel.org
-Signed-off-by: Tero Kristo <t-kristo@ti.com>
----
- Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It would save a lot of effort. But not code duplication. Because if i
+or one of the other maintainers notices it is just your IP with a
+different wrapper, we would NACK the patch and tell them to refactor
+the MSCC driver. There is a long established precedence for that.
 
-diff --git a/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml b/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
-index 85ef69ffebed..1465c9ebaf93 100644
---- a/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
-+++ b/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
-@@ -67,7 +67,7 @@ examples:
- 
-     main_crypto: crypto@4e00000 {
-         compatible = "ti,j721-sa2ul";
--        reg = <0x0 0x4e00000 0x0 0x1200>;
-+        reg = <0x4e00000 0x1200>;
-         power-domains = <&k3_pds 264 TI_SCI_PD_EXCLUSIVE>;
-         dmas = <&main_udmap 0xc000>, <&main_udmap 0x4000>,
-                <&main_udmap 0x4001>;
--- 
-2.17.1
+> The problem is: who will do it? We can't do it, because we have no
+> access to the actual HW.
 
---
-Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
+Microsemi are very friendly. If you ask them, i'm sure they would send
+you a board. I assume you also have some sort of FPGA setup you use
+for your own testing? That gives you two platforms. And if there are
+many PHYs using your IP, it should not be too hard to just go buy a
+reference design kit from a vendor.
+
+And there is the marketing aspect for Rambus. You can say your IP is
+easy to use, the core code is already in the kernel, supported and
+well tested, you just need to add a few wrapper functions in your
+driver. No vendor crap driver needed.
+
+	Andrew
