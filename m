@@ -7,29 +7,30 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47346C433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E77C433DF
 	for <linux-crypto@archiver.kernel.org>; Tue, 25 Aug 2020 01:41:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E1F120639
+	by mail.kernel.org (Postfix) with ESMTP id BD81F20639
 	for <linux-crypto@archiver.kernel.org>; Tue, 25 Aug 2020 01:41:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726000AbgHYBlh (ORCPT
+        id S1725838AbgHYBlj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Aug 2020 21:41:37 -0400
+        Mon, 24 Aug 2020 21:41:39 -0400
 Received: from [216.24.177.18] ([216.24.177.18]:58840 "EHLO fornost.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1725838AbgHYBlh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Aug 2020 21:41:37 -0400
+        id S1726027AbgHYBli (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 Aug 2020 21:41:38 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kANuT-0005C7-Ds; Tue, 25 Aug 2020 11:38:02 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 25 Aug 2020 11:38:01 +1000
-Date:   Tue, 25 Aug 2020 11:38:01 +1000
+        id 1kANr2-0005BT-QY; Tue, 25 Aug 2020 11:34:29 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 25 Aug 2020 11:34:28 +1000
+Date:   Tue, 25 Aug 2020 11:34:28 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] crypto: arm64/gcm - Fix endianness warnings
-Message-ID: <20200825013801.GA16040@gondor.apana.org.au>
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Matthias Kaehlcke <mka@chromium.org>
+Subject: [PATCH] crypto: arm64/sha - Add declarations for assembly variables
+Message-ID: <20200825013428.GA14497@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -39,32 +40,49 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch changes a couple u128's to be128 which is the correct
-type to use and fixes a few sparse warnings.
+This patch adds declarations for variables only used by assembly
+code to silence compiler warnings:
+
+  CC [M]  arch/arm64/crypto/sha1-ce-glue.o
+  AS [M]  arch/arm64/crypto/sha1-ce-core.o
+  CC [M]  arch/arm64/crypto/sha2-ce-glue.o
+  AS [M]  arch/arm64/crypto/sha2-ce-core.o
+  CHECK   ../arch/arm64/crypto/sha1-ce-glue.c
+  CHECK   ../arch/arm64/crypto/sha2-ce-glue.c
+../arch/arm64/crypto/sha1-ce-glue.c:38:11: warning: symbol 'sha1_ce_offsetof_count' was not declared. Should it be static?
+../arch/arm64/crypto/sha1-ce-glue.c:39:11: warning: symbol 'sha1_ce_offsetof_finalize' was not declared. Should it be static?
+../arch/arm64/crypto/sha2-ce-glue.c:38:11: warning: symbol 'sha256_ce_offsetof_count' was not declared. Should it be static?
+../arch/arm64/crypto/sha2-ce-glue.c:40:11: warning: symbol 'sha256_ce_offsetof_finalize' was not declared. Should it be static?
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
-index da1034867aaa..8536008e3e35 100644
---- a/arch/arm64/crypto/ghash-ce-glue.c
-+++ b/arch/arm64/crypto/ghash-ce-glue.c
-@@ -347,7 +347,7 @@ static int gcm_encrypt(struct aead_request *req)
- 	u8 buf[AES_BLOCK_SIZE];
- 	u8 iv[AES_BLOCK_SIZE];
- 	u64 dg[2] = {};
--	u128 lengths;
-+	be128 lengths;
- 	u8 *tag;
- 	int err;
+diff --git a/arch/arm64/crypto/sha1-ce-glue.c b/arch/arm64/crypto/sha1-ce-glue.c
+index 565ef604ca04..c63b99211db3 100644
+--- a/arch/arm64/crypto/sha1-ce-glue.c
++++ b/arch/arm64/crypto/sha1-ce-glue.c
+@@ -25,6 +25,9 @@ struct sha1_ce_state {
+ 	u32			finalize;
+ };
  
-@@ -461,7 +461,7 @@ static int gcm_decrypt(struct aead_request *req)
- 	u8 buf[AES_BLOCK_SIZE];
- 	u8 iv[AES_BLOCK_SIZE];
- 	u64 dg[2] = {};
--	u128 lengths;
-+	be128 lengths;
- 	u8 *tag;
- 	int err;
++extern const u32 sha1_ce_offsetof_count;
++extern const u32 sha1_ce_offsetof_finalize;
++
+ asmlinkage void sha1_ce_transform(struct sha1_ce_state *sst, u8 const *src,
+ 				  int blocks);
+ 
+diff --git a/arch/arm64/crypto/sha2-ce-glue.c b/arch/arm64/crypto/sha2-ce-glue.c
+index 9450d19b9e6e..5e956d7582a5 100644
+--- a/arch/arm64/crypto/sha2-ce-glue.c
++++ b/arch/arm64/crypto/sha2-ce-glue.c
+@@ -25,6 +25,9 @@ struct sha256_ce_state {
+ 	u32			finalize;
+ };
+ 
++extern const u32 sha256_ce_offsetof_count;
++extern const u32 sha256_ce_offsetof_finalize;
++
+ asmlinkage void sha2_ce_transform(struct sha256_ce_state *sst, u8 const *src,
+ 				  int blocks);
  
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
