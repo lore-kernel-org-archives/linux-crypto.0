@@ -2,59 +2,30 @@ Return-Path: <SRS0=MfKA=CE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A423C433E1
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 12:00:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FAA4C433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 12:08:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 615A62087C
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 12:00:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598443238;
-	bh=WdolUUSPQwrh8Aj5TJ8h5qeAtgIkR7u9c5nE+npwIIY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=Cq/0357vqPZ5xC/EdeR5USC2QOFbXImsMiFGhr0rzCmBQG9D6ipJFQCcwdOsSZoYY
-	 G4hM76cZtRhvJJbWcix1HNkv6M3bU1VwRxeDKz1lo1s2OmM8AMOumwjpJtH0oEvDXE
-	 oyQxpbP4DDR447lUZQiyakAIxtmKli2+cy1FKhng=
+	by mail.kernel.org (Postfix) with ESMTP id 6F8D32087C
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 12:08:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729224AbgHZMAR (ORCPT
+        id S1729796AbgHZMIx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Aug 2020 08:00:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58822 "EHLO mail.kernel.org"
+        Wed, 26 Aug 2020 08:08:53 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:33072 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729363AbgHZMAK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Aug 2020 08:00:10 -0400
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D386C2080C;
-        Wed, 26 Aug 2020 12:00:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598443205;
-        bh=WdolUUSPQwrh8Aj5TJ8h5qeAtgIkR7u9c5nE+npwIIY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Qw1Rt0YmTj69jFWJ0biR73mZ980JOtuuj9zihJsBsJRTiPMfezuNNb2FQXeRTDFnN
-         Dtb+xQ58UwcBov1EjWGpb4pfi3b90IRJ/qZq9Vk40+Ql6T9JI0EV56LZxxaAbVKwjG
-         0fC9YtlfKviSR4UCsBKcf2OXdYrufDZ809xWnue0=
-Received: by mail-ot1-f47.google.com with SMTP id i11so1255096otr.5;
-        Wed, 26 Aug 2020 05:00:04 -0700 (PDT)
-X-Gm-Message-State: AOAM531pxbnjxCDwMUPdm0fG6xKBsR0eMACV62U8KTGZ1Nu+WQwltFlL
-        /vxFK/esfvY7MfqTO5iuErrfPIG9/K+axZH0eGA=
-X-Google-Smtp-Source: ABdhPJyRHJMIRG+/FJI73y2W6ECDWrCfnnurge8nTGaW0Q7CAiSYqL3nLbuQh1xgC0wevH+7nsqEBia2B/6cXtCsGvo=
-X-Received: by 2002:a9d:5189:: with SMTP id y9mr4290025otg.77.1598443204195;
- Wed, 26 Aug 2020 05:00:04 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200826055150.2753.90553@ml01.vlan13.01.org> <b34f7644-a495-4845-0a00-0aebf4b9db52@molgen.mpg.de>
- <CAMj1kXEUQdmQDCDXPBNb3hRrbui=HVyDjCDoiFwDr+mDSjP43A@mail.gmail.com> <20200826114952.GA2375@gondor.apana.org.au>
-In-Reply-To: <20200826114952.GA2375@gondor.apana.org.au>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 26 Aug 2020 13:59:53 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGjytfJEbLMbz50it3okQfiLScHB5YK2FMqR5CsmFEBbg@mail.gmail.com>
-Message-ID: <CAMj1kXGjytfJEbLMbz50it3okQfiLScHB5YK2FMqR5CsmFEBbg@mail.gmail.com>
-Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+        id S1729538AbgHZMIv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Aug 2020 08:08:51 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1kAuEC-0003TM-Nd; Wed, 26 Aug 2020 22:08:33 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 26 Aug 2020 22:08:32 +1000
+Date:   Wed, 26 Aug 2020 22:08:32 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ardb@kernel.org>
 Cc:     Paul Menzel <pmenzel@molgen.mpg.de>,
         Caleb Jorden <caljorden@hotmail.com>,
         Sasha Levin <sashal@kernel.org>, iwd@lists.01.org,
@@ -63,37 +34,46 @@ Cc:     Paul Menzel <pmenzel@molgen.mpg.de>,
         LKML <linux-kernel@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
+Message-ID: <20200826120832.GA2996@gondor.apana.org.au>
+References: <20200826055150.2753.90553@ml01.vlan13.01.org>
+ <b34f7644-a495-4845-0a00-0aebf4b9db52@molgen.mpg.de>
+ <CAMj1kXEUQdmQDCDXPBNb3hRrbui=HVyDjCDoiFwDr+mDSjP43A@mail.gmail.com>
+ <20200826114952.GA2375@gondor.apana.org.au>
+ <CAMj1kXGjytfJEbLMbz50it3okQfiLScHB5YK2FMqR5CsmFEBbg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXGjytfJEbLMbz50it3okQfiLScHB5YK2FMqR5CsmFEBbg@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 26 Aug 2020 at 13:50, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Wed, Aug 26, 2020 at 12:40:14PM +0200, Ard Biesheuvel wrote:
+On Wed, Aug 26, 2020 at 01:59:53PM +0200, Ard Biesheuvel wrote:
+> On Wed, 26 Aug 2020 at 13:50, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 > >
-> > It would be helpful if someone could explain for the non-mac80211
-> > enlightened readers how iwd's EAP-PEAPv0 + MSCHAPv2 support relies on
-> > the algif_aead socket interface, and which AEAD algorithms it uses. I
-> > assume this is part of libell?
->
-> I see the problem.  libell/ell/checksum.c doesn't clear the MSG_MORE
-> flag before doing the recv(2).
->
+> > On Wed, Aug 26, 2020 at 12:40:14PM +0200, Ard Biesheuvel wrote:
+> > >
+> > > It would be helpful if someone could explain for the non-mac80211
+> > > enlightened readers how iwd's EAP-PEAPv0 + MSCHAPv2 support relies on
+> > > the algif_aead socket interface, and which AEAD algorithms it uses. I
+> > > assume this is part of libell?
+> >
+> > I see the problem.  libell/ell/checksum.c doesn't clear the MSG_MORE
+> > flag before doing the recv(2).
+> 
+> But that code uses a hash not an aead, afaict.
 
-But that code uses a hash not an aead, afaict.
+Good point.  In that case can we please get a strace with a -s
+option that's big enough to capture the crypto data?
 
-> I was hoping nobody out there was doing this but obviously I've
-> been proven wrong.
->
-> So what I'm going to do is to specifically allow this case of
-> a string of sendmsg(2)'s with MSG_MORE folloed by a recvmsg(2)
-> in the same thread.  I'll add a WARN_ON_ONCE so user-space can
-> eventually be fixed.
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Comparing the working strace and the non-working one should be
+sufficient to identify the problem.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
