@@ -2,81 +2,106 @@ Return-Path: <SRS0=MfKA=CE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA1AC433E1
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 14:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4C23C433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 14:59:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFBC4221E2
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 14:25:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEAEF2078D
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 14:59:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="EErGYoj6"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Izqqo1+F"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728372AbgHZOY1 (ORCPT
+        id S1727875AbgHZO7i (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Aug 2020 10:24:27 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.53]:8870 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727941AbgHZOXh (ORCPT
+        Wed, 26 Aug 2020 10:59:38 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:34946 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727111AbgHZO7h (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Aug 2020 10:23:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1598451814;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=vlFjPjGsBeWfnakdgDl9RQ72Zvd7He5Fjtfa+KRA5hI=;
-        b=EErGYoj6ushAypOJkxoloiORme+T87usmGr2U44EUFKcXhji7dijtd5gTBU1H9bUB9
-        MYJShEWlY6Unv83wmsWoQFxoFf9rGCvPddy7WaFnKJHidkdj3u7J8UCwLb5kIN+NTRbM
-        4Awt5VpFKlp+MiHxOJlQdnp9uTIX4KnDg/xSpfQuUxLMi6N7r8jog2r3stoMFAhRXfzU
-        fs5maugOEL1hEvucDzti+Y27a1Cd/k77LvLM1wXnDu+JA/SyB0A8v4O5znr37+96q3qg
-        pgS5c5RkvcCtgztmSXYLx0lSXU5qVL6Pri7TcVNgbAMy+BYf3w29Pgw+I6OsFoZVaOJp
-        I72Q==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaL/Scj1g="
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.10.7 DYNA|AUTH)
-        with ESMTPSA id 002e9aw7QEMgjED
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Wed, 26 Aug 2020 16:22:42 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Arnd Bergmann <arnd@arndb.de>, kernel test robot <lkp@intel.com>
-Cc:     kbuild-all@lists.01.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-api@vger.kernel.org,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>
-Subject: Re: [PATCH v33 01/12] Linux Random Number Generator
-Date:   Wed, 26 Aug 2020 16:22:41 +0200
-Message-ID: <2144138.CrzyxZ31qj@tauon.chronox.de>
-In-Reply-To: <20200826142742.GA24519@xsang-OptiPlex-9020>
-References: <20200826142742.GA24519@xsang-OptiPlex-9020>
+        Wed, 26 Aug 2020 10:59:37 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07QEwZpt089548;
+        Wed, 26 Aug 2020 14:59:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2020-01-29; bh=DEQF37iaTwa8e9HZ2YdmvTolB6INIb3d14KQJTfuMPA=;
+ b=Izqqo1+Fz+x2RGMoO5XGU/99njvvBKihECYffK9s9muu61/l7gFfoLjFqWc5nqQ0GbhT
+ qBDSPgfb0aXBt4a/afbruz3zZ+ihBJQ/QAMIVF49bK63az7f/AFIxsPXhEqSUJR3qd2I
+ THV6GQiXuUJ5/gQCKdMxqox+jCxrPmiXPinyiWZtRPJndZN9DseZo/IhuqOhMsp7ahkz
+ lse0hvduHy8qNsgp/6EQTJyeCxelEAZAFeI+ngXzaTj1/IhHqiP8LF9ZFRidHtzEF383
+ fYi5bFYBVsmITRmfxhejjhzVBNFHlWTAyDag0T+iqI16ypjvoTpXoFYJxZmAp3p1VUL+ Yw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 335gw82tmw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 26 Aug 2020 14:59:30 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07QEsqnv108816;
+        Wed, 26 Aug 2020 14:59:29 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 333r9m8tca-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 26 Aug 2020 14:59:29 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 07QExRGr030955;
+        Wed, 26 Aug 2020 14:59:27 GMT
+Received: from localhost.localdomain (/98.229.125.203)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 26 Aug 2020 07:59:26 -0700
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Steffen Klassert <steffen.klassert@secunet.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Daniel Jordan <daniel.m.jordan@oracle.com>
+Subject: [PATCH] padata: add a reviewer
+Date:   Wed, 26 Aug 2020 10:59:23 -0400
+Message-Id: <20200826145923.719126-1-daniel.m.jordan@oracle.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9725 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 bulkscore=0
+ adultscore=0 spamscore=0 mlxlogscore=999 phishscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008260113
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9725 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 lowpriorityscore=0
+ mlxscore=0 phishscore=0 bulkscore=0 impostorscore=0 adultscore=0
+ malwarescore=0 clxscore=1011 spamscore=0 mlxlogscore=999
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008260114
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Mittwoch, 26. August 2020, 16:27:42 CEST schrieb kernel test robot:
+I volunteer to review padata changes for the foreseeable future.
 
-Hi,
+Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-> >> drivers/char/lrng/lrng_chacha20.c:54:47: sparse: sparse: cast to
-> >> restricted __le32
->    drivers/char/lrng/lrng_chacha20.c:58:47: sparse: sparse: cast to
-> restricted __le32 --
-
-Thanks for the reports. Both, the __poll_t and the __le32 issues are fixed in 
-v34.
-
-Ciao
-Stephan
-
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 3b186ade3597..1481d47cfd75 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -13024,6 +13024,7 @@ F:	lib/packing.c
+ 
+ PADATA PARALLEL EXECUTION MECHANISM
+ M:	Steffen Klassert <steffen.klassert@secunet.com>
++R:	Daniel Jordan <daniel.m.jordan@oracle.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/core-api/padata.rst
+-- 
+2.27.0
 
