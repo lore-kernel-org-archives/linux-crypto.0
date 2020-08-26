@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 250EBC433E1
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:15:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B4EC433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:17:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E8642208E4
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:15:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4D79208E4
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:17:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730131AbgHZNP3 (ORCPT
+        id S1728132AbgHZNRF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Aug 2020 09:15:29 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:44303 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729177AbgHZNP2 (ORCPT
+        Wed, 26 Aug 2020 09:17:05 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:37783 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729177AbgHZNRE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Aug 2020 09:15:28 -0400
-Received: by mail-lj1-f194.google.com with SMTP id g6so2278339ljn.11;
-        Wed, 26 Aug 2020 06:15:27 -0700 (PDT)
+        Wed, 26 Aug 2020 09:17:04 -0400
+Received: by mail-lj1-f193.google.com with SMTP id w14so2317761ljj.4;
+        Wed, 26 Aug 2020 06:17:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=f/nPRgHC0iGFykXQ1veAuL/EAakIUq9/Zg/UORe3DVo=;
-        b=ZfgII+nubV6VFC5S9VlSTQf0+5gEAae6S0Kq3K8S67Fa5yzY8IwcMpbvex/dVNqhyx
-         EKwrEPL6EI30MZZRfQ2844SAZ2xNFU9eL1WP80sOEBZTrDXdrOZHj3IJP6m/7+uu/t3+
-         MlJqAf2yoh26MTg25Szc5EPvNAxhxqTLyTC3fRqghyDQr7BjT/vOQzLUnBimfXfwAnd1
-         xCXQ2whsdVCI9XTwWtwJbdO6f21Ja2Hv3HhUFohXcyKObXn+SjdljIhfGN5wsPZJkMLW
-         Lj1ZXZJPgf3lMSZkKly1wIAFboYUzeaHn5v7uURyZ5nsO4tthzjhwCJjjHbsXJMyyqon
-         a9WQ==
-X-Gm-Message-State: AOAM532YSg6DRtW70bxkccC1vb0SAyk/ERqpVGdwu+LBjJv4jatkdad5
-        2mp1isPuR094lzE3Cbo+SUvGSr7tUJA=
-X-Google-Smtp-Source: ABdhPJz7jT67Fc/sgQR58BoX7ag/DyxVE8rLkkDR/Zi2YcfjbLUVL6Yj5ZMEtRBXxf5+swH7Q6cR0w==
-X-Received: by 2002:a2e:85a:: with SMTP id g26mr7096722ljd.60.1598447726234;
-        Wed, 26 Aug 2020 06:15:26 -0700 (PDT)
+        bh=vU/nQo+UBNG9xvKd9GuEpi2FmWTAJodJN80NdTSBLAk=;
+        b=RcwuyWIef/Gt4ktGODHegTfBG33CSLzdiIcLnJOlH7LU/w6HDbC8xNHQ/RFczUqRhT
+         6MqKlpU7s97d7AiekXg23QuheGTPO3QXKK/AQrFtX1ajv74ovFprZF/B9JOuIa9bc+h8
+         ZLE2bqw2Re1SjHE8/YAkcTqXALSBvwQi4fWHkN2jdpSfAympAohm4/4KS5y2EIFmVUrq
+         DtVnETyAxU3crAwQjgvji2xkdLVoZl/N+54Z7v4hmBspKjCteNGzqVjs9p4/aQN0UwLm
+         AfV/qfnqqR9GvRY4/aq2Vp+EXt3l6HDNBoySrvEBzxr/cTj4v/7yLTRvUeglB+n6+Cex
+         +vcg==
+X-Gm-Message-State: AOAM530dtR87XfEYg8GYfRqAg75Cmw7LU/2sp/PJpSyBkLddjAFsQgKC
+        IeojRspkEHMXFuNrbtlAKFHV+aFWurI=
+X-Google-Smtp-Source: ABdhPJz7tHUoM8nJr9czWl1gcdQGwvnPgBvglHx5FCWqpeWj9hP2LVpyXxO/BRHRRUxT/7MnePBLcQ==
+X-Received: by 2002:a05:651c:152:: with SMTP id c18mr6508091ljd.15.1598447821446;
+        Wed, 26 Aug 2020 06:17:01 -0700 (PDT)
 Received: from localhost.localdomain (broadband-37-110-38-130.ip.moscow.rt.ru. [37.110.38.130])
-        by smtp.googlemail.com with ESMTPSA id r11sm503320ljk.46.2020.08.26.06.15.25
+        by smtp.googlemail.com with ESMTPSA id u19sm496556ljj.128.2020.08.26.06.17.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Aug 2020 06:15:25 -0700 (PDT)
+        Wed, 26 Aug 2020 06:17:00 -0700 (PDT)
 From:   Denis Efremov <efremov@linux.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Denis Efremov <efremov@linux.com>,
-        Antoine Tenart <antoine.tenart@bootlin.com>,
+        Corentin Labbe <clabbe@baylibre.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: inside-secure - use kfree_sensitive()
-Date:   Wed, 26 Aug 2020 16:15:14 +0300
-Message-Id: <20200826131515.397667-1-efremov@linux.com>
+        linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: amlogic - use kfree_sensitive()
+Date:   Wed, 26 Aug 2020 16:16:57 +0300
+Message-Id: <20200826131657.398090-1-efremov@linux.com>
 X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -65,23 +65,33 @@ Use kfree_sensitive() instead of open-coding it.
 
 Signed-off-by: Denis Efremov <efremov@linux.com>
 ---
- drivers/crypto/inside-secure/safexcel_hash.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 16a467969d8e..5ffdc1cd5847 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -1082,8 +1082,7 @@ static int safexcel_hmac_init_pad(struct ahash_request *areq,
- 		}
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+index d93210726697..f3dca456d9f8 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+@@ -341,8 +341,7 @@ void meson_cipher_exit(struct crypto_tfm *tfm)
+ 	struct meson_cipher_tfm_ctx *op = crypto_tfm_ctx(tfm);
  
- 		/* Avoid leaking */
--		memzero_explicit(keydup, keylen);
--		kfree(keydup);
-+		kfree_sensitive(keydup);
- 
- 		if (ret)
- 			return ret;
+ 	if (op->key) {
+-		memzero_explicit(op->key, op->keylen);
+-		kfree(op->key);
++		kfree_sensitive(op->key);
+ 	}
+ 	crypto_free_skcipher(op->fallback_tfm);
+ }
+@@ -368,8 +367,7 @@ int meson_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 		return -EINVAL;
+ 	}
+ 	if (op->key) {
+-		memzero_explicit(op->key, op->keylen);
+-		kfree(op->key);
++		kfree_sensitive(op->key);
+ 	}
+ 	op->keylen = keylen;
+ 	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
 -- 
 2.26.2
 
