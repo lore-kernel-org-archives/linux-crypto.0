@@ -2,130 +2,128 @@ Return-Path: <SRS0=MfKA=CE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFCA5C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00754C433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:54:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 805B921775
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:36:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dquuv/Vo"
+	by mail.kernel.org (Postfix) with ESMTP id D1D12221E2
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:54:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1598450052;
+	bh=6hMvIJ8osdpkQug3lEUCfY7S1UBQAFg4kG8aCuCcMuM=;
+	h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:
+	 List-ID:From;
+	b=F1MffzMgNPB6WTqi04PLcU6nNN/ali+D/ALnW3B94ksET6/Y1eCOSF9/HaV+4xe0A
+	 PsIxy25yCIm/NfdLlXAR492roLJ2SMRiPMutug1++humeSjd2MDyZGg2J/sRSU1TQa
+	 aB1LABXvEGfVBi2ZlzLkoWYKGSYKJvAEA3qChYQY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729540AbgHZNg2 (ORCPT
+        id S1730491AbgHZNyK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Aug 2020 09:36:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50148 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728276AbgHZNgZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Aug 2020 09:36:25 -0400
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6447FC061574
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2020 06:36:25 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id h15so1817698wrt.12
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2020 06:36:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Qkwmqsb9KNID3kuoDaGDi9EOhJccN3wgQwnGBmSQOw4=;
-        b=Dquuv/Vo7kS5gDZVKUxpsTfJuw8OVOczL99h9XKp66W7hGDoEqT+FsEeLQNhi9NYjK
-         hmF58k+rCtuNL2bK7D0MZZ5Nfar/9OTs4VTLpRIY3gaBNJCvO/A9MCp0D5p0O9Kpoy3n
-         6SCIj9hXene3CVppJb8RPa+5vKAB+1itsVfNgwBrsl24/Z6j5bXISUVXzP1FQKSzLJM3
-         dDrNU/xTBDLCa+mSwG5aQOORDuYKqXowVEwRgUXiTcWh1E/lZuBKx1UYtzssXwIBFZ5x
-         KsgmWMh/1htY8IaRsh0sDi40PDXu5nTyVg1xQEoRUqJw0emdQZq0SzBb5ey15dsio8Vz
-         rGmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Qkwmqsb9KNID3kuoDaGDi9EOhJccN3wgQwnGBmSQOw4=;
-        b=QnIUjNnaUypFTC33NtsnH7Pq2z8vKHI4HOupqHHXdnfGU3EoSog88dzDSOTrcmsFHt
-         iFSB9g1wYI4X2x6Wc/w5+HNm4IMSqzAJJSG5QFndgtvxzFi4LY+0ALxLF63PVtH27Vly
-         ycrfdvNAXcVU4ndibO3J+ejxm5qvxZETAfjXsYOJyyPATmb3wEZ+a4DcX7SgkJKjKNMa
-         EZPBf1SKE4TBE4JjxY5soWofaGNG8cKcQqDaGc5UHA6d9npzrQI6I4ueZEsuRlRwuCoS
-         q7tutL38noH5aCubH0TEO3jJ76zv6Tpg8r7aA9yu4Kbgnj/v84+GhiZ7ki5j5VqeJFdn
-         quAg==
-X-Gm-Message-State: AOAM533es0EBJtsVdS7p94s569ss0b7ZTQbQd5VLt9txnmY87bhL6SUU
-        FF9gXSt2IfWTZTNlFK1GtvM=
-X-Google-Smtp-Source: ABdhPJxC3WOPBFAgIgVFrUfz5nsT/43xg1JrVGJbYpERKSpTH0kcnX4zO+TPzUV8fDD34r3q4GGAbQ==
-X-Received: by 2002:adf:e9cb:: with SMTP id l11mr11630667wrn.379.1598448984075;
-        Wed, 26 Aug 2020 06:36:24 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id f16sm5893730wrw.67.2020.08.26.06.36.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Aug 2020 06:36:23 -0700 (PDT)
-Date:   Wed, 26 Aug 2020 15:36:21 +0200
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Denis Efremov <efremov@linux.com>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH] crypto: sun8i-ce - use kfree_sensitive()
-Message-ID: <20200826133621.GC13819@Red>
-References: <20200826132537.398778-1-efremov@linux.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200826132537.398778-1-efremov@linux.com>
+        Wed, 26 Aug 2020 09:54:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60914 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730416AbgHZNyC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Aug 2020 09:54:02 -0400
+Received: from localhost (unknown [70.37.104.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id ABC5922B4E;
+        Wed, 26 Aug 2020 13:54:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1598450041;
+        bh=6hMvIJ8osdpkQug3lEUCfY7S1UBQAFg4kG8aCuCcMuM=;
+        h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:From;
+        b=fuqnZoraOWtz4BwojOcLOWWFKM9crDAYqq78jkBMojR3WEe092yq39cmmqbkpufuK
+         W9YocmByKUNUYoW8Eq0anpLR9HuKJKu54ZUBBzJ2sCN7UwRrFXc5sduS8qlNyG0mXe
+         dHElgG8lHTPMx65MlClpyVjS+FdNjWDxXuCW2QPo=
+Date:   Wed, 26 Aug 2020 13:54:01 +0000
+From:   Sasha Levin <sashal@kernel.org>
+To:     Sasha Levin <sashal@kernel.org>
+To:     Andrei Botila <andrei.botila@oss.nxp.com>
+To:     Andrei Botila <andrei.botila@nxp.com>
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     stable@vger.kernel.org
+Subject: Re: [PATCH 5/9] crypto: caam/qi - add support for more XTS key lengths
+In-Reply-To: <20200806114127.8650-6-andrei.botila@oss.nxp.com>
+References: <20200806114127.8650-6-andrei.botila@oss.nxp.com>
+Message-Id: <20200826135401.ABC5922B4E@mail.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 26, 2020 at 04:25:37PM +0300, Denis Efremov wrote:
-> Use kfree_sensitive() instead of open-coding it.
-> 
-> Signed-off-by: Denis Efremov <efremov@linux.com>
-> ---
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-> index b4d5fea27d20..970084463dbb 100644
-> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-> @@ -367,8 +367,7 @@ void sun8i_ce_cipher_exit(struct crypto_tfm *tfm)
->  	struct sun8i_cipher_tfm_ctx *op = crypto_tfm_ctx(tfm);
->  
->  	if (op->key) {
-> -		memzero_explicit(op->key, op->keylen);
-> -		kfree(op->key);
-> +		kfree_sensitive(op->key);
->  	}
->  	crypto_free_skcipher(op->fallback_tfm);
->  	pm_runtime_put_sync_suspend(op->ce->dev);
-> @@ -392,8 +391,7 @@ int sun8i_ce_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
->  		return -EINVAL;
->  	}
->  	if (op->key) {
-> -		memzero_explicit(op->key, op->keylen);
-> -		kfree(op->key);
-> +		kfree_sensitive(op->key);
->  	}
->  	op->keylen = keylen;
->  	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
-> @@ -417,8 +415,7 @@ int sun8i_ce_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
->  		return err;
->  
->  	if (op->key) {
-> -		memzero_explicit(op->key, op->keylen);
-> -		kfree(op->key);
-> +		kfree_sensitive(op->key);
->  	}
->  	op->keylen = keylen;
->  	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
-> -- 
-> 2.26.2
-> 
+Hi
 
-Hello
+[This is an automated email]
 
-Same problem than amlogic and sun8i-ss.
-Please remove if (op->key)
+This commit has been processed because it contains a "Fixes:" tag
+fixing commit: b189817cf789 ("crypto: caam/qi - add ablkcipher and authenc algorithms").
 
-Regards
+The bot has tested the following trees: v5.8.2, v5.7.16, v5.4.59, v4.19.140, v4.14.193.
+
+v5.8.2: Failed to apply! Possible dependencies:
+    1108da08e2c1 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
+    a85211f36f3d ("crypto: qat - fallback for xts with 192 bit keys")
+    b185a68710e0 ("crypto: qat - validate xts key")
+    b8aa7dc5c753 ("crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY")
+
+v5.7.16: Failed to apply! Possible dependencies:
+    1108da08e2c1 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
+    a85211f36f3d ("crypto: qat - fallback for xts with 192 bit keys")
+    b185a68710e0 ("crypto: qat - validate xts key")
+    b8aa7dc5c753 ("crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY")
+
+v5.4.59: Failed to apply! Possible dependencies:
+    1108da08e2c1 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
+    64db5e7439fb ("crypto: sparc/aes - convert to skcipher API")
+    66d7fb94e4ff ("crypto: blake2s - generic C library implementation and selftest")
+    674f368a952c ("crypto: remove CRYPTO_TFM_RES_BAD_KEY_LEN")
+    746b2e024c67 ("crypto: lib - tidy up lib/crypto Kconfig and Makefile")
+    7988fb2c03c8 ("crypto: s390/aes - convert to skcipher API")
+    7f725f41f627 ("crypto: powerpc - convert SPE AES algorithms to skcipher API")
+    7f9b0880925f ("crypto: blake2s - implement generic shash driver")
+    91d689337fe8 ("crypto: blake2b - add blake2b generic implementation")
+    b4d0c0aad57a ("crypto: arm - use Kconfig based compiler checks for crypto opcodes")
+    b95bba5d0114 ("crypto: skcipher - rename the crypto_blkcipher module and kconfig option")
+    d00c06398154 ("crypto: s390/paes - convert to skcipher API")
+    da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
+    ed0356eda153 ("crypto: blake2s - x86_64 SIMD implementation")
+
+v4.19.140: Failed to apply! Possible dependencies:
+    0a5dff9882e5 ("crypto: arm/ghash - provide a synchronous version")
+    1108da08e2c1 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
+    1ca1b917940c ("crypto: chacha20-generic - refactor to allow varying number of rounds")
+    5ca7badb1f62 ("crypto: caam/jr - ablkcipher -> skcipher conversion")
+    674f368a952c ("crypto: remove CRYPTO_TFM_RES_BAD_KEY_LEN")
+    8a5a79d5556b ("crypto: x86/chacha20 - Add a 4-block AVX2 variant")
+    99680c5e9182 ("crypto: arm - convert to use crypto_simd_usable()")
+    9b17608f15b9 ("crypto: x86/chacha20 - Use larger block functions more aggressively")
+    9dbe3072c6b1 ("crypto: caam/qi - ablkcipher -> skcipher conversion")
+    a5dd97f86211 ("crypto: x86/chacha20 - Add a 2-block AVX2 variant")
+    aec48adce85d ("crypto: caam/qi - remove ablkcipher IV generation")
+    c3b734dd325d ("crypto: x86/chacha20 - Support partial lengths in 8-block AVX2 variant")
+    cf5448b5c3d8 ("crypto: caam/jr - remove ablkcipher IV generation")
+    da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
+    db8e15a24957 ("crypto: x86/chacha20 - Support partial lengths in 4-block SSSE3 variant")
+    e4e72063d3c0 ("crypto: x86/chacha20 - Support partial lengths in 1-block SSSE3 variant")
+
+v4.14.193: Failed to apply! Possible dependencies:
+    1108da08e2c1 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
+    5ca7badb1f62 ("crypto: caam/jr - ablkcipher -> skcipher conversion")
+    662f70ede597 ("crypto: caam - remove needless ablkcipher key copy")
+    7e0880b9fbbe ("crypto: caam - add Derived Key Protocol (DKP) support")
+    9dbe3072c6b1 ("crypto: caam/qi - ablkcipher -> skcipher conversion")
+    cf5448b5c3d8 ("crypto: caam/jr - remove ablkcipher IV generation")
+
+
+NOTE: The patch will not be queued to stable trees until it is upstream.
+
+How should we proceed with this patch?
+
+-- 
+Thanks
+Sasha
