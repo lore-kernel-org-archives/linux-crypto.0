@@ -2,128 +2,133 @@ Return-Path: <SRS0=MfKA=CE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00754C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:54:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B2ACC433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:56:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D1D12221E2
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:54:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44E1022B47
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:56:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598450052;
-	bh=6hMvIJ8osdpkQug3lEUCfY7S1UBQAFg4kG8aCuCcMuM=;
-	h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:
-	 List-ID:From;
-	b=F1MffzMgNPB6WTqi04PLcU6nNN/ali+D/ALnW3B94ksET6/Y1eCOSF9/HaV+4xe0A
-	 PsIxy25yCIm/NfdLlXAR492roLJ2SMRiPMutug1++humeSjd2MDyZGg2J/sRSU1TQa
-	 aB1LABXvEGfVBi2ZlzLkoWYKGSYKJvAEA3qChYQY=
+	s=default; t=1598450201;
+	bh=0/lFWSsH4RVCGAcyHva9O7Jg31/lNNrAVoSxoUqNhJI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=k5HqnxCadU9d4shG6voEvqXY1+LCS7+TxRESt99YjmMH2pUem6o/MmQRYCwNihB0u
+	 7ST79Ev9ZRv9kVGXYiXiKB2B+w5IREJiZeIxoiwMciw6TJuhDLkU5uhZid8EEj4vh8
+	 enZkPDOLyQxFkIJsQZbNgJp1IbmA92Pc8CCuTRSE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730491AbgHZNyK (ORCPT
+        id S1730424AbgHZN4h (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Aug 2020 09:54:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60914 "EHLO mail.kernel.org"
+        Wed, 26 Aug 2020 09:56:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34636 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730416AbgHZNyC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Aug 2020 09:54:02 -0400
-Received: from localhost (unknown [70.37.104.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1730377AbgHZN4e (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Aug 2020 09:56:34 -0400
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id ABC5922B4E;
-        Wed, 26 Aug 2020 13:54:01 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7A65322BEA;
+        Wed, 26 Aug 2020 13:56:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598450041;
-        bh=6hMvIJ8osdpkQug3lEUCfY7S1UBQAFg4kG8aCuCcMuM=;
-        h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:From;
-        b=fuqnZoraOWtz4BwojOcLOWWFKM9crDAYqq78jkBMojR3WEe092yq39cmmqbkpufuK
-         W9YocmByKUNUYoW8Eq0anpLR9HuKJKu54ZUBBzJ2sCN7UwRrFXc5sduS8qlNyG0mXe
-         dHElgG8lHTPMx65MlClpyVjS+FdNjWDxXuCW2QPo=
-Date:   Wed, 26 Aug 2020 13:54:01 +0000
-From:   Sasha Levin <sashal@kernel.org>
-To:     Sasha Levin <sashal@kernel.org>
-To:     Andrei Botila <andrei.botila@oss.nxp.com>
-To:     Andrei Botila <andrei.botila@nxp.com>
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH 5/9] crypto: caam/qi - add support for more XTS key lengths
-In-Reply-To: <20200806114127.8650-6-andrei.botila@oss.nxp.com>
-References: <20200806114127.8650-6-andrei.botila@oss.nxp.com>
-Message-Id: <20200826135401.ABC5922B4E@mail.kernel.org>
+        s=default; t=1598450192;
+        bh=0/lFWSsH4RVCGAcyHva9O7Jg31/lNNrAVoSxoUqNhJI=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=IxnANnHn1Bm4AvbZmLstcZM1sTr6itieawWuD+oSkrox1qWiOEDM4IMk0ZMoNisFE
+         PXBULxchRPraIAeI/3MK4TDmVOxdesb7ymYFU9Ly1TxheWGHg9GshBJs1/bJoqU4p+
+         ZoLRDzDvGQSLCuiE0LBWEtAXOgUBR3UUkD0WnLHU=
+Received: by mail-oi1-f171.google.com with SMTP id k4so1587404oik.2;
+        Wed, 26 Aug 2020 06:56:32 -0700 (PDT)
+X-Gm-Message-State: AOAM5330Ek1NV7x8fLbzSOY1MyBSguLBPO1Y3mbQAqRGsGKFKgSqhVNI
+        bo7dgkRCEGtU9CNvl19cXYMWO+1j/2Xi9A2wavI=
+X-Google-Smtp-Source: ABdhPJwle7rCF3+SyAzbuFqT8TVilYDkMLKrsLA21+8YtQanwKKPDFdcN6NyYe5gh2Q6RIdugSG7PScOco7snDnVOGw=
+X-Received: by 2002:a05:6808:b37:: with SMTP id t23mr4174250oij.174.1598450191762;
+ Wed, 26 Aug 2020 06:56:31 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200826055150.2753.90553@ml01.vlan13.01.org> <b34f7644-a495-4845-0a00-0aebf4b9db52@molgen.mpg.de>
+ <CAMj1kXEUQdmQDCDXPBNb3hRrbui=HVyDjCDoiFwDr+mDSjP43A@mail.gmail.com>
+ <20200826114952.GA2375@gondor.apana.org.au> <CAMj1kXGjytfJEbLMbz50it3okQfiLScHB5YK2FMqR5CsmFEBbg@mail.gmail.com>
+ <20200826120832.GA2996@gondor.apana.org.au> <CAOq732JaP=4X9Yh_KjER5_ctQWoauxzXTZqyFP9KsLSxvVH8=w@mail.gmail.com>
+ <20200826132952.GA4752@gondor.apana.org.au>
+In-Reply-To: <20200826132952.GA4752@gondor.apana.org.au>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 26 Aug 2020 15:56:20 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXHCazXbeTDfcjD=rUyLVcOqrHcHqfgOnsDWt51dALfSpg@mail.gmail.com>
+Message-ID: <CAMj1kXHCazXbeTDfcjD=rUyLVcOqrHcHqfgOnsDWt51dALfSpg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: af_alg - Work around empty control messages
+ without MSG_MORE
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Andrew Zaborowski <andrew.zaborowski@intel.com>,
+        Paul Menzel <pmenzel@molgen.mpg.de>,
+        Caleb Jorden <caljorden@hotmail.com>,
+        Sasha Levin <sashal@kernel.org>, iwd@lists.01.org,
+        "# 3.4.x" <stable@vger.kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi
+On Wed, 26 Aug 2020 at 15:30, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> The iwd daemon uses libell which sets up the skcipher operation with
+> two separate control messages.  This is fine by itself but the first
+> control message is sent without MSG_MORE.  This means that the first
+> control message is interpreted as an empty request.
+>
+> While libell should be fixed to use MSG_MORE where appropriate, this
+> patch works around the bug in the kernel so that existing binaries
+> continue to work.
+>
+> We will print a warning however.
+>
+> Reported-by: Caleb Jorden <caljorden@hotmail.com>
+> Fixes: f3c802a1f300 ("crypto: algif_aead - Only wake up when...")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
 
-[This is an automated email]
+Applied this onto v5.4.60, and it makes the iwd selftests pass again
 
-This commit has been processed because it contains a "Fixes:" tag
-fixing commit: b189817cf789 ("crypto: caam/qi - add ablkcipher and authenc algorithms").
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Tested-by: Ard Biesheuvel <ardb@kernel.org>
 
-The bot has tested the following trees: v5.8.2, v5.7.16, v5.4.59, v4.19.140, v4.14.193.
-
-v5.8.2: Failed to apply! Possible dependencies:
-    1108da08e2c1 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
-    a85211f36f3d ("crypto: qat - fallback for xts with 192 bit keys")
-    b185a68710e0 ("crypto: qat - validate xts key")
-    b8aa7dc5c753 ("crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY")
-
-v5.7.16: Failed to apply! Possible dependencies:
-    1108da08e2c1 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
-    a85211f36f3d ("crypto: qat - fallback for xts with 192 bit keys")
-    b185a68710e0 ("crypto: qat - validate xts key")
-    b8aa7dc5c753 ("crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY")
-
-v5.4.59: Failed to apply! Possible dependencies:
-    1108da08e2c1 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
-    64db5e7439fb ("crypto: sparc/aes - convert to skcipher API")
-    66d7fb94e4ff ("crypto: blake2s - generic C library implementation and selftest")
-    674f368a952c ("crypto: remove CRYPTO_TFM_RES_BAD_KEY_LEN")
-    746b2e024c67 ("crypto: lib - tidy up lib/crypto Kconfig and Makefile")
-    7988fb2c03c8 ("crypto: s390/aes - convert to skcipher API")
-    7f725f41f627 ("crypto: powerpc - convert SPE AES algorithms to skcipher API")
-    7f9b0880925f ("crypto: blake2s - implement generic shash driver")
-    91d689337fe8 ("crypto: blake2b - add blake2b generic implementation")
-    b4d0c0aad57a ("crypto: arm - use Kconfig based compiler checks for crypto opcodes")
-    b95bba5d0114 ("crypto: skcipher - rename the crypto_blkcipher module and kconfig option")
-    d00c06398154 ("crypto: s390/paes - convert to skcipher API")
-    da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
-    ed0356eda153 ("crypto: blake2s - x86_64 SIMD implementation")
-
-v4.19.140: Failed to apply! Possible dependencies:
-    0a5dff9882e5 ("crypto: arm/ghash - provide a synchronous version")
-    1108da08e2c1 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
-    1ca1b917940c ("crypto: chacha20-generic - refactor to allow varying number of rounds")
-    5ca7badb1f62 ("crypto: caam/jr - ablkcipher -> skcipher conversion")
-    674f368a952c ("crypto: remove CRYPTO_TFM_RES_BAD_KEY_LEN")
-    8a5a79d5556b ("crypto: x86/chacha20 - Add a 4-block AVX2 variant")
-    99680c5e9182 ("crypto: arm - convert to use crypto_simd_usable()")
-    9b17608f15b9 ("crypto: x86/chacha20 - Use larger block functions more aggressively")
-    9dbe3072c6b1 ("crypto: caam/qi - ablkcipher -> skcipher conversion")
-    a5dd97f86211 ("crypto: x86/chacha20 - Add a 2-block AVX2 variant")
-    aec48adce85d ("crypto: caam/qi - remove ablkcipher IV generation")
-    c3b734dd325d ("crypto: x86/chacha20 - Support partial lengths in 8-block AVX2 variant")
-    cf5448b5c3d8 ("crypto: caam/jr - remove ablkcipher IV generation")
-    da6a66853a38 ("crypto: caam - silence .setkey in case of bad key length")
-    db8e15a24957 ("crypto: x86/chacha20 - Support partial lengths in 4-block SSSE3 variant")
-    e4e72063d3c0 ("crypto: x86/chacha20 - Support partial lengths in 1-block SSSE3 variant")
-
-v4.14.193: Failed to apply! Possible dependencies:
-    1108da08e2c1 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
-    5ca7badb1f62 ("crypto: caam/jr - ablkcipher -> skcipher conversion")
-    662f70ede597 ("crypto: caam - remove needless ablkcipher key copy")
-    7e0880b9fbbe ("crypto: caam - add Derived Key Protocol (DKP) support")
-    9dbe3072c6b1 ("crypto: caam/qi - ablkcipher -> skcipher conversion")
-    cf5448b5c3d8 ("crypto: caam/jr - remove ablkcipher IV generation")
-
-
-NOTE: The patch will not be queued to stable trees until it is upstream.
-
-How should we proceed with this patch?
-
--- 
-Thanks
-Sasha
+> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+> index a6f581ab200c..3da21cadc326 100644
+> --- a/crypto/af_alg.c
+> +++ b/crypto/af_alg.c
+> @@ -16,6 +16,7 @@
+>  #include <linux/module.h>
+>  #include <linux/net.h>
+>  #include <linux/rwsem.h>
+> +#include <linux/sched.h>
+>  #include <linux/sched/signal.h>
+>  #include <linux/security.h>
+>
+> @@ -846,8 +847,14 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+>
+>         lock_sock(sk);
+>         if (ctx->init && (init || !ctx->more)) {
+> -               err = -EINVAL;
+> -               goto unlock;
+> +               if (ctx->used) {
+> +                       err = -EINVAL;
+> +                       goto unlock;
+> +               }
+> +
+> +               pr_info_once(
+> +                       "%s sent an empty control message without MSG_MORE.\n",
+> +                       current->comm);
+>         }
+>         ctx->init = true;
+>
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
