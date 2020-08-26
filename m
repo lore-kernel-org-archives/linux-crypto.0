@@ -2,120 +2,90 @@ Return-Path: <SRS0=MfKA=CE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D466C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 08:56:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 423E5C433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 09:07:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC6512071E
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 08:56:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12CEB2075E
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 09:07:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qZ9GJQS3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727829AbgHZI4y (ORCPT
+        id S1727792AbgHZJHr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Aug 2020 04:56:54 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:33544 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727793AbgHZI4x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Aug 2020 04:56:53 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id A7F9DE2FCF4426178BA4;
-        Wed, 26 Aug 2020 16:56:50 +0800 (CST)
-Received: from [127.0.0.1] (10.74.173.29) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Wed, 26 Aug 2020
- 16:56:40 +0800
-Subject: Re: [PATCH RESEND 04/10] crypto: hisilicon/zip - replace 'sprintf'
- with 'scnprintf'
-To:     David Laight <David.Laight@ACULAB.COM>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-References: <1598238709-58699-1-git-send-email-shenyang39@huawei.com>
- <1598238709-58699-5-git-send-email-shenyang39@huawei.com>
- <d1102aca2bdc4df4acc31d8b082cacce@AcuMS.aculab.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "xuzaibo@huawei.com" <xuzaibo@huawei.com>,
-        "wangzhou1@hisilicon.com" <wangzhou1@hisilicon.com>
-From:   "shenyang (M)" <shenyang39@huawei.com>
-Message-ID: <abc0c78e-3232-9081-c330-3d5b8db9e683@huawei.com>
-Date:   Wed, 26 Aug 2020 16:56:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        Wed, 26 Aug 2020 05:07:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36892 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727122AbgHZJHp (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Aug 2020 05:07:45 -0400
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 795F3C061574
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2020 02:07:45 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id b79so396267wmb.4
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2020 02:07:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=NhNd+58Ke9NXCgIaYKHAdShT/zbomUPozimvfjSixrU=;
+        b=qZ9GJQS3j8rbsLLz/ln5goSk4ciwiqFL3uriCAVdtXXs3ELwIMm3H+K/W20gzFZz9E
+         kvwaPukYfJcchgKITR7xXA+3dwS6kT1aZnd3KJYpkvqcXItHatLqbMDpTGJ8soTsX9mT
+         xjEKsPYnWH6WExD0R2sLkUzNiu/OK7LaUfKy25ysvpu+bpxjLShkVOltBMkS9XEMPrql
+         8LTsnq5AR21yv30QQmpZnTy+FYnMhoYkiGaj/AduLJ5/KXXvzlH0BzbGbyTWSTUkaaso
+         /m4dRHmQgwCDSLnDQ++Rusb8wO6FOEkjIDKwCnFXxq36p/GMKbdAJTo7UC4BzfZrA6nq
+         2IMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=NhNd+58Ke9NXCgIaYKHAdShT/zbomUPozimvfjSixrU=;
+        b=QYipdX+7P6MhbYreRYTtOAgcWS4T0QBU2oNLWl7eTwj3DJq88QnX9PNnLj2XnCg10z
+         ql5ooqwt5FmOKcXKqpwwaAokeXrjOZlmQ0gfBoaSfMHmwBHHxDzR+CvZxPuiyGfMWZbo
+         KF+NePY2f8k8GGzvxd85rQ3sIQfwXMP0YtbfrWsHHr3DKqb+hhac++3Tv+qt+3XrOf43
+         OzbBc5v2huEbdYOZa8rA28WYM8QnSL80VuYFgUhjsXGG9smseqQFZmNCqOOttznvbjSy
+         +6r5c6UEnUxZ8yKzNBdkLQ3NUs54MEGuzH/VQWIAtkCIXcLU/n/Ilmzd0Zpi1H1d5ILs
+         7T3g==
+X-Gm-Message-State: AOAM530WjBJoj+iLG+ImNCf+uc4rVIPKRsory8JNoc95N0bgLcWiom7X
+        XLqoNIDAS65S/dONZAVZ4voQf7XACe0=
+X-Google-Smtp-Source: ABdhPJzy787HWfNugnEyjD7drq4MnTq6HvvxuTzC14P2JbChQS+bEZDdkstqKeYkWmRO0GND5tmcJw==
+X-Received: by 2002:a7b:c1cb:: with SMTP id a11mr6300390wmj.90.1598432860506;
+        Wed, 26 Aug 2020 02:07:40 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id v16sm3788118wmj.14.2020.08.26.02.07.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Aug 2020 02:07:39 -0700 (PDT)
+Date:   Wed, 26 Aug 2020 11:07:38 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Martin Cerveny <M.Cerveny@computer.org>
+Cc:     Maxime Ripard <mripard@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: PROBLEM: SHA1 on Allwinner V3s failed
+Message-ID: <20200826090738.GA6772@Red>
+References: <alpine.GSO.2.00.2008260919550.23953@dmz.c-home.cz>
 MIME-Version: 1.0
-In-Reply-To: <d1102aca2bdc4df4acc31d8b082cacce@AcuMS.aculab.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.74.173.29]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.GSO.2.00.2008260919550.23953@dmz.c-home.cz>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, Aug 26, 2020 at 09:52:30AM +0200, Martin Cerveny wrote:
+> Hello.
+> 
+> [1.] One line summary of the problem:
+> 
+> SHA1 on Allwinner V3s failed
+> 
 
+Hello
 
-On 2020/8/24 16:29, David Laight wrote:
-> From: Yang Shen
->> Sent: 24 August 2020 04:12
->>
->> Replace 'sprintf' with 'scnprintf' to avoid overrun.
->>
->> Signed-off-by: Yang Shen <shenyang39@huawei.com>
->> Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
->> ---
->>  drivers/crypto/hisilicon/zip/zip_main.c | 11 +++++++----
->>  1 file changed, 7 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
->> index df1a16f..1883d1b 100644
->> --- a/drivers/crypto/hisilicon/zip/zip_main.c
->> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
->> @@ -428,7 +428,7 @@ static ssize_t hisi_zip_ctrl_debug_read(struct file *filp, char __user *buf,
->>  		return -EINVAL;
->>  	}
->>  	spin_unlock_irq(&file->lock);
->> -	ret = sprintf(tbuf, "%u\n", val);
->> +	ret = scnprintf(tbuf, HZIP_BUF_SIZE, "%u\n", val);
->
-> Should that be sizeof (tbuf).
->
->>  	return simple_read_from_buffer(buf, count, pos, tbuf, ret);
->>  }
->>
->> @@ -514,13 +514,16 @@ static int hisi_zip_core_debug_init(struct hisi_qm *qm)
->>  	struct debugfs_regset32 *regset;
->>  	struct dentry *tmp_d;
->>  	char buf[HZIP_BUF_SIZE];
->> -	int i;
->> +	int i, ret;
->>
->>  	for (i = 0; i < HZIP_CORE_NUM; i++) {
->>  		if (i < HZIP_COMP_CORE_NUM)
->> -			sprintf(buf, "comp_core%d", i);
->> +			ret = scnprintf(buf, HZIP_BUF_SIZE, "comp_core%d", i);
->>  		else
->> -			sprintf(buf, "decomp_core%d", i - HZIP_COMP_CORE_NUM);
->> +			ret = scnprintf(buf, HZIP_BUF_SIZE, "decomp_core%d",
->> +					i - HZIP_COMP_CORE_NUM);
->> +		if (!ret)
->> +			return -ENOMEM;
->
-> and that is just so wrong - did you even try to test
-> the 'buffer too small' code path?
->
-> 	David
->
+Since only SHA1 is failling, could you try to use the "allwinner,sun8i-a33-crypto", just in case V3s has the same SHA1 HW quirck than A33.
 
-Do you means the check is unnecessary?
-
-Yang
-> -
-> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-> Registration No: 1397386 (Wales)
->
->
-> .
->
-
+Regards
