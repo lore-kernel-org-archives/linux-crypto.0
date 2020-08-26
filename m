@@ -2,90 +2,157 @@ Return-Path: <SRS0=MfKA=CE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 423E5C433E1
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 09:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9215DC433DF
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 10:40:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 12CEB2075E
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 09:07:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qZ9GJQS3"
+	by mail.kernel.org (Postfix) with ESMTP id 6DC462083B
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 10:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1598438429;
+	bh=txaSaNPnXRRk4ooQL2bKzX5EI3dP8CHaqLkAxMpUPeI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=ivvWmYLLdPN+HDe53UILfWrYSC1FFdfbW8vIAbE2del41X7ngTCyHsNxMMuhZUFer
+	 bxQGsbBGae9hL30wFTXyigXgpK3UfYFcQq2w+Ex8kPn7Kuaj5d6SJ64lCPFaul6F0D
+	 vppOhBWQQvbQQI0MnNP/2pA9wj/t9HPoqppbrSuk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727792AbgHZJHr (ORCPT
+        id S1728525AbgHZKk2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Aug 2020 05:07:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36892 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727122AbgHZJHp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Aug 2020 05:07:45 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 795F3C061574
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2020 02:07:45 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id b79so396267wmb.4
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2020 02:07:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=NhNd+58Ke9NXCgIaYKHAdShT/zbomUPozimvfjSixrU=;
-        b=qZ9GJQS3j8rbsLLz/ln5goSk4ciwiqFL3uriCAVdtXXs3ELwIMm3H+K/W20gzFZz9E
-         kvwaPukYfJcchgKITR7xXA+3dwS6kT1aZnd3KJYpkvqcXItHatLqbMDpTGJ8soTsX9mT
-         xjEKsPYnWH6WExD0R2sLkUzNiu/OK7LaUfKy25ysvpu+bpxjLShkVOltBMkS9XEMPrql
-         8LTsnq5AR21yv30QQmpZnTy+FYnMhoYkiGaj/AduLJ5/KXXvzlH0BzbGbyTWSTUkaaso
-         /m4dRHmQgwCDSLnDQ++Rusb8wO6FOEkjIDKwCnFXxq36p/GMKbdAJTo7UC4BzfZrA6nq
-         2IMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=NhNd+58Ke9NXCgIaYKHAdShT/zbomUPozimvfjSixrU=;
-        b=QYipdX+7P6MhbYreRYTtOAgcWS4T0QBU2oNLWl7eTwj3DJq88QnX9PNnLj2XnCg10z
-         ql5ooqwt5FmOKcXKqpwwaAokeXrjOZlmQ0gfBoaSfMHmwBHHxDzR+CvZxPuiyGfMWZbo
-         KF+NePY2f8k8GGzvxd85rQ3sIQfwXMP0YtbfrWsHHr3DKqb+hhac++3Tv+qt+3XrOf43
-         OzbBc5v2huEbdYOZa8rA28WYM8QnSL80VuYFgUhjsXGG9smseqQFZmNCqOOttznvbjSy
-         +6r5c6UEnUxZ8yKzNBdkLQ3NUs54MEGuzH/VQWIAtkCIXcLU/n/Ilmzd0Zpi1H1d5ILs
-         7T3g==
-X-Gm-Message-State: AOAM530WjBJoj+iLG+ImNCf+uc4rVIPKRsory8JNoc95N0bgLcWiom7X
-        XLqoNIDAS65S/dONZAVZ4voQf7XACe0=
-X-Google-Smtp-Source: ABdhPJzy787HWfNugnEyjD7drq4MnTq6HvvxuTzC14P2JbChQS+bEZDdkstqKeYkWmRO0GND5tmcJw==
-X-Received: by 2002:a7b:c1cb:: with SMTP id a11mr6300390wmj.90.1598432860506;
-        Wed, 26 Aug 2020 02:07:40 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id v16sm3788118wmj.14.2020.08.26.02.07.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Aug 2020 02:07:39 -0700 (PDT)
-Date:   Wed, 26 Aug 2020 11:07:38 +0200
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Martin Cerveny <M.Cerveny@computer.org>
-Cc:     Maxime Ripard <mripard@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: PROBLEM: SHA1 on Allwinner V3s failed
-Message-ID: <20200826090738.GA6772@Red>
-References: <alpine.GSO.2.00.2008260919550.23953@dmz.c-home.cz>
+        Wed, 26 Aug 2020 06:40:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56216 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728386AbgHZKk0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Aug 2020 06:40:26 -0400
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E5E832080C;
+        Wed, 26 Aug 2020 10:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1598438426;
+        bh=txaSaNPnXRRk4ooQL2bKzX5EI3dP8CHaqLkAxMpUPeI=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=dC+5Olx5mdQHGtKK62E1yUdRwd3jMfhr/j1edBpYOjvI34xMS9P8Lj3QlOSjDdEh3
+         Ads9nnaw2GUczX6HT23SDi4Ct5cjc4fH9rXJNOupxJpuSIdL6wJDS9jDPhMeVvSwRA
+         6tfZnlV6W3577vNWCGv8pcnmnv7eZfTR/3J9JKa8=
+Received: by mail-oo1-f54.google.com with SMTP id a6so326650oog.9;
+        Wed, 26 Aug 2020 03:40:25 -0700 (PDT)
+X-Gm-Message-State: AOAM533d4fGo58lzwKzoQrRPuWg60UoSKZ8airpEhEDVK1zdMBfBkyeq
+        H+OeiQe8ZO7KPB6qJpTwYI9S7pZuydN4BcqlFhM=
+X-Google-Smtp-Source: ABdhPJwV0tCVOBpDOYwyJ7WqID0zDWxC9DNsplWSfqvJpse4QTRdk5ZeqxB8wzlH4itZZkrEmzS/6TmCYNaNFKuQick=
+X-Received: by 2002:a4a:9211:: with SMTP id f17mr4104637ooh.41.1598438425284;
+ Wed, 26 Aug 2020 03:40:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.GSO.2.00.2008260919550.23953@dmz.c-home.cz>
+References: <20200826055150.2753.90553@ml01.vlan13.01.org> <b34f7644-a495-4845-0a00-0aebf4b9db52@molgen.mpg.de>
+In-Reply-To: <b34f7644-a495-4845-0a00-0aebf4b9db52@molgen.mpg.de>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 26 Aug 2020 12:40:14 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEUQdmQDCDXPBNb3hRrbui=HVyDjCDoiFwDr+mDSjP43A@mail.gmail.com>
+Message-ID: <CAMj1kXEUQdmQDCDXPBNb3hRrbui=HVyDjCDoiFwDr+mDSjP43A@mail.gmail.com>
+Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+Cc:     Caleb Jorden <caljorden@hotmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, iwd@lists.01.org,
+        "# 3.4.x" <stable@vger.kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 26, 2020 at 09:52:30AM +0200, Martin Cerveny wrote:
-> Hello.
-> 
-> [1.] One line summary of the problem:
-> 
-> SHA1 on Allwinner V3s failed
-> 
+On Wed, 26 Aug 2020 at 08:18, Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+>
+>
+> Dear Caleb,
+>
+>
+> Thank you for the report. Linux has a no regression policy, so the
+> correct forum to report this to is the Linux kernel folks. I am adding
+> the crypto and stable folks to the receiver list.
+>
+> Am 26.08.20 um 07:51 schrieb caljorden@hotmail.com:
+>
+> > I wanted to note an issue that I have hit with iwd when I upgraded to
+> > the Linux 5.8.3 stable kernel.  My office network uses WPA Enterprise
+> > with EAP-PEAPv0 + MSCHAPv2.  When using this office network,
+> > upgrading to Linux 5.8.3 caused my system to refuse to associate
+> > successfully to the network.  I get the following in my dmesg logs:
+> >
+> > [   40.846535] wlan0: authenticate with <redacted>:60
+> > [   40.850570] wlan0: send auth to <redacted>:60 (try 1/3)
+> > [   40.854627] wlan0: authenticated
+> > [   40.855992] wlan0: associate with <redacted>:60 (try 1/3)
+> > [   40.860450] wlan0: RX AssocResp from <redacted>:60 (capab=3D0x411 st=
+atus=3D0 aid=3D11)
+> > [   40.861620] wlan0: associated
+> > [   41.886503] wlan0: deauthenticating from <redacted>:60 by local choi=
+ce (Reason: 23=3DIEEE8021X_FAILED)
+> > [   42.360127] wlan0: authenticate with <redacted>:22
+> > [   42.364584] wlan0: send auth to <redacted>:22 (try 1/3)
+> > [   42.370821] wlan0: authenticated
+> > [   42.372658] wlan0: associate with <redacted>:22 (try 1/3)
+> > [   42.377426] wlan0: RX AssocResp from <redacted>:22 (capab=3D0x411 st=
+atus=3D0 aid=3D15)
+> > [   42.378607] wlan0: associated
+> > [   43.402009] wlan0: deauthenticating from <redacted>:22 by local choi=
+ce (Reason: 23=3DIEEE8021X_FAILED)
+> > [   43.875921] wlan0: authenticate with <redacted>:60
+> > [   43.879988] wlan0: send auth to <redacted>:60 (try 1/3)
+> > [   43.886244] wlan0: authenticated
+> > [   43.889273] wlan0: associate with <redacted>:60 (try 1/3)
+> > [   43.894586] wlan0: RX AssocResp from <redacted>:60 (capab=3D0x411 st=
+atus=3D0 aid=3D11)
+> > [   43.896077] wlan0: associated
+> > [   44.918504] wlan0: deauthenticating from <redacted>:60 by local choi=
+ce (Reason: 23=3DIEEE8021X_FAILED)
+> >
+> > This continues as long as I let iwd run.
+> >
+> > I downgraded back to Linux 5.8.2, and verified that everything works
+> > as expected.  I also tried using Linux 5.8.3 on a different system at
+> > my home, which uses WPA2-PSK.  It worked fine (though it uses an
+> > Atheros wireless card instead of an Intel card - but I assume that is
+> > irrelevant).
+> >
+> > I decided to try to figure out what caused the issue in the changes
+> > for Linux 5.8.3.  I assumed that it was something that changed in the
+> > crypto interface, which limited my bisection to a very few commits.
+> > Sure enough, I found that if I revert commit
+> > e91d82703ad0bc68942a7d91c1c3d993e3ad87f0 (crypto: algif_aead - Only
+> > wake up when ctx->more is zero), the problem goes away and I am able
+> > to associate to my WPA Enterprise network successfully, and use it.
+> > I found that in order to revert this commit, I also first had to
+> > revert 465c03e999102bddac9b1e132266c232c5456440 (crypto: af_alg - Fix
+> > regression on empty requests), because the two commits have coupled
+> > changes.
+> >
+> > I normally would have assumed that this should be sent to the kernel
+> > list, but I thought I would first mention it here because of what I
+> > found in some email threads on the Linux-Crypto list about the crypto
+> > interfaces to the kernel being sub-optimal and needing to be fixed.
+> > The changes in these commits look like they are just trying to fix
+> > what could be broken interfaces, so I thought that it would make
+> > sense to see what the iwd team thinks about the situation first.
+> >
+> > The wireless card I was using during this testing is an Intel
+> > Wireless 3165 (rev 81).  If there is any additional information I
+> > could help provide, please let me know.
+>
+> It=E2=80=99d be great, if you verified, if the problem occurs with Linus=
+=E2=80=99 master
+> branch too.
+>
 
-Hello
-
-Since only SHA1 is failling, could you try to use the "allwinner,sun8i-a33-crypto", just in case V3s has the same SHA1 HW quirck than A33.
-
-Regards
+It would be helpful if someone could explain for the non-mac80211
+enlightened readers how iwd's EAP-PEAPv0 + MSCHAPv2 support relies on
+the algif_aead socket interface, and which AEAD algorithms it uses. I
+assume this is part of libell?
