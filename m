@@ -2,82 +2,86 @@ Return-Path: <SRS0=MfKA=CE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 002A3C433E1
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:00:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 250EBC433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:15:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD96720FC3
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:00:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E8642208E4
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 13:15:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729382AbgHZNAh (ORCPT
+        id S1730131AbgHZNP3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Aug 2020 09:00:37 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:33116 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728977AbgHZNAg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Aug 2020 09:00:36 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kAv2A-0004QZ-Po; Wed, 26 Aug 2020 23:00:11 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 26 Aug 2020 23:00:10 +1000
-Date:   Wed, 26 Aug 2020 23:00:10 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Andrew Zaborowski <andrew.zaborowski@intel.com>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Paul Menzel <pmenzel@molgen.mpg.de>,
-        Caleb Jorden <caljorden@hotmail.com>,
-        Sasha Levin <sashal@kernel.org>, iwd@lists.01.org,
-        "# 3.4.x" <stable@vger.kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+        Wed, 26 Aug 2020 09:15:29 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:44303 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729177AbgHZNP2 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Aug 2020 09:15:28 -0400
+Received: by mail-lj1-f194.google.com with SMTP id g6so2278339ljn.11;
+        Wed, 26 Aug 2020 06:15:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=f/nPRgHC0iGFykXQ1veAuL/EAakIUq9/Zg/UORe3DVo=;
+        b=ZfgII+nubV6VFC5S9VlSTQf0+5gEAae6S0Kq3K8S67Fa5yzY8IwcMpbvex/dVNqhyx
+         EKwrEPL6EI30MZZRfQ2844SAZ2xNFU9eL1WP80sOEBZTrDXdrOZHj3IJP6m/7+uu/t3+
+         MlJqAf2yoh26MTg25Szc5EPvNAxhxqTLyTC3fRqghyDQr7BjT/vOQzLUnBimfXfwAnd1
+         xCXQ2whsdVCI9XTwWtwJbdO6f21Ja2Hv3HhUFohXcyKObXn+SjdljIhfGN5wsPZJkMLW
+         Lj1ZXZJPgf3lMSZkKly1wIAFboYUzeaHn5v7uURyZ5nsO4tthzjhwCJjjHbsXJMyyqon
+         a9WQ==
+X-Gm-Message-State: AOAM532YSg6DRtW70bxkccC1vb0SAyk/ERqpVGdwu+LBjJv4jatkdad5
+        2mp1isPuR094lzE3Cbo+SUvGSr7tUJA=
+X-Google-Smtp-Source: ABdhPJz7jT67Fc/sgQR58BoX7ag/DyxVE8rLkkDR/Zi2YcfjbLUVL6Yj5ZMEtRBXxf5+swH7Q6cR0w==
+X-Received: by 2002:a2e:85a:: with SMTP id g26mr7096722ljd.60.1598447726234;
+        Wed, 26 Aug 2020 06:15:26 -0700 (PDT)
+Received: from localhost.localdomain (broadband-37-110-38-130.ip.moscow.rt.ru. [37.110.38.130])
+        by smtp.googlemail.com with ESMTPSA id r11sm503320ljk.46.2020.08.26.06.15.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Aug 2020 06:15:25 -0700 (PDT)
+From:   Denis Efremov <efremov@linux.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     Denis Efremov <efremov@linux.com>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
-Message-ID: <20200826130010.GA3232@gondor.apana.org.au>
-References: <20200826055150.2753.90553@ml01.vlan13.01.org>
- <b34f7644-a495-4845-0a00-0aebf4b9db52@molgen.mpg.de>
- <CAMj1kXEUQdmQDCDXPBNb3hRrbui=HVyDjCDoiFwDr+mDSjP43A@mail.gmail.com>
- <20200826114952.GA2375@gondor.apana.org.au>
- <CAMj1kXGjytfJEbLMbz50it3okQfiLScHB5YK2FMqR5CsmFEBbg@mail.gmail.com>
- <20200826120832.GA2996@gondor.apana.org.au>
- <CAOq732JaP=4X9Yh_KjER5_ctQWoauxzXTZqyFP9KsLSxvVH8=w@mail.gmail.com>
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: inside-secure - use kfree_sensitive()
+Date:   Wed, 26 Aug 2020 16:15:14 +0300
+Message-Id: <20200826131515.397667-1-efremov@linux.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOq732JaP=4X9Yh_KjER5_ctQWoauxzXTZqyFP9KsLSxvVH8=w@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 26, 2020 at 02:58:02PM +0200, Andrew Zaborowski wrote:
->
-> Running iwd's and ell's unit tests I can see that at least the
-> following algorithms give EINVAL errors:
-> ecb(aes)
-> cbc(aes)
-> ctr(aes)
-> 
-> The first one fails in recv() and only for some input lengths.  The
-> latter two fail in send().  The relevant ell code starts at
-> https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/ell/cipher.c#n271
-> 
-> The tests didn't get to the point where aead is used.
+Use kfree_sensitive() instead of open-coding it.
 
-Yes ell needs to set MSG_MORE after sending the control message.
-Any sendmsg(2) without a MSG_MORE will be interpreted as the end
-of a request.
+Signed-off-by: Denis Efremov <efremov@linux.com>
+---
+ drivers/crypto/inside-secure/safexcel_hash.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-I'll work around this in the kernel though for the case where there
-is no actual data, with a WARN_ON_ONCE.
-
-Thanks,
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index 16a467969d8e..5ffdc1cd5847 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -1082,8 +1082,7 @@ static int safexcel_hmac_init_pad(struct ahash_request *areq,
+ 		}
+ 
+ 		/* Avoid leaking */
+-		memzero_explicit(keydup, keylen);
+-		kfree(keydup);
++		kfree_sensitive(keydup);
+ 
+ 		if (ret)
+ 			return ret;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.26.2
+
