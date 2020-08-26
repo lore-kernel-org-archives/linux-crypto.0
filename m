@@ -2,84 +2,71 @@ Return-Path: <SRS0=MfKA=CE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60385C433DF
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 16:30:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66840C433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 22:19:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1FC09206FA
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 16:30:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598459452;
-	bh=hRr/a/YAnLdURZWW/rmGtbraj2KU8FLUxIgB33GwWXQ=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=WFuo7fr7ALECFJDf1h8JHqi6Dd8iDa4lme2Bd4bRXcOz6NlMm1/6XbiESwGy+Jdqr
-	 FfqNYMJWxn9znDYfnJptxRGkz9+STbPVapXCslTqDMUJihOrOfZ9Lgh1Ed6E4A2Sgx
-	 TeuBsylbGAqeQCbfkvQS6F4vrw8tLqDLlbGE7E6U=
+	by mail.kernel.org (Postfix) with ESMTP id 4313B20665
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Aug 2020 22:19:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727929AbgHZQaE (ORCPT
+        id S1726798AbgHZWTj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Aug 2020 12:30:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54358 "EHLO mail.kernel.org"
+        Wed, 26 Aug 2020 18:19:39 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:33496 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726739AbgHZQaB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Aug 2020 12:30:01 -0400
-Received: from localhost.localdomain (unknown [194.230.155.216])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8E6AF2074A;
-        Wed, 26 Aug 2020 16:29:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598459401;
-        bh=hRr/a/YAnLdURZWW/rmGtbraj2KU8FLUxIgB33GwWXQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Ugkcwvyy2eF4kcFRRMkgRJ1yQXheRkwuhRoP0kXW++xMfPQHBqdS4QxeP9ZlTQONT
-         x2lAaQnOSBlzovndPDpdNWf8pmgDu0qQL8oR6ik/g/LjJAu7UBfJos+yhWxS6yB7MU
-         fRi9Soxj1q72tXU7iYl9ouFkd5hOJMJhil8YU++M=
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        id S1726753AbgHZWTj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Aug 2020 18:19:39 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1kB3lB-0006pS-LL; Thu, 27 Aug 2020 08:19:14 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 27 Aug 2020 08:19:13 +1000
+Date:   Thu, 27 Aug 2020 08:19:13 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Denis Kenzior <denkenz@gmail.com>,
+        Andrew Zaborowski <andrew.zaborowski@intel.com>,
+        Paul Menzel <pmenzel@molgen.mpg.de>,
+        Caleb Jorden <caljorden@hotmail.com>,
+        Sasha Levin <sashal@kernel.org>, iwd@lists.01.org,
+        "# 3.4.x" <stable@vger.kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH 1/3] crypto: sa2ul - Hide pointer and fix -Wpointer-to-int-cast in dev_dbg()
-Date:   Wed, 26 Aug 2020 18:29:52 +0200
-Message-Id: <20200826162954.28636-1-krzk@kernel.org>
-X-Mailer: git-send-email 2.17.1
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
+Message-ID: <20200826221913.GA16175@gondor.apana.org.au>
+References: <CAMj1kXEUQdmQDCDXPBNb3hRrbui=HVyDjCDoiFwDr+mDSjP43A@mail.gmail.com>
+ <20200826114952.GA2375@gondor.apana.org.au>
+ <CAMj1kXGjytfJEbLMbz50it3okQfiLScHB5YK2FMqR5CsmFEBbg@mail.gmail.com>
+ <20200826120832.GA2996@gondor.apana.org.au>
+ <CAOq732JaP=4X9Yh_KjER5_ctQWoauxzXTZqyFP9KsLSxvVH8=w@mail.gmail.com>
+ <20200826130010.GA3232@gondor.apana.org.au>
+ <c27e5303-48d9-04a4-4e73-cfea5470f357@gmail.com>
+ <20200826141907.GA5111@gondor.apana.org.au>
+ <4bb6d926-a249-8183-b3d9-05b8e1b7808a@gmail.com>
+ <CAMj1kXEn507bEt+eT6q7MpCwNH=oAZsTkFRz0t=kPEV0QxFsOQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXEn507bEt+eT6q7MpCwNH=oAZsTkFRz0t=kPEV0QxFsOQ@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Pointers should not be printed because they might leak important
-information about address space layout.  Use %p to hash the value.  This
-also fixes compilation warnings on 32-bit architecture:
+On Wed, Aug 26, 2020 at 05:42:27PM +0200, Ard Biesheuvel wrote:
+>
+> I still get a failure in aes_siv_encrypt(), which does not occur with
+> the kernel side fix applied.
 
-    drivers/crypto/sa2ul.c:1486:33: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+Where is this test from? I can't find it in the ell git tree.
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- drivers/crypto/sa2ul.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-index 5bc099052bd2..4a950437bf44 100644
---- a/drivers/crypto/sa2ul.c
-+++ b/drivers/crypto/sa2ul.c
-@@ -1482,8 +1482,8 @@ static int sa_sha_init(struct ahash_request *req)
- 	struct sa_sha_req_ctx *rctx = ahash_request_ctx(req);
- 	struct sa_tfm_ctx *ctx = crypto_ahash_ctx(tfm);
- 
--	dev_dbg(sa_k3_dev, "init: digest size: %d, rctx=%llx\n",
--		crypto_ahash_digestsize(tfm), (u64)rctx);
-+	dev_dbg(sa_k3_dev, "init: digest size: %d, rctx=%p\n",
-+		crypto_ahash_digestsize(tfm), rctx);
- 
- 	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback.ahash);
- 	rctx->fallback_req.base.flags =
+Thanks,
 -- 
-2.17.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
