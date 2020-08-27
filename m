@@ -2,151 +2,84 @@ Return-Path: <SRS0=IKCX=CF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0D1CC433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 07:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F39C433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 07:40:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 878F520738
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 07:40:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598514020;
-	bh=/LiQYxCbDRGQBK25FV+ZZG7qakAtgDGsZ/+d3lypKE0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=gyf/+YE+mOmVVe6RLeXMBdRaBbq07mytdSWFmDn0S6OgJpc6vel9KOL8kROvfV3he
-	 g9LggJbkC4JVIki+Qf7s7J2veDC4x73O7p7zwmWde/gD09j/cbzBrEF2yZL6f0fm3G
-	 W010Q2uz658ig4CNEk+h1w/3/HuhZOc55jgydEsw=
+	by mail.kernel.org (Postfix) with ESMTP id 1C310207DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 07:40:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727839AbgH0HkR (ORCPT
+        id S1727935AbgH0Hki (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Aug 2020 03:40:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55032 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727048AbgH0HkN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Aug 2020 03:40:13 -0400
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F31BB207DF;
-        Thu, 27 Aug 2020 07:40:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598514013;
-        bh=/LiQYxCbDRGQBK25FV+ZZG7qakAtgDGsZ/+d3lypKE0=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=syBaQFvdoCiwgk7cVCOoYQ+yK4EBv+0aZ2hy5ghEl8r/qQ5Z4FU6h824YwanRok7K
-         KaUG2O0Vm2LibzQ+/5O89Bmyk58mblOaiwFF1wC23osJy25NNGHGql7ows/EHD9dok
-         SNKgvkLIoQZRoWrFwzjjGKMFvjeSRzU/IM5v7eJc=
-Received: by mail-ot1-f48.google.com with SMTP id 5so3635930otp.12;
-        Thu, 27 Aug 2020 00:40:12 -0700 (PDT)
-X-Gm-Message-State: AOAM530Cd89Tua0V1P4re960xrULsCQ57qfRzSEeIhU9908l1tLhvLe9
-        sPypxUpV7hWSqdQZEyUYEc0OKuMq3K73gKBcKmE=
-X-Google-Smtp-Source: ABdhPJx9MYGrgNv1LMEanHPE4j55h5as3tyjvP5RGGgX2ze5HBi/cvqEI0eE3Io6ZwbEUHdecsRxhxrSDhBEJFj2AQs=
-X-Received: by 2002:a9d:5189:: with SMTP id y9mr7188086otg.77.1598514012179;
- Thu, 27 Aug 2020 00:40:12 -0700 (PDT)
+        Thu, 27 Aug 2020 03:40:38 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:41408 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727048AbgH0Hkg (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Aug 2020 03:40:36 -0400
+Received: by mail-lj1-f196.google.com with SMTP id f26so5291497ljc.8;
+        Thu, 27 Aug 2020 00:40:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Xi4/bpC2nOhERW4W6wGYCHYDZC3N2KKX9AfZgS9TOgk=;
+        b=pvXPGrMEVSxGOWACjDkrCiz8SXSMwlC8nFXZLmNhheSqAIULoq8rgGY5rFhlspegiH
+         NvoTdiThCKDIYJfIN/TADWYv40Q9FRCvN5h+p+8haPjkhaHH8W2Mv8LMKr6IqQEHXdYt
+         L9giiTg9WBdqcqk6dKVXTBPXtPZ6we4lke+kInzkcw8cZKWEr/BdnikFRGYiV+ehpWeF
+         MGlxkdBkQnNrTMsuvGpMhTgBKRl+nxREOAxMcWgxdluICR0pVxku9mOBrc+G9iBkfNF6
+         xGUFR0Erizp6C5hHHtOqqf2OpbWMpuiC0jjiIi3YpG72K1CmMh4HzXp9lfVxkaYc1J2f
+         uexQ==
+X-Gm-Message-State: AOAM530D7GtmTNNPTyoaNvQ62tieIaD5h0uGEuHW6mhoG/rFcyMOKlOf
+        VqB//dnM55sen0ftqcowxow=
+X-Google-Smtp-Source: ABdhPJw4M73xAaQ+uQ8XWCGjPw1KrfF+G/Xp9DyRTNwop2IGinJ8QCcXPy3zPRGN4xQlRCpOuZ4/zw==
+X-Received: by 2002:a2e:7014:: with SMTP id l20mr8695707ljc.162.1598514034102;
+        Thu, 27 Aug 2020 00:40:34 -0700 (PDT)
+Received: from localhost.localdomain ([213.87.147.111])
+        by smtp.googlemail.com with ESMTPSA id 7sm289520ljf.38.2020.08.27.00.40.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Aug 2020 00:40:33 -0700 (PDT)
+From:   Denis Efremov <efremov@linux.com>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc:     Denis Efremov <efremov@linux.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: sun8i-ss - remove redundant memzero_explicit()
+Date:   Thu, 27 Aug 2020 10:40:23 +0300
+Message-Id: <20200827074023.15565-1-efremov@linux.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <CAMj1kXGjytfJEbLMbz50it3okQfiLScHB5YK2FMqR5CsmFEBbg@mail.gmail.com>
- <20200826120832.GA2996@gondor.apana.org.au> <CAOq732JaP=4X9Yh_KjER5_ctQWoauxzXTZqyFP9KsLSxvVH8=w@mail.gmail.com>
- <20200826130010.GA3232@gondor.apana.org.au> <c27e5303-48d9-04a4-4e73-cfea5470f357@gmail.com>
- <20200826141907.GA5111@gondor.apana.org.au> <4bb6d926-a249-8183-b3d9-05b8e1b7808a@gmail.com>
- <CAMj1kXEn507bEt+eT6q7MpCwNH=oAZsTkFRz0t=kPEV0QxFsOQ@mail.gmail.com>
- <20200826221913.GA16175@gondor.apana.org.au> <CAMj1kXH-qZZhw5D5sBEVFP9=Z04pU+xCnQ78sDDw6WuSM-pRGQ@mail.gmail.com>
- <20200827071436.GA30281@gondor.apana.org.au>
-In-Reply-To: <20200827071436.GA30281@gondor.apana.org.au>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 27 Aug 2020 09:40:01 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGJWRXu1Mx=ObTkztTdBQusv0N8o-cH1f+KM7d7geD20w@mail.gmail.com>
-Message-ID: <CAMj1kXGJWRXu1Mx=ObTkztTdBQusv0N8o-cH1f+KM7d7geD20w@mail.gmail.com>
-Subject: Re: [v2 PATCH] crypto: af_alg - Work around empty control messages
- without MSG_MORE
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Denis Kenzior <denkenz@gmail.com>,
-        Andrew Zaborowski <andrew.zaborowski@intel.com>,
-        Paul Menzel <pmenzel@molgen.mpg.de>,
-        Caleb Jorden <caljorden@hotmail.com>,
-        Sasha Levin <sashal@kernel.org>, iwd@lists.01.org,
-        "# 3.4.x" <stable@vger.kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 27 Aug 2020 at 09:15, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Thu, Aug 27, 2020 at 08:40:01AM +0200, Ard Biesheuvel wrote:
-> >
-> > It is part of iwd - just build that and run 'make check'
-> >
-> > With your patch applied, the occurrence of sendmsg() in
-> > operate_cipher() triggers the warn_once(), but if I add MSG_MORE
-> > there, the test hangs.
->
-> I see.  This is a different issue.  The original kernel change
-> was a bit too strict here and it is barfing at the fact that two
-> successive sendmsg's of the same request both contain a control
-> message.
->
-> Here's an updated patch to allow this.
->
-> ---8<---
-> The iwd daemon uses libell which sets up the skcipher operation with
-> two separate control messages.  As the first control message is sent
-> without MSG_MORE, it is interpreted as an empty request.
->
-> While libell should be fixed to use MSG_MORE where appropriate, this
-> patch works around the bug in the kernel so that existing binaries
-> continue to work.
->
-> We will print a warning however.
->
-> A separate issue is that the new kernel code no longer allows the
-> control message to be sent twice within the same request.  This
-> restriction is obviously incompatible with what iwd was doing (first
-> setting an IV and then sending the real control message).  This
-> patch changes the kernel so that this is explicitly allowed.
->
-> Reported-by: Caleb Jorden <caljorden@hotmail.com>
-> Fixes: f3c802a1f300 ("crypto: algif_aead - Only wake up when...")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-> index a6f581ab200c..8be8bec07cdd 100644
-> --- a/crypto/af_alg.c
-> +++ b/crypto/af_alg.c
-> @@ -16,6 +16,7 @@
->  #include <linux/module.h>
->  #include <linux/net.h>
->  #include <linux/rwsem.h>
-> +#include <linux/sched.h>
->  #include <linux/sched/signal.h>
->  #include <linux/security.h>
->
-> @@ -845,9 +846,15 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
->         }
->
->         lock_sock(sk);
-> -       if (ctx->init && (init || !ctx->more)) {
-> -               err = -EINVAL;
-> -               goto unlock;
-> +       if (ctx->init && !ctx->more) {
-> +               if (ctx->used) {
-> +                       err = -EINVAL;
-> +                       goto unlock;
-> +               }
-> +
-> +               pr_info_once(
-> +                       "%s sent an empty control message without MSG_MORE.\n",
-> +                       current->comm);
->         }
->         ctx->init = true;
->
+Remove redundant memzero_explicit() in sun8i_ss_cipher() before calling
+kfree_sensitive(). kfree_sensitive() will zero the memory with
+memzero_explicit().
 
-Yep, that works.
+Signed-off-by: Denis Efremov <efremov@linux.com>
+---
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
+index deb8b39a86db..ed2a69f82e1c 100644
+--- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
++++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
+@@ -248,7 +248,6 @@ static int sun8i_ss_cipher(struct skcipher_request *areq)
+ 			offset = areq->cryptlen - ivsize;
+ 			if (rctx->op_dir & SS_DECRYPTION) {
+ 				memcpy(areq->iv, backup_iv, ivsize);
+-				memzero_explicit(backup_iv, ivsize);
+ 				kfree_sensitive(backup_iv);
+ 			} else {
+ 				scatterwalk_map_and_copy(areq->iv, areq->dst, offset,
+-- 
+2.26.2
+
