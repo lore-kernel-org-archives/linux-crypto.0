@@ -2,104 +2,131 @@ Return-Path: <SRS0=IKCX=CF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10A94C433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 17:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D0F4C433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 17:38:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD75E20791
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 17:35:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598549710;
-	bh=SJFyBgJjnJWvokiUuxx31nRuuPCwZwc1QPvpFnDbkBI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=L8SnvQISgBOHQl2LqT5gI1BwARMffftpPJ42ywj8Ybx9tTUQG1TbDyQJ3GiWThnIa
-	 /8OFcdXtiJw8xjnznV3wxVX5pItsgN6IeZdCupbW/tBo+qoJg/Y3GumbYV34kaaWQ2
-	 Q9fNaywpOVnOLATOtTpiftECi+iB1Rgsf3HXDbzA=
+	by mail.kernel.org (Postfix) with ESMTP id 5C0DB22B4B
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 17:38:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UYG0kOTU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727034AbgH0RfK (ORCPT
+        id S1726250AbgH0Rik (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Aug 2020 13:35:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59054 "EHLO
+        Thu, 27 Aug 2020 13:38:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726217AbgH0RfJ (ORCPT
+        with ESMTP id S1726009AbgH0Rik (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Aug 2020 13:35:09 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96DA9C061264
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2020 10:35:08 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id 185so7347366ljj.7
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2020 10:35:08 -0700 (PDT)
+        Thu, 27 Aug 2020 13:38:40 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C91FC061264
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2020 10:38:40 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id m22so8745529eje.10
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2020 10:38:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+BC/JcdsJrh7D1baGdsMISOmKuvWwQO6PTtPOyfbkKo=;
-        b=eCSI0FOCZRGoIZSFsgWImch53XxylRdRW9nBxdCujM9/5e9Icmd99didgqiTQNpgqR
-         sKrz0tsPtlMub2w7SYON4tyaIZXXNlhBhfBuwtSxuJO7vV+6HrKtKFS4DbuKiBlL7msf
-         NRDW5/K/GBZxy0t/NmYf5fzKOw12bYm48anO8=
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=pXKWjriGhujBv/DGQf3alBhqVGWIFwTOdYaLD9TTrR4=;
+        b=UYG0kOTUt/JnsGk4juCGi7rsxwjIJGvG2wnb0x6BmnqgeT66puD1OZzaJ4mogxpLYR
+         3VHsIobTFucZJMtPRPqwdZsSUPpQn27FtfHACAbfN3nI0IMPlWHYoESLQVkAteAXRz82
+         TiF8MqFq7Mu+7Iwzu3SC1LWYMoCKJ7o8/SMhpLQopOlXUbCkQK6auHUfhVBDtgkRxqgK
+         Yx9ulXDDx9UXp3G/wjkqFR3j8zPquZpaPKhdN+5wLwXVhi6ELPJZehRStzwCs0lUnLeh
+         F+Z3cwHoNsHmL+YIF8GVERzbpRHs72sno3fkbV6mY14Kcubw8foCvDdAjYGTNW8q2woI
+         6ivQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+BC/JcdsJrh7D1baGdsMISOmKuvWwQO6PTtPOyfbkKo=;
-        b=CKJ4B/2LIVDA78ezQNbKpCu2yaBZ6Rg2JdCtRO5VT5UfwiZtxEHsgSPl7JM40PvHc6
-         pLibKLiUSQrL7BoVXrRParkjLq41z2eBI3F0TnbAMcOjupMkeGSkgMBJqf+PM8JImrPr
-         ldCB1kk8zscDbPhA5cpXr2jHU3CLMXCj8whTuZNZ5jIEYp1PXfpJ4Nwn7fP3YEjX2Qza
-         vd0K8PswAao6oXDsJg7QddYjsVR/2g1vpPwK0wFYFEegy30P0LVn+w3d7niMqcJmhKVF
-         xWDi4RoBkT5HWo0c1WAz3aV0GJ9UpvR6ZrUzuoaWoOdlz/QotFGVmhHVlxLiCYrJDCBb
-         OYLQ==
-X-Gm-Message-State: AOAM533hLyMcsqsbZH3/KyLRSi5pfFycikuYP7HZTcD51IIRS7CQpYbm
-        nfMZ+9apsDFhZt5Wvbh9f9NBX6kn3MAVYw==
-X-Google-Smtp-Source: ABdhPJz2h0DCyVZmC3w6LfJg0i+lKbfKq3UyPcBe0oaidUuj5stiDnjG+J4mJuSnUcIdowHeiQV/yg==
-X-Received: by 2002:a05:651c:201b:: with SMTP id s27mr10474846ljo.468.1598549706658;
-        Thu, 27 Aug 2020 10:35:06 -0700 (PDT)
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com. [209.85.167.47])
-        by smtp.gmail.com with ESMTPSA id g19sm601289ljk.125.2020.08.27.10.35.05
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Aug 2020 10:35:05 -0700 (PDT)
-Received: by mail-lf1-f47.google.com with SMTP id q8so971998lfb.6
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2020 10:35:05 -0700 (PDT)
-X-Received: by 2002:ac2:58db:: with SMTP id u27mr5435779lfo.142.1598549704843;
- Thu, 27 Aug 2020 10:35:04 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=pXKWjriGhujBv/DGQf3alBhqVGWIFwTOdYaLD9TTrR4=;
+        b=EWGv6/YjvOqu15sdboZz3BiPF+bJa8P7LZ4I1a5TIzYMhs6qTPXHhESsxYH3/3uasK
+         +SCNTdcuoVjLzHIGJSUpoVKI1iNfELlm82tpAmd95LWcOZh5RrXckedCzqh72Hwd0T+T
+         +tjqRaAR65fCnoA6cisXC+EIMMgxC4TTZyTzdJn2Rtt4X6Gx5DLPT1pdpm5U1ZVrjv1E
+         2Ou7QibR3H6+TmsNbAItguvwpeQlUYPNuhvR046/SUcFHA+JCwiRBXMalpvgz4yPgr0M
+         ga7YI99Md/aujMjs9q+q6vRL5SQZwBF7SoIYltxelv8g9sRsQ3Lnpw2mC1hJOLhpzMm0
+         HF9Q==
+X-Gm-Message-State: AOAM531zw6d9B8nKmbKRzbIhlO5Ky2T+6Ii+HIKnFnq61aXkqwHdGVNt
+        fcIYdcXEKl+ecaUzGru03sZAYEZWzu6V/w==
+X-Google-Smtp-Source: ABdhPJybv/WrWyMhLN26wkOo008brwZxbkETJnZYTw+Vb5JzxDEgOPIw1C4buo+sS2SvssyVUWnnKw==
+X-Received: by 2002:a17:906:a3d6:: with SMTP id ca22mr21749711ejb.78.1598549918523;
+        Thu, 27 Aug 2020 10:38:38 -0700 (PDT)
+Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
+        by smtp.gmail.com with ESMTPSA id ch24sm2432872ejb.7.2020.08.27.10.38.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Aug 2020 10:38:38 -0700 (PDT)
+From:   Uros Bizjak <ubizjak@gmail.com>
+To:     linux-crypto@vger.kernel.org, x86@kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: [PATCH] crypto/x86: Use XORL r32,32 in poly1305-x86_64-cryptogams.pl
+Date:   Thu, 27 Aug 2020 19:38:31 +0200
+Message-Id: <20200827173831.95039-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <202008271145.xE8qIAjp%lkp@intel.com> <20200827080558.GA3024@gondor.apana.org.au>
- <CAMj1kXHJrLtnJWYBKBYRtNHVS6rv51+crMsjLEnSqkud0BBaWw@mail.gmail.com> <20200827082447.GA3185@gondor.apana.org.au>
-In-Reply-To: <20200827082447.GA3185@gondor.apana.org.au>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 27 Aug 2020 10:34:48 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wg2RCgmW_KM8Gf9-3VJW1K2-FTXQsGeGHirBFsG5zPbsg@mail.gmail.com>
-Message-ID: <CAHk-=wg2RCgmW_KM8Gf9-3VJW1K2-FTXQsGeGHirBFsG5zPbsg@mail.gmail.com>
-Subject: Re: lib/crypto/chacha.c:65:1: warning: the frame size of 1604 bytes
- is larger than 1024 bytes
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Ard Biesheuvel <ardb@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        kernel test robot <lkp@intel.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Kees Cook <keescook@chromium.org>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>,
-        kbuild-all@lists.01.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 27, 2020 at 1:25 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> Interestingly this particular file fails with those options on
-> gcc 8, 9 and 10.
+x86_64 zero extends 32bit operations, so for 64bit operands,
+XORL r32,r32 is functionally equal to XORQ r64,r64, but avoids
+a REX prefix byte when legacy registers are used.
 
-How are you guys testing? I have UBSAN and GCOV on, and don't see
-crazy frames on either i386 or x86-64.
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+---
+ arch/x86/crypto/poly1305-x86_64-cryptogams.pl | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-I see 72 bytes and 64 bytes respectively for chacha_permute() (plus
-the register pushes, which is about the same size)
+diff --git a/arch/x86/crypto/poly1305-x86_64-cryptogams.pl b/arch/x86/crypto/poly1305-x86_64-cryptogams.pl
+index 137edcf038cb..7d568012cc15 100644
+--- a/arch/x86/crypto/poly1305-x86_64-cryptogams.pl
++++ b/arch/x86/crypto/poly1305-x86_64-cryptogams.pl
+@@ -246,7 +246,7 @@ $code.=<<___ if (!$kernel);
+ ___
+ &declare_function("poly1305_init_x86_64", 32, 3);
+ $code.=<<___;
+-	xor	%rax,%rax
++	xor	%eax,%eax
+ 	mov	%rax,0($ctx)		# initialize hash value
+ 	mov	%rax,8($ctx)
+ 	mov	%rax,16($ctx)
+@@ -2853,7 +2853,7 @@ $code.=<<___;
+ .type	poly1305_init_base2_44,\@function,3
+ .align	32
+ poly1305_init_base2_44:
+-	xor	%rax,%rax
++	xor	%eax,%eax
+ 	mov	%rax,0($ctx)		# initialize hash value
+ 	mov	%rax,8($ctx)
+ 	mov	%rax,16($ctx)
+@@ -3947,7 +3947,7 @@ xor128_decrypt_n_pad:
+ 	mov	\$16,$len
+ 	sub	%r10,$len
+ 	xor	%eax,%eax
+-	xor	%r11,%r11
++	xor	%r11d,%r11d
+ .Loop_dec_byte:
+ 	mov	($inp,$otp),%r11b
+ 	mov	($otp),%al
+@@ -4085,7 +4085,7 @@ avx_handler:
+ 	.long	0xa548f3fc		# cld; rep movsq
+ 
+ 	mov	$disp,%rsi
+-	xor	%rcx,%rcx		# arg1, UNW_FLAG_NHANDLER
++	xor	%ecx,%ecx		# arg1, UNW_FLAG_NHANDLER
+ 	mov	8(%rsi),%rdx		# arg2, disp->ImageBase
+ 	mov	0(%rsi),%r8		# arg3, disp->ControlPc
+ 	mov	16(%rsi),%r9		# arg4, disp->FunctionEntry
+-- 
+2.26.2
 
-                  Linus
