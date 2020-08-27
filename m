@@ -2,113 +2,133 @@ Return-Path: <SRS0=IKCX=CF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34321C433E1
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 06:45:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA958C433E3
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 07:15:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0F86C20786
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 06:45:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 927B322CB1
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 07:15:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727903AbgH0GpI (ORCPT
+        id S1726988AbgH0HPF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Aug 2020 02:45:08 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:40307 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727786AbgH0GpC (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Aug 2020 02:45:02 -0400
-Received: by mail-lj1-f196.google.com with SMTP id 185so5150702ljj.7;
-        Wed, 26 Aug 2020 23:45:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Z1FtQqybTk7XeGKn+tbU1SxGG4A7Kn9b4E+VmVIA+4E=;
-        b=QM0hma1AoivbeZTjGzIW4YhCx8nVHOSaSI1MOjB7VelmqZ53MhHZZ98537VNZYWkua
-         YfqvI8NwNNGrZlJk1MKCTBsQvmGQJJHqpPI9TuwVaVgYdrOojZU2huKe23m9128My5UT
-         nDr2LLnRloAAKHkLMusX/2R0hFkNaP7GDLjioIonO4auMgnuUTu5ma3uWkNJgtPItDog
-         VmmiqAI08mITBXkX+Hdf5pz0cMGiXLURBeOC8MDIWfu8NvEtOMEt4IeA3tIo13H66BfF
-         27grsA+hwqY65vFbkzpCiaGzHwG5sUKFUC9F4F1KVOKhDLDTchxygDmYatRPFE+GemOY
-         NNOQ==
-X-Gm-Message-State: AOAM532Zo41RZYhRTHGmNgPRDXbpGCswj67wr+2vCsdFlo6h5vMzuGHS
-        8HbCHemuvSrC2WmnbQFhKhVbNaLFPjU=
-X-Google-Smtp-Source: ABdhPJy/YgtnYLAzwc+zepGvHr3uKojbRx+/ttpKqGkFdWBQ+Mih5iRHExuBfwddNNTBXj4VSYR47g==
-X-Received: by 2002:a2e:9284:: with SMTP id d4mr8696417ljh.64.1598510699078;
-        Wed, 26 Aug 2020 23:44:59 -0700 (PDT)
-Received: from localhost.localdomain ([213.87.147.111])
-        by smtp.googlemail.com with ESMTPSA id j17sm282159lfr.32.2020.08.26.23.44.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Aug 2020 23:44:58 -0700 (PDT)
-From:   Denis Efremov <efremov@linux.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     Denis Efremov <efremov@linux.com>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/4] crypto: sun8i-ss - use kfree_sensitive()
-Date:   Thu, 27 Aug 2020 09:44:02 +0300
-Message-Id: <20200827064402.7130-5-efremov@linux.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200827064402.7130-1-efremov@linux.com>
-References: <20200827064402.7130-1-efremov@linux.com>
+        Thu, 27 Aug 2020 03:15:05 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:34218 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726123AbgH0HPF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Aug 2020 03:15:05 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1kBC7I-0004FM-7A; Thu, 27 Aug 2020 17:14:37 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 27 Aug 2020 17:14:36 +1000
+Date:   Thu, 27 Aug 2020 17:14:36 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Denis Kenzior <denkenz@gmail.com>,
+        Andrew Zaborowski <andrew.zaborowski@intel.com>,
+        Paul Menzel <pmenzel@molgen.mpg.de>,
+        Caleb Jorden <caljorden@hotmail.com>,
+        Sasha Levin <sashal@kernel.org>, iwd@lists.01.org,
+        "# 3.4.x" <stable@vger.kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [v2 PATCH] crypto: af_alg - Work around empty control messages
+ without MSG_MORE
+Message-ID: <20200827071436.GA30281@gondor.apana.org.au>
+References: <CAMj1kXGjytfJEbLMbz50it3okQfiLScHB5YK2FMqR5CsmFEBbg@mail.gmail.com>
+ <20200826120832.GA2996@gondor.apana.org.au>
+ <CAOq732JaP=4X9Yh_KjER5_ctQWoauxzXTZqyFP9KsLSxvVH8=w@mail.gmail.com>
+ <20200826130010.GA3232@gondor.apana.org.au>
+ <c27e5303-48d9-04a4-4e73-cfea5470f357@gmail.com>
+ <20200826141907.GA5111@gondor.apana.org.au>
+ <4bb6d926-a249-8183-b3d9-05b8e1b7808a@gmail.com>
+ <CAMj1kXEn507bEt+eT6q7MpCwNH=oAZsTkFRz0t=kPEV0QxFsOQ@mail.gmail.com>
+ <20200826221913.GA16175@gondor.apana.org.au>
+ <CAMj1kXH-qZZhw5D5sBEVFP9=Z04pU+xCnQ78sDDw6WuSM-pRGQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXH-qZZhw5D5sBEVFP9=Z04pU+xCnQ78sDDw6WuSM-pRGQ@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use kfree_sensitive() instead of open-coding it.
+On Thu, Aug 27, 2020 at 08:40:01AM +0200, Ard Biesheuvel wrote:
+>
+> It is part of iwd - just build that and run 'make check'
+> 
+> With your patch applied, the occurrence of sendmsg() in
+> operate_cipher() triggers the warn_once(), but if I add MSG_MORE
+> there, the test hangs.
 
-Signed-off-by: Denis Efremov <efremov@linux.com>
----
- .../crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c   | 15 +++------------
- 1 file changed, 3 insertions(+), 12 deletions(-)
+I see.  This is a different issue.  The original kernel change
+was a bit too strict here and it is barfing at the fact that two
+successive sendmsg's of the same request both contain a control
+message.
 
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-index 7b39b4495571..deb8b39a86db 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-@@ -368,10 +368,7 @@ void sun8i_ss_cipher_exit(struct crypto_tfm *tfm)
- {
- 	struct sun8i_cipher_tfm_ctx *op = crypto_tfm_ctx(tfm);
+Here's an updated patch to allow this.
+
+---8<---
+The iwd daemon uses libell which sets up the skcipher operation with
+two separate control messages.  As the first control message is sent
+without MSG_MORE, it is interpreted as an empty request.
+
+While libell should be fixed to use MSG_MORE where appropriate, this
+patch works around the bug in the kernel so that existing binaries
+continue to work.
+
+We will print a warning however.
+
+A separate issue is that the new kernel code no longer allows the
+control message to be sent twice within the same request.  This
+restriction is obviously incompatible with what iwd was doing (first
+setting an IV and then sending the real control message).  This
+patch changes the kernel so that this is explicitly allowed.
+
+Reported-by: Caleb Jorden <caljorden@hotmail.com>
+Fixes: f3c802a1f300 ("crypto: algif_aead - Only wake up when...")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index a6f581ab200c..8be8bec07cdd 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -16,6 +16,7 @@
+ #include <linux/module.h>
+ #include <linux/net.h>
+ #include <linux/rwsem.h>
++#include <linux/sched.h>
+ #include <linux/sched/signal.h>
+ #include <linux/security.h>
  
--	if (op->key) {
--		memzero_explicit(op->key, op->keylen);
--		kfree(op->key);
--	}
-+	kfree_sensitive(op->key);
- 	crypto_free_skcipher(op->fallback_tfm);
- 	pm_runtime_put_sync(op->ss->dev);
- }
-@@ -393,10 +390,7 @@ int sun8i_ss_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 		dev_dbg(ss->dev, "ERROR: Invalid keylen %u\n", keylen);
- 		return -EINVAL;
- 	}
--	if (op->key) {
--		memzero_explicit(op->key, op->keylen);
--		kfree(op->key);
--	}
-+	kfree_sensitive(op->key);
- 	op->keylen = keylen;
- 	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
- 	if (!op->key)
-@@ -419,10 +413,7 @@ int sun8i_ss_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 		return -EINVAL;
+@@ -845,9 +846,15 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
  	}
  
--	if (op->key) {
--		memzero_explicit(op->key, op->keylen);
--		kfree(op->key);
--	}
-+	kfree_sensitive(op->key);
- 	op->keylen = keylen;
- 	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
- 	if (!op->key)
+ 	lock_sock(sk);
+-	if (ctx->init && (init || !ctx->more)) {
+-		err = -EINVAL;
+-		goto unlock;
++	if (ctx->init && !ctx->more) {
++		if (ctx->used) {
++			err = -EINVAL;
++			goto unlock;
++		}
++
++		pr_info_once(
++			"%s sent an empty control message without MSG_MORE.\n",
++			current->comm);
+ 	}
+ 	ctx->init = true;
+ 
 -- 
-2.26.2
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
