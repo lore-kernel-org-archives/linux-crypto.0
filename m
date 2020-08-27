@@ -2,117 +2,123 @@ Return-Path: <SRS0=IKCX=CF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E70B1C433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 17:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E974C433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 18:15:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBAB02177B
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 17:55:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598550953;
-	bh=6fu/00yovsv+WyNJlrR+vlvmUMNWyprHqNtSN/fD2h4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=mUTcXJXXhJysKytXXqKy96Pj1D2eDuyDdNl0gBt+p9elptwtoWx79sSIvMo14fjPn
-	 ZH5ueySVbnzAo1TCGRpys7b3sL0qLkvTFDzZAzYe5feseAiYZr6w794cKUHtGuWtDj
-	 CWAWsmTqoLWdsh7PD4lMYeTKH09uX79wmuANoCq8=
+	by mail.kernel.org (Postfix) with ESMTP id 147DB22B4D
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 18:15:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726878AbgH0Rzx (ORCPT
+        id S1726944AbgH0SPJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Aug 2020 13:55:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34024 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726299AbgH0Rzw (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Aug 2020 13:55:52 -0400
-Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A2E6C061264
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2020 10:55:52 -0700 (PDT)
-Received: by mail-lj1-x242.google.com with SMTP id w14so7446417ljj.4
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2020 10:55:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aBxw2hdQPG9HwPnbg4ROvvprorSoqDpTe8GqtXP5pJ0=;
-        b=gEx+R3IPWaIJ1rgeNNwr+K1FkcP5eJOLC7ZA9dQ9Cv0uo0pZjd3WeqmWckEgGWoYrU
-         ZAG7LNkdYBfRW3VrlUxFVNYbKu1wyi/QwU3U8A/KnnoM89gRInpWvJhvjjqCkfZnBCSn
-         5eQEyXLyrqPdWNsvej8MpXfKFNrgFKsRiKyn4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aBxw2hdQPG9HwPnbg4ROvvprorSoqDpTe8GqtXP5pJ0=;
-        b=SAl71iDXXPSAlU6kLBSx0FL4C9x4sXq2Kze25lg1ElID3HrLAwraHVn3kojHiemyh5
-         wcfi1H/mabaSI8Jl715TM8rBLr1M2fSuseCkG+uKFZrLeU46KPGteanqkE01bE76vzS3
-         NAdXKjeVobaiK4jbY39mDlzNJ+2HNSTYM5esuAwHetPdRcc5zSs9V1Z9YwzCFsyuDQwJ
-         V5ixj7OtjUUUtZbt6O+BfcZ8p16/HkyBOhEAzt4yR+Nc5wHQ5lEtmg3ay/6UEbyq2kZ4
-         0mcM5lEe0Y+8fmAgzpuN7vANgIaR4FAczoh5wKxyaLMM/J54hpJTx67mr1e5z2yS9Zyl
-         apvg==
-X-Gm-Message-State: AOAM530S2I/+JQigHgZ/W73Zu1qnkOpyWWiwythL8RwqXsllyKI/oYbh
-        dnZ9qnShEnNVcvvnG7paL+P2zxpI9tfqrw==
-X-Google-Smtp-Source: ABdhPJzaotAksgukUKgbbvyl+eB4yeCblc1LpJkuI4g8iDDQ0D6xYAwI8/nHtGmCUn9/Idh2v7htIw==
-X-Received: by 2002:a2e:97da:: with SMTP id m26mr11065733ljj.9.1598550950499;
-        Thu, 27 Aug 2020 10:55:50 -0700 (PDT)
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com. [209.85.208.174])
-        by smtp.gmail.com with ESMTPSA id u18sm621251ljj.3.2020.08.27.10.55.48
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Aug 2020 10:55:49 -0700 (PDT)
-Received: by mail-lj1-f174.google.com with SMTP id r13so4011513ljm.0
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2020 10:55:48 -0700 (PDT)
-X-Received: by 2002:a2e:b008:: with SMTP id y8mr9098156ljk.421.1598550948550;
- Thu, 27 Aug 2020 10:55:48 -0700 (PDT)
-MIME-Version: 1.0
-References: <202008271145.xE8qIAjp%lkp@intel.com> <20200827080558.GA3024@gondor.apana.org.au>
- <CAMj1kXHJrLtnJWYBKBYRtNHVS6rv51+crMsjLEnSqkud0BBaWw@mail.gmail.com>
- <20200827082447.GA3185@gondor.apana.org.au> <CAHk-=wg2RCgmW_KM8Gf9-3VJW1K2-FTXQsGeGHirBFsG5zPbsg@mail.gmail.com>
-In-Reply-To: <CAHk-=wg2RCgmW_KM8Gf9-3VJW1K2-FTXQsGeGHirBFsG5zPbsg@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 27 Aug 2020 10:55:32 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgXW=YLxGN0QVpp-1w5GDd2pf1W-FqY15poKzoVfik2qA@mail.gmail.com>
-Message-ID: <CAHk-=wgXW=YLxGN0QVpp-1w5GDd2pf1W-FqY15poKzoVfik2qA@mail.gmail.com>
-Subject: Re: lib/crypto/chacha.c:65:1: warning: the frame size of 1604 bytes
- is larger than 1024 bytes
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Ard Biesheuvel <ardb@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        kernel test robot <lkp@intel.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Kees Cook <keescook@chromium.org>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>,
-        kbuild-all@lists.01.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 27 Aug 2020 14:15:09 -0400
+Received: from gw.c-home.cz ([89.24.150.100]:41069 "EHLO dmz.c-home.cz"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726093AbgH0SPJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Aug 2020 14:15:09 -0400
+X-Greylist: delayed 799 seconds by postgrey-1.27 at vger.kernel.org; Thu, 27 Aug 2020 14:15:08 EDT
+Received: from localhost.localdomain (intra-239.c-home.cz [192.168.1.239])
+        by dmz.c-home.cz (8.14.4+Sun/8.14.4) with ESMTP id 07RI0T1G020164;
+        Thu, 27 Aug 2020 20:00:34 +0200 (CEST)
+From:   Martin Cerveny <m.cerveny@computer.org>
+To:     clabbe.montjoie@gmail.com
+Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        robh+dt@kernel.org, mripard@kernel.org, wens@csie.org,
+        m.cerveny@computer.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] ARM: dts: sun8i: v3s: Enable crypto engine
+Date:   Thu, 27 Aug 2020 20:00:27 +0200
+Message-Id: <20200827180027.6254-1-m.cerveny@computer.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 27, 2020 at 10:34 AM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> How are you guys testing? I have UBSAN and GCOV on, and don't see
-> crazy frames on either i386 or x86-64.
+V3S contains crypto engine that is compatible with "sun4i-ss".
 
-Oh, never mind. I also have COMPILE_TEST on, so it ends up disabling
-GCOV_PROFILE_ALL and UBSAN_SANITIZE_ALL.
+Tested-by: Martin Cerveny <m.cerveny@computer.org>
+Signed-off-by: Martin Cerveny <m.cerveny@computer.org>
+---
+ .../bindings/crypto/allwinner,sun4i-a10-crypto.yaml    |  5 ++++-
+ arch/arm/boot/dts/sun8i-v3s.dtsi                       | 10 ++++++++++
+ drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c      |  7 +++++++
+ 3 files changed, 21 insertions(+), 1 deletion(-)
 
-And yeah, this seems to be a gcc bug. It generates a ton of stack
-slots for temporaries. It's -fsanitize=object-size that seems to do
-it.
+diff --git a/Documentation/devicetree/bindings/crypto/allwinner,sun4i-a10-crypto.yaml b/Documentation/devicetree/bindings/crypto/allwinner,sun4i-a10-crypto.yaml
+index fc823572b..180efd13a 100644
+--- a/Documentation/devicetree/bindings/crypto/allwinner,sun4i-a10-crypto.yaml
++++ b/Documentation/devicetree/bindings/crypto/allwinner,sun4i-a10-crypto.yaml
+@@ -25,6 +25,7 @@ properties:
+           - const: allwinner,sun4i-a10-crypto
+       - items:
+           - const: allwinner,sun8i-a33-crypto
++      - const: allwinner,sun8i-v3s-crypto
+ 
+   reg:
+     maxItems: 1
+@@ -59,7 +60,9 @@ if:
+   properties:
+     compatible:
+       contains:
+-        const: allwinner,sun6i-a31-crypto
++        oneOf:
++          - const: allwinner,sun6i-a31-crypto
++          - const: allwinner,sun8i-v3s-crypto
+ 
+ then:
+   required:
+diff --git a/arch/arm/boot/dts/sun8i-v3s.dtsi b/arch/arm/boot/dts/sun8i-v3s.dtsi
+index e5312869c..4fec84c40 100644
+--- a/arch/arm/boot/dts/sun8i-v3s.dtsi
++++ b/arch/arm/boot/dts/sun8i-v3s.dtsi
+@@ -234,6 +234,16 @@
+ 			#size-cells = <0>;
+ 		};
+ 
++		crypto: crypto@1c15000 {
++			compatible = "allwinner,sun8i-v3s-crypto";
++			reg = <0x01c15000 0x1000>;
++			interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&ccu CLK_BUS_CE>, <&ccu CLK_CE>;
++			clock-names = "ahb", "mod";
++			resets = <&ccu RST_BUS_CE>;
++			reset-names = "ahb";
++		};
++
+ 		usb_otg: usb@1c19000 {
+ 			compatible = "allwinner,sun8i-h3-musb";
+ 			reg = <0x01c19000 0x0400>;
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
+index a2b67f7f8..d24496cac 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
+@@ -31,6 +31,10 @@ static const struct ss_variant ss_a33_variant = {
+ 	.sha1_in_be = true,
+ };
+ 
++static const struct ss_variant ss_v3s_variant = {
++	.sha1_in_be = true,
++};
++
+ static struct sun4i_ss_alg_template ss_algs[] = {
+ {       .type = CRYPTO_ALG_TYPE_AHASH,
+ 	.mode = SS_OP_MD5,
+@@ -505,6 +509,9 @@ static const struct of_device_id a20ss_crypto_of_match_table[] = {
+ 	{ .compatible = "allwinner,sun8i-a33-crypto",
+ 	  .data = &ss_a33_variant
+ 	},
++	{ .compatible = "allwinner,sun8i-v3s-crypto",
++	  .data = &ss_v3s_variant
++	},
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(of, a20ss_crypto_of_match_table);
+-- 
+2.17.1
 
-And "-fstack-reuse=all" doesn't seem to make any difference.
-
-So I think
-
- (a) our stack size check is good to catch this
-
- (b) gcc and -fsanitize=object-size is basically an unusable combination
-
-and it's not a bug in the kernel.
-
-                Linus
