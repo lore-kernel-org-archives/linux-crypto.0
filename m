@@ -2,110 +2,90 @@ Return-Path: <SRS0=IKCX=CF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C68C8C433E1
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 14:52:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33BE6C433E1
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 14:58:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7AE122B4E
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 14:52:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kZd6UaPO"
+	by mail.kernel.org (Postfix) with ESMTP id 0B81322B4E
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 14:58:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728155AbgH0Owb (ORCPT
+        id S1727968AbgH0O5q (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Aug 2020 10:52:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33408 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727069AbgH0OwZ (ORCPT
+        Thu, 27 Aug 2020 10:57:46 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:44006 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728979AbgH0MYa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Aug 2020 10:52:25 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F23CC061264;
-        Thu, 27 Aug 2020 07:52:25 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id u18so5443809wmc.3;
-        Thu, 27 Aug 2020 07:52:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jaeNLpsr8Lq2JSXGOnPmF1qMG1fiYbDN5QhNqdIriF8=;
-        b=kZd6UaPODsywloqPEXYGJE2wX1gHdTZH7hOlYW8yEjV/sq97IdGkfXMtF9vicvcwRm
-         KcJyQ6o2yMsjJOL2+s192UFD0bsxxS+9VHF43c6vcTFiRYA7JDLbz4itwwtuolELeCXK
-         D2VNogesiQaePTJ5fupCEAeBthgq8jr34crL+aE33HCzo/zMEoZ1+AaoQUkbz2wS0JfZ
-         psKxwafIEd9ZDy5KlS+qQaVT6xOT2P6Fsr1JYIERjesbxs5g4hlcQcQEkAlYttZ8apv+
-         0YL7sL5UUrNOOjQt0A/R761JJjb8zaiY6NOzhBoJaexFSe1nbXCV1eFPEsUyo5YxeGwL
-         5qAg==
+        Thu, 27 Aug 2020 08:24:30 -0400
+Received: by mail-ed1-f68.google.com with SMTP id f24so4709454edw.10;
+        Thu, 27 Aug 2020 05:24:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jaeNLpsr8Lq2JSXGOnPmF1qMG1fiYbDN5QhNqdIriF8=;
-        b=OAHK8a5r4FIpOjsjJQ0GL3roSDlBZBTiQdvUMln9I3/GpeguALqFYDxVpoXdbydBCP
-         lvncT+KFqJCgCFfjEaHO8caPRlXkJfMKbQFlBmLZRD56ztHuvRjDd9IsWCb7w8xNRyW1
-         wNcdUU8cFuplZz0uaC+UbyOQTtq3es1jc4wWU2qqHAtesbvSope2Gh4BJZP3iuCZmXtA
-         tRr9SO9U1lcKqsii0KMVanlso3PoZ/8aYmkYmUK6TF5l//ogxN6yRGSA3Red7DLgv1ik
-         eHkAnD9ZEidoJEYnILONS0IK5jNJ1duGnBjoKTBzEoZYtNWlYp8DeCWj+icje5bPhflp
-         4wiw==
-X-Gm-Message-State: AOAM530d+x7G6wf8eutvHsa2fM0sb5SqzbIuzRVYHMSE82eKXNfG/DCm
-        3umaIQrU3QgZk/S9IqKaLLQ=
-X-Google-Smtp-Source: ABdhPJxObSFHl9EJZG44VyoYurqG2wa1VHgnKMJmUIawdImzxJvkV/78RYAh0OwF0PyYou3oscpcWA==
-X-Received: by 2002:a1c:2dcc:: with SMTP id t195mr11553794wmt.166.1598539943771;
-        Thu, 27 Aug 2020 07:52:23 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id q12sm6328221wrm.39.2020.08.27.07.52.22
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Vdm5bOPgHGnazrV/Kf0E8YPoyr6BTDTZTERvVKKiRHM=;
+        b=Nv2eLtFi7qUWI+BkaMRgMDzKansk6py7a6fhEsVw3637DYVhatbDiGdLhBaQug0Mb3
+         db58+FBogSBiPKcIu6n/unzweD/musmlbHPvejuAr4Wc9oMcPqeNtII5O+zI0Orn/31B
+         KIl8kILId48IKVsKE2VKR4vON6r1Yz3WDYM27MwG7wtMZo9BZlHkgozkkR575Y1gROMg
+         tr/xmbbv9U7YNsIBQ2nZb8YSRcTq1sOIX+72Mc41D5hvD+uOkDAO8hJIKlKSXeTgb5QF
+         /VR9+7kWhYBEp5jy+GNSW2URQVuZGqmJgKOLuZP8hfEm813DmPsoe2/Snoc0q1NNcBXl
+         Knhw==
+X-Gm-Message-State: AOAM533df0Z7kEdlBNzMPEORMCqTnU/QHVaAYjg0ax08q1plhiMoDxga
+        inFq45B4/aweSFI6CPC5Z8FFdmxh/+M=
+X-Google-Smtp-Source: ABdhPJyyvKxCqX6kyF+9lvjOAwGkbcCCXX1PSBj1we4uxG0oHrShT7n2rDYVeh00xibYfjNLDsxuKg==
+X-Received: by 2002:a2e:1417:: with SMTP id u23mr10159832ljd.44.1598530582939;
+        Thu, 27 Aug 2020 05:16:22 -0700 (PDT)
+Received: from localhost.localdomain ([213.87.147.111])
+        by smtp.googlemail.com with ESMTPSA id 85sm434871ljj.61.2020.08.27.05.16.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Aug 2020 07:52:23 -0700 (PDT)
-Date:   Thu, 27 Aug 2020 16:52:21 +0200
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Denis Efremov <efremov@linux.com>, antoine.tenart@bootlin.com
-Cc:     linux-crypto@vger.kernel.org,
+        Thu, 27 Aug 2020 05:16:22 -0700 (PDT)
+From:   Denis Efremov <efremov@linux.com>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc:     Denis Efremov <efremov@linux.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] crypto: inside-secure - use kfree_sensitive()
-Message-ID: <20200827145221.GB14173@Red>
-References: <20200827064402.7130-1-efremov@linux.com>
- <20200827064402.7130-2-efremov@linux.com>
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] crypto: sun8i-ss - remove redundant memzero_explicit()
+Date:   Thu, 27 Aug 2020 15:16:11 +0300
+Message-Id: <20200827121611.18308-1-efremov@linux.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200827080310.GA29222@Red>
+References: <20200827080310.GA29222@Red>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200827064402.7130-2-efremov@linux.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 27, 2020 at 09:43:59AM +0300, Denis Efremov wrote:
-> Use kfree_sensitive() instead of open-coding it.
-> 
-> Signed-off-by: Denis Efremov <efremov@linux.com>
-> ---
->  drivers/crypto/inside-secure/safexcel_hash.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-> index 16a467969d8e..5ffdc1cd5847 100644
-> --- a/drivers/crypto/inside-secure/safexcel_hash.c
-> +++ b/drivers/crypto/inside-secure/safexcel_hash.c
-> @@ -1082,8 +1082,7 @@ static int safexcel_hmac_init_pad(struct ahash_request *areq,
->  		}
->  
->  		/* Avoid leaking */
-> -		memzero_explicit(keydup, keylen);
-> -		kfree(keydup);
-> +		kfree_sensitive(keydup);
->  
->  		if (ret)
->  			return ret;
-> -- 
-> 2.26.2
-> 
+Remove redundant memzero_explicit() in sun8i_ss_cipher() before calling
+kfree_sensitive(). kfree_sensitive() will zero the memory with
+memzero_explicit().
 
-The maintainer of this driver was not TO/CC.
+Fixes: 453431a54934 ("mm, treewide: rename kzfree() to kfree_sensitive()")
+Signed-off-by: Denis Efremov <efremov@linux.com>
+---
+Changes in v2:
+ - fixes tag added
 
-I Add him.
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Regards
+diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
+index deb8b39a86db..ed2a69f82e1c 100644
+--- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
++++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
+@@ -248,7 +248,6 @@ static int sun8i_ss_cipher(struct skcipher_request *areq)
+ 			offset = areq->cryptlen - ivsize;
+ 			if (rctx->op_dir & SS_DECRYPTION) {
+ 				memcpy(areq->iv, backup_iv, ivsize);
+-				memzero_explicit(backup_iv, ivsize);
+ 				kfree_sensitive(backup_iv);
+ 			} else {
+ 				scatterwalk_map_and_copy(areq->iv, areq->dst, offset,
+-- 
+2.26.2
+
