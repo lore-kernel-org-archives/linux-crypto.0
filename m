@@ -4,54 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FEB8C433E1
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 06:44:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 319D7C433E3
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 06:45:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5A11522BEA
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 06:44:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16EFC22BEF
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 06:45:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727881AbgH0Goz (ORCPT
+        id S1727921AbgH0GpA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Aug 2020 02:44:55 -0400
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:46838 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726266AbgH0Goy (ORCPT
+        Thu, 27 Aug 2020 02:45:00 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:39546 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727913AbgH0Go7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Aug 2020 02:44:54 -0400
-Received: by mail-lj1-f195.google.com with SMTP id h19so5137136ljg.13;
-        Wed, 26 Aug 2020 23:44:53 -0700 (PDT)
+        Thu, 27 Aug 2020 02:44:59 -0400
+Received: by mail-lj1-f193.google.com with SMTP id v9so5155814ljk.6;
+        Wed, 26 Aug 2020 23:44:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=f/nPRgHC0iGFykXQ1veAuL/EAakIUq9/Zg/UORe3DVo=;
-        b=KplhNYR/Q7PpC8q3Dd+2RjcTfCDWnusVGHzwlYkOjxB3pJv2RAKyrOjIhaXq5PIARC
-         6+Ock68WsYxgNgaD/crEy+mwc/72EU+f8Opnhei7Th0qlxehZhHzH+aql+NpWZqmsWrw
-         M3yBLqm70qBRd7YsLEl9aXMMTziNj6EB6m5Fwy+1sEED88In8tKBtgaRHhWjZLLACRHI
-         l5w1kLuQb0eoarwGhSbMV0cyzLkEZbVWQjRfPdt3BYYt3X/6C/rCr1IcMMoFEzQEI+Zu
-         4svy+qVzg+s/tAsAe0ZwLZA/c8cjTkZHcjBaipWF6qp5Td86OJrcjtvKYmWHJ1ik0RUg
-         4aQw==
-X-Gm-Message-State: AOAM533bkU0r1FpnmhiCiWN2Py8MJX+0Tznq9PJ0uIdQYcPAXaMzEgn7
-        Iy7oqNqnyP/GhivLMe6o34MQdxpUFxE=
-X-Google-Smtp-Source: ABdhPJz+PdSPsiaJMGDnJnGpAH3k5yyMkhsoQ8EYD5eusfK2iGv6+RkA691Am5KjrG43htjux6RP7Q==
-X-Received: by 2002:a2e:558:: with SMTP id 85mr1670859ljf.293.1598510692176;
-        Wed, 26 Aug 2020 23:44:52 -0700 (PDT)
+        bh=RUri7ENtOA6E3nbBwyRZL4Lb7nWu+4vuwV8JISffe0c=;
+        b=HqdjxUu29zCe9COxFjizuY1p2XJU205RQP5tCuo3B2B1rKg/uqbAIaEq2F6p8+DMCY
+         H1q7xWOn8d1xwQ0p48Ze5S3tcMASIyX+oocRLsjs9f0hUhF7xUwRlPYOc8msUJjFZujP
+         jwD4M+4OFCjYHNDEn4vir2gT8BAARGcckjDy1Z1CrGwoANmsPHEYIUJJ/one6wAEJAIj
+         bCXcLFXIFqlq/Fw+I7cPtw+1KiiQtwdwTlDzWMW5qk/MEw4JOMIrdlLMmwVvs514ONGb
+         W6tMyTJkDpYfD+Wg1+75H3DLjlit1kgB7rYAuOsSmko3I0o72qOegYz2rdIIaFDHeLRF
+         dPRQ==
+X-Gm-Message-State: AOAM531tSjDLaiQaPIFat0TlfvfwJdiagb4bwms+aAKLfVJUCxhA1LuT
+        MGm4T1h3uEqTfRg3coipVW+B+cpTvTk=
+X-Google-Smtp-Source: ABdhPJzetXiGDcGzoWj3Qw8pHSa891wJyQwdGm5qLgZohqV21khoqBOLbCMT1OVX+LXzgFKYmEJQ7g==
+X-Received: by 2002:a2e:960a:: with SMTP id v10mr9136863ljh.416.1598510696659;
+        Wed, 26 Aug 2020 23:44:56 -0700 (PDT)
 Received: from localhost.localdomain ([213.87.147.111])
-        by smtp.googlemail.com with ESMTPSA id j17sm282159lfr.32.2020.08.26.23.44.50
+        by smtp.googlemail.com with ESMTPSA id j17sm282159lfr.32.2020.08.26.23.44.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Aug 2020 23:44:51 -0700 (PDT)
+        Wed, 26 Aug 2020 23:44:56 -0700 (PDT)
 From:   Denis Efremov <efremov@linux.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Denis Efremov <efremov@linux.com>,
         Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/4] crypto: inside-secure - use kfree_sensitive()
-Date:   Thu, 27 Aug 2020 09:43:59 +0300
-Message-Id: <20200827064402.7130-2-efremov@linux.com>
+Subject: [PATCH v2 3/4] crypto: sun8i-ce - use kfree_sensitive()
+Date:   Thu, 27 Aug 2020 09:44:01 +0300
+Message-Id: <20200827064402.7130-4-efremov@linux.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200827064402.7130-1-efremov@linux.com>
 References: <20200827064402.7130-1-efremov@linux.com>
@@ -66,23 +66,49 @@ Use kfree_sensitive() instead of open-coding it.
 
 Signed-off-by: Denis Efremov <efremov@linux.com>
 ---
- drivers/crypto/inside-secure/safexcel_hash.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c   | 15 +++------------
+ 1 file changed, 3 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 16a467969d8e..5ffdc1cd5847 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -1082,8 +1082,7 @@ static int safexcel_hmac_init_pad(struct ahash_request *areq,
- 		}
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+index b4d5fea27d20..f996dc3d7dcc 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+@@ -366,10 +366,7 @@ void sun8i_ce_cipher_exit(struct crypto_tfm *tfm)
+ {
+ 	struct sun8i_cipher_tfm_ctx *op = crypto_tfm_ctx(tfm);
  
- 		/* Avoid leaking */
--		memzero_explicit(keydup, keylen);
--		kfree(keydup);
-+		kfree_sensitive(keydup);
+-	if (op->key) {
+-		memzero_explicit(op->key, op->keylen);
+-		kfree(op->key);
+-	}
++	kfree_sensitive(op->key);
+ 	crypto_free_skcipher(op->fallback_tfm);
+ 	pm_runtime_put_sync_suspend(op->ce->dev);
+ }
+@@ -391,10 +388,7 @@ int sun8i_ce_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 		dev_dbg(ce->dev, "ERROR: Invalid keylen %u\n", keylen);
+ 		return -EINVAL;
+ 	}
+-	if (op->key) {
+-		memzero_explicit(op->key, op->keylen);
+-		kfree(op->key);
+-	}
++	kfree_sensitive(op->key);
+ 	op->keylen = keylen;
+ 	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
+ 	if (!op->key)
+@@ -416,10 +410,7 @@ int sun8i_ce_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 	if (err)
+ 		return err;
  
- 		if (ret)
- 			return ret;
+-	if (op->key) {
+-		memzero_explicit(op->key, op->keylen);
+-		kfree(op->key);
+-	}
++	kfree_sensitive(op->key);
+ 	op->keylen = keylen;
+ 	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
+ 	if (!op->key)
 -- 
 2.26.2
 
