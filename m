@@ -2,110 +2,109 @@ Return-Path: <SRS0=IKCX=CF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E1F1C433E1
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 07:58:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE58AC433E1
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 08:03:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB01820786
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 07:58:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598515092;
-	bh=awYibhA4t5ZtQZw3w3TIiaHR9uOvXpyWJPnRkXljvkY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=m6CsyaCVpWWwI+wgeOR5YlywfuuE7xon6avLhdy/iHDPUukF5GlAz5VDLMpVEjMNm
-	 Ko/w3K32Bow7i9+lejLTWxpvyhE1rgCtUtmC2BTKaK4WdtWa/yJPxoHSRKZ198PmW4
-	 wNggeJ7IYRJ2wqlquuUQcssYk02x9SoXqlIKZo9k=
+	by mail.kernel.org (Postfix) with ESMTP id CE0D922BF5
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Aug 2020 08:03:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g518Chah"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728524AbgH0H5z (ORCPT
+        id S1728134AbgH0IDP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Aug 2020 03:57:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33884 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728391AbgH0HyY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Aug 2020 03:54:24 -0400
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 71E6722CF7;
-        Thu, 27 Aug 2020 07:54:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598514863;
-        bh=awYibhA4t5ZtQZw3w3TIiaHR9uOvXpyWJPnRkXljvkY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=VyTg38LFRqJvBykurOAVgcyjZFl8Dej4Y9E51FKYn4lg3yqaEHQzXimTjSmTO6reK
-         qTnisWe2HgXA675FPlFMAdSvGkBBJ9gmrHgeufWWRp7CkLH62cFVkr5xqSQDuMxwpH
-         AykRuAp6MOyJ3UU/afkB6jI6cKW2r0r4RGJwGBYw=
-Received: by mail-ot1-f52.google.com with SMTP id k2so3701044ots.4;
-        Thu, 27 Aug 2020 00:54:23 -0700 (PDT)
-X-Gm-Message-State: AOAM530nMZDyB90wVjCeMevWdZi+55D776R1NP1NXnzRNqJRvKT6VQ6r
-        wfjGyEOIXCo16oc5dVkyd68RlwEAlqVGhkgfw6c=
-X-Google-Smtp-Source: ABdhPJzka/lf5uRZNedGeD8+aWitXVwNl94o7ceaCS2qOGuAlEmCCdA7zvmUAgTQPMrO41TFr0qmffUFl2snH+2ek34=
-X-Received: by 2002:a9d:5189:: with SMTP id y9mr7216308otg.77.1598514862803;
- Thu, 27 Aug 2020 00:54:22 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAMj1kXEUQdmQDCDXPBNb3hRrbui=HVyDjCDoiFwDr+mDSjP43A@mail.gmail.com>
- <20200826114952.GA2375@gondor.apana.org.au> <CAMj1kXGjytfJEbLMbz50it3okQfiLScHB5YK2FMqR5CsmFEBbg@mail.gmail.com>
- <20200826120832.GA2996@gondor.apana.org.au> <CAOq732JaP=4X9Yh_KjER5_ctQWoauxzXTZqyFP9KsLSxvVH8=w@mail.gmail.com>
- <20200826130010.GA3232@gondor.apana.org.au> <c27e5303-48d9-04a4-4e73-cfea5470f357@gmail.com>
- <20200826141907.GA5111@gondor.apana.org.au> <4bb6d926-a249-8183-b3d9-05b8e1b7808a@gmail.com>
- <CAMj1kXEn507bEt+eT6q7MpCwNH=oAZsTkFRz0t=kPEV0QxFsOQ@mail.gmail.com>
- <20200826221913.GA16175@gondor.apana.org.au> <BL0PR11MB329980406FA0A14A8EF61A07B9550@BL0PR11MB3299.namprd11.prod.outlook.com>
-In-Reply-To: <BL0PR11MB329980406FA0A14A8EF61A07B9550@BL0PR11MB3299.namprd11.prod.outlook.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 27 Aug 2020 09:54:11 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFX_viiR4S8DiDrcS09o2NFQsZGmizdLc9xjrWOrhgjaA@mail.gmail.com>
-Message-ID: <CAMj1kXFX_viiR4S8DiDrcS09o2NFQsZGmizdLc9xjrWOrhgjaA@mail.gmail.com>
-Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
-To:     Caleb Jorden <caljorden@hotmail.com>
+        Thu, 27 Aug 2020 04:03:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53886 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727786AbgH0IDO (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Aug 2020 04:03:14 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D31E5C061264;
+        Thu, 27 Aug 2020 01:03:13 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id h15so4391245wrt.12;
+        Thu, 27 Aug 2020 01:03:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zPWziuz3LCO0WQPUnYkp4/1miRf1Z3XiRWMKLQJruX4=;
+        b=g518ChahuatEds8QIMSD+o8jx/MfIXKn0ioukoF10QqjB8WzfDRDdhPOy8iLUtoVD6
+         L2/Rql8RMcp9/T3IwtLShmTIg5auKyNbNG3cJh7p8aR7QAEvCPjCTdst3xSy89HDL0VV
+         MsFwRW6mC0S3vY/ujOaiahHA0EkxbHntu7wbo9iVKBVArGF1oFvuFAnUuY5gYxgvMzIE
+         QJWCgwgEyqu8q0LYwdtBptX5N5K/SSVsp4OVMYQEt5KbpvEpGOQvFmo9zl9OJPd705Yr
+         D5UPS0968YqhjP3rzZlwtMqviXV+hsajAWHtt681iRmxdAVpSfbZ2owCGj6wmOU5GT2a
+         LFpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zPWziuz3LCO0WQPUnYkp4/1miRf1Z3XiRWMKLQJruX4=;
+        b=l9YwWL7cflwndM/6+iRdyU5U1EFaafsRX1svBRJB6iOVgZdvj/v7S+gv+R6NVFIifw
+         n2MRvC9B1Ykja4UD1wG0v5BwkTR/VUR8Z9yDYt+PV+9ZiMVdAIzLzdiK1L7ZkhFiLGzU
+         A5n+FPwYnqTW7/RE8N8ypq06UXZukLLZB4+a2p+OoMsDilj9slObftNVUSiJ+e33sCNA
+         8WEV5bmSJwT6K2YmIcmYRRvT5rMLYHQI0t53obSp8OwGIF85uwE9e4ihScX7Gj3y3mmj
+         HsoJ0Gi9MmM96AJ80Bum/5kJ80WdB6ZXoyINac11opDtCL0mEcRjB1XnOIKMnVAU9JjL
+         Gp1g==
+X-Gm-Message-State: AOAM533onAFoJF0qsXPwX7m4znao2D5P9rQsAAKiZ8Y724ewU7bGdtEa
+        HqlDOKgqXVTj87kjCjLsWe8=
+X-Google-Smtp-Source: ABdhPJzGp61xe0Gsy8NKvKUnUa/mtH0mX+6nZ5odV/vnmJpvRw48eE0aNfPx4UtYEFibakuMAWTcTA==
+X-Received: by 2002:adf:f192:: with SMTP id h18mr15865363wro.247.1598515392581;
+        Thu, 27 Aug 2020 01:03:12 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id e2sm4251407wrt.66.2020.08.27.01.03.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Aug 2020 01:03:11 -0700 (PDT)
+Date:   Thu, 27 Aug 2020 10:03:10 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Denis Efremov <efremov@linux.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Denis Kenzior <denkenz@gmail.com>,
-        Andrew Zaborowski <andrew.zaborowski@intel.com>,
-        Paul Menzel <pmenzel@molgen.mpg.de>,
-        Sasha Levin <sashal@kernel.org>,
-        "iwd@lists.01.org" <iwd@lists.01.org>,
-        "# 3.4.x" <stable@vger.kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: sun8i-ss - remove redundant memzero_explicit()
+Message-ID: <20200827080310.GA29222@Red>
+References: <20200827074023.15565-1-efremov@linux.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200827074023.15565-1-efremov@linux.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 27 Aug 2020 at 06:56, Caleb Jorden <caljorden@hotmail.com> wrote:
->
-> I can tell you all assumed this, but just by way as a quick update on the original issue:
->
-> I have confirmed that Herbert's patch (crypto: af_alg - Work around empty control messages without MSG_MORE) does indeed fix the original iwd 1.8 + WPA Enterprise issue.
->
-> Thank you!
->
-> Caleb Jorden
->
+On Thu, Aug 27, 2020 at 10:40:23AM +0300, Denis Efremov wrote:
+> Remove redundant memzero_explicit() in sun8i_ss_cipher() before calling
+> kfree_sensitive(). kfree_sensitive() will zero the memory with
+> memzero_explicit().
+> 
+> Signed-off-by: Denis Efremov <efremov@linux.com>
+> ---
+>  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
+> index deb8b39a86db..ed2a69f82e1c 100644
+> --- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
+> +++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
+> @@ -248,7 +248,6 @@ static int sun8i_ss_cipher(struct skcipher_request *areq)
+>  			offset = areq->cryptlen - ivsize;
+>  			if (rctx->op_dir & SS_DECRYPTION) {
+>  				memcpy(areq->iv, backup_iv, ivsize);
+> -				memzero_explicit(backup_iv, ivsize);
+>  				kfree_sensitive(backup_iv);
+>  			} else {
+>  				scatterwalk_map_and_copy(areq->iv, areq->dst, offset,
+> -- 
+> 2.26.2
+> 
 
-Thanks for confirming.
+Hello
 
-> ________________________________________
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: Thursday, August 27, 2020 3:49 AM
-> To: Ard Biesheuvel
-> Cc: Denis Kenzior; Andrew Zaborowski; Paul Menzel; Caleb Jorden; Sasha Levin; iwd@lists.01.org; # 3.4.x; Greg KH; LKML; David S. Miller; Linux Crypto Mailing List
-> Subject: Re: Issue with iwd + Linux 5.8.3 + WPA Enterprise
->
-> On Wed, Aug 26, 2020 at 05:42:27PM +0200, Ard Biesheuvel wrote:
-> >
-> > I still get a failure in aes_siv_encrypt(), which does not occur with
-> > the kernel side fix applied.
->
-> Where is this test from? I can't find it in the ell git tree.
->
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Could you add:
+Fixes: 453431a54934 ("mm, treewide: rename kzfree() to kfree_sensitive()")
+
+Regards
