@@ -7,57 +7,52 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48E77C433E6
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Aug 2020 07:19:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 466EBC433E6
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Aug 2020 07:19:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 133D420CC7
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Aug 2020 07:19:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2609420CC7
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Aug 2020 07:19:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725969AbgH1HT0 (ORCPT
+        id S1727930AbgH1HTp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Aug 2020 03:19:26 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:35286 "EHLO fornost.hmeau.com"
+        Fri, 28 Aug 2020 03:19:45 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:35298 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726010AbgH1HT0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Aug 2020 03:19:26 -0400
+        id S1726010AbgH1HTp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Aug 2020 03:19:45 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kBYfH-0003ff-C6; Fri, 28 Aug 2020 17:19:12 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Aug 2020 17:19:11 +1000
-Date:   Fri, 28 Aug 2020 17:19:11 +1000
+        id 1kBYfb-0003gW-CX; Fri, 28 Aug 2020 17:19:32 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Aug 2020 17:19:31 +1000
+Date:   Fri, 28 Aug 2020 17:19:31 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     YueHaibing <yuehaibing@huawei.com>
-Cc:     davem@davemloft.net, j-keerthy@ti.com,
+To:     George Acosta <acostag.ubuntu@gmail.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Phani Kiran Hemadri <phemadri@marvell.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH -next] crypto: sa2ul - Fix pointer-to-int-cast warning
-Message-ID: <20200828071911.GA28064@gondor.apana.org.au>
-References: <20200818140001.55140-1-yuehaibing@huawei.com>
+Subject: Re: [PATCH] crypto: cavium/nitrox: add an error message to explain
+ the failure of pci_request_mem_regions
+Message-ID: <20200828071931.GB28064@gondor.apana.org.au>
+References: <20200821031209.21279-1-acostag.ubuntu@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200818140001.55140-1-yuehaibing@huawei.com>
+In-Reply-To: <20200821031209.21279-1-acostag.ubuntu@gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 18, 2020 at 10:00:01PM +0800, YueHaibing wrote:
-> drivers/crypto/sa2ul.c: In function ‘sa_sha_init’:
-> drivers/crypto/sa2ul.c:1486:33: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
->    crypto_ahash_digestsize(tfm), (u64)rctx);
->                                  ^
-> ./include/linux/dev_printk.h:123:47: note: in definition of macro ‘dev_dbg’
->    dev_printk(KERN_DEBUG, dev, dev_fmt(fmt), ##__VA_ARGS__); \
->                                                ^~~~~~~~~~~
+On Thu, Aug 20, 2020 at 10:12:08PM -0500, George Acosta wrote:
+> Provide an error message for users when pci_request_mem_regions failed.
 > 
-> Use %p to print rctx pointer.
-> 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> Signed-off-by: George Acosta <acostag.ubuntu@gmail.com>
 > ---
->  drivers/crypto/sa2ul.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/crypto/cavium/nitrox/nitrox_main.c | 1 +
+>  1 file changed, 1 insertion(+)
 
 Patch applied.  Thanks.
 -- 
