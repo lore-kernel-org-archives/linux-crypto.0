@@ -2,90 +2,89 @@ Return-Path: <SRS0=mh6u=CI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4858C433E6
-	for <linux-crypto@archiver.kernel.org>; Sun, 30 Aug 2020 15:01:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F5CCC433E2
+	for <linux-crypto@archiver.kernel.org>; Sun, 30 Aug 2020 22:33:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7C37E20720
-	for <linux-crypto@archiver.kernel.org>; Sun, 30 Aug 2020 15:01:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jR6mRCmV"
+	by mail.kernel.org (Postfix) with ESMTP id 38B4B208A9
+	for <linux-crypto@archiver.kernel.org>; Sun, 30 Aug 2020 22:33:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726515AbgH3PBV (ORCPT
+        id S1726388AbgH3WdR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 30 Aug 2020 11:01:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53750 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726439AbgH3PBU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 30 Aug 2020 11:01:20 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68EAEC061573;
-        Sun, 30 Aug 2020 08:01:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
-        Reply-To:Cc:Content-ID:Content-Description;
-        bh=oCHVt42okohO0gylQNQyVW0C6OzwnP8SCmOEeTDqT64=; b=jR6mRCmVYr8gGatQ+zdEvZl9rh
-        9xYIOVNIVBW+1W1Ej2rOACKMnKijQfCTVesTlC8gnvnX0bfBE4Ed3to8Ys5g1pXrSzLPUMjrXN867
-        McbupSCJymUCyAzXTXg6NeTZ+no06tfnTPou9u3fUVTOtylqWnSOKDWaV58fbRN8N7oB6UktciJI1
-        5kcCUnrWedZ8SK/GEOEYTrstC/mfk8qwLf3aazvlPKozcniHSmzZN5Mo8D/Hw6yJJ9LHzVWrb5cnN
-        Lp1supJIteoshFPENdZJ2+hIwktQJRQ/D0fg+s1aBs71yOysRw9mdl5koV21FCUGLrzLPwTJE+LkK
-        07PxRPfQ==;
-Received: from [2601:1c0:6280:3f0:897c:6038:c71d:ecac]
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kCOpV-0004JZ-09; Sun, 30 Aug 2020 15:01:13 +0000
-Subject: Re: [RESEND PATCH] KEYS: asymmetric: Fix kerneldoc
-To:     Krzysztof Kozlowski <krzk@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200819175212.20583-1-krzk@kernel.org>
- <20200830145655.GA31461@kozik-lap>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <46f2119d-d94c-517f-46cf-10ec27c820f3@infradead.org>
-Date:   Sun, 30 Aug 2020 08:01:10 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+        Sun, 30 Aug 2020 18:33:17 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:37624 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726179AbgH3WdO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 30 Aug 2020 18:33:14 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1kCVsm-0000Lm-KD; Mon, 31 Aug 2020 08:33:05 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 31 Aug 2020 08:33:04 +1000
+Date:   Mon, 31 Aug 2020 08:33:04 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 5.9
+Message-ID: <20200830223304.GA16882@gondor.apana.org.au>
+References: <20200803044024.GA6429@gondor.apana.org.au>
 MIME-Version: 1.0
-In-Reply-To: <20200830145655.GA31461@kozik-lap>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200803044024.GA6429@gondor.apana.org.au>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/30/20 7:56 AM, Krzysztof Kozlowski wrote:
-> On Wed, Aug 19, 2020 at 07:52:12PM +0200, Krzysztof Kozlowski wrote:
->> Fix W=1 compile warnings (invalid kerneldoc):
->>
->>     crypto/asymmetric_keys/asymmetric_type.c:160: warning: Function parameter or member 'kid1' not described in 'asymmetric_key_id_same'
->>     crypto/asymmetric_keys/asymmetric_type.c:160: warning: Function parameter or member 'kid2' not described in 'asymmetric_key_id_same'
->>     crypto/asymmetric_keys/asymmetric_type.c:160: warning: Excess function parameter 'kid_1' description in 'asymmetric_key_id_same'
->>     crypto/asymmetric_keys/asymmetric_type.c:160: warning: Excess function parameter 'kid_2' description in 'asymmetric_key_id_same'
->>
->> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
->> ---
->>  crypto/asymmetric_keys/asymmetric_type.c | 6 ++++--
->>  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> Hi David, Herbert,
-> 
-> Any comments here?
-> 
-> Best regards,
-> Krzysztof
+Hi Linus:
 
-LGTM.  Thanks.
+This push fixes the following issues:
 
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
+- Regression in af_alg that affects iwd.
+- Restore polling delay in qat.
+- Double free in ingenic on error path.
+- Potential build failure in sa2ul due to missing Kconfig dependency.
 
+The following changes since commit 9123e3a74ec7b934a4a099e98af6a61c2f80bbf5:
+
+  Linux 5.9-rc1 (2020-08-16 13:04:57 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus 
+
+for you to fetch changes up to c195d66a8a75c60515819b101975f38b7ec6577f:
+
+  crypto: af_alg - Work around empty control messages without MSG_MORE (2020-08-27 23:20:36 +1000)
+
+----------------------------------------------------------------
+Giovanni Cabiddu (1):
+      crypto: qat - add delay before polling mailbox
+
+Herbert Xu (1):
+      crypto: af_alg - Work around empty control messages without MSG_MORE
+
+Randy Dunlap (1):
+      crypto: sa2ul - add Kconfig selects to fix build error
+
+Wei Yongjun (1):
+      crypto: ingenic - Drop kfree for memory allocated with devm_kzalloc
+
+ crypto/af_alg.c                           | 13 ++++++++++---
+ drivers/char/hw_random/ingenic-rng.c      |  9 ++-------
+ drivers/crypto/Kconfig                    |  3 +++
+ drivers/crypto/qat/qat_common/adf_admin.c |  7 ++++---
+ 4 files changed, 19 insertions(+), 13 deletions(-)
+
+Thanks,
 -- 
-~Randy
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
