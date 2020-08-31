@@ -2,43 +2,43 @@ Return-Path: <SRS0=nLyl=CJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76611C433E7
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 Aug 2020 15:17:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D492C433E2
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 Aug 2020 15:17:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5523E20866
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 Aug 2020 15:17:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B00720767
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 Aug 2020 15:17:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1598887063;
-	bh=aexLTaeJK4i+xGqf+XieaLyn1A/zgNr75WyclVW344E=;
+	s=default; t=1598887071;
+	bh=EyNe/Jqx1lEy+gis8qzIi7lgHKCZTcsoHSdgF9p8kIw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=fA0qFqqw+Gjdz8qAqCz0XGUJkUS3Jq3nkipT2rSmKXq4AhnPT+yJbdIJRjJ+jWwVT
-	 BjHV34S8tz49O/2SY3u0OX/dtI5ZASo7gE4mFz7O+hTXuz80QZhaPjArdZkulv6PM+
-	 i1Roobn10A1jCmGTNF2pzW3RAs6MvEFe7h2bxnEw=
+	b=LVPaJLEtrA+mU6dRvRgCEAk52L0xqL24o/pY//Hs1oVL0zythtGOk54HfqNtGgL5f
+	 l4hCErzxxwtR1cmlFkVwVt3Ylzi6fmyo0YJTTMXfB/o78Bhv3gKuxITIsRU8HovHeN
+	 kXTSbRgos0Hj52snJiqd7SffIHe/WSDDk929DVys=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728472AbgHaPRm (ORCPT
+        id S1728418AbgHaPRY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 31 Aug 2020 11:17:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52794 "EHLO mail.kernel.org"
+        Mon, 31 Aug 2020 11:17:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52500 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728458AbgHaPRc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Aug 2020 11:17:32 -0400
+        id S1728413AbgHaPRT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 31 Aug 2020 11:17:19 -0400
 Received: from e123331-lin.nice.arm.com (adsl-83.46.190.3.tellas.gr [46.190.3.83])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0280D20E65;
-        Mon, 31 Aug 2020 15:17:27 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E1BCB20936;
+        Mon, 31 Aug 2020 15:17:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1598887051;
-        bh=aexLTaeJK4i+xGqf+XieaLyn1A/zgNr75WyclVW344E=;
+        s=default; t=1598887038;
+        bh=EyNe/Jqx1lEy+gis8qzIi7lgHKCZTcsoHSdgF9p8kIw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lpC4mJZ563bRTtJ4KRmZPKzPBz/Sg/xOKaqBo18wZi/G4v5TeH2uYIW/titegpYvc
-         ccEmAPOfX2PTwg3ufni/ekqVA1xOiNmC6d5W6YNoBj94Ss6zt0lXHyJaSRQ8/aVY9d
-         weRsrLcBiOyZ9o91t2K6Ig9n1SlRZdTFwA4swUoQ=
+        b=ILdsKWeRlwJ2eezJwbi3Zbt1trLHnqs1B2cNmTym7FgL0QeJn5Bvyk/LLZ9kwFQNl
+         1BTE6LonD0Ft+xLyHaNdjVRJ1zgrjtySTwyiYYdBTguyM+9NpblCPxjWIn1VIWJDMJ
+         tF7FCyy4jbQ+s71n/BJQ9ILADvwv/ZCmtn0PIHWc=
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ardb@kernel.org>,
@@ -52,9 +52,9 @@ Cc:     Ard Biesheuvel <ardb@kernel.org>,
         Eric Biggers <ebiggers@google.com>,
         Arnd Bergmann <arnd@arndb.de>, netdev@vger.kernel.org,
         devel@driverdev.osuosl.org, linux-nfs@vger.kernel.org
-Subject: [PATCH v3 7/7] crypto: arc4 - mark ecb(arc4) skcipher as obsolete
-Date:   Mon, 31 Aug 2020 18:16:49 +0300
-Message-Id: <20200831151649.21969-8-ardb@kernel.org>
+Subject: [PATCH v3 4/7] crypto: n2 - remove ecb(arc4) support
+Date:   Mon, 31 Aug 2020 18:16:46 +0300
+Message-Id: <20200831151649.21969-5-ardb@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200831151649.21969-1-ardb@kernel.org>
 References: <20200831151649.21969-1-ardb@kernel.org>
@@ -63,99 +63,82 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Cryptographic algorithms may have a lifespan that is significantly
-shorter than Linux's, and so we need to start phasing out algorithms
-that are known to be broken, and are no longer fit for general use.
-
-RC4 (or arc4) is a good example here: there are a few areas where its
-use is still somewhat acceptable, e.g., for interoperability with legacy
-wifi hardware that can only use WEP or TKIP data encryption, but that
-should not imply that, for instance, use of RC4 based EAP-TLS by the WPA
-supplicant for negotiating TKIP keys is equally acceptable, or that RC4
-should remain available as a general purpose cryptographic transform for
-all in-kernel and user space clients.
-
-Now that all in-kernel users that need to retain support have moved to
-the arc4 library interface, and the known users of ecb(arc4) via the
-socket API (iwd [0] and libell [1][2]) have been updated to switch to a
-local implementation, we can take the next step, and mark the ecb(arc4)
-skcipher as obsolete, and only provide it if the socket API is enabled in
-the first place, as well as provide the option to disable all algorithms
-that have been marked as obsolete.
-
-[0] https://git.kernel.org/pub/scm/network/wireless/iwd.git/commit/?id=1db8a85a60c64523
-[1] https://git.kernel.org/pub/scm/libs/ell/ell.git/commit/?id=53482ce421b727c2
-[2] https://git.kernel.org/pub/scm/libs/ell/ell.git/commit/?id=7f6a137809d42f6b
-
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- crypto/Kconfig | 10 ++++++++++
- crypto/arc4.c  | 10 ++++++++++
- 2 files changed, 20 insertions(+)
+ drivers/crypto/n2_core.c | 46 --------------------
+ 1 file changed, 46 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 1b57419fa2e7..e85d8a059489 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1199,6 +1199,7 @@ config CRYPTO_ANUBIS
- 
- config CRYPTO_ARC4
- 	tristate "ARC4 cipher algorithm"
-+	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_LIB_ARC4
- 	help
-@@ -1881,6 +1882,15 @@ config CRYPTO_USER_API_AEAD
- 	  This option enables the user-spaces interface for AEAD
- 	  cipher algorithms.
- 
-+config CRYPTO_USER_API_ENABLE_OBSOLETE
-+	bool "Enable obsolete cryptographic algorithms for userspace"
-+	depends on CRYPTO_USER_API
-+	default y
-+	help
-+	  Allow obsolete cryptographic algorithms to be selected that have
-+	  already been phased out from internal use by the kernel, and are
-+	  only useful for userspace clients that still rely on them.
-+
- config CRYPTO_STATS
- 	bool "Crypto usage statistics for User-space"
- 	depends on CRYPTO_USER
-diff --git a/crypto/arc4.c b/crypto/arc4.c
-index aa79571dbd49..923aa7a6cd60 100644
---- a/crypto/arc4.c
-+++ b/crypto/arc4.c
-@@ -12,6 +12,7 @@
- #include <crypto/internal/skcipher.h>
- #include <linux/init.h>
- #include <linux/module.h>
-+#include <linux/sched.h>
- 
- static int crypto_arc4_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
- 			      unsigned int key_len)
-@@ -39,6 +40,14 @@ static int crypto_arc4_crypt(struct skcipher_request *req)
- 	return err;
- }
- 
-+static int crypto_arc4_init(struct crypto_skcipher *tfm)
-+{
-+	pr_warn_ratelimited("\"%s\" (%ld) uses obsolete ecb(arc4) skcipher\n",
-+			    current->comm, (unsigned long)current->pid);
-+
-+	return 0;
-+}
-+
- static struct skcipher_alg arc4_alg = {
- 	/*
- 	 * For legacy reasons, this is named "ecb(arc4)", not "arc4".
-@@ -55,6 +64,7 @@ static struct skcipher_alg arc4_alg = {
- 	.setkey			=	crypto_arc4_setkey,
- 	.encrypt		=	crypto_arc4_crypt,
- 	.decrypt		=	crypto_arc4_crypt,
-+	.init			=	crypto_arc4_init,
+diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
+index d8aec5153b21..8c8e17d5fb20 100644
+--- a/drivers/crypto/n2_core.c
++++ b/drivers/crypto/n2_core.c
+@@ -662,7 +662,6 @@ struct n2_skcipher_context {
+ 		u8		aes[AES_MAX_KEY_SIZE];
+ 		u8		des[DES_KEY_SIZE];
+ 		u8		des3[3 * DES_KEY_SIZE];
+-		u8		arc4[258]; /* S-box, X, Y */
+ 	} key;
  };
  
- static int __init arc4_init(void)
+@@ -789,36 +788,6 @@ static int n2_3des_setkey(struct crypto_skcipher *skcipher, const u8 *key,
+ 	return 0;
+ }
+ 
+-static int n2_arc4_setkey(struct crypto_skcipher *skcipher, const u8 *key,
+-			  unsigned int keylen)
+-{
+-	struct crypto_tfm *tfm = crypto_skcipher_tfm(skcipher);
+-	struct n2_skcipher_context *ctx = crypto_tfm_ctx(tfm);
+-	struct n2_skcipher_alg *n2alg = n2_skcipher_alg(skcipher);
+-	u8 *s = ctx->key.arc4;
+-	u8 *x = s + 256;
+-	u8 *y = x + 1;
+-	int i, j, k;
+-
+-	ctx->enc_type = n2alg->enc_type;
+-
+-	j = k = 0;
+-	*x = 0;
+-	*y = 0;
+-	for (i = 0; i < 256; i++)
+-		s[i] = i;
+-	for (i = 0; i < 256; i++) {
+-		u8 a = s[i];
+-		j = (j + key[k] + a) & 0xff;
+-		s[i] = s[j];
+-		s[j] = a;
+-		if (++k >= keylen)
+-			k = 0;
+-	}
+-
+-	return 0;
+-}
+-
+ static inline int skcipher_descriptor_len(int nbytes, unsigned int block_size)
+ {
+ 	int this_len = nbytes;
+@@ -1122,21 +1091,6 @@ struct n2_skcipher_tmpl {
+ };
+ 
+ static const struct n2_skcipher_tmpl skcipher_tmpls[] = {
+-	/* ARC4: only ECB is supported (chaining bits ignored) */
+-	{	.name		= "ecb(arc4)",
+-		.drv_name	= "ecb-arc4",
+-		.block_size	= 1,
+-		.enc_type	= (ENC_TYPE_ALG_RC4_STREAM |
+-				   ENC_TYPE_CHAINING_ECB),
+-		.skcipher	= {
+-			.min_keysize	= 1,
+-			.max_keysize	= 256,
+-			.setkey		= n2_arc4_setkey,
+-			.encrypt	= n2_encrypt_ecb,
+-			.decrypt	= n2_decrypt_ecb,
+-		},
+-	},
+-
+ 	/* DES: ECB CBC and CFB are supported */
+ 	{	.name		= "ecb(des)",
+ 		.drv_name	= "ecb-des",
 -- 
 2.17.1
 
