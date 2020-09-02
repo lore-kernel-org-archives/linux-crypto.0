@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DFBFC433E2
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Sep 2020 15:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11EE8C433E2
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Sep 2020 15:34:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED7CD208DB
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Sep 2020 15:06:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2E6520767
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Sep 2020 15:34:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599059212;
-	bh=Kf4AGkwBeCGoHHALVeorzcgycX+eJy9K4IemTaY2rug=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=CJwL1fDd5x/O6bEJz4POycMc+ZMcgM8bLKxxRS1RhRjKD+oQpP8KTh/9S4q+5/YeF
-	 mi/dN8dI6WNupR6XnGdXkCVXWwVa5+OTqCXWdZHJwTWjJUJuQ8vfnr5LJB5k52f4DE
-	 XBK7JZANV7jdRSApYkMu4r8s08X9tGRCHXpbXHWU=
+	s=default; t=1599060893;
+	bh=9fjWbCmuALVUvcHuHMkm09b5211sjynNJ9Tq1XvySIY=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=FL1f1Sz7GhqT6cD1uNJgfU3tAcaWmmCwQ/IRAJpildpVpwUEB1oG4kMN4ChoUweEm
+	 EwCKIrWw1KzcAWrGtXt/LfMVo8615P9lZXi2D3J7kozA6d3GPGtCnAX13ZSO1itaMm
+	 +PxmbP4lTEPnBrtkBKuEyV0LjknBlUU7FWYuk6VI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727955AbgIBPGr (ORCPT
+        id S1726858AbgIBPeu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Sep 2020 11:06:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42886 "EHLO mail.kernel.org"
+        Wed, 2 Sep 2020 11:34:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42804 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728161AbgIBPFl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Sep 2020 11:05:41 -0400
+        id S1728148AbgIBPFi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 2 Sep 2020 11:05:38 -0400
 Received: from kozik-lap.mshome.net (unknown [194.230.155.106])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 33E06208DB;
-        Wed,  2 Sep 2020 15:05:38 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7370B20773;
+        Wed,  2 Sep 2020 15:05:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599059141;
-        bh=Kf4AGkwBeCGoHHALVeorzcgycX+eJy9K4IemTaY2rug=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VSgk85zVnJwt/VLg6KrgcafVnr5qa9RP9MooVdCpAlnwQtnqKIbPFJrhmtrv38w4y
-         jXfAlVoqW4GNgLiLrc23muvJZTjKhoGoiR3RyIEUbnXfgbCEpTFdbU+BmwPVNcNLxr
-         EDn8X09KLElHzjuCD5vsFq83sVfcZ3idPyRGI1GU=
+        s=default; t=1599059137;
+        bh=9fjWbCmuALVUvcHuHMkm09b5211sjynNJ9Tq1XvySIY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=LsixEc0u2r/bJq7yAVUUGvglnE3PaYEdtJmatcn3Azh1lSeG+yUXR3cFJdaqoeUlb
+         o3vf/H1TyiQofCDsL5A9e9eY6nkyrb11Q0SqrM9eDjTfjqMJqIWHpF0ZLX45Z8J2Lo
+         rQWDbT7cGc35c4SOHoXjclIo1T5sLGHzkKBG0niw=
 From:   Krzysztof Kozlowski <krzk@kernel.org>
 To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -54,39 +54,47 @@ To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         linux-kernel@vger.kernel.org,
         linux-stm32@st-md-mailman.stormreply.com
 Cc:     Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH 2/4] crypto: caam - Simplify with dev_err_probe()
-Date:   Wed,  2 Sep 2020 17:05:28 +0200
-Message-Id: <20200902150530.14640-2-krzk@kernel.org>
+Subject: [PATCH 1/4] crypto: caam - Fix kerneldoc
+Date:   Wed,  2 Sep 2020 17:05:27 +0200
+Message-Id: <20200902150530.14640-1-krzk@kernel.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200902150530.14640-1-krzk@kernel.org>
-References: <20200902150530.14640-1-krzk@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Common pattern of handling deferred probe can be simplified with
-dev_err_probe().  Less code and the error value gets printed.
+Fix kerneldoc warnings:
+
+  drivers/crypto/caam/caamalg_qi2.c:73: warning: cannot understand function prototype: 'struct caam_ctx '
+  drivers/crypto/caam/caamalg_qi2.c:2962: warning: cannot understand function prototype: 'struct caam_hash_ctx '
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 ---
- drivers/crypto/caam/caamalg_qi2.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/crypto/caam/caamalg_qi2.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 0441e4ff2df2..076c6b04bea9 100644
+index 66ae1d581168..0441e4ff2df2 100644
 --- a/drivers/crypto/caam/caamalg_qi2.c
 +++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -5115,8 +5115,7 @@ static int dpaa2_caam_probe(struct fsl_mc_device *dpseci_dev)
- 	/* DPIO */
- 	err = dpaa2_dpseci_dpio_setup(priv);
- 	if (err) {
--		if (err != -EPROBE_DEFER)
--			dev_err(dev, "dpaa2_dpseci_dpio_setup() failed\n");
-+		dev_err_probe(dev, err, "dpaa2_dpseci_dpio_setup() failed\n");
- 		goto err_dpio_setup;
- 	}
+@@ -59,7 +59,7 @@ struct caam_skcipher_alg {
+ };
  
+ /**
+- * caam_ctx - per-session context
++ * struct caam_ctx - per-session context
+  * @flc: Flow Contexts array
+  * @key:  [authentication key], encryption key
+  * @flc_dma: I/O virtual addresses of the Flow Contexts
+@@ -2951,7 +2951,7 @@ enum hash_optype {
+ };
+ 
+ /**
+- * caam_hash_ctx - ahash per-session context
++ * struct caam_hash_ctx - ahash per-session context
+  * @flc: Flow Contexts array
+  * @key: authentication key
+  * @flc_dma: I/O virtual addresses of the Flow Contexts
 -- 
 2.17.1
 
