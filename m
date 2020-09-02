@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE14C433E2
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Sep 2020 15:06:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DFBFC433E2
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Sep 2020 15:06:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5994B2087D
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Sep 2020 15:06:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED7CD208DB
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Sep 2020 15:06:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599059209;
-	bh=R9eOfQhQb+/XeZ5M4+bYUU5e3t9TRQD0NsZttudCC+U=;
+	s=default; t=1599059212;
+	bh=Kf4AGkwBeCGoHHALVeorzcgycX+eJy9K4IemTaY2rug=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=eN0REoWWrwPnMZNzBke8lED5f2bhiWA4zxTF2IbppaiSDpIrLpuYCJiNVCNJANvtZ
-	 QByXASReXF5bVRB0fA+YejJMStQGQAYqQHJwau2u/gBxHiM8gVqp/WhR5FDXZL5Jhz
-	 pmhzZoJzU7J5MCiZ8WoLUGwh3i6a7DAuULL3+xp0=
+	b=CJwL1fDd5x/O6bEJz4POycMc+ZMcgM8bLKxxRS1RhRjKD+oQpP8KTh/9S4q+5/YeF
+	 mi/dN8dI6WNupR6XnGdXkCVXWwVa5+OTqCXWdZHJwTWjJUJuQ8vfnr5LJB5k52f4DE
+	 XBK7JZANV7jdRSApYkMu4r8s08X9tGRCHXpbXHWU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727835AbgIBPGi (ORCPT
+        id S1727955AbgIBPGr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Sep 2020 11:06:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42950 "EHLO mail.kernel.org"
+        Wed, 2 Sep 2020 11:06:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42886 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727915AbgIBPFp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Sep 2020 11:05:45 -0400
+        id S1728161AbgIBPFl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 2 Sep 2020 11:05:41 -0400
 Received: from kozik-lap.mshome.net (unknown [194.230.155.106])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DACC020BED;
-        Wed,  2 Sep 2020 15:05:41 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 33E06208DB;
+        Wed,  2 Sep 2020 15:05:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599059145;
-        bh=R9eOfQhQb+/XeZ5M4+bYUU5e3t9TRQD0NsZttudCC+U=;
+        s=default; t=1599059141;
+        bh=Kf4AGkwBeCGoHHALVeorzcgycX+eJy9K4IemTaY2rug=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XmZAi40hKptfBUA/mVShlTC34b3ps+FNOyGPnDSwMzL1Alnl5ayCHzkLjaaqNv+39
-         TQ9Z9m4CdmPGBqjarBXZQcViBHC54orEyfCaQ76S+jdKRwWZh4o05CWCmkiH/I7390
-         go5OlD4b8vx13jhs1LXU3gIox4l3a3f4lde1Jmbw=
+        b=VSgk85zVnJwt/VLg6KrgcafVnr5qa9RP9MooVdCpAlnwQtnqKIbPFJrhmtrv38w4y
+         jXfAlVoqW4GNgLiLrc23muvJZTjKhoGoiR3RyIEUbnXfgbCEpTFdbU+BmwPVNcNLxr
+         EDn8X09KLElHzjuCD5vsFq83sVfcZ3idPyRGI1GU=
 From:   Krzysztof Kozlowski <krzk@kernel.org>
 To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -54,9 +54,9 @@ To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         linux-kernel@vger.kernel.org,
         linux-stm32@st-md-mailman.stormreply.com
 Cc:     Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH 3/4] crypto: stm32-hash - Simplify with dev_err_probe()
-Date:   Wed,  2 Sep 2020 17:05:29 +0200
-Message-Id: <20200902150530.14640-3-krzk@kernel.org>
+Subject: [PATCH 2/4] crypto: caam - Simplify with dev_err_probe()
+Date:   Wed,  2 Sep 2020 17:05:28 +0200
+Message-Id: <20200902150530.14640-2-krzk@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200902150530.14640-1-krzk@kernel.org>
 References: <20200902150530.14640-1-krzk@kernel.org>
@@ -70,31 +70,23 @@ dev_err_probe().  Less code and the error value gets printed.
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 ---
- drivers/crypto/stm32/stm32-hash.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+ drivers/crypto/caam/caamalg_qi2.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
-index 092eaabda238..3524130cf6ee 100644
---- a/drivers/crypto/stm32/stm32-hash.c
-+++ b/drivers/crypto/stm32/stm32-hash.c
-@@ -1464,14 +1464,9 @@ static int stm32_hash_probe(struct platform_device *pdev)
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index 0441e4ff2df2..076c6b04bea9 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -5115,8 +5115,7 @@ static int dpaa2_caam_probe(struct fsl_mc_device *dpseci_dev)
+ 	/* DPIO */
+ 	err = dpaa2_dpseci_dpio_setup(priv);
+ 	if (err) {
+-		if (err != -EPROBE_DEFER)
+-			dev_err(dev, "dpaa2_dpseci_dpio_setup() failed\n");
++		dev_err_probe(dev, err, "dpaa2_dpseci_dpio_setup() failed\n");
+ 		goto err_dpio_setup;
  	}
  
- 	hdev->clk = devm_clk_get(&pdev->dev, NULL);
--	if (IS_ERR(hdev->clk)) {
--		if (PTR_ERR(hdev->clk) != -EPROBE_DEFER) {
--			dev_err(dev, "failed to get clock for hash (%lu)\n",
--				PTR_ERR(hdev->clk));
--		}
--
--		return PTR_ERR(hdev->clk);
--	}
-+	if (IS_ERR(hdev->clk))
-+		return dev_err_probe(dev, PTR_ERR(hdev->clk),
-+				     "failed to get clock for hash\n");
- 
- 	ret = clk_prepare_enable(hdev->clk);
- 	if (ret) {
 -- 
 2.17.1
 
