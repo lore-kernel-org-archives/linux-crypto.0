@@ -2,102 +2,91 @@ Return-Path: <SRS0=A9EK=CM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B23CC433E2
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Sep 2020 06:38:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B5EAC433E2
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Sep 2020 08:37:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E388206EB
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Sep 2020 06:38:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DjWvBbFY"
+	by mail.kernel.org (Postfix) with ESMTP id 463C3205F4
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Sep 2020 08:37:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725967AbgICGiU (ORCPT
+        id S1726448AbgICIhz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Sep 2020 02:38:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48228 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725943AbgICGiS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Sep 2020 02:38:18 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AA0BC061244;
-        Wed,  2 Sep 2020 23:38:18 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id e33so1325018pgm.0;
-        Wed, 02 Sep 2020 23:38:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=JzV2OCqdKiJejSLxD4j9h8uaxc1ywBPDynMdu8MGQD4=;
-        b=DjWvBbFYKTwUUrwMgdbDVts6nrIF8n3LkmmGUcaTH6wk12ytUSDtsZbPyPNZ7KhN0f
-         BrB1VJ4PEHIvsRS6C9N2moXz/bDtABmEyI3AN4Nt6Yp91seZ5xzZmjU/cfyK4x26Dsw+
-         bU7Zwt6alhzP2UPw44N2BYQugdPZtbIw1HkAhXu50B+589L36cVRG9L/zQQEoVlH1hH8
-         sD7UCa+ohys2MGiDwRKvy/xmF54NLOiSwGmHaKLi8NmK0zKrXjKe6iAn85M4ELq4CwM1
-         gdCLz/M2tozNB8PHn8c+Krhkcve81QtjPMp8JNJ/NAURYpCDvdkLGY/Fk/THyWnsJe/z
-         NieQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=JzV2OCqdKiJejSLxD4j9h8uaxc1ywBPDynMdu8MGQD4=;
-        b=T3V+1MFICDl3q1+So/L9ZxAdPAecFlG3MZT102YlrmPuUg8a5CSc+8mVw10o9CIiYA
-         tQ15Tx5DPHuV7L1QUPnIY9G+h9fu5StUcO4PvoMFkAfQW2LgpREfteTU0CAuEAV+3DCz
-         xyOoYy7xNzfc4b+yZLC6DaO0zTxjumZ1/E/v8nJYVtn3GkZkYQSTLggXRtHNu4PGxkIS
-         mhvIugZnAHs+YeiAWm0xpo9vGwLqINWLxgqF2lnlv8BGCiMt2HnuGrkhnVk29HaMf/Gl
-         q2ClVyu0QLQ3PzkcRAgtdqUT7ffCq0E9JFnHxsVpioMBK69LC054shMspLnuoZQwuO+z
-         VI0w==
-X-Gm-Message-State: AOAM532Xp0sry40UI5ZnORG14FYJviQY9zh20p9U4EbOBMSoyWdDOsdz
-        jzSnkCOnkYjAfSSJHsUI2yI=
-X-Google-Smtp-Source: ABdhPJwvJwxeHbddcSMcrw6WNHCMlw8KxZuhNo8a0SYjKuYQMzszVqwi+fMa7X3GuTG5ROpaCUGtqQ==
-X-Received: by 2002:a63:8448:: with SMTP id k69mr1697129pgd.69.1599115097868;
-        Wed, 02 Sep 2020 23:38:17 -0700 (PDT)
-Received: from localhost.localdomain ([218.247.215.252])
-        by smtp.gmail.com with ESMTPSA id e123sm1754835pfh.167.2020.09.02.23.38.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Sep 2020 23:38:17 -0700 (PDT)
-From:   Xiaoliang Pang <dawning.pang@gmail.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        matthias.bgg@gmail.com, swboyd@chromium.org, yuehaibing@huawei.com,
-        tianjia.zhang@linux.alibaba.com, ryder.lee@mediatek.com
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
-        dawning.pang@gmail.com
-Subject: [PATCH] cypto: mediatek - fix leaks in mtk_desc_ring_alloc
-Date:   Thu,  3 Sep 2020 14:38:00 +0800
-Message-Id: <20200903063800.27288-1-dawning.pang@gmail.com>
+        Thu, 3 Sep 2020 04:37:55 -0400
+Received: from smtp25.cstnet.cn ([159.226.251.25]:56116 "EHLO cstnet.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726025AbgICIhz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Sep 2020 04:37:55 -0400
+Received: from localhost.localdomain (unknown [159.226.5.100])
+        by APP-05 (Coremail) with SMTP id zQCowAAH6SFUq1Bfy6kMAQ--.29402S2;
+        Thu, 03 Sep 2020 16:37:40 +0800 (CST)
+From:   Xu Wang <vulab@iscas.ac.cn>
+To:     krzk@kernel.org, vz@mleia.com, k.konieczny@samsung.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: s5p-sss: remove redundant null check
+Date:   Thu,  3 Sep 2020 08:37:38 +0000
+Message-Id: <20200903083738.85345-1-vulab@iscas.ac.cn>
 X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: zQCowAAH6SFUq1Bfy6kMAQ--.29402S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7JF4UZF47GFy5XFW7Ar4kXrb_yoWDCFb_uF
+        1UWFZFgan8uwsayw45Kr17ArWDuF90vFWqgry0yF4rKFyUXrW3u392vw43u39rWa18A3Zx
+        Aw1DWFW8A3Z2vjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb2kYjsxI4VWDJwAYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I
+        6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM2
+        8CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0
+        cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I
+        8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+        64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVW8JVWxJw
+        Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lc2xSY4AK67AK6r43MxAIw28I
+        cxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
+        IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
+        42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42
+        IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2
+        z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8RRRtUUUUU==
+X-Originating-IP: [159.226.5.100]
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCgUIA1z4i+SzXQAAsh
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In the init loop, if an error occurs in function 'dma_alloc_coherent',
-then goto the err_cleanup section,
-in the cleanup loop, after run i--, 
-the struct mtk_ring rising[i] will not be released,
-causing a memory leak
+Because clk_disable_unprepare already checked NULL clock
+parameter, so the additional checks are unnecessary, just remove them.
 
-Signed-off-by: Xiaoliang Pang <dawning.pang@gmail.com>
+Signed-off-by: Xu Wang <vulab@iscas.ac.cn>
 ---
- drivers/crypto/mediatek/mtk-platform.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/s5p-sss.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/mediatek/mtk-platform.c b/drivers/crypto/mediatek/mtk-platform.c
-index 7e3ad085b5bd..05d341e4a696 100644
---- a/drivers/crypto/mediatek/mtk-platform.c
-+++ b/drivers/crypto/mediatek/mtk-platform.c
-@@ -469,7 +469,7 @@ static int mtk_desc_ring_alloc(struct mtk_cryp *cryp)
- 	return 0;
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index 341433fbcc4a..fdcbfd45c884 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -2307,8 +2307,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
+ 	tasklet_kill(&pdata->tasklet);
  
- err_cleanup:
--	for (; i--; ) {
-+	for (; i >= 0; --i) {
- 		dma_free_coherent(cryp->dev, MTK_DESC_RING_SZ,
- 				  ring[i]->res_base, ring[i]->res_dma);
- 		dma_free_coherent(cryp->dev, MTK_DESC_RING_SZ,
+ err_irq:
+-	if (pdata->pclk)
+-		clk_disable_unprepare(pdata->pclk);
++	clk_disable_unprepare(pdata->pclk);
+ 
+ err_clk:
+ 	clk_disable_unprepare(pdata->clk);
+@@ -2338,8 +2337,7 @@ static int s5p_aes_remove(struct platform_device *pdev)
+ 		pdata->use_hash = false;
+ 	}
+ 
+-	if (pdata->pclk)
+-		clk_disable_unprepare(pdata->pclk);
++	clk_disable_unprepare(pdata->pclk);
+ 
+ 	clk_disable_unprepare(pdata->clk);
+ 	s5p_dev = NULL;
 -- 
 2.17.1
 
