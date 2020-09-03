@@ -1,150 +1,103 @@
-Return-Path: <SRS0=ze1v=CL=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=A9EK=CM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83505C433E7
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Sep 2020 17:08:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B23CC433E2
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Sep 2020 06:38:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 53EA320709
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Sep 2020 17:08:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E388206EB
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Sep 2020 06:38:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="CV+8cHsp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DjWvBbFY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726942AbgIBRIL (ORCPT
+        id S1725967AbgICGiU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Sep 2020 13:08:11 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:35844 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726285AbgIBRIL (ORCPT
+        Thu, 3 Sep 2020 02:38:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48228 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725943AbgICGiS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Sep 2020 13:08:11 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 082H4FSb145311;
-        Wed, 2 Sep 2020 17:08:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2020-01-29; bh=OwoqzT+xZqntsl1tMm1voSTpLuS3ETzRtHPm7Fje0T8=;
- b=CV+8cHspsEBhVy54xWeBBvXQUICGL5x6UZMbteqzRboYCF5IIIi44F+zdnzf+Db58RjD
- tInRnlq3VnBSNgi2dR8p1jYGFH9eMWyQzp9cHu09J9nhv68iJFzxU8KGzIiOpxELPEvA
- BwHC9C7E1BKnxdRJmPCdsRh94U1Hmey1/WpJCc4qEbPYy0L7wbyQDKFQzlSlZs1FKH/i
- 7R9jTyHuY4M2vS6u1caNcgraONeLQoHXOUA0ouWg4Wa5rMliBxTBJz1eZ6ic2E1yxXMo
- t5HYRItMMDvKB3smPD0lTM7sxHx1kf29vsfPVQn/bVZvLWHOZJvviYH9+eiTfVsbNIGU eQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 337eymbwu2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 02 Sep 2020 17:08:03 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 082H55th131744;
-        Wed, 2 Sep 2020 17:08:02 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 3380sub3t3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 02 Sep 2020 17:08:02 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 082H80E8027580;
-        Wed, 2 Sep 2020 17:08:01 GMT
-Received: from localhost.localdomain (/98.229.125.203)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 02 Sep 2020 10:08:00 -0700
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [PATCH] padata: fix possible padata_works_lock deadlock
-Date:   Wed,  2 Sep 2020 13:07:56 -0400
-Message-Id: <20200902170756.332491-1-daniel.m.jordan@oracle.com>
-X-Mailer: git-send-email 2.28.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9732 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
- phishscore=0 malwarescore=0 mlxscore=0 spamscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009020163
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9732 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
- priorityscore=1501 phishscore=0 mlxlogscore=999 mlxscore=0
- lowpriorityscore=0 clxscore=1015 spamscore=0 bulkscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009020163
+        Thu, 3 Sep 2020 02:38:18 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AA0BC061244;
+        Wed,  2 Sep 2020 23:38:18 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id e33so1325018pgm.0;
+        Wed, 02 Sep 2020 23:38:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=JzV2OCqdKiJejSLxD4j9h8uaxc1ywBPDynMdu8MGQD4=;
+        b=DjWvBbFYKTwUUrwMgdbDVts6nrIF8n3LkmmGUcaTH6wk12ytUSDtsZbPyPNZ7KhN0f
+         BrB1VJ4PEHIvsRS6C9N2moXz/bDtABmEyI3AN4Nt6Yp91seZ5xzZmjU/cfyK4x26Dsw+
+         bU7Zwt6alhzP2UPw44N2BYQugdPZtbIw1HkAhXu50B+589L36cVRG9L/zQQEoVlH1hH8
+         sD7UCa+ohys2MGiDwRKvy/xmF54NLOiSwGmHaKLi8NmK0zKrXjKe6iAn85M4ELq4CwM1
+         gdCLz/M2tozNB8PHn8c+Krhkcve81QtjPMp8JNJ/NAURYpCDvdkLGY/Fk/THyWnsJe/z
+         NieQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=JzV2OCqdKiJejSLxD4j9h8uaxc1ywBPDynMdu8MGQD4=;
+        b=T3V+1MFICDl3q1+So/L9ZxAdPAecFlG3MZT102YlrmPuUg8a5CSc+8mVw10o9CIiYA
+         tQ15Tx5DPHuV7L1QUPnIY9G+h9fu5StUcO4PvoMFkAfQW2LgpREfteTU0CAuEAV+3DCz
+         xyOoYy7xNzfc4b+yZLC6DaO0zTxjumZ1/E/v8nJYVtn3GkZkYQSTLggXRtHNu4PGxkIS
+         mhvIugZnAHs+YeiAWm0xpo9vGwLqINWLxgqF2lnlv8BGCiMt2HnuGrkhnVk29HaMf/Gl
+         q2ClVyu0QLQ3PzkcRAgtdqUT7ffCq0E9JFnHxsVpioMBK69LC054shMspLnuoZQwuO+z
+         VI0w==
+X-Gm-Message-State: AOAM532Xp0sry40UI5ZnORG14FYJviQY9zh20p9U4EbOBMSoyWdDOsdz
+        jzSnkCOnkYjAfSSJHsUI2yI=
+X-Google-Smtp-Source: ABdhPJwvJwxeHbddcSMcrw6WNHCMlw8KxZuhNo8a0SYjKuYQMzszVqwi+fMa7X3GuTG5ROpaCUGtqQ==
+X-Received: by 2002:a63:8448:: with SMTP id k69mr1697129pgd.69.1599115097868;
+        Wed, 02 Sep 2020 23:38:17 -0700 (PDT)
+Received: from localhost.localdomain ([218.247.215.252])
+        by smtp.gmail.com with ESMTPSA id e123sm1754835pfh.167.2020.09.02.23.38.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Sep 2020 23:38:17 -0700 (PDT)
+From:   Xiaoliang Pang <dawning.pang@gmail.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        matthias.bgg@gmail.com, swboyd@chromium.org, yuehaibing@huawei.com,
+        tianjia.zhang@linux.alibaba.com, ryder.lee@mediatek.com
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+        dawning.pang@gmail.com
+Subject: [PATCH] cypto: mediatek - fix leaks in mtk_desc_ring_alloc
+Date:   Thu,  3 Sep 2020 14:38:00 +0800
+Message-Id: <20200903063800.27288-1-dawning.pang@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-syzbot reports,
+In the init loop, if an error occurs in function 'dma_alloc_coherent',
+then goto the err_cleanup section,
+in the cleanup loop, after run i--, 
+the struct mtk_ring rising[i] will not be released,
+causing a memory leak
 
-  WARNING: inconsistent lock state
-  5.9.0-rc2-syzkaller #0 Not tainted
-  --------------------------------
-  inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
-  syz-executor.0/26715 takes:
-  (padata_works_lock){+.?.}-{2:2}, at: padata_do_parallel kernel/padata.c:220
-  {IN-SOFTIRQ-W} state was registered at:
-    spin_lock include/linux/spinlock.h:354 [inline]
-    padata_do_parallel kernel/padata.c:220
-    ...
-    __do_softirq kernel/softirq.c:298
-    ...
-    sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1091
-    asm_sysvec_apic_timer_interrupt arch/x86/include/asm/idtentry.h:581
-
-   Possible unsafe locking scenario:
-
-         CPU0
-         ----
-    lock(padata_works_lock);
-    <Interrupt>
-      lock(padata_works_lock);
-
-padata_do_parallel() takes padata_works_lock with softirqs enabled, so a
-deadlock is possible if, on the same CPU, the lock is acquired in
-process context and then softirq handling done in an interrupt leads to
-the same path.
-
-Fix by leaving softirqs disabled while do_parallel holds
-padata_works_lock.
-
-Reported-by: syzbot+f4b9f49e38e25eb4ef52@syzkaller.appspotmail.com
-Fixes: 4611ce2246889 ("padata: allocate work structures for parallel jobs from a pool")
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Xiaoliang Pang <dawning.pang@gmail.com>
 ---
- kernel/padata.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/crypto/mediatek/mtk-platform.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 16cb894dc272..d4d3ba6e1728 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -215,12 +215,13 @@ int padata_do_parallel(struct padata_shell *ps,
- 	padata->pd = pd;
- 	padata->cb_cpu = *cb_cpu;
+diff --git a/drivers/crypto/mediatek/mtk-platform.c b/drivers/crypto/mediatek/mtk-platform.c
+index 7e3ad085b5bd..05d341e4a696 100644
+--- a/drivers/crypto/mediatek/mtk-platform.c
++++ b/drivers/crypto/mediatek/mtk-platform.c
+@@ -469,7 +469,7 @@ static int mtk_desc_ring_alloc(struct mtk_cryp *cryp)
+ 	return 0;
  
--	rcu_read_unlock_bh();
--
- 	spin_lock(&padata_works_lock);
- 	padata->seq_nr = ++pd->seq_nr;
- 	pw = padata_work_alloc();
- 	spin_unlock(&padata_works_lock);
-+
-+	rcu_read_unlock_bh();
-+
- 	if (pw) {
- 		padata_work_init(pw, padata_parallel_worker, padata, 0);
- 		queue_work(pinst->parallel_wq, &pw->pw_work);
-
-base-commit: 9c7d619be5a002ea29c172df5e3c1227c22cbb41
+ err_cleanup:
+-	for (; i--; ) {
++	for (; i >= 0; --i) {
+ 		dma_free_coherent(cryp->dev, MTK_DESC_RING_SZ,
+ 				  ring[i]->res_base, ring[i]->res_dma);
+ 		dma_free_coherent(cryp->dev, MTK_DESC_RING_SZ,
 -- 
-2.28.0
+2.17.1
 
