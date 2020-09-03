@@ -2,29 +2,29 @@ Return-Path: <SRS0=A9EK=CM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,UNWANTED_LANGUAGE_BODY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1979DC433E2
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Sep 2020 14:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2907C433E9
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Sep 2020 14:37:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E2CAE206EB
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Sep 2020 14:36:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 976C4206EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Sep 2020 14:37:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729248AbgICOga (ORCPT
+        id S1729309AbgICOgy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Sep 2020 10:36:30 -0400
-Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:54286 "EHLO
-        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729081AbgICOgT (ORCPT
+        Thu, 3 Sep 2020 10:36:54 -0400
+Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:46127 "EHLO
+        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729369AbgICOgS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Sep 2020 10:36:19 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R941e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e07484;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=31;SR=0;TI=SMTPD_---0U7pCPib_1599138763;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U7pCPib_1599138763)
+        Thu, 3 Sep 2020 10:36:18 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e07488;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=31;SR=0;TI=SMTPD_---0U7p3k-0_1599138765;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U7p3k-0_1599138765)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 03 Sep 2020 21:12:43 +0800
+          Thu, 03 Sep 2020 21:12:45 +0800
 From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -55,9 +55,9 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 Cc:     Xufeng Zhang <yunbo.xufeng@linux.alibaba.com>,
         Jia Zhang <zhang.jia@linux.alibaba.com>,
         Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH v6 1/8] crypto: sm3 - export crypto_sm3_final function
-Date:   Thu,  3 Sep 2020 21:12:35 +0800
-Message-Id: <20200903131242.128665-2-tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH v6 5/8] crypto: testmgr - support test with different ciphertext per encryption
+Date:   Thu,  3 Sep 2020 21:12:39 +0800
+Message-Id: <20200903131242.128665-6-tianjia.zhang@linux.alibaba.com>
 X-Mailer: git-send-email 2.19.1.3.ge56e4f7
 In-Reply-To: <20200903131242.128665-1-tianjia.zhang@linux.alibaba.com>
 References: <20200903131242.128665-1-tianjia.zhang@linux.alibaba.com>
@@ -68,65 +68,45 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Both crypto_sm3_update and crypto_sm3_finup have been
-exported, exporting crypto_sm3_final, to avoid having to
-use crypto_sm3_finup(desc, NULL, 0, dgst) to calculate
-the hash in some cases.
+Some asymmetric algorithms will get different ciphertext after
+each encryption, such as SM2, and let testmgr support the testing
+of such algorithms.
+
+In struct akcipher_testvec, set c and c_size to be empty, skip
+the comparison of the ciphertext, and compare the decrypted
+plaintext with m to achieve the test purpose.
 
 Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 Tested-by: Xufeng Zhang <yunbo.xufeng@linux.alibaba.com>
 ---
- crypto/sm3_generic.c | 7 ++++---
- include/crypto/sm3.h | 2 ++
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ crypto/testmgr.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/sm3_generic.c b/crypto/sm3_generic.c
-index 3468975215ca..193c4584bd00 100644
---- a/crypto/sm3_generic.c
-+++ b/crypto/sm3_generic.c
-@@ -149,17 +149,18 @@ int crypto_sm3_update(struct shash_desc *desc, const u8 *data,
- }
- EXPORT_SYMBOL(crypto_sm3_update);
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 23c27fc96394..cd002a030af5 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4025,7 +4025,7 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
+ 		pr_err("alg: akcipher: %s test failed. err %d\n", op, err);
+ 		goto free_all;
+ 	}
+-	if (!vecs->siggen_sigver_test) {
++	if (!vecs->siggen_sigver_test && c) {
+ 		if (req->dst_len != c_size) {
+ 			pr_err("alg: akcipher: %s test failed. Invalid output len\n",
+ 			       op);
+@@ -4056,6 +4056,11 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
+ 		goto free_all;
+ 	}
  
--static int sm3_final(struct shash_desc *desc, u8 *out)
-+int crypto_sm3_final(struct shash_desc *desc, u8 *out)
- {
- 	sm3_base_do_finalize(desc, sm3_generic_block_fn);
- 	return sm3_base_finish(desc, out);
- }
-+EXPORT_SYMBOL(crypto_sm3_final);
- 
- int crypto_sm3_finup(struct shash_desc *desc, const u8 *data,
- 			unsigned int len, u8 *hash)
- {
- 	sm3_base_do_update(desc, data, len, sm3_generic_block_fn);
--	return sm3_final(desc, hash);
-+	return crypto_sm3_final(desc, hash);
- }
- EXPORT_SYMBOL(crypto_sm3_finup);
- 
-@@ -167,7 +168,7 @@ static struct shash_alg sm3_alg = {
- 	.digestsize	=	SM3_DIGEST_SIZE,
- 	.init		=	sm3_base_init,
- 	.update		=	crypto_sm3_update,
--	.final		=	sm3_final,
-+	.final		=	crypto_sm3_final,
- 	.finup		=	crypto_sm3_finup,
- 	.descsize	=	sizeof(struct sm3_state),
- 	.base		=	{
-diff --git a/include/crypto/sm3.h b/include/crypto/sm3.h
-index 1438942dc773..42ea21289ba9 100644
---- a/include/crypto/sm3.h
-+++ b/include/crypto/sm3.h
-@@ -35,6 +35,8 @@ struct shash_desc;
- extern int crypto_sm3_update(struct shash_desc *desc, const u8 *data,
- 			      unsigned int len);
- 
-+extern int crypto_sm3_final(struct shash_desc *desc, u8 *out);
++	if (!vecs->siggen_sigver_test && !c) {
++		c = outbuf_enc;
++		c_size = req->dst_len;
++	}
 +
- extern int crypto_sm3_finup(struct shash_desc *desc, const u8 *data,
- 			     unsigned int len, u8 *hash);
- #endif
+ 	op = vecs->siggen_sigver_test ? "sign" : "decrypt";
+ 	if (WARN_ON(c_size > PAGE_SIZE))
+ 		goto free_all;
 -- 
 2.19.1.3.ge56e4f7
 
