@@ -1,105 +1,61 @@
-Return-Path: <SRS0=A9EK=CM=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=2Pww=CN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,FAKE_REPLY_C,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06FA6C2BBDB
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Sep 2020 18:04:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79AD7C43461
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 07:17:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE97B208C7
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Sep 2020 18:04:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599156261;
-	bh=M/bUGa4+5MJQO1H2/94D6MztczIs+L3ZMGG4rxczDRY=;
-	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=zfEubA1epfT5300v5SsVgJCOEWyy0X4jDIXg6Xci+Tom7jOP82R7OexvJrfsGnYgX
-	 Z8DGybZfybOEXKSOX/lDv6W10X7EAfyjBgRtdvFdSuEIny8w6Cyzrcm7NJay+fQvAf
-	 yPJVWv9qvQG8x4mLDj2/BxIPX31Crc/OCZ9BbX9k=
+	by mail.kernel.org (Postfix) with ESMTP id 56896206D4
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 07:17:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729057AbgICSEU (ORCPT
+        id S1726127AbgIDHRR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Sep 2020 14:04:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36694 "EHLO mail.kernel.org"
+        Fri, 4 Sep 2020 03:17:17 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:42572 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728419AbgICSEQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Sep 2020 14:04:16 -0400
-Received: from localhost.localdomain (unknown [194.230.155.106])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1537D20716;
-        Thu,  3 Sep 2020 18:04:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599156255;
-        bh=M/bUGa4+5MJQO1H2/94D6MztczIs+L3ZMGG4rxczDRY=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=dSuth1Xcu2mR6W60CDiFo6xBHvTnYdE2RuZ1UBFjiYVLyAtnwajOCWKR2YiBnIl1B
-         OT4qYsIBRuzbqwpXwMFZt/JPHehgzo+i2aPQJZgVQ8a2LhvtynqZf5qdu+2kja09Vn
-         q3YnNkvC9Xh1ns5aMLRflQvbavAtAw7cae6zzRFk=
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-To:     Krzysztof Kozlowski <krzk@kernel.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Kamil Konieczny <k.konieczny@samsung.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] crypto: s5p-sss - Pass error from clk_get and reduce verbosity on deferral
-Date:   Thu,  3 Sep 2020 20:04:00 +0200
-Message-Id: <20200903180400.2865-3-krzk@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200903180400.2865-1-krzk@kernel.org>
-References: <20200903180400.2865-1-krzk@kernel.org>
+        id S1726089AbgIDHRR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Sep 2020 03:17:17 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1kE5y9-0008OZ-LB; Fri, 04 Sep 2020 17:17:10 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 04 Sep 2020 17:17:09 +1000
+Date:   Fri, 4 Sep 2020 17:17:09 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Peter Enderborg <peter.enderborg@sony.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        davem@davemloft.net, peter.enderborg@sony.com
+Subject: Re: [PATCH] crypto: Mark tfm buffer as non leak.
+Message-ID: <20200904071709.GA24539@gondor.apana.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200903134007.2769-1-peter.enderborg@sony.com>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Pass the error directly from devm_clk_get() to describe the real reason,
-instead of fixed ENOENT.  Do not print error messages on deferred probe.
+Peter Enderborg <peter.enderborg@sony.com> wrote:
+>
+> This is caused by tfm = (struct crypto_tfm *)(mem + tfmsize);
+> that is keept instead of the allocated buffer in mem.
+> Reference counting is done on alg.
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- drivers/crypto/s5p-sss.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+I don't understand why this is necessary.  We end up returning
+mem in crypto_create_tfm_node and that is the primary means of
+getting to the object.
 
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index f67f1e22ecd1..e83145c43b18 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -2201,11 +2201,10 @@ static int s5p_aes_probe(struct platform_device *pdev)
- 	}
- 
- 	pdata->clk = devm_clk_get(dev, variant->clk_names[0]);
--	if (IS_ERR(pdata->clk)) {
--		dev_err(dev, "failed to find secss clock %s\n",
--			variant->clk_names[0]);
--		return -ENOENT;
--	}
-+	if (IS_ERR(pdata->clk))
-+		return dev_err_probe(dev, PTR_ERR(pdata->clk),
-+				     "failed to find secss clock %s\n",
-+				     variant->clk_names[0]);
- 
- 	err = clk_prepare_enable(pdata->clk);
- 	if (err < 0) {
-@@ -2217,9 +2216,9 @@ static int s5p_aes_probe(struct platform_device *pdev)
- 	if (variant->clk_names[1]) {
- 		pdata->pclk = devm_clk_get(dev, variant->clk_names[1]);
- 		if (IS_ERR(pdata->pclk)) {
--			dev_err(dev, "failed to find clock %s\n",
--				variant->clk_names[1]);
--			err = -ENOENT;
-+			err = dev_err_probe(dev, PTR_ERR(pdata->pclk),
-+					    "failed to find clock %s\n",
-+					    variant->clk_names[1]);
- 			goto err_clk;
- 		}
- 
+The tfm pointer is just an internal thing.  So why do we have
+to mark mem as not a leak?
+
+Cheers,
 -- 
-2.17.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
