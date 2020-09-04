@@ -2,159 +2,109 @@ Return-Path: <SRS0=2Pww=CN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34271C433E2
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 09:22:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A60D9C28E83
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 09:42:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 08F7E2084D
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 09:22:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F7F7205CB
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 09:42:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cerno.tech header.i=@cerno.tech header.b="MRCq8nQv";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="da5TGH2k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gAzMbl9T"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730018AbgIDJWB (ORCPT
+        id S1729975AbgIDJm6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Sep 2020 05:22:01 -0400
-Received: from new4-smtp.messagingengine.com ([66.111.4.230]:34395 "EHLO
-        new4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729712AbgIDJV7 (ORCPT
+        Fri, 4 Sep 2020 05:42:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44206 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729731AbgIDJmx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Sep 2020 05:21:59 -0400
-X-Greylist: delayed 393 seconds by postgrey-1.27 at vger.kernel.org; Fri, 04 Sep 2020 05:21:58 EDT
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailnew.nyi.internal (Postfix) with ESMTP id CC571580383;
-        Fri,  4 Sep 2020 05:15:24 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Fri, 04 Sep 2020 05:15:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cerno.tech; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm3; bh=rPHib73BNe2yJpxQ7N76hqf1+YQ
-        0PpnAHpyX+PBHPHo=; b=MRCq8nQvllk1NZEUvEqqyoTKwToKn+YZxRLmHaKeMkk
-        iyv3nm+Es3nSXJmUhrA+jBX+cLKG4VvZM0oe1yulLdqucwfXiAXoBALd8a2Gj/Nm
-        A3urSgadFqxMSnSJaEzezV2MwZZ0TY3KmkdYeVO7v4X/OmTADaNPxFikGW20MQZu
-        9agrkBJUna5KkhNlZAO51hAhfwZmZk5iN8uA8/XDxlm+3CHsffhQnhLCerk/mBWu
-        ZAKdxnKaEH54BGRX+iKZ4U3oMEYH35PXhBudtHiH0LJUEjxGyIyEZc/MytI7YvLP
-        ZgXqXakNciFyqNRqcRmDPzJ8EjfzuAucCc5b22kqAPA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=rPHib7
-        3BNe2yJpxQ7N76hqf1+YQ0PpnAHpyX+PBHPHo=; b=da5TGH2kc8dVL5zmavPo+1
-        yLu/nJQp1JXkmnTWB1yQOpI80gt9qoMJ7XpXCxKY6fBW6n5QRWecZ7Gh1Bo/Z8n4
-        HnYcqDnGZk02o5/2lAOLOde3bm3FHsFccc/Z9z44qIs1Ck80m5V8vUBpobgGjIA/
-        mZju82dsrYkz61Q3MxCmqvBQOH5TIMHsNGS9r7F+toscAnNj1Iu0XK2HslEKAY2P
-        Wbz/rkkU4WOhorB9kJ7ZweoiBJZ4S0MyhatRvaDfXmy5hFzcA3JWLO2ZxMftZaot
-        rm3hE/NvY6lydJWuGgh1DaF4N8iOfFI501q7qrQbK8n2lWmSUsjshxkxKkEBeDTQ
-        ==
-X-ME-Sender: <xms:qgVSX5uGJu4UeKguzMZCO8CCRBDNU7IfXAaXGF_U3SiRirCSPqoE4g>
-    <xme:qgVSXyeuMMxL8sD-rrqgsl5KzvEvnq5-aVUPjLooVAEONZmqrWYR4BSKjz_rTNAzs
-    bUX-CvMqXUddF0QWVc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrudegfedgudegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucenucfjughrpeffhffvuffkfhggtggujgesghdtre
-    ertddtvdenucfhrhhomhepofgrgihimhgvucftihhprghrugcuoehmrgigihhmvgestggv
-    rhhnohdrthgvtghhqeenucggtffrrghtthgvrhhnpeelkeeghefhuddtleejgfeljeffhe
-    ffgfeijefhgfeufefhtdevteegheeiheegudenucfkphepledtrdekledrieekrdejieen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmrgigih
-    hmvgestggvrhhnohdrthgvtghh
-X-ME-Proxy: <xmx:qgVSX8yIhQLFJEx5N92PNqZlRNxk4nskH6OPfGQqWr0ixrLobVSGQQ>
-    <xmx:qgVSXwPztVTPGbjCOioW2gsk8auO5lz1Haje_4Os8Ikf_V3Me9q-MQ>
-    <xmx:qgVSX5_u1GZxe1EM7TmMdBmM3duz6SuZ-cbeFdgOIYYMfMkTW1VUoA>
-    <xmx:rAVSX4baiUipkmSAjeUd2zBLs4_T2TObQYwnTXCM7i2pX-egAi9v8Q>
-Received: from localhost (lfbn-tou-1-1502-76.w90-89.abo.wanadoo.fr [90.89.68.76])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 2528C3060060;
-        Fri,  4 Sep 2020 05:15:22 -0400 (EDT)
-Date:   Fri, 4 Sep 2020 11:15:20 +0200
-From:   Maxime Ripard <maxime@cerno.tech>
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        robh+dt@kernel.org, robh@kernel.org, wens@csie.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-sunxi@googlegroups.com, m.cerveny@computer.org
-Subject: Re: [PATCH v2] dt-bindings: crypto: Specify that
- allwinner,sun8i-a33-crypto needs reset
-Message-ID: <20200904091520.cwrovnbb2squze5h@gilmour.lan>
-References: <20200903145445.31779-1-clabbe.montjoie@gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="ywcvreqcqed5i46k"
-Content-Disposition: inline
-In-Reply-To: <20200903145445.31779-1-clabbe.montjoie@gmail.com>
+        Fri, 4 Sep 2020 05:42:53 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2316FC061244;
+        Fri,  4 Sep 2020 02:42:52 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id d19so4040066pgl.10;
+        Fri, 04 Sep 2020 02:42:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=k2pP6uCXGE3hf4kIKSJ0TViSAKe2ZDHRqtthemQoyUE=;
+        b=gAzMbl9TqqnXyIRD4TGx12WtzlcUX32PTT1eW7BqLXqe/HdTdxT+emMOtGKKg2tS3H
+         jFqZlQ5OqWNgNqx+/n7a4Q7Te6jcGhHPYbSig/rg2q5PObd6SajiemVm3ewlGqpfu644
+         5Blfjst9QQT95RzWlLfk9rJvA94vL8w91xs3/BfC+cs37CHNKHlvmbiRivIvL6icBMYZ
+         JCrLsfugmAhujtWhAVmimv1MhdKlmKFUmobeCz/rdamM0xqc2Ggn0qP5zHOi6nfqCp95
+         yhOTIjgyy9U+EiWIZUcO0Vvsm3M+xsIAlm2y1B/5Ok9NgAQ0PLF8eHwBNjoTR2+EB6oE
+         5RVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=k2pP6uCXGE3hf4kIKSJ0TViSAKe2ZDHRqtthemQoyUE=;
+        b=quzCPOGu3tOzjrB21MDjEy5l8e6bFxA+/c71ALk/bM+C7QhrEqzyEgbdGPjDdpz5VA
+         5ftspYFE3GMvadFttzfZUUQGF4KAQq6lvzNenqyDtS4pMkZp8sXzovW53hke0O7+6Xd6
+         Iju5CRJhlZ5i89UDNjd8/D6WBMiRKUnjm5namghZtuVh4t1DbT/ajZSdLR9jXgfxyMZE
+         /vS1cf9b/N0a60wpsp03XrIvGiu07r+6hG8CEL3MjmkM5Pc3dPqfeBuL1WAJ0akiMfjt
+         n6GH8/fJ3MGxhJJZBfY1m0P15M5yt9mhb9C12Cew1dI/k8rHhjxNNujNiOfCksKhSxqo
+         46ZQ==
+X-Gm-Message-State: AOAM532rAxdYHml6QQZNBNxorXy8rOdSerK3ww5biS4ZylmaSHZfj3v3
+        zswWfqB6cUtrPl5iLEIh1wI=
+X-Google-Smtp-Source: ABdhPJxL3L6K5Vdob33AgTHPTkGlZCq/T3PVfZsknGNaQ4ivB+nB3Am35D+EDOqj9Yl1PfZqpKP8Eg==
+X-Received: by 2002:aa7:8010:: with SMTP id j16mr7428036pfi.210.1599212571903;
+        Fri, 04 Sep 2020 02:42:51 -0700 (PDT)
+Received: from localhost.localdomain ([218.247.215.252])
+        by smtp.gmail.com with ESMTPSA id a7sm6256342pfd.194.2020.09.04.02.42.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Sep 2020 02:42:51 -0700 (PDT)
+From:   Xiaoliang Pang <dawning.pang@gmail.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        matthias.bgg@gmail.com, swboyd@chromium.org, yuehaibing@huawei.com,
+        tianjia.zhang@linux.alibaba.com, ryder.lee@mediatek.com
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+        dawning.pang@gmail.com
+Subject: [PATCH v2] cypto: mediatek - fix leaks in mtk_desc_ring_alloc
+Date:   Fri,  4 Sep 2020 17:42:33 +0800
+Message-Id: <20200904094233.11624-1-dawning.pang@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+In the init loop, if an error occurs in function 'dma_alloc_coherent',
+then goto the err_cleanup section,
+in the cleanup loop,
+the struct mtk_ring rising[i] will not be released,
+causing a memory leak
 
---ywcvreqcqed5i46k
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Xiaoliang Pang <dawning.pang@gmail.com>
+---
+ drivers/crypto/mediatek/mtk-platform.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Thu, Sep 03, 2020 at 04:54:45PM +0200, Corentin Labbe wrote:
-> When adding allwinner,sun8i-a33-crypto, I forgot to add that it needs res=
-et.
-> Furthermore, there are no need to use items to list only one compatible
-> in compatible list.
->=20
-> Fixes: f81547ba7a98 ("dt-bindings: crypto: add new compatible for A33 SS")
-> Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-> ---
-> Change since v1:
-> - use an enum for adding allwinner,sun8i-a33-crypto to "reset list"
->=20
->  .../bindings/crypto/allwinner,sun4i-a10-crypto.yaml        | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/crypto/allwinner,sun4i-a10=
--crypto.yaml b/Documentation/devicetree/bindings/crypto/allwinner,sun4i-a10=
--crypto.yaml
-> index fc823572bcff..279f4a2e1dd7 100644
-> --- a/Documentation/devicetree/bindings/crypto/allwinner,sun4i-a10-crypto=
-=2Eyaml
-> +++ b/Documentation/devicetree/bindings/crypto/allwinner,sun4i-a10-crypto=
-=2Eyaml
-> @@ -23,8 +23,7 @@ properties:
->        - items:
->            - const: allwinner,sun7i-a20-crypto
->            - const: allwinner,sun4i-a10-crypto
-> -      - items:
-> -          - const: allwinner,sun8i-a33-crypto
-> +      - const: allwinner,sun8i-a33-crypto
-> =20
->    reg:
->      maxItems: 1
-> @@ -59,7 +58,9 @@ if:
->    properties:
->      compatible:
->        contains:
-> -        const: allwinner,sun6i-a31-crypto
-> +        enum:
-> +          - const: allwinner,sun6i-a31-crypto
-> +          - const: allwinner,sun8i-a33-crypto
+diff --git a/drivers/crypto/mediatek/mtk-platform.c b/drivers/crypto/mediatek/mtk-platform.c
+index 05d341e4a696..ebb3bdef0dbe 100644
+--- a/drivers/crypto/mediatek/mtk-platform.c
++++ b/drivers/crypto/mediatek/mtk-platform.c
+@@ -469,13 +469,13 @@ static int mtk_desc_ring_alloc(struct mtk_cryp *cryp)
+ 	return 0;
+ 
+ err_cleanup:
+-	for (; i >= 0; --i) {
++	do {
+ 		dma_free_coherent(cryp->dev, MTK_DESC_RING_SZ,
+ 				  ring[i]->res_base, ring[i]->res_dma);
+ 		dma_free_coherent(cryp->dev, MTK_DESC_RING_SZ,
+ 				  ring[i]->cmd_base, ring[i]->cmd_dma);
+ 		kfree(ring[i]);
+-	}
++	}while(i--);
+ 	return err;
+ }
+ 
+-- 
+2.17.1
 
-That's not the proper syntax for an enum, this would be
-
-> +        enum:
-> +          - allwinner,sun6i-a31-crypto
-> +          - allwinner,sun8i-a33-crypto
-
-Maxime
-
---ywcvreqcqed5i46k
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRcEzekXsqa64kGDp7j7w1vZxhRxQUCX1IFqAAKCRDj7w1vZxhR
-xb4YAP9AndsjE//mBZmHVJjQxFxeoOtzDPG51bM/OUpqPddYmwD/fVvGjW3eKS5y
-J1RNMIZV2ualGb2JEL41KdNHYyCyfAk=
-=36HK
------END PGP SIGNATURE-----
-
---ywcvreqcqed5i46k--
