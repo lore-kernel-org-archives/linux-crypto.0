@@ -2,152 +2,234 @@ Return-Path: <SRS0=2Pww=CN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0820AC433E2
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 11:27:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC172C43461
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 11:30:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFC0D2074D
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 11:27:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CF04206B7
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 11:30:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="S/tGmJML"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="bn473Ddz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730014AbgIDL1S (ORCPT
+        id S1730155AbgIDLax (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Sep 2020 07:27:18 -0400
-Received: from mx08-00178001.pphosted.com ([91.207.212.93]:21986 "EHLO
-        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730210AbgIDL1J (ORCPT
+        Fri, 4 Sep 2020 07:30:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59786 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730136AbgIDLYE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Sep 2020 07:27:09 -0400
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 084BMtnu014170;
-        Fri, 4 Sep 2020 13:25:54 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=st.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-type; s=STMicroelectronics;
- bh=I8ccoTHg3d9B6AkVKdCfXmiAQ8dN+CnLyb2SJtv640w=;
- b=S/tGmJML0d2Xt4lbIUD6dMLDrBrX41roU3etZNiaTzdqS3BFfiJoX3LhCq6NYJEM/14L
- rULRhvJS56awypM44t2P3DTtDyh/c/bdp27qhgADzpjjaoPUyeHXefglOngqIMKzOY/X
- k0zIrEAgkdnHay/lCHnD9V1DR4yuiE95y/k7XyaNqpAFKk+Pg1rsDMHdsrEObMRf6OBW
- dH41fAtF69FXKREm/0mX818jy5LtNFAaAuHz5NTLC+Es6+/EyzdXE2MvzAhxIE0Fk9n9
- niJquIeVAQlZaSCjYhYdMTA03e8le/iyFngAPJTru63SeA3XNXky5wHGVE/S9DY0s6JC 6A== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com with ESMTP id 337c591nbk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Sep 2020 13:25:54 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 14F7910002A;
-        Fri,  4 Sep 2020 13:25:51 +0200 (CEST)
-Received: from Webmail-eu.st.com (sfhdag6node1.st.com [10.75.127.16])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id C024E2AC84B;
-        Fri,  4 Sep 2020 13:25:51 +0200 (CEST)
-Received: from localhost (10.75.127.45) by SFHDAG6NODE1.st.com (10.75.127.16)
- with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 4 Sep 2020 13:25:51
- +0200
-From:   Nicolas Toromanoff <nicolas.toromanoff@st.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>
-CC:     Ard Biesheuvel <ardb@kernel.org>,
-        Nicolas Toromanoff <nicolas.toromanoff@st.com>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] crypto: stm32/crc32 - Avoid lock if hardware is already used
-Date:   Fri, 4 Sep 2020 13:25:27 +0200
-Message-ID: <20200904112527.15677-1-nicolas.toromanoff@st.com>
-X-Mailer: git-send-email 2.17.1
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.75.127.45]
-X-ClientProxiedBy: SFHDAG5NODE3.st.com (10.75.127.15) To SFHDAG6NODE1.st.com
- (10.75.127.16)
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-04_06:2020-09-04,2020-09-04 signatures=0
+        Fri, 4 Sep 2020 07:24:04 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DBB9C06123D
+        for <linux-crypto@vger.kernel.org>; Fri,  4 Sep 2020 04:10:32 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id a9so5707392wmm.2
+        for <linux-crypto@vger.kernel.org>; Fri, 04 Sep 2020 04:10:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=enpDAR+q6vLHcCWoXqxt/APfxOpAFUDPCVJnonleY4M=;
+        b=bn473DdzdhX55zJ4EmlFLqT+gWYU/H95ECDnGSriOw33ruu4gIaHlqTFUnqIboT2Yn
+         yfTxrAFQH+xp8OFzjM/YNwVpX0qsY8vAVlXKcJBowp01KKJYG+ZbSEeIuVAZwJMWXJqz
+         7VRUw5OCJXHKbbv5kgou8LqiQRiiohYacVhQTswXdHrQ5B+le3C5MeZtdcYUN+yQCrTm
+         gAMRFoVFCFslCT3EWPK7K+UaEqknJXsDEss4uU07F2oS2wMT/SpBqEg40jo3PMWumtrN
+         o3Hy8VTT+tj/u+XbVi/utSPzxbaL/FhRBsskFTBenlTvYtwC7hHcU9Y3Ny/cyNc5vtsf
+         dvcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=enpDAR+q6vLHcCWoXqxt/APfxOpAFUDPCVJnonleY4M=;
+        b=s+3loevfmu4MiGH2mMjtkcSDjW3Awx4H3daKClX+2COM4L32kNGxiFDxm6u8C0Oyde
+         Q58Qa4VH68ojNVwta2xtAReGIGNaDjNEgrdUvYuki/IVipIhoMDbGx0fKqVnGaz2uNLC
+         aeIAFA7gjIq0Ip25YwAwAGnbYB/LTPIPYxvVHDc4U8pMrVmNmlDs94s+sJi0a7cN6DtH
+         sqZfqd05VYxL4LFLkXfiIaycHA4EngPHgdS1cHzC1DJpQeCcBjPsgQfXg9/02Ws2D1gf
+         zIkXWZ1ekqm4CnRNporNYnMFD0p6uS1CujeYXGaDD0HDJA/yGmFfBgRjWM6WyUJR3vhA
+         EeyA==
+X-Gm-Message-State: AOAM531SVya20IZGDVk7wrMzMuhWSYB0riGEu5rSxGDBs083SUFl5wna
+        N+iXmNP5k/6QzCiOrK6pHREiEg==
+X-Google-Smtp-Source: ABdhPJw5O1NSJAUt07KeskJXKNX4H9evhQsJ0gerNlA0T6Ex6xyEklbqG95N4CJqYsr2kt8xoiktgw==
+X-Received: by 2002:a1c:a707:: with SMTP id q7mr7593068wme.152.1599217831116;
+        Fri, 04 Sep 2020 04:10:31 -0700 (PDT)
+Received: from localhost.localdomain ([51.15.160.169])
+        by smtp.googlemail.com with ESMTPSA id m3sm10622743wmb.26.2020.09.04.04.10.29
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 04 Sep 2020 04:10:30 -0700 (PDT)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        mripard@kernel.org, wens@csie.org
+Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH v6 18/18] crypto: sun8i-ce: fix some style issue
+Date:   Fri,  4 Sep 2020 11:10:03 +0000
+Message-Id: <1599217803-29755-19-git-send-email-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1599217803-29755-1-git-send-email-clabbe@baylibre.com>
+References: <1599217803-29755-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If STM32 CRC device is already in use, calculate CRC by software.
+This patch fix a double empty line issue reported by checkpatch.
+While at it, since now the maximum line length is now 100, reorder some
+wrapped line.
 
-This will release CPU constraint for a concurrent access to the
-hardware, and avoid masking irqs during the whole block processing.
-
-Fixes: 7795c0baf5ac ("crypto: stm32/crc32 - protect from concurrent accesses")
-
-Signed-off-by: Nicolas Toromanoff <nicolas.toromanoff@st.com>
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- drivers/crypto/stm32/Kconfig       |  2 ++
- drivers/crypto/stm32/stm32-crc32.c | 15 ++++++++++++---
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ .../allwinner/sun8i-ce/sun8i-ce-cipher.c      | 34 ++++++-------------
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c |  9 ++---
+ 2 files changed, 14 insertions(+), 29 deletions(-)
 
-diff --git a/drivers/crypto/stm32/Kconfig b/drivers/crypto/stm32/Kconfig
-index 4ef3eb11361c..8d605b07571f 100644
---- a/drivers/crypto/stm32/Kconfig
-+++ b/drivers/crypto/stm32/Kconfig
-@@ -3,6 +3,8 @@ config CRYPTO_DEV_STM32_CRC
- 	tristate "Support for STM32 crc accelerators"
- 	depends on ARCH_STM32
- 	select CRYPTO_HASH
-+	select CRYPTO_CRC32
-+	select CRYPTO_CRC32C
- 	help
- 	  This enables support for the CRC32 hw accelerator which can be found
- 	  on STMicroelectronics STM32 SOC.
-diff --git a/drivers/crypto/stm32/stm32-crc32.c b/drivers/crypto/stm32/stm32-crc32.c
-index 783a64f3f635..75867c0b0017 100644
---- a/drivers/crypto/stm32/stm32-crc32.c
-+++ b/drivers/crypto/stm32/stm32-crc32.c
-@@ -6,6 +6,7 @@
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+index 2dcf508b0f18..9dae2be26e48 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+@@ -164,12 +164,10 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ 				goto theend_key;
+ 			}
+ 			offset = areq->cryptlen - ivsize;
+-			scatterwalk_map_and_copy(rctx->backup_iv, areq->src,
+-						 offset, ivsize, 0);
++			scatterwalk_map_and_copy(rctx->backup_iv, areq->src, offset, ivsize, 0);
+ 		}
+ 		memcpy(rctx->bounce_iv, areq->iv, ivsize);
+-		addr_iv = dma_map_single(ce->dev, rctx->bounce_iv, rctx->ivlen,
+-					 DMA_TO_DEVICE);
++		addr_iv = dma_map_single(ce->dev, rctx->bounce_iv, rctx->ivlen, DMA_TO_DEVICE);
+ 		cet->t_iv = cpu_to_le32(addr_iv);
+ 		if (dma_mapping_error(ce->dev, addr_iv)) {
+ 			dev_err(ce->dev, "Cannot DMA MAP IV\n");
+@@ -179,8 +177,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ 	}
  
- #include <linux/bitrev.h>
- #include <linux/clk.h>
-+#include <linux/crc32.h>
- #include <linux/crc32poly.h>
- #include <linux/io.h>
- #include <linux/kernel.h>
-@@ -149,7 +150,6 @@ static int burst_update(struct shash_desc *desc, const u8 *d8,
- 	struct stm32_crc_desc_ctx *ctx = shash_desc_ctx(desc);
- 	struct stm32_crc_ctx *mctx = crypto_shash_ctx(desc->tfm);
- 	struct stm32_crc *crc;
--	unsigned long flags;
+ 	if (areq->src == areq->dst) {
+-		nr_sgs = dma_map_sg(ce->dev, areq->src, sg_nents(areq->src),
+-				    DMA_BIDIRECTIONAL);
++		nr_sgs = dma_map_sg(ce->dev, areq->src, sg_nents(areq->src), DMA_BIDIRECTIONAL);
+ 		if (nr_sgs <= 0 || nr_sgs > MAX_SG) {
+ 			dev_err(ce->dev, "Invalid sg number %d\n", nr_sgs);
+ 			err = -EINVAL;
+@@ -188,15 +185,13 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ 		}
+ 		nr_sgd = nr_sgs;
+ 	} else {
+-		nr_sgs = dma_map_sg(ce->dev, areq->src, sg_nents(areq->src),
+-				    DMA_TO_DEVICE);
++		nr_sgs = dma_map_sg(ce->dev, areq->src, sg_nents(areq->src), DMA_TO_DEVICE);
+ 		if (nr_sgs <= 0 || nr_sgs > MAX_SG) {
+ 			dev_err(ce->dev, "Invalid sg number %d\n", nr_sgs);
+ 			err = -EINVAL;
+ 			goto theend_iv;
+ 		}
+-		nr_sgd = dma_map_sg(ce->dev, areq->dst, sg_nents(areq->dst),
+-				    DMA_FROM_DEVICE);
++		nr_sgd = dma_map_sg(ce->dev, areq->dst, sg_nents(areq->dst), DMA_FROM_DEVICE);
+ 		if (nr_sgd <= 0 || nr_sgd > MAX_SG) {
+ 			dev_err(ce->dev, "Invalid sg number %d\n", nr_sgd);
+ 			err = -EINVAL;
+@@ -251,15 +246,13 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ theend_iv:
+ 	if (areq->iv && ivsize > 0) {
+ 		if (addr_iv)
+-			dma_unmap_single(ce->dev, addr_iv, rctx->ivlen,
+-					 DMA_TO_DEVICE);
++			dma_unmap_single(ce->dev, addr_iv, rctx->ivlen, DMA_TO_DEVICE);
+ 		offset = areq->cryptlen - ivsize;
+ 		if (rctx->op_dir & CE_DECRYPTION) {
+ 			memcpy(areq->iv, rctx->backup_iv, ivsize);
+ 			kfree_sensitive(rctx->backup_iv);
+ 		} else {
+-			scatterwalk_map_and_copy(areq->iv, areq->dst, offset,
+-						 ivsize, 0);
++			scatterwalk_map_and_copy(areq->iv, areq->dst, offset, ivsize, 0);
+ 		}
+ 		kfree(rctx->bounce_iv);
+ 	}
+@@ -315,15 +308,13 @@ static int sun8i_ce_cipher_unprepare(struct crypto_engine *engine, void *async_r
  
- 	crc = stm32_crc_get_next_crc();
- 	if (!crc)
-@@ -157,7 +157,15 @@ static int burst_update(struct shash_desc *desc, const u8 *d8,
+ 	if (areq->iv && ivsize > 0) {
+ 		if (cet->t_iv)
+-			dma_unmap_single(ce->dev, cet->t_iv, rctx->ivlen,
+-					 DMA_TO_DEVICE);
++			dma_unmap_single(ce->dev, cet->t_iv, rctx->ivlen, DMA_TO_DEVICE);
+ 		offset = areq->cryptlen - ivsize;
+ 		if (rctx->op_dir & CE_DECRYPTION) {
+ 			memcpy(areq->iv, rctx->backup_iv, ivsize);
+ 			kfree_sensitive(rctx->backup_iv);
+ 		} else {
+-			scatterwalk_map_and_copy(areq->iv, areq->dst, offset,
+-						 ivsize, 0);
++			scatterwalk_map_and_copy(areq->iv, areq->dst, offset, ivsize, 0);
+ 		}
+ 		kfree(rctx->bounce_iv);
+ 	}
+@@ -395,7 +386,6 @@ int sun8i_ce_cipher_init(struct crypto_tfm *tfm)
+ 	sktfm->reqsize = sizeof(struct sun8i_cipher_req_ctx) +
+ 			 crypto_skcipher_reqsize(op->fallback_tfm);
  
- 	pm_runtime_get_sync(crc->dev);
+-
+ 	dev_info(op->ce->dev, "Fallback for %s is %s\n",
+ 		 crypto_tfm_alg_driver_name(&sktfm->base),
+ 		 crypto_tfm_alg_driver_name(crypto_skcipher_tfm(op->fallback_tfm)));
+@@ -427,8 +417,7 @@ void sun8i_ce_cipher_exit(struct crypto_tfm *tfm)
+ 	pm_runtime_put_sync_suspend(op->ce->dev);
+ }
  
--	spin_lock_irqsave(&crc->lock, flags);
-+	if (!spin_trylock(&crc->lock)) {
-+		/* Hardware is busy, calculate crc32 by software */
-+		if (mctx->poly == CRC32_POLY_LE)
-+			ctx->partial = crc32_le(ctx->partial, d8, length);
-+		else
-+			ctx->partial = __crc32c_le(ctx->partial, d8, length);
-+
-+		goto pm_out;
-+	}
+-int sun8i_ce_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
+-			unsigned int keylen)
++int sun8i_ce_aes_setkey(struct crypto_skcipher *tfm, const u8 *key, unsigned int keylen)
+ {
+ 	struct sun8i_cipher_tfm_ctx *op = crypto_skcipher_ctx(tfm);
+ 	struct sun8i_ce_dev *ce = op->ce;
+@@ -459,8 +448,7 @@ int sun8i_ce_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 	return crypto_skcipher_setkey(op->fallback_tfm, key, keylen);
+ }
  
- 	/*
- 	 * Restore previously calculated CRC for this context as init value
-@@ -197,8 +205,9 @@ static int burst_update(struct shash_desc *desc, const u8 *d8,
- 	/* Store partial result */
- 	ctx->partial = readl_relaxed(crc->regs + CRC_DR);
+-int sun8i_ce_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
+-			 unsigned int keylen)
++int sun8i_ce_des3_setkey(struct crypto_skcipher *tfm, const u8 *key, unsigned int keylen)
+ {
+ 	struct sun8i_cipher_tfm_ctx *op = crypto_skcipher_ctx(tfm);
+ 	int err;
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+index cf320898a4b1..1dbbd40ad576 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+@@ -596,8 +596,7 @@ static int sun8i_ce_dbgfs_read(struct seq_file *seq, void *v)
+ 		}
+ 	}
+ #ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_TRNG
+-	seq_printf(seq, "HWRNG %lu %lu\n",
+-		   ce->hwrng_stat_req, ce->hwrng_stat_bytes);
++	seq_printf(seq, "HWRNG %lu %lu\n", ce->hwrng_stat_req, ce->hwrng_stat_bytes);
+ #endif
+ 	return 0;
+ }
+@@ -635,8 +634,7 @@ static int sun8i_ce_allocate_chanlist(struct sun8i_ce_dev *ce)
+ {
+ 	int i, err;
  
--	spin_unlock_irqrestore(&crc->lock, flags);
-+	spin_unlock(&crc->lock);
+-	ce->chanlist = devm_kcalloc(ce->dev, MAXFLOW,
+-				    sizeof(struct sun8i_ce_flow), GFP_KERNEL);
++	ce->chanlist = devm_kcalloc(ce->dev, MAXFLOW, sizeof(struct sun8i_ce_flow), GFP_KERNEL);
+ 	if (!ce->chanlist)
+ 		return -ENOMEM;
  
-+pm_out:
- 	pm_runtime_mark_last_busy(crc->dev);
- 	pm_runtime_put_autosuspend(crc->dev);
+@@ -935,8 +933,7 @@ static int sun8i_ce_probe(struct platform_device *pdev)
+ 	if (err)
+ 		goto error_pm;
  
+-	err = devm_request_irq(&pdev->dev, irq, ce_irq_handler, 0,
+-			       "sun8i-ce-ns", ce);
++	err = devm_request_irq(&pdev->dev, irq, ce_irq_handler, 0, "sun8i-ce-ns", ce);
+ 	if (err) {
+ 		dev_err(ce->dev, "Cannot request CryptoEngine Non-secure IRQ (err=%d)\n", err);
+ 		goto error_irq;
 -- 
-2.17.1
+2.26.2
 
