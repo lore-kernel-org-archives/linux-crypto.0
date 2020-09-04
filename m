@@ -2,106 +2,152 @@ Return-Path: <SRS0=2Pww=CN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82725C433E2
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 11:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0820AC433E2
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 11:27:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 54A55206B7
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 11:24:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFC0D2074D
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 11:27:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="bnr9W94c"
+	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="S/tGmJML"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730042AbgIDLX7 (ORCPT
+        id S1730014AbgIDL1S (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Sep 2020 07:23:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59622 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730043AbgIDLXp (ORCPT
+        Fri, 4 Sep 2020 07:27:18 -0400
+Received: from mx08-00178001.pphosted.com ([91.207.212.93]:21986 "EHLO
+        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730210AbgIDL1J (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Sep 2020 07:23:45 -0400
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98FF8C061232
-        for <linux-crypto@vger.kernel.org>; Fri,  4 Sep 2020 04:10:26 -0700 (PDT)
-Received: by mail-wm1-x344.google.com with SMTP id o21so5725188wmc.0
-        for <linux-crypto@vger.kernel.org>; Fri, 04 Sep 2020 04:10:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=B84TBgeETkt4nO+wKVIpW+Ds3pJrpx/FZNcZ1KM26KI=;
-        b=bnr9W94cIFYUYGbYZM/SjXBTXSmzTwYBy8DJNJXcmc8WG9lGAKRql5O2qS0xoi9z8k
-         lEmn8M0IGhkeEqaCiExydHxJOGaqAxW/sskGh76OdYzjAdCqZQjde9d8mhLVm/VZOtdK
-         R1Y1SntzmRorFlcJtkDUVIMB9h+TZKRSwiysjV3CZz0R5kw20lCPWnziudAOOlM8xfGu
-         i/vnsJGr3U4cJrlpg3CPbstp5DecYYm7pNqZDK3PtkeZnOML6qFMlYihSzeo6/dREzDp
-         etVmWRwa33R2N0Ujch1NRLKJpKP6KSp3pIQxDrgInzxPSD/QeP5uVVdYpQOq3wW100zv
-         bq3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=B84TBgeETkt4nO+wKVIpW+Ds3pJrpx/FZNcZ1KM26KI=;
-        b=ZQr3ja+Cz7pn+eYpxSwASzrdpOSnF2MhOJl2/x74zJNrS2l5KLmkT21Z8y5bkXJE0A
-         yGwFdHaJpmKanDHUeT1oCPesB7hlwoqhNH9u//eCinALeVEBRnmhtfVZV7fGpDjfCuky
-         yq0l0n28Cnhh/E6ppyxfShJ619sifjUuTHS1F2nfqXde58NC0IcV4bS3kMHYAIDcclDg
-         POkW+Wcpg1TKDi5wWtL9YjI/u8RwWrlRNNdZ5kidAsT8GACuyrQ5ytbggVTUTUeW99UY
-         JVKJxWqR0445w0PlQFp8r7JKpharWcFXzCuYx3rlx85V6qDbUmWtPINOEGJj4rq4ZgeP
-         CXMA==
-X-Gm-Message-State: AOAM530B1N6VTTJ3atAXlq4VOuA41HDn31crGzGqC3F3cAHZ5umGmzoP
-        n4dyT0rRhhANBE26YBAyBmivJYV6+WfrKA==
-X-Google-Smtp-Source: ABdhPJwCcPr6IlHHWvbOcoNbdd4+uY/LZzQJ3ZXMxi3Gu7j9EL5gFmOLVKhDopwr3CZ8hLAlqlCWzA==
-X-Received: by 2002:a1c:b60b:: with SMTP id g11mr7190349wmf.48.1599217825183;
-        Fri, 04 Sep 2020 04:10:25 -0700 (PDT)
-Received: from localhost.localdomain ([51.15.160.169])
-        by smtp.googlemail.com with ESMTPSA id m3sm10622743wmb.26.2020.09.04.04.10.24
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 04 Sep 2020 04:10:24 -0700 (PDT)
-From:   Corentin Labbe <clabbe@baylibre.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        mripard@kernel.org, wens@csie.org
-Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v6 13/18] crypto: sun8i-ce: Add stat_bytes debugfs
-Date:   Fri,  4 Sep 2020 11:09:58 +0000
-Message-Id: <1599217803-29755-14-git-send-email-clabbe@baylibre.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1599217803-29755-1-git-send-email-clabbe@baylibre.com>
-References: <1599217803-29755-1-git-send-email-clabbe@baylibre.com>
+        Fri, 4 Sep 2020 07:27:09 -0400
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 084BMtnu014170;
+        Fri, 4 Sep 2020 13:25:54 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=st.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-type; s=STMicroelectronics;
+ bh=I8ccoTHg3d9B6AkVKdCfXmiAQ8dN+CnLyb2SJtv640w=;
+ b=S/tGmJML0d2Xt4lbIUD6dMLDrBrX41roU3etZNiaTzdqS3BFfiJoX3LhCq6NYJEM/14L
+ rULRhvJS56awypM44t2P3DTtDyh/c/bdp27qhgADzpjjaoPUyeHXefglOngqIMKzOY/X
+ k0zIrEAgkdnHay/lCHnD9V1DR4yuiE95y/k7XyaNqpAFKk+Pg1rsDMHdsrEObMRf6OBW
+ dH41fAtF69FXKREm/0mX818jy5LtNFAaAuHz5NTLC+Es6+/EyzdXE2MvzAhxIE0Fk9n9
+ niJquIeVAQlZaSCjYhYdMTA03e8le/iyFngAPJTru63SeA3XNXky5wHGVE/S9DY0s6JC 6A== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com with ESMTP id 337c591nbk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Sep 2020 13:25:54 +0200
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 14F7910002A;
+        Fri,  4 Sep 2020 13:25:51 +0200 (CEST)
+Received: from Webmail-eu.st.com (sfhdag6node1.st.com [10.75.127.16])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id C024E2AC84B;
+        Fri,  4 Sep 2020 13:25:51 +0200 (CEST)
+Received: from localhost (10.75.127.45) by SFHDAG6NODE1.st.com (10.75.127.16)
+ with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 4 Sep 2020 13:25:51
+ +0200
+From:   Nicolas Toromanoff <nicolas.toromanoff@st.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>
+CC:     Ard Biesheuvel <ardb@kernel.org>,
+        Nicolas Toromanoff <nicolas.toromanoff@st.com>,
+        <linux-crypto@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH] crypto: stm32/crc32 - Avoid lock if hardware is already used
+Date:   Fri, 4 Sep 2020 13:25:27 +0200
+Message-ID: <20200904112527.15677-1-nicolas.toromanoff@st.com>
+X-Mailer: git-send-email 2.17.1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.75.127.45]
+X-ClientProxiedBy: SFHDAG5NODE3.st.com (10.75.127.15) To SFHDAG6NODE1.st.com
+ (10.75.127.16)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-04_06:2020-09-04,2020-09-04 signatures=0
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds a new stat_bytes counter in the sun8i-ce debugfs.
+If STM32 CRC device is already in use, calculate CRC by software.
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+This will release CPU constraint for a concurrent access to the
+hardware, and avoid masking irqs during the whole block processing.
+
+Fixes: 7795c0baf5ac ("crypto: stm32/crc32 - protect from concurrent accesses")
+
+Signed-off-by: Nicolas Toromanoff <nicolas.toromanoff@st.com>
 ---
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/crypto/stm32/Kconfig       |  2 ++
+ drivers/crypto/stm32/stm32-crc32.c | 15 ++++++++++++---
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-index 6bbafdf9d40c..910b510d7bb2 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-@@ -276,6 +276,7 @@ struct sun8i_ce_hash_reqctx {
-  * @alg:		one of sub struct must be used
-  * @stat_req:		number of request done on this template
-  * @stat_fb:		number of request which has fallbacked
-+ * @stat_bytes:		total data size done by this template
-  */
- struct sun8i_ce_alg_template {
- 	u32 type;
-@@ -289,6 +290,7 @@ struct sun8i_ce_alg_template {
- #ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
- 	unsigned long stat_req;
- 	unsigned long stat_fb;
-+	unsigned long stat_bytes;
- #endif
- };
+diff --git a/drivers/crypto/stm32/Kconfig b/drivers/crypto/stm32/Kconfig
+index 4ef3eb11361c..8d605b07571f 100644
+--- a/drivers/crypto/stm32/Kconfig
++++ b/drivers/crypto/stm32/Kconfig
+@@ -3,6 +3,8 @@ config CRYPTO_DEV_STM32_CRC
+ 	tristate "Support for STM32 crc accelerators"
+ 	depends on ARCH_STM32
+ 	select CRYPTO_HASH
++	select CRYPTO_CRC32
++	select CRYPTO_CRC32C
+ 	help
+ 	  This enables support for the CRC32 hw accelerator which can be found
+ 	  on STMicroelectronics STM32 SOC.
+diff --git a/drivers/crypto/stm32/stm32-crc32.c b/drivers/crypto/stm32/stm32-crc32.c
+index 783a64f3f635..75867c0b0017 100644
+--- a/drivers/crypto/stm32/stm32-crc32.c
++++ b/drivers/crypto/stm32/stm32-crc32.c
+@@ -6,6 +6,7 @@
+ 
+ #include <linux/bitrev.h>
+ #include <linux/clk.h>
++#include <linux/crc32.h>
+ #include <linux/crc32poly.h>
+ #include <linux/io.h>
+ #include <linux/kernel.h>
+@@ -149,7 +150,6 @@ static int burst_update(struct shash_desc *desc, const u8 *d8,
+ 	struct stm32_crc_desc_ctx *ctx = shash_desc_ctx(desc);
+ 	struct stm32_crc_ctx *mctx = crypto_shash_ctx(desc->tfm);
+ 	struct stm32_crc *crc;
+-	unsigned long flags;
+ 
+ 	crc = stm32_crc_get_next_crc();
+ 	if (!crc)
+@@ -157,7 +157,15 @@ static int burst_update(struct shash_desc *desc, const u8 *d8,
+ 
+ 	pm_runtime_get_sync(crc->dev);
+ 
+-	spin_lock_irqsave(&crc->lock, flags);
++	if (!spin_trylock(&crc->lock)) {
++		/* Hardware is busy, calculate crc32 by software */
++		if (mctx->poly == CRC32_POLY_LE)
++			ctx->partial = crc32_le(ctx->partial, d8, length);
++		else
++			ctx->partial = __crc32c_le(ctx->partial, d8, length);
++
++		goto pm_out;
++	}
+ 
+ 	/*
+ 	 * Restore previously calculated CRC for this context as init value
+@@ -197,8 +205,9 @@ static int burst_update(struct shash_desc *desc, const u8 *d8,
+ 	/* Store partial result */
+ 	ctx->partial = readl_relaxed(crc->regs + CRC_DR);
+ 
+-	spin_unlock_irqrestore(&crc->lock, flags);
++	spin_unlock(&crc->lock);
+ 
++pm_out:
+ 	pm_runtime_mark_last_busy(crc->dev);
+ 	pm_runtime_put_autosuspend(crc->dev);
  
 -- 
-2.26.2
+2.17.1
 
