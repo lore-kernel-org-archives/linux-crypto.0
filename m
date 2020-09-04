@@ -2,92 +2,85 @@ Return-Path: <SRS0=2Pww=CN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60CBFC43461
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 18:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D821C43461
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 19:45:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33574206A5
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 18:38:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C32C2083B
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 19:45:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726092AbgIDSim (ORCPT
+        id S1727051AbgIDTp5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Sep 2020 14:38:42 -0400
-Received: from vps0.lunn.ch ([185.16.172.187]:43630 "EHLO vps0.lunn.ch"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726127AbgIDSim (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Sep 2020 14:38:42 -0400
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94)
-        (envelope-from <andrew@lunn.ch>)
-        id 1kEGba-00DEuJ-3F; Fri, 04 Sep 2020 20:38:34 +0200
-Date:   Fri, 4 Sep 2020 20:38:34 +0200
-From:   Andrew Lunn <andrew@lunn.ch>
-To:     Sunil Kovvuri Goutham <sgoutham@marvell.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Srujana Challa <schalla@marvell.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Suheil Chandran <schandran@marvell.com>,
-        Narayana Prasad Raju Athreya <pathreya@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Geethasowjanya Akula <gakula@marvell.com>,
-        Jerin Jacob Kollanukkaran <jerinj@marvell.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [EXT] Re: [PATCH v2 2/3] drivers: crypto: add support for
- OCTEONTX2 CPT engine
-Message-ID: <20200904183834.GS3112546@lunn.ch>
-References: <1596809360-12597-1-git-send-email-schalla@marvell.com>
- <1596809360-12597-3-git-send-email-schalla@marvell.com>
- <20200813005407.GB24593@gondor.apana.org.au>
- <BYAPR18MB2791C6451CDE93CA053E0208A02D0@BYAPR18MB2791.namprd18.prod.outlook.com>
- <20200904135044.GA2836@gondor.apana.org.au>
- <BYAPR18MB2791A52DA3BF1D7BE5574F99A02D0@BYAPR18MB2791.namprd18.prod.outlook.com>
- <20200904141744.GA3092@gondor.apana.org.au>
- <BY5PR18MB32984DAF0FDED5D9CD1BEB45C62D0@BY5PR18MB3298.namprd18.prod.outlook.com>
+        Fri, 4 Sep 2020 15:45:57 -0400
+Received: from smtprelay0028.hostedemail.com ([216.40.44.28]:43038 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726135AbgIDTp4 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Sep 2020 15:45:56 -0400
+X-Greylist: delayed 512 seconds by postgrey-1.27 at vger.kernel.org; Fri, 04 Sep 2020 15:45:55 EDT
+Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
+        by smtpgrave08.hostedemail.com (Postfix) with ESMTP id AAA521800EC27
+        for <linux-crypto@vger.kernel.org>; Fri,  4 Sep 2020 19:37:24 +0000 (UTC)
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay07.hostedemail.com (Postfix) with ESMTP id D6807181D3028;
+        Fri,  4 Sep 2020 19:37:22 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: meat92_0910680270b4
+X-Filterd-Recvd-Size: 2254
+Received: from XPS-9350.home (unknown [47.151.133.149])
+        (Authenticated sender: joe@perches.com)
+        by omf05.hostedemail.com (Postfix) with ESMTPA;
+        Fri,  4 Sep 2020 19:37:21 +0000 (UTC)
+Message-ID: <906c2ffb0ef6b2d87d6aecdf60b61833ea79e4fb.camel@perches.com>
+Subject: Re: [PATCH v6 18/18] crypto: sun8i-ce: fix some style issue
+From:   Joe Perches <joe@perches.com>
+To:     Corentin Labbe <clabbe@baylibre.com>, davem@davemloft.net,
+        herbert@gondor.apana.org.au, mripard@kernel.org, wens@csie.org
+Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com
+Date:   Fri, 04 Sep 2020 12:37:19 -0700
+In-Reply-To: <1599217803-29755-19-git-send-email-clabbe@baylibre.com>
+References: <1599217803-29755-1-git-send-email-clabbe@baylibre.com>
+         <1599217803-29755-19-git-send-email-clabbe@baylibre.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.36.4-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BY5PR18MB32984DAF0FDED5D9CD1BEB45C62D0@BY5PR18MB3298.namprd18.prod.outlook.com>
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 04, 2020 at 04:36:29PM +0000, Sunil Kovvuri Goutham wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Herbert Xu <herbert@gondor.apana.org.au>
-> > Sent: Friday, September 4, 2020 7:48 PM
-> > To: Srujana Challa <schalla@marvell.com>
-> > Cc: davem@davemloft.net; netdev@vger.kernel.org; linux-
-> > crypto@vger.kernel.org; Suheil Chandran <schandran@marvell.com>;
-> > Narayana Prasad Raju Athreya <pathreya@marvell.com>; Sunil Kovvuri
-> > Goutham <sgoutham@marvell.com>; Linu Cherian <lcherian@marvell.com>;
-> > Geethasowjanya Akula <gakula@marvell.com>; Jerin Jacob Kollanukkaran
-> > <jerinj@marvell.com>; Ard Biesheuvel <ardb@kernel.org>
-> > Subject: Re: [EXT] Re: [PATCH v2 2/3] drivers: crypto: add support for
-> > OCTEONTX2 CPT engine
-> > 
-> > On Fri, Sep 04, 2020 at 02:14:34PM +0000, Srujana Challa wrote:
-> > >
-> > > Since LMT store is our platform specific, it cannot be generalized to all
-> > ARM64.
-> > 
-> > I'm not asking you to generalise it to all of ARM64.  I'm asking you to move
-> > this into a header file under arch/arm64 that can then be shared by both your
-> > crypto driver and your network driver so you don't duplicate this
-> > everywhere.
-> > 
-> 
-> For ARM64 , except erratas other platform or machine dependent stuff are not allowed inside arch/arm64.
-> Also an earlier attempt by us to add few APIs addressing 128bit operations were not allowed by ARM folks
-> as they don't work in a generic way and are SOC specific.
-> http://lkml.iu.edu/hypermail/linux/kernel/1801.3/02211.html
+On Fri, 2020-09-04 at 11:10 +0000, Corentin Labbe wrote:
+> This patch fix a double empty line issue reported by checkpatch.
+> While at it, since now the maximum line length is now 100, reorder some
+> wrapped line.
+[]
+> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+[]
+> @@ -164,12 +164,10 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+>  				goto theend_key;
+>  			}
+>  			offset = areq->cryptlen - ivsize;
+> -			scatterwalk_map_and_copy(rctx->backup_iv, areq->src,
+> -						 offset, ivsize, 0);
+> +			scatterwalk_map_and_copy(rctx->backup_iv, areq->src, offset, ivsize, 0);
+>  		}
+>  		memcpy(rctx->bounce_iv, areq->iv, ivsize);
+> -		addr_iv = dma_map_single(ce->dev, rctx->bounce_iv, rctx->ivlen,
+> -					 DMA_TO_DEVICE);
+> +		addr_iv = dma_map_single(ce->dev, rctx->bounce_iv, rctx->ivlen, DMA_TO_DEVICE);
 
-Maybe put it in include/linux/soc/ ?
+coding-style.rst:
 
-      Andrew
+   Statements longer than 80 columns should be broken into sensible chunks,
+   unless exceeding 80 columns significantly increases readability and does
+   not hide information.
+
+Do these longer lines make the code significantly more readable?
+I don't think they do.
+
+
