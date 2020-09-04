@@ -2,76 +2,84 @@ Return-Path: <SRS0=2Pww=CN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,FAKE_REPLY_C,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 590A9C433E2
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 07:22:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62DD8C43461
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 07:40:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 353E420722
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 07:22:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C6E020748
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 07:40:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726251AbgIDHWZ (ORCPT
+        id S1726575AbgIDHkW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Sep 2020 03:22:25 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:42594 "EHLO fornost.hmeau.com"
+        Fri, 4 Sep 2020 03:40:22 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:42610 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726114AbgIDHWY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Sep 2020 03:22:24 -0400
+        id S1726089AbgIDHkW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Sep 2020 03:40:22 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kE62k-0008TA-Ec; Fri, 04 Sep 2020 17:21:55 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 04 Sep 2020 17:21:54 +1000
-Date:   Fri, 4 Sep 2020 17:21:54 +1000
+        id 1kE6KK-0000Lo-9Q; Fri, 04 Sep 2020 17:40:05 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 04 Sep 2020 17:40:04 +1000
+Date:   Fri, 4 Sep 2020 17:40:04 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Xiaoliang Pang <dawning.pang@gmail.com>
-Cc:     davem@davemloft.net, matthias.bgg@gmail.com, swboyd@chromium.org,
-        yuehaibing@huawei.com, tianjia.zhang@linux.alibaba.com,
-        ryder.lee@mediatek.com, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
-        dawning.pang@gmail.com
-Subject: Re: [PATCH] cypto: mediatek - fix leaks in mtk_desc_ring_alloc
-Message-ID: <20200904072154.GA24603@gondor.apana.org.au>
+To:     "shenyang (M)" <shenyang39@huawei.com>
+Cc:     David Laight <David.Laight@ACULAB.COM>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "xuzaibo@huawei.com" <xuzaibo@huawei.com>,
+        "wangzhou1@hisilicon.com" <wangzhou1@hisilicon.com>
+Subject: Re: [PATCH RESEND 04/10] crypto: hisilicon/zip - replace 'sprintf'
+ with 'scnprintf'
+Message-ID: <20200904074004.GA24815@gondor.apana.org.au>
+References: <1598238709-58699-1-git-send-email-shenyang39@huawei.com>
+ <1598238709-58699-5-git-send-email-shenyang39@huawei.com>
+ <d1102aca2bdc4df4acc31d8b082cacce@AcuMS.aculab.com>
+ <abc0c78e-3232-9081-c330-3d5b8db9e683@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200903063800.27288-1-dawning.pang@gmail.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <abc0c78e-3232-9081-c330-3d5b8db9e683@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Xiaoliang Pang <dawning.pang@gmail.com> wrote:
-> In the init loop, if an error occurs in function 'dma_alloc_coherent',
-> then goto the err_cleanup section,
-> in the cleanup loop, after run i--, 
-> the struct mtk_ring rising[i] will not be released,
-> causing a memory leak
+On Wed, Aug 26, 2020 at 04:56:40PM +0800, shenyang (M) wrote:
+>
+> > > @@ -514,13 +514,16 @@ static int hisi_zip_core_debug_init(struct hisi_qm *qm)
+> > >  	struct debugfs_regset32 *regset;
+> > >  	struct dentry *tmp_d;
+> > >  	char buf[HZIP_BUF_SIZE];
+> > > -	int i;
+> > > +	int i, ret;
+> > > 
+> > >  	for (i = 0; i < HZIP_CORE_NUM; i++) {
+> > >  		if (i < HZIP_COMP_CORE_NUM)
+> > > -			sprintf(buf, "comp_core%d", i);
+> > > +			ret = scnprintf(buf, HZIP_BUF_SIZE, "comp_core%d", i);
+> > >  		else
+> > > -			sprintf(buf, "decomp_core%d", i - HZIP_COMP_CORE_NUM);
+> > > +			ret = scnprintf(buf, HZIP_BUF_SIZE, "decomp_core%d",
+> > > +					i - HZIP_COMP_CORE_NUM);
+> > > +		if (!ret)
+> > > +			return -ENOMEM;
+> > 
+> > and that is just so wrong - did you even try to test
+> > the 'buffer too small' code path?
 > 
-> Signed-off-by: Xiaoliang Pang <dawning.pang@gmail.com>
-> ---
-> drivers/crypto/mediatek/mtk-platform.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/mediatek/mtk-platform.c b/drivers/crypto/mediatek/mtk-platform.c
-> index 7e3ad085b5bd..05d341e4a696 100644
-> --- a/drivers/crypto/mediatek/mtk-platform.c
-> +++ b/drivers/crypto/mediatek/mtk-platform.c
-> @@ -469,7 +469,7 @@ static int mtk_desc_ring_alloc(struct mtk_cryp *cryp)
->        return 0;
-> 
-> err_cleanup:
-> -       for (; i--; ) {
-> +       for (; i >= 0; --i) {
+> Do you means the check is unnecessary?
 
-How about a do while loop instead?
+No he's saying that your patch does the wrong thing when the string
+is truncated.
 
-Thanks,
+Also ENOMEM is a strange error for that case.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
