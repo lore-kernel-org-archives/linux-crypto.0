@@ -2,68 +2,62 @@ Return-Path: <SRS0=2Pww=CN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6B9AC433E2
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 08:28:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C17C433E2
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 08:28:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A6155206C9
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 08:28:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7AE36206C9
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Sep 2020 08:28:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729861AbgIDI2V (ORCPT
+        id S1729741AbgIDI2c (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Sep 2020 04:28:21 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:42684 "EHLO fornost.hmeau.com"
+        Fri, 4 Sep 2020 04:28:32 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:42690 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729826AbgIDI2T (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Sep 2020 04:28:19 -0400
+        id S1728636AbgIDI2c (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Sep 2020 04:28:32 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kE74y-0001PS-Mt; Fri, 04 Sep 2020 18:28:17 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 04 Sep 2020 18:28:16 +1000
-Date:   Fri, 4 Sep 2020 18:28:16 +1000
+        id 1kE75B-0001R7-EJ; Fri, 04 Sep 2020 18:28:30 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 04 Sep 2020 18:28:29 +1000
+Date:   Fri, 4 Sep 2020 18:28:29 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Denis Efremov <efremov@linux.com>
-Cc:     linux-crypto@vger.kernel.org,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] crypto: use kfree_sensitive()
-Message-ID: <20200904082816.GC1214@gondor.apana.org.au>
-References: <20200827064402.7130-1-efremov@linux.com>
+Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: sun8i-ss - remove redundant memzero_explicit()
+Message-ID: <20200904082829.GD1214@gondor.apana.org.au>
+References: <20200827080310.GA29222@Red>
+ <20200827121611.18308-1-efremov@linux.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200827064402.7130-1-efremov@linux.com>
+In-Reply-To: <20200827121611.18308-1-efremov@linux.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 27, 2020 at 09:43:58AM +0300, Denis Efremov wrote:
-> kfree_sensitive() is introduced in commit 453431a54934
-> ("mm, treewide: rename kzfree() to kfree_sensitive()") and uses
-> memzero_explicit() internally. Thus, we can switch to this API
-> instead of open-coding memzero_explicit() && kfree().
+On Thu, Aug 27, 2020 at 03:16:11PM +0300, Denis Efremov wrote:
+> Remove redundant memzero_explicit() in sun8i_ss_cipher() before calling
+> kfree_sensitive(). kfree_sensitive() will zero the memory with
+> memzero_explicit().
 > 
+> Fixes: 453431a54934 ("mm, treewide: rename kzfree() to kfree_sensitive()")
+> Signed-off-by: Denis Efremov <efremov@linux.com>
+> ---
 > Changes in v2:
->  - if (op->len) check removed
+>  - fixes tag added
 > 
-> Denis Efremov (4):
->   crypto: inside-secure - use kfree_sensitive()
->   crypto: amlogic - use kfree_sensitive()
->   crypto: sun8i-ce - use kfree_sensitive()
->   crypto: sun8i-ss - use kfree_sensitive()
-> 
->  .../crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c   | 15 +++------------
->  .../crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c   | 15 +++------------
->  drivers/crypto/amlogic/amlogic-gxl-cipher.c       | 10 ++--------
->  drivers/crypto/inside-secure/safexcel_hash.c      |  3 +--
->  4 files changed, 9 insertions(+), 34 deletions(-)
+>  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 1 -
+>  1 file changed, 1 deletion(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
