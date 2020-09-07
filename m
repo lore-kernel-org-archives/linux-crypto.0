@@ -5,62 +5,62 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B082FC43461
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Sep 2020 14:56:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33E46C433E2
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Sep 2020 16:01:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64D1821532
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Sep 2020 14:56:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA9A52087D
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Sep 2020 16:01:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jFT4wvP4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MZqWmEZS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730065AbgIGO4O (ORCPT
+        id S1730297AbgIGQBa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Sep 2020 10:56:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47130 "EHLO
+        Mon, 7 Sep 2020 12:01:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729890AbgIGOzG (ORCPT
+        with ESMTP id S1730304AbgIGQAe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Sep 2020 10:55:06 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 641C8C061573;
-        Mon,  7 Sep 2020 07:55:05 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id x23so4704764wmi.3;
-        Mon, 07 Sep 2020 07:55:05 -0700 (PDT)
+        Mon, 7 Sep 2020 12:00:34 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90E06C061573;
+        Mon,  7 Sep 2020 09:00:32 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id s13so14782832wmh.4;
+        Mon, 07 Sep 2020 09:00:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=DA8mt+a8EH1CC0yZ7uKHeWsCnJnXRPDo9uEB8E8AISY=;
-        b=jFT4wvP4T3fVEUAycW3J7ySI3oeMadWmVlEgPe16Etc1FgD6zPz11FETURPhEt3Ui+
-         AblqeWlgy5lQMqY77I0ve+J8GDpmDAKJgMP6EWyZL53yTSzWzfU16GUW5b81jacyOwjv
-         amURSBMkw6/UD0ViPggP2+fdmVc6GecyAd6SrZeugqgtjyej0onZiXuTL88DKEcXFR+U
-         8a/27hfxsU1gr2lCU9JsTNPa6f4kiEnneaj1CiYHHn+kyxLMiOlLOTKJcDkzDud5CCaE
-         ovDBb3msvBXQUcvy6N8puGw3bg3b29ufyAitgZmT80ip7Yj6GF29zZtEIUfd8ueasHlQ
-         70YA==
+        bh=Hn3uhyO/mvlvshiIn0lt2/+PxvqSIlZH/wDSRWKnfLw=;
+        b=MZqWmEZSwOn1QtPNMaCQwsp+4GKFQ+218pY/kHay1m+bgEEiX4PTH6qLQ2c+PfM4vp
+         rOBMQw7xntrAyDFKeAvx8odWuBidDJ6IIaXe3gv4qanzAMQCJIswlyJUkIWkoM0HS4CV
+         UDW0OLUDTigf2KarshMcRs/rWuyWbGMCawNN+8VoQa3QsNT+6gFghbUVgqeumqVrhoKU
+         TOQt+OQCQrJTPmgErRR4aTt1lpvseRvZpXxcTrBN6y9TV/S/N4M70jxZA4RYIpnNGv4t
+         ZlCHOUqxbfToMSlMQjj0tTBYzgj15sgz2c3O82v5E7WUZVG1RY2Wu811sqa5oBDdBzaf
+         8u3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=DA8mt+a8EH1CC0yZ7uKHeWsCnJnXRPDo9uEB8E8AISY=;
-        b=oWlsDgu1Bnr8Q0yy9tzREvKRdC8irbBJ+UtehwtHXNsoZM75iv21meAHVQ3CXwkOSE
-         j9W9GUaO7KMcvUtwIoU1RWGdipJ161iqjgezoFTa4EgoF/kmumiYj8q5PX5D05pFgePC
-         pvVra13VFxTR860sEktKK4gb/Xo+KnkJSDd8bt001oSWeDPRKzP+1XGeEXtdWXSya2H1
-         9Ii6/qoHcBxgSUKoIkzWYKtyFmOougRRL3PcAoenyEccwry59LEWhXIKf0fvgiNPvMUp
-         npw7GQPmyyOljzIlgtaU75BDirf9sHWc/QVlLkGsxgQdnN3AzuMrqEkv/6qiJigIX/Km
-         iAvw==
-X-Gm-Message-State: AOAM530bhP8Nt69U5LFlo5Gy/waODNAiWcpZ42MWbyIK2Q6MtUtfO1Hk
-        IZAaROl+MRLOS3rKXbnyieC2hjaNMQo=
-X-Google-Smtp-Source: ABdhPJxIvaKTAJnzoWVfazf4Iteh4NvH9jeyGHHLlpYv+NMm5ePWS4z5SNxtQRZ0aA/+HOhK6ZkXKw==
-X-Received: by 2002:a7b:c387:: with SMTP id s7mr20872656wmj.171.1599490503785;
-        Mon, 07 Sep 2020 07:55:03 -0700 (PDT)
+        bh=Hn3uhyO/mvlvshiIn0lt2/+PxvqSIlZH/wDSRWKnfLw=;
+        b=MhTZ0vyKRBENUAjAAb/qNrUBRjkQ6y+jHbPVKD/VeBbEtjnXZMPH/92MlQLpFEOOId
+         8qnCAp2F6sH9bt5V9hv6XAljUzjPd8kXr2263keQvnz9aDcJH9iHsTwMMCwNlkPcvKZU
+         KMklalz4tgU1olKvxaFcsAPuXJTV96aSW5Qxl7FnjHyGWffURzxhwwNXAERn7jnR3CSo
+         JfcUzDsfPRZMCNOzN4zKM7wyu6YvowfkPNA0GTPp22gjPYVrJyxQccWNaYToNZhFcoP/
+         UYd0mqHFHWlqrTaT1wN3fjHyGBC3RvQK39IjxVZd6L69wCgFiSDxfuuSfzlOO4OOhl09
+         jRFQ==
+X-Gm-Message-State: AOAM531iUpU/QB7s90hV0kVJkN2NfkouXMmXya0f1xjaxolbclnNPx0w
+        FwtGdrfddSOqMrNnadwBWXw=
+X-Google-Smtp-Source: ABdhPJyVv7RLE4gHPfQcWFy7FdMSPgXaXYOThSOaway/2OCfrdLBTFK3XRgmxstCIkRLQspxdQB08A==
+X-Received: by 2002:a7b:c3c8:: with SMTP id t8mr333wmj.101.1599494431299;
+        Mon, 07 Sep 2020 09:00:31 -0700 (PDT)
 Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id g186sm8893629wmg.25.2020.09.07.07.55.02
+        by smtp.googlemail.com with ESMTPSA id t6sm3343043wre.30.2020.09.07.09.00.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Sep 2020 07:55:02 -0700 (PDT)
-Date:   Mon, 7 Sep 2020 16:55:01 +0200
+        Mon, 07 Sep 2020 09:00:30 -0700 (PDT)
+Date:   Mon, 7 Sep 2020 18:00:29 +0200
 From:   Corentin Labbe <clabbe.montjoie@gmail.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     kernel test robot <lkp@intel.com>, kbuild-all@lists.01.org,
@@ -68,7 +68,7 @@ Cc:     kernel test robot <lkp@intel.com>, kbuild-all@lists.01.org,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Subject: Re: [PATCH] crypto: sun4i-ss - Fix SHA1 hash on A33-variant with BE
  CPU
-Message-ID: <20200907145501.GB11894@Red>
+Message-ID: <20200907160029.GC11894@Red>
 References: <202009061621.J89kO43Q%lkp@intel.com>
  <20200907062400.GA15841@gondor.apana.org.au>
 MIME-Version: 1.0
@@ -159,22 +159,8 @@ On Mon, Sep 07, 2020 at 04:24:00PM +1000, Herbert Xu wrote:
 >  			if (ss->variant->sha1_in_be)
 > -				v = cpu_to_le32(readl(ss->base + SS_MD0 + i * 4));
 > +				put_unaligned(v, areq->result + i * 4);
->  			else
-> -				v = cpu_to_be32(readl(ss->base + SS_MD0 + i * 4));
-> -			memcpy(areq->result + i * 4, &v, 4);
-> +				put_unaligned_be32(v, areq->result + i * 4);
->  		}
->  	} else {
->  		for (i = 0; i < 4; i++) {
-> -			v = cpu_to_le32(readl(ss->base + SS_MD0 + i * 4));
-> -			memcpy(areq->result + i * 4, &v, 4);
-> +			v = readl(ss->base + SS_MD0 + i * 4);
-> +			put_unaligned_le32(v, areq->result + i * 4);
->  		}
->  	}
->  
 
-modprobe tcrypt on BE+next-20200828 fail with this patch on A33:
-alg: ahash: sha1-sun4i-ss test failed (wrong result) on test vector 0, cfg=\"init+update+final aligned buffer\"
+The put_unaligned should be _le32.
 
-I will try to debug it.
+This fix the modprobe tcrypt fail.
+
