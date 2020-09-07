@@ -4,35 +4,35 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7803C43461
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Sep 2020 08:25:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0A4DC43461
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Sep 2020 08:25:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9A65121582
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Sep 2020 08:25:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F59D2145D
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Sep 2020 08:25:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728171AbgIGIZT (ORCPT
+        id S1727956AbgIGIZS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Sep 2020 04:25:19 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:10782 "EHLO huawei.com"
+        Mon, 7 Sep 2020 04:25:18 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:10786 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727992AbgIGIYl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Sep 2020 04:24:41 -0400
+        id S1728018AbgIGIYm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 7 Sep 2020 04:24:42 -0400
 Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id E80412F3F38B061D210F;
-        Mon,  7 Sep 2020 16:24:34 +0800 (CST)
+        by Forcepoint Email with ESMTP id 01FB5D3A27C20FD243C0;
+        Mon,  7 Sep 2020 16:24:35 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 7 Sep 2020 16:24:24 +0800
+ 14.3.487.0; Mon, 7 Sep 2020 16:24:26 +0800
 From:   Yang Shen <shenyang39@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH v2 03/10] crypto: hisilicon/zip - modify debugfs interface parameters
-Date:   Mon, 7 Sep 2020 16:21:55 +0800
-Message-ID: <1599466922-10323-4-git-send-email-shenyang39@huawei.com>
+Subject: [PATCH v2 10/10] crypto: hisilicon/zip - fix some coding styles
+Date:   Mon, 7 Sep 2020 16:22:02 +0800
+Message-ID: <1599466922-10323-11-git-send-email-shenyang39@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1599466922-10323-1-git-send-email-shenyang39@huawei.com>
 References: <1599466922-10323-1-git-send-email-shenyang39@huawei.com>
@@ -45,173 +45,129 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Shukun Tan <tanshukun1@huawei.com>
+1.Unified alignment styles
+2.Remove unnecessary goto branch
+3.Remove address printf
 
-Update debugfs interface parameters
-
-Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
 Signed-off-by: Yang Shen <shenyang39@huawei.com>
 Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 ---
- drivers/crypto/hisilicon/zip/zip_main.c | 55 ++++++++++++++-------------------
- 1 file changed, 24 insertions(+), 31 deletions(-)
+ drivers/crypto/hisilicon/zip/zip_crypto.c | 14 +++++++-------
+ drivers/crypto/hisilicon/zip/zip_main.c   | 16 ++++------------
+ 2 files changed, 11 insertions(+), 19 deletions(-)
 
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+index ba73bd8..38f92d4 100644
+--- a/drivers/crypto/hisilicon/zip/zip_crypto.c
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -38,8 +38,10 @@
+ #define HZIP_SGL_SGE_NR				10
+ 
+ static const u8 zlib_head[HZIP_ZLIB_HEAD_SIZE] = {0x78, 0x9c};
+-static const u8 gzip_head[HZIP_GZIP_HEAD_SIZE] = {0x1f, 0x8b, 0x08, 0x0, 0x0,
+-						  0x0, 0x0, 0x0, 0x0, 0x03};
++static const u8 gzip_head[HZIP_GZIP_HEAD_SIZE] = {
++	0x1f, 0x8b, 0x08, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x03
++};
++
+ enum hisi_zip_alg_type {
+ 	HZIP_ALG_TYPE_COMP = 0,
+ 	HZIP_ALG_TYPE_DECOMP = 1,
+@@ -359,7 +361,6 @@ static void hisi_zip_acomp_cb(struct hisi_qp *qp, void *data)
+ 
+ 	atomic64_inc(&dfx->recv_cnt);
+ 	status = sqe->dw3 & HZIP_BD_STATUS_M;
+-
+ 	if (status != 0 && status != HZIP_NC_ERR) {
+ 		dev_err(dev, "%scompress fail in qp%u: %u, output: %u\n",
+ 			(qp->alg_type == 0) ? "" : "de", qp->qp_id, status,
+@@ -520,8 +521,7 @@ static int hisi_zip_do_work(struct hisi_zip_req *req,
+ 	struct hisi_acc_sgl_pool *pool = qp_ctx->sgl_pool;
+ 	struct hisi_zip_dfx *dfx = &qp_ctx->zip_dev->dfx;
+ 	struct hisi_zip_sqe zip_sqe;
+-	dma_addr_t input;
+-	dma_addr_t output;
++	dma_addr_t input, output;
+ 	int ret;
+ 
+ 	if (!a_req->src || !a_req->slen || !a_req->dst || !a_req->dlen)
+@@ -540,9 +540,9 @@ static int hisi_zip_do_work(struct hisi_zip_req *req,
+ 						    (req->req_id << 1) + 1,
+ 						    &output);
+ 	if (IS_ERR(req->hw_dst)) {
+-		dev_err(dev, "failed to map the dst buffer to hw slg (%ld)!\n",
+-			PTR_ERR(req->hw_dst));
+ 		ret = PTR_ERR(req->hw_dst);
++		dev_err(dev, "failed to map the dst buffer to hw slg (%d)!\n",
++			ret);
+ 		goto err_unmap_input;
+ 	}
+ 	req->dma_dst = output;
 diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 058f744..df1a16f 100644
+index d077cc4..f5b9f47 100644
 --- a/drivers/crypto/hisilicon/zip/zip_main.c
 +++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -156,7 +156,6 @@ struct ctrl_debug_file {
-  */
- struct hisi_zip_ctrl {
- 	struct hisi_zip *hisi_zip;
--	struct dentry *debug_root;
- 	struct ctrl_debug_file files[HZIP_DEBUG_FILE_NUM];
+@@ -258,6 +258,7 @@ static int hisi_zip_set_user_domain_and_cache(struct hisi_qm *qm)
+ 	/* qm cache */
+ 	writel(AXI_M_CFG, base + QM_AXI_M_CFG);
+ 	writel(AXI_M_CFG_ENABLE, base + QM_AXI_M_CFG_ENABLE);
++
+ 	/* disable FLR triggered by BME(bus master enable) */
+ 	writel(PEH_AXUSER_CFG, base + QM_PEH_AXUSER_CFG);
+ 	writel(PEH_AXUSER_CFG_ENABLE, base + QM_PEH_AXUSER_CFG_ENABLE);
+@@ -311,7 +312,7 @@ static void hisi_zip_hw_error_enable(struct hisi_qm *qm)
+ 	writel(0x1, qm->io_base + HZIP_CORE_INT_RAS_CE_ENB);
+ 	writel(0x0, qm->io_base + HZIP_CORE_INT_RAS_FE_ENB);
+ 	writel(HZIP_CORE_INT_RAS_NFE_ENABLE,
+-		qm->io_base + HZIP_CORE_INT_RAS_NFE_ENB);
++	       qm->io_base + HZIP_CORE_INT_RAS_NFE_ENB);
+ 
+ 	/* enable ZIP hw error interrupts */
+ 	writel(0, qm->io_base + HZIP_CORE_INT_MASK_REG);
+@@ -487,7 +488,6 @@ static const struct file_operations ctrl_debug_fops = {
+ 	.write = hisi_zip_ctrl_debug_write,
  };
  
-@@ -509,10 +508,8 @@ static int zip_debugfs_atomic64_get(void *data, u64 *val)
- DEFINE_DEBUGFS_ATTRIBUTE(zip_atomic64_ops, zip_debugfs_atomic64_get,
- 			 zip_debugfs_atomic64_set, "%llu\n");
- 
--static int hisi_zip_core_debug_init(struct hisi_zip_ctrl *ctrl)
-+static int hisi_zip_core_debug_init(struct hisi_qm *qm)
+-
+ static int zip_debugfs_atomic64_set(void *data, u64 val)
  {
--	struct hisi_zip *hisi_zip = ctrl->hisi_zip;
--	struct hisi_qm *qm = &hisi_zip->qm;
- 	struct device *dev = &qm->pdev->dev;
- 	struct debugfs_regset32 *regset;
- 	struct dentry *tmp_d;
-@@ -533,7 +530,7 @@ static int hisi_zip_core_debug_init(struct hisi_zip_ctrl *ctrl)
- 		regset->nregs = ARRAY_SIZE(hzip_dfx_regs);
- 		regset->base = qm->io_base + core_offsets[i];
+ 	if (val)
+@@ -632,7 +632,7 @@ static void hisi_zip_log_hw_error(struct hisi_qm *qm, u32 err_sts)
+ 	while (err->msg) {
+ 		if (err->int_msk & err_sts) {
+ 			dev_err(dev, "%s [error status=0x%x] found\n",
+-				 err->msg, err->int_msk);
++				err->msg, err->int_msk);
  
--		tmp_d = debugfs_create_dir(buf, ctrl->debug_root);
-+		tmp_d = debugfs_create_dir(buf, qm->debug.debug_root);
- 		debugfs_create_regset32("regs", 0444, tmp_d, regset);
+ 			if (err->int_msk & HZIP_CORE_INT_STATUS_M_ECC) {
+ 				err_val = readl(qm->io_base +
+@@ -640,9 +640,6 @@ static void hisi_zip_log_hw_error(struct hisi_qm *qm, u32 err_sts)
+ 				dev_err(dev, "hisi-zip multi ecc sram num=0x%x\n",
+ 					((err_val >>
+ 					HZIP_SRAM_ECC_ERR_NUM_SHIFT) & 0xFF));
+-				dev_err(dev, "hisi-zip multi ecc sram addr=0x%x\n",
+-					(err_val >>
+-					HZIP_SRAM_ECC_ERR_ADDR_SHIFT));
+ 			}
+ 		}
+ 		err++;
+@@ -902,15 +899,10 @@ static int __init hisi_zip_init(void)
+ 
+ 	ret = pci_register_driver(&hisi_zip_pci_driver);
+ 	if (ret < 0) {
++		hisi_zip_unregister_debugfs();
+ 		pr_err("Failed to register pci driver.\n");
+-		goto err_pci;
  	}
  
-@@ -552,33 +549,32 @@ static void hisi_zip_dfx_debug_init(struct hisi_qm *qm)
- 	for (i = 0; i < ARRAY_SIZE(zip_dfx_files); i++) {
- 		data = (atomic64_t *)((uintptr_t)dfx + zip_dfx_files[i].offset);
- 		debugfs_create_file(zip_dfx_files[i].name,
--			0644,
--			tmp_dir,
--			data,
--			&zip_atomic64_ops);
-+				    0644, tmp_dir, data,
-+				    &zip_atomic64_ops);
- 	}
- }
- 
--static int hisi_zip_ctrl_debug_init(struct hisi_zip_ctrl *ctrl)
-+static int hisi_zip_ctrl_debug_init(struct hisi_qm *qm)
- {
-+	struct hisi_zip *zip = container_of(qm, struct hisi_zip, qm);
- 	int i;
- 
- 	for (i = HZIP_CURRENT_QM; i < HZIP_DEBUG_FILE_NUM; i++) {
--		spin_lock_init(&ctrl->files[i].lock);
--		ctrl->files[i].ctrl = ctrl;
--		ctrl->files[i].index = i;
-+		spin_lock_init(&zip->ctrl->files[i].lock);
-+		zip->ctrl->files[i].ctrl = zip->ctrl;
-+		zip->ctrl->files[i].index = i;
- 
- 		debugfs_create_file(ctrl_debug_file_name[i], 0600,
--				    ctrl->debug_root, ctrl->files + i,
-+				    qm->debug.debug_root,
-+				    zip->ctrl->files + i,
- 				    &ctrl_debug_fops);
- 	}
- 
--	return hisi_zip_core_debug_init(ctrl);
-+	return hisi_zip_core_debug_init(qm);
- }
- 
--static int hisi_zip_debugfs_init(struct hisi_zip *hisi_zip)
-+static int hisi_zip_debugfs_init(struct hisi_qm *qm)
- {
--	struct hisi_qm *qm = &hisi_zip->qm;
- 	struct device *dev = &qm->pdev->dev;
- 	struct dentry *dev_d;
- 	int ret;
-@@ -593,8 +589,7 @@ static int hisi_zip_debugfs_init(struct hisi_zip *hisi_zip)
- 		goto failed_to_create;
- 
- 	if (qm->fun_type == QM_HW_PF) {
--		hisi_zip->ctrl->debug_root = dev_d;
--		ret = hisi_zip_ctrl_debug_init(hisi_zip->ctrl);
-+		ret = hisi_zip_ctrl_debug_init(qm);
- 		if (ret)
- 			goto failed_to_create;
- 	}
-@@ -608,10 +603,8 @@ static int hisi_zip_debugfs_init(struct hisi_zip *hisi_zip)
+-	return 0;
+-
+-err_pci:
+-	hisi_zip_unregister_debugfs();
+-
  	return ret;
  }
  
--static void hisi_zip_debug_regs_clear(struct hisi_zip *hisi_zip)
-+static void hisi_zip_debug_regs_clear(struct hisi_qm *qm)
- {
--	struct hisi_qm *qm = &hisi_zip->qm;
--
- 	writel(0x0, qm->io_base + QM_DFX_MB_CNT_VF);
- 	writel(0x0, qm->io_base + QM_DFX_DB_CNT_VF);
- 	writel(0x0, qm->io_base + HZIP_SOFT_CTRL_CNT_CLR_CE);
-@@ -619,14 +612,14 @@ static void hisi_zip_debug_regs_clear(struct hisi_zip *hisi_zip)
- 	hisi_qm_debug_regs_clear(qm);
- }
- 
--static void hisi_zip_debugfs_exit(struct hisi_zip *hisi_zip)
-+static void hisi_zip_debugfs_exit(struct hisi_qm *qm)
- {
--	struct hisi_qm *qm = &hisi_zip->qm;
--
- 	debugfs_remove_recursive(qm->debug.debug_root);
- 
--	if (qm->fun_type == QM_HW_PF)
--		hisi_zip_debug_regs_clear(hisi_zip);
-+	if (qm->fun_type == QM_HW_PF) {
-+		hisi_zip_debug_regs_clear(qm);
-+		qm->debug.curr_qm_qp_num = 0;
-+	}
- }
- 
- static void hisi_zip_log_hw_error(struct hisi_qm *qm, u32 err_sts)
-@@ -733,7 +726,7 @@ static int hisi_zip_pf_probe_init(struct hisi_zip *hisi_zip)
- 
- 	hisi_zip_set_user_domain_and_cache(qm);
- 	hisi_qm_dev_err_init(qm);
--	hisi_zip_debug_regs_clear(hisi_zip);
-+	hisi_zip_debug_regs_clear(qm);
- 
- 	return 0;
- }
-@@ -809,7 +802,7 @@ static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	if (ret)
- 		goto err_dev_err_uninit;
- 
--	ret = hisi_zip_debugfs_init(hisi_zip);
-+	ret = hisi_zip_debugfs_init(qm);
- 	if (ret)
- 		dev_err(&pdev->dev, "Failed to init debugfs (%d)!\n", ret);
- 
-@@ -837,7 +830,7 @@ static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	hisi_qm_alg_unregister(qm, &zip_devices);
- 
- err_qm_stop:
--	hisi_zip_debugfs_exit(hisi_zip);
-+	hisi_zip_debugfs_exit(qm);
- 	hisi_qm_stop(qm, QM_NORMAL);
- 
- err_dev_err_uninit:
-@@ -860,7 +853,7 @@ static void hisi_zip_remove(struct pci_dev *pdev)
- 	if (qm->fun_type == QM_HW_PF && qm->vfs_num)
- 		hisi_qm_sriov_disable(pdev, qm->is_frozen);
- 
--	hisi_zip_debugfs_exit(hisi_zip);
-+	hisi_zip_debugfs_exit(qm);
- 	hisi_qm_stop(qm, QM_NORMAL);
- 	hisi_qm_dev_err_uninit(qm);
- 	hisi_qm_uninit(qm);
 -- 
 2.7.4
 
