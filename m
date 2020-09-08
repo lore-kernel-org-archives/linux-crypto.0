@@ -2,129 +2,119 @@ Return-Path: <SRS0=6HzI=CR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1073DC433E2
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Sep 2020 05:00:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59164C43461
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Sep 2020 06:16:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C6368206B8
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Sep 2020 05:00:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B87512166E
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Sep 2020 06:16:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726801AbgIHFAq (ORCPT
+        id S1728904AbgIHGQF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Sep 2020 01:00:46 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:52396 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726639AbgIHFAq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Sep 2020 01:00:46 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kFVkC-0000ag-4X; Tue, 08 Sep 2020 15:00:37 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 08 Sep 2020 15:00:36 +1000
-Date:   Tue, 8 Sep 2020 15:00:36 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
+        Tue, 8 Sep 2020 02:16:05 -0400
+Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:45671 "EHLO
+        wnew1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728775AbgIHGQE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 8 Sep 2020 02:16:04 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailnew.west.internal (Postfix) with ESMTP id C7B1CC63;
+        Tue,  8 Sep 2020 02:16:00 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Tue, 08 Sep 2020 02:16:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cerno.tech; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm3; bh=zJiWzEaieWUTkjd149kfcmDNEkV
+        tYQAGVUYM1KagiNw=; b=HRNaf0nqivK37YCvZIDh7RO8nzWh2/fDKBlD54LoaCB
+        0WuDvtZ+DlCtyd39yIGtuTYNwfdaba7UwxDdzJ+BptmBdUVpDH2/adAd2/RRqjOT
+        /GQlq2LhQ1KYWmf4epZ2f8UnVTUr+p43QHtLocXelJNBAXW2pidygl9UDqWcEXsX
+        zgO9kPmiY7rJoQaMRAYDwRdtqGlB9yBJMp+bJ9/fbsKcJB9a8iRVYSMHFcNkA5sn
+        bFyELdF8Mf239H5Xr/ART8E5NliiWGlrgNwWx9EtTthjsHuBsr2SycccMzOnqkFF
+        p/QXpI2L57GKQ12/2zA9AiaMoxCaBrnlplSvQjkptSw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=zJiWzE
+        aieWUTkjd149kfcmDNEkVtYQAGVUYM1KagiNw=; b=IlLCEqn+XhMyg6/XVGNmhN
+        LWk8MDd3GbNW1g/z9oIm0n8ew3PLMLnK78kvhx6ob6HIZjHn6J+UfyWag3ojzAq4
+        vqpRfG0gapKJMYDY5/96h5pjBY2SyLR7LYxn2fgDEakQb9kNxHH8T7aLlLVDhm75
+        7tBXP0Aes6TvM9chVc71v3tzQ3U20L4ygbBZdrpWZut7F/KR/J0yZjhZjBOmR00k
+        vuY6fTlUVjaHkd6F8D0q/qm8O5BqZACSMfb/VkyLojwPJJorGAaO3WRQXfCOKdS8
+        XaA6GlHykoAMpptk5k6upyGKl5ZbQ+t4KrWowRhm7OmE63sdIyuqzf/JVK0rRjcA
+        ==
+X-ME-Sender: <xms:niFXX_fz-lQYJtSWpVWcbIHXwYaPW-2fr_EmFiqS2A_gn_xIBDOUUw>
+    <xme:niFXX1PmswcgkPM5yObjWO9xiVfVJ1Ps6QtLQpo3g2dqi_TxJi3LQ7U_VbSg4H13O
+    PpXceE2A2xtIqM2Q8Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrudehuddguddtgecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecunecujfgurhepfffhvffukfhfgggtuggjsehgtd
+    erredttddvnecuhfhrohhmpeforgigihhmvgcutfhiphgrrhguuceomhgrgihimhgvsegt
+    vghrnhhordhtvggthheqnecuggftrfgrthhtvghrnhepleekgeehhfdutdeljefgleejff
+    ehfffgieejhffgueefhfdtveetgeehieehgedunecukfhppeeltddrkeelrdeikedrjeei
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhgrgi
+    himhgvsegtvghrnhhordhtvggthh
+X-ME-Proxy: <xmx:niFXX4j7ay4JwOVgMg4twDLEL9eckDyP0h33oIx1LfwTUCo_qknNzw>
+    <xmx:niFXXw-1Od6uGH8RcfgSCqIcnfnV2wzn97HSBDVb71cTwPRBml7pTQ>
+    <xmx:niFXX7tVVZ81ZuRyhDJyVBQ2ruZ7O6YFvqFIVByKAHETEmP8hxHXaQ>
+    <xmx:oCFXXxDWsNJ2_iVkJXv-LE6RR1Pn5GIvWILQNV1o_WVlkMMVK0Rz7-btApk>
+Received: from localhost (lfbn-tou-1-1502-76.w90-89.abo.wanadoo.fr [90.89.68.76])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 498C53280059;
+        Tue,  8 Sep 2020 02:15:58 -0400 (EDT)
+Date:   Tue, 8 Sep 2020 08:15:56 +0200
+From:   Maxime Ripard <maxime@cerno.tech>
 To:     Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc:     kernel test robot <lkp@intel.com>, kbuild-all@lists.01.org,
-        linux-kernel@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [v2 PATCH] crypto: sun4i-ss - Fix sparse endianness markers
-Message-ID: <20200908050036.GA19817@gondor.apana.org.au>
-References: <202009061621.J89kO43Q%lkp@intel.com>
- <20200907062400.GA15841@gondor.apana.org.au>
- <20200907160029.GC11894@Red>
+Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        robh+dt@kernel.org, wens@csie.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
+        m.cerveny@computer.org
+Subject: Re: [PATCH v3] dt-bindings: crypto: Specify that
+ allwinner,sun8i-a33-crypto needs reset
+Message-ID: <20200908061556.btaokh5ftxng7t7m@gilmour.lan>
+References: <20200907175437.4464-1-clabbe.montjoie@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="apfc6x6gq7uthf7s"
 Content-Disposition: inline
-In-Reply-To: <20200907160029.GC11894@Red>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200907175437.4464-1-clabbe.montjoie@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 07, 2020 at 06:00:29PM +0200, Corentin Labbe wrote:
->
-> The put_unaligned should be _le32.
-> 
-> This fix the modprobe tcrypt fail.
 
-Thanks.  Yes the original code was correct.
+--apfc6x6gq7uthf7s
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
----8<---
-This patch also fixes the incorrect endianness markings in the
-sun4i-ss driver.  It should have no effect in the genereated code.
+On Mon, Sep 07, 2020 at 07:54:37PM +0200, Corentin Labbe wrote:
+> When adding allwinner,sun8i-a33-crypto, I forgot to add that it needs res=
+et.
+> Furthermore, there are no need to use items to list only one compatible
+> in compatible list.
+>=20
+> Fixes: f81547ba7a98 ("dt-bindings: crypto: add new compatible for A33 SS")
+> Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 
-Instead of using cpu_to_Xe32 followed by a memcpy, this patch
-converts the final hash write to use put_unaligned_X instead.
+Acked-by: Maxime Ripard <mripard@kernel.org>
 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Thanks!
+Maxime
 
-diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
-index dc35edd90034..1dff48558f53 100644
---- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
-+++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
-@@ -9,6 +9,7 @@
-  * You could find the datasheet in Documentation/arm/sunxi.rst
-  */
- #include "sun4i-ss.h"
-+#include <asm/unaligned.h>
- #include <linux/scatterlist.h>
- 
- /* This is a totally arbitrary value */
-@@ -196,7 +197,7 @@ static int sun4i_hash(struct ahash_request *areq)
- 	struct sg_mapping_iter mi;
- 	int in_r, err = 0;
- 	size_t copied = 0;
--	__le32 wb = 0;
-+	u32 wb = 0;
- 
- 	dev_dbg(ss->dev, "%s %s bc=%llu len=%u mode=%x wl=%u h0=%0x",
- 		__func__, crypto_tfm_alg_name(areq->base.tfm),
-@@ -408,7 +409,7 @@ static int sun4i_hash(struct ahash_request *areq)
- 
- 		nbw = op->len - 4 * nwait;
- 		if (nbw) {
--			wb = cpu_to_le32(*(u32 *)(op->buf + nwait * 4));
-+			wb = le32_to_cpup((__le32 *)(op->buf + nwait * 4));
- 			wb &= GENMASK((nbw * 8) - 1, 0);
- 
- 			op->byte_count += nbw;
-@@ -417,7 +418,7 @@ static int sun4i_hash(struct ahash_request *areq)
- 
- 	/* write the remaining bytes of the nbw buffer */
- 	wb |= ((1 << 7) << (nbw * 8));
--	bf[j++] = le32_to_cpu(wb);
-+	((__le32 *)bf)[j++] = cpu_to_le32(wb);
- 
- 	/*
- 	 * number of space to pad to obtain 64o minus 8(size) minus 4 (final 1)
-@@ -479,16 +480,16 @@ static int sun4i_hash(struct ahash_request *areq)
- 	/* Get the hash from the device */
- 	if (op->mode == SS_OP_SHA1) {
- 		for (i = 0; i < 5; i++) {
-+			v = readl(ss->base + SS_MD0 + i * 4);
- 			if (ss->variant->sha1_in_be)
--				v = cpu_to_le32(readl(ss->base + SS_MD0 + i * 4));
-+				put_unaligned_le32(v, areq->result + i * 4);
- 			else
--				v = cpu_to_be32(readl(ss->base + SS_MD0 + i * 4));
--			memcpy(areq->result + i * 4, &v, 4);
-+				put_unaligned_be32(v, areq->result + i * 4);
- 		}
- 	} else {
- 		for (i = 0; i < 4; i++) {
--			v = cpu_to_le32(readl(ss->base + SS_MD0 + i * 4));
--			memcpy(areq->result + i * 4, &v, 4);
-+			v = readl(ss->base + SS_MD0 + i * 4);
-+			put_unaligned_le32(v, areq->result + i * 4);
- 		}
- 	}
- 
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--apfc6x6gq7uthf7s
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRcEzekXsqa64kGDp7j7w1vZxhRxQUCX1chnAAKCRDj7w1vZxhR
+xfUvAQD8xxLoH6fbnPJmX6BVcYssd2Qs2CpluJZqLpfeHJCOCAEA5LM0Mwzzrnhe
+e8swy3maWAsWSzz/kE7LwoDYMGUApAM=
+=z7iT
+-----END PGP SIGNATURE-----
+
+--apfc6x6gq7uthf7s--
