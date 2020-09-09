@@ -2,190 +2,271 @@ Return-Path: <SRS0=sZ2L=CS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 014E2C43461
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Sep 2020 11:00:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9720AC43461
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Sep 2020 17:32:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 988DE21D7E
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Sep 2020 11:00:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5224F21532
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Sep 2020 17:32:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="pfWSF5Bp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728936AbgIILAP (ORCPT
+        id S1728631AbgIIRc1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Sep 2020 07:00:15 -0400
-Received: from mga07.intel.com ([134.134.136.100]:31533 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729005AbgIIK7t (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Sep 2020 06:59:49 -0400
-IronPort-SDR: 7nTk6UagMfkDPY7Xvmkux8saSBdG4lUwh21/TRnegzQrTGd36/6g0+nkK92MryjuYgmd0N0MUT
- H7n0lFgAs/fw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9738"; a="222511314"
-X-IronPort-AV: E=Sophos;i="5.76,409,1592895600"; 
-   d="scan'208";a="222511314"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2020 03:59:48 -0700
-IronPort-SDR: uZcvasRZeEOMzCa8QkzLLW8sWoSQd0KIUENwiRQxMPP9TAZ/6tO5iIAsM061vMdyx/uWHrxacy
- qD06s1CEwjrg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,409,1592895600"; 
-   d="scan'208";a="341534352"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
-  by FMSMGA003.fm.intel.com with ESMTP; 09 Sep 2020 03:59:46 -0700
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>
-Subject: [PATCH RESEND 2/2] crypto: qat - use PCI_VDEVICE
-Date:   Wed,  9 Sep 2020 11:59:40 +0100
-Message-Id: <20200909105940.203532-3-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200909105940.203532-1-giovanni.cabiddu@intel.com>
-References: <20200909105940.203532-1-giovanni.cabiddu@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Wed, 9 Sep 2020 13:32:27 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:52756 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728363AbgIIRcK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Sep 2020 13:32:10 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 089HTGna186371;
+        Wed, 9 Sep 2020 17:29:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=eLp+i7m93ewxrPjP8Wg5ck+XvsmFjHKt7Wlgb+i1G+k=;
+ b=pfWSF5BpND99eD8Bqe9sTNss+yi1QgQ3TPfVAr3hLU5ug5iW4SzLsMd4K6c2WtwIfYLF
+ EchT+7BSiHOoEs+d/h1Xb99wAc4Ovm8UvR1ASdkSwVleZGIVLhfaFujhSEJIHHAP7zJI
+ Yb+yXXfi1yexwhCDy1FmOQSHCOS3+IC2mq1QY/qpluJOg3l3HcEK5CUfQ9c7/rkEUwzZ
+ NVqFzo8oW/AUrjziLPsUyX2ZT75+o3O5ReVpK4Nz7sETzuE1gp4uQFWMuJx/GnTlfZEX
+ PGO79FGtNgpTWkS5w2aQ1gaLXlff9y2VFtKVejFxNRh5X2iMD9OZKS2yoc/piJd1A3Ly qw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 33c23r3a2h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 09 Sep 2020 17:29:51 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 089HP5KP015770;
+        Wed, 9 Sep 2020 17:27:50 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 33cmk73fuy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 09 Sep 2020 17:27:50 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 089HRiMU015848;
+        Wed, 9 Sep 2020 17:27:44 GMT
+Received: from localhost.us.oracle.com (/10.147.27.2)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 09 Sep 2020 10:27:43 -0700
+From:   Eric Snowberg <eric.snowberg@oracle.com>
+To:     dhowells@redhat.com, dwmw2@infradead.org,
+        jarkko.sakkinen@linux.intel.com
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        jmorris@namei.org, serge@hallyn.com, nayna@linux.ibm.com,
+        zohar@linux.ibm.com, eric.snowberg@oracle.com,
+        erichte@linux.ibm.com, mpe@ellerman.id.au,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: [PATCH v2] certs: Add EFI_CERT_X509_GUID support for dbx entries
+Date:   Wed,  9 Sep 2020 13:27:36 -0400
+Message-Id: <20200909172736.73003-1-eric.snowberg@oracle.com>
+X-Mailer: git-send-email 2.18.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9739 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 phishscore=0
+ mlxlogscore=999 bulkscore=0 adultscore=0 mlxscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009090156
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9739 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 priorityscore=1501
+ mlxlogscore=999 mlxscore=0 bulkscore=0 suspectscore=0 spamscore=0
+ malwarescore=0 phishscore=0 lowpriorityscore=0 clxscore=1011
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009090156
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Build pci_device_id structure using the PCI_VDEVICE macro.
-This removes any references to the ADF_SYSTEM_DEVICE macro.
+The Secure Boot Forbidden Signature Database, dbx, contains a list of now
+revoked signatures and keys previously approved to boot with UEFI Secure
+Boot enabled.  The dbx is capable of containing any number of
+EFI_CERT_X509_SHA256_GUID, EFI_CERT_SHA256_GUID, and EFI_CERT_X509_GUID
+entries.
 
-Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
-Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+Currently when EFI_CERT_X509_GUID are contained in the dbx, the entries are
+skipped.
+
+Add support for EFI_CERT_X509_GUID dbx entries. When a EFI_CERT_X509_GUID
+is found, it is added as an asymmetrical key to the .blacklist keyring.
+Anytime the .platform keyring is used, the keys in the .blacklist keyring
+are referenced, if a matching key is found, the key will be rejected.
+
+Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
 ---
- drivers/crypto/qat/qat_c3xxx/adf_drv.c      | 7 ++-----
- drivers/crypto/qat/qat_c3xxxvf/adf_drv.c    | 7 ++-----
- drivers/crypto/qat/qat_c62x/adf_drv.c       | 7 ++-----
- drivers/crypto/qat/qat_c62xvf/adf_drv.c     | 7 ++-----
- drivers/crypto/qat/qat_dh895xcc/adf_drv.c   | 7 ++-----
- drivers/crypto/qat/qat_dh895xccvf/adf_drv.c | 7 ++-----
- 6 files changed, 12 insertions(+), 30 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_c3xxx/adf_drv.c b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-index bba0f142f7f6..43929d70c41d 100644
---- a/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c3xxx/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_c3xxx_hw_data.h"
+v2: 
+ Fixed build issue reported by kernel test robot <lkp@intel.com>
+ Commit message update (suggested by Jarkko Sakkinen)
+
+---
+ certs/blacklist.c                             | 36 +++++++++++++++++++
+ certs/system_keyring.c                        |  6 ++++
+ include/crypto/pkcs7.h                        |  8 +++++
+ include/keys/system_keyring.h                 | 11 ++++++
+ .../platform_certs/keyring_handler.c          | 11 ++++++
+ 5 files changed, 72 insertions(+)
+
+diff --git a/certs/blacklist.c b/certs/blacklist.c
+index 6514f9ebc943..17ebf50cf0ae 100644
+--- a/certs/blacklist.c
++++ b/certs/blacklist.c
+@@ -15,6 +15,7 @@
+ #include <linux/err.h>
+ #include <linux/seq_file.h>
+ #include <keys/system_keyring.h>
++#include <crypto/pkcs7.h>
+ #include "blacklist.h"
  
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_C3XXX),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C3XXX), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
+ static struct key *blacklist_keyring;
+@@ -100,6 +101,41 @@ int mark_hash_blacklisted(const char *hash)
+ 	return 0;
+ }
  
-diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-index b77a58886599..dca52de22e8d 100644
---- a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_c3xxxvf_hw_data.h"
++int mark_key_revocationlisted(const char *data, size_t size)
++{
++	key_ref_t key;
++
++	key = key_create_or_update(make_key_ref(blacklist_keyring, true),
++				   "asymmetric",
++				   NULL,
++				   data,
++				   size,
++				   ((KEY_POS_ALL & ~KEY_POS_SETATTR) |
++				    KEY_USR_VIEW),
++				   KEY_ALLOC_NOT_IN_QUOTA |
++				   KEY_ALLOC_BUILT_IN);
++
++	if (IS_ERR(key)) {
++		pr_err("Problem with revocation key (%ld)\n", PTR_ERR(key));
++		return PTR_ERR(key);
++	}
++
++	return 0;
++}
++
++int is_key_revocationlisted(struct pkcs7_message *pkcs7)
++{
++	int ret;
++
++	ret = pkcs7_validate_trust(pkcs7, blacklist_keyring);
++
++	if (ret == 0)
++		return -EKEYREJECTED;
++
++	return -ENOKEY;
++}
++EXPORT_SYMBOL_GPL(is_key_revocationlisted);
++
+ /**
+  * is_hash_blacklisted - Determine if a hash is blacklisted
+  * @hash: The hash to be checked as a binary blob
+diff --git a/certs/system_keyring.c b/certs/system_keyring.c
+index 798291177186..f8ea96219155 100644
+--- a/certs/system_keyring.c
++++ b/certs/system_keyring.c
+@@ -241,6 +241,12 @@ int verify_pkcs7_message_sig(const void *data, size_t len,
+ 			pr_devel("PKCS#7 platform keyring is not available\n");
+ 			goto error;
+ 		}
++
++		ret = is_key_revocationlisted(pkcs7);
++		if (ret != -ENOKEY) {
++			pr_devel("PKCS#7 platform key revocationlisted\n");
++			goto error;
++		}
+ 	}
+ 	ret = pkcs7_validate_trust(pkcs7, trusted_keys);
+ 	if (ret < 0) {
+diff --git a/include/crypto/pkcs7.h b/include/crypto/pkcs7.h
+index 38ec7f5f9041..d8f2e0fdfbf4 100644
+--- a/include/crypto/pkcs7.h
++++ b/include/crypto/pkcs7.h
+@@ -26,11 +26,19 @@ extern int pkcs7_get_content_data(const struct pkcs7_message *pkcs7,
+ 				  const void **_data, size_t *_datalen,
+ 				  size_t *_headerlen);
  
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_C3XXX_VF),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C3XXX_VF), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
++#ifdef CONFIG_PKCS7_MESSAGE_PARSER
+ /*
+  * pkcs7_trust.c
+  */
+ extern int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
+ 				struct key *trust_keyring);
++#else
++static inline int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
++				       struct key *trust_keyring)
++{
++	return -ENOKEY;
++}
++#endif
  
-diff --git a/drivers/crypto/qat/qat_c62x/adf_drv.c b/drivers/crypto/qat/qat_c62x/adf_drv.c
-index 722838ff03be..f104c9d1195d 100644
---- a/drivers/crypto/qat/qat_c62x/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c62x/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_c62x_hw_data.h"
+ /*
+  * pkcs7_verify.c
+diff --git a/include/keys/system_keyring.h b/include/keys/system_keyring.h
+index fb8b07daa9d1..b6991cfe1b6d 100644
+--- a/include/keys/system_keyring.h
++++ b/include/keys/system_keyring.h
+@@ -31,11 +31,14 @@ extern int restrict_link_by_builtin_and_secondary_trusted(
+ #define restrict_link_by_builtin_and_secondary_trusted restrict_link_by_builtin_trusted
+ #endif
  
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_C62X),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C62X), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
++extern struct pkcs7_message *pkcs7;
+ #ifdef CONFIG_SYSTEM_BLACKLIST_KEYRING
+ extern int mark_hash_blacklisted(const char *hash);
++extern int mark_key_revocationlisted(const char *data, size_t size);
+ extern int is_hash_blacklisted(const u8 *hash, size_t hash_len,
+ 			       const char *type);
+ extern int is_binary_blacklisted(const u8 *hash, size_t hash_len);
++extern int is_key_revocationlisted(struct pkcs7_message *pkcs7);
+ #else
+ static inline int is_hash_blacklisted(const u8 *hash, size_t hash_len,
+ 				      const char *type)
+@@ -47,6 +50,14 @@ static inline int is_binary_blacklisted(const u8 *hash, size_t hash_len)
+ {
+ 	return 0;
+ }
++static inline int mark_key_revocationlisted(const char *data, size_t size)
++{
++	return 0;
++}
++static inline int is_key_revocationlisted(struct pkcs7_message *pkcs7)
++{
++	return -ENOKEY;
++}
+ #endif
  
-diff --git a/drivers/crypto/qat/qat_c62xvf/adf_drv.c b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-index a766cc18aae9..e0b909e70712 100644
---- a/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_c62xvf_hw_data.h"
+ #ifdef CONFIG_IMA_BLACKLIST_KEYRING
+diff --git a/security/integrity/platform_certs/keyring_handler.c b/security/integrity/platform_certs/keyring_handler.c
+index c5ba695c10e3..cc5a43804bc4 100644
+--- a/security/integrity/platform_certs/keyring_handler.c
++++ b/security/integrity/platform_certs/keyring_handler.c
+@@ -55,6 +55,15 @@ static __init void uefi_blacklist_binary(const char *source,
+ 	uefi_blacklist_hash(source, data, len, "bin:", 4);
+ }
  
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_C62X_VF),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_C62X_VF), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-index 4c3aea07f444..857aa4c8595f 100644
---- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-+++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_dh895xcc_hw_data.h"
- 
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_DH895XCC),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_DH895XCC), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
-diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-index 673348ca5dea..2987855a70dc 100644
---- a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-@@ -18,12 +18,9 @@
- #include <adf_cfg.h>
- #include "adf_dh895xccvf_hw_data.h"
- 
--#define ADF_SYSTEM_DEVICE(device_id) \
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, device_id)}
--
- static const struct pci_device_id adf_pci_tbl[] = {
--	ADF_SYSTEM_DEVICE(PCI_DEVICE_ID_INTEL_QAT_DH895XCC_VF),
--	{0,}
-+	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_INTEL_QAT_DH895XCC_VF), },
-+	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
- 
++/*
++ * Revocationlist the X509 cert
++ */
++static __init void uefi_revocationlist_x509(const char *source,
++					    const void *data, size_t len)
++{
++	mark_key_revocationlisted(data, len);
++}
++
+ /*
+  * Return the appropriate handler for particular signature list types found in
+  * the UEFI db and MokListRT tables.
+@@ -76,5 +85,7 @@ __init efi_element_handler_t get_handler_for_dbx(const efi_guid_t *sig_type)
+ 		return uefi_blacklist_x509_tbs;
+ 	if (efi_guidcmp(*sig_type, efi_cert_sha256_guid) == 0)
+ 		return uefi_blacklist_binary;
++	if (efi_guidcmp(*sig_type, efi_cert_x509_guid) == 0)
++		return uefi_revocationlist_x509;
+ 	return 0;
+ }
 -- 
-2.26.2
+2.18.1
 
