@@ -2,70 +2,133 @@ Return-Path: <SRS0=7O7/=CT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADE4CC433E2
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Sep 2020 02:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44CABC43461
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Sep 2020 04:32:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 746A121D80
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Sep 2020 02:50:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599706209;
-	bh=dkp7auU2FKhEvcTExb27Xv8XLSV29+CJUCDMUeythnQ=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=x2K/IkJZqYWL3tVsaTsVWUZgRPe1CZgqU7OFJ8QhV57wgDWw5tZ/lMUon4FIF+wR9
-	 2S51cn/X8z4rirPrkDaEWZ/+QOAB+knxiF3NoFQir7szTPbHjzp05JOdw1rxWilxl8
-	 /W7FlMRDPsvBNJXhixT4RA3JCO3EXPA68yObHTGc=
+	by mail.kernel.org (Postfix) with ESMTP id 0844E2076D
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Sep 2020 04:32:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RF3P/tH4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728442AbgIJCuH (ORCPT
+        id S1725868AbgIJEcM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Sep 2020 22:50:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57620 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730453AbgIJCsM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Sep 2020 22:48:12 -0400
-Subject: Re: [GIT PULL] Crypto Fixes for 5.9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599706092;
-        bh=dkp7auU2FKhEvcTExb27Xv8XLSV29+CJUCDMUeythnQ=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=lnLxbhhSELHI4cgrWuryB9t0Bbchdok0uTNGkHhl+lDpVuTi22XwXQJgUA+1ts+cE
-         7J4xEYYoKZoGg2hCaBewuQxvYs2i9Qw8adUWBYuDJIClgk8y6zd1E1m+ITtzLYU+IU
-         TYbQykTJt6vaLTUAUQUVcK0VuhSQfzJJ10TBGSpQ=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20200910003423.GA28062@gondor.apana.org.au>
-References: <20200803044024.GA6429@gondor.apana.org.au>
- <20200830223304.GA16882@gondor.apana.org.au> <20200910003423.GA28062@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20200910003423.GA28062@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: 1b0df11fde0f14a269a181b3b7f5122415bc5ed7
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 7fe10096c1508c7f033d34d0741809f8eecc1ed4
-Message-Id: <159970609204.30392.6189665258916818752.pr-tracker-bot@kernel.org>
-Date:   Thu, 10 Sep 2020 02:48:12 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        Thu, 10 Sep 2020 00:32:12 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:51678 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725855AbgIJEcK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Sep 2020 00:32:10 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 089MiVL4156976;
+        Wed, 9 Sep 2020 22:44:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2020-01-29; bh=ZJSWj8UDSgwVvdQeB1Q6BSZE1Es3ixnnotRP8TRgN6o=;
+ b=RF3P/tH4qLGee2XEa4s4rwbn+vrl/a0mcYAsQtMXbU2cV5G71WwcSYGEOqb7At4ftVba
+ /CbbLxC/exYoayLX7V5zJRQYuiXH21IgdBpM1Ae1LX0Otp1GzOg/nUqLQf0becWmULLy
+ fW+0y0ZdbzlCZ1Kh4C6TldbMmjxy1o4qUEyqEF6x+AJrYYZn+WjrE+XfgPubBSwX0uWY
+ Pr0gp6VgRQknYwScAZ4TnTi9RvbvRz/dXlRjJikkP01H7rR/EkNqYq0vA1deh4haUKHW
+ PqIr0FyH22YWxLUirxY35CX0DUpVRGYxBjxzhEH0Epx8W9Rgm3cdlk8htI0tQtTpHdcZ Qw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 33c2mm4pmm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 09 Sep 2020 22:44:47 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 089MdcWP132724;
+        Wed, 9 Sep 2020 22:44:47 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 33dacm6e4s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 09 Sep 2020 22:44:46 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 089Miet6010647;
+        Wed, 9 Sep 2020 22:44:41 GMT
+Received: from dhcp-10-65-181-26.vpn.oracle.com (/10.65.181.26)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 09 Sep 2020 15:44:40 -0700
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v2] certs: Add EFI_CERT_X509_GUID support for dbx entries
+From:   Eric Snowberg <eric.snowberg@oracle.com>
+In-Reply-To: <5074bc5c-8dd4-16d7-2760-3e657b90bfa2@infradead.org>
+Date:   Wed, 9 Sep 2020 16:44:37 -0600
+Cc:     dhowells@redhat.com, dwmw2@infradead.org,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jmorris@namei.org, serge@hallyn.com, nayna@linux.ibm.com,
+        Mimi Zohar <zohar@linux.ibm.com>, erichte@linux.ibm.com,
+        mpe@ellerman.id.au, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <0D3BE738-67D5-41DB-B58E-FCD2ECD9A4F0@oracle.com>
+References: <20200909172736.73003-1-eric.snowberg@oracle.com>
+ <5074bc5c-8dd4-16d7-2760-3e657b90bfa2@infradead.org>
+To:     Randy Dunlap <rdunlap@infradead.org>
+X-Mailer: Apple Mail (2.3273)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9739 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
+ bulkscore=0 phishscore=0 adultscore=0 suspectscore=3 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009090198
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9739 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 priorityscore=1501
+ phishscore=0 adultscore=0 bulkscore=0 clxscore=1011 mlxlogscore=999
+ malwarescore=0 suspectscore=3 lowpriorityscore=0 spamscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009090199
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Thu, 10 Sep 2020 10:34:23 +1000:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+> On Sep 9, 2020, at 11:40 AM, Randy Dunlap <rdunlap@infradead.org> =
+wrote:
+>=20
+> On 9/9/20 10:27 AM, Eric Snowberg wrote:
+>> diff --git a/include/crypto/pkcs7.h b/include/crypto/pkcs7.h
+>> index 38ec7f5f9041..d8f2e0fdfbf4 100644
+>> --- a/include/crypto/pkcs7.h
+>> +++ b/include/crypto/pkcs7.h
+>> @@ -26,11 +26,19 @@ extern int pkcs7_get_content_data(const struct =
+pkcs7_message *pkcs7,
+>> 				  const void **_data, size_t *_datalen,
+>> 				  size_t *_headerlen);
+>>=20
+>> +#ifdef CONFIG_PKCS7_MESSAGE_PARSER
+>> /*
+>>  * pkcs7_trust.c
+>>  */
+>> extern int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
+>> 				struct key *trust_keyring);
+>> +#else
+>> +static inline int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
+>> +				       struct key *trust_keyring)
+>> +{
+>> +	return -ENOKEY;
+>> +}
+>> +#endif
+>=20
+> Just to be clear, you want to do the #else block when
+> CONFIG_PKCS7_MESSAGE_PARSER=3Dm.  Is that correct?
+>=20
+> If so, it might be clearer to use
+>=20
+> #if IS_BUILTIN(CONFIG_PKCS7_MESSAGE_PARSER)
+>=20
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/7fe10096c1508c7f033d34d0741809f8eecc1ed4
+I just added this part to fix a build error when none of the
+asymmetrical keys are defined within a config.  I failed to notice
+CONFIG_PKCS7_MESSAGE_PARSER could be configured to build as a module
+too.  The code I added that uses pkcs7_validate_trust is always=20
+builtin. Taking this into account, please disregard this patch. =20
+I will need to solve this a different way.  Thanks for pointing this=20
+out.
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
