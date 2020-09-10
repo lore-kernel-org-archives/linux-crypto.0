@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73EC4C433E2
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Sep 2020 19:31:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB03C433E2
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Sep 2020 19:31:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 40DD0221E2
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Sep 2020 19:31:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 22B1621D81
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Sep 2020 19:31:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1599766293;
-	bh=J+36KfiCj6ZqQvGQMiAmr/24p4yD+AflrA4ni1Zap14=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=e31lURQzBA7g/GI/dklHat7X7UvQyJyPavfl/XVDkHr2Iskcc6O2+r1LF5trf9zMj
-	 ZU0Y0KcflrrtMt3kh64SA9lH/9cXyfH9E+0ofa47reeilqHjNkdAzPCdXlx2lizLww
-	 AuYoGjKS84gA2xpCsvovIcBpl7KNCsJ5Na62TQfM=
+	s=default; t=1599766301;
+	bh=hL6w8E8SUjjPiOKWWzA5Ali9T6LnigQnlGkrYfgRtaI=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=RWxznKu1XEOmU4YzoDWagMBkBlys6Bvbo/rRaj07gahwseoY72uyBpvFbo6rJAHSq
+	 wOWww4/XSYIyGHjN6RTnR1qmcFN4FtYQSRycVC6STTLBhxTKJEfAtOw+WMYjQ62qqS
+	 7J+MaEouG03XdoFIpgaof5iHUg+Nx14l9nPqZZsQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726741AbgIJTbX (ORCPT
+        id S1727976AbgIJTbh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Sep 2020 15:31:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48048 "EHLO mail.kernel.org"
+        Thu, 10 Sep 2020 15:31:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47930 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726512AbgIJT3j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Sep 2020 15:29:39 -0400
+        id S1727807AbgIJT32 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Sep 2020 15:29:28 -0400
 Received: from localhost.localdomain (unknown [194.230.155.174])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E811821D92;
-        Thu, 10 Sep 2020 19:29:33 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7CA4620882;
+        Thu, 10 Sep 2020 19:29:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1599766176;
-        bh=J+36KfiCj6ZqQvGQMiAmr/24p4yD+AflrA4ni1Zap14=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=xPBKvVFpHggxzO23tGiSaky0KlkF4+un8LWAPbmZObck71qM/avY7UqWtG577qnY0
-         PnA5fZOLc357YA1FVO32FkV6B0h+ZvtEKxwKl3Jnz5KJxQ9pvava+qp9B+q6Tttgta
-         mqfZp2Q4IUeXW9ww6qq3T2nooXdigTyVomwfhcsc=
+        s=default; t=1599766166;
+        bh=hL6w8E8SUjjPiOKWWzA5Ali9T6LnigQnlGkrYfgRtaI=;
+        h=From:To:Cc:Subject:Date:From;
+        b=x84wJj85EWTbHdmxLHCcca3DxsfFMsG5BqTYdZV6EXFQI3f9917GjfxRCRslYuc9m
+         Etxu4BonuYY/VCMILOoyvU/yUt4mKRBC5qjGZ/oVZi4ZOsLZrjmWNCg6EmArpuPXdx
+         UIoQu++lCJCrdk5jovaAHaOen43XILBCHQRS6B/c=
 From:   Krzysztof Kozlowski <krzk@kernel.org>
 To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -54,71 +54,116 @@ To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         linux-stm32@st-md-mailman.stormreply.com
 Cc:     Iuliana Prodan <iuliana.prodan@nxp.com>,
         Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH v2 4/4] crypto: allwinner/sun8i - Simplify with dev_err_probe()
-Date:   Thu, 10 Sep 2020 21:29:19 +0200
-Message-Id: <20200910192919.12503-4-krzk@kernel.org>
+Subject: [PATCH v2 1/4] crypto: caam - Fix kerneldoc
+Date:   Thu, 10 Sep 2020 21:29:16 +0200
+Message-Id: <20200910192919.12503-1-krzk@kernel.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200910192919.12503-1-krzk@kernel.org>
-References: <20200910192919.12503-1-krzk@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Common pattern of handling deferred probe can be simplified with
-dev_err_probe().  Less code and the error value gets printed.
+Fix kerneldoc warnings like:
+
+  drivers/crypto/caam/caamalg_qi2.c:73: warning: cannot understand function prototype: 'struct caam_ctx'
+  drivers/crypto/caam/caamalg_qi2.c:2962: warning: cannot understand function prototype: 'struct caam_hash_ctx'
+  drivers/crypto/caam/ctrl.c:449: warning: Function parameter or member 'ctrl' not described in 'caam_get_era'
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 
 ---
 
 Changes since v1:
-1. None
+1. Fix more warnings
 ---
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 9 +++------
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c | 9 +++------
- 2 files changed, 6 insertions(+), 12 deletions(-)
+ drivers/crypto/caam/caamalg_desc.c |  1 +
+ drivers/crypto/caam/caamalg_qi2.c  |  4 ++--
+ drivers/crypto/caam/ctrl.c         |  4 +++-
+ drivers/crypto/caam/jr.c           | 10 +++++-----
+ 4 files changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-index 138759dc8190..e3c62051c595 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-@@ -573,12 +573,9 @@ static int sun8i_ce_probe(struct platform_device *pdev)
- 		return irq;
+diff --git a/drivers/crypto/caam/caamalg_desc.c b/drivers/crypto/caam/caamalg_desc.c
+index d6c58184bb57..f0f0fdd1ef32 100644
+--- a/drivers/crypto/caam/caamalg_desc.c
++++ b/drivers/crypto/caam/caamalg_desc.c
+@@ -373,6 +373,7 @@ EXPORT_SYMBOL(cnstr_shdsc_aead_encap);
+  *         with OP_ALG_AAI_HMAC_PRECOMP.
+  * @ivsize: initialization vector size
+  * @icvsize: integrity check value (ICV) size (truncated or full)
++ * @geniv: whether to generate Encrypted Chain IV
+  * @is_rfc3686: true when ctr(aes) is wrapped by rfc3686 template
+  * @nonce: pointer to rfc3686 nonce
+  * @ctx1_iv_off: IV offset in CONTEXT1 register
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index 66ae1d581168..0441e4ff2df2 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -59,7 +59,7 @@ struct caam_skcipher_alg {
+ };
  
- 	ce->reset = devm_reset_control_get(&pdev->dev, NULL);
--	if (IS_ERR(ce->reset)) {
--		if (PTR_ERR(ce->reset) == -EPROBE_DEFER)
--			return PTR_ERR(ce->reset);
--		dev_err(&pdev->dev, "No reset control found\n");
--		return PTR_ERR(ce->reset);
--	}
-+	if (IS_ERR(ce->reset))
-+		return dev_err_probe(&pdev->dev, PTR_ERR(ce->reset),
-+				     "No reset control found\n");
+ /**
+- * caam_ctx - per-session context
++ * struct caam_ctx - per-session context
+  * @flc: Flow Contexts array
+  * @key:  [authentication key], encryption key
+  * @flc_dma: I/O virtual addresses of the Flow Contexts
+@@ -2951,7 +2951,7 @@ enum hash_optype {
+ };
  
- 	mutex_init(&ce->mlock);
+ /**
+- * caam_hash_ctx - ahash per-session context
++ * struct caam_hash_ctx - ahash per-session context
+  * @flc: Flow Contexts array
+  * @key: authentication key
+  * @flc_dma: I/O virtual addresses of the Flow Contexts
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 65de57f169d9..f7adcf6ecea5 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -444,7 +444,9 @@ static int caam_get_era_from_hw(struct caam_ctrl __iomem *ctrl)
+  * by u-boot.
+  * In case this property is not passed an attempt to retrieve the CAAM
+  * era via register reads will be made.
+- **/
++ *
++ * @ctrl:	controller region
++ */
+ static int caam_get_era(struct caam_ctrl __iomem *ctrl)
+ {
+ 	struct device_node *caam_node;
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index bf6b03b17251..6f669966ba2c 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -324,7 +324,7 @@ EXPORT_SYMBOL(caam_jr_alloc);
  
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-index 9a23515783a6..576df8c8df51 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-@@ -545,12 +545,9 @@ static int sun8i_ss_probe(struct platform_device *pdev)
- 		return irq;
- 
- 	ss->reset = devm_reset_control_get(&pdev->dev, NULL);
--	if (IS_ERR(ss->reset)) {
--		if (PTR_ERR(ss->reset) == -EPROBE_DEFER)
--			return PTR_ERR(ss->reset);
--		dev_err(&pdev->dev, "No reset control found\n");
--		return PTR_ERR(ss->reset);
--	}
-+	if (IS_ERR(ss->reset))
-+		return dev_err_probe(&pdev->dev, PTR_ERR(ss->reset),
-+				     "No reset control found\n");
- 
- 	mutex_init(&ss->mlock);
- 
+ /**
+  * caam_jr_free() - Free the Job Ring
+- * @rdev     - points to the dev that identifies the Job ring to
++ * @rdev:      points to the dev that identifies the Job ring to
+  *             be released.
+  **/
+ void caam_jr_free(struct device *rdev)
+@@ -349,15 +349,15 @@ EXPORT_SYMBOL(caam_jr_free);
+  *        of this request. This has the form:
+  *        callback(struct device *dev, u32 *desc, u32 stat, void *arg)
+  *        where:
+- *        @dev:    contains the job ring device that processed this
++ *        dev:     contains the job ring device that processed this
+  *                 response.
+- *        @desc:   descriptor that initiated the request, same as
++ *        desc:    descriptor that initiated the request, same as
+  *                 "desc" being argued to caam_jr_enqueue().
+- *        @status: untranslated status received from CAAM. See the
++ *        status:  untranslated status received from CAAM. See the
+  *                 reference manual for a detailed description of
+  *                 error meaning, or see the JRSTA definitions in the
+  *                 register header file
+- *        @areq:   optional pointer to an argument passed with the
++ *        areq:    optional pointer to an argument passed with the
+  *                 original request
+  * @areq: optional pointer to a user argument for use at callback
+  *        time.
 -- 
 2.17.1
 
