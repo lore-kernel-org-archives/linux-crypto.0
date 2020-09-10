@@ -2,39 +2,36 @@ Return-Path: <SRS0=7O7/=CT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF84C433E2
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Sep 2020 21:42:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFA8BC43461
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Sep 2020 21:55:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 166F420BED
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Sep 2020 21:42:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A62E920719
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Sep 2020 21:55:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727850AbgIJVmm (ORCPT
+        id S1728436AbgIJVmo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Sep 2020 17:42:42 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:11770 "EHLO huawei.com"
+        Thu, 10 Sep 2020 17:42:44 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:56130 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729507AbgIJL6D (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Sep 2020 07:58:03 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id CC6DAD7DCEE43683BA2E
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Sep 2020 19:57:53 +0800 (CST)
-Received: from huawei.com (10.67.165.24) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Thu, 10 Sep 2020
- 19:57:50 +0800
+        id S1730900AbgIJM6O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Sep 2020 08:58:14 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id A7900B03051B6D129BF8
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Sep 2020 20:57:57 +0800 (CST)
+Received: from huawei.com (10.67.165.24) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Thu, 10 Sep 2020
+ 20:57:56 +0800
 From:   Longfang Liu <liulongfang@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>
-Subject: [PATCH 2/5] crypto: hisilicon - update HPRE module parameter description
-Date:   Thu, 10 Sep 2020 19:56:40 +0800
-Message-ID: <1599739003-23448-3-git-send-email-liulongfang@huawei.com>
+Subject: [PATCH 0/5] crypto: hisilicon - update ACC module parameter
+Date:   Thu, 10 Sep 2020 20:56:48 +0800
+Message-ID: <1599742610-33571-1-git-send-email-liulongfang@huawei.com>
 X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1599739003-23448-1-git-send-email-liulongfang@huawei.com>
-References: <1599739003-23448-1-git-send-email-liulongfang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.67.165.24]
@@ -44,27 +41,24 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In order to pass kernel CRYPTO test, HPRE module parameter
-'pf_q_num' needs to be set as greater than 1.
+In order to pass kernel crypto test, the ACC module parameter
+pf_q_num needs to be set to an integer greater than 1,
+and then fixed two bugs.
 
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
----
- drivers/crypto/hisilicon/hpre/hpre_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Longfang Liu (5):
+  crypto: hisilicon - update mininum queue
+  crypto: hisilicon - update HPRE module parameter description
+  crypto: hisilicon - update SEC module parameter description
+  crypto: hisilicon - update ZIP module parameter description
+  crypto: hisilicon - fixed memory allocation error
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index 45741d2..cf9169d 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -190,7 +190,7 @@ static const struct kernel_param_ops hpre_pf_q_num_ops = {
- 
- static u32 pf_q_num = HPRE_PF_DEF_Q_NUM;
- module_param_cb(pf_q_num, &hpre_pf_q_num_ops, &pf_q_num, 0444);
--MODULE_PARM_DESC(pf_q_num, "Number of queues in PF of CS(1-1024)");
-+MODULE_PARM_DESC(pf_q_num, "Number of queues in PF of CS(2-1024)");
- 
- static const struct kernel_param_ops vfs_num_ops = {
- 	.set = vfs_num_set,
+ drivers/crypto/hisilicon/hpre/hpre_main.c  |  2 +-
+ drivers/crypto/hisilicon/qm.h              |  4 ++--
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 16 ++++++++++++----
+ drivers/crypto/hisilicon/sec2/sec_main.c   |  2 +-
+ drivers/crypto/hisilicon/zip/zip_main.c    |  2 +-
+ 5 files changed, 17 insertions(+), 9 deletions(-)
+
 -- 
 2.8.1
 
