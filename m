@@ -7,51 +7,52 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6369C433E2
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 06:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 957E7C43461
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 06:56:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6188A221EE
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 06:56:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A7C1221F1
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 06:56:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725535AbgIKG4G (ORCPT
+        id S1725550AbgIKG4M (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Sep 2020 02:56:06 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:58904 "EHLO fornost.hmeau.com"
+        Fri, 11 Sep 2020 02:56:12 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:58908 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725497AbgIKG4E (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Sep 2020 02:56:04 -0400
+        id S1725497AbgIKG4L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Sep 2020 02:56:11 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kGcyV-0007qo-1n; Fri, 11 Sep 2020 16:56:00 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Sep 2020 16:55:59 +1000
-Date:   Fri, 11 Sep 2020 16:55:59 +1000
+        id 1kGcyf-0007r2-1r; Fri, 11 Sep 2020 16:56:10 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Sep 2020 16:56:09 +1000
+Date:   Fri, 11 Sep 2020 16:56:09 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tero Kristo <t-kristo@ti.com>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 2/2] crypto: sa2ul: fix compiler warning produced by clang
-Message-ID: <20200911065558.GA32150@gondor.apana.org.au>
-References: <20200825133106.21542-1-t-kristo@ti.com>
- <20200825133106.21542-3-t-kristo@ti.com>
+To:     Uros Bizjak <ubizjak@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, x86@kernel.org,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH] crypto/x86: Use XORL r32,32 in curve25519-x86_64.c
+Message-ID: <20200911065608.GB32150@gondor.apana.org.au>
+References: <20200827173058.94519-1-ubizjak@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200825133106.21542-3-t-kristo@ti.com>
+In-Reply-To: <20200827173058.94519-1-ubizjak@gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 25, 2020 at 04:31:06PM +0300, Tero Kristo wrote:
-> Clang detects a warning for an assignment that doesn't really do
-> anything. Fix this by removing the offending piece of code.
+On Thu, Aug 27, 2020 at 07:30:58PM +0200, Uros Bizjak wrote:
+> x86_64 zero extends 32bit operations, so for 64bit operands,
+> XORL r32,r32 is functionally equal to XORL r64,r64, but avoids
+> a REX prefix byte when legacy registers are used.
 > 
-> Fixes: 7694b6ca649f ("crypto: sa2ul - Add crypto driver")
-> Reported-by: Nathan Chancellor <natechancellor@gmail.com>
-> Signed-off-by: Tero Kristo <t-kristo@ti.com>
+> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
 > ---
->  drivers/crypto/sa2ul.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+>  arch/x86/crypto/curve25519-x86_64.c | 68 ++++++++++++++---------------
+>  1 file changed, 34 insertions(+), 34 deletions(-)
 
 Patch applied.  Thanks.
 -- 
