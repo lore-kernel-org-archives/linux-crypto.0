@@ -2,63 +2,224 @@ Return-Path: <SRS0=Quof=CU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DCAFC433E2
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 06:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48B87C43461
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 09:00:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CA153221EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 06:59:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1BE122204
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 09:00:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725562AbgIKG7j (ORCPT
+        id S1725562AbgIKJAO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Sep 2020 02:59:39 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:59040 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725550AbgIKG7i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Sep 2020 02:59:38 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kGd1u-0007yb-PA; Fri, 11 Sep 2020 16:59:31 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Sep 2020 16:59:30 +1000
-Date:   Fri, 11 Sep 2020 16:59:30 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: Re: [PATCH] crypto: qat - include domain in top level debugfs path
-Message-ID: <20200911065930.GK32150@gondor.apana.org.au>
-References: <20200904080415.75039-1-giovanni.cabiddu@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200904080415.75039-1-giovanni.cabiddu@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Fri, 11 Sep 2020 05:00:14 -0400
+Received: from e2i568.smtp2go.com ([103.2.142.56]:53969 "EHLO
+        e2i568.smtp2go.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725550AbgIKJAL (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Sep 2020 05:00:11 -0400
+X-Greylist: delayed 515 seconds by postgrey-1.27 at vger.kernel.org; Fri, 11 Sep 2020 05:00:09 EDT
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=smtpservice.net; s=mcg8n0.a1-4.dyn; x=1599815710; h=Feedback-ID:
+        X-Smtpcorp-Track:Message-Id:Date:Subject:To:From:Reply-To:Sender:
+        List-Unsubscribe; bh=folKpxrZLLkfJSiv/2jfY36iWZgBNKKN+SarifOTudc=; b=BA5j+pfG
+        UIdhy4aL5jISHc/QZzTX/s3QE6kcWSDWVlKYLBGSafvDoEb/PP3UEognH2TEpK/AqQnhoT6o4fl6R
+        SQhXbmKEEI1RKbxfh4H57DdzbyPVibdxZsidMrhjXmYezygK6XQKN9YfC6tKtCZ9yz1X8oOFHp6E2
+        8JLWGzRkA+nATgvxlUbPjFwTUlmFmvPum1FYhfbnHsJ10Mz1zLzgjkIaMe9SjSYo/SICBhDAJxBOK
+        DOoizipGt3FfCaqUGl+Kg6DaSdBzCrMIp2j2SrL9cDPOxDLUiQPrYG4aPZx4gt51UxO7MkrN4/W7N
+        uPLhxf/xgC61MbEMIW8Sp/EhHw==;
+Received: from [10.66.228.43] (helo=SmtpCorp)
+        by smtpcorp.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92-S2G)
+        (envelope-from <pvanleeuwen@rambus.com>)
+        id 1kGemH-qt4JMs-Jl; Fri, 11 Sep 2020 08:51:29 +0000
+Received: from [10.159.100.118] (helo=localhost.localdomain.com)
+        by smtpcorp.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92-S2G)
+        (envelope-from <pvanleeuwen@rambus.com>)
+        id 1kGemG-wSEVMJ-H0; Fri, 11 Sep 2020 08:51:28 +0000
+From:   Pascal van Leeuwen <pvanleeuwen@rambus.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, Pascal van Leeuwen <pvanleeuwen@rambus.com>
+Subject: [PATCH] crypto: inside-secure - Add support for EIP197 with output classifier
+Date:   Fri, 11 Sep 2020 09:46:39 +0200
+Message-Id: <1599810399-14999-1-git-send-email-pvanleeuwen@rambus.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Smtpcorp-Track: 1kG-XGwSEVuJH0.W4qR7re_T
+Feedback-ID: 580919m:580919aJ_Wy3x:580919sq7ufa7R3A
+X-Report-Abuse: Please forward a copy of this message, including all headers, to <abuse-report@smtp2go.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 04, 2020 at 09:04:15AM +0100, Giovanni Cabiddu wrote:
-> Use pci_name() when creating debugfs entries in order to include PCI
-> domain in the path.
-> 
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
->  drivers/crypto/qat/qat_c3xxx/adf_drv.c      | 6 ++----
->  drivers/crypto/qat/qat_c3xxxvf/adf_drv.c    | 6 ++----
->  drivers/crypto/qat/qat_c62x/adf_drv.c       | 6 ++----
->  drivers/crypto/qat/qat_c62xvf/adf_drv.c     | 6 ++----
->  drivers/crypto/qat/qat_dh895xcc/adf_drv.c   | 6 ++----
->  drivers/crypto/qat/qat_dh895xccvf/adf_drv.c | 6 ++----
->  6 files changed, 12 insertions(+), 24 deletions(-)
+This patch adds support for EIP197 instances that include the output
+classifier (OCE) option, as used by one of our biggest customers.
+The OCE normally requires initialization and dedicated firmware, but
+for the simple operations supported by this driver, we just bypass it
+completely for now (using what is formally a debug feature).
 
-Patch applied.  Thanks.
+Signed-off-by: Pascal van Leeuwen <pvanleeuwen@rambus.com>
+---
+ drivers/crypto/inside-secure/safexcel.c | 44 ++++++++++++++++++++++++++++++---
+ drivers/crypto/inside-secure/safexcel.h | 13 ++++++++++
+ 2 files changed, 54 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index fa7398e..eb241845 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -304,6 +304,11 @@ static void eip197_init_firmware(struct safexcel_crypto_priv *priv)
+ 		/* Enable access to all IFPP program memories */
+ 		writel(EIP197_PE_ICE_RAM_CTRL_FPP_PROG_EN,
+ 		       EIP197_PE(priv) + EIP197_PE_ICE_RAM_CTRL(pe));
++
++		/* bypass the OCE, if present */
++		if (priv->flags & EIP197_OCE)
++			writel(EIP197_DEBUG_OCE_BYPASS, EIP197_PE(priv) +
++							EIP197_PE_DEBUG(pe));
+ 	}
+ 
+ }
+@@ -1495,6 +1500,9 @@ static int safexcel_probe_generic(void *pdev,
+ 	hwopt = readl(EIP197_GLOBAL(priv) + EIP197_OPTIONS);
+ 	hiaopt = readl(EIP197_HIA_AIC(priv) + EIP197_HIA_OPTIONS);
+ 
++	priv->hwconfig.icever = 0;
++	priv->hwconfig.ocever = 0;
++	priv->hwconfig.psever = 0;
+ 	if (priv->flags & SAFEXCEL_HW_EIP197) {
+ 		/* EIP197 */
+ 		peopt = readl(EIP197_PE(priv) + EIP197_PE_OPTIONS(0));
+@@ -1513,8 +1521,37 @@ static int safexcel_probe_generic(void *pdev,
+ 					    EIP197_N_RINGS_MASK;
+ 		if (hiaopt & EIP197_HIA_OPT_HAS_PE_ARB)
+ 			priv->flags |= EIP197_PE_ARB;
+-		if (EIP206_OPT_ICE_TYPE(peopt) == 1)
++		if (EIP206_OPT_ICE_TYPE(peopt) == 1) {
+ 			priv->flags |= EIP197_ICE;
++			/* Detect ICE EIP207 class. engine and version */
++			version = readl(EIP197_PE(priv) +
++				  EIP197_PE_ICE_VERSION(0));
++			if (EIP197_REG_LO16(version) != EIP207_VERSION_LE) {
++				dev_err(dev, "EIP%d: ICE EIP207 not detected.\n",
++					peid);
++				return -ENODEV;
++			}
++			priv->hwconfig.icever = EIP197_VERSION_MASK(version);
++		}
++		if (EIP206_OPT_OCE_TYPE(peopt) == 1) {
++			priv->flags |= EIP197_OCE;
++			/* Detect EIP96PP packet stream editor and version */
++			version = readl(EIP197_PE(priv) + EIP197_PE_PSE_VERSION(0));
++			if (EIP197_REG_LO16(version) != EIP96_VERSION_LE) {
++				dev_err(dev, "EIP%d: EIP96PP not detected.\n", peid);
++				return -ENODEV;
++			}
++			priv->hwconfig.psever = EIP197_VERSION_MASK(version);
++			/* Detect OCE EIP207 class. engine and version */
++			version = readl(EIP197_PE(priv) +
++				  EIP197_PE_ICE_VERSION(0));
++			if (EIP197_REG_LO16(version) != EIP207_VERSION_LE) {
++				dev_err(dev, "EIP%d: OCE EIP207 not detected.\n",
++					peid);
++				return -ENODEV;
++			}
++			priv->hwconfig.ocever = EIP197_VERSION_MASK(version);
++		}
+ 		/* If not a full TRC, then assume simple TRC */
+ 		if (!(hwopt & EIP197_OPT_HAS_TRC))
+ 			priv->flags |= EIP197_SIMPLE_TRC;
+@@ -1552,13 +1589,14 @@ static int safexcel_probe_generic(void *pdev,
+ 				    EIP197_PE_EIP96_OPTIONS(0));
+ 
+ 	/* Print single info line describing what we just detected */
+-	dev_info(priv->dev, "EIP%d:%x(%d,%d,%d,%d)-HIA:%x(%d,%d,%d),PE:%x/%x,alg:%08x\n",
++	dev_info(priv->dev, "EIP%d:%x(%d,%d,%d,%d)-HIA:%x(%d,%d,%d),PE:%x/%x(alg:%08x)/%x/%x/%x\n",
+ 		 peid, priv->hwconfig.hwver, hwctg, priv->hwconfig.hwnumpes,
+ 		 priv->hwconfig.hwnumrings, priv->hwconfig.hwnumraic,
+ 		 priv->hwconfig.hiaver, priv->hwconfig.hwdataw,
+ 		 priv->hwconfig.hwcfsize, priv->hwconfig.hwrfsize,
+ 		 priv->hwconfig.ppver, priv->hwconfig.pever,
+-		 priv->hwconfig.algo_flags);
++		 priv->hwconfig.algo_flags, priv->hwconfig.icever,
++		 priv->hwconfig.ocever, priv->hwconfig.psever);
+ 
+ 	safexcel_configure(priv);
+ 
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index 7c5fe38..7054306 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -22,6 +22,7 @@
+ #define EIP96_VERSION_LE			0x9f60
+ #define EIP201_VERSION_LE			0x36c9
+ #define EIP206_VERSION_LE			0x31ce
++#define EIP207_VERSION_LE			0x30cf
+ #define EIP197_REG_LO16(reg)			(reg & 0xffff)
+ #define EIP197_REG_HI16(reg)			((reg >> 16) & 0xffff)
+ #define EIP197_VERSION_MASK(reg)		((reg >> 16) & 0xfff)
+@@ -34,6 +35,7 @@
+ 
+ /* EIP206 OPTIONS ENCODING */
+ #define EIP206_OPT_ICE_TYPE(n)			((n>>8)&3)
++#define EIP206_OPT_OCE_TYPE(n)			((n>>10)&3)
+ 
+ /* EIP197 OPTIONS ENCODING */
+ #define EIP197_OPT_HAS_TRC			BIT(31)
+@@ -168,6 +170,7 @@
+ #define EIP197_PE_ICE_FPP_CTRL(n)		(0x0d80 + (0x2000 * (n)))
+ #define EIP197_PE_ICE_PPTF_CTRL(n)		(0x0e00 + (0x2000 * (n)))
+ #define EIP197_PE_ICE_RAM_CTRL(n)		(0x0ff0 + (0x2000 * (n)))
++#define EIP197_PE_ICE_VERSION(n)		(0x0ffc + (0x2000 * (n)))
+ #define EIP197_PE_EIP96_TOKEN_CTRL(n)		(0x1000 + (0x2000 * (n)))
+ #define EIP197_PE_EIP96_FUNCTION_EN(n)		(0x1004 + (0x2000 * (n)))
+ #define EIP197_PE_EIP96_CONTEXT_CTRL(n)		(0x1008 + (0x2000 * (n)))
+@@ -176,8 +179,11 @@
+ #define EIP197_PE_EIP96_FUNCTION2_EN(n)		(0x1030 + (0x2000 * (n)))
+ #define EIP197_PE_EIP96_OPTIONS(n)		(0x13f8 + (0x2000 * (n)))
+ #define EIP197_PE_EIP96_VERSION(n)		(0x13fc + (0x2000 * (n)))
++#define EIP197_PE_OCE_VERSION(n)		(0x1bfc + (0x2000 * (n)))
+ #define EIP197_PE_OUT_DBUF_THRES(n)		(0x1c00 + (0x2000 * (n)))
+ #define EIP197_PE_OUT_TBUF_THRES(n)		(0x1d00 + (0x2000 * (n)))
++#define EIP197_PE_PSE_VERSION(n)		(0x1efc + (0x2000 * (n)))
++#define EIP197_PE_DEBUG(n)			(0x1ff4 + (0x2000 * (n)))
+ #define EIP197_PE_OPTIONS(n)			(0x1ff8 + (0x2000 * (n)))
+ #define EIP197_PE_VERSION(n)			(0x1ffc + (0x2000 * (n)))
+ #define EIP197_MST_CTRL				0xfff4
+@@ -352,6 +358,9 @@
+ /* EIP197_PE_EIP96_TOKEN_CTRL2 */
+ #define EIP197_PE_EIP96_TOKEN_CTRL2_CTX_DONE	BIT(3)
+ 
++/* EIP197_PE_DEBUG */
++#define EIP197_DEBUG_OCE_BYPASS			BIT(1)
++
+ /* EIP197_STRC_CONFIG */
+ #define EIP197_STRC_CONFIG_INIT			BIT(31)
+ #define EIP197_STRC_CONFIG_LARGE_REC(s)		(s<<8)
+@@ -776,6 +785,7 @@ enum safexcel_flags {
+ 	EIP197_PE_ARB		= BIT(2),
+ 	EIP197_ICE		= BIT(3),
+ 	EIP197_SIMPLE_TRC	= BIT(4),
++	EIP197_OCE		= BIT(5),
+ };
+ 
+ struct safexcel_hwconfig {
+@@ -783,7 +793,10 @@ struct safexcel_hwconfig {
+ 	int hwver;
+ 	int hiaver;
+ 	int ppver;
++	int icever;
+ 	int pever;
++	int ocever;
++	int psever;
+ 	int hwdataw;
+ 	int hwcfsize;
+ 	int hwrfsize;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.3.1
+
