@@ -1,89 +1,115 @@
 Return-Path: <SRS0=Quof=CU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=3.0 tests=BAYES_50,
-	HEADER_FROM_DIFFERENT_DOMAINS,LOTS_OF_MONEY,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,T_DEAR_BENEFICIARY,UNCLAIMED_MONEY autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5E76C43461
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 10:47:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3CA7C43461
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 15:57:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE8A5221F0
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 10:47:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 893B321D47
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 15:57:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1599839833;
+	bh=rGbqf9/+lTR20/q7Oy//dTrBqkiYio6GueIG0oElcGY=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=mCIggqN9vAptSYGNnH1gqU5Ey8nhSOz/lgEnjhYwu6iwe3/0T8eCO9grWR3IvQHjp
+	 cpKf5LRSqxt2MwPwV7cWHjQIx3bCSjXjnuxWzZ/Yk30TNCNv2veIjUzpmkc5jeNZ15
+	 t9BlDKGMsSqTPHtz2VHzZNsLchKXxkgUjgz2gGZA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725814AbgIKKrQ convert rfc822-to-8bit (ORCPT
+        id S1726170AbgIKP5J (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Sep 2020 06:47:16 -0400
-Received: from mail.flex.co.jp ([211.8.82.123]:52709 "EHLO www.flex.co.jp"
-        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725768AbgIKKrP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Sep 2020 06:47:15 -0400
-Received: from live.com.mx ([103.89.89.225])
-        (authenticated bits=0)
-        by www.flex.co.jp (MTA) with ESMTP id 0898ndvs009401
-        for <linux-crypto@vger.kernel.org>; Wed, 9 Sep 2020 17:49:49 +0900
-Reply-To: powerinthewords@yahoo.co.jp
-From:   piyin.crhe@live.com.mx
+        Fri, 11 Sep 2020 11:57:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39806 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726228AbgIKPza (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Sep 2020 11:55:30 -0400
+Received: from e123331-lin.nice.arm.com (unknown [91.140.123.103])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C0F0322269;
+        Fri, 11 Sep 2020 14:11:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1599833496;
+        bh=rGbqf9/+lTR20/q7Oy//dTrBqkiYio6GueIG0oElcGY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=ZQdAe5klBavXVdVmWwUvddVN51f4YmXyaQ7YmDxBa77Lv/tQ7xOLKuh4zvdnA3p1I
+         L/KyvkhfWZWwQ5BQNqR73F58lI2+xeCeWldaj3GbZFDFDYpvzVbGVzt26G/cyOC+kt
+         AjRT4MdCnfLVdA0hRXI5PmMl9GeZubBWGt5KaPjY=
+From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: =?utf-8?Q?=5BSpam=5D?=
- We are still waiting for your email...
-Date:   09 Sep 2020 01:49:47 -0700
-Message-ID: <20200909014947.230271B1A5495327@live.com.mx>
-MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-X-SpamInfo: FortiGuard-AntiSpam ip, connection black ip 103.89.89.225
+Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH] crypto: mark unused ciphers as obsolete
+Date:   Fri, 11 Sep 2020 17:11:03 +0300
+Message-Id: <20200911141103.14832-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dear Beneficiary,
+We have a few interesting pieces in our cipher museum, which are never
+used internally, and were only ever provided as generic C implementations.
 
-We wish to inform you that a power of attorney was forwarded to 
-our office  by two gentlemen regarding your unclaimed fund of $56 
-Million Dollar. One of them is an American citizen named Mr. 
-Robert Porter and the other is Mr. Wilhelm Berg a Swedish 
-citizen.We have be waiting for you to contact us since last year.
+Unfortunately, we cannot simply remove this code, as we cannot be sure
+that it is not being used via the AF_ALG socket API, however unlikely.
 
-The document claims these gentlemen to be your authorized 
-representatives, and the power of attorney states that you are 
-already deceased.  It further states that your death was due to 
-lung cancer, with your date of death being January 27th, 2020.
+So let's mark the Anubis, Khazad, SEED and TEA algorithms as obsolete,
+which means they can only be enabled in the build if the socket API is
+enabled in the first place.
 
-They have now submitted a new account to replace the receiving 
-account that was in the original claim of funds. These funds have 
-remained unclaimed for quite some time and the need for 
-resolution is pressing. Below is the new account they have 
-submitted.
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+Hopefully, I will be able to convince the distro kernel maintainers to
+disable CRYPTO_USER_API_ENABLE_OBSOLETE in their v5.10+ builds once the
+iwd changes for arc4 make it downstream (Debian already has an updated
+version in its unstable distro). With the joint coverage of their QA,
+we should be able to confirm that these algos are never used, and
+actually remove them altogether.
 
-Account Name's :  Robert Porter /Wilhelm Berg
-Account: 5007-29 438 66
-IBAN-nr: SE4150000000050072943866
-Bic-kod: ESSESESS
-Skandinaviska Enskilda Banken. (SEB :)
-SWEDEN .
+ crypto/Kconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-In the event that you are in fact still alive, we ask that you 
-confirm your existence by responding to this email. You are to 
-view this as a matter requiring immediate attention and response. 
-We have 48 hr monitoring of all activities within Federal Reserve 
-Bank.On this regard,you will be directed to any of our office 
-center that you will go in person to sign the final papers,
-because we have our payment center in Europe,Asia,America and 
-Canada.You will go to any of the office that you will be directed 
-to with the copy of the documents of your fund.
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index e85d8a059489..fac10143d23f 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1185,6 +1185,7 @@ config CRYPTO_AES_PPC_SPE
+ 
+ config CRYPTO_ANUBIS
+ 	tristate "Anubis cipher algorithm"
++	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
+ 	select CRYPTO_ALGAPI
+ 	help
+ 	  Anubis cipher algorithm.
+@@ -1424,6 +1425,7 @@ config CRYPTO_FCRYPT
+ 
+ config CRYPTO_KHAZAD
+ 	tristate "Khazad cipher algorithm"
++	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
+ 	select CRYPTO_ALGAPI
+ 	help
+ 	  Khazad cipher algorithm.
+@@ -1487,6 +1489,7 @@ config CRYPTO_CHACHA_MIPS
+ 
+ config CRYPTO_SEED
+ 	tristate "SEED cipher algorithm"
++	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
+ 	select CRYPTO_ALGAPI
+ 	help
+ 	  SEED cipher algorithm (RFC4269).
+@@ -1613,6 +1616,7 @@ config CRYPTO_SM4
+ 
+ config CRYPTO_TEA
+ 	tristate "TEA, XTEA and XETA cipher algorithms"
++	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
+ 	select CRYPTO_ALGAPI
+ 	help
+ 	  TEA cipher algorithm.
+-- 
+2.17.1
 
-We have contacted the bank in the Sweden asking them to wait for 
-further directives from Federal Reserve Bank, prior to 
-authorizing any withdrawals in any form.  Our request is based 
-entirely on our attempt to verify that you are in fact deceased, 
-before money is wrongly disbursed.
-
-Your in Service,
-
-Robert Steven Kaplan
-2200 N Pearl St, Dallas, TX 75201, United States
