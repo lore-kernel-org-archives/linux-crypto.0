@@ -2,66 +2,136 @@ Return-Path: <SRS0=Quof=CU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB448C43461
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 04:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75399C43461
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 04:19:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 65DEC221E5
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 04:14:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41211221E5
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Sep 2020 04:19:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725306AbgIKEOG (ORCPT
+        id S1725379AbgIKETs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Sep 2020 00:14:06 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:58424 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725283AbgIKEOF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Sep 2020 00:14:05 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kGaRf-0005x0-5T; Fri, 11 Sep 2020 14:13:56 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Sep 2020 14:13:55 +1000
-Date:   Fri, 11 Sep 2020 14:13:55 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc:     kernel test robot <lkp@intel.com>, kbuild-all@lists.01.org,
-        linux-kernel@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [v2 PATCH] crypto: sun4i-ss - Fix sparse endianness markers
-Message-ID: <20200911041354.GA5275@gondor.apana.org.au>
-References: <202009061621.J89kO43Q%lkp@intel.com>
- <20200907062400.GA15841@gondor.apana.org.au>
- <20200907160029.GC11894@Red>
- <20200908050036.GA19817@gondor.apana.org.au>
- <20200910122248.GA22506@Red>
+        Fri, 11 Sep 2020 00:19:48 -0400
+Received: from smtprelay0064.hostedemail.com ([216.40.44.64]:51536 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725283AbgIKETs (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Sep 2020 00:19:48 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay03.hostedemail.com (Postfix) with ESMTP id 12942837F24A;
+        Fri, 11 Sep 2020 04:19:43 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: seat91_4d0f80d270eb
+X-Filterd-Recvd-Size: 4376
+Received: from XPS-9350.home (unknown [47.151.133.149])
+        (Authenticated sender: joe@perches.com)
+        by omf19.hostedemail.com (Postfix) with ESMTPA;
+        Fri, 11 Sep 2020 04:19:36 +0000 (UTC)
+Message-ID: <f4ad706519917d493a0af32ea2da8565227cc74a.camel@perches.com>
+Subject: Re: [trivial PATCH] treewide: Convert switch/case fallthrough; to
+ break;
+From:   Joe Perches <joe@perches.com>
+To:     Robin Murphy <robin.murphy@arm.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jiri Kosina <trivial@kernel.org>
+Cc:     linux-wireless@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        oss-drivers@netronome.com, nouveau@lists.freedesktop.org,
+        alsa-devel <alsa-devel@alsa-project.org>,
+        dri-devel@lists.freedesktop.org, linux-ide@vger.kernel.org,
+        dm-devel@redhat.com, linux-mtd@lists.infradead.org,
+        linux-i2c@vger.kernel.org, sparclinux@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-rtc@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        dccp@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net,
+        linux-afs@lists.infradead.org, coreteam@netfilter.org,
+        intel-wired-lan@lists.osuosl.org, linux-serial@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
+        Kees Cook <kees.cook@canonical.com>,
+        linux-media@vger.kernel.org, linux-pm@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, linux-sctp@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-nvme@lists.infradead.org,
+        storagedev@microchip.com, ceph-devel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-parisc@vger.kernel.org, netdev@vger.kernel.org,
+        linux-usb@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-mips@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netfilter-devel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        bpf@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        Will Deacon <will@kernel.org>
+Date:   Thu, 10 Sep 2020 21:19:35 -0700
+In-Reply-To: <9372456a-8dcf-2735-57a4-e126aa5df3a6@arm.com>
+References: <e6387578c75736d61b2fe70d9783d91329a97eb4.camel@perches.com>
+         <9372456a-8dcf-2735-57a4-e126aa5df3a6@arm.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.36.4-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200910122248.GA22506@Red>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 10, 2020 at 02:22:48PM +0200, Corentin Labbe wrote:
->
-> I get some md5 error on both A20+BE:
-> alg: ahash: md5 test failed (wrong result) on test vector \"random: psize=129 ksize=0\", cfg=\"random: inplace use_finup nosimd src_divs=[<reimport,nosimd>85.99%@+3999, 5.85%@+30, <reimport>0.96%@+25, <reimport,nosimd>5.9%@+2263, <flush,nosimd>2.11%@+1950] iv_offset=2 key_offset=43\"
-> and A33+BE:
-> [   84.469045] alg: ahash: md5 test failed (wrong result) on test vector \"random: psize=322 ksize=0\", cfg=\"random: inplace may_sleep use_finup src_divs=[<reimport>99.1%@+2668, <reimport>0.88%@alignmask+3630, 0.11%@+3403] iv_offset=33\"
-> +[   84.469074] need:35966fc8 b31ea266 2bf064e9 f20f40ad
-> +[   84.469084] have:e29e4491 f3b6effc fa366691 00e04bd9
+On Thu, 2020-09-10 at 15:21 +0100, Robin Murphy wrote:
+> On 2020-09-09 21:06, Joe Perches wrote:
+> > fallthrough to a separate case/default label break; isn't very readable.
+> > 
+> > Convert pseudo-keyword fallthrough; statements to a simple break; when
+> > the next label is case or default and the only statement in the next
+> > label block is break;
+> > 
+> > Found using:
+> > 
+> > $ grep-2.5.4 -rP --include=*.[ch] -n "fallthrough;(\s*(case\s+\w+|default)\s*:\s*){1,7}break;" *
+> > 
+> > Miscellanea:
+> > 
+> > o Move or coalesce a couple label blocks above a default: block.
+> > 
+> > Signed-off-by: Joe Perches <joe@perches.com>
+> > ---
+> > 
+> > Compiled allyesconfig x86-64 only.
+> > A few files for other arches were not compiled.
+> > 
 > 
-> Thoses errors are random. (1 boot out of 2)
+> [...]
+> > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> > index c192544e874b..743db1abec40 100644
+> > --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> > @@ -3777,7 +3777,7 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
+> >   	switch (FIELD_GET(IDR0_TTF, reg)) {
+> >   	case IDR0_TTF_AARCH32_64:
+> >   		smmu->ias = 40;
+> > -		fallthrough;
+> > +		break;
+> >   	case IDR0_TTF_AARCH64:
+> >   		break;
+> >   	default:
+> 
+> I have to say I don't really agree with the readability argument for 
+> this one - a fallthrough is semantically correct here, since the first 
+> case is a superset of the second. It just happens that anything we would 
+> do for the common subset is implicitly assumed (there are other 
+> potential cases we simply haven't added support for at the moment), thus 
+> the second case is currently empty.
+> This change actively obfuscates that distinction.
 
-Do these really go away without this patch applied? AFAICS the
-generated code should be identical.
+Then perhaps comments should be added to usefully
+describe the mechanisms.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	case IDR0_TTF_AARCH32_64:
+		smmu->ias = 40;
+		fallthrough;	/* and still do the 64 bit processing */
+	case IDR0_TTF_AARCH64:
+		/* Nothing specific yet */
+		break;
+
+> Robin.
+
