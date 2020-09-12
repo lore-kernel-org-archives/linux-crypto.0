@@ -2,160 +2,135 @@ Return-Path: <SRS0=qsSA=CV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 704BFC433E2
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Sep 2020 08:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 596DAC433E2
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Sep 2020 10:05:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C8CC21548
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Sep 2020 08:50:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12074208FE
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Sep 2020 10:05:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ldfJmLVF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725880AbgILIuU (ORCPT
+        id S1725820AbgILKFt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 12 Sep 2020 04:50:20 -0400
-Received: from vmicros1.altlinux.org ([194.107.17.57]:40718 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725833AbgILIuR (ORCPT
+        Sat, 12 Sep 2020 06:05:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37204 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725813AbgILKFr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 12 Sep 2020 04:50:17 -0400
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id 6D69372CA54;
-        Sat, 12 Sep 2020 11:50:13 +0300 (MSK)
-Received: from altlinux.org (sole.flsd.net [185.75.180.6])
-        by imap.altlinux.org (Postfix) with ESMTPSA id 2144F4A4A16;
-        Sat, 12 Sep 2020 11:50:13 +0300 (MSK)
-Date:   Sat, 12 Sep 2020 11:50:13 +0300
-From:   Vitaly Chikunov <vt@altlinux.org>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Howells <dhowells@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Brendan Higgins <brendanhiggins@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Waiman Long <longman@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Tushar Sugandhi <tusharsu@linux.microsoft.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Pascal van Leeuwen <pvanleeuwen@rambus.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keyrings@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org,
-        linux-security-module@vger.kernel.org,
-        Xufeng Zhang <yunbo.xufeng@linux.alibaba.com>,
-        Jia Zhang <zhang.jia@linux.alibaba.com>
-Subject: Re: [PATCH v6 6/8] X.509: support OSCCA certificate parse
-Message-ID: <20200912085013.ugm2azs5xr7iirda@altlinux.org>
-References: <20200903131242.128665-1-tianjia.zhang@linux.alibaba.com>
- <20200903131242.128665-7-tianjia.zhang@linux.alibaba.com>
+        Sat, 12 Sep 2020 06:05:47 -0400
+Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1703C061573
+        for <linux-crypto@vger.kernel.org>; Sat, 12 Sep 2020 03:05:46 -0700 (PDT)
+Received: by mail-wm1-x344.google.com with SMTP id l9so6905572wme.3
+        for <linux-crypto@vger.kernel.org>; Sat, 12 Sep 2020 03:05:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=90YY4GCj9MCnBhlZ4jV2qidPe5U41jo2zEaDvX7aM4Q=;
+        b=ldfJmLVFOGl4H3Z8v/CWbsGSr1VumYHgra/HDUsYfeWMXnuf7uYtH0f8Lq047aB+NI
+         7HM7plddd3nNxPqCML41L+EMFONmrcwBZ5q9eG6gfloMnThSgprmRUAWWqxBR8zAPowK
+         lKF8DuZZe6mYh2UrsjUvLGOeGvKk7gqkTEUJ7/0nn6+BVO9Uu+/Xf2jyWRBh1mK6l6WK
+         HWgwT5/nFWwbOr+/hQi/3K5dHIH7V4bzpDOFuEFoFySScVWSpF+uo56xpNe2LDhv8wZ0
+         HaBXASFKfJs0zqI0JY/Z8ttPggJxLjOhPd67e5rtiS0LYPVXMF0czG/k5xkRajOHxDJA
+         vyKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=90YY4GCj9MCnBhlZ4jV2qidPe5U41jo2zEaDvX7aM4Q=;
+        b=LVsxn//ZyBNaIqWlRshSyz2aJww8iwZoG/9qfLGgDukuvGh69xXVS745S71nPYVJZI
+         rNHosvlGRKjWXx7BZroFmn7Z8acV2NzlJpRsVw26DhyHg5B8DCs0bJ/4QTZIBd6n7O9w
+         wSQqC8NYbzpHXbt5ypX3/2j2kbVpF6rXswZgOMCQa1yl+oVwbFFbX2dwURZSBTpbwX9z
+         g/tsWFV7VdF5ZF3MknktA7uHZc8YcADkrBVTTQPC/9p5uLJ6WOruGHMi3PI8gSjLRn0m
+         OEOaopBRNC0NQgqvy4M/YH1QQ1EBa7vKtP5CRRy9QXoDTdPTMNhFS8VjqsnzPQf3/DGG
+         IWJQ==
+X-Gm-Message-State: AOAM531ckGWIrbZ6vTBiRQvpuwMk9ZK/xvTHLAuBwX4wHrF+5G5KoN/u
+        p1NihFKbmjgpCWCfgwqx404=
+X-Google-Smtp-Source: ABdhPJyDSYSL38ztFT/ifkvFTAaj69PVwgFWPuQ3uh4U3wXSLEJZqcgtFocTHkqjd3xwrhX28BgaTw==
+X-Received: by 2002:a05:600c:2118:: with SMTP id u24mr6126485wml.59.1599905143839;
+        Sat, 12 Sep 2020 03:05:43 -0700 (PDT)
+Received: from [192.168.8.102] (37-48-59-155.nat.epc.tmcz.cz. [37.48.59.155])
+        by smtp.gmail.com with ESMTPSA id b187sm9154522wmb.8.2020.09.12.03.05.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 12 Sep 2020 03:05:42 -0700 (PDT)
+Subject: Re: [PATCH] crypto: mark unused ciphers as obsolete
+To:     Ard Biesheuvel <ardb@kernel.org>,
+        "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>, dm-devel@redhat.com
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>
+References: <20200911141103.14832-1-ardb@kernel.org>
+ <CY4PR0401MB3652AD749C06D0ACD9F085F3C3240@CY4PR0401MB3652.namprd04.prod.outlook.com>
+ <CAMj1kXHOrGoGv6Tse9Vju9mTV_+ks8cUMqx_iSQHPfc+2DVkmw@mail.gmail.com>
+From:   Milan Broz <gmazyland@gmail.com>
+Message-ID: <ddbf295b-1e02-6553-0d78-5543923ba100@gmail.com>
+Date:   Sat, 12 Sep 2020 12:05:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Content-Disposition: inline
-In-Reply-To: <20200903131242.128665-7-tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <CAMj1kXHOrGoGv6Tse9Vju9mTV_+ks8cUMqx_iSQHPfc+2DVkmw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 03, 2020 at 09:12:40PM +0800, Tianjia Zhang wrote:
-> The digital certificate format based on SM2 crypto algorithm as
-> specified in GM/T 0015-2012. It was published by State Encryption
-> Management Bureau, China.
+On 11/09/2020 18:30, Ard Biesheuvel wrote:
+> (cc Milan and dm-devel)
 > 
-> This patch adds the OID object identifier defined by OSCCA. The
-> x509 certificate supports sm2-with-sm3 type certificate parsing.
-> It uses the standard elliptic curve public key, and the sm2
-> algorithm signs the hash generated by sm3.
+> On Fri, 11 Sep 2020 at 19:24, Van Leeuwen, Pascal
+> <pvanleeuwen@rambus.com> wrote:
+>>
+>>> -----Original Message-----
+>>> From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.kernel.org> On Behalf Of Ard Biesheuvel
+>>> Sent: Friday, September 11, 2020 4:11 PM
+>>> To: linux-crypto@vger.kernel.org
+>>> Cc: herbert@gondor.apana.org.au; ebiggers@kernel.org; Ard Biesheuvel <ardb@kernel.org>
+>>> Subject: [PATCH] crypto: mark unused ciphers as obsolete
+>>>
+>>> <<< External Email >>>
+>>> We have a few interesting pieces in our cipher museum, which are never
+>>> used internally, and were only ever provided as generic C implementations.
+>>>
+>>> Unfortunately, we cannot simply remove this code, as we cannot be sure
+>>> that it is not being used via the AF_ALG socket API, however unlikely.
+>>> So let's mark the Anubis, Khazad, SEED and TEA algorithms as obsolete,
+>>>
+>> Wouldn't the IKE deamon be able to utilize these algorithms through the XFRM API?
+>> I'm by no means an expert on the subject, but it looks like the cipher template is
+>> provided there directly via XFRM, so it does not need to live in the kernel source.
+>> And I know for a fact that SEED is being used for IPsec (and TLS) in Korea.
+>>
 > 
-> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> Tested-by: Xufeng Zhang <yunbo.xufeng@linux.alibaba.com>
-> ---
->  crypto/asymmetric_keys/x509_cert_parser.c | 14 +++++++++++++-
->  include/linux/oid_registry.h              |  6 ++++++
->  2 files changed, 19 insertions(+), 1 deletion(-)
+> I have been staring at net/xfrm/xfrm_algo.c, and as far as I can tell,
+> algorithms have to be mentioned there in order to be usable. None of
+> the ciphers that this patch touches are listed there or anywhere else
+> in the kernel.
 > 
-> diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-> index 26ec20ef4899..6a8aee22bfd4 100644
-> --- a/crypto/asymmetric_keys/x509_cert_parser.c
-> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> @@ -234,6 +234,10 @@ int x509_note_pkey_algo(void *context, size_t hdrlen,
->  	case OID_gost2012Signature512:
->  		ctx->cert->sig->hash_algo = "streebog512";
->  		goto ecrdsa;
-> +
-> +	case OID_sm2_with_sm3:
-> +		ctx->cert->sig->hash_algo = "sm3";
-> +		goto sm2;
->  	}
->  
->  rsa_pkcs1:
-> @@ -246,6 +250,11 @@ int x509_note_pkey_algo(void *context, size_t hdrlen,
->  	ctx->cert->sig->encoding = "raw";
->  	ctx->algo_oid = ctx->last_oid;
->  	return 0;
-> +sm2:
-> +	ctx->cert->sig->pkey_algo = "sm2";
-> +	ctx->cert->sig->encoding = "raw";
-> +	ctx->algo_oid = ctx->last_oid;
-> +	return 0;
->  }
->  
->  /*
-> @@ -266,7 +275,8 @@ int x509_note_signature(void *context, size_t hdrlen,
->  	}
->  
->  	if (strcmp(ctx->cert->sig->pkey_algo, "rsa") == 0 ||
-> -	    strcmp(ctx->cert->sig->pkey_algo, "ecrdsa") == 0) {
-> +	    strcmp(ctx->cert->sig->pkey_algo, "ecrdsa") == 0 ||
-> +	    strcmp(ctx->cert->sig->pkey_algo, "sm2") == 0) {
->  		/* Discard the BIT STRING metadata */
->  		if (vlen < 1 || *(const u8 *)value != 0)
->  			return -EBADMSG;
-> @@ -456,6 +466,8 @@ int x509_extract_key_data(void *context, size_t hdrlen,
->  	else if (ctx->last_oid == OID_gost2012PKey256 ||
->  		 ctx->last_oid == OID_gost2012PKey512)
->  		ctx->cert->pub->pkey_algo = "ecrdsa";
-> +	else if (ctx->last_oid == OID_id_ecPublicKey)
-> +		ctx->cert->pub->pkey_algo = "sm2";
->  	else
->  		return -ENOPKG;
->  
-> diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
-> index 657d6bf2c064..48fe3133ff39 100644
-> --- a/include/linux/oid_registry.h
-> +++ b/include/linux/oid_registry.h
-> @@ -107,6 +107,12 @@ enum OID {
->  	OID_gostTC26Sign512B,		/* 1.2.643.7.1.2.1.2.2 */
->  	OID_gostTC26Sign512C,		/* 1.2.643.7.1.2.1.2.3 */
->  
-> +	/* OSCCA */
-> +	OID_sm2,			/* 1.2.156.10197.1.301 */
-> +	OID_sm3,			/* 1.2.156.10197.1.401 */
-> +	OID_sm2_with_sm3,		/* 1.2.156.10197.1.501 */
-> +	OID_sm3WithRSAEncryption,	/* 1.2.156.10197.1.504 */
+>> The point being, there are more users to consider beyond "internal" (meaning hard
+>> coded in the kernel source in this context?) and AF_ALG.
+>>
+> 
+> That is a good point, actually, since dm-crypt could be affected here
+> as well, hence the CCs.
+> 
+> Milan (or others): are you aware of any of these ciphers being used
+> for dm-crypt?
 
-OID_sm3WithRSAEncryption identifier is unused and this mode looks not
-implemented. But, this is probably ok for possible future extension.
+Cryptsetup/dm-crypt can use them (talking about Seed, Khazad, Anubis, TEA), but I think
+there is no real use of these.
+(IOW these are used only if someone deliberately uses them - manually specifying on format.)
 
-Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
+For dm-crypt. there should be no big harm if these are marked obsolete.
 
-Thanks,
-
-
-> +
->  	OID__NR
->  };
->  
+Milan
