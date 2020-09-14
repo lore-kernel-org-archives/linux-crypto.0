@@ -7,336 +7,502 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADC78C433E2
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 04:22:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DACD7C433E2
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 04:22:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7920E217BA
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 04:22:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F32B21974
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 04:22:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725995AbgINEW2 (ORCPT
+        id S1725974AbgINEWn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Sep 2020 00:22:28 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:40910 "EHLO fornost.hmeau.com"
+        Mon, 14 Sep 2020 00:22:43 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:40912 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725974AbgINEW0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1725976AbgINEW0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 14 Sep 2020 00:22:26 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kHg0J-0004sJ-SN; Mon, 14 Sep 2020 14:22:13 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 14 Sep 2020 14:22:11 +1000
+        id 1kHg0M-0004sL-9E; Mon, 14 Sep 2020 14:22:15 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 14 Sep 2020 14:22:14 +1000
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Mon, 14 Sep 2020 14:22:11 +1000
-Subject: [PATCH 1/3] crypto: inside-secure - Move priv pointer into safexcel_context
+Date:   Mon, 14 Sep 2020 14:22:14 +1000
+Subject: [PATCH 2/3] crypto: inside-secure - Move ipad/opad into safexcel_context
 References: <20200914042055.GA19691@gondor.apana.org.au>
 To:     kernel test robot <lkp@intel.com>,
         Pascal van Leeuwen <pascalvanl@gmail.com>,
         kbuild-all@lists.01.org, linux-kernel@vger.kernel.org,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Antoine Tenart <antoine.tenart@bootlin.com>
-Message-Id: <E1kHg0J-0004sJ-SN@fornost.hmeau.com>
+Message-Id: <E1kHg0M-0004sL-9E@fornost.hmeau.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch moves the priv pointer into struct safexcel_context
-because both structs that extend safexcel_context have that pointer
-as well.
+As both safexcel_ahash_ctx and safexcel_cipher_ctx contain ipad
+and opad buffers this patch moves them into the common struct
+safexcel_context.  It also adds a union so that they can be accessed
+in the appropriate endian without crazy casts.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- drivers/crypto/inside-secure/safexcel.h        |    1 
- drivers/crypto/inside-secure/safexcel_cipher.c |   42 ++++++++++++-------------
- drivers/crypto/inside-secure/safexcel_hash.c   |   17 ++++------
- 3 files changed, 30 insertions(+), 30 deletions(-)
+ drivers/crypto/inside-secure/safexcel.h        |    9 ++
+ drivers/crypto/inside-secure/safexcel_cipher.c |   20 ++--
+ drivers/crypto/inside-secure/safexcel_hash.c   |  106 ++++++++++++-------------
+ 3 files changed, 72 insertions(+), 63 deletions(-)
 
 diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 7c5fe382d2720..77eb285b335f4 100644
+index 77eb285b335f4..dd095f6622ace 100644
 --- a/drivers/crypto/inside-secure/safexcel.h
 +++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -819,6 +819,7 @@ struct safexcel_context {
- 			     struct crypto_async_request *req, bool *complete,
- 			     int *ret);
- 	struct safexcel_context_record *ctxr;
-+	struct safexcel_crypto_priv *priv;
+@@ -12,7 +12,9 @@
+ #include <crypto/algapi.h>
+ #include <crypto/internal/hash.h>
+ #include <crypto/sha.h>
++#include <crypto/sha3.h>
+ #include <crypto/skcipher.h>
++#include <linux/types.h>
+ 
+ #define EIP197_HIA_VERSION_BE			0xca35
+ #define EIP197_HIA_VERSION_LE			0x35ca
+@@ -822,6 +824,13 @@ struct safexcel_context {
+ 	struct safexcel_crypto_priv *priv;
  	dma_addr_t ctxr_dma;
  
++	union {
++		__le32 le[SHA3_512_BLOCK_SIZE / 4];
++		__be32 be[SHA3_512_BLOCK_SIZE / 4];
++		u32 word[SHA3_512_BLOCK_SIZE / 4];
++		u8 byte[SHA3_512_BLOCK_SIZE];
++	} ipad, opad;
++
  	int ring;
+ 	bool needs_inv;
+ 	bool exit_inv;
 diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 1ac3253b7903a..052df0da02f47 100644
+index 052df0da02f47..d0cfdbb144a3a 100644
 --- a/drivers/crypto/inside-secure/safexcel_cipher.c
 +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -375,7 +375,7 @@ static int safexcel_skcipher_aes_setkey(struct crypto_skcipher *ctfm,
- {
- 	struct crypto_tfm *tfm = crypto_skcipher_tfm(ctfm);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	struct crypto_aes_ctx aes;
- 	int ret, i;
+@@ -61,8 +61,6 @@ struct safexcel_cipher_ctx {
+ 	/* All the below is AEAD specific */
+ 	u32 hash_alg;
+ 	u32 state_sz;
+-	__be32 ipad[SHA512_DIGEST_SIZE / sizeof(u32)];
+-	__be32 opad[SHA512_DIGEST_SIZE / sizeof(u32)];
  
-@@ -407,7 +407,7 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
- 	struct crypto_tfm *tfm = crypto_aead_tfm(ctfm);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct safexcel_ahash_export_state istate, ostate;
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	struct crypto_authenc_keys keys;
- 	struct crypto_aes_ctx aes;
- 	int err = -EINVAL, i;
-@@ -525,7 +525,7 @@ static int safexcel_context_control(struct safexcel_cipher_ctx *ctx,
- 				    struct safexcel_cipher_req *sreq,
- 				    struct safexcel_command_desc *cdesc)
- {
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	int ctrl_size = ctx->key_len / sizeof(u32);
+ 	struct crypto_cipher *hkaes;
+ 	struct crypto_aead *fback;
+@@ -500,8 +498,8 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
+ 	}
  
- 	cdesc->control_data.control1 = ctx->mode;
-@@ -692,7 +692,7 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
- 	struct skcipher_request *areq = skcipher_request_cast(base);
- 	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(areq);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(base->tfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	struct safexcel_command_desc *cdesc;
- 	struct safexcel_command_desc *first_cdesc = NULL;
- 	struct safexcel_result_desc *rdesc, *first_rdesc = NULL;
-@@ -1020,7 +1020,7 @@ static int safexcel_cipher_send_inv(struct crypto_async_request *base,
- 				    int ring, int *commands, int *results)
- {
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(base->tfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	int ret;
+ 	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma &&
+-	    (memcmp(ctx->ipad, istate.state, ctx->state_sz) ||
+-	     memcmp(ctx->opad, ostate.state, ctx->state_sz)))
++	    (memcmp(&ctx->base.ipad, istate.state, ctx->state_sz) ||
++	     memcmp(&ctx->base.opad, ostate.state, ctx->state_sz)))
+ 		ctx->base.needs_inv = true;
  
- 	ret = safexcel_invalidate_cache(base, priv, ctx->base.ctxr_dma, ring);
-@@ -1039,7 +1039,7 @@ static int safexcel_skcipher_send(struct crypto_async_request *async, int ring,
- 	struct skcipher_request *req = skcipher_request_cast(async);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
- 	struct safexcel_cipher_req *sreq = skcipher_request_ctx(req);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	int ret;
+ 	/* Now copy the keys into the context */
+@@ -509,8 +507,8 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
+ 		ctx->key[i] = cpu_to_le32(((u32 *)keys.enckey)[i]);
+ 	ctx->key_len = keys.enckeylen;
  
- 	BUG_ON(!(priv->flags & EIP197_TRC_CACHE) && sreq->needs_inv);
-@@ -1072,7 +1072,7 @@ static int safexcel_aead_send(struct crypto_async_request *async, int ring,
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
- 	struct safexcel_cipher_req *sreq = aead_request_ctx(req);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	int ret;
+-	memcpy(ctx->ipad, &istate.state, ctx->state_sz);
+-	memcpy(ctx->opad, &ostate.state, ctx->state_sz);
++	memcpy(&ctx->base.ipad, &istate.state, ctx->state_sz);
++	memcpy(&ctx->base.opad, &ostate.state, ctx->state_sz);
  
- 	BUG_ON(!(priv->flags & EIP197_TRC_CACHE) && sreq->needs_inv);
-@@ -1094,7 +1094,7 @@ static int safexcel_cipher_exit_inv(struct crypto_tfm *tfm,
- 				    struct safexcel_inv_result *result)
- {
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	int ring = ctx->base.ring;
+ 	memzero_explicit(&keys, sizeof(keys));
+ 	return 0;
+@@ -718,10 +716,10 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
+ 			totlen_dst += digestsize;
  
- 	init_completion(&result->completion);
-@@ -1157,7 +1157,7 @@ static int safexcel_queue_req(struct crypto_async_request *base,
- 			enum safexcel_cipher_direction dir)
- {
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(base->tfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	int ret, ring;
+ 		memcpy(ctx->base.ctxr->data + ctx->key_len / sizeof(u32),
+-		       ctx->ipad, ctx->state_sz);
++		       &ctx->base.ipad, ctx->state_sz);
+ 		if (!ctx->xcm)
+ 			memcpy(ctx->base.ctxr->data + (ctx->key_len +
+-			       ctx->state_sz) / sizeof(u32), ctx->opad,
++			       ctx->state_sz) / sizeof(u32), &ctx->base.opad,
+ 			       ctx->state_sz);
+ 	} else if ((ctx->mode == CONTEXT_CONTROL_CRYPTO_MODE_CBC) &&
+ 		   (sreq->direction == SAFEXCEL_DECRYPT)) {
+@@ -2618,7 +2616,7 @@ static int safexcel_aead_gcm_setkey(struct crypto_aead *ctfm, const u8 *key,
  
- 	sreq->needs_inv = false;
-@@ -1211,7 +1211,7 @@ static int safexcel_skcipher_cra_init(struct crypto_tfm *tfm)
- 	crypto_skcipher_set_reqsize(__crypto_skcipher_cast(tfm),
- 				    sizeof(struct safexcel_cipher_req));
+ 	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma) {
+ 		for (i = 0; i < AES_BLOCK_SIZE / sizeof(u32); i++) {
+-			if (be32_to_cpu(ctx->ipad[i]) != hashkey[i]) {
++			if (be32_to_cpu(ctx->base.ipad.be[i]) != hashkey[i]) {
+ 				ctx->base.needs_inv = true;
+ 				break;
+ 			}
+@@ -2626,7 +2624,7 @@ static int safexcel_aead_gcm_setkey(struct crypto_aead *ctfm, const u8 *key,
+ 	}
  
--	ctx->priv = tmpl->priv;
-+	ctx->base.priv = tmpl->priv;
+ 	for (i = 0; i < AES_BLOCK_SIZE / sizeof(u32); i++)
+-		ctx->ipad[i] = cpu_to_be32(hashkey[i]);
++		ctx->base.ipad.be[i] = cpu_to_be32(hashkey[i]);
  
- 	ctx->base.send = safexcel_skcipher_send;
- 	ctx->base.handle_result = safexcel_skcipher_handle_result;
-@@ -1237,7 +1237,7 @@ static int safexcel_cipher_cra_exit(struct crypto_tfm *tfm)
- static void safexcel_skcipher_cra_exit(struct crypto_tfm *tfm)
- {
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	int ret;
+ 	memzero_explicit(hashkey, AES_BLOCK_SIZE);
+ 	memzero_explicit(&aes, sizeof(aes));
+@@ -2714,7 +2712,7 @@ static int safexcel_aead_ccm_setkey(struct crypto_aead *ctfm, const u8 *key,
  
- 	if (safexcel_cipher_cra_exit(tfm))
-@@ -1257,7 +1257,7 @@ static void safexcel_skcipher_cra_exit(struct crypto_tfm *tfm)
- static void safexcel_aead_cra_exit(struct crypto_tfm *tfm)
- {
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	int ret;
+ 	for (i = 0; i < len / sizeof(u32); i++) {
+ 		ctx->key[i] = cpu_to_le32(aes.key_enc[i]);
+-		ctx->ipad[i + 2 * AES_BLOCK_SIZE / sizeof(u32)] =
++		ctx->base.ipad.be[i + 2 * AES_BLOCK_SIZE / sizeof(u32)] =
+ 			cpu_to_be32(aes.key_enc[i]);
+ 	}
  
- 	if (safexcel_cipher_cra_exit(tfm))
-@@ -1431,7 +1431,7 @@ static int safexcel_skcipher_aesctr_setkey(struct crypto_skcipher *ctfm,
- {
- 	struct crypto_tfm *tfm = crypto_skcipher_tfm(ctfm);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	struct crypto_aes_ctx aes;
- 	int ret, i;
- 	unsigned int keylen;
-@@ -1505,7 +1505,7 @@ static int safexcel_des_setkey(struct crypto_skcipher *ctfm, const u8 *key,
- 			       unsigned int len)
- {
- 	struct safexcel_cipher_ctx *ctx = crypto_skcipher_ctx(ctfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	int ret;
- 
- 	ret = verify_skcipher_des_key(ctfm, key);
-@@ -1604,7 +1604,7 @@ static int safexcel_des3_ede_setkey(struct crypto_skcipher *ctfm,
- 				   const u8 *key, unsigned int len)
- {
- 	struct safexcel_cipher_ctx *ctx = crypto_skcipher_ctx(ctfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	int err;
- 
- 	err = verify_skcipher_des3_key(ctfm, key);
-@@ -1723,7 +1723,7 @@ static int safexcel_aead_cra_init(struct crypto_tfm *tfm)
- 	crypto_aead_set_reqsize(__crypto_aead_cast(tfm),
- 				sizeof(struct safexcel_cipher_req));
- 
--	ctx->priv = tmpl->priv;
-+	ctx->base.priv = tmpl->priv;
- 
- 	ctx->alg  = SAFEXCEL_AES; /* default */
- 	ctx->blocksz = AES_BLOCK_SIZE;
-@@ -2466,7 +2466,7 @@ static int safexcel_skcipher_aesxts_setkey(struct crypto_skcipher *ctfm,
- {
- 	struct crypto_tfm *tfm = crypto_skcipher_tfm(ctfm);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	struct crypto_aes_ctx aes;
- 	int ret, i;
- 	unsigned int keylen;
-@@ -2580,7 +2580,7 @@ static int safexcel_aead_gcm_setkey(struct crypto_aead *ctfm, const u8 *key,
- {
- 	struct crypto_tfm *tfm = crypto_aead_tfm(ctfm);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	struct crypto_aes_ctx aes;
- 	u32 hashkey[AES_BLOCK_SIZE >> 2];
- 	int ret, i;
-@@ -2693,7 +2693,7 @@ static int safexcel_aead_ccm_setkey(struct crypto_aead *ctfm, const u8 *key,
- {
- 	struct crypto_tfm *tfm = crypto_aead_tfm(ctfm);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	struct crypto_aes_ctx aes;
- 	int ret, i;
- 
-@@ -2815,7 +2815,7 @@ struct safexcel_alg_template safexcel_alg_ccm = {
- static void safexcel_chacha20_setkey(struct safexcel_cipher_ctx *ctx,
- 				     const u8 *key)
- {
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 
- 	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma)
- 		if (memcmp(ctx->key, key, CHACHA_KEY_SIZE))
-@@ -3084,7 +3084,7 @@ static int safexcel_skcipher_sm4_setkey(struct crypto_skcipher *ctfm,
- {
- 	struct crypto_tfm *tfm = crypto_skcipher_tfm(ctfm);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 
- 	if (len != SM4_KEY_SIZE)
- 		return -EINVAL;
 diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 16a467969d8ed..cdedd7976f26b 100644
+index cdedd7976f26b..1711ccfc5d36d 100644
 --- a/drivers/crypto/inside-secure/safexcel_hash.c
 +++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -20,7 +20,6 @@
+@@ -28,9 +28,6 @@ struct safexcel_ahash_ctx {
+ 	bool fb_init_done;
+ 	bool fb_do_setkey;
  
- struct safexcel_ahash_ctx {
- 	struct safexcel_context base;
--	struct safexcel_crypto_priv *priv;
+-	__le32 ipad[SHA3_512_BLOCK_SIZE / sizeof(__le32)];
+-	__le32 opad[SHA3_512_BLOCK_SIZE / sizeof(__le32)];
+-
+ 	struct crypto_cipher *kaes;
+ 	struct crypto_ahash *fback;
+ 	struct crypto_shash *shpre;
+@@ -123,7 +120,7 @@ static void safexcel_context_control(struct safexcel_ahash_ctx *ctx,
+ 	 */
+ 	if (unlikely(req->digest == CONTEXT_CONTROL_DIGEST_XCM)) {
+ 		if (req->xcbcmac)
+-			memcpy(ctx->base.ctxr->data, ctx->ipad, ctx->key_sz);
++			memcpy(ctx->base.ctxr->data, &ctx->base.ipad, ctx->key_sz);
+ 		else
+ 			memcpy(ctx->base.ctxr->data, req->state, req->state_sz);
  
- 	u32 alg;
- 	u8  key_sz;
-@@ -111,7 +110,7 @@ static void safexcel_context_control(struct safexcel_ahash_ctx *ctx,
- 				     struct safexcel_ahash_req *req,
- 				     struct safexcel_command_desc *cdesc)
- {
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	u64 count = 0;
+@@ -205,7 +202,7 @@ static void safexcel_context_control(struct safexcel_ahash_ctx *ctx,
+ 		} else { /* HMAC */
+ 			/* Need outer digest for HMAC finalization */
+ 			memcpy(ctx->base.ctxr->data + (req->state_sz >> 2),
+-			       ctx->opad, req->state_sz);
++			       &ctx->base.opad, req->state_sz);
  
- 	cdesc->control_data.control0 = ctx->alg;
-@@ -316,7 +315,7 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
- 	struct ahash_request *areq = ahash_request_cast(async);
- 	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
- 	struct safexcel_ahash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(areq));
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	struct safexcel_command_desc *cdesc, *first_cdesc = NULL;
- 	struct safexcel_result_desc *rdesc;
- 	struct scatterlist *sg;
-@@ -591,7 +590,7 @@ static int safexcel_ahash_send_inv(struct crypto_async_request *async,
- 	struct safexcel_ahash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(areq));
- 	int ret;
+ 			/* Single pass HMAC - no digest count */
+ 			cdesc->control_data.control0 |=
+@@ -274,7 +271,7 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv,
+ 			memcpy(sreq->cache, sreq->state,
+ 			       crypto_ahash_digestsize(ahash));
  
--	ret = safexcel_invalidate_cache(async, ctx->priv,
-+	ret = safexcel_invalidate_cache(async, ctx->base.priv,
- 					ctx->base.ctxr_dma, ring);
- 	if (unlikely(ret))
+-			memcpy(sreq->state, ctx->opad, sreq->digest_sz);
++			memcpy(sreq->state, &ctx->base.opad, sreq->digest_sz);
+ 
+ 			sreq->len = sreq->block_sz +
+ 				    crypto_ahash_digestsize(ahash);
+@@ -378,10 +375,14 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
+ 				// 10- padding for XCBCMAC & CMAC
+ 				req->cache[cache_len + skip] = 0x80;
+ 				// HW will use K2 iso K3 - compensate!
+-				for (i = 0; i < AES_BLOCK_SIZE / sizeof(u32); i++)
+-					((__be32 *)req->cache)[i] ^=
+-					  cpu_to_be32(le32_to_cpu(
+-					    ctx->ipad[i] ^ ctx->ipad[i + 4]));
++				for (i = 0; i < AES_BLOCK_SIZE / 4; i++) {
++					u32 *cache = (void *)req->cache;
++					u32 *ipad = ctx->base.ipad.word;
++					u32 x;
++
++					x = ipad[i] ^ ipad[i + 4];
++					cache[i] ^= swab(x);
++				}
+ 			}
+ 			cache_len = AES_BLOCK_SIZE;
+ 			queued = queued + extra;
+@@ -701,7 +702,7 @@ static int safexcel_ahash_enqueue(struct ahash_request *areq)
+ 		     /* invalidate for HMAC finish with odigest changed */
+ 		     (req->finish && req->hmac &&
+ 		      memcmp(ctx->base.ctxr->data + (req->state_sz>>2),
+-			     ctx->opad, req->state_sz))))
++			     &ctx->base.opad, req->state_sz))))
+ 			/*
+ 			 * We're still setting needs_inv here, even though it is
+ 			 * cleared right away, because the needs_inv flag can be
+@@ -802,7 +803,7 @@ static int safexcel_ahash_final(struct ahash_request *areq)
+ 			    ctx->alg == CONTEXT_CONTROL_CRYPTO_ALG_MD5 &&
+ 			    req->len == sizeof(u32) && !areq->nbytes)) {
+ 		/* Zero length CRC32 */
+-		memcpy(areq->result, ctx->ipad, sizeof(u32));
++		memcpy(areq->result, &ctx->base.ipad, sizeof(u32));
+ 		return 0;
+ 	} else if (unlikely(ctx->cbcmac && req->len == AES_BLOCK_SIZE &&
+ 			    !areq->nbytes)) {
+@@ -814,9 +815,12 @@ static int safexcel_ahash_final(struct ahash_request *areq)
+ 		/* Zero length (X)CBC/CMAC */
+ 		int i;
+ 
+-		for (i = 0; i < AES_BLOCK_SIZE / sizeof(u32); i++)
+-			((__be32 *)areq->result)[i] =
+-				cpu_to_be32(le32_to_cpu(ctx->ipad[i + 4]));//K3
++		for (i = 0; i < AES_BLOCK_SIZE / sizeof(u32); i++) {
++			u32 *result = (void *)areq->result;
++
++			/* K3 */
++			result[i] = swab(ctx->base.ipad.word[i + 4]);
++		}
+ 		areq->result[0] ^= 0x80;			// 10- padding
+ 		crypto_cipher_encrypt_one(ctx->kaes, areq->result, areq->result);
+ 		return 0;
+@@ -1011,7 +1015,7 @@ static int safexcel_hmac_sha1_init(struct ahash_request *areq)
+ 	memset(req, 0, sizeof(*req));
+ 
+ 	/* Start from ipad precompute */
+-	memcpy(req->state, ctx->ipad, SHA1_DIGEST_SIZE);
++	memcpy(req->state, &ctx->base.ipad, SHA1_DIGEST_SIZE);
+ 	/* Already processed the key^ipad part now! */
+ 	req->len	= SHA1_BLOCK_SIZE;
+ 	req->processed	= SHA1_BLOCK_SIZE;
+@@ -1198,12 +1202,12 @@ static int safexcel_hmac_alg_setkey(struct crypto_ahash *tfm, const u8 *key,
  		return ret;
-@@ -620,7 +619,7 @@ static int safexcel_ahash_send(struct crypto_async_request *async,
- static int safexcel_ahash_exit_inv(struct crypto_tfm *tfm)
- {
- 	struct safexcel_ahash_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	EIP197_REQUEST_ON_STACK(req, ahash, EIP197_AHASH_REQ_SIZE);
- 	struct safexcel_ahash_req *rctx = ahash_request_ctx(req);
- 	struct safexcel_inv_result result = {};
-@@ -688,7 +687,7 @@ static int safexcel_ahash_enqueue(struct ahash_request *areq)
- {
- 	struct safexcel_ahash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(areq));
- 	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	int ret, ring;
  
- 	req->needs_inv = false;
-@@ -917,7 +916,7 @@ static int safexcel_ahash_cra_init(struct crypto_tfm *tfm)
- 		container_of(__crypto_ahash_alg(tfm->__crt_alg),
- 			     struct safexcel_alg_template, alg.ahash);
+ 	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr &&
+-	    (memcmp(ctx->ipad, istate.state, state_sz) ||
+-	     memcmp(ctx->opad, ostate.state, state_sz)))
++	    (memcmp(&ctx->base.ipad, istate.state, state_sz) ||
++	     memcmp(&ctx->base.opad, ostate.state, state_sz)))
+ 		ctx->base.needs_inv = true;
  
--	ctx->priv = tmpl->priv;
-+	ctx->base.priv = tmpl->priv;
- 	ctx->base.send = safexcel_ahash_send;
- 	ctx->base.handle_result = safexcel_handle_result;
- 	ctx->fb_do_setkey = false;
-@@ -956,7 +955,7 @@ static int safexcel_sha1_digest(struct ahash_request *areq)
- static void safexcel_ahash_cra_exit(struct crypto_tfm *tfm)
- {
- 	struct safexcel_ahash_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	int ret;
+-	memcpy(ctx->ipad, &istate.state, state_sz);
+-	memcpy(ctx->opad, &ostate.state, state_sz);
++	memcpy(&ctx->base.ipad, &istate.state, state_sz);
++	memcpy(&ctx->base.opad, &ostate.state, state_sz);
  
- 	/* context not allocated, skip invalidation */
-@@ -1190,7 +1189,7 @@ static int safexcel_hmac_alg_setkey(struct crypto_ahash *tfm, const u8 *key,
- 				    unsigned int state_sz)
- {
- 	struct safexcel_ahash_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
--	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	struct safexcel_ahash_export_state istate, ostate;
- 	int ret;
+ 	return 0;
+ }
+@@ -1376,7 +1380,7 @@ static int safexcel_hmac_sha224_init(struct ahash_request *areq)
+ 	memset(req, 0, sizeof(*req));
  
+ 	/* Start from ipad precompute */
+-	memcpy(req->state, ctx->ipad, SHA256_DIGEST_SIZE);
++	memcpy(req->state, &ctx->base.ipad, SHA256_DIGEST_SIZE);
+ 	/* Already processed the key^ipad part now! */
+ 	req->len	= SHA256_BLOCK_SIZE;
+ 	req->processed	= SHA256_BLOCK_SIZE;
+@@ -1448,7 +1452,7 @@ static int safexcel_hmac_sha256_init(struct ahash_request *areq)
+ 	memset(req, 0, sizeof(*req));
+ 
+ 	/* Start from ipad precompute */
+-	memcpy(req->state, ctx->ipad, SHA256_DIGEST_SIZE);
++	memcpy(req->state, &ctx->base.ipad, SHA256_DIGEST_SIZE);
+ 	/* Already processed the key^ipad part now! */
+ 	req->len	= SHA256_BLOCK_SIZE;
+ 	req->processed	= SHA256_BLOCK_SIZE;
+@@ -1634,7 +1638,7 @@ static int safexcel_hmac_sha512_init(struct ahash_request *areq)
+ 	memset(req, 0, sizeof(*req));
+ 
+ 	/* Start from ipad precompute */
+-	memcpy(req->state, ctx->ipad, SHA512_DIGEST_SIZE);
++	memcpy(req->state, &ctx->base.ipad, SHA512_DIGEST_SIZE);
+ 	/* Already processed the key^ipad part now! */
+ 	req->len	= SHA512_BLOCK_SIZE;
+ 	req->processed	= SHA512_BLOCK_SIZE;
+@@ -1706,7 +1710,7 @@ static int safexcel_hmac_sha384_init(struct ahash_request *areq)
+ 	memset(req, 0, sizeof(*req));
+ 
+ 	/* Start from ipad precompute */
+-	memcpy(req->state, ctx->ipad, SHA512_DIGEST_SIZE);
++	memcpy(req->state, &ctx->base.ipad, SHA512_DIGEST_SIZE);
+ 	/* Already processed the key^ipad part now! */
+ 	req->len	= SHA512_BLOCK_SIZE;
+ 	req->processed	= SHA512_BLOCK_SIZE;
+@@ -1828,7 +1832,7 @@ static int safexcel_hmac_md5_init(struct ahash_request *areq)
+ 	memset(req, 0, sizeof(*req));
+ 
+ 	/* Start from ipad precompute */
+-	memcpy(req->state, ctx->ipad, MD5_DIGEST_SIZE);
++	memcpy(req->state, &ctx->base.ipad, MD5_DIGEST_SIZE);
+ 	/* Already processed the key^ipad part now! */
+ 	req->len	= MD5_HMAC_BLOCK_SIZE;
+ 	req->processed	= MD5_HMAC_BLOCK_SIZE;
+@@ -1899,7 +1903,7 @@ static int safexcel_crc32_cra_init(struct crypto_tfm *tfm)
+ 	int ret = safexcel_ahash_cra_init(tfm);
+ 
+ 	/* Default 'key' is all zeroes */
+-	memset(ctx->ipad, 0, sizeof(u32));
++	memset(&ctx->base.ipad, 0, sizeof(u32));
+ 	return ret;
+ }
+ 
+@@ -1911,7 +1915,7 @@ static int safexcel_crc32_init(struct ahash_request *areq)
+ 	memset(req, 0, sizeof(*req));
+ 
+ 	/* Start from loaded key */
+-	req->state[0]	= (__force __le32)le32_to_cpu(~ctx->ipad[0]);
++	req->state[0]	= cpu_to_le32(~ctx->base.ipad.word[0]);
+ 	/* Set processed to non-zero to enable invalidation detection */
+ 	req->len	= sizeof(u32);
+ 	req->processed	= sizeof(u32);
+@@ -1933,7 +1937,7 @@ static int safexcel_crc32_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 	if (keylen != sizeof(u32))
+ 		return -EINVAL;
+ 
+-	memcpy(ctx->ipad, key, sizeof(u32));
++	memcpy(&ctx->base.ipad, key, sizeof(u32));
+ 	return 0;
+ }
+ 
+@@ -1983,7 +1987,7 @@ static int safexcel_cbcmac_init(struct ahash_request *areq)
+ 	memset(req, 0, sizeof(*req));
+ 
+ 	/* Start from loaded keys */
+-	memcpy(req->state, ctx->ipad, ctx->key_sz);
++	memcpy(req->state, &ctx->base.ipad, ctx->key_sz);
+ 	/* Set processed to non-zero to enable invalidation detection */
+ 	req->len	= AES_BLOCK_SIZE;
+ 	req->processed	= AES_BLOCK_SIZE;
+@@ -2008,9 +2012,9 @@ static int safexcel_cbcmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 	if (ret)
+ 		return ret;
+ 
+-	memset(ctx->ipad, 0, 2 * AES_BLOCK_SIZE);
++	memset(&ctx->base.ipad, 0, 2 * AES_BLOCK_SIZE);
+ 	for (i = 0; i < len / sizeof(u32); i++)
+-		ctx->ipad[i + 8] = (__force __le32)cpu_to_be32(aes.key_enc[i]);
++		ctx->base.ipad.be[i + 8] = cpu_to_be32(aes.key_enc[i]);
+ 
+ 	if (len == AES_KEYSIZE_192) {
+ 		ctx->alg    = CONTEXT_CONTROL_CRYPTO_ALG_XCBC192;
+@@ -2092,8 +2096,7 @@ static int safexcel_xcbcmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 	crypto_cipher_encrypt_one(ctx->kaes, (u8 *)key_tmp + AES_BLOCK_SIZE,
+ 		"\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3\x3");
+ 	for (i = 0; i < 3 * AES_BLOCK_SIZE / sizeof(u32); i++)
+-		ctx->ipad[i] =
+-			cpu_to_le32((__force u32)cpu_to_be32(key_tmp[i]));
++		ctx->base.ipad.word[i] = swab(key_tmp[i]);
+ 
+ 	crypto_cipher_clear_flags(ctx->kaes, CRYPTO_TFM_REQ_MASK);
+ 	crypto_cipher_set_flags(ctx->kaes, crypto_ahash_get_flags(tfm) &
+@@ -2176,8 +2179,7 @@ static int safexcel_cmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 		return ret;
+ 
+ 	for (i = 0; i < len / sizeof(u32); i++)
+-		ctx->ipad[i + 8] =
+-			cpu_to_le32((__force u32)cpu_to_be32(aes.key_enc[i]));
++		ctx->base.ipad.word[i + 8] = swab(aes.key_enc[i]);
+ 
+ 	/* precompute the CMAC key material */
+ 	crypto_cipher_clear_flags(ctx->kaes, CRYPTO_TFM_REQ_MASK);
+@@ -2208,7 +2210,7 @@ static int safexcel_cmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 	/* end of code borrowed from crypto/cmac.c */
+ 
+ 	for (i = 0; i < 2 * AES_BLOCK_SIZE / sizeof(u32); i++)
+-		ctx->ipad[i] = (__force __le32)cpu_to_be32(((u32 *)consts)[i]);
++		ctx->base.ipad.be[i] = cpu_to_be32(((u32 *)consts)[i]);
+ 
+ 	if (len == AES_KEYSIZE_192) {
+ 		ctx->alg    = CONTEXT_CONTROL_CRYPTO_ALG_XCBC192;
+@@ -2330,7 +2332,7 @@ static int safexcel_hmac_sm3_init(struct ahash_request *areq)
+ 	memset(req, 0, sizeof(*req));
+ 
+ 	/* Start from ipad precompute */
+-	memcpy(req->state, ctx->ipad, SM3_DIGEST_SIZE);
++	memcpy(req->state, &ctx->base.ipad, SM3_DIGEST_SIZE);
+ 	/* Already processed the key^ipad part now! */
+ 	req->len	= SM3_BLOCK_SIZE;
+ 	req->processed	= SM3_BLOCK_SIZE;
+@@ -2423,11 +2425,11 @@ static int safexcel_sha3_fbcheck(struct ahash_request *req)
+ 				/* Set fallback cipher HMAC key */
+ 				u8 key[SHA3_224_BLOCK_SIZE];
+ 
+-				memcpy(key, ctx->ipad,
++				memcpy(key, &ctx->base.ipad,
+ 				       crypto_ahash_blocksize(ctx->fback) / 2);
+ 				memcpy(key +
+ 				       crypto_ahash_blocksize(ctx->fback) / 2,
+-				       ctx->opad,
++				       &ctx->base.opad,
+ 				       crypto_ahash_blocksize(ctx->fback) / 2);
+ 				ret = crypto_ahash_setkey(ctx->fback, key,
+ 					crypto_ahash_blocksize(ctx->fback));
+@@ -2800,7 +2802,7 @@ static int safexcel_hmac_sha3_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 		 * first using our fallback cipher
+ 		 */
+ 		ret = crypto_shash_digest(ctx->shdesc, key, keylen,
+-					  (u8 *)ctx->ipad);
++					  ctx->base.ipad.byte);
+ 		keylen = crypto_shash_digestsize(ctx->shpre);
+ 
+ 		/*
+@@ -2809,8 +2811,8 @@ static int safexcel_hmac_sha3_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 		 */
+ 		if (keylen > crypto_ahash_blocksize(tfm) / 2)
+ 			/* Buffers overlap, need to use memmove iso memcpy! */
+-			memmove(ctx->opad,
+-				(u8 *)ctx->ipad +
++			memmove(&ctx->base.opad,
++				ctx->base.ipad.byte +
+ 					crypto_ahash_blocksize(tfm) / 2,
+ 				keylen - crypto_ahash_blocksize(tfm) / 2);
+ 	} else {
+@@ -2820,11 +2822,11 @@ static int safexcel_hmac_sha3_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 		 * to match the existing HMAC driver infrastructure.
+ 		 */
+ 		if (keylen <= crypto_ahash_blocksize(tfm) / 2) {
+-			memcpy(ctx->ipad, key, keylen);
++			memcpy(&ctx->base.ipad, key, keylen);
+ 		} else {
+-			memcpy(ctx->ipad, key,
++			memcpy(&ctx->base.ipad, key,
+ 			       crypto_ahash_blocksize(tfm) / 2);
+-			memcpy(ctx->opad,
++			memcpy(&ctx->base.opad,
+ 			       key + crypto_ahash_blocksize(tfm) / 2,
+ 			       keylen - crypto_ahash_blocksize(tfm) / 2);
+ 		}
+@@ -2832,11 +2834,11 @@ static int safexcel_hmac_sha3_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 
+ 	/* Pad key with zeroes */
+ 	if (keylen <= crypto_ahash_blocksize(tfm) / 2) {
+-		memset((u8 *)ctx->ipad + keylen, 0,
++		memset(ctx->base.ipad.byte + keylen, 0,
+ 		       crypto_ahash_blocksize(tfm) / 2 - keylen);
+-		memset(ctx->opad, 0, crypto_ahash_blocksize(tfm) / 2);
++		memset(&ctx->base.opad, 0, crypto_ahash_blocksize(tfm) / 2);
+ 	} else {
+-		memset((u8 *)ctx->opad + keylen -
++		memset(ctx->base.opad.byte + keylen -
+ 		       crypto_ahash_blocksize(tfm) / 2, 0,
+ 		       crypto_ahash_blocksize(tfm) - keylen);
+ 	}
+@@ -2855,7 +2857,7 @@ static int safexcel_hmac_sha3_224_init(struct ahash_request *areq)
+ 	memset(req, 0, sizeof(*req));
+ 
+ 	/* Copy (half of) the key */
+-	memcpy(req->state, ctx->ipad, SHA3_224_BLOCK_SIZE / 2);
++	memcpy(req->state, &ctx->base.ipad, SHA3_224_BLOCK_SIZE / 2);
+ 	/* Start of HMAC should have len == processed == blocksize */
+ 	req->len	= SHA3_224_BLOCK_SIZE;
+ 	req->processed	= SHA3_224_BLOCK_SIZE;
+@@ -2926,7 +2928,7 @@ static int safexcel_hmac_sha3_256_init(struct ahash_request *areq)
+ 	memset(req, 0, sizeof(*req));
+ 
+ 	/* Copy (half of) the key */
+-	memcpy(req->state, ctx->ipad, SHA3_256_BLOCK_SIZE / 2);
++	memcpy(req->state, &ctx->base.ipad, SHA3_256_BLOCK_SIZE / 2);
+ 	/* Start of HMAC should have len == processed == blocksize */
+ 	req->len	= SHA3_256_BLOCK_SIZE;
+ 	req->processed	= SHA3_256_BLOCK_SIZE;
+@@ -2997,7 +2999,7 @@ static int safexcel_hmac_sha3_384_init(struct ahash_request *areq)
+ 	memset(req, 0, sizeof(*req));
+ 
+ 	/* Copy (half of) the key */
+-	memcpy(req->state, ctx->ipad, SHA3_384_BLOCK_SIZE / 2);
++	memcpy(req->state, &ctx->base.ipad, SHA3_384_BLOCK_SIZE / 2);
+ 	/* Start of HMAC should have len == processed == blocksize */
+ 	req->len	= SHA3_384_BLOCK_SIZE;
+ 	req->processed	= SHA3_384_BLOCK_SIZE;
+@@ -3068,7 +3070,7 @@ static int safexcel_hmac_sha3_512_init(struct ahash_request *areq)
+ 	memset(req, 0, sizeof(*req));
+ 
+ 	/* Copy (half of) the key */
+-	memcpy(req->state, ctx->ipad, SHA3_512_BLOCK_SIZE / 2);
++	memcpy(req->state, &ctx->base.ipad, SHA3_512_BLOCK_SIZE / 2);
+ 	/* Start of HMAC should have len == processed == blocksize */
+ 	req->len	= SHA3_512_BLOCK_SIZE;
+ 	req->processed	= SHA3_512_BLOCK_SIZE;
