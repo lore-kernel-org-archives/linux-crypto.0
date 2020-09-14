@@ -2,96 +2,103 @@ Return-Path: <SRS0=QXJz=CX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA296C2BC11
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 07:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C14B4C43461
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 07:45:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE82522206
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 07:06:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F95B207C3
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 07:45:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jYUciHsl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726063AbgINHEr (ORCPT
+        id S1726046AbgINHpv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Sep 2020 03:04:47 -0400
-Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:39025 "EHLO
-        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726042AbgINHEp (ORCPT
+        Mon, 14 Sep 2020 03:45:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60000 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726020AbgINHpu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Sep 2020 03:04:45 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R391e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=30;SR=0;TI=SMTPD_---0U8qdePo_1600067075;
-Received: from B-455UMD6M-2027.local(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U8qdePo_1600067075)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 14 Sep 2020 15:04:37 +0800
-Subject: Re: [PATCH v6 0/8] crpyto: introduce OSCCA certificate and SM2
- asymmetric algorithm
+        Mon, 14 Sep 2020 03:45:50 -0400
+Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA4E9C06174A;
+        Mon, 14 Sep 2020 00:45:49 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id g4so17544648wrs.5;
+        Mon, 14 Sep 2020 00:45:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=3R77E9EeU0q3+YiyfWBGCJYkWETSW8Cgd6Iyt7BfdgE=;
+        b=jYUciHslOoIXrMwFXOQv4b5M8AsToUU8/l5vkYm2QT5xAu7sNR6sNZDK2205SNQZrV
+         i7WYk4nuem/SEOwPVmXPm0SHMFfrmuvJlSU1WaUtyssLaCqbqn6e+SDkrOuU3w4i4B7S
+         Mjh5wGmMZZRgBaOEFd3h55RXeIYCw++8imnge28YULTYKgpTZTyI80KGfGVhn5hIYqC0
+         zVp24Mv4Rucev2EhqWJLlzIpK31pOlRlhMUah31fJ7uBDWG7qVd6uePxhfTo+JzoyaMr
+         nb1IR8WtkeErSHBMMi4rjew1T0ecfunSMV+SG/UbSevutlK51FcFT/GTW1L3ExRn7B49
+         zUiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=3R77E9EeU0q3+YiyfWBGCJYkWETSW8Cgd6Iyt7BfdgE=;
+        b=HMyDD+789mbkEqV1kaTgu4xCFqNJEbdQRZjyHRSu3HCzNeuq1M1Hg3fg+55ftnqZ7z
+         wPfJcLnSnwx4woISNkkEMwS3yX5rw5SHmknngojzB2REUs2AgczwAVfb0Mqtae4fp6h8
+         c2uaJTxp/8Q20hUQUNrxG2oeaCHDQeGbPln6Yg827N8QJINE91pwLa1/VUq5dhoQgoLf
+         kzNtdBtHvUqBVZPxHCDFe3y4FJbUjqj79NTHn1QIjiiJn0vOPW2rAgSN/47ygAJfsSJt
+         K/qRe2aRD7Pm69tIlIMVGSel3rUCS+FR/4X+8aSqj9MeWz0HIX/uoXY3Y2mcLnOQs9C3
+         oRuw==
+X-Gm-Message-State: AOAM530wt1qeQ8MNeu6VLlH7XyJvdT/VKEoUTsihnPJkIVPiS8B3Xa+Z
+        1Kr6QAxT3JRDFHT7qTviu1Q=
+X-Google-Smtp-Source: ABdhPJzgC1plQU3KLNxPE2pqVjKuloNGrXcm89L8bQcQmJCzuHaT0bS+D6RLsdRdTotZn/LDB2WHrQ==
+X-Received: by 2002:adf:e9c3:: with SMTP id l3mr14261614wrn.63.1600069545827;
+        Mon, 14 Sep 2020 00:45:45 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id y1sm17455186wma.36.2020.09.14.00.45.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Sep 2020 00:45:45 -0700 (PDT)
+Date:   Mon, 14 Sep 2020 09:45:43 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        David Howells <dhowells@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Brendan Higgins <brendanhiggins@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Waiman Long <longman@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Tushar Sugandhi <tusharsu@linux.microsoft.com>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Pascal van Leeuwen <pvanleeuwen@rambus.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keyrings@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org,
-        linux-security-module@vger.kernel.org,
-        Xufeng Zhang <yunbo.xufeng@linux.alibaba.com>,
-        Jia Zhang <zhang.jia@linux.alibaba.com>
-References: <20200903131242.128665-1-tianjia.zhang@linux.alibaba.com>
- <20200911042442.GA5420@gondor.apana.org.au>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <be5f7e28-5645-3923-ceb5-d840e41ad2ed@linux.alibaba.com>
-Date:   Mon, 14 Sep 2020 15:04:35 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.2.2
+Cc:     kernel test robot <lkp@intel.com>, kbuild-all@lists.01.org,
+        linux-kernel@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [v2 PATCH] crypto: sun4i-ss - Fix sparse endianness markers
+Message-ID: <20200914074543.GA8698@Red>
+References: <202009061621.J89kO43Q%lkp@intel.com>
+ <20200907062400.GA15841@gondor.apana.org.au>
+ <20200907160029.GC11894@Red>
+ <20200908050036.GA19817@gondor.apana.org.au>
+ <20200910122248.GA22506@Red>
+ <20200911041354.GA5275@gondor.apana.org.au>
 MIME-Version: 1.0
-In-Reply-To: <20200911042442.GA5420@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200911041354.GA5275@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi，
-
-On 9/11/20 12:24 PM, Herbert Xu wrote:
-> On Thu, Sep 03, 2020 at 09:12:34PM +0800, Tianjia Zhang wrote:
->>
->> ---
->> v6 changes:
->>    1. remove mpi_sub_ui function from mpi library.
->>    2. rebase on mainline.
+On Fri, Sep 11, 2020 at 02:13:55PM +1000, Herbert Xu wrote:
+> On Thu, Sep 10, 2020 at 02:22:48PM +0200, Corentin Labbe wrote:
+> >
+> > I get some md5 error on both A20+BE:
+> > alg: ahash: md5 test failed (wrong result) on test vector \"random: psize=129 ksize=0\", cfg=\"random: inplace use_finup nosimd src_divs=[<reimport,nosimd>85.99%@+3999, 5.85%@+30, <reimport>0.96%@+25, <reimport,nosimd>5.9%@+2263, <flush,nosimd>2.11%@+1950] iv_offset=2 key_offset=43\"
+> > and A33+BE:
+> > [   84.469045] alg: ahash: md5 test failed (wrong result) on test vector \"random: psize=322 ksize=0\", cfg=\"random: inplace may_sleep use_finup src_divs=[<reimport>99.1%@+2668, <reimport>0.88%@alignmask+3630, 0.11%@+3403] iv_offset=33\"
+> > +[   84.469074] need:35966fc8 b31ea266 2bf064e9 f20f40ad
+> > +[   84.469084] have:e29e4491 f3b6effc fa366691 00e04bd9
+> > 
+> > Thoses errors are random. (1 boot out of 2)
 > 
-> This series is still missing acks for patches 6-8.  Without them
-> it cannot proceed.
-> 
-> Thanks,
+> Do these really go away without this patch applied? AFAICS the
+> generated code should be identical.
 > 
 
-This series has some review suggestions for patches 6-8, but the 
-maintainer of asymmetric keys David Howells <dhowells@redhat.com>, I 
-can’t get in touch. The email has been sent successfully. Can you help 
-ping him ?
-
-Thanks and best,
-Tianjia
+It happens without your patch, so your patch is unrelated to this issue.
+You can add:
+Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
