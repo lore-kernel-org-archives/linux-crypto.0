@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C14B4C43461
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 07:45:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94570C433E2
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 10:41:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F95B207C3
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 07:45:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 57722207BB
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 10:41:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jYUciHsl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BInOJyjR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726046AbgINHpv (ORCPT
+        id S1726491AbgINKlY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Sep 2020 03:45:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60000 "EHLO
+        Mon, 14 Sep 2020 06:41:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726020AbgINHpu (ORCPT
+        with ESMTP id S1726474AbgINKlL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Sep 2020 03:45:50 -0400
-Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA4E9C06174A;
-        Mon, 14 Sep 2020 00:45:49 -0700 (PDT)
-Received: by mail-wr1-x442.google.com with SMTP id g4so17544648wrs.5;
-        Mon, 14 Sep 2020 00:45:49 -0700 (PDT)
+        Mon, 14 Sep 2020 06:41:11 -0400
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84CE1C06174A;
+        Mon, 14 Sep 2020 03:41:02 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id m6so18178180wrn.0;
+        Mon, 14 Sep 2020 03:41:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=3R77E9EeU0q3+YiyfWBGCJYkWETSW8Cgd6Iyt7BfdgE=;
-        b=jYUciHslOoIXrMwFXOQv4b5M8AsToUU8/l5vkYm2QT5xAu7sNR6sNZDK2205SNQZrV
-         i7WYk4nuem/SEOwPVmXPm0SHMFfrmuvJlSU1WaUtyssLaCqbqn6e+SDkrOuU3w4i4B7S
-         Mjh5wGmMZZRgBaOEFd3h55RXeIYCw++8imnge28YULTYKgpTZTyI80KGfGVhn5hIYqC0
-         zVp24Mv4Rucev2EhqWJLlzIpK31pOlRlhMUah31fJ7uBDWG7qVd6uePxhfTo+JzoyaMr
-         nb1IR8WtkeErSHBMMi4rjew1T0ecfunSMV+SG/UbSevutlK51FcFT/GTW1L3ExRn7B49
-         zUiA==
+        bh=KK6ppy+gk7UiuxPQUTeMnH2C+XIbYHWEr8o1+X2zUXc=;
+        b=BInOJyjRPk8YQPjXak4SQncm/Rnt8fnKX7KW2tMQ/nQFgfRwbs8qs6TnLWKjquskxH
+         20X3fPs0KriO+DOKwTWqMn8pL5SXBUwuJo+ycG30xuFk6E6mRBuf/aK9XaQYA8k8/Zaj
+         yW1MoQJ2Rq1MI1lrkZ9zin98cM6faweGYrxaMQcUU1wkyTgK35oBPBk49ApYIjm1xdos
+         ANzm54kNz9mYsw+/s3Jlxd3F2qYNuLcqJo+bjt2hw+OUx5BqFOK6U53lq6bc1PSzNhLc
+         0X8sAZ4hjlWhZ2Adyuj3ylvxzsxgEtoHWRFTHvlZvSfJM29zD6p8I7abQHNC8ascpd5j
+         97Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=3R77E9EeU0q3+YiyfWBGCJYkWETSW8Cgd6Iyt7BfdgE=;
-        b=HMyDD+789mbkEqV1kaTgu4xCFqNJEbdQRZjyHRSu3HCzNeuq1M1Hg3fg+55ftnqZ7z
-         wPfJcLnSnwx4woISNkkEMwS3yX5rw5SHmknngojzB2REUs2AgczwAVfb0Mqtae4fp6h8
-         c2uaJTxp/8Q20hUQUNrxG2oeaCHDQeGbPln6Yg827N8QJINE91pwLa1/VUq5dhoQgoLf
-         kzNtdBtHvUqBVZPxHCDFe3y4FJbUjqj79NTHn1QIjiiJn0vOPW2rAgSN/47ygAJfsSJt
-         K/qRe2aRD7Pm69tIlIMVGSel3rUCS+FR/4X+8aSqj9MeWz0HIX/uoXY3Y2mcLnOQs9C3
-         oRuw==
-X-Gm-Message-State: AOAM530wt1qeQ8MNeu6VLlH7XyJvdT/VKEoUTsihnPJkIVPiS8B3Xa+Z
-        1Kr6QAxT3JRDFHT7qTviu1Q=
-X-Google-Smtp-Source: ABdhPJzgC1plQU3KLNxPE2pqVjKuloNGrXcm89L8bQcQmJCzuHaT0bS+D6RLsdRdTotZn/LDB2WHrQ==
-X-Received: by 2002:adf:e9c3:: with SMTP id l3mr14261614wrn.63.1600069545827;
-        Mon, 14 Sep 2020 00:45:45 -0700 (PDT)
+        bh=KK6ppy+gk7UiuxPQUTeMnH2C+XIbYHWEr8o1+X2zUXc=;
+        b=kcggpbOv2LPvJi+szcVW2nApU2qDVqgk0Ohek6tQ/vBNtlqKw1IoIYnzhF3rsVLAcr
+         zV5WDZIr0uOI9o8WhLIESAz4xflqK3NJGStX66mEJ8BScbFSvuUfZHyL53QUnY/lgnzE
+         hNpCF5UPHoEVLQNFstup/eFrqUObC5YONRC5hh2a3XySsvdU12bZXcrFqGoYDWbouJaR
+         SohKxENFfNCWMP2CA1MFUJBRtsgm8fQqfAITwFlKQQ5by++xbFRJgsXIJmvZCT4I9nlr
+         +9av3zQtuIcguQo/xzgmz/lnvN9vtJb2/5fr3ORKKobYEBzee5L9yLDyBI9WefA6OZAv
+         +1ag==
+X-Gm-Message-State: AOAM5306D8T2OFHi2hmKxXuO22J2LS95Q/nqFggt3JrIOBSXupxFqFun
+        7ZDLpX8ucSEPeQ6NgnvPKwU=
+X-Google-Smtp-Source: ABdhPJx9quePo/D3nopjLPPXnThJTb3/w0LqiOFeKU3H19JP8qXFQKfegHyv6mSo8JfrdYKfWGgNLg==
+X-Received: by 2002:a5d:4f09:: with SMTP id c9mr14577754wru.427.1600080061284;
+        Mon, 14 Sep 2020 03:41:01 -0700 (PDT)
 Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id y1sm17455186wma.36.2020.09.14.00.45.44
+        by smtp.googlemail.com with ESMTPSA id j14sm19012868wmj.19.2020.09.14.03.41.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Sep 2020 00:45:45 -0700 (PDT)
-Date:   Mon, 14 Sep 2020 09:45:43 +0200
+        Mon, 14 Sep 2020 03:41:00 -0700 (PDT)
+Date:   Mon, 14 Sep 2020 12:40:58 +0200
 From:   Corentin Labbe <clabbe.montjoie@gmail.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     kernel test robot <lkp@intel.com>, kbuild-all@lists.01.org,
         linux-kernel@vger.kernel.org,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Subject: Re: [v2 PATCH] crypto: sun4i-ss - Fix sparse endianness markers
-Message-ID: <20200914074543.GA8698@Red>
+Message-ID: <20200914104058.GA14265@Red>
 References: <202009061621.J89kO43Q%lkp@intel.com>
  <20200907062400.GA15841@gondor.apana.org.au>
  <20200907160029.GC11894@Red>
@@ -98,7 +98,24 @@ On Fri, Sep 11, 2020 at 02:13:55PM +1000, Herbert Xu wrote:
 > generated code should be identical.
 > 
 
-It happens without your patch, so your patch is unrelated to this issue.
-You can add:
-Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+I got this on next-20200910/multi_v7_defconfig BigEndian
+[   12.137856] alg: hash: skipping comparison tests for md5-sun4i-ss because md5-generic is unavailable
+md5-sun4i-ss md5 reqs=763
+[   98.286632] alg: ahash: md5 test failed (wrong result) on test vector \"random: psize=65 ksize=0\", cfg=\"random: use_finup src_divs=[95.28%@+1052, <reimport>0.61%@+4046, 0.87%@+24, <reimport,nosimd>3.24%@+542] key_offset=54\"
+
+So sun4i-ss is not involved.
+Strangely /proc/crypto show:
+name         : md5                                                                                  
+driver       : md5-generic                                                                          
+module       : md5                                                                                  
+priority     : 0                                                                                    
+refcnt       : 1                                                                                    
+selftest     : passed                                                                               
+internal     : no                                                                                   
+type         : shash                                                                                
+blocksize    : 64                                                                                   
+digestsize   : 16
+
+and I didnt see anything failed/unknow in /proc/crypto
+
+Why the failed algorithm is not visible ?
