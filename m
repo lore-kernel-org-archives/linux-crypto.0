@@ -1,274 +1,111 @@
-Return-Path: <SRS0=0npx=CW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=QXJz=CX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08135C43461
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Sep 2020 16:12:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1E53C43461
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 03:01:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CBF1422207
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Sep 2020 16:12:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 57434221E3
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 03:01:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DvJv456x"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725960AbgIMQMG (ORCPT
+        id S1726020AbgINDBb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Sep 2020 12:12:06 -0400
-Received: from out28-123.mail.aliyun.com ([115.124.28.123]:36061 "EHLO
-        out28-123.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725956AbgIMQL3 (ORCPT
+        Sun, 13 Sep 2020 23:01:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44712 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726016AbgINDBa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Sep 2020 12:11:29 -0400
-X-Alimail-AntiSpam: AC=CONTINUE;BC=0.07436401|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_alarm|0.0204487-0.000512333-0.979039;FP=0|0|0|0|0|-1|-1|-1;HT=e02c03267;MF=zhouyanjie@wanyeetech.com;NM=1;PH=DS;RN=25;RT=25;SR=0;TI=SMTPD_---.IWac2C6_1600013452;
-Received: from localhost.localdomain(mailfrom:zhouyanjie@wanyeetech.com fp:SMTPD_---.IWac2C6_1600013452)
-          by smtp.aliyun-inc.com(10.147.41.187);
-          Mon, 14 Sep 2020 00:11:02 +0800
-From:   =?UTF-8?q?=E5=91=A8=E7=90=B0=E6=9D=B0=20=28Zhou=20Yanjie=29?= 
-        <zhouyanjie@wanyeetech.com>
-To:     arnd@arndb.de, gregkh@linuxfoundation.org, mpm@selenic.com,
-        herbert@gondor.apana.org.au, robh+dt@kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, hadar.gat@arm.com,
-        geert+renesas@glider.be, krzk@kernel.org, wahrenst@gmx.net,
-        masahiroy@kernel.org, tmaimon77@gmail.com, rdunlap@infradead.org,
-        qianweili@huawei.com, daniel.thompson@linaro.org,
-        xuzaibo@huawei.com, olivier.sobrie@silexinsight.com,
-        dongsheng.qiu@ingenic.com, aric.pzqi@ingenic.com,
-        rick.tyliu@ingenic.com, yanfei.li@ingenic.com,
-        sernia.zhou@foxmail.com, zhenwenjin@gmail.com
-Subject: [PATCH 2/2] crypto: Ingenic: Add hardware TRNG for Ingenic X1830.
-Date:   Mon, 14 Sep 2020 00:10:21 +0800
-Message-Id: <20200913161021.120226-3-zhouyanjie@wanyeetech.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20200913161021.120226-1-zhouyanjie@wanyeetech.com>
-References: <20200913161021.120226-1-zhouyanjie@wanyeetech.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        Sun, 13 Sep 2020 23:01:30 -0400
+Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D404FC06174A;
+        Sun, 13 Sep 2020 20:01:29 -0700 (PDT)
+Received: by mail-pg1-x544.google.com with SMTP id g29so10380873pgl.2;
+        Sun, 13 Sep 2020 20:01:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=lyLNdA4xrXocOcTdyl66Bfsi09lJXmV7xTXnFfeHCDE=;
+        b=DvJv456xq70FIh5msQ6QNCM81uLc+IEpVUr7p8Swoi4KEfwBDw43z0YQ7OXV5eZsFy
+         zfyrMccjxhHJJgYVDU6ueLCfDi5lCCouphN1wGJDoybglGNNjMbgqFu1agaUco4gTYIw
+         7xWxzXfocqvrs7PNrvjZ58oTNFa2IMxwgh+aZCxCpVQFToaYBbq+n6I8QgNJDLhctyzo
+         Pm6du+DSKZuoEQitd0etqJHqXABXx+mpirdd+b+XsUgqj+LnS9afJpZt+IOFxa5zgpyl
+         ZC7YgLKK9UCx6RkmytedEA0OFAcyFles175yeSZgfVTTg3v3gyp7fSs/CjIbCKR9J90h
+         +nxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=lyLNdA4xrXocOcTdyl66Bfsi09lJXmV7xTXnFfeHCDE=;
+        b=NCGZZuwxCS2byOenin87/pE84RDYW6183F29UrlzJ39f4GDd8bPQVk1vUImfgUyQVN
+         B/LsG8gXLhGjRA+pmlZVfueKrb4t8WeRGrZJEz4sc3l8S9B7p1oGB4RIOoH7QT5/7jkm
+         6BZLzccm5Xf19JCKxp90IblLIcI05Zd0r28ZfhxzWDfd+E+tLa4VK2NjT8Xf8a2A7poQ
+         6816meNM2Bo6UVWKMYm3MhMgOeFCz0o2MH8aqsnp05cunUYAhJ+JKjBRLKgQBrf+kbrN
+         02WYkbqK5mmOmasP8a3h2e9063iQG4ba2Y6u/0bJVsRmCJFqwCO+12Qq86b1h7ry+TY0
+         AOcg==
+X-Gm-Message-State: AOAM532itk/3//VeHF/AON/b90oloM2KC/8xc9O1nX2wqDEVukm4kggT
+        gUWxPJxBADsRICv8ROeadTU=
+X-Google-Smtp-Source: ABdhPJyQG67+KJ6O9daScNbPgx0CN+jeuxOa0ZZSYpf4iwF5/ESDGcgFhCq5LDsJIhUz8X4B23YV/Q==
+X-Received: by 2002:a17:902:9f86:: with SMTP id g6mr11822108plq.32.1600052489155;
+        Sun, 13 Sep 2020 20:01:29 -0700 (PDT)
+Received: from localhost.localdomain (ec2-13-52-163-24.us-west-1.compute.amazonaws.com. [13.52.163.24])
+        by smtp.gmail.com with ESMTPSA id z18sm8474265pfn.186.2020.09.13.20.01.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Sep 2020 20:01:28 -0700 (PDT)
+From:   Xiaoliang Pang <dawning.pang@gmail.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        matthias.bgg@gmail.com, swboyd@chromium.org, yuehaibing@huawei.com,
+        tianjia.zhang@linux.alibaba.com, ryder.lee@mediatek.com
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+        dawning.pang@gmail.com
+Subject: [PATCH v6] cypto: mediatek - fix leaks in mtk_desc_ring_alloc
+Date:   Mon, 14 Sep 2020 11:00:51 +0800
+Message-Id: <20200914030051.16956-1-dawning.pang@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add X1830 SoC digital true random number generator driver.
+In the init loop, if an error occurs in function 'dma_alloc_coherent',
+then goto the err_cleanup section, after run i--,
+in the array ring, the struct mtk_ring with index i will not be released,
+causing memory leaks
 
-Tested-by: 周正 (Zhou Zheng) <sernia.zhou@foxmail.com>
-Co-developed-by: 漆鹏振 (Qi Pengzhen) <aric.pzqi@ingenic.com>
-Signed-off-by: 漆鹏振 (Qi Pengzhen) <aric.pzqi@ingenic.com>
-Signed-off-by: 周琰杰 (Zhou Yanjie) <zhouyanjie@wanyeetech.com>
+Fixes: 785e5c616c849 ("crypto: mediatek - Add crypto driver support for some MediaTek chips")
+Cc: Ryder Lee <ryder.lee@mediatek.com>
+Signed-off-by: Xiaoliang Pang <dawning.pang@gmail.com>
 ---
- drivers/char/hw_random/Kconfig        |  14 +++
- drivers/char/hw_random/Makefile       |   1 +
- drivers/char/hw_random/ingenic-trng.c | 161 ++++++++++++++++++++++++++++++++++
- 3 files changed, 176 insertions(+)
- create mode 100644 drivers/char/hw_random/ingenic-trng.c
+ drivers/crypto/mediatek/mtk-platform.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index f976a49e1fb5..1232ca9a455c 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -282,6 +282,20 @@ config HW_RANDOM_INGENIC_RNG
+diff --git a/drivers/crypto/mediatek/mtk-platform.c b/drivers/crypto/mediatek/mtk-platform.c
+index 7e3ad085b5bd..f83cead30d8f 100644
+--- a/drivers/crypto/mediatek/mtk-platform.c
++++ b/drivers/crypto/mediatek/mtk-platform.c
+@@ -469,13 +469,13 @@ static int mtk_desc_ring_alloc(struct mtk_cryp *cryp)
+ 	return 0;
  
- 	  If unsure, say Y.
+ err_cleanup:
+-	for (; i--; ) {
++	do {
+ 		dma_free_coherent(cryp->dev, MTK_DESC_RING_SZ,
+ 				  ring[i]->res_base, ring[i]->res_dma);
+ 		dma_free_coherent(cryp->dev, MTK_DESC_RING_SZ,
+ 				  ring[i]->cmd_base, ring[i]->cmd_dma);
+ 		kfree(ring[i]);
+-	}
++	} while (i--);
+ 	return err;
+ }
  
-+config HW_RANDOM_INGENIC_TRNG
-+	tristate "Ingenic True Random Number Generator support"
-+	depends on HW_RANDOM
-+	depends on MACH_X1830
-+	default HW_RANDOM
-+	help
-+	  This driver provides kernel-side support for the True Random Number Generator
-+	  hardware found in ingenic X1830 SoC. YSH & ATIL CU1830-Neo uses X1830 SoC.
-+
-+	  To compile this driver as a module, choose M here: the
-+	  module will be called ingenic-trng.
-+
-+	  If unsure, say Y.
-+
- config HW_RANDOM_NOMADIK
- 	tristate "ST-Ericsson Nomadik Random Number Generator support"
- 	depends on ARCH_NOMADIK
-diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-index 26ae06844f09..8821d1c6f415 100644
---- a/drivers/char/hw_random/Makefile
-+++ b/drivers/char/hw_random/Makefile
-@@ -24,6 +24,7 @@ obj-$(CONFIG_HW_RANDOM_TX4939) += tx4939-rng.o
- obj-$(CONFIG_HW_RANDOM_MXC_RNGA) += mxc-rnga.o
- obj-$(CONFIG_HW_RANDOM_IMX_RNGC) += imx-rngc.o
- obj-$(CONFIG_HW_RANDOM_INGENIC_RNG) += ingenic-rng.o
-+obj-$(CONFIG_HW_RANDOM_INGENIC_TRNG) += ingenic-trng.o
- obj-$(CONFIG_HW_RANDOM_OCTEON) += octeon-rng.o
- obj-$(CONFIG_HW_RANDOM_NOMADIK) += nomadik-rng.o
- obj-$(CONFIG_HW_RANDOM_PSERIES) += pseries-rng.o
-diff --git a/drivers/char/hw_random/ingenic-trng.c b/drivers/char/hw_random/ingenic-trng.c
-new file mode 100644
-index 000000000000..954a8411d67d
---- /dev/null
-+++ b/drivers/char/hw_random/ingenic-trng.c
-@@ -0,0 +1,161 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Ingenic True Random Number Generator driver
-+ * Copyright (c) 2019 漆鹏振 (Qi Pengzhen) <aric.pzqi@ingenic.com>
-+ * Copyright (c) 2020 周琰杰 (Zhou Yanjie) <zhouyanjie@wanyeetech.com>
-+ */
-+
-+#include <linux/clk.h>
-+#include <linux/err.h>
-+#include <linux/kernel.h>
-+#include <linux/hw_random.h>
-+#include <linux/io.h>
-+#include <linux/iopoll.h>
-+#include <linux/module.h>
-+#include <linux/of_device.h>
-+#include <linux/platform_device.h>
-+#include <linux/slab.h>
-+
-+/* DTRNG register offsets */
-+#define TRNG_REG_CFG_OFFSET			0x00
-+#define TRNG_REG_RANDOMNUM_OFFSET	0x04
-+#define TRNG_REG_STATUS_OFFSET		0x08
-+
-+/* bits within the CFG register */
-+#define CFG_RDY_CLR					BIT(12)
-+#define CFG_INT_MASK				BIT(11)
-+#define CFG_GEN_EN					BIT(0)
-+
-+/* bits within the STATUS register */
-+#define STATUS_RANDOM_RDY			BIT(0)
-+
-+struct ingenic_trng {
-+	void __iomem *base;
-+	struct clk *clk;
-+	struct hwrng rng;
-+};
-+
-+static int ingenic_trng_init(struct hwrng *rng)
-+{
-+	struct ingenic_trng *trng = container_of(rng, struct ingenic_trng, rng);
-+	unsigned int ctrl;
-+
-+	ctrl = readl(trng->base + TRNG_REG_CFG_OFFSET);
-+	ctrl |= CFG_GEN_EN;
-+	writel(ctrl, trng->base + TRNG_REG_CFG_OFFSET);
-+
-+	return 0;
-+}
-+
-+static void ingenic_trng_cleanup(struct hwrng *rng)
-+{
-+	struct ingenic_trng *trng = container_of(rng, struct ingenic_trng, rng);
-+	unsigned int ctrl;
-+
-+	ctrl = readl(trng->base + TRNG_REG_CFG_OFFSET);
-+	ctrl &= ~CFG_GEN_EN;
-+	writel(ctrl, trng->base + TRNG_REG_CFG_OFFSET);
-+}
-+
-+static int ingenic_trng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-+{
-+	struct ingenic_trng *trng = container_of(rng, struct ingenic_trng, rng);
-+	u32 *data = buf;
-+	u32 status;
-+	int ret;
-+
-+	ret = readl_poll_timeout(trng->base + TRNG_REG_STATUS_OFFSET, status,
-+				 status & STATUS_RANDOM_RDY, 10, 1000);
-+	if (ret == -ETIMEDOUT) {
-+		pr_err("%s: Wait for DTRNG data ready timeout\n", __func__);
-+		return ret;
-+	}
-+
-+	*data = readl(trng->base + TRNG_REG_RANDOMNUM_OFFSET);
-+
-+	return 4;
-+}
-+
-+static int ingenic_trng_probe(struct platform_device *pdev)
-+{
-+	struct ingenic_trng *trng;
-+	int ret;
-+
-+	trng = devm_kzalloc(&pdev->dev, sizeof(*trng), GFP_KERNEL);
-+	if (!trng)
-+		return -ENOMEM;
-+
-+	trng->base = devm_platform_ioremap_resource(pdev, 0);
-+	if (IS_ERR(trng->base)) {
-+		pr_err("%s: Failed to map DTRNG registers\n", __func__);
-+		ret = PTR_ERR(trng->base);
-+		return PTR_ERR(trng->base);
-+	}
-+
-+	trng->clk = devm_clk_get(&pdev->dev, NULL);
-+	if (IS_ERR(trng->clk)) {
-+		ret = PTR_ERR(trng->clk);
-+		pr_crit("%s: Cannot get DTRNG clock\n", __func__);
-+		return PTR_ERR(trng->clk);
-+	}
-+
-+	ret = clk_prepare_enable(trng->clk);
-+	if (ret) {
-+		pr_crit("%s: Unable to enable DTRNG clock\n", __func__);
-+		return ret;
-+	}
-+
-+	trng->rng.name = pdev->name;
-+	trng->rng.init = ingenic_trng_init;
-+	trng->rng.cleanup = ingenic_trng_cleanup;
-+	trng->rng.read = ingenic_trng_read;
-+
-+	ret = hwrng_register(&trng->rng);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Failed to register hwrng\n");
-+		return ret;
-+	}
-+
-+	platform_set_drvdata(pdev, trng);
-+
-+	dev_info(&pdev->dev, "Ingenic DTRNG driver registered\n");
-+	return 0;
-+}
-+
-+static int ingenic_trng_remove(struct platform_device *pdev)
-+{
-+	struct ingenic_trng *trng = platform_get_drvdata(pdev);
-+	unsigned int ctrl;
-+
-+	hwrng_unregister(&trng->rng);
-+
-+	ctrl = readl(trng->base + TRNG_REG_CFG_OFFSET);
-+	ctrl &= ~CFG_GEN_EN;
-+	writel(ctrl, trng->base + TRNG_REG_CFG_OFFSET);
-+
-+	clk_disable_unprepare(trng->clk);
-+
-+	return 0;
-+}
-+
-+static const struct of_device_id ingenic_trng_of_match[] = {
-+	{ .compatible = "ingenic,x1830-dtrng" },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, ingenic_trng_of_match);
-+
-+static struct platform_driver ingenic_trng_driver = {
-+	.probe		= ingenic_trng_probe,
-+	.remove		= ingenic_trng_remove,
-+	.driver		= {
-+		.name	= "ingenic-trng",
-+		.of_match_table = ingenic_trng_of_match,
-+	},
-+};
-+
-+module_platform_driver(ingenic_trng_driver);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("漆鹏振 (Qi Pengzhen) <aric.pzqi@ingenic.com>");
-+MODULE_AUTHOR("周琰杰 (Zhou Yanjie) <zhouyanjie@wanyeetech.com>");
-+MODULE_DESCRIPTION("Ingenic True Random Number Generator driver");
 -- 
-2.11.0
+2.17.1
 
