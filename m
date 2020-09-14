@@ -2,146 +2,136 @@ Return-Path: <SRS0=QXJz=CX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF0DC43461
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 18:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91153C43461
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 18:20:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A36D2076C
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 18:03:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44B8B2076C
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Sep 2020 18:20:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600107619;
+	bh=IiWBHF7Kq1gGCefdLYFTYRZidx/gNkc82SqKKeeSLrE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=cLHXRXFZ4ZVQiQ6y7w52P3Crl03q30v47qzLPc4GKM4NyqQCd/fOvbtwoj52TXb05
+	 6i+RkrUjfizKZ9YoHji/+DNnI4pB7xff2S+im8Lhs7hpnq26rfpY1xBKfAHeL3a7Rk
+	 WDb4MFrlFanm1rqqPtAktfNwewGxo6j2mrB0F990=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725961AbgINSDK (ORCPT
+        id S1726023AbgINSUQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Sep 2020 14:03:10 -0400
-Received: from mga18.intel.com ([134.134.136.126]:18033 "EHLO mga18.intel.com"
+        Mon, 14 Sep 2020 14:20:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44772 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725948AbgINSCx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Sep 2020 14:02:53 -0400
-IronPort-SDR: wCt4aihyJyDXkIu0yXviar0sZEmDJHSsMWxM5F5H8WCZT7/22t2PP9uQ1mk2Xn+3TbGl41wif4
- m+g/PrqJ0RiQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9744"; a="146871632"
-X-IronPort-AV: E=Sophos;i="5.76,427,1592895600"; 
-   d="scan'208";a="146871632"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 11:02:49 -0700
-IronPort-SDR: weGdycT837iMKjq92vbU6fhtgMdmxLyQhGZDZU4y2sMklAB0Ljdccsw20TsI3ClC6pR+IT5dLL
- 9etEcGO1bwSA==
-X-IronPort-AV: E=Sophos;i="5.76,427,1592895600"; 
-   d="scan'208";a="450979687"
-Received: from mgorski-mobl.ger.corp.intel.com (HELO localhost) ([10.249.43.120])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2020 11:02:44 -0700
-Date:   Mon, 14 Sep 2020 21:02:38 +0300
-From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     dhowells@redhat.com, dwmw2@infradead.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jmorris@namei.org, serge@hallyn.com, nayna@linux.ibm.com,
-        zohar@linux.ibm.com, erichte@linux.ibm.com, mpe@ellerman.id.au,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v2] certs: Add EFI_CERT_X509_GUID support for dbx entries
-Message-ID: <20200914180238.GB9369@linux.intel.com>
-References: <20200909172736.73003-1-eric.snowberg@oracle.com>
- <20200914180127.GA9369@linux.intel.com>
+        id S1725978AbgINSUN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Sep 2020 14:20:13 -0400
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 39306214F1;
+        Mon, 14 Sep 2020 18:20:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600107613;
+        bh=IiWBHF7Kq1gGCefdLYFTYRZidx/gNkc82SqKKeeSLrE=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=mWz2BdugR29K6X0Xu8C6SlkOLSe2pjJNYMFlbO+5ax3K2AVcWjnRt44zquff6bMPR
+         2Q38a3C4gXui8Qjs0kMiRNMPXSsHXx4rfFjWie+6XEumnVmhP7B1CbuwD1H30pdahk
+         2IUwLt/RWlJeeCqbfJUqZJ6R5pdUEYHjy7i+m0o4=
+Received: by mail-oi1-f174.google.com with SMTP id w16so896688oia.2;
+        Mon, 14 Sep 2020 11:20:13 -0700 (PDT)
+X-Gm-Message-State: AOAM532fHsbJzXkpa1rmTpF8S8bRfsBi1mNeXTVTDx5mb5+X5t66lm43
+        MGwQVQUE0ynDEBJYQhLTfICIh8uxnOE5BgUP0zk=
+X-Google-Smtp-Source: ABdhPJwMTJZEt44jiTicdoE04xOArfMKobGqfvMji4Aedg/dvKLfvk9HfmWAwwB9fGTLAYElkuMXqQAzYNd1iX8bbyk=
+X-Received: by 2002:aca:d845:: with SMTP id p66mr400667oig.47.1600107612611;
+ Mon, 14 Sep 2020 11:20:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200914180127.GA9369@linux.intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <20200806163551.14395-1-andrei.botila@oss.nxp.com>
+ <20200806163551.14395-2-andrei.botila@oss.nxp.com> <20200821034651.GA25442@gondor.apana.org.au>
+ <c360d691-8253-bd99-af92-83d9f8e86a2d@nxp.com> <20200908221019.GA23497@gondor.apana.org.au>
+ <67159207-1082-48be-d085-971a84b525e0@nxp.com> <CAMj1kXGg7bSh57kwE57mKRocNRPZCeXifwjF53-3Jb6LYsfZTg@mail.gmail.com>
+ <38f9904b-5bf7-ea99-ed8a-27cb49f405bd@nxp.com>
+In-Reply-To: <38f9904b-5bf7-ea99-ed8a-27cb49f405bd@nxp.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Mon, 14 Sep 2020 21:20:00 +0300
+X-Gmail-Original-Message-ID: <CAMj1kXH0jOQms9y1MywORywoKjxQ2p8ttv+Xf9KTOkfORX5XWw@mail.gmail.com>
+Message-ID: <CAMj1kXH0jOQms9y1MywORywoKjxQ2p8ttv+Xf9KTOkfORX5XWw@mail.gmail.com>
+Subject: Re: [PATCH RESEND 1/9] crypto: caam/jr - add fallback for XTS with
+ more than 8B IV
+To:     =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "Andrei Botila (OSS)" <andrei.botila@oss.nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 14, 2020 at 09:01:34PM +0300, Jarkko Sakkinen wrote:
-> On Wed, Sep 09, 2020 at 01:27:36PM -0400, Eric Snowberg wrote:
-> > The Secure Boot Forbidden Signature Database, dbx, contains a list of now
-> > revoked signatures and keys previously approved to boot with UEFI Secure
-> > Boot enabled.  The dbx is capable of containing any number of
-> > EFI_CERT_X509_SHA256_GUID, EFI_CERT_SHA256_GUID, and EFI_CERT_X509_GUID
-> > entries.
-> > 
-> > Currently when EFI_CERT_X509_GUID are contained in the dbx, the entries are
-> > skipped.
-> > 
-> > Add support for EFI_CERT_X509_GUID dbx entries. When a EFI_CERT_X509_GUID
-> > is found, it is added as an asymmetrical key to the .blacklist keyring.
-> > Anytime the .platform keyring is used, the keys in the .blacklist keyring
-> > are referenced, if a matching key is found, the key will be rejected.
-> > 
-> > Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
-> > ---
-> > 
-> > v2: 
-> >  Fixed build issue reported by kernel test robot <lkp@intel.com>
-> >  Commit message update (suggested by Jarkko Sakkinen)
-> > 
-> > ---
-> >  certs/blacklist.c                             | 36 +++++++++++++++++++
-> >  certs/system_keyring.c                        |  6 ++++
-> >  include/crypto/pkcs7.h                        |  8 +++++
-> >  include/keys/system_keyring.h                 | 11 ++++++
-> >  .../platform_certs/keyring_handler.c          | 11 ++++++
-> >  5 files changed, 72 insertions(+)
-> > 
-> > diff --git a/certs/blacklist.c b/certs/blacklist.c
-> > index 6514f9ebc943..17ebf50cf0ae 100644
-> > --- a/certs/blacklist.c
-> > +++ b/certs/blacklist.c
-> > @@ -15,6 +15,7 @@
-> >  #include <linux/err.h>
-> >  #include <linux/seq_file.h>
-> >  #include <keys/system_keyring.h>
-> > +#include <crypto/pkcs7.h>
-> >  #include "blacklist.h"
-> >  
-> >  static struct key *blacklist_keyring;
-> > @@ -100,6 +101,41 @@ int mark_hash_blacklisted(const char *hash)
-> >  	return 0;
-> >  }
-> >  
-> > +int mark_key_revocationlisted(const char *data, size_t size)
-> > +{
-> > +	key_ref_t key;
-> > +
-> > +	key = key_create_or_update(make_key_ref(blacklist_keyring, true),
-> > +				   "asymmetric",
-> > +				   NULL,
-> > +				   data,
-> > +				   size,
-> > +				   ((KEY_POS_ALL & ~KEY_POS_SETATTR) |
-> > +				    KEY_USR_VIEW),
-> > +				   KEY_ALLOC_NOT_IN_QUOTA |
-> > +				   KEY_ALLOC_BUILT_IN);
-> > +
-> > +	if (IS_ERR(key)) {
-> > +		pr_err("Problem with revocation key (%ld)\n", PTR_ERR(key));
-> > +		return PTR_ERR(key);
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +int is_key_revocationlisted(struct pkcs7_message *pkcs7)
-> > +{
-> > +	int ret;
-> > +
-> > +	ret = pkcs7_validate_trust(pkcs7, blacklist_keyring);
-> > +
-> > +	if (ret == 0)
-> > +		return -EKEYREJECTED;
-> > +
-> > +	return -ENOKEY;
-> > +}
-> > +EXPORT_SYMBOL_GPL(is_key_revocationlisted);
-> 
-> What required this callable from a module?
+On Mon, 14 Sep 2020 at 20:12, Horia Geant=C4=83 <horia.geanta@nxp.com> wrot=
+e:
+>
+> On 9/14/2020 7:28 PM, Ard Biesheuvel wrote:
+> > On Mon, 14 Sep 2020 at 19:24, Horia Geant=C4=83 <horia.geanta@nxp.com> =
+wrote:
+> >>
+> >> On 9/9/2020 1:10 AM, Herbert Xu wrote:
+> >>> On Tue, Sep 08, 2020 at 01:35:04PM +0300, Horia Geant=C4=83 wrote:
+> >>>>
+> >>>>> Just go with the get_unaligned unconditionally.
+> >>>>
+> >>>> Won't this lead to sub-optimal code for ARMv7
+> >>>> in case the IV is aligned?
+> >>>
+> >>> If this should be optimised in ARMv7 then that should be done
+> >>> in get_unaligned itself and not open-coded.
+> >>>
+> >> I am not sure what's wrong with avoiding using the unaligned accessors
+> >> in case data is aligned.
+> >>
+> >> Documentation/core-api/unaligned-memory-access.rst clearly states:
+> >> These macros work for memory accesses of any length (not just 32 bits =
+as
+> >> in the examples above). Be aware that when compared to standard access=
+ of
+> >> aligned memory, using these macros to access unaligned memory can be c=
+ostly in
+> >> terms of performance.
+> >>
+> >> So IMO it makes sense to use get_unaligned() only when needed.
+> >> There are several cases of users doing this, e.g. siphash.
+> >>
+> >
+> > For ARMv7 code, using the unaligned accessors unconditionally is fine,
+> > and it will not affect performance.
+> >
+> > In general, when CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS is defined,
+> > you can use the unaligned accessors. If it is not, it helps to have
+> > different code paths.
+> >
+> arch/arm/include/asm/unaligned.h doesn't make use of
+> linux/unaligned/access_ok.h, even if CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCE=
+SS
+> is set.
+>
+> I understand the comment in the file, however using get_unaligned()
+> unconditionally takes away the opportunity to generate optimized code
+> (using ldrd/ldm) when data is aligned.
+>
 
-Right, nees to be exported for pkcs7.
+But the minimal optimization that is possible here (one ldrd/ldm
+instruction vs two ldr instructions) is defeated by the fact that you
+are using a conditional branch to select between the two. And this is
+not even a hot path to begin with,
 
-
-/Jarkko
+> > This is a bit murky, and through the years, the interpretation of
+> > unaligned-memory-access.rst has shifted a bit, but in this case, it
+> > makes no sense to make the distinction.
+> >
+>
+> Thanks,
+> Horia
