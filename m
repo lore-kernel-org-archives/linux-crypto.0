@@ -1,186 +1,170 @@
-Return-Path: <SRS0=sLqA=CY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=gkSk=CZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBB8FC43461
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Sep 2020 23:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBB16C2D0E3
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 00:32:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C2C920739
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Sep 2020 23:56:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79FFF20770
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 00:32:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="csWN6xgF"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="KfmuBDn0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727050AbgIOX4D (ORCPT
+        id S1726642AbgIPAck (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Sep 2020 19:56:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38162 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727093AbgIOXzx (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Sep 2020 19:55:53 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07B16C06174A
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2020 16:55:53 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id j7so2180331plk.11
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2020 16:55:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Sn/Sypno4GfL9IE1y53yEPFfiB756BHa96VhDjyiPXk=;
-        b=csWN6xgFG/5PPRlKG40yGIAH/n/GescweWDsJt+YigcCg1vDDxcG4DBMhTwwQJbr7T
-         311O16kFBNRT074TyaKKDHaOxl9XBFcl/ekNERQ5RLlyGxW3OHstpLKBsVT6UtLxK8RA
-         E7iSgdONClHUnEeeMpbMNbJRxFbLks13UPd7D602D0GPE0d02GtifYP8g3y4/PxgQ9jb
-         7L2MCfV2qaQc7DLo56bhC5PzlgjVE8CVUZsS+EbPdUjK9Gyh7IdK/rd9FKfwG5MhESSv
-         6QTKpk74sQxwcFaZd0Djyo3wdNUVR8hKLdMcdJr0i27kG/dxfwFoLZEooYdPJ//aF3l3
-         vg/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Sn/Sypno4GfL9IE1y53yEPFfiB756BHa96VhDjyiPXk=;
-        b=HweWbBNeCgqhjdFOthoxx/HgVFXq6ueyELumeJ2XmiJQo2gvaxjXpXJbkM1l/ryRXm
-         mgU6SKbLb+5vD4RfThbgIzomrO92GdkYTovWBnyo6N79I5T593N1QEgafvqzdNlwPhnI
-         2tGo3Qycfm4HdHGpqWFP2cKoX7oo+JQmkUZfqFQVAJYATrL0hocD+Yg3iDvExQNeqi3K
-         NJmzhQNr/bIM12ZGiLnt3sabUelnq5IuD1BtceLaEtEEJX2sVWXoi0Vz2BbdJzf0k39K
-         CNznKz/NFz9RkYyIwZi8j9eE4RzCc3wcGavma3yg/eHRw5p9WL4XuAhFJKbhzCVjUtni
-         GPPw==
-X-Gm-Message-State: AOAM531sfU1VZb+xTykt48JZQB7GbpLaF8jWtesWSk9IGIWDS4u28Pn/
-        qKwfgEdQsIq+Agsu2SxAi3oHuxsTJCw2IYgwtCOGww==
-X-Google-Smtp-Source: ABdhPJy0J4zdrwtfjGVJ5zJpFoAiLEUwPPycCdeEX++11iXUFcIt4bW+HBz6j0BwMVg+Re0QTq02Ph0nlhdicHaovAk=
-X-Received: by 2002:a17:902:a504:b029:d1:e5e7:bdd8 with SMTP id
- s4-20020a170902a504b02900d1e5e7bdd8mr3735678plq.56.1600214152341; Tue, 15 Sep
- 2020 16:55:52 -0700 (PDT)
+        Tue, 15 Sep 2020 20:32:40 -0400
+Received: from mail-vi1eur05on2058.outbound.protection.outlook.com ([40.107.21.58]:47328
+        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726692AbgIONnM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Sep 2020 09:43:12 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=anjLg2mCVIkBhCubO1KYQi+TQGlENzx87L3AcATvMl1s0Ryou9nKtkZyX+OXoNM4k3duyGgLazmsgv09EUs4AqGPcHbeA+i8rjMpw3DGdtziqrEU0JL9SOOoZ6ws+UGX1nMBZreSYG/FGu7HSxxErBDg+SFfsFw+1+4XJWThoyYyofyFAfWl7P0S9K+0sVlyWI8Jn1Mtlyl+1Gabywgr0W6GMJ8O1Fkxpbzz+ZX3yBnXBQAzwOraQc82JFFiJ6FYc7mu+Q8hj734mVCJEbaj+pi1wKzSqKJAqp0a2unSXQv5kxvI1EclS7dBz/14VThapHbQFWExbBKIL2BxjjGodQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zfIzzJfnlwzS1O6KF15C/nM836f8X4rxAxNIEtRdRGs=;
+ b=StTZ+Xt7IjmgmzE1DEtAQmA0DcWOAoawMDHn2fWC/50urI7J+RVZoSRIxvy2TUDn535TgxdH2kY7cfqkxIQrKvNBgPKu69CXxeQ6JJuDSdHlZAQPcNIRC2iOqB/wcjC9nhdk9L9I6YGgjKB8kBrcXqqvNgvYfvd6tae71yNvGLhGj+muARtUEWitTkg612F5Y8V+uloYbLqhmueyY6JXjw+F7HkEJ/W3gl6/U7/aMj5XeoDhzpE2d4KQfbaWFB8fK0YyohEDujUUXwdRZctYiKAdonGmdcBNjjc/wQ7evvtm8JBTBhLItdNDPNhNUj2Xh5fqEneQfu/Rd1CNO9RFQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zfIzzJfnlwzS1O6KF15C/nM836f8X4rxAxNIEtRdRGs=;
+ b=KfmuBDn04tCrelWEpKVRmXG7ZWFfpzNb/ObKET8AQCV2p6BAoU9Nw/kmNpNXL4UgSzXPY8OL2PDICP02TuaCQHFHqiKhPjBDa2S0Z/bfkSIrpQxxYIvdE865cuXf4jwK8w0EncfHWN5sdG0feLdbHA9r8PsdQHXnYenfwpmrBZw=
+Authentication-Results: sigma-star.at; dkim=none (message not signed)
+ header.d=none;sigma-star.at; dmarc=none action=none header.from=nxp.com;
+Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
+ by VI1PR04MB7118.eurprd04.prod.outlook.com (2603:10a6:800:127::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.11; Tue, 15 Sep
+ 2020 13:42:51 +0000
+Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
+ ([fe80::847a:fcdb:3b92:7a7d]) by VI1PR04MB4046.eurprd04.prod.outlook.com
+ ([fe80::847a:fcdb:3b92:7a7d%5]) with mapi id 15.20.3370.019; Tue, 15 Sep 2020
+ 13:42:51 +0000
+Subject: Re: [PATCH 2/2] crypto: caam - support tagged keys for skcipher
+ algorithms
+To:     Richard Weinberger <richard.weinberger@gmail.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        David Gstir <david@sigma-star.at>
+References: <1594591536-531-1-git-send-email-iuliana.prodan@nxp.com>
+ <1594591536-531-3-git-send-email-iuliana.prodan@nxp.com>
+ <CAFLxGvy0T-E-YecWbGZsDVPajuYVc8L-Uf8UCST_61+t+nfhrA@mail.gmail.com>
+ <CAFLxGvw4zvL0N5+wChKq3=_xLuuCYLKDOyKKnKFy3UiWMUwf-g@mail.gmail.com>
+From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
+Message-ID: <ffc5254a-cecb-20b8-fca3-d2cd8486362d@nxp.com>
+Date:   Tue, 15 Sep 2020 16:42:48 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
+In-Reply-To: <CAFLxGvw4zvL0N5+wChKq3=_xLuuCYLKDOyKKnKFy3UiWMUwf-g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR03CA0061.eurprd03.prod.outlook.com (2603:10a6:208::38)
+ To VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
 MIME-Version: 1.0
-References: <20200915094619.32548-1-ardb@kernel.org> <CAKwvOdn90vs-K4gyi47nJOuwc_g0r3p_ytc9ChPEmunCQ1186w@mail.gmail.com>
- <CAMj1kXFtm4Ue0=6qBaKO73Ft1PmKC52chJrbaA8nRLsV5m807g@mail.gmail.com>
-In-Reply-To: <CAMj1kXFtm4Ue0=6qBaKO73Ft1PmKC52chJrbaA8nRLsV5m807g@mail.gmail.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Tue, 15 Sep 2020 16:55:40 -0700
-Message-ID: <CAKwvOd=n6Ny-8UfrVTWqa07g6=9Q_N_ou4f9DkFGwhFFvdtWPw@mail.gmail.com>
-Subject: Re: [PATCH] crypto: arm/sha256-neon - avoid ADRL pseudo instruction
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Stefan Agner <stefan@agner.ch>,
-        Peter Smith <Peter.Smith@arm.com>,
-        Jian Cai <jiancai@google.com>,
-        clang-built-linux <clang-built-linux@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.0.129] (78.97.206.147) by AM0PR03CA0061.eurprd03.prod.outlook.com (2603:10a6:208::38) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16 via Frontend Transport; Tue, 15 Sep 2020 13:42:50 +0000
+X-Originating-IP: [78.97.206.147]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: e76d6ce7-fa85-48d1-60d7-08d8597d3daf
+X-MS-TrafficTypeDiagnostic: VI1PR04MB7118:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR04MB7118516BD925A430810F6C8D98200@VI1PR04MB7118.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 13z60fXiYNRHP1dRenz9ABmUcOVhcnzU6kSqwNOpdPGdfnm9rrM6Cu1mvcXAMZWVG3HJ0X6al+tmp1mWUMFrlEMx/jW0+TiddaDURjMlkU/c8o+fqe9lp6NJT3G+EVP8kR6T1djqv6Tqqxt8Be/svfEkyOP0H0LMBfOtOvSxsEoJTmEOgAsqLbBWYmltLsXkbSdoLKFJOs2U0HYI/QyCCGA1waXscGXHjJJ60HgTFCPck7DAIk5bizpi+0E4HDXVsg6bbQq+XpzF8CncfbbQ6srMUPpKQNVMua+zxyruvey3nyi6t+C6Ihfaz5PC0wFage+xQB0ATtM6gu5n71FsOsitJOSWncj5fs4ZLHQTp8vMgAmYzt021nkU9j63/UoKOrzstUjDggVHQRsRB11CHevK4ayApM9lwf/Rgyn8opNERWMlw6RgCShq9xRysJ+vKA6iIubPFVMWUfSsveAXvDuJphDSAHJVeJ+hye2waJNlQuQg0ljjXkg71/WeUOKx
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39860400002)(346002)(376002)(396003)(366004)(186003)(66946007)(66476007)(66556008)(52116002)(86362001)(31696002)(36756003)(5660300002)(53546011)(2906002)(8676002)(83380400001)(6636002)(26005)(2616005)(956004)(16526019)(478600001)(16576012)(316002)(54906003)(8936002)(110136005)(6486002)(966005)(31686004)(4326008)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: z1tnUoOXTUlJe0gXCzRnUijcxakwrX/zysRx1I/3fwlNy1ktkG2ISRw4w1ny/ELvZlNgzlNHGii07NTuEgVQdhBW6oUSSK6viB0LvCCUVBFsXxSbfJygGqNODr5XMav6eBRJEbnVPblYxGRsug0bKpBgi0FteNx3XNvdSaaGn2ZQ9iSK05pHRiZn2gnIlNZNICKkcRZU0ES0eotCoAoLn5WB3Ug1utyKAIe/C8NwF6PCmw416X7MbAaYRvCZyM9cozBlDrDpZopLywi1BD9OTJeWn9fzq4+HdOaLULeaKwZQQiSVp0N0EY8veW7x/hbvBwMGZ+3N/szPttRhqxWZ2zsYuid8qOW1f3q9IXp80aIl2lk00ZvZebNwx2ztnfh9zRJM01zKB/LvctoKl1fdPZLrIdHWDttnin3zgNbGATQqMk1e938ZlR8D8N3cUgkz/Uyp91lz+7nKHKEN/BC2jiru7dB1CalW8827RKhReB0a9iSKSPgcANgmNEqWKPe35xGli2ZsyEww+p+NlXmA5IOOzGjgG1tvCL0Oa/EzI+rHS00vYNOKJPoxfdnxzbEFST2YV4ova+BzzFzXIJPAAtOdl/EUl/vDADc81mQrro43UYboxxRjmIRXLT/XbRSfSljMCe4idvAw9o+RMnQcvQ==
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e76d6ce7-fa85-48d1-60d7-08d8597d3daf
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB4046.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2020 13:42:51.5591
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JzRjcukLNCEaHB3zEZ455aHVfPcZSp6ICyQbXmc8UIhBFs5DZzAwBGiMOMBzuSP5aW5qpE8ChoUu6PN6WYiPLg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7118
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 15, 2020 at 2:32 PM Ard Biesheuvel <ardb@kernel.org> wrote:
->
-> On Tue, 15 Sep 2020 at 21:50, Nick Desaulniers <ndesaulniers@google.com> wrote:
-> >
-> > On Tue, Sep 15, 2020 at 2:46 AM Ard Biesheuvel <ardb@kernel.org> wrote:
-> > >
-> > > The ADRL pseudo instruction is not an architectural construct, but a
-> > > convenience macro that was supported by the ARM proprietary assembler
-> > > and adopted by binutils GAS as well, but only when assembling in 32-bit
-> > > ARM mode. Therefore, it can only be used in assembler code that is known
-> > > to assemble in ARM mode only, but as it turns out, the Clang assembler
-> > > does not implement ADRL at all, and so it is better to get rid of it
-> > > entirely.
-> > >
-> > > So replace the ADRL instruction with a ADR instruction that refers to
-> > > a nearer symbol, and apply the delta explicitly using an additional
-> > > instruction.
-> > >
-> > > Cc: Nick Desaulniers <ndesaulniers@google.com>
-> > > Cc: Stefan Agner <stefan@agner.ch>
-> > > Cc: Peter Smith <Peter.Smith@arm.com>
-> > > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> > > ---
-> > > I will leave it to the Clang folks to decide whether this needs to be
-> > > backported and how far, but a Cc stable seems reasonable here.
-> > >
-> > >  arch/arm/crypto/sha256-armv4.pl       | 4 ++--
-> > >  arch/arm/crypto/sha256-core.S_shipped | 4 ++--
-> > >  2 files changed, 4 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/arch/arm/crypto/sha256-armv4.pl b/arch/arm/crypto/sha256-armv4.pl
-> > > index 9f96ff48e4a8..8aeb2e82f915 100644
-> > > --- a/arch/arm/crypto/sha256-armv4.pl
-> > > +++ b/arch/arm/crypto/sha256-armv4.pl
-> > > @@ -175,7 +175,6 @@ $code=<<___;
-> > >  #else
-> > >  .syntax unified
-> > >  # ifdef __thumb2__
-> > > -#  define adrl adr
-> > >  .thumb
-> > >  # else
-> > >  .code   32
-> > > @@ -471,7 +470,8 @@ sha256_block_data_order_neon:
-> > >         stmdb   sp!,{r4-r12,lr}
-> > >
-> > >         sub     $H,sp,#16*4+16
-> > > -       adrl    $Ktbl,K256
-> > > +       adr     $Ktbl,.Lsha256_block_data_order
-> > > +       add     $Ktbl,$Ktbl,#K256-.Lsha256_block_data_order
-> > >         bic     $H,$H,#15               @ align for 128-bit stores
-> > >         mov     $t2,sp
-> > >         mov     sp,$H                   @ alloca
-> > > diff --git a/arch/arm/crypto/sha256-core.S_shipped b/arch/arm/crypto/sha256-core.S_shipped
-> > > index ea04b2ab0c33..1861c4e8a5ba 100644
-> > > --- a/arch/arm/crypto/sha256-core.S_shipped
-> > > +++ b/arch/arm/crypto/sha256-core.S_shipped
-> > > @@ -56,7 +56,6 @@
-> > >  #else
-> > >  .syntax unified
-> > >  # ifdef __thumb2__
-> > > -#  define adrl adr
-> > >  .thumb
-> > >  # else
-> > >  .code   32
-> > > @@ -1885,7 +1884,8 @@ sha256_block_data_order_neon:
-> > >         stmdb   sp!,{r4-r12,lr}
-> > >
-> > >         sub     r11,sp,#16*4+16
-> > > -       adrl    r14,K256
-> > > +       adr     r14,.Lsha256_block_data_order
-> > > +       add     r14,r14,#K256-.Lsha256_block_data_order
-> >
-> > Hi Ard,
-> > Thanks for the patch.  With this patch applied:
-> >
-> > $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make LLVM=1 LLVM_IAS=1
-> > -j71 defconfig
-> > $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make LLVM=1 LLVM_IAS=1 -j71
-> > ...
-> > arch/arm/crypto/sha256-core.S:2038:2: error: out of range immediate fixup value
-> >  add r14,r14,#K256-.Lsha256_block_data_order
-> >  ^
-> >
-> > :(
-> >
->
-> Strange. Could you change it to
->
-> sub r14,r14,#.Lsha256_block_data_order-K256
->
-> and try again?
->
-> If that does work, it means the Clang assembler does not update the
-> instruction type for negative addends (add to sub in this case), which
-> would be unfortunate, since it would be another functionality gap.
+On 9/14/2020 9:38 AM, Richard Weinberger wrote:
+> On Thu, Jul 16, 2020 at 4:12 PM Richard Weinberger
+> <richard.weinberger@gmail.com> wrote:
+>>
+>> On Mon, Jul 13, 2020 at 12:09 AM Iuliana Prodan <iuliana.prodan@nxp.com> wrote:
+>>>
+>>> Tagged keys are keys that contain metadata indicating what
+>>> they are and how to handle them using tag_object API.
+>>>
+>>> Add support, for tagged keys, to skcipher algorithms by
+>>> adding new transformations, with _tk_ prefix to distinguish
+>>> between plaintext and tagged keys.
+>>>
+>>> For job descriptors a new option (key_cmd_opt) was added for KEY command.
+>>> Tagged keys can be loaded using only a KEY command with ENC=1
+>>> and the proper setting of the EKT bit. The EKT bit in the
+>>> KEY command indicates which encryption algorithm (AES-ECB or
+>>> AES-CCM) should be used to decrypt the key. These options will be kept in
+>>> key_cmd_opt.
+>>>
+>>> The tk_ transformations can be used directly by their name:
+>>> struct sockaddr_alg sa = {
+>>>     .salg_family = AF_ALG,
+>>>     .salg_type = "skcipher", /* this selects the symmetric cipher */
+>>>     .salg_name = "tk(cbc(aes))" /* this is the cipher name */
+>>> };
+>>> or for dm-crypt, e.g. using dmsetup:
+>>> dmsetup -v create encrypted --table "0 $(blockdev --getsz /dev/mmcblk2p10)
+>>> crypt capi:tk(cbc(aes))-plain :32:logon:seckey 0 /dev/mmcblk2p10 0 1
+>>> sector_size:512".
+>>
+>> How to use it with cryptsetup?
+>> I'm asking because it is not clear to me why you are not implementing
+>> a new kernel key type (KEYS subsystem)
+>> to utilize tagged keys.
+>> Many tools already support the keyctl userspace interface (cryptsetup,
+>> fscrypt, ...).
+> 
+> *friendly ping*
+> 
+We didn't include the key management part in this series,
+just the crypto API support for algorithms with protected keys,
+to get early feedback.
 
-Works.  Can you describe the expected functionality a bit more, so we
-can come up with a bug report/test case?  (an `add` with a negative
-operand should be converted to a `sub` with a positive operand, IIUC?)
+Wrt. key management:
+The NXP vendor / downstream kernel (to be included in i.MX BSP Q3 release)
+will have support for protected keys generation.
+Besides this, a dedicated ioctl-based interface will allow userspace to
+generate and export these keys. After this, user can use standard keyctl
+to add a key (as user / logon type) in the keyring, such that it would be
+available to dm-crypt.
 
-Also, there's a similar adrl in arch/arm/crypto/sha512-core.S, err, is
-that generated?
--- 
-Thanks,
-~Nick Desaulniers
+We know that adding new ioctls is frowned upon, so before trying to upstream
+the ioctl-based solution the plan is checking the feasibility of
+extending keyctl as David Howells suggested:
+https://lore.kernel.org/lkml/8060.1533226481@warthog.procyon.org.uk
+(Note the difference b/w adding new key type - which was rejected -
+and a key "subtype extension".)
+
+Horia
