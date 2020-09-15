@@ -2,102 +2,101 @@ Return-Path: <SRS0=sLqA=CY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F084DC2D0E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Sep 2020 07:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C6CCC2D0E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Sep 2020 09:07:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B06D321974
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Sep 2020 07:11:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600153865;
-	bh=BGQ3eCEwFUe6AJJmnaDMEuJg2cqiX9jtXT/M/+4eiks=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=AMsiAPQ6SmbHvFT90hCqBPHEGx7Y4YV67yjwRpmI0YYN6wO5QcALglxiUkb8D7wEV
-	 Asg5pOMVQZuPDVPuD2goM0HN8sxR9QuvP42Fz4odIWdRoU1D/dmgxrBhOZAgJtmDQp
-	 ZHC65KaZ5hTFgLuSAgJMytBwbwB8U4w3XwLnexHU=
+	by mail.kernel.org (Postfix) with ESMTP id 619EC21D1B
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Sep 2020 09:07:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726107AbgIOHLE (ORCPT
+        id S1726387AbgIOJGf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Sep 2020 03:11:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41644 "EHLO mail.kernel.org"
+        Tue, 15 Sep 2020 05:06:35 -0400
+Received: from mga03.intel.com ([134.134.136.65]:35019 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726091AbgIOHKx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Sep 2020 03:10:53 -0400
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3A908206B5;
-        Tue, 15 Sep 2020 07:10:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600153852;
-        bh=BGQ3eCEwFUe6AJJmnaDMEuJg2cqiX9jtXT/M/+4eiks=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Hy57j0JDynjYyG6P78cB/X1ne7QBpDvOxYkzQbbuaNpIX3IdS2n1KyHL4x5/bi5+S
-         3laCU23JHUdHfWt+siVuRf3ieBtU/E7sRcsZO7DqQX+xUgilE39x5D8ltzHwfHf3yc
-         kDP0LT1pbCysA/0jbWpFreFar91CV8K4FxLz2ENA=
-Received: by mail-oi1-f179.google.com with SMTP id x14so2717270oic.9;
-        Tue, 15 Sep 2020 00:10:52 -0700 (PDT)
-X-Gm-Message-State: AOAM5330TOH9YEifFZ64/Qa+2yl+UoDyGZVYlpx1mPoBb5PezPMQpdYo
-        4lEYtfjLvgzu76BhwPuQnuEOwy+1wZn264Rvr8c=
-X-Google-Smtp-Source: ABdhPJy2V/mnAsBclEEUOHdahMPoNIrScUu4KK+F3G+7suXAqZOb+5SpImHNQzKwxItMwxyIy05XxZZ+k4f/AYv1lvw=
-X-Received: by 2002:a54:4517:: with SMTP id l23mr2478818oil.174.1600153851496;
- Tue, 15 Sep 2020 00:10:51 -0700 (PDT)
+        id S1726269AbgIOJGe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Sep 2020 05:06:34 -0400
+IronPort-SDR: RZD/fFWTjvWyaYIJCtNMDzEdl4brC47SlQmB8DC403Dr6vIA5u/jFu0AFJj/JoHYnbKKWwa4bw
+ iw1Jurkpfvfw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9744"; a="159272034"
+X-IronPort-AV: E=Sophos;i="5.76,429,1592895600"; 
+   d="scan'208";a="159272034"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 02:06:31 -0700
+IronPort-SDR: JN6muYTQqB3wm3kCXqk1xsORqKL94poqyPOQLwwV9SSOFBG1M/RLedvNq9ruyR1KSefDfAWvPJ
+ brvH/uTc728w==
+X-IronPort-AV: E=Sophos;i="5.76,429,1592895600"; 
+   d="scan'208";a="482690707"
+Received: from emoriart-mobl.ger.corp.intel.com (HELO localhost) ([10.252.7.208])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2020 02:06:16 -0700
+From:   Jani Nikula <jani.nikula@linux.intel.com>
+To:     Joe Perches <joe@perches.com>, LKML <linux-kernel@vger.kernel.org>,
+        Jiri Kosina <trivial@kernel.org>
+Cc:     linux-wireless@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        oss-drivers@netronome.com, nouveau@lists.freedesktop.org,
+        alsa-devel <alsa-devel@alsa-project.org>,
+        dri-devel@lists.freedesktop.org, linux-ide@vger.kernel.org,
+        dm-devel@redhat.com, linux-mtd@lists.infradead.org,
+        linux-i2c@vger.kernel.org, sparclinux@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-rtc@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        dccp@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net,
+        linux-afs@lists.infradead.org, coreteam@netfilter.org,
+        intel-wired-lan@lists.osuosl.org, linux-serial@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
+        Kees Cook <kees.cook@canonical.com>,
+        linux-media@vger.kernel.org, linux-pm@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, linux-sctp@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-nvme@lists.infradead.org,
+        storagedev@microchip.com, ceph-devel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-parisc@vger.kernel.org, netdev@vger.kernel.org,
+        linux-usb@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-mips@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netfilter-devel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        bpf@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [Intel-gfx] [trivial PATCH] treewide: Convert switch/case fallthrough; to break;
+In-Reply-To: <e6387578c75736d61b2fe70d9783d91329a97eb4.camel@perches.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <e6387578c75736d61b2fe70d9783d91329a97eb4.camel@perches.com>
+Date:   Tue, 15 Sep 2020 12:06:21 +0300
+Message-ID: <87d02nxvci.fsf@intel.com>
 MIME-Version: 1.0
-References: <20200914204209.256266093@linutronix.de> <CAHk-=win80rdof8Pb=5k6gT9j_v+hz-TQzKPVastZDvBe9RimQ@mail.gmail.com>
- <871rj4owfn.fsf@nanos.tec.linutronix.de> <CAHk-=wj0eUuVQ=hRFZv_nY7g5ZLt7Fy3K7SMJL0ZCzniPtsbbg@mail.gmail.com>
- <CAHk-=wjOV6f_ddg+QVCF6RUe+pXPhSR2WevnNyOs9oT+q2ihEA@mail.gmail.com>
- <20200915033024.GB25789@gondor.apana.org.au> <CAHk-=wgX=ynJAXYYOAM7J8Tee8acERrGOopNu6ZcLN=SEXdGKA@mail.gmail.com>
- <CAHk-=wie0Kb-+XOZNasoay7AKCaQ8Ew8=LyvWTBeiPXC3v2GSA@mail.gmail.com> <20200915070523.GA26629@gondor.apana.org.au>
-In-Reply-To: <20200915070523.GA26629@gondor.apana.org.au>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 15 Sep 2020 10:10:40 +0300
-X-Gmail-Original-Message-ID: <CAMj1kXGpGcvNKngJCx+5dDHMENrH2OdCwOMa6G9W6sAVhUp3Dg@mail.gmail.com>
-Message-ID: <CAMj1kXGpGcvNKngJCx+5dDHMENrH2OdCwOMa6G9W6sAVhUp3Dg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: lib/chacha20poly1305 - Set SG_MITER_ATOMIC unconditionally
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 15 Sep 2020 at 10:05, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Mon, Sep 14, 2020 at 11:55:53PM -0700, Linus Torvalds wrote:
-> >
-> > Maybe we could hide it behind a debug option, at least.
-> >
-> > Or, alterantively, introduce a new "debug_preempt_count" that doesn't
-> > actually disable preemption, but warns about actual sleeping
-> > operations..
->
-> I'm more worried about existing users of kmap_atomic relying on
-> the preemption disabling semantics.  Short of someone checking
-> on every single instance (and that would include derived cases
-> such as all users of sg miter), I think the safer option is to
-> create something brand new and then migrate the existing users
-> to it.  Something like
->
-> static inline void *kmap_atomic_ifhigh(struct page *page)
-> {
->         if (PageHighMem(page))
->                 return kmap_atomic(page);
->         return page_address(page);
-> }
->
-> static inline void kunmap_atomic_ifhigh(struct page *page, void *addr)
-> {
->         if (PageHighMem(page))
->                 kunmap_atomic(addr);
-> }
->
+On Wed, 09 Sep 2020, Joe Perches <joe@perches.com> wrote:
+> diff --git a/drivers/gpu/drm/i915/display/intel_sprite.c b/drivers/gpu/drm/i915/display/intel_sprite.c
+> index 5ac0dbf0e03d..35ac539cc2b1 100644
+> --- a/drivers/gpu/drm/i915/display/intel_sprite.c
+> +++ b/drivers/gpu/drm/i915/display/intel_sprite.c
+> @@ -2861,7 +2861,7 @@ static bool gen12_plane_format_mod_supported(struct drm_plane *_plane,
+>  	case I915_FORMAT_MOD_Y_TILED_GEN12_MC_CCS:
+>  		if (!gen12_plane_supports_mc_ccs(dev_priv, plane->id))
+>  			return false;
+> -		fallthrough;
+> +		break;
+>  	case DRM_FORMAT_MOD_LINEAR:
+>  	case I915_FORMAT_MOD_X_TILED:
+>  	case I915_FORMAT_MOD_Y_TILED:
 
-But we would still need to check all users of SG miter before we could
-move it to this interface.
+Acked-by: Jani Nikula <jani.nikula@intel.com>
+
+for merging via whichever tree seems best.
+
+BR,
+Jani.
+
+
+-- 
+Jani Nikula, Intel Open Source Graphics Center
