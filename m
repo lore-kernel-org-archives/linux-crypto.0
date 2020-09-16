@@ -2,177 +2,193 @@ Return-Path: <SRS0=yTfj=C2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A435C35264
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 14:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC59CC35273
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 14:43:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4868220708
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 14:43:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D4B4221EE
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 14:43:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="S2EeRS8/"
+	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="JGbt6Plg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727380AbgIQOYW (ORCPT
+        id S1727422AbgIQOWP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Sep 2020 10:24:22 -0400
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:36230 "EHLO
-        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727447AbgIQOYU (ORCPT
+        Thu, 17 Sep 2020 10:22:15 -0400
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:38336 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727456AbgIQOUk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Sep 2020 10:24:20 -0400
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-        by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08HDPUGc009032;
-        Thu, 17 Sep 2020 06:28:55 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=DWuNfmlw5F4Pr45zmF1y+cHsXCLihWrtPJ1AnWIPc6I=;
- b=S2EeRS8/zEeheKlO7ZTQpL4OdlCK80CZirxdp3UV2HKVVC1PnQv0wJ/KPBAC1iNFw6Qk
- esfRiAyE+0CLxUPfZetLFfvA38xfXQTugE6oMKGJow4w6zLONW0FszF2uYeaK3UNcRRl
- NPPtY5LuHZPRzSgK3UBGdaOQFMmQM0IVA8SvKHbnbqOnZv7L21Dk+XLze5OUINk5qOTq
- SpjRmoq8XsAkBxUXd3plHNZ0cP4zIM+UgRGW6ZXmNdm1ymz06VR/d3Yl85y/Akb3QKG2
- qFlmgHkfBXzfY1puB/+VR3ApNLsxMvptQOj5tYuKV+JuH8HwV+LPd/Y/m6OGEj9Gux0v iw== 
-Received: from sc-exch03.marvell.com ([199.233.58.183])
-        by mx0b-0016f401.pphosted.com with ESMTP id 33m73p0ajw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Thu, 17 Sep 2020 06:28:55 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by SC-EXCH03.marvell.com
- (10.93.176.83) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 17 Sep
- 2020 06:28:53 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Thu, 17 Sep 2020 06:28:53 -0700
-Received: from hyd1schalla-dt.marvell.com (hyd1schalla-dt.marvell.com [10.29.8.39])
-        by maili.marvell.com (Postfix) with ESMTP id 125623F703F;
-        Thu, 17 Sep 2020 06:28:48 -0700 (PDT)
-From:   Srujana Challa <schalla@marvell.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <kuba@kernel.org>, <sgoutham@marvell.com>, <gakula@marvell.com>,
-        <sbhatta@marvell.com>, <schandran@marvell.com>,
-        <pathreya@marvell.com>, Srujana Challa <schalla@marvell.com>
-Subject: [PATCH v3,net-next,1/4] octeontx2-pf: move asm code to include/linux/soc
-Date:   Thu, 17 Sep 2020 18:58:32 +0530
-Message-ID: <20200917132835.28325-2-schalla@marvell.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200917132835.28325-1-schalla@marvell.com>
-References: <20200917132835.28325-1-schalla@marvell.com>
+        Thu, 17 Sep 2020 10:20:40 -0400
+X-Greylist: delayed 972 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Sep 2020 10:20:18 EDT
+Received: from pps.filterd (m0042983.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08HE0ju0003861;
+        Thu, 17 Sep 2020 07:01:07 -0700
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-00082601.pphosted.com with ESMTP id 33k5pem09d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Sep 2020 07:01:07 -0700
+Received: from pps.reinject (m0042983.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08HDv0dG028393;
+        Thu, 17 Sep 2020 06:57:40 -0700
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by mx0a-00082601.pphosted.com with ESMTP id 33k5q65h7r-3
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Wed, 16 Sep 2020 12:18:22 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (100.104.31.183)
+ by o365-in.thefacebook.com (100.104.36.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1979.3; Wed, 16 Sep 2020 12:18:21 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=M0InFZXC9ZxuTTf0SEDyjuokpEL06DCzzq7ung6ixG6nrFkgTNgWQ/8ksMiZCtyjAm1xKOIyebOgHmnqu06++0bC+zbn1R6C7d8iqpeQbMw1CPQG/QpM5jUt9o7cYgijzGW+KfOQz5RefjLKfBbrszWMVaYnaBjEx0rl3X/uJTJUj29rKRdoRSzBH2FmCLYRhd0ffIiEwiW/kvuQFtxOqXto826UFGyYSGKYElDagE39UO8RcBSIYYbyXG8a4PA9BZ0+UB/hhmV3zG2WSQrr+l9lD+CZwtZa4Fam4DNt618q9Y+8B4cNT3hAOBCvEXfC0UfA2yhqu3r+ltufYQyJOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Pl/bAI3AqxzrrH9ft3zpTCD/pLp07hprxYHeL2EAyfg=;
+ b=g9lj6YLVfEUoOcAN0ESmUEkbig8Q6NlQtnInfNL3qHGzyypKWBw9X4YpWyGErUWnycWP1o34T43ZEbaHtqhOx7XNEIMQTrs7exfYuT+dfQoNJSjoG+CNNL3mAXeOl8VrDMPzv9GUfESgmFrvqnOyepMPl+c9fMrpgy3iLbCxoXpH6ijU7wIcI3nYKtjZo9C6Az9rIzbuiFU9SfMl1Nl6hXUQc3IPzMh1zWhz5vZCB6f5bVyQCh/8NAodP7QD5Zj3y0Bv+uAHDO0qrE6dznhUSLm8vemcDDh2hqkmY5wfXsEeD5cMQBMrLc/hJrgb0t9WTRS94CKRYL92bIs/UlxCkw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
+ header.d=fb.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
+ s=selector2-fb-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Pl/bAI3AqxzrrH9ft3zpTCD/pLp07hprxYHeL2EAyfg=;
+ b=JGbt6PlgaL1lV6csxMctlfLUmUH52a7N8x8L9J6uabp9cdV5S20yF2Sf5eW37ErhWFaXBAuzterOXZ0nNpKR4h/X5QXtOsDPK9sLiT5v66+aNPCsSsIHkWY45I6R+V0Ju65G0ktr/4RPmcNkfLsBUXdikYUJsIweMWCE0x5svJI=
+Received: from BY5PR15MB3667.namprd15.prod.outlook.com (2603:10b6:a03:1f9::18)
+ by BYAPR15MB2997.namprd15.prod.outlook.com (2603:10b6:a03:b0::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Wed, 16 Sep
+ 2020 19:18:17 +0000
+Received: from BY5PR15MB3667.namprd15.prod.outlook.com
+ ([fe80::2d08:987a:126:1c9c]) by BY5PR15MB3667.namprd15.prod.outlook.com
+ ([fe80::2d08:987a:126:1c9c%7]) with mapi id 15.20.3391.014; Wed, 16 Sep 2020
+ 19:18:17 +0000
+From:   Nick Terrell <terrelln@fb.com>
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     Chris Mason <clm@fb.com>, Nick Terrell <nickrterrell@gmail.com>,
+        "Herbert Xu" <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
+        "squashfs-devel@lists.sourceforge.net" 
+        <squashfs-devel@lists.sourceforge.net>,
+        "linux-f2fs-devel@lists.sourceforge.net" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Kernel Team <Kernel-team@fb.com>, Petr Malat <oss@malat.biz>,
+        Johannes Weiner <jweiner@fb.com>,
+        Niket Agarwal <niketa@fb.com>, Yann Collet <cyan@fb.com>
+Thread-Topic: [PATCH 5/9] btrfs: zstd: Switch to the zstd-1.4.6 API
+Thread-Index: AQHWi9t+F+963YLOT0SgwBoo2TG/malq9P8AgABcdACAAALEAIAAA28AgAAA6ACAAEv8AA==
+Date:   Wed, 16 Sep 2020 19:18:17 +0000
+Message-ID: <4D04D534-75BD-4B13-81B9-31B9687A6B64@fb.com>
+References: <20200916034307.2092020-1-nickrterrell@gmail.com>
+ <20200916034307.2092020-7-nickrterrell@gmail.com>
+ <20200916084958.GC31608@infradead.org>
+ <CCDAB4AB-DE8D-4ADE-9221-02AE732CBAE2@fb.com>
+ <20200916143046.GA13543@infradead.org>
+ <1CAB33F1-95DB-4BC5-9023-35DD2E4E0C20@fb.com>
+ <20200916144618.GB16392@infradead.org>
+In-Reply-To: <20200916144618.GB16392@infradead.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: infradead.org; dkim=none (message not signed)
+ header.d=none;infradead.org; dmarc=none action=none header.from=fb.com;
+x-originating-ip: [2620:10d:c090:400::5:d83f]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 97a5bd0e-43fb-42a2-f4da-08d85a75441d
+x-ms-traffictypediagnostic: BYAPR15MB2997:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR15MB299780DCB400AFD7B04A0361AB210@BYAPR15MB2997.namprd15.prod.outlook.com>
+x-fb-source: Internal
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: NVcV/Vtkfy+btdGrv35JUEYADiDiC2P/EB6jTD+hbJQEC7sewWq9c0yOrPfhslVYIZVHhoTK0R9bwJuHUiWswPO//U+wPnvhgav9GnN+ndkK1Aial1vFw4Qr6T+xPaS9mCG/sWiHZTqGJBCDEXU3P2cDcOQTFlqtk+5QMdSdeRVcul7dBW/OU8Gz/H3FOYLhz6Zr4JnYxRhEdu7v026x5AfZf3njJPLrGZV/bAmkzx3LRo0U7W6sqLFaNIVD12FjpKfNHrgEF1qvpmWj2DhGeMzdIyqltz8WSPicaY1bZHnXyXO+6IyJV67onsNv8PQPMTD8cSkx+sRwhgheFpf0wuYsGqsMTtbR1QvmLEgAtupZHzxrdqgzFQ3QjLKNzgul
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR15MB3667.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(376002)(346002)(366004)(396003)(136003)(33656002)(54906003)(2906002)(64756008)(66476007)(76116006)(71200400001)(66946007)(5660300002)(91956017)(66446008)(6506007)(186003)(316002)(4326008)(86362001)(66556008)(6486002)(53546011)(478600001)(6512007)(36756003)(8676002)(8936002)(2616005)(6916009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: GbDkf9zRIf4fbXdCu0/czb1JawfWzOllAc5/aye20eRw60401jr4KClHdz+N8AyYcT2ptUbbLWzbcgiY5E/ID9/oytH9QnjD9RvZ6egBQwEnTYqyyR6LcfhsQMSbVVSO058RG/BeDNPRw2U1zAhWI8G4p0M/1h/LoiaALIwFQ3uuKw5KY5DFNC2bsiEFlIg0I8ymHfl/PdE/P3BYs/AFtFQOmTXH8ZxeB8WxucUabkHDwtHPz/OgBELpwid49jxbD3t224+vCOuBbuVcxehisJzfZf4a7UTby3AC45ChSm3O++13DNDn29j4bx89zcep30sG+xZDHuxSUW6Gw08i/QLM9gyKcey0VDilw2wC4ef99utZd+qIXJK9xUG9vDvBHoCxFXMi8v/fEt8a00ClBsgEyR5jHVh5E45IUCxAOUBSnI3B3uUvKZmDTBhC5xe8ntNUXkMlBy0ZoVe6bIpHmE3E+7kol1Kn4LYRfI63xl0u0bH7Y1+gSmFh2QADsZ4+FUh6vKbvaVxHL9zy9AAxfygqNdjJjIRStRcL/6JzIS09lvldcy1CMRQTMnYKb76g3eeNc4sxVs9IxHFdHgjJOOj3SmBxMzoXSDbw+n+YDZw2mYSTJ4nBU9z9ZO8E8TTXwWIom9oPF5LG5OOr071WsBH7mVP4+bEZIQ/rzi/EyL+DCKidOzmXHRDIvuaLraJ4
+Content-ID: <74653741ADB844449A7BD81A4044B26F@namprd15.prod.outlook.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR15MB3667.namprd15.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 97a5bd0e-43fb-42a2-f4da-08d85a75441d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Sep 2020 19:18:17.1633
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vPzQgLi29MiCYv6hPBiPZ0gbFYqZYyrcjVrybmrzi+cckDzUJwrmwM7+D2jgwo56
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR15MB2997
+X-OriginatorOrg: fb.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-09-16_12:2020-09-16,2020-09-16 signatures=0
+X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 priorityscore=1501
+ bulkscore=0 mlxscore=0 spamscore=0 lowpriorityscore=0 phishscore=0
+ mlxlogscore=999 suspectscore=0 malwarescore=0 impostorscore=0 adultscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009160135
+X-FB-Internal: deliver
+subject: Re: [PATCH 5/9] btrfs: zstd: Switch to the zstd-1.4.6 API
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
  definitions=2020-09-17_09:2020-09-16,2020-09-17 signatures=0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On OcteonTX2 platform CPT instruction enqueue and NIX
-packet send are only possible via LMTST operations which
-uses LDEOR instruction. This patch moves the asm code
-from OcteonTX2 nic driver to include/linux/soc as it
-will be used by OcteonTX2 CPT and NIC driver for
-LMTST.
-
-Signed-off-by: Srujana Challa <schalla@marvell.com>
----
- MAINTAINERS                                   |  2 ++
- .../marvell/octeontx2/nic/otx2_common.h       | 13 +--------
- include/linux/soc/marvell/octeontx2/asm.h     | 29 +++++++++++++++++++
- 3 files changed, 32 insertions(+), 12 deletions(-)
- create mode 100644 include/linux/soc/marvell/octeontx2/asm.h
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 9a545a631f0d..95ddbb4f1a89 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10431,6 +10431,7 @@ M:	Srujana Challa <schalla@marvell.com>
- L:	linux-crypto@vger.kernel.org
- S:	Maintained
- F:	drivers/crypto/marvell/
-+F:	include/linux/soc/marvell/octeontx2/
- 
- MARVELL GIGABIT ETHERNET DRIVERS (skge/sky2)
- M:	Mirko Lindner <mlindner@marvell.com>
-@@ -10503,6 +10504,7 @@ M:	hariprasad <hkelam@marvell.com>
- L:	netdev@vger.kernel.org
- S:	Supported
- F:	drivers/net/ethernet/marvell/octeontx2/nic/
-+F:	include/linux/soc/marvell/octeontx2/
- 
- MARVELL OCTEONTX2 RVU ADMIN FUNCTION DRIVER
- M:	Sunil Goutham <sgoutham@marvell.com>
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index ac47762cce9b..12311964d9d6 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -16,6 +16,7 @@
- #include <linux/net_tstamp.h>
- #include <linux/ptp_clock_kernel.h>
- #include <linux/timecounter.h>
-+#include <linux/soc/marvell/octeontx2/asm.h>
- 
- #include <mbox.h>
- #include "otx2_reg.h"
-@@ -420,21 +421,9 @@ static inline u64 otx2_atomic64_add(u64 incr, u64 *ptr)
- 	return result;
- }
- 
--static inline u64 otx2_lmt_flush(uint64_t addr)
--{
--	u64 result = 0;
--
--	__asm__ volatile(".cpu  generic+lse\n"
--			 "ldeor xzr,%x[rf],[%[rs]]"
--			 : [rf]"=r"(result)
--			 : [rs]"r"(addr));
--	return result;
--}
--
- #else
- #define otx2_write128(lo, hi, addr)
- #define otx2_atomic64_add(incr, ptr)		({ *ptr += incr; })
--#define otx2_lmt_flush(addr)			({ 0; })
- #endif
- 
- /* Alloc pointer from pool/aura */
-diff --git a/include/linux/soc/marvell/octeontx2/asm.h b/include/linux/soc/marvell/octeontx2/asm.h
-new file mode 100644
-index 000000000000..ae2279fe830a
---- /dev/null
-+++ b/include/linux/soc/marvell/octeontx2/asm.h
-@@ -0,0 +1,29 @@
-+/* SPDX-License-Identifier: GPL-2.0-only
-+ * Copyright (C) 2020 Marvell.
-+ */
-+
-+#ifndef __SOC_OTX2_ASM_H
-+#define __SOC_OTX2_ASM_H
-+
-+#if defined(CONFIG_ARM64)
-+/*
-+ * otx2_lmt_flush is used for LMT store operation.
-+ * On octeontx2 platform CPT instruction enqueue and
-+ * NIX packet send are only possible via LMTST
-+ * operations and it uses LDEOR instruction targeting
-+ * the coprocessor address.
-+ */
-+#define otx2_lmt_flush(ioaddr)                          \
-+({                                                      \
-+	u64 result = 0;                                 \
-+	__asm__ volatile(".cpu  generic+lse\n"          \
-+			 "ldeor xzr, %x[rf], [%[rs]]"   \
-+			 : [rf]"=r" (result)            \
-+			 : [rs]"r" (ioaddr));           \
-+	(result);                                       \
-+})
-+#else
-+#define otx2_lmt_flush(ioaddr)          ({ 0; })
-+#endif
-+
-+#endif /* __SOC_OTX2_ASM_H */
--- 
-2.28.0
-
+DQoNCj4gT24gU2VwIDE2LCAyMDIwLCBhdCA3OjQ2IEFNLCBDaHJpc3RvcGggSGVsbHdpZyA8aGNo
+QGluZnJhZGVhZC5vcmc+IHdyb3RlOg0KPiANCj4gT24gV2VkLCBTZXAgMTYsIDIwMjAgYXQgMTA6
+NDM6MDRBTSAtMDQwMCwgQ2hyaXMgTWFzb24gd3JvdGU6DQo+PiBPdGhlcndpc2Ugd2UganVzdCBl
+bmQgdXAgd2l0aCBkcmlmdCBhbmQga2VybmVsLXNwZWNpZmljIGJ1Z3MgdGhhdCBhcmUgaGFyZGVy
+DQo+PiB0byBkZWJ1Zy4gIFRvIHRoZSBleHRlbnQgdGhvc2UgQVBJcyBtYWtlIHVzIGNvbnRvcnQg
+dGhlIGtlcm5lbCBjb2RlLCBJPz8/bQ0KPj4gc3VyZSBOaWNrIGlzIGludGVyZXN0ZWQgaW4gaW1w
+cm92aW5nIHRoaW5ncyBpbiBib3RoIHBsYWNlcy4NCj4gDQo+IFNlcmlvdXNseSwgd2UgZG8gbm90
+IGNhcmUgZWxzZXdoZXJlLiAgV2h5IHdvdWxkIHpsaWIgYmUgYW55IGRpZmZlcmVudD8NCj4gDQo+
+PiBUaGVyZSBhcmUgcHJvYmFibHkgMTAwMCBjb25zdHJ1Y3RpdmUgd2F5cyB0byBoYXZlIHRoYXQg
+Y29udmVyc2F0aW9uLiAgUGxlYXNlDQo+PiBjaG9vc2Ugb25lIG9mIHRob3NlIGluc3RlYWQgb2Yg
+YmVpbmcgYW4gYXNzaG9sZS4NCj4gDQo+IEkgdGhpbmsgeW91IGFyZSB0aGUgYXNzaG9sZSBoZXJl
+IGJ5IGlnbm9yaW5nIHRoZSBwcmFjdGljZXMgd2UgYXJlIHVzaW5nDQo+IGVsc2V3aGVyZSBhbmQg
+dGhpbmsgeW91ciBlbXBsb3llcnMgcGV0IHByb2plY3QgaXMgc29tZWhvdyBzcGVjaWFsLiAgSXQN
+Cj4gaXMgbm90LCBhbmQgY2xhaW1pbmcgc28gaXMgZXZlcnl0aGluZyBidXQgY29uc3RydWN0aXZl
+Lg0KDQpNeSBnb2FsIGluIHVwZGF0aW5nIHRoZSB6c3RkIGtlcm5lbCB0byB1c2UgdGhlIHVwc3Ry
+ZWFtIEFQSSBkaXJlY3RseSBpcyB0bw0KbWFrZSBmcmVxdWVudCBzeW5jcyBpbnRvIHRoZSBrZXJu
+ZWwgZWFzeS4gVGhpcyBpcyBpbXBvcnRhbnQgc28gdGhlIGtlcm5lbA0KZG9lc24ndCBtaXNzIG91
+dCBvbiBidWcgZml4ZXMgYW5kIHBlcmZvcm1hbmNlIGltcHJvdmVtZW50cy4NCg0KVGhlIHVwc3Ry
+ZWFtIHpzdGQgaXMgY29udGludW91c2x5IGZ1enplZCBhbmQgaXMgYmF0dGxlIHRlc3RlZCBpbiBw
+cm9kdWN0aW9uDQphbmQgYWNyb3NzIG1hbnkgZGlmZmVyZW50IHByb2plY3RzIGV4dGVybmFsIHRv
+IEZhY2Vib29rLiBUaGF0IG1lYW5zIHRoYXQNCnpzdGQtMS40LjYgaGFzIGFuIGFkZGl0aW9uYWwg
+MyB5ZWFycyBvZiBjb250aW51b3VzIGZ1enppbmcsIGFzIHdlbGwgYXMNCmltcHJvdmVtZW50cyB0
+byBvdXIgZnV6eiBhbmQgdGVzdCBzdWl0ZS4NCg0KVGhlIHpzdGQgdmVyc2lvbiBpbiB0aGUga2Vy
+bmVsIHdvcmtzIGZpbmUuIEJ1dCwgeW91IGNhbiBzZWUgdGhhdCB0aGUgdmVyc2lvbg0KdGhhdCBn
+b3QgaW1wb3J0ZWQgc3RhZ25hdGVkIHdoZXJlIHVwc3RyZWFtIGhhZCAxNCByZWxlYXNlZCB2ZXJz
+aW9ucy4gSQ0KZG9uJ3QgdGhpbmsgaXQgbWFrZXMgc2Vuc2UgdG8gaGF2ZSBrZXJuZWwgZGV2ZWxv
+cGVycyBtYWludGFpbiB0aGVpciBvd24gY29weQ0Kb2YgenN0ZC4gVGhlaXIgdGltZSB3b3VsZCBi
+ZSBiZXR0ZXIgc3BlbnQgd29ya2luZyBvbiB0aGUgcmVzdCBvZiB0aGUga2VybmVsLg0KVXNpbmcg
+dXBzdHJlYW0gZGlyZWN0bHkgbGV0cyB0aGUga2VybmVsIHByb2ZpdCBmcm9tIHRoZSB3b3JrIHRo
+YXQgd2UsIHRoZSB6c3RkDQpkZXZlbG9wZXJzLCBhcmUgZG9pbmcuIEFuZCBpdCBzdGlsbCBhbGxv
+d3Mga2VybmVsIGRldmVsb3BlcnMgdG8gZml4IGJ1Z3MgaWYgYW55DQpzaG93IHVwLCBhbmQgd2Ug
+Y2FuIGJhY2stcG9ydCB0aGVtIHRvIHVwc3RyZWFtLg0KDQpGb3IgZXhhbXBsZSwgSeKAmXZlIG1l
+YXN1cmVkIHRoYXQgQnRyRlMgZGVjb21wcmVzc2lvbiArIHJlYWQgcGVyZm9ybWFuY2UNCmlzIGlt
+cHJvdmVkIDE1JSB3aXRoIHRoaXMgcGF0Y2guIEFuZCBaUkFNIHBlcmZvcm1hbmNlIGltcHJvdmVz
+IDMwJS4NCkFuZCBTcXVhc2hGUyBkZWNvbXByZXNzaW9uICsgcmVhZCBwZXJmb3JtYW5jZSBpbXBy
+b3ZlcyAxNSUuDQoNCkFkbWl0dGVkbHksIHRoZSBBUEkgcHJvdmlkZWQgZm9yIHN0YXRpYyB3b3Jr
+c3BhY2UgYWxsb2NhdGlvbiBpcyB2ZXJib3NlLiBNb3N0DQp6c3RkIHVzZXJzIGRvbuKAmXQgbmVl
+ZCBpdCwgc28gb3VyIGVmZm9ydHMgdG8gaW1wcm92ZSB0aGUgZXJnb25vbWljcyBvZiB0aGUgQVBJ
+DQpoYXZlbuKAmXQgYmVlbiBmb2N1c2VkIGhlcmUuIEF0IHRoaXMgcG9pbnQsIHdlIGNvdWxkbuKA
+mXQgcmVuYW1lIHRoZXNlIEFQSXMgZWFzaWx5LA0Kc2luY2Ugd2UgaGF2ZSB1c2VycyByZWx5aW5n
+IG9uIG91ciBBUEkuIEl0IGNvdWxkIGJlIGRvbmUsIGJlY2F1c2Ugd2UgZG9u4oCZdA0KZ3VhcmFu
+dGVlIEFCSSBzdGFiaWxpdHkgZm9yIHRoaXMgcG9ydGlvbiBvZiB0aGUgQVBJLCBidXQgd2Ugd291
+bGQgaGF2ZSB0byBoYXZlDQphIGdvb2QgcmVhc29uIGZvciBpdC4NCg0KT25lIHBvc3NpYmlsaXR5
+IGlzIHRvIGhhdmUgYSBrZXJuZWwgd3JhcHBlciBvbiB0b3Agb2YgdGhlIHpzdGQgQVBJIHRvIG1h
+a2UgaXQNCm1vcmUgZXJnb25vbWljLiBJIHBlcnNvbmFsbHkgZG9u4oCZdCByZWFsbHkgc2VlIHRo
+ZSB2YWx1ZSBpbiBpdCwgc2luY2UgaXQgYWRkcw0KYW5vdGhlciBsYXllciBvZiBpbmRpcmVjdGlv
+biBiZXR3ZWVuIHpzdGQgYW5kIHRoZSBjYWxsZXIsIGJ1dCBpdCBjb3VsZCBiZSBkb25lLg0KDQpP
+ZiBhbGwgdGhlIGNvbXByZXNzb3JzIGluIHRoZSBrZXJuZWwsIG9ubHkgbHo0IGFuZCB6c3RkIGFy
+ZSB1bmRlciBhY3RpdmUNCmRldmVsb3BtZW50LiBBbmQgbHo0IGhhcyBzd2l0Y2hlZCB0byB1c2lu
+ZyB0aGUgdXBzdHJlYW0gQVBJIGRpcmVjdGx5Lg0KWHogZG9lcyBzZWUgYSBsaXR0bGUgYml0IG9m
+IGRldmVsb3BtZW50LCBidXQgbm90aGluZyBoYXMgYmVlbiBzeW5jZWQgdG8gdGhlDQprZXJuZWwu
+DQoNCkJlc3QsDQpOaWNr
