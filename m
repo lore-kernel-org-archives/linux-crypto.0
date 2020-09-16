@@ -2,199 +2,577 @@ Return-Path: <SRS0=gkSk=CZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DCE3C433E2
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 09:59:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E98FC43461
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 16:29:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E7502221E5
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 09:59:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600250346;
-	bh=qFni0sLz6kkB+YGb3b0+zGBDJ4LybpPsLb3ZISq3//w=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=FhLE5sJ8VTvpN4C+LmvhezAf09ai7/R5kYOWA6Hy5vnsa1doWvTzDLHNmo5RJCiP3
-	 Mn0TIDruuzeNTFsHAvtGMH5Amcb6SD6SmbWNx0XFlTQzfMMuTkbV84RdVAv8JGeo5n
-	 mEhU4mCYMsafOnWmVwwAAUmf/xhX0ShBg5U42MmQ=
+	by mail.kernel.org (Postfix) with ESMTP id E4ED822247
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 16:29:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="VHHsMXv+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726349AbgIPJ7E (ORCPT
+        id S1726481AbgIPQ27 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Sep 2020 05:59:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35304 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726727AbgIPJ7C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Sep 2020 05:59:02 -0400
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 701AC22209
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2020 09:58:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600250323;
-        bh=qFni0sLz6kkB+YGb3b0+zGBDJ4LybpPsLb3ZISq3//w=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=oAEPLIi2JgAiAC5Wi66g41NuprePDaKq2HPc9zHwbKyPSd2Ib2lL/Uvf1SgtI4rPe
-         GKQpR7ytcXCzyI8CxOitn24fEi7vkf8xzSitenC0td6VPNzoDvCxIZoWjgkyyhK3gl
-         LC9xvw1ql0ROKO05jmJT2NFetc/70RkH7zLOu6rA=
-Received: by mail-ot1-f53.google.com with SMTP id n61so6088234ota.10
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2020 02:58:43 -0700 (PDT)
-X-Gm-Message-State: AOAM532BPOA7qfHrHbyUe9X6YFOxILD8SAyeif3wc97JZTlVMnSanrrq
-        gZdE1hc+8ERsU+2ASQ4OinQrxhX+cFQK5FGATeA=
-X-Google-Smtp-Source: ABdhPJzdyE0FY72khWbT51jz7c4J2tDUuXwGrvP2Bs0DOSEohMaz7SXxMlGK9/8PgNEPVYO3Hau5MVEudIiNQ3Rh9z4=
-X-Received: by 2002:a9d:6193:: with SMTP id g19mr15441181otk.108.1600250322785;
- Wed, 16 Sep 2020 02:58:42 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200915094619.32548-1-ardb@kernel.org> <CAKwvOdn90vs-K4gyi47nJOuwc_g0r3p_ytc9ChPEmunCQ1186w@mail.gmail.com>
- <CAMj1kXFtm4Ue0=6qBaKO73Ft1PmKC52chJrbaA8nRLsV5m807g@mail.gmail.com> <b97cf037b2ca28a75125a31ef020ec86@agner.ch>
-In-Reply-To: <b97cf037b2ca28a75125a31ef020ec86@agner.ch>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 16 Sep 2020 12:58:31 +0300
-X-Gmail-Original-Message-ID: <CAMj1kXFmBvwHsUz1WWAccY6KyE7Z_fYY7UiiDDbsLJ=wj8vMrg@mail.gmail.com>
-Message-ID: <CAMj1kXFmBvwHsUz1WWAccY6KyE7Z_fYY7UiiDDbsLJ=wj8vMrg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: arm/sha256-neon - avoid ADRL pseudo instruction
-To:     Stefan Agner <stefan@agner.ch>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Peter Smith <Peter.Smith@arm.com>
+        Wed, 16 Sep 2020 12:28:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49332 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726490AbgIPQTz (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Sep 2020 12:19:55 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C07BC061225
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2020 04:08:10 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id k14so4402052qvw.20
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2020 04:08:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc:content-transfer-encoding;
+        bh=PwOlpfhwnbh1TObHdgcMyM42GuW6nbfgWUpDOLPjtUk=;
+        b=VHHsMXv+nunAmMepy5dcJiUUg7DEjdGDEY7GspniFqw5q5GDX3aeJBQUxx2kkRvPff
+         IJktG/hkyZhv6BJ0B4mwRa1a86aE0zDANRpW5oNa9t7MYkJINsyJvsKYzUaSkmiZMFx+
+         Mjp8X7XtRo92PiEE7LZDQiqopCDHUoR7g+HmPugw1707YNmeHgFyRUg+WIDxf3MUjcum
+         v3dUXOi4+PAhBycOrgUxIDrbT8z7z/gmE98+OCETqLQPi7Cr3nUbOFFjMY5lMs4CAnab
+         XAEF7LoDB0UCkrF4y04MDUNr3PNyhYytNyNTMDgWSBQlKamqVt9MXGY9+Eoa+dbtrG7V
+         B5BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc:content-transfer-encoding;
+        bh=PwOlpfhwnbh1TObHdgcMyM42GuW6nbfgWUpDOLPjtUk=;
+        b=D4Pn4v/FDM0Lyvy7MlR+L/h872tHrFLvf1M3megdWLPsvemsIqNEJ0XBO57Y1qcnP/
+         Wq94Umin4GABXG/N8mQrvqANVEzfl7vmpLxxh7/8SPGsE0Gyb8mza09HiJU+jWNiIUYo
+         2yQuH78v9egSn1TeFuAi29vRs8g3236eW65HA34hPMzCrZLJKGzSddI7vh2frAoisutD
+         g8c1E4gwmvk5MFnpkAw9nl7SXb6RygB1L461NN8hf9LBk1vkccx7ETlMll7oaHq5pavl
+         fGZpeVrEIA0bByl41hXLH6Fe0KcLV9EwZcndUSJjhiQ7cQlgeYcYym5FopHaNUTkuV2S
+         W01g==
+X-Gm-Message-State: AOAM533KAdLMTYGBVEUemxXI2Xc55nTvrWOiLuM3uOWko/rczvJj57dF
+        LmwLNL03pTiorWXQSM4ls4ta/iSWjZ1g
+X-Google-Smtp-Source: ABdhPJwxwS9C3sZ8Hxk+tipww8fKNsn9gKIEz1I9x89VWb5uWP8G/xFxArzUKso4B0fvojTxkOx9bQyDCdZG
+X-Received: from lenaptr.lon.corp.google.com ([2a00:79e0:d:210:f693:9fff:fef4:29c9])
+ (user=lenaptr job=sendgmr) by 2002:ad4:47cc:: with SMTP id
+ p12mr21860502qvw.25.1600254489141; Wed, 16 Sep 2020 04:08:09 -0700 (PDT)
+Date:   Wed, 16 Sep 2020 12:07:31 +0100
+In-Reply-To: <20200909210017.GA1080156@gmail.com>
+Message-Id: <20200916110731.598437-1-lenaptr@google.com>
+Mime-Version: 1.0
+References: <20200909210017.GA1080156@gmail.com>
+X-Mailer: git-send-email 2.28.0.618.gf4bc123cb7-goog
+Subject: [PATCH v8] crypto: af_alg - add extra parameters for DRBG interface
+From:   Elena Petrova <lenaptr@google.com>
+To:     herbert@gondor.apana.org.au
+Cc:     Elena Petrova <lenaptr@google.com>, linux-crypto@vger.kernel.org,
+        Eric Biggers <ebiggers@kernel.org>,
+        "=?UTF-8?q?Stephan=20M=C3=BCller?=" <smueller@chronox.de>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jeffrey Vander Stoep <jeffv@google.com>,
+        Eric Biggers <ebiggers@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 16 Sep 2020 at 10:45, Stefan Agner <stefan@agner.ch> wrote:
->
-> On 2020-09-15 23:31, Ard Biesheuvel wrote:
-> > On Tue, 15 Sep 2020 at 21:50, Nick Desaulniers <ndesaulniers@google.com> wrote:
-> >>
-> >> On Tue, Sep 15, 2020 at 2:46 AM Ard Biesheuvel <ardb@kernel.org> wrote:
-> >> >
-> >> > The ADRL pseudo instruction is not an architectural construct, but a
-> >> > convenience macro that was supported by the ARM proprietary assembler
-> >> > and adopted by binutils GAS as well, but only when assembling in 32-bit
-> >> > ARM mode. Therefore, it can only be used in assembler code that is known
-> >> > to assemble in ARM mode only, but as it turns out, the Clang assembler
-> >> > does not implement ADRL at all, and so it is better to get rid of it
-> >> > entirely.
-> >> >
-> >> > So replace the ADRL instruction with a ADR instruction that refers to
-> >> > a nearer symbol, and apply the delta explicitly using an additional
-> >> > instruction.
-> >> >
-> >> > Cc: Nick Desaulniers <ndesaulniers@google.com>
-> >> > Cc: Stefan Agner <stefan@agner.ch>
-> >> > Cc: Peter Smith <Peter.Smith@arm.com>
-> >> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> >> > ---
-> >> > I will leave it to the Clang folks to decide whether this needs to be
-> >> > backported and how far, but a Cc stable seems reasonable here.
-> >> >
-> >> >  arch/arm/crypto/sha256-armv4.pl       | 4 ++--
-> >> >  arch/arm/crypto/sha256-core.S_shipped | 4 ++--
-> >> >  2 files changed, 4 insertions(+), 4 deletions(-)
-> >> >
-> >> > diff --git a/arch/arm/crypto/sha256-armv4.pl b/arch/arm/crypto/sha256-armv4.pl
-> >> > index 9f96ff48e4a8..8aeb2e82f915 100644
-> >> > --- a/arch/arm/crypto/sha256-armv4.pl
-> >> > +++ b/arch/arm/crypto/sha256-armv4.pl
-> >> > @@ -175,7 +175,6 @@ $code=<<___;
-> >> >  #else
-> >> >  .syntax unified
-> >> >  # ifdef __thumb2__
-> >> > -#  define adrl adr
-> >> >  .thumb
-> >> >  # else
-> >> >  .code   32
-> >> > @@ -471,7 +470,8 @@ sha256_block_data_order_neon:
-> >> >         stmdb   sp!,{r4-r12,lr}
-> >> >
-> >> >         sub     $H,sp,#16*4+16
-> >> > -       adrl    $Ktbl,K256
-> >> > +       adr     $Ktbl,.Lsha256_block_data_order
-> >> > +       add     $Ktbl,$Ktbl,#K256-.Lsha256_block_data_order
-> >> >         bic     $H,$H,#15               @ align for 128-bit stores
-> >> >         mov     $t2,sp
-> >> >         mov     sp,$H                   @ alloca
-> >> > diff --git a/arch/arm/crypto/sha256-core.S_shipped b/arch/arm/crypto/sha256-core.S_shipped
-> >> > index ea04b2ab0c33..1861c4e8a5ba 100644
-> >> > --- a/arch/arm/crypto/sha256-core.S_shipped
-> >> > +++ b/arch/arm/crypto/sha256-core.S_shipped
-> >> > @@ -56,7 +56,6 @@
-> >> >  #else
-> >> >  .syntax unified
-> >> >  # ifdef __thumb2__
-> >> > -#  define adrl adr
-> >> >  .thumb
-> >> >  # else
-> >> >  .code   32
-> >> > @@ -1885,7 +1884,8 @@ sha256_block_data_order_neon:
-> >> >         stmdb   sp!,{r4-r12,lr}
-> >> >
-> >> >         sub     r11,sp,#16*4+16
-> >> > -       adrl    r14,K256
-> >> > +       adr     r14,.Lsha256_block_data_order
-> >> > +       add     r14,r14,#K256-.Lsha256_block_data_order
-> >>
-> >> Hi Ard,
-> >> Thanks for the patch.  With this patch applied:
-> >>
-> >> $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make LLVM=1 LLVM_IAS=1
-> >> -j71 defconfig
-> >> $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make LLVM=1 LLVM_IAS=1 -j71
-> >> ...
-> >> arch/arm/crypto/sha256-core.S:2038:2: error: out of range immediate fixup value
-> >>  add r14,r14,#K256-.Lsha256_block_data_order
-> >>  ^
-> >>
-> >> :(
-> >>
-> >
-> > Strange. Could you change it to
-> >
-> > sub r14,r14,#.Lsha256_block_data_order-K256
-> >
-> > and try again?
-> >
-> > If that does work, it means the Clang assembler does not update the
-> > instruction type for negative addends (add to sub in this case), which
-> > would be unfortunate, since it would be another functionality gap.
->
-> Hm interesting, I did not come across another instance where this was a
-> problem.
->
-> In this particular case, is it guaranteed to be a subtraction? I guess
-> then using sub for now would be fine...?
->
+Extend the user-space RNG interface:
+  1. Add entropy input via ALG_SET_DRBG_ENTROPY setsockopt option;
+  2. Add additional data input via sendmsg syscall.
 
-Yes for this code it is fine.
+This allows DRBG to be tested with test vectors, for example for the
+purpose of CAVP testing, which otherwise isn't possible.
 
-> FWIW, we discussed possible solution also in this issue
-> (mach-omap2/sleep34xx.S case is handled already):
-> https://github.com/ClangBuiltLinux/linux/issues/430
->
-> --
-> Stefan
->
-> >
-> >
-> >
-> >> Would the adr_l macro you wrote in
-> >> https://lore.kernel.org/linux-arm-kernel/nycvar.YSQ.7.78.906.2009141003360.4095746@knanqh.ubzr/T/#t
-> >> be helpful here?
-> >>
-> >> >         bic     r11,r11,#15             @ align for 128-bit stores
-> >> >         mov     r12,sp
-> >> >         mov     sp,r11                  @ alloca
-> >> > --
-> >> > 2.17.1
-> >> >
-> >>
-> >>
-> >> --
-> >> Thanks,
-> >> ~Nick Desaulniers
+To prevent erroneous use of entropy input, it is hidden under
+CRYPTO_USER_API_RNG_CAVP config option and requires CAP_SYS_ADMIN to
+succeed.
+
+Signed-off-by: Elena Petrova <lenaptr@google.com>
+Acked-by: Stephan M=C3=BCller <smueller@chronox.de>
+Reviewed-by: Eric Biggers <ebiggers@google.com>
+---
+
+Herbert, can you please include this for 5.10?
+
+Updates in v8:
+  Added Reviewed-by tag to the description.
+
+Updates in v7:
+  1) rebased onto the latest at cryptodev-2.6.git, fixed compiler errors;
+  2) replaced kzfree with kfree_sensitive;
+  3) changed rng_test_sendmsg to return an error if len > MAXSIZE;
+  4) updated documentation to say when can Additional Data be provided.
+
+Updates in v6:
+  1) Kconfig option renamed to CRYPTO_USER_API_RNG_CAVP and is now bool ins=
+tead
+     of tristate;
+  2) run-time switch of proto_ops depending on whether the entropy was set;
+  3) corrected the NIST standard name;
+  4) rebased onto the tip of the tree;
+  5) documentation clarified;
+
+Updates in v5:
+  1) use __maybe_unused instead of #ifdef;
+  2) separate code path for a testing mode;
+  3) only allow Additional Data input in a testing mode.
+
+Updates in v4:
+  1) setentropy returns 0 or error code (used to return length);
+  2) bigfixes suggested by Eric.
+
+Updates in v3:
+  1) More details in commit message;
+  2) config option name is now CRYPTO_USER_API_CAVP_DRBG;
+  3) fixed a bug of not releasing socket locks.
+
+Updates in v2:
+  1) Adding CONFIG_CRYPTO_CAVS_DRBG around setentropy.
+  2) Requiring CAP_SYS_ADMIN for entropy reset.
+  3) Locking for send and recv.
+  4) Length checks added for send and setentropy; send and setentropy now r=
+eturn
+     number of bytes accepted.
+  5) Minor code style corrections.
+
+libkcapi patch for testing:
+  https://github.com/Len0k/libkcapi/commit/6f095d270b982008f419078614c15caa=
+592cb531
+
+ Documentation/crypto/userspace-if.rst |  20 ++-
+ crypto/Kconfig                        |   9 ++
+ crypto/af_alg.c                       |  14 ++-
+ crypto/algif_rng.c                    | 175 ++++++++++++++++++++++++--
+ include/crypto/if_alg.h               |   1 +
+ include/uapi/linux/if_alg.h           |   1 +
+ 6 files changed, 205 insertions(+), 15 deletions(-)
+
+diff --git a/Documentation/crypto/userspace-if.rst b/Documentation/crypto/u=
+serspace-if.rst
+index 52019e905900..b45dabbf69d6 100644
+--- a/Documentation/crypto/userspace-if.rst
++++ b/Documentation/crypto/userspace-if.rst
+@@ -296,15 +296,16 @@ follows:
+=20
+     struct sockaddr_alg sa =3D {
+         .salg_family =3D AF_ALG,
+-        .salg_type =3D "rng", /* this selects the symmetric cipher */
+-        .salg_name =3D "drbg_nopr_sha256" /* this is the cipher name */
++        .salg_type =3D "rng", /* this selects the random number generator =
+*/
++        .salg_name =3D "drbg_nopr_sha256" /* this is the RNG name */
+     };
+=20
+=20
+ Depending on the RNG type, the RNG must be seeded. The seed is provided
+ using the setsockopt interface to set the key. For example, the
+ ansi_cprng requires a seed. The DRBGs do not require a seed, but may be
+-seeded.
++seeded. The seed is also known as a *Personalization String* in NIST SP 80=
+0-90A
++standard.
+=20
+ Using the read()/recvmsg() system calls, random numbers can be obtained.
+ The kernel generates at most 128 bytes in one call. If user space
+@@ -314,6 +315,16 @@ WARNING: The user space caller may invoke the initiall=
+y mentioned accept
+ system call multiple times. In this case, the returned file descriptors
+ have the same state.
+=20
++Following CAVP testing interfaces are enabled when kernel is built with
++CRYPTO_USER_API_RNG_CAVP option:
++
++-  the concatenation of *Entropy* and *Nonce* can be provided to the RNG v=
+ia
++   ALG_SET_DRBG_ENTROPY setsockopt interface. Setting the entropy requires
++   CAP_SYS_ADMIN permission.
++
++-  *Additional Data* can be provided using the send()/sendmsg() system cal=
+ls,
++   but only after the entropy has been set.
++
+ Zero-Copy Interface
+ -------------------
+=20
+@@ -377,6 +388,9 @@ mentioned optname:
+    provided ciphertext is assumed to contain an authentication tag of
+    the given size (see section about AEAD memory layout below).
+=20
++-  ALG_SET_DRBG_ENTROPY -- Setting the entropy of the random number genera=
+tor.
++   This option is applicable to RNG cipher type only.
++
+ User space API example
+ ----------------------
+=20
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 1b57419fa2e7..070a88ec1ba8 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1870,6 +1870,15 @@ config CRYPTO_USER_API_RNG
+ 	  This option enables the user-spaces interface for random
+ 	  number generator algorithms.
+=20
++config CRYPTO_USER_API_RNG_CAVP
++	bool "Enable CAVP testing of DRBG"
++	depends on CRYPTO_USER_API_RNG && CRYPTO_DRBG
++	help
++	  This option enables extra API for CAVP testing via the user-space
++	  interface: resetting of DRBG entropy, and providing Additional Data.
++	  This should only be enabled for CAVP testing. You should say
++	  no unless you know what this is.
++
+ config CRYPTO_USER_API_AEAD
+ 	tristate "User-space interface for AEAD cipher algorithms"
+ 	depends on NET
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index a6f581ab200c..8535cb03b484 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -253,6 +253,14 @@ static int alg_setsockopt(struct socket *sock, int lev=
+el, int optname,
+ 		if (!type->setauthsize)
+ 			goto unlock;
+ 		err =3D type->setauthsize(ask->private, optlen);
++		break;
++	case ALG_SET_DRBG_ENTROPY:
++		if (sock->state =3D=3D SS_CONNECTED)
++			goto unlock;
++		if (!type->setentropy)
++			goto unlock;
++
++		err =3D type->setentropy(ask->private, optval, optlen);
+ 	}
+=20
+ unlock:
+@@ -285,6 +293,11 @@ int af_alg_accept(struct sock *sk, struct socket *news=
+ock, bool kern)
+ 	security_sock_graft(sk2, newsock);
+ 	security_sk_clone(sk, sk2);
+=20
++	/*
++	 * newsock->ops assigned here to allow type->accept call to override
++	 * them when required.
++	 */
++	newsock->ops =3D type->ops;
+ 	err =3D type->accept(ask->private, sk2);
+=20
+ 	nokey =3D err =3D=3D -ENOKEY;
+@@ -303,7 +316,6 @@ int af_alg_accept(struct sock *sk, struct socket *newso=
+ck, bool kern)
+ 	alg_sk(sk2)->parent =3D sk;
+ 	alg_sk(sk2)->type =3D type;
+=20
+-	newsock->ops =3D type->ops;
+ 	newsock->state =3D SS_CONNECTED;
+=20
+ 	if (nokey)
+diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
+index 6300e0566dc5..3ca571b10b08 100644
+--- a/crypto/algif_rng.c
++++ b/crypto/algif_rng.c
+@@ -38,6 +38,7 @@
+  * DAMAGE.
+  */
+=20
++#include <linux/capability.h>
+ #include <linux/module.h>
+ #include <crypto/rng.h>
+ #include <linux/random.h>
+@@ -53,15 +54,26 @@ struct rng_ctx {
+ #define MAXSIZE 128
+ 	unsigned int len;
+ 	struct crypto_rng *drng;
++	u8 *addtl;
++	size_t addtl_len;
+ };
+=20
+-static int rng_recvmsg(struct socket *sock, struct msghdr *msg, size_t len=
+,
+-		       int flags)
++struct rng_parent_ctx {
++	struct crypto_rng *drng;
++	u8 *entropy;
++};
++
++static void rng_reset_addtl(struct rng_ctx *ctx)
+ {
+-	struct sock *sk =3D sock->sk;
+-	struct alg_sock *ask =3D alg_sk(sk);
+-	struct rng_ctx *ctx =3D ask->private;
+-	int err;
++	kfree_sensitive(ctx->addtl);
++	ctx->addtl =3D NULL;
++	ctx->addtl_len =3D 0;
++}
++
++static int _rng_recvmsg(struct crypto_rng *drng, struct msghdr *msg, size_=
+t len,
++			u8 *addtl, size_t addtl_len)
++{
++	int err =3D 0;
+ 	int genlen =3D 0;
+ 	u8 result[MAXSIZE];
+=20
+@@ -82,7 +94,7 @@ static int rng_recvmsg(struct socket *sock, struct msghdr=
+ *msg, size_t len,
+ 	 * seeding as they automatically seed. The X9.31 DRNG will return
+ 	 * an error if it was not seeded properly.
+ 	 */
+-	genlen =3D crypto_rng_get_bytes(ctx->drng, result, len);
++	genlen =3D crypto_rng_generate(drng, addtl, addtl_len, result, len);
+ 	if (genlen < 0)
+ 		return genlen;
+=20
+@@ -92,6 +104,63 @@ static int rng_recvmsg(struct socket *sock, struct msgh=
+dr *msg, size_t len,
+ 	return err ? err : len;
+ }
+=20
++static int rng_recvmsg(struct socket *sock, struct msghdr *msg, size_t len=
+,
++		       int flags)
++{
++	struct sock *sk =3D sock->sk;
++	struct alg_sock *ask =3D alg_sk(sk);
++	struct rng_ctx *ctx =3D ask->private;
++
++	return _rng_recvmsg(ctx->drng, msg, len, NULL, 0);
++}
++
++static int rng_test_recvmsg(struct socket *sock, struct msghdr *msg, size_=
+t len,
++			    int flags)
++{
++	struct sock *sk =3D sock->sk;
++	struct alg_sock *ask =3D alg_sk(sk);
++	struct rng_ctx *ctx =3D ask->private;
++	int ret;
++
++	lock_sock(sock->sk);
++	ret =3D _rng_recvmsg(ctx->drng, msg, len, ctx->addtl, ctx->addtl_len);
++	rng_reset_addtl(ctx);
++	release_sock(sock->sk);
++
++	return ret;
++}
++
++static int rng_test_sendmsg(struct socket *sock, struct msghdr *msg, size_=
+t len)
++{
++	int err;
++	struct alg_sock *ask =3D alg_sk(sock->sk);
++	struct rng_ctx *ctx =3D ask->private;
++
++	lock_sock(sock->sk);
++	if (len > MAXSIZE) {
++		err =3D -EMSGSIZE;
++		goto unlock;
++	}
++
++	rng_reset_addtl(ctx);
++	ctx->addtl =3D kmalloc(len, GFP_KERNEL);
++	if (!ctx->addtl) {
++		err =3D -ENOMEM;
++		goto unlock;
++	}
++
++	err =3D memcpy_from_msg(ctx->addtl, msg, len);
++	if (err) {
++		rng_reset_addtl(ctx);
++		goto unlock;
++	}
++	ctx->addtl_len =3D len;
++
++unlock:
++	release_sock(sock->sk);
++	return err ? err : len;
++}
++
+ static struct proto_ops algif_rng_ops =3D {
+ 	.family		=3D	PF_ALG,
+=20
+@@ -111,14 +180,53 @@ static struct proto_ops algif_rng_ops =3D {
+ 	.recvmsg	=3D	rng_recvmsg,
+ };
+=20
++static struct proto_ops __maybe_unused algif_rng_test_ops =3D {
++	.family		=3D	PF_ALG,
++
++	.connect	=3D	sock_no_connect,
++	.socketpair	=3D	sock_no_socketpair,
++	.getname	=3D	sock_no_getname,
++	.ioctl		=3D	sock_no_ioctl,
++	.listen		=3D	sock_no_listen,
++	.shutdown	=3D	sock_no_shutdown,
++	.mmap		=3D	sock_no_mmap,
++	.bind		=3D	sock_no_bind,
++	.accept		=3D	sock_no_accept,
++	.sendpage	=3D	sock_no_sendpage,
++
++	.release	=3D	af_alg_release,
++	.recvmsg	=3D	rng_test_recvmsg,
++	.sendmsg	=3D	rng_test_sendmsg,
++};
++
+ static void *rng_bind(const char *name, u32 type, u32 mask)
+ {
+-	return crypto_alloc_rng(name, type, mask);
++	struct rng_parent_ctx *pctx;
++	struct crypto_rng *rng;
++
++	pctx =3D kzalloc(sizeof(*pctx), GFP_KERNEL);
++	if (!pctx)
++		return ERR_PTR(-ENOMEM);
++
++	rng =3D crypto_alloc_rng(name, type, mask);
++	if (IS_ERR(rng)) {
++		kfree(pctx);
++		return ERR_CAST(rng);
++	}
++
++	pctx->drng =3D rng;
++	return pctx;
+ }
+=20
+ static void rng_release(void *private)
+ {
+-	crypto_free_rng(private);
++	struct rng_parent_ctx *pctx =3D private;
++
++	if (unlikely(!pctx))
++		return;
++	crypto_free_rng(pctx->drng);
++	kfree_sensitive(pctx->entropy);
++	kfree_sensitive(pctx);
+ }
+=20
+ static void rng_sock_destruct(struct sock *sk)
+@@ -126,6 +234,7 @@ static void rng_sock_destruct(struct sock *sk)
+ 	struct alg_sock *ask =3D alg_sk(sk);
+ 	struct rng_ctx *ctx =3D ask->private;
+=20
++	rng_reset_addtl(ctx);
+ 	sock_kfree_s(sk, ctx, ctx->len);
+ 	af_alg_release_parent(sk);
+ }
+@@ -133,6 +242,7 @@ static void rng_sock_destruct(struct sock *sk)
+ static int rng_accept_parent(void *private, struct sock *sk)
+ {
+ 	struct rng_ctx *ctx;
++	struct rng_parent_ctx *pctx =3D private;
+ 	struct alg_sock *ask =3D alg_sk(sk);
+ 	unsigned int len =3D sizeof(*ctx);
+=20
+@@ -141,6 +251,8 @@ static int rng_accept_parent(void *private, struct sock=
+ *sk)
+ 		return -ENOMEM;
+=20
+ 	ctx->len =3D len;
++	ctx->addtl =3D NULL;
++	ctx->addtl_len =3D 0;
+=20
+ 	/*
+ 	 * No seeding done at that point -- if multiple accepts are
+@@ -148,20 +260,58 @@ static int rng_accept_parent(void *private, struct so=
+ck *sk)
+ 	 * state of the RNG.
+ 	 */
+=20
+-	ctx->drng =3D private;
++	ctx->drng =3D pctx->drng;
+ 	ask->private =3D ctx;
+ 	sk->sk_destruct =3D rng_sock_destruct;
+=20
++	/*
++	 * Non NULL pctx->entropy means that CAVP test has been initiated on
++	 * this socket, replace proto_ops algif_rng_ops with algif_rng_test_ops.
++	 */
++	if (pctx->entropy)
++		sk->sk_socket->ops =3D &algif_rng_test_ops;
++
+ 	return 0;
+ }
+=20
+ static int rng_setkey(void *private, const u8 *seed, unsigned int seedlen)
+ {
++	struct rng_parent_ctx *pctx =3D private;
+ 	/*
+ 	 * Check whether seedlen is of sufficient size is done in RNG
+ 	 * implementations.
+ 	 */
+-	return crypto_rng_reset(private, seed, seedlen);
++	return crypto_rng_reset(pctx->drng, seed, seedlen);
++}
++
++static int __maybe_unused rng_setentropy(void *private, sockptr_t entropy,
++					 unsigned int len)
++{
++	struct rng_parent_ctx *pctx =3D private;
++	u8 *kentropy =3D NULL;
++
++	if (!capable(CAP_SYS_ADMIN))
++		return -EACCES;
++
++	if (pctx->entropy)
++		return -EINVAL;
++
++	if (len > MAXSIZE)
++		return -EMSGSIZE;
++
++	if (len) {
++		kentropy =3D memdup_sockptr(entropy, len);
++		if (IS_ERR(kentropy))
++			return PTR_ERR(kentropy);
++	}
++
++	crypto_rng_alg(pctx->drng)->set_ent(pctx->drng, kentropy, len);
++	/*
++	 * Since rng doesn't perform any memory management for the entropy
++	 * buffer, save kentropy pointer to pctx now to free it after use.
++	 */
++	pctx->entropy =3D kentropy;
++	return 0;
+ }
+=20
+ static const struct af_alg_type algif_type_rng =3D {
+@@ -169,6 +319,9 @@ static const struct af_alg_type algif_type_rng =3D {
+ 	.release	=3D	rng_release,
+ 	.accept		=3D	rng_accept_parent,
+ 	.setkey		=3D	rng_setkey,
++#ifdef CONFIG_CRYPTO_USER_API_RNG_CAVP
++	.setentropy	=3D	rng_setentropy,
++#endif
+ 	.ops		=3D	&algif_rng_ops,
+ 	.name		=3D	"rng",
+ 	.owner		=3D	THIS_MODULE
+diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+index ee6412314f8f..a5db86670bdf 100644
+--- a/include/crypto/if_alg.h
++++ b/include/crypto/if_alg.h
+@@ -46,6 +46,7 @@ struct af_alg_type {
+ 	void *(*bind)(const char *name, u32 type, u32 mask);
+ 	void (*release)(void *private);
+ 	int (*setkey)(void *private, const u8 *key, unsigned int keylen);
++	int (*setentropy)(void *private, sockptr_t entropy, unsigned int len);
+ 	int (*accept)(void *private, struct sock *sk);
+ 	int (*accept_nokey)(void *private, struct sock *sk);
+ 	int (*setauthsize)(void *private, unsigned int authsize);
+diff --git a/include/uapi/linux/if_alg.h b/include/uapi/linux/if_alg.h
+index bc2bcdec377b..60b7c2efd921 100644
+--- a/include/uapi/linux/if_alg.h
++++ b/include/uapi/linux/if_alg.h
+@@ -35,6 +35,7 @@ struct af_alg_iv {
+ #define ALG_SET_OP			3
+ #define ALG_SET_AEAD_ASSOCLEN		4
+ #define ALG_SET_AEAD_AUTHSIZE		5
++#define ALG_SET_DRBG_ENTROPY		6
+=20
+ /* Operations */
+ #define ALG_OP_DECRYPT			0
+--=20
+2.28.0.526.ge36021eeef-goog
+
