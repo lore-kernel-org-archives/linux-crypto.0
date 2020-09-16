@@ -2,160 +2,305 @@ Return-Path: <SRS0=gkSk=CZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED98C43461
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 02:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12553C43461
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 03:39:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5C7820809
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 02:27:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A882821D94
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 03:39:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UZOYnGV9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726367AbgIPC1v (ORCPT
+        id S1726140AbgIPDja (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Sep 2020 22:27:51 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:12714 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726168AbgIPC1u (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Sep 2020 22:27:50 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id B2954665F4AF7498DE7E;
-        Wed, 16 Sep 2020 10:27:48 +0800 (CST)
-Received: from huawei.com (10.175.113.32) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Wed, 16 Sep 2020
- 10:27:41 +0800
-From:   Liu Shixin <liushixin2@huawei.com>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-CC:     <qat-linux@intel.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Liu Shixin <liushixin2@huawei.com>
-Subject: [PATCH -next] crypto: qat - convert to use DEFINE_SEQ_ATTRIBUTE macro
-Date:   Wed, 16 Sep 2020 10:50:17 +0800
-Message-ID: <20200916025017.3992367-1-liushixin2@huawei.com>
-X-Mailer: git-send-email 2.25.1
+        Tue, 15 Sep 2020 23:39:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44418 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726131AbgIPDj3 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Sep 2020 23:39:29 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48CFFC06174A;
+        Tue, 15 Sep 2020 20:39:29 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id d13so3114147pgl.6;
+        Tue, 15 Sep 2020 20:39:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/dXCQImWEMRMgy6ij/p3va9TB2IqETDFho83iRHLHbo=;
+        b=UZOYnGV9xEd3Q38l0h4F3wgESyOQDPdKJ/OVp6mgk5l4DbSiGm0reMbWYRC9iCMEgA
+         nEDVFZ89KHyLCmtzuDdqEEAHZcSRNrkllDocarL1wD/E/b5585mIw7Anp6ZmCNPCtvLh
+         p1P9yiPMEaj0AN5iK+WWe6V3WxtnVFRKSXRggeuTWNse0wLdHWd5M6h9Srcza06DZUgp
+         pYtYWvisuq2ox6NDtLh2GDbuuYBz55godHyZGylRMbEs+75/AA6yVB8dkFQIV9BAlFMx
+         tSQtEpp65QtP5aNlDnXT/OsqGzJenUQa0+wIHbWvZLnbbA3RhIuT29sTajetvStVdDcb
+         WF0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/dXCQImWEMRMgy6ij/p3va9TB2IqETDFho83iRHLHbo=;
+        b=IXuRFGwI1Gt/DKIWvHpfFXi4rnAMvQMtq5UpiXc5rYXjOzGegR2Qmzmmx7O+OEzeF5
+         gXDYJKwRr6FNYAgthVPs4aWUB9Hi3lNgAkikD5rIZTDEU4cOFpZKUyKq9nauAEGDEQOT
+         ddVY3FfzDpbpMOMD/fbaS6Xw8TBWDp3goPDyoBXccAmOYcI5fa7uCUL+0uAOfBrNuWcs
+         ZcIwgJ35bKLQu72W+tX08RnZvg1bhoocPh/xmaBeC5Ttd6QMD8seMi+XcbykuGT8JmeO
+         fBm5fzyvhJpVBXBQFtUzEhMRBrvuAPHQAbAdpvKIeyp4cp5fscWd4RqI31A93El5kCZs
+         rEfA==
+X-Gm-Message-State: AOAM5306H1DBJse5NWTVoUJ0jBb/fLVRE1toLaZqPhSQ1ih1dTVQzwNd
+        pAucRSfOgDZ9ISTpJCSTdPsQh6czY+d5xQ==
+X-Google-Smtp-Source: ABdhPJwbCF71/tvgaLc7zOdfm6OAAXs/Xq3SpcZwyMmnkNrToq/fk1pMASBxsfBaKkP79ZPSaCBVLw==
+X-Received: by 2002:a63:185a:: with SMTP id 26mr224880pgy.408.1600227568286;
+        Tue, 15 Sep 2020 20:39:28 -0700 (PDT)
+Received: from nickserv.localdomain (c-98-33-101-203.hsd1.ca.comcast.net. [98.33.101.203])
+        by smtp.gmail.com with ESMTPSA id i20sm12856635pgk.77.2020.09.15.20.39.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Sep 2020 20:39:27 -0700 (PDT)
+From:   Nick Terrell <nickrterrell@gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        squashfs-devel@lists.sourceforge.net,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-kernel@vger.kernel.org, Kernel Team <Kernel-team@fb.com>,
+        Nick Terrell <nickrterrell@gmail.com>,
+        Nick Terrell <terrelln@fb.com>, Chris Mason <clm@fb.com>,
+        Petr Malat <oss@malat.biz>, Johannes Weiner <jweiner@fb.com>,
+        Niket Agarwal <niketa@fb.com>, Yann Collet <cyan@fb.com>
+Subject: [PATCH 0/9] Update to zstd-1.4.6
+Date:   Tue, 15 Sep 2020 20:42:53 -0700
+Message-Id: <20200916034307.2092020-1-nickrterrell@gmail.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.32]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use DEFINE_SEQ_ATTRIBUTE macro to simplify the code.
+From: Nick Terrell <terrelln@fb.com>
 
-Signed-off-by: Liu Shixin <liushixin2@huawei.com>
----
- drivers/crypto/qat/qat_common/adf_cfg.c       | 19 +--------
- .../qat/qat_common/adf_transport_debug.c      | 42 ++-----------------
- 2 files changed, 5 insertions(+), 56 deletions(-)
+This patchset upgrades the zstd library to the latest upstream release. The
+current zstd version in the kernel is a modified version of upstream zstd-1.3.1.
+At the time it was integrated, zstd wasn't ready to be used in the kernel as-is.
+But, it is now possible to use upstream zstd directly in the kernel.
 
-diff --git a/drivers/crypto/qat/qat_common/adf_cfg.c b/drivers/crypto/qat/qat_common/adf_cfg.c
-index ac462796cefc..22ae32838113 100644
---- a/drivers/crypto/qat/qat_common/adf_cfg.c
-+++ b/drivers/crypto/qat/qat_common/adf_cfg.c
-@@ -52,24 +52,7 @@ static const struct seq_operations qat_dev_cfg_sops = {
- 	.show = qat_dev_cfg_show
- };
- 
--static int qat_dev_cfg_open(struct inode *inode, struct file *file)
--{
--	int ret = seq_open(file, &qat_dev_cfg_sops);
--
--	if (!ret) {
--		struct seq_file *seq_f = file->private_data;
--
--		seq_f->private = inode->i_private;
--	}
--	return ret;
--}
--
--static const struct file_operations qat_dev_cfg_fops = {
--	.open = qat_dev_cfg_open,
--	.read = seq_read,
--	.llseek = seq_lseek,
--	.release = seq_release
--};
-+DEFINE_SEQ_ATTRIBUTE(qat_dev_cfg);
- 
- /**
-  * adf_cfg_dev_add() - Create an acceleration device configuration table.
-diff --git a/drivers/crypto/qat/qat_common/adf_transport_debug.c b/drivers/crypto/qat/qat_common/adf_transport_debug.c
-index 2a2eccbf56ec..dac25ba47260 100644
---- a/drivers/crypto/qat/qat_common/adf_transport_debug.c
-+++ b/drivers/crypto/qat/qat_common/adf_transport_debug.c
-@@ -77,31 +77,14 @@ static void adf_ring_stop(struct seq_file *sfile, void *v)
- 	mutex_unlock(&ring_read_lock);
- }
- 
--static const struct seq_operations adf_ring_sops = {
-+static const struct seq_operations adf_ring_debug_sops = {
- 	.start = adf_ring_start,
- 	.next = adf_ring_next,
- 	.stop = adf_ring_stop,
- 	.show = adf_ring_show
- };
- 
--static int adf_ring_open(struct inode *inode, struct file *file)
--{
--	int ret = seq_open(file, &adf_ring_sops);
--
--	if (!ret) {
--		struct seq_file *seq_f = file->private_data;
--
--		seq_f->private = inode->i_private;
--	}
--	return ret;
--}
--
--static const struct file_operations adf_ring_debug_fops = {
--	.open = adf_ring_open,
--	.read = seq_read,
--	.llseek = seq_lseek,
--	.release = seq_release
--};
-+DEFINE_SEQ_ATTRIBUTE(adf_ring_debug);
- 
- int adf_ring_debugfs_add(struct adf_etr_ring_data *ring, const char *name)
- {
-@@ -188,31 +171,14 @@ static void adf_bank_stop(struct seq_file *sfile, void *v)
- 	mutex_unlock(&bank_read_lock);
- }
- 
--static const struct seq_operations adf_bank_sops = {
-+static const struct seq_operations adf_bank_debug_sops = {
- 	.start = adf_bank_start,
- 	.next = adf_bank_next,
- 	.stop = adf_bank_stop,
- 	.show = adf_bank_show
- };
- 
--static int adf_bank_open(struct inode *inode, struct file *file)
--{
--	int ret = seq_open(file, &adf_bank_sops);
--
--	if (!ret) {
--		struct seq_file *seq_f = file->private_data;
--
--		seq_f->private = inode->i_private;
--	}
--	return ret;
--}
--
--static const struct file_operations adf_bank_debug_fops = {
--	.open = adf_bank_open,
--	.read = seq_read,
--	.llseek = seq_lseek,
--	.release = seq_release
--};
-+DEFINE_SEQ_ATTRIBUTE(adf_bank_debug);
- 
- int adf_bank_debugfs_add(struct adf_etr_bank_data *bank)
- {
+I have not yet release zstd-1.4.6 upstream. I want the zstd version in the kernel
+to match up with a known upstream release, so we know exactly what code is
+running. Whenever this patchset is ready for merge, I will cut a release at the
+upstream commit that gets merged. This should not be necessary for future
+releases.
+
+The kernel zstd library is automatically generated from upstream zstd. A script
+makes the necessary changes and imports it into the kernel. The changes are:
+
+1. Replace all libc dependencies with kernel replacements and rewrite includes.
+2. Remove unncessary portability macros like: #if defined(_MSC_VER).
+3. Use the kernel xxhash instead of bundling it.
+
+This automation gets tested every commit by upstream's continuous integration.
+When we cut a new zstd release, we will submit a patch to the kernel to update
+the zstd version in the kernel.
+
+I've updated zstd to upstream with one big patch because every commit must build,
+so that precludes partial updates. Since the commit is 100% generated, I hope the
+review burden is lightened. I considered replaying upstream commits, but that is
+not possible because there have been ~3500 upstream commits since the last zstd
+import, and the commits don't all build individually. The bulk update preserves
+bisectablity because bugs can be bisected to the zstd version update. At that
+point the update can be reverted, and we can work with upstream to find and fix
+the bug. After this big switch in how the kernel consumes zstd, future patches
+will be smaller, because they will only have one upstream release worth of
+changes each.
+
+This patchset comes in 3 parts:
+1. The first 2 patches prepare for the zstd upgrade. The first patch adds a
+   compatibility wrapper so zstd can be upgraded without modifying any callers.
+   The second patch adds an indirection for the lib/decompress_unzstd.c including
+   of all decompression source files.
+2. Import zstd-1.4.6. This patch is completely generated from upstream using
+   automated tooling.
+3. Update all callers to the zstd-1.4.6 API then delete the compatibility
+   wrapper.
+
+I tested every caller of zstd on x86_64. I tested both after the 1.4.6 upgrade
+using the compatibility wrapper, and after the final patch in this series. I had
+problems with F2FS, where I had file truncation both before and after this
+series, so I would appreciate help testing it. All other callers were good.
+
+I tested kernel and initramfs decompression in i386 and arm.
+
+I ran benchmarks to compare the current zstd in the kernel with zstd-1.4.6.
+I benchmarked on x86_64 using QEMU with KVM enabled on an Intel i9-9900k.
+I found:
+* BtrFS zstd compression at levels 1 and 3 is 5% faster
+* BtrFS zstd decompression+read is 15% faster
+* SquashFS zstd decompression+read is 15% faster
+* ZRAM decompression+read is 30% faster
+* Kernel zstd decompression is 35% faster
+* Initramfs zstd decompression+build is 5% faster
+
+The latest zstd also offers bug fixes and a 1 KB reduction in stack uage during
+compression.
+
+Please let me know if there is anything that I can do to ease the way for these
+patches. I think it is important because it gets large performance improvements,
+contains bug fixes, and is switching to a more maintainable model of consuming
+upstream zstd directly, making it easy to keep up to date.
+
+Best,
+Nick Terrell
+
+Nick Terrell (9):
+  lib: zstd: Add zstd compatibility wrapper
+  lib: zstd: Add decompress_sources.h for decompress_unzstd
+  lib: zstd: Upgrade to latest upstream zstd version 1.4.6
+  crypto: zstd: Switch to zstd-1.4.6 API
+  btrfs: zstd: Switch to the zstd-1.4.6 API
+  f2fs: zstd: Switch to the zstd-1.4.6 API
+  squashfs: zstd: Switch to the zstd-1.4.6 API
+  lib: unzstd: Switch to the zstd-1.4.6 API
+  lib: zstd: Remove zstd compatibility wrapper
+
+ crypto/zstd.c                                 |   22 +-
+ fs/btrfs/zstd.c                               |   46 +-
+ fs/f2fs/compress.c                            |  100 +-
+ fs/squashfs/zstd_wrapper.c                    |    7 +-
+ include/linux/zstd.h                          | 3019 ++++++++----
+ include/linux/zstd_errors.h                   |   76 +
+ lib/decompress_unzstd.c                       |   44 +-
+ lib/zstd/Makefile                             |   35 +-
+ lib/zstd/bitstream.h                          |  379 --
+ lib/zstd/common/bitstream.h                   |  437 ++
+ lib/zstd/common/compiler.h                    |  134 +
+ lib/zstd/common/cpu.h                         |  194 +
+ lib/zstd/common/debug.c                       |   24 +
+ lib/zstd/common/debug.h                       |  101 +
+ lib/zstd/common/entropy_common.c              |  355 ++
+ lib/zstd/common/error_private.c               |   55 +
+ lib/zstd/common/error_private.h               |   66 +
+ lib/zstd/common/fse.h                         |  709 +++
+ lib/zstd/common/fse_decompress.c              |  380 ++
+ lib/zstd/common/huf.h                         |  352 ++
+ lib/zstd/common/mem.h                         |  347 ++
+ lib/zstd/common/zstd_common.c                 |   83 +
+ lib/zstd/common/zstd_deps.h                   |  134 +
+ lib/zstd/common/zstd_internal.h               |  424 ++
+ lib/zstd/compress.c                           | 3485 --------------
+ lib/zstd/compress/fse_compress.c              |  625 +++
+ lib/zstd/compress/hist.c                      |  165 +
+ lib/zstd/compress/hist.h                      |   75 +
+ lib/zstd/compress/huf_compress.c              |  764 +++
+ lib/zstd/compress/zstd_compress.c             | 4160 +++++++++++++++++
+ lib/zstd/compress/zstd_compress_internal.h    | 1103 +++++
+ lib/zstd/compress/zstd_compress_literals.c    |  158 +
+ lib/zstd/compress/zstd_compress_literals.h    |   29 +
+ lib/zstd/compress/zstd_compress_sequences.c   |  433 ++
+ lib/zstd/compress/zstd_compress_sequences.h   |   54 +
+ lib/zstd/compress/zstd_compress_superblock.c  |  849 ++++
+ lib/zstd/compress/zstd_compress_superblock.h  |   32 +
+ lib/zstd/compress/zstd_cwksp.h                |  524 +++
+ lib/zstd/compress/zstd_double_fast.c          |  521 +++
+ lib/zstd/compress/zstd_double_fast.h          |   32 +
+ lib/zstd/compress/zstd_fast.c                 |  496 ++
+ lib/zstd/compress/zstd_fast.h                 |   31 +
+ lib/zstd/compress/zstd_lazy.c                 | 1138 +++++
+ lib/zstd/compress/zstd_lazy.h                 |   61 +
+ lib/zstd/compress/zstd_ldm.c                  |  619 +++
+ lib/zstd/compress/zstd_ldm.h                  |  104 +
+ lib/zstd/compress/zstd_opt.c                  | 1200 +++++
+ lib/zstd/compress/zstd_opt.h                  |   50 +
+ lib/zstd/decompress.c                         | 2531 ----------
+ lib/zstd/decompress/huf_decompress.c          | 1205 +++++
+ lib/zstd/decompress/zstd_ddict.c              |  241 +
+ lib/zstd/decompress/zstd_ddict.h              |   44 +
+ lib/zstd/decompress/zstd_decompress.c         | 1836 ++++++++
+ lib/zstd/decompress/zstd_decompress_block.c   | 1540 ++++++
+ lib/zstd/decompress/zstd_decompress_block.h   |   62 +
+ .../decompress/zstd_decompress_internal.h     |  195 +
+ lib/zstd/decompress_sources.h                 |   18 +
+ lib/zstd/entropy_common.c                     |  243 -
+ lib/zstd/error_private.h                      |   53 -
+ lib/zstd/fse.h                                |  575 ---
+ lib/zstd/fse_compress.c                       |  795 ----
+ lib/zstd/fse_decompress.c                     |  325 --
+ lib/zstd/huf.h                                |  212 -
+ lib/zstd/huf_compress.c                       |  772 ---
+ lib/zstd/huf_decompress.c                     |  960 ----
+ lib/zstd/mem.h                                |  151 -
+ lib/zstd/zstd_common.c                        |   75 -
+ lib/zstd/zstd_compress_module.c               |   79 +
+ lib/zstd/zstd_decompress_module.c             |   79 +
+ lib/zstd/zstd_internal.h                      |  273 --
+ lib/zstd/zstd_opt.h                           | 1014 ----
+ 71 files changed, 24497 insertions(+), 13012 deletions(-)
+ create mode 100644 include/linux/zstd_errors.h
+ delete mode 100644 lib/zstd/bitstream.h
+ create mode 100644 lib/zstd/common/bitstream.h
+ create mode 100644 lib/zstd/common/compiler.h
+ create mode 100644 lib/zstd/common/cpu.h
+ create mode 100644 lib/zstd/common/debug.c
+ create mode 100644 lib/zstd/common/debug.h
+ create mode 100644 lib/zstd/common/entropy_common.c
+ create mode 100644 lib/zstd/common/error_private.c
+ create mode 100644 lib/zstd/common/error_private.h
+ create mode 100644 lib/zstd/common/fse.h
+ create mode 100644 lib/zstd/common/fse_decompress.c
+ create mode 100644 lib/zstd/common/huf.h
+ create mode 100644 lib/zstd/common/mem.h
+ create mode 100644 lib/zstd/common/zstd_common.c
+ create mode 100644 lib/zstd/common/zstd_deps.h
+ create mode 100644 lib/zstd/common/zstd_internal.h
+ delete mode 100644 lib/zstd/compress.c
+ create mode 100644 lib/zstd/compress/fse_compress.c
+ create mode 100644 lib/zstd/compress/hist.c
+ create mode 100644 lib/zstd/compress/hist.h
+ create mode 100644 lib/zstd/compress/huf_compress.c
+ create mode 100644 lib/zstd/compress/zstd_compress.c
+ create mode 100644 lib/zstd/compress/zstd_compress_internal.h
+ create mode 100644 lib/zstd/compress/zstd_compress_literals.c
+ create mode 100644 lib/zstd/compress/zstd_compress_literals.h
+ create mode 100644 lib/zstd/compress/zstd_compress_sequences.c
+ create mode 100644 lib/zstd/compress/zstd_compress_sequences.h
+ create mode 100644 lib/zstd/compress/zstd_compress_superblock.c
+ create mode 100644 lib/zstd/compress/zstd_compress_superblock.h
+ create mode 100644 lib/zstd/compress/zstd_cwksp.h
+ create mode 100644 lib/zstd/compress/zstd_double_fast.c
+ create mode 100644 lib/zstd/compress/zstd_double_fast.h
+ create mode 100644 lib/zstd/compress/zstd_fast.c
+ create mode 100644 lib/zstd/compress/zstd_fast.h
+ create mode 100644 lib/zstd/compress/zstd_lazy.c
+ create mode 100644 lib/zstd/compress/zstd_lazy.h
+ create mode 100644 lib/zstd/compress/zstd_ldm.c
+ create mode 100644 lib/zstd/compress/zstd_ldm.h
+ create mode 100644 lib/zstd/compress/zstd_opt.c
+ create mode 100644 lib/zstd/compress/zstd_opt.h
+ delete mode 100644 lib/zstd/decompress.c
+ create mode 100644 lib/zstd/decompress/huf_decompress.c
+ create mode 100644 lib/zstd/decompress/zstd_ddict.c
+ create mode 100644 lib/zstd/decompress/zstd_ddict.h
+ create mode 100644 lib/zstd/decompress/zstd_decompress.c
+ create mode 100644 lib/zstd/decompress/zstd_decompress_block.c
+ create mode 100644 lib/zstd/decompress/zstd_decompress_block.h
+ create mode 100644 lib/zstd/decompress/zstd_decompress_internal.h
+ create mode 100644 lib/zstd/decompress_sources.h
+ delete mode 100644 lib/zstd/entropy_common.c
+ delete mode 100644 lib/zstd/error_private.h
+ delete mode 100644 lib/zstd/fse.h
+ delete mode 100644 lib/zstd/fse_compress.c
+ delete mode 100644 lib/zstd/fse_decompress.c
+ delete mode 100644 lib/zstd/huf.h
+ delete mode 100644 lib/zstd/huf_compress.c
+ delete mode 100644 lib/zstd/huf_decompress.c
+ delete mode 100644 lib/zstd/mem.h
+ delete mode 100644 lib/zstd/zstd_common.c
+ create mode 100644 lib/zstd/zstd_compress_module.c
+ create mode 100644 lib/zstd/zstd_decompress_module.c
+ delete mode 100644 lib/zstd/zstd_internal.h
+ delete mode 100644 lib/zstd/zstd_opt.h
+
 -- 
-2.25.1
+2.28.0
 
