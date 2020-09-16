@@ -2,225 +2,199 @@ Return-Path: <SRS0=gkSk=CZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-18.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E88C43461
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 09:39:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DCE3C433E2
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 09:59:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 978B622225
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 09:39:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7502221E5
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 09:59:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600250346;
+	bh=qFni0sLz6kkB+YGb3b0+zGBDJ4LybpPsLb3ZISq3//w=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=FhLE5sJ8VTvpN4C+LmvhezAf09ai7/R5kYOWA6Hy5vnsa1doWvTzDLHNmo5RJCiP3
+	 Mn0TIDruuzeNTFsHAvtGMH5Amcb6SD6SmbWNx0XFlTQzfMMuTkbV84RdVAv8JGeo5n
+	 mEhU4mCYMsafOnWmVwwAAUmf/xhX0ShBg5U42MmQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726610AbgIPJjQ convert rfc822-to-8bit (ORCPT
+        id S1726349AbgIPJ7E (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Sep 2020 05:39:16 -0400
-Received: from relay2-d.mail.gandi.net ([217.70.183.194]:58755 "EHLO
-        relay2-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726392AbgIPJjP (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Sep 2020 05:39:15 -0400
-X-Originating-IP: 90.76.143.236
-Received: from localhost (lfbn-tou-1-1075-236.w90-76.abo.wanadoo.fr [90.76.143.236])
-        (Authenticated sender: antoine.tenart@bootlin.com)
-        by relay2-d.mail.gandi.net (Postfix) with ESMTPSA id 9F9994000C;
-        Wed, 16 Sep 2020 09:39:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 16 Sep 2020 05:59:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35304 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726727AbgIPJ7C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Sep 2020 05:59:02 -0400
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 701AC22209
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2020 09:58:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600250323;
+        bh=qFni0sLz6kkB+YGb3b0+zGBDJ4LybpPsLb3ZISq3//w=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=oAEPLIi2JgAiAC5Wi66g41NuprePDaKq2HPc9zHwbKyPSd2Ib2lL/Uvf1SgtI4rPe
+         GKQpR7ytcXCzyI8CxOitn24fEi7vkf8xzSitenC0td6VPNzoDvCxIZoWjgkyyhK3gl
+         LC9xvw1ql0ROKO05jmJT2NFetc/70RkH7zLOu6rA=
+Received: by mail-ot1-f53.google.com with SMTP id n61so6088234ota.10
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2020 02:58:43 -0700 (PDT)
+X-Gm-Message-State: AOAM532BPOA7qfHrHbyUe9X6YFOxILD8SAyeif3wc97JZTlVMnSanrrq
+        gZdE1hc+8ERsU+2ASQ4OinQrxhX+cFQK5FGATeA=
+X-Google-Smtp-Source: ABdhPJzdyE0FY72khWbT51jz7c4J2tDUuXwGrvP2Bs0DOSEohMaz7SXxMlGK9/8PgNEPVYO3Hau5MVEudIiNQ3Rh9z4=
+X-Received: by 2002:a9d:6193:: with SMTP id g19mr15441181otk.108.1600250322785;
+ Wed, 16 Sep 2020 02:58:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <1599810399-14999-1-git-send-email-pvanleeuwen@rambus.com>
-References: <1599810399-14999-1-git-send-email-pvanleeuwen@rambus.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        Pascal van Leeuwen <pvanleeuwen@rambus.com>
-To:     Pascal van Leeuwen <pvanleeuwen@rambus.com>,
-        linux-crypto@vger.kernel.org
-From:   Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: Re: [PATCH] crypto: inside-secure - Add support for EIP197 with output classifier
-Message-ID: <160024914969.39497.4731533016684319800@kwain>
-Date:   Wed, 16 Sep 2020 11:39:09 +0200
+References: <20200915094619.32548-1-ardb@kernel.org> <CAKwvOdn90vs-K4gyi47nJOuwc_g0r3p_ytc9ChPEmunCQ1186w@mail.gmail.com>
+ <CAMj1kXFtm4Ue0=6qBaKO73Ft1PmKC52chJrbaA8nRLsV5m807g@mail.gmail.com> <b97cf037b2ca28a75125a31ef020ec86@agner.ch>
+In-Reply-To: <b97cf037b2ca28a75125a31ef020ec86@agner.ch>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 16 Sep 2020 12:58:31 +0300
+X-Gmail-Original-Message-ID: <CAMj1kXFmBvwHsUz1WWAccY6KyE7Z_fYY7UiiDDbsLJ=wj8vMrg@mail.gmail.com>
+Message-ID: <CAMj1kXFmBvwHsUz1WWAccY6KyE7Z_fYY7UiiDDbsLJ=wj8vMrg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: arm/sha256-neon - avoid ADRL pseudo instruction
+To:     Stefan Agner <stefan@agner.ch>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Peter Smith <Peter.Smith@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Pascal,
+On Wed, 16 Sep 2020 at 10:45, Stefan Agner <stefan@agner.ch> wrote:
+>
+> On 2020-09-15 23:31, Ard Biesheuvel wrote:
+> > On Tue, 15 Sep 2020 at 21:50, Nick Desaulniers <ndesaulniers@google.com> wrote:
+> >>
+> >> On Tue, Sep 15, 2020 at 2:46 AM Ard Biesheuvel <ardb@kernel.org> wrote:
+> >> >
+> >> > The ADRL pseudo instruction is not an architectural construct, but a
+> >> > convenience macro that was supported by the ARM proprietary assembler
+> >> > and adopted by binutils GAS as well, but only when assembling in 32-bit
+> >> > ARM mode. Therefore, it can only be used in assembler code that is known
+> >> > to assemble in ARM mode only, but as it turns out, the Clang assembler
+> >> > does not implement ADRL at all, and so it is better to get rid of it
+> >> > entirely.
+> >> >
+> >> > So replace the ADRL instruction with a ADR instruction that refers to
+> >> > a nearer symbol, and apply the delta explicitly using an additional
+> >> > instruction.
+> >> >
+> >> > Cc: Nick Desaulniers <ndesaulniers@google.com>
+> >> > Cc: Stefan Agner <stefan@agner.ch>
+> >> > Cc: Peter Smith <Peter.Smith@arm.com>
+> >> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> >> > ---
+> >> > I will leave it to the Clang folks to decide whether this needs to be
+> >> > backported and how far, but a Cc stable seems reasonable here.
+> >> >
+> >> >  arch/arm/crypto/sha256-armv4.pl       | 4 ++--
+> >> >  arch/arm/crypto/sha256-core.S_shipped | 4 ++--
+> >> >  2 files changed, 4 insertions(+), 4 deletions(-)
+> >> >
+> >> > diff --git a/arch/arm/crypto/sha256-armv4.pl b/arch/arm/crypto/sha256-armv4.pl
+> >> > index 9f96ff48e4a8..8aeb2e82f915 100644
+> >> > --- a/arch/arm/crypto/sha256-armv4.pl
+> >> > +++ b/arch/arm/crypto/sha256-armv4.pl
+> >> > @@ -175,7 +175,6 @@ $code=<<___;
+> >> >  #else
+> >> >  .syntax unified
+> >> >  # ifdef __thumb2__
+> >> > -#  define adrl adr
+> >> >  .thumb
+> >> >  # else
+> >> >  .code   32
+> >> > @@ -471,7 +470,8 @@ sha256_block_data_order_neon:
+> >> >         stmdb   sp!,{r4-r12,lr}
+> >> >
+> >> >         sub     $H,sp,#16*4+16
+> >> > -       adrl    $Ktbl,K256
+> >> > +       adr     $Ktbl,.Lsha256_block_data_order
+> >> > +       add     $Ktbl,$Ktbl,#K256-.Lsha256_block_data_order
+> >> >         bic     $H,$H,#15               @ align for 128-bit stores
+> >> >         mov     $t2,sp
+> >> >         mov     sp,$H                   @ alloca
+> >> > diff --git a/arch/arm/crypto/sha256-core.S_shipped b/arch/arm/crypto/sha256-core.S_shipped
+> >> > index ea04b2ab0c33..1861c4e8a5ba 100644
+> >> > --- a/arch/arm/crypto/sha256-core.S_shipped
+> >> > +++ b/arch/arm/crypto/sha256-core.S_shipped
+> >> > @@ -56,7 +56,6 @@
+> >> >  #else
+> >> >  .syntax unified
+> >> >  # ifdef __thumb2__
+> >> > -#  define adrl adr
+> >> >  .thumb
+> >> >  # else
+> >> >  .code   32
+> >> > @@ -1885,7 +1884,8 @@ sha256_block_data_order_neon:
+> >> >         stmdb   sp!,{r4-r12,lr}
+> >> >
+> >> >         sub     r11,sp,#16*4+16
+> >> > -       adrl    r14,K256
+> >> > +       adr     r14,.Lsha256_block_data_order
+> >> > +       add     r14,r14,#K256-.Lsha256_block_data_order
+> >>
+> >> Hi Ard,
+> >> Thanks for the patch.  With this patch applied:
+> >>
+> >> $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make LLVM=1 LLVM_IAS=1
+> >> -j71 defconfig
+> >> $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- make LLVM=1 LLVM_IAS=1 -j71
+> >> ...
+> >> arch/arm/crypto/sha256-core.S:2038:2: error: out of range immediate fixup value
+> >>  add r14,r14,#K256-.Lsha256_block_data_order
+> >>  ^
+> >>
+> >> :(
+> >>
+> >
+> > Strange. Could you change it to
+> >
+> > sub r14,r14,#.Lsha256_block_data_order-K256
+> >
+> > and try again?
+> >
+> > If that does work, it means the Clang assembler does not update the
+> > instruction type for negative addends (add to sub in this case), which
+> > would be unfortunate, since it would be another functionality gap.
+>
+> Hm interesting, I did not come across another instance where this was a
+> problem.
+>
+> In this particular case, is it guaranteed to be a subtraction? I guess
+> then using sub for now would be fine...?
+>
 
-Quoting Pascal van Leeuwen (2020-09-11 09:46:39)
-> This patch adds support for EIP197 instances that include the output
-> classifier (OCE) option, as used by one of our biggest customers.
-> The OCE normally requires initialization and dedicated firmware, but
-> for the simple operations supported by this driver, we just bypass it
-> completely for now (using what is formally a debug feature).
-> 
-> Signed-off-by: Pascal van Leeuwen <pvanleeuwen@rambus.com>
+Yes for this code it is fine.
 
-Acked-by: Antoine Tenart <antoine.tenart@bootlin.com>
-
-Thanks!
-Antoine
-
-> ---
->  drivers/crypto/inside-secure/safexcel.c | 44 ++++++++++++++++++++++++++++++---
->  drivers/crypto/inside-secure/safexcel.h | 13 ++++++++++
->  2 files changed, 54 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-> index fa7398e..eb241845 100644
-> --- a/drivers/crypto/inside-secure/safexcel.c
-> +++ b/drivers/crypto/inside-secure/safexcel.c
-> @@ -304,6 +304,11 @@ static void eip197_init_firmware(struct safexcel_crypto_priv *priv)
->                 /* Enable access to all IFPP program memories */
->                 writel(EIP197_PE_ICE_RAM_CTRL_FPP_PROG_EN,
->                        EIP197_PE(priv) + EIP197_PE_ICE_RAM_CTRL(pe));
-> +
-> +               /* bypass the OCE, if present */
-> +               if (priv->flags & EIP197_OCE)
-> +                       writel(EIP197_DEBUG_OCE_BYPASS, EIP197_PE(priv) +
-> +                                                       EIP197_PE_DEBUG(pe));
->         }
->  
->  }
-> @@ -1495,6 +1500,9 @@ static int safexcel_probe_generic(void *pdev,
->         hwopt = readl(EIP197_GLOBAL(priv) + EIP197_OPTIONS);
->         hiaopt = readl(EIP197_HIA_AIC(priv) + EIP197_HIA_OPTIONS);
->  
-> +       priv->hwconfig.icever = 0;
-> +       priv->hwconfig.ocever = 0;
-> +       priv->hwconfig.psever = 0;
->         if (priv->flags & SAFEXCEL_HW_EIP197) {
->                 /* EIP197 */
->                 peopt = readl(EIP197_PE(priv) + EIP197_PE_OPTIONS(0));
-> @@ -1513,8 +1521,37 @@ static int safexcel_probe_generic(void *pdev,
->                                             EIP197_N_RINGS_MASK;
->                 if (hiaopt & EIP197_HIA_OPT_HAS_PE_ARB)
->                         priv->flags |= EIP197_PE_ARB;
-> -               if (EIP206_OPT_ICE_TYPE(peopt) == 1)
-> +               if (EIP206_OPT_ICE_TYPE(peopt) == 1) {
->                         priv->flags |= EIP197_ICE;
-> +                       /* Detect ICE EIP207 class. engine and version */
-> +                       version = readl(EIP197_PE(priv) +
-> +                                 EIP197_PE_ICE_VERSION(0));
-> +                       if (EIP197_REG_LO16(version) != EIP207_VERSION_LE) {
-> +                               dev_err(dev, "EIP%d: ICE EIP207 not detected.\n",
-> +                                       peid);
-> +                               return -ENODEV;
-> +                       }
-> +                       priv->hwconfig.icever = EIP197_VERSION_MASK(version);
-> +               }
-> +               if (EIP206_OPT_OCE_TYPE(peopt) == 1) {
-> +                       priv->flags |= EIP197_OCE;
-> +                       /* Detect EIP96PP packet stream editor and version */
-> +                       version = readl(EIP197_PE(priv) + EIP197_PE_PSE_VERSION(0));
-> +                       if (EIP197_REG_LO16(version) != EIP96_VERSION_LE) {
-> +                               dev_err(dev, "EIP%d: EIP96PP not detected.\n", peid);
-> +                               return -ENODEV;
-> +                       }
-> +                       priv->hwconfig.psever = EIP197_VERSION_MASK(version);
-> +                       /* Detect OCE EIP207 class. engine and version */
-> +                       version = readl(EIP197_PE(priv) +
-> +                                 EIP197_PE_ICE_VERSION(0));
-> +                       if (EIP197_REG_LO16(version) != EIP207_VERSION_LE) {
-> +                               dev_err(dev, "EIP%d: OCE EIP207 not detected.\n",
-> +                                       peid);
-> +                               return -ENODEV;
-> +                       }
-> +                       priv->hwconfig.ocever = EIP197_VERSION_MASK(version);
-> +               }
->                 /* If not a full TRC, then assume simple TRC */
->                 if (!(hwopt & EIP197_OPT_HAS_TRC))
->                         priv->flags |= EIP197_SIMPLE_TRC;
-> @@ -1552,13 +1589,14 @@ static int safexcel_probe_generic(void *pdev,
->                                     EIP197_PE_EIP96_OPTIONS(0));
->  
->         /* Print single info line describing what we just detected */
-> -       dev_info(priv->dev, "EIP%d:%x(%d,%d,%d,%d)-HIA:%x(%d,%d,%d),PE:%x/%x,alg:%08x\n",
-> +       dev_info(priv->dev, "EIP%d:%x(%d,%d,%d,%d)-HIA:%x(%d,%d,%d),PE:%x/%x(alg:%08x)/%x/%x/%x\n",
->                  peid, priv->hwconfig.hwver, hwctg, priv->hwconfig.hwnumpes,
->                  priv->hwconfig.hwnumrings, priv->hwconfig.hwnumraic,
->                  priv->hwconfig.hiaver, priv->hwconfig.hwdataw,
->                  priv->hwconfig.hwcfsize, priv->hwconfig.hwrfsize,
->                  priv->hwconfig.ppver, priv->hwconfig.pever,
-> -                priv->hwconfig.algo_flags);
-> +                priv->hwconfig.algo_flags, priv->hwconfig.icever,
-> +                priv->hwconfig.ocever, priv->hwconfig.psever);
->  
->         safexcel_configure(priv);
->  
-> diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-> index 7c5fe38..7054306 100644
-> --- a/drivers/crypto/inside-secure/safexcel.h
-> +++ b/drivers/crypto/inside-secure/safexcel.h
-> @@ -22,6 +22,7 @@
->  #define EIP96_VERSION_LE                       0x9f60
->  #define EIP201_VERSION_LE                      0x36c9
->  #define EIP206_VERSION_LE                      0x31ce
-> +#define EIP207_VERSION_LE                      0x30cf
->  #define EIP197_REG_LO16(reg)                   (reg & 0xffff)
->  #define EIP197_REG_HI16(reg)                   ((reg >> 16) & 0xffff)
->  #define EIP197_VERSION_MASK(reg)               ((reg >> 16) & 0xfff)
-> @@ -34,6 +35,7 @@
->  
->  /* EIP206 OPTIONS ENCODING */
->  #define EIP206_OPT_ICE_TYPE(n)                 ((n>>8)&3)
-> +#define EIP206_OPT_OCE_TYPE(n)                 ((n>>10)&3)
->  
->  /* EIP197 OPTIONS ENCODING */
->  #define EIP197_OPT_HAS_TRC                     BIT(31)
-> @@ -168,6 +170,7 @@
->  #define EIP197_PE_ICE_FPP_CTRL(n)              (0x0d80 + (0x2000 * (n)))
->  #define EIP197_PE_ICE_PPTF_CTRL(n)             (0x0e00 + (0x2000 * (n)))
->  #define EIP197_PE_ICE_RAM_CTRL(n)              (0x0ff0 + (0x2000 * (n)))
-> +#define EIP197_PE_ICE_VERSION(n)               (0x0ffc + (0x2000 * (n)))
->  #define EIP197_PE_EIP96_TOKEN_CTRL(n)          (0x1000 + (0x2000 * (n)))
->  #define EIP197_PE_EIP96_FUNCTION_EN(n)         (0x1004 + (0x2000 * (n)))
->  #define EIP197_PE_EIP96_CONTEXT_CTRL(n)                (0x1008 + (0x2000 * (n)))
-> @@ -176,8 +179,11 @@
->  #define EIP197_PE_EIP96_FUNCTION2_EN(n)                (0x1030 + (0x2000 * (n)))
->  #define EIP197_PE_EIP96_OPTIONS(n)             (0x13f8 + (0x2000 * (n)))
->  #define EIP197_PE_EIP96_VERSION(n)             (0x13fc + (0x2000 * (n)))
-> +#define EIP197_PE_OCE_VERSION(n)               (0x1bfc + (0x2000 * (n)))
->  #define EIP197_PE_OUT_DBUF_THRES(n)            (0x1c00 + (0x2000 * (n)))
->  #define EIP197_PE_OUT_TBUF_THRES(n)            (0x1d00 + (0x2000 * (n)))
-> +#define EIP197_PE_PSE_VERSION(n)               (0x1efc + (0x2000 * (n)))
-> +#define EIP197_PE_DEBUG(n)                     (0x1ff4 + (0x2000 * (n)))
->  #define EIP197_PE_OPTIONS(n)                   (0x1ff8 + (0x2000 * (n)))
->  #define EIP197_PE_VERSION(n)                   (0x1ffc + (0x2000 * (n)))
->  #define EIP197_MST_CTRL                                0xfff4
-> @@ -352,6 +358,9 @@
->  /* EIP197_PE_EIP96_TOKEN_CTRL2 */
->  #define EIP197_PE_EIP96_TOKEN_CTRL2_CTX_DONE   BIT(3)
->  
-> +/* EIP197_PE_DEBUG */
-> +#define EIP197_DEBUG_OCE_BYPASS                        BIT(1)
-> +
->  /* EIP197_STRC_CONFIG */
->  #define EIP197_STRC_CONFIG_INIT                        BIT(31)
->  #define EIP197_STRC_CONFIG_LARGE_REC(s)                (s<<8)
-> @@ -776,6 +785,7 @@ enum safexcel_flags {
->         EIP197_PE_ARB           = BIT(2),
->         EIP197_ICE              = BIT(3),
->         EIP197_SIMPLE_TRC       = BIT(4),
-> +       EIP197_OCE              = BIT(5),
->  };
->  
->  struct safexcel_hwconfig {
-> @@ -783,7 +793,10 @@ struct safexcel_hwconfig {
->         int hwver;
->         int hiaver;
->         int ppver;
-> +       int icever;
->         int pever;
-> +       int ocever;
-> +       int psever;
->         int hwdataw;
->         int hwcfsize;
->         int hwrfsize;
-> -- 
-> 1.8.3.1
-> 
-
--- 
-Antoine Ténart, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+> FWIW, we discussed possible solution also in this issue
+> (mach-omap2/sleep34xx.S case is handled already):
+> https://github.com/ClangBuiltLinux/linux/issues/430
+>
+> --
+> Stefan
+>
+> >
+> >
+> >
+> >> Would the adr_l macro you wrote in
+> >> https://lore.kernel.org/linux-arm-kernel/nycvar.YSQ.7.78.906.2009141003360.4095746@knanqh.ubzr/T/#t
+> >> be helpful here?
+> >>
+> >> >         bic     r11,r11,#15             @ align for 128-bit stores
+> >> >         mov     r12,sp
+> >> >         mov     sp,r11                  @ alloca
+> >> > --
+> >> > 2.17.1
+> >> >
+> >>
+> >>
+> >> --
+> >> Thanks,
+> >> ~Nick Desaulniers
