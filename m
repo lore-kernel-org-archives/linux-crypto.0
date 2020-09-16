@@ -2,154 +2,225 @@ Return-Path: <SRS0=gkSk=CZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE502C43461
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 09:33:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E88C43461
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 09:39:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 917F022207
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 09:33:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A+yh78E6"
+	by mail.kernel.org (Postfix) with ESMTP id 978B622225
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 09:39:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726570AbgIPJdP (ORCPT
+        id S1726610AbgIPJjQ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Sep 2020 05:33:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42544 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726425AbgIPJdO (ORCPT
+        Wed, 16 Sep 2020 05:39:16 -0400
+Received: from relay2-d.mail.gandi.net ([217.70.183.194]:58755 "EHLO
+        relay2-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726392AbgIPJjP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Sep 2020 05:33:14 -0400
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A109C06174A;
-        Wed, 16 Sep 2020 02:33:14 -0700 (PDT)
-Received: by mail-wm1-x344.google.com with SMTP id e11so1817902wme.0;
-        Wed, 16 Sep 2020 02:33:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=YjecuPhauQHL4j4Z2a9keky4ajO3faW/VO0iw9ZMsyw=;
-        b=A+yh78E6fm9DBZfbdqzQH+qzcsEGu6J4+jBTWy2YENyyyt2Zbq0S/OFMY+YMWluCW8
-         z8t3xi+iP90JmyDxktlPvCO+1T3U3hFBPr8qrN+yRgMmJ0GM2L7qRI0Eo3AOZ7RMkQPe
-         LWE3uzHR7S4jsQzPTnyioG1nqAXIH9Jsv1zZo5fzHTOi1paYswkOFIvKmndmutMHCR0b
-         y7j++ofj0gze7dcveAmPNZVSNVJ8f7dc9HkoqOY5StLB4q0UsS53QODCjO0b8LP6kuiJ
-         8vHisP+2YnnZzbQCZ5tRX2F0md65KbL3npfLcO72aSz6q9hmrXsAZ2AjIqklFE2qGRqP
-         eeXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=YjecuPhauQHL4j4Z2a9keky4ajO3faW/VO0iw9ZMsyw=;
-        b=DD3rdSDtqTIWqRQM9vg+LtAgbYXATRxYYPW1fg+f8mAsYcaMqIrs10gJyvfl5MLKnJ
-         dkM17lKEggN/R6ZmcHh3H8iCFnNgnEm3u6VTkcN9o95KfIjxsqEWmH6uxUP8L9mMHW3f
-         yh49oXBkVdN/BEIRCGk7QYqxcqCPajJSvnel/XHkhfFITNZsyA1P7vbKDO3UHwqm0sdr
-         geWFEeSkk1PYqhNHdVBzugBqifjlaGMWvcYIlcPseqmznjjmSu511u3HnGM1rcyRv3sG
-         rqkgApHJhSA9hBgdDStlpzPxuNfCs2fG43dYDrPTY5dEhuPvUu0vSKXXh9XvMBkeGXiF
-         7KuQ==
-X-Gm-Message-State: AOAM5307yMWX1cOViO3Fyjxx/FPl5O6YHzByNAXNnq7QdxZSEymaia0x
-        YtWb9c1EftKrWrKe5/U57p4=
-X-Google-Smtp-Source: ABdhPJxBZS9ztI4xvrbGTpOSw6c/HLSysA8VOVuU/1daXUC/dE1jO2LoC/ZzlHwtXxsbSfmuJA8jmA==
-X-Received: by 2002:a05:600c:2047:: with SMTP id p7mr4017341wmg.168.1600248792836;
-        Wed, 16 Sep 2020 02:33:12 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id u8sm4171183wmj.45.2020.09.16.02.33.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Sep 2020 02:33:11 -0700 (PDT)
-Date:   Wed, 16 Sep 2020 11:33:09 +0200
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Krzysztof Kozlowski <krzk@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-Subject: Re: [PATCH v2 4/4] crypto: allwinner/sun8i - Simplify with
- dev_err_probe()
-Message-ID: <20200916093309.GA11483@Red>
-References: <20200910192919.12503-1-krzk@kernel.org>
- <20200910192919.12503-4-krzk@kernel.org>
+        Wed, 16 Sep 2020 05:39:15 -0400
+X-Originating-IP: 90.76.143.236
+Received: from localhost (lfbn-tou-1-1075-236.w90-76.abo.wanadoo.fr [90.76.143.236])
+        (Authenticated sender: antoine.tenart@bootlin.com)
+        by relay2-d.mail.gandi.net (Postfix) with ESMTPSA id 9F9994000C;
+        Wed, 16 Sep 2020 09:39:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200910192919.12503-4-krzk@kernel.org>
+Content-Transfer-Encoding: 8BIT
+In-Reply-To: <1599810399-14999-1-git-send-email-pvanleeuwen@rambus.com>
+References: <1599810399-14999-1-git-send-email-pvanleeuwen@rambus.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        Pascal van Leeuwen <pvanleeuwen@rambus.com>
+To:     Pascal van Leeuwen <pvanleeuwen@rambus.com>,
+        linux-crypto@vger.kernel.org
+From:   Antoine Tenart <antoine.tenart@bootlin.com>
+Subject: Re: [PATCH] crypto: inside-secure - Add support for EIP197 with output classifier
+Message-ID: <160024914969.39497.4731533016684319800@kwain>
+Date:   Wed, 16 Sep 2020 11:39:09 +0200
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 10, 2020 at 09:29:19PM +0200, Krzysztof Kozlowski wrote:
-> Common pattern of handling deferred probe can be simplified with
-> dev_err_probe().  Less code and the error value gets printed.
+Hello Pascal,
+
+Quoting Pascal van Leeuwen (2020-09-11 09:46:39)
+> This patch adds support for EIP197 instances that include the output
+> classifier (OCE) option, as used by one of our biggest customers.
+> The OCE normally requires initialization and dedicated firmware, but
+> for the simple operations supported by this driver, we just bypass it
+> completely for now (using what is formally a debug feature).
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-> 
+> Signed-off-by: Pascal van Leeuwen <pvanleeuwen@rambus.com>
+
+Acked-by: Antoine Tenart <antoine.tenart@bootlin.com>
+
+Thanks!
+Antoine
+
 > ---
+>  drivers/crypto/inside-secure/safexcel.c | 44 ++++++++++++++++++++++++++++++---
+>  drivers/crypto/inside-secure/safexcel.h | 13 ++++++++++
+>  2 files changed, 54 insertions(+), 3 deletions(-)
 > 
-> Changes since v1:
-> 1. None
-> ---
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 9 +++------
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c | 9 +++------
->  2 files changed, 6 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-> index 138759dc8190..e3c62051c595 100644
-> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-> @@ -573,12 +573,9 @@ static int sun8i_ce_probe(struct platform_device *pdev)
->  		return irq;
+> diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+> index fa7398e..eb241845 100644
+> --- a/drivers/crypto/inside-secure/safexcel.c
+> +++ b/drivers/crypto/inside-secure/safexcel.c
+> @@ -304,6 +304,11 @@ static void eip197_init_firmware(struct safexcel_crypto_priv *priv)
+>                 /* Enable access to all IFPP program memories */
+>                 writel(EIP197_PE_ICE_RAM_CTRL_FPP_PROG_EN,
+>                        EIP197_PE(priv) + EIP197_PE_ICE_RAM_CTRL(pe));
+> +
+> +               /* bypass the OCE, if present */
+> +               if (priv->flags & EIP197_OCE)
+> +                       writel(EIP197_DEBUG_OCE_BYPASS, EIP197_PE(priv) +
+> +                                                       EIP197_PE_DEBUG(pe));
+>         }
 >  
->  	ce->reset = devm_reset_control_get(&pdev->dev, NULL);
-> -	if (IS_ERR(ce->reset)) {
-> -		if (PTR_ERR(ce->reset) == -EPROBE_DEFER)
-> -			return PTR_ERR(ce->reset);
-> -		dev_err(&pdev->dev, "No reset control found\n");
-> -		return PTR_ERR(ce->reset);
-> -	}
-> +	if (IS_ERR(ce->reset))
-> +		return dev_err_probe(&pdev->dev, PTR_ERR(ce->reset),
-> +				     "No reset control found\n");
+>  }
+> @@ -1495,6 +1500,9 @@ static int safexcel_probe_generic(void *pdev,
+>         hwopt = readl(EIP197_GLOBAL(priv) + EIP197_OPTIONS);
+>         hiaopt = readl(EIP197_HIA_AIC(priv) + EIP197_HIA_OPTIONS);
 >  
->  	mutex_init(&ce->mlock);
+> +       priv->hwconfig.icever = 0;
+> +       priv->hwconfig.ocever = 0;
+> +       priv->hwconfig.psever = 0;
+>         if (priv->flags & SAFEXCEL_HW_EIP197) {
+>                 /* EIP197 */
+>                 peopt = readl(EIP197_PE(priv) + EIP197_PE_OPTIONS(0));
+> @@ -1513,8 +1521,37 @@ static int safexcel_probe_generic(void *pdev,
+>                                             EIP197_N_RINGS_MASK;
+>                 if (hiaopt & EIP197_HIA_OPT_HAS_PE_ARB)
+>                         priv->flags |= EIP197_PE_ARB;
+> -               if (EIP206_OPT_ICE_TYPE(peopt) == 1)
+> +               if (EIP206_OPT_ICE_TYPE(peopt) == 1) {
+>                         priv->flags |= EIP197_ICE;
+> +                       /* Detect ICE EIP207 class. engine and version */
+> +                       version = readl(EIP197_PE(priv) +
+> +                                 EIP197_PE_ICE_VERSION(0));
+> +                       if (EIP197_REG_LO16(version) != EIP207_VERSION_LE) {
+> +                               dev_err(dev, "EIP%d: ICE EIP207 not detected.\n",
+> +                                       peid);
+> +                               return -ENODEV;
+> +                       }
+> +                       priv->hwconfig.icever = EIP197_VERSION_MASK(version);
+> +               }
+> +               if (EIP206_OPT_OCE_TYPE(peopt) == 1) {
+> +                       priv->flags |= EIP197_OCE;
+> +                       /* Detect EIP96PP packet stream editor and version */
+> +                       version = readl(EIP197_PE(priv) + EIP197_PE_PSE_VERSION(0));
+> +                       if (EIP197_REG_LO16(version) != EIP96_VERSION_LE) {
+> +                               dev_err(dev, "EIP%d: EIP96PP not detected.\n", peid);
+> +                               return -ENODEV;
+> +                       }
+> +                       priv->hwconfig.psever = EIP197_VERSION_MASK(version);
+> +                       /* Detect OCE EIP207 class. engine and version */
+> +                       version = readl(EIP197_PE(priv) +
+> +                                 EIP197_PE_ICE_VERSION(0));
+> +                       if (EIP197_REG_LO16(version) != EIP207_VERSION_LE) {
+> +                               dev_err(dev, "EIP%d: OCE EIP207 not detected.\n",
+> +                                       peid);
+> +                               return -ENODEV;
+> +                       }
+> +                       priv->hwconfig.ocever = EIP197_VERSION_MASK(version);
+> +               }
+>                 /* If not a full TRC, then assume simple TRC */
+>                 if (!(hwopt & EIP197_OPT_HAS_TRC))
+>                         priv->flags |= EIP197_SIMPLE_TRC;
+> @@ -1552,13 +1589,14 @@ static int safexcel_probe_generic(void *pdev,
+>                                     EIP197_PE_EIP96_OPTIONS(0));
 >  
-> diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-> index 9a23515783a6..576df8c8df51 100644
-> --- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-> +++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-> @@ -545,12 +545,9 @@ static int sun8i_ss_probe(struct platform_device *pdev)
->  		return irq;
+>         /* Print single info line describing what we just detected */
+> -       dev_info(priv->dev, "EIP%d:%x(%d,%d,%d,%d)-HIA:%x(%d,%d,%d),PE:%x/%x,alg:%08x\n",
+> +       dev_info(priv->dev, "EIP%d:%x(%d,%d,%d,%d)-HIA:%x(%d,%d,%d),PE:%x/%x(alg:%08x)/%x/%x/%x\n",
+>                  peid, priv->hwconfig.hwver, hwctg, priv->hwconfig.hwnumpes,
+>                  priv->hwconfig.hwnumrings, priv->hwconfig.hwnumraic,
+>                  priv->hwconfig.hiaver, priv->hwconfig.hwdataw,
+>                  priv->hwconfig.hwcfsize, priv->hwconfig.hwrfsize,
+>                  priv->hwconfig.ppver, priv->hwconfig.pever,
+> -                priv->hwconfig.algo_flags);
+> +                priv->hwconfig.algo_flags, priv->hwconfig.icever,
+> +                priv->hwconfig.ocever, priv->hwconfig.psever);
 >  
->  	ss->reset = devm_reset_control_get(&pdev->dev, NULL);
-> -	if (IS_ERR(ss->reset)) {
-> -		if (PTR_ERR(ss->reset) == -EPROBE_DEFER)
-> -			return PTR_ERR(ss->reset);
-> -		dev_err(&pdev->dev, "No reset control found\n");
-> -		return PTR_ERR(ss->reset);
-> -	}
-> +	if (IS_ERR(ss->reset))
-> +		return dev_err_probe(&pdev->dev, PTR_ERR(ss->reset),
-> +				     "No reset control found\n");
+>         safexcel_configure(priv);
 >  
->  	mutex_init(&ss->mlock);
+> diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+> index 7c5fe38..7054306 100644
+> --- a/drivers/crypto/inside-secure/safexcel.h
+> +++ b/drivers/crypto/inside-secure/safexcel.h
+> @@ -22,6 +22,7 @@
+>  #define EIP96_VERSION_LE                       0x9f60
+>  #define EIP201_VERSION_LE                      0x36c9
+>  #define EIP206_VERSION_LE                      0x31ce
+> +#define EIP207_VERSION_LE                      0x30cf
+>  #define EIP197_REG_LO16(reg)                   (reg & 0xffff)
+>  #define EIP197_REG_HI16(reg)                   ((reg >> 16) & 0xffff)
+>  #define EIP197_VERSION_MASK(reg)               ((reg >> 16) & 0xfff)
+> @@ -34,6 +35,7 @@
 >  
+>  /* EIP206 OPTIONS ENCODING */
+>  #define EIP206_OPT_ICE_TYPE(n)                 ((n>>8)&3)
+> +#define EIP206_OPT_OCE_TYPE(n)                 ((n>>10)&3)
+>  
+>  /* EIP197 OPTIONS ENCODING */
+>  #define EIP197_OPT_HAS_TRC                     BIT(31)
+> @@ -168,6 +170,7 @@
+>  #define EIP197_PE_ICE_FPP_CTRL(n)              (0x0d80 + (0x2000 * (n)))
+>  #define EIP197_PE_ICE_PPTF_CTRL(n)             (0x0e00 + (0x2000 * (n)))
+>  #define EIP197_PE_ICE_RAM_CTRL(n)              (0x0ff0 + (0x2000 * (n)))
+> +#define EIP197_PE_ICE_VERSION(n)               (0x0ffc + (0x2000 * (n)))
+>  #define EIP197_PE_EIP96_TOKEN_CTRL(n)          (0x1000 + (0x2000 * (n)))
+>  #define EIP197_PE_EIP96_FUNCTION_EN(n)         (0x1004 + (0x2000 * (n)))
+>  #define EIP197_PE_EIP96_CONTEXT_CTRL(n)                (0x1008 + (0x2000 * (n)))
+> @@ -176,8 +179,11 @@
+>  #define EIP197_PE_EIP96_FUNCTION2_EN(n)                (0x1030 + (0x2000 * (n)))
+>  #define EIP197_PE_EIP96_OPTIONS(n)             (0x13f8 + (0x2000 * (n)))
+>  #define EIP197_PE_EIP96_VERSION(n)             (0x13fc + (0x2000 * (n)))
+> +#define EIP197_PE_OCE_VERSION(n)               (0x1bfc + (0x2000 * (n)))
+>  #define EIP197_PE_OUT_DBUF_THRES(n)            (0x1c00 + (0x2000 * (n)))
+>  #define EIP197_PE_OUT_TBUF_THRES(n)            (0x1d00 + (0x2000 * (n)))
+> +#define EIP197_PE_PSE_VERSION(n)               (0x1efc + (0x2000 * (n)))
+> +#define EIP197_PE_DEBUG(n)                     (0x1ff4 + (0x2000 * (n)))
+>  #define EIP197_PE_OPTIONS(n)                   (0x1ff8 + (0x2000 * (n)))
+>  #define EIP197_PE_VERSION(n)                   (0x1ffc + (0x2000 * (n)))
+>  #define EIP197_MST_CTRL                                0xfff4
+> @@ -352,6 +358,9 @@
+>  /* EIP197_PE_EIP96_TOKEN_CTRL2 */
+>  #define EIP197_PE_EIP96_TOKEN_CTRL2_CTX_DONE   BIT(3)
+>  
+> +/* EIP197_PE_DEBUG */
+> +#define EIP197_DEBUG_OCE_BYPASS                        BIT(1)
+> +
+>  /* EIP197_STRC_CONFIG */
+>  #define EIP197_STRC_CONFIG_INIT                        BIT(31)
+>  #define EIP197_STRC_CONFIG_LARGE_REC(s)                (s<<8)
+> @@ -776,6 +785,7 @@ enum safexcel_flags {
+>         EIP197_PE_ARB           = BIT(2),
+>         EIP197_ICE              = BIT(3),
+>         EIP197_SIMPLE_TRC       = BIT(4),
+> +       EIP197_OCE              = BIT(5),
+>  };
+>  
+>  struct safexcel_hwconfig {
+> @@ -783,7 +793,10 @@ struct safexcel_hwconfig {
+>         int hwver;
+>         int hiaver;
+>         int ppver;
+> +       int icever;
+>         int pever;
+> +       int ocever;
+> +       int psever;
+>         int hwdataw;
+>         int hwcfsize;
+>         int hwrfsize;
 > -- 
-> 2.17.1
+> 1.8.3.1
 > 
 
-Hello
-
-Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-
-Thanks
+-- 
+Antoine Ténart, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
