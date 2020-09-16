@@ -8,58 +8,58 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0590BC43461
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 03:44:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30CEAC433E2
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 03:48:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BAD7421D94
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 03:44:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4D41221E5
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 03:48:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="awgAfqMF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MBMW6QMq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726412AbgIPDoU (ORCPT
+        id S1726242AbgIPDrz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Sep 2020 23:44:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45022 "EHLO
+        Tue, 15 Sep 2020 23:47:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726368AbgIPDnU (ORCPT
+        with ESMTP id S1726155AbgIPDry (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Sep 2020 23:43:20 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3B7AC06178B;
-        Tue, 15 Sep 2020 20:43:19 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id 34so3083570pgo.13;
-        Tue, 15 Sep 2020 20:43:19 -0700 (PDT)
+        Tue, 15 Sep 2020 23:47:54 -0400
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C689BC06174A;
+        Tue, 15 Sep 2020 20:40:55 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id v14so822306pjd.4;
+        Tue, 15 Sep 2020 20:40:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=krGpYOVpUat0gERMlMR1P1lhK//ROWK8HUHnVTxyKd4=;
-        b=awgAfqMFGK8yHA1kC0CVgZdnEU8AnnjW634aveD/YajxjIdjnyBcmfkVK0Knyqe+lX
-         ljz+UCj2B5zOzqBdmoFJ3K5TNbOqC3eu77I5dV6SNF7fU2eObT28yeZA4crn0+H4i4FQ
-         L/D64ccQxJb2Je2cQin3B1utHqJQ1jZnRUhemwrxt8LqTbezkc2BcdP3TmilWrS5BkIk
-         Xix9H4iocrKO/j+YljDq79ibMq8FsvREhUAr+/yL6CPNVYMUIEPSItl/+8m/fc1LWvJR
-         /f0c2ZAAZz1NghDogu2KP9KiUkVZO6HpIDaDQ5CQCvJ4alrO1dO+24DDWw+x0pfmAeHc
-         YqCA==
+        bh=5fKNeZSsXX3F75uWAvoclig0FCLwLLfStaZMUpC2Nwo=;
+        b=MBMW6QMq9lCxZUAmvXVtcBYONHEPOCnbWNuKiZJWW65LC9wyrofhoWFzZBC+Y3HhOT
+         G2pHeFDFBdqb3XeOD8673GkG54+crAqrHtMGfC5utUo7pGK0gwqJYwghKeqPJ7Fouqg9
+         a1EW2ZbmQ9UtrHQoYRclmzQQgmQLxWA0humcihwtRQ0n+ad/2DwL/kuWTrC6Nea//9NG
+         aeemwFijt+vriQZye/oGtrhD1P91DO8uUR/F8z93hCnSk8VWI+zujWiEUzstQQS4eknN
+         TNO1ZT3oZk2XH5Nrr2r2YHgtTcth54B2w+48DKMsM50qMyTGtTKbwdXs07G4MauJuaw5
+         cVUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=krGpYOVpUat0gERMlMR1P1lhK//ROWK8HUHnVTxyKd4=;
-        b=O9EXHEIrMy4tLY4GINnNGzHrATwuD6+2w+Xm1JVp58Z9tijeKBlbbv5/4YvPwqUNij
-         6FpFkHik8pl7+7ocHkHaL0JsgNBNvOUEwtC9y6MXBPZtIA6Akx2mz1Cf9B+lSYXVV0Jt
-         1LgO4oVvK84F24G5fFK4eTpeOrF+z3olZBXR/sSlcA21/U2iJH8wfLO3TRxIOxj3XGR8
-         +ejRFibJnti71WGuGpaOVFB4J71tVie+0z+iBzIbPpN8U/0jrWLcoJcEdDkFSdGYqYwl
-         N5+apNNFdUvR+q1R+sje32SJRfwdNfIUYuWipxsOM3zDHlG7rg52aB3LY+PoLeRRb6Mp
-         60tw==
-X-Gm-Message-State: AOAM531PIE9dZD3UieTDhkvqMlTIu9s8FoKB/5LHfUE+e9gpDw3l2LbJ
-        W11yMMEU5jZVx12/xFwtAZE=
-X-Google-Smtp-Source: ABdhPJxeMIvZUhBNjhZ4RS0dPE1GL7YPRAlPaogyaHuOLDoBmglPFfzH1O1sjFJF805vobT2idx0zA==
-X-Received: by 2002:a62:19c4:0:b029:13e:d13d:a0fd with SMTP id 187-20020a6219c40000b029013ed13da0fdmr20703922pfz.25.1600227799254;
-        Tue, 15 Sep 2020 20:43:19 -0700 (PDT)
+        bh=5fKNeZSsXX3F75uWAvoclig0FCLwLLfStaZMUpC2Nwo=;
+        b=cSzIoHD4b7tcnjZBHgb2hcePf3OyY0dLofN6VdcBrzXiUegOgfaGl38Wx5lmopJJ1b
+         HcK86isTc8LANR58D0REy1utr42gpbleyQxeeljHQCr1X2hnHUW1PnNqNjRjm1fKQLF4
+         +bDVuapZLRJswPXqmDOGWVcthsW2TsyhZRBrIePXgR++C6odRoCRtY+HtvT+yWzjbTM2
+         b+o5FE9c/YGA3vBAD2o4xGdmYsilM0MAst0I4V5Nb+/z8dik1gwl7D850V7+Qif/vD1y
+         NUC0C9L/k6HY9zlBHrbJxZYbLjcy2RZ78PNZjSdAkNsscapn2FwDSdZj/ievVVzNabFz
+         F5uw==
+X-Gm-Message-State: AOAM533VcGpErlEQY1s1OoJHWdjurlSo9MQD+P7mzmNVBATI9hYZ+q2x
+        DubZmicGYGJW5s3rtcULU/s=
+X-Google-Smtp-Source: ABdhPJz2ijRe9DqZppb7/1KZROPtSsQuUb5Q6+cvVGIVbzAk2adBQ/IF8nSGzwaq7W3PsSJSEg2qxw==
+X-Received: by 2002:a17:902:309:b029:d1:e5e7:ca3f with SMTP id 9-20020a1709020309b02900d1e5e7ca3fmr4663933pld.43.1600227655314;
+        Tue, 15 Sep 2020 20:40:55 -0700 (PDT)
 Received: from nickserv.localdomain (c-98-33-101-203.hsd1.ca.comcast.net. [98.33.101.203])
-        by smtp.gmail.com with ESMTPSA id i20sm12856635pgk.77.2020.09.15.20.43.17
+        by smtp.gmail.com with ESMTPSA id i20sm12856635pgk.77.2020.09.15.20.40.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2020 20:43:18 -0700 (PDT)
+        Tue, 15 Sep 2020 20:40:54 -0700 (PDT)
 From:   Nick Terrell <nickrterrell@gmail.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
@@ -70,9 +70,9 @@ Cc:     linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
         Nick Terrell <terrelln@fb.com>, Chris Mason <clm@fb.com>,
         Petr Malat <oss@malat.biz>, Johannes Weiner <jweiner@fb.com>,
         Niket Agarwal <niketa@fb.com>, Yann Collet <cyan@fb.com>
-Subject: [PATCH 8/9] lib: unzstd: Switch to the zstd-1.4.6 API
-Date:   Tue, 15 Sep 2020 20:43:05 -0700
-Message-Id: <20200916034307.2092020-13-nickrterrell@gmail.com>
+Subject: [PATCH 4/9] crypto: zstd: Switch to zstd-1.4.6 API
+Date:   Tue, 15 Sep 2020 20:42:57 -0700
+Message-Id: <20200916034307.2092020-5-nickrterrell@gmail.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200916034307.2092020-1-nickrterrell@gmail.com>
 References: <20200916034307.2092020-1-nickrterrell@gmail.com>
@@ -90,90 +90,83 @@ code is functionally equivalent.
 
 Signed-off-by: Nick Terrell <terrelln@fb.com>
 ---
- lib/decompress_unzstd.c | 40 ++++++++++++++--------------------------
- 1 file changed, 14 insertions(+), 26 deletions(-)
+ crypto/zstd.c | 24 +++++++++++-------------
+ 1 file changed, 11 insertions(+), 13 deletions(-)
 
-diff --git a/lib/decompress_unzstd.c b/lib/decompress_unzstd.c
-index a79f705f236d..d4685df0e120 100644
---- a/lib/decompress_unzstd.c
-+++ b/lib/decompress_unzstd.c
-@@ -73,7 +73,8 @@
- 
- #include <linux/decompress/mm.h>
- #include <linux/kernel.h>
+diff --git a/crypto/zstd.c b/crypto/zstd.c
+index dcda3cad3b5c..767fe2fbe009 100644
+--- a/crypto/zstd.c
++++ b/crypto/zstd.c
+@@ -11,7 +11,7 @@
+ #include <linux/module.h>
+ #include <linux/net.h>
+ #include <linux/vmalloc.h>
 -#include <linux/zstd_compat.h>
 +#include <linux/zstd.h>
-+#include <linux/zstd_errors.h>
+ #include <crypto/internal/scompress.h>
  
- /* 128MB is the maximum window size supported by zstd. */
- #define ZSTD_WINDOWSIZE_MAX	(1 << ZSTD_WINDOWLOG_MAX)
-@@ -120,9 +121,9 @@ static int INIT decompress_single(const u8 *in_buf, long in_len, u8 *out_buf,
- 				  long out_len, long *in_pos,
- 				  void (*error)(char *x))
+ 
+@@ -24,16 +24,15 @@ struct zstd_ctx {
+ 	void *dwksp;
+ };
+ 
+-static ZSTD_parameters zstd_params(void)
+-{
+-	return ZSTD_getParams(ZSTD_DEF_LEVEL, 0, 0);
+-}
+-
+ static int zstd_comp_init(struct zstd_ctx *ctx)
  {
+ 	int ret = 0;
+-	const ZSTD_parameters params = zstd_params();
+-	const size_t wksp_size = ZSTD_CCtxWorkspaceBound(params.cParams);
++	const size_t wksp_size = ZSTD_estimateCCtxSize(ZSTD_DEF_LEVEL);
++
++	if (ZSTD_isError(wksp_size)) {
++		ret = -EINVAL;
++		goto out_free;
++	}
+ 
+ 	ctx->cwksp = vzalloc(wksp_size);
+ 	if (!ctx->cwksp) {
+@@ -41,7 +40,7 @@ static int zstd_comp_init(struct zstd_ctx *ctx)
+ 		goto out;
+ 	}
+ 
+-	ctx->cctx = ZSTD_initCCtx(ctx->cwksp, wksp_size);
++	ctx->cctx = ZSTD_initStaticCCtx(ctx->cwksp, wksp_size);
+ 	if (!ctx->cctx) {
+ 		ret = -EINVAL;
+ 		goto out_free;
+@@ -56,7 +55,7 @@ static int zstd_comp_init(struct zstd_ctx *ctx)
+ static int zstd_decomp_init(struct zstd_ctx *ctx)
+ {
+ 	int ret = 0;
 -	const size_t wksp_size = ZSTD_DCtxWorkspaceBound();
 +	const size_t wksp_size = ZSTD_estimateDCtxSize();
- 	void *wksp = large_malloc(wksp_size);
--	ZSTD_DCtx *dctx = ZSTD_initDCtx(wksp, wksp_size);
-+	ZSTD_DCtx *dctx = ZSTD_initStaticDCtx(wksp, wksp_size);
- 	int err;
- 	size_t ret;
  
-@@ -165,7 +166,6 @@ static int INIT __unzstd(unsigned char *in_buf, long in_len,
+ 	ctx->dwksp = vzalloc(wksp_size);
+ 	if (!ctx->dwksp) {
+@@ -64,7 +63,7 @@ static int zstd_decomp_init(struct zstd_ctx *ctx)
+ 		goto out;
+ 	}
+ 
+-	ctx->dctx = ZSTD_initDCtx(ctx->dwksp, wksp_size);
++	ctx->dctx = ZSTD_initStaticDCtx(ctx->dwksp, wksp_size);
+ 	if (!ctx->dctx) {
+ 		ret = -EINVAL;
+ 		goto out_free;
+@@ -152,9 +151,8 @@ static int __zstd_compress(const u8 *src, unsigned int slen,
  {
- 	ZSTD_inBuffer in;
- 	ZSTD_outBuffer out;
--	ZSTD_frameParams params;
- 	void *in_allocated = NULL;
- 	void *out_allocated = NULL;
- 	void *wksp = NULL;
-@@ -229,36 +229,24 @@ static int INIT __unzstd(unsigned char *in_buf, long in_len,
- 	out.size = out_len;
+ 	size_t out_len;
+ 	struct zstd_ctx *zctx = ctx;
+-	const ZSTD_parameters params = zstd_params();
  
- 	/*
--	 * We need to know the window size to allocate the ZSTD_DStream.
--	 * Since we are streaming, we need to allocate a buffer for the sliding
--	 * window. The window size varies from 1 KB to ZSTD_WINDOWSIZE_MAX
--	 * (8 MB), so it is important to use the actual value so as not to
--	 * waste memory when it is smaller.
-+	 * Zstd determines the workspace size from the window size written
-+	 * into the frame header. This ensures that we use the minimum value
-+	 * possible, since the window size varies from 1 KB to ZSTD_WINDOWSIZE_MAX
-+	 * (1 GB), so it is very important to use the actual value.
- 	 */
--	ret = ZSTD_getFrameParams(&params, in.src, in.size);
-+	wksp_size = ZSTD_estimateDStreamSize_fromFrame(in.src, in.size);
- 	err = handle_zstd_error(ret, error);
- 	if (err)
- 		goto out;
--	if (ret != 0) {
--		error("ZSTD-compressed data has an incomplete frame header");
--		err = -1;
--		goto out;
--	}
--	if (params.windowSize > ZSTD_WINDOWSIZE_MAX) {
--		error("ZSTD-compressed data has too large a window size");
-+	wksp = large_malloc(wksp_size);
-+	if (wksp == NULL) {
-+		error("Out of memory while allocating ZSTD_DStream");
- 		err = -1;
- 		goto out;
- 	}
--
--	/*
--	 * Allocate the ZSTD_DStream now that we know how much memory is
--	 * required.
--	 */
--	wksp_size = ZSTD_DStreamWorkspaceBound(params.windowSize);
--	wksp = large_malloc(wksp_size);
--	dstream = ZSTD_initDStream(params.windowSize, wksp, wksp_size);
-+	dstream = ZSTD_initStaticDStream(wksp, wksp_size);
- 	if (dstream == NULL) {
--		error("Out of memory while allocating ZSTD_DStream");
-+		error("ZSTD_initStaticDStream failed");
- 		err = -1;
- 		goto out;
- 	}
+-	out_len = ZSTD_compressCCtx(zctx->cctx, dst, *dlen, src, slen, params);
++	out_len = ZSTD_compressCCtx(zctx->cctx, dst, *dlen, src, slen, ZSTD_DEF_LEVEL);
+ 	if (ZSTD_isError(out_len))
+ 		return -EINVAL;
+ 	*dlen = out_len;
 -- 
 2.28.0
 
