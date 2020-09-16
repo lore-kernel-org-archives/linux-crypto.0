@@ -2,261 +2,160 @@ Return-Path: <SRS0=gkSk=CZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30FE4C433E2
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 00:52:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED98C43461
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 02:27:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D59A520936
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 00:52:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NA/shWYm"
+	by mail.kernel.org (Postfix) with ESMTP id B5C7820809
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Sep 2020 02:27:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726597AbgIPAw1 (ORCPT
+        id S1726367AbgIPC1v (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Sep 2020 20:52:27 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:39066 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726592AbgIPAwR (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Sep 2020 20:52:17 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08G0oMEh142287;
-        Wed, 16 Sep 2020 00:51:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2020-01-29;
- bh=P1pMOoWe6LNIy0K4uxNXT7zrnhjw8PJuQG/b1p84A/8=;
- b=NA/shWYmIU/HiJZQs68zdaRh+mh+f9i58n8nc+wpbk6gWgvsYkSIoYRXYBiqODqTQyNp
- PwMBbOESlIV6AUE+xmvI0TqKeZZevtT40RS8JNyzE5PFDyk00ho6am3VM5es7lyDTCge
- v7JisUOYAcbj7TAB9vF2q6mYq2aVo2BasPzvV+escOBUrT6YkKxezM9jmCPuYNoxCntM
- F+S/5+MWL5JwWuCT/qo46uLpE4OzDeQ5kmyj/xno3IjtIj79Rg6vvJueX5GIbszky3dy
- HkJZ9N9FJrtummgcUW3Vuo8U5H69bWRZXs72mt1bArIk11DvHNjWthl8sz3Mjrz8YkOb vg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 33gnrr0827-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 16 Sep 2020 00:51:48 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08G0UjCe151431;
-        Wed, 16 Sep 2020 00:49:47 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 33h890bpgx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Sep 2020 00:49:47 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08G0naIe029785;
-        Wed, 16 Sep 2020 00:49:39 GMT
-Received: from localhost.us.oracle.com (/10.147.27.2)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 16 Sep 2020 00:49:35 +0000
-From:   Eric Snowberg <eric.snowberg@oracle.com>
-To:     dhowells@redhat.com, dwmw2@infradead.org,
-        jarkko.sakkinen@linux.intel.com
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        jmorris@namei.org, serge@hallyn.com, nayna@linux.ibm.com,
-        zohar@linux.ibm.com, eric.snowberg@oracle.com,
-        erichte@linux.ibm.com, mpe@ellerman.id.au,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: [PATCH v4] certs: Add EFI_CERT_X509_GUID support for dbx entries
-Date:   Tue, 15 Sep 2020 20:49:27 -0400
-Message-Id: <20200916004927.64276-1-eric.snowberg@oracle.com>
-X-Mailer: git-send-email 2.18.1
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9745 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 adultscore=0
- suspectscore=0 mlxscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009160001
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9745 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0
- lowpriorityscore=0 malwarescore=0 mlxscore=0 bulkscore=0 suspectscore=0
- clxscore=1015 mlxlogscore=999 adultscore=0 priorityscore=1501
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009160002
+        Tue, 15 Sep 2020 22:27:51 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:12714 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726168AbgIPC1u (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Sep 2020 22:27:50 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id B2954665F4AF7498DE7E;
+        Wed, 16 Sep 2020 10:27:48 +0800 (CST)
+Received: from huawei.com (10.175.113.32) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Wed, 16 Sep 2020
+ 10:27:41 +0800
+From:   Liu Shixin <liushixin2@huawei.com>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>
+CC:     <qat-linux@intel.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Liu Shixin <liushixin2@huawei.com>
+Subject: [PATCH -next] crypto: qat - convert to use DEFINE_SEQ_ATTRIBUTE macro
+Date:   Wed, 16 Sep 2020 10:50:17 +0800
+Message-ID: <20200916025017.3992367-1-liushixin2@huawei.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.113.32]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Secure Boot Forbidden Signature Database, dbx, contains a list of now
-revoked signatures and keys previously approved to boot with UEFI Secure
-Boot enabled.  The dbx is capable of containing any number of
-EFI_CERT_X509_SHA256_GUID, EFI_CERT_SHA256_GUID, and EFI_CERT_X509_GUID
-entries.
+Use DEFINE_SEQ_ATTRIBUTE macro to simplify the code.
 
-Currently when EFI_CERT_X509_GUID are contained in the dbx, the entries are
-skipped.
-
-Add support for EFI_CERT_X509_GUID dbx entries. When a EFI_CERT_X509_GUID
-is found, it is added as an asymmetrical key to the .blacklist keyring.
-Anytime the .platform keyring is used, the keys in the .blacklist keyring
-are referenced, if a matching key is found, the key will be rejected.
-
-Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+Signed-off-by: Liu Shixin <liushixin2@huawei.com>
 ---
-v4:
-Remove unneeded symbol export found by Jarkko Sakkinen
+ drivers/crypto/qat/qat_common/adf_cfg.c       | 19 +--------
+ .../qat/qat_common/adf_transport_debug.c      | 42 ++-----------------
+ 2 files changed, 5 insertions(+), 56 deletions(-)
 
-v3:
-Fixed an issue when CONFIG_PKCS7_MESSAGE_PARSER is not builtin and defined
-as a module instead, pointed out by Randy Dunlap
-
-v2: 
-Fixed build issue reported by kernel test robot <lkp@intel.com>
-Commit message update (suggested by Jarkko Sakkinen)
----
- certs/blacklist.c                             | 32 +++++++++++++++++++
- certs/blacklist.h                             | 12 +++++++
- certs/system_keyring.c                        |  6 ++++
- include/keys/system_keyring.h                 | 11 +++++++
- .../platform_certs/keyring_handler.c          | 11 +++++++
- 5 files changed, 72 insertions(+)
-
-diff --git a/certs/blacklist.c b/certs/blacklist.c
-index 6514f9ebc943..4adac7f8fd94 100644
---- a/certs/blacklist.c
-+++ b/certs/blacklist.c
-@@ -100,6 +100,38 @@ int mark_hash_blacklisted(const char *hash)
- 	return 0;
- }
+diff --git a/drivers/crypto/qat/qat_common/adf_cfg.c b/drivers/crypto/qat/qat_common/adf_cfg.c
+index ac462796cefc..22ae32838113 100644
+--- a/drivers/crypto/qat/qat_common/adf_cfg.c
++++ b/drivers/crypto/qat/qat_common/adf_cfg.c
+@@ -52,24 +52,7 @@ static const struct seq_operations qat_dev_cfg_sops = {
+ 	.show = qat_dev_cfg_show
+ };
  
-+int mark_key_revocationlisted(const char *data, size_t size)
-+{
-+	key_ref_t key;
-+
-+	key = key_create_or_update(make_key_ref(blacklist_keyring, true),
-+				   "asymmetric",
-+				   NULL,
-+				   data,
-+				   size,
-+				   ((KEY_POS_ALL & ~KEY_POS_SETATTR) | KEY_USR_VIEW),
-+				   KEY_ALLOC_NOT_IN_QUOTA | KEY_ALLOC_BUILT_IN);
-+
-+	if (IS_ERR(key)) {
-+		pr_err("Problem with revocation key (%ld)\n", PTR_ERR(key));
-+		return PTR_ERR(key);
-+	}
-+
-+	return 0;
-+}
-+
-+int is_key_revocationlisted(struct pkcs7_message *pkcs7)
-+{
-+	int ret;
-+
-+	ret = validate_trust(pkcs7, blacklist_keyring);
-+
-+	if (ret == 0)
-+		return -EKEYREJECTED;
-+
-+	return -ENOKEY;
-+}
-+
+-static int qat_dev_cfg_open(struct inode *inode, struct file *file)
+-{
+-	int ret = seq_open(file, &qat_dev_cfg_sops);
+-
+-	if (!ret) {
+-		struct seq_file *seq_f = file->private_data;
+-
+-		seq_f->private = inode->i_private;
+-	}
+-	return ret;
+-}
+-
+-static const struct file_operations qat_dev_cfg_fops = {
+-	.open = qat_dev_cfg_open,
+-	.read = seq_read,
+-	.llseek = seq_lseek,
+-	.release = seq_release
+-};
++DEFINE_SEQ_ATTRIBUTE(qat_dev_cfg);
+ 
  /**
-  * is_hash_blacklisted - Determine if a hash is blacklisted
-  * @hash: The hash to be checked as a binary blob
-diff --git a/certs/blacklist.h b/certs/blacklist.h
-index 1efd6fa0dc60..420bb7c86e07 100644
---- a/certs/blacklist.h
-+++ b/certs/blacklist.h
-@@ -1,3 +1,15 @@
- #include <linux/kernel.h>
-+#include <linux/errno.h>
-+#include <crypto/pkcs7.h>
+  * adf_cfg_dev_add() - Create an acceleration device configuration table.
+diff --git a/drivers/crypto/qat/qat_common/adf_transport_debug.c b/drivers/crypto/qat/qat_common/adf_transport_debug.c
+index 2a2eccbf56ec..dac25ba47260 100644
+--- a/drivers/crypto/qat/qat_common/adf_transport_debug.c
++++ b/drivers/crypto/qat/qat_common/adf_transport_debug.c
+@@ -77,31 +77,14 @@ static void adf_ring_stop(struct seq_file *sfile, void *v)
+ 	mutex_unlock(&ring_read_lock);
+ }
  
- extern const char __initconst *const blacklist_hashes[];
-+
-+#ifdef CONFIG_INTEGRITY_PLATFORM_KEYRING
-+#define validate_trust pkcs7_validate_trust
-+#else
-+static inline int validate_trust(struct pkcs7_message *pkcs7,
-+				 struct key *trust_keyring)
-+{
-+	return -ENOKEY;
-+}
-+#endif
-diff --git a/certs/system_keyring.c b/certs/system_keyring.c
-index 798291177186..f8ea96219155 100644
---- a/certs/system_keyring.c
-+++ b/certs/system_keyring.c
-@@ -241,6 +241,12 @@ int verify_pkcs7_message_sig(const void *data, size_t len,
- 			pr_devel("PKCS#7 platform keyring is not available\n");
- 			goto error;
- 		}
-+
-+		ret = is_key_revocationlisted(pkcs7);
-+		if (ret != -ENOKEY) {
-+			pr_devel("PKCS#7 platform key revocationlisted\n");
-+			goto error;
-+		}
- 	}
- 	ret = pkcs7_validate_trust(pkcs7, trusted_keys);
- 	if (ret < 0) {
-diff --git a/include/keys/system_keyring.h b/include/keys/system_keyring.h
-index fb8b07daa9d1..b6991cfe1b6d 100644
---- a/include/keys/system_keyring.h
-+++ b/include/keys/system_keyring.h
-@@ -31,11 +31,14 @@ extern int restrict_link_by_builtin_and_secondary_trusted(
- #define restrict_link_by_builtin_and_secondary_trusted restrict_link_by_builtin_trusted
- #endif
+-static const struct seq_operations adf_ring_sops = {
++static const struct seq_operations adf_ring_debug_sops = {
+ 	.start = adf_ring_start,
+ 	.next = adf_ring_next,
+ 	.stop = adf_ring_stop,
+ 	.show = adf_ring_show
+ };
  
-+extern struct pkcs7_message *pkcs7;
- #ifdef CONFIG_SYSTEM_BLACKLIST_KEYRING
- extern int mark_hash_blacklisted(const char *hash);
-+extern int mark_key_revocationlisted(const char *data, size_t size);
- extern int is_hash_blacklisted(const u8 *hash, size_t hash_len,
- 			       const char *type);
- extern int is_binary_blacklisted(const u8 *hash, size_t hash_len);
-+extern int is_key_revocationlisted(struct pkcs7_message *pkcs7);
- #else
- static inline int is_hash_blacklisted(const u8 *hash, size_t hash_len,
- 				      const char *type)
-@@ -47,6 +50,14 @@ static inline int is_binary_blacklisted(const u8 *hash, size_t hash_len)
+-static int adf_ring_open(struct inode *inode, struct file *file)
+-{
+-	int ret = seq_open(file, &adf_ring_sops);
+-
+-	if (!ret) {
+-		struct seq_file *seq_f = file->private_data;
+-
+-		seq_f->private = inode->i_private;
+-	}
+-	return ret;
+-}
+-
+-static const struct file_operations adf_ring_debug_fops = {
+-	.open = adf_ring_open,
+-	.read = seq_read,
+-	.llseek = seq_lseek,
+-	.release = seq_release
+-};
++DEFINE_SEQ_ATTRIBUTE(adf_ring_debug);
+ 
+ int adf_ring_debugfs_add(struct adf_etr_ring_data *ring, const char *name)
  {
- 	return 0;
- }
-+static inline int mark_key_revocationlisted(const char *data, size_t size)
-+{
-+	return 0;
-+}
-+static inline int is_key_revocationlisted(struct pkcs7_message *pkcs7)
-+{
-+	return -ENOKEY;
-+}
- #endif
- 
- #ifdef CONFIG_IMA_BLACKLIST_KEYRING
-diff --git a/security/integrity/platform_certs/keyring_handler.c b/security/integrity/platform_certs/keyring_handler.c
-index c5ba695c10e3..cc5a43804bc4 100644
---- a/security/integrity/platform_certs/keyring_handler.c
-+++ b/security/integrity/platform_certs/keyring_handler.c
-@@ -55,6 +55,15 @@ static __init void uefi_blacklist_binary(const char *source,
- 	uefi_blacklist_hash(source, data, len, "bin:", 4);
+@@ -188,31 +171,14 @@ static void adf_bank_stop(struct seq_file *sfile, void *v)
+ 	mutex_unlock(&bank_read_lock);
  }
  
-+/*
-+ * Revocationlist the X509 cert
-+ */
-+static __init void uefi_revocationlist_x509(const char *source,
-+					    const void *data, size_t len)
-+{
-+	mark_key_revocationlisted(data, len);
-+}
-+
- /*
-  * Return the appropriate handler for particular signature list types found in
-  * the UEFI db and MokListRT tables.
-@@ -76,5 +85,7 @@ __init efi_element_handler_t get_handler_for_dbx(const efi_guid_t *sig_type)
- 		return uefi_blacklist_x509_tbs;
- 	if (efi_guidcmp(*sig_type, efi_cert_sha256_guid) == 0)
- 		return uefi_blacklist_binary;
-+	if (efi_guidcmp(*sig_type, efi_cert_x509_guid) == 0)
-+		return uefi_revocationlist_x509;
- 	return 0;
- }
+-static const struct seq_operations adf_bank_sops = {
++static const struct seq_operations adf_bank_debug_sops = {
+ 	.start = adf_bank_start,
+ 	.next = adf_bank_next,
+ 	.stop = adf_bank_stop,
+ 	.show = adf_bank_show
+ };
+ 
+-static int adf_bank_open(struct inode *inode, struct file *file)
+-{
+-	int ret = seq_open(file, &adf_bank_sops);
+-
+-	if (!ret) {
+-		struct seq_file *seq_f = file->private_data;
+-
+-		seq_f->private = inode->i_private;
+-	}
+-	return ret;
+-}
+-
+-static const struct file_operations adf_bank_debug_fops = {
+-	.open = adf_bank_open,
+-	.read = seq_read,
+-	.llseek = seq_lseek,
+-	.release = seq_release
+-};
++DEFINE_SEQ_ATTRIBUTE(adf_bank_debug);
+ 
+ int adf_bank_debugfs_add(struct adf_etr_bank_data *bank)
+ {
 -- 
-2.18.1
+2.25.1
 
