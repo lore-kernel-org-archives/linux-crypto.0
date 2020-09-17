@@ -5,68 +5,68 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CE07C43461
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 18:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D492C433E2
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 18:37:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0315821D24
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 18:37:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26466206D4
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 18:37:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="t1F4i2ut"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="XClmft36"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726385AbgIQSgy (ORCPT
+        id S1726433AbgIQSgw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Sep 2020 14:36:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41110 "EHLO
+        Thu, 17 Sep 2020 14:36:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726659AbgIQSgR (ORCPT
+        with ESMTP id S1726385AbgIQSgP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Sep 2020 14:36:17 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D51DC06178C
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Sep 2020 11:36:17 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id g4so3119354wrs.5
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Sep 2020 11:36:17 -0700 (PDT)
+        Thu, 17 Sep 2020 14:36:15 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28B2DC06178B
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Sep 2020 11:36:15 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id a17so3118076wrn.6
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Sep 2020 11:36:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=XM0rn9lgSMh+/oP0wbhw4Z0Og4lOLAMikZRs+DnstJg=;
-        b=t1F4i2utZ2d6rs6DCDEg4dyCXwYJlvBxt8DAK7YCJPHWLEuWYXH+YP7uoYpl016u8t
-         R4PnzNq5M2D/veKMddKOixuoUYhHx0Ug4NcDn0Lq4wFCE0AlpgKfh9rf/6jG5dtNyR6R
-         DOpOWrtTBqxl96lLAdOcxUVPkbt4v8lWwcTJpGp66IEn3Jg6jiLT0n7khrcG6R1nkY/e
-         iUrlTNbDuw47FgRinC3Jlk4Nqi6JcZX7zeDcWOZSvyNib80nmJ7wJ6HAj1OjwjZrsRq6
-         lCv79+SzNgXnA0VhnjgiGBEAtTHLSyq+kQgc2XdhLMOurmIsXN0b9RbDLGKkktFjqb6/
-         TyXg==
+        bh=SdHelnHrIfhdBmXdug1FChKyG7T3Sv9OQk7JTWtycnw=;
+        b=XClmft36wq66EBrOpv8lSS73dG/SktaF4Nc0VJZtC1/dzAUC/4zNXqLulkOXCikLpq
+         UXrUZPpMwk0+lw9g6z5lZYQzF4eZS2hLDMxoK6rab3DjqDD32q6dN+fyCv9FLoF5YU6f
+         BcM3AbfAJPogtKDBJ319T0X3XwzXa4PMyZ6O54SyFgdr4mn6kMooLmg717bujnbxJdU6
+         AkVnL8Szk1NEciRmmoQMMKAAmrEL/VDN9hmAu48b7q/FCmkXZLMZJAVzwbTFm0K2q0JL
+         km0hMPTptvN1ai5/7pn7+miqaVWvwKq2PDJPd/Ka51lO1OLyZSVLoXhfK43r9N7601LM
+         t2ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=XM0rn9lgSMh+/oP0wbhw4Z0Og4lOLAMikZRs+DnstJg=;
-        b=R1fyf0Jgth17tRcRbR+eMMYlwdyt1+pCW9ERSfSbJLBQ87k9beB7FeDHGeK61m+7SS
-         lsv6KND8V5wKGPHyNc1P7bjdpN9FFr/n+lsdotbPEeE94NOrhNHZFT2AOpklqRr7wkrY
-         O6PUqS+zXqPX43D97vNS9WmTr0zHUy75Z7oRafSiM+cceDBz7vCz3hVkDT38+orsXrPL
-         EW++0uScbhJMQMRzLQRToCEf9EwQ2dfwatR4CWCnLWcSjTBLqkihMDL1y/i5ZBhwoMLQ
-         feZFWPDZ5jgmrHqyNcPsWczivQE9tsmSFnBMF7Z2KIW84rvMDGrb5FeSLS076DJkpHUf
-         fXzA==
-X-Gm-Message-State: AOAM532JkQmXKLigVUPjiStD1Yfm0t+5yf3N1rG+6nb/rkbv/HVqJ5fz
-        Kyw71G7yMIqr9lt7JK1g8Ul7KQ==
-X-Google-Smtp-Source: ABdhPJxBCR6h6xFHou/Y3/DMQ76QCXKRZvp9f6aSU4/C91Y2zTMNW6ZBe33yJ+uulWo9T5gTTbvvuA==
-X-Received: by 2002:adf:edd2:: with SMTP id v18mr33152164wro.242.1600367774867;
-        Thu, 17 Sep 2020 11:36:14 -0700 (PDT)
+        bh=SdHelnHrIfhdBmXdug1FChKyG7T3Sv9OQk7JTWtycnw=;
+        b=meH3AQsHOS6Mc/qYbQw/+MbdvDVfQtFkL8dkpTumH4F3NXbVnNcWJa5BjJejr5iRtG
+         gDNVXlNcNq2NtuJvKCijvTLhTCtJXZFtFH6cUr72NfLRtjEfZ8WMp+rJ0mPKgagsDFJQ
+         8A0Ph28R70LPDMJYlkI6MHvEbUxqYkjY7H0joqt8rIXKlxIci9KUjvhL/1LIIZFHebMf
+         7sEjjbQKxMO0Ct98tilKxdDnV5ezqFrOtJVqWsW3J/rJmgpbvfxeAnwpN9MRvbxGiE4+
+         fAT0U0PnrkxcXgyeKgrzEQRCzmj1VMQVhBvynSejUQMTUYqahJviW+k3PjB1AYcce+OQ
+         x5NQ==
+X-Gm-Message-State: AOAM531FRqyxRV20lH2+li5J3JaMDhM1vg4C6e1NmFVpAQhg4s2YqgjK
+        9iGxAklbX/Zqyxfd+5qysHCFCw==
+X-Google-Smtp-Source: ABdhPJwfEu7lEY94WzW8h+jGsLcci6F5r/8iU0L+hzcDtJIrfCTxLwLochPoKHE13UDzQjktO/N2KQ==
+X-Received: by 2002:adf:8b48:: with SMTP id v8mr33777987wra.21.1600367773784;
+        Thu, 17 Sep 2020 11:36:13 -0700 (PDT)
 Received: from localhost.localdomain ([51.15.160.169])
-        by smtp.googlemail.com with ESMTPSA id x16sm571901wrq.62.2020.09.17.11.36.13
+        by smtp.googlemail.com with ESMTPSA id x16sm571901wrq.62.2020.09.17.11.36.12
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 17 Sep 2020 11:36:14 -0700 (PDT)
+        Thu, 17 Sep 2020 11:36:13 -0700 (PDT)
 From:   Corentin Labbe <clabbe@baylibre.com>
 To:     arnd@arndb.de, davem@davemloft.net, herbert@gondor.apana.org.au,
         mripard@kernel.org, wens@csie.org
 Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
         Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH 7/7] crypto: sun4i-ss: add SPDX header and remove blank lines
-Date:   Thu, 17 Sep 2020 18:35:58 +0000
-Message-Id: <1600367758-28589-8-git-send-email-clabbe@baylibre.com>
+Subject: [PATCH 6/7] crypto: sun4i-ss: enabled stats via debugfs
+Date:   Thu, 17 Sep 2020 18:35:57 +0000
+Message-Id: <1600367758-28589-7-git-send-email-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1600367758-28589-1-git-send-email-clabbe@baylibre.com>
 References: <1600367758-28589-1-git-send-email-clabbe@baylibre.com>
@@ -74,49 +74,242 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patchs fixes some remaining style issue.
+This patch enable to access usage stats for each algorithm.
 
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c | 3 ---
- drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c   | 1 +
- 2 files changed, 1 insertion(+), 3 deletions(-)
+ drivers/crypto/allwinner/Kconfig              |  9 ++++
+ .../allwinner/sun4i-ss/sun4i-ss-cipher.c      | 21 ++++++++
+ .../crypto/allwinner/sun4i-ss/sun4i-ss-core.c | 54 +++++++++++++++++++
+ .../crypto/allwinner/sun4i-ss/sun4i-ss-hash.c |  8 +++
+ .../crypto/allwinner/sun4i-ss/sun4i-ss-prng.c |  5 ++
+ drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h  | 11 ++++
+ 6 files changed, 108 insertions(+)
 
+diff --git a/drivers/crypto/allwinner/Kconfig b/drivers/crypto/allwinner/Kconfig
+index 0e72543ad1f1..e9b7f7e3d307 100644
+--- a/drivers/crypto/allwinner/Kconfig
++++ b/drivers/crypto/allwinner/Kconfig
+@@ -51,6 +51,15 @@ config CRYPTO_DEV_SUN4I_SS_PRNG
+ 	  Select this option if you want to provide kernel-side support for
+ 	  the Pseudo-Random Number Generator found in the Security System.
+ 
++config CRYPTO_DEV_SUN4I_SS_DEBUG
++	bool "Enable sun4i-ss stats"
++	depends on CRYPTO_DEV_SUN4I_SS
++	depends on DEBUG_FS
++	help
++	  Say y to enable sun4i-ss debug stats.
++	  This will create /sys/kernel/debug/sun4i-ss/stats for displaying
++	  the number of requests per algorithm.
++
+ config CRYPTO_DEV_SUN8I_CE
+ 	tristate "Support for Allwinner Crypto Engine cryptographic offloader"
+ 	select CRYPTO_SKCIPHER
 diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
-index be6599220e9d..2011aa4f0415 100644
+index c21a1a0a8b16..be6599220e9d 100644
 --- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
 +++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
-@@ -137,7 +137,6 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
- 	return err;
- }
+@@ -34,6 +34,10 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
+ 	struct sg_mapping_iter mi, mo;
+ 	unsigned int oi, oo; /* offset for in and out */
+ 	unsigned long flags;
++#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG
++	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
++	struct sun4i_ss_alg_template *algt;
++#endif
  
--
- static int noinline_for_stack sun4i_ss_cipher_poll_fallback(struct skcipher_request *areq)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(areq);
-@@ -549,7 +548,6 @@ int sun4i_ss_cipher_init(struct crypto_tfm *tfm)
- 				    sizeof(struct sun4i_cipher_req_ctx) +
- 				    crypto_skcipher_reqsize(op->fallback_tfm));
+ 	if (!areq->cryptlen)
+ 		return 0;
+@@ -50,6 +54,12 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
+ 		scatterwalk_map_and_copy(backup_iv, areq->src, areq->cryptlen - ivsize, ivsize, 0);
+ 	}
  
--
- 	err = pm_runtime_get_sync(op->ss->dev);
- 	if (err < 0)
- 		goto error_pm;
-@@ -636,5 +634,4 @@ int sun4i_ss_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 	crypto_skcipher_set_flags(op->fallback_tfm, tfm->base.crt_flags & CRYPTO_TFM_REQ_MASK);
++#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG
++	algt = container_of(alg, struct sun4i_ss_alg_template, alg.crypto);
++	algt->stat_opti++;
++	algt->stat_bytes += areq->cryptlen;
++#endif
++
+ 	spin_lock_irqsave(&ss->slock, flags);
  
- 	return crypto_skcipher_setkey(op->fallback_tfm, key, keylen);
--
- }
+ 	for (i = 0; i < op->keylen / 4; i++)
+@@ -134,7 +144,13 @@ static int noinline_for_stack sun4i_ss_cipher_poll_fallback(struct skcipher_requ
+ 	struct sun4i_tfm_ctx *op = crypto_skcipher_ctx(tfm);
+ 	struct sun4i_cipher_req_ctx *ctx = skcipher_request_ctx(areq);
+ 	int err;
++#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG
++	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
++	struct sun4i_ss_alg_template *algt;
+ 
++	algt = container_of(alg, struct sun4i_ss_alg_template, alg.crypto);
++	algt->stat_fb++;
++#endif
+ 	skcipher_request_set_tfm(&ctx->fallback_req, op->fallback_tfm);
+ 	skcipher_request_set_callback(&ctx->fallback_req, areq->base.flags,
+ 				      areq->base.complete, areq->base.data);
+@@ -228,6 +244,11 @@ static int sun4i_ss_cipher_poll(struct skcipher_request *areq)
+ 		scatterwalk_map_and_copy(backup_iv, areq->src, areq->cryptlen - ivsize, ivsize, 0);
+ 	}
+ 
++#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG
++	algt->stat_req++;
++	algt->stat_bytes += areq->cryptlen;
++#endif
++
+ 	spin_lock_irqsave(&ss->slock, flags);
+ 
+ 	for (i = 0; i < op->keylen / 4; i++)
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
+index a2b67f7f8a81..d044eb8f88b6 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
+@@ -234,6 +234,53 @@ static struct sun4i_ss_alg_template ss_algs[] = {
+ #endif
+ };
+ 
++#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG
++static int sun4i_ss_dbgfs_read(struct seq_file *seq, void *v)
++{
++	unsigned int i;
++
++	for (i = 0; i < ARRAY_SIZE(ss_algs); i++) {
++		if (!ss_algs[i].ss)
++			continue;
++		switch (ss_algs[i].type) {
++		case CRYPTO_ALG_TYPE_SKCIPHER:
++			seq_printf(seq, "%s %s reqs=%lu opti=%lu fallback=%lu tsize=%lu\n",
++				   ss_algs[i].alg.crypto.base.cra_driver_name,
++				   ss_algs[i].alg.crypto.base.cra_name,
++				   ss_algs[i].stat_req, ss_algs[i].stat_opti, ss_algs[i].stat_fb,
++				   ss_algs[i].stat_bytes);
++			break;
++		case CRYPTO_ALG_TYPE_RNG:
++			seq_printf(seq, "%s %s reqs=%lu tsize=%lu\n",
++				   ss_algs[i].alg.rng.base.cra_driver_name,
++				   ss_algs[i].alg.rng.base.cra_name,
++				   ss_algs[i].stat_req, ss_algs[i].stat_bytes);
++			break;
++		case CRYPTO_ALG_TYPE_AHASH:
++			seq_printf(seq, "%s %s reqs=%lu\n",
++				   ss_algs[i].alg.hash.halg.base.cra_driver_name,
++				   ss_algs[i].alg.hash.halg.base.cra_name,
++				   ss_algs[i].stat_req);
++			break;
++		}
++	}
++	return 0;
++}
++
++static int sun4i_ss_dbgfs_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, sun4i_ss_dbgfs_read, inode->i_private);
++}
++
++static const struct file_operations sun4i_ss_debugfs_fops = {
++	.owner = THIS_MODULE,
++	.open = sun4i_ss_dbgfs_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++#endif
++
+ /*
+  * Power management strategy: The device is suspended unless a TFM exists for
+  * one of the algorithms proposed by this driver.
+@@ -454,6 +501,13 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+ 			break;
+ 		}
+ 	}
++
++#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG
++	/* Ignore error of debugfs */
++	ss->dbgfs_dir = debugfs_create_dir("sun4i-ss", NULL);
++	ss->dbgfs_stats = debugfs_create_file("stats", 0444, ss->dbgfs_dir, ss,
++					      &sun4i_ss_debugfs_fops);
++#endif
+ 	return 0;
+ error_alg:
+ 	i--;
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
+index dc35edd90034..3da60256f498 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
+@@ -197,6 +197,10 @@ static int sun4i_hash(struct ahash_request *areq)
+ 	int in_r, err = 0;
+ 	size_t copied = 0;
+ 	__le32 wb = 0;
++#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG
++	struct ahash_alg *alg = __crypto_ahash_alg(tfm->base.__crt_alg);
++	struct sun4i_ss_alg_template *algt;
++#endif
+ 
+ 	dev_dbg(ss->dev, "%s %s bc=%llu len=%u mode=%x wl=%u h0=%0x",
+ 		__func__, crypto_tfm_alg_name(areq->base.tfm),
+@@ -397,6 +401,10 @@ static int sun4i_hash(struct ahash_request *areq)
+  */
+ 
+ hash_final:
++#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG
++	algt = container_of(alg, struct sun4i_ss_alg_template, alg.hash);
++	algt->stat_req++;
++#endif
+ 
+ 	/* write the remaining words of the wait buffer */
+ 	if (op->len) {
 diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
-index 102f8a90ce0f..4d1610952e90 100644
+index 729aafdbea84..102f8a90ce0f 100644
 --- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
 +++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- #include "sun4i-ss.h"
+@@ -32,6 +32,11 @@ int sun4i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
+ 	if (err < 0)
+ 		return err;
  
- int sun4i_ss_prng_seed(struct crypto_rng *tfm, const u8 *seed,
++#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG
++	algt->stat_req++;
++	algt->stat_bytes += todo;
++#endif
++
+ 	spin_lock_bh(&ss->slock);
+ 
+ 	writel(mode, ss->base + SS_CTL);
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
+index 163962f9e284..a98a2c05089b 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
+@@ -13,6 +13,7 @@
+ 
+ #include <linux/clk.h>
+ #include <linux/crypto.h>
++#include <linux/debugfs.h>
+ #include <linux/io.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
+@@ -152,6 +153,10 @@ struct sun4i_ss_ctx {
+ #ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_PRNG
+ 	u32 seed[SS_SEED_LEN / BITS_PER_LONG];
+ #endif
++#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG
++	struct dentry *dbgfs_dir;
++	struct dentry *dbgfs_stats;
++#endif
+ };
+ 
+ struct sun4i_ss_alg_template {
+@@ -163,6 +168,12 @@ struct sun4i_ss_alg_template {
+ 		struct rng_alg rng;
+ 	} alg;
+ 	struct sun4i_ss_ctx *ss;
++#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG
++	unsigned long stat_req;
++	unsigned long stat_fb;
++	unsigned long stat_bytes;
++	unsigned long stat_opti;
++#endif
+ };
+ 
+ struct sun4i_tfm_ctx {
 -- 
 2.26.2
 
