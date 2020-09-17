@@ -2,192 +2,102 @@ Return-Path: <SRS0=yTfj=C2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B49C433E2
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 18:50:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1749C43461
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 19:00:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 216282075B
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 18:50:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F73E206B7
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 19:00:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="YKPiO9UW";
-	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="Qp/YW6GL"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="UDH2kSar"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726550AbgIQSux (ORCPT
+        id S1726607AbgIQTA2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Sep 2020 14:50:53 -0400
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:61362 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726510AbgIQSur (ORCPT
+        Thu, 17 Sep 2020 15:00:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44730 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726589AbgIQS7v (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Sep 2020 14:50:47 -0400
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 08HHpAZW031090;
-        Thu, 17 Sep 2020 10:57:46 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type : content-id
- : content-transfer-encoding : mime-version; s=facebook;
- bh=XCOEkT2hGjYICdGFrJpPyKKEKALHdwgIt0U5/RrDeY8=;
- b=YKPiO9UWNlzagG650BCR8IoFm7KBJ1eaSnsPkCXoLkqjKo03+XN5HD1U0za0hGPwXsEe
- mtmC6yUBoUsZB1i6HWNeZzoCi9GyVbFIP+pG3sSWr6yoOlOt/df6Swa9p4a91pi3fVyJ
- G8aTVwE/YbfwZCR00B448s98kQbozoD9oMg= 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com with ESMTP id 33mc4rr67m-3
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Thu, 17 Sep 2020 10:57:46 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (100.104.31.183)
- by o365-in.thefacebook.com (100.104.36.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1979.3; Thu, 17 Sep 2020 10:57:44 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=asqT+k4EH5YSN2ONT8M45bBV3BsVxLlmKdCPUZEkB3cxhN2brBMqZsTiP0SMBCPnFBSSO++kby2jTWefZzyQU+F+kh2Ou+6I/7f9s6KNO+5rJxYKfTDNMn/EJXO03OIEY/485j5XWKjv/W27F+ui6zVAo0XyzO2xU1CbrnfMl2pNw7/MDnqn6yX/C/AkJ/MxQDhEbELHz/d0NZSre1JQxOwyvUMO/oIqOswGqZXrOBR+ivZ81zaXdWMsJ7wh0RlKnlwD33nktouPEJQR2Mnpoqf6R5KGP2KQcrOMb4iNz+2QhAJE3fmpQDEmgy5zKoM6y1yV5LMyvqvp1uKfRrluPA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XCOEkT2hGjYICdGFrJpPyKKEKALHdwgIt0U5/RrDeY8=;
- b=RYFe8SqPa+liC15k18YWpbvyTdKe1mUM1xhBuWRRgNa5CeJ0WnoHvjIZ8zTTahWhQPbz1p5tZhiMkJ98Dk3kP5aIMoLvclj/R4puIzpurCJqQT08aF+fBCqg5+7kjBDOe5TRbyUFu9J8eDAOtqe3jq2lIHCNvoSG9J5LoeXZz6tDXhAUe2eXQ53BWD6cV53uY7ycoOnAjBVV3GnLh1cpB++Yu6DTTiQIJpVe/q4lFquVgAAxWI2B7SDRBfuYFjSgu+HA/KNyrVkuwLEF0/OREtIVgVkK/gb6umbLiCTwH0UrAI26ehRrJ+muimxKVPaMRzhyHP49+MnbLacALOqW/w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
- header.d=fb.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
- s=selector2-fb-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XCOEkT2hGjYICdGFrJpPyKKEKALHdwgIt0U5/RrDeY8=;
- b=Qp/YW6GLn3DC22LyBNYvB8Q1OKPP59ibYE339x+bH2fvQCGvhcu8WkojV4UmzqAU6xmKpqEEaLZKrLaBRWhyg1Gv0qRwvfC1kQatBOsZNnlEwYmRp5m6CZfvN32bhw676m6ysaxBwu1z6sU6RqYAanwj29LF8cLjcztFCuYpvF0=
-Received: from BY5PR15MB3667.namprd15.prod.outlook.com (2603:10b6:a03:1f9::18)
- by BYAPR15MB2408.namprd15.prod.outlook.com (2603:10b6:a02:85::25) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.14; Thu, 17 Sep
- 2020 17:57:39 +0000
-Received: from BY5PR15MB3667.namprd15.prod.outlook.com
- ([fe80::2d08:987a:126:1c9c]) by BY5PR15MB3667.namprd15.prod.outlook.com
- ([fe80::2d08:987a:126:1c9c%7]) with mapi id 15.20.3391.014; Thu, 17 Sep 2020
- 17:57:39 +0000
-From:   Nick Terrell <terrelln@fb.com>
-To:     Chris Mason <clm@fb.com>
-CC:     Christoph Hellwig <hch@infradead.org>,
-        Rik van Riel <riel@surriel.com>,
-        Nick Terrell <nickrterrell@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
-        "squashfs-devel@lists.sourceforge.net" 
-        <squashfs-devel@lists.sourceforge.net>,
-        "linux-f2fs-devel@lists.sourceforge.net" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Kernel Team <Kernel-team@fb.com>, Petr Malat <oss@malat.biz>,
-        Johannes Weiner <jweiner@fb.com>,
-        Niket Agarwal <niketa@fb.com>, Yann Collet <cyan@fb.com>
-Subject: Re: [PATCH 5/9] btrfs: zstd: Switch to the zstd-1.4.6 API
-Thread-Topic: [PATCH 5/9] btrfs: zstd: Switch to the zstd-1.4.6 API
-Thread-Index: AQHWi9t+F+963YLOT0SgwBoo2TG/malq9P8AgABcdACAAALEAIAAA28AgAAA6ACAAEv8AIAAaX+AgACOPwCAAEmPgIAAOoKA
-Date:   Thu, 17 Sep 2020 17:57:39 +0000
-Message-ID: <570EC702-5364-437A-B74B-06FEFEFCC161@fb.com>
-References: <20200916034307.2092020-1-nickrterrell@gmail.com>
- <20200916034307.2092020-7-nickrterrell@gmail.com>
- <20200916084958.GC31608@infradead.org>
- <CCDAB4AB-DE8D-4ADE-9221-02AE732CBAE2@fb.com>
- <20200916143046.GA13543@infradead.org>
- <1CAB33F1-95DB-4BC5-9023-35DD2E4E0C20@fb.com>
- <20200916144618.GB16392@infradead.org>
- <4D04D534-75BD-4B13-81B9-31B9687A6B64@fb.com>
- <b1eec667d42849f757bbd55f014739509498a59d.camel@surriel.com>
- <20200917100458.GA28031@infradead.org>
- <2073A599-E7CA-476A-9B4B-7BC76B454B9A@fb.com>
-In-Reply-To: <2073A599-E7CA-476A-9B4B-7BC76B454B9A@fb.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [98.33.101.203]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 44dbdcfa-a913-477d-c5d7-08d85b332b3b
-x-ms-traffictypediagnostic: BYAPR15MB2408:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR15MB2408618C97A5153D96C91A93AB3E0@BYAPR15MB2408.namprd15.prod.outlook.com>
-x-fb-source: Internal
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Q3AsIkuPyYHiwJLLjm/bK4opOpOUKRClQ2UJUB2O0MWnbafhxb8DXLDpcLnlx8CdDU/FSePKRE0pscXMMxAadboauWK+11NOssLz/FbZArC6OktlPEL/wfyS3Htw+PErf+/xPEJIh+dCggn+ZjgQ1Pstnyys6vMQSDz9nQ7Bcb8E0hgny7wsQuw6t1Jfy50aRhodhlZz66VVOCvoDl9lxH6J2qbvaUD/nQICkmUP2pM5oxL/b7ZFrMIw5ZHSbC+y0SJvZ3YeEjCnqpXtVL+SEAq2Ru10BFtdAbklcRYkPhK9J545aV7ClEGBZElWxGMYAipAuR1iWE+kgoAclDnIMQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR15MB3667.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(396003)(376002)(366004)(136003)(346002)(6486002)(4326008)(7416002)(36756003)(54906003)(6636002)(6862004)(33656002)(6512007)(2906002)(53546011)(6506007)(76116006)(5660300002)(66446008)(66556008)(66946007)(66476007)(64756008)(2616005)(71200400001)(8936002)(37006003)(86362001)(26005)(316002)(186003)(8676002)(83380400001)(478600001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: Y1+KDAwGDZoc5e7VqKEPyr6Qi9GvpQVKvuAHNRNNyA2SZtIenAqfVDkx9BmmoeuY8i+ym5XuURNXUCa/Qq3YfVFZi+afoOAoobZl7ol4Lgg7/46wTluPNRnNAK/1Vc4Rx1Ny8cOf8mu0M1Uv6dbHNQY9vCMG62e/zCeDu7DHP9q+C++40ugqtAennAQ/9tDe5Nf67VyCPbWDFETQ0EV6UMnGh+9lmw1qsQWR4BavDIJY0OafPtzek/IEeoSDIQsQ2YlLDshIZSsijWStb2L0MR5MyVdbgdngERsDXKfLXYX1oNeUp9SV48Cgr9/j8YrrxALgkVH2izRrZqt8xgEt6gfc0AbkqAMqowPEd9XG5mPBRxRiDCHczeqPopjhPtA58Toz6xaWUba588uvn2Z130Nx3X2rxpSCjf4+nnkfjM7HabJxMWfVV81cdZfJYK1yEGOkTqDbzEkmhMPILlA4fqxS/iasA9CU0ZzfZJOdk3P8zjzCMcbhOkqhjUGSGuR8KJy6dlF/ys8k5PmPZKYx2E8xt6SKbrgZZ/sN7IE131JUgG+rbOdygAsna8pzzPn+iYNdgVaTyH0vLz+pWi1989cjCMkKiCs7vjToe6uXjb7wvmXMSz+BQ+qLOGea2eS0csfcCbFCmQGcMjgcATIidw==
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C65AFC3C2E5B0C4EAAFAD0C6F9A8CB75@namprd15.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR15MB3667.namprd15.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 44dbdcfa-a913-477d-c5d7-08d85b332b3b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Sep 2020 17:57:39.8493
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ikXWZd9HOUavrWR+dtos4fxB2dEbyYsvHmONAlBugmuM2AHweCFU7TzwEDAG/lnX
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR15MB2408
-X-OriginatorOrg: fb.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-09-17_14:2020-09-16,2020-09-17 signatures=0
-X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 malwarescore=0 mlxscore=0
- clxscore=1011 bulkscore=0 adultscore=0 spamscore=0 priorityscore=1501
- suspectscore=0 phishscore=0 impostorscore=0 lowpriorityscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009170133
-X-FB-Internal: deliver
+        Thu, 17 Sep 2020 14:59:51 -0400
+Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F490C061756
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Sep 2020 11:59:45 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id s12so3171522wrw.11
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Sep 2020 11:59:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=/FQeEcWUlQDqfQ8wanTKIcTElJ0+/H0Q34PjAFqIS2E=;
+        b=UDH2kSarbkBuYBTeWj3n0fqUdD9XU0XvPc+4NOngHaapEW0SOpuLQ8y2YcruoNZeEX
+         svVWs1RwWe/w6VHGkXAOgYyz3Cix45a6NYx3vT6cF0+ufr8RGH7pgc/1fC9yA3KIbmZE
+         MTt7xB/yrUVL+6MJpVcF2vyvi/2cOm2JzUH6JFmGAgB61p5NzL4KKCADVFcHVZh7q+UF
+         ohOzgpHwsME46bLgBALQPJR3APlbQv4PT/DrXz2a7r+k3AZWUjujgKyUqrLxY2ve1zWl
+         96ociw42g1nxXnxTmBpW5arpqMbDoUXiYheqCebLj3yquFlTwDkxwk7xLLnZtqD4h3cP
+         N53A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=/FQeEcWUlQDqfQ8wanTKIcTElJ0+/H0Q34PjAFqIS2E=;
+        b=iZ2RWn9u+OrWDymiyzpa9XWkr0cI6CTxvqeV59GmRHR7X2qNMpgz12OlutPpOdDKt/
+         y2zGQS1YTfq4oWzWOlKDtwt8b1trN5dhIbzvdkH6GsAFGkq9l1JsSJ9papj0LsdnxYH4
+         +UHaS5fP0XgJ22u/r3pcg87DebqfhEmKOA4bDf3DXuNwrVctLHZwWMvAiOTz8qnCkeA6
+         lhxCxjsqOf9V7EPlsXrjGl3v1Ch2ucwWbev6M57rop/H1elLsFEVvQ9pduEPPG7n2Q6U
+         G9fekzCs8TKdoHrSd3n58oQ9SeNAoSf4JxQiqFO2Q+xk+9RG62es9KipiBnhcKkkkXGG
+         P2KA==
+X-Gm-Message-State: AOAM530VwTywZZUfB+llcbNZhUy2lLvD5Q3A9wVO57ryOWI2GQobCsyU
+        n//oaUv5vMs75vVvyha8c/Ih7g==
+X-Google-Smtp-Source: ABdhPJzbVDEFcxbw/TjYhFdXwMyu3mguWYl6vvOW6/lfjbNAQgC808oX9KFWtD4HV3w00/BjD7ipww==
+X-Received: by 2002:a5d:6283:: with SMTP id k3mr35007812wru.191.1600369184565;
+        Thu, 17 Sep 2020 11:59:44 -0700 (PDT)
+Received: from localhost.localdomain ([51.15.160.169])
+        by smtp.googlemail.com with ESMTPSA id f23sm16639470wmc.3.2020.09.17.11.59.43
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 17 Sep 2020 11:59:43 -0700 (PDT)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH] crypto: procfs: Removing some useless only space lines
+Date:   Thu, 17 Sep 2020 18:59:36 +0000
+Message-Id: <1600369176-28975-1-git-send-email-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gT24gU2VwIDE3LCAyMDIwLCBhdCA3OjI4IEFNLCBDaHJpcyBNYXNvbiA8Y2xtQGZiLmNv
-bT4gd3JvdGU6DQo+IA0KPiBPbiAxNyBTZXAgMjAyMCwgYXQgNjowNCwgQ2hyaXN0b3BoIEhlbGx3
-aWcgd3JvdGU6DQo+IA0KPj4gT24gV2VkLCBTZXAgMTYsIDIwMjAgYXQgMDk6MzU6NTFQTSAtMDQw
-MCwgUmlrIHZhbiBSaWVsIHdyb3RlOg0KPj4+PiBPbmUgcG9zc2liaWxpdHkgaXMgdG8gaGF2ZSBh
-IGtlcm5lbCB3cmFwcGVyIG9uIHRvcCBvZiB0aGUgenN0ZCBBUEkgdG8NCj4+Pj4gbWFrZSBpdA0K
-Pj4+PiBtb3JlIGVyZ29ub21pYy4gSSBwZXJzb25hbGx5IGRvbj8/P3QgcmVhbGx5IHNlZSB0aGUg
-dmFsdWUgaW4gaXQsIHNpbmNlDQo+Pj4+IGl0IGFkZHMNCj4+Pj4gYW5vdGhlciBsYXllciBvZiBp
-bmRpcmVjdGlvbiBiZXR3ZWVuIHpzdGQgYW5kIHRoZSBjYWxsZXIsIGJ1dCBpdA0KPj4+PiBjb3Vs
-ZCBiZSBkb25lLg0KPj4+IA0KPj4+IFpzdGQgd291bGQgbm90IGJlIHRoZSBmaXJzdCBwYXJ0IG9m
-IHRoZSBrZXJuZWwgdG8NCj4+PiBjb21lIGZyb20gc29tZXdoZXJlIGVsc2UsIGFuZCBoYXZlIHdy
-YXBwZXJzIHdoZW4NCj4+PiBpdCBnZXRzIGludGVncmF0ZWQgaW50byB0aGUga2VybmVsLiBUaGVy
-ZSBjZXJ0YWlubHkNCj4+PiBpcyBwcmVjZWRlbmNlIHRoZXJlLg0KPj4+IA0KPj4+IEl0IHdvdWxk
-IGJlIGludGVyZXN0aW5nIHRvIGtub3cgd2hhdCBDaHJpc3RvcGgncw0KPj4+IHByZWZlcmVuY2Ug
-aXMuDQo+PiANCj4+IFllcywgSSB0aGluayBrZXJuZWwgd3JhcHBlcnMgd291bGQgYmUgYSBwcmV0
-dHkgc2Vuc2libGUgc3RlcCBmb3J3YXJkLg0KPj4gVGhhdCBhbHNvIGF2b2lkIHRoZSBuZWVkIHRv
-IGRvIHN0cmFuZ2UgdXBncmFkZXMgdG8gYSBuZXcgdmVyc2lvbiwNCj4+IGFuZCBpbnN0ZWFkIHdl
-IGNhbiBqdXN0IGNoYW5nZSBBUElzIG9uIGEgYXMtbmVlZGVkIGJhc2lzLg0KPiANCj4gV2hlbiB3
-ZSBhZGQgd3JhcHBlcnMsIHdlIGVuZCB1cCBjcmVhdGluZyBhIGtlcm5lbCBzcGVjaWZpYyBBUEkg
-dGhhdCBkb2VzbuKAmXQgbWF0Y2ggdGhlIHVwc3RyZWFtIHpzdGQgZG9jcywgYW5kIGl0IGRvZXNu
-4oCZdCBsZXZlcmFnZSBhcyBtdWNoIG9mIHRoZSB6c3RkIGZ1enppbmcgYW5kIHRlc3RpbmcuDQo+
-IA0KPiBTbyB3ZeKAmXJlIGFjdHVhbGx5IG1ha2luZyBrZXJuZWwgenN0ZCBzbGlnaHRseSBsZXNz
-IHVzYWJsZSBpbiBob3BlcyB0aGF0IG91ciBrZXJuZWwgc3BlY2lmaWMgcGFydCBvZiB0aGUgQVBJ
-IGlzIGZhbWlsaWFyIGVub3VnaCB0byB1cyB0aGF0IGl0IG1ha2VzIHpzdGQgbW9yZSB1c2FibGUu
-ICBUaGVyZeKAmXMgbm8gd2F5IHRvIGNvbXBhcmUgdGhlIHR3byB1bnRpbCB0aGUgd3JhcHBlcnMg
-YXJlIGRvbmUsIGJ1dCBnaXZlbiB0aGUgY29kZSB0b2RheSBJ4oCZZCBwcmVmZXIgdGhhdCB3ZSBm
-b2N1cyBvbiBtYWtpbmcgaXQgcmVhbGx5IGVhc3kgdG8gdHJhY2sgdXBzdHJlYW0uICBJIHJlYWxs
-eSB1bmRlcnN0YW5kIENocmlzdG9waOKAmXMgc2lkZSBoZXJlLCBidXQgSeKAmWQgcmF0aGVyIHJp
-ZGUgYSBjYW1lbCB3aXRoIHRoZSBncm91cCB0aGFuIGdvIGl0IGFsb25lLg0KPiANCj4gSeKAmWQg
-YWxzbyBtdWNoIHJhdGhlciBzcGVuZCB0aW1lIG9uIGFueSBwcm9ibGVtcyB3aGVyZSB0aGUgc3Ry
-dWN0dXJlIG9mIHRoZSB6c3RkIEFQSXMgZG9u4oCZdCBmaXQgdGhlIGtlcm5lbOKAmXMgbmVlZHMu
-ICBUaGUgYnRyZnMgc3RyZWFtaW5nIGNvbXByZXNzaW9uL2RlY29tcHJlc3Npb24gbG9va3MgcHJl
-dHR5IGNsZWFuIHRvIG1lLCBidXQgSSB0aGluayBKb2hhbm5lcyBtZW50aW9uZWQgc29tZSBwb3Nz
-aWJpbGl0aWVzIHRvIGltcHJvdmUgdGhpbmdzIGZvciB6c3dhcCAob3B0aW1pemF0aW9ucyBmb3Ig
-cGFnZS1hdC1hdGltZSkuICBJZiB0aGVyZSBhcmUgcGxhY2VzIHdoZXJlIHRoZSB6c3RkIG1lbW9y
-eSBtYW5hZ2VtZW50IG9yIGVycm9yIGhhbmRsaW5nIGRvbuKAmXQgZml0IG5hdHVyYWxseSBpbnRv
-IHRoZSBrZXJuZWwsIHRoYXQgd291bGQgYWxzbyBiZSBoaWdoZXIgb24gbXkgbGlzdC4NCg0KVGhp
-cyB1cGRhdGUgaW5jbHVkZXMgdGhlIHJlY2VudCBvcHRpbWl6YXRpb25zIGZvciBaU3dhcCB0aGF0
-IEkndmUgbWFkZSwgd2hpY2gNCmdpdmVzIGEgMzAlIHNwZWVkIGJvb3N0IGZvciBwYWdlLWF0LWEt
-dGltZSBkZWNvbXByZXNzaW9uLg0KDQpXZSdyZSB2ZXJ5IG9wZW4gdG8gaW1wcm92aW5nIGFuZCBj
-aGFuZ2luZyB6c3RkIHRvIGJldHRlciBmaXQgdGhlIG5lZWRzIG9mIHRoZQ0Ka2VybmVsLiBJZiB0
-aGVyZSBhcmUgdXNlIGNhc2VzIHRoYXQgY2FuJ3QgdXNlIHRoZSBleGlzdGluZyBBUEksIG9yIHRo
-ZSBleGlzdGluZw0KQVBJIGlzbid0IG9wdGltYWwsIG9yIGFueSBvdGhlciBwcm9ibGVtcywgd2Xi
-gJlyZSBoYXBweSB0byBoZWxwIGZpZ3VyZSBvdXQgdGhlDQpiZXN0IHNvbHV0aW9uLiBPcGVuaW5n
-IGFuIGlzc3VlIG9uIG91ciB1cHN0cmVhbSBHaXRIdWIgcmVwbyBpcyB0aGUgYmVzdCB3YXkgdG8N
-CmdldCBvdXIgYXR0ZW50aW9uDQoNCi1OaWNrDQoNCj4gRml4aW5nIHRob3NlIGFyZSBwcm9iYWJs
-eSBnb2luZyB0byBiZSBtdWNoIGVhc2llciBpZiB3ZeKAmXJlIGNsb3NlIHRvIHRoZSB6c3RkIHVw
-c3RyZWFtLCBhZ2FpbiBzbyB0aGF0IHdlIGNhbiBsZXZlcmFnZSB0ZXN0aW5nIGFuZCBsb25nIHRl
-cm0gY29kZSBtYWludGVuYW5jZSBkb25lIHRoZXJlLg0KPiANCj4gLWNocmlzDQoNCg==
+Some line got only spaces, remove them
+
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ crypto/proc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/proc.c b/crypto/proc.c
+index 08d8c2bc7e62..12fccb9c5205 100644
+--- a/crypto/proc.c
++++ b/crypto/proc.c
+@@ -36,7 +36,7 @@ static void c_stop(struct seq_file *m, void *p)
+ static int c_show(struct seq_file *m, void *p)
+ {
+ 	struct crypto_alg *alg = list_entry(p, struct crypto_alg, cra_list);
+-	
++
+ 	seq_printf(m, "name         : %s\n", alg->cra_name);
+ 	seq_printf(m, "driver       : %s\n", alg->cra_driver_name);
+ 	seq_printf(m, "module       : %s\n", module_name(alg->cra_module));
+@@ -59,7 +59,7 @@ static int c_show(struct seq_file *m, void *p)
+ 		alg->cra_type->show(m, alg);
+ 		goto out;
+ 	}
+-	
++
+ 	switch (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) {
+ 	case CRYPTO_ALG_TYPE_CIPHER:
+ 		seq_printf(m, "type         : cipher\n");
+-- 
+2.26.2
+
