@@ -2,82 +2,59 @@ Return-Path: <SRS0=yTfj=C2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,FAKE_REPLY_C,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21227C433E2
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 07:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B219C43461
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 08:11:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED39721D7F
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 07:52:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A1952075B
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Sep 2020 08:11:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726210AbgIQHwM (ORCPT
+        id S1726385AbgIQILO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Sep 2020 03:52:12 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:50526 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726311AbgIQHwJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Sep 2020 03:52:09 -0400
-X-Greylist: delayed 975 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Sep 2020 03:52:07 EDT
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 114D39327DA449C22ECE;
-        Thu, 17 Sep 2020 15:35:48 +0800 (CST)
-Received: from huawei.com (10.90.53.225) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Thu, 17 Sep 2020
- 15:35:43 +0800
-From:   Qilong Zhang <zhangqilong3@huawei.com>
-To:     <bbrezillon@kernel.org>, <arno@natisbad.org>,
-        <herbert@gondor.apana.org.au>, <schalla@marvell.com>,
-        <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>
-Subject: [PATCH -next] crypto: marvell/cesa - use devm_platform_ioremap_resource_byname
-Date:   Thu, 17 Sep 2020 15:42:34 +0800
-Message-ID: <20200917074234.114623-1-zhangqilong3@huawei.com>
-X-Mailer: git-send-email 2.26.0.106.g9fadedd
+        Thu, 17 Sep 2020 04:11:14 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:54830 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726444AbgIQIK5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Sep 2020 04:10:57 -0400
+X-Greylist: delayed 2637 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Sep 2020 04:10:55 EDT
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1kIoJY-0004gr-B0; Thu, 17 Sep 2020 17:26:45 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 17 Sep 2020 17:26:44 +1000
+Date:   Thu, 17 Sep 2020 17:26:44 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     tytso@mit.edu, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] random: use correct memory barriers for crng_node_pool
+Message-ID: <20200917072644.GA5311@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.90.53.225]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200916233042.51634-1-ebiggers@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Zhang Qilong <zhangqilong3@huawei.com>
+Eric Biggers <ebiggers@kernel.org> wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> When a CPU selects which CRNG to use, it accesses crng_node_pool without
+> a memory barrier.  That's wrong, because crng_node_pool can be set by
+> another CPU concurrently.  Without a memory barrier, the crng_state that
+> is used might not appear to be fully initialized.
 
-Use the devm_platform_ioremap_resource_byname() helper instead of
-calling platform_get_resource_byname() and devm_ioremap_resource()
-separately.
+The only architecture that requires a barrier for data dependency
+is Alpha.  The correct primitive to ensure that barrier is present
+is smp_barrier_depends, or you could just use READ_ONCE.
 
-Signed-off-by: Zhang Qilong <zhangqilong3@huawei.com>
----
- drivers/crypto/marvell/cesa/cesa.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
-index d63bca9718dc..06211858bf2e 100644
---- a/drivers/crypto/marvell/cesa/cesa.c
-+++ b/drivers/crypto/marvell/cesa/cesa.c
-@@ -437,7 +437,6 @@ static int mv_cesa_probe(struct platform_device *pdev)
- 	struct device *dev = &pdev->dev;
- 	struct mv_cesa_dev *cesa;
- 	struct mv_cesa_engine *engines;
--	struct resource *res;
- 	int irq, ret, i, cpu;
- 	u32 sram_size;
- 
-@@ -475,8 +474,7 @@ static int mv_cesa_probe(struct platform_device *pdev)
- 
- 	spin_lock_init(&cesa->lock);
- 
--	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "regs");
--	cesa->regs = devm_ioremap_resource(dev, res);
-+	cesa->regs = devm_platform_ioremap_resource_byname(pdev, "regs");
- 	if (IS_ERR(cesa->regs))
- 		return PTR_ERR(cesa->regs);
- 
+Cheers,
 -- 
-2.17.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
