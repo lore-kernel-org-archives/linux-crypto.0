@@ -2,134 +2,64 @@ Return-Path: <SRS0=C62c=C3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BFD5C43463
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 07:55:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58360C43463
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 08:01:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B00D20DD4
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 07:55:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="jrK/LdpG";
-	dkim=temperror (0-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="btJ733k8"
+	by mail.kernel.org (Postfix) with ESMTP id 22D2C21481
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 08:01:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726661AbgIRHzy (ORCPT
+        id S1726342AbgIRIBf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Sep 2020 03:55:54 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:60593 "EHLO
-        out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726382AbgIRHzy (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Sep 2020 03:55:54 -0400
-X-Greylist: delayed 432 seconds by postgrey-1.27 at vger.kernel.org; Fri, 18 Sep 2020 03:55:53 EDT
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailout.nyi.internal (Postfix) with ESMTP id 837DB5C044A;
-        Fri, 18 Sep 2020 03:48:41 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Fri, 18 Sep 2020 03:48:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm1; bh=5ZeXJmgc05HVGsHWpRIIzeQSsYY
-        8SOSpkesu/MTdFXI=; b=jrK/LdpG1bcaTqeukrrRUKvcZ2o6pmz2T+PE5cf0e8c
-        pP25XKbe9Kai7KDJQpIpgy5HxWG3ZNv+2Y6WpdfR36Qxz/Hu9W/3fOigqDIHBAeg
-        Tt/JdZDMAffkAt05/yLDanfLF3f0sloHznb2q29ILEWoBCXrEjK4qFF5R+OqtNPE
-        5RFANb54JFhfE/Q8fjNN9gV6WAoqHOupvAUa710JuR37zvx/tp2OvHnYLTjwX/Y5
-        lLi5d2XRIyvRzuRIizy6Bp5S4vZKmMIq6SChBFU8evnW84BNY4Geg8G926xAR4aJ
-        JQVTHKzN8g+m1JK9WHFo40qydvgBOn5pb0nk4XBJyPg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=5ZeXJm
-        gc05HVGsHWpRIIzeQSsYY8SOSpkesu/MTdFXI=; b=btJ733k8PkrZEVjFBB6J+9
-        1j9LeipzuZSFBjL1IVsyzTj84RbYehjmzFIzHEMI1Zyqs7GNPTI+4Ob9S/nAfdTW
-        6xryh5Dtgni2+VoquRVeAl+JO7i/YJMKqfjxNohEk6y7qD1EEMaZv7JLeIS8vZMV
-        Ssg+Wf2Gq3WD3JUzAfyP1ZWOsuiLV2sMN8ka9TgY2Lf+gh4GCDdROCUurAJt+AF7
-        mNJ3ahUA56HB1Ka5Nk7wKlWiddilGZ1UrlmBPAmgqkkB4W/aCkvKkYvMWJww7y30
-        W+VPfdFBed6YCEGv+tHbhw/JYbcVPgoY4D8UFQVODCP4KJiHIGKvsR59yY2dAe1A
-        ==
-X-ME-Sender: <xms:WGZkX0lP-JqFTrdiAGU4TiK-XnvX8fy87fGhelwEsNZAbOfCLcrk_A>
-    <xme:WGZkXz10N8BUpF-7LEd5zLff1_4BOUgNvRw8gBYe_GB1hYu-9HSDZqPCJKgW_zQbt
-    RkNnWmSmzGPQA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrtdehgdduvdehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvffukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
-    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeevueehje
-    fgfffgiedvudekvdektdelleelgefhleejieeugeegveeuuddukedvteenucfkphepkeef
-    rdekiedrjeegrdeigeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrih
-    hlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomh
-X-ME-Proxy: <xmx:WGZkXyqkp696o1O5BVqqVrFGkPkk5h-d4oLk5PhaiAvndIlS5TQPYw>
-    <xmx:WGZkXwkOem9OzwoRZhJP3mJlh-4HruptSl1QRTrBAaGx32xQnYPslg>
-    <xmx:WGZkXy3UIxoeWTwFnwTdBoYTNmscGZPgErLT5dOXxlyb4NCLS-SKQw>
-    <xmx:WWZkX1T7qsWAEG6Ebel466U8B7O1wodEIdTD_ugDq32M3RBP6Kj25Q>
-Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 18540328005A;
-        Fri, 18 Sep 2020 03:48:40 -0400 (EDT)
-Date:   Fri, 18 Sep 2020 09:49:11 +0200
-From:   Greg KH <greg@kroah.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Necip Fazil Yildiran <fazilyildiran@gmail.com>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the staging tree with the crypto tree
-Message-ID: <20200918074911.GA987884@kroah.com>
-References: <20200918152127.4414b524@canb.auug.org.au>
- <20200918054134.GA9252@gondor.apana.org.au>
+        Fri, 18 Sep 2020 04:01:35 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:57738 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726199AbgIRIBf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Sep 2020 04:01:35 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1kJBKh-000484-PJ; Fri, 18 Sep 2020 18:01:28 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Sep 2020 18:01:27 +1000
+Date:   Fri, 18 Sep 2020 18:01:27 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "antoine.tenart@bootlin.com" <antoine.tenart@bootlin.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH] crypto: inside-secure - Fix corruption on not fully
+ coherent systems
+Message-ID: <20200918080127.GA24222@gondor.apana.org.au>
+References: <1599466784-23596-1-git-send-email-pvanleeuwen@rambus.com>
+ <20200918065806.GA9698@gondor.apana.org.au>
+ <CY4PR0401MB365283BF192613FD82EC0C12C33F0@CY4PR0401MB3652.namprd04.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200918054134.GA9252@gondor.apana.org.au>
+In-Reply-To: <CY4PR0401MB365283BF192613FD82EC0C12C33F0@CY4PR0401MB3652.namprd04.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 18, 2020 at 03:41:34PM +1000, Herbert Xu wrote:
-> On Fri, Sep 18, 2020 at 03:21:27PM +1000, Stephen Rothwell wrote:
-> > Hi all,
-> > 
-> > Today's linux-next merge of the staging tree got a conflict in:
-> > 
-> >   drivers/staging/rtl8192e/Kconfig
-> > 
-> > between commit:
-> > 
-> >   054694a46d64 ("staging/rtl8192e: switch to RC4 library interface")
-> > 
-> > from the crypto tree and commits:
-> > 
-> >   243d040a6e4a ("staging: rtl8192e: fix kconfig dependency warning for RTLLIB_CRYPTO_TKIP")
-> >   02c4260713d6 ("staging: rtl8192e: fix kconfig dependency warning for RTLLIB_CRYPTO_WEP")
-> > 
-> > from the staging tree.
+On Fri, Sep 18, 2020 at 07:42:35AM +0000, Van Leeuwen, Pascal wrote:
+>
+> Actually, that is what we did as a _quick hack_ initially, but:
 > 
-> Those two commits should just be dropped.
-
-Ok, I'll go revert these.
-
->  
-> > diff --cc drivers/staging/rtl8192e/Kconfig
-> > index 4c440bdaaf6e,31e076cc6f16..000000000000
-> > --- a/drivers/staging/rtl8192e/Kconfig
-> > +++ b/drivers/staging/rtl8192e/Kconfig
-> > @@@ -25,7 -26,8 +26,8 @@@ config RTLLIB_CRYPTO_CCM
-> >   config RTLLIB_CRYPTO_TKIP
-> >   	tristate "Support for rtllib TKIP crypto"
-> >   	depends on RTLLIB
-> > + 	select CRYPTO
-> >  -	select CRYPTO_ARC4
-> >  +	select CRYPTO_LIB_ARC4
+> First of all, it's not only about the L1 cacheline size. It's about the worst case cache
+> line size in the path all the way from the CPU to the actual memory interface.
 > 
-> As the driver has been converted over to the lib arc4 API, it
-> does not need to select CRYPTO at all.
+> Second, cache line sizes may differ from system to system. So it's not actually
+> a constant at all (unless you compile the driver specifically for 1 target system).
 
-Is it converted in your tree?  If so, have a branch/tag I can pull in to
-prevent merge issues in the future?
+Can this alignment exceed ARCH_DMA_MINALIGN? If not then the
+macro CRYPTO_MINALIGN should cover it.
 
-thanks,
-
-greg k-h
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
