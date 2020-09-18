@@ -7,54 +7,50 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A83C43463
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 07:28:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A62C43464
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 07:29:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 95E3921741
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 07:28:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F97021734
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 07:29:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726597AbgIRH27 (ORCPT
+        id S1726218AbgIRH3L (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Sep 2020 03:28:59 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:57612 "EHLO fornost.hmeau.com"
+        Fri, 18 Sep 2020 03:29:11 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:57626 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726593AbgIRH26 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Sep 2020 03:28:58 -0400
+        id S1726093AbgIRH3L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Sep 2020 03:29:11 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kJApC-0003VY-BT; Fri, 18 Sep 2020 17:28:55 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Sep 2020 17:28:54 +1000
-Date:   Fri, 18 Sep 2020 17:28:54 +1000
+        id 1kJApN-0003WP-4u; Fri, 18 Sep 2020 17:29:06 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Sep 2020 17:29:05 +1000
+Date:   Fri, 18 Sep 2020 17:29:05 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Pascal van Leeuwen <pvanleeuwen@rambus.com>
-Cc:     linux-crypto@vger.kernel.org, antoine.tenart@bootlin.com,
-        davem@davemloft.net
-Subject: Re: [PATCH] crypto: inside-secure - Prevent missing of processing
- errors
-Message-ID: <20200918072854.GD23319@gondor.apana.org.au>
-References: <1599545445-5716-1-git-send-email-pvanleeuwen@rambus.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Tero Kristo <t-kristo@ti.com>, Keerthy <j-keerthy@ti.com>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] crypto: sa2ul - Fix pm_runtime_get_sync() error checking
+Message-ID: <20200918072904.GE23319@gondor.apana.org.au>
+References: <20200909094528.GB420136@mwanda>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1599545445-5716-1-git-send-email-pvanleeuwen@rambus.com>
+In-Reply-To: <20200909094528.GB420136@mwanda>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 08, 2020 at 08:10:45AM +0200, Pascal van Leeuwen wrote:
-> On systems with coherence issues, packet processed could succeed while
-> it should have failed, e.g. because of an authentication fail.
-> This is because the driver would read stale status information that had
-> all error bits initialised to zero = no error.
-> Since this is potential a security risk, we want to prevent it from being
-> a possibility at all. So initialize all error bits to error state, so
-> that reading stale status information will always result in errors.
+On Wed, Sep 09, 2020 at 12:45:28PM +0300, Dan Carpenter wrote:
+> The pm_runtime_get_sync() function returns either 0 or 1 on success but
+> this code treats a return of 1 as a failure.
 > 
-> Signed-off-by: Pascal van Leeuwen <pvanleeuwen@rambus.com>
+> Fixes: 7694b6ca649f ("crypto: sa2ul - Add crypto driver")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 > ---
->  drivers/crypto/inside-secure/safexcel_ring.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
+>  drivers/crypto/sa2ul.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
