@@ -2,54 +2,58 @@ Return-Path: <SRS0=C62c=C3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8082CC43463
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 18:06:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C8EC43463
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 18:25:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 28C5B21D42
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 18:06:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B60B22208
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 18:25:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600452419;
-	bh=11zzBTt+zJr1XN2e3FnZDCJY23qoqQtx3dyPT9fdqgU=;
+	s=default; t=1600453529;
+	bh=St7xrC1YAXFSKU+RhJNVRfCOiAh7WO9dh71WajWIgkU=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References:List-ID:From;
-	b=qrHib3pc4tc4e75Oys2kTCwbAlpPiPI6ot337xrMU7WyY30QTnTiRxcng3wJjkoHT
-	 PIPpivsLPSy6UQUGHiQQLCguY0KLcaIhbAqb5yd1kzY4WNQg/9FvrUFUEbIAj5kdxq
-	 r8iGZrqd9CLC9mPXs8OoVkFQzcZRy/MuiV0q6qAE=
+	b=ahuK/Hstn0HS8J+t9Vognpc9gscL/oy0qTv2wI+FcKk5nlMEAUDPlLpGGbHSzqroL
+	 YUce+Ga9UWvDt/mzi8AJ3a1alXiiy3uCwA94lmpPYiJGy5QnnpdVvjM7zxsKVD6zlw
+	 +ZzXfd1eIN9tr3l2ixeSnFNiS9flRd/K0rapJOmU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726126AbgIRSG6 (ORCPT
+        id S1726370AbgIRSZ2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Sep 2020 14:06:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41946 "EHLO mail.kernel.org"
+        Fri, 18 Sep 2020 14:25:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49724 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726118AbgIRSG6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Sep 2020 14:06:58 -0400
+        id S1726156AbgIRSZ2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Sep 2020 14:25:28 -0400
 Received: from lt-jalone-7480.mtl.com (c-24-6-56-119.hsd1.ca.comcast.net [24.6.56.119])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9BCA321741;
-        Fri, 18 Sep 2020 18:06:56 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D886720DD4;
+        Fri, 18 Sep 2020 18:25:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600452417;
-        bh=11zzBTt+zJr1XN2e3FnZDCJY23qoqQtx3dyPT9fdqgU=;
+        s=default; t=1600453527;
+        bh=St7xrC1YAXFSKU+RhJNVRfCOiAh7WO9dh71WajWIgkU=;
         h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=SUx6YZW8PY2oISsxk+8BFbA9qE8GSbrXfngZtbiY7t+mSNZU9jgGvvM7nVRWLP6wM
-         PZ0YMwf8YUiexftTw5VrDZbdwAjw/c2dRv31vR4592wtxj3E2bE/MJwwC/vPw/YwTy
-         tWkZ8n64NqF1YE030kB6RwL71azn+9SWgF6sy3XU=
-Message-ID: <369798037f17899dbb775915bfafc363880fedbb.camel@kernel.org>
-Subject: Re: [PATCH v3,net-next,0/4] Add Support for Marvell OcteonTX2
- Cryptographic
+        b=mBE0nW9xNDq6f32pid1WqUOZdyUcsjSBjpR8wHnb+gdJoPBGoYqzm1FPQ4hAFG3Be
+         AEAn12nDVOuGi/NAKdxFg71slmJtBjGVZ6jDa2Zlnxexo/aOznNnmDaxQiXAHlku+Z
+         QKuP5PcxpNhnmjSyhYFr++5XEvKHVhqARQmv5KPM=
+Message-ID: <9a43d342868ca6803119e401e7898180b65c4e7c.camel@kernel.org>
+Subject: Re: [PATCH v3,net-next,2/4] octeontx2-af: add support to manage the
+ CPT unit
 From:   Saeed Mahameed <saeed@kernel.org>
 To:     Srujana Challa <schalla@marvell.com>, herbert@gondor.apana.org.au,
         davem@davemloft.net
 Cc:     netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
         kuba@kernel.org, sgoutham@marvell.com, gakula@marvell.com,
-        sbhatta@marvell.com, schandran@marvell.com, pathreya@marvell.com
-Date:   Fri, 18 Sep 2020 11:06:55 -0700
-In-Reply-To: <20200917132835.28325-1-schalla@marvell.com>
+        sbhatta@marvell.com, schandran@marvell.com, pathreya@marvell.com,
+        Vidya Sagar Velumuri <vvelumuri@marvell.com>,
+        Lukas Bartosik <lbartosik@marvell.com>
+Date:   Fri, 18 Sep 2020 11:25:25 -0700
+In-Reply-To: <20200917132835.28325-3-schalla@marvell.com>
 References: <20200917132835.28325-1-schalla@marvell.com>
+         <20200917132835.28325-3-schalla@marvell.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
 MIME-Version: 1.0
@@ -59,103 +63,30 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Thu, 2020-09-17 at 18:58 +0530, Srujana Challa wrote:
-> The following series adds support for Marvell Cryptographic
-> Acceleration
-> Unit(CPT) on OcteonTX2 CN96XX SoC.
-> This series is tested with CRYPTO_EXTRA_TESTS enabled and
-> CRYPTO_DISABLE_TESTS disabled.
+> 
+> 
+> +int rvu_mbox_handler_nix_inline_ipsec_lf_cfg(struct rvu *rvu,
+> 
+> +               struct nix_inline_ipsec_lf_cfg *req, struct msg_rsp
 > 
 
-I am with Jakub on this one, 10K LOC require more explanation in the
-cover-letter.
-e.g. some background, high level design, device components being
-added/changed.  Basically, what should we expect code-wise before we
-jump into 10K LOC review..
+Can you do something about this code alignment ?
 
-> Changes since v2:
->  * Fixed C=1 warnings.
->  * Added code to exit CPT VF driver gracefully.
->  * Moved OcteonTx2 asm code to a header file under include/linux/soc/
-> 
-> Changes since v1:
->  * Moved Makefile changes from patch4 to patch2 and patch3.
-> 
-> Srujana Challa (3):
->   octeontx2-pf: move asm code to include/linux/soc
->   octeontx2-af: add support to manage the CPT unit
->   drivers: crypto: add support for OCTEONTX2 CPT engine
->   drivers: crypto: add the Virtual Function driver for OcteonTX2 CPT
-> 
->  MAINTAINERS                                   |    2 +
->  drivers/crypto/marvell/Kconfig                |   17 +
->  drivers/crypto/marvell/Makefile               |    1 +
->  drivers/crypto/marvell/octeontx2/Makefile     |   10 +
->  .../marvell/octeontx2/otx2_cpt_common.h       |   53 +
->  .../marvell/octeontx2/otx2_cpt_hw_types.h     |  467 ++++
->  .../marvell/octeontx2/otx2_cpt_mbox_common.c  |  286 +++
->  .../marvell/octeontx2/otx2_cpt_mbox_common.h  |  100 +
->  .../marvell/octeontx2/otx2_cpt_reqmgr.h       |  197 ++
->  drivers/crypto/marvell/octeontx2/otx2_cptlf.h |  356 +++
->  .../marvell/octeontx2/otx2_cptlf_main.c       |  967 ++++++++
->  drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   79 +
->  .../marvell/octeontx2/otx2_cptpf_main.c       |  598 +++++
->  .../marvell/octeontx2/otx2_cptpf_mbox.c       |  694 ++++++
->  .../marvell/octeontx2/otx2_cptpf_ucode.c      | 2173
-> +++++++++++++++++
->  .../marvell/octeontx2/otx2_cptpf_ucode.h      |  180 ++
->  drivers/crypto/marvell/octeontx2/otx2_cptvf.h |   29 +
->  .../marvell/octeontx2/otx2_cptvf_algs.c       | 1698 +++++++++++++
->  .../marvell/octeontx2/otx2_cptvf_algs.h       |  172 ++
->  .../marvell/octeontx2/otx2_cptvf_main.c       |  229 ++
->  .../marvell/octeontx2/otx2_cptvf_mbox.c       |  189 ++
->  .../marvell/octeontx2/otx2_cptvf_reqmgr.c     |  540 ++++
->  .../ethernet/marvell/octeontx2/af/Makefile    |    3 +-
->  .../net/ethernet/marvell/octeontx2/af/mbox.h  |   85 +
->  .../net/ethernet/marvell/octeontx2/af/rvu.c   |    2 +-
->  .../net/ethernet/marvell/octeontx2/af/rvu.h   |    7 +
->  .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  343 +++
->  .../marvell/octeontx2/af/rvu_debugfs.c        |  342 +++
->  .../ethernet/marvell/octeontx2/af/rvu_nix.c   |   76 +
->  .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   65 +-
->  .../marvell/octeontx2/nic/otx2_common.h       |   13 +-
->  include/linux/soc/marvell/octeontx2/asm.h     |   29 +
->  32 files changed, 9982 insertions(+), 20 deletions(-)
->  create mode 100644 drivers/crypto/marvell/octeontx2/Makefile
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.h
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptlf.h
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cptlf_main.c
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf.h
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.h
->  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf.h
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.h
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
->  create mode 100644
-> drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
->  create mode 100644
-> drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
->  create mode 100644 include/linux/soc/marvell/octeontx2/asm.h
-> 
+
+checkpatch outputs:
+
+---------------------------------------------------------------------
+---
+Commit c5f9e5da557f ("octeontx2-af: add support to manage the CPT
+unit")
+---------------------------------------------------------------------
+---
+CHECK:PARENTHESIS_ALIGNMENT: Alignment should match open parenthesis
+#958: FILE: drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c:3454:
++int rvu_mbox_handler_nix_inline_ipsec_lf_cfg(struct rvu *rvu,
++               struct nix_inline_ipsec_lf_cfg *req, struct msg_rsp
+*rsp)
+
+WARNING:NO_AUTHOR_SIGN_OFF: Missing Signed-off-by: line by nominal
+patch author 'Srujana <schalla@marvell.com>'
 
