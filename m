@@ -7,53 +7,52 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C8EC43463
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 18:25:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51720C43463
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 18:43:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B60B22208
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 18:25:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E68CC22208
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 18:43:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600453529;
-	bh=St7xrC1YAXFSKU+RhJNVRfCOiAh7WO9dh71WajWIgkU=;
+	s=default; t=1600454632;
+	bh=LglCVJhlKwie2ngrvhTX498Yb2sEwnMxnZXYyAZRMsw=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References:List-ID:From;
-	b=ahuK/Hstn0HS8J+t9Vognpc9gscL/oy0qTv2wI+FcKk5nlMEAUDPlLpGGbHSzqroL
-	 YUce+Ga9UWvDt/mzi8AJ3a1alXiiy3uCwA94lmpPYiJGy5QnnpdVvjM7zxsKVD6zlw
-	 +ZzXfd1eIN9tr3l2ixeSnFNiS9flRd/K0rapJOmU=
+	b=BEkiY++MNLjeEoePqEKokCM5MbOOsZZuiLv30ebjm4+y9cqGRJeN3X83PxzmDxk0f
+	 /obdvISGGqKIGFp7s8jry67BZKsr9nugeWlIFg+RUBx5/EMVPHnhKqnWI7csHeg4bC
+	 xjzDK/wGugnH5oHPF4ijBxTo7livDy0zrHt/nucQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726370AbgIRSZ2 (ORCPT
+        id S1726152AbgIRSnv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Sep 2020 14:25:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49724 "EHLO mail.kernel.org"
+        Fri, 18 Sep 2020 14:43:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53566 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726156AbgIRSZ2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Sep 2020 14:25:28 -0400
+        id S1726115AbgIRSnv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Sep 2020 14:43:51 -0400
 Received: from lt-jalone-7480.mtl.com (c-24-6-56-119.hsd1.ca.comcast.net [24.6.56.119])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D886720DD4;
-        Fri, 18 Sep 2020 18:25:26 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 12C4321534;
+        Fri, 18 Sep 2020 18:43:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600453527;
-        bh=St7xrC1YAXFSKU+RhJNVRfCOiAh7WO9dh71WajWIgkU=;
+        s=default; t=1600454630;
+        bh=LglCVJhlKwie2ngrvhTX498Yb2sEwnMxnZXYyAZRMsw=;
         h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=mBE0nW9xNDq6f32pid1WqUOZdyUcsjSBjpR8wHnb+gdJoPBGoYqzm1FPQ4hAFG3Be
-         AEAn12nDVOuGi/NAKdxFg71slmJtBjGVZ6jDa2Zlnxexo/aOznNnmDaxQiXAHlku+Z
-         QKuP5PcxpNhnmjSyhYFr++5XEvKHVhqARQmv5KPM=
-Message-ID: <9a43d342868ca6803119e401e7898180b65c4e7c.camel@kernel.org>
-Subject: Re: [PATCH v3,net-next,2/4] octeontx2-af: add support to manage the
- CPT unit
+        b=L6ydRE7gU4R7x4qxgnexg5zVzKp5vAUgtqEFa/wCxMy2K8DkPxbTjtFNQ5MvhShcj
+         bvAbCpDOotdC+kA2zPeMdnHdOIf/6cRu6SHgkpBTmxiCEU/ED5YopkiXw1OzwMYuXE
+         jgiWjmmRgc6rjuSiqs32FaCi4od4k2oE4dXCht7I=
+Message-ID: <966695c14eb696cc5551663f2901144ddb8f98d7.camel@kernel.org>
+Subject: Re: [PATCH v3,net-next,3/4] drivers: crypto: add support for
+ OCTEONTX2 CPT engine
 From:   Saeed Mahameed <saeed@kernel.org>
 To:     Srujana Challa <schalla@marvell.com>, herbert@gondor.apana.org.au,
         davem@davemloft.net
 Cc:     netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
         kuba@kernel.org, sgoutham@marvell.com, gakula@marvell.com,
         sbhatta@marvell.com, schandran@marvell.com, pathreya@marvell.com,
-        Vidya Sagar Velumuri <vvelumuri@marvell.com>,
         Lukas Bartosik <lbartosik@marvell.com>
-Date:   Fri, 18 Sep 2020 11:25:25 -0700
-In-Reply-To: <20200917132835.28325-3-schalla@marvell.com>
+Date:   Fri, 18 Sep 2020 11:43:48 -0700
+In-Reply-To: <20200917132835.28325-4-schalla@marvell.com>
 References: <20200917132835.28325-1-schalla@marvell.com>
-         <20200917132835.28325-3-schalla@marvell.com>
+         <20200917132835.28325-4-schalla@marvell.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
 MIME-Version: 1.0
@@ -63,30 +62,35 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Thu, 2020-09-17 at 18:58 +0530, Srujana Challa wrote:
+> Add support for the cryptographic acceleration unit (CPT) on
+> 
+> OcteonTX2 CN96XX SoC.
 > 
 > 
-> +int rvu_mbox_handler_nix_inline_ipsec_lf_cfg(struct rvu *rvu,
 > 
-> +               struct nix_inline_ipsec_lf_cfg *req, struct msg_rsp
+> Signed-off-by: Suheil Chandran <schandran@marvell.com>
 > 
+> Signed-off-by: Lukas Bartosik <lbartosik@marvell.com>
+> 
+> Signed-off-by: Srujana Challa <schalla@marvell.com>
+> 
+> ---
 
-Can you do something about this code alignment ?
+[...]
+>  15 files changed, 5088 insertions(+)
+
+Huge patch, i suggest to break the whole series up to smaller patches, 
+i suggest each component in a separate patch (e.g: infrastructure, new
+mbox, debugfs, etc..)
+
+What linux interfaces are going to enable your ipsec features? i
+couldn't find any netdev, xfrm references in your series .. and the
+cover letter + commit messages lack of such information.
+
+FYI checkpatch is not happy at all with this patch:
+total: 0 errors, 2 warnings, 85 checks, 5094 lines checked
+
+85 mostly legit checks fire up.
 
 
-checkpatch outputs:
-
----------------------------------------------------------------------
----
-Commit c5f9e5da557f ("octeontx2-af: add support to manage the CPT
-unit")
----------------------------------------------------------------------
----
-CHECK:PARENTHESIS_ALIGNMENT: Alignment should match open parenthesis
-#958: FILE: drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c:3454:
-+int rvu_mbox_handler_nix_inline_ipsec_lf_cfg(struct rvu *rvu,
-+               struct nix_inline_ipsec_lf_cfg *req, struct msg_rsp
-*rsp)
-
-WARNING:NO_AUTHOR_SIGN_OFF: Missing Signed-off-by: line by nominal
-patch author 'Srujana <schalla@marvell.com>'
 
