@@ -2,82 +2,100 @@ Return-Path: <SRS0=C62c=C3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C5A5C43464
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 01:31:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACADBC43464
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 02:47:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7043420659
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 01:31:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4524823444
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 02:47:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600397251;
+	bh=CnL7UVfLVRp1dnhxjeYgYx7RdDwaiew1tP06opg43wE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=rAuOO43voA8ykB4rx/4Ur33W5EQbKwGHpRMkqBt2mjM85Du0Yff7RIYR95VKCLFbq
+	 RNnW5B8qeAwk5yI7Heq1Dh5mOQq59Ks7nFoSIMkRmJ27HeCcyHINZ2l2w7MShqkvI2
+	 PJ7OSip36QHJ9zFHHBIQm1RPmtq1J4bp8dDyZHZY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726247AbgIRBaw (ORCPT
+        id S1728326AbgIRCJk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Sep 2020 21:30:52 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:39402 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726249AbgIRBar (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Sep 2020 21:30:47 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id B1178FD116BE2EAA8614;
-        Fri, 18 Sep 2020 09:30:45 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 18 Sep 2020 09:30:38 +0800
-From:   Qinglang Miao <miaoqinglang@huawei.com>
-To:     Zhou Wang <wangzhou1@hisilicon.com>,
+        Thu, 17 Sep 2020 22:09:40 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33440 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728325AbgIRCJi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Sep 2020 22:09:38 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 69D7423977;
+        Fri, 18 Sep 2020 02:09:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600394978;
+        bh=CnL7UVfLVRp1dnhxjeYgYx7RdDwaiew1tP06opg43wE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=pcTPuX4NWPfZqHmD6NKq27eujWM9UwcpwcapXv8sFNzOHsV5iOzTgNm1h7aX3CL8l
+         u/Wtz/Jx5mlGRB2fEp6+aEqQ8PEGcu1yTbklYlJMtTWjm4gfFdPNyX5VxD+sQqC51M
+         3peS7cnczvMptt6trofrb5EKiOm0RnkdB67G9Seo=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ayush Sawal <ayush.sawal@chelsio.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Qinglang Miao" <miaoqinglang@huawei.com>
-Subject: [PATCH -next v2] crypto: hisilicon/qm - Convert to DEFINE_SHOW_ATTRIBUTE
-Date:   Fri, 18 Sep 2020 09:31:13 +0800
-Message-ID: <20200918013113.82740-1-miaoqinglang@huawei.com>
-X-Mailer: git-send-email 2.20.1
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 078/206] crypto: chelsio - This fixes the kernel panic which occurs during a libkcapi test
+Date:   Thu, 17 Sep 2020 22:05:54 -0400
+Message-Id: <20200918020802.2065198-78-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200918020802.2065198-1-sashal@kernel.org>
+References: <20200918020802.2065198-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use DEFINE_SHOW_ATTRIBUTE macro to simplify the code.
+From: Ayush Sawal <ayush.sawal@chelsio.com>
 
-Signed-off-by: Qinglang Miao <miaoqinglang@huawei.com>
+[ Upstream commit 9195189e00a7db55e7d448cee973cae87c5a3c71 ]
+
+The libkcapi test which causes kernel panic is
+aead asynchronous vmsplice multiple test.
+
+./bin/kcapi  -v -d 4 -x 10   -c "ccm(aes)"
+-q 4edb58e8d5eb6bc711c43a6f3693daebde2e5524f1b55297abb29f003236e43d
+-t a7877c99 -n 674742abd0f5ba -k 2861fd0253705d7875c95ba8a53171b4
+-a fb7bc304a3909e66e2e0c5ef952712dd884ce3e7324171369f2c5db1adc48c7d
+
+This patch avoids dma_mapping of a zero length sg which causes the panic,
+by using sg_nents_for_len which maps only upto a specific length
+
+Signed-off-by: Ayush Sawal <ayush.sawal@chelsio.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-v2: based on linux-next(20200917), and can be applied to
-    mainline cleanly now.
+ drivers/crypto/chelsio/chcr_algo.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
- drivers/crypto/hisilicon/qm.c | 12 +-----------
- 1 file changed, 1 insertion(+), 11 deletions(-)
-
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 07efc5283..1923f153d 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -1050,17 +1050,7 @@ static int qm_regs_show(struct seq_file *s, void *unused)
- 	return 0;
- }
- 
--static int qm_regs_open(struct inode *inode, struct file *file)
--{
--	return single_open(file, qm_regs_show, inode->i_private);
--}
--
--static const struct file_operations qm_regs_fops = {
--	.owner = THIS_MODULE,
--	.open = qm_regs_open,
--	.read = seq_read,
--	.release = single_release,
--};
-+DEFINE_SHOW_ATTRIBUTE(qm_regs);
- 
- static ssize_t qm_cmd_read(struct file *filp, char __user *buffer,
- 			   size_t count, loff_t *pos)
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index 9b3c259f081d3..ee508bbbb7504 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -2418,8 +2418,9 @@ int chcr_aead_dma_map(struct device *dev,
+ 	else
+ 		reqctx->b0_dma = 0;
+ 	if (req->src == req->dst) {
+-		error = dma_map_sg(dev, req->src, sg_nents(req->src),
+-				   DMA_BIDIRECTIONAL);
++		error = dma_map_sg(dev, req->src,
++				sg_nents_for_len(req->src, dst_size),
++					DMA_BIDIRECTIONAL);
+ 		if (!error)
+ 			goto err;
+ 	} else {
 -- 
-2.23.0
+2.25.1
 
