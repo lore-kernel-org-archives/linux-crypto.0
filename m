@@ -6,78 +6,70 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A7E2C43463
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 05:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83FA4C43464
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 06:43:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B63D321D7B
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 05:41:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 477F22100A
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 06:43:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726222AbgIRFlr (ORCPT
+        id S1726353AbgIRGny (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Sep 2020 01:41:47 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:57328 "EHLO fornost.hmeau.com"
+        Fri, 18 Sep 2020 02:43:54 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:57426 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726205AbgIRFlr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Sep 2020 01:41:47 -0400
+        id S1726250AbgIRGny (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Sep 2020 02:43:54 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kJ99K-0001jz-Sz; Fri, 18 Sep 2020 15:41:36 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Sep 2020 15:41:34 +1000
-Date:   Fri, 18 Sep 2020 15:41:34 +1000
+        id 1kJA7Y-0002Sf-Mv; Fri, 18 Sep 2020 16:43:49 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Sep 2020 16:43:48 +1000
+Date:   Fri, 18 Sep 2020 16:43:48 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     Greg KH <greg@kroah.com>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>,
+To:     Elena Petrova <lenaptr@google.com>
+Cc:     linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
+        Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
         Ard Biesheuvel <ardb@kernel.org>,
-        Necip Fazil Yildiran <fazilyildiran@gmail.com>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the staging tree with the crypto tree
-Message-ID: <20200918054134.GA9252@gondor.apana.org.au>
-References: <20200918152127.4414b524@canb.auug.org.au>
+        Jeffrey Vander Stoep <jeffv@google.com>,
+        Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH v8] crypto: af_alg - add extra parameters for DRBG
+ interface
+Message-ID: <20200918064348.GA9479@gondor.apana.org.au>
+References: <20200909210017.GA1080156@gmail.com>
+ <20200916110731.598437-1-lenaptr@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200918152127.4414b524@canb.auug.org.au>
+In-Reply-To: <20200916110731.598437-1-lenaptr@google.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 18, 2020 at 03:21:27PM +1000, Stephen Rothwell wrote:
-> Hi all,
-> 
-> Today's linux-next merge of the staging tree got a conflict in:
-> 
->   drivers/staging/rtl8192e/Kconfig
-> 
-> between commit:
-> 
->   054694a46d64 ("staging/rtl8192e: switch to RC4 library interface")
-> 
-> from the crypto tree and commits:
-> 
->   243d040a6e4a ("staging: rtl8192e: fix kconfig dependency warning for RTLLIB_CRYPTO_TKIP")
->   02c4260713d6 ("staging: rtl8192e: fix kconfig dependency warning for RTLLIB_CRYPTO_WEP")
-> 
-> from the staging tree.
+On Wed, Sep 16, 2020 at 12:07:31PM +0100, Elena Petrova wrote:
+>
+> @@ -148,20 +260,58 @@ static int rng_accept_parent(void *private, struct sock *sk)
+>  	 * state of the RNG.
+>  	 */
+>  
+> -	ctx->drng = private;
+> +	ctx->drng = pctx->drng;
+>  	ask->private = ctx;
+>  	sk->sk_destruct = rng_sock_destruct;
+>  
+> +	/*
+> +	 * Non NULL pctx->entropy means that CAVP test has been initiated on
+> +	 * this socket, replace proto_ops algif_rng_ops with algif_rng_test_ops.
+> +	 */
+> +	if (pctx->entropy)
+> +		sk->sk_socket->ops = &algif_rng_test_ops;
+> +
 
-Those two commits should just be dropped.
- 
-> diff --cc drivers/staging/rtl8192e/Kconfig
-> index 4c440bdaaf6e,31e076cc6f16..000000000000
-> --- a/drivers/staging/rtl8192e/Kconfig
-> +++ b/drivers/staging/rtl8192e/Kconfig
-> @@@ -25,7 -26,8 +26,8 @@@ config RTLLIB_CRYPTO_CCM
->   config RTLLIB_CRYPTO_TKIP
->   	tristate "Support for rtllib TKIP crypto"
->   	depends on RTLLIB
-> + 	select CRYPTO
->  -	select CRYPTO_ARC4
->  +	select CRYPTO_LIB_ARC4
+Please make that
 
-As the driver has been converted over to the lib arc4 API, it
-does not need to select CRYPTO at all.
+	if (IS_ENABLED(CONFIG_CRYPTO_USER_API_RNG_CAVP) && pctx->entropy)
+
+so that this and the rest of the new code simply disappears when
+the Kconfig option is off.
 
 Thanks,
 -- 
