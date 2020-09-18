@@ -7,48 +7,52 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49FFBC43464
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 07:28:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DEB3C43464
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 07:28:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 17F6321D20
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 07:28:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2EF1B21734
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Sep 2020 07:28:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726216AbgIRH21 (ORCPT
+        id S1726322AbgIRH2b (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Sep 2020 03:28:27 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:57588 "EHLO fornost.hmeau.com"
+        Fri, 18 Sep 2020 03:28:31 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:57596 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726322AbgIRH21 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Sep 2020 03:28:27 -0400
+        id S1726218AbgIRH2b (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Sep 2020 03:28:31 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kJAof-0003TQ-Mk; Fri, 18 Sep 2020 17:28:22 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Sep 2020 17:28:21 +1000
-Date:   Fri, 18 Sep 2020 17:28:21 +1000
+        id 1kJAok-0003TV-NX; Fri, 18 Sep 2020 17:28:27 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Sep 2020 17:28:26 +1000
+Date:   Fri, 18 Sep 2020 17:28:26 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Tero Kristo <t-kristo@ti.com>
 Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
         linux-omap@vger.kernel.org
-Subject: Re: [PATCH] crypto: omap-sham: convert to use crypto engine
-Message-ID: <20200918072821.GA23319@gondor.apana.org.au>
-References: <20200907075610.32326-1-t-kristo@ti.com>
+Subject: Re: [PATCH] crypto: omap-sham: fix digcnt register handling with
+ export/import
+Message-ID: <20200918072826.GB23319@gondor.apana.org.au>
+References: <20200907075624.32379-1-t-kristo@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200907075610.32326-1-t-kristo@ti.com>
+In-Reply-To: <20200907075624.32379-1-t-kristo@ti.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 07, 2020 at 10:56:10AM +0300, Tero Kristo wrote:
-> Convert the omap-sham driver to use crypto engine for queue handling,
-> instead of using local implementation.
+On Mon, Sep 07, 2020 at 10:56:24AM +0300, Tero Kristo wrote:
+> Running export/import for hashes in peculiar order (mostly done by
+> openssl) can mess up the internal book keeping of the OMAP SHA core.
+> Fix by forcibly writing the correct DIGCNT back to hardware. This issue
+> was noticed while transitioning to openssl 1.1 support.
 > 
+> Fixes: 0d373d603202 ("crypto: omap-sham - Add OMAP4/AM33XX SHAM Support")
 > Signed-off-by: Tero Kristo <t-kristo@ti.com>
 > ---
->  drivers/crypto/omap-sham.c | 186 ++++++++++++++++---------------------
->  1 file changed, 78 insertions(+), 108 deletions(-)
+>  drivers/crypto/omap-sham.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
 Patch applied.  Thanks.
 -- 
