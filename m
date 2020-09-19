@@ -4,24 +4,24 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18BEAC43464
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Sep 2020 11:02:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E08C43464
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Sep 2020 11:03:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D0A68208C3
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Sep 2020 11:02:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 375CB2158C
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Sep 2020 11:03:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726298AbgISLC4 (ORCPT
+        id S1726441AbgISLDC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Sep 2020 07:02:56 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:13773 "EHLO huawei.com"
+        Sat, 19 Sep 2020 07:03:02 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:13772 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726041AbgISLC4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Sep 2020 07:02:56 -0400
+        id S1726159AbgISLC5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 19 Sep 2020 07:02:57 -0400
 Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 84D0F58C6467D70AF53F;
+        by Forcepoint Email with ESMTP id 80ABF425AAEA7E8AF662;
         Sat, 19 Sep 2020 19:02:54 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.24) by
  DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
@@ -30,9 +30,9 @@ From:   Weili Qian <qianweili@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH 1/2] crypto: hisilicon/qm - fix wrong return type of 'pci_get_drvdata'
-Date:   Sat, 19 Sep 2020 19:01:35 +0800
-Message-ID: <1600513296-29287-2-git-send-email-qianweili@huawei.com>
+Subject: [PATCH 2/2] crypto: hisilicon/qm - remove the update of flags
+Date:   Sat, 19 Sep 2020 19:01:36 +0800
+Message-ID: <1600513296-29287-3-git-send-email-qianweili@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1600513296-29287-1-git-send-email-qianweili@huawei.com>
 References: <1600513296-29287-1-git-send-email-qianweili@huawei.com>
@@ -44,63 +44,28 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Yang Shen <shenyang39@huawei.com>
+'qm_init_qp_status' is just a help function to initiate some 'QP' status.
+'QP' status should be updated separately.
+This patch removes the updating flags in 'QP' status.
 
-The parameter type of 'pci_set_drvdata' is 'struct hisi_qm',
-so here the return type of 'pci_get_drvdata' should be 'struct hisi_qm'
-too.
-
-Signed-off-by: Yang Shen <shenyang39@huawei.com>
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre_main.c | 3 +--
- drivers/crypto/hisilicon/sec2/sec_main.c  | 3 +--
- drivers/crypto/hisilicon/zip/zip_main.c   | 3 +--
- 3 files changed, 3 insertions(+), 6 deletions(-)
+ drivers/crypto/hisilicon/qm.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index cf9169d..a33394d 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -900,8 +900,7 @@ static int hpre_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 07efc52..cfd66ee 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -757,7 +757,6 @@ static void qm_init_qp_status(struct hisi_qp *qp)
+ 	qp_status->sq_tail = 0;
+ 	qp_status->cq_head = 0;
+ 	qp_status->cqc_phase = true;
+-	atomic_set(&qp_status->flags, 0);
+ 	atomic_set(&qp_status->used, 0);
+ }
  
- static void hpre_remove(struct pci_dev *pdev)
- {
--	struct hpre *hpre = pci_get_drvdata(pdev);
--	struct hisi_qm *qm = &hpre->qm;
-+	struct hisi_qm *qm = pci_get_drvdata(pdev);
- 	int ret;
- 
- 	hisi_qm_wait_task_finish(qm, &hpre_devices);
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index de42264..5488963 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -915,8 +915,7 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- static void sec_remove(struct pci_dev *pdev)
- {
--	struct sec_dev *sec = pci_get_drvdata(pdev);
--	struct hisi_qm *qm = &sec->qm;
-+	struct hisi_qm *qm = pci_get_drvdata(pdev);
- 
- 	hisi_qm_wait_task_finish(qm, &sec_devices);
- 	hisi_qm_alg_unregister(qm, &sec_devices);
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index ee5f3d9..bd53ee7 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -844,8 +844,7 @@ static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- static void hisi_zip_remove(struct pci_dev *pdev)
- {
--	struct hisi_zip *hisi_zip = pci_get_drvdata(pdev);
--	struct hisi_qm *qm = &hisi_zip->qm;
-+	struct hisi_qm *qm = pci_get_drvdata(pdev);
- 
- 	hisi_qm_wait_task_finish(qm, &zip_devices);
- 	hisi_qm_alg_unregister(qm, &zip_devices);
 -- 
 2.8.1
 
