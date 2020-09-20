@@ -1,99 +1,111 @@
-Return-Path: <SRS0=oEI+=C4=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=6s16=C5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41D90C43465
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Sep 2020 19:05:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6008C43465
+	for <linux-crypto@archiver.kernel.org>; Sun, 20 Sep 2020 14:01:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EF6C02100A
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Sep 2020 19:05:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7269C21531
+	for <linux-crypto@archiver.kernel.org>; Sun, 20 Sep 2020 14:01:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="XRXcynIb"
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="Tv6jedMR";
+	dkim=temperror (0-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="G5WvkymR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726652AbgISTFN (ORCPT
+        id S1726367AbgITOBV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Sep 2020 15:05:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38696 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726617AbgISTFN (ORCPT
+        Sun, 20 Sep 2020 10:01:21 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:56823 "EHLO
+        out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726311AbgITOBV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Sep 2020 15:05:13 -0400
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9804DC0613D0
-        for <linux-crypto@vger.kernel.org>; Sat, 19 Sep 2020 12:05:12 -0700 (PDT)
-Received: by mail-wm1-x344.google.com with SMTP id l15so8903944wmh.1
-        for <linux-crypto@vger.kernel.org>; Sat, 19 Sep 2020 12:05:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=PZQgCTVJaoPDkS3FQ6qHauGfZhEJ//51YELEu9Y52xE=;
-        b=XRXcynIbW7WqgbArclPQcpE9rGo25dMyO2eSsemk/YFMHeLfbHiqjst0TEQ+78rHZb
-         C68W7Sf5VfKD9bH+9ExiVuabozsCjiY4Efbb4xNDjOLHiu4AKdUEYXptc7wMoCFzzlpS
-         G2JxK46RLqiV2GWYyBFtTT6JC/GaJhocAiNXhMfPpzQ8ABJFVhbupCIfiGZQ77aPR0/s
-         TJV/phA0E6XQojM9jhIJOHuF66esjN6NqH6QVahCEN3RS/qosrAwNDO/k5a2y+eCrQtR
-         bd75Ui8tLMG9whY1VYcRLE62cOubNjW7Pb7X17NbSZnFT4qp0BVCPWvp4WMW/wgZycWY
-         SWUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PZQgCTVJaoPDkS3FQ6qHauGfZhEJ//51YELEu9Y52xE=;
-        b=ULWuBEJZs3p3sYEXCZ9o8HYpU9avZVNMhxEy5a2lyFaiPmo68qF6dZzyj/NrUz9Q5D
-         vMMikIYk2A3KR34a5+S9ee39eXx8O9i1ZyuDnqeBJGDGk6pzZ360lMz2ubCncQ4O62AM
-         igneJBJF0Ne+V4GUothgYpQOQfz4FFfHy5MdCx+39qewpnMmnAxj4P2g8GVzx7x1xqkx
-         2zZogugz5iHVe/tibT1NTz73niOne8BIiCWOOubrMDSXlWU1XTOrss9cuPXU/+XaBdBy
-         vYN1hKVJSvrzfmgPzOTuojwSoJ9J1MLdeSBgVtMsmJ2feW0B1Nyw5KEi128DE9b5XSVG
-         1tRw==
-X-Gm-Message-State: AOAM532EmSxOxB1U0Sq7FYbtKIqcGE+LVXXXPo2y0Ku2DQG8rcpg6ds1
-        83oVwfo2UmsBvwuL/c7cdXD21Q==
-X-Google-Smtp-Source: ABdhPJxl+y2QxzQ9a3sEy1MWsd8chRltmFlrXrtZ/mWCfmxuovfU7S/Ah6OI/8mW9RcgzuuAzQFmfA==
-X-Received: by 2002:a1c:bad5:: with SMTP id k204mr22538053wmf.111.1600542310996;
-        Sat, 19 Sep 2020 12:05:10 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id x2sm12624431wrl.13.2020.09.19.12.05.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Sep 2020 12:05:10 -0700 (PDT)
-Date:   Sat, 19 Sep 2020 21:05:08 +0200
-From:   LABBE Corentin <clabbe@baylibre.com>
+        Sun, 20 Sep 2020 10:01:21 -0400
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailout.nyi.internal (Postfix) with ESMTP id EF1F35C0065;
+        Sun, 20 Sep 2020 10:01:19 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Sun, 20 Sep 2020 10:01:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm1; bh=A/ZjnwvXqRqqm+QgiPPmKStHh/4
+        JwIXaKDmYW+WEZVI=; b=Tv6jedMRKhwNpGlOhrdkmsHUsL7R233wB2kNUVkTzNZ
+        ncNIAnTgWuGMV0mbSeoxaULjMEI/L8Uwp/6iy5fYr5yb/1kM5Jwf/JKNycMkTIEC
+        Pa3G9N6PRSixSNgIz/xOAZtKPnDCLLD1PrLi9JnU9v64DbEeNa+pv753yqZXE9fr
+        JvyZhN2qld5vKxmmPz7+9shaXIG0uBCRuHBG91KXCW51l0sO0PEe82Eh3FL8bRzR
+        3XE0gE0OS5Jwte7vgFlZ0E156hQ6RrR8YNk/f+DUr22QT5OGoVEF72WGVYw04cqj
+        //hDgmqV+9GJP2830lQgaDn9YicBWcRU+biSf8IZsKg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=A/Zjnw
+        vXqRqqm+QgiPPmKStHh/4JwIXaKDmYW+WEZVI=; b=G5WvkymRwyYFntEqpm9vQ/
+        UplUMvaCfZiECsCrA03wXsp2ahfu4NYhf8zRcPSHxyou+nCs/VhQtl/iEihMWhia
+        ZzYUDqGiokGu1UvK/+9s6heBSqqyBU2hYdVN8ykH8TAUb+K2zU+/nP5yFk130IpN
+        9Y4kVAaaoNaNRtnFYvTPv1uwM+H7OPPn8T67wmNwOr1kwkxMzOVAUcXWsubAM3Es
+        bn32N1aJsktNHX2GsfgHf3TO/UVMGgDaze/+7YqFZ3wXH1vYffLEXf71JTYPd3M8
+        uXZHyqe24jYWCuH5vEofL9JK0T8guJl8ZhdAiDPqpV2oeGuKfRsENLICey9KP28Q
+        ==
+X-ME-Sender: <xms:rmBnX5YQSMUgNgZvgOA3ObGfJz7jrWLHoUtptZ6MRC_4KdTHt-5P-Q>
+    <xme:rmBnXwbw02TIxPJUYFlHol_IvDNAPOjrXFn_aJ3HAfDIlS2SFR5how4Sg3k7pZMFC
+    Nq3Dlb2O5x9Nw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedruddtgdejudcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghgucfm
+    jfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepveeuheejgf
+    ffgfeivddukedvkedtleelleeghfeljeeiueeggeevueduudekvdetnecukfhppeekfedr
+    keeirdejgedrieegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
+    hfrhhomhepghhrvghgsehkrhhorghhrdgtohhm
+X-ME-Proxy: <xmx:rmBnX7_uyshV2v7D72jpxmFEKuLzJ-ChQoZdyo8g-fTz7PRZr2U3lg>
+    <xmx:rmBnX3qt3s8BdL4DlIBUbxHvi6PnrAJai1RadIiGmM1SK_5x2onhTw>
+    <xmx:rmBnX0o9Z4ZpNkb7avo0qQ9T5ELogtun1f99eY6frv5VfWxOzj8TWg>
+    <xmx:r2BnX9lRnSq1k_hy9fPewKqmU3ew_E5TyQ-ZyZWv-vatirvMUqgquw>
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 59A70328005E;
+        Sun, 20 Sep 2020 10:01:18 -0400 (EDT)
+Date:   Sun, 20 Sep 2020 16:01:43 +0200
+From:   Greg KH <greg@kroah.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     arnd@arndb.de, davem@davemloft.net, mripard@kernel.org,
-        wens@csie.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-sunxi@googlegroups.com, stable@vger.kernel.org
-Subject: Re: [PATCH 4/7] crypto: sun4i-ss: handle BigEndian for cipher
-Message-ID: <20200919190508.GA15359@Red>
-References: <1600367758-28589-1-git-send-email-clabbe@baylibre.com>
- <1600367758-28589-5-git-send-email-clabbe@baylibre.com>
- <20200918073128.GA24168@gondor.apana.org.au>
- <20200918080658.GA22656@Red>
- <20200918080915.GA24549@gondor.apana.org.au>
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Necip Fazil Yildiran <fazilyildiran@gmail.com>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the staging tree with the crypto tree
+Message-ID: <20200920140143.GB2886633@kroah.com>
+References: <20200918152127.4414b524@canb.auug.org.au>
+ <20200918054134.GA9252@gondor.apana.org.au>
+ <20200918074911.GA987884@kroah.com>
+ <20200918075036.GA24315@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200918080915.GA24549@gondor.apana.org.au>
+In-Reply-To: <20200918075036.GA24315@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 18, 2020 at 06:09:15PM +1000, Herbert Xu wrote:
-> On Fri, Sep 18, 2020 at 10:06:58AM +0200, LABBE Corentin wrote:
+On Fri, Sep 18, 2020 at 05:50:36PM +1000, Herbert Xu wrote:
+> On Fri, Sep 18, 2020 at 09:49:11AM +0200, Greg KH wrote:
 > >
-> > But I think only me will see it and since I already have this on my TODO list, I dont see any interest to leave it failing.
-> > Furthermore, having a clean BE boot will permit to enable BE boots for thoses SoCs on kernelCI.
+> > Ok, I'll go revert these.
 > 
-> I'll happily accept patches that fix the actual bug but not ones
-> just papering over it.
+> Thanks!
 > 
+> > > As the driver has been converted over to the lib arc4 API, it
+> > > does not need to select CRYPTO at all.
+> > 
+> > Is it converted in your tree?  If so, have a branch/tag I can pull in to
+> > prevent merge issues in the future?
+> 
+> It's in the cryptodev tree, but unfortunately it's not in a
+> topic branch so you'd be pulling all other crypto changes along
+> with it.
 
-I am sorry, you are right.
-Furthermore, while respining to fix it, it seems that the current fix is enough.
-I have rerun a clean rebuild and test on A10/A13/A20/A33 with BE and sun4i-ss is working fine.
+Sorry for the delay, this is now fixed up in my tree.
 
-I will sent a clean v2.
-
-Regards
+greg k-h
