@@ -2,29 +2,29 @@ Return-Path: <SRS0=6s16=C5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD43C4346F
-	for <linux-crypto@archiver.kernel.org>; Sun, 20 Sep 2020 16:21:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F29C4346A
+	for <linux-crypto@archiver.kernel.org>; Sun, 20 Sep 2020 16:21:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 533C321531
-	for <linux-crypto@archiver.kernel.org>; Sun, 20 Sep 2020 16:21:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E086220EDD
+	for <linux-crypto@archiver.kernel.org>; Sun, 20 Sep 2020 16:21:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726486AbgITQVY (ORCPT
+        id S1726476AbgITQVY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Sun, 20 Sep 2020 12:21:24 -0400
-Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:51221 "EHLO
-        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726392AbgITQVS (ORCPT
+Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:50650 "EHLO
+        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726311AbgITQVT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Sep 2020 12:21:18 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0U9VME2i_1600618866;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U9VME2i_1600618866)
+        Sun, 20 Sep 2020 12:21:19 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R591e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0U9VME3F_1600618869;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U9VME3F_1600618869)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 21 Sep 2020 00:21:07 +0800
+          Mon, 21 Sep 2020 00:21:10 +0800
 From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -58,9 +58,9 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 Cc:     Xufeng Zhang <yunbo.xufeng@linux.alibaba.com>,
         Jia Zhang <zhang.jia@linux.alibaba.com>,
         Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH v7 05/10] crypto: testmgr - support test with different ciphertext per encryption
-Date:   Mon, 21 Sep 2020 00:20:58 +0800
-Message-Id: <20200920162103.83197-6-tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH v7 10/10] integrity: Asymmetric digsig supports SM2-with-SM3 algorithm
+Date:   Mon, 21 Sep 2020 00:21:03 +0800
+Message-Id: <20200920162103.83197-11-tianjia.zhang@linux.alibaba.com>
 X-Mailer: git-send-email 2.19.1.3.ge56e4f7
 In-Reply-To: <20200920162103.83197-1-tianjia.zhang@linux.alibaba.com>
 References: <20200920162103.83197-1-tianjia.zhang@linux.alibaba.com>
@@ -70,45 +70,47 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Some asymmetric algorithms will get different ciphertext after
-each encryption, such as SM2, and let testmgr support the testing
-of such algorithms.
-
-In struct akcipher_testvec, set c and c_size to be empty, skip
-the comparison of the ciphertext, and compare the decrypted
-plaintext with m to achieve the test purpose.
+Asymmetric digsig supports SM2-with-SM3 algorithm combination,
+so that IMA can also verify SM2's signature data.
 
 Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 Tested-by: Xufeng Zhang <yunbo.xufeng@linux.alibaba.com>
+Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
+Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
 ---
- crypto/testmgr.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ security/integrity/digsig_asymmetric.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 23c27fc96394..cd002a030af5 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4025,7 +4025,7 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
- 		pr_err("alg: akcipher: %s test failed. err %d\n", op, err);
- 		goto free_all;
- 	}
--	if (!vecs->siggen_sigver_test) {
-+	if (!vecs->siggen_sigver_test && c) {
- 		if (req->dst_len != c_size) {
- 			pr_err("alg: akcipher: %s test failed. Invalid output len\n",
- 			       op);
-@@ -4056,6 +4056,11 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
- 		goto free_all;
- 	}
+diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
+index cfa4127d0518..b86a4a8f61ab 100644
+--- a/security/integrity/digsig_asymmetric.c
++++ b/security/integrity/digsig_asymmetric.c
+@@ -99,14 +99,22 @@ int asymmetric_verify(struct key *keyring, const char *sig,
+ 	memset(&pks, 0, sizeof(pks));
  
-+	if (!vecs->siggen_sigver_test && !c) {
-+		c = outbuf_enc;
-+		c_size = req->dst_len;
-+	}
-+
- 	op = vecs->siggen_sigver_test ? "sign" : "decrypt";
- 	if (WARN_ON(c_size > PAGE_SIZE))
- 		goto free_all;
+ 	pks.hash_algo = hash_algo_name[hdr->hash_algo];
+-	if (hdr->hash_algo == HASH_ALGO_STREEBOG_256 ||
+-	    hdr->hash_algo == HASH_ALGO_STREEBOG_512) {
++	switch (hdr->hash_algo) {
++	case HASH_ALGO_STREEBOG_256:
++	case HASH_ALGO_STREEBOG_512:
+ 		/* EC-RDSA and Streebog should go together. */
+ 		pks.pkey_algo = "ecrdsa";
+ 		pks.encoding = "raw";
+-	} else {
++		break;
++	case HASH_ALGO_SM3_256:
++		/* SM2 and SM3 should go together. */
++		pks.pkey_algo = "sm2";
++		pks.encoding = "raw";
++		break;
++	default:
+ 		pks.pkey_algo = "rsa";
+ 		pks.encoding = "pkcs1";
++		break;
+ 	}
+ 	pks.digest = (u8 *)data;
+ 	pks.digest_size = datalen;
 -- 
 2.19.1.3.ge56e4f7
 
