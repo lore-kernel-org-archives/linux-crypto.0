@@ -2,29 +2,29 @@ Return-Path: <SRS0=6s16=C5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51EDCC43463
-	for <linux-crypto@archiver.kernel.org>; Sun, 20 Sep 2020 16:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1520EC43465
+	for <linux-crypto@archiver.kernel.org>; Sun, 20 Sep 2020 16:21:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F5D82075E
-	for <linux-crypto@archiver.kernel.org>; Sun, 20 Sep 2020 16:21:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D85E82075E
+	for <linux-crypto@archiver.kernel.org>; Sun, 20 Sep 2020 16:21:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726402AbgITQVO (ORCPT
+        id S1726316AbgITQVX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 20 Sep 2020 12:21:14 -0400
-Received: from out30-44.freemail.mail.aliyun.com ([115.124.30.44]:50125 "EHLO
-        out30-44.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726311AbgITQVO (ORCPT
+        Sun, 20 Sep 2020 12:21:23 -0400
+Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:37975 "EHLO
+        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726412AbgITQVW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Sep 2020 12:21:14 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04357;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0U9VT-1s_1600618863;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U9VT-1s_1600618863)
+        Sun, 20 Sep 2020 12:21:22 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R271e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04357;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0U9VME2v_1600618867;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U9VME2v_1600618867)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 21 Sep 2020 00:21:04 +0800
+          Mon, 21 Sep 2020 00:21:08 +0800
 From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -58,138 +58,115 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 Cc:     Xufeng Zhang <yunbo.xufeng@linux.alibaba.com>,
         Jia Zhang <zhang.jia@linux.alibaba.com>,
         Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH v7 00/10] crpyto: introduce OSCCA certificate and SM2 asymmetric algorithm
-Date:   Mon, 21 Sep 2020 00:20:53 +0800
-Message-Id: <20200920162103.83197-1-tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH v7 07/10] crypto: sm2 - add SM2 test vectors to testmgr
+Date:   Mon, 21 Sep 2020 00:21:00 +0800
+Message-Id: <20200920162103.83197-8-tianjia.zhang@linux.alibaba.com>
 X-Mailer: git-send-email 2.19.1.3.ge56e4f7
+In-Reply-To: <20200920162103.83197-1-tianjia.zhang@linux.alibaba.com>
+References: <20200920162103.83197-1-tianjia.zhang@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello all,
+Add testmgr test vectors for SM2 algorithm. These vectors come
+from `openssl pkeyutl -sign` and libgcrypt.
 
-This new module implement the OSCCA certificate and SM2 public key
-algorithm. It was published by State Encryption Management Bureau, China.
-List of specifications for OSCCA certificate and SM2 elliptic curve
-public key cryptography:
-
-* GM/T 0003.1-2012
-* GM/T 0003.2-2012
-* GM/T 0003.3-2012
-* GM/T 0003.4-2012
-* GM/T 0003.5-2012
-* GM/T 0015-2012
-* GM/T 0009-2012 
-
-IETF: https://tools.ietf.org/html/draft-shen-sm2-ecdsa-02
-oscca: http://www.oscca.gov.cn/sca/xxgk/2010-12/17/content_1002386.shtml
-scctc: http://www.gmbz.org.cn/main/bzlb.html
-
-These patchs add the OID object identifier defined by OSCCA. The
-x509 certificate supports sm2-with-sm3 type certificate parsing
-and verification.
-
-The sm2 algorithm is based on libgcrypt's mpi implementation, and has
-made some additions to the kernel's original mpi library, and added the
-implementation of ec to better support elliptic curve-like algorithms.
-
-sm2 has good support in both openssl and gnupg projects, and sm3 and sm4
-of the OSCCA algorithm family have also been implemented in the kernel.
-
-Among them, sm3 and sm4 have been well implemented in the kernel.
-This group of patches has newly introduced sm2. In order to implement
-sm2 more perfectly, I expanded the mpi library and introduced the
-ec implementation of the mpi library as the basic algorithm. Compared
-to the kernel's crypto/ecc.c, the implementation of mpi/ec.c is more
-complete and elegant, sm2 is implemented based on these algorithms.
-
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Tested-by: Xufeng Zhang <yunbo.xufeng@linux.alibaba.com>
 ---
-v7 changes:
-  1. add sm2 test vectors to testmgr.
-  2. fix potential memory leak in testmgr (PATCH 6/10).
-  3. rebase on mainline.
+ crypto/testmgr.c |  6 +++++
+ crypto/testmgr.h | 59 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 65 insertions(+)
 
-v6 changes:
-  1. remove mpi_sub_ui function from mpi library.
-  2. rebase on mainline.
-
-v5 changes:
-  1. fix compilation failure when SM2 is configured as a module.
-  2. simplify the mpi and ec code, remove unused functions reported by test robot.
-
-v4 changes:
-  1. Pass data directly when calculating sm2 certificate digest.
-  2. rebase on mainline.
-
-v3 changes:
-  1. integrity asymmetric digsig support sm2-with-sm3 algorithm.
-  2. remove unused sm2_set_priv_key().
-  3. rebase on mainline.
-
-v2 changes:
-  1. simplify the sm2 algorithm and only retain the verify function.
-  2. extract the sm2 certificate code into a separate file.
-
-
-Tianjia Zhang (10):
-  crypto: sm3 - export crypto_sm3_final function
-  lib/mpi: Extend the MPI library
-  lib/mpi: Introduce ec implementation to MPI library
-  crypto: sm2 - introduce OSCCA SM2 asymmetric cipher algorithm
-  crypto: testmgr - support test with different ciphertext per
-    encryption
-  crypto: testmgr - Fix potential memory leak in test_akcipher_one()
-  crypto: sm2 - add SM2 test vectors to testmgr
-  X.509: support OSCCA certificate parse
-  X.509: support OSCCA SM2-with-SM3 certificate verification
-  integrity: Asymmetric digsig supports SM2-with-SM3 algorithm
-
- crypto/Kconfig                            |   17 +
- crypto/Makefile                           |    8 +
- crypto/asymmetric_keys/Makefile           |    1 +
- crypto/asymmetric_keys/public_key.c       |    6 +
- crypto/asymmetric_keys/public_key_sm2.c   |   61 +
- crypto/asymmetric_keys/x509_cert_parser.c |   27 +-
- crypto/asymmetric_keys/x509_public_key.c  |    3 +
- crypto/sm2.c                              |  481 +++++++
- crypto/sm2signature.asn1                  |    4 +
- crypto/sm3_generic.c                      |    7 +-
- crypto/testmgr.c                          |   24 +-
- crypto/testmgr.h                          |   59 +
- include/crypto/public_key.h               |   15 +
- include/crypto/sm2.h                      |   25 +
- include/crypto/sm3.h                      |    2 +
- include/linux/mpi.h                       |  192 +++
- include/linux/oid_registry.h              |    6 +
- lib/mpi/Makefile                          |    6 +
- lib/mpi/ec.c                              | 1509 +++++++++++++++++++++
- lib/mpi/mpi-add.c                         |  155 +++
- lib/mpi/mpi-bit.c                         |  251 ++++
- lib/mpi/mpi-cmp.c                         |   46 +-
- lib/mpi/mpi-div.c                         |  238 ++++
- lib/mpi/mpi-internal.h                    |   53 +
- lib/mpi/mpi-inv.c                         |  143 ++
- lib/mpi/mpi-mod.c                         |  155 +++
- lib/mpi/mpi-mul.c                         |   94 ++
- lib/mpi/mpicoder.c                        |  336 +++++
- lib/mpi/mpih-div.c                        |  294 ++++
- lib/mpi/mpih-mul.c                        |   25 +
- lib/mpi/mpiutil.c                         |  204 +++
- security/integrity/digsig_asymmetric.c    |   14 +-
- 32 files changed, 4435 insertions(+), 26 deletions(-)
- create mode 100644 crypto/asymmetric_keys/public_key_sm2.c
- create mode 100644 crypto/sm2.c
- create mode 100644 crypto/sm2signature.asn1
- create mode 100644 include/crypto/sm2.h
- create mode 100644 lib/mpi/ec.c
- create mode 100644 lib/mpi/mpi-add.c
- create mode 100644 lib/mpi/mpi-div.c
- create mode 100644 lib/mpi/mpi-inv.c
- create mode 100644 lib/mpi/mpi-mod.c
- create mode 100644 lib/mpi/mpi-mul.c
-
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index ed8e29efe280..1317a63172d0 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -5384,6 +5384,12 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.hash = __VECS(sha512_tv_template)
+ 		}
++	}, {
++		.alg = "sm2",
++		.test = alg_test_akcipher,
++		.suite = {
++			.akcipher = __VECS(sm2_tv_template)
++		}
+ 	}, {
+ 		.alg = "sm3",
+ 		.test = alg_test_hash,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index b9a2d73d9f8d..8c83811c0e35 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -3792,6 +3792,65 @@ static const struct hash_testvec hmac_streebog512_tv_template[] = {
+ 	},
+ };
+ 
++/*
++ * SM2 test vectors.
++ */
++static const struct akcipher_testvec sm2_tv_template[] = {
++	{ /* Generated from openssl */
++	.key =
++	"\x04"
++	"\x8e\xa0\x33\x69\x91\x7e\x3d\xec\xad\x8e\xf0\x45\x5e\x13\x3e\x68"
++	"\x5b\x8c\xab\x5c\xc6\xc8\x50\xdf\x91\x00\xe0\x24\x73\x4d\x31\xf2"
++	"\x2e\xc0\xd5\x6b\xee\xda\x98\x93\xec\xd8\x36\xaa\xb9\xcf\x63\x82"
++	"\xef\xa7\x1a\x03\xed\x16\xba\x74\xb8\x8b\xf9\xe5\x70\x39\xa4\x70",
++	.key_len = 65,
++	.param_len = 0,
++	.c =
++	"\x30\x45"
++	"\x02\x20"
++	"\x70\xab\xb6\x7d\xd6\x54\x80\x64\x42\x7e\x2d\x05\x08\x36\xc9\x96"
++	"\x25\xc2\xbb\xff\x08\xe5\x43\x15\x5e\xf3\x06\xd9\x2b\x2f\x0a\x9f"
++	"\x02\x21"
++	"\x00"
++	"\xbf\x21\x5f\x7e\x5d\x3f\x1a\x4d\x8f\x84\xc2\xe9\xa6\x4c\xa4\x18"
++	"\xb2\xb8\x46\xf4\x32\x96\xfa\x57\xc6\x29\xd4\x89\xae\xcc\xda\xdb",
++	.c_size = 71,
++	.algo = OID_SM2_with_SM3,
++	.m =
++	"\x47\xa7\xbf\xd3\xda\xc4\x79\xee\xda\x8b\x4f\xe8\x40\x94\xd4\x32"
++	"\x8f\xf1\xcd\x68\x4d\xbd\x9b\x1d\xe0\xd8\x9a\x5d\xad\x85\x47\x5c",
++	.m_size = 32,
++	.public_key_vec = true,
++	.siggen_sigver_test = true,
++	},
++	{ /* From libgcrypt */
++	.key =
++	"\x04"
++	"\x87\x59\x38\x9a\x34\xaa\xad\x07\xec\xf4\xe0\xc8\xc2\x65\x0a\x44"
++	"\x59\xc8\xd9\x26\xee\x23\x78\x32\x4e\x02\x61\xc5\x25\x38\xcb\x47"
++	"\x75\x28\x10\x6b\x1e\x0b\x7c\x8d\xd5\xff\x29\xa9\xc8\x6a\x89\x06"
++	"\x56\x56\xeb\x33\x15\x4b\xc0\x55\x60\x91\xef\x8a\xc9\xd1\x7d\x78",
++	.key_len = 65,
++	.param_len = 0,
++	.c =
++	"\x30\x44"
++	"\x02\x20"
++	"\xd9\xec\xef\xe8\x5f\xee\x3c\x59\x57\x8e\x5b\xab\xb3\x02\xe1\x42"
++	"\x4b\x67\x2c\x0b\x26\xb6\x51\x2c\x3e\xfc\xc6\x49\xec\xfe\x89\xe5"
++	"\x02\x20"
++	"\x43\x45\xd0\xa5\xff\xe5\x13\x27\x26\xd0\xec\x37\xad\x24\x1e\x9a"
++	"\x71\x9a\xa4\x89\xb0\x7e\x0f\xc4\xbb\x2d\x50\xd0\xe5\x7f\x7a\x68",
++	.c_size = 70,
++	.algo = OID_SM2_with_SM3,
++	.m =
++	"\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff\x00"
++	"\x12\x34\x56\x78\x9a\xbc\xde\xf0\x12\x34\x56\x78\x9a\xbc\xde\xf0",
++	.m_size = 32,
++	.public_key_vec = true,
++	.siggen_sigver_test = true,
++	},
++};
++
+ /* Example vectors below taken from
+  * http://www.oscca.gov.cn/UpFile/20101222141857786.pdf
+  *
 -- 
 2.19.1.3.ge56e4f7
 
