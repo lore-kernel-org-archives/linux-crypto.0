@@ -7,23 +7,23 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B75CC43463
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 07:59:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 680C9C43465
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 07:59:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C5A6F214F1
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 07:59:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 390662085B
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 07:59:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726318AbgIUH7S (ORCPT
+        id S1726501AbgIUH7W (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Sep 2020 03:59:18 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56496 "EHLO mx2.suse.de"
+        Mon, 21 Sep 2020 03:59:22 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56802 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726358AbgIUH7R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Sep 2020 03:59:17 -0400
+        id S1726456AbgIUH7T (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Sep 2020 03:59:19 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 2C92AB4FB;
-        Mon, 21 Sep 2020 07:59:51 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 1DDF8B503;
+        Mon, 21 Sep 2020 07:59:53 +0000 (UTC)
 From:   Nicolai Stange <nstange@suse.de>
 To:     "Theodore Y. Ts'o" <tytso@mit.edu>
 Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
@@ -55,9 +55,9 @@ Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         Torsten Duwe <duwe@suse.de>, Petr Tesarik <ptesarik@suse.cz>,
         Nicolai Stange <nstange@suse.de>
-Subject: [RFC PATCH 01/41] random: remove dead code in credit_entropy_bits()
-Date:   Mon, 21 Sep 2020 09:58:17 +0200
-Message-Id: <20200921075857.4424-2-nstange@suse.de>
+Subject: [RFC PATCH 07/41] random: let pool_entropy_delta() take nbits in units of 2^-ENTROPY_SHIFT
+Date:   Mon, 21 Sep 2020 09:58:23 +0200
+Message-Id: <20200921075857.4424-8-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200921075857.4424-1-nstange@suse.de>
 References: <20200921075857.4424-1-nstange@suse.de>
@@ -67,40 +67,62 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since commit 90ea1c6436d2 ("random: remove the blocking pool") the local
-has_initialized in credit_entropy_bits() won't get set anymore and
-the corresponding if-clause became dead code. Remove it as well as the
-has_initialized variable itself from credit_entropy_bits().
+Currently pool_entropy_delta() expects its nbits argument to be given in
+units of integral bits. Using fractional bits for processing intermediate
+entropy counts consistently throughout the code will facilitate upcoming
+changes to the entropy accounting logic in add_interrupt_randomness().
+Replace pool_entropy_delta()'s nbits argument with nfrac, which used to be
+a local variable and is expected to be given in units of 2^-ENTROPY_SHIFT.
+Adapt the single caller, credit_entropy_bits(), accordingly.
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- drivers/char/random.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ drivers/char/random.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index d20ba1b104ca..0580968fd28c 100644
+index 15dd22d74029..08caa7a691a5 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -660,7 +660,7 @@ static void process_random_ready_list(void)
-  */
- static void credit_entropy_bits(struct entropy_store *r, int nbits)
- {
--	int entropy_count, orig, has_initialized = 0;
-+	int entropy_count, orig;
- 	const int pool_size = r->poolinfo->poolfracbits;
- 	int nfrac = nbits << ENTROPY_SHIFT;
+@@ -655,21 +655,20 @@ static void process_random_ready_list(void)
  
-@@ -717,11 +717,6 @@ static void credit_entropy_bits(struct entropy_store *r, int nbits)
+ /*
+  * Based on the pool's current entropy fill level, specified as
+- * base_entropy_count, and the number of new entropy bits to add,
+- * return the amount of new entropy to credit. If the 'fast'
+- * parameter is set to true, the calculation will be guaranteed to
+- * terminate quickly, but this comes at the expense of capping
+- * nbits to one half of the pool size.
++ * base_entropy_count, and the number of new entropy bits in units of
++ * 2^-ENTROPY_SHIFT to add, return the amount of new entropy to
++ * credit. If the 'fast' parameter is set to true, the calculation
++ * will be guaranteed to terminate quickly, but this comes at the
++ * expense of capping nbits to one half of the pool size.
+  */
+ static unsigned int pool_entropy_delta(struct entropy_store *r,
+ 				       int base_entropy_count,
+-				       int nbits, bool fast)
++				       int nfrac, bool fast)
+ {
+ 	const int pool_size = r->poolinfo->poolfracbits;
+ 	int entropy_count = base_entropy_count;
+-	int nfrac = nbits << ENTROPY_SHIFT;
+ 
+-	if (!nbits)
++	if (!nfrac)
+ 		return 0;
+ 
+ 	/*
+@@ -729,7 +728,9 @@ static void credit_entropy_bits(struct entropy_store *r, int nbits)
+ 
+ retry:
+ 	orig = READ_ONCE(r->entropy_count);
+-	entropy_count = orig + pool_entropy_delta(r, orig, nbits, false);
++	entropy_count = orig + pool_entropy_delta(r, orig,
++						  nbits << ENTROPY_SHIFT,
++						  false);
  	if (cmpxchg(&r->entropy_count, orig, entropy_count) != orig)
  		goto retry;
- 
--	if (has_initialized) {
--		r->initialized = 1;
--		kill_fasync(&fasync, SIGIO, POLL_IN);
--	}
--
- 	trace_credit_entropy_bits(r->name, nbits,
- 				  entropy_count >> ENTROPY_SHIFT, _RET_IP_);
  
 -- 
 2.26.2
