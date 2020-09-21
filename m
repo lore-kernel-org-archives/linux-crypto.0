@@ -4,26 +4,26 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E2A7C43464
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18076C43466
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6365F20874
+	by mail.kernel.org (Postfix) with ESMTP id D393C20BED
 	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726610AbgIUIAq (ORCPT
+        id S1726467AbgIUIAx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Sep 2020 04:00:46 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57298 "EHLO mx2.suse.de"
+        Mon, 21 Sep 2020 04:00:53 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57440 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726591AbgIUH7k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726579AbgIUH7k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 21 Sep 2020 03:59:40 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id A947EB52B;
-        Mon, 21 Sep 2020 08:00:07 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id C5D09B523;
+        Mon, 21 Sep 2020 08:00:04 +0000 (UTC)
 From:   Nicolai Stange <nstange@suse.de>
 To:     "Theodore Y. Ts'o" <tytso@mit.edu>
 Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
@@ -55,222 +55,198 @@ Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         Torsten Duwe <duwe@suse.de>, Petr Tesarik <ptesarik@suse.cz>,
         Nicolai Stange <nstange@suse.de>
-Subject: [RFC PATCH 32/41] random: introduce health test stub and wire it up
-Date:   Mon, 21 Sep 2020 09:58:48 +0200
-Message-Id: <20200921075857.4424-33-nstange@suse.de>
+Subject: [RFC PATCH 27/41] random: increase per-IRQ event entropy estimate if in FIPS mode
+Date:   Mon, 21 Sep 2020 09:58:43 +0200
+Message-Id: <20200921075857.4424-28-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200921075857.4424-1-nstange@suse.de>
 References: <20200921075857.4424-1-nstange@suse.de>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-NIST SP800-90B requires certain statistical tests to be run continuously on
-a noise source's output.
+NIST SP800-90C prohibits the use of multiple correlated entropy sources.
+However, add_interrupt_randomness(), add_disk_randomness() and
+add_input_randomness() are clearly not independent and an upcoming patch
+will make the latter two to stop contributing any entropy to the global
+balance if fips_enabled is on.
 
-In preparation to implementing those, introduce an empty stub,
-health_test_process() and wire it up to add_interrupt_randomness(). This
-patch does not implement any actual testing functionality yet, it's mereley
-meant to define the interactions between add_interrupt_randomness() and
-the health tests.
+With the current parameter settings, it can be assumed that
+add_disk_randomness() resp. add_input_randomness() are the dominating
+contributors to the overall entropy reserve for some common workloads: both
+more or less estimate the entropy per event to equal the width of the
+minimum out of the first, second and third jiffes deltas to the previous
+occurrence.
 
-health_test_process() is to be invoked on individual noise samples, i.e.
-cycle counter values and returns, either of three possible status
-codes indicating to the calling add_interrupt_randomness() that
-- either some more samples are needed in order to complete the statistical
-  tests,
-- that the tests have finished with positive result on the latest run
-  of noise samples or
-- that the tests have failed.
+add_interrupt_randomness() on the other hand only attributes one single bit
+entropy to a full batch of 64 IRQ events (or once a second if that
+completes earlier).
 
-Introduce an enum health_result defining constants corresponding to these
-resp. cases: health_queue, health_dispatch and health_discard. Provide
-another value, health_none, to indicate the case that the health tests
-are disabled, because e.g. fips_enabled is unset. Make the stub
-health_test_process() return this value for now.
+Thus, the upcoming exclusion of two potent entropy sources should somehow
+be compensated for.
 
-As long as the statistical tests need more input noise samples before
-reaching a conclusion, health_queue will get returned from
-health_test_process(). FWIW, the number of successive input samples needed
-by the tests will be at the order of 128 to 8192, depending on the per-IRQ
-entropy estimate. add_interrupt_randomness() currently attempts to transfer
-the noise kept within in the per-CPU fast_pool, which is of limited
-capacity, to the global input_pool as soon as a threshold of 64 events is
-reached and it will continue to do so. However, as long as some tests are
-pending, i.e. keep returning health_queue, the associated amount of
-estimated entropy must not get added to the global input_pool balance, but
-queued up at the fast_pool's queued_entropy instance. Once the health test
-have eventually succeeded, as indiciated by health_test_process(), the
-entropy previously queued up may get dispatched to the global reserve.
-OTOH, on test failure health_discard will get returned and all entropy
-queued up from add_interrupt_randomness() since the last dispatch (or
-discard resp.) must get discarded.
+Stephan Müller worked around this very problem in his "LRNG" proposal ([1])
+by increasing the entropy estimate per IRQ event. Namely, in case a
+get_cycles() with instruction granularity is available, he estimated one
+bit of entropy per IRQ event and (IIRC) 1/10 bits otherwise. I haven't
+tested this claim myself, in particular not on smaller devices. But for the
+sake of moving the development of this RFC series forward, I'll assume it
+as granted and hereby postulate that
 
-Note that add_interrupt_randomness() will continue to unconditionally mix
-the samples into the fast_pools and eventually into the global input_pool
--- the health test results really only affect the entropy accounting.
+  The lower eight bits of the differences between get_cycles() from two
+  successive IRQ events on the same CPU carry
+  - one bit of min-entropy in case a get_cycles() with instruction
+    granularity is available and
+  - 1/8 bit of min-entropy in case get_cycles() is still non-trivial, but
+    has a lower resolution.
 
-So, make add_interrupt_randomness() invoke health_test_process() on
-the current cycle counter value in case fips_enabled is set.
+In particular this is assumed to be true for highly periodic interrupts
+like those issued for e.g. USB microframes and on all supported
+architectures. In the former case, the underlying source of randomness is
+believed to follow the same principles as for the Jitter RNGs resp.
+try_to_generate_entropy(): diffences in RAM vs. CPU clockings and
+unpredictability of cache states to a certain extent.
 
-In case a fast_pool's fill level threshold of 64 events is reached at a
-time when health tests are still pending and keep returning health_queue,
-let add_interrupt_randomness() continue to mix the fast_pool's contents
-into the input_pool as before, but enqueue the associated amount of entropy
-at the fast_pool's associated queued_entropy instance for later dispatch.
+Notes:
+- NIST SP800-90B requires a means to access raw samples for validation
+  purposes. Implementation of such an interface is deliberately not part
+  of this RFC series here, but would necessarily be subject of future work.
+  So there would be a means to at least validate these assumptions.
+- The choice of 1/8 over the 1/10 from the LRNG patchset has been made
+  because it's a power of two and I suppose that the estimate of 1/10
+  had been quite arbitrary anyway. Replacement of the 1/8 by smaller
+  powers of two down to 1/64 will be supported throughout this patch
+  series.
 
-Both, entropy dispatch as well as discard operations, require a call to
-__dequeue_entropy(), which in turn must only get invoked with the
-input_pool's ->lock being held. It follows that in case the spin_trylock()
-in add_interrupt_randomness() failed, the latter would not be able to
-perform entropy dispatch or discard operations immediately at the time
-those have been requested by the health tests. Add two new boolean flags,
-->dispatch_needed and ->discard_needed, to struct fast_pool. Set them from
-add_interrupt_randomness() in case health_test_process() returned
-health_dispatch or health_discard resp.. Make the current and subsequent
-add_interrupt_randomness() invocations to check for ->dispatch_needed and
-->discard_needed and to attempt to execute any pending dispatch/discard
-request. Clear ->dispatch_needed and ->discard_needed again when the
-prerequisite ->lock could eventually be obtained.
+Some health tests as required by NIST SP800-90B will be implemented later
+in this series. In order to allow for dynamically decreasing the assessed
+entropy on a per-CPU basis upon health test failures, make it an attibute
+of the per-CPU struct fast_pool. That is, introduce a new integer field
+->event_entropy_shift to struct fast_pool. The estimated entropy per
+IRQ sample will be calculated as 2^-event_entropy_shift. Initialize it
+statically with -1 to indicate that runtime initialization hasn't happened
+yet. Introduce fast_pool_init_accounting() which gets called
+unconditionally from add_interrupt_randomness() for doing the necessary
+runtime initializations once, i.e. if ->event_entropy_shift is
+still found to be negative. Implement it with the help of the also new
+min_irq_event_entropy_shift(), which will return the initial
+->event_entropy_shift value as determined according to the rules from
+above. That is, depending on the have_highres_cycle_ctr, the result is
+eiher zero or three. Note that have_highres_cycle_ctr will only get
+properly initialized from rand_initialize() if fips_enabled is set, but
+->event_entropy_shift will also only ever get accessed in this case.
 
-As actual health tests returning anything but health_none haven't been
-implemented yet, there is no behavioural change at this point.
+Finally, for the case tha fips_enabled is set, make
+add_interrupt_randomness() to estimate the amount of entropy transferred
+from the fast_pool into the global input_pool as
+fast_pool_entropy(->count, ->event_entropy_shift), rather than only one
+single bit. Remember that fast_pool_entropy() calculates the amount of
+entropy contained in a fast_pool, based on the total number of events mixed
+into it and the estimated entropy per event.
 
+[1] https://lkml.kernel.org/r/5695397.lOV4Wx5bFT@positron.chronox.de
+
+Suggested-by: Stephan Müller <smueller@chronox.de>
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- drivers/char/random.c | 78 +++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 75 insertions(+), 3 deletions(-)
+ drivers/char/random.c | 50 ++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 45 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 0f56c873a501..cb6441b96b8e 100644
+index ac36c56dd135..8f79e90f2429 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -881,14 +881,30 @@ static void discard_queued_entropy(struct entropy_store *r,
- 
- struct health_test {};
- 
-+enum health_result {
-+	health_none,
-+	health_queue,
-+	health_dispatch,
-+	health_discard,
-+};
-+
- static void health_test_reset(struct health_test *h)
- {}
- 
-+static enum health_result
-+health_test_process(struct health_test *h, unsigned int event_entropy_shift,
-+		    u8 sample)
-+{
-+	return health_none;
-+}
-+
- struct fast_pool {
- 	__u32		pool[4];
+@@ -615,6 +615,7 @@ struct fast_pool {
  	unsigned long	last;
  	unsigned short	reg_idx;
  	unsigned char	count;
-+	bool		dispatch_needed : 1;
-+	bool		discard_needed : 1;
- 	int		event_entropy_shift;
- 	struct queued_entropy	q;
- 	struct health_test	health;
-@@ -1662,9 +1678,10 @@ void add_interrupt_randomness(int irq, int irq_flags)
- 	cycles_t		cycles = random_get_entropy();
- 	__u32			c_high, j_high;
++	int		event_entropy_shift;
+ };
+ 
+ /*
+@@ -1509,7 +1510,9 @@ void add_input_randomness(unsigned int type, unsigned int code,
+ }
+ EXPORT_SYMBOL_GPL(add_input_randomness);
+ 
+-static DEFINE_PER_CPU(struct fast_pool, irq_randomness);
++static DEFINE_PER_CPU(struct fast_pool, irq_randomness) = {
++	.event_entropy_shift = -1,
++};
+ 
+ #ifdef ADD_INTERRUPT_BENCH
+ static unsigned long avg_cycles, avg_deviation;
+@@ -1599,6 +1602,32 @@ static unsigned int fast_pool_entropy(unsigned int num_events,
+ 	return result >> event_entropy_shift;
+ }
+ 
++static inline int min_irq_event_entropy_shift(void)
++{
++	if (static_branch_likely(&have_highres_cycle_ctr)) {
++		/*
++		 * If a cycle counter with a good enough resolution is
++		 * available, estimate the entropy per IRQ event to
++		 * be no more than 2^-0 == 1 bit.
++		 */
++		return 0;
++	}
++
++	/*
++	 * Otherwise return an estimate upper bound of
++	 * 2^-3 == 1/8 bit per event.
++	 */
++	return 3;
++}
++
++static inline void fast_pool_init_accounting(struct fast_pool *f)
++{
++	if (likely(f->event_entropy_shift >= 0))
++		return;
++
++	f->event_entropy_shift = min_irq_event_entropy_shift();
++}
++
+ void add_interrupt_randomness(int irq, int irq_flags)
+ {
+ 	struct entropy_store	*r;
+@@ -1610,6 +1639,7 @@ void add_interrupt_randomness(int irq, int irq_flags)
  	__u64			ip;
--	bool			reseed;
-+	bool			reseed = false;
- 	struct queued_entropy	*q = &fast_pool->q;
- 	unsigned int		nfrac;
-+	enum health_result	health_result = health_none;
+ 	bool			reseed;
+ 	struct queued_entropy	q = { 0 };
++	unsigned int		nfrac;
  
  	if (cycles == 0)
  		cycles = get_reg(fast_pool, regs);
-@@ -1682,6 +1699,12 @@ void add_interrupt_randomness(int irq, int irq_flags)
- 	this_cpu_add(net_rand_state.s1, fast_pool->pool[cycles & 3]);
+@@ -1644,13 +1674,23 @@ void add_interrupt_randomness(int irq, int irq_flags)
+ 	if (!spin_trylock(&r->lock))
+ 		return;
  
- 	fast_pool_init_accounting(fast_pool);
-+	if (fips_enabled) {
-+		health_result =
-+			health_test_process(&fast_pool->health,
-+					    fast_pool->event_entropy_shift,
-+					    cycles);
+-	fast_pool->last = now;
+-	fast_pool->count = 0;
+-	/* award one bit for the contents of the fast pool */
+-	__queue_entropy(r, &q, 1 << ENTROPY_SHIFT);
++	fast_pool_init_accounting(fast_pool);
++
++	if (!fips_enabled) {
++		/* award one bit for the contents of the fast pool */
++		nfrac = 1 << ENTROPY_SHIFT;
++	} else {
++		nfrac = fast_pool_entropy(fast_pool->count,
++					  fast_pool->event_entropy_shift);
 +	}
- 
- 	if (unlikely(crng_init == 0)) {
- 		if ((fast_pool->count >= 64) &&
-@@ -1693,8 +1716,48 @@ void add_interrupt_randomness(int irq, int irq_flags)
- 		return;
- 	}
- 
-+	switch (health_result) {
-+	case health_dispatch:
-+		/*
-+		 * Still haven't made it around processing a previous
-+		 * entropy discard request?
-+		 */
-+		fast_pool->dispatch_needed = !fast_pool->discard_needed;
-+		break;
-+
-+	case health_discard:
-+		/*
-+		 * Still haven't made it around processing a previous
-+		 * entropy dispatch request?
-+		 */
-+		fast_pool->discard_needed = !fast_pool->dispatch_needed;
-+		break;
-+
-+	case health_queue:
-+		/*
-+		 * If a previous sample triggered a dispatch which is
-+		 * still pending, it's impossible to add new events on
-+		 * top as far as entropy accounting is
-+		 * concerned. Don't count any events until we get a
-+		 * hold of the input_pool ->lock and complete the
-+		 * dispatch below. Undo the increment from fast_mix()
-+		 * above.
-+		 */
-+		if (fast_pool->dispatch_needed)
-+			fast_pool->count--;
-+		break;
-+
-+	case health_none:
-+		/*
-+		 * fips_enabled is unset, suppress compiler warnings.
-+		 */
-+		break;
-+	};
-+
- 	if ((fast_pool->count < 64) &&
--	    !time_after(now, fast_pool->last + HZ))
-+	    !(health_result == health_none &&
-+	      time_after(now, fast_pool->last + HZ)) &&
-+	    !fast_pool->dispatch_needed && !fast_pool->discard_needed)
- 		return;
- 
- 	r = &input_pool;
-@@ -1710,7 +1773,16 @@ void add_interrupt_randomness(int irq, int irq_flags)
- 	}
- 	__queue_entropy(r, q, nfrac);
++	__queue_entropy(r, &q, nfrac);
  	__mix_pool_bytes(r, &fast_pool->pool, sizeof(fast_pool->pool));
--	reseed = __dispatch_queued_entropy_fast(r, q);
-+
-+	if (fast_pool->dispatch_needed || health_result == health_none) {
-+		reseed = __dispatch_queued_entropy_fast(r, q);
-+		fast_pool->dispatch_needed = false;
-+	} else if (fast_pool->discard_needed) {
-+		int dummy;
-+
-+		__dequeue_entropy(r, q, &dummy);
-+		fast_pool->discard_needed = false;
-+	}
+ 	reseed = __dispatch_queued_entropy_fast(r, &q);
  	spin_unlock(&r->lock);
- 
- 	fast_pool->last = now;
++
++	fast_pool->last = now;
++	fast_pool->count = 0;
++
+ 	if (reseed)
+ 		crng_reseed(&primary_crng, r);
+ }
 -- 
 2.26.2
 
