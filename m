@@ -7,23 +7,23 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C2CC43463
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF82C43465
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:01:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1C1F320EDD
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:01:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C92D620EDD
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:01:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726577AbgIUIBI (ORCPT
+        id S1726788AbgIUIBH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Sep 2020 04:01:08 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56892 "EHLO mx2.suse.de"
+        Mon, 21 Sep 2020 04:01:07 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58044 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726576AbgIUH7j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726587AbgIUH7j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 21 Sep 2020 03:59:39 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 3CEE4B532;
-        Mon, 21 Sep 2020 08:00:11 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 1D565B52C;
+        Mon, 21 Sep 2020 08:00:07 +0000 (UTC)
 From:   Nicolai Stange <nstange@suse.de>
 To:     "Theodore Y. Ts'o" <tytso@mit.edu>
 Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
@@ -55,9 +55,9 @@ Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         Torsten Duwe <duwe@suse.de>, Petr Tesarik <ptesarik@suse.cz>,
         Nicolai Stange <nstange@suse.de>
-Subject: [RFC PATCH 38/41] random: enable NIST SP800-90B startup tests
-Date:   Mon, 21 Sep 2020 09:58:54 +0200
-Message-Id: <20200921075857.4424-39-nstange@suse.de>
+Subject: [RFC PATCH 31/41] random: introduce struct health_test + health_test_reset() placeholders
+Date:   Mon, 21 Sep 2020 09:58:47 +0200
+Message-Id: <20200921075857.4424-32-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200921075857.4424-1-nstange@suse.de>
 References: <20200921075857.4424-1-nstange@suse.de>
@@ -67,96 +67,80 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-NIST SP800-90B, section 4.3 requires an entropy source to inhibit output
-until the so-called "startup" tests have completed. These "startup" test
-shall process at least 1024 consecutive samples by means of the continuous
-health tests, i.e. the already implemented Repetition Count Test (RCT) and
-Adaptive Proportion Test (APT).
+The to be implemented health tests will maintain some per-CPU state as they
+successively process the IRQ samples fed into the resp. fast_pool from
+add_interrupt_randomness().
 
-Introduce a new field ->warmup to struct health_test. Initialize it to 1024
-from health_test_reset(). Make health_test_process() decrement ->warmup
-once per event processed without test failure, but reset ->warmup to the
-intitial value upon failure. Prevent health_test_process() from returning
-health_dispatch as long as ->warmup hasn't dropped to zero. This will cause
-the caller, i.e. add_interrupt_randomness(), to not dispatch any entropy to
-the global balance until the startup tests have finished.
+In order to not to clutter future patches with trivialities, introduce
+an empty struct health_test supposed to keep said state in the future.
+Add a member of this new type to struct fast_pool.
 
-Note that this change will delay the initial seeding of the primary_crng,
-especially for those values of the estimated per-IRQ min-entropy H where
-the mimimum of 1024 events from above is by several factors larger than
-128/H, the number of events to be processed by a single APT run. That
-would only affect systems running with fips_enabled though and there's
-simply no way to avoid it without violating the specs.
+Introduce a health_test_reset() stub, which is supposed to (re)initialize
+instances of struct health_test.
+
+Invoke it from the fast_pool_init_accounting() to make sure that a
+fast_pool's contained health_test instance gets initialized once before
+its first usage.
+
+Make add_interrupt_randomness call fast_pool_init_accounting() earlier:
+health test functionality will get invoked before the latter's old location
+and it must have been initialized by that time.
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- drivers/char/random.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
+ drivers/char/random.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 54ee082ca4a8..bd8c24e433d0 100644
+index 37746df53acf..0f56c873a501 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -880,6 +880,7 @@ static void discard_queued_entropy(struct entropy_store *r,
+@@ -879,6 +879,11 @@ static void discard_queued_entropy(struct entropy_store *r,
+ 	spin_unlock_irqrestore(&r->lock, flags);
  }
  
- struct health_test {
-+	unsigned short warmup;
- 	unsigned short apt_event_count;
- 	union {
- 		u32 apt_presearch_bit_counters;
-@@ -1059,6 +1060,13 @@ health_test_apt(struct health_test *h, unsigned int event_entropy_shift,
- 
- static void health_test_reset(struct health_test *h)
- {
-+	/*
-+	 * Don't dispatch until at least 1024 events have been
-+	 * processed by the continuous health tests as required by
-+	 * NIST SP800-90B for the startup tests.
-+	 */
-+	h->warmup = 1024;
++struct health_test {};
 +
- 	health_apt_reset(h);
- }
- 
-@@ -1067,7 +1075,7 @@ health_test_process(struct health_test *h, unsigned int event_entropy_shift,
- 		    u8 sample)
- {
- 	u8 sample_delta;
--	enum health_result rct;
-+	enum health_result rct, apt;
- 
- 	/*
- 	 * The min-entropy estimate has been made for the lower eight
-@@ -1083,6 +1091,8 @@ health_test_process(struct health_test *h, unsigned int event_entropy_shift,
- 		 * Something is really off, get_cycles() has become
- 		 * (or always been) a constant.
- 		 */
-+		if (h->warmup)
-+			health_test_reset(h);
- 		return health_discard;
- 	}
- 
-@@ -1091,7 +1101,18 @@ health_test_process(struct health_test *h, unsigned int event_entropy_shift,
- 	 * don't care about whether the RCT needs to consume more
- 	 * samples to complete.
- 	 */
--	return health_test_apt(h, event_entropy_shift, sample_delta);
-+	apt = health_test_apt(h, event_entropy_shift, sample_delta);
-+	if (unlikely(h->warmup) && --h->warmup) {
-+		if (apt == health_discard)
-+			health_test_reset(h);
-+		/*
-+		 * Don't allow the caller to dispatch until warmup
-+		 * has completed.
-+		 */
-+		return apt == health_dispatch ? health_queue : apt;
-+	}
++static void health_test_reset(struct health_test *h)
++{}
 +
-+	return apt;
- }
- 
  struct fast_pool {
+ 	__u32		pool[4];
+ 	unsigned long	last;
+@@ -886,6 +891,7 @@ struct fast_pool {
+ 	unsigned char	count;
+ 	int		event_entropy_shift;
+ 	struct queued_entropy	q;
++	struct health_test	health;
+ };
+ 
+ /*
+@@ -1644,6 +1650,7 @@ static inline void fast_pool_init_accounting(struct fast_pool *f)
+ 		return;
+ 
+ 	f->event_entropy_shift = min_irq_event_entropy_shift();
++	health_test_reset(&f->health);
+ }
+ 
+ void add_interrupt_randomness(int irq, int irq_flags)
+@@ -1674,6 +1681,8 @@ void add_interrupt_randomness(int irq, int irq_flags)
+ 	add_interrupt_bench(cycles);
+ 	this_cpu_add(net_rand_state.s1, fast_pool->pool[cycles & 3]);
+ 
++	fast_pool_init_accounting(fast_pool);
++
+ 	if (unlikely(crng_init == 0)) {
+ 		if ((fast_pool->count >= 64) &&
+ 		    crng_fast_load((char *) fast_pool->pool,
+@@ -1692,8 +1701,6 @@ void add_interrupt_randomness(int irq, int irq_flags)
+ 	if (!spin_trylock(&r->lock))
+ 		return;
+ 
+-	fast_pool_init_accounting(fast_pool);
+-
+ 	if (!fips_enabled) {
+ 		/* award one bit for the contents of the fast pool */
+ 		nfrac = 1 << ENTROPY_SHIFT;
 -- 
 2.26.2
 
