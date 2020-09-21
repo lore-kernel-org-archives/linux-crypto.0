@@ -7,23 +7,23 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F224AC43463
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 07:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8526C43464
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 07:59:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BAE8420874
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 07:59:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E2802151B
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 07:59:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726488AbgIUH7V (ORCPT
+        id S1726507AbgIUH7W (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Sep 2020 03:59:21 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56832 "EHLO mx2.suse.de"
+        Mon, 21 Sep 2020 03:59:22 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56798 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726471AbgIUH7U (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Sep 2020 03:59:20 -0400
+        id S1726455AbgIUH7T (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Sep 2020 03:59:19 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id A8BF3B504;
-        Mon, 21 Sep 2020 07:59:53 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 8BDECB502;
+        Mon, 21 Sep 2020 07:59:52 +0000 (UTC)
 From:   Nicolai Stange <nstange@suse.de>
 To:     "Theodore Y. Ts'o" <tytso@mit.edu>
 Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
@@ -55,9 +55,9 @@ Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         Torsten Duwe <duwe@suse.de>, Petr Tesarik <ptesarik@suse.cz>,
         Nicolai Stange <nstange@suse.de>
-Subject: [RFC PATCH 08/41] random: introduce __credit_entropy_bits_fast() for hot paths
-Date:   Mon, 21 Sep 2020 09:58:24 +0200
-Message-Id: <20200921075857.4424-9-nstange@suse.de>
+Subject: [RFC PATCH 06/41] random: factor the exponential approximation in credit_entropy_bits() out
+Date:   Mon, 21 Sep 2020 09:58:22 +0200
+Message-Id: <20200921075857.4424-7-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200921075857.4424-1-nstange@suse.de>
 References: <20200921075857.4424-1-nstange@suse.de>
@@ -67,143 +67,136 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When transferring entropy from the fast_pool into the global input_pool
-from add_interrupt_randomness(), there are at least two atomic operations
-involved: one when taking the input_pool's spinlock for the actual mixing
-and another one in the cmpxchg loop in credit_entropy_bits() for
-updating the pool's ->entropy_count. Because cmpxchg is potentially costly,
-it would be nice if it could be avoided.
+In the course of calculating the actual amount of new entropy to credit,
+credit_entropy_bits() applies a linear approximation to
+exp(-nbits/pool_size)) (neglecting scaling factors in the exponent for
+the sake of simplicity).
 
-As said, the input_pool's spinlock is taken anyway, and I see no reason
-why its scope should not be extended to protect ->entropy_count as well.
-Performance considerations set aside, this will also facilitate future
-changes introducing additional fields to input_pool which will also have to
-get updated atomically from the consumer/producer sides.
+In order to limit approximation errors for large nbits, nbits is divided
+into chunks of maximum value pool_size/2 each and said approximation is
+applied to these individually in a loop. That loop has a theoretic upper
+bound of 2*log2(pool_size), which, with the given pool_size of 128 * 32
+bits, equals 24.
 
-The actual move to extend the spinlock's scope to cover ->entropy_count
-will be the subject of a future patch. Prepare for that by putting
-a limit on the work to be done with the lock being held.
+However, in practice nbits hardly ever exceeds values as a large as
+pool_size/2 == 2048, especially not when called from interrupt context,
+i.e. from add_interrupt_randomness() and alike. Thus, imposing a limit of
+one single iteration in these contexts would yield a good guarantee with
+respect to runtime while not losing any entropy.
 
-In order to avoid releasing and regrabbing from hot producer paths, they'll
-keep the lock when executing those calculations in pool_entropy_delta().
-The loop found in the latter has a theoretical upper bound of
-2 * log2(pool_size) == 24 iterations. However, as all entropy increments
-awarded from the interrupt path are less than pool_size/2 in magnitude,
-it is safe to enforce a guaranteed limit of one on the iteration count
-by setting pool_entropy_delta()'s 'fast' parameter.
+In preparation to enabling that, move the approximation code in
+credit_entropy_bits() into a separate function, pool_entropy_delta().
+Based on the initial pool entropy count and the number of new entropy bits
+to credit, it calculates and returns a (positive) delta to add to the
+former. In case the 'fast' parameter is set to true, the calculation
+will be terminated after the first iteration, effectively capping the input
+nbits to one half of the pool size.
 
-Introduce __credit_entropy_bits_fast() doing exactly that. Currently
-it resembles the behaviour from credit_entropy_bits() except that
-- pool_entropy_delta() gets called with 'fast' set to true and
-- that __credit_entropy_bits_fast() returns a bool indicating whether
-  the caller should reseed the primary_crng.
-
-Note that unlike it's the case with credit_entropy_bits(), the reseeding
-won't be possible from within __credit_entropy_bits_fast() anymore once it
-actually gets invoked with the pool lock being held in the future.
-
-There is no functional change.
+There is no functional change; callers with 'fast' set to true will be
+introduced in a future patch.
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- drivers/char/random.c | 49 ++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 46 insertions(+), 3 deletions(-)
+ drivers/char/random.c | 53 ++++++++++++++++++++++++++++++-------------
+ 1 file changed, 37 insertions(+), 16 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 08caa7a691a5..d9e4dd27d45d 100644
+index 6adac462aa0d..15dd22d74029 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -714,6 +714,39 @@ static unsigned int pool_entropy_delta(struct entropy_store *r,
- 	return entropy_count - base_entropy_count;
+@@ -366,7 +366,7 @@
+  * denominated in units of 1/8th bits.
+  *
+  * 2*(ENTROPY_SHIFT + poolbitshift) must <= 31, or the multiply in
+- * credit_entropy_bits() needs to be 64 bits wide.
++ * pool_entropy_delta() needs to be 64 bits wide.
+  */
+ #define ENTROPY_SHIFT 3
+ #define ENTROPY_BITS(r) ((r)->entropy_count >> ENTROPY_SHIFT)
+@@ -654,22 +654,24 @@ static void process_random_ready_list(void)
  }
  
+ /*
+- * Credit the entropy store with n bits of entropy.
+- * Use credit_entropy_bits_safe() if the value comes from userspace
+- * or otherwise should be checked for extreme values.
++ * Based on the pool's current entropy fill level, specified as
++ * base_entropy_count, and the number of new entropy bits to add,
++ * return the amount of new entropy to credit. If the 'fast'
++ * parameter is set to true, the calculation will be guaranteed to
++ * terminate quickly, but this comes at the expense of capping
++ * nbits to one half of the pool size.
+  */
+-static void credit_entropy_bits(struct entropy_store *r, int nbits)
++static unsigned int pool_entropy_delta(struct entropy_store *r,
++				       int base_entropy_count,
++				       int nbits, bool fast)
+ {
+-	int entropy_count, orig;
+ 	const int pool_size = r->poolinfo->poolfracbits;
++	int entropy_count = base_entropy_count;
+ 	int nfrac = nbits << ENTROPY_SHIFT;
+-	int pnfrac;
+ 
+ 	if (!nbits)
+-		return;
++		return 0;
+ 
+-retry:
+-	entropy_count = orig = READ_ONCE(r->entropy_count);
+ 	/*
+ 	 * Credit: we have to account for the possibility of
+ 	 * overwriting already present entropy.	 Even in the
+@@ -691,24 +693,43 @@ static void credit_entropy_bits(struct entropy_store *r, int nbits)
+ 	 * arbitrarily long; this limits the loop to log2(pool_size)*2
+ 	 * turns no matter how large nbits is.
+ 	 */
+-	pnfrac = nfrac;
+ 	do {
+ 		/* The +2 corresponds to the /4 in the denominator */
+ 		const int s = r->poolinfo->poolbitshift + ENTROPY_SHIFT + 2;
+-		unsigned int anfrac = min(pnfrac, pool_size/2);
++		unsigned int anfrac = min(nfrac, pool_size/2);
+ 		unsigned int add =
+ 			((pool_size - entropy_count)*anfrac*3) >> s;
+ 
+ 		entropy_count += add;
+-		pnfrac -= anfrac;
+-	} while (unlikely(entropy_count < pool_size-2 && pnfrac));
++		nfrac -= anfrac;
++	} while (unlikely(!fast && entropy_count < pool_size-2 && nfrac));
+ 
+ 	if (WARN_ON(entropy_count < 0)) {
+ 		pr_warn("negative entropy/overflow: pool %s count %d\n",
+ 			r->name, entropy_count);
+-		entropy_count = orig;
+-	} else if (entropy_count > pool_size)
++		entropy_count = base_entropy_count;
++	} else if (entropy_count > pool_size) {
+ 		entropy_count = pool_size;
++	}
++
++	return entropy_count - base_entropy_count;
++}
++
 +/*
 + * Credit the entropy store with n bits of entropy.
-+ * To be used from hot paths when it is either known that nbits is
-+ * smaller than one half of the pool size or losing anything beyond that
-+ * doesn't matter.
++ * Use credit_entropy_bits_safe() if the value comes from userspace
++ * or otherwise should be checked for extreme values.
 + */
-+static bool __credit_entropy_bits_fast(struct entropy_store *r, int nbits)
++static void credit_entropy_bits(struct entropy_store *r, int nbits)
 +{
 +	int entropy_count, orig;
 +
 +	if (!nbits)
-+		return false;
++		return;
 +
 +retry:
 +	orig = READ_ONCE(r->entropy_count);
-+	entropy_count = orig + pool_entropy_delta(r, orig,
-+						  nbits << ENTROPY_SHIFT,
-+						  true);
-+	if (cmpxchg(&r->entropy_count, orig, entropy_count) != orig)
-+		goto retry;
-+
-+	trace_credit_entropy_bits(r->name, nbits,
-+				  entropy_count >> ENTROPY_SHIFT, _RET_IP_);
-+
-+	if (unlikely(r == &input_pool && crng_init < 2)) {
-+		const int entropy_bits = entropy_count >> ENTROPY_SHIFT;
-+
-+		return (entropy_bits >= 128);
-+	}
-+
-+	return false;
-+}
-+
- /*
-  * Credit the entropy store with n bits of entropy.
-  * Use credit_entropy_bits_safe() if the value comes from userspace
-@@ -1169,6 +1202,7 @@ static void add_timer_randomness(struct timer_rand_state *state, unsigned num)
- 		unsigned num;
- 	} sample;
- 	long delta, delta2, delta3;
-+	bool reseed;
++	entropy_count = orig + pool_entropy_delta(r, orig, nbits, false);
+ 	if (cmpxchg(&r->entropy_count, orig, entropy_count) != orig)
+ 		goto retry;
  
- 	sample.jiffies = jiffies;
- 	sample.cycles = random_get_entropy();
-@@ -1206,7 +1240,9 @@ static void add_timer_randomness(struct timer_rand_state *state, unsigned num)
- 	 * Round down by 1 bit on general principles,
- 	 * and limit entropy estimate to 12 bits.
- 	 */
--	credit_entropy_bits(r, min_t(int, fls(delta>>1), 11));
-+	reseed = __credit_entropy_bits_fast(r, min_t(int, fls(delta>>1), 11));
-+	if (reseed)
-+		crng_reseed(&primary_crng, r);
- }
- 
- void add_input_randomness(unsigned int type, unsigned int code,
-@@ -1274,6 +1310,7 @@ void add_interrupt_randomness(int irq, int irq_flags)
- 	__u64			ip;
- 	unsigned long		seed;
- 	int			credit = 0;
-+	bool			reseed;
- 
- 	if (cycles == 0)
- 		cycles = get_reg(fast_pool, regs);
-@@ -1326,7 +1363,9 @@ void add_interrupt_randomness(int irq, int irq_flags)
- 	fast_pool->count = 0;
- 
- 	/* award one bit for the contents of the fast pool */
--	credit_entropy_bits(r, credit + 1);
-+	reseed = __credit_entropy_bits_fast(r, credit + 1);
-+	if (reseed)
-+		crng_reseed(&primary_crng, r);
- }
- EXPORT_SYMBOL_GPL(add_interrupt_randomness);
- 
-@@ -1599,7 +1638,11 @@ EXPORT_SYMBOL(get_random_bytes);
-  */
- static void entropy_timer(struct timer_list *t)
- {
--	credit_entropy_bits(&input_pool, 1);
-+	bool reseed;
-+
-+	reseed = __credit_entropy_bits_fast(&input_pool, 1);
-+	if (reseed)
-+		crng_reseed(&primary_crng, &input_pool);
- }
- 
- /*
 -- 
 2.26.2
 
