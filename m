@@ -7,23 +7,23 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9301BC43464
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA005C43466
 	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6BA8E214F1
+	by mail.kernel.org (Postfix) with ESMTP id 9F3CE2158C
 	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726628AbgIUH7u (ORCPT
+        id S1726623AbgIUH7u (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Mon, 21 Sep 2020 03:59:50 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56802 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:57144 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726420AbgIUH71 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726540AbgIUH71 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 21 Sep 2020 03:59:27 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 80FADB51D;
-        Mon, 21 Sep 2020 08:00:02 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id E0FA9B516;
+        Mon, 21 Sep 2020 08:00:01 +0000 (UTC)
 From:   Nicolai Stange <nstange@suse.de>
 To:     "Theodore Y. Ts'o" <tytso@mit.edu>
 Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
@@ -55,9 +55,9 @@ Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         Torsten Duwe <duwe@suse.de>, Petr Tesarik <ptesarik@suse.cz>,
         Nicolai Stange <nstange@suse.de>
-Subject: [RFC PATCH 23/41] random: don't award entropy to non-SP800-90B arch RNGs in FIPS mode
-Date:   Mon, 21 Sep 2020 09:58:39 +0200
-Message-Id: <20200921075857.4424-24-nstange@suse.de>
+Subject: [RFC PATCH 22/41] random: introduce arch_has_sp800_90b_random_seed()
+Date:   Mon, 21 Sep 2020 09:58:38 +0200
+Message-Id: <20200921075857.4424-23-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200921075857.4424-1-nstange@suse.de>
 References: <20200921075857.4424-1-nstange@suse.de>
@@ -67,57 +67,136 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-It is required by SP800-90C that only SP800-90B compliant entropy sources
-may be used for seeding DRBGs.
+NIST SP800-90C allows for the combination of multiple SP800-90B entropy
+sources by concatenating their individual outputs together, c.f.
+sec. 5.3.4 and also the constructions in 10.3.1 from the second draft.
 
-Don't award any entropy to arch_get_random_long() if fips_enabled is
-true. Don't award any entropy to arch_get_random_seed_long() if
-fips_enabled && !arch_has_sp800_90b_random_seed().
+We're already doing exactly that when reseeding the primary CRNG from the
+input pool and possibly from arch_get_random_seed_long() +
+arch_get_random_long(). The input pool will be moved gradually towards
+SP800-90B compliance with future patches. Provide a means for the random
+driver to check whether arch_get_random_seed_long() is also a full entropy
+source conforming to NIST SP800-90B.
 
-This is achieved by making min_crng_reseed_pool_entropy() return the
-full minimum seed size if fips_enabled && !arch_has_sp800_90b_random_seed()
-is true. This prevents crng_reseed() from attempting to make up for any
-lack of entropy in the input_pool by reading from the architectural RNG.
+Note that I couldn't find any explicit statement in the specs that would
+allow for using NRBGs as defined by SP800-90C as a drop-in replacement for
+"entropy sources" in the sense of SP800-90B. In particular there is no
+statement that NRBGs may be combined with other SP800-90B entropy sources.
+However, NRBGs always provide stronger guarantees in that they provide
+certain protection against silent failure of backing entropy sources. Thus,
+I think it would be perfectly acceptable to combine SP800-90C NRBGs, i.e.
+ARMv8's RNDRRS or x86's RDSEED with other entropy sources.
 
-Make crng_reseed() bail out in FIPS mode if the input_pool provides
-insufficient entropy and any of the arch_get_random_seed_long()
-invocations fails: there's no statement regarding SP900-90B compliance of
-arch_get_random_long() and so it can't be used as a backup.
+Introduce arch_has_sp800_90b_random_seed().
+- Make the generic stub return false.
+- Make the arm64 variant return false as well: the current
+  arch_get_random_seed_long() is based on RNDR, not RNDRRS.
+- Make it return false on powerpc and s390, too.
+- Let arch_has_sp800_90b_random_seed() return true on x86 if the CPU has
+  RDSEED support.
+Yes, I know, one change per patch, but this is part of a RFC series.
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- drivers/char/random.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/archrandom.h   | 10 +++++++++-
+ arch/powerpc/include/asm/archrandom.h |  5 +++++
+ arch/s390/include/asm/archrandom.h    |  5 +++++
+ arch/x86/include/asm/archrandom.h     |  8 ++++++++
+ include/linux/random.h                |  9 +++++++++
+ 5 files changed, 36 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 7712b4464ef5..aaddee4e4ab1 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1195,9 +1195,13 @@ static int min_crng_reseed_pool_entropy(void)
- 	 * up to one half of the minimum entropy needed for
- 	 * reseeding. That way it won't dominate the entropy
- 	 * collected by other means at input_pool.
-+	 * If in FIPS mode, restrict this to SP900-90B compliant
-+	 * architectural RNGs.
+diff --git a/arch/arm64/include/asm/archrandom.h b/arch/arm64/include/asm/archrandom.h
+index 055d18713db7..db7813c79b3e 100644
+--- a/arch/arm64/include/asm/archrandom.h
++++ b/arch/arm64/include/asm/archrandom.h
+@@ -42,7 +42,15 @@ static inline bool arch_has_random_seed(void)
  	 */
--	if (arch_has_random() || arch_has_random_seed())
-+	if (arch_has_sp800_90b_random_seed() ||
-+	    (!fips_enabled && (arch_has_random() || arch_has_random_seed()))) {
- 		return 8;
-+	}
- 	return 16;
+ 	return cpus_have_const_cap(ARM64_HAS_RNG);
+ }
+-
++static inine bool arch_has_sp800_90b_random_seed(void)
++{
++	/*
++	 * Section K.12.1 from the Arm Architecture Reference Manual
++	 * Armv8" (DDI0487F) sounds like RNDRRS could qualify as a
++	 * NIST SP800-90C NRBG, but we're currently using RNDR only.
++	 */
++	return false;
++}
+ static inline bool __must_check arch_get_random_long(unsigned long *v)
+ {
+ 	return false;
+diff --git a/arch/powerpc/include/asm/archrandom.h b/arch/powerpc/include/asm/archrandom.h
+index 47c2d74e7244..ba0f816d9750 100644
+--- a/arch/powerpc/include/asm/archrandom.h
++++ b/arch/powerpc/include/asm/archrandom.h
+@@ -16,6 +16,11 @@ static inline bool arch_has_random_seed(void)
+ 	return ppc_md.get_random_seed;
  }
  
-@@ -1233,7 +1237,8 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
- 	for (i = 0; i < 8; i++) {
- 		unsigned long	rv;
- 		if (!arch_get_random_seed_long(&rv) &&
--		    !arch_get_random_long(&rv)) {
-+		    ((arch_randomness_required && fips_enabled) ||
-+		     !arch_get_random_long(&rv))) {
- 			if (arch_randomness_required) {
- 				/*
- 				 * The input_pool failed to provide
++static inline bool arch_has_sp800_90b_random_seed(void)
++{
++	return false;
++}
++
+ static inline bool __must_check arch_get_random_long(unsigned long *v)
+ {
+ 	return false;
+diff --git a/arch/s390/include/asm/archrandom.h b/arch/s390/include/asm/archrandom.h
+index 18973845634c..1ee7f9e4b255 100644
+--- a/arch/s390/include/asm/archrandom.h
++++ b/arch/s390/include/asm/archrandom.h
+@@ -31,6 +31,11 @@ static inline bool arch_has_random_seed(void)
+ 	return static_branch_likely(&s390_arch_random_available);
+ }
+ 
++static inline bool arch_has_sp800_90b_random_seed(void)
++{
++	return false;
++}
++
+ static inline bool __must_check arch_get_random_long(unsigned long *v)
+ {
+ 	return false;
+diff --git a/arch/x86/include/asm/archrandom.h b/arch/x86/include/asm/archrandom.h
+index 030f46c9e310..94d4ee8c9e45 100644
+--- a/arch/x86/include/asm/archrandom.h
++++ b/arch/x86/include/asm/archrandom.h
+@@ -80,6 +80,14 @@ static inline bool arch_has_random_seed(void)
+ 	return static_cpu_has(X86_FEATURE_RDSEED);
+ }
+ 
++static inline bool arch_has_sp800_90b_random_seed(void)
++{
++	/*
++	 * According to the Intel SDM, rdseed is NIST SP800-90B
++	 * compliant.
++	 */
++	return arch_has_random_seed();
++}
+ static inline bool __must_check arch_get_random_long(unsigned long *v)
+ {
+ 	return arch_has_random() ? rdrand_long(v) : false;
+diff --git a/include/linux/random.h b/include/linux/random.h
+index d4653422a0c7..933f5daa4a1c 100644
+--- a/include/linux/random.h
++++ b/include/linux/random.h
+@@ -128,6 +128,15 @@ static inline bool arch_has_random_seed(void)
+ {
+ 	return false;
+ }
++/*
++ * Whether or not arch_get_random_seed_long() qualifies as a NIST
++ * SP800-90B compliant entropy source providing full entropy output.
++ * NIST SP800-90C NRBG's are probably fine, too.
++ */
++static inline bool arch_has_sp800_90b_random_seed(void)
++{
++	return false;
++}
+ static inline bool __must_check arch_get_random_long(unsigned long *v)
+ {
+ 	return false;
 -- 
 2.26.2
 
