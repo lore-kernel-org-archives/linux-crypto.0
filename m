@@ -7,22 +7,22 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16987C43465
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26B5CC43465
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:02:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E223A20BED
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:01:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3D2F20EDD
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:01:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726497AbgIUIBw (ORCPT
+        id S1726442AbgIUH7R (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Sep 2020 04:01:52 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56606 "EHLO mx2.suse.de"
+        Mon, 21 Sep 2020 03:59:17 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56334 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726402AbgIUH7S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Sep 2020 03:59:18 -0400
+        id S1726211AbgIUH7R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Sep 2020 03:59:17 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 6CE26B500;
+        by mx2.suse.de (Postfix) with ESMTP id 29F86B340;
         Mon, 21 Sep 2020 07:59:51 +0000 (UTC)
 From:   Nicolai Stange <nstange@suse.de>
 To:     "Theodore Y. Ts'o" <tytso@mit.edu>
@@ -55,9 +55,9 @@ Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         Torsten Duwe <duwe@suse.de>, Petr Tesarik <ptesarik@suse.cz>,
         Nicolai Stange <nstange@suse.de>
-Subject: [RFC PATCH 04/41] random: drop 'reserved' parameter from extract_entropy()
-Date:   Mon, 21 Sep 2020 09:58:20 +0200
-Message-Id: <20200921075857.4424-5-nstange@suse.de>
+Subject: [RFC PATCH 02/41] random: remove dead code for nbits < 0 in credit_entropy_bits()
+Date:   Mon, 21 Sep 2020 09:58:18 +0200
+Message-Id: <20200921075857.4424-3-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200921075857.4424-1-nstange@suse.de>
 References: <20200921075857.4424-1-nstange@suse.de>
@@ -67,83 +67,115 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since commit 43d8a72cd985 ("random: remove variable limit") all call
-sites of extract_entropy() pass in zero for the 'reserved' argument
-and the corresponding code in account() is effectively dead.
+The nbits argument to credit_entropy_bits() is never negative and
+the branch handling it is dead code. Remove it.
 
-Remove it and the drop the now unused 'reserved' argument from
-extract_entropy() as well as from account() called therefrom.
+The code for handling the regular nbits > 0 case used to live in the
+corresponding else branch, but has now been lifted up to function scope.
+Move the declaration of 'pnfrac' to the function prologue in order to
+adhere to C99 rules. Likewise, move the declaration of 's' into the
+body loop, the only scope it's referenced from.
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- drivers/char/random.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ drivers/char/random.c | 69 ++++++++++++++++++++-----------------------
+ 1 file changed, 32 insertions(+), 37 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 14c39608cc17..35e381be20fe 100644
+index 0580968fd28c..c4b7bdbd460e 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -506,7 +506,7 @@ struct entropy_store {
- };
- 
- static ssize_t extract_entropy(struct entropy_store *r, void *buf,
--			       size_t nbytes, int min, int rsvd);
-+			       size_t nbytes, int min);
- static ssize_t _extract_entropy(struct entropy_store *r, void *buf,
- 				size_t nbytes, int fips);
- 
-@@ -944,7 +944,7 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
- 	} buf;
- 
- 	if (r) {
--		num = extract_entropy(r, &buf, 32, 16, 0);
-+		num = extract_entropy(r, &buf, 32, 16);
- 		if (num == 0)
- 			return;
- 	} else {
-@@ -1330,8 +1330,7 @@ EXPORT_SYMBOL_GPL(add_disk_randomness);
-  * This function decides how many bytes to actually take from the
-  * given pool, and also debits the entropy count accordingly.
-  */
--static size_t account(struct entropy_store *r, size_t nbytes, int min,
--		      int reserved)
-+static size_t account(struct entropy_store *r, size_t nbytes, int min)
- {
- 	int entropy_count, orig, have_bytes;
- 	size_t ibytes, nfrac;
-@@ -1345,8 +1344,6 @@ static size_t account(struct entropy_store *r, size_t nbytes, int min,
- 	/* never pull more than available */
- 	have_bytes = entropy_count >> (ENTROPY_SHIFT + 3);
- 
--	if ((have_bytes -= reserved) < 0)
--		have_bytes = 0;
- 	ibytes = min_t(size_t, ibytes, have_bytes);
- 	if (ibytes < min)
- 		ibytes = 0;
-@@ -1469,12 +1466,10 @@ static ssize_t _extract_entropy(struct entropy_store *r, void *buf,
-  * returns it in a buffer.
-  *
-  * The min parameter specifies the minimum amount we can pull before
-- * failing to avoid races that defeat catastrophic reseeding while the
-- * reserved parameter indicates how much entropy we must leave in the
-- * pool after each pull to avoid starving other readers.
-+ * failing to avoid races that defeat catastrophic reseeding.
-  */
- static ssize_t extract_entropy(struct entropy_store *r, void *buf,
--				 size_t nbytes, int min, int reserved)
-+				 size_t nbytes, int min)
- {
- 	__u8 tmp[EXTRACT_SIZE];
- 	unsigned long flags;
-@@ -1495,7 +1490,7 @@ static ssize_t extract_entropy(struct entropy_store *r, void *buf,
- 	}
- 
- 	trace_extract_entropy(r->name, nbytes, ENTROPY_BITS(r), _RET_IP_);
--	nbytes = account(r, nbytes, min, reserved);
-+	nbytes = account(r, nbytes, min);
- 
- 	return _extract_entropy(r, buf, nbytes, fips_enabled);
+@@ -654,7 +654,7 @@ static void process_random_ready_list(void)
  }
+ 
+ /*
+- * Credit (or debit) the entropy store with n bits of entropy.
++ * Credit the entropy store with n bits of entropy.
+  * Use credit_entropy_bits_safe() if the value comes from userspace
+  * or otherwise should be checked for extreme values.
+  */
+@@ -663,50 +663,45 @@ static void credit_entropy_bits(struct entropy_store *r, int nbits)
+ 	int entropy_count, orig;
+ 	const int pool_size = r->poolinfo->poolfracbits;
+ 	int nfrac = nbits << ENTROPY_SHIFT;
++	int pnfrac;
+ 
+ 	if (!nbits)
+ 		return;
+ 
+ retry:
+ 	entropy_count = orig = READ_ONCE(r->entropy_count);
+-	if (nfrac < 0) {
+-		/* Debit */
+-		entropy_count += nfrac;
+-	} else {
+-		/*
+-		 * Credit: we have to account for the possibility of
+-		 * overwriting already present entropy.	 Even in the
+-		 * ideal case of pure Shannon entropy, new contributions
+-		 * approach the full value asymptotically:
+-		 *
+-		 * entropy <- entropy + (pool_size - entropy) *
+-		 *	(1 - exp(-add_entropy/pool_size))
+-		 *
+-		 * For add_entropy <= pool_size/2 then
+-		 * (1 - exp(-add_entropy/pool_size)) >=
+-		 *    (add_entropy/pool_size)*0.7869...
+-		 * so we can approximate the exponential with
+-		 * 3/4*add_entropy/pool_size and still be on the
+-		 * safe side by adding at most pool_size/2 at a time.
+-		 *
+-		 * The use of pool_size-2 in the while statement is to
+-		 * prevent rounding artifacts from making the loop
+-		 * arbitrarily long; this limits the loop to log2(pool_size)*2
+-		 * turns no matter how large nbits is.
+-		 */
+-		int pnfrac = nfrac;
+-		const int s = r->poolinfo->poolbitshift + ENTROPY_SHIFT + 2;
++	/*
++	 * Credit: we have to account for the possibility of
++	 * overwriting already present entropy.	 Even in the
++	 * ideal case of pure Shannon entropy, new contributions
++	 * approach the full value asymptotically:
++	 *
++	 * entropy <- entropy + (pool_size - entropy) *
++	 *	(1 - exp(-add_entropy/pool_size))
++	 *
++	 * For add_entropy <= pool_size/2 then
++	 * (1 - exp(-add_entropy/pool_size)) >=
++	 *    (add_entropy/pool_size)*0.7869...
++	 * so we can approximate the exponential with
++	 * 3/4*add_entropy/pool_size and still be on the
++	 * safe side by adding at most pool_size/2 at a time.
++	 *
++	 * The use of pool_size-2 in the while statement is to
++	 * prevent rounding artifacts from making the loop
++	 * arbitrarily long; this limits the loop to log2(pool_size)*2
++	 * turns no matter how large nbits is.
++	 */
++	pnfrac = nfrac;
++	do {
+ 		/* The +2 corresponds to the /4 in the denominator */
++		const int s = r->poolinfo->poolbitshift + ENTROPY_SHIFT + 2;
++		unsigned int anfrac = min(pnfrac, pool_size/2);
++		unsigned int add =
++			((pool_size - entropy_count)*anfrac*3) >> s;
+ 
+-		do {
+-			unsigned int anfrac = min(pnfrac, pool_size/2);
+-			unsigned int add =
+-				((pool_size - entropy_count)*anfrac*3) >> s;
+-
+-			entropy_count += add;
+-			pnfrac -= anfrac;
+-		} while (unlikely(entropy_count < pool_size-2 && pnfrac));
+-	}
++		entropy_count += add;
++		pnfrac -= anfrac;
++	} while (unlikely(entropy_count < pool_size-2 && pnfrac));
+ 
+ 	if (WARN_ON(entropy_count < 0)) {
+ 		pr_warn("negative entropy/overflow: pool %s count %d\n",
 -- 
 2.26.2
 
