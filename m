@@ -4,26 +4,26 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BBD1C43464
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 07:59:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9301BC43464
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D5FEF20874
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 07:59:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BA8E214F1
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726630AbgIUH7v (ORCPT
+        id S1726628AbgIUH7u (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Sep 2020 03:59:51 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57702 "EHLO mx2.suse.de"
+        Mon, 21 Sep 2020 03:59:50 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56802 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726532AbgIUH71 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726420AbgIUH71 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 21 Sep 2020 03:59:27 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id BB3A9B51A;
-        Mon, 21 Sep 2020 08:00:00 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 80FADB51D;
+        Mon, 21 Sep 2020 08:00:02 +0000 (UTC)
 From:   Nicolai Stange <nstange@suse.de>
 To:     "Theodore Y. Ts'o" <tytso@mit.edu>
 Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
@@ -55,9 +55,9 @@ Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         Torsten Duwe <duwe@suse.de>, Petr Tesarik <ptesarik@suse.cz>,
         Nicolai Stange <nstange@suse.de>
-Subject: [RFC PATCH 20/41] random: provide min_crng_reseed_pool_entropy()
-Date:   Mon, 21 Sep 2020 09:58:36 +0200
-Message-Id: <20200921075857.4424-21-nstange@suse.de>
+Subject: [RFC PATCH 23/41] random: don't award entropy to non-SP800-90B arch RNGs in FIPS mode
+Date:   Mon, 21 Sep 2020 09:58:39 +0200
+Message-Id: <20200921075857.4424-24-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200921075857.4424-1-nstange@suse.de>
 References: <20200921075857.4424-1-nstange@suse.de>
@@ -67,88 +67,57 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently, the current minimum entropy required from the input_pool for
-reseeding the primary_crng() is 16 bytes == 128 bits. A future patch will
-introduce support for obtaining up to a certain fraction thereof from the
-architecture's RNG, if available.
+It is required by SP800-90C that only SP800-90B compliant entropy sources
+may be used for seeding DRBGs.
 
-This will effectively lower the minimum input_pool ->entropy_count required
-for a successful reseed of the primary_crng.
+Don't award any entropy to arch_get_random_long() if fips_enabled is
+true. Don't award any entropy to arch_get_random_seed_long() if
+fips_enabled && !arch_has_sp800_90b_random_seed().
 
-As this value is used at a couple of places, namely crng_reseed() itself
-as well as dispatch_queued_entropy() and __dispatch_queued_entropy_fast(),
-introduce min_crng_reseed_pool_entropy() to ensure consistency among
-these.
+This is achieved by making min_crng_reseed_pool_entropy() return the
+full minimum seed size if fips_enabled && !arch_has_sp800_90b_random_seed()
+is true. This prevents crng_reseed() from attempting to make up for any
+lack of entropy in the input_pool by reading from the architectural RNG.
 
-min_crng_reseed_pool_entropy() returns the minimum amount of entropy in
-bytes required from the input_pool for a successful reseed of the
-primary_crng. Currently it's hardcoded to 16.
-
-Use it in place of the hardcoded constants in crng_reseed(),
-dispatch_queued_entropy() and __dispatch_queued_entropy_fast().
+Make crng_reseed() bail out in FIPS mode if the input_pool provides
+insufficient entropy and any of the arch_get_random_seed_long()
+invocations fails: there's no statement regarding SP900-90B compliance of
+arch_get_random_long() and so it can't be used as a backup.
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- drivers/char/random.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+ drivers/char/random.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 1945249597e0..424de1565927 100644
+index 7712b4464ef5..aaddee4e4ab1 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -516,6 +516,8 @@ static ssize_t extract_entropy(struct entropy_store *r, void *buf,
- static ssize_t _extract_entropy(struct entropy_store *r, void *buf,
- 				size_t nbytes, int fips);
- 
-+static int min_crng_reseed_pool_entropy(void);
-+
- static void crng_reseed(struct crng_state *crng, struct entropy_store *r);
- static __u32 input_pool_data[INPUT_POOL_WORDS] __latent_entropy;
- 
-@@ -916,7 +918,7 @@ static bool __dispatch_queued_entropy_fast(struct entropy_store *r,
- 	if (unlikely(r == &input_pool && crng_init < 2)) {
- 		const int entropy_bits = entropy_count >> ENTROPY_SHIFT;
- 
--		return (entropy_bits >= 128);
-+		return (entropy_bits >= min_crng_reseed_pool_entropy() * 8);
- 	}
- 
- 	return false;
-@@ -965,7 +967,7 @@ static void dispatch_queued_entropy(struct entropy_store *r,
- 		if (crng_init < 2) {
- 			const int entropy_bits = entropy_count >> ENTROPY_SHIFT;
- 
--			if (entropy_bits < 128)
-+			if (entropy_bits < min_crng_reseed_pool_entropy() * 8)
- 				return;
- 			crng_reseed(&primary_crng, r);
- 		}
-@@ -1182,6 +1184,15 @@ static int crng_slow_load(const char *cp, size_t len)
- 	return 1;
+@@ -1195,9 +1195,13 @@ static int min_crng_reseed_pool_entropy(void)
+ 	 * up to one half of the minimum entropy needed for
+ 	 * reseeding. That way it won't dominate the entropy
+ 	 * collected by other means at input_pool.
++	 * If in FIPS mode, restrict this to SP900-90B compliant
++	 * architectural RNGs.
+ 	 */
+-	if (arch_has_random() || arch_has_random_seed())
++	if (arch_has_sp800_90b_random_seed() ||
++	    (!fips_enabled && (arch_has_random() || arch_has_random_seed()))) {
+ 		return 8;
++	}
+ 	return 16;
  }
  
-+/*
-+ * Minimum amount of entropy in bytes required from the input_pool for
-+ * a successful reseed of the primary_crng.
-+ */
-+static int min_crng_reseed_pool_entropy(void)
-+{
-+	return 16;
-+}
-+
- static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
- {
- 	unsigned long	flags;
-@@ -1192,7 +1203,8 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
- 	} buf;
- 
- 	if (r) {
--		num = extract_entropy(r, &buf, 32, 16);
-+		num = extract_entropy(r, &buf, 32,
-+				      min_crng_reseed_pool_entropy());
- 		if (num == 0)
- 			return;
- 	} else {
+@@ -1233,7 +1237,8 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
+ 	for (i = 0; i < 8; i++) {
+ 		unsigned long	rv;
+ 		if (!arch_get_random_seed_long(&rv) &&
+-		    !arch_get_random_long(&rv)) {
++		    ((arch_randomness_required && fips_enabled) ||
++		     !arch_get_random_long(&rv))) {
+ 			if (arch_randomness_required) {
+ 				/*
+ 				 * The input_pool failed to provide
 -- 
 2.26.2
 
