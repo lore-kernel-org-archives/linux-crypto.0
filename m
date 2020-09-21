@@ -7,23 +7,23 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD3C1C43464
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:01:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 894DEC43463
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:01:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA0BA20EDD
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:01:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62C6F20BED
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:01:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726790AbgIUIBH (ORCPT
+        id S1726796AbgIUIBI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Sep 2020 04:01:07 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57622 "EHLO mx2.suse.de"
+        Mon, 21 Sep 2020 04:01:08 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57940 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726584AbgIUH7j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726592AbgIUH7j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 21 Sep 2020 03:59:39 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 0A838B530;
-        Mon, 21 Sep 2020 08:00:10 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id E0F6EB533;
+        Mon, 21 Sep 2020 08:00:12 +0000 (UTC)
 From:   Nicolai Stange <nstange@suse.de>
 To:     "Theodore Y. Ts'o" <tytso@mit.edu>
 Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
@@ -55,9 +55,9 @@ Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         Torsten Duwe <duwe@suse.de>, Petr Tesarik <ptesarik@suse.cz>,
         Nicolai Stange <nstange@suse.de>
-Subject: [RFC PATCH 36/41] random: optimize the APT's presearch
-Date:   Mon, 21 Sep 2020 09:58:52 +0200
-Message-Id: <20200921075857.4424-37-nstange@suse.de>
+Subject: [RFC PATCH 41/41] random: lower per-IRQ entropy estimate upon health test failure
+Date:   Mon, 21 Sep 2020 09:58:57 +0200
+Message-Id: <20200921075857.4424-42-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200921075857.4424-1-nstange@suse.de>
 References: <20200921075857.4424-1-nstange@suse.de>
@@ -67,168 +67,129 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Adaptive Proportion Test's presearch phase is supposed to determine the
-sample value occurring more than half of the times among the first n1=7
-events in a sequence, if there is any such one.
+Currently, if fips_enabled is set, a per-IRQ min-entropy estimate of
+either 1 bit or 1/8 bit is assumed, depending on whether a high resolution
+get_cycles() is available or not. The statistical NIST SP800-90B startup
+health tests are run on a certain amount of noise samples and are intended
+to reject in case this hypothesis turns out to be wrong, i.e. if the
+actual min-entropy is smaller. As long as the startup tests haven't
+finished, entropy dispatch and thus, the initial crng seeding, is
+inhibited. On test failure, the startup tests would restart themselves
+from the beginning.
 
-To this end, it maintains eight counters at struct health_test for counting
-the numbers of ones observed at each of the eight resp. bit positions
-within the sample values' octets. The idea is that if any sample value had
-been encountered more than half of the time, it would dominate all these
-counters and its value could be restored unambiguously from them.
+It follows that in case a system's actual per-IRQ min-entropy is smaller
+than the more or less arbitrarily assessed 1 bit or 1/8 bit resp., there
+will be a good chance that the initial crng seed will never complete.
+AFAICT, such a situation could potentially prevent certain userspace
+daemons like OpenSSH from loading.
 
-For better reviewability, this had been implemented in the most
-straightforward way:
-- the counters had been represented as an array of eight u8s at struct
-  health_test and
-- both, the counter updating as well as the candidate extracion code had
-  been implemented by means of a loop over the eight bit positions.
+In order to still be able to make any progress, make
+add_interrupt_randomness() lower the per-IRQ min-entropy by one half upon
+each health test failure, but only until the minimum supported value of
+1/64 bits has been reached. Note that health test failures will cause a
+restart of the startup health tests already and thus, a certain number of
+additional noise samples resp. IRQ events will have to get examined by the
+health tests before the initial crng seeding can take place. This number
+of fresh events required is reciprocal to the estimated per-IRQ
+min-entropy H: for the Adaptive Proportion Test (APT) it equals ~128 / H.
+It follows that this patch won't be of much help for embedded systems or
+VMs with poor IRQ rates at boot time, at least not without manual
+intervention. But there aren't many options left when fips_enabled is set.
 
-As this is all accessed from add_interrupt_randomness(), optimizations
-won't harm. In particular, using a total of eight bytes for the bit
-counters is wasteful and can be reduced to half of that, optimizing the
-size of struct health_test, which in turn is stored as part of the per-CPU
-struct fast_pool.
+With respect to NIST SP800-90B conformance, this patch enters kind of a
+gray area: NIST SP800-90B has no notion of such a dynamically adjusted
+min-entropy estimate. Instead, it is assumed that some fixed value has been
+estimated based on general principles and subsequently validated in the
+course of the certification process. However, I would argue that if a
+system had successfully passed certification for 1 bit or 1/8 bit resp. of
+estimated min-entropy per sample, it would automatically be approved for
+all smaller values as well. Had we started out with such a lower value
+passing the health tests from the beginning, the latter would never have
+complained in the first place and the system would have come up just fine.
 
-For counts up to n1=7, 3 bits would suffice. Rather than using an array of
-eight u8s, store the bit counter within an u32's eight four-bit nibbles.
+Finally, note that all statistical tests have a non-zero probability of
+false positives and so do the NIST SP800-90B health tests. In order to not
+keep the estimated per-IRQ entropy at a smaller level than necessary for
+forever after spurious health test failures, make
+add_interrupt_randomness() attempt to double it again after a certain
+number of successful health test passes at the degraded entropy level have
+been completed. This threshold should not be too small in order to avoid
+excessive entropy accounting loss due to continuously alternating between
+a too large per-IRQ entropy estimate and the next smaller value. For now,
+choose a value of five as a compromise between quick recovery and limiting
+said accounting loss.
 
-Even though it probably won't matter on average in practice, because the
-APT presearch is run only for a small fraction of all IRQ events, reduce
-the number of instructions issued from the bit counter maintenance and
-candidate extraction code as well. If nothing else, this can potentially
-reduce the maximum IRQ latency by a few cycles.
-
-Namely, make the bit counter updating code in health_apt_presearch_update()
-spread the eight bits from the input sample evenly across an u32. That is,
-the bit at position i will end up at position 4*i. This can be achieved
-within five binops and four shifts. This intermediate value can then get
-subsequently added in a single operation to the "packed" bit counters kept
-in struct health_test in order to conclude the operation.
-
-As for the final candidate extraction in health_apt_presearch_finalize(),
-remember that the i'th counter needs to get compared against
-n1 / 2 = 7 / 2 in order to restore the i'th bit from the resulting
-candidate value. The condition that one such bit counter is >= 4 is
-equivalent to testing its bit at the 2nd position, counted from zero.
-Thus, (->apt_presearch_bit_counters & 0x44444444) >> 2
-will yield a value where the LSB from the i'th nibble, equals the i'th bit
-from the result and everything else is unset. The final result can then be
-obtained by "shrinking" this intermediate representation back into an u8.
-In total, the candidate extraction can be achieved within a sequence of
-seven binops and six shifts.
+So, introduce a new member ->good_tests to struct fast_pool for keeping
+track of the number of successfult health test passes. Make
+add_interrupt_randomness() increment it upon successful healh test
+completion and reset it to zero on failures. Make
+add_interrupt_randomness() double the current min-entropy estimate and
+restart the startup health in case ->good_tests is > 4 and the entropy
+had previously been lowered.
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- drivers/char/random.c | 71 ++++++++++++++++++++++++++++++++-----------
- 1 file changed, 53 insertions(+), 18 deletions(-)
+ drivers/char/random.c | 25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 75a103f24fea..2c744d2a9b26 100644
+index bb79dcb96882..24c09ba9d7d0 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -882,7 +882,7 @@ static void discard_queued_entropy(struct entropy_store *r,
- struct health_test {
- 	unsigned short apt_event_count;
- 	union {
--		u8 apt_presearch_bit_counters[8];
-+		u32 apt_presearch_bit_counters;
- 		struct {
- 			unsigned short apt_candidate_count;
- 			u8 apt_candidate;
-@@ -904,40 +904,75 @@ enum health_result {
- 
- static void health_apt_presearch_update(struct health_test *h, u8 sample_delta)
- {
--	int i;
-+	u32 encoded;
- 
--	for (i = 0; i < 8; ++i) {
--		h->apt_presearch_bit_counters[i] = sample_delta & 0x1;
--		sample_delta >>= 1;
--	}
-+	/*
-+	 * Encode the sample octet by "widening" it into 8
-+	 * nibbles. That is, bit i from the source will be assigned to
-+	 * bit 4*i in the result. All other bits are set to zero.
-+	 */
-+	encoded = sample_delta;
-+	encoded = (encoded & 0xf) | ((encoded >> 4) << 16);
-+	encoded |= (encoded << 6);
-+	encoded |= (encoded << 3);
-+	encoded &= 0x11111111;
-+
-+	/*
-+	 * The nibbles from ->apt_presearch_bit_counters, each
-+	 * counting the number of occurences of 1s at the
-+	 * corresponding bit position, don't overflow into each other.
-+	 */
-+	BUILD_BUG_ON(ilog2(HEALTH_APT_PRESEARCH_EVENT_COUNT) >= 4);
-+	h->apt_presearch_bit_counters += encoded;
- }
- 
- static void health_apt_presearch_finalize(struct health_test *h)
- {
--	int i;
-+	u32 majority, decoded;
- 
- 	/*
- 	 * If some event octet occurred more than half of the time,
- 	 * i.e. more than HEALTH_APT_PRESEARCH_EVENT_COUNT / 2 times,
- 	 * then its value can be restored unambigiously from the eight
--	 * ->apt_presearch_bit_counters each holding the count of 1s
--	 * encountered at the corresponding bit positions.
-+	 * ->apt_presearch_bit_counters nibbles each holding the count
-+	 * of 1s encountered at the corresponding bit positions.
-+	 *
-+	 * Because HEALTH_APT_PRESEARCH_EVENT_COUNT is a power of two
-+	 * minus one, the condition
-+	 * nibble >=  HEALTH_APT_PRESEARCH_EVENT_COUNT / 2
-+	 * is true iff the nibble's bit at postion
-+	 * ilog2(HEALTH_APT_PRESEARCH_EVENT_COUNT) is set.
- 	 */
--	h->apt_candidate = 0;
--	for (i = 0; i < 8; ++i) {
--		if (h->apt_presearch_bit_counters[i] >=
--		    (HEALTH_APT_PRESEARCH_EVENT_COUNT + 1) / 2) {
--			h->apt_candidate |= 1 << i;
--		}
--	}
-+	BUILD_BUG_ON(!is_power_of_2(HEALTH_APT_PRESEARCH_EVENT_COUNT + 1));
-+#define MAJORITY_BIT ilog2(HEALTH_APT_PRESEARCH_EVENT_COUNT)
-+#define SHL_AND_OR(a, shl) ((a) | ((a) << shl))
-+#define SET_ALL_NIBBLES_TO(to) SHL_AND_OR(SHL_AND_OR(SHL_AND_OR(to, 16), 8), 4)
-+#define MAJORITY_MASK SET_ALL_NIBBLES_TO(1 << MAJORITY_BIT)
-+	majority = (h->apt_presearch_bit_counters & MAJORITY_MASK);
-+	majority >>= MAJORITY_BIT;
-+#undef MAJORITY_MASK
-+#undef SET_ALL_NIBBLES_TO
-+#undef MAJORITY_BIT
-+
-+	/*
-+	 * Reverse the encoding from health_apt_update_presearch().
-+	 * That is, "shrink" the eight nibbles back into an octet such
-+	 * that the result's i'th bit is set to the i'th nibble's LSB.
-+	 */
-+	decoded = majority;
-+	decoded |= (decoded >> 3);
-+	decoded |= (decoded >> 3);
-+	decoded |= (decoded >> 3);
-+	decoded = (((decoded >> 16) << 4) | (decoded & 0xf)) & 0xff;
-+
-+	h->apt_candidate = decoded;
- 	h->apt_candidate_count = 0;
+@@ -1126,6 +1126,7 @@ struct fast_pool {
+ 	bool		dispatch_needed : 1;
+ 	bool		discard_needed : 1;
+ 	int		event_entropy_shift;
++	unsigned int		good_tests;
+ 	struct queued_entropy	q;
+ 	struct health_test	health;
  };
+@@ -1926,9 +1927,13 @@ void add_interrupt_randomness(int irq, int irq_flags)
+ 					    cycles);
+ 		if (unlikely(health_result == health_discard)) {
+ 			/*
+-			 * Oops, something's odd. Restart the startup
+-			 * tests.
++			 * Oops, something's odd. Lower the entropy
++			 * estimate and restart the startup tests.
+ 			 */
++			fast_pool->event_entropy_shift =
++				min_t(unsigned int,
++				      fast_pool->event_entropy_shift + 1, 6);
++			fast_pool->good_tests = 0;
+ 			health_test_reset(&fast_pool->health,
+ 					  fast_pool->event_entropy_shift);
+ 		}
+@@ -1951,6 +1956,7 @@ void add_interrupt_randomness(int irq, int irq_flags)
+ 		 * entropy discard request?
+ 		 */
+ 		fast_pool->dispatch_needed = !fast_pool->discard_needed;
++		fast_pool->good_tests++;
+ 		break;
  
- static void health_apt_reset(struct health_test *h)
- {
- 	h->apt_event_count = 0;
--	memset(h->apt_presearch_bit_counters, 0,
--		sizeof(h->apt_presearch_bit_counters));
-+	h->apt_presearch_bit_counters = 0;
- }
+ 	case health_discard:
+@@ -2005,6 +2011,21 @@ void add_interrupt_randomness(int irq, int irq_flags)
+ 	if (fast_pool->dispatch_needed || health_result == health_none) {
+ 		reseed = __dispatch_queued_entropy_fast(r, q);
+ 		fast_pool->dispatch_needed = false;
++
++		/*
++		 * In case the estimated per-IRQ min-entropy had to be
++		 * lowered due to health test failure, but the lower
++		 * value has proven to withstand the tests for some
++		 * time now, try to give the next better value another
++		 * shot.
++		 */
++		if (unlikely((fast_pool->event_entropy_shift >
++			      min_irq_event_entropy_shift())) &&
++		    fast_pool->good_tests > 4) {
++			fast_pool->event_entropy_shift--;
++			health_test_reset(&fast_pool->health,
++					  fast_pool->event_entropy_shift);
++		}
+ 	} else if (fast_pool->discard_needed) {
+ 		int dummy;
  
- static enum health_result
 -- 
 2.26.2
 
