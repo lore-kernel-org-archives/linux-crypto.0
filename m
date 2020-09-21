@@ -7,23 +7,23 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E513AC43468
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C67BDC43469
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AED2D214F1
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F84920BED
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726694AbgIUIA1 (ORCPT
+        id S1726506AbgIUIA1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Mon, 21 Sep 2020 04:00:27 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57142 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:56798 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726492AbgIUH7W (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726496AbgIUH7W (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 21 Sep 2020 03:59:22 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 82889B505;
-        Mon, 21 Sep 2020 07:59:55 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 3C97DB50F;
+        Mon, 21 Sep 2020 07:59:57 +0000 (UTC)
 From:   Nicolai Stange <nstange@suse.de>
 To:     "Theodore Y. Ts'o" <tytso@mit.edu>
 Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
@@ -55,9 +55,9 @@ Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         Torsten Duwe <duwe@suse.de>, Petr Tesarik <ptesarik@suse.cz>,
         Nicolai Stange <nstange@suse.de>
-Subject: [RFC PATCH 11/41] random: convert add_timer_randomness() to queued_entropy API
-Date:   Mon, 21 Sep 2020 09:58:27 +0200
-Message-Id: <20200921075857.4424-12-nstange@suse.de>
+Subject: [RFC PATCH 14/41] random: drop __credit_entropy_bits_fast()
+Date:   Mon, 21 Sep 2020 09:58:30 +0200
+Message-Id: <20200921075857.4424-15-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200921075857.4424-1-nstange@suse.de>
 References: <20200921075857.4424-1-nstange@suse.de>
@@ -67,48 +67,40 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In an effort to drop __credit_entropy_bits_fast() in favor of the new
-__queue_entropy()/__dispatch_queued_entropy_fast() API, convert
-add_timer_randomness() from the former to the latter.
-
-There is no change in functionality at this point, because
-__credit_entropy_bits_fast() has already been reimplemented on top of the
-new API before.
+All former call sites of __credit_entropy_bits_fast() have been converted
+to the new __dispatch_queued_entropy_fast() API. Drop the now unused
+__credit_entropy_bits_fast().
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- drivers/char/random.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/char/random.c | 14 --------------
+ 1 file changed, 14 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index b91d1fc08ac5..e8c86abde901 100644
+index dfbe49fdbcf1..60ce185d7b2d 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -1400,6 +1400,7 @@ static void add_timer_randomness(struct timer_rand_state *state, unsigned num)
- 	long delta, delta2, delta3;
- 	bool reseed;
- 	unsigned long flags;
-+	struct queued_entropy q = { 0 };
+@@ -900,20 +900,6 @@ static bool __dispatch_queued_entropy_fast(struct entropy_store *r,
+ 	return false;
+ }
  
- 	sample.jiffies = jiffies;
- 	sample.cycles = random_get_entropy();
-@@ -1432,13 +1433,14 @@ static void add_timer_randomness(struct timer_rand_state *state, unsigned num)
- 
- 	r = &input_pool;
- 	spin_lock_irqsave(&r->lock, flags);
--	__mix_pool_bytes(r, &sample, sizeof(sample));
- 	/*
- 	 * delta is now minimum absolute delta.
- 	 * Round down by 1 bit on general principles,
- 	 * and limit entropy estimate to 12 bits.
- 	 */
--	reseed = __credit_entropy_bits_fast(r, min_t(int, fls(delta>>1), 11));
-+	__queue_entropy(r, &q, min_t(int, fls(delta>>1), 11) << ENTROPY_SHIFT);
-+	__mix_pool_bytes(r, &sample, sizeof(sample));
-+	reseed = __dispatch_queued_entropy_fast(r, &q);
- 	spin_unlock_irqrestore(&r->lock, flags);
- 	if (reseed)
- 		crng_reseed(&primary_crng, r);
+-/*
+- * Credit the entropy store with n bits of entropy.
+- * To be used from hot paths when it is either known that nbits is
+- * smaller than one half of the pool size or losing anything beyond that
+- * doesn't matter. Must be called with r->lock being held.
+- */
+-static bool __credit_entropy_bits_fast(struct entropy_store *r, int nbits)
+-{
+-	struct queued_entropy q = { 0 };
+-
+-	__queue_entropy(r, &q, nbits << ENTROPY_SHIFT);
+-	return __dispatch_queued_entropy_fast(r, &q);
+-}
+-
+ /*
+  * Credit the pool with previously queued entropy.
+  *
 -- 
 2.26.2
 
