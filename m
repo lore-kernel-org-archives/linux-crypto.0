@@ -2,85 +2,97 @@ Return-Path: <SRS0=YoIG=C6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88FD0C43468
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 13:14:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC0F8C43468
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 15:27:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 65126218AC
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 13:14:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B5E920874
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 15:27:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600702038;
+	bh=YJvzUB9leI7F/NEWLg34ssIzJCylohdw5W4A2beB+KQ=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:List-ID:
+	 From;
+	b=KZcQo5b+wePVw8HgeXSkqmKnzYx6uQnQZnbvpACnTZOHCRpLZgbWzkfhhVtblsQMt
+	 rxmfS43PpVJsEoLX8cl7Hl4MVssfQGSVrGaCQVX4XpeU2VFWfAPiwzWqZpg/R2D/cE
+	 GUnlXpFqr6/4bzSd9zbs20o1AaVvkgbRWGanrdig=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727494AbgIUNOX (ORCPT
+        id S1727760AbgIUP1P (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Sep 2020 09:14:23 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:58830 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727056AbgIUNJz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Sep 2020 09:09:55 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 59B12778451AA172D40D;
-        Mon, 21 Sep 2020 21:09:51 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 21 Sep 2020 21:09:45 +0800
-From:   Qinglang Miao <miaoqinglang@huawei.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Matthias Brugger <matthias.bgg@gmail.com>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>,
-        Qinglang Miao <miaoqinglang@huawei.com>
-Subject: [PATCH -next] crypto: mediatek - simplify the return expression of mtk_dfe_dse_reset()
-Date:   Mon, 21 Sep 2020 21:10:09 +0800
-Message-ID: <20200921131009.91191-1-miaoqinglang@huawei.com>
-X-Mailer: git-send-email 2.20.1
+        Mon, 21 Sep 2020 11:27:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48752 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726830AbgIUP1P (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Sep 2020 11:27:15 -0400
+Received: from paulmck-ThinkPad-P72.home (unknown [50.45.173.55])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5EA1320866;
+        Mon, 21 Sep 2020 15:27:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600702034;
+        bh=YJvzUB9leI7F/NEWLg34ssIzJCylohdw5W4A2beB+KQ=;
+        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+        b=Xw6usfJAVa7s/FL5gt11m0r8FUfpZTI8o+RYkvXOykCQ0OxZfKq2liSv9RTt38L0h
+         HfdR92BAnSC2ZN9wQk0nVEQV/2DZ+LhMIK3nwV3/23qpB+msV06KJPbxINj8CyV5EQ
+         9OOlSw0I0v7p/BuhXr15rvFMVCa0r6jeh15sAWqk=
+Received: by paulmck-ThinkPad-P72.home (Postfix, from userid 1000)
+        id 28C6435227BD; Mon, 21 Sep 2020 08:27:14 -0700 (PDT)
+Date:   Mon, 21 Sep 2020 08:27:14 -0700
+From:   "Paul E. McKenney" <paulmck@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Eric Biggers <ebiggers@kernel.org>, tytso@mit.edu,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        stable@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH] random: use correct memory barriers for crng_node_pool
+Message-ID: <20200921152714.GC29330@paulmck-ThinkPad-P72>
+Reply-To: paulmck@kernel.org
+References: <20200916233042.51634-1-ebiggers@kernel.org>
+ <20200917072644.GA5311@gondor.apana.org.au>
+ <20200917165802.GC855@sol.localdomain>
+ <20200921081939.GA4193@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200921081939.GA4193@gondor.apana.org.au>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Simplify the return expression.
+On Mon, Sep 21, 2020 at 06:19:39PM +1000, Herbert Xu wrote:
+> On Thu, Sep 17, 2020 at 09:58:02AM -0700, Eric Biggers wrote:
+> >
+> > smp_load_acquire() is obviously correct, whereas READ_ONCE() is an optimization
+> > that is difficult to tell whether it's correct or not.  For trivial data
+> > structures it's "easy" to tell.  But whenever there is a->b where b is an
+> > internal implementation detail of another kernel subsystem, the use of which
+> > could involve accesses to global or static data (for example, spin_lock()
+> > accessing lockdep stuff), a control dependency can slip in.
+> 
+> If we're going to follow this line of reasoning, surely you should
+> be converting the RCU derference first and foremost, no?
 
-Signed-off-by: Qinglang Miao <miaoqinglang@huawei.com>
----
- drivers/crypto/mediatek/mtk-platform.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+Agreed, rcu_dereference() is preferred over READ_ONCE() when reading
+RCU-protected pointers.  Much better debugging support, if nothing else.
 
-diff --git a/drivers/crypto/mediatek/mtk-platform.c b/drivers/crypto/mediatek/mtk-platform.c
-index ef4339e84..66bb2378b 100644
---- a/drivers/crypto/mediatek/mtk-platform.c
-+++ b/drivers/crypto/mediatek/mtk-platform.c
-@@ -185,8 +185,6 @@ static int mtk_dfe_dse_state_check(struct mtk_cryp *cryp)
- 
- static int mtk_dfe_dse_reset(struct mtk_cryp *cryp)
- {
--	int err;
--
- 	/* Reset DSE/DFE and correct system priorities for all rings. */
- 	writel(MTK_DFSE_THR_CTRL_RESET, cryp->base + DFE_THR_CTRL);
- 	writel(0, cryp->base + DFE_PRIO_0);
-@@ -200,11 +198,7 @@ static int mtk_dfe_dse_reset(struct mtk_cryp *cryp)
- 	writel(0, cryp->base + DSE_PRIO_2);
- 	writel(0, cryp->base + DSE_PRIO_3);
- 
--	err = mtk_dfe_dse_state_check(cryp);
--	if (err)
--		return err;
--
--	return 0;
-+	return mtk_dfe_dse_state_check(cryp);
- }
- 
- static void mtk_cmd_desc_ring_setup(struct mtk_cryp *cryp,
--- 
-2.23.0
+However, as part of making the kernel safe from DEC Alpha, READ_ONCE()
+does protect against reading and dereferencing pointers to objects
+concurrently being inserted into a linked data structure.  If they are
+never removed (or are removed only when there are known to be no readers),
+RCU is not required.
 
+And to Eric's point, it is also true that when you have pointers to
+static data, and when the compiler can guess this, you do need something
+like smp_load_acquire().  But this is a problem only when you are (1)
+using feedback-driven compiler optimization or (2) when you compare the
+pointer to the address of the static data.
+
+And yes, we are still working to be able to tell the compiler when
+a pointer carries a dependency, but this continues to be slow going.  :-/
+
+							Thanx, Paul
