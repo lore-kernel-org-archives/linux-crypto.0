@@ -4,26 +4,26 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B43C4346A
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E2A7C43464
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C9720214F1
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6365F20874
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 08:00:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726741AbgIUIAr (ORCPT
+        id S1726610AbgIUIAq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Sep 2020 04:00:47 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57374 "EHLO mx2.suse.de"
+        Mon, 21 Sep 2020 04:00:46 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57298 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726578AbgIUH7k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726591AbgIUH7k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 21 Sep 2020 03:59:40 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 6E74BB525;
-        Mon, 21 Sep 2020 08:00:09 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id A947EB52B;
+        Mon, 21 Sep 2020 08:00:07 +0000 (UTC)
 From:   Nicolai Stange <nstange@suse.de>
 To:     "Theodore Y. Ts'o" <tytso@mit.edu>
 Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
@@ -55,9 +55,9 @@ Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         Torsten Duwe <duwe@suse.de>, Petr Tesarik <ptesarik@suse.cz>,
         Nicolai Stange <nstange@suse.de>
-Subject: [RFC PATCH 35/41] random: improve the APT's statistical power
-Date:   Mon, 21 Sep 2020 09:58:51 +0200
-Message-Id: <20200921075857.4424-36-nstange@suse.de>
+Subject: [RFC PATCH 32/41] random: introduce health test stub and wire it up
+Date:   Mon, 21 Sep 2020 09:58:48 +0200
+Message-Id: <20200921075857.4424-33-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200921075857.4424-1-nstange@suse.de>
 References: <20200921075857.4424-1-nstange@suse.de>
@@ -67,204 +67,210 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Adapative Proportion Test as specified by NIST SP800-90B counts how
-often the first sample value in a sequence of n samples occurs among the
-remaining n - 1 ones and will report failure if the result is unexpectedly
-large. The intention is to capture cases where a noise source's actual
-min-entropy falls below the one estimated during the validation process.
-Note that, assuming i.i.d., a decrease in per-IRQ min-entropy corresponds
-to an increase in the maximum probability among all possible sample values,
-per the definition of min-entropy.
+NIST SP800-90B requires certain statistical tests to be run continuously on
+a noise source's output.
 
-For example, consider the maximum supported per-IRQ min-entropy estimate of
-H=1, which corresponds to a maximum probability of p = 2^-H = 50% among all
-possible sample values. Now, if the actual entropy degraded to H/2, it
-would mean that some sample value's likelihood had increased to ~70%. The
-ability of the APT to detect this degradation is limited by the way it's
-currently implemented: a prerequisite for successfully reporting a
-sequence of n samples as bad is to find the offending sample value at the
-leading position. Thus, the power of the APT is always limited by the
-probability of the offending sample value, i.e. 70% in this example, no
-matter how large the total number n of examined of samples is.
+In preparation to implementing those, introduce an empty stub,
+health_test_process() and wire it up to add_interrupt_randomness(). This
+patch does not implement any actual testing functionality yet, it's mereley
+meant to define the interactions between add_interrupt_randomness() and
+the health tests.
 
-This can be improved upon by taking advantage of the fact that only values
-of H <= 1 are currently supported for the per-IRQ entropy estimate. It
-follows that the maximum probability among all sample values would increase
-to > 1/2 in case the actual min-entropy happened to fall below the assumed
-value. If we were to examine a sequence of n1 samples, the expected number
-of occurrences of the offending sample value would be > 1/2 * n1 (again
-assuming i.i.d). For example, for an actual entropy of H/2, with H=1 as
-above, the probability to find 4 or more samples of the same value among a
-sequence of n1 = 7 events would be ~88%, which is an improvement over the
-70% from above.
+health_test_process() is to be invoked on individual noise samples, i.e.
+cycle counter values and returns, either of three possible status
+codes indicating to the calling add_interrupt_randomness() that
+- either some more samples are needed in order to complete the statistical
+  tests,
+- that the tests have finished with positive result on the latest run
+  of noise samples or
+- that the tests have failed.
 
-So partition the total number of samples n = 128/H to examine from the APT
-into two parts, n1 and n2, such that n = n1 + n2 with n1 odd. Rather than
-simply picking the first sample value to subsequently search for in the
-remaining n-1 events, make the APT to run a "presearch" on the first n1
-samples in order to find the value occurring more than n1 / 2 times, if
-there is such one. Make the APT then continue as usual: let it search the
-remaining n2 samples for the found candidate value, count the number of
-occurrences and report failure if a certain threshold is reached.
+Introduce an enum health_result defining constants corresponding to these
+resp. cases: health_queue, health_dispatch and health_discard. Provide
+another value, health_none, to indicate the case that the health tests
+are disabled, because e.g. fips_enabled is unset. Make the stub
+health_test_process() return this value for now.
 
-Of course, new thresholds should be installed in order to gain optimal
-statistical power from the second phase while still maintaining a false
-positive rate of 2^-16 as before. An exhaustive search among all
-possibilities for the different choices of n1 and supported per-IRQ
-min-entropies revealed that n1 = 7 is optimal for n = 128 (H = 1) and
-close to the resp. optimum for larger n, i.e. smaller H. With this choice,
-the new presearch scheme yields new thresholds ("c") and probabilities to
-detect a entropy degradations to H/2 ("power") as tabulated below:
+As long as the statistical tests need more input noise samples before
+reaching a conclusion, health_queue will get returned from
+health_test_process(). FWIW, the number of successive input samples needed
+by the tests will be at the order of 128 to 8192, depending on the per-IRQ
+entropy estimate. add_interrupt_randomness() currently attempts to transfer
+the noise kept within in the per-CPU fast_pool, which is of limited
+capacity, to the global input_pool as soon as a threshold of 64 events is
+reached and it will continue to do so. However, as long as some tests are
+pending, i.e. keep returning health_queue, the associated amount of
+estimated entropy must not get added to the global input_pool balance, but
+queued up at the fast_pool's queued_entropy instance. Once the health test
+have eventually succeeded, as indiciated by health_test_process(), the
+entropy previously queued up may get dispatched to the global reserve.
+OTOH, on test failure health_discard will get returned and all entropy
+queued up from add_interrupt_randomness() since the last dispatch (or
+discard resp.) must get discarded.
 
-   H     n   c    power
-   --------------------
-      1  128   83 64.7%
-    1/2  256  205 79.1%
-    1/4  512  458 81.6%
-    1/8 1024  968 84.0%
-   1/16 2048 1991 84.9%
-   1/32 4096 4038 86.9%
-   1/64 8192 8134 86.4%
+Note that add_interrupt_randomness() will continue to unconditionally mix
+the samples into the fast_pools and eventually into the global input_pool
+-- the health test results really only affect the entropy accounting.
 
-Compare this to the former numbers for the original implementation:
+So, make add_interrupt_randomness() invoke health_test_process() on
+the current cycle counter value in case fips_enabled is set.
 
-   H     n   c    power
-   --------------------
-      1  128   87 52.5%
-    1/2  256  210 67.5%
-    1/4  512  463 76.7%
-    1/8 1024  973 82.8%
-   1/16 2048 1997 82.6%
-   1/32 4096 4044 85.8%
-   1/64 8192 8140 85.8%
+In case a fast_pool's fill level threshold of 64 events is reached at a
+time when health tests are still pending and keep returning health_queue,
+let add_interrupt_randomness() continue to mix the fast_pool's contents
+into the input_pool as before, but enqueue the associated amount of entropy
+at the fast_pool's associated queued_entropy instance for later dispatch.
 
-So for smaller values of H, i.e. for H <= 1/8, the improvement isn't really
-impressive, but that was to be expected. OTOH, for the larger Hs, that is
-for the per-IRQ entropies estimated for systems with a high resolution
-get_cycles(), there is a clear advantage over the old scheme.
+Both, entropy dispatch as well as discard operations, require a call to
+__dequeue_entropy(), which in turn must only get invoked with the
+input_pool's ->lock being held. It follows that in case the spin_trylock()
+in add_interrupt_randomness() failed, the latter would not be able to
+perform entropy dispatch or discard operations immediately at the time
+those have been requested by the health tests. Add two new boolean flags,
+->dispatch_needed and ->discard_needed, to struct fast_pool. Set them from
+add_interrupt_randomness() in case health_test_process() returned
+health_dispatch or health_discard resp.. Make the current and subsequent
+add_interrupt_randomness() invocations to check for ->dispatch_needed and
+->discard_needed and to attempt to execute any pending dispatch/discard
+request. Clear ->dispatch_needed and ->discard_needed again when the
+prerequisite ->lock could eventually be obtained.
 
-Implement the described presearch for finding the sample value occurring
-more than half of the times among the first n1=7 events in a sequence of
-n=128/H samples to examine, if there is such one. Rather than maintaining
-individual per-CPU counters for the 2^8 possible sample values each, count
-the numbers of ones at the eight resp. bit positions. Note that if some
-sample value has indeed been observed more than half of the time, it will
-dominate all these bit counters and its value can be unambiguously restored
-from them, which is all that is needed.
-
-For better reviewability, represent the eight bit counters as an array of
-eight u8's at struct health_test and implement the bit counting as well
-as the final candidate extraction in the most naive way. A follow-up patch
-will sequeeze the counters into a single u32 and also optimize the bit
-counting and candidate extraction performance-wise.
-
-Implement the new health_apt_presearch_update() for updating the presearch
-bit counters. Call it from health_test_apt() on the first n1=7 samples.
-
-Implement the new health_apt_presearch_finalize() for restoring the
-candidate from the presearch bit counters. Call it from health_test_apt()
-once the n1'th event in a sequence has been processed and the presearch
-phase is to be concluded.
-
-Make health_test_apt() search for the candidate value as determined by
-the presearch phase among the sequence's remaining n2 = n - n1 samples.
-Adapt the failure thresholds to the now slightly smaller n2 values.
+As actual health tests returning anything but health_none haven't been
+implemented yet, there is no behavioural change at this point.
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- drivers/char/random.c | 58 +++++++++++++++++++++++++++++++++++++------
- 1 file changed, 50 insertions(+), 8 deletions(-)
+ drivers/char/random.c | 78 +++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 75 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 131302cbc495..75a103f24fea 100644
+index 0f56c873a501..cb6441b96b8e 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -881,8 +881,13 @@ static void discard_queued_entropy(struct entropy_store *r,
+@@ -881,14 +881,30 @@ static void discard_queued_entropy(struct entropy_store *r,
  
- struct health_test {
- 	unsigned short apt_event_count;
--	unsigned short apt_candidate_count;
--	u8 apt_candidate;
-+	union {
-+		u8 apt_presearch_bit_counters[8];
-+		struct {
-+			unsigned short apt_candidate_count;
-+			u8 apt_candidate;
-+		};
-+	};
+ struct health_test {};
  
- 	u8 previous_sample;
- };
-@@ -895,9 +900,44 @@ enum health_result {
- };
- 
- /* Adaptive Proportion Test */
-+#define HEALTH_APT_PRESEARCH_EVENT_COUNT 7
-+
-+static void health_apt_presearch_update(struct health_test *h, u8 sample_delta)
-+{
-+	int i;
-+
-+	for (i = 0; i < 8; ++i) {
-+		h->apt_presearch_bit_counters[i] = sample_delta & 0x1;
-+		sample_delta >>= 1;
-+	}
-+}
-+
-+static void health_apt_presearch_finalize(struct health_test *h)
-+{
-+	int i;
-+
-+	/*
-+	 * If some event octet occurred more than half of the time,
-+	 * i.e. more than HEALTH_APT_PRESEARCH_EVENT_COUNT / 2 times,
-+	 * then its value can be restored unambigiously from the eight
-+	 * ->apt_presearch_bit_counters each holding the count of 1s
-+	 * encountered at the corresponding bit positions.
-+	 */
-+	h->apt_candidate = 0;
-+	for (i = 0; i < 8; ++i) {
-+		if (h->apt_presearch_bit_counters[i] >=
-+		    (HEALTH_APT_PRESEARCH_EVENT_COUNT + 1) / 2) {
-+			h->apt_candidate |= 1 << i;
-+		}
-+	}
-+	h->apt_candidate_count = 0;
++enum health_result {
++	health_none,
++	health_queue,
++	health_dispatch,
++	health_discard,
 +};
 +
- static void health_apt_reset(struct health_test *h)
- {
- 	h->apt_event_count = 0;
-+	memset(h->apt_presearch_bit_counters, 0,
-+		sizeof(h->apt_presearch_bit_counters));
- }
+ static void health_test_reset(struct health_test *h)
+ {}
  
- static enum health_result
-@@ -911,16 +951,18 @@ health_test_apt(struct health_test *h, unsigned int event_entropy_shift,
- 	 * values of event_entropy_shift each, should have probability
- 	 * <= 2^-16.
- 	 */
--	static const unsigned int c[] = {87, 210, 463, 973, 1997, 4044, 8140};
-+	static const unsigned int c[] = {83, 205, 458, 968, 1991, 4038, 8134};
++static enum health_result
++health_test_process(struct health_test *h, unsigned int event_entropy_shift,
++		    u8 sample)
++{
++	return health_none;
++}
 +
-+	BUILD_BUG_ON(HEALTH_APT_PRESEARCH_EVENT_COUNT != 7);
+ struct fast_pool {
+ 	__u32		pool[4];
+ 	unsigned long	last;
+ 	unsigned short	reg_idx;
+ 	unsigned char	count;
++	bool		dispatch_needed : 1;
++	bool		discard_needed : 1;
+ 	int		event_entropy_shift;
+ 	struct queued_entropy	q;
+ 	struct health_test	health;
+@@ -1662,9 +1678,10 @@ void add_interrupt_randomness(int irq, int irq_flags)
+ 	cycles_t		cycles = random_get_entropy();
+ 	__u32			c_high, j_high;
+ 	__u64			ip;
+-	bool			reseed;
++	bool			reseed = false;
+ 	struct queued_entropy	*q = &fast_pool->q;
+ 	unsigned int		nfrac;
++	enum health_result	health_result = health_none;
  
--	if (!h->apt_event_count) {
--		h->apt_event_count = 1;
--		h->apt_candidate = sample_delta;
--		h->apt_candidate_count = 0;
-+	++h->apt_event_count;
-+	if (unlikely(h->apt_event_count <= HEALTH_APT_PRESEARCH_EVENT_COUNT)) {
-+		health_apt_presearch_update(h, sample_delta);
-+		if (h->apt_event_count == HEALTH_APT_PRESEARCH_EVENT_COUNT)
-+			health_apt_presearch_finalize(h);
- 		return health_queue;
+ 	if (cycles == 0)
+ 		cycles = get_reg(fast_pool, regs);
+@@ -1682,6 +1699,12 @@ void add_interrupt_randomness(int irq, int irq_flags)
+ 	this_cpu_add(net_rand_state.s1, fast_pool->pool[cycles & 3]);
+ 
+ 	fast_pool_init_accounting(fast_pool);
++	if (fips_enabled) {
++		health_result =
++			health_test_process(&fast_pool->health,
++					    fast_pool->event_entropy_shift,
++					    cycles);
++	}
+ 
+ 	if (unlikely(crng_init == 0)) {
+ 		if ((fast_pool->count >= 64) &&
+@@ -1693,8 +1716,48 @@ void add_interrupt_randomness(int irq, int irq_flags)
+ 		return;
  	}
  
--	++h->apt_event_count;
- 	if (unlikely(h->apt_candidate == sample_delta &&
- 		     ++h->apt_candidate_count == c[event_entropy_shift])) {
- 		health_apt_reset(h);
++	switch (health_result) {
++	case health_dispatch:
++		/*
++		 * Still haven't made it around processing a previous
++		 * entropy discard request?
++		 */
++		fast_pool->dispatch_needed = !fast_pool->discard_needed;
++		break;
++
++	case health_discard:
++		/*
++		 * Still haven't made it around processing a previous
++		 * entropy dispatch request?
++		 */
++		fast_pool->discard_needed = !fast_pool->dispatch_needed;
++		break;
++
++	case health_queue:
++		/*
++		 * If a previous sample triggered a dispatch which is
++		 * still pending, it's impossible to add new events on
++		 * top as far as entropy accounting is
++		 * concerned. Don't count any events until we get a
++		 * hold of the input_pool ->lock and complete the
++		 * dispatch below. Undo the increment from fast_mix()
++		 * above.
++		 */
++		if (fast_pool->dispatch_needed)
++			fast_pool->count--;
++		break;
++
++	case health_none:
++		/*
++		 * fips_enabled is unset, suppress compiler warnings.
++		 */
++		break;
++	};
++
+ 	if ((fast_pool->count < 64) &&
+-	    !time_after(now, fast_pool->last + HZ))
++	    !(health_result == health_none &&
++	      time_after(now, fast_pool->last + HZ)) &&
++	    !fast_pool->dispatch_needed && !fast_pool->discard_needed)
+ 		return;
+ 
+ 	r = &input_pool;
+@@ -1710,7 +1773,16 @@ void add_interrupt_randomness(int irq, int irq_flags)
+ 	}
+ 	__queue_entropy(r, q, nfrac);
+ 	__mix_pool_bytes(r, &fast_pool->pool, sizeof(fast_pool->pool));
+-	reseed = __dispatch_queued_entropy_fast(r, q);
++
++	if (fast_pool->dispatch_needed || health_result == health_none) {
++		reseed = __dispatch_queued_entropy_fast(r, q);
++		fast_pool->dispatch_needed = false;
++	} else if (fast_pool->discard_needed) {
++		int dummy;
++
++		__dequeue_entropy(r, q, &dummy);
++		fast_pool->discard_needed = false;
++	}
+ 	spin_unlock(&r->lock);
+ 
+ 	fast_pool->last = now;
 -- 
 2.26.2
 
