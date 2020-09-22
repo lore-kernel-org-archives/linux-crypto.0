@@ -1,161 +1,125 @@
-Return-Path: <SRS0=YoIG=C6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=Ubkd=C7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 245FDC4727F
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 23:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E78F1C2D0E2
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Sep 2020 12:59:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB6D223A7A
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Sep 2020 23:52:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600732369;
-	bh=RPrdQUugC5s6Taj5fTPO3aDNuq6ahfRvm1SH7wdeIMM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Ka7u5QMcummAcJcNSqnSrEILVXx+8jHaJo1hl/jbGDf1I50/p5K3LANwry6VwROo1
-	 JzeJ5aoIjWVucFvoUWjxn4GvpajkQjzBgzCFEGgcQ6APrtrCn8oS9CyfthcJryyY8t
-	 X7dN4Rl0Mw5mMxDOX30yCgbomyhoK109wASAeotY=
+	by mail.kernel.org (Postfix) with ESMTP id 8C5102399A
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Sep 2020 12:59:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="zR3WPW9q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728894AbgIUXwq (ORCPT
+        id S1726576AbgIVM7w (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Sep 2020 19:52:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33064 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727124AbgIUXwq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Sep 2020 19:52:46 -0400
-Received: from sol.localdomain (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4EAE523A6B;
-        Mon, 21 Sep 2020 23:52:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600732365;
-        bh=RPrdQUugC5s6Taj5fTPO3aDNuq6ahfRvm1SH7wdeIMM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=1XtX7sF5pJ2g3rkvM61mRC3GHnkXx5uE/aM5SI1d8Y6zXtI6KKFTeO3iDqOTL5sLJ
-         OmURhtHjGOeAxICcn7Ekyx8MChC6/0T/67BaTlyNsNwY2Gm57eR6E/ooZAkC8i/RDj
-         9bqzYczJLjkyjcGRg/QA/nz/CVKbd8DaF8fT5vTQ=
-Date:   Mon, 21 Sep 2020 16:52:43 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Paul E. McKenney" <paulmck@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>, tytso@mit.edu,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        stable@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH] random: use correct memory barriers for crng_node_pool
-Message-ID: <20200921235243.GA32959@sol.localdomain>
-References: <20200916233042.51634-1-ebiggers@kernel.org>
- <20200917072644.GA5311@gondor.apana.org.au>
- <20200917165802.GC855@sol.localdomain>
- <20200921081939.GA4193@gondor.apana.org.au>
- <20200921152714.GC29330@paulmck-ThinkPad-P72>
- <20200921221104.GA6556@gondor.apana.org.au>
- <20200921232639.GK29330@paulmck-ThinkPad-P72>
-MIME-Version: 1.0
+        Tue, 22 Sep 2020 08:59:52 -0400
+Received: from mail-dm6nam10on2069.outbound.protection.outlook.com ([40.107.93.69]:23520
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726563AbgIVM7v (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Sep 2020 08:59:51 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EsoB/lGQVo+E4bH/0KnHL9tA+/nao1LzcKZPf6Z0Btif6kWza/uFiwF9DCh1iuBfdKI2ktkd89unQp83P15BOCRY4YYXHXZwnw5REvqr3NSYOKOc4Ik+MN5cRT5/d3n9g36W5tMdvPeDbanJzoUdZyUkrPY4pywY4T8XYy2+/vMPdvBtRXwnrNVs0zki/hmirz0ORjwqJpE5sndFiTuZVBuMkJ7XRuvX+jgGgiW27vlAMsl4Jn+S7uA8E3ZJ2ngNV1r1Mzzhf8RXV0PAIkBaXwdxtoJjnmrq7tX2DLO+/oGKwg8wGB1OqU7XR1+auc9gHgyEldAH9pfvs4eZwRgQbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JVszv1hS6fG38NL+tKrtbZUJM7fJ88qzGTfuReTO/gk=;
+ b=k9yxu0TBTqB+DQoAUnmZTIRi2z3ZR4Kyi4P+OJTcOu6A0rXIQCaewqB+k67wcv48+d2cKxMxVXT8FD3UVuW4cBrVgn3lozJ4IxpQTzB4PRGX5+CPJjkStQACxx9o5cxoqyysBrhm+2X9vAuhLOqcjS/3yuROP0GUDN87JX1rN571HHPbBoVYr3T1pJb5a/OhceZ03HgPBwggjQTa3hVU0lnu42KjrrCtjAHjOngFOPEaqh/csZvH+fVmUPbkcw5lvPfHspO+OAs6Rsy8NeOPF4LzP3sGgbWk3kEWTBLE6QhF6qmWtAbczRz9L2y8TG/LNjkKlvMAnJbBga8n1mJ1Kg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JVszv1hS6fG38NL+tKrtbZUJM7fJ88qzGTfuReTO/gk=;
+ b=zR3WPW9qDUlzn++cvkfhyA4Mq8In1+mBeSrP6QqxAdsuS3NUA2b+ic7mdrEuBTx1jptjaHWzzqk+mHrPh9FI3k4CLfcDzjXWZyQf8MAUwiBUDTi8FTDpMx+tLTQ51MBli7AYJdmuRT6JYSb27uPwGbF2dpuBTvl01XjdYUdSJlA=
+Authentication-Results: denx.de; dkim=none (message not signed)
+ header.d=none;denx.de; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2590.namprd12.prod.outlook.com (2603:10b6:802:2e::17)
+ by SN1PR12MB2557.namprd12.prod.outlook.com (2603:10b6:802:22::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.19; Tue, 22 Sep
+ 2020 12:59:48 +0000
+Received: from SN1PR12MB2590.namprd12.prod.outlook.com
+ ([fe80::119d:6402:3d29:75fc]) by SN1PR12MB2590.namprd12.prod.outlook.com
+ ([fe80::119d:6402:3d29:75fc%7]) with mapi id 15.20.3391.027; Tue, 22 Sep 2020
+ 12:59:48 +0000
+Date:   Tue, 22 Sep 2020 07:59:42 -0500
+From:   John Allen <john.allen@amd.com>
+To:     Pavel Machek <pavel@denx.de>
+Cc:     thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: ccp - fix error handling
+Message-ID: <20200922125942.GA8119@mojo>
+References: <20200921113435.GA20450@duo.ucw.cz>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200921232639.GK29330@paulmck-ThinkPad-P72>
+In-Reply-To: <20200921113435.GA20450@duo.ucw.cz>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: DM5PR19CA0015.namprd19.prod.outlook.com
+ (2603:10b6:3:151::25) To SN1PR12MB2590.namprd12.prod.outlook.com
+ (2603:10b6:802:2e::17)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mojo (165.204.77.1) by DM5PR19CA0015.namprd19.prod.outlook.com (2603:10b6:3:151::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.14 via Frontend Transport; Tue, 22 Sep 2020 12:59:47 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: e9e3ca4a-f3a6-49fe-ba92-08d85ef762dd
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2557:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN1PR12MB255707BA438E9B801BF0954D9A3B0@SN1PR12MB2557.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3631;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4YbVEpnwxyeU1eoI2QU1T7yLmA4ZtVMfeIQezlB7ZcSkr6BYjhMtSzpJSsmhqFnGdyqXjRO+Hjkn5Wcsgdfc+LqSCJ68mDz9zOxHnH0zgHMl61TrdA2ooEdh+tcGN334g8J22TAO1cw8HZ5w5obK4wl6PC3ciIDHpvqbmV/PPyQOdwqfHPHxmBA6BXc722jj27Wy0Ki3xWA/EY1zHf1yCAcvG9dnIfSTV2TeRD6FfxXaXXA1YUqvDHa6I7KJzRPS9c9U3X0n0eIGRQBkzakulnNDYSH6+hUfV5s/ZvOp+8MEPRkq+hQCEAQcka0Tg4x6g/H90QBqY8jCthDVzrIoeQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2590.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(136003)(366004)(376002)(346002)(52116002)(16526019)(8936002)(44832011)(2906002)(9576002)(66946007)(5660300002)(4744005)(6496006)(66476007)(66556008)(1076003)(6916009)(8676002)(33716001)(4326008)(86362001)(956004)(316002)(55016002)(6666004)(33656002)(26005)(186003)(478600001)(9686003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: Y61SzCxazvaqJPkltYan+52Bg8a4CvSwiGWBSrgsYZdib+r/jP8RnRntCq5dRU3jnfE8quHoY8HVdsC+ePX+biFzu+DTpIbjDnLQXi5gIR+D6okmiGre7XaEahm+uMjYN1nhFeHkDU7zLUe8jm+o1XvOY7ba8ol2Do49/z/0MPwXDP6bYW9VPMybQiTCqGi1VJL8W5uBVxfbJ2++I/7NJ+FJBNbwLQe0CrSrZKSe7T0WVWSTdihYHBMI/CCD3sy+z0eAQ40oWJ0zgH7OPY+bv5CFBPVse71psOwcu63mgMyCghmN1M0JMrGn2/bHY8SrjlAsuTuVGz9We6gsqHBoB4F0GaE0AVLy65jP3DfkroSOOd9kSpj1h6kYMxtavE+CqqcwvxQ3jNUrjkNNVUtDzI4gK3rucuz0wIotqfNhvn8KulomahTidGU1tIP0ytj/yBnKI15MEbRj+B2nCmAtG68u6VE8nJaOxLMZonoAsH+9R99IXw4O0RaRhobl2Bm3Ep6FoVeGYUqD2f4Q8jYnmy024i6Y+0Z+VhcxivCppP2g7svKsVZmmERw3dGcBb5zGt3VSzystSXWtB9VXyeuDfjw5W0IItVQ3/YpdAUGpllh9rbMbyiL8C4TNABCxd9C/4AbUyvwZlTSk66T/caE+Q==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9e3ca4a-f3a6-49fe-ba92-08d85ef762dd
+X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2590.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2020 12:59:48.5234
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: btTNDjzpxCfcbeLtE5GzkmyD5gJn1Uf6pW+MXD5ks4YqyEnI5ILvOEfzS7R2yzvwTxe0PFAVubuBQexP3yltBg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2557
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 21, 2020 at 04:26:39PM -0700, Paul E. McKenney wrote:
-> On Tue, Sep 22, 2020 at 08:11:04AM +1000, Herbert Xu wrote:
-> > On Mon, Sep 21, 2020 at 08:27:14AM -0700, Paul E. McKenney wrote:
-> > > On Mon, Sep 21, 2020 at 06:19:39PM +1000, Herbert Xu wrote:
-> > > > On Thu, Sep 17, 2020 at 09:58:02AM -0700, Eric Biggers wrote:
-> > > > >
-> > > > > smp_load_acquire() is obviously correct, whereas READ_ONCE() is an optimization
-> > > > > that is difficult to tell whether it's correct or not.  For trivial data
-> > > > > structures it's "easy" to tell.  But whenever there is a->b where b is an
-> > > > > internal implementation detail of another kernel subsystem, the use of which
-> > > > > could involve accesses to global or static data (for example, spin_lock()
-> > > > > accessing lockdep stuff), a control dependency can slip in.
-> > > > 
-> > > > If we're going to follow this line of reasoning, surely you should
-> > > > be converting the RCU derference first and foremost, no?
-> > 
-> > ...
-> > 
-> > > And to Eric's point, it is also true that when you have pointers to
-> > > static data, and when the compiler can guess this, you do need something
-> > > like smp_load_acquire().  But this is a problem only when you are (1)
-> > > using feedback-driven compiler optimization or (2) when you compare the
-> > > pointer to the address of the static data.
-> > 
-> > Let me restate what I think Eric is saying.  He is concerned about
-> > the case where a->b and b is some opaque object that may in turn
-> > dereference a global data structure unconnected to a.  The case
-> > in question here is crng_node_pool in drivers/char/random.c which
-> > in turn contains a spin lock.
+On Mon, Sep 21, 2020 at 01:34:35PM +0200, Pavel Machek wrote:
+> Fix resource leak in error handling.
 > 
-> As long as the compiler generates code that reaches that global via
-> pointer a, everything will work fine.  Which it will, unless the guy
-> writing the code makes the mistake of introducing a comparison between the
-> pointer to be dereferenced and the address of the global data structure.
+> Signed-off-by: Pavel Machek (CIP) <pavel@denx.de>
+
+Acked-by: John Allen <john.allen@amd.com>
+
 > 
-> So this is OK:
+> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+> index bd270e66185e..40869ea1ed20 100644
+> --- a/drivers/crypto/ccp/ccp-ops.c
+> +++ b/drivers/crypto/ccp/ccp-ops.c
+> @@ -1744,7 +1744,7 @@ ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+>  			break;
+>  		default:
+>  			ret = -EINVAL;
+> -			goto e_ctx;
+> +			goto e_data;
+>  		}
+>  	} else {
+>  		/* Stash the context */
 > 
-> 	p = rcu_dereference(a);
-> 	do_something(p->b);
-> 
-> This is not OK:
-> 
-> 	p = rcu_dereference(a);
-> 	if (p == &some_global_variable)
-> 		we_really_should_not_have_done_that_comparison();
-> 	do_something(p->b);
-
-If you call some function that's an internal implementation detail of some other
-kernel subsystem, how do you know it doesn't do that?
-
-Also, it's not just the p == &global_variable case.  Consider:
-
-struct a { struct b *b; };
-struct b { ... };
-
-Thread 1:
-
-	/* one-time initialized data shared by all instances of b */
-	static struct c *c;
-
-	void init_b(struct a *a)
-	{
-		if (!c)
-			c = alloc_c();
-
-		smp_store_release(&a->b, kzalloc(sizeof(struct b)));
-	}
-
-Thread 2:
-
-	void use_b_if_present(struct a *a)
-	{
-		struct b *b = READ_ONCE(a->b);
-
-		if (b) {
-			c->... # crashes because c still appears to be NULL
-		}
-	}
+> -- 
+> DENX Software Engineering GmbH,      Managing Director: Wolfgang Denk
+> HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
 
 
-So when the *first* "b" is allocated, the global data "c" is initialized.  Then
-when using a "b", we expect to be able to access "c".  But there's no
-data dependency from "b" to "c"; it's a control dependency only.
-So smp_load_acquire() is needed, not READ_ONCE().
-
-And it can be an internal implementation detail of "b"'s subsystem whether it
-happens to use global data "c".
-
-This sort of thing is why people objected to the READ_ONCE() optimization during
-the discussion at
-https://lkml.kernel.org/linux-fsdevel/20200717044427.68747-1-ebiggers@kernel.org/T/#u.
-Most kernel developers aren't experts in the LKMM, and they want something
-that's guaranteed to be correct without having to to think really hard about it
-and make assumptions about the internal implementation details of other
-subsystems, how compilers have implemented the C standard, and so on.
-
-- Eric
