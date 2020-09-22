@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11782C2D0E2
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Sep 2020 16:04:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6EF6C4727D
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Sep 2020 16:04:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC5D0208A9
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Sep 2020 16:04:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 824722399A
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Sep 2020 16:04:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="Fl4ApLcn"
+	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="l7lUgBCw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726803AbgIVQEh (ORCPT
+        id S1726781AbgIVQEc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Sep 2020 12:04:37 -0400
+        Tue, 22 Sep 2020 12:04:32 -0400
 Received: from mail-eopbgr60083.outbound.protection.outlook.com ([40.107.6.83]:40665
         "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726721AbgIVQEe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Sep 2020 12:04:34 -0400
+        id S1726686AbgIVQEU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Sep 2020 12:04:20 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gqQS5h0miMlOxmXCUpZ5hNSy6dJe2l8F4GDsPkvQCo88mXr0RrhEKK+Zx60igUTKBD174FjFdI29JIsBn1sx4pX3VB0vTr/2I7keJ/FPmfMGcsitXznvxdqcWxunI/P99TZ1OoYrxT80H+Nhvk4HAn0c6A8CfQWHKeKiU0kqjlENWdOu3ycU7PfY7rhKJmzQp0dcZytZ3yUu39wXv3BLz/WGF06eJVbeI2uPdhvXaR54S9EozsAhjSghzcAJPB0zfopnqbKjYTqCpkXX6P8KS5Vsx8l/QZqPHDYgwra3Aj76v038wjsvMp9HNKAYa4XHtqYD+5Nj3r32jAnC2ghlrA==
+ b=j9LFYUhHzLHfS5RHimcYxbW9Fkt1UvC9R//H2944MMyP4lnbArIgx5gtnO0lEfDSNv3io84PoZ5uNP64kHRz+NywSY7gTxd6nEZle3f4oEzTCp9raec+CdTP/wGiDLmCvvmK62R6jZedwleHio8gFXZDPQDReCEfkPUSwOCEynQrsqm8L7WY+ehXAFVdVNpS0HgElHm6EpPcSGIIDvOugcW6ztmt7XHKYAmkkicgmHLImQCgeMExPK9MMi3rDmeRe/G7zmJfxQXHnwO0/WqCwv2kOEw4yH+7HuKi2+R/3k2zIRN09czLlhC7SUh5yjyGd5rky7UaIDHFQdwSWP7oWw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=P/UjFOmwTRD6x38o94IyQEOLTYv2mNzSRW+3pBngMlA=;
- b=Vx4K75FZFw+F3rkx3EnIMo0kV+vZPQXceCNO8MXvVjOKR0ErfKbsH2e8fa9r7oKFwnFeL8T9Px3LjiYv0+yQyYRHOb161ihHQTK+5Ys+OfJRH0tKMPp+Dk6RIV7HOeM5oVC9xOU1wXNcL4YtxD0BLPKAf6aGFTCLKG2Mto7fAfj8JDoAmXMSx7ULHFZPKjrfdPbXnohnkj0UNLQTGYQM1AmTXvWVvnSNGXVtr46xRkFYVked58oGtmT9Fx8xHkF9sXACXbIOrPNuF+/jK56S8+aaYRvMrl0iSmH4Fp/fbe4AGcZ5m8s2mjVdNYP/Wcbcc4PV30LVUyyXPfxbwcpRLQ==
+ bh=laPo1FlHkzXyhfDF4v0FpI8og+Wt4VtXWIaKVkWosQY=;
+ b=SW0pYgjeAy0ODc80KfqfKkLyjyIvHydRv58CXrEjZ14EboSvZ6rnz8pKrvPZu/5SlqG0euVAP4Nd9yM9HFC3Tw+QUUW42y4ZjQKbgPBahXKhy204aGYZnhYVKwS6DIIEaUx4Mje4ubQ1RAH8+Mh2MSRBs7d9On/m2bmJWdzAA1H9eZybFlVaNZ/1J+sg3FJHMEz9o003whdrmyPLGQrXl4UkkyjJ1S4br5Jq3ygipk6bEEjix5wnRun+U49HswDfK+eXB8g+bilduRNIA8zkTDQst2O3tFVn3R6OAuKrjmgAz+EYkBdJTIy6mv98WGGf0uzXMDz16MZ+lph+b3A5jA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
  dkim=pass header.d=oss.nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
  s=selector2-NXP1-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=P/UjFOmwTRD6x38o94IyQEOLTYv2mNzSRW+3pBngMlA=;
- b=Fl4ApLcnRtgyCaolxaM3jiA6L7wEBp8dOhoX+8sDDTOydDjVcyFJEfB3BzPjVl18WgAjVnubdKpjmYXUb1bzi+xIR2TAvmldi1jORXBW/mO7HsnW62IJJBhJpyT5W3zK2bVTKww34n+o3qMGgsrYXHPn5hvAaNfsKSS3Lq0k5v8=
+ bh=laPo1FlHkzXyhfDF4v0FpI8og+Wt4VtXWIaKVkWosQY=;
+ b=l7lUgBCwCsVEHGjeUVOOHXjWzffTl/WzjxD7EVULfIRfraavEkndvEW1GOCGDehy+NGN/pq5nBGBqrIFmMcyyWUti1hVIe8CsbXXdHmpZl0+bOo2nAazRcT+CIry2B3S1QPXwD2nBsegqTvs16UP99LpBetFKG1n+KzXGud2PRQ=
 Authentication-Results: nxp.com; dkim=none (message not signed)
  header.d=none;nxp.com; dmarc=none action=none header.from=oss.nxp.com;
 Received: from VE1PR04MB6608.eurprd04.prod.outlook.com (2603:10a6:803:125::12)
  by VI1PR04MB7072.eurprd04.prod.outlook.com (2603:10a6:800:12c::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Tue, 22 Sep
- 2020 16:04:06 +0000
+ 2020 16:04:05 +0000
 Received: from VE1PR04MB6608.eurprd04.prod.outlook.com
  ([fe80::34b6:beed:6762:a67c]) by VE1PR04MB6608.eurprd04.prod.outlook.com
  ([fe80::34b6:beed:6762:a67c%7]) with mapi id 15.20.3391.027; Tue, 22 Sep 2020
- 16:04:06 +0000
+ 16:04:05 +0000
 From:   Andrei Botila <andrei.botila@oss.nxp.com>
 To:     Horia Geanta <horia.geanta@nxp.com>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 07/10] crypto: caam - add xts check for block length equal to zero
-Date:   Tue, 22 Sep 2020 19:03:25 +0300
-Message-Id: <20200922160328.28926-8-andrei.botila@oss.nxp.com>
+Subject: [PATCH v3 06/10] crypto: caam/qi2 - add support for more XTS key lengths
+Date:   Tue, 22 Sep 2020 19:03:24 +0300
+Message-Id: <20200922160328.28926-7-andrei.botila@oss.nxp.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200922160328.28926-1-andrei.botila@oss.nxp.com>
 References: <20200922160328.28926-1-andrei.botila@oss.nxp.com>
@@ -67,32 +67,32 @@ X-ClientProxiedBy: AM4PR0302CA0022.eurprd03.prod.outlook.com
  (2603:10a6:803:125::12)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from lsv15007.swis.ro-buh01.nxp.com (83.217.231.2) by AM4PR0302CA0022.eurprd03.prod.outlook.com (2603:10a6:205:2::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.13 via Frontend Transport; Tue, 22 Sep 2020 16:04:05 +0000
+Received: from lsv15007.swis.ro-buh01.nxp.com (83.217.231.2) by AM4PR0302CA0022.eurprd03.prod.outlook.com (2603:10a6:205:2::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3391.13 via Frontend Transport; Tue, 22 Sep 2020 16:04:04 +0000
 X-Mailer: git-send-email 2.17.1
 X-Originating-IP: [83.217.231.2]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: d893ba53-c78a-4f94-3cf0-08d85f1121ae
+X-MS-Office365-Filtering-Correlation-Id: 18061e8d-16ba-47cf-25c9-08d85f11211c
 X-MS-TrafficTypeDiagnostic: VI1PR04MB7072:
 X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR04MB70726AE0002588D3EA2BEB39B43B0@VI1PR04MB7072.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-Microsoft-Antispam-PRVS: <VI1PR04MB70720C581C11A2376DFA675EB43B0@VI1PR04MB7072.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1824;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 9M9XVU4EGk1HhwS7u1MeimoNO4LIeTGBjZuzyJSy0f0eRVCqXmeNeWLDG/vLa1Nq2U4FiLr/QvVRbXb26OR5dUC3erfFQDNrC9nv7FwWY+DwwUUSXphR4GUitm6oXvcWv0RYq4NjAOWjwf/37sb/SNENQ4aomsr8xo3ul8MPyYFHIovkhWPTYpNK7jItfM6IsoVUGIlL8v6FIc6ouWmXlgHCGdfg2jSkx9et4dQrbGeFKlwPdGzzPhcro2+onvqoiqPtN1QS5xKvMYxMP9pbJ6CO2FbbAX4zoRcW41xdkn+5lXHk3jY5C5wlyNpzp+9T0ZZkbzNhmr6YGVtWQbCEJw==
+X-Microsoft-Antispam-Message-Info: IMpgX0wf0ZvZWV9gyK4jOjVFFhkVr+MFdYb95XcPn6qOz7vOF/JdZ94plve/NzCYOsrMgkMBQpGujkignzi0omnLXETVV+kwCUmPqQJtxhxU6Gm5QAfHpT8jOVGvzWdfvTVON/xHEuz3HsuswqVNFD9Snj9xQ7fv2tPNpF3e7kgUh6nrk0uBeOuNe3lBU3oR1H3OnXT08zSO7dgJn3ZnCb085jgk5U6t6o4Pu95V08fZGVgrPAEHUf3wdICUj5Z6TS4ju/8p8+C4hORUY6nMZU1atkCDz8fnrs6OyPVaO/a9wJZZZXJHrpNZf+S1zPPTL9b0PCy47hRKj7kuw1GhoQ==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB6608.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(376002)(366004)(346002)(39860400002)(136003)(1076003)(4326008)(2616005)(6512007)(83380400001)(186003)(16526019)(2906002)(956004)(5660300002)(66556008)(66476007)(8936002)(316002)(6506007)(44832011)(66946007)(52116002)(6486002)(478600001)(110136005)(8676002)(26005)(86362001)(6666004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: j+mz2gK4pf8NhISgyid0+VwhvzsXXsRDmCQwYIqVgL3BFbrOydAYbnpjABLwzocJIdJlFXmyrr4UEol1O5NNt2ucM+3qebkKRH5u3Q2dBz0ktsKSgqFjDWaGX+2NkvdCgTeBpiPpMNUBfRbuLEJKLtFZLMTNFgll558aSFvpLtpJX8j+jqiLFcqdMfAPMUPjzchnL19VUPdpeJ7jXdXEHdhx6YoWtbP3/Wg5GUp2tVXv168u9U1+iJNgE0Q3lVvyi9UC6rKWIOZ22anEiStK9Z5c+9H1JmHn1p881vP5sL9qkMIwPY2jxwsYO7KMO/30gmbfplJPyzEmnapslKSfEfEGmangg/TYbB8w1IUHOn/BDdlB5+WDrKlqxviYQdN+JVgWzN0NO+JCnfpL/zF0Po/jPrS4FlIdSBzxU1ORmCS+5+ZuOWUcdWYkdaRyuvFqxcFQmJskSkc5C7jrH8rXd7M6HtQiTABOG3edVcuihVL3l27p9ha3MOMgk7jOT0LLE5UAFl9lS5Sl9nafN3EUwFVyQ2b+hLO8boWjCzifXWiN1Ub2BtBqgkf06eFI14OxxxfasMrBOzjweKHY2BpWTv9BR0x6GZezhUO+nDyE42y6tHJ80u4JK7IvuFfjfvZRhcAe2ENKrG7edu6DuhwrTA==
+X-MS-Exchange-AntiSpam-MessageData: 16aplXrL+yut3eDN9IyeTv6Az+DjIzoz1kM+I2ZN5ETrE+Y4xtqAbVElK/QT7+me+u1JmJP4M/fW8PNFGpxCzqFOm0ahfc2QUL52HJudyi725LYJArXw0N+3qUd1bRYKOzCO/tz9pTIPdmAFwhe5B73vbBw7zH952Hopec81y5sTg+3s6FP1IUSN2eGZdMT9fRDYkzpzfeU3/QVScPyccOcWaZZnPfVTydcqY0DdTydbTfJkOFPg8tC3uh+3d0uhWD1ZFAGd4INDwX3RkAK5Cl0N+V0FUf2Yd3v1QFRVu1sylTznJ5LNcNW57Nn6tfvcXWhqn5pdpwT9ScvIc0oNMv0+xe/GJEl0isyI2iiGacBWZvEFyM4L4jKHLxJHdjAgs2NhYQDStSLAaI/4/Hb+vmgTqHWcGPjQGAHAShV97Jc0iq7azNfmlgWCH1GxDzIlVt3Kc1vs8P0rl+vgZv/ptIE0/xLFkrfd5dFd6+MNzzi3duFf+akGyt0lGaXI9BmHeDAoy6mYf4IJGz9Z0Tgs2WGtUrhQVucokIQTewKn/1GlQfgPPdPw7glaQJhYpgnKlzOrkfGqs7emSk3RYAZ7e2fYlRhXfU8b5uaPA9JVAs7Sz0EG6plNZwS2UyV1RPXPdjlwY5YQcjSlEjKg1Nv31A==
 X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d893ba53-c78a-4f94-3cf0-08d85f1121ae
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18061e8d-16ba-47cf-25c9-08d85f11211c
 X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB6608.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2020 16:04:05.9533
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2020 16:04:04.9989
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9HXyD2f/EAlmCFyIzR9lWy5I/nwvagaFSrya/UMc5UrDIkEwyWGRAP3ndJm1maoxyWhvSUqatzZQTvZ4DcjVPw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: cK7HL8NDBpFiic1AQRHneVrih8HTtGmnNU4iIlGte6cxcUp94KgPpkbz8SPNqZSyaNRS+PJgbsoTSuy8oU5O5g==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7072
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -100,86 +100,76 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Andrei Botila <andrei.botila@nxp.com>
 
-XTS should not return succes when dealing with block length equal to zero.
-This is different than the rest of the skcipher algorithms.
+CAAM accelerator only supports XTS-AES-128 and XTS-AES-256 since
+it adheres strictly to the standard. All the other key lengths
+are accepted and processed through a fallback as long as they pass
+the xts_verify_key() checks.
 
-Fixes: 31bb2f0da1b50 ("crypto: caam - check zero-length input")
-Cc: <stable@vger.kernel.org> # v5.4+
+Fixes: 226853ac3ebe ("crypto: caam/qi2 - add skcipher algorithms")
+Cc: <stable@vger.kernel.org> # v4.20+
 Signed-off-by: Andrei Botila <andrei.botila@nxp.com>
 ---
- drivers/crypto/caam/caamalg.c     |  7 ++++++-
- drivers/crypto/caam/caamalg_qi.c  |  7 ++++++-
- drivers/crypto/caam/caamalg_qi2.c | 14 ++++++++++++--
- 3 files changed, 24 insertions(+), 4 deletions(-)
+ drivers/crypto/caam/caamalg_qi2.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index a79b26f84169..e72aa3e2e065 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -1787,7 +1787,12 @@ static inline int skcipher_crypt(struct skcipher_request *req, bool encrypt)
- 	u32 *desc;
- 	int ret = 0;
- 
--	if (!req->cryptlen)
-+	/*
-+	 * XTS is expected to return an error even for input length = 0
-+	 * Note that the case input length < block size will be caught during
-+	 * HW offloading and return an error.
-+	 */
-+	if (!req->cryptlen && !ctx->fallback)
- 		return 0;
- 
- 	if (ctx->fallback && (xts_skcipher_ivsize(req) ||
-diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
-index 30aceaf325d7..efcc7cb050fc 100644
---- a/drivers/crypto/caam/caamalg_qi.c
-+++ b/drivers/crypto/caam/caamalg_qi.c
-@@ -1405,7 +1405,12 @@ static inline int skcipher_crypt(struct skcipher_request *req, bool encrypt)
- 	struct caam_ctx *ctx = crypto_skcipher_ctx(skcipher);
- 	int ret;
- 
--	if (!req->cryptlen)
-+	/*
-+	 * XTS is expected to return an error even for input length = 0
-+	 * Note that the case input length < block size will be caught during
-+	 * HW offloading and return an error.
-+	 */
-+	if (!req->cryptlen && !ctx->fallback)
- 		return 0;
- 
- 	if (ctx->fallback && (xts_skcipher_ivsize(req) ||
 diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 255b818c82b2..4cbd7e834888 100644
+index c36d11820db3..255b818c82b2 100644
 --- a/drivers/crypto/caam/caamalg_qi2.c
 +++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -1472,7 +1472,12 @@ static int skcipher_encrypt(struct skcipher_request *req)
- 	struct caam_request *caam_req = skcipher_request_ctx(req);
- 	int ret;
+@@ -19,6 +19,7 @@
+ #include <linux/fsl/mc.h>
+ #include <soc/fsl/dpaa2-io.h>
+ #include <soc/fsl/dpaa2-fd.h>
++#include <crypto/xts.h>
+ #include <asm/unaligned.h>
  
--	if (!req->cryptlen)
-+	/*
-+	 * XTS is expected to return an error even for input length = 0
-+	 * Note that the case input length < block size will be caught during
-+	 * HW offloading and return an error.
-+	 */
-+	if (!req->cryptlen && !ctx->fallback)
+ #define CAAM_CRA_PRIORITY	2000
+@@ -81,6 +82,7 @@ struct caam_ctx {
+ 	struct alginfo adata;
+ 	struct alginfo cdata;
+ 	unsigned int authsize;
++	bool xts_key_fallback;
+ 	struct crypto_skcipher *fallback;
+ };
+ 
+@@ -1060,11 +1062,15 @@ static int xts_skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
+ 	u32 *desc;
+ 	int err;
+ 
+-	if (keylen != 2 * AES_MIN_KEY_SIZE  && keylen != 2 * AES_MAX_KEY_SIZE) {
++	err = xts_verify_key(skcipher, key, keylen);
++	if (err) {
+ 		dev_dbg(dev, "key size mismatch\n");
+-		return -EINVAL;
++		return err;
+ 	}
+ 
++	if (keylen != 2 * AES_KEYSIZE_128 && keylen != 2 * AES_KEYSIZE_256)
++		ctx->xts_key_fallback = true;
++
+ 	err = crypto_skcipher_setkey(ctx->fallback, key, keylen);
+ 	if (err)
+ 		return err;
+@@ -1469,7 +1475,8 @@ static int skcipher_encrypt(struct skcipher_request *req)
+ 	if (!req->cryptlen)
  		return 0;
  
- 	if (ctx->fallback && (xts_skcipher_ivsize(req) ||
-@@ -1516,7 +1521,12 @@ static int skcipher_decrypt(struct skcipher_request *req)
- 	struct caam_request *caam_req = skcipher_request_ctx(req);
- 	int ret;
- 
--	if (!req->cryptlen)
-+	/*
-+	 * XTS is expected to return an error even for input length = 0
-+	 * Note that the case input length < block size will be caught during
-+	 * HW offloading and return an error.
-+	 */
-+	if (!req->cryptlen && !ctx->fallback)
+-	if (ctx->fallback && xts_skcipher_ivsize(req)) {
++	if (ctx->fallback && (xts_skcipher_ivsize(req) ||
++			      ctx->xts_key_fallback)) {
+ 		skcipher_request_set_tfm(&caam_req->fallback_req, ctx->fallback);
+ 		skcipher_request_set_callback(&caam_req->fallback_req,
+ 					      req->base.flags,
+@@ -1512,7 +1519,8 @@ static int skcipher_decrypt(struct skcipher_request *req)
+ 	if (!req->cryptlen)
  		return 0;
  
- 	if (ctx->fallback && (xts_skcipher_ivsize(req) ||
+-	if (ctx->fallback && xts_skcipher_ivsize(req)) {
++	if (ctx->fallback && (xts_skcipher_ivsize(req) ||
++			      ctx->xts_key_fallback)) {
+ 		skcipher_request_set_tfm(&caam_req->fallback_req, ctx->fallback);
+ 		skcipher_request_set_callback(&caam_req->fallback_req,
+ 					      req->base.flags,
 -- 
 2.17.1
 
