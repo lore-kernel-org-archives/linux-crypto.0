@@ -2,123 +2,75 @@ Return-Path: <SRS0=nWKA=DA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2C28C4727E
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 18:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A3E8C2D0A8
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 18:22:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4AC5820791
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 18:06:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="ueL9XXI+"
+	by mail.kernel.org (Postfix) with ESMTP id 03BDE235F7
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 18:22:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600885362;
+	bh=mlB6rdIZtIuoDKMYTjboUQQNek6n4dzbSSNWip0zkp8=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=IXuccwUAPXgpRhcgANfZ269ejr00l4+8/SRrrot33y/buQX05QWu4tT5b2lC0OzBk
+	 6M5kT/+nyrJF8KhapkoZHITDzUFkXFMmfehzs20U5aY67XLYoz+4v5Ao+C4NU0hPdO
+	 1leX21vKYHW5Xb7ngbOPerXRTiJZU24ZOJST5vMI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726755AbgIWSGN (ORCPT
+        id S1726498AbgIWSWl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Sep 2020 14:06:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38718 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726600AbgIWSGN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Sep 2020 14:06:13 -0400
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30714C0613D2
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Sep 2020 11:06:13 -0700 (PDT)
-Received: by mail-wm1-x344.google.com with SMTP id x23so940396wmi.3
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Sep 2020 11:06:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=rBQqEcNI4qmQoA7TvV4cKxPn9VpIANl2GdIqii9bNbU=;
-        b=ueL9XXI+GUUtrlNnir3mOL/bIGZr6jNjX0YvFnEppBB+t7oi2t723yNVDI4ZUdLeJt
-         pPeQBRbm2R0RiKsD9uUrcCUGcW/svCrTyfuR2+8cWGmx7WXu0lfuJDGbNB/lE+P7CcE6
-         vrDbP5b1klSs3fbRQAFv4SBuSTZp66AhBw/NCzFv1EOtSvTHJx00A/+aZ1Ho0qh3Fs8+
-         MBrmy2t4ZKhOqI2P8MDOI78ActrU+Q9nRQ8C0TNaiBw/BkMPj6LdX7ZSRP1wADeQ4OUy
-         aRAJ3r2mgYe4Lno0nLsE0KMOSNfN9asYiR+2Y0tqt0e9fKSMoXl9aGOk2U6h6OkOE70D
-         RsNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=rBQqEcNI4qmQoA7TvV4cKxPn9VpIANl2GdIqii9bNbU=;
-        b=pGN40C5Bu0iC+9BMayLJCK51B9TpY5Wlp6M9/pPT+GJ2bXjfwRCYJ4SOBdkRgVp1Wr
-         6AX8iq29fSIG2xZJLs9PefLfusTwwIrlW/YIg2rfYZwf3ApwEUxw4uL9ZXH6uI0+q9v+
-         9xgLQFIEEEwl9fPqC8Xkd3ReMOIt0HorWfSSDZPozLZrYDnfPlPw3CgbSnaBRkaD8wlm
-         MnuvlObjqXf547i6FebUGlPDSQtOzUuokjT8Crdghh9huznBwQNJXaBLJ61RBa68kD4a
-         rZ1jxqByCQ/xWwJlcg4k8U3YyaRLdpH74QuddGqtWpRG0YENC3IkGg6VAaKJDoQqzb6Q
-         fClw==
-X-Gm-Message-State: AOAM533rXcGC6NjYZmmQcjbs552y4KIbJTnyxeAlc6BHDhX+UPXcrStH
-        5dkB10yLxsQXB8obTLOxFTN9HA==
-X-Google-Smtp-Source: ABdhPJytV9q3vh1dokw73NDu8zEDyQey80TL3qbLRsyGW990BMBCXndofi3MAqXrMN/rc9rF3zxoNA==
-X-Received: by 2002:a1c:152:: with SMTP id 79mr800490wmb.90.1600884371787;
-        Wed, 23 Sep 2020 11:06:11 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id o16sm541123wrp.52.2020.09.23.11.06.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Sep 2020 11:06:10 -0700 (PDT)
-Date:   Wed, 23 Sep 2020 20:06:08 +0200
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-sunxi <linux-sunxi@googlegroups.com>,
-        "# 3.4.x" <stable@vger.kernel.org>
-Subject: Re: [PATCH v2 4/7] crypto: sun4i-ss: handle BigEndian for cipher
-Message-ID: <20200923180608.GA26666@Red>
-References: <1600627038-40000-1-git-send-email-clabbe@baylibre.com>
- <1600627038-40000-5-git-send-email-clabbe@baylibre.com>
- <CAK8P3a34V16PUoVJjoUOVCik_rdb6vAy=54qRzWdO+aJcwUwsg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK8P3a34V16PUoVJjoUOVCik_rdb6vAy=54qRzWdO+aJcwUwsg@mail.gmail.com>
+        Wed, 23 Sep 2020 14:22:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33790 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726476AbgIWSWl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Sep 2020 14:22:41 -0400
+Received: from e123331-lin.nice.arm.com (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 974FC20791;
+        Wed, 23 Sep 2020 18:22:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600885360;
+        bh=mlB6rdIZtIuoDKMYTjboUQQNek6n4dzbSSNWip0zkp8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=M0yfp7By/VGzeOGWt4oNVxfMsa6ykpHR3Mbkae5j2QgYjdL+Q/ORwUAZXVzNDv/mD
+         KeIIuzKRSAspny8mbnBKZzjV6ux2n6LuqqzROEAsL3V0XemwWBQ9W+y/7DI4xnx4Va
+         ano9bw71rbfvfxikRr56NiHn9YXMf2rgmuqjnW5E=
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        David Laight <David.Laight@aculab.com>
+Subject: [PATCH 0/2] crypto: xor - defer and optimize boot time benchmark
+Date:   Wed, 23 Sep 2020 20:22:28 +0200
+Message-Id: <20200923182230.22715-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 23, 2020 at 04:00:32PM +0200, Arnd Bergmann wrote:
-> On Sun, Sep 20, 2020 at 8:37 PM Corentin Labbe <clabbe@baylibre.com> wrote:
-> >
-> > Ciphers produce invalid results on BE.
-> > Key and IV need to be written in LE.
-> >
-> > Fixes: 6298e948215f2 ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
-> > Cc: <stable@vger.kernel.org>
-> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> > ---
-> >  drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c | 12 ++++++------
-> >  1 file changed, 6 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
-> > index c6c25204780d..a05889745097 100644
-> > --- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
-> > +++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
-> > @@ -52,13 +52,13 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
-> >
-> >         spin_lock_irqsave(&ss->slock, flags);
-> >
-> > -       for (i = 0; i < op->keylen; i += 4)
-> > -               writel(*(op->key + i / 4), ss->base + SS_KEY0 + i);
-> > +       for (i = 0; i < op->keylen / 4; i++)
-> > +               writel(cpu_to_le32(op->key[i]), ss->base + SS_KEY0 + i * 4);
-> 
-> I suspect what you actually want here is writesl() in place of the
-> loop. This skips the byteswap on big-endian, rather than swapping
-> each word twice.
-> 
-> The point is that this register seems to act as a FIFO for a byte-stream
-> rather than a 32-bit fixed-endian register.
-> 
->      Arnd
+Doug reports [0] that the XOR boot time benchmark takes more time than
+necessary, and runs at a time when there is little room for other
+boot time tasks to run concurrently.
 
-Thanks, using writesl() fixes the warning, but I need to keep the loop since the register is different each time.
-Or does it is better to use directly __raw_writel() ?
+Let's fix this by #1 deferring the benchmark, and #2 uses a faster
+implementation.
+
+[0] https://lore.kernel.org/linux-arm-kernel/20200921172603.1.Id9450c1d3deef17718bd5368580a3c44895209ee@changeid/
+
+Cc: Douglas Anderson <dianders@chromium.org>
+Cc: David Laight <David.Laight@aculab.com>
+
+Ard Biesheuvel (2):
+  crypto: xor - defer load time benchmark to a later time
+  crypto: xor - use ktime for template benchmarking
+
+ crypto/xor.c | 65 +++++++++++++-------
+ 1 file changed, 43 insertions(+), 22 deletions(-)
+
+-- 
+2.17.1
+
