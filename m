@@ -2,171 +2,119 @@ Return-Path: <SRS0=nWKA=DA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B39B8C2D0A8
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 18:22:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33899C2D0A8
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 18:59:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5A4112371F
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 18:22:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600885365;
-	bh=0doP0aooxFGz+DXE+9HEDhM0qRnc9fhdhI2cG/YkZ4Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=FTdcf/6JHhMfB5+e8pyfndTqVjQrW5JedG/mazAIZAQ5RT0KXNYkRR13TxwOIPiqp
-	 C8tU+YfS8Tktac6PN8Y42XUy7TFzYNoZLdGGa7JtHqvUu1lqkzjwukBsiryevXbrzk
-	 AowE4A1UVSo23zJ+D10V//qHOyRiBvnIi49LoQfA=
+	by mail.kernel.org (Postfix) with ESMTP id CE09C208B6
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 18:59:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726636AbgIWSWo (ORCPT
+        id S1726727AbgIWS7W (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Sep 2020 14:22:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33826 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726476AbgIWSWo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Sep 2020 14:22:44 -0400
-Received: from e123331-lin.nice.arm.com (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CC478235F7;
-        Wed, 23 Sep 2020 18:22:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600885364;
-        bh=0doP0aooxFGz+DXE+9HEDhM0qRnc9fhdhI2cG/YkZ4Q=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=eW0TQObXNZLRjFux6mShjzE6nF4fx7+EimVuNwlsVZgctj5IVjkQ74/msuYCzyo3L
-         N/Vyp+GTX2bcVG6Goom4+/JOH0M1dn9uKvgvOumNIF5UnAkfAwiqdCXsZ3DK86Ti8J
-         cRo19sjpxLCiRVq5cwLJAVunqwjtlknu3XCr40VU=
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>,
-        Douglas Anderson <dianders@chromium.org>,
-        David Laight <David.Laight@aculab.com>
-Subject: [PATCH 2/2] crypto: xor - use ktime for template benchmarking
-Date:   Wed, 23 Sep 2020 20:22:30 +0200
-Message-Id: <20200923182230.22715-3-ardb@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200923182230.22715-1-ardb@kernel.org>
-References: <20200923182230.22715-1-ardb@kernel.org>
+        Wed, 23 Sep 2020 14:59:22 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:39159 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726460AbgIWS7V (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Sep 2020 14:59:21 -0400
+Received: from mail-qt1-f180.google.com ([209.85.160.180]) by
+ mrelayeu.kundenserver.de (mreue106 [212.227.15.145]) with ESMTPSA (Nemesis)
+ id 1MHWzP-1kGVAE350r-00DZiz; Wed, 23 Sep 2020 20:59:19 +0200
+Received: by mail-qt1-f180.google.com with SMTP id e7so795745qtj.11;
+        Wed, 23 Sep 2020 11:59:19 -0700 (PDT)
+X-Gm-Message-State: AOAM531wP72iA0pbmJE5KBpH6cKsCYf/WxXicRDnjpCtkpqw9aCTvJlJ
+        EF/cJw14rzQRsvYr3MFHAxxRvPAq2HMp5IJvIfw=
+X-Google-Smtp-Source: ABdhPJwme+rb5RoO6LECQNeo8izrVwlnHxry8TaPntfd7H7TZLiqhZzguIxt8lKcD7A5risH74SRBfnVMBOeFQ1ENqU=
+X-Received: by 2002:aed:2ce5:: with SMTP id g92mr1583405qtd.204.1600887558368;
+ Wed, 23 Sep 2020 11:59:18 -0700 (PDT)
+MIME-Version: 1.0
+References: <1600627038-40000-1-git-send-email-clabbe@baylibre.com>
+ <1600627038-40000-5-git-send-email-clabbe@baylibre.com> <CAK8P3a34V16PUoVJjoUOVCik_rdb6vAy=54qRzWdO+aJcwUwsg@mail.gmail.com>
+ <20200923180608.GA26666@Red>
+In-Reply-To: <20200923180608.GA26666@Red>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Wed, 23 Sep 2020 20:59:02 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a2s_mJaK+Z1_vvY_oCax1x2ksyiOVBd7MytA47bQ6tVfw@mail.gmail.com>
+Message-ID: <CAK8P3a2s_mJaK+Z1_vvY_oCax1x2ksyiOVBd7MytA47bQ6tVfw@mail.gmail.com>
+Subject: Re: [PATCH v2 4/7] crypto: sun4i-ss: handle BigEndian for cipher
+To:     LABBE Corentin <clabbe@baylibre.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-sunxi <linux-sunxi@googlegroups.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, "# 3.4.x" <stable@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:Ffk0sIPApP9DGKKBthlUPcFIrquo0PFCB2U91OY+rfsvP8EcTBt
+ xSgoOt3nR4v6AJ/G66vt7yKV+EpgVVmVNAQ/u3ft53yF8EJ4hG9woEvRM39HD82t3Im7hVY
+ S6QLI/YwlnQQgIQWIvd9HyFCOhXxw47DSXODks1Hjiz4Kl/cKmFDw5wWwfyDSOurEUe6xUF
+ VSVxqwa0Rgh5dtTgzzutg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:T7JvNbskoq0=:IdcnmBiMJGzWYlKdmp1CIU
+ S4Cg7RxeWWa0TGMIx7wSYU4EjkMm7SSM5EKP8wQvHkf1qA49umQPq6/0Yq/b53g4vspDV3nQI
+ 5aZGZkH/EXXQzoIpEWRZqXdsa2+EIxKU1AdkLHboaQWNF27OkCaRP117wzZQCCCf10kH4/JMN
+ q8S9mOlybsdBL9VnTWZiAtzbR4Y9eI0DjR+LDH9wVbyCJpkoHG9LG2fPzSZ5v6ANALK1MizqK
+ gHwHTdmNb9r+Lrrs0RfKUSMtfs//sujITiJmzRCKvjNeEyR2sTwB1wXE7OpqslPLN1AiCQQ32
+ FDZ6tLaJgFJY27jG/RVB48smOjTLeeEI18A2lC5YETACUaLITipMu4NXYd8T8O9pNdEW0W3hK
+ EgIhDMMFekwKfcw3uhqy4O0LrLpQBpYr1JAMGu6cEvA6f32SGZSK+Z654wcFYhlFZDGpsXwg/
+ u6cSnXv5ho7wWFzZDO3thITHERXFSXFxCqougP46u1TjaO1Nnz9FqFJ/eFqxV7SI4kDOrwE17
+ PhzkcyAgUe+JaMQ3ZurbVIzxclQ90ccBQ5AoFBafckJ3HA9malbkkgNKFfvu7P0HHK2JTMKs7
+ 5RYlFJxvInF2Hk0rEAVhbbb6Gia61oqvRGn/N+LBmq+8bW/Tc4QtR5jkNhLh7J6C1VMeeBYk/
+ Q2E+3msI/mCQAH+JAoRhi2Bz8EZ4UoD4GQH7Big/oqr7EUfE6MmBEBxHmBun3hFyvwbU0r6SH
+ cj+dqtRPYfnrZfjB5AIKsyLwQQHe3HT+Z60nJoMnAv/yvXkzNqeu0NrCAzgjqEzeMWztWw8JH
+ kYITKJGzRFYxVf1XaGG2TGnb5oYkSTD+5dvIWJWTDT0J0/6XQ9d74wT59S2RgBc4MwiNuqZYZ
+ 5+2kSNBTXe/WeClBePF+KsulQ13HZUHISnt5rKfKC9THge9KXynV+1Zc3FhEfE7lp927WlyCq
+ jwjAxulYxaFcigkGeL8IoTlBe95Xk7QJd9ttw4xIOX/22RrR40CUD
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently, we use the jiffies counter as a time source, by staring at
-it until a HZ period elapses, and then staring at it again and perform
-as many XOR operations as we can at the same time until another HZ
-period elapses, so that we can calculate the throughput. This takes
-longer than necessary, and depends on HZ, which is undesirable, since
-HZ is system dependent.
+On Wed, Sep 23, 2020 at 8:08 PM LABBE Corentin <clabbe@baylibre.com> wrote:
+> On Wed, Sep 23, 2020 at 04:00:32PM +0200, Arnd Bergmann wrote:
+> > On Sun, Sep 20, 2020 at 8:37 PM Corentin Labbe <clabbe@baylibre.com> wrote:
+> > > diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
+> > > index c6c25204780d..a05889745097 100644
+> > > --- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
+> > > +++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
+> > > @@ -52,13 +52,13 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
+> > >
+> > >         spin_lock_irqsave(&ss->slock, flags);
+> > >
+> > > -       for (i = 0; i < op->keylen; i += 4)
+> > > -               writel(*(op->key + i / 4), ss->base + SS_KEY0 + i);
+> > > +       for (i = 0; i < op->keylen / 4; i++)
+> > > +               writel(cpu_to_le32(op->key[i]), ss->base + SS_KEY0 + i * 4);
+> >
+> > I suspect what you actually want here is writesl() in place of the
+> > loop. This skips the byteswap on big-endian, rather than swapping
+> > each word twice.
+> >
+> > The point is that this register seems to act as a FIFO for a byte-stream
+> > rather than a 32-bit fixed-endian register.
+>
+> Thanks, using writesl() fixes the warning, but I need to keep the loop
+> since the register is different each time.
 
-Let's use the ktime interface instead, and use it to time a fixed
-number of XOR operations, which can be done much faster, and makes
-the time spent depend on the performance level of the system itself,
-which is much more reasonable.
+Ah, I see. I thought we had an interface for that as well, but I can't
+find it now. I see memcpy_toio32() in one driver, but that implementation
+appears to be wrong here (and probably also wrong for the machine
+it was meant for)
 
-On ThunderX2, I get the following results:
+There is the regular memcpy_toio(), but on big-endian Arm that
+turns into a per-byte copy, which might either not work on your
+hardware or be too slow.
 
-Before:
+There is also __iowrite32_copy(), which is not what I had remembered
+but does seem to do what you want here.
 
-  [72625.956765] xor: measuring software checksum speed
-  [72625.993104]    8regs     : 10169.000 MB/sec
-  [72626.033099]    32regs    : 12050.000 MB/sec
-  [72626.073095]    arm64_neon: 11100.000 MB/sec
-  [72626.073097] xor: using function: 32regs (12050.000 MB/sec)
+> Or does it is better to use directly __raw_writel() ?
 
-After:
+__raw_writel() is not very portable, so I would avoid that in normal
+device drivers even when you only run them on specific hardware.
 
-  [ 2503.189696] xor: measuring software checksum speed
-  [ 2503.189896]    8regs           : 10556 MB/sec
-  [ 2503.190061]    32regs          : 12538 MB/sec
-  [ 2503.190250]    arm64_neon      : 11470 MB/sec
-  [ 2503.190252] xor: using function: 32regs (12538 MB/sec)
-
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- crypto/xor.c | 36 ++++++++------------
- 1 file changed, 15 insertions(+), 21 deletions(-)
-
-diff --git a/crypto/xor.c b/crypto/xor.c
-index b42c38343733..23f98b451b69 100644
---- a/crypto/xor.c
-+++ b/crypto/xor.c
-@@ -76,49 +76,43 @@ static int __init register_xor_blocks(void)
- }
- #endif
- 
--#define BENCH_SIZE (PAGE_SIZE)
-+#define BENCH_SIZE	4096
-+#define REPS		100
- 
- static void __init
- do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
- {
- 	int speed;
--	unsigned long now, j;
--	int i, count, max;
-+	int i, j, count;
-+	ktime_t min, start, diff;
- 
- 	tmpl->next = template_list;
- 	template_list = tmpl;
- 
- 	preempt_disable();
- 
--	/*
--	 * Count the number of XORs done during a whole jiffy, and use
--	 * this to calculate the speed of checksumming.  We use a 2-page
--	 * allocation to have guaranteed color L1-cache layout.
--	 */
--	max = 0;
-+	min = (ktime_t)S64_MAX;
- 	for (i = 0; i < 5; i++) {
--		j = jiffies;
--		count = 0;
--		while ((now = jiffies) == j)
--			cpu_relax();
--		while (time_before(jiffies, now + 1)) {
-+		start = ktime_get();
-+		for (j = 0; j < REPS; j++) {
- 			mb(); /* prevent loop optimzation */
- 			tmpl->do_2(BENCH_SIZE, b1, b2);
- 			mb();
- 			count++;
- 			mb();
- 		}
--		if (count > max)
--			max = count;
-+		diff = ktime_sub(ktime_get(), start);
-+		if (diff < min)
-+			min = diff;
- 	}
- 
- 	preempt_enable();
- 
--	speed = max * (HZ * BENCH_SIZE / 1024);
-+	// bytes/ns == GB/s, multiply by 1000 to get MB/s [not MiB/s]
-+	speed = (1000 * REPS * BENCH_SIZE) / (u32)min;
- 	tmpl->speed = speed;
- 
--	printk(KERN_INFO "   %-10s: %5d.%03d MB/sec\n", tmpl->name,
--	       speed / 1000, speed % 1000);
-+	printk(KERN_INFO "   %-16s: %5d MB/sec\n", tmpl->name, speed);
- }
- 
- static int __init
-@@ -158,8 +152,8 @@ calibrate_xor_blocks(void)
- 		if (f->speed > fastest->speed)
- 			fastest = f;
- 
--	printk(KERN_INFO "xor: using function: %s (%d.%03d MB/sec)\n",
--	       fastest->name, fastest->speed / 1000, fastest->speed % 1000);
-+	printk(KERN_INFO "xor: using function: %s (%d MB/sec)\n",
-+	       fastest->name, fastest->speed);
- 
- #undef xor_speed
- 
--- 
-2.17.1
-
+      Arnd
