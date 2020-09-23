@@ -2,95 +2,299 @@ Return-Path: <SRS0=nWKA=DA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAE37C4363D
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 22:08:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07C17C4727E
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 22:38:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9A99823787
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 22:08:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A271723119
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 22:38:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e//6wWpV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726476AbgIWWIR (ORCPT
+        id S1726693AbgIWWiU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Sep 2020 18:08:17 -0400
-Received: from 212.199.177.27.static.012.net.il ([212.199.177.27]:55843 "EHLO
-        herzl.nuvoton.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726419AbgIWWIR (ORCPT
+        Wed, 23 Sep 2020 18:38:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52466 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726199AbgIWWiT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Sep 2020 18:08:17 -0400
-X-Greylist: delayed 2645 seconds by postgrey-1.27 at vger.kernel.org; Wed, 23 Sep 2020 18:08:17 EDT
-Received: from taln60.nuvoton.co.il (ntil-fw [212.199.177.25])
-        by herzl.nuvoton.co.il (8.13.8/8.13.8) with ESMTP id 08NLN8mr026845;
-        Thu, 24 Sep 2020 00:23:08 +0300
-Received: by taln60.nuvoton.co.il (Postfix, from userid 10070)
-        id EBDB3639D6; Thu, 24 Sep 2020 00:23:07 +0300 (IDT)
-From:   Tomer Maimon <tmaimon77@gmail.com>
-To:     mpm@selenic.com, herbert@gondor.apana.org.au, arnd@arndb.de,
-        gregkh@linuxfoundation.org, avifishman70@gmail.com,
-        tali.perry1@gmail.com, venture@google.com, yuenn@google.com,
-        benjaminfair@google.com, joel@jms.id.au
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        openbmc@lists.ozlabs.org, tmaimon77@gmail.com
-Subject: [PATCH v1] hw_random: npcm: modify readl to readb
-Date:   Thu, 24 Sep 2020 00:23:05 +0300
-Message-Id: <20200923212305.198485-1-tmaimon77@gmail.com>
-X-Mailer: git-send-email 2.22.0
+        Wed, 23 Sep 2020 18:38:19 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB899C0613CE;
+        Wed, 23 Sep 2020 15:38:19 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id 34so591750pgo.13;
+        Wed, 23 Sep 2020 15:38:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=4G8NJ7gBvmk7nE2Yhc5f36mYV1caN+TA2ng5rrNJ52k=;
+        b=e//6wWpVk1BhA/UC96AvTv1sS2ltuDncPv9BuvIZ7qfgG+YnwoWa30tPXYHbCTGg+i
+         O9QPX513HroUDjhw7Dy2Y+xk0rVwlRJoC4u1iZQ39BrhQaZ6vpnjQTFon86bR/guIM6O
+         8woIwJRZmoZ8TuHrEnEjGa7/eUyykHK4QtT/Zf9Yv4VxtrqXTyTD9LgyQe6pDgrkIREz
+         I7HJ75c8hd6HBD2iB3aDgxqaTIyMeBkaqZ59KQfnO7wJUe/RrbEpZ7I3lTMBOVgnbeLY
+         VJE+QhGQNqv3lAMQ9ObEg+c1JfmxEnM22uXYEUSGwoMC0th2JPVgfG7wImkSH8ddFnp6
+         OH2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=4G8NJ7gBvmk7nE2Yhc5f36mYV1caN+TA2ng5rrNJ52k=;
+        b=QbkWzomR4pnMGyatdiB0GaBp/hS/rTYCap4KvjxJliJA1E7jakncX3x/VuO48OCzfF
+         ddzk/axwd32MzuX8HRFOtFT7N+Q3lfWqepc9DwMZ8ChznE2fYAZLkki2VEaJcRK7KZCn
+         MnnJMPCU2+f1kob+1LyFEa9ea2n2r/OKsz/izc8+I1LZ/Hu0MONZBTNLUweh2x/oUENT
+         uEpDjZLaxM6WbDRs3MzugSAuhDv9lJDF9DggD3v4vh6OUke94hM56P1PicZscHloYFZr
+         mf6V19RTrdc48+ydulDX+Q/DNk3Y58+hFzQUguxi57+/EOBl40DSfddF9JNTA85jcWaP
+         nluw==
+X-Gm-Message-State: AOAM530MeI4OA0u6Nsi0AtlUmPBTxXENF2tLi7J3biEcAalTfNzrg9SR
+        zAbW6Cz4SmUM6mx7Aq+OsjQ=
+X-Google-Smtp-Source: ABdhPJy41mUkxsEETeLY/pxBipDkhGbonDSW6onkmuqg+MfsGtRLm1/vxSpgrsIX5HW7nVjcab94EA==
+X-Received: by 2002:a62:7c43:0:b029:139:858b:8033 with SMTP id x64-20020a627c430000b0290139858b8033mr1801462pfc.3.1600900699124;
+        Wed, 23 Sep 2020 15:38:19 -0700 (PDT)
+Received: from nickserv.localdomain (c-98-33-101-203.hsd1.ca.comcast.net. [98.33.101.203])
+        by smtp.gmail.com with ESMTPSA id d20sm417964pjv.39.2020.09.23.15.38.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Sep 2020 15:38:18 -0700 (PDT)
+From:   Nick Terrell <nickrterrell@gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        squashfs-devel@lists.sourceforge.net,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-kernel@vger.kernel.org, Kernel Team <Kernel-team@fb.com>,
+        Nick Terrell <nickrterrell@gmail.com>,
+        Nick Terrell <terrelln@fb.com>, Chris Mason <clm@fb.com>,
+        Petr Malat <oss@malat.biz>, Johannes Weiner <jweiner@fb.com>,
+        Niket Agarwal <niketa@fb.com>, Yann Collet <cyan@fb.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: [PATCH v3 1/9] lib: zstd: Add zstd compatibility wrapper
+Date:   Wed, 23 Sep 2020 15:41:58 -0700
+Message-Id: <20200923224206.68968-2-nickrterrell@gmail.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20200923224206.68968-1-nickrterrell@gmail.com>
+References: <20200923224206.68968-1-nickrterrell@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Modify the read size to the correct HW random
-registers size, 8bit.
-The incorrect read size caused and faulty
-HW random value.
+From: Nick Terrell <terrelln@fb.com>
 
-Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
+Adds zstd_compat.h which provides the necessary functions from the
+current zstd.h API. It is only active for zstd versions 1.4.6 and newer.
+That means it is disabled currently, but will become active when a later
+patch in this series updates the zstd library in the kernel to 1.4.6.
+
+This header allows the zstd upgrade to 1.4.6 without changing any
+callers, since they all include zstd through the compatibility wrapper.
+Later patches in this series transition each caller away from the
+compatibility wrapper. After all the callers have been transitioned away
+from the compatibility wrapper, the final patch in this series deletes
+it.
+
+Signed-off-by: Nick Terrell <terrelln@fb.com>
 ---
- drivers/char/hw_random/npcm-rng.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ crypto/zstd.c               |   2 +-
+ fs/btrfs/zstd.c             |   2 +-
+ fs/f2fs/compress.c          |   2 +-
+ fs/squashfs/zstd_wrapper.c  |   2 +-
+ include/linux/zstd_compat.h | 116 ++++++++++++++++++++++++++++++++++++
+ lib/decompress_unzstd.c     |   2 +-
+ 6 files changed, 121 insertions(+), 5 deletions(-)
+ create mode 100644 include/linux/zstd_compat.h
 
-diff --git a/drivers/char/hw_random/npcm-rng.c b/drivers/char/hw_random/npcm-rng.c
-index 5d0d13f891b7..1ec5f267a656 100644
---- a/drivers/char/hw_random/npcm-rng.c
-+++ b/drivers/char/hw_random/npcm-rng.c
-@@ -58,24 +58,24 @@ static int npcm_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+diff --git a/crypto/zstd.c b/crypto/zstd.c
+index 1a3309f066f7..dcda3cad3b5c 100644
+--- a/crypto/zstd.c
++++ b/crypto/zstd.c
+@@ -11,7 +11,7 @@
+ #include <linux/module.h>
+ #include <linux/net.h>
+ #include <linux/vmalloc.h>
+-#include <linux/zstd.h>
++#include <linux/zstd_compat.h>
+ #include <crypto/internal/scompress.h>
  
- 	pm_runtime_get_sync((struct device *)priv->rng.priv);
  
--	while (max >= sizeof(u32)) {
-+	while (max) {
- 		if (wait) {
--			if (readl_poll_timeout(priv->base + NPCM_RNGCS_REG,
-+			if (readb_poll_timeout(priv->base + NPCM_RNGCS_REG,
- 					       ready,
- 					       ready & NPCM_RNG_DATA_VALID,
- 					       NPCM_RNG_POLL_USEC,
- 					       NPCM_RNG_TIMEOUT_USEC))
- 				break;
- 		} else {
--			if ((readl(priv->base + NPCM_RNGCS_REG) &
-+			if ((readb(priv->base + NPCM_RNGCS_REG) &
- 			    NPCM_RNG_DATA_VALID) == 0)
- 				break;
- 		}
+diff --git a/fs/btrfs/zstd.c b/fs/btrfs/zstd.c
+index 9a4871636c6c..a7367ff573d4 100644
+--- a/fs/btrfs/zstd.c
++++ b/fs/btrfs/zstd.c
+@@ -16,7 +16,7 @@
+ #include <linux/refcount.h>
+ #include <linux/sched.h>
+ #include <linux/slab.h>
+-#include <linux/zstd.h>
++#include <linux/zstd_compat.h>
+ #include "misc.h"
+ #include "compression.h"
+ #include "ctree.h"
+diff --git a/fs/f2fs/compress.c b/fs/f2fs/compress.c
+index 1dfb126a0cb2..e056f3a2b404 100644
+--- a/fs/f2fs/compress.c
++++ b/fs/f2fs/compress.c
+@@ -11,7 +11,7 @@
+ #include <linux/backing-dev.h>
+ #include <linux/lzo.h>
+ #include <linux/lz4.h>
+-#include <linux/zstd.h>
++#include <linux/zstd_compat.h>
  
--		*(u32 *)buf = readl(priv->base + NPCM_RNGD_REG);
--		retval += sizeof(u32);
--		buf += sizeof(u32);
--		max -= sizeof(u32);
-+		*(u8 *)buf = readb(priv->base + NPCM_RNGD_REG);
-+		retval++;
-+		buf++;
-+		max--;
- 	}
+ #include "f2fs.h"
+ #include "node.h"
+diff --git a/fs/squashfs/zstd_wrapper.c b/fs/squashfs/zstd_wrapper.c
+index b7cb1faa652d..f8c512a6204e 100644
+--- a/fs/squashfs/zstd_wrapper.c
++++ b/fs/squashfs/zstd_wrapper.c
+@@ -11,7 +11,7 @@
+ #include <linux/mutex.h>
+ #include <linux/bio.h>
+ #include <linux/slab.h>
+-#include <linux/zstd.h>
++#include <linux/zstd_compat.h>
+ #include <linux/vmalloc.h>
  
- 	pm_runtime_mark_last_busy((struct device *)priv->rng.priv);
+ #include "squashfs_fs.h"
+diff --git a/include/linux/zstd_compat.h b/include/linux/zstd_compat.h
+new file mode 100644
+index 000000000000..cda9208bf04a
+--- /dev/null
++++ b/include/linux/zstd_compat.h
+@@ -0,0 +1,116 @@
++/*
++ * Copyright (c) 2016-present, Facebook, Inc.
++ * All rights reserved.
++ *
++ * This source code is licensed under the BSD-style license found in the
++ * LICENSE file in the root directory of https://github.com/facebook/zstd.
++ * An additional grant of patent rights can be found in the PATENTS file in the
++ * same directory.
++ *
++ * This program is free software; you can redistribute it and/or modify it under
++ * the terms of the GNU General Public License version 2 as published by the
++ * Free Software Foundation. This program is dual-licensed; you may select
++ * either version 2 of the GNU General Public License ("GPL") or BSD license
++ * ("BSD").
++ */
++
++#ifndef ZSTD_COMPAT_H
++#define ZSTD_COMPAT_H
++
++#include <linux/zstd.h>
++
++#if defined(ZSTD_VERSION_NUMBER) && (ZSTD_VERSION_NUMBER >= 10406)
++/*
++ * This header provides backwards compatibility for the zstd-1.4.6 library
++ * upgrade. This header allows us to upgrade the zstd library version without
++ * modifying any callers. Then we will migrate callers from the compatibility
++ * wrapper one at a time until none remain. At which point we will delete this
++ * header.
++ *
++ * It is temporary and will be deleted once the upgrade is complete.
++ */
++
++#include <linux/zstd_errors.h>
++
++static inline size_t ZSTD_CCtxWorkspaceBound(ZSTD_compressionParameters compression_params)
++{
++    return ZSTD_estimateCCtxSize_usingCParams(compression_params);
++}
++
++static inline size_t ZSTD_CStreamWorkspaceBound(ZSTD_compressionParameters compression_params)
++{
++    return ZSTD_estimateCStreamSize_usingCParams(compression_params);
++}
++
++static inline size_t ZSTD_DCtxWorkspaceBound(void)
++{
++    return ZSTD_estimateDCtxSize();
++}
++
++static inline size_t ZSTD_DStreamWorkspaceBound(unsigned long long window_size)
++{
++    return ZSTD_estimateDStreamSize(window_size);
++}
++
++static inline ZSTD_CCtx* ZSTD_initCCtx(void* wksp, size_t wksp_size)
++{
++    if (wksp == NULL)
++        return NULL;
++    return ZSTD_initStaticCCtx(wksp, wksp_size);
++}
++
++static inline ZSTD_CStream* ZSTD_initCStream_compat(ZSTD_parameters params, uint64_t pledged_src_size, void* wksp, size_t wksp_size)
++{
++    ZSTD_CStream* cstream;
++    size_t ret;
++
++    if (wksp == NULL)
++        return NULL;
++
++    cstream = ZSTD_initStaticCStream(wksp, wksp_size);
++    if (cstream == NULL)
++        return NULL;
++
++    /* 0 means unknown in old API but means 0 in new API */
++    if (pledged_src_size == 0)
++        pledged_src_size = ZSTD_CONTENTSIZE_UNKNOWN;
++
++    ret = ZSTD_initCStream_advanced(cstream, NULL, 0, params, pledged_src_size);
++    if (ZSTD_isError(ret))
++        return NULL;
++
++    return cstream;
++}
++#define ZSTD_initCStream ZSTD_initCStream_compat
++
++static inline ZSTD_DCtx* ZSTD_initDCtx(void* wksp, size_t wksp_size)
++{
++    if (wksp == NULL)
++        return NULL;
++    return ZSTD_initStaticDCtx(wksp, wksp_size);
++}
++
++static inline ZSTD_DStream* ZSTD_initDStream_compat(unsigned long long window_size, void* wksp, size_t wksp_size)
++{
++    if (wksp == NULL)
++        return NULL;
++    (void)window_size;
++    return ZSTD_initStaticDStream(wksp, wksp_size);
++}
++#define ZSTD_initDStream ZSTD_initDStream_compat
++
++typedef ZSTD_frameHeader ZSTD_frameParams;
++
++static inline size_t ZSTD_getFrameParams(ZSTD_frameParams* frame_params, const void* src, size_t src_size)
++{
++    return ZSTD_getFrameHeader(frame_params, src, src_size);
++}
++
++static inline size_t ZSTD_compressCCtx_compat(ZSTD_CCtx* cctx, void* dst, size_t dst_capacity, const void* src, size_t src_size, ZSTD_parameters params)
++{
++    return ZSTD_compress_advanced(cctx, dst, dst_capacity, src, src_size, NULL, 0, params);
++}
++#define ZSTD_compressCCtx ZSTD_compressCCtx_compat
++
++#endif /* ZSTD_VERSION_NUMBER >= 10406 */
++#endif /* ZSTD_COMPAT_H */
+diff --git a/lib/decompress_unzstd.c b/lib/decompress_unzstd.c
+index 0ad2c15479ed..dbc290af26b4 100644
+--- a/lib/decompress_unzstd.c
++++ b/lib/decompress_unzstd.c
+@@ -77,7 +77,7 @@
+ 
+ #include <linux/decompress/mm.h>
+ #include <linux/kernel.h>
+-#include <linux/zstd.h>
++#include <linux/zstd_compat.h>
+ 
+ /* 128MB is the maximum window size supported by zstd. */
+ #define ZSTD_WINDOWSIZE_MAX	(1 << ZSTD_WINDOWLOG_MAX)
 -- 
-2.22.0
+2.28.0
 
