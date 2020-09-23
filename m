@@ -2,153 +2,147 @@ Return-Path: <SRS0=nWKA=DA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B44EC2D0A8
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 11:08:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B75DC2D0A8
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 11:59:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C2DA20725
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 11:08:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D8825221F0
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 11:59:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="LiB52Xn/"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="RFaM3pzg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726419AbgIWLIh (ORCPT
+        id S1726514AbgIWL7z (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Sep 2020 07:08:37 -0400
-Received: from mail2.candelatech.com ([208.74.158.173]:43380 "EHLO
-        mail3.candelatech.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726332AbgIWLIh (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Sep 2020 07:08:37 -0400
-X-Greylist: delayed 304 seconds by postgrey-1.27 at vger.kernel.org; Wed, 23 Sep 2020 07:08:36 EDT
-Received: from [192.168.254.6] (unknown [50.46.158.169])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail3.candelatech.com (Postfix) with ESMTPSA id 8CEF513C2B0;
-        Wed, 23 Sep 2020 04:03:31 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 8CEF513C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-        s=default; t=1600859012;
-        bh=qmqNgz560CSBYNGnAzZ2I7gND2SEDOvbMwyR+2oCsiI=;
-        h=Subject:From:To:Cc:References:Date:In-Reply-To:From;
-        b=LiB52Xn/hWgDGYZIe3DGaA/gRWHDFhh3FpNQvrqY6Hn5QEu2s+3qzyqD8J65AWCmC
-         ZL2xlTY9WYXh6r8SuALvM3qplZpcCczM4JFhSvIQTuPozGMdF4gApQfibF608DXnKG
-         sBOyPTMNgfd84dmXcB0TGywGuxHrwatdHBmL6NGw=
-Subject: Re: [PATCH] crypto: x86/aesni - implement accelerated CBCMAC, CMAC
- and XCBC shashes
-From:   Ben Greear <greearb@candelatech.com>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Wed, 23 Sep 2020 07:59:55 -0400
+Received: from mail-eopbgr80044.outbound.protection.outlook.com ([40.107.8.44]:59366
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726472AbgIWL7y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Sep 2020 07:59:54 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ey63/CkgtCfUFnzF/x3NNlN4uUHaDU8gHe5pMWO078RbUIpnIGU+AoBbgqmwJ0zeQ1SIocLXTRQ6wJkNjHoH6tydLica1L7qK9D1mxWMoYTx7LrDRqoMrnkyhLQ4k2v1oEt11OVKXD334ZOWBNfhudq4ro8RjfYJEB1kfFjwlbKOJbBsgicjGERA5tXS3clfLT/GkMu5x/PNk9whCUqxbsfHgWOMll/rFDcJL/hKWi18YJi04Fcm68MvqlofZcIKDV+zAWvafu4uQeUYXeNYYU6+H2gqhV9RHTsjmhWBac75/Zkj6O2L1IZD4YQgM/YR2z36E7v1G29KVTQp39AeEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XuPUhO0nCg+2NkjXYoqCwM9KMgKCBOedyMkursRSX3A=;
+ b=UJNAFZIrM0BxTgau/pB9rvhLmgslHezmd426/f0Ajd/UxdMsDPisjpECHPvS2Gb7sqidgQJZc8mfXGIyeJ1e15vWry0GyUBIp3sm0zneiQRJYxIKbAUYrpda5IkMVZYDRyrhlWXlhhQpAOiXSMxpNb/FKtwaEIyd2KOvuYwf0AUi29J3x5liSyexabNHpb1vrcCkLQp784yhYQP7DL+YGn6xRfrNkviJKtnbHjknRxxwds337H867xzoUob6KQk8YN40CvVlXzpycLTwfzhsNpfFsaNqPY9/uH42HCX6AJqW9LouWw2fVRYgYiqC2ZZKpzt/Df8CzfScp4issh79TQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XuPUhO0nCg+2NkjXYoqCwM9KMgKCBOedyMkursRSX3A=;
+ b=RFaM3pzgQLuIEp+HoTTQMmv7LxAL+a4IpyblmaLTeEDubwAbh1JxP+HmW2BW5Y0ui/XCLc62o/FAhV5pYiyxh0LLOaGHjXFBuWBJgGhO1doYjvYdYt08OQ+JplogDfOoJdkzG2r+JvuX5OptEzbf7toUXvBRwEtq2JMtYWUBuRo=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=nxp.com;
+Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
+ by VI1PR04MB3982.eurprd04.prod.outlook.com (2603:10a6:803:49::30) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.20; Wed, 23 Sep
+ 2020 11:59:51 +0000
+Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
+ ([fe80::847a:fcdb:3b92:7a7d]) by VI1PR04MB4046.eurprd04.prod.outlook.com
+ ([fe80::847a:fcdb:3b92:7a7d%5]) with mapi id 15.20.3391.026; Wed, 23 Sep 2020
+ 11:59:51 +0000
+Subject: Re: [PATCH v3 00/10] crypto: caam - xts(aes) updates
+To:     "Andrei Botila (OSS)" <andrei.botila@oss.nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>
-References: <20200802090616.1328-1-ardb@kernel.org>
- <25776a56-4c6a-3976-f4bc-fa53ba4a1550@candelatech.com>
- <CAMj1kXFAbip567hFaFtoqdevrSEpqFOGQ1+ejL98XrDOaTeggA@mail.gmail.com>
- <9c137bbf-2892-df7a-e6fa-8cce417ecd45@candelatech.com>
- <CAMj1kXFnfYKj1JE4NLsxXtaeKuAOKyBYDbayLr-mHDUYqnV1bA@mail.gmail.com>
- <d7f44f7a-d00e-cef4-5c91-86119e240038@candelatech.com>
-Organization: Candela Technologies
-Message-ID: <391c30de-4746-940c-6585-d69c27f2f4cb@candelatech.com>
-Date:   Wed, 23 Sep 2020 04:03:31 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <d7f44f7a-d00e-cef4-5c91-86119e240038@candelatech.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-MW
+        "David S. Miller" <davem@davemloft.net>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20200922160328.28926-1-andrei.botila@oss.nxp.com>
+From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
+Message-ID: <70fa9fb9-d785-1928-e761-2332c305948e@nxp.com>
+Date:   Wed, 23 Sep 2020 14:59:48 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
+In-Reply-To: <20200922160328.28926-1-andrei.botila@oss.nxp.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM0PR01CA0148.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:aa::17) To VI1PR04MB4046.eurprd04.prod.outlook.com
+ (2603:10a6:803:4d::29)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.0.129] (78.97.206.147) by AM0PR01CA0148.eurprd01.prod.exchangelabs.com (2603:10a6:208:aa::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3412.20 via Frontend Transport; Wed, 23 Sep 2020 11:59:50 +0000
+X-Originating-IP: [78.97.206.147]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: cda6ee45-eee9-400b-71f8-08d85fb82d2f
+X-MS-TrafficTypeDiagnostic: VI1PR04MB3982:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR04MB398265A23EB51FD46A7EF28C98380@VI1PR04MB3982.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: zjOQ0cngpwsWuiaRayboEO2RuqLq67H/SbZMI2ySOkmmo3SzHmBDVuic8AEyrv8PduFIlgBmaCHDHl5HRAwgrk/qPFJ2z1fPzcg3yYGI0q13JcEh1VicvhNKya6dQu3fDwV6SnWDnBtzpY02QlGrlm404DDiHA4a9+94csGKi22bpCwX/U2euTHV87fqRWGJH9HWiQFKoIvj6E1jm3dtgzNCw6Iw/TwYW9Mpx+fIn9vj6NJtbZ2TMHcg4pWW6HveliVS7JiqtyYWxTfXbpG1dBkeFipAjjQ19JxZdlkxmAoyJFarV8zmNG7OXymcaaYvKsQk/6SKK/54YIhKTz3pSDW2x6MD4TEQ1FNZHSlMvc03I4yzJTWx3XGHG61MIeHG
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(346002)(366004)(396003)(39850400004)(16576012)(86362001)(26005)(110136005)(36756003)(83380400001)(316002)(31686004)(53546011)(186003)(5660300002)(16526019)(31696002)(8936002)(2616005)(956004)(2906002)(54906003)(52116002)(8676002)(6486002)(66946007)(66476007)(66556008)(4326008)(478600001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: Om3Q9zDeZG+OlJuKUtS+IendRLSiuQ3SayH6WQxtjngjVgpo7FSFR+AuO3fkzniknXBXYngq0fdwc03i3KNWlW31TVyWsgN4cRVlXWh8NfieqcFZmRxFIsOOFPZhwaLUF5/cOTTKsAsE8S5Z976kK4UpWm6UJtkFOzbCmNEG8xNX4Rg+ZjLvC0jZsJmAYZAwWxD8DA6Lm4SdSJNREhgpzM8mJ5hlV43poDIpqhGd7ZiHe1NqCc+sbz98SITGUbuoL6w/XsvbiWnCSS24UVN00W4thz484HFRRR69WT8edLHjmpWL2fby3kbQim00srXiRgkmMoEqrxRx+pGhBOAVaXRMPyJoy/r+JksqUzF143mR35g/HJ32sNwsABJIVreIo4S12YRazaZh5zzLJbP46PcD/xxLo3UFc3/HixDHIgsVr5jmN0MjXRVSdyrSOrhVq2E2sv4l62dYLldUXfVts/QEi4/yIjSPamjTCBnjHE1kvD2eQ2nMW476Y3ITzxVzaN66Ix3Lj6RVC+m+ORuRSv6QYKnjPhY4lw9XMwiJ8nIwdoD+CMc15R5SRuc+7Gwzl9pVCGXuyjMlsHM3Dt0vPMaaeCekbwqAOQEbBwH+X2N2rszG6RrB4FBDHBvBP4hNRQ5ZF1WBr6WEvMHLRltdsQ==
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cda6ee45-eee9-400b-71f8-08d85fb82d2f
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB4046.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2020 11:59:51.2428
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: irKE93dPr5Pbye4KuSyVnCcSmku1t8RB0uWEgHBqh4m9Z+cUBOn7cV0/WqaihM6CVuGmldbHNK1JYSdWfH6JWQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB3982
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/4/20 12:45 PM, Ben Greear wrote:
-> On 8/4/20 6:08 AM, Ard Biesheuvel wrote:
->> On Tue, 4 Aug 2020 at 15:01, Ben Greear <greearb@candelatech.com> wrote:
->>>
->>> On 8/4/20 5:55 AM, Ard Biesheuvel wrote:
->>>> On Mon, 3 Aug 2020 at 21:11, Ben Greear <greearb@candelatech.com> wrote:
->>>>>
->>>>> Hello,
->>>>>
->>>>> This helps a bit...now download sw-crypt performance is about 150Mbps,
->>>>> but still not as good as with my patch on 5.4 kernel, and fpu is still
->>>>> high in perf top:
->>>>>
->>>>>       13.89%  libc-2.29.so   [.] __memset_sse2_unaligned_erms
->>>>>         6.62%  [kernel]       [k] kernel_fpu_begin
->>>>>         4.14%  [kernel]       [k] _aesni_enc1
->>>>>         2.06%  [kernel]       [k] __crypto_xor
->>>>>         1.95%  [kernel]       [k] copy_user_generic_string
->>>>>         1.93%  libjvm.so      [.] SpinPause
->>>>>         1.01%  [kernel]       [k] aesni_encrypt
->>>>>         0.98%  [kernel]       [k] crypto_ctr_crypt
->>>>>         0.93%  [kernel]       [k] udp_sendmsg
->>>>>         0.78%  [kernel]       [k] crypto_inc
->>>>>         0.74%  [kernel]       [k] __ip_append_data.isra.53
->>>>>         0.65%  [kernel]       [k] aesni_cbc_enc
->>>>>         0.64%  [kernel]       [k] __dev_queue_xmit
->>>>>         0.62%  [kernel]       [k] ipt_do_table
->>>>>         0.62%  [kernel]       [k] igb_xmit_frame_ring
->>>>>         0.59%  [kernel]       [k] ip_route_output_key_hash_rcu
->>>>>         0.57%  [kernel]       [k] memcpy
->>>>>         0.57%  libjvm.so      [.] InstanceKlass::oop_follow_contents
->>>>>         0.56%  [kernel]       [k] irq_fpu_usable
->>>>>         0.56%  [kernel]       [k] mac_do_update
->>>>>
->>>>> If you'd like help setting up a test rig and have an ath10k pcie NIC or ath9k pcie NIC,
->>>>> then I can help.  Possibly hwsim would also be a good test case, but I have not tried
->>>>> that.
->>>>>
->>>>
->>>> I don't think this is likely to be reproducible on other
->>>> micro-architectures, so setting up a test rig is unlikely to help.
->>>>
->>>> I'll send out a v2 which implements a ahash instead of a shash (and
->>>> implements some other tweaks) so that kernel_fpu_begin() is only
->>>> called twice for each packet on the cbcmac path.
->>>>
->>>> Do you have any numbers for the old kernel without your patch? This
->>>> pathological FPU preserve/restore behavior could be caused be the
->>>> optimizations, or by other changes that landed in the meantime, so I
->>>> would like to know if kernel_fpu_begin() is as prominent in those
->>>> traces as well.
->>>>
->>>
->>> This same patch makes i7 mobile processors able to handle 1Gbps+ software
->>> decrypt rates, where without the patch, the rate was badly constrained and CPU
->>> load was much higher, so it is definitely noticeable on other processors too.
->>
->> OK
->>
->>> The weak processor on the current test rig is convenient because the problem
->>> is so noticeable even at slower wifi speeds.
->>>
->>> We can do some tests on 5.4 with our patch reverted.
->>>
->>
->> The issue with your CCM patch is that it keeps the FPU enabled for the
->> entire input, which also means that preemption is disabled, which
->> makes the -rt people grumpy. (Of course, it also uses APIs that no
->> longer exists, but that should be easy to fix)
->>
->> Do you happen to have any ballpark figures for the packet sizes and
->> the time spent doing encryption?
->>
+On 9/22/2020 7:03 PM, Andrei Botila (OSS) wrote:
+> From: Andrei Botila <andrei.botila@nxp.com>
 > 
-> My tester reports this last patch appears to break wpa-2 entirely, so we
-> cannot test it as is.
-
-Hello,
-
-I'm still hoping that I can find some one to help enable this feature again
-on 5.9-ish kernels.
-
-I don't care about preemption being disabled for long-ish times, that is no worse than what I had
-before, so even if an official in-kernel patch is not possible, I can carry an
-out-of-tree patch.
+> This patch series fixes some problems in CAAM's implementation of xts(aes):
+>  - CAAM until Era 9 can't process XTS with 16B IV
+>  - CAAM can only process in hardware XTS key lengths of 16B and 32B
+>  - These hardware limitations are resolved through a fallback
+>  - CAAM used to return 0 for XTS block length equal to zero
+> 
+> This patch series also adds a new feature in CAAM's xts(aes):
+>  - CAAM is now able to process XTS with 16B IV in HW
+> 
+> Changes since v2:
+> - modified xts_skcipher_ivsize() based on comments
+> - squashed the previous 7-9/12 commits
+> 
+> Changes since v1:
+> - use only get_unaligned() for calculating XTS IV size
+> - fixed the double calling of crypto_skcipher_set_reqsize() in case of XTS
+> - added a patch which modifies the return value for XTS when block length
+>   is equal to zero
+> 
+> Andrei Botila (10):
+>   crypto: caam/jr - add fallback for XTS with more than 8B IV
+>   crypto: caam/qi - add fallback for XTS with more than 8B IV
+>   crypto: caam/qi2 - add fallback for XTS with more than 8B IV
+>   crypto: caam/jr - add support for more XTS key lengths
+>   crypto: caam/qi - add support for more XTS key lengths
+>   crypto: caam/qi2 - add support for more XTS key lengths
+>   crypto: caam - add xts check for block length equal to zero
+>   crypto: caam/jr - add support for XTS with 16B IV
+>   crypto: caam/qi - add support for XTS with 16B IV
+>   crypto: caam/qi2 - add support for XTS with 16B IV
+> 
+>  drivers/crypto/caam/Kconfig        |   3 +
+>  drivers/crypto/caam/caamalg.c      |  94 +++++++++++++++++++++---
+>  drivers/crypto/caam/caamalg_desc.c |  27 ++++---
+>  drivers/crypto/caam/caamalg_qi.c   |  94 +++++++++++++++++++++---
+>  drivers/crypto/caam/caamalg_qi2.c  | 111 ++++++++++++++++++++++++++---
+>  drivers/crypto/caam/caamalg_qi2.h  |   2 +
+>  6 files changed, 293 insertions(+), 38 deletions(-)
+> 
+For the series:
+Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
 
 Thanks,
-Ben
+Horia
