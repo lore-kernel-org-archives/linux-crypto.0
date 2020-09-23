@@ -2,75 +2,124 @@ Return-Path: <SRS0=nWKA=DA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A3E8C2D0A8
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 18:22:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F639C4727D
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 18:22:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03BDE235F7
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 18:22:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AFA5D2371F
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 18:22:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600885362;
-	bh=mlB6rdIZtIuoDKMYTjboUQQNek6n4dzbSSNWip0zkp8=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=IXuccwUAPXgpRhcgANfZ269ejr00l4+8/SRrrot33y/buQX05QWu4tT5b2lC0OzBk
-	 6M5kT/+nyrJF8KhapkoZHITDzUFkXFMmfehzs20U5aY67XLYoz+4v5Ao+C4NU0hPdO
-	 1leX21vKYHW5Xb7ngbOPerXRTiJZU24ZOJST5vMI=
+	s=default; t=1600885363;
+	bh=bFlHKsUqlsvmTDL5pqgGS4guHekdp/JPWpXfv0hfy14=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=q8x6c1QGAIds13XjBsJuKdKgyyrShUOsLXa0314ZB+07nhY5KuxcpOUWj+6SfFQvX
+	 uzfIWQzw4UmyDUp9WMuM8+T2d0eOeoAepGdMqMMcFyXLGJyBXvzpt/mL7Zm88JCMZs
+	 6a7buem+mzzfgQQXK2vUb2OrRIXl+DT876DMaJ78=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726498AbgIWSWl (ORCPT
+        id S1726604AbgIWSWn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Sep 2020 14:22:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33790 "EHLO mail.kernel.org"
+        Wed, 23 Sep 2020 14:22:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33808 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726476AbgIWSWl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Sep 2020 14:22:41 -0400
+        id S1726476AbgIWSWn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Sep 2020 14:22:43 -0400
 Received: from e123331-lin.nice.arm.com (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 974FC20791;
-        Wed, 23 Sep 2020 18:22:39 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3BC4E2223E;
+        Wed, 23 Sep 2020 18:22:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600885360;
-        bh=mlB6rdIZtIuoDKMYTjboUQQNek6n4dzbSSNWip0zkp8=;
-        h=From:To:Cc:Subject:Date:From;
-        b=M0yfp7By/VGzeOGWt4oNVxfMsa6ykpHR3Mbkae5j2QgYjdL+Q/ORwUAZXVzNDv/mD
-         KeIIuzKRSAspny8mbnBKZzjV6ux2n6LuqqzROEAsL3V0XemwWBQ9W+y/7DI4xnx4Va
-         ano9bw71rbfvfxikRr56NiHn9YXMf2rgmuqjnW5E=
+        s=default; t=1600885362;
+        bh=bFlHKsUqlsvmTDL5pqgGS4guHekdp/JPWpXfv0hfy14=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=K/P72bHhIZtvjtP/44qQBqfp0GEUma0M//TEcuSrdSJaxLXS2e7/YHWuvMHoKs6Xd
+         4k7ZY0jtXc1q/yB4LAZaDK4uz5bRbSTGW1GSmw7e1NgX7cIvOE3Op1MPIYxkfz8fpC
+         3lUhq8pRmQONPQa+cXUZDorOD3p0ezsRJmNbegRc=
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>,
         Douglas Anderson <dianders@chromium.org>,
         David Laight <David.Laight@aculab.com>
-Subject: [PATCH 0/2] crypto: xor - defer and optimize boot time benchmark
-Date:   Wed, 23 Sep 2020 20:22:28 +0200
-Message-Id: <20200923182230.22715-1-ardb@kernel.org>
+Subject: [PATCH 1/2] crypto: xor - defer load time benchmark to a later time
+Date:   Wed, 23 Sep 2020 20:22:29 +0200
+Message-Id: <20200923182230.22715-2-ardb@kernel.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200923182230.22715-1-ardb@kernel.org>
+References: <20200923182230.22715-1-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Doug reports [0] that the XOR boot time benchmark takes more time than
-necessary, and runs at a time when there is little room for other
-boot time tasks to run concurrently.
+Currently, the XOR module performs its boot time benchmark at core
+initcall time when it is built-in, to ensure that the RAID code can
+make use of it when it is built-in as well.
 
-Let's fix this by #1 deferring the benchmark, and #2 uses a faster
-implementation.
+Let's defer this to a later stage during the boot, to avoid impacting
+the overall boot time of the system. Instead, just pick an arbitrary
+implementation from the list, and use that as the preliminary default.
 
-[0] https://lore.kernel.org/linux-arm-kernel/20200921172603.1.Id9450c1d3deef17718bd5368580a3c44895209ee@changeid/
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ crypto/xor.c | 29 +++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
-Cc: Douglas Anderson <dianders@chromium.org>
-Cc: David Laight <David.Laight@aculab.com>
-
-Ard Biesheuvel (2):
-  crypto: xor - defer load time benchmark to a later time
-  crypto: xor - use ktime for template benchmarking
-
- crypto/xor.c | 65 +++++++++++++-------
- 1 file changed, 43 insertions(+), 22 deletions(-)
-
+diff --git a/crypto/xor.c b/crypto/xor.c
+index ea7349e6ed23..b42c38343733 100644
+--- a/crypto/xor.c
++++ b/crypto/xor.c
+@@ -54,6 +54,28 @@ EXPORT_SYMBOL(xor_blocks);
+ /* Set of all registered templates.  */
+ static struct xor_block_template *__initdata template_list;
+ 
++#ifndef MODULE
++static void __init do_xor_register(struct xor_block_template *tmpl)
++{
++	tmpl->next = template_list;
++	template_list = tmpl;
++}
++
++static int __init register_xor_blocks(void)
++{
++	active_template = XOR_SELECT_TEMPLATE(NULL);
++
++	if (!active_template) {
++#define xor_speed	do_xor_register
++		// register all the templates and pick the first as the default
++		XOR_TRY_TEMPLATES;
++#undef xor_speed
++		active_template = template_list;
++	}
++	return 0;
++}
++#endif
++
+ #define BENCH_SIZE (PAGE_SIZE)
+ 
+ static void __init
+@@ -129,6 +151,7 @@ calibrate_xor_blocks(void)
+ #define xor_speed(templ)	do_xor_speed((templ), b1, b2)
+ 
+ 	printk(KERN_INFO "xor: measuring software checksum speed\n");
++	template_list = NULL;
+ 	XOR_TRY_TEMPLATES;
+ 	fastest = template_list;
+ 	for (f = fastest; f; f = f->next)
+@@ -150,6 +173,10 @@ static __exit void xor_exit(void) { }
+ 
+ MODULE_LICENSE("GPL");
+ 
++#ifndef MODULE
+ /* when built-in xor.o must initialize before drivers/md/md.o */
+-core_initcall(calibrate_xor_blocks);
++core_initcall(register_xor_blocks);
++#endif
++
++module_init(calibrate_xor_blocks);
+ module_exit(xor_exit);
 -- 
 2.17.1
 
