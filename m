@@ -2,108 +2,65 @@ Return-Path: <SRS0=nWKA=DA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B281C4727D
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 01:57:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 901F4C4363D
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 05:57:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE39B238A1
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 01:57:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600826225;
-	bh=SrmFN8dhaRffVMep//B9NyvNwxgrwqQfBh1vwxxpMT4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=VjbwksQuqOIQcwvsFVJdGumtkfDlQxP/tgY2o2scrwf8ZKDFdG9TsreAw8+reRBnm
-	 HJPS7RH7ocrLhm9U4jrT4tRWOKJP9yVoFHzKVhg/jvWV04T7ccz/HYDMkClyv73RJo
-	 Yqs0iYJhVsL3RMwk5yn3+P30U9XaLXv/1AulmWK0=
+	by mail.kernel.org (Postfix) with ESMTP id 41885235FC
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 05:57:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="g/f91SGO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726960AbgIWB5F (ORCPT
+        id S1726608AbgIWF5U (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Sep 2020 21:57:05 -0400
-Received: from mail-il1-f195.google.com ([209.85.166.195]:45385 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726847AbgIWB5F (ORCPT
+        Wed, 23 Sep 2020 01:57:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39458 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726448AbgIWF5U (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Sep 2020 21:57:05 -0400
-Received: by mail-il1-f195.google.com with SMTP id h2so19285152ilo.12;
-        Tue, 22 Sep 2020 18:57:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=34pMhFQ28SHC3mzxbMUDtsJGYufWbe2RlD1uSSeVBbQ=;
-        b=ngMgJreq97y7VSnZSbgLuwuw8XXk9scYsIiN/FDI/FpB+Uh9Jm2ggdhPKP1PGGSOdd
-         1Yq1LcelwojMnbwmBZ1m7WA9fBgWSI7jU3q9VV9XrbqAf9/2BGSMkpriLJQukqD15FJi
-         aQiAT9JARR4dgHue/eO3oHbhX+TAewFmPSZMJ5U2XiYtnKWvOgKVlR4QH9JdH3tbSrla
-         lpb7uatxq+R4z7yPqkf8hrXMOFUGSFL2Byp5ca4Pbn50YQRq0dz2fGFzOLImUeeDRe6W
-         hKgT6lyCyfRbKPgsw5dBdA+cFI7yKVnwyuDKIo8+LNMKnQvI/AkCzGyw6jb5Ta0qE8fO
-         SSYA==
-X-Gm-Message-State: AOAM533Q+bOanVzc1sV/xf3sQ0eeePcO05pzg597y9ZafSOA8Fsz+KN9
-        f7vB0+ALzTmJw+Z86+gTqg==
-X-Google-Smtp-Source: ABdhPJw/o4PwxGTeqWV+adBWTIEGsOkRpZod6MJ/eFAMyAZXrL7UJ3MpPMRsbXfGwT/zjEc/YHa5jQ==
-X-Received: by 2002:a92:c7b0:: with SMTP id f16mr6998290ilk.137.1600826224427;
-        Tue, 22 Sep 2020 18:57:04 -0700 (PDT)
-Received: from xps15 ([64.188.179.253])
-        by smtp.gmail.com with ESMTPSA id j77sm10254679ili.31.2020.09.22.18.57.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2020 18:57:03 -0700 (PDT)
-Received: (nullmailer pid 3701896 invoked by uid 1000);
-        Wed, 23 Sep 2020 01:57:02 -0000
-Date:   Tue, 22 Sep 2020 19:57:02 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
+        Wed, 23 Sep 2020 01:57:20 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26EBEC061755;
+        Tue, 22 Sep 2020 22:57:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=+xPayIM5KsnWTfKDPlxSGNgmE5Ab/DG3SsTYQ0nYWCA=; b=g/f91SGO92fFuYvJtguHCdSROs
+        1Kl3jQYtC3DJmj9dFU+X/DxR2smj2rRxEiMVTCdpcVec1wTczcbnjIg4MRK5bGkoL38Dny+RvaB3g
+        mdma3P/6FfdNyO8L2AQ1mZMCsPxdzEDJV4mfqL972CHGS7iqYA1ZKxm9Jklkqk2t48cWxc9wbvikZ
+        89h2DQQYsF6wQTCjDfLCFb6eo9aX6Ql5xCzzbuZ+KS+SRmmlVEQD1kIF1BeFck/pwuOT8Ism12NW1
+        IW033ZHgZHMiPVMGFmIaU7YkHWiPus6SQH2uk+BD2umQQFRbBX/aAyTuaGhJ6KLBgtsXGBf/DjjHX
+        gbrdKdlA==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kKxmG-0002rE-HI; Wed, 23 Sep 2020 05:57:16 +0000
+Date:   Wed, 23 Sep 2020 06:57:16 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Nick Terrell <nickrterrell@gmail.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] dt-bindings: crypto: update ccree optional params
-Message-ID: <20200923015702.GA3676455@bogus>
-References: <20200916071950.1493-1-gilad@benyossef.com>
- <20200916071950.1493-2-gilad@benyossef.com>
+        linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        squashfs-devel@lists.sourceforge.net,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-kernel@vger.kernel.org, Kernel Team <Kernel-team@fb.com>,
+        Nick Terrell <terrelln@fb.com>, Chris Mason <clm@fb.com>,
+        Petr Malat <oss@malat.biz>, Johannes Weiner <jweiner@fb.com>,
+        Niket Agarwal <niketa@fb.com>, Yann Collet <cyan@fb.com>
+Subject: Re: [PATCH v2 0/9] Update to zstd-1.4.6
+Message-ID: <20200923055716.GA10796@infradead.org>
+References: <20200922210924.1725-1-nickrterrell@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200916071950.1493-2-gilad@benyossef.com>
+In-Reply-To: <20200922210924.1725-1-nickrterrell@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 16, 2020 at 10:19:49AM +0300, Gilad Ben-Yossef wrote:
-> Document ccree driver supporting new optional parameters allowing to
-> customize the DMA transactions cache parameters and ACE bus sharability
-> properties.
-> 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> ---
->  Documentation/devicetree/bindings/crypto/arm-cryptocell.txt | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
-> index 6130e6eb4af8..1a1603e457a8 100644
-> --- a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
-> +++ b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
-> @@ -13,6 +13,10 @@ Required properties:
->  Optional properties:
->  - clocks: Reference to the crypto engine clock.
->  - dma-coherent: Present if dma operations are coherent.
-> +- awcache: Set write transactions cache attributes
-> +- arcache: Set read transactions cache attributes
-
-dma-coherent already implies these are 011x, 101x or 111x. In my limited 
-experience configuring these (Calxeda SATA and ethernet), writeback, 
-write-allocate was pretty much always optimal. 
-
-> +- awdomain: Set write transactions ACE sharability domain (712, 703, 713 only)
-> +- ardomain: Set read transactions ACE sharability domain (712, 703, 713 only)
-
-This probably needs something common. We may need something for Mali, 
-too. I don't think different settings for read and write makes much 
-sense nor does anything beyond IS or OS. 
-
-These could also just be implied by the compatible string (and requiring 
-an SoC specific one).
-
-Rob
+FYI, as mentioned last time:  clear NAK for letting these bad APIs
+slip into the overall kernel code.  Please provide proper kernel style
+wrappers to avoid these kinds of updates and in the future just change
+APIs on an as-needed basis.
