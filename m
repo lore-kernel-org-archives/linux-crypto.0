@@ -6,61 +6,62 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 901F4C4363D
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 05:57:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85776C4363D
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 06:02:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 41885235FC
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 05:57:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B41620639
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Sep 2020 06:02:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="g/f91SGO"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hZCmO8Od"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726608AbgIWF5U (ORCPT
+        id S1726661AbgIWGCx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Sep 2020 01:57:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39458 "EHLO
+        Wed, 23 Sep 2020 02:02:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726448AbgIWF5U (ORCPT
+        with ESMTP id S1726179AbgIWGCx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Sep 2020 01:57:20 -0400
+        Wed, 23 Sep 2020 02:02:53 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26EBEC061755;
-        Tue, 22 Sep 2020 22:57:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D9ACC061755;
+        Tue, 22 Sep 2020 23:02:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=+xPayIM5KsnWTfKDPlxSGNgmE5Ab/DG3SsTYQ0nYWCA=; b=g/f91SGO92fFuYvJtguHCdSROs
-        1Kl3jQYtC3DJmj9dFU+X/DxR2smj2rRxEiMVTCdpcVec1wTczcbnjIg4MRK5bGkoL38Dny+RvaB3g
-        mdma3P/6FfdNyO8L2AQ1mZMCsPxdzEDJV4mfqL972CHGS7iqYA1ZKxm9Jklkqk2t48cWxc9wbvikZ
-        89h2DQQYsF6wQTCjDfLCFb6eo9aX6Ql5xCzzbuZ+KS+SRmmlVEQD1kIF1BeFck/pwuOT8Ism12NW1
-        IW033ZHgZHMiPVMGFmIaU7YkHWiPus6SQH2uk+BD2umQQFRbBX/aAyTuaGhJ6KLBgtsXGBf/DjjHX
-        gbrdKdlA==;
+        bh=hZUL2HnNKYLfhcs8IoUDD8keLkSgoNqI3GOKUrr4gtI=; b=hZCmO8Od0bWL+z/luBOLjY+bwK
+        Nad77oKEyuEVoNTuVlPLlqafZ1BWpYKTAUHsC992ktWe5f9RKNgPv5YMl6i8OMdaQCW4gOAbY40F8
+        08TqkJVinw37x+Dujpfr50jBrGBrtNKEXJiOfImvFH4z82gW5h2LGTS+ewfAin7nG3ORGU72iSf2X
+        hZ8RP5r3CGShYRSWmwmwiOsUAgjWiXJy6/lfakYhUHFjrX+M6KMFgDKahNXMaENqXtSv85ftDHcjb
+        4IzU+cu/sO3HUqmGrP/EWO5CZzOY4hd8NUhKsIX5tz2LT3b4ukBQCIfK0P3ARnbSRVK3tqPsuMYFU
+        G0ls0mTw==;
 Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kKxmG-0002rE-HI; Wed, 23 Sep 2020 05:57:16 +0000
-Date:   Wed, 23 Sep 2020 06:57:16 +0100
+        id 1kKxrb-0003Dy-1F; Wed, 23 Sep 2020 06:02:47 +0000
+Date:   Wed, 23 Sep 2020 07:02:46 +0100
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Nick Terrell <nickrterrell@gmail.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        squashfs-devel@lists.sourceforge.net,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-kernel@vger.kernel.org, Kernel Team <Kernel-team@fb.com>,
-        Nick Terrell <terrelln@fb.com>, Chris Mason <clm@fb.com>,
-        Petr Malat <oss@malat.biz>, Johannes Weiner <jweiner@fb.com>,
-        Niket Agarwal <niketa@fb.com>, Yann Collet <cyan@fb.com>
-Subject: Re: [PATCH v2 0/9] Update to zstd-1.4.6
-Message-ID: <20200923055716.GA10796@infradead.org>
-References: <20200922210924.1725-1-nickrterrell@gmail.com>
+To:     Peter Ujfalusi <peter.ujfalusi@ti.com>
+Cc:     herbert@gondor.apana.org.au, t-kristo@ti.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        j-keerthy@ti.com
+Subject: Re: [PATCH] crypto: sa2ul: Fix DMA mapping API usage
+Message-ID: <20200923060246.GA11550@infradead.org>
+References: <20200921113846.6973-1-peter.ujfalusi@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200922210924.1725-1-nickrterrell@gmail.com>
+In-Reply-To: <20200921113846.6973-1-peter.ujfalusi@ti.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-FYI, as mentioned last time:  clear NAK for letting these bad APIs
-slip into the overall kernel code.  Please provide proper kernel style
-wrappers to avoid these kinds of updates and in the future just change
-APIs on an as-needed basis.
+On Mon, Sep 21, 2020 at 02:38:46PM +0300, Peter Ujfalusi wrote:
+> Make sure that we call the dma_unmap_sg on the correct scatterlist on
+> completion with the correct sg_nents.
+> 
+> We also should be calling dma_sync_sg_for_device() on the tx buffer before
+> giving it to the DMA and the dma_sync_sg_for_cpu() should be called on the
+> scatterlist we received the data back.
+
+You might want to look into using struct sg_table and the DMA mapping
+helpers using it to simplify this a bit.
