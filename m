@@ -2,318 +2,251 @@ Return-Path: <SRS0=z3ky=DB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F77C4346E
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Sep 2020 08:12:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AADFC4346E
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Sep 2020 08:32:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 927C0212CC
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Sep 2020 08:12:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDC132376F
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Sep 2020 08:32:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1600936325;
+	bh=zekxZiEgzsbQy2evisDRCHtjovyjkGze2I72XWL5gyw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=OIkSQ8C3laGrn4PPTimhFyhqLpe38voXw17Ywy8+SyU/f8gT1bRXII3gCE4cAC1Z5
+	 E9Ys7+FQudF7gDv+kwkg/rRX2H4Ciz91ah4smcbpfSJGs/u2dvGy1ptVD6tuCw2yoN
+	 JOJ2PIwefRarPbVQhqv69gU0nJ076hzW4QyiJcQE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727180AbgIXIMY (ORCPT
+        id S1727031AbgIXIcF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Sep 2020 04:12:24 -0400
-Received: from mga02.intel.com ([134.134.136.20]:22501 "EHLO mga02.intel.com"
+        Thu, 24 Sep 2020 04:32:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42220 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727013AbgIXIMX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Sep 2020 04:12:23 -0400
-IronPort-SDR: K9+fLubVdWcQxyqCclXGH0y9Im/vVqzOXyOGK6ljuGVlYhYOdsfQp7Hmrf+gv8AELtURTzIngb
- Un18KYA8HT+g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="148788393"
-X-IronPort-AV: E=Sophos;i="5.77,296,1596524400"; 
-   d="scan'208";a="148788393"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2020 01:12:19 -0700
-IronPort-SDR: BtwXldKVE7FWHcMuvMuakmnXOuV12N8g1pU9clav6f9fP5xx1yxoT61v16dd0q5EH/jHe2z0Db
- eHSu5KC11YzA==
-X-IronPort-AV: E=Sophos;i="5.77,296,1596524400"; 
-   d="scan'208";a="335847157"
-Received: from shao2-debian.sh.intel.com (HELO [10.239.13.3]) ([10.239.13.3])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2020 01:12:16 -0700
-Subject: Re: [PATCH v3 3/9] lib: zstd: Upgrade to latest upstream zstd version
- 1.4.6
-To:     Nick Terrell <nickrterrell@gmail.com>,
-        kernel test robot <lkp@intel.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>, kbuild-all@lists.01.org,
-        linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        squashfs-devel@lists.sourceforge.net,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-kernel@vger.kernel.org, Kernel Team <Kernel-team@fb.com>,
-        Chris Mason <chris.mason@fusionio.com>,
-        Petr Malat <oss@malat.biz>
-References: <20200923224206.68968-4-nickrterrell@gmail.com>
- <202009241007.ZmzDeiuB%lkp@intel.com>
- <CANr2Dbd1DXb66_Gf9aAB7PCn6=yz_Or5_JWZtm_cHndYrO+28A@mail.gmail.com>
-From:   Rong Chen <rong.a.chen@intel.com>
-Message-ID: <270836be-7c35-f204-39d9-ab095af66d1a@intel.com>
-Date:   Thu, 24 Sep 2020 16:11:34 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726960AbgIXIcD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 24 Sep 2020 04:32:03 -0400
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1167C2396E
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Sep 2020 08:32:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1600936322;
+        bh=zekxZiEgzsbQy2evisDRCHtjovyjkGze2I72XWL5gyw=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=WVGUo4KnUCSkHcXLAz5UhIV7X73G7nj/+f+KMRYDMGOZIg+V9pWAABTIfy0a9wDPS
+         tqEUUekylSWyXBOXa8srW/p2b7AQo/nB739DYIske9yFo9dA/CB97Nnbo0Z4lMa74b
+         Lwz04PrdWkCAfNgLPMMH8dga0tHwp2da2yjNyYcw=
+Received: by mail-ot1-f54.google.com with SMTP id y5so2407445otg.5
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Sep 2020 01:32:02 -0700 (PDT)
+X-Gm-Message-State: AOAM530dQc7yzJPLvl6mOBL25ynMiOO44U+GQhHU3UZIjhGdw/c8xBmj
+        t+DQU4t96Pjn5lbmpedDJ34aUOajV87MfgMlWhE=
+X-Google-Smtp-Source: ABdhPJy67uw8mqrxfZL/m5wYsGes9nmTlqQHEKXkkzoCVcuh7C32ckV7DmJdcDwFGmFXbdlE8Cf0R/EVMA8NUw59MmU=
+X-Received: by 2002:a9d:6193:: with SMTP id g19mr2343952otk.108.1600936321214;
+ Thu, 24 Sep 2020 01:32:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CANr2Dbd1DXb66_Gf9aAB7PCn6=yz_Or5_JWZtm_cHndYrO+28A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <20200923182230.22715-1-ardb@kernel.org> <20200923182230.22715-3-ardb@kernel.org>
+ <CAD=FV=XR6FRnwDbCix9cqB+28Jd_tHKqV8rEtkASy=FPoSs6-w@mail.gmail.com>
+In-Reply-To: <CAD=FV=XR6FRnwDbCix9cqB+28Jd_tHKqV8rEtkASy=FPoSs6-w@mail.gmail.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 24 Sep 2020 10:31:49 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFMYR5_4v3_dzEdvESzh65+ni5-8VUt0h7gC3D0mMhdaw@mail.gmail.com>
+Message-ID: <CAMj1kXFMYR5_4v3_dzEdvESzh65+ni5-8VUt0h7gC3D0mMhdaw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] crypto: xor - use ktime for template benchmarking
+To:     Doug Anderson <dianders@chromium.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Laight <David.Laight@aculab.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Nick,
+On Thu, 24 Sep 2020 at 02:36, Doug Anderson <dianders@chromium.org> wrote:
+>
+> Hi,
+>
+> On Wed, Sep 23, 2020 at 11:22 AM Ard Biesheuvel <ardb@kernel.org> wrote:
+> >
+> > Currently, we use the jiffies counter as a time source, by staring at
+> > it until a HZ period elapses, and then staring at it again and perform
+> > as many XOR operations as we can at the same time until another HZ
+> > period elapses, so that we can calculate the throughput. This takes
+> > longer than necessary, and depends on HZ, which is undesirable, since
+> > HZ is system dependent.
+> >
+> > Let's use the ktime interface instead, and use it to time a fixed
+> > number of XOR operations, which can be done much faster, and makes
+> > the time spent depend on the performance level of the system itself,
+> > which is much more reasonable.
+> >
+> > On ThunderX2, I get the following results:
+> >
+> > Before:
+> >
+> >   [72625.956765] xor: measuring software checksum speed
+> >   [72625.993104]    8regs     : 10169.000 MB/sec
+> >   [72626.033099]    32regs    : 12050.000 MB/sec
+> >   [72626.073095]    arm64_neon: 11100.000 MB/sec
+> >   [72626.073097] xor: using function: 32regs (12050.000 MB/sec)
+> >
+> > After:
+> >
+> >   [ 2503.189696] xor: measuring software checksum speed
+> >   [ 2503.189896]    8regs           : 10556 MB/sec
+> >   [ 2503.190061]    32regs          : 12538 MB/sec
+> >   [ 2503.190250]    arm64_neon      : 11470 MB/sec
+> >   [ 2503.190252] xor: using function: 32regs (12538 MB/sec)
+> >
+> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> > ---
+> >  crypto/xor.c | 36 ++++++++------------
+> >  1 file changed, 15 insertions(+), 21 deletions(-)
+> >
+> > diff --git a/crypto/xor.c b/crypto/xor.c
+> > index b42c38343733..23f98b451b69 100644
+> > --- a/crypto/xor.c
+> > +++ b/crypto/xor.c
+> > @@ -76,49 +76,43 @@ static int __init register_xor_blocks(void)
+> >  }
+> >  #endif
+> >
+> > -#define BENCH_SIZE (PAGE_SIZE)
+> > +#define BENCH_SIZE     4096
+>
+> I'm curious why the change away from PAGE_SIZE to using 4096.
+> Everything should work OK w/ using PAGE_SIZE, right?
+>
 
-Thanks for the feedback, we'll take a look at these errors that maybe 
-false positives.
+Yes, but then the test will take 16x more time on a 64k page size
+system for no reason whatsoever.
 
-Best Regards,
-Rong Chen
+>
+> > +#define REPS           100
+>
+> Is this sufficient?  I'm not sure what the lower bound on what's
+> expected of ktime.  If I'm doing the math right, on your system
+> running 100 loops took 38802 ns in one case, since:
+>
+> (4096 * 1000 * 100) / 10556 = 38802
+>
+> If you happen to have your timer backed by a 32 kHz clock, one tick of
+> ktime could be as much as 31250 ns, right?  Maybe on systems backed
+> with a 32kHz clock they'll take longer, but it still seems moderately
+> iffy?  I dunno, maybe I'm just being paranoid.
+>
 
-On 9/24/20 11:05 AM, Nick Terrell wrote:
-> On Wed, Sep 23, 2020 at 7:28 PM kernel test robot <lkp@intel.com> wrote:
->> Hi Nick,
->>
->> Thank you for the patch! Yet something to improve:
->>
->> [auto build test ERROR on kdave/for-next]
->> [also build test ERROR on f2fs/dev-test linus/master v5.9-rc6 next-20200923]
->> [cannot apply to cryptodev/master crypto/master]
->> [If your patch is applied to the wrong git tree, kindly drop us a note.
->> And when submitting patch, we suggest to use '--base' as documented in
->> https://git-scm.com/docs/git-format-patch]
->>
->> url:    https://github.com/0day-ci/linux/commits/Nick-Terrell/Update-to-zstd-1-4-6/20200924-064102
->> base:   https://git.kernel.org/pub/scm/linux/kernel/git/kdave/linux.git for-next
->> config: h8300-randconfig-p002-20200923 (attached as .config)
->> compiler: h8300-linux-gcc (GCC) 9.3.0
->> reproduce (this is a W=1 build):
->>          wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->>          chmod +x ~/bin/make.cross
->>          # save the attached .config to linux build tree
->>          COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-9.3.0 make.cross ARCH=h8300
->>
->> If you fix the issue, kindly add following tag as appropriate
->> Reported-by: kernel test robot <lkp@intel.com>
->>
->> All errors (new ones prefixed by >>):
->>
->>     h8300-linux-ld: lib/zstd/common/entropy_common.o: in function `MEM_swap32':
->>>> lib/zstd/common/mem.h:179: undefined reference to `__bswapsi2'
->>>> h8300-linux-ld: lib/zstd/common/mem.h:179: undefined reference to `__bswapsi2'
->>>> h8300-linux-ld: lib/zstd/common/mem.h:179: undefined reference to `__bswapsi2'
->>>> h8300-linux-ld: lib/zstd/common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/common/fse_decompress.o: in function `MEM_swap32':
->>>> lib/zstd/common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/common/fse_decompress.o:lib/zstd/common/mem.h:179: more undefined references to `__bswapsi2' follow
->>     h8300-linux-ld: lib/zstd/compress/zstd_compress.o: in function `MEM_swap64':
->>>> lib/zstd/compress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>     h8300-linux-ld: lib/zstd/compress/zstd_compress.o: in function `MEM_swap32':
->>>> lib/zstd/compress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>>> h8300-linux-ld: lib/zstd/compress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>>> h8300-linux-ld: lib/zstd/compress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>>> h8300-linux-ld: lib/zstd/compress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>>> h8300-linux-ld: lib/zstd/compress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/compress/zstd_compress.o:lib/zstd/compress/../common/mem.h:179: more undefined references to `__bswapsi2' follow
->>     h8300-linux-ld: lib/zstd/compress/zstd_double_fast.o: in function `MEM_swap64':
->>>> lib/zstd/compress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>>> h8300-linux-ld: lib/zstd/compress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>>> h8300-linux-ld: lib/zstd/compress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>>> h8300-linux-ld: lib/zstd/compress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>>> h8300-linux-ld: lib/zstd/compress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>     h8300-linux-ld: lib/zstd/compress/zstd_double_fast.o:lib/zstd/compress/../common/mem.h:192: more undefined references to `__bswapdi2' follow
->>     h8300-linux-ld: lib/zstd/compress/zstd_opt.o: in function `MEM_swap32':
->>>> lib/zstd/compress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>>> h8300-linux-ld: lib/zstd/compress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/compress/zstd_opt.o: in function `MEM_swap64':
->>>> lib/zstd/compress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>>> h8300-linux-ld: lib/zstd/compress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>     h8300-linux-ld: lib/zstd/compress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>     h8300-linux-ld: lib/zstd/compress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>     h8300-linux-ld: lib/zstd/compress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>     h8300-linux-ld: lib/zstd/compress/zstd_opt.o:lib/zstd/compress/../common/mem.h:192: more undefined references to `__bswapdi2' follow
->>     h8300-linux-ld: lib/zstd/decompress/huf_decompress.o: in function `MEM_swap32':
->>     lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/huf_decompress.o:lib/zstd/decompress/../common/mem.h:179: more undefined references to `__bswapsi2' follow
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress.o: in function `MEM_swap64':
->>     lib/zstd/decompress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress.o: in function `MEM_swap32':
->>     lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress.o:lib/zstd/decompress/../common/mem.h:179: more undefined references to `__bswapsi2' follow
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress.o: in function `MEM_swap64':
->>     lib/zstd/decompress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress.o: in function `MEM_swap32':
->>     lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress.o: in function `MEM_swap64':
->>     lib/zstd/decompress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress.o: in function `MEM_swap32':
->>     lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress.o: in function `MEM_swap64':
->>     lib/zstd/decompress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress.o: in function `MEM_swap32':
->>     lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress.o: in function `MEM_swap64':
->>     lib/zstd/decompress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress.o: in function `MEM_swap32':
->>     lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress.o:lib/zstd/decompress/../common/mem.h:179: more undefined references to `__bswapsi2' follow
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress.o: in function `MEM_swap64':
->>     lib/zstd/decompress/../common/mem.h:192: undefined reference to `__bswapdi2'
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress.o: in function `MEM_swap32':
->>     lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress_block.o: in function `MEM_swap32':
->>     lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/../common/mem.h:179: undefined reference to `__bswapsi2'
->>     h8300-linux-ld: lib/zstd/decompress/zstd_decompress_block.o:lib/zstd/decompress/../common/mem.h:179: more undefined references to `__bswapsi2' follow
-> Looks like I need to fix these. It looks like I should use the swab*()
-> functions from include/linux/swab.h. I'll put up a v4 shortly.
->
->> cppcheck warnings: (new ones prefixed by >>)
->>
->>>> lib/zstd/decompress/zstd_ddict.c:147:32: warning: Boolean result is used in bitwise operation. Clarify expression with parentheses. [clarifyCondition]
->>         if (!customMem.customAlloc ^ !customMem.customFree) return NULL;
->>                                    ^
-> This one is a bit silly, but I will fix it.
->
->>>> lib/zstd/common/zstd_deps.h:131:0: warning: syntax error [syntaxError]
->>     ^
->>>> lib/zstd/compress/zstd_ldm.c:571:0: warning: Array 'rep[3]' accessed at index 3, which is out of bounds. [arrayIndexOutOfBounds]
->>         ZSTD_blockCompressor const blockCompressor =
->>     ^
-> This seems like a false positive.
->
->>>> lib/zstd/common/zstd_deps.h:131:0: warning: syntax error [syntaxError]
->>     ^
->>>> lib/zstd/decompress/zstd_decompress.c:133:32: warning: Boolean result is used in bitwise operation. Clarify expression with parentheses. [clarifyCondition]
->>         if (!customMem.customAlloc ^ !customMem.customFree) return NULL;
->>                                    ^
->>>> lib/zstd/decompress/zstd_decompress.c:1751:28: warning: Variable 'zds->inPos' is reassigned a value before the old one has been used. [redundantAssignment]
->>                     zds->inPos = 0;   /* input is consumed */
->>                                ^
->>     lib/zstd/decompress/zstd_decompress.c:1747:28: note: Variable 'zds->inPos' is reassigned a value before the old one has been used.
->>                     zds->inPos += loadedSize;
->>                                ^
->>     lib/zstd/decompress/zstd_decompress.c:1751:28: note: Variable 'zds->inPos' is reassigned a value before the old one has been used.
->>                     zds->inPos = 0;   /* input is consumed */
->>                                ^
-> This is a false positive. It is incorrectly analyzing the control flow.
->
->>>> lib/zstd/common/zstd_deps.h:131:0: warning: syntax error [syntaxError]
->>     ^
->>>> lib/zstd/compress/zstd_compress.c:84:32: warning: Boolean result is used in bitwise operation. Clarify expression with parentheses. [clarifyCondition]
->>         if (!customMem.customAlloc ^ !customMem.customFree) return NULL;
->>                                    ^
->>     lib/zstd/compress/zstd_compress.c:200:32: warning: Boolean result is used in bitwise operation. Clarify expression with parentheses. [clarifyCondition]
->>         if (!customMem.customAlloc ^ !customMem.customFree) return NULL;
->>                                    ^
->>     lib/zstd/compress/zstd_compress.c:3345:32: warning: Boolean result is used in bitwise operation. Clarify expression with parentheses. [clarifyCondition]
->>         if (!customMem.customAlloc ^ !customMem.customFree) return NULL;
->>                                    ^
->>>> lib/zstd/common/zstd_internal.h:401:27: warning: Array 'DeBruijnClz[32]' accessed at index 509099, which is out of bounds. [arrayIndexOutOfBounds]
->>             return DeBruijnClz[(v * 0x07C4ACDDU) >> 27];
->>                               ^
-> This is a false positive. v is a 32-bit integer, so the index must be
-> less than 2^(32-27) = 32, which is the size of the array.
->
->>     lib/zstd/compress/zstd_compress.c:3494:40: note: Assignment 'limitedSrcSize=(uint32_t)(pledgedSrcSize<524288U?pledgedSrcSize:524288U)', assigned value is 524288
->>                 U32 const limitedSrcSize = (U32)MIN(pledgedSrcSize, 1U << 19);
->>                                            ^
->>     lib/zstd/compress/zstd_compress.c:3495:90: note: Calling function 'ZSTD_highbit32', 1st argument 'limitedSrcSize-1' value is 524287
->>                 U32 const limitedSrcLog = limitedSrcSize > 1 ? ZSTD_highbit32(limitedSrcSize - 1) + 1 : 1;
->>                                                                                              ^
->>     lib/zstd/common/zstd_internal.h:395:17: note: Assignment 'v=val', assigned value is 524287
->>             U32 v = val;
->>                     ^
->>     lib/zstd/common/zstd_internal.h:396:0: note: Assignment 'v=v|(v>>1)', assigned value is 524287
->>             v |= v >> 1;
->>     ^
->>     lib/zstd/common/zstd_internal.h:397:0: note: Assignment 'v=v|(v>>2)', assigned value is 524287
->>             v |= v >> 2;
->>     ^
->>     lib/zstd/common/zstd_internal.h:398:0: note: Assignment 'v=v|(v>>4)', assigned value is 524287
->>             v |= v >> 4;
->>     ^
->>     lib/zstd/common/zstd_internal.h:399:0: note: Assignment 'v=v|(v>>8)', assigned value is 524287
->>             v |= v >> 8;
->>     ^
->>     lib/zstd/common/zstd_internal.h:400:0: note: Assignment 'v=v|(v>>16)', assigned value is 524287
->>             v |= v >> 16;
->>     ^
->>     lib/zstd/common/zstd_internal.h:401:27: note: Array index out of bounds
->>             return DeBruijnClz[(v * 0x07C4ACDDU) >> 27];
->>                               ^
->>>> lib/zstd/common/zstd_deps.h:131:0: warning: syntax error [syntaxError]
->>     ^
->>>> lib/zstd/compress/zstd_lazy.c:663:74: warning: Overflow in pointer arithmetic, NULL pointer is subtracted. [nullPointerArithmetic]
->>         const U32 dictAndPrefixLength = (U32)((ip - prefixLowest) + (dictEnd - dictLowest));
->>                                                                              ^
->>     lib/zstd/compress/zstd_lazy.c:658:70: note: Assignment 'dictEnd=dictMode==ZSTD_dictMatchState?dms->window.nextSrc:NULL', assigned value is 0
->>         const BYTE* const dictEnd      = dictMode == ZSTD_dictMatchState ?
->>                                                                          ^
->>     lib/zstd/compress/zstd_lazy.c:663:74: note: Null pointer subtraction
->>         const U32 dictAndPrefixLength = (U32)((ip - prefixLowest) + (dictEnd - dictLowest));
->>                                                                              ^
->>>> lib/zstd/common/zstd_deps.h:131:0: warning: syntax error [syntaxError]
->>     ^
->>>> lib/zstd/compress/zstd_double_fast.c:97:75: warning: Overflow in pointer arithmetic, NULL pointer is subtracted. [nullPointerArithmetic]
->>         const U32 dictAndPrefixLength  = (U32)((ip - prefixLowest) + (dictEnd - dictStart));
->>                                                                               ^
->>     lib/zstd/compress/zstd_double_fast.c:88:70: note: Assignment 'dictEnd=dictMode==ZSTD_dictMatchState?dms->window.nextSrc:NULL', assigned value is 0
->>         const BYTE* const dictEnd      = dictMode == ZSTD_dictMatchState ?
->>                                                                          ^
->>     lib/zstd/compress/zstd_double_fast.c:97:75: note: Null pointer subtraction
->>         const U32 dictAndPrefixLength  = (U32)((ip - prefixLowest) + (dictEnd - dictStart));
->>                                                                               ^
-> Seems like another false positive.
->
->>>> lib/zstd/common/zstd_deps.h:131:0: warning: syntax error [syntaxError]
->>     ^
->>
->> # https://github.com/0day-ci/linux/commit/400786d3b08436113bcb3c9c16a97eefc31317c1
->> git remote add linux-review https://github.com/0day-ci/linux
->> git fetch --no-tags linux-review Nick-Terrell/Update-to-zstd-1-4-6/20200924-064102
->> git checkout 400786d3b08436113bcb3c9c16a97eefc31317c1
->> vim +179 lib/zstd/common/mem.h
->>
->>     173
->>     174
->>     175  MEM_STATIC U32 MEM_swap32(U32 in)
->>     176  {
->>     177  #if (defined (__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 403)) \
->>     178    || (defined(__clang__) && __has_builtin(__builtin_bswap32))
->>   > 179      return __builtin_bswap32(in);
->>     180  #else
->>     181      return  ((in << 24) & 0xff000000 ) |
->>     182              ((in <<  8) & 0x00ff0000 ) |
->>     183              ((in >>  8) & 0x0000ff00 ) |
->>     184              ((in >> 24) & 0x000000ff );
->>     185  #endif
->>     186  }
->>     187
->>
->> ---
->> 0-DAY CI Kernel Test Service, Intel Corporation
->> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+No, that is a good point - I didn't really consider that ktime could
+be that coarse.
 
+OTOH, we don't really need the full 5 digits of precision either, as
+long as we don't misidentify the fastest algorithm.
+
+So I think it should be sufficient to bump this to 800. If my
+calculations are correct, this would limit any potential
+misidentification of algorithms performing below 10 GB/s to ones that
+only deviate in performance up to 10%.
+
+800 * 1000 * 4096 / (10 * 31250) = 10485
+800 * 1000 * 4096 / (11 * 31250) = 9532
+
+(10485/9532) / 10485 = 10%
+
+>
+> >  static void __init
+> >  do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
+> >  {
+> >         int speed;
+> > -       unsigned long now, j;
+> > -       int i, count, max;
+> > +       int i, j, count;
+> > +       ktime_t min, start, diff;
+> >
+> >         tmpl->next = template_list;
+> >         template_list = tmpl;
+> >
+> >         preempt_disable();
+> >
+> > -       /*
+> > -        * Count the number of XORs done during a whole jiffy, and use
+> > -        * this to calculate the speed of checksumming.  We use a 2-page
+> > -        * allocation to have guaranteed color L1-cache layout.
+> > -        */
+> > -       max = 0;
+> > +       min = (ktime_t)S64_MAX;
+> >         for (i = 0; i < 5; i++) {
+> > -               j = jiffies;
+> > -               count = 0;
+> > -               while ((now = jiffies) == j)
+> > -                       cpu_relax();
+> > -               while (time_before(jiffies, now + 1)) {
+> > +               start = ktime_get();
+> > +               for (j = 0; j < REPS; j++) {
+> >                         mb(); /* prevent loop optimzation */
+> >                         tmpl->do_2(BENCH_SIZE, b1, b2);
+> >                         mb();
+> >                         count++;
+> >                         mb();
+> >                 }
+> > -               if (count > max)
+> > -                       max = count;
+> > +               diff = ktime_sub(ktime_get(), start);
+> > +               if (diff < min)
+> > +                       min = diff;
+> >         }
+> >
+> >         preempt_enable();
+> >
+> > -       speed = max * (HZ * BENCH_SIZE / 1024);
+> > +       // bytes/ns == GB/s, multiply by 1000 to get MB/s [not MiB/s]
+>
+> Comment is super helpful, thanks!  ...but are folks really OK with
+> "//" comments these days?
+>
+
+Linus said he is fine with it, and even prefers it for single line
+comments, so I don't think it's a problem
+
+>
+> > +       speed = (1000 * REPS * BENCH_SIZE) / (u32)min;
+>
+> nit: Just for prettiness, maybe call ktime_to_ns(min)?
+>
+> optional nit: I always think of u32 as something for accessing
+> hardware.  Maybe "unsigned int"?
+>
+
+Ack
+
+>
+> >         tmpl->speed = speed;
+> >
+> > -       printk(KERN_INFO "   %-10s: %5d.%03d MB/sec\n", tmpl->name,
+> > -              speed / 1000, speed % 1000);
+> > +       printk(KERN_INFO "   %-16s: %5d MB/sec\n", tmpl->name, speed);
+>
+> Since you're touching, switch to pr_info()?
+>
+
+Ack (x2)
+
+
+>
+> >  }
+> >
+> >  static int __init
+> > @@ -158,8 +152,8 @@ calibrate_xor_blocks(void)
+> >                 if (f->speed > fastest->speed)
+> >                         fastest = f;
+> >
+> > -       printk(KERN_INFO "xor: using function: %s (%d.%03d MB/sec)\n",
+> > -              fastest->name, fastest->speed / 1000, fastest->speed % 1000);
+> > +       printk(KERN_INFO "xor: using function: %s (%d MB/sec)\n",
+> > +              fastest->name, fastest->speed);
+>
+> Since you're touching, switch to pr_info()?
+>
+>
+> -Doug
