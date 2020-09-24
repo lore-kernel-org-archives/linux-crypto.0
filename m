@@ -2,92 +2,173 @@ Return-Path: <SRS0=z3ky=DB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91604C4727E
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Sep 2020 03:29:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D96DC4346E
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Sep 2020 05:00:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E3652388A
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Sep 2020 03:29:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0760206C1
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Sep 2020 05:00:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726705AbgIXD3b (ORCPT
+        id S1726769AbgIXFAy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Sep 2020 23:29:31 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:48816 "EHLO fornost.hmeau.com"
+        Thu, 24 Sep 2020 01:00:54 -0400
+Received: from mga02.intel.com ([134.134.136.20]:5968 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727215AbgIXD3S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Sep 2020 23:29:18 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kLHwO-0001Nu-Hx; Thu, 24 Sep 2020 13:29:05 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 24 Sep 2020 13:29:04 +1000
-Date:   Thu, 24 Sep 2020 13:29:04 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     kernel test robot <lkp@intel.com>
-Cc:     "Jason A. Donenfeld" <zx2c4@kernel.org>, kbuild-all@lists.01.org,
-        linux-kernel@vger.kernel.org, Samuel Neves <sneves@dei.uc.pt>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: x86/poly1305 - Remove assignments with no effect
-Message-ID: <20200924032904.GA9083@gondor.apana.org.au>
-References: <20200921085652.GB7761@xsang-OptiPlex-9020>
+        id S1726683AbgIXFAy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 24 Sep 2020 01:00:54 -0400
+IronPort-SDR: OfpLZDhRmvDs2nqyvxAllb63aV3m5+pe16cae/6sYVH12ZxMS3K4wOkePVrEMKysSvllIrHKv7
+ ddD2CZQzjO1A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9753"; a="148751722"
+X-IronPort-AV: E=Sophos;i="5.77,296,1596524400"; 
+   d="scan'208";a="148751722"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2020 22:00:52 -0700
+IronPort-SDR: sFUnctqmR4qg1KgsfRgpOyMaAKHwkJVp2+Ol5m45qzFnvoQ+jf1n3W3d5DD2GcWB1QDi3Mk2fZ
+ x+Xd49rWtnNA==
+X-IronPort-AV: E=Sophos;i="5.77,296,1596524400"; 
+   d="scan'208";a="455195672"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.51])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2020 22:00:50 -0700
+Date:   Thu, 24 Sep 2020 06:00:42 +0100
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Liu Shixin <liushixin2@huawei.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        qat-linux <qat-linux@intel.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH -next] crypto: qat - convert to use DEFINE_SEQ_ATTRIBUTE
+ macro
+Message-ID: <20200924050042.GA32206@silpixa00400314>
+References: <7a1e8142cb4944ee95cea13e7efad23d@irsmsx602.ger.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200921085652.GB7761@xsang-OptiPlex-9020>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <7a1e8142cb4944ee95cea13e7efad23d@irsmsx602.ger.corp.intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 21, 2020 at 04:56:52PM +0800, kernel test robot wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
-> head:   eb5f95f1593f7c22dac681b19e815828e2af3efd
-> commit: d7d7b853566254648df59f7ea27ea05952a6cfa8 crypto: x86/poly1305 - wire up faster implementations for kernel
-> date:   8 months ago
-> :::::: branch date: 14 hours ago
-> :::::: commit date: 8 months ago
-> compiler: gcc-9 (Debian 9.3.0-15) 9.3.0
+On Wed, Sep 16, 2020 at 03:50:17AM +0100, Liu Shixin wrote:
+> Use DEFINE_SEQ_ATTRIBUTE macro to simplify the code.
 > 
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Liu Shixin <liushixin2@huawei.com>
+
+Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+
+> ---
+>  drivers/crypto/qat/qat_common/adf_cfg.c       | 19 +--------
+>  .../qat/qat_common/adf_transport_debug.c      | 42 ++-----------------
+>  2 files changed, 5 insertions(+), 56 deletions(-)
 > 
+> diff --git a/drivers/crypto/qat/qat_common/adf_cfg.c b/drivers/crypto/qat/qat_common/adf_cfg.c
+> index ac462796cefc..22ae32838113 100644
+> --- a/drivers/crypto/qat/qat_common/adf_cfg.c
+> +++ b/drivers/crypto/qat/qat_common/adf_cfg.c
+> @@ -52,24 +52,7 @@ static const struct seq_operations qat_dev_cfg_sops = {
+>  	.show = qat_dev_cfg_show
+>  };
+>  
+> -static int qat_dev_cfg_open(struct inode *inode, struct file *file)
+> -{
+> -	int ret = seq_open(file, &qat_dev_cfg_sops);
+> -
+> -	if (!ret) {
+> -		struct seq_file *seq_f = file->private_data;
+> -
+> -		seq_f->private = inode->i_private;
+> -	}
+> -	return ret;
+> -}
+> -
+> -static const struct file_operations qat_dev_cfg_fops = {
+> -	.open = qat_dev_cfg_open,
+> -	.read = seq_read,
+> -	.llseek = seq_lseek,
+> -	.release = seq_release
+> -};
+> +DEFINE_SEQ_ATTRIBUTE(qat_dev_cfg);
+>  
+>  /**
+>   * adf_cfg_dev_add() - Create an acceleration device configuration table.
+> diff --git a/drivers/crypto/qat/qat_common/adf_transport_debug.c b/drivers/crypto/qat/qat_common/adf_transport_debug.c
+> index 2a2eccbf56ec..dac25ba47260 100644
+> --- a/drivers/crypto/qat/qat_common/adf_transport_debug.c
+> +++ b/drivers/crypto/qat/qat_common/adf_transport_debug.c
+> @@ -77,31 +77,14 @@ static void adf_ring_stop(struct seq_file *sfile, void *v)
+>  	mutex_unlock(&ring_read_lock);
+>  }
+>  
+> -static const struct seq_operations adf_ring_sops = {
+> +static const struct seq_operations adf_ring_debug_sops = {
+>  	.start = adf_ring_start,
+>  	.next = adf_ring_next,
+>  	.stop = adf_ring_stop,
+>  	.show = adf_ring_show
+>  };
+>  
+> -static int adf_ring_open(struct inode *inode, struct file *file)
+> -{
+> -	int ret = seq_open(file, &adf_ring_sops);
+> -
+> -	if (!ret) {
+> -		struct seq_file *seq_f = file->private_data;
+> -
+> -		seq_f->private = inode->i_private;
+> -	}
+> -	return ret;
+> -}
+> -
+> -static const struct file_operations adf_ring_debug_fops = {
+> -	.open = adf_ring_open,
+> -	.read = seq_read,
+> -	.llseek = seq_lseek,
+> -	.release = seq_release
+> -};
+> +DEFINE_SEQ_ATTRIBUTE(adf_ring_debug);
+>  
+>  int adf_ring_debugfs_add(struct adf_etr_ring_data *ring, const char *name)
+>  {
+> @@ -188,31 +171,14 @@ static void adf_bank_stop(struct seq_file *sfile, void *v)
+>  	mutex_unlock(&bank_read_lock);
+>  }
+>  
+> -static const struct seq_operations adf_bank_sops = {
+> +static const struct seq_operations adf_bank_debug_sops = {
+>  	.start = adf_bank_start,
+>  	.next = adf_bank_next,
+>  	.stop = adf_bank_stop,
+>  	.show = adf_bank_show
+>  };
+>  
+> -static int adf_bank_open(struct inode *inode, struct file *file)
+> -{
+> -	int ret = seq_open(file, &adf_bank_sops);
+> -
+> -	if (!ret) {
+> -		struct seq_file *seq_f = file->private_data;
+> -
+> -		seq_f->private = inode->i_private;
+> -	}
+> -	return ret;
+> -}
+> -
+> -static const struct file_operations adf_bank_debug_fops = {
+> -	.open = adf_bank_open,
+> -	.read = seq_read,
+> -	.llseek = seq_lseek,
+> -	.release = seq_release
+> -};
+> +DEFINE_SEQ_ATTRIBUTE(adf_bank_debug);
+>  
+>  int adf_bank_debugfs_add(struct adf_etr_bank_data *bank)
+>  {
+> -- 
+> 2.25.1
 > 
-> cppcheck warnings: (new ones prefixed by >>)
-> 
->    arch/x86/crypto/poly1305_glue.c:165:4: warning: Assignment of function parameter has no effect outside the function. Did you forget dereferencing it? [uselessAssignmentPtrArg]
->       inp += POLY1305_BLOCK_SIZE;
->       ^
-> >> arch/x86/crypto/poly1305_glue.c:166:4: warning: Assignment of function parameter has no effect outside the function. [uselessAssignmentArg]
->       len -= POLY1305_BLOCK_SIZE;
->       ^
-
-This patch should fix the problem.
-
----8<---
-This patch removes a few ineffectual assignments from the function
-crypto_poly1305_setdctxkey.
-
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
-index f85885d6ccd8..e508dbd91813 100644
---- a/arch/x86/crypto/poly1305_glue.c
-+++ b/arch/x86/crypto/poly1305_glue.c
-@@ -158,9 +158,6 @@ static unsigned int crypto_poly1305_setdctxkey(struct poly1305_desc_ctx *dctx,
- 			dctx->s[1] = get_unaligned_le32(&inp[4]);
- 			dctx->s[2] = get_unaligned_le32(&inp[8]);
- 			dctx->s[3] = get_unaligned_le32(&inp[12]);
--			inp += POLY1305_BLOCK_SIZE;
--			len -= POLY1305_BLOCK_SIZE;
--			acc += POLY1305_BLOCK_SIZE;
- 			dctx->sset = true;
- 		}
- 	}
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
