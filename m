@@ -2,203 +2,72 @@ Return-Path: <SRS0=J/bj=DC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9F5AC4741F
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Sep 2020 14:01:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C91AC4363D
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Sep 2020 14:09:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A3DC20936
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Sep 2020 14:01:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D682208A9
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Sep 2020 14:09:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728662AbgIYOBZ (ORCPT
+        id S1728942AbgIYOI7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Sep 2020 10:01:25 -0400
-Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:39918 "EHLO
-        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728365AbgIYOBZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Sep 2020 10:01:25 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R601e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04357;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=33;SR=0;TI=SMTPD_---0UA2lM0k_1601042472;
-Received: from 30.25.232.10(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UA2lM0k_1601042472)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 25 Sep 2020 22:01:14 +0800
-Subject: Re: [PATCH] lib/mpi: Fix unused variable warnings
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        David Howells <dhowells@redhat.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Brendan Higgins <brendanhiggins@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Waiman Long <longman@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Tushar Sugandhi <tusharsu@linux.microsoft.com>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Pascal van Leeuwen <pvanleeuwen@rambus.com>,
-        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Xufeng Zhang <yunbo.xufeng@linux.alibaba.com>,
-        Jia Zhang <zhang.jia@linux.alibaba.com>
-References: <20200920162103.83197-1-tianjia.zhang@linux.alibaba.com>
- <20200920162103.83197-3-tianjia.zhang@linux.alibaba.com>
- <20200925081955.GV6381@gondor.apana.org.au>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <5dc5b1cf-389c-0f96-0b8c-50fa41d186a9@linux.alibaba.com>
-Date:   Fri, 25 Sep 2020 22:01:12 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.2.2
+        Fri, 25 Sep 2020 10:08:59 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:47148 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728959AbgIYOI6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 25 Sep 2020 10:08:58 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 58CF5DE3620179093242;
+        Fri, 25 Sep 2020 22:08:56 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
+ 14.3.487.0; Fri, 25 Sep 2020 22:08:50 +0800
+From:   Yang Shen <shenyang39@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>
+Subject: [PATCH RESEND 4/4] crypto: hisilicon/zip - fix the uninitalized 'curr_qm_qp_num'
+Date:   Fri, 25 Sep 2020 22:06:17 +0800
+Message-ID: <1601042777-26150-5-git-send-email-shenyang39@huawei.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1601042777-26150-1-git-send-email-shenyang39@huawei.com>
+References: <1601042777-26150-1-git-send-email-shenyang39@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200925081955.GV6381@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+From: Sihang Chen <chensihang1@hisilicon.com>
 
-Thanks for your patch, The changes look good.
-I have tested this patch, so,
+The 'qm->curr_qm_qp_num' is not initialized, which will result in failure
+to write the current_q file.
 
-Tested-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Signed-off-by: Sihang Chen <chensihang1@hisilicon.com>
+Signed-off-by: Yang Shen <shenyang39@huawei.com>
+Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
+---
+ drivers/crypto/hisilicon/zip/zip_main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Best regards,
-Tianjia
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index f10bf99..4bd2c81 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -760,6 +760,7 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+ 	if (qm->fun_type == QM_HW_PF) {
+ 		qm->qp_base = HZIP_PF_DEF_Q_BASE;
+ 		qm->qp_num = pf_q_num;
++		qm->debug.curr_qm_qp_num = pf_q_num;
+ 		qm->qm_list = &zip_devices;
+ 	} else if (qm->fun_type == QM_HW_VF && qm->ver == QM_HW_V1) {
+ 		/*
+-- 
+2.7.4
 
-On 9/25/20 4:19 PM, Herbert Xu wrote:
-> On Mon, Sep 21, 2020 at 12:20:55AM +0800, Tianjia Zhang wrote:
->> Expand the mpi library based on libgcrypt, and the ECC algorithm of
->> mpi based on libgcrypt requires these functions.
->> Some other algorithms will be developed based on mpi ecc, such as SM2.
->>
->> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->> Tested-by: Xufeng Zhang <yunbo.xufeng@linux.alibaba.com>
-> 
-> This creates some compiler warnings.
-> 
-> ---8<---
-> This patch removes a number of unused variables and marks others
-> as unused in order to silence compiler warnings about them.
-> 
-> Fixes: a8ea8bdd9df9 ("lib/mpi: Extend the MPI library")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/lib/mpi/mpi-div.c b/lib/mpi/mpi-div.c
-> index 21332dab97d4..45beab8b9e9e 100644
-> --- a/lib/mpi/mpi-div.c
-> +++ b/lib/mpi/mpi-div.c
-> @@ -92,7 +92,6 @@ void mpi_tdiv_qr(MPI quot, MPI rem, MPI num, MPI den)
->   	unsigned int normalization_steps;
->   	mpi_limb_t q_limb;
->   	mpi_ptr_t marker[5];
-> -	unsigned int marker_nlimbs[5];
->   	int markidx = 0;
->   
->   	/* Ensure space is enough for quotient and remainder.
-> @@ -152,7 +151,6 @@ void mpi_tdiv_qr(MPI quot, MPI rem, MPI num, MPI den)
->   		 * numerator would be gradually overwritten by the quotient limbs.
->   		 */
->   		if (qp == np) { /* Copy NP object to temporary space.  */
-> -			marker_nlimbs[markidx] = nsize;
->   			np = marker[markidx++] = mpi_alloc_limb_space(nsize);
->   			MPN_COPY(np, qp, nsize);
->   		}
-> @@ -173,7 +171,6 @@ void mpi_tdiv_qr(MPI quot, MPI rem, MPI num, MPI den)
->   		 * the most significant word.  Use temporary storage not to clobber
->   		 * the original contents of the denominator.
->   		 */
-> -		marker_nlimbs[markidx] = dsize;
->   		tp = marker[markidx++] = mpi_alloc_limb_space(dsize);
->   		mpihelp_lshift(tp, dp, dsize, normalization_steps);
->   		dp = tp;
-> @@ -195,7 +192,6 @@ void mpi_tdiv_qr(MPI quot, MPI rem, MPI num, MPI den)
->   		if (dp == rp || (quot && (dp == qp))) {
->   			mpi_ptr_t tp;
->   
-> -			marker_nlimbs[markidx] = dsize;
->   			tp = marker[markidx++] = mpi_alloc_limb_space(dsize);
->   			MPN_COPY(tp, dp, dsize);
->   			dp = tp;
-> diff --git a/lib/mpi/mpi-internal.h b/lib/mpi/mpi-internal.h
-> index d29c4537c3a3..554002182db1 100644
-> --- a/lib/mpi/mpi-internal.h
-> +++ b/lib/mpi/mpi-internal.h
-> @@ -114,7 +114,7 @@ typedef int mpi_size_t;		/* (must be a signed type) */
->    */
->   #define UDIV_QRNND_PREINV(q, r, nh, nl, d, di)				\
->   	do {								\
-> -		mpi_limb_t _ql;						\
-> +		mpi_limb_t _ql __maybe_unused;				\
->   		mpi_limb_t _q, _r;					\
->   		mpi_limb_t _xh, _xl;					\
->   		umul_ppmm(_q, _ql, (nh), (di));				\
-> diff --git a/lib/mpi/mpi-mul.c b/lib/mpi/mpi-mul.c
-> index 587e6335cc12..8f5fa200f297 100644
-> --- a/lib/mpi/mpi-mul.c
-> +++ b/lib/mpi/mpi-mul.c
-> @@ -21,7 +21,6 @@ void mpi_mul(MPI w, MPI u, MPI v)
->   	int usign, vsign, sign_product;
->   	int assign_wp = 0;
->   	mpi_ptr_t tmp_limb = NULL;
-> -	unsigned int tmp_limb_nlimbs = 0;
->   
->   	if (u->nlimbs < v->nlimbs) {
->   		/* Swap U and V. */
-> @@ -55,7 +54,6 @@ void mpi_mul(MPI w, MPI u, MPI v)
->   	} else { /* Make U and V not overlap with W.	*/
->   		if (wp == up) {
->   			/* W and U are identical.  Allocate temporary space for U. */
-> -			tmp_limb_nlimbs = usize;
->   			up = tmp_limb = mpi_alloc_limb_space(usize);
->   			/* Is V identical too?  Keep it identical with U.  */
->   			if (wp == vp)
-> @@ -64,7 +62,6 @@ void mpi_mul(MPI w, MPI u, MPI v)
->   			MPN_COPY(up, wp, usize);
->   		} else if (wp == vp) {
->   			/* W and V are identical.  Allocate temporary space for V. */
-> -			tmp_limb_nlimbs = vsize;
->   			vp = tmp_limb = mpi_alloc_limb_space(vsize);
->   			/* Copy to the temporary space.  */
->   			MPN_COPY(vp, wp, vsize);
-> diff --git a/lib/mpi/mpih-div.c b/lib/mpi/mpih-div.c
-> index 182a656a1ba0..be70ee2e42d3 100644
-> --- a/lib/mpi/mpih-div.c
-> +++ b/lib/mpi/mpih-div.c
-> @@ -31,7 +31,7 @@ mpihelp_mod_1(mpi_ptr_t dividend_ptr, mpi_size_t dividend_size,
->   {
->   	mpi_size_t i;
->   	mpi_limb_t n1, n0, r;
-> -	mpi_limb_t dummy;
-> +	mpi_limb_t dummy __maybe_unused;
->   
->   	/* Botch: Should this be handled at all?  Rely on callers?	*/
->   	if (!dividend_size)
-> @@ -382,7 +382,7 @@ mpihelp_divmod_1(mpi_ptr_t quot_ptr,
->   {
->   	mpi_size_t i;
->   	mpi_limb_t n1, n0, r;
-> -	mpi_limb_t dummy;
-> +	mpi_limb_t dummy __maybe_unused;
->   
->   	if (!dividend_size)
->   		return 0;
-> 
