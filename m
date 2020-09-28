@@ -1,82 +1,115 @@
-Return-Path: <SRS0=daZt=DE=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=0P/0=DF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43540C47425
-	for <linux-crypto@archiver.kernel.org>; Sun, 27 Sep 2020 20:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DEFDC4346E
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Sep 2020 01:42:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01DBD23977
-	for <linux-crypto@archiver.kernel.org>; Sun, 27 Sep 2020 20:15:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2EEA023A34
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Sep 2020 01:42:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h3emFgsM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726387AbgI0UPw (ORCPT
+        id S1726440AbgI1Bm2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 27 Sep 2020 16:15:52 -0400
-Received: from smtprelay0182.hostedemail.com ([216.40.44.182]:36606 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726239AbgI0UPw (ORCPT
+        Sun, 27 Sep 2020 21:42:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34802 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726409AbgI1Bm2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 27 Sep 2020 16:15:52 -0400
-X-Greylist: delayed 441 seconds by postgrey-1.27 at vger.kernel.org; Sun, 27 Sep 2020 16:15:51 EDT
-Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
-        by smtpgrave02.hostedemail.com (Postfix) with ESMTP id 1170418011273;
-        Sun, 27 Sep 2020 20:08:31 +0000 (UTC)
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay05.hostedemail.com (Postfix) with ESMTP id 7E77118017FB8;
-        Sun, 27 Sep 2020 20:08:29 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-HE-Tag: toy29_471566e2717b
-X-Filterd-Recvd-Size: 2021
-Received: from XPS-9350.home (unknown [47.151.133.149])
-        (Authenticated sender: joe@perches.com)
-        by omf19.hostedemail.com (Postfix) with ESMTPA;
-        Sun, 27 Sep 2020 20:08:26 +0000 (UTC)
-Message-ID: <9f6ebf51253bf420c8f6f8974a82283ae3e9e446.camel@perches.com>
-Subject: Re: [PATCH 00/18] use semicolons rather than commas to separate
- statements
-From:   Joe Perches <joe@perches.com>
-To:     Julia Lawall <Julia.Lawall@inria.fr>, linux-iio@vger.kernel.org
-Cc:     Valdis =?UTF-8?Q?Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
+        Sun, 27 Sep 2020 21:42:28 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19038C0613CE;
+        Sun, 27 Sep 2020 18:42:43 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id b17so2638410pji.1;
+        Sun, 27 Sep 2020 18:42:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=8dvvyKbSOAlgek5cc8aTLapz1pd13ZzkOFYmkcPpkd4=;
+        b=h3emFgsM6piZBSbVf/atrjx/QFGhrpigxWKDnEpPikiSAGfjadQfqVz7D8L3eS1dIC
+         Ey2CLiD8B6GZ5sHxpEL1WSHrTIxbPE6FF+kihoC4bFXe9pD0c7/xb81xoNcFQ7JWW43m
+         k4RA027NJeoR4FN/o9aerkgGpOgzFUgLkpZsW9TWOqe/Er/dIfsJ/Bi0fzCzV0u6ITqj
+         oGJGU8CGwncW7ZDruv3kVi7hd1P0n3LnyhvSO2SE2pJnBFgeo/InooYzPva5S7l0HDDU
+         vI2xqbKA7vHhl00a6SHlCBComY5Ra+G2i8Dp4J8xPyo37v/2lOfdzwuqXUi+lbHMmCp/
+         hpdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=8dvvyKbSOAlgek5cc8aTLapz1pd13ZzkOFYmkcPpkd4=;
+        b=hBA37+ddGtNqTJGd6nctGw0M+vtUl/GcjUOzIGV5DfqyPKYBDXKcJrN4ag1Tleoikl
+         X5RfJA52Qh56b0xo1btNQZL6lDJjvQty98cXFe41haPcbHytnsQxHD44Qi9pjpIkeVVq
+         O1WtIethlTa7rJvVYKS8xw9DS4fMuGSh4D2dA/Kj8iSrhEr86agGrztvX19j/vd8y45b
+         sqrqveyI9QL2XmvK9fyDhfzh4KLOLaYBiHuFtMnOILUy4dTBvgJDHLd+TL00QkG3bKlF
+         zaznQ6yDhukI/CJ4+simNSBFbe9z/o6dTe/fg526UsfeNr0WguZQ/DsbqxHt0Few+Oix
+         fVCA==
+X-Gm-Message-State: AOAM533kvl66oVTb3ZBKuuHYk8wigcVC1pGuW5tow/bROrCL6e/yyJGs
+        ipdA7yDElUQSO0FDu8vuj6IealVg7NAFKA==
+X-Google-Smtp-Source: ABdhPJzygoBiYd6Buh+m4UHKonvhgMi2Rfn3a5kRAQQZ789YxIOvdyRD484gZNpKzOR92zhQM9IpKA==
+X-Received: by 2002:a17:90a:ca03:: with SMTP id x3mr7366766pjt.92.1601257362214;
+        Sun, 27 Sep 2020 18:42:42 -0700 (PDT)
+Received: from [192.168.1.3] (ip68-111-84-250.oc.oc.cox.net. [68.111.84.250])
+        by smtp.gmail.com with ESMTPSA id ev19sm4932293pjb.42.2020.09.27.18.42.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 27 Sep 2020 18:42:41 -0700 (PDT)
+Subject: Re: [PATCH 06/18] hwrng: iproc-rng200 - use semicolons rather than
+ commas to separate statements
+To:     Julia Lawall <Julia.Lawall@inria.fr>,
+        Matt Mackall <mpm@selenic.com>
+Cc:     =?UTF-8?Q?Valdis_Kl=c4=93tnieks?= <valdis.kletnieks@vt.edu>,
+        Joe Perches <joe@perches.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         kernel-janitors@vger.kernel.org,
-        David Lechner <david@lechnology.com>,
-        linux-wireless@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux-crypto@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        Jerome Brunet <jbrunet@baylibre.com>,
-        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-        linux-amlogic@lists.infradead.org, linux-acpi@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael@kernel.org>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org
-Date:   Sun, 27 Sep 2020 13:08:25 -0700
-In-Reply-To: <1601233948-11629-1-git-send-email-Julia.Lawall@inria.fr>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
 References: <1601233948-11629-1-git-send-email-Julia.Lawall@inria.fr>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.36.4-0ubuntu1 
+ <1601233948-11629-7-git-send-email-Julia.Lawall@inria.fr>
+From:   Florian Fainelli <f.fainelli@gmail.com>
+Message-ID: <793939ba-520a-8041-b3c7-20900a21f308@gmail.com>
+Date:   Sun, 27 Sep 2020 18:42:40 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.2.2
 MIME-Version: 1.0
+In-Reply-To: <1601233948-11629-7-git-send-email-Julia.Lawall@inria.fr>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 2020-09-27 at 21:12 +0200, Julia Lawall wrote:
-> These patches replace commas by semicolons.  This was done using the
-> Coccinelle semantic patch (http://coccinelle.lip6.fr/) shown below.
+
+
+On 9/27/2020 12:12 PM, Julia Lawall wrote:
+> Replace commas with semicolons.  What is done is essentially described by
+> the following Coccinelle semantic patch (http://coccinelle.lip6.fr/):
 > 
-> This semantic patch ensures that commas inside for loop headers will not be
-> transformed.  It also doesn't touch macro definitions.
+> // <smpl>
+> @@ expression e1,e2; @@
+> e1
+> -,
+> +;
+> e2
+> ... when any
+> // </smpl>
+> 
+> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
 
-Thanks.
-
-All of these appear to be correct and without effect
-except for __LINE__ number changes where braces are added.
-
-
-
+Acked-by: Florian Fainelli <f.fainelli@gmail.com>
+-- 
+Florian
