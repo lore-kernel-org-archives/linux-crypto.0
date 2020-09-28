@@ -2,184 +2,131 @@ Return-Path: <SRS0=0P/0=DF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4856C2D0A8
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Sep 2020 21:05:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB71C2D0A8
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Sep 2020 23:48:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E8B32100A
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Sep 2020 21:05:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E836B207D8
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Sep 2020 23:48:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Hh/PAUyr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726668AbgI1VFk (ORCPT
+        id S1726421AbgI1XsB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Sep 2020 17:05:40 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3563 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726590AbgI1VFk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Sep 2020 17:05:40 -0400
-Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.53])
-        by Forcepoint Email with ESMTP id 27038F80262D21FAAB0B;
-        Tue, 29 Sep 2020 05:05:38 +0800 (CST)
-Received: from dggemi709-chm.china.huawei.com (10.3.20.108) by
- DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Tue, 29 Sep 2020 05:05:37 +0800
-Received: from dggemi761-chm.china.huawei.com (10.1.198.147) by
- dggemi709-chm.china.huawei.com (10.3.20.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Tue, 29 Sep 2020 05:05:37 +0800
-Received: from dggemi761-chm.china.huawei.com ([10.9.49.202]) by
- dggemi761-chm.china.huawei.com ([10.9.49.202]) with mapi id 15.01.1913.007;
- Tue, 29 Sep 2020 05:05:37 +0800
-From:   "Song Bao Hua (Barry Song)" <song.bao.hua@hisilicon.com>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-CC:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Luis Claudio R . Goncalves" <lgoncalv@redhat.com>,
-        Mahipal Challa <mahipalreddy2006@gmail.com>,
-        Seth Jennings <sjenning@redhat.com>,
-        "Dan Streetman" <ddstreet@ieee.org>,
-        Vitaly Wool <vitaly.wool@konsulko.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
-        "fanghao (A)" <fanghao11@huawei.com>,
-        Colin Ian King <colin.king@canonical.com>
-Subject: RE: [PATCH v6] mm/zswap: move to use crypto_acomp API for hardware
- acceleration
-Thread-Topic: [PATCH v6] mm/zswap: move to use crypto_acomp API for hardware
- acceleration
-Thread-Index: AQHWlat2/tz4PWWjYEyGimM6I0lKCKl+fZuA
-Date:   Mon, 28 Sep 2020 21:05:37 +0000
-Message-ID: <27a13284256c4780a21dd947a01d9a3c@hisilicon.com>
-References: <20200818123100.4140-1-song.bao.hua@hisilicon.com>
- <20200928152432.l3auscdx2suyli4u@linutronix.de>
-In-Reply-To: <20200928152432.l3auscdx2suyli4u@linutronix.de>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.126.200.63]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Mon, 28 Sep 2020 19:48:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41874 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726064AbgI1XsB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 28 Sep 2020 19:48:01 -0400
+Received: from mail-vs1-xe41.google.com (mail-vs1-xe41.google.com [IPv6:2607:f8b0:4864:20::e41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98334C0613D3
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Sep 2020 16:47:59 -0700 (PDT)
+Received: by mail-vs1-xe41.google.com with SMTP id w25so1860556vsk.9
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Sep 2020 16:47:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=hzBJEc2rfX+SRBe+kzCS76t/grRjnOGOEK+9vtZKuhE=;
+        b=Hh/PAUyrwAagfQLLcZ4fY28lldnXGopLLC7d7SduXmUiNSjuvkku3ih7Oxk04TqA7f
+         /S+IvqMXIQWVqnZCPK3jfcSiNadQlW0uY/iL5vXGKU8zaKdEp49YXSn4REWcg/0/CSA1
+         YDGI8w0aXG0uKYUXlolZnF0VpCZe3BU96yv+w=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hzBJEc2rfX+SRBe+kzCS76t/grRjnOGOEK+9vtZKuhE=;
+        b=iAEJo70o5JGgFK91lmEkJN6FYbmdumwF6SiZjd9Bhrkyn9DczesUkwm/tLgDYT7x7s
+         52QBRlcIe/dn46QC3jjw2orfF+JCATh3HT6OkFhXdy+Mk8zI0Pv1POhrCGIEaRp0WGsE
+         s9YYPS9+PS8YgeURlNUYH4f2DbIgKHxyWDN0glpGjHO4QbAf4FbQic2tRjSZY3fNnDha
+         1yc22/T/wg2PZUpQF0evo4AEMT36eax1LKqf3FznSD2tF0vR6RhQfaUC4c7Ajzk/6IYt
+         o8VqXRyi1achHQMTFVGVYJZPgQjy/HcBgUQOktymDymq57VLXuvblZ9u8LmXGuWdIy8+
+         W4pg==
+X-Gm-Message-State: AOAM530hnbTgQ6fVbZ9LrniVtBKba8uuhjH2MWa50xXrq2lgquYjo04N
+        dJ4z5HZsFXM/dzIBRSc4Y4lWdbp9PQ/k7w==
+X-Google-Smtp-Source: ABdhPJwNFyTprx5zs7HF1d4Ex7Svhb8iMpKY29RJPDCcYqdzdcQtEkW5mq3+G+iJTIJU7dG4lJlzQw==
+X-Received: by 2002:a67:bd12:: with SMTP id y18mr1357719vsq.45.1601336878472;
+        Mon, 28 Sep 2020 16:47:58 -0700 (PDT)
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com. [209.85.222.42])
+        by smtp.gmail.com with ESMTPSA id j4sm280898uan.20.2020.09.28.16.47.57
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Sep 2020 16:47:57 -0700 (PDT)
+Received: by mail-ua1-f42.google.com with SMTP id z1so2807001uaa.6
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Sep 2020 16:47:57 -0700 (PDT)
+X-Received: by 2002:ab0:2ea1:: with SMTP id y1mr2453341uay.104.1601336877206;
+ Mon, 28 Sep 2020 16:47:57 -0700 (PDT)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+References: <20200926102651.31598-1-ardb@kernel.org> <20200926102651.31598-3-ardb@kernel.org>
+In-Reply-To: <20200926102651.31598-3-ardb@kernel.org>
+From:   Doug Anderson <dianders@chromium.org>
+Date:   Mon, 28 Sep 2020 16:47:45 -0700
+X-Gmail-Original-Message-ID: <CAD=FV=WGnm2bSe-1yJ46yLHv43Grpse6DXC7CFaWMd_W9--EGw@mail.gmail.com>
+Message-ID: <CAD=FV=WGnm2bSe-1yJ46yLHv43Grpse6DXC7CFaWMd_W9--EGw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] crypto: xor - use ktime for template benchmarking
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Laight <David.Laight@aculab.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogU2ViYXN0aWFuIEFuZHJ6
-ZWogU2lld2lvciBbbWFpbHRvOmJpZ2Vhc3lAbGludXRyb25peC5kZV0NCj4gU2VudDogVHVlc2Rh
-eSwgU2VwdGVtYmVyIDI5LCAyMDIwIDQ6MjUgQU0NCj4gVG86IFNvbmcgQmFvIEh1YSAoQmFycnkg
-U29uZykgPHNvbmcuYmFvLmh1YUBoaXNpbGljb24uY29tPg0KPiBDYzogYWtwbUBsaW51eC1mb3Vu
-ZGF0aW9uLm9yZzsgaGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1Ow0KPiBkYXZlbUBkYXZlbWxv
-ZnQubmV0OyBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOyBsaW51eC1tbUBrdmFjay5vcmc7
-DQo+IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IEx1aXMgQ2xhdWRpbyBSIC4gR29uY2Fs
-dmVzDQo+IDxsZ29uY2FsdkByZWRoYXQuY29tPjsgTWFoaXBhbCBDaGFsbGEgPG1haGlwYWxyZWRk
-eTIwMDZAZ21haWwuY29tPjsNCj4gU2V0aCBKZW5uaW5ncyA8c2plbm5pbmdAcmVkaGF0LmNvbT47
-IERhbiBTdHJlZXRtYW4gPGRkc3RyZWV0QGllZWUub3JnPjsNCj4gVml0YWx5IFdvb2wgPHZpdGFs
-eS53b29sQGtvbnN1bGtvLmNvbT47IFdhbmd6aG91IChCKQ0KPiA8d2FuZ3pob3UxQGhpc2lsaWNv
-bi5jb20+OyBmYW5naGFvIChBKSA8ZmFuZ2hhbzExQGh1YXdlaS5jb20+OyBDb2xpbg0KPiBJYW4g
-S2luZyA8Y29saW4ua2luZ0BjYW5vbmljYWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHY2
-XSBtbS96c3dhcDogbW92ZSB0byB1c2UgY3J5cHRvX2Fjb21wIEFQSSBmb3INCj4gaGFyZHdhcmUg
-YWNjZWxlcmF0aW9uDQo+IA0KPiBPbiAyMDIwLTA4LTE5IDAwOjMxOjAwIFsrMTIwMF0sIEJhcnJ5
-IFNvbmcgd3JvdGU6DQo+ID4gZGlmZiAtLWdpdCBhL21tL3pzd2FwLmMgYi9tbS96c3dhcC5jDQo+
-ID4gaW5kZXggZmJiNzgyOTI0Y2NjLi4wMGI1ZjE0YTczMzIgMTAwNjQ0DQo+ID4gLS0tIGEvbW0v
-enN3YXAuYw0KPiA+ICsrKyBiL21tL3pzd2FwLmMNCj4gPiBAQCAtMTI3LDkgKzEyOSwxNyBAQA0K
-PiBtb2R1bGVfcGFyYW1fbmFtZWQoc2FtZV9maWxsZWRfcGFnZXNfZW5hYmxlZCwNCj4genN3YXBf
-c2FtZV9maWxsZWRfcGFnZXNfZW5hYmxlZCwNCj4gPiAgKiBkYXRhIHN0cnVjdHVyZXMNCj4gPiAg
-KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKi8NCj4gPg0KPiA+ICtzdHJ1Y3QgY3J5
-cHRvX2Fjb21wX2N0eCB7DQo+ID4gKwlzdHJ1Y3QgY3J5cHRvX2Fjb21wICphY29tcDsNCj4gPiAr
-CXN0cnVjdCBhY29tcF9yZXEgKnJlcTsNCj4gPiArCXN0cnVjdCBjcnlwdG9fd2FpdCB3YWl0Ow0K
-PiA+ICsJdTggKmRzdG1lbTsNCj4gPiArCXN0cnVjdCBtdXRleCAqbXV0ZXg7DQo+ID4gK307DQo+
-ID4gKw0KPiA+ICBzdHJ1Y3QgenN3YXBfcG9vbCB7DQo+ID4gIAlzdHJ1Y3QgenBvb2wgKnpwb29s
-Ow0KPiA+IC0Jc3RydWN0IGNyeXB0b19jb21wICogX19wZXJjcHUgKnRmbTsNCj4gPiArCXN0cnVj
-dCBjcnlwdG9fYWNvbXBfY3R4IF9fcGVyY3B1ICphY29tcF9jdHg7DQo+ID4gIAlzdHJ1Y3Qga3Jl
-ZiBrcmVmOw0KPiA+ICAJc3RydWN0IGxpc3RfaGVhZCBsaXN0Ow0KPiA+ICAJc3RydWN0IHdvcmtf
-c3RydWN0IHJlbGVhc2Vfd29yazsNCj4gPiBAQCAtMzg4LDIzICszOTgsNDMgQEAgc3RhdGljIHN0
-cnVjdCB6c3dhcF9lbnRyeQ0KPiAqenN3YXBfZW50cnlfZmluZF9nZXQoc3RydWN0IHJiX3Jvb3Qg
-KnJvb3QsDQo+ID4gICogcGVyLWNwdSBjb2RlDQo+ID4gICoqKioqKioqKioqKioqKioqKioqKioq
-KioqKioqKioqKiovDQo+ID4gIHN0YXRpYyBERUZJTkVfUEVSX0NQVSh1OCAqLCB6c3dhcF9kc3Rt
-ZW0pOw0KPiA+ICsvKg0KPiA+ICsgKiBJZiB1c2VycyBkeW5hbWljYWxseSBjaGFuZ2UgdGhlIHpw
-b29sIHR5cGUgYW5kIGNvbXByZXNzb3IgYXQgcnVudGltZSwNCj4gaS5lLg0KPiA+ICsgKiB6c3dh
-cCBpcyBydW5uaW5nLCB6c3dhcCBjYW4gaGF2ZSBtb3JlIHRoYW4gb25lIHpwb29sIG9uIG9uZSBj
-cHUsIGJ1dA0KPiB0aGV5DQo+ID4gKyAqIGFyZSBzaGFyaW5nIGR0c21lbS4gU28gd2UgbmVlZCB0
-aGlzIG11dGV4IHRvIGJlIHBlci1jcHUuDQo+ID4gKyAqLw0KPiA+ICtzdGF0aWMgREVGSU5FX1BF
-Ul9DUFUoc3RydWN0IG11dGV4ICosIHpzd2FwX211dGV4KTsNCj4gDQo+IFRoZXJlIGlzIG5vIG5l
-ZWQgdG8gbWFrZSBpdCBzdHVyY3QgbXV0ZXgqLiBZb3UgY291bGQgbWFrZSBpdCBzdHJ1Y3QNCj4g
-bXV0ZXguIFRoZSBmb2xsb3dpbmcgbWFrZSBpdCBtb3JlIG9idmlvdXMgaG93IHRoZSByZWxhdGlv
-biBoZXJlIGlzIChldmVuDQo+IHdpdGhvdXQgYSBjb21tZW50KToNCj4gDQo+IHxzdHJ1Y3QgenN3
-YXBfbWVtX3Bvb2wgew0KPiB8CXZvaWQJCSpkc3RfbWVtOw0KPiB8CXN0cnVjdCBtdXRleAlsb2Nr
-Ow0KPiB8fTsNCj4gfA0KPiB8c3RhdGljIERFRklORV9QRVJfQ1BVKHN0cnVjdCB6c3dhcF9tZW1f
-cG9vbCAsIHpzd2FwX21lbV9wb29sKTsNCj4gDQo+IFBsZWFzZSBhY2Nlc3Mgb25seSB0aGlzLCBk
-b24ndCBhZGQgdXNlIGEgcG9pbnRlciBpbiBhIGFub3RoZXIgc3RydWN0IHRvDQo+IGRlc3RfbWVt
-IG9yIGxvY2sgd2hpY2ggbWF5IGNvbmZ1c2UgcGVvcGxlLg0KDQpXZWxsLiBJdCBzZWVtcyBzZW5z
-aWJsZS4NCg0KPiANCj4gVGhpcyByZXNvdXJjZSBpcyBwZXItQ1BVLiAgRG8geW91IHJlYWxseSB1
-dGlsaXplIHRoZW0gYWxsPyBPbiAyLCA4LCAxNiwNCj4gNjQsIDEyOCBjb3JlIHN5c3RlbT8gTW9y
-ZSBsYXRlcuKApg0KDQpJdCBtaWdodCBiZSBhIGdvb2QgcGxhY2UgdG8gaW52ZXN0aWdhdGUgaWYg
-d2UgYXJlIGdvaW5nIHRvIGRvIGRlZXAgcGVyZm9ybWFuY2UNCnR1bmluZyBvZiB6c3dhcCBhZnRl
-cndhcmRzLiBCdXQgaXQgaXMgb2J2aW91c2x5IG91dCBvZiB0aGUgc2NvcGUgb2YgdGhpcyBwYXRj
-aC4NCg0KSW4gbXkgdW5kZXJzdGFuZGluZywgc29tZSBib3R0bGVuZWNrIGNvdWxkIGV4aXN0IGlu
-IHRoZSBlYXJsaWVyIGNvZGUgcGF0aCBvZiANCm1lbW9yeSBtYW5hZ2VtZW50IGJlZm9yZSBmcm9u
-dHN3YXAgYW5kIHpzd2FwIGlmIHRoZXJlIGFyZSB0b28gbWFueSBjb3Jlcw0KYXMgdGhlIG1lbW9y
-eSBhbmQgdGhlIExSVSBpcyBnbG9iYWxseSBtYW5hZ2VkIGFuZCB0aGVyZSBtaWdodCBiZSBzb21l
-DQpsb2NrIGlzc3VlIHRvIGJsb2NrIHRoZSB0aHJvdWdocHV0IG9mIGZyb250c3dhcC4NCg0KPiAN
-Cj4gPiBAQCAtOTE2LDE0ICs5NzQsMjEgQEAgc3RhdGljIGludCB6c3dhcF93cml0ZWJhY2tfZW50
-cnkoc3RydWN0IHpwb29sDQo+ICpwb29sLCB1bnNpZ25lZCBsb25nIGhhbmRsZSkNCj4gPg0KPiA+
-ICAJY2FzZSBaU1dBUF9TV0FQQ0FDSEVfTkVXOiAvKiBwYWdlIGlzIGxvY2tlZCAqLw0KPiA+ICAJ
-CS8qIGRlY29tcHJlc3MgKi8NCj4gPiArCQlhY29tcF9jdHggPSB0aGlzX2NwdV9wdHIoZW50cnkt
-PnBvb2wtPmFjb21wX2N0eCk7DQo+IA0KPiBNeSBmZWVsaW5nIGlzIHRoYXQgdGhpcyB0cmlnZ2Vy
-cyBhIHdhcm5pbmcgd2l0aCBDT05GSUdfREVCVUdfUFJFRU1QVC4gSQ0KPiBkb24ndCBzZWUgaG93
-IGl0IGNvdWxkIGJlIGF2b2lkIGl0LiBJZiB5b3UgYXJlIG5vdCBwcmVlbXB0aWJsZSBoZXJlIHRo
-ZW4NCj4geW91IG11c3Qgbm90IHNsZWVwIGxhdGVyLg0KDQpJIGd1ZXNzIHlvdSBhcmUgdGFsa2lu
-ZyBhYm91dCBzb21lIG90aGVyIEFQSXMgbGlrZSBnZXRfY3B1X3B0cigpLg0KDQpXaGlsZSBBUElz
-IGxpa2UgZ2V0X2NwdV92YXIoKSBhbmQgZ2V0X2NwdV9wdHIoKSB3aWxsIHByb2hpYml0IHByZWVt
-cHRpb24gYW5kDQpkaXNhbGxvdyBzbGVlcGluZywgQVBJcyBsaWtlIHRoaXNfY3B1X3B0cigpIGFu
-ZCB0aGlzX2NwdV9wdHIoKSB3b24ndCBkbyB0aGF0Og0KDQojZGVmaW5lIGdldF9jcHVfdmFyKHZh
-cikJCQkJCQlcDQooKih7CQkJCQkJCQkJXA0KCXByZWVtcHRfZGlzYWJsZSgpOwkJCQkJCVwNCgl0
-aGlzX2NwdV9wdHIoJnZhcik7CQkJCQkJXA0KfSkpDQoNCiNkZWZpbmUgcHV0X2NwdV92YXIodmFy
-KQkJCQkJCVwNCmRvIHsJCQkJCQkJCQlcDQoJKHZvaWQpJih2YXIpOwkJCQkJCQlcDQoJcHJlZW1w
-dF9lbmFibGUoKTsJCQkJCQlcDQp9IHdoaWxlICgwKQ0KDQojZGVmaW5lIGdldF9jcHVfcHRyKHZh
-cikJCQkJCQlcDQooewkJCQkJCQkJCVwNCglwcmVlbXB0X2Rpc2FibGUoKTsJCQkJCQlcDQoJdGhp
-c19jcHVfcHRyKHZhcik7CQkJCQkJXA0KfSkNCg0KI2RlZmluZSBwdXRfY3B1X3B0cih2YXIpCQkJ
-CQkJXA0KZG8gewkJCQkJCQkJCVwNCgkodm9pZCkodmFyKTsJCQkJCQkJXA0KCXByZWVtcHRfZW5h
-YmxlKCk7CQkJCQkJXA0KfSB3aGlsZSAoMCkNCg0KPiANCj4gPiArDQo+ID4gIAkJZGxlbiA9IFBB
-R0VfU0laRTsNCj4gPiAgCQlzcmMgPSAodTggKil6aGRyICsgc2l6ZW9mKHN0cnVjdCB6c3dhcF9o
-ZWFkZXIpOw0KPiA+IC0JCWRzdCA9IGttYXBfYXRvbWljKHBhZ2UpOw0KPiA+IC0JCXRmbSA9ICpn
-ZXRfY3B1X3B0cihlbnRyeS0+cG9vbC0+dGZtKTsNCj4gPiAtCQlyZXQgPSBjcnlwdG9fY29tcF9k
-ZWNvbXByZXNzKHRmbSwgc3JjLCBlbnRyeS0+bGVuZ3RoLA0KPiA+IC0JCQkJCSAgICAgZHN0LCAm
-ZGxlbik7DQo+ID4gLQkJcHV0X2NwdV9wdHIoZW50cnktPnBvb2wtPnRmbSk7DQo+ID4gLQkJa3Vu
-bWFwX2F0b21pYyhkc3QpOw0KPiA+ICsJCWRzdCA9IGttYXAocGFnZSk7DQo+ID4gKw0KPiA+ICsJ
-CW11dGV4X2xvY2soYWNvbXBfY3R4LT5tdXRleCk7DQo+ID4gKwkJc2dfaW5pdF9vbmUoJmlucHV0
-LCBzcmMsIGVudHJ5LT5sZW5ndGgpOw0KPiA+ICsJCXNnX2luaXRfb25lKCZvdXRwdXQsIGRzdCwg
-ZGxlbik7DQo+ID4gKwkJYWNvbXBfcmVxdWVzdF9zZXRfcGFyYW1zKGFjb21wX2N0eC0+cmVxLCAm
-aW5wdXQsICZvdXRwdXQsDQo+IGVudHJ5LT5sZW5ndGgsIGRsZW4pOw0KPiA+ICsJCXJldCA9IGNy
-eXB0b193YWl0X3JlcShjcnlwdG9fYWNvbXBfZGVjb21wcmVzcyhhY29tcF9jdHgtPnJlcSksDQo+
-ICZhY29tcF9jdHgtPndhaXQpOw0KPiA+ICsJCWRsZW4gPSBhY29tcF9jdHgtPnJlcS0+ZGxlbjsN
-Cj4gPiArCQltdXRleF91bmxvY2soYWNvbXBfY3R4LT5tdXRleCk7DQo+IA0KPiBTYXkgYSByZXF1
-ZXN0IGNvbWVzIGluIG9uIENQVTEuIEFmdGVyIHRoZSBtdXRleF9sb2NrKCkgeW91IGdldCBtaWdy
-YXRlZCB0bw0KPiBDUFUyLiBZb3UgZG8gY3J5cHRvX3dhaXRfcmVxKCkgb24gQ1BVMi4gSW4gdGhh
-dCB0aW1lIGFub3RoZXIgcmVxdWVzdA0KPiBnZXRzIGluIG9uIENQVTEuIEl0IGJsb2NrcyBvbiB0
-aGUgdmVyeSBzYW1lIG11dGV4LiBObyBkYXRhIGNvcnJ1cHRpb24gYnV0DQo+IGl0IGNvdWxkIGhh
-dmUgdXNlZCBhbm90aGVyIGJ1ZmZlciBpbnN0ZWFkIG9mIGJsb2NraW5nIGFuZCB3YWl0aW5nIGZv
-cg0KPiB0aGUgcHJldmlvdXMgb25lIHRvIGZpbmlzaCBpdHMgd29yay4NCj4gU28gaXQgbWlnaHQg
-bWFrZSBzZW5zZSB0byBoYXZlIGEgcG9vbCBvZiBwYWdlcyB3aGljaCBhcmUgc2hhcmVkIGluIHRo
-ZQ0KPiBzeXN0ZW0gZ2xvYmFsbHkgc3lzdGVtIGluc3RlYWQgb2YgaGF2aW5nIHN0cmljdCBwZXIt
-Q1BVIGFsbG9jYXRpb25zDQo+IHdoaWxlIGJlaW5nIGZ1bGx5IG1pZ3JhdGUtYWJsZSB3aGlsZSB0
-aGUgYXJlIGluIHVzZS4NCg0KSXQgbWlnaHQgYmUgYSBnb29kIHBsYWNlIHRvIGludmVzdGlnYXRl
-IHdoZXRoZXIgdGhpcyBjYW4gaGVscCBpbXByb3ZlIHRoZSBwZXJmb3JtYW5jZSBvZg0KenN3YXAu
-IEl0IGNvdWxkIGJlIGluIGEgdG9kbyBsaXN0IGZvciBvcHRpbWl6aW5nIHRoZSB1dGlsaXphdGlv
-biBvZiB0aGUgcG9vbC4gT24gdGhlIG90aGVyDQpoYW5kLCBpdCBpcyBvYnZpb3VzbHkgbm90IHBy
-b3BlciB0byBwdXQgdGhhdCBjaGFuZ2UgaW4gdGhpcyBwYXRjaC4NCg0KPiANCj4gV2hpbGUgYXQg
-aXQ6IEZvciBkc3QgeW91IGNvdWxkIHVzZSBzZ19zZXRfcGFnZSgpLiBUaGlzIHdvdWxkIGF2b2lk
-IHRoZQ0KPiBrbWFwKCkuDQoNCkl0IHNlZW1zIGl0IGlzIHRydWUgd2hpbGUgaXQgbmVlZHMgYSBj
-YWxsIHRvIHNnX2luaXRfdGFibGUoKS4gTWF5YmUgaXQgaXMgd29ydGggdG8gYWRkIG9uZQ0KbW9y
-ZSBBUEkgc2ltaWxhciB3aXRoIHNnX2luaXRfb25lKCkgYnV0IHRoZSBwYXJhbWV0ZXIgaXMgcGFn
-ZSByYXRoZXIgdGhhbiBidWZmZXIgaWYgc2cNCndpdGggb25lIHBhZ2UocykgaXMgYSBxdWl0ZSBj
-b21tb24gY2FzZS4NCg0KRm9yIHRoaXMgY2FzZSwgSSBhZ3JlZSBpdCBpcyBiZXR0ZXIgdG8gcmVt
-b3ZlIHRoaXMgcmVkdW5kYW50IGttYXAva3VubWFwLg0KDQo+IA0KPiA+ICsJCWt1bm1hcChwYWdl
-KTsNCj4gPiAgCQlCVUdfT04ocmV0KTsNCj4gPiAgCQlCVUdfT04oZGxlbiAhPSBQQUdFX1NJWkUp
-Ow0KPiA+DQo+IA0KPiBTZWJhc3RpYW4NCg0KVGhhbmtzDQpCYXJyeQ0K
+Hi,
+
+On Sat, Sep 26, 2020 at 3:27 AM Ard Biesheuvel <ardb@kernel.org> wrote:
+>
+> Currently, we use the jiffies counter as a time source, by staring at
+> it until a HZ period elapses, and then staring at it again and perform
+> as many XOR operations as we can at the same time until another HZ
+> period elapses, so that we can calculate the throughput. This takes
+> longer than necessary, and depends on HZ, which is undesirable, since
+> HZ is system dependent.
+>
+> Let's use the ktime interface instead, and use it to time a fixed
+> number of XOR operations, which can be done much faster, and makes
+> the time spent depend on the performance level of the system itself,
+> which is much more reasonable. To ensure that we have the resolution
+> we need even on systems with 32 kHz time sources, while not spending too
+> much time in the benchmark on a slow CPU, let's switch to 3 attempts of
+> 800 repetitions each: that way, we will only misidentify algorithms that
+> perform within 10% of each other as the fastest if they are faster than
+> 10 GB/s to begin with, which is not expected to occur on systems with
+> such coarse clocks.
+>
+> On ThunderX2, I get the following results:
+>
+> Before:
+>
+>   [72625.956765] xor: measuring software checksum speed
+>   [72625.993104]    8regs     : 10169.000 MB/sec
+>   [72626.033099]    32regs    : 12050.000 MB/sec
+>   [72626.073095]    arm64_neon: 11100.000 MB/sec
+>   [72626.073097] xor: using function: 32regs (12050.000 MB/sec)
+>
+> After:
+>
+>   [72599.650216] xor: measuring software checksum speed
+>   [72599.651188]    8regs           : 10491 MB/sec
+>   [72599.652006]    32regs          : 12345 MB/sec
+>   [72599.652871]    arm64_neon      : 11402 MB/sec
+>   [72599.652873] xor: using function: 32regs (12345 MB/sec)
+
+What are the chances of 12345 coming up?  ;-)
+
+>
+> Link: https://lore.kernel.org/linux-crypto/20200923182230.22715-3-ardb@kernel.org/
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> ---
+>  crypto/xor.c | 38 +++++++++-----------
+>  1 file changed, 16 insertions(+), 22 deletions(-)
+
+This looks good to me.  Thanks for taking this on!
+
+Reviewed-by: Douglas Anderson <dianders@chromium.org>
