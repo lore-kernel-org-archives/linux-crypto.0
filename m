@@ -2,40 +2,53 @@ Return-Path: <SRS0=8ohu=DG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51464C4346E
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Sep 2020 10:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F33CC4346E
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Sep 2020 10:28:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A67B206B8
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Sep 2020 10:02:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40A90208FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Sep 2020 10:28:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Ni7fscmq";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="zlKbLUvf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725536AbgI2KCT (ORCPT
+        id S1727805AbgI2K2z (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Sep 2020 06:02:19 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:33216 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725468AbgI2KCT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Sep 2020 06:02:19 -0400
-Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.57])
-        by Forcepoint Email with ESMTP id 968367AF5184FA23B79D;
-        Tue, 29 Sep 2020 18:02:15 +0800 (CST)
-Received: from dggemi760-chm.china.huawei.com (10.1.198.146) by
- DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Tue, 29 Sep 2020 18:02:15 +0800
-Received: from dggemi761-chm.china.huawei.com (10.1.198.147) by
- dggemi760-chm.china.huawei.com (10.1.198.146) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Tue, 29 Sep 2020 18:02:15 +0800
-Received: from dggemi761-chm.china.huawei.com ([10.9.49.202]) by
- dggemi761-chm.china.huawei.com ([10.9.49.202]) with mapi id 15.01.1913.007;
- Tue, 29 Sep 2020 18:02:15 +0800
-From:   "Song Bao Hua (Barry Song)" <song.bao.hua@hisilicon.com>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-CC:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        Tue, 29 Sep 2020 06:28:55 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:45360 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725372AbgI2K2z (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 29 Sep 2020 06:28:55 -0400
+Date:   Tue, 29 Sep 2020 12:28:51 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1601375333;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZZy1/JUjxBwS/xwCpto2G8UIj6PQNs3p6DoNNAVeFOw=;
+        b=Ni7fscmqCScbEIjbvkmBZdsABowtrIUYy52UJ4kp2MXjEySrOS6SiYCW9uvFXljx2QAKyM
+        XB+8X7sttmxZzqMW9OJgPZjIMlybKL+pn9+BaIC5U9sp06vYMq+dQUjdqaU6wLiiZ1Rtm4
+        oDrfJeTRlARMzqNbE9+ZyOYf1XvbKUgEj9O8PqKB3yyyZSLVD2V8mVTZt0BirFUfoK39Qh
+        TYAZBt0WwpDFGTGOnQfXqxbtt4odkyNZn3SbV0M1YmMeJncg3SOWZzeOSB5n4mQKvRVhla
+        1Kgovvv6gvdboZaUv/7PEDjk2iemC+5HzYd6F29Uh6sKzMJruZmReqKbfH53sA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1601375333;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZZy1/JUjxBwS/xwCpto2G8UIj6PQNs3p6DoNNAVeFOw=;
+        b=zlKbLUvf92DXLQvjKZLjYOgI9RVQU34MJiDViUoZSqS6rJFLwnSSluK6SNIFWAJMiunGc7
+        6IZVZpwaYUS47TDA==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     "Song Bao Hua (Barry Song)" <song.bao.hua@hisilicon.com>
+Cc:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
         "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
         "davem@davemloft.net" <davem@davemloft.net>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
@@ -44,112 +57,102 @@ CC:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
         "Luis Claudio R . Goncalves" <lgoncalv@redhat.com>,
         Mahipal Challa <mahipalreddy2006@gmail.com>,
         Seth Jennings <sjenning@redhat.com>,
-        "Dan Streetman" <ddstreet@ieee.org>,
+        Dan Streetman <ddstreet@ieee.org>,
         Vitaly Wool <vitaly.wool@konsulko.com>,
         "Wangzhou (B)" <wangzhou1@hisilicon.com>,
         "fanghao (A)" <fanghao11@huawei.com>,
         Colin Ian King <colin.king@canonical.com>
-Subject: RE: [PATCH v6] mm/zswap: move to use crypto_acomp API for hardware
+Subject: Re: [PATCH v6] mm/zswap: move to use crypto_acomp API for hardware
  acceleration
-Thread-Topic: [PATCH v6] mm/zswap: move to use crypto_acomp API for hardware
- acceleration
-Thread-Index: AQHWlat2/tz4PWWjYEyGimM6I0lKCKl+fZuAgACGPED//9FBgIAAiB0w
-Date:   Tue, 29 Sep 2020 10:02:15 +0000
-Message-ID: <5951148aef79459192826f405a6fa5aa@hisilicon.com>
+Message-ID: <20200929102851.3m5ardu2orfbhe3d@linutronix.de>
 References: <20200818123100.4140-1-song.bao.hua@hisilicon.com>
  <20200928152432.l3auscdx2suyli4u@linutronix.de>
  <76bb2b545117413eb0879abcf91cf0f0@hisilicon.com>
  <20200929093113.3cv63szruo3c4inu@linutronix.de>
-In-Reply-To: <20200929093113.3cv63szruo3c4inu@linutronix.de>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.126.200.63]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ <5951148aef79459192826f405a6fa5aa@hisilicon.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <5951148aef79459192826f405a6fa5aa@hisilicon.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogU2ViYXN0aWFuIEFuZHJ6
-ZWogU2lld2lvciBbbWFpbHRvOmJpZ2Vhc3lAbGludXRyb25peC5kZV0NCj4gU2VudDogVHVlc2Rh
-eSwgU2VwdGVtYmVyIDI5LCAyMDIwIDEwOjMxIFBNDQo+IFRvOiBTb25nIEJhbyBIdWEgKEJhcnJ5
-IFNvbmcpIDxzb25nLmJhby5odWFAaGlzaWxpY29uLmNvbT4NCj4gQ2M6IGFrcG1AbGludXgtZm91
-bmRhdGlvbi5vcmc7IGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdTsNCj4gZGF2ZW1AZGF2ZW1s
-b2Z0Lm5ldDsgbGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZzsgbGludXgtbW1Aa3ZhY2sub3Jn
-Ow0KPiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBMdWlzIENsYXVkaW8gUiAuIEdvbmNh
-bHZlcw0KPiA8bGdvbmNhbHZAcmVkaGF0LmNvbT47IE1haGlwYWwgQ2hhbGxhIDxtYWhpcGFscmVk
-ZHkyMDA2QGdtYWlsLmNvbT47DQo+IFNldGggSmVubmluZ3MgPHNqZW5uaW5nQHJlZGhhdC5jb20+
-OyBEYW4gU3RyZWV0bWFuIDxkZHN0cmVldEBpZWVlLm9yZz47DQo+IFZpdGFseSBXb29sIDx2aXRh
-bHkud29vbEBrb25zdWxrby5jb20+OyBXYW5nemhvdSAoQikNCj4gPHdhbmd6aG91MUBoaXNpbGlj
-b24uY29tPjsgZmFuZ2hhbyAoQSkgPGZhbmdoYW8xMUBodWF3ZWkuY29tPjsgQ29saW4NCj4gSWFu
-IEtpbmcgPGNvbGluLmtpbmdAY2Fub25pY2FsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2
-Nl0gbW0venN3YXA6IG1vdmUgdG8gdXNlIGNyeXB0b19hY29tcCBBUEkgZm9yDQo+IGhhcmR3YXJl
-IGFjY2VsZXJhdGlvbg0KPiANCj4gT24gMjAyMC0wOS0yOSAwNToxNDozMSBbKzAwMDBdLCBTb25n
-IEJhbyBIdWEgKEJhcnJ5IFNvbmcpIHdyb3RlOg0KPiA+IEFmdGVyIHNlY29uZCB0aG91Z2h0IGFu
-ZCB0cnlpbmcgdG8gbWFrZSB0aGlzIGNoYW5nZSwgSSB3b3VsZCBsaWtlIHRvIGNoYW5nZQ0KPiBt
-eSBtaW5kDQo+ID4gYW5kIGRpc2FncmVlIHdpdGggdGhpcyBpZGVhLiBUd28gcmVhc29uczoNCj4g
-PiAxLiB3aGlsZSB1c2luZyB0aGlzX2NwdV9wdHIoKSB3aXRob3V0IHByZWVtcHRpb24gbG9jaywg
-cGVvcGxlIHVzdWFsbHkgcHV0IGFsbA0KPiB0aGluZ3MgYm91bmQNCj4gPiB3aXRoIG9uZSBjcHUg
-dG8gb25lIHN0cnVjdHVyZSwgc28gdGhhdCBvbmNlIHdlIGdldCB0aGUgcG9pbnRlciBvZiB0aGUg
-d2hvbGUNCj4gc3RydWN0dXJlLCB3ZSBnZXQNCj4gPiBhbGwgaXRzIHBhcnRzIGJlbG9uZ2luZyB0
-byB0aGUgc2FtZSBjcHUuIElmIHdlIG1vdmUgdGhlIGRzdG1lbSBhbmQgbXV0ZXgNCj4gb3V0IG9m
-IHRoZSBzdHJ1Y3R1cmUNCj4gPiBjb250YWluaW5nIHRoZW0sIHdlIHdpbGwgaGF2ZSB0byBkbzoN
-Cj4gPiAJYS4gZ2V0X2NwdV9wdHIoKSBmb3IgdGhlIGFjb21wX2N0eCAgIC8vbG9jayBwcmVlbXB0
-aW9uDQo+ID4gCWIuIHRoaXNfY3B1X3B0cigpIGZvciB0aGUgZHN0bWVtIGFuZCBtdXRleA0KPiA+
-IAljLiBwdXRfY3B1X3B0cigpIGZvciB0aGUgYWNvbXBfY3R4ICAvL3VubG9jayBwcmVlbXB0aW9u
-DQo+ID4gCWQuIG11dGV4X2xvY2soKQ0KPiA+IAkgIHNnX2luaXRfb25lKCkNCj4gPiAJICBjb21w
-cmVzcy9kZWNvbXByZXNzIGV0Yy4NCj4gPiAJICAuLi4NCj4gPiAJICBtdXRleF91bmxvY2sNCj4g
-Pg0KPiA+IGFzIHRoZSBnZXQoKSBhbmQgcHV0KCkgaGF2ZSBhIHByZWVtcHRpb24gbG9jay91bmxv
-Y2ssIHRoaXMgd2lsbCBtYWtlIGNlcnRhaW4NCj4gdGhpc19jcHVfcHRyKCkNCj4gPiBpbiB0aGUg
-c3RlcCAiYiIgd2lsbCByZXR1cm4gdGhlIHJpZ2h0IGRzdG1lbSBhbmQgbXV0ZXggd2hpY2ggYmVs
-b25nIHRvIHRoZQ0KPiBzYW1lIGNwdSB3aXRoDQo+ID4gc3RlcCAiYSIuDQo+ID4NCj4gPiBUaGUg
-c3RlcHMgZnJvbSAiYSIgdG8gImMiIGFyZSBxdWl0ZSBzaWxseSBhbmQgY29uZnVzaW5nLiBJIGJl
-bGlldmUgdGhlIGV4aXN0aW5nDQo+IGNvZGUgYWxpZ25zDQo+ID4gd2l0aCB0aGUgbW9zdCBzaW1p
-bGFyIGNvZGUgaW4ga2VybmVsIGJldHRlcjoNCj4gPiAJYS4gdGhpc19jcHVfcHRyKCkgICAvL2dl
-dCBldmVyeXRoaW5nIGZvciBvbmUgY3B1DQo+ID4gCWIuIG11dGV4X2xvY2soKQ0KPiA+IAkgIHNn
-X2luaXRfb25lKCkNCj4gPiAJICBjb21wcmVzcy9kZWNvbXByZXNzIGV0Yy4NCj4gPiAJICAuLi4N
-Cj4gPiAJICBtdXRleF91bmxvY2sNCj4gDQo+IE15IHBvaW50IHdhcyB0aGF0IHRoZXJlIHdpbGwg
-YmUgYSB3YXJuaW5nIGF0IHJ1bi10aW1lIGFuZCB5b3UgZG9uJ3Qgd2FudA0KPiB0aGF0LiBUaGVy
-ZSBhcmUgcmF3XyBhY2Nlc3NvcnMgaWYgeW91IGtub3cgd2hhdCB5b3UgYXJlIGRvaW5nLiBCdXTi
-gKYNCg0KSSBoYXZlIG9ubHkgc2VlbiBnZXRfY3B1X3B0ci92YXIoKSB0aGluZ3Mgd2lsbCBkaXNh
-YmxlIHByZWVtcHRpb24uIEkgZG9uJ3QgdGhpbmsNCndlIHdpbGwgaGF2ZSBhIHdhcm5pbmcgYXMg
-dGhpc19jcHVfcHRyKCkgd29uJ3QgZGlzYWJsZSBwcmVlbXB0aW9uLg0KDQo+IA0KPiBFYXJsaWVy
-IHlvdSBoYWQgY29tcHJlc3Npb24vZGVjb21wcmVzc2lvbiB3aXRoIGRpc2FibGVkIHByZWVtcHRp
-b24gYW5kDQoNCk5vLiB0aGF0IGlzIHJpZ2h0IG5vdyBkb25lIGluIGVuYWJsZWQgcHJlZW1wdGlv
-biBjb250ZXh0IHdpdGggdGhpcyBwYXRjaC4gVGhlIGNvZGUgYmVmb3JlIHRoaXMgcGF0Y2gNCndh
-cyBkb2luZyAoZGUpY29tcHJlc3Npb24gaW4gcHJlZW1wdGlvbi1kaXNhYmxlZCBjb250ZXh0IGJ5
-IHVzaW5nIGdldF9jcHVfcHRyIGFuZCBnZXRfY3B1X3Zhci4NCg0KPiBzdHJpY3QgcGVyLUNQVSBt
-ZW1vcnkgYWxsb2NhdGlvbi4gTm93IGlmIHlvdSBrZWVwIHRoaXMgcGVyLUNQVSBtZW1vcnkNCj4g
-YWxsb2NhdGlvbiB0aGVuIHlvdSBnYWluIGEgcG9zc2libGUgYm90dGxlbmVjay4NCj4gSW4gdGhl
-IHByZXZpb3VzIGVtYWlsIHlvdSBzYWlkIHRoYXQgdGhlcmUgbWF5IGJlIGEgYm90dGxlbmVjayBp
-biB0aGUNCj4gdXBwZXIgbGF5ZXIgd2hlcmUgeW91IGNhbid0IHV0aWxpemUgYWxsIHRoYXQgbWVt
-b3J5IHlvdSBhbGxvY2F0ZS4gU28geW91DQo+IG1heSB3YW50IHRvIHJldGhpbmsgdGhhdCBzdHJh
-dGVneSBiZWZvcmUgdGhhdCByZXdvcmsuDQoNCndlIGFyZSBwcm9iYWJseSBub3QgdGFsa2luZyBh
-Ym91dCBzYW1lIHRoaW5nIDotKQ0KSSB3YXMgdGFsa2luZyBhYm91dCBwb3NzaWJsZSBnZW5lcmlj
-IHN3YXAgYm90dGxlbmVjay4gRm9yIGV4YW1wbGUsIExSVSBpcyBnbG9iYWwsDQp3aGlsZSBzd2Fw
-cGluZywgbXVsdGlwbGUgY29yZXMgbWlnaHQgaGF2ZSBzb21lIGxvY2tzIG9uIHRoaXMgTFJVLiBm
-b3IgZXhhbXBsZSwNCmlmIHdlIGhhdmUgOCBpbmFjdGl2ZSBwYWdlcyB0byBzd2FwIG91dCwgSSBh
-bSBub3Qgc3VyZSBpZiBtbSBjYW4gdXNlIDggY29yZXMNCnRvIHN3YXAgdGhlbSBvdXQgYXQgdGhl
-IHNhbWUgdGltZS4NCg0KPiANCj4gPiAyLiB3aGlsZSBhbGxvY2F0aW5nIG11dGV4LCB3ZSBjYW4g
-cHV0IHRoZSBtdXRleCBpbnRvIGxvY2FsIG1lbW9yeSBieSB1c2luZw0KPiBrbWFsbG9jX25vZGUo
-KS4NCj4gPiBJZiB3ZSBtb3ZlIHRvICJzdHJ1Y3QgbXV0ZXggbG9jayIgZGlyZWN0bHksIG1vc3Qg
-Q1BVcyBpbiBhIE5VTUEgc2VydmVyIHdpbGwNCj4gaGF2ZSB0byBhY2Nlc3MNCj4gPiByZW1vdGUg
-bWVtb3J5IHRvIHJlYWQvd3JpdGUgdGhlIG11dGV4LCB0aGVyZWZvcmUsIHRoaXMgd2lsbCBpbmNy
-ZWFzZSB0aGUNCj4gbGF0ZW5jeSBkcmFtYXRpY2FsbHkuDQo+IA0KPiBJZiB5b3UgbmVlZCBzb21l
-dGhpbmcgcGVyLUNQVSB0aGVuIERFRklORV9QRVJfQ1BVKCkgd2lsbCBnaXZlIGl0IHRvIHlvdS4N
-Cg0KWWVzLiBJdCBpcyB0cnVlLg0KDQo+IEl0IHdvdWxkIGJlIHZlcnkgYmFkIGZvciBwZXJmb3Jt
-YW5jZSBpZiB0aGlzIGFsbG9jYXRpb25zIHdlcmUgbm90IGZyb20NCj4gQ1BVLWxvY2FsIG1lbW9y
-eSwgcmlnaHQ/IFNvIHdoYXQgbWFrZXMgeW91IHRoaW5rIHRoaXMgaXMgd29yc2UgdGhhbg0KPiBr
-bWFsbG9jX25vZGUoKSBiYXNlZCBhbGxvY2F0aW9ucz8NCg0KWWVzLiBJZiB5b3VyIHJlYWQgenN3
-YXAgY29kZSwgaXQgaGFzIGNvbnNpZGVyZWQgTlVNQSB2ZXJ5IGNhcmVmdWxseSBieSBhbGxvY2F0
-aW5nIHZhcmlvdXMNCm1lbW9yeSBsb2NhbGx5LiBBbmQgaW4gY3J5cHRvIGZyYW1ld29yaywgSSBh
-bHNvIGFkZGVkIEFQSSB0byBhbGxvY2F0ZSBsb2NhbCBjb21wcmVzc2lvbi4NCmh0dHBzOi8vZ2l0
-Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L3RvcnZhbGRzL2xpbnV4LmdpdC9j
-b21taXQvP2lkPTdiYzEzYjViNjBlOTQNCnRoaXMgenN3YXAgcGF0Y2ggaGFzIHVzZWQgdGhlIG5l
-dyBub2RlLWF3YXJlIEFQSS4NCg0KTWVtb3J5IGFjY2VzcyBjcm9zc2luZyBOVU1BIG5vZGUsIHBy
-YWN0aWNhbGx5IGNyb3NzaW5nIHBhY2thZ2VzLCBjYW4gZHJhbWF0aWNhbGx5IGluY3JlYXNlLA0K
-bGlrZSBkb3VibGUsIHRyaXBsZSBvciBtb3JlLg0KDQpUaGFua3MNCkJhcnJ5DQoNCg==
+On 2020-09-29 10:02:15 [+0000], Song Bao Hua (Barry Song) wrote:
+> > My point was that there will be a warning at run-time and you don't want
+> > that. There are raw_ accessors if you know what you are doing. But=E2=
+=80=A6
+>=20
+> I have only seen get_cpu_ptr/var() things will disable preemption. I don'=
+t think
+> we will have a warning as this_cpu_ptr() won't disable preemption.
+
+Good. Just enable CONFIG_DEBUG_PREEMPT and tell please what happens.
+
+> > Earlier you had compression/decompression with disabled preemption and
+>=20
+> No. that is right now done in enabled preemption context with this patch.=
+ The code before this patch
+> was doing (de)compression in preemption-disabled context by using get_cpu=
+_ptr and get_cpu_var.
+
+Exactly what I am saying. And within this get_cpu_ptr() section there
+was the compression/decompression sitting. So compression/decompression
+happend while preemtion was off.
+
+> > strict per-CPU memory allocation. Now if you keep this per-CPU memory
+> > allocation then you gain a possible bottleneck.
+> > In the previous email you said that there may be a bottleneck in the
+> > upper layer where you can't utilize all that memory you allocate. So you
+> > may want to rethink that strategy before that rework.
+>=20
+> we are probably not talking about same thing :-)
+> I was talking about possible generic swap bottleneck. For example, LRU is=
+ global,
+> while swapping, multiple cores might have some locks on this LRU. for exa=
+mple,
+> if we have 8 inactive pages to swap out, I am not sure if mm can use 8 co=
+res
+> to swap them out at the same time.
+
+In that case you probably don't need 8* per-CPU memory for this task.
+
+> >=20
+> > > 2. while allocating mutex, we can put the mutex into local memory by =
+using
+> > kmalloc_node().
+> > > If we move to "struct mutex lock" directly, most CPUs in a NUMA serve=
+r will
+> > have to access
+> > > remote memory to read/write the mutex, therefore, this will increase =
+the
+> > latency dramatically.
+> >=20
+> > If you need something per-CPU then DEFINE_PER_CPU() will give it to you.
+>=20
+> Yes. It is true.
+>=20
+> > It would be very bad for performance if this allocations were not from
+> > CPU-local memory, right? So what makes you think this is worse than
+> > kmalloc_node() based allocations?
+>=20
+> Yes. If your read zswap code, it has considered NUMA very carefully by al=
+locating various
+> memory locally. And in crypto framework, I also added API to allocate loc=
+al compression.
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit=
+/?id=3D7bc13b5b60e94
+> this zswap patch has used the new node-aware API.
+>=20
+> Memory access crossing NUMA node, practically crossing packages, can dram=
+atically increase,
+> like double, triple or more.
+
+So you are telling me, DEFINE_PER_CPU() does not allocate the memory for
+each CPU to be local but kmalloc_node() does?
+
+> Thanks
+> Barry
+
+Sebastian
