@@ -2,85 +2,91 @@ Return-Path: <SRS0=8ohu=DG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10144C4741F
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Sep 2020 13:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFCB0C4727D
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Sep 2020 13:42:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3F8420848
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Sep 2020 13:38:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86C5E207C4
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Sep 2020 13:42:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729351AbgI2Ni1 (ORCPT
+        id S1730216AbgI2Nmo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Sep 2020 09:38:27 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:34571 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725306AbgI2Ni0 (ORCPT
+        Tue, 29 Sep 2020 09:42:44 -0400
+Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:45675 "EHLO
+        mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728493AbgI2Nmo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Sep 2020 09:38:26 -0400
-Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
-        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <colin.king@canonical.com>)
-        id 1kNFpj-0006f8-Ab; Tue, 29 Sep 2020 13:38:19 +0000
-From:   Colin King <colin.king@canonical.com>
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH][next] crypto: sun8i-ss@: fix memory leak on pointer d
-Date:   Tue, 29 Sep 2020 14:38:19 +0100
-Message-Id: <20200929133819.156092-1-colin.king@canonical.com>
-X-Mailer: git-send-email 2.27.0
+        Tue, 29 Sep 2020 09:42:44 -0400
+X-IronPort-AV: E=Sophos;i="5.77,318,1596492000"; 
+   d="scan'208";a="470076349"
+Received: from abo-173-121-68.mrs.modulonet.fr (HELO hadrien) ([85.68.121.173])
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Sep 2020 15:42:38 +0200
+Date:   Tue, 29 Sep 2020 15:42:32 +0200 (CEST)
+From:   Julia Lawall <julia.lawall@inria.fr>
+X-X-Sender: jll@hadrien
+To:     Joe Perches <joe@perches.com>
+cc:     Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>, linux-iio@vger.kernel.org,
+        drbd-dev@tron.linbit.com,
+        =?UTF-8?Q?Valdis_Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
+        David Lechner <david@lechnology.com>,
+        Neil Armstrong <narmstrong@baylibre.com>,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        linux-wireless@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        kernel-janitors@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-amlogic@lists.infradead.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        openipmi-developer@lists.sourceforge.net,
+        linux-clk@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Jerome Brunet <jbrunet@baylibre.com>
+Subject: Re: [PATCH 00/18] use semicolons rather than commas to separate
+ statements
+In-Reply-To: <5f0d2b20f5088281363bb4a35c5652a2c087f159.camel@perches.com>
+Message-ID: <alpine.DEB.2.22.394.2009291542090.2808@hadrien>
+References: <1601233948-11629-1-git-send-email-Julia.Lawall@inria.fr>  <CAMj1kXGh+CzuXkAnqsoMO2A3T1p=D6uFOV347Ym5+VFn5U1gWg@mail.gmail.com>  <20200929124108.GY4282@kadam>  <alpine.DEB.2.22.394.2009291445050.2808@hadrien>
+ <5f0d2b20f5088281363bb4a35c5652a2c087f159.camel@perches.com>
+User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
 
-Currently the error return path on a failed dma_mapping_error call
-is not kfree'ing memory allocated to d. Add an extra error exit label
-to end of the function where the kfree and return occurs to fix this
-issue.
 
-Addresses-Coverity: ("Resource leak")
-Fixes: ac2614d721de ("crypto: sun8i-ss - Add support for the PRNG")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+On Tue, 29 Sep 2020, Joe Perches wrote:
 
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
-index 08a1473b2145..42b02720dbbf 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
-@@ -103,7 +103,8 @@ int sun8i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
- 	dma_iv = dma_map_single(ss->dev, ctx->seed, ctx->slen, DMA_TO_DEVICE);
- 	if (dma_mapping_error(ss->dev, dma_iv)) {
- 		dev_err(ss->dev, "Cannot DMA MAP IV\n");
--		return -EFAULT;
-+		err = -EFAULT;
-+		goto err_free;
- 	}
- 
- 	dma_dst = dma_map_single(ss->dev, d, todo, DMA_FROM_DEVICE);
-@@ -167,6 +168,7 @@ int sun8i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
- 		memcpy(ctx->seed, d + dlen, ctx->slen);
- 	}
- 	memzero_explicit(d, todo);
-+err_free:
- 	kfree(d);
- 
- 	return err;
--- 
-2.27.0
+> On Tue, 2020-09-29 at 14:47 +0200, Julia Lawall wrote:
+> > On Tue, 29 Sep 2020, Dan Carpenter wrote:
+> > > The times where commas are used deliberately to replace curly braces are
+> > > just evil.  Either way the code is cleaner with semi-colons.
+> >
+> > I also found exaamples like the following to be particularly unforunate:
+> >
+> >                                 fprintf(stderr,
+> >                                         "page_nr %lu wrong count %Lu %Lu\n",
+> >                                        page_nr, count,
+> >                                        count_verify[page_nr]), exit(1);
+> >
+> > The exit is very hard to see, unless you know to look for it.
+>
+> I sent that patch last month.
+> https://patchwork.kernel.org/patch/11734877/
+>
+> It's still not applied.
 
+OK, thanks.  I'll not send those then :)
+
+julia
