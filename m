@@ -2,55 +2,40 @@ Return-Path: <SRS0=8ohu=DG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF140C4346E
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Sep 2020 09:31:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51464C4346E
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Sep 2020 10:02:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6980F20848
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Sep 2020 09:31:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="A5Zbb/Dv";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="3EnIof77"
+	by mail.kernel.org (Postfix) with ESMTP id 0A67B206B8
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Sep 2020 10:02:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728089AbgI2Jbf (ORCPT
+        id S1725536AbgI2KCT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Sep 2020 05:31:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46706 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728095AbgI2JbQ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Sep 2020 05:31:16 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF49C0613D4;
-        Tue, 29 Sep 2020 02:31:16 -0700 (PDT)
-Date:   Tue, 29 Sep 2020 11:31:13 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1601371875;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2djAMpO5TFmJwF9yWVuXnnQCBlfzgcL1zzo3u7vPd8U=;
-        b=A5Zbb/DvjeeCK2DUlLEoZrvkhgGJsS37gshTwYsb3aqDUyGzOCuyQR/JFhGPul9jWwCbae
-        FCwQd92XgYGn96wE+HRHZnX9/lXWxL5UCQKikaQN3HJpMYQ7dnUuysi6REaMtPAuoUPu7Z
-        z9P38bjbqIzIXwget4wZiZoywWP3u3cr8ZKlfCh3wPE23RhcX1u3//hzEcvxpTpT9SRI1F
-        djjcpvjKvggYd+6zi005AyTdMMykFsP0ZbXiIzywn4RdT5hWSJtvpfIuH+a5wFTV2+UnL+
-        Ls3Z2Fw3Oq3EOa2/sEMMtjZWiUlr4JWmE3WBOpZFmMXLo0cGpJpduAuwhl0d9g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1601371875;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2djAMpO5TFmJwF9yWVuXnnQCBlfzgcL1zzo3u7vPd8U=;
-        b=3EnIof77mO0TghjbFH5tQykZxy+5nn/AcwbZ4oiR5qNLmFhOp5rNJf4wsvWgkv1Zk9DKVb
-        IGzg5Bz5Fr63y7Aw==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     "Song Bao Hua (Barry Song)" <song.bao.hua@hisilicon.com>
-Cc:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        Tue, 29 Sep 2020 06:02:19 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:33216 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725468AbgI2KCT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 29 Sep 2020 06:02:19 -0400
+Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.57])
+        by Forcepoint Email with ESMTP id 968367AF5184FA23B79D;
+        Tue, 29 Sep 2020 18:02:15 +0800 (CST)
+Received: from dggemi760-chm.china.huawei.com (10.1.198.146) by
+ DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Tue, 29 Sep 2020 18:02:15 +0800
+Received: from dggemi761-chm.china.huawei.com (10.1.198.147) by
+ dggemi760-chm.china.huawei.com (10.1.198.146) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Tue, 29 Sep 2020 18:02:15 +0800
+Received: from dggemi761-chm.china.huawei.com ([10.9.49.202]) by
+ dggemi761-chm.china.huawei.com ([10.9.49.202]) with mapi id 15.01.1913.007;
+ Tue, 29 Sep 2020 18:02:15 +0800
+From:   "Song Bao Hua (Barry Song)" <song.bao.hua@hisilicon.com>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+CC:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
         "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
         "davem@davemloft.net" <davem@davemloft.net>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
@@ -59,85 +44,112 @@ Cc:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
         "Luis Claudio R . Goncalves" <lgoncalv@redhat.com>,
         Mahipal Challa <mahipalreddy2006@gmail.com>,
         Seth Jennings <sjenning@redhat.com>,
-        Dan Streetman <ddstreet@ieee.org>,
+        "Dan Streetman" <ddstreet@ieee.org>,
         Vitaly Wool <vitaly.wool@konsulko.com>,
         "Wangzhou (B)" <wangzhou1@hisilicon.com>,
         "fanghao (A)" <fanghao11@huawei.com>,
         Colin Ian King <colin.king@canonical.com>
-Subject: Re: [PATCH v6] mm/zswap: move to use crypto_acomp API for hardware
+Subject: RE: [PATCH v6] mm/zswap: move to use crypto_acomp API for hardware
  acceleration
-Message-ID: <20200929093113.3cv63szruo3c4inu@linutronix.de>
+Thread-Topic: [PATCH v6] mm/zswap: move to use crypto_acomp API for hardware
+ acceleration
+Thread-Index: AQHWlat2/tz4PWWjYEyGimM6I0lKCKl+fZuAgACGPED//9FBgIAAiB0w
+Date:   Tue, 29 Sep 2020 10:02:15 +0000
+Message-ID: <5951148aef79459192826f405a6fa5aa@hisilicon.com>
 References: <20200818123100.4140-1-song.bao.hua@hisilicon.com>
  <20200928152432.l3auscdx2suyli4u@linutronix.de>
  <76bb2b545117413eb0879abcf91cf0f0@hisilicon.com>
+ <20200929093113.3cv63szruo3c4inu@linutronix.de>
+In-Reply-To: <20200929093113.3cv63szruo3c4inu@linutronix.de>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.126.200.63]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <76bb2b545117413eb0879abcf91cf0f0@hisilicon.com>
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2020-09-29 05:14:31 [+0000], Song Bao Hua (Barry Song) wrote:
-> After second thought and trying to make this change, I would like to chan=
-ge my mind
-> and disagree with this idea. Two reasons:
-> 1. while using this_cpu_ptr() without preemption lock, people usually put=
- all things bound
-> with one cpu to one structure, so that once we get the pointer of the who=
-le structure, we get
-> all its parts belonging to the same cpu. If we move the dstmem and mutex =
-out of the structure
-> containing them, we will have to do:
-> 	a. get_cpu_ptr() for the acomp_ctx   //lock preemption
-> 	b. this_cpu_ptr() for the dstmem and mutex
-> 	c. put_cpu_ptr() for the acomp_ctx  //unlock preemption
-> 	d. mutex_lock()
-> 	  sg_init_one()
-> 	  compress/decompress etc.
-> 	  ...
-> 	  mutex_unlock
->=20
-> as the get() and put() have a preemption lock/unlock, this will make cert=
-ain this_cpu_ptr()
-> in the step "b" will return the right dstmem and mutex which belong to th=
-e same cpu with
-> step "a".
->=20
-> The steps from "a" to "c" are quite silly and confusing. I believe the ex=
-isting code aligns
-> with the most similar code in kernel better:
-> 	a. this_cpu_ptr()   //get everything for one cpu
-> 	b. mutex_lock()
-> 	  sg_init_one()
-> 	  compress/decompress etc.
-> 	  ...
-> 	  mutex_unlock
-
-My point was that there will be a warning at run-time and you don't want
-that. There are raw_ accessors if you know what you are doing. But=E2=80=A6
-
-Earlier you had compression/decompression with disabled preemption and
-strict per-CPU memory allocation. Now if you keep this per-CPU memory
-allocation then you gain a possible bottleneck.
-In the previous email you said that there may be a bottleneck in the
-upper layer where you can't utilize all that memory you allocate. So you
-may want to rethink that strategy before that rework.
-
-> 2. while allocating mutex, we can put the mutex into local memory by usin=
-g kmalloc_node().
-> If we move to "struct mutex lock" directly, most CPUs in a NUMA server wi=
-ll have to access
-> remote memory to read/write the mutex, therefore, this will increase the =
-latency dramatically.
-
-If you need something per-CPU then DEFINE_PER_CPU() will give it to you.
-It would be very bad for performance if this allocations were not from
-CPU-local memory, right? So what makes you think this is worse than
-kmalloc_node() based allocations?
-
-> Thanks
-> Barry
-
-Sebastian
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogU2ViYXN0aWFuIEFuZHJ6
+ZWogU2lld2lvciBbbWFpbHRvOmJpZ2Vhc3lAbGludXRyb25peC5kZV0NCj4gU2VudDogVHVlc2Rh
+eSwgU2VwdGVtYmVyIDI5LCAyMDIwIDEwOjMxIFBNDQo+IFRvOiBTb25nIEJhbyBIdWEgKEJhcnJ5
+IFNvbmcpIDxzb25nLmJhby5odWFAaGlzaWxpY29uLmNvbT4NCj4gQ2M6IGFrcG1AbGludXgtZm91
+bmRhdGlvbi5vcmc7IGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdTsNCj4gZGF2ZW1AZGF2ZW1s
+b2Z0Lm5ldDsgbGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZzsgbGludXgtbW1Aa3ZhY2sub3Jn
+Ow0KPiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBMdWlzIENsYXVkaW8gUiAuIEdvbmNh
+bHZlcw0KPiA8bGdvbmNhbHZAcmVkaGF0LmNvbT47IE1haGlwYWwgQ2hhbGxhIDxtYWhpcGFscmVk
+ZHkyMDA2QGdtYWlsLmNvbT47DQo+IFNldGggSmVubmluZ3MgPHNqZW5uaW5nQHJlZGhhdC5jb20+
+OyBEYW4gU3RyZWV0bWFuIDxkZHN0cmVldEBpZWVlLm9yZz47DQo+IFZpdGFseSBXb29sIDx2aXRh
+bHkud29vbEBrb25zdWxrby5jb20+OyBXYW5nemhvdSAoQikNCj4gPHdhbmd6aG91MUBoaXNpbGlj
+b24uY29tPjsgZmFuZ2hhbyAoQSkgPGZhbmdoYW8xMUBodWF3ZWkuY29tPjsgQ29saW4NCj4gSWFu
+IEtpbmcgPGNvbGluLmtpbmdAY2Fub25pY2FsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2
+Nl0gbW0venN3YXA6IG1vdmUgdG8gdXNlIGNyeXB0b19hY29tcCBBUEkgZm9yDQo+IGhhcmR3YXJl
+IGFjY2VsZXJhdGlvbg0KPiANCj4gT24gMjAyMC0wOS0yOSAwNToxNDozMSBbKzAwMDBdLCBTb25n
+IEJhbyBIdWEgKEJhcnJ5IFNvbmcpIHdyb3RlOg0KPiA+IEFmdGVyIHNlY29uZCB0aG91Z2h0IGFu
+ZCB0cnlpbmcgdG8gbWFrZSB0aGlzIGNoYW5nZSwgSSB3b3VsZCBsaWtlIHRvIGNoYW5nZQ0KPiBt
+eSBtaW5kDQo+ID4gYW5kIGRpc2FncmVlIHdpdGggdGhpcyBpZGVhLiBUd28gcmVhc29uczoNCj4g
+PiAxLiB3aGlsZSB1c2luZyB0aGlzX2NwdV9wdHIoKSB3aXRob3V0IHByZWVtcHRpb24gbG9jaywg
+cGVvcGxlIHVzdWFsbHkgcHV0IGFsbA0KPiB0aGluZ3MgYm91bmQNCj4gPiB3aXRoIG9uZSBjcHUg
+dG8gb25lIHN0cnVjdHVyZSwgc28gdGhhdCBvbmNlIHdlIGdldCB0aGUgcG9pbnRlciBvZiB0aGUg
+d2hvbGUNCj4gc3RydWN0dXJlLCB3ZSBnZXQNCj4gPiBhbGwgaXRzIHBhcnRzIGJlbG9uZ2luZyB0
+byB0aGUgc2FtZSBjcHUuIElmIHdlIG1vdmUgdGhlIGRzdG1lbSBhbmQgbXV0ZXgNCj4gb3V0IG9m
+IHRoZSBzdHJ1Y3R1cmUNCj4gPiBjb250YWluaW5nIHRoZW0sIHdlIHdpbGwgaGF2ZSB0byBkbzoN
+Cj4gPiAJYS4gZ2V0X2NwdV9wdHIoKSBmb3IgdGhlIGFjb21wX2N0eCAgIC8vbG9jayBwcmVlbXB0
+aW9uDQo+ID4gCWIuIHRoaXNfY3B1X3B0cigpIGZvciB0aGUgZHN0bWVtIGFuZCBtdXRleA0KPiA+
+IAljLiBwdXRfY3B1X3B0cigpIGZvciB0aGUgYWNvbXBfY3R4ICAvL3VubG9jayBwcmVlbXB0aW9u
+DQo+ID4gCWQuIG11dGV4X2xvY2soKQ0KPiA+IAkgIHNnX2luaXRfb25lKCkNCj4gPiAJICBjb21w
+cmVzcy9kZWNvbXByZXNzIGV0Yy4NCj4gPiAJICAuLi4NCj4gPiAJICBtdXRleF91bmxvY2sNCj4g
+Pg0KPiA+IGFzIHRoZSBnZXQoKSBhbmQgcHV0KCkgaGF2ZSBhIHByZWVtcHRpb24gbG9jay91bmxv
+Y2ssIHRoaXMgd2lsbCBtYWtlIGNlcnRhaW4NCj4gdGhpc19jcHVfcHRyKCkNCj4gPiBpbiB0aGUg
+c3RlcCAiYiIgd2lsbCByZXR1cm4gdGhlIHJpZ2h0IGRzdG1lbSBhbmQgbXV0ZXggd2hpY2ggYmVs
+b25nIHRvIHRoZQ0KPiBzYW1lIGNwdSB3aXRoDQo+ID4gc3RlcCAiYSIuDQo+ID4NCj4gPiBUaGUg
+c3RlcHMgZnJvbSAiYSIgdG8gImMiIGFyZSBxdWl0ZSBzaWxseSBhbmQgY29uZnVzaW5nLiBJIGJl
+bGlldmUgdGhlIGV4aXN0aW5nDQo+IGNvZGUgYWxpZ25zDQo+ID4gd2l0aCB0aGUgbW9zdCBzaW1p
+bGFyIGNvZGUgaW4ga2VybmVsIGJldHRlcjoNCj4gPiAJYS4gdGhpc19jcHVfcHRyKCkgICAvL2dl
+dCBldmVyeXRoaW5nIGZvciBvbmUgY3B1DQo+ID4gCWIuIG11dGV4X2xvY2soKQ0KPiA+IAkgIHNn
+X2luaXRfb25lKCkNCj4gPiAJICBjb21wcmVzcy9kZWNvbXByZXNzIGV0Yy4NCj4gPiAJICAuLi4N
+Cj4gPiAJICBtdXRleF91bmxvY2sNCj4gDQo+IE15IHBvaW50IHdhcyB0aGF0IHRoZXJlIHdpbGwg
+YmUgYSB3YXJuaW5nIGF0IHJ1bi10aW1lIGFuZCB5b3UgZG9uJ3Qgd2FudA0KPiB0aGF0LiBUaGVy
+ZSBhcmUgcmF3XyBhY2Nlc3NvcnMgaWYgeW91IGtub3cgd2hhdCB5b3UgYXJlIGRvaW5nLiBCdXTi
+gKYNCg0KSSBoYXZlIG9ubHkgc2VlbiBnZXRfY3B1X3B0ci92YXIoKSB0aGluZ3Mgd2lsbCBkaXNh
+YmxlIHByZWVtcHRpb24uIEkgZG9uJ3QgdGhpbmsNCndlIHdpbGwgaGF2ZSBhIHdhcm5pbmcgYXMg
+dGhpc19jcHVfcHRyKCkgd29uJ3QgZGlzYWJsZSBwcmVlbXB0aW9uLg0KDQo+IA0KPiBFYXJsaWVy
+IHlvdSBoYWQgY29tcHJlc3Npb24vZGVjb21wcmVzc2lvbiB3aXRoIGRpc2FibGVkIHByZWVtcHRp
+b24gYW5kDQoNCk5vLiB0aGF0IGlzIHJpZ2h0IG5vdyBkb25lIGluIGVuYWJsZWQgcHJlZW1wdGlv
+biBjb250ZXh0IHdpdGggdGhpcyBwYXRjaC4gVGhlIGNvZGUgYmVmb3JlIHRoaXMgcGF0Y2gNCndh
+cyBkb2luZyAoZGUpY29tcHJlc3Npb24gaW4gcHJlZW1wdGlvbi1kaXNhYmxlZCBjb250ZXh0IGJ5
+IHVzaW5nIGdldF9jcHVfcHRyIGFuZCBnZXRfY3B1X3Zhci4NCg0KPiBzdHJpY3QgcGVyLUNQVSBt
+ZW1vcnkgYWxsb2NhdGlvbi4gTm93IGlmIHlvdSBrZWVwIHRoaXMgcGVyLUNQVSBtZW1vcnkNCj4g
+YWxsb2NhdGlvbiB0aGVuIHlvdSBnYWluIGEgcG9zc2libGUgYm90dGxlbmVjay4NCj4gSW4gdGhl
+IHByZXZpb3VzIGVtYWlsIHlvdSBzYWlkIHRoYXQgdGhlcmUgbWF5IGJlIGEgYm90dGxlbmVjayBp
+biB0aGUNCj4gdXBwZXIgbGF5ZXIgd2hlcmUgeW91IGNhbid0IHV0aWxpemUgYWxsIHRoYXQgbWVt
+b3J5IHlvdSBhbGxvY2F0ZS4gU28geW91DQo+IG1heSB3YW50IHRvIHJldGhpbmsgdGhhdCBzdHJh
+dGVneSBiZWZvcmUgdGhhdCByZXdvcmsuDQoNCndlIGFyZSBwcm9iYWJseSBub3QgdGFsa2luZyBh
+Ym91dCBzYW1lIHRoaW5nIDotKQ0KSSB3YXMgdGFsa2luZyBhYm91dCBwb3NzaWJsZSBnZW5lcmlj
+IHN3YXAgYm90dGxlbmVjay4gRm9yIGV4YW1wbGUsIExSVSBpcyBnbG9iYWwsDQp3aGlsZSBzd2Fw
+cGluZywgbXVsdGlwbGUgY29yZXMgbWlnaHQgaGF2ZSBzb21lIGxvY2tzIG9uIHRoaXMgTFJVLiBm
+b3IgZXhhbXBsZSwNCmlmIHdlIGhhdmUgOCBpbmFjdGl2ZSBwYWdlcyB0byBzd2FwIG91dCwgSSBh
+bSBub3Qgc3VyZSBpZiBtbSBjYW4gdXNlIDggY29yZXMNCnRvIHN3YXAgdGhlbSBvdXQgYXQgdGhl
+IHNhbWUgdGltZS4NCg0KPiANCj4gPiAyLiB3aGlsZSBhbGxvY2F0aW5nIG11dGV4LCB3ZSBjYW4g
+cHV0IHRoZSBtdXRleCBpbnRvIGxvY2FsIG1lbW9yeSBieSB1c2luZw0KPiBrbWFsbG9jX25vZGUo
+KS4NCj4gPiBJZiB3ZSBtb3ZlIHRvICJzdHJ1Y3QgbXV0ZXggbG9jayIgZGlyZWN0bHksIG1vc3Qg
+Q1BVcyBpbiBhIE5VTUEgc2VydmVyIHdpbGwNCj4gaGF2ZSB0byBhY2Nlc3MNCj4gPiByZW1vdGUg
+bWVtb3J5IHRvIHJlYWQvd3JpdGUgdGhlIG11dGV4LCB0aGVyZWZvcmUsIHRoaXMgd2lsbCBpbmNy
+ZWFzZSB0aGUNCj4gbGF0ZW5jeSBkcmFtYXRpY2FsbHkuDQo+IA0KPiBJZiB5b3UgbmVlZCBzb21l
+dGhpbmcgcGVyLUNQVSB0aGVuIERFRklORV9QRVJfQ1BVKCkgd2lsbCBnaXZlIGl0IHRvIHlvdS4N
+Cg0KWWVzLiBJdCBpcyB0cnVlLg0KDQo+IEl0IHdvdWxkIGJlIHZlcnkgYmFkIGZvciBwZXJmb3Jt
+YW5jZSBpZiB0aGlzIGFsbG9jYXRpb25zIHdlcmUgbm90IGZyb20NCj4gQ1BVLWxvY2FsIG1lbW9y
+eSwgcmlnaHQ/IFNvIHdoYXQgbWFrZXMgeW91IHRoaW5rIHRoaXMgaXMgd29yc2UgdGhhbg0KPiBr
+bWFsbG9jX25vZGUoKSBiYXNlZCBhbGxvY2F0aW9ucz8NCg0KWWVzLiBJZiB5b3VyIHJlYWQgenN3
+YXAgY29kZSwgaXQgaGFzIGNvbnNpZGVyZWQgTlVNQSB2ZXJ5IGNhcmVmdWxseSBieSBhbGxvY2F0
+aW5nIHZhcmlvdXMNCm1lbW9yeSBsb2NhbGx5LiBBbmQgaW4gY3J5cHRvIGZyYW1ld29yaywgSSBh
+bHNvIGFkZGVkIEFQSSB0byBhbGxvY2F0ZSBsb2NhbCBjb21wcmVzc2lvbi4NCmh0dHBzOi8vZ2l0
+Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L3RvcnZhbGRzL2xpbnV4LmdpdC9j
+b21taXQvP2lkPTdiYzEzYjViNjBlOTQNCnRoaXMgenN3YXAgcGF0Y2ggaGFzIHVzZWQgdGhlIG5l
+dyBub2RlLWF3YXJlIEFQSS4NCg0KTWVtb3J5IGFjY2VzcyBjcm9zc2luZyBOVU1BIG5vZGUsIHBy
+YWN0aWNhbGx5IGNyb3NzaW5nIHBhY2thZ2VzLCBjYW4gZHJhbWF0aWNhbGx5IGluY3JlYXNlLA0K
+bGlrZSBkb3VibGUsIHRyaXBsZSBvciBtb3JlLg0KDQpUaGFua3MNCkJhcnJ5DQoNCg==
