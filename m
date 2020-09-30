@@ -2,132 +2,126 @@ Return-Path: <SRS0=wif3=DH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6559C4727E
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Sep 2020 16:03:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E840C4727C
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Sep 2020 18:09:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D5E320789
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Sep 2020 16:03:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1601481830;
-	bh=d/UjG1nCA1JG1VOl7i+9DvO19UCGEZ9Pdk/X/fb/ck8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=g2WuwrHSVwHb86E7MeFbDCY5oCj7rktIZcvskrtSL7pio94OFHTM9tmBRq68WFJtV
-	 jkdNnVuoqdFHUCwm9ziynQCRgq0AHyvq8/MNgT47pTNHtbU7uXGS9+4rWbMNlpl5mU
-	 XIRipdbGP1JXuJCfYgCuRlzHcIZUpQmYRjAY+YuY=
+	by mail.kernel.org (Postfix) with ESMTP id A9BD62076A
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Sep 2020 18:09:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="VarIvOdW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728081AbgI3QDq (ORCPT
+        id S1726534AbgI3SJ2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Sep 2020 12:03:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60702 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725355AbgI3QDq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Sep 2020 12:03:46 -0400
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2A59920B1F;
-        Wed, 30 Sep 2020 16:03:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1601481825;
-        bh=d/UjG1nCA1JG1VOl7i+9DvO19UCGEZ9Pdk/X/fb/ck8=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=wzDoDL/qM/Yr0keCU1jzREn08ZPYsNisltjAzc3f4vAn4wsl2W7uoUPhxPImmzpst
-         SImiiaeh80Tv1oN/CLEQChq5Iqy+flOvgDHDeU3xdikc55FFlI7tjsYp744z/LiyWi
-         X/k2vJcHsoB3xILrSG+mxNRc7rPsb/SoV4T3acYI=
-Received: by mail-ot1-f42.google.com with SMTP id 60so2339861otw.3;
-        Wed, 30 Sep 2020 09:03:45 -0700 (PDT)
-X-Gm-Message-State: AOAM5305egLXfsphWrFZkEF95gMd4nU/7c2tuT2BOjKuZVExJ4uvkhFj
-        L+hnz/JmUkb9okCaps1UFcipwsSo18IK0JSOWyc=
-X-Google-Smtp-Source: ABdhPJx9uZma2udofiaFu+pMAJ3U7PlPQjF1ps5+9/+UIA10uI7fIWGY7tBvGFRSGepCVP85EfK3bYfKIoTWI8TWRjY=
-X-Received: by 2002:a9d:6193:: with SMTP id g19mr1938806otk.108.1601481824405;
- Wed, 30 Sep 2020 09:03:44 -0700 (PDT)
+        Wed, 30 Sep 2020 14:09:28 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:45712 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726476AbgI3SJ2 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 30 Sep 2020 14:09:28 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08UI01dV050533;
+        Wed, 30 Sep 2020 18:09:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=UEaRiYRBxUeUBHTLs10lcQvjesJtGuVb0ziBQ7IPbec=;
+ b=VarIvOdWDEDO1H8/IlOUyZWRpyoJ8CieyKlwQ/sjnuOx1B9Yf78LOfRaU0dePDiKmWvp
+ VgbV0kYlAsSLIJmD0RMzMLEvAAO4/GoRIeKGt6S9JY5VDeNB4Oun901CojDxE2l1r1sN
+ MRHq5UdnbGazZs6J/EVhSbHbTXn0fqq1quQoWHBFhvvD+HT3vjuUi9BcxmB9XzIE3RDS
+ jvDHXijWiqjDBDkEdaaBAtxlRCAku9LYyPKy/mnAtLRCuI7YqXPUVuGE+O+vkMzR4MI0
+ kYOmWJX4rki+sbBWr4Ct1pUyk95olzCtu3w+dD40gnx+Wf4jdNvh4ty6chXJI++VSA+b gA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2130.oracle.com with ESMTP id 33su5b24b2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 30 Sep 2020 18:09:17 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08UI4tNl093183;
+        Wed, 30 Sep 2020 18:09:17 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 33uv2frmdk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 30 Sep 2020 18:09:17 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08UI9Gc7025354;
+        Wed, 30 Sep 2020 18:09:16 GMT
+Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 30 Sep 2020 11:09:16 -0700
+Date:   Wed, 30 Sep 2020 14:18:23 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Will Deacon <will@kernel.org>, tj@kernel.org,
+        jiangshanlai@gmail.com, mark.rutland@arm.com,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>
+Subject: Re: WARNING: at kernel/workqueue.c:1473 __queue_work+0x3b8/0x3d0
+Message-ID: <20200930181823.vq3up3vcxau7nf3y@ca-dmjordan1.us.oracle.com>
+References: <20200218163504.y5ofvaejleuf5tbh@ca-dmjordan1.us.oracle.com>
+ <20200220090350.GA19858@Red>
+ <20200221174223.r3y6tugavp3k5jdl@ca-dmjordan1.us.oracle.com>
+ <20200228123311.GE3275@willie-the-truck>
+ <20200228153331.uimy62rat2tdxxod@ca-dmjordan1.us.oracle.com>
+ <20200301175351.GA11684@Red>
+ <20200302172510.fspofleipqjcdxak@ca-dmjordan1.us.oracle.com>
+ <20200303074819.GB9935@Red>
+ <20200303213111.op2vtxfmwtn7i6db@ca-dmjordan1.us.oracle.com>
+ <20200925181203.GA26463@Red>
 MIME-Version: 1.0
-References: <20200930130123.8064-1-colin.king@canonical.com> <CAAUqJDuDsgLZ_7i=knqFNkqWJn+G3FqE3Yv=RBLr27mBMJk1Cg@mail.gmail.com>
-In-Reply-To: <CAAUqJDuDsgLZ_7i=knqFNkqWJn+G3FqE3Yv=RBLr27mBMJk1Cg@mail.gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 30 Sep 2020 18:03:33 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXF2AzFkcyWzUHagq4xD_4BHpiscrPurndmJmJyp2KgXJg@mail.gmail.com>
-Message-ID: <CAMj1kXF2AzFkcyWzUHagq4xD_4BHpiscrPurndmJmJyp2KgXJg@mail.gmail.com>
-Subject: Re: [PATCH][next][resend] lib/mpi: fix off-by-one check on index "no"
-To:     =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
-Cc:     Colin King <colin.king@canonical.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Waiman Long <longman@redhat.com>,
-        kernel-janitors@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200925181203.GA26463@Red>
+User-Agent: NeoMutt/20180716
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9760 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 adultscore=0
+ suspectscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009300144
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9760 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=0
+ lowpriorityscore=0 spamscore=0 clxscore=1011 mlxscore=0 impostorscore=0
+ malwarescore=0 phishscore=0 adultscore=0 bulkscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009300143
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 30 Sep 2020 at 16:36, Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.co=
-m> wrote:
->
-> st 30. 9. 2020 o 15:04 Colin King <colin.king@canonical.com> nap=C3=ADsal=
-(a):
-> >
-> > From: Colin Ian King <colin.king@canonical.com>
-> >
-> > There is an off-by-one range check on the upper limit of
-> > index "no".  Fix this by changing the > comparison to >=3D
->
-> Note that this doesn't completely fix the bug though... (see below)
->
+On Fri, Sep 25, 2020 at 08:12:03PM +0200, Corentin Labbe wrote:
+> On Tue, Mar 03, 2020 at 04:31:11PM -0500, Daniel Jordan wrote:
+> > On Tue, Mar 03, 2020 at 08:48:19AM +0100, Corentin Labbe wrote:
+> > > The patch fix the issue. Thanks!
+> > 
+> > Thanks for trying it!
+> > 
+> > > So you could add:
+> > > Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> > > Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> > > Tested-on: sun50i-h6-pine-h64
+> > > Tested-on: imx8mn-ddr4-evk
+> > > Tested-on: sun50i-a64-bananapi-m64
+> > 
+> > I definitely will if the patch turns out to be the right fix.
+> > 
+> > thanks,
+> > Daniel
+> 
+> Hello
+> 
+> I forgot about this problem since the patch is in my branch since.
+> But a co-worker hit this problem recently and without this patch my CI still have it.
 
-And by the same reasoning, it does not address the coverity issue
-either, since the out of bounds read is still executed.
+Hi,
 
+Sure, I'm happy to help get a fix merged, but let's nail down what the problem
+is first.  It'd be useful to have the things requested here:
 
-> >
-> > Addresses-Coverity: ("Out-of-bounds read")
-> > Fixes: a8ea8bdd9df9 ("lib/mpi: Extend the MPI library")
-> > Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> > ---
-> >
-> > resend to Cc linux-crypto
-> >
-> > ---
-> >  lib/mpi/mpiutil.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/lib/mpi/mpiutil.c b/lib/mpi/mpiutil.c
-> > index 3c63710c20c6..632d0a4bf93f 100644
-> > --- a/lib/mpi/mpiutil.c
-> > +++ b/lib/mpi/mpiutil.c
-> > @@ -69,7 +69,7 @@ postcore_initcall(mpi_init);
-> >   */
-> >  MPI mpi_const(enum gcry_mpi_constants no)
-> >  {
-> > -       if ((int)no < 0 || no > MPI_NUMBER_OF_CONSTANTS)
-> > +       if ((int)no < 0 || no >=3D MPI_NUMBER_OF_CONSTANTS)
-> >                 pr_err("MPI: invalid mpi_const selector %d\n", no);
->
-> What the code does is it just logs an error if the value is out of
-> range, but then it happily continues dereferencing the array anyway...
-> In the original libgcrypt code [1] (which BTW needs this patch, too),
-> there is log_bug() instead of pr_err(), which doesn't just log the
-> error, but also abort()'s the program. BUG() would be the correct
-> kernel equivalent for log_bug(). It seems the whole kernel's MPI
-> library clone should be re-audited for other instances of pr_*()'s
-> that should in fact be BUG()'s (or even better, WARN_ONCE()'s with
-> proper error handling, but that might diverge the code from libgcrypt
-> too much...).
->
-> [1] https://github.com/gpg/libgcrypt/blob/9cd92ebae21900e54cc3d8b607c8ed1=
-afbf2eb9b/mpi/mpiutil.c#L773
->
-> >         if (!constants[no])
-> >                 pr_err("MPI: MPI subsystem not initialized\n");
-> > --
-> > 2.27.0
-> >
+https://lore.kernel.org/linux-crypto/20200303213017.tanczhqd3nhpeeak@ca-dmjordan1.us.oracle.com/
+
+thanks,
+Daniel
