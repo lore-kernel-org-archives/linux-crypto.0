@@ -2,88 +2,82 @@ Return-Path: <SRS0=TFX5=DJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B186C4363D
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Oct 2020 06:55:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 415E0C4363D
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Oct 2020 06:55:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2DB65206FA
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Oct 2020 06:55:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5C50206DD
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Oct 2020 06:55:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dPcWs/ve"
+	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="n6u081Jq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725995AbgJBGzA (ORCPT
+        id S1725993AbgJBGzP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Oct 2020 02:55:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41174 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725948AbgJBGzA (ORCPT
+        Fri, 2 Oct 2020 02:55:15 -0400
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.54]:23164 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725948AbgJBGzP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Oct 2020 02:55:00 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA833C0613D0;
-        Thu,  1 Oct 2020 23:54:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=wsszzdNdt8/s5qmse2DtQE9T6ptZdmllS5Ln6Q6wU9w=; b=dPcWs/vek1tL6i1nQlvOrE1uA7
-        8xNJ8Oje5kX7lSLWTZyOtzuVqtVFyeYSK1k+YIC4hGdDMAVJix1JWLikC5X5IMWqei9i4rHgZwVGd
-        SD0S05U3c/JiwtVUkoPuwiYZEYROVD9jo7aNA0uZo8FMJLUmj6UXjrCS4I45G+y+s0isM6bwvh7dP
-        Mb6tKl+tTbGqe6MJsL9Z5CDppphb88mIwyztnvEAI6ZVtZ3QFkMZaFBUXwFdYq3zWn+lXU7X1M9Hz
-        qUm9iN54MuQJB97nh2XBZhPFT665ncwJylT4Br6ojvvNBQiuEsWumjLPjZeirdZDZIV/cZjn1eiSn
-        472YLMnw==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kOExy-0007q1-6R; Fri, 02 Oct 2020 06:54:54 +0000
-Date:   Fri, 2 Oct 2020 07:54:54 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Nick Terrell <terrelln@fb.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Nick Terrell <nickrterrell@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
-        "squashfs-devel@lists.sourceforge.net" 
-        <squashfs-devel@lists.sourceforge.net>,
-        "linux-f2fs-devel@lists.sourceforge.net" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Kernel Team <Kernel-team@fb.com>, Chris Mason <clm@fb.com>,
-        Petr Malat <oss@malat.biz>, Johannes Weiner <jweiner@fb.com>,
-        Niket Agarwal <niketa@fb.com>, Yann Collet <cyan@fb.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v4 0/9] Update to zstd-1.4.6
-Message-ID: <20201002065454.GA29993@infradead.org>
-References: <20200930065318.3326526-1-nickrterrell@gmail.com>
- <20200930065336.GA13656@infradead.org>
- <8743398B-0BBB-424E-A6A7-9D8AE4EFE8ED@fb.com>
+        Fri, 2 Oct 2020 02:55:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1601621713;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=dG3VsnJVeZhSi88eTw1lFhyXDWSG0bJwarleuLQpKFA=;
+        b=n6u081JqROnb/24iw8fW+sXZ7jMXAfnCR8IGMvpO1+6RW4MDfPlPWyctAwHrPw9TxW
+        VIZDn/JYhq4gKh2ODHwwGrQJ5AEt0LClbYshHl5plkoETyWensKVaM44MHHMCInoRNHE
+        CVisftjBByjFNAaDifLNF9QqNkXiyn/JCYeO0LSMQHpQrffZx+8EliHs+8dUlMKAu8iD
+        YeQHuo9bEQcG9fXEkMxadVq0eUjdUY7PIVO1TNxyt8X9W7oOLDs4sV1iFhpNTuwLK86N
+        F9sVw9ymlmMXgnO69+17YtMtScNLEVt20D0oXb8gW78v5lK2W+rpF6JD178UDd+KUjDE
+        kq9Q==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9x2wdNs6neUFoh7cs3k0="
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 47.1.9 AUTH)
+        with ESMTPSA id 602bfdw926t79aM
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Fri, 2 Oct 2020 08:55:07 +0200 (CEST)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Palmer Dabbelt <palmerdabbelt@google.com>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     linux-riscv@lists.infradead.org, kernel-team@android.com,
+        kernel test robot <lkp@intel.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: get_cycles from modular code in jitterentropy, was Re: [PATCH] clocksource: clint: Export clint_time_val for modules
+Date:   Fri, 02 Oct 2020 08:55:04 +0200
+Message-ID: <3059805.eeVPZ7aKPO@tauon.chronox.de>
+In-Reply-To: <20201002064905.GA27115@infradead.org>
+References: <20200930065617.934638-1-palmerdabbelt@google.com> <20201002064905.GA27115@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8743398B-0BBB-424E-A6A7-9D8AE4EFE8ED@fb.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 30, 2020 at 08:05:45PM +0000, Nick Terrell wrote:
-> 
-> 
-> > On Sep 29, 2020, at 11:53 PM, Christoph Hellwig <hch@infradead.org> wrote:
-> > 
-> > As you keep resend this I keep retelling you that should not do it.
-> > Please provide a proper Linux API, and switch to that.  Versioned APIs
-> > have absolutely no business in the Linux kernel.
-> 
-> The API is not versioned. We provide a stable ABI for a large section of our API,
-> and the parts that aren???t ABI stable don???t change in semantics, and undergo long
-> deprecation periods before being removed.
-> 
-> The change of callers is a one-time change to transition from the existing API
-> in the kernel, which was never upstream's API, to upstream's API.
+Am Freitag, 2. Oktober 2020, 08:49:05 CEST schrieb Christoph Hellwig:
 
-Again, please transition it to a sane kernel API.  We don't have an
-"upstream" in this case.
+Hi Christoph,
+
+> On Tue, Sep 29, 2020 at 11:56:18PM -0700, Palmer Dabbelt wrote:
+> > clint_time_val will soon be used by the RISC-V implementation of
+> > random_get_entropy(), which is a static inline function that may be used
+> > by
+> > modules (at least CRYPTO_JITTERENTROPY=m).
+> 
+> At very least this needs to be an EXPORT_SYMBOL_GPL.  But I really don't
+> think modules have any business using get_cycles, so I'd much rather
+> fix CRYPTO_JITTERENTROPY to be required to be build in.
+
+Changing CRYPTO_JITTERENTROPY from tistate to bool should be no problem.
+
+I will provide a patch.
+
+Ciao
+Stephan
+
+
