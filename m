@@ -2,128 +2,116 @@ Return-Path: <SRS0=TFX5=DJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 878A4C4363D
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Oct 2020 07:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA10C4363D
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Oct 2020 07:55:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2EA4B2072E
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Oct 2020 07:11:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J/cJnSdn"
+	by mail.kernel.org (Postfix) with ESMTP id 335CD20719
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Oct 2020 07:55:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726257AbgJBHLa (ORCPT
+        id S1725993AbgJBHz1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Oct 2020 03:11:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43688 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725948AbgJBHL3 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Oct 2020 03:11:29 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9ECFC0613D0;
-        Fri,  2 Oct 2020 00:11:28 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id j136so552009wmj.2;
-        Fri, 02 Oct 2020 00:11:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=l/AslFcI8o0tIrBRAfurd9q83mHu1ImdAYZFQ7SBMck=;
-        b=J/cJnSdnnm0K3mV2PTCGEBTi1lofC2iZq70FUtde1Hza28OCY1enutx2mZ5VfOiyJa
-         TbavxFH4a8TVQFiB5FgnPdKyKGC6zwLl8NRjtxGKN1KchMQXGi2lX15Kw68CPgblMt2U
-         2KnYm3aGn9tR3PPV6U/n9ekuebZ6hRc+SJu9SkUgTsQR5B5sFCpfhsnQRNbBPbzGqk0l
-         CUDq1siUaDcdUUIrayNrxInva20WYdA2WyTrgY9y2ys7HUWNrC3pDgeVWP55kksQhMU3
-         ih8HDpTQjKYpWZa2yQsYx+0TNurvLr0Dyvad1hVnS5DZATe3H7WhM+RMX/JHEO/OSzBQ
-         HLIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=l/AslFcI8o0tIrBRAfurd9q83mHu1ImdAYZFQ7SBMck=;
-        b=WwRaATx3T/INtCyFkrOYm9bao1AiyIS4CiLZLlakA5kKaoD7QE9/hkg4uCaeJ58xq9
-         +TmNxgeSSG4DFt389wedIYRLXZc14SPJuotjayXYf9PWo4QS0IuS4W6xWqsxIbE8y9Fh
-         VgiSzSkluPKJO++e4LUqP9OFn7/9JEyjwk8RJBV6VgM8eTgPYYmcgK5qlpDiEfFWgFKw
-         wfD5LwoRvjWP7ej3glJNsw1y4A/oyvDwgiMFKT/dLzAohUjyKsiqRP6EkLaRKpYxjuoJ
-         37s2dUBGKPB3CoQERQqpp1uVZCjsqLAdEyhHTFc/6ATuzpHUsPZ0nM2kr4TY1znP0d/y
-         RKzg==
-X-Gm-Message-State: AOAM5303g16qs9pAEnabiyiZ5qn68vAv4fpSeezIhNGeZETcP5zthBPO
-        KCyCvrphywmFYdBQ1VdDchU=
-X-Google-Smtp-Source: ABdhPJwyvwxJtDY4aUnKoug3IveaE7MWK3ZSR6SvTGzqrruMA1ENCGgT0YL5LI2l9eIjEr/hNj/pwQ==
-X-Received: by 2002:a7b:c0c1:: with SMTP id s1mr1234143wmh.73.1601622687477;
-        Fri, 02 Oct 2020 00:11:27 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id e13sm669646wre.60.2020.10.02.00.11.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Oct 2020 00:11:26 -0700 (PDT)
-Date:   Fri, 2 Oct 2020 09:11:25 +0200
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH][next] crypto: sun8i-ss - Fix memory leak in
- sun8i_ss_prng_generate()
-Message-ID: <20201002071125.GA15586@Red>
-References: <20200928175945.GA11320@embeddedor>
+        Fri, 2 Oct 2020 03:55:27 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:48594 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725968AbgJBHz1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Oct 2020 03:55:27 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1kOFuU-0001qj-1x; Fri, 02 Oct 2020 17:55:23 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Oct 2020 17:55:22 +1000
+Date:   Fri, 2 Oct 2020 17:55:22 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        =?utf-8?B?a2l5aW4o5bC55LquKQ==?= <kiyin@tencent.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        =?utf-8?B?aHVudGNoZW4o6ZmI6ZizKQ==?= <huntchen@tencent.com>,
+        =?utf-8?B?ZGFubnl3YW5nKOeOi+Wuhyk=?= <dannywang@tencent.com>
+Cc:     Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
+        Rob Rice <rob.rice@broadcom.com>,
+        Steve Lin <steven.lin1@broadcom.com>
+Subject: [PATCH] crypto: bcm - Verify GCM/CCM key length in setkey
+Message-ID: <20201002075522.GA6186@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200928175945.GA11320@embeddedor>
+Content-Transfer-Encoding: 8bit
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 28, 2020 at 12:59:45PM -0500, Gustavo A. R. Silva wrote:
-> Set _err_ to the return error code -EFAULT before jumping to the new
-> label err_d, so resources for _d_ can be released before returning
-> from function sun8i_ss_prng_generate().
-> 
-> Addresses-Coverity-ID: 1497459 ("Resource leak")
-> Fixes: ac2614d721de ("crypto: sun8i-ss - Add support for the PRNG")
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> ---
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
-> index 08a1473b2145..0573f6289e8b 100644
-> --- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
-> +++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
-> @@ -103,7 +103,8 @@ int sun8i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
->  	dma_iv = dma_map_single(ss->dev, ctx->seed, ctx->slen, DMA_TO_DEVICE);
->  	if (dma_mapping_error(ss->dev, dma_iv)) {
->  		dev_err(ss->dev, "Cannot DMA MAP IV\n");
-> -		return -EFAULT;
-> +		err = -EFAULT;
-> +		goto err_d;
->  	}
->  
->  	dma_dst = dma_map_single(ss->dev, d, todo, DMA_FROM_DEVICE);
-> @@ -160,7 +161,7 @@ int sun8i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
->  	dma_unmap_single(ss->dev, dma_dst, todo, DMA_FROM_DEVICE);
->  err_iv:
->  	dma_unmap_single(ss->dev, dma_iv, ctx->slen, DMA_TO_DEVICE);
-> -
-> +err_d:
->  	if (!err) {
->  		memcpy(dst, d, dlen);
->  		/* Update seed */
-> -- 
-> 2.27.0
-> 
+The setkey function for GCM/CCM algorithms didn't verify the key
+length before copying the key and subtracting the salt length.
 
-Hello
+This patch delays the copying of the key til after the verification
+has been done.  It also adds checks on the key length to ensure
+that it's at least as long as the salt.
 
-The label could be better placed just before the kfree.
-In error case, there are no need to memzero the not used "d".
+Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
+Cc: <stable@vger.kernel.org>
+Reported-by: kiyin(尹亮) <kiyin@tencent.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-But a patch with it, was already sent to the ML.
-Anyway if you fix it, you could add "Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>"
-
-Regards
+diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+index 5d38b87b9d77..50d169e61b41 100644
+--- a/drivers/crypto/bcm/cipher.c
++++ b/drivers/crypto/bcm/cipher.c
+@@ -2867,7 +2867,6 @@ static int aead_gcm_ccm_setkey(struct crypto_aead *cipher,
+ 
+ 	ctx->enckeylen = keylen;
+ 	ctx->authkeylen = 0;
+-	memcpy(ctx->enckey, key, ctx->enckeylen);
+ 
+ 	switch (ctx->enckeylen) {
+ 	case AES_KEYSIZE_128:
+@@ -2883,6 +2882,8 @@ static int aead_gcm_ccm_setkey(struct crypto_aead *cipher,
+ 		goto badkey;
+ 	}
+ 
++	memcpy(ctx->enckey, key, ctx->enckeylen);
++
+ 	flow_log("  enckeylen:%u authkeylen:%u\n", ctx->enckeylen,
+ 		 ctx->authkeylen);
+ 	flow_dump("  enc: ", ctx->enckey, ctx->enckeylen);
+@@ -2937,6 +2938,10 @@ static int aead_gcm_esp_setkey(struct crypto_aead *cipher,
+ 	struct iproc_ctx_s *ctx = crypto_aead_ctx(cipher);
+ 
+ 	flow_log("%s\n", __func__);
++
++	if (keylen < GCM_ESP_SALT_SIZE)
++		return -EINVAL;
++
+ 	ctx->salt_len = GCM_ESP_SALT_SIZE;
+ 	ctx->salt_offset = GCM_ESP_SALT_OFFSET;
+ 	memcpy(ctx->salt, key + keylen - GCM_ESP_SALT_SIZE, GCM_ESP_SALT_SIZE);
+@@ -2965,6 +2970,10 @@ static int rfc4543_gcm_esp_setkey(struct crypto_aead *cipher,
+ 	struct iproc_ctx_s *ctx = crypto_aead_ctx(cipher);
+ 
+ 	flow_log("%s\n", __func__);
++
++	if (keylen < GCM_ESP_SALT_SIZE)
++		return -EINVAL;
++
+ 	ctx->salt_len = GCM_ESP_SALT_SIZE;
+ 	ctx->salt_offset = GCM_ESP_SALT_OFFSET;
+ 	memcpy(ctx->salt, key + keylen - GCM_ESP_SALT_SIZE, GCM_ESP_SALT_SIZE);
+@@ -2994,6 +3003,10 @@ static int aead_ccm_esp_setkey(struct crypto_aead *cipher,
+ 	struct iproc_ctx_s *ctx = crypto_aead_ctx(cipher);
+ 
+ 	flow_log("%s\n", __func__);
++
++	if (keylen < CCM_ESP_SALT_SIZE)
++		return -EINVAL;
++
+ 	ctx->salt_len = CCM_ESP_SALT_SIZE;
+ 	ctx->salt_offset = CCM_ESP_SALT_OFFSET;
+ 	memcpy(ctx->salt, key + keylen - CCM_ESP_SALT_SIZE, CCM_ESP_SALT_SIZE);
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
