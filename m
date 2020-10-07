@@ -2,147 +2,183 @@ Return-Path: <SRS0=WH6x=DO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C37C4363C
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Oct 2020 19:41:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55094C4363C
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Oct 2020 20:47:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5002C20872
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Oct 2020 19:41:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kcN3zsM/"
+	by mail.kernel.org (Postfix) with ESMTP id 088D920872
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Oct 2020 20:47:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1602103670;
+	bh=QkyYBwYAU0gbcgieGpN8QBhSkiPhbX6uskPmAzkOR4E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
+	b=jGTtIV3QRsdxGAg0oD5WUFIfxUFnB5YP+u+fNsI8g+fCb53KN8W9MQDuUEo5hneOd
+	 GiPwtqYNa7z0Bc6SmS/zSZofoOTEESRoWL+M0PyqmA156VlN4oFngdcDl17qUlhh1z
+	 eQwlDj8+I6BJL53y5LRA07L3C9KGkFkOrbUgfQgE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728414AbgJGTlX (ORCPT
+        id S1727701AbgJGUrt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Oct 2020 15:41:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52194 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728412AbgJGTlX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Oct 2020 15:41:23 -0400
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FF35C061755;
-        Wed,  7 Oct 2020 12:41:22 -0700 (PDT)
-Received: by mail-wr1-x443.google.com with SMTP id n6so3390721wrm.13;
-        Wed, 07 Oct 2020 12:41:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=BlXTl6Hst6j2ZWlhRy8AiZeKdtWqE6ffJKL4bR3bTTQ=;
-        b=kcN3zsM/ZtIXY6Z3zNNaFiikNc/iRaBZnxWvNYxoXEUtzNiHbwXZE4CR024aHVJEt3
-         dXZoZeL6K3E3uWH8Xp9tFUjWpzrtRdRM9v1kwZdo7Ed4w0h6bFcL0v1ixtz9pjUhzzkE
-         TU/3b5FJtRRkNVZVxbNiInzha9rZEHRsxWTUTlUN2rhDPp6S+3m1pN6xficRXceeERJ7
-         QCkvpeB5aJ4MuBZnnXgrkAep6Rt5RGtqj1tYUiMsArrJSipocmOvPJ0Z6gelvX/+YHaq
-         bBPMlYl0XA9kURPuUbQuH42W/milxSPmX4C/iLklEzeXB9/C12CppD3jJbhAvWIhw09i
-         a+Bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BlXTl6Hst6j2ZWlhRy8AiZeKdtWqE6ffJKL4bR3bTTQ=;
-        b=JmmGgUb5jJhH8KXazu1Z10EHToVqUIu7kLExO/L0e7PlepPq/kIhjqVeg/AFgiqyYO
-         heZzZqp78dB92yadWJ+pDGpUa/q7T4LVkNovO2j+y4LI05jMfRkf+gLU/tMs7gMy6V8U
-         /4dab/j99xxfYGBdX1H2Wgh0x97///Bw7F1NWHgs1PR2DmJFmryROstF/sRrErg5Pjpp
-         OODRGgUOuRco9LlMb9k2Y/+VZpqpCK/8nCkiidLoQMxmgacexYdbi2/v86NJQ/jc/Q/S
-         uI4qPcLKTsLWHJT9qQwTtaIKC55290co8rKTHD0R/tb7QtQ0Ktg8aNbp2Pq3t/JXhQUK
-         Y9ng==
-X-Gm-Message-State: AOAM530qtLiA+K/nQViK/wKe4z/M8GVfclsTSkT3eP8fIrJWY6WQxwlQ
-        wss44cqzmgPd7v91qdvyMkQ=
-X-Google-Smtp-Source: ABdhPJy/7viZdAja+X9JBIUZBanX5mxDMsnzvuFIPvUeDKF3xHLhGKTLJJ0EwcgvuZBD0cR6EcQ74A==
-X-Received: by 2002:adf:ce01:: with SMTP id p1mr4928562wrn.33.1602099680845;
-        Wed, 07 Oct 2020 12:41:20 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id c1sm4156555wru.49.2020.10.07.12.41.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Oct 2020 12:41:19 -0700 (PDT)
-Date:   Wed, 7 Oct 2020 21:41:17 +0200
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Robin Murphy <robin.murphy@arm.com>, mark.rutland@arm.com,
-        jiangshanlai@gmail.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, tj@kernel.org,
-        Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: WARNING: at kernel/workqueue.c:1473 __queue_work+0x3b8/0x3d0
-Message-ID: <20201007194117.GA4859@Red>
-References: <20200220090350.GA19858@Red>
- <20200221174223.r3y6tugavp3k5jdl@ca-dmjordan1.us.oracle.com>
- <20200228123311.GE3275@willie-the-truck>
- <20200228153331.uimy62rat2tdxxod@ca-dmjordan1.us.oracle.com>
- <20200301175351.GA11684@Red>
- <20200302172510.fspofleipqjcdxak@ca-dmjordan1.us.oracle.com>
- <e7c92da2-42c0-a97d-7427-6fdc769b41b9@arm.com>
- <20200303213017.tanczhqd3nhpeeak@ca-dmjordan1.us.oracle.com>
- <20201001175022.GA22444@Red>
- <20201005170910.vxwrdwnzlw3ahkb4@ca-dmjordan1.us.oracle.com>
+        Wed, 7 Oct 2020 16:47:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33578 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727817AbgJGUrt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Oct 2020 16:47:49 -0400
+Received: from kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com (unknown [163.114.132.6])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id ED98620782;
+        Wed,  7 Oct 2020 20:47:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1602103668;
+        bh=QkyYBwYAU0gbcgieGpN8QBhSkiPhbX6uskPmAzkOR4E=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=oYncJtbUkQrwNOc2HFdtVvcxKKmpAV0uUVzfaSSe4oOYdg6pZ2QC3MSTuXP3vtRDA
+         rW0LaMz4sFrN9VhDI4VcCJXq9DVvfQuHuZscf3iv5SWNAE2egE9cyaSPtgCSDcfpN/
+         4WBa9K8uzK0yAyTbGjqmTgWWmmiPTCcctiXd+UPg=
+Date:   Wed, 7 Oct 2020 13:47:46 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Pooja Trivedi <poojatrivedi@gmail.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Mallesham Jatharakonda <mallesh537@gmail.com>,
+        Josh Tway <josh.tway@stackpath.com>, netdev@vger.kernel.org
+Subject: Re: [RFC 1/1] net/tls(TLS_SW): Handle -ENOSPC error return from
+ device/AES-NI
+Message-ID: <20201007134746.069d7f2f@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+In-Reply-To: <CAOrEdsnCbcKiNoyHB=mX2h8soG1txX+aynZaFLNhtwMZWTDkEg@mail.gmail.com>
+References: <CAOrEdsmKn7_YWcWZ_b7+mL-uJC8m_=tU70q3aZTOzEDYw7j4ng@mail.gmail.com>
+        <CAOrEdsnCbcKiNoyHB=mX2h8soG1txX+aynZaFLNhtwMZWTDkEg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201005170910.vxwrdwnzlw3ahkb4@ca-dmjordan1.us.oracle.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 05, 2020 at 01:09:10PM -0400, Daniel Jordan wrote:
-> On Thu, Oct 01, 2020 at 07:50:22PM +0200, Corentin Labbe wrote:
-> > On Tue, Mar 03, 2020 at 04:30:17PM -0500, Daniel Jordan wrote:
-> > > Barring other ideas, Corentin, would you be willing to boot with
-> > > 
-> > >     trace_event=initcall:*,module:* trace_options=stacktrace
-> > > 
-> > > and
-> > > 
-> > > diff --git a/kernel/module.c b/kernel/module.c
-> > > index 33569a01d6e1..393be6979a27 100644
-> > > --- a/kernel/module.c
-> > > +++ b/kernel/module.c
-> > > @@ -3604,8 +3604,11 @@ static noinline int do_init_module(struct module *mod)
-> > >  	 * be cleaned up needs to sync with the queued work - ie
-> > >  	 * rcu_barrier()
-> > >  	 */
-> > > -	if (llist_add(&freeinit->node, &init_free_list))
-> > > +	if (llist_add(&freeinit->node, &init_free_list)) {
-> > > +		pr_warn("%s: schedule_work for mod=%s\n", __func__, mod->name);
-> > > +		dump_stack();
-> > >  		schedule_work(&init_free_wq);
-> > > +	}
-> > >  
-> > >  	mutex_unlock(&module_mutex);
-> > >  	wake_up_all(&module_wq);
-> > > 
-> > > but not my earlier fix and share the dmesg and ftrace output to see if the
-> > > theory holds?
-> > > 
-> > > Also, could you attach your config?  Curious now what your crypto options look
-> > > like after fiddling with some of them today while trying and failing to see
-> > > this on x86.
-> > > 
-> > > thanks,
-> > > Daniel
-> > 
-> > Hello
-> > 
-> > Sorry for the very delayed answer.
-> > 
-> > I fail to reproduce it on x86 (qemu and  real hw) and arm.
-> > It seems to only happen on arm64.
+On Wed, 7 Oct 2020 15:19:47 -0400 Pooja Trivedi wrote:
+> When an -ENOSPC error code is returned by the crypto device or AES-NI
+> layer, TLS SW path sets an EBADMSG on the socket causing the
+> application to fail.  In an attempt to address the -ENOSPC in the TLS
+> SW path, changes were made in tls_sw_sendpage path to trim current
+> payload off the plain and encrypted messages, and send a 'zero bytes
+> copied' return to the application.  The following diff shows those
+> changes:
 > 
-> Thanks for the config and dmesg, but there's no ftrace.  I see it's not
-> configured in your kernel, so could you boot with my earlier debug patch plus
-> this one and the kernel argument initcall_debug instead?
+> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> index 9a3d9fedd7aa..4dce4668cb07 100644
+> --- a/net/tls/tls_sw.c
+> +++ b/net/tls/tls_sw.c
+> @@ -762,7 +762,7 @@ static int tls_push_record(struct sock *sk, int flags,
+>   rc = tls_do_encryption(sk, tls_ctx, ctx, req,
+>         msg_pl->sg.size + prot->tail_size, i);
+>   if (rc < 0) {
+> -               if (rc != -EINPROGRESS) {
+> +              if ((rc != -EINPROGRESS) && (rc != -ENOSPC)) {
+>                             tls_err_abort(sk, EBADMSG);
+>                             if (split) {
 > 
-> I'm trying to see whether it really is a request module call from the crypto
-> tests that's triggering this warning.  Preeetty likely that's what's happening,
-> but want to be sure since I can't reproduce this.  Then I can post the fix.
+> tls_ctx->pending_open_record_frags = true;
 > 
+> @@ -1073,8 +1073,15 @@ int tls_sw_sendmsg(struct sock *sk, struct
+> msghdr *msg, size_t size)
+>   else if (ret == -ENOMEM)
+>                goto wait_for_memory;
+>   else if (ret != -EAGAIN) {
+> -              if (ret == -ENOSPC)
+> +             if (ret == -ENOSPC) {
+>                           ret = 0;
+>                           copied -= try_to_copy;
+>                           iov_iter_revert(&msg->msg_iter,
+> msg_pl->sg.size - orig_size);
+>                           tls_trim_both_msgs(sk, orig_size);
+>                }
+>                goto send_end;
+>      }
+>   }
+> 
+> @@ -1150,6 +1157,7 @@ static int tls_sw_do_sendpage(struct sock *sk,
+> struct page *page,
+>   ssize_t copied = 0;
+>   bool full_record;
+>   int record_room;
+> + int orig_size;
+>   int ret = 0;
+>   bool eor;
+> 
+> @@ -1175,7 +1183,7 @@ static int tls_sw_do_sendpage(struct sock *sk,
+> struct page *page,
+>   }
+> 
+>   msg_pl = &rec->msg_plaintext;
+> -
+> + orig_size = msg_pl->sg.size;
+>   full_record = false;
+>   record_room = TLS_MAX_PAYLOAD_SIZE - msg_pl->sg.size;
+>   copy = size;
+> 
+> @@ -1219,8 +1227,12 @@ static int tls_sw_do_sendpage(struct sock *sk,
+> struct page *page,
+> 
+>   else if (ret == -ENOMEM)
+>              goto wait_for_memory;
+>   else if (ret != -EAGAIN) {
+> -            if (ret == -ENOSPC)
+> +           if (ret == -ENOSPC) {
+> +                      tls_trim_both_msgs(sk, orig_size);
+>                         copied -= copy;
+>                         ret = 0;
+>               }
+>               goto sendpage_end;
+>    }
+>   }
+> 
+> 
+> However, when above patch was tried, the application tried to send
+> remaining data based on the offset as expected, but encryption failed
+> due to data integrity issues.  Further debugging revealed that
+> sk_msg_trim(), called by tls_trim_both_msgs() does not update the page
+> frag offset.  It seems like sk_msg_trim() needs to subtract the trim
+> length from the pfrag->offset corresponding to how the sk_msg_alloc()
+> call increments the pfrag-->offset with the length it charges to the
+> socket via sk_mem_charge().
+> When sk_msg_trim() calls sk_mem_uncharge() to uncharge trim length off
+> the socket, it should also perform
+>            pfrag->offset -= trim;
 
-I have added CONFIG_FTRACE=y and your second patch.
-The boot log can be seen at http://kernel.montjoie.ovh/108789.log
+Let's CC netdev. It's a bit surprising to me that pfrag->offset matters
+here, we're basically "wasting" a bit of the page but why would that
+cause data integrity issues?
 
-But it seems the latest dump_stack addition flood a bit.
-I have started to read ftrace documentation, but if you have a quick what to do in /sys/kernel/debug/tracing, it will be helpfull.
+> While the sk_msg_trim() pfrag->offset subtraction change hasn't been
+> tried yet, the following hack in TLS layer has been tried and has
+> correctly worked. This proves that the above observation/theory
+> regarding pfrag->offset update would be the fix:
+> 
+> 
+> +                                       if (ret == -ENOSPC) {
+> +                                               struct page_frag *pfrag;
+> +                                               tls_trim_both_msgs(sk,
+> orig_size);
+> +
+> +                                               copied -= copy;
+> +                                               pfrag = sk_page_frag(sk);
+> +                                               pfrag->offset -= copy;
+> 
+> 
+> What are your thoughts on the best way to fix the issue?
+> sk_msg_trim() seems like the most logical place, but
+> suggestions/comments/questions are welcome.
+> 
+> Another thing to think about is whether -EBUSY should be handled
+> similarly. Vendors have differences and the conditions under which
+> these error codes are returned are not very consistent when the sidecar
+> device path is involved.
 
+Why would the driver return EBUSY from an async API? What's the caller
+supposed to do with that?
+
+
+While we have you - weren't you sending a sendpage() fix at some point?
+Did that get lost?
