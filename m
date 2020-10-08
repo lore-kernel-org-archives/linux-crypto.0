@@ -7,57 +7,52 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F2E8C47095
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Oct 2020 05:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93935C4363C
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Oct 2020 05:44:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 379442087D
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Oct 2020 05:43:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 571ED2173E
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Oct 2020 05:44:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728008AbgJHFnx (ORCPT
+        id S1728271AbgJHFoI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Oct 2020 01:43:53 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:41206 "EHLO fornost.hmeau.com"
+        Thu, 8 Oct 2020 01:44:08 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:41220 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726245AbgJHFnx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Oct 2020 01:43:53 -0400
+        id S1726245AbgJHFoI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Oct 2020 01:44:08 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kQOiU-0006SF-P0; Thu, 08 Oct 2020 16:43:51 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Oct 2020 16:43:51 +1100
-Date:   Thu, 8 Oct 2020 16:43:51 +1100
+        id 1kQOib-0006T4-2l; Thu, 08 Oct 2020 16:43:58 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Oct 2020 16:43:57 +1100
+Date:   Thu, 8 Oct 2020 16:43:57 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@intel.com>
-Subject: Re: [PATCH] crypto: qat - drop input parameter from adf_enable_aer()
-Message-ID: <20201008054351.GB9733@gondor.apana.org.au>
-References: <20200930222211.557316-1-giovanni.cabiddu@intel.com>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] X.509: fix error return value on the failed path
+Message-ID: <20201008054357.GC9733@gondor.apana.org.au>
+References: <20201005144628.83875-1-tianjia.zhang@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200930222211.557316-1-giovanni.cabiddu@intel.com>
+In-Reply-To: <20201005144628.83875-1-tianjia.zhang@linux.alibaba.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 30, 2020 at 11:22:11PM +0100, Giovanni Cabiddu wrote:
-> Remove pointer to struct pci_driver from function adf_enable_aer() as it
-> is possible to get it directly from pdev->driver.
+On Mon, Oct 05, 2020 at 10:46:28PM +0800, Tianjia Zhang wrote:
+> When memory allocation fails, an appropriate return value
+> should be set.
 > 
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
-> Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@intel.com>
+> Fixes: 215525639631 ("X.509: support OSCCA SM2-with-SM3 certificate verification")
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 > ---
->  drivers/crypto/qat/qat_c3xxx/adf_drv.c         | 2 +-
->  drivers/crypto/qat/qat_c62x/adf_drv.c          | 2 +-
->  drivers/crypto/qat/qat_common/adf_aer.c        | 6 +++---
->  drivers/crypto/qat/qat_common/adf_common_drv.h | 2 +-
->  drivers/crypto/qat/qat_dh895xcc/adf_drv.c      | 2 +-
->  5 files changed, 7 insertions(+), 7 deletions(-)
+>  crypto/asymmetric_keys/public_key_sm2.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
