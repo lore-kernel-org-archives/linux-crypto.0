@@ -2,91 +2,98 @@ Return-Path: <SRS0=kcel=DP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3315C433E7
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Oct 2020 05:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E755C433E7
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Oct 2020 05:58:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 556CC217BA
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Oct 2020 05:52:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4839C2173E
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Oct 2020 05:58:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728482AbgJHFwp (ORCPT
+        id S1726469AbgJHF61 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Oct 2020 01:52:45 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:41248 "EHLO fornost.hmeau.com"
+        Thu, 8 Oct 2020 01:58:27 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:41258 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726245AbgJHFwp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Oct 2020 01:52:45 -0400
+        id S1726245AbgJHF61 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Oct 2020 01:58:27 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kQOqz-0006af-PP; Thu, 08 Oct 2020 16:52:38 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Oct 2020 16:52:38 +1100
-Date:   Thu, 8 Oct 2020 16:52:38 +1100
+        id 1kQOwT-0006fQ-Q9; Thu, 08 Oct 2020 16:58:18 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Oct 2020 16:58:18 +1100
+Date:   Thu, 8 Oct 2020 16:58:18 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc:     kernel test robot <lkp@intel.com>, kbuild-all@lists.01.org,
+To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Xufeng Zhang <yunbo.xufeng@linux.alibaba.com>,
         linux-kernel@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [v2 PATCH] crypto: sun4i-ss - Fix sparse endianness markers
-Message-ID: <20201008055238.GA9813@gondor.apana.org.au>
-References: <202009061621.J89kO43Q%lkp@intel.com>
- <20200907062400.GA15841@gondor.apana.org.au>
- <20200907160029.GC11894@Red>
- <20200908050036.GA19817@gondor.apana.org.au>
- <20200910122248.GA22506@Red>
- <20200911041354.GA5275@gondor.apana.org.au>
- <20200914104058.GA14265@Red>
- <20200924030859.GA8223@gondor.apana.org.au>
- <20200924132738.GA24386@Red>
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] lib/mpi: Remove unused scalar_copied
+Message-ID: <20201008055818.GB9813@gondor.apana.org.au>
+References: <20200928182438.GA11739@embeddedor>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200924132738.GA24386@Red>
+In-Reply-To: <20200928182438.GA11739@embeddedor>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 24, 2020 at 03:27:38PM +0200, Corentin Labbe wrote:
->
-> This is an example on next-20200923+BigEndian
-> alg: ahash: sha1 test failed (wrong result) on test vector \"random: psize=194 ksize=0\", cfg=\"random: inplace may_sleep use_finup src_divs=[98.25%@+1124, <flush>1.75%@+5] iv_offset=18\"
+On Mon, Sep 28, 2020 at 01:24:38PM -0500, Gustavo A. R. Silva wrote:
+> 
+> I'm reporting the following bug detected by Coverity:
+> 
+> The _scalar_copied_ variable is set to 0 at
+> 
+> lib/mpi/ec.c:1255:
+> 1255                 int scalar_copied = 0;
+> 
+> and it is never updated before reaching the code below:
+> 
+> lib/mpi/ec.c:1317
+> 1317                 if (scalar_copied)                                                         
+> 1318                         mpi_free(scalar);
+> 
+> This code was introduced by commit d58bb7e55a8a ("lib/mpi: Introduce ec
+> implementation to MPI library")
+> 
+> Any ideas on what's the right solution for this?
 
-Hmm, the only way I can see this happening is if it was triggered
-by tcrypt.  Were you using tcrypt by any chance?
+I think it should be removed.
 
-Ccing Eric in case he has any insight.
+---8<---
+The scalar_copied variable is not as the scalar is never copied
+in that block.  This patch removes it.
 
-> === DUMP /proc/crypto ===
-> name         : sha1
-> driver       : sha1-sun4i-ss
-> module       : kernel
-> priority     : 300
-> refcnt       : 1
-> selftest     : passed
-> internal     : no
-> type         : ahash
-> async        : no
-> blocksize    : 64
-> digestsize   : 20
+Fixes: d58bb7e55a8a ("lib/mpi: Introduce ec implementation to...")
+Reported-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-...
-
-> name         : sha1
-> driver       : sha1-generic
-> module       : kernel
-> priority     : 100
-> refcnt       : 1
-> selftest     : passed
-> internal     : no
-> type         : shash
-> blocksize    : 64
-> digestsize   : 20
-
-Thanks,
+diff --git a/lib/mpi/ec.c b/lib/mpi/ec.c
+index c21470122dfc..40f5908e57a4 100644
+--- a/lib/mpi/ec.c
++++ b/lib/mpi/ec.c
+@@ -1252,7 +1252,6 @@ void mpi_ec_mul_point(MPI_POINT result,
+ 		MPI_POINT q1, q2, prd, sum;
+ 		unsigned long sw;
+ 		mpi_size_t rsize;
+-		int scalar_copied = 0;
+ 
+ 		/* Compute scalar point multiplication with Montgomery Ladder.
+ 		 * Note that we don't use Y-coordinate in the points at all.
+@@ -1314,8 +1313,6 @@ void mpi_ec_mul_point(MPI_POINT result,
+ 		point_free(&p2);
+ 		point_free(&p1_);
+ 		point_free(&p2_);
+-		if (scalar_copied)
+-			mpi_free(scalar);
+ 		return;
+ 	}
+ 
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
