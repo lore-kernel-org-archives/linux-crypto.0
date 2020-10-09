@@ -2,103 +2,100 @@ Return-Path: <SRS0=BuJA=DQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F4CCC433E7
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Oct 2020 04:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 877FFC433E7
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Oct 2020 05:30:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05CAC221FF
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Oct 2020 04:17:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1602217041;
-	bh=6HzeqdBIfVdvyZk6B7RpcfY+6wxw2GL9NoatG6xmzKs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=zy+ezBxO3c7R/I4utUOA09+eYa+RyBSsjgvsWuh1kUa8YAvfMuzVsRUbGucJYSnYc
-	 kW2me4DHq1ZCqs4QdvKs4tHEWF/OfJ7Nsqy2plRGFPG0M/qHwVgtn+xZwH07xLp05f
-	 0i8BuXvNKi8ye+NPBtoUPlubFWV9ubaKi92Kz1Xg=
+	by mail.kernel.org (Postfix) with ESMTP id 2D45822244
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Oct 2020 05:30:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WLsTGBgL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729346AbgJIERU (ORCPT
+        id S1730626AbgJIFaR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Oct 2020 00:17:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59648 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725900AbgJIERT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Oct 2020 00:17:19 -0400
-Received: from sol.localdomain (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AD8A522248;
-        Fri,  9 Oct 2020 04:17:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1602217039;
-        bh=6HzeqdBIfVdvyZk6B7RpcfY+6wxw2GL9NoatG6xmzKs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dD56mhdY8U+eRBjGbi+EGx+ZnFeHXPfrEHEPb7vS3cPUV7mX9bow2Ui4kHI05CUs0
-         SnGPeMJVlzEIbqYwo7BOC++emtF9x4YEa+unrqys2lM7MxJMWslDf2zizmI59sAgBb
-         HB4syT/6knjOm3WQXnEGxeoo2k25BO2i6gSW619o=
-Date:   Thu, 8 Oct 2020 21:17:17 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Jessica Yu <jeyu@kernel.org>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Will Deacon <will@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] module: statically initialize init section freeing data
-Message-ID: <20201009041717.GA854@sol.localdomain>
-References: <20201008173220.923671-1-daniel.m.jordan@oracle.com>
+        Fri, 9 Oct 2020 01:30:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54586 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730468AbgJIFaR (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Oct 2020 01:30:17 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03D6CC0613D2;
+        Thu,  8 Oct 2020 22:30:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description;
+        bh=4pjyAWId0ghwBgR3VsDX1F0k5S1+a8uKnwgxeFTVCIc=; b=WLsTGBgLuMFl4CVIpocMpZeRyd
+        ocsjE7j4JS3MwzE15i5TDRAfYofvp7biITlQlb9cFZKVCVGL3K7m2i7mukTpLJJ/tMry37YMq+v0j
+        yI7EOf9dsaSbNGwTn4UVI6VHFs1OFtGtSpFarjwO0aamVXfLokbhkwo4JS6OQF31qh2P9aqgFCZqN
+        ZRwt1wwhxPDmrYkGk2Dc2ONg9ltQ/ITq5CiI8RAEoriw3ELKyriFVayhBfZerrdu/nClSYGnqp+MR
+        PoLrLYiirwszTlU4ue6ybSOzBJ7gSXVgCkQaldFeyxirCFgIYg+rWVjSHp/Y41ilOKHSYtlzIJkWM
+        00LvHgyg==;
+Received: from [2601:1c0:6280:3f0::8280] (helo=dragon.site)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kQkyl-00065Z-7f; Fri, 09 Oct 2020 05:30:07 +0000
+Subject: Re: drivers/crypto/chelsio/chcr_ktls.c:1078: undefined reference to
+ `tls_get_record'
+To:     kernel test robot <lkp@intel.com>,
+        Rohit Maheshwari <rohitm@chelsio.com>
+Cc:     kbuild-all@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+References: <202008080002.xe30V0kb%lkp@intel.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <c015720e-d83e-1400-a67f-ab1a736a3d7b@infradead.org>
+Date:   Thu, 8 Oct 2020 22:30:02 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201008173220.923671-1-daniel.m.jordan@oracle.com>
+In-Reply-To: <202008080002.xe30V0kb%lkp@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Oct 08, 2020 at 01:32:20PM -0400, Daniel Jordan wrote:
-> Corentin hit the following workqueue warning when running with
-> CRYPTO_MANAGER_EXTRA_TESTS:
+On 8/7/20 9:16 AM, kernel test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+> head:   86cfccb66937dd6cbf26ed619958b9e587e6a115
+> commit: 5a4b9fe7fece62ecab6fb28fe92362f83b41c33e cxgb4/chcr: complete record tx handling
+> date:   5 months ago
+> config: parisc-randconfig-r013-20200807 (attached as .config)
+> compiler: hppa-linux-gcc (GCC) 9.3.0
+> reproduce (this is a W=1 build):
+>          wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>          chmod +x ~/bin/make.cross
+>          git checkout 5a4b9fe7fece62ecab6fb28fe92362f83b41c33e
+>          # save the attached .config to linux build tree
+>          COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-9.3.0 make.cross ARCH=parisc
 > 
->   WARNING: CPU: 2 PID: 147 at kernel/workqueue.c:1473 __queue_work+0x3b8/0x3d0
->   Modules linked in: ghash_generic
->   CPU: 2 PID: 147 Comm: modprobe Not tainted
->       5.6.0-rc1-next-20200214-00068-g166c9264f0b1-dirty #545
->   Hardware name: Pine H64 model A (DT)
->   pc : __queue_work+0x3b8/0x3d0
->   Call trace:
->    __queue_work+0x3b8/0x3d0
->    queue_work_on+0x6c/0x90
->    do_init_module+0x188/0x1f0
->    load_module+0x1d00/0x22b0
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
 > 
-> I wasn't able to reproduce on x86 or rpi 3b+.
+> All errors (new ones prefixed by >>):
 > 
-> This is
-> 
->   WARN_ON(!list_empty(&work->entry))
-> 
-> from __queue_work(), and it happens because the init_free_wq work item
-> isn't initialized in time for a crypto test that requests the gcm
-> module.  Some crypto tests were recently moved earlier in boot as
-> explained in commit c4741b230597 ("crypto: run initcalls for generic
-> implementations earlier"), which went into mainline less than two weeks
-> before the Fixes commit.
-> 
-> Avoid the warning by statically initializing init_free_wq and the
-> corresponding llist.
-> 
-> Link: https://lore.kernel.org/lkml/20200217204803.GA13479@Red/
-> Fixes: 1a7b7d922081 ("modules: Use vmalloc special flag")
-> Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-> Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-> Tested-on: sun50i-h6-pine-h64
-> Tested-on: imx8mn-ddr4-evk
-> Tested-on: sun50i-a64-bananapi-m64
-> Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+>     hppa-linux-ld: drivers/crypto/chelsio/chcr_ktls.o: in function `chcr_ktls_xmit':
+>>> drivers/crypto/chelsio/chcr_ktls.c:1078: undefined reference to `tls_get_record'
+>     hppa-linux-ld: drivers/crypto/chelsio/chcr_ktls.o: in function `.LC10':
+>>> chcr_ktls.c:(.rodata.cst4+0x0): undefined reference to `tls_validate_xmit_skb'
 
-Looks good,
+Hi,
+Has anyone tried to fix this build error?
+It still fails on v5.9-rc8.
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+CONFIG_TLS=m
+but
+CONFIG_CRYPTO_DEV_CHELSIO=y
+CONFIG_CHELSIO_TLS_DEVICE=y
+
+so the builtin driver cannot reach the TLS loadable module symbols.
+
+--
+~Randy
