@@ -2,119 +2,178 @@ Return-Path: <SRS0=BuJA=DQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF270C4363D
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Oct 2020 12:15:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D9FC433DF
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Oct 2020 15:35:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8FFAD222C4
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Oct 2020 12:15:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1602245746;
-	bh=6jY6pADWd4LdcEnG1rOTq/8tMFI7N/XzmAw3LP7tTK4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=vKWFI43Q3cqEGXziwrv56xh80g2OZM2BtfJFi63b/M6QTlUsvyMKc3pOOwtOgnKaz
-	 HR7YxvbXvwAxyYnneVhEHJMPlbRr2n+8RGf8XlDUBPFawbu//l6vRJU7JmhHrc+HBJ
-	 CRCr+ebyRZ3aWSGq+rxjPSY+u3xK2QhFMylWP+9c=
+	by mail.kernel.org (Postfix) with ESMTP id 1B88D222E7
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Oct 2020 15:35:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="DgCwK5po"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388486AbgJIMPp (ORCPT
+        id S2387664AbgJIPe7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Oct 2020 08:15:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40778 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388460AbgJIMPh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Oct 2020 08:15:37 -0400
-Received: from mail.kernel.org (ip5f5ad5d0.dynamic.kabel-deutschland.de [95.90.213.208])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2D120222B9;
-        Fri,  9 Oct 2020 12:15:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1602245736;
-        bh=6jY6pADWd4LdcEnG1rOTq/8tMFI7N/XzmAw3LP7tTK4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=0AeBMrZ4FC+HlS20YlGTq0hOpIlfLPoMUe7dwcxMv+i4B6MLcrCTsAJ/yKdiGF+0o
-         3EIB0NBNDnSDuSjQPU4BDTAt3uFmqZggpsTJvSK0lPkIMKZDxj7YdRRy2mH7P7qGpK
-         nNySqgQCgwMzj4SapTVMtZWajXTFi1DJKzAsJLWw=
-Received: from mchehab by mail.kernel.org with local (Exim 4.94)
-        (envelope-from <mchehab@kernel.org>)
-        id 1kQrJ6-003kt3-JY; Fri, 09 Oct 2020 14:15:32 +0200
-From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>
-Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Maxime Ripard <mripard@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] crypto: sun8x-ce*: update entries to its documentation
-Date:   Fri,  9 Oct 2020 14:15:31 +0200
-Message-Id: <52bfc99d585587cf4eaeb0b2ba85f7da751f7f33.1602245659.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <cover.1602245659.git.mchehab+huawei@kernel.org>
-References: <cover.1602245659.git.mchehab+huawei@kernel.org>
+        Fri, 9 Oct 2020 11:34:59 -0400
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:18802 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2389252AbgJIPe7 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Oct 2020 11:34:59 -0400
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 099FUPDI019606;
+        Fri, 9 Oct 2020 08:34:52 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=pfpt0220;
+ bh=MharBup91CZHNOZxGep4IoLgVXRoflqRzhC3qmkMnGg=;
+ b=DgCwK5pousNbtHbkUzqtO9Bn0/nSZrWi540rrV/kWmAUTmiE+Pw2AOdVzhtUAeLv8wT8
+ d8sg7IuIeTnkenlB++2tZ+LkfWmwFDb1+qVmEVqkK7oedrla4GlP/TZG9kiGU+9V9Ktz
+ 3FageGGryLfXKgm4+AUUBvXxokbcHzHRQcxTW1dJlZTOZLM1fH3ZioQ+Y0+yWGvulp5I
+ alx2fpDZGri4AoEYwTHiHxN8/5Gl4wfA57Ax9974X+QaH8x1Av5MDuIBTxowLFW/S+p4
+ WvBGcbZHbKzVuF/GIqT3jqDcslem0U2Bjt72z1WDRuVwhE739WTdlYMsKU4vzZAyQBy/ nQ== 
+Received: from sc-exch01.marvell.com ([199.233.58.181])
+        by mx0a-0016f401.pphosted.com with ESMTP id 3429h8bbsn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Fri, 09 Oct 2020 08:34:52 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by SC-EXCH01.marvell.com
+ (10.93.176.81) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 9 Oct
+ 2020 08:34:51 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Fri, 9 Oct 2020 08:34:51 -0700
+Received: from hyd1schalla-dt.marvell.com (hyd1schalla-dt.marvell.com [10.29.8.39])
+        by maili.marvell.com (Postfix) with ESMTP id CB17C3F703F;
+        Fri,  9 Oct 2020 08:34:47 -0700 (PDT)
+From:   Srujana Challa <schalla@marvell.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <kuba@kernel.org>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <schandran@marvell.com>,
+        <pathreya@marvell.com>, Srujana Challa <schalla@marvell.com>
+Subject: [PATCH v4,net-next,01/13] octeontx2-pf: move lmt flush to include/linux/soc
+Date:   Fri, 9 Oct 2020 21:04:09 +0530
+Message-ID: <20201009153421.30562-2-schalla@marvell.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201009153421.30562-1-schalla@marvell.com>
+References: <20201009153421.30562-1-schalla@marvell.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-09_06:2020-10-09,2020-10-09 signatures=0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The README file was converted to ReST format. Update the
-references for it accordingly.
+On OcteonTX2 platform CPT instruction enqueue and NIX
+packet send are only possible via LMTST operations which
+uses LDEOR instruction. This patch moves lmt flush
+function from OcteonTX2 nic driver to include/linux/soc
+since it will be used by OcteonTX2 CPT and NIC driver for
+LMTST.
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Signed-off-by: Suheil Chandran <schandran@marvell.com>
+Signed-off-by: Srujana Challa <schalla@marvell.com>
 ---
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c | 2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ MAINTAINERS                                   |  2 ++
+ .../marvell/octeontx2/nic/otx2_common.h       | 13 +--------
+ include/linux/soc/marvell/octeontx2/asm.h     | 29 +++++++++++++++++++
+ 3 files changed, 32 insertions(+), 12 deletions(-)
+ create mode 100644 include/linux/soc/marvell/octeontx2/asm.h
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-index fa2f1b4fad7b..a94bf28f858a 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-@@ -7,7 +7,7 @@
-  *
-  * This file add support for MD5 and SHA1/SHA224/SHA256/SHA384/SHA512.
-  *
-- * You could find the datasheet in Documentation/arm/sunxi/README
-+ * You could find the datasheet in Documentation/arm/sunxi.rst
-  */
- #include <linux/dma-mapping.h>
- #include <linux/pm_runtime.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-index 78503006949c..cfde9ee4356b 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-@@ -7,7 +7,7 @@
-  *
-  * This file handle the PRNG
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi/README
-+ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-  */
- #include "sun8i-ce.h"
- #include <linux/dma-mapping.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-index 654328160d19..5b7af4498bd5 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-@@ -7,7 +7,7 @@
-  *
-  * This file handle the TRNG
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi/README
-+ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-  */
- #include "sun8i-ce.h"
- #include <linux/dma-mapping.h>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c99577961cc4..80fdfeb7f750 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10431,6 +10431,7 @@ M:	Srujana Challa <schalla@marvell.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+ F:	drivers/crypto/marvell/
++F:	include/linux/soc/marvell/octeontx2/
+ 
+ MARVELL GIGABIT ETHERNET DRIVERS (skge/sky2)
+ M:	Mirko Lindner <mlindner@marvell.com>
+@@ -10503,6 +10504,7 @@ M:	hariprasad <hkelam@marvell.com>
+ L:	netdev@vger.kernel.org
+ S:	Supported
+ F:	drivers/net/ethernet/marvell/octeontx2/nic/
++F:	include/linux/soc/marvell/octeontx2/
+ 
+ MARVELL OCTEONTX2 RVU ADMIN FUNCTION DRIVER
+ M:	Sunil Goutham <sgoutham@marvell.com>
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index ac47762cce9b..12311964d9d6 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -16,6 +16,7 @@
+ #include <linux/net_tstamp.h>
+ #include <linux/ptp_clock_kernel.h>
+ #include <linux/timecounter.h>
++#include <linux/soc/marvell/octeontx2/asm.h>
+ 
+ #include <mbox.h>
+ #include "otx2_reg.h"
+@@ -420,21 +421,9 @@ static inline u64 otx2_atomic64_add(u64 incr, u64 *ptr)
+ 	return result;
+ }
+ 
+-static inline u64 otx2_lmt_flush(uint64_t addr)
+-{
+-	u64 result = 0;
+-
+-	__asm__ volatile(".cpu  generic+lse\n"
+-			 "ldeor xzr,%x[rf],[%[rs]]"
+-			 : [rf]"=r"(result)
+-			 : [rs]"r"(addr));
+-	return result;
+-}
+-
+ #else
+ #define otx2_write128(lo, hi, addr)
+ #define otx2_atomic64_add(incr, ptr)		({ *ptr += incr; })
+-#define otx2_lmt_flush(addr)			({ 0; })
+ #endif
+ 
+ /* Alloc pointer from pool/aura */
+diff --git a/include/linux/soc/marvell/octeontx2/asm.h b/include/linux/soc/marvell/octeontx2/asm.h
+new file mode 100644
+index 000000000000..ae2279fe830a
+--- /dev/null
++++ b/include/linux/soc/marvell/octeontx2/asm.h
+@@ -0,0 +1,29 @@
++/* SPDX-License-Identifier: GPL-2.0-only
++ * Copyright (C) 2020 Marvell.
++ */
++
++#ifndef __SOC_OTX2_ASM_H
++#define __SOC_OTX2_ASM_H
++
++#if defined(CONFIG_ARM64)
++/*
++ * otx2_lmt_flush is used for LMT store operation.
++ * On octeontx2 platform CPT instruction enqueue and
++ * NIX packet send are only possible via LMTST
++ * operations and it uses LDEOR instruction targeting
++ * the coprocessor address.
++ */
++#define otx2_lmt_flush(ioaddr)                          \
++({                                                      \
++	u64 result = 0;                                 \
++	__asm__ volatile(".cpu  generic+lse\n"          \
++			 "ldeor xzr, %x[rf], [%[rs]]"   \
++			 : [rf]"=r" (result)            \
++			 : [rs]"r" (ioaddr));           \
++	(result);                                       \
++})
++#else
++#define otx2_lmt_flush(ioaddr)          ({ 0; })
++#endif
++
++#endif /* __SOC_OTX2_ASM_H */
 -- 
-2.26.2
+2.28.0
 
