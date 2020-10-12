@@ -2,106 +2,157 @@ Return-Path: <SRS0=K/JA=DT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7117C433DF
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Oct 2020 18:35:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F2ABC433E7
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Oct 2020 20:39:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A9866208FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Oct 2020 18:35:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1602527703;
-	bh=4bedygPxkAIdJoSdpOeA13U7DggA6lrz5iExsiBazPA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=2fHh5Y6N5Hdd50miue+Msh1Mrgryw368n5JykR4gnMC+qvZg5U5hXR06ow+DsofM0
-	 OyhGOnpMGQGJsqmUEsJN6hsNILWwzfuEUAV1j6nQ2mWh1z62sGrpVVjIVY3y01AkIY
-	 TrjNvirlNWk8XgK5PrhLlFUxDCU7PUJzKkcqSFwk=
+	by mail.kernel.org (Postfix) with ESMTP id 0A6EC2145D
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Oct 2020 20:39:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389336AbgJLSfD (ORCPT
+        id S1728890AbgJLUjD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Oct 2020 14:35:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43432 "EHLO mail.kernel.org"
+        Mon, 12 Oct 2020 16:39:03 -0400
+Received: from mga09.intel.com ([134.134.136.24]:33900 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389213AbgJLSfC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Oct 2020 14:35:02 -0400
-Received: from linux-8ccs (p57a236d4.dip0.t-ipconnect.de [87.162.54.212])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9933020797;
-        Mon, 12 Oct 2020 18:35:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1602527702;
-        bh=4bedygPxkAIdJoSdpOeA13U7DggA6lrz5iExsiBazPA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=S7hfWuJJGRQ3EMneN7eL6QLc2STkWB9VKl2NCkFX2dzbQzYkhWqgWUnpuMWjdxE8f
-         vsaSAbVKrj7hDPWwY3cbGtzd30e24nBJ06PiSqY5i+XD6mVmYioG9FLrREZev5ksn/
-         PGJzqGfubIl9Q5894Dbr2c9fOoOqO6wZCoMuBfTA=
-Date:   Mon, 12 Oct 2020 20:34:57 +0200
-From:   Jessica Yu <jeyu@kernel.org>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Will Deacon <will@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] module: statically initialize init section freeing data
-Message-ID: <20201012183456.GA7338@linux-8ccs>
-References: <20201008173220.923671-1-daniel.m.jordan@oracle.com>
+        id S1728412AbgJLUjD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Oct 2020 16:39:03 -0400
+IronPort-SDR: Bzsb/LIFTjFyJVw84/QIUJk7YWUJScsual3vrglpSf8qBCWNcPMfzGc1H1G/Yb3U1mJuAi93kR
+ BHDJxFUOnoDg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9772"; a="165913052"
+X-IronPort-AV: E=Sophos;i="5.77,367,1596524400"; 
+   d="scan'208";a="165913052"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2020 13:39:01 -0700
+IronPort-SDR: i6hj7Vbe3GrCD9Y1GucMspW7V9qgwNzI3gK464X8JjWx05m9Tz2nNUquHZr//VbTVZcww+9gkn
+ vai0ELYs9JVg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,367,1596524400"; 
+   d="scan'208";a="299328096"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
+  by fmsmga007.fm.intel.com with ESMTP; 12 Oct 2020 13:39:00 -0700
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH 00/31] crypto: qat - rework in preparation for qat_4xxx driver
+Date:   Mon, 12 Oct 2020 21:38:16 +0100
+Message-Id: <20201012203847.340030-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20201008173220.923671-1-daniel.m.jordan@oracle.com>
-X-OS:   Linux linux-8ccs 4.12.14-lp150.12.61-default x86_64
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-+++ Daniel Jordan [08/10/20 13:32 -0400]:
->Corentin hit the following workqueue warning when running with
->CRYPTO_MANAGER_EXTRA_TESTS:
->
->  WARNING: CPU: 2 PID: 147 at kernel/workqueue.c:1473 __queue_work+0x3b8/0x3d0
->  Modules linked in: ghash_generic
->  CPU: 2 PID: 147 Comm: modprobe Not tainted
->      5.6.0-rc1-next-20200214-00068-g166c9264f0b1-dirty #545
->  Hardware name: Pine H64 model A (DT)
->  pc : __queue_work+0x3b8/0x3d0
->  Call trace:
->   __queue_work+0x3b8/0x3d0
->   queue_work_on+0x6c/0x90
->   do_init_module+0x188/0x1f0
->   load_module+0x1d00/0x22b0
->
->I wasn't able to reproduce on x86 or rpi 3b+.
->
->This is
->
->  WARN_ON(!list_empty(&work->entry))
->
->from __queue_work(), and it happens because the init_free_wq work item
->isn't initialized in time for a crypto test that requests the gcm
->module.  Some crypto tests were recently moved earlier in boot as
->explained in commit c4741b230597 ("crypto: run initcalls for generic
->implementations earlier"), which went into mainline less than two weeks
->before the Fixes commit.
->
->Avoid the warning by statically initializing init_free_wq and the
->corresponding llist.
->
->Link: https://lore.kernel.org/lkml/20200217204803.GA13479@Red/
->Fixes: 1a7b7d922081 ("modules: Use vmalloc special flag")
->Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
->Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
->Tested-on: sun50i-h6-pine-h64
->Tested-on: imx8mn-ddr4-evk
->Tested-on: sun50i-a64-bananapi-m64
->Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+This set is an initial rework of the QAT driver in preparation for the
+inclusion of the qat_4xxx driver (QAT GEN4).
 
-Applied, thanks!
+Summary of changes:
+  * IV update logic moved to software to remove allocation of the IV
+    buffer in the data-path and allow for devices that are not capable
+    of updating it when performing AES-CBC or AES-CTR.
+  * Added logic to detect the presence of engines and accelerators via
+    soft-straps and fuse registers.
+  * Added infrastructure to support devices with an arbitrary number of
+    rings per bank.
+  * Introduced adf_gen2_hw_data.[c|h] that contain logic that is common
+    between QAT GEN2 devices (c62x, c3xxx and dh895xcc).
+  * Abstracted logic that configures iov threads.
+  * Abstracted access to transport CSRs.
+  * Abstracted, refactored and updated admin interface logic.
+  * Abstracted and refactored arbiter logic.
+  * Changed sequence on how arbitration is enabled on rings.
+  * Added support for device capability detection.
+  * Replaced hardcoded masks.
+  * Changed logic in adf_sriov.c to allow for drivers that do not
+    implement some of the functions of that module.
+  * Refactored logic related to device configuration and instance
+    creation.
+  * Changed logic to allow for instances in different banks.
+  * Extended accelerator mask.
 
-Jessica
+Ahsan Atta (1):
+  crypto: qat - num_rings_per_bank is device dependent
+
+Giovanni Cabiddu (28):
+  crypto: qat - mask device capabilities with soft straps
+  crypto: qat - fix configuration of iov threads
+  crypto: qat - split transport CSR access logic
+  crypto: qat - relocate GEN2 CSR access code
+  crypto: qat - abstract admin interface
+  crypto: qat - add packed to init admin structures
+  crypto: qat - rename ME in AE
+  crypto: qat - change admin sequence
+  crypto: qat - use admin mask to send fw constants
+  crypto: qat - update constants table
+  crypto: qat - remove writes into WQCFG
+  crypto: qat - remove unused macros in arbiter module
+  crypto: qat - abstract arbiter access
+  crypto: qat - register crypto instances based on capability
+  crypto: qat - enable ring after pair is programmed
+  crypto: qat - abstract build ring base
+  crypto: qat - replace constant masks with GENMASK
+  crypto: qat - use BIT_ULL() - 1 pattern for masks
+  crypto: qat - abstract writes to arbiter enable
+  crypto: qat - remove hardcoded bank irq clear flag mask
+  crypto: qat - call functions in adf_sriov if available
+  crypto: qat - remove unnecessary void* casts
+  crypto: qat - change return value in adf_cfg_add_key_value_param()
+  crypto: qat - change return value in adf_cfg_key_val_get()
+  crypto: qat - refactor qat_crypto_create_instances()
+  crypto: qat - refactor qat_crypto_dev_config()
+  crypto: qat - allow for instances in different banks
+  crypto: qat - extend ae_mask
+
+Marco Chiappero (2):
+  crypto: qat - update IV in software
+  crypto: qat - add support for capability detection
+
+ .../crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c  |  49 ++++-
+ .../crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.h  |   5 +
+ drivers/crypto/qat/qat_c3xxx/adf_drv.c        |  11 +-
+ .../qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c     |   7 +-
+ drivers/crypto/qat/qat_c3xxxvf/adf_drv.c      |   4 +-
+ .../crypto/qat/qat_c62x/adf_c62x_hw_data.c    |  49 ++++-
+ .../crypto/qat/qat_c62x/adf_c62x_hw_data.h    |   5 +
+ drivers/crypto/qat/qat_c62x/adf_drv.c         |  11 +-
+ .../qat/qat_c62xvf/adf_c62xvf_hw_data.c       |   7 +-
+ drivers/crypto/qat/qat_c62xvf/adf_drv.c       |   4 +-
+ drivers/crypto/qat/qat_common/Makefile        |   1 +
+ .../crypto/qat/qat_common/adf_accel_devices.h |  58 +++++-
+ drivers/crypto/qat/qat_common/adf_admin.c     |  77 ++++----
+ drivers/crypto/qat/qat_common/adf_cfg.c       |   4 +-
+ .../crypto/qat/qat_common/adf_cfg_strings.h   |   3 +-
+ .../crypto/qat/qat_common/adf_gen2_hw_data.c  | 181 ++++++++++++++++++
+ .../crypto/qat/qat_common/adf_gen2_hw_data.h  | 123 ++++++++++++
+ .../crypto/qat/qat_common/adf_hw_arbiter.c    |  94 ++++-----
+ drivers/crypto/qat/qat_common/adf_isr.c       |   4 +-
+ drivers/crypto/qat/qat_common/adf_sriov.c     |  74 ++-----
+ drivers/crypto/qat/qat_common/adf_transport.c | 130 +++++++++----
+ .../qat_common/adf_transport_access_macros.h  |  67 -------
+ .../qat/qat_common/adf_transport_debug.c      |  32 ++--
+ .../qat/qat_common/adf_transport_internal.h   |   2 +-
+ drivers/crypto/qat/qat_common/adf_vf_isr.c    |   5 +-
+ .../qat/qat_common/icp_qat_fw_init_admin.h    |   6 +-
+ drivers/crypto/qat/qat_common/icp_qat_hw.h    |  23 +++
+ drivers/crypto/qat/qat_common/qat_algs.c      | 136 +++++++------
+ drivers/crypto/qat/qat_common/qat_crypto.c    | 162 ++++++++++------
+ drivers/crypto/qat/qat_common/qat_crypto.h    |  26 ++-
+ drivers/crypto/qat/qat_common/qat_hal.c       |  27 +--
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |  60 +++++-
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.h   |   5 +
+ drivers/crypto/qat/qat_dh895xcc/adf_drv.c     |   9 +-
+ .../qat_dh895xccvf/adf_dh895xccvf_hw_data.c   |   7 +-
+ drivers/crypto/qat/qat_dh895xccvf/adf_drv.c   |   4 +-
+ 36 files changed, 1024 insertions(+), 448 deletions(-)
+ create mode 100644 drivers/crypto/qat/qat_common/adf_gen2_hw_data.c
+ create mode 100644 drivers/crypto/qat/qat_common/adf_gen2_hw_data.h
+
+-- 
+2.26.2
+
