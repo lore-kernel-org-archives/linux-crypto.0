@@ -1,100 +1,62 @@
-Return-Path: <SRS0=/RUi=DS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=K/JA=DT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36E08C433DF
-	for <linux-crypto@archiver.kernel.org>; Sun, 11 Oct 2020 10:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9587C433DF
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Oct 2020 03:07:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF830207F7
-	for <linux-crypto@archiver.kernel.org>; Sun, 11 Oct 2020 10:19:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1602411563;
-	bh=E80FqfqRXRL4++0Ml+FlpdDwAKsno997KrBJ1rNmCSQ=;
-	h=In-Reply-To:References:Subject:Cc:To:From:Date:List-ID:From;
-	b=nlT2qemuPnBoMk6D8KObAHAxDm/VRgBopLO4nrMMmEtqJDeicHXNk3j4bVcjYMJzM
-	 WFjiTSCF8oluOiMGADhvwHuOqfBVBJPS9GWAu8+JRAuxOkUl70i0OUM3kJ+Bbt2NU1
-	 rlmr7PePxMAUu0zlVO90bFFOO5M4HxdfzTAmSjZw=
+	by mail.kernel.org (Postfix) with ESMTP id 87D9120782
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Oct 2020 03:07:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728290AbgJKKTT (ORCPT
+        id S1726974AbgJLDHn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 11 Oct 2020 06:19:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47250 "EHLO mail.kernel.org"
+        Sun, 11 Oct 2020 23:07:43 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:55510 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727035AbgJKKTS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 11 Oct 2020 06:19:18 -0400
-Received: from localhost (pop.92-184-102-180.mobile.abo.orange.fr [92.184.102.180])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 95343207F7;
-        Sun, 11 Oct 2020 10:19:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1602411558;
-        bh=E80FqfqRXRL4++0Ml+FlpdDwAKsno997KrBJ1rNmCSQ=;
-        h=In-Reply-To:References:Subject:Cc:To:From:Date:From;
-        b=Hmeuo20eDt1ccuObCbtaRLqtUJtZ/RSoYdy9vMnE+wboS/MLVi47ODeEVkxHWZETU
-         PUctPHQxfaGFZ0NDz/W7dy/0QLd34JPyCW+a69WPdzSP1cOKFWf60+gOmaVEw8WrO2
-         isz6sz/KNqijdMoGBVUkBTqUW/hdC03BmtxdHEaw=
-Content-Type: text/plain; charset="utf-8"
+        id S1726950AbgJLDHn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 11 Oct 2020 23:07:43 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1kRoBT-0008T6-9j; Mon, 12 Oct 2020 14:07:36 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 12 Oct 2020 14:07:35 +1100
+Date:   Mon, 12 Oct 2020 14:07:35 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     poojatrivedi@gmail.com, linux-crypto@vger.kernel.org,
+        mallesh537@gmail.com, josh.tway@stackpath.com,
+        netdev@vger.kernel.org
+Subject: Re: [RFC 1/1] net/tls(TLS_SW): Handle -ENOSPC error return from
+ device/AES-NI
+Message-ID: <20201012030735.GA24873@gondor.apana.org.au>
+References: <20201007134746.069d7f2f@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+ <20201008053534.GA4685@gondor.apana.org.au>
+ <20201009094830.57736e5d@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20201010164736.12871-1-colin.king@canonical.com>
-References: <20201010164736.12871-1-colin.king@canonical.com>
-Subject: Re: [PATCH] crypto: inside-secure: Fix sizeof() mismatch
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-To:     "David S . Miller" <davem@davemloft.net>,
-        Colin King <colin.king@canonical.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ofer Heifetz <oferh@marvell.com>, linux-crypto@vger.kernel.org
-From:   Antoine Tenart <atenart@kernel.org>
-Message-ID: <160241154768.6233.86808650362778908@surface>
-Date:   Sun, 11 Oct 2020 12:19:12 +0200
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201009094830.57736e5d@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+On Fri, Oct 09, 2020 at 09:48:30AM -0700, Jakub Kicinski wrote:
+>
+> Are you saying that if we set CRYPTO_TFM_REQ_MAY_BACKLOG we should
+> never see ENOSPC with a correctly functioning driver? Or do we need 
+> to handle both errors, regardless?
 
-Quoting Colin King (2020-10-10 18:47:36)
-> From: Colin Ian King <colin.king@canonical.com>
->=20
-> An incorrect sizeof() is being used, sizeof(priv->ring[i].rdr_req) is
-> not correct, it should be sizeof(*priv->ring[i].rdr_req). Note that
-> since the size of ** is the same size as * this is not causing any
-> issues.
->=20
-> Addresses-Coverity: ("Sizeof not portable (SIZEOF_MISMATCH)")
-> Fixes: 9744fec95f06 ("crypto: inside-secure - remove request list to impr=
-ove performance")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Correct, you will never see ENOSPC if you request MAY_BACKLOG.
+However, you must then ensure that when you get EBUSY that you
+stop issuing new requests until the Crypto API signals through
+the callback that you can start again.
 
-Acked-by: Antoine Tenart <atenart@kernel.org>
-
-Thanks!
-Antoine
-
-> ---
->  drivers/crypto/inside-secure/safexcel.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/ins=
-ide-secure/safexcel.c
-> index eb2418450f12..2e1562108a85 100644
-> --- a/drivers/crypto/inside-secure/safexcel.c
-> +++ b/drivers/crypto/inside-secure/safexcel.c
-> @@ -1639,7 +1639,7 @@ static int safexcel_probe_generic(void *pdev,
-> =20
->                 priv->ring[i].rdr_req =3D devm_kcalloc(dev,
->                         EIP197_DEFAULT_RING_SIZE,
-> -                       sizeof(priv->ring[i].rdr_req),
-> +                       sizeof(*priv->ring[i].rdr_req),
->                         GFP_KERNEL);
->                 if (!priv->ring[i].rdr_req)
->                         return -ENOMEM;
-> --=20
-> 2.27.0
->=20
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
