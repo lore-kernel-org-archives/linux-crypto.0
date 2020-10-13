@@ -2,118 +2,68 @@ Return-Path: <SRS0=wcu2=DU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 469F7C433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Oct 2020 12:15:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3144FC433E7
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Oct 2020 16:24:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EBC9822247
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Oct 2020 12:15:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DFCCC25298
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Oct 2020 16:24:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1602591336;
-	bh=6jY6pADWd4LdcEnG1rOTq/8tMFI7N/XzmAw3LP7tTK4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ytsnLgEOB0d22GKsUfvcsZQl2/o9rekBgcPT8zZdXUh7GAIGXcgCr7gEE335LF/gD
-	 hGo7+OK3QpxCuLYvicg8BDwPdgjpr6sG7hsuOEldIdK/EhTj/Lx0pNIU0GfHdmrjKJ
-	 sIAbFIMtiJY/wRFypydxuO0ElU5yFZ25k5rlpBfc=
+	s=default; t=1602606251;
+	bh=P+b1xRiVd/Glip2OOGNcKabJe6x7rDVX6Y/HLYin6D4=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=vDFs0m5lcYCZgY14XgPiGsa09xHcfvarbeR5dldL8/vgBf06VFbV+hyRrpdZBoaBM
+	 c/09hnZ4ZgQ0P+S19WUuzL1csdCcX3M2TuH2VF8qnVaDwm13SRaJp1DHPi6IIzgauX
+	 beR2PfUZ99ROehs/vT+PMcHJXrLtRRILrUt5vrpU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727141AbgJMMPf (ORCPT
+        id S2389769AbgJMQYK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Oct 2020 08:15:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41342 "EHLO mail.kernel.org"
+        Tue, 13 Oct 2020 12:24:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49386 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727007AbgJMMO5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Oct 2020 08:14:57 -0400
-Received: from mail.kernel.org (ip5f5ad5b2.dynamic.kabel-deutschland.de [95.90.213.178])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 585F122384;
-        Tue, 13 Oct 2020 12:14:55 +0000 (UTC)
+        id S2389679AbgJMQYF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Oct 2020 12:24:05 -0400
+Subject: Re: [GIT PULL] Crypto Update for 5.10
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1602591295;
-        bh=6jY6pADWd4LdcEnG1rOTq/8tMFI7N/XzmAw3LP7tTK4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ZLKLRGcHw+Jhgg8LShujgoam4S9h+R4TwFSFdIFJ7DcuJcnUGoQZwcgdFUtqFO9FA
-         ei5qhg5SRXErlQbzrLOrpe4SfY/9G1f7Fvo28tbrIL4yj9V5hggiCJU7K/kCDNFlLG
-         i8ncBRqdGaJjbQJRqCVohbtIl1YB9mniaOPRZRCU=
-Received: from mchehab by mail.kernel.org with local (Exim 4.94)
-        (envelope-from <mchehab@kernel.org>)
-        id 1kSJCf-006Cof-9R; Tue, 13 Oct 2020 14:14:53 +0200
-From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        s=default; t=1602606245;
+        bh=P+b1xRiVd/Glip2OOGNcKabJe6x7rDVX6Y/HLYin6D4=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=Sd6qgZLpvDR/6YZCHv4KsMUOSwi0AESFDSNFHbJeHpLZIU/Kly9luLhOAC/8W0dVx
+         XuiyFuIZjdeiHck3MzsfV9d3rmDivvtlM+8XnYZaHBq5AddvAPzbWZ4RFdOvSq+kmW
+         xKtnP8iZPGfhec/LFT0DBUqv9T8abDKhDM9Zsq4c=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20201012033249.GA25179@gondor.apana.org.au>
+References: <20200803044024.GA6429@gondor.apana.org.au> <20201012033249.GA25179@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20201012033249.GA25179@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+X-PR-Tracked-Commit-Id: 3093e7c16e12d729c325adb3c53dde7308cefbd8
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 39a5101f989e8d2be557136704d53990f9b402c8
+Message-Id: <160260624522.24492.2693209013854643177.pr-tracker-bot@kernel.org>
+Date:   Tue, 13 Oct 2020 16:24:05 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         "David S. Miller" <davem@davemloft.net>,
-        "Jonathan Corbet" <corbet@lwn.net>, Chen-Yu Tsai <wens@csie.org>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Maxime Ripard <mripard@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 21/24] crypto: sun8x-ce*: update entries to its documentation
-Date:   Tue, 13 Oct 2020 14:14:48 +0200
-Message-Id: <f8e8feef7e17cf66a2587139386d951a0265adcf.1602590106.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <cover.1602590106.git.mchehab+huawei@kernel.org>
-References: <cover.1602590106.git.mchehab+huawei@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The README file was converted to ReST format. Update the
-references for it accordingly.
+The pull request you sent on Mon, 12 Oct 2020 14:32:49 +1100:
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
----
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c | 2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-index fa2f1b4fad7b..a94bf28f858a 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-@@ -7,7 +7,7 @@
-  *
-  * This file add support for MD5 and SHA1/SHA224/SHA256/SHA384/SHA512.
-  *
-- * You could find the datasheet in Documentation/arm/sunxi/README
-+ * You could find the datasheet in Documentation/arm/sunxi.rst
-  */
- #include <linux/dma-mapping.h>
- #include <linux/pm_runtime.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-index 78503006949c..cfde9ee4356b 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-@@ -7,7 +7,7 @@
-  *
-  * This file handle the PRNG
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi/README
-+ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-  */
- #include "sun8i-ce.h"
- #include <linux/dma-mapping.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-index 654328160d19..5b7af4498bd5 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-@@ -7,7 +7,7 @@
-  *
-  * This file handle the TRNG
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi/README
-+ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-  */
- #include "sun8i-ce.h"
- #include <linux/dma-mapping.h>
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/39a5101f989e8d2be557136704d53990f9b402c8
+
+Thank you!
+
 -- 
-2.26.2
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
