@@ -2,345 +2,176 @@ Return-Path: <SRS0=zNo2=DW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2458DC433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Oct 2020 03:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB37C433E7
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Oct 2020 08:30:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA89D22243
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Oct 2020 03:32:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 734082224E
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Oct 2020 08:30:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="aPkgSELC";
+	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="QF8J/DFU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727020AbgJODcM (ORCPT
+        id S1728900AbgJOIaS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Oct 2020 23:32:12 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:44046 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726869AbgJODcM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Oct 2020 23:32:12 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kStzd-0004qJ-An; Thu, 15 Oct 2020 14:31:54 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 15 Oct 2020 14:31:53 +1100
-Date:   Thu, 15 Oct 2020 14:31:53 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     kernel test robot <lkp@intel.com>
-Cc:     Keerthy <j-keerthy@ti.com>, kbuild-all@lists.01.org,
-        linux-kernel@vger.kernel.org, Tero Kristo <t-kristo@ti.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [RESEND PATCH] crypto: sa2ul - Reduce stack usage
-Message-ID: <20201015033153.GA10972@gondor.apana.org.au>
-References: <202008161440.gqdm1lpp%lkp@intel.com>
- <20200824131230.GA4813@gondor.apana.org.au>
+        Thu, 15 Oct 2020 04:30:18 -0400
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:14902 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726996AbgJOIaS (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Oct 2020 04:30:18 -0400
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09F8PXNF006538;
+        Thu, 15 Oct 2020 01:30:06 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pfpt0220;
+ bh=Zjj4tXKPxeaArO8+zyZgh7yKYuf0f1jxiWTaq0Ib2ns=;
+ b=aPkgSELC9GxhQBHSnSS7Y0ajl8MpixWRybduVNheiRAINZxcMkps5FJQpHrbmw7Uhrh9
+ 1cb0HWqSyk5pZykySrinv6DTnQG5RndRyrkOesNNPUvRrE17odbIjwv1gzE27DqZlZkv
+ 867IGbiH5VskyDIA8JkffN3iPKTvHeKcrlUeTwHBNF79LNoVtJf48qb10ZdW0Q59G+sj
+ NL3xp7l0FH8zab0eL8y78BDjHqdMJXABEb+sA2bpUfGw0TUA4Le1/XOjKkhl0afuJbip
+ JvUv2wvF0POaezWblC5kxnMilxhbwm5Dm0jmeTUnqfsC3hr3QXB9XZhKt8wb5KipDA2N tQ== 
+Received: from sc-exch02.marvell.com ([199.233.58.182])
+        by mx0a-0016f401.pphosted.com with ESMTP id 343aantx59-9
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Thu, 15 Oct 2020 01:30:06 -0700
+Received: from SC-EXCH04.marvell.com (10.93.176.84) by SC-EXCH02.marvell.com
+ (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 15 Oct
+ 2020 01:29:34 -0700
+Received: from SC-EXCH03.marvell.com (10.93.176.83) by SC-EXCH04.marvell.com
+ (10.93.176.84) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 15 Oct
+ 2020 01:29:34 -0700
+Received: from NAM02-BL2-obe.outbound.protection.outlook.com (104.47.38.53) by
+ SC-EXCH03.marvell.com (10.93.176.83) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2 via Frontend Transport; Thu, 15 Oct 2020 01:29:34 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AN0SeM72shWxHjyF7MKCivPWQhaf78+45EN0yRcrK4fZNCHzGXpP2r/n16jAIFi1uFC+4ySg2YvQhwbUGk+cXCUYvwkYXi9OUrRFv6wW7PSw1FMk/nksW7rUr1xSA03g+ecdPUH6f99o6EWQgSUvGKmg0pOiI80moCLlAqnApW+bUoYFp6YxahKJpyDS9eNYIU0GQjPYPTx7xdDkH2rHWZVEddfJ4HoLUoAuskVdVTp37GpCbh8JXFruSosIo4ntWo7weB6z4ow6PiweTpS2W4FsCuSQLmCfI5cXn1Gzh+LSh3tkc80/PlOsakioO/bBGudcq2K/7vOB8uDzgkRU0w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Zjj4tXKPxeaArO8+zyZgh7yKYuf0f1jxiWTaq0Ib2ns=;
+ b=RjBYIrXGG2RfGK6QphYdqbksRCFBlDTS8Z6zbtfi8RtGUpEh/gYbNrALn/OpbQMj88B5cshs5icsMf+DjtNAb2UvWlK8m0Z5Thd2PsatZO0laAI8Fc8s2BNuJgKz+qQ6KcCtHbKGshuyFv47EAcr5x+wYMrRRJDD7FKBDt1WK/wekvmMh6EA/xMOEEqM1wiXuT5KHIfvVsNAsfAApkawi0SeAaFuq5Fg/WLALFcwTRL0IDB0nA0kPJ7T/c5SoDkfv1XZHvHWJSOcEmh2PNojyGMRqsgG2HKzWSPv3YiA4+90/eoe49ThR8kcFZDKwSJQtqWvEO9GiHHSMcPF9k/Qfw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Zjj4tXKPxeaArO8+zyZgh7yKYuf0f1jxiWTaq0Ib2ns=;
+ b=QF8J/DFUz90p9Pm0QdtjUseOvRnKaghDzys3WfHui+7OE4MxUvR3ZZslnqPlD+OZbVzHDPFJGAog3uPHM+LP3kBdB/VdKQuuyKpBdSbixcIAYZBC1zuCimxrzLYtjSwxvZyJisZm17EW9JK6scliKuBuLYSiIwhWIreCITcQUFc=
+Received: from BYAPR18MB2791.namprd18.prod.outlook.com (2603:10b6:a03:111::21)
+ by BYAPR18MB2661.namprd18.prod.outlook.com (2603:10b6:a03:136::26) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.24; Thu, 15 Oct
+ 2020 08:29:30 +0000
+Received: from BYAPR18MB2791.namprd18.prod.outlook.com
+ ([fe80::68cb:a1a3:e1cf:f9d2]) by BYAPR18MB2791.namprd18.prod.outlook.com
+ ([fe80::68cb:a1a3:e1cf:f9d2%5]) with mapi id 15.20.3455.032; Thu, 15 Oct 2020
+ 08:29:30 +0000
+From:   Srujana Challa <schalla@marvell.com>
+To:     Jakub Kicinski <kuba@kernel.org>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+        Geethasowjanya Akula <gakula@marvell.com>,
+        Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+        Suheil Chandran <schandran@marvell.com>,
+        "Narayana Prasad Raju Athreya" <pathreya@marvell.com>
+Subject: RE: [EXT] Re: [PATCH v7,net-next,07/13] crypto: octeontx2: load
+ microcode and create engine groups
+Thread-Topic: [EXT] Re: [PATCH v7,net-next,07/13] crypto: octeontx2: load
+ microcode and create engine groups
+Thread-Index: AQHWoIa6AHfVkGFIKUGTzj17hQ9DR6mXzPkAgACLdzA=
+Date:   Thu, 15 Oct 2020 08:29:30 +0000
+Message-ID: <BYAPR18MB2791FBC1851E0488FE328FAEA0020@BYAPR18MB2791.namprd18.prod.outlook.com>
+References: <20201012105719.12492-1-schalla@marvell.com>
+        <20201012105719.12492-8-schalla@marvell.com>
+ <20201014170622.6de93e9a@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+In-Reply-To: <20201014170622.6de93e9a@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: kernel.org; dkim=none (message not signed)
+ header.d=none;kernel.org; dmarc=none action=none header.from=marvell.com;
+x-originating-ip: [103.96.19.165]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5c6b5807-52ab-47c1-7fe2-08d870e46fd7
+x-ms-traffictypediagnostic: BYAPR18MB2661:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR18MB266196753B21C5D440239A62A0020@BYAPR18MB2661.namprd18.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: oMgMRr7vGVtgE6fn2RvaP5pXkMH/MyYeLKURW7ORDzZrARuo1A4t1PFRSKdJBUSlyt+tknyHuLVlnpbgUwqfIfktjZHUCOt5dH7DgWP0E1s7ZzL/gvDuUg5SsH106IUsdmVodNPmxyvJIPgGgDRQ79mhSuIjfeHoUHo0i+Xu0Ha/643VCVXZSZOP0c4kEEDn6TLz4moax/MQ6VhC5X+WP2VVr5Zu7FINat3Kl/uHUd99bmuB2KeainqNBJDxlsIdNRKxnwKRgU1HofWdRrd1yP1EQLCj5rqI8OAVB/g1wwZuQKDySbb0Y9EZx0eQTElTmj3doODPprFaKzwJ4f8AfQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR18MB2791.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(346002)(396003)(366004)(136003)(76116006)(66946007)(66476007)(66556008)(64756008)(66446008)(478600001)(83380400001)(52536014)(316002)(9686003)(55016002)(54906003)(2906002)(4326008)(86362001)(6506007)(186003)(26005)(8676002)(8936002)(6916009)(107886003)(5660300002)(7696005)(33656002)(71200400001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: RzD3z1WlFrp+Ec9dRLVjCKgCnStcwqms9c+arQSw5dQXqBriFr9cbmahjCIkJoimYLiMRRl4EiPvTQBKEkAwGLuz05WclyB78HQvnl49NQhzqk+yNSmCvLb4u708i8PbPUQ60nfisGf+KUX44k/DH46i6SloBzNiDea4mGyXKozriSkiLYhXBClkLhGlO1woj6e/xLNQFbvw2yKFNZAcHJf+ky3PC1+8a2d+uwoh8iT/EYrQ//YH8c+dWP3EIsPFP6PP2ikMrHML0vkr7yoqWVIvSWljPfTFz44CckMmAG/myFIk8BC9qtmhu4dfeh5t0jAcsp+D2giA+t6UGFcJ7V/A0xXUSt/z2+8t9sGhLL/4LMNFvQ7EihYOznsB3SwVPfAxIcV5L18tK40Y4NTed0eZikpS+T39iYbCcy2/dWRZJP9RG8TNwrPbr8Jpc660V3sjRtH1YO7L6Te1Si9k49TbxXnta9cS58+HtSI+KdYiy7N8uXs4hPSEdSwX3TddpVp/GbXmPRydlu2Qrc8aKqlU/Px0IxgQt+iSGGDnzuSv5hi+XEiecE0SeqDTe+36uI2KCmV5pWAhrr9dQtgXniCJbdWkUPsjNCwNrBzPc7K2jBCTNdtof/AvY6NNdP+gSotjzOYYXOyUmjYIArMOQQ==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200824131230.GA4813@gondor.apana.org.au>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR18MB2791.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5c6b5807-52ab-47c1-7fe2-08d870e46fd7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Oct 2020 08:29:30.2854
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: X+nS1b33vbNsCEzF42w5IYFrTbjrmLz1F2uyXp+yhkGwc73RoJ1svlFvY3ght6HIdyY28Uo9Fg9PmvhKhyfOxw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR18MB2661
+X-OriginatorOrg: marvell.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-10-15_03:2020-10-14,2020-10-15 signatures=0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Resending to linux-crypto.
- 
----8<---
-This patch reduces the stack usage in sa2ul:
+> Subject: [EXT] Re: [PATCH v7,net-next,07/13] crypto: octeontx2: load micr=
+ocode
+> and create engine groups
+>=20
+> External Email
+>=20
+> ----------------------------------------------------------------------
+> On Mon, 12 Oct 2020 16:27:13 +0530 Srujana Challa wrote:
+> > +/* tar header as defined in POSIX 1003.1-1990. */
+> > +struct tar_hdr_t {
+> > +	char name[100];
+> > +	char mode[8];
+> > +	char uid[8];
+> > +	char gid[8];
+> > +	char size[12];
+> > +	char mtime[12];
+> > +	char chksum[8];
+> > +	char typeflag;
+> > +	char linkname[100];
+> > +	char magic[6];
+> > +	char version[2];
+> > +	char uname[32];
+> > +	char gname[32];
+> > +	char devmajor[8];
+> > +	char devminor[8];
+> > +	char prefix[155];
+> > +};
+> > +
+> > +struct tar_blk_t {
+> > +	union {
+> > +		struct tar_hdr_t hdr;
+> > +		char block[TAR_BLOCK_LEN];
+> > +	};
+> > +};
+>=20
+> In networking we've been pushing back on parsing firmware files
+> in the kernel. Why do you need to parse tar archives?
 
-1. Move the exported sha state into sa_prepare_iopads so that it
-can occupy the same space as the k_pad buffer.
-
-2. Use one buffer for ipad/opad in sa_prepare_iopads.
-
-3. Remove ipad/opad buffer from sa_set_sc_auth.
-
-4. Use async skcipher fallback and remove on-stack request from
-sa_cipher_run.
-
-Reported-by: kernel test robot <lkp@intel.com>
-Fixes: d2c8ac187fc9 ("crypto: sa2ul - Add AEAD algorithm support")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-index 5bc099052bd2..66629cad9531 100644
---- a/drivers/crypto/sa2ul.c
-+++ b/drivers/crypto/sa2ul.c
-@@ -9,8 +9,10 @@
-  *		Tero Kristo
-  */
- #include <linux/clk.h>
-+#include <linux/dma-mapping.h>
- #include <linux/dmaengine.h>
- #include <linux/dmapool.h>
-+#include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/of_device.h>
- #include <linux/platform_device.h>
-@@ -356,42 +358,45 @@ static void sa_swiz_128(u8 *in, u16 len)
- }
- 
- /* Prepare the ipad and opad from key as per SHA algorithm step 1*/
--static void prepare_kiopad(u8 *k_ipad, u8 *k_opad, const u8 *key, u16 key_sz)
-+static void prepare_kipad(u8 *k_ipad, const u8 *key, u16 key_sz)
- {
- 	int i;
- 
--	for (i = 0; i < key_sz; i++) {
-+	for (i = 0; i < key_sz; i++)
- 		k_ipad[i] = key[i] ^ 0x36;
--		k_opad[i] = key[i] ^ 0x5c;
--	}
- 
- 	/* Instead of XOR with 0 */
--	for (; i < SHA1_BLOCK_SIZE; i++) {
-+	for (; i < SHA1_BLOCK_SIZE; i++)
- 		k_ipad[i] = 0x36;
-+}
-+
-+static void prepare_kopad(u8 *k_opad, const u8 *key, u16 key_sz)
-+{
-+	int i;
-+
-+	for (i = 0; i < key_sz; i++)
-+		k_opad[i] = key[i] ^ 0x5c;
-+
-+	/* Instead of XOR with 0 */
-+	for (; i < SHA1_BLOCK_SIZE; i++)
- 		k_opad[i] = 0x5c;
--	}
- }
- 
--static void sa_export_shash(struct shash_desc *hash, int block_size,
-+static void sa_export_shash(void *state, struct shash_desc *hash,
- 			    int digest_size, __be32 *out)
- {
--	union {
--		struct sha1_state sha1;
--		struct sha256_state sha256;
--		struct sha512_state sha512;
--	} sha;
--	void *state;
-+	struct sha1_state *sha1;
-+	struct sha256_state *sha256;
- 	u32 *result;
--	int i;
- 
- 	switch (digest_size) {
- 	case SHA1_DIGEST_SIZE:
--		state = &sha.sha1;
--		result = sha.sha1.state;
-+		sha1 = state;
-+		result = sha1->state;
- 		break;
- 	case SHA256_DIGEST_SIZE:
--		state = &sha.sha256;
--		result = sha.sha256.state;
-+		sha256 = state;
-+		result = sha256->state;
- 		break;
- 	default:
- 		dev_err(sa_k3_dev, "%s: bad digest_size=%d\n", __func__,
-@@ -401,8 +406,7 @@ static void sa_export_shash(struct shash_desc *hash, int block_size,
- 
- 	crypto_shash_export(hash, state);
- 
--	for (i = 0; i < digest_size >> 2; i++)
--		out[i] = cpu_to_be32(result[i]);
-+	cpu_to_be32_array(out, result, digest_size / 4);
- }
- 
- static void sa_prepare_iopads(struct algo_data *data, const u8 *key,
-@@ -411,24 +415,28 @@ static void sa_prepare_iopads(struct algo_data *data, const u8 *key,
- 	SHASH_DESC_ON_STACK(shash, data->ctx->shash);
- 	int block_size = crypto_shash_blocksize(data->ctx->shash);
- 	int digest_size = crypto_shash_digestsize(data->ctx->shash);
--	u8 k_ipad[SHA1_BLOCK_SIZE];
--	u8 k_opad[SHA1_BLOCK_SIZE];
-+	union {
-+		struct sha1_state sha1;
-+		struct sha256_state sha256;
-+		u8 k_pad[SHA1_BLOCK_SIZE];
-+	} sha;
- 
- 	shash->tfm = data->ctx->shash;
- 
--	prepare_kiopad(k_ipad, k_opad, key, key_sz);
--
--	memzero_explicit(ipad, block_size);
--	memzero_explicit(opad, block_size);
-+	prepare_kipad(sha.k_pad, key, key_sz);
- 
- 	crypto_shash_init(shash);
--	crypto_shash_update(shash, k_ipad, block_size);
--	sa_export_shash(shash, block_size, digest_size, ipad);
-+	crypto_shash_update(shash, sha.k_pad, block_size);
-+	sa_export_shash(&sha, shash, digest_size, ipad);
-+
-+	prepare_kopad(sha.k_pad, key, key_sz);
- 
- 	crypto_shash_init(shash);
--	crypto_shash_update(shash, k_opad, block_size);
-+	crypto_shash_update(shash, sha.k_pad, block_size);
- 
--	sa_export_shash(shash, block_size, digest_size, opad);
-+	sa_export_shash(&sha, shash, digest_size, opad);
-+
-+	memzero_explicit(&sha, sizeof(sha));
- }
- 
- /* Derive the inverse key used in AES-CBC decryption operation */
-@@ -501,7 +509,8 @@ static int sa_set_sc_enc(struct algo_data *ad, const u8 *key, u16 key_sz,
- static void sa_set_sc_auth(struct algo_data *ad, const u8 *key, u16 key_sz,
- 			   u8 *sc_buf)
- {
--	__be32 ipad[64], opad[64];
-+	__be32 *ipad = (void *)(sc_buf + 32);
-+	__be32 *opad = (void *)(sc_buf + 64);
- 
- 	/* Set Authentication mode selector to hash processing */
- 	sc_buf[0] = SA_HASH_PROCESSING;
-@@ -510,14 +519,9 @@ static void sa_set_sc_auth(struct algo_data *ad, const u8 *key, u16 key_sz,
- 	sc_buf[1] |= ad->auth_ctrl;
- 
- 	/* Copy the keys or ipad/opad */
--	if (ad->keyed_mac) {
-+	if (ad->keyed_mac)
- 		ad->prep_iopad(ad, key, key_sz, ipad, opad);
--
--		/* Copy ipad to AuthKey */
--		memcpy(&sc_buf[32], ipad, ad->hash_size);
--		/* Copy opad to Aux-1 */
--		memcpy(&sc_buf[64], opad, ad->hash_size);
--	} else {
-+	else {
- 		/* basic hash */
- 		sc_buf[1] |= SA_BASIC_HASH;
- 	}
-@@ -814,7 +818,7 @@ static void sa_cipher_cra_exit(struct crypto_skcipher *tfm)
- 	sa_free_ctx_info(&ctx->enc, data);
- 	sa_free_ctx_info(&ctx->dec, data);
- 
--	crypto_free_sync_skcipher(ctx->fallback.skcipher);
-+	crypto_free_skcipher(ctx->fallback.skcipher);
- }
- 
- static int sa_cipher_cra_init(struct crypto_skcipher *tfm)
-@@ -822,6 +826,7 @@ static int sa_cipher_cra_init(struct crypto_skcipher *tfm)
- 	struct sa_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	struct sa_crypto_data *data = dev_get_drvdata(sa_k3_dev);
- 	const char *name = crypto_tfm_alg_name(&tfm->base);
-+	struct crypto_skcipher *child;
- 	int ret;
- 
- 	memzero_explicit(ctx, sizeof(*ctx));
-@@ -836,14 +841,17 @@ static int sa_cipher_cra_init(struct crypto_skcipher *tfm)
- 		return ret;
- 	}
- 
--	ctx->fallback.skcipher =
--		crypto_alloc_sync_skcipher(name, 0, CRYPTO_ALG_NEED_FALLBACK);
-+	child = crypto_alloc_skcipher(name, 0, CRYPTO_ALG_NEED_FALLBACK);
- 
--	if (IS_ERR(ctx->fallback.skcipher)) {
-+	if (IS_ERR(child)) {
- 		dev_err(sa_k3_dev, "Error allocating fallback algo %s\n", name);
--		return PTR_ERR(ctx->fallback.skcipher);
-+		return PTR_ERR(child);
- 	}
- 
-+	ctx->fallback.skcipher = child;
-+	crypto_skcipher_set_reqsize(tfm, crypto_skcipher_reqsize(child) +
-+					 sizeof(struct skcipher_request));
-+
- 	dev_dbg(sa_k3_dev, "%s(0x%p) sc-ids(0x%x(0x%pad), 0x%x(0x%pad))\n",
- 		__func__, tfm, ctx->enc.sc_id, &ctx->enc.sc_phys,
- 		ctx->dec.sc_id, &ctx->dec.sc_phys);
-@@ -854,6 +862,7 @@ static int sa_cipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 			    unsigned int keylen, struct algo_data *ad)
- {
- 	struct sa_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct crypto_skcipher *child = ctx->fallback.skcipher;
- 	int cmdl_len;
- 	struct sa_cmdl_cfg cfg;
- 	int ret;
-@@ -869,12 +878,10 @@ static int sa_cipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 	cfg.enc_eng_id = ad->enc_eng.eng_id;
- 	cfg.iv_size = crypto_skcipher_ivsize(tfm);
- 
--	crypto_sync_skcipher_clear_flags(ctx->fallback.skcipher,
-+	crypto_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-+	crypto_skcipher_set_flags(child, tfm->base.crt_flags &
- 					 CRYPTO_TFM_REQ_MASK);
--	crypto_sync_skcipher_set_flags(ctx->fallback.skcipher,
--				       tfm->base.crt_flags &
--				       CRYPTO_TFM_REQ_MASK);
--	ret = crypto_sync_skcipher_setkey(ctx->fallback.skcipher, key, keylen);
-+	ret = crypto_skcipher_setkey(child, key, keylen);
- 	if (ret)
- 		return ret;
- 
-@@ -1234,7 +1241,6 @@ static int sa_cipher_run(struct skcipher_request *req, u8 *iv, int enc)
- 	    crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
- 	struct crypto_alg *alg = req->base.tfm->__crt_alg;
- 	struct sa_req sa_req = { 0 };
--	int ret;
- 
- 	if (!req->cryptlen)
- 		return 0;
-@@ -1246,20 +1252,18 @@ static int sa_cipher_run(struct skcipher_request *req, u8 *iv, int enc)
- 	if (req->cryptlen > SA_MAX_DATA_SZ ||
- 	    (req->cryptlen >= SA_UNSAFE_DATA_SZ_MIN &&
- 	     req->cryptlen <= SA_UNSAFE_DATA_SZ_MAX)) {
--		SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback.skcipher);
-+		struct skcipher_request *subreq = skcipher_request_ctx(req);
- 
--		skcipher_request_set_sync_tfm(subreq, ctx->fallback.skcipher);
-+		skcipher_request_set_tfm(subreq, ctx->fallback.skcipher);
- 		skcipher_request_set_callback(subreq, req->base.flags,
--					      NULL, NULL);
-+					      req->base.complete,
-+					      req->base.data);
- 		skcipher_request_set_crypt(subreq, req->src, req->dst,
- 					   req->cryptlen, req->iv);
- 		if (enc)
--			ret = crypto_skcipher_encrypt(subreq);
-+			return crypto_skcipher_encrypt(subreq);
- 		else
--			ret = crypto_skcipher_decrypt(subreq);
--
--		skcipher_request_zero(subreq);
--		return ret;
-+			return crypto_skcipher_decrypt(subreq);
- 	}
- 
- 	sa_req.size = req->cryptlen;
-diff --git a/drivers/crypto/sa2ul.h b/drivers/crypto/sa2ul.h
-index 7f7e3fe60d11..bb40df3876e5 100644
---- a/drivers/crypto/sa2ul.h
-+++ b/drivers/crypto/sa2ul.h
-@@ -12,10 +12,8 @@
- #ifndef _K3_SA2UL_
- #define _K3_SA2UL_
- 
--#include <linux/interrupt.h>
--#include <linux/skbuff.h>
--#include <linux/hw_random.h>
- #include <crypto/aes.h>
-+#include <crypto/sha.h>
- 
- #define SA_ENGINE_ENABLE_CONTROL	0x1000
- 
-@@ -311,7 +309,7 @@ struct sa_tfm_ctx {
- 	struct crypto_shash	*shash;
- 	/* for fallback */
- 	union {
--		struct crypto_sync_skcipher	*skcipher;
-+		struct crypto_skcipher		*skcipher;
- 		struct crypto_ahash		*ahash;
- 		struct crypto_aead		*aead;
- 	} fallback;
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+We have 3 variants of crypto engines and each uses a different firmware fil=
+e. So instead of 3 independent files in /lib/firmware, we have a consolidat=
+ed tar file. The tar file is a container.
+Minimal parsing of firmware file is required to ensure parity between engin=
+e, firmware and driver. For example we verify version compatibility.
