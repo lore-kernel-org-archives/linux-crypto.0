@@ -2,176 +2,167 @@ Return-Path: <SRS0=zNo2=DW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB37C433E7
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Oct 2020 08:30:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 916C0C43457
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Oct 2020 09:24:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 734082224E
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Oct 2020 08:30:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="aPkgSELC";
-	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="QF8J/DFU"
+	by mail.kernel.org (Postfix) with ESMTP id 38FDC22243
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Oct 2020 09:24:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728900AbgJOIaS (ORCPT
+        id S1726583AbgJOJYn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Oct 2020 04:30:18 -0400
-Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:14902 "EHLO
-        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726996AbgJOIaS (ORCPT
+        Thu, 15 Oct 2020 05:24:43 -0400
+Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:49307 "EHLO
+        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726426AbgJOJYn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Oct 2020 04:30:18 -0400
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-        by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09F8PXNF006538;
-        Thu, 15 Oct 2020 01:30:06 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pfpt0220;
- bh=Zjj4tXKPxeaArO8+zyZgh7yKYuf0f1jxiWTaq0Ib2ns=;
- b=aPkgSELC9GxhQBHSnSS7Y0ajl8MpixWRybduVNheiRAINZxcMkps5FJQpHrbmw7Uhrh9
- 1cb0HWqSyk5pZykySrinv6DTnQG5RndRyrkOesNNPUvRrE17odbIjwv1gzE27DqZlZkv
- 867IGbiH5VskyDIA8JkffN3iPKTvHeKcrlUeTwHBNF79LNoVtJf48qb10ZdW0Q59G+sj
- NL3xp7l0FH8zab0eL8y78BDjHqdMJXABEb+sA2bpUfGw0TUA4Le1/XOjKkhl0afuJbip
- JvUv2wvF0POaezWblC5kxnMilxhbwm5Dm0jmeTUnqfsC3hr3QXB9XZhKt8wb5KipDA2N tQ== 
-Received: from sc-exch02.marvell.com ([199.233.58.182])
-        by mx0a-0016f401.pphosted.com with ESMTP id 343aantx59-9
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Thu, 15 Oct 2020 01:30:06 -0700
-Received: from SC-EXCH04.marvell.com (10.93.176.84) by SC-EXCH02.marvell.com
- (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 15 Oct
- 2020 01:29:34 -0700
-Received: from SC-EXCH03.marvell.com (10.93.176.83) by SC-EXCH04.marvell.com
- (10.93.176.84) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 15 Oct
- 2020 01:29:34 -0700
-Received: from NAM02-BL2-obe.outbound.protection.outlook.com (104.47.38.53) by
- SC-EXCH03.marvell.com (10.93.176.83) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2 via Frontend Transport; Thu, 15 Oct 2020 01:29:34 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AN0SeM72shWxHjyF7MKCivPWQhaf78+45EN0yRcrK4fZNCHzGXpP2r/n16jAIFi1uFC+4ySg2YvQhwbUGk+cXCUYvwkYXi9OUrRFv6wW7PSw1FMk/nksW7rUr1xSA03g+ecdPUH6f99o6EWQgSUvGKmg0pOiI80moCLlAqnApW+bUoYFp6YxahKJpyDS9eNYIU0GQjPYPTx7xdDkH2rHWZVEddfJ4HoLUoAuskVdVTp37GpCbh8JXFruSosIo4ntWo7weB6z4ow6PiweTpS2W4FsCuSQLmCfI5cXn1Gzh+LSh3tkc80/PlOsakioO/bBGudcq2K/7vOB8uDzgkRU0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Zjj4tXKPxeaArO8+zyZgh7yKYuf0f1jxiWTaq0Ib2ns=;
- b=RjBYIrXGG2RfGK6QphYdqbksRCFBlDTS8Z6zbtfi8RtGUpEh/gYbNrALn/OpbQMj88B5cshs5icsMf+DjtNAb2UvWlK8m0Z5Thd2PsatZO0laAI8Fc8s2BNuJgKz+qQ6KcCtHbKGshuyFv47EAcr5x+wYMrRRJDD7FKBDt1WK/wekvmMh6EA/xMOEEqM1wiXuT5KHIfvVsNAsfAApkawi0SeAaFuq5Fg/WLALFcwTRL0IDB0nA0kPJ7T/c5SoDkfv1XZHvHWJSOcEmh2PNojyGMRqsgG2HKzWSPv3YiA4+90/eoe49ThR8kcFZDKwSJQtqWvEO9GiHHSMcPF9k/Qfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Zjj4tXKPxeaArO8+zyZgh7yKYuf0f1jxiWTaq0Ib2ns=;
- b=QF8J/DFUz90p9Pm0QdtjUseOvRnKaghDzys3WfHui+7OE4MxUvR3ZZslnqPlD+OZbVzHDPFJGAog3uPHM+LP3kBdB/VdKQuuyKpBdSbixcIAYZBC1zuCimxrzLYtjSwxvZyJisZm17EW9JK6scliKuBuLYSiIwhWIreCITcQUFc=
-Received: from BYAPR18MB2791.namprd18.prod.outlook.com (2603:10b6:a03:111::21)
- by BYAPR18MB2661.namprd18.prod.outlook.com (2603:10b6:a03:136::26) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.24; Thu, 15 Oct
- 2020 08:29:30 +0000
-Received: from BYAPR18MB2791.namprd18.prod.outlook.com
- ([fe80::68cb:a1a3:e1cf:f9d2]) by BYAPR18MB2791.namprd18.prod.outlook.com
- ([fe80::68cb:a1a3:e1cf:f9d2%5]) with mapi id 15.20.3455.032; Thu, 15 Oct 2020
- 08:29:30 +0000
-From:   Srujana Challa <schalla@marvell.com>
-To:     Jakub Kicinski <kuba@kernel.org>
-CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-        Geethasowjanya Akula <gakula@marvell.com>,
-        Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-        Suheil Chandran <schandran@marvell.com>,
-        "Narayana Prasad Raju Athreya" <pathreya@marvell.com>
-Subject: RE: [EXT] Re: [PATCH v7,net-next,07/13] crypto: octeontx2: load
- microcode and create engine groups
-Thread-Topic: [EXT] Re: [PATCH v7,net-next,07/13] crypto: octeontx2: load
- microcode and create engine groups
-Thread-Index: AQHWoIa6AHfVkGFIKUGTzj17hQ9DR6mXzPkAgACLdzA=
-Date:   Thu, 15 Oct 2020 08:29:30 +0000
-Message-ID: <BYAPR18MB2791FBC1851E0488FE328FAEA0020@BYAPR18MB2791.namprd18.prod.outlook.com>
-References: <20201012105719.12492-1-schalla@marvell.com>
-        <20201012105719.12492-8-schalla@marvell.com>
- <20201014170622.6de93e9a@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-In-Reply-To: <20201014170622.6de93e9a@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=none action=none header.from=marvell.com;
-x-originating-ip: [103.96.19.165]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5c6b5807-52ab-47c1-7fe2-08d870e46fd7
-x-ms-traffictypediagnostic: BYAPR18MB2661:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR18MB266196753B21C5D440239A62A0020@BYAPR18MB2661.namprd18.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: oMgMRr7vGVtgE6fn2RvaP5pXkMH/MyYeLKURW7ORDzZrARuo1A4t1PFRSKdJBUSlyt+tknyHuLVlnpbgUwqfIfktjZHUCOt5dH7DgWP0E1s7ZzL/gvDuUg5SsH106IUsdmVodNPmxyvJIPgGgDRQ79mhSuIjfeHoUHo0i+Xu0Ha/643VCVXZSZOP0c4kEEDn6TLz4moax/MQ6VhC5X+WP2VVr5Zu7FINat3Kl/uHUd99bmuB2KeainqNBJDxlsIdNRKxnwKRgU1HofWdRrd1yP1EQLCj5rqI8OAVB/g1wwZuQKDySbb0Y9EZx0eQTElTmj3doODPprFaKzwJ4f8AfQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR18MB2791.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(346002)(396003)(366004)(136003)(76116006)(66946007)(66476007)(66556008)(64756008)(66446008)(478600001)(83380400001)(52536014)(316002)(9686003)(55016002)(54906003)(2906002)(4326008)(86362001)(6506007)(186003)(26005)(8676002)(8936002)(6916009)(107886003)(5660300002)(7696005)(33656002)(71200400001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: RzD3z1WlFrp+Ec9dRLVjCKgCnStcwqms9c+arQSw5dQXqBriFr9cbmahjCIkJoimYLiMRRl4EiPvTQBKEkAwGLuz05WclyB78HQvnl49NQhzqk+yNSmCvLb4u708i8PbPUQ60nfisGf+KUX44k/DH46i6SloBzNiDea4mGyXKozriSkiLYhXBClkLhGlO1woj6e/xLNQFbvw2yKFNZAcHJf+ky3PC1+8a2d+uwoh8iT/EYrQ//YH8c+dWP3EIsPFP6PP2ikMrHML0vkr7yoqWVIvSWljPfTFz44CckMmAG/myFIk8BC9qtmhu4dfeh5t0jAcsp+D2giA+t6UGFcJ7V/A0xXUSt/z2+8t9sGhLL/4LMNFvQ7EihYOznsB3SwVPfAxIcV5L18tK40Y4NTed0eZikpS+T39iYbCcy2/dWRZJP9RG8TNwrPbr8Jpc660V3sjRtH1YO7L6Te1Si9k49TbxXnta9cS58+HtSI+KdYiy7N8uXs4hPSEdSwX3TddpVp/GbXmPRydlu2Qrc8aKqlU/Px0IxgQt+iSGGDnzuSv5hi+XEiecE0SeqDTe+36uI2KCmV5pWAhrr9dQtgXniCJbdWkUPsjNCwNrBzPc7K2jBCTNdtof/AvY6NNdP+gSotjzOYYXOyUmjYIArMOQQ==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 15 Oct 2020 05:24:43 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0UC5QX1p_1602753881;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UC5QX1p_1602753881)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 15 Oct 2020 17:24:41 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH] crypto: sm2 - remove unnecessary reset operations
+Date:   Thu, 15 Oct 2020 17:24:41 +0800
+Message-Id: <20201015092441.12939-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.19.1.3.ge56e4f7
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR18MB2791.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5c6b5807-52ab-47c1-7fe2-08d870e46fd7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Oct 2020 08:29:30.2854
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: X+nS1b33vbNsCEzF42w5IYFrTbjrmLz1F2uyXp+yhkGwc73RoJ1svlFvY3ght6HIdyY28Uo9Fg9PmvhKhyfOxw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR18MB2661
-X-OriginatorOrg: marvell.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-10-15_03:2020-10-14,2020-10-15 signatures=0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> Subject: [EXT] Re: [PATCH v7,net-next,07/13] crypto: octeontx2: load micr=
-ocode
-> and create engine groups
->=20
-> External Email
->=20
-> ----------------------------------------------------------------------
-> On Mon, 12 Oct 2020 16:27:13 +0530 Srujana Challa wrote:
-> > +/* tar header as defined in POSIX 1003.1-1990. */
-> > +struct tar_hdr_t {
-> > +	char name[100];
-> > +	char mode[8];
-> > +	char uid[8];
-> > +	char gid[8];
-> > +	char size[12];
-> > +	char mtime[12];
-> > +	char chksum[8];
-> > +	char typeflag;
-> > +	char linkname[100];
-> > +	char magic[6];
-> > +	char version[2];
-> > +	char uname[32];
-> > +	char gname[32];
-> > +	char devmajor[8];
-> > +	char devminor[8];
-> > +	char prefix[155];
-> > +};
-> > +
-> > +struct tar_blk_t {
-> > +	union {
-> > +		struct tar_hdr_t hdr;
-> > +		char block[TAR_BLOCK_LEN];
-> > +	};
-> > +};
->=20
-> In networking we've been pushing back on parsing firmware files
-> in the kernel. Why do you need to parse tar archives?
+This is an algorithm optimization. The reset operation when
+setting the public key is repeated and redundant, so remove it.
+At the same time, `sm2_ecc_os2ec()` is optimized to make the
+function more simpler and more in line with the Linux code style.
 
-We have 3 variants of crypto engines and each uses a different firmware fil=
-e. So instead of 3 independent files in /lib/firmware, we have a consolidat=
-ed tar file. The tar file is a container.
-Minimal parsing of firmware file is required to ensure parity between engin=
-e, firmware and driver. For example we verify version compatibility.
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+---
+ crypto/sm2.c | 75 ++++++++++++++++++++--------------------------------
+ 1 file changed, 29 insertions(+), 46 deletions(-)
+
+diff --git a/crypto/sm2.c b/crypto/sm2.c
+index 767e160333f6..b21addc3ac06 100644
+--- a/crypto/sm2.c
++++ b/crypto/sm2.c
+@@ -119,12 +119,6 @@ static void sm2_ec_ctx_deinit(struct mpi_ec_ctx *ec)
+ 	memset(ec, 0, sizeof(*ec));
+ }
+ 
+-static int sm2_ec_ctx_reset(struct mpi_ec_ctx *ec)
+-{
+-	sm2_ec_ctx_deinit(ec);
+-	return sm2_ec_ctx_init(ec);
+-}
+-
+ /* RESULT must have been initialized and is set on success to the
+  * point given by VALUE.
+  */
+@@ -132,55 +126,48 @@ static int sm2_ecc_os2ec(MPI_POINT result, MPI value)
+ {
+ 	int rc;
+ 	size_t n;
+-	const unsigned char *buf;
+-	unsigned char *buf_memory;
++	unsigned char *buf;
+ 	MPI x, y;
+ 
+-	n = (mpi_get_nbits(value)+7)/8;
+-	buf_memory = kmalloc(n, GFP_KERNEL);
+-	rc = mpi_print(GCRYMPI_FMT_USG, buf_memory, n, &n, value);
+-	if (rc) {
+-		kfree(buf_memory);
+-		return rc;
+-	}
+-	buf = buf_memory;
++	n = MPI_NBYTES(value);
++	buf = kmalloc(n, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
+ 
+-	if (n < 1) {
+-		kfree(buf_memory);
+-		return -EINVAL;
+-	}
+-	if (*buf != 4) {
+-		kfree(buf_memory);
+-		return -EINVAL; /* No support for point compression.  */
+-	}
+-	if (((n-1)%2)) {
+-		kfree(buf_memory);
+-		return -EINVAL;
+-	}
+-	n = (n-1)/2;
++	rc = mpi_print(GCRYMPI_FMT_USG, buf, n, &n, value);
++	if (rc)
++		goto err_freebuf;
++
++	rc = -EINVAL;
++	if (n < 1 || ((n - 1) % 2))
++		goto err_freebuf;
++	/* No support for point compression */
++	if (*buf != 0x4)
++		goto err_freebuf;
++
++	rc = -ENOMEM;
++	n = (n - 1) / 2;
+ 	x = mpi_read_raw_data(buf + 1, n);
+-	if (!x) {
+-		kfree(buf_memory);
+-		return -ENOMEM;
+-	}
++	if (!x)
++		goto err_freebuf;
+ 	y = mpi_read_raw_data(buf + 1 + n, n);
+-	kfree(buf_memory);
+-	if (!y) {
+-		mpi_free(x);
+-		return -ENOMEM;
+-	}
++	if (!y)
++		goto err_freex;
+ 
+ 	mpi_normalize(x);
+ 	mpi_normalize(y);
+-
+ 	mpi_set(result->x, x);
+ 	mpi_set(result->y, y);
+ 	mpi_set_ui(result->z, 1);
+ 
+-	mpi_free(x);
+-	mpi_free(y);
++	rc = 0;
+ 
+-	return 0;
++	mpi_free(y);
++err_freex:
++	mpi_free(x);
++err_freebuf:
++	kfree(buf);
++	return rc;
+ }
+ 
+ struct sm2_signature_ctx {
+@@ -399,10 +386,6 @@ static int sm2_set_pub_key(struct crypto_akcipher *tfm,
+ 	MPI a;
+ 	int rc;
+ 
+-	rc = sm2_ec_ctx_reset(ec);
+-	if (rc)
+-		return rc;
+-
+ 	ec->Q = mpi_point_new(0);
+ 	if (!ec->Q)
+ 		return -ENOMEM;
+-- 
+2.19.1.3.ge56e4f7
+
