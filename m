@@ -2,99 +2,97 @@ Return-Path: <SRS0=63hd=DX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17DC7C43457
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Oct 2020 17:26:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 853FCC43457
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Oct 2020 17:28:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE7CD20874
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Oct 2020 17:26:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DD2021D40
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Oct 2020 17:28:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391429AbgJPR00 (ORCPT
+        id S2390877AbgJPR2b (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Oct 2020 13:26:26 -0400
-Received: from verein.lst.de ([213.95.11.211]:36538 "EHLO verein.lst.de"
+        Fri, 16 Oct 2020 13:28:31 -0400
+Received: from mga02.intel.com ([134.134.136.20]:5396 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391280AbgJPR00 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Oct 2020 13:26:26 -0400
-Received: by verein.lst.de (Postfix, from userid 2005)
-        id 68CC068BEB; Fri, 16 Oct 2020 19:26:19 +0200 (CEST)
-Date:   Fri, 16 Oct 2020 19:26:19 +0200
-From:   Torsten Duwe <duwe@lst.de>
-To:     Stephan Mueller <smueller@chronox.de>
-Cc:     Willy Tarreau <w@1wt.eu>, "Theodore Y. Ts'o" <tytso@mit.edu>,
-        linux-crypto@vger.kernel.org, Nicolai Stange <nstange@suse.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Peter Matthias <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Neil Horman <nhorman@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Andy Lavr <andy.lavr@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Petr Tesarik <ptesarik@suse.cz>
-Subject: Re: [DISCUSSION PATCH 00/41] random: possible ways towards NIST
- SP800-90B compliance
-Message-ID: <20201016172619.GA18410@lst.de>
-References: <20200921075857.4424-1-nstange@suse.de> <20201002123836.GA14807@lst.de> <20201002131555.GD3783@1wt.eu> <2961243.vtBmWVcJkq@tauon.chronox.de>
+        id S1732302AbgJPR2b (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Oct 2020 13:28:31 -0400
+IronPort-SDR: F1ZdE3lPQMzh+tzhA4Z+BBc96NAucCQGhN//mk22lduK/Q9qQcwhlou/GqBf9dSkVX8HlRvqQx
+ qdLF07VtVebQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9776"; a="153570022"
+X-IronPort-AV: E=Sophos;i="5.77,383,1596524400"; 
+   d="scan'208";a="153570022"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2020 10:28:23 -0700
+IronPort-SDR: qWDqfqZU10c7b/gbksS0K0nf5uubNWZ5cv12KWD7Ys5lkkWtd0VPCvAX+oakzXqLJbEGACOHDA
+ q3yBhJFyt4dQ==
+X-IronPort-AV: E=Sophos;i="5.77,383,1596524400"; 
+   d="scan'208";a="464750835"
+Received: from apurdea-mobl1.ger.corp.intel.com (HELO dalessan-mobl1.ir.intel.com) ([10.251.84.178])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2020 10:28:20 -0700
+From:   Daniele Alessandrelli <daniele.alessandrelli@linux.intel.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Gross <mgross@linux.intel.com>,
+        Declan Murphy <declan.murphy@intel.com>,
+        Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+Subject: [PATCH 0/3] crypto: Add Keem Bay OCS HCU driver
+Date:   Fri, 16 Oct 2020 18:27:56 +0100
+Message-Id: <20201016172759.1260407-1-daniele.alessandrelli@linux.intel.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2961243.vtBmWVcJkq@tauon.chronox.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 02, 2020 at 03:56:28PM +0200, Stephan Mueller wrote:
-> Am Freitag, 2. Oktober 2020, 15:15:55 CEST schrieb Willy Tarreau:
-> 
-> Hi Willy,
-> 
-> > > And this is all ???
-> > 
-> > Possibly a lot of people got used to seeing the numerous versions
-> > and are less attentive to new series, it's possible that your message
-> > will wake everyone up.
-> 
-> I think that points to my patch series. My patch series which provide a 
-> complete separate, API and ABI compliant drop in replacement of /dev/random, 
-> nobody from the gatekeepers cared to even answer. It would not touch the 
-> existing code.
-> 
-> After waiting some time without changing the code (e.g. after Andi Lutomirski 
-> commented), I got no answer at all from the gatekeepers, not even any 
-> indication in what direction I should move if something was not desired in the 
-> patch series.
-> 
-> Thus I continued adding the features that I think are necessary and for which 
-> I received comments from mathematicians. What else should I do?
-> 
-> With the patch set v35 of my patch series, I see all my goals finally 
-> achieved at I expect the code to be stable from here on. The last one was the 
-> hardest: to get rid of all non-cryptographic conditioning operations and yet 
-> retain performance en par or even superior to the existing /dev/random 
-> implementation.
+The Intel Keem Bay SoC has an Offload Crypto Subsystem (OCS) featuring a
+Hashing Control Unit (HCU) for accelerating hashing operations.
 
-Would you mind to resend it here, for a comparison?
+This driver adds support for such hardware thus enabling hardware-accelerated
+hashing on the Keem Bay SoC for the following algorithms:
+- sha224 and hmac(sha224)
+- sha256 and hmac(sha256)
+- sha384 and hmac(sha384)
+- sha512 and hmac(sha512)
+- sm3    and hmac(sm3)
 
-	Torsten
+The driver is passing crypto manager self-tests, including the extra tests
+(CRYPTO_MANAGER_EXTRA_TESTS=y).
+
+
+Daniele Alessandrelli (1):
+  MAINTAINERS: Add maintainers for Keem Bay OCS HCU driver
+
+Declan Murphy (2):
+  dt-bindings: crypto: Add Keem Bay OCS HCU bindings
+  crypto: keembay: Add Keem Bay OCS HCU driver
+
+ .../crypto/intel,keembay-ocs-hcu.yaml         |   52 +
+ MAINTAINERS                                   |   11 +
+ drivers/crypto/Kconfig                        |    2 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/keembay/Kconfig                |   23 +
+ drivers/crypto/keembay/Makefile               |    5 +
+ drivers/crypto/keembay/keembay-ocs-hcu-core.c | 1473 +++++++++++++++++
+ drivers/crypto/keembay/ocs-hcu.c              |  590 +++++++
+ drivers/crypto/keembay/ocs-hcu.h              |  113 ++
+ 9 files changed, 2270 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/intel,keembay-ocs-hcu.yaml
+ create mode 100644 drivers/crypto/keembay/Kconfig
+ create mode 100644 drivers/crypto/keembay/Makefile
+ create mode 100644 drivers/crypto/keembay/keembay-ocs-hcu-core.c
+ create mode 100644 drivers/crypto/keembay/ocs-hcu.c
+ create mode 100644 drivers/crypto/keembay/ocs-hcu.h
+
+
+base-commit: 3093e7c16e12d729c325adb3c53dde7308cefbd8
+-- 
+2.26.2
 
