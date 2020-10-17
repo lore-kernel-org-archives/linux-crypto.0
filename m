@@ -1,71 +1,151 @@
 Return-Path: <SRS0=kY7N=DY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.9 required=3.0 tests=BAYES_00,BITCOIN_SPAM_04,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,PDS_BTC_ID,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68912C433E7
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Oct 2020 13:12:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00F20C43457
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Oct 2020 14:42:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EDA1B20658
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Oct 2020 13:12:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB0AE20758
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Oct 2020 14:42:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="IFh0eLdt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NoJwgQLb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438009AbgJQNMz (ORCPT
+        id S2438360AbgJQOmJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 17 Oct 2020 09:12:55 -0400
-Received: from mail-41103.protonmail.ch ([185.70.41.103]:59129 "EHLO
-        mail-41103.protonmail.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2437998AbgJQNMz (ORCPT
+        Sat, 17 Oct 2020 10:42:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52192 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2438385AbgJQOmI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Oct 2020 09:12:55 -0400
-Received: from mail-02.mail-europe.com (mail-02.mail-europe.com [51.89.119.103])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        by mail-41103.protonmail.ch (Postfix) with ESMTPS id 686AC200A0DB
-        for <linux-crypto@vger.kernel.org>; Sat, 17 Oct 2020 13:12:53 +0000 (UTC)
-Authentication-Results: mail-41103.protonmail.ch;
-        dkim=pass (1024-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="IFh0eLdt"
-Date:   Sat, 17 Oct 2020 13:12:39 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail; t=1602940369;
-        bh=Fsu0KIQhAmBwCSNdcOfR5NUAkTMf/tt4bnQkLN5yLFs=;
-        h=Date:To:From:Cc:Reply-To:Subject:From;
-        b=IFh0eLdt6BxcGrNi9dT+XA2FPBoyQU6n1P+Miq8yfHR+7/j0WA4bLoyjqECnLqsZN
-         ErHY4JVhA2/XPt9qOPxai1r3dk0pXdc15vObUdUk6hh7fvGG9LCDWv0VdSFXx7zPNh
-         BbH3OuVelWRfSg3OVt5c7Djp3L5MJxk8gzMVEXSU=
-To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-From:   Jari Ruusu <jariruusu@protonmail.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Reply-To: Jari Ruusu <jariruusu@protonmail.com>
-Subject: Announce loop-AES-v3.7s file/swap crypto package
-Message-ID: <X9JUzx7zpthmi7qXRTK61kZC7JD-N7uWB1VJHrKAe5wfd4FpxYmBhTTfhlc05854jkpD2_4xwuJevhGB02KzYTi9T0KDxso7DftfvN04uc0=@protonmail.com>
+        Sat, 17 Oct 2020 10:42:08 -0400
+Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10B76C0613CE
+        for <linux-crypto@vger.kernel.org>; Sat, 17 Oct 2020 07:42:08 -0700 (PDT)
+Received: by mail-qk1-x743.google.com with SMTP id s14so4297547qkg.11
+        for <linux-crypto@vger.kernel.org>; Sat, 17 Oct 2020 07:42:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9CncpsOILmLKwmuLD+64MGtHxizM1mPz6idw5KYbDws=;
+        b=NoJwgQLbKZ7Hu0/tmLxhrQqwAEPpHHzII4ro9saGyVBh2KkMbPMebjoK6qIwZeVAiw
+         Uqg1vJkUIACrR/ptH8JoOFqJBCqRSO3U4kzWdIXQncjOecN8OqPgYTg2/AP01ZRSLg+u
+         1/hV5kSvRpHMkM+hgyzBWKB5HZoqjM0CwQARcaN0iZDM5FTw5oW+rJo7Jq6Jp4hbud21
+         9uOZiVO5aXXWdpnPVNLmoaFzjoZ8/Z5r+XQONDB9y72QsECDJ4lp59UC+/LnjcdzVuez
+         lwzpIZ80h9uLuwErVHGAk6Vnu4dt42UhqdCGXlDZVoM5xCQXtGliOd34H1NvtJ02fHXs
+         pDOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9CncpsOILmLKwmuLD+64MGtHxizM1mPz6idw5KYbDws=;
+        b=gSHOuaK9KFqvetcJUITx6mV9/ddrcezYlomhZM/1FSAigssTtZlNeJBqIhJW3BqdXE
+         MeA5XaUKJi3N841PSug+662KgQmXt7vm/MYpnXFvQAkLyskOmEqSsRGaok3GYDnHroJw
+         jGU0hnYKse7wepzD1IKrJsDvjWuRiv3WulmAfcRvqt5jh7dyK3pRv7m1OagtqNL3zyuz
+         /KFo8JdB6iESAfGZanmmLJ9DktZYOh5+XcxPTf76Uevr9emSKi7zR0G6VRWLFvc6O9mz
+         3/BA+c03cmsVR4kim6K+f+RwFTLfwwsZBEDR7Yz1EEsG7jt0DBfj6teSKXN9//cU/O+t
+         J4TQ==
+X-Gm-Message-State: AOAM531JUkPVBWPqQAJeGlFbHYftyV0OT+9Jw34bOAnGgXGwLProVi+b
+        FeFa9+F+2dHM5BkLWS9a4ti1wggykuU/O+S0CjGbew==
+X-Google-Smtp-Source: ABdhPJwRz4xCGWsXfmJotwOmnaXVke0rNvSDHk56uNYOReGF9ulLpLK3zw48BxNzjCGSB3ztI+OleQQ83/3me8zAsKI=
+X-Received: by 2002:a37:9747:: with SMTP id z68mr8387175qkd.424.1602945726771;
+ Sat, 17 Oct 2020 07:42:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <00000000000014370305b1c55370@google.com> <202010162042.7C51549A16@keescook>
+ <CACT4Y+bG=89ii+kzgGvNiZnB9ZEcAsy-3YofJeW5K_rynp_S7g@mail.gmail.com> <CAG48ez0LKk7iEersZe-S25SGJm-AFVW2jzG32X=NkKon+1Fuxw@mail.gmail.com>
+In-Reply-To: <CAG48ez0LKk7iEersZe-S25SGJm-AFVW2jzG32X=NkKon+1Fuxw@mail.gmail.com>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Sat, 17 Oct 2020 16:41:55 +0200
+Message-ID: <CACT4Y+beaHrWisaSsV90xQn+t2Xn-bxvVgmx8ih_h=yJYPjs4A@mail.gmail.com>
+Subject: Re: UBSAN: array-index-out-of-bounds in alg_bind
+To:     Jann Horn <jannh@google.com>
+Cc:     Kees Cook <keescook@chromium.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        syzbot <syzbot+92ead4eb8e26a26d465e@syzkaller.appspotmail.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        linux-hardening@vger.kernel.org,
+        Elena Petrova <lenaptr@google.com>,
+        Vegard Nossum <vegard.nossum@oracle.com>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Linux API <linux-api@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-loop-AES changes since previous release:
-- Worked around kernel interface changes on 5.9 kernels
-- Partial re-write of ioctl handling to get rid of set_fs() which is
-  expected to be removed from mainline kernels in near future.
+On Sat, Oct 17, 2020 at 1:02 PM Jann Horn <jannh@google.com> wrote:
+> > > > dashboard link: https://syzkaller.appspot.com/bug?extid=92ead4eb8e26a26d465e
+> > > > [...]
+> > > > Reported-by: syzbot+92ead4eb8e26a26d465e@syzkaller.appspotmail.com
+> > > > [...]
+> > > > UBSAN: array-index-out-of-bounds in crypto/af_alg.c:166:2
+> > > > index 91 is out of range for type '__u8 [64]'
+> > >
+> > > This seems to be an "as intended", if very odd. false positive (the actual
+> > > memory area is backed by the on-stack _K_SS_MAXSIZE-sized sockaddr_storage
+> > > "address" variable in __sys_bind. But yes, af_alg's salg_name member
+> > > size here doesn't make sense.
+> >
+> > As Vegard noted elsewhere, compilers can start making assumptions
+> > based on absence of UB and compile code in surprising ways as the
+> > result leading to very serious and very real bugs.
+> >
+> > One example would be a compiler generating jump table for common sizes
+> > during PGO and leaving size > 64 as wild jump.
+> >
+> > Another example would be a compiler assuming that copy size <= 64.
+> > Then if there is another copy into a 64-byte buffer with a proper size
+> > check, the compiler can now drop that size check (since it now knows
+> > size <= 64) and we get real stack smash (for a copy that does have a
+> > proper size check before!).
+>
+> FWIW, the kernel currently still has a bunch of places that use
+> C89-style length-1 arrays (which were in the past used to work around
+> C89's lack of proper flexible arrays). Gustavo A. R. Silva has a bunch
+> of patches pending to change those places now, but those are not
+> marked for stable backporting; so in all currently released kernels,
+> we'll probably keep having length-1 arrays at the ends of C structs
+> that are used as if they were flexible arrays. (Unless someone makes
+> the case that these patches are not just cleanups but actually fix
+> some sort of real bug, and therefore need to be backported.)
+>
+> The code in this example looks just like one of those C89-style
+> length-1 arrays to me (except that the length isn't 1).
+>
+> Of course I do agree that this should be cleaned up, and that having
+> bogus array lengths in the source code is a bad idea.
+>
+> > And we do want compilers to be that smart today. Because of all levels
+> > of abstractions/macros/inlining we actually have lots of
+> > redundant/nonsensical code in the end after all inlining and
+> > expansions, and we do want compilers to infer things, remove redundant
+> > checks, etc so that we can have both nice abstract source code and
+> > efficient machine code at the same time.
+>
+> I guess that kinda leads to the question: Do we just need to fix the
+> kernel code here (which is comparatively easy), or do you think that
+> this is a sufficiently big problem that we need to go and somehow
+> change the actual UAPI headers here (e.g. by deprecating the existing
+> UAPI struct and making a new one with a different name)?
 
+Good question. What I wrote is not based on some concrete
+miscompilation at hand. I just meant that there are more things
+involved that may appear at first glance.
 
-bzip2 compressed tarball is here:
-
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7s.tar.bz2
-    md5sum 154fabeb1976dc6dc111c96918d4c128
-
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7s.tar.bz2.sign
-
---
-Jari Ruusu=C2=A0 4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD=C2=A0 ACDF F073 3C=
-80 8132 F189
-
+Re proactively fixing UAPI, I would say if somebody is up to doing it
+now, I would say it's good and a right change. Otherwise delaying
+fixing it is also a reasonable strategy because (1) there are probably
+more such cases, (2) any work on enabling more optimizations, global
+optimizations, etc is only feasible if there is a tool that helps to
+identify all places that need to be fixed. So whoever/whenever will be
+fixing this, one more or one less case probably does not matter much.
+It's a different story if there is already a tool/compiler warning
+that traps on some code and that code harms deployment of the tool.
