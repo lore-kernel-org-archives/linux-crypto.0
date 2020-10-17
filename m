@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 520BAC43457
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Oct 2020 06:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2CFFC433DF
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Oct 2020 10:50:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0452720791
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Oct 2020 06:21:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76BDB20720
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Oct 2020 10:50:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LMmylegy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Po3pnypk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437071AbgJQGV3 (ORCPT
+        id S2411724AbgJQKuT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 17 Oct 2020 02:21:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60376 "EHLO
+        Sat, 17 Oct 2020 06:50:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2437073AbgJQGV1 (ORCPT
+        with ESMTP id S2437411AbgJQKuS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Oct 2020 02:21:27 -0400
-Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0A5BC0613D5
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2020 23:21:26 -0700 (PDT)
-Received: by mail-lj1-x242.google.com with SMTP id a5so5065848ljj.11
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2020 23:21:26 -0700 (PDT)
+        Sat, 17 Oct 2020 06:50:18 -0400
+Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39F7AC0613D4
+        for <linux-crypto@vger.kernel.org>; Sat, 17 Oct 2020 03:50:18 -0700 (PDT)
+Received: by mail-qk1-x743.google.com with SMTP id h140so3994928qke.7
+        for <linux-crypto@vger.kernel.org>; Sat, 17 Oct 2020 03:50:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=K5fP2IedoKQlRQouSCWpsDIMKmWivfsQ9eQLA1F2LGk=;
-        b=LMmylegyEXB4ETZFcAg0jZ3ywuK/RWOoyd8IF2q7wbf0FlBPa1CmGDbEXkW+jghAbm
-         L/ZDBTeW0W+eYkvJeGow+VVh0xMTCd2CjHybf0Yd0FJf6PC7WL4xF2qG5wrVBC42yxgQ
-         8zg/2jexyYshW1yQH1s+pVSH0LX9mH5ZboR6fOLWNE1KqDRC8jjvr83OZzi4/ipuIs9Q
-         dFrUSBctQ7q6gHPyfMClsBZMkU9oNgNQp7tdM4fX4J+lCCSGXw7In/UD6xkyOWe4J850
-         JMe5a+2COrcu8wW2/OjDhZZYR++6Jrvj9sBrMWL/JEJjmvrImBEV8RyU9R0lJv9ID5mO
-         57jQ==
+        bh=055XhVIRqP1y92ksbeRYlOScnRv7buL/39+/wOdRWmc=;
+        b=Po3pnypkJETwuaiQDhURNeD5V4DFZ+hAD8v5bMnK5CpIR198upQMrG9wMoIA6I1Wlq
+         H1MvYarkmxPQEyEp0dXJArIcEldYcJxodnroi73Z8aSRx83RPsJYwL/1u1vCGyJJ5pVU
+         VINV5Oi9oCr3pH9CLmw5bHedxbpibqH5pMH35ClZMEBt7tv7H5fj8Bl7OStEfO4rMFX4
+         dD1spb06Z2C3ACNwaY/pWFCZ23Y2d6Hj1sMwpooVJPNPGB5PzjA5SO3IgsLEtfoF4xFN
+         ETQ9AVpmNH4TUYLBRA1uPlT2z33MYdZn0ldeUxtw3lgpiFguldpuIDAW/LCLtISdC4fS
+         4bIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=K5fP2IedoKQlRQouSCWpsDIMKmWivfsQ9eQLA1F2LGk=;
-        b=FzlDCbNjHK/WgRgqqth82r4UAQ7lj5FLYqaGqCvDqbq0fS5ue59QkxKDCq0r6KpkBk
-         I9WEte/n63j4AYqLSUqj9jKRS0NFOot0ca8Cwq+r8S6G1JKhMR1N9sqlasQe5cczWMBb
-         yHGqoHPwcZS/P4PzGZ2Ikfj2hLD1BJh4YRvKYg7w025cikmet8og7wFQPrIDuyCicD7u
-         bR8iaabMbjaEtGMx4i4aAnN+qUNaMOmKJPuaKNeTPpugGYkKCUjnYAZHhkpANY/CGMeh
-         faPqw57C/K0K4oNA2tb2zCPgLLSA14MX5RamlYqJ4Y8ATBAb6ZkwqHDzOrK3YvC3KHz+
-         xKGw==
-X-Gm-Message-State: AOAM530LH7/FdT+KQ345/tlCw2JzgxKi8wyuKKZqZtEVgLLpT961VdYd
-        3JaDxfVn4hgOrYmMNhEw72vOq2X2TQapEde+XnQuZw==
-X-Google-Smtp-Source: ABdhPJxODCfO9ZVU11lc/q6G6VCj8F3pnGVHFozeCzeN2p8bjSk3h58nmS2HKf7Nkir5cfAE2D9bdypZ/Mc+oRT6tqk=
-X-Received: by 2002:a05:651c:1205:: with SMTP id i5mr2905687lja.47.1602915685058;
- Fri, 16 Oct 2020 23:21:25 -0700 (PDT)
+        bh=055XhVIRqP1y92ksbeRYlOScnRv7buL/39+/wOdRWmc=;
+        b=SEOay6l5i7DPQTIGL8Ef7gn9+oSA6vVCidYJggpVUlFGMbgSDJ+E4wIqbHsICC3OIV
+         511WbgndYvUHWjoK2+v8mkWGQ7z7txNAYH9q8kvxM0YAFn8Gi0lS4BGJzXTFsMYlll92
+         lq04kysybI7L9HAicpu6rW2Q2l4zFi2SydWvs8bqijkrUADDgJgt6Y5FGpgz4EY1wiXC
+         lOXD/1KzWxPuCXWOG7uQGPv7NF3Qi4Fh+Dgw2qOE3EMRem8MWL9UIdLHyal4Ng1TB69r
+         8SxqBAuCof3Mda/VoW7vj9dWVUh7nTNUTe78NQZLPdB4r54mRuvQ0djOFEtAwR0pOgik
+         5J1g==
+X-Gm-Message-State: AOAM532wySse0JjlsIaTxEWmt1ifzV858ql0WQmFqPCpnSwaf8q/gDOh
+        zJPbLaqiB8SdnGynSXxcLADwHOgt3yyA1sPjCEkKgg==
+X-Google-Smtp-Source: ABdhPJxV3RXLH3GyiYBTqM9lre3tNUr3I5sMPtKZzoumySL+QLXDeoTsyj5EPEiy1paknIIPanyVGa+0Di2Di0LJ1yY=
+X-Received: by 2002:a05:620a:1657:: with SMTP id c23mr8237965qko.231.1602931816990;
+ Sat, 17 Oct 2020 03:50:16 -0700 (PDT)
 MIME-Version: 1.0
 References: <00000000000014370305b1c55370@google.com> <202010162042.7C51549A16@keescook>
 In-Reply-To: <202010162042.7C51549A16@keescook>
-From:   Jann Horn <jannh@google.com>
-Date:   Sat, 17 Oct 2020 08:20:58 +0200
-Message-ID: <CAG48ez1KEOHL5VCNtrsRTHa6Wj9xUY+daReb4V08O8dFzarkjw@mail.gmail.com>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Sat, 17 Oct 2020 12:50:05 +0200
+Message-ID: <CACT4Y+bG=89ii+kzgGvNiZnB9ZEcAsy-3YofJeW5K_rynp_S7g@mail.gmail.com>
 Subject: Re: UBSAN: array-index-out-of-bounds in alg_bind
 To:     Kees Cook <keescook@chromium.org>
-Cc:     herbert@gondor.apana.org.au,
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         syzbot <syzbot+92ead4eb8e26a26d465e@syzkaller.appspotmail.com>,
-        linux-crypto@vger.kernel.org,
-        kernel list <linux-kernel@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
         linux-hardening@vger.kernel.org,
         Elena Petrova <lenaptr@google.com>,
-        Linux API <linux-api@vger.kernel.org>
+        Vegard Nossum <vegard.nossum@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-+linux-api because this is about fixing UAPI without breaking userspace
-
-On Sat, Oct 17, 2020 at 8:02 AM Kees Cook <keescook@chromium.org> wrote:
+On Sat, Oct 17, 2020 at 5:49 AM Kees Cook <keescook@chromium.org> wrote:
+>
 > On Fri, Oct 16, 2020 at 01:12:24AM -0700, syzbot wrote:
 > > dashboard link: https://syzkaller.appspot.com/bug?extid=92ead4eb8e26a26d465e
 > > [...]
@@ -90,45 +90,41 @@ On Sat, Oct 17, 2020 at 8:02 AM Kees Cook <keescook@chromium.org> wrote:
 > This seems to be an "as intended", if very odd. false positive (the actual
 > memory area is backed by the on-stack _K_SS_MAXSIZE-sized sockaddr_storage
 > "address" variable in __sys_bind. But yes, af_alg's salg_name member
-> size here doesn't make sense. The origin appears to be that 3f69cc60768b
+> size here doesn't make sense.
+
+As Vegard noted elsewhere, compilers can start making assumptions
+based on absence of UB and compile code in surprising ways as the
+result leading to very serious and very real bugs.
+
+One example would be a compiler generating jump table for common sizes
+during PGO and leaving size > 64 as wild jump.
+
+Another example would be a compiler assuming that copy size <= 64.
+Then if there is another copy into a 64-byte buffer with a proper size
+check, the compiler can now drop that size check (since it now knows
+size <= 64) and we get real stack smash (for a copy that does have a
+proper size check before!).
+
+And we do want compilers to be that smart today. Because of all levels
+of abstractions/macros/inlining we actually have lots of
+redundant/nonsensical code in the end after all inlining and
+expansions, and we do want compilers to infer things, remove redundant
+checks, etc so that we can have both nice abstract source code and
+efficient machine code at the same time.
+
+
+> The origin appears to be that 3f69cc60768b
 > ("crypto: af_alg - Allow arbitrarily long algorithm names") intentionally
 > didn't extend the kernel structure (which is actually just using the UAPI
 > structure). I don't see a reason the UAPI couldn't have been extended:
 > it's a sockaddr implementation, so the size is always passed in as part
 > of the existing API.
-
-If you e.g. recompiled the wrong parts of the "btcheck" project with
-such changed UAPI headers, I think you'd get OOB writes, because they
-have this in a header
-(https://sources.debian.org/src/btcheck/2.1-4/src/kernelcryptoapi.h/?hl=29#L29):
-
-typedef struct {
-  struct sockaddr_alg sa;
-  int safd;
-  int fd;
-} lkca_hash_ctx;
-
-so if you rebuilt e.g. kernelcryptoapi.o (which uses the struct)
-without also rebuilding hash.o (which allocates the struct), code in
-kernelcryptoapi.o would write beyond the end of lkca_hash_ctx, I
-think.
-
-Sure, there aren't many places that do this kind of thing for this
-struct. But at least in theory, you can't change the size of UAPI
-structs because someone might be passing instances of that struct
-around between object files.
-
+>
 > At the very least the kernel needs to switch to using a correctly-sized
 > structure: I expected UBSAN_BOUNDS to be enabled globally by default at
 > some point in the future (with the minimal runtime -- the
 > instrumentation is tiny and catches real issues).
-
-Yeah, the kernel should probably use a struct that looks different
-from the userspace one. :/ I guess we'll probably end up with some
-ugly hack with "#ifdef __KERNEL__", where the same struct has
-different sizes between kernel and userspace? Or am I being too
-puritan about UAPI consistency?
-
+>
 > Reproduction:
 >
 > struct sockaddr_alg sa = {
@@ -140,5 +136,11 @@ puritan about UAPI consistency?
 > bind(fd, (void *)&sa, sizeof(sa));
 >
 > Replace "sizeof(sa)" with x where 64<x<=128.
-
-I think you mean 88<x<=128 ?
+>
+> --
+> Kees Cook
+>
+> --
+> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/202010162042.7C51549A16%40keescook.
