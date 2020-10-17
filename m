@@ -2,112 +2,143 @@ Return-Path: <SRS0=kY7N=DY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B59AC43467
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Oct 2020 06:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 520BAC43457
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Oct 2020 06:21:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EBE2920720
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Oct 2020 06:01:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0452720791
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Oct 2020 06:21:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EyNFtokk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LMmylegy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436853AbgJQGB4 (ORCPT
+        id S2437071AbgJQGV3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 17 Oct 2020 02:01:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57318 "EHLO
+        Sat, 17 Oct 2020 02:21:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2436908AbgJQGBl (ORCPT
+        with ESMTP id S2437073AbgJQGV1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Oct 2020 02:01:41 -0400
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C28BAC05BD19
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2020 20:49:41 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id v12so2259508ply.12
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2020 20:49:41 -0700 (PDT)
+        Sat, 17 Oct 2020 02:21:27 -0400
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0A5BC0613D5
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2020 23:21:26 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id a5so5065848ljj.11
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2020 23:21:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jax4atoPJwkdfJLEu7w0obe+ESpSyuWLwfdsf3Y/MXI=;
-        b=EyNFtokkMOa7ze2Kbr5RF4vu56zkybgxN1S+XqwEuGm/93rAdYcsk5GVZrOQwne0Gu
-         uamOGa2VlAv5ps8EotoVIXq0pWWgr9NqBa597VliymjdSANE2AB0vq82ErtnsEBKOe7S
-         7ZLvcEmQu9YYEu2QMarKqvs6phZOpdh7IIN1U=
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=K5fP2IedoKQlRQouSCWpsDIMKmWivfsQ9eQLA1F2LGk=;
+        b=LMmylegyEXB4ETZFcAg0jZ3ywuK/RWOoyd8IF2q7wbf0FlBPa1CmGDbEXkW+jghAbm
+         L/ZDBTeW0W+eYkvJeGow+VVh0xMTCd2CjHybf0Yd0FJf6PC7WL4xF2qG5wrVBC42yxgQ
+         8zg/2jexyYshW1yQH1s+pVSH0LX9mH5ZboR6fOLWNE1KqDRC8jjvr83OZzi4/ipuIs9Q
+         dFrUSBctQ7q6gHPyfMClsBZMkU9oNgNQp7tdM4fX4J+lCCSGXw7In/UD6xkyOWe4J850
+         JMe5a+2COrcu8wW2/OjDhZZYR++6Jrvj9sBrMWL/JEJjmvrImBEV8RyU9R0lJv9ID5mO
+         57jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jax4atoPJwkdfJLEu7w0obe+ESpSyuWLwfdsf3Y/MXI=;
-        b=gZvZ2ZNl5TskobO+O5uioaa8ilwGVBf2dgp692M7u3RjyDIRSET7JpZ/aCPWFrQpoB
-         Q0N1cdX2rRWWQ2Td3Jn4LChTyNgXEca3joomH5CJbmUCe2STaipsSj3HgT2xTd5sfbW/
-         aZnHXEBVqF3PA1PxtGYbLLfAxFALvgCsrdBhKgXW6q0aVgYTDX3SsFK9t9+eQsPxNDbv
-         9uUomUO0oHLDYYfuonGgBTpQDBcEw9nUg4gfjGcGn1YGhrnsFneV1RjL/VhCv8EgLw6/
-         7A7FRtWupynY+QLWrWKN7x0mejHLl+xS07yEnVA5ATg/ehpJHSt2csx6N93dVimnE9Yp
-         EJAQ==
-X-Gm-Message-State: AOAM5315jE2GiSqOHtdeZ6Q6IJAQryK4CZeO91vzgiPSxRcgw6VznX//
-        vu7bFccJDVb8ll7vLAjv88J57A==
-X-Google-Smtp-Source: ABdhPJy3c4n93YNge6bCvLa5SNe3k/VWD6dF7uIpzuTvy8Uq0axiuYe+VCgXWMxO8UG8MTQ3YwVQsw==
-X-Received: by 2002:a17:902:bcc6:b029:d4:db82:4439 with SMTP id o6-20020a170902bcc6b02900d4db824439mr7210581pls.63.1602906581160;
-        Fri, 16 Oct 2020 20:49:41 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id w74sm4510226pff.200.2020.10.16.20.49.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Oct 2020 20:49:39 -0700 (PDT)
-Date:   Fri, 16 Oct 2020 20:49:38 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     herbert@gondor.apana.org.au
-Cc:     syzbot <syzbot+92ead4eb8e26a26d465e@syzkaller.appspotmail.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, linux-hardening@vger.kernel.org,
-        Elena Petrova <lenaptr@google.com>
-Subject: Re: UBSAN: array-index-out-of-bounds in alg_bind
-Message-ID: <202010162042.7C51549A16@keescook>
-References: <00000000000014370305b1c55370@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=K5fP2IedoKQlRQouSCWpsDIMKmWivfsQ9eQLA1F2LGk=;
+        b=FzlDCbNjHK/WgRgqqth82r4UAQ7lj5FLYqaGqCvDqbq0fS5ue59QkxKDCq0r6KpkBk
+         I9WEte/n63j4AYqLSUqj9jKRS0NFOot0ca8Cwq+r8S6G1JKhMR1N9sqlasQe5cczWMBb
+         yHGqoHPwcZS/P4PzGZ2Ikfj2hLD1BJh4YRvKYg7w025cikmet8og7wFQPrIDuyCicD7u
+         bR8iaabMbjaEtGMx4i4aAnN+qUNaMOmKJPuaKNeTPpugGYkKCUjnYAZHhkpANY/CGMeh
+         faPqw57C/K0K4oNA2tb2zCPgLLSA14MX5RamlYqJ4Y8ATBAb6ZkwqHDzOrK3YvC3KHz+
+         xKGw==
+X-Gm-Message-State: AOAM530LH7/FdT+KQ345/tlCw2JzgxKi8wyuKKZqZtEVgLLpT961VdYd
+        3JaDxfVn4hgOrYmMNhEw72vOq2X2TQapEde+XnQuZw==
+X-Google-Smtp-Source: ABdhPJxODCfO9ZVU11lc/q6G6VCj8F3pnGVHFozeCzeN2p8bjSk3h58nmS2HKf7Nkir5cfAE2D9bdypZ/Mc+oRT6tqk=
+X-Received: by 2002:a05:651c:1205:: with SMTP id i5mr2905687lja.47.1602915685058;
+ Fri, 16 Oct 2020 23:21:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00000000000014370305b1c55370@google.com>
+References: <00000000000014370305b1c55370@google.com> <202010162042.7C51549A16@keescook>
+In-Reply-To: <202010162042.7C51549A16@keescook>
+From:   Jann Horn <jannh@google.com>
+Date:   Sat, 17 Oct 2020 08:20:58 +0200
+Message-ID: <CAG48ez1KEOHL5VCNtrsRTHa6Wj9xUY+daReb4V08O8dFzarkjw@mail.gmail.com>
+Subject: Re: UBSAN: array-index-out-of-bounds in alg_bind
+To:     Kees Cook <keescook@chromium.org>
+Cc:     herbert@gondor.apana.org.au,
+        syzbot <syzbot+92ead4eb8e26a26d465e@syzkaller.appspotmail.com>,
+        linux-crypto@vger.kernel.org,
+        kernel list <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        linux-hardening@vger.kernel.org,
+        Elena Petrova <lenaptr@google.com>,
+        Linux API <linux-api@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 16, 2020 at 01:12:24AM -0700, syzbot wrote:
-> dashboard link: https://syzkaller.appspot.com/bug?extid=92ead4eb8e26a26d465e
-> [...]
-> Reported-by: syzbot+92ead4eb8e26a26d465e@syzkaller.appspotmail.com
-> [...]
-> UBSAN: array-index-out-of-bounds in crypto/af_alg.c:166:2
-> index 91 is out of range for type '__u8 [64]'
++linux-api because this is about fixing UAPI without breaking userspace
 
-This seems to be an "as intended", if very odd. false positive (the actual
-memory area is backed by the on-stack _K_SS_MAXSIZE-sized sockaddr_storage
-"address" variable in __sys_bind. But yes, af_alg's salg_name member
-size here doesn't make sense. The origin appears to be that 3f69cc60768b
-("crypto: af_alg - Allow arbitrarily long algorithm names") intentionally
-didn't extend the kernel structure (which is actually just using the UAPI
-structure). I don't see a reason the UAPI couldn't have been extended:
-it's a sockaddr implementation, so the size is always passed in as part
-of the existing API.
+On Sat, Oct 17, 2020 at 8:02 AM Kees Cook <keescook@chromium.org> wrote:
+> On Fri, Oct 16, 2020 at 01:12:24AM -0700, syzbot wrote:
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=92ead4eb8e26a26d465e
+> > [...]
+> > Reported-by: syzbot+92ead4eb8e26a26d465e@syzkaller.appspotmail.com
+> > [...]
+> > UBSAN: array-index-out-of-bounds in crypto/af_alg.c:166:2
+> > index 91 is out of range for type '__u8 [64]'
+>
+> This seems to be an "as intended", if very odd. false positive (the actual
+> memory area is backed by the on-stack _K_SS_MAXSIZE-sized sockaddr_storage
+> "address" variable in __sys_bind. But yes, af_alg's salg_name member
+> size here doesn't make sense. The origin appears to be that 3f69cc60768b
+> ("crypto: af_alg - Allow arbitrarily long algorithm names") intentionally
+> didn't extend the kernel structure (which is actually just using the UAPI
+> structure). I don't see a reason the UAPI couldn't have been extended:
+> it's a sockaddr implementation, so the size is always passed in as part
+> of the existing API.
 
-At the very least the kernel needs to switch to using a correctly-sized
-structure: I expected UBSAN_BOUNDS to be enabled globally by default at
-some point in the future (with the minimal runtime -- the
-instrumentation is tiny and catches real issues).
+If you e.g. recompiled the wrong parts of the "btcheck" project with
+such changed UAPI headers, I think you'd get OOB writes, because they
+have this in a header
+(https://sources.debian.org/src/btcheck/2.1-4/src/kernelcryptoapi.h/?hl=29#L29):
 
-Reproduction:
+typedef struct {
+  struct sockaddr_alg sa;
+  int safd;
+  int fd;
+} lkca_hash_ctx;
 
-struct sockaddr_alg sa = {
-    .salg_family = AF_ALG,
-    .salg_type = "skcipher",
-    .salg_name = "cbc(aes)"
-};
-fd = socket(AF_ALG, SOCK_SEQPACKET, 0);
-bind(fd, (void *)&sa, sizeof(sa));
+so if you rebuilt e.g. kernelcryptoapi.o (which uses the struct)
+without also rebuilding hash.o (which allocates the struct), code in
+kernelcryptoapi.o would write beyond the end of lkca_hash_ctx, I
+think.
 
-Replace "sizeof(sa)" with x where 64<x<=128.
+Sure, there aren't many places that do this kind of thing for this
+struct. But at least in theory, you can't change the size of UAPI
+structs because someone might be passing instances of that struct
+around between object files.
 
--- 
-Kees Cook
+> At the very least the kernel needs to switch to using a correctly-sized
+> structure: I expected UBSAN_BOUNDS to be enabled globally by default at
+> some point in the future (with the minimal runtime -- the
+> instrumentation is tiny and catches real issues).
+
+Yeah, the kernel should probably use a struct that looks different
+from the userspace one. :/ I guess we'll probably end up with some
+ugly hack with "#ifdef __KERNEL__", where the same struct has
+different sizes between kernel and userspace? Or am I being too
+puritan about UAPI consistency?
+
+> Reproduction:
+>
+> struct sockaddr_alg sa = {
+>     .salg_family = AF_ALG,
+>     .salg_type = "skcipher",
+>     .salg_name = "cbc(aes)"
+> };
+> fd = socket(AF_ALG, SOCK_SEQPACKET, 0);
+> bind(fd, (void *)&sa, sizeof(sa));
+>
+> Replace "sizeof(sa)" with x where 64<x<=128.
+
+I think you mean 88<x<=128 ?
