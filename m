@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 486DEC43457
-	for <linux-crypto@archiver.kernel.org>; Sun, 18 Oct 2020 19:53:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2611AC43467
+	for <linux-crypto@archiver.kernel.org>; Sun, 18 Oct 2020 20:00:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D08922269
-	for <linux-crypto@archiver.kernel.org>; Sun, 18 Oct 2020 19:53:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBCC32226B
+	for <linux-crypto@archiver.kernel.org>; Sun, 18 Oct 2020 20:00:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603050795;
-	bh=UHq/nKFmMR0GDOVk+cziNE50FRsC7lMUxeb4brzJxpU=;
+	s=default; t=1603051227;
+	bh=jiy9vWTn50fD4MZ6fl/rHP8hti2qRxhKsMglCxxq8WI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=hNf4rRiubS6mML8/IJ4QMaR8REpW7JFhWp4tkCWb6NzcDL7iWZj46Cxg3doeVeXTc
-	 /7TFWkmzEiFqOwz5Ntm1U7uDWTyRydYVwvZXwdmvb4h4QDfSRk0qTajm0iHv3QNXTv
-	 WAHs09D8Lxo7tOf+7EpPgrNYsnwZxcvY67LI3Z8s=
+	b=hw7uyLEJS9rsdwUAXgXgf8FyIaC6R/Hb0GtHjKThp4CRWyzocv7qQ3im5W8tHv93Q
+	 Ogd7WhGid8V0v19JvEEVu1fub7F5lercGP6if/E5ag6Lp2L6z9/6gWyLxqwq2sypEU
+	 68YEB3EWBr9YE1X/5/2Zq7VRsA+Rk94wGi3y4gp8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729124AbgJRTxF (ORCPT
+        id S2388665AbgJRUAA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 18 Oct 2020 15:53:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60764 "EHLO mail.kernel.org"
+        Sun, 18 Oct 2020 16:00:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56604 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729076AbgJRTUw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 18 Oct 2020 15:20:52 -0400
+        id S1727698AbgJRTSd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 18 Oct 2020 15:18:33 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 74B31222E7;
-        Sun, 18 Oct 2020 19:20:51 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id EAD4B22274;
+        Sun, 18 Oct 2020 19:18:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603048852;
-        bh=UHq/nKFmMR0GDOVk+cziNE50FRsC7lMUxeb4brzJxpU=;
+        s=default; t=1603048712;
+        bh=jiy9vWTn50fD4MZ6fl/rHP8hti2qRxhKsMglCxxq8WI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=sZD0fMtLF6TW69WcyFXlfOt1S1ocyR1HBumxItbhi8f+ZpRQN3YGNTp2FvCO/swFJ
-         TwN8kV/QMZULNtjvSaIL6aVo/MCumbzn1aQj2xPDtu/aafmZqm4hVBpIbft8DkPJzy
-         7WTO7fnyfxb253AVTm7Ok1LMwoa+Ig05GjHhJdpc=
+        b=Y4onsN16Z46l3lw4BDB/12tsYp5Kq0kUfgPivGpRfpYRdHxw5FIjLnvCQkw4QdQVg
+         QkEvcS5L1EyQHS3ILIFwn1G6qaHbW7zA7VZkVFGroSRdwUpKamNE8i/hM1wHqe7wEP
+         b1j0UezWXHkxLjPrmBIqyn9wjI4AXgIjHgWToRAw=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Longfang Liu <liulongfang@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.8 020/101] crypto: hisilicon - fixed memory allocation error
-Date:   Sun, 18 Oct 2020 15:19:05 -0400
-Message-Id: <20201018192026.4053674-20-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.9 020/111] crypto: hisilicon - fixed memory allocation error
+Date:   Sun, 18 Oct 2020 15:16:36 -0400
+Message-Id: <20201018191807.4052726-20-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201018192026.4053674-1-sashal@kernel.org>
-References: <20201018192026.4053674-1-sashal@kernel.org>
+In-Reply-To: <20201018191807.4052726-1-sashal@kernel.org>
+References: <20201018191807.4052726-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -73,10 +73,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 12 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 64614a9bdf219..047826f18bd35 100644
+index 497969ae8b230..b9973d152a24a 100644
 --- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
 +++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -332,11 +332,14 @@ static int sec_alg_resource_alloc(struct sec_ctx *ctx,
+@@ -342,11 +342,14 @@ static int sec_alg_resource_alloc(struct sec_ctx *ctx,
  		ret = sec_alloc_pbuf_resource(dev, res);
  		if (ret) {
  			dev_err(dev, "fail to alloc pbuf dma resource!\n");
@@ -92,7 +92,7 @@ index 64614a9bdf219..047826f18bd35 100644
  alloc_fail:
  	sec_free_civ_resource(dev, res);
  
-@@ -447,8 +450,10 @@ static int sec_ctx_base_init(struct sec_ctx *ctx)
+@@ -457,8 +460,10 @@ static int sec_ctx_base_init(struct sec_ctx *ctx)
  	ctx->fake_req_limit = QM_Q_DEPTH >> 1;
  	ctx->qp_ctx = kcalloc(sec->ctx_q_num, sizeof(struct sec_qp_ctx),
  			      GFP_KERNEL);
@@ -105,7 +105,7 @@ index 64614a9bdf219..047826f18bd35 100644
  
  	for (i = 0; i < sec->ctx_q_num; i++) {
  		ret = sec_create_qp_ctx(&sec->qm, ctx, i, 0);
-@@ -457,12 +462,15 @@ static int sec_ctx_base_init(struct sec_ctx *ctx)
+@@ -467,12 +472,15 @@ static int sec_ctx_base_init(struct sec_ctx *ctx)
  	}
  
  	return 0;
