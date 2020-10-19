@@ -2,97 +2,151 @@ Return-Path: <SRS0=7/wf=D2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2FC0C433DF
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Oct 2020 19:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12D7BC433DF
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Oct 2020 19:45:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5AC8A22314
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Oct 2020 19:37:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2679222EA
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Oct 2020 19:45:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FJ1QkjrH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vqIoQqfP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731002AbgJSThB (ORCPT
+        id S1731071AbgJSTp2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Oct 2020 15:37:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29155 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730021AbgJSThB (ORCPT
+        Mon, 19 Oct 2020 15:45:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34396 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731247AbgJSTm3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Oct 2020 15:37:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603136220;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=KU15bin5yh1/o+lq3KE7RT9x6CrBiQ+UqRtjQPmKPRU=;
-        b=FJ1QkjrHbYOoI5pGwb+6AJa1TZaWOhBAMdaa5vnczNBprnDoQijwzS6tW2T/dw8JtYzntk
-        gta2WT7pc4Ze/PRRIcQnAhfRYQabJMzzdzSyFFi4yQve3shdNw/8KBIOls+zVZDG6UNhAk
-        Azj96n4GN1lvxEUcTb55fCGCA2HmPX4=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-444-5d9HDO4wP66WVXHYveYmMQ-1; Mon, 19 Oct 2020 15:36:58 -0400
-X-MC-Unique: 5d9HDO4wP66WVXHYveYmMQ-1
-Received: by mail-qt1-f199.google.com with SMTP id x42so717716qta.13
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2020 12:36:58 -0700 (PDT)
+        Mon, 19 Oct 2020 15:42:29 -0400
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 167CFC0613E0
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2020 12:42:28 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id v12so307906ply.12
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2020 12:42:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=no6WOfZDuAXhTDfVia9Vunkz4L7BthY0F8m0jo4//vs=;
+        b=vqIoQqfPtCUD7ceHGEmbvFqqUZd/9dE0IpLQQ4p4nyONBXQMSFxBG5OzgCaJfT8eu8
+         Ez0DMwUntzcU9c2WJzs/WqMvxG3bzlj0mstlcz+E4fW0gt02sZNjrL1HdU6SHVwmCE5R
+         WFeHYzJRJuPZspqj8YJ2wlUmUN4Mc8MNrI6kLekCJ8yejCepkvkgEUeb7TbpDze1NnEh
+         TP2SjhqdakZDUedR00qYjd62k5W2m7FgfHIpcuS/rhjqMGxVL3Apppn+UDRO/ftdIfoh
+         duvoKavmXDacw9mysFV+xdp1Tg4QxCPiDxNSeCeZyO+34Y2S1kYSdX61NJzSKhmGsX5T
+         HLpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=KU15bin5yh1/o+lq3KE7RT9x6CrBiQ+UqRtjQPmKPRU=;
-        b=U4elr9PX0e00tA3ApbQmWsM7AH//gp25s3fcr2ozur0nEo3o36+rYwtU+m8v7jprpg
-         t/WWBZ/F3UyzP22HRvehpzcu6SIsWBwX8qTjm6nK5ryImAUZtMp1Yxxxarzc7VIE/RiQ
-         yE6oICe17ibT+ScOyIzv1B70tPK1CemZbwlxmMsAk/UclVZY0WzIPWHGXD3d50VCsFOB
-         yXYbVEc23i1U7j6RIFEnzDIzJghj2fMCgUYmfpTbPj5rIxiNOQoSuMRs+u4LMrPi+uSf
-         5PvBUk9fi8jV+uAcCLkZ2xl2rYIj0nlSViEADRrYPdw3IvZckCdRwWXEVQPqwKksVb/Q
-         4q4Q==
-X-Gm-Message-State: AOAM531mJKKioyhErc+0iDDJgdbjPsFFkFj7RUB8uBeUIiQvxhxHSZ1z
-        g8NfWI84HG+XjKg1f6i8lLLsY/zsehkkfdYxM4F0MWWSn+HfVcn5Bs/b46mId2BbMr0y3BNj0hA
-        /v863OwWj3BIoaRGzhhjDRVDw
-X-Received: by 2002:ae9:e804:: with SMTP id a4mr1107012qkg.324.1603136218438;
-        Mon, 19 Oct 2020 12:36:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwvdQAIzHDvjts4PDAgJJfYwub44mHei8vjHCDSaOolSbAYtAnuSPossUBmcHdVD0H8TWveuQ==
-X-Received: by 2002:ae9:e804:: with SMTP id a4mr1106991qkg.324.1603136218130;
-        Mon, 19 Oct 2020 12:36:58 -0700 (PDT)
-Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
-        by smtp.gmail.com with ESMTPSA id o1sm424115qkf.129.2020.10.19.12.36.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Oct 2020 12:36:57 -0700 (PDT)
-From:   trix@redhat.com
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
-        ludovic.desroches@microchip.com
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Tom Rix <trix@redhat.com>
-Subject: [PATCH] crypto: atmel-sha: remove unneeded break
-Date:   Mon, 19 Oct 2020 12:36:53 -0700
-Message-Id: <20201019193653.13757-1-trix@redhat.com>
-X-Mailer: git-send-email 2.18.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=no6WOfZDuAXhTDfVia9Vunkz4L7BthY0F8m0jo4//vs=;
+        b=UTxTatlCxcOJqnYnhdRffZHbdhmdFT3W6PYixSM8A422arFzDYv7gHbBKJ2/L92ITk
+         +Sn7lEH6Y6k9d8rgU8RKeYxxNDcL5rM3vCAwdylRf8nDL5LcW/E56696zzVC4F6AUMlp
+         xyuAjSTNkwZUEWo+uSFwttY79Aw2OT/DfYBdJwr+LR81k3HZ/p5gO2XCkhuT3lUTpslm
+         ymE7kCxihN0RpTwNAZUt9igkzLapsmsjbbUUvYglg/FPTtDYJlwrq6QBmScOd9IcGXA3
+         xtL48K4EVXBllfjwVjz38tFLrTaP14ybLiRpmgTrG1U+hS1UE0ufJyC3huEfeEZrOyaY
+         c7yg==
+X-Gm-Message-State: AOAM5325nSBYPtp7sMGAQDQ8Xl+cHwJhtLM0HQFPT+8hl50Dkqxnlsox
+        tIk1k0gZ5kwtmzK//wEYTS5KY0TVTzG+ANtGVYZjeQ==
+X-Google-Smtp-Source: ABdhPJxy4K+2uRaBuhFTeTSlHPetqrP1uAAP7dKvm6UBZz10SCa23PJUxb54E5JJmlle9J/y892Qp+TTrKvO4GeNXIk=
+X-Received: by 2002:a17:90a:ee87:: with SMTP id i7mr921476pjz.25.1603136546933;
+ Mon, 19 Oct 2020 12:42:26 -0700 (PDT)
+MIME-Version: 1.0
+References: <20201017160928.12698-1-trix@redhat.com> <20201018054332.GB593954@kroah.com>
+In-Reply-To: <20201018054332.GB593954@kroah.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon, 19 Oct 2020 12:42:15 -0700
+Message-ID: <CAKwvOdkR_Ttfo7_JKUiZFVqr=Uh=4b05KCPCSuzwk=zaWtA2_Q@mail.gmail.com>
+Subject: Re: [RFC] treewide: cleanup unreachable breaks
+To:     Tom Rix <trix@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, linux-edac@vger.kernel.org,
+        linux-acpi@vger.kernel.org, linux-pm@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-power@fi.rohmeurope.com, linux-gpio@vger.kernel.org,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        nouveau@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org,
+        spice-devel@lists.freedesktop.org, linux-iio@vger.kernel.org,
+        linux-amlogic@lists.infradead.org,
+        industrypack-devel@lists.sourceforge.net,
+        linux-media@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
+        linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-can@vger.kernel.org,
+        Network Development <netdev@vger.kernel.org>,
+        intel-wired-lan@lists.osuosl.org, ath10k@lists.infradead.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        linux-stm32@st-md-mailman.stormreply.com, linux-nfc@lists.01.org,
+        linux-nvdimm <linux-nvdimm@lists.01.org>,
+        linux-pci@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org, patches@opensource.cirrus.com,
+        storagedev@microchip.com, devel@driverdev.osuosl.org,
+        linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+        usb-storage@lists.one-eyed-alien.net,
+        linux-watchdog@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        bpf <bpf@vger.kernel.org>, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        alsa-devel@alsa-project.org,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        George Burgess <gbiv@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Tom Rix <trix@redhat.com>
+On Sat, Oct 17, 2020 at 10:43 PM Greg KH <gregkh@linuxfoundation.org> wrote:
+>
+> On Sat, Oct 17, 2020 at 09:09:28AM -0700, trix@redhat.com wrote:
+> > From: Tom Rix <trix@redhat.com>
+> >
+> > This is a upcoming change to clean up a new warning treewide.
+> > I am wondering if the change could be one mega patch (see below) or
+> > normal patch per file about 100 patches or somewhere half way by collecting
+> > early acks.
+>
+> Please break it up into one-patch-per-subsystem, like normal, and get it
+> merged that way.
+>
+> Sending us a patch, without even a diffstat to review, isn't going to
+> get you very far...
 
-A break is not needed if it is preceded by a return
+Tom,
+If you're able to automate this cleanup, I suggest checking in a
+script that can be run on a directory.  Then for each subsystem you
+can say in your commit "I ran scripts/fix_whatever.py on this subdir."
+ Then others can help you drive the tree wide cleanup.  Then we can
+enable -Wunreachable-code-break either by default, or W=2 right now
+might be a good idea.
 
-Signed-off-by: Tom Rix <trix@redhat.com>
----
- drivers/crypto/atmel-sha.c | 1 -
- 1 file changed, 1 deletion(-)
+Ah, George (gbiv@, cc'ed), did an analysis recently of
+`-Wunreachable-code-loop-increment`, `-Wunreachable-code-break`, and
+`-Wunreachable-code-return` for Android userspace.  From the review:
+```
+Spoilers: of these, it seems useful to turn on
+-Wunreachable-code-loop-increment and -Wunreachable-code-return by
+default for Android
+...
+While these conventions about always having break arguably became
+obsolete when we enabled -Wfallthrough, my sample turned up zero
+potential bugs caught by this warning, and we'd need to put a lot of
+effort into getting a clean tree. So this warning doesn't seem to be
+worth it.
+```
+Looks like there's an order of magnitude of `-Wunreachable-code-break`
+than the other two.
 
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 75ccf41a7cb9..0eb6f54e3b66 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -459,7 +459,6 @@ static int atmel_sha_init(struct ahash_request *req)
- 		break;
- 	default:
- 		return -EINVAL;
--		break;
- 	}
- 
- 	ctx->bufcnt = 0;
+We probably should add all 3 to W=2 builds (wrapped in cc-option).
+I've filed https://github.com/ClangBuiltLinux/linux/issues/1180 to
+follow up on.
 -- 
-2.18.1
-
+Thanks,
+~Nick Desaulniers
