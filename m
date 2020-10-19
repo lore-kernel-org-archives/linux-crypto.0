@@ -4,53 +4,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AD75C433E7
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Oct 2020 15:30:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBF40C433DF
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Oct 2020 15:30:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23B3F2236F
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Oct 2020 15:30:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78C3F2231B
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Oct 2020 15:30:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730251AbgJSPab (ORCPT
+        id S1730171AbgJSPaX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Oct 2020 11:30:31 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:40208 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730174AbgJSPaY (ORCPT
+        Mon, 19 Oct 2020 11:30:23 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:34344 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730159AbgJSPaX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Oct 2020 11:30:24 -0400
-Received: by mail-io1-f65.google.com with SMTP id k25so51140ioh.7;
-        Mon, 19 Oct 2020 08:30:23 -0700 (PDT)
+        Mon, 19 Oct 2020 11:30:23 -0400
+Received: by mail-io1-f67.google.com with SMTP id z5so120141iob.1;
+        Mon, 19 Oct 2020 08:30:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=4+9pTpDU9v67Xmq4Io7/AIaSK+w54y2rbDVaGr/lU9M=;
-        b=RhjAJJSwuE6n+78am8EH10luuVWf+a+YrguG8pA/br7HPYqr/4mA2EH5GYV0FJ1o1H
-         ElyS7S8Nb4/5KJMcBrBq+ilYP9jXx09Kv1L8omnG+kJ74TC+vIlinOIhg8C33AgbUDBm
-         oAfN/IT83RAU24rzFUBrx9/mBKsgWO08MhbBroTjJMjH8xLAHMq/o5i2ghWde80x+jKZ
-         hTmu6iABs0tdUP6v16/4kFiK75EqoES6wRaYPOuWr25VlJKXEJRDdOsE/gXyk2nmIZFZ
-         by44KuvC7615snG/fC996M7L7KUJqdBgHQ1kNshuU1AqreLcHqwMTisJfthRKmMniA9W
-         R7xw==
-X-Gm-Message-State: AOAM532ZZrO8fP1vTUeKUz5H+/evudw41mQ6zkDjk4iyLPTNkDl26i0L
-        Lw8JeFIRPQ7AK6dg05IMZqc=
-X-Google-Smtp-Source: ABdhPJxgtHPR7zr47m94FsqUaDBLKQBM+NkR1RRTMe5rBKcfzWOBQ19JGb1f2JHOFqDpvnjAB6ssIw==
-X-Received: by 2002:a02:a893:: with SMTP id l19mr396103jam.1.1603121423229;
-        Mon, 19 Oct 2020 08:30:23 -0700 (PDT)
+        bh=aC0csafA10XEKxluLw+TGr+3B4XctKQH20XSmRK1UrE=;
+        b=MSWB6fqIC6j6CuW5pNwGF6kA9prfZNxEGnGCkLHeyHeN2vqvRGcbZ5n3F1Ug71+3TR
+         S3pnKQ/qV9Son6pwJjK41QHMvK5DFRhX6iM/TicSgVZttJb8lj/voLn8ct+abl5qsLK0
+         kyTwMN05MYFIKMfcGPNGDQ0txA5McrADbXjbUOHusMltZAtxnbH1v48Y/xejve1Yx48q
+         V9SZIA8QziVRTVma/PUiZ2uJ+7PRxyxJT7NnMspIsZ0XWo0gftZ7xPHru4oJ/LuLjNwb
+         h0su3WyzRrTd3gsFd4lJ8e9d/yZea8gJQsoHStpO2jT0B9brQsEUiC3LvSHqhCRY7wnU
+         kzFQ==
+X-Gm-Message-State: AOAM530FvBO7nVHsR8R+KFgPZ5zj4anzcNpRQLpJwQqBqvIH8wfiVBtw
+        gVdpsyW+gdg0F6NaBgShKn8uGKB5Jy1PrA==
+X-Google-Smtp-Source: ABdhPJw6vOfZ53/ezVU4AfArNOg2Eqfsf+hVvOCdWsrW2Ftb3e/WpgVAoeJLJYjdkRpu7CwYqg9uoA==
+X-Received: by 2002:a02:8661:: with SMTP id e88mr390665jai.43.1603121421961;
+        Mon, 19 Oct 2020 08:30:21 -0700 (PDT)
 Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
-        by smtp.gmail.com with ESMTPSA id m86sm20898ilb.44.2020.10.19.08.30.22
+        by smtp.gmail.com with ESMTPSA id m86sm20898ilb.44.2020.10.19.08.30.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Oct 2020 08:30:22 -0700 (PDT)
+        Mon, 19 Oct 2020 08:30:21 -0700 (PDT)
 From:   Arvind Sankar <nivedita@alum.mit.edu>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org
-Subject: [PATCH 4/5] crypto: lib/sha256 - Unroll SHA256 loop 8 times intead of 64
-Date:   Mon, 19 Oct 2020 11:30:15 -0400
-Message-Id: <20201019153016.2698303-5-nivedita@alum.mit.edu>
+Subject: [PATCH 3/5] crypto: lib/sha256 - Clear W[] in sha256_update() instead of sha256_transform()
+Date:   Mon, 19 Oct 2020 11:30:14 -0400
+Message-Id: <20201019153016.2698303-4-nivedita@alum.mit.edu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201019153016.2698303-1-nivedita@alum.mit.edu>
 References: <20201019153016.2698303-1-nivedita@alum.mit.edu>
@@ -60,206 +60,66 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This reduces code size substantially (on x86_64 with gcc-10 the size of
-sha256_update() goes from 7593 bytes to 1952 bytes including the new
-SHA256_K array), and on x86 is slightly faster than the full unroll.
+The temporary W[] array is currently zeroed out once every call to
+sha256_transform(), i.e. once every 64 bytes of input data. Moving it to
+sha256_update() instead so that it is cleared only once per update can
+save about 2-3% of the total time taken to compute the digest, with a
+reasonable memset() implementation, and considerably more (~20%) with a
+bad one (eg the x86 purgatory currently uses a memset() coded in C).
 
 Signed-off-by: Arvind Sankar <nivedita@alum.mit.edu>
 ---
- lib/crypto/sha256.c | 164 ++++++++------------------------------------
- 1 file changed, 28 insertions(+), 136 deletions(-)
+ lib/crypto/sha256.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
 diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
-index c6bfeacc5b81..9f0b71d41ea0 100644
+index 099cd11f83c1..c6bfeacc5b81 100644
 --- a/lib/crypto/sha256.c
 +++ b/lib/crypto/sha256.c
-@@ -18,6 +18,17 @@
- #include <crypto/sha.h>
- #include <asm/unaligned.h>
- 
-+static const u32 SHA256_K[] = {
-+	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
-+	0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
-+	0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
-+	0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
-+	0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
-+	0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
-+	0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
-+	0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
-+};
-+
- static inline u32 Ch(u32 x, u32 y, u32 z)
- {
- 	return z ^ (x & (y ^ z));
-@@ -43,9 +54,15 @@ static inline void BLEND_OP(int I, u32 *W)
+@@ -43,10 +43,9 @@ static inline void BLEND_OP(int I, u32 *W)
  	W[I] = s1(W[I-2]) + W[I-7] + s0(W[I-15]) + W[I-16];
  }
  
-+#define SHA256_ROUND(i, a, b, c, d, e, f, g, h) do {		\
-+	u32 t1, t2;						\
-+	t1 = h + e1(e) + Ch(e, f, g) + SHA256_K[i] + W[i];	\
-+	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1 + t2;	\
-+} while (0)
-+
- static void sha256_transform(u32 *state, const u8 *input, u32 *W)
+-static void sha256_transform(u32 *state, const u8 *input)
++static void sha256_transform(u32 *state, const u8 *input, u32 *W)
  {
--	u32 a, b, c, d, e, f, g, h, t1, t2;
-+	u32 a, b, c, d, e, f, g, h;
+ 	u32 a, b, c, d, e, f, g, h, t1, t2;
+-	u32 W[64];
  	int i;
  
  	/* load the input */
-@@ -61,141 +78,16 @@ static void sha256_transform(u32 *state, const u8 *input, u32 *W)
- 	e = state[4];  f = state[5];  g = state[6];  h = state[7];
- 
- 	/* now iterate */
--	t1 = h + e1(e) + Ch(e, f, g) + 0x428a2f98 + W[0];
--	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1 + t2;
--	t1 = g + e1(d) + Ch(d, e, f) + 0x71374491 + W[1];
--	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1 + t2;
--	t1 = f + e1(c) + Ch(c, d, e) + 0xb5c0fbcf + W[2];
--	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1 + t2;
--	t1 = e + e1(b) + Ch(b, c, d) + 0xe9b5dba5 + W[3];
--	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1 + t2;
--	t1 = d + e1(a) + Ch(a, b, c) + 0x3956c25b + W[4];
--	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1 + t2;
--	t1 = c + e1(h) + Ch(h, a, b) + 0x59f111f1 + W[5];
--	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1 + t2;
--	t1 = b + e1(g) + Ch(g, h, a) + 0x923f82a4 + W[6];
--	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1 + t2;
--	t1 = a + e1(f) + Ch(f, g, h) + 0xab1c5ed5 + W[7];
--	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1 + t2;
--
--	t1 = h + e1(e) + Ch(e, f, g) + 0xd807aa98 + W[8];
--	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1 + t2;
--	t1 = g + e1(d) + Ch(d, e, f) + 0x12835b01 + W[9];
--	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1 + t2;
--	t1 = f + e1(c) + Ch(c, d, e) + 0x243185be + W[10];
--	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1 + t2;
--	t1 = e + e1(b) + Ch(b, c, d) + 0x550c7dc3 + W[11];
--	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1 + t2;
--	t1 = d + e1(a) + Ch(a, b, c) + 0x72be5d74 + W[12];
--	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1 + t2;
--	t1 = c + e1(h) + Ch(h, a, b) + 0x80deb1fe + W[13];
--	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1 + t2;
--	t1 = b + e1(g) + Ch(g, h, a) + 0x9bdc06a7 + W[14];
--	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1 + t2;
--	t1 = a + e1(f) + Ch(f, g, h) + 0xc19bf174 + W[15];
--	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1 + t2;
--
--	t1 = h + e1(e) + Ch(e, f, g) + 0xe49b69c1 + W[16];
--	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1 + t2;
--	t1 = g + e1(d) + Ch(d, e, f) + 0xefbe4786 + W[17];
--	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1 + t2;
--	t1 = f + e1(c) + Ch(c, d, e) + 0x0fc19dc6 + W[18];
--	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1 + t2;
--	t1 = e + e1(b) + Ch(b, c, d) + 0x240ca1cc + W[19];
--	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1 + t2;
--	t1 = d + e1(a) + Ch(a, b, c) + 0x2de92c6f + W[20];
--	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1 + t2;
--	t1 = c + e1(h) + Ch(h, a, b) + 0x4a7484aa + W[21];
--	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1 + t2;
--	t1 = b + e1(g) + Ch(g, h, a) + 0x5cb0a9dc + W[22];
--	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1 + t2;
--	t1 = a + e1(f) + Ch(f, g, h) + 0x76f988da + W[23];
--	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1 + t2;
--
--	t1 = h + e1(e) + Ch(e, f, g) + 0x983e5152 + W[24];
--	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1 + t2;
--	t1 = g + e1(d) + Ch(d, e, f) + 0xa831c66d + W[25];
--	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1 + t2;
--	t1 = f + e1(c) + Ch(c, d, e) + 0xb00327c8 + W[26];
--	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1 + t2;
--	t1 = e + e1(b) + Ch(b, c, d) + 0xbf597fc7 + W[27];
--	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1 + t2;
--	t1 = d + e1(a) + Ch(a, b, c) + 0xc6e00bf3 + W[28];
--	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1 + t2;
--	t1 = c + e1(h) + Ch(h, a, b) + 0xd5a79147 + W[29];
--	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1 + t2;
--	t1 = b + e1(g) + Ch(g, h, a) + 0x06ca6351 + W[30];
--	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1 + t2;
--	t1 = a + e1(f) + Ch(f, g, h) + 0x14292967 + W[31];
--	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1 + t2;
--
--	t1 = h + e1(e) + Ch(e, f, g) + 0x27b70a85 + W[32];
--	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1 + t2;
--	t1 = g + e1(d) + Ch(d, e, f) + 0x2e1b2138 + W[33];
--	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1 + t2;
--	t1 = f + e1(c) + Ch(c, d, e) + 0x4d2c6dfc + W[34];
--	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1 + t2;
--	t1 = e + e1(b) + Ch(b, c, d) + 0x53380d13 + W[35];
--	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1 + t2;
--	t1 = d + e1(a) + Ch(a, b, c) + 0x650a7354 + W[36];
--	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1 + t2;
--	t1 = c + e1(h) + Ch(h, a, b) + 0x766a0abb + W[37];
--	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1 + t2;
--	t1 = b + e1(g) + Ch(g, h, a) + 0x81c2c92e + W[38];
--	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1 + t2;
--	t1 = a + e1(f) + Ch(f, g, h) + 0x92722c85 + W[39];
--	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1 + t2;
--
--	t1 = h + e1(e) + Ch(e, f, g) + 0xa2bfe8a1 + W[40];
--	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1 + t2;
--	t1 = g + e1(d) + Ch(d, e, f) + 0xa81a664b + W[41];
--	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1 + t2;
--	t1 = f + e1(c) + Ch(c, d, e) + 0xc24b8b70 + W[42];
--	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1 + t2;
--	t1 = e + e1(b) + Ch(b, c, d) + 0xc76c51a3 + W[43];
--	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1 + t2;
--	t1 = d + e1(a) + Ch(a, b, c) + 0xd192e819 + W[44];
--	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1 + t2;
--	t1 = c + e1(h) + Ch(h, a, b) + 0xd6990624 + W[45];
--	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1 + t2;
--	t1 = b + e1(g) + Ch(g, h, a) + 0xf40e3585 + W[46];
--	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1 + t2;
--	t1 = a + e1(f) + Ch(f, g, h) + 0x106aa070 + W[47];
--	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1 + t2;
--
--	t1 = h + e1(e) + Ch(e, f, g) + 0x19a4c116 + W[48];
--	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1 + t2;
--	t1 = g + e1(d) + Ch(d, e, f) + 0x1e376c08 + W[49];
--	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1 + t2;
--	t1 = f + e1(c) + Ch(c, d, e) + 0x2748774c + W[50];
--	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1 + t2;
--	t1 = e + e1(b) + Ch(b, c, d) + 0x34b0bcb5 + W[51];
--	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1 + t2;
--	t1 = d + e1(a) + Ch(a, b, c) + 0x391c0cb3 + W[52];
--	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1 + t2;
--	t1 = c + e1(h) + Ch(h, a, b) + 0x4ed8aa4a + W[53];
--	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1 + t2;
--	t1 = b + e1(g) + Ch(g, h, a) + 0x5b9cca4f + W[54];
--	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1 + t2;
--	t1 = a + e1(f) + Ch(f, g, h) + 0x682e6ff3 + W[55];
--	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1 + t2;
--
--	t1 = h + e1(e) + Ch(e, f, g) + 0x748f82ee + W[56];
--	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1 + t2;
--	t1 = g + e1(d) + Ch(d, e, f) + 0x78a5636f + W[57];
--	t2 = e0(h) + Maj(h, a, b);    c += t1;    g = t1 + t2;
--	t1 = f + e1(c) + Ch(c, d, e) + 0x84c87814 + W[58];
--	t2 = e0(g) + Maj(g, h, a);    b += t1;    f = t1 + t2;
--	t1 = e + e1(b) + Ch(b, c, d) + 0x8cc70208 + W[59];
--	t2 = e0(f) + Maj(f, g, h);    a += t1;    e = t1 + t2;
--	t1 = d + e1(a) + Ch(a, b, c) + 0x90befffa + W[60];
--	t2 = e0(e) + Maj(e, f, g);    h += t1;    d = t1 + t2;
--	t1 = c + e1(h) + Ch(h, a, b) + 0xa4506ceb + W[61];
--	t2 = e0(d) + Maj(d, e, f);    g += t1;    c = t1 + t2;
--	t1 = b + e1(g) + Ch(g, h, a) + 0xbef9a3f7 + W[62];
--	t2 = e0(c) + Maj(c, d, e);    f += t1;    b = t1 + t2;
--	t1 = a + e1(f) + Ch(f, g, h) + 0xc67178f2 + W[63];
--	t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1 + t2;
-+	for (i = 0; i < 64; i += 8) {
-+		SHA256_ROUND(i + 0, a, b, c, d, e, f, g, h);
-+		SHA256_ROUND(i + 1, h, a, b, c, d, e, f, g);
-+		SHA256_ROUND(i + 2, g, h, a, b, c, d, e, f);
-+		SHA256_ROUND(i + 3, f, g, h, a, b, c, d, e);
-+		SHA256_ROUND(i + 4, e, f, g, h, a, b, c, d);
-+		SHA256_ROUND(i + 5, d, e, f, g, h, a, b, c);
-+		SHA256_ROUND(i + 6, c, d, e, f, g, h, a, b);
-+		SHA256_ROUND(i + 7, b, c, d, e, f, g, h, a);
-+	}
+@@ -200,15 +199,13 @@ static void sha256_transform(u32 *state, const u8 *input)
  
  	state[0] += a; state[1] += b; state[2] += c; state[3] += d;
  	state[4] += e; state[5] += f; state[6] += g; state[7] += h;
+-
+-	/* clear any sensitive info... */
+-	memzero_explicit(W, 64 * sizeof(u32));
+ }
+ 
+ void sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+ {
+ 	unsigned int partial, done;
+ 	const u8 *src;
++	u32 W[64];
+ 
+ 	partial = sctx->count & 0x3f;
+ 	sctx->count += len;
+@@ -223,11 +220,13 @@ void sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+ 		}
+ 
+ 		do {
+-			sha256_transform(sctx->state, src);
++			sha256_transform(sctx->state, src, W);
+ 			done += 64;
+ 			src = data + done;
+ 		} while (done + 63 < len);
+ 
++		memzero_explicit(W, sizeof(W));
++
+ 		partial = 0;
+ 	}
+ 	memcpy(sctx->buf + partial, src, len - done);
 -- 
 2.26.2
 
