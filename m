@@ -5,43 +5,43 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BD1DC433DF
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Oct 2020 19:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC48C4363A
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Oct 2020 19:53:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0C66222C2
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Oct 2020 19:53:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 598DF222C2
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Oct 2020 19:53:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="h1ENWONY"
+	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="NDfyDG5q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727936AbgJSTwr (ORCPT
+        id S1727698AbgJSTx3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Oct 2020 15:52:47 -0400
-Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.177]:27329 "EHLO
+        Mon, 19 Oct 2020 15:53:29 -0400
+Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.179]:8852 "EHLO
         mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731412AbgJSTwq (ORCPT
+        with ESMTP id S1731414AbgJSTwq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 19 Oct 2020 15:52:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1603137161;
         s=strato-dkim-0002; d=chronox.de;
         h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
         X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=kHQnkVfStHYeA2IR3/MUj97L+KuhfZfqQXPCk2cj9E0=;
-        b=h1ENWONY0tRAlRj0v6nilHJI7nTr8LKj8zEKY9NjSZw1ZHsFWXDoXBOEzQc5PYVbfI
-        0tJ/eUUwoEKrODFNlCCYFUQJWvG7gmc20KEiy6aW449zACnjX4VOIb317tcuus2ewFdM
-        iNJKHhnSG3sBEUKq34HCq6pG33jSAYCg/pPwsl/+hoHL/UQiTDKz+DKyZ8nr9jfZqJBY
-        v7eC888/b0Y7+E4BAmstGiLj9yIMg1mSUPcwxYw9qB0xmiIlIxI+2nbURJ7SIDTBuHrn
-        z0rzCKIAetnsPVVGkLJ6PjfmxL05Ydbixi2etwkokkvqOL3/wEICNnkGl5kiqKAPUsgc
-        Y2HQ==
+        bh=GT0wcQHlgU/1MyN2U88fd3rq7pEA11XXtEYFsHX3OpU=;
+        b=NDfyDG5qp87vOV5kNnGcKxbty0T5YRnBQJ3yiqAQ3aajDmOVORQ1gp3NO0Q+atv5qh
+        zWXxZrAWpgCx5KIkETiThmPZW50mnQMXxbb4VQ9Rsx1pND1bH5VOGFy547hqYVTqj4VI
+        bNiNXy8FjV2fhTEz1exGH75BAkqXP7/zIqha1fJR6lgM/95jTg75dz5pi26rfA3NbAep
+        26UC0i7BEGQZhqiLp7JhqACIrhla6fGGUsOIMpIlhjGcVR4vg8wnlkPZaE/EC4S3b0y8
+        +6rhCANLOHBoreuXIky4TjpvhjgJzXGfFo253v4ijHXJnHkTGrLQq+VLm+HFq/gDK13l
+        rgNQ==
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbJPSb3t0="
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
         by smtp.strato.de (RZmta 47.2.1 DYNA|AUTH)
-        with ESMTPSA id C0b627w9JJpmU6u
+        with ESMTPSA id C0b627w9JJpqU6w
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-        Mon, 19 Oct 2020 21:51:48 +0200 (CEST)
+        Mon, 19 Oct 2020 21:51:52 +0200 (CEST)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Torsten Duwe <duwe@lst.de>
 Cc:     Willy Tarreau <w@1wt.eu>, "Theodore Y. Ts'o" <tytso@mit.edu>,
@@ -71,28 +71,48 @@ Cc:     Willy Tarreau <w@1wt.eu>, "Theodore Y. Ts'o" <tytso@mit.edu>,
         Eric Biggers <ebiggers@kernel.org>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Petr Tesarik <ptesarik@suse.cz>
-Subject: [PATCH v36 05/13] LRNG - add common generic hash support
-Date:   Mon, 19 Oct 2020 21:33:27 +0200
-Message-ID: <8668311.CDJkKcVGEf@positron.chronox.de>
+Subject: [PATCH v36 03/13] LRNG - sysctls and /proc interface
+Date:   Mon, 19 Oct 2020 21:32:24 +0200
+Message-ID: <20822658.EfDdHjke4D@positron.chronox.de>
 In-Reply-To: <3073852.aeNJFYEL58@positron.chronox.de>
 References: <20200921075857.4424-1-nstange@suse.de> <20201016172619.GA18410@lst.de> <3073852.aeNJFYEL58@positron.chronox.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The LRNG switchable DRNG support also allows the replacement of the hash
-implementation used as conditioning component. The common generic hash
-support code provides the required callbacks using the synchronous hash
-implementations of the kernel crypto API.
+The LRNG sysctl interface provides the same controls as the existing
+/dev/random implementation. These sysctls behave identically and are
+implemented identically. The goal is to allow a possible merge of the
+existing /dev/random implementation with this implementation which
+implies that this patch tries have a very close similarity. Yet, all
+sysctls are documented at [1].
 
-All synchronous hash implementations supported by the kernel crypto API
-can be used as part of the LRNG with this generic support.
+In addition, it provides the file lrng_type which provides details about
+the LRNG:
 
-The generic support is intended to be configured by separate switchable
-DRNG backends.
+=2D the name of the DRNG that produces the random numbers for /dev/random,
+/dev/urandom, getrandom(2)
+
+=2D the hash used to produce random numbers from the entropy pool
+
+=2D the number of secondary DRNG instances
+
+=2D indicator whether the LRNG operates SP800-90B compliant
+
+=2D indicator whether a high-resolution timer is identified - only with a
+high-resolution timer the interrupt noise source will deliver sufficient
+entropy
+
+=2D indicator whether the LRNG has been minimally seeded (i.e. is the
+secondary DRNG seeded with at least 128 bits of of entropy)
+
+=2D indicator whether the LRNG has been fully seeded (i.e. is the
+secondary DRNG seeded with at least 256 bits of entropy)
+
+[1] https://www.chronox.de/lrng.html
 
 CC: Torsten Duwe <duwe@lst.de>
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
@@ -111,174 +131,253 @@ CC: Andy Lutomirski <luto@kernel.org>
 CC: Florian Weimer <fweimer@redhat.com>
 CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
-CC: "Peter, Matthias" <matthias.peter@bsi.bund.de>
-CC: Roman Drahtmueller <draht@schaltsekun.de>
-CC: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-CC: Neil Horman <nhorman@redhat.com>
+Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
+Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
+Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Tested-by: Neil Horman <nhorman@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- drivers/char/lrng/Kconfig           |  7 +++
- drivers/char/lrng/Makefile          |  1 +
- drivers/char/lrng/lrng_kcapi_hash.c | 97 +++++++++++++++++++++++++++++
- drivers/char/lrng/lrng_kcapi_hash.h | 19 ++++++
- 4 files changed, 124 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_kcapi_hash.c
- create mode 100644 drivers/char/lrng/lrng_kcapi_hash.h
+=2D--
+ drivers/char/lrng/Makefile          |   1 +
+ drivers/char/lrng/lrng_interfaces.c |   2 -
+ drivers/char/lrng/lrng_internal.h   |   4 +
+ drivers/char/lrng/lrng_proc.c       | 182 ++++++++++++++++++++++++++++
+ 4 files changed, 187 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/char/lrng/lrng_proc.c
 
-diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-index e211fcf5aa8b..daa2057248ac 100644
---- a/drivers/char/lrng/Kconfig
-+++ b/drivers/char/lrng/Kconfig
-@@ -76,4 +76,11 @@ menuconfig LRNG_DRNG_SWITCH
- 	  accessible via the external interfaces. With this configuration
- 	  option other DRNGs can be selected and loaded at runtime.
- 
-+if LRNG_DRNG_SWITCH
-+
-+config LRNG_KCAPI_HASH
-+	bool
-+
-+endif # LRNG_DRNG_SWITCH
-+
- endif # LRNG
 diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 0eb4a6849c88..40f8826edeeb 100644
---- a/drivers/char/lrng/Makefile
+index 29724c65287d..ac97f0b11cb7 100644
+=2D-- a/drivers/char/lrng/Makefile
 +++ b/drivers/char/lrng/Makefile
-@@ -11,3 +11,4 @@ obj-y				+= lrng_pool.o lrng_aux.o \
- obj-$(CONFIG_NUMA)		+= lrng_numa.o
- obj-$(CONFIG_SYSCTL)		+= lrng_proc.o
- obj-$(CONFIG_LRNG_DRNG_SWITCH)	+= lrng_switch.o
-+obj-$(CONFIG_LRNG_KCAPI_HASH)	+= lrng_kcapi_hash.o
-diff --git a/drivers/char/lrng/lrng_kcapi_hash.c b/drivers/char/lrng/lrng_kcapi_hash.c
+@@ -9,3 +9,4 @@ obj-y				+=3D lrng_pool.o lrng_aux.o \
+ 				   lrng_interfaces.o
+=20
+ obj-$(CONFIG_NUMA)		+=3D lrng_numa.o
++obj-$(CONFIG_SYSCTL)		+=3D lrng_proc.o
+diff --git a/drivers/char/lrng/lrng_interfaces.c b/drivers/char/lrng/lrng_i=
+nterfaces.c
+index 19d01d3f7492..b55de97523ad 100644
+=2D-- a/drivers/char/lrng/lrng_interfaces.c
++++ b/drivers/char/lrng/lrng_interfaces.c
+@@ -38,8 +38,6 @@ static DECLARE_WAIT_QUEUE_HEAD(lrng_write_wait);
+ static DECLARE_WAIT_QUEUE_HEAD(lrng_init_wait);
+ static struct fasync_struct *fasync;
+=20
+=2Dstruct ctl_table random_table[];
+=2D
+ /********************************** Helper *******************************=
+****/
+=20
+ /* Is the DRNG seed level too low? */
+diff --git a/drivers/char/lrng/lrng_internal.h b/drivers/char/lrng/lrng_int=
+ernal.h
+index f858effcf710..2f8c14ffbaf3 100644
+=2D-- a/drivers/char/lrng/lrng_internal.h
++++ b/drivers/char/lrng/lrng_internal.h
+@@ -113,7 +113,11 @@ void lrng_cc20_init_state_boot(struct chacha20_state *=
+state);
+=20
+ /********************************** /proc ********************************=
+*****/
+=20
++#ifdef CONFIG_SYSCTL
++void lrng_pool_inc_numa_node(void);
++#else
+ static inline void lrng_pool_inc_numa_node(void) { }
++#endif
+=20
+ /****************************** LRNG interfaces **************************=
+*****/
+=20
+diff --git a/drivers/char/lrng/lrng_proc.c b/drivers/char/lrng/lrng_proc.c
 new file mode 100644
-index 000000000000..c5ddc71f5f8c
---- /dev/null
-+++ b/drivers/char/lrng/lrng_kcapi_hash.c
-@@ -0,0 +1,97 @@
+index 000000000000..b2985a2ae0f7
+=2D-- /dev/null
++++ b/drivers/char/lrng/lrng_proc.c
+@@ -0,0 +1,182 @@
 +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
 +/*
-+ * Backend for providing the hash primitive using the kernel crypto API.
++ * LRNG proc and sysctl interfaces
 + *
-+ * Copyright (C) 2020, Stephan Mueller <smueller@chronox.de>
++ * Copyright (C) 2016 - 2020, Stephan Mueller <smueller@chronox.de>
 + */
 +
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++#include <linux/lrng.h>
++#include <linux/proc_fs.h>
++#include <linux/seq_file.h>
++#include <linux/sysctl.h>
++#include <linux/uuid.h>
 +
-+#include <crypto/hash.h>
++#include "lrng_internal.h"
++#include "lrng_sw_noise.h"
 +
-+#include "lrng_kcapi_hash.h"
++/*
++ * This function is used to return both the bootid UUID, and random
++ * UUID.  The difference is in whether table->data is NULL; if it is,
++ * then a new UUID is generated and returned to the user.
++ *
++ * If the user accesses this via the proc interface, the UUID will be
++ * returned as an ASCII string in the standard UUID format; if via the
++ * sysctl system call, as 16 bytes of binary data.
++ */
++static int lrng_proc_do_uuid(struct ctl_table *table, int write,
++			     void *buffer, size_t *lenp, loff_t *ppos)
++{
++	struct ctl_table fake_table;
++	unsigned char buf[64], tmp_uuid[16], *uuid;
 +
-+struct lrng_hash_info {
-+	struct crypto_shash *tfm;
++	uuid =3D table->data;
++	if (!uuid) {
++		uuid =3D tmp_uuid;
++		generate_random_uuid(uuid);
++	} else {
++		static DEFINE_SPINLOCK(bootid_spinlock);
++
++		spin_lock(&bootid_spinlock);
++		if (!uuid[8])
++			generate_random_uuid(uuid);
++		spin_unlock(&bootid_spinlock);
++	}
++
++	sprintf(buf, "%pU", uuid);
++
++	fake_table.data =3D buf;
++	fake_table.maxlen =3D sizeof(buf);
++
++	return proc_dostring(&fake_table, write, buffer, lenp, ppos);
++}
++
++static int lrng_proc_do_entropy(struct ctl_table *table, int write,
++				void *buffer, size_t *lenp, loff_t *ppos)
++{
++	struct ctl_table fake_table;
++	int entropy_count;
++
++	entropy_count =3D lrng_avail_entropy();
++
++	fake_table.data =3D &entropy_count;
++	fake_table.maxlen =3D sizeof(entropy_count);
++
++	return proc_dointvec(&fake_table, write, buffer, lenp, ppos);
++}
++
++static int lrng_proc_do_poolsize(struct ctl_table *table, int write,
++				 void *buffer, size_t *lenp, loff_t *ppos)
++{
++	struct ctl_table fake_table;
++	int entropy_count;
++
++	/* LRNG can at most retain entropy in per-CPU pools and aux pool */
++	entropy_count =3D lrng_get_digestsize() * (num_online_cpus() + 1);
++
++	fake_table.data =3D &entropy_count;
++	fake_table.maxlen =3D sizeof(entropy_count);
++
++	return proc_dointvec(&fake_table, write, buffer, lenp, ppos);
++}
++
++static int lrng_min_write_thresh;
++static int lrng_max_write_thresh =3D LRNG_MAX_DIGESTSIZE;
++static char lrng_sysctl_bootid[16];
++static int lrng_drng_reseed_max_min;
++
++struct ctl_table random_table[] =3D {
++	{
++		.procname	=3D "poolsize",
++		.maxlen		=3D sizeof(int),
++		.mode		=3D 0444,
++		.proc_handler	=3D lrng_proc_do_poolsize,
++	},
++	{
++		.procname	=3D "entropy_avail",
++		.maxlen		=3D sizeof(int),
++		.mode		=3D 0444,
++		.proc_handler	=3D lrng_proc_do_entropy,
++	},
++	{
++		.procname	=3D "write_wakeup_threshold",
++		.data		=3D &lrng_write_wakeup_bits,
++		.maxlen		=3D sizeof(int),
++		.mode		=3D 0644,
++		.proc_handler	=3D proc_dointvec_minmax,
++		.extra1		=3D &lrng_min_write_thresh,
++		.extra2		=3D &lrng_max_write_thresh,
++	},
++	{
++		.procname	=3D "boot_id",
++		.data		=3D &lrng_sysctl_bootid,
++		.maxlen		=3D 16,
++		.mode		=3D 0444,
++		.proc_handler	=3D lrng_proc_do_uuid,
++	},
++	{
++		.procname	=3D "uuid",
++		.maxlen		=3D 16,
++		.mode		=3D 0444,
++		.proc_handler	=3D lrng_proc_do_uuid,
++	},
++	{
++		.procname       =3D "urandom_min_reseed_secs",
++		.data           =3D &lrng_drng_reseed_max_time,
++		.maxlen         =3D sizeof(int),
++		.mode           =3D 0644,
++		.proc_handler   =3D proc_dointvec,
++		.extra1		=3D &lrng_drng_reseed_max_min,
++	},
++	{ }
 +};
 +
-+static inline void _lrng_kcapi_hash_free(struct lrng_hash_info *lrng_hash)
-+{
-+	struct crypto_shash *tfm = lrng_hash->tfm;
++/* Number of online DRNGs */
++static u32 numa_drngs =3D 1;
 +
-+	crypto_free_shash(tfm);
-+	kfree(lrng_hash);
++void lrng_pool_inc_numa_node(void)
++{
++	numa_drngs++;
 +}
 +
-+void *lrng_kcapi_hash_alloc(const char *name)
++static int lrng_proc_type_show(struct seq_file *m, void *v)
 +{
-+	struct lrng_hash_info *lrng_hash;
-+	struct crypto_shash *tfm;
-+	int ret;
++	struct lrng_drng *lrng_drng_init =3D lrng_drng_init_instance();
++	unsigned long flags =3D 0;
++	unsigned char buf[350];
 +
-+	if (!name) {
-+		pr_err("Hash name missing\n");
-+		return ERR_PTR(-EINVAL);
-+	}
++	lrng_drng_lock(lrng_drng_init, &flags);
++	snprintf(buf, sizeof(buf),
++		 "DRNG name: %s\n"
++		 "Hash for reading entropy pool: %s\n"
++		 "Hash for operating aux entropy pool: %s\n"
++		 "LRNG security strength in bits: %d\n"
++		 "per-CPU interrupt collection size: %u\n"
++		 "number of DRNG instances: %u\n"
++		 "SP800-90B compliance: %s\n"
++		 "High-resolution timer: %s\n"
++		 "LRNG minimally seeded: %s\n"
++		 "LRNG fully seeded: %s\n",
++		 lrng_drng_init->crypto_cb->lrng_drng_name(),
++		 lrng_drng_init->crypto_cb->lrng_hash_name(),
++		 lrng_drng_init->crypto_cb->lrng_hash_name(),
++		 lrng_security_strength(),
++		 LRNG_DATA_NUM_VALUES,
++		 numa_drngs,
++		 lrng_sp80090b_compliant() ? "true" : "false",
++		 lrng_pool_highres_timer() ? "true" : "false",
++		 lrng_state_min_seeded() ? "true" : "false",
++		 lrng_state_fully_seeded() ? "true" : "false");
++	lrng_drng_unlock(lrng_drng_init, &flags);
 +
-+	tfm = crypto_alloc_shash(name, 0, 0);
-+	if (IS_ERR(tfm)) {
-+		pr_err("could not allocate hash %s\n", name);
-+		return ERR_CAST(tfm);
-+	}
++	seq_write(m, buf, strlen(buf));
 +
-+	ret = sizeof(struct lrng_hash_info);
-+	lrng_hash = kmalloc(ret, GFP_KERNEL);
-+	if (!lrng_hash) {
-+		crypto_free_shash(tfm);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	lrng_hash->tfm = tfm;
-+
-+	pr_info("Hash %s allocated\n", name);
-+
-+	return lrng_hash;
++	return 0;
 +}
-+EXPORT_SYMBOL(lrng_kcapi_hash_alloc);
 +
-+u32 lrng_kcapi_hash_digestsize(void *hash)
++static int __init lrng_proc_type_init(void)
 +{
-+	struct lrng_hash_info *lrng_hash = (struct lrng_hash_info *)hash;
-+	struct crypto_shash *tfm = lrng_hash->tfm;
-+
-+	return crypto_shash_digestsize(tfm);
++	proc_create_single("lrng_type", 0444, NULL, &lrng_proc_type_show);
++	return 0;
 +}
-+EXPORT_SYMBOL(lrng_kcapi_hash_digestsize);
 +
-+void lrng_kcapi_hash_dealloc(void *hash)
-+{
-+	struct lrng_hash_info *lrng_hash = (struct lrng_hash_info *)hash;
-+
-+	_lrng_kcapi_hash_free(lrng_hash);
-+	pr_info("Hash deallocated\n");
-+}
-+EXPORT_SYMBOL(lrng_kcapi_hash_dealloc);
-+
-+int lrng_kcapi_hash_init(struct shash_desc *shash, void *hash)
-+{
-+	struct lrng_hash_info *lrng_hash = (struct lrng_hash_info *)hash;
-+	struct crypto_shash *tfm = lrng_hash->tfm;
-+
-+	shash->tfm = tfm;
-+	return crypto_shash_init(shash);
-+}
-+EXPORT_SYMBOL(lrng_kcapi_hash_init);
-+
-+int lrng_kcapi_hash_update(struct shash_desc *shash, const u8 *inbuf,
-+			   u32 inbuflen)
-+{
-+	return crypto_shash_update(shash, inbuf, inbuflen);
-+}
-+EXPORT_SYMBOL(lrng_kcapi_hash_update);
-+
-+int lrng_kcapi_hash_final(struct shash_desc *shash, u8 *digest)
-+{
-+	return crypto_shash_final(shash, digest);
-+}
-+EXPORT_SYMBOL(lrng_kcapi_hash_final);
-diff --git a/drivers/char/lrng/lrng_kcapi_hash.h b/drivers/char/lrng/lrng_kcapi_hash.h
-new file mode 100644
-index 000000000000..5bca7aba197f
---- /dev/null
-+++ b/drivers/char/lrng/lrng_kcapi_hash.h
-@@ -0,0 +1,19 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause */
-+/*
-+ * Copyright (C) 2020, Stephan Mueller <smueller@chronox.de>
-+ */
-+
-+#ifndef _LRNG_KCAPI_HASH_H
-+#define _LRNG_KCAPI_HASH_H
-+
-+#include <linux/module.h>
-+
-+void *lrng_kcapi_hash_alloc(const char *name);
-+u32 lrng_kcapi_hash_digestsize(void *hash);
-+void lrng_kcapi_hash_dealloc(void *hash);
-+int lrng_kcapi_hash_init(struct shash_desc *shash, void *hash);
-+int lrng_kcapi_hash_update(struct shash_desc *shash, const u8 *inbuf,
-+			   u32 inbuflen);
-+int lrng_kcapi_hash_final(struct shash_desc *shash, u8 *digest);
-+
-+#endif /* _LRNG_KCAPI_HASH_H */
--- 
++module_init(lrng_proc_type_init);
+=2D-=20
 2.26.2
 
 
