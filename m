@@ -2,167 +2,111 @@ Return-Path: <SRS0=SXL7=D3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FB94C4363D
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 14:09:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01446C4363D
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 14:55:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1DEA62224F
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 14:09:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ewDv3aOr"
+	by mail.kernel.org (Postfix) with ESMTP id B371D21741
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 14:55:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407867AbgJTOJd (ORCPT
+        id S1728489AbgJTOzx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Oct 2020 10:09:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48358 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2407832AbgJTOJd (ORCPT
+        Tue, 20 Oct 2020 10:55:53 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:42355 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2393570AbgJTOzw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Oct 2020 10:09:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603202972;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rOdQp2iOSkahNa0CfH1+VDlgH/zqWEjNOjN0qUXEes0=;
-        b=ewDv3aOrdJ+x5A6s7YiY6e3DZ/xG19fiCFYxEBc219ynzJxgu/51wlX4XbcPcMAU2oHyfD
-        PtMot7BJZaqOvPJXq6YGOAgeRSVWl5/eHGglGFP0XXl1T9R1hHW25Ri1M+zqhWdXytm0kf
-        dEEfBPozJhD9ETuNOOZz/yhFPpgdSTo=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-100-sTjOzMfiPZmq3tqKhUOCBg-1; Tue, 20 Oct 2020 10:09:30 -0400
-X-MC-Unique: sTjOzMfiPZmq3tqKhUOCBg-1
-Received: by mail-qv1-f71.google.com with SMTP id dd7so1428287qvb.6
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Oct 2020 07:09:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=rOdQp2iOSkahNa0CfH1+VDlgH/zqWEjNOjN0qUXEes0=;
-        b=s+4/MzV7Cy4+fTNHTTHGloP53fGlEf8BYKW2PGRZg4zXRNn+WBvqdaxJB/rk2vX7gy
-         u86DjVqHzaDkeHfmNcUZ3Mran6YonDrHlpwg/3gBwnFaUOhdNUTWz/YLP/c9xN7tPlp2
-         77IXbs3MfYi48jZQEyJQfw6Wq/acEd9d0AwX/7UhDH8emqqKJC+KkozysdYTQPSvGc17
-         wMtb3iTjGBfExbGBCnyBctWd5uztQw0LKBwM9oEEcPV0IFUbkUtZLlZuRtqjlfqVEeOA
-         ocwAQ6/8XVuVeDN+6XKVZuawkJ3XzfQWNjCL4BAJITiXhzu3sNnRF8NrP70PHJVXXXF0
-         aNIg==
-X-Gm-Message-State: AOAM5307kvnSeJePooYSyXUqjXeIMRKeDaY1CzHsvmwRJOAt1jkOuGN/
-        dhU717/9kMWxwa3arVYgasYXrJljP7HjT9dR2cXYzzhu7sjumZ941gtE3MRCHQoawoDv4y2BMco
-        T/vLu5h0fgMZMo1i3eBy6n+fu
-X-Received: by 2002:a05:620a:2195:: with SMTP id g21mr2990082qka.358.1603202969737;
-        Tue, 20 Oct 2020 07:09:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwKUy8N8weGLwzCzHDZ8oTBMtQsWbHEBLlPfZD5zpEfJ13ExA6QvxSe7FmqqHnm4D1jNxINeQ==
-X-Received: by 2002:a05:620a:2195:: with SMTP id g21mr2990039qka.358.1603202969497;
-        Tue, 20 Oct 2020 07:09:29 -0700 (PDT)
-Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
-        by smtp.gmail.com with ESMTPSA id o14sm785284qto.16.2020.10.20.07.09.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Oct 2020 07:09:28 -0700 (PDT)
-Subject: Re: [RFC] treewide: cleanup unreachable breaks
-To:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, linux-edac@vger.kernel.org,
-        linux-acpi@vger.kernel.org, linux-pm@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-power@fi.rohmeurope.com, linux-gpio@vger.kernel.org,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        nouveau@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org,
-        spice-devel@lists.freedesktop.org, linux-iio@vger.kernel.org,
-        linux-amlogic@lists.infradead.org,
-        industrypack-devel@lists.sourceforge.net,
-        linux-media@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
-        linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-can@vger.kernel.org,
-        Network Development <netdev@vger.kernel.org>,
-        intel-wired-lan@lists.osuosl.org, ath10k@lists.infradead.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        linux-stm32@st-md-mailman.stormreply.com, linux-nfc@lists.01.org,
-        linux-nvdimm <linux-nvdimm@lists.01.org>,
-        linux-pci@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org, patches@opensource.cirrus.com,
-        storagedev@microchip.com, devel@driverdev.osuosl.org,
-        linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
-        usb-storage@lists.one-eyed-alien.net,
-        linux-watchdog@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        bpf <bpf@vger.kernel.org>, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        alsa-devel@alsa-project.org,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        George Burgess <gbiv@google.com>
-References: <20201017160928.12698-1-trix@redhat.com>
- <20201018054332.GB593954@kroah.com>
- <CAKwvOdkR_Ttfo7_JKUiZFVqr=Uh=4b05KCPCSuzwk=zaWtA2_Q@mail.gmail.com>
- <20201019230546.GH36674@ziepe.ca>
-From:   Tom Rix <trix@redhat.com>
-Message-ID: <859ff6ff-3e10-195c-6961-7b2902b151d4@redhat.com>
-Date:   Tue, 20 Oct 2020 07:09:23 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        Tue, 20 Oct 2020 10:55:52 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-57-xS59UY4nNimTtYgwsOO0kw-1; Tue, 20 Oct 2020 15:55:48 +0100
+X-MC-Unique: xS59UY4nNimTtYgwsOO0kw-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Tue, 20 Oct 2020 15:55:47 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Tue, 20 Oct 2020 15:55:47 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Arvind Sankar' <nivedita@alum.mit.edu>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH 4/5] crypto: lib/sha256 - Unroll SHA256 loop 8 times
+ intead of 64
+Thread-Topic: [PATCH 4/5] crypto: lib/sha256 - Unroll SHA256 loop 8 times
+ intead of 64
+Thread-Index: AQHWpizLtR2ktKloi0KILMfFeYMjdqmgGc8ggABdwQCAABu2AA==
+Date:   Tue, 20 Oct 2020 14:55:47 +0000
+Message-ID: <6ee12f8fa3914fbcb5e4a1388e430acd@AcuMS.aculab.com>
+References: <20201019153016.2698303-1-nivedita@alum.mit.edu>
+ <20201019153016.2698303-5-nivedita@alum.mit.edu>
+ <1324eb3519d54ddd9469d30a94c11823@AcuMS.aculab.com>
+ <20201020140726.GB2996696@rani.riverdale.lan>
+In-Reply-To: <20201020140726.GB2996696@rani.riverdale.lan>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-In-Reply-To: <20201019230546.GH36674@ziepe.ca>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
 Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-On 10/19/20 4:05 PM, Jason Gunthorpe wrote:
-> On Mon, Oct 19, 2020 at 12:42:15PM -0700, Nick Desaulniers wrote:
->> On Sat, Oct 17, 2020 at 10:43 PM Greg KH <gregkh@linuxfoundation.org> wrote:
->>> On Sat, Oct 17, 2020 at 09:09:28AM -0700, trix@redhat.com wrote:
->>>> From: Tom Rix <trix@redhat.com>
->>>>
->>>> This is a upcoming change to clean up a new warning treewide.
->>>> I am wondering if the change could be one mega patch (see below) or
->>>> normal patch per file about 100 patches or somewhere half way by collecting
->>>> early acks.
->>> Please break it up into one-patch-per-subsystem, like normal, and get it
->>> merged that way.
->>>
->>> Sending us a patch, without even a diffstat to review, isn't going to
->>> get you very far...
->> Tom,
->> If you're able to automate this cleanup, I suggest checking in a
->> script that can be run on a directory.  Then for each subsystem you
->> can say in your commit "I ran scripts/fix_whatever.py on this subdir."
->>  Then others can help you drive the tree wide cleanup.  Then we can
->> enable -Wunreachable-code-break either by default, or W=2 right now
->> might be a good idea.
-> I remember using clang-modernize in the past to fix issues very
-> similar to this, if clang machinery can generate the warning, can't
-> something like clang-tidy directly generate the patch?
-
-Yes clang-tidy and similar are good tools.
-
-Sometimes they change too much and your time shifts
-
-from editing to analyzing and dropping changes.
-
-
-I am looking at them for auto changing api.
-
-When i have something greater than half baked i will post.
-
-Tom
-
->
-> You can send me a patch for drivers/infiniband/* as well
->
-> Thanks,
-> Jason
->
+RnJvbTogQXJ2aW5kIFNhbmthcg0KPiBTZW50OiAyMCBPY3RvYmVyIDIwMjAgMTU6MDcNCj4gVG86
+IERhdmlkIExhaWdodCA8RGF2aWQuTGFpZ2h0QEFDVUxBQi5DT00+DQo+IA0KPiBPbiBUdWUsIE9j
+dCAyMCwgMjAyMCBhdCAwNzo0MTozM0FNICswMDAwLCBEYXZpZCBMYWlnaHQgd3JvdGU6DQo+ID4g
+RnJvbTogQXJ2aW5kIFNhbmthcj4gU2VudDogMTkgT2N0b2JlciAyMDIwIDE2OjMwDQo+ID4gPiBU
+bzogSGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1PjsgRGF2aWQgUy4gTWls
+bGVyIDxkYXZlbUBkYXZlbWxvZnQubmV0PjsgbGludXgtDQo+ID4gPiBjcnlwdG9Admdlci5rZXJu
+ZWwub3JnDQo+ID4gPiBDYzogbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZw0KPiA+ID4gU3Vi
+amVjdDogW1BBVENIIDQvNV0gY3J5cHRvOiBsaWIvc2hhMjU2IC0gVW5yb2xsIFNIQTI1NiBsb29w
+IDggdGltZXMgaW50ZWFkIG9mIDY0DQo+ID4gPg0KPiA+ID4gVGhpcyByZWR1Y2VzIGNvZGUgc2l6
+ZSBzdWJzdGFudGlhbGx5IChvbiB4ODZfNjQgd2l0aCBnY2MtMTAgdGhlIHNpemUgb2YNCj4gPiA+
+IHNoYTI1Nl91cGRhdGUoKSBnb2VzIGZyb20gNzU5MyBieXRlcyB0byAxOTUyIGJ5dGVzIGluY2x1
+ZGluZyB0aGUgbmV3DQo+ID4gPiBTSEEyNTZfSyBhcnJheSksIGFuZCBvbiB4ODYgaXMgc2xpZ2h0
+bHkgZmFzdGVyIHRoYW4gdGhlIGZ1bGwgdW5yb2xsLg0KPiA+DQo+ID4gVGhlIHNwZWVkIHdpbGwg
+ZGVwZW5kIG9uIGV4YWN0bHkgd2hpY2ggY3B1IHR5cGUgaXMgdXNlZC4NCj4gPiBJdCBpcyBldmVu
+IHBvc3NpYmxlIHRoYXQgdGhlICdub3QgdW5yb2xsZWQgYXQgYWxsJyBsb29wDQo+ID4gKHdpdGgg
+dGhlIGFsbCB0aGUgZXh0cmEgcmVnaXN0ZXIgbW92ZXMpIGlzIGZhc3RlciBvbiBzb21lIHg4Ni02
+NCBjcHUuDQo+IA0KPiBZZXMsIEkgc2hvdWxkIGhhdmUgbWVudGlvbmVkIHRoaXMgd2FzIHRlc3Rl
+ZCBvbiBhIEJyb2Fkd2VsbCBYZW9uLCBhdA0KPiBsZWFzdCBvbiB0aGF0IHByb2Nlc3Nvciwgbm8g
+dW5yb2xsaW5nIGlzIGEgbWVhc3VyYWJsZSBwZXJmb3JtYW5jZSBsb3NzLg0KPiBCdXQgdGhlIGhv
+cGUgaXMgdGhhdCA4eCB1bnJvbGwgc2hvdWxkIGJlIGdlbmVyYWxseSBlbm91Z2ggdW5yb2xsaW5n
+IHRoYXQNCj4gNjR4IGlzIHVubGlrZWx5IHRvIHNwZWVkIGl0IHVwIG1vcmUsIGFuZCBzbyBoYXMg
+bm8gYWR2YW50YWdlIG92ZXIgOHguDQoNCihJJ3ZlIGp1c3QgbG9va2VkIGF0IHRoZSBhY3R1YWwg
+Y29kZSwgbm90IGp1c3QgdGhlIHBhdGNoLikNCg0KWWVzIEkgZG91YnQgdGhlIDY0eCB1bnJvbGwg
+d2FzIGV2ZXIgYSBzaWduaWZpY2FudCBnYWluLg0KVW5yb2xsaW5nIGNvbXBsZXRlbHkgcmVxdWly
+ZXMgYSBsb2FkIG9mIHJlZ2lzdGVyIG1vdmVzL3JlbmFtZXM7DQpwcm9iYWJseSB0b28gbWFueSB0
+byBiZSAnemVybyBjb3N0Jy4NCg0KV2l0aCBtb2Rlcm4gY3B1IHlvdSBjYW4gb2Z0ZW4gZ2V0IHRo
+ZSBsb29wIGNvbnRyb2wgaW5zdHJ1Y3Rpb25zDQonZm9yIGZyZWUnIHNvIHVucm9sbGluZyBqdXN0
+IGtpbGxzIHRoZSBJLWNhY2hlLg0KU29tZSBvZiB0aGUgY3B1IGhhdmUgbG9vcCBidWZmZXJzIGZv
+ciBkZWNvZGVkIGluc3RydWN0aW9ucywNCnVucm9sbCBiZXlvbmQgdGhhdCBzaXplIGFuZCB5b3Ug
+c3VkZGVubHkgZ2V0IHRoZSBkZWNvZGVyIGNvc3RzDQpoaXR0aW5nIHlvdSBhZ2Fpbi4NCg0KLi4u
+DQo+ID4gSWYgeW91IGNhbiBwdXQgU0hBMjU2X0tbXSBhbmQgV1tdIGludG8gYSBzdHJ1Y3QgdGhl
+biB0aGUNCj4gPiBjb21waWxlciBjYW4gdXNlIHRoZSBzYW1lIHJlZ2lzdGVyIHRvIGFkZHJlc3Mg
+aW50byBib3RoDQo+ID4gYXJyYXlzICh1c2luZyBhbiBvZmZzZXQgb2YgNjQqNCBmb3IgdGhlIHNl
+Y29uZCBvbmUpLg0KPiA+IChpZSBrZWVwIHRoZSB0d28gYXJyYXlzLCBub3QgYW4gYXJyYXkgb2Yg
+c3RydWN0KS4NCj4gPiBUaGlzIHNob3VsZCByZWR1Y2UgdGhlIHJlZ2lzdGVyIHByZXNzdXJlIHNs
+aWdodGx5Lg0KPiANCj4gSSBjYW4gdHJ5IHRoYXQsIGNvdWxkIGNvcHkgdGhlIGRhdGEgaW4gc2hh
+MjU2X3VwZGF0ZSgpIHNvIGl0J3MgYW1vcnRpemVkDQo+IG92ZXIgdGhlIHdob2xlIGlucHV0Lg0K
+DQpIYXZpbmcgbG9va2VkIG1vcmUgY2xvc2VseSB0aGUgZXh0cmEgY29weSBuZWVkZWQgaXMgcHJv
+YmFibHkNCmJpZ2dlciB0aGFuIGFueSBzYXZpbmcuDQoNCldoYXQgdGhhdCBjb2RlIG5lZWRzIGlz
+IHNvbWUgc3BlY2lhbCAzLWlucHV0IGluc3RydWN0aW9ucyA6LSkNCkl0IHdvdWxkIHdvcmsgYSBs
+b3QgYmV0dGVyIHdyaXR0ZW4gaW4gVkhETCBmb3IgYW4gZnBnYS4NCg0KCURhdmlkDQoNCi0NClJl
+Z2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0
+b24gS2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykN
+Cg==
 
