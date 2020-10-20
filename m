@@ -2,146 +2,167 @@ Return-Path: <SRS0=SXL7=D3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0DBFC388F7
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 14:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FB94C4363D
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 14:09:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78EB3208C3
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 14:07:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DEA62224F
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 14:09:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nP+etFNq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ewDv3aOr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407774AbgJTOHa (ORCPT
+        id S2407867AbgJTOJd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Oct 2020 10:07:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36582 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2407765AbgJTOHa (ORCPT
+        Tue, 20 Oct 2020 10:09:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48358 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2407832AbgJTOJd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Oct 2020 10:07:30 -0400
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F65EC061755;
-        Tue, 20 Oct 2020 07:07:30 -0700 (PDT)
-Received: by mail-il1-x141.google.com with SMTP id z2so2348389ilh.11;
-        Tue, 20 Oct 2020 07:07:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:date:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=1lBTu54CE46HbIpamog6b+bIOObBI3JzssghUHuWI3o=;
-        b=nP+etFNqv0sHkZDmtCRhJ1xgocs2Q6P+ogmJvNJhHcdiITJjln9o6gzzxriLngcTXh
-         R54cDMtdADlowipqvFCmfZRUVWIGeF02z8ewIbx0JgrpfiDX5Q8GsyaBA7O78Hv8pUgh
-         vzwX61iBHQw90LWfBUJd7uKhY2PILiTI0/qz5YAGFjlAqrv5Ua+BzywyTWIcp76Qng1G
-         R5P5gWu/G1mnf5FR7W/86gBMXQPuveVmRY+/ceRvxmxcVa1O3EHSdRzpClwPEMEJSnqQ
-         +00rktb5vH+FwNvgj6TsjNYAhwNuj827mnJB7cjRd6CiTUDGhwhAd0LqZgFLGWU/pdZP
-         S4eA==
+        Tue, 20 Oct 2020 10:09:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603202972;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rOdQp2iOSkahNa0CfH1+VDlgH/zqWEjNOjN0qUXEes0=;
+        b=ewDv3aOrdJ+x5A6s7YiY6e3DZ/xG19fiCFYxEBc219ynzJxgu/51wlX4XbcPcMAU2oHyfD
+        PtMot7BJZaqOvPJXq6YGOAgeRSVWl5/eHGglGFP0XXl1T9R1hHW25Ri1M+zqhWdXytm0kf
+        dEEfBPozJhD9ETuNOOZz/yhFPpgdSTo=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-100-sTjOzMfiPZmq3tqKhUOCBg-1; Tue, 20 Oct 2020 10:09:30 -0400
+X-MC-Unique: sTjOzMfiPZmq3tqKhUOCBg-1
+Received: by mail-qv1-f71.google.com with SMTP id dd7so1428287qvb.6
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Oct 2020 07:09:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=1lBTu54CE46HbIpamog6b+bIOObBI3JzssghUHuWI3o=;
-        b=skngr64QqavHRJaFGSsNBHx9xNCBIwyvJ3XJhlsJbi/atqMjs5hFpenxhZZovnSKWz
-         CS4XkBXD2jLF4U64VsgCubZ5M2UYjomZCl37VOR/6X0LZCXy+0yBvW0KV0wXa5r2Wibm
-         ha3xGeXl56LyXf4n4PcsNjfuB7H8+bY6YaatRodnyt0xC2AReO+x2NQlwkgJwZSAa2ak
-         Kst0mAvLSjJlipe4IcY7wR75aXliIQMw8qnWyF/ahSiUS5u1aG1BNd92ViJczrE/2jRo
-         I21JqywmIXkJqI+y8IWtp9vp/58KZxp52DQiyiWEO5ysy3c+KavzvI8J9Z4zOPUl8yN8
-         N1sQ==
-X-Gm-Message-State: AOAM530Wvfw9M/Ep5TaxZbXmtLgzFRmfWQuAPWi5gDmxXY77faJe4u7f
-        hGhEbkyUJ5XxLZTKKQV114I=
-X-Google-Smtp-Source: ABdhPJwwUjL7yZ2R75M5d9LbePEMBc5lyYqPoG87sntcDFZDMD1wFGg2h6O3XdgXZuCZwotMsygBXA==
-X-Received: by 2002:a05:6e02:970:: with SMTP id q16mr2132632ilt.69.1603202849775;
-        Tue, 20 Oct 2020 07:07:29 -0700 (PDT)
-Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
-        by smtp.gmail.com with ESMTPSA id f13sm2132026ilf.85.2020.10.20.07.07.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Oct 2020 07:07:28 -0700 (PDT)
-Sender: Arvind Sankar <niveditas98@gmail.com>
-From:   Arvind Sankar <nivedita@alum.mit.edu>
-X-Google-Original-From: Arvind Sankar <arvind@rani.riverdale.lan>
-Date:   Tue, 20 Oct 2020 10:07:26 -0400
-To:     David Laight <David.Laight@ACULAB.COM>
-Cc:     'Arvind Sankar' <nivedita@alum.mit.edu>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 4/5] crypto: lib/sha256 - Unroll SHA256 loop 8 times
- intead of 64
-Message-ID: <20201020140726.GB2996696@rani.riverdale.lan>
-References: <20201019153016.2698303-1-nivedita@alum.mit.edu>
- <20201019153016.2698303-5-nivedita@alum.mit.edu>
- <1324eb3519d54ddd9469d30a94c11823@AcuMS.aculab.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=rOdQp2iOSkahNa0CfH1+VDlgH/zqWEjNOjN0qUXEes0=;
+        b=s+4/MzV7Cy4+fTNHTTHGloP53fGlEf8BYKW2PGRZg4zXRNn+WBvqdaxJB/rk2vX7gy
+         u86DjVqHzaDkeHfmNcUZ3Mran6YonDrHlpwg/3gBwnFaUOhdNUTWz/YLP/c9xN7tPlp2
+         77IXbs3MfYi48jZQEyJQfw6Wq/acEd9d0AwX/7UhDH8emqqKJC+KkozysdYTQPSvGc17
+         wMtb3iTjGBfExbGBCnyBctWd5uztQw0LKBwM9oEEcPV0IFUbkUtZLlZuRtqjlfqVEeOA
+         ocwAQ6/8XVuVeDN+6XKVZuawkJ3XzfQWNjCL4BAJITiXhzu3sNnRF8NrP70PHJVXXXF0
+         aNIg==
+X-Gm-Message-State: AOAM5307kvnSeJePooYSyXUqjXeIMRKeDaY1CzHsvmwRJOAt1jkOuGN/
+        dhU717/9kMWxwa3arVYgasYXrJljP7HjT9dR2cXYzzhu7sjumZ941gtE3MRCHQoawoDv4y2BMco
+        T/vLu5h0fgMZMo1i3eBy6n+fu
+X-Received: by 2002:a05:620a:2195:: with SMTP id g21mr2990082qka.358.1603202969737;
+        Tue, 20 Oct 2020 07:09:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwKUy8N8weGLwzCzHDZ8oTBMtQsWbHEBLlPfZD5zpEfJ13ExA6QvxSe7FmqqHnm4D1jNxINeQ==
+X-Received: by 2002:a05:620a:2195:: with SMTP id g21mr2990039qka.358.1603202969497;
+        Tue, 20 Oct 2020 07:09:29 -0700 (PDT)
+Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
+        by smtp.gmail.com with ESMTPSA id o14sm785284qto.16.2020.10.20.07.09.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Oct 2020 07:09:28 -0700 (PDT)
+Subject: Re: [RFC] treewide: cleanup unreachable breaks
+To:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, linux-edac@vger.kernel.org,
+        linux-acpi@vger.kernel.org, linux-pm@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-power@fi.rohmeurope.com, linux-gpio@vger.kernel.org,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        nouveau@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org,
+        spice-devel@lists.freedesktop.org, linux-iio@vger.kernel.org,
+        linux-amlogic@lists.infradead.org,
+        industrypack-devel@lists.sourceforge.net,
+        linux-media@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
+        linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-can@vger.kernel.org,
+        Network Development <netdev@vger.kernel.org>,
+        intel-wired-lan@lists.osuosl.org, ath10k@lists.infradead.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        linux-stm32@st-md-mailman.stormreply.com, linux-nfc@lists.01.org,
+        linux-nvdimm <linux-nvdimm@lists.01.org>,
+        linux-pci@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org, patches@opensource.cirrus.com,
+        storagedev@microchip.com, devel@driverdev.osuosl.org,
+        linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+        usb-storage@lists.one-eyed-alien.net,
+        linux-watchdog@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        bpf <bpf@vger.kernel.org>, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        alsa-devel@alsa-project.org,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        George Burgess <gbiv@google.com>
+References: <20201017160928.12698-1-trix@redhat.com>
+ <20201018054332.GB593954@kroah.com>
+ <CAKwvOdkR_Ttfo7_JKUiZFVqr=Uh=4b05KCPCSuzwk=zaWtA2_Q@mail.gmail.com>
+ <20201019230546.GH36674@ziepe.ca>
+From:   Tom Rix <trix@redhat.com>
+Message-ID: <859ff6ff-3e10-195c-6961-7b2902b151d4@redhat.com>
+Date:   Tue, 20 Oct 2020 07:09:23 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20201019230546.GH36674@ziepe.ca>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1324eb3519d54ddd9469d30a94c11823@AcuMS.aculab.com>
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 20, 2020 at 07:41:33AM +0000, David Laight wrote:
-> From: Arvind Sankar> Sent: 19 October 2020 16:30
-> > To: Herbert Xu <herbert@gondor.apana.org.au>; David S. Miller <davem@davemloft.net>; linux-
-> > crypto@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
-> > Subject: [PATCH 4/5] crypto: lib/sha256 - Unroll SHA256 loop 8 times intead of 64
-> > 
-> > This reduces code size substantially (on x86_64 with gcc-10 the size of
-> > sha256_update() goes from 7593 bytes to 1952 bytes including the new
-> > SHA256_K array), and on x86 is slightly faster than the full unroll.
-> 
-> The speed will depend on exactly which cpu type is used.
-> It is even possible that the 'not unrolled at all' loop
-> (with the all the extra register moves) is faster on some x86-64 cpu.
 
-Yes, I should have mentioned this was tested on a Broadwell Xeon, at
-least on that processor, no unrolling is a measurable performance loss.
-But the hope is that 8x unroll should be generally enough unrolling that
-64x is unlikely to speed it up more, and so has no advantage over 8x.
+On 10/19/20 4:05 PM, Jason Gunthorpe wrote:
+> On Mon, Oct 19, 2020 at 12:42:15PM -0700, Nick Desaulniers wrote:
+>> On Sat, Oct 17, 2020 at 10:43 PM Greg KH <gregkh@linuxfoundation.org> wrote:
+>>> On Sat, Oct 17, 2020 at 09:09:28AM -0700, trix@redhat.com wrote:
+>>>> From: Tom Rix <trix@redhat.com>
+>>>>
+>>>> This is a upcoming change to clean up a new warning treewide.
+>>>> I am wondering if the change could be one mega patch (see below) or
+>>>> normal patch per file about 100 patches or somewhere half way by collecting
+>>>> early acks.
+>>> Please break it up into one-patch-per-subsystem, like normal, and get it
+>>> merged that way.
+>>>
+>>> Sending us a patch, without even a diffstat to review, isn't going to
+>>> get you very far...
+>> Tom,
+>> If you're able to automate this cleanup, I suggest checking in a
+>> script that can be run on a directory.  Then for each subsystem you
+>> can say in your commit "I ran scripts/fix_whatever.py on this subdir."
+>>  Then others can help you drive the tree wide cleanup.  Then we can
+>> enable -Wunreachable-code-break either by default, or W=2 right now
+>> might be a good idea.
+> I remember using clang-modernize in the past to fix issues very
+> similar to this, if clang machinery can generate the warning, can't
+> something like clang-tidy directly generate the patch?
 
-> 
-> > 
-> > Signed-off-by: Arvind Sankar <nivedita@alum.mit.edu>
-> > ---
-> >  lib/crypto/sha256.c | 164 ++++++++------------------------------------
-> >  1 file changed, 28 insertions(+), 136 deletions(-)
-> > 
-> > diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
-> > index c6bfeacc5b81..9f0b71d41ea0 100644
-> > --- a/lib/crypto/sha256.c
-> > +++ b/lib/crypto/sha256.c
-> > @@ -18,6 +18,17 @@
-> >  #include <crypto/sha.h>
-> >  #include <asm/unaligned.h>
-> ...
-> > 
-> > +#define SHA256_ROUND(i, a, b, c, d, e, f, g, h) do {		\
-> > +	u32 t1, t2;						\
-> > +	t1 = h + e1(e) + Ch(e, f, g) + SHA256_K[i] + W[i];	\
-> > +	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1 + t2;	\
-> 
-> Split to 3 lines.
+Yes clang-tidy and similar are good tools.
 
-This was the way the code was before, but I can reformat it, sure.
+Sometimes they change too much and your time shifts
 
-> 
-> If you can put SHA256_K[] and W[] into a struct then the
-> compiler can use the same register to address into both
-> arrays (using an offset of 64*4 for the second one).
-> (ie keep the two arrays, not an array of struct).
-> This should reduce the register pressure slightly.
+from editing to analyzing and dropping changes.
 
-I can try that, could copy the data in sha256_update() so it's amortized
-over the whole input.
 
-> 
-> 	David
-> 
-> -
-> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-> Registration No: 1397386 (Wales)
-> 
+I am looking at them for auto changing api.
+
+When i have something greater than half baked i will post.
+
+Tom
+
+>
+> You can send me a patch for drivers/infiniband/* as well
+>
+> Thanks,
+> Jason
+>
+
