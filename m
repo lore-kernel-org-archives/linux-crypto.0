@@ -2,137 +2,138 @@ Return-Path: <SRS0=SXL7=D3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA622C5517B
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 18:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBB24C388F7
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 19:46:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9095B2223C
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 18:43:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A17522282
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 19:46:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FIVPt1C3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437573AbgJTSmz (ORCPT
+        id S2438312AbgJTTp7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Oct 2020 14:42:55 -0400
-Received: from smtprelay0130.hostedemail.com ([216.40.44.130]:38858 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2437566AbgJTSmy (ORCPT
+        Tue, 20 Oct 2020 15:45:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32866 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2438310AbgJTTp7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Oct 2020 14:42:54 -0400
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay02.hostedemail.com (Postfix) with ESMTP id 43FA51260;
-        Tue, 20 Oct 2020 18:42:51 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-HE-Tag: humor84_3a06a8527241
-X-Filterd-Recvd-Size: 4943
-Received: from XPS-9350.home (unknown [47.151.133.149])
-        (Authenticated sender: joe@perches.com)
-        by omf17.hostedemail.com (Postfix) with ESMTPA;
-        Tue, 20 Oct 2020 18:42:43 +0000 (UTC)
-Message-ID: <3bc5c2e3b3edc22a4d167ec807ecdaaf8dcda76d.camel@perches.com>
-Subject: Re: [RFC] treewide: cleanup unreachable breaks
-From:   Joe Perches <joe@perches.com>
-To:     Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, linux-edac@vger.kernel.org,
-        linux-acpi@vger.kernel.org, linux-pm@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-power@fi.rohmeurope.com, linux-gpio@vger.kernel.org,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        nouveau@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org,
-        spice-devel@lists.freedesktop.org, linux-iio@vger.kernel.org,
-        linux-amlogic@lists.infradead.org,
-        industrypack-devel@lists.sourceforge.net,
-        linux-media@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
-        linux-scsi@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-can@vger.kernel.org,
-        Network Development <netdev@vger.kernel.org>,
-        intel-wired-lan@lists.osuosl.org, ath10k@lists.infradead.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        linux-stm32@st-md-mailman.stormreply.com, linux-nfc@lists.01.org,
-        linux-nvdimm <linux-nvdimm@lists.01.org>,
-        linux-pci@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org, patches@opensource.cirrus.com,
-        storagedev@microchip.com, devel@driverdev.osuosl.org,
-        linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
-        usb-storage@lists.one-eyed-alien.net,
-        linux-watchdog@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        bpf <bpf@vger.kernel.org>, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        alsa-devel@alsa-project.org,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        George Burgess <gbiv@google.com>
-Date:   Tue, 20 Oct 2020 11:42:42 -0700
-In-Reply-To: <CAKwvOdkR_Ttfo7_JKUiZFVqr=Uh=4b05KCPCSuzwk=zaWtA2_Q@mail.gmail.com>
-References: <20201017160928.12698-1-trix@redhat.com>
-         <20201018054332.GB593954@kroah.com>
-         <CAKwvOdkR_Ttfo7_JKUiZFVqr=Uh=4b05KCPCSuzwk=zaWtA2_Q@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.36.4-0ubuntu1 
+        Tue, 20 Oct 2020 15:45:59 -0400
+Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 527A0C0613CE;
+        Tue, 20 Oct 2020 12:45:59 -0700 (PDT)
+Received: by mail-qv1-xf43.google.com with SMTP id b11so1481636qvr.9;
+        Tue, 20 Oct 2020 12:45:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:date:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=sK1elVQQ2NrMHu7mvagLbiYZu4C55oZZTQPkobK5nAA=;
+        b=FIVPt1C3GPLD58Aht5yhIbLIJzNX1qLh/+8Y2D5jFcbJl2GUjJEul+B2u4Keysi+Ky
+         Iuh/wpq2xu1ui3HpmYredW8rivQt7akCpk0zKxvOoNMgUW25Y2d3paLZ8M1ycZf3qIs7
+         avn7T9rIG7z+VrDrkEbD2GKZiQqm+4u7k8Dxi8tIB+HKs/LjjtNSbzx1EuH7/x3QzDig
+         gKhbkPbTPSV7Gm10JqoQZIKw4B71WL9jJCTMdgTIFn10CZOofjF3hyPMVhoautKpzc1G
+         tPOKDXSlCFdnhOKIJIblN6LMGHeN8/pDAlP3dhn9iddLufrTnXv80QunczIh8o5GteTX
+         Krgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=sK1elVQQ2NrMHu7mvagLbiYZu4C55oZZTQPkobK5nAA=;
+        b=jOlzJf3Mh44Lya107tG9aTgtsCcsODz9Q3/mXQfkmPEBskGSc88dhNn8uNZ0otiCa7
+         9DOkcD61AqPseXHemIp3RO86QnBwujA06pWvNPQw4ukibCyLvnwKPlYcyF/Uov6XytV/
+         zNN5KBMeQbguZBAoX0r77gUi94S9VH/veoX+xJ6rdC3EzAcBRc3m4bGkogv0a/T2gihd
+         iNl4QTVn/U+CQiJZ/588Q7Rx8PmQzCYubSxPdsMKo1qlZrbEFZyZ8a2zNhkV7bx4Re9I
+         4B0wFCIqAQpxFB/N+QMyt0eph8siZ9xIR2Rr2Ir9KnMaWOUQxVOh6nmQiJR0Z63/AEfY
+         6PIw==
+X-Gm-Message-State: AOAM531T880ck/WvSdtezjtKOyPGbWPr9QtyEPT+etx5Z9rIg+dVJ/W4
+        2bHaC1FaPd0tRELrt5R96nAs6SEFu82RDg==
+X-Google-Smtp-Source: ABdhPJxELK7oZ0oYWJ0WnphNoAGjBJqnGvEKQxdUVArKHywaT4exP6kWtSzC21mDExeS+Ye2rbpHMA==
+X-Received: by 2002:ad4:4701:: with SMTP id k1mr5058780qvz.47.1603223158412;
+        Tue, 20 Oct 2020 12:45:58 -0700 (PDT)
+Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
+        by smtp.gmail.com with ESMTPSA id z26sm1276353qtb.85.2020.10.20.12.45.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Oct 2020 12:45:57 -0700 (PDT)
+Sender: Arvind Sankar <niveditas98@gmail.com>
+From:   Arvind Sankar <nivedita@alum.mit.edu>
+X-Google-Original-From: Arvind Sankar <arvind@rani.riverdale.lan>
+Date:   Tue, 20 Oct 2020 15:45:55 -0400
+To:     David Laight <David.Laight@ACULAB.COM>
+Cc:     'Arvind Sankar' <nivedita@alum.mit.edu>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 4/5] crypto: lib/sha256 - Unroll SHA256 loop 8 times
+ intead of 64
+Message-ID: <20201020194555.GA3464628@rani.riverdale.lan>
+References: <20201019153016.2698303-1-nivedita@alum.mit.edu>
+ <20201019153016.2698303-5-nivedita@alum.mit.edu>
+ <1324eb3519d54ddd9469d30a94c11823@AcuMS.aculab.com>
+ <20201020140726.GB2996696@rani.riverdale.lan>
+ <6ee12f8fa3914fbcb5e4a1388e430acd@AcuMS.aculab.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6ee12f8fa3914fbcb5e4a1388e430acd@AcuMS.aculab.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2020-10-19 at 12:42 -0700, Nick Desaulniers wrote:
-> On Sat, Oct 17, 2020 at 10:43 PM Greg KH <gregkh@linuxfoundation.org> wrote:
-> > On Sat, Oct 17, 2020 at 09:09:28AM -0700, trix@redhat.com wrote:
-> > > From: Tom Rix <trix@redhat.com>
-> > > 
-> > > This is a upcoming change to clean up a new warning treewide.
-> > > I am wondering if the change could be one mega patch (see below) or
-> > > normal patch per file about 100 patches or somewhere half way by collecting
-> > > early acks.
+On Tue, Oct 20, 2020 at 02:55:47PM +0000, David Laight wrote:
+> From: Arvind Sankar
+> > Sent: 20 October 2020 15:07
+> > To: David Laight <David.Laight@ACULAB.COM>
 > > 
-> > Please break it up into one-patch-per-subsystem, like normal, and get it
-> > merged that way.
+> > On Tue, Oct 20, 2020 at 07:41:33AM +0000, David Laight wrote:
+> > > From: Arvind Sankar> Sent: 19 October 2020 16:30
+> > > > To: Herbert Xu <herbert@gondor.apana.org.au>; David S. Miller <davem@davemloft.net>; linux-
+> > > > crypto@vger.kernel.org
+> > > > Cc: linux-kernel@vger.kernel.org
+> > > > Subject: [PATCH 4/5] crypto: lib/sha256 - Unroll SHA256 loop 8 times intead of 64
+> > > >
+> > > > This reduces code size substantially (on x86_64 with gcc-10 the size of
+> > > > sha256_update() goes from 7593 bytes to 1952 bytes including the new
+> > > > SHA256_K array), and on x86 is slightly faster than the full unroll.
+> > >
+> > > The speed will depend on exactly which cpu type is used.
+> > > It is even possible that the 'not unrolled at all' loop
+> > > (with the all the extra register moves) is faster on some x86-64 cpu.
 > > 
-> > Sending us a patch, without even a diffstat to review, isn't going to
-> > get you very far...
+> > Yes, I should have mentioned this was tested on a Broadwell Xeon, at
+> > least on that processor, no unrolling is a measurable performance loss.
+> > But the hope is that 8x unroll should be generally enough unrolling that
+> > 64x is unlikely to speed it up more, and so has no advantage over 8x.
 > 
-> Tom,
-> If you're able to automate this cleanup, I suggest checking in a
-> script that can be run on a directory.  Then for each subsystem you
-> can say in your commit "I ran scripts/fix_whatever.py on this subdir."
->  Then others can help you drive the tree wide cleanup.  Then we can
-> enable -Wunreachable-code-break either by default, or W=2 right now
-> might be a good idea.
+> (I've just looked at the actual code, not just the patch.)
 > 
-> Ah, George (gbiv@, cc'ed), did an analysis recently of
-> `-Wunreachable-code-loop-increment`, `-Wunreachable-code-break`, and
-> `-Wunreachable-code-return` for Android userspace.  From the review:
-> ```
-> Spoilers: of these, it seems useful to turn on
-> -Wunreachable-code-loop-increment and -Wunreachable-code-return by
-> default for Android
+> Yes I doubt the 64x unroll was ever a significant gain.
+> Unrolling completely requires a load of register moves/renames;
+> probably too many to be 'zero cost'.
+> 
+> With modern cpu you can often get the loop control instructions
+> 'for free' so unrolling just kills the I-cache.
+> Some of the cpu have loop buffers for decoded instructions,
+> unroll beyond that size and you suddenly get the decoder costs
+> hitting you again.
+> 
 > ...
-> While these conventions about always having break arguably became
-> obsolete when we enabled -Wfallthrough, my sample turned up zero
-> potential bugs caught by this warning, and we'd need to put a lot of
-> effort into getting a clean tree. So this warning doesn't seem to be
-> worth it.
-> ```
-> Looks like there's an order of magnitude of `-Wunreachable-code-break`
-> than the other two.
+> > > If you can put SHA256_K[] and W[] into a struct then the
+> > > compiler can use the same register to address into both
+> > > arrays (using an offset of 64*4 for the second one).
+> > > (ie keep the two arrays, not an array of struct).
+> > > This should reduce the register pressure slightly.
+> > 
+> > I can try that, could copy the data in sha256_update() so it's amortized
+> > over the whole input.
 > 
-> We probably should add all 3 to W=2 builds (wrapped in cc-option).
-> I've filed https://github.com/ClangBuiltLinux/linux/issues/1180 to
-> follow up on.
+> Having looked more closely the extra copy needed is probably
+> bigger than any saving.
+> 
 
-I suggest using W=1 as people that are doing cleanups
-generally use that and not W=123 or any other style.
-
-Every other use of W= is still quite noisy and these
-code warnings are relatively trivially to fix up.
-
-
+On x86-64 it doesn't make much difference, but it speeds up x86-32 by
+around 10% (on long inputs).
