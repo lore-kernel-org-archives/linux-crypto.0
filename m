@@ -2,212 +2,113 @@ Return-Path: <SRS0=SXL7=D3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6941FC43457
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 06:50:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37104C433E7
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 07:41:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0AB69223BF
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 06:50:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dzRGjCJO"
+	by mail.kernel.org (Postfix) with ESMTP id D7F0B2224B
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Oct 2020 07:41:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404597AbgJTGun (ORCPT
+        id S1731702AbgJTHli convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Oct 2020 02:50:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53594 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404594AbgJTGum (ORCPT
+        Tue, 20 Oct 2020 03:41:38 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:24317 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731571AbgJTHli (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Oct 2020 02:50:42 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29F1FC061755;
-        Mon, 19 Oct 2020 23:50:41 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id e7so612749pfn.12;
-        Mon, 19 Oct 2020 23:50:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=Mrea4LjAjlkriBDNrlEPZxK+wRxK9ddZNkjAKVpkbEc=;
-        b=dzRGjCJOlyKQf3KF8xPwNR5M6QOjvfsdyIwzGUsWDVJoy19f2fRhYG2AhzZlKRkLmZ
-         Cufzy355gF48EGwziQehtmEN7ic0LkRWsqQuTQ/JTZDLDhprOnY8XATOgULW0Z/tn0mW
-         jhqdUFTraEpn5e2iFyDtt81vrog7K1DlxNDYHo0DUqRrtKxq/420ytSEIoMOWGx6zgLS
-         iSeVvNISiOviIjKETk1gW3SPQgOKzRYok8AnV4peZjMhOlGymc1OPIMydbjMNcl3rHar
-         yOQ+W9bOkWmHpAAHerD1dCdOzbeBXHHBSbfGGP7tflas+Xev0gsZNzPisdnc0Xx6P+ek
-         Pimg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=Mrea4LjAjlkriBDNrlEPZxK+wRxK9ddZNkjAKVpkbEc=;
-        b=TEXh6MEVEDKdPy1NmBumiK+VNLYaG6Gn9A0wwcwp26LnmKUdzE8gHLJvsibkgRAz8v
-         VNoeG0heWgfELpaLlt5uwgIwc12rAGVEhT2181WUCatkSckmEBT9blBj9Q3SrwMeM7E3
-         Nks1pMphDdCJYMh3j3caEGROZ+npvNCMRet779fve38wOTjwuRA18DJnjPVIA1VN/T4F
-         1wsFdelS3Hlk75xx6PGhcqBNrzVq+l7FxWtklbZ7uZ7cnQ6BpPF9Nleb1HN1ii4Kceum
-         wI0x6xIL6C5c0M/3sf61XJWCxVoQA3POOVKSIclO7jkS/12VreCdXWrj/qDQL2+hXo5N
-         WOnA==
-X-Gm-Message-State: AOAM533IRJ5hdW0rB/cYfyoShV0W5SD5Pvd4RmpHXIAQphFXqF5CMmXs
-        IzFQ8BZLOYu6xEIyZM72d/43zEMdvHTmzg==
-X-Google-Smtp-Source: ABdhPJxQXxuMfSlxGpGrzojxEZ82apkCkU7/lUvcU9VuuwWXZmhtrbL73KSO1E8n/PqqjhP1rtQLSA==
-X-Received: by 2002:a63:f908:: with SMTP id h8mr1488419pgi.203.1603176640723;
-        Mon, 19 Oct 2020 23:50:40 -0700 (PDT)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id c203sm1026346pfb.96.2020.10.19.23.50.38
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 19 Oct 2020 23:50:40 -0700 (PDT)
-From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Lee, Chun-Yi" <jlee@suse.com>
-Subject: [RFC PATCH 2/2] PKCS#7: Check codeSigning EKU for kernel module and kexec pe verification
-Date:   Tue, 20 Oct 2020 14:50:01 +0800
-Message-Id: <20201020065001.13836-3-jlee@suse.com>
-X-Mailer: git-send-email 2.12.3
-In-Reply-To: <20201020065001.13836-1-jlee@suse.com>
-References: <20201020065001.13836-1-jlee@suse.com>
+        Tue, 20 Oct 2020 03:41:38 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-19-Ws7YY1epMoqWjkynPZLMpQ-1; Tue, 20 Oct 2020 08:41:34 +0100
+X-MC-Unique: Ws7YY1epMoqWjkynPZLMpQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Tue, 20 Oct 2020 08:41:33 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Tue, 20 Oct 2020 08:41:33 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Arvind Sankar' <nivedita@alum.mit.edu>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH 4/5] crypto: lib/sha256 - Unroll SHA256 loop 8 times
+ intead of 64
+Thread-Topic: [PATCH 4/5] crypto: lib/sha256 - Unroll SHA256 loop 8 times
+ intead of 64
+Thread-Index: AQHWpizLtR2ktKloi0KILMfFeYMjdqmgGc8g
+Date:   Tue, 20 Oct 2020 07:41:33 +0000
+Message-ID: <1324eb3519d54ddd9469d30a94c11823@AcuMS.aculab.com>
+References: <20201019153016.2698303-1-nivedita@alum.mit.edu>
+ <20201019153016.2698303-5-nivedita@alum.mit.edu>
+In-Reply-To: <20201019153016.2698303-5-nivedita@alum.mit.edu>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
+MIME-Version: 1.0
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds the logic for checking the CodeSigning extended
-key usage extenstion when verifying signature of kernel module or
-kexec PE binary in PKCS#7.
+From: Arvind Sankar> Sent: 19 October 2020 16:30
+> To: Herbert Xu <herbert@gondor.apana.org.au>; David S. Miller <davem@davemloft.net>; linux-
+> crypto@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Subject: [PATCH 4/5] crypto: lib/sha256 - Unroll SHA256 loop 8 times intead of 64
+> 
+> This reduces code size substantially (on x86_64 with gcc-10 the size of
+> sha256_update() goes from 7593 bytes to 1952 bytes including the new
+> SHA256_K array), and on x86 is slightly faster than the full unroll.
 
-Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
----
- certs/system_keyring.c               |  2 +-
- crypto/asymmetric_keys/Kconfig       | 10 ++++++++++
- crypto/asymmetric_keys/pkcs7_trust.c | 37 +++++++++++++++++++++++++++++++++---
- include/crypto/pkcs7.h               |  3 ++-
- 4 files changed, 47 insertions(+), 5 deletions(-)
+The speed will depend on exactly which cpu type is used.
+It is even possible that the 'not unrolled at all' loop
+(with the all the extra register moves) is faster on some x86-64 cpu.
 
-diff --git a/certs/system_keyring.c b/certs/system_keyring.c
-index 798291177186..4104f5465d8a 100644
---- a/certs/system_keyring.c
-+++ b/certs/system_keyring.c
-@@ -242,7 +242,7 @@ int verify_pkcs7_message_sig(const void *data, size_t len,
- 			goto error;
- 		}
- 	}
--	ret = pkcs7_validate_trust(pkcs7, trusted_keys);
-+	ret = pkcs7_validate_trust(pkcs7, trusted_keys, usage);
- 	if (ret < 0) {
- 		if (ret == -ENOKEY)
- 			pr_devel("PKCS#7 signature not signed with a trusted key\n");
-diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-index 1f1f004dc757..6e3de0c3b5f0 100644
---- a/crypto/asymmetric_keys/Kconfig
-+++ b/crypto/asymmetric_keys/Kconfig
-@@ -96,4 +96,14 @@ config SIGNED_PE_FILE_VERIFICATION
- 	  This option provides support for verifying the signature(s) on a
- 	  signed PE binary.
- 
-+config CHECK_CODESIGN_EKU
-+	bool "Check codeSigning extended key usage"
-+	depends on PKCS7_MESSAGE_PARSER=y
-+	depends on SYSTEM_DATA_VERIFICATION
-+	help
-+	  This option provides support for checking the codeSigning extended
-+	  key usage extension when verifying the signature in PKCS#7. It
-+	  affects kernel module verification and kexec PE binary verification
-+	  now.
-+
- endif # ASYMMETRIC_KEY_TYPE
-diff --git a/crypto/asymmetric_keys/pkcs7_trust.c b/crypto/asymmetric_keys/pkcs7_trust.c
-index 61af3c4d82cc..1d2318ff63db 100644
---- a/crypto/asymmetric_keys/pkcs7_trust.c
-+++ b/crypto/asymmetric_keys/pkcs7_trust.c
-@@ -16,12 +16,36 @@
- #include <crypto/public_key.h>
- #include "pkcs7_parser.h"
- 
-+#ifdef CONFIG_CHECK_CODESIGN_EKU
-+static bool check_codesign_eku(struct key *key,
-+			     enum key_being_used_for usage)
-+{
-+	struct public_key *public_key = key->payload.data[asym_crypto];
-+
-+	switch (usage) {
-+	case VERIFYING_MODULE_SIGNATURE:
-+	case VERIFYING_KEXEC_PE_SIGNATURE:
-+		return !!(public_key->eku & EKU_codeSigning);
-+	default:
-+		break;
-+	}
-+	return true;
-+}
-+#else
-+static bool check_codesign_eku(struct key *key,
-+			     enum key_being_used_for usage)
-+{
-+	return true;
-+}
-+#endif
-+
- /**
-  * Check the trust on one PKCS#7 SignedInfo block.
-  */
- static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
- 				    struct pkcs7_signed_info *sinfo,
--				    struct key *trust_keyring)
-+				    struct key *trust_keyring,
-+				    enum key_being_used_for usage)
- {
- 	struct public_key_signature *sig = sinfo->sig;
- 	struct x509_certificate *x509, *last = NULL, *p;
-@@ -112,6 +136,12 @@ static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
- 	return -ENOKEY;
- 
- matched:
-+	if (!check_codesign_eku(key, usage)) {
-+		pr_warn("sinfo %u: The signer %x key is not CodeSigning\n",
-+			sinfo->index, key_serial(key));
-+		key_put(key);
-+		return -ENOKEY;
-+	}
- 	ret = verify_signature(key, sig);
- 	key_put(key);
- 	if (ret < 0) {
-@@ -156,7 +186,8 @@ static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
-  * May also return -ENOMEM.
-  */
- int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
--			 struct key *trust_keyring)
-+			 struct key *trust_keyring,
-+			 enum key_being_used_for usage)
- {
- 	struct pkcs7_signed_info *sinfo;
- 	struct x509_certificate *p;
-@@ -167,7 +198,7 @@ int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
- 		p->seen = false;
- 
- 	for (sinfo = pkcs7->signed_infos; sinfo; sinfo = sinfo->next) {
--		ret = pkcs7_validate_trust_one(pkcs7, sinfo, trust_keyring);
-+		ret = pkcs7_validate_trust_one(pkcs7, sinfo, trust_keyring, usage);
- 		switch (ret) {
- 		case -ENOKEY:
- 			continue;
-diff --git a/include/crypto/pkcs7.h b/include/crypto/pkcs7.h
-index 38ec7f5f9041..b3b48240ba73 100644
---- a/include/crypto/pkcs7.h
-+++ b/include/crypto/pkcs7.h
-@@ -30,7 +30,8 @@ extern int pkcs7_get_content_data(const struct pkcs7_message *pkcs7,
-  * pkcs7_trust.c
-  */
- extern int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
--				struct key *trust_keyring);
-+				struct key *trust_keyring,
-+				enum key_being_used_for usage);
- 
- /*
-  * pkcs7_verify.c
--- 
-2.16.4
+> 
+> Signed-off-by: Arvind Sankar <nivedita@alum.mit.edu>
+> ---
+>  lib/crypto/sha256.c | 164 ++++++++------------------------------------
+>  1 file changed, 28 insertions(+), 136 deletions(-)
+> 
+> diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
+> index c6bfeacc5b81..9f0b71d41ea0 100644
+> --- a/lib/crypto/sha256.c
+> +++ b/lib/crypto/sha256.c
+> @@ -18,6 +18,17 @@
+>  #include <crypto/sha.h>
+>  #include <asm/unaligned.h>
+...
+> 
+> +#define SHA256_ROUND(i, a, b, c, d, e, f, g, h) do {		\
+> +	u32 t1, t2;						\
+> +	t1 = h + e1(e) + Ch(e, f, g) + SHA256_K[i] + W[i];	\
+> +	t2 = e0(a) + Maj(a, b, c);    d += t1;    h = t1 + t2;	\
+
+Split to 3 lines.
+
+If you can put SHA256_K[] and W[] into a struct then the
+compiler can use the same register to address into both
+arrays (using an offset of 64*4 for the second one).
+(ie keep the two arrays, not an array of struct).
+This should reduce the register pressure slightly.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
