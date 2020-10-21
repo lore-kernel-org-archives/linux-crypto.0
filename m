@@ -2,131 +2,111 @@ Return-Path: <SRS0=E9jf=D4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B0EC561F8
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Oct 2020 10:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16BEBC388F9
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Oct 2020 15:16:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 539422237B
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Oct 2020 10:20:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A49AF2177B
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Oct 2020 15:16:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="i04+RrcM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AiMDdQAi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2409949AbgJUKU1 (ORCPT
+        id S2501929AbgJUPQH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Oct 2020 06:20:27 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([51.163.158.102]:22913 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2409947AbgJUKU0 (ORCPT
+        Wed, 21 Oct 2020 11:16:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44210 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2502113AbgJUPQH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Oct 2020 06:20:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1603275623;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lvA6JH2s+U6ObZG8b4tCXCs08lgAevTFwjtqnmIE4ig=;
-        b=i04+RrcMM80s2/1iad+f0abiziMmIkne/DQV5tipoDa45pJg1TctXXE3+x9aILCf840jb0
-        TglfAvgBMr7hbitI40ji0Uj1S+kqUkdX3Gu+tE5of4qsSnRkOaCUogxTVPt3R2ENbm5Ab1
-        lBG1tbM0uB2K93ZZurGBFVnHE9WHAFs=
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com
- (mail-he1eur04lp2054.outbound.protection.outlook.com [104.47.13.54]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- de-mta-15-Zz5w17R4NpOzeD96Hjkj_Q-1; Wed, 21 Oct 2020 12:20:21 +0200
-X-MC-Unique: Zz5w17R4NpOzeD96Hjkj_Q-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OwHqKIoGhw+9/ax4VP4g6Wvu6xIbwEkSP8rWCdeJCWma6/hbCyA4eOMqfRa6Vn5tyx/xxXQpQRQcat8+0UW0WCFXUXpFUtuj4ER+QAsJs+vD7InAOhWq5fsWusoUVtO73HCVcAWmcszOTGAvBeHJ2zzbym/H5lJK1fA9DzAC1U/hdZ3c8EVaJqYsmWVk3NawxRBIF+YQQssCQCLUTAyD05K5ORYP85ooZoYU2BlM6szL0k5Q7ltxyKf6jaabJ8jdtdwVqyiXMFjT+Eq0YovFIdFvz6vEvxD6wf76z0kFmiP/S66A71YvUqRl4xvcxSoXDmrfPQrGSGEKbud5ru6+kA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lvA6JH2s+U6ObZG8b4tCXCs08lgAevTFwjtqnmIE4ig=;
- b=adXdfJeE27HdLgUoLKCH2/JCDdvNaCTp3hb0vhIz4cx/GwnIlCoUvZTNtfq1LOy18dl5WGEiYwYA9+uJ+qfN2A0ln2i2d9RFId/h+iosMEog5frdpiXRG6Go8AdAjSdFB2siRuyRp2rGR+0ad8eNf82mINyr/d1eziJoLVUNzV6f7ZXrTA317VcyekwrlR3gxrtOKFbBTmhX4TnZDA96mWzQpek7j2+SRS5amBjlTI1MRuMPp/DlBTMNqWTwv6DZvyEmdco3De3k1hCCJY2jGbRzP6IsvFaEpoxAQj4ohiBW3aheDd19ZmRd0Q4rcNN8Bn+67eIexbconpOxkw/9jw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: infradead.org; dkim=none (message not signed)
- header.d=none;infradead.org; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR04MB7102.eurprd04.prod.outlook.com (2603:10a6:800:124::12)
- by VI1PR04MB5247.eurprd04.prod.outlook.com (2603:10a6:803:55::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.25; Wed, 21 Oct
- 2020 10:20:19 +0000
-Received: from VI1PR04MB7102.eurprd04.prod.outlook.com
- ([fe80::4850:c5a:699b:e466]) by VI1PR04MB7102.eurprd04.prod.outlook.com
- ([fe80::4850:c5a:699b:e466%9]) with mapi id 15.20.3499.018; Wed, 21 Oct 2020
- 10:20:19 +0000
-Date:   Wed, 21 Oct 2020 18:20:07 +0800
-From:   joeyli <jlee@suse.com>
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     list.lkml.keyrings@me.benboeckel.net,
-        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
-        David Howells <dhowells@redhat.com>,
+        Wed, 21 Oct 2020 11:16:07 -0400
+Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A79BC0613CE;
+        Wed, 21 Oct 2020 08:16:07 -0700 (PDT)
+Received: by mail-qk1-x743.google.com with SMTP id s14so2764821qkg.11;
+        Wed, 21 Oct 2020 08:16:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:date:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=9MM2vEZBw6tjXUDyjGU6HmX8YCJo6rvFJY1GE/amDAw=;
+        b=AiMDdQAiKYq+RAmX5cSS6Cn/89NjZLdcc9W3Vo9eFLejakE/Iu8RDxTcaYOgQM53iw
+         dSl0L9KJMzvkoMY3V+veK9yAJRKMs9ZPfvzd2hljEutjRsVhL5lWWlaGAFqCIGdtyp4H
+         vUQ2Zdjor3oywHO1+4Nw7FJC1Zt5Xj8c0p7ecDXtKya5IObozbbkOSaG9aHz4oH1T3RC
+         dpIsojEilh3a4VfVoe35w0g2AbHlyrpzFpyiqXetUGM7kd79K1qGdWBMzcY4ikdXR41v
+         yVkE1Bd7qGwzS3L70aFhRZCuB0XPpL3nLHklmAj9ciceE8W2A9Xdn3jGGzYfZsJ5KWmq
+         CkOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=9MM2vEZBw6tjXUDyjGU6HmX8YCJo6rvFJY1GE/amDAw=;
+        b=F1MN+QX1WarzBFJ8FBwKu6JDgBUJxHn8N0wTivLblvmUl3cDHk9lLVhWKcMKhBcMcN
+         2bbhJHLTZRoex9YM731SvOc8X7kLHnjB83ZeevbbChpmtswsrLJ9CohP9l3VqFH4dNWx
+         Thkd/Mduv7tNOStEmRcFcBnLeegfuhnZ9QA+mh6VDAxHopkzNm8UBnhGIKpP49gwydQh
+         oFJg6zPq2T3HH7jDWqNgSi4w5x+Ipb7n5FInaLCTe/MA/CAYSKMOaNpYw5ZY504XkJUc
+         974MVnD8Z0BwfR0MhcYLfLP47K0IdKpjPRfWwClBIbVnSLf51B8S+B/vuO3pzhd9jytR
+         PyIQ==
+X-Gm-Message-State: AOAM531DxpatJd5v0OiVvE/AL2kBb1I3QChsPfKt46lHoeIVvJoioNqz
+        BSlafAWaQaA30k6aWL/JFEQ=
+X-Google-Smtp-Source: ABdhPJx85NH8Q8Qnh3+FEQses7EhMqZQ1HiCXdrHQOBc0QBn+Wu6ZfGIFkGCdL7ZFZOFFM+co2Lycw==
+X-Received: by 2002:a37:9f0a:: with SMTP id i10mr3484421qke.61.1603293366700;
+        Wed, 21 Oct 2020 08:16:06 -0700 (PDT)
+Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
+        by smtp.gmail.com with ESMTPSA id 67sm1472106qkd.14.2020.10.21.08.16.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Oct 2020 08:16:05 -0700 (PDT)
+Sender: Arvind Sankar <niveditas98@gmail.com>
+From:   Arvind Sankar <nivedita@alum.mit.edu>
+X-Google-Original-From: Arvind Sankar <arvind@rani.riverdale.lan>
+Date:   Wed, 21 Oct 2020 11:16:04 -0400
+To:     David Laight <David.Laight@ACULAB.COM>
+Cc:     'Arvind Sankar' <nivedita@alum.mit.edu>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] PKCS#7: Check codeSigning EKU for kernel module
- and kexec pe verification
-Message-ID: <20201021102007.GB13854@linux-l9pv.suse>
-References: <20201020065001.13836-1-jlee@suse.com>
- <20201020065001.13836-3-jlee@suse.com>
- <20201020134208.GA297878@erythro.dev.benboeckel.internal>
- <885f1b81-6141-a3be-1dc0-92c1fc825e3c@infradead.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <885f1b81-6141-a3be-1dc0-92c1fc825e3c@infradead.org>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-Originating-IP: [124.11.22.254]
-X-ClientProxiedBy: HKAPR04CA0009.apcprd04.prod.outlook.com
- (2603:1096:203:d0::19) To VI1PR04MB7102.eurprd04.prod.outlook.com
- (2603:10a6:800:124::12)
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 6/6] crypto: lib/sha - Combine round constants and
+ message schedule
+Message-ID: <20201021151604.GA3750362@rani.riverdale.lan>
+References: <20201020203957.3512851-1-nivedita@alum.mit.edu>
+ <20201020203957.3512851-7-nivedita@alum.mit.edu>
+ <d8c1750ffcef4236904919321b872cd2@AcuMS.aculab.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from linux-l9pv.suse (124.11.22.254) by HKAPR04CA0009.apcprd04.prod.outlook.com (2603:1096:203:d0::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend Transport; Wed, 21 Oct 2020 10:20:15 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a404e30a-304b-4c7a-0778-08d875aae989
-X-MS-TrafficTypeDiagnostic: VI1PR04MB5247:
-X-Microsoft-Antispam-PRVS: <VI1PR04MB52478D6737E1F3C6BEC6962AA31C0@VI1PR04MB5247.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +S7nLE7YfTHR2aoOgWFXiBH6p5hrOuA4M3DJ078FMiqbqIXniSL5EZOmW6S16u5REZKoQ0laHyokIuCRp/8ofkaCbqVR93ohQAomcoCbplwPl2GM2F4RPP15bh2j0CZPufaaHUsts1RIYZg8kdYbBBQIviqqYSXptPYPQzdMzBOYmcZONVEYn1CkIRBgcAfDNSt+FQMY8a5yyLp1IdNoiJn0STKlvNmp9WLCfOIJQpHc7xydenLKpU2QRvTWR56PLVSD0Tr3Qw2etr2o/Irlkl3rK3mYYVF2/pXArijSAIwAj/lGUEuikFDCJqpI17K6i/nvMlJtUjFtFaLEjWCp9lBnsQWYPJZAjJeB6EbvGdQ68T1zXQ0mPUR7EU821AKL
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB7102.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(376002)(39860400002)(396003)(346002)(136003)(316002)(66556008)(36756003)(8886007)(186003)(52116002)(956004)(26005)(8936002)(7696005)(66946007)(66476007)(33656002)(83380400001)(16526019)(9686003)(478600001)(1076003)(15650500001)(4744005)(54906003)(86362001)(55016002)(6916009)(2906002)(5660300002)(8676002)(53546011)(4326008)(6506007)(6666004)(43062003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: 4tS76mOfTlFjlg/1VDLIi/ukv/nzz/QfYLZS4rMRGfRz+pQzMN+WFzSFzXcq3PAGUz8FBtx82mX6kUNz7UwqR3NMA55Z8m9NYW1kQAJY+zs6OLQesc554PtFzyjurxfm64CB7oV4wehK37eJHJUAYWYtqX8SQ/C0aBqWbWF325138diND0F8joJEbqWd4TnRXGaf6NH5SUVz3ulQfoq3oeDStvYgn/AfTPVMk2nbin0KYvL+u3q30/hXW5KL+UE8Bc/1Mn4wJJdvS+82n3cqSV17DxoJpuNG5IhKi1WEeLNeZcyPiKqH/Am3NvUwPDQP+Yrr5PCkql0oQMLXDPR17xAfWWfGXlyjVA9GIj3E3YjIR8i7f474QOZuruKV3dhZYUEkgmMknK3bt8DMQAgghcFGjcq0i3E5elRK5D5M9C5hRPrVcNQ4biHCa+6UEdyz3sGeGHNbmCmhnF2wfCqAgAbf7zPVJpxrAAyc/f1omE92pNd6IDH1IjPs90/UZaPsyhOZOmlXkLaNZFAkr1eRP7yaOXwlWYzsmMtQl4zEOE4H1VEudBhu09VldkPoc1G3t8V86fJY/1CRMm8pDHx2Xb6eKncB1Fx/qdc0xSSCrDpyqQsQGwI0fEZmL2WzUQo7y1PTq5bLM9exXLX+Se72jQ==
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a404e30a-304b-4c7a-0778-08d875aae989
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB7102.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2020 10:20:19.7022
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gsZsrSK9bowhHqamB3wjrbGRtg98iFIQLgUV8FflxjzOVflNwLYmaOyRA040DZe+
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB5247
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d8c1750ffcef4236904919321b872cd2@AcuMS.aculab.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Randy,
-
-On Tue, Oct 20, 2020 at 07:56:29AM -0700, Randy Dunlap wrote:
-> On 10/20/20 6:42 AM, Ben Boeckel wrote:
-> > On Tue, Oct 20, 2020 at 14:50:01 +0800, Lee, Chun-Yi wrote:
-> >> +config CHECK_CODESIGN_EKU
-> >> +	bool "Check codeSigning extended key usage"
-> >> +	depends on PKCS7_MESSAGE_PARSER=y
-> >> +	depends on SYSTEM_DATA_VERIFICATION
-> >> +	help
-> >> +	  This option provides support for checking the codeSigning extended
-> >> +	  key usage extension when verifying the signature in PKCS#7. It
+On Tue, Oct 20, 2020 at 09:36:00PM +0000, David Laight wrote:
+> From: Arvind Sankar
+> > Sent: 20 October 2020 21:40
+> > 
+> > Putting the round constants and the message schedule arrays together in
+> > one structure saves one register, which can be a significant benefit on
+> > register-constrained architectures. On x86-32 (tested on Broadwell
+> > Xeon), this gives a 10% performance benefit.
 > 
-> 	  extended ... extension.
-> Can we drop one of those or reword it?
+> I'm actually stunned it makes that much difference.
+> The object code must be truly horrid (before and after).
+> 
+> There are probably other strange tweaks that give a similar
+> improvement.
+> 
+> 	David
+> 
 
-I will remove the _extension_ word in next version. Thanks for your review!
+Hm yes, I took a closer look at the generated code, and gcc seems to be
+doing something completely braindead. Before this change, it actually
+copies 8 words at a time from SHA256_K onto the stack, and uses those
+stack temporaries for the calculation. So this patch is giving a benefit
+just because it only does the copy once instead of every time around the
+loop.
 
-Joey Lee
-
+It doesn't even really need a register to hold SHA256_K since this isn't
+PIC code, it could just access it directly as SHA256_K(%ecx) if it just
+multiplied the loop counter i by 4.
