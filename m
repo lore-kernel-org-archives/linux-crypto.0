@@ -2,102 +2,101 @@ Return-Path: <SRS0=E9jf=D4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1AA7C56202
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Oct 2020 19:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD702C4363A
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Oct 2020 20:07:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 97D1224178
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Oct 2020 19:23:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t8zYGjnd"
+	by mail.kernel.org (Postfix) with ESMTP id 5DCCE24171
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Oct 2020 20:07:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2444244AbgJUTXR (ORCPT
+        id S2505080AbgJUUHI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Oct 2020 15:23:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54324 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2441845AbgJUTXR (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Oct 2020 15:23:17 -0400
-Received: from mail-yb1-xb43.google.com (mail-yb1-xb43.google.com [IPv6:2607:f8b0:4864:20::b43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 073EDC0613CE;
-        Wed, 21 Oct 2020 12:23:17 -0700 (PDT)
-Received: by mail-yb1-xb43.google.com with SMTP id c129so2734858yba.8;
-        Wed, 21 Oct 2020 12:23:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Ngb6VdnFO3Cj0Aq7+OesUyk7zjfF0LMjcERe0s6GBrk=;
-        b=t8zYGjndpXem8DQZgcJuBlFjaO5IBm2Rsc1xHDtuNliFDnzjVT0i5Buhk12ftG+GvR
-         APTGDWJZrfOm4Fgyv1oC0frFaF4koQEjFiY1IXfv8vc7VVvx0/RqOufYTNt/EXfwx6b3
-         OHvZCx29eRVDULPQIgwEEt+IKY40doVUxY/vX25PIeWXis4ZiVce1eT8uqZyPkrwHr2f
-         V4nQApPN5RIy/OdNZcucmP+lCsb2zKy+UZnNZm8nWL6xeeF7fugXQV7Ax73x+8xXKKfg
-         m2THQ+BdsKwRQiD2aIPsryJ/Q8XPCljvh2K2AsWHlhGOCZXAOYkD+IrWbWNyHfJw7JCZ
-         YMAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Ngb6VdnFO3Cj0Aq7+OesUyk7zjfF0LMjcERe0s6GBrk=;
-        b=JkbTc3yx0HHiyIKPo0F44aL84A1yJlaj+F4xLLHKduFpJF1D9+BvtX5hmP0U2fYfxa
-         yqwgUrbihT8JBluut0YtXRXvvcQFSW5HTR0HnyTMjD5F+WH+S5fIn+nOiVHJY/GWqjJY
-         LV8as7ujiCNm/3c9JTcH9Uusp3pW4HH9oQdGingwaq2s84cQmPlSvFS+kdR3TC01gA8O
-         2B0ivASEQCgZUfNC+jlaWuPQoULxJiflBiNFtRJZ2dkm+x/dFSBnOxqIl6JnQj01hHwT
-         ytSb8X4BAFQAMzJ4DBEGWm8B0EDdPvj9eeznGb9A9PP1+gsIYzY3915r4iLUG/PQegvf
-         TE1Q==
-X-Gm-Message-State: AOAM532sXDYpDffxcvPwm/QKqy+6Jv/BU3LOwFUITjsgkz59cMDGdDnz
-        pIp5XbTjQeftW7qxNdqBivMdmVT2gXcahUAv4PY=
-X-Google-Smtp-Source: ABdhPJxdsOYT82PK7x6Fj8Pd5fHM4hcKBF/eXtyc2y+iIT2S5Ob9BhvjkkyLWKF3HF6eu0aMB1v8BZMQ1KVcBeFT1Ao=
-X-Received: by 2002:a25:384c:: with SMTP id f73mr6935747yba.135.1603308196270;
- Wed, 21 Oct 2020 12:23:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <e9b1ba517f06b81bd24e54c84f5e44d81c27c566.camel@perches.com>
- <CAMj1kXHe0hEDiGNMM_fg3_RYjM6B6mbKJ+1R7tsnA66ZzsiBgw@mail.gmail.com> <1cecfbfc853b2e71a96ab58661037c28a2f9280e.camel@perches.com>
-In-Reply-To: <1cecfbfc853b2e71a96ab58661037c28a2f9280e.camel@perches.com>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Wed, 21 Oct 2020 21:23:05 +0200
-Message-ID: <CANiq72=FFasodzT76EqaSj_NEY2chV6hzoDtkhMMQfa422oJrQ@mail.gmail.com>
-Subject: Re: [PATCH -next] treewide: Remove stringification from __alias macro definition
-To:     Joe Perches <joe@perches.com>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, X86 ML <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Marco Elver <elver@google.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>,
-        Alexander Potapenko <glider@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-efi <linux-efi@vger.kernel.org>,
-        kasan-dev <kasan-dev@googlegroups.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 21 Oct 2020 16:07:08 -0400
+Received: from inva020.nxp.com ([92.121.34.13]:47712 "EHLO inva020.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2505078AbgJUUHI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 21 Oct 2020 16:07:08 -0400
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 384CB1A0A84;
+        Wed, 21 Oct 2020 22:07:06 +0200 (CEST)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 2BA461A0C34;
+        Wed, 21 Oct 2020 22:07:06 +0200 (CEST)
+Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id AB7E02033F;
+        Wed, 21 Oct 2020 22:07:05 +0200 (CEST)
+From:   Iuliana Prodan <iuliana.prodan@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx <linux-imx@nxp.com>,
+        Andrei Botila <andrei.botila@nxp.com>,
+        Dragos Rosioru <dragos.rosioru@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Subject: [PATCH] crypto: caam - enable crypto-engine retry mechanism
+Date:   Wed, 21 Oct 2020 23:06:50 +0300
+Message-Id: <1603310810-25307-1-git-send-email-iuliana.prodan@nxp.com>
+X-Mailer: git-send-email 2.1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 21, 2020 at 9:07 PM Joe Perches <joe@perches.com> wrote:
->
-> Using quotes in __section caused/causes differences
-> between clang and gcc.
+Use the new crypto_engine_alloc_init_and_set() function to
+initialize crypto-engine and enable retry mechanism.
 
-Yeah, it is a good cleanup get.
+Set the maximum size for crypto-engine software queue based on
+Job Ring size (JOBR_DEPTH) and a threshold (reserved for the
+non-crypto-API requests that are not pass through crypto-engine).
 
-Thanks!
+The callback for do_batch_requests is NULL, since CAAM
+doesn't support linked requests.
 
-> https://lkml.org/lkml/2020/9/29/2187
+Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+---
+ drivers/crypto/caam/intern.h | 3 +++
+ drivers/crypto/caam/jr.c     | 6 +++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-Can you please put this in a Link: like Ard suggested? (and ideally
-find the message in lore.kernel.org instead).
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index 9112279..44fe6ee 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -16,6 +16,9 @@
+ /* Currently comes from Kconfig param as a ^2 (driver-required) */
+ #define JOBR_DEPTH (1 << CONFIG_CRYPTO_DEV_FSL_CAAM_RINGSIZE)
+ 
++#define THRESHOLD 15
++#define CRYPTO_ENGINE_MAX_QLEN (2 * (JOBR_DEPTH - THRESHOLD))
++
+ /* Kconfig params for interrupt coalescing if selected (else zero) */
+ #ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_INTC
+ #define JOBR_INTC JRCFG_ICEN
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 6f66996..88540c9 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -550,7 +550,11 @@ static int caam_jr_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	/* Initialize crypto engine */
+-	jrpriv->engine = crypto_engine_alloc_init(jrdev, false);
++	jrpriv->engine = crypto_engine_alloc_init_and_set(jrdev,
++							  true,
++							  NULL,
++							  false,
++							  CRYPTO_ENGINE_MAX_QLEN);
+ 	if (!jrpriv->engine) {
+ 		dev_err(jrdev, "Could not init crypto-engine\n");
+ 		return -ENOMEM;
+-- 
+2.1.0
 
-Cheers,
-Miguel
