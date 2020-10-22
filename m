@@ -2,69 +2,85 @@ Return-Path: <SRS0=kAoH=D5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D57C388F7
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Oct 2020 05:03:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A266EC56202
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Oct 2020 07:33:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0026C223FB
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Oct 2020 05:02:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603342980;
-	bh=grOL9UzXnA0JO4eRDSJG6Nrn9WZXrL2VbgFYaFjGelE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=CeMHY6jbOYbfKWHR8GdZOz6ZPJ4MlQNcYS8q1hLiUxVqcs2y1XbHypW+z4dQ0ZJLL
-	 abeoGHT0vE28YqzZv2Btgc4EvZuu0AVHwbWXeFjJDQL0fcbLGLUrFVeUybSbSyiTJR
-	 3Q3ZxrY6fmfBxE5Vpci/qn7WlFsoxfDSkAc8233Y=
+	by mail.kernel.org (Postfix) with ESMTP id 2B03C222E9
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Oct 2020 07:33:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lMsJhYJG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2507707AbgJVFC7 (ORCPT
+        id S2508574AbgJVHda (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Oct 2020 01:02:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60598 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2507705AbgJVFC6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Oct 2020 01:02:58 -0400
-Received: from sol.localdomain (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
+        Thu, 22 Oct 2020 03:33:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53680 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2441599AbgJVHda (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Oct 2020 03:33:30 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30FC2C0613CE;
+        Thu, 22 Oct 2020 00:33:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=JbI0bflC8HQp7NYmkplX8khPFM4YNdFK0FBEU2KovRA=; b=lMsJhYJGc3BhDxJe68Hgu906om
+        8Qon8SVUIOhCVFuRh77uHlceHn4dW4RO1HFDbxJpb/Sk9mzOY+XWXyTgrQqS2EoDdglvOg8WVe9MJ
+        0N8c+ERqyETP4BuQ2qpnicSgJF4qro87FMpPt4G8VWiqvBj9nXYRhLIbKNNyxSVJRJBtcMoDTxKC1
+        Uyu1v2J+K/vCxRtKmxxi6Hl4iirCl7pCaSOWmLIAezfrHRAS2pAtWZ9xKLDUgBZ9xclunQAUFM6bI
+        PPWvYBw+4GGlfLjNCyByVldTQ/emii876kndho+qdxv0hvvZHqveaESL6Y3+55wsXV2XLq7zJn4Xb
+        b/00Gw6g==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kVV5w-00028b-Mt; Thu, 22 Oct 2020 07:33:08 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C452D20657;
-        Thu, 22 Oct 2020 05:02:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603342978;
-        bh=grOL9UzXnA0JO4eRDSJG6Nrn9WZXrL2VbgFYaFjGelE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=uSeZLdbv2dG9Cs3UKg1lwf4W9cFcRN148Z/ZyujpikqHGI1YlMy4pgiIcwe/N7aXN
-         W5UHrq2DJ9kArqNIuXQnC/XUEtLEG7wHjNl/GpzpxE1Tt1fSsW7d0plBGT9oXyE+MM
-         degOUYvnD+2I7jyjBpwqwFeb1JxVJ6zQNbx9wAgU=
-Date:   Wed, 21 Oct 2020 22:02:56 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Arvind Sankar <nivedita@alum.mit.edu>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id A8B873011C6;
+        Thu, 22 Oct 2020 09:33:07 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 94AE72BB9BA76; Thu, 22 Oct 2020 09:33:07 +0200 (CEST)
+Date:   Thu, 22 Oct 2020 09:33:07 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Joe Perches <joe@perches.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+        Marco Elver <elver@google.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        David Laight <David.Laight@aculab.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 5/6] crypto: lib/sha256 - Unroll LOAD and BLEND loops
-Message-ID: <20201022050256.GH857@sol.localdomain>
-References: <20201020203957.3512851-1-nivedita@alum.mit.edu>
- <20201020203957.3512851-6-nivedita@alum.mit.edu>
+        Andrey Ryabinin <aryabinin@virtuozzo.com>,
+        Alexander Potapenko <glider@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-kernel@vger.kernel.org, linux-efi@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-crypto@vger.kernel.org,
+        linux-mm <linux-mm@kvack.org>
+Subject: Re: [PATCH -next] treewide: Remove stringification from __alias
+ macro definition
+Message-ID: <20201022073307.GP2628@hirez.programming.kicks-ass.net>
+References: <e9b1ba517f06b81bd24e54c84f5e44d81c27c566.camel@perches.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201020203957.3512851-6-nivedita@alum.mit.edu>
+In-Reply-To: <e9b1ba517f06b81bd24e54c84f5e44d81c27c566.camel@perches.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 20, 2020 at 04:39:56PM -0400, Arvind Sankar wrote:
-> Unrolling the LOAD and BLEND loops improves performance by ~8% on x86_64
-> (tested on Broadwell Xeon) while not increasing code size too much.
+On Wed, Oct 21, 2020 at 11:58:25AM -0700, Joe Perches wrote:
+> Like the __section macro, the __alias macro uses
+> macro # stringification to create quotes around
+> the section name used in the __attribute__.
 > 
-> Signed-off-by: Arvind Sankar <nivedita@alum.mit.edu>
-> ---
+> Remove the stringification and add quotes or a
+> stringification to the uses instead.
 
-Looks good,
-
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+There's a complete lack of rationale for this change.
