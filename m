@@ -2,114 +2,101 @@ Return-Path: <SRS0=juaY=D6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB73CC4363A
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Oct 2020 17:00:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7221BC388F9
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Oct 2020 19:22:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 86C3720797
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Oct 2020 17:00:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603472407;
-	bh=JbINGNb1wfDyaqjNDKC5RrjbUiFD1VruFriCCFRJSIY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=LW23iZybrL2Q6kIwBViJTz3fVeoDH6638QlylFeMn+2Fu1m3zAD4bsQE/H1q/Sd2R
-	 4V1eHHz2cdafcSHPPwCPQej2y8UZejgo0T4xpqGZcU9jr8xbwauwD7Ht+PiNwLXstU
-	 yjbofQaTK0InVfWKZSHXd6O8emu15H6zvgwxnMhM=
+	by mail.kernel.org (Postfix) with ESMTP id 11E2C21582
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Oct 2020 19:22:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1750572AbgJWRAH (ORCPT
+        id S1753946AbgJWTWG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Oct 2020 13:00:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51756 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S465168AbgJWRAG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Oct 2020 13:00:06 -0400
-Received: from gmail.com (unknown [104.132.1.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id ADEB9206BE;
-        Fri, 23 Oct 2020 17:00:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603472406;
-        bh=JbINGNb1wfDyaqjNDKC5RrjbUiFD1VruFriCCFRJSIY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QfQdRr83Pwxc4s7oxCoXyNiSw+gc1EIlexY2GVX6Te+36OoIRWO2g1SqhbkmqLzWI
-         2BOvtAKicV1yBmYKqjsav+bWQf94GI2EbZowoQRTCu0UZbVC3H/v/f5lxVYnUTZkAW
-         gHhaMD4eyBx3v02/B84OCkMTSrDsPoAv7psWp64Y=
-Date:   Fri, 23 Oct 2020 10:00:03 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Konrad Dybcio <konradybcio@gmail.com>
-Cc:     linux-crypto@vger.kernel.org, Satya Tangirala <satyat@google.com>
-Subject: Re: Qualcomm Crypto Engine driver
-Message-ID: <20201023170003.GC3908702@gmail.com>
-References: <CAMS8qEVZFBFv4VpFtijxnR8Z5-wWFkpZx8nKOmbm6U-vah7eLg@mail.gmail.com>
+        Fri, 23 Oct 2020 15:22:06 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:45052 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750751AbgJWTWG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Oct 2020 15:22:06 -0400
+Received: by mail-qk1-f196.google.com with SMTP id s14so2226351qkg.11;
+        Fri, 23 Oct 2020 12:22:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=t6coSryefsb3ak8Nuc7NVKsRwzzU7GO9O3ZnHo7ZcNg=;
+        b=h+AxWE8yWqy23u2MIbIDNUNm/7HuECev6jaeoKKWrTqVrmYUuaJvQBjQgLfHiScRtP
+         2XtWyuRiI4JmWe1VMhhV/dyTJN/EPVl80v8Md64312hgUJqj1zBHQB+OwmPlqK5Lrf5M
+         IuUHnhyMLHqIiurnzfPWWCnBEAW+WRURjV5aYaX0BlrhmMNDuSMxl44RzLQElhI3Ille
+         OdPBXbCZ0+gVojZHrvX1tEKMaD9IfDO6hxuZe4BKDURIiSqxINXPxyXAd94SKXm1xU6n
+         iGKo72KTqExXzH7Ldk1TPmAvNH/un8JH7MFR1RTGwA9tscWyAvWErySN90lHrSkdtNWY
+         l6Ag==
+X-Gm-Message-State: AOAM533QAgKfN1zN/B2Khv78RH6nhpDDSApxcURyf1J8Lw9AN1FYiuyR
+        vvN0HNjpWfQcmYTRGQWMf9+VMzE1Ihhhcg==
+X-Google-Smtp-Source: ABdhPJwWpHtO1IsK1G/zRxMYsmViv/Vym8k2zV/eJh+ZHvp/S6mBwvs2KzoQROOCukQdYyDLyqkrQg==
+X-Received: by 2002:a37:67c3:: with SMTP id b186mr3721945qkc.26.1603480924992;
+        Fri, 23 Oct 2020 12:22:04 -0700 (PDT)
+Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
+        by smtp.gmail.com with ESMTPSA id n199sm1398493qkn.77.2020.10.23.12.22.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Oct 2020 12:22:04 -0700 (PDT)
+From:   Arvind Sankar <nivedita@alum.mit.edu>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        David Laight <David.Laight@aculab.com>
+Cc:     linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/5] crypto: lib/sha256 - cleanup/optimization
+Date:   Fri, 23 Oct 2020 15:21:58 -0400
+Message-Id: <20201023192203.400040-1-nivedita@alum.mit.edu>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMS8qEVZFBFv4VpFtijxnR8Z5-wWFkpZx8nKOmbm6U-vah7eLg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Konrad,
+Patch 1 -- Use memzero_explicit() instead of structure assignment/plain
+memset() to clear sensitive state.
 
-On Fri, Oct 23, 2020 at 01:55:13PM +0200, Konrad Dybcio wrote:
-> Hi,
-> 
-> I was investigating Qualcomm Crypto Engine support on my sdm630
-> smartphone and found out that the already-present driver is
-> compatible. In meantime I found two issues:
-> 
-> 1. The driver doesn't seem to have a maintainer? drivers/crypto/qce
-> doesn't seem to exist in the MAINTAINERS file..
-> 
-> 2. The person who first submitted it likely faced an issue with memory
-> allocation. On downstream (taking sdm630 as example) Qualcomm decided
-> to allocate 0x20000@1de0000 for the device and 0x24000@1dc4000 for
-> BAM, which isn't something upstream driver agrees with (these memory
-> regions overlap and the driver straight up doesn't probe..).
-> I "fixed" it by giving (QCE register) - (DMA register) memory size to
-> the DMA (which doesn't seem to cause any issues) and changing all the
-> registers in the header file by 0x1A000 (just like it is downstream
-> [1]), but the former person "fixed" it by offsetting the QCE node in
-> qcom-ipq4019.dtsi by 0x1A000.
-> 
-> Which fix is more correct? I'd advocate for my one as the more
-> accurate, but I can adapt to what's already been invented.. Test
-> results ("cryptsetup benchmark")  don't differ between these two
-> (though they are worse than without the QCE, which is most likely
-> related to unimplemented bus bandwidth scaling).
-> 
-> 
-> [1] https://github.com/sonyxperiadev/kernel/blob/aosp/LA.UM.7.1.r1/drivers/crypto/msm/qcryptohw_50.h
-> 
-> Konrad Dybcio
+Patch 2 -- Currently the temporary variables used in the generic sha256
+implementation are cleared, but the clearing is optimized away due to
+lack of compiler barriers. Drop the clearing.
 
-Out of curiosity, what use cases do you have in mind for drivers/crypto/qce/ on
-SDM630?  I can't help you with that driver, but it may be worth mentioning that
-that the SDM630 (and most other Snapdragon SoCs) also includes an Inline Crypto
-Engine (ICE) as part of the eMMC host controller.  The "Inline Crypto Engine" is
-very different from the regular "Crypto Engine" which drivers/crypto/qce/ is
-for.  And in practice, ICE is what is used on Snapdragon-based Android devices
-to accelerate the storage encryption; drivers/crypto/qce/ isn't used.
+The last three patches are optimizations for generic sha256.
 
-So if your goal is to run Android with an upstream kernel on SDM630, ICE support
-would probably be more useful.  On the other hand, dm-crypt doesn't currently
-support inline encryption, so if your goal is just to run other Linux distros,
-ICE wouldn't be as useful (since outside Android, dm-crypt is more commonly used
-than fscrypt, which is what Android uses).
+v3:
+- Add some more files to patch 1
+- Reword commit message for patch 2
+- Reformat SHA256_K array
+- Drop v2 patch combining K and W arrays
 
-FWIW, I'm interested in adding support for the eMMC interface to ICE, but I
-haven't had hardware with upstream support to use.  (I was able to add upstream
-support for the UFS interface to ICE, since there is a SDM845 development board
-with upstream support, and upstream Linux now has a framework "blk-crypto" for
-supporting inline encryption hardware.)  I see there's been recent upstreaming
-work on SDM630 by yourself and others.  I haven't had much luck getting a Sony
-Xperia 10 to boot with an upstream kernel, though -- and I've also tried some of
-the branches at https://github.com/SoMainline/linux, including yours I think.
-If you're able to give some tips to getting it working (probably off-list, since
-it's a bit off-topic for linux-crypto) I'd appreciate it -- thanks!
+v2:
+- Add patch to combine K and W arrays, suggested by David
+- Reformat SHA256_ROUND() macro a little
 
-- Eric
+Arvind Sankar (5):
+  crypto: Use memzero_explicit() for clearing state
+  crypto: lib/sha256 - Don't clear temporary variables
+  crypto: lib/sha256 - Clear W[] in sha256_update() instead of
+    sha256_transform()
+  crypto: lib/sha256 - Unroll SHA256 loop 8 times intead of 64
+  crypto: lib/sha256 - Unroll LOAD and BLEND loops
+
+ arch/arm64/crypto/ghash-ce-glue.c |   2 +-
+ arch/arm64/crypto/poly1305-glue.c |   2 +-
+ arch/arm64/crypto/sha3-ce-glue.c  |   2 +-
+ arch/x86/crypto/poly1305_glue.c   |   2 +-
+ include/crypto/sha1_base.h        |   3 +-
+ include/crypto/sha256_base.h      |   3 +-
+ include/crypto/sha512_base.h      |   3 +-
+ include/crypto/sm3_base.h         |   3 +-
+ lib/crypto/sha256.c               | 212 +++++++++---------------------
+ 9 files changed, 76 insertions(+), 156 deletions(-)
+
+-- 
+2.26.2
+
