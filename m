@@ -2,99 +2,92 @@ Return-Path: <SRS0=juaY=D6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49DCCC388F9
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Oct 2020 21:53:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29EE6C388F9
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Oct 2020 22:11:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4230208E4
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Oct 2020 21:53:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE2C020BED
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Oct 2020 22:11:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603490014;
-	bh=Ij37+nLWdhORElfqYs8jtc6OQd/BGn0J09kWaWaub44=;
+	s=default; t=1603491089;
+	bh=oYDdkAGeOEwqEQlJ3M1O6TGp5eWuctvbDWvQg3nFwJc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=rBcTP8qPXy+Dlryn3E2D246fNfNGPsKLoQlqFZ1+Hwl0vOBg8LJJifCZ6cFmA3MdR
-	 EOIWDwznncPvUMcnygXYH8uxG29XORBrHhq4ugluWn50EYU28Lkh8cHXm7igZJa213
-	 qxYm94lW89Z4fZLjFqLVxG0ZT9vurPEbmskUWKxY=
+	b=bKYhsfvTBKHrqvCWMGCmkUFUIwW10IGhUPHhjDZf9aRX1I786sw8K7GAwQp25or1j
+	 xJ//nEhnB1B++Nco5w0gWVFsPn5B55azfYuX1Th+jj65uldeUKR+nCzPZ65lWWVo2G
+	 CRrVKlFLj0JmcnFDMBzaMOgICa10AClqGyfh6UnA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1756966AbgJWVxd (ORCPT
+        id S1757043AbgJWWL3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Oct 2020 17:53:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54192 "EHLO mail.kernel.org"
+        Fri, 23 Oct 2020 18:11:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56996 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756964AbgJWVxc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Oct 2020 17:53:32 -0400
+        id S1757036AbgJWWL2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Oct 2020 18:11:28 -0400
 Received: from gmail.com (unknown [104.132.1.76])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id ACE4720857;
-        Fri, 23 Oct 2020 21:53:31 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0AAA720724;
+        Fri, 23 Oct 2020 22:11:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603490012;
-        bh=Ij37+nLWdhORElfqYs8jtc6OQd/BGn0J09kWaWaub44=;
+        s=default; t=1603491088;
+        bh=oYDdkAGeOEwqEQlJ3M1O6TGp5eWuctvbDWvQg3nFwJc=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nugwVx/zVZIlwfzOET6+GuwwgnQJjNPwjBmYCB7gf+774kJ69BUcUP+RTBwca/lsB
-         qRxXBt0K8ECFwoDH04ZlccuEerj8ssPgYIUvGXt4T2CzH1oeS3WeRcFofla8b2y37r
-         qwaDS8+OekhJASNfUtZR9bhduF5kZ7eg7ifGd4Vw=
-Date:   Fri, 23 Oct 2020 14:53:29 -0700
+        b=xxb/GAjvsPxTRs76hmFkdHimX18DvXWGGDbMDdK7f2OEgLtOzJAp9fOMx79mW5KDW
+         jrF+kplGKkYgHIb12ePKpXbDRPxWF5qKWHe+jO3D2Sf+yoFJccO/pd/9RPWaYrAw18
+         eywmcxbINrfrNIQN0OFWYyur+NOhGakeNv7rhJsE=
+Date:   Fri, 23 Oct 2020 15:11:26 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Arvind Sankar <nivedita@alum.mit.edu>,
+To:     Arvind Sankar <nivedita@alum.mit.edu>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         David Laight <David.Laight@aculab.com>,
-        linux-kernel@vger.kernel.org,
-        Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [PATCH v2 1/6] crypto: Use memzero_explicit() for clearing state
-Message-ID: <20201023215329.GA180517@gmail.com>
-References: <20201020203957.3512851-1-nivedita@alum.mit.edu>
- <20201020203957.3512851-2-nivedita@alum.mit.edu>
- <20201022043633.GD857@sol.localdomain>
- <20201023153927.GA217686@rani.riverdale.lan>
- <20201023155604.GA3908702@gmail.com>
- <20201023204536.GB27708@gondor.apana.org.au>
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 2/5] crypto: lib/sha256 - Don't clear temporary
+ variables
+Message-ID: <20201023221126.GB180517@gmail.com>
+References: <20201023192203.400040-1-nivedita@alum.mit.edu>
+ <20201023192203.400040-3-nivedita@alum.mit.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201023204536.GB27708@gondor.apana.org.au>
+In-Reply-To: <20201023192203.400040-3-nivedita@alum.mit.edu>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Oct 24, 2020 at 07:45:36AM +1100, Herbert Xu wrote:
-> On Fri, Oct 23, 2020 at 08:56:04AM -0700, Eric Biggers wrote:
-> >
-> > When clearing memory because "it may be sensitive" rather than "it's needed for
-> > the code to behave correctly", I think it's best to use memzero_explicit() to
-> > make the intent clear, even if it seems that memset() is sufficient.  Also keep
-> > in mind that support for compiling the kernel with LTO (link-time optimization)
-> > is being worked on (and some people already do it), which results in more code
-> > being optimized out.
+On Fri, Oct 23, 2020 at 03:22:00PM -0400, Arvind Sankar wrote:
+> The assignments to clear a through h and t1/t2 are optimized out by the
+> compiler because they are unused after the assignments.
 > 
-> The rule up until now has been that we only use memzero_explicit for
-> stack variables.  At this point please don't convert anything else
-> as it will cause too much churn.
+> Clearing individual scalar variables is unlikely to be useful, as they
+> may have been assigned to registers, and even if stack spilling was
+> required, there may be compiler-generated temporaries that are
+> impossible to clear in any case.
 > 
-> If LTO did arrive we should do a global conversion.
+> So drop the clearing of a through h and t1/t2.
 > 
+> Signed-off-by: Arvind Sankar <nivedita@alum.mit.edu>
+> ---
+>  lib/crypto/sha256.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
+> index d43bc39ab05e..099cd11f83c1 100644
+> --- a/lib/crypto/sha256.c
+> +++ b/lib/crypto/sha256.c
+> @@ -202,7 +202,6 @@ static void sha256_transform(u32 *state, const u8 *input)
+>  	state[4] += e; state[5] += f; state[6] += g; state[7] += h;
+>  
+>  	/* clear any sensitive info... */
+> -	a = b = c = d = e = f = g = h = t1 = t2 = 0;
+>  	memzero_explicit(W, 64 * sizeof(u32));
+>  }
 
-LTO is actively being worked on, now up to v6:
-https://lkml.kernel.org/lkml/20201013003203.4168817-1-samitolvanen@google.com/
-And in the real world it's already being used; the Android Compatibility
-Definition Document strongly recommends enabling CFI, which depends on LTO.
+Looks good,
 
-It's doubtful that anyone will do a global conversion from memset() to
-memzero_explicit(), as it's too hard to find all the places that should be
-converted.  They are in lots of different subsystems; the crypto subsystem will
-have the most, but not all.  We just need to fix as many as we can.  If you'd
-like to do something more comprehensive than this patch, that would be great,
-but I hope we don't wait forever for a global conversion that never happens.
-
-FWIW, kfree_sensitive() (formerly kzfree) already got converted by
-https://git.kernel.org/linus/8982ae527fbef170, and it wasn't really
-controversial.  Some people even wanted Cc stable (which I disagreed with, but
-it apparently made the final version).
-
-- Eric
+Reviewed-by: Eric Biggers <ebiggers@google.com>
