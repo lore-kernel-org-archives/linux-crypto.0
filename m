@@ -2,88 +2,72 @@ Return-Path: <SRS0=juaY=D6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB118C388F9
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Oct 2020 22:28:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 319E1C388F9
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Oct 2020 22:31:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9799B20FC3
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Oct 2020 22:28:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B688E2137B
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Oct 2020 22:31:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603492128;
-	bh=0JGkPldSTQ0mjX8nFULRC/vLmBKJl6lR8G1LPBTcZgw=;
-	h=From:To:Subject:Date:List-ID:From;
-	b=OJA4Yzo7P7sNINPyufLWvJxRgUEm8BdLO/3YHpo/a2/Dp0vwPLUthWZCjcbkOQjUR
-	 lmQIxH4XnUwsey1KAwvV5Q6EL5kUqEMyJa4yRAgbrVyQKyPkMmH1gznTZ0W7rP0EQB
-	 shhyTeSKmSrCfNX52kW10Jq9mJBDWWAsIkRdZkv4=
+	s=default; t=1603492284;
+	bh=i8RM3CKw39RhCAPy2hzJBpQNkFJtyzO4IU8+1xXvR9U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=EFw+32i8hmD4l5xdIYR66gMGuLBncU1zFgBztb/xrdA3IYMGMyBi9gBSXr3GNOcVU
+	 HTtgQPdJl6k6dYZzx0IkC02DYUQS0pkgEz9efiKcgRR+/5MyERWjrc/OYfhxr3tRCb
+	 NAR6rM5M7Zw9L2MlwnLEp29P3Yyf2LVtXxHMAOR4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1757101AbgJWW2s (ORCPT
+        id S1757115AbgJWWbY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Oct 2020 18:28:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44606 "EHLO mail.kernel.org"
+        Fri, 23 Oct 2020 18:31:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46764 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752863AbgJWW2r (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Oct 2020 18:28:47 -0400
-Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1757099AbgJWWbX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Oct 2020 18:31:23 -0400
+Received: from gmail.com (unknown [104.132.1.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4EE3120BED;
-        Fri, 23 Oct 2020 22:28:47 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E3E3620BED;
+        Fri, 23 Oct 2020 22:31:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603492127;
-        bh=0JGkPldSTQ0mjX8nFULRC/vLmBKJl6lR8G1LPBTcZgw=;
-        h=From:To:Subject:Date:From;
-        b=tiGciqw2b7a05vZvzrnG4QAMHQhIVyNMVV1UOMVI/l0Lpdn/S5Fp4t0M1vk2Z7vkZ
-         nuNs60eYrRZkxnwR5dOn+L0JuH5KrKOEmfDUcRU4knOswydwPyeJwO32lsNKWR860m
-         reOQxtMD++rYTizeWbAzFokyeL3pAixotjTlc+AI=
+        s=default; t=1603492283;
+        bh=i8RM3CKw39RhCAPy2hzJBpQNkFJtyzO4IU8+1xXvR9U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AbP1Ugtq/BVULN+PmVbtdY9vNZBB2R+HE3gwR2Pn+LSrpNjR9yROsSthgaoVhgppd
+         i1zU4YNHNTvyXWS2lPn03TuE7/1tPPWviObdQZbynpgqhefg0O/mjND1Ra3g4TLCgu
+         0QITHOgj9TAJIONWEA2eUiC9clOVXoD1GT5PoSuc=
+Date:   Fri, 23 Oct 2020 15:31:21 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH] crypto: x86/poly1305 - add back a needed assignment
-Date:   Fri, 23 Oct 2020 15:27:48 -0700
-Message-Id: <20201023222748.356207-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.29.0.rc1.297.gfa9743e501-goog
+To:     Arvind Sankar <nivedita@alum.mit.edu>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        David Laight <David.Laight@aculab.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 4/5] crypto: lib/sha256 - Unroll SHA256 loop 8 times
+ intead of 64
+Message-ID: <20201023223121.GC180517@gmail.com>
+References: <20201023192203.400040-1-nivedita@alum.mit.edu>
+ <20201023192203.400040-5-nivedita@alum.mit.edu>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201023192203.400040-5-nivedita@alum.mit.edu>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Fri, Oct 23, 2020 at 03:22:02PM -0400, Arvind Sankar wrote:
+> This reduces code size substantially (on x86_64 with gcc-10 the size of
+> sha256_update() goes from 7593 bytes to 1952 bytes including the new
+> SHA256_K array), and on x86 is slightly faster than the full unroll
+> (tested on Broadwell Xeon).
+> 
+> Signed-off-by: Arvind Sankar <nivedita@alum.mit.edu>
 
-One of the assignments that was removed by commit 4a0c1de64bf9 ("crypto:
-x86/poly1305 - Remove assignments with no effect") is actually needed,
-since it affects the return value.
+Looks good,
 
-This fixes the following crypto self-test failure:
-
-    alg: shash: poly1305-simd test failed (wrong result) on test vector 2, cfg="init+update+final aligned buffer"
-
-Fixes: 4a0c1de64bf9 ("crypto: x86/poly1305 - Remove assignments with no effect")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
-
-Note, this is a regression in mainline, so please include this in a pull
-request for 5.10.
-
- arch/x86/crypto/poly1305_glue.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
-index e508dbd91813..c44aba290fbb 100644
---- a/arch/x86/crypto/poly1305_glue.c
-+++ b/arch/x86/crypto/poly1305_glue.c
-@@ -158,6 +158,7 @@ static unsigned int crypto_poly1305_setdctxkey(struct poly1305_desc_ctx *dctx,
- 			dctx->s[1] = get_unaligned_le32(&inp[4]);
- 			dctx->s[2] = get_unaligned_le32(&inp[8]);
- 			dctx->s[3] = get_unaligned_le32(&inp[12]);
-+			acc += POLY1305_BLOCK_SIZE;
- 			dctx->sset = true;
- 		}
- 	}
--- 
-2.29.0.rc1.297.gfa9743e501-goog
+Reviewed-by: Eric Biggers <ebiggers@google.com>
 
