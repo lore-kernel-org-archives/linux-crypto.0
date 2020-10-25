@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F005C4363A
-	for <linux-crypto@archiver.kernel.org>; Sun, 25 Oct 2020 14:31:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C392BC4363A
+	for <linux-crypto@archiver.kernel.org>; Sun, 25 Oct 2020 14:31:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 24182208E4
-	for <linux-crypto@archiver.kernel.org>; Sun, 25 Oct 2020 14:31:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 916B5208E4
+	for <linux-crypto@archiver.kernel.org>; Sun, 25 Oct 2020 14:31:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1414761AbgJYObY (ORCPT
+        id S1416635AbgJYOb2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 25 Oct 2020 10:31:24 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:34851 "EHLO
+        Sun, 25 Oct 2020 10:31:28 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:40120 "EHLO
         mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1414677AbgJYObY (ORCPT
+        with ESMTP id S1414677AbgJYOb2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 25 Oct 2020 10:31:24 -0400
-Received: by mail-qt1-f196.google.com with SMTP id c15so4921116qtc.2;
-        Sun, 25 Oct 2020 07:31:23 -0700 (PDT)
+        Sun, 25 Oct 2020 10:31:28 -0400
+Received: by mail-qt1-f196.google.com with SMTP id m9so4899089qth.7;
+        Sun, 25 Oct 2020 07:31:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=MN0s8vlWrwWpnF9v8V5eNRd1d4ATTd49nrUqABX5hio=;
-        b=ABdQs9FVB8/FzH8dKAILE4TkU/0WO2NHBuHP9zeq4lYz1kyJ1asNrBgxWVMh3bsIUA
-         AGWqBw/D8j0CWprixxXJBrfZn8QYylaPBG7j5JXYE1xztO5/jP7cuyVTCaJcYI7JMFet
-         ym9MPhVf2aSjXQxLDSVp/zbA6OmTWs09RCgsd/fHdThVOn8Wk/TfeArCL3yq7DUeLGAA
-         54iSTNyKhgttz/geEpm2deBV/KaYlKB0zzSO8LlXDbSkAj+8uwmb/T6i1iYAXSk7Tpep
-         gHkd4elqXb8n6A1OXl/6X0xDJzvEdITCAJ3HNCWDLn/8iHZu9arKrirb3D+wxoQwm1jV
-         6BRw==
-X-Gm-Message-State: AOAM532lF+KE9aJ4fJKsjf2EHbOqj8UbFy5WyumVkF4m0ddCexbIT5hD
-        LG1SBDNbJW3nsw5kwcP9kpk=
-X-Google-Smtp-Source: ABdhPJyOKIf4i9PAJrrokcQidlOn76hVGHHE4GJVfoadKRDzionc4xHJHuexCc+Z/QteZtRrMAURNg==
-X-Received: by 2002:aed:3a86:: with SMTP id o6mr11818147qte.333.1603636283458;
-        Sun, 25 Oct 2020 07:31:23 -0700 (PDT)
+        bh=bi7rG0H94VO76zPLa4Hh0/sN75asB3cy5CcRjg5R6zI=;
+        b=nyp0VgarkLXREJjtBpcWE0kZDqvPQ0R2yuPDrRgGg2lEClPv/Slonlc94thftyEBHV
+         pwHUqAjSix+ap5kdAfn1YGOeI19gBHm2vru48ThN9OfE8RqbzbcQBO9D05qdGXf3jptG
+         1HQGULOuHNGncGYDyMEuxFTmFqa2nDcVfOaNv7NhyS9p4SnaA1d2+gZZNHsR50iNZv5x
+         w3tRu6XRVaVOaHdChrKovEl5n/THltSuE28ZBBO3tmPJ2oOju2RTsKXvvrS8eRPLV1fJ
+         lLnD8T/a/ZQlVJwwAHsjjdkRk8PYEx6eCHFd2KDb2Yqq6usLwZuztS1jYgv+uhcaShRk
+         lgOw==
+X-Gm-Message-State: AOAM531tKJupFq/8CXE+PD/M+n4tLdrMnYmgFyOMwOFs93Hrrdi9B1Yt
+        u4Kh4Y4GEMQWtbYfnFNKX1Q=
+X-Google-Smtp-Source: ABdhPJy6TJ7OnnPMnOVBY7QpOsC5dVA//baSaIV9SoClXC96369xl8GnFioUvT3jfKCGp6Xr8IyUnw==
+X-Received: by 2002:a05:622a:242:: with SMTP id c2mr12600299qtx.230.1603636287091;
+        Sun, 25 Oct 2020 07:31:27 -0700 (PDT)
 Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
-        by smtp.gmail.com with ESMTPSA id s73sm4740898qke.71.2020.10.25.07.31.22
+        by smtp.gmail.com with ESMTPSA id s73sm4740898qke.71.2020.10.25.07.31.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Oct 2020 07:31:22 -0700 (PDT)
+        Sun, 25 Oct 2020 07:31:26 -0700 (PDT)
 From:   Arvind Sankar <nivedita@alum.mit.edu>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -50,9 +50,9 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Eric Biggers <ebiggers@kernel.org>,
         David Laight <David.Laight@aculab.com>
 Cc:     linux-kernel@vger.kernel.org, Eric Biggers <ebiggers@google.com>
-Subject: [PATCH v4 1/6] crypto: lib/sha256 - Use memzero_explicit() for clearing state
-Date:   Sun, 25 Oct 2020 10:31:14 -0400
-Message-Id: <20201025143119.1054168-2-nivedita@alum.mit.edu>
+Subject: [PATCH v4 4/6] crypto: lib/sha256 - Clear W[] in sha256_update() instead of sha256_transform()
+Date:   Sun, 25 Oct 2020 10:31:17 -0400
+Message-Id: <20201025143119.1054168-5-nivedita@alum.mit.edu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201025143119.1054168-1-nivedita@alum.mit.edu>
 References: <20201025143119.1054168-1-nivedita@alum.mit.edu>
@@ -62,31 +62,67 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Without the barrier_data() inside memzero_explicit(), the compiler may
-optimize away the state-clearing if it can tell that the state is not
-used afterwards. At least in lib/crypto/sha256.c:__sha256_final(), the
-function can get inlined into sha256(), in which case the memset is
-optimized away.
+The temporary W[] array is currently zeroed out once every call to
+sha256_transform(), i.e. once every 64 bytes of input data. Moving it to
+sha256_update() instead so that it is cleared only once per update can
+save about 2-3% of the total time taken to compute the digest, with a
+reasonable memset() implementation, and considerably more (~20%) with a
+bad one (eg the x86 purgatory currently uses a memset() coded in C).
 
 Signed-off-by: Arvind Sankar <nivedita@alum.mit.edu>
 Reviewed-by: Eric Biggers <ebiggers@google.com>
 ---
- lib/crypto/sha256.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ lib/crypto/sha256.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
 diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
-index 2321f6cb322f..d43bc39ab05e 100644
+index 099cd11f83c1..c6bfeacc5b81 100644
 --- a/lib/crypto/sha256.c
 +++ b/lib/crypto/sha256.c
-@@ -265,7 +265,7 @@ static void __sha256_final(struct sha256_state *sctx, u8 *out, int digest_words)
- 		put_unaligned_be32(sctx->state[i], &dst[i]);
- 
- 	/* Zeroize sensitive information. */
--	memset(sctx, 0, sizeof(*sctx));
-+	memzero_explicit(sctx, sizeof(*sctx));
+@@ -43,10 +43,9 @@ static inline void BLEND_OP(int I, u32 *W)
+ 	W[I] = s1(W[I-2]) + W[I-7] + s0(W[I-15]) + W[I-16];
  }
  
- void sha256_final(struct sha256_state *sctx, u8 *out)
+-static void sha256_transform(u32 *state, const u8 *input)
++static void sha256_transform(u32 *state, const u8 *input, u32 *W)
+ {
+ 	u32 a, b, c, d, e, f, g, h, t1, t2;
+-	u32 W[64];
+ 	int i;
+ 
+ 	/* load the input */
+@@ -200,15 +199,13 @@ static void sha256_transform(u32 *state, const u8 *input)
+ 
+ 	state[0] += a; state[1] += b; state[2] += c; state[3] += d;
+ 	state[4] += e; state[5] += f; state[6] += g; state[7] += h;
+-
+-	/* clear any sensitive info... */
+-	memzero_explicit(W, 64 * sizeof(u32));
+ }
+ 
+ void sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+ {
+ 	unsigned int partial, done;
+ 	const u8 *src;
++	u32 W[64];
+ 
+ 	partial = sctx->count & 0x3f;
+ 	sctx->count += len;
+@@ -223,11 +220,13 @@ void sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+ 		}
+ 
+ 		do {
+-			sha256_transform(sctx->state, src);
++			sha256_transform(sctx->state, src, W);
+ 			done += 64;
+ 			src = data + done;
+ 		} while (done + 63 < len);
+ 
++		memzero_explicit(W, sizeof(W));
++
+ 		partial = 0;
+ 	}
+ 	memcpy(sctx->buf + partial, src, len - done);
 -- 
 2.26.2
 
