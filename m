@@ -2,112 +2,122 @@ Return-Path: <SRS0=H1lS=EA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4C6C4363A
-	for <linux-crypto@archiver.kernel.org>; Sun, 25 Oct 2020 23:23:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17DF7C4363A
+	for <linux-crypto@archiver.kernel.org>; Sun, 25 Oct 2020 23:53:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 13EDD223BD
-	for <linux-crypto@archiver.kernel.org>; Sun, 25 Oct 2020 23:23:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C223921D42
+	for <linux-crypto@archiver.kernel.org>; Sun, 25 Oct 2020 23:53:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pcAX1d+T"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1420543AbgJYXX5 (ORCPT
+        id S1420714AbgJYXxy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 25 Oct 2020 19:23:57 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:47475 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731177AbgJYXX4 (ORCPT
+        Sun, 25 Oct 2020 19:53:54 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:46138 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1418308AbgJYXxx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 25 Oct 2020 19:23:56 -0400
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-63-lT5RP1WqMKS6mc77jdOVTw-1; Sun, 25 Oct 2020 23:23:52 +0000
-X-MC-Unique: lT5RP1WqMKS6mc77jdOVTw-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Sun, 25 Oct 2020 23:23:52 +0000
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Sun, 25 Oct 2020 23:23:52 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Arvind Sankar' <nivedita@alum.mit.edu>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Sun, 25 Oct 2020 19:53:53 -0400
+Received: by mail-qk1-f193.google.com with SMTP id a23so6895959qkg.13;
+        Sun, 25 Oct 2020 16:53:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:date:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=LBtOv6ii27P7UDwcOYJQCSjkPKpG8hoxT55RTEp71C0=;
+        b=pcAX1d+Tz+7IByaAVNQmiVtKSSi9GAqWCZmJuTz1wHVZPnBR6VUgRJWn9MuIOc7n1c
+         ma0276pXIw6OsFn/9Ozy2JcWfH9StjzEOUwX3wUqCD0O/rXbHHGkVntSNTJtQ4CrliZp
+         9f9oUCatsGSGuMWnjBsFfA8M+CyZfZfUn5dB2NOTDuVssWhhpkbJb0cffixg03lMH8jp
+         9Jehzx+RzzrkcQ6j1gC88ZRPQNXyD73KKY4f1RNEen7QEBIjWyyDNH5aapW/fxPRAPWB
+         VFI467yMSCdsCSx0ARQhZ8T9FoZdQ2FKUa+n5R/kSKvAGX4EoC5YBUR2otLse55FaIWt
+         ImWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=LBtOv6ii27P7UDwcOYJQCSjkPKpG8hoxT55RTEp71C0=;
+        b=cocOKW8YO+61OTltyTKq2RgGYJYRWMyZ6xtA1U81POWYmcbc0UHV4nhIAu4CwuQZyr
+         IPNzgCxoJrbfxi2aDTnqdBfM0yxW8spSE4k9eR3YeDyT38qUYbZ8+Bjdge6Qr/WDMJpm
+         jWm6+cNVdap5bKe42lns5T+l+2BdbWw+76MlTmQa+e4yKV8TkIZv0E6C4Nvh4EFlHS3R
+         8wIdCSjTKYRkzFGqVlLr0INRdygX2yPvah7fnw9IJZDMMA6QY7gVic8ANEBWUdVgXJZz
+         +XSLEzfxReOplEidBX/C7ePsGLrPzgHwL+ueQmo9jSxMPkykNUpDUbWBYSHoYdH5Drjd
+         F6HQ==
+X-Gm-Message-State: AOAM532iib7Doc76OXth3apOXcvvhw/vvuD02Oo2wgXroofYzkz4iUnO
+        B3UtsVXdCsK/rc9abUI2polGQuUEAcX9aw==
+X-Google-Smtp-Source: ABdhPJyJsxyvUZ/GbCglvNzYQrDMCbIrcQI1evltOiE4KvF53u16tBfd5xKkaIgPVKsmWy4r72MO8w==
+X-Received: by 2002:a37:ad1a:: with SMTP id f26mr13396854qkm.1.1603670032187;
+        Sun, 25 Oct 2020 16:53:52 -0700 (PDT)
+Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
+        by smtp.gmail.com with ESMTPSA id m38sm1454693qta.8.2020.10.25.16.53.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Oct 2020 16:53:51 -0700 (PDT)
+Sender: Arvind Sankar <niveditas98@gmail.com>
+From:   Arvind Sankar <nivedita@alum.mit.edu>
+X-Google-Original-From: Arvind Sankar <arvind@rani.riverdale.lan>
+Date:   Sun, 25 Oct 2020 19:53:49 -0400
+To:     David Laight <David.Laight@ACULAB.COM>
+Cc:     'Arvind Sankar' <nivedita@alum.mit.edu>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Eric Biggers <ebiggers@kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Eric Biggers <ebiggers@google.com>
-Subject: RE: [PATCH v4 6/6] crypto: lib/sha256 - Unroll LOAD and BLEND loops
-Thread-Topic: [PATCH v4 6/6] crypto: lib/sha256 - Unroll LOAD and BLEND loops
-Thread-Index: AQHWqtuIw2smrl1NBkSqLe7bNPuvsKmonqLggAAjnQCAADBjsA==
-Date:   Sun, 25 Oct 2020 23:23:52 +0000
-Message-ID: <5d8f86fcfe84441fa5c9877959069ff1@AcuMS.aculab.com>
+Subject: Re: [PATCH v4 6/6] crypto: lib/sha256 - Unroll LOAD and BLEND loops
+Message-ID: <20201025235349.GA1281192@rani.riverdale.lan>
 References: <20201025143119.1054168-1-nivedita@alum.mit.edu>
  <20201025143119.1054168-7-nivedita@alum.mit.edu>
  <05150bdb3a4c4b2682ab9cb8fb2ed411@AcuMS.aculab.com>
  <20201025201820.GA1237388@rani.riverdale.lan>
-In-Reply-To: <20201025201820.GA1237388@rani.riverdale.lan>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+ <5d8f86fcfe84441fa5c9877959069ff1@AcuMS.aculab.com>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5d8f86fcfe84441fa5c9877959069ff1@AcuMS.aculab.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-RnJvbTogQXJ2aW5kIFNhbmthcg0KPiBTZW50OiAyNSBPY3RvYmVyIDIwMjAgMjA6MTgNCj4gDQo+
-IE9uIFN1biwgT2N0IDI1LCAyMDIwIGF0IDA2OjUxOjE4UE0gKzAwMDAsIERhdmlkIExhaWdodCB3
-cm90ZToNCj4gPiBGcm9tOiBBcnZpbmQgU2Fua2FyDQo+ID4gPiBTZW50OiAyNSBPY3RvYmVyIDIw
-MjAgMTQ6MzENCj4gPiA+DQo+ID4gPiBVbnJvbGxpbmcgdGhlIExPQUQgYW5kIEJMRU5EIGxvb3Bz
-IGltcHJvdmVzIHBlcmZvcm1hbmNlIGJ5IH44JSBvbiB4ODZfNjQNCj4gPiA+ICh0ZXN0ZWQgb24g
-QnJvYWR3ZWxsIFhlb24pIHdoaWxlIG5vdCBpbmNyZWFzaW5nIGNvZGUgc2l6ZSB0b28gbXVjaC4N
-Cj4gPg0KPiA+IEkgY2FuJ3QgYmVsaWV2ZSB1bnJvbGxpbmcgdGhlIEJMRU5EIGxvb3AgbWFrZXMg
-YW55IGRpZmZlcmVuY2UuDQo+IA0KPiBJdCdzIGFjdHVhbGx5IHRoZSBCTEVORCBsb29wIHRoYXQg
-YWNjb3VudHMgZm9yIGFsbW9zdCBhbGwgb2YgdGhlDQo+IGRpZmZlcmVuY2UuIFRoZSBMT0FEIGxv
-b3AgZG9lc24ndCBtYXR0ZXIgbXVjaCBpbiBnZW5lcmFsOiBldmVuIHJlcGxhY2luZw0KPiBpdCB3
-aXRoIGEgcGxhaW4gbWVtY3B5KCkgb25seSBpbmNyZWFzZXMgcGVyZm9ybWFuY2UgYnkgMy00JS4g
-QnV0DQo+IHVucm9sbGluZyBpdCBpcyBsb3cgY29zdCBpbiBjb2RlIHNpemUgdGVybXMsIGFuZCBj
-bGFuZyBhY3R1YWxseSBkb2VzIGl0DQo+IHdpdGhvdXQgYmVpbmcgYXNrZWQuDQoNCihtZW1jcHkg
-aXMgd3JvbmcgLSBtaXNzZXMgdGhlIGJ5dGUgc3dhcHMpLg0KDQpUaGF0J3Mgb2RkLCB0aGUgQkxF
-TkQgbG9vcCBpcyBhYm91dCAyMCBpbnN0cnVjdGlvbnMuDQpJIHdvdWxkbid0IGV4cGVjdCB1bnJv
-bGxpbmcgdG8gaGVscCAtIHVubGVzcyB5b3UgbWFuYWdlDQp0byB1c2UgMTYgcmVnaXN0ZXJzIGZv
-ciB0aGUgYWN0aXZlIFdbXSB2YWx1ZXMuDQoNCj4gPiBXUlQgcGF0Y2ggNS4NCj4gPiBPbiB0aGUg
-QzI3NTggdGhlIG9yaWdpbmFsIHVucm9sbGVkIGNvZGUgaXMgc2xpZ2h0bHkgZmFzdGVyLg0KPiA+
-IE9uIHRoZSBpNy03NzAwIHRoZSA4IHVucm9sbCBpcyBhIGJpdCBmYXN0ZXIgJ2hvdCBjYWNoZScs
-DQo+ID4gYnV0IHNsb3dlciAnY29sZCBjYWNoZScgLSBwcm9iYWJseSBiZWNhdXNlIG9mIHRoZSBk
-LWNhY2hlDQo+ID4gbG9hZHMgZm9yIEtbXS4NCj4gPg0KPiA+IE5vbi14ODYgYXJjaGl0ZWN0dXJl
-cyBtaWdodCBuZWVkIHRvIHVzZSBkLWNhY2hlIHJlYWRzIGZvcg0KPiA+IHRoZSAzMmJpdCAnSycg
-Y29uc3RhbnRzIGV2ZW4gaW4gdGhlIHVucm9sbGVkIGxvb3AuDQo+ID4gWDg2IGNhbiB1c2UgJ2xl
-YScgd2l0aCBhIDMyYml0IG9mZnNldCB0byBhdm9pZCBkYXRhIHJlYWRzLg0KPiA+IFNvIHRoZSBj
-b2xkLWNhY2hlIGNhc2UgZm9yIHRoZSBvbGQgY29kZSBtYXkgYmUgc2ltaWxhci4NCj4gDQo+IE5v
-dCBzdXJlIEkgZm9sbG93OiBpbiB0aGUgb2xkIGNvZGUsIHRoZSBLJ3MgYXJlIDMyLWJpdCBpbW1l
-ZGlhdGVzLCBzbw0KPiB0aGV5IHNob3VsZCBjb21lIGZyb20gdGhlIGktY2FjaGUgd2hldGhlciBh
-biBhZGQgb3IgYW4gbGVhIGlzIHVzZWQ/DQoNCkkgd2FzIHRoaW5raW5nIG9mIG90aGVyIGluc3Ry
-dWN0aW9uIHNldHMgdGhhdCBlbmQgdXAgdXNpbmcgcGMtcmVsYXRpdmUNCmFkZHJlc3NpbmcgZm9y
-IGNvbnN0YW50cy4NCk1pZ2h0IG9ubHkgaGFwcGVuIGZvciA2NGJpbnQgb25lcyB0aG91Z2guDQoN
-Cj4gV2h5IGlzIHRoZSBjb2xkLWNhY2hlIGNhc2UgcmVsZXZhbnQgYW55d2F5PyBJZiB0aGUgY29k
-ZSBpcyBvbmx5IGJlaW5nDQo+IGV4ZWN1dGVkIGEgY291cGxlIG9mIHRpbWVzIG9yIHNvLCBpLmUu
-IHlvdSdyZSBoYXNoaW5nIGEgc2luZ2xlIHNheQ0KPiA2NC0xMjggYnl0ZSBpbnB1dCBvbmNlIGlu
-IGEgYmx1ZSBtb29uLCB0aGUgcGVyZm9ybWFuY2Ugb2YgdGhlIGhhc2gNCj4gZG9lc24ndCByZWFs
-bHkgbWF0dGVyLCBubz8NCg0KSSB3YXMgbWVhc3VyaW5nIHRoZSBjb2xkIGNhY2hlIG9uZSBiZWNh
-dXNlIEkgY291bGQuDQpJIGRpZG4ndCBub3RlIHRoZSBhY3R1YWwgZmlndXJlcyBidXQgaXQgd2Fz
-IDgtMTAgdGltZXMgc2xvd2VyDQp0aGF0IHRoZSBob3QtY2FjaGUgY2FzZS4NCldoaWxlIHNoYTI1
-NiBpcyBsaWtlbHkgdG8gYmUgcnVuIGhvdC1jYWNoZSAob24gYSBiaWcgYnVmZmVyKQ0KdGhlIGNv
-bGQtY2FjaGUgdGltaW5nIGFyZSBwcm9iYWJseSByZWxldmFudCBmb3IgdGhpbmdzIGxpa2UgbWVt
-Y3B5KCkuDQpJIHJlbWVtYmVyIHNlZWluZyBhIHZlcnkgbG9uZyBkaXZpZGUgZnVuY3Rpb24gZm9y
-IHNwYXJjMzIgdGhhdA0Kd2FzIHByb2JhYmx5IG9ubHkgYSBnYWluIGluIGEgYmVuY2htYXJrIGxv
-b3AgLSBpdCB3b3VsZCBoYXZlDQpkaXNwbGFjZWQgYSBsb3Qgb2YgdGhlIHdvcmtpbmcgc2V0IGZy
-b20gdGhlIGktY2FjaGUhDQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNp
-ZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsN
-ClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
+On Sun, Oct 25, 2020 at 11:23:52PM +0000, David Laight wrote:
+> From: Arvind Sankar
+> > Sent: 25 October 2020 20:18
+> > 
+> > On Sun, Oct 25, 2020 at 06:51:18PM +0000, David Laight wrote:
+> > > From: Arvind Sankar
+> > > > Sent: 25 October 2020 14:31
+> > > >
+> > > > Unrolling the LOAD and BLEND loops improves performance by ~8% on x86_64
+> > > > (tested on Broadwell Xeon) while not increasing code size too much.
+> > >
+> > > I can't believe unrolling the BLEND loop makes any difference.
+> > 
+> > It's actually the BLEND loop that accounts for almost all of the
+> > difference. The LOAD loop doesn't matter much in general: even replacing
+> > it with a plain memcpy() only increases performance by 3-4%. But
+> > unrolling it is low cost in code size terms, and clang actually does it
+> > without being asked.
+> 
+> (memcpy is wrong - misses the byte swaps).
 
+I know it's wrong, the point is that it's impossible to gain very much
+from optimizing the LOAD loop because it doesn't account for much of the
+total time.
+
+> 
+> That's odd, the BLEND loop is about 20 instructions.
+> I wouldn't expect unrolling to help - unless you manage
+> to use 16 registers for the active W[] values.
+> 
+
+I am not sure about what's going on inside the hardware, but even with
+a straightforward assembly version that just reads out of memory the way
+the calculation is specified, unrolling the BLEND loop 8x speeds up the
+performance by 7-8%.
+
+The compiler is actually pretty bad here, just translating everything
+into assembler with no attempt to optimize anything gets a 10-12%
+speedup over the C version.
