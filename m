@@ -7,25 +7,25 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E092EC2D0A3
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 13:05:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 533ECC55178
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 13:05:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7DA520790
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 13:05:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1555920790
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 13:05:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1737199AbgJZNFK (ORCPT
+        id S1776158AbgJZNFP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Oct 2020 09:05:10 -0400
-Received: from foss.arm.com ([217.140.110.172]:38298 "EHLO foss.arm.com"
+        Mon, 26 Oct 2020 09:05:15 -0400
+Received: from foss.arm.com ([217.140.110.172]:38316 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391920AbgJZNFJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Oct 2020 09:05:09 -0400
+        id S2391920AbgJZNFP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 26 Oct 2020 09:05:15 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1F06414BF;
-        Mon, 26 Oct 2020 06:05:08 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E1914150C;
+        Mon, 26 Oct 2020 06:05:12 -0700 (PDT)
 Received: from e110176-lin.arm.com (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9F5013F68F;
-        Mon, 26 Oct 2020 06:05:05 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6F9713F68F;
+        Mon, 26 Oct 2020 06:05:10 -0700 (PDT)
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -33,9 +33,9 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
 Cc:     Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org
-Subject: [PATCH 1/4] crypto: add eboiv as a crypto API template
-Date:   Mon, 26 Oct 2020 15:04:44 +0200
-Message-Id: <20201026130450.6947-2-gilad@benyossef.com>
+Subject: [PATCH 2/4] crypto: add eboiv(cbc(aes)) test vectors
+Date:   Mon, 26 Oct 2020 15:04:45 +0200
+Message-Id: <20201026130450.6947-3-gilad@benyossef.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201026130450.6947-1-gilad@benyossef.com>
 References: <20201026130450.6947-1-gilad@benyossef.com>
@@ -45,370 +45,345 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Encrypted byte-offset initialization vector (EBOIV) is an IV
-generation method that is used in some cases by dm-crypt for
-supporting the BitLocker volume encryption used by Windows 8
-and onwards as a backwards compatible version in lieu of XTS
-support. Support for eboiv was added to dm-crypt in 5.6.
+Add test vectors for the use of the EBOIV template with cbc(aes)
+modes as it is being used by dm-crypt for BitLocker support.
 
-This patch re-implements eboiv as a generic crypto API
-template, thus allowing use of a alternative architecture
-specific optimzied implementations (as well as saving a
-memory allocation along the way).
+Vectors taken from dm-crypt test suite images.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- crypto/Kconfig  |  21 ++++
- crypto/Makefile |   1 +
- crypto/eboiv.c  | 295 ++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 317 insertions(+)
- create mode 100644 crypto/eboiv.c
+ crypto/tcrypt.c  |   9 ++
+ crypto/testmgr.c |   6 +
+ crypto/testmgr.h | 279 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 294 insertions(+)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index e85d8a059489..a29aac2b10d2 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -521,6 +521,27 @@ config CRYPTO_ESSIV
- 	  combined with ESSIV the only feasible mode for h/w accelerated
- 	  block encryption)
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 234b1adcfbcb..583c027fe8f5 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -2344,6 +2344,15 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 				NULL, 0, 16, 8, speed_template_16);
+ 		break;
  
-+config CRYPTO_EBOIV
-+	tristate "EBOIV support for block encryption"
-+	help
-+	  Encrypted byte-offset initialization vector (EBOIV) is an IV
-+	  generation method that is used in some cases by dm-crypt for
-+	  supporting the BitLocker volume encryption used by Windows 8
-+	  and onwards as a backwards compatible version in lieu of XTS
-+	  support.
++	case 222:
++		test_acipher_speed("eboiv(cbc(aes))",
++				  ENCRYPT, sec, NULL, 0,
++				  speed_template_16_32);
++		test_acipher_speed("eboiv(cbc(aes))",
++				  DECRYPT, sec, NULL, 0,
++				  speed_template_16_32);
++		break;
 +
-+	  It uses the block encryption key as the symmetric key for a
-+	  block encryption pass applied to the sector offset of the block.
-+	  Additional details can be found at
-+	  https://www.jedec.org/sites/default/files/docs/JESD223C.pdf
-+
-+	  Note that the use of EBOIV is not recommended for new deployments,
-+	  and so this only needs to be enabled when interoperability with
-+	  existing encrypted volumes of filesystems is required, or when
-+	  building for a particular system that requires it (e.g., when
-+	  interop with BitLocker encrypted volumes of Windows systems
-+	  prior to Windows 10 is required)
-+
- comment "Hash modes"
+ 	case 300:
+ 		if (alg) {
+ 			test_hash_speed(alg, sec, generic_hash_speed_template);
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 66ee3bbc9872..9c30db79f323 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4771,6 +4771,12 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.alg = "drbg_pr_sha512",
+ 		.fips_allowed = 1,
+ 		.test = alg_test_null,
++	}, {
++		.alg = "eboiv(cbc(aes))",
++		.test = alg_test_skcipher,
++		.suite = {
++			.cipher = __VECS(eboiv_aes_cbc_tv_template)
++		}
+ 	}, {
+ 		.alg = "ecb(aes)",
+ 		.test = alg_test_skcipher,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index cc9dc4cfec8c..0dc18148ea04 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -33045,6 +33045,285 @@ static const struct comp_testvec zstd_decomp_tv_template[] = {
+ 	},
+ };
  
- config CRYPTO_CMAC
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 4ca12b6044f7..bf47ee2ad5cf 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -166,6 +166,7 @@ obj-$(CONFIG_CRYPTO_ZSTD) += zstd.o
- obj-$(CONFIG_CRYPTO_OFB) += ofb.o
- obj-$(CONFIG_CRYPTO_ECC) += ecc.o
- obj-$(CONFIG_CRYPTO_ESSIV) += essiv.o
-+obj-$(CONFIG_CRYPTO_EBOIV) += eboiv.o
- obj-$(CONFIG_CRYPTO_CURVE25519) += curve25519-generic.o
- 
- ecdh_generic-y += ecdh.o
-diff --git a/crypto/eboiv.c b/crypto/eboiv.c
-new file mode 100644
-index 000000000000..467833e89139
---- /dev/null
-+++ b/crypto/eboiv.c
-@@ -0,0 +1,295 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * EBOIV skcipher template for block encryption
-+ *
-+ * This template encapsulates the  Encrypted byte-offset IV generation algorithm
-+ * used in Bitlocker in CBC mode by dm-crypt, which converts the initial vector
-+ * for the skcipher used for block encryption, by encrypting it using the same
-+ * skcipher key as encryption key. Usually, the input IV is a 64-bit sector
-+ * offset (the byte offset of the start of the sector) in LE representation
-+ * zero-padded to the size of the IV, but this * is not assumed by this driver.
-+ *
-+ * The typical use of this template is to instantiate the skcipher
-+ * 'eboiv(cbc(aes))', which is the only instantiation used by
-+ * dm-crypt for supporting BitLocker AES-CBC mode as specified in
-+ * https://www.jedec.org/sites/default/files/docs/JESD223C.pdf
-+ *
-+ * Copyright (C) 2020 ARM Limited or its affiliates.
-+ * Written by Gilad Ben-Yossef <gilad@benyossef.com>
-+ *
-+ * Heavily based on:
-+ *
-+ * ESSIV skcipher and aead template for block encryption
-+ * Copyright (c) 2019 Linaro, Ltd. <ard.biesheuvel@linaro.org>
-+ *
-+ * and
-+ *
-+ * dm-crypt eboiv code
-+ * by Milan Broz <gmazyland@gmail.com> and Ard Biesheuvel <ardb@kernel.org>
-+ *
-+ */
-+
-+#include <crypto/internal/skcipher.h>
-+#include <crypto/scatterwalk.h>
-+#include <linux/module.h>
-+
-+#include "internal.h"
-+
-+struct eboiv_instance_ctx {
-+	struct crypto_skcipher_spawn skcipher_spawn;
-+	char eboiv_cipher_name[CRYPTO_MAX_ALG_NAME];
++/* vectors taken from cryptosetup test suite images */
++static const struct cipher_testvec eboiv_aes_cbc_tv_template[] = {
++	{
++		/* cbc-aes-128 with 512b sector size, 0th sector */
++		.key	= "\x6c\x96\xf8\x2a\x94\x2e\x87\x5f"
++			  "\x02\x9c\x3d\xd9\xe4\x35\x17\x73",
++		.klen	= 16,
++		.iv	= "\x00\x50\x1a\x02\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.ptext	= "\xeb\x52\x90\x4e\x54\x46\x53\x20"
++			  "\x20\x20\x20\x00\x02\x08\x00\x00"
++			  "\x00\x00\x00\x00\x00\xf8\x00\x00"
++			  "\x3f\x00\xff\x00\x00\x08\x00\x00"
++			  "\x00\x00\x00\x00\x80\x00\x00\x00"
++			  "\xff\x1f\x03\x00\x00\x00\x00\x00"
++			  "\x55\x21\x00\x00\x00\x00\x00\x00"
++			  "\x02\x00\x00\x00\x00\x00\x00\x00"
++			  "\xf6\x00\x00\x00\x01\x00\x00\x00"
++			  "\x13\x1e\xf1\xd4\x56\xf1\xd4\xf2"
++			  "\x00\x00\x00\x00\xfa\x33\xc0\x8e"
++			  "\xd0\xbc\x00\x7c\xfb\x68\xc0\x07"
++			  "\x1f\x1e\x68\x66\x00\xcb\x88\x16"
++			  "\x0e\x00\x66\x81\x3e\x03\x00\x4e"
++			  "\x54\x46\x53\x75\x15\xb4\x41\xbb"
++			  "\xaa\x55\xcd\x13\x72\x0c\x81\xfb"
++			  "\x55\xaa\x75\x06\xf7\xc1\x01\x00"
++			  "\x75\x03\xe9\xdd\x00\x1e\x83\xec"
++			  "\x18\x68\x1a\x00\xb4\x48\x8a\x16"
++			  "\x0e\x00\x8b\xf4\x16\x1f\xcd\x13"
++			  "\x9f\x83\xc4\x18\x9e\x58\x1f\x72"
++			  "\xe1\x3b\x06\x0b\x00\x75\xdb\xa3"
++			  "\x0f\x00\xc1\x2e\x0f\x00\x04\x1e"
++			  "\x5a\x33\xdb\xb9\x00\x20\x2b\xc8"
++			  "\x66\xff\x06\x11\x00\x03\x16\x0f"
++			  "\x00\x8e\xc2\xff\x06\x16\x00\xe8"
++			  "\x4b\x00\x2b\xc8\x77\xef\xb8\x00"
++			  "\xbb\xcd\x1a\x66\x23\xc0\x75\x2d"
++			  "\x66\x81\xfb\x54\x43\x50\x41\x75"
++			  "\x24\x81\xf9\x02\x01\x72\x1e\x16"
++			  "\x68\x07\xbb\x16\x68\x52\x11\x16"
++			  "\x68\x09\x00\x66\x53\x66\x53\x66"
++			  "\x55\x16\x16\x16\x68\xb8\x01\x66"
++			  "\x61\x0e\x07\xcd\x1a\x33\xc0\xbf"
++			  "\x0a\x13\xb9\xf6\x0c\xfc\xf3\xaa"
++			  "\xe9\xfe\x01\x90\x90\x66\x60\x1e"
++			  "\x06\x66\xa1\x11\x00\x66\x03\x06"
++			  "\x1c\x00\x1e\x66\x68\x00\x00\x00"
++			  "\x00\x66\x50\x06\x53\x68\x01\x00"
++			  "\x68\x10\x00\xb4\x42\x8a\x16\x0e"
++			  "\x00\x16\x1f\x8b\xf4\xcd\x13\x66"
++			  "\x59\x5b\x5a\x66\x59\x66\x59\x1f"
++			  "\x0f\x82\x16\x00\x66\xff\x06\x11"
++			  "\x00\x03\x16\x0f\x00\x8e\xc2\xff"
++			  "\x0e\x16\x00\x75\xbc\x07\x1f\x66"
++			  "\x61\xc3\xa1\xf6\x01\xe8\x09\x00"
++			  "\xa1\xfa\x01\xe8\x03\x00\xf4\xeb"
++			  "\xfd\x8b\xf0\xac\x3c\x00\x74\x09"
++			  "\xb4\x0e\xbb\x07\x00\xcd\x10\xeb"
++			  "\xf2\xc3\x0d\x0a\x41\x20\x64\x69"
++			  "\x73\x6b\x20\x72\x65\x61\x64\x20"
++			  "\x65\x72\x72\x6f\x72\x20\x6f\x63"
++			  "\x63\x75\x72\x72\x65\x64\x00\x0d"
++			  "\x0a\x42\x4f\x4f\x54\x4d\x47\x52"
++			  "\x20\x69\x73\x20\x63\x6f\x6d\x70"
++			  "\x72\x65\x73\x73\x65\x64\x00\x0d"
++			  "\x0a\x50\x72\x65\x73\x73\x20\x43"
++			  "\x74\x72\x6c\x2b\x41\x6c\x74\x2b"
++			  "\x44\x65\x6c\x20\x74\x6f\x20\x72"
++			  "\x65\x73\x74\x61\x72\x74\x0d\x0a"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x8a\x01"
++			  "\xa7\x01\xbf\x01\x00\x00\x55\xaa",
++		.ctext	= "\xae\x81\x3f\xac\x8a\xee\x8d\x6e"
++			  "\xc2\x6b\xff\x87\x65\xe8\xfd\x0d"
++			  "\xdc\x99\x61\xd3\x01\xa4\x26\x05"
++			  "\x7e\xf1\x1e\x61\xde\x84\x1f\x21"
++			  "\xf9\x27\x10\x31\x64\xdd\xee\xd2"
++			  "\xce\xaf\xb6\x1a\x11\xcf\xde\x2d"
++			  "\x1e\xd1\x0d\x42\x51\x89\x4c\x01"
++			  "\x6f\xae\x26\x65\xff\x12\xe3\xa2"
++			  "\xa4\x8a\x0c\x74\xed\xfa\xab\x05"
++			  "\x7d\x6e\x58\x24\x92\x2e\xc2\x33"
++			  "\xa2\x71\x3b\xec\x4e\x3b\x17\xde"
++			  "\xfb\xc0\xaa\x04\x72\xe7\x76\x3d"
++			  "\xf2\x3d\xc4\x50\x3d\x5e\xac\x5d"
++			  "\x95\x4d\x02\xbc\xe1\xed\x46\x25"
++			  "\xe5\x8e\x51\x36\x31\x6d\xb4\x2f"
++			  "\x04\x09\x18\xa8\x66\x5f\xbc\xb2"
++			  "\x39\x20\x79\xd7\x3c\xc3\xf7\x3e"
++			  "\x3e\xe6\x31\xc8\x9a\xd8\xdc\xcf"
++			  "\xb7\x49\x0e\x5b\x9e\xc3\xd4\x5d"
++			  "\x2c\xa2\xaf\x7c\x9e\xb0\x5d\x45"
++			  "\x18\x32\xbf\x50\xc8\x47\xc1\x55"
++			  "\x1c\xd8\xf9\xc8\xdd\x97\x46\xba"
++			  "\x3c\x8c\xbd\x14\x07\xf7\x14\xa7"
++			  "\x5e\x44\xc3\x41\x86\x37\x46\xbc"
++			  "\x45\xcb\xaf\xff\xf4\xba\xdf\xe5"
++			  "\xfa\x62\xa6\x04\x74\x90\x24\x38"
++			  "\x13\x37\x9f\xe5\x73\x76\x4e\x4c"
++			  "\x1b\x57\xe5\x85\x14\xa2\x24\x24"
++			  "\xb1\xc7\xa4\x47\xfa\x5f\x4d\x32"
++			  "\xfa\x43\x0c\x71\x49\x45\x2a\xcb"
++			  "\x5d\xd5\xa4\x75\x1d\x53\x21\x5c"
++			  "\xa3\x0b\xd4\x23\xba\x20\x10\x00"
++			  "\x27\x2b\x9f\xbe\x49\x0b\x2c\xe9"
++			  "\x2f\x61\x19\x9f\x88\x06\x94\xb4"
++			  "\x35\xdf\x15\xff\xc9\x76\x1b\x18"
++			  "\xf4\x0d\xb5\x41\x53\x51\x4e\x41"
++			  "\xf3\x1a\x60\x8f\x2d\x48\x60\x05"
++			  "\xff\xb7\x5c\x46\x77\xd6\x29\xad"
++			  "\x51\x10\x51\x7f\x97\x44\x4c\xa3"
++			  "\xf5\x71\x95\x9c\x9d\x82\xfb\x3e"
++			  "\x1c\xfd\x88\x99\xe3\x0c\xdf\xad"
++			  "\xf3\xba\x0e\x44\x4a\x24\x8e\xf7"
++			  "\x5d\x44\x41\x78\xc0\x0c\x80\xe2"
++			  "\xaa\x52\xad\x65\xea\x09\x15\x52"
++			  "\x67\x0d\xa2\x39\x74\xde\x4f\x64"
++			  "\x1c\x5b\x58\x55\x2a\x30\xef\x8f"
++			  "\xc1\x53\x4d\xe4\x3d\xae\x4c\x04"
++			  "\xf5\x1c\x04\x47\xad\x8e\xdf\xd8"
++			  "\x8f\xe2\x64\xcc\x37\xdd\xf1\x4f"
++			  "\xab\xc2\x53\x4f\x7d\xe3\xb1\x57"
++			  "\xfe\x3d\x5c\xea\xfb\xe0\x1b\xad"
++			  "\xc3\x0f\xc5\xed\x42\xb1\xac\x88"
++			  "\x96\x96\x7c\xd3\xe4\x44\xd1\xe6"
++			  "\x88\xd2\xae\xdd\x7a\xd4\x20\x53"
++			  "\xb2\x4f\x0f\x46\xe3\xf0\x08\x3b"
++			  "\x57\xc3\x93\xe8\x47\x96\xae\xe1"
++			  "\xfe\x85\x37\xdc\xd1\x77\xce\x12"
++			  "\x6c\xa8\x73\x42\x84\x12\x0e\x95"
++			  "\x20\x02\xdc\xfd\x5e\x26\x70\x2c"
++			  "\x96\xa1\x72\x5d\x88\xdb\xf3\xb2"
++			  "\x8c\xc0\xf9\x02\xea\x93\x7a\x62"
++			  "\x64\x42\xbb\xe3\x50\x7d\xdd\x07"
++			  "\xd0\xe6\x1a\x11\x82\xa3\xc5\x34"
++			  "\x3b\x1f\x3a\x8a\xbe\xd4\xea\x23",
++		.len	= 512,
++	}, {
++		/* cbc-aes-256 with 512b sector size, nth sector */
++		.key	= "\x9c\x3c\x73\xa4\xad\x15\xac\xcc"
++			  "\xc5\x02\x0c\x41\x00\xf5\xc2\x70"
++			  "\x83\x66\x49\x65\x07\x9c\xf6\xb9"
++			  "\xde\x18\x54\xa1\x76\xf0\x66\xee",
++		.klen	= 32,
++		.iv	= "\x00\x50\x1a\x02\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.ptext	= "\xeb\x52\x90\x4e\x54\x46\x53\x20"
++			  "\x20\x20\x20\x00\x02\x08\x00\x00"
++			  "\x00\x00\x00\x00\x00\xf8\x00\x00"
++			  "\x3f\x00\xff\x00\x00\x28\x03\x00"
++			  "\x00\x00\x00\x00\x80\x00\x00\x00"
++			  "\xff\x1f\x03\x00\x00\x00\x00\x00"
++			  "\x55\x21\x00\x00\x00\x00\x00\x00"
++			  "\x02\x00\x00\x00\x00\x00\x00\x00"
++			  "\xf6\x00\x00\x00\x01\x00\x00\x00"
++			  "\x75\xf2\x02\xc0\x10\x03\xc0\x9a"
++			  "\x00\x00\x00\x00\xfa\x33\xc0\x8e"
++			  "\xd0\xbc\x00\x7c\xfb\x68\xc0\x07"
++			  "\x1f\x1e\x68\x66\x00\xcb\x88\x16"
++			  "\x0e\x00\x66\x81\x3e\x03\x00\x4e"
++			  "\x54\x46\x53\x75\x15\xb4\x41\xbb"
++			  "\xaa\x55\xcd\x13\x72\x0c\x81\xfb"
++			  "\x55\xaa\x75\x06\xf7\xc1\x01\x00"
++			  "\x75\x03\xe9\xdd\x00\x1e\x83\xec"
++			  "\x18\x68\x1a\x00\xb4\x48\x8a\x16"
++			  "\x0e\x00\x8b\xf4\x16\x1f\xcd\x13"
++			  "\x9f\x83\xc4\x18\x9e\x58\x1f\x72"
++			  "\xe1\x3b\x06\x0b\x00\x75\xdb\xa3"
++			  "\x0f\x00\xc1\x2e\x0f\x00\x04\x1e"
++			  "\x5a\x33\xdb\xb9\x00\x20\x2b\xc8"
++			  "\x66\xff\x06\x11\x00\x03\x16\x0f"
++			  "\x00\x8e\xc2\xff\x06\x16\x00\xe8"
++			  "\x4b\x00\x2b\xc8\x77\xef\xb8\x00"
++			  "\xbb\xcd\x1a\x66\x23\xc0\x75\x2d"
++			  "\x66\x81\xfb\x54\x43\x50\x41\x75"
++			  "\x24\x81\xf9\x02\x01\x72\x1e\x16"
++			  "\x68\x07\xbb\x16\x68\x52\x11\x16"
++			  "\x68\x09\x00\x66\x53\x66\x53\x66"
++			  "\x55\x16\x16\x16\x68\xb8\x01\x66"
++			  "\x61\x0e\x07\xcd\x1a\x33\xc0\xbf"
++			  "\x0a\x13\xb9\xf6\x0c\xfc\xf3\xaa"
++			  "\xe9\xfe\x01\x90\x90\x66\x60\x1e"
++			  "\x06\x66\xa1\x11\x00\x66\x03\x06"
++			  "\x1c\x00\x1e\x66\x68\x00\x00\x00"
++			  "\x00\x66\x50\x06\x53\x68\x01\x00"
++			  "\x68\x10\x00\xb4\x42\x8a\x16\x0e"
++			  "\x00\x16\x1f\x8b\xf4\xcd\x13\x66"
++			  "\x59\x5b\x5a\x66\x59\x66\x59\x1f"
++			  "\x0f\x82\x16\x00\x66\xff\x06\x11"
++			  "\x00\x03\x16\x0f\x00\x8e\xc2\xff"
++			  "\x0e\x16\x00\x75\xbc\x07\x1f\x66"
++			  "\x61\xc3\xa1\xf6\x01\xe8\x09\x00"
++			  "\xa1\xfa\x01\xe8\x03\x00\xf4\xeb"
++			  "\xfd\x8b\xf0\xac\x3c\x00\x74\x09"
++			  "\xb4\x0e\xbb\x07\x00\xcd\x10\xeb"
++			  "\xf2\xc3\x0d\x0a\x41\x20\x64\x69"
++			  "\x73\x6b\x20\x72\x65\x61\x64\x20"
++			  "\x65\x72\x72\x6f\x72\x20\x6f\x63"
++			  "\x63\x75\x72\x72\x65\x64\x00\x0d"
++			  "\x0a\x42\x4f\x4f\x54\x4d\x47\x52"
++			  "\x20\x69\x73\x20\x63\x6f\x6d\x70"
++			  "\x72\x65\x73\x73\x65\x64\x00\x0d"
++			  "\x0a\x50\x72\x65\x73\x73\x20\x43"
++			  "\x74\x72\x6c\x2b\x41\x6c\x74\x2b"
++			  "\x44\x65\x6c\x20\x74\x6f\x20\x72"
++			  "\x65\x73\x74\x61\x72\x74\x0d\x0a"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x8a\x01"
++			  "\xa7\x01\xbf\x01\x00\x00\x55\xaa",
++		.ctext	= "\x95\xec\x37\xc9\x2c\xf8\x91\x1d"
++			  "\xdd\x17\xa5\x17\x8a\x56\x34\xec"
++			  "\xba\x14\x06\x20\xc1\xd2\xb3\xda"
++			  "\xf3\xfc\x05\x32\x93\x83\x3d\xbb"
++			  "\x41\x30\xce\xc9\x2e\x92\x0d\x5a"
++			  "\xb4\xab\x59\x21\xda\xbd\x1e\xfb"
++			  "\xbf\xf9\x6d\x8d\x91\x85\x02\xdc"
++			  "\xe4\xae\xb6\xf0\x26\x9f\xa2\xb0"
++			  "\xb2\x8b\x52\xfe\xd1\x19\x33\x8f"
++			  "\x9f\x4e\x39\x83\x6f\x89\x6f\x13"
++			  "\xb6\xbd\x14\xfb\xff\x46\xf1\xf0"
++			  "\x87\x8b\x2b\x92\x3d\x16\x57\x84"
++			  "\x07\x6e\x5a\xd0\x03\xab\x2d\x22"
++			  "\x4b\xf4\xc1\xbd\xe4\xb8\x6a\x72"
++			  "\x76\x9a\xc4\xa5\x11\xb0\x56\xa9"
++			  "\xee\xe4\xdd\x19\xc3\x79\x57\x61"
++			  "\x03\x07\x16\x15\xc8\x17\x23\xcd"
++			  "\xb7\x24\xa8\x06\x24\x8f\x26\x68"
++			  "\xf8\x54\xce\xfe\xc7\xc0\x11\x75"
++			  "\xc8\xa6\xc7\xf4\x4c\x49\x3c\x65"
++			  "\x3e\x18\xbf\x16\xac\xd4\xc1\x97"
++			  "\x7b\x02\x04\x78\x04\xf4\x14\x15"
++			  "\x4c\x60\xbc\x22\xd6\xb1\x8a\x51"
++			  "\xd5\x40\xe7\x9c\xf7\xd0\x63\xe0"
++			  "\xe9\x84\x0d\xb8\x1b\x45\x69\x11"
++			  "\x70\xfb\xeb\x0d\x07\xeb\x25\xaf"
++			  "\x6e\x5c\x90\xae\x9a\x75\x6d\xbf"
++			  "\x4c\xac\x60\xe6\xdb\x71\x38\xdc"
++			  "\xa5\xaa\x3e\x75\xf4\xe5\x43\x59"
++			  "\xe9\x86\x46\x9f\xc1\x5c\x77\x3e"
++			  "\xeb\x8d\x31\xd3\x4b\x85\x68\xb8"
++			  "\x10\x1f\x58\x27\xe8\x60\xeb\x65"
++			  "\xe2\xda\x03\xbb\x06\x4e\x11\x44"
++			  "\x1d\xd1\xe9\xa7\xae\x37\x48\x73"
++			  "\xd1\xae\xa7\xae\x24\x9a\xb2\x62"
++			  "\xb7\x12\x7f\x89\x7f\x98\x9b\x07"
++			  "\xfe\xb6\xc6\x1a\x25\xc4\x78\xac"
++			  "\x5b\x31\x30\x22\xf2\x89\x3f\x4d"
++			  "\x8c\x4c\xfb\xe7\xb0\x7c\x92\x28"
++			  "\x65\xb6\x8d\x04\x47\x48\xc3\xb4"
++			  "\x77\xac\xe2\xa4\xe0\x08\x11\x7e"
++			  "\x53\x08\xde\x4c\xec\xdf\x9e\x5b"
++			  "\xbe\x24\x7a\x08\x6b\x53\xec\x29"
++			  "\x96\x61\x30\xd2\xcb\x72\x80\x5b"
++			  "\xba\x1f\xcf\xaa\x46\x6f\x5b\xe3"
++			  "\xd5\x32\xb9\x7b\xe0\x69\x2f\xa2"
++			  "\x0b\xb2\x43\xf1\x3e\x30\xdd\x76"
++			  "\x73\xe1\xe7\x28\xac\x91\xa8\x9e"
++			  "\x6e\x77\xac\x6d\x0b\xbc\x52\x98"
++			  "\x65\x36\x2b\x10\x9b\x40\xe0\x1e"
++			  "\x7d\x5b\xfb\xe3\x9d\xa7\x93\xff"
++			  "\xfa\xe3\x42\xc5\x8e\x2c\xa4\x2a"
++			  "\x5d\x0b\x18\xec\xfb\xcf\x18\xaf"
++			  "\x06\x30\xf1\xa3\x9d\x51\xe3\xc3"
++			  "\x2f\x10\x06\x3e\x74\x23\xbb\x14"
++			  "\xfe\x05\x08\xf9\xd1\xb2\x47\x6a"
++			  "\x17\xd3\x1b\x9d\xac\xc9\x55\x1f"
++			  "\xde\x1f\x51\x03\x96\xe3\x64\xe0"
++			  "\xd2\xd6\x01\xc2\x6c\x79\x07\x4f"
++			  "\x08\x03\x78\x23\x16\xd2\x23\xec"
++			  "\x3f\x5d\xb6\xdc\xa5\xea\xbf\x8f"
++			  "\x47\xc0\x34\x3f\x61\x55\x30\x03"
++			  "\x36\xd9\xbf\xbb\x39\x7b\x90\xfb"
++			  "\x8d\xf1\x47\xa2\x03\x25\x3f\x92",
++		.len	= 512,
++	},
 +};
 +
-+struct eboiv_tfm_ctx {
-+	struct crypto_skcipher *skcipher;
-+};
-+
-+struct eboiv_req_ctx {
-+	struct skcipher_request *req;
-+	bool enc;
-+	struct scatterlist src;
-+	struct scatterlist dst;
-+	u8 iv[MAX_CIPHER_BLOCKSIZE] __aligned(__alignof__(__le64));
-+	struct skcipher_request subreq;
-+};
-+
-+static int eboiv_skcipher_setkey(struct crypto_skcipher *tfm,
-+				 const u8 *key, unsigned int keylen)
-+{
-+	struct eboiv_tfm_ctx *tctx = crypto_skcipher_ctx(tfm);
-+
-+	crypto_skcipher_clear_flags(tctx->skcipher, CRYPTO_TFM_REQ_MASK);
-+	crypto_skcipher_set_flags(tctx->skcipher,
-+				  crypto_skcipher_get_flags(tfm) &
-+				  CRYPTO_TFM_REQ_MASK);
-+	return crypto_skcipher_setkey(tctx->skcipher, key, keylen);
-+}
-+
-+static void eboiv_skcipher_done(struct crypto_async_request *areq, int err)
-+{
-+	struct skcipher_request *req = areq->data;
-+
-+	if (err == -EINPROGRESS)
-+		return;
-+
-+	skcipher_request_complete(req, err);
-+}
-+
-+static int eboiv_skcipher_do_crypt(struct skcipher_request *req, bool enc)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	const struct eboiv_tfm_ctx *tctx = crypto_skcipher_ctx(tfm);
-+	struct eboiv_req_ctx *req_ctx = skcipher_request_ctx(req);
-+	struct skcipher_request *subreq = &req_ctx->subreq;
-+
-+	skcipher_request_set_tfm(subreq, tctx->skcipher);
-+	skcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen, req_ctx->iv);
-+	skcipher_request_set_callback(subreq, skcipher_request_flags(req), eboiv_skcipher_done,
-+				      req);
-+
-+	return enc ? crypto_skcipher_encrypt(subreq) :
-+		     crypto_skcipher_decrypt(subreq);
-+}
-+
-+static void eboiv_skcipher_iv_done(struct crypto_async_request *areq, int err)
-+{
-+	struct eboiv_req_ctx *req_ctx = areq->data;
-+	struct skcipher_request *req = req_ctx->req;
-+	int ret;
-+
-+	if (!err) {
-+
-+		ret = eboiv_skcipher_do_crypt(req, req_ctx->enc);
-+
-+		if ((ret == -EINPROGRESS) || (ret == -EBUSY))
-+			return;
-+	}
-+
-+	skcipher_request_complete(req, err);
-+}
-+
-+static int eboiv_skcipher_crypt(struct skcipher_request *req, bool enc)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	const struct eboiv_tfm_ctx *tctx = crypto_skcipher_ctx(tfm);
-+	struct eboiv_req_ctx *req_ctx = skcipher_request_ctx(req);
-+	struct skcipher_request *subreq = &req_ctx->subreq;
-+	size_t iv_size = crypto_skcipher_ivsize(tfm);
-+	int ret;
-+
-+	/* The supplied IV is assumed to be in sector offset format (though
-+	 * we don't enforce it) - encrypt it.
-+	 */
-+	sg_init_one(&req_ctx->src, page_address(ZERO_PAGE(0)), iv_size);
-+	sg_init_one(&req_ctx->dst, req_ctx->iv, iv_size);
-+	skcipher_request_set_tfm(subreq, tctx->skcipher);
-+	skcipher_request_set_crypt(subreq, &req_ctx->src, &req_ctx->dst, iv_size, req->iv);
-+
-+	req_ctx->req = req;
-+	req_ctx->enc = enc;
-+
-+	skcipher_request_set_callback(subreq, skcipher_request_flags(req), eboiv_skcipher_iv_done,
-+				      req_ctx);
-+
-+	ret = crypto_skcipher_encrypt(subreq);
-+
-+	if (ret)
-+		return ret;
-+
-+	return eboiv_skcipher_do_crypt(req, enc);
-+
-+}
-+
-+static int eboiv_skcipher_encrypt(struct skcipher_request *req)
-+{
-+	return eboiv_skcipher_crypt(req, true);
-+}
-+
-+static int eboiv_skcipher_decrypt(struct skcipher_request *req)
-+{
-+	return eboiv_skcipher_crypt(req, false);
-+}
-+
-+static int eboiv_skcipher_init_tfm(struct crypto_skcipher *tfm)
-+{
-+	struct skcipher_instance *inst = skcipher_alg_instance(tfm);
-+	struct eboiv_instance_ctx *ictx = skcipher_instance_ctx(inst);
-+	struct eboiv_tfm_ctx *tctx = crypto_skcipher_ctx(tfm);
-+	struct crypto_skcipher *skcipher;
-+
-+	skcipher = crypto_spawn_skcipher(&ictx->skcipher_spawn);
-+	if (IS_ERR(skcipher))
-+		return PTR_ERR(skcipher);
-+
-+	crypto_skcipher_set_reqsize(tfm, sizeof(struct eboiv_req_ctx) +
-+				    crypto_skcipher_reqsize(skcipher));
-+
-+	tctx->skcipher = skcipher;
-+	return 0;
-+}
-+
-+static void eboiv_skcipher_exit_tfm(struct crypto_skcipher *tfm)
-+{
-+	struct eboiv_tfm_ctx *tctx = crypto_skcipher_ctx(tfm);
-+
-+	crypto_free_skcipher(tctx->skcipher);
-+}
-+
-+static void eboiv_skcipher_free_instance(struct skcipher_instance *inst)
-+{
-+	struct eboiv_instance_ctx *ictx = skcipher_instance_ctx(inst);
-+
-+	crypto_drop_skcipher(&ictx->skcipher_spawn);
-+	kfree(inst);
-+}
-+
-+static int eboiv_create(struct crypto_template *tmpl, struct rtattr **tb)
-+{
-+	struct crypto_attr_type *algt;
-+	const char *inner_cipher_name;
-+	struct skcipher_instance *skcipher_inst = NULL;
-+	struct crypto_instance *inst;
-+	struct crypto_alg *base, *block_base;
-+	struct eboiv_instance_ctx *ictx;
-+	struct skcipher_alg *skcipher_alg = NULL;
-+	int ivsize;
-+	u32 mask;
-+	int err;
-+
-+	algt = crypto_get_attr_type(tb);
-+	if (IS_ERR(algt))
-+		return PTR_ERR(algt);
-+
-+	inner_cipher_name = crypto_attr_alg_name(tb[1]);
-+	if (IS_ERR(inner_cipher_name))
-+		return PTR_ERR(inner_cipher_name);
-+
-+	mask = crypto_algt_inherited_mask(algt);
-+
-+	skcipher_inst = kzalloc(sizeof(*skcipher_inst) + sizeof(*ictx), GFP_KERNEL);
-+	if (!skcipher_inst)
-+		return -ENOMEM;
-+
-+	inst = skcipher_crypto_instance(skcipher_inst);
-+	base = &skcipher_inst->alg.base;
-+	ictx = crypto_instance_ctx(inst);
-+
-+	/* Symmetric cipher, e.g., "cbc(aes)" */
-+	err = crypto_grab_skcipher(&ictx->skcipher_spawn, inst, inner_cipher_name, 0, mask);
-+	if (err)
-+		goto out_free_inst;
-+
-+	skcipher_alg = crypto_spawn_skcipher_alg(&ictx->skcipher_spawn);
-+	block_base = &skcipher_alg->base;
-+	ivsize = crypto_skcipher_alg_ivsize(skcipher_alg);
-+
-+	if (ivsize != block_base->cra_blocksize)
-+		goto out_drop_skcipher;
-+
-+	/* Instance fields */
-+
-+	err = -ENAMETOOLONG;
-+	if (snprintf(base->cra_name, CRYPTO_MAX_ALG_NAME, "eboiv(%s)",
-+		     block_base->cra_name) >= CRYPTO_MAX_ALG_NAME)
-+		goto out_drop_skcipher;
-+
-+	if (snprintf(base->cra_driver_name, CRYPTO_MAX_ALG_NAME,
-+		     "eboiv(%s)", block_base->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
-+		goto out_drop_skcipher;
-+
-+	base->cra_blocksize	= block_base->cra_blocksize;
-+	base->cra_ctxsize	= sizeof(struct eboiv_tfm_ctx);
-+	base->cra_alignmask	= block_base->cra_alignmask;
-+	base->cra_priority	= block_base->cra_priority;
-+
-+	skcipher_inst->alg.setkey	= eboiv_skcipher_setkey;
-+	skcipher_inst->alg.encrypt	= eboiv_skcipher_encrypt;
-+	skcipher_inst->alg.decrypt	= eboiv_skcipher_decrypt;
-+	skcipher_inst->alg.init		= eboiv_skcipher_init_tfm;
-+	skcipher_inst->alg.exit		= eboiv_skcipher_exit_tfm;
-+
-+	skcipher_inst->alg.min_keysize	= crypto_skcipher_alg_min_keysize(skcipher_alg);
-+	skcipher_inst->alg.max_keysize	= crypto_skcipher_alg_max_keysize(skcipher_alg);
-+	skcipher_inst->alg.ivsize	= ivsize;
-+	skcipher_inst->alg.chunksize	= crypto_skcipher_alg_chunksize(skcipher_alg);
-+	skcipher_inst->alg.walksize	= crypto_skcipher_alg_walksize(skcipher_alg);
-+
-+	skcipher_inst->free		= eboiv_skcipher_free_instance;
-+
-+	err = skcipher_register_instance(tmpl, skcipher_inst);
-+
-+	if (err)
-+		goto out_drop_skcipher;
-+
-+	return 0;
-+
-+out_drop_skcipher:
-+	crypto_drop_skcipher(&ictx->skcipher_spawn);
-+out_free_inst:
-+	kfree(skcipher_inst);
-+	return err;
-+}
-+
-+/* eboiv(cipher_name) */
-+static struct crypto_template eboiv_tmpl = {
-+	.name	= "eboiv",
-+	.create	= eboiv_create,
-+	.module	= THIS_MODULE,
-+};
-+
-+static int __init eboiv_module_init(void)
-+{
-+	return crypto_register_template(&eboiv_tmpl);
-+}
-+
-+static void __exit eboiv_module_exit(void)
-+{
-+	crypto_unregister_template(&eboiv_tmpl);
-+}
-+
-+subsys_initcall(eboiv_module_init);
-+module_exit(eboiv_module_exit);
-+
-+MODULE_DESCRIPTION("EBOIV (BitLocker) skcipher wrapper for block encryption");
-+MODULE_LICENSE("GPL v2");
-+MODULE_ALIAS_CRYPTO("eboiv");
+ /* based on aes_cbc_tv_template */
+ static const struct cipher_testvec essiv_aes_cbc_tv_template[] = {
+ 	{
 -- 
 2.28.0
 
