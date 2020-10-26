@@ -2,203 +2,132 @@ Return-Path: <SRS0=A9yi=EB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 319CBC4363A
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 18:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 908FFC2D0A3
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 18:30:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CA4DE2222C
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 18:26:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603736792;
-	bh=gybTqJ0jxhz6SPBPfV2ny6/w0HsDcFeLANRpB3SrjT4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=WG51Kjg/IgM2k7MsPxo3//WWzSvThN+5ZKpQsm6gR88FIq0NC6Jn6T1NuA5ftsqRc
-	 i17BQwGonNf2e41TeezYICf3BzrnPFOObFxpq2pYpV7D0uudsrEEGn/Ub4bA6nMYeV
-	 aK4tcUBMRdfMMrjnV/2jMaZ8BdtC2lyQhNCED3J4=
+	by mail.kernel.org (Postfix) with ESMTP id 55F9220874
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 18:30:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DYYBJPJx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1789709AbgJZS0c (ORCPT
+        id S1789790AbgJZSaD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Oct 2020 14:26:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34858 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1789657AbgJZS0b (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Oct 2020 14:26:31 -0400
-Received: from sol.localdomain (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 80DAE20874;
-        Mon, 26 Oct 2020 18:26:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603736790;
-        bh=gybTqJ0jxhz6SPBPfV2ny6/w0HsDcFeLANRpB3SrjT4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=1803MW6Ms9+aCqQkPsbvfnbuiXZPpwcohNI+9CJZHMm7ySsAEDdNj22URn9yEW8+w
-         skoPbxs8WnAHiNomj0SKd5p7oL17WFlEF3a0iZAZwiK5HQ5ZyWJn8Wz1kzjWsUa+Z0
-         pflDe0VL8WWHOLnSfnYAEg931OZtGQqGqaU2AoOQ=
-Date:   Mon, 26 Oct 2020 11:26:28 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
+        Mon, 26 Oct 2020 14:30:03 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:34531 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1789777AbgJZSaD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 26 Oct 2020 14:30:03 -0400
+Received: by mail-wm1-f67.google.com with SMTP id k21so6301305wmi.1;
+        Mon, 26 Oct 2020 11:30:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Uvxk0V+v5R+Ui18EWs/4gGZzPd6uaBwxyhilQrUITXg=;
+        b=DYYBJPJxGMmJNF/y3y79mjSRcAW1v7JjG9JNYaZDgdpZOCygPjbMeRa0vQIfmRZsNn
+         xZgToB3m8fKrLviNRf3mJwvPMixZAun3LGDanXoDetiHUeD2OU3jJu19z124C2Lbr86b
+         f73wkIEMnIGrCER5eKz7unOkHWK228f2t0MNyEKh96YNQj4cjOLni6LIDLoaiO2jeHL4
+         36z6TROaA/c+oddr/xUpHRUslS2Z+vDtyFD0Ayv4wTYHwRNDS73S7E4FyRojYVUY3QHH
+         n88EDtjoNPIbL5UdFRViv+bzGPnc0yJvcjFH+fGD9HRujXFzcvQH7plt+iWhFLSaKrG0
+         gnjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Uvxk0V+v5R+Ui18EWs/4gGZzPd6uaBwxyhilQrUITXg=;
+        b=iZ3Q0XTW4Jid0ngdshFFIxhhx+1dHT/R22KjLvP6EZPqT/z8fqKetlvfgMI/wllKHt
+         9jEW6avsEFj6lsVjM/Ho9fKLxJ0Z3Ne/uwAHPZLsBVAPBgAF/wb5uT9D93lz5dHKoHbI
+         0pChcxjxNUSJTXLWo37m9JK97XKXAWrhFNN9FEwflHz5JY0tj1Wo2wxMWP2yCzcDFYsr
+         TfhqWbDuriT4I6M2IM2sXo2axfNgjBcQMo4B6NbFK/GcjpvjWLRZOvqyhRfAgT15tWZw
+         /EtQLE1JHOAU/nqXClB0qdGxhRzJkHOPSLquj0Haf0h+9wFS0ELoAf/Daz1XaPK8HRYq
+         qnLg==
+X-Gm-Message-State: AOAM5302kVdEwl8uNhp+lOyU8y6vZrK9VD46dswibkxX3ABFfDd+7GUN
+        /Bb8IBFDi3FHcPOfJd8MYyLeIfWLfzA=
+X-Google-Smtp-Source: ABdhPJxGuvImDDTPNUyAg2ANEUotzgD+NbaqgYewNtg3QdjYtiYNovB0ZP9faDoV/YdGSo52APdArQ==
+X-Received: by 2002:a1c:9c41:: with SMTP id f62mr17094373wme.23.1603737000340;
+        Mon, 26 Oct 2020 11:30:00 -0700 (PDT)
+Received: from [192.168.2.28] (39.35.broadband4.iol.cz. [85.71.35.39])
+        by smtp.gmail.com with ESMTPSA id j17sm22999314wrw.68.2020.10.26.11.29.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Oct 2020 11:29:59 -0700 (PDT)
+Subject: Re: [PATCH 3/4] dm crypt: switch to EBOIV crypto API template
+To:     Eric Biggers <ebiggers@kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Song Liu <song@kernel.org>, Alasdair Kergon <agk@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
         Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org
-Subject: Re: [PATCH 1/4] crypto: add eboiv as a crypto API template
-Message-ID: <20201026182628.GI858@sol.localdomain>
+        Song Liu <song@kernel.org>, Ofir Drang <ofir.drang@arm.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-raid@vger.kernel.org
 References: <20201026130450.6947-1-gilad@benyossef.com>
- <20201026130450.6947-2-gilad@benyossef.com>
- <20201026182448.GH858@sol.localdomain>
+ <20201026130450.6947-4-gilad@benyossef.com>
+ <20201026175231.GG858@sol.localdomain>
+From:   Milan Broz <gmazyland@gmail.com>
+Message-ID: <d07b062c-1405-4d72-b907-1c4dfa97aecb@gmail.com>
+Date:   Mon, 26 Oct 2020 19:29:57 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201026182448.GH858@sol.localdomain>
+In-Reply-To: <20201026175231.GG858@sol.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 26, 2020 at 11:24:50AM -0700, Eric Biggers wrote:
-> > +static int eboiv_create(struct crypto_template *tmpl, struct rtattr **tb)
-> > +{
-> > +	struct crypto_attr_type *algt;
-> > +	const char *inner_cipher_name;
-> > +	struct skcipher_instance *skcipher_inst = NULL;
-> > +	struct crypto_instance *inst;
-> > +	struct crypto_alg *base, *block_base;
-> > +	struct eboiv_instance_ctx *ictx;
-> > +	struct skcipher_alg *skcipher_alg = NULL;
-> > +	int ivsize;
-> > +	u32 mask;
-> > +	int err;
-> > +
-> > +	algt = crypto_get_attr_type(tb);
-> > +	if (IS_ERR(algt))
-> > +		return PTR_ERR(algt);
+On 26/10/2020 18:52, Eric Biggers wrote:
+> On Mon, Oct 26, 2020 at 03:04:46PM +0200, Gilad Ben-Yossef wrote:
+>> Replace the explicit EBOIV handling in the dm-crypt driver with calls
+>> into the crypto API, which now possesses the capability to perform
+>> this processing within the crypto subsystem.
+>>
+>> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+>>
+>> ---
+>>  drivers/md/Kconfig    |  1 +
+>>  drivers/md/dm-crypt.c | 61 ++++++++++++++-----------------------------
+>>  2 files changed, 20 insertions(+), 42 deletions(-)
+>>
+>> diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
+>> index 30ba3573626c..ca6e56a72281 100644
+>> --- a/drivers/md/Kconfig
+>> +++ b/drivers/md/Kconfig
+>> @@ -273,6 +273,7 @@ config DM_CRYPT
+>>  	select CRYPTO
+>>  	select CRYPTO_CBC
+>>  	select CRYPTO_ESSIV
+>> +	select CRYPTO_EBOIV
+>>  	help
+>>  	  This device-mapper target allows you to create a device that
+>>  	  transparently encrypts the data on it. You'll need to activate
 > 
-> Need to check that the algorithm is being instantiated as skcipher.
-> crypto_check_attr_type() should be used.
-> 
-> > +
-> > +	inner_cipher_name = crypto_attr_alg_name(tb[1]);
-> > +	if (IS_ERR(inner_cipher_name))
-> > +		return PTR_ERR(inner_cipher_name);
-> 
-> The result of crypto_attr_alg_name() can be passed directly to
-> crypto_grab_skcipher().
-> 
-> > +	mask = crypto_algt_inherited_mask(algt);
-> > +
-> > +	skcipher_inst = kzalloc(sizeof(*skcipher_inst) + sizeof(*ictx), GFP_KERNEL);
-> > +	if (!skcipher_inst)
-> > +		return -ENOMEM;
-> > +
-> > +	inst = skcipher_crypto_instance(skcipher_inst);
-> > +	base = &skcipher_inst->alg.base;
-> > +	ictx = crypto_instance_ctx(inst);
-> > +
-> > +	/* Symmetric cipher, e.g., "cbc(aes)" */
-> > +	err = crypto_grab_skcipher(&ictx->skcipher_spawn, inst, inner_cipher_name, 0, mask);
-> > +	if (err)
-> > +		goto out_free_inst;
-> > +
-> > +	skcipher_alg = crypto_spawn_skcipher_alg(&ictx->skcipher_spawn);
-> > +	block_base = &skcipher_alg->base;
-> > +	ivsize = crypto_skcipher_alg_ivsize(skcipher_alg);
-> > +
-> > +	if (ivsize != block_base->cra_blocksize)
-> > +		goto out_drop_skcipher;
-> 
-> Shouldn't it be verified that the underlying algorithm is actually cbc?
-> 
-> > +	skcipher_inst->alg.chunksize	= crypto_skcipher_alg_chunksize(skcipher_alg);
-> > +	skcipher_inst->alg.walksize	= crypto_skcipher_alg_walksize(skcipher_alg);
-> 
-> Setting these isn't necessary.
-> 
-> > +
-> > +	skcipher_inst->free		= eboiv_skcipher_free_instance;
-> > +
-> > +	err = skcipher_register_instance(tmpl, skcipher_inst);
-> > +
-> > +	if (err)
-> > +		goto out_drop_skcipher;
-> > +
-> > +	return 0;
-> > +
-> > +out_drop_skcipher:
-> > +	crypto_drop_skcipher(&ictx->skcipher_spawn);
-> > +out_free_inst:
-> > +	kfree(skcipher_inst);
-> > +	return err;
-> > +}
-> 
-> eboiv_skcipher_free_instance() can be called on the error path.
+> Can CRYPTO_EBOIV please not be selected by default?  If someone really wants
+> Bitlocker compatibility support, they can select this option themselves.
 
-Here's the version of eboiv_create() I recommend (untested):
+Please no! Until this move of IV to crypto API, we can rely on
+support in dm-crypt (if it is not supported, it is just a very old kernel).
+(Actually, this was the first thing I checked in this patchset - if it is
+unconditionally enabled for compatibility once dmcrypt is selected.)
 
-static int eboiv_create(struct crypto_template *tmpl, struct rtattr **tb)
-{
-	struct skcipher_instance *inst;
-	struct eboiv_instance_ctx *ictx;
-	struct skcipher_alg *alg;
-	u32 mask;
-	int err;
+People already use removable devices with BitLocker.
+It was the whole point that it works out-of-the-box without enabling anything.
 
-	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SKCIPHER, &mask);
-	if (err)
-		return err;
+If you insist on this to be optional, please better keep this IV inside dmcrypt.
+(EBOIV has no other use than for disk encryption anyway.)
 
-	inst = kzalloc(sizeof(*inst) + sizeof(*ictx), GFP_KERNEL);
-	if (!inst)
-		return -ENOMEM;
-	ictx = skcipher_instance_ctx(inst);
+Or maybe another option would be to introduce option under dm-crypt Kconfig that
+defaults to enabled (like support for foreign/legacy disk encryption schemes) and that
+selects these IVs/modes.
+But requiring some random switch in crypto API will only confuse users.
 
-	err = crypto_grab_skcipher(&ictx->skcipher_spawn,
-				   skcipher_crypto_instance(inst),
-				   crypto_attr_alg_name(tb[1]), 0, mask);
-	if (err)
-		goto err_free_inst;
-	alg = crypto_spawn_skcipher_alg(&ictx->skcipher_spawn);
-
-	err = -EINVAL;
-	if (strncmp(alg->base.cra_name, "cbc(", 4) ||
-	    crypto_skcipher_alg_ivsize(alg) != alg->base.cra_blocksize)
-		goto err_free_inst;
-
-	err = -ENAMETOOLONG;
-	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME, "eboiv(%s)",
-		     alg->base.cra_name) >= CRYPTO_MAX_ALG_NAME)
-		goto err_free_inst;
-
-	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
-		     "eboiv(%s)", alg->base.cra_driver_name) >=
-	    CRYPTO_MAX_ALG_NAME)
-		goto err_free_inst;
-
-	inst->alg.base.cra_blocksize	= alg->base.cra_blocksize;
-	inst->alg.base.cra_ctxsize	= sizeof(struct eboiv_tfm_ctx);
-	inst->alg.base.cra_alignmask	= alg->base.cra_alignmask;
-	inst->alg.base.cra_priority	= alg->base.cra_priority;
-
-	inst->alg.setkey	= eboiv_skcipher_setkey;
-	inst->alg.encrypt	= eboiv_skcipher_encrypt;
-	inst->alg.decrypt	= eboiv_skcipher_decrypt;
-	inst->alg.init		= eboiv_skcipher_init_tfm;
-	inst->alg.exit		= eboiv_skcipher_exit_tfm;
-
-	inst->alg.min_keysize	= crypto_skcipher_alg_min_keysize(alg);
-	inst->alg.max_keysize	= crypto_skcipher_alg_max_keysize(alg);
-	inst->alg.ivsize	= crypto_skcipher_alg_ivsize(alg);
-
-	inst->free		= eboiv_skcipher_free_instance;
-
-	err = skcipher_register_instance(tmpl, inst);
-	if (err) {
-err_free_inst:
-		eboiv_skcipher_free_instance(inst);
-	}
-	return err;
-}
+Milan
