@@ -2,108 +2,171 @@ Return-Path: <SRS0=A9yi=EB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BBF6C4363A
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 19:13:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15073C388F9
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 20:08:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BACBB2080A
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 19:13:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C60B021BE5
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 20:08:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1603742896;
+	bh=nqiSiVnZ0rhfYdOwfE4FtrcQRW3wI+osVJOzPMj6Cy4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=kSpEOhnUVD0KSsY6LGUFSp5KXjzfJQaIDZ2fIbCiYLZGslnSVw+k9ZqGUnGCzIKI8
+	 j751KLX55C4i7v/yEg99qT2ONKwio6NMMRJYM/rVGCXiVpH4AXYolDXpD2gLR9V3o4
+	 C5xxrK7k2dYiSZJ3hNz6zomadACOyIXOKpkv5PBY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408560AbgJZTNV (ORCPT
+        id S1730016AbgJZUIN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Oct 2020 15:13:21 -0400
-Received: from inva020.nxp.com ([92.121.34.13]:48744 "EHLO inva020.nxp.com"
+        Mon, 26 Oct 2020 16:08:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51858 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392992AbgJZTGi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Oct 2020 15:06:38 -0400
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id E54FD1A056F;
-        Mon, 26 Oct 2020 20:06:35 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id D85FA1A00AB;
-        Mon, 26 Oct 2020 20:06:35 +0100 (CET)
-Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 6223820308;
-        Mon, 26 Oct 2020 20:06:35 +0100 (CET)
-From:   Iuliana Prodan <iuliana.prodan@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>,
-        Andrei Botila <andrei.botila@nxp.com>,
-        Dragos Rosioru <dragos.rosioru@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-Subject: [PATCH v2] crypto: caam - enable crypto-engine retry mechanism
-Date:   Mon, 26 Oct 2020 21:06:26 +0200
-Message-Id: <1603739186-4007-1-git-send-email-iuliana.prodan@nxp.com>
-X-Mailer: git-send-email 2.1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+        id S1726059AbgJZUIM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 26 Oct 2020 16:08:12 -0400
+Received: from sol.attlocal.net (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B276821BE5;
+        Mon, 26 Oct 2020 20:08:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1603742892;
+        bh=nqiSiVnZ0rhfYdOwfE4FtrcQRW3wI+osVJOzPMj6Cy4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=npYKCGJQlwbwQhm4NR1Gi5cNRyMVPcd5j98huT1AmLqbzY0vjhXRVyt0cBkicSMq3
+         nAIlja9fAjuPvq0rGI5IlX6CBG0JlbCMM6leyx6mLdEN5U5xeBiW3p1N/uqa+NSdpy
+         sSR65LGWv72V7FdOFHPniH6rJAQdKJ6rJ7lgTt4Y=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     syzkaller-bugs@googlegroups.com, linux-hardening@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jann Horn <jannh@google.com>,
+        Kees Cook <keescook@chromium.org>,
+        Elena Petrova <lenaptr@google.com>,
+        Vegard Nossum <vegard.nossum@oracle.com>,
+        "Gustavo A . R . Silva" <gustavoars@kernel.org>,
+        stable@vger.kernel.org,
+        syzbot+92ead4eb8e26a26d465e@syzkaller.appspotmail.com
+Subject: [PATCH] crypto: af_alg - avoid undefined behavior accessing salg_name
+Date:   Mon, 26 Oct 2020 13:07:15 -0700
+Message-Id: <20201026200715.170261-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.29.1
+In-Reply-To: <CACT4Y+beaHrWisaSsV90xQn+t2Xn-bxvVgmx8ih_h=yJYPjs4A@mail.gmail.com>
+References: <CACT4Y+beaHrWisaSsV90xQn+t2Xn-bxvVgmx8ih_h=yJYPjs4A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use the new crypto_engine_alloc_init_and_set() function to
-initialize crypto-engine and enable retry mechanism.
+From: Eric Biggers <ebiggers@google.com>
 
-Set the maximum size for crypto-engine software queue based on
-Job Ring size (JOBR_DEPTH) and a threshold (reserved for the
-non-crypto-API requests that are not passed through crypto-engine).
+Commit 3f69cc60768b ("crypto: af_alg - Allow arbitrarily long algorithm
+names") made the kernel start accepting arbitrarily long algorithm names
+in sockaddr_alg.  However, the actual length of the salg_name field
+stayed at the original 64 bytes.
 
-The callback for do_batch_requests is NULL, since CAAM
-doesn't support linked requests.
+This is broken because the kernel can access indices >= 64 in salg_name,
+which is undefined behavior -- even though the memory that is accessed
+is still located within the sockaddr structure.  It would only be
+defined behavior if the array were properly marked as arbitrary-length
+(either by making it a flexible array, which is the recommended way
+these days, or by making it an array of length 0 or 1).
 
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+We can't simply change salg_name into a flexible array, since that would
+break source compatibility with userspace programs that embed
+sockaddr_alg into another struct, or (more commonly) declare a
+sockaddr_alg like 'struct sockaddr_alg sa = { .salg_name = "foo" };'.
+
+One solution would be to change salg_name into a flexible array only
+when '#ifdef __KERNEL__'.  However, that would keep userspace without an
+easy way to actually use the longer algorithm names.
+
+Instead, add a new structure 'sockaddr_alg_new' that has the flexible
+array field, and expose it to both userspace and the kernel.
+Make the kernel use it correctly in alg_bind().
+
+This addresses the syzbot report
+"UBSAN: array-index-out-of-bounds in alg_bind"
+(https://syzkaller.appspot.com/bug?extid=92ead4eb8e26a26d465e).
+
+Reported-by: syzbot+92ead4eb8e26a26d465e@syzkaller.appspotmail.com
+Fixes: 3f69cc60768b ("crypto: af_alg - Allow arbitrarily long algorithm names")
+Cc: <stable@vger.kernel.org> # v4.12+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
-Changes since v1:
-- add comment for THRESHOLD define;
-- update max size for crypto-engine queue.
+ crypto/af_alg.c             | 10 +++++++---
+ include/uapi/linux/if_alg.h | 16 ++++++++++++++++
+ 2 files changed, 23 insertions(+), 3 deletions(-)
 
- drivers/crypto/caam/intern.h | 8 ++++++++
- drivers/crypto/caam/jr.c     | 4 +++-
- 2 files changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index 9112279..7d45b21 100644
---- a/drivers/crypto/caam/intern.h
-+++ b/drivers/crypto/caam/intern.h
-@@ -16,6 +16,14 @@
- /* Currently comes from Kconfig param as a ^2 (driver-required) */
- #define JOBR_DEPTH (1 << CONFIG_CRYPTO_DEV_FSL_CAAM_RINGSIZE)
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index d11db80d24cd1..9acb9d2c4bcf9 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -147,7 +147,7 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ 	const u32 allowed = CRYPTO_ALG_KERN_DRIVER_ONLY;
+ 	struct sock *sk = sock->sk;
+ 	struct alg_sock *ask = alg_sk(sk);
+-	struct sockaddr_alg *sa = (void *)uaddr;
++	struct sockaddr_alg_new *sa = (void *)uaddr;
+ 	const struct af_alg_type *type;
+ 	void *private;
+ 	int err;
+@@ -155,7 +155,11 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ 	if (sock->state == SS_CONNECTED)
+ 		return -EINVAL;
+ 
+-	if (addr_len < sizeof(*sa))
++	BUILD_BUG_ON(offsetof(struct sockaddr_alg_new, salg_name) !=
++		     offsetof(struct sockaddr_alg, salg_name));
++	BUILD_BUG_ON(offsetof(struct sockaddr_alg, salg_name) != sizeof(*sa));
++
++	if (addr_len < sizeof(*sa) + 1)
+ 		return -EINVAL;
+ 
+ 	/* If caller uses non-allowed flag, return error. */
+@@ -163,7 +167,7 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ 		return -EINVAL;
+ 
+ 	sa->salg_type[sizeof(sa->salg_type) - 1] = 0;
+-	sa->salg_name[sizeof(sa->salg_name) + addr_len - sizeof(*sa) - 1] = 0;
++	sa->salg_name[addr_len - sizeof(*sa) - 1] = 0;
+ 
+ 	type = alg_get_type(sa->salg_type);
+ 	if (PTR_ERR(type) == -ENOENT) {
+diff --git a/include/uapi/linux/if_alg.h b/include/uapi/linux/if_alg.h
+index 60b7c2efd921c..dc52a11ba6d15 100644
+--- a/include/uapi/linux/if_alg.h
++++ b/include/uapi/linux/if_alg.h
+@@ -24,6 +24,22 @@ struct sockaddr_alg {
+ 	__u8	salg_name[64];
+ };
  
 +/*
-+ * Maximum size for crypto-engine software queue based on Job Ring
-+ * size (JOBR_DEPTH) and a THRESHOLD (reserved for the non-crypto-API
-+ * requests that are not passed through crypto-engine)
++ * Linux v4.12 and later removed the 64-byte limit on salg_name[]; it's now an
++ * arbitrary-length field.  We had to keep the original struct above for source
++ * compatibility with existing userspace programs, though.  Use the new struct
++ * below if support for very long algorithm names is needed.  To do this,
++ * allocate 'sizeof(struct sockaddr_alg_new) + strlen(algname) + 1' bytes, and
++ * copy algname (including the null terminator) into salg_name.
 + */
-+#define THRESHOLD 15
-+#define CRYPTO_ENGINE_MAX_QLEN (JOBR_DEPTH - THRESHOLD)
++struct sockaddr_alg_new {
++	__u16	salg_family;
++	__u8	salg_type[14];
++	__u32	salg_feat;
++	__u32	salg_mask;
++	__u8	salg_name[];
++};
 +
- /* Kconfig params for interrupt coalescing if selected (else zero) */
- #ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_INTC
- #define JOBR_INTC JRCFG_ICEN
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index 6f66996..7f2b1101 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -550,7 +550,9 @@ static int caam_jr_probe(struct platform_device *pdev)
- 	}
- 
- 	/* Initialize crypto engine */
--	jrpriv->engine = crypto_engine_alloc_init(jrdev, false);
-+	jrpriv->engine = crypto_engine_alloc_init_and_set(jrdev, true, NULL,
-+							  false,
-+							  CRYPTO_ENGINE_MAX_QLEN);
- 	if (!jrpriv->engine) {
- 		dev_err(jrdev, "Could not init crypto-engine\n");
- 		return -ENOMEM;
+ struct af_alg_iv {
+ 	__u32	ivlen;
+ 	__u8	iv[0];
+
+base-commit: 3650b228f83adda7e5ee532e2b90429c03f7b9ec
 -- 
-2.1.0
+2.29.1
 
