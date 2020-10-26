@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7DC9C5517A
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 16:17:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5372C4363A
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 16:17:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68D3321D41
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 16:17:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 914C3207F7
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Oct 2020 16:17:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603729047;
-	bh=gwHsUFVSXyQW3l/c9gZqK84vNwrsMULJDNdeLaIwLxo=;
+	s=default; t=1603729048;
+	bh=4RgHLxmAPQ9dbQbgafZ4VTUASPkrncAqdgJrCsstMgc=;
 	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=gnuYTkAievxLSlMIOCmHbsnHxCfjEmaG9dLh/T2RN4b/QH9iVpKOQnVYqGTisC7Km
-	 KkB6/I9L/gmc6nV/hlJxbg8Yt+VWWbbZAtMdpTTYNGiJb6cc5pyZN9oOahwMicX4ok
-	 OuqUlGIHKoDaSKh+DUO29RGr0qrzGqJYCgjWh4AE=
+	b=GDef87yS0qqOnbDt0YLaC5rMMzGbBbqt4T2rhGnr9B4/7rLAevBTYdKss8IunPtVm
+	 6Lt+bnDdEHfM+v67hbDVQjzIchRcXkeKuFPKv3VnV8KMu6Y3/SMP5viiOX/0uxqiMq
+	 MqcPHNRF2U7lWjEsautBeJltnLm9FYs7HNudLUXc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1785587AbgJZQR0 (ORCPT
+        id S1785588AbgJZQR1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Oct 2020 12:17:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60374 "EHLO mail.kernel.org"
+        Mon, 26 Oct 2020 12:17:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60376 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1737072AbgJZQR0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1775423AbgJZQR0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 26 Oct 2020 12:17:26 -0400
 Received: from sol.attlocal.net (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8E6F721D41
+        by mail.kernel.org (Postfix) with ESMTPSA id BCCB8207F7
         for <linux-crypto@vger.kernel.org>; Mon, 26 Oct 2020 16:17:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1603729045;
-        bh=gwHsUFVSXyQW3l/c9gZqK84vNwrsMULJDNdeLaIwLxo=;
+        bh=4RgHLxmAPQ9dbQbgafZ4VTUASPkrncAqdgJrCsstMgc=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=w9XkECQ2EGDj0qxh971KkFwFRxM6bNSVbQdABQQMNSSUVgje+TTfybU1PYNO5yP7S
-         0eI8+QwpEjJl8LERXz3XMxfGaSmq0VaAhrvicwpiFe5GufNpGe8TU+y4WG1l0+VARQ
-         pBmx3OeWS7Scb4SDoSw7ZaT+G8vXlXvBXNUYWnQE=
+        b=NiGem/nomm3+s5VuHet1QKSpDP6InZrv169HTe8fepeIOE2FFMqCS2+9gth5mJVly
+         J4inNvkDvucWg9qsY60F7llHCpSc2vTBIZxDqkkierfBlFLVHkRV8dUDc9f9qYgOqw
+         AXPU4whKJc5sanmxursNyZ4CMCgovW0eug04XWq4=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH 2/4] crypto: testmgr - always print the actual hash driver name
-Date:   Mon, 26 Oct 2020 09:17:00 -0700
-Message-Id: <20201026161702.39201-3-ebiggers@kernel.org>
+Subject: [PATCH 3/4] crypto: testmgr - always print the actual AEAD driver name
+Date:   Mon, 26 Oct 2020 09:17:01 -0700
+Message-Id: <20201026161702.39201-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.29.1
 In-Reply-To: <20201026161702.39201-1-ebiggers@kernel.org>
 References: <20201026161702.39201-1-ebiggers@kernel.org>
@@ -61,177 +61,184 @@ driver name.  So it shouldn't be used in places where a driver name is
 wanted, e.g. when reporting a test failure or when checking whether the
 driver is the generic driver or not.
 
-Fix this for the hash algorithm tests by getting the driver name from
-the crypto_ahash or crypto_shash that actually got allocated.
+Fix this for the AEAD algorithm tests by getting the driver name from
+the crypto_aead that actually got allocated.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/testmgr.c | 43 ++++++++++++++++++++-----------------------
- 1 file changed, 20 insertions(+), 23 deletions(-)
+ crypto/testmgr.c | 42 ++++++++++++++++++------------------------
+ 1 file changed, 18 insertions(+), 24 deletions(-)
 
 diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index a64a639eddfa4..ec64b70a5a836 100644
+index ec64b70a5a836..1b785b2f49870 100644
 --- a/crypto/testmgr.c
 +++ b/crypto/testmgr.c
-@@ -1171,8 +1171,7 @@ static inline const void *sg_data(struct scatterlist *sg)
+@@ -1919,8 +1919,7 @@ static int alg_test_hash(const struct alg_test_desc *desc, const char *driver,
+ 	return err;
  }
  
- /* Test one hash test vector in one configuration, using the shash API */
--static int test_shash_vec_cfg(const char *driver,
--			      const struct hash_testvec *vec,
-+static int test_shash_vec_cfg(const struct hash_testvec *vec,
- 			      const char *vec_name,
- 			      const struct testvec_config *cfg,
- 			      struct shash_desc *desc,
-@@ -1183,6 +1182,7 @@ static int test_shash_vec_cfg(const char *driver,
- 	const unsigned int alignmask = crypto_shash_alignmask(tfm);
- 	const unsigned int digestsize = crypto_shash_digestsize(tfm);
- 	const unsigned int statesize = crypto_shash_statesize(tfm);
-+	const char *driver = crypto_shash_driver_name(tfm);
- 	const struct test_sg_division *divs[XBUFSIZE];
- 	unsigned int i;
- 	u8 result[HASH_MAX_DIGESTSIZE + TESTMGR_POISON_LEN];
-@@ -1355,8 +1355,7 @@ static int check_nonfinal_ahash_op(const char *op, int err,
- }
- 
- /* Test one hash test vector in one configuration, using the ahash API */
--static int test_ahash_vec_cfg(const char *driver,
--			      const struct hash_testvec *vec,
-+static int test_ahash_vec_cfg(const struct hash_testvec *vec,
- 			      const char *vec_name,
- 			      const struct testvec_config *cfg,
- 			      struct ahash_request *req,
-@@ -1367,6 +1366,7 @@ static int test_ahash_vec_cfg(const char *driver,
- 	const unsigned int alignmask = crypto_ahash_alignmask(tfm);
- 	const unsigned int digestsize = crypto_ahash_digestsize(tfm);
- 	const unsigned int statesize = crypto_ahash_statesize(tfm);
-+	const char *driver = crypto_ahash_driver_name(tfm);
- 	const u32 req_flags = CRYPTO_TFM_REQ_MAY_BACKLOG | cfg->req_flags;
- 	const struct test_sg_division *divs[XBUFSIZE];
- 	DECLARE_CRYPTO_WAIT(wait);
-@@ -1521,8 +1521,7 @@ static int test_ahash_vec_cfg(const char *driver,
- 				 driver, cfg);
- }
- 
--static int test_hash_vec_cfg(const char *driver,
--			     const struct hash_testvec *vec,
-+static int test_hash_vec_cfg(const struct hash_testvec *vec,
+-static int test_aead_vec_cfg(const char *driver, int enc,
+-			     const struct aead_testvec *vec,
++static int test_aead_vec_cfg(int enc, const struct aead_testvec *vec,
  			     const char *vec_name,
  			     const struct testvec_config *cfg,
- 			     struct ahash_request *req,
-@@ -1539,20 +1538,18 @@ static int test_hash_vec_cfg(const char *driver,
- 	 */
- 
- 	if (desc) {
--		err = test_shash_vec_cfg(driver, vec, vec_name, cfg, desc, tsgl,
-+		err = test_shash_vec_cfg(vec, vec_name, cfg, desc, tsgl,
- 					 hashstate);
- 		if (err)
- 			return err;
- 	}
- 
--	return test_ahash_vec_cfg(driver, vec, vec_name, cfg, req, tsgl,
--				  hashstate);
-+	return test_ahash_vec_cfg(vec, vec_name, cfg, req, tsgl, hashstate);
+ 			     struct aead_request *req,
+@@ -1930,6 +1929,7 @@ static int test_aead_vec_cfg(const char *driver, int enc,
+ 	const unsigned int alignmask = crypto_aead_alignmask(tfm);
+ 	const unsigned int ivsize = crypto_aead_ivsize(tfm);
+ 	const unsigned int authsize = vec->clen - vec->plen;
++	const char *driver = crypto_aead_driver_name(tfm);
+ 	const u32 req_flags = CRYPTO_TFM_REQ_MAY_BACKLOG | cfg->req_flags;
+ 	const char *op = enc ? "encryption" : "decryption";
+ 	DECLARE_CRYPTO_WAIT(wait);
+@@ -2102,9 +2102,8 @@ static int test_aead_vec_cfg(const char *driver, int enc,
+ 	return 0;
  }
  
--static int test_hash_vec(const char *driver, const struct hash_testvec *vec,
--			 unsigned int vec_num, struct ahash_request *req,
--			 struct shash_desc *desc, struct test_sglist *tsgl,
--			 u8 *hashstate)
-+static int test_hash_vec(const struct hash_testvec *vec, unsigned int vec_num,
-+			 struct ahash_request *req, struct shash_desc *desc,
-+			 struct test_sglist *tsgl, u8 *hashstate)
+-static int test_aead_vec(const char *driver, int enc,
+-			 const struct aead_testvec *vec, unsigned int vec_num,
+-			 struct aead_request *req,
++static int test_aead_vec(int enc, const struct aead_testvec *vec,
++			 unsigned int vec_num, struct aead_request *req,
+ 			 struct cipher_test_sglists *tsgls)
  {
  	char vec_name[16];
- 	unsigned int i;
-@@ -1561,7 +1558,7 @@ static int test_hash_vec(const char *driver, const struct hash_testvec *vec,
+@@ -2117,7 +2116,7 @@ static int test_aead_vec(const char *driver, int enc,
  	sprintf(vec_name, "%u", vec_num);
  
- 	for (i = 0; i < ARRAY_SIZE(default_hash_testvec_configs); i++) {
--		err = test_hash_vec_cfg(driver, vec, vec_name,
-+		err = test_hash_vec_cfg(vec, vec_name,
- 					&default_hash_testvec_configs[i],
- 					req, desc, tsgl, hashstate);
+ 	for (i = 0; i < ARRAY_SIZE(default_cipher_testvec_configs); i++) {
+-		err = test_aead_vec_cfg(driver, enc, vec, vec_name,
++		err = test_aead_vec_cfg(enc, vec, vec_name,
+ 					&default_cipher_testvec_configs[i],
+ 					req, tsgls);
  		if (err)
-@@ -1576,7 +1573,7 @@ static int test_hash_vec(const char *driver, const struct hash_testvec *vec,
+@@ -2132,7 +2131,7 @@ static int test_aead_vec(const char *driver, int enc,
  		for (i = 0; i < fuzz_iterations; i++) {
  			generate_random_testvec_config(&cfg, cfgname,
  						       sizeof(cfgname));
--			err = test_hash_vec_cfg(driver, vec, vec_name, &cfg,
-+			err = test_hash_vec_cfg(vec, vec_name, &cfg,
- 						req, desc, tsgl, hashstate);
+-			err = test_aead_vec_cfg(driver, enc, vec, vec_name,
++			err = test_aead_vec_cfg(enc, vec, vec_name,
+ 						&cfg, req, tsgls);
  			if (err)
  				return err;
-@@ -1633,8 +1630,7 @@ static void generate_random_hash_testvec(struct shash_desc *desc,
-  * Test the hash algorithm represented by @req against the corresponding generic
-  * implementation, if one is available.
-  */
--static int test_hash_vs_generic_impl(const char *driver,
--				     const char *generic_driver,
-+static int test_hash_vs_generic_impl(const char *generic_driver,
- 				     unsigned int maxkeysize,
- 				     struct ahash_request *req,
- 				     struct shash_desc *desc,
-@@ -1646,6 +1642,7 @@ static int test_hash_vs_generic_impl(const char *driver,
- 	const unsigned int blocksize = crypto_ahash_blocksize(tfm);
- 	const unsigned int maxdatasize = (2 * PAGE_SIZE) - TESTMGR_POISON_LEN;
- 	const char *algname = crypto_hash_alg_common(tfm)->base.cra_name;
-+	const char *driver = crypto_ahash_driver_name(tfm);
+@@ -2148,7 +2147,6 @@ static int test_aead_vec(const char *driver, int enc,
+ struct aead_extra_tests_ctx {
+ 	struct aead_request *req;
+ 	struct crypto_aead *tfm;
+-	const char *driver;
+ 	const struct alg_test_desc *test_desc;
+ 	struct cipher_test_sglists *tsgls;
+ 	unsigned int maxdatasize;
+@@ -2354,7 +2352,7 @@ static int test_aead_inauthentic_inputs(struct aead_extra_tests_ctx *ctx)
+ 		if (ctx->vec.novrfy) {
+ 			generate_random_testvec_config(&ctx->cfg, ctx->cfgname,
+ 						       sizeof(ctx->cfgname));
+-			err = test_aead_vec_cfg(ctx->driver, DECRYPT, &ctx->vec,
++			err = test_aead_vec_cfg(DECRYPT, &ctx->vec,
+ 						ctx->vec_name, &ctx->cfg,
+ 						ctx->req, ctx->tsgls);
+ 			if (err)
+@@ -2373,7 +2371,7 @@ static int test_aead_vs_generic_impl(struct aead_extra_tests_ctx *ctx)
+ {
+ 	struct crypto_aead *tfm = ctx->tfm;
+ 	const char *algname = crypto_aead_alg(tfm)->base.cra_name;
+-	const char *driver = ctx->driver;
++	const char *driver = crypto_aead_driver_name(tfm);
+ 	const char *generic_driver = ctx->test_desc->generic_driver;
  	char _generic_driver[CRYPTO_MAX_ALG_NAME];
- 	struct crypto_shash *generic_tfm = NULL;
- 	struct shash_desc *generic_desc = NULL;
-@@ -1732,7 +1729,7 @@ static int test_hash_vs_generic_impl(const char *driver,
- 					     vec_name, sizeof(vec_name));
- 		generate_random_testvec_config(cfg, cfgname, sizeof(cfgname));
+ 	struct crypto_aead *generic_tfm = NULL;
+@@ -2450,14 +2448,14 @@ static int test_aead_vs_generic_impl(struct aead_extra_tests_ctx *ctx)
+ 		generate_random_testvec_config(&ctx->cfg, ctx->cfgname,
+ 					       sizeof(ctx->cfgname));
+ 		if (!ctx->vec.novrfy) {
+-			err = test_aead_vec_cfg(driver, ENCRYPT, &ctx->vec,
++			err = test_aead_vec_cfg(ENCRYPT, &ctx->vec,
+ 						ctx->vec_name, &ctx->cfg,
+ 						ctx->req, ctx->tsgls);
+ 			if (err)
+ 				goto out;
+ 		}
+ 		if (ctx->vec.crypt_error == 0 || ctx->vec.novrfy) {
+-			err = test_aead_vec_cfg(driver, DECRYPT, &ctx->vec,
++			err = test_aead_vec_cfg(DECRYPT, &ctx->vec,
+ 						ctx->vec_name, &ctx->cfg,
+ 						ctx->req, ctx->tsgls);
+ 			if (err)
+@@ -2472,8 +2470,7 @@ static int test_aead_vs_generic_impl(struct aead_extra_tests_ctx *ctx)
+ 	return err;
+ }
  
--		err = test_hash_vec_cfg(driver, &vec, vec_name, cfg,
-+		err = test_hash_vec_cfg(&vec, vec_name, cfg,
- 					req, desc, tsgl, hashstate);
- 		if (err)
- 			goto out;
-@@ -1749,8 +1746,7 @@ static int test_hash_vs_generic_impl(const char *driver,
+-static int test_aead_extra(const char *driver,
+-			   const struct alg_test_desc *test_desc,
++static int test_aead_extra(const struct alg_test_desc *test_desc,
+ 			   struct aead_request *req,
+ 			   struct cipher_test_sglists *tsgls)
+ {
+@@ -2489,7 +2486,6 @@ static int test_aead_extra(const char *driver,
+ 		return -ENOMEM;
+ 	ctx->req = req;
+ 	ctx->tfm = crypto_aead_reqtfm(req);
+-	ctx->driver = driver;
+ 	ctx->test_desc = test_desc;
+ 	ctx->tsgls = tsgls;
+ 	ctx->maxdatasize = (2 * PAGE_SIZE) - TESTMGR_POISON_LEN;
+@@ -2524,8 +2520,7 @@ static int test_aead_extra(const char *driver,
  	return err;
  }
  #else /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
--static int test_hash_vs_generic_impl(const char *driver,
--				     const char *generic_driver,
-+static int test_hash_vs_generic_impl(const char *generic_driver,
- 				     unsigned int maxkeysize,
- 				     struct ahash_request *req,
- 				     struct shash_desc *desc,
-@@ -1820,6 +1816,7 @@ static int __alg_test_hash(const struct hash_testvec *vecs,
- 		       driver, PTR_ERR(atfm));
- 		return PTR_ERR(atfm);
- 	}
-+	driver = crypto_ahash_driver_name(atfm);
+-static int test_aead_extra(const char *driver,
+-			   const struct alg_test_desc *test_desc,
++static int test_aead_extra(const struct alg_test_desc *test_desc,
+ 			   struct aead_request *req,
+ 			   struct cipher_test_sglists *tsgls)
+ {
+@@ -2533,8 +2528,7 @@ static int test_aead_extra(const char *driver,
+ }
+ #endif /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
  
- 	req = ahash_request_alloc(atfm, GFP_KERNEL);
- 	if (!req) {
-@@ -1859,13 +1856,12 @@ static int __alg_test_hash(const struct hash_testvec *vecs,
- 	}
+-static int test_aead(const char *driver, int enc,
+-		     const struct aead_test_suite *suite,
++static int test_aead(int enc, const struct aead_test_suite *suite,
+ 		     struct aead_request *req,
+ 		     struct cipher_test_sglists *tsgls)
+ {
+@@ -2542,8 +2536,7 @@ static int test_aead(const char *driver, int enc,
+ 	int err;
  
- 	for (i = 0; i < num_vecs; i++) {
--		err = test_hash_vec(driver, &vecs[i], i, req, desc, tsgl,
--				    hashstate);
-+		err = test_hash_vec(&vecs[i], i, req, desc, tsgl, hashstate);
+ 	for (i = 0; i < suite->count; i++) {
+-		err = test_aead_vec(driver, enc, &suite->vecs[i], i, req,
+-				    tsgls);
++		err = test_aead_vec(enc, &suite->vecs[i], i, req, tsgls);
  		if (err)
- 			goto out;
+ 			return err;
  		cond_resched();
- 	}
--	err = test_hash_vs_generic_impl(driver, generic_driver, maxkeysize, req,
-+	err = test_hash_vs_generic_impl(generic_driver, maxkeysize, req,
- 					desc, tsgl, hashstate);
- out:
- 	kfree(hashstate);
-@@ -3602,6 +3598,7 @@ static int alg_test_crc32c(const struct alg_test_desc *desc,
- 		       "%ld\n", driver, PTR_ERR(tfm));
+@@ -2571,6 +2564,7 @@ static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
+ 		       driver, PTR_ERR(tfm));
  		return PTR_ERR(tfm);
  	}
-+	driver = crypto_shash_driver_name(tfm);
++	driver = crypto_aead_driver_name(tfm);
  
- 	do {
- 		SHASH_DESC_ON_STACK(shash, tfm);
+ 	req = aead_request_alloc(tfm, GFP_KERNEL);
+ 	if (!req) {
+@@ -2588,15 +2582,15 @@ static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
+ 		goto out;
+ 	}
+ 
+-	err = test_aead(driver, ENCRYPT, suite, req, tsgls);
++	err = test_aead(ENCRYPT, suite, req, tsgls);
+ 	if (err)
+ 		goto out;
+ 
+-	err = test_aead(driver, DECRYPT, suite, req, tsgls);
++	err = test_aead(DECRYPT, suite, req, tsgls);
+ 	if (err)
+ 		goto out;
+ 
+-	err = test_aead_extra(driver, desc, req, tsgls);
++	err = test_aead_extra(desc, req, tsgls);
+ out:
+ 	free_cipher_test_sglists(tsgls);
+ 	aead_request_free(req);
 -- 
 2.29.1
 
