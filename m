@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E03C6C55179
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 22:55:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E82DC388F9
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 22:56:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACB5822202
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 22:55:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC37722202
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 22:56:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ras1ZN9p";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="v4kTPiwV"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="bMHlhllu";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="F+okaaPl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1832523AbgJ0Wzx (ORCPT
+        id S1832555AbgJ0W4B (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 27 Oct 2020 18:55:53 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:49954 "EHLO
+        Tue, 27 Oct 2020 18:56:01 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:50078 "EHLO
         galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1795169AbgJ0Wzt (ORCPT
+        with ESMTP id S1832543AbgJ0Wz6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Oct 2020 18:55:49 -0400
+        Tue, 27 Oct 2020 18:55:58 -0400
 From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1603839347;
+        s=2020; t=1603839355;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NCh5w9ecP7hR6Lh6yrwLcXDxY3S9AS4A8O59ClkmQuc=;
-        b=ras1ZN9p/0s71wAw6BiBK7tQahnylR+TBxJ5FU+RyyAUd654I45XroAagmXNcOhZGwycQU
-        JuB4srVEeq8JEdNYcazZGYxW43kHEWBW5olkexuNTx+ROG4rW4+lIg6oh7RjFfnmiYIMSa
-        wja8WVkTfnwqG5yCdjniR3JYvVzyFeZ5xY4gUgFa/48uACynrZzW+jFjl7+Gm1Ak37HK8p
-        i/LKjYW8uioJWsvMjaEFv0DOxsaAb1xs+tCGlkELjceM3XFKR9pZVfCoL3oL63qwaBCct1
-        uDLBmNS2D4JG5AgIEUYeAmWi2edcivpTlNAp8bjFhFJaHoQh3tvbl3SKJ1tFdA==
+        bh=ecxJzZtRribDKzKIiwElpzea91WJXQDRkjrSNkyvp44=;
+        b=bMHlhlluCx8UyhuU9NTXFEBFBDPzmifO9O7nsSBrqtLd+vr4IXh9AiD/7K0zGUjEiHeczw
+        11cc4w8mxNiAF8ibzLraKYfn9RPhxYf4MtwYhVbwMuDsFMoxLHA/DSgHVzUj4DyGyD3vPW
+        E2tipXy7jDjfZE0npmPtMrXPiWTv01kHZhkmvY8bq7w3Z8ZeikEww4mvYZCUOYPqraVy1S
+        gwdqr3G3BB9h9qxhCr8fJdTDRs1LYzp2vzKChp8W4yBFl2siku3YD3x2aLGnerVg7aNO60
+        y45jk/Re/uruKE8kGCYWFbVhlc7ZjQL3Dk63LQoOdWHzf+Ni6Jkp2iVd0fOseQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1603839347;
+        s=2020e; t=1603839355;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NCh5w9ecP7hR6Lh6yrwLcXDxY3S9AS4A8O59ClkmQuc=;
-        b=v4kTPiwVtn0BHjC1H1qdUC0DOW5ocQSNsfxbnR+jglqhT5b2wBt7em4IRx8CX07gIiVoDE
-        zxqH636veSWAMICg==
+        bh=ecxJzZtRribDKzKIiwElpzea91WJXQDRkjrSNkyvp44=;
+        b=F+okaaPlS1iKiuSjJd/s7xvfHx4naujCeq35xuq8TIJfx0CUcb4GntS5xPg3EjWk1mcjb2
+        f+BuFsDmP7NUaeAg==
 To:     netdev@vger.kernel.org
 Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
         Daniel Drake <dsd@gentoo.org>,
@@ -67,9 +67,9 @@ Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
         Zhu Yanjun <zyjzyj2000@gmail.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH net-next 03/15] net: forcedeth: Replace context and lock check with a lockdep_assert()
-Date:   Tue, 27 Oct 2020 23:54:42 +0100
-Message-Id: <20201027225454.3492351-4-bigeasy@linutronix.de>
+Subject: [PATCH net-next 09/15] net: hostap: Remove in_atomic() check.
+Date:   Tue, 27 Oct 2020 23:54:48 +0100
+Message-Id: <20201027225454.3492351-10-bigeasy@linutronix.de>
 In-Reply-To: <20201027225454.3492351-1-bigeasy@linutronix.de>
 References: <20201027225454.3492351-1-bigeasy@linutronix.de>
 MIME-Version: 1.0
@@ -78,41 +78,50 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-nv_update_stats() triggers a WARN_ON() when invoked from hard interrupt
-context because the locks in use are not hard interrupt safe. It also has
-an assert_spin_locked() which was the lock check before the lockdep era.
+hostap_get_wireless_stats() is the iw_handler_if::get_wireless_stats()
+callback of this driver. This callback was not allowed to sleep until
+commit a160ee69c6a46 ("wext: let get_wireless_stats() sleep") in v2.6.32.
 
-Lockdep has way broader locking correctness checks and covers both issues,
-so replace the warning and the lock assert with lockdep_assert_held().
+Remove the therefore pointless in_atomic() check.
 
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Rain River <rain.1986.08.12@gmail.com>
-Cc: Zhu Yanjun <zyjzyj2000@gmail.com>
+Cc: Jouni Malinen <j@w1.fi>
+Cc: Kalle Valo <kvalo@codeaurora.org>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: linux-wireless@vger.kernel.org
 Cc: netdev@vger.kernel.org
 ---
- drivers/net/ethernet/nvidia/forcedeth.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ drivers/net/wireless/intersil/hostap/hostap_ioctl.c | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
 
-diff --git a/drivers/net/ethernet/nvidia/forcedeth.c b/drivers/net/ethernet=
-/nvidia/forcedeth.c
-index 2fc10a36afa4a..7e85cf943be11 100644
---- a/drivers/net/ethernet/nvidia/forcedeth.c
-+++ b/drivers/net/ethernet/nvidia/forcedeth.c
-@@ -1666,11 +1666,7 @@ static void nv_update_stats(struct net_device *dev)
- 	struct fe_priv *np =3D netdev_priv(dev);
- 	u8 __iomem *base =3D get_hwbase(dev);
+diff --git a/drivers/net/wireless/intersil/hostap/hostap_ioctl.c b/drivers/=
+net/wireless/intersil/hostap/hostap_ioctl.c
+index 514c7b01dbf6f..49766b285230c 100644
+--- a/drivers/net/wireless/intersil/hostap/hostap_ioctl.c
++++ b/drivers/net/wireless/intersil/hostap/hostap_ioctl.c
+@@ -44,19 +44,8 @@ static struct iw_statistics *hostap_get_wireless_stats(s=
+truct net_device *dev)
 =20
--	/* If it happens that this is run in top-half context, then
--	 * replace the spin_lock of hwstats_lock with
--	 * spin_lock_irqsave() in calling functions. */
--	WARN_ONCE(in_irq(), "forcedeth: estats spin_lock(_bh) from top-half");
--	assert_spin_locked(&np->hwstats_lock);
-+	lockdep_assert_held(&np->hwstats_lock);
+ 	if (local->iw_mode !=3D IW_MODE_MASTER &&
+ 	    local->iw_mode !=3D IW_MODE_REPEAT) {
+-		int update =3D 1;
+-#ifdef in_atomic
+-		/* RID reading might sleep and it must not be called in
+-		 * interrupt context or while atomic. However, this
+-		 * function seems to be called while atomic (at least in Linux
+-		 * 2.5.59). Update signal quality values only if in suitable
+-		 * context. Otherwise, previous values read from tick timer
+-		 * will be used. */
+-		if (in_atomic())
+-			update =3D 0;
+-#endif /* in_atomic */
 =20
- 	/* query hardware */
- 	np->estats.tx_bytes +=3D readl(base + NvRegTxCnt);
+-		if (update && prism2_update_comms_qual(dev) =3D=3D 0)
++		if (prism2_update_comms_qual(dev) =3D=3D 0)
+ 			wstats->qual.updated =3D IW_QUAL_ALL_UPDATED |
+ 				IW_QUAL_DBM;
+=20
 --=20
 2.28.0
 
