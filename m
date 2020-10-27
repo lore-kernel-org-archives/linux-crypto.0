@@ -2,140 +2,117 @@ Return-Path: <SRS0=pM9r=EC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E94C388F9
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 19:04:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F209AC4363A
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 21:11:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C0EF821D41
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 19:04:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C3A220747
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 21:11:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jAlyIsI5"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="P5LHWXvR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1829292AbgJ0TES (ORCPT
+        id S2505411AbgJ0VL1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 27 Oct 2020 15:04:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37198 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1829285AbgJ0TES (ORCPT
+        Tue, 27 Oct 2020 17:11:27 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:38100 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2505367AbgJ0VL0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Oct 2020 15:04:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1603825457;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=Lh9LpJ3xp/HEd5FTWkXTDeH3pzRCHbh41QZoY7qmsLY=;
-        b=jAlyIsI5nolMSvILeTWMPZE0UMe9uwqMk5dZ9Wm3V4OnqNXk5negVxy+iViG+un7cyhk0j
-        NKPTKxlqQSrShkU7l6QuR/XtV1hibuH3DIU5dgezD36fHQwHYsFD/TnLFobEn4kjJQpq9i
-        SMMIcaXI0URGL3Cghs3drkwc7jTapKo=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-88iuZifcOM6sSbHPvZ3rVQ-1; Tue, 27 Oct 2020 15:04:13 -0400
-X-MC-Unique: 88iuZifcOM6sSbHPvZ3rVQ-1
-Received: by mail-ot1-f71.google.com with SMTP id e1so751840otb.21
-        for <linux-crypto@vger.kernel.org>; Tue, 27 Oct 2020 12:04:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=Lh9LpJ3xp/HEd5FTWkXTDeH3pzRCHbh41QZoY7qmsLY=;
-        b=dBtZqGyx3hq5aMxfA+33dYsx5o2BW2kmwd+bCG+jXzhPZ6Ag6AUCgmu+p+drow+doi
-         7CfAvLvN2aEOrDewiOYP6guCIqCMGss0eNfpDhIkjZ/qch7pghNYE+XQvEfOwrCofNGK
-         1cYBRs8V6u++nHDtBIxChyJItzqVLM+pONdBTIoU9IgFaFbaKa0+/7Z9SM6pg6BfR4NA
-         Aqhirx6/ajnc4SSGYobNYasbmrgcCts/VnxsT3XAO4dQH5aIddL/29VthXHwydscyRSD
-         DixEK6hAJmoZ4bqrcktXbTNN2eIfXRch9wBNTWod7TdSx7XRbPfO+mCG1l6bGmPF9lQ6
-         A+cQ==
-X-Gm-Message-State: AOAM530UQ5CvNL0mq05/bJDgFPP7CgGhQyX2R3uBVezhnaAL0bP7fWCD
-        xEA7U4Yr4Sti/3qpDB1BNo33vXS+U2HAGCot5XZlaeuvJGBU7g0fpJuga/HJNFBlNMvUjZj7gID
-        IeW8UofBZoRilO3946toouauH
-X-Received: by 2002:a4a:d8c1:: with SMTP id c1mr2914218oov.31.1603825453196;
-        Tue, 27 Oct 2020 12:04:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwvw7oDmX4Y9Qq+lv0BXLIdNWKnR8vgPIn4RzyZlnd2saiZ8H8D1LJGtyG5d3zxPaP61mcgtQ==
-X-Received: by 2002:a4a:d8c1:: with SMTP id c1mr2914198oov.31.1603825452956;
-        Tue, 27 Oct 2020 12:04:12 -0700 (PDT)
-Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
-        by smtp.gmail.com with ESMTPSA id q10sm1698690oih.56.2020.10.27.12.04.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Oct 2020 12:04:12 -0700 (PDT)
-From:   trix@redhat.com
-To:     giovanni.cabiddu@intel.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, ebiggers@google.com,
-        dominik.przychodni@intel.com, wojciech.ziemba@intel.com,
-        mpatocka@redhat.com, geert+renesas@glider.be, ardb@kernel.org
-Cc:     qat-linux@intel.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Tom Rix <trix@redhat.com>
-Subject: [PATCH] crypto: qat: remove unneeded semicolon
-Date:   Tue, 27 Oct 2020 12:04:07 -0700
-Message-Id: <20201027190407.1587980-1-trix@redhat.com>
-X-Mailer: git-send-email 2.18.1
+        Tue, 27 Oct 2020 17:11:26 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09RL8gCJ168382;
+        Tue, 27 Oct 2020 21:11:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=lRZmq3kWpRJ7AxDzYsfJ3jGJvDrAet61pmfQoBn+ils=;
+ b=P5LHWXvRAIsaSx9WhFZC0Es1OCmbw8MWwYSR41GoCDhjrfgZ3Hb7P4oUcCWY2kD0zbwK
+ 8uaukGj2yRaNbXW5lbtNBKzjCG6aN95xrPdPrHKs4KQGaha3rnLlVRhvl/3opDMVVb+J
+ Ne9FfXw+W4acQegSIqQCgmabEoxCOX83q0jF1gQFzBscCOL2Jq9/jsM5YSWhu7POeUaT
+ CRK7phLEDRZnyR726Z+AzXr30eqWLD+up7Jp3z+zS+05/Mc9S1j60EMHsNxsJz3AKGDs
+ LHxD7DA9/smrlC6GcP+/UTfAe2hAMx/yW0Co5bf/uyP6HTmXqsBCRXWChHWq50+DS3nX dw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 34dgm4203u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 27 Oct 2020 21:11:21 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09RL5LL9186830;
+        Tue, 27 Oct 2020 21:11:21 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 34cx6wf1x7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 27 Oct 2020 21:11:21 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 09RLBJEv016279;
+        Tue, 27 Oct 2020 21:11:19 GMT
+Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 27 Oct 2020 14:11:19 -0700
+Date:   Tue, 27 Oct 2020 17:20:34 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Nico Pache <npache@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        steffen.klassert@secunet.com, daniel.m.jordan@oracle.com
+Subject: Re: [PATCH v2] Remove __init from padata_do_multithreaded and
+ padata_mt_helper.
+Message-ID: <20201027212034.qiwk34ihwsdwlqv3@ca-dmjordan1.us.oracle.com>
+References: <20200702155548.14690-1-npache@redhat.com>
+ <20200708195140.hioiltf7pwppz6j7@ca-dmjordan1.us.oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200708195140.hioiltf7pwppz6j7@ca-dmjordan1.us.oracle.com>
+User-Agent: NeoMutt/20180716
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9787 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 spamscore=0
+ bulkscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010270124
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9787 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 impostorscore=0
+ adultscore=0 bulkscore=0 spamscore=0 phishscore=0 mlxlogscore=999
+ suspectscore=0 clxscore=1011 mlxscore=0 malwarescore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010270124
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Tom Rix <trix@redhat.com>
+On 10/27/20 12:46 AM, Nico Pache wrote:
+> On Wed, Jul 08, 2020 at 03:51:40PM -0400, Daniel Jordan wrote:
+> > (I was away for a while)
+> > 
+> > On Thu, Jul 02, 2020 at 11:55:48AM -0400, Nico Pache wrote:
+> > > Allow padata_do_multithreaded function to be called after bootstrap.
+> > 
+> > The functions are __init because they're currently only needed during boot, and
+> > using __init allows the text to be freed once it's over, saving some memory.
+> > 
+> > So this change, in isolation, doesn't make sense.  If there were an enhancement
+> > you were thinking of making, this patch could then be bundled with it so the
+> > change is made only when it's used.
+> > 
+> > However, there's still work that needs to be merged before
+> > padata_do_multithreaded can be called after boot.  See the parts about priority
+> > adjustments (MAX_NICE/renicing) and concurrency limits in this branch
+> > 
+> >   https://oss.oracle.com/git/gitweb.cgi?p=linux-dmjordan.git;a=shortlog;h=refs/heads/padata-mt-wip-v0.5
+> > 
+> > and the ktask discussions from linux-mm/lkml where concerns about these issues
+> > were raised.  I plan to post these parts fairly soon and can include you if you
+> > want.
+>
+> I really like the speed benefits I've been able to achieve by using your
+> padata multithreaded interface in the branch you linked me to. Do you
+> still have plans on moving forward with this upstream?
 
-A semicolon is not needed after a switch statement.
+Yes, I'm still planning to push these patches upstream, but it's going to take
+some time with all the prerequisites.  I'm working on remote charging in the
+CPU controller now, which is the biggest unfinished task.  A little background
+on that here:
 
-Signed-off-by: Tom Rix <trix@redhat.com>
----
- drivers/crypto/qat/qat_common/qat_algs.c      | 2 +-
- drivers/crypto/qat/qat_common/qat_asym_algs.c | 8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
-index d552dbcfe0a0..f5d890206e86 100644
---- a/drivers/crypto/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -103,7 +103,7 @@ static int qat_get_inter_state_size(enum icp_qat_hw_auth_algo qat_hash_alg)
- 		return ICP_QAT_HW_SHA512_STATE1_SZ;
- 	default:
- 		return -EFAULT;
--	};
-+	}
- 	return -EFAULT;
- }
- 
-diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-index 846569ec9066..04f2cf769fc1 100644
---- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-@@ -201,7 +201,7 @@ static unsigned long qat_dh_fn_id(unsigned int len, bool g2)
- 		return g2 ? PKE_DH_G2_4096 : PKE_DH_4096;
- 	default:
- 		return 0;
--	};
-+	}
- }
- 
- static inline struct qat_dh_ctx *qat_dh_get_params(struct crypto_kpp *tfm)
-@@ -577,7 +577,7 @@ static unsigned long qat_rsa_enc_fn_id(unsigned int len)
- 		return PKE_RSA_EP_4096;
- 	default:
- 		return 0;
--	};
-+	}
- }
- 
- #define PKE_RSA_DP1_512 0x1c161b3c
-@@ -606,7 +606,7 @@ static unsigned long qat_rsa_dec_fn_id(unsigned int len)
- 		return PKE_RSA_DP1_4096;
- 	default:
- 		return 0;
--	};
-+	}
- }
- 
- #define PKE_RSA_DP2_512 0x1c131b57
-@@ -635,7 +635,7 @@ static unsigned long qat_rsa_dec_fn_id_crt(unsigned int len)
- 		return PKE_RSA_DP2_4096;
- 	default:
- 		return 0;
--	};
-+	}
- }
- 
- static int qat_rsa_enc(struct akcipher_request *req)
--- 
-2.18.1
-
+https://lore.kernel.org/linux-mm/20200219220859.GF54486@cmpxchg.org/
