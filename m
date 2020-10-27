@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E82DC388F9
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 22:56:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EFAC4363A
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 22:56:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC37722202
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 22:56:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9777221F7
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 22:56:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="bMHlhllu";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="F+okaaPl"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="HCswUXFn";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="oAEOw6n2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1832555AbgJ0W4B (ORCPT
+        id S1832526AbgJ0W4H (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 27 Oct 2020 18:56:01 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:50078 "EHLO
+        Tue, 27 Oct 2020 18:56:07 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:50362 "EHLO
         galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1832543AbgJ0Wz6 (ORCPT
+        with ESMTP id S1832562AbgJ0W4F (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Oct 2020 18:55:58 -0400
+        Tue, 27 Oct 2020 18:56:05 -0400
 From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1603839355;
+        s=2020; t=1603839362;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ecxJzZtRribDKzKIiwElpzea91WJXQDRkjrSNkyvp44=;
-        b=bMHlhlluCx8UyhuU9NTXFEBFBDPzmifO9O7nsSBrqtLd+vr4IXh9AiD/7K0zGUjEiHeczw
-        11cc4w8mxNiAF8ibzLraKYfn9RPhxYf4MtwYhVbwMuDsFMoxLHA/DSgHVzUj4DyGyD3vPW
-        E2tipXy7jDjfZE0npmPtMrXPiWTv01kHZhkmvY8bq7w3Z8ZeikEww4mvYZCUOYPqraVy1S
-        gwdqr3G3BB9h9qxhCr8fJdTDRs1LYzp2vzKChp8W4yBFl2siku3YD3x2aLGnerVg7aNO60
-        y45jk/Re/uruKE8kGCYWFbVhlc7ZjQL3Dk63LQoOdWHzf+Ni6Jkp2iVd0fOseQ==
+        bh=JdH9fbe/FwP3XeKGJ3l0Cm+b4e3o/aTEE/5T4JYIZFo=;
+        b=HCswUXFnBU+7krIAiJOvKpJSk3khqzvmKXrOz1gM0erhfW+xw/741cfqlWqCbrRKLGLiBt
+        2ZUaoSP5ox8MMXp4zr4zTdeIQdrQbLDd0lfErEBFbuXJjY3Sl3TG4/ouW5bIhvmTNIXpU2
+        BTxYIVC5S4gOd9AbXC9lwhtY+aEdK+XsyZo+dmWM4PBHrMzxjgQL0BRejFLweIG6Bz/IjH
+        nC8PmUrMrQF9GbZZGnV1R5kFKPY2Fs+ZajwTg/K7K2jZYCeoeZvjAFEvEq0xdkMubwsmn/
+        UsR1mqQZqTsrHdN5Gr4QV7uqdaWF2X7OF6/NuBkY5fZeD4jNj5by8GNXbkDe4w==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1603839355;
+        s=2020e; t=1603839362;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ecxJzZtRribDKzKIiwElpzea91WJXQDRkjrSNkyvp44=;
-        b=F+okaaPlS1iKiuSjJd/s7xvfHx4naujCeq35xuq8TIJfx0CUcb4GntS5xPg3EjWk1mcjb2
-        f+BuFsDmP7NUaeAg==
+        bh=JdH9fbe/FwP3XeKGJ3l0Cm+b4e3o/aTEE/5T4JYIZFo=;
+        b=oAEOw6n2K77vQLRBPQlNlkEg06bqlyVo2TatzLpimvX8utPK3aWhDMLaJa4tCTD6u/57ST
+        kccvLXygOL73iBBg==
 To:     netdev@vger.kernel.org
 Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
         Daniel Drake <dsd@gentoo.org>,
@@ -67,61 +67,103 @@ Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
         Zhu Yanjun <zyjzyj2000@gmail.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH net-next 09/15] net: hostap: Remove in_atomic() check.
-Date:   Tue, 27 Oct 2020 23:54:48 +0100
-Message-Id: <20201027225454.3492351-10-bigeasy@linutronix.de>
+Subject: [PATCH net-next 14/15] net: dpaa: Replace in_irq() usage.
+Date:   Tue, 27 Oct 2020 23:54:53 +0100
+Message-Id: <20201027225454.3492351-15-bigeasy@linutronix.de>
 In-Reply-To: <20201027225454.3492351-1-bigeasy@linutronix.de>
 References: <20201027225454.3492351-1-bigeasy@linutronix.de>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-hostap_get_wireless_stats() is the iw_handler_if::get_wireless_stats()
-callback of this driver. This callback was not allowed to sleep until
-commit a160ee69c6a46 ("wext: let get_wireless_stats() sleep") in v2.6.32.
+The driver uses in_irq() + in_serving_softirq() magic to decide if NAPI
+scheduling is required or packet processing.
 
-Remove the therefore pointless in_atomic() check.
+The usage of in_*() in drivers is phased out and Linus clearly requested
+that code which changes behaviour depending on context should either be
+seperated or the context be conveyed in an argument passed by the caller,
+which usually knows the context.
+
+Use the `napi' argument passed by the callback. It is set true if
+called from the interrupt handler and NAPI should be scheduled.
 
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Jouni Malinen <j@w1.fi>
-Cc: Kalle Valo <kvalo@codeaurora.org>
+Cc: "Horia Geant=C4=83" <horia.geanta@nxp.com>
+Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Madalin Bucur <madalin.bucur@nxp.com>
 Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-wireless@vger.kernel.org
+Cc: Li Yang <leoyang.li@nxp.com>
+Cc: linux-crypto@vger.kernel.org
 Cc: netdev@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-arm-kernel@lists.infradead.org
 ---
- drivers/net/wireless/intersil/hostap/hostap_ioctl.c | 13 +------------
- 1 file changed, 1 insertion(+), 12 deletions(-)
+ drivers/net/ethernet/freescale/dpaa/dpaa_eth.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/wireless/intersil/hostap/hostap_ioctl.c b/drivers/=
-net/wireless/intersil/hostap/hostap_ioctl.c
-index 514c7b01dbf6f..49766b285230c 100644
---- a/drivers/net/wireless/intersil/hostap/hostap_ioctl.c
-+++ b/drivers/net/wireless/intersil/hostap/hostap_ioctl.c
-@@ -44,19 +44,8 @@ static struct iw_statistics *hostap_get_wireless_stats(s=
-truct net_device *dev)
+diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c b/drivers/net/e=
+thernet/freescale/dpaa/dpaa_eth.c
+index 27835310b718e..2c949acd74c67 100644
+--- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
++++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+@@ -2300,9 +2300,9 @@ static void dpaa_tx_conf(struct net_device *net_dev,
+ }
 =20
- 	if (local->iw_mode !=3D IW_MODE_MASTER &&
- 	    local->iw_mode !=3D IW_MODE_REPEAT) {
--		int update =3D 1;
--#ifdef in_atomic
--		/* RID reading might sleep and it must not be called in
--		 * interrupt context or while atomic. However, this
--		 * function seems to be called while atomic (at least in Linux
--		 * 2.5.59). Update signal quality values only if in suitable
--		 * context. Otherwise, previous values read from tick timer
--		 * will be used. */
--		if (in_atomic())
--			update =3D 0;
--#endif /* in_atomic */
+ static inline int dpaa_eth_napi_schedule(struct dpaa_percpu_priv *percpu_p=
+riv,
+-					 struct qman_portal *portal)
++					 struct qman_portal *portal, bool napi)
+ {
+-	if (unlikely(in_irq() || !in_serving_softirq())) {
++	if (napi) {
+ 		/* Disable QMan IRQ and invoke NAPI */
+ 		qman_p_irqsource_remove(portal, QM_PIRQ_DQRI);
 =20
--		if (update && prism2_update_comms_qual(dev) =3D=3D 0)
-+		if (prism2_update_comms_qual(dev) =3D=3D 0)
- 			wstats->qual.updated =3D IW_QUAL_ALL_UPDATED |
- 				IW_QUAL_DBM;
+@@ -2333,7 +2333,7 @@ static enum qman_cb_dqrr_result rx_error_dqrr(struct =
+qman_portal *portal,
 =20
+ 	percpu_priv =3D this_cpu_ptr(priv->percpu_priv);
+=20
+-	if (dpaa_eth_napi_schedule(percpu_priv, portal))
++	if (dpaa_eth_napi_schedule(percpu_priv, portal, napi))
+ 		return qman_cb_dqrr_stop;
+=20
+ 	dpaa_eth_refill_bpools(priv);
+@@ -2377,7 +2377,7 @@ static enum qman_cb_dqrr_result rx_default_dqrr(struc=
+t qman_portal *portal,
+ 	percpu_priv =3D this_cpu_ptr(priv->percpu_priv);
+ 	percpu_stats =3D &percpu_priv->stats;
+=20
+-	if (unlikely(dpaa_eth_napi_schedule(percpu_priv, portal)))
++	if (unlikely(dpaa_eth_napi_schedule(percpu_priv, portal, napi)))
+ 		return qman_cb_dqrr_stop;
+=20
+ 	/* Make sure we didn't run out of buffers */
+@@ -2474,7 +2474,7 @@ static enum qman_cb_dqrr_result conf_error_dqrr(struc=
+t qman_portal *portal,
+=20
+ 	percpu_priv =3D this_cpu_ptr(priv->percpu_priv);
+=20
+-	if (dpaa_eth_napi_schedule(percpu_priv, portal))
++	if (dpaa_eth_napi_schedule(percpu_priv, portal, napi))
+ 		return qman_cb_dqrr_stop;
+=20
+ 	dpaa_tx_error(net_dev, priv, percpu_priv, &dq->fd, fq->fqid);
+@@ -2499,7 +2499,7 @@ static enum qman_cb_dqrr_result conf_dflt_dqrr(struct=
+ qman_portal *portal,
+=20
+ 	percpu_priv =3D this_cpu_ptr(priv->percpu_priv);
+=20
+-	if (dpaa_eth_napi_schedule(percpu_priv, portal))
++	if (dpaa_eth_napi_schedule(percpu_priv, portal, napi))
+ 		return qman_cb_dqrr_stop;
+=20
+ 	dpaa_tx_conf(net_dev, priv, percpu_priv, &dq->fd, fq->fqid);
 --=20
 2.28.0
 
