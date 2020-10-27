@@ -2,290 +2,229 @@ Return-Path: <SRS0=pM9r=EC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1D3C83866
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 15:44:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D785BC63697
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 16:43:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A410621D42
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 15:44:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89D2721707
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Oct 2020 16:43:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SbUT6LrP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1801801AbgJ0PoU (ORCPT
+        id S1811899AbgJ0Qn0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 27 Oct 2020 11:44:20 -0400
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:45780 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1800152AbgJ0PfN (ORCPT
+        Tue, 27 Oct 2020 12:43:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59410 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1811885AbgJ0QnU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Oct 2020 11:35:13 -0400
-Received: from obbardc-laptop.home (unknown [IPv6:2a00:23c5:9900:2d00:fa7c:ed23:2f0a:448d])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: obbardc)
-        by bhuna.collabora.co.uk (Postfix) with ESMTPSA id EDCD91F45025;
-        Tue, 27 Oct 2020 15:35:10 +0000 (GMT)
-From:   Christopher Obbard <chris.obbard@collabora.com>
-To:     Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        linux-um@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Jeff Dike <jdike@addtoit.com>, Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>, kernel@collabora.com,
-        Christopher Obbard <chris.obbard@collabora.com>,
-        Alexander Neville <dark@volatile.bz>,
-        Sjoerd Simons <sjoerd.simons@collabora.co.uk>
-Subject: [PATCH] um: random: register random as hwrng-core device
-Date:   Tue, 27 Oct 2020 15:30:22 +0000
-Message-Id: <20201027153022.196800-1-chris.obbard@collabora.com>
-X-Mailer: git-send-email 2.28.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Tue, 27 Oct 2020 12:43:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1603816998;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=mj6uaiHROCag3uZJ/gHJroorYDnXKuN4EyYRFIYPu8Y=;
+        b=SbUT6LrPKSG/kjhEPSpbNL37X7EqS95pLWLFJN05U8T6IvmsgoI1621azrkHaUCQe2IU+4
+        A+8ip+R7TFhvfL2PFtA2YPAVSij+jMd+5zp3Ro8XdkS11BXJM1Rlv3U/dAVL3h95weU9IY
+        Ml5NELPo7a9T9EfhM60DKYJDO3/RVn0=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-121-o1Hcd2IYMXiizB5EhdgrzQ-1; Tue, 27 Oct 2020 12:43:14 -0400
+X-MC-Unique: o1Hcd2IYMXiizB5EhdgrzQ-1
+Received: by mail-oi1-f197.google.com with SMTP id k16so427263oik.6
+        for <linux-crypto@vger.kernel.org>; Tue, 27 Oct 2020 09:43:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=mj6uaiHROCag3uZJ/gHJroorYDnXKuN4EyYRFIYPu8Y=;
+        b=QS0M9KVw2jnB/VCXe5s0ePqdfrP6VTF2ETN02XqCtPuPbZxP1Fq2mWY2euQDpJiKho
+         e95VjHQIYg5Fbu7zE+jaPr5OST513F6hhStsV/RtQuVLBMPhtW+f6oXJtkoCkztqXDFm
+         65xHLeRQcvxKOvZL0CJKN9KxiN2zxx47YcJTsTPmWKozPfAXurmHGzXUvQBc4K9bTzbl
+         6/aiW5ZZEyyOzL+F1Ca8juhcSCaBKipjlza049ud5hUb7+lCyu5YaNjLDTDOXd7qdyhz
+         1g2Axs36xdGz5dlpLOh6a8m9gxWHw0L7S2KqPGqyx/PXHBn6QTbqm5n8TOmldgq+zusU
+         SBAg==
+X-Gm-Message-State: AOAM5318Af0eryDL1CTZj4sNjI4i2ZnXqVw1RDNl8NLneO0Mxw6YdSAM
+        gMRcDe6vzThiAxK8wj+F899NCvt2m87LblBUjmJbsrfixnSFhGmZ7sgxR8p31AGzbWwyLiHxa20
+        0yJmmubiqsA24+czkl5qEMDJL
+X-Received: by 2002:aca:ef03:: with SMTP id n3mr2048464oih.67.1603816993830;
+        Tue, 27 Oct 2020 09:43:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw7y1eCX7WfRNi9tkZnfLpiDio1qtG9FKTpwYlLMD9SlPYp6FIE57BquNUx5oTk2cs+UUc+WA==
+X-Received: by 2002:aca:ef03:: with SMTP id n3mr2048435oih.67.1603816993577;
+        Tue, 27 Oct 2020 09:43:13 -0700 (PDT)
+Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
+        by smtp.gmail.com with ESMTPSA id l89sm90968otc.6.2020.10.27.09.43.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Oct 2020 09:43:12 -0700 (PDT)
+From:   trix@redhat.com
+To:     linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
+Cc:     linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        qat-linux@intel.com, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-iio@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-mmc@vger.kernel.org,
+        netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        linux-amlogic@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-rtc@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-aspeed@lists.ozlabs.org, linux-samsung-soc@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org,
+        linux-rpi-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
+        =?UTF-8?q?=EF=BB=BFFrom=20=3A=20Tom=20Rix?= <trix@redhat.com>
+Subject: Subject: [RFC] clang tooling cleanups
+Date:   Tue, 27 Oct 2020 09:42:55 -0700
+Message-Id: <20201027164255.1573301-1-trix@redhat.com>
+X-Mailer: git-send-email 2.18.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The UML random driver creates a dummy device under the guest,
-/dev/hw_random. When this file is read from the guest, the driver
-reads from the host machine's /dev/random, in-turn reading from
-the host kernel's entropy pool. This entropy pool could have been
-filled by a hardware random number generator or just the host
-kernel's internal software entropy generator.
+This rfc will describe
+An upcoming treewide cleanup.
+How clang tooling was used to programatically do the clean up.
+Solicit opinions on how to generally use clang tooling.
 
-Currently the driver does not fill the guests kernel entropy pool,
-this requires a userspace tool running inside the guest (like
-rng-tools) to read from the dummy device provided by this driver,
-which then would fill the guest's internal entropy pool.
+The clang warning -Wextra-semi-stmt produces about 10k warnings.
+Reviewing these, a subset of semicolon after a switch looks safe to
+fix all the time.  An example problem
 
-This all seems quite pointless when we are already reading from an
-entropy pool, so this patch aims to register the device as a hwrng
-device using the hwrng-core framework. This not only improves and
-cleans up the driver, but also fills the guest's entropy pool
-without having to resort to using extra userspace tools in the guest.
+void foo(int a) {
+     switch(a) {
+     	       case 1:
+	       ...
+     }; <--- extra semicolon
+}
 
-This is typically a nuisance when booting a guest: the random pool
-takes a long time (~200s) to build up enough entropy since the dummy
-hwrng is not used to fill the guest's pool.
+Treewide, there are about 100 problems in 50 files for x86_64 allyesconfig.
+These fixes will be the upcoming cleanup.
 
-This port was originally attempted by Alexander Neville "dark" (in CC,
-discussion in Link), but the conversation there stalled since the
-handling of -EAGAIN errors were no removed and longer handled by the
-driver. This patch attempts to use the existing method of error
-handling but utilises the new hwrng core.
+clang already supports fixing this problem. Add to your command line
 
-The issue can be noticed when booting a UML guest:
+  clang -c -Wextra-semi-stmt -Xclang -fixit foo.c
 
-    [    2.560000] random: fast init done
-    [  214.000000] random: crng init done
+  foo.c:8:3: warning: empty expression statement has no effect;
+    remove unnecessary ';' to silence this warning [-Wextra-semi-stmt]
+        };
+         ^
+  foo.c:8:3: note: FIX-IT applied suggested code changes
+  1 warning generated.
 
-With the patch applied, filling the pool becomes a lot quicker:
+The big problem is using this treewide is it will fix all 10k problems.
+10k changes to analyze and upstream is not practical.
 
-    [    2.560000] random: fast init done
-    [   12.000000] random: crng init done
+Another problem is the generic fixer only removes the semicolon.
+So empty lines with some tabs need to be manually cleaned.
 
-Cc: Alexander Neville <dark@volatile.bz>
-Link: https://lore.kernel.org/lkml/20190828204609.02a7ff70@TheDarkness/
-Link: https://lore.kernel.org/lkml/20190829135001.6a5ff940@TheDarkness.local/
-Cc: Sjoerd Simons <sjoerd.simons@collabora.co.uk>
-Signed-off-by: Christopher Obbard <chris.obbard@collabora.com>
----
- arch/um/drivers/random.c       | 101 ++++++++-------------------------
- drivers/char/hw_random/Kconfig |  16 +++---
- 2 files changed, 33 insertions(+), 84 deletions(-)
+What is needed is a more precise fixer.
 
-diff --git a/arch/um/drivers/random.c b/arch/um/drivers/random.c
-index ce115fce52f0..e4b9b2ce9abf 100644
---- a/arch/um/drivers/random.c
-+++ b/arch/um/drivers/random.c
-@@ -11,6 +11,7 @@
- #include <linux/fs.h>
- #include <linux/interrupt.h>
- #include <linux/miscdevice.h>
-+#include <linux/hw_random.h>
- #include <linux/delay.h>
- #include <linux/uaccess.h>
- #include <init.h>
-@@ -18,9 +19,8 @@
- #include <os.h>
- 
- /*
-- * core module and version information
-+ * core module information
-  */
--#define RNG_VERSION "1.0.0"
- #define RNG_MODULE_NAME "hw_random"
- 
- /* Changed at init time, in the non-modular case, and at module load
-@@ -28,88 +28,36 @@
-  * protects against a module being loaded twice at the same time.
-  */
- static int random_fd = -1;
--static DECLARE_WAIT_QUEUE_HEAD(host_read_wait);
-+static struct hwrng hwrng = { 0, };
-+static DECLARE_COMPLETION(have_data);
- 
--static int rng_dev_open (struct inode *inode, struct file *filp)
-+static int rng_dev_read(struct hwrng *rng, void *buf, size_t max, bool block)
- {
--	/* enforce read-only access to this chrdev */
--	if ((filp->f_mode & FMODE_READ) == 0)
--		return -EINVAL;
--	if ((filp->f_mode & FMODE_WRITE) != 0)
--		return -EINVAL;
-+	int ret;
- 
--	return 0;
--}
--
--static atomic_t host_sleep_count = ATOMIC_INIT(0);
--
--static ssize_t rng_dev_read (struct file *filp, char __user *buf, size_t size,
--			     loff_t *offp)
--{
--	u32 data;
--	int n, ret = 0, have_data;
--
--	while (size) {
--		n = os_read_file(random_fd, &data, sizeof(data));
--		if (n > 0) {
--			have_data = n;
--			while (have_data && size) {
--				if (put_user((u8) data, buf++)) {
--					ret = ret ? : -EFAULT;
--					break;
--				}
--				size--;
--				ret++;
--				have_data--;
--				data >>= 8;
--			}
--		}
--		else if (n == -EAGAIN) {
--			DECLARE_WAITQUEUE(wait, current);
--
--			if (filp->f_flags & O_NONBLOCK)
--				return ret ? : -EAGAIN;
--
--			atomic_inc(&host_sleep_count);
-+	for (;;) {
-+		ret = os_read_file(random_fd, buf, max);
-+		if (block && ret == -EAGAIN) {
- 			add_sigio_fd(random_fd);
- 
--			add_wait_queue(&host_read_wait, &wait);
--			set_current_state(TASK_INTERRUPTIBLE);
-+			ret = wait_for_completion_killable(&have_data);
- 
--			schedule();
--			remove_wait_queue(&host_read_wait, &wait);
-+			ignore_sigio_fd(random_fd);
-+			deactivate_fd(random_fd, RANDOM_IRQ);
- 
--			if (atomic_dec_and_test(&host_sleep_count)) {
--				ignore_sigio_fd(random_fd);
--				deactivate_fd(random_fd, RANDOM_IRQ);
--			}
-+			if (ret < 0)
-+				break;
-+		} else {
-+			break;
- 		}
--		else
--			return n;
--
--		if (signal_pending (current))
--			return ret ? : -ERESTARTSYS;
- 	}
--	return ret;
--}
- 
--static const struct file_operations rng_chrdev_ops = {
--	.owner		= THIS_MODULE,
--	.open		= rng_dev_open,
--	.read		= rng_dev_read,
--	.llseek		= noop_llseek,
--};
--
--/* rng_init shouldn't be called more than once at boot time */
--static struct miscdevice rng_miscdev = {
--	HWRNG_MINOR,
--	RNG_MODULE_NAME,
--	&rng_chrdev_ops,
--};
-+	return ret != -EAGAIN ? ret : 0;
-+}
- 
- static irqreturn_t random_interrupt(int irq, void *data)
- {
--	wake_up(&host_read_wait);
-+	complete(&have_data);
- 
- 	return IRQ_HANDLED;
- }
-@@ -126,18 +74,19 @@ static int __init rng_init (void)
- 		goto out;
- 
- 	random_fd = err;
--
- 	err = um_request_irq(RANDOM_IRQ, random_fd, IRQ_READ, random_interrupt,
- 			     0, "random", NULL);
- 	if (err)
- 		goto err_out_cleanup_hw;
- 
- 	sigio_broken(random_fd, 1);
-+	hwrng.name = RNG_MODULE_NAME;
-+	hwrng.read = rng_dev_read;
-+	hwrng.quality = 1024;
- 
--	err = misc_register (&rng_miscdev);
-+	err = hwrng_register(&hwrng);
- 	if (err) {
--		printk (KERN_ERR RNG_MODULE_NAME ": misc device register "
--			"failed\n");
-+		pr_err(RNG_MODULE_NAME " registering failed (%d)\n", err);
- 		goto err_out_cleanup_hw;
- 	}
- out:
-@@ -161,8 +110,8 @@ static void cleanup(void)
- 
- static void __exit rng_cleanup(void)
- {
-+	hwrng_unregister(&hwrng);
- 	os_close_file(random_fd);
--	misc_deregister (&rng_miscdev);
- }
- 
- module_init (rng_init);
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index e92c4d9469d8..5952210526aa 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -540,15 +540,15 @@ endif # HW_RANDOM
- 
- config UML_RANDOM
- 	depends on UML
--	tristate "Hardware random number generator"
-+	select HW_RANDOM
-+	tristate "UML Random Number Generator support"
- 	help
- 	  This option enables UML's "hardware" random number generator.  It
- 	  attaches itself to the host's /dev/random, supplying as much entropy
- 	  as the host has, rather than the small amount the UML gets from its
--	  own drivers.  It registers itself as a standard hardware random number
--	  generator, major 10, minor 183, and the canonical device name is
--	  /dev/hwrng.
--	  The way to make use of this is to install the rng-tools package
--	  (check your distro, or download from
--	  http://sourceforge.net/projects/gkernel/).  rngd periodically reads
--	  /dev/hwrng and injects the entropy into /dev/random.
-+	  own drivers. It registers itself as a rng-core driver thus providing
-+	  a device which is usually called /dev/hwrng. This hardware random
-+	  number generator does feed into the kernel's random number generator
-+	  entropy pool.
-+
-+	  If unsure, say Y.
--- 
-2.28.0
+Enter clang-tidy.
+https://clang.llvm.org/extra/clang-tidy/
+
+Already part of the static checker infrastructure, invoke on the clang
+build with
+  make clang-tidy
+
+It is only a matter of coding up a specific checker for the cleanup.
+Upstream this is review is happening here
+https://reviews.llvm.org/D90180
+
+The development of a checker/fixer is
+Start with a reproducer
+
+void foo (int a) {
+  switch (a) {};
+}
+
+Generate the abstract syntax tree (AST)
+
+  clang -Xclang -ast-dump foo.c
+
+`-FunctionDecl 
+  |-ParmVarDecl 
+  `-CompoundStmt 
+    |-SwitchStmt 
+    | |-ImplicitCastExpr
+    | | `-DeclRefExpr
+    | `-CompoundStmt
+    `-NullStmt
+
+Write a matcher to get you most of the way
+
+void SwitchSemiCheck::registerMatchers(MatchFinder *Finder) {
+  Finder->addMatcher(
+      compoundStmt(has(switchStmt().bind("switch"))).bind("comp"), this);
+}
+
+The 'bind' method is important, it allows a string to be associated
+with a node in the AST.  In this case these are
+
+`-FunctionDecl 
+  |-ParmVarDecl 
+  `-CompoundStmt <-------- comp
+    |-SwitchStmt <-------- switch
+    | |-ImplicitCastExpr
+    | | `-DeclRefExpr
+    | `-CompoundStmt
+    `-NullStmt
+
+When a match is made the 'check' method will be called.
+
+  void SwitchSemiCheck::check(const MatchFinder::MatchResult &Result) {
+    auto *C = Result.Nodes.getNodeAs<CompoundStmt>("comp");
+    auto *S = Result.Nodes.getNodeAs<SwitchStmt>("switch");
+
+This is where the string in the bind calls are changed to nodes
+
+`-FunctionDecl 
+  |-ParmVarDecl 
+  `-CompoundStmt <-------- comp, C
+    |-SwitchStmt <-------- switch, S
+    | |-ImplicitCastExpr
+    | | `-DeclRefExpr
+    | `-CompoundStmt
+    `-NullStmt <---------- looking for N
+
+And then more logic to find the NullStmt
+
+  auto Current = C->body_begin();
+  auto Next = Current;
+  Next++;
+  while (Next != C->body_end()) {
+    if (*Current == S) {
+      if (const auto *N = dyn_cast<NullStmt>(*Next)) {
+
+When it is found, a warning is printed and a FixItHint is proposed.
+
+  auto H = FixItHint::CreateReplacement(
+    SourceRange(S->getBody()->getEndLoc(), N->getSemiLoc()), "}");
+  diag(N->getSemiLoc(), "unneeded semicolon") << H;
+
+This fixit replaces from the end of switch to the semicolon with a
+'}'.  Because the end of the switch is '}' this has the effect of
+removing all the whitespace as well as the semicolon.
+
+Because of the checker's placement in clang-tidy existing linuxkernel
+checkers, all that was needed to fix the tree was to add a '-fix'to the
+build's clang-tidy call.
+
+I am looking for opinions on what we want to do specifically with
+cleanups and generally about other source-to-source programmatic
+changes to the code base.
+
+For cleanups, I think we need a new toplevel target
+
+clang-tidy-fix
+
+And an explicit list of fixers that have a very high (100%?) fix rate.
+
+Ideally a bot should make the changes, but a bot could also nag folks.
+Is there interest in a bot making the changes? Does one already exist?
+
+The general source-to-source is a bit blue sky.  Ex/ could automagicly
+refactor api, outline similar cut-n-pasted functions etc. Anything on
+someone's wishlist you want to try out ?
+
+Signed-off-by: Tom Rix <trix@redhat.com>
 
