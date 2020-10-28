@@ -2,290 +2,181 @@ Return-Path: <SRS0=z7PZ=EE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D16DC55179
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Oct 2020 01:38:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74653C388F7
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Oct 2020 02:01:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A09B2076D
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Oct 2020 01:38:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DD462076B
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Oct 2020 02:01:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="IjwVf/Xv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729725AbgJ1WDA (ORCPT
+        id S1727731AbgJ2CBR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Oct 2020 18:03:00 -0400
-Received: from foss.arm.com ([217.140.110.172]:38786 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729501AbgJ1WCP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Oct 2020 18:02:15 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4DB2D176B;
-        Wed, 28 Oct 2020 05:34:40 -0700 (PDT)
-Received: from e110176-lin.kfn.arm.com (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5697C3F719;
-        Wed, 28 Oct 2020 05:34:38 -0700 (PDT)
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc:     Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/4] crypto: ccree: re-introduce ccree eboiv support
-Date:   Wed, 28 Oct 2020 14:34:19 +0200
-Message-Id: <20201028123420.30623-5-gilad@benyossef.com>
+        Wed, 28 Oct 2020 22:01:17 -0400
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:7378 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727860AbgJ1Vte (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Oct 2020 17:49:34 -0400
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09SEo9b2016957;
+        Wed, 28 Oct 2020 07:51:01 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=pfpt0220;
+ bh=WYIPc+mZEl1wnC4lFX/q5K0azbyOC/eMDopX7eznjsY=;
+ b=IjwVf/XvAf2L/1AML0pC/L569pzmdkpeD61KO1vN2/pGfbjHXGJTE7vpnq3OtsZSYkAu
+ bMAFqFuupcyKbYc6lyIRQh/NvKCMHHkhPhTv+kCB+HONpmbFvPlL2bOlbeLMA2rIhaXc
+ stnvHIyD8yFwdDMNNX+8aMFsyJWpmM2Hdw2qm2tI//nbUJmOeK88sMUKFFs97SDM1ZYQ
+ 0axx8/ZSmCwgebI6sl/8lhYceV1H4NADIGSAuUddjloK1zF1bf83Y8h/+GAMvqINjKWC
+ uiRNx/mNAxquHPCswZ5geRfkLyN7l9/sPvg3v23p9VwW2GPzC2iKczdih/Ppv6Mgp7WE LQ== 
+Received: from sc-exch01.marvell.com ([199.233.58.181])
+        by mx0a-0016f401.pphosted.com with ESMTP id 34chmn8832-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Wed, 28 Oct 2020 07:51:00 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by SC-EXCH01.marvell.com
+ (10.93.176.81) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 28 Oct
+ 2020 07:51:00 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 28 Oct
+ 2020 07:50:59 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Wed, 28 Oct 2020 07:50:59 -0700
+Received: from hyd1schalla-dt.marvell.com (hyd1schalla-dt.marvell.com [10.29.8.39])
+        by maili.marvell.com (Postfix) with ESMTP id B25713F7041;
+        Wed, 28 Oct 2020 07:50:55 -0700 (PDT)
+From:   Srujana Challa <schalla@marvell.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <kuba@kernel.org>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <schandran@marvell.com>,
+        <pathreya@marvell.com>, Srujana Challa <schalla@marvell.com>
+Subject: [PATCH v8,net-next,01/12] octeontx2-pf: move lmt flush to include/linux/soc
+Date:   Wed, 28 Oct 2020 20:20:04 +0530
+Message-ID: <20201028145015.19212-2-schalla@marvell.com>
 X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201028123420.30623-1-gilad@benyossef.com>
-References: <20201028123420.30623-1-gilad@benyossef.com>
+In-Reply-To: <20201028145015.19212-1-schalla@marvell.com>
+References: <20201028145015.19212-1-schalla@marvell.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-10-28_07:2020-10-28,2020-10-28 signatures=0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-BitLocker eboiv support, which was removed in
-commit 1d8b41ff6991 ("crypto: ccree - remove bitlocker cipher")
-is reintroduced based on the crypto API new support for
-eboiv.
+On OcteonTX2 platform CPT instruction enqueue and NIX
+packet send are only possible via LMTST operations which
+uses LDEOR instruction. This patch moves lmt flush
+function from OcteonTX2 nic driver to include/linux/soc
+since it will be used by OcteonTX2 CPT and NIC driver for
+LMTST.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Fixes: 1d8b41ff6991 ("crypto: ccree - remove bitlocker cipher")
+Signed-off-by: Suheil Chandran <schandran@marvell.com>
+Signed-off-by: Srujana Challa <schalla@marvell.com>
 ---
- drivers/crypto/ccree/cc_cipher.c     | 132 +++++++++++++++++++--------
- drivers/crypto/ccree/cc_crypto_ctx.h |   1 +
- 2 files changed, 96 insertions(+), 37 deletions(-)
+ MAINTAINERS                                   |  2 ++
+ .../marvell/octeontx2/nic/otx2_common.h       | 13 +--------
+ include/linux/soc/marvell/octeontx2/asm.h     | 29 +++++++++++++++++++
+ 3 files changed, 32 insertions(+), 12 deletions(-)
+ create mode 100644 include/linux/soc/marvell/octeontx2/asm.h
 
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index dafa6577a845..a13ae60189ed 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -74,10 +74,14 @@ static int validate_keys_sizes(struct cc_cipher_ctx *ctx_p, u32 size)
- 	case S_DIN_to_AES:
- 		switch (size) {
- 		case CC_AES_128_BIT_KEY_SIZE:
--		case CC_AES_192_BIT_KEY_SIZE:
- 			if (ctx_p->cipher_mode != DRV_CIPHER_XTS)
- 				return 0;
- 			break;
-+		case CC_AES_192_BIT_KEY_SIZE:
-+			if (ctx_p->cipher_mode != DRV_CIPHER_XTS &&
-+			    ctx_p->cipher_mode != DRV_CIPHER_BITLOCKER)
-+				return 0;
-+			break;
- 		case CC_AES_256_BIT_KEY_SIZE:
- 			return 0;
- 		case (CC_AES_192_BIT_KEY_SIZE * 2):
-@@ -120,6 +124,7 @@ static int validate_data_size(struct cc_cipher_ctx *ctx_p,
- 		case DRV_CIPHER_ECB:
- 		case DRV_CIPHER_CBC:
- 		case DRV_CIPHER_ESSIV:
-+		case DRV_CIPHER_BITLOCKER:
- 			if (IS_ALIGNED(size, AES_BLOCK_SIZE))
- 				return 0;
- 			break;
-@@ -345,7 +350,8 @@ static int cc_cipher_sethkey(struct crypto_skcipher *sktfm, const u8 *key,
- 		}
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f281f8077de0..bfb7f3e45d33 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10476,6 +10476,7 @@ M:	Srujana Challa <schalla@marvell.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+ F:	drivers/crypto/marvell/
++F:	include/linux/soc/marvell/octeontx2/
  
- 		if (ctx_p->cipher_mode == DRV_CIPHER_XTS ||
--		    ctx_p->cipher_mode == DRV_CIPHER_ESSIV) {
-+		    ctx_p->cipher_mode == DRV_CIPHER_ESSIV ||
-+		    ctx_p->cipher_mode == DRV_CIPHER_BITLOCKER) {
- 			if (hki.hw_key1 == hki.hw_key2) {
- 				dev_err(dev, "Illegal hw key numbers (%d,%d)\n",
- 					hki.hw_key1, hki.hw_key2);
-@@ -543,6 +549,7 @@ static void cc_setup_readiv_desc(struct crypto_tfm *tfm,
- 		break;
- 	case DRV_CIPHER_XTS:
- 	case DRV_CIPHER_ESSIV:
-+	case DRV_CIPHER_BITLOCKER:
- 		/*  IV */
- 		hw_desc_init(&desc[*seq_size]);
- 		set_setup_mode(&desc[*seq_size], SETUP_WRITE_STATE1);
-@@ -597,6 +604,7 @@ static void cc_setup_state_desc(struct crypto_tfm *tfm,
- 		break;
- 	case DRV_CIPHER_XTS:
- 	case DRV_CIPHER_ESSIV:
-+	case DRV_CIPHER_BITLOCKER:
- 		break;
- 	default:
- 		dev_err(dev, "Unsupported cipher mode (%d)\n", cipher_mode);
-@@ -616,56 +624,70 @@ static void cc_setup_xex_state_desc(struct crypto_tfm *tfm,
- 	int flow_mode = ctx_p->flow_mode;
- 	int direction = req_ctx->gen_ctx.op_type;
- 	dma_addr_t key_dma_addr = ctx_p->user.key_dma_addr;
--	unsigned int key_len = (ctx_p->keylen / 2);
- 	dma_addr_t iv_dma_addr = req_ctx->gen_ctx.iv_dma_addr;
--	unsigned int key_offset = key_len;
-+	unsigned int key_len;
-+	unsigned int key_offset;
+ MARVELL GIGABIT ETHERNET DRIVERS (skge/sky2)
+ M:	Mirko Lindner <mlindner@marvell.com>
+@@ -10548,6 +10549,7 @@ M:	hariprasad <hkelam@marvell.com>
+ L:	netdev@vger.kernel.org
+ S:	Supported
+ F:	drivers/net/ethernet/marvell/octeontx2/nic/
++F:	include/linux/soc/marvell/octeontx2/
  
- 	switch (cipher_mode) {
- 	case DRV_CIPHER_ECB:
--		break;
- 	case DRV_CIPHER_CBC:
- 	case DRV_CIPHER_CBC_CTS:
- 	case DRV_CIPHER_CTR:
- 	case DRV_CIPHER_OFB:
--		break;
--	case DRV_CIPHER_XTS:
--	case DRV_CIPHER_ESSIV:
-+		/* No secondary key for these ciphers, so just return */
-+		return;
+ MARVELL OCTEONTX2 RVU ADMIN FUNCTION DRIVER
+ M:	Sunil Goutham <sgoutham@marvell.com>
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index d6253f2a414d..2e8288445dcb 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -16,6 +16,7 @@
+ #include <linux/net_tstamp.h>
+ #include <linux/ptp_clock_kernel.h>
+ #include <linux/timecounter.h>
++#include <linux/soc/marvell/octeontx2/asm.h>
  
--		if (cipher_mode == DRV_CIPHER_ESSIV)
--			key_len = SHA256_DIGEST_SIZE;
-+	case DRV_CIPHER_XTS:
-+		/* Secondary key is same size as primary key and stored after primary key */
-+		key_len = ctx_p->keylen / 2;
-+		key_offset = key_len;
-+		break;
- 
--		/* load XEX key */
--		hw_desc_init(&desc[*seq_size]);
--		set_cipher_mode(&desc[*seq_size], cipher_mode);
--		set_cipher_config0(&desc[*seq_size], direction);
--		if (cc_key_type(tfm) == CC_HW_PROTECTED_KEY) {
--			set_hw_crypto_key(&desc[*seq_size],
--					  ctx_p->hw.key2_slot);
--		} else {
--			set_din_type(&desc[*seq_size], DMA_DLLI,
--				     (key_dma_addr + key_offset),
--				     key_len, NS_BIT);
--		}
--		set_xex_data_unit_size(&desc[*seq_size], nbytes);
--		set_flow_mode(&desc[*seq_size], S_DIN_to_AES2);
--		set_key_size_aes(&desc[*seq_size], key_len);
--		set_setup_mode(&desc[*seq_size], SETUP_LOAD_XEX_KEY);
--		(*seq_size)++;
-+	case DRV_CIPHER_ESSIV:
-+		/* Secondary key is a digest of primary key and stored after primary key */
-+		key_len = SHA256_DIGEST_SIZE;
-+		key_offset = ctx_p->keylen / 2;
-+		break;
- 
--		/* Load IV */
--		hw_desc_init(&desc[*seq_size]);
--		set_setup_mode(&desc[*seq_size], SETUP_LOAD_STATE1);
--		set_cipher_mode(&desc[*seq_size], cipher_mode);
--		set_cipher_config0(&desc[*seq_size], direction);
--		set_key_size_aes(&desc[*seq_size], key_len);
--		set_flow_mode(&desc[*seq_size], flow_mode);
--		set_din_type(&desc[*seq_size], DMA_DLLI, iv_dma_addr,
--			     CC_AES_BLOCK_SIZE, NS_BIT);
--		(*seq_size)++;
-+	case DRV_CIPHER_BITLOCKER:
-+		/* Secondary key is same as primary key */
-+		key_len = ctx_p->keylen;
-+		key_offset = 0;
- 		break;
-+
- 	default:
-+		/* This should never really happen */
- 		dev_err(dev, "Unsupported cipher mode (%d)\n", cipher_mode);
-+		return;
-+	}
-+
-+	/* load XEX key */
-+	hw_desc_init(&desc[*seq_size]);
-+	set_cipher_mode(&desc[*seq_size], cipher_mode);
-+	set_cipher_config0(&desc[*seq_size], direction);
-+	if (cc_key_type(tfm) == CC_HW_PROTECTED_KEY) {
-+		set_hw_crypto_key(&desc[*seq_size],
-+				  ctx_p->hw.key2_slot);
-+	} else {
-+		set_din_type(&desc[*seq_size], DMA_DLLI,
-+			     (key_dma_addr + key_offset),
-+			     key_len, NS_BIT);
- 	}
-+	set_xex_data_unit_size(&desc[*seq_size], nbytes);
-+	set_flow_mode(&desc[*seq_size], S_DIN_to_AES2);
-+	set_key_size_aes(&desc[*seq_size], key_len);
-+	set_setup_mode(&desc[*seq_size], SETUP_LOAD_XEX_KEY);
-+	(*seq_size)++;
-+
-+	/* Load IV */
-+	hw_desc_init(&desc[*seq_size]);
-+	set_setup_mode(&desc[*seq_size], SETUP_LOAD_STATE1);
-+	set_cipher_mode(&desc[*seq_size], cipher_mode);
-+	set_cipher_config0(&desc[*seq_size], direction);
-+	set_key_size_aes(&desc[*seq_size], key_len);
-+	set_flow_mode(&desc[*seq_size], flow_mode);
-+	set_din_type(&desc[*seq_size], DMA_DLLI, iv_dma_addr, CC_AES_BLOCK_SIZE, NS_BIT);
-+	(*seq_size)++;
+ #include <mbox.h>
+ #include "otx2_reg.h"
+@@ -421,21 +422,9 @@ static inline u64 otx2_atomic64_add(u64 incr, u64 *ptr)
+ 	return result;
  }
  
- static int cc_out_flow_mode(struct cc_cipher_ctx *ctx_p)
-@@ -702,6 +724,7 @@ static void cc_setup_key_desc(struct crypto_tfm *tfm,
- 	case DRV_CIPHER_CTR:
- 	case DRV_CIPHER_OFB:
- 	case DRV_CIPHER_ECB:
-+	case DRV_CIPHER_BITLOCKER:
- 		/* Load key */
- 		hw_desc_init(&desc[*seq_size]);
- 		set_cipher_mode(&desc[*seq_size], cipher_mode);
-@@ -1040,6 +1063,24 @@ static const struct cc_alg_template skcipher_algs[] = {
- 		.std_body = CC_STD_NIST,
- 		.sec_func = true,
- 	},
-+	{
-+		.name = "eboiv(cbc(paes))",
-+		.driver_name = "eboiv-cbc-paes-ccree",
-+		.blocksize = AES_BLOCK_SIZE,
-+		.template_skcipher = {
-+			.setkey = cc_cipher_sethkey,
-+			.encrypt = cc_cipher_encrypt,
-+			.decrypt = cc_cipher_decrypt,
-+			.min_keysize = CC_HW_KEY_SIZE,
-+			.max_keysize = CC_HW_KEY_SIZE,
-+			.ivsize = AES_BLOCK_SIZE,
-+			},
-+		.cipher_mode = DRV_CIPHER_BITLOCKER,
-+		.flow_mode = S_DIN_to_AES,
-+		.min_hw_rev = CC_HW_REV_712,
-+		.std_body = CC_STD_NIST,
-+		.sec_func = true,
-+	},
- 	{
- 		.name = "ecb(paes)",
- 		.driver_name = "ecb-paes-ccree",
-@@ -1168,6 +1209,23 @@ static const struct cc_alg_template skcipher_algs[] = {
- 		.min_hw_rev = CC_HW_REV_712,
- 		.std_body = CC_STD_NIST,
- 	},
-+	{
-+		.name = "eboiv(cbc(aes))",
-+		.driver_name = "eboiv-cbc-aes-ccree",
-+		.blocksize = AES_BLOCK_SIZE,
-+		.template_skcipher = {
-+			.setkey = cc_cipher_setkey,
-+			.encrypt = cc_cipher_encrypt,
-+			.decrypt = cc_cipher_decrypt,
-+			.min_keysize = AES_MIN_KEY_SIZE,
-+			.max_keysize = AES_MAX_KEY_SIZE,
-+			.ivsize = AES_BLOCK_SIZE,
-+			},
-+		.cipher_mode = DRV_CIPHER_BITLOCKER,
-+		.flow_mode = S_DIN_to_AES,
-+		.min_hw_rev = CC_HW_REV_712,
-+		.std_body = CC_STD_NIST,
-+	},
- 	{
- 		.name = "ecb(aes)",
- 		.driver_name = "ecb-aes-ccree",
-diff --git a/drivers/crypto/ccree/cc_crypto_ctx.h b/drivers/crypto/ccree/cc_crypto_ctx.h
-index bd9a1c0896b3..ccf960a0d989 100644
---- a/drivers/crypto/ccree/cc_crypto_ctx.h
-+++ b/drivers/crypto/ccree/cc_crypto_ctx.h
-@@ -108,6 +108,7 @@ enum drv_cipher_mode {
- 	DRV_CIPHER_CBC_CTS = 11,
- 	DRV_CIPHER_GCTR = 12,
- 	DRV_CIPHER_ESSIV = 13,
-+	DRV_CIPHER_BITLOCKER = 14,
- 	DRV_CIPHER_RESERVE32B = S32_MAX
- };
+-static inline u64 otx2_lmt_flush(uint64_t addr)
+-{
+-	u64 result = 0;
+-
+-	__asm__ volatile(".cpu  generic+lse\n"
+-			 "ldeor xzr,%x[rf],[%[rs]]"
+-			 : [rf]"=r"(result)
+-			 : [rs]"r"(addr));
+-	return result;
+-}
+-
+ #else
+ #define otx2_write128(lo, hi, addr)
+ #define otx2_atomic64_add(incr, ptr)		({ *ptr += incr; })
+-#define otx2_lmt_flush(addr)			({ 0; })
+ #endif
  
+ /* Alloc pointer from pool/aura */
+diff --git a/include/linux/soc/marvell/octeontx2/asm.h b/include/linux/soc/marvell/octeontx2/asm.h
+new file mode 100644
+index 000000000000..ae2279fe830a
+--- /dev/null
++++ b/include/linux/soc/marvell/octeontx2/asm.h
+@@ -0,0 +1,29 @@
++/* SPDX-License-Identifier: GPL-2.0-only
++ * Copyright (C) 2020 Marvell.
++ */
++
++#ifndef __SOC_OTX2_ASM_H
++#define __SOC_OTX2_ASM_H
++
++#if defined(CONFIG_ARM64)
++/*
++ * otx2_lmt_flush is used for LMT store operation.
++ * On octeontx2 platform CPT instruction enqueue and
++ * NIX packet send are only possible via LMTST
++ * operations and it uses LDEOR instruction targeting
++ * the coprocessor address.
++ */
++#define otx2_lmt_flush(ioaddr)                          \
++({                                                      \
++	u64 result = 0;                                 \
++	__asm__ volatile(".cpu  generic+lse\n"          \
++			 "ldeor xzr, %x[rf], [%[rs]]"   \
++			 : [rf]"=r" (result)            \
++			 : [rs]"r" (ioaddr));           \
++	(result);                                       \
++})
++#else
++#define otx2_lmt_flush(ioaddr)          ({ 0; })
++#endif
++
++#endif /* __SOC_OTX2_ASM_H */
 -- 
 2.28.0
 
