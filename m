@@ -2,85 +2,183 @@ Return-Path: <SRS0=zC9F=ED=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC9AC56201
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 22:15:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51C9DC388F7
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 22:35:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B81624171
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 22:15:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0767C20714
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 22:35:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="CGnkb+/t"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731301AbgJ1WPR (ORCPT
+        id S2388236AbgJ1Wfm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Oct 2020 18:15:17 -0400
-Received: from kvm5.telegraphics.com.au ([98.124.60.144]:51986 "EHLO
-        kvm5.telegraphics.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731268AbgJ1WPG (ORCPT
+        Wed, 28 Oct 2020 18:35:42 -0400
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:23384 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2387882AbgJ1Wek (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Oct 2020 18:15:06 -0400
-Received: from localhost (localhost.localdomain [127.0.0.1])
-        by kvm5.telegraphics.com.au (Postfix) with ESMTP id A654929A58;
-        Tue, 27 Oct 2020 23:26:19 -0400 (EDT)
-Date:   Wed, 28 Oct 2020 14:26:12 +1100 (AEDT)
-From:   Finn Thain <fthain@telegraphics.com.au>
-To:     Tom Rix <trix@redhat.com>
-cc:     linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com,
-        linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        qat-linux@intel.com, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-iio@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-mmc@vger.kernel.org,
-        netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
-        linux-amlogic@lists.infradead.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-rtc@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-aspeed@lists.ozlabs.org, linux-samsung-soc@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org,
-        linux-rpi-kernel@lists.infradead.org, linux-tegra@vger.kernel.org
-Subject: Re: [RFC] clang tooling cleanups
-In-Reply-To: <20201027164255.1573301-1-trix@redhat.com>
-Message-ID: <alpine.LNX.2.23.453.2010281344120.31@nippy.intranet>
-References: <20201027164255.1573301-1-trix@redhat.com>
+        Wed, 28 Oct 2020 18:34:40 -0400
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09SEoAuD016998;
+        Wed, 28 Oct 2020 07:50:51 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=fVYmNaJZQA3SnI/meXy/Sd+T2HsGf5+owPmULrrRHSg=;
+ b=CGnkb+/td+s5PUOMauj3JTwMXZ2RgK/b6WOWQIbZ0UIQabdW6q8detMz3e2WVQynf9K5
+ cxWY5S6+qj+pNdl6aj8uxOVEfeZR3FuaHGqRRJhq4silbRLQQkFS/brj19368DhyiNZO
+ HAvEob814FUTk/dNW/eazLbVz3Q3D0Ryjh77jR7oR1S5b5hzhdvQTJppSRmteAk7xTVO
+ U007ik44B1vJdEgrwl5luWjLyP34mngp8SZulyrERW6Z5VI/eT1deL0+NdW6PxAnbTyO
+ U2Jp2F8PeO5QaGOVDtMBp3yJrWbk2bttwCvYcngxcny25rNjpHnhfOrXNg6jl1/Y7hpF Hg== 
+Received: from sc-exch02.marvell.com ([199.233.58.182])
+        by mx0a-0016f401.pphosted.com with ESMTP id 34chmn8823-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Wed, 28 Oct 2020 07:50:51 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by SC-EXCH02.marvell.com
+ (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 28 Oct
+ 2020 07:50:50 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Wed, 28 Oct 2020 07:50:50 -0700
+Received: from hyd1schalla-dt.marvell.com (hyd1schalla-dt.marvell.com [10.29.8.39])
+        by maili.marvell.com (Postfix) with ESMTP id 141893F703F;
+        Wed, 28 Oct 2020 07:50:46 -0700 (PDT)
+From:   Srujana Challa <schalla@marvell.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <kuba@kernel.org>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <schandran@marvell.com>,
+        <pathreya@marvell.com>, Srujana Challa <schalla@marvell.com>
+Subject: [PATCH v8,net-next,00/12] Add Support for Marvell OcteonTX2
+Date:   Wed, 28 Oct 2020 20:20:03 +0530
+Message-ID: <20201028145015.19212-1-schalla@marvell.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-10-28_07:2020-10-28,2020-10-28 signatures=0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+This series introduces crypto(CPT) drivers(PF & VF) for Marvell OcteonTX2
+CN96XX Soc.
 
-On Tue, 27 Oct 2020, trix@redhat.com wrote:
+OcteonTX2 SOC's resource virtualization unit (RVU) supports multiple
+physical and virtual functions. Each of the PF/VF's functionality is
+determined by what kind of resources are attached to it. When the CPT
+block is attached to a VF, it can function as a security device.
+The following document provides an overview of the hardware and
+different drivers for the OcteonTX2 SOC: 
+https://www.kernel.org/doc/Documentation/networking/device_drivers/marvell/octeontx2.rst
 
-> This rfc will describe
-> An upcoming treewide cleanup.
-> How clang tooling was used to programatically do the clean up.
-> Solicit opinions on how to generally use clang tooling.
-> 
+The CPT PF driver is responsible for:
+- Forwarding messages to/from VFs from/to admin function(AF),
+- Enabling/disabling VFs,
+- Loading/unloading microcode (creation/deletion of engine groups).
 
-This tooling is very impressive. It makes possible an idea that I had a 
-while ago, to help make code review more efficient. It works like this. 
+The CPT VF driver works as a crypto offload device.
 
-Suppose a patch, p, is the difference between the new tree, n, and the old 
-tree, o. That is, p = n - o.
+This patch series includes:
+- Patch to update existing Marvell sources to support the CPT driver.
+- Patch that adds mailbox messages to the admin function (AF) driver,
+to configure CPT HW registers.
+- CPT PF driver patches that include AF<=>PF<=>VF mailbox communication,
+sriov_configure, and firmware load to the acceleration engines.
+- CPT VF driver patches that include VF<=>PF mailbox communication and
+crypto offload support through the kernel cryptographic API.
 
-Now let clang-tidy be the transformation 't'. This gets you a much more 
-readable patch submission, P = t(n) - t(o).
+This series is tested with CRYPTO_EXTRA_TESTS enabled and
+CRYPTO_DISABLE_TESTS disabled.
 
-The only difficulty is that, if I submit P intead of p then 'git am' will 
-probably reject it. This is solved by a little tooling around git, such 
-that, should a patch P fail to apply, the relevant files are automatically 
-reformatted with the officially endorsed transformation t, to generate a 
-minimal cleanup patch, such that P can be automatically applied on top.
+Changes since v7:
+ * Removed writable entries in debugfs.
+ * Dropped IPsec support.
+Changes since v6:
+ * Removed driver version.
+Changes since v4:
+ * Rebased the patches onto net-next tree with base
+   'commit bc081a693a56 ("Merge branch 'Offload-tc-vlan-mangle-to-mscc_ocelot-switch'")' 
+Changes since v3:
+ * Splitup the patches into smaller patches with more informartion.
+Changes since v2:
+ * Fixed C=1 warnings.
+ * Added code to exit CPT VF driver gracefully.
+ * Moved OcteonTx2 asm code to a header file under include/linux/soc/
+Changes since v1:
+ * Moved Makefile changes from patch4 to patch2 and patch3.
 
-If the patch submission process required* that every patch submission was 
-generated like P and not like p, it would immediately eliminate all 
-clean-up patches from the workload of all reviewers, and also make the 
-reviewers' job easier because all submissions are now formatted correctly, 
-and also avoid time lost to round-trips, such as, "you can have a 
-reviewed-by if you respin to fix some minor style issues".
+Srujana Challa (12):
+  octeontx2-pf: move lmt flush to include/linux/soc
+  octeontx2-af: add mailbox interface for CPT
+  octeontx2-af: add debugfs entries for CPT block
+  drivers: crypto: add Marvell OcteonTX2 CPT PF driver
+  crypto: octeontx2: add mailbox communication with AF
+  crypto: octeontx2: enable SR-IOV and mailbox communication with VF
+  crypto: octeontx2: load microcode and create engine groups
+  crypto: octeontx2: add LF framework
+  crypto: octeontx2: add support to get engine capabilities
+  crypto: octeontx2: add virtual function driver support
+  crypto: octeontx2: add support to process the crypto request
+  crypto: octeontx2: register with linux crypto framework
 
-* Enforcing this, e.g. with checkpatch, is slightly more complicated, but 
-it works the same way: generate a minimal cleanup patch for the relevant 
-files, apply the patch-to-be-submitted, and finally confirm that the 
-modified files are unchanged under t.
+ MAINTAINERS                                   |    2 +
+ drivers/crypto/marvell/Kconfig                |   14 +
+ drivers/crypto/marvell/Makefile               |    1 +
+ drivers/crypto/marvell/octeontx2/Makefile     |   10 +
+ .../marvell/octeontx2/otx2_cpt_common.h       |  123 ++
+ .../marvell/octeontx2/otx2_cpt_hw_types.h     |  464 +++++
+ .../marvell/octeontx2/otx2_cpt_mbox_common.c  |  202 ++
+ .../marvell/octeontx2/otx2_cpt_reqmgr.h       |  197 ++
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.c |  426 +++++
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.h |  351 ++++
+ drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   52 +
+ .../marvell/octeontx2/otx2_cptpf_main.c       |  570 ++++++
+ .../marvell/octeontx2/otx2_cptpf_mbox.c       |  331 ++++
+ .../marvell/octeontx2/otx2_cptpf_ucode.c      | 1533 +++++++++++++++
+ .../marvell/octeontx2/otx2_cptpf_ucode.h      |  162 ++
+ drivers/crypto/marvell/octeontx2/otx2_cptvf.h |   28 +
+ .../marvell/octeontx2/otx2_cptvf_algs.c       | 1665 +++++++++++++++++
+ .../marvell/octeontx2/otx2_cptvf_algs.h       |  170 ++
+ .../marvell/octeontx2/otx2_cptvf_main.c       |  401 ++++
+ .../marvell/octeontx2/otx2_cptvf_mbox.c       |  139 ++
+ .../marvell/octeontx2/otx2_cptvf_reqmgr.c     |  539 ++++++
+ .../ethernet/marvell/octeontx2/af/Makefile    |    3 +-
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   33 +
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   |    2 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |    2 +
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  229 +++
+ .../marvell/octeontx2/af/rvu_debugfs.c        |  304 +++
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   63 +-
+ .../marvell/octeontx2/nic/otx2_common.h       |   13 +-
+ include/linux/soc/marvell/octeontx2/asm.h     |   29 +
+ 30 files changed, 8038 insertions(+), 20 deletions(-)
+ create mode 100644 drivers/crypto/marvell/octeontx2/Makefile
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptlf.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptlf.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+ create mode 100644 include/linux/soc/marvell/octeontx2/asm.h
+
+-- 
+2.28.0
+
