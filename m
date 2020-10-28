@@ -2,100 +2,85 @@ Return-Path: <SRS0=zC9F=ED=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 772A2C388F7
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 21:59:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC9AC56201
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 22:15:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 281022475A
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 21:59:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B81624171
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 22:15:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729328AbgJ1V7c (ORCPT
+        id S1731301AbgJ1WPR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Oct 2020 17:59:32 -0400
-Received: from inva020.nxp.com ([92.121.34.13]:39076 "EHLO inva020.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729318AbgJ1V7b (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Oct 2020 17:59:31 -0400
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id B32D61A14E2;
-        Wed, 28 Oct 2020 10:03:44 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id A55851A14F4;
-        Wed, 28 Oct 2020 10:03:44 +0100 (CET)
-Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 4D4C92030E;
-        Wed, 28 Oct 2020 10:03:44 +0100 (CET)
-From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Russell King <linux@armlinux.org.uk>,
-        Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        NXP Linux Team <linux-imx@nxp.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: arm/aes-neonbs - fix usage of cbc(aes) fallback
-Date:   Wed, 28 Oct 2020 11:03:20 +0200
-Message-Id: <20201028090320.4222-1-horia.geanta@nxp.com>
-X-Mailer: git-send-email 2.17.1
+        Wed, 28 Oct 2020 18:15:17 -0400
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:51986 "EHLO
+        kvm5.telegraphics.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731268AbgJ1WPG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Oct 2020 18:15:06 -0400
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by kvm5.telegraphics.com.au (Postfix) with ESMTP id A654929A58;
+        Tue, 27 Oct 2020 23:26:19 -0400 (EDT)
+Date:   Wed, 28 Oct 2020 14:26:12 +1100 (AEDT)
+From:   Finn Thain <fthain@telegraphics.com.au>
+To:     Tom Rix <trix@redhat.com>
+cc:     linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com,
+        linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        qat-linux@intel.com, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-iio@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-mmc@vger.kernel.org,
+        netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        linux-amlogic@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-rtc@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-aspeed@lists.ozlabs.org, linux-samsung-soc@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org,
+        linux-rpi-kernel@lists.infradead.org, linux-tegra@vger.kernel.org
+Subject: Re: [RFC] clang tooling cleanups
+In-Reply-To: <20201027164255.1573301-1-trix@redhat.com>
+Message-ID: <alpine.LNX.2.23.453.2010281344120.31@nippy.intranet>
+References: <20201027164255.1573301-1-trix@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Loading the module deadlocks since:
--local cbc(aes) implementation needs a fallback and
--crypto API tries to find one but the request_module() resolves back to
-the same module
 
-Fix this by changing the module alias for cbc(aes) and
-using the NEED_FALLBACK flag when requesting for a fallback algorithm.
+On Tue, 27 Oct 2020, trix@redhat.com wrote:
 
-Fixes: 00b99ad2bac2 ("crypto: arm/aes-neonbs - Use generic cbc encryption path")
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- arch/arm/crypto/aes-neonbs-glue.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+> This rfc will describe
+> An upcoming treewide cleanup.
+> How clang tooling was used to programatically do the clean up.
+> Solicit opinions on how to generally use clang tooling.
+> 
 
-diff --git a/arch/arm/crypto/aes-neonbs-glue.c b/arch/arm/crypto/aes-neonbs-glue.c
-index bda8bf17631e..f70af1d0514b 100644
---- a/arch/arm/crypto/aes-neonbs-glue.c
-+++ b/arch/arm/crypto/aes-neonbs-glue.c
-@@ -19,7 +19,7 @@ MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
- MODULE_LICENSE("GPL v2");
- 
- MODULE_ALIAS_CRYPTO("ecb(aes)");
--MODULE_ALIAS_CRYPTO("cbc(aes)");
-+MODULE_ALIAS_CRYPTO("cbc(aes)-all");
- MODULE_ALIAS_CRYPTO("ctr(aes)");
- MODULE_ALIAS_CRYPTO("xts(aes)");
- 
-@@ -191,7 +191,8 @@ static int cbc_init(struct crypto_skcipher *tfm)
- 	struct aesbs_cbc_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	unsigned int reqsize;
- 
--	ctx->enc_tfm = crypto_alloc_skcipher("cbc(aes)", 0, CRYPTO_ALG_ASYNC);
-+	ctx->enc_tfm = crypto_alloc_skcipher("cbc(aes)", 0, CRYPTO_ALG_ASYNC |
-+					     CRYPTO_ALG_NEED_FALLBACK);
- 	if (IS_ERR(ctx->enc_tfm))
- 		return PTR_ERR(ctx->enc_tfm);
- 
-@@ -441,7 +442,8 @@ static struct skcipher_alg aes_algs[] = { {
- 	.base.cra_blocksize	= AES_BLOCK_SIZE,
- 	.base.cra_ctxsize	= sizeof(struct aesbs_cbc_ctx),
- 	.base.cra_module	= THIS_MODULE,
--	.base.cra_flags		= CRYPTO_ALG_INTERNAL,
-+	.base.cra_flags		= CRYPTO_ALG_INTERNAL |
-+				  CRYPTO_ALG_NEED_FALLBACK,
- 
- 	.min_keysize		= AES_MIN_KEY_SIZE,
- 	.max_keysize		= AES_MAX_KEY_SIZE,
--- 
-2.17.1
+This tooling is very impressive. It makes possible an idea that I had a 
+while ago, to help make code review more efficient. It works like this. 
 
+Suppose a patch, p, is the difference between the new tree, n, and the old 
+tree, o. That is, p = n - o.
+
+Now let clang-tidy be the transformation 't'. This gets you a much more 
+readable patch submission, P = t(n) - t(o).
+
+The only difficulty is that, if I submit P intead of p then 'git am' will 
+probably reject it. This is solved by a little tooling around git, such 
+that, should a patch P fail to apply, the relevant files are automatically 
+reformatted with the officially endorsed transformation t, to generate a 
+minimal cleanup patch, such that P can be automatically applied on top.
+
+If the patch submission process required* that every patch submission was 
+generated like P and not like p, it would immediately eliminate all 
+clean-up patches from the workload of all reviewers, and also make the 
+reviewers' job easier because all submissions are now formatted correctly, 
+and also avoid time lost to round-trips, such as, "you can have a 
+reviewed-by if you respin to fix some minor style issues".
+
+* Enforcing this, e.g. with checkpatch, is slightly more complicated, but 
+it works the same way: generate a minimal cleanup patch for the relevant 
+files, apply the patch-to-be-submitted, and finally confirm that the 
+modified files are unchanged under t.
