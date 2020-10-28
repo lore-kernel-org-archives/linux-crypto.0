@@ -2,684 +2,143 @@ Return-Path: <SRS0=zC9F=ED=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13E05C55179
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 21:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A51F3C4363A
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 21:42:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 835D024680
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 21:41:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="XSGcvy2g"
+	by mail.kernel.org (Postfix) with ESMTP id 54F6421582
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 21:42:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1603921348;
+	bh=diRpUytNGr4vcLPj80uDkTMwdSI1HzXRNGWbFmZNeE4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=oilMlGyBhajF5TBxGO8tmXp3buzZSVKSRub/9B2BZ+synCvbceq6yzFhekYq6xPk9
+	 xtYZOUkcxpMCJ0yHKKyonzJThyMgGQoeO/uH7aVy6OqmdxTC9mIjRXjdCQhmqJ2mSt
+	 n51dSW9VJaRTZewjVPo2PtjuWy95oBRcA6iYjw9M=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725840AbgJ1Vln (ORCPT
+        id S1726231AbgJ1Vm1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Oct 2020 17:41:43 -0400
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:15902 "EHLO
-        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725879AbgJ1Vlg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Oct 2020 17:41:36 -0400
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-        by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09SEpNX6026674;
-        Wed, 28 Oct 2020 07:51:28 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=0ip2TnjT9Dwby2kVulvfx09bZ6GrqHA23CyYgHcfEAI=;
- b=XSGcvy2gNqiGbqzlN3jDhUUDrfeAU5j7oTGoDIxfQQGGxO8Wk/aS7D3izbKlxK5JIwhz
- QAu8XkCGx/5lUTeRa9o5n0yNFKpBVuN1EHA/jTmLPpVYUFmTcvbbqs8XDcu60JfaNmwZ
- 3Epr+zkwjEdMFeX9EYWJLwIE5Qof0YlzZGDl9nJzTl983cgJhMCq73M+e3JfyXsxKh5C
- bLgch2jB2374iq/bfi/h/y0xeh+3SfVg43+02ZGXCJBWbSLaJwB4BTP6pOKVbejOSCNm
- ZIdK2Lezl51stWsG47x2YHnO9z+8QYrVYckvdmz041ov1/pkUKwGRZ6UnaQG01Pei7Od pQ== 
-Received: from sc-exch03.marvell.com ([199.233.58.183])
-        by mx0b-0016f401.pphosted.com with ESMTP id 34cksmfq8c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Wed, 28 Oct 2020 07:51:28 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by SC-EXCH03.marvell.com
- (10.93.176.83) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 28 Oct
- 2020 07:51:26 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 28 Oct
- 2020 07:51:25 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Wed, 28 Oct 2020 07:51:25 -0700
-Received: from hyd1schalla-dt.marvell.com (hyd1schalla-dt.marvell.com [10.29.8.39])
-        by maili.marvell.com (Postfix) with ESMTP id 1301E3F703F;
-        Wed, 28 Oct 2020 07:51:21 -0700 (PDT)
-From:   Srujana Challa <schalla@marvell.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <kuba@kernel.org>, <sgoutham@marvell.com>, <gakula@marvell.com>,
-        <sbhatta@marvell.com>, <schandran@marvell.com>,
-        <pathreya@marvell.com>, Srujana Challa <schalla@marvell.com>
-Subject: [PATCH v8,net-next,06/12] crypto: octeontx2: enable SR-IOV and mailbox communication with VF
-Date:   Wed, 28 Oct 2020 20:20:09 +0530
-Message-ID: <20201028145015.19212-7-schalla@marvell.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201028145015.19212-1-schalla@marvell.com>
-References: <20201028145015.19212-1-schalla@marvell.com>
+        Wed, 28 Oct 2020 17:42:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38178 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726110AbgJ1VmZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Oct 2020 17:42:25 -0400
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4916124804;
+        Wed, 28 Oct 2020 18:06:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1603908397;
+        bh=diRpUytNGr4vcLPj80uDkTMwdSI1HzXRNGWbFmZNeE4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=L1PUX5qJV3wrtoiw3Awx/J+kAC9EjUHUAglD5hffuzyV53Hpkp+mPkP+JXr35QK7c
+         4jcgeKlnR1Uz4YpSQXrMBKUV/1DYWtIJ6C5d2/4Y76zd20lMFTX47E16FohUOYzfWs
+         32G2AlRPxoQEZu2HTsTdMnRz/0KmfVzygY7KSfEI=
+Date:   Wed, 28 Oct 2020 19:07:28 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Torsten Duwe <duwe@lst.de>
+Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+        Willy Tarreau <w@1wt.eu>, linux-crypto@vger.kernel.org,
+        Nicolai Stange <nstange@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        And y Lavr <andy.lavr@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Petr Tesarik <ptesarik@suse.cz>, simo@redhat.com
+Subject: Re: [PATCH v36 00/13] /dev/random - a new approach
+Message-ID: <20201028180728.GA2831268@kroah.com>
+References: <20200921075857.4424-1-nstange@suse.de>
+ <2961243.vtBmWVcJkq@tauon.chronox.de>
+ <20201016172619.GA18410@lst.de>
+ <3073852.aeNJFYEL58@positron.chronox.de>
+ <20201028185117.74300988@blackhole.lan>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-10-28_07:2020-10-28,2020-10-28 signatures=0
+In-Reply-To: <20201028185117.74300988@blackhole.lan>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Adds 'sriov_configure' to enable/disable virtual functions (VFs).
-Also Initializes VF<=>PF mailbox IRQs, register handlers for
-processing these mailbox messages.
+On Wed, Oct 28, 2020 at 06:51:17PM +0100, Torsten Duwe wrote:
+> On Mon, 19 Oct 2020 21:28:50 +0200
+> Stephan Müller <smueller@chronox.de> wrote:
+> [...]
+> > * Sole use of crypto for data processing:
+> [...]
+> >  - The LRNG uses only properly defined and implemented cryptographic
+> >    algorithms unlike the use of the SHA-1 transformation in the
+> > existing /dev/random implementation.
+> > 
+> >  - Hash operations use NUMA-node-local hash instances to benefit large
+> >    parallel systems.
+> > 
+> >  - LRNG uses limited number of data post-processing steps
+> [...]
+> > * Performance
+> > 
+> >  - Faster by up to 75% in the critical code path of the interrupt
+> > handler depending on data collection size configurable at kernel
+> > compile time - the default is about equal in performance with
+> > existing /dev/random as outlined in [2] section 4.2.
+> 
+> [...]
+> >  - ChaCha20 DRNG is significantly faster as implemented in the
+> > existing /dev/random as demonstrated with [2] table 2.
+> > 
+> >  - Faster entropy collection during boot time to reach fully seeded
+> >    level, including on virtual systems or systems with SSDs as
+> > outlined in [2] section 4.1.
+> > 
+> > * Testing
+> [...]
+> 
+> So we now have 2 proposals for a state-of-the-art RNG, and over a month
+> without a single comment on-topic from any `get_maintainer.pl`
+> 
+> I don't want to emphasise the certification aspects so much. The
+> interrelation is rather that those certifications require certain code
+> features, features which are reasonable per se. But the current code is
+> lagging way behind.
+> 
+> I see the focus namely on performance, scalability, testability and
+> virtualisation. And it certainly is an advantage to use the code
+> already present under crypto, with its optimisations, and not rely
+> on some home brew.
+> 
+> Can we please have a discussion about how to proceed?
+> Ted, Greg, Arnd: which approach would you prefer?
 
-Admin function (AF) handles resource allocation and configuration for
-PFs and their VFs. PFs request the AF directly, via mailboxes.
-Unlike PFs, VFs cannot send a mailbox request directly. A VF sends
-mailbox messages to its parent PF, with which it shares a mailbox
-region. The PF then forwards these messages to the AF. After handling
-the request, the AF sends a response back to the VF, through the PF.
+Greg and Arnd are not the random driver maintainers, as is now correctly
+shown in the 5.10-rc1 MAINTAINERS file, so I doubt we (well at least I)
+have any say here, sorry.
 
-This patch adds support for this 'VF <=> PF <=> AF' mailbox
-communication.
+good luck!
 
-Signed-off-by: Suheil Chandran <schandran@marvell.com>
-Signed-off-by: Srujana Challa <schalla@marvell.com>
----
- .../marvell/octeontx2/otx2_cpt_common.h       |   1 +
- drivers/crypto/marvell/octeontx2/otx2_cptpf.h |  19 ++
- .../marvell/octeontx2/otx2_cptpf_main.c       | 287 ++++++++++++++++++
- .../marvell/octeontx2/otx2_cptpf_mbox.c       | 172 ++++++++++-
- 4 files changed, 477 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-index b677f8c7e724..277c7c7f95cf 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-@@ -14,6 +14,7 @@
- #include "rvu.h"
- #include "mbox.h"
- 
-+#define OTX2_CPT_MAX_VFS_NUM 128
- #define OTX2_CPT_RVU_FUNC_ADDR_S(blk, slot, offs) \
- 		(((blk) << 20) | ((slot) << 12) | (offs))
- 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf.h b/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
-index 87fe4c6838e5..c7c687cb091e 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
-@@ -7,19 +7,38 @@
- 
- #include "otx2_cpt_common.h"
- 
-+struct otx2_cptpf_dev;
-+struct otx2_cptvf_info {
-+	struct otx2_cptpf_dev *cptpf;	/* PF pointer this VF belongs to */
-+	struct work_struct vfpf_mbox_work;
-+	struct pci_dev *vf_dev;
-+	int vf_id;
-+	int intr_idx;
-+};
-+
- struct otx2_cptpf_dev {
- 	void __iomem *reg_base;		/* CPT PF registers start address */
- 	void __iomem *afpf_mbox_base;	/* PF-AF mbox start address */
-+	void __iomem *vfpf_mbox_base;   /* VF-PF mbox start address */
- 	struct pci_dev *pdev;		/* PCI device handle */
-+	struct otx2_cptvf_info vf[OTX2_CPT_MAX_VFS_NUM];
- 	/* AF <=> PF mbox */
- 	struct otx2_mbox	afpf_mbox;
- 	struct work_struct	afpf_mbox_work;
- 	struct workqueue_struct *afpf_mbox_wq;
- 
-+	/* VF <=> PF mbox */
-+	struct otx2_mbox	vfpf_mbox;
-+	struct workqueue_struct *vfpf_mbox_wq;
-+
- 	u8 pf_id;               /* RVU PF number */
-+	u8 max_vfs;		/* Maximum number of VFs supported by CPT */
-+	u8 enabled_vfs;		/* Number of enabled VFs */
- };
- 
- irqreturn_t otx2_cptpf_afpf_mbox_intr(int irq, void *arg);
- void otx2_cptpf_afpf_mbox_handler(struct work_struct *work);
-+irqreturn_t otx2_cptpf_vfpf_mbox_intr(int irq, void *arg);
-+void otx2_cptpf_vfpf_mbox_handler(struct work_struct *work);
- 
- #endif /* __OTX2_CPTPF_H */
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-index 5b96dbe461f2..adff12adfdd7 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-@@ -10,6 +10,232 @@
- #define OTX2_CPT_DRV_NAME    "octeontx2-cpt"
- #define OTX2_CPT_DRV_STRING  "Marvell OcteonTX2 CPT Physical Function Driver"
- 
-+static void cptpf_enable_vfpf_mbox_intr(struct otx2_cptpf_dev *cptpf,
-+					int numvfs)
-+{
-+	int ena_bits;
-+
-+	/* Clear any pending interrupts */
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+			 RVU_PF_VFPF_MBOX_INTX(0), ~0x0ULL);
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+			 RVU_PF_VFPF_MBOX_INTX(1), ~0x0ULL);
-+
-+	/* Enable VF interrupts for VFs from 0 to 63 */
-+	ena_bits = ((numvfs - 1) % 64);
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+			 RVU_PF_VFPF_MBOX_INT_ENA_W1SX(0),
-+			 GENMASK_ULL(ena_bits, 0));
-+
-+	if (numvfs > 64) {
-+		/* Enable VF interrupts for VFs from 64 to 127 */
-+		ena_bits = numvfs - 64 - 1;
-+		otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+				RVU_PF_VFPF_MBOX_INT_ENA_W1SX(1),
-+				GENMASK_ULL(ena_bits, 0));
-+	}
-+}
-+
-+static void cptpf_disable_vfpf_mbox_intr(struct otx2_cptpf_dev *cptpf,
-+					 int numvfs)
-+{
-+	int vector;
-+
-+	/* Disable VF-PF interrupts */
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+			 RVU_PF_VFPF_MBOX_INT_ENA_W1CX(0), ~0ULL);
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+			 RVU_PF_VFPF_MBOX_INT_ENA_W1CX(1), ~0ULL);
-+	/* Clear any pending interrupts */
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+			 RVU_PF_VFPF_MBOX_INTX(0), ~0ULL);
-+
-+	vector = pci_irq_vector(cptpf->pdev, RVU_PF_INT_VEC_VFPF_MBOX0);
-+	free_irq(vector, cptpf);
-+
-+	if (numvfs > 64) {
-+		otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+				 RVU_PF_VFPF_MBOX_INTX(1), ~0ULL);
-+		vector = pci_irq_vector(cptpf->pdev, RVU_PF_INT_VEC_VFPF_MBOX1);
-+		free_irq(vector, cptpf);
-+	}
-+}
-+
-+static void cptpf_enable_vf_flr_intrs(struct otx2_cptpf_dev *cptpf)
-+{
-+	/* Clear interrupt if any */
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0, RVU_PF_VFFLR_INTX(0),
-+			~0x0ULL);
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0, RVU_PF_VFFLR_INTX(1),
-+			~0x0ULL);
-+
-+	/* Enable VF FLR interrupts */
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+			 RVU_PF_VFFLR_INT_ENA_W1SX(0), ~0x0ULL);
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+			 RVU_PF_VFFLR_INT_ENA_W1SX(1), ~0x0ULL);
-+}
-+
-+static void cptpf_disable_vf_flr_intrs(struct otx2_cptpf_dev *cptpf, int numvfs)
-+{
-+	int vector;
-+
-+	/* Disable VF FLR interrupts */
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+			 RVU_PF_VFFLR_INT_ENA_W1CX(0), ~0x0ULL);
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+			 RVU_PF_VFFLR_INT_ENA_W1CX(1), ~0x0ULL);
-+
-+	/* Clear interrupt if any */
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0, RVU_PF_VFFLR_INTX(0),
-+			 ~0x0ULL);
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0, RVU_PF_VFFLR_INTX(1),
-+			 ~0x0ULL);
-+
-+	vector = pci_irq_vector(cptpf->pdev, RVU_PF_INT_VEC_VFFLR0);
-+	free_irq(vector, cptpf);
-+
-+	if (numvfs > 64) {
-+		vector = pci_irq_vector(cptpf->pdev, RVU_PF_INT_VEC_VFFLR1);
-+		free_irq(vector, cptpf);
-+	}
-+}
-+
-+static irqreturn_t cptpf_vf_flr_intr(int __always_unused irq, void *arg)
-+{
-+	struct otx2_cptpf_dev *cptpf = arg;
-+
-+	/* Clear transaction pending register */
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0, RVU_PF_VFTRPENDX(0),
-+			 ~0x0ULL);
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0, RVU_PF_VFTRPENDX(1),
-+			 ~0x0ULL);
-+
-+	/* Clear interrupt if any */
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0, RVU_PF_VFFLR_INTX(0),
-+			 ~0x0ULL);
-+	otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0, RVU_PF_VFFLR_INTX(1),
-+			 ~0x0ULL);
-+
-+	return IRQ_HANDLED;
-+}
-+
-+static void cptpf_unregister_vfpf_intr(struct otx2_cptpf_dev *cptpf, int numvfs)
-+{
-+	cptpf_disable_vfpf_mbox_intr(cptpf, numvfs);
-+	cptpf_disable_vf_flr_intrs(cptpf, numvfs);
-+}
-+
-+static int cptpf_register_vfpf_intr(struct otx2_cptpf_dev *cptpf, int numvfs)
-+{
-+	struct pci_dev *pdev = cptpf->pdev;
-+	struct device *dev = &pdev->dev;
-+	int ret, vector;
-+
-+	vector = pci_irq_vector(pdev, RVU_PF_INT_VEC_VFPF_MBOX0);
-+	/* Register VF-PF mailbox interrupt handler */
-+	ret = request_irq(vector, otx2_cptpf_vfpf_mbox_intr, 0, "CPTVFPF Mbox0",
-+			  cptpf);
-+	if (ret) {
-+		dev_err(dev,
-+			"IRQ registration failed for PFVF mbox0 irq\n");
-+		return ret;
-+	}
-+	vector = pci_irq_vector(pdev, RVU_PF_INT_VEC_VFFLR0);
-+	/* Register VF FLR interrupt handler */
-+	ret = request_irq(vector, cptpf_vf_flr_intr, 0, "CPTPF FLR0", cptpf);
-+	if (ret) {
-+		dev_err(dev,
-+			"IRQ registration failed for VFFLR0 irq\n");
-+		goto free_mbox0_irq;
-+	}
-+	if (numvfs > 64) {
-+		vector = pci_irq_vector(pdev, RVU_PF_INT_VEC_VFPF_MBOX1);
-+		ret = request_irq(vector, otx2_cptpf_vfpf_mbox_intr, 0,
-+				  "CPTVFPF Mbox1", cptpf);
-+		if (ret) {
-+			dev_err(dev,
-+				"IRQ registration failed for PFVF mbox1 irq\n");
-+			goto free_flr0_irq;
-+		}
-+		vector = pci_irq_vector(pdev, RVU_PF_INT_VEC_VFFLR1);
-+		/* Register VF FLR interrupt handler */
-+		ret = request_irq(vector, cptpf_vf_flr_intr, 0, "CPTPF FLR1",
-+				  cptpf);
-+		if (ret) {
-+			dev_err(dev,
-+				"IRQ registration failed for VFFLR1 irq\n");
-+			goto free_mbox1_irq;
-+		}
-+	}
-+	cptpf_enable_vfpf_mbox_intr(cptpf, numvfs);
-+	cptpf_enable_vf_flr_intrs(cptpf);
-+
-+	return 0;
-+
-+free_mbox1_irq:
-+	vector = pci_irq_vector(pdev, RVU_PF_INT_VEC_VFPF_MBOX1);
-+	free_irq(vector, cptpf);
-+free_flr0_irq:
-+	vector = pci_irq_vector(pdev, RVU_PF_INT_VEC_VFFLR0);
-+	free_irq(vector, cptpf);
-+free_mbox0_irq:
-+	vector = pci_irq_vector(pdev, RVU_PF_INT_VEC_VFPF_MBOX0);
-+	free_irq(vector, cptpf);
-+	return ret;
-+}
-+
-+static int cptpf_vfpf_mbox_init(struct otx2_cptpf_dev *cptpf, int numvfs)
-+{
-+	struct device *dev = &cptpf->pdev->dev;
-+	u64 vfpf_mbox_base;
-+	int err, i;
-+
-+	cptpf->vfpf_mbox_wq = alloc_workqueue("cpt_vfpf_mailbox",
-+					      WQ_UNBOUND | WQ_HIGHPRI |
-+					      WQ_MEM_RECLAIM, 1);
-+	if (!cptpf->vfpf_mbox_wq)
-+		return -ENOMEM;
-+
-+	/* Map VF-PF mailbox memory */
-+	vfpf_mbox_base = readq(cptpf->reg_base + RVU_PF_VF_BAR4_ADDR);
-+	if (!vfpf_mbox_base) {
-+		dev_err(dev, "VF-PF mailbox address not configured\n");
-+		err = -ENOMEM;
-+		goto free_wqe;
-+	}
-+	cptpf->vfpf_mbox_base = devm_ioremap_wc(dev, vfpf_mbox_base,
-+						MBOX_SIZE * cptpf->max_vfs);
-+	if (!cptpf->vfpf_mbox_base) {
-+		dev_err(dev, "Mapping of VF-PF mailbox address failed\n");
-+		err = -ENOMEM;
-+		goto free_wqe;
-+	}
-+	err = otx2_mbox_init(&cptpf->vfpf_mbox, cptpf->vfpf_mbox_base,
-+			     cptpf->pdev, cptpf->reg_base, MBOX_DIR_PFVF,
-+			     numvfs);
-+	if (err)
-+		goto free_wqe;
-+
-+	for (i = 0; i < numvfs; i++) {
-+		cptpf->vf[i].vf_id = i;
-+		cptpf->vf[i].cptpf = cptpf;
-+		cptpf->vf[i].intr_idx = i % 64;
-+		INIT_WORK(&cptpf->vf[i].vfpf_mbox_work,
-+			  otx2_cptpf_vfpf_mbox_handler);
-+	}
-+	return 0;
-+free_wqe:
-+	destroy_workqueue(cptpf->vfpf_mbox_wq);
-+	return err;
-+}
-+
-+static void cptpf_vfpf_mbox_destroy(struct otx2_cptpf_dev *cptpf)
-+{
-+	destroy_workqueue(cptpf->vfpf_mbox_wq);
-+	otx2_mbox_destroy(&cptpf->vfpf_mbox);
-+}
-+
- static void cptpf_disable_afpf_mbox_intr(struct otx2_cptpf_dev *cptpf)
- {
- 	/* Disable AF-PF interrupt */
-@@ -97,6 +323,63 @@ static int cpt_is_pf_usable(struct otx2_cptpf_dev *cptpf)
- 	return 0;
- }
- 
-+static int cptpf_sriov_disable(struct pci_dev *pdev)
-+{
-+	struct otx2_cptpf_dev *cptpf = pci_get_drvdata(pdev);
-+	int numvfs = pci_num_vf(pdev);
-+
-+	if (!numvfs)
-+		return 0;
-+
-+	pci_disable_sriov(pdev);
-+	cptpf_unregister_vfpf_intr(cptpf, numvfs);
-+	cptpf_vfpf_mbox_destroy(cptpf);
-+	module_put(THIS_MODULE);
-+	cptpf->enabled_vfs = 0;
-+
-+	return 0;
-+}
-+
-+static int cptpf_sriov_enable(struct pci_dev *pdev, int numvfs)
-+{
-+	struct otx2_cptpf_dev *cptpf = pci_get_drvdata(pdev);
-+	int ret;
-+
-+	/* Initialize VF<=>PF mailbox */
-+	ret = cptpf_vfpf_mbox_init(cptpf, cptpf->max_vfs);
-+	if (ret)
-+		return ret;
-+	/* Register VF<=>PF mailbox interrupt */
-+	ret = cptpf_register_vfpf_intr(cptpf, numvfs);
-+	if (ret)
-+		goto free_mbox;
-+
-+	cptpf->enabled_vfs = numvfs;
-+	ret = pci_enable_sriov(pdev, numvfs);
-+	if (ret)
-+		goto disable_intr;
-+
-+	dev_notice(&cptpf->pdev->dev, "VFs enabled: %d\n", numvfs);
-+
-+	try_module_get(THIS_MODULE);
-+	return numvfs;
-+disable_intr:
-+	cptpf_unregister_vfpf_intr(cptpf, numvfs);
-+	cptpf->enabled_vfs = 0;
-+free_mbox:
-+	cptpf_vfpf_mbox_destroy(cptpf);
-+	return ret;
-+}
-+
-+static int otx2_cptpf_sriov_configure(struct pci_dev *pdev, int numvfs)
-+{
-+	if (numvfs > 0) {
-+		return cptpf_sriov_enable(pdev, numvfs);
-+	} else {
-+		return cptpf_sriov_disable(pdev);
-+	}
-+}
-+
- static int otx2_cptpf_probe(struct pci_dev *pdev,
- 			    const struct pci_device_id *ent)
- {
-@@ -163,6 +446,8 @@ static int otx2_cptpf_probe(struct pci_dev *pdev,
- 	if (err)
- 		goto destroy_afpf_mbox;
- 
-+	cptpf->max_vfs = pci_sriov_get_totalvfs(pdev);
-+
- 	return 0;
- destroy_afpf_mbox:
- 	cptpf_afpf_mbox_destroy(cptpf);
-@@ -177,6 +462,7 @@ static void otx2_cptpf_remove(struct pci_dev *pdev)
- 
- 	if (!cptpf)
- 		return;
-+	cptpf_sriov_disable(pdev);
- 	/* Disable AF-PF mailbox interrupt */
- 	cptpf_disable_afpf_mbox_intr(cptpf);
- 	/* Destroy AF-PF mbox */
-@@ -195,6 +481,7 @@ static struct pci_driver otx2_cpt_pci_driver = {
- 	.id_table = otx2_cpt_id_table,
- 	.probe = otx2_cptpf_probe,
- 	.remove = otx2_cptpf_remove,
-+	.sriov_configure = otx2_cptpf_sriov_configure
- };
- 
- module_pci_driver(otx2_cpt_pci_driver);
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-index 0a8bd46b5686..398f1c6402d9 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-@@ -5,6 +5,127 @@
- #include "otx2_cptpf.h"
- #include "rvu_reg.h"
- 
-+static int forward_to_af(struct otx2_cptpf_dev *cptpf,
-+			 struct otx2_cptvf_info *vf,
-+			 struct mbox_msghdr *req, int size)
-+{
-+	struct mbox_msghdr *msg;
-+	int ret;
-+
-+	msg = otx2_mbox_alloc_msg(&cptpf->afpf_mbox, 0, size);
-+	if (msg == NULL)
-+		return -ENOMEM;
-+
-+	memcpy((uint8_t *)msg + sizeof(struct mbox_msghdr),
-+	       (uint8_t *)req + sizeof(struct mbox_msghdr), size);
-+	msg->id = req->id;
-+	msg->pcifunc = req->pcifunc;
-+	msg->sig = req->sig;
-+	msg->ver = req->ver;
-+
-+	otx2_mbox_msg_send(&cptpf->afpf_mbox, 0);
-+	ret = otx2_mbox_wait_for_rsp(&cptpf->afpf_mbox, 0);
-+	if (ret == -EIO) {
-+		dev_err(&cptpf->pdev->dev, "RVU MBOX timeout.\n");
-+		return ret;
-+	} else if (ret) {
-+		dev_err(&cptpf->pdev->dev, "RVU MBOX error: %d.\n", ret);
-+		return -EFAULT;
-+	}
-+	return 0;
-+}
-+
-+static int cptpf_handle_vf_req(struct otx2_cptpf_dev *cptpf,
-+			       struct otx2_cptvf_info *vf,
-+			       struct mbox_msghdr *req, int size)
-+{
-+	int err = 0;
-+
-+	/* Check if msg is valid, if not reply with an invalid msg */
-+	if (req->sig != OTX2_MBOX_REQ_SIG)
-+		goto inval_msg;
-+
-+	return forward_to_af(cptpf, vf, req, size);
-+
-+inval_msg:
-+	otx2_reply_invalid_msg(&cptpf->vfpf_mbox, vf->vf_id, 0, req->id);
-+	otx2_mbox_msg_send(&cptpf->vfpf_mbox, vf->vf_id);
-+	return err;
-+}
-+
-+irqreturn_t otx2_cptpf_vfpf_mbox_intr(int __always_unused irq, void *arg)
-+{
-+	struct otx2_cptpf_dev *cptpf = arg;
-+	struct otx2_cptvf_info *vf;
-+	int i, vf_idx;
-+	u64 intr;
-+
-+	/*
-+	 * Check which VF has raised an interrupt and schedule
-+	 * corresponding work queue to process the messages
-+	 */
-+	for (i = 0; i < 2; i++) {
-+		/* Read the interrupt bits */
-+		intr = otx2_cpt_read64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+				       RVU_PF_VFPF_MBOX_INTX(i));
-+
-+		for (vf_idx = i * 64; vf_idx < cptpf->enabled_vfs; vf_idx++) {
-+			vf = &cptpf->vf[vf_idx];
-+			if (intr & (1ULL << vf->intr_idx)) {
-+				queue_work(cptpf->vfpf_mbox_wq,
-+					   &vf->vfpf_mbox_work);
-+				/* Clear the interrupt */
-+				otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM,
-+						 0, RVU_PF_VFPF_MBOX_INTX(i),
-+						 BIT_ULL(vf->intr_idx));
-+			}
-+		}
-+	}
-+	return IRQ_HANDLED;
-+}
-+
-+void otx2_cptpf_vfpf_mbox_handler(struct work_struct *work)
-+{
-+	struct otx2_cptpf_dev *cptpf;
-+	struct otx2_cptvf_info *vf;
-+	struct otx2_mbox_dev *mdev;
-+	struct mbox_hdr *req_hdr;
-+	struct mbox_msghdr *msg;
-+	struct otx2_mbox *mbox;
-+	int offset, i, err;
-+
-+	vf = container_of(work, struct otx2_cptvf_info, vfpf_mbox_work);
-+	cptpf = vf->cptpf;
-+	mbox = &cptpf->vfpf_mbox;
-+	/* sync with mbox memory region */
-+	smp_rmb();
-+	mdev = &mbox->dev[vf->vf_id];
-+	/* Process received mbox messages */
-+	req_hdr = (struct mbox_hdr *)(mdev->mbase + mbox->rx_start);
-+	offset = mbox->rx_start + ALIGN(sizeof(*req_hdr), MBOX_MSG_ALIGN);
-+
-+	for (i = 0; i < req_hdr->num_msgs; i++) {
-+		msg = (struct mbox_msghdr *)(mdev->mbase + offset);
-+
-+		/* Set which VF sent this message based on mbox IRQ */
-+		msg->pcifunc = ((u16)cptpf->pf_id << RVU_PFVF_PF_SHIFT) |
-+				((vf->vf_id + 1) & RVU_PFVF_FUNC_MASK);
-+
-+		err = cptpf_handle_vf_req(cptpf, vf, msg,
-+					  msg->next_msgoff - offset);
-+		/*
-+		 * Behave as the AF, drop the msg if there is
-+		 * no memory, timeout handling also goes here
-+		 */
-+		if (err == -ENOMEM || err == -EIO)
-+			break;
-+		offset = msg->next_msgoff;
-+	}
-+	/* Send mbox responses to VF */
-+	if (mdev->num_msgs)
-+		otx2_mbox_msg_send(mbox, vf->vf_id);
-+}
-+
- irqreturn_t otx2_cptpf_afpf_mbox_intr(int __always_unused irq, void *arg)
- {
- 	struct otx2_cptpf_dev *cptpf = arg;
-@@ -50,6 +171,46 @@ static void process_afpf_mbox_msg(struct otx2_cptpf_dev *cptpf,
- 	}
- }
- 
-+static void forward_to_vf(struct otx2_cptpf_dev *cptpf, struct mbox_msghdr *msg,
-+			  int vf_id, int size)
-+{
-+	struct otx2_mbox *vfpf_mbox;
-+	struct mbox_msghdr *fwd;
-+
-+	if (msg->id >= MBOX_MSG_MAX) {
-+		dev_err(&cptpf->pdev->dev,
-+			"MBOX msg with unknown ID %d\n", msg->id);
-+		return;
-+	}
-+	if (msg->sig != OTX2_MBOX_RSP_SIG) {
-+		dev_err(&cptpf->pdev->dev,
-+			"MBOX msg with wrong signature %x, ID %d\n",
-+			msg->sig, msg->id);
-+		return;
-+	}
-+	vfpf_mbox = &cptpf->vfpf_mbox;
-+	vf_id--;
-+	if (vf_id >= cptpf->enabled_vfs) {
-+		dev_err(&cptpf->pdev->dev,
-+			"MBOX msg to unknown VF: %d >= %d\n",
-+			vf_id, cptpf->enabled_vfs);
-+		return;
-+	}
-+	fwd = otx2_mbox_alloc_msg(vfpf_mbox, vf_id, size);
-+	if (!fwd) {
-+		dev_err(&cptpf->pdev->dev,
-+			"Forwarding to VF%d failed.\n", vf_id);
-+		return;
-+	}
-+	memcpy((uint8_t *)fwd + sizeof(struct mbox_msghdr),
-+		(uint8_t *)msg + sizeof(struct mbox_msghdr), size);
-+	fwd->id = msg->id;
-+	fwd->pcifunc = msg->pcifunc;
-+	fwd->sig = msg->sig;
-+	fwd->ver = msg->ver;
-+	fwd->rc = msg->rc;
-+}
-+
- /* Handle mailbox messages received from AF */
- void otx2_cptpf_afpf_mbox_handler(struct work_struct *work)
- {
-@@ -58,7 +219,7 @@ void otx2_cptpf_afpf_mbox_handler(struct work_struct *work)
- 	struct otx2_mbox_dev *mdev;
- 	struct mbox_hdr *rsp_hdr;
- 	struct mbox_msghdr *msg;
--	int offset, i;
-+	int offset, vf_id, i;
- 
- 	cptpf = container_of(work, struct otx2_cptpf_dev, afpf_mbox_work);
- 	afpf_mbox = &cptpf->afpf_mbox;
-@@ -72,7 +233,14 @@ void otx2_cptpf_afpf_mbox_handler(struct work_struct *work)
- 	for (i = 0; i < rsp_hdr->num_msgs; i++) {
- 		msg = (struct mbox_msghdr *)(mdev->mbase + afpf_mbox->rx_start +
- 					     offset);
--		process_afpf_mbox_msg(cptpf, msg);
-+		vf_id = (msg->pcifunc >> RVU_PFVF_FUNC_SHIFT) &
-+			 RVU_PFVF_FUNC_MASK;
-+		if (vf_id > 0)
-+			forward_to_vf(cptpf, msg, vf_id,
-+				      msg->next_msgoff - offset);
-+		else
-+			process_afpf_mbox_msg(cptpf, msg);
-+
- 		offset = msg->next_msgoff;
- 		mdev->msgs_acked++;
- 	}
--- 
-2.28.0
-
+greg k-h
