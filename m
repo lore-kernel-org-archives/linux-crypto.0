@@ -5,61 +5,61 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFEF5C4363A
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 21:46:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54A71C55179
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 21:46:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 72AC52473C
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 21:46:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4CB424724
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 21:46:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="RjbB+ECW"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="GrnbOqiZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727477AbgJ1VqS (ORCPT
+        id S1727001AbgJ1Vqe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Oct 2020 17:46:18 -0400
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:20394 "EHLO
-        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725869AbgJ1VqR (ORCPT
+        Wed, 28 Oct 2020 17:46:34 -0400
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:7378 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726291AbgJ1Vqd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Oct 2020 17:46:17 -0400
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-        by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09SEpNgd026671;
-        Wed, 28 Oct 2020 07:51:23 -0700
+        Wed, 28 Oct 2020 17:46:33 -0400
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09SEo97u016937;
+        Wed, 28 Oct 2020 07:51:57 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=pfpt0220;
- bh=+UdJ9gBLuFDtAYfC7rDoeSo1jsSZfEctJk6n1KmV2+I=;
- b=RjbB+ECWhPd+HVv8G1FHRxBSjzgmFD5h/e2E3rm3l5wp4mgn/4wwu89RdItvGQz2z3z6
- PSclSu3OMaw5wdfV7id0M/wGb8StAmvreBMB4MqxW/CxkqdXzXZJk6upIrTYClt0M2us
- vj7pM27LeMUscn8igY7vPlSr5d+6p/HG2yRXRZ1R8h8bpkaYAhI7jXnlu74lrmCMjPZl
- m7NJoECx+yYqwCMVTNuHtNPs5uxkSNBCGquhHjaxpKG37qlZMP1NEtEH8wpKKYDZu3zN
- 4UxlJQ7WwnmtaoKetzjaYq2CYh4c1HYDxaew8ltm9xCRtGrAnwR/VWo0VAdSSaR6jX9g eA== 
-Received: from sc-exch03.marvell.com ([199.233.58.183])
-        by mx0b-0016f401.pphosted.com with ESMTP id 34cksmfq7g-1
+ bh=+r3JOQhTKH9nsSsNuxMzzgelsEWme9uM/or6Ok+GHIA=;
+ b=GrnbOqiZZ8G1ITJoDdCCAHp1qZBawyG/uurfH/6dd+cnKJTOTaxCYowMLk4G0qdk3MCQ
+ BBrGgnsnba0QqIvkJEZy7YKORly4S12knsMZGN93RFLvY5ZYJfh0nbW7PX7r9Zi98NVH
+ 66taaEiJdDSwUDLyUi2zkxM8+JQxATcyk6bJCZ5kHYMtmpKtDq9FdEpTGb2AaORNxMhI
+ Eb/3zCglMR3GGcjd/SHQ4GO5A/KcbAcFoHwlS5XrMhATgTSZlL1MDksT9EyP3TMPmU9i
+ pOICXoNaowM47zr54Mn7YSIFSEenNWIJXPyBdmSWaic+PhLtZQh4raARj7ueESV/3kLc 1g== 
+Received: from sc-exch01.marvell.com ([199.233.58.181])
+        by mx0a-0016f401.pphosted.com with ESMTP id 34chmn887n-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Wed, 28 Oct 2020 07:51:23 -0700
-Received: from SC-EXCH04.marvell.com (10.93.176.84) by SC-EXCH03.marvell.com
- (10.93.176.83) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 28 Oct
- 2020 07:51:15 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by SC-EXCH04.marvell.com
- (10.93.176.84) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 28 Oct
- 2020 07:51:14 -0700
+        Wed, 28 Oct 2020 07:51:56 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by SC-EXCH01.marvell.com
+ (10.93.176.81) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 28 Oct
+ 2020 07:51:55 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 28 Oct
+ 2020 07:51:54 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
  (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Wed, 28 Oct 2020 07:51:15 -0700
+ Transport; Wed, 28 Oct 2020 07:51:54 -0700
 Received: from hyd1schalla-dt.marvell.com (hyd1schalla-dt.marvell.com [10.29.8.39])
-        by maili.marvell.com (Postfix) with ESMTP id 4A80C3F703F;
-        Wed, 28 Oct 2020 07:51:11 -0700 (PDT)
+        by maili.marvell.com (Postfix) with ESMTP id 2C2C23F703F;
+        Wed, 28 Oct 2020 07:51:50 -0700 (PDT)
 From:   Srujana Challa <schalla@marvell.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <kuba@kernel.org>, <sgoutham@marvell.com>, <gakula@marvell.com>,
         <sbhatta@marvell.com>, <schandran@marvell.com>,
         <pathreya@marvell.com>, Srujana Challa <schalla@marvell.com>
-Subject: [PATCH v8,net-next,04/12] drivers: crypto: add Marvell OcteonTX2 CPT PF driver
-Date:   Wed, 28 Oct 2020 20:20:07 +0530
-Message-ID: <20201028145015.19212-5-schalla@marvell.com>
+Subject: [PATCH v8,net-next,11/12] crypto: octeontx2: add support to process the crypto request
+Date:   Wed, 28 Oct 2020 20:20:14 +0530
+Message-ID: <20201028145015.19212-12-schalla@marvell.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201028145015.19212-1-schalla@marvell.com>
 References: <20201028145015.19212-1-schalla@marvell.com>
@@ -72,708 +72,1063 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Adds skeleton for the Marvell OcteonTX2 CPT physical function
-driver which includes probe, PCI specific initialization and
-hardware register defines.
-RVU defines are present in AF driver
-(drivers/net/ethernet/marvell/octeontx2/af), header files from
-AF driver are included here to avoid duplication.
+Attach LFs to CPT VF to process the crypto requests and register
+LF interrupts.
 
 Signed-off-by: Suheil Chandran <schandran@marvell.com>
 Signed-off-by: Srujana Challa <schalla@marvell.com>
 ---
- drivers/crypto/marvell/Kconfig                |  10 +
- drivers/crypto/marvell/Makefile               |   1 +
- drivers/crypto/marvell/octeontx2/Makefile     |   6 +
- .../marvell/octeontx2/otx2_cpt_common.h       |  32 ++
- .../marvell/octeontx2/otx2_cpt_hw_types.h     | 464 ++++++++++++++++++
- drivers/crypto/marvell/octeontx2/otx2_cptpf.h |  13 +
- .../marvell/octeontx2/otx2_cptpf_main.c       | 106 ++++
- 7 files changed, 632 insertions(+)
- create mode 100644 drivers/crypto/marvell/octeontx2/Makefile
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf.h
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
+ drivers/crypto/marvell/octeontx2/Makefile     |   2 +-
+ .../marvell/octeontx2/otx2_cpt_common.h       |   3 +
+ .../marvell/octeontx2/otx2_cpt_reqmgr.h       | 145 +++++
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.h |   7 +
+ .../marvell/octeontx2/otx2_cptvf_main.c       | 196 +++++++
+ .../marvell/octeontx2/otx2_cptvf_mbox.c       |  26 +
+ .../marvell/octeontx2/otx2_cptvf_reqmgr.c     | 532 ++++++++++++++++++
+ 7 files changed, 910 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
 
-diff --git a/drivers/crypto/marvell/Kconfig b/drivers/crypto/marvell/Kconfig
-index 13063384f958..1440ec9e1fb4 100644
---- a/drivers/crypto/marvell/Kconfig
-+++ b/drivers/crypto/marvell/Kconfig
-@@ -35,3 +35,13 @@ config CRYPTO_DEV_OCTEONTX_CPT
- 
- 		To compile this driver as module, choose M here:
- 		the modules will be called octeontx-cpt and octeontx-cptvf
-+
-+config CRYPTO_DEV_OCTEONTX2_CPT
-+	tristate "Marvell OcteonTX2 CPT driver"
-+	depends on ARM64 || COMPILE_TEST
-+	depends on PCI_MSI && 64BIT
-+	select OCTEONTX2_MBOX
-+	select CRYPTO_DEV_MARVELL
-+	help
-+		This driver allows you to utilize the Marvell Cryptographic
-+		Accelerator Unit(CPT) found in OcteonTX2 series of processors.
-diff --git a/drivers/crypto/marvell/Makefile b/drivers/crypto/marvell/Makefile
-index 6c6a1519b0f1..39db6d9c0aaf 100644
---- a/drivers/crypto/marvell/Makefile
-+++ b/drivers/crypto/marvell/Makefile
-@@ -2,3 +2,4 @@
- 
- obj-$(CONFIG_CRYPTO_DEV_MARVELL_CESA) += cesa/
- obj-$(CONFIG_CRYPTO_DEV_OCTEONTX_CPT) += octeontx/
-+obj-$(CONFIG_CRYPTO_DEV_OCTEONTX2_CPT) += octeontx2/
 diff --git a/drivers/crypto/marvell/octeontx2/Makefile b/drivers/crypto/marvell/octeontx2/Makefile
-new file mode 100644
-index 000000000000..db763ad46a91
---- /dev/null
+index ef6fb2ab3571..41c0a5832b3f 100644
+--- a/drivers/crypto/marvell/octeontx2/Makefile
 +++ b/drivers/crypto/marvell/octeontx2/Makefile
-@@ -0,0 +1,6 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_CRYPTO_DEV_OCTEONTX2_CPT) += octeontx2-cpt.o
-+
-+octeontx2-cpt-objs := otx2_cptpf_main.o
-+
-+ccflags-y += -I$(srctree)/drivers/net/ethernet/marvell/octeontx2/af
+@@ -4,6 +4,6 @@ obj-$(CONFIG_CRYPTO_DEV_OCTEONTX2_CPT) += octeontx2-cpt.o octeontx2-cptvf.o
+ octeontx2-cpt-objs := otx2_cptpf_main.o otx2_cptpf_mbox.o \
+ 		      otx2_cpt_mbox_common.o otx2_cptpf_ucode.o otx2_cptlf.o
+ octeontx2-cptvf-objs := otx2_cptvf_main.o otx2_cptvf_mbox.o otx2_cptlf.o \
+-			otx2_cpt_mbox_common.o
++			otx2_cpt_mbox_common.o otx2_cptvf_reqmgr.o
+ 
+ ccflags-y += -I$(srctree)/drivers/net/ethernet/marvell/octeontx2/af
 diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-new file mode 100644
-index 000000000000..eff4ffa58dc4
---- /dev/null
+index ca220178e518..e41de466a3f7 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
 +++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-@@ -0,0 +1,32 @@
-+/* SPDX-License-Identifier: GPL-2.0-only
-+ * Copyright (C) 2020 Marvell.
+@@ -17,6 +17,9 @@
+ #define OTX2_CPT_MAX_VFS_NUM 128
+ #define OTX2_CPT_RVU_FUNC_ADDR_S(blk, slot, offs) \
+ 		(((blk) << 20) | ((slot) << 12) | (offs))
++#define OTX2_CPT_RVU_PFFUNC(pf, func)	\
++		((((pf) & RVU_PFVF_PF_MASK) << RVU_PFVF_PF_SHIFT) | \
++		(((func) & RVU_PFVF_FUNC_MASK) << RVU_PFVF_FUNC_SHIFT))
+ 
+ #define OTX2_CPT_INVALID_CRYPTO_ENG_GRP 0xFF
+ #define OTX2_CPT_NAME_LENGTH 64
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
+index 9184f91c68c1..5e191434ab98 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
++++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
+@@ -10,6 +10,22 @@
+ /* Completion code size and initial value */
+ #define OTX2_CPT_COMPLETION_CODE_SIZE 8
+ #define OTX2_CPT_COMPLETION_CODE_INIT OTX2_CPT_COMP_E_NOTDONE
++/*
++ * Maximum total number of SG buffers is 100, we divide it equally
++ * between input and output
 + */
++#define OTX2_CPT_MAX_SG_IN_CNT  50
++#define OTX2_CPT_MAX_SG_OUT_CNT 50
 +
-+#ifndef __OTX2_CPT_COMMON_H
-+#define __OTX2_CPT_COMMON_H
++/* DMA mode direct or SG */
++#define OTX2_CPT_DMA_MODE_DIRECT 0
++#define OTX2_CPT_DMA_MODE_SG     1
 +
-+#include <linux/pci.h>
-+#include <linux/types.h>
-+#include <linux/module.h>
-+#include <linux/delay.h>
-+#include <linux/crypto.h>
-+#include "otx2_cpt_hw_types.h"
-+#include "rvu.h"
++/* Context source CPTR or DPTR */
++#define OTX2_CPT_FROM_CPTR 0
++#define OTX2_CPT_FROM_DPTR 1
 +
-+#define OTX2_CPT_RVU_FUNC_ADDR_S(blk, slot, offs) \
-+		(((blk) << 20) | ((slot) << 12) | (offs))
++#define OTX2_CPT_MAX_REQ_SIZE 65535
+ 
+ union otx2_cpt_opcode {
+ 	u16 flags;
+@@ -19,6 +35,13 @@ union otx2_cpt_opcode {
+ 	} s;
+ };
+ 
++struct otx2_cptvf_request {
++	u32 param1;
++	u32 param2;
++	u16 dlen;
++	union otx2_cpt_opcode opcode;
++};
 +
-+static inline void otx2_cpt_write64(void __iomem *reg_base, u64 blk, u64 slot,
-+				    u64 offs, u64 val)
+ /*
+  * CPT_INST_S software command definitions
+  * Words EI (0-3)
+@@ -48,4 +71,126 @@ struct otx2_cpt_iq_command {
+ 	union otx2_cpt_iq_cmd_word3 cptr;
+ };
+ 
++struct otx2_cpt_pending_entry {
++	void *completion_addr;	/* Completion address */
++	void *info;
++	/* Kernel async request callback */
++	void (*callback)(int status, void *arg1, void *arg2);
++	struct crypto_async_request *areq; /* Async request callback arg */
++	u8 resume_sender;	/* Notify sender to resume sending requests */
++	u8 busy;		/* Entry status (free/busy) */
++};
++
++struct otx2_cpt_pending_queue {
++	struct otx2_cpt_pending_entry *head; /* Head of the queue */
++	u32 front;		/* Process work from here */
++	u32 rear;		/* Append new work here */
++	u32 pending_count;	/* Pending requests count */
++	u32 qlen;		/* Queue length */
++	spinlock_t lock;	/* Queue lock */
++};
++
++struct otx2_cpt_buf_ptr {
++	u8 *vptr;
++	dma_addr_t dma_addr;
++	u16 size;
++};
++
++union otx2_cpt_ctrl_info {
++	u32 flags;
++	struct {
++#if defined(__BIG_ENDIAN_BITFIELD)
++		u32 reserved_6_31:26;
++		u32 grp:3;	/* Group bits */
++		u32 dma_mode:2;	/* DMA mode */
++		u32 se_req:1;	/* To SE core */
++#else
++		u32 se_req:1;	/* To SE core */
++		u32 dma_mode:2;	/* DMA mode */
++		u32 grp:3;	/* Group bits */
++		u32 reserved_6_31:26;
++#endif
++	} s;
++};
++
++struct otx2_cpt_req_info {
++	/* Kernel async request callback */
++	void (*callback)(int status, void *arg1, void *arg2);
++	struct crypto_async_request *areq; /* Async request callback arg */
++	struct otx2_cptvf_request req;/* Request information (core specific) */
++	union otx2_cpt_ctrl_info ctrl;/* User control information */
++	struct otx2_cpt_buf_ptr in[OTX2_CPT_MAX_SG_IN_CNT];
++	struct otx2_cpt_buf_ptr out[OTX2_CPT_MAX_SG_OUT_CNT];
++	u8 *iv_out;     /* IV to send back */
++	u16 rlen;	/* Output length */
++	u8 in_cnt;	/* Number of input buffers */
++	u8 out_cnt;	/* Number of output buffers */
++	u8 req_type;	/* Type of request */
++	u8 is_enc;	/* Is a request an encryption request */
++	u8 is_trunc_hmac;/* Is truncated hmac used */
++};
++
++struct otx2_cpt_inst_info {
++	struct otx2_cpt_pending_entry *pentry;
++	struct otx2_cpt_req_info *req;
++	struct pci_dev *pdev;
++	void *completion_addr;
++	u8 *out_buffer;
++	u8 *in_buffer;
++	dma_addr_t dptr_baddr;
++	dma_addr_t rptr_baddr;
++	dma_addr_t comp_baddr;
++	unsigned long time_in;
++	u32 dlen;
++	u32 dma_len;
++	u8 extra_time;
++};
++
++struct otx2_cpt_sglist_component {
++	__be16 len0;
++	__be16 len1;
++	__be16 len2;
++	__be16 len3;
++	__be64 ptr0;
++	__be64 ptr1;
++	__be64 ptr2;
++	__be64 ptr3;
++};
++
++static inline void otx2_cpt_info_destroy(struct pci_dev *pdev,
++					 struct otx2_cpt_inst_info *info)
 +{
-+	writeq_relaxed(val, reg_base +
-+		       OTX2_CPT_RVU_FUNC_ADDR_S(blk, slot, offs));
++	struct otx2_cpt_req_info *req;
++	int i;
++
++	if (info->dptr_baddr)
++		dma_unmap_single(&pdev->dev, info->dptr_baddr,
++				 info->dma_len, DMA_BIDIRECTIONAL);
++
++	if (info->req) {
++		req = info->req;
++		for (i = 0; i < req->out_cnt; i++) {
++			if (req->out[i].dma_addr)
++				dma_unmap_single(&pdev->dev,
++						 req->out[i].dma_addr,
++						 req->out[i].size,
++						 DMA_BIDIRECTIONAL);
++		}
++
++		for (i = 0; i < req->in_cnt; i++) {
++			if (req->in[i].dma_addr)
++				dma_unmap_single(&pdev->dev,
++						 req->in[i].dma_addr,
++						 req->in[i].size,
++						 DMA_BIDIRECTIONAL);
++		}
++	}
++	kzfree(info);
 +}
 +
-+static inline u64 otx2_cpt_read64(void __iomem *reg_base, u64 blk, u64 slot,
-+				  u64 offs)
++struct otx2_cptlf_wqe;
++int otx2_cpt_do_request(struct pci_dev *pdev, struct otx2_cpt_req_info *req,
++			int cpu_num);
++void otx2_cpt_post_process(struct otx2_cptlf_wqe *wqe);
++
+ #endif /* __OTX2_CPT_REQMGR_H */
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptlf.h b/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
+index edf404f039cf..18cedfb06131 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
+@@ -80,6 +80,7 @@ struct otx2_cptlf_info {
+ 	u8 slot;                                /* Slot number of this LF */
+ 
+ 	struct otx2_cpt_inst_queue iqueue;/* Instruction queue */
++	struct otx2_cpt_pending_queue pqueue; /* Pending queue */
+ 	struct otx2_cptlf_wqe *wqe;       /* Tasklet work info */
+ };
+ 
+@@ -91,6 +92,7 @@ struct otx2_cptlfs_info {
+ 	struct otx2_mbox *mbox;
+ 	u8 are_lfs_attached;	/* Whether CPT LFs are attached */
+ 	u8 lfs_num;		/* Number of CPT LFs */
++	u8 kcrypto_eng_grp_num;	/* Kernel crypto engine group number */
+ 	atomic_t state;         /* LF's state. started/reset */
+ };
+ 
+@@ -333,6 +335,11 @@ static inline void otx2_cpt_send_cmd(union otx2_cpt_inst_s *cptinst,
+ 	} while (!ret);
+ }
+ 
++static inline bool otx2_cptlf_started(struct otx2_cptlfs_info *lfs)
 +{
-+	return readq_relaxed(reg_base +
-+			     OTX2_CPT_RVU_FUNC_ADDR_S(blk, slot, offs));
++	return atomic_read(&lfs->state) == OTX2_CPTLF_STARTED;
 +}
-+#endif /* __OTX2_CPT_COMMON_H */
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
++
+ int otx2_cptlf_init(struct otx2_cptlfs_info *lfs, u8 eng_grp_msk, int pri,
+ 		    int lfs_num);
+ void otx2_cptlf_shutdown(struct otx2_cptlfs_info *lfs);
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
+index b90b265f0f42..a54c989eb13b 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
+@@ -3,6 +3,7 @@
+ 
+ #include "otx2_cpt_common.h"
+ #include "otx2_cptvf.h"
++#include "otx2_cptlf.h"
+ #include <rvu_reg.h>
+ 
+ #define OTX2_CPTVF_DRV_NAME "octeontx2-cptvf"
+@@ -94,6 +95,193 @@ static void cptvf_pfvf_mbox_destroy(struct otx2_cptvf_dev *cptvf)
+ 	otx2_mbox_destroy(&cptvf->pfvf_mbox);
+ }
+ 
++static void cptlf_work_handler(unsigned long data)
++{
++	otx2_cpt_post_process((struct otx2_cptlf_wqe *) data);
++}
++
++static void cleanup_tasklet_work(struct otx2_cptlfs_info *lfs)
++{
++	int i;
++
++	for (i = 0; i <  lfs->lfs_num; i++) {
++		if (!lfs->lf[i].wqe)
++			continue;
++
++		tasklet_kill(&lfs->lf[i].wqe->work);
++		kfree(lfs->lf[i].wqe);
++		lfs->lf[i].wqe = NULL;
++	}
++}
++
++static int init_tasklet_work(struct otx2_cptlfs_info *lfs)
++{
++	struct otx2_cptlf_wqe *wqe;
++	int i, ret = 0;
++
++	for (i = 0; i < lfs->lfs_num; i++) {
++		wqe = kzalloc(sizeof(struct otx2_cptlf_wqe), GFP_KERNEL);
++		if (!wqe) {
++			ret = -ENOMEM;
++			goto cleanup_tasklet;
++		}
++
++		tasklet_init(&wqe->work, cptlf_work_handler, (u64) wqe);
++		wqe->lfs = lfs;
++		wqe->lf_num = i;
++		lfs->lf[i].wqe = wqe;
++	}
++	return 0;
++cleanup_tasklet:
++	cleanup_tasklet_work(lfs);
++	return ret;
++}
++
++static void free_pending_queues(struct otx2_cptlfs_info *lfs)
++{
++	int i;
++
++	for (i = 0; i < lfs->lfs_num; i++) {
++		kfree(lfs->lf[i].pqueue.head);
++		lfs->lf[i].pqueue.head = NULL;
++	}
++}
++
++static int alloc_pending_queues(struct otx2_cptlfs_info *lfs)
++{
++	int size, ret, i;
++
++	if (!lfs->lfs_num)
++		return -EINVAL;
++
++	for (i = 0; i < lfs->lfs_num; i++) {
++		lfs->lf[i].pqueue.qlen = OTX2_CPT_INST_QLEN_MSGS;
++		size = lfs->lf[i].pqueue.qlen *
++		       sizeof(struct otx2_cpt_pending_entry);
++
++		lfs->lf[i].pqueue.head = kzalloc(size, GFP_KERNEL);
++		if (!lfs->lf[i].pqueue.head) {
++			ret = -ENOMEM;
++			goto error;
++		}
++
++		/* Initialize spin lock */
++		spin_lock_init(&lfs->lf[i].pqueue.lock);
++	}
++	return 0;
++error:
++	free_pending_queues(lfs);
++	return ret;
++}
++
++static void lf_sw_cleanup(struct otx2_cptlfs_info *lfs)
++{
++	cleanup_tasklet_work(lfs);
++	free_pending_queues(lfs);
++}
++
++static int lf_sw_init(struct otx2_cptlfs_info *lfs)
++{
++	int ret;
++
++	ret = alloc_pending_queues(lfs);
++	if (ret) {
++		dev_err(&lfs->pdev->dev,
++			"Allocating pending queues failed\n");
++		return ret;
++	}
++	ret = init_tasklet_work(lfs);
++	if (ret) {
++		dev_err(&lfs->pdev->dev,
++			"Tasklet work init failed\n");
++		goto pending_queues_free;
++	}
++	return 0;
++
++pending_queues_free:
++	free_pending_queues(lfs);
++	return ret;
++}
++
++static void cptvf_lf_shutdown(struct otx2_cptlfs_info *lfs)
++{
++	atomic_set(&lfs->state, OTX2_CPTLF_IN_RESET);
++
++	/* Remove interrupts affinity */
++	otx2_cptlf_free_irqs_affinity(lfs);
++	/* Disable instruction queue */
++	otx2_cptlf_disable_iqueues(lfs);
++	/* Unregister LFs interrupts */
++	otx2_cptlf_unregister_interrupts(lfs);
++	/* Cleanup LFs software side */
++	lf_sw_cleanup(lfs);
++	/* Send request to detach LFs */
++	otx2_cpt_detach_rsrcs_msg(lfs);
++}
++
++static int cptvf_lf_init(struct otx2_cptvf_dev *cptvf)
++{
++	struct otx2_cptlfs_info *lfs = &cptvf->lfs;
++	struct device *dev = &cptvf->pdev->dev;
++	int ret, lfs_num;
++	u8 eng_grp_msk;
++
++	/* Get engine group number for symmetric crypto */
++	cptvf->lfs.kcrypto_eng_grp_num = OTX2_CPT_INVALID_CRYPTO_ENG_GRP;
++	ret = otx2_cptvf_send_eng_grp_num_msg(cptvf, OTX2_CPT_SE_TYPES);
++	if (ret)
++		return ret;
++
++	if (cptvf->lfs.kcrypto_eng_grp_num == OTX2_CPT_INVALID_CRYPTO_ENG_GRP) {
++		dev_err(dev, "Engine group for kernel crypto not available\n");
++		ret = -ENOENT;
++		return ret;
++	}
++	eng_grp_msk = 1 << cptvf->lfs.kcrypto_eng_grp_num;
++
++	lfs->reg_base = cptvf->reg_base;
++	lfs->pdev = cptvf->pdev;
++	lfs->mbox = &cptvf->pfvf_mbox;
++
++	lfs_num = num_online_cpus();
++	ret = otx2_cptlf_init(lfs, eng_grp_msk, OTX2_CPT_QUEUE_HI_PRIO,
++			      lfs_num);
++	if (ret)
++		return ret;
++
++	/* Get msix offsets for attached LFs */
++	ret = otx2_cpt_msix_offset_msg(lfs);
++	if (ret)
++		goto cleanup_lf;
++
++	/* Initialize LFs software side */
++	ret = lf_sw_init(lfs);
++	if (ret)
++		goto cleanup_lf;
++
++	/* Register LFs interrupts */
++	ret = otx2_cptlf_register_interrupts(lfs);
++	if (ret)
++		goto cleanup_lf_sw;
++
++	/* Set interrupts affinity */
++	ret = otx2_cptlf_set_irqs_affinity(lfs);
++	if (ret)
++		goto unregister_intr;
++
++	atomic_set(&lfs->state, OTX2_CPTLF_STARTED);
++
++	return 0;
++unregister_intr:
++	otx2_cptlf_unregister_interrupts(lfs);
++cleanup_lf_sw:
++	lf_sw_cleanup(lfs);
++cleanup_lf:
++	otx2_cptlf_shutdown(lfs);
++
++	return ret;
++}
++
+ static int otx2_cptvf_probe(struct pci_dev *pdev,
+ 			    const struct pci_device_id *ent)
+ {
+@@ -149,7 +337,14 @@ static int otx2_cptvf_probe(struct pci_dev *pdev,
+ 	if (ret)
+ 		goto destroy_pfvf_mbox;
+ 
++	/* Initialize CPT LFs */
++	ret = cptvf_lf_init(cptvf);
++	if (ret)
++		goto unregister_interrupts;
++
+ 	return 0;
++unregister_interrupts:
++	cptvf_disable_pfvf_mbox_intrs(cptvf);
+ destroy_pfvf_mbox:
+ 	cptvf_pfvf_mbox_destroy(cptvf);
+ clear_drvdata:
+@@ -166,6 +361,7 @@ static void otx2_cptvf_remove(struct pci_dev *pdev)
+ 		dev_err(&pdev->dev, "Invalid CPT VF device.\n");
+ 		return;
+ 	}
++	cptvf_lf_shutdown(&cptvf->lfs);
+ 	/* Disable PF-VF mailbox interrupt */
+ 	cptvf_disable_pfvf_mbox_intrs(cptvf);
+ 	/* Destroy PF-VF mbox */
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
+index 417099a86742..092a5ab18417 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
+@@ -28,6 +28,7 @@ static void process_pfvf_mbox_mbox_msg(struct otx2_cptvf_dev *cptvf,
+ 				       struct mbox_msghdr *msg)
+ {
+ 	struct otx2_cptlfs_info *lfs = &cptvf->lfs;
++	struct otx2_cpt_egrp_num_rsp *rsp_grp;
+ 	struct cpt_rd_wr_reg_msg *rsp_reg;
+ 	struct msix_offset_rsp *rsp_msix;
+ 	int i;
+@@ -75,6 +76,10 @@ static void process_pfvf_mbox_mbox_msg(struct otx2_cptvf_dev *cptvf,
+ 		if (!rsp_reg->is_write)
+ 			*rsp_reg->ret_val = rsp_reg->val;
+ 		break;
++	case MBOX_MSG_GET_ENG_GRP_NUM:
++		rsp_grp = (struct otx2_cpt_egrp_num_rsp *) msg;
++		cptvf->lfs.kcrypto_eng_grp_num = rsp_grp->eng_grp_num;
++		break;
+ 	default:
+ 		dev_err(&cptvf->pdev->dev, "Unsupported msg %d received.\n",
+ 			msg->id);
+@@ -111,3 +116,24 @@ void otx2_cptvf_pfvf_mbox_handler(struct work_struct *work)
+ 	}
+ 	otx2_mbox_reset(pfvf_mbox, 0);
+ }
++
++int otx2_cptvf_send_eng_grp_num_msg(struct otx2_cptvf_dev *cptvf, int eng_type)
++{
++	struct otx2_mbox *mbox = &cptvf->pfvf_mbox;
++	struct pci_dev *pdev = cptvf->pdev;
++	struct otx2_cpt_egrp_num_msg *req;
++
++	req = (struct otx2_cpt_egrp_num_msg *)
++	      otx2_mbox_alloc_msg_rsp(mbox, 0, sizeof(*req),
++				      sizeof(struct otx2_cpt_egrp_num_rsp));
++	if (req == NULL) {
++		dev_err(&pdev->dev, "RVU MBOX failed to get message.\n");
++		return -EFAULT;
++	}
++	req->hdr.id = MBOX_MSG_GET_ENG_GRP_NUM;
++	req->hdr.sig = OTX2_MBOX_REQ_SIG;
++	req->hdr.pcifunc = OTX2_CPT_RVU_PFFUNC(cptvf->vf_id, 0);
++	req->eng_type = eng_type;
++
++	return otx2_cpt_send_mbox_msg(mbox, pdev);
++}
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
 new file mode 100644
-index 000000000000..ecafc42f37a2
+index 000000000000..05fd59082b5a
 --- /dev/null
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
-@@ -0,0 +1,464 @@
-+/* SPDX-License-Identifier: GPL-2.0-only
-+ * Copyright (C) 2020 Marvell.
-+ */
-+
-+#ifndef __OTX2_CPT_HW_TYPES_H
-+#define __OTX2_CPT_HW_TYPES_H
-+
-+#include <linux/types.h>
-+
-+/* Device IDs */
-+#define OTX2_CPT_PCI_PF_DEVICE_ID 0xA0FD
-+#define OTX2_CPT_PCI_VF_DEVICE_ID 0xA0FE
-+
-+/* Mailbox interrupts offset */
-+#define OTX2_CPT_PF_MBOX_INT	6
-+#define OTX2_CPT_PF_INT_VEC_E_MBOXX(x, a) ((x) + (a))
-+
-+/* Maximum supported microcode groups */
-+#define OTX2_CPT_MAX_ENGINE_GROUPS 8
-+
-+/* CPT instruction size in bytes */
-+#define OTX2_CPT_INST_SIZE	64
-+/*
-+ * CPT VF MSIX vectors and their offsets
-+ */
-+#define OTX2_CPT_VF_MSIX_VECTORS 1
-+#define OTX2_CPT_VF_INTR_MBOX_MASK BIT(0)
-+
-+/* CPT LF MSIX vectors */
-+#define OTX2_CPT_LF_MSIX_VECTORS 2
-+
-+/* OcteonTX2 CPT PF registers */
-+#define OTX2_CPT_PF_CONSTANTS           (0x0)
-+#define OTX2_CPT_PF_RESET               (0x100)
-+#define OTX2_CPT_PF_DIAG                (0x120)
-+#define OTX2_CPT_PF_BIST_STATUS         (0x160)
-+#define OTX2_CPT_PF_ECC0_CTL            (0x200)
-+#define OTX2_CPT_PF_ECC0_FLIP           (0x210)
-+#define OTX2_CPT_PF_ECC0_INT            (0x220)
-+#define OTX2_CPT_PF_ECC0_INT_W1S        (0x230)
-+#define OTX2_CPT_PF_ECC0_ENA_W1S        (0x240)
-+#define OTX2_CPT_PF_ECC0_ENA_W1C        (0x250)
-+#define OTX2_CPT_PF_MBOX_INTX(b)        (0x400 | (b) << 3)
-+#define OTX2_CPT_PF_MBOX_INT_W1SX(b)    (0x420 | (b) << 3)
-+#define OTX2_CPT_PF_MBOX_ENA_W1CX(b)    (0x440 | (b) << 3)
-+#define OTX2_CPT_PF_MBOX_ENA_W1SX(b)    (0x460 | (b) << 3)
-+#define OTX2_CPT_PF_EXEC_INT            (0x500)
-+#define OTX2_CPT_PF_EXEC_INT_W1S        (0x520)
-+#define OTX2_CPT_PF_EXEC_ENA_W1C        (0x540)
-+#define OTX2_CPT_PF_EXEC_ENA_W1S        (0x560)
-+#define OTX2_CPT_PF_GX_EN(b)            (0x600 | (b) << 3)
-+#define OTX2_CPT_PF_EXEC_INFO           (0x700)
-+#define OTX2_CPT_PF_EXEC_BUSY           (0x800)
-+#define OTX2_CPT_PF_EXEC_INFO0          (0x900)
-+#define OTX2_CPT_PF_EXEC_INFO1          (0x910)
-+#define OTX2_CPT_PF_INST_REQ_PC         (0x10000)
-+#define OTX2_CPT_PF_INST_LATENCY_PC     (0x10020)
-+#define OTX2_CPT_PF_RD_REQ_PC           (0x10040)
-+#define OTX2_CPT_PF_RD_LATENCY_PC       (0x10060)
-+#define OTX2_CPT_PF_RD_UC_PC            (0x10080)
-+#define OTX2_CPT_PF_ACTIVE_CYCLES_PC    (0x10100)
-+#define OTX2_CPT_PF_EXE_CTL             (0x4000000)
-+#define OTX2_CPT_PF_EXE_STATUS          (0x4000008)
-+#define OTX2_CPT_PF_EXE_CLK             (0x4000010)
-+#define OTX2_CPT_PF_EXE_DBG_CTL         (0x4000018)
-+#define OTX2_CPT_PF_EXE_DBG_DATA        (0x4000020)
-+#define OTX2_CPT_PF_EXE_BIST_STATUS     (0x4000028)
-+#define OTX2_CPT_PF_EXE_REQ_TIMER       (0x4000030)
-+#define OTX2_CPT_PF_EXE_MEM_CTL         (0x4000038)
-+#define OTX2_CPT_PF_EXE_PERF_CTL        (0x4001000)
-+#define OTX2_CPT_PF_EXE_DBG_CNTX(b)     (0x4001100 | (b) << 3)
-+#define OTX2_CPT_PF_EXE_PERF_EVENT_CNT  (0x4001180)
-+#define OTX2_CPT_PF_EXE_EPCI_INBX_CNT(b)  (0x4001200 | (b) << 3)
-+#define OTX2_CPT_PF_EXE_EPCI_OUTBX_CNT(b) (0x4001240 | (b) << 3)
-+#define OTX2_CPT_PF_ENGX_UCODE_BASE(b)  (0x4002000 | (b) << 3)
-+#define OTX2_CPT_PF_QX_CTL(b)           (0x8000000 | (b) << 20)
-+#define OTX2_CPT_PF_QX_GMCTL(b)         (0x8000020 | (b) << 20)
-+#define OTX2_CPT_PF_QX_CTL2(b)          (0x8000100 | (b) << 20)
-+#define OTX2_CPT_PF_VFX_MBOXX(b, c)     (0x8001000 | (b) << 20 | \
-+					 (c) << 8)
-+
-+/* OcteonTX2 CPT LF registers */
-+#define OTX2_CPT_LF_CTL                 (0x10)
-+#define OTX2_CPT_LF_DONE_WAIT           (0x30)
-+#define OTX2_CPT_LF_INPROG              (0x40)
-+#define OTX2_CPT_LF_DONE                (0x50)
-+#define OTX2_CPT_LF_DONE_ACK            (0x60)
-+#define OTX2_CPT_LF_DONE_INT_ENA_W1S    (0x90)
-+#define OTX2_CPT_LF_DONE_INT_ENA_W1C    (0xa0)
-+#define OTX2_CPT_LF_MISC_INT            (0xb0)
-+#define OTX2_CPT_LF_MISC_INT_W1S        (0xc0)
-+#define OTX2_CPT_LF_MISC_INT_ENA_W1S    (0xd0)
-+#define OTX2_CPT_LF_MISC_INT_ENA_W1C    (0xe0)
-+#define OTX2_CPT_LF_Q_BASE              (0xf0)
-+#define OTX2_CPT_LF_Q_SIZE              (0x100)
-+#define OTX2_CPT_LF_Q_INST_PTR          (0x110)
-+#define OTX2_CPT_LF_Q_GRP_PTR           (0x120)
-+#define OTX2_CPT_LF_NQX(a)              (0x400 | (a) << 3)
-+#define OTX2_CPT_RVU_FUNC_BLKADDR_SHIFT 20
-+/* LMT LF registers */
-+#define OTX2_CPT_LMT_LFBASE             BIT_ULL(OTX2_CPT_RVU_FUNC_BLKADDR_SHIFT)
-+#define OTX2_CPT_LMT_LF_LMTLINEX(a)     (OTX2_CPT_LMT_LFBASE | 0x000 | \
-+					 (a) << 12)
-+/* RVU VF registers */
-+#define OTX2_RVU_VF_INT                 (0x20)
-+#define OTX2_RVU_VF_INT_W1S             (0x28)
-+#define OTX2_RVU_VF_INT_ENA_W1S         (0x30)
-+#define OTX2_RVU_VF_INT_ENA_W1C         (0x38)
-+
-+/*
-+ * Enumeration otx2_cpt_ucode_error_code_e
-+ *
-+ * Enumerates ucode errors
-+ */
-+enum otx2_cpt_ucode_comp_code_e {
-+	OTX2_CPT_UCC_SUCCESS = 0x00,
-+	OTX2_CPT_UCC_INVALID_OPCODE = 0x01,
-+
-+	/* Scatter gather */
-+	OTX2_CPT_UCC_SG_WRITE_LENGTH = 0x02,
-+	OTX2_CPT_UCC_SG_LIST = 0x03,
-+	OTX2_CPT_UCC_SG_NOT_SUPPORTED = 0x04,
-+
-+};
-+
-+/*
-+ * Enumeration otx2_cpt_comp_e
-+ *
-+ * OcteonTX2 CPT Completion Enumeration
-+ * Enumerates the values of CPT_RES_S[COMPCODE].
-+ */
-+enum otx2_cpt_comp_e {
-+	OTX2_CPT_COMP_E_NOTDONE = 0x00,
-+	OTX2_CPT_COMP_E_GOOD = 0x01,
-+	OTX2_CPT_COMP_E_FAULT = 0x02,
-+	OTX2_CPT_COMP_E_HWERR = 0x04,
-+	OTX2_CPT_COMP_E_INSTERR = 0x05,
-+	OTX2_CPT_COMP_E_LAST_ENTRY = 0x06
-+};
-+
-+/*
-+ * Enumeration otx2_cpt_vf_int_vec_e
-+ *
-+ * OcteonTX2 CPT VF MSI-X Vector Enumeration
-+ * Enumerates the MSI-X interrupt vectors.
-+ */
-+enum otx2_cpt_vf_int_vec_e {
-+	OTX2_CPT_VF_INT_VEC_E_MBOX = 0x00
-+};
-+
-+/*
-+ * Enumeration otx2_cpt_lf_int_vec_e
-+ *
-+ * OcteonTX2 CPT LF MSI-X Vector Enumeration
-+ * Enumerates the MSI-X interrupt vectors.
-+ */
-+enum otx2_cpt_lf_int_vec_e {
-+	OTX2_CPT_LF_INT_VEC_E_MISC = 0x00,
-+	OTX2_CPT_LF_INT_VEC_E_DONE = 0x01
-+};
-+
-+/*
-+ * Structure otx2_cpt_inst_s
-+ *
-+ * CPT Instruction Structure
-+ * This structure specifies the instruction layout. Instructions are
-+ * stored in memory as little-endian unless CPT()_PF_Q()_CTL[INST_BE] is set.
-+ * cpt_inst_s_s
-+ * Word 0
-+ * doneint:1 Done interrupt.
-+ *	0 = No interrupts related to this instruction.
-+ *	1 = When the instruction completes, CPT()_VQ()_DONE[DONE] will be
-+ *	incremented,and based on the rules described there an interrupt may
-+ *	occur.
-+ * Word 1
-+ * res_addr [127: 64] Result IOVA.
-+ *	If nonzero, specifies where to write CPT_RES_S.
-+ *	If zero, no result structure will be written.
-+ *	Address must be 16-byte aligned.
-+ *	Bits <63:49> are ignored by hardware; software should use a
-+ *	sign-extended bit <48> for forward compatibility.
-+ * Word 2
-+ *  grp:10 [171:162] If [WQ_PTR] is nonzero, the SSO guest-group to use when
-+ *	CPT submits work SSO.
-+ *	For the SSO to not discard the add-work request, FPA_PF_MAP() must map
-+ *	[GRP] and CPT()_PF_Q()_GMCTL[GMID] as valid.
-+ *  tt:2 [161:160] If [WQ_PTR] is nonzero, the SSO tag type to use when CPT
-+ *	submits work to SSO
-+ *  tag:32 [159:128] If [WQ_PTR] is nonzero, the SSO tag to use when CPT
-+ *	submits work to SSO.
-+ * Word 3
-+ *  wq_ptr [255:192] If [WQ_PTR] is nonzero, it is a pointer to a
-+ *	work-queue entry that CPT submits work to SSO after all context,
-+ *	output data, and result write operations are visible to other
-+ *	CNXXXX units and the cores. Bits <2:0> must be zero.
-+ *	Bits <63:49> are ignored by hardware; software should
-+ *	use a sign-extended bit <48> for forward compatibility.
-+ *	Internal:
-+ *	Bits <63:49>, <2:0> are ignored by hardware, treated as always 0x0.
-+ * Word 4
-+ *  ei0; [319:256] Engine instruction word 0. Passed to the AE/SE.
-+ * Word 5
-+ *  ei1; [383:320] Engine instruction word 1. Passed to the AE/SE.
-+ * Word 6
-+ *  ei2; [447:384] Engine instruction word 1. Passed to the AE/SE.
-+ * Word 7
-+ *  ei3; [511:448] Engine instruction word 1. Passed to the AE/SE.
-+ *
-+ */
-+union otx2_cpt_inst_s {
-+	u64 u[8];
-+
-+	struct {
-+		/* Word 0 */
-+		u64 nixtxl:3;
-+		u64 doneint:1;
-+		u64 nixtx_addr:60;
-+		/* Word 1 */
-+		u64 res_addr;
-+		/* Word 2 */
-+		u64 tag:32;
-+		u64 tt:2;
-+		u64 grp:10;
-+		u64 reserved_172_175:4;
-+		u64 rvu_pf_func:16;
-+		/* Word 3 */
-+		u64 qord:1;
-+		u64 reserved_194_193:2;
-+		u64 wq_ptr:61;
-+		/* Word 4 */
-+		u64 ei0;
-+		/* Word 5 */
-+		u64 ei1;
-+		/* Word 6 */
-+		u64 ei2;
-+		/* Word 7 */
-+		u64 ei3;
-+	} s;
-+};
-+
-+/*
-+ * Structure otx2_cpt_res_s
-+ *
-+ * CPT Result Structure
-+ * The CPT coprocessor writes the result structure after it completes a
-+ * CPT_INST_S instruction. The result structure is exactly 16 bytes, and
-+ * each instruction completion produces exactly one result structure.
-+ *
-+ * This structure is stored in memory as little-endian unless
-+ * CPT()_PF_Q()_CTL[INST_BE] is set.
-+ * cpt_res_s_s
-+ * Word 0
-+ *  doneint:1 [16:16] Done interrupt. This bit is copied from the
-+ *	corresponding instruction's CPT_INST_S[DONEINT].
-+ *  compcode:8 [7:0] Indicates completion/error status of the CPT coprocessor
-+ *	for the	associated instruction, as enumerated by CPT_COMP_E.
-+ *	Core software may write the memory location containing [COMPCODE] to
-+ *	0x0 before ringing the doorbell, and then poll for completion by
-+ *	checking for a nonzero value.
-+ *	Once the core observes a nonzero [COMPCODE] value in this case,the CPT
-+ *	coprocessor will have also completed L2/DRAM write operations.
-+ * Word 1
-+ *  reserved
-+ *
-+ */
-+union otx2_cpt_res_s {
-+	u64 u[2];
-+
-+	struct {
-+		u64 compcode:8;
-+		u64 uc_compcode:8;
-+		u64 doneint:1;
-+		u64 reserved_17_63:47;
-+		u64 reserved_64_127;
-+	} s;
-+};
-+
-+/*
-+ * Register (RVU_PF_BAR0) cpt#_af_constants1
-+ *
-+ * CPT AF Constants Register
-+ * This register contains implementation-related parameters of CPT.
-+ */
-+union otx2_cptx_af_constants1 {
-+	u64 u;
-+	struct otx2_cptx_af_constants1_s {
-+		u64 se:16;
-+		u64 ie:16;
-+		u64 ae:16;
-+		u64 reserved_48_63:16;
-+	} s;
-+};
-+
-+/*
-+ * RVU_PFVF_BAR2 - cpt_lf_misc_int
-+ *
-+ * This register contain the per-queue miscellaneous interrupts.
-+ *
-+ */
-+union otx2_cptx_lf_misc_int {
-+	u64 u;
-+	struct otx2_cptx_lf_misc_int_s {
-+		u64 reserved_0:1;
-+		u64 nqerr:1;
-+		u64 irde:1;
-+		u64 nwrp:1;
-+		u64 reserved_4:1;
-+		u64 hwerr:1;
-+		u64 fault:1;
-+		u64 reserved_7_63:57;
-+	} s;
-+};
-+
-+/*
-+ * RVU_PFVF_BAR2 - cpt_lf_misc_int_ena_w1s
-+ *
-+ * This register sets interrupt enable bits.
-+ *
-+ */
-+union otx2_cptx_lf_misc_int_ena_w1s {
-+	u64 u;
-+	struct otx2_cptx_lf_misc_int_ena_w1s_s {
-+		u64 reserved_0:1;
-+		u64 nqerr:1;
-+		u64 irde:1;
-+		u64 nwrp:1;
-+		u64 reserved_4:1;
-+		u64 hwerr:1;
-+		u64 fault:1;
-+		u64 reserved_7_63:57;
-+	} s;
-+};
-+
-+/*
-+ * RVU_PFVF_BAR2 - cpt_lf_ctl
-+ *
-+ * This register configures the queue.
-+ *
-+ * When the queue is not execution-quiescent (see CPT_LF_INPROG[EENA,INFLIGHT]),
-+ * software must only write this register with [ENA]=0.
-+ */
-+union otx2_cptx_lf_ctl {
-+	u64 u;
-+	struct otx2_cptx_lf_ctl_s {
-+		u64 ena:1;
-+		u64 fc_ena:1;
-+		u64 fc_up_crossing:1;
-+		u64 reserved_3:1;
-+		u64 fc_hyst_bits:4;
-+		u64 reserved_8_63:56;
-+	} s;
-+};
-+
-+/*
-+ * RVU_PFVF_BAR2 - cpt_lf_done_wait
-+ *
-+ * This register specifies the per-queue interrupt coalescing settings.
-+ */
-+union otx2_cptx_lf_done_wait {
-+	u64 u;
-+	struct otx2_cptx_lf_done_wait_s {
-+		u64 num_wait:20;
-+		u64 reserved_20_31:12;
-+		u64 time_wait:16;
-+		u64 reserved_48_63:16;
-+	} s;
-+};
-+
-+/*
-+ * RVU_PFVF_BAR2 - cpt_lf_done
-+ *
-+ * This register contain the per-queue instruction done count.
-+ */
-+union otx2_cptx_lf_done {
-+	u64 u;
-+	struct otx2_cptx_lf_done_s {
-+		u64 done:20;
-+		u64 reserved_20_63:44;
-+	} s;
-+};
-+
-+/*
-+ * RVU_PFVF_BAR2 - cpt_lf_inprog
-+ *
-+ * These registers contain the per-queue instruction in flight registers.
-+ *
-+ */
-+union otx2_cptx_lf_inprog {
-+	u64 u;
-+	struct otx2_cptx_lf_inprog_s {
-+		u64 inflight:9;
-+		u64 reserved_9_15:7;
-+		u64 eena:1;
-+		u64 grp_drp:1;
-+		u64 reserved_18_30:13;
-+		u64 grb_partial:1;
-+		u64 grb_cnt:8;
-+		u64 gwb_cnt:8;
-+		u64 reserved_48_63:16;
-+	} s;
-+};
-+
-+/*
-+ * RVU_PFVF_BAR2 - cpt_lf_q_base
-+ *
-+ * CPT initializes these CSR fields to these values on any CPT_LF_Q_BASE write:
-+ * _ CPT_LF_Q_INST_PTR[XQ_XOR]=0.
-+ * _ CPT_LF_Q_INST_PTR[NQ_PTR]=2.
-+ * _ CPT_LF_Q_INST_PTR[DQ_PTR]=2.
-+ * _ CPT_LF_Q_GRP_PTR[XQ_XOR]=0.
-+ * _ CPT_LF_Q_GRP_PTR[NQ_PTR]=1.
-+ * _ CPT_LF_Q_GRP_PTR[DQ_PTR]=1.
-+ */
-+union otx2_cptx_lf_q_base {
-+	u64 u;
-+	struct otx2_cptx_lf_q_base_s {
-+		u64 fault:1;
-+		u64 reserved_1_6:6;
-+		u64 addr:46;
-+		u64 reserved_53_63:11;
-+	} s;
-+};
-+
-+/*
-+ * RVU_PFVF_BAR2 - cpt_lf_q_size
-+ *
-+ * CPT initializes these CSR fields to these values on any CPT_LF_Q_SIZE write:
-+ * _ CPT_LF_Q_INST_PTR[XQ_XOR]=0.
-+ * _ CPT_LF_Q_INST_PTR[NQ_PTR]=2.
-+ * _ CPT_LF_Q_INST_PTR[DQ_PTR]=2.
-+ * _ CPT_LF_Q_GRP_PTR[XQ_XOR]=0.
-+ * _ CPT_LF_Q_GRP_PTR[NQ_PTR]=1.
-+ * _ CPT_LF_Q_GRP_PTR[DQ_PTR]=1.
-+ */
-+union otx2_cptx_lf_q_size {
-+	u64 u;
-+	struct otx2_cptx_lf_q_size_s {
-+		u64 size_div40:15;
-+		u64 reserved_15_63:49;
-+	} s;
-+};
-+
-+/*
-+ * RVU_PF_BAR0 - cpt_af_lf_ctl
-+ *
-+ * This register configures queues. This register should be written only
-+ * when the queue is execution-quiescent (see CPT_LF_INPROG[INFLIGHT]).
-+ */
-+union otx2_cptx_af_lf_ctrl {
-+	u64 u;
-+	struct otx2_cptx_af_lf_ctrl_s {
-+		u64 pri:1;
-+		u64 reserved_1_8:8;
-+		u64 pf_func_inst:1;
-+		u64 cont_err:1;
-+		u64 reserved_11_15:5;
-+		u64 nixtx_en:1;
-+		u64 reserved_17_47:31;
-+		u64 grp:8;
-+		u64 reserved_56_63:8;
-+	} s;
-+};
-+
-+#endif /* __OTX2_CPT_HW_TYPES_H */
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf.h b/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
-new file mode 100644
-index 000000000000..84cdc8cc2c15
---- /dev/null
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
-@@ -0,0 +1,13 @@
-+/* SPDX-License-Identifier: GPL-2.0-only
-+ * Copyright (C) 2020 Marvell.
-+ */
-+
-+#ifndef __OTX2_CPTPF_H
-+#define __OTX2_CPTPF_H
-+
-+struct otx2_cptpf_dev {
-+	void __iomem *reg_base;		/* CPT PF registers start address */
-+	struct pci_dev *pdev;		/* PCI device handle */
-+};
-+
-+#endif /* __OTX2_CPTPF_H */
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-new file mode 100644
-index 000000000000..25ac8d5ff7ee
---- /dev/null
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-@@ -0,0 +1,106 @@
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
+@@ -0,0 +1,532 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/* Copyright (C) 2020 Marvell. */
 +
-+#include <linux/firmware.h>
-+#include "otx2_cpt_hw_types.h"
++#include "otx2_cptvf.h"
 +#include "otx2_cpt_common.h"
-+#include "otx2_cptpf.h"
-+#include "rvu_reg.h"
 +
-+#define OTX2_CPT_DRV_NAME    "octeontx2-cpt"
-+#define OTX2_CPT_DRV_STRING  "Marvell OcteonTX2 CPT Physical Function Driver"
++/* SG list header size in bytes */
++#define SG_LIST_HDR_SIZE	8
 +
-+static int cpt_is_pf_usable(struct otx2_cptpf_dev *cptpf)
++/* Default timeout when waiting for free pending entry in us */
++#define CPT_PENTRY_TIMEOUT	1000
++#define CPT_PENTRY_STEP		50
++
++/* Default threshold for stopping and resuming sender requests */
++#define CPT_IQ_STOP_MARGIN	128
++#define CPT_IQ_RESUME_MARGIN	512
++
++/* Default command timeout in seconds */
++#define CPT_COMMAND_TIMEOUT	4
++#define CPT_TIME_IN_RESET_COUNT 5
++
++static void otx2_cpt_dump_sg_list(struct pci_dev *pdev,
++				  struct otx2_cpt_req_info *req)
 +{
-+	u64 rev;
++	int i;
 +
-+	rev = otx2_cpt_read64(cptpf->reg_base, BLKADDR_RVUM, 0,
-+			      RVU_PF_BLOCK_ADDRX_DISC(BLKADDR_RVUM));
-+	rev = (rev >> 12) & 0xFF;
++	pr_debug("Gather list size %d\n", req->in_cnt);
++	for (i = 0; i < req->in_cnt; i++) {
++		pr_debug("Buffer %d size %d, vptr 0x%p, dmaptr 0x%p\n", i,
++			 req->in[i].size, req->in[i].vptr,
++			 (void *) req->in[i].dma_addr);
++		pr_debug("Buffer hexdump (%d bytes)\n",
++			 req->in[i].size);
++		print_hex_dump_debug("", DUMP_PREFIX_NONE, 16, 1,
++				     req->in[i].vptr, req->in[i].size, false);
++	}
++	pr_debug("Scatter list size %d\n", req->out_cnt);
++	for (i = 0; i < req->out_cnt; i++) {
++		pr_debug("Buffer %d size %d, vptr 0x%p, dmaptr 0x%p\n", i,
++			 req->out[i].size, req->out[i].vptr,
++			 (void *) req->out[i].dma_addr);
++		pr_debug("Buffer hexdump (%d bytes)\n", req->out[i].size);
++		print_hex_dump_debug("", DUMP_PREFIX_NONE, 16, 1,
++				     req->out[i].vptr, req->out[i].size, false);
++	}
++}
++
++static inline struct otx2_cpt_pending_entry *get_free_pending_entry(
++					struct otx2_cpt_pending_queue *q,
++					int qlen)
++{
++	struct otx2_cpt_pending_entry *ent = NULL;
++
++	ent = &q->head[q->rear];
++	if (unlikely(ent->busy))
++		return NULL;
++
++	q->rear++;
++	if (unlikely(q->rear == qlen))
++		q->rear = 0;
++
++	return ent;
++}
++
++static inline u32 modulo_inc(u32 index, u32 length, u32 inc)
++{
++	if (WARN_ON(inc > length))
++		inc = length;
++
++	index += inc;
++	if (unlikely(index >= length))
++		index -= length;
++
++	return index;
++}
++
++static inline void free_pentry(struct otx2_cpt_pending_entry *pentry)
++{
++	pentry->completion_addr = NULL;
++	pentry->info = NULL;
++	pentry->callback = NULL;
++	pentry->areq = NULL;
++	pentry->resume_sender = false;
++	pentry->busy = false;
++}
++
++static inline int setup_sgio_components(struct pci_dev *pdev,
++					struct otx2_cpt_buf_ptr *list,
++					int buf_count, u8 *buffer)
++{
++	struct otx2_cpt_sglist_component *sg_ptr = NULL;
++	int ret = 0, i, j;
++	int components;
++
++	if (unlikely(!list)) {
++		dev_err(&pdev->dev, "Input list pointer is NULL\n");
++		return -EFAULT;
++	}
++
++	for (i = 0; i < buf_count; i++) {
++		if (unlikely(!list[i].vptr))
++			continue;
++		list[i].dma_addr = dma_map_single(&pdev->dev, list[i].vptr,
++						  list[i].size,
++						  DMA_BIDIRECTIONAL);
++		if (unlikely(dma_mapping_error(&pdev->dev, list[i].dma_addr))) {
++			dev_err(&pdev->dev, "Dma mapping failed\n");
++			ret = -EIO;
++			goto sg_cleanup;
++		}
++	}
++	components = buf_count / 4;
++	sg_ptr = (struct otx2_cpt_sglist_component *)buffer;
++	for (i = 0; i < components; i++) {
++		sg_ptr->len0 = cpu_to_be16(list[i * 4 + 0].size);
++		sg_ptr->len1 = cpu_to_be16(list[i * 4 + 1].size);
++		sg_ptr->len2 = cpu_to_be16(list[i * 4 + 2].size);
++		sg_ptr->len3 = cpu_to_be16(list[i * 4 + 3].size);
++		sg_ptr->ptr0 = cpu_to_be64(list[i * 4 + 0].dma_addr);
++		sg_ptr->ptr1 = cpu_to_be64(list[i * 4 + 1].dma_addr);
++		sg_ptr->ptr2 = cpu_to_be64(list[i * 4 + 2].dma_addr);
++		sg_ptr->ptr3 = cpu_to_be64(list[i * 4 + 3].dma_addr);
++		sg_ptr++;
++	}
++	components = buf_count % 4;
++
++	switch (components) {
++	case 3:
++		sg_ptr->len2 = cpu_to_be16(list[i * 4 + 2].size);
++		sg_ptr->ptr2 = cpu_to_be64(list[i * 4 + 2].dma_addr);
++		fallthrough;
++	case 2:
++		sg_ptr->len1 = cpu_to_be16(list[i * 4 + 1].size);
++		sg_ptr->ptr1 = cpu_to_be64(list[i * 4 + 1].dma_addr);
++		fallthrough;
++	case 1:
++		sg_ptr->len0 = cpu_to_be16(list[i * 4 + 0].size);
++		sg_ptr->ptr0 = cpu_to_be64(list[i * 4 + 0].dma_addr);
++		break;
++	default:
++		break;
++	}
++	return ret;
++
++sg_cleanup:
++	for (j = 0; j < i; j++) {
++		if (list[j].dma_addr) {
++			dma_unmap_single(&pdev->dev, list[j].dma_addr,
++					 list[j].size, DMA_BIDIRECTIONAL);
++		}
++
++		list[j].dma_addr = 0;
++	}
++	return ret;
++}
++
++static inline struct otx2_cpt_inst_info *info_create(struct pci_dev *pdev,
++					      struct otx2_cpt_req_info *req,
++					      gfp_t gfp)
++{
++	int align = OTX2_CPT_DMA_MINALIGN;
++	struct otx2_cpt_inst_info *info;
++	u32 dlen, align_dlen, info_len;
++	u16 g_sz_bytes, s_sz_bytes;
++	u32 total_mem_len;
++
++	if (unlikely(req->in_cnt > OTX2_CPT_MAX_SG_IN_CNT ||
++		     req->out_cnt > OTX2_CPT_MAX_SG_OUT_CNT)) {
++		dev_err(&pdev->dev, "Error too many sg components\n");
++		return NULL;
++	}
++
++	g_sz_bytes = ((req->in_cnt + 3) / 4) *
++		      sizeof(struct otx2_cpt_sglist_component);
++	s_sz_bytes = ((req->out_cnt + 3) / 4) *
++		      sizeof(struct otx2_cpt_sglist_component);
++
++	dlen = g_sz_bytes + s_sz_bytes + SG_LIST_HDR_SIZE;
++	align_dlen = ALIGN(dlen, align);
++	info_len = ALIGN(sizeof(*info), align);
++	total_mem_len = align_dlen + info_len + sizeof(union otx2_cpt_res_s);
++
++	info = kzalloc(total_mem_len, gfp);
++	if (unlikely(!info))
++		return NULL;
++
++	info->dlen = dlen;
++	info->in_buffer = (u8 *)info + info_len;
++
++	((u16 *)info->in_buffer)[0] = req->out_cnt;
++	((u16 *)info->in_buffer)[1] = req->in_cnt;
++	((u16 *)info->in_buffer)[2] = 0;
++	((u16 *)info->in_buffer)[3] = 0;
++	cpu_to_be64s((u64 *)info->in_buffer);
++
++	/* Setup gather (input) components */
++	if (setup_sgio_components(pdev, req->in, req->in_cnt,
++				  &info->in_buffer[8])) {
++		dev_err(&pdev->dev, "Failed to setup gather list\n");
++		goto destroy_info;
++	}
++
++	if (setup_sgio_components(pdev, req->out, req->out_cnt,
++				  &info->in_buffer[8 + g_sz_bytes])) {
++		dev_err(&pdev->dev, "Failed to setup scatter list\n");
++		goto destroy_info;
++	}
++
++	info->dma_len = total_mem_len - info_len;
++	info->dptr_baddr = dma_map_single(&pdev->dev, info->in_buffer,
++					  info->dma_len, DMA_BIDIRECTIONAL);
++	if (unlikely(dma_mapping_error(&pdev->dev, info->dptr_baddr))) {
++		dev_err(&pdev->dev, "DMA Mapping failed for cpt req\n");
++		goto destroy_info;
++	}
 +	/*
-+	 * Check if AF has setup revision for RVUM block, otherwise
-+	 * driver probe should be deferred until AF driver comes up
++	 * Get buffer for union otx2_cpt_res_s response
++	 * structure and its physical address
 +	 */
-+	if (!rev) {
-+		dev_warn(&cptpf->pdev->dev,
-+			 "AF is not initialized, deferring probe\n");
-+		return -EPROBE_DEFER;
-+	}
-+	return 0;
++	info->completion_addr = info->in_buffer + align_dlen;
++	info->comp_baddr = info->dptr_baddr + align_dlen;
++
++	return info;
++destroy_info:
++	otx2_cpt_info_destroy(pdev, info);
++	return NULL;
 +}
 +
-+static int otx2_cptpf_probe(struct pci_dev *pdev,
-+			    const struct pci_device_id *ent)
++static int process_request(struct pci_dev *pdev, struct otx2_cpt_req_info *req,
++			   struct otx2_cpt_pending_queue *pqueue,
++			   struct otx2_cptlf_info *lf)
 +{
-+	struct device *dev = &pdev->dev;
-+	struct otx2_cptpf_dev *cptpf;
-+	int err;
++	struct otx2_cptvf_request *cpt_req = &req->req;
++	struct otx2_cpt_pending_entry *pentry = NULL;
++	union otx2_cpt_ctrl_info *ctrl = &req->ctrl;
++	struct otx2_cpt_inst_info *info = NULL;
++	union otx2_cpt_res_s *result = NULL;
++	struct otx2_cpt_iq_command iq_cmd;
++	union otx2_cpt_inst_s cptinst;
++	int retry, ret = 0;
++	u8 resume_sender;
++	gfp_t gfp;
 +
-+	cptpf = devm_kzalloc(dev, sizeof(*cptpf), GFP_KERNEL);
-+	if (!cptpf)
++	gfp = (req->areq->flags & CRYPTO_TFM_REQ_MAY_SLEEP) ? GFP_KERNEL :
++							      GFP_ATOMIC;
++	if (unlikely(!otx2_cptlf_started(lf->lfs)))
++		return -ENODEV;
++
++	info = info_create(pdev, req, gfp);
++	if (unlikely(!info)) {
++		dev_err(&pdev->dev, "Setting up cpt inst info failed");
 +		return -ENOMEM;
++	}
++	cpt_req->dlen = info->dlen;
 +
-+	err = pcim_enable_device(pdev);
-+	if (err) {
-+		dev_err(dev, "Failed to enable PCI device\n");
-+		goto clear_drvdata;
++	result = info->completion_addr;
++	result->s.compcode = OTX2_CPT_COMPLETION_CODE_INIT;
++
++	spin_lock_bh(&pqueue->lock);
++	pentry = get_free_pending_entry(pqueue, pqueue->qlen);
++	retry = CPT_PENTRY_TIMEOUT / CPT_PENTRY_STEP;
++	while (unlikely(!pentry) && retry--) {
++		spin_unlock_bh(&pqueue->lock);
++		udelay(CPT_PENTRY_STEP);
++		spin_lock_bh(&pqueue->lock);
++		pentry = get_free_pending_entry(pqueue, pqueue->qlen);
 +	}
 +
-+	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
-+	if (err) {
-+		dev_err(dev, "Unable to get usable DMA configuration\n");
-+		goto clear_drvdata;
++	if (unlikely(!pentry)) {
++		ret = -ENOSPC;
++		goto destroy_info;
 +	}
-+	/* Map PF's configuration registers */
-+	err = pcim_iomap_regions_request_all(pdev, 1 << PCI_PF_REG_BAR_NUM,
-+					     OTX2_CPT_DRV_NAME);
-+	if (err) {
-+		dev_err(dev, "Couldn't get PCI resources 0x%x\n", err);
-+		goto clear_drvdata;
-+	}
-+	pci_set_master(pdev);
-+	pci_set_drvdata(pdev, cptpf);
-+	cptpf->pdev = pdev;
 +
-+	cptpf->reg_base = pcim_iomap_table(pdev)[PCI_PF_REG_BAR_NUM];
++	/*
++	 * Check if we are close to filling in entire pending queue,
++	 * if so then tell the sender to stop/sleep by returning -EBUSY
++	 * We do it only for context which can sleep (GFP_KERNEL)
++	 */
++	if (gfp == GFP_KERNEL &&
++	    pqueue->pending_count > (pqueue->qlen - CPT_IQ_STOP_MARGIN)) {
++		pentry->resume_sender = true;
++	} else
++		pentry->resume_sender = false;
++	resume_sender = pentry->resume_sender;
++	pqueue->pending_count++;
 +
-+	/* Check if AF driver is up, otherwise defer probe */
-+	err = cpt_is_pf_usable(cptpf);
-+	if (err)
-+		goto clear_drvdata;
++	pentry->completion_addr = info->completion_addr;
++	pentry->info = info;
++	pentry->callback = req->callback;
++	pentry->areq = req->areq;
++	pentry->busy = true;
++	info->pentry = pentry;
++	info->time_in = jiffies;
++	info->req = req;
 +
-+	return 0;
-+clear_drvdata:
-+	pci_set_drvdata(pdev, NULL);
-+	return err;
++	/* Fill in the command */
++	iq_cmd.cmd.u = 0;
++	iq_cmd.cmd.s.opcode = cpu_to_be16(cpt_req->opcode.flags);
++	iq_cmd.cmd.s.param1 = cpu_to_be16(cpt_req->param1);
++	iq_cmd.cmd.s.param2 = cpu_to_be16(cpt_req->param2);
++	iq_cmd.cmd.s.dlen   = cpu_to_be16(cpt_req->dlen);
++
++	/* 64-bit swap for microcode data reads, not needed for addresses*/
++	cpu_to_be64s(&iq_cmd.cmd.u);
++	iq_cmd.dptr = info->dptr_baddr;
++	iq_cmd.rptr = 0;
++	iq_cmd.cptr.u = 0;
++	iq_cmd.cptr.s.grp = ctrl->s.grp;
++
++	/* Fill in the CPT_INST_S type command for HW interpretation */
++	otx2_cpt_fill_inst(&cptinst, &iq_cmd, info->comp_baddr);
++
++	/* Print debug info if enabled */
++	otx2_cpt_dump_sg_list(pdev, req);
++	pr_debug("Cpt_inst_s hexdump (%d bytes)\n", OTX2_CPT_INST_SIZE);
++	print_hex_dump_debug("", 0, 16, 1, &cptinst, OTX2_CPT_INST_SIZE, false);
++	pr_debug("Dptr hexdump (%d bytes)\n", cpt_req->dlen);
++	print_hex_dump_debug("", 0, 16, 1, info->in_buffer,
++			     cpt_req->dlen, false);
++
++	/* Send CPT command */
++	otx2_cpt_send_cmd(&cptinst, 1, lf);
++
++	/*
++	 * We allocate and prepare pending queue entry in critical section
++	 * together with submitting CPT instruction to CPT instruction queue
++	 * to make sure that order of CPT requests is the same in both
++	 * pending and instruction queues
++	 */
++	spin_unlock_bh(&pqueue->lock);
++
++	ret = resume_sender ? -EBUSY : -EINPROGRESS;
++	return ret;
++destroy_info:
++	spin_unlock_bh(&pqueue->lock);
++	otx2_cpt_info_destroy(pdev, info);
++	return ret;
 +}
 +
-+static void otx2_cptpf_remove(struct pci_dev *pdev)
++int otx2_cpt_do_request(struct pci_dev *pdev, struct otx2_cpt_req_info *req,
++			int cpu_num)
 +{
-+	struct otx2_cptpf_dev *cptpf = pci_get_drvdata(pdev);
++	struct otx2_cptvf_dev *cptvf = pci_get_drvdata(pdev);
++	struct otx2_cptlfs_info *lfs = &cptvf->lfs;
 +
-+	if (!cptpf)
-+		return;
-+
-+	pci_set_drvdata(pdev, NULL);
++	return process_request(lfs->pdev, req, &lfs->lf[cpu_num].pqueue,
++			       &lfs->lf[cpu_num]);
 +}
 +
-+/* Supported devices */
-+static const struct pci_device_id otx2_cpt_id_table[] = {
-+	{ PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, OTX2_CPT_PCI_PF_DEVICE_ID) },
-+	{ 0, }  /* end of table */
-+};
++static int cpt_process_ccode(struct pci_dev *pdev,
++			     union otx2_cpt_res_s *cpt_status,
++			     struct otx2_cpt_inst_info *info,
++			     u32 *res_code)
++{
++	u8 uc_ccode = cpt_status->s.uc_compcode;
++	u8 ccode = cpt_status->s.compcode;
 +
-+static struct pci_driver otx2_cpt_pci_driver = {
-+	.name = OTX2_CPT_DRV_NAME,
-+	.id_table = otx2_cpt_id_table,
-+	.probe = otx2_cptpf_probe,
-+	.remove = otx2_cptpf_remove,
-+};
++	switch (ccode) {
++	case OTX2_CPT_COMP_E_FAULT:
++		dev_err(&pdev->dev,
++			"Request failed with DMA fault\n");
++		otx2_cpt_dump_sg_list(pdev, info->req);
++		break;
 +
-+module_pci_driver(otx2_cpt_pci_driver);
++	case OTX2_CPT_COMP_E_HWERR:
++		dev_err(&pdev->dev,
++			"Request failed with hardware error\n");
++		otx2_cpt_dump_sg_list(pdev, info->req);
++		break;
 +
-+MODULE_AUTHOR("Marvell");
-+MODULE_DESCRIPTION(OTX2_CPT_DRV_STRING);
-+MODULE_LICENSE("GPL v2");
-+MODULE_DEVICE_TABLE(pci, otx2_cpt_id_table);
++	case OTX2_CPT_COMP_E_INSTERR:
++		dev_err(&pdev->dev,
++			"Request failed with instruction error\n");
++		otx2_cpt_dump_sg_list(pdev, info->req);
++		break;
++
++	case OTX2_CPT_COMP_E_NOTDONE:
++		/* check for timeout */
++		if (time_after_eq(jiffies, info->time_in +
++				  CPT_COMMAND_TIMEOUT * HZ))
++			dev_warn(&pdev->dev,
++				 "Request timed out 0x%p", info->req);
++		else if (info->extra_time < CPT_TIME_IN_RESET_COUNT) {
++			info->time_in = jiffies;
++			info->extra_time++;
++		}
++		return 1;
++
++	case OTX2_CPT_COMP_E_GOOD:
++		/*
++		 * Check microcode completion code, it is only valid
++		 * when completion code is CPT_COMP_E::GOOD
++		 */
++		if (uc_ccode != OTX2_CPT_UCC_SUCCESS) {
++			/*
++			 * If requested hmac is truncated and ucode returns
++			 * s/g write length error then we report success
++			 * because ucode writes as many bytes of calculated
++			 * hmac as available in gather buffer and reports
++			 * s/g write length error if number of bytes in gather
++			 * buffer is less than full hmac size.
++			 */
++			if (info->req->is_trunc_hmac &&
++			    uc_ccode == OTX2_CPT_UCC_SG_WRITE_LENGTH) {
++				*res_code = 0;
++				break;
++			}
++
++			dev_err(&pdev->dev,
++				"Request failed with software error code 0x%x\n",
++				cpt_status->s.uc_compcode);
++			otx2_cpt_dump_sg_list(pdev, info->req);
++			break;
++		}
++		/* Request has been processed with success */
++		*res_code = 0;
++		break;
++
++	default:
++		dev_err(&pdev->dev,
++			"Request returned invalid status %d\n", ccode);
++		break;
++	}
++	return 0;
++}
++
++static inline void process_pending_queue(struct pci_dev *pdev,
++					 struct otx2_cpt_pending_queue *pqueue)
++{
++	struct otx2_cpt_pending_entry *resume_pentry = NULL;
++	void (*callback)(int status, void *arg, void *req);
++	struct otx2_cpt_pending_entry *pentry = NULL;
++	union otx2_cpt_res_s *cpt_status = NULL;
++	struct otx2_cpt_inst_info *info = NULL;
++	struct otx2_cpt_req_info *req = NULL;
++	struct crypto_async_request *areq;
++	u32 res_code, resume_index;
++
++	while (1) {
++		spin_lock_bh(&pqueue->lock);
++		pentry = &pqueue->head[pqueue->front];
++
++		if (WARN_ON(!pentry)) {
++			spin_unlock_bh(&pqueue->lock);
++			break;
++		}
++
++		res_code = -EINVAL;
++		if (unlikely(!pentry->busy)) {
++			spin_unlock_bh(&pqueue->lock);
++			break;
++		}
++
++		if (unlikely(!pentry->callback)) {
++			dev_err(&pdev->dev, "Callback NULL\n");
++			goto process_pentry;
++		}
++
++		info = pentry->info;
++		if (unlikely(!info)) {
++			dev_err(&pdev->dev, "Pending entry post arg NULL\n");
++			goto process_pentry;
++		}
++
++		req = info->req;
++		if (unlikely(!req)) {
++			dev_err(&pdev->dev, "Request NULL\n");
++			goto process_pentry;
++		}
++
++		cpt_status = pentry->completion_addr;
++		if (unlikely(!cpt_status)) {
++			dev_err(&pdev->dev, "Completion address NULL\n");
++			goto process_pentry;
++		}
++
++		if (cpt_process_ccode(pdev, cpt_status, info, &res_code)) {
++			spin_unlock_bh(&pqueue->lock);
++			return;
++		}
++		info->pdev = pdev;
++
++process_pentry:
++		/*
++		 * Check if we should inform sending side to resume
++		 * We do it CPT_IQ_RESUME_MARGIN elements in advance before
++		 * pending queue becomes empty
++		 */
++		resume_index = modulo_inc(pqueue->front, pqueue->qlen,
++					  CPT_IQ_RESUME_MARGIN);
++		resume_pentry = &pqueue->head[resume_index];
++		if (resume_pentry &&
++		    resume_pentry->resume_sender) {
++			resume_pentry->resume_sender = false;
++			callback = resume_pentry->callback;
++			areq = resume_pentry->areq;
++
++			if (callback) {
++				spin_unlock_bh(&pqueue->lock);
++
++				/*
++				 * EINPROGRESS is an indication for sending
++				 * side that it can resume sending requests
++				 */
++				callback(-EINPROGRESS, areq, info);
++				spin_lock_bh(&pqueue->lock);
++			}
++		}
++
++		callback = pentry->callback;
++		areq = pentry->areq;
++		free_pentry(pentry);
++
++		pqueue->pending_count--;
++		pqueue->front = modulo_inc(pqueue->front, pqueue->qlen, 1);
++		spin_unlock_bh(&pqueue->lock);
++
++		/*
++		 * Call callback after current pending entry has been
++		 * processed, we don't do it if the callback pointer is
++		 * invalid.
++		 */
++		if (callback)
++			callback(res_code, areq, info);
++	}
++}
++
++void otx2_cpt_post_process(struct otx2_cptlf_wqe *wqe)
++{
++	process_pending_queue(wqe->lfs->pdev,
++			      &wqe->lfs->lf[wqe->lf_num].pqueue);
++}
 -- 
 2.28.0
 
