@@ -2,108 +2,571 @@ Return-Path: <SRS0=zC9F=ED=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED402C55179
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 21:56:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21743C4363A
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 21:59:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B3E32470E
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 21:56:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ACA3D2473C
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Oct 2020 21:59:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="L2xbAiWT"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="X+sGhkKq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728480AbgJ1V4S (ORCPT
+        id S1729318AbgJ1V7i (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Oct 2020 17:56:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49764 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728590AbgJ1V4O (ORCPT
+        Wed, 28 Oct 2020 17:59:38 -0400
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:7414 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729336AbgJ1V7e (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Oct 2020 17:56:14 -0400
-Received: from mail-yb1-xb43.google.com (mail-yb1-xb43.google.com [IPv6:2607:f8b0:4864:20::b43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B6EEC0613CF
-        for <linux-crypto@vger.kernel.org>; Wed, 28 Oct 2020 14:56:14 -0700 (PDT)
-Received: by mail-yb1-xb43.google.com with SMTP id a12so441700ybg.9
-        for <linux-crypto@vger.kernel.org>; Wed, 28 Oct 2020 14:56:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=9ZlXToatDcyQe4UfooUu3JrhisJTqzWvPk9UeTaykHI=;
-        b=L2xbAiWTTbIrt5K7yoWLPYgbHcR6JA3ygW52PmeYhcPUro9EBJ7jeSZ+LuUceUwi6h
-         7oJ0nyVewkcb5K+ygEJWYYMKXhaWMSobBdS26zzBkdJSzJLQfkJ9ORBytL4idG2x8OiJ
-         9aarfLTEzGCk1uCjCog7oi7V7msQ35V7eKNBN6lB3Pt0XeZUaZZGqxIfwBcha2zEJ3WN
-         kZ9kfFU6h35Lf2aGkBLA0WhEm9MhweORqvnr/qOj6MkqYCWc4yB4rpgdiBoO/86iCgZ7
-         IEUBBDYCvLrMJVulHBHcZCHWqbinwfnCxIm8NM7pVPl6asD8IeCh1a7crlyWFtjVbf2K
-         AdbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=9ZlXToatDcyQe4UfooUu3JrhisJTqzWvPk9UeTaykHI=;
-        b=Ne+ZZbKLe2lIY33kP3nTw/kiIDuXDgkMH9fFlqOV6vs93BLcOF9ArvJ6sQ0dqrwArC
-         v5oEAX38vgPA5geOfrsxtcCZ6RYrJ6ur0koaq1ajbC8KM4DZXji8uEwMtNfp3aVLmAKf
-         QJp89A5BXVCw3aQ8wOdoP3hlvteACyzVX8EOjBzHXB5zsY1epp5ASgdD8cnzy2beZwFt
-         +7Ou/7ppjSURdP2TKDDuBsgWt6VFR9XiMwle5XUm/AeHh2Tj3FWnRBM+era/blW+aHUv
-         KSW9Q5Bk9RduYos+Hwc2Ip+k33dxbcG4hLFdP3yrb3K3EXi0QV/dx3Zz4UOU0DxZ72kJ
-         xl1w==
-X-Gm-Message-State: AOAM533ZUkEbAofnrhkt1LUwZxNQd5Emyge85z05I7hiNTOuzGuoST0b
-        0Qnzoe9/8ZOc6uciCTfBk21wX781kWmAove8zhvTbQ8xzAA9GA==
-X-Google-Smtp-Source: ABdhPJwPEPpN0dIcKBfaGDgutMYF3sOkE6KoP9i1uddB1epbqqtMw2qCiW/gFeatIzJ1+Wk2li1pZyaWC1wQlcX+ghA=
-X-Received: by 2002:a25:41d0:: with SMTP id o199mr9520447yba.276.1603885293714;
- Wed, 28 Oct 2020 04:41:33 -0700 (PDT)
+        Wed, 28 Oct 2020 17:59:34 -0400
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 09SEoFkx017152;
+        Wed, 28 Oct 2020 07:51:44 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pfpt0220;
+ bh=5iZtiL0lsSVW0faSIKF/ffd/0FCE+7WMlOhqwZm1n0w=;
+ b=X+sGhkKq/gdfF00dJ0NRCkp0kxj5lkSFiin4yQo8q2JFi4G+IUqzhRw8Srzu/tMgWn/K
+ bUHUlKrxJFG4FEPEz/RKTPKUJeR4p009TdjIpjm05sgqAAyh7z2Po4hgiA1V2Wqf6PuA
+ UpYE/lh66L4tlzm6iL6WMYK3gz4EntN9LWfyDuDe+uQCtCpHDjkM4W3+C4SftS7aO/gA
+ 8WqF1Z7ckwSGa+CWEbjfIBdXT80kcTKtGAoD/mR40rPbm0bJHgWfhU6w66b9wwqKtkX1
+ gtxrH7Whqz/1ARMgAWDlqTwwP2RpcRFqDJ40cZo90XjbA8s2nQG1v5fCUCrMQiOnmzFO +Q== 
+Received: from sc-exch02.marvell.com ([199.233.58.182])
+        by mx0a-0016f401.pphosted.com with ESMTP id 34chmn886f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Wed, 28 Oct 2020 07:51:43 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by SC-EXCH02.marvell.com
+ (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 28 Oct
+ 2020 07:51:43 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 28 Oct
+ 2020 07:51:42 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Wed, 28 Oct 2020 07:51:42 -0700
+Received: from hyd1schalla-dt.marvell.com (hyd1schalla-dt.marvell.com [10.29.8.39])
+        by maili.marvell.com (Postfix) with ESMTP id 9633F3F7040;
+        Wed, 28 Oct 2020 07:51:38 -0700 (PDT)
+From:   Srujana Challa <schalla@marvell.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <kuba@kernel.org>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <schandran@marvell.com>,
+        <pathreya@marvell.com>, Srujana Challa <schalla@marvell.com>
+Subject: [PATCH v8,net-next,09/12] crypto: octeontx2: add support to get engine capabilities
+Date:   Wed, 28 Oct 2020 20:20:12 +0530
+Message-ID: <20201028145015.19212-10-schalla@marvell.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201028145015.19212-1-schalla@marvell.com>
+References: <20201028145015.19212-1-schalla@marvell.com>
 MIME-Version: 1.0
-References: <20201026130450.6947-1-gilad@benyossef.com> <20201026130450.6947-4-gilad@benyossef.com>
- <20201026175231.GG858@sol.localdomain> <d07b062c-1405-4d72-b907-1c4dfa97aecb@gmail.com>
- <20201026183936.GJ858@sol.localdomain> <20201026184155.GA6863@gondor.apana.org.au>
- <20201026184402.GA6908@gondor.apana.org.au>
-In-Reply-To: <20201026184402.GA6908@gondor.apana.org.au>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Wed, 28 Oct 2020 13:41:28 +0200
-Message-ID: <CAOtvUMf-xv5cHTjExW2Ffx6soLavFztow6DwE6Qo5pffF0N5uw@mail.gmail.com>
-Subject: Re: [PATCH 3/4] dm crypt: switch to EBOIV crypto API template
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Milan Broz <gmazyland@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        Song Liu <song@kernel.org>, Ofir Drang <ofir.drang@arm.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        linux-raid@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-10-28_07:2020-10-28,2020-10-28 signatures=0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 26, 2020 at 8:44 PM Herbert Xu <herbert@gondor.apana.org.au> wr=
-ote:
->
-> On Tue, Oct 27, 2020 at 05:41:55AM +1100, Herbert Xu wrote:
-> >
-> > The point is that people rebuilding their kernel can end up with a
-> > broken system.  Just set a default on EBOIV if dm-crypt is on.
->
-> That's not enough as it's an existing option.  So we need to
-> add a new Kconfig option with a default equal to dm-crypt.
+Adds support to get engine capabilities and adds a new mailbox
+to share capabilities with VF driver.
 
-Sorry if I'm being daft, but what did you refer to be "an existing
-option"? there was no CONFIG_EBOIV before my patchset, it was simply
-built as part of dm-crypt so it seems that setting CONFIG_EBOIV
-default to dm-crypto Kconfig option value does solves the problem, or
-have I missed something?
+Signed-off-by: Suheil Chandran <schandran@marvell.com>
+Signed-off-by: Srujana Challa <schalla@marvell.com>
+---
+ .../marvell/octeontx2/otx2_cpt_common.h       |  36 ++++
+ .../marvell/octeontx2/otx2_cpt_reqmgr.h       |  51 ++++++
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.h |  62 +++++++
+ drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   3 +
+ .../marvell/octeontx2/otx2_cptpf_main.c       |   5 +
+ .../marvell/octeontx2/otx2_cptpf_mbox.c       |  31 ++++
+ .../marvell/octeontx2/otx2_cptpf_ucode.c      | 165 ++++++++++++++++++
+ .../marvell/octeontx2/otx2_cptpf_ucode.h      |   1 +
+ 8 files changed, 354 insertions(+)
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
 
-Thanks,
-Gilad
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
+index d5576f5d3b90..705a0503b962 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
++++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
+@@ -20,6 +20,7 @@
+ 
+ #define OTX2_CPT_INVALID_CRYPTO_ENG_GRP 0xFF
+ #define OTX2_CPT_NAME_LENGTH 64
++#define OTX2_CPT_DMA_MINALIGN 128
+ 
+ #define BAD_OTX2_CPT_ENG_TYPE OTX2_CPT_MAX_ENG_TYPES
+ 
+@@ -32,6 +33,7 @@ enum otx2_cpt_eng_type {
+ 
+ /* Take mbox id from end of CPT mbox range in AF (range 0xA00 - 0xBFF) */
+ #define MBOX_MSG_GET_ENG_GRP_NUM        0xBFF
++#define MBOX_MSG_GET_CAPS               0xBFD
+ 
+ /*
+  * Message request and response to get engine group number
+@@ -49,6 +51,40 @@ struct otx2_cpt_egrp_num_rsp {
+ 	u8 eng_grp_num;
+ };
+ 
++/* CPT HW capabilities */
++union otx2_cpt_eng_caps {
++	u64 u;
++	struct {
++		u64 reserved_0_4:5;
++		u64 mul:1;
++		u64 sha1_sha2:1;
++		u64 chacha20:1;
++		u64 zuc_snow3g:1;
++		u64 sha3:1;
++		u64 aes:1;
++		u64 kasumi:1;
++		u64 des:1;
++		u64 crc:1;
++		u64 reserved_14_63:50;
++	};
++};
++
++/*
++ * Message request and response to get HW capabilities for each
++ * engine type (SE, IE, AE).
++ * This messages are only used between CPT PF <=> CPT VF
++ */
++struct otx2_cpt_caps_msg {
++	struct mbox_msghdr hdr;
++};
++
++struct otx2_cpt_caps_rsp {
++	struct mbox_msghdr hdr;
++	u16 cpt_pf_drv_version;
++	u8 cpt_revision;
++	union otx2_cpt_eng_caps eng_caps[OTX2_CPT_MAX_ENG_TYPES];
++};
++
+ static inline void otx2_cpt_write64(void __iomem *reg_base, u64 blk, u64 slot,
+ 				    u64 offs, u64 val)
+ {
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
+new file mode 100644
+index 000000000000..9184f91c68c1
+--- /dev/null
++++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
+@@ -0,0 +1,51 @@
++/* SPDX-License-Identifier: GPL-2.0-only
++ * Copyright (C) 2020 Marvell.
++ */
++
++#ifndef __OTX2_CPT_REQMGR_H
++#define __OTX2_CPT_REQMGR_H
++
++#include "otx2_cpt_common.h"
++
++/* Completion code size and initial value */
++#define OTX2_CPT_COMPLETION_CODE_SIZE 8
++#define OTX2_CPT_COMPLETION_CODE_INIT OTX2_CPT_COMP_E_NOTDONE
++
++union otx2_cpt_opcode {
++	u16 flags;
++	struct {
++		u8 major;
++		u8 minor;
++	} s;
++};
++
++/*
++ * CPT_INST_S software command definitions
++ * Words EI (0-3)
++ */
++union otx2_cpt_iq_cmd_word0 {
++	u64 u;
++	struct {
++		__be16 opcode;
++		__be16 param1;
++		__be16 param2;
++		__be16 dlen;
++	} s;
++};
++
++union otx2_cpt_iq_cmd_word3 {
++	u64 u;
++	struct {
++		u64 cptr:61;
++		u64 grp:3;
++	} s;
++};
++
++struct otx2_cpt_iq_command {
++	union otx2_cpt_iq_cmd_word0 cmd;
++	u64 dptr;
++	u64 rptr;
++	union otx2_cpt_iq_cmd_word3 cptr;
++};
++
++#endif /* __OTX2_CPT_REQMGR_H */
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptlf.h b/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
+index be1315ddfb7b..edf404f039cf 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
+@@ -4,9 +4,11 @@
+ #ifndef __OTX2_CPTLF_H
+ #define __OTX2_CPTLF_H
+ 
++#include <linux/soc/marvell/octeontx2/asm.h>
+ #include <mbox.h>
+ #include <rvu.h>
+ #include "otx2_cpt_common.h"
++#include "otx2_cpt_reqmgr.h"
+ 
+ /*
+  * CPT instruction and pending queues user requested length in CPT_INST_S msgs
+@@ -271,6 +273,66 @@ static inline void otx2_cptlf_enable_iqueues(struct otx2_cptlfs_info *lfs)
+ 	}
+ }
+ 
++static inline void otx2_cpt_fill_inst(union otx2_cpt_inst_s *cptinst,
++				      struct otx2_cpt_iq_command *iq_cmd,
++				      u64 comp_baddr)
++{
++	cptinst->u[0] = 0x0;
++	cptinst->s.doneint = true;
++	cptinst->s.res_addr = comp_baddr;
++	cptinst->u[2] = 0x0;
++	cptinst->u[3] = 0x0;
++	cptinst->s.ei0 = iq_cmd->cmd.u;
++	cptinst->s.ei1 = iq_cmd->dptr;
++	cptinst->s.ei2 = iq_cmd->rptr;
++	cptinst->s.ei3 = iq_cmd->cptr.u;
++}
++
++/*
++ * On OcteonTX2 platform the parameter insts_num is used as a count of
++ * instructions to be enqueued. The valid values for insts_num are:
++ * 1 - 1 CPT instruction will be enqueued during LMTST operation
++ * 2 - 2 CPT instructions will be enqueued during LMTST operation
++ */
++static inline void otx2_cpt_send_cmd(union otx2_cpt_inst_s *cptinst,
++				     u32 insts_num, struct otx2_cptlf_info *lf)
++{
++	void __iomem *lmtline = lf->lmtline;
++	long ret;
++
++	/*
++	 * Make sure memory areas pointed in CPT_INST_S
++	 * are flushed before the instruction is sent to CPT
++	 */
++	dma_wmb();
++
++	do {
++		/* Copy CPT command to LMTLINE */
++		memcpy_toio(lmtline, cptinst, insts_num * OTX2_CPT_INST_SIZE);
++
++		/*
++		 * LDEOR initiates atomic transfer to I/O device
++		 * The following will cause the LMTST to fail (the LDEOR
++		 * returns zero):
++		 * - No stores have been performed to the LMTLINE since it was
++		 * last invalidated.
++		 * - The bytes which have been stored to LMTLINE since it was
++		 * last invalidated form a pattern that is non-contiguous, does
++		 * not start at byte 0, or does not end on a 8-byte boundary.
++		 * (i.e.comprises a formation of other than 1–16 8-byte
++		 * words.)
++		 *
++		 * These rules are designed such that an operating system
++		 * context switch or hypervisor guest switch need have no
++		 * knowledge of the LMTST operations; the switch code does not
++		 * need to store to LMTCANCEL. Also note as LMTLINE data cannot
++		 * be read, there is no information leakage between processes.
++		 */
++		ret = otx2_lmt_flush(lf->ioreg);
++
++	} while (!ret);
++}
++
+ int otx2_cptlf_init(struct otx2_cptlfs_info *lfs, u8 eng_grp_msk, int pri,
+ 		    int lfs_num);
+ void otx2_cptlf_shutdown(struct otx2_cptlfs_info *lfs);
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf.h b/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
+index 15561fe50bc0..fabe9fd33ee7 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
+@@ -26,6 +26,9 @@ struct otx2_cptpf_dev {
+ 	struct otx2_cptvf_info vf[OTX2_CPT_MAX_VFS_NUM];
+ 	struct otx2_cpt_eng_grps eng_grps;/* Engine groups information */
+ 	struct otx2_cptlfs_info lfs;      /* CPT LFs attached to this PF */
++	/* HW capabilities for each engine type */
++	union otx2_cpt_eng_caps eng_caps[OTX2_CPT_MAX_ENG_TYPES];
++	bool is_eng_caps_discovered;
+ 
+ 	/* AF <=> PF mbox */
+ 	struct otx2_mbox	afpf_mbox;
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
+index 165f431a5256..f93ef2378835 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
+@@ -408,6 +408,11 @@ static int cptpf_sriov_enable(struct pci_dev *pdev, int numvfs)
+ 	if (ret)
+ 		goto free_mbox;
+ 
++	/* Get CPT HW capabilities using LOAD_FVC operation. */
++	ret = otx2_cpt_discover_eng_capabilities(cptpf);
++	if (ret)
++		goto disable_intr;
++
+ 	ret = otx2_cpt_create_eng_grps(cptpf->pdev, &cptpf->eng_grps);
+ 	if (ret)
+ 		goto disable_intr;
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
+index c9bb6b14876c..c273e6a2a3b7 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
+@@ -5,6 +5,12 @@
+ #include "otx2_cptpf.h"
+ #include "rvu_reg.h"
+ 
++/*
++ * CPT PF driver version, It will be incremented by 1 for every feature
++ * addition in CPT mailbox messages.
++ */
++#define OTX2_CPT_PF_DRV_VERSION 0x1
++
+ static int forward_to_af(struct otx2_cptpf_dev *cptpf,
+ 			 struct otx2_cptvf_info *vf,
+ 			 struct mbox_msghdr *req, int size)
+@@ -35,6 +41,28 @@ static int forward_to_af(struct otx2_cptpf_dev *cptpf,
+ 	return 0;
+ }
+ 
++static int handle_msg_get_caps(struct otx2_cptpf_dev *cptpf,
++			       struct otx2_cptvf_info *vf,
++			       struct mbox_msghdr *req)
++{
++	struct otx2_cpt_caps_rsp *rsp;
++
++	rsp = (struct otx2_cpt_caps_rsp *)
++	      otx2_mbox_alloc_msg(&cptpf->vfpf_mbox, vf->vf_id,
++				  sizeof(*rsp));
++	if (!rsp)
++		return -ENOMEM;
++
++	rsp->hdr.id = MBOX_MSG_GET_CAPS;
++	rsp->hdr.sig = OTX2_MBOX_RSP_SIG;
++	rsp->hdr.pcifunc = req->pcifunc;
++	rsp->cpt_pf_drv_version = OTX2_CPT_PF_DRV_VERSION;
++	rsp->cpt_revision = cptpf->pdev->revision;
++	memcpy(&rsp->eng_caps, &cptpf->eng_caps, sizeof(rsp->eng_caps));
++
++	return 0;
++}
++
+ static int handle_msg_get_eng_grp_num(struct otx2_cptpf_dev *cptpf,
+ 				      struct otx2_cptvf_info *vf,
+ 				      struct mbox_msghdr *req)
+@@ -72,6 +100,9 @@ static int cptpf_handle_vf_req(struct otx2_cptpf_dev *cptpf,
+ 	case MBOX_MSG_GET_ENG_GRP_NUM:
+ 		err = handle_msg_get_eng_grp_num(cptpf, vf, req);
+ 		break;
++	case MBOX_MSG_GET_CAPS:
++		err = handle_msg_get_caps(cptpf, vf, req);
++		break;
+ 	default:
+ 		err = forward_to_af(cptpf, vf, req, size);
+ 		break;
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
+index 190937b6515b..f6223673b60f 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
+@@ -6,6 +6,8 @@
+ #include "otx2_cptpf_ucode.h"
+ #include "otx2_cpt_common.h"
+ #include "otx2_cptpf.h"
++#include "otx2_cptlf.h"
++#include "otx2_cpt_reqmgr.h"
+ #include "rvu_reg.h"
+ 
+ #define CSR_DELAY 30
+@@ -1366,3 +1368,166 @@ int otx2_cpt_init_eng_grps(struct pci_dev *pdev,
+ 	otx2_cpt_cleanup_eng_grps(pdev, eng_grps);
+ 	return ret;
+ }
++
++static int create_eng_caps_discovery_grps(struct pci_dev *pdev,
++					  struct otx2_cpt_eng_grps *eng_grps)
++{
++	struct tar_ucode_info_t *tar_info[OTX2_CPT_MAX_ETYPES_PER_GRP] = {  };
++	struct otx2_cpt_engines engs[OTX2_CPT_MAX_ETYPES_PER_GRP] = { {0} };
++	struct tar_arch_info_t *tar_arch = NULL;
++	char tar_filename[OTX2_CPT_NAME_LENGTH];
++	int ret = -EINVAL;
++
++	sprintf(tar_filename, "cpt%02d-mc.tar", pdev->revision);
++	tar_arch = load_tar_archive(&pdev->dev, tar_filename);
++	if (!tar_arch)
++		return -EINVAL;
++
++	tar_info[0] = get_uc_from_tar_archive(tar_arch, OTX2_CPT_AE_TYPES);
++	if (tar_info[0] == NULL) {
++		dev_err(&pdev->dev, "Unable to find AE firmware in %s\n",
++			tar_filename);
++		ret = -EINVAL;
++		goto release_tar;
++	}
++	engs[0].type = OTX2_CPT_AE_TYPES;
++	engs[0].count = 2;
++
++	ret = create_engine_group(&pdev->dev, eng_grps, engs, 1,
++				  (void **) tar_info, 0);
++	if (ret)
++		goto release_tar;
++
++	tar_info[0] = get_uc_from_tar_archive(tar_arch, OTX2_CPT_SE_TYPES);
++	if (tar_info[0] == NULL) {
++		dev_err(&pdev->dev, "Unable to find SE firmware in %s\n",
++			tar_filename);
++		ret = -EINVAL;
++		goto delete_eng_grp;
++	}
++	engs[0].type = OTX2_CPT_SE_TYPES;
++	engs[0].count = 2;
++
++	ret = create_engine_group(&pdev->dev, eng_grps, engs, 1,
++				  (void **) tar_info, 0);
++	if (ret)
++		goto delete_eng_grp;
++
++	tar_info[0] = get_uc_from_tar_archive(tar_arch, OTX2_CPT_IE_TYPES);
++	if (tar_info[0] == NULL) {
++		dev_err(&pdev->dev, "Unable to find AE firmware in %s\n",
++			tar_filename);
++		ret = -EINVAL;
++		goto delete_eng_grp;
++	}
++	engs[0].type = OTX2_CPT_IE_TYPES;
++	engs[0].count = 2;
++
++	ret = create_engine_group(&pdev->dev, eng_grps, engs, 1,
++				  (void **) tar_info, 0);
++	if (ret)
++		goto delete_eng_grp;
++
++	release_tar_archive(tar_arch);
++	return 0;
++
++delete_eng_grp:
++	delete_engine_grps(pdev, eng_grps);
++release_tar:
++	release_tar_archive(tar_arch);
++	return ret;
++}
++
++/*
++ * Get CPT HW capabilities using LOAD_FVC operation.
++ */
++int otx2_cpt_discover_eng_capabilities(struct otx2_cptpf_dev *cptpf)
++{
++	struct otx2_cptlfs_info *lfs = &cptpf->lfs;
++	struct otx2_cpt_iq_command iq_cmd;
++	union otx2_cpt_opcode opcode;
++	union otx2_cpt_res_s *result;
++	union otx2_cpt_inst_s inst;
++	dma_addr_t rptr_baddr;
++	struct pci_dev *pdev;
++	u32 len, compl_rlen;
++	int ret, etype;
++	void *rptr;
++
++	/*
++	 * We don't get capabilities if it was already done
++	 * (when user enabled VFs for the first time)
++	 */
++	if (cptpf->is_eng_caps_discovered)
++		return 0;
++
++	pdev = cptpf->pdev;
++	/*
++	 * Create engine groups for each type to submit LOAD_FVC op and
++	 * get engine's capabilities.
++	 */
++	ret = create_eng_caps_discovery_grps(pdev, &cptpf->eng_grps);
++	if (ret)
++		goto delete_grps;
++
++	lfs->pdev = pdev;
++	lfs->reg_base = cptpf->reg_base;
++	lfs->mbox = &cptpf->afpf_mbox;
++	ret = otx2_cptlf_init(&cptpf->lfs, OTX2_CPT_ALL_ENG_GRPS_MASK,
++			      OTX2_CPT_QUEUE_HI_PRIO, 1);
++	if (ret)
++		goto delete_grps;
++
++	compl_rlen = ALIGN(sizeof(union otx2_cpt_res_s), OTX2_CPT_DMA_MINALIGN);
++	len = compl_rlen + LOADFVC_RLEN;
++
++	result = kzalloc(len, GFP_KERNEL);
++	if (!result) {
++		ret = -ENOMEM;
++		goto lf_cleanup;
++	}
++	rptr_baddr = dma_map_single(&pdev->dev, (void *)result, len,
++				    DMA_BIDIRECTIONAL);
++	if (dma_mapping_error(&pdev->dev, rptr_baddr)) {
++		dev_err(&pdev->dev, "DMA mapping failed\n");
++		ret = -EFAULT;
++		goto free_result;
++	}
++	rptr = (u8 *)result + compl_rlen;
++
++	/* Fill in the command */
++	opcode.s.major = LOADFVC_MAJOR_OP;
++	opcode.s.minor = LOADFVC_MINOR_OP;
++
++	iq_cmd.cmd.u = 0;
++	iq_cmd.cmd.s.opcode = cpu_to_be16(opcode.flags);
++
++	/* 64-bit swap for microcode data reads, not needed for addresses */
++	cpu_to_be64s(&iq_cmd.cmd.u);
++	iq_cmd.dptr = 0;
++	iq_cmd.rptr = rptr_baddr + compl_rlen;
++	iq_cmd.cptr.u = 0;
++
++	for (etype = 1; etype < OTX2_CPT_MAX_ENG_TYPES; etype++) {
++		result->s.compcode = OTX2_CPT_COMPLETION_CODE_INIT;
++		iq_cmd.cptr.s.grp = otx2_cpt_get_eng_grp(&cptpf->eng_grps,
++							 etype);
++		otx2_cpt_fill_inst(&inst, &iq_cmd, rptr_baddr);
++		otx2_cpt_send_cmd(&inst, 1, &cptpf->lfs.lf[0]);
++
++		while (result->s.compcode == OTX2_CPT_COMPLETION_CODE_INIT)
++			cpu_relax();
++
++		cptpf->eng_caps[etype].u = be64_to_cpup(rptr);
++	}
++	dma_unmap_single(&pdev->dev, rptr_baddr, len, DMA_BIDIRECTIONAL);
++	cptpf->is_eng_caps_discovered = true;
++free_result:
++	kzfree(result);
++lf_cleanup:
++	otx2_cptlf_shutdown(&cptpf->lfs);
++delete_grps:
++	delete_engine_grps(pdev, &cptpf->eng_grps);
++
++	return ret;
++}
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.h b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.h
+index ab7a1461b095..2decbf2f1e4a 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.h
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.h
+@@ -157,5 +157,6 @@ int otx2_cpt_create_eng_grps(struct pci_dev *pdev,
+ 			     struct otx2_cpt_eng_grps *eng_grps);
+ int otx2_cpt_disable_all_cores(struct otx2_cptpf_dev *cptpf);
+ int otx2_cpt_get_eng_grp(struct otx2_cpt_eng_grps *eng_grps, int eng_type);
++int otx2_cpt_discover_eng_capabilities(struct otx2_cptpf_dev *cptpf);
+ 
+ #endif /* __OTX2_CPTPF_UCODE_H */
+-- 
+2.28.0
 
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
