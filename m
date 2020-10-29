@@ -2,123 +2,104 @@ Return-Path: <SRS0=z7PZ=EE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF52C388F7
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Oct 2020 00:23:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5C3EC56201
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Oct 2020 00:53:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ADF02207DE
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Oct 2020 00:23:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DB44208C3
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Oct 2020 00:53:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G2vDIVHW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388468AbgJ2AXt convert rfc822-to-8bit (ORCPT
+        id S1726594AbgJ2AxM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Oct 2020 20:23:49 -0400
-Received: from verein.lst.de ([213.95.11.211]:45358 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388466AbgJ1Wh2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Oct 2020 18:37:28 -0400
-Received: by verein.lst.de (Postfix, from userid 107)
-        id 9202368C65; Wed, 28 Oct 2020 18:52:06 +0100 (CET)
-Received: from blackhole.lan (p5b33f9d6.dip0.t-ipconnect.de [91.51.249.214])
-        by verein.lst.de (Postfix) with ESMTPSA id 73EA367357;
-        Wed, 28 Oct 2020 18:51:22 +0100 (CET)
-Date:   Wed, 28 Oct 2020 18:51:17 +0100
-From:   Torsten Duwe <duwe@lst.de>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     Stephan =?UTF-8?B?TcO8bGxlcg==?= <smueller@chronox.de>,
-        Willy Tarreau <w@1wt.eu>, linux-crypto@vger.kernel.org,
-        Nicolai Stange <nstange@suse.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Peter Matthias <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Neil Horman <nhorman@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        And y Lavr <andy.lavr@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Petr Tesarik <ptesarik@suse.cz>, marcelo.cerri@canonical.com,
-        simo@redhat.com
-Subject: Re: [PATCH v36 00/13] /dev/random - a new approach
-Message-ID: <20201028185117.74300988@blackhole.lan>
-In-Reply-To: <3073852.aeNJFYEL58@positron.chronox.de>
-References: <20200921075857.4424-1-nstange@suse.de>
-        <2961243.vtBmWVcJkq@tauon.chronox.de>
-        <20201016172619.GA18410@lst.de>
-        <3073852.aeNJFYEL58@positron.chronox.de>
-Organization: LST e.V.
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
+        Wed, 28 Oct 2020 20:53:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50564 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725787AbgJ2AwV (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Oct 2020 20:52:21 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D5DAC0613CF;
+        Wed, 28 Oct 2020 17:52:21 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id u62so1564985iod.8;
+        Wed, 28 Oct 2020 17:52:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
+        bh=qYfouXO8KCaYN4zQ36HTIQpNGijmRLMWaq601lgAgNU=;
+        b=G2vDIVHWR7/IySHEfb2dLNbCkBqSEU5VvJPZJRUp/kBh6zWjJfcvZQTwD5bQcrVpyj
+         Lgu+oF51MHKub9m/z5fVoCaqEKrNRX3xwQZjygoSPFi2pCex2hHIrsYOyUlc9OM1ShKV
+         sIJLBedc4BovIGspIoi2hqzmO2iF+G49bbyR7PnRVWUX2CUWRorq4Mn1rPiNMUTAuyLS
+         6EsrhHnMZ7ka+rJbM47rmiHwKbvTI3YFcjPsrKppesVyX47nHLFDJL+ymF9xnk+G8Lk6
+         znxTNvg7a7V9mx1E6gfw8djo1TWbJSE+Ala0MPFZGKadfWG+LJ72Npd0qjS6BkfDzb76
+         vSHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=qYfouXO8KCaYN4zQ36HTIQpNGijmRLMWaq601lgAgNU=;
+        b=cjYDYwkTdzseqnr4gUrcMIfTMoGKIS4Kk6h3ZD9XMnzdNnfBKXfKA46oJrWaUU3XkH
+         uxtOiwe2B0NagDRm+EtMkWYnconiTFHDNpj8GAi6+7bGUw8r2hdAFqTopmVAUcc8NxSA
+         FukvlsmWSetbfnR5bsinsz6v6lFFmjghjLAN7cw/1SPS1Da1NbcZRHAvrygZBoVQE/se
+         O1otKDz0dnPTVj3R3PTli0Fbe+bXmtqrdBK7gaoidyymZbcHsWj6+T6VBH2hBU9NraDL
+         iiUZm8h7/rxkmNff29+8tD9zqGZ4BManEHOfYv78lNphT1nAWv+UT/RHURqRDooFlbPl
+         CIow==
+X-Gm-Message-State: AOAM53130jStcOnVwLM5pRLOal5ddPGdLXVgvlxnrpgAeKL6csa6ZUDm
+        SjFaS2v4qykNWzvjrbVJ0EU=
+X-Google-Smtp-Source: ABdhPJyJf1tSyGy80LhBfMuk+K/qeOqKhP54ePbdXLX+pW7phQWZckMRKslk5bWBBhJ6e0DrKDx4Hg==
+X-Received: by 2002:a5e:930d:: with SMTP id k13mr1593676iom.33.1603932740730;
+        Wed, 28 Oct 2020 17:52:20 -0700 (PDT)
+Received: from fedora-project ([185.240.246.172])
+        by smtp.gmail.com with ESMTPSA id r14sm1026454ilc.78.2020.10.28.17.52.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Oct 2020 17:52:20 -0700 (PDT)
+Date:   Wed, 28 Oct 2020 20:52:17 -0400
+From:   Nigel Christian <nigel.l.christian@gmail.com>
+To:     dan.carpenter@oracle.com, martin@kaiser.cx
+Cc:     mpm@selenic.com, herbert@gondor.apana.org.au, shawnguo@kernel.org,
+        s.hauer@pengutronix.de, kernel@pengutronix.de, festevam@gmail.com,
+        linux-imx@nxp.com, linux-crypto@vger.kernel.org,
+        prasannatsmkumar@gmail.com, m.felsch@pengutronix.de,
+        kernel-janitors@vger.kernel.org
+Subject: [PATCH resend] hwrng: imx-rngc - irq already prints an error
+Message-ID: <20201029005217.GA28008@fedora-project>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 19 Oct 2020 21:28:50 +0200
-Stephan Müller <smueller@chronox.de> wrote:
-[...]
-> * Sole use of crypto for data processing:
-[...]
->  - The LRNG uses only properly defined and implemented cryptographic
->    algorithms unlike the use of the SHA-1 transformation in the
-> existing /dev/random implementation.
-> 
->  - Hash operations use NUMA-node-local hash instances to benefit large
->    parallel systems.
-> 
->  - LRNG uses limited number of data post-processing steps
-[...]
-> * Performance
-> 
->  - Faster by up to 75% in the critical code path of the interrupt
-> handler depending on data collection size configurable at kernel
-> compile time - the default is about equal in performance with
-> existing /dev/random as outlined in [2] section 4.2.
+Clean up the check for irq. dev_err() is superfluous as
+platform_get_irq() already prints an error. Check for zero
+would indicate a bug. Remove curly braces to conform to
+styling requirements.
+Signed-off-by: Nigel Christian <nigel.l.christian@gmail.com>
+---
+ drivers/char/hw_random/imx-rngc.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-[...]
->  - ChaCha20 DRNG is significantly faster as implemented in the
-> existing /dev/random as demonstrated with [2] table 2.
-> 
->  - Faster entropy collection during boot time to reach fully seeded
->    level, including on virtual systems or systems with SSDs as
-> outlined in [2] section 4.1.
-> 
-> * Testing
-[...]
-
-So we now have 2 proposals for a state-of-the-art RNG, and over a month
-without a single comment on-topic from any `get_maintainer.pl`
-
-I don't want to emphasise the certification aspects so much. The
-interrelation is rather that those certifications require certain code
-features, features which are reasonable per se. But the current code is
-lagging way behind.
-
-I see the focus namely on performance, scalability, testability and
-virtualisation. And it certainly is an advantage to use the code
-already present under crypto, with its optimisations, and not rely
-on some home brew.
-
-Can we please have a discussion about how to proceed?
-Ted, Greg, Arnd: which approach would you prefer?
-
-	Torsten
+diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
+index 61c844baf26e..b05d676ca814 100644
+--- a/drivers/char/hw_random/imx-rngc.c
++++ b/drivers/char/hw_random/imx-rngc.c
+@@ -252,10 +252,8 @@ static int imx_rngc_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	irq = platform_get_irq(pdev, 0);
+-	if (irq <= 0) {
+-		dev_err(&pdev->dev, "Couldn't get irq %d\n", irq);
++	if (irq < 0)
+ 		return irq;
+-	}
+ 
+ 	ret = clk_prepare_enable(rngc->clk);
+ 	if (ret)
+-- 
+2.28.0
 
