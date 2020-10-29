@@ -2,290 +2,76 @@ Return-Path: <SRS0=z7PZ=EE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7628CC2D0A3
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Oct 2020 10:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04E3BC2D0A3
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Oct 2020 13:28:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 193CE2076E
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Oct 2020 10:06:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C2C720809
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Oct 2020 13:28:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b="fzg7iB17"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725562AbgJ2KGH (ORCPT
+        id S1727055AbgJ2N2I (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Oct 2020 06:06:07 -0400
-Received: from foss.arm.com ([217.140.110.172]:58682 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726134AbgJ2KGG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Oct 2020 06:06:06 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D617C139F;
-        Thu, 29 Oct 2020 03:06:04 -0700 (PDT)
-Received: from e110176-lin.kfn.arm.com (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C2C423F66E;
-        Thu, 29 Oct 2020 03:06:02 -0700 (PDT)
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Cc:     Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 4/4] crypto: ccree: re-introduce ccree eboiv support
-Date:   Thu, 29 Oct 2020 12:05:45 +0200
-Message-Id: <20201029100546.28686-5-gilad@benyossef.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201029100546.28686-1-gilad@benyossef.com>
-References: <20201029100546.28686-1-gilad@benyossef.com>
+        Thu, 29 Oct 2020 09:28:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55620 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726979AbgJ2N2H (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 29 Oct 2020 09:28:07 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B709C0613D2
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2020 06:28:07 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id l24so3012928edj.8
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2020 06:28:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cryptogams.org; s=gmail;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Oyeiy5Q1TmGmr/PgxXO0r5cep4TDtJRBLYIRB17UjEA=;
+        b=fzg7iB17YBdH0KzkgMDVvq7cF0jMFUr8q5sXJvSLpWrXm3yLyg3cMVJ9getLlTtEOb
+         AOc0aAl4dnfJx9/Z62oWMFZ6+lSC02DHunAcVjsLPM3mmKjkVObD10gBjZ1c6j8p1SkS
+         axfqPy+WY7Gi4IuOLi0Qrn0JuFwu3uuNJBekf/Rjyzyb23GHM9w26va8O6kT5A4x4Eec
+         qe1r8Uba+HJT0CL2swpTnk3nTUJwHOw6aUBoDOw0nQ/NznCUlUhXhRzrRKRNXf5FkgM6
+         hE+A1n6xzfiz0aEr0IJx7wGCceMUbG0S//6kfH//rfrkC4VH/Md1wMT2IGyNwGzQYgBB
+         ADMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Oyeiy5Q1TmGmr/PgxXO0r5cep4TDtJRBLYIRB17UjEA=;
+        b=fPCElY7c1VDlwYSUWhzNglVX1pV8iQoJ09FjJBVElWuvBHq8vCL1hKzRL6eN3ExMX6
+         2mznl+dDKEJZgha7fVEFIIyG2PMyYPg72SirIec/WlKF3hjE5Au0Bdqc+DDe0cNBmtfs
+         rYTwIsCilXkuZ5QZShFQ5o3mylnCEZdMMjVdUsccDZQMosjCA8F3PuZ1GYuTUAuf2wj/
+         rQuzBib3WPMjEe2keTOARlo95ePH5NdVGUCZXRvFlro0jTAyUfD09pwcpwo8P3PB0E71
+         6EfhJlYMXPnatdzM9Mnn1tmRgWK1CfgaR4GSLdhH1+mFeEQPPSe4zVOaafesAkiioYHg
+         U2mg==
+X-Gm-Message-State: AOAM530qw6o9+S7mVY4K+AiCtr5VZVXh2ZVDCBkdQrwkB0TuLqOAiqHZ
+        zhkhz4bmnvBqsAHA1aapcJrN6nk5V0LJPfxL+fG1QQzLSfsZOg==
+X-Google-Smtp-Source: ABdhPJwQ5HbVCufig4+3RLBmiXBpdxafNIGuSdENMCreFHr0TSLZnK0rJgL0SzvN3vuA4v0TF4qOvJ7YFKRSncQHKsc=
+X-Received: by 2002:aa7:d1cc:: with SMTP id g12mr4037019edp.195.1603978086248;
+ Thu, 29 Oct 2020 06:28:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20201026230027.25813-1-ardb@kernel.org> <20201026230323.GA1947033@gmail.com>
+ <CAMj1kXGYgxe_=1kQjKZKOxc7KkxjM4g7D5jsexBfrM++_FAiGw@mail.gmail.com> <CAMj1kXE6nxmwbyJb3kJdThmpf1wGQEe73Zh=2e7zcj=9wh3MxQ@mail.gmail.com>
+In-Reply-To: <CAMj1kXE6nxmwbyJb3kJdThmpf1wGQEe73Zh=2e7zcj=9wh3MxQ@mail.gmail.com>
+From:   Andy Polyakov <appro@cryptogams.org>
+Date:   Thu, 29 Oct 2020 14:27:54 +0100
+Message-ID: <CABb3=+ZU1Exw697+zMCZAG43mDKFf5NkjAZqE35cn7-da+aGAg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: arm64/poly1305-neon - reorder PAC authentication
+ with SP update
+To:     Ard Biesheuvel <ardb@kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-BitLocker eboiv support, which was removed in
-commit 1d8b41ff6991 ("crypto: ccree - remove bitlocker cipher")
-is reintroduced based on the crypto API new support for
-eboiv.
+> (+ Andy)
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Fixes: 1d8b41ff6991 ("crypto: ccree - remove bitlocker cipher")
----
- drivers/crypto/ccree/cc_cipher.c     | 132 +++++++++++++++++++--------
- drivers/crypto/ccree/cc_crypto_ctx.h |   1 +
- 2 files changed, 96 insertions(+), 37 deletions(-)
-
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index dafa6577a845..a13ae60189ed 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -74,10 +74,14 @@ static int validate_keys_sizes(struct cc_cipher_ctx *ctx_p, u32 size)
- 	case S_DIN_to_AES:
- 		switch (size) {
- 		case CC_AES_128_BIT_KEY_SIZE:
--		case CC_AES_192_BIT_KEY_SIZE:
- 			if (ctx_p->cipher_mode != DRV_CIPHER_XTS)
- 				return 0;
- 			break;
-+		case CC_AES_192_BIT_KEY_SIZE:
-+			if (ctx_p->cipher_mode != DRV_CIPHER_XTS &&
-+			    ctx_p->cipher_mode != DRV_CIPHER_BITLOCKER)
-+				return 0;
-+			break;
- 		case CC_AES_256_BIT_KEY_SIZE:
- 			return 0;
- 		case (CC_AES_192_BIT_KEY_SIZE * 2):
-@@ -120,6 +124,7 @@ static int validate_data_size(struct cc_cipher_ctx *ctx_p,
- 		case DRV_CIPHER_ECB:
- 		case DRV_CIPHER_CBC:
- 		case DRV_CIPHER_ESSIV:
-+		case DRV_CIPHER_BITLOCKER:
- 			if (IS_ALIGNED(size, AES_BLOCK_SIZE))
- 				return 0;
- 			break;
-@@ -345,7 +350,8 @@ static int cc_cipher_sethkey(struct crypto_skcipher *sktfm, const u8 *key,
- 		}
- 
- 		if (ctx_p->cipher_mode == DRV_CIPHER_XTS ||
--		    ctx_p->cipher_mode == DRV_CIPHER_ESSIV) {
-+		    ctx_p->cipher_mode == DRV_CIPHER_ESSIV ||
-+		    ctx_p->cipher_mode == DRV_CIPHER_BITLOCKER) {
- 			if (hki.hw_key1 == hki.hw_key2) {
- 				dev_err(dev, "Illegal hw key numbers (%d,%d)\n",
- 					hki.hw_key1, hki.hw_key2);
-@@ -543,6 +549,7 @@ static void cc_setup_readiv_desc(struct crypto_tfm *tfm,
- 		break;
- 	case DRV_CIPHER_XTS:
- 	case DRV_CIPHER_ESSIV:
-+	case DRV_CIPHER_BITLOCKER:
- 		/*  IV */
- 		hw_desc_init(&desc[*seq_size]);
- 		set_setup_mode(&desc[*seq_size], SETUP_WRITE_STATE1);
-@@ -597,6 +604,7 @@ static void cc_setup_state_desc(struct crypto_tfm *tfm,
- 		break;
- 	case DRV_CIPHER_XTS:
- 	case DRV_CIPHER_ESSIV:
-+	case DRV_CIPHER_BITLOCKER:
- 		break;
- 	default:
- 		dev_err(dev, "Unsupported cipher mode (%d)\n", cipher_mode);
-@@ -616,56 +624,70 @@ static void cc_setup_xex_state_desc(struct crypto_tfm *tfm,
- 	int flow_mode = ctx_p->flow_mode;
- 	int direction = req_ctx->gen_ctx.op_type;
- 	dma_addr_t key_dma_addr = ctx_p->user.key_dma_addr;
--	unsigned int key_len = (ctx_p->keylen / 2);
- 	dma_addr_t iv_dma_addr = req_ctx->gen_ctx.iv_dma_addr;
--	unsigned int key_offset = key_len;
-+	unsigned int key_len;
-+	unsigned int key_offset;
- 
- 	switch (cipher_mode) {
- 	case DRV_CIPHER_ECB:
--		break;
- 	case DRV_CIPHER_CBC:
- 	case DRV_CIPHER_CBC_CTS:
- 	case DRV_CIPHER_CTR:
- 	case DRV_CIPHER_OFB:
--		break;
--	case DRV_CIPHER_XTS:
--	case DRV_CIPHER_ESSIV:
-+		/* No secondary key for these ciphers, so just return */
-+		return;
- 
--		if (cipher_mode == DRV_CIPHER_ESSIV)
--			key_len = SHA256_DIGEST_SIZE;
-+	case DRV_CIPHER_XTS:
-+		/* Secondary key is same size as primary key and stored after primary key */
-+		key_len = ctx_p->keylen / 2;
-+		key_offset = key_len;
-+		break;
- 
--		/* load XEX key */
--		hw_desc_init(&desc[*seq_size]);
--		set_cipher_mode(&desc[*seq_size], cipher_mode);
--		set_cipher_config0(&desc[*seq_size], direction);
--		if (cc_key_type(tfm) == CC_HW_PROTECTED_KEY) {
--			set_hw_crypto_key(&desc[*seq_size],
--					  ctx_p->hw.key2_slot);
--		} else {
--			set_din_type(&desc[*seq_size], DMA_DLLI,
--				     (key_dma_addr + key_offset),
--				     key_len, NS_BIT);
--		}
--		set_xex_data_unit_size(&desc[*seq_size], nbytes);
--		set_flow_mode(&desc[*seq_size], S_DIN_to_AES2);
--		set_key_size_aes(&desc[*seq_size], key_len);
--		set_setup_mode(&desc[*seq_size], SETUP_LOAD_XEX_KEY);
--		(*seq_size)++;
-+	case DRV_CIPHER_ESSIV:
-+		/* Secondary key is a digest of primary key and stored after primary key */
-+		key_len = SHA256_DIGEST_SIZE;
-+		key_offset = ctx_p->keylen / 2;
-+		break;
- 
--		/* Load IV */
--		hw_desc_init(&desc[*seq_size]);
--		set_setup_mode(&desc[*seq_size], SETUP_LOAD_STATE1);
--		set_cipher_mode(&desc[*seq_size], cipher_mode);
--		set_cipher_config0(&desc[*seq_size], direction);
--		set_key_size_aes(&desc[*seq_size], key_len);
--		set_flow_mode(&desc[*seq_size], flow_mode);
--		set_din_type(&desc[*seq_size], DMA_DLLI, iv_dma_addr,
--			     CC_AES_BLOCK_SIZE, NS_BIT);
--		(*seq_size)++;
-+	case DRV_CIPHER_BITLOCKER:
-+		/* Secondary key is same as primary key */
-+		key_len = ctx_p->keylen;
-+		key_offset = 0;
- 		break;
-+
- 	default:
-+		/* This should never really happen */
- 		dev_err(dev, "Unsupported cipher mode (%d)\n", cipher_mode);
-+		return;
-+	}
-+
-+	/* load XEX key */
-+	hw_desc_init(&desc[*seq_size]);
-+	set_cipher_mode(&desc[*seq_size], cipher_mode);
-+	set_cipher_config0(&desc[*seq_size], direction);
-+	if (cc_key_type(tfm) == CC_HW_PROTECTED_KEY) {
-+		set_hw_crypto_key(&desc[*seq_size],
-+				  ctx_p->hw.key2_slot);
-+	} else {
-+		set_din_type(&desc[*seq_size], DMA_DLLI,
-+			     (key_dma_addr + key_offset),
-+			     key_len, NS_BIT);
- 	}
-+	set_xex_data_unit_size(&desc[*seq_size], nbytes);
-+	set_flow_mode(&desc[*seq_size], S_DIN_to_AES2);
-+	set_key_size_aes(&desc[*seq_size], key_len);
-+	set_setup_mode(&desc[*seq_size], SETUP_LOAD_XEX_KEY);
-+	(*seq_size)++;
-+
-+	/* Load IV */
-+	hw_desc_init(&desc[*seq_size]);
-+	set_setup_mode(&desc[*seq_size], SETUP_LOAD_STATE1);
-+	set_cipher_mode(&desc[*seq_size], cipher_mode);
-+	set_cipher_config0(&desc[*seq_size], direction);
-+	set_key_size_aes(&desc[*seq_size], key_len);
-+	set_flow_mode(&desc[*seq_size], flow_mode);
-+	set_din_type(&desc[*seq_size], DMA_DLLI, iv_dma_addr, CC_AES_BLOCK_SIZE, NS_BIT);
-+	(*seq_size)++;
- }
- 
- static int cc_out_flow_mode(struct cc_cipher_ctx *ctx_p)
-@@ -702,6 +724,7 @@ static void cc_setup_key_desc(struct crypto_tfm *tfm,
- 	case DRV_CIPHER_CTR:
- 	case DRV_CIPHER_OFB:
- 	case DRV_CIPHER_ECB:
-+	case DRV_CIPHER_BITLOCKER:
- 		/* Load key */
- 		hw_desc_init(&desc[*seq_size]);
- 		set_cipher_mode(&desc[*seq_size], cipher_mode);
-@@ -1040,6 +1063,24 @@ static const struct cc_alg_template skcipher_algs[] = {
- 		.std_body = CC_STD_NIST,
- 		.sec_func = true,
- 	},
-+	{
-+		.name = "eboiv(cbc(paes))",
-+		.driver_name = "eboiv-cbc-paes-ccree",
-+		.blocksize = AES_BLOCK_SIZE,
-+		.template_skcipher = {
-+			.setkey = cc_cipher_sethkey,
-+			.encrypt = cc_cipher_encrypt,
-+			.decrypt = cc_cipher_decrypt,
-+			.min_keysize = CC_HW_KEY_SIZE,
-+			.max_keysize = CC_HW_KEY_SIZE,
-+			.ivsize = AES_BLOCK_SIZE,
-+			},
-+		.cipher_mode = DRV_CIPHER_BITLOCKER,
-+		.flow_mode = S_DIN_to_AES,
-+		.min_hw_rev = CC_HW_REV_712,
-+		.std_body = CC_STD_NIST,
-+		.sec_func = true,
-+	},
- 	{
- 		.name = "ecb(paes)",
- 		.driver_name = "ecb-paes-ccree",
-@@ -1168,6 +1209,23 @@ static const struct cc_alg_template skcipher_algs[] = {
- 		.min_hw_rev = CC_HW_REV_712,
- 		.std_body = CC_STD_NIST,
- 	},
-+	{
-+		.name = "eboiv(cbc(aes))",
-+		.driver_name = "eboiv-cbc-aes-ccree",
-+		.blocksize = AES_BLOCK_SIZE,
-+		.template_skcipher = {
-+			.setkey = cc_cipher_setkey,
-+			.encrypt = cc_cipher_encrypt,
-+			.decrypt = cc_cipher_decrypt,
-+			.min_keysize = AES_MIN_KEY_SIZE,
-+			.max_keysize = AES_MAX_KEY_SIZE,
-+			.ivsize = AES_BLOCK_SIZE,
-+			},
-+		.cipher_mode = DRV_CIPHER_BITLOCKER,
-+		.flow_mode = S_DIN_to_AES,
-+		.min_hw_rev = CC_HW_REV_712,
-+		.std_body = CC_STD_NIST,
-+	},
- 	{
- 		.name = "ecb(aes)",
- 		.driver_name = "ecb-aes-ccree",
-diff --git a/drivers/crypto/ccree/cc_crypto_ctx.h b/drivers/crypto/ccree/cc_crypto_ctx.h
-index bd9a1c0896b3..ccf960a0d989 100644
---- a/drivers/crypto/ccree/cc_crypto_ctx.h
-+++ b/drivers/crypto/ccree/cc_crypto_ctx.h
-@@ -108,6 +108,7 @@ enum drv_cipher_mode {
- 	DRV_CIPHER_CBC_CTS = 11,
- 	DRV_CIPHER_GCTR = 12,
- 	DRV_CIPHER_ESSIV = 13,
-+	DRV_CIPHER_BITLOCKER = 14,
- 	DRV_CIPHER_RESERVE32B = S32_MAX
- };
- 
--- 
-2.28.0
-
+Thanks! Applied to cryptogams, pinged openssl. Cheers.
