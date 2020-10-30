@@ -1,158 +1,270 @@
-Return-Path: <SRS0=z7PZ=EE=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=SmAa=EF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF6BFC4363A
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Oct 2020 16:58:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1581CC5517A
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Oct 2020 03:07:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A8D820790
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Oct 2020 16:58:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603990722;
-	bh=iYeg6q9T2GIN+qn/k3HlyGFJZfOQ70keB07zwtWFL60=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=YJ570O1tn7zHzlw3KlcENqtvG19qZp6mv2/5MNlbNH9YIG49KNOjabHtBOAHtEPnr
-	 BngDlAJgmhYsUtBZvQvohVajzTi+kpE8FbrdxbS0GPcIiDLnmrjMdSuofaBWQqUzAI
-	 H0tPX79bPfbWL20ZO33rwVQbm5WsFhjNSzMlNVbQ=
+	by mail.kernel.org (Postfix) with ESMTP id B948C20796
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Oct 2020 03:07:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726078AbgJ2Q6l (ORCPT
+        id S1726037AbgJ3DHk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Oct 2020 12:58:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58256 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725775AbgJ2Q6l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Oct 2020 12:58:41 -0400
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5A74420EDD
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2020 16:58:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603990720;
-        bh=iYeg6q9T2GIN+qn/k3HlyGFJZfOQ70keB07zwtWFL60=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=sjnl8YNYzkwza1ud4CoBc2OS6NYftPy6DwnfKbGqkrl/HShWyElD5dG/yZOgcVrFr
-         9Vn9xNGwfj7UnjGQeGMqA9nEKNPRLI7Mm6NjAIuGVfslCqrd6lTG9V3Wl3xZiRuA6Z
-         qTV/cfl+oD2CY8ZMX2T9eYprVluKdTg0bGIhFHeo=
-Received: by mail-ot1-f50.google.com with SMTP id k3so2987482otp.1
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2020 09:58:40 -0700 (PDT)
-X-Gm-Message-State: AOAM533mSSknTEQiVpl9Fu4zTU5b1IG9zDzpUHH+zadCPcqAVt1usq6f
-        t8hJRfKNSPgxnzL3AvgnvJ1uYJAYNpD0mTfAO0g=
-X-Google-Smtp-Source: ABdhPJyVZD1ycipnCgVtods2VjNWteTpY+YtnDXo+0Csncgyo7NWHb3M3i+VoZsNZAyReGl3HQKHRvGfAIMbFXM0x3A=
-X-Received: by 2002:a05:6830:1f13:: with SMTP id u19mr3897510otg.108.1603990719196;
- Thu, 29 Oct 2020 09:58:39 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200802090616.1328-1-ardb@kernel.org> <25776a56-4c6a-3976-f4bc-fa53ba4a1550@candelatech.com>
- <CAMj1kXFAbip567hFaFtoqdevrSEpqFOGQ1+ejL98XrDOaTeggA@mail.gmail.com>
- <9c137bbf-2892-df7a-e6fa-8cce417ecd45@candelatech.com> <CAMj1kXFnfYKj1JE4NLsxXtaeKuAOKyBYDbayLr-mHDUYqnV1bA@mail.gmail.com>
- <d7f44f7a-d00e-cef4-5c91-86119e240038@candelatech.com> <391c30de-4746-940c-6585-d69c27f2f4cb@candelatech.com>
-In-Reply-To: <391c30de-4746-940c-6585-d69c27f2f4cb@candelatech.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 29 Oct 2020 17:58:27 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGMBGs+5eHfXbmm11VowdTuCo+iDcNjWuCw8X_1xaYc8w@mail.gmail.com>
-Message-ID: <CAMj1kXGMBGs+5eHfXbmm11VowdTuCo+iDcNjWuCw8X_1xaYc8w@mail.gmail.com>
-Subject: Re: [PATCH] crypto: x86/aesni - implement accelerated CBCMAC, CMAC
- and XCBC shashes
-To:     Ben Greear <greearb@candelatech.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thu, 29 Oct 2020 23:07:40 -0400
+Received: from smtprelay0170.hostedemail.com ([216.40.44.170]:45330 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725780AbgJ3DHk (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 29 Oct 2020 23:07:40 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay02.hostedemail.com (Postfix) with ESMTP id DD427629;
+        Fri, 30 Oct 2020 03:07:37 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: rain79_4f07ec327292
+X-Filterd-Recvd-Size: 11188
+Received: from joe-laptop.perches.com (unknown [47.151.133.149])
+        (Authenticated sender: joe@perches.com)
+        by omf13.hostedemail.com (Postfix) with ESMTPA;
+        Fri, 30 Oct 2020 03:07:34 +0000 (UTC)
+From:   Joe Perches <joe@perches.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+        Marco Elver <elver@google.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        "David S. Miller" <davem@davemloft.net>,
+        Andrey Ryabinin <aryabinin@virtuozzo.com>,
+        Alexander Potapenko <glider@google.com>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-efi@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-crypto@vger.kernel.org,
+        linux-mm@kvack.org, clang-built-linux@googlegroups.com
+Subject: [PATCH] treewide: Remove stringification from __alias macro definition
+Date:   Thu, 29 Oct 2020 20:07:31 -0700
+Message-Id: <8451df41359b52f048780d19e07b6fa4445b6392.1604026698.git.joe@perches.com>
+X-Mailer: git-send-email 2.26.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 23 Sep 2020 at 13:03, Ben Greear <greearb@candelatech.com> wrote:
->
-> On 8/4/20 12:45 PM, Ben Greear wrote:
-> > On 8/4/20 6:08 AM, Ard Biesheuvel wrote:
-> >> On Tue, 4 Aug 2020 at 15:01, Ben Greear <greearb@candelatech.com> wrote:
-> >>>
-> >>> On 8/4/20 5:55 AM, Ard Biesheuvel wrote:
-> >>>> On Mon, 3 Aug 2020 at 21:11, Ben Greear <greearb@candelatech.com> wrote:
-> >>>>>
-> >>>>> Hello,
-> >>>>>
-> >>>>> This helps a bit...now download sw-crypt performance is about 150Mbps,
-> >>>>> but still not as good as with my patch on 5.4 kernel, and fpu is still
-> >>>>> high in perf top:
-> >>>>>
-> >>>>>       13.89%  libc-2.29.so   [.] __memset_sse2_unaligned_erms
-> >>>>>         6.62%  [kernel]       [k] kernel_fpu_begin
-> >>>>>         4.14%  [kernel]       [k] _aesni_enc1
-> >>>>>         2.06%  [kernel]       [k] __crypto_xor
-> >>>>>         1.95%  [kernel]       [k] copy_user_generic_string
-> >>>>>         1.93%  libjvm.so      [.] SpinPause
-> >>>>>         1.01%  [kernel]       [k] aesni_encrypt
-> >>>>>         0.98%  [kernel]       [k] crypto_ctr_crypt
-> >>>>>         0.93%  [kernel]       [k] udp_sendmsg
-> >>>>>         0.78%  [kernel]       [k] crypto_inc
-> >>>>>         0.74%  [kernel]       [k] __ip_append_data.isra.53
-> >>>>>         0.65%  [kernel]       [k] aesni_cbc_enc
-> >>>>>         0.64%  [kernel]       [k] __dev_queue_xmit
-> >>>>>         0.62%  [kernel]       [k] ipt_do_table
-> >>>>>         0.62%  [kernel]       [k] igb_xmit_frame_ring
-> >>>>>         0.59%  [kernel]       [k] ip_route_output_key_hash_rcu
-> >>>>>         0.57%  [kernel]       [k] memcpy
-> >>>>>         0.57%  libjvm.so      [.] InstanceKlass::oop_follow_contents
-> >>>>>         0.56%  [kernel]       [k] irq_fpu_usable
-> >>>>>         0.56%  [kernel]       [k] mac_do_update
-> >>>>>
-> >>>>> If you'd like help setting up a test rig and have an ath10k pcie NIC or ath9k pcie NIC,
-> >>>>> then I can help.  Possibly hwsim would also be a good test case, but I have not tried
-> >>>>> that.
-> >>>>>
-> >>>>
-> >>>> I don't think this is likely to be reproducible on other
-> >>>> micro-architectures, so setting up a test rig is unlikely to help.
-> >>>>
-> >>>> I'll send out a v2 which implements a ahash instead of a shash (and
-> >>>> implements some other tweaks) so that kernel_fpu_begin() is only
-> >>>> called twice for each packet on the cbcmac path.
-> >>>>
-> >>>> Do you have any numbers for the old kernel without your patch? This
-> >>>> pathological FPU preserve/restore behavior could be caused be the
-> >>>> optimizations, or by other changes that landed in the meantime, so I
-> >>>> would like to know if kernel_fpu_begin() is as prominent in those
-> >>>> traces as well.
-> >>>>
-> >>>
-> >>> This same patch makes i7 mobile processors able to handle 1Gbps+ software
-> >>> decrypt rates, where without the patch, the rate was badly constrained and CPU
-> >>> load was much higher, so it is definitely noticeable on other processors too.
-> >>
-> >> OK
-> >>
-> >>> The weak processor on the current test rig is convenient because the problem
-> >>> is so noticeable even at slower wifi speeds.
-> >>>
-> >>> We can do some tests on 5.4 with our patch reverted.
-> >>>
-> >>
-> >> The issue with your CCM patch is that it keeps the FPU enabled for the
-> >> entire input, which also means that preemption is disabled, which
-> >> makes the -rt people grumpy. (Of course, it also uses APIs that no
-> >> longer exists, but that should be easy to fix)
-> >>
-> >> Do you happen to have any ballpark figures for the packet sizes and
-> >> the time spent doing encryption?
-> >>
-> >
-> > My tester reports this last patch appears to break wpa-2 entirely, so we
-> > cannot test it as is.
->
-> Hello,
->
-> I'm still hoping that I can find some one to help enable this feature again
-> on 5.9-ish kernels.
->
-> I don't care about preemption being disabled for long-ish times, that is no worse than what I had
-> before, so even if an official in-kernel patch is not possible, I can carry an
-> out-of-tree patch.
->
+Like the old __section macro, the __alias macro uses macro # stringification
+to create quotes around the symbol name used in the __attribute__.
 
-Just a note that this is still on my stack, just not at the very top :-)
+This can cause differences between gcc and clang when the stringification
+itself contains a quote character.  So avoid these differences by always
+using quotes to define the aliased symbol.
+
+Remove the stringification and add quotes and when necessary a stringification
+when existing uses have a ## concatenation.
+
+Signed-off-by: Joe Perches <joe@perches.com>
+---
+
+Unlike the __section macro conversion in commit 33def8498fdd
+("treewide: Convert macro and uses of __section(foo) to __section("foo")")
+this one was done by hand.
+
+No other use of __alias exists in the kernel.
+
+This patch does _not_ convert any uses of __attribute__((alias("<foo>")))
+so it should not cause any compilation issues.
+
+ arch/x86/boot/compressed/string.c       |  6 +++---
+ arch/x86/include/asm/syscall_wrapper.h  |  2 +-
+ drivers/firmware/efi/runtime-wrappers.c |  2 +-
+ include/linux/compiler_attributes.h     |  2 +-
+ kernel/kcsan/core.c                     | 10 +++++-----
+ lib/crc32.c                             |  4 ++--
+ lib/crypto/aes.c                        |  4 ++--
+ mm/kasan/generic.c                      |  8 ++++----
+ 8 files changed, 19 insertions(+), 19 deletions(-)
+
+diff --git a/arch/x86/boot/compressed/string.c b/arch/x86/boot/compressed/string.c
+index 81fc1eaa3229..d38b122f51ef 100644
+--- a/arch/x86/boot/compressed/string.c
++++ b/arch/x86/boot/compressed/string.c
+@@ -75,7 +75,7 @@ void *memcpy(void *dest, const void *src, size_t n)
+ }
+ 
+ #ifdef CONFIG_KASAN
+-extern void *__memset(void *s, int c, size_t n) __alias(memset);
+-extern void *__memmove(void *dest, const void *src, size_t n) __alias(memmove);
+-extern void *__memcpy(void *dest, const void *src, size_t n) __alias(memcpy);
++extern void *__memset(void *s, int c, size_t n) __alias("memset");
++extern void *__memmove(void *dest, const void *src, size_t n) __alias("memmove");
++extern void *__memcpy(void *dest, const void *src, size_t n) __alias("memcpy");
+ #endif
+diff --git a/arch/x86/include/asm/syscall_wrapper.h b/arch/x86/include/asm/syscall_wrapper.h
+index a84333adeef2..f19d1bbbff3d 100644
+--- a/arch/x86/include/asm/syscall_wrapper.h
++++ b/arch/x86/include/asm/syscall_wrapper.h
+@@ -69,7 +69,7 @@ extern long __ia32_sys_ni_syscall(const struct pt_regs *regs);
+ 	long __##abi##_##name(const struct pt_regs *regs);		\
+ 	ALLOW_ERROR_INJECTION(__##abi##_##name, ERRNO);			\
+ 	long __##abi##_##name(const struct pt_regs *regs)		\
+-		__alias(__do_##name);
++		__alias("__do_" #name);
+ 
+ #define __SYS_STUBx(abi, name, ...)					\
+ 	long __##abi##_##name(const struct pt_regs *regs);		\
+diff --git a/drivers/firmware/efi/runtime-wrappers.c b/drivers/firmware/efi/runtime-wrappers.c
+index 1410beaef5c3..14e380ac65d4 100644
+--- a/drivers/firmware/efi/runtime-wrappers.c
++++ b/drivers/firmware/efi/runtime-wrappers.c
+@@ -162,7 +162,7 @@ static DEFINE_SEMAPHORE(efi_runtime_lock);
+  * Expose the EFI runtime lock to the UV platform
+  */
+ #ifdef CONFIG_X86_UV
+-extern struct semaphore __efi_uv_runtime_lock __alias(efi_runtime_lock);
++extern struct semaphore __efi_uv_runtime_lock __alias("efi_runtime_lock");
+ #endif
+ 
+ /*
+diff --git a/include/linux/compiler_attributes.h b/include/linux/compiler_attributes.h
+index ea7b756b1c8f..4819512c9abd 100644
+--- a/include/linux/compiler_attributes.h
++++ b/include/linux/compiler_attributes.h
+@@ -42,7 +42,7 @@
+ /*
+  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-alias-function-attribute
+  */
+-#define __alias(symbol)                 __attribute__((__alias__(#symbol)))
++#define __alias(symbol)                 __attribute__((__alias__(symbol)))
+ 
+ /*
+  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-aligned-function-attribute
+diff --git a/kernel/kcsan/core.c b/kernel/kcsan/core.c
+index 3994a217bde7..465f6cfc317c 100644
+--- a/kernel/kcsan/core.c
++++ b/kernel/kcsan/core.c
+@@ -814,7 +814,7 @@ EXPORT_SYMBOL(__kcsan_check_access);
+ 	}                                                                      \
+ 	EXPORT_SYMBOL(__tsan_read##size);                                      \
+ 	void __tsan_unaligned_read##size(void *ptr)                            \
+-		__alias(__tsan_read##size);                                    \
++		__alias("__tsan_read" #size);                                  \
+ 	EXPORT_SYMBOL(__tsan_unaligned_read##size);                            \
+ 	void __tsan_write##size(void *ptr);                                    \
+ 	void __tsan_write##size(void *ptr)                                     \
+@@ -823,7 +823,7 @@ EXPORT_SYMBOL(__kcsan_check_access);
+ 	}                                                                      \
+ 	EXPORT_SYMBOL(__tsan_write##size);                                     \
+ 	void __tsan_unaligned_write##size(void *ptr)                           \
+-		__alias(__tsan_write##size);                                   \
++		__alias("__tsan_write" #size);                                 \
+ 	EXPORT_SYMBOL(__tsan_unaligned_write##size);                           \
+ 	void __tsan_read_write##size(void *ptr);                               \
+ 	void __tsan_read_write##size(void *ptr)                                \
+@@ -833,7 +833,7 @@ EXPORT_SYMBOL(__kcsan_check_access);
+ 	}                                                                      \
+ 	EXPORT_SYMBOL(__tsan_read_write##size);                                \
+ 	void __tsan_unaligned_read_write##size(void *ptr)                      \
+-		__alias(__tsan_read_write##size);                              \
++		__alias("__tsan_read_write" #size);                            \
+ 	EXPORT_SYMBOL(__tsan_unaligned_read_write##size)
+ 
+ DEFINE_TSAN_READ_WRITE(1);
+@@ -877,7 +877,7 @@ EXPORT_SYMBOL(__tsan_write_range);
+ 	}                                                                      \
+ 	EXPORT_SYMBOL(__tsan_volatile_read##size);                             \
+ 	void __tsan_unaligned_volatile_read##size(void *ptr)                   \
+-		__alias(__tsan_volatile_read##size);                           \
++		__alias("__tsan_volatile_read" #size);                         \
+ 	EXPORT_SYMBOL(__tsan_unaligned_volatile_read##size);                   \
+ 	void __tsan_volatile_write##size(void *ptr);                           \
+ 	void __tsan_volatile_write##size(void *ptr)                            \
+@@ -892,7 +892,7 @@ EXPORT_SYMBOL(__tsan_write_range);
+ 	}                                                                      \
+ 	EXPORT_SYMBOL(__tsan_volatile_write##size);                            \
+ 	void __tsan_unaligned_volatile_write##size(void *ptr)                  \
+-		__alias(__tsan_volatile_write##size);                          \
++		__alias("__tsan_volatile_write" #size);                        \
+ 	EXPORT_SYMBOL(__tsan_unaligned_volatile_write##size)
+ 
+ DEFINE_TSAN_VOLATILE_READ_WRITE(1);
+diff --git a/lib/crc32.c b/lib/crc32.c
+index 2a68dfd3b96c..373a17aaa432 100644
+--- a/lib/crc32.c
++++ b/lib/crc32.c
+@@ -206,8 +206,8 @@ u32 __pure __weak __crc32c_le(u32 crc, unsigned char const *p, size_t len)
+ EXPORT_SYMBOL(crc32_le);
+ EXPORT_SYMBOL(__crc32c_le);
+ 
+-u32 __pure crc32_le_base(u32, unsigned char const *, size_t) __alias(crc32_le);
+-u32 __pure __crc32c_le_base(u32, unsigned char const *, size_t) __alias(__crc32c_le);
++u32 __pure crc32_le_base(u32, unsigned char const *, size_t) __alias("crc32_le");
++u32 __pure __crc32c_le_base(u32, unsigned char const *, size_t) __alias("__crc32c_le");
+ 
+ /*
+  * This multiplies the polynomials x and y modulo the given modulus.
+diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
+index 827fe89922ff..5b80514595c2 100644
+--- a/lib/crypto/aes.c
++++ b/lib/crypto/aes.c
+@@ -82,8 +82,8 @@ static volatile const u8 __cacheline_aligned aes_inv_sbox[] = {
+ 	0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d,
+ };
+ 
+-extern const u8 crypto_aes_sbox[256] __alias(aes_sbox);
+-extern const u8 crypto_aes_inv_sbox[256] __alias(aes_inv_sbox);
++extern const u8 crypto_aes_sbox[256] __alias("aes_sbox");
++extern const u8 crypto_aes_inv_sbox[256] __alias("aes_inv_sbox");
+ 
+ EXPORT_SYMBOL(crypto_aes_sbox);
+ EXPORT_SYMBOL(crypto_aes_inv_sbox);
+diff --git a/mm/kasan/generic.c b/mm/kasan/generic.c
+index 248264b9cb76..4496f897e4f5 100644
+--- a/mm/kasan/generic.c
++++ b/mm/kasan/generic.c
+@@ -234,7 +234,7 @@ EXPORT_SYMBOL(__asan_unregister_globals);
+ 		check_memory_region_inline(addr, size, false, _RET_IP_);\
+ 	}								\
+ 	EXPORT_SYMBOL(__asan_load##size);				\
+-	__alias(__asan_load##size)					\
++	__alias("__asan_load" #size)					\
+ 	void __asan_load##size##_noabort(unsigned long);		\
+ 	EXPORT_SYMBOL(__asan_load##size##_noabort);			\
+ 	void __asan_store##size(unsigned long addr)			\
+@@ -242,7 +242,7 @@ EXPORT_SYMBOL(__asan_unregister_globals);
+ 		check_memory_region_inline(addr, size, true, _RET_IP_);	\
+ 	}								\
+ 	EXPORT_SYMBOL(__asan_store##size);				\
+-	__alias(__asan_store##size)					\
++	__alias("__asan_store" #size)					\
+ 	void __asan_store##size##_noabort(unsigned long);		\
+ 	EXPORT_SYMBOL(__asan_store##size##_noabort)
+ 
+@@ -258,7 +258,7 @@ void __asan_loadN(unsigned long addr, size_t size)
+ }
+ EXPORT_SYMBOL(__asan_loadN);
+ 
+-__alias(__asan_loadN)
++__alias("__asan_loadN")
+ void __asan_loadN_noabort(unsigned long, size_t);
+ EXPORT_SYMBOL(__asan_loadN_noabort);
+ 
+@@ -268,7 +268,7 @@ void __asan_storeN(unsigned long addr, size_t size)
+ }
+ EXPORT_SYMBOL(__asan_storeN);
+ 
+-__alias(__asan_storeN)
++__alias("__asan_storeN")
+ void __asan_storeN_noabort(unsigned long, size_t);
+ EXPORT_SYMBOL(__asan_storeN_noabort);
+ 
+-- 
+2.26.0
+
