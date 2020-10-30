@@ -2,69 +2,100 @@ Return-Path: <SRS0=SmAa=EF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73F88C00A89
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Oct 2020 08:18:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE042C4741F
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Oct 2020 09:24:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0EA7222228
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Oct 2020 08:18:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FBD320720
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Oct 2020 09:24:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uR+S+1eT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725355AbgJ3ISc (ORCPT
+        id S1726222AbgJ3JYd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Oct 2020 04:18:32 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:6671 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725784AbgJ3ISc (ORCPT
+        Fri, 30 Oct 2020 05:24:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43522 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726028AbgJ3JYd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Oct 2020 04:18:32 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CMwDg1xlHz15PTM;
-        Fri, 30 Oct 2020 16:18:27 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 30 Oct 2020 16:18:23 +0800
-From:   Tian Tao <tiantao6@hisilicon.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <catalin.marinas@arm.com>, <will@kernel.org>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] crypto: arm64 - move const after static
-Date:   Fri, 30 Oct 2020 16:19:00 +0800
-Message-ID: <1604045940-33684-1-git-send-email-tiantao6@hisilicon.com>
-X-Mailer: git-send-email 2.7.4
+        Fri, 30 Oct 2020 05:24:33 -0400
+Received: from mail-yb1-xb41.google.com (mail-yb1-xb41.google.com [IPv6:2607:f8b0:4864:20::b41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 006B4C0613CF;
+        Fri, 30 Oct 2020 02:24:32 -0700 (PDT)
+Received: by mail-yb1-xb41.google.com with SMTP id s89so4535296ybi.12;
+        Fri, 30 Oct 2020 02:24:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=AT9nl2GUPzLTlSYpK+8OlDbwytVPpP6cQwtdlWueTMI=;
+        b=uR+S+1eTfx+3pO8Uvenz/xK8TAAFzoqm70Rsc+ppSdSEzc8y8lxO31iAaA9jqqUmfh
+         4p2NGu5wTyzD//yFvoWivRS3w8cJHVLtJfkcQWrwW85x8HDG0lnVA0snK+bHJc+Dlh52
+         oq4hYkU0TVqs3EBkfJ2hwvhH4+TkhcdkvycSoH3C2W0yu4hFUGLTKsmxI3cYCMZN+HQT
+         l27DFu/bKPJUup/5xFt2vOo5RMs3YjYHMmYRsO3OdVcMFh8DxHnMg6ZPlhrMJliIyGXJ
+         FuKBxM/9paKGjLVzQ40c3nbQpmYAAE7W4y/G/5M26RKT45bvtVjraY9TyOFPsWuRE+mX
+         2W+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AT9nl2GUPzLTlSYpK+8OlDbwytVPpP6cQwtdlWueTMI=;
+        b=gTG8uY2O62tMBkabs2dCvbuZSDGjnKFH8ks/gybKjfCyvJ7WZHYhir19JnyMC55vXh
+         SfFaYlz+CeXElMjEB2V4BpOAqxXsuwLuFMe0CISCHIbO+TmSCzwhtlDy/vQcIC1vgTM/
+         ZbZUP5k3+woVQI+GgO2dGHLT7HzY5lG9+TFNDesRyB/ODBPHNX8RbaL1VJsupbPmxoMh
+         bGAd/JBLV2kIvUyBP+5RF5HaBH3ViZidAP0BKP2OXNQBGlDQiaTo2OG97O5SwF6rZgBe
+         AYS4mpNIPINQUJKjYYNwIuR++fPutznlcTgmlcFH4VrACNNKXaeejiZ2PxIXeH20j+/S
+         q2+g==
+X-Gm-Message-State: AOAM5308SfR+ppBqpcRkI/LmurVwoKXip0RtBJUeYhRYNtX+NWUcwTYk
+        suQ0sig646olIhXxmxQBc0po5FOxV34RydBYODk=
+X-Google-Smtp-Source: ABdhPJyp2BYrU/SfS6yYO922RYV9IromEZZ0HI5Zqxn9ErDh20M7nXRBUP63MxRwLbNa3FVzjUTV5P9jYilOaZio0S8=
+X-Received: by 2002:a25:d441:: with SMTP id m62mr2320037ybf.422.1604049872377;
+ Fri, 30 Oct 2020 02:24:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-CFilter-Loop: Reflected
+References: <8451df41359b52f048780d19e07b6fa4445b6392.1604026698.git.joe@perches.com>
+In-Reply-To: <8451df41359b52f048780d19e07b6fa4445b6392.1604026698.git.joe@perches.com>
+From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date:   Fri, 30 Oct 2020 10:24:21 +0100
+Message-ID: <CANiq72nXkHeF26vY7EK5u0h8pFXwWq5YUUcSHDULvgh1caCNGA@mail.gmail.com>
+Subject: Re: [PATCH] treewide: Remove stringification from __alias macro definition
+To:     Joe Perches <joe@perches.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Marco Elver <elver@google.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andrey Ryabinin <aryabinin@virtuozzo.com>,
+        Alexander Potapenko <glider@google.com>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-efi <linux-efi@vger.kernel.org>,
+        kasan-dev <kasan-dev@googlegroups.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fixed the WARNING: Move const after static - use 'static const u8'
+On Fri, Oct 30, 2020 at 4:07 AM Joe Perches <joe@perches.com> wrote:
+>
+> Like the old __section macro, the __alias macro uses macro # stringification
+> to create quotes around the symbol name used in the __attribute__.
 
-Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
----
- arch/arm64/crypto/aes-ce-glue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hmm... isn't this V2? It seems none of the Acks/Reviews were picked
+up, did something major change?
 
-diff --git a/arch/arm64/crypto/aes-ce-glue.c b/arch/arm64/crypto/aes-ce-glue.c
-index 56a5f6f..8ba6f04 100644
---- a/arch/arm64/crypto/aes-ce-glue.c
-+++ b/arch/arm64/crypto/aes-ce-glue.c
-@@ -77,7 +77,7 @@ int ce_aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
- 	/*
- 	 * The AES key schedule round constants
- 	 */
--	static u8 const rcon[] = {
-+	static const u8 rcon[] = {
- 		0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36,
- 	};
- 
--- 
-2.7.4
-
+Cheers,
+Miguel
