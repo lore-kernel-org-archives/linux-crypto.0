@@ -2,106 +2,69 @@ Return-Path: <SRS0=SmAa=EF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B496C5517A
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Oct 2020 08:08:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73F88C00A89
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Oct 2020 08:18:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E2A12222C
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Oct 2020 08:08:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1604045304;
-	bh=acxrTQkHAJd6J4NM+xeR/HLxVVlvpm5kFDDF2TgWGBg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Tn1irBNHq55qll0+QkgnaoMNqP8TV34NJLN+OxB3SBbwvhONBiEkT+0OUFWb0MFxj
-	 XRrMETQysOd8ThBiRvR4Ref7ghNFQQu0mAjYMElPjKoyFWFae8nxGzzcKWGBlWY1w3
-	 cgox7YCjr5zyh6/VO4joRFjzz1qsMG3k5hgd34J4=
+	by mail.kernel.org (Postfix) with ESMTP id 0EA7222228
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Oct 2020 08:18:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725944AbgJ3IIW (ORCPT
+        id S1725355AbgJ3ISc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Oct 2020 04:08:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38084 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725355AbgJ3IIW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Oct 2020 04:08:22 -0400
-Received: from kernel.org (83-245-197-237.elisa-laajakaista.fi [83.245.197.237])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7E7CF22228;
-        Fri, 30 Oct 2020 08:08:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604045301;
-        bh=acxrTQkHAJd6J4NM+xeR/HLxVVlvpm5kFDDF2TgWGBg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=tVJmbi1QFNYykyvuUOJpOGNO0icuPGIQpKRAE+G/AldhJTYHKNiIMlUaO7oet5qOl
-         qeLV4wSNAV+13ID3Ak5mMGiaXivvt8xn8UtvCiXabOQzc6LZDVpeSn1HTDyOIwtqxW
-         ydGux+as4ScLi0mix+qUKMhtS/4xgwUCSoxc3Uc8=
-Date:   Fri, 30 Oct 2020 10:08:15 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Krzysztof Kozlowski <krzk@kernel.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [RESEND PATCH] KEYS: asymmetric: Fix kerneldoc
-Message-ID: <20201030080815.GA51616@kernel.org>
-References: <20201029154830.26997-1-krzk@kernel.org>
+        Fri, 30 Oct 2020 04:18:32 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:6671 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725784AbgJ3ISc (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 30 Oct 2020 04:18:32 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CMwDg1xlHz15PTM;
+        Fri, 30 Oct 2020 16:18:27 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.487.0; Fri, 30 Oct 2020 16:18:23 +0800
+From:   Tian Tao <tiantao6@hisilicon.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <catalin.marinas@arm.com>, <will@kernel.org>,
+        <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH] crypto: arm64 - move const after static
+Date:   Fri, 30 Oct 2020 16:19:00 +0800
+Message-ID: <1604045940-33684-1-git-send-email-tiantao6@hisilicon.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201029154830.26997-1-krzk@kernel.org>
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Oct 29, 2020 at 04:48:30PM +0100, Krzysztof Kozlowski wrote:
-> Fix W=1 compile warnings (invalid kerneldoc):
-> 
->     crypto/asymmetric_keys/asymmetric_type.c:160: warning: Function parameter or member 'kid1' not described in 'asymmetric_key_id_same'
->     crypto/asymmetric_keys/asymmetric_type.c:160: warning: Function parameter or member 'kid2' not described in 'asymmetric_key_id_same'
->     crypto/asymmetric_keys/asymmetric_type.c:160: warning: Excess function parameter 'kid_1' description in 'asymmetric_key_id_same'
->     crypto/asymmetric_keys/asymmetric_type.c:160: warning: Excess function parameter 'kid_2' description in 'asymmetric_key_id_same'
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-> Acked-by: Randy Dunlap <rdunlap@infradead.org>
-> ---
+Fixed the WARNING: Move const after static - use 'static const u8'
 
-Reviewed-by: Jarkko Sakkinen <jarkko.sakkinen@iki.fi>
+Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
+---
+ arch/arm64/crypto/aes-ce-glue.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->  crypto/asymmetric_keys/asymmetric_type.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
-> index 33e77d846caa..ad8af3d70ac0 100644
-> --- a/crypto/asymmetric_keys/asymmetric_type.c
-> +++ b/crypto/asymmetric_keys/asymmetric_type.c
-> @@ -152,7 +152,8 @@ EXPORT_SYMBOL_GPL(asymmetric_key_generate_id);
->  
->  /**
->   * asymmetric_key_id_same - Return true if two asymmetric keys IDs are the same.
-> - * @kid_1, @kid_2: The key IDs to compare
-> + * @kid1: The key ID to compare
-> + * @kid2: The key ID to compare
->   */
->  bool asymmetric_key_id_same(const struct asymmetric_key_id *kid1,
->  			    const struct asymmetric_key_id *kid2)
-> @@ -168,7 +169,8 @@ EXPORT_SYMBOL_GPL(asymmetric_key_id_same);
->  /**
->   * asymmetric_key_id_partial - Return true if two asymmetric keys IDs
->   * partially match
-> - * @kid_1, @kid_2: The key IDs to compare
-> + * @kid1: The key ID to compare
-> + * @kid2: The key ID to compare
->   */
->  bool asymmetric_key_id_partial(const struct asymmetric_key_id *kid1,
->  			       const struct asymmetric_key_id *kid2)
-> -- 
-> 2.25.1
-> 
-> 
+diff --git a/arch/arm64/crypto/aes-ce-glue.c b/arch/arm64/crypto/aes-ce-glue.c
+index 56a5f6f..8ba6f04 100644
+--- a/arch/arm64/crypto/aes-ce-glue.c
++++ b/arch/arm64/crypto/aes-ce-glue.c
+@@ -77,7 +77,7 @@ int ce_aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
+ 	/*
+ 	 * The AES key schedule round constants
+ 	 */
+-	static u8 const rcon[] = {
++	static const u8 rcon[] = {
+ 		0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36,
+ 	};
+ 
+-- 
+2.7.4
 
-/Jarkko
