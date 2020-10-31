@@ -2,124 +2,123 @@ Return-Path: <SRS0=m/1o=EG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11AEFC55178
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 17:12:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0947C388F7
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 18:55:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4B482076D
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 17:12:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1604164340;
-	bh=twQgN1Y1z8exlY3r71I3ZihQiCAGvG9Gae4RwmXJ/ts=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=JjXty89vAUmMO8D9cEtpVclxhgK7YKETcFEp/pai9zmJ09Oyy88sbr6ZttBsENDMt
-	 41JYymsgKQKcbSUkVBFPGZjME42VrEYBng6HVLLo+Hcn98h4PDAmzBC1gt66SaW8BL
-	 Cm/oQi9cXTi4ZrLdysGzLn4xeqi3Iq8hLOmvFXms=
+	by mail.kernel.org (Postfix) with ESMTP id 844512071A
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 18:55:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nQU90Rrs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728185AbgJaRMS (ORCPT
+        id S1728273AbgJaSzQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 31 Oct 2020 13:12:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52774 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727120AbgJaRMR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 31 Oct 2020 13:12:17 -0400
-Received: from kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net (c-67-180-217-166.hsd1.ca.comcast.net [67.180.217.166])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2F444206E5;
-        Sat, 31 Oct 2020 17:12:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604164337;
-        bh=twQgN1Y1z8exlY3r71I3ZihQiCAGvG9Gae4RwmXJ/ts=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=BtU7BEOuk65G9AhsBSbq29tqoeagdjbEzoTanYWmoCtuMCYigAiLgK11D5wMFmwcJ
-         nGdnuDEWBvTemNLvy3iTArF4CpVp2MfmgvvkX5CtfAtpJfwrL7jbbg8oi8TU3fN+AS
-         CjvtkSVxRf+kBaJf3M0H7+fviR9KvGGUqFE5Tcjg=
-Date:   Sat, 31 Oct 2020 10:12:15 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     netdev@vger.kernel.org, Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Daniel Drake <dsd@gentoo.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia =?UTF-8?B?R2VhbnTEgw==?= <horia.geanta@nxp.com>,
-        Jon Mason <jdmason@kudzu.us>, Jouni Malinen <j@w1.fi>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Leon Romanovsky <leon@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-rdma@vger.kernel.org,
-        linux-wireless@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
-        Madalin Bucur <madalin.bucur@nxp.com>,
-        Ping-Ke Shih <pkshih@realtek.com>,
-        Rain River <rain.1986.08.12@gmail.com>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Samuel Chessman <chessman@tux.org>,
-        Ulrich Kunitz <kune@deine-taler.de>,
-        Zhu Yanjun <zyjzyj2000@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH net-next 14/15] net: dpaa: Replace in_irq() usage.
-Message-ID: <20201031101215.38a13e51@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-In-Reply-To: <20201027225454.3492351-15-bigeasy@linutronix.de>
-References: <20201027225454.3492351-1-bigeasy@linutronix.de>
-        <20201027225454.3492351-15-bigeasy@linutronix.de>
+        Sat, 31 Oct 2020 14:55:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43884 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726627AbgJaSzQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 31 Oct 2020 14:55:16 -0400
+Received: from mail-vs1-xe42.google.com (mail-vs1-xe42.google.com [IPv6:2607:f8b0:4864:20::e42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C151C0617A6
+        for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2020 11:55:16 -0700 (PDT)
+Received: by mail-vs1-xe42.google.com with SMTP id x11so2646311vsx.12
+        for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2020 11:55:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Ihn/9P+mI1TrpSLseBlkeoMR2PdaTo/ADbJQl9C/IIU=;
+        b=nQU90Rrs9I2q8LielzG3CHQ9BdmI3+TrMcefvHN8QoZr4xUAA9khecRuhiV3s1l/XY
+         1BSmdGdGwXnfpvThJrRfw6KL4Bare+f196eZ+x6MknAtRLKnI6TXai4uauwnZWAUxs3Q
+         C3EOoUeHWIdfooJePelKZ7nBVDAKjxMhA0IwQuVq5+UVwopeKlly3DTT0sy1XjLZN45w
+         +4jiZgwa0q05L4EDXWXZM5njJV6hvZtZkvB7a6FyILewuMrvbZSZ/AMWJpxN7VXw+Bpd
+         0LtuPKXqEqz2hUgQZ7OshzvRZyYYbQNmk2wes7dj7moa3rjk+8U0jfOnID6rHFXNxxAJ
+         s9vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Ihn/9P+mI1TrpSLseBlkeoMR2PdaTo/ADbJQl9C/IIU=;
+        b=lpfCzsuAPeGpqobd83ie6DJNHml8RZth7XthxuxpqHF44jC2wHhE+XRDenc5luPbRR
+         OEpYRS7lUrfFzp1hkFq+FvXYmEt7fcSnAxU+CYcWYSN31FiVkUJ9gSP9DkaVZABwQTPy
+         7jm49t29vSSBCUsx8dCayMTBaKxIpx0DHWY5bgL+PA4uVx4O9CwDW6E+MmscKT5LdFdF
+         C8ZhGgTJZ4bZNlRxf9gJ7dZ6gYph6DFheanCAJQl1cbcCowHxIIVGodPyPjP9l7wBFDp
+         buT5OiH7A3KuJ0Cq0Xc0Q2fGL3/2SK7xBuEId0AM2VyjrZuEQGvPAd4kPwZaz4naElT8
+         RWnw==
+X-Gm-Message-State: AOAM533rILIi19uzjoFhKr5FjXb51lBbErs03DRjxAlb2M3hSblnFgd2
+        ngYgIf5F6cQlbTe+uGTdhfrJy6/rLT4=
+X-Google-Smtp-Source: ABdhPJyjo8VeToXiSjZrnsgDhpYRCNaqkUmt++liiRWdHQR2sL3eL19l/M3lyWEg61U/1VVV2HMWdQ==
+X-Received: by 2002:a67:2647:: with SMTP id m68mr11033016vsm.39.1604170514983;
+        Sat, 31 Oct 2020 11:55:14 -0700 (PDT)
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com. [209.85.221.173])
+        by smtp.gmail.com with ESMTPSA id g123sm1316198vsg.5.2020.10.31.11.55.13
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 31 Oct 2020 11:55:14 -0700 (PDT)
+Received: by mail-vk1-f173.google.com with SMTP id a8so2163293vkm.2
+        for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2020 11:55:13 -0700 (PDT)
+X-Received: by 2002:a1f:c149:: with SMTP id r70mr10316795vkf.1.1604170513281;
+ Sat, 31 Oct 2020 11:55:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <20201028145015.19212-1-schalla@marvell.com> <20201028145015.19212-13-schalla@marvell.com>
+In-Reply-To: <20201028145015.19212-13-schalla@marvell.com>
+From:   Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date:   Sat, 31 Oct 2020 14:54:35 -0400
+X-Gmail-Original-Message-ID: <CA+FuTScj_mRU0Eor2-_awn7s=AOAx_x57NOJscmmWV-BtwaFmA@mail.gmail.com>
+Message-ID: <CA+FuTScj_mRU0Eor2-_awn7s=AOAx_x57NOJscmmWV-BtwaFmA@mail.gmail.com>
+Subject: Re: [PATCH v8,net-next,12/12] crypto: octeontx2: register with linux
+ crypto framework
+To:     Srujana Challa <schalla@marvell.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Network Development <netdev@vger.kernel.org>,
+        linux-crypto@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+        schandran@marvell.com, pathreya@marvell.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 27 Oct 2020 23:54:53 +0100 Sebastian Andrzej Siewior wrote:
-> The driver uses in_irq() + in_serving_softirq() magic to decide if NAPI
-> scheduling is required or packet processing.
->=20
-> The usage of in_*() in drivers is phased out and Linus clearly requested
-> that code which changes behaviour depending on context should either be
-> seperated or the context be conveyed in an argument passed by the caller,
-> which usually knows the context.
->=20
-> Use the `napi' argument passed by the callback. It is set true if
-> called from the interrupt handler and NAPI should be scheduled.
->=20
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Cc: "Horia Geant=C4=83" <horia.geanta@nxp.com>
-> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Madalin Bucur <madalin.bucur@nxp.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Li Yang <leoyang.li@nxp.com>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: linuxppc-dev@lists.ozlabs.org
-> Cc: linux-arm-kernel@lists.infradead.org
+On Wed, Oct 28, 2020 at 5:43 PM Srujana Challa <schalla@marvell.com> wrote:
+>
+> CPT offload module utilises the linux crypto framework to offload
+> crypto processing. This patch registers supported algorithms by
+> calling registration functions provided by the kernel crypto API.
+>
+> The module currently supports:
+> - AES block cipher in CBC,ECB,XTS and CFB mode.
+> - 3DES block cipher in CBC and ECB mode.
+> - AEAD algorithms.
+>   authenc(hmac(sha1),cbc(aes)),
+>   authenc(hmac(sha256),cbc(aes)),
+>   authenc(hmac(sha384),cbc(aes)),
+>   authenc(hmac(sha512),cbc(aes)),
+>   authenc(hmac(sha1),ecb(cipher_null)),
+>   authenc(hmac(sha256),ecb(cipher_null)),
+>   authenc(hmac(sha384),ecb(cipher_null)),
+>   authenc(hmac(sha512),ecb(cipher_null)),
+>   rfc4106(gcm(aes)).
+>
+> Signed-off-by: Suheil Chandran <schandran@marvell.com>
+> Signed-off-by: Srujana Challa <schalla@marvell.com>
 > ---
->  drivers/net/ethernet/freescale/dpaa/dpaa_eth.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c b/drivers/net=
-/ethernet/freescale/dpaa/dpaa_eth.c
-> index 27835310b718e..2c949acd74c67 100644
-> --- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-> +++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-> @@ -2300,9 +2300,9 @@ static void dpaa_tx_conf(struct net_device *net_dev,
->  }
-> =20
->  static inline int dpaa_eth_napi_schedule(struct dpaa_percpu_priv *percpu=
-_priv,
-> -					 struct qman_portal *portal)
-> +					 struct qman_portal *portal, bool napi)
->  {
-> -	if (unlikely(in_irq() || !in_serving_softirq())) {
-> +	if (napi) {
->  		/* Disable QMan IRQ and invoke NAPI */
->  		qman_p_irqsource_remove(portal, QM_PIRQ_DQRI);
-> =20
+>  drivers/crypto/marvell/Kconfig                |    4 +
+>  drivers/crypto/marvell/octeontx2/Makefile     |    3 +-
+>  .../marvell/octeontx2/otx2_cpt_reqmgr.h       |    1 +
+>  .../marvell/octeontx2/otx2_cptvf_algs.c       | 1665 +++++++++++++++++
+>  .../marvell/octeontx2/otx2_cptvf_algs.h       |  170 ++
 
-Nit: some networking drivers have a bool napi which means "are we
-running in napi context", the semantics here feel a little backwards,
-at least to me. But if I'm the only one thinking this, so be it.
+These files are almost verbatim copies of
+.../marvell/octeontx/otx_cptvf_algs.(ch), with the usual name changes
+otx_ to otx2_
+
+Is there some way to avoid code duplication? I guess this is not
+uncommon for subsequent hardware device drivers from the same vendor.
+
+If nothing else, knowing this makes reviewing a lot easier.
