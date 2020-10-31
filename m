@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0947C388F7
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 18:55:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A67AC388F9
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 19:19:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 844512071A
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 18:55:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 055922065C
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 19:19:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nQU90Rrs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BNPxEwa+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728273AbgJaSzQ (ORCPT
+        id S1725832AbgJaTTu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 31 Oct 2020 14:55:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43884 "EHLO
+        Sat, 31 Oct 2020 15:19:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726627AbgJaSzQ (ORCPT
+        with ESMTP id S1725681AbgJaTTt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 31 Oct 2020 14:55:16 -0400
-Received: from mail-vs1-xe42.google.com (mail-vs1-xe42.google.com [IPv6:2607:f8b0:4864:20::e42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C151C0617A6
-        for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2020 11:55:16 -0700 (PDT)
-Received: by mail-vs1-xe42.google.com with SMTP id x11so2646311vsx.12
-        for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2020 11:55:16 -0700 (PDT)
+        Sat, 31 Oct 2020 15:19:49 -0400
+Received: from mail-ua1-x941.google.com (mail-ua1-x941.google.com [IPv6:2607:f8b0:4864:20::941])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1613C0617A6
+        for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2020 12:19:49 -0700 (PDT)
+Received: by mail-ua1-x941.google.com with SMTP id t15so2764390ual.6
+        for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2020 12:19:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Ihn/9P+mI1TrpSLseBlkeoMR2PdaTo/ADbJQl9C/IIU=;
-        b=nQU90Rrs9I2q8LielzG3CHQ9BdmI3+TrMcefvHN8QoZr4xUAA9khecRuhiV3s1l/XY
-         1BSmdGdGwXnfpvThJrRfw6KL4Bare+f196eZ+x6MknAtRLKnI6TXai4uauwnZWAUxs3Q
-         C3EOoUeHWIdfooJePelKZ7nBVDAKjxMhA0IwQuVq5+UVwopeKlly3DTT0sy1XjLZN45w
-         +4jiZgwa0q05L4EDXWXZM5njJV6hvZtZkvB7a6FyILewuMrvbZSZ/AMWJpxN7VXw+Bpd
-         0LtuPKXqEqz2hUgQZ7OshzvRZyYYbQNmk2wes7dj7moa3rjk+8U0jfOnID6rHFXNxxAJ
-         s9vA==
+        bh=wwf1XRuzqH8iDHRAKdxul3V5TY+R1Lm9WGQNmM2sOaM=;
+        b=BNPxEwa+WTE2Lxke8s7Ayr8UVA9ODk8sISCXedOqCyXoDTasLUrAOudyVTHHHIUBm8
+         MTO7HWokQ5KJ3cPE3S8gG9RNkwWrVvvb4WRKRMwYiQgvZYWtLdM6TFzfHFnnnb93DH9o
+         R0CU4iS/o9jwIW7OEreGqoYwTdThGw6ffU7NNxmsywaDEtsEgNda1iBKSp8Gu8Ak6ko4
+         Jx9btHFG04Ubami2QJwSqP8joV7aEgZfvnrMRECLssImVvzFA+9jTBwIA2/yh9P4YNY5
+         1S8MkdYjDZFmVDjqXCGqYj/y52VxUB2Bef8YL9geYZ0GxsHYDPBSi+skjpP0HsoHSe2w
+         28gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Ihn/9P+mI1TrpSLseBlkeoMR2PdaTo/ADbJQl9C/IIU=;
-        b=lpfCzsuAPeGpqobd83ie6DJNHml8RZth7XthxuxpqHF44jC2wHhE+XRDenc5luPbRR
-         OEpYRS7lUrfFzp1hkFq+FvXYmEt7fcSnAxU+CYcWYSN31FiVkUJ9gSP9DkaVZABwQTPy
-         7jm49t29vSSBCUsx8dCayMTBaKxIpx0DHWY5bgL+PA4uVx4O9CwDW6E+MmscKT5LdFdF
-         C8ZhGgTJZ4bZNlRxf9gJ7dZ6gYph6DFheanCAJQl1cbcCowHxIIVGodPyPjP9l7wBFDp
-         buT5OiH7A3KuJ0Cq0Xc0Q2fGL3/2SK7xBuEId0AM2VyjrZuEQGvPAd4kPwZaz4naElT8
-         RWnw==
-X-Gm-Message-State: AOAM533rILIi19uzjoFhKr5FjXb51lBbErs03DRjxAlb2M3hSblnFgd2
-        ngYgIf5F6cQlbTe+uGTdhfrJy6/rLT4=
-X-Google-Smtp-Source: ABdhPJyjo8VeToXiSjZrnsgDhpYRCNaqkUmt++liiRWdHQR2sL3eL19l/M3lyWEg61U/1VVV2HMWdQ==
-X-Received: by 2002:a67:2647:: with SMTP id m68mr11033016vsm.39.1604170514983;
-        Sat, 31 Oct 2020 11:55:14 -0700 (PDT)
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com. [209.85.221.173])
-        by smtp.gmail.com with ESMTPSA id g123sm1316198vsg.5.2020.10.31.11.55.13
+        bh=wwf1XRuzqH8iDHRAKdxul3V5TY+R1Lm9WGQNmM2sOaM=;
+        b=WSl7p08+UmCLvQ87Nz04t+rgbrlXMLg0OOk6PIQX7gawyaPmt9g44cmGnHnPshqk7X
+         WJ2r79bop/esIVbfX9of5SO4a50SDoBejb2Bq4vyxims4E9HbHJVayLSATqRB3z4ohcO
+         lQpqkUn/jNsR0Sb00C9l5887lL48m6e0zQlSE6ZTqEcmCx7pHQVAwytObBuQY3x4pEC5
+         j8W9V4aZ3JwdkjbZhfepPH//nT+oS4S0yv12kLAonpiwxEworQf2rjz/fgrAADQm4bpr
+         XYD5oA3eFk8lvDci7VE92NpSZEv6dFXbf6B80QWkBDRylBuDK144CkQ7JXWYf+om3brn
+         KkNg==
+X-Gm-Message-State: AOAM530EB3jcWPDt1OEjOLV3KTd5JY3etpElCRlVLiiWrr/jS9b14LL6
+        8h3TWCPeKXLHmDoxQCdzjKA22TbdI6g=
+X-Google-Smtp-Source: ABdhPJz24Zh/yutgE0mcrhQ2GsSv8B0oxk6MQeSmZHXBSfuBWn6UF6ICsovraZyi8KejoLw4bwbDig==
+X-Received: by 2002:ab0:244f:: with SMTP id g15mr4938937uan.78.1604171987394;
+        Sat, 31 Oct 2020 12:19:47 -0700 (PDT)
+Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com. [209.85.217.54])
+        by smtp.gmail.com with ESMTPSA id x4sm293209vkg.24.2020.10.31.12.19.46
         for <linux-crypto@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 31 Oct 2020 11:55:14 -0700 (PDT)
-Received: by mail-vk1-f173.google.com with SMTP id a8so2163293vkm.2
-        for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2020 11:55:13 -0700 (PDT)
-X-Received: by 2002:a1f:c149:: with SMTP id r70mr10316795vkf.1.1604170513281;
- Sat, 31 Oct 2020 11:55:13 -0700 (PDT)
+        Sat, 31 Oct 2020 12:19:46 -0700 (PDT)
+Received: by mail-vs1-f54.google.com with SMTP id b3so5280026vsc.5
+        for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2020 12:19:46 -0700 (PDT)
+X-Received: by 2002:a05:6102:52b:: with SMTP id m11mr1067435vsa.28.1604171985842;
+ Sat, 31 Oct 2020 12:19:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20201028145015.19212-1-schalla@marvell.com> <20201028145015.19212-13-schalla@marvell.com>
-In-Reply-To: <20201028145015.19212-13-schalla@marvell.com>
+References: <20201028145015.19212-1-schalla@marvell.com> <20201028145015.19212-12-schalla@marvell.com>
+In-Reply-To: <20201028145015.19212-12-schalla@marvell.com>
 From:   Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date:   Sat, 31 Oct 2020 14:54:35 -0400
-X-Gmail-Original-Message-ID: <CA+FuTScj_mRU0Eor2-_awn7s=AOAx_x57NOJscmmWV-BtwaFmA@mail.gmail.com>
-Message-ID: <CA+FuTScj_mRU0Eor2-_awn7s=AOAx_x57NOJscmmWV-BtwaFmA@mail.gmail.com>
-Subject: Re: [PATCH v8,net-next,12/12] crypto: octeontx2: register with linux
- crypto framework
+Date:   Sat, 31 Oct 2020 15:19:09 -0400
+X-Gmail-Original-Message-ID: <CA+FuTSdVszdtPvpasE2FpZ97WRP1uV5UJMC5KjrnziTUY8UQOw@mail.gmail.com>
+Message-ID: <CA+FuTSdVszdtPvpasE2FpZ97WRP1uV5UJMC5KjrnziTUY8UQOw@mail.gmail.com>
+Subject: Re: [PATCH v8,net-next,11/12] crypto: octeontx2: add support to
+ process the crypto request
 To:     Srujana Challa <schalla@marvell.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         David Miller <davem@davemloft.net>,
@@ -85,40 +85,44 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 28, 2020 at 5:43 PM Srujana Challa <schalla@marvell.com> wrote:
+On Wed, Oct 28, 2020 at 5:52 PM Srujana Challa <schalla@marvell.com> wrote:
 >
-> CPT offload module utilises the linux crypto framework to offload
-> crypto processing. This patch registers supported algorithms by
-> calling registration functions provided by the kernel crypto API.
->
-> The module currently supports:
-> - AES block cipher in CBC,ECB,XTS and CFB mode.
-> - 3DES block cipher in CBC and ECB mode.
-> - AEAD algorithms.
->   authenc(hmac(sha1),cbc(aes)),
->   authenc(hmac(sha256),cbc(aes)),
->   authenc(hmac(sha384),cbc(aes)),
->   authenc(hmac(sha512),cbc(aes)),
->   authenc(hmac(sha1),ecb(cipher_null)),
->   authenc(hmac(sha256),ecb(cipher_null)),
->   authenc(hmac(sha384),ecb(cipher_null)),
->   authenc(hmac(sha512),ecb(cipher_null)),
->   rfc4106(gcm(aes)).
+> Attach LFs to CPT VF to process the crypto requests and register
+> LF interrupts.
 >
 > Signed-off-by: Suheil Chandran <schandran@marvell.com>
 > Signed-off-by: Srujana Challa <schalla@marvell.com>
 > ---
->  drivers/crypto/marvell/Kconfig                |    4 +
->  drivers/crypto/marvell/octeontx2/Makefile     |    3 +-
->  .../marvell/octeontx2/otx2_cpt_reqmgr.h       |    1 +
->  .../marvell/octeontx2/otx2_cptvf_algs.c       | 1665 +++++++++++++++++
->  .../marvell/octeontx2/otx2_cptvf_algs.h       |  170 ++
+>  drivers/crypto/marvell/octeontx2/Makefile     |   2 +-
+>  .../marvell/octeontx2/otx2_cpt_common.h       |   3 +
+>  .../marvell/octeontx2/otx2_cpt_reqmgr.h       | 145 +++++
+>  drivers/crypto/marvell/octeontx2/otx2_cptlf.h |   7 +
+>  .../marvell/octeontx2/otx2_cptvf_main.c       | 196 +++++++
+>  .../marvell/octeontx2/otx2_cptvf_mbox.c       |  26 +
+>  .../marvell/octeontx2/otx2_cptvf_reqmgr.c     | 532 ++++++++++++++++++
+>  7 files changed, 910 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
 
-These files are almost verbatim copies of
-.../marvell/octeontx/otx_cptvf_algs.(ch), with the usual name changes
-otx_ to otx2_
 
-Is there some way to avoid code duplication? I guess this is not
-uncommon for subsequent hardware device drivers from the same vendor.
+> +static int init_tasklet_work(struct otx2_cptlfs_info *lfs)
+> +{
+> +       struct otx2_cptlf_wqe *wqe;
+> +       int i, ret = 0;
+> +
+> +       for (i = 0; i < lfs->lfs_num; i++) {
+> +               wqe = kzalloc(sizeof(struct otx2_cptlf_wqe), GFP_KERNEL);
+> +               if (!wqe) {
+> +                       ret = -ENOMEM;
+> +                       goto cleanup_tasklet;
+> +               }
+> +
+> +               tasklet_init(&wqe->work, cptlf_work_handler, (u64) wqe);
+> +               wqe->lfs = lfs;
+> +               wqe->lf_num = i;
+> +               lfs->lf[i].wqe = wqe;
+> +       }
+> +       return 0;
+> +cleanup_tasklet:
 
-If nothing else, knowing this makes reviewing a lot easier.
+nit: here and elsewhere, please leave an empty line between the return
+statement and subsequent label.
