@@ -2,70 +2,68 @@ Return-Path: <SRS0=m/1o=EG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 046FDC388F7
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 16:59:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82F40C388F7
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 17:08:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF17A20720
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 16:59:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F684208A9
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 17:08:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1604163581;
-	bh=lDhAL0eL5RojYfF/GFsNMNdak8tx6KUFC/4p8XlKQ+0=;
+	s=default; t=1604164092;
+	bh=Mw09u45BOHIABzfIiri3F7X5K7CUh0+5Rw6SY0INk3A=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=LyUcHy9X3WrZXVC6domk8yXbpKnjkl9fNzxvkfAHAnAFe06YbisccUBzAnjzpj281
-	 eEvtzZFCLyl6AXKunIZV6GBkbNIYqOT/8zR4K+a0LCXuuSWCy//blFxCOBZpzLqhwd
-	 lPlfNsa8DqNpKFGlQZQ6Ev/TKuVwaV6wixg5qv5o=
+	b=V5Sk+/kvL3EZFrYBC9iLG/ez9Btsfu3O/CWcirUO91wl9mtxswYYEd1iYL8R1mQ2T
+	 kkE7nEQzmmva7zBiaFjmHdwBjkirMLnJ/qcZXxGxcVBoDi3e0pAw9mOTW7Ao8zQ5oZ
+	 TQcvAgdXPz8TG21Hanb5iaOt0gZLVV1KZF+J2q1o=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728091AbgJaQ7k (ORCPT
+        id S1728185AbgJaRIL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 31 Oct 2020 12:59:40 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49006 "EHLO mail.kernel.org"
+        Sat, 31 Oct 2020 13:08:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51944 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726586AbgJaQ7k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 31 Oct 2020 12:59:40 -0400
+        id S1726586AbgJaRIL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 31 Oct 2020 13:08:11 -0400
 Received: from kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net (c-67-180-217-166.hsd1.ca.comcast.net [67.180.217.166])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2138020679;
-        Sat, 31 Oct 2020 16:59:39 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C3A6C206DC;
+        Sat, 31 Oct 2020 17:08:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604163579;
-        bh=lDhAL0eL5RojYfF/GFsNMNdak8tx6KUFC/4p8XlKQ+0=;
+        s=default; t=1604164090;
+        bh=Mw09u45BOHIABzfIiri3F7X5K7CUh0+5Rw6SY0INk3A=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=WPRhV/HezItBXgNi5d2ycQq4A4eUJK+BThEYto+xOSJ4smwlD233EQe/+MSo6OUG7
-         hAcoU/6GPl+ouTcU4vvF9vbkmuEbzLsBiM3DqzmAvhBNjBOSNGEpRMg+65J1cQxune
-         Ku7TDFT5KDbD/PDEsn/bQLdlZEwFITorDxMKVTVQ=
-Date:   Sat, 31 Oct 2020 09:59:38 -0700
+        b=oSvD+IafsTffY12YssYphnyq1CGSiLQZYrnV0kxDYeAp9B54AcB0s1cbpAYcjabDw
+         zy8wOV8hikf+zUnDgqfhmvMmNAhbqojdd34fXEJWiieRB32Huz2Cs5Aef/EhCK0Uk2
+         AXRUjnPnfa6UuiNSy5YOGzan8ugiyhO1oFrDzePk=
+Date:   Sat, 31 Oct 2020 10:08:09 -0700
 From:   Jakub Kicinski <kuba@kernel.org>
-To:     Leon Romanovsky <leon@kernel.org>,
-        Saeed Mahameed <saeedm@nvidia.com>
-Cc:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        netdev@vger.kernel.org, Aymen Sghaier <aymen.sghaier@nxp.com>,
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     netdev@vger.kernel.org, Aymen Sghaier <aymen.sghaier@nxp.com>,
         Daniel Drake <dsd@gentoo.org>,
         "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Horia =?UTF-8?B?R2VhbnTEgw==?= <horia.geanta@nxp.com>,
         Jon Mason <jdmason@kudzu.us>, Jouni Malinen <j@w1.fi>,
         Kalle Valo <kvalo@codeaurora.org>,
+        Leon Romanovsky <leon@kernel.org>,
         linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org, linux-rdma@vger.kernel.org,
         linux-wireless@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
         Madalin Bucur <madalin.bucur@nxp.com>,
         Ping-Ke Shih <pkshih@realtek.com>,
         Rain River <rain.1986.08.12@gmail.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
         Samuel Chessman <chessman@tux.org>,
         Ulrich Kunitz <kune@deine-taler.de>,
         Zhu Yanjun <zyjzyj2000@gmail.com>,
         Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH net-next 04/15] net: mlx5: Replace in_irq() usage.
-Message-ID: <20201031095938.3878412e@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-In-Reply-To: <20201027225454.3492351-5-bigeasy@linutronix.de>
+Subject: Re: [PATCH net-next 00/15] in_interrupt() cleanup, part 2
+Message-ID: <20201031100809.300bf4ab@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+In-Reply-To: <20201027225454.3492351-1-bigeasy@linutronix.de>
 References: <20201027225454.3492351-1-bigeasy@linutronix.de>
-        <20201027225454.3492351-5-bigeasy@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -73,25 +71,33 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 27 Oct 2020 23:54:43 +0100 Sebastian Andrzej Siewior wrote:
-> mlx5_eq_async_int() uses in_irq() to decide whether eq::lock needs to be
-> acquired and released with spin_[un]lock() or the irq saving/restoring
-> variants.
+On Tue, 27 Oct 2020 23:54:39 +0100 Sebastian Andrzej Siewior wrote:
+> Folks,
 > 
-> The usage of in_*() in drivers is phased out and Linus clearly requested
-> that code which changes behaviour depending on context should either be
-> seperated or the context be conveyed in an argument passed by the caller,
-> which usually knows the context.
+> in the discussion about preempt count consistency across kernel configurations:
 > 
-> mlx5_eq_async_int() knows the context via the action argument already so
-> using it for the lock variant decision is a straight forward replacement
-> for in_irq().
+>   https://lore.kernel.org/r/20200914204209.256266093@linutronix.de/
 > 
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Cc: Saeed Mahameed <saeedm@nvidia.com>
-> Cc: Leon Romanovsky <leon@kernel.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: linux-rdma@vger.kernel.org
+> Linus clearly requested that code in drivers and libraries which changes
+> behaviour based on execution context should either be split up so that
+> e.g. task context invocations and BH invocations have different interfaces
+> or if that's not possible the context information has to be provided by the
+> caller which knows in which context it is executing.
+> 
+> This includes conditional locking, allocation mode (GFP_*) decisions and
+> avoidance of code paths which might sleep.
+> 
+> In the long run, usage of 'preemptible, in_*irq etc.' should be banned from
+> driver code completely.
+> 
+> This is part two addressing remaining drivers except for orinoco-usb.
 
-Saeed, please pick this up into your tree.
+Sebastian, thanks for there, I picked up only the Ethernet patches:
+
+5ce7f3f46f6b net: neterion: s2io: Replace in_interrupt() for context detection
+dc5e8bfcd12e net: forcedeth: Replace context and lock check with a lockdep_assert()
+beca92820dc4 net: tlan: Replace in_irq() usage
+
+Please repost the wireless stuff for Kalle to linux-wireless@vger, 
+and repost the fsl stuff separately (our patchwork queue is huge, 
+I can't keep this waiting for an ack any longer). 
