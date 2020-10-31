@@ -4,36 +4,36 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33134C4742C
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 09:08:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C1FAC4742C
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 09:08:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EFEBC2076D
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 09:08:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C7962076D
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 09:08:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726565AbgJaJIt (ORCPT
+        id S1726589AbgJaJIy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 31 Oct 2020 05:08:49 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:7022 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726497AbgJaJIo (ORCPT
+        Sat, 31 Oct 2020 05:08:54 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:7388 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726560AbgJaJIw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 31 Oct 2020 05:08:44 -0400
+        Sat, 31 Oct 2020 05:08:52 -0400
 Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CNYJ9589dzhcf1;
-        Sat, 31 Oct 2020 17:08:41 +0800 (CST)
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CNYJH0P8Dz70tb;
+        Sat, 31 Oct 2020 17:08:47 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.24) by
  DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 31 Oct 2020 17:08:34 +0800
+ 14.3.487.0; Sat, 31 Oct 2020 17:08:36 +0800
 From:   Weili Qian <qianweili@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH 3/8] crypto: hisilicon/qm - modify the return type of debugfs interface
-Date:   Sat, 31 Oct 2020 17:07:03 +0800
-Message-ID: <1604135228-18410-4-git-send-email-qianweili@huawei.com>
+Subject: [PATCH 8/8] crypto: hisilicon/qm - split 'hisi_qm_init' into smaller pieces
+Date:   Sat, 31 Oct 2020 17:07:08 +0800
+Message-ID: <1604135228-18410-9-git-send-email-qianweili@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1604135228-18410-1-git-send-email-qianweili@huawei.com>
 References: <1604135228-18410-1-git-send-email-qianweili@huawei.com>
@@ -45,138 +45,168 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since 'qm_create_debugfs_file' always returns 0, change it as 'void'.
+'hisi_qm_init' initializes configuration of QM.
+To improve code readability, split it into two pieces.
 
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre_main.c |  4 +---
- drivers/crypto/hisilicon/qm.c             | 19 ++++---------------
- drivers/crypto/hisilicon/qm.h             |  2 +-
- drivers/crypto/hisilicon/sec2/sec_main.c  |  4 +---
- drivers/crypto/hisilicon/zip/zip_main.c   |  4 +---
- 5 files changed, 8 insertions(+), 25 deletions(-)
+ drivers/crypto/hisilicon/qm.c | 86 ++++++++++++++++++++++++++-----------------
+ 1 file changed, 53 insertions(+), 33 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index a33394d..e5c9919 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -705,9 +705,7 @@ static int hpre_debugfs_init(struct hisi_qm *qm)
- 
- 	qm->debug.sqe_mask_offset = HPRE_SQE_MASK_OFFSET;
- 	qm->debug.sqe_mask_len = HPRE_SQE_MASK_LEN;
--	ret = hisi_qm_debug_init(qm);
--	if (ret)
--		goto failed_to_create;
-+	hisi_qm_debug_init(qm);
- 
- 	if (qm->pdev->device == HPRE_PCI_DEVICE_ID) {
- 		ret = hpre_ctrl_debug_init(qm);
 diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index d5d06ae..627479f 100644
+index 6e8d20d..f21ccae 100644
 --- a/drivers/crypto/hisilicon/qm.c
 +++ b/drivers/crypto/hisilicon/qm.c
-@@ -1520,7 +1520,7 @@ static const struct file_operations qm_cmd_fops = {
- 	.write = qm_cmd_write,
- };
- 
--static int qm_create_debugfs_file(struct hisi_qm *qm, enum qm_debug_file index)
-+static void qm_create_debugfs_file(struct hisi_qm *qm, enum qm_debug_file index)
- {
- 	struct dentry *qm_d = qm->debug.qm_d;
- 	struct debugfs_file *file = qm->debug.files + index;
-@@ -1531,8 +1531,6 @@ static int qm_create_debugfs_file(struct hisi_qm *qm, enum qm_debug_file index)
- 	file->index = index;
- 	mutex_init(&file->lock);
- 	file->debug = &qm->debug;
--
--	return 0;
+@@ -2442,6 +2442,16 @@ static void hisi_qm_pre_init(struct hisi_qm *qm)
+ 	qm->is_frozen = false;
  }
  
- static void qm_hw_error_init_v1(struct hisi_qm *qm, u32 ce, u32 nfe, u32 fe)
-@@ -2824,12 +2822,12 @@ DEFINE_DEBUGFS_ATTRIBUTE(qm_atomic64_ops, qm_debugfs_atomic64_get,
-  *
-  * Create qm related debugfs files.
-  */
--int hisi_qm_debug_init(struct hisi_qm *qm)
-+void hisi_qm_debug_init(struct hisi_qm *qm)
- {
- 	struct qm_dfx *dfx = &qm->debug.dfx;
- 	struct dentry *qm_d;
- 	void *data;
--	int i, ret;
-+	int i;
- 
- 	qm_d = debugfs_create_dir("qm", qm->debug.debug_root);
- 	qm->debug.qm_d = qm_d;
-@@ -2837,10 +2835,7 @@ int hisi_qm_debug_init(struct hisi_qm *qm)
- 	/* only show this in PF */
- 	if (qm->fun_type == QM_HW_PF)
- 		for (i = CURRENT_Q; i < DEBUG_FILE_NUM; i++)
--			if (qm_create_debugfs_file(qm, i)) {
--				ret = -ENOENT;
--				goto failed_to_create;
--			}
-+			qm_create_debugfs_file(qm, i);
- 
- 	debugfs_create_file("regs", 0444, qm->debug.qm_d, qm, &qm_regs_fops);
- 
-@@ -2856,12 +2851,6 @@ int hisi_qm_debug_init(struct hisi_qm *qm)
- 			data,
- 			&qm_atomic64_ops);
++static void hisi_qm_pci_uninit(struct hisi_qm *qm)
++{
++	struct pci_dev *pdev = qm->pdev;
++
++	pci_free_irq_vectors(pdev);
++	iounmap(qm->io_base);
++	pci_release_mem_regions(pdev);
++	pci_disable_device(pdev);
++}
++
+ /**
+  * hisi_qm_uninit() - Uninitialize qm.
+  * @qm: The qm needed uninit.
+@@ -2460,9 +2470,6 @@ void hisi_qm_uninit(struct hisi_qm *qm)
+ 		return;
  	}
+ 
+-	uacce_remove(qm->uacce);
+-	qm->uacce = NULL;
 -
--	return 0;
--
--failed_to_create:
--	debugfs_remove_recursive(qm_d);
--	return ret;
+ 	hisi_qp_memory_uninit(qm, qm->qp_num);
+ 	idr_destroy(&qm->qp_idr);
+ 
+@@ -2474,10 +2481,9 @@ void hisi_qm_uninit(struct hisi_qm *qm)
+ 	}
+ 
+ 	qm_irq_unregister(qm);
+-	pci_free_irq_vectors(pdev);
+-	iounmap(qm->io_base);
+-	pci_release_mem_regions(pdev);
+-	pci_disable_device(pdev);
++	hisi_qm_pci_uninit(qm);
++	uacce_remove(qm->uacce);
++	qm->uacce = NULL;
+ 
+ 	up_write(&qm->qps_lock);
  }
- EXPORT_SYMBOL_GPL(hisi_qm_debug_init);
+@@ -4038,34 +4044,22 @@ void hisi_qm_alg_unregister(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
+ }
+ EXPORT_SYMBOL_GPL(hisi_qm_alg_unregister);
  
-diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
-index 0420f4c..8624d12 100644
---- a/drivers/crypto/hisilicon/qm.h
-+++ b/drivers/crypto/hisilicon/qm.h
-@@ -350,7 +350,7 @@ void hisi_qm_release_qp(struct hisi_qp *qp);
- int hisi_qp_send(struct hisi_qp *qp, const void *msg);
- int hisi_qm_get_free_qp_num(struct hisi_qm *qm);
- int hisi_qm_get_vft(struct hisi_qm *qm, u32 *base, u32 *number);
--int hisi_qm_debug_init(struct hisi_qm *qm);
-+void hisi_qm_debug_init(struct hisi_qm *qm);
- enum qm_hw_ver hisi_qm_get_hw_version(struct pci_dev *pdev);
- void hisi_qm_debug_regs_clear(struct hisi_qm *qm);
- int hisi_qm_sriov_enable(struct pci_dev *pdev, int max_vfs);
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 2f52581..b35c1c2 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -652,9 +652,7 @@ static int sec_debugfs_init(struct hisi_qm *qm)
- 						  sec_debugfs_root);
- 	qm->debug.sqe_mask_offset = SEC_SQE_MASK_OFFSET;
- 	qm->debug.sqe_mask_len = SEC_SQE_MASK_LEN;
--	ret = hisi_qm_debug_init(qm);
--	if (ret)
--		goto failed_to_create;
-+	hisi_qm_debug_init(qm);
+-/**
+- * hisi_qm_init() - Initialize configures about qm.
+- * @qm: The qm needing init.
+- *
+- * This function init qm, then we can call hisi_qm_start to put qm into work.
+- */
+-int hisi_qm_init(struct hisi_qm *qm)
++static int hisi_qm_pci_init(struct hisi_qm *qm)
+ {
+ 	struct pci_dev *pdev = qm->pdev;
+ 	struct device *dev = &pdev->dev;
+ 	unsigned int num_vec;
+ 	int ret;
  
- 	ret = sec_debug_init(qm);
+-	hisi_qm_pre_init(qm);
+-
+-	ret = qm_alloc_uacce(qm);
+-	if (ret < 0)
+-		dev_warn(&pdev->dev, "fail to alloc uacce (%d)\n", ret);
+-
+ 	ret = pci_enable_device_mem(pdev);
+ 	if (ret < 0) {
+-		dev_err(&pdev->dev, "Failed to enable device mem!\n");
+-		goto err_remove_uacce;
++		dev_err(dev, "Failed to enable device mem!\n");
++		return ret;
+ 	}
+ 
+ 	ret = pci_request_mem_regions(pdev, qm->dev_name);
+ 	if (ret < 0) {
+-		dev_err(&pdev->dev, "Failed to request mem regions!\n");
++		dev_err(dev, "Failed to request mem regions!\n");
+ 		goto err_disable_pcidev;
+ 	}
+ 
+@@ -4093,9 +4087,42 @@ int hisi_qm_init(struct hisi_qm *qm)
+ 		goto err_iounmap;
+ 	}
+ 
++	return 0;
++
++err_iounmap:
++	iounmap(qm->io_base);
++err_release_mem_regions:
++	pci_release_mem_regions(pdev);
++err_disable_pcidev:
++	pci_disable_device(pdev);
++	return ret;
++}
++
++/**
++ * hisi_qm_init() - Initialize configures about qm.
++ * @qm: The qm needing init.
++ *
++ * This function init qm, then we can call hisi_qm_start to put qm into work.
++ */
++int hisi_qm_init(struct hisi_qm *qm)
++{
++	struct pci_dev *pdev = qm->pdev;
++	struct device *dev = &pdev->dev;
++	int ret;
++
++	hisi_qm_pre_init(qm);
++
++	ret = qm_alloc_uacce(qm);
++	if (ret < 0)
++		dev_warn(dev, "fail to alloc uacce (%d)\n", ret);
++
++	ret = hisi_qm_pci_init(qm);
++	if (ret)
++		goto err_remove_uacce;
++
+ 	ret = qm_irq_register(qm);
  	if (ret)
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 4bd2c81..3d1524b 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -590,9 +590,7 @@ static int hisi_zip_debugfs_init(struct hisi_qm *qm)
- 	qm->debug.sqe_mask_offset = HZIP_SQE_MASK_OFFSET;
- 	qm->debug.sqe_mask_len = HZIP_SQE_MASK_LEN;
- 	qm->debug.debug_root = dev_d;
--	ret = hisi_qm_debug_init(qm);
--	if (ret)
--		goto failed_to_create;
-+	hisi_qm_debug_init(qm);
+-		goto err_free_irq_vectors;
++		goto err_pci_uninit;
  
- 	if (qm->fun_type == QM_HW_PF) {
- 		ret = hisi_zip_ctrl_debug_init(qm);
+ 	if (qm->fun_type == QM_HW_VF && qm->ver != QM_HW_V1) {
+ 		/* v2 starts to support get vft by mailbox */
+@@ -4118,14 +4145,8 @@ int hisi_qm_init(struct hisi_qm *qm)
+ 
+ err_irq_unregister:
+ 	qm_irq_unregister(qm);
+-err_free_irq_vectors:
+-	pci_free_irq_vectors(pdev);
+-err_iounmap:
+-	iounmap(qm->io_base);
+-err_release_mem_regions:
+-	pci_release_mem_regions(pdev);
+-err_disable_pcidev:
+-	pci_disable_device(pdev);
++err_pci_uninit:
++	hisi_qm_pci_uninit(qm);
+ err_remove_uacce:
+ 	uacce_remove(qm->uacce);
+ 	qm->uacce = NULL;
+@@ -4133,7 +4154,6 @@ int hisi_qm_init(struct hisi_qm *qm)
+ }
+ EXPORT_SYMBOL_GPL(hisi_qm_init);
+ 
+-
+ MODULE_LICENSE("GPL v2");
+ MODULE_AUTHOR("Zhou Wang <wangzhou1@hisilicon.com>");
+ MODULE_DESCRIPTION("HiSilicon Accelerator queue manager driver");
 -- 
 2.8.1
 
