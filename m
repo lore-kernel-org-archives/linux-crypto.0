@@ -2,79 +2,96 @@ Return-Path: <SRS0=m/1o=EG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6FB1C388F7
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 09:09:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 046FDC388F7
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 16:59:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 85D1B2076D
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 09:09:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF17A20720
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Oct 2020 16:59:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1604163581;
+	bh=lDhAL0eL5RojYfF/GFsNMNdak8tx6KUFC/4p8XlKQ+0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
+	b=LyUcHy9X3WrZXVC6domk8yXbpKnjkl9fNzxvkfAHAnAFe06YbisccUBzAnjzpj281
+	 eEvtzZFCLyl6AXKunIZV6GBkbNIYqOT/8zR4K+a0LCXuuSWCy//blFxCOBZpzLqhwd
+	 lPlfNsa8DqNpKFGlQZQ6Ev/TKuVwaV6wixg5qv5o=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726576AbgJaJJ0 (ORCPT
+        id S1728091AbgJaQ7k (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 31 Oct 2020 05:09:26 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:7019 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726543AbgJaJIn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 31 Oct 2020 05:08:43 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CNYJ951GTzhcdf;
-        Sat, 31 Oct 2020 17:08:41 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 31 Oct 2020 17:08:34 +0800
-From:   Weili Qian <qianweili@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH 4/8] crypto: hisilicon/qm - modify return type of 'qm_set_sqctype'
-Date:   Sat, 31 Oct 2020 17:07:04 +0800
-Message-ID: <1604135228-18410-5-git-send-email-qianweili@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1604135228-18410-1-git-send-email-qianweili@huawei.com>
-References: <1604135228-18410-1-git-send-email-qianweili@huawei.com>
+        Sat, 31 Oct 2020 12:59:40 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49006 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726586AbgJaQ7k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 31 Oct 2020 12:59:40 -0400
+Received: from kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net (c-67-180-217-166.hsd1.ca.comcast.net [67.180.217.166])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2138020679;
+        Sat, 31 Oct 2020 16:59:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1604163579;
+        bh=lDhAL0eL5RojYfF/GFsNMNdak8tx6KUFC/4p8XlKQ+0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=WPRhV/HezItBXgNi5d2ycQq4A4eUJK+BThEYto+xOSJ4smwlD233EQe/+MSo6OUG7
+         hAcoU/6GPl+ouTcU4vvF9vbkmuEbzLsBiM3DqzmAvhBNjBOSNGEpRMg+65J1cQxune
+         Ku7TDFT5KDbD/PDEsn/bQLdlZEwFITorDxMKVTVQ=
+Date:   Sat, 31 Oct 2020 09:59:38 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Leon Romanovsky <leon@kernel.org>,
+        Saeed Mahameed <saeedm@nvidia.com>
+Cc:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        netdev@vger.kernel.org, Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Daniel Drake <dsd@gentoo.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Horia =?UTF-8?B?R2VhbnTEgw==?= <horia.geanta@nxp.com>,
+        Jon Mason <jdmason@kudzu.us>, Jouni Malinen <j@w1.fi>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-rdma@vger.kernel.org,
+        linux-wireless@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
+        Madalin Bucur <madalin.bucur@nxp.com>,
+        Ping-Ke Shih <pkshih@realtek.com>,
+        Rain River <rain.1986.08.12@gmail.com>,
+        Samuel Chessman <chessman@tux.org>,
+        Ulrich Kunitz <kune@deine-taler.de>,
+        Zhu Yanjun <zyjzyj2000@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH net-next 04/15] net: mlx5: Replace in_irq() usage.
+Message-ID: <20201031095938.3878412e@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+In-Reply-To: <20201027225454.3492351-5-bigeasy@linutronix.de>
+References: <20201027225454.3492351-1-bigeasy@linutronix.de>
+        <20201027225454.3492351-5-bigeasy@linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since 'qm_set_sqctype' always returns 0, change it as 'void'.
+On Tue, 27 Oct 2020 23:54:43 +0100 Sebastian Andrzej Siewior wrote:
+> mlx5_eq_async_int() uses in_irq() to decide whether eq::lock needs to be
+> acquired and released with spin_[un]lock() or the irq saving/restoring
+> variants.
+> 
+> The usage of in_*() in drivers is phased out and Linus clearly requested
+> that code which changes behaviour depending on context should either be
+> seperated or the context be conveyed in an argument passed by the caller,
+> which usually knows the context.
+> 
+> mlx5_eq_async_int() knows the context via the action argument already so
+> using it for the lock variant decision is a straight forward replacement
+> for in_irq().
+> 
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Cc: Saeed Mahameed <saeedm@nvidia.com>
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: linux-rdma@vger.kernel.org
 
-Signed-off-by: Weili Qian <qianweili@huawei.com>
-Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
----
- drivers/crypto/hisilicon/qm.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 627479f..17f84db 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -2118,7 +2118,7 @@ static void hisi_qm_uacce_stop_queue(struct uacce_queue *q)
- 	hisi_qm_stop_qp(q->priv);
- }
- 
--static int qm_set_sqctype(struct uacce_queue *q, u16 type)
-+static void qm_set_sqctype(struct uacce_queue *q, u16 type)
- {
- 	struct hisi_qm *qm = q->uacce->priv;
- 	struct hisi_qp *qp = q->priv;
-@@ -2126,8 +2126,6 @@ static int qm_set_sqctype(struct uacce_queue *q, u16 type)
- 	down_write(&qm->qps_lock);
- 	qp->alg_type = type;
- 	up_write(&qm->qps_lock);
--
--	return 0;
- }
- 
- static long hisi_qm_uacce_ioctl(struct uacce_queue *q, unsigned int cmd,
--- 
-2.8.1
-
+Saeed, please pick this up into your tree.
