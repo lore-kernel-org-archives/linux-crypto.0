@@ -2,132 +2,142 @@ Return-Path: <SRS0=zLA1=EI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40DD3C2D0A3
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 11:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B071FC388F2
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 13:45:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F08192076E
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 11:19:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 611C722268
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 13:45:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728359AbgKBLTE (ORCPT
+        id S1725841AbgKBNpv convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Nov 2020 06:19:04 -0500
-Received: from mga05.intel.com ([192.55.52.43]:22909 "EHLO mga05.intel.com"
+        Mon, 2 Nov 2020 08:45:51 -0500
+Received: from verein.lst.de ([213.95.11.211]:33241 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728253AbgKBLTE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Nov 2020 06:19:04 -0500
-IronPort-SDR: g19nmgtWmOvst89sfnf1tbL4BWUW+lKsXARijIctObK0DLQ8drASf1DRamNJo5umP3eZhTcS/m
- JwhObDxaNraw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9792"; a="253575769"
-X-IronPort-AV: E=Sophos;i="5.77,444,1596524400"; 
-   d="scan'208";a="253575769"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2020 03:19:03 -0800
-IronPort-SDR: exXf9gIIu47z4ZEa6YfCsbTywZw+0LyLQ/rMWrTwtDLwxiTLSn62U6Q5fDKZN8FpHUGAPgcitV
- 5i121SeDZzhw==
-X-IronPort-AV: E=Sophos;i="5.77,444,1596524400"; 
-   d="scan'208";a="527904799"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.51])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2020 03:19:01 -0800
-Date:   Mon, 2 Nov 2020 11:18:53 +0000
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     trix@redhat.com
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        ebiggers@google.com, dominik.przychodni@intel.com,
-        wojciech.ziemba@intel.com, mpatocka@redhat.com,
-        geert+renesas@glider.be, ardb@kernel.org, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: qat: remove unneeded semicolon
-Message-ID: <20201102111853.GA693055@silpixa00400314>
-References: <20201027190407.1587980-1-trix@redhat.com>
+        id S1725791AbgKBNpv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 2 Nov 2020 08:45:51 -0500
+Received: by verein.lst.de (Postfix, from userid 107)
+        id 834FC68BEB; Mon,  2 Nov 2020 14:45:49 +0100 (CET)
+Received: from blackhole (p5b0d807e.dip0.t-ipconnect.de [91.13.128.126])
+        by verein.lst.de (Postfix) with ESMTPSA id 2CD1767357;
+        Mon,  2 Nov 2020 14:44:44 +0100 (CET)
+Date:   Mon, 2 Nov 2020 14:44:35 +0100
+From:   Torsten Duwe <duwe@lst.de>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>
+Cc:     Stephan =?UTF-8?B?TcO8bGxlcg==?= <smueller@chronox.de>,
+        Willy Tarreau <w@1wt.eu>, linux-crypto@vger.kernel.org,
+        Nicolai Stange <nstange@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        And y Lavr <andy.lavr@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Petr Tesarik <ptesarik@suse.cz>, simo@redhat.com
+Subject: Re: [PATCH v36 00/13] /dev/random - a new approach
+Message-ID: <20201102154435.71cab8c0@blackhole>
+In-Reply-To: <20201028180728.GA2831268@kroah.com>
+References: <20200921075857.4424-1-nstange@suse.de>
+        <2961243.vtBmWVcJkq@tauon.chronox.de>
+        <20201016172619.GA18410@lst.de>
+        <3073852.aeNJFYEL58@positron.chronox.de>
+        <20201028185117.74300988@blackhole.lan>
+        <20201028180728.GA2831268@kroah.com>
+Organization: LST e.V.
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201027190407.1587980-1-trix@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 27, 2020 at 12:04:07PM -0700, trix@redhat.com wrote:
-> From: Tom Rix <trix@redhat.com>
+On Wed, 28 Oct 2020 19:07:28 +0100
+Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:
+
+> On Wed, Oct 28, 2020 at 06:51:17PM +0100, Torsten Duwe wrote:
+> > On Mon, 19 Oct 2020 21:28:50 +0200
+> > Stephan Müller <smueller@chronox.de> wrote:
+> > [...]
+> > > * Sole use of crypto for data processing:
+> > [...]
+> > >  - The LRNG uses only properly defined and implemented
+> > > cryptographic algorithms unlike the use of the SHA-1
+> > > transformation in the existing /dev/random implementation.
+> > > 
+> > >  - Hash operations use NUMA-node-local hash instances to benefit
+> > > large parallel systems.
+> > > 
+> > >  - LRNG uses limited number of data post-processing steps
+> > [...]
+> > > * Performance
+> > > 
+> > >  - Faster by up to 75% in the critical code path of the interrupt
+> > > handler depending on data collection size configurable at kernel
+> > > compile time - the default is about equal in performance with
+> > > existing /dev/random as outlined in [2] section 4.2.
+> > 
+> > [...]
+> > >  - ChaCha20 DRNG is significantly faster as implemented in the
+> > > existing /dev/random as demonstrated with [2] table 2.
+> > > 
+> > >  - Faster entropy collection during boot time to reach fully
+> > > seeded level, including on virtual systems or systems with SSDs as
+> > > outlined in [2] section 4.1.
+> > > 
+> > > * Testing
+> > [...]
+> > 
+> > So we now have 2 proposals for a state-of-the-art RNG, and over a
+> > month without a single comment on-topic from any `get_maintainer.pl`
+> > 
+> > I don't want to emphasise the certification aspects so much. The
+> > interrelation is rather that those certifications require certain
+> > code features, features which are reasonable per se. But the
+> > current code is lagging way behind.
+> > 
+> > I see the focus namely on performance, scalability, testability and
+> > virtualisation. And it certainly is an advantage to use the code
+> > already present under crypto, with its optimisations, and not rely
+> > on some home brew.
+> > 
+> > Can we please have a discussion about how to proceed?
+> > Ted, Greg, Arnd: which approach would you prefer?
 > 
-> A semicolon is not needed after a switch statement.
-I rebased the patch on top of cryptodev-2.6/master as it didn't apply
-after the latest patches to the qat driver and modified slightly the commit
-message: /s/qat:/qat -/
+> Greg and Arnd are not the random driver maintainers, as is now
+> correctly shown in the 5.10-rc1 MAINTAINERS file, so I doubt we (well
+> at least I) have any say here, sorry.
 
-----8<----
-From: Tom Rix <trix@redhat.com>
-Subject: [PATCH] crypto: qat - remove unneeded semicolon
+No problem. get_maintainer (for the proposals) works on paths, not on
+topics and I didn't want to leave anybody out.
 
-A semicolon is not needed after a switch statement.
+Ted, if you don't have the time any more to take care of /dev/random,
+it's not a shame to hand over maintainership, especially given your
+long history of Linux contributions.
 
-Signed-off-by: Tom Rix <trix@redhat.com>
-[giovanni.cabiddu@intel.com: rebased and minor change to commit message]
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_common/qat_algs.c      | 2 +-
- drivers/crypto/qat/qat_common/qat_asym_algs.c | 8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+Please do seriously consider to hand it over to someone new. This would
+be a good opportunity.
 
-diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
-index a38afc61f6d2..0fab8bb8ca59 100644
---- a/drivers/crypto/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -105,7 +105,7 @@ static int qat_get_inter_state_size(enum icp_qat_hw_auth_algo qat_hash_alg)
- 		return ICP_QAT_HW_SHA512_STATE1_SZ;
- 	default:
- 		return -EFAULT;
--	};
-+	}
- 	return -EFAULT;
- }
- 
-diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-index f112078be868..2c863d25327a 100644
---- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-@@ -201,7 +201,7 @@ static unsigned long qat_dh_fn_id(unsigned int len, bool g2)
- 		return g2 ? PKE_DH_G2_4096 : PKE_DH_4096;
- 	default:
- 		return 0;
--	};
-+	}
- }
- 
- static int qat_dh_compute_value(struct kpp_request *req)
-@@ -572,7 +572,7 @@ static unsigned long qat_rsa_enc_fn_id(unsigned int len)
- 		return PKE_RSA_EP_4096;
- 	default:
- 		return 0;
--	};
-+	}
- }
- 
- #define PKE_RSA_DP1_512 0x1c161b3c
-@@ -601,7 +601,7 @@ static unsigned long qat_rsa_dec_fn_id(unsigned int len)
- 		return PKE_RSA_DP1_4096;
- 	default:
- 		return 0;
--	};
-+	}
- }
- 
- #define PKE_RSA_DP2_512 0x1c131b57
-@@ -630,7 +630,7 @@ static unsigned long qat_rsa_dec_fn_id_crt(unsigned int len)
- 		return PKE_RSA_DP2_4096;
- 	default:
- 		return 0;
--	};
-+	}
- }
- 
- static int qat_rsa_enc(struct akcipher_request *req)
--- 
-2.28.0
+	Torsten
 
