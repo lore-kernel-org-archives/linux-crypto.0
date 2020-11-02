@@ -2,230 +2,168 @@ Return-Path: <SRS0=zLA1=EI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21A25C388F2
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 09:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BFC1C00A89
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 10:50:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4583222B9
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 09:51:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF3E32231B
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 10:50:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="aHi5PfBA";
-	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="Ms1LqZJK"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Q3HJpQM7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728322AbgKBJvr (ORCPT
+        id S1728253AbgKBKuA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Nov 2020 04:51:47 -0500
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:15710 "EHLO
-        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727992AbgKBJvq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Nov 2020 04:51:46 -0500
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-        by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0A29pYB1002794;
-        Mon, 2 Nov 2020 01:51:35 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pfpt0220;
- bh=zjJfF5V28gqZ56sE5eHnO9VTLWfFPG7eir7kac9q4CU=;
- b=aHi5PfBAd4MOnM+Iak8jT+8NP0VKGZjQCi1T9bVgaosTmPCBQIdhLY6gHl+2QpaJdCb/
- fEhiMp0SBmkhpDeG9GbC6G0AD5bBl/49tTleDmwqw8g+D0GNhlY/MjMRSgHFmHQsnLE+
- ydMIxP3Jr4UxrPoXjQ+ObniCaEcdO3jx/GBoeN1GV1RrfVa5KU147xawwTylpA4/fWvj
- ZjN8rbX2XJ+YM/L0PVPyLIaAk0ymv1mdnUW8DPBMqEuARZnx9s7k2K8ufvVoZooWs3IA
- oYrb5HGGohHAAIYt0Ho0PxVvo2DsJ8+URPnO7v0AENaF79oZen79wpdZsFpawx9qYG8P Yw== 
-Received: from sc-exch01.marvell.com ([199.233.58.181])
-        by mx0b-0016f401.pphosted.com with ESMTP id 34h7enpq5n-2
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Mon, 02 Nov 2020 01:51:34 -0800
-Received: from SC-EXCH02.marvell.com (10.93.176.82) by SC-EXCH01.marvell.com
- (10.93.176.81) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 2 Nov
- 2020 01:51:32 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.107)
- by SC-EXCH02.marvell.com (10.93.176.82) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2 via Frontend Transport; Mon, 2 Nov 2020 01:51:32 -0800
+        Mon, 2 Nov 2020 05:50:00 -0500
+Received: from mail-eopbgr80055.outbound.protection.outlook.com ([40.107.8.55]:12590
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728005AbgKBKt7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 2 Nov 2020 05:49:59 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cLVZA8xL0hp+Y1Zb6gE9gmaXbFM/fF+S/KwEwPAJOkecXHa4ej8GZAr+sRke/a++jUh4vY+ofCaKWZQ89z2x04wwomEkiorbkB5IQfQyBJlkLjQswK1hFziNL4Jfi/AQm8qwk7pWm2N45IOsqQLWPb2vo5SMiUhtVxOUVj7hXehEDp0fZu621SKJozkSeCwaID6O3IK4xPbjM4hcfMzDjCkxoviDk1uh4m5Yh1fGuR3yoLsqI99V2wprMBQvrlrfGa43yBiYfrFQj2RNqHgQFuo/POqQtWZZhSPZtEg25EAmBHrbFsMWnrEUpLb881U0MZpQfERFLmJPxZ1s7RzpRw==
+ b=ONLcq+i0sKjKYDjOub5O1ls09poc+aGFgAJ8PFUOqaqoYGnfTpaLm/9GwV/LNgIMy7kYnjqkW1y20IzBrrL1/PV/ZTAcv44u8LsfRsREa4qOeF6kSUqFg/T56erHwFy3A+cDVXoLAPKxUyzvkO3/EdslyzVH24MCh38MDNqqDUSq1mGGiOSeV6XIE0wximF1DyIemA2y7nkqINxghdxwBJMboT73Vtg1ZdPtdUrlzvV07Ms4ZC/sf/4NQmzkwtgHu1yNzoymV9OG6k827wh9pKHhEwC4wT+LSQE6c3j8c/NyqjpmJRNKYgqgmB2owWx7Zag9qjnmNZhX5ruCxCC7ig==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zjJfF5V28gqZ56sE5eHnO9VTLWfFPG7eir7kac9q4CU=;
- b=lEI5an6eqEht5Vr7b+0CObQjRokniKGRbWJjjNQyjfzlu823j9I1PDzwu8WFZtoba79Fa8Aa6Fr1M4Jturf6P4SctmCkBD7M3vmXZmjIA2Hj2+QRkFY5pWUuYBfQAAIFJRAdVYSiAMe1kodbjpNg4VhqflP+ymMoWQtWukX/zabGb38JtdqGpPMt2hR3ItbNm3wURuR5dJyCwnB8Zku7ZIRPTwTJUrAYsi8MVkUWdkmR5oawt7JoEuf+BXTIpS81rEadis8eT9ry8G086x0lheU2ejmnYTv2+TWccIhkeC2Oe8RKKDJa4HeHRHIlHoit67jLgIk716KMhQY4XwrDig==
+ bh=qTrVNzec9lCw8G5xR/DMtwvsRrgX2obA6z3GjrTELX8=;
+ b=P0Jy2U2ZLEj6mdmthjuJuOurTM5eMZLrENjjjuhTrCttIbe2eGiL3ccw23D6evENuCBkAgJUoy2qGI0YM8Qg8PG3sZrqjkvfWJYAlBUx32O70V4rR+bVrDQMN5wXMyym8araCjexfXFgfgxwEyoP2pgYY1AuoKivt/Jooa2AsPjhGvOJpJ3IyjzPOvMOesA/DEIIvg99ZZI++G6iC5m4HyadzThpSLvWDaX943rsa3sOVweddr8vx9Bj23rctcG3Aio5HtQLWWTZvvngs9LwoAg0PCDm/OwElhsKjXUIA1h8R+q2j0z4bul0+XONqRmOsP07gBv3Shh2hwX4CM1x6g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zjJfF5V28gqZ56sE5eHnO9VTLWfFPG7eir7kac9q4CU=;
- b=Ms1LqZJKphGaEF7vgKeT05hhV2+KTMNORBslIc8h5EAJDYxmhK8pLZbDO+tM3IognHMy9wLQiCCfSHKGX1IzBxt4OeQy+5fJTb/XZ6Ushr6VXTkJrj2lE6cWGdzcHLexSCGg9Qh1Q93kh3KuUknzHjHBcEgX16/L7DO4dTkTpDE=
-Received: from BYAPR18MB2791.namprd18.prod.outlook.com (2603:10b6:a03:111::21)
- by BY5PR18MB3409.namprd18.prod.outlook.com (2603:10b6:a03:1af::29) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.29; Mon, 2 Nov
- 2020 09:51:28 +0000
-Received: from BYAPR18MB2791.namprd18.prod.outlook.com
- ([fe80::68cb:a1a3:e1cf:f9d2]) by BYAPR18MB2791.namprd18.prod.outlook.com
- ([fe80::68cb:a1a3:e1cf:f9d2%5]) with mapi id 15.20.3499.030; Mon, 2 Nov 2020
- 09:51:28 +0000
-From:   Srujana Challa <schalla@marvell.com>
-To:     Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Network Development <netdev@vger.kernel.org>,
+ bh=qTrVNzec9lCw8G5xR/DMtwvsRrgX2obA6z3GjrTELX8=;
+ b=Q3HJpQM7tQuIBsEGe3mNVMtTTmgZNilQLubcr1IWr7CI+OsThkuO60DFtdYYg3vPgiTCrp4GRvUUzn6QJCE23WHUltDisjcZ40UtuywvhfbRKbSxe6YMiewGpl2xTDdrwYWB0I4IdHYRTaXoSoTENOug3fuX8T8AATay11xx2k0=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=nxp.com;
+Received: from VI1PR0402MB3712.eurprd04.prod.outlook.com
+ (2603:10a6:803:1c::25) by VE1PR04MB6512.eurprd04.prod.outlook.com
+ (2603:10a6:803:120::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.27; Mon, 2 Nov
+ 2020 10:49:55 +0000
+Received: from VI1PR0402MB3712.eurprd04.prod.outlook.com
+ ([fe80::ade4:e169:1f4a:28c]) by VI1PR0402MB3712.eurprd04.prod.outlook.com
+ ([fe80::ade4:e169:1f4a:28c%4]) with mapi id 15.20.3499.030; Mon, 2 Nov 2020
+ 10:49:55 +0000
+Subject: Re: [PATCH] crypto: caam - fix printing on xts fallback allocation
+ error path
+To:     =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>
+Cc:     Andrei Botila <andrei.botila@nxp.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-        Geethasowjanya Akula <gakula@marvell.com>,
-        Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-        Suheil Chandran <schandran@marvell.com>,
-        "Narayana Prasad Raju Athreya" <pathreya@marvell.com>
-Subject: RE: [EXT] Re: [PATCH v8,net-next,02/12] octeontx2-af: add mailbox
- interface for CPT
-Thread-Topic: [EXT] Re: [PATCH v8,net-next,02/12] octeontx2-af: add mailbox
- interface for CPT
-Thread-Index: AQHWrTnGmauEeee310SK81XISN0owKmwUwGAgARMNYA=
-Date:   Mon, 2 Nov 2020 09:51:28 +0000
-Message-ID: <BYAPR18MB279165911FEAC6402C75A754A0100@BYAPR18MB2791.namprd18.prod.outlook.com>
-References: <20201028145015.19212-1-schalla@marvell.com>
- <20201028145015.19212-3-schalla@marvell.com>
- <CA+FuTSeLG+WV_Et75trH1kF0ahFpqfe2SvMRfjKk+OYycWktVw@mail.gmail.com>
-In-Reply-To: <CA+FuTSeLG+WV_Et75trH1kF0ahFpqfe2SvMRfjKk+OYycWktVw@mail.gmail.com>
-Accept-Language: en-US
+        dl-linux-imx <linux-imx@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20201101200553.25248-1-horia.geanta@nxp.com>
+From:   Iuliana Prodan <iuliana.prodan@nxp.com>
+Message-ID: <e729817e-5c9d-112f-2c1d-514b91e19870@nxp.com>
+Date:   Mon, 2 Nov 2020 12:49:52 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
+In-Reply-To: <20201101200553.25248-1-horia.geanta@nxp.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=marvell.com;
-x-originating-ip: [2409:4070:2086:77f5:9042:7a80:ca40:111a]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4ee1747b-5678-48b9-6a00-08d87f14decc
-x-ms-traffictypediagnostic: BY5PR18MB3409:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BY5PR18MB340957B818DF56BC79431497A0100@BY5PR18MB3409.namprd18.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: x+70X3JW23KJ/kIOoHj7Cr7mGoqTbFteRX+qobhLGU49vhPRwGjP//6Wbel1hGMukbWmu3oRBkJU8gPNGQVt4b8fnxvdcBQdI97crIqkugTlm6UYixLgyKvtp3c3jRPn4be6oeP84BSIn2ApUnoNBUeuKGR0936edP7QEdyXOsm5yu0nutrDwzBiBhewGC3yG81p6h8jBKRfoO1Yhfl4b4cm9DoDnTo3PNZ15fx1Suf9AofO49C/GUMX2SqtxAGIz8KXdJQZC5ydFlZYieKCiGPl/+qlSMhEdcUERHT8g2v2Vn4bmPsawLRq+ZFe4ypoT7ztUiv2JfMbGqN58P0g7g==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR18MB2791.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(346002)(39850400004)(376002)(366004)(107886003)(71200400001)(86362001)(6916009)(53546011)(2906002)(4326008)(6506007)(186003)(8936002)(33656002)(8676002)(9686003)(7696005)(64756008)(83380400001)(52536014)(66446008)(54906003)(316002)(5660300002)(478600001)(15650500001)(76116006)(55016002)(66556008)(66476007)(66946007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: nzXoHQKlQj33H9TRUo6O9Sp+gJXtWqft1Ku5Er6sra7b79lIud1j7nTsO5tGZfd6QQerKUibixRodVDa2uDQvGzYyp+8Zk1ye8rs54DXp8yo7mZjMBP1y/ej84Zt7o8xrWAV9SmmRNhNjqdttJwdPTIf4at1ZF84wOkhCx43J0J/ALd26W5W5eUvJN/u0kbMgw6NQYWEJ/qvHE/5clN6s2pIKIKVWPcXbJYDppI/MX40mC2Kdr8B7voOB8Fv+0cqN7od8BPvaeFev17L5hU+DyudviWEEnKEO073BpXTBjxA3K6QDCsb5iw5rOMBWEkByLZ0fPEnxsbcPceaaQhhZ0XF2piI/2lUxEBWHuuC1KOCSmiSnif4TwOPI+Kt+VN+R6XigOIfHwfVColH7TeoWWGAkLOJ0G8shJVSFt2dNmgJTgZLy+KkqK+Gi5ddpxtildayceahXhS8btftxehzNbsnRek43BN5bz0yx3CiZ7BGaPkV1eK9f6ohlDcOjpUM/5kYKveuhbrjQqU3us1tvOOoYpRpMfW2T+PmIBlbL+tLi2U2eBv5WsmWBs7PQYmWzJyxfqtI0/hDDvskkAw39i4b2pQQyaNs4dbc7muRTAtqh5y34E5jT5/GMjIPa9YD0pU7hLfpLka2uPcfSmOfpfDQLoPGDQA+iH0MKnZ6CBpgfC9tZwiLdJO98sq/ii+mqMCPr0T/JkTlTmWFEHpHwQ==
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [188.26.141.79]
+X-ClientProxiedBy: AM0PR10CA0071.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:15::24) To VI1PR0402MB3712.eurprd04.prod.outlook.com
+ (2603:10a6:803:1c::25)
 MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.5] (188.26.141.79) by AM0PR10CA0071.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:15::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend Transport; Mon, 2 Nov 2020 10:49:54 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 32480489-ac73-4890-a6f2-08d87f1d08b9
+X-MS-TrafficTypeDiagnostic: VE1PR04MB6512:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VE1PR04MB6512347B8D9D5FC1B10222A38C100@VE1PR04MB6512.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:506;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wnjG9QfmvV63AFbh5ADLUS528A42m+VLCl4QVSfWxpVsBC/WRdxJZ7Iwk5XIc94lH/Ol8jz3koHdhybZDBydCrveMXeDsWcJDhP/vNLl+ekHH+apuNHFoCZMhNBtauWfYMKx90HU/PBmDE3O0vbl1XVbA2teyg3zV0nFVDa/a0IUv5SOZQ2Pc6T48CFF45S4GEhKUbGTWbvDWTLgb6I8I+Lr2WeR8fpKYYXQP6ZWXnjpYz74UQVQRvHrWKmXXSRfZovOZ7aNePTp3fOHYV6NAffHEC2+X4FlLZLUDk0f3kiQx2WaUFOmVMLgUn4VLQG4C4h3sUjrsq73ihZ7gMIL5+wLHb+K3t0eyO0Fl5tr8uuJN0NaWe2bisgap7OL6735
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3712.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(376002)(136003)(366004)(396003)(31686004)(83380400001)(316002)(54906003)(66946007)(110136005)(16576012)(44832011)(36756003)(478600001)(2906002)(8936002)(8676002)(16526019)(4326008)(186003)(2616005)(6486002)(26005)(956004)(52116002)(86362001)(5660300002)(66556008)(31696002)(66476007)(53546011)(6636002)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: vpmBgXG5fjFxDVXgma/VaNevoGzIWsDV8nb/Cd5Va1rvklzWi62qSHbKHsk1U+L0+QgfKJizA/PJytqSqjDq/EvnSgoOfcCI9SoSXUkBhI1akEmKLte/TCbKCfaBJct3d016Oe8nxcZJrjbmjBJxMcIFJrlx5dFLTtkxwiwuIdpNiP3jAPS+AF5RDAbGNNacaESoKjOs6lE6xuKXkowUGJEFesKK3sZyYOwMSey5WKq9MuEoZSXaEN+aKti8jO1pQgK/pwV5l25YXbigSVKV6FOl1N80a1A8tSfUo/2uqZDyjXiIwPaWwAWO2GKs3oSywdfnoIcQmNnlyozUObKWh2Nvk4rw9fxTjUF174s7aJ6N6nwshcTeIdVrgWeMHJlE6thyUFCyMFZ7p3vZhf17Eix9sFcenOtq+WpWc5ylRNT4G21peJWWa0a1oKs/VNNKR/4qW49UIVGOZBZc0CUMYhIrTo9ckbi7x82AO7shovYaNnafV7UqA7d5sxrJ8ldyy4W+0mO2MaDSBUNkdpnH96UwEkA/7mZ3YowlPDjTx8jYbF9JEqyNnnUQSp3QUl07mcUeSkceyF1HJ+ct213ilrh3lmd7dfw6L3/zcD/pzAaP4eqc7fQuZPU9dgdjmCgl3Evgyka67/UKEWlhl03wMQ==
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32480489-ac73-4890-a6f2-08d87f1d08b9
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3712.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR18MB2791.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ee1747b-5678-48b9-6a00-08d87f14decc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Nov 2020 09:51:28.6377
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Nov 2020 10:49:55.2437
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KAiFzdUbWw9dGWDvEEGRlvr/gjYfkjH8GU5h7QLEUuOrGJv0zMFPDr5mBtBLbtgt5Cu7hB2+866VaDMOD6w6FA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR18MB3409
-X-OriginatorOrg: marvell.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
- definitions=2020-11-02_03:2020-10-30,2020-11-02 signatures=0
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sjlGsKJLqQea1EuhevTRLYnQZ8hGFsApHhLbHN3XygudIwpN+DmhTkCLRlJ8EjlxsVM7CuxTCAvxHE9dIlMMAw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB6512
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiBPbiBXZWQsIE9jdCAyOCwgMjAyMCBhdCAxMDo0NCBQTSBTcnVqYW5hIENoYWxsYSA8c2NoYWxs
-YUBtYXJ2ZWxsLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBPbiBPY3Rlb25UWDIgU29DLCB0aGUgYWRt
-aW4gZnVuY3Rpb24gKEFGKSBpcyB0aGUgb25seSBvbmUgd2l0aCBhbGwNCj4gPiBwcml2aWxpZ2Vz
-IHRvIGNvbmZpZ3VyZSBIVyBhbmQgYWxsb2MgcmVzb3VyY2VzLCBQRnMgYW5kIGl0J3MgVkZzDQo+
-ID4gaGF2ZSB0byByZXF1ZXN0IEFGIHZpYSBtYWlsYm94IGZvciBhbGwgdGhlaXIgbmVlZHMuIFRo
-aXMgcGF0Y2ggYWRkcw0KPiA+IGEgbWFpbGJveCBpbnRlcmZhY2UgZm9yIENQVCBQRnMgYW5kIFZG
-cyB0byBhbGxvY2F0ZSByZXNvdXJjZXMNCj4gPiBmb3IgY3J5cHRvZ3JhcGh5Lg0KPiA+DQo+ID4g
-U2lnbmVkLW9mZi1ieTogU3VoZWlsIENoYW5kcmFuIDxzY2hhbmRyYW5AbWFydmVsbC5jb20+DQo+
-ID4gU2lnbmVkLW9mZi1ieTogU3J1amFuYSBDaGFsbGEgPHNjaGFsbGFAbWFydmVsbC5jb20+DQo+
-ID4gLS0tDQo+ID4gIC4uLi9ldGhlcm5ldC9tYXJ2ZWxsL29jdGVvbnR4Mi9hZi9NYWtlZmlsZSAg
-ICB8ICAgMyArLQ0KPiA+ICAuLi4vbmV0L2V0aGVybmV0L21hcnZlbGwvb2N0ZW9udHgyL2FmL21i
-b3guaCAgfCAgMzMgKysrDQo+ID4gIC4uLi9uZXQvZXRoZXJuZXQvbWFydmVsbC9vY3Rlb250eDIv
-YWYvcnZ1LmMgICB8ICAgMiArLQ0KPiA+ICAuLi4vbmV0L2V0aGVybmV0L21hcnZlbGwvb2N0ZW9u
-dHgyL2FmL3J2dS5oICAgfCAgIDEgKw0KPiA+ICAuLi4vZXRoZXJuZXQvbWFydmVsbC9vY3Rlb250
-eDIvYWYvcnZ1X2NwdC5jICAgfCAyMjkgKysrKysrKysrKysrKysrKysrDQo+ID4gIC4uLi9ldGhl
-cm5ldC9tYXJ2ZWxsL29jdGVvbnR4Mi9hZi9ydnVfcmVnLmggICB8ICA2MyArKysrLQ0KPiA+ICA2
-IGZpbGVzIGNoYW5nZWQsIDMyMyBpbnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQ0KPiA+ICBj
-cmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy9uZXQvZXRoZXJuZXQvbWFydmVsbC9vY3Rlb250eDIv
-YWYvcnZ1X2NwdC5jDQo+IA0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9t
-YXJ2ZWxsL29jdGVvbnR4Mi9hZi9ydnVfcmVnLmgNCj4gYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9t
-YXJ2ZWxsL29jdGVvbnR4Mi9hZi9ydnVfcmVnLmgNCj4gPiBpbmRleCA3Y2E1OTliOTczYzAuLjgw
-N2IxYzFhOWQ4NSAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9tYXJ2ZWxs
-L29jdGVvbnR4Mi9hZi9ydnVfcmVnLmgNCj4gPiArKysgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9t
-YXJ2ZWxsL29jdGVvbnR4Mi9hZi9ydnVfcmVnLmgNCj4gPiBAQCAtNDI5LDEyICs0MjksNjMgQEAN
-Cj4gPiAgI2RlZmluZSBUSU1fQUZfTEZfUlNUICAgICAgICAgICAgICAgICAgKDB4MjApDQo+ID4N
-Cj4gPiAgLyogQ1BUICovDQo+ID4gLSNkZWZpbmUgQ1BUX0FGX0NPTlNUQU5UUzAgICAgICAgICAg
-ICAgICgweDAwMDApDQo+ID4gLSNkZWZpbmUgQ1BUX1BSSVZfTEZYX0NGRyAgICAgICAgICAgICAg
-ICgweDQxMDAwKQ0KPiA+IC0jZGVmaW5lIENQVF9QUklWX0xGWF9JTlRfQ0ZHICAgICAgICAgICAo
-MHg0MzAwMCkNCj4gPiAtI2RlZmluZSBDUFRfQUZfUlZVX0xGX0NGR19ERUJVRyAgICAgICAgICAg
-ICAgICAoMHg0NTAwMCkNCj4gPiAtI2RlZmluZSBDUFRfQUZfTEZfUlNUICAgICAgICAgICAgICAg
-ICAgKDB4NDQwMDApDQo+ID4gLSNkZWZpbmUgQ1BUX0FGX0JMS19SU1QgICAgICAgICAgICAgICAg
-ICgweDQ2MDAwKQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9DT05TVEFOVFMwICAgICAgICAgICAgICAg
-KDB4MDAwMCkNCj4gPiArI2RlZmluZSBDUFRfQUZfQ09OU1RBTlRTMSAgICAgICAgICAgICAgICgw
-eDEwMDApDQo+ID4gKyNkZWZpbmUgQ1BUX0FGX0RJQUcgICAgICAgICAgICAgICAgICAgICAoMHgz
-MDAwKQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9FQ08gICAgICAgICAgICAgICAgICAgICAgKDB4NDAw
-MCkNCj4gPiArI2RlZmluZSBDUFRfQUZfRkxUWF9JTlQoYSkgICAgICAgICAgICAgICgweGEwMDB1
-bGwgfCAodTY0KShhKSA8PCAzKQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9GTFRYX0lOVF9XMVMoYSkg
-ICAgICAgICAgKDB4YjAwMHVsbCB8ICh1NjQpKGEpIDw8IDMpDQo+ID4gKyNkZWZpbmUgQ1BUX0FG
-X0ZMVFhfSU5UX0VOQV9XMUMoYSkgICAgICAoMHhjMDAwdWxsIHwgKHU2NCkoYSkgPDwgMykNCj4g
-PiArI2RlZmluZSBDUFRfQUZfRkxUWF9JTlRfRU5BX1cxUyhhKSAgICAgICgweGQwMDB1bGwgfCAo
-dTY0KShhKSA8PCAzKQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9QU05YX0VYRShhKSAgICAgICAgICAg
-ICAgKDB4ZTAwMHVsbCB8ICh1NjQpKGEpIDw8IDMpDQo+ID4gKyNkZWZpbmUgQ1BUX0FGX1BTTlhf
-RVhFX1cxUyhhKSAgICAgICAgICAoMHhmMDAwdWxsIHwgKHU2NCkoYSkgPDwgMykNCj4gPiArI2Rl
-ZmluZSBDUFRfQUZfUFNOWF9MRihhKSAgICAgICAgICAgICAgICgweDEwMDAwdWxsIHwgKHU2NCko
-YSkgPDwgMykNCj4gPiArI2RlZmluZSBDUFRfQUZfUFNOWF9MRl9XMVMoYSkgICAgICAgICAgICgw
-eDExMDAwdWxsIHwgKHU2NCkoYSkgPDwgMykNCj4gPiArI2RlZmluZSBDUFRfQUZfRVhFWF9DVEwy
-KGEpICAgICAgICAgICAgICgweDEyMDAwdWxsIHwgKHU2NCkoYSkgPDwgMykNCj4gPiArI2RlZmlu
-ZSBDUFRfQUZfRVhFWF9TVFMoYSkgICAgICAgICAgICAgICgweDEzMDAwdWxsIHwgKHU2NCkoYSkg
-PDwgMykNCj4gPiArI2RlZmluZSBDUFRfQUZfRVhFX0VSUl9JTkZPICAgICAgICAgICAgICgweDE0
-MDAwKQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9FWEVYX0FDVElWRShhKSAgICAgICAgICAgKDB4MTYw
-MDB1bGwgfCAodTY0KShhKSA8PCAzKQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9JTlNUX1JFUV9QQyAg
-ICAgICAgICAgICAgKDB4MTcwMDApDQo+ID4gKyNkZWZpbmUgQ1BUX0FGX0lOU1RfTEFURU5DWV9Q
-QyAgICAgICAgICAoMHgxODAwMCkNCj4gPiArI2RlZmluZSBDUFRfQUZfUkRfUkVRX1BDICAgICAg
-ICAgICAgICAgICgweDE5MDAwKQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9SRF9MQVRFTkNZX1BDICAg
-ICAgICAgICAgKDB4MWEwMDApDQo+ID4gKyNkZWZpbmUgQ1BUX0FGX1JEX1VDX1BDICAgICAgICAg
-ICAgICAgICAoMHgxYjAwMCkNCj4gPiArI2RlZmluZSBDUFRfQUZfQUNUSVZFX0NZQ0xFU19QQyAg
-ICAgICAgICgweDFjMDAwKQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9FWEVfREJHX0NUTCAgICAgICAg
-ICAgICAgKDB4MWQwMDApDQo+ID4gKyNkZWZpbmUgQ1BUX0FGX0VYRV9EQkdfREFUQSAgICAgICAg
-ICAgICAoMHgxZTAwMCkNCj4gPiArI2RlZmluZSBDUFRfQUZfRVhFX1JFUV9USU1FUiAgICAgICAg
-ICAgICgweDFmMDAwKQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9FWEVYX0NUTChhKSAgICAgICAgICAg
-ICAgKDB4MjAwMDB1bGwgfCAodTY0KShhKSA8PCAzKQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9FWEVf
-UEVSRl9DVEwgICAgICAgICAgICAgKDB4MjEwMDApDQo+ID4gKyNkZWZpbmUgQ1BUX0FGX0VYRV9E
-QkdfQ05UWChhKSAgICAgICAgICAoMHgyMjAwMHVsbCB8ICh1NjQpKGEpIDw8IDMpDQo+ID4gKyNk
-ZWZpbmUgQ1BUX0FGX0VYRV9QRVJGX0VWRU5UX0NOVCAgICAgICAoMHgyMzAwMCkNCj4gPiArI2Rl
-ZmluZSBDUFRfQUZfRVhFX0VQQ0lfSU5CWF9DTlQoYSkgICAgICgweDI0MDAwdWxsIHwgKHU2NCko
-YSkgPDwgMykNCj4gPiArI2RlZmluZSBDUFRfQUZfRVhFX0VQQ0lfT1VUQlhfQ05UKGEpICAgICgw
-eDI1MDAwdWxsIHwgKHU2NCkoYSkgPDwgMykNCj4gPiArI2RlZmluZSBDUFRfQUZfRVhFWF9VQ09E
-RV9CQVNFKGEpICAgICAgICgweDI2MDAwdWxsIHwgKHU2NCkoYSkgPDwgMykNCj4gPiArI2RlZmlu
-ZSBDUFRfQUZfTEZYX0NUTChhKSAgICAgICAgICAgICAgICgweDI3MDAwdWxsIHwgKHU2NCkoYSkg
-PDwgMykNCj4gPiArI2RlZmluZSBDUFRfQUZfTEZYX0NUTDIoYSkgICAgICAgICAgICAgICgweDI5
-MDAwdWxsIHwgKHU2NCkoYSkgPDwgMykNCj4gPiArI2RlZmluZSBDUFRfQUZfQ1BUQ0xLX0NOVCAg
-ICAgICAgICAgICAgICgweDJhMDAwKQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9QRl9GVU5DICAgICAg
-ICAgICAgICAgICAgKDB4MmIwMDApDQo+ID4gKyNkZWZpbmUgQ1BUX0FGX0xGWF9QVFJfQ1RMKGEp
-ICAgICAgICAgICAoMHgyYzAwMHVsbCB8ICh1NjQpKGEpIDw8IDMpDQo+ID4gKyNkZWZpbmUgQ1BU
-X0FGX0dSUFhfVEhSKGEpICAgICAgICAgICAgICAoMHgyZDAwMHVsbCB8ICh1NjQpKGEpIDw8IDMp
-DQo+ID4gKyNkZWZpbmUgQ1BUX0FGX0NUTCAgICAgICAgICAgICAgICAgICAgICAoMHgyZTAwMHVs
-bCkNCj4gPiArI2RlZmluZSBDUFRfQUZfWEVYX1RIUihhKSAgICAgICAgICAgICAgICgweDJmMDAw
-dWxsIHwgKHU2NCkoYSkgPDwgMykNCj4gPiArI2RlZmluZSBDUFRfUFJJVl9MRlhfQ0ZHICAgICAg
-ICAgICAgICAgICgweDQxMDAwKQ0KPiA+ICsjZGVmaW5lIENQVF9QUklWX0FGX0lOVF9DRkcgICAg
-ICAgICAgICAgKDB4NDIwMDApDQo+ID4gKyNkZWZpbmUgQ1BUX1BSSVZfTEZYX0lOVF9DRkcgICAg
-ICAgICAgICAoMHg0MzAwMCkNCj4gPiArI2RlZmluZSBDUFRfQUZfTEZfUlNUICAgICAgICAgICAg
-ICAgICAgICgweDQ0MDAwKQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9SVlVfTEZfQ0ZHX0RFQlVHICAg
-ICAgICAgKDB4NDUwMDApDQo+ID4gKyNkZWZpbmUgQ1BUX0FGX0JMS19SU1QgICAgICAgICAgICAg
-ICAgICAoMHg0NjAwMCkNCj4gPiArI2RlZmluZSBDUFRfQUZfUlZVX0lOVCAgICAgICAgICAgICAg
-ICAgICgweDQ3MDAwKQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9SVlVfSU5UX1cxUyAgICAgICAgICAg
-ICAgKDB4NDcwMDgpDQo+ID4gKyNkZWZpbmUgQ1BUX0FGX1JWVV9JTlRfRU5BX1cxUyAgICAgICAg
-ICAoMHg0NzAxMCkNCj4gPiArI2RlZmluZSBDUFRfQUZfUlZVX0lOVF9FTkFfVzFDICAgICAgICAg
-ICgweDQ3MDE4KQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9SQVNfSU5UICAgICAgICAgICAgICAgICAg
-KDB4NDcwMjApDQo+ID4gKyNkZWZpbmUgQ1BUX0FGX1JBU19JTlRfVzFTICAgICAgICAgICAgICAo
-MHg0NzAyOCkNCj4gPiArI2RlZmluZSBDUFRfQUZfUkFTX0lOVF9FTkFfVzFTICAgICAgICAgICgw
-eDQ3MDMwKQ0KPiA+ICsjZGVmaW5lIENQVF9BRl9SQVNfSU5UX0VOQV9XMUMgICAgICAgICAgKDB4
-NDcwMzgpDQo+ID4gKw0KPiA+ICsjZGVmaW5lIENQVF9BRl9MRl9DVEwyX1NISUZUIDMNCj4gPiAr
-I2RlZmluZSBDUFRfQUZfTEZfU1NPX1BGX0ZVTkNfU0hJRlQgMzINCj4gPg0KPiA+ICAjZGVmaW5l
-IE5QQ19BRl9CTEtfUlNUICAgICAgICAgICAgICAgICAgKDB4MDAwNDApDQo+IA0KPiBNb3N0IG9m
-IHRoZXNlIGFyZSBub3QgcmVsYXRlZCB0byB0aGlzIHBhdGNoLiBVc2VkIG9ubHkgaW4gdGhlDQo+
-IGZvbGxvdy1vbiBkZWJ1ZyBpbnRlcmZhY2Ugb25lPw0KDQpBZGRlZCBhbGwgaGFyZHdhcmUgQ1BU
-IEFGIHJlZ2lzdGVyIGRlZmluZXMgaGVyZS4gSSB3aWxsIGFkZCB0aGlzDQpwb2ludCB0byB0aGUg
-cGF0Y2ggZGVzY3JpcHRpb24gaW4gbmV4dCB2ZXJzaW9uLg0KVGhhbmtzLg0K
+On 11/1/2020 10:05 PM, Horia Geantă wrote:
+> At the time xts fallback tfm allocation fails the device struct
+> hasn't been enabled yet in the caam xts tfm's private context.
+> 
+> Fix this by using the device struct from xts algorithm's private context
+> or, when not available, by replacing dev_err with pr_err.
+> 
+> Fixes: 9d9b14dbe077 ("crypto: caam/jr - add fallback for XTS with more than 8B IV")
+> Fixes: 83e8aa912138 ("crypto: caam/qi - add fallback for XTS with more than 8B IV")
+> Fixes: 36e2d7cfdcf1 ("crypto: caam/qi2 - add fallback for XTS with more than 8B IV")
+> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+Reviewed-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+
+> ---
+>   drivers/crypto/caam/caamalg.c     | 4 ++--
+>   drivers/crypto/caam/caamalg_qi.c  | 4 ++--
+>   drivers/crypto/caam/caamalg_qi2.c | 3 ++-
+>   3 files changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+> index cf5bd7666dfc..8697ae53b063 100644
+> --- a/drivers/crypto/caam/caamalg.c
+> +++ b/drivers/crypto/caam/caamalg.c
+> @@ -3404,8 +3404,8 @@ static int caam_cra_init(struct crypto_skcipher *tfm)
+>   		fallback = crypto_alloc_skcipher(tfm_name, 0,
+>   						 CRYPTO_ALG_NEED_FALLBACK);
+>   		if (IS_ERR(fallback)) {
+> -			dev_err(ctx->jrdev, "Failed to allocate %s fallback: %ld\n",
+> -				tfm_name, PTR_ERR(fallback));
+> +			pr_err("Failed to allocate %s fallback: %ld\n",
+> +			       tfm_name, PTR_ERR(fallback));
+>   			return PTR_ERR(fallback);
+>   		}
+>   
+> diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
+> index 66f60d78bdc8..a24ae966df4a 100644
+> --- a/drivers/crypto/caam/caamalg_qi.c
+> +++ b/drivers/crypto/caam/caamalg_qi.c
+> @@ -2502,8 +2502,8 @@ static int caam_cra_init(struct crypto_skcipher *tfm)
+>   		fallback = crypto_alloc_skcipher(tfm_name, 0,
+>   						 CRYPTO_ALG_NEED_FALLBACK);
+>   		if (IS_ERR(fallback)) {
+> -			dev_err(ctx->jrdev, "Failed to allocate %s fallback: %ld\n",
+> -				tfm_name, PTR_ERR(fallback));
+> +			pr_err("Failed to allocate %s fallback: %ld\n",
+> +			       tfm_name, PTR_ERR(fallback));
+>   			return PTR_ERR(fallback);
+>   		}
+>   
+> diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+> index 98c1ff1744bb..a780e627838a 100644
+> --- a/drivers/crypto/caam/caamalg_qi2.c
+> +++ b/drivers/crypto/caam/caamalg_qi2.c
+> @@ -1611,7 +1611,8 @@ static int caam_cra_init_skcipher(struct crypto_skcipher *tfm)
+>   		fallback = crypto_alloc_skcipher(tfm_name, 0,
+>   						 CRYPTO_ALG_NEED_FALLBACK);
+>   		if (IS_ERR(fallback)) {
+> -			dev_err(ctx->dev, "Failed to allocate %s fallback: %ld\n",
+> +			dev_err(caam_alg->caam.dev,
+> +				"Failed to allocate %s fallback: %ld\n",
+>   				tfm_name, PTR_ERR(fallback));
+>   			return PTR_ERR(fallback);
+>   		}
+> 
