@@ -2,82 +2,216 @@ Return-Path: <SRS0=zLA1=EI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21176C388F2
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 17:05:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D088C00A89
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 21:10:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF78720786
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 17:05:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E24FB208B6
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 21:10:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="eou7idGm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727395AbgKBRFC (ORCPT
+        id S1725933AbgKBVK2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Nov 2020 12:05:02 -0500
-Received: from mga06.intel.com ([134.134.136.31]:19151 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727387AbgKBRFC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Nov 2020 12:05:02 -0500
-IronPort-SDR: +wK6zkB8SrU0MmePryqXy68VYYuObKRBZ04cwcVg1SyY/7Pz28RXA9OdMgV18zO9taM+YIb6EM
- fCYbLo09tTIQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9793"; a="230548447"
-X-IronPort-AV: E=Sophos;i="5.77,445,1596524400"; 
-   d="scan'208";a="230548447"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2020 09:05:01 -0800
-IronPort-SDR: vkVL7SQD7VL5jFdqhNJHA0zstdnawejRBQhAIPxcPZ00KaxkbRnwBJvBPO0FmzmJHMuP1TFc4w
- Xg/BZhR5jcbw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,445,1596524400"; 
-   d="scan'208";a="528085770"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
-  by fmsmga005.fm.intel.com with ESMTP; 02 Nov 2020 09:04:59 -0800
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Adam Guerin <adam.guerin@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - remove cast for mailbox CSR
-Date:   Mon,  2 Nov 2020 17:04:54 +0000
-Message-Id: <20201102170454.716263-1-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.28.0
-MIME-Version: 1.0
+        Mon, 2 Nov 2020 16:10:28 -0500
+Received: from mail-eopbgr40084.outbound.protection.outlook.com ([40.107.4.84]:34794
+        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725806AbgKBVK2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 2 Nov 2020 16:10:28 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XUmUrLdMHWJ+XsEQedhyz9FZwykdrQpYyRn0HY7EB1MDp/cf8WkAVOiJ7M/J9qVXLtC0cC3/L2emDPC7q+/V8E1oQncR6gBqzkyOAp33lv8uXEbOezkfUxJ1x/V4zpSly72rktxNOSpo6vkHADQ6ycGKqK91IEda2Mkm2MmLc8Fh0H0AnMStQ+7MJ0fkg2nDqKBRkk2eRMveXCZ83YVsw/5ltX2HhMdARPRHarQTuxKW2+By04LBMdFvfvPv67IrrHGXVdDLcmgIoKH8Uh5hLcx00EOGkIrZLikmYi5LATGcAGG0M79n/l1NuuWUpbnzMm80TeKaT+7VhccLQ75kpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ovBsjrh7YRVXAmXkPV7MA7HDbomwBCymIH1Q4A9vc/Q=;
+ b=hFhnBh94tNie9yjXuoMVHl7Nys2zswJ/eTlt7BUw6O6REkhwS89DPNgAJjGPlsZ82DPgXleZk0dayHm266BW2QfphcTbkfIB3YQlfDLMvsOs2MD7/fI3oanTvkSArf6xjv0EV663fk5KiC6KWm3l2Nf8XXh2iTcEukFGPGX6IauO0tk6zUvx+MCRJ89qjOXZ4tNuvbQ1f2Pl0daj1Ufj0Ly+oaqiFPyp11lEwLds9QhW31I4y0r+tmxS6kIVAw1sn9XTlSTPPd0ghek83ZMFjYZGkO2+CPiEeRMdM2dxXzB8NxoqIUzQc6NWVGctgjMjK7Q6AyB6K+qEQRCrNfZyeg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ovBsjrh7YRVXAmXkPV7MA7HDbomwBCymIH1Q4A9vc/Q=;
+ b=eou7idGmtr5VGJZSAJItK+HDadpK77cidRLfWJiRNCPfixwi/beR/l4xgO2DhPOkVxHT/wBTMDROrqLqrDNQIQa+g+IOICv0afd8zVanwvNa/e2kXn4bLk8Mf7s5GHlNNwuEi9ruUiFitBnZ+EncUL+VF54CC5kGC9QvfPEYNGs=
+Authentication-Results: lists.infradead.org; dkim=none (message not signed)
+ header.d=none;lists.infradead.org; dmarc=none action=none
+ header.from=nxp.com;
+Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
+ by VI1PR0401MB2317.eurprd04.prod.outlook.com (2603:10a6:800:28::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Mon, 2 Nov
+ 2020 21:10:22 +0000
+Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
+ ([fe80::dcb4:903:81f8:a8e2]) by VI1PR04MB4046.eurprd04.prod.outlook.com
+ ([fe80::dcb4:903:81f8:a8e2%6]) with mapi id 15.20.3499.030; Mon, 2 Nov 2020
+ 21:10:22 +0000
+Subject: Re: [PATCH v2 net-next 1/3] soc/fsl/qbman: Add an argument to signal
+ if NAPI processing is required.
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Priyanka Jain <priyanka.jain@nxp.com>,
+        Vakul Garg <vakul.garg@nxp.com>
+Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Madalin Bucur <madalin.bucur@nxp.com>,
+        Jakub Kicinski <kuba@kernel.org>, Leo Li <leoyang.li@nxp.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+References: <20201101232257.3028508-1-bigeasy@linutronix.de>
+ <20201101232257.3028508-2-bigeasy@linutronix.de>
+From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
+Message-ID: <8e25b5d2-0c59-e756-8c04-479d1ad5a775@nxp.com>
+Date:   Mon, 2 Nov 2020 23:10:18 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
+In-Reply-To: <20201101232257.3028508-2-bigeasy@linutronix.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [78.97.206.147]
+X-ClientProxiedBy: AM0PR03CA0101.eurprd03.prod.outlook.com
+ (2603:10a6:208:69::42) To VI1PR04MB4046.eurprd04.prod.outlook.com
+ (2603:10a6:803:4d::29)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.0.129] (78.97.206.147) by AM0PR03CA0101.eurprd03.prod.outlook.com (2603:10a6:208:69::42) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend Transport; Mon, 2 Nov 2020 21:10:20 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 027faef6-949c-4642-ed47-08d87f73b5ae
+X-MS-TrafficTypeDiagnostic: VI1PR0401MB2317:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR0401MB23170B061B0C48A0513E583198100@VI1PR0401MB2317.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2887;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: vWtRhiRxyY/kjVj5xTBXJ9gvFCBttfedEBNiv+bvyRi523MF6PL2Nd3FBBN1F9Sptc+vfsFOrkASGRspZYhqJs7s3WgSoOqhTpZq67/fyxq9EMt/UEmQaNU4CVJwKyCS8M6wlA4MhA31e1P/T0ZFzT43cBnw+hKG4MadVkpVjt9zbUj6IKFLY7JCyIvekcESS+gD2vdGr6xqbtCj/Jb00aZ33N6cUNeBLruxV7jYeFSxbqU1jexxExi6tuRwZmYNsIJYRg4/3S1xRCAP0sdbhAv81oY7LA+zvInMAF4rSYp9DmAwEKUe1J5eS+FTSto5w1aTO5lg32BLKdHnUgAkcu6ePK+QTfnFCcMMWZ1KhtTky46f2A87qFgnwEsbIfMk6z2C+MWQJ650Gbvl5Ak6ljPBZ6WwlIlMlgFrNrWR/xR/1K8Ec7FhHGxkj+P0e65BF4LOwKX9NoIFMZ19paDz9CuepckYTDxHNTJq0r97qq8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(396003)(39850400004)(376002)(346002)(316002)(110136005)(54906003)(16576012)(31686004)(966005)(956004)(2616005)(86362001)(478600001)(4326008)(66556008)(66476007)(186003)(16526019)(6636002)(66946007)(52116002)(26005)(8676002)(31696002)(2906002)(53546011)(36756003)(6486002)(8936002)(83380400001)(5660300002)(21314003)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: 9yGIIKjUE+lgX9oWhO1CCFaFB5leE1dnprbklkZN8ZWBM5bcqgpOa5MKErkjUVbn6JHy7T2Yjzy+Vk99Iz4PG42nzMaBzd8BVHPjxuzQrpg25Vbg+fN8Sn4KGvusDicjKKN7VXEAcBDS/1JW0wcEu2U42ua48mpyF06sYHCd7MRz8Gq0xZ/FI/rpQan1ABqKJN4TdP3E5jD3mFNUwM7eyAcOAAe+mLU6oGQgbsNdvq9E/Oh3tMwLqBN5Yfp93WJwt9y3cjn96tgxZLOhQh4swUX2gJJlVY9uZTPlK9thtdXvLPu3LAErVf2q24sIrw7ZOSQQrJhg6w79PV68pM8iR/dDT7xuUXNZJqFZyiILOmz8uN4rfPnWRXU+nyUilWDRd3kdUquJdJf+QNCVraiCmxtrTv5I1Dh4h+vIZ31k1VaoSD+e/DyojlUepNpRKqiIsnKGjlpqI6Rjs39TcN6J3Di0w5miRl9FzDddTlkFqnUMpn6bwEE4THQMHReGC/665SriqrLvoJzOESN2sxEP2BwHhZ9z9cyiRxpfZ00sxEhAahWx69ezEXB4kGDgEONfVN59L8Dp0zZ9ikvoCC997fnvgfqjB/wiv0VXNZFUN501zm9D/EGfmZ4HTJoHNggW7JInmrdhAaihYHQk89N2jg==
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 027faef6-949c-4642-ed47-08d87f73b5ae
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB4046.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Nov 2020 21:10:22.1650
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Fb8tGOn+6EkkdSCvA3ZmKUaQmEGQvCNG6j5MvIsUPMF+qIzyes6FMYWYqk7mRuUa9vNljsNZa07SDg1pH9ATuA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0401MB2317
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Adam Guerin <adam.guerin@intel.com>
+On 11/2/2020 1:23 AM, Sebastian Andrzej Siewior wrote:
+> dpaa_eth_napi_schedule() and caam_qi_napi_schedule() schedule NAPI if
+> invoked from:
+> 
+>  - Hard interrupt context
+>  - Any context which is not serving soft interrupts
+> 
+> Any context which is not serving soft interrupts includes hard interrupts
+> so the in_irq() check is redundant. caam_qi_napi_schedule() has a comment
+> about this:
+> 
+>         /*
+>          * In case of threaded ISR, for RT kernels in_irq() does not return
+>          * appropriate value, so use in_serving_softirq to distinguish between
+>          * softirq and irq contexts.
+>          */
+>          if (in_irq() || !in_serving_softirq())
+> 
+> This has nothing to do with RT. Even on a non RT kernel force threaded
+> interrupts run obviously in thread context and therefore in_irq() returns
+> false when invoked from the handler.
+> 
+> The extension of the in_irq() check with !in_serving_softirq() was there
+> when the drivers were added, but in the out of tree FSL BSP the original
+> condition was in_irq() which got extended due to failures on RT.
+> 
+Looks like the initial FSL BSP commit adding this check is:
+edca0b7a448a ("dpaa_eth: Fix Rx-stall issue in threaded ISR")
+https://source.codeaurora.org/external/qoriq/qoriq-yocto-sdk/linux/commit/?h=fsl-sdk-v1.2&id=edca0b7a448ac18ef0a9b1238209b7595d511e19
 
-Remove cast for mailbox CSR in adf_admin.c as it is not needed.
+This was done for dpaa_eth and the same logic was reused in caam.
+In the process of upstreaming the development history got lost and
+the comment in dpaa_eth was removed.
 
-Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Signed-off-by: Adam Guerin <adam.guerin@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_common/adf_admin.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This was back in 2012 on a v3.0.34 kernel.
+Not sure if/how things changed in the meantime, i.e. whether in_irq()
+behaviour when called from softirq changed on -rt kernels (assuming this was
+the problem Priyanka tried solving).
 
-diff --git a/drivers/crypto/qat/qat_common/adf_admin.c b/drivers/crypto/qat/qat_common/adf_admin.c
-index 7c2ca54229aa..43680e178242 100644
---- a/drivers/crypto/qat/qat_common/adf_admin.c
-+++ b/drivers/crypto/qat/qat_common/adf_admin.c
-@@ -254,7 +254,7 @@ int adf_init_admin_comms(struct adf_accel_dev *accel_dev)
- 	hw_data->get_admin_info(&admin_csrs_info);
- 
- 	mailbox_offset = admin_csrs_info.mailbox_offset;
--	mailbox = (void __iomem *)((uintptr_t)csr + mailbox_offset);
-+	mailbox = csr + mailbox_offset;
- 	adminmsg_u = admin_csrs_info.admin_msg_ur;
- 	adminmsg_l = admin_csrs_info.admin_msg_lr;
- 
--- 
-2.28.0
+> The usage of in_xxx() in drivers is phased out and Linus clearly requested
+> that code which changes behaviour depending on context should either be
+> separated or the context be conveyed in an argument passed by the caller,
+> which usually knows the context. Right he is, the above construct is
+> clearly showing why.
+> 
+> The following callchains have been analyzed to end up in
+> dpaa_eth_napi_schedule():
+> 
+> qman_p_poll_dqrr()
+>   __poll_portal_fast()
+>     fq->cb.dqrr()
+>        dpaa_eth_napi_schedule()
+> 
+> portal_isr()
+>   __poll_portal_fast()
+>     fq->cb.dqrr()
+>        dpaa_eth_napi_schedule()
+> 
+> Both need to schedule NAPI.
+Only the call from interrupt context.
 
+> The crypto part has another code path leading up to this:
+>   kill_fq()
+>      empty_retired_fq()
+>        qman_p_poll_dqrr()
+>          __poll_portal_fast()
+>             fq->cb.dqrr()
+>                dpaa_eth_napi_schedule()
+> 
+> kill_fq() is called from task context and ends up scheduling NAPI, but
+> that's pointless and an unintended side effect of the !in_serving_softirq()
+> check.
+> 
+Correct.
+
+> The code path:
+>   caam_qi_poll() -> qman_p_poll_dqrr()
+> 
+> is invoked from NAPI and I *assume* from crypto's NAPI device and not
+> from qbman's NAPI device. I *guess* it is okay to skip scheduling NAPI
+> (because this is what happens now) but could be changed if it is wrong
+> due to `budget' handling.
+> 
+Looks good to me.
+
+> Add an argument to __poll_portal_fast() which is true if NAPI needs to be
+> scheduled. This requires propagating the value to the caller including
+> `qman_cb_dqrr' typedef which is used by the dpaa and the crypto driver.
+> 
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Cc: "Horia Geantă" <horia.geanta@nxp.com>
+> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
+> Cc: Herbert XS <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Madalin Bucur <madalin.bucur@nxp.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Li Yang <leoyang.li@nxp.com>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: linuxppc-dev@lists.ozlabs.org
+> Cc: linux-arm-kernel@lists.infradead.org
+Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+
+Thanks,
+Horia
