@@ -2,127 +2,167 @@ Return-Path: <SRS0=zLA1=EI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48118C4741F
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 02:17:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B6CCC2D0A3
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 02:33:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10BC7206D4
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 02:17:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09FAD221FC
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Nov 2020 02:33:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727683AbgKBCRT (ORCPT
+        id S1727712AbgKBCdC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 1 Nov 2020 21:17:19 -0500
-Received: from mail-il1-f198.google.com ([209.85.166.198]:55569 "EHLO
-        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727687AbgKBCRS (ORCPT
+        Sun, 1 Nov 2020 21:33:02 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:6687 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727450AbgKBCdC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 1 Nov 2020 21:17:18 -0500
-Received: by mail-il1-f198.google.com with SMTP id d9so9189066iln.22
-        for <linux-crypto@vger.kernel.org>; Sun, 01 Nov 2020 18:17:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=bX3kU4P8yJuAY82nsfBl0rlgJH/7CdYcGrqPlOLjb6A=;
-        b=b4y+ZmAkk+cNzbM6Mo8hDnyk/DX9Pzy7sig99/Ve2PSpAkYxnxGRR0oSXN0rZqnGrb
-         AWMk3Sfa/HjmRCd6MloQsfcBRjizxmeIrCrybOxlKuqXfcU8qSCiODU3jLo/SGRAuz1w
-         /DKqhBqWVDjCG83w28zGfHgBrvg/SO5TOj4IIQxBhByjnB4yalJjXf5ucKRjFRTihk9Y
-         RkOMdiIsSrR/hPjRo/aELRQts55EUX9+NNT+w2UL378UTzqAHbnxzijDJvAnTIASMhb2
-         QMI5wrd7DYCRGmVClo7w2DoPyF+ht/d0DXTGs2Rme9Pb4R2K/pBd0XiJuJfD/HZfzdmc
-         vBtw==
-X-Gm-Message-State: AOAM533McdrB8OUDNIfdutQDkBHFUmefneP25oBEOH5vsPWyNKXVT8RF
-        PDVj20C2SJ3W1tds8uonSubhPIvoEXIz4Er1r+Sl4D9OR6bf
-X-Google-Smtp-Source: ABdhPJwULsSw1nWFIVrIGiYn037uYE295gM+Ktp0k2e6asH2TIZtXJtu6z7hccagspKZOHSss24KU1iUY9QXh3Ua/3XwHqAxGA21
+        Sun, 1 Nov 2020 21:33:02 -0500
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CPcQf0l6xz15QF5;
+        Mon,  2 Nov 2020 10:32:58 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.24) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 2 Nov 2020 10:32:50 +0800
+From:   Meng Yu <yumeng18@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
+        <wangzhou1@hisilicon.com>, <yumeng18@huawei.com>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2 3/5] crypto: hisilicon/hpre - add algorithm type
+Date:   Mon, 2 Nov 2020 10:31:03 +0800
+Message-ID: <1604284265-1271-4-git-send-email-yumeng18@huawei.com>
+X-Mailer: git-send-email 2.8.1
+In-Reply-To: <1604284265-1271-1-git-send-email-yumeng18@huawei.com>
+References: <1604284265-1271-1-git-send-email-yumeng18@huawei.com>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:a11:: with SMTP id 17mr10180222jan.59.1604283437871;
- Sun, 01 Nov 2020 18:17:17 -0800 (PST)
-Date:   Sun, 01 Nov 2020 18:17:17 -0800
-In-Reply-To: <00000000000014370305b1c55370@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006ef8a105b31658b5@google.com>
-Subject: Re: UBSAN: array-index-out-of-bounds in alg_bind
-From:   syzbot <syzbot+92ead4eb8e26a26d465e@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, dvyukov@google.com, ebiggers@kernel.org,
-        gustavoars@kernel.org, herbert@gondor.apana.org.au,
-        jannh@google.com, keescook@chromium.org, lenaptr@google.com,
-        linux-api@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        vegard.nossum@oracle.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+Algorithm type is brought in to get hardware HPRE queue
+to support different algorithms.
 
-HEAD commit:    3cea11cd Linux 5.10-rc2
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1443bf92500000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e791ddf0875adf65
-dashboard link: https://syzkaller.appspot.com/bug?extid=92ead4eb8e26a26d465e
-compiler:       clang version 11.0.0 (https://github.com/llvm/llvm-project.git ca2dcbd030eadbf0aa9b660efe864ff08af6e18b)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=145afc2c500000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=141ad11a500000
+Signed-off-by: Meng Yu <yumeng18@huawei.com>
+Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
+---
+ drivers/crypto/hisilicon/hpre/hpre.h        | 10 +++++++++-
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 12 ++++++------
+ drivers/crypto/hisilicon/hpre/hpre_main.c   | 11 +++++++++--
+ 3 files changed, 24 insertions(+), 9 deletions(-)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+92ead4eb8e26a26d465e@syzkaller.appspotmail.com
-
-================================================================================
-UBSAN: array-index-out-of-bounds in crypto/af_alg.c:166:2
-index 98 is out of range for type '__u8 [64]'
-CPU: 1 PID: 8468 Comm: syz-executor983 Not tainted 5.10.0-rc2-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x137/0x1be lib/dump_stack.c:118
- ubsan_epilogue lib/ubsan.c:148 [inline]
- __ubsan_handle_out_of_bounds+0xdb/0x130 lib/ubsan.c:356
- alg_bind+0x738/0x740 crypto/af_alg.c:166
- __sys_bind+0x283/0x360 net/socket.c:1656
- __do_sys_bind net/socket.c:1667 [inline]
- __se_sys_bind net/socket.c:1665 [inline]
- __x64_sys_bind+0x76/0x80 net/socket.c:1665
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-RIP: 0033:0x4402c9
-Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 7b 13 fc ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007ffe05301528 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
-RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 00000000004402c9
-RDX: 000000000000007b RSI: 00000000200000c0 RDI: 0000000000000003
-RBP: 00000000006ca018 R08: 0000000000000000 R09: 00000000004002c8
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000401ad0
-R13: 0000000000401b60 R14: 0000000000000000 R15: 0000000000000000
-================================================================================
-Kernel panic - not syncing: panic_on_warn set ...
-CPU: 1 PID: 8468 Comm: syz-executor983 Not tainted 5.10.0-rc2-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x137/0x1be lib/dump_stack.c:118
- panic+0x291/0x800 kernel/panic.c:231
- ubsan_epilogue lib/ubsan.c:162 [inline]
- __ubsan_handle_out_of_bounds+0x12b/0x130 lib/ubsan.c:356
- alg_bind+0x738/0x740 crypto/af_alg.c:166
- __sys_bind+0x283/0x360 net/socket.c:1656
- __do_sys_bind net/socket.c:1667 [inline]
- __se_sys_bind net/socket.c:1665 [inline]
- __x64_sys_bind+0x76/0x80 net/socket.c:1665
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-RIP: 0033:0x4402c9
-Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 7b 13 fc ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007ffe05301528 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
-RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 00000000004402c9
-RDX: 000000000000007b RSI: 00000000200000c0 RDI: 0000000000000003
-RBP: 00000000006ca018 R08: 0000000000000000 R09: 00000000004002c8
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000401ad0
-R13: 0000000000401b60 R14: 0000000000000000 R15: 0000000000000000
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
+diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
+index cc50f23..02193e1 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre.h
++++ b/drivers/crypto/hisilicon/hpre/hpre.h
+@@ -10,6 +10,14 @@
+ #define HPRE_PF_DEF_Q_NUM		64
+ #define HPRE_PF_DEF_Q_BASE		0
+ 
++/*
++ * type used in qm sqc DW6.
++ * 0 - Algorithm which has been supported in V2, like RSA, DH and so on;
++ * 1 - ECC algorithm in V3.
++ */
++#define HPRE_V2_ALG_TYPE	0
++#define HPRE_V3_ECC_ALG_TYPE	1
++
+ enum {
+ 	HPRE_CLUSTER0,
+ 	HPRE_CLUSTER1,
+@@ -92,7 +100,7 @@ struct hpre_sqe {
+ 	__le32 rsvd1[_HPRE_SQE_ALIGN_EXT];
+ };
+ 
+-struct hisi_qp *hpre_create_qp(void);
++struct hisi_qp *hpre_create_qp(u8 type);
+ int hpre_algs_register(struct hisi_qm *qm);
+ void hpre_algs_unregister(struct hisi_qm *qm);
+ 
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index d89b2f5..712bea9 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -152,12 +152,12 @@ static void hpre_rm_req_from_ctx(struct hpre_asym_request *hpre_req)
+ 	}
+ }
+ 
+-static struct hisi_qp *hpre_get_qp_and_start(void)
++static struct hisi_qp *hpre_get_qp_and_start(u8 type)
+ {
+ 	struct hisi_qp *qp;
+ 	int ret;
+ 
+-	qp = hpre_create_qp();
++	qp = hpre_create_qp(type);
+ 	if (!qp) {
+ 		pr_err("Can not create hpre qp!\n");
+ 		return ERR_PTR(-ENODEV);
+@@ -422,11 +422,11 @@ static void hpre_alg_cb(struct hisi_qp *qp, void *resp)
+ 	req->cb(ctx, resp);
+ }
+ 
+-static int hpre_ctx_init(struct hpre_ctx *ctx)
++static int hpre_ctx_init(struct hpre_ctx *ctx, u8 type)
+ {
+ 	struct hisi_qp *qp;
+ 
+-	qp = hpre_get_qp_and_start();
++	qp = hpre_get_qp_and_start(type);
+ 	if (IS_ERR(qp))
+ 		return PTR_ERR(qp);
+ 
+@@ -674,7 +674,7 @@ static int hpre_dh_init_tfm(struct crypto_kpp *tfm)
+ {
+ 	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
+ 
+-	return hpre_ctx_init(ctx);
++	return hpre_ctx_init(ctx, HPRE_V2_ALG_TYPE);
+ }
+ 
+ static void hpre_dh_exit_tfm(struct crypto_kpp *tfm)
+@@ -1100,7 +1100,7 @@ static int hpre_rsa_init_tfm(struct crypto_akcipher *tfm)
+ 		return PTR_ERR(ctx->rsa.soft_tfm);
+ 	}
+ 
+-	ret = hpre_ctx_init(ctx);
++	ret = hpre_ctx_init(ctx, HPRE_V2_ALG_TYPE);
+ 	if (ret)
+ 		crypto_free_akcipher(ctx->rsa.soft_tfm);
+ 
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index 719f8715..c3c18da 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -209,13 +209,20 @@ static u32 vfs_num;
+ module_param_cb(vfs_num, &vfs_num_ops, &vfs_num, 0444);
+ MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63), 0(default)");
+ 
+-struct hisi_qp *hpre_create_qp(void)
++struct hisi_qp *hpre_create_qp(u8 type)
+ {
+ 	int node = cpu_to_node(smp_processor_id());
+ 	struct hisi_qp *qp = NULL;
+ 	int ret;
+ 
+-	ret = hisi_qm_alloc_qps_node(&hpre_devices, 1, 0, node, &qp);
++	if (type != HPRE_V2_ALG_TYPE && type != HPRE_V3_ECC_ALG_TYPE)
++		return NULL;
++
++	/*
++	 * type: 0 - RSA/DH. algorithm supported in V2,
++	 *       1 - ECC algorithm in V3.
++	 */
++	ret = hisi_qm_alloc_qps_node(&hpre_devices, 1, type, node, &qp);
+ 	if (!ret)
+ 		return qp;
+ 
+-- 
+2.8.1
 
