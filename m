@@ -2,331 +2,106 @@ Return-Path: <SRS0=/kEc=EJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A08C2D0A3
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Nov 2020 16:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CDB5C2D0A3
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Nov 2020 17:29:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0556E22264
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Nov 2020 16:28:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1604420898;
-	bh=FDr82e5XLXaA/5p2QOhTZxnB/3VWOgegCifjHuJvs80=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=yoSuv+Mwbs/yiFAXh0nrE2F9SXSsJNY4U3xjG9V8SudeNOEGLYk6cdz9xyX6E7QZU
-	 0qlCdoLwIvVBomEJDZum0lvjKTyNtWoPJhAOnAd6BEKC5EXyn4bV25Bcpg0/yJrA3q
-	 Q5j9yIBoUdzAWhI6cN+ljVcLHMSWCJNUF2TYuJyo=
+	by mail.kernel.org (Postfix) with ESMTP id 21636216C4
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Nov 2020 17:29:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727479AbgKCQ2R (ORCPT
+        id S1728679AbgKCR3o (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Nov 2020 11:28:17 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52774 "EHLO mail.kernel.org"
+        Tue, 3 Nov 2020 12:29:44 -0500
+Received: from mga12.intel.com ([192.55.52.136]:40193 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727385AbgKCQ2R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Nov 2020 11:28:17 -0500
-Received: from e123331-lin.nice.arm.com (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 94519206DF;
-        Tue,  3 Nov 2020 16:28:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604420896;
-        bh=FDr82e5XLXaA/5p2QOhTZxnB/3VWOgegCifjHuJvs80=;
-        h=From:To:Cc:Subject:Date:From;
-        b=RQIYEuIhEqKl/J8b4wJMvJwXtS+WHLEYHlxX6gU5OQXZ9zKY/XJmtLzgKeff9/eto
-         1CclWFUAF06G5huOSazlbbfMO+BJdOIuP2K11kGSOdHfK1Y7Oq1reMASUUP4nPApCu
-         nCJhgT1tI58N5GujAeAMvXtAr1OHMSw0kc8e71gI=
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, andre.przywara@arm.com,
-        linux-arm-kernel@lists.infradead.org,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v2] crypto: arm/chacha-neon - optimize for non-block size multiples
-Date:   Tue,  3 Nov 2020 17:28:09 +0100
-Message-Id: <20201103162809.28167-1-ardb@kernel.org>
-X-Mailer: git-send-email 2.17.1
+        id S1726581AbgKCR3n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Nov 2020 12:29:43 -0500
+IronPort-SDR: 3C33d2yUvRbNkUr/v9xC16WGSWkaaXBd3SURCzyYk9OUND3zU0m1guNwsQ/pi8KrXV7woV0wU+
+ /1XUDOefFxuQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9794"; a="148372310"
+X-IronPort-AV: E=Sophos;i="5.77,448,1596524400"; 
+   d="scan'208";a="148372310"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2020 09:29:42 -0800
+IronPort-SDR: cY0cKhWQgyzWoO1yCJvcROR5rXT8Zgh6tb6IEIAcVEyo35bmznBusc0ZEW1ptSOJOzj7OlPfxx
+ FvLUWmJNk9XA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,448,1596524400"; 
+   d="scan'208";a="320515723"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
+  by orsmga003.jf.intel.com with ESMTP; 03 Nov 2020 09:29:38 -0800
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Adam Guerin <adam.guerin@intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - replace pci with PCI in comments
+Date:   Tue,  3 Nov 2020 17:29:36 +0000
+Message-Id: <20201103172936.765026-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.28.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The current NEON based ChaCha implementation for ARM is optimized for
-multiples of 4x the ChaCha block size (64 bytes). This makes sense for
-block encryption, but given that ChaCha is also often used in the
-context of networking, it makes sense to consider arbitrary length
-inputs as well.
+From: Adam Guerin <adam.guerin@intel.com>
 
-For example, WireGuard typically uses 1420 byte packets, and performing
-ChaCha encryption involves 5 invocations of chacha_4block_xor_neon()
-and 3 invocations of chacha_block_xor_neon(), where the last one also
-involves a memcpy() using a buffer on the stack to process the final
-chunk of 1420 % 64 == 12 bytes.
+Change all lower case pci in comments to be upper case PCI.
 
-Let's optimize for this case as well, by letting chacha_4block_xor_neon()
-deal with any input size between 64 and 256 bytes, using NEON permutation
-instructions and overlapping loads and stores. This way, the 140 byte
-tail of a 1420 byte input buffer can simply be processed in one go.
-
-This results in the following performance improvements for 1420 byte
-blocks, without significant impact on power-of-2 input sizes. (Note
-that Raspberry Pi is widely used in combination with a 32-bit kernel,
-even though the core is 64-bit capable)
-
-   Cortex-A8  (BeagleBone)       :   7%
-   Cortex-A15 (Calxeda Midway)   :  21%
-   Cortex-A53 (Raspberry Pi 3)   :   3%
-   Cortex-A72 (Raspberry Pi 4)   :  19%
-
-Cc: Eric Biggers <ebiggers@google.com>
-Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: Adam Guerin <adam.guerin@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
-v2:
-- avoid memcpy() if the residual byte count is exactly 64 bytes
-- get rid of register based post increments, and simply rewind the src
-  pointer as needed (the dst pointer did not need the register post
-  increment in the first place)
-- add benchmark results for 32-bit CPUs to commit log.
+ drivers/crypto/qat/qat_common/adf_dev_mgr.c | 4 ++--
+ drivers/crypto/qat/qat_common/adf_sriov.c   | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
- arch/arm/crypto/chacha-glue.c      | 34 +++----
- arch/arm/crypto/chacha-neon-core.S | 97 ++++++++++++++++++--
- 2 files changed, 107 insertions(+), 24 deletions(-)
-
-diff --git a/arch/arm/crypto/chacha-glue.c b/arch/arm/crypto/chacha-glue.c
-index 59da6c0b63b6..7b5cf8430c6d 100644
---- a/arch/arm/crypto/chacha-glue.c
-+++ b/arch/arm/crypto/chacha-glue.c
-@@ -23,7 +23,7 @@
- asmlinkage void chacha_block_xor_neon(const u32 *state, u8 *dst, const u8 *src,
- 				      int nrounds);
- asmlinkage void chacha_4block_xor_neon(const u32 *state, u8 *dst, const u8 *src,
--				       int nrounds);
-+				       int nrounds, unsigned int nbytes);
- asmlinkage void hchacha_block_arm(const u32 *state, u32 *out, int nrounds);
- asmlinkage void hchacha_block_neon(const u32 *state, u32 *out, int nrounds);
+diff --git a/drivers/crypto/qat/qat_common/adf_dev_mgr.c b/drivers/crypto/qat/qat_common/adf_dev_mgr.c
+index 92ec035576df..29dc2e3d38ff 100644
+--- a/drivers/crypto/qat/qat_common/adf_dev_mgr.c
++++ b/drivers/crypto/qat/qat_common/adf_dev_mgr.c
+@@ -285,9 +285,9 @@ struct adf_accel_dev *adf_devmgr_get_first(void)
  
-@@ -42,24 +42,24 @@ static void chacha_doneon(u32 *state, u8 *dst, const u8 *src,
- {
- 	u8 buf[CHACHA_BLOCK_SIZE];
+ /**
+  * adf_devmgr_pci_to_accel_dev() - Get accel_dev associated with the pci_dev.
+- * @pci_dev:  Pointer to pci device.
++ * @pci_dev:  Pointer to PCI device.
+  *
+- * Function returns acceleration device associated with the given pci device.
++ * Function returns acceleration device associated with the given PCI device.
+  * To be used by QAT device specific drivers.
+  *
+  * Return: pointer to accel_dev or NULL if not found.
+diff --git a/drivers/crypto/qat/qat_common/adf_sriov.c b/drivers/crypto/qat/qat_common/adf_sriov.c
+index d887640355d4..8c822c2861c2 100644
+--- a/drivers/crypto/qat/qat_common/adf_sriov.c
++++ b/drivers/crypto/qat/qat_common/adf_sriov.c
+@@ -122,13 +122,13 @@ EXPORT_SYMBOL_GPL(adf_disable_sriov);
  
--	while (bytes >= CHACHA_BLOCK_SIZE * 4) {
--		chacha_4block_xor_neon(state, dst, src, nrounds);
--		bytes -= CHACHA_BLOCK_SIZE * 4;
--		src += CHACHA_BLOCK_SIZE * 4;
--		dst += CHACHA_BLOCK_SIZE * 4;
--		state[12] += 4;
--	}
--	while (bytes >= CHACHA_BLOCK_SIZE) {
--		chacha_block_xor_neon(state, dst, src, nrounds);
--		bytes -= CHACHA_BLOCK_SIZE;
--		src += CHACHA_BLOCK_SIZE;
--		dst += CHACHA_BLOCK_SIZE;
--		state[12]++;
-+	while (bytes > CHACHA_BLOCK_SIZE) {
-+		unsigned int l = min(bytes, CHACHA_BLOCK_SIZE * 4U);
-+
-+		chacha_4block_xor_neon(state, dst, src, nrounds, l);
-+		bytes -= l;
-+		src += l;
-+		dst += l;
-+		state[12] += DIV_ROUND_UP(l, CHACHA_BLOCK_SIZE);
- 	}
- 	if (bytes) {
--		memcpy(buf, src, bytes);
--		chacha_block_xor_neon(state, buf, buf, nrounds);
--		memcpy(dst, buf, bytes);
-+		const u8 *s = src;
-+		u8 *d = dst;
-+
-+		if (bytes != CHACHA_BLOCK_SIZE)
-+			s = d = memcpy(buf, src, bytes);
-+		chacha_block_xor_neon(state, d, s, nrounds);
-+		if (d != dst)
-+			memcpy(dst, buf, bytes);
- 	}
- }
- 
-diff --git a/arch/arm/crypto/chacha-neon-core.S b/arch/arm/crypto/chacha-neon-core.S
-index eb22926d4912..13d12f672656 100644
---- a/arch/arm/crypto/chacha-neon-core.S
-+++ b/arch/arm/crypto/chacha-neon-core.S
-@@ -47,6 +47,7 @@
-   */
- 
- #include <linux/linkage.h>
-+#include <asm/cache.h>
- 
- 	.text
- 	.fpu		neon
-@@ -205,7 +206,7 @@ ENDPROC(hchacha_block_neon)
- 
- 	.align		5
- ENTRY(chacha_4block_xor_neon)
--	push		{r4-r5}
-+	push		{r4, lr}
- 	mov		r4, sp			// preserve the stack pointer
- 	sub		ip, sp, #0x20		// allocate a 32 byte buffer
- 	bic		ip, ip, #0x1f		// aligned to 32 bytes
-@@ -229,10 +230,10 @@ ENTRY(chacha_4block_xor_neon)
- 	vld1.32		{q0-q1}, [r0]
- 	vld1.32		{q2-q3}, [ip]
- 
--	adr		r5, .Lctrinc
-+	adr		lr, .Lctrinc
- 	vdup.32		q15, d7[1]
- 	vdup.32		q14, d7[0]
--	vld1.32		{q4}, [r5, :128]
-+	vld1.32		{q4}, [lr, :128]
- 	vdup.32		q13, d6[1]
- 	vdup.32		q12, d6[0]
- 	vdup.32		q11, d5[1]
-@@ -455,7 +456,7 @@ ENTRY(chacha_4block_xor_neon)
- 
- 	// Re-interleave the words in the first two rows of each block (x0..7).
- 	// Also add the counter values 0-3 to x12[0-3].
--	  vld1.32	{q8}, [r5, :128]	// load counter values 0-3
-+	  vld1.32	{q8}, [lr, :128]	// load counter values 0-3
- 	vzip.32		q0, q1			// => (0 1 0 1) (0 1 0 1)
- 	vzip.32		q2, q3			// => (2 3 2 3) (2 3 2 3)
- 	vzip.32		q4, q5			// => (4 5 4 5) (4 5 4 5)
-@@ -493,6 +494,8 @@ ENTRY(chacha_4block_xor_neon)
- 
- 	// Re-interleave the words in the last two rows of each block (x8..15).
- 	vld1.32		{q8-q9}, [sp, :256]
-+	  mov		sp, r4		// restore original stack pointer
-+	  ldr		r4, [r4, #8]	// load number of bytes
- 	vzip.32		q12, q13	// => (12 13 12 13) (12 13 12 13)
- 	vzip.32		q14, q15	// => (14 15 14 15) (14 15 14 15)
- 	vzip.32		q8, q9		// => (8 9 8 9) (8 9 8 9)
-@@ -520,41 +523,121 @@ ENTRY(chacha_4block_xor_neon)
- 	// XOR the rest of the data with the keystream
- 
- 	vld1.8		{q0-q1}, [r2]!
-+	subs		r4, r4, #96
- 	veor		q0, q0, q8
- 	veor		q1, q1, q12
-+	ble		.Lle96
- 	vst1.8		{q0-q1}, [r1]!
- 
- 	vld1.8		{q0-q1}, [r2]!
-+	subs		r4, r4, #32
- 	veor		q0, q0, q2
- 	veor		q1, q1, q6
-+	ble		.Lle128
- 	vst1.8		{q0-q1}, [r1]!
- 
- 	vld1.8		{q0-q1}, [r2]!
-+	subs		r4, r4, #32
- 	veor		q0, q0, q10
- 	veor		q1, q1, q14
-+	ble		.Lle160
- 	vst1.8		{q0-q1}, [r1]!
- 
- 	vld1.8		{q0-q1}, [r2]!
-+	subs		r4, r4, #32
- 	veor		q0, q0, q4
- 	veor		q1, q1, q5
-+	ble		.Lle192
- 	vst1.8		{q0-q1}, [r1]!
- 
- 	vld1.8		{q0-q1}, [r2]!
-+	subs		r4, r4, #32
- 	veor		q0, q0, q9
- 	veor		q1, q1, q13
-+	ble		.Lle224
- 	vst1.8		{q0-q1}, [r1]!
- 
- 	vld1.8		{q0-q1}, [r2]!
-+	subs		r4, r4, #32
- 	veor		q0, q0, q3
- 	veor		q1, q1, q7
-+	blt		.Llt256
-+.Lout:
- 	vst1.8		{q0-q1}, [r1]!
- 
- 	vld1.8		{q0-q1}, [r2]
--	  mov		sp, r4		// restore original stack pointer
- 	veor		q0, q0, q11
- 	veor		q1, q1, q15
- 	vst1.8		{q0-q1}, [r1]
- 
--	pop		{r4-r5}
--	bx		lr
-+	pop		{r4, pc}
-+
-+.Lle192:
-+	vmov		q4, q9
-+	vmov		q5, q13
-+
-+.Lle160:
-+	// nothing to do
-+
-+.Lfinalblock:
-+	// Process the final block if processing less than 4 full blocks.
-+	// Entered with 32 bytes of ChaCha cipher stream in q4-q5, and the
-+	// previous 32 byte output block that still needs to be written at
-+	// [r1] in q0-q1.
-+	beq		.Lfullblock
-+
-+.Lpartialblock:
-+	adr		lr, .Lpermute + 32
-+	add		r2, r2, r4
-+	add		lr, lr, r4
-+	add		r4, r4, r1
-+
-+	vld1.8		{q2-q3}, [lr]
-+	vld1.8		{q6-q7}, [r2]
-+
-+	add		r4, r4, #32
-+
-+	vtbl.8		d4, {q4-q5}, d4
-+	vtbl.8		d5, {q4-q5}, d5
-+	vtbl.8		d6, {q4-q5}, d6
-+	vtbl.8		d7, {q4-q5}, d7
-+
-+	veor		q6, q6, q2
-+	veor		q7, q7, q3
-+
-+	vst1.8		{q6-q7}, [r4]	// overlapping stores
-+	vst1.8		{q0-q1}, [r1]
-+	pop		{r4, pc}
-+
-+.Lfullblock:
-+	vmov		q11, q4
-+	vmov		q15, q5
-+	b		.Lout
-+.Lle96:
-+	vmov		q4, q2
-+	vmov		q5, q6
-+	b		.Lfinalblock
-+.Lle128:
-+	vmov		q4, q10
-+	vmov		q5, q14
-+	b		.Lfinalblock
-+.Lle224:
-+	vmov		q4, q3
-+	vmov		q5, q7
-+	b		.Lfinalblock
-+.Llt256:
-+	vmov		q4, q11
-+	vmov		q5, q15
-+	b		.Lpartialblock
- ENDPROC(chacha_4block_xor_neon)
-+
-+	.align		L1_CACHE_SHIFT
-+.Lpermute:
-+	.byte		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
-+	.byte		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
-+	.byte		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17
-+	.byte		0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
-+	.byte		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
-+	.byte		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
-+	.byte		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17
-+	.byte		0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
+ /**
+  * adf_sriov_configure() - Enable SRIOV for the device
+- * @pdev:  Pointer to pci device.
++ * @pdev:  Pointer to PCI device.
+  * @numvfs: Number of virtual functions (VFs) to enable.
+  *
+  * Note that the @numvfs parameter is ignored and all VFs supported by the
+  * device are enabled due to the design of the hardware.
+  *
+- * Function enables SRIOV for the pci device.
++ * Function enables SRIOV for the PCI device.
+  *
+  * Return: number of VFs enabled on success, error code otherwise.
+  */
 -- 
-2.17.1
+2.28.0
 
