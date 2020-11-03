@@ -2,91 +2,108 @@ Return-Path: <SRS0=/kEc=EJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7086C388F9
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Nov 2020 18:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 855E8C4742C
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Nov 2020 19:31:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9ACA022370
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Nov 2020 18:49:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AF90221FB
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Nov 2020 19:31:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1604431916;
+	bh=S+XTa/Ddbvh+IsyG31DYZypsQ7ugisv/L9FbS0/2MT0=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:List-ID:From;
+	b=FW13SDHQJlzbTgR2Evz6YK0GZBL8n2hVXTWLkMr5TdaIFFOkIPlcV6jf86iseDCUf
+	 pdm7z2eyC5Z7OIPDKTzQP2a35ZTqdxpaG55o39ytLrC92QJ5x/DG7W+zCCc+o2wPBz
+	 GvSF0rPwByGp7zFmaof7HujcnZji9CHzyqAMxtxw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729377AbgKCStz (ORCPT
+        id S1727706AbgKCTby (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Nov 2020 13:49:55 -0500
-Received: from mga05.intel.com ([192.55.52.43]:53371 "EHLO mga05.intel.com"
+        Tue, 3 Nov 2020 14:31:54 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59636 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729001AbgKCStx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Nov 2020 13:49:53 -0500
-IronPort-SDR: ZtkSGSKz4Iuf90X7wx3ukVg2/6mlsYHLm6FYQ63e7aI8nyspnBRMiWLMqxbLSHXSDteM/xtvgY
- hqtavm9qke3Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9794"; a="253818898"
-X-IronPort-AV: E=Sophos;i="5.77,448,1596524400"; 
-   d="scan'208";a="253818898"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2020 10:49:53 -0800
-IronPort-SDR: Xwls4WBh9N0vJNUA3A+EaHsgTNsasVd9DTWf82V/r7L9/asaMiaxncMsCdFp6BASaVWmOV9WXA
- QdjdUTfbSybQ==
-X-IronPort-AV: E=Sophos;i="5.77,448,1596524400"; 
-   d="scan'208";a="528595224"
-Received: from riglesi-mobl.ger.corp.intel.com (HELO dalessan-mobl1.ir.intel.com) ([10.252.9.152])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2020 10:49:50 -0800
-From:   Daniele Alessandrelli <daniele.alessandrelli@linux.intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Gross <mgross@linux.intel.com>,
-        Declan Murphy <declan.murphy@intel.com>,
-        Daniele Alessandrelli <daniele.alessandrelli@intel.com>
-Subject: [PATCH v2 3/3] MAINTAINERS: Add maintainers for Keem Bay OCS HCU driver
-Date:   Tue,  3 Nov 2020 18:49:25 +0000
-Message-Id: <20201103184925.294456-4-daniele.alessandrelli@linux.intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201103184925.294456-1-daniele.alessandrelli@linux.intel.com>
-References: <20201103184925.294456-1-daniele.alessandrelli@linux.intel.com>
+        id S1725957AbgKCTby (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Nov 2020 14:31:54 -0500
+Received: from lt-jalone-7480.mtl.com (c-24-6-56-119.hsd1.ca.comcast.net [24.6.56.119])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C8D632080D;
+        Tue,  3 Nov 2020 19:31:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1604431913;
+        bh=S+XTa/Ddbvh+IsyG31DYZypsQ7ugisv/L9FbS0/2MT0=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=k04pehKHXgSp1gCBIIxlvyMNlN4PLVoxEtSR7x5/ZEXOffB4o52TItFE+b2KZHrSW
+         SwG4YWmCouheXFGspowoxdbzUcr7oLJZsERO8RhQv1Z0b4p6KyHByvoVgVxn9pD+7V
+         zZfoeuawcOmpYjV+yEzum15EHJsBhYetDi8Izc74=
+Message-ID: <2eeb1f2ccce034455babdef88a275b4e5ebfba81.camel@kernel.org>
+Subject: Re: [PATCH net-next 04/15] net: mlx5: Replace in_irq() usage.
+From:   Saeed Mahameed <saeed@kernel.org>
+To:     Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>
+Cc:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        netdev@vger.kernel.org, Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Daniel Drake <dsd@gentoo.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Horia =?UTF-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Jon Mason <jdmason@kudzu.us>, Jouni Malinen <j@w1.fi>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-rdma@vger.kernel.org,
+        linux-wireless@vger.kernel.org, Li Yang <leoyang.li@nxp.com>,
+        Madalin Bucur <madalin.bucur@nxp.com>,
+        Ping-Ke Shih <pkshih@realtek.com>,
+        Rain River <rain.1986.08.12@gmail.com>,
+        Samuel Chessman <chessman@tux.org>,
+        Ulrich Kunitz <kune@deine-taler.de>,
+        Zhu Yanjun <zyjzyj2000@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Date:   Tue, 03 Nov 2020 11:31:50 -0800
+In-Reply-To: <20201031095938.3878412e@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+References: <20201027225454.3492351-1-bigeasy@linutronix.de>
+         <20201027225454.3492351-5-bigeasy@linutronix.de>
+         <20201031095938.3878412e@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+On Sat, 2020-10-31 at 09:59 -0700, Jakub Kicinski wrote:
+> On Tue, 27 Oct 2020 23:54:43 +0100 Sebastian Andrzej Siewior wrote:
+> > mlx5_eq_async_int() uses in_irq() to decide whether eq::lock needs
+> > to be
+> > acquired and released with spin_[un]lock() or the irq
+> > saving/restoring
+> > variants.
+> > 
+> > The usage of in_*() in drivers is phased out and Linus clearly
+> > requested
+> > that code which changes behaviour depending on context should
+> > either be
+> > seperated or the context be conveyed in an argument passed by the
+> > caller,
+> > which usually knows the context.
+> > 
+> > mlx5_eq_async_int() knows the context via the action argument
+> > already so
+> > using it for the lock variant decision is a straight forward
+> > replacement
+> > for in_irq().
+> > 
+> > Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > Cc: Saeed Mahameed <saeedm@nvidia.com>
+> > Cc: Leon Romanovsky <leon@kernel.org>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: Jakub Kicinski <kuba@kernel.org>
+> > Cc: linux-rdma@vger.kernel.org
+> 
+> Saeed, please pick this up into your tree.
 
-Add maintainers for the Intel Keem Bay Offload Crypto Subsystem (OCS)
-Hash Control Unit (HCU) crypto driver.
-
-Signed-off-by: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
----
- MAINTAINERS | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 606f9d7ef19a..1a0d7368c468 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -8863,6 +8863,17 @@ M:	Deepak Saxena <dsaxena@plexity.net>
- S:	Maintained
- F:	drivers/char/hw_random/ixp4xx-rng.c
- 
-+INTEL KEEM BAY OCS HCU CRYPTO DRIVER
-+M:	Declan Murphy <declan.murphy@intel.com>
-+M:	Daniele Alessandrelli <daniele.alessandrelli@intel.com>
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/crypto/intel,keembay-ocs-hcu.yaml
-+F:	drivers/crypto/keembay/Kconfig
-+F:	drivers/crypto/keembay/Makefile
-+F:	drivers/crypto/keembay/keembay-ocs-hcu-core.c
-+F:	drivers/crypto/keembay/ocs-hcu.c
-+F:	drivers/crypto/keembay/ocs-hcu.h
-+
- INTEL MANAGEMENT ENGINE (mei)
- M:	Tomas Winkler <tomas.winkler@intel.com>
- L:	linux-kernel@vger.kernel.org
--- 
-2.26.2
+Applied to net-next-mlx5 will submit to net-next shortly.
 
