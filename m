@@ -2,43 +2,46 @@ Return-Path: <SRS0=/kEc=EJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C01F8C2D0A3
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Nov 2020 12:15:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F98C2D0A3
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Nov 2020 12:16:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5724022264
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Nov 2020 12:15:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD18C20786
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Nov 2020 12:16:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728714AbgKCMPT (ORCPT
+        id S1728896AbgKCMQa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Nov 2020 07:15:19 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7134 "EHLO
+        Tue, 3 Nov 2020 07:16:30 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:7135 "EHLO
         szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728168AbgKCMPT (ORCPT
+        with ESMTP id S1728168AbgKCMQ3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Nov 2020 07:15:19 -0500
+        Tue, 3 Nov 2020 07:16:29 -0500
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CQTJ21W5Tz15R2V;
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CQTJ21j4rz15R2W;
         Tue,  3 Nov 2020 20:15:14 +0800 (CST)
 Received: from huawei.com (10.110.54.32) by DGGEMS414-HUB.china.huawei.com
  (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Tue, 3 Nov 2020
- 20:15:08 +0800
+ 20:15:09 +0800
 From:   l00374334 <liqiang64@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <catalin.marinas@arm.com>, <will@kernel.org>,
         <mcoquelin.stm32@gmail.com>, <alexandre.torgue@st.com>
 CC:     <linux-arm-kernel@lists.infradead.org>,
         <linux-crypto@vger.kernel.org>, <liqiang64@huawei.com>
-Subject: [PATCH 0/1] arm64: Accelerate Adler32 using arm64 SVE instructions.
-Date:   Tue, 3 Nov 2020 20:15:05 +0800
-Message-ID: <20201103121506.1533-1-liqiang64@huawei.com>
+Subject: [PATCH 1/1] arm64: Accelerate Adler32 using arm64 SVE instructions.
+Date:   Tue, 3 Nov 2020 20:15:06 +0800
+Message-ID: <20201103121506.1533-2-liqiang64@huawei.com>
 X-Mailer: git-send-email 2.23.0.windows.1
+In-Reply-To: <20201103121506.1533-1-liqiang64@huawei.com>
+References: <20201103121506.1533-1-liqiang64@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
 X-Originating-IP: [10.110.54.32]
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -47,123 +50,36 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: liqiang <liqiang64@huawei.com>
 
-Dear all,
+	In the libz library, the checksum algorithm adler32 usually occupies
+	a relatively high hot spot, and the SVE instruction set can easily
+	accelerate it, so that the performance of libz library will be
+	significantly improved.
 
-Thank you for taking the precious time to read this email!
+	We can divides buf into blocks according to the bit width of SVE,
+	and then uses vector registers to perform operations in units of blocks
+	to achieve the purpose of acceleration.
 
-Let me introduce the implementation ideas of my code here.
+	On machines that support ARM64 sve instructions, this algorithm is
+	about 3~4 times faster than the algorithm implemented in C language
+	in libz. The wider the SVE instruction, the better the acceleration effect.
 
-In the process of using the compression library libz, I found that the adler32
-checksum always occupies a higher hot spot, so I paid attention to this algorithm.
-After getting in touch with the SVE instruction set of armv8, I realized that
-SVE can effectively accelerate adler32, so I made some attempts and got correct
-and better performance results. I very much hope that this modification can be
-applied to the kernel.
+	Measured on a Taishan 1951 machine that supports 256bit width SVE,
+	below are the results of my measured random data of 1M and 10M:
 
-Below is my analysis process:
+		[root@xxx adler32]# ./benchmark 1000000
+		Libz alg: Time used:    608 us, 1644.7 Mb/s.
+		SVE  alg: Time used:    166 us, 6024.1 Mb/s.
 
-Adler32 algorithm
-=================
+		[root@xxx adler32]# ./benchmark 10000000
+		Libz alg: Time used:   6484 us, 1542.3 Mb/s.
+		SVE  alg: Time used:   2034 us, 4916.4 Mb/s.
 
-Reference: https://en.wikipedia.org/wiki/Adler-32
+	The blocks can be of any size, so the algorithm can automatically adapt
+	to SVE hardware with different bit widths without modifying the code.
 
-Assume that the buf of the Adler32 checksum to be calculated is D and the length is n:
 
-        A = 1 + D1 + D2 + ... + Dn (mod 65521)
-
-        B = (1 + D1) + (1 + D1 + D2) + ... + (1 + D1 + D2 + ... + Dn) (mod 65521)
-          = n×D1 + (n−1)×D2 + (n−2)×D3 + ... + Dn + n (mod 65521)
-
-        Adler-32(D) = B × 65536 + A
-
-In C, an inefficient but straightforward implementation is:
-
-        const uint32_t MOD_ADLER = 65521;
-
-        uint32_t adler32(unsigned char *data, size_t len)
-        {
-                uint32_t a = 1, b = 0;
-                size_t index;
-
-                // Process each byte of the data in order
-                for (index = 0; index < len; ++index)
-                {
-                        a = (a + data[index]) % MOD_ADLER;
-                        b = (b + a) % MOD_ADLER;
-                }
-
-                return (b << 16) | a;
-        }
-
-SVE vector method
-=================
-
-Step 1. Determine the block size:
-        Use addvl instruction to get SVE bit width.
-        Assuming the SVE bit width is x here.
-
-Step 2. Start to calculate the first block:
-        The calculation formula is:
-                A1 = 1 + D1 + D2 + ... + Dx (mod 65521)
-                B1 = x*D1 + (x-1)*D2 + ... + Dx + x (mod 65521)
-
-Step 3. Calculate the follow block:
-        The calculation formula of A2 is very simple, just add up:
-                A2 = A1 + Dx+1 + Dx+2 + ... + D2x (mod 65521)
-
-        The calculation formula of B2 is more complicated, because
-        the result is related to the length of buf. When calculating
-        the B1 block, it is actually assumed that the length is the
-        block length x. Now when calculating B2, the length is expanded
-        to 2x, so B2 becomes:
-                B2 = 2x*D1 + (2x-1)*D2             + ... + (x+1)*Dx + x*D(x+1) + ... + D2x + 2x
-                   = x*D1 + x*D1 + x*D2 + (x-1)*D2 + ... + x*Dx + Dx + x*1 + x + [x*D(x+1) + (x-1)*D(x+2) + ... + D2x]
-                     ^^^^   ~~~~   ^^^^   ~~~~~~~~         ^^^^   ~~   ^^^   ~   +++++++++++++++++++++++++++++++++++++
-        Through the above polynomial transformation:
-                Symbol "^" represents the <x * A1>;
-                Symbol "~" represents the <B1>;
-                Symbol "+" represents the next block.
-
-        So we can get the method of calculating the next block from
-        the previous block(Assume that the first byte number of the
-        new block starts from 1):
-                An+1 = An + D1 + D2 + ... + Dx (mod 65521)
-                Bn+1 = Bn + x*An + x*D1 + (x-1)*D2 + ... + Dx (mod 65521)
-
-Step 4. Implement and test with SVE instruction set:
-        Implement the above ideas with the SVE instruction set (Please refer
-        to the patch for details), and conduct correctness and performance tests.
-
-        The following are three sets of test data, the test objects are random
-        data of 1M, 10M, 100M:
-                [root@xxx adler32]# ./benchmark 1000000
-                Libz alg: Time used:    615 us, 1626.0 Mb/s.
-                SVE  alg: Time used:    163 us, 6135.0 Mb/s.
-                Libz result: 0x7a6a200
-                Sve  result: 0x7a6a200
-                Equal
-
-                [root@xxx adler32]# ./benchmark 10000000
-                Libz alg: Time used:   6486 us, 1541.8 Mb/s.
-                SVE  alg: Time used:   2077 us, 4814.6 Mb/s.
-                Libz result: 0xf92a8b92
-                Sve  result: 0xf92a8b92
-                Equal
-
-                [root@xxx adler32]# ./benchmark 100000000
-                Libz alg: Time used:  64352 us, 1554.0 Mb/s.
-                SVE  alg: Time used:  20697 us, 4831.6 Mb/s.
-                Libz result: 0x295bf401
-                Sve  result: 0x295bf401
-                Equal
-	Test environment: Taishan 1951.
-
-        The test results show that on Taishan 1951, the speed of SVE is generally
-        about 3 to 4 times that of the C algorithm.
-
-liqiang (1):
-  Accelerate Adler32 using arm64 SVE instructions.
-
+Signed-off-by: liqiang <liqiang64@huawei.com>
+---
  arch/arm64/crypto/Kconfig            |   5 ++
  arch/arm64/crypto/Makefile           |   3 +
  arch/arm64/crypto/adler32-sve-glue.c |  93 ++++++++++++++++++++
@@ -174,6 +90,316 @@ liqiang (1):
  create mode 100644 arch/arm64/crypto/adler32-sve-glue.c
  create mode 100644 arch/arm64/crypto/adler32-sve.S
 
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index b8eb045..cfe58b9 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -126,4 +126,9 @@ config CRYPTO_AES_ARM64_BS
+ 	select CRYPTO_LIB_AES
+ 	select CRYPTO_SIMD
+ 
++config SVE_ADLER32
++	tristate "Accelerate Adler32 using arm64 SVE instructions."
++	depends on ARM64_SVE
++	select CRYPTO_HASH
++
+ endif
+diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+index d0901e6..45fe649 100644
+--- a/arch/arm64/crypto/Makefile
++++ b/arch/arm64/crypto/Makefile
+@@ -63,6 +63,9 @@ aes-arm64-y := aes-cipher-core.o aes-cipher-glue.o
+ obj-$(CONFIG_CRYPTO_AES_ARM64_BS) += aes-neon-bs.o
+ aes-neon-bs-y := aes-neonbs-core.o aes-neonbs-glue.o
+ 
++obj-$(CONFIG_SVE_ADLER32) += sve-adler32.o
++sve-adler32-y := adler32-sve.o adler32-sve-glue.o
++
+ CFLAGS_aes-glue-ce.o	:= -DUSE_V8_CRYPTO_EXTENSIONS
+ 
+ $(obj)/aes-glue-%.o: $(src)/aes-glue.c FORCE
+diff --git a/arch/arm64/crypto/adler32-sve-glue.c b/arch/arm64/crypto/adler32-sve-glue.c
+new file mode 100644
+index 0000000..cb74514
+--- /dev/null
++++ b/arch/arm64/crypto/adler32-sve-glue.c
+@@ -0,0 +1,93 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Accelerate Adler32 using arm64 SVE instructions.
++ * Automatically support all bit width of SVE
++ * vector(128~2048).
++ *
++ * Copyright (C) 2020 Huawei Technologies Co., Ltd.
++ *
++ * Author: Li Qiang <liqiang64@huawei.com>
++ */
++#include <linux/cpufeature.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/zutil.h>
++
++#include <crypto/internal/hash.h>
++#include <crypto/internal/simd.h>
++
++#include <asm/neon.h>
++#include <asm/simd.h>
++
++/* Scalable vector extension min size 128bit */
++#define SVE_ADLER32_MIN_SIZE 16U
++#define SVE_ADLER32_DIGEST_SIZE 4
++#define SVE_ADLER32_BLOCKSIZE 1
++
++asmlinkage u32 adler32_sve(u32 adler, const u8 *buf, u32 len);
++
++static int adler32_sve_init(struct shash_desc *desc)
++{
++	u32 *adler32 = shash_desc_ctx(desc);
++
++	*adler32 = 1;
++	return 0;
++}
++
++static int adler32_sve_update(struct shash_desc *desc, const u8 *data,
++				  unsigned int length)
++{
++	u32 *adler32 = shash_desc_ctx(desc);
++
++	if (length >= SVE_ADLER32_MIN_SIZE && crypto_simd_usable()) {
++		kernel_neon_begin();
++		*adler32 = adler32_sve(*adler32, data, length);
++		kernel_neon_end();
++	} else {
++		*adler32 = zlib_adler32(*adler32, data, length);
++	}
++	return 0;
++}
++
++static int adler32_sve_final(struct shash_desc *desc, u8 *out)
++{
++	u32 *adler32 = shash_desc_ctx(desc);
++
++	*(u32 *)out = *adler32;
++	return 0;
++}
++
++static struct shash_alg adler32_sve_alg[] = {{
++	.digestsize				= SVE_ADLER32_DIGEST_SIZE,
++	.descsize				= SVE_ADLER32_DIGEST_SIZE,
++	.init					= adler32_sve_init,
++	.update					= adler32_sve_update,
++	.final					= adler32_sve_final,
++
++	.base.cra_name			= "adler32",
++	.base.cra_driver_name	= "adler32-arm64-sve",
++	.base.cra_priority		= 200,
++	.base.cra_blocksize		= SVE_ADLER32_BLOCKSIZE,
++	.base.cra_module		= THIS_MODULE,
++}};
++
++static int __init adler32_sve_mod_init(void)
++{
++	if (!cpu_have_named_feature(SVE))
++		return 0;
++
++	return crypto_register_shash(adler32_sve_alg);
++}
++
++static void __exit adler32_sve_mod_exit(void)
++{
++	crypto_unregister_shash(adler32_sve_alg);
++}
++
++module_init(adler32_sve_mod_init);
++module_exit(adler32_sve_mod_exit);
++
++MODULE_AUTHOR("Li Qiang <liqiang64@huawei.com>");
++MODULE_LICENSE("GPL v2");
++MODULE_ALIAS_CRYPTO("adler32");
++MODULE_ALIAS_CRYPTO("adler32-arm64-sve");
+diff --git a/arch/arm64/crypto/adler32-sve.S b/arch/arm64/crypto/adler32-sve.S
+new file mode 100644
+index 0000000..34ee4bb
+--- /dev/null
++++ b/arch/arm64/crypto/adler32-sve.S
+@@ -0,0 +1,127 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Accelerate Adler32 using arm64 SVE instructions. Automatically support all bit
++ *	 width of SVE vector(128~2048).
++ *
++ * Copyright (C) 2020 Huawei Technologies Co., Ltd.
++ *
++ * Author: Li Qiang <liqiang64@huawei.com>
++ */
++
++#include <linux/linkage.h>
++#include <asm/assembler.h>
++
++.arch armv8-a+sve
++.file "adler32_sve.S"
++.text
++.align 6
++
++//The supported sve vector length range is 128~2048 by this Adler_sequence
++.Adler_sequence:
++	.short 256,255,254,253,252,251,250,249,248,247,246,245,244,243,242,241
++	.short 240,239,238,237,236,235,234,233,232,231,230,229,228,227,226,225
++	.short 224,223,222,221,220,219,218,217,216,215,214,213,212,211,210,209
++	.short 208,207,206,205,204,203,202,201,200,199,198,197,196,195,194,193
++	.short 192,191,190,189,188,187,186,185,184,183,182,181,180,179,178,177
++	.short 176,175,174,173,172,171,170,169,168,167,166,165,164,163,162,161
++	.short 160,159,158,157,156,155,154,153,152,151,150,149,148,147,146,145
++	.short 144,143,142,141,140,139,138,137,136,135,134,133,132,131,130,129
++	.short 128,127,126,125,124,123,122,121,120,119,118,117,116,115,114,113
++	.short 112,111,110,109,108,107,106,105,104,103,102,101,100, 99, 98, 97
++	.short	96, 95, 94, 93, 92, 91, 90, 89, 88, 87, 86, 85, 84, 83, 82, 81
++	.short	80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70, 69, 68, 67, 66, 65
++	.short	64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49
++	.short	48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33
++	.short	32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17
++	.short	16, 15, 14, 13, 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1
++
++SYM_FUNC_START(adler32_sve)
++	and w10, w0, #0xffff
++	lsr w11, w0, #16
++
++	// Get the length of the sve vector to x6.
++	mov x6, #0
++	mov x9, #256
++	addvl x6, x6, #1
++	adr x12, .Adler_sequence
++	ptrue p1.h
++
++	// Get the starting position of the required sequence.
++	sub x9, x9, x6
++	ld1h z24.h, p1/z, [x12, x9, lsl #1] // taps1 to z24.h
++	inch x9
++	ld1h z25.h, p1/z, [x12, x9, lsl #1] // taps2 to z25.h
++	mov x9, #0
++	// A little of byte, jumper to normal proc
++	mov x14, #3
++	mul x15, x14, x6
++	cmp x2, x15
++	b.le Lnormal_proc
++
++	ptrue p0.b
++.align 6
++LBig_loop:
++	// x is SVE vector length (byte).
++	// Bn = Bn-1 + An-1 * x + x * D1 + (x-1) * D2 + ... + 1 * Dx
++	// An = An-1 + D1 + D2 + D3 + ... + Dx
++
++	.macro ADLER_BLOCK_X
++	ld1b z0.b, p0/z, [x1, x9]
++	incb x9
++	uaddv d20, p0, z0.b // D1 + D2 + ... + Dx
++	mov x12, v20.2d[0]
++	madd x11, x10, x6, x11 // Bn = An-1 * x + Bn-1
++
++	uunpklo z26.h, z0.b
++	uunpkhi z27.h, z0.b
++	mul z26.h, p1/m, z26.h, z24.h // x * D1 + (x-1) * D2 + ... + (x/2 + 1) * D(x/2)
++	mul z27.h, p1/m, z27.h, z25.h // (x/2) * D(x/2 + 1) + (x/2 - 1) * D(x/2 + 2) + ... + 1 * Dx
++
++	uaddv d21, p1, z26.h
++	uaddv d22, p1, z27.h
++	mov x13, v21.2d[0]
++	mov x14, v22.2d[0]
++
++	add x11, x13, x11
++	add x11, x14, x11	  // Bn += x * D1 + (x-1) * D2 + ... + 1 * Dx
++	add x10, x12, x10	  // An += D1 + D2 + ... + Dx
++	.endm
++	ADLER_BLOCK_X
++	ADLER_BLOCK_X
++	ADLER_BLOCK_X
++	// calc = reg0 % 65521
++	.macro mod65521, reg0, reg1, reg2
++	mov w\reg1, #0x8071
++	mov w\reg2, #0xfff1
++	movk w\reg1, #0x8007, lsl #16
++	umull x\reg1, w\reg0, w\reg1
++	lsr x\reg1, x\reg1, #47
++	msub w\reg0, w\reg1, w\reg2, w\reg0
++	.endm
++
++	mod65521 10, 14, 12
++	mod65521 11, 14, 12
++
++	sub x2, x2, x15
++	cmp x2, x15
++	b.ge LBig_loop
++
++.align 6
++Lnormal_proc:
++	cmp x2, #0
++	b.eq Lret
++
++	ldrb w12, [x1, x9]
++	add x9, x9, #1
++	add x10, x12, x10
++	add x11, x10, x11
++	sub x2, x2, #1
++	b Lnormal_proc
++
++Lret:
++	mod65521 10, 14, 12
++	mod65521 11, 14, 12
++	lsl x11, x11, #16
++	orr x0, x10, x11
++	ret
++SYM_FUNC_END(adler32_sve)
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index a64a639..58b8020 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4174,6 +4174,13 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.cipher = __VECS(adiantum_xchacha20_aes_tv_template)
+ 		},
++	}, {
++		.alg = "adler32",
++		.test = alg_test_hash,
++		.fips_allowed = 1,
++		.suite = {
++			.hash = __VECS(adler32_tv_template)
++		}
+ 	}, {
+ 		.alg = "aegis128",
+ 		.test = alg_test_aead,
+@@ -5640,7 +5647,6 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
+ 	}
+ 
+ 	DO_ONCE(testmgr_onetime_init);
+-
+ 	if ((type & CRYPTO_ALG_TYPE_MASK) == CRYPTO_ALG_TYPE_CIPHER) {
+ 		char nalg[CRYPTO_MAX_ALG_NAME];
+ 
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 8c83811..5233960 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -3676,6 +3676,19 @@ static const struct hash_testvec crct10dif_tv_template[] = {
+ 	}
+ };
+ 
++static const struct hash_testvec adler32_tv_template[] = {
++	{
++		.plaintext	= "abcde",
++		.psize		= 5,
++		.digest		= "\xf0\x01\xc8\x05",
++	},
++	{
++		.plaintext	= "0123456789101112131415",
++		.psize		= 22,
++		.digest		= "\x63\x04\xa8\x32",
++	},
++};
++
+ /*
+  * Streebog test vectors from RFC 6986 and GOST R 34.11-2012
+  */
 -- 
 2.19.1
 
