@@ -2,110 +2,138 @@ Return-Path: <SRS0=EIvj=EK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F21C2D0A3
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Nov 2020 17:57:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A77FC2D0A3
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Nov 2020 18:13:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B6CA82083B
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Nov 2020 17:57:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1604512666;
-	bh=xW2DCv1bVj8xZGAEExQ8YdJt58u6JujrKWAdykKMBT8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=X7dqTuSuPA9/Pj1+G0OtLy+YXt6YbK8U/nTSfBQhtcnkOa/oIuYvSX19b2/BHH88s
-	 Hlufeox4AmdC3S4W30XbQK9WxkrUoxHkNHJmAd4cg26lMN/2eG4rr8wQvUhpjqDCBu
-	 wcNQ+m4EEg/t4e8Z7M/ow8WJsQ02UFw/MXY/yDnY=
+	by mail.kernel.org (Postfix) with ESMTP id F28662083B
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Nov 2020 18:13:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731043AbgKDR5q (ORCPT
+        id S1730340AbgKDSNM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Nov 2020 12:57:46 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38206 "EHLO mail.kernel.org"
+        Wed, 4 Nov 2020 13:13:12 -0500
+Received: from foss.arm.com ([217.140.110.172]:41536 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726608AbgKDR5p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Nov 2020 12:57:45 -0500
-Received: from sol.localdomain (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 604B920639;
-        Wed,  4 Nov 2020 17:57:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604512664;
-        bh=xW2DCv1bVj8xZGAEExQ8YdJt58u6JujrKWAdykKMBT8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GUw/u0M0wg3yZno9YljUV9hR5ZAxyDxdNF2C6Ss9DHqGp7RMQWyA+lCUSGL9/sewd
-         bjHoLOQawHNfYTX6Dkm1T4VDytSDbbZFTcs4ao69FBZq6BIdQJ52+jshAfL4IfyLf/
-         TfTdHPpqxkd3yvrJF8AcJcj5DDIPfMr7YbegNZIc=
-Date:   Wed, 4 Nov 2020 09:57:42 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     l00374334 <liqiang64@huawei.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        catalin.marinas@arm.com, will@kernel.org,
-        mcoquelin.stm32@gmail.com, alexandre.torgue@st.com,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
+        id S1730052AbgKDSNM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 4 Nov 2020 13:13:12 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8473414BF;
+        Wed,  4 Nov 2020 10:13:11 -0800 (PST)
+Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 18CC63F718;
+        Wed,  4 Nov 2020 10:13:09 -0800 (PST)
+Date:   Wed, 4 Nov 2020 18:13:06 +0000
+From:   Dave Martin <Dave.Martin@arm.com>
+To:     Mark Brown <broonie@kernel.org>
+Cc:     Alexandre Torgue <alexandre.torgue@st.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        l00374334 <liqiang64@huawei.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 1/1] arm64: Accelerate Adler32 using arm64 SVE
  instructions.
-Message-ID: <20201104175742.GA846@sol.localdomain>
+Message-ID: <20201104181256.GG6882@arm.com>
 References: <20201103121506.1533-1-liqiang64@huawei.com>
  <20201103121506.1533-2-liqiang64@huawei.com>
+ <CAMj1kXFJRQ59waFwbe2X0v5pGvMv6Yo6DJPLMEzjxDAThC-+gw@mail.gmail.com>
+ <20201103180031.GO6882@arm.com>
+ <20201104175032.GA15020@sirena.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201103121506.1533-2-liqiang64@huawei.com>
+In-Reply-To: <20201104175032.GA15020@sirena.org.uk>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 03, 2020 at 08:15:06PM +0800, l00374334 wrote:
-> From: liqiang <liqiang64@huawei.com>
+On Wed, Nov 04, 2020 at 05:50:33PM +0000, Mark Brown wrote:
+> On Tue, Nov 03, 2020 at 06:00:32PM +0000, Dave Martin wrote:
+> > On Tue, Nov 03, 2020 at 03:34:27PM +0100, Ard Biesheuvel wrote:
 > 
-> 	In the libz library, the checksum algorithm adler32 usually occupies
-> 	a relatively high hot spot, and the SVE instruction set can easily
-> 	accelerate it, so that the performance of libz library will be
-> 	significantly improved.
+> > > First of all, I don't think it is safe at the moment to use SVE in the
+> > > kernel, as we don't preserve all state IIRC. My memory is a bit hazy,
 > 
-> 	We can divides buf into blocks according to the bit width of SVE,
-> 	and then uses vector registers to perform operations in units of blocks
-> 	to achieve the purpose of acceleration.
+> > I'm not convinced that it's safe right now.  SVE in the kernel is
+> > unsupported, partly due to cost and partly due to the lack of a
+> > compelling use case.
 > 
-> 	On machines that support ARM64 sve instructions, this algorithm is
-> 	about 3~4 times faster than the algorithm implemented in C language
-> 	in libz. The wider the SVE instruction, the better the acceleration effect.
-> 
-> 	Measured on a Taishan 1951 machine that supports 256bit width SVE,
-> 	below are the results of my measured random data of 1M and 10M:
-> 
-> 		[root@xxx adler32]# ./benchmark 1000000
-> 		Libz alg: Time used:    608 us, 1644.7 Mb/s.
-> 		SVE  alg: Time used:    166 us, 6024.1 Mb/s.
-> 
-> 		[root@xxx adler32]# ./benchmark 10000000
-> 		Libz alg: Time used:   6484 us, 1542.3 Mb/s.
-> 		SVE  alg: Time used:   2034 us, 4916.4 Mb/s.
-> 
-> 	The blocks can be of any size, so the algorithm can automatically adapt
-> 	to SVE hardware with different bit widths without modifying the code.
-> 
-> 
-> Signed-off-by: liqiang <liqiang64@huawei.com>
+> I think at a minimum we'd want to handle the vector length explicitly
+> for kernel mode SVE, vector length independent code will work most of
+> the time but at the very least it feels like a landmine waiting to cause
+> trouble.  If nothing else there's probably going to be cases where it
+> makes a difference for performance.  Other than that I'm not currently
+> seeing any issues since we're handling SVE in the same paths we handle
+> the rest of the FPSIMD stuff.
 
-Note that this patch does nothing to actually wire up the kernel's copy of libz
-(lib/zlib_{deflate,inflate}/) to use this implementation of Adler32.  To do so,
-libz would either need to be changed to use the shash API, or you'd need to
-implement an adler32() function in lib/crypto/ that automatically uses an
-accelerated implementation if available, and make libz call it.
+Having a random vector length could be good for testing ;)
 
-Also, in either case a C implementation would be required too.  There can't be
-just an architecture-specific implementation.
+I was tempted to add that as a deliberate feature, but that sort of
+nothing doesn't really belong in the kernel...
 
-Also as others have pointed out, there's probably not much point in having a SVE
-implementation of Adler32 when there isn't even a NEON implementation yet.  It's
-not too hard to implement Adler32 using NEON, and there are already several
-permissively-licensed NEON implementations out there that could be used as a
-reference, e.g. my implementation using NEON instrinsics here:
-https://github.com/ebiggers/libdeflate/blob/v1.6/lib/arm/adler32_impl.h
 
-- Eric
+Anyway:
+
+The main reasons for constraining the vector length are a) to hide
+mismatches between CPUs in heterogeneous systems, b) to ensure that
+validated software doesn't run with a vector length it wasn't validated
+for, and c) testing.
+
+For kernel code, it's reasonable to say that all code should be vector-
+length agnostic unless there's a really good reason not to be.  So we
+may not care too much about (b).
+
+In that case, just setting ZCR_EL1.LEN to max in kernel_sve_begin() (or
+whatever) probably makes sense.
+
+For (c), it might be useful to have a command-line parameter or debugfs
+widget to constrain the vector length for kernel code; perhaps globally
+or perhaps per driver or algo.
+
+
+Otherwise, I agree that using SVE in the kernel _should_ probably work
+safely, using the same basic mechanism as kernel_mode_neon().  Also,
+it shouldn't have higher overheads than kernel-mode-NEON now.
+
+
+> 
+> > I think it would be preferable to see this algo accelerated for NEON
+> > first, since all AArch64 hardware can benefit from that.
+> 
+> ...
+> 
+> > much of a problem.  kernel_neon_begin() may incur a save of the full SVE
+> > state anyway, so in some ways it would be a good thing if we could
+> > actually make use of all those registers.
+> 
+> > SVE hardware remains rare, so as a general policy I don't think we
+> > should accept SVE implementations of any algorithm that does not
+> > already have a NEON implementation -- unless the contributor can
+> > explain why nobody with non-SVE hardware is going to care about the
+> > performance of that algo.
+> 
+> I tend to agree here, my concerns are around the cost of maintaining a
+> SVE implementation relative to the number of users who'd benefit from it
+> rather than around the basic idea of using SVE at all.  If we were
+> seeing substantial performance benefits over an implementation using
+> NEON, or had some other strong push to use SVE like a really solid
+> understanding of why SVE is a good fit for the algorithm but NEON isn't,
+> then it'd be worth finishing up the infrastructure.  The infrastructure
+> itself doesn't seem fundamentally problematic.
+
+Agreed
+
+Nonetheless, working up a candidate algorithm to help us see whether
+there is a good use case seems like a worthwhile project, so I don't
+want to discourage that too much.
+
+Cheers
+---Dave
