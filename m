@@ -2,213 +2,165 @@ Return-Path: <SRS0=9iLH=EL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E16DC388F9
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Nov 2020 04:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E349BC00A89
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Nov 2020 07:51:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E9B2120795
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Nov 2020 04:25:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i71nKCxm"
+	by mail.kernel.org (Postfix) with ESMTP id 8BE812151B
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Nov 2020 07:51:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1604562682;
+	bh=oxQwtuW0hwiokYEAdCc1FFU1wnaunMZOGRSZJvYbK84=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=EkwVhc9kE2AgCxLu/UHvzJ7rmIwurIQnoaH9mLDTAnkovWlhKUXjZrdVA4AMCx24k
+	 iDBzBXx8uj1/hh8Dsw2hJKeBehVSd8YuX/7bqUUJ84RGrT0p80cx2XBmbeE5gaMog4
+	 O2XjnA+MD0NO8eKnbCMkAHhj2jEJszhyNlutjdXw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730131AbgKEEZA (ORCPT
+        id S1725827AbgKEHvW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Nov 2020 23:25:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34976 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730078AbgKEEY7 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Nov 2020 23:24:59 -0500
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 202EEC0613CF;
-        Wed,  4 Nov 2020 20:24:59 -0800 (PST)
-Received: by mail-pg1-x542.google.com with SMTP id x13so399577pgp.7;
-        Wed, 04 Nov 2020 20:24:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=rEVQORojpxPILZoW25n2HNyuoMNfuJyQRA19mYILOf8=;
-        b=i71nKCxm/Rk7Qe0vfqXmlNOIbt9fIuievRqcCn5TJ1yWIdb59otcj93oz7j+gpZZWo
-         Bp6lTHoFkgmmVJDji7oItHa5kc9VjRnHjZzsPiy/LrWinbv+5uRpmvxIuhDnTMid3S3x
-         x9JmlkWfqwTYLVEqsdgw1Shol9H+Mp4WsGw0er643fBik2QBf/oBlbKOXNg8BVHq1P7d
-         eweO2JBa6jgeNWz99UIYx/pKdjGP0px9q+CsV9n/AZpXUCCjEIpKBze+wCLNFthZ8LuJ
-         CySDEmIbmdVIhQxI03oDD+oIR2gX3i68ERDpDX2/L3OAVGtHDcT3nx+1ihH9vgWSyMue
-         A8Iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=rEVQORojpxPILZoW25n2HNyuoMNfuJyQRA19mYILOf8=;
-        b=EFHxwh/aKzxhOhj40dQzqrXRW8Vl58l0Zs4S2FTh6O7awn9Ycn8z+tpwMznDWwDOfY
-         ZyrJMOZ1k2ZzKzMH2OeB+OtiStfrR0n6uo0k9nGAvmoLu2vpEFBZxpMH5LbSQSW74SjX
-         BOxBZsb6COLjNcRuxBi77N/iARbm7MKYWz/hq78QAYfX5NgCDcfRIFJECYAxQP9TOQPd
-         hhnBKuQfCz2aipwmZHrs9yUFGDeC6bQSGuflmrk79xlAC6bVYfxxVbsjOEw+kJFLc6TY
-         3YHbJnGEBPOhw2pt6xQ/4TwoKYV7YSdrkb2DknqXOq+s2q4keDeEmeVUDO/rrVuJF/Qv
-         F7pw==
-X-Gm-Message-State: AOAM5336vik3CNGFz6NYeb6Db1yYXQ1pt7G7FNm3qhYhGMthxT3+9jRg
-        uDypJdr84Ztv73KtKZA9L/k=
-X-Google-Smtp-Source: ABdhPJxxSyyliKXbv7VU2uhEsbi4aEkX5Awvipq0CP4TmL0j/U/T8uSPpKMflgkHnq9+9ELOvhfBgQ==
-X-Received: by 2002:aa7:8b50:0:b029:18a:adb4:8411 with SMTP id i16-20020aa78b500000b029018aadb48411mr775573pfd.66.1604550298712;
-        Wed, 04 Nov 2020 20:24:58 -0800 (PST)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id z22sm472782pfa.220.2020.11.04.20.24.55
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 04 Nov 2020 20:24:58 -0800 (PST)
-From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ben Boeckel <me@benboeckel.net>,
-        Randy Dunlap <rdunlap@infradead.org>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Lee, Chun-Yi" <jlee@suse.com>
-Subject: [PATCH v2 2/2] PKCS#7: Check codeSigning EKU for kernel module and kexec pe verification
-Date:   Thu,  5 Nov 2020 12:24:06 +0800
-Message-Id: <20201105042406.5783-3-jlee@suse.com>
-X-Mailer: git-send-email 2.12.3
-In-Reply-To: <20201105042406.5783-1-jlee@suse.com>
-References: <20201105042406.5783-1-jlee@suse.com>
+        Thu, 5 Nov 2020 02:51:22 -0500
+Received: from mail.kernel.org ([198.145.29.99]:51384 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725287AbgKEHvV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 5 Nov 2020 02:51:21 -0500
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 22B3821556
+        for <linux-crypto@vger.kernel.org>; Thu,  5 Nov 2020 07:51:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1604562681;
+        bh=oxQwtuW0hwiokYEAdCc1FFU1wnaunMZOGRSZJvYbK84=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=Z715G/ZJJT7qc61nYJWySEPdvkoXhGG17BhN+03gZ77IuM8evpigz4F1mmeGUdP0f
+         I32ldaaLrRPCqOCTLV6ribRsVjkc5N1ZOs2J41gE4fxVtR3cO39BAMoMx83diZ9gPI
+         V71//HKSmEYWYGtZn3qet1GrcrFdVDD2Iizdys40=
+Received: by mail-ot1-f41.google.com with SMTP id 32so616184otm.3
+        for <linux-crypto@vger.kernel.org>; Wed, 04 Nov 2020 23:51:21 -0800 (PST)
+X-Gm-Message-State: AOAM5304eHbOJ8PCvGJehecX5yFa/S8aFdgtx1RBFDd/llfnVgumHtDs
+        UjwenKsAvgEbGcg+I/c8XqpGri8L8YQzJn75pnI=
+X-Google-Smtp-Source: ABdhPJxgCFEIL2XHfTZqQD1BqlYhZO35F/h2gqv286fgM1lIjCyxyPxLjVFKcC2ZDEpBQ32AWbRuHJEQVAX24h0XawE=
+X-Received: by 2002:a05:6830:4028:: with SMTP id i8mr829221ots.90.1604562680278;
+ Wed, 04 Nov 2020 23:51:20 -0800 (PST)
+MIME-Version: 1.0
+References: <20201103121506.1533-1-liqiang64@huawei.com> <20201103121506.1533-2-liqiang64@huawei.com>
+ <20201104175742.GA846@sol.localdomain> <2dad168c-f6cb-103c-04ce-cc3c2561e01b@huawei.com>
+In-Reply-To: <2dad168c-f6cb-103c-04ce-cc3c2561e01b@huawei.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 5 Nov 2020 08:51:08 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXG+YJvHLFDMk7ABAD=WthxLx5Uh0LAXCP6+2tXEySj7eg@mail.gmail.com>
+Message-ID: <CAMj1kXG+YJvHLFDMk7ABAD=WthxLx5Uh0LAXCP6+2tXEySj7eg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] arm64: Accelerate Adler32 using arm64 SVE instructions.
+To:     Li Qiang <liqiang64@huawei.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds the logic for checking the CodeSigning extended
-key usage when verifying signature of kernel module or
-kexec PE binary in PKCS#7.
+On Thu, 5 Nov 2020 at 03:50, Li Qiang <liqiang64@huawei.com> wrote:
+>
+> Hi Eric,
+>
+> =E5=9C=A8 2020/11/5 1:57, Eric Biggers =E5=86=99=E9=81=93:
+> > On Tue, Nov 03, 2020 at 08:15:06PM +0800, l00374334 wrote:
+> >> From: liqiang <liqiang64@huawei.com>
+> >>
+> >>      In the libz library, the checksum algorithm adler32 usually occup=
+ies
+> >>      a relatively high hot spot, and the SVE instruction set can easil=
+y
+> >>      accelerate it, so that the performance of libz library will be
+> >>      significantly improved.
+> >>
+> >>      We can divides buf into blocks according to the bit width of SVE,
+> >>      and then uses vector registers to perform operations in units of =
+blocks
+> >>      to achieve the purpose of acceleration.
+> >>
+> >>      On machines that support ARM64 sve instructions, this algorithm i=
+s
+> >>      about 3~4 times faster than the algorithm implemented in C langua=
+ge
+> >>      in libz. The wider the SVE instruction, the better the accelerati=
+on effect.
+> >>
+> >>      Measured on a Taishan 1951 machine that supports 256bit width SVE=
+,
+> >>      below are the results of my measured random data of 1M and 10M:
+> >>
+> >>              [root@xxx adler32]# ./benchmark 1000000
+> >>              Libz alg: Time used:    608 us, 1644.7 Mb/s.
+> >>              SVE  alg: Time used:    166 us, 6024.1 Mb/s.
+> >>
+> >>              [root@xxx adler32]# ./benchmark 10000000
+> >>              Libz alg: Time used:   6484 us, 1542.3 Mb/s.
+> >>              SVE  alg: Time used:   2034 us, 4916.4 Mb/s.
+> >>
+> >>      The blocks can be of any size, so the algorithm can automatically=
+ adapt
+> >>      to SVE hardware with different bit widths without modifying the c=
+ode.
+> >>
+> >>
+> >> Signed-off-by: liqiang <liqiang64@huawei.com>
+> >
+> > Note that this patch does nothing to actually wire up the kernel's copy=
+ of libz
+> > (lib/zlib_{deflate,inflate}/) to use this implementation of Adler32.  T=
+o do so,
+> > libz would either need to be changed to use the shash API, or you'd nee=
+d to
+> > implement an adler32() function in lib/crypto/ that automatically uses =
+an
+> > accelerated implementation if available, and make libz call it.
+> >
+> > Also, in either case a C implementation would be required too.  There c=
+an't be
+> > just an architecture-specific implementation.
+>
+> Okay, thank you for the problems and suggestions you gave. I will continu=
+e to
+> improve my code.
+>
+> >
+> > Also as others have pointed out, there's probably not much point in hav=
+ing a SVE
+> > implementation of Adler32 when there isn't even a NEON implementation y=
+et.  It's
+> > not too hard to implement Adler32 using NEON, and there are already sev=
+eral
+> > permissively-licensed NEON implementations out there that could be used=
+ as a
+> > reference, e.g. my implementation using NEON instrinsics here:
+> > https://github.com/ebiggers/libdeflate/blob/v1.6/lib/arm/adler32_impl.h
+> >
+> > - Eric
+> > .
+> >
+>
+> I am very happy to get this NEON implementation code. :)
+>
 
-Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
----
- certs/system_keyring.c               |  2 +-
- crypto/asymmetric_keys/Kconfig       |  9 +++++++++
- crypto/asymmetric_keys/pkcs7_trust.c | 37 +++++++++++++++++++++++++++++++++---
- include/crypto/pkcs7.h               |  3 ++-
- 4 files changed, 46 insertions(+), 5 deletions(-)
+Note that NEON intrinsics can be compiled for 32-bit ARM as well (with
+a bit of care - please refer to lib/raid6/recov_neon_inner.c for an
+example of how to deal with intrinsics that are only available on
+arm64) and are less error prone, so intrinsics should be preferred if
+feasible.
 
-diff --git a/certs/system_keyring.c b/certs/system_keyring.c
-index 798291177186..4104f5465d8a 100644
---- a/certs/system_keyring.c
-+++ b/certs/system_keyring.c
-@@ -242,7 +242,7 @@ int verify_pkcs7_message_sig(const void *data, size_t len,
- 			goto error;
- 		}
- 	}
--	ret = pkcs7_validate_trust(pkcs7, trusted_keys);
-+	ret = pkcs7_validate_trust(pkcs7, trusted_keys, usage);
- 	if (ret < 0) {
- 		if (ret == -ENOKEY)
- 			pr_devel("PKCS#7 signature not signed with a trusted key\n");
-diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-index 1f1f004dc757..1754812df989 100644
---- a/crypto/asymmetric_keys/Kconfig
-+++ b/crypto/asymmetric_keys/Kconfig
-@@ -96,4 +96,13 @@ config SIGNED_PE_FILE_VERIFICATION
- 	  This option provides support for verifying the signature(s) on a
- 	  signed PE binary.
- 
-+config CHECK_CODESIGN_EKU
-+	bool "Check codeSigning extended key usage"
-+	depends on PKCS7_MESSAGE_PARSER=y
-+	depends on SYSTEM_DATA_VERIFICATION
-+	help
-+	  This option provides support for checking the codeSigning extended
-+	  key usage when verifying the signature in PKCS#7. It affects kernel
-+	  module verification and kexec PE binary verification.
-+
- endif # ASYMMETRIC_KEY_TYPE
-diff --git a/crypto/asymmetric_keys/pkcs7_trust.c b/crypto/asymmetric_keys/pkcs7_trust.c
-index 61af3c4d82cc..1d2318ff63db 100644
---- a/crypto/asymmetric_keys/pkcs7_trust.c
-+++ b/crypto/asymmetric_keys/pkcs7_trust.c
-@@ -16,12 +16,36 @@
- #include <crypto/public_key.h>
- #include "pkcs7_parser.h"
- 
-+#ifdef CONFIG_CHECK_CODESIGN_EKU
-+static bool check_codesign_eku(struct key *key,
-+			     enum key_being_used_for usage)
-+{
-+	struct public_key *public_key = key->payload.data[asym_crypto];
-+
-+	switch (usage) {
-+	case VERIFYING_MODULE_SIGNATURE:
-+	case VERIFYING_KEXEC_PE_SIGNATURE:
-+		return !!(public_key->eku & EKU_codeSigning);
-+	default:
-+		break;
-+	}
-+	return true;
-+}
-+#else
-+static bool check_codesign_eku(struct key *key,
-+			     enum key_being_used_for usage)
-+{
-+	return true;
-+}
-+#endif
-+
- /**
-  * Check the trust on one PKCS#7 SignedInfo block.
-  */
- static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
- 				    struct pkcs7_signed_info *sinfo,
--				    struct key *trust_keyring)
-+				    struct key *trust_keyring,
-+				    enum key_being_used_for usage)
- {
- 	struct public_key_signature *sig = sinfo->sig;
- 	struct x509_certificate *x509, *last = NULL, *p;
-@@ -112,6 +136,12 @@ static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
- 	return -ENOKEY;
- 
- matched:
-+	if (!check_codesign_eku(key, usage)) {
-+		pr_warn("sinfo %u: The signer %x key is not CodeSigning\n",
-+			sinfo->index, key_serial(key));
-+		key_put(key);
-+		return -ENOKEY;
-+	}
- 	ret = verify_signature(key, sig);
- 	key_put(key);
- 	if (ret < 0) {
-@@ -156,7 +186,8 @@ static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
-  * May also return -ENOMEM.
-  */
- int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
--			 struct key *trust_keyring)
-+			 struct key *trust_keyring,
-+			 enum key_being_used_for usage)
- {
- 	struct pkcs7_signed_info *sinfo;
- 	struct x509_certificate *p;
-@@ -167,7 +198,7 @@ int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
- 		p->seen = false;
- 
- 	for (sinfo = pkcs7->signed_infos; sinfo; sinfo = sinfo->next) {
--		ret = pkcs7_validate_trust_one(pkcs7, sinfo, trust_keyring);
-+		ret = pkcs7_validate_trust_one(pkcs7, sinfo, trust_keyring, usage);
- 		switch (ret) {
- 		case -ENOKEY:
- 			continue;
-diff --git a/include/crypto/pkcs7.h b/include/crypto/pkcs7.h
-index 38ec7f5f9041..b3b48240ba73 100644
---- a/include/crypto/pkcs7.h
-+++ b/include/crypto/pkcs7.h
-@@ -30,7 +30,8 @@ extern int pkcs7_get_content_data(const struct pkcs7_message *pkcs7,
-  * pkcs7_trust.c
-  */
- extern int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
--				struct key *trust_keyring);
-+				struct key *trust_keyring,
-+				enum key_being_used_for usage);
- 
- /*
-  * pkcs7_verify.c
--- 
-2.16.4
-
+However, you have still not explained how optimizing Adler32 makes a
+difference for a real-world use case. Where is libdeflate used on a
+hot path?
