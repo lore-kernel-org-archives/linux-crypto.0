@@ -2,119 +2,106 @@ Return-Path: <SRS0=9iLH=EL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D718DC2D0A3
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Nov 2020 02:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C2BC00A89
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Nov 2020 04:24:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8905120825
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Nov 2020 02:49:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDBE420825
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Nov 2020 04:24:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E16ZNRL2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729344AbgKECt7 (ORCPT
+        id S1730954AbgKEEYa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Nov 2020 21:49:59 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:7056 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726185AbgKECt6 (ORCPT
+        Wed, 4 Nov 2020 23:24:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34898 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726225AbgKEEYa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Nov 2020 21:49:58 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CRSfn0D8gzhgRL;
-        Thu,  5 Nov 2020 10:49:53 +0800 (CST)
-Received: from [10.110.54.32] (10.110.54.32) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Thu, 5 Nov 2020
- 10:49:51 +0800
-Subject: Re: [PATCH 1/1] arm64: Accelerate Adler32 using arm64 SVE
- instructions.
-To:     Eric Biggers <ebiggers@kernel.org>
-CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <catalin.marinas@arm.com>, <will@kernel.org>,
-        <mcoquelin.stm32@gmail.com>, <alexandre.torgue@st.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-crypto@vger.kernel.org>
-References: <20201103121506.1533-1-liqiang64@huawei.com>
- <20201103121506.1533-2-liqiang64@huawei.com>
- <20201104175742.GA846@sol.localdomain>
-From:   Li Qiang <liqiang64@huawei.com>
-Message-ID: <2dad168c-f6cb-103c-04ce-cc3c2561e01b@huawei.com>
-Date:   Thu, 5 Nov 2020 10:49:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
-MIME-Version: 1.0
-In-Reply-To: <20201104175742.GA846@sol.localdomain>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.110.54.32]
-X-CFilter-Loop: Reflected
+        Wed, 4 Nov 2020 23:24:30 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 250A6C0613CF;
+        Wed,  4 Nov 2020 20:24:30 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id g7so74038pfc.2;
+        Wed, 04 Nov 2020 20:24:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=mf2mQtl5Jrm98A+7graXanfNE3UgwsoUiK1x4tqEZfo=;
+        b=E16ZNRL2p3UqVWctbIlbFovHG943cFUyARwZPuf0UKQwfK1XyOkqpE07ubMnC+cOQ1
+         KsqmvkHuUyUhgjtrhDtz8GW9/kMhlKeRrrmRIiiLtzLIddyo9/4Z/Q6Fdb/9Uwpo6sKB
+         BvmKCmFF5hcdHFs6ALsyQ0il4eKsYiT5w25+AqffSmb3jyVGEiqfFX6jKjRrPzw6u8Nr
+         bYuKSpevA1FOrRkPe8rM/LywqrkJm6IKvkzas/hTfLobYxJqBStZd1EdtjW61EHCE0kL
+         hhfQFgIs+qAi44uRUkrMrpvTuTOLVa+LONCtUBI1aTa/MNysEbSj7z9i0dTzMHNkUTxa
+         i+dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=mf2mQtl5Jrm98A+7graXanfNE3UgwsoUiK1x4tqEZfo=;
+        b=Oq1jdSO75u7pRotXy3Ue2iedrZKBWy4EXv8F/dyIePrPjVakQIChBJPopgW6UT3eIj
+         EZw72GrXOgWhCofUHnQOVnOH5qoJec0UxeFeR4Dl1DEkvDyNWiRz8gunZIih1+EgGE0O
+         HnuZlzN45sVABYiO7YJDn1LYxpUMXl3yex5221cP7sPX1sUVQYe3zuEJJhUPmfEzNI2M
+         IezOe94ScjLOpl+d10Q6joL22thCKmE8aDgi73Ordc/jf9xxCm2QPC9vaDRA2Xuamb1c
+         y6WqRwa1DMWKvfZYapKVOBikILH9ThGrA0F6ZgEEKHD9kmL1FMjC9DVKWVYVnA9nKeR9
+         tVyA==
+X-Gm-Message-State: AOAM533tDZmuou3KfTyZ16k5fvyH5CaWTCDa77HOXj4DTLLVR31bhRGN
+        R82B2lvtw9b19vc7DpPXegHWNkJYShw=
+X-Google-Smtp-Source: ABdhPJxTzQGBfB3x2gNsgtCXI3YFBqX/Dl/pGM/hzJHdyCo12Jp4Zeq7xSl2qYmJw9yUCO9EP0cuhQ==
+X-Received: by 2002:a17:90a:2fc5:: with SMTP id n5mr556889pjm.174.1604550269774;
+        Wed, 04 Nov 2020 20:24:29 -0800 (PST)
+Received: from linux-l9pv.suse ([124.11.22.254])
+        by smtp.gmail.com with ESMTPSA id z22sm472782pfa.220.2020.11.04.20.24.25
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 04 Nov 2020 20:24:27 -0800 (PST)
+From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ben Boeckel <me@benboeckel.net>,
+        Randy Dunlap <rdunlap@infradead.org>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Lee, Chun-Yi" <jlee@suse.com>
+Subject: [PATCH v2 0/2] Check codeSigning extended key usage extension
+Date:   Thu,  5 Nov 2020 12:24:04 +0800
+Message-Id: <20201105042406.5783-1-jlee@suse.com>
+X-Mailer: git-send-email 2.12.3
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+NIAP PP_OS certification requests that the OS shall validate the
+CodeSigning extended key usage extension field for integrity
+verifiction of exectable code:
 
-ÔÚ 2020/11/5 1:57, Eric Biggers Ð´µÀ:
-> On Tue, Nov 03, 2020 at 08:15:06PM +0800, l00374334 wrote:
->> From: liqiang <liqiang64@huawei.com>
->>
->> 	In the libz library, the checksum algorithm adler32 usually occupies
->> 	a relatively high hot spot, and the SVE instruction set can easily
->> 	accelerate it, so that the performance of libz library will be
->> 	significantly improved.
->>
->> 	We can divides buf into blocks according to the bit width of SVE,
->> 	and then uses vector registers to perform operations in units of blocks
->> 	to achieve the purpose of acceleration.
->>
->> 	On machines that support ARM64 sve instructions, this algorithm is
->> 	about 3~4 times faster than the algorithm implemented in C language
->> 	in libz. The wider the SVE instruction, the better the acceleration effect.
->>
->> 	Measured on a Taishan 1951 machine that supports 256bit width SVE,
->> 	below are the results of my measured random data of 1M and 10M:
->>
->> 		[root@xxx adler32]# ./benchmark 1000000
->> 		Libz alg: Time used:    608 us, 1644.7 Mb/s.
->> 		SVE  alg: Time used:    166 us, 6024.1 Mb/s.
->>
->> 		[root@xxx adler32]# ./benchmark 10000000
->> 		Libz alg: Time used:   6484 us, 1542.3 Mb/s.
->> 		SVE  alg: Time used:   2034 us, 4916.4 Mb/s.
->>
->> 	The blocks can be of any size, so the algorithm can automatically adapt
->> 	to SVE hardware with different bit widths without modifying the code.
->>
->>
->> Signed-off-by: liqiang <liqiang64@huawei.com>
-> 
-> Note that this patch does nothing to actually wire up the kernel's copy of libz
-> (lib/zlib_{deflate,inflate}/) to use this implementation of Adler32.  To do so,
-> libz would either need to be changed to use the shash API, or you'd need to
-> implement an adler32() function in lib/crypto/ that automatically uses an
-> accelerated implementation if available, and make libz call it.
-> 
-> Also, in either case a C implementation would be required too.  There can't be
-> just an architecture-specific implementation.
+    https://www.niap-ccevs.org/MMO/PP/-442-/
+        FIA_X509_EXT.1.1
 
-Okay, thank you for the problems and suggestions you gave. I will continue to
-improve my code.
+This patchset adds the logic for parsing the codeSigning EKU extension
+field in X.509. And checking the CodeSigning EKU when verifying
+signature of kernel module or kexec PE binary in PKCS#7.
 
-> 
-> Also as others have pointed out, there's probably not much point in having a SVE
-> implementation of Adler32 when there isn't even a NEON implementation yet.  It's
-> not too hard to implement Adler32 using NEON, and there are already several
-> permissively-licensed NEON implementations out there that could be used as a
-> reference, e.g. my implementation using NEON instrinsics here:
-> https://github.com/ebiggers/libdeflate/blob/v1.6/lib/arm/adler32_impl.h
-> 
-> - Eric
-> .
-> 
+v2:
+Changed the help wording in the Kconfig.
 
-I am very happy to get this NEON implementation code. :)
+Lee, Chun-Yi (2):
+  X.509: Add CodeSigning extended key usage parsing
+  PKCS#7: Check codeSigning EKU for kernel module and kexec pe
+    verification
+
+ certs/system_keyring.c                    |  2 +-
+ crypto/asymmetric_keys/Kconfig            |  9 ++++++++
+ crypto/asymmetric_keys/pkcs7_trust.c      | 37 ++++++++++++++++++++++++++++---
+ crypto/asymmetric_keys/x509_cert_parser.c | 24 ++++++++++++++++++++
+ include/crypto/pkcs7.h                    |  3 ++-
+ include/crypto/public_key.h               |  1 +
+ include/linux/oid_registry.h              |  5 +++++
+ 7 files changed, 76 insertions(+), 5 deletions(-)
 
 -- 
-Best regards,
-Li Qiang
+2.16.4
+
