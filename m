@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F27C2D0A3
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 11:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C900C2D0A3
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 11:29:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C91C206C1
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 11:29:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E705B206C1
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 11:29:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727253AbgKFL3S (ORCPT
+        id S1727263AbgKFL3V (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Nov 2020 06:29:18 -0500
+        Fri, 6 Nov 2020 06:29:21 -0500
 Received: from mga07.intel.com ([134.134.136.100]:59432 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727170AbgKFL3S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Nov 2020 06:29:18 -0500
-IronPort-SDR: cTDwGxV1tYiqpyWkkD70zeKJl9GN7uM9l6ELAmAXUXsjLPUNMzs4bAmPVQEIHrJLw68Pcx2gBB
- CdC04f3I8wuQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9796"; a="233698341"
+        id S1727233AbgKFL3V (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 6 Nov 2020 06:29:21 -0500
+IronPort-SDR: 02rNWVXqGaPP4CAVhWQxal4jiXOdZ5YRriC8fBR56t8WXtvT147tv4WvTPZcymSEBV7Mlr6t9g
+ Kcod5NF0ULSQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9796"; a="233698345"
 X-IronPort-AV: E=Sophos;i="5.77,456,1596524400"; 
-   d="scan'208";a="233698341"
+   d="scan'208";a="233698345"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2020 03:29:17 -0800
-IronPort-SDR: Bzc5mv1ZkLHD8RyzhEkd5k2eGRJslL7e0fpfsQI42Q7W1JhNtanOEol7WRpU7rKzw3q2tsn022
- IdFvX2h7Jpjg==
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2020 03:29:20 -0800
+IronPort-SDR: ST7+LIjcTOepBvaeiTr7hJv7L6P9wzzYDTzVeYU9rzkv88D/aoDKPkzDbefZk9ueGvbd25UYtM
+ mL3lgCaX44Wg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.77,456,1596524400"; 
-   d="scan'208";a="529779370"
+   d="scan'208";a="529779384"
 Received: from haps801-neoncity02.sh.intel.com ([10.67.114.160])
-  by fmsmga005.fm.intel.com with ESMTP; 06 Nov 2020 03:29:16 -0800
+  by fmsmga005.fm.intel.com with ESMTP; 06 Nov 2020 03:29:18 -0800
 From:   Jack Xu <jack.xu@intel.com>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
         Jack Xu <jack.xu@intel.com>,
         Wojciech Ziemba <wojciech.ziemba@intel.com>,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH 26/32] crypto: qat - loader: use ae_mask
-Date:   Fri,  6 Nov 2020 19:28:04 +0800
-Message-Id: <20201106112810.2566-27-jack.xu@intel.com>
+Subject: [PATCH 27/32] crypto: qat - loader: add CSS3K support
+Date:   Fri,  6 Nov 2020 19:28:05 +0800
+Message-Id: <20201106112810.2566-28-jack.xu@intel.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20201106112810.2566-1-jack.xu@intel.com>
 References: <20201106112810.2566-1-jack.xu@intel.com>
@@ -54,131 +54,245 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use ae_mask to decide which Accelerator Engine (AE) to target in AE
-related operations, instead of a sequential loop, to skip AEs that are
-fused out.
+Add support for CSS3K, which uses RSA3K as image signature algorithm,
+to support the next generation of QAT devices.
 
 Signed-off-by: Jack Xu <jack.xu@intel.com>
 Co-developed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
 Signed-off-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
 Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/qat/qat_common/qat_uclo.c | 26 +++++++++++++-----------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+ .../qat/qat_common/icp_qat_fw_loader_handle.h |  1 +
+ drivers/crypto/qat/qat_common/icp_qat_uclo.h  | 54 +++++++++++++------
+ drivers/crypto/qat/qat_common/qat_hal.c       |  2 +
+ drivers/crypto/qat/qat_common/qat_uclo.c      | 51 +++++++++---------
+ 4 files changed, 68 insertions(+), 40 deletions(-)
 
+diff --git a/drivers/crypto/qat/qat_common/icp_qat_fw_loader_handle.h b/drivers/crypto/qat/qat_common/icp_qat_fw_loader_handle.h
+index 81dba42248bf..29710e88e8b8 100644
+--- a/drivers/crypto/qat/qat_common/icp_qat_fw_loader_handle.h
++++ b/drivers/crypto/qat/qat_common/icp_qat_fw_loader_handle.h
+@@ -33,6 +33,7 @@ struct icp_qat_fw_loader_chip_info {
+ 	u32 misc_ctl_csr;
+ 	u32 wakeup_event_val;
+ 	bool fw_auth;
++	bool css_3k;
+ };
+ 
+ struct icp_qat_fw_loader_handle {
+diff --git a/drivers/crypto/qat/qat_common/icp_qat_uclo.h b/drivers/crypto/qat/qat_common/icp_qat_uclo.h
+index 5728a81d9dea..4315b4504c26 100644
+--- a/drivers/crypto/qat/qat_common/icp_qat_uclo.h
++++ b/drivers/crypto/qat/qat_common/icp_qat_uclo.h
+@@ -42,24 +42,48 @@
+ #define ICP_QAT_SUOF_IMAG "SUF_IMAG"
+ #define ICP_QAT_SIMG_AE_INIT_SEQ_LEN    (50 * sizeof(unsigned long long))
+ #define ICP_QAT_SIMG_AE_INSTS_LEN       (0x4000 * sizeof(unsigned long long))
+-#define ICP_QAT_CSS_FWSK_MODULUS_LEN    256
+-#define ICP_QAT_CSS_FWSK_EXPONENT_LEN   4
+-#define ICP_QAT_CSS_FWSK_PAD_LEN        252
+-#define ICP_QAT_CSS_FWSK_PUB_LEN   (ICP_QAT_CSS_FWSK_MODULUS_LEN + \
+-				    ICP_QAT_CSS_FWSK_EXPONENT_LEN + \
+-				    ICP_QAT_CSS_FWSK_PAD_LEN)
+-#define ICP_QAT_CSS_SIGNATURE_LEN   256
++
++#define DSS_FWSK_MODULUS_LEN    384 /* RSA3K */
++#define DSS_FWSK_EXPONENT_LEN   4
++#define DSS_FWSK_PADDING_LEN    380
++#define DSS_SIGNATURE_LEN       384 /* RSA3K */
++
++#define CSS_FWSK_MODULUS_LEN    256 /* RSA2K */
++#define CSS_FWSK_EXPONENT_LEN   4
++#define CSS_FWSK_PADDING_LEN    252
++#define CSS_SIGNATURE_LEN       256 /* RSA2K */
++
++#define ICP_QAT_CSS_FWSK_MODULUS_LEN(handle)	((handle)->chip_info->css_3k ? \
++						DSS_FWSK_MODULUS_LEN  : \
++						CSS_FWSK_MODULUS_LEN)
++
++#define ICP_QAT_CSS_FWSK_EXPONENT_LEN(handle)	((handle)->chip_info->css_3k ? \
++						DSS_FWSK_EXPONENT_LEN : \
++						CSS_FWSK_EXPONENT_LEN)
++
++#define ICP_QAT_CSS_FWSK_PAD_LEN(handle)	((handle)->chip_info->css_3k ? \
++						DSS_FWSK_PADDING_LEN : \
++						CSS_FWSK_PADDING_LEN)
++
++#define ICP_QAT_CSS_FWSK_PUB_LEN(handle)	(ICP_QAT_CSS_FWSK_MODULUS_LEN(handle) + \
++						ICP_QAT_CSS_FWSK_EXPONENT_LEN(handle) + \
++						ICP_QAT_CSS_FWSK_PAD_LEN(handle))
++
++#define ICP_QAT_CSS_SIGNATURE_LEN(handle)	((handle)->chip_info->css_3k ? \
++						DSS_SIGNATURE_LEN : \
++						CSS_SIGNATURE_LEN)
++
+ #define ICP_QAT_CSS_AE_IMG_LEN     (sizeof(struct icp_qat_simg_ae_mode) + \
+ 				    ICP_QAT_SIMG_AE_INIT_SEQ_LEN +         \
+ 				    ICP_QAT_SIMG_AE_INSTS_LEN)
+-#define ICP_QAT_CSS_AE_SIMG_LEN    (sizeof(struct icp_qat_css_hdr) + \
+-				    ICP_QAT_CSS_FWSK_PUB_LEN + \
+-				    ICP_QAT_CSS_SIGNATURE_LEN + \
+-				    ICP_QAT_CSS_AE_IMG_LEN)
+-#define ICP_QAT_AE_IMG_OFFSET	   (sizeof(struct icp_qat_css_hdr) + \
+-				    ICP_QAT_CSS_FWSK_MODULUS_LEN + \
+-				    ICP_QAT_CSS_FWSK_EXPONENT_LEN + \
+-				    ICP_QAT_CSS_SIGNATURE_LEN)
++#define ICP_QAT_CSS_AE_SIMG_LEN(handle) (sizeof(struct icp_qat_css_hdr) + \
++					ICP_QAT_CSS_FWSK_PUB_LEN(handle) + \
++					ICP_QAT_CSS_SIGNATURE_LEN(handle) + \
++					ICP_QAT_CSS_AE_IMG_LEN)
++#define ICP_QAT_AE_IMG_OFFSET(handle) (sizeof(struct icp_qat_css_hdr) + \
++					ICP_QAT_CSS_FWSK_MODULUS_LEN(handle) + \
++					ICP_QAT_CSS_FWSK_EXPONENT_LEN(handle) + \
++					ICP_QAT_CSS_SIGNATURE_LEN(handle))
+ #define ICP_QAT_CSS_MAX_IMAGE_LEN   0x40000
+ 
+ #define ICP_QAT_CTX_MODE(ae_mode) ((ae_mode) & 0xf)
+diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
+index eae1a5e0efeb..8470139bcfe8 100644
+--- a/drivers/crypto/qat/qat_common/qat_hal.c
++++ b/drivers/crypto/qat/qat_common/qat_hal.c
+@@ -706,6 +706,7 @@ static int qat_hal_chip_init(struct icp_qat_fw_loader_handle *handle,
+ 		handle->chip_info->misc_ctl_csr = MISC_CONTROL;
+ 		handle->chip_info->wakeup_event_val = WAKEUP_EVENT;
+ 		handle->chip_info->fw_auth = true;
++		handle->chip_info->css_3k = false;
+ 		break;
+ 	case PCI_DEVICE_ID_INTEL_QAT_DH895XCC:
+ 		handle->chip_info->sram_visible = true;
+@@ -717,6 +718,7 @@ static int qat_hal_chip_init(struct icp_qat_fw_loader_handle *handle,
+ 		handle->chip_info->misc_ctl_csr = MISC_CONTROL;
+ 		handle->chip_info->wakeup_event_val = WAKEUP_EVENT;
+ 		handle->chip_info->fw_auth = false;
++		handle->chip_info->css_3k = false;
+ 		break;
+ 	default:
+ 		ret = -EINVAL;
 diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
-index 7b02c4e165c6..0b1cf0708e2e 100644
+index 0b1cf0708e2e..933b6357971f 100644
 --- a/drivers/crypto/qat/qat_common/qat_uclo.c
 +++ b/drivers/crypto/qat/qat_common/qat_uclo.c
-@@ -373,6 +373,7 @@ static int qat_uclo_init_ustore(struct icp_qat_fw_loader_handle *handle,
- 	unsigned int ustore_size;
- 	unsigned int patt_pos;
- 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
-+	unsigned long ae_mask = handle->hal_handle->ae_mask;
- 	u64 *fill_data;
+@@ -1039,10 +1039,11 @@ static int qat_uclo_map_suof_file_hdr(struct icp_qat_fw_loader_handle *handle,
+ 	return 0;
+ }
  
- 	uof_image = image->img_ptr;
-@@ -385,7 +386,7 @@ static int qat_uclo_init_ustore(struct icp_qat_fw_loader_handle *handle,
- 		       sizeof(u64));
- 	page = image->page;
- 
--	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
-+	for_each_set_bit(ae, &ae_mask, handle->hal_handle->ae_max_num) {
- 		if (!test_bit(ae, (unsigned long *)&uof_image->ae_assigned))
- 			continue;
- 		ustore_size = obj_handle->ae_data[ae].eff_ustore_size;
-@@ -406,6 +407,7 @@ static int qat_uclo_init_memory(struct icp_qat_fw_loader_handle *handle)
- 	int i, ae;
- 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
- 	struct icp_qat_uof_initmem *initmem = obj_handle->init_mem_tab.init_mem;
-+	unsigned long ae_mask = handle->hal_handle->ae_mask;
- 
- 	for (i = 0; i < obj_handle->init_mem_tab.entry_num; i++) {
- 		if (initmem->num_in_bytes) {
-@@ -418,7 +420,8 @@ static int qat_uclo_init_memory(struct icp_qat_fw_loader_handle *handle)
- 			(sizeof(struct icp_qat_uof_memvar_attr) *
- 			initmem->val_attr_num));
- 	}
--	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
-+
-+	for_each_set_bit(ae, &ae_mask, handle->hal_handle->ae_max_num) {
- 		if (qat_hal_batch_wr_lm(handle, ae,
- 					obj_handle->lm_init_tab[ae])) {
- 			pr_err("QAT: fail to batch init lmem for AE %d\n", ae);
-@@ -649,11 +652,9 @@ static int qat_uclo_map_ae(struct icp_qat_fw_loader_handle *handle, int max_ae)
- 	int i, ae;
- 	int mflag = 0;
- 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
-+	unsigned long ae_mask = handle->hal_handle->ae_mask;
- 
--	for (ae = 0; ae < max_ae; ae++) {
--		if (!test_bit(ae,
--			      (unsigned long *)&handle->hal_handle->ae_mask))
--			continue;
-+	for_each_set_bit(ae, &ae_mask, max_ae) {
- 		for (i = 0; i < obj_handle->uimage_num; i++) {
- 			if (!test_bit(ae, (unsigned long *)
- 			&obj_handle->ae_uimage[i].img_ptr->ae_assigned))
-@@ -845,6 +846,7 @@ static int qat_uclo_init_reg_sym(struct icp_qat_fw_loader_handle *handle,
- static int qat_uclo_init_globals(struct icp_qat_fw_loader_handle *handle)
+-static void qat_uclo_map_simg(struct icp_qat_suof_handle *suof_handle,
++static void qat_uclo_map_simg(struct icp_qat_fw_loader_handle *handle,
+ 			      struct icp_qat_suof_img_hdr *suof_img_hdr,
+ 			      struct icp_qat_suof_chunk_hdr *suof_chunk_hdr)
  {
- 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
-+	unsigned long ae_mask = handle->hal_handle->ae_mask;
- 	struct icp_qat_uclo_aedata *aed;
- 	unsigned int s, ae;
++	struct icp_qat_suof_handle *suof_handle = handle->sobj_handle;
+ 	struct icp_qat_simg_ae_mode *ae_mode;
+ 	struct icp_qat_suof_objhdr *suof_objhdr;
  
-@@ -857,7 +859,7 @@ static int qat_uclo_init_globals(struct icp_qat_fw_loader_handle *handle)
- 		}
+@@ -1057,10 +1058,10 @@ static void qat_uclo_map_simg(struct icp_qat_suof_handle *suof_handle,
+ 	suof_img_hdr->css_key = (suof_img_hdr->css_header +
+ 				 sizeof(struct icp_qat_css_hdr));
+ 	suof_img_hdr->css_signature = suof_img_hdr->css_key +
+-				      ICP_QAT_CSS_FWSK_MODULUS_LEN +
+-				      ICP_QAT_CSS_FWSK_EXPONENT_LEN;
++				      ICP_QAT_CSS_FWSK_MODULUS_LEN(handle) +
++				      ICP_QAT_CSS_FWSK_EXPONENT_LEN(handle);
+ 	suof_img_hdr->css_simg = suof_img_hdr->css_signature +
+-				 ICP_QAT_CSS_SIGNATURE_LEN;
++				 ICP_QAT_CSS_SIGNATURE_LEN(handle);
+ 
+ 	ae_mode = (struct icp_qat_simg_ae_mode *)(suof_img_hdr->css_simg);
+ 	suof_img_hdr->ae_mask = ae_mode->ae_mask;
+@@ -1169,7 +1170,7 @@ static int qat_uclo_map_suof(struct icp_qat_fw_loader_handle *handle,
  	}
  
--	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
-+	for_each_set_bit(ae, &ae_mask, handle->hal_handle->ae_max_num) {
- 		aed = &obj_handle->ae_data[ae];
- 		for (s = 0; s < aed->slice_num; s++) {
- 			if (!aed->ae_slices[s].encap_image)
-@@ -932,9 +934,7 @@ static int qat_uclo_set_ae_mode(struct icp_qat_fw_loader_handle *handle)
- 	unsigned char ae, s;
- 	int error;
+ 	for (i = 0; i < suof_handle->img_table.num_simgs; i++) {
+-		qat_uclo_map_simg(handle->sobj_handle, &suof_img_hdr[i],
++		qat_uclo_map_simg(handle, &suof_img_hdr[i],
+ 				  &suof_chunk_hdr[1 + i]);
+ 		ret = qat_uclo_check_simg_compat(handle,
+ 						 &suof_img_hdr[i]);
+@@ -1270,13 +1271,13 @@ static int qat_uclo_map_auth_fw(struct icp_qat_fw_loader_handle *handle,
+ 	unsigned int length, simg_offset = sizeof(*auth_chunk);
+ 	struct icp_firml_dram_desc img_desc;
  
--	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
--		if (!test_bit(ae, &ae_mask))
--			continue;
-+	for_each_set_bit(ae, &ae_mask, handle->hal_handle->ae_max_num) {
- 		ae_data = &obj_handle->ae_data[ae];
- 		for (s = 0; s < min_t(unsigned int, ae_data->slice_num,
- 				      ICP_QAT_UCLO_MAX_CTX); s++) {
-@@ -1372,13 +1372,14 @@ static int qat_uclo_load_fw(struct icp_qat_fw_loader_handle *handle,
- 	unsigned int fcu_sts;
- 	struct icp_qat_simg_ae_mode *virt_addr;
- 	unsigned int fcu_loaded_ae_pos = FCU_LOADED_AE_POS;
-+	unsigned long ae_mask = handle->hal_handle->ae_mask;
+-	if (size > (ICP_QAT_AE_IMG_OFFSET + ICP_QAT_CSS_MAX_IMAGE_LEN)) {
++	if (size > (ICP_QAT_AE_IMG_OFFSET(handle) + ICP_QAT_CSS_MAX_IMAGE_LEN)) {
+ 		pr_err("QAT: error, input image size overflow %d\n", size);
+ 		return -EINVAL;
+ 	}
+ 	length = (css_hdr->fw_type == CSS_AE_FIRMWARE) ?
+-		 ICP_QAT_CSS_AE_SIMG_LEN + simg_offset :
+-		 size + ICP_QAT_CSS_FWSK_PAD_LEN + simg_offset;
++		 ICP_QAT_CSS_AE_SIMG_LEN(handle) + simg_offset :
++		 size + ICP_QAT_CSS_FWSK_PAD_LEN(handle) + simg_offset;
+ 	if (qat_uclo_simg_alloc(handle, &img_desc, length)) {
+ 		pr_err("QAT: error, allocate continuous dram fail\n");
+ 		return -ENOMEM;
+@@ -1303,42 +1304,42 @@ static int qat_uclo_map_auth_fw(struct icp_qat_fw_loader_handle *handle,
  
+ 	memcpy((void *)(uintptr_t)virt_addr,
+ 	       (void *)(image + sizeof(*css_hdr)),
+-	       ICP_QAT_CSS_FWSK_MODULUS_LEN);
++	       ICP_QAT_CSS_FWSK_MODULUS_LEN(handle));
+ 	/* padding */
+-	memset((void *)(uintptr_t)(virt_addr + ICP_QAT_CSS_FWSK_MODULUS_LEN),
+-	       0, ICP_QAT_CSS_FWSK_PAD_LEN);
++	memset((void *)(uintptr_t)(virt_addr + ICP_QAT_CSS_FWSK_MODULUS_LEN(handle)),
++	       0, ICP_QAT_CSS_FWSK_PAD_LEN(handle));
+ 
+ 	/* exponent */
+-	memcpy((void *)(uintptr_t)(virt_addr + ICP_QAT_CSS_FWSK_MODULUS_LEN +
+-	       ICP_QAT_CSS_FWSK_PAD_LEN),
++	memcpy((void *)(uintptr_t)(virt_addr + ICP_QAT_CSS_FWSK_MODULUS_LEN(handle) +
++	       ICP_QAT_CSS_FWSK_PAD_LEN(handle)),
+ 	       (void *)(image + sizeof(*css_hdr) +
+-			ICP_QAT_CSS_FWSK_MODULUS_LEN),
++			ICP_QAT_CSS_FWSK_MODULUS_LEN(handle)),
+ 	       sizeof(unsigned int));
+ 
+ 	/* signature */
+ 	bus_addr = ADD_ADDR(auth_desc->fwsk_pub_high,
+ 			    auth_desc->fwsk_pub_low) +
+-		   ICP_QAT_CSS_FWSK_PUB_LEN;
+-	virt_addr = virt_addr + ICP_QAT_CSS_FWSK_PUB_LEN;
++		   ICP_QAT_CSS_FWSK_PUB_LEN(handle);
++	virt_addr = virt_addr + ICP_QAT_CSS_FWSK_PUB_LEN(handle);
+ 	auth_desc->signature_high = (unsigned int)(bus_addr >> BITS_IN_DWORD);
+ 	auth_desc->signature_low = (unsigned int)bus_addr;
+ 
+ 	memcpy((void *)(uintptr_t)virt_addr,
+ 	       (void *)(image + sizeof(*css_hdr) +
+-	       ICP_QAT_CSS_FWSK_MODULUS_LEN +
+-	       ICP_QAT_CSS_FWSK_EXPONENT_LEN),
+-	       ICP_QAT_CSS_SIGNATURE_LEN);
++	       ICP_QAT_CSS_FWSK_MODULUS_LEN(handle) +
++	       ICP_QAT_CSS_FWSK_EXPONENT_LEN(handle)),
++	       ICP_QAT_CSS_SIGNATURE_LEN(handle));
+ 
+ 	bus_addr = ADD_ADDR(auth_desc->signature_high,
+ 			    auth_desc->signature_low) +
+-		   ICP_QAT_CSS_SIGNATURE_LEN;
+-	virt_addr += ICP_QAT_CSS_SIGNATURE_LEN;
++		   ICP_QAT_CSS_SIGNATURE_LEN(handle);
++	virt_addr += ICP_QAT_CSS_SIGNATURE_LEN(handle);
+ 
+ 	auth_desc->img_high = (unsigned int)(bus_addr >> BITS_IN_DWORD);
+ 	auth_desc->img_low = (unsigned int)bus_addr;
+-	auth_desc->img_len = size - ICP_QAT_AE_IMG_OFFSET;
++	auth_desc->img_len = size - ICP_QAT_AE_IMG_OFFSET(handle);
+ 	memcpy((void *)(uintptr_t)virt_addr,
+-	       (void *)(image + ICP_QAT_AE_IMG_OFFSET),
++	       (void *)(image + ICP_QAT_AE_IMG_OFFSET(handle)),
+ 	       auth_desc->img_len);
+ 	virt_addr = virt_base;
+ 	/* AE firmware */
+@@ -1377,8 +1378,8 @@ static int qat_uclo_load_fw(struct icp_qat_fw_loader_handle *handle,
  	virt_addr = (void *)((uintptr_t)desc +
  		     sizeof(struct icp_qat_auth_chunk) +
  		     sizeof(struct icp_qat_css_hdr) +
- 		     ICP_QAT_CSS_FWSK_PUB_LEN +
- 		     ICP_QAT_CSS_SIGNATURE_LEN);
--	for (i = 0; i < handle->hal_handle->ae_max_num; i++) {
-+	for_each_set_bit(i, &ae_mask, handle->hal_handle->ae_max_num) {
+-		     ICP_QAT_CSS_FWSK_PUB_LEN +
+-		     ICP_QAT_CSS_SIGNATURE_LEN);
++		     ICP_QAT_CSS_FWSK_PUB_LEN(handle) +
++		     ICP_QAT_CSS_SIGNATURE_LEN(handle));
+ 	for_each_set_bit(i, &ae_mask, handle->hal_handle->ae_max_num) {
  		int retry = 0;
- 
- 		if (!((virt_addr->ae_mask >> i) & 0x1))
-@@ -1847,6 +1848,7 @@ static void qat_uclo_wr_uimage_page(struct icp_qat_fw_loader_handle *handle,
- 				    struct icp_qat_uof_image *image)
- {
- 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
-+	unsigned long ae_mask = handle->hal_handle->ae_mask;
- 	unsigned long ae_assigned = image->ae_assigned;
- 	struct icp_qat_uclo_aedata *aed;
- 	unsigned int ctx_mask, s;
-@@ -1860,7 +1862,7 @@ static void qat_uclo_wr_uimage_page(struct icp_qat_fw_loader_handle *handle,
- 		ctx_mask = 0x55;
- 	/* load the default page and set assigned CTX PC
- 	 * to the entrypoint address */
--	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
-+	for_each_set_bit(ae, &ae_mask, handle->hal_handle->ae_max_num) {
- 		if (!test_bit(ae, &ae_assigned))
- 			continue;
  
 -- 
 2.25.4
