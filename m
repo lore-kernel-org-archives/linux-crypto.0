@@ -7,67 +7,89 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F29C2D0A3
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 07:01:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EC6AC2D0A3
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 07:01:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 930E1206F4
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 07:01:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3D53206F4
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 07:01:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725837AbgKFHBI (ORCPT
+        id S1726190AbgKFHBl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Nov 2020 02:01:08 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:35008 "EHLO fornost.hmeau.com"
+        Fri, 6 Nov 2020 02:01:41 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:35026 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725828AbgKFHBH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Nov 2020 02:01:07 -0500
+        id S1725828AbgKFHBl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 6 Nov 2020 02:01:41 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kavk8-0007zq-Nj; Fri, 06 Nov 2020 18:01:05 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Nov 2020 18:01:04 +1100
-Date:   Fri, 6 Nov 2020 18:01:04 +1100
+        id 1kavkQ-00080h-KI; Fri, 06 Nov 2020 18:01:23 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Nov 2020 18:01:22 +1100
+Date:   Fri, 6 Nov 2020 18:01:22 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>
-Cc:     Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>,
-        Andrei Botila <andrei.botila@nxp.com>,
-        Dragos Rosioru <dragos.rosioru@nxp.com>
-Subject: Re: [PATCH v2] crypto: caam - enable crypto-engine retry mechanism
-Message-ID: <20201106070104.GB11620@gondor.apana.org.au>
-References: <1603739186-4007-1-git-send-email-iuliana.prodan@nxp.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        linux-hardening@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jann Horn <jannh@google.com>,
+        Kees Cook <keescook@chromium.org>,
+        Elena Petrova <lenaptr@google.com>,
+        Vegard Nossum <vegard.nossum@oracle.com>,
+        "Gustavo A . R . Silva" <gustavoars@kernel.org>,
+        stable@vger.kernel.org,
+        syzbot+92ead4eb8e26a26d465e@syzkaller.appspotmail.com
+Subject: Re: [PATCH] crypto: af_alg - avoid undefined behavior accessing
+ salg_name
+Message-ID: <20201106070122.GC11620@gondor.apana.org.au>
+References: <CACT4Y+beaHrWisaSsV90xQn+t2Xn-bxvVgmx8ih_h=yJYPjs4A@mail.gmail.com>
+ <20201026200715.170261-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1603739186-4007-1-git-send-email-iuliana.prodan@nxp.com>
+In-Reply-To: <20201026200715.170261-1-ebiggers@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 26, 2020 at 09:06:26PM +0200, Iuliana Prodan wrote:
-> Use the new crypto_engine_alloc_init_and_set() function to
-> initialize crypto-engine and enable retry mechanism.
+On Mon, Oct 26, 2020 at 01:07:15PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Set the maximum size for crypto-engine software queue based on
-> Job Ring size (JOBR_DEPTH) and a threshold (reserved for the
-> non-crypto-API requests that are not passed through crypto-engine).
+> Commit 3f69cc60768b ("crypto: af_alg - Allow arbitrarily long algorithm
+> names") made the kernel start accepting arbitrarily long algorithm names
+> in sockaddr_alg.  However, the actual length of the salg_name field
+> stayed at the original 64 bytes.
 > 
-> The callback for do_batch_requests is NULL, since CAAM
-> doesn't support linked requests.
+> This is broken because the kernel can access indices >= 64 in salg_name,
+> which is undefined behavior -- even though the memory that is accessed
+> is still located within the sockaddr structure.  It would only be
+> defined behavior if the array were properly marked as arbitrary-length
+> (either by making it a flexible array, which is the recommended way
+> these days, or by making it an array of length 0 or 1).
 > 
-> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+> We can't simply change salg_name into a flexible array, since that would
+> break source compatibility with userspace programs that embed
+> sockaddr_alg into another struct, or (more commonly) declare a
+> sockaddr_alg like 'struct sockaddr_alg sa = { .salg_name = "foo" };'.
+> 
+> One solution would be to change salg_name into a flexible array only
+> when '#ifdef __KERNEL__'.  However, that would keep userspace without an
+> easy way to actually use the longer algorithm names.
+> 
+> Instead, add a new structure 'sockaddr_alg_new' that has the flexible
+> array field, and expose it to both userspace and the kernel.
+> Make the kernel use it correctly in alg_bind().
+> 
+> This addresses the syzbot report
+> "UBSAN: array-index-out-of-bounds in alg_bind"
+> (https://syzkaller.appspot.com/bug?extid=92ead4eb8e26a26d465e).
+> 
+> Reported-by: syzbot+92ead4eb8e26a26d465e@syzkaller.appspotmail.com
+> Fixes: 3f69cc60768b ("crypto: af_alg - Allow arbitrarily long algorithm names")
+> Cc: <stable@vger.kernel.org> # v4.12+
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 > ---
-> Changes since v1:
-> - add comment for THRESHOLD define;
-> - update max size for crypto-engine queue.
-> 
->  drivers/crypto/caam/intern.h | 8 ++++++++
->  drivers/crypto/caam/jr.c     | 4 +++-
->  2 files changed, 11 insertions(+), 1 deletion(-)
+>  crypto/af_alg.c             | 10 +++++++---
+>  include/uapi/linux/if_alg.h | 16 ++++++++++++++++
+>  2 files changed, 23 insertions(+), 3 deletions(-)
 
 Patch applied.  Thanks.
 -- 
