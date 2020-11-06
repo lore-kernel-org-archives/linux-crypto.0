@@ -2,373 +2,155 @@ Return-Path: <SRS0=5ZxX=EM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A54DBC2D0A3
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 16:39:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78AD0C2D0A3
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 17:10:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4170B21556
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 16:39:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1604680787;
-	bh=8kcMktZPC4KxkB1gqgWY39KBBRpCMsSjadnkfrUUfSc=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=x1C2EIP+3FD4BpgH70Rk8/mcB0LzQ+bpltRJxUVe4kE/Tmrl/YBJhPTmIN/8gTtR2
-	 iqCTKjUMjYuXT/VQq1tWf8rIKoH1ISHMykT5GlgCk+Jf+RlBWrqGAyxw/OhRZt27pw
-	 9VDo6R6a0gA9NQKuOb8VnZ779AmGDDzGzNPLNVGk=
+	by mail.kernel.org (Postfix) with ESMTP id 1095F2151B
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 17:10:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="O8ZZhEUu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726765AbgKFQjq (ORCPT
+        id S1726075AbgKFRKw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Nov 2020 11:39:46 -0500
-Received: from mail.kernel.org ([198.145.29.99]:46610 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726928AbgKFQjq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Nov 2020 11:39:46 -0500
-Received: from e123331-lin.nice.arm.com (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C408D2151B;
-        Fri,  6 Nov 2020 16:39:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604680784;
-        bh=8kcMktZPC4KxkB1gqgWY39KBBRpCMsSjadnkfrUUfSc=;
-        h=From:To:Cc:Subject:Date:From;
-        b=ZeqbsKgUBRo7VEJV/+lIms/N/f7xfBv8xmumcfazGrsuoVHrO2AbI2dzpPZDElegl
-         fQY6BSolQJnZMpiiFUfoU772eBkleP7T4M1BtV/pBFHF48Ei23H0yQaucfQ4T/zbhy
-         mch63TkrOqWlQuKwWMqp2ahCoKT4d++XH7tN9p8U=
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH] crypto: arm64/chacha - simplify tail block handling
-Date:   Fri,  6 Nov 2020 17:39:38 +0100
-Message-Id: <20201106163938.3050-1-ardb@kernel.org>
-X-Mailer: git-send-email 2.17.1
+        Fri, 6 Nov 2020 12:10:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40816 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725868AbgKFRKw (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 6 Nov 2020 12:10:52 -0500
+Received: from mail-qv1-xf44.google.com (mail-qv1-xf44.google.com [IPv6:2607:f8b0:4864:20::f44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13607C0613D3
+        for <linux-crypto@vger.kernel.org>; Fri,  6 Nov 2020 09:10:52 -0800 (PST)
+Received: by mail-qv1-xf44.google.com with SMTP id w5so756580qvn.12
+        for <linux-crypto@vger.kernel.org>; Fri, 06 Nov 2020 09:10:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=/T4V4t+QdvwoK1NFTGIFvOZHdTRgisoLRqVT8P2lJvo=;
+        b=O8ZZhEUu0ahk3vx3VEAynSB5X0BHcaeX65/n+GCfnMVQlCjjMM3p23k8VknqbUFUyG
+         xS4iWwZ+m9Z6mkg5EpOdNoMXsSwme47E9SKHvzuTH2cbn6QNDJF2YiIdr4aqoE7iXB/k
+         R26qVZFvuzWp9l9JFughus5JP/AB6TfuCX+HSeXdMTzkEtakFSXtNv9tzCAglH78ZTaw
+         TxKQlv8W2NUJMBS609YgLTLtYOArXV3u02qTZ0YfEviaHGbm+YY/2p/KBah6FMWeQiQ3
+         QQZnfhpfPbY0agR5AT7VNJeqCdJ5FGWJIUDioISdb0gQmdag4avVcFq3hR21efkD9fzo
+         9fZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/T4V4t+QdvwoK1NFTGIFvOZHdTRgisoLRqVT8P2lJvo=;
+        b=I5VI+tis37yZdQ+P1xtcd2xC54z5rYqz/NIpJbx9XpqIW3xlxur3drSPExHqVxo+Uh
+         0K/q9TIkkVFs5zo4qh1AL1ggv4V2KDNfm8EE6m2gMfnvjTwOd7T6ZYJNWBPJ2Rg4WnOA
+         iJUE1J/2wTXVHRIeiyDlGf22WHiOTvyQjVcxysuIvPXAc3ktNxyFV2OeW+BMiaCq8Pgq
+         9bTV+VMsKhKbuJIEq0KhlQDY4orNVq/2pf3POnVjMMxJrew7EtCFbjSJDHjoygrNDICn
+         Lp1vUkdeL1nlpl07r/S1Pqgjtcxd+ufU47LVroreTozJSZE4Vmj5zu3vfZHjqI+uNAH1
+         LzSQ==
+X-Gm-Message-State: AOAM531nO28nmWFMVwbKHImKa5aGJvj0DNNmuuQpTLhRZPtcRM8xAE6U
+        bEIqwFUwde8HKbiOx8E9knTBMA==
+X-Google-Smtp-Source: ABdhPJwF/MdD1qNke+ECauvjnsTNgCBiugOoWghae9wdj3qkdlvkqshdqouzdfR5ybfqevB97gjCZQ==
+X-Received: by 2002:a0c:e346:: with SMTP id a6mr2528444qvm.9.1604682651091;
+        Fri, 06 Nov 2020 09:10:51 -0800 (PST)
+Received: from [192.168.1.45] (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
+        by smtp.gmail.com with ESMTPSA id n4sm799428qkf.42.2020.11.06.09.10.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Nov 2020 09:10:49 -0800 (PST)
+Subject: Re: [PATCH v5 5/9] btrfs: zstd: Switch to the zstd-1.4.6 API
+To:     Nick Terrell <nickrterrell@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        squashfs-devel@lists.sourceforge.net,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-kernel@vger.kernel.org, Kernel Team <Kernel-team@fb.com>,
+        Nick Terrell <terrelln@fb.com>, Chris Mason <clm@fb.com>,
+        Petr Malat <oss@malat.biz>, Johannes Weiner <jweiner@fb.com>,
+        Niket Agarwal <niketa@fb.com>, Yann Collet <cyan@fb.com>
+References: <20201103060535.8460-1-nickrterrell@gmail.com>
+ <20201103060535.8460-6-nickrterrell@gmail.com>
+From:   Josef Bacik <josef@toxicpanda.com>
+Message-ID: <b12254bc-7320-7170-f39d-e76afe1a7561@toxicpanda.com>
+Date:   Fri, 6 Nov 2020 12:10:47 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.4.0
+MIME-Version: 1.0
+In-Reply-To: <20201103060535.8460-6-nickrterrell@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Based on lessons learnt from optimizing the 32-bit version of this driver,
-we can simplify the arm64 version considerably, by reordering the final
-two stores when the last block is not a multiple of 64 bytes. This removes
-the need to use permutation instructions to calculate the elements that are
-clobbered by the final overlapping store, given that the store of the
-penultimate block now follows it, and that one carries the correct values
-for those elements already.
+On 11/3/20 1:05 AM, Nick Terrell wrote:
+> From: Nick Terrell <terrelln@fb.com>
+> 
+> Move away from the compatibility wrapper to the zstd-1.4.6 API. This
+> code is functionally equivalent.
+> 
+> Signed-off-by: Nick Terrell <terrelln@fb.com>
+> ---
+>   fs/btrfs/zstd.c | 48 ++++++++++++++++++++++++++++--------------------
+>   1 file changed, 28 insertions(+), 20 deletions(-)
+> 
+> diff --git a/fs/btrfs/zstd.c b/fs/btrfs/zstd.c
+> index a7367ff573d4..6b466e090cd7 100644
+> --- a/fs/btrfs/zstd.c
+> +++ b/fs/btrfs/zstd.c
+> @@ -16,7 +16,7 @@
+>   #include <linux/refcount.h>
+>   #include <linux/sched.h>
+>   #include <linux/slab.h>
+> -#include <linux/zstd_compat.h>
+> +#include <linux/zstd.h>
+>   #include "misc.h"
+>   #include "compression.h"
+>   #include "ctree.h"
+> @@ -159,8 +159,8 @@ static void zstd_calc_ws_mem_sizes(void)
+>   			zstd_get_btrfs_parameters(level, ZSTD_BTRFS_MAX_INPUT);
+>   		size_t level_size =
+>   			max_t(size_t,
+> -			      ZSTD_CStreamWorkspaceBound(params.cParams),
+> -			      ZSTD_DStreamWorkspaceBound(ZSTD_BTRFS_MAX_INPUT));
+> +			      ZSTD_estimateCStreamSize_usingCParams(params.cParams),
+> +			      ZSTD_estimateDStreamSize(ZSTD_BTRFS_MAX_INPUT));
+>   
+>   		max_size = max_t(size_t, max_size, level_size);
+>   		zstd_ws_mem_sizes[level - 1] = max_size;
+> @@ -389,13 +389,23 @@ int zstd_compress_pages(struct list_head *ws, struct address_space *mapping,
+>   	*total_in = 0;
+>   
+>   	/* Initialize the stream */
+> -	stream = ZSTD_initCStream(params, len, workspace->mem,
+> -			workspace->size);
+> +	stream = ZSTD_initStaticCStream(workspace->mem, workspace->size);
+>   	if (!stream) {
+> -		pr_warn("BTRFS: ZSTD_initCStream failed\n");
+> +		pr_warn("BTRFS: ZSTD_initStaticCStream failed\n");
+>   		ret = -EIO;
+>   		goto out;
+>   	}
+> +	{
+> +		size_t ret2;
+> +
+> +		ret2 = ZSTD_initCStream_advanced(stream, NULL, 0, params, len);
+> +		if (ZSTD_isError(ret2)) {
+> +			pr_warn("BTRFS: ZSTD_initCStream_advanced returned %s\n",
+> +					ZSTD_getErrorName(ret2));
+> +			ret = -EIO;
+> +			goto out;
+> +		}
+> +	}
 
-While at it, simplify the overlapping loads as well, by calculating the
-address of the final overlapping load upfront, and switching to this
-address for every load that would otherwise extend past the end of the
-source buffer.
+Please don't do this, you can just add size_t ret2 at the top and not put this 
+in a block.  Other than that the code looks fine, once you fix that you can add
 
-There is no impact on performance, but the resulting code is substantially
-smaller and easier to follow.
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
-Cc: Eric Biggers <ebiggers@google.com>
-Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- arch/arm64/crypto/chacha-neon-core.S | 193 +++++++-------------
- 1 file changed, 69 insertions(+), 124 deletions(-)
+Thanks,
 
-diff --git a/arch/arm64/crypto/chacha-neon-core.S b/arch/arm64/crypto/chacha-neon-core.S
-index e90386a7db8e..b70ac76f2610 100644
---- a/arch/arm64/crypto/chacha-neon-core.S
-+++ b/arch/arm64/crypto/chacha-neon-core.S
-@@ -195,7 +195,6 @@ SYM_FUNC_START(chacha_4block_xor_neon)
- 	adr_l		x10, .Lpermute
- 	and		x5, x4, #63
- 	add		x10, x10, x5
--	add		x11, x10, #64
- 
- 	//
- 	// This function encrypts four consecutive ChaCha blocks by loading
-@@ -645,11 +644,11 @@ CPU_BE(	  rev		a15, a15	)
- 	zip2		v31.4s, v14.4s, v15.4s
- 	  eor		a15, a15, w9
- 
--	mov		x3, #64
-+	add		x3, x2, x4
-+	sub		x3, x3, #128		// start of last block
-+
- 	subs		x5, x4, #128
--	add		x6, x5, x2
--	csel		x3, x3, xzr, ge
--	csel		x2, x2, x6, ge
-+	csel		x2, x2, x3, ge
- 
- 	// interleave 64-bit words in state n, n+2
- 	zip1		v0.2d, v16.2d, v18.2d
-@@ -658,13 +657,10 @@ CPU_BE(	  rev		a15, a15	)
- 	zip1		v8.2d, v17.2d, v19.2d
- 	zip2		v12.2d, v17.2d, v19.2d
- 	  stp		a2, a3, [x1, #-56]
--	ld1		{v16.16b-v19.16b}, [x2], x3
- 
- 	subs		x6, x4, #192
--	ccmp		x3, xzr, #4, lt
--	add		x7, x6, x2
--	csel		x3, x3, xzr, eq
--	csel		x2, x2, x7, eq
-+	ld1		{v16.16b-v19.16b}, [x2], #64
-+	csel		x2, x2, x3, ge
- 
- 	zip1		v1.2d, v20.2d, v22.2d
- 	zip2		v5.2d, v20.2d, v22.2d
-@@ -672,13 +668,10 @@ CPU_BE(	  rev		a15, a15	)
- 	zip1		v9.2d, v21.2d, v23.2d
- 	zip2		v13.2d, v21.2d, v23.2d
- 	  stp		a6, a7, [x1, #-40]
--	ld1		{v20.16b-v23.16b}, [x2], x3
- 
- 	subs		x7, x4, #256
--	ccmp		x3, xzr, #4, lt
--	add		x8, x7, x2
--	csel		x3, x3, xzr, eq
--	csel		x2, x2, x8, eq
-+	ld1		{v20.16b-v23.16b}, [x2], #64
-+	csel		x2, x2, x3, ge
- 
- 	zip1		v2.2d, v24.2d, v26.2d
- 	zip2		v6.2d, v24.2d, v26.2d
-@@ -686,12 +679,10 @@ CPU_BE(	  rev		a15, a15	)
- 	zip1		v10.2d, v25.2d, v27.2d
- 	zip2		v14.2d, v25.2d, v27.2d
- 	  stp		a10, a11, [x1, #-24]
--	ld1		{v24.16b-v27.16b}, [x2], x3
- 
- 	subs		x8, x4, #320
--	ccmp		x3, xzr, #4, lt
--	add		x9, x8, x2
--	csel		x2, x2, x9, eq
-+	ld1		{v24.16b-v27.16b}, [x2], #64
-+	csel		x2, x2, x3, ge
- 
- 	zip1		v3.2d, v28.2d, v30.2d
- 	zip2		v7.2d, v28.2d, v30.2d
-@@ -699,151 +690,105 @@ CPU_BE(	  rev		a15, a15	)
- 	zip1		v11.2d, v29.2d, v31.2d
- 	zip2		v15.2d, v29.2d, v31.2d
- 	  stp		a14, a15, [x1, #-8]
-+
-+	tbnz		x5, #63, .Lt128
- 	ld1		{v28.16b-v31.16b}, [x2]
- 
- 	// xor with corresponding input, write to output
--	tbnz		x5, #63, 0f
- 	eor		v16.16b, v16.16b, v0.16b
- 	eor		v17.16b, v17.16b, v1.16b
- 	eor		v18.16b, v18.16b, v2.16b
- 	eor		v19.16b, v19.16b, v3.16b
--	st1		{v16.16b-v19.16b}, [x1], #64
--	cbz		x5, .Lout
- 
--	tbnz		x6, #63, 1f
-+	tbnz		x6, #63, .Lt192
-+
- 	eor		v20.16b, v20.16b, v4.16b
- 	eor		v21.16b, v21.16b, v5.16b
- 	eor		v22.16b, v22.16b, v6.16b
- 	eor		v23.16b, v23.16b, v7.16b
--	st1		{v20.16b-v23.16b}, [x1], #64
--	cbz		x6, .Lout
- 
--	tbnz		x7, #63, 2f
-+	st1		{v16.16b-v19.16b}, [x1], #64
-+	tbnz		x7, #63, .Lt256
-+
- 	eor		v24.16b, v24.16b, v8.16b
- 	eor		v25.16b, v25.16b, v9.16b
- 	eor		v26.16b, v26.16b, v10.16b
- 	eor		v27.16b, v27.16b, v11.16b
--	st1		{v24.16b-v27.16b}, [x1], #64
--	cbz		x7, .Lout
- 
--	tbnz		x8, #63, 3f
-+	st1		{v20.16b-v23.16b}, [x1], #64
-+	tbnz		x8, #63, .Lt320
-+
- 	eor		v28.16b, v28.16b, v12.16b
- 	eor		v29.16b, v29.16b, v13.16b
- 	eor		v30.16b, v30.16b, v14.16b
- 	eor		v31.16b, v31.16b, v15.16b
-+
-+	st1		{v24.16b-v27.16b}, [x1], #64
- 	st1		{v28.16b-v31.16b}, [x1]
- 
- .Lout:	frame_pop
- 	ret
- 
--	// fewer than 128 bytes of in/output
--0:	ld1		{v8.16b}, [x10]
--	ld1		{v9.16b}, [x11]
--	movi		v10.16b, #16
--	sub		x2, x1, #64
--	add		x1, x1, x5
--	ld1		{v16.16b-v19.16b}, [x2]
--	tbl		v4.16b, {v0.16b-v3.16b}, v8.16b
--	tbx		v20.16b, {v16.16b-v19.16b}, v9.16b
--	add		v8.16b, v8.16b, v10.16b
--	add		v9.16b, v9.16b, v10.16b
--	tbl		v5.16b, {v0.16b-v3.16b}, v8.16b
--	tbx		v21.16b, {v16.16b-v19.16b}, v9.16b
--	add		v8.16b, v8.16b, v10.16b
--	add		v9.16b, v9.16b, v10.16b
--	tbl		v6.16b, {v0.16b-v3.16b}, v8.16b
--	tbx		v22.16b, {v16.16b-v19.16b}, v9.16b
--	add		v8.16b, v8.16b, v10.16b
--	add		v9.16b, v9.16b, v10.16b
--	tbl		v7.16b, {v0.16b-v3.16b}, v8.16b
--	tbx		v23.16b, {v16.16b-v19.16b}, v9.16b
--
--	eor		v20.16b, v20.16b, v4.16b
--	eor		v21.16b, v21.16b, v5.16b
--	eor		v22.16b, v22.16b, v6.16b
--	eor		v23.16b, v23.16b, v7.16b
--	st1		{v20.16b-v23.16b}, [x1]
--	b		.Lout
--
- 	// fewer than 192 bytes of in/output
--1:	ld1		{v8.16b}, [x10]
--	ld1		{v9.16b}, [x11]
--	movi		v10.16b, #16
--	add		x1, x1, x6
--	tbl		v0.16b, {v4.16b-v7.16b}, v8.16b
--	tbx		v20.16b, {v16.16b-v19.16b}, v9.16b
--	add		v8.16b, v8.16b, v10.16b
--	add		v9.16b, v9.16b, v10.16b
--	tbl		v1.16b, {v4.16b-v7.16b}, v8.16b
--	tbx		v21.16b, {v16.16b-v19.16b}, v9.16b
--	add		v8.16b, v8.16b, v10.16b
--	add		v9.16b, v9.16b, v10.16b
--	tbl		v2.16b, {v4.16b-v7.16b}, v8.16b
--	tbx		v22.16b, {v16.16b-v19.16b}, v9.16b
--	add		v8.16b, v8.16b, v10.16b
--	add		v9.16b, v9.16b, v10.16b
--	tbl		v3.16b, {v4.16b-v7.16b}, v8.16b
--	tbx		v23.16b, {v16.16b-v19.16b}, v9.16b
--
--	eor		v20.16b, v20.16b, v0.16b
--	eor		v21.16b, v21.16b, v1.16b
--	eor		v22.16b, v22.16b, v2.16b
--	eor		v23.16b, v23.16b, v3.16b
--	st1		{v20.16b-v23.16b}, [x1]
-+.Lt192:	cbz		x5, 1f				// exactly 128 bytes?
-+	ld1		{v28.16b-v31.16b}, [x10]
-+	add		x5, x5, x1
-+	tbl		v28.16b, {v4.16b-v7.16b}, v28.16b
-+	tbl		v29.16b, {v4.16b-v7.16b}, v29.16b
-+	tbl		v30.16b, {v4.16b-v7.16b}, v30.16b
-+	tbl		v31.16b, {v4.16b-v7.16b}, v31.16b
-+
-+0:	eor		v20.16b, v20.16b, v28.16b
-+	eor		v21.16b, v21.16b, v29.16b
-+	eor		v22.16b, v22.16b, v30.16b
-+	eor		v23.16b, v23.16b, v31.16b
-+	st1		{v20.16b-v23.16b}, [x5]		// overlapping stores
-+1:	st1		{v16.16b-v19.16b}, [x1]
- 	b		.Lout
- 
-+	// fewer than 128 bytes of in/output
-+.Lt128:	ld1		{v28.16b-v31.16b}, [x10]
-+	add		x5, x5, x1
-+	sub		x1, x1, #64
-+	tbl		v28.16b, {v0.16b-v3.16b}, v28.16b
-+	tbl		v29.16b, {v0.16b-v3.16b}, v29.16b
-+	tbl		v30.16b, {v0.16b-v3.16b}, v30.16b
-+	tbl		v31.16b, {v0.16b-v3.16b}, v31.16b
-+	ld1		{v16.16b-v19.16b}, [x1]		// reload first output block
-+	b		0b
-+
- 	// fewer than 256 bytes of in/output
--2:	ld1		{v4.16b}, [x10]
--	ld1		{v5.16b}, [x11]
--	movi		v6.16b, #16
--	add		x1, x1, x7
-+.Lt256:	cbz		x6, 2f				// exactly 192 bytes?
-+	ld1		{v4.16b-v7.16b}, [x10]
-+	add		x6, x6, x1
- 	tbl		v0.16b, {v8.16b-v11.16b}, v4.16b
--	tbx		v24.16b, {v20.16b-v23.16b}, v5.16b
--	add		v4.16b, v4.16b, v6.16b
--	add		v5.16b, v5.16b, v6.16b
--	tbl		v1.16b, {v8.16b-v11.16b}, v4.16b
--	tbx		v25.16b, {v20.16b-v23.16b}, v5.16b
--	add		v4.16b, v4.16b, v6.16b
--	add		v5.16b, v5.16b, v6.16b
--	tbl		v2.16b, {v8.16b-v11.16b}, v4.16b
--	tbx		v26.16b, {v20.16b-v23.16b}, v5.16b
--	add		v4.16b, v4.16b, v6.16b
--	add		v5.16b, v5.16b, v6.16b
--	tbl		v3.16b, {v8.16b-v11.16b}, v4.16b
--	tbx		v27.16b, {v20.16b-v23.16b}, v5.16b
--
--	eor		v24.16b, v24.16b, v0.16b
--	eor		v25.16b, v25.16b, v1.16b
--	eor		v26.16b, v26.16b, v2.16b
--	eor		v27.16b, v27.16b, v3.16b
--	st1		{v24.16b-v27.16b}, [x1]
-+	tbl		v1.16b, {v8.16b-v11.16b}, v5.16b
-+	tbl		v2.16b, {v8.16b-v11.16b}, v6.16b
-+	tbl		v3.16b, {v8.16b-v11.16b}, v7.16b
-+
-+	eor		v28.16b, v28.16b, v0.16b
-+	eor		v29.16b, v29.16b, v1.16b
-+	eor		v30.16b, v30.16b, v2.16b
-+	eor		v31.16b, v31.16b, v3.16b
-+	st1		{v28.16b-v31.16b}, [x6]		// overlapping stores
-+2:	st1		{v20.16b-v23.16b}, [x1]
- 	b		.Lout
- 
- 	// fewer than 320 bytes of in/output
--3:	ld1		{v4.16b}, [x10]
--	ld1		{v5.16b}, [x11]
--	movi		v6.16b, #16
--	add		x1, x1, x8
-+.Lt320:	cbz		x7, 3f				// exactly 256 bytes?
-+	ld1		{v4.16b-v7.16b}, [x10]
-+	add		x7, x7, x1
- 	tbl		v0.16b, {v12.16b-v15.16b}, v4.16b
--	tbx		v28.16b, {v24.16b-v27.16b}, v5.16b
--	add		v4.16b, v4.16b, v6.16b
--	add		v5.16b, v5.16b, v6.16b
--	tbl		v1.16b, {v12.16b-v15.16b}, v4.16b
--	tbx		v29.16b, {v24.16b-v27.16b}, v5.16b
--	add		v4.16b, v4.16b, v6.16b
--	add		v5.16b, v5.16b, v6.16b
--	tbl		v2.16b, {v12.16b-v15.16b}, v4.16b
--	tbx		v30.16b, {v24.16b-v27.16b}, v5.16b
--	add		v4.16b, v4.16b, v6.16b
--	add		v5.16b, v5.16b, v6.16b
--	tbl		v3.16b, {v12.16b-v15.16b}, v4.16b
--	tbx		v31.16b, {v24.16b-v27.16b}, v5.16b
-+	tbl		v1.16b, {v12.16b-v15.16b}, v5.16b
-+	tbl		v2.16b, {v12.16b-v15.16b}, v6.16b
-+	tbl		v3.16b, {v12.16b-v15.16b}, v7.16b
- 
- 	eor		v28.16b, v28.16b, v0.16b
- 	eor		v29.16b, v29.16b, v1.16b
- 	eor		v30.16b, v30.16b, v2.16b
- 	eor		v31.16b, v31.16b, v3.16b
--	st1		{v28.16b-v31.16b}, [x1]
-+	st1		{v28.16b-v31.16b}, [x7]		// overlapping stores
-+3:	st1		{v24.16b-v27.16b}, [x1]
- 	b		.Lout
- SYM_FUNC_END(chacha_4block_xor_neon)
- 
-@@ -851,7 +796,7 @@ SYM_FUNC_END(chacha_4block_xor_neon)
- 	.align		L1_CACHE_SHIFT
- .Lpermute:
- 	.set		.Li, 0
--	.rept		192
-+	.rept		128
- 	.byte		(.Li - 64)
- 	.set		.Li, .Li + 1
- 	.endr
--- 
-2.17.1
-
+Josef
