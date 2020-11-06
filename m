@@ -2,268 +2,373 @@ Return-Path: <SRS0=5ZxX=EM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44953C55179
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 11:29:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A54DBC2D0A3
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 16:39:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EEADC206C1
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 11:29:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4170B21556
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Nov 2020 16:39:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1604680787;
+	bh=8kcMktZPC4KxkB1gqgWY39KBBRpCMsSjadnkfrUUfSc=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=x1C2EIP+3FD4BpgH70Rk8/mcB0LzQ+bpltRJxUVe4kE/Tmrl/YBJhPTmIN/8gTtR2
+	 iqCTKjUMjYuXT/VQq1tWf8rIKoH1ISHMykT5GlgCk+Jf+RlBWrqGAyxw/OhRZt27pw
+	 9VDo6R6a0gA9NQKuOb8VnZ779AmGDDzGzNPLNVGk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727220AbgKFL33 (ORCPT
+        id S1726765AbgKFQjq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Nov 2020 06:29:29 -0500
-Received: from mga07.intel.com ([134.134.136.100]:59432 "EHLO mga07.intel.com"
+        Fri, 6 Nov 2020 11:39:46 -0500
+Received: from mail.kernel.org ([198.145.29.99]:46610 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727170AbgKFL33 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Nov 2020 06:29:29 -0500
-IronPort-SDR: in51/2GNbJAn2lajSk6hRy9avGQuOjpNRFDore+isnIzzLQ0dv+FfiFDM7atvkt34PO1BQ3NR8
- NfNbn9csT/8Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9796"; a="233698366"
-X-IronPort-AV: E=Sophos;i="5.77,456,1596524400"; 
-   d="scan'208";a="233698366"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2020 03:29:28 -0800
-IronPort-SDR: /P2Y/mOCB0qYxNoOgQpYaA36/j05G1ESPzUfX7h2CfypqbqYsI/FlJs9/N9Fj7EAIKcrGqv4Sq
- eSJSFoWS9zVg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,456,1596524400"; 
-   d="scan'208";a="529779450"
-Received: from haps801-neoncity02.sh.intel.com ([10.67.114.160])
-  by fmsmga005.fm.intel.com with ESMTP; 06 Nov 2020 03:29:27 -0800
-From:   Jack Xu <jack.xu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Jack Xu <jack.xu@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH 32/32] crypto: qat - loader: add gen4 firmware loader
-Date:   Fri,  6 Nov 2020 19:28:10 +0800
-Message-Id: <20201106112810.2566-33-jack.xu@intel.com>
-X-Mailer: git-send-email 2.25.4
-In-Reply-To: <20201106112810.2566-1-jack.xu@intel.com>
-References: <20201106112810.2566-1-jack.xu@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1726928AbgKFQjq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 6 Nov 2020 11:39:46 -0500
+Received: from e123331-lin.nice.arm.com (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C408D2151B;
+        Fri,  6 Nov 2020 16:39:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1604680784;
+        bh=8kcMktZPC4KxkB1gqgWY39KBBRpCMsSjadnkfrUUfSc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=ZeqbsKgUBRo7VEJV/+lIms/N/f7xfBv8xmumcfazGrsuoVHrO2AbI2dzpPZDElegl
+         fQY6BSolQJnZMpiiFUfoU772eBkleP7T4M1BtV/pBFHF48Ei23H0yQaucfQ4T/zbhy
+         mch63TkrOqWlQuKwWMqp2ahCoKT4d++XH7tN9p8U=
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>,
+        Eric Biggers <ebiggers@google.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH] crypto: arm64/chacha - simplify tail block handling
+Date:   Fri,  6 Nov 2020 17:39:38 +0100
+Message-Id: <20201106163938.3050-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add support for the QAT gen4 devices in the firmware loader.
+Based on lessons learnt from optimizing the 32-bit version of this driver,
+we can simplify the arm64 version considerably, by reordering the final
+two stores when the last block is not a multiple of 64 bytes. This removes
+the need to use permutation instructions to calculate the elements that are
+clobbered by the final overlapping store, given that the store of the
+penultimate block now follows it, and that one carries the correct values
+for those elements already.
 
-Signed-off-by: Jack Xu <jack.xu@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+While at it, simplify the overlapping loads as well, by calculating the
+address of the final overlapping load upfront, and switching to this
+address for every load that would otherwise extend past the end of the
+source buffer.
+
+There is no impact on performance, but the resulting code is substantially
+smaller and easier to follow.
+
+Cc: Eric Biggers <ebiggers@google.com>
+Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- .../crypto/qat/qat_common/adf_accel_devices.h |  2 +
- drivers/crypto/qat/qat_common/icp_qat_hal.h   | 12 ++-
- drivers/crypto/qat/qat_common/icp_qat_uclo.h  |  2 +
- drivers/crypto/qat/qat_common/qat_hal.c       | 77 +++++++++++++++----
- drivers/crypto/qat/qat_common/qat_uclo.c      |  2 +
- 5 files changed, 78 insertions(+), 17 deletions(-)
+ arch/arm64/crypto/chacha-neon-core.S | 193 +++++++-------------
+ 1 file changed, 69 insertions(+), 124 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-index 996d25565b11..5694422ec66c 100644
---- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-@@ -15,6 +15,8 @@
- #define ADF_C62XVF_DEVICE_NAME "c6xxvf"
- #define ADF_C3XXX_DEVICE_NAME "c3xxx"
- #define ADF_C3XXXVF_DEVICE_NAME "c3xxxvf"
-+#define ADF_4XXX_PCI_DEVICE_ID 0x4940
-+#define ADF_4XXXIOV_PCI_DEVICE_ID 0x4941
- #define ADF_ERRSOU3 (0x3A000 + 0x0C)
- #define ADF_ERRSOU5 (0x3A000 + 0xD8)
- #define ADF_DEVICE_FUSECTL_OFFSET 0x40
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_hal.h b/drivers/crypto/qat/qat_common/icp_qat_hal.h
-index 8372f18ebc80..20b2ee1fc65a 100644
---- a/drivers/crypto/qat/qat_common/icp_qat_hal.h
-+++ b/drivers/crypto/qat/qat_common/icp_qat_hal.h
-@@ -10,6 +10,14 @@ enum hal_global_csr {
- 	ICP_GLOBAL_CLK_ENABLE = 0xA50
- };
+diff --git a/arch/arm64/crypto/chacha-neon-core.S b/arch/arm64/crypto/chacha-neon-core.S
+index e90386a7db8e..b70ac76f2610 100644
+--- a/arch/arm64/crypto/chacha-neon-core.S
++++ b/arch/arm64/crypto/chacha-neon-core.S
+@@ -195,7 +195,6 @@ SYM_FUNC_START(chacha_4block_xor_neon)
+ 	adr_l		x10, .Lpermute
+ 	and		x5, x4, #63
+ 	add		x10, x10, x5
+-	add		x11, x10, #64
  
-+enum {
-+	MISC_CONTROL_C4XXX = 0xAA0,
-+	ICP_RESET_CPP0 = 0x938,
-+	ICP_RESET_CPP1 = 0x93c,
-+	ICP_GLOBAL_CLK_ENABLE_CPP0 = 0x964,
-+	ICP_GLOBAL_CLK_ENABLE_CPP1 = 0x968
-+};
-+
- enum hal_ae_csr {
- 	USTORE_ADDRESS = 0x000,
- 	USTORE_DATA_LOWER = 0x004,
-@@ -111,7 +119,9 @@ enum fcu_sts {
- #define ICP_QAT_CAP_OFFSET (ICP_QAT_AE_OFFSET + 0x10000)
- #define LOCAL_TO_XFER_REG_OFFSET 0x800
- #define ICP_QAT_EP_OFFSET 0x3a000
--
-+#define ICP_QAT_EP_OFFSET_4XXX   0x200000 /* HI MMIO CSRs */
-+#define ICP_QAT_AE_OFFSET_4XXX   0x600000
-+#define ICP_QAT_CAP_OFFSET_4XXX  0x640000
- #define SET_CAP_CSR(handle, csr, val) \
- 	ADF_CSR_WR((handle)->hal_cap_g_ctl_csr_addr_v, csr, val)
- #define GET_CAP_CSR(handle, csr) \
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_uclo.h b/drivers/crypto/qat/qat_common/icp_qat_uclo.h
-index 0ec8a5ab51b5..4b36869bf460 100644
---- a/drivers/crypto/qat/qat_common/icp_qat_uclo.h
-+++ b/drivers/crypto/qat/qat_common/icp_qat_uclo.h
-@@ -6,6 +6,7 @@
- #define ICP_QAT_AC_895XCC_DEV_TYPE 0x00400000
- #define ICP_QAT_AC_C62X_DEV_TYPE   0x01000000
- #define ICP_QAT_AC_C3XXX_DEV_TYPE  0x02000000
-+#define ICP_QAT_AC_4XXX_A_DEV_TYPE 0x08000000
- #define ICP_QAT_UCLO_MAX_AE       12
- #define ICP_QAT_UCLO_MAX_CTX      8
- #define ICP_QAT_UCLO_MAX_UIMAGE   (ICP_QAT_UCLO_MAX_AE * ICP_QAT_UCLO_MAX_CTX)
-@@ -13,6 +14,7 @@
- #define ICP_QAT_UCLO_MAX_XFER_REG 128
- #define ICP_QAT_UCLO_MAX_GPR_REG  128
- #define ICP_QAT_UCLO_MAX_LMEM_REG 1024
-+#define ICP_QAT_UCLO_MAX_LMEM_REG_2X 1280
- #define ICP_QAT_UCLO_AE_ALL_CTX   0xff
- #define ICP_QAT_UOF_OBJID_LEN     8
- #define ICP_QAT_UOF_FID 0xc6c2
-diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
-index a3c1f2163910..bd3028126cbe 100644
---- a/drivers/crypto/qat/qat_common/qat_hal.c
-+++ b/drivers/crypto/qat/qat_common/qat_hal.c
-@@ -695,6 +695,39 @@ static int qat_hal_chip_init(struct icp_qat_fw_loader_handle *handle,
+ 	//
+ 	// This function encrypts four consecutive ChaCha blocks by loading
+@@ -645,11 +644,11 @@ CPU_BE(	  rev		a15, a15	)
+ 	zip2		v31.4s, v14.4s, v15.4s
+ 	  eor		a15, a15, w9
  
- 	handle->pci_dev = pci_info->pci_dev;
- 	switch (handle->pci_dev->device) {
-+	case ADF_4XXX_PCI_DEVICE_ID:
-+		handle->chip_info->sram_visible = false;
-+		handle->chip_info->nn = false;
-+		handle->chip_info->lm2lm3 = true;
-+		handle->chip_info->lm_size = ICP_QAT_UCLO_MAX_LMEM_REG_2X;
-+		handle->chip_info->icp_rst_csr = ICP_RESET_CPP0;
-+		handle->chip_info->icp_rst_mask = 0x100015;
-+		handle->chip_info->glb_clk_enable_csr = ICP_GLOBAL_CLK_ENABLE_CPP0;
-+		handle->chip_info->misc_ctl_csr = MISC_CONTROL_C4XXX;
-+		handle->chip_info->wakeup_event_val = 0x80000000;
-+		handle->chip_info->fw_auth = true;
-+		handle->chip_info->css_3k = true;
-+		handle->chip_info->tgroup_share_ustore = true;
-+		handle->chip_info->fcu_ctl_csr = FCU_CONTROL_4XXX;
-+		handle->chip_info->fcu_sts_csr = FCU_STATUS_4XXX;
-+		handle->chip_info->fcu_dram_addr_hi = FCU_DRAM_ADDR_HI_4XXX;
-+		handle->chip_info->fcu_dram_addr_lo = FCU_DRAM_ADDR_LO_4XXX;
-+		handle->chip_info->fcu_loaded_ae_csr = FCU_AE_LOADED_4XXX;
-+		handle->chip_info->fcu_loaded_ae_pos = 0;
+-	mov		x3, #64
++	add		x3, x2, x4
++	sub		x3, x3, #128		// start of last block
 +
-+		handle->hal_cap_g_ctl_csr_addr_v =
-+			(void __iomem *)((uintptr_t)misc_bar->virt_addr +
-+			ICP_QAT_CAP_OFFSET_4XXX);
-+		handle->hal_cap_ae_xfer_csr_addr_v =
-+			(void __iomem *)((uintptr_t)misc_bar->virt_addr +
-+			ICP_QAT_AE_OFFSET_4XXX);
-+		handle->hal_ep_csr_addr_v =
-+			(void __iomem *)((uintptr_t)misc_bar->virt_addr +
-+			ICP_QAT_EP_OFFSET_4XXX);
-+		handle->hal_cap_ae_local_csr_addr_v =
-+			(void __iomem *)((uintptr_t)handle->hal_cap_ae_xfer_csr_addr_v
-+							+ LOCAL_TO_XFER_REG_OFFSET);
-+		break;
- 	case PCI_DEVICE_ID_INTEL_QAT_C62X:
- 	case PCI_DEVICE_ID_INTEL_QAT_C3XXX:
- 		handle->chip_info->sram_visible = false;
-@@ -702,6 +735,8 @@ static int qat_hal_chip_init(struct icp_qat_fw_loader_handle *handle,
- 		handle->chip_info->lm2lm3 = false;
- 		handle->chip_info->lm_size = ICP_QAT_UCLO_MAX_LMEM_REG;
- 		handle->chip_info->icp_rst_csr = ICP_RESET;
-+		handle->chip_info->icp_rst_mask = (hw_data->ae_mask << RST_CSR_AE_LSB) |
-+						  (hw_data->accel_mask << RST_CSR_QAT_LSB);
- 		handle->chip_info->glb_clk_enable_csr = ICP_GLOBAL_CLK_ENABLE;
- 		handle->chip_info->misc_ctl_csr = MISC_CONTROL;
- 		handle->chip_info->wakeup_event_val = WAKEUP_EVENT;
-@@ -714,6 +749,18 @@ static int qat_hal_chip_init(struct icp_qat_fw_loader_handle *handle,
- 		handle->chip_info->fcu_dram_addr_lo = FCU_DRAM_ADDR_LO;
- 		handle->chip_info->fcu_loaded_ae_csr = FCU_STATUS;
- 		handle->chip_info->fcu_loaded_ae_pos = FCU_LOADED_AE_POS;
-+		handle->hal_cap_g_ctl_csr_addr_v =
-+			(void __iomem *)((uintptr_t)misc_bar->virt_addr +
-+			ICP_QAT_CAP_OFFSET);
-+		handle->hal_cap_ae_xfer_csr_addr_v =
-+			(void __iomem *)((uintptr_t)misc_bar->virt_addr +
-+			ICP_QAT_AE_OFFSET);
-+		handle->hal_ep_csr_addr_v =
-+			(void __iomem *)((uintptr_t)misc_bar->virt_addr +
-+			ICP_QAT_EP_OFFSET);
-+		handle->hal_cap_ae_local_csr_addr_v =
-+			(void __iomem *)((uintptr_t)handle->hal_cap_ae_xfer_csr_addr_v
-+			+ LOCAL_TO_XFER_REG_OFFSET);
- 		break;
- 	case PCI_DEVICE_ID_INTEL_QAT_DH895XCC:
- 		handle->chip_info->sram_visible = true;
-@@ -721,6 +768,8 @@ static int qat_hal_chip_init(struct icp_qat_fw_loader_handle *handle,
- 		handle->chip_info->lm2lm3 = false;
- 		handle->chip_info->lm_size = ICP_QAT_UCLO_MAX_LMEM_REG;
- 		handle->chip_info->icp_rst_csr = ICP_RESET;
-+		handle->chip_info->icp_rst_mask = (hw_data->ae_mask << RST_CSR_AE_LSB) |
-+						  (hw_data->accel_mask << RST_CSR_QAT_LSB);
- 		handle->chip_info->glb_clk_enable_csr = ICP_GLOBAL_CLK_ENABLE;
- 		handle->chip_info->misc_ctl_csr = MISC_CONTROL;
- 		handle->chip_info->wakeup_event_val = WAKEUP_EVENT;
-@@ -733,6 +782,18 @@ static int qat_hal_chip_init(struct icp_qat_fw_loader_handle *handle,
- 		handle->chip_info->fcu_dram_addr_lo = 0;
- 		handle->chip_info->fcu_loaded_ae_csr = 0;
- 		handle->chip_info->fcu_loaded_ae_pos = 0;
-+		handle->hal_cap_g_ctl_csr_addr_v =
-+			(void __iomem *)((uintptr_t)misc_bar->virt_addr +
-+			ICP_QAT_CAP_OFFSET);
-+		handle->hal_cap_ae_xfer_csr_addr_v =
-+			(void __iomem *)((uintptr_t)misc_bar->virt_addr +
-+			ICP_QAT_AE_OFFSET);
-+		handle->hal_ep_csr_addr_v =
-+			(void __iomem *)((uintptr_t)misc_bar->virt_addr +
-+			ICP_QAT_EP_OFFSET);
-+		handle->hal_cap_ae_local_csr_addr_v =
-+			(void __iomem *)((uintptr_t)handle->hal_cap_ae_xfer_csr_addr_v
-+			+ LOCAL_TO_XFER_REG_OFFSET);
- 		break;
- 	default:
- 		ret = -EINVAL;
-@@ -744,22 +805,6 @@ static int qat_hal_chip_init(struct icp_qat_fw_loader_handle *handle,
- 			&pci_info->pci_bars[hw_data->get_sram_bar_id(hw_data)];
- 		handle->hal_sram_addr_v = sram_bar->virt_addr;
- 	}
+ 	subs		x5, x4, #128
+-	add		x6, x5, x2
+-	csel		x3, x3, xzr, ge
+-	csel		x2, x2, x6, ge
++	csel		x2, x2, x3, ge
+ 
+ 	// interleave 64-bit words in state n, n+2
+ 	zip1		v0.2d, v16.2d, v18.2d
+@@ -658,13 +657,10 @@ CPU_BE(	  rev		a15, a15	)
+ 	zip1		v8.2d, v17.2d, v19.2d
+ 	zip2		v12.2d, v17.2d, v19.2d
+ 	  stp		a2, a3, [x1, #-56]
+-	ld1		{v16.16b-v19.16b}, [x2], x3
+ 
+ 	subs		x6, x4, #192
+-	ccmp		x3, xzr, #4, lt
+-	add		x7, x6, x2
+-	csel		x3, x3, xzr, eq
+-	csel		x2, x2, x7, eq
++	ld1		{v16.16b-v19.16b}, [x2], #64
++	csel		x2, x2, x3, ge
+ 
+ 	zip1		v1.2d, v20.2d, v22.2d
+ 	zip2		v5.2d, v20.2d, v22.2d
+@@ -672,13 +668,10 @@ CPU_BE(	  rev		a15, a15	)
+ 	zip1		v9.2d, v21.2d, v23.2d
+ 	zip2		v13.2d, v21.2d, v23.2d
+ 	  stp		a6, a7, [x1, #-40]
+-	ld1		{v20.16b-v23.16b}, [x2], x3
+ 
+ 	subs		x7, x4, #256
+-	ccmp		x3, xzr, #4, lt
+-	add		x8, x7, x2
+-	csel		x3, x3, xzr, eq
+-	csel		x2, x2, x8, eq
++	ld1		{v20.16b-v23.16b}, [x2], #64
++	csel		x2, x2, x3, ge
+ 
+ 	zip1		v2.2d, v24.2d, v26.2d
+ 	zip2		v6.2d, v24.2d, v26.2d
+@@ -686,12 +679,10 @@ CPU_BE(	  rev		a15, a15	)
+ 	zip1		v10.2d, v25.2d, v27.2d
+ 	zip2		v14.2d, v25.2d, v27.2d
+ 	  stp		a10, a11, [x1, #-24]
+-	ld1		{v24.16b-v27.16b}, [x2], x3
+ 
+ 	subs		x8, x4, #320
+-	ccmp		x3, xzr, #4, lt
+-	add		x9, x8, x2
+-	csel		x2, x2, x9, eq
++	ld1		{v24.16b-v27.16b}, [x2], #64
++	csel		x2, x2, x3, ge
+ 
+ 	zip1		v3.2d, v28.2d, v30.2d
+ 	zip2		v7.2d, v28.2d, v30.2d
+@@ -699,151 +690,105 @@ CPU_BE(	  rev		a15, a15	)
+ 	zip1		v11.2d, v29.2d, v31.2d
+ 	zip2		v15.2d, v29.2d, v31.2d
+ 	  stp		a14, a15, [x1, #-8]
++
++	tbnz		x5, #63, .Lt128
+ 	ld1		{v28.16b-v31.16b}, [x2]
+ 
+ 	// xor with corresponding input, write to output
+-	tbnz		x5, #63, 0f
+ 	eor		v16.16b, v16.16b, v0.16b
+ 	eor		v17.16b, v17.16b, v1.16b
+ 	eor		v18.16b, v18.16b, v2.16b
+ 	eor		v19.16b, v19.16b, v3.16b
+-	st1		{v16.16b-v19.16b}, [x1], #64
+-	cbz		x5, .Lout
+ 
+-	tbnz		x6, #63, 1f
++	tbnz		x6, #63, .Lt192
++
+ 	eor		v20.16b, v20.16b, v4.16b
+ 	eor		v21.16b, v21.16b, v5.16b
+ 	eor		v22.16b, v22.16b, v6.16b
+ 	eor		v23.16b, v23.16b, v7.16b
+-	st1		{v20.16b-v23.16b}, [x1], #64
+-	cbz		x6, .Lout
+ 
+-	tbnz		x7, #63, 2f
++	st1		{v16.16b-v19.16b}, [x1], #64
++	tbnz		x7, #63, .Lt256
++
+ 	eor		v24.16b, v24.16b, v8.16b
+ 	eor		v25.16b, v25.16b, v9.16b
+ 	eor		v26.16b, v26.16b, v10.16b
+ 	eor		v27.16b, v27.16b, v11.16b
+-	st1		{v24.16b-v27.16b}, [x1], #64
+-	cbz		x7, .Lout
+ 
+-	tbnz		x8, #63, 3f
++	st1		{v20.16b-v23.16b}, [x1], #64
++	tbnz		x8, #63, .Lt320
++
+ 	eor		v28.16b, v28.16b, v12.16b
+ 	eor		v29.16b, v29.16b, v13.16b
+ 	eor		v30.16b, v30.16b, v14.16b
+ 	eor		v31.16b, v31.16b, v15.16b
++
++	st1		{v24.16b-v27.16b}, [x1], #64
+ 	st1		{v28.16b-v31.16b}, [x1]
+ 
+ .Lout:	frame_pop
+ 	ret
+ 
+-	// fewer than 128 bytes of in/output
+-0:	ld1		{v8.16b}, [x10]
+-	ld1		{v9.16b}, [x11]
+-	movi		v10.16b, #16
+-	sub		x2, x1, #64
+-	add		x1, x1, x5
+-	ld1		{v16.16b-v19.16b}, [x2]
+-	tbl		v4.16b, {v0.16b-v3.16b}, v8.16b
+-	tbx		v20.16b, {v16.16b-v19.16b}, v9.16b
+-	add		v8.16b, v8.16b, v10.16b
+-	add		v9.16b, v9.16b, v10.16b
+-	tbl		v5.16b, {v0.16b-v3.16b}, v8.16b
+-	tbx		v21.16b, {v16.16b-v19.16b}, v9.16b
+-	add		v8.16b, v8.16b, v10.16b
+-	add		v9.16b, v9.16b, v10.16b
+-	tbl		v6.16b, {v0.16b-v3.16b}, v8.16b
+-	tbx		v22.16b, {v16.16b-v19.16b}, v9.16b
+-	add		v8.16b, v8.16b, v10.16b
+-	add		v9.16b, v9.16b, v10.16b
+-	tbl		v7.16b, {v0.16b-v3.16b}, v8.16b
+-	tbx		v23.16b, {v16.16b-v19.16b}, v9.16b
 -
--	handle->chip_info->icp_rst_mask = (hw_data->ae_mask << RST_CSR_AE_LSB) |
--					  (hw_data->accel_mask << RST_CSR_QAT_LSB);
--	handle->hal_cap_g_ctl_csr_addr_v =
--		(void __iomem *)((uintptr_t)misc_bar->virt_addr +
--				 ICP_QAT_CAP_OFFSET);
--	handle->hal_cap_ae_xfer_csr_addr_v =
--		(void __iomem *)((uintptr_t)misc_bar->virt_addr +
--				 ICP_QAT_AE_OFFSET);
--	handle->hal_ep_csr_addr_v =
--		(void __iomem *)((uintptr_t)misc_bar->virt_addr +
--				 ICP_QAT_EP_OFFSET);
--	handle->hal_cap_ae_local_csr_addr_v =
--		(void __iomem *)((uintptr_t)handle->hal_cap_ae_xfer_csr_addr_v +
--				 LOCAL_TO_XFER_REG_OFFSET);
--	handle->pci_dev = pci_info->pci_dev;
- 	handle->hal_handle->revision_id = accel_dev->accel_pci_dev.revid;
- 	handle->hal_handle->ae_mask = hw_data->ae_mask;
- 	handle->hal_handle->admin_ae_mask = hw_data->admin_ae_mask;
-diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
-index c089c2709376..1fb5fc852f6b 100644
---- a/drivers/crypto/qat/qat_common/qat_uclo.c
-+++ b/drivers/crypto/qat/qat_common/qat_uclo.c
-@@ -728,6 +728,8 @@ qat_uclo_get_dev_type(struct icp_qat_fw_loader_handle *handle)
- 		return ICP_QAT_AC_C62X_DEV_TYPE;
- 	case PCI_DEVICE_ID_INTEL_QAT_C3XXX:
- 		return ICP_QAT_AC_C3XXX_DEV_TYPE;
-+	case ADF_4XXX_PCI_DEVICE_ID:
-+		return ICP_QAT_AC_4XXX_A_DEV_TYPE;
- 	default:
- 		pr_err("QAT: unsupported device 0x%x\n",
- 		       handle->pci_dev->device);
+-	eor		v20.16b, v20.16b, v4.16b
+-	eor		v21.16b, v21.16b, v5.16b
+-	eor		v22.16b, v22.16b, v6.16b
+-	eor		v23.16b, v23.16b, v7.16b
+-	st1		{v20.16b-v23.16b}, [x1]
+-	b		.Lout
+-
+ 	// fewer than 192 bytes of in/output
+-1:	ld1		{v8.16b}, [x10]
+-	ld1		{v9.16b}, [x11]
+-	movi		v10.16b, #16
+-	add		x1, x1, x6
+-	tbl		v0.16b, {v4.16b-v7.16b}, v8.16b
+-	tbx		v20.16b, {v16.16b-v19.16b}, v9.16b
+-	add		v8.16b, v8.16b, v10.16b
+-	add		v9.16b, v9.16b, v10.16b
+-	tbl		v1.16b, {v4.16b-v7.16b}, v8.16b
+-	tbx		v21.16b, {v16.16b-v19.16b}, v9.16b
+-	add		v8.16b, v8.16b, v10.16b
+-	add		v9.16b, v9.16b, v10.16b
+-	tbl		v2.16b, {v4.16b-v7.16b}, v8.16b
+-	tbx		v22.16b, {v16.16b-v19.16b}, v9.16b
+-	add		v8.16b, v8.16b, v10.16b
+-	add		v9.16b, v9.16b, v10.16b
+-	tbl		v3.16b, {v4.16b-v7.16b}, v8.16b
+-	tbx		v23.16b, {v16.16b-v19.16b}, v9.16b
+-
+-	eor		v20.16b, v20.16b, v0.16b
+-	eor		v21.16b, v21.16b, v1.16b
+-	eor		v22.16b, v22.16b, v2.16b
+-	eor		v23.16b, v23.16b, v3.16b
+-	st1		{v20.16b-v23.16b}, [x1]
++.Lt192:	cbz		x5, 1f				// exactly 128 bytes?
++	ld1		{v28.16b-v31.16b}, [x10]
++	add		x5, x5, x1
++	tbl		v28.16b, {v4.16b-v7.16b}, v28.16b
++	tbl		v29.16b, {v4.16b-v7.16b}, v29.16b
++	tbl		v30.16b, {v4.16b-v7.16b}, v30.16b
++	tbl		v31.16b, {v4.16b-v7.16b}, v31.16b
++
++0:	eor		v20.16b, v20.16b, v28.16b
++	eor		v21.16b, v21.16b, v29.16b
++	eor		v22.16b, v22.16b, v30.16b
++	eor		v23.16b, v23.16b, v31.16b
++	st1		{v20.16b-v23.16b}, [x5]		// overlapping stores
++1:	st1		{v16.16b-v19.16b}, [x1]
+ 	b		.Lout
+ 
++	// fewer than 128 bytes of in/output
++.Lt128:	ld1		{v28.16b-v31.16b}, [x10]
++	add		x5, x5, x1
++	sub		x1, x1, #64
++	tbl		v28.16b, {v0.16b-v3.16b}, v28.16b
++	tbl		v29.16b, {v0.16b-v3.16b}, v29.16b
++	tbl		v30.16b, {v0.16b-v3.16b}, v30.16b
++	tbl		v31.16b, {v0.16b-v3.16b}, v31.16b
++	ld1		{v16.16b-v19.16b}, [x1]		// reload first output block
++	b		0b
++
+ 	// fewer than 256 bytes of in/output
+-2:	ld1		{v4.16b}, [x10]
+-	ld1		{v5.16b}, [x11]
+-	movi		v6.16b, #16
+-	add		x1, x1, x7
++.Lt256:	cbz		x6, 2f				// exactly 192 bytes?
++	ld1		{v4.16b-v7.16b}, [x10]
++	add		x6, x6, x1
+ 	tbl		v0.16b, {v8.16b-v11.16b}, v4.16b
+-	tbx		v24.16b, {v20.16b-v23.16b}, v5.16b
+-	add		v4.16b, v4.16b, v6.16b
+-	add		v5.16b, v5.16b, v6.16b
+-	tbl		v1.16b, {v8.16b-v11.16b}, v4.16b
+-	tbx		v25.16b, {v20.16b-v23.16b}, v5.16b
+-	add		v4.16b, v4.16b, v6.16b
+-	add		v5.16b, v5.16b, v6.16b
+-	tbl		v2.16b, {v8.16b-v11.16b}, v4.16b
+-	tbx		v26.16b, {v20.16b-v23.16b}, v5.16b
+-	add		v4.16b, v4.16b, v6.16b
+-	add		v5.16b, v5.16b, v6.16b
+-	tbl		v3.16b, {v8.16b-v11.16b}, v4.16b
+-	tbx		v27.16b, {v20.16b-v23.16b}, v5.16b
+-
+-	eor		v24.16b, v24.16b, v0.16b
+-	eor		v25.16b, v25.16b, v1.16b
+-	eor		v26.16b, v26.16b, v2.16b
+-	eor		v27.16b, v27.16b, v3.16b
+-	st1		{v24.16b-v27.16b}, [x1]
++	tbl		v1.16b, {v8.16b-v11.16b}, v5.16b
++	tbl		v2.16b, {v8.16b-v11.16b}, v6.16b
++	tbl		v3.16b, {v8.16b-v11.16b}, v7.16b
++
++	eor		v28.16b, v28.16b, v0.16b
++	eor		v29.16b, v29.16b, v1.16b
++	eor		v30.16b, v30.16b, v2.16b
++	eor		v31.16b, v31.16b, v3.16b
++	st1		{v28.16b-v31.16b}, [x6]		// overlapping stores
++2:	st1		{v20.16b-v23.16b}, [x1]
+ 	b		.Lout
+ 
+ 	// fewer than 320 bytes of in/output
+-3:	ld1		{v4.16b}, [x10]
+-	ld1		{v5.16b}, [x11]
+-	movi		v6.16b, #16
+-	add		x1, x1, x8
++.Lt320:	cbz		x7, 3f				// exactly 256 bytes?
++	ld1		{v4.16b-v7.16b}, [x10]
++	add		x7, x7, x1
+ 	tbl		v0.16b, {v12.16b-v15.16b}, v4.16b
+-	tbx		v28.16b, {v24.16b-v27.16b}, v5.16b
+-	add		v4.16b, v4.16b, v6.16b
+-	add		v5.16b, v5.16b, v6.16b
+-	tbl		v1.16b, {v12.16b-v15.16b}, v4.16b
+-	tbx		v29.16b, {v24.16b-v27.16b}, v5.16b
+-	add		v4.16b, v4.16b, v6.16b
+-	add		v5.16b, v5.16b, v6.16b
+-	tbl		v2.16b, {v12.16b-v15.16b}, v4.16b
+-	tbx		v30.16b, {v24.16b-v27.16b}, v5.16b
+-	add		v4.16b, v4.16b, v6.16b
+-	add		v5.16b, v5.16b, v6.16b
+-	tbl		v3.16b, {v12.16b-v15.16b}, v4.16b
+-	tbx		v31.16b, {v24.16b-v27.16b}, v5.16b
++	tbl		v1.16b, {v12.16b-v15.16b}, v5.16b
++	tbl		v2.16b, {v12.16b-v15.16b}, v6.16b
++	tbl		v3.16b, {v12.16b-v15.16b}, v7.16b
+ 
+ 	eor		v28.16b, v28.16b, v0.16b
+ 	eor		v29.16b, v29.16b, v1.16b
+ 	eor		v30.16b, v30.16b, v2.16b
+ 	eor		v31.16b, v31.16b, v3.16b
+-	st1		{v28.16b-v31.16b}, [x1]
++	st1		{v28.16b-v31.16b}, [x7]		// overlapping stores
++3:	st1		{v24.16b-v27.16b}, [x1]
+ 	b		.Lout
+ SYM_FUNC_END(chacha_4block_xor_neon)
+ 
+@@ -851,7 +796,7 @@ SYM_FUNC_END(chacha_4block_xor_neon)
+ 	.align		L1_CACHE_SHIFT
+ .Lpermute:
+ 	.set		.Li, 0
+-	.rept		192
++	.rept		128
+ 	.byte		(.Li - 64)
+ 	.set		.Li, .Li + 1
+ 	.endr
 -- 
-2.25.4
+2.17.1
 
