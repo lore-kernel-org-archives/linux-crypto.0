@@ -2,57 +2,45 @@ Return-Path: <SRS0=FTK2=EP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FF10C388F7
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Nov 2020 10:29:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D0DC2D0A3
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Nov 2020 11:46:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 125FA207BC
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Nov 2020 10:29:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DkqJWn72";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="kBMeCola"
+	by mail.kernel.org (Postfix) with ESMTP id 7135B206ED
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Nov 2020 11:46:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727183AbgKIK3N (ORCPT
+        id S1729038AbgKILqK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Nov 2020 05:29:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53514 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726535AbgKIK3N (ORCPT
+        Mon, 9 Nov 2020 06:46:10 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:2303 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726999AbgKILqK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Nov 2020 05:29:13 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C26F4C0613CF;
-        Mon,  9 Nov 2020 02:29:12 -0800 (PST)
-Date:   Mon, 9 Nov 2020 11:29:09 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1604917750;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nXSfGPHblcxD6fRoSPhPSSHFsJUTblx0RZ8tFRLfhus=;
-        b=DkqJWn72jRCdyw9uxzDjB+Lsv1iGa/AL0tJGQT51XDOa5/yv0Yo0PSxn+RprFoHPXenYs4
-        7tEF4j+WmF92KO/7HTNbU3GnE/EhopTRrvoUYqZAmdY4pTMrG1JFoB/Q8vKTZN6ECiqzRL
-        L0cuipHHmQQl/cu9Cn9bMGO8MvzzCxdCx1hfzMdH+/dwYmZN4aKgPynNFgcAJVaSPxa8VX
-        TsNl8rniTpK0Fuoj94OjtxaxpNv/A0WNqIamWtanr1dVKJ6cX2e3DFTpJip73BpEz4TkoB
-        Qt1x7N/ImlN/ZlK1QVSZTZ9aqaN+j2Jp2sXMULM9PzGaKIk1BfkVtj8R7EwtpA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1604917750;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nXSfGPHblcxD6fRoSPhPSSHFsJUTblx0RZ8tFRLfhus=;
-        b=kBMeColad+U3332dzsE7I9XTLjw2q7CtyaCiVgwtRZW/gmgaf4NNwhDqeGpOvZEl4sVt5L
-        oqT22564Yk3ngPDA==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     Barry Song <song.bao.hua@hisilicon.com>
-Cc:     linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-        akpm@linux-foundation.org, linuxarm@huawei.com,
-        fanghao11@huawei.com, linux-kernel@vger.kernel.org,
+        Mon, 9 Nov 2020 06:46:10 -0500
+Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.56])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4CV8ML54sQz13QwC;
+        Mon,  9 Nov 2020 19:45:50 +0800 (CST)
+Received: from dggemi712-chm.china.huawei.com (10.3.20.111) by
+ DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Mon, 9 Nov 2020 19:46:05 +0800
+Received: from dggemi761-chm.china.huawei.com (10.1.198.147) by
+ dggemi712-chm.china.huawei.com (10.3.20.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Mon, 9 Nov 2020 19:46:04 +0800
+Received: from dggemi761-chm.china.huawei.com ([10.9.49.202]) by
+ dggemi761-chm.china.huawei.com ([10.9.49.202]) with mapi id 15.01.1913.007;
+ Mon, 9 Nov 2020 19:46:04 +0800
+From:   "Song Bao Hua (Barry Song)" <song.bao.hua@hisilicon.com>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+CC:     "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        Linuxarm <linuxarm@huawei.com>,
+        "fanghao (A)" <fanghao11@huawei.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Vitaly Wool <vitalywool@gmail.com>,
         "Luis Claudio R . Goncalves" <lgoncalv@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -60,53 +48,86 @@ Cc:     linux-mm@kvack.org, linux-crypto@vger.kernel.org,
         Mahipal Challa <mahipalreddy2006@gmail.com>,
         Seth Jennings <sjenning@redhat.com>,
         Dan Streetman <ddstreet@ieee.org>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
         Colin Ian King <colin.king@canonical.com>
-Subject: Re: [PATCH v7] mm/zswap: move to use crypto_acomp API for hardware
+Subject: RE: [PATCH v7] mm/zswap: move to use crypto_acomp API for hardware
  acceleration
-Message-ID: <20201109102909.u34zzudqqng6nhg6@linutronix.de>
+Thread-Topic: [PATCH v7] mm/zswap: move to use crypto_acomp API for hardware
+ acceleration
+Thread-Index: AQHWtNNH87FlqW4qs0KvSuGaGT58KKm/Fo6AgACQEbA=
+Date:   Mon, 9 Nov 2020 11:46:04 +0000
+Message-ID: <017c57cee12f4492977425fab7121ad1@hisilicon.com>
 References: <20201107065332.26992-1-song.bao.hua@hisilicon.com>
+ <20201109102909.u34zzudqqng6nhg6@linutronix.de>
+In-Reply-To: <20201109102909.u34zzudqqng6nhg6@linutronix.de>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.126.203.196]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20201107065332.26992-1-song.bao.hua@hisilicon.com>
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I've been looking at the patch and it looks like it should work. Having
-numbers to backup the performance in the pure-software version and with
-HW acceleration would _very_ nice to have.
-
-On 2020-11-07 19:53:32 [+1300], Barry Song wrote:
-> index fbb7829..73f04de 100644
-> --- a/mm/zswap.c
-> +++ b/mm/zswap.c
-> @@ -415,30 +445,54 @@ static int zswap_dstmem_dead(unsigned int cpu)
-=E2=80=A6
-> +	acomp_ctx->req =3D req;
-> +
-> +	crypto_init_wait(&acomp_ctx->wait);
-> +	/*
-> +	 * if the backend of acomp is async zip, crypto_req_done() will wakeup
-> +	 * crypto_wait_req(); if the backend of acomp is scomp, the callback
-> +	 * won't be called, crypto_wait_req() will return without blocking.
-> +	 */
-> +	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> +				   crypto_req_done, &acomp_ctx->wait);
-> +
-> +	acomp_ctx->mutex =3D per_cpu(zswap_mutex, cpu);
-> +	acomp_ctx->dstmem =3D per_cpu(zswap_dstmem, cpu);
-
-You added a comment here and there you never mentioned that this single
-per-CPU mutex protects the per-CPU context (which you can have more than
-one on a single CPU) and the scratch/dstmem which is one per-CPU. Of
-course if you read the code you figure it out.
-I still think that you should have a pool of memory and crypto contexts
-which you can use instead of having them strictly per-CPU. The code is
-fully preemptible and you may have multiple requests on the same CPU.
-Yes, locking works but at the same you block processing while waiting on
-a lock and the "reserved memory" on other CPUs remains unused.
-
-Sebastian
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFNlYmFzdGlhbiBBbmRyemVq
+IFNpZXdpb3IgW21haWx0bzpiaWdlYXN5QGxpbnV0cm9uaXguZGVdDQo+IFNlbnQ6IE1vbmRheSwg
+Tm92ZW1iZXIgOSwgMjAyMCAxMToyOSBQTQ0KPiBUbzogU29uZyBCYW8gSHVhIChCYXJyeSBTb25n
+KSA8c29uZy5iYW8uaHVhQGhpc2lsaWNvbi5jb20+DQo+IENjOiBsaW51eC1tbUBrdmFjay5vcmc7
+IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7DQo+IGFrcG1AbGludXgtZm91bmRhdGlvbi5v
+cmc7IExpbnV4YXJtIDxsaW51eGFybUBodWF3ZWkuY29tPjsgZmFuZ2hhbyAoQSkNCj4gPGZhbmdo
+YW8xMUBodWF3ZWkuY29tPjsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgVml0YWx5IFdv
+b2wNCj4gPHZpdGFseXdvb2xAZ21haWwuY29tPjsgTHVpcyBDbGF1ZGlvIFIgLiBHb25jYWx2ZXMg
+PGxnb25jYWx2QHJlZGhhdC5jb20+Ow0KPiBIZXJiZXJ0IFh1IDxoZXJiZXJ0QGdvbmRvci5hcGFu
+YS5vcmcuYXU+OyBEYXZpZCBTIC4gTWlsbGVyDQo+IDxkYXZlbUBkYXZlbWxvZnQubmV0PjsgTWFo
+aXBhbCBDaGFsbGEgPG1haGlwYWxyZWRkeTIwMDZAZ21haWwuY29tPjsNCj4gU2V0aCBKZW5uaW5n
+cyA8c2plbm5pbmdAcmVkaGF0LmNvbT47IERhbiBTdHJlZXRtYW4gPGRkc3RyZWV0QGllZWUub3Jn
+PjsNCj4gV2FuZ3pob3UgKEIpIDx3YW5nemhvdTFAaGlzaWxpY29uLmNvbT47IENvbGluIElhbiBL
+aW5nDQo+IDxjb2xpbi5raW5nQGNhbm9uaWNhbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0gg
+djddIG1tL3pzd2FwOiBtb3ZlIHRvIHVzZSBjcnlwdG9fYWNvbXAgQVBJIGZvcg0KPiBoYXJkd2Fy
+ZSBhY2NlbGVyYXRpb24NCj4gDQo+IEkndmUgYmVlbiBsb29raW5nIGF0IHRoZSBwYXRjaCBhbmQg
+aXQgbG9va3MgbGlrZSBpdCBzaG91bGQgd29yay4gSGF2aW5nIG51bWJlcnMNCg0KVGhhbmtzIHZl
+cnkgbXVjaCBmb3IgcmV2aWV3aW5nIGl0IGFuZCB0aGUgcHJldmlvdXMgcGF0Y2hlcy4gSSBhcHBy
+ZWNpYXRlLg0KDQo+IHRvIGJhY2t1cCB0aGUgcGVyZm9ybWFuY2UgaW4gdGhlIHB1cmUtc29mdHdh
+cmUgdmVyc2lvbiBhbmQgd2l0aCBIVw0KPiBhY2NlbGVyYXRpb24gd291bGQgX3ZlcnlfIG5pY2Ug
+dG8gaGF2ZS4NCg0KU3VyZS4gVGhlIDFzdCBzdGVwIGlzIGZpeGluZyB0aGUgYnJva2VuIGNvbm5l
+Y3QgYmV0d2VlbiBuZXcgY3J5cHRvIEFQSXMgYW5kDQp6c3dhcC4gVGhlbiB3ZSBhcmUgZ29pbmcg
+dG8gZGlnIGludG8gcG9zc2libGUgcGVyZm9ybWFuY2UgaW1wcm92ZW1lbnRzLg0KSWYgd2UgcHV0
+IGFsbCB0aGUgZ29hbHMgaW4gdGhlIHNpbmdsZSBmaXJzdCBzdGVwLCBpdCB3aWxsIGJlIGhhcmQg
+Zm9yIHVzIHRvIHNlZSBhbg0KYWNjb21wbGlzaG1lbnQgb2YgYW55IHJlYWwgaW1wcm92ZW1lbnQu
+DQoNCj4gDQo+IE9uIDIwMjAtMTEtMDcgMTk6NTM6MzIgWysxMzAwXSwgQmFycnkgU29uZyB3cm90
+ZToNCj4gPiBpbmRleCBmYmI3ODI5Li43M2YwNGRlIDEwMDY0NA0KPiA+IC0tLSBhL21tL3pzd2Fw
+LmMNCj4gPiArKysgYi9tbS96c3dhcC5jDQo+ID4gQEAgLTQxNSwzMCArNDQ1LDU0IEBAIHN0YXRp
+YyBpbnQgenN3YXBfZHN0bWVtX2RlYWQodW5zaWduZWQgaW50IGNwdSkNCj4g4oCmDQo+ID4gKwlh
+Y29tcF9jdHgtPnJlcSA9IHJlcTsNCj4gPiArDQo+ID4gKwljcnlwdG9faW5pdF93YWl0KCZhY29t
+cF9jdHgtPndhaXQpOw0KPiA+ICsJLyoNCj4gPiArCSAqIGlmIHRoZSBiYWNrZW5kIG9mIGFjb21w
+IGlzIGFzeW5jIHppcCwgY3J5cHRvX3JlcV9kb25lKCkgd2lsbCB3YWtldXANCj4gPiArCSAqIGNy
+eXB0b193YWl0X3JlcSgpOyBpZiB0aGUgYmFja2VuZCBvZiBhY29tcCBpcyBzY29tcCwgdGhlIGNh
+bGxiYWNrDQo+ID4gKwkgKiB3b24ndCBiZSBjYWxsZWQsIGNyeXB0b193YWl0X3JlcSgpIHdpbGwg
+cmV0dXJuIHdpdGhvdXQgYmxvY2tpbmcuDQo+ID4gKwkgKi8NCj4gPiArCWFjb21wX3JlcXVlc3Rf
+c2V0X2NhbGxiYWNrKHJlcSwgQ1JZUFRPX1RGTV9SRVFfTUFZX0JBQ0tMT0csDQo+ID4gKwkJCQkg
+ICBjcnlwdG9fcmVxX2RvbmUsICZhY29tcF9jdHgtPndhaXQpOw0KPiA+ICsNCj4gPiArCWFjb21w
+X2N0eC0+bXV0ZXggPSBwZXJfY3B1KHpzd2FwX211dGV4LCBjcHUpOw0KPiA+ICsJYWNvbXBfY3R4
+LT5kc3RtZW0gPSBwZXJfY3B1KHpzd2FwX2RzdG1lbSwgY3B1KTsNCj4gDQo+IFlvdSBhZGRlZCBh
+IGNvbW1lbnQgaGVyZSBhbmQgdGhlcmUgeW91IG5ldmVyIG1lbnRpb25lZCB0aGF0IHRoaXMgc2lu
+Z2xlDQo+IHBlci1DUFUgbXV0ZXggcHJvdGVjdHMgdGhlIHBlci1DUFUgY29udGV4dCAod2hpY2gg
+eW91IGNhbiBoYXZlIG1vcmUgdGhhbg0KPiBvbmUgb24gYSBzaW5nbGUgQ1BVKSBhbmQgdGhlIHNj
+cmF0Y2gvZHN0bWVtIHdoaWNoIGlzIG9uZSBwZXItQ1BVLiBPZiBjb3Vyc2UNCj4gaWYgeW91IHJl
+YWQgdGhlIGNvZGUgeW91IGZpZ3VyZSBpdCBvdXQuDQo+IEkgc3RpbGwgdGhpbmsgdGhhdCB5b3Ug
+c2hvdWxkIGhhdmUgYSBwb29sIG9mIG1lbW9yeSBhbmQgY3J5cHRvIGNvbnRleHRzIHdoaWNoDQo+
+IHlvdSBjYW4gdXNlIGluc3RlYWQgb2YgaGF2aW5nIHRoZW0gc3RyaWN0bHkgcGVyLUNQVS4gVGhl
+IGNvZGUgaXMgZnVsbHkNCj4gcHJlZW1wdGlibGUgYW5kIHlvdSBtYXkgaGF2ZSBtdWx0aXBsZSBy
+ZXF1ZXN0cyBvbiB0aGUgc2FtZSBDUFUuDQo+IFllcywgbG9ja2luZyB3b3JrcyBidXQgYXQgdGhl
+IHNhbWUgeW91IGJsb2NrIHByb2Nlc3Npbmcgd2hpbGUgd2FpdGluZyBvbiBhIGxvY2sNCj4gYW5k
+IHRoZSAicmVzZXJ2ZWQgbWVtb3J5IiBvbiBvdGhlciBDUFVzIHJlbWFpbnMgdW51c2VkLg0KDQpG
+b3Igc3VyZSB0aGUgYnVmZmVyIHBvb2wgd2lsbCBiZSBwdXQgaW50byBteSBUb2RvIGxpc3Qgb24g
+enN3YXAgcHJvamVjdC4gRm9yIHRoaXMNCm1vbWVudCwgbGV0J3MgZml4IHRoZSBicm9rZW4gY29u
+bmVjdGlvbiBiZXR3ZWVuIFpJUCBkcml2ZXJzIGFuZCB6c3dhcCBmaXJzdC4NClRoaXMgd2lsbCBo
+ZWxwIGJ1aWxkIHRoZSBmYWl0aCBvbiB0aGUgd2hvbGUgcHJvamVjdCBhbmQgbW90aXZhdGUgdGhl
+IG1vdmUgdG8NCnRoZSBuZXh0IHN0ZXAuDQoNClN0ZXAgYnkgc3RlcCwgd2Ugd2lsbCBtYWtlIHpz
+d2FwIGJldHRlciBhbmQgYmV0dGVyIG9uIHBlcmZvcm1hbmNlIGJ5IGxldmVyYWdpbmcNCnRoZSBw
+b3dlciBvZiBaSVAgaGFyZHdhcmUuDQoNCj4gDQo+IFNlYmFzdGlhbg0KDQpUaGFua3MNCkJhcnJ5
+DQo=
