@@ -2,132 +2,187 @@ Return-Path: <SRS0=FTK2=EP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D0DC2D0A3
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Nov 2020 11:46:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC936C2D0A3
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Nov 2020 12:09:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7135B206ED
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Nov 2020 11:46:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30D2820789
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Nov 2020 12:09:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="CVzyxbKn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729038AbgKILqK (ORCPT
+        id S1727077AbgKIMJx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Nov 2020 06:46:10 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:2303 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726999AbgKILqK (ORCPT
+        Mon, 9 Nov 2020 07:09:53 -0500
+Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:10976 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726410AbgKIMJx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Nov 2020 06:46:10 -0500
-Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.56])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4CV8ML54sQz13QwC;
-        Mon,  9 Nov 2020 19:45:50 +0800 (CST)
-Received: from dggemi712-chm.china.huawei.com (10.3.20.111) by
- DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Mon, 9 Nov 2020 19:46:05 +0800
-Received: from dggemi761-chm.china.huawei.com (10.1.198.147) by
- dggemi712-chm.china.huawei.com (10.3.20.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Mon, 9 Nov 2020 19:46:04 +0800
-Received: from dggemi761-chm.china.huawei.com ([10.9.49.202]) by
- dggemi761-chm.china.huawei.com ([10.9.49.202]) with mapi id 15.01.1913.007;
- Mon, 9 Nov 2020 19:46:04 +0800
-From:   "Song Bao Hua (Barry Song)" <song.bao.hua@hisilicon.com>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-CC:     "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        "fanghao (A)" <fanghao11@huawei.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Vitaly Wool <vitalywool@gmail.com>,
-        "Luis Claudio R . Goncalves" <lgoncalv@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Mahipal Challa <mahipalreddy2006@gmail.com>,
-        Seth Jennings <sjenning@redhat.com>,
-        Dan Streetman <ddstreet@ieee.org>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
-        Colin Ian King <colin.king@canonical.com>
-Subject: RE: [PATCH v7] mm/zswap: move to use crypto_acomp API for hardware
- acceleration
-Thread-Topic: [PATCH v7] mm/zswap: move to use crypto_acomp API for hardware
- acceleration
-Thread-Index: AQHWtNNH87FlqW4qs0KvSuGaGT58KKm/Fo6AgACQEbA=
-Date:   Mon, 9 Nov 2020 11:46:04 +0000
-Message-ID: <017c57cee12f4492977425fab7121ad1@hisilicon.com>
-References: <20201107065332.26992-1-song.bao.hua@hisilicon.com>
- <20201109102909.u34zzudqqng6nhg6@linutronix.de>
-In-Reply-To: <20201109102909.u34zzudqqng6nhg6@linutronix.de>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.126.203.196]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Mon, 9 Nov 2020 07:09:53 -0500
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+        by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0A9C9iFM011312;
+        Mon, 9 Nov 2020 04:09:44 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=G/xzgY4R63QcXVPiHC+0z3pg4LL4rHMCp+akPCgiwiw=;
+ b=CVzyxbKnlVKohq6ITOFsZ8eczV8qjNWLSqr+PtqyvuTiil2Juxm16t7yCq8K2goSYGgJ
+ DhZ9HN7lyO2yOWGXFyYUuiwB7fSrKQYSJEgV3rc/SVS49M3gNvkDmTI50zc50lw5qur7
+ K9S6cN6gQB9oZlKBHAk64CZKMvzwQiR2Yjbz80gYLIqCRShgNw67/CSgB8yT3zJeTBUW
+ ojuWvPGh8SCVUs/040OihQAxdWGw7NK3tHaQHR4ca5z0IwuRWWdO0bzsfqo4J9uhnYMa
+ cTjormbmi3/7b3gcDFk2pZavqYpshdlQ4++Y675kV1ufVW0refYX+0oEWIHNlXIVIcrV Bg== 
+Received: from sc-exch03.marvell.com ([199.233.58.183])
+        by mx0b-0016f401.pphosted.com with ESMTP id 34nuysad8e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Mon, 09 Nov 2020 04:09:44 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by SC-EXCH03.marvell.com
+ (10.93.176.83) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 9 Nov
+ 2020 04:09:42 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 9 Nov
+ 2020 04:09:41 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Mon, 9 Nov 2020 04:09:41 -0800
+Received: from hyd1schalla-dt.marvell.com (hyd1schalla-dt.marvell.com [10.29.8.39])
+        by maili.marvell.com (Postfix) with ESMTP id 1BB263F7041;
+        Mon,  9 Nov 2020 04:09:37 -0800 (PST)
+From:   Srujana Challa <schalla@marvell.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <kuba@kernel.org>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <schandran@marvell.com>,
+        <pathreya@marvell.com>, Srujana Challa <schalla@marvell.com>
+Subject: [PATCH v9,net-next,00/12] Add Support for Marvell OcteonTX2 Cryptographic Acceleration Unit
+Date:   Mon, 9 Nov 2020 17:39:12 +0530
+Message-ID: <20201109120924.358-1-schalla@marvell.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312,18.0.737
+ definitions=2020-11-09_02:2020-11-05,2020-11-09 signatures=0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFNlYmFzdGlhbiBBbmRyemVq
-IFNpZXdpb3IgW21haWx0bzpiaWdlYXN5QGxpbnV0cm9uaXguZGVdDQo+IFNlbnQ6IE1vbmRheSwg
-Tm92ZW1iZXIgOSwgMjAyMCAxMToyOSBQTQ0KPiBUbzogU29uZyBCYW8gSHVhIChCYXJyeSBTb25n
-KSA8c29uZy5iYW8uaHVhQGhpc2lsaWNvbi5jb20+DQo+IENjOiBsaW51eC1tbUBrdmFjay5vcmc7
-IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7DQo+IGFrcG1AbGludXgtZm91bmRhdGlvbi5v
-cmc7IExpbnV4YXJtIDxsaW51eGFybUBodWF3ZWkuY29tPjsgZmFuZ2hhbyAoQSkNCj4gPGZhbmdo
-YW8xMUBodWF3ZWkuY29tPjsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgVml0YWx5IFdv
-b2wNCj4gPHZpdGFseXdvb2xAZ21haWwuY29tPjsgTHVpcyBDbGF1ZGlvIFIgLiBHb25jYWx2ZXMg
-PGxnb25jYWx2QHJlZGhhdC5jb20+Ow0KPiBIZXJiZXJ0IFh1IDxoZXJiZXJ0QGdvbmRvci5hcGFu
-YS5vcmcuYXU+OyBEYXZpZCBTIC4gTWlsbGVyDQo+IDxkYXZlbUBkYXZlbWxvZnQubmV0PjsgTWFo
-aXBhbCBDaGFsbGEgPG1haGlwYWxyZWRkeTIwMDZAZ21haWwuY29tPjsNCj4gU2V0aCBKZW5uaW5n
-cyA8c2plbm5pbmdAcmVkaGF0LmNvbT47IERhbiBTdHJlZXRtYW4gPGRkc3RyZWV0QGllZWUub3Jn
-PjsNCj4gV2FuZ3pob3UgKEIpIDx3YW5nemhvdTFAaGlzaWxpY29uLmNvbT47IENvbGluIElhbiBL
-aW5nDQo+IDxjb2xpbi5raW5nQGNhbm9uaWNhbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0gg
-djddIG1tL3pzd2FwOiBtb3ZlIHRvIHVzZSBjcnlwdG9fYWNvbXAgQVBJIGZvcg0KPiBoYXJkd2Fy
-ZSBhY2NlbGVyYXRpb24NCj4gDQo+IEkndmUgYmVlbiBsb29raW5nIGF0IHRoZSBwYXRjaCBhbmQg
-aXQgbG9va3MgbGlrZSBpdCBzaG91bGQgd29yay4gSGF2aW5nIG51bWJlcnMNCg0KVGhhbmtzIHZl
-cnkgbXVjaCBmb3IgcmV2aWV3aW5nIGl0IGFuZCB0aGUgcHJldmlvdXMgcGF0Y2hlcy4gSSBhcHBy
-ZWNpYXRlLg0KDQo+IHRvIGJhY2t1cCB0aGUgcGVyZm9ybWFuY2UgaW4gdGhlIHB1cmUtc29mdHdh
-cmUgdmVyc2lvbiBhbmQgd2l0aCBIVw0KPiBhY2NlbGVyYXRpb24gd291bGQgX3ZlcnlfIG5pY2Ug
-dG8gaGF2ZS4NCg0KU3VyZS4gVGhlIDFzdCBzdGVwIGlzIGZpeGluZyB0aGUgYnJva2VuIGNvbm5l
-Y3QgYmV0d2VlbiBuZXcgY3J5cHRvIEFQSXMgYW5kDQp6c3dhcC4gVGhlbiB3ZSBhcmUgZ29pbmcg
-dG8gZGlnIGludG8gcG9zc2libGUgcGVyZm9ybWFuY2UgaW1wcm92ZW1lbnRzLg0KSWYgd2UgcHV0
-IGFsbCB0aGUgZ29hbHMgaW4gdGhlIHNpbmdsZSBmaXJzdCBzdGVwLCBpdCB3aWxsIGJlIGhhcmQg
-Zm9yIHVzIHRvIHNlZSBhbg0KYWNjb21wbGlzaG1lbnQgb2YgYW55IHJlYWwgaW1wcm92ZW1lbnQu
-DQoNCj4gDQo+IE9uIDIwMjAtMTEtMDcgMTk6NTM6MzIgWysxMzAwXSwgQmFycnkgU29uZyB3cm90
-ZToNCj4gPiBpbmRleCBmYmI3ODI5Li43M2YwNGRlIDEwMDY0NA0KPiA+IC0tLSBhL21tL3pzd2Fw
-LmMNCj4gPiArKysgYi9tbS96c3dhcC5jDQo+ID4gQEAgLTQxNSwzMCArNDQ1LDU0IEBAIHN0YXRp
-YyBpbnQgenN3YXBfZHN0bWVtX2RlYWQodW5zaWduZWQgaW50IGNwdSkNCj4g4oCmDQo+ID4gKwlh
-Y29tcF9jdHgtPnJlcSA9IHJlcTsNCj4gPiArDQo+ID4gKwljcnlwdG9faW5pdF93YWl0KCZhY29t
-cF9jdHgtPndhaXQpOw0KPiA+ICsJLyoNCj4gPiArCSAqIGlmIHRoZSBiYWNrZW5kIG9mIGFjb21w
-IGlzIGFzeW5jIHppcCwgY3J5cHRvX3JlcV9kb25lKCkgd2lsbCB3YWtldXANCj4gPiArCSAqIGNy
-eXB0b193YWl0X3JlcSgpOyBpZiB0aGUgYmFja2VuZCBvZiBhY29tcCBpcyBzY29tcCwgdGhlIGNh
-bGxiYWNrDQo+ID4gKwkgKiB3b24ndCBiZSBjYWxsZWQsIGNyeXB0b193YWl0X3JlcSgpIHdpbGwg
-cmV0dXJuIHdpdGhvdXQgYmxvY2tpbmcuDQo+ID4gKwkgKi8NCj4gPiArCWFjb21wX3JlcXVlc3Rf
-c2V0X2NhbGxiYWNrKHJlcSwgQ1JZUFRPX1RGTV9SRVFfTUFZX0JBQ0tMT0csDQo+ID4gKwkJCQkg
-ICBjcnlwdG9fcmVxX2RvbmUsICZhY29tcF9jdHgtPndhaXQpOw0KPiA+ICsNCj4gPiArCWFjb21w
-X2N0eC0+bXV0ZXggPSBwZXJfY3B1KHpzd2FwX211dGV4LCBjcHUpOw0KPiA+ICsJYWNvbXBfY3R4
-LT5kc3RtZW0gPSBwZXJfY3B1KHpzd2FwX2RzdG1lbSwgY3B1KTsNCj4gDQo+IFlvdSBhZGRlZCBh
-IGNvbW1lbnQgaGVyZSBhbmQgdGhlcmUgeW91IG5ldmVyIG1lbnRpb25lZCB0aGF0IHRoaXMgc2lu
-Z2xlDQo+IHBlci1DUFUgbXV0ZXggcHJvdGVjdHMgdGhlIHBlci1DUFUgY29udGV4dCAod2hpY2gg
-eW91IGNhbiBoYXZlIG1vcmUgdGhhbg0KPiBvbmUgb24gYSBzaW5nbGUgQ1BVKSBhbmQgdGhlIHNj
-cmF0Y2gvZHN0bWVtIHdoaWNoIGlzIG9uZSBwZXItQ1BVLiBPZiBjb3Vyc2UNCj4gaWYgeW91IHJl
-YWQgdGhlIGNvZGUgeW91IGZpZ3VyZSBpdCBvdXQuDQo+IEkgc3RpbGwgdGhpbmsgdGhhdCB5b3Ug
-c2hvdWxkIGhhdmUgYSBwb29sIG9mIG1lbW9yeSBhbmQgY3J5cHRvIGNvbnRleHRzIHdoaWNoDQo+
-IHlvdSBjYW4gdXNlIGluc3RlYWQgb2YgaGF2aW5nIHRoZW0gc3RyaWN0bHkgcGVyLUNQVS4gVGhl
-IGNvZGUgaXMgZnVsbHkNCj4gcHJlZW1wdGlibGUgYW5kIHlvdSBtYXkgaGF2ZSBtdWx0aXBsZSBy
-ZXF1ZXN0cyBvbiB0aGUgc2FtZSBDUFUuDQo+IFllcywgbG9ja2luZyB3b3JrcyBidXQgYXQgdGhl
-IHNhbWUgeW91IGJsb2NrIHByb2Nlc3Npbmcgd2hpbGUgd2FpdGluZyBvbiBhIGxvY2sNCj4gYW5k
-IHRoZSAicmVzZXJ2ZWQgbWVtb3J5IiBvbiBvdGhlciBDUFVzIHJlbWFpbnMgdW51c2VkLg0KDQpG
-b3Igc3VyZSB0aGUgYnVmZmVyIHBvb2wgd2lsbCBiZSBwdXQgaW50byBteSBUb2RvIGxpc3Qgb24g
-enN3YXAgcHJvamVjdC4gRm9yIHRoaXMNCm1vbWVudCwgbGV0J3MgZml4IHRoZSBicm9rZW4gY29u
-bmVjdGlvbiBiZXR3ZWVuIFpJUCBkcml2ZXJzIGFuZCB6c3dhcCBmaXJzdC4NClRoaXMgd2lsbCBo
-ZWxwIGJ1aWxkIHRoZSBmYWl0aCBvbiB0aGUgd2hvbGUgcHJvamVjdCBhbmQgbW90aXZhdGUgdGhl
-IG1vdmUgdG8NCnRoZSBuZXh0IHN0ZXAuDQoNClN0ZXAgYnkgc3RlcCwgd2Ugd2lsbCBtYWtlIHpz
-d2FwIGJldHRlciBhbmQgYmV0dGVyIG9uIHBlcmZvcm1hbmNlIGJ5IGxldmVyYWdpbmcNCnRoZSBw
-b3dlciBvZiBaSVAgaGFyZHdhcmUuDQoNCj4gDQo+IFNlYmFzdGlhbg0KDQpUaGFua3MNCkJhcnJ5
-DQo=
+This series introduces crypto(CPT) drivers(PF & VF) for Marvell OcteonTX2
+CN96XX Soc.
+
+OcteonTX2 SOC's resource virtualization unit (RVU) supports multiple
+physical and virtual functions. Each of the PF/VF's functionality is
+determined by what kind of resources are attached to it. When the CPT
+block is attached to a VF, it can function as a security device.
+The following document provides an overview of the hardware and
+different drivers for the OcteonTX2 SOC: 
+https://www.kernel.org/doc/Documentation/networking/device_drivers/marvell/octeontx2.rst
+
+The CPT PF driver is responsible for:
+- Forwarding messages to/from VFs from/to admin function(AF),
+- Enabling/disabling VFs,
+- Loading/unloading microcode (creation/deletion of engine groups).
+
+The CPT VF driver works as a crypto offload device.
+
+This patch series includes:
+- Patch to update existing Marvell sources to support the CPT driver.
+- Patch that adds mailbox messages to the admin function (AF) driver,
+to configure CPT HW registers.
+- CPT PF driver patches that include AF<=>PF<=>VF mailbox communication,
+sriov_configure, and firmware load to the acceleration engines.
+- CPT VF driver patches that include VF<=>PF mailbox communication and
+crypto offload support through the kernel cryptographic API.
+
+This series is tested with CRYPTO_EXTRA_TESTS enabled and
+CRYPTO_DISABLE_TESTS disabled.
+
+Changes since v8:
+ * Load firmware files individually instead of tar.
+Changes since v7:
+ * Removed writable entries in debugfs.
+ * Dropped IPsec support.
+Changes since v6:
+ * Removed driver version.
+Changes since v4:
+ * Rebased the patches onto net-next tree with base
+   'commit bc081a693a56 ("Merge branch 'Offload-tc-vlan-mangle-to-mscc_ocelot-switch'")' 
+Changes since v3:
+ * Splitup the patches into smaller patches with more informartion.
+Changes since v2:
+ * Fixed C=1 warnings.
+ * Added code to exit CPT VF driver gracefully.
+ * Moved OcteonTx2 asm code to a header file under include/linux/soc/
+Changes since v1:
+ * Moved Makefile changes from patch4 to patch2 and patch3.
+
+Srujana Challa (12):
+  octeontx2-pf: move lmt flush to include/linux/soc
+  octeontx2-af: add mailbox interface for CPT
+  octeontx2-af: add debugfs entries for CPT block
+  drivers: crypto: add Marvell OcteonTX2 CPT PF driver
+  crypto: octeontx2: add mailbox communication with AF
+  crypto: octeontx2: enable SR-IOV and mailbox communication with VF
+  crypto: octeontx2: load microcode and create engine groups
+  crypto: octeontx2: add LF framework
+  crypto: octeontx2: add support to get engine capabilities
+  crypto: octeontx2: add virtual function driver support
+  crypto: octeontx2: add support to process the crypto request
+  crypto: octeontx2: register with linux crypto framework
+
+ MAINTAINERS                                   |    2 +
+ drivers/crypto/marvell/Kconfig                |   14 +
+ drivers/crypto/marvell/Makefile               |    1 +
+ drivers/crypto/marvell/octeontx2/Makefile     |   10 +
+ .../marvell/octeontx2/otx2_cpt_common.h       |  123 ++
+ .../marvell/octeontx2/otx2_cpt_hw_types.h     |  464 +++++
+ .../marvell/octeontx2/otx2_cpt_mbox_common.c  |  202 ++
+ .../marvell/octeontx2/otx2_cpt_reqmgr.h       |  197 ++
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.c |  429 +++++
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.h |  352 ++++
+ drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   52 +
+ .../marvell/octeontx2/otx2_cptpf_main.c       |  574 ++++++
+ .../marvell/octeontx2/otx2_cptpf_mbox.c       |  331 ++++
+ .../marvell/octeontx2/otx2_cptpf_ucode.c      | 1415 ++++++++++++++
+ .../marvell/octeontx2/otx2_cptpf_ucode.h      |  162 ++
+ drivers/crypto/marvell/octeontx2/otx2_cptvf.h |   28 +
+ .../marvell/octeontx2/otx2_cptvf_algs.c       | 1664 +++++++++++++++++
+ .../marvell/octeontx2/otx2_cptvf_algs.h       |  170 ++
+ .../marvell/octeontx2/otx2_cptvf_main.c       |  405 ++++
+ .../marvell/octeontx2/otx2_cptvf_mbox.c       |  139 ++
+ .../marvell/octeontx2/otx2_cptvf_reqmgr.c     |  541 ++++++
+ .../ethernet/marvell/octeontx2/af/Makefile    |    3 +-
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   33 +
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |    1 +
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  233 +++
+ .../marvell/octeontx2/af/rvu_debugfs.c        |  272 +++
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   63 +-
+ .../marvell/octeontx2/nic/otx2_common.h       |   13 +-
+ include/linux/soc/marvell/octeontx2/asm.h     |   29 +
+ 29 files changed, 7903 insertions(+), 19 deletions(-)
+ create mode 100644 drivers/crypto/marvell/octeontx2/Makefile
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptlf.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptlf.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+ create mode 100644 include/linux/soc/marvell/octeontx2/asm.h
+
+-- 
+2.28.0
+
