@@ -2,192 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A9DFC388F7
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Nov 2020 09:10:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C43CC5517A
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Nov 2020 09:25:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A3FF7207BC
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Nov 2020 09:10:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30AF420781
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Nov 2020 09:25:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="GnYZ70CQ"
+	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="G1L6d83h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726827AbgKJJKv (ORCPT
+        id S1729962AbgKJJZs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Nov 2020 04:10:51 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39974 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726825AbgKJJKu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Nov 2020 04:10:50 -0500
-Received: from e123331-lin.nice.arm.com (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5BF8E20780;
-        Tue, 10 Nov 2020 09:10:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604999449;
-        bh=pb8ZTmOJX9aXi6v481kRqmUQxy7+yLqwqXuPeAjALWI=;
-        h=From:To:Cc:Subject:Date:From;
-        b=GnYZ70CQRpKSsBcLSlKiE99B00+G7Zz9K+/wwSz4Er6MUu4y0sMQ2E2DL6g3gQX8k
-         hJW1KO+tAmja0KryKiFCgZUvNfL1TlYSHxfOXYSJbc/dyeAMYCfa5LyZTS0CmyOm7b
-         +Rp6u1zhjwsdM6+zkW5GX4bhM/Aob5XPHToMFoL8=
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH v2] crypto: arm64/gcm - move authentication tag check to SIMD domain
-Date:   Tue, 10 Nov 2020 10:10:42 +0100
-Message-Id: <20201110091042.2847-1-ardb@kernel.org>
-X-Mailer: git-send-email 2.17.1
+        Tue, 10 Nov 2020 04:25:48 -0500
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.51]:8570 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729417AbgKJJZr (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Nov 2020 04:25:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1605000345;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=Muj+NMY/EMMLy32xXtOumpx5dkBS25Z8v7DfG0sequM=;
+        b=G1L6d83hHPg8Hi49yUxT/RyknXV71nZynuEon/erBwmHMowpoAUMmtfJbBOX1sjFrm
+        3RMtHgKAri8ZIfQDQsx+Vr+JiJdoqDpZO1Iub1ktY5EZpeKglTygMjq/sCgQCcwXdTlJ
+        oFOYRDrG6zY0ErT2g2Xd+Esp9KmsQYU1f3mN7Fke1otOgqENxC6XDLy2uDS34//EK0Pe
+        dB2E/9PX2cl9ONjrkVM7W+B+9GqqXOuZuhuX50sxGex6lHd+m+4Dn23YPunMAcdv/yFP
+        fJ9OsNqVID8CPf44b3M9uw01/+HyC2did9UkA82dD+Qq1mSJP74tM2P5cA0xzqU68x+8
+        Gzcg==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaIvSfEhGW"
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 47.3.3 DYNA|AUTH)
+        with ESMTPSA id Y03aecwAA9PhFDG
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Tue, 10 Nov 2020 10:25:43 +0100 (CET)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Paul Menzel <pmenzel@molgen.mpg.de>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: jitterentropy: `jent_mod_init()` takes 17 ms
+Date:   Tue, 10 Nov 2020 10:25:42 +0100
+Message-ID: <4825077.WBkqHH8m98@tauon.chronox.de>
+In-Reply-To: <02fa159f-4f94-cfb7-1f88-bed91c6542a1@molgen.mpg.de>
+References: <02fa159f-4f94-cfb7-1f88-bed91c6542a1@molgen.mpg.de>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Instead of copying the calculated authentication tag to memory and
-calling crypto_memneq() to verify it, use vector bytewise compare and
-min across vector instructions to decide whether the tag is valid. This
-is more efficient, and given that the tag is only transiently held in a
-NEON register, it is also safer, given that calculated tags for failed
-decryptions should be withheld.
+Am Montag, 9. November 2020, 20:31:02 CET schrieb Paul Menzel:
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
-v2: drop superfluous ')'
+Hi Paul,
 
- arch/arm64/crypto/ghash-ce-core.S | 15 +++++++
- arch/arm64/crypto/ghash-ce-glue.c | 46 ++++++++++++--------
- 2 files changed, 43 insertions(+), 18 deletions(-)
+> Dear Linux folks,
+> 
+> 
+> By mistake I built `XFRM_ESP` into the Linux kernel, resulting in
+> 
+>      CONFIG_CRYPTO_SEQIV=y
+>      CONFIG_CRYPTO_ECHAINIV=y
+> 
+> and also the Jitterentropy RNG to be built in.
+> 
+>      CRYPTO_JITTERENTROPY=y
+> 
+> So, on the Asus F2A85-M PRO starting Linux 4.10-rc3 with
+> `initcall_debug`, the init method is run unconditionally, and it takes
+> 17.5 ms, which is over ten percent of the overall 900 ms the Linux
 
-diff --git a/arch/arm64/crypto/ghash-ce-core.S b/arch/arm64/crypto/ghash-ce-core.S
-index 6b958dcdf136..7868330dd54e 100644
---- a/arch/arm64/crypto/ghash-ce-core.S
-+++ b/arch/arm64/crypto/ghash-ce-core.S
-@@ -544,7 +544,22 @@ CPU_LE(	rev		w8, w8		)
- 	ext		XL.16b, XL.16b, XL.16b, #8
- 	rev64		XL.16b, XL.16b
- 	eor		XL.16b, XL.16b, KS0.16b
-+
-+	.if		\enc == 1
- 	st1		{XL.16b}, [x10]			// store tag
-+	.else
-+	ldp		x11, x12, [sp, #40]		// load tag pointer and authsize
-+	adr_l		x17, .Lpermute_table
-+	ld1		{KS0.16b}, [x11]		// load supplied tag
-+	add		x17, x17, x12
-+	ld1		{KS1.16b}, [x17]		// load permute vector
-+
-+	cmeq		XL.16b, XL.16b, KS0.16b		// compare tags
-+	mvn		XL.16b, XL.16b			// -1 for fail, 0 for pass
-+	tbl		XL.16b, {XL.16b}, KS1.16b	// keep authsize bytes only
-+	sminv		b0, XL.16b			// signed minimum across XL
-+	smov		w0, v0.b[0]			// return b0
-+	.endif
- 
- 4:	ldp		x29, x30, [sp], #32
- 	ret
-diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
-index 8536008e3e35..184602a97454 100644
---- a/arch/arm64/crypto/ghash-ce-glue.c
-+++ b/arch/arm64/crypto/ghash-ce-glue.c
-@@ -55,10 +55,10 @@ asmlinkage void pmull_ghash_update_p8(int blocks, u64 dg[], const char *src,
- asmlinkage void pmull_gcm_encrypt(int bytes, u8 dst[], const u8 src[],
- 				  u64 const h[][2], u64 dg[], u8 ctr[],
- 				  u32 const rk[], int rounds, u8 tag[]);
--
--asmlinkage void pmull_gcm_decrypt(int bytes, u8 dst[], const u8 src[],
--				  u64 const h[][2], u64 dg[], u8 ctr[],
--				  u32 const rk[], int rounds, u8 tag[]);
-+asmlinkage int pmull_gcm_decrypt(int bytes, u8 dst[], const u8 src[],
-+				 u64 const h[][2], u64 dg[], u8 ctr[],
-+				 u32 const rk[], int rounds, const u8 l[],
-+				 const u8 tag[], u64 authsize);
- 
- static int ghash_init(struct shash_desc *desc)
- {
-@@ -458,6 +458,7 @@ static int gcm_decrypt(struct aead_request *req)
- 	unsigned int authsize = crypto_aead_authsize(aead);
- 	int nrounds = num_rounds(&ctx->aes_key);
- 	struct skcipher_walk walk;
-+	u8 otag[AES_BLOCK_SIZE];
- 	u8 buf[AES_BLOCK_SIZE];
- 	u8 iv[AES_BLOCK_SIZE];
- 	u64 dg[2] = {};
-@@ -474,9 +475,15 @@ static int gcm_decrypt(struct aead_request *req)
- 	memcpy(iv, req->iv, GCM_IV_SIZE);
- 	put_unaligned_be32(2, iv + GCM_IV_SIZE);
- 
-+	scatterwalk_map_and_copy(otag, req->src,
-+				 req->assoclen + req->cryptlen - authsize,
-+				 authsize, 0);
-+
- 	err = skcipher_walk_aead_decrypt(&walk, req, false);
- 
- 	if (likely(crypto_simd_usable())) {
-+		int ret;
-+
- 		do {
- 			const u8 *src = walk.src.virt.addr;
- 			u8 *dst = walk.dst.virt.addr;
-@@ -493,9 +500,10 @@ static int gcm_decrypt(struct aead_request *req)
- 			}
- 
- 			kernel_neon_begin();
--			pmull_gcm_decrypt(nbytes, dst, src, ctx->ghash_key.h,
--					  dg, iv, ctx->aes_key.key_enc, nrounds,
--					  tag);
-+			ret = pmull_gcm_decrypt(nbytes, dst, src,
-+						ctx->ghash_key.h,
-+						dg, iv, ctx->aes_key.key_enc,
-+						nrounds, tag, otag, authsize);
- 			kernel_neon_end();
- 
- 			if (unlikely(!nbytes))
-@@ -507,6 +515,11 @@ static int gcm_decrypt(struct aead_request *req)
- 
- 			err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
- 		} while (walk.nbytes);
-+
-+		if (err)
-+			return err;
-+		if (ret)
-+			return -EBADMSG;
- 	} else {
- 		while (walk.nbytes >= AES_BLOCK_SIZE) {
- 			int blocks = walk.nbytes / AES_BLOCK_SIZE;
-@@ -548,23 +561,20 @@ static int gcm_decrypt(struct aead_request *req)
- 			err = skcipher_walk_done(&walk, 0);
- 		}
- 
-+		if (err)
-+			return err;
-+
- 		put_unaligned_be64(dg[1], tag);
- 		put_unaligned_be64(dg[0], tag + 8);
- 		put_unaligned_be32(1, iv + GCM_IV_SIZE);
- 		aes_encrypt(&ctx->aes_key, iv, iv);
- 		crypto_xor(tag, iv, AES_BLOCK_SIZE);
--	}
--
--	if (err)
--		return err;
- 
--	/* compare calculated auth tag with the stored one */
--	scatterwalk_map_and_copy(buf, req->src,
--				 req->assoclen + req->cryptlen - authsize,
--				 authsize, 0);
--
--	if (crypto_memneq(tag, buf, authsize))
--		return -EBADMSG;
-+		if (crypto_memneq(tag, otag, authsize)) {
-+			memzero_explicit(tag, AES_BLOCK_SIZE);
-+			return -EBADMSG;
-+		}
-+	}
- 	return 0;
- }
- 
--- 
-2.17.1
+Hm, 17.5 / 900 = 2%, or am I missing something?
+
+> kernel needs until loading the init process.
+> 
+>      [    0.300544] calling  jent_mod_init+0x0/0x2c @ 1
+>      [    0.318438] initcall jent_mod_init+0x0/0x2c returned 0 after
+> 17471 usecs
+> 
+> Looking at the output of systemd-bootchart, it looks like, that this
+> indeed delayed the boot a little, as the other init methods seem to be
+> ordered after it.
+> 
+> I am now building it as a module, but am wondering if the time can be
+> reduced to below ten milliseconds.
+
+What you see is the test whether the Jitter RNG has a proper noise source. The 
+function jent_entropy_init() is the cause of the operation. It performs 1024 
+times a test to validate the appropriateness of the noise source. You can 
+adjust that with the TESTLOOPCOUNT in this function. But I am not sure 
+adjusting is a wise course of action.
+
+Ciao
+Stephan
+
 
