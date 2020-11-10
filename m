@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91C7AC56201
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Nov 2020 19:04:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FEE5C388F7
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Nov 2020 19:05:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 397E020797
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Nov 2020 19:04:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 268C620797
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Nov 2020 19:05:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="SccUXDQ7"
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="AhIwZsal"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731221AbgKJTE6 (ORCPT
+        id S1731281AbgKJTFA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Nov 2020 14:04:58 -0500
-Received: from mail.kernel.org ([198.145.29.99]:51174 "EHLO mail.kernel.org"
+        Tue, 10 Nov 2020 14:05:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:51200 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731187AbgKJTE6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Nov 2020 14:04:58 -0500
+        id S1731187AbgKJTFA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Nov 2020 14:05:00 -0500
 Received: from e123331-lin.nice.arm.com (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D7B8320797;
-        Tue, 10 Nov 2020 19:04:55 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E14D02076E;
+        Tue, 10 Nov 2020 19:04:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1605035097;
-        bh=wr4zyW0voGVfANkMYGTbA/RIH7KAE0Nb5B76D7KVWCE=;
+        s=default; t=1605035099;
+        bh=uMlXX6dEGvjboEdSLJCaee28jrk5uTh2PV9QmdrnoPg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SccUXDQ7eQvb3TDggVcHyttWoxIJiMcxr3Mgc1V4795SG0fyGuP0he8qZbd+3ibyH
-         td6T7/RN1YctaM87qujJQCdGXGq20eAwD5Ok7bGL7AKgQm3CSJFoqd4mLoNBZ6WSTI
-         AcDtSTkSStIcjDd2B8Emy+u1qq7rvauPsmi+N/lM=
+        b=AhIwZsalO+SdeWzz5OC0Fep9bk2tisPQWmF2wm4aymmF8A+CadDkjeYFlU6uGatoK
+         lCx+UwnHXsgQpXT1oGsJDd+JxGbQ2odH9iRi7JZURcCoYzRJj8520F1Qg54bqhhOe2
+         TiyXNO5JlV9D7h+tl5SqCbA+RUT2Y7ib1tqV2dbA=
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>,
         Ondrej Mosnacek <omosnacek@gmail.com>,
         Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2 3/4] crypto: aegis128/neon - move final tag check to SIMD domain
-Date:   Tue, 10 Nov 2020 20:04:43 +0100
-Message-Id: <20201110190444.10634-4-ardb@kernel.org>
+Subject: [PATCH v2 4/4] crypto: aegis128 - expose SIMD code path as separate driver
+Date:   Tue, 10 Nov 2020 20:04:44 +0100
+Message-Id: <20201110190444.10634-5-ardb@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201110190444.10634-1-ardb@kernel.org>
 References: <20201110190444.10634-1-ardb@kernel.org>
@@ -49,170 +49,253 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Instead of calculating the tag and returning it to the caller on
-decryption, use a SIMD compare and min across vector to perform
-the comparison. This is slightly more efficient, and removes the
-need on the caller's part to wipe the tag from memory if the
-decryption failed.
+Wiring the SIMD code into the generic driver has the unfortunate side
+effect that the tcrypt testing code cannot distinguish them, and will
+therefore not use the latter to fuzz test the former, as it does for
+other algorithms.
 
-While at it, switch to unsigned int when passing cryptlen and
-assoclen - we don't support input sizes where the difference
-matters anyway.
+So let's refactor the code a bit so we can register two implementations:
+aegis128-generic and aegis128-simd.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- crypto/aegis128-core.c       | 21 +++++++++----
- crypto/aegis128-neon-inner.c | 33 ++++++++++++++++----
- crypto/aegis128-neon.c       | 21 +++++++++----
- 3 files changed, 57 insertions(+), 18 deletions(-)
+ crypto/aegis128-core.c | 176 +++++++++++++-------
+ 1 file changed, 119 insertions(+), 57 deletions(-)
 
 diff --git a/crypto/aegis128-core.c b/crypto/aegis128-core.c
-index 3a71235892f5..859c7b905618 100644
+index 859c7b905618..19f38e8c1627 100644
 --- a/crypto/aegis128-core.c
 +++ b/crypto/aegis128-core.c
-@@ -67,9 +67,11 @@ void crypto_aegis128_encrypt_chunk_simd(struct aegis_state *state, u8 *dst,
- 					const u8 *src, unsigned int size);
- void crypto_aegis128_decrypt_chunk_simd(struct aegis_state *state, u8 *dst,
- 					const u8 *src, unsigned int size);
--void crypto_aegis128_final_simd(struct aegis_state *state,
--				union aegis_block *tag_xor,
--				u64 assoclen, u64 cryptlen);
-+int crypto_aegis128_final_simd(struct aegis_state *state,
-+			       union aegis_block *tag_xor,
-+			       unsigned int assoclen,
-+			       unsigned int cryptlen,
-+			       unsigned int authsize);
+@@ -396,7 +396,7 @@ static int crypto_aegis128_setauthsize(struct crypto_aead *tfm,
+ 	return 0;
+ }
  
- static void crypto_aegis128_update(struct aegis_state *state)
+-static int crypto_aegis128_encrypt(struct aead_request *req)
++static int crypto_aegis128_encrypt_generic(struct aead_request *req)
  {
-@@ -411,7 +413,7 @@ static int crypto_aegis128_encrypt(struct aead_request *req)
- 		crypto_aegis128_process_crypt(&state, &walk,
- 					      crypto_aegis128_encrypt_chunk_simd);
- 		crypto_aegis128_final_simd(&state, &tag, req->assoclen,
--					   cryptlen);
-+					   cryptlen, 0);
- 	} else {
- 		crypto_aegis128_init(&state, &ctx->key, req->iv);
- 		crypto_aegis128_process_ad(&state, req->src, req->assoclen);
-@@ -445,8 +447,15 @@ static int crypto_aegis128_decrypt(struct aead_request *req)
- 		crypto_aegis128_process_ad(&state, req->src, req->assoclen);
- 		crypto_aegis128_process_crypt(&state, &walk,
- 					      crypto_aegis128_decrypt_chunk_simd);
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	union aegis_block tag = {};
+@@ -407,27 +407,18 @@ static int crypto_aegis128_encrypt(struct aead_request *req)
+ 	struct aegis_state state;
+ 
+ 	skcipher_walk_aead_encrypt(&walk, req, false);
+-	if (aegis128_do_simd()) {
+-		crypto_aegis128_init_simd(&state, &ctx->key, req->iv);
+-		crypto_aegis128_process_ad(&state, req->src, req->assoclen);
+-		crypto_aegis128_process_crypt(&state, &walk,
+-					      crypto_aegis128_encrypt_chunk_simd);
 -		crypto_aegis128_final_simd(&state, &tag, req->assoclen,
--					   cryptlen);
-+		if (unlikely(crypto_aegis128_final_simd(&state, &tag,
-+							req->assoclen,
-+							cryptlen, authsize))) {
-+			skcipher_walk_aead_decrypt(&walk, req, false);
-+			crypto_aegis128_process_crypt(NULL, &walk,
-+						      crypto_aegis128_wipe_chunk);
-+			return -EBADMSG;
-+		}
-+		return 0;
- 	} else {
- 		crypto_aegis128_init(&state, &ctx->key, req->iv);
- 		crypto_aegis128_process_ad(&state, req->src, req->assoclen);
-diff --git a/crypto/aegis128-neon-inner.c b/crypto/aegis128-neon-inner.c
-index cd1b3ad1d1f3..7de485907d81 100644
---- a/crypto/aegis128-neon-inner.c
-+++ b/crypto/aegis128-neon-inner.c
-@@ -199,6 +199,17 @@ static uint8x16_t vqtbx1q_u8(uint8x16_t v, uint8x16_t a, uint8x16_t b)
- 	return vcombine_u8(vtbx2_u8(vget_low_u8(v), __a.pair, vget_low_u8(b)),
- 			   vtbx2_u8(vget_high_u8(v), __a.pair, vget_high_u8(b)));
- }
-+
-+static int8_t vminvq_s8(int8x16_t v)
-+{
-+	int8x8_t s = vpmin_s8(vget_low_s8(v), vget_high_s8(v));
-+
-+	s = vpmin_s8(s, s);
-+	s = vpmin_s8(s, s);
-+	s = vpmin_s8(s, s);
-+
-+	return vget_lane_s8(s, 0);
-+}
- #endif
+-					   cryptlen, 0);
+-	} else {
+-		crypto_aegis128_init(&state, &ctx->key, req->iv);
+-		crypto_aegis128_process_ad(&state, req->src, req->assoclen);
+-		crypto_aegis128_process_crypt(&state, &walk,
+-					      crypto_aegis128_encrypt_chunk);
+-		crypto_aegis128_final(&state, &tag, req->assoclen, cryptlen);
+-	}
++	crypto_aegis128_init(&state, &ctx->key, req->iv);
++	crypto_aegis128_process_ad(&state, req->src, req->assoclen);
++	crypto_aegis128_process_crypt(&state, &walk,
++				      crypto_aegis128_encrypt_chunk);
++	crypto_aegis128_final(&state, &tag, req->assoclen, cryptlen);
  
- static const uint8_t permute[] __aligned(64) = {
-@@ -302,8 +313,10 @@ void crypto_aegis128_decrypt_chunk_neon(void *state, void *dst, const void *src,
- 	aegis128_save_state_neon(st, state);
+ 	scatterwalk_map_and_copy(tag.bytes, req->dst, req->assoclen + cryptlen,
+ 				 authsize, 1);
+ 	return 0;
  }
  
--void crypto_aegis128_final_neon(void *state, void *tag_xor, uint64_t assoclen,
--				uint64_t cryptlen)
-+int crypto_aegis128_final_neon(void *state, void *tag_xor,
-+			       unsigned int assoclen,
-+			       unsigned int cryptlen,
-+			       unsigned int authsize)
+-static int crypto_aegis128_decrypt(struct aead_request *req)
++static int crypto_aegis128_decrypt_generic(struct aead_request *req)
  {
- 	struct aegis128_state st = aegis128_load_state_neon(state);
- 	uint8x16_t v;
-@@ -311,13 +324,21 @@ void crypto_aegis128_final_neon(void *state, void *tag_xor, uint64_t assoclen,
+ 	static const u8 zeros[AEGIS128_MAX_AUTH_SIZE] = {};
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+@@ -442,27 +433,11 @@ static int crypto_aegis128_decrypt(struct aead_request *req)
+ 				 authsize, 0);
  
- 	preload_sbox();
+ 	skcipher_walk_aead_decrypt(&walk, req, false);
+-	if (aegis128_do_simd()) {
+-		crypto_aegis128_init_simd(&state, &ctx->key, req->iv);
+-		crypto_aegis128_process_ad(&state, req->src, req->assoclen);
+-		crypto_aegis128_process_crypt(&state, &walk,
+-					      crypto_aegis128_decrypt_chunk_simd);
+-		if (unlikely(crypto_aegis128_final_simd(&state, &tag,
+-							req->assoclen,
+-							cryptlen, authsize))) {
+-			skcipher_walk_aead_decrypt(&walk, req, false);
+-			crypto_aegis128_process_crypt(NULL, &walk,
+-						      crypto_aegis128_wipe_chunk);
+-			return -EBADMSG;
+-		}
+-		return 0;
+-	} else {
+-		crypto_aegis128_init(&state, &ctx->key, req->iv);
+-		crypto_aegis128_process_ad(&state, req->src, req->assoclen);
+-		crypto_aegis128_process_crypt(&state, &walk,
+-					      crypto_aegis128_decrypt_chunk);
+-		crypto_aegis128_final(&state, &tag, req->assoclen, cryptlen);
+-	}
++	crypto_aegis128_init(&state, &ctx->key, req->iv);
++	crypto_aegis128_process_ad(&state, req->src, req->assoclen);
++	crypto_aegis128_process_crypt(&state, &walk,
++				      crypto_aegis128_decrypt_chunk);
++	crypto_aegis128_final(&state, &tag, req->assoclen, cryptlen);
  
--	v = st.v[3] ^ (uint8x16_t)vcombine_u64(vmov_n_u64(8 * assoclen),
--					       vmov_n_u64(8 * cryptlen));
-+	v = st.v[3] ^ (uint8x16_t)vcombine_u64(vmov_n_u64(8ULL * assoclen),
-+					       vmov_n_u64(8ULL * cryptlen));
+ 	if (unlikely(crypto_memneq(tag.bytes, zeros, authsize))) {
+ 		/*
+@@ -482,42 +457,128 @@ static int crypto_aegis128_decrypt(struct aead_request *req)
+ 	return 0;
+ }
  
- 	for (i = 0; i < 7; i++)
- 		st = aegis128_update_neon(st, v);
+-static struct aead_alg crypto_aegis128_alg = {
+-	.setkey = crypto_aegis128_setkey,
+-	.setauthsize = crypto_aegis128_setauthsize,
+-	.encrypt = crypto_aegis128_encrypt,
+-	.decrypt = crypto_aegis128_decrypt,
++static int crypto_aegis128_encrypt_simd(struct aead_request *req)
++{
++	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
++	union aegis_block tag = {};
++	unsigned int authsize = crypto_aead_authsize(tfm);
++	struct aegis_ctx *ctx = crypto_aead_ctx(tfm);
++	unsigned int cryptlen = req->cryptlen;
++	struct skcipher_walk walk;
++	struct aegis_state state;
  
--	v = vld1q_u8(tag_xor);
--	v ^= st.v[0] ^ st.v[1] ^ st.v[2] ^ st.v[3] ^ st.v[4];
-+	v = st.v[0] ^ st.v[1] ^ st.v[2] ^ st.v[3] ^ st.v[4];
-+
-+	if (authsize > 0) {
-+		v = vqtbl1q_u8(~vceqq_u8(v, vld1q_u8(tag_xor)),
-+			       vld1q_u8(permute + authsize));
-+
-+		return vminvq_s8((int8x16_t)v);
-+	}
-+
- 	vst1q_u8(tag_xor, v);
+-	.ivsize = AEGIS128_NONCE_SIZE,
+-	.maxauthsize = AEGIS128_MAX_AUTH_SIZE,
+-	.chunksize = AEGIS_BLOCK_SIZE,
++	if (!aegis128_do_simd())
++		return crypto_aegis128_encrypt_generic(req);
+ 
+-	.base = {
+-		.cra_blocksize = 1,
+-		.cra_ctxsize = sizeof(struct aegis_ctx),
+-		.cra_alignmask = 0,
++	skcipher_walk_aead_encrypt(&walk, req, false);
++	crypto_aegis128_init_simd(&state, &ctx->key, req->iv);
++	crypto_aegis128_process_ad(&state, req->src, req->assoclen);
++	crypto_aegis128_process_crypt(&state, &walk,
++				      crypto_aegis128_encrypt_chunk_simd);
++	crypto_aegis128_final_simd(&state, &tag, req->assoclen, cryptlen, 0);
+ 
+-		.cra_priority = 100,
++	scatterwalk_map_and_copy(tag.bytes, req->dst, req->assoclen + cryptlen,
++				 authsize, 1);
 +	return 0;
- }
-diff --git a/crypto/aegis128-neon.c b/crypto/aegis128-neon.c
-index 8271b1fa0fbc..94d591a002a4 100644
---- a/crypto/aegis128-neon.c
-+++ b/crypto/aegis128-neon.c
-@@ -14,8 +14,10 @@ void crypto_aegis128_encrypt_chunk_neon(void *state, void *dst, const void *src,
- 					unsigned int size);
- void crypto_aegis128_decrypt_chunk_neon(void *state, void *dst, const void *src,
- 					unsigned int size);
--void crypto_aegis128_final_neon(void *state, void *tag_xor, uint64_t assoclen,
--				uint64_t cryptlen);
-+int crypto_aegis128_final_neon(void *state, void *tag_xor,
-+			       unsigned int assoclen,
-+			       unsigned int cryptlen,
-+			       unsigned int authsize);
++}
  
- int aegis128_have_aes_insn __ro_after_init;
+-		.cra_name = "aegis128",
+-		.cra_driver_name = "aegis128-generic",
++static int crypto_aegis128_decrypt_simd(struct aead_request *req)
++{
++	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
++	union aegis_block tag;
++	unsigned int authsize = crypto_aead_authsize(tfm);
++	unsigned int cryptlen = req->cryptlen - authsize;
++	struct aegis_ctx *ctx = crypto_aead_ctx(tfm);
++	struct skcipher_walk walk;
++	struct aegis_state state;
++
++	if (!aegis128_do_simd())
++		return crypto_aegis128_decrypt_generic(req);
++
++	scatterwalk_map_and_copy(tag.bytes, req->src, req->assoclen + cryptlen,
++				 authsize, 0);
++
++	skcipher_walk_aead_decrypt(&walk, req, false);
++	crypto_aegis128_init_simd(&state, &ctx->key, req->iv);
++	crypto_aegis128_process_ad(&state, req->src, req->assoclen);
++	crypto_aegis128_process_crypt(&state, &walk,
++				      crypto_aegis128_decrypt_chunk_simd);
  
-@@ -60,11 +62,18 @@ void crypto_aegis128_decrypt_chunk_simd(union aegis_block *state, u8 *dst,
- 	kernel_neon_end();
- }
+-		.cra_module = THIS_MODULE,
++	if (unlikely(crypto_aegis128_final_simd(&state, &tag, req->assoclen,
++						cryptlen, authsize))) {
++		skcipher_walk_aead_decrypt(&walk, req, false);
++		crypto_aegis128_process_crypt(NULL, &walk,
++					      crypto_aegis128_wipe_chunk);
++		return -EBADMSG;
+ 	}
++	return 0;
++}
++
++static struct aead_alg crypto_aegis128_alg_generic = {
++	.setkey			= crypto_aegis128_setkey,
++	.setauthsize		= crypto_aegis128_setauthsize,
++	.encrypt		= crypto_aegis128_encrypt_generic,
++	.decrypt		= crypto_aegis128_decrypt_generic,
++
++	.ivsize			= AEGIS128_NONCE_SIZE,
++	.maxauthsize		= AEGIS128_MAX_AUTH_SIZE,
++	.chunksize		= AEGIS_BLOCK_SIZE,
++
++	.base.cra_blocksize	= 1,
++	.base.cra_ctxsize	= sizeof(struct aegis_ctx),
++	.base.cra_alignmask	= 0,
++	.base.cra_priority	= 100,
++	.base.cra_name		= "aegis128",
++	.base.cra_driver_name	= "aegis128-generic",
++};
++
++static struct aead_alg crypto_aegis128_alg_simd = {
++	.base.cra_module	= THIS_MODULE,
++	.setkey			= crypto_aegis128_setkey,
++	.setauthsize		= crypto_aegis128_setauthsize,
++	.encrypt		= crypto_aegis128_encrypt_simd,
++	.decrypt		= crypto_aegis128_decrypt_simd,
++
++	.ivsize			= AEGIS128_NONCE_SIZE,
++	.maxauthsize		= AEGIS128_MAX_AUTH_SIZE,
++	.chunksize		= AEGIS_BLOCK_SIZE,
++
++	.base.cra_blocksize	= 1,
++	.base.cra_ctxsize	= sizeof(struct aegis_ctx),
++	.base.cra_alignmask	= 0,
++	.base.cra_priority	= 200,
++	.base.cra_name		= "aegis128",
++	.base.cra_driver_name	= "aegis128-simd",
++	.base.cra_module	= THIS_MODULE,
+ };
  
--void crypto_aegis128_final_simd(union aegis_block *state,
--				union aegis_block *tag_xor,
--				u64 assoclen, u64 cryptlen)
-+int crypto_aegis128_final_simd(union aegis_block *state,
-+			       union aegis_block *tag_xor,
-+			       unsigned int assoclen,
-+			       unsigned int cryptlen,
-+			       unsigned int authsize)
+ static int __init crypto_aegis128_module_init(void)
  {
 +	int ret;
 +
- 	kernel_neon_begin();
--	crypto_aegis128_final_neon(state, tag_xor, assoclen, cryptlen);
-+	ret = crypto_aegis128_final_neon(state, tag_xor, assoclen, cryptlen,
-+					 authsize);
- 	kernel_neon_end();
++	ret = crypto_register_aead(&crypto_aegis128_alg_generic);
++	if (ret)
++		return ret;
 +
-+	return ret;
+ 	if (IS_ENABLED(CONFIG_CRYPTO_AEGIS128_SIMD) &&
+-	    crypto_aegis128_have_simd())
++	    crypto_aegis128_have_simd()) {
++		ret = crypto_register_aead(&crypto_aegis128_alg_simd);
++		if (ret) {
++			crypto_unregister_aead(&crypto_aegis128_alg_generic);
++			return ret;
++		}
+ 		static_branch_enable(&have_simd);
+-
+-	return crypto_register_aead(&crypto_aegis128_alg);
++	}
++	return 0;
  }
+ 
+ static void __exit crypto_aegis128_module_exit(void)
+ {
+-	crypto_unregister_aead(&crypto_aegis128_alg);
++	if (IS_ENABLED(CONFIG_CRYPTO_AEGIS128_SIMD) &&
++	    crypto_aegis128_have_simd())
++		crypto_unregister_aead(&crypto_aegis128_alg_simd);
++
++	crypto_unregister_aead(&crypto_aegis128_alg_generic);
+ }
+ 
+ subsys_initcall(crypto_aegis128_module_init);
+@@ -528,3 +589,4 @@ MODULE_AUTHOR("Ondrej Mosnacek <omosnacek@gmail.com>");
+ MODULE_DESCRIPTION("AEGIS-128 AEAD algorithm");
+ MODULE_ALIAS_CRYPTO("aegis128");
+ MODULE_ALIAS_CRYPTO("aegis128-generic");
++MODULE_ALIAS_CRYPTO("aegis128-simd");
 -- 
 2.17.1
 
