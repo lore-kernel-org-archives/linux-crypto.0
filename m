@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0AC5C5517A
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Nov 2020 07:58:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A9DFC388F7
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Nov 2020 09:10:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52BE6208CA
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Nov 2020 07:58:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3FF7207BC
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Nov 2020 09:10:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="h1eklgoa"
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="GnYZ70CQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728323AbgKJH6W (ORCPT
+        id S1726827AbgKJJKv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Nov 2020 02:58:22 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50412 "EHLO mail.kernel.org"
+        Tue, 10 Nov 2020 04:10:51 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39974 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726825AbgKJH6W (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Nov 2020 02:58:22 -0500
+        id S1726825AbgKJJKu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Nov 2020 04:10:50 -0500
 Received: from e123331-lin.nice.arm.com (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EE9122080A;
-        Tue, 10 Nov 2020 07:58:20 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5BF8E20780;
+        Tue, 10 Nov 2020 09:10:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1604995101;
-        bh=XyWnCCRqboN7ShlbLTs12iGG7x6q2Fg5mlE/bAWkn+I=;
+        s=default; t=1604999449;
+        bh=pb8ZTmOJX9aXi6v481kRqmUQxy7+yLqwqXuPeAjALWI=;
         h=From:To:Cc:Subject:Date:From;
-        b=h1eklgoaSdZdLiHkzHjs8sjqNH3zu3UpZwmN14Z1abnXTKSUrIIVkRIgNC9fg3At/
-         +UlzTT/VIgXTPWMO9k5V/5u4a/Fk6beUn0TkH+IaLSuL/+Cgzi44HeXQx38UIQr4Ot
-         OMi2psqE7ZqYEtbD6iO0oZX8vBbQT67fjIX35uBs=
+        b=GnYZ70CQRpKSsBcLSlKiE99B00+G7Zz9K+/wwSz4Er6MUu4y0sMQ2E2DL6g3gQX8k
+         hJW1KO+tAmja0KryKiFCgZUvNfL1TlYSHxfOXYSJbc/dyeAMYCfa5LyZTS0CmyOm7b
+         +Rp6u1zhjwsdM6+zkW5GX4bhM/Aob5XPHToMFoL8=
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH] crypto: arm64/gcm - move authentication tag check to SIMD domain
-Date:   Tue, 10 Nov 2020 08:58:10 +0100
-Message-Id: <20201110075810.29050-1-ardb@kernel.org>
+Subject: [PATCH v2] crypto: arm64/gcm - move authentication tag check to SIMD domain
+Date:   Tue, 10 Nov 2020 10:10:42 +0100
+Message-Id: <20201110091042.2847-1-ardb@kernel.org>
 X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -54,8 +54,10 @@ decryptions should be withheld.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/arm64/crypto/ghash-ce-core.S | 15 ++++++++++
- arch/arm64/crypto/ghash-ce-glue.c | 46 +++++++++++++++++++------------
+v2: drop superfluous ')'
+
+ arch/arm64/crypto/ghash-ce-core.S | 15 +++++++
+ arch/arm64/crypto/ghash-ce-glue.c | 46 ++++++++++++--------
  2 files changed, 43 insertions(+), 18 deletions(-)
 
 diff --git a/arch/arm64/crypto/ghash-ce-core.S b/arch/arm64/crypto/ghash-ce-core.S
@@ -86,7 +88,7 @@ index 6b958dcdf136..7868330dd54e 100644
  4:	ldp		x29, x30, [sp], #32
  	ret
 diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
-index 8536008e3e35..405923e3be4a 100644
+index 8536008e3e35..184602a97454 100644
 --- a/arch/arm64/crypto/ghash-ce-glue.c
 +++ b/arch/arm64/crypto/ghash-ce-glue.c
 @@ -55,10 +55,10 @@ asmlinkage void pmull_ghash_update_p8(int blocks, u64 dg[], const char *src,
@@ -179,7 +181,7 @@ index 8536008e3e35..405923e3be4a 100644
 -	if (crypto_memneq(tag, buf, authsize))
 -		return -EBADMSG;
 +		if (crypto_memneq(tag, otag, authsize)) {
-+			memzero_explicit(tag, AES_BLOCK_SIZE));
++			memzero_explicit(tag, AES_BLOCK_SIZE);
 +			return -EBADMSG;
 +		}
 +	}
