@@ -2,107 +2,138 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2BE7C56201
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 09:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F394C56201
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 10:20:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 82B08221FC
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 09:36:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2123922203
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 10:20:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cwM47uyO"
+	dkim=pass (2048-bit key) header.d=markus-regensburg.de header.i=@markus-regensburg.de header.b="VSgAB+K0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727210AbgKLJgf (ORCPT
+        id S1725966AbgKLKUy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Nov 2020 04:36:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41648 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725928AbgKLJgd (ORCPT
+        Thu, 12 Nov 2020 05:20:54 -0500
+Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.20]:36660 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725902AbgKLKUy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Nov 2020 04:36:33 -0500
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03E0CC0613D1;
-        Thu, 12 Nov 2020 01:36:33 -0800 (PST)
-Received: by mail-yb1-xb30.google.com with SMTP id v92so4726143ybi.4;
-        Thu, 12 Nov 2020 01:36:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sTS5WgslFCC2reGOH2FyGvABtQkS4qb5R30Fuulj5m8=;
-        b=cwM47uyOFGAIz3TUSqUCwRt/vNtGWcwvTqq4zBDmSgSMpSkLdOsZ+mZ10Nx60VFE/7
-         GENk2IdkTw2OQgeor8LXrH2bgWBC3CLe5NGxD9Y33YTNcJwedWPd7VMuraQN2vsTjJvc
-         U4wmlovFlNKoAlaMUPTUQHuIuu9zf6thn9m6i2YNYr8tFdBn42kCerj3TQdToVPJ8JvC
-         NpSBewleknloYUEQHe+sIetwiL+WQasePGRjbhokK/Ywivq+IQ3t2jliW4UcqdSBdY4d
-         ed3tP3GMXwS39jnxpCYG3g7Jn10pOXasZ2S2/LpR4ojff8wUl/a2wP62wqBHQwxVGFrU
-         s+gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sTS5WgslFCC2reGOH2FyGvABtQkS4qb5R30Fuulj5m8=;
-        b=nvUzoJbGvqHKE35SXJrGPg4W9YMXVXh0WEGsiumoRt6LPD5cpENKPiIHcqfaO8hDxj
-         Nbh2kDcTPtIl7i2GuCX8LUo3a57ICr7yN5UXCtzC7qmvwPKuKNgy4XjA86l/zy4dgCA0
-         jal0PhM1ygFWQ+injLrgb0nUVYuVOOxm5NkX6rtgyI01hysCHczVULeuqAPqKyteUQow
-         UBKbaw2xM49jdCIRJCL9WIaq2du8PJBNxnM2LEtnZRhxtlH6jzEa90ZSq/QOdkFqAk83
-         MElBHv6n/dVftowGRJuIcbnTQJLlfW4W7CePN4rEl7YSFoB1ytIUeQWRWuW1mPZqsqzU
-         411w==
-X-Gm-Message-State: AOAM530IDqInPaqz5Yi1XTs09HojMbdcjlMJyCdg9fyFVqSNgFWMlGRu
-        Pkc5ekuwuxIo3OIuQjbsBL7vTOdvdLwy8Bs51Bs=
-X-Google-Smtp-Source: ABdhPJw+DSBsjOzzy6fUdz00vxTSW1vYI1rXcO6XgtQgLKtgyEK76EAKOWdWYqXlPG9i9d5sRjN0rAFnbbhHMcnLXIM=
-X-Received: by 2002:a25:61c5:: with SMTP id v188mr34927594ybb.422.1605173792160;
- Thu, 12 Nov 2020 01:36:32 -0800 (PST)
+        Thu, 12 Nov 2020 05:20:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1605176447;
+        s=strato-dkim-0002; d=markus-regensburg.de;
+        h=Date:Message-ID:Subject:Cc:To:From:X-RZG-CLASS-ID:X-RZG-AUTH:From:
+        Subject:Sender;
+        bh=lMd+40ZCnpal0YfLhuyaIaMGv3su1HrbJXXccto5G0k=;
+        b=VSgAB+K0/C+pwJ2scQ5AzyYvARjWOqi0TBbhmyfAJiGhnGO6SrYVQm6CKet9loC63G
+        VTQWP/qgfPM0wgjOTiQH7CbdbJvwygDopiCKRJ76KTyhglAEYigTSSTxCAAVI+T1VnMw
+        SkYt9/WwBYRmT7OFesUYY3ia2R+Wnr8XuJSyOqRjCuLL3DbEBiGbvy6sL9d9t1blAUjC
+        kKMlSwVv6WlW1nbzLImkP5aVgbH6FDaUfHBOtVNWD0cDfqfHjQcan6gkVfoawCD8EEGe
+        FOgYKW/XaUXCBND7bEQu7qMrJeIrBeqgzQFSLfr+ydy9zyUbPHm7MTggiZ4UM0B4v/S5
+        XEyQ==
+X-RZG-AUTH: ":OGMGfEG7W/Jia0H4RdpQ6UBM+orSOYYzpexsp56HbOixc6mZ0UouEGtpBP1knqc5tUr6mh9s/aSFuPMBsF4CVLlvH23FWKSfXnUC8c1MY4+42pNRzjoG"
+X-RZG-CLASS-ID: mo00
+Received: from [IPv6:2a02:810d:8240:2ce4:98ea:9dff:fed8:3fe0]
+        by smtp.strato.de (RZmta 47.3.3 AUTH)
+        with ESMTPSA id Y0a0c9wACAJwMfT
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Thu, 12 Nov 2020 11:19:58 +0100 (CET)
+From:   Tobias Markus <tobias@markus-regensburg.de>
+To:     linux-crypto@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        David Howells <dhowells@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org
+Subject: Null pointer dereference in public key verification (related to SM2
+ introduction)
+Message-ID: <67250277-7903-2005-b94b-193bce0a3388@markus-regensburg.de>
+Date:   Thu, 12 Nov 2020 11:19:57 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-References: <e9b1ba517f06b81bd24e54c84f5e44d81c27c566.camel@perches.com>
- <20201022073307.GP2628@hirez.programming.kicks-ass.net> <133aa0c8c5e2cbc862df109200b982e89046dbc0.camel@perches.com>
- <CAMj1kXF_0_bu0nbJyUU-yBDCOAirRvGkX-V8kQPVh_GHO2WM-g@mail.gmail.com>
-In-Reply-To: <CAMj1kXF_0_bu0nbJyUU-yBDCOAirRvGkX-V8kQPVh_GHO2WM-g@mail.gmail.com>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Thu, 12 Nov 2020 10:36:21 +0100
-Message-ID: <CANiq72k9y-sh1fUyxdvXgYEfZOS_CSwRK+LyR6nVtRaOjYJbwQ@mail.gmail.com>
-Subject: Re: [PATCH -next] treewide: Remove stringification from __alias macro definition
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Joe Perches <joe@perches.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, X86 ML <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Marco Elver <elver@google.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>,
-        Alexander Potapenko <glider@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-efi <linux-efi@vger.kernel.org>,
-        kasan-dev <kasan-dev@googlegroups.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 11, 2020 at 8:19 AM Ard Biesheuvel <ardb@kernel.org> wrote:
->
-> I am still not convinced we need this change, as I don't see how the
-> concerns regarding __section apply to __alias. But if we do, can we
-> please use the same approach, i.e., revert the current patch, and
-> queue it again after v5.11-rc1 with all new occurrences covered as
-> well?
+Hi,
 
-In general, it would be nice to move all compiler attributes to use
-the `__` syntax, which is independent of compiler vendor, gives us a
-level of indirection to modify behavior between compilers and is
-shorter/nicer for users.
+running 5.10-rc3, I have come across a null pointer dereference.
+It occured while trying to connect to a 802.1x/EAP-protected network using iwd.
+However, the bug seems to be limited to iwd's usage of the keyctl API (unrelated to the wireless subsystem).
 
-But it is low priority, so it should go in whenever it causes the
-least amount of trouble.
+The bug seems related to the recent changes related to the SM2/SM3 algorithms, commits 215525639631a and 3093e7c16e12d.
 
-Cheers,
-Miguel
+I am including both the kernel logs as well as the system logs immediately before and after the null pointer dereference.
+public_key_verify_signature+0x189 is crypto/asymmetric_keys/public_key.c:359, i.e.
+  if (strcmp(sig->pkey_algo, "sm2") == 0 && sig->data_size) {
+    [...]
+Note that this block was introduced in commit 215525639631a.
+
+kernel: wlan0: authenticate with <redacted>
+kernel: wlan0: send auth to <redacted> (try 1/3)
+kernel: wlan0: authenticated
+kernel: wlan0: associate with <redacted> (try 1/3)
+kernel: wlan0: RX AssocResp from <redacted> (capab=0x411 status=0 aid=24)
+kernel: wlan0: associated
+iwd[492]: EAP server tried method 52 while client was configured for method 25
+kernel: BUG: kernel NULL pointer dereference, address: 0000000000000000
+kernel: wlan0: Limiting TX power to 23 (23 - 0) dBm as advertised by <redacted>
+kernel: #PF: supervisor read access in kernel mode
+kernel: #PF: error_code(0x0000) - not-present page
+kernel: PGD 0 P4D 0
+kernel: Oops: 0000 [#1] PREEMPT SMP PTI
+kernel: CPU: 1 PID: 492 Comm: iwd Tainted: G        W       T 5.10.0-rc3-custom #133
+kernel: Hardware name: LENOVO 20HES01100/20HES01100, BIOS N1QET88W (1.63 ) 04/22/2020
+kernel: RIP: 0010:public_key_verify_signature+0x189/0x3f0
+kernel: Code: 48 8b 40 d0 44 89 c2 4c 89 fe 4c 89 e7 e8 4f 90 e7 00 85 c0 0f 85 67 01 00 00 48 8b 75 30 48 c7 c7 60 7d 85 9d >
+kernel: RSP: 0018:ffff9fd6406ffd50 EFLAGS: 00010246
+kernel: RAX: 0000000000000000 RBX: ffff8e1090272a40 RCX: 0000000000000004
+kernel: RDX: ffff8e1082680400 RSI: 0000000000000000 RDI: ffffffff9d857d60
+kernel: RBP: ffff9fd6406ffe88 R08: ffff8e10900ac820 R09: 0000000000000008
+kernel: R10: 0000000000000000 R11: 000000000000010a R12: ffff8e1082681200
+kernel: R13: ffff8e1082680900 R14: ffff9fd6406ffd88 R15: ffff8e10864df600
+kernel: FS:  00007fbcb627e740(0000) GS:ffff8e13f2680000(0000) knlGS:0000000000000000
+kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+kernel: CR2: 0000000000000000 CR3: 0000000110304005 CR4: 00000000003706e0
+kernel: Call Trace:
+kernel:  asymmetric_key_verify_signature+0x5e/0x80
+kernel:  keyctl_pkey_verify+0xb6/0x110
+kernel:  do_syscall_64+0x33/0x40
+kernel:  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+kernel: RIP: 0033:0x7fbcb637bd5d
+kernel: Code: 00 c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b >
+kernel: RSP: 002b:00007ffd7e69d648 EFLAGS: 00000246 ORIG_RAX: 00000000000000fa
+kernel: RAX: ffffffffffffffda RBX: 00007ffd7e69d6d0 RCX: 00007fbcb637bd5d
+kernel: RDX: 000056210c5a3420 RSI: 00007ffd7e69d650 RDI: 000000000000001c
+kernel: RBP: 000056210c5a3420 R08: 000056210c5a7a6d R09: 0000003024d797a1
+kernel: R10: 00007ffd7e69d6d0 R11: 0000000000000246 R12: 000056210c5a7a6d
+kernel: R13: 000056210c3b0b30 R14: 000056210c5a7a24 R15: 00007ffd7e69d6d0
+kernel: Modules linked in: usblp
+kernel: CR2: 0000000000000000
+kernel: ---[ end trace ffdad8803dc4f4a6 ]---
+kernel: RIP: 0010:public_key_verify_signature+0x189/0x3f0
+kernel: Code: 48 8b 40 d0 44 89 c2 4c 89 fe 4c 89 e7 e8 4f 90 e7 00 85 c0 0f 85 67 01 00 00 48 8b 75 30 48 c7 c7 60 7d 85 9d >
+kernel: RSP: 0018:ffff9fd6406ffd50 EFLAGS: 00010246
+kernel: RAX: 0000000000000000 RBX: ffff8e1090272a40 RCX: 0000000000000004
+kernel: RDX: ffff8e1082680400 RSI: 0000000000000000 RDI: ffffffff9d857d60
+kernel: RBP: ffff9fd6406ffe88 R08: ffff8e10900ac820 R09: 0000000000000008
+kernel: R10: 0000000000000000 R11: 000000000000010a R12: ffff8e1082681200
+kernel: R13: ffff8e1082680900 R14: ffff9fd6406ffd88 R15: ffff8e10864df600
+kernel: FS:  00007fbcb627e740(0000) GS:ffff8e13f2680000(0000) knlGS:0000000000000000
+kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+kernel: CR2: 0000000000000000 CR3: 0000000110304005 CR4: 00000000003706e0
+systemd[1]: iwd.service: Main process exited, code=killed, status=9/KILL
+systemd[1]: iwd.service: Failed with result 'signal'.
+
+
+Please advise if you need any further information.
+
+Kind regards,
+Tobias
