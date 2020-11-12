@@ -7,49 +7,50 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BEC1C2D0A3
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 12:58:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB668C56202
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 12:58:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B566C21D7F
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 12:58:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56E4921D91
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 12:58:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="STpCutuN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z9hBglv6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728219AbgKLM6G (ORCPT
+        id S1728341AbgKLM6f (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Nov 2020 07:58:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31858 "EHLO
+        Thu, 12 Nov 2020 07:58:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41144 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728223AbgKLM6E (ORCPT
+        by vger.kernel.org with ESMTP id S1728340AbgKLM6e (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Nov 2020 07:58:04 -0500
+        Thu, 12 Nov 2020 07:58:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605185882;
+        s=mimecast20190719; t=1605185912;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=EKLlZYAbQMt1tMpfeGrxE8DYlcnIAOJnTTrk+3E2Iec=;
-        b=STpCutuNOIMGhcKM2eAtxGQ5HIWVjyNtxIwmapSq2SHVHZ26Hd4EBgQU8vOlBDZZ9I8kAd
-        xpenc1hONbxp8nS9n1FR3A6TfUvSDtxGGmEyQOaHsOCJ448oLXB9mK3bIwrmCEYssC1IAH
-        /Etb63vTMLBUu+sZeX9GuqXu58dwfKQ=
+        bh=SySPm7r+Xs/nsq8dnyoEL5ZEMshgWivB2CrExFwxAHM=;
+        b=Z9hBglv6U5FlKln9X0/IjEbJ1B9Iz5K9dZ5t60Bmjq2er6Axls9Mn577p4iwfgi6WlJYyP
+        MuIX7L7Blv1M8wgLzFUrZNIjFjbwsVQx9n5+0bZoPPQx9a4OWN3bgthgAj0J0J/vs3VrpW
+        M7TzoXagGuHH+t6ZBlpUk64Ypqs7gOk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-84-kZ4_MPqZPryJ8JMNzo8XtA-1; Thu, 12 Nov 2020 07:57:58 -0500
-X-MC-Unique: kZ4_MPqZPryJ8JMNzo8XtA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-559-6asMlXxbMB2Dc-JzdtiQKA-1; Thu, 12 Nov 2020 07:58:30 -0500
+X-MC-Unique: 6asMlXxbMB2Dc-JzdtiQKA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 961031007B2A;
-        Thu, 12 Nov 2020 12:57:56 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CD60C1882FA3;
+        Thu, 12 Nov 2020 12:58:28 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-115-47.rdu2.redhat.com [10.10.115.47])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 921AF5D9E8;
-        Thu, 12 Nov 2020 12:57:54 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C87D910013BD;
+        Thu, 12 Nov 2020 12:58:26 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 01/18] crypto/krb5: Implement Kerberos crypto core
+Subject: [PATCH 05/18] crypto/krb5: Implement the Kerberos5 rfc3961 encrypt
+ and decrypt functions
 From:   David Howells <dhowells@redhat.com>
 To:     herbert@gondor.apana.org.au, bfields@fieldses.org
 Cc:     dhowells@redhat.com, trond.myklebust@hammerspace.com,
@@ -57,304 +58,441 @@ Cc:     dhowells@redhat.com, trond.myklebust@hammerspace.com,
         linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Date:   Thu, 12 Nov 2020 12:57:53 +0000
-Message-ID: <160518587378.2277919.8315623921666827993.stgit@warthog.procyon.org.uk>
+Date:   Thu, 12 Nov 2020 12:58:26 +0000
+Message-ID: <160518590606.2277919.18393717448457481276.stgit@warthog.procyon.org.uk>
 In-Reply-To: <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
 References: <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Provide core structures, an encoding-type registry and basic module and
-config bits for a generic Kerberos crypto library.
+Add functions that encrypt and decrypt a piece of an skbuff according to
+rfc3961 sec 5.3, using Ki to checksum the data to be secured and Ke to
+encrypt it during the encryption phase, then decrypting with Ke and
+verifying the checksum with Ki in the decryption phase.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- crypto/Kconfig         |    1 +
- crypto/Makefile        |    1 +
- crypto/krb5/Kconfig    |   11 ++++++
- crypto/krb5/Makefile   |    9 +++++
- crypto/krb5/internal.h |   87 ++++++++++++++++++++++++++++++++++++++++++++++++
- crypto/krb5/main.c     |   42 +++++++++++++++++++++++
- include/crypto/krb5.h  |   67 +++++++++++++++++++++++++++++++++++++
- 7 files changed, 218 insertions(+)
- create mode 100644 crypto/krb5/Kconfig
- create mode 100644 crypto/krb5/Makefile
- create mode 100644 crypto/krb5/internal.h
- create mode 100644 crypto/krb5/main.c
- create mode 100644 include/crypto/krb5.h
+ crypto/krb5/internal.h           |   18 +++
+ crypto/krb5/main.c               |  102 +++++++++++++++++++
+ crypto/krb5/rfc3961_simplified.c |  204 ++++++++++++++++++++++++++++++++++++++
+ include/crypto/krb5.h            |   12 ++
+ 4 files changed, 336 insertions(+)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 094ef56ab7b4..0d5ca023bb77 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1940,5 +1940,6 @@ source "lib/crypto/Kconfig"
- source "drivers/crypto/Kconfig"
- source "crypto/asymmetric_keys/Kconfig"
- source "certs/Kconfig"
-+source "crypto/krb5/Kconfig"
- 
- endif	# if CRYPTO
-diff --git a/crypto/Makefile b/crypto/Makefile
-index b279483fba50..732467ed3c94 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -197,3 +197,4 @@ obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) += asymmetric_keys/
- obj-$(CONFIG_CRYPTO_HASH_INFO) += hash_info.o
- crypto_simd-y := simd.o
- obj-$(CONFIG_CRYPTO_SIMD) += crypto_simd.o
-+obj-$(CONFIG_CRYPTO_KRB5) += krb5/
-diff --git a/crypto/krb5/Kconfig b/crypto/krb5/Kconfig
-new file mode 100644
-index 000000000000..881754500732
---- /dev/null
-+++ b/crypto/krb5/Kconfig
-@@ -0,0 +1,11 @@
-+config CRYPTO_KRB5
-+	tristate "Kerberos 5 crypto"
-+	select CRYPTO_MANAGER
-+	select CRYPTO_SKCIPHER
-+	select CRYPTO_HASH_INFO
-+	select CRYPTO_SHA1
-+	select CRYPTO_CBC
-+	select CRYPTO_CTS
-+	select CRYPTO_AES
-+	help
-+	  Provide Kerberos-5-based security.
-diff --git a/crypto/krb5/Makefile b/crypto/krb5/Makefile
-new file mode 100644
-index 000000000000..071ce2ff82e5
---- /dev/null
-+++ b/crypto/krb5/Makefile
-@@ -0,0 +1,9 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Makefile for asymmetric cryptographic keys
-+#
-+
-+krb5-y += \
-+	main.o
-+
-+obj-$(CONFIG_CRYPTO_KRB5) += krb5.o
 diff --git a/crypto/krb5/internal.h b/crypto/krb5/internal.h
-new file mode 100644
-index 000000000000..d2e3da7f101e
---- /dev/null
+index 874dddada713..ce07decf19f0 100644
+--- a/crypto/krb5/internal.h
 +++ b/crypto/krb5/internal.h
-@@ -0,0 +1,87 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/* Kerberos5 crypto internals
-+ *
-+ * Copyright (C) 2020 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ */
-+
-+#include <crypto/krb5.h>
-+
-+/*
-+ * Profile used for key derivation and encryption.
-+ */
-+struct krb5_crypto_profile {
-+	 /* Pseudo-random function */
-+	int (*calc_PRF)(const struct krb5_enctype *krb5,
-+			const struct krb5_buffer *protocol_key,
-+			const struct krb5_buffer *octet_string,
-+			struct krb5_buffer *result,
-+			gfp_t gfp);
-+
-+	/* Checksum key derivation */
-+	int (*calc_Kc)(const struct krb5_enctype *krb5,
-+		       const struct krb5_buffer *TK,
-+		       const struct krb5_buffer *usage_constant,
-+		       struct krb5_buffer *Kc,
-+		       gfp_t gfp);
-+
-+	/* Encryption key derivation */
-+	int (*calc_Ke)(const struct krb5_enctype *krb5,
-+		       const struct krb5_buffer *TK,
-+		       const struct krb5_buffer *usage_constant,
-+		       struct krb5_buffer *Ke,
-+		       gfp_t gfp);
-+
-+	 /* Integrity key derivation */
-+	int (*calc_Ki)(const struct krb5_enctype *krb5,
-+		       const struct krb5_buffer *TK,
-+		       const struct krb5_buffer *usage_constant,
-+		       struct krb5_buffer *Ki,
-+		       gfp_t gfp);
-+
-+	/* Encrypt data in-place, inserting confounder and checksum. */
-+	ssize_t (*encrypt)(const struct krb5_enctype *krb5,
-+			   struct krb5_enc_keys *keys,
-+			   struct scatterlist *sg, unsigned nr_sg, size_t sg_len,
-+			   size_t data_offset, size_t data_len,
-+			   bool preconfounded);
-+
-+	/* Decrypt data in-place, removing confounder and checksum */
-+	int (*decrypt)(const struct krb5_enctype *krb5,
-+		       struct krb5_enc_keys *keys,
-+		       struct scatterlist *sg, unsigned nr_sg,
-+		       size_t *_offset, size_t *_len,
-+		       int *_error_code);
-+
-+	/* Generate a MIC on part of a packet, inserting the checksum */
-+	ssize_t (*get_mic)(const struct krb5_enctype *krb5,
-+			   struct crypto_shash *shash,
-+			   const struct krb5_buffer *metadata,
-+			   struct scatterlist *sg, unsigned nr_sg, size_t sg_len,
-+			   size_t data_offset, size_t data_len);
-+
-+	/* Verify the MIC on a piece of data, removing the checksum */
-+	int (*verify_mic)(const struct krb5_enctype *krb5,
-+			  struct crypto_shash *shash,
-+			  const struct krb5_buffer *metadata,
-+			  struct scatterlist *sg, unsigned nr_sg,
-+			  size_t *_offset, size_t *_len,
-+			  int *_error_code);
-+};
-+
-+/*
-+ * Crypto size/alignment rounding convenience macros.
-+ */
-+#define crypto_roundup(X) round_up((X), CRYPTO_MINALIGN)
-+
-+#define krb5_shash_size(TFM) \
-+	crypto_roundup(sizeof(struct shash_desc) + crypto_shash_descsize(TFM))
-+#define krb5_skcipher_size(TFM) \
-+	crypto_roundup(sizeof(struct skcipher_request) + crypto_skcipher_reqsize(TFM))
-+#define krb5_digest_size(TFM) \
-+	crypto_roundup(crypto_shash_digestsize(TFM))
-+#define krb5_sync_skcipher_size(TFM) \
-+	krb5_skcipher_size(&(TFM)->base)
-+#define krb5_sync_skcipher_ivsize(TFM) \
-+	crypto_roundup(crypto_sync_skcipher_ivsize(TFM))
-+#define round16(x) (((x) + 15) & ~15)
-diff --git a/crypto/krb5/main.c b/crypto/krb5/main.c
-new file mode 100644
-index 000000000000..58d40252adc9
---- /dev/null
-+++ b/crypto/krb5/main.c
-@@ -0,0 +1,42 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* RxGK transport key derivation.
-+ *
-+ * Copyright (C) 2020 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ */
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/module.h>
-+#include <linux/export.h>
-+#include <linux/kernel.h>
-+#include "internal.h"
-+
-+MODULE_DESCRIPTION("Kerberos 5 crypto");
-+MODULE_AUTHOR("Red Hat, Inc.");
-+MODULE_LICENSE("GPL");
-+
-+static const struct krb5_enctype *const krb5_supported_enctypes[] = {
-+};
-+
-+/**
-+ * crypto_krb5_find_enctype - Find the handler for a Kerberos5 encryption type
-+ * @enctype: The standard Kerberos encryption type number
-+ *
-+ * Look up a Kerberos encryption type by number.  If successful, returns a
-+ * pointer to the type tables; returns NULL otherwise.
-+ */
-+const struct krb5_enctype *crypto_krb5_find_enctype(u32 enctype)
-+{
-+	const struct krb5_enctype *krb5;
-+	size_t i;
-+
-+	for (i = 0; i < ARRAY_SIZE(krb5_supported_enctypes); i++) {
-+		krb5 = krb5_supported_enctypes[i];
-+		if (krb5->etype == enctype)
-+			return krb5;
-+	}
-+
-+	return NULL;
-+}
-+EXPORT_SYMBOL(crypto_krb5_find_enctype);
-diff --git a/include/crypto/krb5.h b/include/crypto/krb5.h
-new file mode 100644
-index 000000000000..2bd6cfe50b85
---- /dev/null
-+++ b/include/crypto/krb5.h
-@@ -0,0 +1,67 @@
-+/* Kerberos 5 crypto
-+ *
-+ * Copyright (C) 2020 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public Licence
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the Licence, or (at your option) any later version.
-+ */
-+
-+#ifndef _CRYPTO_KRB5_H
-+#define _CRYPTO_KRB5_H
-+
-+struct crypto_shash;
-+struct scatterlist;
-+
-+struct krb5_buffer {
-+	unsigned int	len;
-+	void		*data;
-+};
-+
-+/*
-+ * Encryption key and checksum for RxGK encryption.  These always come
-+ * as a pair as per RFC3961 encrypt().
-+ */
-+struct krb5_enc_keys {
-+	struct crypto_sync_skcipher	*Ke; /* Encryption key */
-+	struct crypto_shash		*Ki; /* Checksum key */
-+};
-+
-+/*
-+ * Kerberos encoding type definition.
-+ */
-+struct krb5_enctype {
-+	int		etype;		/* Encryption (key) type */
-+	int		ctype;		/* Checksum type */
-+	const char	*name;		/* "Friendly" name */
-+	const char	*encrypt_name;	/* Crypto encrypt name */
-+	const char	*cksum_name;	/* Crypto checksum name */
-+	const char	*hash_name;	/* Crypto hash name */
-+	u16		block_len;	/* Length of encryption block */
-+	u16		conf_len;	/* Length of confounder (normally == block_len) */
-+	u16		cksum_len;	/* Length of checksum */
-+	u16		key_bytes;	/* Length of raw key, in bytes */
-+	u16		key_len;	/* Length of final key, in bytes */
-+	u16		hash_len;	/* Length of hash in bytes */
-+	u16		prf_len;	/* Length of PRF() result in bytes */
-+	u16		Kc_len;		/* Length of Kc in bytes */
-+	u16		Ke_len;		/* Length of Ke in bytes */
-+	u16		Ki_len;		/* Length of Ki in bytes */
-+	bool		keyed_cksum;	/* T if a keyed cksum */
-+	bool		pad;		/* T if should pad */
-+
-+	const struct krb5_crypto_profile *profile;
-+
-+	int (*random_to_key)(const struct krb5_enctype *krb5,
-+			     const struct krb5_buffer *in,
-+			     struct krb5_buffer *out);	/* complete key generation */
-+};
-+
+@@ -7,6 +7,7 @@
+ 
+ #include <linux/scatterlist.h>
+ #include <crypto/krb5.h>
++#include <crypto/hash.h>
+ 
+ /*
+  * Profile used for key derivation and encryption.
+@@ -87,7 +88,24 @@ struct krb5_crypto_profile {
+ 	crypto_roundup(crypto_sync_skcipher_ivsize(TFM))
+ #define round16(x) (((x) + 15) & ~15)
+ 
 +/*
 + * main.c
 + */
-+extern const struct krb5_enctype *crypto_krb5_find_enctype(u32 enctype);
++int crypto_shash_update_sg(struct shash_desc *desc, struct scatterlist *sg,
++			   size_t offset, size_t len);
 +
-+#endif /* _CRYPTO_KRB5_H */
+ /*
+  * rfc3961_simplified.c
+  */
+ extern const struct krb5_crypto_profile rfc3961_simplified_profile;
++
++ssize_t rfc3961_encrypt(const struct krb5_enctype *krb5,
++			struct krb5_enc_keys *keys,
++			struct scatterlist *sg, unsigned nr_sg, size_t sg_len,
++			size_t data_offset, size_t data_len,
++			bool preconfounded);
++int rfc3961_decrypt(const struct krb5_enctype *krb5,
++		    struct krb5_enc_keys *keys,
++		    struct scatterlist *sg, unsigned nr_sg,
++		    size_t *_offset, size_t *_len,
++		    int *_error_code);
+diff --git a/crypto/krb5/main.c b/crypto/krb5/main.c
+index 58d40252adc9..db3fc34be272 100644
+--- a/crypto/krb5/main.c
++++ b/crypto/krb5/main.c
+@@ -10,6 +10,7 @@
+ #include <linux/module.h>
+ #include <linux/export.h>
+ #include <linux/kernel.h>
++#include <linux/highmem.h>
+ #include "internal.h"
+ 
+ MODULE_DESCRIPTION("Kerberos 5 crypto");
+@@ -40,3 +41,104 @@ const struct krb5_enctype *crypto_krb5_find_enctype(u32 enctype)
+ 	return NULL;
+ }
+ EXPORT_SYMBOL(crypto_krb5_find_enctype);
++
++int crypto_shash_update_sg(struct shash_desc *desc, struct scatterlist *sg,
++			   size_t offset, size_t len)
++{
++	for (;; sg++) {
++		int ret;
++
++		if (offset < sg->length) {
++			struct page *page = sg_page(sg);
++			void *p = kmap_atomic(page);
++			size_t seg = min_t(size_t, len, sg->length - offset);
++
++			ret = crypto_shash_update(desc, p + sg->offset + offset, seg);
++			kunmap_atomic(p);
++			if (ret < 0)
++				return ret;
++			len -= seg;
++			offset = 0;
++		} else {
++			offset -= sg->length;
++		}
++		if (sg_is_last(sg) || len > 0)
++			break;
++	}
++
++	return 0;
++}
++
++/**
++ * crypto_krb5_encrypt - Apply Kerberos encryption and integrity.
++ * @krb5: The encoding to use.
++ * @keys: The encryption and integrity keys to use.
++ * @sg: Scatterlist defining the crypto buffer.
++ * @nr_sg: The number of elements in @sg.
++ * @sg_len: The size of the buffer.
++ * @data_offset: The offset of the data in the @sg buffer.
++ * @data_len: The length of the data.
++ * @preconfounded: True if the confounder is already inserted.
++ *
++ * Using the specified Kerberos encoding, insert a confounder and padding as
++ * needed, encrypt this and the data in place and insert an integrity checksum
++ * into the buffer.
++ *
++ * The buffer must include space for the confounder, the checksum and any
++ * padding required.  The caller can preinsert the confounder into the buffer
++ * (for testing, for example).
++ *
++ * The resulting secured blob may be less than the size of the buffer.
++ *
++ * Returns the size of the secure blob if successful, -ENOMEM on an allocation
++ * failure, -EFAULT if there is insufficient space, -EMSGSIZE if the confounder
++ * is too short or the data is misaligned.  Other errors may also be returned
++ * from the crypto layer.
++ */
++ssize_t crypto_krb5_encrypt(const struct krb5_enctype *krb5,
++			    struct krb5_enc_keys *keys,
++			    struct scatterlist *sg, unsigned nr_sg, size_t sg_len,
++			    size_t data_offset, size_t data_len,
++			    bool preconfounded)
++{
++	if (WARN_ON(data_offset > sg_len ||
++		    data_len > sg_len ||
++		    data_offset > sg_len - data_len))
++		return -EMSGSIZE;
++	return krb5->profile->encrypt(krb5, keys, sg, nr_sg, sg_len,
++				      data_offset, data_len, preconfounded);
++}
++EXPORT_SYMBOL(crypto_krb5_encrypt);
++
++/**
++ * crypto_krb5_decrypt - Validate and remove Kerberos encryption and integrity.
++ * @krb5: The encoding to use.
++ * @keys: The encryption and integrity keys to use.
++ * @sg: Scatterlist defining the crypto buffer.
++ * @nr_sg: The number of elements in @sg.
++ * @_offset: Offset of the secure blob in the buffer; updated to data offset.
++ * @_len: The length of the secure blob; updated to data length.
++ * @_error_code: Set to a Kerberos error code for parsing/validation errors.
++ *
++ * Using the specified Kerberos encoding, check and remove the integrity
++ * checksum and decrypt the secure region, stripping off the confounder.
++ *
++ * If successful, @_offset and @_len are updated to outline the region in which
++ * the data plus the trailing padding are stored.  The caller is responsible
++ * for working out how much padding there is and removing it.
++ *
++ * Returns the 0 if successful, -ENOMEM on an allocation failure; sets
++ * *_error_code and returns -EPROTO if the data cannot be parsed or if the
++ * integrity checksum doesn't match).  Other errors may also be returned from
++ * the crypto layer.
++ */
++int crypto_krb5_decrypt(const struct krb5_enctype *krb5,
++			struct krb5_enc_keys *keys,
++			struct scatterlist *sg, unsigned nr_sg,
++			size_t *_offset, size_t *_len,
++			int *_error_code)
++{
++	return krb5->profile->decrypt(krb5, keys, sg, nr_sg,
++				      _offset, _len, _error_code);
++}
++EXPORT_SYMBOL(crypto_krb5_decrypt);
+diff --git a/crypto/krb5/rfc3961_simplified.c b/crypto/krb5/rfc3961_simplified.c
+index 0a5c689f6354..0a5c19b83f51 100644
+--- a/crypto/krb5/rfc3961_simplified.c
++++ b/crypto/krb5/rfc3961_simplified.c
+@@ -65,6 +65,8 @@
+ 
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
++#include <linux/random.h>
++#include <linux/skbuff.h>
+ #include <linux/slab.h>
+ #include <linux/lcm.h>
+ #include <crypto/skcipher.h>
+@@ -386,9 +388,211 @@ static int rfc3961_calc_PRF(const struct krb5_enctype *krb5,
+ 	return ret;
+ }
+ 
++/*
++ * Apply encryption and checksumming functions to part of a scatterlist.
++ */
++ssize_t rfc3961_encrypt(const struct krb5_enctype *krb5,
++			struct krb5_enc_keys *keys,
++			struct scatterlist *sg, unsigned nr_sg, size_t sg_len,
++			size_t data_offset, size_t data_len,
++			bool preconfounded)
++{
++	struct skcipher_request	*req;
++	struct shash_desc *desc;
++	ssize_t ret, done;
++	size_t bsize, base_len, secure_offset, secure_len, pad_len, cksum_offset;
++	void *buffer;
++	u8 *cksum, *iv;
++
++	if (WARN_ON(data_offset != krb5->conf_len))
++		return -EINVAL; /* Can't set offset on skcipher */
++
++	secure_offset = 0;
++	base_len = krb5->conf_len + data_len;
++	if (krb5->pad) {
++		secure_len = round_up(base_len, krb5->block_len);
++		pad_len    = secure_len - base_len;
++	} else {
++		secure_len = base_len;
++		pad_len    = 0;
++	}
++	cksum_offset = secure_len;
++	if (WARN_ON(cksum_offset + krb5->cksum_len > sg_len))
++		return -EFAULT;
++
++	bsize = krb5_shash_size(keys->Ki) +
++		krb5_digest_size(keys->Ki) +
++		krb5_sync_skcipher_size(keys->Ke) +
++		krb5_sync_skcipher_ivsize(keys->Ke);
++	bsize = max_t(size_t, bsize, krb5->conf_len);
++	bsize = max_t(size_t, bsize, krb5->block_len);
++	buffer = kzalloc(bsize, GFP_NOFS);
++	if (!buffer)
++		return -ENOMEM;
++
++	/* Insert the confounder into the skb */
++	ret = -EFAULT;
++	if (!preconfounded) {
++		get_random_bytes(buffer, krb5->conf_len);
++		done = sg_pcopy_from_buffer(sg, nr_sg, buffer, krb5->conf_len,
++					    secure_offset);
++		if (done != krb5->conf_len)
++			goto error;
++	}
++
++	/* We need to pad out to the crypto blocksize. */
++	if (pad_len) {
++		done = sg_zero_buffer(sg, nr_sg, pad_len, data_offset + data_len);
++		if (done != pad_len)
++			goto error;
++	}
++
++	/* Calculate the checksum using key Ki */
++	cksum = buffer + krb5_shash_size(keys->Ki);
++
++	desc = buffer;
++	desc->tfm = keys->Ki;
++	ret = crypto_shash_init(desc);
++	if (ret < 0)
++		goto error;
++
++	ret = crypto_shash_update_sg(desc, sg, secure_offset, secure_len);
++	if (ret < 0)
++		goto error;
++
++	ret = crypto_shash_final(desc, cksum);
++	if (ret < 0)
++		goto error;
++
++	/* Append the checksum into the buffer. */
++	ret = -EFAULT;
++	done = sg_pcopy_from_buffer(sg, nr_sg, cksum, krb5->cksum_len, cksum_offset);
++	if (done != krb5->cksum_len)
++		goto error;
++
++	/* Encrypt the secure region with key Ke. */
++	req = buffer +
++		krb5_shash_size(keys->Ki) +
++		krb5_digest_size(keys->Ki);
++	iv = buffer +
++		krb5_shash_size(keys->Ki) +
++		krb5_digest_size(keys->Ki) +
++		krb5_sync_skcipher_size(keys->Ke);
++
++	skcipher_request_set_sync_tfm(req, keys->Ke);
++	skcipher_request_set_callback(req, 0, NULL, NULL);
++	skcipher_request_set_crypt(req, sg, sg, secure_len, iv);
++	ret = crypto_skcipher_encrypt(req);
++	if (ret < 0)
++		goto error;
++
++	ret = secure_len + krb5->cksum_len;
++
++error:
++	kfree_sensitive(buffer);
++	return ret;
++}
++
++/*
++ * Apply decryption and checksumming functions to part of an skbuff.  The
++ * offset and length are updated to reflect the actual content of the encrypted
++ * region.
++ */
++int rfc3961_decrypt(const struct krb5_enctype *krb5,
++		    struct krb5_enc_keys *keys,
++		    struct scatterlist *sg, unsigned nr_sg,
++		    size_t *_offset, size_t *_len,
++		    int *_error_code)
++{
++	struct skcipher_request	*req;
++	struct shash_desc *desc;
++	ssize_t done;
++	size_t bsize, secure_len, offset = *_offset, len = *_len;
++	void *buffer = NULL;
++	int ret;
++	u8 *cksum, *cksum2, *iv;
++
++	if (WARN_ON(*_offset != 0))
++		return -EINVAL; /* Can't set offset on skcipher */
++
++	if (len < krb5->conf_len + krb5->cksum_len) {
++		*_error_code = 1; //RXGK_SEALED_INCON;
++		return -EPROTO;
++	}
++	secure_len = len - krb5->cksum_len;
++
++	bsize = krb5_shash_size(keys->Ki) +
++		krb5_digest_size(keys->Ki) * 2 +
++		krb5_sync_skcipher_size(keys->Ke) +
++		krb5_sync_skcipher_ivsize(keys->Ke);
++	buffer = kzalloc(bsize, GFP_NOFS);
++	if (!buffer)
++		return -ENOMEM;
++
++	/* Decrypt the secure region with key Ke. */
++	req = buffer +
++		krb5_shash_size(keys->Ki) +
++		krb5_digest_size(keys->Ki) * 2;
++	iv = buffer +
++		krb5_shash_size(keys->Ki) +
++		krb5_digest_size(keys->Ki) * 2 +
++		krb5_sync_skcipher_size(keys->Ke);
++
++	skcipher_request_set_sync_tfm(req, keys->Ke);
++	skcipher_request_set_callback(req, 0, NULL, NULL);
++	skcipher_request_set_crypt(req, sg, sg, secure_len, iv);
++	ret = crypto_skcipher_decrypt(req);
++	if (ret < 0)
++		goto error;
++
++	/* Calculate the checksum using key Ki */
++	cksum = buffer +
++		krb5_shash_size(keys->Ki);
++	cksum2 = buffer +
++		krb5_shash_size(keys->Ki) +
++		krb5_digest_size(keys->Ki);
++
++	desc = buffer;
++	desc->tfm = keys->Ki;
++	ret = crypto_shash_init(desc);
++	if (ret < 0)
++		goto error;
++
++	ret = crypto_shash_update_sg(desc, sg, 0, secure_len);
++	if (ret < 0)
++		goto error;
++
++	ret = crypto_shash_final(desc, cksum);
++	if (ret < 0)
++		goto error;
++
++	/* Get the checksum from the buffer. */
++	ret = -EFAULT;
++	done = sg_pcopy_to_buffer(sg, nr_sg, cksum2, krb5->cksum_len,
++				  offset + len - krb5->cksum_len);
++	if (done != krb5->cksum_len)
++		goto error;
++
++	if (memcmp(cksum, cksum2, krb5->cksum_len) != 0) {
++		*_error_code = 1; //RXGK_SEALED_INCON;
++		ret = -EPROTO;
++		goto error;
++	}
++
++	*_offset += krb5->conf_len;
++	*_len -= krb5->conf_len + krb5->cksum_len;
++	ret = 0;
++
++error:
++	kfree_sensitive(buffer);
++	return ret;
++}
++
+ const struct krb5_crypto_profile rfc3961_simplified_profile = {
+ 	.calc_PRF	= rfc3961_calc_PRF,
+ 	.calc_Kc	= rfc3961_calc_DK,
+ 	.calc_Ke	= rfc3961_calc_DK,
+ 	.calc_Ki	= rfc3961_calc_DK,
++	.encrypt	= rfc3961_encrypt,
++	.decrypt	= rfc3961_decrypt,
+ };
+diff --git a/include/crypto/krb5.h b/include/crypto/krb5.h
+index 04286bacaf06..fb77f70117c1 100644
+--- a/include/crypto/krb5.h
++++ b/include/crypto/krb5.h
+@@ -12,6 +12,8 @@
+ #ifndef _CRYPTO_KRB5_H
+ #define _CRYPTO_KRB5_H
+ 
++#include <linux/crypto.h>
++
+ struct crypto_shash;
+ struct scatterlist;
+ 
+@@ -103,6 +105,16 @@ struct krb5_enctype {
+  */
+ extern const struct krb5_enctype *crypto_krb5_find_enctype(u32 enctype);
+ 
++extern ssize_t crypto_krb5_encrypt(const struct krb5_enctype *krb5,
++				   struct krb5_enc_keys *keys,
++				   struct scatterlist *sg, unsigned nr_sg, size_t sg_len,
++				   size_t data_offset, size_t data_len,
++				   bool preconfounded);
++extern int crypto_krb5_decrypt(const struct krb5_enctype *krb5,
++			       struct krb5_enc_keys *keys,
++			       struct scatterlist *sg, unsigned nr_sg,
++			       size_t *_offset, size_t *_len,
++			       int *_error_code);
+ /*
+  * kdf.c
+  */
 
 
