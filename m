@@ -2,277 +2,182 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A671C2D0A3
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 11:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B5E6C2D0A3
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 12:57:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7CD4121D40
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 11:17:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A073021D91
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 12:57:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c0pLs/Lb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727035AbgKLLRy (ORCPT
+        id S1728176AbgKLM5z (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Nov 2020 06:17:54 -0500
-Received: from foss.arm.com ([217.140.110.172]:47578 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725902AbgKLLRx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Nov 2020 06:17:53 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B707139F;
-        Thu, 12 Nov 2020 03:17:52 -0800 (PST)
-Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF5883F73C;
-        Thu, 12 Nov 2020 03:17:50 -0800 (PST)
-Date:   Thu, 12 Nov 2020 11:17:47 +0000
-From:   Dave Martin <Dave.Martin@arm.com>
-To:     Li Qiang <liqiang64@huawei.com>
-Cc:     alexandre.torgue@st.com, catalin.marinas@arm.com,
-        gaoguijin@huawei.com, colordev.jiang@huawei.com,
-        luchunhua@huawei.com, linux-crypto@vger.kernel.org,
-        mcoquelin.stm32@gmail.com, liliang889@huawei.com, will@kernel.org,
-        davem@davemloft.net, linux-arm-kernel@lists.infradead.org,
-        herbert@gondor.apana.org.au
-Subject: Re: [PATCH 0/1] arm64: Accelerate Adler32 using arm64 SVE
- instructions.
-Message-ID: <20201112111745.GS6882@arm.com>
-References: <20201103121506.1533-1-liqiang64@huawei.com>
- <20201105165301.GH6882@arm.com>
- <f323de50-c358-88e7-6588-7d14542f2754@huawei.com>
- <20201110104629.GJ6882@arm.com>
- <89a9bdcc-b96e-2f2d-6c52-ca44e0e3472c@huawei.com>
- <20201110160708.GL6882@arm.com>
- <484ad2c8-3905-fc98-237c-f7eb4045edbc@huawei.com>
+        Thu, 12 Nov 2020 07:57:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25694 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727827AbgKLM5y (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Nov 2020 07:57:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605185872;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=KApSY4n0QrJwiU60IUmc5BIOxVfBJ4BfZCyb2aGAlK4=;
+        b=c0pLs/LbzvaoZPYbrRv6XFD8tDboXjhxMmogFgCC2xKKZzwwFi15VDJ/zAyV5i4DHY/j9H
+        e5MkOcvOJ/lwpqsvbUOqp2n+SD9Gk9OMjrTVjupLXKnnSW770ljvxGHCgVZvalLD3gD6TF
+        tDmn7t8kBXXwlihLT7v5KbDABmELrK4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-128-LTVl2aaZOp-mAJ7msfQEwQ-1; Thu, 12 Nov 2020 07:57:50 -0500
+X-MC-Unique: LTVl2aaZOp-mAJ7msfQEwQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BAE51882FAB;
+        Thu, 12 Nov 2020 12:57:48 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-115-47.rdu2.redhat.com [10.10.115.47])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4335A5D9E4;
+        Thu, 12 Nov 2020 12:57:46 +0000 (UTC)
+Subject: [RFC][PATCH 00/18] crypto: Add generic Kerberos library
+From:   David Howells <dhowells@redhat.com>
+To:     herbert@gondor.apana.org.au, bfields@fieldses.org
+Cc:     dhowells@redhat.com, trond.myklebust@hammerspace.com,
+        linux-crypto@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Thu, 12 Nov 2020 12:57:45 +0000
+Message-ID: <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/0.23
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <484ad2c8-3905-fc98-237c-f7eb4045edbc@huawei.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 12, 2020 at 03:20:53PM +0800, Li Qiang wrote:
-> 
-> 
-> 在 2020/11/11 0:07, Dave Martin 写道:
-> >>>>> 	add     zA.s, pP/m, zA.s, zX.s        // zA.s += zX.s
-> >>>>>
-> >>>>> 	msb     zX.s, pP/m, zJ.s, zB.s        // zX.s := zB.s - zX.s * zJ.s
-> >>>>>
-> >>>>> 	movprfx zB, zA
-> >>>>> 	mad     zB.s, pP/m, zV.s, zX.s        // zB.s := zX.s + zA.s * V
-> >> I found the bug I encountered earlier, that is, the calculation of zB here
-> >> needs to use pA with all elements activated. The reason is the same as my
-> >> previous guess, because all elements of zA should be involved when calculating zB.
-> >> Because the original calculation formula is like this.
-> >>
-> >> For example:
-> >> In the last loop:
-> >> 	left byte is:	  3 |   4 |  \0 |
-> >> 	zA.s is:	100 | 200 | 100 | 200 (sum = 600)
-> >> 	pP.s is:	  1 |   1 |   0 |   0 (Only activate the first 2 channels)
-> >>
-> >> At this time, if the calculation of zB only takes the first 2 active elements, the data
-> >> is incomplete, because according to the description of the original algorithm, zB is always
-> >> based on the sum of all the accumulated bytes.
-> > Yes, you're quite right here: zX is partial: only the elements pP are
-> > valid; but all elements of zA and zB are always valid.  I was focusing
-> > too much on the handling of the partial input block.
-> > 
-> >> Here we can simply change the prediction register used in the two sentences related to
-> >> zB to the one that is all true (it is pA in our code), like this:
-> >> 	msb     zX.s, pA/m, zJ.s, zB.s        // zX.s := zB.s - zX.s * zJ.s
-> > Are you sure about this?  In a final partial block, the trailing
-> > elements of zX.s beyond pP will be leftover junk from the last
-> > iteration.
-> 
-> Yes, I have verified this code and it is correct. The reason is that if pP is used here,
-> the inactive elements of zB will be ignored in zX, which will cause data loss.(I think it is
 
-Yes, you're quite right.  I was forgetting about the /z (zeroing)
-semantics for the ld1b.  This means that we get away with not
-inactivating those elements in the msb instruction, since zeros
-multiplied by the elements of zJ remain zero.
+Hi Herbert, Bruce,
 
-> because the zB data is covered by the multiplication and addition results of zX, zA, and zV
-> using movprfx and mad. Have I got that right?) :)
+Here's my first cut at a generic Kerberos crypto library in the kernel so
+that I can share code between rxrpc and sunrpc (and cifs?).
 
-Yes, I think so.
+I derived some of the parts from the sunrpc gss library and added more
+advanced AES and Camellia crypto.  I haven't ported across the DES-based
+crypto yet - I figure that can wait a bit till the interface is sorted.
 
-> On the other hand zX uses the prediction register pP/z when loading data, the value of the
-> inactive element is 0, the inactive element in zX will not affect the final result, the inactive
-> element in zB will be directly assigned to the inactive element of zX element.
-> 
-> Then in the next instruction, it will be added to zB along with zX.
+Whilst I have put it into a directory under crypto/, I haven't made an
+interface that goes and loads it (analogous to crypto_alloc_skcipher,
+say).  Instead, you call:
 
-Yes.
+        const struct krb5_enctype *crypto_krb5_find_enctype(u32 enctype);
 
-This might be part of the reason why the architects decided that SVE
-loads zero the inactive elements instead of leaving them unchanged.
+to go and get a handler table and then use a bunch of accessor functions to
+jump through the hoops.  This is basically the way the sunrpc gsslib does
+things.  It might be worth making it so you do something like:
 
-> 
-> > 
-> > This might require a bit more thought in order to get the final block
-> > handling correct.
-> > 
-> >> trailloop:			// Last cycle entrance
-> >>         cntp    x6, p1, p0.s	// Get active element count of last cycle
-> >>         cpy     zV.s, p1/m, w6	// Set zV to the actual value.
-> > Note that you can also write "mov" here, but I'm not sure which alias is
-> > preferred>
-> >> loop:				// Core loop entrance
-> >>         ld1b    zX.s, p0/z, [x1]
-> >>         incw    x1
-> >>
-> >>         add     zA.s, p0/m, zA.s, zX.s	// The calculation of zA still needs to use p0
-> >>         msb     zX.s, p1/m, zJ.s, zB.s	// Change p register here
-> >>         movprfx zB, zA
-> >>         mad     zB.s, p1/m, zV.s, zX.s	// Change p register here
-> > As discussed above, are you sure this is correct now?
+	struct crypto_mech *ctx = crypto_mech_alloc("krb5(18)");
 
-I think we've agreed that it is correct.
+to get enctype 18, but I'm not sure if it's worth the effort.  Also, I'm
+not sure if there are any alternatives to kerberos we will need to support.
 
-Thinking about the code flow, I think the initialisation of zV is
-slightly wrong: for very short data, the first block may be shorter than
-VL.
+There are three main interfaces to it:
 
-I think this is easily solved by getting rid of the constant
-initialisation for zV and removing the branch that skips the CNTP code
-when entering the loop for the first time.  That way, zV gets
-initialised to the correct thing on entering the loop, irrespective of
-whether we have a whole vector on the first iteration.
+ (*) I/O crypto: encrypt, decrypt, get_mic and verify_mic.
 
-Note, to squeeze maximum performance out of this, you still probably
-want to unroll the loop a few times so that you can schedule useful work
-in between each load and the computations that depend on it.
+     These all do in-place crypto, using an sglist to define the buffer
+     with the data in it.  Is it necessary to make it able to take separate
+     input and output buffers?
 
-> >> start:
-> >>         whilelo p0.s, x1, xLimit
-> >>         b.last  loop		// The condition for the core loop to continue is that b.last is true
-> >>         b.first trailloop	// If b.last is false and b.first is true, it means the last cycle
-> >>
-> >>         uaddv   d0, p1, zA.s
-> >>         uaddv   d1, p1, zB.s
-> >>
-> >>         mov     x12, v0.2d[0]
-> >>         mov     x13, v1.2d[0]
-> > The "2" here seems not to be required by the syntax, although it's
-> > harmless.
-> 
-> Yes I deleted it.
-> 
-> > 
-> >>         add     x10, x10, x12
-> >>         add     x11, x11, x13
-> >>         add     x11, x11, x2
-> > If x10 and x11 are used as accmulators by the caller, I guess this works.
-> 
-> X10 and X11 are part A and part B of the initial value of adler32 passed in by the caller.
+ (*) PRF+ calculation for key derivation.
+ (*) Kc, Ke, Ki derivation.
 
-Right, that makes sense.
+     These use krb5_buffer structs to pass objects around.  This is akin to
+     the xdr_netobj, but has a void* instead of a u8* data pointer.
 
-> 
-> > 
-> >>         mod65521        10, 14, 12
-> >>         mod65521        11, 14, 12
+In terms of rxrpc's rxgk, there's another step in key derivation that isn't
+part of the kerberos standard, but uses the PRF+ function to generate a key
+that is then used to generate Kc, Ke and Ki.  Is it worth putting this into
+the directory or maybe having a callout to insert an intermediate step in
+key derivation?
 
-Note, can you replace these with udiv?
+Note that, for purposes of illustration, I've included some rxrpc patches
+that use this interface to implement the rxgk Rx security class.  The
+branch also is based on some rxrpc patches that are a prerequisite for
+this, but the crypto patches don't need it.
 
-While using mul might be slightly cheaper to achieve this, it makes the
-code more complex and will have a negligible impact on the overall
-cost...
+---
+The patches can be found here also:
 
-So, does something like this work:
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=crypto-krb5
 
-	mov	x3, #65521
-	udiv	x4, x10, x3
-	udiv	x5, x11, x3
-	msub	x10, x4, x3, x10
-	msub	x11, x5, x3, x11
+David
+---
+David Howells (18):
+      crypto/krb5: Implement Kerberos crypto core
+      crypto/krb5: Add some constants out of sunrpc headers
+      crypto/krb5: Provide infrastructure and key derivation
+      crypto/krb5: Implement the Kerberos5 rfc3961 key derivation
+      crypto/krb5: Implement the Kerberos5 rfc3961 encrypt and decrypt functions
+      crypto/krb5: Implement the Kerberos5 rfc3961 get_mic and verify_mic
+      crypto/krb5: Implement the AES enctypes from rfc3962
+      crypto/krb5: Implement crypto self-testing
+      crypto/krb5: Implement the AES enctypes from rfc8009
+      crypto/krb5: Implement the AES encrypt/decrypt from rfc8009
+      crypto/krb5: Add the AES self-testing data from rfc8009
+      crypto/krb5: Implement the Camellia enctypes from rfc6803
+      rxrpc: Add the security index for yfs-rxgk
+      rxrpc: Add YFS RxGK (GSSAPI) security class
+      rxrpc: rxgk: Provide infrastructure and key derivation
+      rxrpc: rxgk: Implement the yfs-rxgk security class (GSSAPI)
+      rxrpc: rxgk: Implement connection rekeying
+      rxgk: Support OpenAFS's rxgk implementation
 
-> >>         lsl     x11, x11, #16
-> >>         orr     x0, x10, x11
-> >>         ret
-> >> -->8--
-> >>
-> >> After this modification, The test results are correct when the data length is less than about 8 Kbyte,
-> >> part A will still be correct after 8K, and an overflow error will occur in part B. This is because A
-> >> only accumulates all the bytes, and the accumulative acceleration of B expands faster, because the
-> >> accumulative formula of B is:
-> >> 	B = (1 + D1) + (1 + D1 + D2) + ... + (1 + D1 + D2 + ... + Dn) (mod 65521)
-> >>            = n×D1 + (n−1)×D2 + (n−2)×D3 + ... + Dn + n (mod 65521)
-> >>
-> >> If we take the average value of Dx to 128 and n to 8192:
-> >> 	B = (1 + 2 + ... + 8129) * 128 + 8192
-> >> 	  = 4,295,499,776 (32bit overflow)
-> >>
-> >> So I think the 32-bit accumulator is still not enough for part B here. :)
-> >>
-> >> -- 
-> >> Best regards,
-> >> Li Qiang
-> > That makes sense.  I hadn't tried to calculate the actual bound.
-> > 
-> > It may be worth trying this with 64-bit accumulators.  This will
-> > probably slow things down, but it depends on the relative computation /
-> > memory throughput exhibited by the hardware.
-> 
-> If a 64-bit wide vector register is used, for most scenes where the amount of data is not particularly large,
-> is it wasted more vector resources?
 
-Yes :)
+ crypto/krb5/Kconfig              |    9 +
+ crypto/krb5/Makefile             |   11 +-
+ crypto/krb5/internal.h           |  101 +++
+ crypto/krb5/kdf.c                |  223 ++++++
+ crypto/krb5/main.c               |  190 +++++
+ crypto/krb5/rfc3961_simplified.c |  732 ++++++++++++++++++
+ crypto/krb5/rfc3962_aes.c        |  140 ++++
+ crypto/krb5/rfc6803_camellia.c   |  249 ++++++
+ crypto/krb5/rfc8009_aes2.c       |  440 +++++++++++
+ crypto/krb5/selftest.c           |  543 +++++++++++++
+ crypto/krb5/selftest_data.c      |  289 +++++++
+ fs/afs/misc.c                    |   13 +
+ include/crypto/krb5.h            |  100 +++
+ include/keys/rxrpc-type.h        |   17 +
+ include/trace/events/rxrpc.h     |    4 +
+ include/uapi/linux/rxrpc.h       |   17 +
+ net/rxrpc/Kconfig                |   10 +
+ net/rxrpc/Makefile               |    5 +
+ net/rxrpc/ar-internal.h          |   20 +
+ net/rxrpc/conn_object.c          |    2 +
+ net/rxrpc/key.c                  |  319 ++++++++
+ net/rxrpc/rxgk.c                 | 1232 ++++++++++++++++++++++++++++++
+ net/rxrpc/rxgk_app.c             |  424 ++++++++++
+ net/rxrpc/rxgk_common.h          |  164 ++++
+ net/rxrpc/rxgk_kdf.c             |  271 +++++++
+ net/rxrpc/security.c             |    6 +
+ 26 files changed, 5530 insertions(+), 1 deletion(-)
+ create mode 100644 crypto/krb5/kdf.c
+ create mode 100644 crypto/krb5/rfc3961_simplified.c
+ create mode 100644 crypto/krb5/rfc3962_aes.c
+ create mode 100644 crypto/krb5/rfc6803_camellia.c
+ create mode 100644 crypto/krb5/rfc8009_aes2.c
+ create mode 100644 crypto/krb5/selftest.c
+ create mode 100644 crypto/krb5/selftest_data.c
+ create mode 100644 net/rxrpc/rxgk.c
+ create mode 100644 net/rxrpc/rxgk_app.c
+ create mode 100644 net/rxrpc/rxgk_common.h
+ create mode 100644 net/rxrpc/rxgk_kdf.c
 
-Depending on the algorithm, this might be a better tradeoff if it meant
-that the data could be processed in larger chunks.  I suspect that the
-tradeoff is unfavourable in this particluar case though -- but I haven't
-tried it.
 
-> Maybe we can also try to use 16-bit wide vector registers to load data and calculations,
-> and accumulate them into the scalar register xn before overflow, just like my original patch,
-> but I can try to use ascending order to change the processing of the last loop Be more elegant.
-
-Perhaps.  But I assumed that 16-bit elements would overflow much too
-fast to be practical.  Just multiplying zX by zJ once can produce
-element values up to 0xfe01 if VL is 256 bytes.
-
-Did you have some idea for how to make this work?
-
-It may be possible to do 16-bit multiplies with 32-bit accumulation.
-SVE2 has some NEON-style mixed-width multiply-accumulate instructions
-that can achieve this sort of thing directly, but in SVE(1) I think 
-you would have to break the multiply-accumulates up.  Say:
-
-	mul	zX.h, pP/m, zX.h, zJ.h
-	sub	zX.s, pP/m, zB.s, zX.s
-
-whilelo pP.s should generate a predicate with odd .h elements inactive,
-and ld1b zX.s, pP/z, ... will make sure those elements are all zeroed in
-xX.h.
-
-I'm not sure this would be faster than a single 32-bit msb, since
-multiply-accumulates are likely to be heavily optimised in the hardware,
-but you could try it.
-
-> > 
-> > I think the code can't be bulletproof without breaking the input into
-> > chunks anyway, though.
-> 
-> I don't quite understand what it means here. Does it mean that the input bytes are read into the vector in
-> blocks for calculation (this is how it is done now) or the intermediate results are stored in different elements
-> of the vector in blocks during the calculation process? :-)
-
-I mean, you limit the number of iterations of the core loop so that
-overflow doesn't happen.  You're already doing this; I just wanted to
- make the point that 64-bit accumulators probably don't solve this
-problem, even though it will take a very large number of iterations to
-cause an overflow.
-
-Unless Adler32 specifies the maximum length of the input data not to
-exceed some value, it could go on forever -- so overflow becomes
-inevitable.
-
-Cheers
----Dave
