@@ -2,131 +2,74 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BAD8C388F7
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 13:01:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 077DDC388F7
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 13:44:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4B23C21D7F
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 13:01:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A124422248
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Nov 2020 13:44:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I/aNE1D/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ObMrIESu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728249AbgKLM6R (ORCPT
+        id S1727796AbgKLNoX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Nov 2020 07:58:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56179 "EHLO
+        Thu, 12 Nov 2020 08:44:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60818 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728251AbgKLM6L (ORCPT
+        by vger.kernel.org with ESMTP id S1728196AbgKLNoW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Nov 2020 07:58:11 -0500
+        Thu, 12 Nov 2020 08:44:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605185890;
+        s=mimecast20190719; t=1605188661;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DAVAInVcp6zb/CSQMkiobU5XXmB1jibPH4NSxa0idq0=;
-        b=I/aNE1D/2yuSv72lZtKu/yVaE7/x4RAKkRysmRU/nXHyFY1Gq4d0LOcRATO+vc9xXvPYQ1
-        hMQwUWtiq2BCwXcYGLXEfjRsXfnGVdake1eLoN1c9GxfoKy9PSa3gfjBI7u/FpG3nOWVNi
-        k1Xkq2PJFdTaGYfEH6sq7IZAEy2bWnY=
+        bh=BUwAIt+GOyG7Z7TJGWPImVlKsyad1TuYvU2wjzCyMwM=;
+        b=ObMrIESuhWusZm82qSdcZCJvg0T0jx4NNJw/Lpi2pKsMcUyj/Do5DV9QIgoRg/vev4RWFQ
+        q5LEU4Xyk/PxJbRwY13bn8bzqClZ6l9RzDfzfVtXYqB9emTFGdB7IE7GVRSPlPLH7LLDR0
+        CpozfZtnz/RGtJzQzmxlkf+AQ+7I+Bo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-Cv7XutOCNf62MnfBD1BTcg-1; Thu, 12 Nov 2020 07:58:06 -0500
-X-MC-Unique: Cv7XutOCNf62MnfBD1BTcg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-59-GVDbAyBiPoCIGQMZjHAg_Q-1; Thu, 12 Nov 2020 08:44:17 -0500
+X-MC-Unique: GVDbAyBiPoCIGQMZjHAg_Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 714EF64156;
-        Thu, 12 Nov 2020 12:58:04 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C717A100F7A3;
+        Thu, 12 Nov 2020 13:44:15 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-115-47.rdu2.redhat.com [10.10.115.47])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 944E65B4AD;
-        Thu, 12 Nov 2020 12:58:02 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D98195DA7E;
+        Thu, 12 Nov 2020 13:44:13 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 02/18] crypto/krb5: Add some constants out of sunrpc headers
 From:   David Howells <dhowells@redhat.com>
-To:     herbert@gondor.apana.org.au, bfields@fieldses.org
-Cc:     dhowells@redhat.com, trond.myklebust@hammerspace.com,
-        linux-crypto@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Thu, 12 Nov 2020 12:58:01 +0000
-Message-ID: <160518588181.2277919.13100188317180416955.stgit@warthog.procyon.org.uk>
 In-Reply-To: <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
 References: <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/0.23
+To:     herbert@gondor.apana.org.au
+Cc:     dhowells@redhat.com, bfields@fieldses.org,
+        trond.myklebust@hammerspace.com, linux-crypto@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC][PATCH 00/18] crypto: Add generic Kerberos library
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2319366.1605188653.1@warthog.procyon.org.uk>
+Date:   Thu, 12 Nov 2020 13:44:13 +0000
+Message-ID: <2319367.1605188653@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add some constants from the sunrpc headers.
+Would it be possible/practical to make the skcipher encrypt functions take an
+offset into the scatterlist rather than always starting at the beginning?
 
-Signed-off-by: David Howells <dhowells@redhat.com>
----
-
- include/crypto/krb5.h |   39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
-
-diff --git a/include/crypto/krb5.h b/include/crypto/krb5.h
-index 2bd6cfe50b85..a7e4ab4e1348 100644
---- a/include/crypto/krb5.h
-+++ b/include/crypto/krb5.h
-@@ -15,6 +15,45 @@
- struct crypto_shash;
- struct scatterlist;
- 
-+/* per Kerberos v5 protocol spec crypto types from the wire.
-+ * these get mapped to linux kernel crypto routines.
-+ */
-+#define KRB5_ENCTYPE_NULL			0x0000
-+#define KRB5_ENCTYPE_DES_CBC_CRC		0x0001	/* DES cbc mode with CRC-32 */
-+#define KRB5_ENCTYPE_DES_CBC_MD4		0x0002	/* DES cbc mode with RSA-MD4 */
-+#define KRB5_ENCTYPE_DES_CBC_MD5		0x0003	/* DES cbc mode with RSA-MD5 */
-+#define KRB5_ENCTYPE_DES_CBC_RAW		0x0004	/* DES cbc mode raw */
-+/* XXX deprecated? */
-+#define KRB5_ENCTYPE_DES3_CBC_SHA		0x0005	/* DES-3 cbc mode with NIST-SHA */
-+#define KRB5_ENCTYPE_DES3_CBC_RAW		0x0006	/* DES-3 cbc mode raw */
-+#define KRB5_ENCTYPE_DES_HMAC_SHA1		0x0008
-+#define KRB5_ENCTYPE_DES3_CBC_SHA1		0x0010
-+#define KRB5_ENCTYPE_AES128_CTS_HMAC_SHA1_96	0x0011
-+#define KRB5_ENCTYPE_AES256_CTS_HMAC_SHA1_96	0x0012
-+#define KRB5_ENCTYPE_ARCFOUR_HMAC		0x0017
-+#define KRB5_ENCTYPE_ARCFOUR_HMAC_EXP		0x0018
-+#define KRB5_ENCTYPE_UNKNOWN			0x01ff
-+
-+#define KRB5_CKSUMTYPE_CRC32			0x0001
-+#define KRB5_CKSUMTYPE_RSA_MD4			0x0002
-+#define KRB5_CKSUMTYPE_RSA_MD4_DES		0x0003
-+#define KRB5_CKSUMTYPE_DESCBC			0x0004
-+#define KRB5_CKSUMTYPE_RSA_MD5			0x0007
-+#define KRB5_CKSUMTYPE_RSA_MD5_DES		0x0008
-+#define KRB5_CKSUMTYPE_NIST_SHA			0x0009
-+#define KRB5_CKSUMTYPE_HMAC_SHA1_DES3		0x000c
-+#define KRB5_CKSUMTYPE_HMAC_SHA1_96_AES128	0x000f
-+#define KRB5_CKSUMTYPE_HMAC_SHA1_96_AES256	0x0010
-+#define KRB5_CKSUMTYPE_HMAC_MD5_ARCFOUR		-138 /* Microsoft md5 hmac cksumtype */
-+
-+/*
-+ * Constants used for key derivation
-+ */
-+/* from rfc3961 */
-+#define KEY_USAGE_SEED_CHECKSUM         (0x99)
-+#define KEY_USAGE_SEED_ENCRYPTION       (0xAA)
-+#define KEY_USAGE_SEED_INTEGRITY        (0x55)
-+
- struct krb5_buffer {
- 	unsigned int	len;
- 	void		*data;
-
+David
 
