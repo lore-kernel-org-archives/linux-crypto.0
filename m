@@ -7,85 +7,55 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F71C388F9
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 05:10:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4D57C4742C
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 05:10:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 995A120A8B
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 05:10:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3ADF20B80
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 05:10:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726104AbgKMFK0 (ORCPT
+        id S1726096AbgKMFK3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Nov 2020 00:10:26 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:33682 "EHLO fornost.hmeau.com"
+        Fri, 13 Nov 2020 00:10:29 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:33690 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726023AbgKMFKZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Nov 2020 00:10:25 -0500
+        id S1726023AbgKMFK2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Nov 2020 00:10:28 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kdRLl-0000rU-AU; Fri, 13 Nov 2020 16:10:18 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Nov 2020 16:10:17 +1100
-Date:   Fri, 13 Nov 2020 16:10:17 +1100
+        id 1kdRLu-0000rY-7J; Fri, 13 Nov 2020 16:10:27 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Nov 2020 16:10:26 +1100
+Date:   Fri, 13 Nov 2020 16:10:26 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, andre.przywara@arm.com,
-        linux-arm-kernel@lists.infradead.org,
-        Eric Biggers <ebiggers@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v2] crypto: arm/chacha-neon - optimize for non-block size
- multiples
-Message-ID: <20201113051017.GC8350@gondor.apana.org.au>
-References: <20201103162809.28167-1-ardb@kernel.org>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Adam Guerin <adam.guerin@intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: Re: [PATCH] crypto: qat - replace pci with PCI in comments
+Message-ID: <20201113051026.GD8350@gondor.apana.org.au>
+References: <20201103172936.765026-1-giovanni.cabiddu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201103162809.28167-1-ardb@kernel.org>
+In-Reply-To: <20201103172936.765026-1-giovanni.cabiddu@intel.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 03, 2020 at 05:28:09PM +0100, Ard Biesheuvel wrote:
-> The current NEON based ChaCha implementation for ARM is optimized for
-> multiples of 4x the ChaCha block size (64 bytes). This makes sense for
-> block encryption, but given that ChaCha is also often used in the
-> context of networking, it makes sense to consider arbitrary length
-> inputs as well.
+On Tue, Nov 03, 2020 at 05:29:36PM +0000, Giovanni Cabiddu wrote:
+> From: Adam Guerin <adam.guerin@intel.com>
 > 
-> For example, WireGuard typically uses 1420 byte packets, and performing
-> ChaCha encryption involves 5 invocations of chacha_4block_xor_neon()
-> and 3 invocations of chacha_block_xor_neon(), where the last one also
-> involves a memcpy() using a buffer on the stack to process the final
-> chunk of 1420 % 64 == 12 bytes.
+> Change all lower case pci in comments to be upper case PCI.
 > 
-> Let's optimize for this case as well, by letting chacha_4block_xor_neon()
-> deal with any input size between 64 and 256 bytes, using NEON permutation
-> instructions and overlapping loads and stores. This way, the 140 byte
-> tail of a 1420 byte input buffer can simply be processed in one go.
-> 
-> This results in the following performance improvements for 1420 byte
-> blocks, without significant impact on power-of-2 input sizes. (Note
-> that Raspberry Pi is widely used in combination with a 32-bit kernel,
-> even though the core is 64-bit capable)
-> 
->    Cortex-A8  (BeagleBone)       :   7%
->    Cortex-A15 (Calxeda Midway)   :  21%
->    Cortex-A53 (Raspberry Pi 3)   :   3%
->    Cortex-A72 (Raspberry Pi 4)   :  19%
-> 
-> Cc: Eric Biggers <ebiggers@google.com>
-> Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Signed-off-by: Adam Guerin <adam.guerin@intel.com>
+> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 > ---
-> v2:
-> - avoid memcpy() if the residual byte count is exactly 64 bytes
-> - get rid of register based post increments, and simply rewind the src
->   pointer as needed (the dst pointer did not need the register post
->   increment in the first place)
-> - add benchmark results for 32-bit CPUs to commit log.
-> 
->  arch/arm/crypto/chacha-glue.c      | 34 +++----
->  arch/arm/crypto/chacha-neon-core.S | 97 ++++++++++++++++++--
->  2 files changed, 107 insertions(+), 24 deletions(-)
+>  drivers/crypto/qat/qat_common/adf_dev_mgr.c | 4 ++--
+>  drivers/crypto/qat/qat_common/adf_sriov.c   | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
 
 Patch applied.  Thanks.
 -- 
