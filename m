@@ -2,93 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91E24C55ABD
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 07:22:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D68ADC4742C
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 08:58:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F4F122245
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 07:22:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="hbCHyrnS"
+	by mail.kernel.org (Postfix) with ESMTP id 915CB2076E
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 08:58:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726272AbgKMHWp (ORCPT
+        id S1726181AbgKMI6p (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Nov 2020 02:22:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47776 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726112AbgKMHWp (ORCPT
+        Fri, 13 Nov 2020 03:58:45 -0500
+Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:40886 "EHLO
+        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726348AbgKMI6n (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Nov 2020 02:22:45 -0500
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 645F9C0613D1;
-        Thu, 12 Nov 2020 23:22:45 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4CXVKv0Fp2z9sTR;
-        Fri, 13 Nov 2020 18:22:43 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1605252163;
-        bh=uOcWXi+dGfEbfMzmrdCvYcBYURx9rTT/OjNqaFr2HuE=;
-        h=Date:From:To:Cc:Subject:From;
-        b=hbCHyrnS6kKgVcxYKOWxw2Sa6eO7BTVMWzAUe7wb1VdfUWAJTrVBvnrg8qZVrlnM7
-         8NCANaODIp6zBgi14G3CXIii52I+XFCE5xAXfc+vNsrbiXakMvGGE2LFO4nyZkB5QG
-         rqt3mG9JcWc2NUzr/dNp3QZbbqGSsKrRlcrQmq9Rkx11aTfy6SvgGivtzYTnWW1eA0
-         okqYeST2oFAivvtm3lSd+KHq8ADLfrv1kjNOJz+gvKGdKBm051weXfbGZn51FMuCmW
-         w1xxVS5HkyI4LJpGkXu+Ehez8nafbBhWeHA+OZ8cfJL+PyLz7KDRDnA6IVC2pG4yxl
-         dgsqIwKEfmdUg==
-Date:   Fri, 13 Nov 2020 18:22:42 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Hui Tang <tanghui20@huawei.com>, Meng Yu <yumeng18@huawei.com>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Signed-off-by missing for commit in the crypto tree
-Message-ID: <20201113182242.26d97b28@canb.auug.org.au>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/3IDlOsqnXyzh2kVN8yJf0pX";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+        Fri, 13 Nov 2020 03:58:43 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R811e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=alex.shi@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0UFAepvk_1605257910;
+Received: from aliy80.localdomain(mailfrom:alex.shi@linux.alibaba.com fp:SMTPD_---0UFAepvk_1605257910)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 13 Nov 2020 16:58:39 +0800
+From:   Alex Shi <alex.shi@linux.alibaba.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] PKCS#7: drop function from kernel-doc pkcs7_validate_trust_one
+Date:   Fri, 13 Nov 2020 16:58:15 +0800
+Message-Id: <1605257895-5536-6-git-send-email-alex.shi@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1605257895-5536-1-git-send-email-alex.shi@linux.alibaba.com>
+References: <1605257895-5536-1-git-send-email-alex.shi@linux.alibaba.com>
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/3IDlOsqnXyzh2kVN8yJf0pX
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+The function is a static function, so no needs add into kernel-doc. and
+we could avoid warning:
+crypto/asymmetric_keys/pkcs7_trust.c:25: warning: Function parameter or
+member 'pkcs7' not described in 'pkcs7_validate_trust_one'
+crypto/asymmetric_keys/pkcs7_trust.c:25: warning: Function parameter or
+member 'sinfo' not described in 'pkcs7_validate_trust_one'
+crypto/asymmetric_keys/pkcs7_trust.c:25: warning: Function parameter or
+member 'trust_keyring' not described in 'pkcs7_validate_trust_one'
 
-Hi all,
+Signed-off-by: Alex Shi <alex.shi@linux.alibaba.com>
+Cc: David Howells <dhowells@redhat.com> 
+Cc: Herbert Xu <herbert@gondor.apana.org.au> 
+Cc: "David S. Miller" <davem@davemloft.net> 
+Cc: keyrings@vger.kernel.org 
+Cc: linux-crypto@vger.kernel.org 
+Cc: linux-kernel@vger.kernel.org 
+---
+ crypto/asymmetric_keys/pkcs7_trust.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Commit
+diff --git a/crypto/asymmetric_keys/pkcs7_trust.c b/crypto/asymmetric_keys/pkcs7_trust.c
+index 61af3c4d82cc..b531df2013c4 100644
+--- a/crypto/asymmetric_keys/pkcs7_trust.c
++++ b/crypto/asymmetric_keys/pkcs7_trust.c
+@@ -16,7 +16,7 @@
+ #include <crypto/public_key.h>
+ #include "pkcs7_parser.h"
+ 
+-/**
++/*
+  * Check the trust on one PKCS#7 SignedInfo block.
+  */
+ static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
+-- 
+2.29.GIT
 
-  50d7e084c48d ("crypto: hisilicon/hpre - add initial settings adapt to 'Ku=
-npeng 930'")
-
-is missing a Signed-off-by from its author.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/3IDlOsqnXyzh2kVN8yJf0pX
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl+uNEIACgkQAVBC80lX
-0Gz7WAf8D2U4wb0ZsyE7tgmaBUaDyvHpKeQ87i/yzh3FoiQgEtD1yzt68A5xnYP5
-EsZW3O6Y8zZMRdy/yvfDa8fHifBSky5DESLcO9qIxNWQtYaCSMlBA18Jcb5FJtTp
-jOw+imYJ1/6THRis9NBmpFF6+kT5ccV3uariIQtYMgDYA0gt7lOzMeYDVNFYrGVZ
-5ofk6glnK0UNctXwSUorHfrHXKe8JGr1fxwZ27j4RBQCu1d+0nq35li586SQLYYg
-FQkddGfAM7Joqi2mrOuRbXmBFo9/OqroXDHp5QLu0Xr1yHFSZndP92/9OoR0027u
-73+sOiaMeG0B5LttgpcaOfZ14AE52A==
-=et0x
------END PGP SIGNATURE-----
-
---Sig_/3IDlOsqnXyzh2kVN8yJf0pX--
