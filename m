@@ -2,170 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D3E7C388F7
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 09:13:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 735A6C388F7
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 09:32:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B703920857
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 09:13:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B1062145D
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 09:32:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726200AbgKMJNf convert rfc822-to-8bit (ORCPT
+        id S1726176AbgKMJcY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Nov 2020 04:13:35 -0500
-Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:41694 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726184AbgKMJNe (ORCPT
+        Fri, 13 Nov 2020 04:32:24 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:7189 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726149AbgKMJcX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Nov 2020 04:13:34 -0500
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-220-PqFSW9A9PH2BcaJY30TEYQ-1; Fri, 13 Nov 2020 09:13:25 +0000
-X-MC-Unique: PqFSW9A9PH2BcaJY30TEYQ-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Fri, 13 Nov 2020 09:13:24 +0000
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Fri, 13 Nov 2020 09:13:24 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Nathan Chancellor' <natechancellor@gmail.com>,
-        Christian Lamparter <chunkeey@gmail.com>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "clang-built-linux@googlegroups.com" 
-        <clang-built-linux@googlegroups.com>
-Subject: RE: [PATCH] crypto: crypto4xx - Replace bitwise OR with logical OR in
- crypto4xx_build_pd
-Thread-Topic: [PATCH] crypto: crypto4xx - Replace bitwise OR with logical OR
- in crypto4xx_build_pd
-Thread-Index: AQHWuT2oUlZMOSIiOk6Ynob79/7MV6nFxI1w
-Date:   Fri, 13 Nov 2020 09:13:24 +0000
-Message-ID: <a163bb51881149eaa13461a93b3e45bd@AcuMS.aculab.com>
-References: <20201112200702.1664905-1-natechancellor@gmail.com>
- <1f5e8575-ab7e-59ea-6be7-0340df4d31c5@gmail.com>
- <20201112214904.GA3194701@ubuntu-m3-large-x86>
-In-Reply-To: <20201112214904.GA3194701@ubuntu-m3-large-x86>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Fri, 13 Nov 2020 04:32:23 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CXYCC4NGlz15L0Y;
+        Fri, 13 Nov 2020 17:32:07 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.487.0; Fri, 13 Nov 2020 17:32:09 +0800
+From:   Yang Shen <shenyang39@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>
+Subject: [PATCH] crypto: hisilicon/zip - add a work_queue for zip irq
+Date:   Fri, 13 Nov 2020 17:32:35 +0800
+Message-ID: <1605259955-17796-1-git-send-email-shenyang39@huawei.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Nathan Chancellor
-> Sent: 12 November 2020 21:49
-> 
-> On Thu, Nov 12, 2020 at 10:21:35PM +0100, Christian Lamparter wrote:
-> > Hello,
-> >
-> > On 12/11/2020 21:07, Nathan Chancellor wrote:
-> > > Clang warns:
-> > >
-> > > drivers/crypto/amcc/crypto4xx_core.c:921:60: warning: operator '?:' has
-> > > lower precedence than '|'; '|' will be evaluated first
-> > > [-Wbitwise-conditional-parentheses]
-> > >                   (crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AEAD) ?
-> > >                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^
-> > > drivers/crypto/amcc/crypto4xx_core.c:921:60: note: place parentheses
-> > > around the '|' expression to silence this warning
-> > >                   (crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AEAD) ?
-> > >                                                                           ^
-> > >                                                                          )
-> > > drivers/crypto/amcc/crypto4xx_core.c:921:60: note: place parentheses
-> > > around the '?:' expression to evaluate it first
-> > >                   (crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AEAD) ?
-> > >                                                                           ^
-> > >                   (
-> > > 1 warning generated.
-> > >
-> > > It looks like this should have been a logical OR so that
-> > > PD_CTL_HASH_FINAL gets added to the w bitmask if crypto_tfm_alg_type
-> > > is either CRYPTO_ALG_TYPE_AHASH or CRYPTO_ALG_TYPE_AEAD.
-> > Yes. This probably wasn't spotted earlier since the driver doesn't make
-> > use of CRYPTO_ALG_TYPE_AHASH (yet). This is because the hash accelerator
-> > setup cost was never worth it.
-> >
-> > > Change the operator so that everything works properly.
-> > I'm curious if this is true. Is there a way to break this somehow on purpose?
-> 
-> I do not really have a way to validate that statement, I just figured
-> that the operator being wrong meant that something could go wrong that
-> was not intended.
-> 
-> > I've extracted the code from line 921 and added the defines
-> > (the CRYPTO_ALG_... from the current 5.10-rc3 crypto.h and the PD_CTL_
-> > from crypto4xx_reg_def.h) and replaced the u32 with uint32_t
-> > so it runs in userspace too:
-> >
-> > --- crypto4xx_test.c ---
-> > /* test study - is it possible to break the | vs || in crypto4xx's code */
-> >
-> > #include <stdio.h>
-> > #include <stdint.h>
-> >
-> > #define CRYPTO_ALG_TYPE_AEAD 	0x00000003
-> > #define CRYPTO_ALG_TYPE_AHASH	0x0000000f
-> > #define PD_CTL_HASH_FINAL	(1<<4) /* Stand-in for BIT(4) */
-> > #define PD_CTL_HOST_READY	(1<<0) /* BIT(0) */
-> >
-> > uint32_t func_with_bitwise_or(uint32_t alg_type)
-> > {
-> > 	return PD_CTL_HOST_READY |
-> > 		((alg_type == CRYPTO_ALG_TYPE_AHASH) |
-> > 		 (alg_type == CRYPTO_ALG_TYPE_AEAD) ?
-> > 			PD_CTL_HASH_FINAL : 0);
-> > }
-> 
-> Looking at this more, I think the only reason that the code works as is
-> is because PD_CTL_HOST_READY is 1 AND CRYPTO_ALG_TYPE_AHASH is not used.
-> 
-> (alg_type == CRYPTO_ALG_TYPE_AEAD) ? PD_CTL_HASH_FINAL : 0 is evaluated
-> first, which results in either PD_CTL_HASH_FINAL or 0.
-> 
-> Then (alg_type == CRYPTO_ALG_TYPE_AHASH) is evaluated, which is
-> evaluated to either 0 or 1.
-> 
-> Then we mask everything together:
-> 
-> PD_CTL_HOST_READY | (0 || 1) | (PD_CTL_HOST_READY || 0)
+The patch 'irqchip/gic-v3-its: Balance initial LPI affinity across CPUs'
+set the IRQ to an uncentain CPU. If an IRQ is bound to the CPU used by the
+thread which is sending request, the throughput will be just half.
 
-The result is the same for both | and || as they are both higher
-priority than ?: (which is only higher priority than ,).
+So allocate a 'work_queue' and set as 'WQ_UNBOUND' to do the back half work
+on some different CPUS.
 
-The () around the == aren't needed (except to stop the compiler
-bleating). The bitwise | is lower priority than == because it
-existed before || and K&R didn't change the priority when they
-added || (I think they've said later they wished they had.)
+Signed-off-by: Yang Shen <shenyang39@huawei.com>
+Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
+---
+ drivers/crypto/hisilicon/zip/zip_main.c | 26 +++++++++++++++++++++++---
+ 1 file changed, 23 insertions(+), 3 deletions(-)
 
-The () around the entire ?: clause are needed.
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index 3d1524b..4fb5a32b 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -747,6 +747,8 @@ static int hisi_zip_pf_probe_init(struct hisi_zip *hisi_zip)
 
-So the code is the same as:
-	rval = PD_CTL_HOST_READY;
-	if (alg_type == CRYPTO_ALG_TYPE_AHASH | alg_type == CRYPTO_ALG_TYPE_AEAD)
-		rval |= PD_CTL_HASH_FINAL;
-	return rval;
+ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+ {
++	int ret;
++
+ 	qm->pdev = pdev;
+ 	qm->ver = pdev->revision;
+ 	qm->algs = "zlib\ngzip";
+@@ -772,7 +774,25 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+ 		qm->qp_num = HZIP_QUEUE_NUM_V1 - HZIP_PF_DEF_Q_NUM;
+ 	}
 
-Using | may well generate faster code (no branches).
+-	return hisi_qm_init(qm);
++	qm->wq = alloc_workqueue("%s", WQ_HIGHPRI | WQ_MEM_RECLAIM |
++				 WQ_UNBOUND, num_online_cpus(),
++				 pci_name(qm->pdev));
++	if (!qm->wq) {
++		pci_err(qm->pdev, "fail to alloc workqueue\n");
++		return -ENOMEM;
++	}
++
++	ret = hisi_qm_init(qm);
++	if (ret)
++		destroy_workqueue(qm->wq);
++
++	return ret;
++}
++
++static void hisi_zip_qm_uninit(struct hisi_qm *qm)
++{
++	hisi_qm_uninit(qm);
++	destroy_workqueue(qm->wq);
+ }
 
-	David
+ static int hisi_zip_probe_init(struct hisi_zip *hisi_zip)
+@@ -854,7 +874,7 @@ static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	hisi_qm_dev_err_uninit(qm);
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+ err_qm_uninit:
+-	hisi_qm_uninit(qm);
++	hisi_zip_qm_uninit(qm);
+
+ 	return ret;
+ }
+@@ -872,7 +892,7 @@ static void hisi_zip_remove(struct pci_dev *pdev)
+ 	hisi_zip_debugfs_exit(qm);
+ 	hisi_qm_stop(qm, QM_NORMAL);
+ 	hisi_qm_dev_err_uninit(qm);
+-	hisi_qm_uninit(qm);
++	hisi_zip_qm_uninit(qm);
+ }
+
+ static const struct pci_error_handlers hisi_zip_err_handler = {
+--
+2.7.4
 
