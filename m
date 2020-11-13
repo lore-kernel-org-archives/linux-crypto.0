@@ -2,59 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4874BC5519F
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 03:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E21CC388F9
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 03:57:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F116522201
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 03:41:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2541D22241
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Nov 2020 03:57:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726215AbgKMDlI (ORCPT
+        id S1726069AbgKMD5x (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Nov 2020 22:41:08 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:33236 "EHLO fornost.hmeau.com"
+        Thu, 12 Nov 2020 22:57:53 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:33304 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726174AbgKMDlH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Nov 2020 22:41:07 -0500
+        id S1726011AbgKMD5x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Nov 2020 22:57:53 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kdPxM-00009a-V1; Fri, 13 Nov 2020 14:41:02 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Nov 2020 14:41:00 +1100
-Date:   Fri, 13 Nov 2020 14:41:00 +1100
+        id 1kdQDF-0000IO-Q9; Fri, 13 Nov 2020 14:57:26 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Nov 2020 14:57:25 +1100
+Date:   Fri, 13 Nov 2020 14:57:25 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Cc:     wangqing@vivo.com, aymen.sghaier@nxp.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: crypto: caam/qi - simplify error path for context allocation
-Message-ID: <20201113034100.GA28413@gondor.apana.org.au>
-References: <7e8409c9-ce91-3970-6ae0-e6e06987c117@nxp.com>
- <20201113033924.GA28388@gondor.apana.org.au>
+To:     Meng Yu <yumeng18@huawei.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        xuzaibo@huawei.com, wangzhou1@hisilicon.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 5/5] crypto: hisilicon/hpre - add 'CURVE25519'
+ algorithm
+Message-ID: <20201113035725.GA1025@gondor.apana.org.au>
+References: <1604284265-1271-1-git-send-email-yumeng18@huawei.com>
+ <1604284265-1271-6-git-send-email-yumeng18@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20201113033924.GA28388@gondor.apana.org.au>
+In-Reply-To: <1604284265-1271-6-git-send-email-yumeng18@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 13, 2020 at 02:39:24PM +1100, Herbert Xu wrote:
-> Horia Geantă <horia.geanta@nxp.com> wrote:
-> >
-> > -- >8 --
-> > 
-> > Subject: [PATCH] crypto: caam/qi - simplify error path for context allocation
+On Mon, Nov 02, 2020 at 10:31:05AM +0800, Meng Yu wrote:
+> Enable 'CURVE25519' algorithm in 'Kunpeng 930'.
 > 
-> You can't do this.  Patchwork takes any replies with the same
-> Subject line as a comment.
-> 
-> You need to resend this patch with a different subject.
+> Signed-off-by: Meng Yu <yumeng18@huawei.com>
+> Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
+> Reported-by: kernel test robot <lkp@intel.com>
+> ---
+>  drivers/crypto/hisilicon/hpre/hpre.h        |   2 +
+>  drivers/crypto/hisilicon/hpre/hpre_crypto.c | 387 +++++++++++++++++++++++++++-
+>  2 files changed, 381 insertions(+), 8 deletions(-)
 
-Nevermind, you did change the email subject too.
+This is not sparse clean:
+
+  CC [M]  drivers/crypto/hisilicon/sec2/sec_crypto.o
+../drivers/crypto/hisilicon/hpre/hpre_crypto.c:2073:18: warning: invalid assignment: |=
+../drivers/crypto/hisilicon/hpre/hpre_crypto.c:2073:18:    left side has type restricted __le32
+../drivers/crypto/hisilicon/hpre/hpre_crypto.c:2073:18:    right side has type unsigned int
+../drivers/crypto/hisilicon/hpre/hpre_crypto.c:2192:20: warning: restricted __le32 degrades to integer
+
+Please fix and resubmit.
 
 Thanks,
 -- 
