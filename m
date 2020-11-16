@@ -2,110 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03CB6C5519F
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Nov 2020 14:55:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A6DC5519F
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Nov 2020 15:47:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC44C241A6
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Nov 2020 14:55:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5B47207BC
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Nov 2020 15:47:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="bBUZ5kG0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730428AbgKPOzO convert rfc822-to-8bit (ORCPT
+        id S1730774AbgKPPra (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Nov 2020 09:55:14 -0500
-Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:55390 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730398AbgKPOzN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Nov 2020 09:55:13 -0500
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-98-JkwNPBRkP3WlYXkMFARcSg-1; Mon, 16 Nov 2020 14:54:59 +0000
-X-MC-Unique: JkwNPBRkP3WlYXkMFARcSg-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Mon, 16 Nov 2020 14:54:58 +0000
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Mon, 16 Nov 2020 14:54:58 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Corentin Labbe' <clabbe@baylibre.com>,
-        "arnd@arndb.de" <arnd@arndb.de>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "jernej.skrabec@siol.net" <jernej.skrabec@siol.net>,
-        "mripard@kernel.org" <mripard@kernel.org>,
-        "wens@csie.org" <wens@csie.org>
-CC:     "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-sunxi@googlegroups.com" <linux-sunxi@googlegroups.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [PATCH v3 2/7] crypto: sun4i-ss: checking sg length is not
- sufficient
-Thread-Topic: [PATCH v3 2/7] crypto: sun4i-ss: checking sg length is not
- sufficient
-Thread-Index: AQHWvCBry++55PgsQECGWrYMz9WH2qnK16lg
-Date:   Mon, 16 Nov 2020 14:54:58 +0000
-Message-ID: <0a9e713557104048b535958b5fe6cb10@AcuMS.aculab.com>
-References: <20201116135345.11834-1-clabbe@baylibre.com>
- <20201116135345.11834-3-clabbe@baylibre.com>
-In-Reply-To: <20201116135345.11834-3-clabbe@baylibre.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Mon, 16 Nov 2020 10:47:30 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34206 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730348AbgKPPr3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 16 Nov 2020 10:47:29 -0500
+Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0F03F20888;
+        Mon, 16 Nov 2020 15:47:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1605541649;
+        bh=sMTgzNRsrEqsRuLvdBLUUHqrR3j8TcZ0NCD0/HoI52c=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=bBUZ5kG07Yl8a9tQMs/QdhJgpIaoPTud6FawcN9OIs3t8G9s3zzlLhWIGXOmKQw0Q
+         lw+SUJxC+qG2I6dS8v3Kuh7w4YrO6RAfSxFxi4uKSIlOIxHuC/NFn7LSoCOjVf7zfV
+         qErWtbDy3ggUbV0M4v4TRxc4qy6jk0RXtcQL8k3s=
+Received: by mail-oi1-f179.google.com with SMTP id w145so19245537oie.9;
+        Mon, 16 Nov 2020 07:47:29 -0800 (PST)
+X-Gm-Message-State: AOAM531v8sfnX2QL40VFNd5FxrSeooIxUji+9SsMOhhg1LtTFVf7IwNl
+        +ZgLE/D64xcPs9KqZUVRajF41nHp5IXmxil1IVA=
+X-Google-Smtp-Source: ABdhPJwtEdUsppLCAadjjssiA4VW6Mu0wAQgb+s+CdH11TnsM2ahFBi35u8Nh6V2aCMqX1p/8Wi7ZuPnGhFDWKPXXTw=
+X-Received: by 2002:aca:3c54:: with SMTP id j81mr51617oia.11.1605541647968;
+ Mon, 16 Nov 2020 07:47:27 -0800 (PST)
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+References: <20201116135345.11834-1-clabbe@baylibre.com> <20201116135345.11834-5-clabbe@baylibre.com>
+In-Reply-To: <20201116135345.11834-5-clabbe@baylibre.com>
+From:   Arnd Bergmann <arnd@kernel.org>
+Date:   Mon, 16 Nov 2020 16:47:11 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a0UZHmM2xfKegZ4mo_7N15614YPhx_FoY_h6WWF9M58Uw@mail.gmail.com>
+Message-ID: <CAK8P3a0UZHmM2xfKegZ4mo_7N15614YPhx_FoY_h6WWF9M58Uw@mail.gmail.com>
+Subject: Re: [PATCH v3 4/7] crypto: sun4i-ss: handle BigEndian for cipher
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>, David Miller <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jernej Skrabec <jernej.skrabec@siol.net>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-sunxi <linux-sunxi@googlegroups.com>,
+        "# 3.4.x" <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Corentin Labbe
-> Sent: 16 November 2020 13:54
-> 
-> The optimized cipher function need length multiple of 4 bytes.
-> But it get sometimes odd length.
-> This is due to SG data could be stored with an offset.
-> 
-> So the fix is to check also if the offset is aligned with 4 bytes.
+On Mon, Nov 16, 2020 at 2:53 PM Corentin Labbe <clabbe@baylibre.com> wrote:
+>
+> Ciphers produce invalid results on BE.
+> Key and IV need to be written in LE.
+>
 > Fixes: 6298e948215f2 ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
 > Cc: <stable@vger.kernel.org>
 > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 > ---
->  drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c b/drivers/crypto/allwinner/sun4i-
-> ss/sun4i-ss-cipher.c
-> index 19f1aa577ed4..4dd736ee5a4d 100644
+>  drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
+> index 53478c3feca6..8f4621826330 100644
 > --- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
 > +++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
-> @@ -186,12 +186,12 @@ static int sun4i_ss_cipher_poll(struct skcipher_request *areq)
->  	 * we can use the SS optimized function
->  	 */
->  	while (in_sg && no_chunk == 1) {
-> -		if (in_sg->length % 4)
-> +		if (in_sg->length % 4 || !IS_ALIGNED(in_sg->offset, sizeof(u32)))
+> @@ -52,13 +52,13 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
+>
+>         spin_lock_irqsave(&ss->slock, flags);
+>
+> -       for (i = 0; i < op->keylen; i += 4)
+> -               writel(*(op->key + i / 4), ss->base + SS_KEY0 + i);
+> +       for (i = 0; i < op->keylen / 4; i++)
+> +               writesl(ss->base + SS_KEY0 + i * 4, &op->key[i], 1);
+>
 
-You probably ought to do the test in a consistent manner.
-Probably something that reduces to:
-	((unsigned long)in_sg->offset | in_sg->length) & 3u
+This looks correct, but I wonder if we should just introduce
+memcpy_toio32() and memcpy_fromio32() as a generic interface,
+as this seems to come up occasionally, and the method here
+(a loop around an inline function with another loop) is a bit clumsy.
 
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+      Arnd
