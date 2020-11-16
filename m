@@ -2,99 +2,416 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A6DC5519F
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Nov 2020 15:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6B6FC4742C
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Nov 2020 15:56:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E5B47207BC
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Nov 2020 15:47:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="bBUZ5kG0"
+	by mail.kernel.org (Postfix) with ESMTP id 7D01D207BC
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Nov 2020 15:56:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730774AbgKPPra (ORCPT
+        id S1730631AbgKPP4p (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Nov 2020 10:47:30 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34206 "EHLO mail.kernel.org"
+        Mon, 16 Nov 2020 10:56:45 -0500
+Received: from foss.arm.com ([217.140.110.172]:42210 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730348AbgKPPr3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Nov 2020 10:47:29 -0500
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0F03F20888;
-        Mon, 16 Nov 2020 15:47:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1605541649;
-        bh=sMTgzNRsrEqsRuLvdBLUUHqrR3j8TcZ0NCD0/HoI52c=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=bBUZ5kG07Yl8a9tQMs/QdhJgpIaoPTud6FawcN9OIs3t8G9s3zzlLhWIGXOmKQw0Q
-         lw+SUJxC+qG2I6dS8v3Kuh7w4YrO6RAfSxFxi4uKSIlOIxHuC/NFn7LSoCOjVf7zfV
-         qErWtbDy3ggUbV0M4v4TRxc4qy6jk0RXtcQL8k3s=
-Received: by mail-oi1-f179.google.com with SMTP id w145so19245537oie.9;
-        Mon, 16 Nov 2020 07:47:29 -0800 (PST)
-X-Gm-Message-State: AOAM531v8sfnX2QL40VFNd5FxrSeooIxUji+9SsMOhhg1LtTFVf7IwNl
-        +ZgLE/D64xcPs9KqZUVRajF41nHp5IXmxil1IVA=
-X-Google-Smtp-Source: ABdhPJwtEdUsppLCAadjjssiA4VW6Mu0wAQgb+s+CdH11TnsM2ahFBi35u8Nh6V2aCMqX1p/8Wi7ZuPnGhFDWKPXXTw=
-X-Received: by 2002:aca:3c54:: with SMTP id j81mr51617oia.11.1605541647968;
- Mon, 16 Nov 2020 07:47:27 -0800 (PST)
+        id S1731570AbgKPP4p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 16 Nov 2020 10:56:45 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C590631B;
+        Mon, 16 Nov 2020 07:56:43 -0800 (PST)
+Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 236663F70D;
+        Mon, 16 Nov 2020 07:56:42 -0800 (PST)
+Date:   Mon, 16 Nov 2020 15:56:38 +0000
+From:   Dave Martin <Dave.Martin@arm.com>
+To:     Li Qiang <liqiang64@huawei.com>
+Cc:     alexandre.torgue@st.com, catalin.marinas@arm.com,
+        gaoguijin@huawei.com, colordev.jiang@huawei.com,
+        luchunhua@huawei.com, linux-crypto@vger.kernel.org,
+        mcoquelin.stm32@gmail.com, liliang889@huawei.com, will@kernel.org,
+        davem@davemloft.net, linux-arm-kernel@lists.infradead.org,
+        herbert@gondor.apana.org.au
+Subject: Re: [PATCH 0/1] arm64: Accelerate Adler32 using arm64 SVE
+ instructions.
+Message-ID: <20201116155636.GZ6882@arm.com>
+References: <20201103121506.1533-1-liqiang64@huawei.com>
+ <20201105165301.GH6882@arm.com>
+ <f323de50-c358-88e7-6588-7d14542f2754@huawei.com>
+ <20201110104629.GJ6882@arm.com>
+ <89a9bdcc-b96e-2f2d-6c52-ca44e0e3472c@huawei.com>
+ <20201110160708.GL6882@arm.com>
+ <484ad2c8-3905-fc98-237c-f7eb4045edbc@huawei.com>
+ <20201112111745.GS6882@arm.com>
+ <72514954-ea04-6aa3-73d8-bb0fc39b6de2@huawei.com>
 MIME-Version: 1.0
-References: <20201116135345.11834-1-clabbe@baylibre.com> <20201116135345.11834-5-clabbe@baylibre.com>
-In-Reply-To: <20201116135345.11834-5-clabbe@baylibre.com>
-From:   Arnd Bergmann <arnd@kernel.org>
-Date:   Mon, 16 Nov 2020 16:47:11 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a0UZHmM2xfKegZ4mo_7N15614YPhx_FoY_h6WWF9M58Uw@mail.gmail.com>
-Message-ID: <CAK8P3a0UZHmM2xfKegZ4mo_7N15614YPhx_FoY_h6WWF9M58Uw@mail.gmail.com>
-Subject: Re: [PATCH v3 4/7] crypto: sun4i-ss: handle BigEndian for cipher
-To:     Corentin Labbe <clabbe@baylibre.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jernej Skrabec <jernej.skrabec@siol.net>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-sunxi <linux-sunxi@googlegroups.com>,
-        "# 3.4.x" <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <72514954-ea04-6aa3-73d8-bb0fc39b6de2@huawei.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Nov 16, 2020 at 2:53 PM Corentin Labbe <clabbe@baylibre.com> wrote:
->
-> Ciphers produce invalid results on BE.
-> Key and IV need to be written in LE.
->
-> Fixes: 6298e948215f2 ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> ---
->  drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
-> index 53478c3feca6..8f4621826330 100644
-> --- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
-> +++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
-> @@ -52,13 +52,13 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
->
->         spin_lock_irqsave(&ss->slock, flags);
->
-> -       for (i = 0; i < op->keylen; i += 4)
-> -               writel(*(op->key + i / 4), ss->base + SS_KEY0 + i);
-> +       for (i = 0; i < op->keylen / 4; i++)
-> +               writesl(ss->base + SS_KEY0 + i * 4, &op->key[i], 1);
->
+On Sat, Nov 14, 2020 at 03:31:56PM +0800, Li Qiang wrote:
+> 
+> 
+> 在 2020/11/12 19:17, Dave Martin 写道:
+> > On Thu, Nov 12, 2020 at 03:20:53PM +0800, Li Qiang wrote:
+> >>
+> >>
+> >> 在 2020/11/11 0:07, Dave Martin 写道:
+> >>>>>>> 	add     zA.s, pP/m, zA.s, zX.s        // zA.s += zX.s
+> >>>>>>>
+> >>>>>>> 	msb     zX.s, pP/m, zJ.s, zB.s        // zX.s := zB.s - zX.s * zJ.s
+> >>>>>>>
+> >>>>>>> 	movprfx zB, zA
+> >>>>>>> 	mad     zB.s, pP/m, zV.s, zX.s        // zB.s := zX.s + zA.s * V
+> >>>> I found the bug I encountered earlier, that is, the calculation of zB here
+> >>>> needs to use pA with all elements activated. The reason is the same as my
+> >>>> previous guess, because all elements of zA should be involved when calculating zB.
+> >>>> Because the original calculation formula is like this.
+> >>>>
+> >>>> For example:
+> >>>> In the last loop:
+> >>>> 	left byte is:	  3 |   4 |  \0 |
+> >>>> 	zA.s is:	100 | 200 | 100 | 200 (sum = 600)
+> >>>> 	pP.s is:	  1 |   1 |   0 |   0 (Only activate the first 2 channels)
+> >>>>
+> >>>> At this time, if the calculation of zB only takes the first 2 active elements, the data
+> >>>> is incomplete, because according to the description of the original algorithm, zB is always
+> >>>> based on the sum of all the accumulated bytes.
+> >>> Yes, you're quite right here: zX is partial: only the elements pP are
+> >>> valid; but all elements of zA and zB are always valid.  I was focusing
+> >>> too much on the handling of the partial input block.
+> >>>
+> >>>> Here we can simply change the prediction register used in the two sentences related to
+> >>>> zB to the one that is all true (it is pA in our code), like this:
+> >>>> 	msb     zX.s, pA/m, zJ.s, zB.s        // zX.s := zB.s - zX.s * zJ.s
+> >>> Are you sure about this?  In a final partial block, the trailing
+> >>> elements of zX.s beyond pP will be leftover junk from the last
+> >>> iteration.
+> >>
+> >> Yes, I have verified this code and it is correct. The reason is that if pP is used here,
+> >> the inactive elements of zB will be ignored in zX, which will cause data loss.(I think it is
+> > 
+> > Yes, you're quite right.  I was forgetting about the /z (zeroing)
+> > semantics for the ld1b.  This means that we get away with not
+> > inactivating those elements in the msb instruction, since zeros
+> > multiplied by the elements of zJ remain zero.
+> > 
+> >> because the zB data is covered by the multiplication and addition results of zX, zA, and zV
+> >> using movprfx and mad. Have I got that right?) :)
+> > 
+> > Yes, I think so.
+> > 
+> >> On the other hand zX uses the prediction register pP/z when loading data, the value of the
+> >> inactive element is 0, the inactive element in zX will not affect the final result, the inactive
+> >> element in zB will be directly assigned to the inactive element of zX element.
+> >>
+> >> Then in the next instruction, it will be added to zB along with zX.
+> > 
+> > Yes.
+> > 
+> > This might be part of the reason why the architects decided that SVE
+> > loads zero the inactive elements instead of leaving them unchanged.
+> 
+> I think so, it is a useful feature in this scenario.
+> 
+> > 
+> >>
+> >>>
+> >>> This might require a bit more thought in order to get the final block
+> >>> handling correct.
+> >>>
+> >>>> trailloop:			// Last cycle entrance
+> >>>>         cntp    x6, p1, p0.s	// Get active element count of last cycle
+> >>>>         cpy     zV.s, p1/m, w6	// Set zV to the actual value.
+> >>> Note that you can also write "mov" here, but I'm not sure which alias is
+> >>> preferred>
+> >>>> loop:				// Core loop entrance
+> >>>>         ld1b    zX.s, p0/z, [x1]
+> >>>>         incw    x1
+> >>>>
+> >>>>         add     zA.s, p0/m, zA.s, zX.s	// The calculation of zA still needs to use p0
+> >>>>         msb     zX.s, p1/m, zJ.s, zB.s	// Change p register here
+> >>>>         movprfx zB, zA
+> >>>>         mad     zB.s, p1/m, zV.s, zX.s	// Change p register here
+> >>> As discussed above, are you sure this is correct now?
+> > 
+> > I think we've agreed that it is correct.
+> > 
+> > Thinking about the code flow, I think the initialisation of zV is
+> > slightly wrong: for very short data, the first block may be shorter than
+> > VL.
+> > 
+> > I think this is easily solved by getting rid of the constant
+> > initialisation for zV and removing the branch that skips the CNTP code
+> > when entering the loop for the first time.  That way, zV gets
+> > initialised to the correct thing on entering the loop, irrespective of
+> > whether we have a whole vector on the first iteration.
+> 
+> The problem you are worried about is valuable. This problem must be considered when
+> the loop is unrolled. However, the code in my email a few days ago did not have this
+> problem, and I have also tested use cases with a length less than VL. :)
+> 
+> The reason is that when the length of the test case is less than VL, 'b.last' is
+> false and 'b.first' is true, and then it will still jump directly to trailloop to update zV.
+> 
+> 	b	start
+> trailloop:
+> 	cntp	x6, p1, p0.s
+> 	mov	zV.s, p1/m, w6
+> loop:
+> 	...
+> start:
+> 	whilelo	p0.s, x1, xLimit
+> 	b.last	loop
+> 	b.first	trailloop
 
-This looks correct, but I wonder if we should just introduce
-memcpy_toio32() and memcpy_fromio32() as a generic interface,
-as this seems to come up occasionally, and the method here
-(a loop around an inline function with another loop) is a bit clumsy.
+Yes, that makes sense.  I rotated the loop so that it didn't need a
+separate entry point, but the logic is similar otherwise.
 
-      Arnd
+> > 
+> > Note, to squeeze maximum performance out of this, you still probably
+> > want to unroll the loop a few times so that you can schedule useful work
+> > in between each load and the computations that depend on it.
+> 
+> Yes, I tried to expand the loop on the basis of the previous code, but the effect was
+> not very satisfactory(the performance is only about 2 times that of the C version),
+> so I reconsidered the way of implementation, based on the formula you derived earlier.
+> 
+> > 
+> >>>> start:
+> >>>>         whilelo p0.s, x1, xLimit
+> >>>>         b.last  loop		// The condition for the core loop to continue is that b.last is true
+> >>>>         b.first trailloop	// If b.last is false and b.first is true, it means the last cycle
+> >>>>
+> >>>>         uaddv   d0, p1, zA.s
+> >>>>         uaddv   d1, p1, zB.s
+> >>>>
+> >>>>         mov     x12, v0.2d[0]
+> >>>>         mov     x13, v1.2d[0]
+> >>> The "2" here seems not to be required by the syntax, although it's
+> >>> harmless.
+> >>
+> >> Yes I deleted it.
+> >>
+> >>>
+> >>>>         add     x10, x10, x12
+> >>>>         add     x11, x11, x13
+> >>>>         add     x11, x11, x2
+> >>> If x10 and x11 are used as accmulators by the caller, I guess this works.
+> >>
+> >> X10 and X11 are part A and part B of the initial value of adler32 passed in by the caller.
+> > 
+> > Right, that makes sense.
+> > 
+> >>
+> >>>
+> >>>>         mod65521        10, 14, 12
+> >>>>         mod65521        11, 14, 12
+> > 
+> > Note, can you replace these with udiv?
+> > 
+> > While using mul might be slightly cheaper to achieve this, it makes the
+> > code more complex and will have a negligible impact on the overall
+> > cost...
+> > 
+> > So, does something like this work:
+> > 
+> > 	mov	x3, #65521
+> > 	udiv	x4, x10, x3
+> > 	udiv	x5, x11, x3
+> > 	msub	x10, x4, x3, x10
+> > 	msub	x11, x5, x3, x11
+> 
+> Yes, the reason for doing this here is that I initially performed modulo division
+> in the loop body, so that we can never overflow the data, so I considered optimizing
+> the division to multiplication.If we only do a modular division at the end, we don't
+> need to implement the code like this.
+> 
+> > 
+> >>>>         lsl     x11, x11, #16
+> >>>>         orr     x0, x10, x11
+> >>>>         ret
+> >>>> -->8--
+> >>>>
+> >>>> After this modification, The test results are correct when the data length is less than about 8 Kbyte,
+> >>>> part A will still be correct after 8K, and an overflow error will occur in part B. This is because A
+> >>>> only accumulates all the bytes, and the accumulative acceleration of B expands faster, because the
+> >>>> accumulative formula of B is:
+> >>>> 	B = (1 + D1) + (1 + D1 + D2) + ... + (1 + D1 + D2 + ... + Dn) (mod 65521)
+> >>>>            = n×D1 + (n−1)×D2 + (n−2)×D3 + ... + Dn + n (mod 65521)
+> >>>>
+> >>>> If we take the average value of Dx to 128 and n to 8192:
+> >>>> 	B = (1 + 2 + ... + 8129) * 128 + 8192
+> >>>> 	  = 4,295,499,776 (32bit overflow)
+> >>>>
+> >>>> So I think the 32-bit accumulator is still not enough for part B here. :)
+> >>>>
+> >>>> -- 
+> >>>> Best regards,
+> >>>> Li Qiang
+> >>> That makes sense.  I hadn't tried to calculate the actual bound.
+> >>>
+> >>> It may be worth trying this with 64-bit accumulators.  This will
+> >>> probably slow things down, but it depends on the relative computation /
+> >>> memory throughput exhibited by the hardware.
+> >>
+> >> If a 64-bit wide vector register is used, for most scenes where the amount of data is not particularly large,
+> >> is it wasted more vector resources?
+> > 
+> > Yes :)
+> > 
+> > Depending on the algorithm, this might be a better tradeoff if it meant
+> > that the data could be processed in larger chunks.  I suspect that the
+> > tradeoff is unfavourable in this particluar case though -- but I haven't
+> > tried it.
+> > 
+> >> Maybe we can also try to use 16-bit wide vector registers to load data and calculations,
+> >> and accumulate them into the scalar register xn before overflow, just like my original patch,
+> >> but I can try to use ascending order to change the processing of the last loop Be more elegant.
+> > 
+> > Perhaps.  But I assumed that 16-bit elements would overflow much too
+> > fast to be practical.  Just multiplying zX by zJ once can produce
+> > element values up to 0xfe01 if VL is 256 bytes.
+> > 
+> > Did you have some idea for how to make this work?
+> > 
+> > It may be possible to do 16-bit multiplies with 32-bit accumulation.
+> > SVE2 has some NEON-style mixed-width multiply-accumulate instructions
+> > that can achieve this sort of thing directly, but in SVE(1) I think 
+> > you would have to break the multiply-accumulates up.  Say:
+> > 
+> > 	mul	zX.h, pP/m, zX.h, zJ.h
+> > 	sub	zX.s, pP/m, zB.s, zX.s
+> > 
+> > whilelo pP.s should generate a predicate with odd .h elements inactive,
+> > and ld1b zX.s, pP/z, ... will make sure those elements are all zeroed in
+> > xX.h.
+> > 
+> > I'm not sure this would be faster than a single 32-bit msb, since
+> > multiply-accumulates are likely to be heavily optimised in the hardware,
+> > but you could try it.
+> 
+> I adopted a part of the patch I originally submitted, combined with the formula you gave
+> to calculate B[n+v] using an increasing sequence, and then modify the code again. The code is at the end.
+> 
+> > 
+> >>>
+> >>> I think the code can't be bulletproof without breaking the input into
+> >>> chunks anyway, though.
+> >>
+> >> I don't quite understand what it means here. Does it mean that the input bytes are read into the vector in
+> >> blocks for calculation (this is how it is done now) or the intermediate results are stored in different elements
+> >> of the vector in blocks during the calculation process? :-)
+> > 
+> > I mean, you limit the number of iterations of the core loop so that
+> > overflow doesn't happen.  You're already doing this; I just wanted to
+> >  make the point that 64-bit accumulators probably don't solve this
+> > problem, even though it will take a very large number of iterations to
+> > cause an overflow.
+> > 
+> > Unless Adler32 specifies the maximum length of the input data not to
+> > exceed some value, it could go on forever -- so overflow becomes
+> > inevitable.
+> 
+> Yes, I understand that if we do not perform the modulo division in time, data overflow will happen sooner or later.
+> So my initial patch added modulo division to the loop body and optimized it.:)
+> 
+> As you said, if we don’t want to perform modular division in the loop body, then we need to block the input and
+> perform the modular division in time before the data will never overflow (Need to consider the worst case,
+> that is, all data is 0xff).
+> 
+> --8<--
+> 	...
+> 	adler_A .req    x10
+> 	adler_B .req    x11
+> 	
+> 	.macro	adler32_core
+> 	ld1b	zX.h, p0/z, [x1]	// load bytes
+> 	inch	x1
+> 
+> 	uaddv	d0, p0, zX.h
+> 	mul	zX.h, p0/m, zX.h, zJ.h	// Sum [j=0 .. v-1] j*X[j+n]
+> 	mov	x9, v0.d[0]
+> 	uaddv	d1, p0, zX.h
+> 	add	adler_A, adler_A, x9	// A[n+v] = An + Sum [j=0 ... v-1] X[j]
+> 	mov	x9, v1.d[0]
+> 	madd	adler_B, x7, adler_A, adler_B	// Bn + v*A[n+v]
+> 	sub	adler_B, adler_B, x9		// B[n+v] = Bn + v*A[n+v] - Sum [j=0 .. v-1] j*X[j+n]
+> 	.endm
+
+If this has best performance, I find that quite surprising.  Those uaddv
+instructions will stop the vector lanes flowing independently inside the
+loop, so if an individual element load is slow arriving then everything
+will have to wait.
+
+A decent hardware prefetcher may tend to hide that issue for sequential
+memory access, though: i.e., if the hardware does a decent job of
+fetching data before the actual loads are issued, the data may appear to
+arrive with minimal delay.
+
+The effect might be a lot worse for algorithms that have less
+predictable memory access patterns.
+
+Possibly you do win some additional performance due to processing twice
+as many elements at once, here.
+
+> 
+> 	.macro	adler32_loop
+> 	whilelo	p0.h, x1, xLimit
+> 	cntp	x7, p0, p0.h		// x7 is used to store 'v'
+> 	adler32_core
+> 	.endm
+> 
+> ENTRY(XXX)
+> 	...
+> 	add	xLimit, x1, x2
+> 
+> loop:
+> 	adler32_loop
+> 	adler32_loop
+> 	adler32_loop
+> 	adler32_loop
+> 	cmp	x7, #0
+> 	b.ne	loop
+> 
+> 	mov	x3, #65521
+> 	udiv	x4, x10, x3
+> 	udiv	x5, x11, x3
+> 	msub	x10, x4, x3, x10
+> 	msub	x11, x5, x3, x11
+> 	...
+> -->8--
+> 
+> 
+> I tested 500Mbyte random data, the result is completely correct, longer data volume did not test,
+> I think we can also wrap a layer of data block control code, that is, after the data volume
+> exceeds a certain threshold, the control code The input data is segmented by threshold, and
+> the initial adler32 of the subsequent segment is the result of the previous segment calculation.
+> 
+> Like:
+> 	adler32 = 1;
+> 	if (len <= MAX_BLOCK_LEN)
+> 		adler32 = adler32_sve(adler32, buf, len);
+> 	else {
+> 		int i = 0;
+> 		while (i < len) {
+> 			int block_len = (len - i > MAX_BLOCK_LEN) ? MAX_BLOCK_LEN : (len - i);
+> 			adler32 = adler32_sve(adler32, &buf[i], block_len);
+> 			i += block_len;
+> 		}
+> 	}
+> 	return adler32;
+> 
+> In this way, we don't have to worry about when the data overflows and when to modulo in the core algorithm code.
+
+Yes, something like that ought to work.
+
+Cheers
+---Dave
