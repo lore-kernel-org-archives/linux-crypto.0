@@ -2,38 +2,39 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07E35C2D0A3
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Nov 2020 18:59:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 419E2C4742C
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Nov 2020 19:00:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CA2ED2244C
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Nov 2020 18:59:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08B9122263
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Nov 2020 19:00:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726883AbgKPS7L (ORCPT
+        id S1727285AbgKPS7R (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Nov 2020 13:59:11 -0500
-Received: from mga05.intel.com ([192.55.52.43]:4394 "EHLO mga05.intel.com"
+        Mon, 16 Nov 2020 13:59:17 -0500
+Received: from mga05.intel.com ([192.55.52.43]:4423 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725879AbgKPS7K (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Nov 2020 13:59:10 -0500
-IronPort-SDR: ZSCnhhop357eiTV0eSs0L1+lPTN3EcbSKi+WEf8cW1OWCh1rfP594Irxi+I1YRlpWpk5BMlovR
- IsV2TY/IZ16g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9807"; a="255508820"
+        id S1727236AbgKPS7R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 16 Nov 2020 13:59:17 -0500
+IronPort-SDR: u/i8KgLeJmJQCJvxeyIJ8FhekXvgQCjSrk4Dw+xM7bnI8vLgpvz66zshtvzof458EUuP7AubMl
+ 9SfI1wc2lBzA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9807"; a="255508862"
 X-IronPort-AV: E=Sophos;i="5.77,483,1596524400"; 
-   d="scan'208";a="255508820"
+   d="scan'208";a="255508862"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2020 10:59:07 -0800
-IronPort-SDR: zbyVVXbqFUOi3JjC9nuCPM9Omjk+TB2gDXwV1guWIh7xQAmYY/YCyVlkpANIFjMWWF0eA+waJg
- 5Of0r9R1X5ig==
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2020 10:59:17 -0800
+IronPort-SDR: 4/xnP9wBn5mz2scHV/nllFuERvDam3Dpo7+VFCYJPsYFFGN12retQhFr4JHi0t1wXS8ezwIZkU
+ R0b/aHDtAhrA==
 X-IronPort-AV: E=Sophos;i="5.77,483,1596524400"; 
-   d="scan'208";a="543709966"
+   d="scan'208";a="543710031"
 Received: from abarnicl-mobl2.ger.corp.intel.com (HELO dalessan-mobl1.ir.intel.com) ([10.252.19.98])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2020 10:59:04 -0800
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2020 10:59:14 -0800
 From:   Daniele Alessandrelli <daniele.alessandrelli@linux.intel.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
@@ -42,63 +43,51 @@ Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         Mark Gross <mgross@linux.intel.com>,
         Declan Murphy <declan.murphy@intel.com>,
         Daniele Alessandrelli <daniele.alessandrelli@intel.com>
-Subject: [PATCH v3 0/3] crypto: Add Keem Bay OCS HCU driver
-Date:   Mon, 16 Nov 2020 18:58:43 +0000
-Message-Id: <20201116185846.773464-1-daniele.alessandrelli@linux.intel.com>
+Subject: [PATCH v3 3/3] MAINTAINERS: Add maintainers for Keem Bay OCS HCU driver
+Date:   Mon, 16 Nov 2020 18:58:46 +0000
+Message-Id: <20201116185846.773464-4-daniele.alessandrelli@linux.intel.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201116185846.773464-1-daniele.alessandrelli@linux.intel.com>
+References: <20201116185846.773464-1-daniele.alessandrelli@linux.intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Intel Keem Bay SoC has an Offload Crypto Subsystem (OCS) featuring a
-Hashing Control Unit (HCU) for accelerating hashing operations.
+From: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
 
-This driver adds support for such hardware thus enabling hardware-accelerated
-hashing on the Keem Bay SoC for the following algorithms:
-- sha224 and hmac(sha224)
-- sha256 and hmac(sha256)
-- sha384 and hmac(sha384)
-- sha512 and hmac(sha512)
-- sm3    and hmac(sm3)
+Add maintainers for the Intel Keem Bay Offload Crypto Subsystem (OCS)
+Hash Control Unit (HCU) crypto driver.
 
-The driver is passing crypto manager self-tests, including the extra tests
-(CRYPTO_MANAGER_EXTRA_TESTS=y).
+Signed-off-by: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+Acked-by: Declan Murphy <declan.murphy@intel.com>
+---
+ MAINTAINERS | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-v2 -> v3:
-- Fixed more issues with dt-bindings (removed useless descriptions for reg,
-  interrupts, and clocks)
-
-v1 -> v2:
-- Fixed issues with dt-bindings
-
-Daniele Alessandrelli (1):
-  MAINTAINERS: Add maintainers for Keem Bay OCS HCU driver
-
-Declan Murphy (2):
-  dt-bindings: crypto: Add Keem Bay OCS HCU bindings
-  crypto: keembay: Add Keem Bay OCS HCU driver
-
- .../crypto/intel,keembay-ocs-hcu.yaml         |   46 +
- MAINTAINERS                                   |   11 +
- drivers/crypto/Kconfig                        |    2 +
- drivers/crypto/Makefile                       |    1 +
- drivers/crypto/keembay/Kconfig                |   20 +
- drivers/crypto/keembay/Makefile               |    5 +
- drivers/crypto/keembay/keembay-ocs-hcu-core.c | 1484 +++++++++++++++++
- drivers/crypto/keembay/ocs-hcu.c              |  593 +++++++
- drivers/crypto/keembay/ocs-hcu.h              |  115 ++
- 9 files changed, 2277 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/intel,keembay-ocs-hcu.yaml
- create mode 100644 drivers/crypto/keembay/Kconfig
- create mode 100644 drivers/crypto/keembay/Makefile
- create mode 100644 drivers/crypto/keembay/keembay-ocs-hcu-core.c
- create mode 100644 drivers/crypto/keembay/ocs-hcu.c
- create mode 100644 drivers/crypto/keembay/ocs-hcu.h
-
-
-base-commit: c3a98c3ad5c0dc60a1ac66bf91147a3f39cac96b
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 606f9d7ef19a..1a0d7368c468 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -8863,6 +8863,17 @@ M:	Deepak Saxena <dsaxena@plexity.net>
+ S:	Maintained
+ F:	drivers/char/hw_random/ixp4xx-rng.c
+ 
++INTEL KEEM BAY OCS HCU CRYPTO DRIVER
++M:	Declan Murphy <declan.murphy@intel.com>
++M:	Daniele Alessandrelli <daniele.alessandrelli@intel.com>
++S:	Maintained
++F:	Documentation/devicetree/bindings/crypto/intel,keembay-ocs-hcu.yaml
++F:	drivers/crypto/keembay/Kconfig
++F:	drivers/crypto/keembay/Makefile
++F:	drivers/crypto/keembay/keembay-ocs-hcu-core.c
++F:	drivers/crypto/keembay/ocs-hcu.c
++F:	drivers/crypto/keembay/ocs-hcu.h
++
+ INTEL MANAGEMENT ENGINE (mei)
+ M:	Tomas Winkler <tomas.winkler@intel.com>
+ L:	linux-kernel@vger.kernel.org
 -- 
 2.26.2
 
