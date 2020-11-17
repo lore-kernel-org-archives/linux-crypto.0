@@ -2,78 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88E7BC2D0E4
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 08:36:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA7CC64E69
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 09:42:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E1602467B
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 08:36:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ZAGMil2h"
+	by mail.kernel.org (Postfix) with ESMTP id 86669206B2
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 09:42:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726297AbgKQIfq (ORCPT
+        id S1727526AbgKQJmW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Nov 2020 03:35:46 -0500
-Received: from mail.zx2c4.com ([192.95.5.64]:42039 "EHLO mail.zx2c4.com"
+        Tue, 17 Nov 2020 04:42:22 -0500
+Received: from s2.neomailbox.net ([5.148.176.60]:28642 "EHLO s2.neomailbox.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726211AbgKQIfq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Nov 2020 03:35:46 -0500
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 5f5f8117;
-        Tue, 17 Nov 2020 08:31:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=Hr+jI+KVdqgUSqaJucRaw9uwCVA=; b=ZAGMil
-        2h6me0N7K8kyNY4QsrK8PyskCMWyz9/JNkfEywmRPm2FPJumdSZdhMUWiS7+rAhK
-        Lf9kiMA4h/IN7aF+k5H1loaXIr4qOzlRV9lfv6JZIYnKhDaGyBHKW6R8gF9ChgRe
-        Vm+9S2rfvh/+/VC4GecX8VNItLHAF4CKT3EyesP/UgT26Us4wp2hhswk1IzIw6Ap
-        02a+1gT0CIlz15iy4VTiydfYh8WAxb/eA4wbKlzqH4UTPZuhsyC8QjkAckdW0OF4
-        LqBy0oobxCWUkYnFLWLg7GyAHS1YdUF5f88okOEmPC7YXb5CrtQJXJti3DAsOK9s
-        cJCi2qRlx5f9ZrAg==
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 14ca90a1 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Tue, 17 Nov 2020 08:31:54 +0000 (UTC)
-Received: by mail-yb1-f174.google.com with SMTP id c129so18201561yba.8;
-        Tue, 17 Nov 2020 00:35:42 -0800 (PST)
-X-Gm-Message-State: AOAM533TrTfq/08KF4CH8nr3aKc3kICHKnOdcu2qnwmGbjX6VM+J7X8u
-        k2HK4AypLey+Id8F3NkQKZ8DLzAzZmeNlN8KvVw=
-X-Google-Smtp-Source: ABdhPJxltpJ7lh/BAV2z4t5JKlLag1wKxZinZcAn5MaBtMCCdqxT5sWm5uXwl/7xTG7nwungx+QhIoCScN+KUkPRPIw=
-X-Received: by 2002:a25:6f83:: with SMTP id k125mr26083401ybc.123.1605602142005;
- Tue, 17 Nov 2020 00:35:42 -0800 (PST)
-MIME-Version: 1.0
-References: <20201117021839.4146-1-a@unstable.cc> <CAMj1kXFxk31wtD3H8V0KbMd82UL_babEWpVTSkfqPpNjSqPNLA@mail.gmail.com>
-In-Reply-To: <CAMj1kXFxk31wtD3H8V0KbMd82UL_babEWpVTSkfqPpNjSqPNLA@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Tue, 17 Nov 2020 09:35:31 +0100
-X-Gmail-Original-Message-ID: <CAHmME9p8XNfz1ZdELVFXC4=QY-S6VzJfyf4oREgTM96WJUKeTQ@mail.gmail.com>
-Message-ID: <CAHmME9p8XNfz1ZdELVFXC4=QY-S6VzJfyf4oREgTM96WJUKeTQ@mail.gmail.com>
-Subject: Re: [PATCH cryptodev] crypto: lib/chacha20poly1305 - allow users to
- specify 96bit nonce
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Antonio Quartulli <a@unstable.cc>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        id S1727218AbgKQJmV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Nov 2020 04:42:21 -0500
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         WireGuard mailing list <wireguard@lists.zx2c4.com>,
-        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
-        <netdev@vger.kernel.org>, keyrings@vger.kernel.org,
+        Netdev <netdev@vger.kernel.org>, keyrings@vger.kernel.org,
         linux-security-module <linux-security-module@vger.kernel.org>,
         Antonio Quartulli <antonio@openvpn.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         David Howells <dhowells@redhat.com>,
         Jarkko Sakkinen <jarkko@kernel.org>,
         Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <20201117021839.4146-1-a@unstable.cc>
+ <CAHmME9q8k26a9rn72KTfcJw0kJ0iMdob6BBsAsyYBzvfYjRtQQ@mail.gmail.com>
+From:   Antonio Quartulli <a@unstable.cc>
+Subject: Re: [PATCH cryptodev] crypto: lib/chacha20poly1305 - allow users to
+ specify 96bit nonce
+Message-ID: <69c23c36-60fe-2676-d07a-67ce1f752dd1@unstable.cc>
+Date:   Tue, 17 Nov 2020 10:41:10 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAHmME9q8k26a9rn72KTfcJw0kJ0iMdob6BBsAsyYBzvfYjRtQQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 17, 2020 at 9:32 AM Ard Biesheuvel <ardb@kernel.org> wrote:
-> If you are going back to the drawing board with in-kernel acceleration
-> for OpenVPN
+Hello,
 
-As far as I can tell, they're mostly after compatibility with their
-existing userspace stuff. Otherwise, if they were going back to the
-drawing board, they could just make openvpn userspace set up xfrm or
-wg tunnels to achieve basically the same design. And actually, the
-xfrm approach kind of makes a lot of sense for what they're doing; it
-was designed for that type of split-daemon tunneling design.
+On 17/11/2020 09:30, Jason A. Donenfeld wrote:
+> Nack.
+> 
+> This API is meant to take simple integers, so that programmers can use
+> atomic64_t with it and have safe nonces. I'm also interested in
+> preserving the API's ability to safely encrypt more than 4 gigs of
+> data at once. Passing a buffer also encourages people to use
+> randomized nonces, which isn't really safe. Finally, there are no
+> in-tree users of 96bit nonces for this interface. If you're after a
+> cornucopia of compatibility primitives, the ipsec stuff might be more
+> to your fitting. Or, add a new simple function/api. But adding
+> complexity to users of the existing one and confusing future users of
+> it is a non-starter. It's supposed to be deliberately non-awful to
+> use.
+> 
+
+Thanks for explaining the ratio behind this API.
+
+At first I thought this API wanted to take over the existing one, hence
+my attempt of making it more generic and re-use it.
+But I understand now this was not the goal.
+
+I will stick to the classic crypto API then.
+
+Best Regards,
+
+
+p.s. I am curious about any use case you may have in mind for encrypting
+more than 4GB in one go, as there are no users doing that right now.
+
+-- 
+Antonio Quartulli
