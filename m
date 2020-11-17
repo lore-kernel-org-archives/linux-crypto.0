@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01005C8300F
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 13:47:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5355CC63697
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 13:48:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5DB320853
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 13:47:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1C62216C4
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 13:48:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LldeBECg"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EMg+icpS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387718AbgKQNrW (ORCPT
+        id S1733082AbgKQNrj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Nov 2020 08:47:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35172 "EHLO
+        Tue, 17 Nov 2020 08:47:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387706AbgKQNrS (ORCPT
+        with ESMTP id S2387715AbgKQNrW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Nov 2020 08:47:18 -0500
-Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7828FC0617A7
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2020 05:47:18 -0800 (PST)
-Received: by mail-qt1-x841.google.com with SMTP id g20so3731016qtu.4
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2020 05:47:18 -0800 (PST)
+        Tue, 17 Nov 2020 08:47:22 -0500
+Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17DEBC061A47
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2020 05:47:22 -0800 (PST)
+Received: by mail-qk1-x741.google.com with SMTP id n132so20352756qke.1
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2020 05:47:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=wRMDxR1XzzcnMM9BghVE3BSiYKlfFjMEfZKA+FewRzQ=;
-        b=LldeBECgjxfNc01pMMqn+TCglP4FaITU11CevOHj/I9uVcZalmI/16VmXDiAzApW72
-         CEwDuB1uUo9ywfKlwHDbII4KfKBPxRGrdk2syyTt62rSD6xDuESOWfc7I3pyqhN5qRK/
-         R1ePjpLK4Q8yy4EZQkGASIciJo0wwC1lFqRDxK/AR4Wwh4eH2TNySo22ab4GLunSpN2s
-         k6dMjBbjqs7jKy3veOGIMWMuwLv8ll6mLpFLeDhZdtSblWqYqe8T0i4FdDKvtqJ43rxi
-         iWqyyiJdm3sUh607/tcMien4gRyoLbeu+mKDszFRnB1CHILikrvJKZtUbRscj8SOreTe
-         iFAQ==
+        bh=viLHKc8a3d3lX6KoyTITkukZpyuIVB/pcP2R7QEguMU=;
+        b=EMg+icpS0V3k41YQtK49iZlqVjzspufUju4x5jODYnd0mhH5J5EVPJBx7xJUXmPlMZ
+         AirOETSM+7lQuaXpQdqLfAsrwJqLA9/Q/yg8X/QngzhWK3ZkYVPXyI8d+JQcMxJfHCdk
+         He8fRgj/JrWnypLHpbAsCU0UmspkAqvp0u0sBlEoLThhQZo02Cvz2APW/VacvZ4N2t9H
+         GqdCN96qAzc/7ohE2niMvV3mj97cBxErPWIL4kjeEspwn/qDL8NALFYuJGdOJUt2/fs5
+         jyD8KNm4w0e1cEJqu/eixfWOx1S8qx3WigTWN5HoaecU/S6/wjEVll+R3vaGPszlTe5o
+         FSdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=wRMDxR1XzzcnMM9BghVE3BSiYKlfFjMEfZKA+FewRzQ=;
-        b=anPHT/ynZxwwILBojDPdV7291VnHKpTaxHEkbEYEU/3h5+iyHSWVveWIjl7speY3/P
-         14IAIUB8WCUDU67koCQ2GS8rZq6cxw0x2le307rSClqm5XHuWpLfR4ryFjbkFq7YTKny
-         Me5YvAdSrz5Nd+afmh1j8ew0Ry1Fj10oGgp+LQLMPGIzFxG7eoQFXgBOtt41PPUD0pV4
-         6jzacc8n6/uJacdvhs64afLuOptvKm1qgPKNC0oF9S02Thl5XPsXkgVvyvXuMea9maPg
-         Cu4/f9Xkp/lahK36b2czoehX0PxFGF0Bx2TYEVpKYAR33gJ4zj/5Sd126rfCvBzj3Cbb
-         XJhQ==
-X-Gm-Message-State: AOAM531vL+ZJSduwLq5hyzNywBFJjxoxSMHlbB5eDhQeNFK1LnEVBUnv
-        a1yVy5yZz40nLt165zj1kzirNw==
-X-Google-Smtp-Source: ABdhPJyhLYlf/CcQQnfzErvP3YcpAQEosGNi/jI0FVPEOOX5BfJ1cuI6DZPcB7frnmdp5E/eh0TG+A==
-X-Received: by 2002:ac8:668c:: with SMTP id d12mr19127585qtp.352.1605620837750;
-        Tue, 17 Nov 2020 05:47:17 -0800 (PST)
+        bh=viLHKc8a3d3lX6KoyTITkukZpyuIVB/pcP2R7QEguMU=;
+        b=TI/Us0BfYWsVPeQhy9+frwo8v2tZ7sGHqcSqJB1ICYrH7CsPg62uJiw59VlbuV29zH
+         l4hpzQXD/c0w4MUK3x+xaqe0zYCcoIj8krJrUpVEDx3DoRNHIKZtLG09E6Zm6GtmZG6q
+         PfOo26QVCIhg9G5CYUIgU2epvKWkWBrqqE/aAiQovvbgUWAdCw3v1Px/gfys8S0xC9hR
+         oUo8dh329QDgPpH5dWDyekQcizKdO/WKE1pb1Af9bCuXK5K+DQZueopq63OFxF5/ithU
+         t3FkpD2rsZYdjhbZYMBsluMC9AbA1rEdMbkLF5kkRUHY3KzLOwTgGhuWfWqU9rlT1L6+
+         gW1g==
+X-Gm-Message-State: AOAM530ozPQp6zmXXTSgEMpCGQvyHbK17EeDnryzhqYvNG5ZKymnCXhl
+        GePjlVTkbyuvbF5lVnAKeCn5hw==
+X-Google-Smtp-Source: ABdhPJyUVg24bUGBBdwHbWdUiJC7RDIAp4/ry5pgYm4QOustac2fgOjaf+2YxP1aVS0APm/+u/or+Q==
+X-Received: by 2002:a37:6307:: with SMTP id x7mr19306358qkb.195.1605620841250;
+        Tue, 17 Nov 2020 05:47:21 -0800 (PST)
 Received: from pop-os.fios-router.home (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.googlemail.com with ESMTPSA id t133sm14607355qke.82.2020.11.17.05.47.16
+        by smtp.googlemail.com with ESMTPSA id t133sm14607355qke.82.2020.11.17.05.47.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Nov 2020 05:47:16 -0800 (PST)
+        Tue, 17 Nov 2020 05:47:19 -0800 (PST)
 From:   Thara Gopinath <thara.gopinath@linaro.org>
 To:     agross@kernel.org, bjorn.andersson@linaro.org,
         herbert@gondor.apana.org.au, davem@davemloft.net,
@@ -66,9 +66,9 @@ To:     agross@kernel.org, bjorn.andersson@linaro.org,
 Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
         devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-clk@vger.kernel.org
-Subject: [PATCH 1/6] dt-binding:clock: Add entry for crypto engine RPMH clock resource
-Date:   Tue, 17 Nov 2020 08:47:09 -0500
-Message-Id: <20201117134714.3456446-2-thara.gopinath@linaro.org>
+Subject: [PATCH 4/6] drivers:crypto:qce: Fix SHA result buffer corruption issues.
+Date:   Tue, 17 Nov 2020 08:47:12 -0500
+Message-Id: <20201117134714.3456446-5-thara.gopinath@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201117134714.3456446-1-thara.gopinath@linaro.org>
 References: <20201117134714.3456446-1-thara.gopinath@linaro.org>
@@ -78,25 +78,30 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add clock id forc CE clock resource which is required to bring up the
-crypto engine on sdm845.
+Partial hash was being copied into the final result buffer without the
+entire message block processed. Depending on how the end user processes
+this result buffer, errors vary from result buffer corruption to result
+buffer poisoing. Fix this issue by ensuring that only the final hash value
+is copied into the result buffer.
 
 Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
 ---
- include/dt-bindings/clock/qcom,rpmh.h | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/crypto/qce/sha.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/dt-bindings/clock/qcom,rpmh.h b/include/dt-bindings/clock/qcom,rpmh.h
-index 2e6c54e65455..30111c8f7fe9 100644
---- a/include/dt-bindings/clock/qcom,rpmh.h
-+++ b/include/dt-bindings/clock/qcom,rpmh.h
-@@ -21,5 +21,6 @@
- #define RPMH_IPA_CLK				12
- #define RPMH_LN_BB_CLK1				13
- #define RPMH_LN_BB_CLK1_A			14
-+#define RPMH_CE_CLK				15
+diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
+index 87be96a0b0bb..61c418c12345 100644
+--- a/drivers/crypto/qce/sha.c
++++ b/drivers/crypto/qce/sha.c
+@@ -48,7 +48,7 @@ static void qce_ahash_done(void *data)
+ 	dma_unmap_sg(qce->dev, &rctx->result_sg, 1, DMA_FROM_DEVICE);
  
- #endif
+ 	memcpy(rctx->digest, result->auth_iv, digestsize);
+-	if (req->result)
++	if (req->result && rctx->last_blk)
+ 		memcpy(req->result, result->auth_iv, digestsize);
+ 
+ 	rctx->byte_count[0] = cpu_to_be32(result->auth_byte_count[0]);
 -- 
 2.25.1
 
