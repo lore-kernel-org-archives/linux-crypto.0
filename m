@@ -2,110 +2,209 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7573C2D0E4
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 12:46:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C16DC56202
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 13:33:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B35722203
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 12:46:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E85CE2078E
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 13:33:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="WKPVzja5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727267AbgKQMqI (ORCPT
+        id S1731924AbgKQNcl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Nov 2020 07:46:08 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7636 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725355AbgKQMqI (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Nov 2020 07:46:08 -0500
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Cb5Jw45DWz15MbQ;
-        Tue, 17 Nov 2020 20:45:52 +0800 (CST)
-Received: from [10.110.54.32] (10.110.54.32) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Tue, 17 Nov 2020
- 20:45:55 +0800
-Subject: Re: [PATCH 0/1] arm64: Accelerate Adler32 using arm64 SVE
- instructions.
-To:     Dave Martin <Dave.Martin@arm.com>
-CC:     <alexandre.torgue@st.com>, <catalin.marinas@arm.com>,
-        <gaoguijin@huawei.com>, <colordev.jiang@huawei.com>,
-        <luchunhua@huawei.com>, <linux-crypto@vger.kernel.org>,
-        <mcoquelin.stm32@gmail.com>, <liliang889@huawei.com>,
-        <will@kernel.org>, <davem@davemloft.net>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <herbert@gondor.apana.org.au>
-References: <20201103121506.1533-1-liqiang64@huawei.com>
- <20201105165301.GH6882@arm.com>
- <f323de50-c358-88e7-6588-7d14542f2754@huawei.com>
- <20201110104629.GJ6882@arm.com>
- <89a9bdcc-b96e-2f2d-6c52-ca44e0e3472c@huawei.com>
- <20201110160708.GL6882@arm.com>
- <484ad2c8-3905-fc98-237c-f7eb4045edbc@huawei.com>
- <20201112111745.GS6882@arm.com>
- <72514954-ea04-6aa3-73d8-bb0fc39b6de2@huawei.com>
- <20201116155636.GZ6882@arm.com>
-From:   Li Qiang <liqiang64@huawei.com>
-Message-ID: <ab2a10f0-82eb-8e31-f53f-0bcae6977504@huawei.com>
-Date:   Tue, 17 Nov 2020 20:45:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
-MIME-Version: 1.0
-In-Reply-To: <20201116155636.GZ6882@arm.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.110.54.32]
-X-CFilter-Loop: Reflected
+        Tue, 17 Nov 2020 08:32:41 -0500
+Received: from mail.kernel.org ([198.145.29.99]:42464 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732324AbgKQNck (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Nov 2020 08:32:40 -0500
+Received: from e123331-lin.nice.arm.com (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 94EAB24199;
+        Tue, 17 Nov 2020 13:32:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1605619960;
+        bh=N2U9menlQv60P/GBM6E2+KMGks+534jhCdZlvYWzxB4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=WKPVzja5YoK7XofHAZxTxQ/DGxLHzSjEqySpSLFgK5fc2AmvwaJHcZyNbw27y4l5c
+         V7gQ/5t6bowjPoVOzi7Qp6awGuCdSouQEjjdJviXABMcumpBCpzkwoG05doRNjHS+O
+         PfW+p8looZ3MznGkxkMvaNIvG42T7dblVPSPajbw=
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Ondrej Mosnacek <omosnacek@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH v3 2/4] crypto: aegis128/neon - optimize tail block handling
+Date:   Tue, 17 Nov 2020 14:32:12 +0100
+Message-Id: <20201117133214.29114-3-ardb@kernel.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20201117133214.29114-1-ardb@kernel.org>
+References: <20201117133214.29114-1-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Avoid copying the tail block via a stack buffer if the total size
+exceeds a single AEGIS block. In this case, we can use overlapping
+loads and stores and NEON permutation instructions instead, which
+leads to a modest performance improvement on some cores (< 5%),
+and is slightly cleaner. Note that we still need to use a stack
+buffer if the entire input is smaller than 16 bytes, given that
+we cannot use 16 byte NEON loads and stores safely in this case.
 
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ crypto/aegis128-neon-inner.c | 89 +++++++++++++++++---
+ 1 file changed, 75 insertions(+), 14 deletions(-)
 
-在 2020/11/16 23:56, Dave Martin 写道:
->> --8<--
->> 	...
->> 	adler_A .req    x10
->> 	adler_B .req    x11
->> 	
->> 	.macro	adler32_core
->> 	ld1b	zX.h, p0/z, [x1]	// load bytes
->> 	inch	x1
->>
->> 	uaddv	d0, p0, zX.h
->> 	mul	zX.h, p0/m, zX.h, zJ.h	// Sum [j=0 .. v-1] j*X[j+n]
->> 	mov	x9, v0.d[0]
->> 	uaddv	d1, p0, zX.h
->> 	add	adler_A, adler_A, x9	// A[n+v] = An + Sum [j=0 ... v-1] X[j]
->> 	mov	x9, v1.d[0]
->> 	madd	adler_B, x7, adler_A, adler_B	// Bn + v*A[n+v]
->> 	sub	adler_B, adler_B, x9		// B[n+v] = Bn + v*A[n+v] - Sum [j=0 .. v-1] j*X[j+n]
->> 	.endm
-> If this has best performance, I find that quite surprising.  Those uaddv
-> instructions will stop the vector lanes flowing independently inside the
-> loop, so if an individual element load is slow arriuaddving then everything
-> will have to wait.
-
-I don't know much about this problem, do you mean that the uaddv instruction used in
-the loop has a great impact on performance?
-
-> 
-> A decent hardware prefetcher may tend to hide that issue for sequential
-> memory access, though: i.e., if the hardware does a decent job of
-> fetching data before the actual loads are issued, the data may appear to
-> arrive with minimal delay.
-> 
-> The effect might be a lot worse for algorithms that have less
-> predictable memory access patterns.
-> 
-> Possibly you do win some additional performance due to processing twice
-> as many elements at once, here.
-
-I think so. Compared to loading bytes into zX.h, if you load them directly into zX.b,
-and then use uunpklo/uunpkhi for register expansion, the performance will be more better(20% faster).
-This may be the reason.
-
+diff --git a/crypto/aegis128-neon-inner.c b/crypto/aegis128-neon-inner.c
+index 2a660ac1bc3a..cd1b3ad1d1f3 100644
+--- a/crypto/aegis128-neon-inner.c
++++ b/crypto/aegis128-neon-inner.c
+@@ -20,7 +20,6 @@
+ extern int aegis128_have_aes_insn;
+ 
+ void *memcpy(void *dest, const void *src, size_t n);
+-void *memset(void *s, int c, size_t n);
+ 
+ struct aegis128_state {
+ 	uint8x16_t v[5];
+@@ -173,10 +172,46 @@ void crypto_aegis128_update_neon(void *state, const void *msg)
+ 	aegis128_save_state_neon(st, state);
+ }
+ 
++#ifdef CONFIG_ARM
++/*
++ * AArch32 does not provide these intrinsics natively because it does not
++ * implement the underlying instructions. AArch32 only provides 64-bit
++ * wide vtbl.8/vtbx.8 instruction, so use those instead.
++ */
++static uint8x16_t vqtbl1q_u8(uint8x16_t a, uint8x16_t b)
++{
++	union {
++		uint8x16_t	val;
++		uint8x8x2_t	pair;
++	} __a = { a };
++
++	return vcombine_u8(vtbl2_u8(__a.pair, vget_low_u8(b)),
++			   vtbl2_u8(__a.pair, vget_high_u8(b)));
++}
++
++static uint8x16_t vqtbx1q_u8(uint8x16_t v, uint8x16_t a, uint8x16_t b)
++{
++	union {
++		uint8x16_t	val;
++		uint8x8x2_t	pair;
++	} __a = { a };
++
++	return vcombine_u8(vtbx2_u8(vget_low_u8(v), __a.pair, vget_low_u8(b)),
++			   vtbx2_u8(vget_high_u8(v), __a.pair, vget_high_u8(b)));
++}
++#endif
++
++static const uint8_t permute[] __aligned(64) = {
++	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
++	 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
++	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
++};
++
+ void crypto_aegis128_encrypt_chunk_neon(void *state, void *dst, const void *src,
+ 					unsigned int size)
+ {
+ 	struct aegis128_state st = aegis128_load_state_neon(state);
++	const int short_input = size < AEGIS_BLOCK_SIZE;
+ 	uint8x16_t msg;
+ 
+ 	preload_sbox();
+@@ -186,7 +221,8 @@ void crypto_aegis128_encrypt_chunk_neon(void *state, void *dst, const void *src,
+ 
+ 		msg = vld1q_u8(src);
+ 		st = aegis128_update_neon(st, msg);
+-		vst1q_u8(dst, msg ^ s);
++		msg ^= s;
++		vst1q_u8(dst, msg);
+ 
+ 		size -= AEGIS_BLOCK_SIZE;
+ 		src += AEGIS_BLOCK_SIZE;
+@@ -195,13 +231,26 @@ void crypto_aegis128_encrypt_chunk_neon(void *state, void *dst, const void *src,
+ 
+ 	if (size > 0) {
+ 		uint8x16_t s = st.v[1] ^ (st.v[2] & st.v[3]) ^ st.v[4];
+-		uint8_t buf[AEGIS_BLOCK_SIZE] = {};
++		uint8_t buf[AEGIS_BLOCK_SIZE];
++		const void *in = src;
++		void *out = dst;
++		uint8x16_t m;
+ 
+-		memcpy(buf, src, size);
+-		msg = vld1q_u8(buf);
+-		st = aegis128_update_neon(st, msg);
+-		vst1q_u8(buf, msg ^ s);
+-		memcpy(dst, buf, size);
++		if (__builtin_expect(short_input, 0))
++			in = out = memcpy(buf + AEGIS_BLOCK_SIZE - size, src, size);
++
++		m = vqtbl1q_u8(vld1q_u8(in + size - AEGIS_BLOCK_SIZE),
++			       vld1q_u8(permute + 32 - size));
++
++		st = aegis128_update_neon(st, m);
++
++		vst1q_u8(out + size - AEGIS_BLOCK_SIZE,
++			 vqtbl1q_u8(m ^ s, vld1q_u8(permute + size)));
++
++		if (__builtin_expect(short_input, 0))
++			memcpy(dst, out, size);
++		else
++			vst1q_u8(out - AEGIS_BLOCK_SIZE, msg);
+ 	}
+ 
+ 	aegis128_save_state_neon(st, state);
+@@ -211,6 +260,7 @@ void crypto_aegis128_decrypt_chunk_neon(void *state, void *dst, const void *src,
+ 					unsigned int size)
+ {
+ 	struct aegis128_state st = aegis128_load_state_neon(state);
++	const int short_input = size < AEGIS_BLOCK_SIZE;
+ 	uint8x16_t msg;
+ 
+ 	preload_sbox();
+@@ -228,14 +278,25 @@ void crypto_aegis128_decrypt_chunk_neon(void *state, void *dst, const void *src,
+ 	if (size > 0) {
+ 		uint8x16_t s = st.v[1] ^ (st.v[2] & st.v[3]) ^ st.v[4];
+ 		uint8_t buf[AEGIS_BLOCK_SIZE];
++		const void *in = src;
++		void *out = dst;
++		uint8x16_t m;
+ 
+-		vst1q_u8(buf, s);
+-		memcpy(buf, src, size);
+-		msg = vld1q_u8(buf) ^ s;
+-		vst1q_u8(buf, msg);
+-		memcpy(dst, buf, size);
++		if (__builtin_expect(short_input, 0))
++			in = out = memcpy(buf + AEGIS_BLOCK_SIZE - size, src, size);
+ 
+-		st = aegis128_update_neon(st, msg);
++		m = s ^ vqtbx1q_u8(s, vld1q_u8(in + size - AEGIS_BLOCK_SIZE),
++				   vld1q_u8(permute + 32 - size));
++
++		st = aegis128_update_neon(st, m);
++
++		vst1q_u8(out + size - AEGIS_BLOCK_SIZE,
++			 vqtbl1q_u8(m, vld1q_u8(permute + size)));
++
++		if (__builtin_expect(short_input, 0))
++			memcpy(dst, out, size);
++		else
++			vst1q_u8(out - AEGIS_BLOCK_SIZE, msg);
+ 	}
+ 
+ 	aegis128_save_state_neon(st, state);
 -- 
-Best regards,
-Li Qiang
+2.17.1
+
