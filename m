@@ -2,209 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C16DC56202
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 13:33:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86792C64EBC
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 13:47:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E85CE2078E
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 13:33:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CE1020853
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 13:47:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="WKPVzja5"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pADkLWn3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731924AbgKQNcl (ORCPT
+        id S2387706AbgKQNrY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Nov 2020 08:32:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:42464 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732324AbgKQNck (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Nov 2020 08:32:40 -0500
-Received: from e123331-lin.nice.arm.com (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 94EAB24199;
-        Tue, 17 Nov 2020 13:32:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1605619960;
-        bh=N2U9menlQv60P/GBM6E2+KMGks+534jhCdZlvYWzxB4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WKPVzja5YoK7XofHAZxTxQ/DGxLHzSjEqySpSLFgK5fc2AmvwaJHcZyNbw27y4l5c
-         V7gQ/5t6bowjPoVOzi7Qp6awGuCdSouQEjjdJviXABMcumpBCpzkwoG05doRNjHS+O
-         PfW+p8looZ3MznGkxkMvaNIvG42T7dblVPSPajbw=
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Ondrej Mosnacek <omosnacek@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v3 2/4] crypto: aegis128/neon - optimize tail block handling
-Date:   Tue, 17 Nov 2020 14:32:12 +0100
-Message-Id: <20201117133214.29114-3-ardb@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20201117133214.29114-1-ardb@kernel.org>
-References: <20201117133214.29114-1-ardb@kernel.org>
+        Tue, 17 Nov 2020 08:47:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35184 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387708AbgKQNrV (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Nov 2020 08:47:21 -0500
+Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60F4AC061A48
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2020 05:47:19 -0800 (PST)
+Received: by mail-qk1-x744.google.com with SMTP id q5so20300179qkc.12
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2020 05:47:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=bSmgo4rQ5O0fX8LYI85JiwQBIWbes3kZEYBAYwb9WP4=;
+        b=pADkLWn3Qaa/5GwfpL3hT5/lWoignlAcveK+X397LauWuhBnOiMq/ILZKtqAWfe1KO
+         TtA2TDvPwJFR+f8jX5dOIHRmw792c1hQM594gnsBCohcpy3ODIia7JpbYxXF+DXLW/hf
+         rJ8nhw2blGDt+ivDTOU1eGl1U40D9Xuu7dqrHySUzsa8N/NAM3GeQoiawpsACrxeas0P
+         JUh8DJ1CfQhmPyhU5p9MsurK5JnwbTUONlqIWYtrTvNAVaY9aUjLZ7tSdw/qXz3RKzLm
+         mOGA0jVPoeiznkTX5eUTf207QvbNFHPT5S17yPK5FHQSGvgMrc7Y29RwnFp6j79g1VSn
+         kWvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=bSmgo4rQ5O0fX8LYI85JiwQBIWbes3kZEYBAYwb9WP4=;
+        b=XLvc5wg1oJNGm8mKlc4Asb2aiDELh5n7zesIz+hbgSK23aDdgB5rhxHcbRo8p3nDNw
+         ZBZYOoCeC0TjSfrrJL6qVP9bPhyFpIKW9ZcLJHLu+ivFnK8rJ4zE+o+6jM+F2hRElyLs
+         JQ8PzsXsczrGCBRFWYqql0QUqZ8ZkbIGulzpqLmy86pkIwt9bZm/LkjqERY7feH12Ww8
+         aHHnsrOuirfq4vIsxsN3modQuHtTsbURvsseERqea9b24ohdnmCCorXeYDG7o29x0z6o
+         iChWdEd2nrTcK43y5qb0ws5xwVxY3OiApfb6cy4CyHwIifXcNHqw9yG6qkjfPPH1JJu9
+         4vlw==
+X-Gm-Message-State: AOAM531yJvL3YibCJE7KYVmMDg7XVbJ73KrAmEGpC/X/x5hhueKIP7wI
+        M2nGxUXwwJ6vBkL9CdFGZTxxAA==
+X-Google-Smtp-Source: ABdhPJxZtI6Mq2GWjbvPL6wQ5zSPvGk2zzdCa0OsPopCnS8G45403JlJFrwj2mT9Rk+LrGbO3gKTmQ==
+X-Received: by 2002:a37:4897:: with SMTP id v145mr19613184qka.134.1605620838558;
+        Tue, 17 Nov 2020 05:47:18 -0800 (PST)
+Received: from pop-os.fios-router.home (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
+        by smtp.googlemail.com with ESMTPSA id t133sm14607355qke.82.2020.11.17.05.47.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Nov 2020 05:47:18 -0800 (PST)
+From:   Thara Gopinath <thara.gopinath@linaro.org>
+To:     agross@kernel.org, bjorn.andersson@linaro.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        robh+dt@kernel.org, sboyd@kernel.org, mturquette@baylibre.com
+Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-clk@vger.kernel.org
+Subject: [PATCH 2/6] clk:qcom:rpmh: Add CE clock on sdm845.
+Date:   Tue, 17 Nov 2020 08:47:10 -0500
+Message-Id: <20201117134714.3456446-3-thara.gopinath@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20201117134714.3456446-1-thara.gopinath@linaro.org>
+References: <20201117134714.3456446-1-thara.gopinath@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Avoid copying the tail block via a stack buffer if the total size
-exceeds a single AEGIS block. In this case, we can use overlapping
-loads and stores and NEON permutation instructions instead, which
-leads to a modest performance improvement on some cores (< 5%),
-and is slightly cleaner. Note that we still need to use a stack
-buffer if the entire input is smaller than 16 bytes, given that
-we cannot use 16 byte NEON loads and stores safely in this case.
+Qualcomm CE clock resource that is managed by BCM is required
+by crypto driver to access the core clock.
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
 ---
- crypto/aegis128-neon-inner.c | 89 +++++++++++++++++---
- 1 file changed, 75 insertions(+), 14 deletions(-)
+ drivers/clk/qcom/clk-rpmh.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/crypto/aegis128-neon-inner.c b/crypto/aegis128-neon-inner.c
-index 2a660ac1bc3a..cd1b3ad1d1f3 100644
---- a/crypto/aegis128-neon-inner.c
-+++ b/crypto/aegis128-neon-inner.c
-@@ -20,7 +20,6 @@
- extern int aegis128_have_aes_insn;
+diff --git a/drivers/clk/qcom/clk-rpmh.c b/drivers/clk/qcom/clk-rpmh.c
+index e2c669b08aff..7e2a4a9b9bf6 100644
+--- a/drivers/clk/qcom/clk-rpmh.c
++++ b/drivers/clk/qcom/clk-rpmh.c
+@@ -349,6 +349,7 @@ DEFINE_CLK_RPMH_VRM(sdm845, rf_clk2, rf_clk2_ao, "rfclka2", 1);
+ DEFINE_CLK_RPMH_VRM(sdm845, rf_clk3, rf_clk3_ao, "rfclka3", 1);
+ DEFINE_CLK_RPMH_VRM(sm8150, rf_clk3, rf_clk3_ao, "rfclka3", 1);
+ DEFINE_CLK_RPMH_BCM(sdm845, ipa, "IP0");
++DEFINE_CLK_RPMH_BCM(sdm845, ce, "CE0");
  
- void *memcpy(void *dest, const void *src, size_t n);
--void *memset(void *s, int c, size_t n);
+ static struct clk_hw *sdm845_rpmh_clocks[] = {
+ 	[RPMH_CXO_CLK]		= &sdm845_bi_tcxo.hw,
+@@ -364,6 +365,7 @@ static struct clk_hw *sdm845_rpmh_clocks[] = {
+ 	[RPMH_RF_CLK3]		= &sdm845_rf_clk3.hw,
+ 	[RPMH_RF_CLK3_A]	= &sdm845_rf_clk3_ao.hw,
+ 	[RPMH_IPA_CLK]		= &sdm845_ipa.hw,
++	[RPMH_CE_CLK]		= &sdm845_ce.hw,
+ };
  
- struct aegis128_state {
- 	uint8x16_t v[5];
-@@ -173,10 +172,46 @@ void crypto_aegis128_update_neon(void *state, const void *msg)
- 	aegis128_save_state_neon(st, state);
- }
- 
-+#ifdef CONFIG_ARM
-+/*
-+ * AArch32 does not provide these intrinsics natively because it does not
-+ * implement the underlying instructions. AArch32 only provides 64-bit
-+ * wide vtbl.8/vtbx.8 instruction, so use those instead.
-+ */
-+static uint8x16_t vqtbl1q_u8(uint8x16_t a, uint8x16_t b)
-+{
-+	union {
-+		uint8x16_t	val;
-+		uint8x8x2_t	pair;
-+	} __a = { a };
-+
-+	return vcombine_u8(vtbl2_u8(__a.pair, vget_low_u8(b)),
-+			   vtbl2_u8(__a.pair, vget_high_u8(b)));
-+}
-+
-+static uint8x16_t vqtbx1q_u8(uint8x16_t v, uint8x16_t a, uint8x16_t b)
-+{
-+	union {
-+		uint8x16_t	val;
-+		uint8x8x2_t	pair;
-+	} __a = { a };
-+
-+	return vcombine_u8(vtbx2_u8(vget_low_u8(v), __a.pair, vget_low_u8(b)),
-+			   vtbx2_u8(vget_high_u8(v), __a.pair, vget_high_u8(b)));
-+}
-+#endif
-+
-+static const uint8_t permute[] __aligned(64) = {
-+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-+	 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-+};
-+
- void crypto_aegis128_encrypt_chunk_neon(void *state, void *dst, const void *src,
- 					unsigned int size)
- {
- 	struct aegis128_state st = aegis128_load_state_neon(state);
-+	const int short_input = size < AEGIS_BLOCK_SIZE;
- 	uint8x16_t msg;
- 
- 	preload_sbox();
-@@ -186,7 +221,8 @@ void crypto_aegis128_encrypt_chunk_neon(void *state, void *dst, const void *src,
- 
- 		msg = vld1q_u8(src);
- 		st = aegis128_update_neon(st, msg);
--		vst1q_u8(dst, msg ^ s);
-+		msg ^= s;
-+		vst1q_u8(dst, msg);
- 
- 		size -= AEGIS_BLOCK_SIZE;
- 		src += AEGIS_BLOCK_SIZE;
-@@ -195,13 +231,26 @@ void crypto_aegis128_encrypt_chunk_neon(void *state, void *dst, const void *src,
- 
- 	if (size > 0) {
- 		uint8x16_t s = st.v[1] ^ (st.v[2] & st.v[3]) ^ st.v[4];
--		uint8_t buf[AEGIS_BLOCK_SIZE] = {};
-+		uint8_t buf[AEGIS_BLOCK_SIZE];
-+		const void *in = src;
-+		void *out = dst;
-+		uint8x16_t m;
- 
--		memcpy(buf, src, size);
--		msg = vld1q_u8(buf);
--		st = aegis128_update_neon(st, msg);
--		vst1q_u8(buf, msg ^ s);
--		memcpy(dst, buf, size);
-+		if (__builtin_expect(short_input, 0))
-+			in = out = memcpy(buf + AEGIS_BLOCK_SIZE - size, src, size);
-+
-+		m = vqtbl1q_u8(vld1q_u8(in + size - AEGIS_BLOCK_SIZE),
-+			       vld1q_u8(permute + 32 - size));
-+
-+		st = aegis128_update_neon(st, m);
-+
-+		vst1q_u8(out + size - AEGIS_BLOCK_SIZE,
-+			 vqtbl1q_u8(m ^ s, vld1q_u8(permute + size)));
-+
-+		if (__builtin_expect(short_input, 0))
-+			memcpy(dst, out, size);
-+		else
-+			vst1q_u8(out - AEGIS_BLOCK_SIZE, msg);
- 	}
- 
- 	aegis128_save_state_neon(st, state);
-@@ -211,6 +260,7 @@ void crypto_aegis128_decrypt_chunk_neon(void *state, void *dst, const void *src,
- 					unsigned int size)
- {
- 	struct aegis128_state st = aegis128_load_state_neon(state);
-+	const int short_input = size < AEGIS_BLOCK_SIZE;
- 	uint8x16_t msg;
- 
- 	preload_sbox();
-@@ -228,14 +278,25 @@ void crypto_aegis128_decrypt_chunk_neon(void *state, void *dst, const void *src,
- 	if (size > 0) {
- 		uint8x16_t s = st.v[1] ^ (st.v[2] & st.v[3]) ^ st.v[4];
- 		uint8_t buf[AEGIS_BLOCK_SIZE];
-+		const void *in = src;
-+		void *out = dst;
-+		uint8x16_t m;
- 
--		vst1q_u8(buf, s);
--		memcpy(buf, src, size);
--		msg = vld1q_u8(buf) ^ s;
--		vst1q_u8(buf, msg);
--		memcpy(dst, buf, size);
-+		if (__builtin_expect(short_input, 0))
-+			in = out = memcpy(buf + AEGIS_BLOCK_SIZE - size, src, size);
- 
--		st = aegis128_update_neon(st, msg);
-+		m = s ^ vqtbx1q_u8(s, vld1q_u8(in + size - AEGIS_BLOCK_SIZE),
-+				   vld1q_u8(permute + 32 - size));
-+
-+		st = aegis128_update_neon(st, m);
-+
-+		vst1q_u8(out + size - AEGIS_BLOCK_SIZE,
-+			 vqtbl1q_u8(m, vld1q_u8(permute + size)));
-+
-+		if (__builtin_expect(short_input, 0))
-+			memcpy(dst, out, size);
-+		else
-+			vst1q_u8(out - AEGIS_BLOCK_SIZE, msg);
- 	}
- 
- 	aegis128_save_state_neon(st, state);
+ static const struct clk_rpmh_desc clk_rpmh_sdm845 = {
 -- 
-2.17.1
+2.25.1
 
