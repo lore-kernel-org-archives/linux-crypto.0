@@ -2,63 +2,63 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16CDAC64E75
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 13:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D30C64E90
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 13:48:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B374E20853
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 13:48:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 149F6216C4
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Nov 2020 13:48:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rwMZLeyL"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uITHCquF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387712AbgKQNrk (ORCPT
+        id S2387707AbgKQNrz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Nov 2020 08:47:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35198 "EHLO
+        Tue, 17 Nov 2020 08:47:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387714AbgKQNrW (ORCPT
+        with ESMTP id S1733187AbgKQNrR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Nov 2020 08:47:22 -0500
-Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D032C061A52
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2020 05:47:20 -0800 (PST)
-Received: by mail-qk1-x742.google.com with SMTP id q22so20332289qkq.6
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2020 05:47:20 -0800 (PST)
+        Tue, 17 Nov 2020 08:47:17 -0500
+Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B88F5C0617A7
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2020 05:47:16 -0800 (PST)
+Received: by mail-qk1-x743.google.com with SMTP id y197so20302778qkb.7
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2020 05:47:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=5QU426516gN5B7sidkCWDZ3OKQOV/oU0oHJW0VHpSkg=;
-        b=rwMZLeyLWttxc4XDjPnukiljhxU6HO3ndxtJOhGkDy8LDVIdx4DadyIdeZojxsuUDn
-         KCrLXLoxruP5kULRvPuTwyt95lKqokIZq8M/ifyDy3PL15YgwVOPNK/i614h62o1x8CG
-         /0qzdeWOJJb8Iz41v/PP7p78hdDdWUFQ3nSEWp4q7BKGOWLOjPk5uU9ZuLzsoeatHEru
-         HrJNpafaix2c82oPFeM6675vuqdjyC0N0kYum1G60R614a4Gtlgb+hPpNNxZRMUn4wfw
-         +eaDq/TtS9z97xWmDELh2yhTyQvMssgxjXvmKByEtIw12UjAy2zig7SwrIbtl0fQ6Pmh
-         9YDw==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XGZNfBnMhcoajJLQ/PaK163KVnh/WRfsEYaW7uieePg=;
+        b=uITHCquF0CJt2Uab+/hGYZm0vWFhcGH9FRKGyQXczn6wRa24Wy4LVxkn98bIOrZVOh
+         qKY0FmAmQLVAbapXIlEJsmkbgjcWmZvCvr8+EkkpNNOXelHLN9exGQ0OdpUkW/GQsXIo
+         d/uIsmLcPBKghxGUHgSOGc6oy9mo4MyJnFCV5B/8DhL/l6wKzc1lEvIrTK4Bv881A2/T
+         mz3hv1zc0NbhEgWLJLsTUemzWAH1rQE6ijp1+ntSy6/FrW56sYkQmYUqqeoGvgfpVhz4
+         Y8CORkb3QWgvfNsuaYXbqBWgt3XxnUVuhR6YPLGLjpq2RovdyKq+Y2Q3spgD/zVWZBYq
+         CSbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=5QU426516gN5B7sidkCWDZ3OKQOV/oU0oHJW0VHpSkg=;
-        b=UkrPuHwZNdIIqBcIFo2NRUzcM6QA/guRBeUtyny71o77OPDfn+awF1REvYXEchQ6wu
-         rjjZAJYNPAh9Oc+ZxxPg6BuJyqRWZpjcfWqBn1C1jADfdjMbJyKGj9ivaMBU0CwlehOz
-         AtlXPgW1z/1ptQWTFuPUtZxmU+WUZW15V30fhQijpOduNs8Mqac0PaBU+ilsCYl9qp14
-         lqMl2xyPNkuV6FvrZ0XNFNjsj1HWi8Pa6z3RT2EvZSMZHvJoEolkVSc4gXbe/lcpX5hF
-         5dXcg0x4QFJZ73/QIH+anQjBHcGw2vxmvMPyQz+C8jW22k6N7cWwssSCpD83qz7eiTDY
-         sedw==
-X-Gm-Message-State: AOAM532JEa0dIIZosDbVa/mf10R1izyFWOGg5Abfv9F1ndAtVeCLF7xh
-        hp89VOiSKhUmjeeZHehmwiQDzQ==
-X-Google-Smtp-Source: ABdhPJzxr/ei6ibxqMp8Adp1P5r3wT5YbF8z+z4rZ4fzSkPXu5USsiUxhdomudmHb+pE5AtUkGD3lw==
-X-Received: by 2002:a37:8c03:: with SMTP id o3mr3914007qkd.41.1605620839526;
-        Tue, 17 Nov 2020 05:47:19 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XGZNfBnMhcoajJLQ/PaK163KVnh/WRfsEYaW7uieePg=;
+        b=qLTTKbn++hjaEBcFTG8OOP4okED5Ar3ZkfrYW5rBlH7XzHm81GlveA/zX+E57hmOw3
+         tJbjo4KjbKOFGP2LCIgZHe04kdCg3Q97fC7DFQqRiJEYHeGKyKaLldEIokWR8TzDNqgp
+         EJpwjJ5UlQCEXC01XS/UOPAmCcnzdhttKMObyrgJpgNHCYDZxJIGQRNEmZjGAR5Qu5Km
+         PqyOMP40g/WQwJQsmFZRAWzIpJB+qUqJxpFaOf7JHZmFcQYOjTQuwUJLrR5JJebrMMpP
+         NT1V5eUwO169eWqsRrTATadKxC/Jl2CFQD92CBoRW7+gvDFgoNIrJWogWIEVZZAeugmy
+         lXNw==
+X-Gm-Message-State: AOAM530oBdAuZF3/Kji0nhJiZdyR1CuLHBDAF6B5/tVHCscdOMRQ7Yus
+        esrjclF+6fMiU0Utz06SgMrtJ9ITdsy+eQ==
+X-Google-Smtp-Source: ABdhPJxWMKszw/F8jgG5+KqgSBxWMDaR48rZToh6p3HknBV2X6MaSjtNAp8Y/yTPmj5ZGMtKQ4xL+Q==
+X-Received: by 2002:a05:620a:5f6:: with SMTP id z22mr19190467qkg.211.1605620835911;
+        Tue, 17 Nov 2020 05:47:15 -0800 (PST)
 Received: from pop-os.fios-router.home (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.googlemail.com with ESMTPSA id t133sm14607355qke.82.2020.11.17.05.47.18
+        by smtp.googlemail.com with ESMTPSA id t133sm14607355qke.82.2020.11.17.05.47.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Nov 2020 05:47:18 -0800 (PST)
+        Tue, 17 Nov 2020 05:47:15 -0800 (PST)
 From:   Thara Gopinath <thara.gopinath@linaro.org>
 To:     agross@kernel.org, bjorn.andersson@linaro.org,
         herbert@gondor.apana.org.au, davem@davemloft.net,
@@ -66,61 +66,39 @@ To:     agross@kernel.org, bjorn.andersson@linaro.org,
 Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
         devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-clk@vger.kernel.org
-Subject: [PATCH 3/6] drivers:crypto:qce: Enable support for crypto engine on sdm845.
-Date:   Tue, 17 Nov 2020 08:47:11 -0500
-Message-Id: <20201117134714.3456446-4-thara.gopinath@linaro.org>
+Subject: [PATCH 0/6] Enable Qualcomm Crypto Engine on sdm845
+Date:   Tue, 17 Nov 2020 08:47:08 -0500
+Message-Id: <20201117134714.3456446-1-thara.gopinath@linaro.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201117134714.3456446-1-thara.gopinath@linaro.org>
-References: <20201117134714.3456446-1-thara.gopinath@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add support Qualcomm Crypto Engine accelerated encryption and
-authentication algorithms on sdm845.
+Qualcomm crypto engine supports hardware accelerated algorithms for
+encryption and authentication. Enable support for aes,des,3des encryption
+algorithms and sha1,sha256, hmac(sha1),hmac(sha256) authentication
+algorithms on sdm845.The patch series has been tested using the kernel
+crypto testing module tcrypto.ko.
 
-Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
----
- drivers/crypto/qce/core.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+Thara Gopinath (6):
+  dt-binding:clock: Add entry for crypto engine RPMH clock resource
+  clk:qcom:rpmh: Add CE clock on sdm845.
+  drivers:crypto:qce: Enable support for crypto engine on sdm845.
+  drivers:crypto:qce: Fix SHA result buffer corruption issues.
+  dts:qcom:sdm845: Add dt entries to support crypto engine.
+  devicetree:bindings:crypto: Extend qcom-qce binding to add support for
+    crypto engine version 5.4
 
-diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-index ea616b7259ae..67c3ca13e55b 100644
---- a/drivers/crypto/qce/core.c
-+++ b/drivers/crypto/qce/core.c
-@@ -160,7 +160,21 @@ static int qce_check_version(struct qce_device *qce)
- 		return -ENODEV;
- 
- 	qce->burst_size = QCE_BAM_BURST_SIZE;
--	qce->pipe_pair_id = 1;
-+
-+	/*
-+	 * Rx and tx pipes are treated as a pair inside CE.
-+	 * Pipe pair number depended on the actual BAM dma pipe
-+	 * that is used for transfers. The BAM dma pipes are passed
-+	 * from the device tree and used to derive the pipe pair
-+	 * id in the CE driver as follows.
-+	 * 	BAM dma pipes(rx, tx)		CE pipe pair id
-+	 *		0,1				0
-+	 *		2,3				1
-+	 *		4,5				2
-+	 *		6,7				3
-+	 *		...
-+	 */
-+	qce->pipe_pair_id = qce->dma.rxchan->chan_id >> 1;
- 
- 	dev_dbg(qce->dev, "Crypto device found, version %d.%d.%d\n",
- 		major, minor, step);
-@@ -261,6 +275,7 @@ static int qce_crypto_remove(struct platform_device *pdev)
- 
- static const struct of_device_id qce_crypto_of_match[] = {
- 	{ .compatible = "qcom,crypto-v5.1", },
-+	{ .compatible = "qcom,crypto-v5.4", },
- 	{}
- };
- MODULE_DEVICE_TABLE(of, qce_crypto_of_match);
+ .../devicetree/bindings/crypto/qcom-qce.txt   |  4 ++-
+ arch/arm64/boot/dts/qcom/sdm845.dtsi          | 30 +++++++++++++++++++
+ drivers/clk/qcom/clk-rpmh.c                   |  2 ++
+ drivers/crypto/qce/core.c                     | 17 ++++++++++-
+ drivers/crypto/qce/sha.c                      |  2 +-
+ include/dt-bindings/clock/qcom,rpmh.h         |  1 +
+ 6 files changed, 53 insertions(+), 3 deletions(-)
+
 -- 
 2.25.1
 
