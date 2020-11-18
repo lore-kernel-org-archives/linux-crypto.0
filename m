@@ -2,226 +2,130 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55FD2C64E7B
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Nov 2020 03:49:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10EEDC5519F
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Nov 2020 03:56:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3496024698
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Nov 2020 03:49:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C2E3E2465E
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Nov 2020 03:56:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=hp.com header.i=@hp.com header.b="anOH7lsH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727186AbgKRDsx (ORCPT
+        id S1727160AbgKRD4G (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Nov 2020 22:48:53 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7640 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727205AbgKRDsx (ORCPT
+        Tue, 17 Nov 2020 22:56:06 -0500
+Received: from us-smtp-delivery-162.mimecast.com ([216.205.24.162]:25248 "EHLO
+        us-smtp-delivery-162.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725613AbgKRD4F (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Nov 2020 22:48:53 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CbTLV6G2Gz15LPm;
-        Wed, 18 Nov 2020 11:48:34 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 18 Nov 2020 11:48:41 +0800
-From:   Meng Yu <yumeng18@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
-        <wangzhou1@hisilicon.com>, <yumeng18@huawei.com>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 2/5] crypto: hisilicon/hpre - add version adapt to new algorithms
-Date:   Wed, 18 Nov 2020 11:46:58 +0800
-Message-ID: <1605671221-30692-3-git-send-email-yumeng18@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1605671221-30692-1-git-send-email-yumeng18@huawei.com>
-References: <1605671221-30692-1-git-send-email-yumeng18@huawei.com>
+        Tue, 17 Nov 2020 22:56:05 -0500
+X-Greylist: delayed 386 seconds by postgrey-1.27 at vger.kernel.org; Tue, 17 Nov 2020 22:56:05 EST
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hp.com; s=mimecast20180716;
+        t=1605671764;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+nAuWCyqSCKlxjA6DGp9/NBOYAPK1jxXANASBpPclsY=;
+        b=anOH7lsHSa4j1MuxIz5l2iEnSJBv8vilUIH0S3ZprsTg/rBSMW+qMKZd9yxKZoky+KBn9b
+        raERkIAzUpfyrg4Q4cDGaQtVJ2vH/AqhTyhMgBkkH9RxdPV5xOuYL8eGidtTcQO6A98Gv4
+        IVX/U734J+YmM8SP/jXFXI1gsCHGfh0=
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com
+ (mail-dm6nam12lp2171.outbound.protection.outlook.com [104.47.59.171])
+ (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-533-iSYAwJRgPA-LTFSu7xsL7g-1; Tue, 17 Nov 2020 22:49:37 -0500
+X-MC-Unique: iSYAwJRgPA-LTFSu7xsL7g-1
+Received: from TU4PR8401MB1216.NAMPRD84.PROD.OUTLOOK.COM
+ (2a01:111:e400:7712::13) by TU4PR8401MB0590.NAMPRD84.PROD.OUTLOOK.COM
+ (2a01:111:e400:770b::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3564.28; Wed, 18 Nov
+ 2020 03:49:34 +0000
+Received: from TU4PR8401MB1216.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::c03a:bba9:ff3a:ae3c]) by TU4PR8401MB1216.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::c03a:bba9:ff3a:ae3c%8]) with mapi id 15.20.3564.028; Wed, 18 Nov 2020
+ 03:49:34 +0000
+From:   "Bhat, Jayalakshmi Manjunath" <jayalakshmi.bhat@hp.com>
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: ESP failure when PTB is received as non ESP packet and payload as ESP
+Thread-Topic: ESP failure when PTB is received as non ESP packet and payload
+ as ESP
+Thread-Index: Ada9XXB6jZQyerO4Rkin5F9kMdGAuAAADVBg
+Date:   Wed, 18 Nov 2020 03:49:34 +0000
+Message-ID: <TU4PR8401MB121629D61C3659EAD7C72441F6E10@TU4PR8401MB1216.NAMPRD84.PROD.OUTLOOK.COM>
+References: <TU4PR8401MB12165581C53282069BF4EC7AF6E10@TU4PR8401MB1216.NAMPRD84.PROD.OUTLOOK.COM>
+In-Reply-To: <TU4PR8401MB12165581C53282069BF4EC7AF6E10@TU4PR8401MB1216.NAMPRD84.PROD.OUTLOOK.COM>
+Accept-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [49.207.218.124]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 4e3cd82b-e5e7-4ba6-a648-08d88b74f6c7
+x-ms-traffictypediagnostic: TU4PR8401MB0590:
+x-microsoft-antispam-prvs: <TU4PR8401MB059042046BF0C81A445244FAF6E10@TU4PR8401MB0590.NAMPRD84.PROD.OUTLOOK.COM>
+x-ms-oob-tlc-oobclassifiers: OLM:407
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0
+x-microsoft-antispam-message-info: cNfzxmW7GBb4Q8VB7mNlKGDOFCTlmfEMmnTx6sbRApN77p8yGhNxIwXdnAu2vq38ai1xQdohwrlqwzNt9c7VehcrWDRojDXXBwmrDBe3LLHMgmmhuDJw7OcYBSRLGhlLSSLWpSTEbscTsh8S/8Qg5SGtHDFlk85xdQcFeRxeuaK1qR1V1wpRPkVQXPk+zN23iZXdGyYNS/LhNdk8XACT+zPJsAzh+0tNS1kBJPmdyEMlfd+/aQkaLcnnZlCLeqU+ehTmt5LcfN7e4HnVPFTPWT3Zet+nxehCvAdMFXUTY0QxFcrc4nX70yABewiM450l
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TU4PR8401MB1216.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(396003)(39860400002)(136003)(346002)(366004)(376002)(2906002)(66446008)(9686003)(71200400001)(8676002)(55016002)(33656002)(86362001)(26005)(110136005)(450100002)(52536014)(6506007)(55236004)(316002)(83380400001)(7696005)(186003)(64756008)(2940100002)(76116006)(66556008)(66946007)(478600001)(5660300002)(66476007)(8936002);DIR:OUT;SFP:1102
+x-ms-exchange-antispam-messagedata: 9S9ZtekwIY/ywDjQUBcb2GU5fn38IBIZPDKGTuttzYByzkuUyrxp+NrOJZdGaPg630D7MteVoUYUqGGEsoKHO6/qg8X1Or/bhQk8hhyNtNxn0ATNwx2zzb5ctMhIuZ5q0BrvZyKDuXCbO9c7v7rtbS+Bp+bKD5Ou4lRtkOv3P1xFBI1XLuvY3hcEeqfN8RdyVM2gi/m1YVSlQDfe0OxBKG1i3He5RYC8wqZuAYtZ69yrAIAl6rRYl4Cq/C60gOKxQ6qNpNQfyQVpt5lCBRffBnLFRn1o4Z+YoVgOuLrYHLU9vM+Q9iCMeyuKKDhMsQtOo/ZpvCZQx7vTva3DEN6F2t3gHVdKlJusfMJT+KRQ5YPO6semZrMxNQBlq/jb7lFXU055jmBNLickCrxf6OU7XAWr+P/gav48WZhXbmQRAChn6dxj1oLUDzso8+OhB9e87pukU7H/l1PrEDFwDRUBZZdbFMeuQRmwPMwbWc1TjMGCuvgwjmGKJZLr1moIt9bRKNIWCAe6We+vWzkAfgjX1a7El8NGYdMGLxDd86nNhzzbko4xlwaMAX3e5Ii5SCGGrbD+cDLmm6cQSHgMzAqlTm3xgppxw+AywcQ2mEZ8vtJG3q2l4YomHiB5K1w63SBwvb2nJ9cmirAFKh4zKy0o7MbRmk7gEMf4eOejgW8y48JrkAQ5HaBN6sueMu31weUhsWs7LptIRYLxoXGzaEjiIglY7HtmK+lLfKtG8DtZSaaqEcPZBMssGEDi0lkYtr9TCuscrXKmSPN/f0NdaOOtc1eKqZCUPN9KD7KCpJeKt6KIo96bac817hdMM4/mnH4yS3x6cq5XQrVXYCnjCPMDs8eQbvqvk8z4IrZNFf4/y81L/+lD7VNBoa6/f2dxysRI/9LEdGTDG71vSDlmDUR41g==
+x-ms-exchange-transport-forked: True
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+X-OriginatorOrg: hp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TU4PR8401MB1216.NAMPRD84.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4e3cd82b-e5e7-4ba6-a648-08d88b74f6c7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Nov 2020 03:49:34.4272
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: ca7981a2-785a-463d-b82a-3db87dfc3ce6
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 7x34JxREoxxPha7Wu/ClqrJP+29BNjaW4sZ1cv7pMsvWQBDi4PsazOji/PIfRNKNU3FwOET6yqC7x6x1/hee1g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TU4PR8401MB0590
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA62A171 smtp.mailfrom=jayalakshmi.bhat@hp.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: hp.com
+Content-Language: en-US
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-'DH' and 'RSA' algorithms are supported by Kunpeng 920 and Kunpeng 930,
-but some new algrithms(like ECDH) are only supported by Kunpeng 930, so
-we add parameter 'struct hisi_qm *qm' to 'hpre_algs_(un)register' to
-identify the chip's version.
+Hi All,
 
-Signed-off-by: Meng Yu <yumeng18@huawei.com>
-Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
----
- drivers/crypto/hisilicon/hpre/hpre.h        | 5 +++--
- drivers/crypto/hisilicon/hpre/hpre_crypto.c | 4 ++--
- drivers/crypto/hisilicon/qm.c               | 4 ++--
- drivers/crypto/hisilicon/qm.h               | 4 ++--
- drivers/crypto/hisilicon/sec2/sec.h         | 4 ++--
- drivers/crypto/hisilicon/sec2/sec_crypto.c  | 4 ++--
- drivers/crypto/hisilicon/sec2/sec_crypto.h  | 4 ++--
- drivers/crypto/hisilicon/zip/zip.h          | 4 ++--
- drivers/crypto/hisilicon/zip/zip_crypto.c   | 4 ++--
- 9 files changed, 19 insertions(+), 18 deletions(-)
+There are 2 difference scenarios our device receives PTB.
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
-index 181c109..cc50f23 100644
---- a/drivers/crypto/hisilicon/hpre/hpre.h
-+++ b/drivers/crypto/hisilicon/hpre/hpre.h
-@@ -93,7 +93,8 @@ struct hpre_sqe {
- };
- 
- struct hisi_qp *hpre_create_qp(void);
--int hpre_algs_register(void);
--void hpre_algs_unregister(void);
-+int hpre_algs_register(struct hisi_qm *qm);
-+void hpre_algs_unregister(struct hisi_qm *qm);
-+
- 
- #endif
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index a87f990..d89b2f5 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -1154,7 +1154,7 @@ static struct kpp_alg dh = {
- };
- #endif
- 
--int hpre_algs_register(void)
-+int hpre_algs_register(struct hisi_qm *qm)
- {
- 	int ret;
- 
-@@ -1171,7 +1171,7 @@ int hpre_algs_register(void)
- 	return ret;
- }
- 
--void hpre_algs_unregister(void)
-+void hpre_algs_unregister(struct hisi_qm *qm)
- {
- 	crypto_unregister_akcipher(&rsa);
- #ifdef CONFIG_CRYPTO_DH
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index f21ccae..e25636b 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -4012,7 +4012,7 @@ int hisi_qm_alg_register(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
- 	mutex_unlock(&qm_list->lock);
- 
- 	if (flag) {
--		ret = qm_list->register_to_crypto();
-+		ret = qm_list->register_to_crypto(qm);
- 		if (ret) {
- 			mutex_lock(&qm_list->lock);
- 			list_del(&qm->list);
-@@ -4040,7 +4040,7 @@ void hisi_qm_alg_unregister(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
- 	mutex_unlock(&qm_list->lock);
- 
- 	if (list_empty(&qm_list->list))
--		qm_list->unregister_from_crypto();
-+		qm_list->unregister_from_crypto(qm);
- }
- EXPORT_SYMBOL_GPL(hisi_qm_alg_unregister);
- 
-diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
-index 8624d12..a63256a 100644
---- a/drivers/crypto/hisilicon/qm.h
-+++ b/drivers/crypto/hisilicon/qm.h
-@@ -193,8 +193,8 @@ struct hisi_qm_err_ini {
- struct hisi_qm_list {
- 	struct mutex lock;
- 	struct list_head list;
--	int (*register_to_crypto)(void);
--	void (*unregister_from_crypto)(void);
-+	int (*register_to_crypto)(struct hisi_qm *qm);
-+	void (*unregister_from_crypto)(struct hisi_qm *qm);
- };
- 
- struct hisi_qm {
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 0849191..17ddb20 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -183,6 +183,6 @@ struct sec_dev {
- 
- void sec_destroy_qps(struct hisi_qp **qps, int qp_num);
- struct hisi_qp **sec_create_qps(void);
--int sec_register_to_crypto(void);
--void sec_unregister_from_crypto(void);
-+int sec_register_to_crypto(struct hisi_qm *qm);
-+void sec_unregister_from_crypto(struct hisi_qm *qm);
- #endif
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 87bc08a..f512ce2 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -1632,7 +1632,7 @@ static struct aead_alg sec_aeads[] = {
- 		     AES_BLOCK_SIZE, AES_BLOCK_SIZE, SHA512_DIGEST_SIZE),
- };
- 
--int sec_register_to_crypto(void)
-+int sec_register_to_crypto(struct hisi_qm *qm)
- {
- 	int ret;
- 
-@@ -1649,7 +1649,7 @@ int sec_register_to_crypto(void)
- 	return ret;
- }
- 
--void sec_unregister_from_crypto(void)
-+void sec_unregister_from_crypto(struct hisi_qm *qm)
- {
- 	crypto_unregister_skciphers(sec_skciphers,
- 				    ARRAY_SIZE(sec_skciphers));
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.h b/drivers/crypto/hisilicon/sec2/sec_crypto.h
-index b2786e1..0e933e7 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.h
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.h
-@@ -211,6 +211,6 @@ struct sec_sqe {
- 	struct sec_sqe_type2 type2;
- };
- 
--int sec_register_to_crypto(void);
--void sec_unregister_from_crypto(void);
-+int sec_register_to_crypto(struct hisi_qm *qm);
-+void sec_unregister_from_crypto(struct hisi_qm *qm);
- #endif
-diff --git a/drivers/crypto/hisilicon/zip/zip.h b/drivers/crypto/hisilicon/zip/zip.h
-index 92397f9..9ed7461 100644
---- a/drivers/crypto/hisilicon/zip/zip.h
-+++ b/drivers/crypto/hisilicon/zip/zip.h
-@@ -62,6 +62,6 @@ struct hisi_zip_sqe {
- };
- 
- int zip_create_qps(struct hisi_qp **qps, int ctx_num, int node);
--int hisi_zip_register_to_crypto(void);
--void hisi_zip_unregister_from_crypto(void);
-+int hisi_zip_register_to_crypto(struct hisi_qm *qm);
-+void hisi_zip_unregister_from_crypto(struct hisi_qm *qm);
- #endif
-diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-index 08b4660..41f6966 100644
---- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-+++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-@@ -665,7 +665,7 @@ static struct acomp_alg hisi_zip_acomp_gzip = {
- 	}
- };
- 
--int hisi_zip_register_to_crypto(void)
-+int hisi_zip_register_to_crypto(struct hisi_qm *qm)
- {
- 	int ret;
- 
-@@ -684,7 +684,7 @@ int hisi_zip_register_to_crypto(void)
- 	return ret;
- }
- 
--void hisi_zip_unregister_from_crypto(void)
-+void hisi_zip_unregister_from_crypto(struct hisi_qm *qm)
- {
- 	crypto_unregister_acomp(&hisi_zip_acomp_gzip);
- 	crypto_unregister_acomp(&hisi_zip_acomp_zlib);
--- 
-2.8.1
+In the first scenario PTB is received as ESP packet. First ESP gets decrypt=
+ed and has payload of ICMP packet as PTB. PTB is 1280.
+PMTU is set on the device via icmp6_err function in kernel. =A0
+
+This is followed by device receiving fragmented PING requests. =A0As part o=
+f ESP and XFRM processing esp6_get_mtu gets called.
+And esp6_get_mtu calculates MTU as MTU-ESP HEADER-IPHEADER etc. Here MTU re=
+mains as 1500 and calculated MTU is also fine.
+Thus the execution works good.=A0=20
+
+
+In the second scenario PTB is received as non ESP packet. However payload i=
+n this packet is an ESP. PTB is 1280.=A0 PMTU is set via=20
+esp6_err function in kernel. This function also invokes xfrm_policy_destroy=
+.=20
+
+This is followed by device receiving fragmented PING requests. Device creat=
+es new xfrm_state and sets the MTU as 1280.
+esp6_get_mtu calculates MTU as 1280- ESP HEADER-IPHEADER etc which result M=
+TU < IP6_MIN_MTU and test fails.
+
+Has anyone encountered scenario 2. Any inputs are appreciated.
+
+Thanks and Regards,
+Jayalakshmi
+
+
 
