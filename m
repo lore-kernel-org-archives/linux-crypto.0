@@ -7,22 +7,22 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 622A8C64E8A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55FD2C64E7B
 	for <linux-crypto@archiver.kernel.org>; Wed, 18 Nov 2020 03:49:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 14DFE24695
+	by mail.kernel.org (Postfix) with ESMTP id 3496024698
 	for <linux-crypto@archiver.kernel.org>; Wed, 18 Nov 2020 03:49:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727687AbgKRDtC (ORCPT
+        id S1727186AbgKRDsx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Nov 2020 22:49:02 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7641 "EHLO
+        Tue, 17 Nov 2020 22:48:53 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:7640 "EHLO
         szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727200AbgKRDtB (ORCPT
+        with ESMTP id S1727205AbgKRDsx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Nov 2020 22:49:01 -0500
+        Tue, 17 Nov 2020 22:48:53 -0500
 Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CbTLW002rz15N1M;
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CbTLV6G2Gz15LPm;
         Wed, 18 Nov 2020 11:48:34 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.24) by
  DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
@@ -32,9 +32,9 @@ To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>, <yumeng18@huawei.com>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 3/5] crypto: hisilicon/hpre - add algorithm type
-Date:   Wed, 18 Nov 2020 11:46:59 +0800
-Message-ID: <1605671221-30692-4-git-send-email-yumeng18@huawei.com>
+Subject: [PATCH v3 2/5] crypto: hisilicon/hpre - add version adapt to new algorithms
+Date:   Wed, 18 Nov 2020 11:46:58 +0800
+Message-ID: <1605671221-30692-3-git-send-email-yumeng18@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1605671221-30692-1-git-send-email-yumeng18@huawei.com>
 References: <1605671221-30692-1-git-send-email-yumeng18@huawei.com>
@@ -46,123 +46,182 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Algorithm type is brought in to get hardware HPRE queue
-to support different algorithms.
+'DH' and 'RSA' algorithms are supported by Kunpeng 920 and Kunpeng 930,
+but some new algrithms(like ECDH) are only supported by Kunpeng 930, so
+we add parameter 'struct hisi_qm *qm' to 'hpre_algs_(un)register' to
+identify the chip's version.
 
 Signed-off-by: Meng Yu <yumeng18@huawei.com>
 Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre.h        | 10 +++++++++-
- drivers/crypto/hisilicon/hpre/hpre_crypto.c | 12 ++++++------
- drivers/crypto/hisilicon/hpre/hpre_main.c   | 11 +++++++++--
- 3 files changed, 24 insertions(+), 9 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre.h        | 5 +++--
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 4 ++--
+ drivers/crypto/hisilicon/qm.c               | 4 ++--
+ drivers/crypto/hisilicon/qm.h               | 4 ++--
+ drivers/crypto/hisilicon/sec2/sec.h         | 4 ++--
+ drivers/crypto/hisilicon/sec2/sec_crypto.c  | 4 ++--
+ drivers/crypto/hisilicon/sec2/sec_crypto.h  | 4 ++--
+ drivers/crypto/hisilicon/zip/zip.h          | 4 ++--
+ drivers/crypto/hisilicon/zip/zip_crypto.c   | 4 ++--
+ 9 files changed, 19 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
-index cc50f23..02193e1 100644
+index 181c109..cc50f23 100644
 --- a/drivers/crypto/hisilicon/hpre/hpre.h
 +++ b/drivers/crypto/hisilicon/hpre/hpre.h
-@@ -10,6 +10,14 @@
- #define HPRE_PF_DEF_Q_NUM		64
- #define HPRE_PF_DEF_Q_BASE		0
- 
-+/*
-+ * type used in qm sqc DW6.
-+ * 0 - Algorithm which has been supported in V2, like RSA, DH and so on;
-+ * 1 - ECC algorithm in V3.
-+ */
-+#define HPRE_V2_ALG_TYPE	0
-+#define HPRE_V3_ECC_ALG_TYPE	1
-+
- enum {
- 	HPRE_CLUSTER0,
- 	HPRE_CLUSTER1,
-@@ -92,7 +100,7 @@ struct hpre_sqe {
- 	__le32 rsvd1[_HPRE_SQE_ALIGN_EXT];
+@@ -93,7 +93,8 @@ struct hpre_sqe {
  };
  
--struct hisi_qp *hpre_create_qp(void);
-+struct hisi_qp *hpre_create_qp(u8 type);
- int hpre_algs_register(struct hisi_qm *qm);
- void hpre_algs_unregister(struct hisi_qm *qm);
+ struct hisi_qp *hpre_create_qp(void);
+-int hpre_algs_register(void);
+-void hpre_algs_unregister(void);
++int hpre_algs_register(struct hisi_qm *qm);
++void hpre_algs_unregister(struct hisi_qm *qm);
++
  
+ #endif
 diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index d89b2f5..712bea9 100644
+index a87f990..d89b2f5 100644
 --- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
 +++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -152,12 +152,12 @@ static void hpre_rm_req_from_ctx(struct hpre_asym_request *hpre_req)
- 	}
- }
+@@ -1154,7 +1154,7 @@ static struct kpp_alg dh = {
+ };
+ #endif
  
--static struct hisi_qp *hpre_get_qp_and_start(void)
-+static struct hisi_qp *hpre_get_qp_and_start(u8 type)
+-int hpre_algs_register(void)
++int hpre_algs_register(struct hisi_qm *qm)
  {
- 	struct hisi_qp *qp;
  	int ret;
  
--	qp = hpre_create_qp();
-+	qp = hpre_create_qp(type);
- 	if (!qp) {
- 		pr_err("Can not create hpre qp!\n");
- 		return ERR_PTR(-ENODEV);
-@@ -422,11 +422,11 @@ static void hpre_alg_cb(struct hisi_qp *qp, void *resp)
- 	req->cb(ctx, resp);
+@@ -1171,7 +1171,7 @@ int hpre_algs_register(void)
+ 	return ret;
  }
  
--static int hpre_ctx_init(struct hpre_ctx *ctx)
-+static int hpre_ctx_init(struct hpre_ctx *ctx, u8 type)
+-void hpre_algs_unregister(void)
++void hpre_algs_unregister(struct hisi_qm *qm)
  {
- 	struct hisi_qp *qp;
+ 	crypto_unregister_akcipher(&rsa);
+ #ifdef CONFIG_CRYPTO_DH
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index f21ccae..e25636b 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -4012,7 +4012,7 @@ int hisi_qm_alg_register(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
+ 	mutex_unlock(&qm_list->lock);
  
--	qp = hpre_get_qp_and_start();
-+	qp = hpre_get_qp_and_start(type);
- 	if (IS_ERR(qp))
- 		return PTR_ERR(qp);
+ 	if (flag) {
+-		ret = qm_list->register_to_crypto();
++		ret = qm_list->register_to_crypto(qm);
+ 		if (ret) {
+ 			mutex_lock(&qm_list->lock);
+ 			list_del(&qm->list);
+@@ -4040,7 +4040,7 @@ void hisi_qm_alg_unregister(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
+ 	mutex_unlock(&qm_list->lock);
  
-@@ -674,7 +674,7 @@ static int hpre_dh_init_tfm(struct crypto_kpp *tfm)
- {
- 	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
- 
--	return hpre_ctx_init(ctx);
-+	return hpre_ctx_init(ctx, HPRE_V2_ALG_TYPE);
+ 	if (list_empty(&qm_list->list))
+-		qm_list->unregister_from_crypto();
++		qm_list->unregister_from_crypto(qm);
  }
+ EXPORT_SYMBOL_GPL(hisi_qm_alg_unregister);
  
- static void hpre_dh_exit_tfm(struct crypto_kpp *tfm)
-@@ -1100,7 +1100,7 @@ static int hpre_rsa_init_tfm(struct crypto_akcipher *tfm)
- 		return PTR_ERR(ctx->rsa.soft_tfm);
- 	}
+diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
+index 8624d12..a63256a 100644
+--- a/drivers/crypto/hisilicon/qm.h
++++ b/drivers/crypto/hisilicon/qm.h
+@@ -193,8 +193,8 @@ struct hisi_qm_err_ini {
+ struct hisi_qm_list {
+ 	struct mutex lock;
+ 	struct list_head list;
+-	int (*register_to_crypto)(void);
+-	void (*unregister_from_crypto)(void);
++	int (*register_to_crypto)(struct hisi_qm *qm);
++	void (*unregister_from_crypto)(struct hisi_qm *qm);
+ };
  
--	ret = hpre_ctx_init(ctx);
-+	ret = hpre_ctx_init(ctx, HPRE_V2_ALG_TYPE);
- 	if (ret)
- 		crypto_free_akcipher(ctx->rsa.soft_tfm);
+ struct hisi_qm {
+diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
+index 0849191..17ddb20 100644
+--- a/drivers/crypto/hisilicon/sec2/sec.h
++++ b/drivers/crypto/hisilicon/sec2/sec.h
+@@ -183,6 +183,6 @@ struct sec_dev {
  
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index fc7173a..1ae8fa1 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -209,13 +209,20 @@ static u32 vfs_num;
- module_param_cb(vfs_num, &vfs_num_ops, &vfs_num, 0444);
- MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63), 0(default)");
+ void sec_destroy_qps(struct hisi_qp **qps, int qp_num);
+ struct hisi_qp **sec_create_qps(void);
+-int sec_register_to_crypto(void);
+-void sec_unregister_from_crypto(void);
++int sec_register_to_crypto(struct hisi_qm *qm);
++void sec_unregister_from_crypto(struct hisi_qm *qm);
+ #endif
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 87bc08a..f512ce2 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -1632,7 +1632,7 @@ static struct aead_alg sec_aeads[] = {
+ 		     AES_BLOCK_SIZE, AES_BLOCK_SIZE, SHA512_DIGEST_SIZE),
+ };
  
--struct hisi_qp *hpre_create_qp(void)
-+struct hisi_qp *hpre_create_qp(u8 type)
+-int sec_register_to_crypto(void)
++int sec_register_to_crypto(struct hisi_qm *qm)
  {
- 	int node = cpu_to_node(smp_processor_id());
- 	struct hisi_qp *qp = NULL;
  	int ret;
  
--	ret = hisi_qm_alloc_qps_node(&hpre_devices, 1, 0, node, &qp);
-+	if (type != HPRE_V2_ALG_TYPE && type != HPRE_V3_ECC_ALG_TYPE)
-+		return NULL;
-+
-+	/*
-+	 * type: 0 - RSA/DH. algorithm supported in V2,
-+	 *       1 - ECC algorithm in V3.
-+	 */
-+	ret = hisi_qm_alloc_qps_node(&hpre_devices, 1, type, node, &qp);
- 	if (!ret)
- 		return qp;
+@@ -1649,7 +1649,7 @@ int sec_register_to_crypto(void)
+ 	return ret;
+ }
  
+-void sec_unregister_from_crypto(void)
++void sec_unregister_from_crypto(struct hisi_qm *qm)
+ {
+ 	crypto_unregister_skciphers(sec_skciphers,
+ 				    ARRAY_SIZE(sec_skciphers));
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.h b/drivers/crypto/hisilicon/sec2/sec_crypto.h
+index b2786e1..0e933e7 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.h
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.h
+@@ -211,6 +211,6 @@ struct sec_sqe {
+ 	struct sec_sqe_type2 type2;
+ };
+ 
+-int sec_register_to_crypto(void);
+-void sec_unregister_from_crypto(void);
++int sec_register_to_crypto(struct hisi_qm *qm);
++void sec_unregister_from_crypto(struct hisi_qm *qm);
+ #endif
+diff --git a/drivers/crypto/hisilicon/zip/zip.h b/drivers/crypto/hisilicon/zip/zip.h
+index 92397f9..9ed7461 100644
+--- a/drivers/crypto/hisilicon/zip/zip.h
++++ b/drivers/crypto/hisilicon/zip/zip.h
+@@ -62,6 +62,6 @@ struct hisi_zip_sqe {
+ };
+ 
+ int zip_create_qps(struct hisi_qp **qps, int ctx_num, int node);
+-int hisi_zip_register_to_crypto(void);
+-void hisi_zip_unregister_from_crypto(void);
++int hisi_zip_register_to_crypto(struct hisi_qm *qm);
++void hisi_zip_unregister_from_crypto(struct hisi_qm *qm);
+ #endif
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+index 08b4660..41f6966 100644
+--- a/drivers/crypto/hisilicon/zip/zip_crypto.c
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -665,7 +665,7 @@ static struct acomp_alg hisi_zip_acomp_gzip = {
+ 	}
+ };
+ 
+-int hisi_zip_register_to_crypto(void)
++int hisi_zip_register_to_crypto(struct hisi_qm *qm)
+ {
+ 	int ret;
+ 
+@@ -684,7 +684,7 @@ int hisi_zip_register_to_crypto(void)
+ 	return ret;
+ }
+ 
+-void hisi_zip_unregister_from_crypto(void)
++void hisi_zip_unregister_from_crypto(struct hisi_qm *qm)
+ {
+ 	crypto_unregister_acomp(&hisi_zip_acomp_gzip);
+ 	crypto_unregister_acomp(&hisi_zip_acomp_zlib);
 -- 
 2.8.1
 
