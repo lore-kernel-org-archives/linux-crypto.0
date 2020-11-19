@@ -4,38 +4,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16C7FC388F9
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Nov 2020 19:58:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C808C388F9
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Nov 2020 22:25:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B801322261
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Nov 2020 19:58:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA310208FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Nov 2020 22:25:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726944AbgKST61 (ORCPT
+        id S1726466AbgKSWZb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Nov 2020 14:58:27 -0500
-Received: from mga04.intel.com ([192.55.52.120]:14183 "EHLO mga04.intel.com"
+        Thu, 19 Nov 2020 17:25:31 -0500
+Received: from mga01.intel.com ([192.55.52.88]:26654 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726820AbgKST61 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Nov 2020 14:58:27 -0500
-IronPort-SDR: wfkSV18YztEjQN7iiCtK61d3gKMP7/YMtMbsd7Y7fJuLcwIIT6NtNbJlMjQhRq7MXASv2lHgui
- PwI2Al/7RpuA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9810"; a="168782679"
+        id S1726105AbgKSWZb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Nov 2020 17:25:31 -0500
+IronPort-SDR: jPutyleZCuA5th77TLJg6X7KIpHlwXK2FCV2tBBgt/5ax56cwHGqIDSONaWzwxJVOpXb69pxZJ
+ dn0BPXod3ptQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9810"; a="189471936"
 X-IronPort-AV: E=Sophos;i="5.78,354,1599548400"; 
-   d="scan'208";a="168782679"
+   d="scan'208";a="189471936"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2020 11:58:26 -0800
-IronPort-SDR: mNmWCJtYPhnq+MLG2r+sOL8j9YmUXjIGiWPp/Y9ybuSk2U45p5P8vpnmblP23MJtea4St1WcUr
- g00c/CFqhquQ==
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2020 14:25:30 -0800
+IronPort-SDR: LmGCMt4qb3T1rKgJrsrSNZCnA5fx/qTFRH3Cj7MTclQZhGYUFHIrB4xm40mL6xuQ8a2lvZIgPq
+ LOOH4iwIZjkA==
 X-IronPort-AV: E=Sophos;i="5.78,354,1599548400"; 
-   d="scan'208";a="360143084"
+   d="scan'208";a="476988121"
 Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.51])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2020 11:58:24 -0800
-Date:   Thu, 19 Nov 2020 19:58:16 +0000
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2020 14:25:28 -0800
+Date:   Thu, 19 Nov 2020 22:25:19 +0000
 From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To:     Julia Lawall <julia.lawall@inria.fr>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
@@ -43,33 +43,32 @@ Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         qat-linux@intel.com, Denis Efremov <efremov@linux.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         kbuild-all@lists.01.org
-Subject: Re: [PATCH] crypto: qat - fix excluded_middle.cocci warnings
-Message-ID: <20201119195816.GA131726@silpixa00400314>
+Subject: [PATCH RESEND] crypto: qat - fix excluded_middle.cocci warnings
+Message-ID: <20201119222519.GA138362@silpixa00400314>
 References: <alpine.DEB.2.22.394.2011131811110.2840@hadrien>
+ <20201119195816.GA131726@silpixa00400314>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.22.394.2011131811110.2840@hadrien>
+In-Reply-To: <20201119195816.GA131726@silpixa00400314>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 13, 2020 at 06:14:00PM +0100, Julia Lawall wrote:
-> From: kernel test robot <lkp@intel.com>
+On Thu, Nov 19, 2020 at 07:58:16PM +0000, Giovanni Cabiddu wrote:
+> On Fri, Nov 13, 2020 at 06:14:00PM +0100, Julia Lawall wrote:
+> > From: kernel test robot <lkp@intel.com>
+> > 
+> >  Condition !A || A && B is equivalent to !A || B.
+> A similar change was submitted and discussed some time ago:
+> https://patchwork.kernel.org/project/linux-crypto/patch/78b1532c-f8bf-48e4-d0a7-30ea0137d408@huawei.com/
 > 
->  Condition !A || A && B is equivalent to !A || B.
-A similar change was submitted and discussed some time ago:
-https://patchwork.kernel.org/project/linux-crypto/patch/78b1532c-f8bf-48e4-d0a7-30ea0137d408@huawei.com/
-
-The change simplifies the logic but makes the code less readable.
-I added a comment to clarify it.
-
-Regards,
-
--- 
-Giovanni
+> The change simplifies the logic but makes the code less readable.
+> I added a comment to clarify it.
+Resending as it skipped linux-crypto patchwork.
 
 ----8<----
+
 From: kernel test robot <lkp@intel.com>
 Date: Fri, 13 Nov 2020 18:14:00 +0100
 Subject: [PATCH] crypto: qat - fix excluded_middle.cocci warnings
@@ -115,4 +114,3 @@ index 29dc2e3d38ff..4c752eed10fe 100644
  	} else if (accel_dev->is_vf && pf) {
 -- 
 2.28.0
-
