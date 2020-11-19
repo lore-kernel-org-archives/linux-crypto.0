@@ -2,115 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C808C388F9
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Nov 2020 22:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D383BC6379D
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Nov 2020 22:45:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA310208FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Nov 2020 22:25:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78A6A2224D
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Nov 2020 22:45:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="QGVKQ+m6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726466AbgKSWZb (ORCPT
+        id S1726847AbgKSWo4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Nov 2020 17:25:31 -0500
-Received: from mga01.intel.com ([192.55.52.88]:26654 "EHLO mga01.intel.com"
+        Thu, 19 Nov 2020 17:44:56 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34616 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726105AbgKSWZb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Nov 2020 17:25:31 -0500
-IronPort-SDR: jPutyleZCuA5th77TLJg6X7KIpHlwXK2FCV2tBBgt/5ax56cwHGqIDSONaWzwxJVOpXb69pxZJ
- dn0BPXod3ptQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9810"; a="189471936"
-X-IronPort-AV: E=Sophos;i="5.78,354,1599548400"; 
-   d="scan'208";a="189471936"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2020 14:25:30 -0800
-IronPort-SDR: LmGCMt4qb3T1rKgJrsrSNZCnA5fx/qTFRH3Cj7MTclQZhGYUFHIrB4xm40mL6xuQ8a2lvZIgPq
- LOOH4iwIZjkA==
-X-IronPort-AV: E=Sophos;i="5.78,354,1599548400"; 
-   d="scan'208";a="476988121"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.51])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2020 14:25:28 -0800
-Date:   Thu, 19 Nov 2020 22:25:19 +0000
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Julia Lawall <julia.lawall@inria.fr>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        qat-linux@intel.com, Denis Efremov <efremov@linux.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kbuild-all@lists.01.org
-Subject: [PATCH RESEND] crypto: qat - fix excluded_middle.cocci warnings
-Message-ID: <20201119222519.GA138362@silpixa00400314>
-References: <alpine.DEB.2.22.394.2011131811110.2840@hadrien>
- <20201119195816.GA131726@silpixa00400314>
+        id S1726105AbgKSWo4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Nov 2020 17:44:56 -0500
+Received: from sol.localdomain (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2697C22227;
+        Thu, 19 Nov 2020 22:44:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1605825895;
+        bh=OtvJO8yvmIDxhqSkBjQjFoBGFp/nQ39GEQmF1YaXcsE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QGVKQ+m6/Nc+feFugcLakgmc/ol17FoOF5zCFohuHmRT181t/2WKSssYpZMmfnjME
+         syhjfkVUxTyE3BxFf/eBLh8ybjnASTxUTXLKDmXrI7EPmCTq1b5vldIT+GmCbTt5tG
+         bItZtP6k9YNlv16RHGZciUY62Zt6Q4Ml58vVT+EM=
+Date:   Thu, 19 Nov 2020 14:44:53 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Thara Gopinath <thara.gopinath@linaro.org>
+Cc:     agross@kernel.org, bjorn.andersson@linaro.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        robh+dt@kernel.org, sboyd@kernel.org, mturquette@baylibre.com,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-clk@vger.kernel.org
+Subject: Re: [Patch v2 0/6] Enable Qualcomm Crypto Engine on sdm845
+Message-ID: <X7b1ZX5SEMq1PbVN@sol.localdomain>
+References: <20201119155233.3974286-1-thara.gopinath@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201119195816.GA131726@silpixa00400314>
+In-Reply-To: <20201119155233.3974286-1-thara.gopinath@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 19, 2020 at 07:58:16PM +0000, Giovanni Cabiddu wrote:
-> On Fri, Nov 13, 2020 at 06:14:00PM +0100, Julia Lawall wrote:
-> > From: kernel test robot <lkp@intel.com>
-> > 
-> >  Condition !A || A && B is equivalent to !A || B.
-> A similar change was submitted and discussed some time ago:
-> https://patchwork.kernel.org/project/linux-crypto/patch/78b1532c-f8bf-48e4-d0a7-30ea0137d408@huawei.com/
-> 
-> The change simplifies the logic but makes the code less readable.
-> I added a comment to clarify it.
-Resending as it skipped linux-crypto patchwork.
+On Thu, Nov 19, 2020 at 10:52:27AM -0500, Thara Gopinath wrote:
+> Qualcomm crypto engine supports hardware accelerated algorithms for
+> encryption and authentication. Enable support for aes,des,3des encryption
+> algorithms and sha1,sha256, hmac(sha1),hmac(sha256) authentication
+> algorithms on sdm845.The patch series has been tested using the kernel
+> crypto testing module tcrypto.ko.
 
-----8<----
+Can you please test CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y too?  Implementations of
+crypto algorithms shouldn't be enabled unless they are passing all tests.
 
-From: kernel test robot <lkp@intel.com>
-Date: Fri, 13 Nov 2020 18:14:00 +0100
-Subject: [PATCH] crypto: qat - fix excluded_middle.cocci warnings
+Also, did you compare the performance of this hardware to ARMv8 CE?  I thought
+that QCE (at least on other SoCs) isn't very useful because ARMv8 CE is faster.
 
- Condition !A || A && B is equivalent to !A || B.
-
-Generated by: scripts/coccinelle/misc/excluded_middle.cocci
-
-Fixes: b76f0ea01312 ("coccinelle: misc: add excluded_middle.cocci script")
-CC: Denis Efremov <efremov@linux.com>
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Julia Lawall <julia.lawall@inria.fr>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_common/adf_dev_mgr.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/qat/qat_common/adf_dev_mgr.c b/drivers/crypto/qat/qat_common/adf_dev_mgr.c
-index 29dc2e3d38ff..4c752eed10fe 100644
---- a/drivers/crypto/qat/qat_common/adf_dev_mgr.c
-+++ b/drivers/crypto/qat/qat_common/adf_dev_mgr.c
-@@ -151,8 +151,8 @@ int adf_devmgr_add_dev(struct adf_accel_dev *accel_dev,
- 	mutex_lock(&table_lock);
- 	atomic_set(&accel_dev->ref_count, 0);
- 
--	/* PF on host or VF on guest */
--	if (!accel_dev->is_vf || (accel_dev->is_vf && !pf)) {
-+	/* PF on host or VF on guest - optimized to remove redundant is_vf */
-+	if (!accel_dev->is_vf || !pf) {
- 		struct vf_id_map *map;
- 
- 		list_for_each(itr, &accel_table) {
-@@ -248,7 +248,8 @@ void adf_devmgr_rm_dev(struct adf_accel_dev *accel_dev,
- 		       struct adf_accel_dev *pf)
- {
- 	mutex_lock(&table_lock);
--	if (!accel_dev->is_vf || (accel_dev->is_vf && !pf)) {
-+	/* PF on host or VF on guest - optimized to remove redundant is_vf */
-+	if (!accel_dev->is_vf || !pf) {
- 		id_map[accel_dev->accel_id] = 0;
- 		num_devices--;
- 	} else if (accel_dev->is_vf && pf) {
--- 
-2.28.0
+- Eric
