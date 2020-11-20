@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 825EFC5519F
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 06:01:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3955C5519F
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 06:29:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2850422256
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 06:01:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0A5C22256
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 06:29:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725785AbgKTGBi (ORCPT
+        id S1725789AbgKTG2m (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Nov 2020 01:01:38 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:33856 "EHLO fornost.hmeau.com"
+        Fri, 20 Nov 2020 01:28:42 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:33914 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725777AbgKTGBi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Nov 2020 01:01:38 -0500
+        id S1725820AbgKTG2m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Nov 2020 01:28:42 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kfzUB-0006UI-Ky; Fri, 20 Nov 2020 17:01:32 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2020 17:01:31 +1100
-Date:   Fri, 20 Nov 2020 17:01:31 +1100
+        id 1kfzuQ-0006nZ-Ff; Fri, 20 Nov 2020 17:28:39 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2020 17:28:38 +1100
+Date:   Fri, 20 Nov 2020 17:28:38 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LABBE Corentin <clabbe.montjoie@gmail.com>,
-        Aaro Koskinen <aaro.koskinen@iki.fi>
-Subject: [PATCH] crypto: mips/octeon - Fix sparse endianness warnings
-Message-ID: <20201120060131.GA27557@gondor.apana.org.au>
+        Kim Phillips <kim.phillips@freescale.com>,
+        Markus Stockhausen <stockhausen@collogia.de>
+Subject: [PATCH] crypto: powerpc/sha256-spe - Fix sparse endianness warning
+Message-ID: <20201120062838.GA18874@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -39,56 +39,23 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch fixes a number of endianness warnings in the mips/octeon
-code.
+This patch fixes a sparse endianness warning in sha256-spe.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/arch/mips/cavium-octeon/crypto/octeon-crypto.h b/arch/mips/cavium-octeon/crypto/octeon-crypto.h
-index 7315cc307397..cb68f9e284bb 100644
---- a/arch/mips/cavium-octeon/crypto/octeon-crypto.h
-+++ b/arch/mips/cavium-octeon/crypto/octeon-crypto.h
-@@ -41,7 +41,7 @@ do {							\
-  */
- #define read_octeon_64bit_hash_dword(index)		\
- ({							\
--	u64 __value;					\
-+	__be64 __value;					\
- 							\
- 	__asm__ __volatile__ (				\
- 	"dmfc2 %[rt],0x0048+" STR(index)		\
-diff --git a/arch/mips/cavium-octeon/crypto/octeon-md5.c b/arch/mips/cavium-octeon/crypto/octeon-md5.c
-index 8c8ea139653e..5ee4ade99b99 100644
---- a/arch/mips/cavium-octeon/crypto/octeon-md5.c
-+++ b/arch/mips/cavium-octeon/crypto/octeon-md5.c
-@@ -68,10 +68,11 @@ static int octeon_md5_init(struct shash_desc *desc)
+diff --git a/arch/powerpc/crypto/sha256-spe-glue.c b/arch/powerpc/crypto/sha256-spe-glue.c
+index 88530ae0791f..a6e650a97d8f 100644
+--- a/arch/powerpc/crypto/sha256-spe-glue.c
++++ b/arch/powerpc/crypto/sha256-spe-glue.c
+@@ -177,7 +177,7 @@ static int ppc_spe_sha256_final(struct shash_desc *desc, u8 *out)
+ 
+ static int ppc_spe_sha224_final(struct shash_desc *desc, u8 *out)
  {
- 	struct md5_state *mctx = shash_desc_ctx(desc);
+-	u32 D[SHA256_DIGEST_SIZE >> 2];
++	__be32 D[SHA256_DIGEST_SIZE >> 2];
+ 	__be32 *dst = (__be32 *)out;
  
--	mctx->hash[0] = cpu_to_le32(MD5_H0);
--	mctx->hash[1] = cpu_to_le32(MD5_H1);
--	mctx->hash[2] = cpu_to_le32(MD5_H2);
--	mctx->hash[3] = cpu_to_le32(MD5_H3);
-+	mctx->hash[0] = MD5_H0;
-+	mctx->hash[1] = MD5_H1;
-+	mctx->hash[2] = MD5_H2;
-+	mctx->hash[3] = MD5_H3;
-+	cpu_to_le32_array(mctx->hash, 4);
- 	mctx->byte_count = 0;
- 
- 	return 0;
-@@ -139,8 +140,9 @@ static int octeon_md5_final(struct shash_desc *desc, u8 *out)
- 	}
- 
- 	memset(p, 0, padding);
--	mctx->block[14] = cpu_to_le32(mctx->byte_count << 3);
--	mctx->block[15] = cpu_to_le32(mctx->byte_count >> 29);
-+	mctx->block[14] = mctx->byte_count << 3;
-+	mctx->block[15] = mctx->byte_count >> 29;
-+	cpu_to_le32_array(mctx->block + 14, 2);
- 	octeon_md5_transform(mctx->block);
- 
- 	octeon_md5_read_hash(mctx);
+ 	ppc_spe_sha256_final(desc, (u8 *)D);
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
