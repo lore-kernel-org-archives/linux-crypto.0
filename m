@@ -7,82 +7,88 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D964CC5519F
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 03:45:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 825EFC5519F
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 06:01:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1A4C20BED
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 03:45:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2850422256
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 06:01:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726282AbgKTDop (ORCPT
+        id S1725785AbgKTGBi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Nov 2020 22:44:45 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:33432 "EHLO fornost.hmeau.com"
+        Fri, 20 Nov 2020 01:01:38 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:33856 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726122AbgKTDoo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Nov 2020 22:44:44 -0500
+        id S1725777AbgKTGBi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Nov 2020 01:01:38 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kfxLk-0005FP-Tc; Fri, 20 Nov 2020 14:44:42 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2020 14:44:40 +1100
-Date:   Fri, 20 Nov 2020 14:44:40 +1100
+        id 1kfzUB-0006UI-Ky; Fri, 20 Nov 2020 17:01:32 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2020 17:01:31 +1100
+Date:   Fri, 20 Nov 2020 17:01:31 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, ebiggers@kernel.org
-Subject: Re: [PATCH 2/3] crypto: tcrypt - permit tcrypt.ko to be builtin
-Message-ID: <20201120034440.GA18047@gondor.apana.org.au>
-References: <20201109083143.2884-1-ardb@kernel.org>
- <20201109083143.2884-3-ardb@kernel.org>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LABBE Corentin <clabbe.montjoie@gmail.com>,
+        Aaro Koskinen <aaro.koskinen@iki.fi>
+Subject: [PATCH] crypto: mips/octeon - Fix sparse endianness warnings
+Message-ID: <20201120060131.GA27557@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201109083143.2884-3-ardb@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Nov 09, 2020 at 09:31:42AM +0100, Ard Biesheuvel wrote:
-> When working on crypto algorithms, being able to run tcrypt quickly
-> without booting an entire Linux installation can be very useful. For
-> instance, QEMU/kvm can be used to boot a kernel from the command line,
-> and having tcrypt.ko builtin would allow tcrypt to be executed to run
-> benchmarks, or to run tests for algortithms that need to be instantiated
-> from templates, without the need to make it past the point where the
-> rootfs is mounted.
-> 
-> So let's relax the requirement that tcrypt can only be built as a
-> module when CRYPTO_MANAGER_EXTRA_TESTS is enabled, as this is already
-> documented as a crypto development-only symbol.
-> 
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  crypto/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 094ef56ab7b4..9ff2d687e334 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -201,7 +201,7 @@ config CRYPTO_AUTHENC
->  
->  config CRYPTO_TEST
->  	tristate "Testing module"
-> -	depends on m
-> +	depends on m || CRYPTO_MANAGER_EXTRA_TESTS
->  	select CRYPTO_MANAGER
->  	help
->  	  Quick & dirty crypto test module.
+This patch fixes a number of endianness warnings in the mips/octeon
+code.
 
-This breaks the build:
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-crypto/Kconfig:150:error: recursive dependency detected!
-crypto/Kconfig:150:     symbol CRYPTO_MANAGER_EXTRA_TESTS depends on CRYPTO_MANAGER
-crypto/Kconfig:119:     symbol CRYPTO_MANAGER is selected by CRYPTO_TEST
-crypto/Kconfig:206:     symbol CRYPTO_TEST depends on CRYPTO_MANAGER_EXTRA_TESTS
-For a resolution refer to Documentation/kbuild/kconfig-language.rst
-subsection "Kconfig recursive dependency limitations"
-
-Cheers,
+diff --git a/arch/mips/cavium-octeon/crypto/octeon-crypto.h b/arch/mips/cavium-octeon/crypto/octeon-crypto.h
+index 7315cc307397..cb68f9e284bb 100644
+--- a/arch/mips/cavium-octeon/crypto/octeon-crypto.h
++++ b/arch/mips/cavium-octeon/crypto/octeon-crypto.h
+@@ -41,7 +41,7 @@ do {							\
+  */
+ #define read_octeon_64bit_hash_dword(index)		\
+ ({							\
+-	u64 __value;					\
++	__be64 __value;					\
+ 							\
+ 	__asm__ __volatile__ (				\
+ 	"dmfc2 %[rt],0x0048+" STR(index)		\
+diff --git a/arch/mips/cavium-octeon/crypto/octeon-md5.c b/arch/mips/cavium-octeon/crypto/octeon-md5.c
+index 8c8ea139653e..5ee4ade99b99 100644
+--- a/arch/mips/cavium-octeon/crypto/octeon-md5.c
++++ b/arch/mips/cavium-octeon/crypto/octeon-md5.c
+@@ -68,10 +68,11 @@ static int octeon_md5_init(struct shash_desc *desc)
+ {
+ 	struct md5_state *mctx = shash_desc_ctx(desc);
+ 
+-	mctx->hash[0] = cpu_to_le32(MD5_H0);
+-	mctx->hash[1] = cpu_to_le32(MD5_H1);
+-	mctx->hash[2] = cpu_to_le32(MD5_H2);
+-	mctx->hash[3] = cpu_to_le32(MD5_H3);
++	mctx->hash[0] = MD5_H0;
++	mctx->hash[1] = MD5_H1;
++	mctx->hash[2] = MD5_H2;
++	mctx->hash[3] = MD5_H3;
++	cpu_to_le32_array(mctx->hash, 4);
+ 	mctx->byte_count = 0;
+ 
+ 	return 0;
+@@ -139,8 +140,9 @@ static int octeon_md5_final(struct shash_desc *desc, u8 *out)
+ 	}
+ 
+ 	memset(p, 0, padding);
+-	mctx->block[14] = cpu_to_le32(mctx->byte_count << 3);
+-	mctx->block[15] = cpu_to_le32(mctx->byte_count >> 29);
++	mctx->block[14] = mctx->byte_count << 3;
++	mctx->block[15] = mctx->byte_count >> 29;
++	cpu_to_le32_array(mctx->block + 14, 2);
+ 	octeon_md5_transform(mctx->block);
+ 
+ 	octeon_md5_read_hash(mctx);
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
