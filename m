@@ -7,30 +7,28 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3955C5519F
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 06:29:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26DCAC5519F
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 06:41:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A0A5C22256
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 06:29:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5A3E2222F
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 06:41:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725789AbgKTG2m (ORCPT
+        id S1725940AbgKTGl3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Nov 2020 01:28:42 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:33914 "EHLO fornost.hmeau.com"
+        Fri, 20 Nov 2020 01:41:29 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:34084 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725820AbgKTG2m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Nov 2020 01:28:42 -0500
+        id S1725824AbgKTGl3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Nov 2020 01:41:29 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kfzuQ-0006nZ-Ff; Fri, 20 Nov 2020 17:28:39 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2020 17:28:38 +1100
-Date:   Fri, 20 Nov 2020 17:28:38 +1100
+        id 1kg06o-00077d-NY; Fri, 20 Nov 2020 17:41:27 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2020 17:41:26 +1100
+Date:   Fri, 20 Nov 2020 17:41:26 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Kim Phillips <kim.phillips@freescale.com>,
-        Markus Stockhausen <stockhausen@collogia.de>
-Subject: [PATCH] crypto: powerpc/sha256-spe - Fix sparse endianness warning
-Message-ID: <20201120062838.GA18874@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: sparc - Fix sparse endianness warnings
+Message-ID: <20201120064126.GA28499@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -39,23 +37,43 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch fixes a sparse endianness warning in sha256-spe.
+This patch fixes a coulpe of sparse endianness warnings.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/arch/powerpc/crypto/sha256-spe-glue.c b/arch/powerpc/crypto/sha256-spe-glue.c
-index 88530ae0791f..a6e650a97d8f 100644
---- a/arch/powerpc/crypto/sha256-spe-glue.c
-+++ b/arch/powerpc/crypto/sha256-spe-glue.c
-@@ -177,7 +177,7 @@ static int ppc_spe_sha256_final(struct shash_desc *desc, u8 *out)
+diff --git a/arch/sparc/crypto/crc32c_glue.c b/arch/sparc/crypto/crc32c_glue.c
+index 4e9323229e71..82efb7f81c28 100644
+--- a/arch/sparc/crypto/crc32c_glue.c
++++ b/arch/sparc/crypto/crc32c_glue.c
+@@ -35,7 +35,7 @@ static int crc32c_sparc64_setkey(struct crypto_shash *hash, const u8 *key,
  
- static int ppc_spe_sha224_final(struct shash_desc *desc, u8 *out)
+ 	if (keylen != sizeof(u32))
+ 		return -EINVAL;
+-	*(__le32 *)mctx = le32_to_cpup((__le32 *)key);
++	*mctx = le32_to_cpup((__le32 *)key);
+ 	return 0;
+ }
+ 
+diff --git a/arch/sparc/crypto/md5_glue.c b/arch/sparc/crypto/md5_glue.c
+index 111283fe837e..511db98d590a 100644
+--- a/arch/sparc/crypto/md5_glue.c
++++ b/arch/sparc/crypto/md5_glue.c
+@@ -33,10 +33,11 @@ static int md5_sparc64_init(struct shash_desc *desc)
  {
--	u32 D[SHA256_DIGEST_SIZE >> 2];
-+	__be32 D[SHA256_DIGEST_SIZE >> 2];
- 	__be32 *dst = (__be32 *)out;
+ 	struct md5_state *mctx = shash_desc_ctx(desc);
  
- 	ppc_spe_sha256_final(desc, (u8 *)D);
+-	mctx->hash[0] = cpu_to_le32(MD5_H0);
+-	mctx->hash[1] = cpu_to_le32(MD5_H1);
+-	mctx->hash[2] = cpu_to_le32(MD5_H2);
+-	mctx->hash[3] = cpu_to_le32(MD5_H3);
++	mctx->hash[0] = MD5_H0;
++	mctx->hash[1] = MD5_H1;
++	mctx->hash[2] = MD5_H2;
++	mctx->hash[3] = MD5_H3;
++	le32_to_cpu_array(mctx->hash, 4);
+ 	mctx->byte_count = 0;
+ 
+ 	return 0;
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
