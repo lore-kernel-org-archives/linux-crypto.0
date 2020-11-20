@@ -7,53 +7,59 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A7E3C5519F
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 06:58:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13E2AC56201
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 06:59:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2530F22240
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 06:58:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB0B522240
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Nov 2020 06:59:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726255AbgKTG6x (ORCPT
+        id S1726325AbgKTG7Q (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Nov 2020 01:58:53 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:34250 "EHLO fornost.hmeau.com"
+        Fri, 20 Nov 2020 01:59:16 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:34268 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726094AbgKTG6x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Nov 2020 01:58:53 -0500
+        id S1726297AbgKTG7P (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Nov 2020 01:59:15 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kg0Nc-0007mB-3f; Fri, 20 Nov 2020 17:58:49 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2020 17:58:48 +1100
-Date:   Fri, 20 Nov 2020 17:58:48 +1100
+        id 1kg0Nj-0007mN-I4; Fri, 20 Nov 2020 17:58:56 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2020 17:58:55 +1100
+Date:   Fri, 20 Nov 2020 17:58:55 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Colin King <colin.king@canonical.com>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] crypto: fix a couple of spelling mistakes in Kconfig
- files
-Message-ID: <20201120065847.GH20581@gondor.apana.org.au>
-References: <20201114121227.416572-1-colin.king@canonical.com>
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     dan.carpenter@oracle.com, davem@davemloft.net,
+        jernej.skrabec@siol.net, mripard@kernel.org, wens@csie.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: allwinner: sun8i-ce: fix two error path's memory
+ leak
+Message-ID: <20201120065855.GI20581@gondor.apana.org.au>
+References: <20201115190807.12251-1-clabbe@baylibre.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201114121227.416572-1-colin.king@canonical.com>
+In-Reply-To: <20201115190807.12251-1-clabbe@baylibre.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Nov 14, 2020 at 12:12:27PM +0000, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
+On Sun, Nov 15, 2020 at 07:08:07PM +0000, Corentin Labbe wrote:
+> This patch fixes the following smatch warnings:
+> drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c:412
+> sun8i_ce_hash_run() warn: possible memory leak of 'result'
+> Note: "buf" is leaked as well.
 > 
-> There are a couple of spelling mistakes in two crypto Kconfig files.
-> Fix these.
+> Furthermore, in case of ENOMEM, crypto_finalize_hash_request() was not
+> called which was an error.
 > 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> Fixes: 56f6d5aee88d ("crypto: sun8i-ce - support hash algorithms")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 > ---
->  drivers/crypto/Kconfig           | 2 +-
->  drivers/crypto/allwinner/Kconfig | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  .../crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 20 +++++++++++--------
+>  1 file changed, 12 insertions(+), 8 deletions(-)
 
 Patch applied.  Thanks.
 -- 
