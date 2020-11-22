@@ -2,83 +2,212 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63F83C56202
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Nov 2020 03:23:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CE0C5519F
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Nov 2020 07:52:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1625D20786
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Nov 2020 03:23:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BCb+FFzp"
+	by mail.kernel.org (Postfix) with ESMTP id 765072078E
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Nov 2020 07:52:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726959AbgKVDXe (ORCPT
+        id S1726461AbgKVHwC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 21 Nov 2020 22:23:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33526 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726544AbgKVDXe (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 21 Nov 2020 22:23:34 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9E05C0613CF;
-        Sat, 21 Nov 2020 19:23:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=t7P1qjxLtvKyLv5lupmc5Zc5j0L3lqaoBXMlGIL9vWk=; b=BCb+FFzpwYCsAL5/GuZs0qQqU7
-        2wigu715rAloO1MXfHFDjsI/DCCkjrJ0RLz4Myz+wD98+zNWw6243kPWNzvqzMn6Tn8JVpmOuQv+x
-        7EKe3xartwVOhq4ran1ZhW92oaIukRN20h1OI3pPMusUrtae1AY4TqDUCPUPtiDgxz6eQOoVcrvcz
-        Ara6lCihfF7KrYMxKPcv522GOw1XE7kmR9pLBWd69WCJIf1380JdPIessAMMrwuE8sqCmQUL7YEHL
-        BXN0W+EBw/mKx6JrVL7roopk6K2PnHDj+T1EiV35semdke1klNMJQXZf1Gvzraa/TLsC310jvDxAq
-        zJ5cWKdw==;
-Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kgfxw-0001fc-2G; Sun, 22 Nov 2020 03:23:04 +0000
-Date:   Sun, 22 Nov 2020 03:23:04 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     trix@redhat.com
-Cc:     joe@perches.com, clang-built-linux@googlegroups.com,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        xen-devel@lists.xenproject.org, tboot-devel@lists.sourceforge.net,
-        kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-acpi@vger.kernel.org, devel@acpica.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, netdev@vger.kernel.org,
-        linux-media@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
-        linux-scsi@vger.kernel.org, linux-wireless@vger.kernel.org,
-        ibm-acpi-devel@lists.sourceforge.net,
-        platform-driver-x86@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-omap@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        ecryptfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        cluster-devel@redhat.com, linux-mtd@lists.infradead.org,
-        keyrings@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, alsa-devel@alsa-project.org,
-        bpf@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-nfs@vger.kernel.org, patches@opensource.cirrus.com
-Subject: Re: [RFC] MAINTAINERS tag for cleanup robot
-Message-ID: <20201122032304.GE4327@casper.infradead.org>
-References: <20201121165058.1644182-1-trix@redhat.com>
+        Sun, 22 Nov 2020 02:52:02 -0500
+Received: from foss.arm.com ([217.140.110.172]:36784 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725978AbgKVHwC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 22 Nov 2020 02:52:02 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AB2CC101E;
+        Sat, 21 Nov 2020 23:52:01 -0800 (PST)
+Received: from e110176-lin.arm.com (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3FA043F718;
+        Sat, 21 Nov 2020 23:52:00 -0800 (PST)
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v3] crypto: ccree - rework cache parameters handling
+Date:   Sun, 22 Nov 2020 09:51:53 +0200
+Message-Id: <20201122075154.20478-1-gilad@benyossef.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201121165058.1644182-1-trix@redhat.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Nov 21, 2020 at 08:50:58AM -0800, trix@redhat.com wrote:
-> The fixer review is
-> https://reviews.llvm.org/D91789
-> 
-> A run over allyesconfig for x86_64 finds 62 issues, 5 are false positives.
-> The false positives are caused by macros passed to other macros and by
-> some macro expansions that did not have an extra semicolon.
-> 
-> This cleans up about 1,000 of the current 10,000 -Wextra-semi-stmt
-> warnings in linux-next.
+Rework the setting of DMA cache parameters, program more appropriate
+values and explicitly set sharability domain.
 
-Are any of them not false-positives?  It's all very well to enable
-stricter warnings, but if they don't fix any bugs, they're just churn.
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+---
+
+Changes from previous versions:
+- After discussion with Rob H., drop notion of setting the parameters
+  from device tree and just use good defaults for cached/non cached.
+
+ drivers/crypto/ccree/cc_driver.c | 75 +++++++++++++++++++++++++-------
+ drivers/crypto/ccree/cc_driver.h |  6 +--
+ drivers/crypto/ccree/cc_pm.c     |  2 +-
+ 3 files changed, 63 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
+index 6f519d3e896c..d0e59e942568 100644
+--- a/drivers/crypto/ccree/cc_driver.c
++++ b/drivers/crypto/ccree/cc_driver.c
+@@ -100,6 +100,57 @@ static const struct of_device_id arm_ccree_dev_of_match[] = {
+ };
+ MODULE_DEVICE_TABLE(of, arm_ccree_dev_of_match);
+ 
++static void init_cc_cache_params(struct cc_drvdata *drvdata)
++{
++	struct device *dev = drvdata_to_dev(drvdata);
++	u32 cache_params, ace_const, val, mask;
++
++	/* compute CC_AXIM_CACHE_PARAMS */
++	cache_params = cc_ioread(drvdata, CC_REG(AXIM_CACHE_PARAMS));
++	dev_dbg(dev, "Cache params previous: 0x%08X\n", cache_params);
++
++	/* non cached or write-back, write allocate */
++	val = drvdata->coherent ? 0xb : 0x2;
++
++	mask = CC_GENMASK(CC_AXIM_CACHE_PARAMS_AWCACHE);
++	cache_params &= ~mask;
++	cache_params |= FIELD_PREP(mask, val);
++
++	mask = CC_GENMASK(CC_AXIM_CACHE_PARAMS_AWCACHE_LAST);
++	cache_params &= ~mask;
++	cache_params |= FIELD_PREP(mask, val);
++
++	mask = CC_GENMASK(CC_AXIM_CACHE_PARAMS_ARCACHE);
++	cache_params &= ~mask;
++	cache_params |= FIELD_PREP(mask, val);
++
++	drvdata->cache_params = cache_params;
++
++	dev_dbg(dev, "Cache params current: 0x%08X\n", cache_params);
++
++	if (drvdata->hw_rev <= CC_HW_REV_710)
++		return;
++
++	/* compute CC_AXIM_ACE_CONST */
++	ace_const = cc_ioread(drvdata, CC_REG(AXIM_ACE_CONST));
++	dev_dbg(dev, "ACE-const previous: 0x%08X\n", ace_const);
++
++	/* system or outer-sharable */
++	val = drvdata->coherent ? 0x2 : 0x3;
++
++	mask = CC_GENMASK(CC_AXIM_ACE_CONST_ARDOMAIN);
++	ace_const &= ~mask;
++	ace_const |= FIELD_PREP(mask, val);
++
++	mask = CC_GENMASK(CC_AXIM_ACE_CONST_AWDOMAIN);
++	ace_const &= ~mask;
++	ace_const |= FIELD_PREP(mask, val);
++
++	dev_dbg(dev, "ACE-const current: 0x%08X\n", ace_const);
++
++	drvdata->ace_const = ace_const;
++}
++
+ static u32 cc_read_idr(struct cc_drvdata *drvdata, const u32 *idr_offsets)
+ {
+ 	int i;
+@@ -218,9 +269,9 @@ bool cc_wait_for_reset_completion(struct cc_drvdata *drvdata)
+ 	return false;
+ }
+ 
+-int init_cc_regs(struct cc_drvdata *drvdata, bool is_probe)
++int init_cc_regs(struct cc_drvdata *drvdata)
+ {
+-	unsigned int val, cache_params;
++	unsigned int val;
+ 	struct device *dev = drvdata_to_dev(drvdata);
+ 
+ 	/* Unmask all AXI interrupt sources AXI_CFG1 register   */
+@@ -245,19 +296,9 @@ int init_cc_regs(struct cc_drvdata *drvdata, bool is_probe)
+ 
+ 	cc_iowrite(drvdata, CC_REG(HOST_IMR), ~val);
+ 
+-	cache_params = (drvdata->coherent ? CC_COHERENT_CACHE_PARAMS : 0x0);
+-
+-	val = cc_ioread(drvdata, CC_REG(AXIM_CACHE_PARAMS));
+-
+-	if (is_probe)
+-		dev_dbg(dev, "Cache params previous: 0x%08X\n", val);
+-
+-	cc_iowrite(drvdata, CC_REG(AXIM_CACHE_PARAMS), cache_params);
+-	val = cc_ioread(drvdata, CC_REG(AXIM_CACHE_PARAMS));
+-
+-	if (is_probe)
+-		dev_dbg(dev, "Cache params current: 0x%08X (expect: 0x%08X)\n",
+-			val, cache_params);
++	cc_iowrite(drvdata, CC_REG(AXIM_CACHE_PARAMS), drvdata->cache_params);
++	if (drvdata->hw_rev >= CC_HW_REV_712)
++		cc_iowrite(drvdata, CC_REG(AXIM_ACE_CONST), drvdata->ace_const);
+ 
+ 	return 0;
+ }
+@@ -445,7 +486,9 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	}
+ 	dev_dbg(dev, "Registered to IRQ: %d\n", irq);
+ 
+-	rc = init_cc_regs(new_drvdata, true);
++	init_cc_cache_params(new_drvdata);
++
++	rc = init_cc_regs(new_drvdata);
+ 	if (rc) {
+ 		dev_err(dev, "init_cc_regs failed\n");
+ 		goto post_pm_err;
+diff --git a/drivers/crypto/ccree/cc_driver.h b/drivers/crypto/ccree/cc_driver.h
+index af77b2020350..12cd68d59baa 100644
+--- a/drivers/crypto/ccree/cc_driver.h
++++ b/drivers/crypto/ccree/cc_driver.h
+@@ -49,8 +49,6 @@ enum cc_std_body {
+ 	CC_STD_ALL = 0x3
+ };
+ 
+-#define CC_COHERENT_CACHE_PARAMS 0xEEE
+-
+ #define CC_PINS_FULL	0x0
+ #define CC_PINS_SLIM	0x9F
+ 
+@@ -155,6 +153,8 @@ struct cc_drvdata {
+ 	int std_bodies;
+ 	bool sec_disabled;
+ 	u32 comp_mask;
++	u32 cache_params;
++	u32 ace_const;
+ };
+ 
+ struct cc_crypto_alg {
+@@ -205,7 +205,7 @@ static inline void dump_byte_array(const char *name, const u8 *the_array,
+ }
+ 
+ bool cc_wait_for_reset_completion(struct cc_drvdata *drvdata);
+-int init_cc_regs(struct cc_drvdata *drvdata, bool is_probe);
++int init_cc_regs(struct cc_drvdata *drvdata);
+ void fini_cc_regs(struct cc_drvdata *drvdata);
+ unsigned int cc_get_default_hash_len(struct cc_drvdata *drvdata);
+ 
+diff --git a/drivers/crypto/ccree/cc_pm.c b/drivers/crypto/ccree/cc_pm.c
+index 3c65bf070c90..d5421b0c6831 100644
+--- a/drivers/crypto/ccree/cc_pm.c
++++ b/drivers/crypto/ccree/cc_pm.c
+@@ -45,7 +45,7 @@ static int cc_pm_resume(struct device *dev)
+ 	}
+ 
+ 	cc_iowrite(drvdata, CC_REG(HOST_POWER_DOWN_EN), POWER_DOWN_DISABLE);
+-	rc = init_cc_regs(drvdata, false);
++	rc = init_cc_regs(drvdata);
+ 	if (rc) {
+ 		dev_err(dev, "init_cc_regs (%x)\n", rc);
+ 		return rc;
+-- 
+2.29.2
+
