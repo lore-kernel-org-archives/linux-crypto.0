@@ -2,191 +2,161 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C2CCC8302C
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Nov 2020 16:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60F35C63777
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Nov 2020 17:07:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F07E62073C
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Nov 2020 16:33:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 122802083E
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Nov 2020 17:07:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="taYTQdLW";
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="taYTQdLW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gOQnORTb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389981AbgKWQc1 (ORCPT
+        id S1733067AbgKWRGQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 Nov 2020 11:32:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36830 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730953AbgKWQbg (ORCPT
+        Mon, 23 Nov 2020 12:06:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50014 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2388111AbgKWRGO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Nov 2020 11:31:36 -0500
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0C8FC0613CF;
-        Mon, 23 Nov 2020 08:31:35 -0800 (PST)
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 7AB3012808F4;
-        Mon, 23 Nov 2020 08:31:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1606149095;
-        bh=+IhPqZ/v6VfDyyXzj4lMu9axEsbedJZyqBpFfwsfG+g=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=taYTQdLWt1uKXwIt/3Ve/mEupTdq+Wcpdv+UXp5WQMTWxY34l98m0qHLcdAiwuo2t
-         gwBg46qri78QHRql74q8THMzP+7WPx9XqttvrPch20gBcYUMT4pLXQarcLhIoin1Gp
-         Z+ziweydBKwdaV8ZmrW12X55c5G6vUR8Kiznotik=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id a5HoKkemyWLj; Mon, 23 Nov 2020 08:31:35 -0800 (PST)
-Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:600:8280:66d1::527])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 9FAA112808A8;
-        Mon, 23 Nov 2020 08:31:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1606149095;
-        bh=+IhPqZ/v6VfDyyXzj4lMu9axEsbedJZyqBpFfwsfG+g=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=taYTQdLWt1uKXwIt/3Ve/mEupTdq+Wcpdv+UXp5WQMTWxY34l98m0qHLcdAiwuo2t
-         gwBg46qri78QHRql74q8THMzP+7WPx9XqttvrPch20gBcYUMT4pLXQarcLhIoin1Gp
-         Z+ziweydBKwdaV8ZmrW12X55c5G6vUR8Kiznotik=
-Message-ID: <8f5611bb015e044fa1c0a48147293923c2d904e4.camel@HansenPartnership.com>
-Subject: Re: [Intel-wired-lan] [PATCH 000/141] Fix fall-through warnings for
- Clang
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     Joe Perches <joe@perches.com>, Kees Cook <keescook@chromium.org>,
-        Jakub Kicinski <kuba@kernel.org>, alsa-devel@alsa-project.org,
-        linux-atm-general@lists.sourceforge.net,
-        reiserfs-devel@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        linux-ide@vger.kernel.org, dm-devel@redhat.com,
-        keyrings@vger.kernel.org, linux-mtd@lists.infradead.org,
-        GR-everest-linux-l2@marvell.com, wcn36xx@lists.infradead.org,
-        samba-technical@lists.samba.org, linux-i3c@lists.infradead.org,
-        linux1394-devel@lists.sourceforge.net,
-        linux-afs@lists.infradead.org,
-        usb-storage@lists.one-eyed-alien.net, drbd-dev@lists.linbit.com,
-        devel@driverdev.osuosl.org, linux-cifs@vger.kernel.org,
-        rds-devel@oss.oracle.com,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-scsi@vger.kernel.org, linux-rdma@vger.kernel.org,
-        oss-drivers@netronome.com, bridge@lists.linux-foundation.org,
-        linux-security-module@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org,
-        linux-stm32@st-md-mailman.stormreply.com, cluster-devel@redhat.com,
-        linux-acpi@vger.kernel.org, coreteam@netfilter.org,
-        intel-wired-lan@lists.osuosl.org, linux-input@vger.kernel.org,
-        Miguel Ojeda <ojeda@kernel.org>,
-        tipc-discussion@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        selinux@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, linux-geode@lists.infradead.org,
-        linux-can@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-gpio@vger.kernel.org, op-tee@lists.trustedfirmware.org,
-        linux-mediatek@lists.infradead.org, xen-devel@lists.xenproject.org,
-        nouveau@lists.freedesktop.org, linux-hams@vger.kernel.org,
-        ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-arm-kernel@lists.infradead.org, linux-hwmon@vger.kernel.org,
-        x86@kernel.org, linux-nfs@vger.kernel.org,
-        GR-Linux-NIC-Dev@marvell.com, linux-mm@kvack.org,
-        netdev@vger.kernel.org, linux-decnet-user@lists.sourceforge.net,
-        linux-mmc@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-        linux-sctp@vger.kernel.org, linux-usb@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        patches@opensource.cirrus.com, linux-integrity@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-hardening@vger.kernel.org,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Greg KH <gregkh@linuxfoundation.org>
-Date:   Mon, 23 Nov 2020 08:31:30 -0800
-In-Reply-To: <20201123130348.GA3119@embeddedor>
-References: <cover.1605896059.git.gustavoars@kernel.org>
-         <20201120105344.4345c14e@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-         <202011201129.B13FDB3C@keescook>
-         <20201120115142.292999b2@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-         <202011220816.8B6591A@keescook>
-         <9b57fd4914b46f38d54087d75e072d6e947cb56d.camel@HansenPartnership.com>
-         <ca071decb87cc7e905411423c05a48f9fd2f58d7.camel@perches.com>
-         <0147972a72bc13f3629de8a32dee6f1f308994b5.camel@HansenPartnership.com>
-         <d8d1e9add08cdd4158405e77762d4946037208f8.camel@perches.com>
-         <dbd2cb703ed9eefa7dde9281ea26ab0f7acc8afe.camel@HansenPartnership.com>
-         <20201123130348.GA3119@embeddedor>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
+        Mon, 23 Nov 2020 12:06:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606151173;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ETdBmUCF01QVQJOZ+sQu9TUGQeVKu9xOEmE1E5gBvfU=;
+        b=gOQnORTbcgQjBtBdCY6Aov3rN/rI65WW6qTLLDb3lQ8k/Ph/zOmfpDnexofSKODImkyVjO
+        XZWW1wplF/Mko4cc9tR8cO6Huf2JaRgH4V2Ic3TB6IOOPxELNLSkMWuYMZDz2hrOpKYLUx
+        J043lYhf6HIt0YH7TXlNav1ywXU085Y=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-100-GTNSK9-kOxq-g1mo-tQwVg-1; Mon, 23 Nov 2020 12:06:09 -0500
+X-MC-Unique: GTNSK9-kOxq-g1mo-tQwVg-1
+Received: by mail-qv1-f69.google.com with SMTP id r5so10054957qvr.15
+        for <linux-crypto@vger.kernel.org>; Mon, 23 Nov 2020 09:06:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=ETdBmUCF01QVQJOZ+sQu9TUGQeVKu9xOEmE1E5gBvfU=;
+        b=rAee7dS35loCxl3szbNCsqffpbqV8ganUVMI3p8LVWRk9MwnZr2EAPA6k7+wH0/XBH
+         3rFCYuYEMbhY5jVKmd9zr+Rx3pepafBxrRefX2nry81QBCw7bkh5CxHzUXJ5lJue9Vz6
+         3CyO7LOUQIIq/Ddva655ZldzJiIVJQeBizxk8l1UFQ4vxlVNpuFvuWsgzZrZBFbdTa8O
+         4e8/1nHYM0byJkCIeIzYpiLxNftK3IvXGFlINGSdiBuMHPrWS7tML48ZFkwMq11gHEg6
+         H7+2aSkjTbKGS2u7mHE2l0sTAOoCv7DXR38vhSsTceDacPxo4HjL1izmjkFwK8mlsybV
+         x44g==
+X-Gm-Message-State: AOAM533RIYsWZnHX742TNnwwWVGHoCtOAqjEJ5F2PlQeb3L1lt/JPpTF
+        3OTTCL6UPfqUDfXGo1j+TgsppPisyVgHugcCS0f8KrORhZV6oHRiXPf8R7WzLWUenhUnxlhTole
+        Tti2kKGdL6MXUgeC41qdfx58r
+X-Received: by 2002:ac8:5d53:: with SMTP id g19mr70893qtx.354.1606151168832;
+        Mon, 23 Nov 2020 09:06:08 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwHR8oVpP3xv7xpCkK6lH4mawBfXgRI3GL2dEiLGp13/vfLrDKV7SBtsWnvpv2iFDtHltekRw==
+X-Received: by 2002:ac8:5d53:: with SMTP id g19mr70839qtx.354.1606151168572;
+        Mon, 23 Nov 2020 09:06:08 -0800 (PST)
+Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
+        by smtp.gmail.com with ESMTPSA id o187sm10226153qkb.120.2020.11.23.09.06.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Nov 2020 09:06:07 -0800 (PST)
+Subject: Re: [RFC] MAINTAINERS tag for cleanup robot
+To:     Joe Perches <joe@perches.com>, clang-built-linux@googlegroups.com
+Cc:     linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        xen-devel@lists.xenproject.org, tboot-devel@lists.sourceforge.net,
+        kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-acpi@vger.kernel.org, devel@acpica.org,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, netdev@vger.kernel.org,
+        linux-media@vger.kernel.org, MPT-FusionLinux.pdl@broadcom.com,
+        linux-scsi@vger.kernel.org, linux-wireless@vger.kernel.org,
+        ibm-acpi-devel@lists.sourceforge.net,
+        platform-driver-x86@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-omap@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        ecryptfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        cluster-devel@redhat.com, linux-mtd@lists.infradead.org,
+        keyrings@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, alsa-devel@alsa-project.org,
+        bpf@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-nfs@vger.kernel.org, patches@opensource.cirrus.com
+References: <20201121165058.1644182-1-trix@redhat.com>
+ <2105f0c05e9eae8bee8e17dcc5314474b3c0bc73.camel@perches.com>
+ <6e8c1926-4209-8f10-d0f9-72c875a85a88@redhat.com>
+ <859bae8ddae3238116824192f6ddf1c91a381913.camel@perches.com>
+From:   Tom Rix <trix@redhat.com>
+Message-ID: <88eeba27-ee36-df63-8cd9-3cccbe5e0850@redhat.com>
+Date:   Mon, 23 Nov 2020 09:06:03 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
+In-Reply-To: <859bae8ddae3238116824192f6ddf1c91a381913.camel@perches.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2020-11-23 at 07:03 -0600, Gustavo A. R. Silva wrote:
-> On Sun, Nov 22, 2020 at 11:53:55AM -0800, James Bottomley wrote:
-> > On Sun, 2020-11-22 at 11:22 -0800, Joe Perches wrote:
-> > > On Sun, 2020-11-22 at 11:12 -0800, James Bottomley wrote:
-> > > > On Sun, 2020-11-22 at 10:25 -0800, Joe Perches wrote:
-> > > > > On Sun, 2020-11-22 at 10:21 -0800, James Bottomley wrote:
-> > > > > > Please tell me our reward for all this effort isn't a
-> > > > > > single missing error print.
-> > > > > 
-> > > > > There were quite literally dozens of logical defects found
-> > > > > by the fallthrough additions.  Very few were logging only.
-> > > > 
-> > > > So can you give us the best examples (or indeed all of them if
-> > > > someone is keeping score)?  hopefully this isn't a US election
-> > > > situation ...
-> > > 
-> > > Gustavo?  Are you running for congress now?
-> > > 
-> > > https://lwn.net/Articles/794944/
-> > 
-> > That's 21 reported fixes of which about 50% seem to produce no
-> > change in code behaviour at all, a quarter seem to have no user
-> > visible effect with the remaining quarter producing unexpected
-> > errors on obscure configuration parameters, which is why no-one
-> > really noticed them before.
-> 
-> The really important point here is the number of bugs this has
-> prevented and will prevent in the future. See an example of this,
-> below:
-> 
-> https://lore.kernel.org/linux-iio/20190813135802.GB27392@kroah.com/
 
-I think this falls into the same category as the other six bugs: it
-changes the output/input for parameters but no-one has really noticed,
-usually because the command is obscure or the bias effect is minor.
+On 11/22/20 10:22 AM, Joe Perches wrote:
+> On Sun, 2020-11-22 at 08:33 -0800, Tom Rix wrote:
+>> On 11/21/20 9:10 AM, Joe Perches wrote:
+>>> On Sat, 2020-11-21 at 08:50 -0800, trix@redhat.com wrote:
+>>>> A difficult part of automating commits is composing the subsystem
+>>>> preamble in the commit log.  For the ongoing effort of a fixer producing
+>>>> one or two fixes a release the use of 'treewide:' does not seem appropriate.
+>>>>
+>>>> It would be better if the normal prefix was used.  Unfortunately normal is
+>>>> not consistent across the tree.
+>>>>
+>>>> So I am looking for comments for adding a new tag to the MAINTAINERS file
+>>>>
+>>>> 	D: Commit subsystem prefix
+>>>>
+>>>> ex/ for FPGA DFL DRIVERS
+>>>>
+>>>> 	D: fpga: dfl:
+>>> I'm all for it.  Good luck with the effort.  It's not completely trivial.
+>>>
+>>> From a decade ago:
+>>>
+>>> https://lore.kernel.org/lkml/1289919077.28741.50.camel@Joe-Laptop/
+>>>
+>>> (and that thread started with extra semicolon patches too)
+>> Reading the history, how about this.
+>>
+>> get_maintainer.pl outputs a single prefix, if multiple files have the
+>> same prefix it works, if they don't its an error.
+>>
+>> Another script 'commit_one_file.sh' does the call to get_mainainter.pl
+>> to get the prefix and be called by run-clang-tools.py to get the fixer
+>> specific message.
+> It's not whether the script used is get_maintainer or any other script,
+> the question is really if the MAINTAINERS file is the appropriate place
+> to store per-subsystem patch specific prefixes.
+>
+> It is.
+>
+> Then the question should be how are the forms described and what is the
+> inheritance priority.  My preference would be to have a default of
+> inherit the parent base and add basename(subsystem dirname).
+>
+> Commit history seems to have standardized on using colons as the separator
+> between the commit prefix and the subject.
+>
+> A good mechanism to explore how various subsystems have uses prefixes in
+> the past might be something like:
+>
+> $ git log --no-merges --pretty='%s' -<commit_count> <subsystem_path> | \
+>   perl -n -e 'print substr($_, 0, rindex($_, ":") + 1) . "\n";' | \
+>   sort | uniq -c | sort -rn
 
-> This work is still relevant, even if the total number of issues/bugs
-> we find in the process is zero (which is not the case).
+Thanks, I have shamelessly stolen this line and limited the commits to the maintainer.
 
-Really, no ... something which produces no improvement has no value at
-all ... we really shouldn't be wasting maintainer time with it because
-it has a cost to merge.  I'm not sure we understand where the balance
-lies in value vs cost to merge but I am confident in the zero value
-case.
+I will post something once the generation of the prefixes is done.
 
-> "The sucky thing about doing hard work to deploy hardening is that
-> the result is totally invisible by definition (things not happening)
-> [..]"
-> - Dmitry Vyukov
-
-Really, no.  Something that can't be measured at all doesn't exist.
-
-And actually hardening is one of those things you can measure (which I
-do have to admit isn't true for everything in the security space) ...
-it's number of exploitable bugs found before you did it vs number of
-exploitable bugs found after you did it.  Usually hardening eliminates
-a class of bug, so the way I've measured hardening before is to go
-through the CVE list for the last couple of years for product X, find
-all the bugs that are of the class we're looking to eliminate and say
-if we had hardened X against this class of bug we'd have eliminated Y%
-of the exploits.  It can be quite impressive if Y is a suitably big
-number.
-
-James
-
+Tom
 
