@@ -2,118 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEB08C56201
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Nov 2020 14:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43F4DC63798
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Nov 2020 15:33:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8789720738
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Nov 2020 14:48:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D8DF720738
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Nov 2020 15:33:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="tWoPDQgv"
+	dkim=pass (1024-bit key) header.d=novek.ru header.i=@novek.ru header.b="JC8BNMsI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389339AbgKXOru (ORCPT
+        id S2389078AbgKXPdI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Nov 2020 09:47:50 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58484 "EHLO mail.kernel.org"
+        Tue, 24 Nov 2020 10:33:08 -0500
+Received: from novek.ru ([213.148.174.62]:47476 "EHLO novek.ru"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388174AbgKXOrt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Nov 2020 09:47:49 -0500
-Received: from embeddedor (187-162-31-110.static.axtel.net [187.162.31.110])
+        id S2389662AbgKXPdH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 24 Nov 2020 10:33:07 -0500
+Received: from nat1.ooonet.ru (gw.zelenaya.net [91.207.137.40])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A5073206F9;
-        Tue, 24 Nov 2020 14:47:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1606229266;
-        bh=KHWIOvsVxIgxzJ3ANvrXr+IcifXvCH3d9eC+5p4MJwo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=tWoPDQgvsKVPCfxibPNl9c0zBQ9NfBrnsDyv8UIAtPJxHLfF4o1CuP3vwUt19y/P8
-         Y66kkjj2Cim4kMyRQiiYzb1whNr+v/N+nMKfcHqv3RaX8mBnUDrFmNddDbw9/dIVnH
-         xirANyC4hb8bYXXRvxw8qG9eYp8JWf8UX9D38PQM=
-Date:   Tue, 24 Nov 2020 08:47:54 -0600
-From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To:     Mark Brown <broonie@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-sctp@vger.kernel.org,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        linux-hardening@vger.kernel.org,
-        usb-storage@lists.one-eyed-alien.net, linux-block@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        bridge@lists.linux-foundation.org, GR-Linux-NIC-Dev@marvell.com,
-        rds-devel@oss.oracle.com, dri-devel@lists.freedesktop.org,
-        linux-media@vger.kernel.org, wcn36xx@lists.infradead.org,
-        linux-wireless@vger.kernel.org, linux-mediatek@lists.infradead.org,
-        reiserfs-devel@vger.kernel.org, oss-drivers@netronome.com,
-        linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
-        virtualization@lists.linux-foundation.org,
-        Joe Perches <joe@perches.com>, patches@opensource.cirrus.com,
-        linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-cifs@vger.kernel.org, coreteam@netfilter.org,
-        Kees Cook <keescook@chromium.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-scsi@vger.kernel.org, linux-afs@lists.infradead.org,
-        netfilter-devel@vger.kernel.org, linux-geode@lists.infradead.org,
-        drbd-dev@lists.linbit.com, linux-ext4@vger.kernel.org,
-        linux-hams@vger.kernel.org, target-devel@vger.kernel.org,
-        samba-technical@lists.samba.org,
-        tipc-discussion@lists.sourceforge.net,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-renesas-soc@vger.kernel.org, linux-input@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, linux-nfs@vger.kernel.org,
-        devel@driverdev.osuosl.org, selinux@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, linux-iio@vger.kernel.org,
-        linux-i3c@lists.infradead.org, Miguel Ojeda <ojeda@kernel.org>,
-        linux-can@vger.kernel.org, linux-integrity@vger.kernel.org,
-        GR-everest-linux-l2@marvell.com, keyrings@vger.kernel.org,
-        intel-wired-lan@lists.osuosl.org, linux-usb@vger.kernel.org,
-        nouveau@lists.freedesktop.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org, linux-mm@kvack.org,
-        cluster-devel@redhat.com, linux1394-devel@lists.sourceforge.net,
-        linux-decnet-user@lists.sourceforge.net,
-        op-tee@lists.trustedfirmware.org, linux-ide@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, linux-acpi@vger.kernel.org,
-        dm-devel@redhat.com, linux-watchdog@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-mtd@lists.infradead.org,
-        ceph-devel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH 000/141] Fix fall-through warnings for Clang
-Message-ID: <20201124144754.GL16084@embeddedor>
-References: <cover.1605896059.git.gustavoars@kernel.org>
- <160616392671.21180.16517492185091399884.b4-ty@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <160616392671.21180.16517492185091399884.b4-ty@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+        by novek.ru (Postfix) with ESMTPSA id C90E35030C8;
+        Tue, 24 Nov 2020 18:25:31 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 novek.ru C90E35030C8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=novek.ru; s=mail;
+        t=1606231533; bh=7QInkW/Oq3shx84L/3laQQ6VwguvjNXZ8FcFLS5fzv8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=JC8BNMsIpMof43AK8eFWJSfjEU6KZVOQDf/LnaxWhLtzlqXr+EgsQgIlMasXU6Msb
+         xO7O9YmJcTP0kuk3ZidFYMpCQoYArtGBI2RzuhCOeSLrnZ6EyY1vvfEhz3+0Cwbb3R
+         CH2Q6MUnYmephjYJ3Yc8Y14/r/v7TfNU9+CeX/D4=
+From:   Vadim Fedorenko <vfedorenko@novek.ru>
+To:     Jakub Kicinski <kuba@kernel.org>,
+        Boris Pismenny <borisp@nvidia.com>,
+        Aviad Yehezkel <aviadye@nvidia.com>
+Cc:     Vadim Fedorenko <vfedorenko@novek.ru>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: [net-next v2 3/5] net/tls: add CHACHA20-POLY1305 specific behavior
+Date:   Tue, 24 Nov 2020 18:24:48 +0300
+Message-Id: <1606231490-653-4-git-send-email-vfedorenko@novek.ru>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1606231490-653-1-git-send-email-vfedorenko@novek.ru>
+References: <1606231490-653-1-git-send-email-vfedorenko@novek.ru>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Nov 23, 2020 at 08:38:46PM +0000, Mark Brown wrote:
-> On Fri, 20 Nov 2020 12:21:39 -0600, Gustavo A. R. Silva wrote:
-> > This series aims to fix almost all remaining fall-through warnings in
-> > order to enable -Wimplicit-fallthrough for Clang.
-> > 
-> > In preparation to enable -Wimplicit-fallthrough for Clang, explicitly
-> > add multiple break/goto/return/fallthrough statements instead of just
-> > letting the code fall through to the next case.
-> > 
-> > [...]
-> 
-> Applied to
-> 
->    https://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator.git for-next
-> 
-> Thanks!
-> 
-> [1/1] regulator: as3722: Fix fall-through warnings for Clang
->       commit: b52b417ccac4fae5b1f2ec4f1d46eb91e4493dc5
+RFC 7905 defines special behavior for ChaCha-Poly TLS sessions.
+The differences are in the calculation of nonce and the absence
+of explicit IV. This behavior is like TLSv1.3 partly.
 
-Thank you, Mark.
---
-Gustavo
+Signed-off-by: Vadim Fedorenko <vfedorenko@novek.ru>
+---
+ include/net/tls.h | 9 ++++++---
+ net/tls/tls_sw.c  | 6 ++++--
+ 2 files changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/include/net/tls.h b/include/net/tls.h
+index e4e9c2a..b2637ed 100644
+--- a/include/net/tls.h
++++ b/include/net/tls.h
+@@ -502,7 +502,8 @@ static inline void tls_advance_record_sn(struct sock *sk,
+ 	if (tls_bigint_increment(ctx->rec_seq, prot->rec_seq_size))
+ 		tls_err_abort(sk, EBADMSG);
+ 
+-	if (prot->version != TLS_1_3_VERSION)
++	if (prot->version != TLS_1_3_VERSION &&
++	    prot->cipher_type != TLS_CIPHER_CHACHA20_POLY1305)
+ 		tls_bigint_increment(ctx->iv + prot->salt_size,
+ 				     prot->iv_size);
+ }
+@@ -516,7 +517,8 @@ static inline void tls_fill_prepend(struct tls_context *ctx,
+ 	size_t pkt_len, iv_size = prot->iv_size;
+ 
+ 	pkt_len = plaintext_len + prot->tag_size;
+-	if (prot->version != TLS_1_3_VERSION) {
++	if (prot->version != TLS_1_3_VERSION &&
++	    prot->cipher_type != TLS_CIPHER_CHACHA20_POLY1305) {
+ 		pkt_len += iv_size;
+ 
+ 		memcpy(buf + TLS_NONCE_OFFSET,
+@@ -561,7 +563,8 @@ static inline void xor_iv_with_seq(struct tls_prot_info *prot, char *iv, char *s
+ {
+ 	int i;
+ 
+-	if (prot->version == TLS_1_3_VERSION) {
++	if (prot->version == TLS_1_3_VERSION ||
++	    prot->cipher_type == TLS_CIPHER_CHACHA20_POLY1305) {
+ 		for (i = 0; i < 8; i++)
+ 			iv[i + 4] ^= seq[i];
+ 	}
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 6bc757a..b4eefdb 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1464,7 +1464,8 @@ static int decrypt_internal(struct sock *sk, struct sk_buff *skb,
+ 		kfree(mem);
+ 		return err;
+ 	}
+-	if (prot->version == TLS_1_3_VERSION)
++	if (prot->version == TLS_1_3_VERSION ||
++	    prot->cipher_type == TLS_CIPHER_CHACHA20_POLY1305)
+ 		memcpy(iv + iv_offset, tls_ctx->rx.iv,
+ 		       crypto_aead_ivsize(ctx->aead_recv));
+ 	else
+@@ -2068,7 +2069,8 @@ static int tls_read_size(struct strparser *strp, struct sk_buff *skb)
+ 	data_len = ((header[4] & 0xFF) | (header[3] << 8));
+ 
+ 	cipher_overhead = prot->tag_size;
+-	if (prot->version != TLS_1_3_VERSION)
++	if (prot->version != TLS_1_3_VERSION &&
++	    prot->cipher_type != TLS_CIPHER_CHACHA20_POLY1305)
+ 		cipher_overhead += prot->iv_size;
+ 
+ 	if (data_len > TLS_MAX_PAYLOAD_SIZE + cipher_overhead +
+-- 
+1.8.3.1
+
