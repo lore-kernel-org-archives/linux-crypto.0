@@ -2,262 +2,158 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEEA2C83019
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Nov 2020 21:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E40C63777
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Nov 2020 21:14:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 771E121527
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Nov 2020 21:10:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 086DA206F9
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Nov 2020 21:14:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AWR/7M4m"
+	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="csNEOeyu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731499AbgKYVKL (ORCPT
+        id S1731655AbgKYVN6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Nov 2020 16:10:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46218 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731381AbgKYVKE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Nov 2020 16:10:04 -0500
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2BC6C0613D4
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2020 13:10:03 -0800 (PST)
-Received: by mail-pf1-x441.google.com with SMTP id s21so3484236pfu.13
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2020 13:10:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=5kDOOuMOjwqEdI4fOY8lF/zJwxoesF7EbkKd66qXZt4=;
-        b=AWR/7M4mhE4fi43nRvdimsQoF0WR0/yRvzcmpbbdNnukQZ4s3FUnDOA4HlPrcfy1KL
-         TnDV3Sp7ib0l66wO1u9Qkihqc0ymqk7uAD73hLx1Hbj+4zgGkd46Av0r6N17g4aWHL9f
-         T52peLS6H3gWn2HtVm1n8SJNqsSbmk3lehF9k=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=5kDOOuMOjwqEdI4fOY8lF/zJwxoesF7EbkKd66qXZt4=;
-        b=QVIQjIl/Z8LKFRoInYubu+uikoZVBV2/lcirUqyre8mrhWKCWGMvfU9KjqSM5NGNAz
-         W9OJaedI2xceMx9DToDV99tenYfYNmU8equ97lc3KJgpVZ0FmjbaCSADqEI5G2g/iwsh
-         576+AoRcpFm36HHT8F78GnPcRk9Gh2Xt7pOJlUwUqrOv6XxxLoQc4YCccpxUY4i7nK7V
-         IPauYQ/OzjQio9KIN2Q5SIjJH+kj1v000w4fRZoR+nyN7ZAZLTuJkyTdqL/iRRHbtTEn
-         38X+a/pgEH+4Lb/ukoJ3cI8Dj2a1h262ZdiMmgOL+KasoHHdGgDFlqRZa3uWimrdsKW+
-         qHHQ==
-X-Gm-Message-State: AOAM531Kz6VhuDFzBlprei2rRCCUGRIUA10v24V025/i+oUpaJ4Gol2q
-        d8gHbJYpsCAMoF8D3iJWDOGoCw==
-X-Google-Smtp-Source: ABdhPJx/eEsXFJ4LN0K87oZeE7bvP2eO9KEt7vLrempCPcmRQAJuuV8YImLC928PO4R7i7Khu5FszQ==
-X-Received: by 2002:a65:6547:: with SMTP id a7mr4391475pgw.198.1606338602870;
-        Wed, 25 Nov 2020 13:10:02 -0800 (PST)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id x30sm2796297pgc.86.2020.11.25.13.10.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2020 13:10:01 -0800 (PST)
-Date:   Wed, 25 Nov 2020 13:10:00 -0800
-From:   Kees Cook <keescook@chromium.org>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Joe Perches <joe@perches.com>,
-        Jakub Kicinski <kuba@kernel.org>, alsa-devel@alsa-project.org,
-        linux-atm-general@lists.sourceforge.net,
-        reiserfs-devel@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        linux-ide@vger.kernel.org, dm-devel@redhat.com,
-        keyrings@vger.kernel.org, linux-mtd@lists.infradead.org,
-        GR-everest-linux-l2@marvell.com, wcn36xx@lists.infradead.org,
-        samba-technical@lists.samba.org, linux-i3c@lists.infradead.org,
-        linux1394-devel@lists.sourceforge.net,
-        linux-afs@lists.infradead.org,
-        usb-storage@lists.one-eyed-alien.net, drbd-dev@lists.linbit.com,
-        devel@driverdev.osuosl.org, linux-cifs@vger.kernel.org,
-        rds-devel@oss.oracle.com,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-scsi@vger.kernel.org, linux-rdma@vger.kernel.org,
-        oss-drivers@netronome.com, bridge@lists.linux-foundation.org,
-        linux-security-module@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org,
-        linux-stm32@st-md-mailman.stormreply.com, cluster-devel@redhat.com,
-        linux-acpi@vger.kernel.org, coreteam@netfilter.org,
-        intel-wired-lan@lists.osuosl.org, linux-input@vger.kernel.org,
-        Miguel Ojeda <ojeda@kernel.org>,
-        tipc-discussion@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        selinux@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, linux-geode@lists.infradead.org,
-        linux-can@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-gpio@vger.kernel.org, op-tee@lists.trustedfirmware.org,
-        linux-mediatek@lists.infradead.org, xen-devel@lists.xenproject.org,
-        nouveau@lists.freedesktop.org, linux-hams@vger.kernel.org,
-        ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-arm-kernel@lists.infradead.org, linux-hwmon@vger.kernel.org,
-        x86@kernel.org, linux-nfs@vger.kernel.org,
-        GR-Linux-NIC-Dev@marvell.com, linux-mm@kvack.org,
-        netdev@vger.kernel.org, linux-decnet-user@lists.sourceforge.net,
-        linux-mmc@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-        linux-sctp@vger.kernel.org, linux-usb@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        patches@opensource.cirrus.com, linux-integrity@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-hardening@vger.kernel.org,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [Intel-wired-lan] [PATCH 000/141] Fix fall-through warnings for
- Clang
-Message-ID: <202011251240.1E67BE900@keescook>
-References: <202011220816.8B6591A@keescook>
- <9b57fd4914b46f38d54087d75e072d6e947cb56d.camel@HansenPartnership.com>
- <ca071decb87cc7e905411423c05a48f9fd2f58d7.camel@perches.com>
- <0147972a72bc13f3629de8a32dee6f1f308994b5.camel@HansenPartnership.com>
- <d8d1e9add08cdd4158405e77762d4946037208f8.camel@perches.com>
- <dbd2cb703ed9eefa7dde9281ea26ab0f7acc8afe.camel@HansenPartnership.com>
- <20201123130348.GA3119@embeddedor>
- <8f5611bb015e044fa1c0a48147293923c2d904e4.camel@HansenPartnership.com>
- <202011241327.BB28F12F6@keescook>
- <a841536fe65bb33f1c72ce2455a6eb47a0107565.camel@HansenPartnership.com>
+        Wed, 25 Nov 2020 16:13:58 -0500
+Received: from mail-eopbgr130054.outbound.protection.outlook.com ([40.107.13.54]:41543
+        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1731620AbgKYVN6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 25 Nov 2020 16:13:58 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EwOpa9ojIg2UYCk/vwGK4lbkC2DZjPYaLRjV/e+pS+mIGXgbpE25hqtoR/HSXD0bfo/Z8G2ImOO4Doq061zLXxS4GPxQR4VAWhshUC3j/h1/YKmoQq1KdNREnIBgVqKRV91IJVmyxgCgzznuSN2uNWC4PSv0sfyoAZn0DRP8/KcM9FAO8tCYQv09Cwaxi621daLGNe44ThoazKdBro7rEw+kElx+Z93VDInrtHMH386mvSg69PVKM4DWnayKfM99J3ISoCMZclj8e1FzHLS44q4XEmNyB+ODRqCFSjK0vZ8MSMsTbMdHUWnfJH1zq+d2UmePQgrHhjPWg5uplf5vMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0dI8AdtWRDOfFQ/45mta7yP0VTIxsh3j6gmm7J3AvQ0=;
+ b=ayc0iQvUQtcexmcdrCJ/92FGXZDh55me1If+RKcEFKvTNnWG9s/cyaMUH3QELN+ePMynSiJ+6YtZJmdXA7juM4+nQh+FfYTCzkO2rxZsVweE3cwGs7r2QGHgPBqrCvL6guYfpzggrNFRX891bB/kewCb53OYJ4mB7JLIsWEDRGE1kFcrn033JioGXi3dM4Kt8UrenuuOK6tqsS0Iz5rDuSEagigTgHg3KHMpYYJW5X1gtsfHky/H6+SlqC1MactKfB+7dkT7DR0Mu8RkJMu8bmuKW90CVFr2d6tHkOs2CPRpYNjjYYXVHlxKGMw8MO3w6ZlVT7mEuezfFgsmiPL0Xw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0dI8AdtWRDOfFQ/45mta7yP0VTIxsh3j6gmm7J3AvQ0=;
+ b=csNEOeyuCsewfvQTTYKlJYkOsPTzSagePAzr7pO8jkicBfo71TTpYMif+3YVxhPGCfLTKqEGjR/TjmLELpFoqUTsnazLqSThSzBLXpnPafoiH1bUwr0OL2kmodU2xE8geL0DGRdWyW7/GwQRNtyMtSn5757EltrBW4/fPAaHlf4=
+Authentication-Results: gondor.apana.org.au; dkim=none (message not signed)
+ header.d=none;gondor.apana.org.au; dmarc=none action=none
+ header.from=oss.nxp.com;
+Received: from VI1PR0402MB3712.eurprd04.prod.outlook.com
+ (2603:10a6:803:1c::25) by VI1PR04MB6941.eurprd04.prod.outlook.com
+ (2603:10a6:803:12e::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.22; Wed, 25 Nov
+ 2020 21:13:53 +0000
+Received: from VI1PR0402MB3712.eurprd04.prod.outlook.com
+ ([fe80::ade4:e169:1f4a:28c]) by VI1PR0402MB3712.eurprd04.prod.outlook.com
+ ([fe80::ade4:e169:1f4a:28c%4]) with mapi id 15.20.3589.025; Wed, 25 Nov 2020
+ 21:13:53 +0000
+From:   "Iuliana Prodan (OSS)" <iuliana.prodan@oss.nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Horia Geanta <horia.geanta@nxp.com>
+Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx <linux-imx@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Subject: [RFC PATCH 0/4] crypto: add CRYPTO_TFM_REQ_DMA flag
+Date:   Wed, 25 Nov 2020 23:13:07 +0200
+Message-Id: <20201125211311.2179-1-iuliana.prodan@oss.nxp.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-Originating-IP: [83.217.231.2]
+X-ClientProxiedBy: AM0PR10CA0117.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:e6::34) To VI1PR0402MB3712.eurprd04.prod.outlook.com
+ (2603:10a6:803:1c::25)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a841536fe65bb33f1c72ce2455a6eb47a0107565.camel@HansenPartnership.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from lsv15040.swis.ro-buh01.nxp.com (83.217.231.2) by AM0PR10CA0117.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:e6::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.22 via Frontend Transport; Wed, 25 Nov 2020 21:13:51 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: cc3c2ceb-59fc-41ea-c065-08d8918702cc
+X-MS-TrafficTypeDiagnostic: VI1PR04MB6941:
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR04MB69412D60300105104D9D8303CDFA0@VI1PR04MB6941.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: I0i8+fteuY8rozY1ddXUrSUvlZLlICGnk+HSQ/am6ljnuz40AzUeiOFEmiJ6cSSMhDvzYBt73/UeZK5uRZwK6SXEmWpGq1xCJ1FXquTp2c1kbxv1gqBUv4NyoEHowgdqpAlcYnPs4RljT5kDnM2q3RURXr/nB9CFbGJksqjnogmW1DNdI+vnPoExNn514tebYipZ48KtUkLbjMCfdNXnxXGTTmPkVbJYBEu+vEoApnE9a8YzyltEshIuh/54rSZoePBfOogF29Fzw/t016YehMIvy2qOrxOg8U2Em8Uv9ikZr/IM+RPHE6pf5Nx+PviRPM+EV06FWmpkvT/dDc0I5g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3712.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(376002)(396003)(366004)(136003)(316002)(86362001)(5660300002)(66476007)(66556008)(186003)(52116002)(6512007)(66946007)(26005)(110136005)(54906003)(2906002)(8676002)(6486002)(16526019)(4326008)(83380400001)(8936002)(478600001)(1076003)(6506007)(956004)(2616005)(6666004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?Ka0eQat1pFZE958ii8nUnFk3q+i793Y6FAsDl33tsjYDexfXCJhvW+8g4tNC?=
+ =?us-ascii?Q?2YSLpkYH55hlPqdSCq8B4AcWj93Gz25BaNBt4UuhzONmYvOePMRkqeWY8Gcr?=
+ =?us-ascii?Q?pxcT6SePQ7cUWMm0Fe9gH0IGtK/hNKPWPssCJy/R/LT106WT6kOjI3H1XNAu?=
+ =?us-ascii?Q?cgFw69AfbrrWGxR5yxJUGDNKNPPPdlQZ0VLTm9lWujETsz+V789Xlpl0cAtB?=
+ =?us-ascii?Q?NsIxdQlfqPAg9diy3F2dAQe06ath75bUydEdUN+1JRyJ33w7r3cOpZjSgKKD?=
+ =?us-ascii?Q?zfYGYV4ZxjcLHRtFEACTKpYpkyH5OTc0uor70UQZZipnc45hTGu0g9qBCSxz?=
+ =?us-ascii?Q?O+LiqDQCWdChvBtuhVJjwpgvh4j8C14I5xc6V36wZChfxhBx0AnVSNSTfFpo?=
+ =?us-ascii?Q?UTTT0Aoa245bpDeAYI4d543yYPiwx8bLUQq0sf3cc7WnvCV9QSPIN/meNZ91?=
+ =?us-ascii?Q?LgSEVF0YdHbeKAKDRonWLKktNu1Ia2XPP9SiV3kODDrsXNLoeH9DjkZZtaW6?=
+ =?us-ascii?Q?FanG4IT6b7QXBImY2DJgtAecU4Rp+pZVhj8EggseL8u31hGHuiBqnhqMha2l?=
+ =?us-ascii?Q?ERaItbFmKHjqauzV3J0dt0bnJSlYQt4VR/2qIAKMPxV6iAMqXZLJ2RKrfAaS?=
+ =?us-ascii?Q?rzSTaCktt1rCHzby4POa0v/qMHd6c1q9yRlaq5v4UzrcFB+K/552txFHIQku?=
+ =?us-ascii?Q?MSlnz3tmCz35T4246jaVzj0kEYo/zj3OsWNMe+yrnFXLv5zH4mKq/gI0EZNu?=
+ =?us-ascii?Q?N7TGvwMnnu+AeVk1b9JOqIDHmn72tSJ3ICH6BrfCv8MSxH1lKzVw2zDkQ6Eu?=
+ =?us-ascii?Q?ziEjkv+h1y7WSx6jgxgntor49xfxMUXVYDTCaujzuVGYLHIWcavvX+vPhuKO?=
+ =?us-ascii?Q?5GvL5aTAEUrzZ+KipSHc3vPZ2zTfiA+qwHkV6+L1/UROogVZWfA6lB6/qf+f?=
+ =?us-ascii?Q?0TUp1a4pyXOeJk44DijI3YjD+a/VDUU0p6sxkmE+BfgftBRslyRBiGzRaFPD?=
+ =?us-ascii?Q?/Xej?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cc3c2ceb-59fc-41ea-c065-08d8918702cc
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3712.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2020 21:13:52.9349
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AqsO+DMCozi3D49174zIT1+PWJrRb6O/qXfZhiSXfLXk3k+cvw5VCpZGsXE1P+wOXjJopwpCPCPo8fSxD0A5Vw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6941
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 24, 2020 at 11:05:35PM -0800, James Bottomley wrote:
-> Now, what we have seems to be about 6 cases (at least what's been shown
-> in this thread) where a missing break would cause potentially user
-> visible issues.  That means the value of this isn't zero, but it's not
-> a no-brainer massive win either.  That's why I think asking what we've
-> invested vs the return isn't a useless exercise.
+From: Iuliana Prodan <iuliana.prodan@nxp.com>
 
-The number is much higher[1]. If it were 6 in the entire history of the
-kernel, I would agree with you. :) Some were fixed _before_ Gustavo's
-effort too, which I also count towards the idea of "this is a dangerous
-weakness in C, and now we have stopped it forever."
+Add the option to allocate the crypto request object plus any extra space
+needed by the driver into a DMA-able memory.
 
-> But the broader point I'm making is just because the compiler people
-> come up with a shiny new warning doesn't necessarily mean the problem
-> it's detecting is one that causes us actual problems in the code base. 
-> I'd really be happier if we had a theory about what classes of CVE or
-> bug we could eliminate before we embrace the next new warning.
+Add CRYPTO_TFM_REQ_DMA flag to be used by backend implementations to
+indicate to crypto API the need to allocate GFP_DMA memory
+for private contexts of the crypto requests.
 
-But we did! It was long ago justified and documented[2], and even links to
-the CWE[3] for it. This wasn't random joy over discovering a new warning
-we could turn on, this was turning on a warning that the compiler folks
-finally gave us to handle an entire class of flaws. If we need to update
-the code-base to address it not a useful debate -- that was settled
-already, even if you're only discovering it now. :P. This last patch
-set is about finishing that work for Clang, which is correctly even
-more strict than GCC.
+For IPsec use cases, CRYPTO_TFM_REQ_DMA flag is also checked in
+esp_alloc_tmp() function for IPv4 and IPv6.
 
--Kees
+This series includes an example of how a driver can use
+CRYPTO_TFM_REQ_DMA flag while setting reqsize to a larger value
+to avoid allocating memory at crypto request runtime.
+The extra size needed by the driver is added to the reqsize field
+that indicates how much memory could be needed per request.
 
-[1] https://outflux.net/slides/2019/lss/kspp.pdf calls out specific
-    numbers (about 6.5% of the patches fixed missing breaks):
-	v4.19:  3 of 129
-	v4.20:  2 of  59
-	v5.0:   3 of  56
-	v5.1:  10 of 100
-	v5.2:   6 of  71
-	v5.3:   7 of  69
+Iuliana Prodan (4):
+  crypto: add CRYPTO_TFM_REQ_DMA flag
+  net: esp: check CRYPTO_TFM_REQ_DMA flag when allocating crypto request
+  crypto: caam - avoid allocating memory at crypto request runtime for
+    skcipher
+  crypto: caam - avoid allocating memory at crypto request runtime for
+    aead
 
-    And in the history of the kernel, it's been an ongoing source of
-    flaws:
-
-    $ l --no-merges | grep -i 'missing break' | wc -l
-    185
-
-    The frequency of such errors being "naturally" found was pretty
-    steady until the static checkers started warning, and then it was
-    on the rise, but the full effort flushed the rest out, and now it's
-    dropped to almost zero:
-
-      1 v2.6.12
-      3 v2.6.16.28
-      1 v2.6.17
-      1 v2.6.19
-      2 v2.6.21
-      1 v2.6.22
-      3 v2.6.24
-      3 v2.6.29
-      1 v2.6.32
-      1 v2.6.33
-      1 v2.6.35
-      4 v2.6.36
-      3 v2.6.38
-      2 v2.6.39
-      7 v3.0
-      2 v3.1
-      2 v3.2
-      2 v3.3
-      3 v3.4
-      1 v3.5
-      8 v3.6
-      7 v3.7
-      3 v3.8
-      6 v3.9
-      3 v3.10
-      2 v3.11
-      5 v3.12
-      5 v3.13
-      2 v3.14
-      4 v3.15
-      2 v3.16
-      3 v3.17
-      2 v3.18
-      2 v3.19
-      1 v4.0
-      2 v4.1
-      5 v4.2
-      4 v4.5
-      5 v4.7
-      6 v4.8
-      1 v4.9
-      3 v4.10
-      2 v4.11
-      6 v4.12
-      3 v4.13
-      2 v4.14
-      5 v4.15
-      2 v4.16
-      7 v4.18
-      2 v4.19
-      6 v4.20
-      3 v5.0
-     12 v5.1
-      3 v5.2
-      4 v5.3
-      2 v5.4
-      1 v5.8
-
-
-    And the reason it's fully zero, is because we still have the cases we're
-    cleaning up right now. Even this last one from v5.8 is specifically of
-    the same type this series addresses:
-
-        case 4:
-                color_index = TrueCModeIndex;
-+               break;
-        default:
-                return;
-        }
-
-
-[2] https://www.kernel.org/doc/html/latest/process/deprecated.html#implicit-switch-case-fall-through
-
-	All switch/case blocks must end in one of:
-
-	break;
-	fallthrough;
-	continue;
-	goto <label>;
-	return [expression];
-
-[3] https://cwe.mitre.org/data/definitions/484.html
+ drivers/crypto/caam/caamalg.c | 130 +++++++++++++++++++++++++---------
+ include/crypto/aead.h         |   4 ++
+ include/crypto/akcipher.h     |  21 ++++++
+ include/crypto/hash.h         |   4 ++
+ include/crypto/skcipher.h     |   4 ++
+ include/linux/crypto.h        |   1 +
+ net/ipv4/esp4.c               |   7 +-
+ net/ipv6/esp6.c               |   7 +-
+ 8 files changed, 144 insertions(+), 34 deletions(-)
 
 -- 
-Kees Cook
+2.17.1
+
