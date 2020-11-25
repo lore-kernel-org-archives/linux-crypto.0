@@ -2,108 +2,119 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADED2C5519F
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Nov 2020 07:22:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C76C5519F
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Nov 2020 07:27:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3416A208B8
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Nov 2020 07:22:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8EB4B20B1F
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Nov 2020 07:27:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="uTzoJ7Sv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JVTjCVNK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727394AbgKYHWY (ORCPT
+        id S1725815AbgKYH1J (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Nov 2020 02:22:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:48350 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727247AbgKYHWY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Nov 2020 02:22:24 -0500
-Received: from e123331-lin.nice.arm.com (lfbn-nic-1-188-42.w2-15.abo.wanadoo.fr [2.15.37.42])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 206E120857;
-        Wed, 25 Nov 2020 07:22:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1606288943;
-        bh=JkkXUobeOFJVhogiCBWd6tAQXnktbFv/uDDp/Lhar/g=;
-        h=From:To:Cc:Subject:Date:From;
-        b=uTzoJ7SvhHKTzgCo8lO/NNrLT8oHCBbbPLNfGSAQLIWesFFzmhep5+uhTxS3xq1tS
-         8DABJLrt4mvO+YiM39otg/OgkV+htafEaneumESfDaGFwsubZ56qGIo6QuQgQSNWly
-         D0jqruuypFiuZXhSNqH4xNUR0Lu9Pol/ycuXyKqw=
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
-        james.morse@arm.com, Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH] crypto: arm/aes-ce - work around Cortex-A72 erratum #1655431
-Date:   Wed, 25 Nov 2020 08:22:16 +0100
-Message-Id: <20201125072216.892-1-ardb@kernel.org>
-X-Mailer: git-send-email 2.17.1
+        Wed, 25 Nov 2020 02:27:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59088 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725308AbgKYH1I (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 25 Nov 2020 02:27:08 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C16FEC0613D4;
+        Tue, 24 Nov 2020 23:27:08 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id bj5so684355plb.4;
+        Tue, 24 Nov 2020 23:27:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=dE8a5WlGPDxWc2nopfLth4ca5yh3gzs/QZ1YaMzoCcg=;
+        b=JVTjCVNKIef82UXKWf0/tQJeETUdDE0HDCq4b2tt1MBvndGO8HI54SCQUN+hES57k7
+         Xp+bJUqF5W0s8QjVBiDKEFU8YPJ9aJHbmk3lnBGfM4iffNuIEvqwj30E8M8cil89PmTN
+         lYSuL2gyuFytg5uM5jgY3llpWirvDAOvzDQuEnFNH8Yr3eH76Sxn1oOqDjlM2/LzBKFk
+         Nw4B6AoMXScf6B+CYCkqvPo88hkJmnPZPkw3KMtCs6aRerN6pCpl7+Lna6ECzSjUA2aa
+         CpWcn981ACJPTQFGQbtxG8HWepHw/T+89YhkFbVjlKgwhyYb+JnK38pFB9+SonQ+cyU4
+         qdAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=dE8a5WlGPDxWc2nopfLth4ca5yh3gzs/QZ1YaMzoCcg=;
+        b=kErpUoyhy4eJonrJl4KCWBMcXUmuleXb0gRlqVDrTq0BajM5ZzSCiC7wBOIkLCHlyQ
+         wGVY/D9//Q2xNpivJN5NK9taWwPoerM8koLf5wunWonEzj2RG1e6EpZDelLcZEU1JqU0
+         LrVy2V6VFANYTC6QR7+FeJZaxjuLiuLnUpWaTpmkLI232ewrC9s+Mu0hiA0zuAq9r7g+
+         cQdG8ICcnDOjU6ybwDMobQL87zYbU7I9s5QXf7UVKf3BQvsgk+hQsUteNRtHYSmbfcHp
+         s5towGBIMBkjK4RrE+jjHV9wqZVz2zAZmChdBRgOdagaYceq/P0GxQgdT4QYEOY5Ar/1
+         Bj8A==
+X-Gm-Message-State: AOAM5312PEr21od7pNNO82ve0iZy3rH8ygDMlga06jF1/TedjXF8p+ee
+        zorM7Pjb9HVWuYv1O8Oh+4I=
+X-Google-Smtp-Source: ABdhPJzyK94324FGJdnuQQ8Th1gFIVXL9yGsRpw5lIrVTHJ4dqFIVuo81nVLEdEwM8Hliaa9p1Yp3A==
+X-Received: by 2002:a17:902:bf0b:b029:d8:f677:30f2 with SMTP id bi11-20020a170902bf0bb02900d8f67730f2mr1424461plb.25.1606289228251;
+        Tue, 24 Nov 2020 23:27:08 -0800 (PST)
+Received: from linux-l9pv.suse ([124.11.22.254])
+        by smtp.gmail.com with ESMTPSA id q7sm1006055pfh.91.2020.11.24.23.27.02
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 24 Nov 2020 23:27:07 -0800 (PST)
+From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ben Boeckel <me@benboeckel.net>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Malte Gell <malte.gell@gmx.de>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Lee, Chun-Yi" <jlee@suse.com>
+Subject: [PATCH 0/4] Check codeSigning extended key usage extension
+Date:   Wed, 25 Nov 2020 15:26:49 +0800
+Message-Id: <20201125072653.15657-1-jlee@suse.com>
+X-Mailer: git-send-email 2.12.3
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-ARM Cortex-A72 cores running in 32-bit mode are affected by a silicon
-erratum (1655431: ELR recorded incorrectly on interrupt taken between
-cryptographic instructions in a sequence [0]) where the second instruction
-of a AES instruction pair may execute twice if an interrupt is taken right
-after the first instruction consumes an input register of which a single
-32-bit lane has been updated the last time it was modified.
+NIAP PP_OS certification requests that the OS shall validate the
+CodeSigning extended key usage extension field for integrity
+verifiction of exectable code:
 
-This is not such a rare occurrence as it may seem: in counter mode, only
-the least significant 32-bit word is incremented in the absence of a
-carry, which makes our counter mode implementation susceptible to the
-erratum.
+    https://www.niap-ccevs.org/MMO/PP/-442-/
+        FIA_X509_EXT.1.1
 
-So let's shuffle the counter assignments around a bit so that the most
-recent updates when the AES instruction pair executes are 128-bit wide.
+This patchset adds the logic for parsing the codeSigning EKU extension
+field in X.509. And checking the CodeSigning EKU when verifying
+signature of kernel module or kexec PE binary in PKCS#7.
 
-[0] ARM-EPM-012079 v11.0 Cortex-A72 MPCore Software Developers Errata Notice
+v3:
+- Add codeSigning EKU to x509.genkey key generation config.
+- Add openssl command option example for generating CodeSign EKU to
+  module-signing.rst document. 
 
-Cc: <stable@vger.kernel.org> # v5.4+
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- arch/arm/crypto/aes-ce-core.S | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+v2:
+Changed the help wording in the Kconfig.
 
-diff --git a/arch/arm/crypto/aes-ce-core.S b/arch/arm/crypto/aes-ce-core.S
-index 4d1707388d94..c0ef9680d90b 100644
---- a/arch/arm/crypto/aes-ce-core.S
-+++ b/arch/arm/crypto/aes-ce-core.S
-@@ -386,20 +386,20 @@ ENTRY(ce_aes_ctr_encrypt)
- .Lctrloop4x:
- 	subs		r4, r4, #4
- 	bmi		.Lctr1x
--	add		r6, r6, #1
-+	add		ip, r6, #1
- 	vmov		q0, q7
-+	rev		ip, ip
-+	add		lr, r6, #2
-+	vmov		s31, ip
-+	add		ip, r6, #3
-+	rev		lr, lr
- 	vmov		q1, q7
--	rev		ip, r6
--	add		r6, r6, #1
-+	vmov		s31, lr
-+	rev		ip, ip
- 	vmov		q2, q7
--	vmov		s7, ip
--	rev		ip, r6
--	add		r6, r6, #1
-+	vmov		s31, ip
-+	add		r6, r6, #4
- 	vmov		q3, q7
--	vmov		s11, ip
--	rev		ip, r6
--	add		r6, r6, #1
--	vmov		s15, ip
- 	vld1.8		{q4-q5}, [r1]!
- 	vld1.8		{q6}, [r1]!
- 	vld1.8		{q15}, [r1]!
+Lee, Chun-Yi (4):
+  X.509: Add CodeSigning extended key usage parsing
+  PKCS#7: Check codeSigning EKU for kernel module and kexec pe
+    verification
+  modsign: Add codeSigning EKU when generating X.509 key generation
+    config
+  Documentation/admin-guide/module-signing.rst: add openssl command
+    option example for CodeSign EKU
+
+ Documentation/admin-guide/module-signing.rst |  6 +++++
+ certs/Makefile                               |  1 +
+ certs/system_keyring.c                       |  2 +-
+ crypto/asymmetric_keys/Kconfig               |  9 +++++++
+ crypto/asymmetric_keys/pkcs7_trust.c         | 37 +++++++++++++++++++++++++---
+ crypto/asymmetric_keys/x509_cert_parser.c    | 24 ++++++++++++++++++
+ include/crypto/pkcs7.h                       |  3 ++-
+ include/crypto/public_key.h                  |  1 +
+ include/linux/oid_registry.h                 |  5 ++++
+ 9 files changed, 83 insertions(+), 5 deletions(-)
+
 -- 
-2.17.1
+2.16.4
 
