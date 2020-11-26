@@ -2,80 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D90C63697
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Nov 2020 12:04:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2060C56202
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Nov 2020 13:12:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 62B872087C
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Nov 2020 12:04:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B50D21D46
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Nov 2020 13:12:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388375AbgKZMET (ORCPT
+        id S2389784AbgKZNMD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Nov 2020 07:04:19 -0500
-Received: from mga06.intel.com ([134.134.136.31]:7769 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726321AbgKZMET (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Nov 2020 07:04:19 -0500
-IronPort-SDR: Ay13JN+vTm1NrpwxE71aBO18W8gPPl+V7BtBwxn+rqqjk3PUBhjhotMr8VaneGRdhjJucG5Dd1
- MfXmtS0NVh/A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9816"; a="233881451"
-X-IronPort-AV: E=Sophos;i="5.78,372,1599548400"; 
-   d="scan'208";a="233881451"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2020 04:04:18 -0800
-IronPort-SDR: Rdr0vgWgv4OAA1iUSSQd7PXQpUoWlTqP4uRbIuN5+eKpIQrJVZMMV8hzIQOpdbf1xDp+Jwonm5
- lY8Az+ZW/xOg==
-X-IronPort-AV: E=Sophos;i="5.78,372,1599548400"; 
-   d="scan'208";a="333354621"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.51])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2020 04:04:16 -0800
-Date:   Thu, 26 Nov 2020 12:04:08 +0000
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "andriy.shevchenko@linux.intel.com" 
-        <andriy.shevchenko@linux.intel.com>,
-        "Trahe, Fiona" <fiona.trahe@intel.com>,
-        "Ziemba, Wojciech" <wojciech.ziemba@intel.com>,
-        "Chiappero, Marco" <marco.chiappero@intel.com>,
-        qat-linux <qat-linux@intel.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>
-Subject: Re: [PATCH] crypto: qat - Use dma_set_mask_and_coherent to simplify
- code
-Message-ID: <20201126120408.GA21666@silpixa00400314>
-References: <20201121071359.1320167-1-christophe.jaillet@wanadoo.fr>
+        Thu, 26 Nov 2020 08:12:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53900 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389604AbgKZNMD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 26 Nov 2020 08:12:03 -0500
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [IPv6:2001:41d0:e:133a::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E979AC0613D4;
+        Thu, 26 Nov 2020 05:12:02 -0800 (PST)
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.94)
+        (envelope-from <n0-1@orbyte.nwl.cc>)
+        id 1kiH44-0006pB-KQ; Thu, 26 Nov 2020 14:12:00 +0100
+Date:   Thu, 26 Nov 2020 14:12:00 +0100
+From:   Phil Sutter <phil@nwl.cc>
+To:     Steffen Klassert <steffen.klassert@secunet.com>
+Cc:     linux-crypto@vger.kernel.org, netfilter-devel@vger.kernel.org
+Subject: Re: XFRM interface and NF_INET_LOCAL_OUT hook
+Message-ID: <20201126131200.GH4647@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, netfilter-devel@vger.kernel.org
+References: <20201125112342.GA11766@orbyte.nwl.cc>
+ <20201126094021.GK8805@gauss3.secunet.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201121071359.1320167-1-christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20201126094021.GK8805@gauss3.secunet.de>
+Sender:  <n0-1@orbyte.nwl.cc>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Christophe,
+Hi Steffen,
 
-On Sat, Nov 21, 2020 at 07:13:59AM +0000, Christophe JAILLET wrote:
-> 'pci_set_dma_mask()' + 'pci_set_consistent_dma_mask()' can be replaced by
-> an equivalent 'dma_set_mask_and_coherent()' which is much less verbose.
+On Thu, Nov 26, 2020 at 10:40:21AM +0100, Steffen Klassert wrote:
+> On Wed, Nov 25, 2020 at 12:23:42PM +0100, Phil Sutter wrote:
+> > I am working on a ticket complaining about netfilter policy match
+> > missing packets in OUTPUT chain if XFRM interface is being used.
+> > 
+> > I don't fully overlook the relevant code path, but it seems like
+> > skb_dest(skb)->xfrm is not yet assigned when the skb is routed towards
+> > XFRM interface and already cleared again (by xfrm_output_one?) before it
+> > makes its way towards the real output interface. NF_INET_POST_ROUTING
+> > hook works though.
+> > 
+> > Is this a bug or an expected quirk when using XFRM interface?
 > 
-> While at it, also remove some unless extra () in the 32 bits case.
-> 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
-> Instead of returning -EFAULT, we could also propagate the error returned
-> by dma_set_mask_and_coherent()
-I'm going to re-submit implementing the comment above and also including
-qat_4xxx.
+> This is expected behaviour. The xfrm interfaces are plaintext devices,
+> the plaintext packets are routed to the xfrm interface which guarantees
+> transformation. So the lookup that assigns skb_dst(skb)->xfrm
+> happens 'behind' the interface. After transformation,
+> skb_dst(skb)->xfrm will be cleared. So this assignment exists just
+> inside xfrm in that case.
 
-Regards,
+OK, thanks for the clarification.
 
--- 
-Giovanni
+> Does netfilter match against skb_dst(skb)->xfrm? What is the exact case
+> that does not work?
+
+The reported use-case is a match against tunnel data in output hook:
+
+| table t {
+|     chain c {
+|         type filter hook output priority filter
+|         oifname eth0 ipsec out ip daddr 192.168.1.2
+|     }
+| }
+
+The ipsec expression tries to extract that data from skb_dst(skb)->xfrm
+if present. In xt_policy (for iptables), code is equivalent. The above
+works when not using xfrm_interface. Initially I assumed one just needs
+to adjust the oifname match, but even dropping it doesn't help.
+
+Cheers, Phil
