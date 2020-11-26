@@ -2,89 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C536CC6379D
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Nov 2020 08:20:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF4F4C56202
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Nov 2020 09:40:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 72EF820872
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Nov 2020 08:20:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PRoK32GP"
+	by mail.kernel.org (Postfix) with ESMTP id 8B53B206B2
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Nov 2020 09:40:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726562AbgKZITu (ORCPT
+        id S1733192AbgKZJkZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Nov 2020 03:19:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50664 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727362AbgKZITu (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Nov 2020 03:19:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606378788;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=z+p2GprWbi/If7VTS8JWkfE6Lqw1+SLhZ1FsmVKk/Hc=;
-        b=PRoK32GPUlJaRWJl7pn+RnBlI2gn3y2fZJAwl03NrcpDMTLdC+sQiiKgzN1HMPN7olDC9m
-        MC4h8wzuD8SImecweaQto1N38ha7royL1vGPnrPS7z+pQp9FX8H/Oi8dOu/wfPoaSuYiza
-        a5umgpqQItVb8SUjB0W4WicGXTH5u+4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-582-xR60jiNjNfyAZn5VXKFC7A-1; Thu, 26 Nov 2020 03:19:46 -0500
-X-MC-Unique: xR60jiNjNfyAZn5VXKFC7A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Thu, 26 Nov 2020 04:40:25 -0500
+Received: from a.mx.secunet.com ([62.96.220.36]:42868 "EHLO a.mx.secunet.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1733102AbgKZJkZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 26 Nov 2020 04:40:25 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by a.mx.secunet.com (Postfix) with ESMTP id A75A7204EF;
+        Thu, 26 Nov 2020 10:40:23 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id bG_lvu7VLkd6; Thu, 26 Nov 2020 10:40:23 +0100 (CET)
+Received: from mail-essen-02.secunet.de (unknown [10.53.40.205])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8742D8143EB;
-        Thu, 26 Nov 2020 08:19:44 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-112-111.rdu2.redhat.com [10.10.112.111])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7CCF95D6AC;
-        Thu, 26 Nov 2020 08:19:42 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20201126063303.GA18366@gondor.apana.org.au>
-References: <20201126063303.GA18366@gondor.apana.org.au> <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     dhowells@redhat.com, bfields@fieldses.org,
-        trond.myklebust@hammerspace.com, linux-crypto@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC][PATCH 00/18] crypto: Add generic Kerberos library
+        by a.mx.secunet.com (Postfix) with ESMTPS id 34E32204B4;
+        Thu, 26 Nov 2020 10:40:23 +0100 (CET)
+Received: from mbx-essen-01.secunet.de (10.53.40.197) by
+ mail-essen-02.secunet.de (10.53.40.205) with Microsoft SMTP Server (TLS) id
+ 14.3.487.0; Thu, 26 Nov 2020 10:40:22 +0100
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
+ (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 26 Nov
+ 2020 10:40:22 +0100
+Received: by gauss2.secunet.de (Postfix, from userid 1000)      id E21C731804CE;
+ Thu, 26 Nov 2020 10:40:21 +0100 (CET)
+Date:   Thu, 26 Nov 2020 10:40:21 +0100
+From:   Steffen Klassert <steffen.klassert@secunet.com>
+To:     Phil Sutter <phil@nwl.cc>, <linux-crypto@vger.kernel.org>,
+        <netfilter-devel@vger.kernel.org>
+Subject: Re: XFRM interface and NF_INET_LOCAL_OUT hook
+Message-ID: <20201126094021.GK8805@gauss3.secunet.de>
+References: <20201125112342.GA11766@orbyte.nwl.cc>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1976718.1606378781.1@warthog.procyon.org.uk>
-Date:   Thu, 26 Nov 2020 08:19:41 +0000
-Message-ID: <1976719.1606378781@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Disposition: inline
+In-Reply-To: <20201125112342.GA11766@orbyte.nwl.cc>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-01.secunet.de (10.53.40.197)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+Hi Phil,
 
-> > Here's my first cut at a generic Kerberos crypto library in the kernel so
-> > that I can share code between rxrpc and sunrpc (and cifs?).
+On Wed, Nov 25, 2020 at 12:23:42PM +0100, Phil Sutter wrote:
+> Hi Steffen,
 > 
-> I can't find the bit where you are actually sharing this code with
-> sunrpc, am I missing something?
+> I am working on a ticket complaining about netfilter policy match
+> missing packets in OUTPUT chain if XFRM interface is being used.
+> 
+> I don't fully overlook the relevant code path, but it seems like
+> skb_dest(skb)->xfrm is not yet assigned when the skb is routed towards
+> XFRM interface and already cleared again (by xfrm_output_one?) before it
+> makes its way towards the real output interface. NF_INET_POST_ROUTING
+> hook works though.
+> 
+> Is this a bug or an expected quirk when using XFRM interface?
 
-I haven't done that yet.  Sorry, I should've been more explicit with what I
-was after.  I was wanting to find out if the nfs/nfsd people are okay with
-this (and if there are any gotchas I should know about - it turns out, if I
-understand it correctly, the relevant code may being being rewritten a bit
-anyway).
+This is expected behaviour. The xfrm interfaces are plaintext devices,
+the plaintext packets are routed to the xfrm interface which guarantees
+transformation. So the lookup that assigns skb_dst(skb)->xfrm
+happens 'behind' the interface. After transformation,
+skb_dst(skb)->xfrm will be cleared. So this assignment exists just
+inside xfrm in that case.
 
-And from you, I was wanting to find out if you're okay with an interface of
-this kind in crypto/ where the code is just used directly - or whether I'll
-be required to wrap it up in the autoloading, module-handling mechanisms.
-
-David
-
+Does netfilter match against skb_dst(skb)->xfrm? What is the exact case
+that does not work?
