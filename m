@@ -7,26 +7,26 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31539C2D0E4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0DA2C63777
 	for <linux-crypto@archiver.kernel.org>; Fri, 27 Nov 2020 09:42:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E05D821D81
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Nov 2020 09:42:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CAB621D81
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Nov 2020 09:42:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729459AbgK0Jmo (ORCPT
+        id S1727281AbgK0Jmp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Nov 2020 04:42:44 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:8419 "EHLO
-        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729148AbgK0Jmn (ORCPT
+        Fri, 27 Nov 2020 04:42:45 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:8188 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728998AbgK0Jmo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Nov 2020 04:42:43 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Cj8mV1bm5z741C;
-        Fri, 27 Nov 2020 17:42:18 +0800 (CST)
+        Fri, 27 Nov 2020 04:42:44 -0500
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Cj8mM2DPLzkhFh;
+        Fri, 27 Nov 2020 17:42:11 +0800 (CST)
 Received: from localhost.localdomain.localdomain (10.175.113.25) by
  DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 27 Nov 2020 17:42:33 +0800
+ 14.3.487.0; Fri, 27 Nov 2020 17:42:31 +0800
 From:   Qinglang Miao <miaoqinglang@huawei.com>
 To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -38,9 +38,9 @@ CC:     <linux-crypto@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>,
         Qinglang Miao <miaoqinglang@huawei.com>
-Subject: [PATCH 3/3] crypto: sun8i - fix reference leak in sun8i-ss
-Date:   Fri, 27 Nov 2020 17:46:46 +0800
-Message-ID: <20201127094646.121735-4-miaoqinglang@huawei.com>
+Subject: [PATCH 1/3] crypto: sun4i - fix reference leak in sun4i-ss
+Date:   Fri, 27 Nov 2020 17:46:44 +0800
+Message-ID: <20201127094646.121735-2-miaoqinglang@huawei.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201127094646.121735-1-miaoqinglang@huawei.com>
 References: <20201127094646.121735-1-miaoqinglang@huawei.com>
@@ -66,35 +66,63 @@ leak by replacing it with new funtion.
 Reported-by: Hulk Robot <hulkci@huawei.com>
 Signed-off-by: Qinglang Miao <miaoqinglang@huawei.com>
 ---
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 2 +-
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c   | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c | 2 +-
+ drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c   | 2 +-
+ drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c   | 2 +-
+ drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c   | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-index ed2a69f82..7c355bc2f 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-@@ -351,7 +351,7 @@ int sun8i_ss_cipher_init(struct crypto_tfm *tfm)
- 	op->enginectx.op.prepare_request = NULL;
- 	op->enginectx.op.unprepare_request = NULL;
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
+index b72de8939..d0d6671c1 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
+@@ -504,7 +504,7 @@ int sun4i_ss_cipher_init(struct crypto_tfm *tfm)
+ 				    crypto_skcipher_reqsize(op->fallback_tfm));
+ 
  
 -	err = pm_runtime_get_sync(op->ss->dev);
 +	err = pm_runtime_resume_and_get(op->ss->dev);
- 	if (err < 0) {
- 		dev_err(op->ss->dev, "pm error %d\n", err);
+ 	if (err < 0)
  		goto error_pm;
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-index e0ddc6847..80e89066d 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-@@ -753,7 +753,7 @@ static int sun8i_ss_probe(struct platform_device *pdev)
- 	if (err)
- 		goto error_alg;
+ 
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
+index a2b67f7f8..19fd03185 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
+@@ -413,7 +413,7 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+ 	 * this info could be useful
+ 	 */
  
 -	err = pm_runtime_get_sync(ss->dev);
 +	err = pm_runtime_resume_and_get(ss->dev);
  	if (err < 0)
- 		goto error_alg;
+ 		goto error_pm;
+ 
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
+index 1dff48558..fac21fc1e 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
+@@ -27,7 +27,7 @@ int sun4i_hash_crainit(struct crypto_tfm *tfm)
+ 	algt = container_of(alg, struct sun4i_ss_alg_template, alg.hash);
+ 	op->ss = algt->ss;
+ 
+-	err = pm_runtime_get_sync(op->ss->dev);
++	err = pm_runtime_resume_and_get(op->ss->dev);
+ 	if (err < 0)
+ 		return err;
+ 
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
+index 729aafdbe..848937463 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
+@@ -28,7 +28,7 @@ int sun4i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
+ 	algt = container_of(alg, struct sun4i_ss_alg_template, alg.rng);
+ 	ss = algt->ss;
+ 
+-	err = pm_runtime_get_sync(ss->dev);
++	err = pm_runtime_resume_and_get(ss->dev);
+ 	if (err < 0)
+ 		return err;
  
 -- 
 2.23.0
