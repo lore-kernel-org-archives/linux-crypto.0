@@ -7,53 +7,56 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1655DC64E7C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C3C2C64E7D
 	for <linux-crypto@archiver.kernel.org>; Fri, 27 Nov 2020 06:27:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6B04221FF
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Nov 2020 06:27:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A57E221FD
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Nov 2020 06:27:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392645AbgK0G1Y (ORCPT
+        id S2392654AbgK0G11 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Nov 2020 01:27:24 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:33508 "EHLO fornost.hmeau.com"
+        Fri, 27 Nov 2020 01:27:27 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:33514 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392527AbgK0G1X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Nov 2020 01:27:23 -0500
+        id S2392527AbgK0G10 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 27 Nov 2020 01:27:26 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kiXDl-0000yj-L5; Fri, 27 Nov 2020 17:27:06 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Nov 2020 17:27:05 +1100
-Date:   Fri, 27 Nov 2020 17:27:05 +1100
+        id 1kiXE0-00011X-67; Fri, 27 Nov 2020 17:27:21 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Nov 2020 17:27:20 +1100
+Date:   Fri, 27 Nov 2020 17:27:20 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
-        davem@davemloft.net, lbartosik@marvell.com,
-        akpm@linux-foundation.org, hannes@cmpxchg.org, longman@redhat.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] crypto: marvell/octeontx - Use dma_set_mask_and_coherent
- to simplify code
-Message-ID: <20201127062705.GH11448@gondor.apana.org.au>
-References: <20201121074916.1322898-1-christophe.jaillet@wanadoo.fr>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] crypto: ccree - rework cache parameters handling
+Message-ID: <20201127062720.GJ11448@gondor.apana.org.au>
+References: <20201122075154.20478-1-gilad@benyossef.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201121074916.1322898-1-christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20201122075154.20478-1-gilad@benyossef.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Nov 21, 2020 at 08:49:16AM +0100, Christophe JAILLET wrote:
-> 'pci_set_dma_mask()' + 'pci_set_consistent_dma_mask()' can be replaced by
-> an equivalent 'dma_set_mask_and_coherent()' which is much less verbose.
+On Sun, Nov 22, 2020 at 09:51:53AM +0200, Gilad Ben-Yossef wrote:
+> Rework the setting of DMA cache parameters, program more appropriate
+> values and explicitly set sharability domain.
 > 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 > ---
->  drivers/crypto/marvell/octeontx/otx_cptpf_main.c | 10 ++--------
->  drivers/crypto/marvell/octeontx/otx_cptvf_main.c | 10 ++--------
->  2 files changed, 4 insertions(+), 16 deletions(-)
+> 
+> Changes from previous versions:
+> - After discussion with Rob H., drop notion of setting the parameters
+>   from device tree and just use good defaults for cached/non cached.
+> 
+>  drivers/crypto/ccree/cc_driver.c | 75 +++++++++++++++++++++++++-------
+>  drivers/crypto/ccree/cc_driver.h |  6 +--
+>  drivers/crypto/ccree/cc_pm.c     |  2 +-
+>  3 files changed, 63 insertions(+), 20 deletions(-)
 
 Patch applied.  Thanks.
 -- 
