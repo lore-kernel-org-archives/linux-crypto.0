@@ -7,34 +7,37 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A247C2D0E4
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Nov 2020 09:40:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F3EEC2D0E4
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Nov 2020 09:41:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3BCD421D81
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Nov 2020 09:40:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 050D621D81
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Nov 2020 09:40:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726178AbgK0JkW (ORCPT
+        id S1728731AbgK0Jkl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Nov 2020 04:40:22 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:8047 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725616AbgK0JkW (ORCPT
+        Fri, 27 Nov 2020 04:40:41 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:7999 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728493AbgK0Jkj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Nov 2020 04:40:22 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Cj8jl4KDwzhjJs;
-        Fri, 27 Nov 2020 17:39:55 +0800 (CST)
+        Fri, 27 Nov 2020 04:40:39 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Cj8kD2DQTzhjF1;
+        Fri, 27 Nov 2020 17:40:20 +0800 (CST)
 Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 27 Nov 2020 17:40:11 +0800
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.487.0; Fri, 27 Nov 2020 17:40:30 +0800
 From:   Qinglang Miao <miaoqinglang@huawei.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Qinglang Miao" <miaoqinglang@huawei.com>
-Subject: [PATCH] crypto: sa2ul - fix reference leak in sa_ul_probe()
-Date:   Fri, 27 Nov 2020 17:44:27 +0800
-Message-ID: <20201127094427.120635-1-miaoqinglang@huawei.com>
+To:     =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>,
+        "Krzysztof Kozlowski" <krzk@kernel.org>
+CC:     <linux-samsung-soc@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>,
+        Qinglang Miao <miaoqinglang@huawei.com>
+Subject: [PATCH] hwrng: exynos - fix reference leak in exynos_trng_probe
+Date:   Fri, 27 Nov 2020 17:44:46 +0800
+Message-ID: <20201127094446.121277-1-miaoqinglang@huawei.com>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
@@ -55,26 +58,26 @@ leak by replacing it with new funtion.
 
 [0] dd8088d5a896 ("PM: runtime: Add  pm_runtime_resume_and_get to deal with usage counter")
 
-Fixes: 7694b6ca649f ("crypto: sa2ul - Add crypto driver")
+Fixes: 6cd225cc5d8a ("hwrng: exynos - add Samsung Exynos True RNG driver")
 Reported-by: Hulk Robot <hulkci@huawei.com>
 Signed-off-by: Qinglang Miao <miaoqinglang@huawei.com>
 ---
- drivers/crypto/sa2ul.c | 2 +-
+ drivers/char/hw_random/exynos-trng.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-index eda93fab9..39d56ab12 100644
---- a/drivers/crypto/sa2ul.c
-+++ b/drivers/crypto/sa2ul.c
-@@ -2345,7 +2345,7 @@ static int sa_ul_probe(struct platform_device *pdev)
- 	dev_set_drvdata(sa_k3_dev, dev_data);
+diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
+index 8e1fe3f8d..666246bc8 100644
+--- a/drivers/char/hw_random/exynos-trng.c
++++ b/drivers/char/hw_random/exynos-trng.c
+@@ -132,7 +132,7 @@ static int exynos_trng_probe(struct platform_device *pdev)
+ 		return PTR_ERR(trng->mem);
  
- 	pm_runtime_enable(dev);
--	ret = pm_runtime_get_sync(dev);
-+	ret = pm_runtime_resume_and_get(dev);
+ 	pm_runtime_enable(&pdev->dev);
+-	ret = pm_runtime_get_sync(&pdev->dev);
++	ret = pm_runtime_resume_and_get(&pdev->dev);
  	if (ret < 0) {
- 		dev_err(&pdev->dev, "%s: failed to get sync: %d\n", __func__,
- 			ret);
+ 		dev_err(&pdev->dev, "Could not get runtime PM.\n");
+ 		goto err_pm_get;
 -- 
 2.23.0
 
