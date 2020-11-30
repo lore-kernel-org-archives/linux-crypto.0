@@ -2,47 +2,51 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03EEAC64E8A
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 06:55:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54313C64E8A
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 08:25:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B880B206C1
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 06:55:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F342020731
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 08:25:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725902AbgK3GzF (ORCPT
+        id S1726137AbgK3IZK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Nov 2020 01:55:05 -0500
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:50550 "EHLO
-        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725884AbgK3GzF (ORCPT
+        Mon, 30 Nov 2020 03:25:10 -0500
+Received: from smtp-bc08.mail.infomaniak.ch ([45.157.188.8]:50107 "EHLO
+        smtp-bc08.mail.infomaniak.ch" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727529AbgK3IZI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Nov 2020 01:55:05 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0UGwypdg_1606719263;
-Received: from B-455UMD6M-2027.local(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UGwypdg_1606719263)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 30 Nov 2020 14:54:23 +0800
-Subject: Re: [PATCH] crypto: ecrdsa - use subsys_initcall instead of
- module_init
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Vitaly Chikunov <vt@altlinux.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20201015110241.89676-1-tianjia.zhang@linux.alibaba.com>
- <20201015120504.GA12976@gondor.apana.org.au>
- <f6d98764-dde8-6f40-c0e7-9eb5b087d713@linux.alibaba.com>
- <20201130022422.GA21049@gondor.apana.org.au>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <df22e694-0a2e-811a-412e-269303c5d27d@linux.alibaba.com>
-Date:   Mon, 30 Nov 2020 14:54:23 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.4.3
+        Mon, 30 Nov 2020 03:25:08 -0500
+Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
+        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Ckyv71SkPzlhCHK;
+        Mon, 30 Nov 2020 09:24:19 +0100 (CET)
+Received: from ns3096276.ip-94-23-54.eu (unknown [94.23.54.103])
+        by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Ckyv42C21zlh8TB;
+        Mon, 30 Nov 2020 09:24:16 +0100 (CET)
+Subject: Re: [PATCH v1 0/9] Enable root to update the blacklist keyring
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <jmorris@namei.org>,
+        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "Serge E . Hallyn" <serge@hallyn.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
+References: <20201120180426.922572-1-mic@digikod.net>
+ <20201130024011.GA24870@kernel.org>
+From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+Message-ID: <80fb0eae-8321-5ae2-8d50-eabbe86981da@digikod.net>
+Date:   Mon, 30 Nov 2020 09:23:59 +0100
+User-Agent: 
 MIME-Version: 1.0
-In-Reply-To: <20201130022422.GA21049@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20201130024011.GA24870@kernel.org>
+Content-Type: text/plain; charset=iso-8859-15
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -50,32 +54,68 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-
-On 11/30/20 10:24 AM, Herbert Xu wrote:
-> On Mon, Nov 30, 2020 at 10:21:56AM +0800, Tianjia Zhang wrote:
+On 30/11/2020 03:40, Jarkko Sakkinen wrote:
+> On Fri, Nov 20, 2020 at 07:04:17PM +0100, Mickaël Salaün wrote:
+>> Hi,
 >>
->>> That is true only if there are non-generic implementations of
->>> the algorithms, which is not the case here.  Please explain the
->>> real reason why this is needed.
+>> This patch series mainly add a new configuration option to enable the
+>> root user to load signed keys in the blacklist keyring.  This keyring is
+>> useful to "untrust" certificates or files.  Enabling to safely update
+>> this keyring without recompiling the kernel makes it more usable.
+> 
+> I apologize for latency. This cycle has been difficult because of
+> final cuts with the huge SGX patch set.
+> 
+> I did skim through this and did not see anything striking (but it
+> was a quick look).
+> 
+> What would be easiest way to smoke test the changes?
+
+An easy way to test it is to enable the second trusted keyring to
+dynamically load certificates in the kernel. Then we can create a hash
+of a valid certificate (but not loaded yet) and sign it as explained in
+tools/certs/print-cert-tbs-hash.sh (patch 9/9). Once this hash is loaded
+in the kernel, loading the blacklisted certificate will be denied. We
+can also test it with a PKCS#7 signature chain, either with the
+blacklist keyring itself, or with a signed dm-verity image.
+
+> 
+>> Regards,
 >>
->> This is a generic algorithm, the author Vitaly Chikunov has also confirmed
->> it, please consider this patch again.
+>> Mickaël Salaün (9):
+>>   certs: Fix blacklisted hexadecimal hash string check
+>>   certs: Make blacklist_vet_description() more strict
+>>   certs: Factor out the blacklist hash creation
+>>   certs: Check that builtin blacklist hashes are valid
+>>   PKCS#7: Fix missing include
+>>   certs: Fix blacklist flag type confusion
+>>   certs: Allow root user to append signed hashes to the blacklist
+>>     keyring
+>>   certs: Replace K{U,G}IDT_INIT() with GLOBAL_ROOT_{U,G}ID
+>>   tools/certs: Add print-cert-tbs-hash.sh
+>>
+>>  MAINTAINERS                                   |   2 +
+>>  certs/.gitignore                              |   1 +
+>>  certs/Kconfig                                 |  10 +
+>>  certs/Makefile                                |  15 +-
+>>  certs/blacklist.c                             | 210 +++++++++++++-----
+>>  certs/system_keyring.c                        |   5 +-
+>>  crypto/asymmetric_keys/x509_public_key.c      |   3 +-
+>>  include/keys/system_keyring.h                 |  14 +-
+>>  include/linux/verification.h                  |   2 +
+>>  scripts/check-blacklist-hashes.awk            |  37 +++
+>>  .../platform_certs/keyring_handler.c          |  26 +--
+>>  tools/certs/print-cert-tbs-hash.sh            |  91 ++++++++
+>>  12 files changed, 335 insertions(+), 81 deletions(-)
+>>  create mode 100755 scripts/check-blacklist-hashes.awk
+>>  create mode 100755 tools/certs/print-cert-tbs-hash.sh
+>>
+>>
+>> base-commit: 09162bc32c880a791c6c0668ce0745cf7958f576
+>> -- 
+>> 2.29.2
+>>
+>>
 > 
-> As I said, the generic algorithm only needs to be loaded early *if*
-> there are non-generic implementations.
+> /Jarkko
 > 
-> Cheers,
-> 
-
-For ecrdsa, there is no reason to advance the initialization to 
-subsys_init, this is just to make code clean up to have algorithm 
-initialization uniform with other implementations.
-
-Itâ€™s just that I think that in the commit c4741b230597 ("crypto: run 
-initcalls for generic implementations earlier"), the modification to 
-ecrdsa happened to be omitted, because from the point of commit time, it 
-was submitted at the same time as the ecrdsa commits, and it may happen 
-to be omitted for ecrdsa.
-
-Best regards,
-Tianjia
