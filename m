@@ -2,77 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D70C64E7B
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 12:48:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DD1FC83013
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 12:54:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8492207BC
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 12:48:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z/8Dc6Pb"
+	by mail.kernel.org (Postfix) with ESMTP id 0086320691
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 12:54:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725859AbgK3MsD (ORCPT
+        id S1726260AbgK3MyI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Nov 2020 07:48:03 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43340 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725849AbgK3MsD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Nov 2020 07:48:03 -0500
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DB057207BC
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Nov 2020 12:47:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1606740442;
-        bh=8RxdMuG6a6mMddTxQNnZRKG4dMrJGGLLz+GeVFQF9UI=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Z/8Dc6PbRz9nE9NHnA+E2m0MCckwvw4iSqEa6V/dwTcFB/l2/z8Gtt7NW1mU/up2b
-         WbMbUfOULrP1Mxycz/PaSuTTQvQAg2i87/3dBoGr4sPLUoECmYHqQ03KAAZfYTrqS2
-         9cRSLFhOnxQpe75Wa3qf8oWKQ1sUiyOayLqDTV8U=
-Received: by mail-ot1-f50.google.com with SMTP id h39so11112396otb.5
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Nov 2020 04:47:21 -0800 (PST)
-X-Gm-Message-State: AOAM5336SUbXeH4YBhZprNoabRrRcsq6/ryLbjTcSFeOi2oQKlfUOEdv
-        2H5Qf9TfG7fwT1h5doIYqk7FHQTV2c0v/iq5jhA=
-X-Google-Smtp-Source: ABdhPJy5TJM1PFhxHP9B2qaeHFJwS+IJZUyPjzNwdTd6m/Z8luL97paANBKGi3bD5qy6u2IroIFjMPI6f6NQRiDzT7M=
-X-Received: by 2002:a05:6830:214c:: with SMTP id r12mr16069966otd.90.1606740441115;
- Mon, 30 Nov 2020 04:47:21 -0800 (PST)
+        Mon, 30 Nov 2020 07:54:08 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:8533 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726001AbgK3MyG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 30 Nov 2020 07:54:06 -0500
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Cl4s658FgzhkdP;
+        Mon, 30 Nov 2020 20:52:58 +0800 (CST)
+Received: from localhost.localdomain.localdomain (10.175.113.25) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 30 Nov 2020 20:53:16 +0800
+From:   Qinglang Miao <miaoqinglang@huawei.com>
+To:     =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>,
+        "Krzysztof Kozlowski" <krzk@kernel.org>
+CC:     <linux-samsung-soc@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>,
+        Qinglang Miao <miaoqinglang@huawei.com>
+Subject: [PATCH v2] hwrng: exynos - fix reference leak in exynos_trng_probe
+Date:   Mon, 30 Nov 2020 21:01:18 +0800
+Message-ID: <20201130130118.51339-1-miaoqinglang@huawei.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20201130122620.16640-1-ardb@kernel.org> <CAMuHMdW39bXXS+OACMOFWXgf2=zgmfN0WjhV+_H4aZLbfAQVjw@mail.gmail.com>
-In-Reply-To: <CAMuHMdW39bXXS+OACMOFWXgf2=zgmfN0WjhV+_H4aZLbfAQVjw@mail.gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Mon, 30 Nov 2020 13:47:10 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXHtW_+mJ+JLcQbO3T5v=G=mnRdtMZ5_14736-eTAaw6xQ@mail.gmail.com>
-Message-ID: <CAMj1kXHtW_+mJ+JLcQbO3T5v=G=mnRdtMZ5_14736-eTAaw6xQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: aegis128 - avoid spurious references crypto_aegis128_update_simd
-To:     Geert Uytterhoeven <geert@linux-m68k.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.113.25]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 30 Nov 2020 at 13:42, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
->
-> Hi Ard,
->
-> On Mon, Nov 30, 2020 at 1:26 PM Ard Biesheuvel <ardb@kernel.org> wrote:
-> > Geert reports that builds where CONFIG_CRYPTO_AEGIS128_SIMD is not set
-> > may still emit references to crypto_aegis128_update_simd(), which
-> > cannot be satisfied and therefore break the build. These references
-> > only exist in functions that can be optimized away, but apparently,
-> > the compiler is not always able to prove this.
->
-> The code is not unreachable. Both crypto_aegis128_encrypt_simd() and
-> crypto_aegis128_decrypt_simd() call crypto_aegis128_process_ad(..., true);
->
+pm_runtime_get_sync will increment pm usage counter even
+failed. Forgetting to putting operation will result in a
+reference leak here.
 
-Those functions themselves can be optimized away too, as well as
-struct aead_alg crypto_aegis128_alg_simd, which is the only thing that
-refers to those functions, and is itself only referenced inside a 'if
-(IS_ENABLED(CONFIG_CRYPTO_AEGIS128_SIMD))' conditional block. This is
-why it works fine most of the time.
+Replace it with pm_runtime_resume_and_get to keep usage
+counter balanced. I remove err_clock label at the same.
+
+Fixes: 6cd225cc5d8a ("hwrng: exynos - add Samsung Exynos True RNG driver")
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Suggested-by: Lukasz Stelmach <l.stelmach@samsung.com>
+Signed-off-by: Qinglang Miao <miaoqinglang@huawei.com>
+---
+ v2: remobe useless label as Lukasz suggested.
+
+ drivers/char/hw_random/exynos-trng.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
+index 8e1fe3f8d..ffebb72e4 100644
+--- a/drivers/char/hw_random/exynos-trng.c
++++ b/drivers/char/hw_random/exynos-trng.c
+@@ -132,7 +132,7 @@ static int exynos_trng_probe(struct platform_device *pdev)
+ 		return PTR_ERR(trng->mem);
+ 
+ 	pm_runtime_enable(&pdev->dev);
+-	ret = pm_runtime_get_sync(&pdev->dev);
++	ret = pm_runtime_resume_and_get(&pdev->dev);
+ 	if (ret < 0) {
+ 		dev_err(&pdev->dev, "Could not get runtime PM.\n");
+ 		goto err_pm_get;
+@@ -142,13 +142,13 @@ static int exynos_trng_probe(struct platform_device *pdev)
+ 	if (IS_ERR(trng->clk)) {
+ 		ret = PTR_ERR(trng->clk);
+ 		dev_err(&pdev->dev, "Could not get clock.\n");
+-		goto err_clock;
++		goto err_pm_get;
+ 	}
+ 
+ 	ret = clk_prepare_enable(trng->clk);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "Could not enable the clk.\n");
+-		goto err_clock;
++		goto err_pm_get;
+ 	}
+ 
+ 	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
+@@ -164,9 +164,6 @@ static int exynos_trng_probe(struct platform_device *pdev)
+ err_register:
+ 	clk_disable_unprepare(trng->clk);
+ 
+-err_clock:
+-	pm_runtime_put_sync(&pdev->dev);
+-
+ err_pm_get:
+ 	pm_runtime_disable(&pdev->dev);
+ 
+-- 
+2.23.0
+
