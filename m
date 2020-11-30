@@ -2,31 +2,59 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89CA4C64E8A
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 15:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D3E9C64E7B
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 15:16:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3421220725
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 15:13:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EDC120725
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 15:16:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LWkyQL71"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726827AbgK3PNQ (ORCPT
+        id S1726653AbgK3PQT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Nov 2020 10:13:16 -0500
-Received: from verein.lst.de ([213.95.11.211]:44748 "EHLO verein.lst.de"
+        Mon, 30 Nov 2020 10:16:19 -0500
+Received: from mail.zx2c4.com ([192.95.5.64]:44377 "EHLO mail.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725899AbgK3PNQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Nov 2020 10:13:16 -0500
-Received: by verein.lst.de (Postfix, from userid 2005)
-        id 3702A6736F; Mon, 30 Nov 2020 16:12:32 +0100 (CET)
-Date:   Mon, 30 Nov 2020 16:12:32 +0100
-From:   Torsten Duwe <duwe@lst.de>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Stephan =?utf-8?Q?M=C3=BCller?= <smueller@chronox.de>,
-        Willy Tarreau <w@1wt.eu>, linux-crypto@vger.kernel.org,
+        id S1725899AbgK3PQS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 30 Nov 2020 10:16:18 -0500
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id b6b41515;
+        Mon, 30 Nov 2020 15:10:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type; s=mail; bh=12rqlfUcyjBIdcubsxjR5/8B2DM=; b=LWkyQL
+        71ddl9uiltR3GyHix9UWTmVg3n4Z+00ld7+Tp7oP3lX5xbA42v3grgXp3faAjjRr
+        8uXiHkVaEIJdKznZWWhbMZNP3ZkHh7Ogt0ZwmoXqQfUATlN/Plw+0gxggeOKvrRZ
+        qspiaw+l9for/syhxo/AV1v8u5OtyD6T/ATaOvz2hqrE20g1uYI9Gkn08OxpGxEd
+        GjL8WT4Zxn/JUUTpATuPW2S8yn8mvLhupmSKMmbDnAyUnWTUsFRD9l2PwVTr4A5G
+        hznBVCrJbeu68pIHp3WKMnUWAAeJSg2bgeLC6Ico6u61DxKM14FRXJTRCG2jE++v
+        s07V4wknlK5/NEGg==
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2cfb59f8 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 30 Nov 2020 15:10:02 +0000 (UTC)
+Received: by mail-yb1-f173.google.com with SMTP id x2so7721597ybt.11;
+        Mon, 30 Nov 2020 07:15:35 -0800 (PST)
+X-Gm-Message-State: AOAM532TZAisVnWqFjMfLOhY8MunyT9gBW/GtDHvhf27u9AAl5oU6nsL
+        VpgfI/cl+EM431pjTXlsiiVDB/Zq/CS6e7egRkE=
+X-Google-Smtp-Source: ABdhPJxUFrp6jsMaYkripYAMMseOy64kR9cSfDa+EijAqesWgnJClXB7aCy/cSIrZNUfbNxcaaoMyXPZZYN+5ULAKHU=
+X-Received: by 2002:a25:bb81:: with SMTP id y1mr27562036ybg.456.1606749334107;
+ Mon, 30 Nov 2020 07:15:34 -0800 (PST)
+MIME-Version: 1.0
+References: <20201130151231.GA24862@lst.de>
+In-Reply-To: <20201130151231.GA24862@lst.de>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 30 Nov 2020 16:15:23 +0100
+X-Gmail-Original-Message-ID: <CAHmME9p4vFGWh7+CKF4f3dw5r+ru5PVG0-vP77JowX8sPhin1g@mail.gmail.com>
+Message-ID: <CAHmME9p4vFGWh7+CKF4f3dw5r+ru5PVG0-vP77JowX8sPhin1g@mail.gmail.com>
+Subject: Re: drivers/char/random.c needs a (new) maintainer
+To:     duwe@lst.de
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>,
+        Willy Tarreau <w@1wt.eu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Nicolai Stange <nstange@suse.de>,
         LKML <linux-kernel@vger.kernel.org>,
         Arnd Bergmann <arnd@arndb.de>,
@@ -49,60 +77,17 @@ Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>,
         Julia Lawall <julia.lawall@inria.fr>,
         Dan Carpenter <dan.carpenter@oracle.com>,
         And y Lavr <andy.lavr@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>, ardb@kernel.org,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
         Petr Tesarik <ptesarik@suse.cz>, simo@redhat.com
-Subject: drivers/char/random.c needs a (new) maintainer
-Message-ID: <20201130151231.GA24862@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus!
+I am willing to maintain random.c and have intentions to have a
+formally verified RNG. I've mentioned this to Ted before.
 
-AFAIK it's legit to bother you directly with issues like this one?
-
-I see certifications as the mere messengers here which tell us that
-our /dev/random is technologically outdated. Input entropy amounts are
-guesstimated in advance, obviously much too conservatively, compiled in
-and never checked thereafter; the whitening is done using some home-
-grown hash function derivative and other non-cryptographic, non-standard
-operations.
-
-All of this does not affect the Linux kernel directly, it will compile
-happily, and will run smoothly with all given crypto apps. Only new
-crypto keys are generated slower than necessary or, much worse, might
-contain less entropy than required because something broke down
-unnoticed.  In that case, problems would arise only much later, but in
-the real world and with much graver impact. I would rather like to see
-the Linux /dev/random being reliable, whether certified or not. If it
-provided that reliable entropy fast that would be even cooler. If it
-was at least possible to get approval from a standardization body
-(without forcing this onto all users, of course) that would be optimal.
-
-Meanwhile there's quite a maintenance backlog; minor fixes are
-pending, medium-sized cleanups are ignored and major patch sets to add
-the missing features are not even discussed. (I'm deliberately not
-including links here to avoid excessive finger pointing.)
-
-I'd like to believe that Ted is too busy working on ext4, but,
-especially on explicit request, a "hold on, I'm busy, will get at it
-later" or "right, someone wants to take over?" would be appropriate
-IMHO. It is also not helpful to object to or ignore all changes which
-might benefit certifications just for that sole reason and because of
-personal aversion. No reply at all yields exactly the same result as
-having no maintainer at all, hence the subject.
-
-Could you please try to get a definite answer from him? I know there
-is at least one person (probably more) with enough enthusiasm and
-expertise who would happily take over, should that turn out to be a
-problem.
-
-Thanks,
-
-	Torsten
-
+But I think Ted's reluctance to not accept the recent patches sent to
+this list is mostly justified, and I have no desire to see us rush
+into replacing random.c with something suboptimal or FIPSy.
