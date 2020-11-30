@@ -2,57 +2,37 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D3E9C64E7B
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 15:16:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61EDCC71156
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 16:56:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0EDC120725
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 15:16:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LWkyQL71"
+	by mail.kernel.org (Postfix) with ESMTP id 2730920855
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 16:56:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726653AbgK3PQT (ORCPT
+        id S1726970AbgK3Q4N (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Nov 2020 10:16:19 -0500
-Received: from mail.zx2c4.com ([192.95.5.64]:44377 "EHLO mail.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725899AbgK3PQS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Nov 2020 10:16:18 -0500
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id b6b41515;
-        Mon, 30 Nov 2020 15:10:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=12rqlfUcyjBIdcubsxjR5/8B2DM=; b=LWkyQL
-        71ddl9uiltR3GyHix9UWTmVg3n4Z+00ld7+Tp7oP3lX5xbA42v3grgXp3faAjjRr
-        8uXiHkVaEIJdKznZWWhbMZNP3ZkHh7Ogt0ZwmoXqQfUATlN/Plw+0gxggeOKvrRZ
-        qspiaw+l9for/syhxo/AV1v8u5OtyD6T/ATaOvz2hqrE20g1uYI9Gkn08OxpGxEd
-        GjL8WT4Zxn/JUUTpATuPW2S8yn8mvLhupmSKMmbDnAyUnWTUsFRD9l2PwVTr4A5G
-        hznBVCrJbeu68pIHp3WKMnUWAAeJSg2bgeLC6Ico6u61DxKM14FRXJTRCG2jE++v
-        s07V4wknlK5/NEGg==
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2cfb59f8 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Mon, 30 Nov 2020 15:10:02 +0000 (UTC)
-Received: by mail-yb1-f173.google.com with SMTP id x2so7721597ybt.11;
-        Mon, 30 Nov 2020 07:15:35 -0800 (PST)
-X-Gm-Message-State: AOAM532TZAisVnWqFjMfLOhY8MunyT9gBW/GtDHvhf27u9AAl5oU6nsL
-        VpgfI/cl+EM431pjTXlsiiVDB/Zq/CS6e7egRkE=
-X-Google-Smtp-Source: ABdhPJxUFrp6jsMaYkripYAMMseOy64kR9cSfDa+EijAqesWgnJClXB7aCy/cSIrZNUfbNxcaaoMyXPZZYN+5ULAKHU=
-X-Received: by 2002:a25:bb81:: with SMTP id y1mr27562036ybg.456.1606749334107;
- Mon, 30 Nov 2020 07:15:34 -0800 (PST)
-MIME-Version: 1.0
-References: <20201130151231.GA24862@lst.de>
-In-Reply-To: <20201130151231.GA24862@lst.de>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 30 Nov 2020 16:15:23 +0100
-X-Gmail-Original-Message-ID: <CAHmME9p4vFGWh7+CKF4f3dw5r+ru5PVG0-vP77JowX8sPhin1g@mail.gmail.com>
-Message-ID: <CAHmME9p4vFGWh7+CKF4f3dw5r+ru5PVG0-vP77JowX8sPhin1g@mail.gmail.com>
-Subject: Re: drivers/char/random.c needs a (new) maintainer
-To:     duwe@lst.de
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>,
+        Mon, 30 Nov 2020 11:56:13 -0500
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:45579 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728148AbgK3Q4N (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 30 Nov 2020 11:56:13 -0500
+Received: from callcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 0AUGrdfr005363
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 30 Nov 2020 11:53:40 -0500
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id 6172A420136; Mon, 30 Nov 2020 11:53:39 -0500 (EST)
+Date:   Mon, 30 Nov 2020 11:53:39 -0500
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     duwe@lst.de, Linus Torvalds <torvalds@linux-foundation.org>,
+        Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
         Willy Tarreau <w@1wt.eu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Nicolai Stange <nstange@suse.de>,
@@ -80,14 +60,32 @@ Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         Eric Biggers <ebiggers@kernel.org>,
         Ard Biesheuvel <ardb@kernel.org>,
         Petr Tesarik <ptesarik@suse.cz>, simo@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: drivers/char/random.c needs a (new) maintainer
+Message-ID: <20201130165339.GE5364@mit.edu>
+References: <20201130151231.GA24862@lst.de>
+ <CAHmME9p4vFGWh7+CKF4f3dw5r+ru5PVG0-vP77JowX8sPhin1g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHmME9p4vFGWh7+CKF4f3dw5r+ru5PVG0-vP77JowX8sPhin1g@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I am willing to maintain random.c and have intentions to have a
-formally verified RNG. I've mentioned this to Ted before.
+On Mon, Nov 30, 2020 at 04:15:23PM +0100, Jason A. Donenfeld wrote:
+> I am willing to maintain random.c and have intentions to have a
+> formally verified RNG. I've mentioned this to Ted before.
+> 
+> But I think Ted's reluctance to not accept the recent patches sent to
+> this list is mostly justified, and I have no desire to see us rush
+> into replacing random.c with something suboptimal or FIPSy.
 
-But I think Ted's reluctance to not accept the recent patches sent to
-this list is mostly justified, and I have no desire to see us rush
-into replacing random.c with something suboptimal or FIPSy.
+Being a maintainer is not about *accepting* patches, it's about
+*reviewing* them.  I do plan to make time to catch up on reviewing
+patches this cycle.  One thing that would help me is if folks
+(especially Jason, if you would) could start with a detailed review of
+Nicolai's patches.  His incremental approach is I believe the best one
+from a review perspective, and certainly his cleanup patches are ones
+which I would expect are no-brainers.
+
+						- Ted
