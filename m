@@ -2,89 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55571C64E7B
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 13:10:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89CA4C64E8A
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 15:13:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED96720825
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 13:10:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3421220725
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Nov 2020 15:13:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726050AbgK3NKU (ORCPT
+        id S1726827AbgK3PNQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Nov 2020 08:10:20 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:33927 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725961AbgK3NKT (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Nov 2020 08:10:19 -0500
-Received: by mail-ot1-f67.google.com with SMTP id h19so11223787otr.1
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Nov 2020 05:10:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=syueVib23V0V7ir42+aU8JSvF0sFTmAkdHUTkEANl68=;
-        b=XbpdxFKLpTJc5bZ9Vogpx8VkldNhBY7ySuyOUVarXB68NhfNnOJjLRCQYdGWMTg3sM
-         zw1ei/piLILMQ47lBDX62Y71XzWppbhaEl5TeXrTVxKQ8cC3vqrsUZKy7qVgf5Odunms
-         PflBauL6ZO6tGVHK/wLDnofD6YmBemql9UBMcXYmo+lkGWp5AmVB/vEItqIOCU2CZbYZ
-         l5tcVIN213jBJWWXtnBxBuGvVRRiUTrvnvZc7d4p5rJUIrgrQz38SeKi6pvhHO5w3TSv
-         MQ/cHQbCmStGFw8U+rD4Kn1P39oehpVEsJbNAhqxq4cGaqjEvLyUT1FeleA/JWJtTG62
-         63vg==
-X-Gm-Message-State: AOAM533T8k/neERlnERd0/w7pC58DVNeDyjVH4eGYlJx/Ihuji4kmsCf
-        4KsuDjtbVOIrNz/IwJ31yQQW184QBbKzAJTKibbBfCiHmIM=
-X-Google-Smtp-Source: ABdhPJzq9Qahbq4AM+FeSkcwcyCFSNPS+rt3lZUAJVYOW6suQxSrd//UCH7Rd+yd1EH3HNYv2WYndtPlyQLBu8ASZww=
-X-Received: by 2002:a05:6830:1f5a:: with SMTP id u26mr8307244oth.250.1606741777254;
- Mon, 30 Nov 2020 05:09:37 -0800 (PST)
+        Mon, 30 Nov 2020 10:13:16 -0500
+Received: from verein.lst.de ([213.95.11.211]:44748 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725899AbgK3PNQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 30 Nov 2020 10:13:16 -0500
+Received: by verein.lst.de (Postfix, from userid 2005)
+        id 3702A6736F; Mon, 30 Nov 2020 16:12:32 +0100 (CET)
+Date:   Mon, 30 Nov 2020 16:12:32 +0100
+From:   Torsten Duwe <duwe@lst.de>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Stephan =?utf-8?Q?M=C3=BCller?= <smueller@chronox.de>,
+        Willy Tarreau <w@1wt.eu>, linux-crypto@vger.kernel.org,
+        Nicolai Stange <nstange@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        And y Lavr <andy.lavr@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>, ardb@kernel.org,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Petr Tesarik <ptesarik@suse.cz>, simo@redhat.com
+Subject: drivers/char/random.c needs a (new) maintainer
+Message-ID: <20201130151231.GA24862@lst.de>
 MIME-Version: 1.0
-References: <20201130122620.16640-1-ardb@kernel.org> <CAMuHMdW39bXXS+OACMOFWXgf2=zgmfN0WjhV+_H4aZLbfAQVjw@mail.gmail.com>
- <CAMj1kXHtW_+mJ+JLcQbO3T5v=G=mnRdtMZ5_14736-eTAaw6xQ@mail.gmail.com>
-In-Reply-To: <CAMj1kXHtW_+mJ+JLcQbO3T5v=G=mnRdtMZ5_14736-eTAaw6xQ@mail.gmail.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Mon, 30 Nov 2020 14:09:26 +0100
-Message-ID: <CAMuHMdV+eWLWQe2wfnakfG9=OLPNA8jNTfxnLyz22oBBpB5VHA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: aegis128 - avoid spurious references crypto_aegis128_update_simd
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Ard,
+Hi Linus!
 
-On Mon, Nov 30, 2020 at 1:47 PM Ard Biesheuvel <ardb@kernel.org> wrote:
-> On Mon, 30 Nov 2020 at 13:42, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
-> > On Mon, Nov 30, 2020 at 1:26 PM Ard Biesheuvel <ardb@kernel.org> wrote:
-> > > Geert reports that builds where CONFIG_CRYPTO_AEGIS128_SIMD is not set
-> > > may still emit references to crypto_aegis128_update_simd(), which
-> > > cannot be satisfied and therefore break the build. These references
-> > > only exist in functions that can be optimized away, but apparently,
-> > > the compiler is not always able to prove this.
-> >
-> > The code is not unreachable. Both crypto_aegis128_encrypt_simd() and
-> > crypto_aegis128_decrypt_simd() call crypto_aegis128_process_ad(..., true);
-> >
->
-> Those functions themselves can be optimized away too, as well as
-> struct aead_alg crypto_aegis128_alg_simd, which is the only thing that
-> refers to those functions, and is itself only referenced inside a 'if
-> (IS_ENABLED(CONFIG_CRYPTO_AEGIS128_SIMD))' conditional block. This is
-> why it works fine most of the time.
+AFAIK it's legit to bother you directly with issues like this one?
 
-I stand corrected: I missed the conditional registration of
-crypto_aegis128_alg_simd.
+I see certifications as the mere messengers here which tell us that
+our /dev/random is technologically outdated. Input entropy amounts are
+guesstimated in advance, obviously much too conservatively, compiled in
+and never checked thereafter; the whitening is done using some home-
+grown hash function derivative and other non-cryptographic, non-standard
+operations.
 
-Gr{oetje,eeting}s,
+All of this does not affect the Linux kernel directly, it will compile
+happily, and will run smoothly with all given crypto apps. Only new
+crypto keys are generated slower than necessary or, much worse, might
+contain less entropy than required because something broke down
+unnoticed.  In that case, problems would arise only much later, but in
+the real world and with much graver impact. I would rather like to see
+the Linux /dev/random being reliable, whether certified or not. If it
+provided that reliable entropy fast that would be even cooler. If it
+was at least possible to get approval from a standardization body
+(without forcing this onto all users, of course) that would be optimal.
 
-                        Geert
+Meanwhile there's quite a maintenance backlog; minor fixes are
+pending, medium-sized cleanups are ignored and major patch sets to add
+the missing features are not even discussed. (I'm deliberately not
+including links here to avoid excessive finger pointing.)
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+I'd like to believe that Ted is too busy working on ext4, but,
+especially on explicit request, a "hold on, I'm busy, will get at it
+later" or "right, someone wants to take over?" would be appropriate
+IMHO. It is also not helpful to object to or ignore all changes which
+might benefit certifications just for that sole reason and because of
+personal aversion. No reply at all yields exactly the same result as
+having no maintainer at all, hence the subject.
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Could you please try to get a definite answer from him? I know there
+is at least one person (probably more) with enough enthusiasm and
+expertise who would happily take over, should that turn out to be a
+problem.
+
+Thanks,
+
+	Torsten
+
