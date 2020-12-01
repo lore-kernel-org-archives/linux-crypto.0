@@ -2,136 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C02C83018
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 05:56:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A491DC64E7A
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 06:33:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C359C2087D
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 05:56:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47AE220857
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 06:33:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="emDPbOhP"
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="KleEj1Fl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726771AbgLAFyu (ORCPT
+        id S1727031AbgLAGdj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Dec 2020 00:54:50 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:58724 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725859AbgLAFyt (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Dec 2020 00:54:49 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B15n67q107471;
-        Tue, 1 Dec 2020 05:53:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : mime-version :
- content-type; s=corp-2020-01-29;
- bh=l9ihS9O8ty7fvCGsyg6t+FL2UWzq+Pp7wI7g9M3fu94=;
- b=emDPbOhPomsDJ0NVhkgalKaWcDmTVt43uxmasZhRdsIKDAK5SyUn3ZBbDT0tfjc2Ub+G
- pwnVB+2L6jYArSQUwoKsFjxw+gIeAIQd1agInCI9m5zu6sstYek99cFlGrF83pfAMoYp
- 7h3VW08t/kH06cHx+UsVCvNai9zlonapT50haza8ExqU3V0ifCJ/7nW0lmA/qRSavM+P
- eE0d7ezZdfPLepa71ISDd/u3VXj3GbiZhoaxq0dsKdiEuu46H687kMfk2k9ooRtVL0+n
- yN1cC747fo++ObKGg9Es3E0DMkXRjQCXCIESHdIfuri0sdDNQNO6hiI2IHC3bOw+gche Nw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2130.oracle.com with ESMTP id 353c2aru96-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 01 Dec 2020 05:53:05 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B15oGDF104852;
-        Tue, 1 Dec 2020 05:53:04 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by userp3020.oracle.com with ESMTP id 3540arqfy6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 01 Dec 2020 05:53:04 +0000
-Received: from userp3020.oracle.com (userp3020.oracle.com [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B15r2KY111063;
-        Tue, 1 Dec 2020 05:53:02 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 3540arqfwj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 01 Dec 2020 05:53:02 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0B15qbsa005213;
-        Tue, 1 Dec 2020 05:52:40 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 30 Nov 2020 21:52:37 -0800
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, alsa-devel@alsa-project.org,
-        amd-gfx@lists.freedesktop.org, bridge@lists.linux-foundation.org,
-        ceph-devel@vger.kernel.org, cluster-devel@redhat.com,
-        coreteam@netfilter.org, devel@driverdev.osuosl.org,
-        dm-devel@redhat.com, drbd-dev@tron.linbit.com,
-        dri-devel@lists.freedesktop.org, GR-everest-linux-l2@marvell.com,
-        GR-Linux-NIC-Dev@marvell.com, intel-gfx@lists.freedesktop.org,
-        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, linux-acpi@vger.kernel.org,
-        linux-afs@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net,
-        linux-block@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-ext4@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-geode@lists.infradead.org, linux-gpio@vger.kernel.org,
-        linux-hams@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-i3c@lists.infradead.org, linux-ide@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-media@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mm@kvack.org,
-        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, nouveau@lists.freedesktop.org,
-        op-tee@lists.trustedfirmware.org, oss-drivers@netronome.com,
-        patches@opensource.cirrus.com, rds-devel@oss.oracle.com,
-        reiserfs-devel@vger.kernel.org, samba-technical@lists.samba.org,
-        selinux@vger.kernel.org, target-devel@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net,
-        usb-storage@lists.one-eyed-alien.net,
-        virtualization@lists.linux-foundation.org,
-        wcn36xx@lists.infradead.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org, linux-hardening@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Miguel Ojeda <ojeda@kernel.org>, Joe Perches <joe@perches.com>,
-        Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH 000/141] Fix fall-through warnings for Clang
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq1h7p6gjkk.fsf@ca-mkp.ca.oracle.com>
-References: <cover.1605896059.git.gustavoars@kernel.org>
-Date:   Tue, 01 Dec 2020 00:52:27 -0500
-In-Reply-To: <cover.1605896059.git.gustavoars@kernel.org> (Gustavo
-        A. R. Silva's message of "Fri, 20 Nov 2020 12:21:39 -0600")
+        Tue, 1 Dec 2020 01:33:39 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38968 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725859AbgLAGdj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 1 Dec 2020 01:33:39 -0500
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8AA8820857
+        for <linux-crypto@vger.kernel.org>; Tue,  1 Dec 2020 06:32:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1606804378;
+        bh=WdEJMU9jhUlyte7Ihqk7bKUBHAhWuc4AeFSkrg1ryQ0=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=KleEj1FlgLh5SUZ6zafBrFB/jc89eDhNjUyOCTyek/LI6TU+0aVgqwwOLrehK05eC
+         wD3AIfIIeZr1F9mwdNW4EB0eTX9PhQokJNaDRu1jYw+lFMawoVrIE+lJmb4dIqTV8K
+         IQstyjuny5g8j0uN6WLUDjdPzBbUXZ4fcoa/iW70=
+Received: by mail-ot1-f50.google.com with SMTP id f16so650827otl.11
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Nov 2020 22:32:58 -0800 (PST)
+X-Gm-Message-State: AOAM531SgMttjcl+GfGzufkTvgVHDuSN+2qbgYj9gL8H4JpitU/8lslw
+        3dOOSnwxiCjq7Z6lCljZQYsR3DTkKUufogjNL5w=
+X-Google-Smtp-Source: ABdhPJwVEq/ImuPOszqN/TgLxcOQ90C0SMwPtgXHot6ke0Z8PNqI/e7IgDp0fS3wVelTTdp1U9PmrB3P93rxz+FygRY=
+X-Received: by 2002:a05:6830:3099:: with SMTP id f25mr876717ots.77.1606804377750;
+ Mon, 30 Nov 2020 22:32:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9821 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 lowpriorityscore=0
- clxscore=1011 bulkscore=0 mlxlogscore=289 phishscore=0 malwarescore=0
- spamscore=0 adultscore=0 mlxscore=0 priorityscore=1501 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012010039
+References: <20201129182035.7015-1-ardb@kernel.org> <4e850713-af8b-f81f-bf3d-f4ee5185d99f@candelatech.com>
+In-Reply-To: <4e850713-af8b-f81f-bf3d-f4ee5185d99f@candelatech.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 1 Dec 2020 07:32:46 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXGt_sjyBH1veEEEizHjUMWEkuTUicxmhbLjQXnJ9LXGpw@mail.gmail.com>
+Message-ID: <CAMj1kXGt_sjyBH1veEEEizHjUMWEkuTUicxmhbLjQXnJ9LXGpw@mail.gmail.com>
+Subject: Re: [PATCH] crypto: aesni - add ccm(aes) algorithm implementation
+To:     Ben Greear <greearb@candelatech.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Steve deRosier <derosier@cal-sierra.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Mon, 30 Nov 2020 at 23:48, Ben Greear <greearb@candelatech.com> wrote:
+>
+> On 11/29/20 10:20 AM, Ard Biesheuvel wrote:
+> > From: Steve deRosier <ardb@kernel.org>
+> >
+> > Add ccm(aes) implementation from linux-wireless mailing list (see
+> > http://permalink.gmane.org/gmane.linux.kernel.wireless.general/126679).
+> >
+> > This eliminates FPU context store/restore overhead existing in more
+> > general ccm_base(ctr(aes-aesni),aes-aesni) case in MAC calculation.
+> >
+> > Suggested-by: Ben Greear <greearb@candelatech.com>
+> > Co-developed-by: Steve deRosier <derosier@cal-sierra.com>
+> > Signed-off-by: Steve deRosier <derosier@cal-sierra.com>
+> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> > ---
+> > Ben,
+> >
+> > This is almost a rewrite of the original patch, switching to the new
+> > skcipher API, using the existing SIMD helper, and drop numerous unrelated
+> > changes. The basic approach is almost identical, though, so I expect this
+> > to perform on par or perhaps slightly faster than the original.
+> >
+> > Could you please confirm with some numbers?
+>
+> I tried this on my apu2 platform, here is perf top during a TCP download using
+> rx-sw-crypt (ie, the aesni cpu decrypt path):
+>
+>    18.77%  [kernel]                            [k] acpi_idle_enter
+>    14.68%  [kernel]                            [k] kernel_fpu_begin
+>     4.45%  [kernel]                            [k] __crypto_xor
+>     3.46%  [kernel]                            [k] _aesni_enc1
+>
+> Total throughput is 127Mbps or so.  This is with your patch applied to 5.8.0+
+> kernel (it applied clean with 'git am')
+>
+> Is there a good way to verify at runtime that I've properly applied your patch?
+>
+> On my 5.4 kernel with the old version of the patch installed, I see 253Mbps throughput,
+> and perf-top shows:
+>
+>    13.33%  [kernel]                            [k] acpi_idle_do_entry
+>     9.21%  [kernel]                            [k] _aesni_enc1
+>     4.49%  [unknown]                           [.] 0x00007fbc3f00adb6
+>     4.34%  [unknown]                           [.] 0x00007fbc3f00adba
+>     3.85%  [kernel]                            [k] memcpy
+>
+>
+> So, new patch is not working that well for me...
+>
 
-Gustavo,
+That is odd. The net number of invocations of kernel_fpu_begin()
+should be the same, so I cannot explain why they suddenly take more
+time. I am starting to think that this is a different issue
+altogether.
 
-> This series aims to fix almost all remaining fall-through warnings in
-> order to enable -Wimplicit-fallthrough for Clang.
-
-Applied 20-22,54,120-124 to 5.11/scsi-staging, thanks.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+One thing that you could try is dropping the '.cra_alignmask' line as
+we don't actually need it, but I am skeptical that this is the cause
+of this.
