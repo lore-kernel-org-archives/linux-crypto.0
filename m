@@ -2,119 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ADCEC64E7B
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 06:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7399BC64E7A
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 08:22:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 09AA42087D
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 06:51:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CF1C2087D
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 08:22:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e+AzRyBR"
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="0ugfFVtm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726713AbgLAGvP (ORCPT
+        id S1728668AbgLAIWH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Dec 2020 01:51:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59108 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725859AbgLAGvP (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Dec 2020 01:51:15 -0500
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB732C0613CF;
-        Mon, 30 Nov 2020 22:50:34 -0800 (PST)
-Received: by mail-pf1-x443.google.com with SMTP id q22so205394pfk.12;
-        Mon, 30 Nov 2020 22:50:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=5TbZRDFuS6pZ0tUWXbMbLbpnoAnGVDMU7ST9hOrM+1w=;
-        b=e+AzRyBR4DLj0yY3x0KPjvibjwmrpTiNoi6bJ+DdYAu5BLOJFpji490fQs/2baa3Og
-         zvKeYgBvczsT14jpc+vT8b9kdm4U4GdwfVCuIEWHw3k/pRd3pVJEuQvXxAu1Ev21E9Dr
-         9WxHziTFY1S9/w9Ct6N2kPaYIK7pQT5m6rtOa5TQ57l0f2MacMEz3zM7QEnsCP5sdpQN
-         9v6U/WEEWZKumdRnRHO0GbW39xkTq4yK+QrAo8r3iownSOLyzak21fNRDiz9VG+ce1Ac
-         aYmQ8os5cWiyFqFvuUgztBn661Aw7H6UwyZsFOlIsY2oA3CIKuV4M26OaONB1fc5Po3v
-         ssEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=5TbZRDFuS6pZ0tUWXbMbLbpnoAnGVDMU7ST9hOrM+1w=;
-        b=B61kRVEjq5DQBX8ztv2SvLecFsSXwE5ual5M1MqOeDwJBEWK+Yq9netUVoTf5LXDQx
-         9Mw8DXrQlD1XlVbYu7o0lWUD+4/XZPhVUFnKtau26AmmNTj+bA00C4tORFe4XAj8MJJl
-         Vugeo9pl4/Z2Y7GoSmuFMm6NIYSJFCKlE2ig8uIVybI+7k4BAKiSik5emg5VzUby5RM+
-         DpVoD08RX/Lsvc0u7DQ/UctxOP07yOUVDdsI0UabYo/Y9gMvA7qwjKOvH3xgzmSvI8tU
-         wUivkGj2euqZb2q4gCAoHKCFCktAGpCzWH5v5RZTjxRd3NLMXeKdVWYq1wH6Zelw4HLU
-         anNw==
-X-Gm-Message-State: AOAM533esAJDXBRz+DfAqKsIneDt7kobrHVRWni/n+6bD7HqHJLNhzmO
-        bTEFC8H/aHoPzrELrZIOHfv+TYpiFB0=
-X-Google-Smtp-Source: ABdhPJxLXb0m/onpoQcyuCUIYX5W7JPNbhOhJrKliJRDzbDshn8gU+6egfzSiG5G1p6tIdZmUj6DCg==
-X-Received: by 2002:a63:a503:: with SMTP id n3mr1075553pgf.416.1606805434370;
-        Mon, 30 Nov 2020 22:50:34 -0800 (PST)
-Received: from localhost.localdomain ([8.210.202.142])
-        by smtp.gmail.com with ESMTPSA id l3sm1035966pju.44.2020.11.30.22.50.31
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 30 Nov 2020 22:50:33 -0800 (PST)
-From:   Yejune Deng <yejune.deng@gmail.com>
-To:     xuzaibo@huawei.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yejune.deng@gmail.com
-Subject: [PATCH] crypto: hisilicon/trng replace atomic_add_return()
-Date:   Tue,  1 Dec 2020 14:50:18 +0800
-Message-Id: <1606805418-4739-1-git-send-email-yejune.deng@gmail.com>
-X-Mailer: git-send-email 1.9.1
+        Tue, 1 Dec 2020 03:22:07 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47644 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727192AbgLAIWH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 1 Dec 2020 03:22:07 -0500
+Received: from embeddedor (187-162-31-110.static.axtel.net [187.162.31.110])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 94ECB20659;
+        Tue,  1 Dec 2020 08:21:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1606810884;
+        bh=xHTFstOj6O/KMLPWIJ9livXkeh5E3cNJZoMEX1ICbl0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=0ugfFVtmDEFz3qweRxNJGIbdlhHbJEbe+SPrGbc9I44gM+O6I2rVgrcZagGiPQlJe
+         qDa/e9cJY/n7rREFFqWQI6CYR7sTmaWJfiub5J4ReXH3L76qQfPF0XWoTZ+/KCqBa1
+         43uSa/AsDxhQJOFTJrlenu8ULt+S2HlexiyIiZjk=
+Date:   Tue, 1 Dec 2020 02:20:47 -0600
+From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     linux-kernel@vger.kernel.org, alsa-devel@alsa-project.org,
+        amd-gfx@lists.freedesktop.org, bridge@lists.linux-foundation.org,
+        ceph-devel@vger.kernel.org, cluster-devel@redhat.com,
+        coreteam@netfilter.org, devel@driverdev.osuosl.org,
+        dm-devel@redhat.com, drbd-dev@tron.linbit.com,
+        dri-devel@lists.freedesktop.org, GR-everest-linux-l2@marvell.com,
+        GR-Linux-NIC-Dev@marvell.com, intel-gfx@lists.freedesktop.org,
+        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux-acpi@vger.kernel.org,
+        linux-afs@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net,
+        linux-block@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-ext4@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-geode@lists.infradead.org, linux-gpio@vger.kernel.org,
+        linux-hams@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        linux-i3c@lists.infradead.org, linux-ide@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-media@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, nouveau@lists.freedesktop.org,
+        op-tee@lists.trustedfirmware.org, oss-drivers@netronome.com,
+        patches@opensource.cirrus.com, rds-devel@oss.oracle.com,
+        reiserfs-devel@vger.kernel.org, samba-technical@lists.samba.org,
+        selinux@vger.kernel.org, target-devel@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net,
+        usb-storage@lists.one-eyed-alien.net,
+        virtualization@lists.linux-foundation.org,
+        wcn36xx@lists.infradead.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, linux-hardening@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Miguel Ojeda <ojeda@kernel.org>, Joe Perches <joe@perches.com>,
+        Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH 000/141] Fix fall-through warnings for Clang
+Message-ID: <20201201082047.GA11832@embeddedor>
+References: <cover.1605896059.git.gustavoars@kernel.org>
+ <yq1h7p6gjkk.fsf@ca-mkp.ca.oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <yq1h7p6gjkk.fsf@ca-mkp.ca.oracle.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-a set of atomic_inc_return() looks more neater
+On Tue, Dec 01, 2020 at 12:52:27AM -0500, Martin K. Petersen wrote:
+> 
+> Gustavo,
+> 
+> > This series aims to fix almost all remaining fall-through warnings in
+> > order to enable -Wimplicit-fallthrough for Clang.
+> 
+> Applied 20-22,54,120-124 to 5.11/scsi-staging, thanks.
 
-Signed-off-by: Yejune Deng <yejune.deng@gmail.com>
----
- drivers/crypto/hisilicon/trng/trng.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Awesome! :)
 
-diff --git a/drivers/crypto/hisilicon/trng/trng.c b/drivers/crypto/hisilicon/trng/trng.c
-index a5033cf..2971268 100644
---- a/drivers/crypto/hisilicon/trng/trng.c
-+++ b/drivers/crypto/hisilicon/trng/trng.c
-@@ -267,12 +267,12 @@ static int hisi_trng_probe(struct platform_device *pdev)
- 	}
- 
- 	hisi_trng_add_to_list(trng);
--	if (atomic_add_return(1, &trng_active_devs) == 1) {
-+	if (atomic_inc_return(&trng_active_devs) == 1) {
- 		ret = crypto_register_rng(&hisi_trng_alg);
- 		if (ret) {
- 			dev_err(&pdev->dev,
- 				"failed to register crypto(%d)\n", ret);
--			atomic_sub_return(1, &trng_active_devs);
-+			atomic_dec_return(&trng_active_devs);
- 			goto err_remove_from_list;
- 		}
- 	}
-@@ -289,7 +289,7 @@ static int hisi_trng_probe(struct platform_device *pdev)
- 	return ret;
- 
- err_crypto_unregister:
--	if (atomic_sub_return(1, &trng_active_devs) == 0)
-+	if (atomic_dec_return(&trng_active_devs) == 0)
- 		crypto_unregister_rng(&hisi_trng_alg);
- 
- err_remove_from_list:
-@@ -305,7 +305,7 @@ static int hisi_trng_remove(struct platform_device *pdev)
- 	while (hisi_trng_del_from_list(trng))
- 		;
- 
--	if (atomic_sub_return(1, &trng_active_devs) == 0)
-+	if (atomic_dec_return(&trng_active_devs) == 0)
- 		crypto_unregister_rng(&hisi_trng_alg);
- 
- 	return 0;
--- 
-1.9.1
-
+Thanks, Martin.
+--
+Gustavo
