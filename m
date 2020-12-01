@@ -2,118 +2,119 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A491DC64E7A
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 06:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ADCEC64E7B
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 06:51:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 47AE220857
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 06:33:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09AA42087D
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 06:51:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="KleEj1Fl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e+AzRyBR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727031AbgLAGdj (ORCPT
+        id S1726713AbgLAGvP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Dec 2020 01:33:39 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38968 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725859AbgLAGdj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Dec 2020 01:33:39 -0500
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8AA8820857
-        for <linux-crypto@vger.kernel.org>; Tue,  1 Dec 2020 06:32:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1606804378;
-        bh=WdEJMU9jhUlyte7Ihqk7bKUBHAhWuc4AeFSkrg1ryQ0=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=KleEj1FlgLh5SUZ6zafBrFB/jc89eDhNjUyOCTyek/LI6TU+0aVgqwwOLrehK05eC
-         wD3AIfIIeZr1F9mwdNW4EB0eTX9PhQokJNaDRu1jYw+lFMawoVrIE+lJmb4dIqTV8K
-         IQstyjuny5g8j0uN6WLUDjdPzBbUXZ4fcoa/iW70=
-Received: by mail-ot1-f50.google.com with SMTP id f16so650827otl.11
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Nov 2020 22:32:58 -0800 (PST)
-X-Gm-Message-State: AOAM531SgMttjcl+GfGzufkTvgVHDuSN+2qbgYj9gL8H4JpitU/8lslw
-        3dOOSnwxiCjq7Z6lCljZQYsR3DTkKUufogjNL5w=
-X-Google-Smtp-Source: ABdhPJwVEq/ImuPOszqN/TgLxcOQ90C0SMwPtgXHot6ke0Z8PNqI/e7IgDp0fS3wVelTTdp1U9PmrB3P93rxz+FygRY=
-X-Received: by 2002:a05:6830:3099:: with SMTP id f25mr876717ots.77.1606804377750;
- Mon, 30 Nov 2020 22:32:57 -0800 (PST)
-MIME-Version: 1.0
-References: <20201129182035.7015-1-ardb@kernel.org> <4e850713-af8b-f81f-bf3d-f4ee5185d99f@candelatech.com>
-In-Reply-To: <4e850713-af8b-f81f-bf3d-f4ee5185d99f@candelatech.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 1 Dec 2020 07:32:46 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGt_sjyBH1veEEEizHjUMWEkuTUicxmhbLjQXnJ9LXGpw@mail.gmail.com>
-Message-ID: <CAMj1kXGt_sjyBH1veEEEizHjUMWEkuTUicxmhbLjQXnJ9LXGpw@mail.gmail.com>
-Subject: Re: [PATCH] crypto: aesni - add ccm(aes) algorithm implementation
-To:     Ben Greear <greearb@candelatech.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Steve deRosier <derosier@cal-sierra.com>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 1 Dec 2020 01:51:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59108 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725859AbgLAGvP (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 1 Dec 2020 01:51:15 -0500
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB732C0613CF;
+        Mon, 30 Nov 2020 22:50:34 -0800 (PST)
+Received: by mail-pf1-x443.google.com with SMTP id q22so205394pfk.12;
+        Mon, 30 Nov 2020 22:50:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=5TbZRDFuS6pZ0tUWXbMbLbpnoAnGVDMU7ST9hOrM+1w=;
+        b=e+AzRyBR4DLj0yY3x0KPjvibjwmrpTiNoi6bJ+DdYAu5BLOJFpji490fQs/2baa3Og
+         zvKeYgBvczsT14jpc+vT8b9kdm4U4GdwfVCuIEWHw3k/pRd3pVJEuQvXxAu1Ev21E9Dr
+         9WxHziTFY1S9/w9Ct6N2kPaYIK7pQT5m6rtOa5TQ57l0f2MacMEz3zM7QEnsCP5sdpQN
+         9v6U/WEEWZKumdRnRHO0GbW39xkTq4yK+QrAo8r3iownSOLyzak21fNRDiz9VG+ce1Ac
+         aYmQ8os5cWiyFqFvuUgztBn661Aw7H6UwyZsFOlIsY2oA3CIKuV4M26OaONB1fc5Po3v
+         ssEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=5TbZRDFuS6pZ0tUWXbMbLbpnoAnGVDMU7ST9hOrM+1w=;
+        b=B61kRVEjq5DQBX8ztv2SvLecFsSXwE5ual5M1MqOeDwJBEWK+Yq9netUVoTf5LXDQx
+         9Mw8DXrQlD1XlVbYu7o0lWUD+4/XZPhVUFnKtau26AmmNTj+bA00C4tORFe4XAj8MJJl
+         Vugeo9pl4/Z2Y7GoSmuFMm6NIYSJFCKlE2ig8uIVybI+7k4BAKiSik5emg5VzUby5RM+
+         DpVoD08RX/Lsvc0u7DQ/UctxOP07yOUVDdsI0UabYo/Y9gMvA7qwjKOvH3xgzmSvI8tU
+         wUivkGj2euqZb2q4gCAoHKCFCktAGpCzWH5v5RZTjxRd3NLMXeKdVWYq1wH6Zelw4HLU
+         anNw==
+X-Gm-Message-State: AOAM533esAJDXBRz+DfAqKsIneDt7kobrHVRWni/n+6bD7HqHJLNhzmO
+        bTEFC8H/aHoPzrELrZIOHfv+TYpiFB0=
+X-Google-Smtp-Source: ABdhPJxLXb0m/onpoQcyuCUIYX5W7JPNbhOhJrKliJRDzbDshn8gU+6egfzSiG5G1p6tIdZmUj6DCg==
+X-Received: by 2002:a63:a503:: with SMTP id n3mr1075553pgf.416.1606805434370;
+        Mon, 30 Nov 2020 22:50:34 -0800 (PST)
+Received: from localhost.localdomain ([8.210.202.142])
+        by smtp.gmail.com with ESMTPSA id l3sm1035966pju.44.2020.11.30.22.50.31
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 30 Nov 2020 22:50:33 -0800 (PST)
+From:   Yejune Deng <yejune.deng@gmail.com>
+To:     xuzaibo@huawei.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yejune.deng@gmail.com
+Subject: [PATCH] crypto: hisilicon/trng replace atomic_add_return()
+Date:   Tue,  1 Dec 2020 14:50:18 +0800
+Message-Id: <1606805418-4739-1-git-send-email-yejune.deng@gmail.com>
+X-Mailer: git-send-email 1.9.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 30 Nov 2020 at 23:48, Ben Greear <greearb@candelatech.com> wrote:
->
-> On 11/29/20 10:20 AM, Ard Biesheuvel wrote:
-> > From: Steve deRosier <ardb@kernel.org>
-> >
-> > Add ccm(aes) implementation from linux-wireless mailing list (see
-> > http://permalink.gmane.org/gmane.linux.kernel.wireless.general/126679).
-> >
-> > This eliminates FPU context store/restore overhead existing in more
-> > general ccm_base(ctr(aes-aesni),aes-aesni) case in MAC calculation.
-> >
-> > Suggested-by: Ben Greear <greearb@candelatech.com>
-> > Co-developed-by: Steve deRosier <derosier@cal-sierra.com>
-> > Signed-off-by: Steve deRosier <derosier@cal-sierra.com>
-> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> > ---
-> > Ben,
-> >
-> > This is almost a rewrite of the original patch, switching to the new
-> > skcipher API, using the existing SIMD helper, and drop numerous unrelated
-> > changes. The basic approach is almost identical, though, so I expect this
-> > to perform on par or perhaps slightly faster than the original.
-> >
-> > Could you please confirm with some numbers?
->
-> I tried this on my apu2 platform, here is perf top during a TCP download using
-> rx-sw-crypt (ie, the aesni cpu decrypt path):
->
->    18.77%  [kernel]                            [k] acpi_idle_enter
->    14.68%  [kernel]                            [k] kernel_fpu_begin
->     4.45%  [kernel]                            [k] __crypto_xor
->     3.46%  [kernel]                            [k] _aesni_enc1
->
-> Total throughput is 127Mbps or so.  This is with your patch applied to 5.8.0+
-> kernel (it applied clean with 'git am')
->
-> Is there a good way to verify at runtime that I've properly applied your patch?
->
-> On my 5.4 kernel with the old version of the patch installed, I see 253Mbps throughput,
-> and perf-top shows:
->
->    13.33%  [kernel]                            [k] acpi_idle_do_entry
->     9.21%  [kernel]                            [k] _aesni_enc1
->     4.49%  [unknown]                           [.] 0x00007fbc3f00adb6
->     4.34%  [unknown]                           [.] 0x00007fbc3f00adba
->     3.85%  [kernel]                            [k] memcpy
->
->
-> So, new patch is not working that well for me...
->
+a set of atomic_inc_return() looks more neater
 
-That is odd. The net number of invocations of kernel_fpu_begin()
-should be the same, so I cannot explain why they suddenly take more
-time. I am starting to think that this is a different issue
-altogether.
+Signed-off-by: Yejune Deng <yejune.deng@gmail.com>
+---
+ drivers/crypto/hisilicon/trng/trng.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-One thing that you could try is dropping the '.cra_alignmask' line as
-we don't actually need it, but I am skeptical that this is the cause
-of this.
+diff --git a/drivers/crypto/hisilicon/trng/trng.c b/drivers/crypto/hisilicon/trng/trng.c
+index a5033cf..2971268 100644
+--- a/drivers/crypto/hisilicon/trng/trng.c
++++ b/drivers/crypto/hisilicon/trng/trng.c
+@@ -267,12 +267,12 @@ static int hisi_trng_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	hisi_trng_add_to_list(trng);
+-	if (atomic_add_return(1, &trng_active_devs) == 1) {
++	if (atomic_inc_return(&trng_active_devs) == 1) {
+ 		ret = crypto_register_rng(&hisi_trng_alg);
+ 		if (ret) {
+ 			dev_err(&pdev->dev,
+ 				"failed to register crypto(%d)\n", ret);
+-			atomic_sub_return(1, &trng_active_devs);
++			atomic_dec_return(&trng_active_devs);
+ 			goto err_remove_from_list;
+ 		}
+ 	}
+@@ -289,7 +289,7 @@ static int hisi_trng_probe(struct platform_device *pdev)
+ 	return ret;
+ 
+ err_crypto_unregister:
+-	if (atomic_sub_return(1, &trng_active_devs) == 0)
++	if (atomic_dec_return(&trng_active_devs) == 0)
+ 		crypto_unregister_rng(&hisi_trng_alg);
+ 
+ err_remove_from_list:
+@@ -305,7 +305,7 @@ static int hisi_trng_remove(struct platform_device *pdev)
+ 	while (hisi_trng_del_from_list(trng))
+ 		;
+ 
+-	if (atomic_sub_return(1, &trng_active_devs) == 0)
++	if (atomic_dec_return(&trng_active_devs) == 0)
+ 		crypto_unregister_rng(&hisi_trng_alg);
+ 
+ 	return 0;
+-- 
+1.9.1
+
