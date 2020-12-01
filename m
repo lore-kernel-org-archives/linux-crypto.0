@@ -2,127 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 905BFC64E7A
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 15:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 930A3C64E7B
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 19:40:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21B012076C
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 15:16:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ltmVNyD5";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="QBKJlVkR"
+	by mail.kernel.org (Postfix) with ESMTP id 3F0CE2151B
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 19:40:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390203AbgLAPPw (ORCPT
+        id S2392442AbgLATkG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Dec 2020 10:15:52 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:56046 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391549AbgLAPPu (ORCPT
+        Tue, 1 Dec 2020 14:40:06 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:43823 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389343AbgLATj7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Dec 2020 10:15:50 -0500
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1606835708;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MsXeMQ47McPWqbbEZn2X1D+kqQzuS1hMi5EWz6bK4Uk=;
-        b=ltmVNyD5+BvygaqiVzK9ZDnlWMHSHNWaEdbeBa/nCER1t70kyWNVzPR0tTfKoKbuz2ckOW
-        3sdqC1NViFTOc7/gUiRJxWVTA4z0T5m+F1RyfcOZ7PI8ECg7U6mkigKfSf1MhEeA1RH1CE
-        N0vBE5R0qr7QH/VJWkIQ0O3xGPzHpZ14Khf3rBfSVj6+2Zba3KGkRILFLaodwxMoACYXtn
-        HUBcRPQ5exM87SOYSrkOs+paa6pXvU2O61q9AKmpsDZ958x/wN0SKY4W90n44L45kkHEFS
-        L9BjAmFnWRFcIwc+5ifL0EgllhsqunL84C41w2nBlx6iM2O+IQSW0LJhB1127Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1606835708;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MsXeMQ47McPWqbbEZn2X1D+kqQzuS1hMi5EWz6bK4Uk=;
-        b=QBKJlVkRNcyH0Bclc71acDWFd6u6gDY9f+B8NvXAq9eLz9HdL+JvO4FyI1FZ8kaogqW+VB
-        s9M/ut+0Uo77xIAQ==
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc:     herbert@gondor.apana.org.au, mripard@kernel.org, wens@csie.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: crypto: sun4i-ss: error with kmap
-In-Reply-To: <20201201144529.GA6786@Red>
-References: <20201201130102.GA23461@Red> <87ft4phcyx.fsf@nanos.tec.linutronix.de> <20201201135252.GA9584@Red> <87y2ihfw6z.fsf@nanos.tec.linutronix.de> <20201201144529.GA6786@Red>
-Date:   Tue, 01 Dec 2020 16:15:08 +0100
-Message-ID: <87v9dlfthf.fsf@nanos.tec.linutronix.de>
+        Tue, 1 Dec 2020 14:39:59 -0500
+Received: by mail-io1-f66.google.com with SMTP id n14so2838078iom.10;
+        Tue, 01 Dec 2020 11:39:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Jq7u5/UfncNIXt0qMkxHCilNHf/0tvbW1U30cwWUoHA=;
+        b=QlG3WRkkQWH0ipPUOeJRQFsc2ZwARJNVZFZ30XY4Wuyt0cUOubjqRsYz5us0490k66
+         nYoWlxi4iX0srTtw1j4rolkiL+tVyzgL7wSNMBRrQIvoRxeN5j11YIy6s1Z7bGED+cOl
+         nozWJnP8w7y5E9uxd5tMyEWC/XPd8KQzXeyoNNiG/dlbR5aockHUZTKiEwhFBtTmTMyw
+         VApT9BnBkvhJ2gmPZlkWQVMGrijBMWC9Ng9FfrUloWHgBIBQSMd4g8tleEZWtUxyjhLP
+         Cbic1TRW2+oS2is77/bRT8mV7ZJ+/323JoS3yfxoq0ChgPUdpK/9/3+t7GQsfV84j5gP
+         mb5Q==
+X-Gm-Message-State: AOAM532k7M19xQa8MgQb+ICwAmGYR/52HB9aIQ8tTJotvnGXDGKs8LBH
+        JA5h95Rqb6O/85qHQQYKag==
+X-Google-Smtp-Source: ABdhPJxfrgZAxduHRKzNo2RBuk+51qGlK4QYC5A5RaXdhzhkKQOJbkkHDFsBY8Q3kqPdqmY8ZFhU1w==
+X-Received: by 2002:a02:650e:: with SMTP id u14mr1783751jab.143.1606851558412;
+        Tue, 01 Dec 2020 11:39:18 -0800 (PST)
+Received: from xps15 ([64.188.179.253])
+        by smtp.gmail.com with ESMTPSA id n16sm275022ilj.19.2020.12.01.11.39.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Dec 2020 11:39:17 -0800 (PST)
+Received: (nullmailer pid 931037 invoked by uid 1000);
+        Tue, 01 Dec 2020 19:39:15 -0000
+Date:   Tue, 1 Dec 2020 12:39:15 -0700
+From:   Rob Herring <robh@kernel.org>
+To:     Daniele Alessandrelli <daniele.alessandrelli@linux.intel.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
+        Declan Murphy <declan.murphy@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Mark Gross <mgross@linux.intel.com>,
+        devicetree@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>
+Subject: Re: [PATCH v3 1/3] dt-bindings: crypto: Add Keem Bay OCS HCU bindings
+Message-ID: <20201201193915.GA930982@robh.at.kernel.org>
+References: <20201116185846.773464-1-daniele.alessandrelli@linux.intel.com>
+ <20201116185846.773464-2-daniele.alessandrelli@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201116185846.773464-2-daniele.alessandrelli@linux.intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 01 2020 at 15:45, Corentin Labbe wrote:
-> On Tue, Dec 01, 2020 at 03:16:36PM +0100, Thomas Gleixner wrote:
-> In fact the warn was a bit later so I added:
->        preempt_disable();
->         idx = arch_kmap_local_unmap_idx(kmap_local_idx(), addr);
-> -       WARN_ON_ONCE(addr != __fix_to_virt(FIX_KMAP_BEGIN + idx));
-> +       if (WARN_ON_ONCE(addr != __fix_to_virt(FIX_KMAP_BEGIN + idx)))
-> +               pr_err("kunmap_local: vaddr %lx\n", (unsigned long) vaddr);
->  
->         arch_kmap_local_pre_unmap(addr);
->         pte_clear(&init_mm, addr, kmap_pte - idx);
->
-> and this give kunmap_local: vaddr ffefe000
+On Mon, 16 Nov 2020 18:58:44 +0000, Daniele Alessandrelli wrote:
+> From: Declan Murphy <declan.murphy@intel.com>
+> 
+> Add device-tree bindings for the Intel Keem Bay Offload Crypto Subsystem
+> (OCS) Hashing Control Unit (HCU) crypto driver.
+> 
+> Signed-off-by: Declan Murphy <declan.murphy@intel.com>
+> Signed-off-by: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+> Acked-by: Mark Gross <mgross@linux.intel.com>
+> ---
+>  .../crypto/intel,keembay-ocs-hcu.yaml         | 46 +++++++++++++++++++
+>  1 file changed, 46 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/intel,keembay-ocs-hcu.yaml
+> 
 
-which looks like a valid one.
-
-Can you apply the patch below and add 'ftrace_dump_on_oops' on the
-command line or enable it in /proc/sys/kernel/ftrace_dump_on_oops before
-starting the test.
-
-That should spill out the trace after crashing.
-
-Thanks,
-
-        tglx
----
-diff --git a/mm/highmem.c b/mm/highmem.c
-index b49364a306b8..461fe2c26107 100644
---- a/mm/highmem.c
-+++ b/mm/highmem.c
-@@ -485,6 +485,7 @@ static inline bool kmap_high_unmap_local(unsigned long vaddr)
- {
- #ifdef ARCH_NEEDS_KMAP_HIGH_GET
- 	if (vaddr >= PKMAP_ADDR(0) && vaddr < PKMAP_ADDR(LAST_PKMAP)) {
-+		trace_printk("kunmap_high: %lx\n", vaddr);
- 		kunmap_high(pte_page(pkmap_page_table[PKMAP_NR(vaddr)]));
- 		return true;
- 	}
-@@ -520,6 +521,7 @@ void *__kmap_local_pfn_prot(unsigned long pfn, pgprot_t prot)
- 	preempt_disable();
- 	idx = arch_kmap_local_map_idx(kmap_local_idx_push(), pfn);
- 	vaddr = __fix_to_virt(FIX_KMAP_BEGIN + idx);
-+	trace_printk("kmap_local_pfn: %d %lx\n", idx, (unsigned long) vaddr);
- 	BUG_ON(!pte_none(*(kmap_pte - idx)));
- 	pteval = pfn_pte(pfn, prot);
- 	set_pte_at(&init_mm, vaddr, kmap_pte - idx, pteval);
-@@ -545,8 +547,10 @@ void *__kmap_local_page_prot(struct page *page, pgprot_t prot)
- 
- 	/* Try kmap_high_get() if architecture has it enabled */
- 	kmap = arch_kmap_local_high_get(page);
--	if (kmap)
-+	if (kmap) {
-+		trace_printk("kmap_local_high_get: %lx\n", (unsigned long) kmap);
- 		return kmap;
-+	}
- 
- 	return __kmap_local_pfn_prot(page_to_pfn(page), prot);
- }
-@@ -578,6 +582,7 @@ void kunmap_local_indexed(void *vaddr)
- 
- 	preempt_disable();
- 	idx = arch_kmap_local_unmap_idx(kmap_local_idx(), addr);
-+	trace_printk("kunmap_local: %i %lx\n", idx, (unsigned long) vaddr);
- 	WARN_ON_ONCE(addr != __fix_to_virt(FIX_KMAP_BEGIN + idx));
- 
- 	arch_kmap_local_pre_unmap(addr);
-
+Reviewed-by: Rob Herring <robh@kernel.org>
