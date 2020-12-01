@@ -7,45 +7,44 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6640DC64E7A
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 14:26:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E352C64E7A
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 14:26:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0DD3320637
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 14:26:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51B0720758
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Dec 2020 14:26:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728951AbgLAO0O (ORCPT
+        id S1729083AbgLAO0X (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Dec 2020 09:26:14 -0500
-Received: from mga18.intel.com ([134.134.136.126]:7317 "EHLO mga18.intel.com"
+        Tue, 1 Dec 2020 09:26:23 -0500
+Received: from mga18.intel.com ([134.134.136.126]:7384 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728702AbgLAO0O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Dec 2020 09:26:14 -0500
-IronPort-SDR: Pvg0ys1kurO9GD1EFLaqf/TtpgdjOaGOioqy1IF4JxfBtVzSLWSJoGmZgrKHFR7zNeWQXAJFKr
- FwmIC2yQWw2g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9821"; a="160603451"
+        id S1728702AbgLAO0X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 1 Dec 2020 09:26:23 -0500
+IronPort-SDR: cByg4gO4aCF4DO1HZvC8mBR7lJwcCwq767obyqpucIcs3rt935ZbTqWGcwu9M6/llIHdXBRaiT
+ w8dZ19US5Qmg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9821"; a="160603458"
 X-IronPort-AV: E=Sophos;i="5.78,384,1599548400"; 
-   d="scan'208";a="160603451"
+   d="scan'208";a="160603458"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2020 06:24:57 -0800
-IronPort-SDR: NmQ+BS67WkVM7HilVJQO4Sc0XalHAEStjJujGRlqaPbn7GG919UBWXeEWdesdptUEou7T/cgqw
- oopPPnPiq60g==
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2020 06:25:01 -0800
+IronPort-SDR: MMB5rW1VtvkBi5tLKNLNBIPzBuBpO/P7Pr961uoovNfuiTIPh7WtImo7ooKWBpuKQtaZa4hCps
+ hgvHd1Gafv4g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.78,384,1599548400"; 
-   d="scan'208";a="345478639"
+   d="scan'208";a="345478662"
 Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
-  by orsmga002.jf.intel.com with ESMTP; 01 Dec 2020 06:24:56 -0800
+  by orsmga002.jf.intel.com with ESMTP; 01 Dec 2020 06:24:59 -0800
 From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
         Marco Chiappero <marco.chiappero@intel.com>,
-        Tomasz Kowalik <tomaszx.kowalik@intel.com>,
-        Mateusz Polrola <mateuszx.potrola@intel.com>,
+        Tomaszx Kowalik <tomaszx.kowalik@intel.com>,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH 1/3] crypto: qat - add AES-CTR support for QAT GEN4 devices
-Date:   Tue,  1 Dec 2020 14:24:49 +0000
-Message-Id: <20201201142451.138221-2-giovanni.cabiddu@intel.com>
+Subject: [PATCH 3/3] crypto: qat - add capability detection logic in qat_4xxx
+Date:   Tue,  1 Dec 2020 14:24:51 +0000
+Message-Id: <20201201142451.138221-4-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201201142451.138221-1-giovanni.cabiddu@intel.com>
 References: <20201201142451.138221-1-giovanni.cabiddu@intel.com>
@@ -57,131 +56,107 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Marco Chiappero <marco.chiappero@intel.com>
 
-Add support for AES-CTR for QAT GEN4 devices.
-Also, introduce the capability ICP_ACCEL_CAPABILITIES_AES_V2 and the
-helper macro HW_CAP_AES_V2, which allow to distinguish between
-different HW generations.
+Add logic to detect device capabilities in qat_4xxx driver.
 
-Co-developed-by: Tomasz Kowalik <tomaszx.kowalik@intel.com>
-Signed-off-by: Tomasz Kowalik <tomaszx.kowalik@intel.com>
-Co-developed-by: Mateusz Polrola <mateuszx.potrola@intel.com>
-Signed-off-by: Mateusz Polrola <mateuszx.potrola@intel.com>
+Read fuses and build the device capabilities mask. This will enable
+services and handling specific to QAT 4xxx devices.
+
+Co-developed-by: Tomaszx Kowalik <tomaszx.kowalik@intel.com>
+Signed-off-by: Tomaszx Kowalik <tomaszx.kowalik@intel.com>
 Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
 Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/qat/qat_common/icp_qat_fw_la.h |  7 +++++++
- drivers/crypto/qat/qat_common/icp_qat_hw.h    | 17 ++++++++++++++++-
- drivers/crypto/qat/qat_common/qat_algs.c      | 17 ++++++++++++++++-
- 3 files changed, 39 insertions(+), 2 deletions(-)
+ .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.c    | 24 +++++++++++++++++++
+ .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.h    | 11 +++++++++
+ drivers/crypto/qat/qat_4xxx/adf_drv.c         |  3 +++
+ 3 files changed, 38 insertions(+)
 
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_fw_la.h b/drivers/crypto/qat/qat_common/icp_qat_fw_la.h
-index 6757ec09d81f..28fa17f14be4 100644
---- a/drivers/crypto/qat/qat_common/icp_qat_fw_la.h
-+++ b/drivers/crypto/qat/qat_common/icp_qat_fw_la.h
-@@ -33,6 +33,9 @@ struct icp_qat_fw_la_bulk_req {
- 	struct icp_qat_fw_comn_req_cd_ctrl cd_ctrl;
- };
+diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
+index e7a7c1e3da28..344bfae45bff 100644
+--- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
++++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
+@@ -5,6 +5,7 @@
+ #include <adf_pf2vf_msg.h>
+ #include <adf_gen4_hw_data.h>
+ #include "adf_4xxx_hw_data.h"
++#include "icp_qat_hw.h"
  
-+#define ICP_QAT_FW_LA_USE_UCS_SLICE_TYPE 1
-+#define QAT_LA_SLICE_TYPE_BITPOS 14
-+#define QAT_LA_SLICE_TYPE_MASK 0x3
- #define ICP_QAT_FW_LA_GCM_IV_LEN_12_OCTETS 1
- #define ICP_QAT_FW_LA_GCM_IV_LEN_NOT_12_OCTETS 0
- #define QAT_FW_LA_ZUC_3G_PROTO_FLAG_BITPOS 12
-@@ -179,6 +182,10 @@ struct icp_qat_fw_la_bulk_req {
- 	QAT_FIELD_SET(flags, val, QAT_LA_PARTIAL_BITPOS, \
- 	QAT_LA_PARTIAL_MASK)
+ struct adf_fw_config {
+ 	u32 ae_mask;
+@@ -91,6 +92,28 @@ static void set_msix_default_rttable(struct adf_accel_dev *accel_dev)
+ 		ADF_CSR_WR(csr, ADF_4XXX_MSIX_RTTABLE_OFFSET(i), i);
+ }
  
-+#define ICP_QAT_FW_LA_SLICE_TYPE_SET(flags, val) \
-+	QAT_FIELD_SET(flags, val, QAT_LA_SLICE_TYPE_BITPOS, \
-+	QAT_LA_SLICE_TYPE_MASK)
++static u32 get_accel_cap(struct adf_accel_dev *accel_dev)
++{
++	struct pci_dev *pdev = accel_dev->accel_pci_dev.pci_dev;
++	u32 fusectl1;
++	u32 capabilities = ICP_ACCEL_CAPABILITIES_CRYPTO_SYMMETRIC |
++			   ICP_ACCEL_CAPABILITIES_CRYPTO_ASYMMETRIC |
++			   ICP_ACCEL_CAPABILITIES_AUTHENTICATION |
++			   ICP_ACCEL_CAPABILITIES_AES_V2;
 +
- struct icp_qat_fw_cipher_req_hdr_cd_pars {
- 	union {
- 		struct {
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_hw.h b/drivers/crypto/qat/qat_common/icp_qat_hw.h
-index 4aa5d724e11b..e39e8a2d51a7 100644
---- a/drivers/crypto/qat/qat_common/icp_qat_hw.h
-+++ b/drivers/crypto/qat/qat_common/icp_qat_hw.h
-@@ -65,6 +65,11 @@ struct icp_qat_hw_auth_config {
- 	__u32 reserved;
- };
++	/* Read accelerator capabilities mask */
++	pci_read_config_dword(pdev, ADF_4XXX_FUSECTL1_OFFSET, &fusectl1);
++
++	if (fusectl1 & ICP_ACCEL_4XXX_MASK_CIPHER_SLICE)
++		capabilities &= ~ICP_ACCEL_CAPABILITIES_CRYPTO_SYMMETRIC;
++	if (fusectl1 & ICP_ACCEL_4XXX_MASK_AUTH_SLICE)
++		capabilities &= ~ICP_ACCEL_CAPABILITIES_AUTHENTICATION;
++	if (fusectl1 & ICP_ACCEL_4XXX_MASK_PKE_SLICE)
++		capabilities &= ~ICP_ACCEL_CAPABILITIES_CRYPTO_ASYMMETRIC;
++
++	return capabilities;
++}
++
+ static enum dev_sku_info get_sku(struct adf_hw_device_data *self)
+ {
+ 	return DEV_SKU_1;
+@@ -189,6 +212,7 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data)
+ 	hw_data->get_misc_bar_id = get_misc_bar_id;
+ 	hw_data->get_arb_info = get_arb_info;
+ 	hw_data->get_admin_info = get_admin_info;
++	hw_data->get_accel_cap = get_accel_cap;
+ 	hw_data->get_sku = get_sku;
+ 	hw_data->fw_name = ADF_4XXX_FW;
+ 	hw_data->fw_mmp_name = ADF_4XXX_MMP;
+diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h
+index cdde0be886bf..4fe2a776293c 100644
+--- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h
++++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h
+@@ -69,6 +69,17 @@
+ #define ADF_4XXX_ASYM_OBJ	"qat_4xxx_asym.bin"
+ #define ADF_4XXX_ADMIN_OBJ	"qat_4xxx_admin.bin"
  
-+struct icp_qat_hw_ucs_cipher_config {
-+	__u32 val;
-+	__u32 reserved[3];
++/* qat_4xxx fuse bits are different from old GENs, redefine them */
++enum icp_qat_4xxx_slice_mask {
++	ICP_ACCEL_4XXX_MASK_CIPHER_SLICE = BIT(0),
++	ICP_ACCEL_4XXX_MASK_AUTH_SLICE = BIT(1),
++	ICP_ACCEL_4XXX_MASK_PKE_SLICE = BIT(2),
++	ICP_ACCEL_4XXX_MASK_COMPRESS_SLICE = BIT(3),
++	ICP_ACCEL_4XXX_MASK_UCS_SLICE = BIT(4),
++	ICP_ACCEL_4XXX_MASK_EIA3_SLICE = BIT(5),
++	ICP_ACCEL_4XXX_MASK_SMX_SLICE = BIT(6),
 +};
 +
- enum icp_qat_slice_mask {
- 	ICP_ACCEL_MASK_CIPHER_SLICE = BIT(0),
- 	ICP_ACCEL_MASK_AUTH_SLICE = BIT(1),
-@@ -86,6 +91,8 @@ enum icp_qat_capabilities_mask {
- 	ICP_ACCEL_CAPABILITIES_RAND = BIT(7),
- 	ICP_ACCEL_CAPABILITIES_ZUC = BIT(8),
- 	ICP_ACCEL_CAPABILITIES_SHA3 = BIT(9),
-+	/* Bits 10-25 are currently reserved */
-+	ICP_ACCEL_CAPABILITIES_AES_V2 = BIT(26)
- };
+ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data);
+ void adf_clean_hw_data_4xxx(struct adf_hw_device_data *hw_data);
  
- #define QAT_AUTH_MODE_BITPOS 4
-@@ -278,7 +285,15 @@ struct icp_qat_hw_cipher_aes256_f8 {
- 	__u8 key[ICP_QAT_HW_AES_256_F8_KEY_SZ];
- };
+diff --git a/drivers/crypto/qat/qat_4xxx/adf_drv.c b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+index de5a955f406a..a8805c815d16 100644
+--- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
++++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+@@ -233,6 +233,9 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(64));
+ 	}
  
-+struct icp_qat_hw_ucs_cipher_aes256_f8 {
-+	struct icp_qat_hw_ucs_cipher_config cipher_config;
-+	__u8 key[ICP_QAT_HW_AES_256_F8_KEY_SZ];
-+};
++	/* Get accelerator capabilities mask */
++	hw_data->accel_capabilities_mask = hw_data->get_accel_cap(accel_dev);
 +
- struct icp_qat_hw_cipher_algo_blk {
--	struct icp_qat_hw_cipher_aes256_f8 aes;
-+	union {
-+		struct icp_qat_hw_cipher_aes256_f8 aes;
-+		struct icp_qat_hw_ucs_cipher_aes256_f8 ucs_aes;
-+	};
- } __aligned(64);
- #endif
-diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
-index b3a68d986417..84d1a3545c3a 100644
---- a/drivers/crypto/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -33,6 +33,10 @@
- 				       ICP_QAT_HW_CIPHER_KEY_CONVERT, \
- 				       ICP_QAT_HW_CIPHER_DECRYPT)
+ 	/* Find and map all the device's BARS */
+ 	bar_mask = pci_select_bars(pdev, IORESOURCE_MEM) & ADF_4XXX_BAR_MASK;
  
-+#define HW_CAP_AES_V2(accel_dev) \
-+	(GET_HW_DATA(accel_dev)->accel_capabilities_mask & \
-+	 ICP_ACCEL_CAPABILITIES_AES_V2)
-+
- static DEFINE_MUTEX(algs_lock);
- static unsigned int active_devs;
- 
-@@ -416,12 +420,23 @@ static void qat_alg_skcipher_init_com(struct qat_alg_skcipher_ctx *ctx,
- 	struct icp_qat_fw_comn_req_hdr_cd_pars *cd_pars = &req->cd_pars;
- 	struct icp_qat_fw_comn_req_hdr *header = &req->comn_hdr;
- 	struct icp_qat_fw_cipher_cd_ctrl_hdr *cd_ctrl = (void *)&req->cd_ctrl;
-+	bool aes_v2_capable = HW_CAP_AES_V2(ctx->inst->accel_dev);
-+	int mode = ctx->mode;
- 
--	memcpy(cd->aes.key, key, keylen);
- 	qat_alg_init_common_hdr(header);
- 	header->service_cmd_id = ICP_QAT_FW_LA_CMD_CIPHER;
- 	cd_pars->u.s.content_desc_params_sz =
- 				sizeof(struct icp_qat_hw_cipher_algo_blk) >> 3;
-+
-+	if (aes_v2_capable && mode == ICP_QAT_HW_CIPHER_CTR_MODE) {
-+		ICP_QAT_FW_LA_SLICE_TYPE_SET(header->serv_specif_flags,
-+					     ICP_QAT_FW_LA_USE_UCS_SLICE_TYPE);
-+		keylen = round_up(keylen, 16);
-+		memcpy(cd->ucs_aes.key, key, keylen);
-+	} else {
-+		memcpy(cd->aes.key, key, keylen);
-+	}
-+
- 	/* Cipher CD config setup */
- 	cd_ctrl->cipher_key_sz = keylen >> 3;
- 	cd_ctrl->cipher_state_sz = AES_BLOCK_SIZE >> 3;
 -- 
 2.28.0
 
