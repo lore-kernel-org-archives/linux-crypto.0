@@ -2,138 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5ED4C6369E
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Dec 2020 20:29:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BFCCC64E7B
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Dec 2020 21:00:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4EC2921D7A
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Dec 2020 20:29:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 047F02222F
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Dec 2020 21:00:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726151AbgLBU3O (ORCPT
+        id S1726162AbgLBVAT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Dec 2020 15:29:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42302 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725903AbgLBU3N (ORCPT
+        Wed, 2 Dec 2020 16:00:19 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:36354 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725866AbgLBVAS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Dec 2020 15:29:13 -0500
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5514C0617A7;
-        Wed,  2 Dec 2020 12:28:33 -0800 (PST)
-Received: by mail-pf1-x443.google.com with SMTP id w187so1979241pfd.5;
-        Wed, 02 Dec 2020 12:28:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=WENPVElJQF3n0FCtwr/Deyj/08dbHxSq1tQKlooFAvw=;
-        b=ezehFisbVfB+MB8e754s3Ekkx0EUMSCv2vXtrYfxfh+ntN+w8g96YN7QKALLza/OYJ
-         mpanSL+Ly9/PnLfUOOGTw0C/6bozOQ6lX0LrzyEqYN/0cyNh2GcvHPS/aG71VQ/sMKWO
-         AND6z5oZxtEjUeNwq0aObCu0zdewzC4QNtTYzymORIggWs2ZQx2wjUuZxsFolCEDf+7v
-         bHR6L1FO1cIObDSoDksj/MxYT82noLVvkLCoQrFlt3clf/RlQEx6mzxQt3NFPrs6e/I7
-         mQ1Vi7USiZD/8CXlOS3rH83MsN0aVWU57mALEm6mC+3VCBSaWJiWQNorfZq1QqOEDAiz
-         9MZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=WENPVElJQF3n0FCtwr/Deyj/08dbHxSq1tQKlooFAvw=;
-        b=T4ZDoQyV91C+YpZFT6bTrxU6qJHCWSfTqs6Dn/J3nMudu34uPhk7JOH6Potbh09Rcn
-         TYC20jQyoIs/hqDbUG6070mbHSaNsfNWSeYhjMfuioZ3FzJOB5jYUmg2/AeHdlWV4Cxg
-         PuK/ZdCsf6LG3vEaxKVdoMtSsSzB61CoPlrsEufIGcpbWmNnF6ugeSRnZBHLx/MyHv+b
-         ZWWQC93r8YZVL8UFRZURjAgJoOUtAHbHQSxwn+kl4S072luRzUMD7L8UoJAFILpQ9bk8
-         DFKDk45YWvSYQiFdGP+J4ZW9vIx1wa21UV7VPWUiBqmoqN1wg5Lhromu91tH9przNo6i
-         ffCg==
-X-Gm-Message-State: AOAM531r3kmDwtZfOhJ9LDNkDMmaqZsAPigXKy9WS8LmjfRXEMIloS5h
-        0sUvJ6bRQeJAlz5/VBvbl/s=
-X-Google-Smtp-Source: ABdhPJx8DYIDpxyFh2AnnF0HS8udrS8iv3EKguuhCCjewcbdOTJFX69vygn3dqnL3eh8PqeuPKQTIA==
-X-Received: by 2002:a63:b60:: with SMTP id a32mr1424789pgl.275.1606940913171;
-        Wed, 02 Dec 2020 12:28:33 -0800 (PST)
-Received: from nickserv.localdomain (c-98-33-101-203.hsd1.ca.comcast.net. [98.33.101.203])
-        by smtp.gmail.com with ESMTPSA id r11sm535120pgn.26.2020.12.02.12.28.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Dec 2020 12:28:32 -0800 (PST)
-From:   Nick Terrell <nickrterrell@gmail.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        squashfs-devel@lists.sourceforge.net,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-kernel@vger.kernel.org, Kernel Team <Kernel-team@fb.com>,
-        Nick Terrell <nickrterrell@gmail.com>,
-        Nick Terrell <terrelln@fb.com>, Chris Mason <clm@fb.com>,
-        Petr Malat <oss@malat.biz>, Johannes Weiner <jweiner@fb.com>,
-        Niket Agarwal <niketa@fb.com>, Yann Collet <cyan@fb.com>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH v6 2/3] lib: zstd: Add decompress_sources.h for decompress_unzstd
-Date:   Wed,  2 Dec 2020 12:32:41 -0800
-Message-Id: <20201202203242.1187898-3-nickrterrell@gmail.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20201202203242.1187898-1-nickrterrell@gmail.com>
-References: <20201202203242.1187898-1-nickrterrell@gmail.com>
+        Wed, 2 Dec 2020 16:00:18 -0500
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1606942776;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=taIfbIJFc06Wgj9BGKuuNGwAkjIFWbU5Zsh2o+YzsmA=;
+        b=00QEUXqAFNKpQ6+e5uJM2FH3qEVe0kNWxdqkxUkLsnTRW/qVHm1WpHVM6DJZ7AbBHK7Iq+
+        VZ0r7sqvRZf+RuX5goBhbvpl6tPmBYq2/xH0QOMaOns/pFLWlJu1kb4QYH0xcNfaBvg37Z
+        kQ7eGTdfLZDwwTSy+ua1m9NCWv5czucLn3fPEm6b7nmbb/Zi/d10RP/+Lr9BXo5GF9C2Ab
+        QAAZdYC0TQF2BaOftCBFZ7h7Bpa8nXYNGlb5Nte0xgQ4UBZWyJVjApKZOePqnCUlWheC65
+        g4Fu2piPzfV+H2VoWvsznG7A37log5bbPogZj15C10Rlo+Y8SAMWWgQppa1IEQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1606942776;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=taIfbIJFc06Wgj9BGKuuNGwAkjIFWbU5Zsh2o+YzsmA=;
+        b=cMkLtZVB5OpYFgq8AsudqRSf7/MtS1a5WgE9/jZBaicoWs3bRSxi47qMfD0fNNZXsGFuAE
+        yoi1PV6wXF0hsABg==
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc:     herbert@gondor.apana.org.au, mripard@kernel.org, wens@csie.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: crypto: sun4i-ss: error with kmap
+In-Reply-To: <20201202195501.GA29296@Red>
+References: <20201201130102.GA23461@Red> <87ft4phcyx.fsf@nanos.tec.linutronix.de> <20201201135252.GA9584@Red> <87y2ihfw6z.fsf@nanos.tec.linutronix.de> <20201201144529.GA6786@Red> <87v9dlfthf.fsf@nanos.tec.linutronix.de> <20201202195501.GA29296@Red>
+Date:   Wed, 02 Dec 2020 21:59:36 +0100
+Message-ID: <877dpzexfr.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Nick Terrell <terrelln@fb.com>
+On Wed, Dec 02 2020 at 20:55, Corentin Labbe wrote:
+> On Tue, Dec 01, 2020 at 04:15:08PM +0100, Thomas Gleixner wrote:
+>
+> The result could be seen at http://kernel.montjoie.ovh/129768.log
+> The log is 9Mb, but the ftrace dump seems not terminated, tell me if you need more.
 
-Adds decompress_sources.h which includes every .c file necessary for
-zstd decompression. This is used in decompress_unzstd.c so the internal
-structure of the library isn't exposed.
+Correct, the interesting entries right before the crash are missing. Can
+you try to make the trace buffers smaller or wait longer before
+terminating the thing?
 
-This allows us to upgrade the zstd library version without modifying any
-callers. Instead we just need to update decompress_sources.h.
+16k buffer size per CPU should be completely sufficient. That should
+give us roughly the last 100 entries per CPU.
 
-Signed-off-by: Nick Terrell <terrelln@fb.com>
----
- lib/decompress_unzstd.c       |  6 +-----
- lib/zstd/decompress_sources.h | 14 ++++++++++++++
- 2 files changed, 15 insertions(+), 5 deletions(-)
- create mode 100644 lib/zstd/decompress_sources.h
+'trace_buf_size=16k'
 
-diff --git a/lib/decompress_unzstd.c b/lib/decompress_unzstd.c
-index 87ff567fd76d..d42281d7d416 100644
---- a/lib/decompress_unzstd.c
-+++ b/lib/decompress_unzstd.c
-@@ -68,11 +68,7 @@
- #ifdef STATIC
- # define UNZSTD_PREBOOT
- # include "xxhash.c"
--# include "zstd/entropy_common.c"
--# include "zstd/fse_decompress.c"
--# include "zstd/huf_decompress.c"
--# include "zstd/zstd_common.c"
--# include "zstd/decompress.c"
-+# include "zstd/decompress_sources.h"
- #endif
- 
- #include <linux/decompress/mm.h>
-diff --git a/lib/zstd/decompress_sources.h b/lib/zstd/decompress_sources.h
-new file mode 100644
-index 000000000000..d2fe10af0043
---- /dev/null
-+++ b/lib/zstd/decompress_sources.h
-@@ -0,0 +1,14 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+
-+/*
-+ * This file includes every .c file needed for decompression.
-+ * It is used by lib/decompress_unzstd.c to include the decompression
-+ * source into the translation-unit, so it can be used for kernel
-+ * decompression.
-+ */
-+
-+#include "entropy_common.c"
-+#include "fse_decompress.c"
-+#include "huf_decompress.c"
-+#include "zstd_common.c"
-+#include "decompress.c"
--- 
-2.29.2
+is the command line option for that.
+
+Thanks,
+
+        tglx
+
+
 
