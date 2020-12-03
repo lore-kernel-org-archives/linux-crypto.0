@@ -6,30 +6,29 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34112C4361A
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Dec 2020 22:27:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E9FBC4361A
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Dec 2020 23:21:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D804422287
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Dec 2020 22:26:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7640223E8
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Dec 2020 23:21:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387396AbgLCW0n (ORCPT
+        id S1728965AbgLCXVH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Dec 2020 17:26:43 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53232 "EHLO mail.kernel.org"
+        Thu, 3 Dec 2020 18:21:07 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37304 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728020AbgLCW0n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Dec 2020 17:26:43 -0500
+        id S1727983AbgLCXVH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Dec 2020 18:21:07 -0500
 From:   Arnd Bergmann <arnd@kernel.org>
 Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Ondrej Mosnacek <omosnacek@gmail.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@google.com>,
+        Tudor-Dan Ambarus <tudor.ambarus@microchip.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Keerthy <j-keerthy@ti.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: aegis128 - fix link error without SIMD
-Date:   Thu,  3 Dec 2020 23:25:49 +0100
-Message-Id: <20201203222557.952393-1-arnd@kernel.org>
+Subject: [PATCH] crypto: atmel-i2c - select CONFIG_BITREVERSE
+Date:   Fri,  4 Dec 2020 00:20:04 +0100
+Message-Id: <20201203232022.1485386-1-arnd@kernel.org>
 X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -39,42 +38,34 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-When the SIMD portion of the driver is disabled, the compiler cannot
-figure out in advance if it will be called:
+The bitreverse helper is almost always built into the kernel,
+but in a rare randconfig build it is possible to hit a case
+in which it is a loadable module while the atmel-i2c driver
+is built-in:
 
-ERROR: modpost: "crypto_aegis128_update_simd" [crypto/aegis128.ko] undefined!
+arm-linux-gnueabi-ld: drivers/crypto/atmel-i2c.o: in function `atmel_i2c_checksum':
+atmel-i2c.c:(.text+0xa0): undefined reference to `byte_rev_table'
 
-Add a conditional to let the compiler use dead code elimination
-as before.
+Add one more 'select' statement to prevent this.
 
-Fixes: ac50aec41a9f ("crypto: aegis128 - expose SIMD code path as separate driver")
+Fixes: 11105693fa05 ("crypto: atmel-ecc - introduce Microchip / Atmel ECC driver")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- crypto/aegis128-core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/crypto/aegis128-core.c b/crypto/aegis128-core.c
-index 2b05f79475d3..89dc1c559689 100644
---- a/crypto/aegis128-core.c
-+++ b/crypto/aegis128-core.c
-@@ -89,7 +89,7 @@ static void crypto_aegis128_update_a(struct aegis_state *state,
- 				     const union aegis_block *msg,
- 				     bool do_simd)
- {
--	if (do_simd) {
-+	if (IS_ENABLED(CONFIG_CRYPTO_AEGIS128_SIMD) && do_simd) {
- 		crypto_aegis128_update_simd(state, msg);
- 		return;
- 	}
-@@ -101,7 +101,7 @@ static void crypto_aegis128_update_a(struct aegis_state *state,
- static void crypto_aegis128_update_u(struct aegis_state *state, const void *msg,
- 				     bool do_simd)
- {
--	if (do_simd) {
-+	if (IS_ENABLED(CONFIG_CRYPTO_AEGIS128_SIMD) && do_simd) {
- 		crypto_aegis128_update_simd(state, msg);
- 		return;
- 	}
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 6a02ab13835c..67a17644ce17 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -550,6 +550,7 @@ config CRYPTO_DEV_ATMEL_SHA
+ 
+ config CRYPTO_DEV_ATMEL_I2C
+ 	tristate
++	select BITREVERSE
+ 
+ config CRYPTO_DEV_ATMEL_ECC
+ 	tristate "Support for Microchip / Atmel ECC hw accelerator"
 -- 
 2.27.0
 
