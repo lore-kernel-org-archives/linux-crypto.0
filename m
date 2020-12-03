@@ -2,66 +2,131 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21592C6369E
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Dec 2020 00:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D670C6369E
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Dec 2020 01:17:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C1E77221FB
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Dec 2020 00:31:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11B87221FB
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Dec 2020 01:17:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725923AbgLCAax (ORCPT
+        id S1727624AbgLCBQv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Dec 2020 19:30:53 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:55864 "EHLO fornost.hmeau.com"
+        Wed, 2 Dec 2020 20:16:51 -0500
+Received: from rere.qmqm.pl ([91.227.64.183]:14765 "EHLO rere.qmqm.pl"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725885AbgLCAaw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Dec 2020 19:30:52 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kkcVB-0005vo-LM; Thu, 03 Dec 2020 11:29:42 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 03 Dec 2020 11:29:41 +1100
-Date:   Thu, 3 Dec 2020 11:29:41 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Cc:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
-        Stephen Boyd <swboyd@chromium.org>,
-        Theodore Ts'o <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Keerthy <j-keerthy@ti.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] random: Don't freeze in add_hwgenerator_randomness() if
- stopping kthread
-Message-ID: <20201203002941.GA18133@gondor.apana.org.au>
-References: <20191110135543.3476097-1-mail@maciej.szmigiero.name>
- <5dcee409.1c69fb81.f5027.48ad@mx.google.com>
- <415922ac-3c87-081c-6fdf-73fc97d0f397@maciej.szmigiero.name>
- <20191117005641.qgremf2lrj46qy4p@gondor.apana.org.au>
- <2f581f84-378f-05cf-1902-f0494aafe706@nxp.com>
+        id S1726479AbgLCBQv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 2 Dec 2020 20:16:51 -0500
+Received: from remote.user (localhost [127.0.0.1])
+        by rere.qmqm.pl (Postfix) with ESMTPSA id 4CmdFh0f48zDf;
+        Thu,  3 Dec 2020 02:16:07 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rere.qmqm.pl; s=1;
+        t=1606958169; bh=6oH15t1Df77ZzG2EVYajQgZvMvBqFmQvQbWlZwQ2QEs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SB1xzSoxRoViOvvVeCEfofLQUmg5XpUMvkEJnMhZgf4r5+49NISCcc68BpcHlcelp
+         vNYiHf3Y6pH9y2kgG7CWVFcbafVXxYka/WdyrF0KPL5Hvh5EhPE4vDVnBYWQ3gRoX8
+         ztYX1Suc2WQy4SYjMo6rZCiD2t1qqX3t4HkyXGYXL9AipWeYZm9B4FPZDuskD4j7MS
+         ayG7+2YnPhqL8qlmrUe2wpRqI5pMaDMoU5rWiO90pfbg+wyvzGLDAFf7lfU7Rn2Ml5
+         BU67UaFjNVJGrLp02M/bcgw7yq7F2AcsD/5mZfdpWtcSPr9z531bqis+g9Of2npGuf
+         2JgTSxT7Emreg==
+X-Virus-Status: Clean
+X-Virus-Scanned: clamav-milter 0.102.4 at mail
+Date:   Thu, 3 Dec 2020 02:16:06 +0100
+From:   =?iso-8859-2?Q?Micha=B3_Miros=B3aw?= <mirq-linux@rere.qmqm.pl>
+To:     Nick Terrell <nickrterrell@gmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        squashfs-devel@lists.sourceforge.net,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-kernel@vger.kernel.org, Kernel Team <Kernel-team@fb.com>,
+        Nick Terrell <terrelln@fb.com>, Chris Mason <clm@fb.com>,
+        Petr Malat <oss@malat.biz>, Johannes Weiner <jweiner@fb.com>,
+        Niket Agarwal <niketa@fb.com>, Yann Collet <cyan@fb.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v6 1/3] lib: zstd: Add kernel-specific API
+Message-ID: <20201203011606.GA20621@qmqm.qmqm.pl>
+References: <20201202203242.1187898-1-nickrterrell@gmail.com>
+ <20201202203242.1187898-2-nickrterrell@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-2
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2f581f84-378f-05cf-1902-f0494aafe706@nxp.com>
+In-Reply-To: <20201202203242.1187898-2-nickrterrell@gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 02, 2020 at 04:28:07PM +0200, Horia GeantÄƒ wrote:
->
-> I wasn't able to find a follow-up on this topic.
-> Could you advise on what's the proper thing to do going forward?
+On Wed, Dec 02, 2020 at 12:32:40PM -0800, Nick Terrell wrote:
+> From: Nick Terrell <terrelln@fb.com>
+> 
+> This patch:
+> - Moves `include/linux/zstd.h` -> `lib/zstd/zstd.h`
+> - Adds a new API in `include/linux/zstd.h` that is functionally
+>   equivalent to the in-use subset of the current API. Functions are
+>   renamed to avoid symbol collisions with zstd, to make it clear it is
+>   not the upstream zstd API, and to follow the kernel style guide.
+> - Updates all callers to use the new API.
+> 
+> There are no functional changes in this patch. Since there are no
+> functional change, I felt it was okay to update all the callers in a
+> single patch, since once the API is approved, the callers are
+> mechanically changed.
+[...]
+> --- a/lib/decompress_unzstd.c
+> +++ b/lib/decompress_unzstd.c
+[...]
+>  static int INIT handle_zstd_error(size_t ret, void (*error)(char *x))
+>  {
+> -	const int err = ZSTD_getErrorCode(ret);
+> -
+> -	if (!ZSTD_isError(ret))
+> +	if (!zstd_is_error(ret))
+>  		return 0;
+>  
+> -	switch (err) {
+> -	case ZSTD_error_memory_allocation:
+> -		error("ZSTD decompressor ran out of memory");
+> -		break;
+> -	case ZSTD_error_prefix_unknown:
+> -		error("Input is not in the ZSTD format (wrong magic bytes)");
+> -		break;
+> -	case ZSTD_error_dstSize_tooSmall:
+> -	case ZSTD_error_corruption_detected:
+> -	case ZSTD_error_checksum_wrong:
+> -		error("ZSTD-compressed data is corrupt");
+> -		break;
+> -	default:
+> -		error("ZSTD-compressed data is probably corrupt");
+> -		break;
+> -	}
+> +	error("ZSTD decompression failed");
+>  	return -1;
+>  }
 
-I think someone needs to come up with a patch that does not
-cause regressions.
+This looses diagnostics specificity - is this intended? At least the
+out-of-memory condition seems useful to distinguish.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> +size_t zstd_compress_stream(zstd_cstream *cstream,
+> +	struct zstd_out_buffer *output, struct zstd_in_buffer *input)
+> +{
+> +	ZSTD_outBuffer o;
+> +	ZSTD_inBuffer i;
+> +	size_t ret;
+> +
+> +	memcpy(&o, output, sizeof(o));
+> +	memcpy(&i, input, sizeof(i));
+> +	ret = ZSTD_compressStream(cstream, &o, &i);
+> +	memcpy(output, &o, sizeof(o));
+> +	memcpy(input, &i, sizeof(i));
+> +	return ret;
+> +}
+
+Is all this copying necessary? How is it different from type-punning by
+direct pointer cast?
+
+Best Regards
+Micha³ Miros³aw
