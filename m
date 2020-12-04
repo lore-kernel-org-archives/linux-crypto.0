@@ -2,82 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35234C4361A
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 15:09:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B23C4361B
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 15:39:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0AA5922B2D
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 15:09:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C366D22C9C
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 15:39:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730398AbgLDPJK (ORCPT
+        id S1730523AbgLDPjO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Dec 2020 10:09:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43540 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725923AbgLDPJJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Dec 2020 10:09:09 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF621C061A51;
-        Fri,  4 Dec 2020 07:08:29 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1607094507;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=m+5fUfCGN4l8PttwLmFKEO9H2mckNeF24mD/TIdsWmA=;
-        b=IMK9HWTOFmsmGjUiNSHj45Vv6+Y4MUAZ4rHxVC3aeoHN2rE5EBGlduOSi8RJbyfAANrFlR
-        LvoWc0CDfTy7NXTHYTYsXnVED6ZyvuyBTu0a9o5jYQdphqrLvLPbskLSFNdS7uWI2tUzqz
-        cBemexfhX7i3B63iOQUMo+oE/d/o4zpyumtdAlZEuRm8S1RezGtdjN3T+jpF3gwVy4yLqq
-        7iP8XzvD/utBLvvxbLB0QOeJEFBwWoUuDHD8XVo8WC5mIwK2cUH+CEvlvaN/TDjn7U2OZL
-        z/SvS8RdMz/hjlYEnAejzfQZW5mr/bR2gzQ0XB7qiehZGarVU+FzWkPfkh7pog==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1607094507;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=m+5fUfCGN4l8PttwLmFKEO9H2mckNeF24mD/TIdsWmA=;
-        b=INkOrHiJFDwY6z7hGqBnk6yKA9vFBYJNsviMtfs2IwfBxi0PyZSJvR9EccALbcd/BAKPYz
-        qCzaYhAQYTLVRtDg==
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc:     herbert@gondor.apana.org.au, mripard@kernel.org, wens@csie.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-mm@kvack.org, Andrew Morton <akpm@linuxfoundation.org>
-Subject: Re: crypto: sun4i-ss: error with kmap
-In-Reply-To: <20201204132631.GA25321@Red>
-References: <20201201130102.GA23461@Red> <87ft4phcyx.fsf@nanos.tec.linutronix.de> <20201201135252.GA9584@Red> <87y2ihfw6z.fsf@nanos.tec.linutronix.de> <20201201144529.GA6786@Red> <87v9dlfthf.fsf@nanos.tec.linutronix.de> <20201202195501.GA29296@Red> <877dpzexfr.fsf@nanos.tec.linutronix.de> <20201203173846.GA16207@Red> <87r1o6bh1u.fsf@nanos.tec.linutronix.de> <20201204132631.GA25321@Red>
-Date:   Fri, 04 Dec 2020 16:08:27 +0100
-Message-ID: <874kl1bod0.fsf@nanos.tec.linutronix.de>
+        Fri, 4 Dec 2020 10:39:14 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40336 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730395AbgLDPjO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Dec 2020 10:39:14 -0500
+Date:   Fri, 4 Dec 2020 17:38:27 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1607096313;
+        bh=iTThFfM4EWdfNqRekI8Xw/sXCVHPS1MXBYIjkuMK8Ks=;
+        h=From:To:Cc:Subject:References:In-Reply-To:From;
+        b=V7vsQ1s4GxsMXkkDoUlNHfZPeXbbuLJCSXhMiX/9w+dV6iw6wiZ3Awxol5VI5w8Gf
+         ka4Y+tRVd/7Z5/XJfmzYbh5+yFBGCpyADJntQIMPG6/KHcnqWqychZ6kf0ExzYWuPv
+         Wm+pBJCRKkOW2OuEdKdoOFL8BNSY5UE398cBbF3OG6sDSRrXMOWvawYKDQy71EjXaR
+         Omm6q+Q3QhzheEfyLUlc9Sk+c2oJxnXRTQGg+kYRUSJ30ZxFwMe9C2322Y0jXWk11p
+         +88w85y3ZnG/KI6BekGYGf+JbNZzhEuBSOmADrfyxN2C/VDKXyfTsucMHaXJCbN2hV
+         oCZ8Ek1o67aoA==
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     =?us-ascii?B?PT9VVEYtOD9RP01pY2thPWMzPWFibF9TYWxhPWMzPWJjbj89?= 
+        <mic@digikod.net>, David Woodhouse <dwmw2@infradead.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <jmorris@namei.org>,
+        =?us-ascii?B?PT9VVEYtOD9RP01pY2thPWMzPWFibF9TYWxhPWMzPWJjbj89?= 
+        <mic@linux.microsoft.com>, Mimi Zohar <zohar@linux.ibm.com>,
+        "Serge E . Hallyn" <serge@hallyn.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v1 0/9] Enable root to update the blacklist keyring
+Message-ID: <20201204153827.GB6337@kernel.org>
+References: <80fb0eae-8321-5ae2-8d50-eabbe86981da@digikod.net>
+ <20201120180426.922572-1-mic@digikod.net>
+ <20201130024011.GA24870@kernel.org>
+ <113544.1607090496@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <113544.1607090496@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 04 2020 at 14:26, Corentin Labbe wrote:
-> On Fri, Dec 04, 2020 at 12:34:05AM +0100, Thomas Gleixner wrote:
->> The unmap comes from sg_miter_stop() and looking at the previous
->> map/unmap cycles there are never nested maps.
->> 
->> [  996.943030] cryptset-316       0d..4 73943317us : __kmap_local_pfn_prot: kmap_local_pfn: 1 ffefd000
->> 
->> is the first event which allocates a nested map. 
->> 
->> So something goes south either in sg_miter or in the crypto maze.
->> 
->> Enabling CONFIG_DEBUG_KMAP_LOCAL and function tracing might give us more clue.
->
-> Done, http://kernel.montjoie.ovh/130466.log
+On Fri, Dec 04, 2020 at 02:01:36PM +0000, David Howells wrote:
+> Mickaël Salaün <mic@digikod.net> wrote:
+> 
+> > > What would be easiest way to smoke test the changes?
+> > 
+> > An easy way to test it is to enable the second trusted keyring to
+> > dynamically load certificates in the kernel. Then we can create a hash
+> > of a valid certificate (but not loaded yet) and sign it as explained in
+> > tools/certs/print-cert-tbs-hash.sh (patch 9/9). Once this hash is loaded
+> > in the kernel, loading the blacklisted certificate will be denied. We
+> > can also test it with a PKCS#7 signature chain, either with the
+> > blacklist keyring itself, or with a signed dm-verity image.
+> 
+> It might also be possible to use the pkcs#7 test key type
+> (CONFIG_PKCS7_TEST_KEY) to aid in that.
+> 
+> David
 
-Does not provide more information with the debug enabled. So can you
-please enable CONFIG_FUNCTION_TRACER and add 'ftrace=function' to the
-command line?
+Thanks, note taken.
 
-Thanks,
-
-        tglx
+/Jarkko
