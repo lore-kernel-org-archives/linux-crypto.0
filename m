@@ -2,81 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05061C1B0D9
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 17:06:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93CA0C1B0D8
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 17:07:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B0F6722B43
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 17:06:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6DBC722BEA
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 17:07:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388514AbgLDRFw (ORCPT
+        id S1731086AbgLDRGy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Dec 2020 12:05:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33440 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388471AbgLDRFw (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Dec 2020 12:05:52 -0500
-Received: from latitanza.investici.org (latitanza.investici.org [IPv6:2001:888:2000:56::19])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C37AFC061A52
-        for <linux-crypto@vger.kernel.org>; Fri,  4 Dec 2020 09:05:03 -0800 (PST)
-Received: from mx3.investici.org (unknown [127.0.0.1])
-        by latitanza.investici.org (Postfix) with ESMTP id 4CnfFJ4PVmz8sgM;
-        Fri,  4 Dec 2020 17:04:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=privacyrequired.com;
-        s=stigmate; t=1607101460;
-        bh=gIk9W+Rj/wr2yLXrcQnEBv0D9GdsEMSYb5Q/KwMf3wA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uPSMRQkbP8NPk5NKlROEj7mrY8QRY3USoQVGMdhcC+Ii+r5Y4xY2pSBE2b9LkLTou
-         ZJYYc6olk86+NUF/V0c72u05Bkc3o7ue9Rz1RNdfqFsXuCtAmc+AVaaNJVkzrr9D7g
-         eR7OklxOVtWZKHJT1SgDvPUcVE1UNI/P4XTy6EHo=
-Received: from [82.94.249.234] (mx3.investici.org [82.94.249.234]) (Authenticated sender: laniel_francis@privacyrequired.com) by localhost (Postfix) with ESMTPSA id 4CnfFJ07MFz8sfb;
-        Fri,  4 Dec 2020 17:04:19 +0000 (UTC)
-From:   laniel_francis@privacyrequired.com
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Francis Laniel <laniel_francis@privacyrequired.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v1 03/12] crypto: Replace strstarts() by str_has_prefix().
-Date:   Fri,  4 Dec 2020 18:03:09 +0100
-Message-Id: <20201204170319.20383-4-laniel_francis@privacyrequired.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201204170319.20383-1-laniel_francis@privacyrequired.com>
-References: <20201204170319.20383-1-laniel_francis@privacyrequired.com>
+        Fri, 4 Dec 2020 12:06:54 -0500
+Received: from mail.kernel.org ([198.145.29.99]:32868 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728924AbgLDRGx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Dec 2020 12:06:53 -0500
+X-Gm-Message-State: AOAM531GBwtP9wjZfv/hNZtM1rTTpbf9KeJ2fwzfSJk33h6T+D+GBdDZ
+        S6sgI1+0Xi7X5Rn3JLr2HfuFkHnvU1G8Ci+llgI=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1607101572;
+        bh=vec0ymMx+wnF0gfcJ8Hu7mkpp7jIjtysTw6fFvmzqeM=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=I0HtVWnVer1z+5BBs3cxv/CYkp67TvlLIWfjFM2peNcQ5Y2tFvbMsRMvkyU5uvHnG
+         IRSqNJnC0kSv8Gw5eQIAvaWMM5zD6Qex8VOekMk/cGhY3xGdoruQxh7AEouXyyQKML
+         sggXuz87OM/xpHw1AHlolAxSDpG933dg1ekV8AFdjny4zhW7CLhx6hewPXNnCX6383
+         ISThDIqZ0dek2KCxo6vMGTX7VG/jDNZvBqZfUXApmfUR9bPxaBJwjyoINa4IgWrmrp
+         f4N6NXy/fPMKyYTAKcewuLwJjzguSZ7fNd+gkQBykqTmCftFbIXb0k63aZyZ4EfoER
+         65TrA7vHUfDkQ==
+X-Google-Smtp-Source: ABdhPJz/xmXkEkku+Emo5ZLaxzMbQOcBAvTQmo8aS4l/1QBG9FXpc/dvkPoniOT2Szt2kX6d2vyhuiwEmMoRZ9AImvI=
+X-Received: by 2002:a4a:45c3:: with SMTP id y186mr4202016ooa.13.1607101571557;
+ Fri, 04 Dec 2020 09:06:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20201204154626.GA26255@fieldses.org> <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com>
+ <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
+ <118876.1607093975@warthog.procyon.org.uk> <122997.1607097713@warthog.procyon.org.uk>
+ <20201204160347.GA26933@fieldses.org> <125709.1607100601@warthog.procyon.org.uk>
+In-Reply-To: <125709.1607100601@warthog.procyon.org.uk>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Fri, 4 Dec 2020 18:06:00 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXEOm_yh478i+dqPiz0eoBxp4eag3j2qHm5eBLe+2kihoQ@mail.gmail.com>
+Message-ID: <CAMj1kXEOm_yh478i+dqPiz0eoBxp4eag3j2qHm5eBLe+2kihoQ@mail.gmail.com>
+Subject: Re: Why the auxiliary cipher in gss_krb5_crypto.c?
+To:     David Howells <dhowells@redhat.com>
+Cc:     Bruce Fields <bfields@fieldses.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
+        <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Francis Laniel <laniel_francis@privacyrequired.com>
+On Fri, 4 Dec 2020 at 17:52, David Howells <dhowells@redhat.com> wrote:
+>
+> Bruce Fields <bfields@fieldses.org> wrote:
+>
+> > OK, I guess I don't understand the question.  I haven't thought about
+> > this code in at least a decade.  What's an auxilary cipher?  Is this a
+> > question about why we're implementing something, or how we're
+> > implementing it?
+>
+> That's what the Linux sunrpc implementation calls them:
+>
+>         struct crypto_sync_skcipher *acceptor_enc;
+>         struct crypto_sync_skcipher *initiator_enc;
+>         struct crypto_sync_skcipher *acceptor_enc_aux;
+>         struct crypto_sync_skcipher *initiator_enc_aux;
+>
+> Auxiliary ciphers aren't mentioned in rfc396{1,2} so it appears to be
+> something peculiar to that implementation.
+>
+> So acceptor_enc and acceptor_enc_aux, for instance, are both based on the same
+> key, and the implementation seems to pass the IV from one to the other.  The
+> only difference is that the 'aux' cipher lacks the CTS wrapping - which only
+> makes a difference for the final two blocks[*] of the encryption (or
+> decryption) - and only if the data doesn't fully fill out the last block
+> (ie. it needs padding in some way so that the encryption algorithm can handle
+> it).
+>
+> [*] Encryption cipher blocks, that is.
+>
+> So I think it's purpose is twofold:
+>
+>  (1) It's a way to be a bit more efficient, cutting out the CTS layer's
+>      indirection and additional buffering.
+>
+>  (2) crypto_skcipher_encrypt() assumes that it's doing the entire crypto
+>      operation in one go and will always impose the final CTS bit, so you
+>      can't call it repeatedly to progress through a buffer (as
+>      xdr_process_buf() would like to do) as that would corrupt the data being
+>      encrypted - unless you made sure that the data was always block-size
+>      aligned (in which case, there's no point using CTS).
+>
+> I wonder how much going through three layers of crypto modules costs.  Looking
+> at how AES can be implemented using, say, Intel AES intructions, it looks like
+> AES+CBC should be easy to do in a single module.  I wonder if we could have
+> optimised kerberos crypto that do the AES and the SHA together in a single
+> loop.
+>
 
-The two functions indicates if a string begins with a given prefix.
-The only difference is that strstarts() returns a bool while str_has_prefix()
-returns the length of the prefix if the string begins with it or 0 otherwise.
+The tricky thing with CTS is that you have to ensure that the final
+full and partial blocks are presented to the crypto driver as one
+chunk, or it won't be able to perform the ciphertext stealing. This
+might be the reason for the current approach. If the sunrpc code has
+multiple disjoint chunks of data to encrypto, it is always better to
+wrap it in a single scatterlist and call into the skcipher only once.
 
-Signed-off-by: Francis Laniel <laniel_francis@privacyrequired.com>
----
- crypto/essiv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/essiv.c b/crypto/essiv.c
-index d012be23d496..f85d4416891f 100644
---- a/crypto/essiv.c
-+++ b/crypto/essiv.c
-@@ -504,7 +504,7 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
- 			goto out_free_inst;
- 		aead_alg = crypto_spawn_aead_alg(&ictx->u.aead_spawn);
- 		block_base = &aead_alg->base;
--		if (!strstarts(block_base->cra_name, "authenc(")) {
-+		if (!str_has_prefix(block_base->cra_name, "authenc(")) {
- 			pr_warn("Only authenc() type AEADs are supported by ESSIV\n");
- 			err = -EINVAL;
- 			goto out_drop_skcipher;
--- 
-2.20.1
-
+However, I would recommend against it: at least for ARM and arm64, I
+have already contributed SIMD based implementations that use SIMD
+permutation instructions and overlapping loads and stores to perform
+the ciphertext stealing, which means that there is only a single layer
+which implements CTS+CBC+AES, and this layer can consume the entire
+scatterlist in one go. We could easily do something similar in the
+AES-NI driver as well.
