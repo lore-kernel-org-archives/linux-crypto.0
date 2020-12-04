@@ -2,73 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D93FEC0018C
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 15:00:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D72F1C4361B
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 15:01:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB22922B3A
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 15:00:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9B8B22B45
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 15:01:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729486AbgLDPAb (ORCPT
+        id S1730412AbgLDPBK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Dec 2020 10:00:31 -0500
-Received: from smtp-190d.mail.infomaniak.ch ([185.125.25.13]:40083 "EHLO
-        smtp-190d.mail.infomaniak.ch" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727620AbgLDPAa (ORCPT
+        Fri, 4 Dec 2020 10:01:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41557 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730410AbgLDPBJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Dec 2020 10:00:30 -0500
-Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
-        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4CnbTW596pzlhmSq;
-        Fri,  4 Dec 2020 15:59:43 +0100 (CET)
-Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
-        by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4CnbTV6bcxzlh8TC;
-        Fri,  4 Dec 2020 15:59:42 +0100 (CET)
-Subject: Re: [PATCH v1 2/9] certs: Make blacklist_vet_description() more
- strict
-To:     David Howells <dhowells@redhat.com>
-Cc:     David Woodhouse <dwmw2@infradead.org>,
-        "David S . Miller" <davem@davemloft.net>,
+        Fri, 4 Dec 2020 10:01:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607093983;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=OTBOnyE1n+B2er0y+QuZYiU0VZBSiLUvAG5osfhcmQc=;
+        b=gPWG0q4t20Ry4+O/ui8q22rrjqbd99D4pGBAxMWTThYGZo6S51VSvDbd9+UwRrSyzYyVCh
+        10zuCQbXp9rIojvimcRxEyWvqGuxFEQ52/c3IjIs3FQ88ixBQpMtDgN7CO92UFo/J1ih35
+        XoHx06vb+U3Q/VIK5s0O9Amtxo/TWzQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-52-PzPPozy8PUqmAMwzJKEjCw-1; Fri, 04 Dec 2020 09:59:41 -0500
+X-MC-Unique: PzPPozy8PUqmAMwzJKEjCw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2FE30107ACE3;
+        Fri,  4 Dec 2020 14:59:39 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-116-67.rdu2.redhat.com [10.10.116.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B307A18AD4;
+        Fri,  4 Dec 2020 14:59:36 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com>
+References: <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com> <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
+To:     Chuck Lever <chuck.lever@oracle.com>,
+        Bruce Fields <bfields@fieldses.org>
+Cc:     dhowells@redhat.com, CIFS <linux-cifs@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <jmorris@namei.org>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "Serge E . Hallyn" <serge@hallyn.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
-References: <20201120180426.922572-3-mic@digikod.net>
- <20201120180426.922572-1-mic@digikod.net>
- <113978.1607090965@warthog.procyon.org.uk>
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-Message-ID: <44b14c7f-0136-4023-42fb-7ff19c78715d@digikod.net>
-Date:   Fri, 4 Dec 2020 15:59:42 +0100
-User-Agent: 
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        linux-crypto@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-afs@lists.infradead.org
+Subject: Why the auxiliary cipher in gss_krb5_crypto.c?
 MIME-Version: 1.0
-In-Reply-To: <113978.1607090965@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <118875.1607093975.1@warthog.procyon.org.uk>
+Date:   Fri, 04 Dec 2020 14:59:35 +0000
+Message-ID: <118876.1607093975@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Chuck, Bruce,
 
+Why is gss_krb5_crypto.c using an auxiliary cipher?  For reference, the
+gss_krb5_aes_encrypt() code looks like the attached.
 
-On 04/12/2020 15:09, David Howells wrote:
-> Mickaël Salaün <mic@digikod.net> wrote:
-> 
->> +	if (*desc)
->> +		/* The hash is greater than MAX_HASH_LEN. */
->> +		return -EINVAL;
-> 
-> -ENOPKG might be better.  It's not that the string is invalid, it's just that
-> it's unsupported at the moment.
+From what I can tell, in AES mode, the difference between the main cipher and
+the auxiliary cipher is that the latter is "cbc(aes)" whereas the former is
+"cts(cbc(aes))" - but they have the same key.
 
-Right, I'll switch to this with the next series.
+Reading up on CTS, I'm guessing the reason it's like this is that CTS is the
+same as the non-CTS, except for the last two blocks, but the non-CTS one is
+more efficient.
 
-> 
-> David
-> 
+David
+---
+	nbytes = buf->len - offset - GSS_KRB5_TOK_HDR_LEN;
+	nblocks = (nbytes + blocksize - 1) / blocksize;
+	cbcbytes = 0;
+	if (nblocks > 2)
+		cbcbytes = (nblocks - 2) * blocksize;
+
+	memset(desc.iv, 0, sizeof(desc.iv));
+
+	if (cbcbytes) {
+		SYNC_SKCIPHER_REQUEST_ON_STACK(req, aux_cipher);
+
+		desc.pos = offset + GSS_KRB5_TOK_HDR_LEN;
+		desc.fragno = 0;
+		desc.fraglen = 0;
+		desc.pages = pages;
+		desc.outbuf = buf;
+		desc.req = req;
+
+		skcipher_request_set_sync_tfm(req, aux_cipher);
+		skcipher_request_set_callback(req, 0, NULL, NULL);
+
+		sg_init_table(desc.infrags, 4);
+		sg_init_table(desc.outfrags, 4);
+
+		err = xdr_process_buf(buf, offset + GSS_KRB5_TOK_HDR_LEN,
+				      cbcbytes, encryptor, &desc);
+		skcipher_request_zero(req);
+		if (err)
+			goto out_err;
+	}
+
+	/* Make sure IV carries forward from any CBC results. */
+	err = gss_krb5_cts_crypt(cipher, buf,
+				 offset + GSS_KRB5_TOK_HDR_LEN + cbcbytes,
+				 desc.iv, pages, 1);
+	if (err) {
+		err = GSS_S_FAILURE;
+		goto out_err;
+	}
+
