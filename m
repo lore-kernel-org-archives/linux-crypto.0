@@ -2,63 +2,73 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1CE6C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 07:18:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E154EC4167B
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 08:01:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 58C6820639
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 07:18:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E784227C3
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 08:01:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727892AbgLDHSH (ORCPT
+        id S1728448AbgLDIBM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Dec 2020 02:18:07 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:32792 "EHLO fornost.hmeau.com"
+        Fri, 4 Dec 2020 03:01:12 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58900 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725550AbgLDHSH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Dec 2020 02:18:07 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kl5LA-0006gA-VQ; Fri, 04 Dec 2020 18:17:18 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 04 Dec 2020 18:17:16 +1100
-Date:   Fri, 4 Dec 2020 18:17:16 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, geert@linux-m68k.org
-Subject: Re: [PATCH] crypto: aegis128 - avoid spurious references
- crypto_aegis128_update_simd
-Message-ID: <20201204071716.GA31869@gondor.apana.org.au>
-References: <20201130122620.16640-1-ardb@kernel.org>
+        id S1728006AbgLDIBM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Dec 2020 03:01:12 -0500
+Date:   Fri, 4 Dec 2020 09:01:36 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1607068832;
+        bh=KbgMLWqu/q/WfIjx7vih5Bs5YLK0QKMwGERH9O/ubkE=;
+        h=From:To:Cc:Subject:From;
+        b=VzU1lt65LOCZwL6xXpN/k9rdNdUmEb5is/1GPcR1Q0O51OtSQgt7jyUn6eSonrejc
+         i2clp31L7xVq1iFzeqiv4420SaaXW5GyzGrsIQWG8D2bvtr1K0M6im9bBL6vjteXqY
+         8NS46T/TpJhjnYUUsZWRfpQLviGe3GDIJyqNci4g=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ilil Blum Shem-Tov <ilil.blum.shem-tov@intel.com>
+Subject: [PATCH] crypto: asym_tpm: correct zero out potential secrets
+Message-ID: <X8ns4AfwjKudpyfe@kroah.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201130122620.16640-1-ardb@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Nov 30, 2020 at 01:26:20PM +0100, Ard Biesheuvel wrote:
-> Geert reports that builds where CONFIG_CRYPTO_AEGIS128_SIMD is not set
-> may still emit references to crypto_aegis128_update_simd(), which
-> cannot be satisfied and therefore break the build. These references
-> only exist in functions that can be optimized away, but apparently,
-> the compiler is not always able to prove this.
-> 
-> So add some explicit checks for CONFIG_CRYPTO_AEGIS128_SIMD to help the
-> compiler figure this out.
-> 
-> Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  crypto/aegis128-core.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+The function derive_pub_key() should be calling memzero_explicit()
+instead of memset() in case the complier decides to optimize away the
+call to memset() because it "knows" no one is going to touch the memory
+anymore.
 
-Patch applied.  Thanks.
+Reported-by: Ilil Blum Shem-Tov <ilil.blum.shem-tov@intel.com>
+Tested-by: Ilil Blum Shem-Tov <ilil.blum.shem-tov@intel.com>
+Cc: stable <stable@vger.kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ crypto/asymmetric_keys/asym_tpm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/asymmetric_keys/asym_tpm.c b/crypto/asymmetric_keys/asym_tpm.c
+index 378b18b9bc34..84a5d6af9609 100644
+--- a/crypto/asymmetric_keys/asym_tpm.c
++++ b/crypto/asymmetric_keys/asym_tpm.c
+@@ -354,7 +354,7 @@ static uint32_t derive_pub_key(const void *pub_key, uint32_t len, uint8_t *buf)
+ 	memcpy(cur, e, sizeof(e));
+ 	cur += sizeof(e);
+ 	/* Zero parameters to satisfy set_pub_key ABI. */
+-	memset(cur, 0, SETKEY_PARAMS_SIZE);
++	memzero_explicit(cur, SETKEY_PARAMS_SIZE);
+ 
+ 	return cur - buf;
+ }
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.29.2
+
