@@ -2,92 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C85BC4361B
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 14:03:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95274C4361A
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 14:05:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0317322AB9
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 14:03:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D47622A99
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 14:05:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388138AbgLDODO (ORCPT
+        id S1729140AbgLDOFa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Dec 2020 09:03:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41475 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2388115AbgLDODO (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Dec 2020 09:03:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607090508;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4M4yoOZ8+d2uOnRn+suIjK8Rel43Q7KGhvoch0szyZ0=;
-        b=It2q/rtxa4PNwJtJE18C15hOA4oCKQVRqSkB5pzKAm/L/v6iyNt6Rs1ot0r8NmzKlNcSMn
-        BMRbNbnPVWM06Ulqp4OMBQwuitElfmJK108tq2kkRZGGLMLf8EHY0mVBtJm/3JjH08nxiz
-        IbYcjSz9D+tKfDKlHLb2MkvoCeQEi+w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-99hyNT8ANI6M6dKa2e9EUQ-1; Fri, 04 Dec 2020 09:01:44 -0500
-X-MC-Unique: 99hyNT8ANI6M6dKa2e9EUQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACB5B193ECE3;
-        Fri,  4 Dec 2020 14:01:40 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-116-67.rdu2.redhat.com [10.10.116.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B36C9100164C;
-        Fri,  4 Dec 2020 14:01:37 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <80fb0eae-8321-5ae2-8d50-eabbe86981da@digikod.net>
-References: <80fb0eae-8321-5ae2-8d50-eabbe86981da@digikod.net> <20201120180426.922572-1-mic@digikod.net> <20201130024011.GA24870@kernel.org>
-To:     =?us-ascii?Q?=3D=3FUTF-8=3FQ=3FMicka=3Dc3=3Dabl=5FSala=3Dc3=3Dbcn=3F?=
-         =?us-ascii?Q?=3D?= <mic@digikod.net>
-Cc:     dhowells@redhat.com, Jarkko Sakkinen <jarkko@kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "David S . Miller" <davem@davemloft.net>,
+        Fri, 4 Dec 2020 09:05:30 -0500
+Received: from mx2.suse.de ([195.135.220.15]:46334 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726775AbgLDOFa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Dec 2020 09:05:30 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 04381AC75;
+        Fri,  4 Dec 2020 14:04:49 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id DBFD1DA7E3; Fri,  4 Dec 2020 15:03:14 +0100 (CET)
+Date:   Fri, 4 Dec 2020 15:03:14 +0100
+From:   David Sterba <dsterba@suse.cz>
+To:     kernel test robot <lkp@intel.com>
+Cc:     Nick Terrell <nickrterrell@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <jmorris@namei.org>,
-        =?us-ascii?Q?=3D=3FUTF-8=3FQ=3FMicka=3Dc3=3Dabl?=
-         =?us-ascii?Q?=5FSala=3Dc3=3Dbcn=3F=3D?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "Serge E . Hallyn" <serge@hallyn.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v1 0/9] Enable root to update the blacklist keyring
+        kbuild-all@lists.01.org, linux-crypto@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, squashfs-devel@lists.sourceforge.net,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-kernel@vger.kernel.org, Kernel Team <Kernel-team@fb.com>,
+        Chris Mason <chris.mason@fusionio.com>,
+        Petr Malat <oss@malat.biz>
+Subject: Re: [PATCH v6 3/3] lib: zstd: Upgrade to latest upstream zstd
+ version 1.4.6
+Message-ID: <20201204140314.GS6430@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, kernel test robot <lkp@intel.com>,
+        Nick Terrell <nickrterrell@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>, kbuild-all@lists.01.org,
+        linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        squashfs-devel@lists.sourceforge.net,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-kernel@vger.kernel.org, Kernel Team <Kernel-team@fb.com>,
+        Chris Mason <chris.mason@fusionio.com>, Petr Malat <oss@malat.biz>
+References: <20201202203242.1187898-4-nickrterrell@gmail.com>
+ <202012030743.Xg5AJ7Ms-lkp@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 04 Dec 2020 14:01:36 +0000
-Message-ID: <113544.1607090496@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202012030743.Xg5AJ7Ms-lkp@intel.com>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Micka=C3=ABl Sala=C3=BCn <mic@digikod.net> wrote:
+On Thu, Dec 03, 2020 at 07:58:16AM +0800, kernel test robot wrote:
+> All warnings (new ones prefixed by >>):
+> 
+>    lib/zstd/compress/zstd_double_fast.c: In function 'ZSTD_compressBlock_doubleFast_extDict_generic':
+> >> lib/zstd/compress/zstd_double_fast.c:501:1: warning: the frame size of 3724 bytes is larger than 1280 bytes [-Wframe-larger-than=]
 
-> > What would be easiest way to smoke test the changes?
->=20
-> An easy way to test it is to enable the second trusted keyring to
-> dynamically load certificates in the kernel. Then we can create a hash
-> of a valid certificate (but not loaded yet) and sign it as explained in
-> tools/certs/print-cert-tbs-hash.sh (patch 9/9). Once this hash is loaded
-> in the kernel, loading the blacklisted certificate will be denied. We
-> can also test it with a PKCS#7 signature chain, either with the
-> blacklist keyring itself, or with a signed dm-verity image.
+Frame size 3724?
 
-It might also be possible to use the pkcs#7 test key type
-(CONFIG_PKCS7_TEST_KEY) to aid in that.
+>    lib/zstd/compress/zstd_double_fast.c: In function 'ZSTD_compressBlock_doubleFast':
+>    lib/zstd/compress/zstd_double_fast.c:336:1: warning: the frame size of 3792 bytes is larger than 1280 bytes [-Wframe-larger-than=]
 
-David
+3792
 
+>    lib/zstd/compress/zstd_double_fast.c: In function 'ZSTD_compressBlock_doubleFast_dictMatchState':
+>    lib/zstd/compress/zstd_double_fast.c:356:1: warning: the frame size of 3808 bytes is larger than 1280 bytes [-Wframe-larger-than=]
+
+3808
+
+>    lib/zstd/compress/zstd_fast.c: In function 'ZSTD_compressBlock_fast_extDict_generic':
+> >> lib/zstd/compress/zstd_fast.c:476:1: warning: the frame size of 2736 bytes is larger than 1280 bytes [-Wframe-larger-than=]
+
+2736
+
+>    lib/zstd/compress/zstd_fast.c: In function 'ZSTD_compressBlock_fast':
+>    lib/zstd/compress/zstd_fast.c:204:1: warning: the frame size of 1508 bytes is larger than 1280 bytes [-Wframe-larger-than=]
+
+1508
+
+>    lib/zstd/compress/zstd_fast.c: In function 'ZSTD_compressBlock_fast_dictMatchState':
+>    lib/zstd/compress/zstd_fast.c:372:1: warning: the frame size of 1540 bytes is larger than 1280 bytes [-Wframe-larger-than=]
+
+1540
+
+For userspace code it's nothing but in kernel it's a lot for a single
+function. The largest number is almost one page, there were days where
+this would be one half of the whole stack space. We can't waste precious
+resources like that. Taking the userspace code as-is does not seem to
+work.
