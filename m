@@ -7,68 +7,54 @@ X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D635C4361A
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 07:16:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D945EC4361A
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 07:16:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 074F2207C8
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 07:16:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81D25207C8
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 07:16:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728589AbgLDHQW (ORCPT
+        id S1728588AbgLDHQZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Dec 2020 02:16:22 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:60978 "EHLO fornost.hmeau.com"
+        Fri, 4 Dec 2020 02:16:25 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:60982 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728473AbgLDHQW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Dec 2020 02:16:22 -0500
+        id S1728462AbgLDHQY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Dec 2020 02:16:24 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kl5JR-0006dG-Dz; Fri, 04 Dec 2020 18:15:30 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 04 Dec 2020 18:15:29 +1100
-Date:   Fri, 4 Dec 2020 18:15:29 +1100
+        id 1kl5Jc-0006dM-UF; Fri, 04 Dec 2020 18:15:42 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 04 Dec 2020 18:15:40 +1100
+Date:   Fri, 4 Dec 2020 18:15:40 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        james.morse@arm.com, ebiggers@kernel.org
-Subject: Re: [PATCH v2] crypto: arm/aes-ce - work around Cortex-A57/A72
- silion errata
-Message-ID: <20201204071529.GB31775@gondor.apana.org.au>
-References: <20201126074907.18965-1-ardb@kernel.org>
+To:     Uros Bizjak <ubizjak@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, x86@kernel.org,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH] crypto: x86/aesni-intel: Use TEST %reg,%reg instead of
+ CMP $0,%reg
+Message-ID: <20201204071540.GC31775@gondor.apana.org.au>
+References: <20201127094452.7721-1-ubizjak@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201126074907.18965-1-ardb@kernel.org>
+In-Reply-To: <20201127094452.7721-1-ubizjak@gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 26, 2020 at 08:49:07AM +0100, Ard Biesheuvel wrote:
-> ARM Cortex-A57 and Cortex-A72 cores running in 32-bit mode are affected
-> by silicon errata #1742098 and #1655431, respectively, where the second
-> instruction of a AES instruction pair may execute twice if an interrupt
-> is taken right after the first instruction consumes an input register of
-> which a single 32-bit lane has been updated the last time it was modified.
+On Fri, Nov 27, 2020 at 10:44:52AM +0100, Uros Bizjak wrote:
+> CMP $0,%reg can't set overflow flag, so we can use shorter TEST %reg,%reg
+> instruction when only zero and sign flags are checked (E,L,LE,G,GE conditions).
 > 
-> This is not such a rare occurrence as it may seem: in counter mode, only
-> the least significant 32-bit word is incremented in the absence of a
-> carry, which makes our counter mode implementation susceptible to these
-> errata.
-> 
-> So let's shuffle the counter assignments around a bit so that the most
-> recent updates when the AES instruction pair executes are 128-bit wide.
-> 
-> [0] ARM-EPM-049219 v23 Cortex-A57 MPCore Software Developers Errata Notice
-> [1] ARM-EPM-012079 v11.0 Cortex-A72 MPCore Software Developers Errata Notice
-> 
-> Cc: <stable@vger.kernel.org> # v5.4+
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
 > ---
-> v2: - add comment block describing the erratum and how it is being worked
->       around
->     - mention A57 as well as A72, as both are affected
-> 
->  arch/arm/crypto/aes-ce-core.S | 32 ++++++++++++++------
->  1 file changed, 22 insertions(+), 10 deletions(-)
+>  arch/x86/crypto/aesni-intel_asm.S        | 20 ++++++++++----------
+>  arch/x86/crypto/aesni-intel_avx-x86_64.S | 20 ++++++++++----------
+>  2 files changed, 20 insertions(+), 20 deletions(-)
 
 Patch applied.  Thanks.
 -- 
