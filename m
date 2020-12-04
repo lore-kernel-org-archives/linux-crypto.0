@@ -2,138 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DBDEC4167B
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 17:36:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47F7CC1B0D9
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 17:57:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D072229C4
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 17:36:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2047022BEA
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Dec 2020 17:57:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728495AbgLDRgm (ORCPT
+        id S2387681AbgLDR5m (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Dec 2020 12:36:42 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39186 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726254AbgLDRgl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Dec 2020 12:36:41 -0500
-X-Gm-Message-State: AOAM530lYNSiOfOYX3WfNLis5YpyxGOItX23T/Zomz7IjRcgfOtm/QJc
-        7kOgzWySY9XAyMia6QPCIJnoxJ8rG7nyDozDskU=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607103360;
-        bh=nzOPWzsALGm9g96B6OfU76fRBhiHX0cmH9B2INe3Q4I=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Ig1oMzSXyhdIbA9js/0zEH5KavGr3idC/dJT8rM75LAdwf0sLCyFFeL6uFKbDX5Q2
-         HzusRHGuh9tiXURDyTSTsFXM2actfCmvzS3EWsmPGcWHuxeSx4+XW/XyUAXc/dGSjW
-         0qIH0PoOa7WI4p0mHmUTCYI3J2hIuvBsg7U6hk4fHDBe8PvnNAhyIBlb8eNRshvsKG
-         e5AxtFETFlv7CoQqu6Ta+4jembBa+jRqgWkaiA0VjeT1mNajL5tTHQwqNY/1GY6+Kv
-         CMEoj8qt0kgOlVXPGfxfwAbOnImsvxTu/PFkdrYTZkSy2eFaO2eRk0Uc486CIIhyCX
-         Agp7ec8rwAWHg==
-X-Google-Smtp-Source: ABdhPJznC6r+tZ49KMWbvmkRQRkw7RbodUPNa/S/eN750bh5EDuKqJYhR44eXH+qljWAdk/oc/WNBhTWFufK1T560JQ=
-X-Received: by 2002:a05:6830:214c:: with SMTP id r12mr4423697otd.90.1607103359560;
- Fri, 04 Dec 2020 09:35:59 -0800 (PST)
-MIME-Version: 1.0
-References: <20201204154626.GA26255@fieldses.org> <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com>
- <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
- <118876.1607093975@warthog.procyon.org.uk> <122997.1607097713@warthog.procyon.org.uk>
- <20201204160347.GA26933@fieldses.org> <125709.1607100601@warthog.procyon.org.uk>
- <CAMj1kXEOm_yh478i+dqPiz0eoBxp4eag3j2qHm5eBLe+2kihoQ@mail.gmail.com> <127458.1607102368@warthog.procyon.org.uk>
-In-Reply-To: <127458.1607102368@warthog.procyon.org.uk>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Fri, 4 Dec 2020 18:35:48 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXFe50HvZLxG6Kh-oYBCf5uu51hhuh7mW5UQ62ZSqmu_xA@mail.gmail.com>
-Message-ID: <CAMj1kXFe50HvZLxG6Kh-oYBCf5uu51hhuh7mW5UQ62ZSqmu_xA@mail.gmail.com>
-Subject: Re: Why the auxiliary cipher in gss_krb5_crypto.c?
-To:     David Howells <dhowells@redhat.com>
-Cc:     Bruce Fields <bfields@fieldses.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        Fri, 4 Dec 2020 12:57:42 -0500
+Received: from bedivere.hansenpartnership.com ([96.44.175.130]:57236 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726021AbgLDR5m (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Dec 2020 12:57:42 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id EFE5C12806D3;
+        Fri,  4 Dec 2020 09:57:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1607104620;
+        bh=j/eiQ9XC4YVyXHPaGvnixXqre38vTxKbe7IysEXG/gQ=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=LJv6d585fMMbsbl72vwxEil6yGk8n+dpPg0+K0c9QGLI6z2Tnb35IajlkkZ/poYVt
+         Apwk3JR5UaJjDvC46VLJvsCb+SFQ5eqvWGVnU98pT0RQI8tTzpuqlku09Jz0OireDV
+         CvQHnAFrsu77RWt/AkDGWfrret+uJBj5l78JAyzI=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id INp-1Jb0T2J6; Fri,  4 Dec 2020 09:57:00 -0800 (PST)
+Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:600:8280:66d1::527])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 92AB012806D2;
+        Fri,  4 Dec 2020 09:56:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1607104620;
+        bh=j/eiQ9XC4YVyXHPaGvnixXqre38vTxKbe7IysEXG/gQ=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=LJv6d585fMMbsbl72vwxEil6yGk8n+dpPg0+K0c9QGLI6z2Tnb35IajlkkZ/poYVt
+         Apwk3JR5UaJjDvC46VLJvsCb+SFQ5eqvWGVnU98pT0RQI8tTzpuqlku09Jz0OireDV
+         CvQHnAFrsu77RWt/AkDGWfrret+uJBj5l78JAyzI=
+Message-ID: <d706cdbcc4eba3fb3fe17453017a6623f1ec80dc.camel@HansenPartnership.com>
+Subject: Re: [RFC PATCH v1 00/12] Replace strstarts() by str_has_prefix()
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     laniel_francis@privacyrequired.com,
+        Russell King <linux@armlinux.org.uk>,
+        Hauke Mehrtens <hauke@hauke-m.de>,
+        =?UTF-8?Q?Rafa=C5=82_Mi=C5=82ecki?= <zajec5@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        bcm-kernel-feedback-list@broadcom.com,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
-        <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org
+        "David S. Miller" <davem@davemloft.net>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Tomi Valkeinen <tomi.valkeinen@ti.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+        Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Bin Liu <b-liu@ti.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jessica Yu <jeyu@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-efi@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-renesas-soc@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-usb@vger.kernel.org
+Date:   Fri, 04 Dec 2020 09:56:58 -0800
+In-Reply-To: <20201204170319.20383-1-laniel_francis@privacyrequired.com>
+References: <20201204170319.20383-1-laniel_francis@privacyrequired.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 4 Dec 2020 at 18:19, David Howells <dhowells@redhat.com> wrote:
->
-> Ard Biesheuvel <ardb@kernel.org> wrote:
->
-> > The tricky thing with CTS is that you have to ensure that the final
-> > full and partial blocks are presented to the crypto driver as one
-> > chunk, or it won't be able to perform the ciphertext stealing. This
-> > might be the reason for the current approach. If the sunrpc code has
-> > multiple disjoint chunks of data to encrypto, it is always better to
-> > wrap it in a single scatterlist and call into the skcipher only once.
->
-> Yeah - the problem with that is that for sunrpc, we might be dealing with 1MB
-> plus bits of non-contiguous pages, requiring >8K of scatterlist elements
-> (admittedly, we can chain them, but we may have to do one or more large
-> allocations).
->
-> > However, I would recommend against it:
->
-> Sorry, recommend against what?
->
+On Fri, 2020-12-04 at 18:03 +0100, laniel_francis@privacyrequired.com
+wrote:
+> In this patch set, I replaced all calls to strstarts() by calls to
+> str_has_prefix(). Indeed, the kernel has two functions to test if a
+> string begins with an other:
+> 1. strstarts() which returns a bool, so 1 if the string begins with
+> the prefix,0 otherwise.
+> 2. str_has_prefix() which returns the length of the prefix or 0.
+> 
+> str_has_prefix() was introduced later than strstarts(), in commit
+> 495d714ad140 which also stated that str_has_prefix() should replace
+> strstarts(). This is what this patch set does.
 
-Recommend against the current approach of manipulating the input like
-this and feeding it into the skcipher piecemeal.
+What's the reason why?  If you look at the use cases for the
+replacement of strstart()  they're all cases where we need to know the
+length we're skipping and this is hard coded, leading to potential
+errors later.  This is a classic example:  3d739c1f6156 ("tracing: Use
+the return of str_has_prefix() to remove open coded numbers").  However
+you're not doing this transformation in the conversion, so the
+conversion is pretty useless.  I also see no case for replacing
+strstart() where we're using it simply as a boolean without needing to
+know the length of the prefix.
 
-Herbert recently made some changes for MSG_MORE support in the AF_ALG
-code, which permits a skcipher encryption to be split into several
-invocations of the skcipher layer without the need for this complexity
-on the side of the caller. Maybe there is a way to reuse that here.
-Herbert?
+James
 
-> > at least for ARM and arm64, I
-> > have already contributed SIMD based implementations that use SIMD
-> > permutation instructions and overlapping loads and stores to perform
-> > the ciphertext stealing, which means that there is only a single layer
-> > which implements CTS+CBC+AES, and this layer can consume the entire
-> > scatterlist in one go. We could easily do something similar in the
-> > AES-NI driver as well.
->
-> Can you point me at that in the sources?
->
 
-arm64 has
-
-arch/arm64/crypto/aes-glue.c
-arch/arm64/crypto/aes-modes.S
-
-where the former implements the skcipher wrapper for an implementation
-of "cts(cbc(aes))"
-
-static int cts_cbc_encrypt(struct skcipher_request *req)
-
-walks over the src/dst scatterlist and feeds the data into the asm
-helpers, one for the bulk of the input, and one for the final full and
-partial blocks (or two final full blocks)
-
-The SIMD asm helpers are
-
-aes_cbc_encrypt
-aes_cbc_decrypt
-aes_cbc_cts_encrypt
-aes_cbc_cts_decrypt
-
-> Can you also do SHA at the same time in the same loop?
->
-
-SHA-1 or HMAC-SHA1? The latter could probably be modeled as an AEAD.
-The former doesn't really fit the current API so we'd have to invent
-something for it.
-
-> Note that the rfc3962 AES does the checksum over the plaintext, but rfc8009
-> does it over the ciphertext.
->
-> David
->
