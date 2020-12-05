@@ -2,169 +2,163 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB1DC4167B
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Dec 2020 18:45:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE70BC4167B
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Dec 2020 19:49:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6EFAD22E00
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Dec 2020 18:45:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AFBB72311C
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Dec 2020 19:49:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728162AbgLESo0 (ORCPT
+        id S1726134AbgLETtA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 5 Dec 2020 13:44:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44440 "EHLO
+        Sat, 5 Dec 2020 14:49:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727039AbgLESoV (ORCPT
+        with ESMTP id S1725985AbgLETtA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 5 Dec 2020 13:44:21 -0500
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 564DEC0613D1;
-        Sat,  5 Dec 2020 10:43:40 -0800 (PST)
-Received: by mail-wm1-x341.google.com with SMTP id h21so9945777wmb.2;
-        Sat, 05 Dec 2020 10:43:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=xy8pTkIM3V0NC8hsWJahqGP6V2oO9J48tUSWZxlA9uk=;
-        b=ZC0wB4xOfrZGXbQAYkwSKi5ecx7lxC5Vf4+MXSsx4L7QUjRw4dfdEiQ8MIPjAiBNgn
-         vGLaRLq9GDAwwVjdTIE3mb6aa8BdM5f0ozv+eGRpnvq+rMgpgoaf5eXNtd+XcdO1efkI
-         q4apFVhyQ4I2JjN3jjJzcVbbnVijKtGUyNC9WtR2Ye91BioAlGYWa4M+4gCiXsmu4Eb+
-         urVod55S1VNcUvoxhkXZYS/Dg+8NDwuy4KoHjDqd8APLAa5jUepNnZwhMdAo9NeXwJLc
-         5MuUYSuHiB7Vf/Kplln2nrwITqqVXiajQRpn6Iu2ZUsPQ+GqGcliBEK3zoqcc9/8Mi1w
-         9oJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xy8pTkIM3V0NC8hsWJahqGP6V2oO9J48tUSWZxlA9uk=;
-        b=qkHllk2pMS5xXWDCsE0s/G7J6e8OQGfYe6iD4wfVoYxne2uk9FcJ+LvZL5zpH7URuI
-         MbkFl5s9gMxkm+Vz+0Mmt+JLHRNt2TQgvnVvxUc7cTe1I7QN/qlnROy9l9xN8fCR1FG2
-         UbAHxzcJkUwIffdFCw7YHNIpAMVFJNe4DrE3OQw888JIBBUtDNftuoPLjxx9WxA08WZ0
-         weqfEHX+dn7PUDUWTFeZiMyQJmjWuaUYJpD+fEcSjBNnaZASuq8JnDQzMb22dPBaIYPq
-         XIFUA7IK9N/KzCaVAx04TBvD1+wYOAiYdhN93tMH+bngnEUTLOGUIIPsKV1J+9SEL0k3
-         hleA==
-X-Gm-Message-State: AOAM5307BZk5RWWIGU+NqMkSbaUAJ1h52/oCLxO1p3ZE+BgIqhtQUk+X
-        hjnyve+KQtAIEUv7P7Z1cls=
-X-Google-Smtp-Source: ABdhPJwSK1RomPg3IX344esDcP0wSct5ZEkZlRVcgy1IeoI9W66W/Q0BTNxSa5aKL27jcKYmnyX4yQ==
-X-Received: by 2002:a1c:7c09:: with SMTP id x9mr10401089wmc.98.1607193819114;
-        Sat, 05 Dec 2020 10:43:39 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id j6sm8401536wrq.38.2020.12.05.10.43.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Dec 2020 10:43:38 -0800 (PST)
-Date:   Sat, 5 Dec 2020 19:43:34 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
+        Sat, 5 Dec 2020 14:49:00 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D10FC0613D1;
+        Sat,  5 Dec 2020 11:48:18 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1607197695;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5V64cHoDauQUIjehmXNdE3d+yc6rEovliqZd890tZyc=;
+        b=2dZo+Tgpz46/CvuMRAaMBs6LBghauRtHEJYgcpKvgHaboX1eRha21sywPs90/boVHgePPW
+        4BQ4o7Qf70lN6yBLyI0a2okxXCsi1LIIq4E8VeZIp3fLI/SVaERVtQpJzVF5xsZkSpezWG
+        n9tbwfrwuJakp/IDyFWh4UIY5T+8p2K4znYOZGgg2g5bxFPaUSUN/69DeneBxLzMbi5I2y
+        phdHLVyRJZEH8+KKgcMNBeMh37Jn33RIshbPbIanUhyyEmwf8tU1vrFbsRngNE00Hfc/u0
+        dmGy0w1lKccZ+gk0KbHg/4WM1Ve0y1j1wWskzFuXOCXotUS8naIKBp1BcusgSg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1607197695;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5V64cHoDauQUIjehmXNdE3d+yc6rEovliqZd890tZyc=;
+        b=yo8evh+GXBHbspAYbEKASwVyNqiH9vfFd2JG9cthkSOM+YN9oopdlp3N2ZhOvsUAXW4mFt
+        KJ+wK35XaaclkPAw==
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
 Cc:     herbert@gondor.apana.org.au, mripard@kernel.org, wens@csie.org,
         linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-mm@kvack.org, Andrew Morton <akpm@linuxfoundation.org>
+        linux-mm@kvack.org, Andrew Morton <akpm@linuxfoundation.org>,
+        Julia Lawall <julia.lawall@lip6.fr>
 Subject: Re: crypto: sun4i-ss: error with kmap
-Message-ID: <20201205184334.GA8034@Red>
-References: <20201201144529.GA6786@Red>
- <87v9dlfthf.fsf@nanos.tec.linutronix.de>
- <20201202195501.GA29296@Red>
- <877dpzexfr.fsf@nanos.tec.linutronix.de>
- <20201203173846.GA16207@Red>
- <87r1o6bh1u.fsf@nanos.tec.linutronix.de>
- <20201204132631.GA25321@Red>
- <874kl1bod0.fsf@nanos.tec.linutronix.de>
- <20201204192753.GA19782@Red>
- <87wnxx9tle.fsf@nanos.tec.linutronix.de>
+In-Reply-To: <20201205184334.GA8034@Red>
+References: <20201201144529.GA6786@Red> <87v9dlfthf.fsf@nanos.tec.linutronix.de> <20201202195501.GA29296@Red> <877dpzexfr.fsf@nanos.tec.linutronix.de> <20201203173846.GA16207@Red> <87r1o6bh1u.fsf@nanos.tec.linutronix.de> <20201204132631.GA25321@Red> <874kl1bod0.fsf@nanos.tec.linutronix.de> <20201204192753.GA19782@Red> <87wnxx9tle.fsf@nanos.tec.linutronix.de> <20201205184334.GA8034@Red>
+Date:   Sat, 05 Dec 2020 20:48:15 +0100
+Message-ID: <87mtys8268.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87wnxx9tle.fsf@nanos.tec.linutronix.de>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 04, 2020 at 09:58:21PM +0100, Thomas Gleixner wrote:
-> On Fri, Dec 04 2020 at 20:27, Corentin Labbe wrote:
-> > On Fri, Dec 04, 2020 at 04:08:27PM +0100, Thomas Gleixner wrote:
-> >> On Fri, Dec 04 2020 at 14:26, Corentin Labbe wrote:
-> >> > On Fri, Dec 04, 2020 at 12:34:05AM +0100, Thomas Gleixner wrote:
-> >> >> The unmap comes from sg_miter_stop() and looking at the previous
-> >> >> map/unmap cycles there are never nested maps.
-> >> >> 
-> >> >> [  996.943030] cryptset-316       0d..4 73943317us : __kmap_local_pfn_prot: kmap_local_pfn: 1 ffefd000
-> >> >> 
-> >> >> is the first event which allocates a nested map. 
-> >> >> 
-> >> >> So something goes south either in sg_miter or in the crypto maze.
-> >> >> 
-> >> >> Enabling CONFIG_DEBUG_KMAP_LOCAL and function tracing might give us more clue.
-> >> >
-> >> > Done, http://kernel.montjoie.ovh/130466.log
-> >> 
-> >> Does not provide more information with the debug enabled. So can you
-> >> please enable CONFIG_FUNCTION_TRACER and add 'ftrace=function' to the
-> >> command line?
-> >
-> > Done, http://kernel.montjoie.ovh/130490.log
-> 
-> Aaargh. That overwrites everything while printing out that
-> warning.
-> 
-> Can you please replace the debug patch with the one below and try again?
-> That stops the trace right on the condition.
-> 
-> Thanks,
-> 
->         tglx
-> ---
-> diff --git a/mm/highmem.c b/mm/highmem.c
-> index b49364a306b8..8f8862f79d23 100644
-> --- a/mm/highmem.c
-> +++ b/mm/highmem.c
-> @@ -485,6 +485,7 @@ static inline bool kmap_high_unmap_local(unsigned long vaddr)
->  {
->  #ifdef ARCH_NEEDS_KMAP_HIGH_GET
->  	if (vaddr >= PKMAP_ADDR(0) && vaddr < PKMAP_ADDR(LAST_PKMAP)) {
-> +		trace_printk("kunmap_high: %lx\n", vaddr);
->  		kunmap_high(pte_page(pkmap_page_table[PKMAP_NR(vaddr)]));
->  		return true;
->  	}
-> @@ -520,6 +521,7 @@ void *__kmap_local_pfn_prot(unsigned long pfn, pgprot_t prot)
->  	preempt_disable();
->  	idx = arch_kmap_local_map_idx(kmap_local_idx_push(), pfn);
->  	vaddr = __fix_to_virt(FIX_KMAP_BEGIN + idx);
-> +	trace_printk("kmap_local_pfn: %d %lx\n", idx, (unsigned long) vaddr);
->  	BUG_ON(!pte_none(*(kmap_pte - idx)));
->  	pteval = pfn_pte(pfn, prot);
->  	set_pte_at(&init_mm, vaddr, kmap_pte - idx, pteval);
-> @@ -545,8 +547,10 @@ void *__kmap_local_page_prot(struct page *page, pgprot_t prot)
->  
->  	/* Try kmap_high_get() if architecture has it enabled */
->  	kmap = arch_kmap_local_high_get(page);
-> -	if (kmap)
-> +	if (kmap) {
-> +		trace_printk("kmap_local_high_get: %lx\n", (unsigned long) kmap);
->  		return kmap;
-> +	}
->  
->  	return __kmap_local_pfn_prot(page_to_pfn(page), prot);
->  }
-> @@ -578,7 +582,11 @@ void kunmap_local_indexed(void *vaddr)
->  
->  	preempt_disable();
->  	idx = arch_kmap_local_unmap_idx(kmap_local_idx(), addr);
-> -	WARN_ON_ONCE(addr != __fix_to_virt(FIX_KMAP_BEGIN + idx));
-> +	trace_printk("kunmap_local: %i %lx\n", idx, (unsigned long) vaddr);
-> +	if (addr != __fix_to_virt(FIX_KMAP_BEGIN + idx)) {
-> +		tracing_off();
-> +		BUG();
-> +	}
->  
->  	arch_kmap_local_pre_unmap(addr);
->  	pte_clear(&init_mm, addr, kmap_pte - idx);
-> 
+Corentin,
 
-Hello, the result could be found at http://kernel.montjoie.ovh/130739.log
+On Sat, Dec 05 2020 at 19:43, Corentin Labbe wrote:
+> On Fri, Dec 04, 2020 at 09:58:21PM +0100, Thomas Gleixner wrote:
+>> Can you please replace the debug patch with the one below and try again?
+>> That stops the trace right on the condition.
+>
+> Hello, the result could be found at http://kernel.montjoie.ovh/130739.log
 
-Thanks
+Thanks for providing this. This is clearly showing where stuff goes
+wrong. It starts here at 729.550001. I removed the uninteresting parts:
+
+0d..2 147103293us : __kmap_local_page_prot <-sg_miter_next
+0d..3 147103308us :__kmap_local_pfn_prot: kmap_local_pfn: 1 ffefd000
+
+0d..3 147103311us : __kmap_local_page_prot <-sg_miter_next
+0d..4 147103325us : __kmap_local_pfn_prot: kmap_local_pfn: 3 ffefb000
+
+0d..3 147103429us : kunmap_local_indexed <-sg_miter_stop
+0d..4 147103433us : kunmap_local_indexed: kunmap_local: 3 ffefd000
+
+So this maps two pages and unmaps the first one. That's all called from
+sun4i_ss_opti_poll() and the bug is clearly visible there:
+
+	sg_miter_next(&mi);
+	sg_miter_next(&mo);
+
+release_ss:
+	sg_miter_stop(&mi);
+	sg_miter_stop(&mo);
+
+Written by yourself :) Same issue in sun4i_ss_cipher_poll()
+
+Fix below.
+
+Julia, it might be worth to have a coccinelle check for that. It's the
+only place which got it wrong, but this goes unnoticed when code is
+e.g. only fully tested on 64bit or as in this case never tested with
+full debugging enabled. The whole kmap_atomic and kmap_local (new in
+next) family and all users like the sg_miter stuff are affected by this.
+
+Thanks,
+
+        tglx
+---
+Subject: crypto: sun4i-ss - Fix sg_miter_stop() ordering
+From: Thomas Gleixner <tglx@linutronix.de>
+Date: Sat, 05 Dec 2020 20:17:28 +0100
+
+sun4i_ss_opti_poll() and sun4i_ss_cipher_poll() do:
+
+        sg_miter_next(&mi);
+        sg_miter_next(&mo);
+	...
+        sg_miter_stop(&mi);
+        sg_miter_stop(&mo);
+
+which is the wrong order because sg_miter_next() maps a page with
+kmap_atomic() and sg_miter_stop() unmaps it. kmap_atomic() uses a stack
+internaly which requires that the nested map is unmapped first. As this
+uses the wrong order it triggers the warning in kunmap_local_indexed()
+which checks the to be unmapped address and subsequently crashes.
+
+This went unnoticed for 5 years because the ARM kmap_atomic()
+implementation had the warning conditional on CONFIG_DEBUG_HIGHMEM which
+was obviously never enabled when testing that driver.
+
+Flip the order to cure it.
+
+Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Fixes: 6298e948215f ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Cc: stable@vger.kernel.org
+---
+ drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
+@@ -109,8 +109,8 @@ static int noinline_for_stack sun4i_ss_o
+ 	}
+ 
+ release_ss:
+-	sg_miter_stop(&mi);
+ 	sg_miter_stop(&mo);
++	sg_miter_stop(&mi);
+ 	writel(0, ss->base + SS_CTL);
+ 	spin_unlock_irqrestore(&ss->slock, flags);
+ 	return err;
+@@ -333,8 +333,8 @@ static int sun4i_ss_cipher_poll(struct s
+ 	}
+ 
+ release_ss:
+-	sg_miter_stop(&mi);
+ 	sg_miter_stop(&mo);
++	sg_miter_stop(&mi);
+ 	writel(0, ss->base + SS_CTL);
+ 	spin_unlock_irqrestore(&ss->slock, flags);
+ 
+
+
