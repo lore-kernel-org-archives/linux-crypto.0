@@ -2,135 +2,133 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04C70C4361B
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 10:06:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93E75C1B0E3
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 12:03:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C638023120
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 10:06:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B4F320882
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 12:03:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726207AbgLGKGK (ORCPT
+        id S1727264AbgLGMD1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Dec 2020 05:06:10 -0500
-Received: from a.mx.secunet.com ([62.96.220.36]:50004 "EHLO a.mx.secunet.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726023AbgLGKGJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Dec 2020 05:06:09 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by a.mx.secunet.com (Postfix) with ESMTP id 055D820270;
-        Mon,  7 Dec 2020 11:05:28 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id WJ-Ol7voqbH2; Mon,  7 Dec 2020 11:05:27 +0100 (CET)
-Received: from mail-essen-01.secunet.de (unknown [10.53.40.204])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+        Mon, 7 Dec 2020 07:03:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37855 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726840AbgLGMD1 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 7 Dec 2020 07:03:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607342521;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SWjLfwTOONQTPdH1Ex4bzcrn6zadIhm2DfjdXxC5840=;
+        b=JUhpsWstPBJJ/n5T2VV5ozE3FJTmsZUCiZ8Hug+0jDxwPNSZuMX1i1UhiUgvLJMoZfdrlM
+        8EVaPCHPEoB1AeEX2BKN/iTUn1nSEsNcBtxnn0L2g7KhrLXBv1LrXPZsBvGf899LjF4h9Q
+        T02LTIuxXsrRUEZ5eS2W8UwRV22pjng=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-_SXenQ4DNjKzlIC-NcF6nw-1; Mon, 07 Dec 2020 07:01:57 -0500
+X-MC-Unique: _SXenQ4DNjKzlIC-NcF6nw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by a.mx.secunet.com (Postfix) with ESMTPS id 85987201E5;
-        Mon,  7 Dec 2020 11:05:27 +0100 (CET)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- mail-essen-01.secunet.de (10.53.40.204) with Microsoft SMTP Server (TLS) id
- 14.3.487.0; Mon, 7 Dec 2020 11:05:27 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Mon, 7 Dec 2020
- 11:05:26 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)      id 4A269318085B;
- Wed,  2 Dec 2020 14:18:47 +0100 (CET)
-Date:   Wed, 2 Dec 2020 14:18:47 +0100
-From:   Steffen Klassert <steffen.klassert@secunet.com>
-To:     Phil Sutter <phil@nwl.cc>, <linux-crypto@vger.kernel.org>,
-        <netfilter-devel@vger.kernel.org>
-Subject: Re: XFRM interface and NF_INET_LOCAL_OUT hook
-Message-ID: <20201202131847.GB85961@gauss3.secunet.de>
-References: <20201125112342.GA11766@orbyte.nwl.cc>
- <20201126094021.GK8805@gauss3.secunet.de>
- <20201126131200.GH4647@orbyte.nwl.cc>
- <20201127095511.GD9390@gauss3.secunet.de>
- <20201127141048.GL4647@orbyte.nwl.cc>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D11C742391;
+        Mon,  7 Dec 2020 12:01:55 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-116-67.rdu2.redhat.com [10.10.116.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3B8FA60BE2;
+        Mon,  7 Dec 2020 12:01:53 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAMj1kXFe50HvZLxG6Kh-oYBCf5uu51hhuh7mW5UQ62ZSqmu_xA@mail.gmail.com>
+References: <CAMj1kXFe50HvZLxG6Kh-oYBCf5uu51hhuh7mW5UQ62ZSqmu_xA@mail.gmail.com> <20201204154626.GA26255@fieldses.org> <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com> <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk> <118876.1607093975@warthog.procyon.org.uk> <122997.1607097713@warthog.procyon.org.uk> <20201204160347.GA26933@fieldses.org> <125709.1607100601@warthog.procyon.org.uk> <CAMj1kXEOm_yh478i+dqPiz0eoBxp4eag3j2qHm5eBLe+2kihoQ@mail.gmail.com> <127458.1607102368@warthog.procyon.org.uk>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     dhowells@redhat.com, Bruce Fields <bfields@fieldses.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
+        <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org
+Subject: Re: Why the auxiliary cipher in gss_krb5_crypto.c?
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20201127141048.GL4647@orbyte.nwl.cc>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-ID: <468624.1607342512.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Mon, 07 Dec 2020 12:01:52 +0000
+Message-ID: <468625.1607342512@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 27, 2020 at 03:10:48PM +0100, Phil Sutter wrote:
-> On Fri, Nov 27, 2020 at 10:55:11AM +0100, Steffen Klassert wrote:
-> > On Thu, Nov 26, 2020 at 02:12:00PM +0100, Phil Sutter wrote:
-> > > > > 
-> > > > > Is this a bug or an expected quirk when using XFRM interface?
-> > > > 
-> > > > This is expected behaviour. The xfrm interfaces are plaintext devices,
-> > > > the plaintext packets are routed to the xfrm interface which guarantees
-> > > > transformation. So the lookup that assigns skb_dst(skb)->xfrm
-> > > > happens 'behind' the interface. After transformation,
-> > > > skb_dst(skb)->xfrm will be cleared. So this assignment exists just
-> > > > inside xfrm in that case.
-> > > 
-> > > OK, thanks for the clarification.
-> > > 
-> > > > Does netfilter match against skb_dst(skb)->xfrm? What is the exact case
-> > > > that does not work?
-> > > 
-> > > The reported use-case is a match against tunnel data in output hook:
-> > > 
-> > > | table t {
-> > > |     chain c {
-> > > |         type filter hook output priority filter
-> > > |         oifname eth0 ipsec out ip daddr 192.168.1.2
-> > > |     }
-> > > | }
-> > > 
-> > > The ipsec expression tries to extract that data from skb_dst(skb)->xfrm
-> > > if present. In xt_policy (for iptables), code is equivalent. The above
-> > > works when not using xfrm_interface. Initially I assumed one just needs
-> > > to adjust the oifname match, but even dropping it doesn't help.
-> > 
-> > Yes, this does not work with xfrm interfaces. As said, they are plaintext
-> > devices that guarantee transformation.
-> > 
-> > Maybe you can try to match after transformation by using the secpath,
-> > but not sure if that is what you need.
-> 
-> Secpath is used for input only, no?
+Ard Biesheuvel <ardb@kernel.org> wrote:
 
-Yes, apparently :-/
+> > Yeah - the problem with that is that for sunrpc, we might be dealing w=
+ith 1MB
+> > plus bits of non-contiguous pages, requiring >8K of scatterlist elemen=
+ts
+> > (admittedly, we can chain them, but we may have to do one or more larg=
+e
+> > allocations).
+> >
+> > > However, I would recommend against it:
+> >
+> > Sorry, recommend against what?
+> >
+> =
 
-There are cases where we have a secpath for output, but you can't rely
-on it.
+> Recommend against the current approach of manipulating the input like
+> this and feeding it into the skcipher piecemeal.
 
-> I played a bit more with xfrm_interface and noticed that when used,
-> NF_INET_LOCAL_OUT hook sees the packet (an ICMP reply) only once instead
-> of twice as without xfrm_interface. I don't think using it should change
-> behaviour that much apart from packets without matching policy being
-> dropped. What do you think about the following fix? I checked forwarding
-> packets as well and it looks like behaviour is identical to plain
-> policy:
-> 
-> diff --git a/net/xfrm/xfrm_interface.c b/net/xfrm/xfrm_interface.c
-> index aa4cdcf69d471..24af61c95b4d4 100644
-> --- a/net/xfrm/xfrm_interface.c
-> +++ b/net/xfrm/xfrm_interface.c
-> @@ -317,7 +317,8 @@ xfrmi_xmit2(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
->         skb_dst_set(skb, dst);
->         skb->dev = tdev;
->  
-> -       err = dst_output(xi->net, skb->sk, skb);
-> +       err = NF_HOOK(skb_dst(skb)->ops->family, NF_INET_LOCAL_OUT, xi->net,
-> +                     skb->sk, skb, NULL, skb_dst(skb)->dev, dst_output);
->         if (net_xmit_eval(err) == 0) {
->                 struct pcpu_sw_netstats *tstats = this_cpu_ptr(dev->tstats);
+Right.  I understand the problem, but as I mentioned above, the scatterlis=
+t
+itself becomes a performance issue as it may exceed two pages in size.  Do=
+uble
+that as there may need to be separate input and output scatterlists.
 
-I don't mind that change, but we have to be carefull on namespace transition.
-xi->net is the namespace 'behind' the xfrm interface. I guess this is the
-namespace where you want to do the match because that is the namespace
-that has the policies and states for the xfrm interface. So I think that
-change is correct, I just wanted to point that out explicitely.
+> Herbert recently made some changes for MSG_MORE support in the AF_ALG
+> code, which permits a skcipher encryption to be split into several
+> invocations of the skcipher layer without the need for this complexity
+> on the side of the caller. Maybe there is a way to reuse that here.
+> Herbert?
+
+I wonder if it would help if the input buffer and output buffer didn't hav=
+e to
+correspond exactly in usage - ie. the output buffer could be used at a slo=
+wer
+rate than the input to allow for buffering inside the crypto algorithm.
+
+> > Can you also do SHA at the same time in the same loop?
+> =
+
+> SHA-1 or HMAC-SHA1? The latter could probably be modeled as an AEAD.
+> The former doesn't really fit the current API so we'd have to invent
+> something for it.
+
+The hashes corresponding to the kerberos enctypes I'm supporting are:
+
+HMAC-SHA1 for aes128-cts-hmac-sha1-96 and aes256-cts-hmac-sha1-96.
+
+HMAC-SHA256 for aes128-cts-hmac-sha256-128
+
+HMAC-SHA384 for aes256-cts-hmac-sha384-192
+
+CMAC-CAMELLIA for camellia128-cts-cmac and camellia256-cts-cmac
+
+I'm not sure you can support all of those with the instructions available.
+
+David
+
