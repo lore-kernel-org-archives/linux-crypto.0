@@ -2,110 +2,144 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E35D0C4361B
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 12:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5FC7C1B087
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 13:09:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7906233FE
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 12:39:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E07822B40
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 13:09:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725802AbgLGMjd (ORCPT
+        id S1726209AbgLGNJJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Dec 2020 07:39:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51116 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725764AbgLGMjc (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Dec 2020 07:39:32 -0500
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 081DFC0613D3
-        for <linux-crypto@vger.kernel.org>; Mon,  7 Dec 2020 04:38:52 -0800 (PST)
-Received: by mail-wr1-x435.google.com with SMTP id m5so2977914wrx.9
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Dec 2020 04:38:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google;
-        h=reply-to:subject:to:references:from:organization:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dIOFLZF/ARCog985Fac1F7qO/0ylxBb0XiFsDdUBm1g=;
-        b=WtvyeFwsM8WLlHSJ34tBTHVAGXq7C1F1Dp+UeEQT5v/tUJ4LJ1xXn6lDBfkmeoAMD1
-         wh2oZPdrtwSFiM2Kc4lyxz2AT5YZORc+qaeUSO1olobWMpVwb5g/cqpsmCo0O68tmz3H
-         Yz8p+TRh0Rh/4+brmD2YdCWURbQc7OHANqv1pUrZ+T9pXZqFr9gpAEL/9EbTQr1L5L+E
-         9FRV+Amtqe70zokPfFxq1ZPRKvzrfb0z/b2EmYnfvVbQdfLkEAXsfWhpENoz0/TCLs0V
-         mO6iVBsi7I/3o+v8vGqYXmU/654JrDDMOwrH7zCqEuPHAdlz153gEtstOggO0iKtTdTK
-         bX8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:subject:to:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=dIOFLZF/ARCog985Fac1F7qO/0ylxBb0XiFsDdUBm1g=;
-        b=lwyNLa1xKPWz/NBAyymqn/feM5T1bGN2ZbJiWxTggWlwQO2m60NCqf5qcHAekULTYw
-         CGomd98TNqnMhbMrKg1hJlYECPnAWhrxWl0cLBc8gC5FC6MhZ0AWAXqVUCHSoL9wPYE0
-         kdNedjFn10IU5DWMfN8tTopoE0gU7hsb9j/VRt3lXIDGONrKM4vpnCne4HU3yctaL9Vg
-         hiumUBiMRwboRDYVmH+Ek8v0HUo2iOmvWRpmV55d5aJ13u5BuqCQGImTrykY65sIukaA
-         UEXqwazUqhZ4uHveNSOIAEx08tSbHic+nWue0tOROWl/NcjiOBn7s0PFStT4jCdiHFOY
-         7eCA==
-X-Gm-Message-State: AOAM530hPG6zrpyQRXe1I9kNzHHeWDEnoVCFZzW9C07gr8S0BdGVeim6
-        k3+hJPXhsxTzWAj1Fg+5V/ZRPrBhIPOFEg==
-X-Google-Smtp-Source: ABdhPJy6jqX9Il1owU37RM/oACMkvLKCKymIGpwdTgpXYCzvTDD7x9zY0sfvsJbf9wE15KgFdyFkXQ==
-X-Received: by 2002:a5d:540f:: with SMTP id g15mr11354452wrv.397.1607344730728;
-        Mon, 07 Dec 2020 04:38:50 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:410:bb00:19a7:a975:b119:8f99? ([2a01:e0a:410:bb00:19a7:a975:b119:8f99])
-        by smtp.gmail.com with ESMTPSA id w3sm14078898wma.3.2020.12.07.04.38.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Dec 2020 04:38:50 -0800 (PST)
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: XFRM interface and NF_INET_LOCAL_OUT hook
-To:     Steffen Klassert <steffen.klassert@secunet.com>,
-        Phil Sutter <phil@nwl.cc>, linux-crypto@vger.kernel.org,
-        netfilter-devel@vger.kernel.org
-References: <20201125112342.GA11766@orbyte.nwl.cc>
- <20201126094021.GK8805@gauss3.secunet.de>
- <20201126131200.GH4647@orbyte.nwl.cc>
- <20201127095511.GD9390@gauss3.secunet.de>
- <20201127141048.GL4647@orbyte.nwl.cc>
- <20201202131847.GB85961@gauss3.secunet.de>
-From:   Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Organization: 6WIND
-Message-ID: <b2e87407-97d1-bd6b-ca82-6d34fca87b62@6wind.com>
-Date:   Mon, 7 Dec 2020 13:38:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Mon, 7 Dec 2020 08:09:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34448 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725774AbgLGNJJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 7 Dec 2020 08:09:09 -0500
+X-Gm-Message-State: AOAM531nlowu/yVlky6u2pitBwj/AM3Qqn/TU52EeOl3dedNaEO5v30A
+        NgnDRalEUWTeQ4IlBNKZHkgvbAJQkrrfrMDJmQA=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1607346508;
+        bh=YiXfatZ6lH4pAyul08wZ68jWEXOKruJ8RP71cHFKE7U=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=DfT+77pJBcQ2Tz59v8I4UyfPu2VZ9kJOjlVYBjLELyOR9ps8CfmynkxvwsF8gtzjI
+         wteAvAxYZSjmljyE8mJsS/y/eyV8RzNK2ArSo0a5p1vfwBdAer+shvPD0ESQZT8gro
+         znbojXG6QvGNoEtJk7v86aFHScfXER5QzZqEt7cgHF1IbYfs1aL5sk2k/ct6wriFPD
+         eKKzP9SJConbTzoCSFFbLv872uxj5X/HAq3YbVvbND+yeS/JjEGD8yKjtkA7Svz5m2
+         xqRlO7x656wxKMlHRRp2QmNpL8xsQOnbQXje8XBGY0J1VNFeudfwihFBPO/8jDWhKL
+         me6vEBbvqQ4ig==
+X-Google-Smtp-Source: ABdhPJzOCttNG+HMmWL4e+OBsb98ZTp2Sv3FvcRmuGSUW/GZMTC2iGL0S6fIlzxpxGDYQ2h6OZ4tshGuqZ+cL5EHurQ=
+X-Received: by 2002:a4a:c60c:: with SMTP id l12mr10949035ooq.45.1607346507298;
+ Mon, 07 Dec 2020 05:08:27 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20201202131847.GB85961@gauss3.secunet.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20201204154626.GA26255@fieldses.org> <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com>
+ <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
+ <118876.1607093975@warthog.procyon.org.uk> <122997.1607097713@warthog.procyon.org.uk>
+ <20201204160347.GA26933@fieldses.org> <125709.1607100601@warthog.procyon.org.uk>
+ <CAMj1kXEOm_yh478i+dqPiz0eoBxp4eag3j2qHm5eBLe+2kihoQ@mail.gmail.com>
+ <127458.1607102368@warthog.procyon.org.uk> <CAMj1kXFe50HvZLxG6Kh-oYBCf5uu51hhuh7mW5UQ62ZSqmu_xA@mail.gmail.com>
+ <468625.1607342512@warthog.procyon.org.uk>
+In-Reply-To: <468625.1607342512@warthog.procyon.org.uk>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Mon, 7 Dec 2020 14:08:16 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXH_gEjgZKx=8uQgv=ckBqTVoh3vrHj=O-nY-nm5VMgLaA@mail.gmail.com>
+Message-ID: <CAMj1kXH_gEjgZKx=8uQgv=ckBqTVoh3vrHj=O-nY-nm5VMgLaA@mail.gmail.com>
+Subject: Re: Why the auxiliary cipher in gss_krb5_crypto.c?
+To:     David Howells <dhowells@redhat.com>
+Cc:     Bruce Fields <bfields@fieldses.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
+        <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le 02/12/2020 à 14:18, Steffen Klassert a écrit :
-> On Fri, Nov 27, 2020 at 03:10:48PM +0100, Phil Sutter wrote:
-[snip]
->> diff --git a/net/xfrm/xfrm_interface.c b/net/xfrm/xfrm_interface.c
->> index aa4cdcf69d471..24af61c95b4d4 100644
->> --- a/net/xfrm/xfrm_interface.c
->> +++ b/net/xfrm/xfrm_interface.c
->> @@ -317,7 +317,8 @@ xfrmi_xmit2(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
->>         skb_dst_set(skb, dst);
->>         skb->dev = tdev;
->>  
->> -       err = dst_output(xi->net, skb->sk, skb);
->> +       err = NF_HOOK(skb_dst(skb)->ops->family, NF_INET_LOCAL_OUT, xi->net,
->> +                     skb->sk, skb, NULL, skb_dst(skb)->dev, dst_output);
->>         if (net_xmit_eval(err) == 0) {
->>                 struct pcpu_sw_netstats *tstats = this_cpu_ptr(dev->tstats);
-> 
-> I don't mind that change, but we have to be carefull on namespace transition.
-> xi->net is the namespace 'behind' the xfrm interface. I guess this is the
-> namespace where you want to do the match because that is the namespace
-> that has the policies and states for the xfrm interface. So I think that
-> change is correct, I just wanted to point that out explicitely.
-> 
-I also agree with the change and the x-netns case.
+On Mon, 7 Dec 2020 at 13:02, David Howells <dhowells@redhat.com> wrote:
+>
+> Ard Biesheuvel <ardb@kernel.org> wrote:
+>
+> > > Yeah - the problem with that is that for sunrpc, we might be dealing with 1MB
+> > > plus bits of non-contiguous pages, requiring >8K of scatterlist elements
+> > > (admittedly, we can chain them, but we may have to do one or more large
+> > > allocations).
+> > >
+> > > > However, I would recommend against it:
+> > >
+> > > Sorry, recommend against what?
+> > >
+> >
+> > Recommend against the current approach of manipulating the input like
+> > this and feeding it into the skcipher piecemeal.
+>
+> Right.  I understand the problem, but as I mentioned above, the scatterlist
+> itself becomes a performance issue as it may exceed two pages in size.  Double
+> that as there may need to be separate input and output scatterlists.
+>
+
+I wasn't aware that Herbert's work hadn't been merged yet. So that
+means it is entirely reasonable to split the input like this and feed
+the first part into a cbc(aes) skcipher and the last part into a
+cts(cbc(aes)) skcipher, provided that you ensure that the last part
+covers the final two blocks (one full block and one block that is
+either full or partial)
+
+With Herbert's changes, you will be able to use the same skcipher, and
+pass a flag to all but the final part that more data is coming. But
+for lack of that, the current approach is optimal for cases where
+having to cover the entire input with a single scatterlist is
+undesirable.
+
+> > Herbert recently made some changes for MSG_MORE support in the AF_ALG
+> > code, which permits a skcipher encryption to be split into several
+> > invocations of the skcipher layer without the need for this complexity
+> > on the side of the caller. Maybe there is a way to reuse that here.
+> > Herbert?
+>
+> I wonder if it would help if the input buffer and output buffer didn't have to
+> correspond exactly in usage - ie. the output buffer could be used at a slower
+> rate than the input to allow for buffering inside the crypto algorithm.
+>
+
+I don't follow - how could one be used at a slower rate?
+
+> > > Can you also do SHA at the same time in the same loop?
+> >
+> > SHA-1 or HMAC-SHA1? The latter could probably be modeled as an AEAD.
+> > The former doesn't really fit the current API so we'd have to invent
+> > something for it.
+>
+> The hashes corresponding to the kerberos enctypes I'm supporting are:
+>
+> HMAC-SHA1 for aes128-cts-hmac-sha1-96 and aes256-cts-hmac-sha1-96.
+>
+> HMAC-SHA256 for aes128-cts-hmac-sha256-128
+>
+> HMAC-SHA384 for aes256-cts-hmac-sha384-192
+>
+> CMAC-CAMELLIA for camellia128-cts-cmac and camellia256-cts-cmac
+>
+> I'm not sure you can support all of those with the instructions available.
+>
+
+It depends on whether the caller can make use of the authenc()
+pattern, which is a type of AEAD we support. There are numerous
+implementations of authenc(hmac(shaXXX),cbc(aes)), including h/w
+accelerated ones, but none that implement ciphertext stealing. So that
+means that, even if you manage to use the AEAD layer to perform both
+at the same time, the generic authenc() template will perform the
+cts(cbc(aes)) and hmac(shaXXX) by calling into skciphers and ahashes,
+respectively, which won't give you any benefit until accelerated
+implementations turn up that perform the whole operation in one pass
+over the input. And even then, I don't think the performance benefit
+will be worth it.
