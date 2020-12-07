@@ -8,56 +8,56 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04FAEC433FE
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AE7FC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:02:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C0EFF23341
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:02:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56AD723341
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:02:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726379AbgLGJCP (ORCPT
+        id S1726491AbgLGJCW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Dec 2020 04:02:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45598 "EHLO
+        Mon, 7 Dec 2020 04:02:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726336AbgLGJCP (ORCPT
+        with ESMTP id S1726336AbgLGJCV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Dec 2020 04:02:15 -0500
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A6AFC0613D0
-        for <linux-crypto@vger.kernel.org>; Mon,  7 Dec 2020 01:01:38 -0800 (PST)
-Received: by mail-pf1-x443.google.com with SMTP id p4so3296167pfg.0
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Dec 2020 01:01:38 -0800 (PST)
+        Mon, 7 Dec 2020 04:02:21 -0500
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B535AC0613D3
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Dec 2020 01:01:44 -0800 (PST)
+Received: by mail-pg1-x543.google.com with SMTP id t37so8347527pga.7
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Dec 2020 01:01:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=TNGOSyD9pvSkFWvUcTJ6vgncpYFYELUqqTXdTgopIzw=;
-        b=YqEgtCO1VCHtD+TPIaRKXJ6nBtvUPhRnW/tZPf/a0BgypZWAHgfVxRoTim5JqfLihs
-         UL2bYIdD5/vDeoMGHtIle8YMfNtVnVPxEm5E83GR8sO1N4xi1Cwdn+R/WNTk7ERdTX/1
-         Dn0qiCtN7JioHWCQPTVKhylS21nJx/gLtzAHDjB9j2Amnb/QhmVPM3iQioP4PL6tCAvy
-         0X5d8A7XoL9ZVXHuYOP9AgGpJUDgYpf27HByfom2KBC6V14EfD+DlKu2qHtuicN18F1L
-         DVKcy4cQdn8WzfzslL2yKwAo7lC9Rl7bh5JA5FylJKOeO/GT0d3iTiaEM1u+YDm6y8FP
-         xNqg==
+        bh=bcWybFW0Ro+8sR47Oi3fg+rTDgDElKicz0ep/BqaKXI=;
+        b=iFLr6cVQD84XOdcT8Kh2qAJ2UxyPCdwT2MiMfkxr434r9ng7gRQnW+Gjjm+3LFQdjX
+         O8jOErV8qyZ+wWGSJuWxEwm1BVNBiu8clC9dj8qheK225ngAuzYJ9mLzbc/qTzguTcg6
+         wpcs8xD4Yo6S/woW19RlgENhApFdtKejdr1kOEtPuZGrU0VaAk71Z9TdGJ7weG+5dj6+
+         Ww/B9mvKJV8TiJctYjwL3JMTeJHdoSBg6gpuSVJ9hKb0D575Q+kGgeLezuqZqV5x8a3I
+         ojxXgQOh3jYnNrpIFh3/9ZEty+RQYDOdgwLkAahTM3VoJJnNCUw0lcMKWpf9/6ISJT3p
+         q6iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=TNGOSyD9pvSkFWvUcTJ6vgncpYFYELUqqTXdTgopIzw=;
-        b=nJQiqrKru2etzx6kPVjmiljOMcW5LnLNMoES5xa7Gw9Kep4P+A/npSgbJ7YehIfPpJ
-         ND9rT+h5vRPfMb/Y3nH0UPMEdkNeOAOdHU5Dijs5idzWHXOp45Un/2bC9nMe/J4Z986F
-         JpzFAWImxfDwHF/X0RxEqDS68Hls75ntS5oys0yN2p8kN/GXmH27OIpNXlWX89IeUKWH
-         uxmC1nTAKzhe2gMwk+ffug05cCmphmV7Buhuzj/WGxiXKCjoR8waZcaq0QfJHAVw2I8K
-         m0o7MC+UYo2slvdqSSxCs9D6FZ9hY+Tq85XRzJduA+5sPuPFoHGEKYOmto9xm+ZNYCv/
-         OJzQ==
-X-Gm-Message-State: AOAM532Y2GV4+ArLIlHecbdbDhxyMHT9yCxMTjXdFtJb5wYGfz7tT7Gb
-        HDNmz1e6tmFy70DzMTqEihw=
-X-Google-Smtp-Source: ABdhPJzH1NILmg8DaeKOl+ffgiDfnXwTRLvgsjb1J+cmX1q14iDLXGQW0UtcBx1ObaHchTs716peTQ==
-X-Received: by 2002:aa7:82c1:0:b029:19e:3672:50ca with SMTP id f1-20020aa782c10000b029019e367250camr685546pfn.12.1607331697836;
-        Mon, 07 Dec 2020 01:01:37 -0800 (PST)
+        bh=bcWybFW0Ro+8sR47Oi3fg+rTDgDElKicz0ep/BqaKXI=;
+        b=c5Ra7/25YjWS7GSbbAkygpcmS/XubvDUJ8y5cuvvrn6nzUl4RbCpxGHShxMl0IpIpL
+         keJ4VPewoWzDM8VD3Su0tZ7LZqWj+Ad8G8O/mEKByXuLHVqXLg/MTdRaZ/z3BU+fMHX6
+         8oJMJtLJArn0vYdZyS2G61ztiN6yNRLWUb3MUuBa7nqWU9bnK0K6//gMQARMWvE1FB/u
+         rxvi/hr6fSYwrl8bwnq3qPHeBBQziqKW9bz4uTHEnw8FOltDawfAXLXwDQzOsIvmdwf/
+         0/TleJY+S/fFdGUG3tiBRdzZ7HlJT2ITMVooLz6Q7M1fL8jO09258kM4RjzxTXn0A5hw
+         ww/w==
+X-Gm-Message-State: AOAM531kpqn0JbFB9FZPAosACI0QZi4qgb0k1WoEibhIVh5TW0BL9UMm
+        uESd8mCIRwZr+IQyitc2PT4=
+X-Google-Smtp-Source: ABdhPJx+DTWuSfZMEdRqFW6QP6apGccblWe4PJLBsoGSElAl0nBpKdxuCZDqV992H721q86JMUiOVA==
+X-Received: by 2002:a65:55c1:: with SMTP id k1mr11295329pgs.130.1607331704276;
+        Mon, 07 Dec 2020 01:01:44 -0800 (PST)
 Received: from localhost.localdomain ([49.207.208.18])
-        by smtp.gmail.com with ESMTPSA id w200sm11325029pfc.14.2020.12.07.01.01.31
+        by smtp.gmail.com with ESMTPSA id w200sm11325029pfc.14.2020.12.07.01.01.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Dec 2020 01:01:37 -0800 (PST)
+        Mon, 07 Dec 2020 01:01:43 -0800 (PST)
 From:   Allen Pais <allen.lkml@gmail.com>
 To:     herbert@gondor.apana.org.au
 Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
@@ -69,9 +69,9 @@ Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
         k.konieczny@samsung.com, linux-crypto@vger.kernel.org,
         Allen Pais <apais@microsoft.com>,
         Romain Perier <romain.perier@gmail.com>
-Subject: [RESEND 17/19] crypto: s5p: convert tasklets to use new tasklet_setup() API
-Date:   Mon,  7 Dec 2020 14:29:29 +0530
-Message-Id: <20201207085931.661267-18-allen.lkml@gmail.com>
+Subject: [RESEND 18/19] crypto: talitos: convert tasklets to use new tasklet_setup() API
+Date:   Mon,  7 Dec 2020 14:29:30 +0530
+Message-Id: <20201207085931.661267-19-allen.lkml@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201207085931.661267-1-allen.lkml@gmail.com>
 References: <20201207085931.661267-1-allen.lkml@gmail.com>
@@ -91,56 +91,90 @@ and from_tasklet() to pass the tasklet pointer explicitly.
 Signed-off-by: Romain Perier <romain.perier@gmail.com>
 Signed-off-by: Allen Pais <apais@microsoft.com>
 ---
- drivers/crypto/s5p-sss.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ drivers/crypto/talitos.c | 42 ++++++++++++++++++----------------------
+ 1 file changed, 19 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index 88a6c853ffd7..81d5222d5e63 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -1444,9 +1444,9 @@ static int s5p_hash_handle_queue(struct s5p_aes_dev *dd,
-  * s5p_hash_tasklet_cb() - hash tasklet
-  * @data:	ptr to s5p_aes_dev
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 66773892f665..7cc985ce0766 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -402,10 +402,11 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
+  * process completed requests for channels that have done status
   */
--static void s5p_hash_tasklet_cb(unsigned long data)
-+static void s5p_hash_tasklet_cb(struct tasklet_struct *t)
- {
--	struct s5p_aes_dev *dd = (struct s5p_aes_dev *)data;
-+	struct s5p_aes_dev *dd = from_tasklet(dd, t, hash_tasklet);
+ #define DEF_TALITOS1_DONE(name, ch_done_mask)				\
+-static void talitos1_done_##name(unsigned long data)			\
++static void talitos1_done_##name(struct tasklet_struct *t)		\
+ {									\
+-	struct device *dev = (struct device *)data;			\
+-	struct talitos_private *priv = dev_get_drvdata(dev);		\
++	struct talitos_private *priv = from_tasklet(priv, t,		\
++		done_task[0]);						\
++	struct device *dev = priv->dev;					\
+ 	unsigned long flags;						\
+ 									\
+ 	if (ch_done_mask & 0x10000000)					\
+@@ -428,11 +429,12 @@ static void talitos1_done_##name(unsigned long data)			\
+ DEF_TALITOS1_DONE(4ch, TALITOS1_ISR_4CHDONE)
+ DEF_TALITOS1_DONE(ch0, TALITOS1_ISR_CH_0_DONE)
  
- 	if (!test_bit(HASH_FLAGS_BUSY, &dd->hash_flags)) {
- 		s5p_hash_handle_queue(dd, NULL);
-@@ -1974,9 +1974,9 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
- 	s5p_aes_complete(req, err);
+-#define DEF_TALITOS2_DONE(name, ch_done_mask)				\
+-static void talitos2_done_##name(unsigned long data)			\
++#define DEF_TALITOS2_DONE(name, ch_done_mask, tasklet_idx)		\
++static void talitos2_done_##name(struct tasklet_struct *t)		\
+ {									\
+-	struct device *dev = (struct device *)data;			\
+-	struct talitos_private *priv = dev_get_drvdata(dev);		\
++	struct talitos_private *priv = from_tasklet(priv, t,		\
++		done_task[tasklet_idx]);				\
++	struct device *dev = priv->dev;					\
+ 	unsigned long flags;						\
+ 									\
+ 	if (ch_done_mask & 1)						\
+@@ -452,10 +454,10 @@ static void talitos2_done_##name(unsigned long data)			\
+ 	spin_unlock_irqrestore(&priv->reg_lock, flags);			\
  }
  
--static void s5p_tasklet_cb(unsigned long data)
-+static void s5p_tasklet_cb(struct tasklet_struct *t)
- {
--	struct s5p_aes_dev *dev = (struct s5p_aes_dev *)data;
-+	struct s5p_aes_dev *dev = from_tasklet(dev, t, tasklet);
- 	struct crypto_async_request *async_req, *backlog;
- 	struct s5p_aes_reqctx *reqctx;
- 	unsigned long flags;
-@@ -2257,7 +2257,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
- 	platform_set_drvdata(pdev, pdata);
- 	s5p_dev = pdata;
+-DEF_TALITOS2_DONE(4ch, TALITOS2_ISR_4CHDONE)
+-DEF_TALITOS2_DONE(ch0, TALITOS2_ISR_CH_0_DONE)
+-DEF_TALITOS2_DONE(ch0_2, TALITOS2_ISR_CH_0_2_DONE)
+-DEF_TALITOS2_DONE(ch1_3, TALITOS2_ISR_CH_1_3_DONE)
++DEF_TALITOS2_DONE(4ch, TALITOS2_ISR_4CHDONE, 0)
++DEF_TALITOS2_DONE(ch0, TALITOS2_ISR_CH_0_DONE, 0)
++DEF_TALITOS2_DONE(ch0_2, TALITOS2_ISR_CH_0_2_DONE, 0)
++DEF_TALITOS2_DONE(ch1_3, TALITOS2_ISR_CH_1_3_DONE, 1)
  
--	tasklet_init(&pdata->tasklet, s5p_tasklet_cb, (unsigned long)pdata);
-+	tasklet_setup(&pdata->tasklet, s5p_tasklet_cb);
- 	crypto_init_queue(&pdata->queue, CRYPTO_QUEUE_LEN);
+ /*
+  * locate current (offending) descriptor
+@@ -3385,23 +3387,17 @@ static int talitos_probe(struct platform_device *ofdev)
  
- 	for (i = 0; i < ARRAY_SIZE(algs); i++) {
-@@ -2267,8 +2267,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
+ 	if (has_ftr_sec1(priv)) {
+ 		if (priv->num_channels == 1)
+-			tasklet_init(&priv->done_task[0], talitos1_done_ch0,
+-				     (unsigned long)dev);
++			tasklet_setup(&priv->done_task[0], talitos1_done_ch0);
+ 		else
+-			tasklet_init(&priv->done_task[0], talitos1_done_4ch,
+-				     (unsigned long)dev);
++			tasklet_setup(&priv->done_task[0], talitos1_done_4ch);
+ 	} else {
+ 		if (priv->irq[1]) {
+-			tasklet_init(&priv->done_task[0], talitos2_done_ch0_2,
+-				     (unsigned long)dev);
+-			tasklet_init(&priv->done_task[1], talitos2_done_ch1_3,
+-				     (unsigned long)dev);
++			tasklet_setup(&priv->done_task[0], talitos2_done_ch0_2);
++			tasklet_setup(&priv->done_task[1], talitos2_done_ch1_3);
+ 		} else if (priv->num_channels == 1) {
+-			tasklet_init(&priv->done_task[0], talitos2_done_ch0,
+-				     (unsigned long)dev);
++			tasklet_setup(&priv->done_task[0], talitos2_done_ch0);
+ 		} else {
+-			tasklet_init(&priv->done_task[0], talitos2_done_4ch,
+-				     (unsigned long)dev);
++			tasklet_setup(&priv->done_task[0], talitos2_done_4ch);
+ 		}
  	}
  
- 	if (pdata->use_hash) {
--		tasklet_init(&pdata->hash_tasklet, s5p_hash_tasklet_cb,
--			     (unsigned long)pdata);
-+		tasklet_setup(&pdata->hash_tasklet, s5p_hash_tasklet_cb);
- 		crypto_init_queue(&pdata->hash_queue, SSS_HASH_QUEUE_LENGTH);
- 
- 		for (hash_i = 0; hash_i < ARRAY_SIZE(algs_sha1_md5_sha256);
 -- 
 2.25.1
 
