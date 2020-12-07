@@ -8,56 +8,56 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EE9AC4361B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F142C4167B
 	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:01:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE1382333D
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:01:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18C632333D
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:01:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726452AbgLGJBP (ORCPT
+        id S1726484AbgLGJBR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Dec 2020 04:01:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45428 "EHLO
+        Mon, 7 Dec 2020 04:01:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726207AbgLGJBO (ORCPT
+        with ESMTP id S1726207AbgLGJBR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Dec 2020 04:01:14 -0500
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB32FC0613D0
-        for <linux-crypto@vger.kernel.org>; Mon,  7 Dec 2020 01:00:31 -0800 (PST)
-Received: by mail-pf1-x42d.google.com with SMTP id c12so2089571pfo.10
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Dec 2020 01:00:31 -0800 (PST)
+        Mon, 7 Dec 2020 04:01:17 -0500
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4886C061A52
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Dec 2020 01:01:05 -0800 (PST)
+Received: by mail-pj1-x1043.google.com with SMTP id hk16so7053131pjb.4
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Dec 2020 01:01:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=nllu/1tGGDrEMJ/oLNxcbjQW0tHY+y5w5t3p2pyUa+M=;
-        b=coDYmNpHSBdexEszS/lxNf+euhBncaDaj/GZHlSSADcBf5TZE0aDXv/F5x+8VM61Vd
-         s5KfRX5O37Jb/lNu4mNT8Bx9GqUYSkdvXYq9K8XXC+xOlJrZIVsPV9nmRe43ZVWVksVp
-         kYPLliJpULr0WMSHryPK4Q0oEQsU1Dpkbz28oTKONHbyWplTkhFdS5sUosYDMveaBABc
-         15sHiLZwvj2MC1nRavwZ0gXnLVfKcb9TPl/HKxze8iNrer9LhJ62Gd934ITSMzKE+HG0
-         8qw+r7lmqmeRY1lHYjeli/Gfr/rGkefLerTabTImvWYiDpY1I2zIStM62h1kVS3C4ey5
-         fZBw==
+        bh=GcAYPi2He4WT4nOyUOQGohetD9h1+ROi0M4lDzpFuEs=;
+        b=VOV8u1XTI0VAz3HA9t+q8ngVh4xQNv9Ga6L5nTwucsy3HdNJfRtCWwTKPnQnCcoNPu
+         2Q3wJbMhwYOH/w4mrPg1IaF3MymiINbTLpUL97/JNKLiW+PUbVLgO8z178MTnRLZ7Nyp
+         6HOJfQnL5do6xUg0izme0oXWd6QSmHHb7NCzDdDj4DckYqbcHFgIQGBjX01PbP7arAMc
+         ZlCCyQkM8kMSUFs3J6N/pP+vZfPfUcZ52IF3iQ6QCuDAGgIQk37SliFGZGs+sC7Yo89n
+         b6/ksoktxFyQXl/alFAFlkHprH7FGtHxZspPeAT7ZngZNmShXGmPLR5wE3FCqYyr4/lI
+         dGNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=nllu/1tGGDrEMJ/oLNxcbjQW0tHY+y5w5t3p2pyUa+M=;
-        b=jKws2di7ixX8elXd2te4IbVPYg/BGJKMqZ9CIw4ByKFLQvHB2+iT/xiQlEIT7kwEX2
-         gD04xtLn2EXahLlpeXwC/y+4zGww2fAvS6JtMJ8MawlOUGECEY4vJrzDPOz274/U1RGr
-         8lYmWSTUh49l0qGWagAFwg35JiltI7nreqBgI2t9NRsAYAgFx4QT6xsHbxvfgUsMEMfP
-         xI+C0ww9E9KhSG+dCAl6M7gAPb8TigHc+0ej9zNBSp15uq1hR7+j7bqZyoTzBK6zWpUz
-         w0xs3khpvYzFXYeGkrDA7I+FWt2Yj6sdnbKKyKXcv7ndpsgusFMoYyfxe/T+hdvNUtfi
-         d4YA==
-X-Gm-Message-State: AOAM533VKQHVqdby/wZYwrgTLIo6e1P/yyLT9aybRngjMJyO6TkFKLIv
-        Fw+ns0odex6Y7tetb998P5w=
-X-Google-Smtp-Source: ABdhPJwwk8liiggnVy6F4SuwIj/Nc9hO+9RpP0MMqzpZ7u0O/1tJ/9qt1x+xCF2w8xqZnLhs6mssNA==
-X-Received: by 2002:aa7:8a88:0:b029:19d:8f05:b7a6 with SMTP id a8-20020aa78a880000b029019d8f05b7a6mr15035971pfc.39.1607331631239;
-        Mon, 07 Dec 2020 01:00:31 -0800 (PST)
+        bh=GcAYPi2He4WT4nOyUOQGohetD9h1+ROi0M4lDzpFuEs=;
+        b=FKmnz4ROjIe9njOXTcL1IYeIUXSOneCZfDLwGjLMby/F7bJKwmCZGzfuQDMeziXk+G
+         jKFPdwPAr1nXC3NOO34xRro3J25z8iAqsKfCY0gf+z4B67Ubfdy0+lOabef9GhbEXaQG
+         lU2Qkz4419FB4TeuA3BQoGyB14z5w7kp+18ixrnfCb+XCtPqpV6+QyDc+R3udqzrZnKV
+         Cd3AFeFuRdEyiRWpRs14FvfvrcAhpg/B4WqbWEgwSRIMEqvqHjI2g5FxkyuKgkX0weA6
+         nTqvJfMKNklZCTpJIprtMnEal2L1dFhfswaZhsQ6FfEsiOnj5e778k3SOQqo1UWJ2V8p
+         5xQg==
+X-Gm-Message-State: AOAM532id9EJTKTOheJkmIFKEotWcAbePjsP0Zp+k6W/8L7v/w5sXiOX
+        I7qJxH5K8zOSFu0+C/Y/yi8=
+X-Google-Smtp-Source: ABdhPJxfImiHKFQRVZn5gC/bvjgdR1cccZZfapyciDpBcOB/T1UnrT+NVihU77rjdMI1WO6BsQo5Yw==
+X-Received: by 2002:a17:90b:215:: with SMTP id fy21mr15747225pjb.227.1607331665241;
+        Mon, 07 Dec 2020 01:01:05 -0800 (PST)
 Received: from localhost.localdomain ([49.207.208.18])
-        by smtp.gmail.com with ESMTPSA id w200sm11325029pfc.14.2020.12.07.01.00.24
+        by smtp.gmail.com with ESMTPSA id w200sm11325029pfc.14.2020.12.07.01.00.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Dec 2020 01:00:30 -0800 (PST)
+        Mon, 07 Dec 2020 01:01:04 -0800 (PST)
 From:   Allen Pais <allen.lkml@gmail.com>
 To:     herbert@gondor.apana.org.au
 Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
@@ -69,9 +69,9 @@ Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
         k.konieczny@samsung.com, linux-crypto@vger.kernel.org,
         Allen Pais <apais@microsoft.com>,
         Romain Perier <romain.perier@gmail.com>
-Subject: [RESEND 07/19] crypto: ccree: convert tasklets to use new tasklet_setup() API
-Date:   Mon,  7 Dec 2020 14:29:19 +0530
-Message-Id: <20201207085931.661267-8-allen.lkml@gmail.com>
+Subject: [RESEND 12/19] crypto: omap: convert tasklets to use new tasklet_setup() API
+Date:   Mon,  7 Dec 2020 14:29:24 +0530
+Message-Id: <20201207085931.661267-13-allen.lkml@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201207085931.661267-1-allen.lkml@gmail.com>
 References: <20201207085931.661267-1-allen.lkml@gmail.com>
@@ -91,74 +91,86 @@ and from_tasklet() to pass the tasklet pointer explicitly.
 Signed-off-by: Romain Perier <romain.perier@gmail.com>
 Signed-off-by: Allen Pais <apais@microsoft.com>
 ---
- drivers/crypto/ccree/cc_fips.c        |  6 +++---
- drivers/crypto/ccree/cc_request_mgr.c | 12 ++++++------
- 2 files changed, 9 insertions(+), 9 deletions(-)
+ drivers/crypto/omap-aes.c  | 6 +++---
+ drivers/crypto/omap-des.c  | 6 +++---
+ drivers/crypto/omap-sham.c | 6 +++---
+ 3 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_fips.c b/drivers/crypto/ccree/cc_fips.c
-index 702aefc21447..bad228a36776 100644
---- a/drivers/crypto/ccree/cc_fips.c
-+++ b/drivers/crypto/ccree/cc_fips.c
-@@ -109,9 +109,9 @@ void cc_tee_handle_fips_error(struct cc_drvdata *p_drvdata)
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index 4fd14d90cc40..4eae24167a5d 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -502,9 +502,9 @@ static void omap_aes_copy_ivout(struct omap_aes_dev *dd, u8 *ivbuf)
+ 		((u32 *)ivbuf)[i] = omap_aes_read(dd, AES_REG_IV(dd, i));
  }
  
- /* Deferred service handler, run as interrupt-fired tasklet */
--static void fips_dsr(unsigned long devarg)
-+static void fips_dsr(struct tasklet_struct *t)
+-static void omap_aes_done_task(unsigned long data)
++static void omap_aes_done_task(struct tasklet_struct *t)
  {
--	struct cc_drvdata *drvdata = (struct cc_drvdata *)devarg;
-+	struct cc_drvdata *drvdata = from_tasklet(drvdata, t, tasklet);
- 	u32 irq, val;
+-	struct omap_aes_dev *dd = (struct omap_aes_dev *)data;
++	struct omap_aes_dev *dd = from_tasklet(dd, t, done_task);
  
- 	irq = (drvdata->irq & (CC_GPR0_IRQ_MASK));
-@@ -143,7 +143,7 @@ int cc_fips_init(struct cc_drvdata *p_drvdata)
- 	p_drvdata->fips_handle = fips_h;
+ 	pr_debug("enter done_task\n");
  
- 	dev_dbg(dev, "Initializing fips tasklet\n");
--	tasklet_init(&fips_h->tasklet, fips_dsr, (unsigned long)p_drvdata);
-+	tasklet_setup(&fips_h->tasklet, fips_dsr);
- 	fips_h->drvdata = p_drvdata;
- 	fips_h->nb.notifier_call = cc_ree_fips_failure;
- 	atomic_notifier_chain_register(&fips_fail_notif_chain, &fips_h->nb);
-diff --git a/drivers/crypto/ccree/cc_request_mgr.c b/drivers/crypto/ccree/cc_request_mgr.c
-index 33fb27745d52..ec0f3bf00d33 100644
---- a/drivers/crypto/ccree/cc_request_mgr.c
-+++ b/drivers/crypto/ccree/cc_request_mgr.c
-@@ -70,7 +70,7 @@ static const u32 cc_cpp_int_masks[CC_CPP_NUM_ALGS][CC_CPP_NUM_SLOTS] = {
- 	  BIT(CC_HOST_IRR_REE_OP_ABORTED_SM_7_INT_BIT_SHIFT) }
+@@ -1150,7 +1150,7 @@ static int omap_aes_probe(struct platform_device *pdev)
+ 		 (reg & dd->pdata->major_mask) >> dd->pdata->major_shift,
+ 		 (reg & dd->pdata->minor_mask) >> dd->pdata->minor_shift);
+ 
+-	tasklet_init(&dd->done_task, omap_aes_done_task, (unsigned long)dd);
++	tasklet_setup(&dd->done_task, omap_aes_done_task);
+ 
+ 	err = omap_aes_dma_init(dd);
+ 	if (err == -EPROBE_DEFER) {
+diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+index c9d38bcfd1c7..fddcfc3ba57b 100644
+--- a/drivers/crypto/omap-des.c
++++ b/drivers/crypto/omap-des.c
+@@ -594,9 +594,9 @@ static int omap_des_crypt_req(struct crypto_engine *engine,
+ 	return omap_des_crypt_dma_start(dd);
+ }
+ 
+-static void omap_des_done_task(unsigned long data)
++static void omap_des_done_task(struct tasklet_struct *t)
+ {
+-	struct omap_des_dev *dd = (struct omap_des_dev *)data;
++	struct omap_des_dev *dd = from_tasklet(dd, t, done_task);
+ 	int i;
+ 
+ 	pr_debug("enter done_task\n");
+@@ -1011,7 +1011,7 @@ static int omap_des_probe(struct platform_device *pdev)
+ 		 (reg & dd->pdata->major_mask) >> dd->pdata->major_shift,
+ 		 (reg & dd->pdata->minor_mask) >> dd->pdata->minor_shift);
+ 
+-	tasklet_init(&dd->done_task, omap_des_done_task, (unsigned long)dd);
++	tasklet_setup(&dd->done_task, omap_des_done_task);
+ 
+ 	err = omap_des_dma_init(dd);
+ 	if (err == -EPROBE_DEFER) {
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index a3b38d2c92e7..b0fa0443793b 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1724,9 +1724,9 @@ static struct ahash_alg algs_sha384_sha512[] = {
+ },
  };
  
--static void comp_handler(unsigned long devarg);
-+static void comp_handler(struct tasklet_struct *t);
- #ifdef COMP_IN_WQ
- static void comp_work_handler(struct work_struct *work);
- #endif
-@@ -140,8 +140,7 @@ int cc_req_mgr_init(struct cc_drvdata *drvdata)
- 	INIT_DELAYED_WORK(&req_mgr_h->compwork, comp_work_handler);
- #else
- 	dev_dbg(dev, "Initializing completion tasklet\n");
--	tasklet_init(&req_mgr_h->comptask, comp_handler,
--		     (unsigned long)drvdata);
-+	tasklet_setup(&req_mgr_h->comptask, comp_handler);
- #endif
- 	req_mgr_h->hw_queue_size = cc_ioread(drvdata,
- 					     CC_REG(DSCRPTR_QUEUE_SRAM_SIZE));
-@@ -611,11 +610,12 @@ static inline u32 cc_axi_comp_count(struct cc_drvdata *drvdata)
- }
- 
- /* Deferred service handler, run as interrupt-fired tasklet */
--static void comp_handler(unsigned long devarg)
-+static void comp_handler(struct tasklet_struct *t)
+-static void omap_sham_done_task(unsigned long data)
++static void omap_sham_done_task(struct tasklet_struct *t)
  {
--	struct cc_drvdata *drvdata = (struct cc_drvdata *)devarg;
- 	struct cc_req_mgr_handle *request_mgr_handle =
--						drvdata->request_mgr_handle;
-+				from_tasklet(request_mgr_handle, t, comptask);
-+	struct cc_drvdata *drvdata = container_of((void *)request_mgr_handle,
-+				     typeof(*drvdata), request_mgr_handle);
- 	struct device *dev = drvdata_to_dev(drvdata);
- 	u32 irq;
+-	struct omap_sham_dev *dd = (struct omap_sham_dev *)data;
++	struct omap_sham_dev *dd = from_tasklet(dd, t, done_task);
+ 	int err = 0;
  
+ 	dev_dbg(dd->dev, "%s: flags=%lx\n", __func__, dd->flags);
+@@ -2083,7 +2083,7 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, dd);
+ 
+ 	INIT_LIST_HEAD(&dd->list);
+-	tasklet_init(&dd->done_task, omap_sham_done_task, (unsigned long)dd);
++	tasklet_setup(&dd->done_task, omap_sham_done_task);
+ 	crypto_init_queue(&dd->queue, OMAP_SHAM_QUEUE_LENGTH);
+ 
+ 	err = (dev->of_node) ? omap_sham_get_res_of(dd, dev, &res) :
 -- 
 2.25.1
 
