@@ -2,127 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA284C4361B
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 18:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C09D6C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 22:10:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA8A02389F
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 18:47:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82A2B23975
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 22:10:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725901AbgLGSrO (ORCPT
+        id S1726184AbgLGWJ6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Dec 2020 13:47:14 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39408 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725774AbgLGSrO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Dec 2020 13:47:14 -0500
-Date:   Mon, 7 Dec 2020 10:46:31 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607366793;
-        bh=JBixQUkzOkhiB9Bd33TyeEeWD3v529EPSHNS2wBFeAU=;
-        h=From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PIVLFFqm3hFDKabhtxYK6TzKLcbdX+Bwu+HlW41LgFQgI2WG52DDxkdNWjbWT/Lic
-         HoxG/U3YKlDjceBP8bNQMBnwC+GI2vo3bjSzTl+Cm6dQIdsuHFlnL+97XNk7YdyWjn
-         JJIgxPJfjCZ3Uv44ZwKI3EpncFPxACbUistTRcAWoT07mFaE4LelxFe4gs7feQeIcT
-         tn+siJb4cfU0s2AqEcb2UvBX4ONWcp16OWDj0L2AeJHNNdWvFyiJ4n6A8BmYmhY2F2
-         E2+4uW1K8yhVxXqHlQkxU7m/xvAUOk6YOBgBgUSm4TrXU34UZ4iNiaVXp7tlxtY7iI
-         jtWIsNsvlTL+Q==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        dhowells@redhat.com
-Subject: Re: [PATCH] crypto: aes-ni - implement support for cts(cbc(aes))
-Message-ID: <X854h5CjaI8ru7PT@gmail.com>
-References: <20201206224523.30777-1-ardb@kernel.org>
+        Mon, 7 Dec 2020 17:09:58 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:37552 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726007AbgLGWJ6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 7 Dec 2020 17:09:58 -0500
+Received: by mail-ot1-f67.google.com with SMTP id o11so11364944ote.4;
+        Mon, 07 Dec 2020 14:09:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=eEyuCq0orrK+zaG7y0s2/donzkzWcAZFmgt/A1f//Yk=;
+        b=oQsNqxXWeRo9cSnUQ1BDDThk5nzLZokrl0l3E6wJk1l7Isgb23jBPUqKDmn0XmJg0I
+         GUV5yeg3egcEr/putvp8O2wSco/x1UuFxlt/RP0dTOPLaqSZbqHsvRd8nBWla3PFlzeW
+         XbVIofLTwm6vOzd01ozmZRpo8JsYocHwYxdNuxQ2tAQ/sUE05l5HSwghgevZw3LAJ4wu
+         GmOeIlBzGWNbTM3JIMwPXAUUd6B8eg5h6ubVncj7wcA4nBgolV+uF/ddR5pBY8bpgaZL
+         8alYtpSafJxnhgPp5FWaGOA82JluVmg8r6zFj2a7A8Bch6Giw9t17wwL3zWLwqs3npnz
+         1lmg==
+X-Gm-Message-State: AOAM531fVdSW2LXCGX06xVkgYYWvIPVYQPfzKISCE7bOdrcN0qzbb6cQ
+        JiplwqnubwisgxG4vKuS9Q==
+X-Google-Smtp-Source: ABdhPJy+Zvpma0/n7ijbAgsnojTNissbUFf8+kWdcn9VvzvovXHlQI/qIhixgouaF2p/sDJ9KdZNsg==
+X-Received: by 2002:a9d:5f03:: with SMTP id f3mr14573953oti.91.1607378951694;
+        Mon, 07 Dec 2020 14:09:11 -0800 (PST)
+Received: from xps15 (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id 60sm2928735ott.32.2020.12.07.14.09.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Dec 2020 14:09:10 -0800 (PST)
+Received: (nullmailer pid 923974 invoked by uid 1000);
+        Mon, 07 Dec 2020 22:09:09 -0000
+Date:   Mon, 7 Dec 2020 16:09:09 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Thara Gopinath <thara.gopinath@linaro.org>
+Cc:     agross@kernel.org, bjorn.andersson@linaro.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net, sboyd@kernel.org,
+        mturquette@baylibre.com, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org
+Subject: Re: [Patch v2 6/6] dt-bindings: crypto: qcom-qce: Add v5.4 to binding
+Message-ID: <20201207220909.GA918596@robh.at.kernel.org>
+References: <20201119155233.3974286-1-thara.gopinath@linaro.org>
+ <20201119155233.3974286-7-thara.gopinath@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201206224523.30777-1-ardb@kernel.org>
+In-Reply-To: <20201119155233.3974286-7-thara.gopinath@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Dec 06, 2020 at 11:45:23PM +0100, Ard Biesheuvel wrote:
-> Follow the same approach as the arm64 driver for implementing a version
-> of AES-NI in CBC mode that supports ciphertext stealing. Compared to the
-> generic CTS template wrapped around the existing cbc-aes-aesni skcipher,
-> this results in a ~2x speed increase for relatively short inputs (less
-> than 256 bytes), which is relevant given that AES-CBC with ciphertext
-> stealing is used for filename encryption in the fscrypt layer. For larger
-> inputs, the speedup is still significant (~25% on decryption, ~6% on
-> encryption).
+On Thu, Nov 19, 2020 at 10:52:33AM -0500, Thara Gopinath wrote:
+> Add compatible string to support v5.4 crypto engine.
 > 
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
+> Reviewed-by: Bjorn Andersson <bjorn.andersson@linaro.org>
 > ---
-> Full tcrypt benchmark results for cts(cbc-aes-aesni) vs cts-cbc-aes-aesni
-> after the diff (Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz)
+>  Documentation/devicetree/bindings/crypto/qcom-qce.txt | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
->  arch/x86/crypto/aesni-intel_asm.S  |  87 +++++++++++++
->  arch/x86/crypto/aesni-intel_glue.c | 133 ++++++++++++++++++++
->  2 files changed, 220 insertions(+)
+> diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.txt b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
+> index fdd53b184ba8..ed1ede9c0acc 100644
+> --- a/Documentation/devicetree/bindings/crypto/qcom-qce.txt
+> +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
+> @@ -2,7 +2,9 @@ Qualcomm crypto engine driver
+>  
+>  Required properties:
+>  
+> -- compatible  : should be "qcom,crypto-v5.1"
+> +- compatible  : should be
+> +		"qcom,crypto-v5.1" for ipq6018
+> +		"qcom,crypto-v5.4" for sdm845
 
-This is passing the self-tests (including the extra tests), and it's definitely
-faster, and would be useful for fscrypt.  I did my own benchmarks and got
+An outstanding example of why to use SoC specific compatibles rather 
+than versions. Keep v5.1, but use SoC compatibles going forward.
 
-Encryption:
-
-        Message size  Before (MB/s)  After (MB/s)
-        ------------  -------------  ------------
-        32            136.83         273.04
-        64            230.03         262.04
-        128           372.92         487.71
-        256           541.41         652.95
-
-Decryption:
-
-        Message size  Before (MB/s)  After (MB/s)
-        ------------  -------------  ------------
-        32            121.95         280.04
-        64            208.72         279.72
-        128           397.98         635.79
-        256           723.09         1105.05
-
-(This was with "Intel(R) Xeon(R) Gold 6154 CPU @ 3.00GHz")
-
-So feel free to add:
-
-Tested-by: Eric Biggers <ebiggers@google.com>
-
-I might not have time to fully review this, but one comment below:
-
-> +static int cts_cbc_encrypt(struct skcipher_request *req)
-> +{
-[...]
-> +static int cts_cbc_decrypt(struct skcipher_request *req)
-> +{
-[...]
->  #ifdef CONFIG_X86_64
-> +	}, {
-> +		.base = {
-> +			.cra_name		= "__cts(cbc(aes))",
-> +			.cra_driver_name	= "__cts-cbc-aes-aesni",
-> +			.cra_priority		= 400,
-> +			.cra_flags		= CRYPTO_ALG_INTERNAL,
-> +			.cra_blocksize		= AES_BLOCK_SIZE,
-> +			.cra_ctxsize		= CRYPTO_AES_CTX_SIZE,
-> +			.cra_module		= THIS_MODULE,
-> +		},
-> +		.min_keysize	= AES_MIN_KEY_SIZE,
-> +		.max_keysize	= AES_MAX_KEY_SIZE,
-> +		.ivsize		= AES_BLOCK_SIZE,
-> +		.walksize	= 2 * AES_BLOCK_SIZE,
-> +		.setkey		= aesni_skcipher_setkey,
-> +		.encrypt	= cts_cbc_encrypt,
-> +		.decrypt	= cts_cbc_decrypt,
-
-The algorithm is conditional on CONFIG_X86_64, but the function definitions
-aren't.
-
-It needs to be one way or the other, otherwise there will be a compiler warning
-on 32-bit builds.
-
-- Eric
+>  - reg         : specifies base physical address and size of the registers map
+>  - clocks      : phandle to clock-controller plus clock-specifier pair
+>  - clock-names : "iface" clocks register interface
+> -- 
+> 2.25.1
+> 
