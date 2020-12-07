@@ -2,122 +2,170 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FD0BC433FE
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 14:16:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB85C4361B
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 15:54:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A4FB235F8
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 14:16:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59FA623731
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 15:54:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726112AbgLGOQe (ORCPT
+        id S1726249AbgLGPyF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Dec 2020 09:16:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23538 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725770AbgLGOQe (ORCPT
+        Mon, 7 Dec 2020 10:54:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53318 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725774AbgLGPyF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Dec 2020 09:16:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607350507;
+        Mon, 7 Dec 2020 10:54:05 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FBE4C061749;
+        Mon,  7 Dec 2020 07:53:25 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1607356403;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=MgTQnfyHDBIlg0aW7LHURku9NdTnw1Wvewb97jbt5cc=;
-        b=TtlqS1QZlEQ5xRIhrDDn7ELQQQKyAt1LhZFf3YzjTBzJMJnH5oW1iK+33s5FrcPtsJkeSq
-        ttNSeOQMtf4PImWgp14FTFx3pHakoccfm4UT30BhR2Xqz2PGdf0SCUnxEPBXtjarqwoUrV
-        WHSJWvqtCMyFXpN3nDXSK6aDjiFRGgg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-YhyV3gt5MI-mqE0CMyDmIA-1; Mon, 07 Dec 2020 09:15:05 -0500
-X-MC-Unique: YhyV3gt5MI-mqE0CMyDmIA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28400DF8A7;
-        Mon,  7 Dec 2020 14:15:03 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-116-67.rdu2.redhat.com [10.10.116.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CE5C719C45;
-        Mon,  7 Dec 2020 14:15:00 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAMj1kXH_gEjgZKx=8uQgv=ckBqTVoh3vrHj=O-nY-nm5VMgLaA@mail.gmail.com>
-References: <CAMj1kXH_gEjgZKx=8uQgv=ckBqTVoh3vrHj=O-nY-nm5VMgLaA@mail.gmail.com> <20201204154626.GA26255@fieldses.org> <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com> <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk> <118876.1607093975@warthog.procyon.org.uk> <122997.1607097713@warthog.procyon.org.uk> <20201204160347.GA26933@fieldses.org> <125709.1607100601@warthog.procyon.org.uk> <CAMj1kXEOm_yh478i+dqPiz0eoBxp4eag3j2qHm5eBLe+2kihoQ@mail.gmail.com> <127458.1607102368@warthog.procyon.org.uk> <CAMj1kXFe50HvZLxG6Kh-oYBCf5uu51hhuh7mW5UQ62ZSqmu_xA@mail.gmail.com> <468625.1607342512@warthog.procyon.org.uk>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     dhowells@redhat.com, Bruce Fields <bfields@fieldses.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
-        <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org
-Subject: Re: Why the auxiliary cipher in gss_krb5_crypto.c?
+        bh=iOkZ3W3L6bSlN1APqwo5nIbtEaSMrjF8AC1jOpzqAYQ=;
+        b=DLUeAs6z7ruzwD1nO9N5q2h9ySs502k7C/NjLDlKP3QPiqtaYKGnGduBhA7hvz0PJ/mCXG
+        /2yd7g6u1OAOE0+FtCgqBlqlH1ojAFEfpgvstJxlVYP/7OxX37BW70nEjPzRCz8grX+K7v
+        36tsLhxo3zsPPC8aywkLsI78RRXtzEePzzF4IiKLq8z4c/OKCygD/IJbbZ066VSKyZnNSR
+        hpX0rm1sa9NIWtTQwVC/Pslf4VYwZ8ZV2cXSzsDoLXiKt/Y79GOIpiP8AgsVhAKqnRc0ZV
+        uJAda+nTdqOrHefeDqI3BGj7/UnWjNqtm7DTVvnvBz4OVdo+65nfWW2ofi0KLg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1607356403;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=iOkZ3W3L6bSlN1APqwo5nIbtEaSMrjF8AC1jOpzqAYQ=;
+        b=3FfR88oQdeCnzCNAmXtEP9jaR90FX/aW6kJwge0mwQRORSYJTbOJ71GDDVCZP1z0L3bM8h
+        vC889D2QR6hiMBBg==
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc:     herbert@gondor.apana.org.au, mripard@kernel.org, wens@csie.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-mm@kvack.org, Andrew Morton <akpm@linuxfoundation.org>,
+        Julia Lawall <julia.lawall@lip6.fr>,
+        Matthew Wilcox <willy@infradead.org>
+Subject: Re: crypto: sun4i-ss: error with kmap
+In-Reply-To: <20201207121820.GB8458@Red>
+References: <20201203173846.GA16207@Red> <87r1o6bh1u.fsf@nanos.tec.linutronix.de> <20201204132631.GA25321@Red> <874kl1bod0.fsf@nanos.tec.linutronix.de> <20201204192753.GA19782@Red> <87wnxx9tle.fsf@nanos.tec.linutronix.de> <20201205184334.GA8034@Red> <87mtys8268.fsf@nanos.tec.linutronix.de> <20201206214053.GA8458@Red> <87ft4i79oq.fsf@nanos.tec.linutronix.de> <20201207121820.GB8458@Red>
+Date:   Mon, 07 Dec 2020 16:53:23 +0100
+Message-ID: <87o8j562a4.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <482242.1607350500.1@warthog.procyon.org.uk>
-Date:   Mon, 07 Dec 2020 14:15:00 +0000
-Message-ID: <482243.1607350500@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Ard Biesheuvel <ardb@kernel.org> wrote:
+On Mon, Dec 07 2020 at 13:18, Corentin Labbe wrote:
+> On Mon, Dec 07, 2020 at 01:15:49AM +0100, Thomas Gleixner wrote:
 
-> > I wonder if it would help if the input buffer and output buffer didn't
-> > have to correspond exactly in usage - ie. the output buffer could be used
-> > at a slower rate than the input to allow for buffering inside the crypto
-> > algorithm.
-> >
-> 
-> I don't follow - how could one be used at a slower rate?
+> So if I understand correctly, basicly I cannot have two atomic kmap at
+> the same time since it made unmapping them in the right order complex.
 
-I mean that the crypto algorithm might need to buffer the last part of the
-input until it has a block's worth before it can write to the output.
+You can, but the ordering has to be correct and with sg_miter that's
+probably hard to get right.
 
-> > The hashes corresponding to the kerberos enctypes I'm supporting are:
-> >
-> > HMAC-SHA1 for aes128-cts-hmac-sha1-96 and aes256-cts-hmac-sha1-96.
-> >
-> > HMAC-SHA256 for aes128-cts-hmac-sha256-128
-> >
-> > HMAC-SHA384 for aes256-cts-hmac-sha384-192
-> >
-> > CMAC-CAMELLIA for camellia128-cts-cmac and camellia256-cts-cmac
-> >
-> > I'm not sure you can support all of those with the instructions available.
->
-> It depends on whether the caller can make use of the authenc()
-> pattern, which is a type of AEAD we support.
+> I am not sure to have well understood your hint, but could you give me
 
-Interesting.  I didn't realise AEAD was an API.
+So the point is:
 
-> There are numerous implementations of authenc(hmac(shaXXX),cbc(aes)),
-> including h/w accelerated ones, but none that implement ciphertext
-> stealing. So that means that, even if you manage to use the AEAD layer to
-> perform both at the same time, the generic authenc() template will perform
-> the cts(cbc(aes)) and hmac(shaXXX) by calling into skciphers and ahashes,
-> respectively, which won't give you any benefit until accelerated
-> implementations turn up that perform the whole operation in one pass over
-> the input. And even then, I don't think the performance benefit will be
-> worth it.
+   sg_miter_next(&mi);  map 1 -> vaddr1
+   sg_miter_next(&mo);  map 2 -> vaddr2
 
-Also, the rfc8009 variants that use AES with SHA256/384 hash the ciphertext,
-not the plaintext.
+   do {
+      ...
+      if (cond) {
+         sg_miter_next(&mi)
+           sg_miter_stop()
+             unmap(vaddr1);      unmaps map2   -> FAIL
+             if (next_page)
+                map();           maps map2 -> vaddr2 -> FAIL
+      }
 
-For the moment, it's probably not worth worrying about, then.  If I can manage
-to abstract the sunrpc bits out into a krb5 library, we can improve the
-library later.
+The only way how that could have ever worked is when the conditional
+sg_miter_next(&mi) did not try to map a new page, i.e. end of data.
 
-David
+The ARM kunmap_atomic() had:
 
+#ifdef CONFIG_DEBUG_HIGHMEM
+		BUG_ON(vaddr != __fix_to_virt(idx));
+		set_fixmap_pte(idx, __pte(0));
+#else
+
+which means the warning and clearing the PTE only happens when debugging
+is enabled. That made your code "work" by chance because the unmap
+leaves map2 intact which means the vaddr2 mapping stays valid, so the
+access to it further down still worked.
+
+   sg_miter_next(&mi);  map 1 -> vaddr1
+   sg_miter_next(&mo);  map 2 -> vaddr2
+
+   do {
+      ...
+      if (cond) {
+         sg_miter_next(&mi)
+           sg_miter_stop()
+             unmap(vaddr1);      idx 2 ---> 1
+                                 but mapping still valid for vaddr2
+      }
+
+   *vaddr2 = x;                  works by chance
+
+But that also would cause trouble in the following case:
+
+   sg_miter_next(&mi);  map 1 -> vaddr1
+   sg_miter_next(&mo);  map 2 -> vaddr2
+
+   do {
+      ...
+      if (cond) {
+         sg_miter_next(&mi)
+           sg_miter_stop()
+             unmap(vaddr1);      idx 2 ---> 1
+                                 but mapping still valid for vaddr2
+      }
+
+interrupt
+   kmap_atomic(some_other_page)
+     idx 1 -> 2                 map some_otherpage to vaddr2
+   kunmap_atomic(vaddr2)        idx 2 --->  1
+                                mapping still valid for vaddr2,
+                                but now points to some_other_page
+end of interrupt
+
+      *vaddr2 = x;              <-- accesses some_other_page  -> FAIL
+
+This is the worst one because it's random data corruption and extremly
+hard to debug.
+
+I made the warning and the pte clearing in the new code unconditional
+just to catch any issues upfront which it did.
+
+   sg_miter_next(&mi);  map 1 -> vaddr1
+   sg_miter_next(&mo);  map 2 -> vaddr2
+
+   do {
+      ...
+      if (cond) {
+         sg_miter_next(&mi)
+           sg_miter_stop()
+             unmap(vaddr1);      unmaps map2   -> FAIL
+             clear map2          invalidates vaddr2
+      }
+
+      *vaddr2 = x;              <-- accesses the unmapped vaddr2 -> CRASH
+ 
+> what you think about the following patch which fix (at least) the
+> crash.  Instead of holding SGmiter (and so two kmap), I use only one
+> at a time.
+
+That looks fine at least vs. the sg_miter/kmap_atomic usage.
+
+Thanks,
+
+        tglx
