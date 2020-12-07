@@ -2,144 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5FC7C1B087
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 13:09:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56857C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 13:32:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9E07822B40
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 13:09:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0550233A0
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 13:32:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726209AbgLGNJJ (ORCPT
+        id S1725781AbgLGNcd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Dec 2020 08:09:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34448 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725774AbgLGNJJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Dec 2020 08:09:09 -0500
-X-Gm-Message-State: AOAM531nlowu/yVlky6u2pitBwj/AM3Qqn/TU52EeOl3dedNaEO5v30A
-        NgnDRalEUWTeQ4IlBNKZHkgvbAJQkrrfrMDJmQA=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607346508;
-        bh=YiXfatZ6lH4pAyul08wZ68jWEXOKruJ8RP71cHFKE7U=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=DfT+77pJBcQ2Tz59v8I4UyfPu2VZ9kJOjlVYBjLELyOR9ps8CfmynkxvwsF8gtzjI
-         wteAvAxYZSjmljyE8mJsS/y/eyV8RzNK2ArSo0a5p1vfwBdAer+shvPD0ESQZT8gro
-         znbojXG6QvGNoEtJk7v86aFHScfXER5QzZqEt7cgHF1IbYfs1aL5sk2k/ct6wriFPD
-         eKKzP9SJConbTzoCSFFbLv872uxj5X/HAq3YbVvbND+yeS/JjEGD8yKjtkA7Svz5m2
-         xqRlO7x656wxKMlHRRp2QmNpL8xsQOnbQXje8XBGY0J1VNFeudfwihFBPO/8jDWhKL
-         me6vEBbvqQ4ig==
-X-Google-Smtp-Source: ABdhPJzOCttNG+HMmWL4e+OBsb98ZTp2Sv3FvcRmuGSUW/GZMTC2iGL0S6fIlzxpxGDYQ2h6OZ4tshGuqZ+cL5EHurQ=
-X-Received: by 2002:a4a:c60c:: with SMTP id l12mr10949035ooq.45.1607346507298;
- Mon, 07 Dec 2020 05:08:27 -0800 (PST)
+        Mon, 7 Dec 2020 08:32:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59374 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725804AbgLGNcd (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 7 Dec 2020 08:32:33 -0500
+X-Greylist: delayed 1725 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 07 Dec 2020 05:31:53 PST
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [IPv6:2001:41d0:e:133a::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 020A3C0613D0
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Dec 2020 05:31:53 -0800 (PST)
+Received: from localhost ([::1]:60542 helo=tatos)
+        by orbyte.nwl.cc with esmtp (Exim 4.94)
+        (envelope-from <phil@nwl.cc>)
+        id 1kmGAU-0000Qe-UU; Mon, 07 Dec 2020 14:03:06 +0100
+From:   Phil Sutter <phil@nwl.cc>
+To:     Steffen Klassert <steffen.klassert@secunet.com>
+Cc:     linux-crypto@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: [PATCH] xfrm: interface: Don't hide plain packets from netfilter
+Date:   Mon,  7 Dec 2020 14:03:03 +0100
+Message-Id: <20201207130303.30774-1-phil@nwl.cc>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-References: <20201204154626.GA26255@fieldses.org> <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com>
- <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
- <118876.1607093975@warthog.procyon.org.uk> <122997.1607097713@warthog.procyon.org.uk>
- <20201204160347.GA26933@fieldses.org> <125709.1607100601@warthog.procyon.org.uk>
- <CAMj1kXEOm_yh478i+dqPiz0eoBxp4eag3j2qHm5eBLe+2kihoQ@mail.gmail.com>
- <127458.1607102368@warthog.procyon.org.uk> <CAMj1kXFe50HvZLxG6Kh-oYBCf5uu51hhuh7mW5UQ62ZSqmu_xA@mail.gmail.com>
- <468625.1607342512@warthog.procyon.org.uk>
-In-Reply-To: <468625.1607342512@warthog.procyon.org.uk>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Mon, 7 Dec 2020 14:08:16 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXH_gEjgZKx=8uQgv=ckBqTVoh3vrHj=O-nY-nm5VMgLaA@mail.gmail.com>
-Message-ID: <CAMj1kXH_gEjgZKx=8uQgv=ckBqTVoh3vrHj=O-nY-nm5VMgLaA@mail.gmail.com>
-Subject: Re: Why the auxiliary cipher in gss_krb5_crypto.c?
-To:     David Howells <dhowells@redhat.com>
-Cc:     Bruce Fields <bfields@fieldses.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
-        <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 7 Dec 2020 at 13:02, David Howells <dhowells@redhat.com> wrote:
->
-> Ard Biesheuvel <ardb@kernel.org> wrote:
->
-> > > Yeah - the problem with that is that for sunrpc, we might be dealing with 1MB
-> > > plus bits of non-contiguous pages, requiring >8K of scatterlist elements
-> > > (admittedly, we can chain them, but we may have to do one or more large
-> > > allocations).
-> > >
-> > > > However, I would recommend against it:
-> > >
-> > > Sorry, recommend against what?
-> > >
-> >
-> > Recommend against the current approach of manipulating the input like
-> > this and feeding it into the skcipher piecemeal.
->
-> Right.  I understand the problem, but as I mentioned above, the scatterlist
-> itself becomes a performance issue as it may exceed two pages in size.  Double
-> that as there may need to be separate input and output scatterlists.
->
+With an IPsec tunnel without dedicated interface, netfilter sees locally
+generated packets twice as they exit the physical interface: Once as "the
+inner packet" with IPsec context attached and once as the encrypted
+(ESP) packet.
 
-I wasn't aware that Herbert's work hadn't been merged yet. So that
-means it is entirely reasonable to split the input like this and feed
-the first part into a cbc(aes) skcipher and the last part into a
-cts(cbc(aes)) skcipher, provided that you ensure that the last part
-covers the final two blocks (one full block and one block that is
-either full or partial)
+With xfrm_interface, the inner packet did not traverse NF_INET_LOCAL_OUT
+hook anymore, making it impossible to match on both inner header values
+and associated IPsec data from that hook.
 
-With Herbert's changes, you will be able to use the same skcipher, and
-pass a flag to all but the final part that more data is coming. But
-for lack of that, the current approach is optimal for cases where
-having to cover the entire input with a single scatterlist is
-undesirable.
+Fix this by looping packets transmitted from xfrm_interface through
+NF_INET_LOCAL_OUT before passing them on to dst_output(), which makes
+behaviour consistent again from netfilter's point of view.
 
-> > Herbert recently made some changes for MSG_MORE support in the AF_ALG
-> > code, which permits a skcipher encryption to be split into several
-> > invocations of the skcipher layer without the need for this complexity
-> > on the side of the caller. Maybe there is a way to reuse that here.
-> > Herbert?
->
-> I wonder if it would help if the input buffer and output buffer didn't have to
-> correspond exactly in usage - ie. the output buffer could be used at a slower
-> rate than the input to allow for buffering inside the crypto algorithm.
->
+Fixes: f203b76d78092 ("xfrm: Add virtual xfrm interfaces")
+Signed-off-by: Phil Sutter <phil@nwl.cc>
+---
+ net/xfrm/xfrm_interface.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-I don't follow - how could one be used at a slower rate?
+diff --git a/net/xfrm/xfrm_interface.c b/net/xfrm/xfrm_interface.c
+index aa4cdcf69d471..24af61c95b4d4 100644
+--- a/net/xfrm/xfrm_interface.c
++++ b/net/xfrm/xfrm_interface.c
+@@ -317,7 +317,8 @@ xfrmi_xmit2(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
+ 	skb_dst_set(skb, dst);
+ 	skb->dev = tdev;
+ 
+-	err = dst_output(xi->net, skb->sk, skb);
++	err = NF_HOOK(skb_dst(skb)->ops->family, NF_INET_LOCAL_OUT, xi->net,
++		      skb->sk, skb, NULL, skb_dst(skb)->dev, dst_output);
+ 	if (net_xmit_eval(err) == 0) {
+ 		struct pcpu_sw_netstats *tstats = this_cpu_ptr(dev->tstats);
+ 
+-- 
+2.28.0
 
-> > > Can you also do SHA at the same time in the same loop?
-> >
-> > SHA-1 or HMAC-SHA1? The latter could probably be modeled as an AEAD.
-> > The former doesn't really fit the current API so we'd have to invent
-> > something for it.
->
-> The hashes corresponding to the kerberos enctypes I'm supporting are:
->
-> HMAC-SHA1 for aes128-cts-hmac-sha1-96 and aes256-cts-hmac-sha1-96.
->
-> HMAC-SHA256 for aes128-cts-hmac-sha256-128
->
-> HMAC-SHA384 for aes256-cts-hmac-sha384-192
->
-> CMAC-CAMELLIA for camellia128-cts-cmac and camellia256-cts-cmac
->
-> I'm not sure you can support all of those with the instructions available.
->
-
-It depends on whether the caller can make use of the authenc()
-pattern, which is a type of AEAD we support. There are numerous
-implementations of authenc(hmac(shaXXX),cbc(aes)), including h/w
-accelerated ones, but none that implement ciphertext stealing. So that
-means that, even if you manage to use the AEAD layer to perform both
-at the same time, the generic authenc() template will perform the
-cts(cbc(aes)) and hmac(shaXXX) by calling into skciphers and ahashes,
-respectively, which won't give you any benefit until accelerated
-implementations turn up that perform the whole operation in one pass
-over the input. And even then, I don't think the performance benefit
-will be worth it.
