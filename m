@@ -8,56 +8,56 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A71C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04FAEC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:02:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ECDD723341
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:02:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0EFF23341
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:02:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726530AbgLGJCK (ORCPT
+        id S1726379AbgLGJCP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Dec 2020 04:02:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45578 "EHLO
+        Mon, 7 Dec 2020 04:02:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726537AbgLGJCI (ORCPT
+        with ESMTP id S1726336AbgLGJCP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Dec 2020 04:02:08 -0500
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68174C0613D2
-        for <linux-crypto@vger.kernel.org>; Mon,  7 Dec 2020 01:01:31 -0800 (PST)
-Received: by mail-pj1-x1041.google.com with SMTP id lb18so4439178pjb.5
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Dec 2020 01:01:31 -0800 (PST)
+        Mon, 7 Dec 2020 04:02:15 -0500
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A6AFC0613D0
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Dec 2020 01:01:38 -0800 (PST)
+Received: by mail-pf1-x443.google.com with SMTP id p4so3296167pfg.0
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Dec 2020 01:01:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=a0a+s8DfWmh39WSyDsFfhzIHFFGVsGTi08AQmbosj58=;
-        b=q9ZQM37CmElJTky2NfOIFrcEZ3EPLdQ4nKPRicVUOVSUchKoqecobL7H8p56cAM66/
-         JLdS/WCuH9mjY14lkLdeYOlLDZidyW09jgf2BlwKmQh8IjbAKS56QLFrXavHqf/ZvNmi
-         Ag5uAb0a31GiEWBTTIiNdBhYQuPSLTY+Ch5WI+nMaohXAbzkJWy6m7SubwGsXLwfhR13
-         CuFwhRczqCKTiYqwQDHj/wQM3+/600bW9KaW4+GUt6mVlOWHdWM4cNw7wmHp/eti3uDN
-         4ehVxMYCd1f46y+e+cLNwztO+uGjR6dSAoABLaqBPXXUCrDxPVuamy9vYGhU5qjQkRA5
-         nuWQ==
+        bh=TNGOSyD9pvSkFWvUcTJ6vgncpYFYELUqqTXdTgopIzw=;
+        b=YqEgtCO1VCHtD+TPIaRKXJ6nBtvUPhRnW/tZPf/a0BgypZWAHgfVxRoTim5JqfLihs
+         UL2bYIdD5/vDeoMGHtIle8YMfNtVnVPxEm5E83GR8sO1N4xi1Cwdn+R/WNTk7ERdTX/1
+         Dn0qiCtN7JioHWCQPTVKhylS21nJx/gLtzAHDjB9j2Amnb/QhmVPM3iQioP4PL6tCAvy
+         0X5d8A7XoL9ZVXHuYOP9AgGpJUDgYpf27HByfom2KBC6V14EfD+DlKu2qHtuicN18F1L
+         DVKcy4cQdn8WzfzslL2yKwAo7lC9Rl7bh5JA5FylJKOeO/GT0d3iTiaEM1u+YDm6y8FP
+         xNqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=a0a+s8DfWmh39WSyDsFfhzIHFFGVsGTi08AQmbosj58=;
-        b=GqTFqZ2yu+eQD3i7F5fKnEsKI3DNXdbHjnibDfjBdM4qQE8ytQ5iaqK4aqOOPU8piC
-         21hTL1wer2jCFzxxvy60PQ8fqP1CfWvpxrJIjCa5ssHxVlNV5q3PA9af/ApRJUoFZVUa
-         5394IY0RJ90tOq0KJQzwj3UnRSPeXa14ZCDwQE0myjO4bRsq0FSNHFY/Ue/3ZLpBrBby
-         TuxTvsPfT3/WpiNRiWHFt5EiLRpw7s05Eeuv6gZDkdQ5dXA5HZw4op1sDBycmFfdFfPd
-         ugSetyN+Jxh1s5Jdov4atrf7PBz8vDbGkwJjsBORW22UGynsfr/WqI103ChKUsghZWub
-         UbVg==
-X-Gm-Message-State: AOAM531z6iETMYMnAjJfBoAY50rXDsnCcIv3Hi9bk/eRMEcImdvCV2pL
-        N04Rc6DM+tHUaCK7TcY5gt4=
-X-Google-Smtp-Source: ABdhPJwGZer2FXc/4pJqfukARQ2Cq4qQYfAeJ5j7F8qsNFCGUryti8kBuKVXacQX5hlQcc1iaFErLA==
-X-Received: by 2002:a17:90a:e005:: with SMTP id u5mr15445795pjy.64.1607331691057;
-        Mon, 07 Dec 2020 01:01:31 -0800 (PST)
+        bh=TNGOSyD9pvSkFWvUcTJ6vgncpYFYELUqqTXdTgopIzw=;
+        b=nJQiqrKru2etzx6kPVjmiljOMcW5LnLNMoES5xa7Gw9Kep4P+A/npSgbJ7YehIfPpJ
+         ND9rT+h5vRPfMb/Y3nH0UPMEdkNeOAOdHU5Dijs5idzWHXOp45Un/2bC9nMe/J4Z986F
+         JpzFAWImxfDwHF/X0RxEqDS68Hls75ntS5oys0yN2p8kN/GXmH27OIpNXlWX89IeUKWH
+         uxmC1nTAKzhe2gMwk+ffug05cCmphmV7Buhuzj/WGxiXKCjoR8waZcaq0QfJHAVw2I8K
+         m0o7MC+UYo2slvdqSSxCs9D6FZ9hY+Tq85XRzJduA+5sPuPFoHGEKYOmto9xm+ZNYCv/
+         OJzQ==
+X-Gm-Message-State: AOAM532Y2GV4+ArLIlHecbdbDhxyMHT9yCxMTjXdFtJb5wYGfz7tT7Gb
+        HDNmz1e6tmFy70DzMTqEihw=
+X-Google-Smtp-Source: ABdhPJzH1NILmg8DaeKOl+ffgiDfnXwTRLvgsjb1J+cmX1q14iDLXGQW0UtcBx1ObaHchTs716peTQ==
+X-Received: by 2002:aa7:82c1:0:b029:19e:3672:50ca with SMTP id f1-20020aa782c10000b029019e367250camr685546pfn.12.1607331697836;
+        Mon, 07 Dec 2020 01:01:37 -0800 (PST)
 Received: from localhost.localdomain ([49.207.208.18])
-        by smtp.gmail.com with ESMTPSA id w200sm11325029pfc.14.2020.12.07.01.01.24
+        by smtp.gmail.com with ESMTPSA id w200sm11325029pfc.14.2020.12.07.01.01.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Dec 2020 01:01:30 -0800 (PST)
+        Mon, 07 Dec 2020 01:01:37 -0800 (PST)
 From:   Allen Pais <allen.lkml@gmail.com>
 To:     herbert@gondor.apana.org.au
 Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
@@ -69,9 +69,9 @@ Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
         k.konieczny@samsung.com, linux-crypto@vger.kernel.org,
         Allen Pais <apais@microsoft.com>,
         Romain Perier <romain.perier@gmail.com>
-Subject: [RESEND 16/19] crypto: rockchip: convert tasklets to use new tasklet_setup() API
-Date:   Mon,  7 Dec 2020 14:29:28 +0530
-Message-Id: <20201207085931.661267-17-allen.lkml@gmail.com>
+Subject: [RESEND 17/19] crypto: s5p: convert tasklets to use new tasklet_setup() API
+Date:   Mon,  7 Dec 2020 14:29:29 +0530
+Message-Id: <20201207085931.661267-18-allen.lkml@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201207085931.661267-1-allen.lkml@gmail.com>
 References: <20201207085931.661267-1-allen.lkml@gmail.com>
@@ -91,50 +91,56 @@ and from_tasklet() to pass the tasklet pointer explicitly.
 Signed-off-by: Romain Perier <romain.perier@gmail.com>
 Signed-off-by: Allen Pais <apais@microsoft.com>
 ---
- drivers/crypto/rockchip/rk3288_crypto.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+ drivers/crypto/s5p-sss.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
-index 35d73061d156..af6ad9f49009 100644
---- a/drivers/crypto/rockchip/rk3288_crypto.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto.c
-@@ -201,9 +201,9 @@ static int rk_crypto_enqueue(struct rk_crypto_info *dev,
- 	return ret;
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index 88a6c853ffd7..81d5222d5e63 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -1444,9 +1444,9 @@ static int s5p_hash_handle_queue(struct s5p_aes_dev *dd,
+  * s5p_hash_tasklet_cb() - hash tasklet
+  * @data:	ptr to s5p_aes_dev
+  */
+-static void s5p_hash_tasklet_cb(unsigned long data)
++static void s5p_hash_tasklet_cb(struct tasklet_struct *t)
+ {
+-	struct s5p_aes_dev *dd = (struct s5p_aes_dev *)data;
++	struct s5p_aes_dev *dd = from_tasklet(dd, t, hash_tasklet);
+ 
+ 	if (!test_bit(HASH_FLAGS_BUSY, &dd->hash_flags)) {
+ 		s5p_hash_handle_queue(dd, NULL);
+@@ -1974,9 +1974,9 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
+ 	s5p_aes_complete(req, err);
  }
  
--static void rk_crypto_queue_task_cb(unsigned long data)
-+static void rk_crypto_queue_task_cb(struct tasklet_struct *T)
+-static void s5p_tasklet_cb(unsigned long data)
++static void s5p_tasklet_cb(struct tasklet_struct *t)
  {
--	struct rk_crypto_info *dev = (struct rk_crypto_info *)data;
-+	struct rk_crypto_info *dev = from_tasklet(dev, t, queue_task);
+-	struct s5p_aes_dev *dev = (struct s5p_aes_dev *)data;
++	struct s5p_aes_dev *dev = from_tasklet(dev, t, tasklet);
  	struct crypto_async_request *async_req, *backlog;
+ 	struct s5p_aes_reqctx *reqctx;
  	unsigned long flags;
- 	int err = 0;
-@@ -231,9 +231,9 @@ static void rk_crypto_queue_task_cb(unsigned long data)
- 		dev->complete(dev->async_req, err);
- }
+@@ -2257,7 +2257,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, pdata);
+ 	s5p_dev = pdata;
  
--static void rk_crypto_done_task_cb(unsigned long data)
-+static void rk_crypto_done_task_cb(struct tasklet_struct *t)
- {
--	struct rk_crypto_info *dev = (struct rk_crypto_info *)data;
-+	struct rk_crypto_info *dev = from_tasklet(dev, t, done_task);
+-	tasklet_init(&pdata->tasklet, s5p_tasklet_cb, (unsigned long)pdata);
++	tasklet_setup(&pdata->tasklet, s5p_tasklet_cb);
+ 	crypto_init_queue(&pdata->queue, CRYPTO_QUEUE_LEN);
  
- 	if (dev->err) {
- 		dev->complete(dev->async_req, dev->err);
-@@ -389,10 +389,8 @@ static int rk_crypto_probe(struct platform_device *pdev)
- 	crypto_info->dev = &pdev->dev;
- 	platform_set_drvdata(pdev, crypto_info);
+ 	for (i = 0; i < ARRAY_SIZE(algs); i++) {
+@@ -2267,8 +2267,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
+ 	}
  
--	tasklet_init(&crypto_info->queue_task,
--		     rk_crypto_queue_task_cb, (unsigned long)crypto_info);
--	tasklet_init(&crypto_info->done_task,
--		     rk_crypto_done_task_cb, (unsigned long)crypto_info);
-+	tasklet_setup(&crypto_info->queue_task, rk_crypto_queue_task_cb);
-+	tasklet_setup(&crypto_info->done_task, rk_crypto_done_task_cb);
- 	crypto_init_queue(&crypto_info->queue, 50);
+ 	if (pdata->use_hash) {
+-		tasklet_init(&pdata->hash_tasklet, s5p_hash_tasklet_cb,
+-			     (unsigned long)pdata);
++		tasklet_setup(&pdata->hash_tasklet, s5p_hash_tasklet_cb);
+ 		crypto_init_queue(&pdata->hash_queue, SSS_HASH_QUEUE_LENGTH);
  
- 	crypto_info->enable_clk = rk_crypto_enable_clk;
+ 		for (hash_i = 0; hash_i < ARRAY_SIZE(algs_sha1_md5_sha256);
 -- 
 2.25.1
 
