@@ -8,56 +8,56 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2BD0C4361B
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DF43C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:01:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 91F8223341
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:01:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F03A623357
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Dec 2020 09:01:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726415AbgLGJBC (ORCPT
+        id S1726480AbgLGJBP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Dec 2020 04:01:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45396 "EHLO
+        Mon, 7 Dec 2020 04:01:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726416AbgLGJBC (ORCPT
+        with ESMTP id S1726207AbgLGJBP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Dec 2020 04:01:02 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A70DC061A51
-        for <linux-crypto@vger.kernel.org>; Mon,  7 Dec 2020 01:00:24 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id 131so9160937pfb.9
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Dec 2020 01:00:24 -0800 (PST)
+        Mon, 7 Dec 2020 04:01:15 -0500
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75AE7C0613D1
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Dec 2020 01:00:38 -0800 (PST)
+Received: by mail-pf1-x441.google.com with SMTP id f9so8576531pfc.11
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Dec 2020 01:00:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Hl02x8ql2XGF95XIKstR0+VLj5TGwdqR79qBtHrvrJQ=;
-        b=PVBEZVERiXtOe7GDNM4swZX2Y6AWjP/R8pT+Rp5j9PHLnL2m1kOSQ98NjSUdAYVu0h
-         nsnAM6SKAaxxcMWBhRZyp1dASFMBQfGpAqR2Q69cGboEQshl2mlYOW6V1j3F2XZxK1tM
-         wiSQMTIb8n1nYuojfYuUBWLb7MQBgRVtXWUy17cPQNbFEsQaHQJG1berm6bBL+jMecLS
-         yLHtVovq3C7/oTatiV5kl/jhRMK9R6Y0N393PLN/e6Sn7eu5gfS2RTI/1+Ik4N80LXBz
-         Zm+t+O248Cj+x+ZY++H80AYXSH4J/wgXrG6cCkk5WeiG+R3S5CSZ7sxCvi7m7TcL7tHU
-         jrNw==
+        bh=x5of+eu/O3/72kx5fP37UL1yWIpLxGlDGOGpwCqEig8=;
+        b=UhgUXmmm5hHsgzg4VLk67KHbXam/G6cZDancgohIojsxIWWPAWR0P9S7hK12P9gGOs
+         J3oqtih7OkDfpy5gC8enW7MOGfGMvMq8c7ip0JJstLv7NESWzxPgWNa5VhLpYkBWmzRx
+         xP/hcITLH04H7A0+MSGfF1JIT4/CDFK+CT1JHa+fiOtAzC8s0OONZQoJMwwxQ0Yg2f7r
+         SU7xXVODeVFDNtPK1sxK7OXmDPc2tW3lhPIMH5EoIGqy6qUCBe0Fz7nmU/0TjiIIymWU
+         dLf6E8cWdcxEFRTbJINPHFcqLKoJRehVUYUqCL9TwL96LYG5HsVo+5jKItSb0PXrzB4S
+         FcwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Hl02x8ql2XGF95XIKstR0+VLj5TGwdqR79qBtHrvrJQ=;
-        b=lM4zTLFXz5qKnNC8oKFKWDeXkRJqbb9WybdGJRlTaNZ22u+8cp4gLO0/gqgS4a4Xk2
-         iBFfa4vUnv4hDM6Yqs3USoWVyc5zvEEi+C5AsT5yDsVyYW6VK41GnTypOq4JKPJ/4d0i
-         IJr55vAaR8SOmXDTQWzxhF9NPkooJWhOz/shlQPtsAZSAA4rfcwgc1CNGeMT9W4hoj00
-         o4GPUqHdGgBEsXda8SPMQHpuTAzUZ8Esnbuf6Iz4IBXW/TatQtPyqeZhJ2DI4VI190t+
-         Q3KHP4KkT+jeZtOe7cThJ3WsrUVXkzWQWgJ0VmZhR2h/bYuQ3JsdwZcB+pnNLLpQtEYd
-         rXYw==
-X-Gm-Message-State: AOAM532xjbruDlJLc6tyGtKgDbplcKV6JpbPTsJNA4csYGEpwvJkUm70
-        I5EpWdwYUPxqD20Lxix5q3k=
-X-Google-Smtp-Source: ABdhPJwzFrdQQVvhHkK5bfWwvpLahJG1logcT+5pTHKLEcZY3C3N8k6fPf0QFDslFhmgcjMybBiRRQ==
-X-Received: by 2002:a62:8cd6:0:b029:18b:ad92:503b with SMTP id m205-20020a628cd60000b029018bad92503bmr15037751pfd.77.1607331624096;
-        Mon, 07 Dec 2020 01:00:24 -0800 (PST)
+        bh=x5of+eu/O3/72kx5fP37UL1yWIpLxGlDGOGpwCqEig8=;
+        b=kca0MOmbxVWFI9Pm3cIfDLVm+D4hWAcB5bgTUrOpf4zMWEfZDJixIHcXFGjsMUmgAD
+         6uZTciY4X8zeZoBEfoCq7ELxz5JNrSKupuQENssuqoRHAQ+ohUMLzFlRn2yVT1z9P4A4
+         w1JPcHQgOgxbBqfaenp5Ah+PeOQIc8Wn/0raKbef7z66NPqhs8rYD4FLuJGpDWB27v/x
+         1IYv6Y5iBScrTvbJCyD7uidamqg0c5T5aLINtHKb/5OglmipUMxFZ4FZN3fDRg6CC+EQ
+         xk0mrDXKUyQmsqntEIVN0vnSLz9MBdVBuEyl/x/zJ99Jb9nUtd1RNDteVm08SZXnYVgS
+         LRFw==
+X-Gm-Message-State: AOAM532AcBDF6Y6cM6MaUHbNtDTTCi+NWObUXX6RXkaDrc+2WHm7Brbo
+        0wao+Y5N7ZAslGRAZCqrrP8=
+X-Google-Smtp-Source: ABdhPJwN5u7DYmVUOjez2U/vkXdRn/aVPRTzLc6jlYV+LNOMmhQ3kUhuqqifsajpV54rZHQXxcUA/w==
+X-Received: by 2002:a62:6003:0:b029:18c:796f:de1b with SMTP id u3-20020a6260030000b029018c796fde1bmr15040891pfb.23.1607331638094;
+        Mon, 07 Dec 2020 01:00:38 -0800 (PST)
 Received: from localhost.localdomain ([49.207.208.18])
-        by smtp.gmail.com with ESMTPSA id w200sm11325029pfc.14.2020.12.07.01.00.17
+        by smtp.gmail.com with ESMTPSA id w200sm11325029pfc.14.2020.12.07.01.00.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Dec 2020 01:00:23 -0800 (PST)
+        Mon, 07 Dec 2020 01:00:37 -0800 (PST)
 From:   Allen Pais <allen.lkml@gmail.com>
 To:     herbert@gondor.apana.org.au
 Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
@@ -69,9 +69,9 @@ Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
         k.konieczny@samsung.com, linux-crypto@vger.kernel.org,
         Allen Pais <apais@microsoft.com>,
         Romain Perier <romain.perier@gmail.com>
-Subject: [RESEND 06/19] crypto: ccp: convert tasklets to use new tasklet_setup() API
-Date:   Mon,  7 Dec 2020 14:29:18 +0530
-Message-Id: <20201207085931.661267-7-allen.lkml@gmail.com>
+Subject: [RESEND 08/19] crypto: hifn_795x: convert tasklets to use new tasklet_setup() API
+Date:   Mon,  7 Dec 2020 14:29:20 +0530
+Message-Id: <20201207085931.661267-9-allen.lkml@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201207085931.661267-1-allen.lkml@gmail.com>
 References: <20201207085931.661267-1-allen.lkml@gmail.com>
@@ -91,107 +91,34 @@ and from_tasklet() to pass the tasklet pointer explicitly.
 Signed-off-by: Romain Perier <romain.perier@gmail.com>
 Signed-off-by: Allen Pais <apais@microsoft.com>
 ---
- drivers/crypto/ccp/ccp-dev-v3.c    | 9 ++++-----
- drivers/crypto/ccp/ccp-dev-v5.c    | 9 ++++-----
- drivers/crypto/ccp/ccp-dmaengine.c | 7 +++----
- 3 files changed, 11 insertions(+), 14 deletions(-)
+ drivers/crypto/hifn_795x.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
-index 0d5576f6ad21..858566867fa3 100644
---- a/drivers/crypto/ccp/ccp-dev-v3.c
-+++ b/drivers/crypto/ccp/ccp-dev-v3.c
-@@ -321,9 +321,9 @@ static void ccp_enable_queue_interrupts(struct ccp_device *ccp)
- 	iowrite32(ccp->qim, ccp->io_regs + IRQ_MASK_REG);
+diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+index 7e7a8f01ea6b..47f7bb43477e 100644
+--- a/drivers/crypto/hifn_795x.c
++++ b/drivers/crypto/hifn_795x.c
+@@ -2445,9 +2445,9 @@ static int hifn_register_alg(struct hifn_device *dev)
+ 	return err;
  }
  
--static void ccp_irq_bh(unsigned long data)
-+static void ccp_irq_bh(struct tasklet_struct *t)
+-static void hifn_tasklet_callback(unsigned long data)
++static void hifn_tasklet_callback(struct tasklet_struct *t)
  {
--	struct ccp_device *ccp = (struct ccp_device *)data;
-+	struct ccp_device *ccp = from_tasklet(ccp, t, irq_tasklet);
- 	struct ccp_cmd_queue *cmd_q;
- 	u32 q_int, status;
- 	unsigned int i;
-@@ -361,7 +361,7 @@ static irqreturn_t ccp_irq_handler(int irq, void *data)
- 	if (ccp->use_tasklet)
- 		tasklet_schedule(&ccp->irq_tasklet);
- 	else
--		ccp_irq_bh((unsigned long)ccp);
-+		ccp_irq_bh(&ccp->irq_tasklet);
+-	struct hifn_device *dev = (struct hifn_device *)data;
++	struct hifn_device *dev = from_tasklet(dev, t, tasklet);
  
- 	return IRQ_HANDLED;
- }
-@@ -457,8 +457,7 @@ static int ccp_init(struct ccp_device *ccp)
+ 	/*
+ 	 * This is ok to call this without lock being held,
+@@ -2533,7 +2533,7 @@ static int hifn_probe(struct pci_dev *pdev, const struct pci_device_id *id)
  
- 	/* Initialize the ISR tasklet? */
- 	if (ccp->use_tasklet)
--		tasklet_init(&ccp->irq_tasklet, ccp_irq_bh,
--			     (unsigned long)ccp);
-+		tasklet_setup(&ccp->irq_tasklet, ccp_irq_bh);
+ 	pci_set_drvdata(pdev, dev);
  
- 	dev_dbg(dev, "Starting threads...\n");
- 	/* Create a kthread for each queue */
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index 7838f63bab32..e68b05a3169b 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -733,9 +733,9 @@ static void ccp5_enable_queue_interrupts(struct ccp_device *ccp)
- 		iowrite32(SUPPORTED_INTERRUPTS, ccp->cmd_q[i].reg_int_enable);
- }
+-	tasklet_init(&dev->tasklet, hifn_tasklet_callback, (unsigned long)dev);
++	tasklet_setup(&dev->tasklet, hifn_tasklet_callback);
  
--static void ccp5_irq_bh(unsigned long data)
-+static void ccp5_irq_bh(struct tasklet_struct *t)
- {
--	struct ccp_device *ccp = (struct ccp_device *)data;
-+	struct ccp_device *ccp = from_tasklet(ccp, t, irq_tasklet);
- 	u32 status;
- 	unsigned int i;
+ 	crypto_init_queue(&dev->queue, 1);
  
-@@ -772,7 +772,7 @@ static irqreturn_t ccp5_irq_handler(int irq, void *data)
- 	if (ccp->use_tasklet)
- 		tasklet_schedule(&ccp->irq_tasklet);
- 	else
--		ccp5_irq_bh((unsigned long)ccp);
-+		ccp5_irq_bh(&ccp->irq_tasklet);
- 	return IRQ_HANDLED;
- }
- 
-@@ -894,8 +894,7 @@ static int ccp5_init(struct ccp_device *ccp)
- 	}
- 	/* Initialize the ISR tasklet */
- 	if (ccp->use_tasklet)
--		tasklet_init(&ccp->irq_tasklet, ccp5_irq_bh,
--			     (unsigned long)ccp);
-+		tasklet_setup(&ccp->irq_tasklet, ccp5_irq_bh);
- 
- 	dev_dbg(dev, "Loading LSB map...\n");
- 	/* Copy the private LSB mask to the public registers */
-diff --git a/drivers/crypto/ccp/ccp-dmaengine.c b/drivers/crypto/ccp/ccp-dmaengine.c
-index 0770a83bf1a5..a85690866b05 100644
---- a/drivers/crypto/ccp/ccp-dmaengine.c
-+++ b/drivers/crypto/ccp/ccp-dmaengine.c
-@@ -121,9 +121,9 @@ static void ccp_cleanup_desc_resources(struct ccp_device *ccp,
- 	}
- }
- 
--static void ccp_do_cleanup(unsigned long data)
-+static void ccp_do_cleanup(struct tasklet_struct *t)
- {
--	struct ccp_dma_chan *chan = (struct ccp_dma_chan *)data;
-+	struct ccp_dma_chan *chan = from_tasklet(chan, t, cleanup_tasklet);
- 	unsigned long flags;
- 
- 	dev_dbg(chan->ccp->dev, "%s - chan=%s\n", __func__,
-@@ -712,8 +712,7 @@ int ccp_dmaengine_register(struct ccp_device *ccp)
- 		INIT_LIST_HEAD(&chan->active);
- 		INIT_LIST_HEAD(&chan->complete);
- 
--		tasklet_init(&chan->cleanup_tasklet, ccp_do_cleanup,
--			     (unsigned long)chan);
-+		tasklet_setup(&chan->cleanup_tasklet, ccp_do_cleanup);
- 
- 		dma_chan->device = dma_dev;
- 		dma_cookie_init(dma_chan);
 -- 
 2.25.1
 
