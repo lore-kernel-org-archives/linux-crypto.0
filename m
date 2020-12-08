@@ -2,102 +2,82 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 501A9C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 14:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34AF0C4167B
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 16:16:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E09423A5B
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 14:47:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0375923B31
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 16:16:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729856AbgLHOry (ORCPT
+        id S1729457AbgLHQQE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Dec 2020 09:47:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40328 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729840AbgLHOry (ORCPT
+        Tue, 8 Dec 2020 11:16:04 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:45948 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726810AbgLHQQE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Dec 2020 09:47:54 -0500
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22A6EC061749;
-        Tue,  8 Dec 2020 06:47:14 -0800 (PST)
-Received: by mail-io1-xd41.google.com with SMTP id z5so17094725iob.11;
-        Tue, 08 Dec 2020 06:47:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UAkK5jHni9HllrRopYYiLmdi3EZEk2eB9x/rxa5QN5E=;
-        b=viNwddBii2g6zOX398mLVdQU6mJGm0XGdzujm1/OMwkIq5+nDn3K4GFE2bzZfJVAYq
-         hmuRhn3hUNlXIevwsZ2++13skFgAoLHYiW5FrA4gEewPdKg3r8iIiLoVpvmDdyRGV1ck
-         ufBp56izRIZ7KJYFzJQ0CCea85qIze8kvnRyK5RX+DcydriL5eqixKtB51tGsoiiMdi1
-         0mUt1d6+fcxnZEYk6QG3EAUz1+jwOHYUvIcDL2h4SxQAPmrmYKBPeyJvsi/oAZsEx3Zx
-         FdFJmxb2Z4B+jhtdOLqxfMSuClx1IVi9gLP/8AGqmOUpONtK/GzkpahC9RYExZ93xeSm
-         fe0g==
+        Tue, 8 Dec 2020 11:16:04 -0500
+Received: by mail-oi1-f196.google.com with SMTP id f132so5461253oib.12;
+        Tue, 08 Dec 2020 08:15:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UAkK5jHni9HllrRopYYiLmdi3EZEk2eB9x/rxa5QN5E=;
-        b=WvMANYve+6bQ0wjjmmivcXinpb5NM1vWVEZ7F9uwurg0r/DJjU+mVuJieDmcv8myw3
-         agabl4HUlt8wpq/0VVmvhl7dU4CMP5ngPxp2BaqrP5TgkIXjfKJapYK9qh2stpCw7QAr
-         4I+XPrCWC4+772KJfmScRkhX/a/43RY0fSns4vBZbk1MuyGVpMiMriED9+0xCfu79qac
-         8H7y8nsf7VeYez4gFqsh3an6hTPaVDdGd8/eEzyHrg8axSDwKwyUJO+ur80UGDN52y6Y
-         om7WHiodD4mAhD/9BiEDcLwEFX/NWs5d5OELQpQqHDm7RlEDa4NAL/Zk4P9En2f/4hl+
-         kVcw==
-X-Gm-Message-State: AOAM5329H2MspGebGLOned1WmtInWCNTENr5Y+ECZv92YcPrt/4cKHP1
-        ubuvAJ44SP5+iux5W3oDWoNAL+M1F+wSfspJWc1o9H+RR/51/g==
-X-Google-Smtp-Source: ABdhPJy5GMzagNUoT9ETs+Q+A+gmRBOs7Ru/qFnzazz28eHN7K5bmM9/G923ChQo8KhsJ1GxLVtPvpjV0E11vBHmot8=
-X-Received: by 2002:a05:6602:214b:: with SMTP id y11mr13725071ioy.78.1607438833340;
- Tue, 08 Dec 2020 06:47:13 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/A5RkYY4853LJ83SNcwGrd9pzrqICpgZ4WV/ppEDVw0=;
+        b=oFUpt/yymq/cDRWk54sA89/BLjCbfyDZpdTiQV8K5LqSW3PkqLqQT9mgxvamOG9r+V
+         86zf/bDo+jpn/s4l/I93VSomc/FC+uTDNJ9ollZxwrS3Asei4n8R8T1YKwDYfPJOcK35
+         uGu+Bau/3VtLNegpbwWSrDsDNot57UkS37m6KIoV2yAbpdi70lgM0kPk8ekgl9RPHMFT
+         UUJwk0mgVUQHypJes6t/XkgWMOGo1LAlSjg3xassTefXdVdebR7ZtoaEA/KxIZskoiHM
+         OeLemdv2uFhPFQPnYt9DKdaagGG+LwkYH8ybCSdszstVAUn4tGIjaBkd5//kf96xeOUu
+         sS5A==
+X-Gm-Message-State: AOAM533/hRuYwYX5FV55lTq1va0gK0xDhJpDpbmWt7/EAEVlBkqTE13A
+        9Sv1ivXiGX1EGYt3ktuxGA==
+X-Google-Smtp-Source: ABdhPJyBhn7yunGObn+5VAHECgHK18a7z4JWaQwAkAVty8iu2yN6sKxNqznL6eWk+z748LSe/WbHow==
+X-Received: by 2002:aca:4d8b:: with SMTP id a133mr3333273oib.79.1607444123100;
+        Tue, 08 Dec 2020 08:15:23 -0800 (PST)
+Received: from xps15 (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id m109sm3465698otc.30.2020.12.08.08.15.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Dec 2020 08:15:21 -0800 (PST)
+Received: (nullmailer pid 2630366 invoked by uid 1000);
+        Tue, 08 Dec 2020 16:15:19 -0000
+Date:   Tue, 8 Dec 2020 10:15:19 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Daniele Alessandrelli <daniele.alessandrelli@linux.intel.com>
+Cc:     Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        devicetree@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 1/2] dt-bindings: Add Keem Bay OCS AES bindings
+Message-ID: <20201208161519.GA2630335@robh.at.kernel.org>
+References: <20201126115148.68039-1-daniele.alessandrelli@linux.intel.com>
+ <20201126115148.68039-2-daniele.alessandrelli@linux.intel.com>
 MIME-Version: 1.0
-References: <20201207134309.16762-1-phil@nwl.cc>
-In-Reply-To: <20201207134309.16762-1-phil@nwl.cc>
-From:   Eyal Birger <eyal.birger@gmail.com>
-Date:   Tue, 8 Dec 2020 16:47:02 +0200
-Message-ID: <CAHsH6Gupw7o96e5hOmaLBCZtqgoV0LZ4L7h-Y+2oROtXSXvTxw@mail.gmail.com>
-Subject: Re: [PATCH v2] xfrm: interface: Don't hide plain packets from netfilter
-To:     Phil Sutter <phil@nwl.cc>
-Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        Linux Kernel Network Developers <netdev@vger.kernel.org>,
-        Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201126115148.68039-2-daniele.alessandrelli@linux.intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Phil,
+On Thu, 26 Nov 2020 11:51:47 +0000, Daniele Alessandrelli wrote:
+> From: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+> 
+> Add device-tree bindings for Intel Keem Bay Offload and Crypto Subsystem
+> (OCS) AES crypto driver.
+> 
+> Signed-off-by: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+> Acked-by: Mark Gross <mgross@linux.intel.com>
+> ---
+>  .../crypto/intel,keembay-ocs-aes.yaml         | 45 +++++++++++++++++++
+>  1 file changed, 45 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/intel,keembay-ocs-aes.yaml
+> 
 
-On Mon, Dec 7, 2020 at 4:07 PM Phil Sutter <phil@nwl.cc> wrote:
->
-> With an IPsec tunnel without dedicated interface, netfilter sees locally
-> generated packets twice as they exit the physical interface: Once as "the
-> inner packet" with IPsec context attached and once as the encrypted
-> (ESP) packet.
->
-> With xfrm_interface, the inner packet did not traverse NF_INET_LOCAL_OUT
-> hook anymore, making it impossible to match on both inner header values
-> and associated IPsec data from that hook.
->
-
-Why wouldn't locally generated traffic not traverse the
-NF_INET_LOCAL_OUT hook via e.g. __ip_local_out() when xmitted on an xfrmi?
-I would expect it to appear in netfilter, but without the IPsec
-context, as it's not
-there yet.
-
-> Fix this by looping packets transmitted from xfrm_interface through
-> NF_INET_LOCAL_OUT before passing them on to dst_output(), which makes
-> behaviour consistent again from netfilter's point of view.
-
-When an XFRM interface is used when forwarding, why would it be correct
-for NF_INET_LOCAL_OUT to observe the inner packet?
-
-What am I missing?
-
-Thanks!
-Eyal.
+Reviewed-by: Rob Herring <robh@kernel.org>
