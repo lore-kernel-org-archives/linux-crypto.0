@@ -2,93 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00F5AC2BB9A
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 14:15:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8821EC4361B
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 14:36:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B849C23A33
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 14:15:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 586E223A6A
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 14:36:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729625AbgLHOPX (ORCPT
+        id S1729139AbgLHOfk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Dec 2020 09:15:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52106 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729590AbgLHOPX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Dec 2020 09:15:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607436837;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tffr6g9iDgmcI1vdIiaVq+38gJQDylZk+4muqW+tsNE=;
-        b=PYPRxxRSdfplv5X8EEkbvHRzLxpQozQ/FPoppOBP5D/81FAR9/eUOu/c4Lv9CYnt/9C2RE
-        V6FNERbX9+IM1sVOntnpE99gUw0o4YBjSDARTrHNmW2SMJiTl8qQBkyBnX3iet6LZ6ql56
-        +w/v5SuFcWqzGmj2PuGmBVbGts7Q2iM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-_6Jn5BKhNzC6LVuO_YUIoQ-1; Tue, 08 Dec 2020 09:13:53 -0500
-X-MC-Unique: _6Jn5BKhNzC6LVuO_YUIoQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DADC19611AE;
-        Tue,  8 Dec 2020 14:13:51 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-116-67.rdu2.redhat.com [10.10.116.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5E13960BE2;
-        Tue,  8 Dec 2020 14:13:49 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAMj1kXE+oi2Q7OE8o0xP4XabZt-y61NMG3Q3eyRzSG6cG9i4Kg@mail.gmail.com>
-References: <CAMj1kXE+oi2Q7OE8o0xP4XabZt-y61NMG3Q3eyRzSG6cG9i4Kg@mail.gmail.com> <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com> <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk> <118876.1607093975@warthog.procyon.org.uk> <955415.1607433903@warthog.procyon.org.uk>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     dhowells@redhat.com, Chuck Lever <chuck.lever@oracle.com>,
-        Bruce Fields <bfields@fieldses.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
-        <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org
-Subject: Re: Why the auxiliary cipher in gss_krb5_crypto.c?
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <960648.1607436828.1@warthog.procyon.org.uk>
-Date:   Tue, 08 Dec 2020 14:13:48 +0000
-Message-ID: <960649.1607436828@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+        Tue, 8 Dec 2020 09:35:40 -0500
+Received: from mail.kernel.org ([198.145.29.99]:49166 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726738AbgLHOfk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 8 Dec 2020 09:35:40 -0500
+From:   Ard Biesheuvel <ardb@kernel.org>
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH] crypto: tcrypt - avoid signed overflow in byte count
+Date:   Tue,  8 Dec 2020 15:34:41 +0100
+Message-Id: <20201208143441.2796-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Ard Biesheuvel <ardb@kernel.org> wrote:
+The signed long type used for printing the number of bytes processed in
+tcrypt benchmarks limits the range to -/+ 2 GiB, which is not sufficient
+to cover the performance of common accelerated ciphers such as AES-NI
+when benchmarked with sec=1. So switch to u64 instead.
 
-> Apparently, it is permitted for gss_krb5_cts_crypt() to do a
-> kmalloc(GFP_NOFS) in the context from where gss_krb5_aes_encrypt() is
-> being invoked, and so I don't see why it wouldn't be possible to
-> simply kmalloc() a scatterlist[] of the appropriate size, populate it
-> with all the pages, bufs and whatever else gets passed into the
-> skcipher, and pass it into the skcipher in one go.
+While at it, fix up a missing printk->pr_cont conversion in the AEAD
+benchmark.
 
-I never said it wasn't possible.  But doing a pair of order-1 allocations from
-there might have a significant detrimental effect on performance - in which
-case Trond and co. will say "no".
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ crypto/tcrypt.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-Remember: to crypt 1MiB of data on a 64-bit machine requires 2 x minimum 8KiB
-scatterlist arrays.  That's assuming the pages in the middle are contiguous,
-which might not be the case for a direct I/O read/write.  So for the DIO case,
-it could be involve an order-2 allocation (or chaining of single pages).
-
-David
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index a647bb298fbc..a4a11d2b57bd 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -199,8 +199,8 @@ static int test_mb_aead_jiffies(struct test_mb_aead_data *data, int enc,
+ 			goto out;
+ 	}
+ 
+-	pr_cont("%d operations in %d seconds (%ld bytes)\n",
+-		bcount * num_mb, secs, (long)bcount * blen * num_mb);
++	pr_cont("%d operations in %d seconds (%llu bytes)\n",
++		bcount * num_mb, secs, (u64)bcount * blen * num_mb);
+ 
+ out:
+ 	kfree(rc);
+@@ -471,8 +471,8 @@ static int test_aead_jiffies(struct aead_request *req, int enc,
+ 			return ret;
+ 	}
+ 
+-	printk("%d operations in %d seconds (%ld bytes)\n",
+-	       bcount, secs, (long)bcount * blen);
++	pr_cont("%d operations in %d seconds (%llu bytes)\n",
++	        bcount, secs, (u64)bcount * blen);
+ 	return 0;
+ }
+ 
+@@ -764,8 +764,8 @@ static int test_mb_ahash_jiffies(struct test_mb_ahash_data *data, int blen,
+ 			goto out;
+ 	}
+ 
+-	pr_cont("%d operations in %d seconds (%ld bytes)\n",
+-		bcount * num_mb, secs, (long)bcount * blen * num_mb);
++	pr_cont("%d operations in %d seconds (%llu bytes)\n",
++		bcount * num_mb, secs, (u64)bcount * blen * num_mb);
+ 
+ out:
+ 	kfree(rc);
+@@ -1201,8 +1201,8 @@ static int test_mb_acipher_jiffies(struct test_mb_skcipher_data *data, int enc,
+ 			goto out;
+ 	}
+ 
+-	pr_cont("%d operations in %d seconds (%ld bytes)\n",
+-		bcount * num_mb, secs, (long)bcount * blen * num_mb);
++	pr_cont("%d operations in %d seconds (%llu bytes)\n",
++		bcount * num_mb, secs, (u64)bcount * blen * num_mb);
+ 
+ out:
+ 	kfree(rc);
+@@ -1441,8 +1441,8 @@ static int test_acipher_jiffies(struct skcipher_request *req, int enc,
+ 			return ret;
+ 	}
+ 
+-	pr_cont("%d operations in %d seconds (%ld bytes)\n",
+-		bcount, secs, (long)bcount * blen);
++	pr_cont("%d operations in %d seconds (%llu bytes)\n",
++		bcount, secs, (u64)bcount * blen);
+ 	return 0;
+ }
+ 
+-- 
+2.17.1
 
