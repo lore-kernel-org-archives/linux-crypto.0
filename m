@@ -2,89 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 712B0C4361B
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 13:27:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07DEDC4361B
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 14:01:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3793023A79
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 13:27:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B311E23AC6
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 14:01:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727258AbgLHN0i (ORCPT
+        id S1729510AbgLHOA6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Dec 2020 08:26:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38017 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729123AbgLHN0h (ORCPT
+        Tue, 8 Dec 2020 09:00:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33022 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728546AbgLHOA6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Dec 2020 08:26:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607433911;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=idJ8/WupSy/edQ30Crz8uX2zPv1PKuxsc+ILe2DB9b0=;
-        b=Od9CGOeRi6UcTDp1u8RMa8blH1ImgrhYMM2weaf7q6Y+myp9mbOCQcm3s6FbD8Q2ZLeT+e
-        fSty+XNJNpzc3+pOsexkpZDBXTE+MY7Ewoo5WlN/YhnfINXlXGCis4JRbY1pnFVOv6KYgB
-        ZoH1P0rcbEWSfbVBld2+URMAFuT45W0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-kqSR4vZoPnaCpsCt-8xsaA-1; Tue, 08 Dec 2020 08:25:09 -0500
-X-MC-Unique: kqSR4vZoPnaCpsCt-8xsaA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EEB2107ACF5;
-        Tue,  8 Dec 2020 13:25:07 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-116-67.rdu2.redhat.com [10.10.116.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 938835D6AB;
-        Tue,  8 Dec 2020 13:25:04 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <118876.1607093975@warthog.procyon.org.uk>
-References: <118876.1607093975@warthog.procyon.org.uk> <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com> <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
-To:     Chuck Lever <chuck.lever@oracle.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Cc:     dhowells@redhat.com, Bruce Fields <bfields@fieldses.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        linux-crypto@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-afs@lists.infradead.org
-Subject: Re: Why the auxiliary cipher in gss_krb5_crypto.c?
+        Tue, 8 Dec 2020 09:00:58 -0500
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [IPv6:2001:41d0:e:133a::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46829C061749;
+        Tue,  8 Dec 2020 06:00:18 -0800 (PST)
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.94)
+        (envelope-from <n0-1@orbyte.nwl.cc>)
+        id 1kmdXJ-0006n8-82; Tue, 08 Dec 2020 15:00:13 +0100
+Date:   Tue, 8 Dec 2020 15:00:13 +0100
+From:   Phil Sutter <phil@nwl.cc>
+To:     Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v2] xfrm: interface: Don't hide plain packets from
+ netfilter
+Message-ID: <20201208140013.GX4647@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
+        Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        netdev@vger.kernel.org
+References: <20201207134309.16762-1-phil@nwl.cc>
+ <9d9cb6dc-32a3-ff1a-5111-7688ce7a2897@6wind.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <955414.1607433903.1@warthog.procyon.org.uk>
-Date:   Tue, 08 Dec 2020 13:25:03 +0000
-Message-ID: <955415.1607433903@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9d9cb6dc-32a3-ff1a-5111-7688ce7a2897@6wind.com>
+Sender:  <n0-1@orbyte.nwl.cc>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I wonder - would it make sense to reserve two arrays of scatterlist structs
-and a mutex per CPU sufficient to map up to 1MiB of pages with each array
-while the krb5 service is in use?
+Hi Nicolas,
 
-That way sunrpc could, say, grab the mutex, map the input and output buffers,
-do the entire crypto op in one go and then release the mutex - at least for
-big ops, small ops needn't use this service.
+On Tue, Dec 08, 2020 at 10:02:16AM +0100, Nicolas Dichtel wrote:
+> Le 07/12/2020 à 14:43, Phil Sutter a écrit :
+[...]
+> > diff --git a/net/xfrm/xfrm_interface.c b/net/xfrm/xfrm_interface.c
+> > index aa4cdcf69d471..24af61c95b4d4 100644
+> > --- a/net/xfrm/xfrm_interface.c
+> > +++ b/net/xfrm/xfrm_interface.c
+> > @@ -317,7 +317,8 @@ xfrmi_xmit2(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
+> >  	skb_dst_set(skb, dst);
+> >  	skb->dev = tdev;
+> >  
+> > -	err = dst_output(xi->net, skb->sk, skb);
+> > +	err = NF_HOOK(skb_dst(skb)->ops->family, NF_INET_LOCAL_OUT, xi->net,
+> skb->protocol must be correctly set, maybe better to use it instead of
+> skb_dst(skb)->ops->family?
 
-For rxrpc/afs's use case this would probably be overkill - it's doing crypto
-on each packet, not on whole operations - but I could still make use of it
-there.
+skb->protocol holds ETH_P_* values in network byte order, NF_HOOK()
+expects an NFPROTO_* value, so this would at least not be a simple
+replacement. Actually I copied the code from xfrm_output_resume() in
+xfrm_output.c, where skb_dst(skb)->ops is dereferenced without checking
+as well. Do you think this is risky?
 
-However, that then limits the maximum size of an op to 1MiB, plus dangly bits
-on either side (which can be managed with chained scatterlist structs) and
-also limits the number of large simultaneous krb5 crypto ops we can do.
+> > +		      skb->sk, skb, NULL, skb_dst(skb)->dev, dst_output);
+> And here, tdev instead of skb_dst(skb)->dev ?
 
-David
+Well yes, tdev was set to dst->dev earlier. Likewise I could use dst
+directly instead of skb_dst(skb) to simplify the call a bit further.
+OTOH I like how in the version above it is clear that skb's dst should
+be used, irrespective of the code above (and any later changes that may
+receive). No strong opinion though, so if your version is regarded the
+preferred one, I'm fine with that.
 
+Thanks, Phil
