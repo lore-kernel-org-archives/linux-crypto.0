@@ -2,124 +2,127 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C9AEC1B0E3
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 08:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0476C4361B
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 09:03:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA32623A60
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 08:29:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80A6A23A9A
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Dec 2020 09:03:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727895AbgLHI2p (ORCPT
+        id S1728600AbgLHJDC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Dec 2020 03:28:45 -0500
-Received: from mail.kernel.org ([198.145.29.99]:42392 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725208AbgLHI2p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Dec 2020 03:28:45 -0500
-X-Gm-Message-State: AOAM533CHJvzc9ByQs7T5tU695sXulZc7tnBIgdBZGk1OfHKQnIXvHfN
-        L8Tekjc2Y3ADK+merNjoQ7zdlI1v9FI4NynNj9k=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607416084;
-        bh=jyKkaKXiQzGnuQvTvF+wC0qTSGobbL2G0IC3stRghDU=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=p1zog/D2c5Ld+5yRO3wK8h1myUlWQkC27l8KQdRti0iMcEAGkgHB0Az3bG1ASpErD
-         e/KpAUIsOVhgy+ZfyLeLkm3Rhse1yQ6VpfDebd0V7VWCGZrIDDQauRy0hpR+30voPM
-         MBzhI4WXahCXQIAADZC6xgZ4Sfm1DgXgc58vT3kfyx3YNp1aYzLwJfVQV+G27lR+bS
-         niVcC9YO4iC/ZQNXlqgDG1xv1qQSAN3JSQJV2jkEBSdUd4Qufs26xSgmkHl4cPKbzb
-         aMys6HLwNTht5X27ltyNHYeakx6bXhxw0Ks6VGzd/1tl1oD7vR/io4vIA/UkGEn611
-         dR07Z1tB8MlkA==
-X-Google-Smtp-Source: ABdhPJwS0+KqYVwv76AZtzOyLb7K4/Q9YxUc5R358VAL2n1Q3JFjnSXSbPcwLv0jq4LS0xkvO+SkX4Q5VleICXbWnU0=
-X-Received: by 2002:a9d:62c1:: with SMTP id z1mr15552080otk.108.1607416083657;
- Tue, 08 Dec 2020 00:28:03 -0800 (PST)
+        Tue, 8 Dec 2020 04:03:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43430 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728544AbgLHJDA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 8 Dec 2020 04:03:00 -0500
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B91E5C061793
+        for <linux-crypto@vger.kernel.org>; Tue,  8 Dec 2020 01:02:19 -0800 (PST)
+Received: by mail-ej1-x644.google.com with SMTP id jx16so23520772ejb.10
+        for <linux-crypto@vger.kernel.org>; Tue, 08 Dec 2020 01:02:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google;
+        h=reply-to:subject:to:cc:references:from:organization:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=D292rnchnagOWW2nrkDLX5KQjbRLYsh4Pq7aFW+b4P0=;
+        b=jJJ9a1eREXY/Zp+bSKAKPZsEo+YNdU2Q+1VaskhhOMVr3iKhmEAa2t+CvOVTKWpr4f
+         YaKwUoL4AG8/gOso24uvacDF4SAI+gpEWr07kIiQBN/I/cDzFrXBALU3RKeZw1+IpIgX
+         Up3Yaj0+jQ0wzRTzrRdzI3+l0zs5bHrzk0DMniMJCg7X2IvjhVGuvsfDql/1BgOpBqMv
+         jxL+7mxpAdZN11qzIU3Eo5bOEA6VzA0VEkQv9TncL6reEqLLmbjcKZ8eonRMzmnD1oJw
+         BQaQORn0RDZCA0OGBYTsX+CDa3ZijRce2+iQ3WeRiRUP0LPLw/mtZhY2tNgSDdB75gSi
+         EDtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:reply-to:subject:to:cc:references:from
+         :organization:message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=D292rnchnagOWW2nrkDLX5KQjbRLYsh4Pq7aFW+b4P0=;
+        b=EMAprFPNCs3u48P8m0SiculMmsazsAYISPeU/J3zxHFZbkiMQuQNPgzYx9krJzVCIU
+         sD9Fmois8BTJoa7iYsyPORVU+28tpa4UzXk1eHfxQpsda57aaFCOa7i79TPASq60sbP9
+         H2K7BnFnGqon42ypaXvbhv+LUeIrDLSTjBg4/yOlf4v6xZcjNKwILdQUdDMywYw5+2pV
+         U+ku0kSyKgn3jA0r6CGwDbCIgOOg08lt2nv0qV8rPY07lgIOAzZ6H96vY3J7UuZCpfio
+         gxtRqlSGAgywh+p8kdNa4i6kfQHtIMZpjkjKfGe9Jt19qTDlEThK979gcrE5BvDThncf
+         nGxg==
+X-Gm-Message-State: AOAM533m9E3p3GXmSqHIl+o2k658Sqkm2mLqVm1re576E9ZdrIf0oFSQ
+        HB1AV4NnhCFS0I5KWi2VIsxiJg==
+X-Google-Smtp-Source: ABdhPJzJSs1flUXfzucgSX7a5NileHk4PEQCXlXqFqC0mXTbOD7XWzFU4HGhEUrPl+lUL/lFySPF6Q==
+X-Received: by 2002:a17:907:3f9e:: with SMTP id hr30mr22330553ejc.258.1607418138431;
+        Tue, 08 Dec 2020 01:02:18 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:410:bb00:8c20:be83:b3f:b8b9? ([2a01:e0a:410:bb00:8c20:be83:b3f:b8b9])
+        by smtp.gmail.com with ESMTPSA id n22sm16261112edr.11.2020.12.08.01.02.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Dec 2020 01:02:17 -0800 (PST)
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH v2] xfrm: interface: Don't hide plain packets from
+ netfilter
+To:     Phil Sutter <phil@nwl.cc>,
+        Steffen Klassert <steffen.klassert@secunet.com>
+Cc:     linux-crypto@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        netdev@vger.kernel.org
+References: <20201207134309.16762-1-phil@nwl.cc>
+From:   Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+Message-ID: <9d9cb6dc-32a3-ff1a-5111-7688ce7a2897@6wind.com>
+Date:   Tue, 8 Dec 2020 10:02:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20201204154626.GA26255@fieldses.org> <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com>
- <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
- <118876.1607093975@warthog.procyon.org.uk> <122997.1607097713@warthog.procyon.org.uk>
- <20201204160347.GA26933@fieldses.org> <125709.1607100601@warthog.procyon.org.uk>
- <CAMj1kXEOm_yh478i+dqPiz0eoBxp4eag3j2qHm5eBLe+2kihoQ@mail.gmail.com>
- <127458.1607102368@warthog.procyon.org.uk> <CAMj1kXFe50HvZLxG6Kh-oYBCf5uu51hhuh7mW5UQ62ZSqmu_xA@mail.gmail.com>
- <468625.1607342512@warthog.procyon.org.uk> <CAMj1kXH_gEjgZKx=8uQgv=ckBqTVoh3vrHj=O-nY-nm5VMgLaA@mail.gmail.com>
- <482243.1607350500@warthog.procyon.org.uk>
-In-Reply-To: <482243.1607350500@warthog.procyon.org.uk>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 8 Dec 2020 09:27:52 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXG5_ePTr7KCxE-m6g9xNHr72-xPMoED7Jmx38uNt6bzoQ@mail.gmail.com>
-Message-ID: <CAMj1kXG5_ePTr7KCxE-m6g9xNHr72-xPMoED7Jmx38uNt6bzoQ@mail.gmail.com>
-Subject: Re: Why the auxiliary cipher in gss_krb5_crypto.c?
-To:     David Howells <dhowells@redhat.com>
-Cc:     Bruce Fields <bfields@fieldses.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
-        <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20201207134309.16762-1-phil@nwl.cc>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 7 Dec 2020 at 15:15, David Howells <dhowells@redhat.com> wrote:
->
-> Ard Biesheuvel <ardb@kernel.org> wrote:
->
-> > > I wonder if it would help if the input buffer and output buffer didn't
-> > > have to correspond exactly in usage - ie. the output buffer could be used
-> > > at a slower rate than the input to allow for buffering inside the crypto
-> > > algorithm.
-> > >
-> >
-> > I don't follow - how could one be used at a slower rate?
->
-> I mean that the crypto algorithm might need to buffer the last part of the
-> input until it has a block's worth before it can write to the output.
->
+Le 07/12/2020 à 14:43, Phil Sutter a écrit :
+> With an IPsec tunnel without dedicated interface, netfilter sees locally
+> generated packets twice as they exit the physical interface: Once as "the
+> inner packet" with IPsec context attached and once as the encrypted
+> (ESP) packet.
+> 
+> With xfrm_interface, the inner packet did not traverse NF_INET_LOCAL_OUT
+> hook anymore, making it impossible to match on both inner header values
+> and associated IPsec data from that hook.
+> 
+> Fix this by looping packets transmitted from xfrm_interface through
+> NF_INET_LOCAL_OUT before passing them on to dst_output(), which makes
+> behaviour consistent again from netfilter's point of view.
+> 
+> Fixes: f203b76d78092 ("xfrm: Add virtual xfrm interfaces")
+> Signed-off-by: Phil Sutter <phil@nwl.cc>
+> ---
+> Changes since v1:
+> - Extend recipients list, no code changes.
+> ---
+>  net/xfrm/xfrm_interface.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/xfrm/xfrm_interface.c b/net/xfrm/xfrm_interface.c
+> index aa4cdcf69d471..24af61c95b4d4 100644
+> --- a/net/xfrm/xfrm_interface.c
+> +++ b/net/xfrm/xfrm_interface.c
+> @@ -317,7 +317,8 @@ xfrmi_xmit2(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
+>  	skb_dst_set(skb, dst);
+>  	skb->dev = tdev;
+>  
+> -	err = dst_output(xi->net, skb->sk, skb);
+> +	err = NF_HOOK(skb_dst(skb)->ops->family, NF_INET_LOCAL_OUT, xi->net,
+skb->protocol must be correctly set, maybe better to use it instead of
+skb_dst(skb)->ops->family?
 
-This is what is typically handled transparently by the driver. When
-you populate a scatterlist, it doesn't matter how misaligned the
-individual elements are, the scatterlist walker will always present
-the data in chunks that the crypto algorithm can manage. This is why
-using a single scatterlist for the entire input is preferable in
-general.
+> +		      skb->sk, skb, NULL, skb_dst(skb)->dev, dst_output);
+And here, tdev instead of skb_dst(skb)->dev ?
 
-> > > The hashes corresponding to the kerberos enctypes I'm supporting are:
-> > >
-> > > HMAC-SHA1 for aes128-cts-hmac-sha1-96 and aes256-cts-hmac-sha1-96.
-> > >
-> > > HMAC-SHA256 for aes128-cts-hmac-sha256-128
-> > >
-> > > HMAC-SHA384 for aes256-cts-hmac-sha384-192
-> > >
-> > > CMAC-CAMELLIA for camellia128-cts-cmac and camellia256-cts-cmac
-> > >
-> > > I'm not sure you can support all of those with the instructions available.
-> >
-> > It depends on whether the caller can make use of the authenc()
-> > pattern, which is a type of AEAD we support.
->
-> Interesting.  I didn't realise AEAD was an API.
->
-> > There are numerous implementations of authenc(hmac(shaXXX),cbc(aes)),
-> > including h/w accelerated ones, but none that implement ciphertext
-> > stealing. So that means that, even if you manage to use the AEAD layer to
-> > perform both at the same time, the generic authenc() template will perform
-> > the cts(cbc(aes)) and hmac(shaXXX) by calling into skciphers and ahashes,
-> > respectively, which won't give you any benefit until accelerated
-> > implementations turn up that perform the whole operation in one pass over
-> > the input. And even then, I don't think the performance benefit will be
-> > worth it.
->
-> Also, the rfc8009 variants that use AES with SHA256/384 hash the ciphertext,
-> not the plaintext.
->
-> For the moment, it's probably not worth worrying about, then.  If I can manage
-> to abstract the sunrpc bits out into a krb5 library, we can improve the
-> library later.
->
+>  	if (net_xmit_eval(err) == 0) {
+>  		struct pcpu_sw_netstats *tstats = this_cpu_ptr(dev->tstats);
+>  
+> 
