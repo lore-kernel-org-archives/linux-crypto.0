@@ -2,201 +2,301 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A58CCC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Dec 2020 06:48:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD6ABC4167B
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Dec 2020 07:53:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D85123B7D
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Dec 2020 06:48:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9123D23BC7
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Dec 2020 07:53:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728176AbgLIGro (ORCPT
+        id S1728419AbgLIHww (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Dec 2020 01:47:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49820 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725892AbgLIGro (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Dec 2020 01:47:44 -0500
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27BEBC0613CF
-        for <linux-crypto@vger.kernel.org>; Tue,  8 Dec 2020 22:47:04 -0800 (PST)
-Received: by mail-yb1-xb33.google.com with SMTP id t13so250960ybq.7
-        for <linux-crypto@vger.kernel.org>; Tue, 08 Dec 2020 22:47:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=VHlNP5J/XSEkBY/Rz0LLE1N8qPSMQR0jctb3I4aJUKs=;
-        b=kyrACNoWg1YLtzk/9UGB5XgzkYhL06D/bq2rG80LQQYmxjBTQ/dseMNCYMArseFfv3
-         Dvv/vtikGg8H1U40FUr8ey6HDRSPCAL/oLeDzZ37RJmkR6qK0+IHnj1jJQG7SdNfoMEA
-         3OXofSOCkNnh/limOFZGP7CTcgA2Jf/HxcHYZmAk33j+mqZNIs8FOhU1wEmW8UB1IdQy
-         MWcQX6TT7LllEdu7cli5jZ+6MKnDFHJo7ucxOidWlLhHm23EOtg8cMigLmGjQhK4vi4Z
-         amnrAjIoHFRSfp83S+lB12a4KhJLnNG+zf+/Jqkhs8o6Oh42tHxHMZHQtCgIfrc6vCji
-         ZH/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=VHlNP5J/XSEkBY/Rz0LLE1N8qPSMQR0jctb3I4aJUKs=;
-        b=rh6GVcStqsVh6amiJy5GYbyF6W7wpxCEflmU1hNpugecVorneRwQ7/98DqKzLEklCL
-         VFmCABc3d/nYRIFAvEmDpZ6lWn8sA54SNjqkfWP4awM2e1OuUw9mhqifZT2NXsh/W5io
-         p5PIgS4Zy+yHBnUP9HOmncIEX2QDwda7/5TX8tHcOT9lf2na6Hip3QRSrFVuDqFhSUb6
-         aEOQKzz6wEoqha2HwYX+/VbliWMD2S+Sd1i8CRtJ9yzUsKJ05kNgCX2ABu/FC++DkZkE
-         sGA9svg6Ry8Z1jOxo09ESsiZkUdH36VweErKPmJ05vW0xQdkrbACucKZnLz6qqZeoPFW
-         nvzg==
-X-Gm-Message-State: AOAM531D0OvZttUnsuPldtN7/Mtb+3J3K/IS8JKzWxS1HQ8hjmxAhDSe
-        yPiWeLOJhzqUSNSXwXXrR5qhac7OHuVvvE47rxwx5g==
-X-Google-Smtp-Source: ABdhPJxlkPZmha6RgCSBVG2OBO36xhKA8Wna/KtpzDImkcHDFe9QN9pHFG5XhpJhapTJuGgV+SfbTEpt86cs+l492DI=
-X-Received: by 2002:a25:abd0:: with SMTP id v74mr1644136ybi.193.1607496422978;
- Tue, 08 Dec 2020 22:47:02 -0800 (PST)
+        Wed, 9 Dec 2020 02:52:52 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39790 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727953AbgLIHww (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Dec 2020 02:52:52 -0500
+X-Gm-Message-State: AOAM532CyUJejyv/56a4eKV6r93lkUDiwhRTc4MhYB3LH+X7WeahVDMt
+        h8PKLIYOiCWCJOw2ia7uSPtis2mWcD0BWpH4bwk=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1607500293;
+        bh=OEQSYtYb9NVegyVw846n4Oj+FsIUHUrywKo9JP+Mzxk=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=Sum/Mv9KTKsuXnyljn+CR2uqjs3V8AAGrxYc3UxzU6vr6fhlgw1vr1TyrYTW4cZpw
+         fesxqOqeu5BK0zYg+Jr+uSryZSZY0BAufyEXWeKSwy4pnnAEC+dlHaLBQKdaTs3bB4
+         AiWjIC3zRoqjsHOJDAFpLzowzZQJsqYXMiUCsCdOEc1UZIR09miqTy+pS4NndVwv+d
+         /dz1lphsikuxvwoZKakZEls5khqXPy2znmOpgzGUDV99kHZP+d5Wo3t9NV/g8dKV5S
+         fD7nq6ZspYmBHjqJNydTtypd1TfUKYscG0jt94l+cGjyGMwn8nnUpqP/cSxzGWS/0T
+         EGW5cD56jh7Jg==
+X-Google-Smtp-Source: ABdhPJxW0H5yIBMW0GtzKADzByU+brtAwQ+8wQSMZwDc6hliuCHMHu4QzBZWYSE5pcmAZ+nmWyAfPGd4XL5ysSRkLwg=
+X-Received: by 2002:aca:5ec2:: with SMTP id s185mr896367oib.33.1607500292653;
+ Tue, 08 Dec 2020 23:51:32 -0800 (PST)
 MIME-Version: 1.0
-References: <20201207085931.661267-1-allen.lkml@gmail.com> <20201207085931.661267-8-allen.lkml@gmail.com>
-In-Reply-To: <20201207085931.661267-8-allen.lkml@gmail.com>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Wed, 9 Dec 2020 08:46:47 +0200
-Message-ID: <CAOtvUMeAQYwoB_9jmMdwi8tTYtD8=-r5T7RFTiKgEnDHgkbP+g@mail.gmail.com>
-Subject: Re: [RESEND 07/19] crypto: ccree: convert tasklets to use new
- tasklet_setup() API
-To:     Allen Pais <allen.lkml@gmail.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
-        ludovic.desroches@microchip.com, jesper.nilsson@axis.com,
-        lars.persson@axis.com,
-        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
-        aymen.sghaier@nxp.com, bbrezillon@kernel.org,
-        Arnaud Ebalard <arno@natisbad.org>, schalla@marvell.com,
-        Matthias Brugger <matthias.bgg@gmail.com>, heiko@sntech.de,
-        krzk@kernel.org, vz@mleia.com, k.konieczny@samsung.com,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Allen Pais <apais@microsoft.com>,
-        Romain Perier <romain.perier@gmail.com>
+References: <20201204212847.13256-1-brijesh.singh@amd.com>
+In-Reply-To: <20201204212847.13256-1-brijesh.singh@amd.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 9 Dec 2020 08:51:21 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXFkyJwZ4BGSU-4UB5VR1etJ6atb7YpWMTzzBuu9FQKagA@mail.gmail.com>
+Message-ID: <CAMj1kXFkyJwZ4BGSU-4UB5VR1etJ6atb7YpWMTzzBuu9FQKagA@mail.gmail.com>
+Subject: Re: [PATCH] KVM/SVM: add support for SEV attestation command
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     kvm@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        John Allen <john.allen@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Allen,
-
-Thank you for the patch.
-
-Please make sure to CC maintainers on changes to drivers they
-maintain, otherwise it's hard to keep track. Thanks!
-
-On Mon, Dec 7, 2020 at 11:02 AM Allen Pais <allen.lkml@gmail.com> wrote:
+On Fri, 4 Dec 2020 at 22:30, Brijesh Singh <brijesh.singh@amd.com> wrote:
 >
-> From: Allen Pais <apais@microsoft.com>
+> The SEV FW version >= 0.23 added a new command that can be used to query
+> the attestation report containing the SHA-256 digest of the guest memory
+> encrypted through the KVM_SEV_LAUNCH_UPDATE_{DATA, VMSA} commands and
+> sign the report with the Platform Endorsement Key (PEK).
 >
-> In preparation for unconditionally passing the
-> struct tasklet_struct pointer to all tasklet
-> callbacks, switch to using the new tasklet_setup()
-> and from_tasklet() to pass the tasklet pointer explicitly.
+> See the SEV FW API spec section 6.8 for more details.
 >
-> Signed-off-by: Romain Perier <romain.perier@gmail.com>
-> Signed-off-by: Allen Pais <apais@microsoft.com>
+> Note there already exist a command (KVM_SEV_LAUNCH_MEASURE) that can be
+> used to get the SHA-256 digest. The main difference between the
+> KVM_SEV_LAUNCH_MEASURE and KVM_SEV_ATTESTATION_REPORT is that the later
+
+latter
+
+> can be called while the guest is running and the measurement value is
+> signed with PEK.
+>
+> Cc: James Bottomley <jejb@linux.ibm.com>
+> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
+> Cc: David Rientjes <rientjes@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: John Allen <john.allen@amd.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: linux-crypto@vger.kernel.org
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
->  drivers/crypto/ccree/cc_fips.c        |  6 +++---
->  drivers/crypto/ccree/cc_request_mgr.c | 12 ++++++------
->  2 files changed, 9 insertions(+), 9 deletions(-)
+>  .../virt/kvm/amd-memory-encryption.rst        | 21 ++++++
+>  arch/x86/kvm/svm/sev.c                        | 71 +++++++++++++++++++
+>  drivers/crypto/ccp/sev-dev.c                  |  1 +
+>  include/linux/psp-sev.h                       | 17 +++++
+>  include/uapi/linux/kvm.h                      |  8 +++
+>  5 files changed, 118 insertions(+)
 >
-> diff --git a/drivers/crypto/ccree/cc_fips.c b/drivers/crypto/ccree/cc_fip=
-s.c
-> index 702aefc21447..bad228a36776 100644
-> --- a/drivers/crypto/ccree/cc_fips.c
-> +++ b/drivers/crypto/ccree/cc_fips.c
-> @@ -109,9 +109,9 @@ void cc_tee_handle_fips_error(struct cc_drvdata *p_dr=
-vdata)
+> diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
+> index 09a8f2a34e39..4c6685d0fddd 100644
+> --- a/Documentation/virt/kvm/amd-memory-encryption.rst
+> +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+> @@ -263,6 +263,27 @@ Returns: 0 on success, -negative on error
+>                  __u32 trans_len;
+>          };
+>
+> +10. KVM_SEV_GET_ATTESATION_REPORT
+
+KVM_SEV_GET_ATTESTATION_REPORT
+
+> +---------------------------------
+> +
+> +The KVM_SEV_GET_ATTESATION_REPORT command can be used by the hypervisor to query the attestation
+
+KVM_SEV_GET_ATTESTATION_REPORT
+
+> +report containing the SHA-256 digest of the guest memory and VMSA passed through the KVM_SEV_LAUNCH
+> +commands and signed with the PEK. The digest returned by the command should match the digest
+> +used by the guest owner with the KVM_SEV_LAUNCH_MEASURE.
+> +
+> +Parameters (in): struct kvm_sev_attestation
+> +
+> +Returns: 0 on success, -negative on error
+> +
+> +::
+> +
+> +        struct kvm_sev_attestation_report {
+> +                __u8 mnonce[16];        /* A random mnonce that will be placed in the report */
+> +
+> +                __u64 uaddr;            /* userspace address where the report should be copied */
+> +                __u32 len;
+> +        };
+> +
+>  References
+>  ==========
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 566f4d18185b..c4d3ee6be362 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -927,6 +927,74 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>         return ret;
 >  }
 >
->  /* Deferred service handler, run as interrupt-fired tasklet */
-> -static void fips_dsr(unsigned long devarg)
-> +static void fips_dsr(struct tasklet_struct *t)
-
-Sorry for the nitpick, but I would really prefer to have a more
-meaningful name for this parameter than just 't'.
-
-tasklet, task, tsk... any descriptive name is fine.
-
+> +static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +       void __user *report = (void __user *)(uintptr_t)argp->data;
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +       struct sev_data_attestation_report *data;
+> +       struct kvm_sev_attestation_report params;
+> +       void __user *p;
+> +       void *blob = NULL;
+> +       int ret;
+> +
+> +       if (!sev_guest(kvm))
+> +               return -ENOTTY;
+> +
+> +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> +               return -EFAULT;
+> +
+> +       data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+> +       if (!data)
+> +               return -ENOMEM;
+> +
+> +       /* User wants to query the blob length */
+> +       if (!params.len)
+> +               goto cmd;
+> +
+> +       p = (void __user *)(uintptr_t)params.uaddr;
+> +       if (p) {
+> +               if (params.len > SEV_FW_BLOB_MAX_SIZE) {
+> +                       ret = -EINVAL;
+> +                       goto e_free;
+> +               }
+> +
+> +               ret = -ENOMEM;
+> +               blob = kmalloc(params.len, GFP_KERNEL);
+> +               if (!blob)
+> +                       goto e_free;
+> +
+> +               data->address = __psp_pa(blob);
+> +               data->len = params.len;
+> +               memcpy(data->mnonce, params.mnonce, sizeof(params.mnonce));
+> +       }
+> +cmd:
+> +       data->handle = sev->handle;
+> +       ret = sev_issue_cmd(kvm, SEV_CMD_ATTESTATION_REPORT, data, &argp->error);
+> +       /*
+> +        * If we query the session length, FW responded with expected data.
+> +        */
+> +       if (!params.len)
+> +               goto done;
+> +
+> +       if (ret)
+> +               goto e_free_blob;
+> +
+> +       if (blob) {
+> +               if (copy_to_user(p, blob, params.len))
+> +                       ret = -EFAULT;
+> +       }
+> +
+> +done:
+> +       params.len = data->len;
+> +       if (copy_to_user(report, &params, sizeof(params)))
+> +               ret = -EFAULT;
+> +e_free_blob:
+> +       kfree(blob);
+> +e_free:
+> +       kfree(data);
+> +       return ret;
+> +}
+> +
+>  int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
 >  {
-> -       struct cc_drvdata *drvdata =3D (struct cc_drvdata *)devarg;
-> +       struct cc_drvdata *drvdata =3D from_tasklet(drvdata, t, tasklet);
->         u32 irq, val;
+>         struct kvm_sev_cmd sev_cmd;
+> @@ -971,6 +1039,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>         case KVM_SEV_LAUNCH_SECRET:
+>                 r = sev_launch_secret(kvm, &sev_cmd);
+>                 break;
+> +       case KVM_SEV_GET_ATTESTATION_REPORT:
+> +               r = sev_get_attestation_report(kvm, &sev_cmd);
+> +               break;
+>         default:
+>                 r = -EINVAL;
+>                 goto out;
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 476113e12489..cb9b4c4e371e 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -128,6 +128,7 @@ static int sev_cmd_buffer_len(int cmd)
+>         case SEV_CMD_LAUNCH_UPDATE_SECRET:      return sizeof(struct sev_data_launch_secret);
+>         case SEV_CMD_DOWNLOAD_FIRMWARE:         return sizeof(struct sev_data_download_firmware);
+>         case SEV_CMD_GET_ID:                    return sizeof(struct sev_data_get_id);
+> +       case SEV_CMD_ATTESTATION_REPORT:        return sizeof(struct sev_data_attestation_report);
+>         default:                                return 0;
+>         }
 >
->         irq =3D (drvdata->irq & (CC_GPR0_IRQ_MASK));
-> @@ -143,7 +143,7 @@ int cc_fips_init(struct cc_drvdata *p_drvdata)
->         p_drvdata->fips_handle =3D fips_h;
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 49d155cd2dfe..b801ead1e2bb 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -66,6 +66,7 @@ enum sev_cmd {
+>         SEV_CMD_LAUNCH_MEASURE          = 0x033,
+>         SEV_CMD_LAUNCH_UPDATE_SECRET    = 0x034,
+>         SEV_CMD_LAUNCH_FINISH           = 0x035,
+> +       SEV_CMD_ATTESTATION_REPORT      = 0x036,
 >
->         dev_dbg(dev, "Initializing fips tasklet\n");
-> -       tasklet_init(&fips_h->tasklet, fips_dsr, (unsigned long)p_drvdata=
-);
-> +       tasklet_setup(&fips_h->tasklet, fips_dsr);
->         fips_h->drvdata =3D p_drvdata;
->         fips_h->nb.notifier_call =3D cc_ree_fips_failure;
->         atomic_notifier_chain_register(&fips_fail_notif_chain, &fips_h->n=
-b);
-> diff --git a/drivers/crypto/ccree/cc_request_mgr.c b/drivers/crypto/ccree=
-/cc_request_mgr.c
-> index 33fb27745d52..ec0f3bf00d33 100644
-> --- a/drivers/crypto/ccree/cc_request_mgr.c
-> +++ b/drivers/crypto/ccree/cc_request_mgr.c
-> @@ -70,7 +70,7 @@ static const u32 cc_cpp_int_masks[CC_CPP_NUM_ALGS][CC_C=
-PP_NUM_SLOTS] =3D {
->           BIT(CC_HOST_IRR_REE_OP_ABORTED_SM_7_INT_BIT_SHIFT) }
+>         /* Guest migration commands (outgoing) */
+>         SEV_CMD_SEND_START              = 0x040,
+> @@ -483,6 +484,22 @@ struct sev_data_dbg {
+>         u32 len;                                /* In */
+>  } __packed;
+>
+> +/**
+> + * struct sev_data_attestation_report - SEV_ATTESTATION_REPORT command parameters
+> + *
+> + * @handle: handle of the VM
+> + * @mnonce: a random nonce that will be included in the report.
+> + * @address: physical address where the report will be copied.
+> + * @len: length of the physical buffer.
+> + */
+> +struct sev_data_attestation_report {
+> +       u32 handle;                             /* In */
+> +       u32 reserved;
+> +       u64 address;                            /* In */
+> +       u8 mnonce[16];                          /* In */
+> +       u32 len;                                /* In/Out */
+> +} __packed;
+> +
+>  #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+>
+>  /**
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index ca41220b40b8..d3385f7f08a2 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1585,6 +1585,8 @@ enum sev_cmd_id {
+>         KVM_SEV_DBG_ENCRYPT,
+>         /* Guest certificates commands */
+>         KVM_SEV_CERT_EXPORT,
+> +       /* Attestation report */
+> +       KVM_SEV_GET_ATTESTATION_REPORT,
+>
+>         KVM_SEV_NR_MAX,
+>  };
+> @@ -1637,6 +1639,12 @@ struct kvm_sev_dbg {
+>         __u32 len;
 >  };
 >
-> -static void comp_handler(unsigned long devarg);
-> +static void comp_handler(struct tasklet_struct *t);
->  #ifdef COMP_IN_WQ
->  static void comp_work_handler(struct work_struct *work);
->  #endif
-> @@ -140,8 +140,7 @@ int cc_req_mgr_init(struct cc_drvdata *drvdata)
->         INIT_DELAYED_WORK(&req_mgr_h->compwork, comp_work_handler);
->  #else
->         dev_dbg(dev, "Initializing completion tasklet\n");
-> -       tasklet_init(&req_mgr_h->comptask, comp_handler,
-> -                    (unsigned long)drvdata);
-> +       tasklet_setup(&req_mgr_h->comptask, comp_handler);
->  #endif
->         req_mgr_h->hw_queue_size =3D cc_ioread(drvdata,
->                                              CC_REG(DSCRPTR_QUEUE_SRAM_SI=
-ZE));
-> @@ -611,11 +610,12 @@ static inline u32 cc_axi_comp_count(struct cc_drvda=
-ta *drvdata)
->  }
->
->  /* Deferred service handler, run as interrupt-fired tasklet */
-> -static void comp_handler(unsigned long devarg)
-> +static void comp_handler(struct tasklet_struct *t)
->  {
-> -       struct cc_drvdata *drvdata =3D (struct cc_drvdata *)devarg;
->         struct cc_req_mgr_handle *request_mgr_handle =3D
-> -                                               drvdata->request_mgr_hand=
-le;
-> +                               from_tasklet(request_mgr_handle, t, compt=
-ask);
-> +       struct cc_drvdata *drvdata =3D container_of((void *)request_mgr_h=
-andle,
-> +                                    typeof(*drvdata), request_mgr_handle=
-);
->         struct device *dev =3D drvdata_to_dev(drvdata);
->         u32 irq;
->
+> +struct kvm_sev_attestation_report {
+> +       __u8 mnonce[16];
+> +       __u64 uaddr;
+> +       __u32 len;
+> +};
+> +
+>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU    (1 << 0)
+>  #define KVM_DEV_ASSIGN_PCI_2_3         (1 << 1)
+>  #define KVM_DEV_ASSIGN_MASK_INTX       (1 << 2)
 > --
-> 2.25.1
+> 2.17.1
 >
-
-Other than that it looks good to me.
-
-Thanks,
-Gilad
-
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
