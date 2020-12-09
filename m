@@ -2,119 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00E1FC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Dec 2020 19:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A2CC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Dec 2020 21:51:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A6474233F8
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Dec 2020 19:14:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E8EB23C44
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Dec 2020 21:51:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728997AbgLITN3 (ORCPT
+        id S2388337AbgLIVvF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Dec 2020 14:13:29 -0500
-Received: from new4-smtp.messagingengine.com ([66.111.4.230]:46315 "EHLO
-        new4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732900AbgLITNS (ORCPT
+        Wed, 9 Dec 2020 16:51:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48300 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388359AbgLIVvE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Dec 2020 14:13:18 -0500
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 15DB0580233;
-        Wed,  9 Dec 2020 14:12:09 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Wed, 09 Dec 2020 14:12:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=benboeckel.net;
-         h=date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm3; bh=xqge9GL++YyfKHKH4XONW7ozJfi
-        dwx7PvG5HtEjyOe0=; b=m3gY3WLVBfZGq/irJNiytLeMlzk/M5NTAAR/FH5jqHr
-        /0SmipuGZSJkkQHLZy03t4wdKQvKtNeyujVLs3QQvKg6JLC/JC0a4gxkEUkHjs/Y
-        6D28H4EaRr2kgLZg6QDgPG1GbppiuyflIO60t5BbxiK/X8UBOA/Y/utQsYwo1wtJ
-        Uh6IVwdCDmCplnnZi2RYkaZZdVHvDiCzM9vgsik+LUr8tl89CYu6l37DLHwPsktL
-        o+UB6Wp5njGfoUq7L/dB7O8Z+etIcobJUMMMBQX8yvNJJ7vFhPuM6PUORuTqjA4g
-        bs1GVO/iitBXudSv17VToLBGbG+ClYFILvVkN2z71BA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=xqge9G
-        L++YyfKHKH4XONW7ozJfidwx7PvG5HtEjyOe0=; b=ft6xD5Jxyu6vQl4RKJVLj6
-        JjuBWCO35p679lel5YZypf0d3CtLZ+mofFE6diDitfM4SIMkMmFL/S7pjyDaLBd0
-        FXRc5mXE8TbnacwOXp0V3eNzaEiZ8iley6vbY+XNGup1dzyU4XZuoEFbHnik06h7
-        oLjFf2pXRaFhCOAlgLGuQ4UN79LKgLzyx2k+Akqm0kiVvN+yGalW9Y9iMNwfKusB
-        FcaoX5E8ePqrDtY9yVUbSY+zJT/IBVBeKN5Pw0jAupaAm3oEWuj+ffPZSVQmwp4Y
-        CPzH0vzicO6eyFiXK3c+P9oINGZ2cNv1Zd7alLZV1r9ZRUjggyH8LhmRRhZtPBrA
-        ==
-X-ME-Sender: <xms:hCHRX66wOUyGK3PYwc_CEMwTAwRa3uQT0kiIgZHjHC1DLGz8t2w8Mg>
-    <xme:hCHRXz6qqlU5fATQNBifjZZ39A4oKbEqYwrL3zJb1wJaLpcZD3AJz8dxOExZHru6i
-    miQsrAYtmxxRnrhOp8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrudejkedguddvfecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvuffkfhggtggujggfsehttdertddtreejnecuhfhrohhmpeeuvghn
-    uceuohgvtghkvghluceomhgvsegsvghnsghovggtkhgvlhdrnhgvtheqnecuggftrfgrth
-    htvghrnhepudffjeegieefudelveekueffkeffjeeiledvgfeiffekkeeihedvveejledt
-    tddtnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepvdegrdduieelrddvtd
-    drvdehheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhm
-    pehmvgessggvnhgsohgvtghkvghlrdhnvght
-X-ME-Proxy: <xmx:hCHRX5eIJntLG4IlKcBofqVmsx_lVi7N7qKKRe4dfnqeBDeIZUicpw>
-    <xmx:hCHRX3I-NzDLPiJ_DoGzTobgwfd_YWlR25la3yv4MNdyvl8c5C25jw>
-    <xmx:hCHRX-LG-9KAiEVWQ-Vh0exrJZqz9or-NauN9V41178F7D0uOAXq8w>
-    <xmx:iSHRX2DloI69yDVccwBkLxgeeTdCTFaaRs4phr7s_Un6Q6v7to5v-w>
-Received: from localhost (unknown [24.169.20.255])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 622931080066;
-        Wed,  9 Dec 2020 14:12:04 -0500 (EST)
-Date:   Wed, 9 Dec 2020 14:12:04 -0500
-From:   Ben Boeckel <me@benboeckel.net>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        "Alexander A. Klimov" <grandmaster@al2klimov.de>,
-        Petko Manolov <petkan@mip-labs.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>, linux-kernel@vger.kernel.org,
-        YueHaibing <yuehaibing@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jann Horn <jannh@google.com>, linux-crypto@vger.kernel.org,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Ben Boeckel <mathstuf@gmail.com>, keyrings@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        linux-security-module@vger.kernel.org,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Tom Rix <trix@redhat.com>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Alex Shi <alex.shi@linux.alibaba.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@iki.fi>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        James Morris <jmorris@namei.org>,
-        Denis Efremov <efremov@linux.com>,
-        =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@linux.microsoft.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: Re: [PATCH 00/18] keys: Miscellaneous fixes
-Message-ID: <20201209191204.GB1448831@erythro>
-References: <160751606428.1238376.14935502103503420781.stgit@warthog.procyon.org.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <160751606428.1238376.14935502103503420781.stgit@warthog.procyon.org.uk>
-User-Agent: Mutt/1.14.6 (2020-07-11)
+        Wed, 9 Dec 2020 16:51:04 -0500
+Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B5B1C0613D6
+        for <linux-crypto@vger.kernel.org>; Wed,  9 Dec 2020 13:50:24 -0800 (PST)
+Received: by mail-qv1-xf43.google.com with SMTP id s6so1410637qvn.6
+        for <linux-crypto@vger.kernel.org>; Wed, 09 Dec 2020 13:50:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=2j4efCb99IGeE7Lao722KUA6F+C0bnE0hR4URrzbDuM=;
+        b=ay6s22JodcrhrTuTSb/f+PnrYs/b33tEtEJOnHTTcIj5AoWfAxIwLJP2U9FrQrsZJ0
+         5KEEhKoxmJZCF50ZgyS823mzHQcs5z5YcYpimRoUAC0qPHNAQp4n5pwWKNs7B9DFYCFe
+         Kab7+QsWkOrPJ02yq+NQqXqtju1eaw24bMYVp4x+9y7kIirOI6OXYE48h3Wso47iuOu2
+         gixTp9s49C2hyPpeVfNctY9i0+e+VvJopBpZut6lemznIZx11eAXNCh3MHiikhkKBwmS
+         euaTXblMjMF9RsZBlDpwVEPM3r7uELPHbQ38NE/eJU4JinW8Qn7svGYvWJ6awXkwSf/o
+         9rjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=2j4efCb99IGeE7Lao722KUA6F+C0bnE0hR4URrzbDuM=;
+        b=VxmiD+D5nzWikaz1fHIq8Xb4dY1dclMcFC7Je+NkTsbEqlss577/UaeuuRO5Iwk939
+         JIs9kHOfENEPPaIaz99ZJitwWIaY8FArc/BqHmka+/73V8LQvJ/tP+35ov/iEPWUcOUJ
+         LuJfPeDSdAEmlNJZ9URg0fwzePSzeiP4pgzhxAjR0ToD30BM56yauz4Q4m8Ta8Em7YFr
+         RoyUhkiHqYrRXTk7YlAIevhQ8Sjv+KrHWaxCdCLIYnl4Ka1jynBx9A1LPRkcLV2EnfyH
+         6BtSbCC44K4pkCJ2KxGAPwg3I4E2tB5qKT2mALNt1Lp/xSaZ9TLO64/oR2thoLHe7HKA
+         9V+w==
+X-Gm-Message-State: AOAM5309Gr/za77xFuDdoR5n4v2x+BOEh1LhnHdNSXZ7xgp+jEpili/2
+        LSDViSxxrWwXLCXK8HCgJ74=
+X-Google-Smtp-Source: ABdhPJzXS8IA1Co7S89BjuxruCkpKZ6p7Jwj6s2KNpzf559Lp+9+qgP46x5f8dzkUMRmlkA7Z5dWCw==
+X-Received: by 2002:a05:6214:98d:: with SMTP id dt13mr1818754qvb.37.1607550623825;
+        Wed, 09 Dec 2020 13:50:23 -0800 (PST)
+Received: from localhost.localdomain ([177.194.79.136])
+        by smtp.gmail.com with ESMTPSA id q194sm2184906qka.102.2020.12.09.13.50.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Dec 2020 13:50:23 -0800 (PST)
+From:   Fabio Estevam <festevam@gmail.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, Fabio Estevam <festevam@gmail.com>
+Subject: [PATCH] crypto: sahara - Remove unused .id_table support
+Date:   Wed,  9 Dec 2020 18:50:14 -0300
+Message-Id: <20201209215014.15467-1-festevam@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 09, 2020 at 12:14:24 +0000, David Howells wrote:
-> I've extended my collection of minor keyrings fixes for the next merge
-> window.  Anything else I should add (or anything I should drop)?
-> 
-> The patches can be found on the following branch:
-> 
-> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-fixes
+Since 5.10-rc1 i.MX is a devicetree-only platform and the existing
+.id_table support in this driver was only useful for old non-devicetree
+platforms.
 
-1-16 LGTM (modulo the typo in patch 7's commit message). 17 and 18 are
-outside my knowledge right now.
+Remove the unused .id_table support.
 
-Reviewed-by: Ben Boeckel <mathstuf@gmail.com>
+Signed-off-by: Fabio Estevam <festevam@gmail.com>
+---
+ drivers/crypto/sahara.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
---Ben
+diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
+index 8b5be29cb4dc..457084b344c1 100644
+--- a/drivers/crypto/sahara.c
++++ b/drivers/crypto/sahara.c
+@@ -1350,12 +1350,6 @@ static void sahara_unregister_algs(struct sahara_dev *dev)
+ 			crypto_unregister_ahash(&sha_v4_algs[i]);
+ }
+ 
+-static const struct platform_device_id sahara_platform_ids[] = {
+-	{ .name = "sahara-imx27" },
+-	{ /* sentinel */ }
+-};
+-MODULE_DEVICE_TABLE(platform, sahara_platform_ids);
+-
+ static const struct of_device_id sahara_dt_ids[] = {
+ 	{ .compatible = "fsl,imx53-sahara" },
+ 	{ .compatible = "fsl,imx27-sahara" },
+@@ -1540,7 +1534,6 @@ static struct platform_driver sahara_driver = {
+ 		.name	= SAHARA_NAME,
+ 		.of_match_table = sahara_dt_ids,
+ 	},
+-	.id_table = sahara_platform_ids,
+ };
+ 
+ module_platform_driver(sahara_driver);
+-- 
+2.17.1
+
