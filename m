@@ -2,162 +2,140 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0AC5C4167B
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Dec 2020 12:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 164EEC19425
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Dec 2020 14:42:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6622B23BE5
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Dec 2020 12:21:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCFF02332A
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Dec 2020 14:42:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731404AbgLIMQX (ORCPT
+        id S1733025AbgLIOlU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Dec 2020 07:16:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54098 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731391AbgLIMQR (ORCPT
+        Wed, 9 Dec 2020 09:41:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38232 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730850AbgLIOlP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Dec 2020 07:16:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607516090;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=hyA2PO8n71MXxUKu/m0tSLtuCTd/rvDr3IPFkb7YJtc=;
-        b=ie4e8ElvKvhLca9lExLV1WOc0fGx6DhBUZPMV8thq43TelZrPjjj0q6N85E+5X2MzU/1lX
-        EjPZtsvW3NRGF+qRCKgjP/wW2/Co4huAUpA8c9gOWwgAZ61VfYpAeHRWOsdid2J9c8xop5
-        mCa5OxEYfHMj/k0C/WQr8QnssjaAjDU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-g6j_3dX3Nh2n2wD4Cvb9CQ-1; Wed, 09 Dec 2020 07:14:46 -0500
-X-MC-Unique: g6j_3dX3Nh2n2wD4Cvb9CQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A808100F770;
-        Wed,  9 Dec 2020 12:14:30 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-116-67.rdu2.redhat.com [10.10.116.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4C08D5C1D0;
-        Wed,  9 Dec 2020 12:14:24 +0000 (UTC)
-Subject: [PATCH 00/18] keys: Miscellaneous fixes
-From:   David Howells <dhowells@redhat.com>
-To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Cc:     "Alexander A. Klimov" <grandmaster@al2klimov.de>,
-        Petko Manolov <petkan@mip-labs.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>, linux-kernel@vger.kernel.org,
-        YueHaibing <yuehaibing@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jann Horn <jannh@google.com>, linux-crypto@vger.kernel.org,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Ben Boeckel <mathstuf@gmail.com>, keyrings@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        linux-security-module@vger.kernel.org,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Tom Rix <trix@redhat.com>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Alex Shi <alex.shi@linux.alibaba.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@iki.fi>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        James Morris <jmorris@namei.org>,
-        Denis Efremov <efremov@linux.com>,
-        =?utf-8?q?Micka=C3=ABl_Sala=C3=BCn?= <mic@linux.microsoft.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        dhowells@redhat.com, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 09 Dec 2020 12:14:24 +0000
-Message-ID: <160751606428.1238376.14935502103503420781.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/0.23
+        Wed, 9 Dec 2020 09:41:15 -0500
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E483C061793;
+        Wed,  9 Dec 2020 06:40:35 -0800 (PST)
+Received: by mail-il1-x143.google.com with SMTP id t9so1765957ilf.2;
+        Wed, 09 Dec 2020 06:40:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=lrVKy9ubG/ETOf2frLaztz8leb/O1uo8SpRzH8S0NrM=;
+        b=H+x6Xuq3KblNHKzIOGWYPWs6L1G1DaKK0iCwMzPh83oa67KQOh04X1zP74yAStkQUg
+         x3hqlPaSpisaey+sn/ANVqchR4dY/VIi62DOXCpK46dfyCDZJLnY3LDGcembjAs9Jejc
+         3oi6Kx4S0Ph368r3xKOj0E0h1/ExCPZl7ZIWiHRutAq4jtPNeJ2HNcEKazHjRB20967R
+         25Kn7A3MlhHuLdKSBcXMX0TQZdIqQACBHqFMfTvQEkyVz1p/ie8RZycO2BMKT/S1GDyR
+         kHabgqtW2h+wQJOcFpGStHkZ0ewcD4j0sJ4pZST0cfDS9HKm+DfjNzQ9VlpGzumPH4Pl
+         ME7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=lrVKy9ubG/ETOf2frLaztz8leb/O1uo8SpRzH8S0NrM=;
+        b=lRg8ysQBmoka+kPPCpI0S0oYX5L+nhla8MWbyJUx9ZTKeTOzOzsDKNQ7KQ9xsL6Oal
+         bADtqFA3njyhbYT83lDm6Lr58pzCgV07apKf1CNlLcevaW16nfdWdq0PItWOVBfmuUGx
+         gfwxJYep8LSv1wMuMHspvXFrbdp3gDPcpthzzyrdws4GMbgXtTkYCpNfSIZkJ7ZciZ2O
+         DlwZEa9ipdMGNAQGEFVUyLlxawQQYsn9iA41gRVel37jnqoQ83CFJfrJUaK9MdZsh3Uo
+         GPtr6WnIjA4hNhqWP/tvHo9CGPi4DmH+6QZpcaE9WH5kwJJh/72KBLensQ9j+M6i1hk2
+         9fxw==
+X-Gm-Message-State: AOAM530k/C6t4ZnWKZTuxJGwY8OrhaLtNLQekQ1GYjQ0VuY3Ge2aRevV
+        0p13lRcE+Q5+B1DNGvX25ef5Va0mO/zQAmu/zJanBiwlN7uyvXerljQ=
+X-Google-Smtp-Source: ABdhPJy5RiOg7nIVTJtIQNb5lXpcVlKpPeV60+E3GUZJ9hcjHIAulWDk3miEwCBVG6CiZFYd0wC87gLOaYIlmp1c/c8=
+X-Received: by 2002:a92:d09:: with SMTP id 9mr3323278iln.54.1607524834704;
+ Wed, 09 Dec 2020 06:40:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20201207134309.16762-1-phil@nwl.cc> <CAHsH6Gupw7o96e5hOmaLBCZtqgoV0LZ4L7h-Y+2oROtXSXvTxw@mail.gmail.com>
+ <20201208185139.GZ4647@orbyte.nwl.cc>
+In-Reply-To: <20201208185139.GZ4647@orbyte.nwl.cc>
+From:   Eyal Birger <eyal.birger@gmail.com>
+Date:   Wed, 9 Dec 2020 16:40:23 +0200
+Message-ID: <CAHsH6GvT=Af-BAWK0z_CdrYWPn0qt+C=BRjy10MLRNhLWfH0rQ@mail.gmail.com>
+Subject: Re: [PATCH v2] xfrm: interface: Don't hide plain packets from netfilter
+To:     Phil Sutter <phil@nwl.cc>, Eyal Birger <eyal.birger@gmail.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        Linux Kernel Network Developers <netdev@vger.kernel.org>,
+        Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Phil,
 
-Hi Jarkko,
+On Tue, Dec 8, 2020 at 8:51 PM Phil Sutter <phil@nwl.cc> wrote:
+>
+> Hi Eyal,
+>
+> On Tue, Dec 08, 2020 at 04:47:02PM +0200, Eyal Birger wrote:
+> > On Mon, Dec 7, 2020 at 4:07 PM Phil Sutter <phil@nwl.cc> wrote:
+> > >
+> > > With an IPsec tunnel without dedicated interface, netfilter sees locally
+> > > generated packets twice as they exit the physical interface: Once as "the
+> > > inner packet" with IPsec context attached and once as the encrypted
+> > > (ESP) packet.
+> > >
+> > > With xfrm_interface, the inner packet did not traverse NF_INET_LOCAL_OUT
+> > > hook anymore, making it impossible to match on both inner header values
+> > > and associated IPsec data from that hook.
+> > >
+> >
+> > Why wouldn't locally generated traffic not traverse the
+> > NF_INET_LOCAL_OUT hook via e.g. __ip_local_out() when xmitted on an xfrmi?
+> > I would expect it to appear in netfilter, but without the IPsec
+> > context, as it's not
+> > there yet.
+>
+> Yes, that's right. Having an iptables rule with LOG target in OUTPUT
+> chain, a packet sent from the local host is logged multiple times:
+>
+> | IN= OUT=xfrm SRC=192.168.111.1 DST=192.168.111.2 LEN=84 TOS=0x00 PREC=0x00 TTL=64 ID=21840 DF
+> | PROTO=ICMP TYPE=8 CODE=0 ID=56857 SEQ=1
+> | IN= OUT=eth0 SRC=192.168.111.1 DST=192.168.111.2 LEN=84 TOS=0x00 PREC=0x00 TTL=64 ID=21840 DF PROTO=ICMP TYPE=8 CODE=0 ID=56857 SEQ=1
+> | IN= OUT=eth0 SRC=192.168.1.1 DST=192.168.1.2 LEN=140 TOS=0x00 PREC=0x00 TTL=64 ID=0 DF PROTO=ESP SPI=0x1000
+>
+> First when being sent to xfrm interface, then two times between xfrm and
+> eth0, the second time as ESP packet. This is with my patch applied.
+> Without it, the second log entry is missing. I'm arguing the above is
+> consistent to IPsec without xfrm interface:
+>
+> | IN= OUT=eth1 SRC=192.168.112.1 DST=192.168.112.2 LEN=84 TOS=0x00 PREC=0x00 TTL=64 ID=49341 DF PROTO=ICMP TYPE=8 CODE=0 ID=44114 SEQ=1
+> | IN= OUT=eth1 SRC=192.168.2.1 DST=192.168.2.2 LEN=140 TOS=0x00 PREC=0x00 TTL=64 ID=37109 DF PROTO=ESP SPI=0x1000
+>
+> The packet appears twice being sent to eth1, the second time as ESP
+> packet. I understand xfrm interface as a collector of to-be-xfrmed
+> packets, dropping those which do not match a policy.
+>
+> > > Fix this by looping packets transmitted from xfrm_interface through
+> > > NF_INET_LOCAL_OUT before passing them on to dst_output(), which makes
+> > > behaviour consistent again from netfilter's point of view.
+> >
+> > When an XFRM interface is used when forwarding, why would it be correct
+> > for NF_INET_LOCAL_OUT to observe the inner packet?
+>
+> A valid question, indeed. One could interpret packets being forwarded by
+> those tunneling devices emit the packets one feeds them from the local
+> host. I just checked and ip_vti behaves identical to xfrm_interface
+> prior to my patch, so maybe my patch is crap and the inability to match
+> on ipsec context data when using any of those devices is just by design.
+>
 
-I've extended my collection of minor keyrings fixes for the next merge
-window.  Anything else I should add (or anything I should drop)?
+I would find such interpretation and behavior to be surprising for an IPsec
+forwarder...
+I guess some functionality of policy matching is lost with these
+devices; although they do offer the ability to match ipsec traffic based on
+the destination interface it is possible to have multiple ipsec flows share
+the same device so netfilter doesn't provide the ability to distinguish
+between different flows on the outbound direction in such cases.
 
-The patches can be found on the following branch:
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-fixes
-
-David
----
-Alex Shi (2):
-      PKCS#7: drop function from kernel-doc pkcs7_validate_trust_one
-      certs/blacklist: fix kernel doc interface issue
-
-Alexander A. Klimov (1):
-      encrypted-keys: Replace HTTP links with HTTPS ones
-
-David Howells (1):
-      certs: Fix blacklist flag type confusion
-
-Denis Efremov (1):
-      security/keys: use kvfree_sensitive()
-
-Gabriel Krisman Bertazi (1):
-      watch_queue: Drop references to /dev/watch_queue
-
-Gustavo A. R. Silva (1):
-      security: keys: Fix fall-through warnings for Clang
-
-Jann Horn (1):
-      keys: Remove outdated __user annotations
-
-Krzysztof Kozlowski (1):
-      KEYS: asymmetric: Fix kerneldoc
-
-Mickaël Salaün (3):
-      certs: Fix blacklisted hexadecimal hash string check
-      PKCS#7: Fix missing include
-      certs: Replace K{U,G}IDT_INIT() with GLOBAL_ROOT_{U,G}ID
-
-Randy Dunlap (2):
-      security: keys: delete repeated words in comments
-      crypto: asymmetric_keys: fix some comments in pkcs7_parser.h
-
-Tianjia Zhang (1):
-      crypto: public_key: Remove redundant header file from public_key.h
-
-Tom Rix (2):
-      KEYS: remove redundant memset
-      keys: remove trailing semicolon in macro definition
-
-YueHaibing (1):
-      crypto: pkcs7: Use match_string() helper to simplify the code
-
-
- Documentation/security/keys/core.rst     |  4 ++--
- certs/blacklist.c                        | 10 +++++-----
- certs/system_keyring.c                   |  5 +++--
- crypto/asymmetric_keys/asymmetric_type.c |  6 ++++--
- crypto/asymmetric_keys/pkcs7_parser.h    |  5 ++---
- crypto/asymmetric_keys/pkcs7_trust.c     |  2 +-
- crypto/asymmetric_keys/pkcs7_verify.c    |  9 ++++-----
- include/crypto/public_key.h              |  1 -
- include/keys/encrypted-type.h            |  2 +-
- include/linux/key.h                      |  5 +++--
- include/linux/verification.h             |  2 ++
- samples/Kconfig                          |  2 +-
- samples/watch_queue/watch_test.c         |  2 +-
- security/integrity/ima/ima_mok.c         |  3 +--
- security/keys/Kconfig                    |  8 ++++----
- security/keys/big_key.c                  |  9 +++------
- security/keys/key.c                      |  2 ++
- security/keys/keyctl.c                   |  2 +-
- security/keys/keyctl_pkey.c              |  2 --
- security/keys/keyring.c                  | 10 +++++-----
- 20 files changed, 45 insertions(+), 46 deletions(-)
-
-
+Thanks,
+Eyal.
