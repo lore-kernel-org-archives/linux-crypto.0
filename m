@@ -2,90 +2,142 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02F33C4361B
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Dec 2020 09:51:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0900C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Dec 2020 11:11:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B539823D39
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Dec 2020 09:51:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 947E823B85
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Dec 2020 11:11:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728547AbgLJJup (ORCPT
+        id S2387787AbgLJLLN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Dec 2020 04:50:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31725 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728074AbgLJJup (ORCPT
+        Thu, 10 Dec 2020 06:11:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58180 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729342AbgLJLLC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Dec 2020 04:50:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607593759;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ANRQNvQxs5wiZtk/4xV+GI9Sns6KDSiXIeFUsgCF5nw=;
-        b=dYZhXkZa9c5QZS5fXz+uWU/+kZNCgZTjTXIlo6OtGrB4QKVlj/BXypm2p91L2zFWYy4uyW
-        GRBIGOoM45cx+omd+GUZNL28V7YWE7cTmIq00jOOuxwkhTJFsxoWKIoB5C5RqIM7WIF8/n
-        MsE8s2nP+a4bc+Vc3dQLbzS0TJpf+Eg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-lCu6pvXdM4Wj2oM-EJz8lg-1; Thu, 10 Dec 2020 04:49:15 -0500
-X-MC-Unique: lCu6pvXdM4Wj2oM-EJz8lg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7B66AFA89;
-        Thu, 10 Dec 2020 09:49:12 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-116-67.rdu2.redhat.com [10.10.116.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0A4D55B6A2;
-        Thu, 10 Dec 2020 09:49:08 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20200916004927.64276-1-eric.snowberg@oracle.com>
-References: <20200916004927.64276-1-eric.snowberg@oracle.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     dhowells@redhat.com, dwmw2@infradead.org,
-        jarkko.sakkinen@linux.intel.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, jmorris@namei.org, serge@hallyn.com,
-        nayna@linux.ibm.com, zohar@linux.ibm.com, erichte@linux.ibm.com,
-        mpe@ellerman.id.au, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v4] certs: Add EFI_CERT_X509_GUID support for dbx entries
+        Thu, 10 Dec 2020 06:11:02 -0500
+Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF686C0613D6
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Dec 2020 03:10:21 -0800 (PST)
+Received: by mail-wr1-x442.google.com with SMTP id a12so5031186wrv.8
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Dec 2020 03:10:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google;
+        h=reply-to:subject:to:references:from:organization:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=d7ICbgeRa9HWZM53L6FPnxQMWAPWR9TgfC0TXxGcXgY=;
+        b=Y7E8EsSRlSiI1SKlfkm77fV6nbaNLGTDyBSWwv6ntHL2U2HSawwu3IVkGFzGepJTdP
+         ZMQIVisdTXTOzlVShKl8xIHGOyeiXR4SMggIwsUs1L2lLN8mVpu5V17VachjC1pn02bp
+         31mA4wtEG3mo/rz0Gdb/TRtvO//IVinAE8tg+PmnBjewPeO2OJzjTQfAbjTOO8M6krZE
+         95ex5r0MLFPOMEDv0IzZnHfAZajJat0+1v+gji+o7ZbMRSN/Sv2PTxhmGifh5Yhyar0U
+         0FaBhh4vH4wKn+QF+v1992doKWBnPBBLmgJkPGSfxfxCpLTaFSNLEou//OdLSvxF8Qw9
+         Zokw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:reply-to:subject:to:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=d7ICbgeRa9HWZM53L6FPnxQMWAPWR9TgfC0TXxGcXgY=;
+        b=DBnbfxoTF1cHiTXHx1NfBR7+g2XU/TkoTnOvYhzq8I74X6J0t4woWaf3gQKWunUa0g
+         cngggmN1U1ufX68SaQXOC5ZVGicPbk2PpVkOdAdnIG68zROI++IGceNMNcevvyZKhqZP
+         YMy2vlCKDTMvLroGcEnVWqfQzqDVItfn9FB2MtdHPPgvKY+cuvpUVeaMsdpFWtrjV9gs
+         vSxh/wmydeuIcZrr4qIM192ELfrRtV2iGp1mcBPxb+54t/dGdsjS3Bp4sl/DDSRCstM7
+         ZasIGUSbsz1bPu2a2yTN7n+KPeqF2O6svE7WSKih2Eacj0xteh+2a6UWozJHtVQ217/f
+         i8nA==
+X-Gm-Message-State: AOAM531saJQ2CHiRJM9kjbKrfY4XmN3MYN7Co8aExH8PK/yyukv2fkNv
+        RpEocMIn7xfiQ0kURWEaGN/7bg==
+X-Google-Smtp-Source: ABdhPJzb7Ju0zEnjWKanAAII/6K9SrAT10GNT6ZVuqEpTJappgIgntBt89e5JFa/EzIeWnwxq6WuGw==
+X-Received: by 2002:adf:fb88:: with SMTP id a8mr7665047wrr.412.1607598620562;
+        Thu, 10 Dec 2020 03:10:20 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:410:bb00:111a:62e7:97b9:77f? ([2a01:e0a:410:bb00:111a:62e7:97b9:77f])
+        by smtp.gmail.com with ESMTPSA id s13sm8523254wmj.28.2020.12.10.03.10.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Dec 2020 03:10:19 -0800 (PST)
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH v2] xfrm: interface: Don't hide plain packets from
+ netfilter
+To:     Eyal Birger <eyal.birger@gmail.com>, Phil Sutter <phil@nwl.cc>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        Linux Kernel Network Developers <netdev@vger.kernel.org>
+References: <20201207134309.16762-1-phil@nwl.cc>
+ <CAHsH6Gupw7o96e5hOmaLBCZtqgoV0LZ4L7h-Y+2oROtXSXvTxw@mail.gmail.com>
+ <20201208185139.GZ4647@orbyte.nwl.cc>
+ <CAHsH6GvT=Af-BAWK0z_CdrYWPn0qt+C=BRjy10MLRNhLWfH0rQ@mail.gmail.com>
+From:   Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+Message-ID: <9fc5cbb8-26c7-c1c2-2018-3c0cd8c805f4@6wind.com>
+Date:   Thu, 10 Dec 2020 12:10:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1360577.1607593748.1@warthog.procyon.org.uk>
-Date:   Thu, 10 Dec 2020 09:49:08 +0000
-Message-ID: <1360578.1607593748@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <CAHsH6GvT=Af-BAWK0z_CdrYWPn0qt+C=BRjy10MLRNhLWfH0rQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Eric Snowberg <eric.snowberg@oracle.com> wrote:
+Le 09/12/2020 à 15:40, Eyal Birger a écrit :
+> Hi Phil,
+> 
+> On Tue, Dec 8, 2020 at 8:51 PM Phil Sutter <phil@nwl.cc> wrote:
+>>
+>> Hi Eyal,
+>>
+>> On Tue, Dec 08, 2020 at 04:47:02PM +0200, Eyal Birger wrote:
+>>> On Mon, Dec 7, 2020 at 4:07 PM Phil Sutter <phil@nwl.cc> wrote:
+[snip]
+>>
+>> The packet appears twice being sent to eth1, the second time as ESP
+>> packet. I understand xfrm interface as a collector of to-be-xfrmed
+>> packets, dropping those which do not match a policy.
+>>
+>>>> Fix this by looping packets transmitted from xfrm_interface through
+>>>> NF_INET_LOCAL_OUT before passing them on to dst_output(), which makes
+>>>> behaviour consistent again from netfilter's point of view.
+>>>
+>>> When an XFRM interface is used when forwarding, why would it be correct
+>>> for NF_INET_LOCAL_OUT to observe the inner packet?
+I think it is valid because:
+ - it would be consistent with ip tunnels (see iptunnel_xmit())
+ - it would be consistent with the standard xfrm path see [1]
+ - from the POV of the forwarder, the packet is locally emitted, the src @ is
+   owned by the forwarder.
 
-> Add support for EFI_CERT_X509_GUID dbx entries. When a EFI_CERT_X509_GUID
-> is found, it is added as an asymmetrical key to the .blacklist keyring.
-> Anytime the .platform keyring is used, the keys in the .blacklist keyring
-> are referenced, if a matching key is found, the key will be rejected.
+[1] https://upload.wikimedia.org/wikipedia/commons/3/37/Netfilter-packet-flow.svg
 
-Ummm...  Why this way and not as a blacklist key which takes up less space?
-I'm guessing that you're using the key chain matching logic.  We really only
-need to blacklist the key IDs.
+>>
+>> A valid question, indeed. One could interpret packets being forwarded by
+>> those tunneling devices emit the packets one feeds them from the local
+>> host. I just checked and ip_vti behaves identical to xfrm_interface
+>> prior to my patch, so maybe my patch is crap and the inability to match
+>> on ipsec context data when using any of those devices is just by design.
+There was no real design for vti[6] interfaces, it's why xfrmi interfaces have
+been added. But they should be consistent I think, so this patch should handle
+xfrmi and vti[6] together.
 
-Also, what should happen if a revocation cert rejected by the blacklist?
 
-> +int mark_key_revocationlisted(const char *data, size_t size)
+Regards,
+Nicolas
 
-Hmmm...  The name looks wrong, but I can see the potential issue that kernel
-keys can actually be marked revoked as a separate concept.  How about
-add_key_to_revocation_list() and is_key_on_revocation_list().
-
-David
-
+>>
+> 
+> I would find such interpretation and behavior to be surprising for an IPsec
+> forwarder...
+> I guess some functionality of policy matching is lost with these
+> devices; although they do offer the ability to match ipsec traffic based on
+> the destination interface it is possible to have multiple ipsec flows share
+> the same device so netfilter doesn't provide the ability to distinguish
+> between different flows on the outbound direction in such cases.
+> 
+> Thanks,
+> Eyal.
+> 
