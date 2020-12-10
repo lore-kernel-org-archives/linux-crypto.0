@@ -2,135 +2,273 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C88C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Dec 2020 19:00:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95FBBC2BB40
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Dec 2020 20:00:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E55E723440
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Dec 2020 19:00:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6128923380
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Dec 2020 20:00:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393289AbgLJS6o (ORCPT
+        id S2404436AbgLJT7x (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Dec 2020 13:58:44 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:37476 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393280AbgLJS60 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Dec 2020 13:58:26 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BAItPjn018585;
-        Thu, 10 Dec 2020 18:57:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2020-01-29; bh=H/4Xhon6gyv1yvafz+CvgbgQzeUprDw4jRoragP4NGM=;
- b=GucSOwhUWl6lgomtvDJdNJQYRaBdvsik5bOjr7hfXN3TY1WDiz6nsCu252BnM+sKgd/o
- 0ooRoVzbbhkLgCqe25w+YF2lQbSyBocXpWZ3O4+rVMVVknEB5ID65BQqiomiehQ4jaxE
- jEzEbV8NyNzMPds3WY3C7Lhqf/bEsDNc0xrrphFmEDnv/dkF/GyNqkQjVrGvZg7Nla+K
- zpvYvJu3tM9mWQGkao7uc+knNOFkduj5BULmdc/R5GK1LWsCwLpTVj5xe35X2dT5L4Ai
- ag0FzGAFOJio4SJBjtnw1bVgZg+G25E7dr3wMIJlgRfNE/8oeY3QUXpyMmfGO7JC7gXx Cg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2130.oracle.com with ESMTP id 357yqc760v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 10 Dec 2020 18:57:16 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BAIsl13080562;
-        Thu, 10 Dec 2020 18:57:15 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 358kywrpek-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 10 Dec 2020 18:57:15 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0BAIv1Zm011914;
-        Thu, 10 Dec 2020 18:57:01 GMT
-Received: from dhcp-10-65-174-87.vpn.oracle.com (/10.65.174.87)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 10 Dec 2020 10:57:01 -0800
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v4] certs: Add EFI_CERT_X509_GUID support for dbx entries
-From:   Eric Snowberg <eric.snowberg@oracle.com>
-In-Reply-To: <1360578.1607593748@warthog.procyon.org.uk>
-Date:   Thu, 10 Dec 2020 11:56:58 -0700
-Cc:     dwmw2@infradead.org,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jmorris@namei.org, serge@hallyn.com, nayna@linux.ibm.com,
-        Mimi Zohar <zohar@linux.ibm.com>, erichte@linux.ibm.com,
-        mpe@ellerman.id.au, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        Eric Snowberg <eric.snowberg@oracle.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <E090372C-06A3-4991-8FC3-F06A0DA60729@oracle.com>
-References: <20200916004927.64276-1-eric.snowberg@oracle.com>
- <1360578.1607593748@warthog.procyon.org.uk>
-To:     David Howells <dhowells@redhat.com>
-X-Mailer: Apple Mail (2.3273)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9831 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 mlxscore=0
- malwarescore=0 suspectscore=3 mlxlogscore=999 bulkscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012100118
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9831 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 mlxlogscore=999
- clxscore=1011 malwarescore=0 bulkscore=0 phishscore=0 adultscore=0
- spamscore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012100118
+        Thu, 10 Dec 2020 14:59:53 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60756 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2404416AbgLJT7n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Dec 2020 14:59:43 -0500
+Date:   Thu, 10 Dec 2020 20:58:55 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1607630342;
+        bh=s2+iLf6qBKVf58ffYZN9l2zof1I9JLW9V6wDx6uBGB8=;
+        h=From:To:Cc:Subject:References:In-Reply-To:From;
+        b=eklBHcybGU7NaHOQQv++7WWXgTVIXfU4CnRYhDTvdmMh828hU1HhwGuy262A7mXl3
+         UVfMlgSR9hjmxiHEEmyAKdwE8N24GronEa9YX/3xByG12lhH5sLlYjOzWtARATmbU+
+         gbjs//eYTsEVpjwIHW5m8/FwAch5WCZ79eUruF3gO37OfRXISugUzkUxi/tczLL5H1
+         C81E6xkV7hUWEVha0XOmiWm7bl+CmN06kwTj6Wpcq+BBF8+02d6kP4fL05muxPEfXb
+         pZ3KGXhlBNtOeEDWP9EZLwn/4dPMZS2smZLYs42jw9BUNf2bClh/cggGRtfKBSWABt
+         n3IVdl/kI4rwg==
+From:   Wolfram Sang <wsa@kernel.org>
+To:     Heiner Kallweit <hkallweit1@gmail.com>
+Cc:     George Cherian <gcherian@marvell.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Boris Brezillon <bbrezillon@kernel.org>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Srujana Challa <schalla@marvell.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Elie Morisse <syniurge@gmail.com>,
+        Nehal Shah <nehal-bakulchandra.shah@amd.com>,
+        Shyam Sundar S K <shyam-sundar.s-k@amd.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Andreas Larsson <andreas@gaisler.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Netanel Belgazal <netanel@amazon.com>,
+        Arthur Kiyanovski <akiyano@amazon.com>,
+        Guy Tzalik <gtzalik@amazon.com>,
+        Saeed Bishara <saeedb@amazon.com>,
+        Zorik Machulsky <zorik@amazon.com>,
+        Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+        Keyur Chudgar <keyur@os.amperecomputing.com>,
+        Quan Nguyen <quan@os.amperecomputing.com>,
+        Igor Russkikh <irusskikh@marvell.com>,
+        Jay Cliburn <jcliburn@gmail.com>,
+        Chris Snook <chris.snook@gmail.com>,
+        Ariel Elior <aelior@marvell.com>,
+        Sudarsana Kalluru <skalluru@marvell.com>,
+        GR-everest-linux-l2@marvell.com,
+        Michael Chan <michael.chan@broadcom.com>,
+        Raju Rangoju <rajur@chelsio.com>,
+        Madalin Bucur <madalin.bucur@nxp.com>,
+        Ioana Ciornei <ioana.ciornei@nxp.com>,
+        Ioana Radulescu <ruxandra.radulescu@nxp.com>,
+        Claudiu Manoil <claudiu.manoil@nxp.com>,
+        Catherine Sullivan <csully@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        Jon Olson <jonolson@google.com>,
+        Yisen Zhuang <yisen.zhuang@huawei.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Hauke Mehrtens <hauke@hauke-m.de>,
+        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Sunil Goutham <sgoutham@marvell.com>,
+        Geetha sowjanya <gakula@marvell.com>,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
+        hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>,
+        John Crispin <john@phrozen.org>,
+        Sean Wang <sean.wang@mediatek.com>,
+        Mark Lee <Mark-MC.Lee@mediatek.com>,
+        Tariq Toukan <tariqt@nvidia.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Boris Pismenny <borisp@nvidia.com>,
+        Jon Mason <jdmason@kudzu.us>,
+        Rain River <rain.1986.08.12@gmail.com>,
+        Zhu Yanjun <zyjzyj2000@gmail.com>,
+        Shannon Nelson <snelson@pensando.io>,
+        Pensando Drivers <drivers@pensando.io>,
+        Jiri Pirko <jiri@resnulli.us>,
+        Edward Cree <ecree.xilinx@gmail.com>,
+        Martin Habets <habetsm.xilinx@gmail.com>,
+        Daniele Venzano <venza@brownhat.org>,
+        Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+        Wingman Kwok <w-kwok2@ti.com>,
+        Murali Karicheri <m-karicheri2@ti.com>,
+        Kevin Brace <kevinbrace@bracecomputerlab.com>,
+        Radhey Shyam Pandey <radhey.shyam.pandey@xilinx.com>,
+        Michal Simek <michal.simek@xilinx.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Nick Kossifidis <mickflemm@gmail.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Larry Finger <Larry.Finger@lwfinger.net>,
+        Luca Coelho <luciano.coelho@intel.com>,
+        Lorenzo Bianconi <lorenzo.bianconi83@gmail.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, qat-linux@intel.com,
+        linux-i2c@vger.kernel.org, linux-rdma@vger.kernel.org,
+        netdev@vger.kernel.org, bpf@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
+        ath11k@lists.infradead.org, wil6210@qti.qualcomm.com,
+        b43-dev@lists.infradead.org, iommu@lists.linux-foundation.org
+Subject: Re: [PATCH] dma-mapping: move hint unlikely for dma_mapping_error
+ from drivers to core
+Message-ID: <20201210195855.GA11120@kunai>
+Mail-Followup-To: Wolfram Sang <wsa@kernel.org>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        George Cherian <gcherian@marvell.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Boris Brezillon <bbrezillon@kernel.org>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Srujana Challa <schalla@marvell.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Elie Morisse <syniurge@gmail.com>,
+        Nehal Shah <nehal-bakulchandra.shah@amd.com>,
+        Shyam Sundar S K <shyam-sundar.s-k@amd.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Doug Ledford <dledford@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Andreas Larsson <andreas@gaisler.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Netanel Belgazal <netanel@amazon.com>,
+        Arthur Kiyanovski <akiyano@amazon.com>,
+        Guy Tzalik <gtzalik@amazon.com>, Saeed Bishara <saeedb@amazon.com>,
+        Zorik Machulsky <zorik@amazon.com>,
+        Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+        Keyur Chudgar <keyur@os.amperecomputing.com>,
+        Quan Nguyen <quan@os.amperecomputing.com>,
+        Igor Russkikh <irusskikh@marvell.com>,
+        Jay Cliburn <jcliburn@gmail.com>,
+        Chris Snook <chris.snook@gmail.com>,
+        Ariel Elior <aelior@marvell.com>,
+        Sudarsana Kalluru <skalluru@marvell.com>,
+        GR-everest-linux-l2@marvell.com,
+        Michael Chan <michael.chan@broadcom.com>,
+        Raju Rangoju <rajur@chelsio.com>,
+        Madalin Bucur <madalin.bucur@nxp.com>,
+        Ioana Ciornei <ioana.ciornei@nxp.com>,
+        Ioana Radulescu <ruxandra.radulescu@nxp.com>,
+        Claudiu Manoil <claudiu.manoil@nxp.com>,
+        Catherine Sullivan <csully@google.com>,
+        Sagi Shahar <sagis@google.com>, Jon Olson <jonolson@google.com>,
+        Yisen Zhuang <yisen.zhuang@huawei.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Hauke Mehrtens <hauke@hauke-m.de>,
+        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Sunil Goutham <sgoutham@marvell.com>,
+        Geetha sowjanya <gakula@marvell.com>,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
+        hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>,
+        John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
+        Mark Lee <Mark-MC.Lee@mediatek.com>,
+        Tariq Toukan <tariqt@nvidia.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Boris Pismenny <borisp@nvidia.com>, Jon Mason <jdmason@kudzu.us>,
+        Rain River <rain.1986.08.12@gmail.com>,
+        Zhu Yanjun <zyjzyj2000@gmail.com>,
+        Shannon Nelson <snelson@pensando.io>,
+        Pensando Drivers <drivers@pensando.io>,
+        Jiri Pirko <jiri@resnulli.us>, Edward Cree <ecree.xilinx@gmail.com>,
+        Martin Habets <habetsm.xilinx@gmail.com>,
+        Daniele Venzano <venza@brownhat.org>,
+        Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+        Wingman Kwok <w-kwok2@ti.com>,
+        Murali Karicheri <m-karicheri2@ti.com>,
+        Kevin Brace <kevinbrace@bracecomputerlab.com>,
+        Radhey Shyam Pandey <radhey.shyam.pandey@xilinx.com>,
+        Michal Simek <michal.simek@xilinx.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Nick Kossifidis <mickflemm@gmail.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Larry Finger <Larry.Finger@lwfinger.net>,
+        Luca Coelho <luciano.coelho@intel.com>,
+        Lorenzo Bianconi <lorenzo.bianconi83@gmail.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, qat-linux@intel.com,
+        linux-i2c@vger.kernel.org, linux-rdma@vger.kernel.org,
+        netdev@vger.kernel.org, bpf@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
+        ath11k@lists.infradead.org, wil6210@qti.qualcomm.com,
+        b43-dev@lists.infradead.org, iommu@lists.linux-foundation.org
+References: <5d08af46-5897-b827-dcfb-181d869c8f71@gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="k+w/mQv8wyuph6w0"
+Content-Disposition: inline
+In-Reply-To: <5d08af46-5897-b827-dcfb-181d869c8f71@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-> On Dec 10, 2020, at 2:49 AM, David Howells <dhowells@redhat.com> =
-wrote:
+--k+w/mQv8wyuph6w0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Dec 10, 2020 at 03:47:50PM +0100, Heiner Kallweit wrote:
+> Zillions of drivers use the unlikely() hint when checking the result of
+> dma_mapping_error(). This is an inline function anyway, so we can move
+> the hint into the function and remove it from drivers.
+> From time to time discussions pop up how effective unlikely() is,
+> and that it should be used only if something is really very unlikely.
+> I think that's the case here.
 >=20
-> Eric Snowberg <eric.snowberg@oracle.com> wrote:
+> Patch was created with some help from coccinelle.
 >=20
->> Add support for EFI_CERT_X509_GUID dbx entries. When a =
-EFI_CERT_X509_GUID
->> is found, it is added as an asymmetrical key to the .blacklist =
-keyring.
->> Anytime the .platform keyring is used, the keys in the .blacklist =
-keyring
->> are referenced, if a matching key is found, the key will be rejected.
+> @@
+> expression dev, dma_addr;
+> @@
 >=20
-> Ummm...  Why this way and not as a blacklist key which takes up less =
-space?
-> I'm guessing that you're using the key chain matching logic.  We =
-really only
-> need to blacklist the key IDs.
-
-I implemented it this way so that certs in the dbx would only impact=20
-the .platform keyring. I was under the impression we didn=E2=80=99t want =
-to have=20
-Secure Boot UEFI db/dbx certs dictate keyring functionality within the =
-kernel
-itself. Meaning if we have a matching dbx cert in any other keyring =
-(builtin,
-secondary, ima, etc.), it would be allowed. If that is not how you=E2=80=99=
-d like to=20
-see it done, let me know and I=E2=80=99ll make the change.
-
-> Also, what should happen if a revocation cert rejected by the =
-blacklist?
-
-I=E2=80=99m not sure I understand the question. How would it be =
-rejected?
-
->> +int mark_key_revocationlisted(const char *data, size_t size)
+> - unlikely(dma_mapping_error(dev, dma_addr))
+> + dma_mapping_error(dev, dma_addr)
 >=20
-> Hmmm...  The name looks wrong, but I can see the potential issue that =
-kernel
-> keys can actually be marked revoked as a separate concept.  How about
-> add_key_to_revocation_list() and is_key_on_revocation_list().
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-I'll update the names in the next version.
+Acked-by: Wolfram Sang <wsa@kernel.org> # for I2C
 
-Thanks.
 
+--k+w/mQv8wyuph6w0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAl/SffoACgkQFA3kzBSg
+KbYcjxAAgOE4gHcgEP8+Oex1fposdP2Z4KiWFjIYYWG4fo/Ry9PjDbSGh9Nptht2
+fnsCRcFXFj4oaSXaflBTq6ky4usgo2Gyp9puXbnpyj7P2uEjrqZs1zUFpAWdzMor
+UgiJkW/P2IZjCDfwxE8nn9L0fm8ZfcHWqVohAgDh/9SKsrQCdzlzwvd7vSQ94fXr
+qnYrmc6BF68dxVZx4TV18GddP5qFXYKytQ8pXL51XZEJTI05IGmc2l6hs/B4tKj6
+muxiEFw5Ac0eseMimi4J5YDJJZxWe28onn69mMJYQDzVPqSZRyhSAqCv0EhMg6Vp
+sABbG/eShtxir8A5ZrVRgqCaVyBjPu6pHAxdccHkj4d/6hfvD6F2FDXXaWirAf3i
+A4gsMJAmxtBYV0Lyx0D+fzCFnvUSDDSOEayRJdzotQXVCbLvuWHTp6EXVJFD5mMU
+/o3LApTC1uYQTXfGh1HHanpSEXLXfVgzjuDHRUsVIwemk5JwUAl6fw4oXbMrHYdZ
+v9Inx4U81LGxayz1vGmzbE39AeE7YH/5lH4metjot96RpKa+Gg++mMxUHBPW6Jam
+AOz6I3cKYsn7mPkzAZfDNvhvfgz2vxXcGGULSCdaWnVCJY7FMqe8i98w1z/Ymo7U
+JSXmDUhFS43r0JqUfbR0sRGgLL+kHTEa6I4ZT8UNd9DmTtS0Jmo=
+=4X1P
+-----END PGP SIGNATURE-----
+
+--k+w/mQv8wyuph6w0--
