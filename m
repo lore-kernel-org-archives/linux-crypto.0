@@ -2,129 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD24C1B0D8
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 12:29:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2742DC4361B
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 13:03:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 964EC23FB3
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 12:29:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D74DB23DE3
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 13:03:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405941AbgLKM2w (ORCPT
+        id S2405989AbgLKNC3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Dec 2020 07:28:52 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33394 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388064AbgLKM2W (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Dec 2020 07:28:22 -0500
-From:   Ard Biesheuvel <ardb@kernel.org>
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Ayush Sawal <ayush.sawal@chelsio.com>,
-        Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
-        Rohit Maheshwari <rohitm@chelsio.com>
-Subject: [PATCH v2 1/2] chcr_ktls: use AES library for single use cipher
-Date:   Fri, 11 Dec 2020 13:27:14 +0100
-Message-Id: <20201211122715.15090-2-ardb@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20201211122715.15090-1-ardb@kernel.org>
-References: <20201211122715.15090-1-ardb@kernel.org>
+        Fri, 11 Dec 2020 08:02:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59316 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391594AbgLKNCD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Dec 2020 08:02:03 -0500
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDDAAC0613CF;
+        Fri, 11 Dec 2020 05:01:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=rMzTkRBHUwuuyWZIHH9a6s635U0L90G4G36xFMgcyhQ=; b=SOQLHFFA+ehnBJ6pZS21QAMZ2c
+        +GapFcfuB5gMQaGWgZxgCIOLVTNEN0MLdahOuJ433N4ftNOGaGGzrkTGK3YWXWHbD191JZV/+5+5y
+        EmM31xnO2wyysHgltCGQfzZOMH8iVQ/skAxfvmBa6Z9OZf2PLXJzLlu0+Jy1WzG0XndSoYXHS3Btb
+        Pn4HGZo+fw94dSBKWO8puOxBHnbFTzNt69RleROZ7grLB6i7OaiRVistU90KytjQL4ryLqC91URkH
+        KSukG70kZhkCzEG67gLomMPn+ZZTdoJxGtLsDNBsYwGayHKM0DRLf7ues3fIG1C4gBWdBTMy4q2Z5
+        tA+ymCXw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kni2g-00036R-5c; Fri, 11 Dec 2020 13:01:02 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id B43883003E5;
+        Fri, 11 Dec 2020 14:00:58 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 9D8D221BE8D82; Fri, 11 Dec 2020 14:00:58 +0100 (CET)
+Date:   Fri, 11 Dec 2020 14:00:58 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, TimGuo-oc@zhaoxin.com,
+        CooperYan@zhaoxin.com, QiyuanWang@zhaoxin.com,
+        HerryYang@zhaoxin.com, CobeChen@zhaoxin.com,
+        SilviaZhao@zhaoxin.com, thomas.lendacky@amd.com
+Subject: Re: [PATCH] crypto: x86/crc32c-intel - Don't match some Zhaoxin CPUs
+Message-ID: <20201211130058.GZ2414@hirez.programming.kicks-ass.net>
+References: <1607686144-2604-1-git-send-email-TonyWWang-oc@zhaoxin.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1607686144-2604-1-git-send-email-TonyWWang-oc@zhaoxin.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Allocating a cipher via the crypto API only to free it again after using
-it to encrypt a single block is unnecessary in cases where the algorithm
-is known at compile time. So replace this pattern with a call to the AES
-library.
+On Fri, Dec 11, 2020 at 07:29:04PM +0800, Tony W Wang-oc wrote:
+> The driver crc32c-intel match CPUs supporting X86_FEATURE_XMM4_2.
+> On platforms with Zhaoxin CPUs supporting this X86 feature, When
+> crc32c-intel and crc32c-generic are both registered, system will
+> use crc32c-intel because its .cra_priority is greater than
+> crc32c-generic. This case expect to use crc32c-generic driver for
+> some Zhaoxin CPUs to get performance gain, So remove these Zhaoxin
+> CPUs support from crc32c-intel.
+> 
+> Signed-off-by: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+> ---
+>  arch/x86/crypto/crc32c-intel_glue.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/arch/x86/crypto/crc32c-intel_glue.c b/arch/x86/crypto/crc32c-intel_glue.c
+> index feccb52..6dafdae 100644
+> --- a/arch/x86/crypto/crc32c-intel_glue.c
+> +++ b/arch/x86/crypto/crc32c-intel_glue.c
+> @@ -222,8 +222,16 @@ MODULE_DEVICE_TABLE(x86cpu, crc32c_cpu_id);
+>  
+>  static int __init crc32c_intel_mod_init(void)
+>  {
+> +	struct cpuinfo_x86 *c = &boot_cpu_data;
+> +
+>  	if (!x86_match_cpu(crc32c_cpu_id))
+>  		return -ENODEV;
+> +
+> +	if (c->x86_vendor == X86_VENDOR_ZHAOXIN || c->x86_vendor == X86_VENDOR_CENTAUR) {
+> +		if (c->x86 == 0x6 || (c->x86 == 0x7 && c->x86_model <= 0x3b))
+> +			return -ENODEV;
+> +	}
 
-Cc: Ayush Sawal <ayush.sawal@chelsio.com>
-Cc: Vinay Kumar Yadav <vinay.yadav@chelsio.com>
-Cc: Rohit Maheshwari <rohitm@chelsio.com>
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- drivers/net/ethernet/chelsio/inline_crypto/Kconfig             |  1 +
- drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c | 19 +++++++------------
- 2 files changed, 8 insertions(+), 12 deletions(-)
+Egads, why can't you use that x86_match_cpu() above, and also this
+really wants a comment on why you're excluding these chips. Also, since
+(IIRC) ZHAOXIN is basically AND, shouldn't they also be listed?
 
-diff --git a/drivers/net/ethernet/chelsio/inline_crypto/Kconfig b/drivers/net/ethernet/chelsio/inline_crypto/Kconfig
-index bc06e83fd3c6..521955e1f894 100644
---- a/drivers/net/ethernet/chelsio/inline_crypto/Kconfig
-+++ b/drivers/net/ethernet/chelsio/inline_crypto/Kconfig
-@@ -42,6 +42,7 @@ config CHELSIO_TLS_DEVICE
-         depends on CHELSIO_T4
-         depends on TLS
-         depends on TLS_DEVICE
-+	select CRYPTO_LIB_AES
-         help
-           This flag enables support for kernel tls offload over Chelsio T6
-           crypto accelerator. CONFIG_CHELSIO_TLS_DEVICE flag can be enabled
-diff --git a/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c b/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
-index 5195f692f14d..e9b75cec34db 100644
---- a/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
-+++ b/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
-@@ -9,6 +9,7 @@
- #include <linux/ip.h>
- #include <net/ipv6.h>
- #include <linux/netdevice.h>
-+#include <crypto/aes.h>
- #include "chcr_ktls.h"
- 
- static LIST_HEAD(uld_ctx_list);
-@@ -30,7 +31,7 @@ static int chcr_ktls_save_keys(struct chcr_ktls_info *tx_info,
- 	unsigned char ghash_h[TLS_CIPHER_AES_GCM_256_TAG_SIZE];
- 	struct tls12_crypto_info_aes_gcm_128 *info_128_gcm;
- 	struct ktls_key_ctx *kctx = &tx_info->key_ctx;
--	struct crypto_cipher *cipher;
-+	struct crypto_aes_ctx aes_ctx;
- 	unsigned char *key, *salt;
- 
- 	switch (crypto_info->cipher_type) {
-@@ -91,18 +92,14 @@ static int chcr_ktls_save_keys(struct chcr_ktls_info *tx_info,
- 	/* Calculate the H = CIPH(K, 0 repeated 16 times).
- 	 * It will go in key context
- 	 */
--	cipher = crypto_alloc_cipher("aes", 0, 0);
--	if (IS_ERR(cipher)) {
--		ret = -ENOMEM;
--		goto out;
--	}
- 
--	ret = crypto_cipher_setkey(cipher, key, keylen);
-+	ret = aes_expandkey(&aes_ctx, key, keylen);
- 	if (ret)
--		goto out1;
-+		goto out;
- 
- 	memset(ghash_h, 0, ghash_size);
--	crypto_cipher_encrypt_one(cipher, ghash_h, ghash_h);
-+	aes_encrypt(&aes_ctx, ghash_h, ghash_h);
-+	memzero_explicit(&aes_ctx, sizeof(aes_ctx));
- 
- 	/* fill the Key context */
- 	if (direction == TLS_OFFLOAD_CTX_DIR_TX) {
-@@ -111,7 +108,7 @@ static int chcr_ktls_save_keys(struct chcr_ktls_info *tx_info,
- 						 key_ctx_size >> 4);
- 	} else {
- 		ret = -EINVAL;
--		goto out1;
-+		goto out;
- 	}
- 
- 	memcpy(kctx->salt, salt, tx_info->salt_size);
-@@ -119,8 +116,6 @@ static int chcr_ktls_save_keys(struct chcr_ktls_info *tx_info,
- 	memcpy(kctx->key + keylen, ghash_h, ghash_size);
- 	tx_info->key_ctx_len = key_ctx_size;
- 
--out1:
--	crypto_free_cipher(cipher);
- out:
- 	return ret;
- }
--- 
-2.17.1
+That is; write it like:
 
+	m = x86_match_cpu(crc32_cpu_id);
+	if (!m || !m->data)
+		return -ENODEV;
+
+That way you can have positive and negative matches in the array
+(obviously the existing FEATURE test would need data=1 and be last).
