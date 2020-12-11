@@ -2,172 +2,72 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2770C1B0E3
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 08:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D47C2BBCA
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 10:09:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F70223104
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 08:20:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2639F23F57
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 10:09:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405514AbgLKITl (ORCPT
+        id S2387811AbgLKKJD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Dec 2020 03:19:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43970 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405451AbgLKITE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Dec 2020 03:19:04 -0500
-Received: from mail.kapsi.fi (mail.kapsi.fi [IPv6:2001:67c:1be8::25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BACCC0613CF;
-        Fri, 11 Dec 2020 00:18:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=kapsi.fi;
-         s=20161220; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=Q/1c6zPVM2kb71FCgSBD6/BH9IEEPXCHItl80hWLcm0=; b=u/yNH50V0yU1iD8Syex+KFHGGA
-        y0LTrZM6Bv1aX/OLuM9ZrAIceytMk7Qy8++YBOjHUyCjZO8/AOU2vmdSzYDuI/XbTKaU1R9StBqiw
-        Y1k9eMua+bF4q40NniX6vk3DKVDCZLzGboS+52kpRzqFljtyzD59mcsjRm69LUOcHa6thJceOcqq0
-        XioQ2+Awe9qJypEOhbqQBW6OOSAriepEoy/WCLjBAOKhRqhV/HorrsQHP9hbTenfflOxgxRSqi6Yu
-        GcA+bh+KyJk5c4v0w91QmIbSpqLybY+aV+gRsHgC8DzRvLzWSv1LlIUv+dWqko9BhzgqFR+cYKTNS
-        ch7+3Yqw==;
-Received: from 83-245-197-237.elisa-laajakaista.fi ([83.245.197.237] helo=kapsi.fi)
-        by mail.kapsi.fi with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.89)
-        (envelope-from <jarkko.sakkinen@iki.fi>)
-        id 1kndcl-0006qP-07; Fri, 11 Dec 2020 10:17:59 +0200
-Date:   Fri, 11 Dec 2020 10:17:57 +0200
-From:   Jarkko Sakkinen <jarkko.sakkinen@iki.fi>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        "Alexander A. Klimov" <grandmaster@al2klimov.de>,
-        Petko Manolov <petkan@mip-labs.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>, linux-kernel@vger.kernel.org,
-        YueHaibing <yuehaibing@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jann Horn <jannh@google.com>, linux-crypto@vger.kernel.org,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Ben Boeckel <mathstuf@gmail.com>, keyrings@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        linux-security-module@vger.kernel.org,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Tom Rix <trix@redhat.com>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Alex Shi <alex.shi@linux.alibaba.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        James Morris <jmorris@namei.org>,
-        Denis Efremov <efremov@linux.com>,
-        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: Re: [PATCH 00/18] keys: Miscellaneous fixes
-Message-ID: <20201211081757.GA3789@kapsi.fi>
-References: <160751606428.1238376.14935502103503420781.stgit@warthog.procyon.org.uk>
+        Fri, 11 Dec 2020 05:09:03 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:33354 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2394175AbgLKKIn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Dec 2020 05:08:43 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1knfL2-0004mr-6E; Fri, 11 Dec 2020 21:07:49 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Dec 2020 21:07:48 +1100
+Date:   Fri, 11 Dec 2020 21:07:48 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Marco Chiappero <marco.chiappero@intel.com>,
+        Tomaszx Kowalik <tomaszx.kowalik@intel.com>
+Subject: Re: [PATCH 2/3] crypto: qat - add AES-XTS support for QAT GEN4
+ devices
+Message-ID: <20201211100748.GA994@gondor.apana.org.au>
+References: <20201201142451.138221-1-giovanni.cabiddu@intel.com>
+ <20201201142451.138221-3-giovanni.cabiddu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <160751606428.1238376.14935502103503420781.stgit@warthog.procyon.org.uk>
-X-SA-Exim-Connect-IP: 83.245.197.237
-X-SA-Exim-Mail-From: jarkko.sakkinen@iki.fi
-X-SA-Exim-Scanned: No (on mail.kapsi.fi); SAEximRunCond expanded to false
+In-Reply-To: <20201201142451.138221-3-giovanni.cabiddu@intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 09, 2020 at 12:14:24PM +0000, David Howells wrote:
-> 
-> Hi Jarkko,
-> 
-> I've extended my collection of minor keyrings fixes for the next merge
-> window.  Anything else I should add (or anything I should drop)?
+On Tue, Dec 01, 2020 at 02:24:50PM +0000, Giovanni Cabiddu wrote:
+>
+> @@ -1293,6 +1366,12 @@ static int qat_alg_skcipher_init_xts_tfm(struct crypto_skcipher *tfm)
+>  	if (IS_ERR(ctx->ftfm))
+>  		return PTR_ERR(ctx->ftfm);
+>  
+> +	ctx->tweak = crypto_alloc_cipher("aes", 0, 0);
+> +	if (IS_ERR(ctx->tweak)) {
+> +		crypto_free_skcipher(ctx->ftfm);
+> +		return PTR_ERR(ctx->tweak);
+> +	}
+> +
+>  	reqsize = max(sizeof(struct qat_crypto_request),
+>  		      sizeof(struct skcipher_request) +
+>  		      crypto_skcipher_reqsize(ctx->ftfm));
 
-Looks good to me. I dropped the keys fixes that I had previously in
-my tree that I saw in yours.
+This may clash with the work that Ard is doing on simpler ciphers.
 
+So I think this should switch over to using the library interface
+for aes.  What do you think Ard?
 
-/Jarkko
-
-> 
-> The patches can be found on the following branch:
-> 
-> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-fixes
-> 
-> David
-> ---
-> Alex Shi (2):
->       PKCS#7: drop function from kernel-doc pkcs7_validate_trust_one
->       certs/blacklist: fix kernel doc interface issue
-> 
-> Alexander A. Klimov (1):
->       encrypted-keys: Replace HTTP links with HTTPS ones
-> 
-> David Howells (1):
->       certs: Fix blacklist flag type confusion
-> 
-> Denis Efremov (1):
->       security/keys: use kvfree_sensitive()
-> 
-> Gabriel Krisman Bertazi (1):
->       watch_queue: Drop references to /dev/watch_queue
-> 
-> Gustavo A. R. Silva (1):
->       security: keys: Fix fall-through warnings for Clang
-> 
-> Jann Horn (1):
->       keys: Remove outdated __user annotations
-> 
-> Krzysztof Kozlowski (1):
->       KEYS: asymmetric: Fix kerneldoc
-> 
-> Mickaël Salaün (3):
->       certs: Fix blacklisted hexadecimal hash string check
->       PKCS#7: Fix missing include
->       certs: Replace K{U,G}IDT_INIT() with GLOBAL_ROOT_{U,G}ID
-> 
-> Randy Dunlap (2):
->       security: keys: delete repeated words in comments
->       crypto: asymmetric_keys: fix some comments in pkcs7_parser.h
-> 
-> Tianjia Zhang (1):
->       crypto: public_key: Remove redundant header file from public_key.h
-> 
-> Tom Rix (2):
->       KEYS: remove redundant memset
->       keys: remove trailing semicolon in macro definition
-> 
-> YueHaibing (1):
->       crypto: pkcs7: Use match_string() helper to simplify the code
-> 
-> 
->  Documentation/security/keys/core.rst     |  4 ++--
->  certs/blacklist.c                        | 10 +++++-----
->  certs/system_keyring.c                   |  5 +++--
->  crypto/asymmetric_keys/asymmetric_type.c |  6 ++++--
->  crypto/asymmetric_keys/pkcs7_parser.h    |  5 ++---
->  crypto/asymmetric_keys/pkcs7_trust.c     |  2 +-
->  crypto/asymmetric_keys/pkcs7_verify.c    |  9 ++++-----
->  include/crypto/public_key.h              |  1 -
->  include/keys/encrypted-type.h            |  2 +-
->  include/linux/key.h                      |  5 +++--
->  include/linux/verification.h             |  2 ++
->  samples/Kconfig                          |  2 +-
->  samples/watch_queue/watch_test.c         |  2 +-
->  security/integrity/ima/ima_mok.c         |  3 +--
->  security/keys/Kconfig                    |  8 ++++----
->  security/keys/big_key.c                  |  9 +++------
->  security/keys/key.c                      |  2 ++
->  security/keys/keyctl.c                   |  2 +-
->  security/keys/keyctl_pkey.c              |  2 --
->  security/keys/keyring.c                  | 10 +++++-----
->  20 files changed, 45 insertions(+), 46 deletions(-)
-> 
-> 
-> 
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
