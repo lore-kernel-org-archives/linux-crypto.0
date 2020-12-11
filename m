@@ -2,66 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA15C4361B
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 19:25:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43B75C4361B
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 20:06:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 89D4D2405B
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 19:25:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE22E23EF5
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 20:06:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2395333AbgLKRom (ORCPT
+        id S2395015AbgLKSdq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Dec 2020 12:44:42 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57874 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2395330AbgLKRoj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Dec 2020 12:44:39 -0500
-Date:   Fri, 11 Dec 2020 09:43:57 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607708639;
-        bh=7nRRic/cUXS9Hr120HkaEBHl46oBlU5a4nWuOWcPCFM=;
-        h=From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MEsY9jZz2eeaM+mnf1yXNs0NqEbEnR/tGlBxqTngG/GgPHKPMN2KGA1wIt0eILUXH
-         LJWYJhD4xe8YcXtKtrL+/zHYaAFgHr9pE9ccJtQjBaotXOQKVhoCbN2n8tQQ8uSIhj
-         xiecXbJf+DaemV3DdBQR74EYj7fRiyBQ3Pq0lqv59XZG3tjiwVPTd1m8MfPhiS971z
-         xC9YAFxmFHFe6g2TmrYLNq38X2wZKnpm0XORAeI6OJDXKZpHbVu7RsYE7RoNwwUfct
-         aJXCmwDhgqIEr40Hliycj8/QkthUgjnBY9GicG65BsHMwzJaKLU9GqgKm+Wrg/5ibd
-         75JgQIgXoVnOA==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, TimGuo-oc@zhaoxin.com,
-        CooperYan@zhaoxin.com, QiyuanWang@zhaoxin.com,
-        HerryYang@zhaoxin.com, CobeChen@zhaoxin.com, SilviaZhao@zhaoxin.com
-Subject: Re: [PATCH] crypto: x86/crc32c-intel - Don't match some Zhaoxin CPUs
-Message-ID: <X9Ov3RWDpUik7gXo@sol.localdomain>
-References: <1607686144-2604-1-git-send-email-TonyWWang-oc@zhaoxin.com>
+        Fri, 11 Dec 2020 13:33:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53988 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2394883AbgLKSd1 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Dec 2020 13:33:27 -0500
+Received: from smtp-42ab.mail.infomaniak.ch (smtp-42ab.mail.infomaniak.ch [IPv6:2001:1600:3:17::42ab])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C6EEC0613D6
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Dec 2020 10:32:35 -0800 (PST)
+Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
+        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Cszsp6KkXzlh8TL;
+        Fri, 11 Dec 2020 19:32:30 +0100 (CET)
+Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
+        by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Cszsm6CK0zlh8TF;
+        Fri, 11 Dec 2020 19:32:28 +0100 (CET)
+Subject: Re: [PATCH v1 4/9] certs: Check that builtin blacklist hashes are
+ valid
+To:     David Howells <dhowells@redhat.com>
+Cc:     David Woodhouse <dwmw2@infradead.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <jmorris@namei.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "Serge E . Hallyn" <serge@hallyn.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
+References: <20201120180426.922572-5-mic@digikod.net>
+ <20201120180426.922572-1-mic@digikod.net>
+ <1221725.1607515111@warthog.procyon.org.uk>
+From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+Message-ID: <492d0fe7-826a-ac8f-bc41-29718ab3bb60@digikod.net>
+Date:   Fri, 11 Dec 2020 19:32:28 +0100
+User-Agent: 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1607686144-2604-1-git-send-email-TonyWWang-oc@zhaoxin.com>
+In-Reply-To: <1221725.1607515111@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 11, 2020 at 07:29:04PM +0800, Tony W Wang-oc wrote:
-> The driver crc32c-intel match CPUs supporting X86_FEATURE_XMM4_2.
-> On platforms with Zhaoxin CPUs supporting this X86 feature, When
-> crc32c-intel and crc32c-generic are both registered, system will
-> use crc32c-intel because its .cra_priority is greater than
-> crc32c-generic. This case expect to use crc32c-generic driver for
-> some Zhaoxin CPUs to get performance gain, So remove these Zhaoxin
-> CPUs support from crc32c-intel.
+
+On 09/12/2020 12:58, David Howells wrote:
+> Mickaël Salaün <mic@digikod.net> wrote:
 > 
-> Signed-off-by: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+>> +      cmd_check_blacklist_hashes = $(AWK) -f scripts/check-blacklist-hashes.awk $(2); touch $@
+> 
+> The script name needs prefixing with $(srctree)/ so that it can be used with
+> alternative build directories.
 
-Does this mean that the performance of the crc32c instruction on those CPUs is
-actually slower than a regular C implementation?  That's very weird.
+Right
 
-- Eric
+> 
+> Note that doesn't apply to scripts/extract-cert in the same makefile as that's
+> a built program and is to be found in the build dir, not the sources.
+> 
+> Btw, I'm pulling some of your cleanups/fixes into my fixes branch.
+
+OK, thanks. I'll send a new patch series rebased on your branch.
+
+> 
+> David
+> 
