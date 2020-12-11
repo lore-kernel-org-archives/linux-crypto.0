@@ -2,94 +2,129 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3383C2BB40
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD24C1B0D8
 	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 12:29:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B816C23EB1
+	by mail.kernel.org (Postfix) with ESMTP id 964EC23FB3
 	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 12:29:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388064AbgLKM2x (ORCPT
+        id S2405941AbgLKM2w (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Dec 2020 07:28:53 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33376 "EHLO mail.kernel.org"
+        Fri, 11 Dec 2020 07:28:52 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33394 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2395552AbgLKM2U (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Dec 2020 07:28:20 -0500
+        id S2388064AbgLKM2W (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Dec 2020 07:28:22 -0500
 From:   Ard Biesheuvel <ardb@kernel.org>
 Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@google.com>
-Subject: [PATCH v2 0/2] crypto: remove bare cipher from public API
-Date:   Fri, 11 Dec 2020 13:27:13 +0100
-Message-Id: <20201211122715.15090-1-ardb@kernel.org>
+        Eric Biggers <ebiggers@google.com>,
+        Ayush Sawal <ayush.sawal@chelsio.com>,
+        Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
+        Rohit Maheshwari <rohitm@chelsio.com>
+Subject: [PATCH v2 1/2] chcr_ktls: use AES library for single use cipher
+Date:   Fri, 11 Dec 2020 13:27:14 +0100
+Message-Id: <20201211122715.15090-2-ardb@kernel.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20201211122715.15090-1-ardb@kernel.org>
+References: <20201211122715.15090-1-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Patch #2 puts the cipher API (which should not be used outside of the
-crypto API implementation) into an internal header file and module
-namespace
+Allocating a cipher via the crypto API only to free it again after using
+it to encrypt a single block is unnecessary in cases where the algorithm
+is known at compile time. So replace this pattern with a call to the AES
+library.
 
-Patch #1 is a prerequisite for this, to avoid having to make the chelsio
-driver import the crypto internal namespace.
+Cc: Ayush Sawal <ayush.sawal@chelsio.com>
+Cc: Vinay Kumar Yadav <vinay.yadav@chelsio.com>
+Cc: Rohit Maheshwari <rohitm@chelsio.com>
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ drivers/net/ethernet/chelsio/inline_crypto/Kconfig             |  1 +
+ drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c | 19 +++++++------------
+ 2 files changed, 8 insertions(+), 12 deletions(-)
 
-Changes since v1:
-- add missing Kconfig dependency on CRYPT_LIB_AES (#1)
-- add missing module namespace import into skcipher.c (#2) - this addresses
-  the kbuild failure report
-- add module import to QAT driver, which now contains a valid use of the
-  bare cipher API
-
-Cc: Eric Biggers <ebiggers@google.com>
-
-Ard Biesheuvel (2):
-  chcr_ktls: use AES library for single use cipher
-  crypto: remove cipher routines from public crypto API
-
- Documentation/crypto/api-skcipher.rst         |   4 +-
- arch/arm/crypto/aes-neonbs-glue.c             |   3 +
- arch/s390/crypto/aes_s390.c                   |   2 +
- crypto/adiantum.c                             |   2 +
- crypto/ansi_cprng.c                           |   2 +
- crypto/cbc.c                                  |   1 +
- crypto/ccm.c                                  |   2 +
- crypto/cfb.c                                  |   2 +
- crypto/cipher.c                               |   7 +-
- crypto/cmac.c                                 |   2 +
- crypto/ctr.c                                  |   2 +
- crypto/drbg.c                                 |   2 +
- crypto/ecb.c                                  |   1 +
- crypto/essiv.c                                |   2 +
- crypto/keywrap.c                              |   2 +
- crypto/ofb.c                                  |   2 +
- crypto/pcbc.c                                 |   2 +
- crypto/skcipher.c                             |   2 +
- crypto/testmgr.c                              |   3 +
- crypto/vmac.c                                 |   2 +
- crypto/xcbc.c                                 |   2 +
- crypto/xts.c                                  |   2 +
- drivers/crypto/geode-aes.c                    |   2 +
- drivers/crypto/inside-secure/safexcel.c       |   1 +
- drivers/crypto/inside-secure/safexcel_hash.c  |   1 +
- drivers/crypto/qat/qat_common/adf_ctl_drv.c   |   1 +
- drivers/crypto/qat/qat_common/qat_algs.c      |   1 +
- drivers/crypto/vmx/aes.c                      |   1 +
- drivers/crypto/vmx/vmx.c                      |   1 +
- .../ethernet/chelsio/inline_crypto/Kconfig    |   1 +
- .../chelsio/inline_crypto/ch_ktls/chcr_ktls.c |  19 +-
- include/crypto/algapi.h                       |  39 ----
- include/crypto/internal/cipher.h              | 218 ++++++++++++++++++
- include/crypto/internal/skcipher.h            |   1 +
- include/linux/crypto.h                        | 163 -------------
- 35 files changed, 281 insertions(+), 219 deletions(-)
- create mode 100644 include/crypto/internal/cipher.h
-
+diff --git a/drivers/net/ethernet/chelsio/inline_crypto/Kconfig b/drivers/net/ethernet/chelsio/inline_crypto/Kconfig
+index bc06e83fd3c6..521955e1f894 100644
+--- a/drivers/net/ethernet/chelsio/inline_crypto/Kconfig
++++ b/drivers/net/ethernet/chelsio/inline_crypto/Kconfig
+@@ -42,6 +42,7 @@ config CHELSIO_TLS_DEVICE
+         depends on CHELSIO_T4
+         depends on TLS
+         depends on TLS_DEVICE
++	select CRYPTO_LIB_AES
+         help
+           This flag enables support for kernel tls offload over Chelsio T6
+           crypto accelerator. CONFIG_CHELSIO_TLS_DEVICE flag can be enabled
+diff --git a/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c b/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
+index 5195f692f14d..e9b75cec34db 100644
+--- a/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
++++ b/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
+@@ -9,6 +9,7 @@
+ #include <linux/ip.h>
+ #include <net/ipv6.h>
+ #include <linux/netdevice.h>
++#include <crypto/aes.h>
+ #include "chcr_ktls.h"
+ 
+ static LIST_HEAD(uld_ctx_list);
+@@ -30,7 +31,7 @@ static int chcr_ktls_save_keys(struct chcr_ktls_info *tx_info,
+ 	unsigned char ghash_h[TLS_CIPHER_AES_GCM_256_TAG_SIZE];
+ 	struct tls12_crypto_info_aes_gcm_128 *info_128_gcm;
+ 	struct ktls_key_ctx *kctx = &tx_info->key_ctx;
+-	struct crypto_cipher *cipher;
++	struct crypto_aes_ctx aes_ctx;
+ 	unsigned char *key, *salt;
+ 
+ 	switch (crypto_info->cipher_type) {
+@@ -91,18 +92,14 @@ static int chcr_ktls_save_keys(struct chcr_ktls_info *tx_info,
+ 	/* Calculate the H = CIPH(K, 0 repeated 16 times).
+ 	 * It will go in key context
+ 	 */
+-	cipher = crypto_alloc_cipher("aes", 0, 0);
+-	if (IS_ERR(cipher)) {
+-		ret = -ENOMEM;
+-		goto out;
+-	}
+ 
+-	ret = crypto_cipher_setkey(cipher, key, keylen);
++	ret = aes_expandkey(&aes_ctx, key, keylen);
+ 	if (ret)
+-		goto out1;
++		goto out;
+ 
+ 	memset(ghash_h, 0, ghash_size);
+-	crypto_cipher_encrypt_one(cipher, ghash_h, ghash_h);
++	aes_encrypt(&aes_ctx, ghash_h, ghash_h);
++	memzero_explicit(&aes_ctx, sizeof(aes_ctx));
+ 
+ 	/* fill the Key context */
+ 	if (direction == TLS_OFFLOAD_CTX_DIR_TX) {
+@@ -111,7 +108,7 @@ static int chcr_ktls_save_keys(struct chcr_ktls_info *tx_info,
+ 						 key_ctx_size >> 4);
+ 	} else {
+ 		ret = -EINVAL;
+-		goto out1;
++		goto out;
+ 	}
+ 
+ 	memcpy(kctx->salt, salt, tx_info->salt_size);
+@@ -119,8 +116,6 @@ static int chcr_ktls_save_keys(struct chcr_ktls_info *tx_info,
+ 	memcpy(kctx->key + keylen, ghash_h, ghash_size);
+ 	tx_info->key_ctx_len = key_ctx_size;
+ 
+-out1:
+-	crypto_free_cipher(cipher);
+ out:
+ 	return ret;
+ }
 -- 
 2.17.1
 
