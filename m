@@ -5,36 +5,36 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE654C1B0D9
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 06:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 323F7C2BB9A
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 06:33:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A20E423B85
+	by mail.kernel.org (Postfix) with ESMTP id D1AA123ECD
 	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 06:33:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391191AbgLKGdW (ORCPT
+        id S2391416AbgLKGdW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 11 Dec 2020 01:33:22 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:9508 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391016AbgLKGdR (ORCPT
+Received: from szxga04-in.huawei.com ([45.249.212.190]:9183 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391107AbgLKGdV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Dec 2020 01:33:17 -0500
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CsgtS3Mzqzhqfn;
-        Fri, 11 Dec 2020 14:32:00 +0800 (CST)
+        Fri, 11 Dec 2020 01:33:21 -0500
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CsgtN0XclzkpNv;
+        Fri, 11 Dec 2020 14:31:56 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.24) by
  DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 11 Dec 2020 14:32:27 +0800
+ 14.3.487.0; Fri, 11 Dec 2020 14:32:28 +0800
 From:   Meng Yu <yumeng18@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>, <yumeng18@huawei.com>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH v4 1/5] crypto: hisilicon/hpre - add some updates to adapt to Kunpeng 930
-Date:   Fri, 11 Dec 2020 14:30:30 +0800
-Message-ID: <1607668234-46130-2-git-send-email-yumeng18@huawei.com>
+Subject: [PATCH v4 3/5] crypto: expose elliptic curve parameters as Crypto APIs
+Date:   Fri, 11 Dec 2020 14:30:32 +0800
+Message-ID: <1607668234-46130-4-git-send-email-yumeng18@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1607668234-46130-1-git-send-email-yumeng18@huawei.com>
 References: <1607668234-46130-1-git-send-email-yumeng18@huawei.com>
@@ -46,222 +46,265 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Hui Tang <tanghui20@huawei.com>
+Move elliptic curves definition to 'include/crypto/ecc_curve_defs.h',
+so all can use it,
 
-HPRE of Kunpeng 930 is updated on cluster numbers and configurations
-of Kunpeng 920 HPRE, so we try to update this driver to make it running
-okay on both chips.
-
-Signed-off-by: Hui Tang <tanghui20@huawei.com>
 Signed-off-by: Meng Yu <yumeng18@huawei.com>
 Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre.h      |  8 ++-
- drivers/crypto/hisilicon/hpre/hpre_main.c | 93 +++++++++++++++++++++----------
- 2 files changed, 68 insertions(+), 33 deletions(-)
+ crypto/ecc.c                    |  1 -
+ crypto/ecc.h                    | 37 +----------------
+ crypto/ecc_curve_defs.h         | 57 -------------------------
+ crypto/ecrdsa_defs.h            |  2 +-
+ include/crypto/ecc_curve_defs.h | 92 +++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 95 insertions(+), 94 deletions(-)
+ delete mode 100644 crypto/ecc_curve_defs.h
+ create mode 100644 include/crypto/ecc_curve_defs.h
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
-index e784712..cc50f23 100644
---- a/drivers/crypto/hisilicon/hpre/hpre.h
-+++ b/drivers/crypto/hisilicon/hpre/hpre.h
-@@ -14,8 +14,7 @@ enum {
- 	HPRE_CLUSTER0,
- 	HPRE_CLUSTER1,
- 	HPRE_CLUSTER2,
--	HPRE_CLUSTER3,
--	HPRE_CLUSTERS_NUM,
-+	HPRE_CLUSTER3
- };
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index c80aa25..f23efdd 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -35,7 +35,6 @@
+ #include <linux/ratelimit.h>
  
- enum hpre_ctrl_dbgfs_file {
-@@ -36,7 +35,10 @@ enum hpre_dfx_dbgfs_file {
- 	HPRE_DFX_FILE_NUM
- };
+ #include "ecc.h"
+-#include "ecc_curve_defs.h"
  
--#define HPRE_DEBUGFS_FILE_NUM    (HPRE_DEBUG_FILE_NUM + HPRE_CLUSTERS_NUM - 1)
-+#define HPRE_CLUSTERS_NUM_V2		(HPRE_CLUSTER3 + 1)
-+#define HPRE_CLUSTERS_NUM_V3		1
-+#define HPRE_CLUSTERS_NUM_MAX		HPRE_CLUSTERS_NUM_V2
-+#define HPRE_DEBUGFS_FILE_NUM (HPRE_DEBUG_FILE_NUM + HPRE_CLUSTERS_NUM_MAX - 1)
+ typedef struct {
+ 	u64 m_low;
+diff --git a/crypto/ecc.h b/crypto/ecc.h
+index d4e546b..e5afaf3 100644
+--- a/crypto/ecc.h
++++ b/crypto/ecc.h
+@@ -26,6 +26,8 @@
+ #ifndef _CRYPTO_ECC_H
+ #define _CRYPTO_ECC_H
  
- struct hpre_debugfs_file {
- 	int index;
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index e5c9919..fc7173a 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -29,6 +29,8 @@
- #define HPRE_BD_ARUSR_CFG		0x301030
- #define HPRE_BD_AWUSR_CFG		0x301034
- #define HPRE_TYPES_ENB			0x301038
-+#define HPRE_RSA_ENB			BIT(0)
-+#define HPRE_ECC_ENB			BIT(1)
- #define HPRE_DATA_RUSER_CFG		0x30103c
- #define HPRE_DATA_WUSER_CFG		0x301040
- #define HPRE_INT_MASK			0x301400
-@@ -73,7 +75,8 @@
- #define HPRE_QM_AXI_CFG_MASK		0xffff
- #define HPRE_QM_VFG_AX_MASK		0xff
- #define HPRE_BD_USR_MASK		0x3
--#define HPRE_CLUSTER_CORE_MASK		0xf
-+#define HPRE_CLUSTER_CORE_MASK_V2	0xf
-+#define HPRE_CLUSTER_CORE_MASK_V3	0xff
- 
- #define HPRE_AM_OOO_SHUTDOWN_ENB	0x301044
- #define HPRE_AM_OOO_SHUTDOWN_ENABLE	BIT(0)
-@@ -86,6 +89,11 @@
- #define HPRE_QM_PM_FLR			BIT(11)
- #define HPRE_QM_SRIOV_FLR		BIT(12)
- 
-+#define HPRE_CLUSTERS_NUM(qm)		\
-+	(((qm)->ver >= QM_HW_V3) ? HPRE_CLUSTERS_NUM_V3 : HPRE_CLUSTERS_NUM_V2)
-+#define HPRE_CLUSTER_CORE_MASK(qm)	\
-+	(((qm)->ver >= QM_HW_V3) ? HPRE_CLUSTER_CORE_MASK_V3 :\
-+		HPRE_CLUSTER_CORE_MASK_V2)
- #define HPRE_VIA_MSI_DSM		1
- #define HPRE_SQE_MASK_OFFSET		8
- #define HPRE_SQE_MASK_LEN		24
-@@ -238,8 +246,40 @@ static int hpre_cfg_by_dsm(struct hisi_qm *qm)
- 	return 0;
- }
- 
-+static int hpre_set_cluster(struct hisi_qm *qm)
-+{
-+	u32 cluster_core_mask = HPRE_CLUSTER_CORE_MASK(qm);
-+	u8 clusters_num = HPRE_CLUSTERS_NUM(qm);
-+	struct device *dev = &qm->pdev->dev;
-+	unsigned long offset;
-+	u32 val = 0;
-+	int ret, i;
++#include <crypto/ecc_curve_defs.h>
 +
-+	for (i = 0; i < clusters_num; i++) {
-+		offset = i * HPRE_CLSTR_ADDR_INTRVL;
-+
-+		/* clusters initiating */
-+		writel(cluster_core_mask,
-+		       HPRE_ADDR(qm, offset + HPRE_CORE_ENB));
-+		writel(0x1, HPRE_ADDR(qm, offset + HPRE_CORE_INI_CFG));
-+		ret = readl_relaxed_poll_timeout(HPRE_ADDR(qm, offset +
-+					HPRE_CORE_INI_STATUS), val,
-+					((val & cluster_core_mask) ==
-+					cluster_core_mask),
-+					HPRE_REG_RD_INTVRL_US,
-+					HPRE_REG_RD_TMOUT_US);
-+		if (ret) {
-+			dev_err(dev,
-+				"cluster %d int st status timeout!\n", i);
-+			return -ETIMEDOUT;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- /*
-- * For Hi1620, we shoul disable FLR triggered by hardware (BME/PM/SRIOV).
-+ * For Kunpeng 920, we shoul disable FLR triggered by hardware (BME/PM/SRIOV).
-  * Or it may stay in D3 state when we bind and unbind hpre quickly,
-  * as it does FLR triggered by hardware.
-  */
-@@ -257,9 +297,8 @@ static void disable_flr_of_bme(struct hisi_qm *qm)
- static int hpre_set_user_domain_and_cache(struct hisi_qm *qm)
- {
- 	struct device *dev = &qm->pdev->dev;
--	unsigned long offset;
--	int ret, i;
- 	u32 val;
-+	int ret;
+ /* One digit is u64 qword. */
+ #define ECC_CURVE_NIST_P192_DIGITS  3
+ #define ECC_CURVE_NIST_P256_DIGITS  4
+@@ -33,44 +35,9 @@
  
- 	writel(HPRE_QM_USR_CFG_MASK, HPRE_ADDR(qm, QM_ARUSER_M_CFG_ENABLE));
- 	writel(HPRE_QM_USR_CFG_MASK, HPRE_ADDR(qm, QM_AWUSER_M_CFG_ENABLE));
-@@ -270,7 +309,12 @@ static int hpre_set_user_domain_and_cache(struct hisi_qm *qm)
- 	val |= BIT(HPRE_TIMEOUT_ABNML_BIT);
- 	writel_relaxed(val, HPRE_ADDR(qm, HPRE_QM_ABNML_INT_MASK));
+ #define ECC_DIGITS_TO_BYTES_SHIFT 3
  
--	writel(0x1, HPRE_ADDR(qm, HPRE_TYPES_ENB));
-+	if (qm->ver >= QM_HW_V3)
-+		writel(HPRE_RSA_ENB | HPRE_ECC_ENB,
-+			HPRE_ADDR(qm, HPRE_TYPES_ENB));
-+	else
-+		writel(HPRE_RSA_ENB, HPRE_ADDR(qm, HPRE_TYPES_ENB));
-+
- 	writel(HPRE_QM_VFG_AX_MASK, HPRE_ADDR(qm, HPRE_VFG_AXCACHE));
- 	writel(0x0, HPRE_ADDR(qm, HPRE_BD_ENDIAN));
- 	writel(0x0, HPRE_ADDR(qm, HPRE_INT_MASK));
-@@ -291,37 +335,25 @@ static int hpre_set_user_domain_and_cache(struct hisi_qm *qm)
- 		return -ETIMEDOUT;
- 	}
- 
--	for (i = 0; i < HPRE_CLUSTERS_NUM; i++) {
--		offset = i * HPRE_CLSTR_ADDR_INTRVL;
+-/**
+- * struct ecc_point - elliptic curve point in affine coordinates
+- *
+- * @x:		X coordinate in vli form.
+- * @y:		Y coordinate in vli form.
+- * @ndigits:	Length of vlis in u64 qwords.
+- */
+-struct ecc_point {
+-	u64 *x;
+-	u64 *y;
+-	u8 ndigits;
+-};
 -
--		/* clusters initiating */
--		writel(HPRE_CLUSTER_CORE_MASK,
--		       HPRE_ADDR(qm, offset + HPRE_CORE_ENB));
--		writel(0x1, HPRE_ADDR(qm, offset + HPRE_CORE_INI_CFG));
--		ret = readl_relaxed_poll_timeout(HPRE_ADDR(qm, offset +
--					HPRE_CORE_INI_STATUS), val,
--					((val & HPRE_CLUSTER_CORE_MASK) ==
--					HPRE_CLUSTER_CORE_MASK),
--					HPRE_REG_RD_INTVRL_US,
--					HPRE_REG_RD_TMOUT_US);
--		if (ret) {
--			dev_err(dev,
--				"cluster %d int st status timeout!\n", i);
--			return -ETIMEDOUT;
--		}
--	}
+ #define ECC_POINT_INIT(x, y, ndigits)	(struct ecc_point) { x, y, ndigits }
+ 
+ /**
+- * struct ecc_curve - definition of elliptic curve
+- *
+- * @name:	Short name of the curve.
+- * @g:		Generator point of the curve.
+- * @p:		Prime number, if Barrett's reduction is used for this curve
+- *		pre-calculated value 'mu' is appended to the @p after ndigits.
+- *		Use of Barrett's reduction is heuristically determined in
+- *		vli_mmod_fast().
+- * @n:		Order of the curve group.
+- * @a:		Curve parameter a.
+- * @b:		Curve parameter b.
+- */
+-struct ecc_curve {
+-	char *name;
+-	struct ecc_point g;
+-	u64 *p;
+-	u64 *n;
+-	u64 *a;
+-	u64 *b;
+-};
 -
--	ret = hpre_cfg_by_dsm(qm);
-+	ret = hpre_set_cluster(qm);
- 	if (ret)
--		dev_err(dev, "acpi_evaluate_dsm err.\n");
-+		return -ETIMEDOUT;
+-/**
+  * ecc_is_key_valid() - Validate a given ECDH private key
+  *
+  * @curve_id:		id representing the curve to use
+diff --git a/crypto/ecc_curve_defs.h b/crypto/ecc_curve_defs.h
+deleted file mode 100644
+index 69be6c7..0000000
+--- a/crypto/ecc_curve_defs.h
++++ /dev/null
+@@ -1,57 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _CRYTO_ECC_CURVE_DEFS_H
+-#define _CRYTO_ECC_CURVE_DEFS_H
+-
+-/* NIST P-192: a = p - 3 */
+-static u64 nist_p192_g_x[] = { 0xF4FF0AFD82FF1012ull, 0x7CBF20EB43A18800ull,
+-				0x188DA80EB03090F6ull };
+-static u64 nist_p192_g_y[] = { 0x73F977A11E794811ull, 0x631011ED6B24CDD5ull,
+-				0x07192B95FFC8DA78ull };
+-static u64 nist_p192_p[] = { 0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFFFFFFFFFEull,
+-				0xFFFFFFFFFFFFFFFFull };
+-static u64 nist_p192_n[] = { 0x146BC9B1B4D22831ull, 0xFFFFFFFF99DEF836ull,
+-				0xFFFFFFFFFFFFFFFFull };
+-static u64 nist_p192_a[] = { 0xFFFFFFFFFFFFFFFCull, 0xFFFFFFFFFFFFFFFEull,
+-				0xFFFFFFFFFFFFFFFFull };
+-static u64 nist_p192_b[] = { 0xFEB8DEECC146B9B1ull, 0x0FA7E9AB72243049ull,
+-				0x64210519E59C80E7ull };
+-static struct ecc_curve nist_p192 = {
+-	.name = "nist_192",
+-	.g = {
+-		.x = nist_p192_g_x,
+-		.y = nist_p192_g_y,
+-		.ndigits = 3,
+-	},
+-	.p = nist_p192_p,
+-	.n = nist_p192_n,
+-	.a = nist_p192_a,
+-	.b = nist_p192_b
+-};
+-
+-/* NIST P-256: a = p - 3 */
+-static u64 nist_p256_g_x[] = { 0xF4A13945D898C296ull, 0x77037D812DEB33A0ull,
+-				0xF8BCE6E563A440F2ull, 0x6B17D1F2E12C4247ull };
+-static u64 nist_p256_g_y[] = { 0xCBB6406837BF51F5ull, 0x2BCE33576B315ECEull,
+-				0x8EE7EB4A7C0F9E16ull, 0x4FE342E2FE1A7F9Bull };
+-static u64 nist_p256_p[] = { 0xFFFFFFFFFFFFFFFFull, 0x00000000FFFFFFFFull,
+-				0x0000000000000000ull, 0xFFFFFFFF00000001ull };
+-static u64 nist_p256_n[] = { 0xF3B9CAC2FC632551ull, 0xBCE6FAADA7179E84ull,
+-				0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFF00000000ull };
+-static u64 nist_p256_a[] = { 0xFFFFFFFFFFFFFFFCull, 0x00000000FFFFFFFFull,
+-				0x0000000000000000ull, 0xFFFFFFFF00000001ull };
+-static u64 nist_p256_b[] = { 0x3BCE3C3E27D2604Bull, 0x651D06B0CC53B0F6ull,
+-				0xB3EBBD55769886BCull, 0x5AC635D8AA3A93E7ull };
+-static struct ecc_curve nist_p256 = {
+-	.name = "nist_256",
+-	.g = {
+-		.x = nist_p256_g_x,
+-		.y = nist_p256_g_y,
+-		.ndigits = 4,
+-	},
+-	.p = nist_p256_p,
+-	.n = nist_p256_n,
+-	.a = nist_p256_a,
+-	.b = nist_p256_b
+-};
+-
+-#endif
+diff --git a/crypto/ecrdsa_defs.h b/crypto/ecrdsa_defs.h
+index 170baf0..2074099 100644
+--- a/crypto/ecrdsa_defs.h
++++ b/crypto/ecrdsa_defs.h
+@@ -13,7 +13,7 @@
+ #ifndef _CRYTO_ECRDSA_DEFS_H
+ #define _CRYTO_ECRDSA_DEFS_H
  
--	disable_flr_of_bme(qm);
-+	/* This setting is only needed by Kunpeng 920. */
-+	if (qm->ver == QM_HW_V2) {
-+		ret = hpre_cfg_by_dsm(qm);
-+		if (ret)
-+			dev_err(dev, "acpi_evaluate_dsm err.\n");
+-#include "ecc.h"
++#include <crypto/ecc_curve_defs.h>
+ 
+ #define ECRDSA_MAX_SIG_SIZE (2 * 512 / 8)
+ #define ECRDSA_MAX_DIGITS (512 / 64)
+diff --git a/include/crypto/ecc_curve_defs.h b/include/crypto/ecc_curve_defs.h
+new file mode 100644
+index 0000000..1080766
+--- /dev/null
++++ b/include/crypto/ecc_curve_defs.h
+@@ -0,0 +1,92 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _CRYTO_ECC_CURVE_DEFS_H
++#define _CRYTO_ECC_CURVE_DEFS_H
 +
-+		disable_flr_of_bme(qm);
-+	}
- 
- 	return ret;
- }
- 
- static void hpre_cnt_regs_clear(struct hisi_qm *qm)
- {
-+	u8 clusters_num = HPRE_CLUSTERS_NUM(qm);
- 	unsigned long offset;
- 	int i;
- 
-@@ -330,7 +362,7 @@ static void hpre_cnt_regs_clear(struct hisi_qm *qm)
- 	writel(0x0, qm->io_base + QM_DFX_DB_CNT_VF);
- 
- 	/* clear clusterX/cluster_ctrl */
--	for (i = 0; i < HPRE_CLUSTERS_NUM; i++) {
-+	for (i = 0; i < clusters_num; i++) {
- 		offset = HPRE_CLSTR_BASE + i * HPRE_CLSTR_ADDR_INTRVL;
- 		writel(0x0, qm->io_base + offset + HPRE_CLUSTER_INQURY);
- 	}
-@@ -629,13 +661,14 @@ static int hpre_pf_comm_regs_debugfs_init(struct hisi_qm *qm)
- 
- static int hpre_cluster_debugfs_init(struct hisi_qm *qm)
- {
-+	u8 clusters_num = HPRE_CLUSTERS_NUM(qm);
- 	struct device *dev = &qm->pdev->dev;
- 	char buf[HPRE_DBGFS_VAL_MAX_LEN];
- 	struct debugfs_regset32 *regset;
- 	struct dentry *tmp_d;
- 	int i, ret;
- 
--	for (i = 0; i < HPRE_CLUSTERS_NUM; i++) {
-+	for (i = 0; i < clusters_num; i++) {
- 		ret = snprintf(buf, HPRE_DBGFS_VAL_MAX_LEN, "cluster%d", i);
- 		if (ret < 0)
- 			return -EINVAL;
++/**
++ * struct ecc_point - elliptic curve point in affine coordinates
++ *
++ * @x:		X coordinate in vli form.
++ * @y:		Y coordinate in vli form.
++ * @ndigits:	Length of vlis in u64 qwords.
++ */
++struct ecc_point {
++	u64 *x;
++	u64 *y;
++	u8 ndigits;
++};
++
++/**
++ * struct ecc_curve - definition of elliptic curve
++ *
++ * @name:	Short name of the curve.
++ * @g:		Generator point of the curve.
++ * @p:		Prime number, if Barrett's reduction is used for this curve
++ *		pre-calculated value 'mu' is appended to the @p after ndigits.
++ *		Use of Barrett's reduction is heuristically determined in
++ *		vli_mmod_fast().
++ * @n:		Order of the curve group.
++ * @a:		Curve parameter a.
++ * @b:		Curve parameter b.
++ */
++struct ecc_curve {
++	char *name;
++	struct ecc_point g;
++	u64 *p;
++	u64 *n;
++	u64 *a;
++	u64 *b;
++};
++
++/* NIST P-192: a = p - 3 */
++static u64 nist_p192_g_x[] = { 0xF4FF0AFD82FF1012ull, 0x7CBF20EB43A18800ull,
++				0x188DA80EB03090F6ull };
++static u64 nist_p192_g_y[] = { 0x73F977A11E794811ull, 0x631011ED6B24CDD5ull,
++				0x07192B95FFC8DA78ull };
++static u64 nist_p192_p[] = { 0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFFFFFFFFFEull,
++				0xFFFFFFFFFFFFFFFFull };
++static u64 nist_p192_n[] = { 0x146BC9B1B4D22831ull, 0xFFFFFFFF99DEF836ull,
++				0xFFFFFFFFFFFFFFFFull };
++static u64 nist_p192_a[] = { 0xFFFFFFFFFFFFFFFCull, 0xFFFFFFFFFFFFFFFEull,
++				0xFFFFFFFFFFFFFFFFull };
++static u64 nist_p192_b[] = { 0xFEB8DEECC146B9B1ull, 0x0FA7E9AB72243049ull,
++				0x64210519E59C80E7ull };
++static struct ecc_curve nist_p192 = {
++	.name = "nist_192",
++	.g = {
++		.x = nist_p192_g_x,
++		.y = nist_p192_g_y,
++		.ndigits = 3,
++	},
++	.p = nist_p192_p,
++	.n = nist_p192_n,
++	.a = nist_p192_a,
++	.b = nist_p192_b
++};
++
++/* NIST P-256: a = p - 3 */
++static u64 nist_p256_g_x[] = { 0xF4A13945D898C296ull, 0x77037D812DEB33A0ull,
++				0xF8BCE6E563A440F2ull, 0x6B17D1F2E12C4247ull };
++static u64 nist_p256_g_y[] = { 0xCBB6406837BF51F5ull, 0x2BCE33576B315ECEull,
++				0x8EE7EB4A7C0F9E16ull, 0x4FE342E2FE1A7F9Bull };
++static u64 nist_p256_p[] = { 0xFFFFFFFFFFFFFFFFull, 0x00000000FFFFFFFFull,
++				0x0000000000000000ull, 0xFFFFFFFF00000001ull };
++static u64 nist_p256_n[] = { 0xF3B9CAC2FC632551ull, 0xBCE6FAADA7179E84ull,
++				0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFF00000000ull };
++static u64 nist_p256_a[] = { 0xFFFFFFFFFFFFFFFCull, 0x00000000FFFFFFFFull,
++				0x0000000000000000ull, 0xFFFFFFFF00000001ull };
++static u64 nist_p256_b[] = { 0x3BCE3C3E27D2604Bull, 0x651D06B0CC53B0F6ull,
++				0xB3EBBD55769886BCull, 0x5AC635D8AA3A93E7ull };
++static struct ecc_curve nist_p256 = {
++	.name = "nist_256",
++	.g = {
++		.x = nist_p256_g_x,
++		.y = nist_p256_g_y,
++		.ndigits = 4,
++	},
++	.p = nist_p256_p,
++	.n = nist_p256_n,
++	.a = nist_p256_a,
++	.b = nist_p256_b
++};
++
++#endif
 -- 
 2.8.1
 
