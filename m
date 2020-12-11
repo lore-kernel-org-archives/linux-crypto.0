@@ -2,71 +2,73 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D47C2BBCA
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 10:09:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB05CC4361B
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 10:11:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2639F23F57
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 10:09:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88F3922D72
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Dec 2020 10:11:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387811AbgLKKJD (ORCPT
+        id S1727043AbgLKKLL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Dec 2020 05:09:03 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:33354 "EHLO fornost.hmeau.com"
+        Fri, 11 Dec 2020 05:11:11 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:33372 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2394175AbgLKKIn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Dec 2020 05:08:43 -0500
+        id S1731557AbgLKKKm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Dec 2020 05:10:42 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1knfL2-0004mr-6E; Fri, 11 Dec 2020 21:07:49 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Dec 2020 21:07:48 +1100
-Date:   Fri, 11 Dec 2020 21:07:48 +1100
+        id 1knfMu-0004qD-WF; Fri, 11 Dec 2020 21:09:46 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Dec 2020 21:09:45 +1100
+Date:   Fri, 11 Dec 2020 21:09:45 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Marco Chiappero <marco.chiappero@intel.com>,
-        Tomaszx Kowalik <tomaszx.kowalik@intel.com>
-Subject: Re: [PATCH 2/3] crypto: qat - add AES-XTS support for QAT GEN4
- devices
-Message-ID: <20201211100748.GA994@gondor.apana.org.au>
-References: <20201201142451.138221-1-giovanni.cabiddu@intel.com>
- <20201201142451.138221-3-giovanni.cabiddu@intel.com>
+To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Cc:     "Iuliana Prodan (OSS)" <iuliana.prodan@oss.nxp.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Subject: Re: [PATCH 0/5] crypto: caam - avoid allocating memory at crypto
+ request runtime
+Message-ID: <20201211100944.GA1133@gondor.apana.org.au>
+References: <20201203013524.30495-1-iuliana.prodan@oss.nxp.com>
+ <d454a0da-395d-3893-9ae1-f52236bcdde8@nxp.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20201201142451.138221-3-giovanni.cabiddu@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d454a0da-395d-3893-9ae1-f52236bcdde8@nxp.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 01, 2020 at 02:24:50PM +0000, Giovanni Cabiddu wrote:
+On Thu, Dec 10, 2020 at 10:28:35AM +0200, Horia Geantă wrote:
 >
-> @@ -1293,6 +1366,12 @@ static int qat_alg_skcipher_init_xts_tfm(struct crypto_skcipher *tfm)
->  	if (IS_ERR(ctx->ftfm))
->  		return PTR_ERR(ctx->ftfm);
->  
-> +	ctx->tweak = crypto_alloc_cipher("aes", 0, 0);
-> +	if (IS_ERR(ctx->tweak)) {
-> +		crypto_free_skcipher(ctx->ftfm);
-> +		return PTR_ERR(ctx->tweak);
-> +	}
-> +
->  	reqsize = max(sizeof(struct qat_crypto_request),
->  		      sizeof(struct skcipher_request) +
->  		      crypto_skcipher_reqsize(ctx->ftfm));
+> Moving the memory allocations from caam driver into the generic crypto API
+> has the side effect of dropping the GFP_DMA allocation flag.
+> 
+> For cases when caam device is limited to 32-bit address space and
+> there's no IOMMU, this could lead to DMA API using bounce buffering.
+> 
+> We need to measure the performance impact of this change before deciding
+> what we should do next.
 
-This may clash with the work that Ard is doing on simpler ciphers.
+This only applies to the control data, right? The actual data
+being operated on surely is the most important factor.
 
-So I think this should switch over to using the library interface
-for aes.  What do you think Ard?
+In any case, did you respond to Ard's concern about potentially
+exhausting DMA memory?
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
