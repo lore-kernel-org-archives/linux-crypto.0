@@ -2,122 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_03_06,
-	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 620E8C433FE
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Dec 2020 10:24:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D8A3C4361B
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Dec 2020 10:55:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01FF822D50
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Dec 2020 10:24:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66FFF230FF
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Dec 2020 10:55:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438604AbgLLKYp (ORCPT
+        id S2438818AbgLLKy7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 12 Dec 2020 05:24:45 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45164 "EHLO mail.kernel.org"
+        Sat, 12 Dec 2020 05:54:59 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56384 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2438603AbgLLKYj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 12 Dec 2020 05:24:39 -0500
-X-Gm-Message-State: AOAM530+xaKNxs4IWX1vFwtED/as/jioTycSy3Eh0CYZlSA4DYbIJyuX
-        O7VwYUjl4qGKHPoyoahQNjXk93NY75eoqGIQkT0=
+        id S1726591AbgLLKy7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 12 Dec 2020 05:54:59 -0500
+X-Gm-Message-State: AOAM530MgMyFxV64AKMHo3/fqrGgkMYA46ZH1Q7F0pR3uRNBZzNKIgli
+        pbahEjyBu04PfwTzrdC2uMNiaHKTDGyXmOLIIm8=
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607757876;
-        bh=LFk/bFbBaLa8sIoViCOS2xA/UMpCtW509dPSQj5OyiE=;
+        s=k20201202; t=1607770458;
+        bh=I2k6JcKef6p2Y07EpasqSQz/C60x4ofi+mzysUW+G74=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=arcrHA9ncebBDfw1C3V6f9qVIK60eQq3GVSLtZEzWgZYXZr4ZMZw4DuD/G2Tvi2Y8
-         KahzvF97RIVz0Qsx4D+c+F0rtHXqRMm/RQC7VpRrHbt2fhmh0c2bADHEmhfkdNNxey
-         vbqW+wBzRD3wzTMb0DghLYFk9DJa2V1ZEo77TbiQQLXbXHlQR1OGRlPURn6zkdLgKK
-         zkJ+VxVfGVxzm/7Zu6lPhZJbCtSET7AORswKTscpnSzOD2Hinb2V5LyhLZ4PYKjakO
-         l6FUlDbr+PnDw48r8f9XA3I1/FEmemIA5I9c7gqaSoEdG6HCna2LlNbfil9ea8OLTs
-         Od22f4a4GDv5A==
-X-Google-Smtp-Source: ABdhPJylaMOKQi6GzGcqMhPxzXajQQBBGN9gqe1QPIbCuZ2QCaiQvKAal+b7kiraHyAPn2eqyO9JuUqtKXfk1AcBBjQ=
-X-Received: by 2002:aca:b809:: with SMTP id i9mr12007508oif.174.1607757875411;
- Fri, 11 Dec 2020 23:24:35 -0800 (PST)
+        b=R/u+XyxMYztIqz8elA/Sbr1Ln9z4A8v83dLt3pCpLOD/ZbY1zpSX1Yomgz6SflZrU
+         LMvGh6LS3Tja5Li8eCYqSENBJc6/0usA0wIhkEK/I8prf+6p3i/mOxV92bpCsdz5av
+         utUoGJrT8BdlMWKJFR830qULVrpSuy4XleiRLctvklEk+nD6b0riDEyo+E4teI3Mcf
+         8un+dmK7m+f4tTG0tQtLHpDokw01aO2T9OUeSTlR1IlkhKUBk5swqAO5yG4K7S7txC
+         CcI75E11StEX6xBMTUp+8huAH6NLFuJ9Ti87z0aY0cj2zqkXsl0uVdzm0CXqAaOqH+
+         LH92h+vWMxm/Q==
+X-Google-Smtp-Source: ABdhPJzTVu8UnT9t8lYDnzh23onvGBawiayLuGYYV5y7vjFoQ76zU9aHbwkc5nGeieLtu61vp0i14GB6Mi/WOJPGPyE=
+X-Received: by 2002:a05:6830:1c24:: with SMTP id f4mr12718462ote.108.1607770458126;
+ Sat, 12 Dec 2020 02:54:18 -0800 (PST)
 MIME-Version: 1.0
-References: <20201103162809.28167-1-ardb@kernel.org> <X9RmlccBrwoY7zXS@sol.localdomain>
-In-Reply-To: <X9RmlccBrwoY7zXS@sol.localdomain>
+References: <1607686144-2604-1-git-send-email-TonyWWang-oc@zhaoxin.com>
+ <X9Ov3RWDpUik7gXo@sol.localdomain> <CAMj1kXEDjQG_my5FWVY+b7Q43-_waW74sZyBAPCkd7EEdku+Rw@mail.gmail.com>
+In-Reply-To: <CAMj1kXEDjQG_my5FWVY+b7Q43-_waW74sZyBAPCkd7EEdku+Rw@mail.gmail.com>
 From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Sat, 12 Dec 2020 08:24:24 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXEyZXKiiO55qRMyTGkThBspGnPAFdxRkc+d9H29AmhoZQ@mail.gmail.com>
-Message-ID: <CAMj1kXEyZXKiiO55qRMyTGkThBspGnPAFdxRkc+d9H29AmhoZQ@mail.gmail.com>
-Subject: Re: [PATCH v2] crypto: arm/chacha-neon - optimize for non-block size multiples
+Date:   Sat, 12 Dec 2020 11:54:07 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXH=u7+_DSEsUmFbtgGdPqCUs=AfTqX0mgL+DYvW2hAc8g@mail.gmail.com>
+Message-ID: <CAMj1kXH=u7+_DSEsUmFbtgGdPqCUs=AfTqX0mgL+DYvW2hAc8g@mail.gmail.com>
+Subject: Re: [PATCH] crypto: x86/crc32c-intel - Don't match some Zhaoxin CPUs
 To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+Cc:     Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        TimGuo-oc@zhaoxin.com, CooperYan@zhaoxin.com,
+        QiyuanWang@zhaoxin.com, HerryYang@zhaoxin.com,
+        CobeChen@zhaoxin.com, SilviaZhao@zhaoxin.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 12 Dec 2020 at 07:43, Eric Biggers <ebiggers@kernel.org> wrote:
+On Sat, 12 Dec 2020 at 10:36, Ard Biesheuvel <ardb@kernel.org> wrote:
 >
-> Hi Ard,
->
-> On Tue, Nov 03, 2020 at 05:28:09PM +0100, Ard Biesheuvel wrote:
-> > @@ -42,24 +42,24 @@ static void chacha_doneon(u32 *state, u8 *dst, const u8 *src,
-> >  {
-> >       u8 buf[CHACHA_BLOCK_SIZE];
+> On Fri, 11 Dec 2020 at 20:07, Eric Biggers <ebiggers@kernel.org> wrote:
 > >
-> > -     while (bytes >= CHACHA_BLOCK_SIZE * 4) {
-> > -             chacha_4block_xor_neon(state, dst, src, nrounds);
-> > -             bytes -= CHACHA_BLOCK_SIZE * 4;
-> > -             src += CHACHA_BLOCK_SIZE * 4;
-> > -             dst += CHACHA_BLOCK_SIZE * 4;
-> > -             state[12] += 4;
-> > -     }
-> > -     while (bytes >= CHACHA_BLOCK_SIZE) {
-> > -             chacha_block_xor_neon(state, dst, src, nrounds);
-> > -             bytes -= CHACHA_BLOCK_SIZE;
-> > -             src += CHACHA_BLOCK_SIZE;
-> > -             dst += CHACHA_BLOCK_SIZE;
-> > -             state[12]++;
-> > +     while (bytes > CHACHA_BLOCK_SIZE) {
-> > +             unsigned int l = min(bytes, CHACHA_BLOCK_SIZE * 4U);
-> > +
-> > +             chacha_4block_xor_neon(state, dst, src, nrounds, l);
-> > +             bytes -= l;
-> > +             src += l;
-> > +             dst += l;
-> > +             state[12] += DIV_ROUND_UP(l, CHACHA_BLOCK_SIZE);
-> >       }
-> >       if (bytes) {
-> > -             memcpy(buf, src, bytes);
-> > -             chacha_block_xor_neon(state, buf, buf, nrounds);
-> > -             memcpy(dst, buf, bytes);
-> > +             const u8 *s = src;
-> > +             u8 *d = dst;
-> > +
-> > +             if (bytes != CHACHA_BLOCK_SIZE)
-> > +                     s = d = memcpy(buf, src, bytes);
-> > +             chacha_block_xor_neon(state, d, s, nrounds);
-> > +             if (d != dst)
-> > +                     memcpy(dst, buf, bytes);
-> >       }
-> >  }
+> > On Fri, Dec 11, 2020 at 07:29:04PM +0800, Tony W Wang-oc wrote:
+> > > The driver crc32c-intel match CPUs supporting X86_FEATURE_XMM4_2.
+> > > On platforms with Zhaoxin CPUs supporting this X86 feature, When
+> > > crc32c-intel and crc32c-generic are both registered, system will
+> > > use crc32c-intel because its .cra_priority is greater than
+> > > crc32c-generic. This case expect to use crc32c-generic driver for
+> > > some Zhaoxin CPUs to get performance gain, So remove these Zhaoxin
+> > > CPUs support from crc32c-intel.
+> > >
+> > > Signed-off-by: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+> >
+> > Does this mean that the performance of the crc32c instruction on those CPUs is
+> > actually slower than a regular C implementation?  That's very weird.
 > >
 >
-> Shouldn't this be incrementing the block counter after chacha_block_xor_neon()?
-> It might be needed by the library API.
+> This driver does not use CRC instructions, but carryless
+> multiplication and aggregation. So I suppose the pclmulqdq instruction
+> triggers some pathological performance limitation here.
 >
 
-Yeah, good point. 'bytes' could be exactly CHACHA_BLOCK_SIZE now,
-which wasn't the case before.
+Just noticed it uses both crc instructions and pclmulqdq instructions.
+Sorry for the noise.
 
-I'll send a fix.
+> That means the crct10dif driver probably needs the same treatment.
 
-> Also, even with that fixed, this patch is causing the self-tests (both the
-> chacha20poly1305_selftest(), and the crypto API tests for chacha20-neon,
-> xchacha20-neon, and xchacha12-neon) to fail when I boot a kernel in QEMU.  This
-> doesn't happen on real hardware (Raspberry Pi 2), and I don't see any other bugs
-> in this patch, so I'm not sure what the problem is.  Did you run the self-tests
-> on every platform you tested this on?
->
-
-Does your QEMU lack this patch? I found that bug working on this code.
-
-https://git.qemu.org/?p=qemu.git;a=commitdiff;h=604cef3e57eaeeef77074d78f6cf2eca1be11c62
+Tony, can you confirm that the problem is in the CRC instructions and
+not in the PCLMULQDQ code path that supersedes it when available?
