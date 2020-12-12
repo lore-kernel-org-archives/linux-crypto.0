@@ -3,85 +3,125 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76957C433FE
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Dec 2020 19:48:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 287C2C19425
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Dec 2020 19:49:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 24FD922B30
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Dec 2020 19:48:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC72D22EBE
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Dec 2020 19:49:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407774AbgLLTsI (ORCPT
+        id S2407835AbgLLTsy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 12 Dec 2020 14:48:08 -0500
-Received: from mail.kernel.org ([198.145.29.99]:42830 "EHLO mail.kernel.org"
+        Sat, 12 Dec 2020 14:48:54 -0500
+Received: from mail.kernel.org ([198.145.29.99]:43008 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726486AbgLLTsI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 12 Dec 2020 14:48:08 -0500
-Date:   Sat, 12 Dec 2020 11:47:26 -0800
+        id S2407792AbgLLTsu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 12 Dec 2020 14:48:50 -0500
+Date:   Sat, 12 Dec 2020 11:48:08 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607802448;
-        bh=vNFu1FQqXn693Eeq23d8uH8kLV3j5vVMLIyTP5bgQHM=;
+        s=k20201202; t=1607802489;
+        bh=3aKr4v+i7KrJ+/Nfda/fGXDWB/9VCxMZkwZGpDIuFKY=;
         h=From:To:Cc:Subject:References:In-Reply-To:From;
-        b=psf59Wn8qrDbR/ptPO1SiHhVgC3vnxPRWwAvRQIgP/vWgK4CU2mOA9r8rGbeD8dyf
-         BOPDEO7rg+XDciE0toY5QQEAvAQihGVQIMt8nOWgPFoNLXOS/IKvSo0WKCeaayQq1N
-         62sO6ue+rsdmaKTLu26EgGeWI8+z8IDU0nL1WmjCIcjlAOp8/jpHCfkIw05jtWd43w
-         3xXzWXN/tUkdoxCT4hLmZ/2JBIVOMu2sdxfDeADVFocCi+g5M03cYSO1X8ZhRmUXzS
-         6oO5D4VjUDDxtH0XFKOqgxLaPcOCcjhVEJyvnpcLdrlrc4KAliE/3QhOxqMoKGxjIw
-         zQxu0zvAY3Ifw==
+        b=WpFQpG5qolNpv1gtAFkxVPl1ZGnKqa0PxiDR7lnBFMHq4WJxxrXn4+wDLAKroYAlx
+         sHe6tdiopSV/LI4mkthukp9XJ1f2Zx9Tj13vM4HLlsRkliNJYsKo9N6qs362i/sB+r
+         +8vY/dm6Gew0DlA/QUJYWEHmFxeBt8mLPDvAtrcLEcZyjYMYqtyzNXUEk1GrsGrHQc
+         JIquqwX/wLM0VOAjZFqNQFAhspekIF4QTqr1hbFpJn+UHIdjF51e6XFywbywYUHsKF
+         fgzYT61lQZz2SCVi1PW174lDUvq19GtCbPl+zaiKrWl3PT0oYrsyvhCn1u8dZ07y4W
+         Dkg/IjQXKmJtg==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-Subject: Re: [PATCH] crypto: arm/chacha-neon - add missing counter increment
-Message-ID: <X9UeTo2uHdepDLsq@sol.localdomain>
-References: <20201212083243.27073-1-ardb@kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH v2] crypto: arm/chacha-neon - optimize for non-block size
+ multiples
+Message-ID: <X9UeeOMVi/fxkVkX@sol.localdomain>
+References: <20201103162809.28167-1-ardb@kernel.org>
+ <X9RmlccBrwoY7zXS@sol.localdomain>
+ <CAMj1kXEyZXKiiO55qRMyTGkThBspGnPAFdxRkc+d9H29AmhoZQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201212083243.27073-1-ardb@kernel.org>
+In-Reply-To: <CAMj1kXEyZXKiiO55qRMyTGkThBspGnPAFdxRkc+d9H29AmhoZQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Dec 12, 2020 at 09:32:43AM +0100, Ard Biesheuvel wrote:
-> Commit 86cd97ec4b943af3 ("crypto: arm/chacha-neon - optimize for non-block
-> size multiples") refactored the chacha block handling in the glue code in
-> a way that may result in the counter increment to be omitted when calling
-> chacha_block_xor_neon() to process a full block. This violates the API,
-> which requires that the output IV is suitable for handling more input as
-> long as the preceding input has been presented in round multiples of the
-> block size.
-
-It appears that the library API actually requires that the counter be
-incremented on partial blocks too.  See __chacha20poly1305_encrypt().
-
-I guess the missing increment in chacha_doneon() just wasn't noticed before
-because chacha20poly1305 only needs this behavior on 32-byte inputs, and
-chacha_doneon() is only executed when the length is over 64 bytes.
-
+On Sat, Dec 12, 2020 at 08:24:24AM +0100, Ard Biesheuvel wrote:
+> On Sat, 12 Dec 2020 at 07:43, Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > Hi Ard,
+> >
+> > On Tue, Nov 03, 2020 at 05:28:09PM +0100, Ard Biesheuvel wrote:
+> > > @@ -42,24 +42,24 @@ static void chacha_doneon(u32 *state, u8 *dst, const u8 *src,
+> > >  {
+> > >       u8 buf[CHACHA_BLOCK_SIZE];
+> > >
+> > > -     while (bytes >= CHACHA_BLOCK_SIZE * 4) {
+> > > -             chacha_4block_xor_neon(state, dst, src, nrounds);
+> > > -             bytes -= CHACHA_BLOCK_SIZE * 4;
+> > > -             src += CHACHA_BLOCK_SIZE * 4;
+> > > -             dst += CHACHA_BLOCK_SIZE * 4;
+> > > -             state[12] += 4;
+> > > -     }
+> > > -     while (bytes >= CHACHA_BLOCK_SIZE) {
+> > > -             chacha_block_xor_neon(state, dst, src, nrounds);
+> > > -             bytes -= CHACHA_BLOCK_SIZE;
+> > > -             src += CHACHA_BLOCK_SIZE;
+> > > -             dst += CHACHA_BLOCK_SIZE;
+> > > -             state[12]++;
+> > > +     while (bytes > CHACHA_BLOCK_SIZE) {
+> > > +             unsigned int l = min(bytes, CHACHA_BLOCK_SIZE * 4U);
+> > > +
+> > > +             chacha_4block_xor_neon(state, dst, src, nrounds, l);
+> > > +             bytes -= l;
+> > > +             src += l;
+> > > +             dst += l;
+> > > +             state[12] += DIV_ROUND_UP(l, CHACHA_BLOCK_SIZE);
+> > >       }
+> > >       if (bytes) {
+> > > -             memcpy(buf, src, bytes);
+> > > -             chacha_block_xor_neon(state, buf, buf, nrounds);
+> > > -             memcpy(dst, buf, bytes);
+> > > +             const u8 *s = src;
+> > > +             u8 *d = dst;
+> > > +
+> > > +             if (bytes != CHACHA_BLOCK_SIZE)
+> > > +                     s = d = memcpy(buf, src, bytes);
+> > > +             chacha_block_xor_neon(state, d, s, nrounds);
+> > > +             if (d != dst)
+> > > +                     memcpy(dst, buf, bytes);
+> > >       }
+> > >  }
+> > >
+> >
+> > Shouldn't this be incrementing the block counter after chacha_block_xor_neon()?
+> > It might be needed by the library API.
+> >
 > 
-> So increment the counter after calling chacha_block_xor_neon().
+> Yeah, good point. 'bytes' could be exactly CHACHA_BLOCK_SIZE now,
+> which wasn't the case before.
 > 
-> Fixes: 86cd97ec4b943af3 ("crypto: arm/chacha-neon - optimize for non-block size multiples")
-> Reported-by: Eric Biggers <ebiggers@kernel.org>
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  arch/arm/crypto/chacha-glue.c | 1 +
->  1 file changed, 1 insertion(+)
+> I'll send a fix.
 > 
-> diff --git a/arch/arm/crypto/chacha-glue.c b/arch/arm/crypto/chacha-glue.c
-> index 7b5cf8430c6d..f19e6da8cdd0 100644
-> --- a/arch/arm/crypto/chacha-glue.c
-> +++ b/arch/arm/crypto/chacha-glue.c
-> @@ -60,6 +60,7 @@ static void chacha_doneon(u32 *state, u8 *dst, const u8 *src,
->  		chacha_block_xor_neon(state, d, s, nrounds);
->  		if (d != dst)
->  			memcpy(dst, buf, bytes);
-> +		state[12] += 1;
->  	}
+> > Also, even with that fixed, this patch is causing the self-tests (both the
+> > chacha20poly1305_selftest(), and the crypto API tests for chacha20-neon,
+> > xchacha20-neon, and xchacha12-neon) to fail when I boot a kernel in QEMU.  This
+> > doesn't happen on real hardware (Raspberry Pi 2), and I don't see any other bugs
+> > in this patch, so I'm not sure what the problem is.  Did you run the self-tests
+> > on every platform you tested this on?
+> >
+> 
+> Does your QEMU lack this patch? I found that bug working on this code.
+> 
+> https://git.qemu.org/?p=qemu.git;a=commitdiff;h=604cef3e57eaeeef77074d78f6cf2eca1be11c62
 
-Maybe write this as:
+It doesn't have that patch.  That must be the problem then; good to hear that
+you've already fixed it.
 
-	state[12]++;
+- Eric
