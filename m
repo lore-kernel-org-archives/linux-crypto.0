@@ -3,135 +3,237 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 703B0C433FE
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Dec 2020 16:26:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B418C4361B
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Dec 2020 22:30:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C04C233CE
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Dec 2020 16:26:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39ED6207A5
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Dec 2020 22:30:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390595AbgLMQ0J (ORCPT
+        id S1731182AbgLMWaM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Dec 2020 11:26:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39856 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726166AbgLMQ0J (ORCPT
+        Sun, 13 Dec 2020 17:30:12 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18438 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731175AbgLMWaC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Dec 2020 11:26:09 -0500
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4B1FC0613D6
-        for <linux-crypto@vger.kernel.org>; Sun, 13 Dec 2020 08:25:28 -0800 (PST)
-Received: by mail-wr1-x441.google.com with SMTP id d26so784020wrb.12
-        for <linux-crypto@vger.kernel.org>; Sun, 13 Dec 2020 08:25:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jamieiles-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Rf+b9N2htku5WJ9Hu0NGJ+c4uKlPgFBYFEnRhIM8Uhs=;
-        b=S2Ty7Lhn1rwak6hdqcbPARjAEnxxvMgu6mXc9eqNXbZ4hVjaGEqQB8pMUoe4zTi1a7
-         9K5iVrrFK26itWqBcEUcsB426J87wE6+0bdUwlzGPyaQAK7WJ2mi8EEN38iGxMFmnrsP
-         RvAbxMjbqNfxeOib8SiOEhiZQlK2QiETI6lZECSO98DeQC4x86MPTvAar80gTr8fHlo9
-         Me754RKBSGlMI4siQAk6QGOOJKPhpOHTAHbm+6yPlQO+KD153S9F2Nau3c/43mdt5Cbk
-         efxE27ZeDqsyw9BQh3/7tvmX/sjx5PrOfXZJKnEygqAclqItBdi4Ow5kpP0d/zx2xj9h
-         cClA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Rf+b9N2htku5WJ9Hu0NGJ+c4uKlPgFBYFEnRhIM8Uhs=;
-        b=TE8N9rF2aBF/n3yEKjuAUF4zdbrzWPgg88T9QnKIaBhRn5SnaODKETobHvmkXoU86M
-         x5EyrWp/guSWBWatA1FkEfCGfU7hSvqHLr3yRJQfCx/S2f2Rp5i1n6DwfXGJ07kdss0D
-         OIjTf3oWr0yjV+OIq49cYdLkSDxKnSZQijL6oczI7/34PMTHjKjxp7zRuLSFClmWTkUo
-         Xfy8f0T4wpFIW2d53BUE4n8ghOl4YAzBzfJpdPxiA12p7rW6EmKb1Lv/NQgOEcq/SagR
-         hbXumuqfD6uGrcg4lvNeJq8cYNq6tETXUB8tP/ptWo1DZaPwP4m6ep/oRHQhT29shMnI
-         L6bg==
-X-Gm-Message-State: AOAM532Wjk9WL41t+GKwj8eDKqLeWtbHvvJ8lovuQdFcdoG1nAFjEP23
-        D7K7rOVqvzz+s/SOmZcYbu+g5A==
-X-Google-Smtp-Source: ABdhPJzLE3t6E6T+7CANIDVOP3RTPKz+wUMY/WJbm93kEjoOQjfqOkI5aZIByNISKdCoVp6ig7p5VA==
-X-Received: by 2002:a5d:5005:: with SMTP id e5mr24119814wrt.279.1607876727343;
-        Sun, 13 Dec 2020 08:25:27 -0800 (PST)
-Received: from localhost ([82.44.17.50])
-        by smtp.gmail.com with ESMTPSA id z2sm27245655wml.23.2020.12.13.08.25.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Dec 2020 08:25:26 -0800 (PST)
-Date:   Sun, 13 Dec 2020 16:25:25 +0000
-From:   Jamie Iles <jamie@jamieiles.com>
-To:     Rob Herring <robh@kernel.org>
-List-Id: <soc.lore.kernel.org>
-Cc:     Jamie Iles <jamie@jamieiles.com>,
+        Sun, 13 Dec 2020 17:30:02 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BDMBj9G059546;
+        Sun, 13 Dec 2020 17:29:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=V1zmJvv/J3Tu5Mv95QCY0IBPJcTkOgwk4YgXrqAO/4Y=;
+ b=hNxa4ezFneSS1MzDUBGKBAgDA+H3ZsflcGMkt7riU//8aByBlweOpOsvCxyxbVrObCSx
+ QibWQX3fUL/o2yBEYiomUyxIPs8DAPTf00PFfRk6ixJYSTjRTeweuC1uaVTXdgDmCx3e
+ /FrFrzIB0orWysdl20dD3NE+jkw1CG964p70lgSjoEfrMmcuPXdEUD9iqtGOYjHCBch1
+ IUrPLev1ON0j/5U69rqS0JLlyev6usHQie9VLVtVvmf1VMEVAharzKq4V9vk3g90h6su
+ EhlGt8C5zkLe3ef0gt/CYNIbT6uCnUzdfLmXxF7H25DedrgRfxzf7qUMNZZIIX8xCQcn cQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35duhkg9ww-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 13 Dec 2020 17:29:03 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0BDMS13G108405;
+        Sun, 13 Dec 2020 17:29:03 -0500
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 35duhkg9w7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 13 Dec 2020 17:29:03 -0500
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BDMSAL2015673;
+        Sun, 13 Dec 2020 22:29:02 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma04wdc.us.ibm.com with ESMTP id 35cng8kf3d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 13 Dec 2020 22:29:02 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BDMT14X24510782
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 13 Dec 2020 22:29:01 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 297FD7805C;
+        Sun, 13 Dec 2020 22:29:01 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 13C6D7805E;
+        Sun, 13 Dec 2020 22:28:58 +0000 (GMT)
+Received: from jarvis.int.hansenpartnership.com (unknown [9.80.214.106])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Sun, 13 Dec 2020 22:28:57 +0000 (GMT)
+Message-ID: <5d0085a960956ce8d9eae06465313012d448189c.camel@linux.ibm.com>
+Subject: Re: [PATCH] KVM/SVM: add support for SEV attestation command
+From:   James Bottomley <jejb@linux.ibm.com>
+Reply-To: jejb@linux.ibm.com
+To:     Brijesh Singh <brijesh.singh@amd.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Cc:     kvm@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        John Allen <john.allen@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, soc@kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH 0/4] Remove PicoXcell
-Message-ID: <20201213162525.GA223635@willow>
-References: <20201210200315.2965567-1-robh@kernel.org>
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Date:   Sun, 13 Dec 2020 14:28:56 -0800
+In-Reply-To: <78e18a3d-900b-fac5-19ca-c2defeb8d73a@amd.com>
+References: <20201204212847.13256-1-brijesh.singh@amd.com>
+         <CAMj1kXFkyJwZ4BGSU-4UB5VR1etJ6atb7YpWMTzzBuu9FQKagA@mail.gmail.com>
+         <78e18a3d-900b-fac5-19ca-c2defeb8d73a@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201210200315.2965567-1-robh@kernel.org>
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-13_06:2020-12-11,2020-12-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ impostorscore=0 spamscore=0 clxscore=1011 mlxscore=0 lowpriorityscore=0
+ phishscore=0 malwarescore=0 priorityscore=1501 suspectscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012130169
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Acked-by: Jamie Iles <jamie@jamieiles.com>
+On Wed, 2020-12-09 at 21:25 -0600, Brijesh Singh wrote:
+> Noted, I will send v2 with these fixed.
 
-for the series.  Intel EOLd this product now, good idea to remove it.
+I ran a test on this.  It turns out for rome systems you need firmware
+md_sev_fam17h_model3xh_0.24b0A (or later) installed to get this and the
+QEMU patch with the base64 decoding fixed, but with that
 
-Thanks,
+Tested-by: James Bottomley <jejb@linux.ibm.com>
 
-Jamie
+Attached is the test programme I used.
 
-On Thu, Dec 10, 2020 at 02:03:11PM -0600, Rob Herring wrote:
-> PicoXcell has had nothing but treewide cleanups for at least the last 8
-> years and no signs of activity. The most recent activity is a yocto vendor
-> kernel based on v3.0 in 2015.
-> 
-> These patches can go via the respective maintainers' trees.
-> 
-> Rob
-> 
-> Rob Herring (4):
->   ARM: dts: Remove PicoXcell platforms
->   ARM: Remove PicoXcell platform support
->   crypto: Remove PicoXcell driver
->   dt-bindings: Remove PicoXcell bindings
-> 
->  .../devicetree/bindings/arm/picoxcell.txt     |   24 -
->  .../bindings/crypto/picochip-spacc.txt        |   21 -
->  .../devicetree/bindings/net/macb.txt          |    2 -
->  .../bindings/timer/snps,dw-apb-timer.yaml     |    7 -
->  MAINTAINERS                                   |    9 -
->  arch/arm/Kconfig                              |    2 -
->  arch/arm/Kconfig.debug                        |   13 +-
->  arch/arm/Makefile                             |    1 -
->  arch/arm/boot/dts/Makefile                    |    3 -
->  arch/arm/boot/dts/picoxcell-pc3x2.dtsi        |  239 ---
->  arch/arm/boot/dts/picoxcell-pc3x3.dtsi        |  355 ----
->  arch/arm/boot/dts/picoxcell-pc7302-pc3x2.dts  |   78 -
->  arch/arm/boot/dts/picoxcell-pc7302-pc3x3.dts  |   84 -
->  arch/arm/mach-picoxcell/Kconfig               |    9 -
->  arch/arm/mach-picoxcell/Makefile              |    2 -
->  arch/arm/mach-picoxcell/common.c              |   81 -
->  drivers/crypto/Kconfig                        |   18 -
->  drivers/crypto/Makefile                       |    1 -
->  drivers/crypto/picoxcell_crypto.c             | 1806 -----------------
->  drivers/crypto/picoxcell_crypto_regs.h        |  115 --
->  20 files changed, 1 insertion(+), 2869 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/arm/picoxcell.txt
->  delete mode 100644 Documentation/devicetree/bindings/crypto/picochip-spacc.txt
->  delete mode 100644 arch/arm/boot/dts/picoxcell-pc3x2.dtsi
->  delete mode 100644 arch/arm/boot/dts/picoxcell-pc3x3.dtsi
->  delete mode 100644 arch/arm/boot/dts/picoxcell-pc7302-pc3x2.dts
->  delete mode 100644 arch/arm/boot/dts/picoxcell-pc7302-pc3x3.dts
->  delete mode 100644 arch/arm/mach-picoxcell/Kconfig
->  delete mode 100644 arch/arm/mach-picoxcell/Makefile
->  delete mode 100644 arch/arm/mach-picoxcell/common.c
->  delete mode 100644 drivers/crypto/picoxcell_crypto.c
->  delete mode 100644 drivers/crypto/picoxcell_crypto_regs.h
-> 
-> --
-> 2.25.1
+James
+
+---
+
+#!/usr/bin/python3
+##
+# Python script get an attestation and verify it with the PEK
+#
+# This assumes you've already exported the pek.cert with sev-tool
+# from https://github.com/AMDESE/sev-tool.git
+#
+# sev-tool --export_cert_chain
+#
+# creates several files, the only one this script needs is pek.cert
+#
+# Tables and chapters refer to the amd 55766.pdf document
+#
+# https://www.amd.com/system/files/TechDocs/55766_SEV-KM_API_Specification.pdf
+##
+import sys
+import os 
+import base64
+import hashlib
+from argparse import ArgumentParser
+from Crypto.PublicKey import ECC
+from Crypto.Math.Numbers import Integer
+from git.qemu.python.qemu import qmp
+
+if __name__ == "__main__":
+    parser = ArgumentParser(description='Inject secret into SEV')
+    parser.add_argument('--pek-cert',
+                        help='The Platform DH certificate in binary form',
+                        default='pek.cert')
+    parser.add_argument('--socket',
+                        help='Socket to connect to QMP on, defaults to localhost:6550',
+                        default='localhost:6550')
+    args = parser.parse_args()
+
+    if (args.socket[0] == '/'):
+        socket = args.socket
+    elif (':' in args.socket):
+        s = args.socket.split(':')
+        socket = (s[0], int(s[1]))
+    else:
+        parse.error('--socket must be <host>:<port> or /path/to/unix')
+
+    fh = open(args.pek_cert, 'rb')
+    pek = bytearray(fh.read())
+    curve = int.from_bytes(pek[16:20], byteorder='little')
+    curves = {
+        1: 'p256',
+        2: 'p384'
+        }
+    Qx = int.from_bytes(bytes(pek[20:92]), byteorder='little')
+    Qy = int.from_bytes(bytes(pek[92:164]), byteorder='little')
+
+    pubkey = ECC.construct(point_x=Qx, point_y=Qy, curve=curves[curve])
+
+    Qmp = qmp.QEMUMonitorProtocol(address=socket);
+    Qmp.connect()
+    caps = Qmp.command('query-sev')
+    print('SEV query found API={api-major}.{api-minor} build={build-id} policy={policy}\n'.format(**caps))
+
+    nonce=os.urandom(16)
+
+    report = Qmp.command('query-sev-attestation-report',
+                         mnonce=base64.b64encode(nonce).decode())
+
+    a = base64.b64decode(report['data'])
+
+    ##
+    # returned data is formulated as Table 60. Attestation Report Buffer
+    ##
+    rnonce = a[0:16]
+    rmeas = a[16:48]
+
+    if (nonce != rnonce):
+        sys.exit('returned nonce doesn\'t match input nonce')
+
+    policy = int.from_bytes(a[48:52], byteorder='little')
+    usage = int.from_bytes(a[52:56], byteorder='little')
+    algo = int.from_bytes(a[56:60], byteorder='little')
+
+    if (policy != caps['policy']):
+        sys.exit('Policy mismatch:', policy, '!=', caps['policy'])
+
+    if (usage != 0x1002):
+        sys.exit('error PEK is not specified in usage: ', usage)
+
+    if (algo == 0x2):
+        h = hashlib.sha256()
+    elif (algo == 0x102):
+        ##
+        # The spec (6.8) says the signature must be ECDSA-SHA256 so this
+        # should be impossible, but it turns out to be the way our
+        # current test hardware produces its signature
+        ##
+        h = hashlib.sha384()
+    else:
+        sys.exit('unrecognized signing algorithm: ', algo)
+
+    h.update(a[0:52])
+
+    sig = a[64:208]
+    r = int.from_bytes(sig[0:72],byteorder='little')
+    s = int.from_bytes(sig[72:144],byteorder='little')
+    ##
+    # subtlety: r and s are little (AMD defined) z is big (crypto requirement)
+    ##
+    z = int.from_bytes(h.digest(), byteorder='big')
+
+    ##
+    # python crypto doesn't have a way of passing in r and s as
+    # integers and I'm not inclined to wrap them up as a big endian
+    # binary signature to have Signature.DSS unwrap them again, so
+    # call the _verify() private interface that does take integers
+    ##
+    if (not pubkey._verify(Integer(z), (Integer(r), Integer(s)))):
+        sys.exit('returned signature did not verify')
+
+    print('usage={usage}, algorithm={algo}'.format(usage=hex(usage),
+                                                   algo=hex(algo)))
+    print('ovmf-hash: ', rmeas.hex())
+
