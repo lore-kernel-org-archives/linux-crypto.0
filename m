@@ -2,128 +2,134 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E83C2BB48
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 21:42:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE34FC4361B
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 23:47:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3CB3E22258
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 21:42:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F02C206EC
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 23:47:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731623AbgLNVlg (ORCPT
+        id S1726913AbgLNXrK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Dec 2020 16:41:36 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:50579 "EHLO ozlabs.org"
+        Mon, 14 Dec 2020 18:47:10 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:45813 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406807AbgLNVlg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Dec 2020 16:41:36 -0500
+        id S1727300AbgLNXrJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Dec 2020 18:47:09 -0500
 Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4CvvvV00l7z9s0b;
-        Tue, 15 Dec 2020 08:40:37 +1100 (AEDT)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Cvyhf0k3xz9sRK;
+        Tue, 15 Dec 2020 10:46:26 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1607982046;
-        bh=3JjwU9FMTSysTsKbEoxAhXtb46+VKMMyJV4VwIySsK8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=REfdSlWuUXlbrEy9wNC7xeUA389v3fyMhH+YczsFqIsexBekVy60lA0NLu+dQA5br
-         WUn5xQ6fDTiGyPVUK8tY5RQrF28LCjPE3RK8akrHH8aib+sWbgui62plDcsZVGHAYe
-         kAOMwVjBIn0THee9OXpGWzOcGNxF7jCCGLm6mUrYq17aVNHF+5lx7tlGger6vyfQpR
-         NJP/OIgufaOy2EH0nt5Nw+WCGsx/B9BxWWziu5BAEWpUNz+jPK1IG8XNzo++X+UB0G
-         9dJta20ibHjRehKUEuUCybDkxcK4+bsKk2Yn32GDmQImlWdqAezetKsSz++R6tR+xv
-         daB9VNl+1cxDg==
-Date:   Tue, 15 Dec 2020 08:40:37 +1100
+        s=201702; t=1607989587;
+        bh=+zLolRCIT4qpIfZSJNjSg4Xw4U1OY+fGl+wCDLOzkjg=;
+        h=Date:From:To:Cc:Subject:From;
+        b=cnKfDbOMM3mjDgexqgrr1T84BKlaYj6kaGYaJkGTotX1LnyZyGvv3/2as5aZ7/qNC
+         Iv9IL7pJtNm28c/DXH8TfeWvVxmASFpJITza20lNZu8U32BxtBD1GsPF9NI01xDpAe
+         y3vMuHAff5Zyn3ArYWSybNgkWQmCcazV7KHvHDfTH9VOpRxJd5r/brUoNGtDlPw5L8
+         MIZ4RV/N0Y3mq78q2VjnwEWK/rfV7iXxnNkHSEp1Odphs5cvn364b13NtJyE1hCfRK
+         K6uj2aCFB/5bNbZwVCDydR05sUvwJfw+PQ/G4Y1sW0bjHA3xcMaJysoNJxqnccLeUI
+         FR+PVB0YOR01g==
+Date:   Tue, 15 Dec 2020 10:46:24 +1100
 From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        "Alexander A. Klimov" <grandmaster@al2klimov.de>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Alex Shi <alex.shi@linux.alibaba.com>,
-        Ben Boeckel <mathstuf@gmail.com>,
-        Denis Efremov <efremov@linux.com>,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Jann Horn <jannh@google.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Tom Rix <trix@redhat.com>, YueHaibing <yuehaibing@huawei.com>,
-        keyrings@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+To:     Jeff Layton <jlayton@kernel.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>
+Cc:     Eric Biggers <ebiggers@google.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>
-Subject: Re: [GIT PULL] keys: Collected minor fixes and cleanups
-Message-ID: <20201215084037.76dd4c98@canb.auug.org.au>
-In-Reply-To: <CAADWXX83JC0oSVoDxOwsLE1DPm8r6JLWcAsP0UyCLO_X544pkQ@mail.gmail.com>
-References: <2659836.1607940186@warthog.procyon.org.uk>
-        <CAHk-=wido5stGfFtRzmW19bB1w2XQAuY8oxUtFN2ZWdk2Grq-w@mail.gmail.com>
-        <CAADWXX83JC0oSVoDxOwsLE1DPm8r6JLWcAsP0UyCLO_X544pkQ@mail.gmail.com>
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the ceph tree
+Message-ID: <20201215104624.603c75da@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/u0N.9FFRBQ5prXVibfV=Cb0";
+Content-Type: multipart/signed; boundary="Sig_/ZCBAKa_hl0AZPkIEEKSZPi8";
  protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/u0N.9FFRBQ5prXVibfV=Cb0
+--Sig_/ZCBAKa_hl0AZPkIEEKSZPi8
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-Hi Linus,
+Hi all,
 
-On Mon, 14 Dec 2020 13:05:51 -0800 Linus Torvalds <torvalds@linux-foundatio=
-n.org> wrote:
->
-> On Mon, Dec 14, 2020 at 12:49 PM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
-> >
-> > I suspect the fix is trivial (change the "," to "|"), but I will not
-> > be pulling this - or anything else that hasn't been in linux-next -
-> > from you this merge window. =20
->=20
-> It looks like Stephen Rothwell saw it in next yesterday, and fixed it
-> up there in his merge.
->=20
-> So somebody was aware of the problem. But unlike Stephen, I don't take
-> broken code and just silently fix it up in the merge.
->=20
-> I suspect Stephen might have thought it was a merge conflict fix,
-> rather than just a broken branch.
->=20
-> Stephen: that makes linux-next test coverage kind of pointless, if you
-> just fix bugs in the branches you merge. You should reject things more
-> aggressively, rather than make them "pass" in Linux-next.
+After merging the ceph tree, today's linux-next build (x86_64
+allmodconfig) failed like this:
 
-I also reported it last Friday
-(https://lore.kernel.org/lkml/20201211155031.0e35abf2@canb.auug.org.au/)
-and so assumed it would be fixed before being sent to you ... I
-sometimes fix simple things up but mostly reject them - clearly that
-would not have made a difference here.
+net/ceph/messenger_v2.c:13:10: fatal error: crypto/sha.h: No such file or d=
+irectory
+   13 | #include <crypto/sha.h>
+      |          ^~~~~~~~~~~~~~
+
+Caused by commit
+
+  cd1a677cad99 ("libceph, ceph: implement msgr2.1 protocol (crc and secure =
+modes)")
+
+interacting with commit
+
+  a24d22b225ce ("crypto: sha - split sha.h into sha1.h and sha2.h")
+
+from the crypto tree (and now in Linus' tree).
+
+I have applied the following merge fix patch:
+
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Date: Tue, 15 Dec 2020 10:40:58 +1100
+Subject: [PATCH] fixup for "crypto: sha - split sha.h into sha1.h and sha2.=
+h"
+
+conflicting with
+
+"libceph, ceph: implement msgr2.1 protocol (crc and secure modes)"
+
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+---
+ net/ceph/messenger_v2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/ceph/messenger_v2.c b/net/ceph/messenger_v2.c
+index 5e38c847317b..c1ebb2aa08b5 100644
+--- a/net/ceph/messenger_v2.c
++++ b/net/ceph/messenger_v2.c
+@@ -10,7 +10,7 @@
+ #include <crypto/aead.h>
+ #include <crypto/algapi.h>  /* for crypto_memneq() */
+ #include <crypto/hash.h>
+-#include <crypto/sha.h>
++#include <crypto/sha2.h>
+ #include <linux/bvec.h>
+ #include <linux/crc32c.h>
+ #include <linux/net.h>
+--=20
+2.29.2
 
 --=20
 Cheers,
 Stephen Rothwell
 
---Sig_/u0N.9FFRBQ5prXVibfV=Cb0
+--Sig_/ZCBAKa_hl0AZPkIEEKSZPi8
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl/X29UACgkQAVBC80lX
-0GzRywf/TUfUtDuvxp4LbMQJ8kjHjmCm97z+Owe85JLyLp/OUf8AE0mh+Cx6kbEB
-KvpBwSaQ5c3x4FyOeUbOXVCdn7r1hGy6+tttnurK5cbtAza6U7U19MGcu7oI1ii1
-2VFDwMun1dGrJt78apl/F47icTL6TwkW0IX2SYErXh09Roi4x8C4Hy0hJ2PBnb49
-BWpTaUwa1zwv5bVbb+iHmh6nc652ahMqJ7bLaEpt+TEbDHm9q9TNBtZv/8EIDh3e
-gNN2DVDjBx7HeQD3Y16WSezLth1D7I6clxxAS550E+qdKgeOaxs/XxVhgQMuBEUH
-5nGAA4KtqRTKyiH8dgW3gAkwR6652A==
-=rGZ4
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl/X+VAACgkQAVBC80lX
+0Gz6mgf/XJ06Oo1tsJeiQa8ZiqjyuvOOt6mNgqoe6KyFrgKFDUS83t4TDbMiJlKa
+5O9bavpKw0Sv8SdmB2mo0T4OLqtOcjQQSxsGHOw3XO/KkKECIePOVg6rYHSdIC4+
+Dl19BKXNm+IbjgyYlnVAAYEbwZr0PVK9TzStMkRRcWgu6VK4rivprihIPTBbJL9W
+UWpQRMd3/jRNsj+HQTUq/1DM8DQ40EMNb7GNFoks2Ia4zAYSILa2796FCPHNI98q
+paBRqQtA9gfnAT8ZsAIDic5Ytn5L3vc+1yoVPBuOdBCbLjHuNREWqMy04dmfQj4K
+bBvkbY+IOK0aKX200DGPXS4P1G6uhQ==
+=FYzZ
 -----END PGP SIGNATURE-----
 
---Sig_/u0N.9FFRBQ5prXVibfV=Cb0--
+--Sig_/ZCBAKa_hl0AZPkIEEKSZPi8--
