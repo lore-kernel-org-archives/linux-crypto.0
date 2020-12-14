@@ -2,154 +2,102 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90872C1B0D9
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 02:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E0EC4361B
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 04:00:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E430238E1
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 02:55:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79A45238E4
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 04:00:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438131AbgLNCzo (ORCPT
+        id S2438492AbgLNEAw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Dec 2020 21:55:44 -0500
-Received: from ozlabs.org ([203.11.71.1]:50019 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726867AbgLNCzl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Dec 2020 21:55:41 -0500
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4CvQwb3PhQz9sRR;
-        Mon, 14 Dec 2020 13:54:54 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1607914498;
-        bh=lCODkhvBcMAzJ2JraOyKtROTbpTLOwTpUeDgzVZ/WRM=;
-        h=Date:From:To:Cc:Subject:From;
-        b=Lq0kS14Z9K5kg/7Ulx/AT1LTd8ZyCMaty5dD+SUh4y74I2umSRDhCHP5liqXOFyY8
-         0U/U4151W4P1mj2EL+3ywuuJSijuyvj5rjyXdf+thNGWoxyfncmnfXadOs0OX3yjSm
-         aiotfihN/PqbwNseEQo6tpxBFEYHoJFFXIBTTd/oWDGMlJZxVLhyoOLpFkqDdNJ19K
-         +CJh+KLTivNH8vJp2V10IBnn6jxT0THTJoIiid/C3LGsdrdymKuk2wevrKhmY9jYmu
-         YvGclKVB+KcVPJq99ukGSW/Sb0wTZw3/3tYvMhhn7wORlMAHahoDxPPLYp7cRc/cf9
-         Gai4LPLahKYBg==
-Date:   Mon, 14 Dec 2020 13:54:53 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Dave Airlie <airlied@linux.ie>,
-        DRI <dri-devel@lists.freedesktop.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Anitha Chrisanthus <anitha.chrisanthus@intel.com>,
-        Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Mike Healy <mikex.healy@intel.com>,
-        Sam Ravnborg <sam@ravnborg.org>
-Subject: linux-next: manual merge of the drm tree with the crypto tree
-Message-ID: <20201214135453.16e76e9d@canb.auug.org.au>
+        Sun, 13 Dec 2020 23:00:52 -0500
+Received: from ZXSHCAS1.zhaoxin.com ([203.148.12.81]:36303 "EHLO
+        ZXSHCAS1.zhaoxin.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727093AbgLNEAm (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 13 Dec 2020 23:00:42 -0500
+Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHCAS1.zhaoxin.com
+ (10.28.252.161) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Mon, 14 Dec
+ 2020 11:59:56 +0800
+Received: from tony-HX002EA.zhaoxin.com (10.32.56.37) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Mon, 14 Dec
+ 2020 11:59:54 +0800
+From:   Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <x86@kernel.org>, <hpa@zytor.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <TimGuo-oc@zhaoxin.com>, <CooperYan@zhaoxin.com>,
+        <QiyuanWang@zhaoxin.com>, <HerryYang@zhaoxin.com>,
+        <CobeChen@zhaoxin.com>, <SilviaZhao@zhaoxin.com>
+Subject: [PATCH] crypto: x86/crc32c-intel - Don't match some Zhaoxin CPUs
+Date:   Mon, 14 Dec 2020 11:59:52 +0800
+Message-ID: <1607918392-19171-1-git-send-email-TonyWWang-oc@zhaoxin.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/8qi0JHtIjRjh.eFSKzZUn+z";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain
+X-Originating-IP: [10.32.56.37]
+X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
+ zxbjmbx1.zhaoxin.com (10.29.252.163)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/8qi0JHtIjRjh.eFSKzZUn+z
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+The driver crc32c-intel match CPUs supporting X86_FEATURE_XMM4_2.
+On platforms with Zhaoxin CPUs supporting this X86 feature, when
+crc32c-intel and crc32c-generic are both registered, system will
+use crc32c-intel because its .cra_priority is greater than
+crc32c-generic.
 
-Hi all,
+When doing lmbench3 Create and Delete file test on partitions with
+ext4 enabling metadata checksum, found using crc32c-generic driver
+could get about 20% performance gain than using the driver crc32c-intel
+on some Zhaoxin CPUs.
 
-Today's linux-next merge of the drm tree got a conflict in:
+This case expect to use crc32c-generic driver for these Zhaoxin CPUs
+to get performance gain, so remove these Zhaoxin CPUs support from
+crc32c-intel.
 
-  MAINTAINERS
+Signed-off-by: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+---
+ arch/x86/crypto/crc32c-intel_glue.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-between commit:
+diff --git a/arch/x86/crypto/crc32c-intel_glue.c b/arch/x86/crypto/crc32c-intel_glue.c
+index feccb52..2cbbdde 100644
+--- a/arch/x86/crypto/crc32c-intel_glue.c
++++ b/arch/x86/crypto/crc32c-intel_glue.c
+@@ -215,6 +215,12 @@ static struct shash_alg alg = {
+ };
+ 
+ static const struct x86_cpu_id crc32c_cpu_id[] = {
++	X86_MATCH_VENDOR_FAM_FEATURE(ZHAOXIN, 0x6, X86_FEATURE_XMM4_2, 1),
++	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(ZHAOXIN, 0x7, 0x1b, X86_FEATURE_XMM4_2, 1),
++	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(ZHAOXIN, 0x7, 0x3b, X86_FEATURE_XMM4_2, 1),
++	X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 0x6, X86_FEATURE_XMM4_2, 1),
++	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(CENTAUR, 0x7, 0x1b, X86_FEATURE_XMM4_2, 1),
++	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(CENTAUR, 0x7, 0x3b, X86_FEATURE_XMM4_2, 1),
+ 	X86_MATCH_FEATURE(X86_FEATURE_XMM4_2, NULL),
+ 	{}
+ };
+@@ -222,7 +228,9 @@ MODULE_DEVICE_TABLE(x86cpu, crc32c_cpu_id);
+ 
+ static int __init crc32c_intel_mod_init(void)
+ {
+-	if (!x86_match_cpu(crc32c_cpu_id))
++	const struct x86_cpu_id *m = x86_match_cpu(crc32c_cpu_id);
++
++	if (!m || m->driver_data)
+ 		return -ENODEV;
+ #ifdef CONFIG_X86_64
+ 	if (boot_cpu_has(X86_FEATURE_PCLMULQDQ)) {
+-- 
+2.7.4
 
-  885743324513 ("crypto: keembay - Add support for Keem Bay OCS AES/SM4")
-
-from the crypto tree and commit:
-
-  ed794057b052 ("drm/kmb: Build files for KeemBay Display driver")
-
-from the drm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc MAINTAINERS
-index 3b358262de8f,eb18459c1d16..000000000000
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@@ -6932,11 -6913,16 +6941,10 @@@ S:	Maintaine
-  W:	http://floatingpoint.sourceforge.net/emulator/index.html
-  F:	arch/x86/math-emu/
- =20
- -FRAME RELAY DLCI/FRAD (Sangoma drivers too)
- -L:	netdev@vger.kernel.org
- -S:	Orphan
- -F:	drivers/net/wan/dlci.c
- -F:	drivers/net/wan/sdla.c
- -
-  FRAMEBUFFER LAYER
-- M:	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-  L:	dri-devel@lists.freedesktop.org
-  L:	linux-fbdev@vger.kernel.org
-- S:	Maintained
-+ S:	Orphan
-  Q:	http://patchwork.kernel.org/project/linux-fbdev/list/
-  T:	git git://anongit.freedesktop.org/drm/drm-misc
-  F:	Documentation/fb/
-@@@ -8985,16 -8962,13 +8993,23 @@@ M:	Deepak Saxena <dsaxena@plexity.net
-  S:	Maintained
-  F:	drivers/char/hw_random/ixp4xx-rng.c
- =20
-+ INTEL KEEMBAY DRM DRIVER
-+ M:	Anitha Chrisanthus <anitha.chrisanthus@intel.com>
-+ M:	Edmund Dea <edmund.j.dea@intel.com>
-+ S:	Maintained
-+ F:	Documentation/devicetree/bindings/display/intel,kmb_display.yaml
-+ F:	drivers/gpu/drm/kmb/
-+=20
- +INTEL KEEM BAY OCS AES/SM4 CRYPTO DRIVER
- +M:	Daniele Alessandrelli <daniele.alessandrelli@intel.com>
- +S:	Maintained
- +F:	Documentation/devicetree/bindings/crypto/intel,keembay-ocs-aes.yaml
- +F:	drivers/crypto/keembay/Kconfig
- +F:	drivers/crypto/keembay/Makefile
- +F:	drivers/crypto/keembay/keembay-ocs-aes-core.c
- +F:	drivers/crypto/keembay/ocs-aes.c
- +F:	drivers/crypto/keembay/ocs-aes.h
- +
-  INTEL MANAGEMENT ENGINE (mei)
-  M:	Tomas Winkler <tomas.winkler@intel.com>
-  L:	linux-kernel@vger.kernel.org
-
---Sig_/8qi0JHtIjRjh.eFSKzZUn+z
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl/W0/0ACgkQAVBC80lX
-0GyRRQf+JhtIB4eEMtaUN1EiCWo8HsYmi9p1zRP+Q5EYizSxggmTQZ8uR/ySfD0w
-YIrgTLwACjuq7xLQddaZNEW9X2sV8r0D61ax1d7hvYftYwQWF5zYHuqdTj99sfgm
-xCpxvpWdTG/AIXUG8EqzRYPWFLYaD/FgiMiNxp5EvVHqCty4DrxOQ47AdRJXTduF
-06C65eJ+RU2jKjtraoWLB6wQh22wzeQ2cUGYObP4AJdfannoDEz4Kw8CWHvFq/1P
-wkmnJt8eX0xSkXOx2is/Vem5ckLyfvnUsWu3yG60syYlTF/FE1NXofsZw3SPlLn5
-RIZKggHKvxU0LKkhfnWcZ0C5wPrsSg==
-=PC48
------END PGP SIGNATURE-----
-
---Sig_/8qi0JHtIjRjh.eFSKzZUn+z--
