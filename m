@@ -2,65 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D1DEC4361B
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 21:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28AC5C4361B
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 21:17:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC19D2247F
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 21:08:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE9C22247F
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 21:17:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503487AbgLNU5J (ORCPT
+        id S2387650AbgLNVQz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Dec 2020 15:57:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37206 "EHLO mail.kernel.org"
+        Mon, 14 Dec 2020 16:16:55 -0500
+Received: from inet10.abb.com ([138.225.1.74]:55964 "EHLO inet10.abb.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2503474AbgLNU5J (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Dec 2020 15:57:09 -0500
-Subject: Re: [GIT PULL] Crypto Update for 5.11
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607979388;
-        bh=Lmn6ZsEaEUQ9mue61U1vPzfAhy3bz2nfUmE7MAWqucI=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=iK/j62QiB/2JPf85XZ7lKsgCvy3a2Gp45RswzgN7MKMphF5XOLYGLASUNiUZxdmYn
-         HnpR35tJsDvlI2tAdjg+pSa3GgG5U2BZYNYUEHaVw0L6i/TiArxzPVUl/A7JcKLXai
-         yG8bWDVxGprrkdOYXThFQDCqbUm69OrbZXwnnT3UbWsYLhVFwmlqWrhGDU8K4o8iRH
-         ZsgZtSnA1lP7r1Kx74CmZIwz6JszCPftNrx/6dgSKxBUMVzYBTX/BSABGCayurNDjT
-         qQFvfczQu1a2RPZbT80iOgravz3PcuYFaAopWUSonuq6VxmKvUUj3jiOu6YEddmfc2
-         +Wod4U5+dRN1A==
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20201214055515.GA14196@gondor.apana.org.au>
-References: <20200803044024.GA6429@gondor.apana.org.au>
- <20201012033249.GA25179@gondor.apana.org.au> <20201214055515.GA14196@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20201214055515.GA14196@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 linus
-X-PR-Tracked-Commit-Id: 93cebeb1c21a65b92636aaa278a32fbc0415ec67
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 9e4b0d55d84a66dbfede56890501dc96e696059c
-Message-Id: <160797938848.26822.10464960743618800942.pr-tracker-bot@kernel.org>
-Date:   Mon, 14 Dec 2020 20:56:28 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        id S1726557AbgLNVQy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Dec 2020 16:16:54 -0500
+X-Greylist: delayed 13465 seconds by postgrey-1.27 at vger.kernel.org; Mon, 14 Dec 2020 16:16:53 EST
+Received: from gitsiv.ch.abb.com (gitsiv.keymile.net [10.41.156.251])
+        by inet10.abb.com (8.14.7/8.14.7) with SMTP id 0BEHUoXo010976;
+        Mon, 14 Dec 2020 18:30:50 +0100
+Received: from ch900154.keymile.net (ch900154.keymile.net [172.31.40.201])
+        by gitsiv.ch.abb.com (Postfix) with ESMTP id B6B10610841F;
+        Mon, 14 Dec 2020 18:30:50 +0100 (CET)
+From:   Luca Dariz <luca.dariz@hitachi-powergrids.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     Luca Dariz <luca.dariz@hitachi-powergrids.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Colin Ian King <colin.king@canonical.com>,
+        Holger Brunck <holger.brunck@hitachi-powergrids.com>,
+        Valentin Longchamp <valentin.longchamp@hitachi-powergrids.com>
+Subject: [PATCH] hwrng: fix khwrng lifecycle
+Date:   Mon, 14 Dec 2020 18:29:33 +0100
+Message-Id: <20201214172933.25580-1-luca.dariz@hitachi-powergrids.com>
+X-Mailer: git-send-email 2.24.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Mon, 14 Dec 2020 16:55:16 +1100:
+There are two issues with the management of the kernel thread to gather
+entropy:
+* it can terminate also if the rng is removed, and in this case it doesn'=
+t
+  synchronize with kthread_should_stop(), but it directly sets hwrng_fill
+  to NULL. If this happens after the NULL check but before kthread_stop()
+  is called, we'll have a NULL pointer dereference.
+* if we have a register/unregister too fast, it can happen that the kthre=
+ad
+  is not yet started when kthread_stop is called, and this seems to leave=
+ a
+  corrupted or uninitialized kthread struct. This is detected by the
+  WARN_ON at kernel/kthread.c:75 and later causes a page domain fault.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 linus
+CC: Matt Mackall <mpm@selenic.com>
+CC: Herbert Xu <herbert@gondor.apana.org.au>
+CC: Colin Ian King <colin.king@canonical.com>
+CC: Holger Brunck <holger.brunck@hitachi-powergrids.com>
+CC: Valentin Longchamp <valentin.longchamp@hitachi-powergrids.com>
+Signed-off-by: Luca Dariz <luca.dariz@hitachi-powergrids.com>
+---
+ drivers/char/hw_random/core.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/9e4b0d55d84a66dbfede56890501dc96e696059c
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.=
+c
+index 8c1c47dd9f46..5845da93c7f4 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -31,6 +31,7 @@ static struct hwrng *current_rng;
+ /* the current rng has been explicitly chosen by user via sysfs */
+ static int cur_rng_set_by_user;
+ static struct task_struct *hwrng_fill;
++static struct completion hwrng_started =3D COMPLETION_INITIALIZER(hwrng_=
+started);
+ /* list of registered rngs, sorted decending by quality */
+ static LIST_HEAD(rng_list);
+ /* Protects rng_list and current_rng */
+@@ -432,12 +433,15 @@ static int hwrng_fillfn(void *unused)
+ {
+ 	long rc;
+=20
++	complete(&hwrng_started);
+ 	while (!kthread_should_stop()) {
+ 		struct hwrng *rng;
+=20
+ 		rng =3D get_current_rng();
+-		if (IS_ERR(rng) || !rng)
+-			break;
++		if (IS_ERR(rng) || !rng) {
++			msleep_interruptible(10000);
++			continue;
++		}
+ 		mutex_lock(&reading_mutex);
+ 		rc =3D rng_get_data(rng, rng_fillbuf,
+ 				  rng_buffer_size(), 1);
+@@ -462,6 +466,8 @@ static void start_khwrngd(void)
+ 	if (IS_ERR(hwrng_fill)) {
+ 		pr_err("hwrng_fill thread creation failed\n");
+ 		hwrng_fill =3D NULL;
++	} else {
++		wait_for_completion(&hwrng_started);
+ 	}
+ }
+=20
+--=20
+2.24.3
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
