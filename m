@@ -2,114 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28AC5C4361B
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 21:17:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E83C2BB48
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 21:42:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DE9C22247F
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 21:17:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CB3E22258
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 21:42:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387650AbgLNVQz (ORCPT
+        id S1731623AbgLNVlg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Dec 2020 16:16:55 -0500
-Received: from inet10.abb.com ([138.225.1.74]:55964 "EHLO inet10.abb.com"
+        Mon, 14 Dec 2020 16:41:36 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:50579 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726557AbgLNVQy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Dec 2020 16:16:54 -0500
-X-Greylist: delayed 13465 seconds by postgrey-1.27 at vger.kernel.org; Mon, 14 Dec 2020 16:16:53 EST
-Received: from gitsiv.ch.abb.com (gitsiv.keymile.net [10.41.156.251])
-        by inet10.abb.com (8.14.7/8.14.7) with SMTP id 0BEHUoXo010976;
-        Mon, 14 Dec 2020 18:30:50 +0100
-Received: from ch900154.keymile.net (ch900154.keymile.net [172.31.40.201])
-        by gitsiv.ch.abb.com (Postfix) with ESMTP id B6B10610841F;
-        Mon, 14 Dec 2020 18:30:50 +0100 (CET)
-From:   Luca Dariz <luca.dariz@hitachi-powergrids.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     Luca Dariz <luca.dariz@hitachi-powergrids.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Colin Ian King <colin.king@canonical.com>,
-        Holger Brunck <holger.brunck@hitachi-powergrids.com>,
-        Valentin Longchamp <valentin.longchamp@hitachi-powergrids.com>
-Subject: [PATCH] hwrng: fix khwrng lifecycle
-Date:   Mon, 14 Dec 2020 18:29:33 +0100
-Message-Id: <20201214172933.25580-1-luca.dariz@hitachi-powergrids.com>
-X-Mailer: git-send-email 2.24.3
+        id S2406807AbgLNVlg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Dec 2020 16:41:36 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4CvvvV00l7z9s0b;
+        Tue, 15 Dec 2020 08:40:37 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1607982046;
+        bh=3JjwU9FMTSysTsKbEoxAhXtb46+VKMMyJV4VwIySsK8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=REfdSlWuUXlbrEy9wNC7xeUA389v3fyMhH+YczsFqIsexBekVy60lA0NLu+dQA5br
+         WUn5xQ6fDTiGyPVUK8tY5RQrF28LCjPE3RK8akrHH8aib+sWbgui62plDcsZVGHAYe
+         kAOMwVjBIn0THee9OXpGWzOcGNxF7jCCGLm6mUrYq17aVNHF+5lx7tlGger6vyfQpR
+         NJP/OIgufaOy2EH0nt5Nw+WCGsx/B9BxWWziu5BAEWpUNz+jPK1IG8XNzo++X+UB0G
+         9dJta20ibHjRehKUEuUCybDkxcK4+bsKk2Yn32GDmQImlWdqAezetKsSz++R6tR+xv
+         daB9VNl+1cxDg==
+Date:   Tue, 15 Dec 2020 08:40:37 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        "Alexander A. Klimov" <grandmaster@al2klimov.de>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Alex Shi <alex.shi@linux.alibaba.com>,
+        Ben Boeckel <mathstuf@gmail.com>,
+        Denis Efremov <efremov@linux.com>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Jann Horn <jannh@google.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@linux.microsoft.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Tom Rix <trix@redhat.com>, YueHaibing <yuehaibing@huawei.com>,
+        keyrings@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        LSM List <linux-security-module@vger.kernel.org>
+Subject: Re: [GIT PULL] keys: Collected minor fixes and cleanups
+Message-ID: <20201215084037.76dd4c98@canb.auug.org.au>
+In-Reply-To: <CAADWXX83JC0oSVoDxOwsLE1DPm8r6JLWcAsP0UyCLO_X544pkQ@mail.gmail.com>
+References: <2659836.1607940186@warthog.procyon.org.uk>
+        <CAHk-=wido5stGfFtRzmW19bB1w2XQAuY8oxUtFN2ZWdk2Grq-w@mail.gmail.com>
+        <CAADWXX83JC0oSVoDxOwsLE1DPm8r6JLWcAsP0UyCLO_X544pkQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="Sig_/u0N.9FFRBQ5prXVibfV=Cb0";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There are two issues with the management of the kernel thread to gather
-entropy:
-* it can terminate also if the rng is removed, and in this case it doesn'=
-t
-  synchronize with kthread_should_stop(), but it directly sets hwrng_fill
-  to NULL. If this happens after the NULL check but before kthread_stop()
-  is called, we'll have a NULL pointer dereference.
-* if we have a register/unregister too fast, it can happen that the kthre=
-ad
-  is not yet started when kthread_stop is called, and this seems to leave=
- a
-  corrupted or uninitialized kthread struct. This is detected by the
-  WARN_ON at kernel/kthread.c:75 and later causes a page domain fault.
+--Sig_/u0N.9FFRBQ5prXVibfV=Cb0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-CC: Matt Mackall <mpm@selenic.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-CC: Colin Ian King <colin.king@canonical.com>
-CC: Holger Brunck <holger.brunck@hitachi-powergrids.com>
-CC: Valentin Longchamp <valentin.longchamp@hitachi-powergrids.com>
-Signed-off-by: Luca Dariz <luca.dariz@hitachi-powergrids.com>
----
- drivers/char/hw_random/core.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Hi Linus,
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.=
-c
-index 8c1c47dd9f46..5845da93c7f4 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -31,6 +31,7 @@ static struct hwrng *current_rng;
- /* the current rng has been explicitly chosen by user via sysfs */
- static int cur_rng_set_by_user;
- static struct task_struct *hwrng_fill;
-+static struct completion hwrng_started =3D COMPLETION_INITIALIZER(hwrng_=
-started);
- /* list of registered rngs, sorted decending by quality */
- static LIST_HEAD(rng_list);
- /* Protects rng_list and current_rng */
-@@ -432,12 +433,15 @@ static int hwrng_fillfn(void *unused)
- {
- 	long rc;
-=20
-+	complete(&hwrng_started);
- 	while (!kthread_should_stop()) {
- 		struct hwrng *rng;
-=20
- 		rng =3D get_current_rng();
--		if (IS_ERR(rng) || !rng)
--			break;
-+		if (IS_ERR(rng) || !rng) {
-+			msleep_interruptible(10000);
-+			continue;
-+		}
- 		mutex_lock(&reading_mutex);
- 		rc =3D rng_get_data(rng, rng_fillbuf,
- 				  rng_buffer_size(), 1);
-@@ -462,6 +466,8 @@ static void start_khwrngd(void)
- 	if (IS_ERR(hwrng_fill)) {
- 		pr_err("hwrng_fill thread creation failed\n");
- 		hwrng_fill =3D NULL;
-+	} else {
-+		wait_for_completion(&hwrng_started);
- 	}
- }
-=20
+On Mon, 14 Dec 2020 13:05:51 -0800 Linus Torvalds <torvalds@linux-foundatio=
+n.org> wrote:
+>
+> On Mon, Dec 14, 2020 at 12:49 PM Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+> >
+> > I suspect the fix is trivial (change the "," to "|"), but I will not
+> > be pulling this - or anything else that hasn't been in linux-next -
+> > from you this merge window. =20
+>=20
+> It looks like Stephen Rothwell saw it in next yesterday, and fixed it
+> up there in his merge.
+>=20
+> So somebody was aware of the problem. But unlike Stephen, I don't take
+> broken code and just silently fix it up in the merge.
+>=20
+> I suspect Stephen might have thought it was a merge conflict fix,
+> rather than just a broken branch.
+>=20
+> Stephen: that makes linux-next test coverage kind of pointless, if you
+> just fix bugs in the branches you merge. You should reject things more
+> aggressively, rather than make them "pass" in Linux-next.
+
+I also reported it last Friday
+(https://lore.kernel.org/lkml/20201211155031.0e35abf2@canb.auug.org.au/)
+and so assumed it would be fixed before being sent to you ... I
+sometimes fix simple things up but mostly reject them - clearly that
+would not have made a difference here.
+
 --=20
-2.24.3
+Cheers,
+Stephen Rothwell
 
+--Sig_/u0N.9FFRBQ5prXVibfV=Cb0
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl/X29UACgkQAVBC80lX
+0GzRywf/TUfUtDuvxp4LbMQJ8kjHjmCm97z+Owe85JLyLp/OUf8AE0mh+Cx6kbEB
+KvpBwSaQ5c3x4FyOeUbOXVCdn7r1hGy6+tttnurK5cbtAza6U7U19MGcu7oI1ii1
+2VFDwMun1dGrJt78apl/F47icTL6TwkW0IX2SYErXh09Roi4x8C4Hy0hJ2PBnb49
+BWpTaUwa1zwv5bVbb+iHmh6nc652ahMqJ7bLaEpt+TEbDHm9q9TNBtZv/8EIDh3e
+gNN2DVDjBx7HeQD3Y16WSezLth1D7I6clxxAS550E+qdKgeOaxs/XxVhgQMuBEUH
+5nGAA4KtqRTKyiH8dgW3gAkwR6652A==
+=rGZ4
+-----END PGP SIGNATURE-----
+
+--Sig_/u0N.9FFRBQ5prXVibfV=Cb0--
