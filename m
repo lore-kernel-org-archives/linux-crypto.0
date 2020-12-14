@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B3AC2BB9A
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 20:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDADFC4361B
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 20:07:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 534842168B
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 20:05:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97B0E207A0
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Dec 2020 20:07:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502929AbgLNUEt (ORCPT
+        id S2502063AbgLNUFC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Dec 2020 15:04:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41114 "EHLO
+        Mon, 14 Dec 2020 15:05:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2502925AbgLNUEb (ORCPT
+        with ESMTP id S2502925AbgLNUE4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Dec 2020 15:04:31 -0500
+        Mon, 14 Dec 2020 15:04:56 -0500
 Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1576C0611CD
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Dec 2020 12:03:29 -0800 (PST)
-Received: by mail-pl1-x643.google.com with SMTP id q4so3666549plr.7
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Dec 2020 12:03:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AA72C0613D3
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Dec 2020 12:03:36 -0800 (PST)
+Received: by mail-pl1-x643.google.com with SMTP id v3so9372018plz.13
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Dec 2020 12:03:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=/NQcBcxnSSCbTyD9KLIq28pNKLVWeJF0Xi2g4zRlj5Q=;
-        b=BWDbKhjIvlRnDFMJS30nLErO8n5zQGQOFr1GBmhiQ/z5Sbj/gTfISm+/YyP+1ejNIx
-         BhfOtwhF44hLrad5DcFQ+cN/J6SylBqt31eT4nYLCVZ7bh6x6KszGxEmUuRKUZWatp6+
-         dIvo65hW3LpA6XtZIbkKL3igOiCQXoa4+T/Kqf6G/ixh1pmKNZld1WOINtrK07GLWFSp
-         psYayT4MMDC5yIVWSuLTPFRdI78XqUZU+i4p+zHerSrQFfh9MDIj4tFNNH4hBZgase8V
-         IAEQImbr5FvbiCd0Wa+duYix6UHO+QvIMT5iN1nrcxr8JWaU5o5pd2RCBRkprysJbMiz
-         SCrw==
+        bh=ogpWsvnZoTjsVLTMRwt0MUzlpuTaHOsyq+/rZpbzBIA=;
+        b=KN7E6r54tS+57WRULrmmLeaw88D1Jj68cHY9ifod+rnE8TkdZfWWuAeHYfDl7npTuT
+         Az9qnXF4556bv5SJSqaQyZUCfqF4kWCZEAVneVdpMnL2nZxN11iMWr0Xb44+DKmzhAwc
+         xf4vxanuiHvuFo+ls2wKAZHPGUp+WRBr3y9W2mhxH71esdIH8mcok2/T2bfVbWJXYQ7y
+         +Tbkb76pFVLwvyadTD+0kp84GYnmo3Di5fH2oHC3dQiu01lmOeZpusFNIMeF7sBU6DoG
+         Uz3N5DLoYy38B6ZNilVRqdOaXcvaj1t7KWSr7owWHoaKTbx84jjrt/oedwjZT2Se+5RI
+         39fQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=/NQcBcxnSSCbTyD9KLIq28pNKLVWeJF0Xi2g4zRlj5Q=;
-        b=Rtc4WxFLjCm0fgJzRucy/dkXGf5spyzLbR5hipxkMkuWkd6flSDmzIlY1za2HjCsuN
-         DHMDHd7RqUdTvgHNd1V7R4dy1/fjwbblXaAizvXBauvCpGbByJuAac00fDSk3AqE7evx
-         ZMZgHgZ5uCeejDRbm1JlEMiMoTwYtWAoDjVMjpOE/kZm2RrXOnZIP5Ux2cOo0T7mCsEC
-         HYzFBwJ5xDiwnoshKlZZJTRyQNsBEAuFs12Z3OJ/3phAtuBDJUrPhEDTM60rSWerWxMA
-         FZMDAdFwnhXZIck38A8mgG6uUlB6K8mq3G+xZZalgupELu5WGsx3xAt3+2aqFH+/KMca
-         SdEw==
-X-Gm-Message-State: AOAM5305cnmCz4P4LEluFIT8hSB7ooNj77mXwHKQdlcKwWTWoDOlhotj
-        Qbswl4YqhHpVg3J6LeoGorBi5X1JtnxrZA==
-X-Google-Smtp-Source: ABdhPJzVftKX3JHllPFJXT+Px6ObnhPcoq33wsrCnt7OC07UiXA3O0/RMhAm/IYNx/ni//62ovC1Pw==
-X-Received: by 2002:a17:90a:9f44:: with SMTP id q4mr27157886pjv.226.1607976209548;
-        Mon, 14 Dec 2020 12:03:29 -0800 (PST)
+        bh=ogpWsvnZoTjsVLTMRwt0MUzlpuTaHOsyq+/rZpbzBIA=;
+        b=dl7WCjj9Gl6zD+YmIpINSbD3PmmI/zfm1UQj/cbOhZWvKEZiH+wP/WK1S0EHvJjbUg
+         IRphXBLR4d72cZ3SdTD3TD13ZOqPlnsLl8t1MqT+uINSouFl8JE+jb7e0kulMNZNGjRe
+         CevNlPt9fnNei584U+8vQ5bt8cIwRjc9/R5m6KJ1WDGk8F1UNePgK7hvnYY6l3t3CQev
+         HYwIAGOjL+oaEYvMLQZsxOgiyaMhts1DMwBdyYHKAFWOhrrlUbgBO3wmoadBdRkhBZ9B
+         9l0RgsYv2EjLTYO1ssDeAf6ys8i96KCgy26jTUTXDg+AG5TwQ2oCvpdL59wVp3eCRsfk
+         +rfg==
+X-Gm-Message-State: AOAM532uepih0ofKkdit/6W9axsgmrbwskoplFr9ONYxOUNxc9iyA2lG
+        +cVRMieGR/Qx314wrC3gHQmUZw==
+X-Google-Smtp-Source: ABdhPJxnwCeO9nOyTdaRjxZ6GMaPGJjCrMkYzCFe+XNY3AESM6nW89/uvfknHadfXxweJ1ZLXeY7mw==
+X-Received: by 2002:a17:90b:346:: with SMTP id fh6mr15544080pjb.225.1607976215664;
+        Mon, 14 Dec 2020 12:03:35 -0800 (PST)
 Received: from localhost.localdomain ([163.172.76.58])
-        by smtp.googlemail.com with ESMTPSA id js9sm22434109pjb.2.2020.12.14.12.03.23
+        by smtp.googlemail.com with ESMTPSA id js9sm22434109pjb.2.2020.12.14.12.03.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Dec 2020 12:03:29 -0800 (PST)
+        Mon, 14 Dec 2020 12:03:35 -0800 (PST)
 From:   Corentin Labbe <clabbe@baylibre.com>
 To:     arnd@arndb.de, davem@davemloft.net, herbert@gondor.apana.org.au,
         jernej.skrabec@siol.net, mripard@kernel.org, wens@csie.org
 Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
         Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v4 6/8] crypto: sun4i-ss: fix kmap usage
-Date:   Mon, 14 Dec 2020 20:02:30 +0000
-Message-Id: <20201214200232.17357-7-clabbe@baylibre.com>
+Subject: [PATCH v4 7/8] crypto: sun4i-ss: enabled stats via debugfs
+Date:   Mon, 14 Dec 2020 20:02:31 +0000
+Message-Id: <20201214200232.17357-8-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201214200232.17357-1-clabbe@baylibre.com>
 References: <20201214200232.17357-1-clabbe@baylibre.com>
@@ -72,246 +72,233 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-With the recent kmap change, some tests which were conditional on
-CONFIG_DEBUG_HIGHMEM now are enabled by default.
-This permit to detect a problem in sun4i-ss usage of kmap.
+This patch enable to access usage stats for each algorithm.
 
-sun4i-ss uses two kmap via sg_miter (one for input, one for output), but
-using two kmap at the same time is hard:
-"the ordering has to be correct and with sg_miter that's probably hard to get
-right." (quoting Tlgx)
-
-So the easiest solution is to never have two sg_miter/kmap open at the same time.
-After each use of sg_miter, I store the current index, for being able to
-resume sg_miter to the right place.
-
-Fixes: 6298e948215f ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- .../allwinner/sun4i-ss/sun4i-ss-cipher.c      | 109 +++++++++++-------
- 1 file changed, 65 insertions(+), 44 deletions(-)
+ drivers/crypto/allwinner/Kconfig              |  9 ++++
+ .../allwinner/sun4i-ss/sun4i-ss-cipher.c      | 20 +++++++
+ .../crypto/allwinner/sun4i-ss/sun4i-ss-core.c | 52 +++++++++++++++++++
+ .../crypto/allwinner/sun4i-ss/sun4i-ss-hash.c |  6 +++
+ .../crypto/allwinner/sun4i-ss/sun4i-ss-prng.c |  5 ++
+ drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h  |  6 +++
+ 6 files changed, 98 insertions(+)
 
+diff --git a/drivers/crypto/allwinner/Kconfig b/drivers/crypto/allwinner/Kconfig
+index 3bd917584754..16eb42140e28 100644
+--- a/drivers/crypto/allwinner/Kconfig
++++ b/drivers/crypto/allwinner/Kconfig
+@@ -51,6 +51,15 @@ config CRYPTO_DEV_SUN4I_SS_PRNG
+ 	  Select this option if you want to provide kernel-side support for
+ 	  the Pseudo-Random Number Generator found in the Security System.
+ 
++config CRYPTO_DEV_SUN4I_SS_DEBUG
++	bool "Enable sun4i-ss stats"
++	depends on CRYPTO_DEV_SUN4I_SS
++	depends on DEBUG_FS
++	help
++	  Say y to enable sun4i-ss debug stats.
++	  This will create /sys/kernel/debug/sun4i-ss/stats for displaying
++	  the number of requests per algorithm.
++
+ config CRYPTO_DEV_SUN8I_CE
+ 	tristate "Support for Allwinner Crypto Engine cryptographic offloader"
+ 	select CRYPTO_SKCIPHER
 diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
-index 5759fa79f293..ffa628c89e21 100644
+index ffa628c89e21..d5275d914d09 100644
 --- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
 +++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
-@@ -31,6 +31,8 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
- 	unsigned int ileft = areq->cryptlen;
- 	unsigned int oleft = areq->cryptlen;
- 	unsigned int todo;
-+	unsigned long pi = 0, po = 0; /* progress for in and out */
-+	bool miter_err;
+@@ -36,6 +36,8 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
  	struct sg_mapping_iter mi, mo;
  	unsigned int oi, oo; /* offset for in and out */
  	unsigned long flags;
-@@ -63,39 +65,51 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
- 	}
- 	writel(mode, ss->base + SS_CTL);
++	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
++	struct sun4i_ss_alg_template *algt;
  
--	sg_miter_start(&mi, areq->src, sg_nents(areq->src),
--		       SG_MITER_FROM_SG | SG_MITER_ATOMIC);
--	sg_miter_start(&mo, areq->dst, sg_nents(areq->dst),
--		       SG_MITER_TO_SG | SG_MITER_ATOMIC);
--	sg_miter_next(&mi);
--	sg_miter_next(&mo);
--	if (!mi.addr || !mo.addr) {
--		dev_err_ratelimited(ss->dev, "ERROR: sg_miter return null\n");
--		err = -EINVAL;
--		goto release_ss;
--	}
- 
- 	ileft = areq->cryptlen / 4;
- 	oleft = areq->cryptlen / 4;
- 	oi = 0;
- 	oo = 0;
- 	do {
--		todo = min(rx_cnt, ileft);
--		todo = min_t(size_t, todo, (mi.length - oi) / 4);
--		if (todo) {
--			ileft -= todo;
--			writesl(ss->base + SS_RXFIFO, mi.addr + oi, todo);
--			oi += todo * 4;
--		}
--		if (oi == mi.length) {
--			sg_miter_next(&mi);
--			oi = 0;
-+		if (ileft) {
-+			sg_miter_start(&mi, areq->src, sg_nents(areq->src),
-+					SG_MITER_FROM_SG | SG_MITER_ATOMIC);
-+			if (pi)
-+				sg_miter_skip(&mi, pi);
-+			miter_err = sg_miter_next(&mi);
-+			if (!miter_err || !mi.addr) {
-+				dev_err_ratelimited(ss->dev, "ERROR: sg_miter return null\n");
-+				err = -EINVAL;
-+				goto release_ss;
-+			}
-+			todo = min(rx_cnt, ileft);
-+			todo = min_t(size_t, todo, (mi.length - oi) / 4);
-+			if (todo) {
-+				ileft -= todo;
-+				writesl(ss->base + SS_RXFIFO, mi.addr + oi, todo);
-+				oi += todo * 4;
-+			}
-+			if (oi == mi.length) {
-+				pi += mi.length;
-+				oi = 0;
-+			}
-+			sg_miter_stop(&mi);
- 		}
- 
- 		spaces = readl(ss->base + SS_FCSR);
- 		rx_cnt = SS_RXFIFO_SPACES(spaces);
- 		tx_cnt = SS_TXFIFO_SPACES(spaces);
- 
-+		sg_miter_start(&mo, areq->dst, sg_nents(areq->dst),
-+			       SG_MITER_TO_SG | SG_MITER_ATOMIC);
-+		if (po)
-+			sg_miter_skip(&mo, po);
-+		miter_err = sg_miter_next(&mo);
-+		if (!miter_err || !mo.addr) {
-+			dev_err_ratelimited(ss->dev, "ERROR: sg_miter return null\n");
-+			err = -EINVAL;
-+			goto release_ss;
-+		}
- 		todo = min(tx_cnt, oleft);
- 		todo = min_t(size_t, todo, (mo.length - oo) / 4);
- 		if (todo) {
-@@ -104,9 +118,10 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
- 			oo += todo * 4;
- 		}
- 		if (oo == mo.length) {
--			sg_miter_next(&mo);
- 			oo = 0;
-+			po += mo.length;
- 		}
-+		sg_miter_stop(&mo);
- 	} while (oleft);
- 
- 	if (areq->iv) {
-@@ -120,8 +135,6 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
+ 	if (!areq->cryptlen)
+ 		return 0;
+@@ -52,6 +54,12 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
+ 		scatterwalk_map_and_copy(backup_iv, areq->src, areq->cryptlen - ivsize, ivsize, 0);
  	}
  
- release_ss:
--	sg_miter_stop(&mi);
--	sg_miter_stop(&mo);
- 	writel(0, ss->base + SS_CTL);
- 	spin_unlock_irqrestore(&ss->slock, flags);
- 	return err;
-@@ -174,6 +187,8 @@ static int sun4i_ss_cipher_poll(struct skcipher_request *areq)
- 	unsigned int todo;
- 	void *backup_iv = NULL;
- 	struct sg_mapping_iter mi, mo;
-+	unsigned long pi = 0, po = 0; /* progress for in and out */
-+	bool miter_err;
- 	unsigned int oi, oo;	/* offset for in and out */
- 	unsigned int ob = 0;	/* offset in buf */
- 	unsigned int obo = 0;	/* offset in bufo*/
-@@ -234,17 +249,6 @@ static int sun4i_ss_cipher_poll(struct skcipher_request *areq)
- 	}
- 	writel(mode, ss->base + SS_CTL);
- 
--	sg_miter_start(&mi, areq->src, sg_nents(areq->src),
--		       SG_MITER_FROM_SG | SG_MITER_ATOMIC);
--	sg_miter_start(&mo, areq->dst, sg_nents(areq->dst),
--		       SG_MITER_TO_SG | SG_MITER_ATOMIC);
--	sg_miter_next(&mi);
--	sg_miter_next(&mo);
--	if (!mi.addr || !mo.addr) {
--		dev_err_ratelimited(ss->dev, "ERROR: sg_miter return null\n");
--		err = -EINVAL;
--		goto release_ss;
--	}
- 	ileft = areq->cryptlen;
- 	oleft = areq->cryptlen;
- 	oi = 0;
-@@ -252,6 +256,16 @@ static int sun4i_ss_cipher_poll(struct skcipher_request *areq)
- 
- 	while (oleft) {
- 		if (ileft) {
-+			sg_miter_start(&mi, areq->src, sg_nents(areq->src),
-+				       SG_MITER_FROM_SG | SG_MITER_ATOMIC);
-+			if (pi)
-+				sg_miter_skip(&mi, pi);
-+			miter_err = sg_miter_next(&mi);
-+			if (!miter_err || !mi.addr) {
-+				dev_err_ratelimited(ss->dev, "ERROR: sg_miter return null\n");
-+				err = -EINVAL;
-+				goto release_ss;
-+			}
- 			/*
- 			 * todo is the number of consecutive 4byte word that we
- 			 * can read from current SG
-@@ -284,31 +298,38 @@ static int sun4i_ss_cipher_poll(struct skcipher_request *areq)
- 				}
- 			}
- 			if (oi == mi.length) {
--				sg_miter_next(&mi);
-+				pi += mi.length;
- 				oi = 0;
- 			}
-+			sg_miter_stop(&mi);
- 		}
- 
- 		spaces = readl(ss->base + SS_FCSR);
- 		rx_cnt = SS_RXFIFO_SPACES(spaces);
- 		tx_cnt = SS_TXFIFO_SPACES(spaces);
--		dev_dbg(ss->dev,
--			"%x %u/%zu %u/%u cnt=%u %u/%zu %u/%u cnt=%u %u\n",
--			mode,
--			oi, mi.length, ileft, areq->cryptlen, rx_cnt,
--			oo, mo.length, oleft, areq->cryptlen, tx_cnt, ob);
- 
- 		if (!tx_cnt)
- 			continue;
-+		sg_miter_start(&mo, areq->dst, sg_nents(areq->dst),
-+			       SG_MITER_TO_SG | SG_MITER_ATOMIC);
-+		if (po)
-+			sg_miter_skip(&mo, po);
-+		miter_err = sg_miter_next(&mo);
-+		if (!miter_err || !mo.addr) {
-+			dev_err_ratelimited(ss->dev, "ERROR: sg_miter return null\n");
-+			err = -EINVAL;
-+			goto release_ss;
-+		}
- 		/* todo in 4bytes word */
- 		todo = min(tx_cnt, oleft / 4);
- 		todo = min_t(size_t, todo, (mo.length - oo) / 4);
++	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG)) {
++		algt = container_of(alg, struct sun4i_ss_alg_template, alg.crypto);
++		algt->stat_opti++;
++		algt->stat_bytes += areq->cryptlen;
++	}
 +
- 		if (todo) {
- 			readsl(ss->base + SS_TXFIFO, mo.addr + oo, todo);
- 			oleft -= todo * 4;
- 			oo += todo * 4;
- 			if (oo == mo.length) {
--				sg_miter_next(&mo);
-+				po += mo.length;
- 				oo = 0;
- 			}
- 		} else {
-@@ -333,12 +354,14 @@ static int sun4i_ss_cipher_poll(struct skcipher_request *areq)
- 				obo += todo;
- 				oo += todo;
- 				if (oo == mo.length) {
-+					po += mo.length;
- 					sg_miter_next(&mo);
- 					oo = 0;
- 				}
- 			} while (obo < obl);
- 			/* bufo must be fully used here */
+ 	spin_lock_irqsave(&ss->slock, flags);
+ 
+ 	for (i = 0; i < op->keylen / 4; i++)
+@@ -147,6 +155,13 @@ static int noinline_for_stack sun4i_ss_cipher_poll_fallback(struct skcipher_requ
+ 	struct sun4i_tfm_ctx *op = crypto_skcipher_ctx(tfm);
+ 	struct sun4i_cipher_req_ctx *ctx = skcipher_request_ctx(areq);
+ 	int err;
++	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
++	struct sun4i_ss_alg_template *algt;
++
++	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG)) {
++		algt = container_of(alg, struct sun4i_ss_alg_template, alg.crypto);
++		algt->stat_fb++;
++	}
+ 
+ 	skcipher_request_set_tfm(&ctx->fallback_req, op->fallback_tfm);
+ 	skcipher_request_set_callback(&ctx->fallback_req, areq->base.flags,
+@@ -236,6 +251,11 @@ static int sun4i_ss_cipher_poll(struct skcipher_request *areq)
+ 		scatterwalk_map_and_copy(backup_iv, areq->src, areq->cryptlen - ivsize, ivsize, 0);
+ 	}
+ 
++	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG)) {
++		algt->stat_req++;
++		algt->stat_bytes += areq->cryptlen;
++	}
++
+ 	spin_lock_irqsave(&ss->slock, flags);
+ 
+ 	for (i = 0; i < op->keylen / 4; i++)
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
+index a2b67f7f8a81..709905ec4680 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
+@@ -10,6 +10,7 @@
+  */
+ #include <linux/clk.h>
+ #include <linux/crypto.h>
++#include <linux/debugfs.h>
+ #include <linux/io.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
+@@ -234,6 +235,51 @@ static struct sun4i_ss_alg_template ss_algs[] = {
+ #endif
+ };
+ 
++static int sun4i_ss_dbgfs_read(struct seq_file *seq, void *v)
++{
++	unsigned int i;
++
++	for (i = 0; i < ARRAY_SIZE(ss_algs); i++) {
++		if (!ss_algs[i].ss)
++			continue;
++		switch (ss_algs[i].type) {
++		case CRYPTO_ALG_TYPE_SKCIPHER:
++			seq_printf(seq, "%s %s reqs=%lu opti=%lu fallback=%lu tsize=%lu\n",
++				   ss_algs[i].alg.crypto.base.cra_driver_name,
++				   ss_algs[i].alg.crypto.base.cra_name,
++				   ss_algs[i].stat_req, ss_algs[i].stat_opti, ss_algs[i].stat_fb,
++				   ss_algs[i].stat_bytes);
++			break;
++		case CRYPTO_ALG_TYPE_RNG:
++			seq_printf(seq, "%s %s reqs=%lu tsize=%lu\n",
++				   ss_algs[i].alg.rng.base.cra_driver_name,
++				   ss_algs[i].alg.rng.base.cra_name,
++				   ss_algs[i].stat_req, ss_algs[i].stat_bytes);
++			break;
++		case CRYPTO_ALG_TYPE_AHASH:
++			seq_printf(seq, "%s %s reqs=%lu\n",
++				   ss_algs[i].alg.hash.halg.base.cra_driver_name,
++				   ss_algs[i].alg.hash.halg.base.cra_name,
++				   ss_algs[i].stat_req);
++			break;
++		}
++	}
++	return 0;
++}
++
++static int sun4i_ss_dbgfs_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, sun4i_ss_dbgfs_read, inode->i_private);
++}
++
++static const struct file_operations sun4i_ss_debugfs_fops = {
++	.owner = THIS_MODULE,
++	.open = sun4i_ss_dbgfs_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
+ /*
+  * Power management strategy: The device is suspended unless a TFM exists for
+  * one of the algorithms proposed by this driver.
+@@ -454,6 +500,12 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+ 			break;
  		}
-+		sg_miter_stop(&mo);
  	}
- 	if (areq->iv) {
- 		if (mode & SS_DECRYPTION) {
-@@ -351,8 +374,6 @@ static int sun4i_ss_cipher_poll(struct skcipher_request *areq)
- 	}
++
++	/* Ignore error of debugfs */
++	ss->dbgfs_dir = debugfs_create_dir("sun4i-ss", NULL);
++	ss->dbgfs_stats = debugfs_create_file("stats", 0444, ss->dbgfs_dir, ss,
++					      &sun4i_ss_debugfs_fops);
++
+ 	return 0;
+ error_alg:
+ 	i--;
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
+index 1dff48558f53..c1b4585e9bbc 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
+@@ -191,8 +191,10 @@ static int sun4i_hash(struct ahash_request *areq)
+ 	u32 spaces, rx_cnt = SS_RX_DEFAULT, bf[32] = {0}, v, ivmode = 0;
+ 	struct sun4i_req_ctx *op = ahash_request_ctx(areq);
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
++	struct ahash_alg *alg = __crypto_ahash_alg(tfm->base.__crt_alg);
+ 	struct sun4i_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
+ 	struct sun4i_ss_ctx *ss = tfmctx->ss;
++	struct sun4i_ss_alg_template *algt;
+ 	struct scatterlist *in_sg = areq->src;
+ 	struct sg_mapping_iter mi;
+ 	int in_r, err = 0;
+@@ -398,6 +400,10 @@ static int sun4i_hash(struct ahash_request *areq)
+  */
  
- release_ss:
--	sg_miter_stop(&mi);
--	sg_miter_stop(&mo);
- 	writel(0, ss->base + SS_CTL);
- 	spin_unlock_irqrestore(&ss->slock, flags);
+ hash_final:
++	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG)) {
++		algt = container_of(alg, struct sun4i_ss_alg_template, alg.hash);
++		algt->stat_req++;
++	}
  
+ 	/* write the remaining words of the wait buffer */
+ 	if (op->len) {
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
+index 729aafdbea84..152841076e3a 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
+@@ -32,6 +32,11 @@ int sun4i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
+ 	if (err < 0)
+ 		return err;
+ 
++	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG)) {
++		algt->stat_req++;
++		algt->stat_bytes += todo;
++	}
++
+ 	spin_lock_bh(&ss->slock);
+ 
+ 	writel(mode, ss->base + SS_CTL);
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
+index c242fccb2ab6..0fee6f4e2d90 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
+@@ -154,6 +154,8 @@ struct sun4i_ss_ctx {
+ #ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_PRNG
+ 	u32 seed[SS_SEED_LEN / BITS_PER_LONG];
+ #endif
++	struct dentry *dbgfs_dir;
++	struct dentry *dbgfs_stats;
+ };
+ 
+ struct sun4i_ss_alg_template {
+@@ -165,6 +167,10 @@ struct sun4i_ss_alg_template {
+ 		struct rng_alg rng;
+ 	} alg;
+ 	struct sun4i_ss_ctx *ss;
++	unsigned long stat_req;
++	unsigned long stat_fb;
++	unsigned long stat_bytes;
++	unsigned long stat_opti;
+ };
+ 
+ struct sun4i_tfm_ctx {
 -- 
 2.26.2
 
