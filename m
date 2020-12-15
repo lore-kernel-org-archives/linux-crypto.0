@@ -2,117 +2,124 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 900ABC4361B
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Dec 2020 08:56:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF71C2BB9A
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Dec 2020 08:59:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C54622225
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Dec 2020 08:56:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC4512222A
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Dec 2020 08:59:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726385AbgLOI4i (ORCPT
+        id S1727363AbgLOI7Z (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Dec 2020 03:56:38 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60908 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726921AbgLOI4c (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Dec 2020 03:56:32 -0500
-X-Gm-Message-State: AOAM530Hac0bMk5sERUXG911rJsypgGAZCYwfwOgxhb409rf/mltBBGr
-        2XYm5OPAf2V4bf/zV/dy6oaggidzQSTSEpQ7yiY=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608022550;
-        bh=D2+MbPEoLQnpTqTu5KG2rzBroID4r2x61dVimhXbLb0=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=jFMyfiX3u18/YLOaBuiBFFLMfzD33IAnBbqlvJhl2HYlTQER5k7SBbkD/YQBq3dEC
-         TLjhW00UI+XDO/dEE6YdFFo5ivWHOzxDqp/oPnIV6NlZBqoeQeYMxaJ+yqXuY4zsms
-         m/KugvOiZnaj/kc29nhr7c2EkTcpWtqrUtkUd63tHng+JzEAQwpvazaSVv3V4DPla5
-         GqjghIDS7epqQ8bFpq5whBKaqoaVjduhZ3+QDQ57sMzEGBn9ah5oCyTCrOOwaTL42S
-         wy0wwXS6f+KHaYhstvv28//Yl/VUjcQ6dbExMbMvseRfY4bySAr+JiHmP36MGP2p+T
-         w2PO3/Tca6M7A==
-X-Google-Smtp-Source: ABdhPJy5MHyCIOmI2KPR75DMyNS6+dFAQmh9gMndmZn+cCV7InhvJ7MVk/HBp+SPEhx2xnretew1/htnWhWbTCyArAI=
-X-Received: by 2002:aca:b809:: with SMTP id i9mr20685479oif.174.1608022548913;
- Tue, 15 Dec 2020 00:55:48 -0800 (PST)
+        Tue, 15 Dec 2020 03:59:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47696 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726777AbgLOI7T (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Dec 2020 03:59:19 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7726C0617A6;
+        Tue, 15 Dec 2020 00:58:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=AKm4eJHa0x7jzyMwctEebqE5zykXwFHnRzlnlcFMVho=; b=NgHRH8X+2NtNssI6RUv7NlxmWx
+        xce2nCced5yWEbsjfNHzsgUH2BPLDgAuslXtubwogm+lWxJCBVsh6EWvlqRESsWSV56mSTwelxAQd
+        hjSLxc2rpQqwvANXLLP0EQsiW3lf4D9mdSrNFriG3vgE3VOxZ9sWnOqMUKZlk7I745kusquQMx+AX
+        1SWL+BfGyZ1mNPu/JqmwaSyZbhHNkC7uYVPOAIVZK6h/aI3FVQLaPmqOyjgSpuefT+ldunvusWmUC
+        PzAcuMmkv//VTgx9IFhWD5+HfXoxiN0uyxwIEyDbDPhbgp79C2i6OQtgnxXXkVlwIsl1xvg7dSVx1
+        nb5uMg/g==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kp6A1-00051s-ID; Tue, 15 Dec 2020 08:58:21 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 3429D300446;
+        Tue, 15 Dec 2020 09:58:19 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 142CE2C787A47; Tue, 15 Dec 2020 09:58:19 +0100 (CET)
+Date:   Tue, 15 Dec 2020 09:58:19 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, TimGuo-oc@zhaoxin.com,
+        CooperYan@zhaoxin.com, QiyuanWang@zhaoxin.com,
+        HerryYang@zhaoxin.com, CobeChen@zhaoxin.com, SilviaZhao@zhaoxin.com
+Subject: Re: [PATCH] crypto: x86/crc32c-intel - Don't match some Zhaoxin CPUs
+Message-ID: <20201215085819.GE3040@hirez.programming.kicks-ass.net>
+References: <1607918392-19171-1-git-send-email-TonyWWang-oc@zhaoxin.com>
 MIME-Version: 1.0
-References: <CAMj1kXGO+kbZ+2VmUQKxLYos2nR5vqZKjengxPxPjSXudG-zLw@mail.gmail.com>
- <20201201221628.GA32130@gondor.apana.org.au> <CAMj1kXFrLiHfv1S1AM=5pc1J9gWwZVuoGvmFoTT0-+oREoojTA@mail.gmail.com>
- <20201201231158.GA32274@gondor.apana.org.au> <CAMj1kXHwD5ktJTUrh8sndMY7P0kSFhgkGT66YJN1-ONUaU05-g@mail.gmail.com>
- <20201210024342.GA26428@gondor.apana.org.au> <e02fe07e-8cb6-f889-3228-60e4fabf4e40@candelatech.com>
- <CAMj1kXF05XZtyakdpLixpP9Lroy0D3_gEcY2SFbSshD8ERUU7w@mail.gmail.com>
- <20201210111427.GA28014@gondor.apana.org.au> <CAMj1kXG39GgsTeNBbX7_oaK+f-awPyL8NxJ7R+fyOBjL4c5xMw@mail.gmail.com>
- <20201210121627.GB28441@gondor.apana.org.au> <CAMj1kXE-+35tfO87024xB274ZVOu7HTHqDa8o-hjoxDasd8p7g@mail.gmail.com>
-In-Reply-To: <CAMj1kXE-+35tfO87024xB274ZVOu7HTHqDa8o-hjoxDasd8p7g@mail.gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 15 Dec 2020 09:55:37 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXH5LPib2vPgLkdzHX4gSawDSE=ij451s106_xTuT19YmA@mail.gmail.com>
-Message-ID: <CAMj1kXH5LPib2vPgLkdzHX4gSawDSE=ij451s106_xTuT19YmA@mail.gmail.com>
-Subject: Re: [PATCH v2] crypto: aesni - add ccm(aes) algorithm implementation
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Ben Greear <greearb@candelatech.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1607918392-19171-1-git-send-email-TonyWWang-oc@zhaoxin.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-(+ Eric)
+On Mon, Dec 14, 2020 at 11:59:52AM +0800, Tony W Wang-oc wrote:
 
-TL;DR can we find a way to use synchronous SIMD skciphers/aeads
-without cryptd or scalar fallbacks
+Didn't I mention something about a comment?
 
-On Thu, 10 Dec 2020 at 13:19, Ard Biesheuvel <ardb@kernel.org> wrote:
->
-> On Thu, 10 Dec 2020 at 13:16, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> >
-> > On Thu, Dec 10, 2020 at 01:03:56PM +0100, Ard Biesheuvel wrote:
-> > >
-> > > But we should probably start policing this a bit more. For instance, we now have
-> > >
-> > > drivers/net/macsec.c:
-> > >
-> > > /* Pick a sync gcm(aes) cipher to ensure order is preserved. */
-> > > tfm = crypto_alloc_aead("gcm(aes)", 0, CRYPTO_ALG_ASYNC);
-> > >
-> > > (btw the comment is bogus, right?)
-> > >
-> > > TLS_SW does the same thing in net/tls/tls_device_fallback.c.
-> >
-> > Short of us volunteering to write code for every user out there
-> > I don't see a way out.
-> >
-> > > Async is obviously needed for h/w accelerators, but could we perhaps
-> > > do better for s/w SIMD algorithms? Those are by far the most widely
-> > > used ones.
-> >
-> > If you can come up with a way that avoids the cryptd model without
-> > using a fallback obviously that would be the ultimate solution.
-> >
->
-> Could we disable softirq handling in these regions?
+>  static const struct x86_cpu_id crc32c_cpu_id[] = {
+> +	X86_MATCH_VENDOR_FAM_FEATURE(ZHAOXIN, 0x6, X86_FEATURE_XMM4_2, 1),
+> +	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(ZHAOXIN, 0x7, 0x1b, X86_FEATURE_XMM4_2, 1),
+> +	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(ZHAOXIN, 0x7, 0x3b, X86_FEATURE_XMM4_2, 1),
+> +	X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 0x6, X86_FEATURE_XMM4_2, 1),
+> +	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(CENTAUR, 0x7, 0x1b, X86_FEATURE_XMM4_2, 1),
+> +	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(CENTAUR, 0x7, 0x3b, X86_FEATURE_XMM4_2, 1),
+>  	X86_MATCH_FEATURE(X86_FEATURE_XMM4_2, NULL),
+>  	{}
 
-I have been looking into this a bit, and I wonder if we might consider
-doing the following:
-- forbid synchronous skcipher/aead encrypt/decrypt calls from any
-other context than task or softirq (insofar this is not already the
-case)
-- limit kernel mode SIMD in general to task or softirq context
-- reduce the scope for simd begin/end blocks, which is better for
-PREEMPT in any case, and no longer results in a performance hit on x86
-as it did before, now that we have lazy restore for the userland FPU
-state
-- disable softirq processing when enabling kernel mode SIMD
+Also, the above is weird in that is has the negative entries marked
+positive, and 1/NULL are inconsistent.
 
-This way, we don't need a scalar fallback at all, given that any SIMD
-use in softirq context is guaranteed to occur when the SIMD registers
-are dead from the task's pov.
+Something like so then?
 
-So the question is then how granular these kernel mode SIMD regions
-need to be to avoid excessive latencies in softirq handling.
+---
 
-I think this could also be an opportunity for a bit more alignment
-between architectures on this topic.
-
--- 
-Ard.
+diff --git a/arch/x86/crypto/crc32c-intel_glue.c b/arch/x86/crypto/crc32c-intel_glue.c
+index feccb5254c7e..f6e6669a5102 100644
+--- a/arch/x86/crypto/crc32c-intel_glue.c
++++ b/arch/x86/crypto/crc32c-intel_glue.c
+@@ -215,14 +215,31 @@ static struct shash_alg alg = {
+ };
+ 
+ static const struct x86_cpu_id crc32c_cpu_id[] = {
+-	X86_MATCH_FEATURE(X86_FEATURE_XMM4_2, NULL),
++	/*
++	 * Negative entries; exclude these chips from using this driver.
++	 * They match the positive rule below, but their CRC32 instruction
++	 * implementation is so slow, it doesn't merrit use.
++	 */
++	X86_MATCH_VENDOR_FAM_FEATURE(ZHAOXIN, 0x6, X86_FEATURE_XMM4_2, false),
++	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(ZHAOXIN, 0x7, 0x1b, X86_FEATURE_XMM4_2, false),
++	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(ZHAOXIN, 0x7, 0x3b, X86_FEATURE_XMM4_2, false),
++	X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 0x6, X86_FEATURE_XMM4_2, false),
++	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(CENTAUR, 0x7, 0x1b, X86_FEATURE_XMM4_2, false),
++	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(CENTAUR, 0x7, 0x3b, X86_FEATURE_XMM4_2, false),
++	/*
++	 * Positive entry; SSE-4.2 instructions include special purpose CRC32
++	 * instructions.
++	 */
++	X86_MATCH_FEATURE(X86_FEATURE_XMM4_2, true),
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(x86cpu, crc32c_cpu_id);
+ 
+ static int __init crc32c_intel_mod_init(void)
+ {
+-	if (!x86_match_cpu(crc32c_cpu_id))
++	const struct x86_cpu_id *m = x86_match_cpu(crc32c_cpu_id);
++
++	if (!m || !m->driver_data)
+ 		return -ENODEV;
+ #ifdef CONFIG_X86_64
+ 	if (boot_cpu_has(X86_FEATURE_PCLMULQDQ)) {
