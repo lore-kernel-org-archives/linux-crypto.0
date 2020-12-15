@@ -2,92 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C60C4361B
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Dec 2020 02:16:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B91C2BB48
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Dec 2020 04:58:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 08000206CB
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Dec 2020 02:16:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CE202168B
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Dec 2020 04:58:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726559AbgLOCQh (ORCPT
+        id S1725948AbgLOE6B (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Dec 2020 21:16:37 -0500
-Received: from ZXSHCAS1.zhaoxin.com ([203.148.12.81]:46345 "EHLO
-        ZXSHCAS1.zhaoxin.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726050AbgLOCQb (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Dec 2020 21:16:31 -0500
-Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHCAS1.zhaoxin.com
- (10.28.252.161) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Tue, 15 Dec
- 2020 10:15:42 +0800
-Received: from [10.32.56.37] (10.32.56.37) by zxbjmbx1.zhaoxin.com
- (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Tue, 15 Dec
- 2020 10:15:39 +0800
-Subject: Re: [PATCH] crypto: x86/crc32c-intel - Don't match some Zhaoxin CPUs
-To:     Eric Biggers <ebiggers@kernel.org>
-CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <x86@kernel.org>, <hpa@zytor.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <TimGuo-oc@zhaoxin.com>,
-        <CooperYan@zhaoxin.com>, <QiyuanWang@zhaoxin.com>,
-        <HerryYang@zhaoxin.com>, <CobeChen@zhaoxin.com>,
-        <SilviaZhao@zhaoxin.com>
-References: <1607686144-2604-1-git-send-email-TonyWWang-oc@zhaoxin.com>
- <X9Ov3RWDpUik7gXo@sol.localdomain>
- <1f8d17bf-c1d9-6496-d2f8-5773633011fb@zhaoxin.com>
- <X9fN7mOMdn1Dxn63@sol.localdomain>
-From:   Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
-Message-ID: <a95984ea-7451-78fe-88c5-b81f633fecdf@zhaoxin.com>
-Date:   Tue, 15 Dec 2020 10:15:29 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 14 Dec 2020 23:58:01 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34398 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725535AbgLOE5x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Dec 2020 23:57:53 -0500
+Date:   Tue, 15 Dec 2020 06:57:02 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1608008229;
+        bh=kOjVmQdCAqW6cDtf74EVsL3eevU9FttJOVVYKFdveYI=;
+        h=From:To:Cc:Subject:References:In-Reply-To:From;
+        b=heWtiKZvsp7E+YSNyoxoDoqk2l8vAJ3AzOLPezP2wYKXKCW9NwpODvMg2PLxCGsus
+         Z++3ezrHXmMZuCc8HtfwnO/mqvX89mgZOIXbadRgGEM+B+qNQPnzlAJsHbTgLcwU+f
+         lbGgNWM4i3UYPMVloevHXJg7wc8P3G8zMNaotf7GAadsWHBeVYYYumzPacJitRveQJ
+         z81D7CNeefQ4LVpnFzX1V6hi6rhxBkNXaXJJ7so5y2PlABeisBg+pSlC8Pg1NOdRZE
+         TokPQbTr3k63xhDl5Uc4WN/P1UZYBtxSsRC8B6gtjWh42cYB6vmSHb7EGT9r/IndPT
+         SZQ6LoTp1bDYg==
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        "Alexander A. Klimov" <grandmaster@al2klimov.de>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Alex Shi <alex.shi@linux.alibaba.com>,
+        Ben Boeckel <mathstuf@gmail.com>,
+        Denis Efremov <efremov@linux.com>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Jann Horn <jannh@google.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Tom Rix <trix@redhat.com>, YueHaibing <yuehaibing@huawei.com>,
+        keyrings@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        LSM List <linux-security-module@vger.kernel.org>
+Subject: Re: [GIT PULL] keys: Collected minor fixes and cleanups
+Message-ID: <20201215045702.GA24600@kernel.org>
+References: <2659836.1607940186@warthog.procyon.org.uk>
+ <CAHk-=wido5stGfFtRzmW19bB1w2XQAuY8oxUtFN2ZWdk2Grq-w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <X9fN7mOMdn1Dxn63@sol.localdomain>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.32.56.37]
-X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
- zxbjmbx1.zhaoxin.com (10.29.252.163)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wido5stGfFtRzmW19bB1w2XQAuY8oxUtFN2ZWdk2Grq-w@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Mon, Dec 14, 2020 at 12:49:27PM -0800, Linus Torvalds wrote:
+> The pain just isn't worth it, but more importantly, you simply need to
+> get your workflow in order, and not send me completely untested
+> garbage that hasn't even been compiled.
 
-On 15/12/2020 04:41, Eric Biggers wrote:
-> On Mon, Dec 14, 2020 at 10:28:19AM +0800, Tony W Wang-oc wrote:
->> On 12/12/2020 01:43, Eric Biggers wrote:
->>> On Fri, Dec 11, 2020 at 07:29:04PM +0800, Tony W Wang-oc wrote:
->>>> The driver crc32c-intel match CPUs supporting X86_FEATURE_XMM4_2.
->>>> On platforms with Zhaoxin CPUs supporting this X86 feature, When
->>>> crc32c-intel and crc32c-generic are both registered, system will
->>>> use crc32c-intel because its .cra_priority is greater than
->>>> crc32c-generic. This case expect to use crc32c-generic driver for
->>>> some Zhaoxin CPUs to get performance gain, So remove these Zhaoxin
->>>> CPUs support from crc32c-intel.
->>>>
->>>> Signed-off-by: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
->>>
->>> Does this mean that the performance of the crc32c instruction on those CPUs is
->>> actually slower than a regular C implementation?  That's very weird.
->>>
->>
->> From the lmbench3 Create and Delete file test on those chips, I think yes.
->>
-> 
-> Did you try measuring the performance of the hashing itself, and not some
-> higher-level filesystem operations?
-> 
+I have now more bandwidth. It was mostly eaten by SGX, especially last
+few months. Starting from next week, I'll start proactively test keyring
+changes (I'm this week on vacation).
 
-Yes. Was testing on these Zhaoxin CPUs, the result is that with the same
-input value the generic C implementation takes fewer time than the
-crc32c instruction implementation.
+I've been thinking that maybe a two-folded approach would make sense for
+keyring:
 
-Sincerely
-Tony
+1. I would pick fixes to my linux-tpmdd where they would get quickly
+   mirrored to linux-next. It's already taking changes for trusted
+   keys, i.e. not solely for TPM changes.
+2. Feature changes would go through David's tree.
+
+>                Linus
+
+/Jarkko
