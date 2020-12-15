@@ -2,66 +2,145 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF6F3C2BB9A
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Dec 2020 09:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7078C4361B
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Dec 2020 09:59:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 759B422258
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Dec 2020 09:20:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8124C221FF
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Dec 2020 09:59:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727967AbgLOJT6 (ORCPT
+        id S1727082AbgLOJ7o (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Dec 2020 04:19:58 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:50836 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727543AbgLOJTx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Dec 2020 04:19:53 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kp6U2-0002Pr-Sk; Tue, 15 Dec 2020 20:19:04 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 15 Dec 2020 20:19:02 +1100
-Date:   Tue, 15 Dec 2020 20:19:02 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Ben Greear <greearb@candelatech.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH v2] crypto: aesni - add ccm(aes) algorithm implementation
-Message-ID: <20201215091902.GA21455@gondor.apana.org.au>
-References: <20201201231158.GA32274@gondor.apana.org.au>
- <CAMj1kXHwD5ktJTUrh8sndMY7P0kSFhgkGT66YJN1-ONUaU05-g@mail.gmail.com>
- <20201210024342.GA26428@gondor.apana.org.au>
- <e02fe07e-8cb6-f889-3228-60e4fabf4e40@candelatech.com>
- <CAMj1kXF05XZtyakdpLixpP9Lroy0D3_gEcY2SFbSshD8ERUU7w@mail.gmail.com>
- <20201210111427.GA28014@gondor.apana.org.au>
- <CAMj1kXG39GgsTeNBbX7_oaK+f-awPyL8NxJ7R+fyOBjL4c5xMw@mail.gmail.com>
- <20201210121627.GB28441@gondor.apana.org.au>
- <CAMj1kXE-+35tfO87024xB274ZVOu7HTHqDa8o-hjoxDasd8p7g@mail.gmail.com>
- <CAMj1kXH5LPib2vPgLkdzHX4gSawDSE=ij451s106_xTuT19YmA@mail.gmail.com>
+        Tue, 15 Dec 2020 04:59:44 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:37170 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727075AbgLOJ7o (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Dec 2020 04:59:44 -0500
+Received: by mail-ot1-f68.google.com with SMTP id o11so18759415ote.4;
+        Tue, 15 Dec 2020 01:59:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2tYDUx6SI753W7Hldtg8DzizZYg8W92/yzDFr2NF0Jc=;
+        b=FrW/FBtfpz6KgzpY+die90Y4luCoSgmkVqYbkVRwSvSM38dHi7N8bvZOEYVj+ssfmH
+         dj/2xxh2vm2Yt5D31r2hIJBPwdIYI3j6dklXN5OjDwyPqbRJ3Lh5Ff0X2226dBMNPp9p
+         VxKr3XqDgVXNm97xfAArqZq311Im5vvcPtkA/7/3TOyW5oh5Fp6csD462grUikbpmnBp
+         h+ys4owE4tmnSm2YMhUu9Bw8GUaX+alF3O6UIOhr1qqf5cvvuKDCUcYII9D8aoa4TKGA
+         6NhUEm7GH3mlwwKuc4PoCNoJWhMByuCrrpVniEqI7cSkH2GAskzPmfSYwQSfpQbQ9J5M
+         hfJQ==
+X-Gm-Message-State: AOAM532CBwsLvcSIHBgpVkZXWjAwA2TSUf1mwV5kOD8EeUJi4qX5m1GO
+        HZ/VfnYW2uifztU3YmgleT9CMuZRlnxJVEaytv3jb304irM=
+X-Google-Smtp-Source: ABdhPJyyNRhC2Vw49xndoQcAupIZbC+RrIVipadrop2ecq63H3T7mySSTLO496si4WWnsrh5cgZ2HmOOGuWj5wTt9T0=
+X-Received: by 2002:a9d:2203:: with SMTP id o3mr22660508ota.107.1608026343634;
+ Tue, 15 Dec 2020 01:59:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXH5LPib2vPgLkdzHX4gSawDSE=ij451s106_xTuT19YmA@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20201214135453.16e76e9d@canb.auug.org.au>
+In-Reply-To: <20201214135453.16e76e9d@canb.auug.org.au>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Tue, 15 Dec 2020 10:58:52 +0100
+Message-ID: <CAMuHMdWYBLqUVRyNRbOZm=oxv+_uLJ9FK6ebPPvgHcN4Y-YUSQ@mail.gmail.com>
+Subject: Re: linux-next: manual merge of the drm tree with the crypto tree
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     Dave Airlie <airlied@linux.ie>,
+        DRI <dri-devel@lists.freedesktop.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Anitha Chrisanthus <anitha.chrisanthus@intel.com>,
+        Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Mike Healy <mikex.healy@intel.com>,
+        Sam Ravnborg <sam@ravnborg.org>,
+        "Paul J. Murphy" <paul.j.murphy@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 15, 2020 at 09:55:37AM +0100, Ard Biesheuvel wrote:
+On Mon, Dec 14, 2020 at 2:44 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+> Today's linux-next merge of the drm tree got a conflict in:
 >
-> So the question is then how granular these kernel mode SIMD regions
-> need to be to avoid excessive latencies in softirq handling.
+>   MAINTAINERS
+>
+> between commit:
+>
+>   885743324513 ("crypto: keembay - Add support for Keem Bay OCS AES/SM4")
+>
+> from the crypto tree and commit:
+>
+>   ed794057b052 ("drm/kmb: Build files for KeemBay Display driver")
+>
+> from the drm tree.
+>
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>
+> --
+> Cheers,
+> Stephen Rothwell
+>
+> diff --cc MAINTAINERS
+> index 3b358262de8f,eb18459c1d16..000000000000
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
 
-Can you get some real world numbers on what the latency is like?
+> @@@ -8985,16 -8962,13 +8993,23 @@@ M:   Deepak Saxena <dsaxena@plexity.net
+>   S:    Maintained
+>   F:    drivers/char/hw_random/ixp4xx-rng.c
+>
+> + INTEL KEEMBAY DRM DRIVER
 
-Then we could take it to the scheduler folks and see if they're
-OK with it.
+Is it KEEMBAY?
 
-Thanks,
+> + M:    Anitha Chrisanthus <anitha.chrisanthus@intel.com>
+> + M:    Edmund Dea <edmund.j.dea@intel.com>
+> + S:    Maintained
+> + F:    Documentation/devicetree/bindings/display/intel,kmb_display.yaml
+
+I was just going to comment about "intel,kmb_*" vs. "intel,keembay-*", until
+I noticed intel,kmb_display.yaml does not exist, but is called
+Documentation/devicetree/bindings/display/intel,keembay-display.yaml
+in next-20201214.
+
+> + F:    drivers/gpu/drm/kmb/
+> +
+>  +INTEL KEEM BAY OCS AES/SM4 CRYPTO DRIVER
+
+or KEEM BAY?
+
+Or Keem Bay? Keembay? KeemBay?
+
+All of them are present in next-20201214.
+
+>  +M:    Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+>  +S:    Maintained
+>  +F:    Documentation/devicetree/bindings/crypto/intel,keembay-ocs-aes.yaml
+>  +F:    drivers/crypto/keembay/Kconfig
+>  +F:    drivers/crypto/keembay/Makefile
+>  +F:    drivers/crypto/keembay/keembay-ocs-aes-core.c
+>  +F:    drivers/crypto/keembay/ocs-aes.c
+>  +F:    drivers/crypto/keembay/ocs-aes.h
+>  +
+>   INTEL MANAGEMENT ENGINE (mei)
+>   M:    Tomas Winkler <tomas.winkler@intel.com>
+>   L:    linux-kernel@vger.kernel.org
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
