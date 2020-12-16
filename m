@@ -5,35 +5,35 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22A17C2BBD5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED1C5C3526C
 	for <linux-crypto@archiver.kernel.org>; Wed, 16 Dec 2020 17:47:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE04323B3E
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Dec 2020 17:47:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBEAE24D45
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Dec 2020 17:47:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727960AbgLPRrI (ORCPT
+        id S1727986AbgLPRrT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Dec 2020 12:47:08 -0500
-Received: from mga11.intel.com ([192.55.52.93]:21280 "EHLO mga11.intel.com"
+        Wed, 16 Dec 2020 12:47:19 -0500
+Received: from mga11.intel.com ([192.55.52.93]:21271 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727910AbgLPRrI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Dec 2020 12:47:08 -0500
-IronPort-SDR: Qzhg1+mb5/ypRD+vC9ZxbrFzB2ac0s0N1t4tJHOulXPz5vOmgxYz0x5HJtt86FnasPRevU76t3
- j8BuwMXatH8A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9837"; a="171593428"
+        id S1727982AbgLPRrT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Dec 2020 12:47:19 -0500
+IronPort-SDR: RHp2/9W3L3m3RkY0saUzRG1yqdiSth/igyabycXvhClOiGR0yPYCF08WNQQvOHIL6v3D7vW4Cq
+ bQVnIUHrBfTw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9837"; a="171593438"
 X-IronPort-AV: E=Sophos;i="5.78,424,1599548400"; 
-   d="scan'208";a="171593428"
+   d="scan'208";a="171593438"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2020 09:46:12 -0800
-IronPort-SDR: 4FnDo7nVzF8J2anLlDJCKdYCVEECMXpXPaDaB9NPJtszykzPwM+CjUCaAfNOc3Li1y8SnbXB5x
- FpP1pogRR2rw==
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2020 09:46:13 -0800
+IronPort-SDR: 6s/7eqTL8aFJezfJCuYyl1RK/0Mx09HmkBbcdt/0qcc2GpHptnoGcx4pLV5q8Bz/2LvrqtJ6r0
+ gE2r3ziEcnXg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.78,424,1599548400"; 
-   d="scan'208";a="391854209"
+   d="scan'208";a="391854221"
 Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
-  by FMSMGA003.fm.intel.com with ESMTP; 16 Dec 2020 09:46:12 -0800
+  by FMSMGA003.fm.intel.com with ESMTP; 16 Dec 2020 09:46:13 -0800
 From:   "Chang S. Bae" <chang.seok.bae@intel.com>
 To:     tglx@linutronix.de, mingo@kernel.org, bp@suse.de, luto@kernel.org,
         x86@kernel.org, herbert@gondor.apana.org.au
@@ -41,10 +41,10 @@ Cc:     dan.j.williams@intel.com, dave.hansen@intel.com,
         ravi.v.shankar@intel.com, ning.sun@intel.com,
         kumar.n.dwarakanath@intel.com, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, chang.seok.bae@intel.com,
-        linux-doc@vger.kernel.org
-Subject: [RFC PATCH 5/8] x86/cpu: Add a config option and a chicken bit for Key Locker
-Date:   Wed, 16 Dec 2020 09:41:43 -0800
-Message-Id: <20201216174146.10446-6-chang.seok.bae@intel.com>
+        linux-kselftest@vger.kernel.org
+Subject: [RFC PATCH 6/8] selftests/x86: Test Key Locker internal key maintenance
+Date:   Wed, 16 Dec 2020 09:41:44 -0800
+Message-Id: <20201216174146.10446-7-chang.seok.bae@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201216174146.10446-1-chang.seok.bae@intel.com>
 References: <20201216174146.10446-1-chang.seok.bae@intel.com>
@@ -52,87 +52,215 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add a kernel config option to enable the feature (disabled by default) at
-compile-time.
+The test validates the internal key to be the same in all CPUs.
 
-Also, add a new command-line parameter -- 'nokeylocker' to disable the
-feature at boot-time.
+It performs the validation again with the Suspend-To-RAM (ACPI S3) state.
 
 Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
-Cc: x86@kernel.org
-Cc: linux-doc@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
 ---
- Documentation/admin-guide/kernel-parameters.txt |  2 ++
- arch/x86/Kconfig                                | 14 ++++++++++++++
- arch/x86/kernel/cpu/common.c                    | 16 ++++++++++++++++
- 3 files changed, 32 insertions(+)
+ tools/testing/selftests/x86/Makefile    |   2 +-
+ tools/testing/selftests/x86/keylocker.c | 177 ++++++++++++++++++++++++
+ 2 files changed, 178 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/x86/keylocker.c
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 44fde25bb221..c389ad8fb9de 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -3220,6 +3220,8 @@
- 
- 	nohugeiomap	[KNL,X86,PPC,ARM64] Disable kernel huge I/O mappings.
- 
-+	nokeylocker	[X86] Disables Key Locker hardware feature.
+diff --git a/tools/testing/selftests/x86/Makefile b/tools/testing/selftests/x86/Makefile
+index 6703c7906b71..c53e496d77b2 100644
+--- a/tools/testing/selftests/x86/Makefile
++++ b/tools/testing/selftests/x86/Makefile
+@@ -13,7 +13,7 @@ CAN_BUILD_WITH_NOPIE := $(shell ./check_cc.sh $(CC) trivial_program.c -no-pie)
+ TARGETS_C_BOTHBITS := single_step_syscall sysret_ss_attrs syscall_nt test_mremap_vdso \
+ 			check_initial_reg_state sigreturn iopl ioperm \
+ 			test_vdso test_vsyscall mov_ss_trap \
+-			syscall_arg_fault fsgsbase_restore
++			syscall_arg_fault fsgsbase_restore keylocker
+ TARGETS_C_32BIT_ONLY := entry_from_vm86 test_syscall_vdso unwind_vdso \
+ 			test_FCMOV test_FCOMI test_FISTTP \
+ 			vdso_restorer
+diff --git a/tools/testing/selftests/x86/keylocker.c b/tools/testing/selftests/x86/keylocker.c
+new file mode 100644
+index 000000000000..3d69c1615bca
+--- /dev/null
++++ b/tools/testing/selftests/x86/keylocker.c
+@@ -0,0 +1,177 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * keylocker.c, validating the internal key management
++ */
++#undef _GNU_SOURCE
++#define _GNU_SOURCE 1
 +
- 	nosmt		[KNL,S390] Disable symmetric multithreading (SMT).
- 			Equivalent to smt=1.
- 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index fbf26e0f7a6a..7623af32f919 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -1886,6 +1886,20 @@ config X86_INTEL_MEMORY_PROTECTION_KEYS
- 
- 	  If unsure, say y.
- 
-+config X86_KEYLOCKER
-+	prompt "Key Locker"
-+	def_bool n
-+	depends on CPU_SUP_INTEL
-+	help
-+	  Key Locker is a new security feature to protect a data encryption
-+	  key for the Advanced Encryption Standard (AES) algorithm.
++#include <stdio.h>
++#include <stdbool.h>
++#include <string.h>
++#include <fcntl.h>
++#include <err.h>
++#include <sched.h>
++#include <setjmp.h>
++#include <signal.h>
++#include <unistd.h>
 +
-+	  When enabled, every CPU has a unique internal key to wrap the AES
-+	  key into an encoded format.  The internal key is not accessible
-+	  to software once loaded.
++#define HANDLE_SIZE	48
 +
-+	  If unsure, say y.
++static bool keylocker_disabled;
 +
- choice
- 	prompt "TSX enable mode"
- 	depends on CPU_SUP_INTEL
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index a446d5aff08f..ba5bd79fbac2 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -354,6 +354,22 @@ static __always_inline void setup_umip(struct cpuinfo_x86 *c)
- /* These bits should not change their value after CPU init is finished. */
- static const unsigned long cr4_pinned_mask =
- 	X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_UMIP | X86_CR4_FSGSBASE;
-+
-+static __init int x86_nokeylocker_setup(char *arg)
++/* Encode a 128-bit key to a 384-bit handle */
++static inline void __encode_key(char *handle)
 +{
-+	/* Expect an exact match without trailing characters */
-+	if (strlen(arg))
-+		return 0;
++	static const unsigned char aeskey[] = { 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
++						0x71, 0x77, 0x74, 0x69, 0x6f, 0x6b, 0x6c, 0x78 };
 +
-+	if (!cpu_feature_enabled(X86_FEATURE_KEYLOCKER))
-+		return 1;
++	asm volatile ("movdqu %0, %%xmm0" : : "m" (*aeskey) :);
 +
-+	setup_clear_cpu_cap(X86_FEATURE_KEYLOCKER);
-+	pr_info("x86/keylocker: Disabled by kernel command line\n");
-+	return 1;
++	/* Set no restriction to the handle */
++	asm volatile ("mov $0, %%eax" :);
++
++	/* ENCODEKEY128 %EAX */
++	asm volatile (".byte 0xf3, 0xf, 0x38, 0xfa, 0xc0");
++
++	asm volatile ("movdqu %%xmm0, %0; movdqu %%xmm1, %1; movdqu %%xmm2, %2;"
++		      : "=m" (handle[0]), "=m" (handle[0x10]), "=m" (handle[0x20]));
 +}
-+__setup("nokeylocker", x86_nokeylocker_setup);
 +
- static DEFINE_STATIC_KEY_FALSE_RO(cr_pinning);
- static unsigned long cr4_pinned_bits __ro_after_init;
- 
++static jmp_buf jmpbuf;
++
++static void handle_sigill(int sig, siginfo_t *si, void *ctx_void)
++{
++	keylocker_disabled = true;
++	siglongjmp(jmpbuf, 1);
++}
++
++static bool encode_key(char *handle)
++{
++	bool success = true;
++	struct sigaction sa;
++	int ret;
++
++	memset(&sa, 0, sizeof(sa));
++
++	/* Set signal handler */
++	sa.sa_flags = SA_SIGINFO;
++	sa.sa_sigaction = handle_sigill;
++	sigemptyset(&sa.sa_mask);
++	ret = sigaction(SIGILL, &sa, 0);
++	if (ret)
++		err(1, "sigaction");
++
++	if (sigsetjmp(jmpbuf, 1))
++		success = false;
++	else
++		__encode_key(handle);
++
++	/* Clear signal handler */
++	sa.sa_flags = 0;
++	sa.sa_sigaction = NULL;
++	sa.sa_handler = SIG_DFL;
++	sigemptyset(&sa.sa_mask);
++	ret = sigaction(SIGILL, &sa, 0);
++	if (ret)
++		err(1, "sigaction");
++
++	return success;
++}
++
++/*
++ * Test if the internal key is the same in all the CPUs:
++ *
++ * Since the value is not readable, compare the encoded output of a AES key
++ * between CPUs.
++ */
++
++static int nerrs;
++
++static unsigned char cpu0_handle[HANDLE_SIZE] = { 0 };
++
++static void test_internal_key(bool slept, long cpus)
++{
++	int cpu, errs;
++
++	printf("Test the internal key consistency between CPUs\n");
++
++	for (cpu = 0, errs = 0; cpu < cpus; cpu++) {
++		char handle[HANDLE_SIZE] = { 0 };
++		cpu_set_t mask;
++		bool success;
++
++		CPU_ZERO(&mask);
++		CPU_SET(cpu, &mask);
++		sched_setaffinity(0, sizeof(cpu_set_t), &mask);
++
++		success = encode_key(handle);
++		if (!success) {
++			/* The encode should success after the S3 sleep */
++			if (slept)
++				errs++;
++			printf("[%s]\tKey Locker disabled at CPU%d\n",
++			       slept ? "FAIL" : "NOTE", cpu);
++			continue;
++		}
++
++		if (cpu == 0 && !slept) {
++			/* Record the first handle value as reference */
++			memcpy(cpu0_handle, handle, HANDLE_SIZE);
++		} else if (memcmp(cpu0_handle, handle, HANDLE_SIZE)) {
++			printf("[FAIL]\tMismatched internal key at CPU%d\n",
++			       cpu);
++			errs++;
++		}
++	}
++
++	if (errs == 0 && !keylocker_disabled)
++		printf("[OK]\tAll the internal keys are the same\n");
++	else
++		nerrs += errs;
++}
++
++static void switch_to_sleep(bool *slept)
++{
++	ssize_t bytes;
++	int fd;
++
++	printf("Transition to Suspend-To-RAM state\n");
++
++	fd = open("/sys/power/mem_sleep", O_RDWR);
++	if (fd < 0)
++		err(1, "Open /sys/power/mem_sleep");
++
++	bytes = write(fd, "deep", strlen("deep"));
++	if (bytes != strlen("deep"))
++		err(1, "Write /sys/power/mem_sleep");
++	close(fd);
++
++	fd = open("/sys/power/state", O_RDWR);
++	if (fd < 0)
++		err(1, "Open /sys/power/state");
++
++	bytes = write(fd, "mem", strlen("mem"));
++	if (bytes != strlen("mem"))
++		err(1, "Write /sys/power/state");
++	close(fd);
++
++	printf("Wake up from Suspend-To-RAM state\n");
++	*slept = true;
++}
++
++int main(void)
++{
++	bool slept = false;
++	long cpus;
++
++	cpus = sysconf(_SC_NPROCESSORS_ONLN);
++	printf("%ld CPUs in the system\n", cpus);
++
++	test_internal_key(slept, cpus);
++	if (keylocker_disabled)
++		return nerrs ? 1 : 0;
++
++	switch_to_sleep(&slept);
++	test_internal_key(slept, cpus);
++	return nerrs ? 1 : 0;
++}
 -- 
 2.17.1
 
