@@ -2,136 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2EFBC2BBCA
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Dec 2020 11:25:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D00EC2BBCA
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Dec 2020 11:49:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7AB042312E
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Dec 2020 11:25:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2FE34233CE
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Dec 2020 11:49:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725812AbgLPLZX (ORCPT
+        id S1725878AbgLPLsv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Dec 2020 06:25:23 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:9211 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725385AbgLPLZW (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Dec 2020 06:25:22 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Cwt6t5pxrzkqBb;
-        Wed, 16 Dec 2020 19:23:50 +0800 (CST)
-Received: from [10.63.139.185] (10.63.139.185) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 16 Dec 2020 19:24:31 +0800
-Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
-To:     Bjorn Helgaas <helgaas@kernel.org>,
-        Zhangfei Gao <zhangfei.gao@linaro.org>
-References: <20200623150427.GA2403606@bjorn-Precision-5520>
-CC:     Arnd Bergmann <arnd@arndb.de>, Joerg Roedel <joro@8bytes.org>,
-        "Bjorn Helgaas" <bhelgaas@google.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Hanjun Guo <guohanjun@huawei.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        <kenneth-lee-2012@foxmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:IOMMU DRIVERS" <iommu@lists.linux-foundation.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-pci <linux-pci@vger.kernel.org>,
-        Thanu Rangarajan <Thanu.Rangarajan@arm.com>,
-        Souvik Chakravarty <Souvik.Chakravarty@arm.com>,
-        wanghuiqiang <wanghuiqiang@huawei.com>
-From:   Zhou Wang <wangzhou1@hisilicon.com>
-Message-ID: <5FD9EE6E.1040505@hisilicon.com>
-Date:   Wed, 16 Dec 2020 19:24:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.5.1
+        Wed, 16 Dec 2020 06:48:51 -0500
+Received: from mga17.intel.com ([192.55.52.151]:27995 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725283AbgLPLsv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Dec 2020 06:48:51 -0500
+IronPort-SDR: dvUR0Dvtd4vInGdaoAn6BxrD9vgdwjFUNj8e+58VOBo4UtfFOZO7uRhle2mq4w7sM93LreJDJW
+ qH8h2VQLmXxA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9836"; a="154856586"
+X-IronPort-AV: E=Sophos;i="5.78,424,1599548400"; 
+   d="scan'208";a="154856586"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2020 03:47:05 -0800
+IronPort-SDR: mw6V4X+kWItnM7h5ADAiCrJmgqyFR3J+R1aoKxvRKPm36tpYNYS55mN8A45XXfTfLkTqEdMYL0
+ +KQ8EbJs0VaQ==
+X-IronPort-AV: E=Sophos;i="5.78,424,1599548400"; 
+   d="scan'208";a="368985136"
+Received: from johnlyon-mobl.ger.corp.intel.com (HELO dalessan-mobl1.ir.intel.com) ([10.251.90.249])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2020 03:47:02 -0800
+From:   Daniele Alessandrelli <daniele.alessandrelli@linux.intel.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Gross <mgross@linux.intel.com>,
+        Declan Murphy <declan.murphy@intel.com>,
+        Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+Subject: [PATCH v4 0/5] crypto: Add Keem Bay OCS HCU driver
+Date:   Wed, 16 Dec 2020 11:46:34 +0000
+Message-Id: <20201216114639.3451399-1-daniele.alessandrelli@linux.intel.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20200623150427.GA2403606@bjorn-Precision-5520>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.63.139.185]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2020/6/23 23:04, Bjorn Helgaas wrote:
-> On Fri, Jun 19, 2020 at 10:26:54AM +0800, Zhangfei Gao wrote:
->> Have studied _DSM method, two issues we met comparing using quirk.
->>
->> 1. Need change definition of either pci_host_bridge or pci_dev, like adding
->> member can_stall,
->> while pci system does not know stall now.
->>
->> a, pci devices do not have uuid: uuid need be described in dsdt, while pci
->> devices are not defined in dsdt.
->>     so we have to use host bridge.
-> 
-> PCI devices *can* be described in the DSDT.  IIUC these particular
-> devices are hardwired (not plug-in cards), so platform firmware can
-> know about them and could describe them in the DSDT.
-> 
->> b,  Parsing dsdt is in in pci subsystem.
->> Like drivers/acpi/pci_root.c:
->>        obj = acpi_evaluate_dsm(ACPI_HANDLE(bus->bridge), &pci_acpi_dsm_guid,
->> 1,
->>                                 IGNORE_PCI_BOOT_CONFIG_DSM, NULL);
->>
->> After parsing DSM in pci, we need record this info.
->> Currently, can_stall info is recorded in iommu_fwspec,
->> which is allocated in iommu_fwspec_init and called by iort_iommu_configure
->> for uefi.
-> 
-> You can look for a _DSM wherever it is convenient for you.  It could
-> be in an AMBA shim layer.
-> 
->> 2. Guest kernel also need support sva.
->> Using quirk, the guest can boot with sva enabled, since quirk is
->> self-contained by kernel.
->> If using  _DSM, a specific uefi or dtb has to be provided,
->> currently we can useQEMU_EFI.fd from apt install qemu-efi
-> 
-> I don't quite understand what this means, but as I mentioned before, a
-> quirk for a *limited* number of devices is OK, as long as there is a
-> plan that removes the need for a quirk for future devices.
-> 
-> E.g., if the next platform version ships with a DTB or firmware with a
-> _DSM or other mechanism that enables the kernel to discover this
-> information without a kernel change, it's fine to use a quirk to cover
-> the early platform.
-> 
-> The principles are:
-> 
->   - I don't want to have to update a quirk for every new Device ID
->     that needs this.
+The Intel Keem Bay SoC has an Offload Crypto Subsystem (OCS) featuring a
+Hashing Control Unit (HCU) for accelerating hashing operations.
 
-Hi Bjorn and Zhangfei,
+This driver adds support for such hardware thus enabling hardware-accelerated
+hashing on the Keem Bay SoC for the following algorithms:
+- sha224 and hmac(sha224)
+- sha256 and hmac(sha256)
+- sha384 and hmac(sha384)
+- sha512 and hmac(sha512)
+- sm3    and hmac(sm3)
 
-We plan to use ATS/PRI to support SVA in future PCI devices. However, for
-current devices, we need to add limited number of quirk to let them
-work. The device IDs of current quirk needed devices are ZIP engine(0xa250, 0xa251),
-SEC engine(0xa255, 0xa256), HPRE engine(0xa258, 0xa259), revision id are
-0x21 and 0x30.
+The driver is passing crypto manager self-tests, including the extra tests
+(CRYPTO_MANAGER_EXTRA_TESTS=y).
 
-Let's continue to upstream these quirks!
+v3 -> v4:
+- Addressed comments from Mark Gross.
+- Added Reviewed-by-tag from Rob Herring to DT binding patch.
+- Driver reworked to better separate the code interacting with the hardware
+  from the code implementing the crypto ahash API.
+- Main patch split into 3 different patches to simplify review (patch series is
+  now composed of 5 patches)
 
-Best,
-Zhou
+v2 -> v3:
+- Fixed more issues with dt-bindings (removed useless descriptions for reg,
+  interrupts, and clocks)
 
-> 
->   - I don't really want to have to manage non-PCI information in the
->     struct pci_dev.  If this is AMBA- or IOMMU-related, it should be
->     stored in a structure related to AMBA or the IOMMU.
-> .
-> 
+v1 -> v2:
+- Fixed issues with dt-bindings
+
+Daniele Alessandrelli (3):
+  crypto: keembay-ocs-hcu - Add HMAC support
+  crypto: keembay-ocs-hcu - Add optional support for sha224
+  MAINTAINERS: Add maintainers for Keem Bay OCS HCU driver
+
+Declan Murphy (2):
+  dt-bindings: crypto: Add Keem Bay OCS HCU bindings
+  crypto: keembay - Add Keem Bay OCS HCU driver
+
+ .../crypto/intel,keembay-ocs-hcu.yaml         |   46 +
+ MAINTAINERS                                   |   11 +
+ drivers/crypto/keembay/Kconfig                |   29 +
+ drivers/crypto/keembay/Makefile               |    3 +
+ drivers/crypto/keembay/keembay-ocs-hcu-core.c | 1264 +++++++++++++++++
+ drivers/crypto/keembay/ocs-hcu.c              |  840 +++++++++++
+ drivers/crypto/keembay/ocs-hcu.h              |  106 ++
+ 7 files changed, 2299 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/intel,keembay-ocs-hcu.yaml
+ create mode 100644 drivers/crypto/keembay/keembay-ocs-hcu-core.c
+ create mode 100644 drivers/crypto/keembay/ocs-hcu.c
+ create mode 100644 drivers/crypto/keembay/ocs-hcu.h
+
+
+base-commit: 7bba37a1591369e2e506d599b8f5d7d0516b2dbc
+-- 
+2.26.2
+
