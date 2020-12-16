@@ -2,118 +2,136 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C7AC2BBCA
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Dec 2020 11:00:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2EFBC2BBCA
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Dec 2020 11:25:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A58F23124
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Dec 2020 11:00:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7AB042312E
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Dec 2020 11:25:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726000AbgLPLAW (ORCPT
+        id S1725812AbgLPLZX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Dec 2020 06:00:22 -0500
-Received: from inet10.abb.com ([138.225.1.74]:36128 "EHLO inet10.abb.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725562AbgLPLAT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Dec 2020 06:00:19 -0500
-Received: from gitsiv.ch.abb.com (gitsiv.keymile.net [10.41.156.251])
-        by inet10.abb.com (8.14.7/8.14.7) with SMTP id 0BGAxHjs013605;
-        Wed, 16 Dec 2020 11:59:17 +0100
-Received: from ch900154.keymile.net (ch900154.keymile.net [172.31.40.201])
-        by gitsiv.ch.abb.com (Postfix) with ESMTP id 5DD7461088F1;
-        Wed, 16 Dec 2020 11:59:17 +0100 (CET)
-From:   Luca Dariz <luca.dariz@hitachi-powergrids.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     Luca Dariz <luca.dariz@hitachi-powergrids.com>,
-        Matt Mackall <mpm@selenic.com>,
+        Wed, 16 Dec 2020 06:25:23 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:9211 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725385AbgLPLZW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Dec 2020 06:25:22 -0500
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Cwt6t5pxrzkqBb;
+        Wed, 16 Dec 2020 19:23:50 +0800 (CST)
+Received: from [10.63.139.185] (10.63.139.185) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.498.0; Wed, 16 Dec 2020 19:24:31 +0800
+Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
+To:     Bjorn Helgaas <helgaas@kernel.org>,
+        Zhangfei Gao <zhangfei.gao@linaro.org>
+References: <20200623150427.GA2403606@bjorn-Precision-5520>
+CC:     Arnd Bergmann <arnd@arndb.de>, Joerg Roedel <joro@8bytes.org>,
+        "Bjorn Helgaas" <bhelgaas@google.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Hanjun Guo <guohanjun@huawei.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>,
+        jean-philippe <jean-philippe@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Colin Ian King <colin.king@canonical.com>,
-        Holger Brunck <holger.brunck@hitachi-powergrids.com>,
-        Valentin Longchamp <valentin.longchamp@hitachi-powergrids.com>
-Subject: [PATCH v2] hwrng: fix khwrng lifecycle
-Date:   Wed, 16 Dec 2020 11:59:06 +0100
-Message-Id: <20201216105906.6607-1-luca.dariz@hitachi-powergrids.com>
-X-Mailer: git-send-email 2.24.3
+        <kenneth-lee-2012@foxmail.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "open list:IOMMU DRIVERS" <iommu@lists.linux-foundation.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-pci <linux-pci@vger.kernel.org>,
+        Thanu Rangarajan <Thanu.Rangarajan@arm.com>,
+        Souvik Chakravarty <Souvik.Chakravarty@arm.com>,
+        wanghuiqiang <wanghuiqiang@huawei.com>
+From:   Zhou Wang <wangzhou1@hisilicon.com>
+Message-ID: <5FD9EE6E.1040505@hisilicon.com>
+Date:   Wed, 16 Dec 2020 19:24:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.5.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200623150427.GA2403606@bjorn-Precision-5520>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.63.139.185]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There are two issues with the management of the kernel thread to gather
-entropy:
-* it can terminate also if the rng is removed, and in this case it doesn'=
-t
-  synchronize with kthread_should_stop(), but it directly sets hwrng_fill
-  to NULL. If this happens after the NULL check but before kthread_stop()
-  is called, we'll have a NULL pointer dereference.
-* if we have a register/unregister too fast, it can happen that the kthre=
-ad
-  is not yet started when kthread_stop is called, and this seems to leave=
- a
-  corrupted or uninitialized kthread struct. This is detected by the
-  WARN_ON at kernel/kthread.c:75 and later causes a page domain fault.
+On 2020/6/23 23:04, Bjorn Helgaas wrote:
+> On Fri, Jun 19, 2020 at 10:26:54AM +0800, Zhangfei Gao wrote:
+>> Have studied _DSM method, two issues we met comparing using quirk.
+>>
+>> 1. Need change definition of either pci_host_bridge or pci_dev, like adding
+>> member can_stall,
+>> while pci system does not know stall now.
+>>
+>> a, pci devices do not have uuid: uuid need be described in dsdt, while pci
+>> devices are not defined in dsdt.
+>>     so we have to use host bridge.
+> 
+> PCI devices *can* be described in the DSDT.  IIUC these particular
+> devices are hardwired (not plug-in cards), so platform firmware can
+> know about them and could describe them in the DSDT.
+> 
+>> b,  Parsing dsdt is in in pci subsystem.
+>> Like drivers/acpi/pci_root.c:
+>>        obj = acpi_evaluate_dsm(ACPI_HANDLE(bus->bridge), &pci_acpi_dsm_guid,
+>> 1,
+>>                                 IGNORE_PCI_BOOT_CONFIG_DSM, NULL);
+>>
+>> After parsing DSM in pci, we need record this info.
+>> Currently, can_stall info is recorded in iommu_fwspec,
+>> which is allocated in iommu_fwspec_init and called by iort_iommu_configure
+>> for uefi.
+> 
+> You can look for a _DSM wherever it is convenient for you.  It could
+> be in an AMBA shim layer.
+> 
+>> 2. Guest kernel also need support sva.
+>> Using quirk, the guest can boot with sva enabled, since quirk is
+>> self-contained by kernel.
+>> If using  _DSM, a specific uefi or dtb has to be provided,
+>> currently we can useQEMU_EFI.fd from apt install qemu-efi
+> 
+> I don't quite understand what this means, but as I mentioned before, a
+> quirk for a *limited* number of devices is OK, as long as there is a
+> plan that removes the need for a quirk for future devices.
+> 
+> E.g., if the next platform version ships with a DTB or firmware with a
+> _DSM or other mechanism that enables the kernel to discover this
+> information without a kernel change, it's fine to use a quirk to cover
+> the early platform.
+> 
+> The principles are:
+> 
+>   - I don't want to have to update a quirk for every new Device ID
+>     that needs this.
 
-CC: Matt Mackall <mpm@selenic.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-CC: Colin Ian King <colin.king@canonical.com>
-CC: Holger Brunck <holger.brunck@hitachi-powergrids.com>
-CC: Valentin Longchamp <valentin.longchamp@hitachi-powergrids.com>
-Signed-off-by: Luca Dariz <luca.dariz@hitachi-powergrids.com>
----
-v2:
-* reduced sleep from 10s to 10ms in case there is no rng; the termination
-  should be faster in this case as it could block a pending register or
-  unregister.
+Hi Bjorn and Zhangfei,
 
- drivers/char/hw_random/core.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+We plan to use ATS/PRI to support SVA in future PCI devices. However, for
+current devices, we need to add limited number of quirk to let them
+work. The device IDs of current quirk needed devices are ZIP engine(0xa250, 0xa251),
+SEC engine(0xa255, 0xa256), HPRE engine(0xa258, 0xa259), revision id are
+0x21 and 0x30.
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.=
-c
-index 8c1c47dd9f46..367b122c1d70 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -31,6 +31,7 @@ static struct hwrng *current_rng;
- /* the current rng has been explicitly chosen by user via sysfs */
- static int cur_rng_set_by_user;
- static struct task_struct *hwrng_fill;
-+static struct completion hwrng_started =3D COMPLETION_INITIALIZER(hwrng_=
-started);
- /* list of registered rngs, sorted decending by quality */
- static LIST_HEAD(rng_list);
- /* Protects rng_list and current_rng */
-@@ -432,12 +433,15 @@ static int hwrng_fillfn(void *unused)
- {
- 	long rc;
-=20
-+	complete(&hwrng_started);
- 	while (!kthread_should_stop()) {
- 		struct hwrng *rng;
-=20
- 		rng =3D get_current_rng();
--		if (IS_ERR(rng) || !rng)
--			break;
-+		if (IS_ERR(rng) || !rng) {
-+			msleep_interruptible(10);
-+			continue;
-+		}
- 		mutex_lock(&reading_mutex);
- 		rc =3D rng_get_data(rng, rng_fillbuf,
- 				  rng_buffer_size(), 1);
-@@ -462,6 +466,8 @@ static void start_khwrngd(void)
- 	if (IS_ERR(hwrng_fill)) {
- 		pr_err("hwrng_fill thread creation failed\n");
- 		hwrng_fill =3D NULL;
-+	} else {
-+		wait_for_completion(&hwrng_started);
- 	}
- }
-=20
---=20
-2.24.3
+Let's continue to upstream these quirks!
 
+Best,
+Zhou
+
+> 
+>   - I don't really want to have to manage non-PCI information in the
+>     struct pci_dev.  If this is AMBA- or IOMMU-related, it should be
+>     stored in a structure related to AMBA or the IOMMU.
+> .
+> 
