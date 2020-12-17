@@ -2,76 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F6DC1B0D8
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Dec 2020 22:33:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A36A9C4361B
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Dec 2020 01:24:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 745D923602
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Dec 2020 22:33:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6449D20866
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Dec 2020 01:24:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727151AbgLPWdi (ORCPT
+        id S1731284AbgLQBYP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Dec 2020 17:33:38 -0500
-Received: from mail.zx2c4.com ([192.95.5.64]:43111 "EHLO mail.zx2c4.com"
+        Wed, 16 Dec 2020 20:24:15 -0500
+Received: from rere.qmqm.pl ([91.227.64.183]:47793 "EHLO rere.qmqm.pl"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727167AbgLPWdh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Dec 2020 17:33:37 -0500
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id f09161a8
-        for <linux-crypto@vger.kernel.org>;
-        Wed, 16 Dec 2020 22:25:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=JOWtu1omcs+/9E16DeEz4AU0Nk4=; b=DPjsPg
-        Ifh00P9HWTpmQUvcaAIEiYd8+/GtxdQ600s50vt4S70wqGfA1EKlncXmeDmmh5sR
-        BdinzixnNw5aGXWxL77vNQ/N9MEmVCDJq0qP3W6dGWtw8WuB1HBuEE8Is4jxfcpY
-        70P1e2/ziiI5IrGZJ/Inw/HfrvbETWEl8DcwOpAb0HqhYC3wdFNGoTJVci3WTZyd
-        bTrRz3wobJAUoA4fSOKeML76+93jHUwOmscemeZ8FmKWISUgbtafA2Umn5EaJhRx
-        HWVShJLJSeeAY+rIE4RMBGUd1rTHTAecSVteTbQ6oFK7aYzScq/0xOLsfyDGnYhc
-        GDIXrh6u00NJYPng==
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ff0d5c68 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
-        for <linux-crypto@vger.kernel.org>;
-        Wed, 16 Dec 2020 22:25:15 +0000 (UTC)
-Received: by mail-yb1-f177.google.com with SMTP id w139so23983419ybe.4
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Dec 2020 14:32:55 -0800 (PST)
-X-Gm-Message-State: AOAM531bXw/6kL0j58COobtm3LrICBH0uQvHDIbGw9QjfBlX3suFCwzH
-        6hvL1VNEBR5KVGnfboYZ5cY+HACDg6txr7JNDkA=
-X-Google-Smtp-Source: ABdhPJyG7jbTvHGZ3OGV/zORXRnE9z2ICpfUIkSkqXUxk8VSKABJEH43WeCUgs8y9o/etl3jfP7SSQMEtD3TaA5dgGc=
-X-Received: by 2002:a25:bb81:: with SMTP id y1mr54022580ybg.456.1608157975181;
- Wed, 16 Dec 2020 14:32:55 -0800 (PST)
-MIME-Version: 1.0
-References: <20201215234708.105527-1-ebiggers@kernel.org> <X9pyfAaw5hQ6ngTI@gmail.com>
-In-Reply-To: <X9pyfAaw5hQ6ngTI@gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 16 Dec 2020 23:32:44 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qj+D8opq6pnoMd4vsOsTYaL9Ntxk0HvskAiPvXFev75A@mail.gmail.com>
-Message-ID: <CAHmME9qj+D8opq6pnoMd4vsOsTYaL9Ntxk0HvskAiPvXFev75A@mail.gmail.com>
-Subject: Re: [PATCH 0/5] crypto: add NEON-optimized BLAKE2b
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Ard Biesheuvel <ardb@kernel.org>,
+        id S1728191AbgLQBYP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Dec 2020 20:24:15 -0500
+Received: from remote.user (localhost [127.0.0.1])
+        by rere.qmqm.pl (Postfix) with ESMTPSA id 4CxDlk0Rxjz63;
+        Thu, 17 Dec 2020 02:23:29 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rere.qmqm.pl; s=1;
+        t=1608168212; bh=xW9ibLoV5/qLNGN3Busmpz2Fsg3WeYdpFtrM6aESBL8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=F0QsVj+LedvuKyx7KZpPQpw/FaclNAFrecY5kvlTJPqc3hYXnLY7op+/R4JKKwzDF
+         ecWxaZk85UXkipmWiu3WwIoa/34ijll1c4Ngi+s3cv69sH0T1McNVJBKLGObCRXzpH
+         Jc5sXYV/LlIoS8hF/K6iOIvo6Ao6HNI661kpnm0A7SSzIMH6G+R8ZIfES4MKDY1r9m
+         YTolpcJL32aBuI62lC7xiIntdYzi+kFihpB5y/tgq/67LV/cyol3x5aVHUxOh+cqLo
+         HQDZEaBtrtIWxCvaz1hyzR5Xvs2NUwWZTjiZDF4cPyy0vuCpkz+K+Qj4lm/PcwXW3R
+         6vAZMtyNYVphQ==
+X-Virus-Status: Clean
+X-Virus-Scanned: clamav-milter 0.102.4 at mail
+Date:   Thu, 17 Dec 2020 02:23:38 +0100
+From:   =?iso-8859-2?Q?Micha=B3_Miros=B3aw?= <mirq-linux@rere.qmqm.pl>
+To:     Nick Terrell <terrelln@fb.com>
+Cc:     David Sterba <dsterba@suse.cz>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        David Sterba <dsterba@suse.com>,
-        Paul Crowley <paulcrowley@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Eric Biggers <ebiggers@kernel.org>,
+        Nick Terrell <nickrterrell@gmail.com>,
+        "squashfs-devel@lists.sourceforge.net" 
+        <squashfs-devel@lists.sourceforge.net>,
+        Christoph Hellwig <hch@infradead.org>,
+        Yann Collet <cyan@fb.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-f2fs-devel@lists.sourceforge.net" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        Petr Malat <oss@malat.biz>, Chris Mason <clm@fb.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Kernel Team <Kernel-team@fb.com>,
+        Niket Agarwal <niketa@fb.com>,
+        Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
+        Johannes Weiner <jweiner@fb.com>
+Subject: Re: [f2fs-dev] [PATCH v7 0/3] Update to zstd-1.4.6
+Message-ID: <20201217012337.GA24705@qmqm.qmqm.pl>
+References: <20201203205114.1395668-1-nickrterrell@gmail.com>
+ <DF6B2E26-2D6E-44FF-89DB-93A37E2EA268@fb.com>
+ <X9lOHkAE67EP/sXo@sol.localdomain>
+ <B3F00261-E977-4B85-84CD-66B07DA79D9D@fb.com>
+ <20201216005806.GA26841@gondor.apana.org.au>
+ <20201216185052.GL6430@twin.jikos.cz>
+ <6C449BCE-E7DB-4EE6-B4F5-FED3977BD8F0@fb.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6C449BCE-E7DB-4EE6-B4F5-FED3977BD8F0@fb.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+On Wed, Dec 16, 2020 at 10:07:38PM +0000, Nick Terrell wrote:
+[...]
+> It is very large. If it helps, in the commit message I’ve provided this link [0],
+> which provides the diff between upstream zstd as-is and the imported zstd,
+> which has been modified by the automated tooling to work in the kernel.
+> [0] https://github.com/terrelln/linux/commit/ac2ee65dcb7318afe426ad08f6a844faf3aebb41
 
-On Wed, Dec 16, 2020 at 9:48 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> By the way, if people are interested in having my ARM scalar implementation of
-> BLAKE2s in the kernel too, I can send a patchset for that too.  It just ended up
-> being slower than BLAKE2b and SHA-1, so it wasn't as good for the use case
-> mentioned above.  If it were to be added as "blake2s-256-arm", we'd have:
+I looks like you could remove a bit more dead code by noting __GNUC__ >= 4
+(gcc-4.9 is currently the oldest supported [1]).
 
-I'd certainly be interested in this. Any rough idea how it performs
-for pretty small messages compared to the generic implementation?
-100-140 byte ranges? Is the speedup about the same as for longer
-messages because this doesn't parallelize across multiple blocks?
+[1] Documentation/process/changes.rst
 
-Jason
+Best Regards
+Michał Mirosław
