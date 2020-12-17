@@ -4,133 +4,91 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2655C2BBD4
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Dec 2020 20:39:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BADB5C4361B
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Dec 2020 20:55:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74C3823A03
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Dec 2020 20:39:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D2FD233E2
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Dec 2020 20:55:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726988AbgLQUit (ORCPT
+        id S1730199AbgLQUzl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Dec 2020 15:38:49 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38340 "EHLO mail.kernel.org"
+        Thu, 17 Dec 2020 15:55:41 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44226 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726951AbgLQUit (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Dec 2020 15:38:49 -0500
-Date:   Thu, 17 Dec 2020 14:38:06 -0600
+        id S1730019AbgLQUzl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Dec 2020 15:55:41 -0500
+X-Gm-Message-State: AOAM532P8LB1WIr2QKYAZNjqHlY7YEJWmORLS7vX1eFkRPlTVGuaNWIb
+        LEMVxpfFlkrq8Gcw3yi6m78ajkkmo8FNFGDb3X/Svg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608237488;
-        bh=Rpq08eYW+DA58q5pcS/wXU0VbVBc1vYow6lIlzk55rU=;
-        h=From:To:Cc:Subject:In-Reply-To:From;
-        b=KqE949u41Nqk8wZdC73imrPNhV6iDujEFjRfkVjZScfGg5NLARgNksvDkk54oZI9i
-         mv/u6l2got64jOQ5WYUtngu2q9vI6xjHII+Jcy+PrjjE2gs1K6xgdwztx+nAvI4G2p
-         D/IUTUhGXYUo0T11xN0y5dzNNoaIntqhsq2soJ1qJZmtzmxSv5ozHe2eIvw5XczDhw
-         7imXx7N9zkX5LZaNE/XBXWbLBfgxWdq6WNk63Vd9f31kXpIWOfBj6C4mP+2GZruhTz
-         M32DBRPOd7HuNC1U2xW9CiDgiKPo9i9u/PExMcMNgvaVJ1cxp2OOgAAkXwohRF2CCU
-         mV7YA0/SGEecA==
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Zhou Wang <wangzhou1@hisilicon.com>
-Cc:     Zhangfei Gao <zhangfei.gao@linaro.org>,
-        Arnd Bergmann <arnd@arndb.de>, Joerg Roedel <joro@8bytes.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Hanjun Guo <guohanjun@huawei.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        kenneth-lee-2012@foxmail.com,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:IOMMU DRIVERS" <iommu@lists.linux-foundation.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-pci <linux-pci@vger.kernel.org>,
-        Thanu Rangarajan <Thanu.Rangarajan@arm.com>,
-        Souvik Chakravarty <Souvik.Chakravarty@arm.com>,
-        wanghuiqiang <wanghuiqiang@huawei.com>
-Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
-Message-ID: <20201217203806.GA20785@bjorn-Precision-5520>
+        s=k20201202; t=1608238501;
+        bh=j6GmibYzc7mQabW9Jo+ZodqqvNf0SKFcf0HnL/RxL64=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=K8Ws0N0Dx5S3ffwsKvdfGtI8kPHe95I/1MIJXbTlzMRPRMXeZdf9rGXhxM9eHusWz
+         aFRUWhRlLLzi/B/oVUh6riI8fjGCdat54dwKQDvnZsqzuizeXWnOdkt7E5sXNPY++k
+         uQKAi43tbYU+FBwKR/DgvdHUHhxR4BRAoUJnuKicrzcYSwGKPX78QfTQOwJdpLEtW6
+         3UZ4ffcuMMxmI+hHDqhzYGL92aSvrU0s7xc5jVCigmHdw3dP/SyifEWTJGSOfS3Uri
+         XvlePVQdeM4tccDGB6JWvRkYWGcg3bSfCNBzUL0JgZZefldGk7PmutTQQFQMopQ3hF
+         fwng1NeMmnD/A==
+X-Google-Smtp-Source: ABdhPJziDYyWijk3+B63Kq1ka2KB1sjgmpOL8Lao1HOEPY+Agckn8z39OdblYSmrrPWA0s4rnWzHwWH9Mj9VbN+3hj0=
+X-Received: by 2002:a1c:6741:: with SMTP id b62mr1091491wmc.21.1608238499179;
+ Thu, 17 Dec 2020 12:54:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5FD9EE6E.1040505@hisilicon.com>
+References: <20201216174146.10446-1-chang.seok.bae@intel.com> <20201216174146.10446-8-chang.seok.bae@intel.com>
+In-Reply-To: <20201216174146.10446-8-chang.seok.bae@intel.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Thu, 17 Dec 2020 12:54:47 -0800
+X-Gmail-Original-Message-ID: <CALCETrWbuf6jJU_wfKwuCL97SZhXd9Vqfd8RhdO1uwLZKMM=Fw@mail.gmail.com>
+Message-ID: <CALCETrWbuf6jJU_wfKwuCL97SZhXd9Vqfd8RhdO1uwLZKMM=Fw@mail.gmail.com>
+Subject: Re: [RFC PATCH 7/8] crypto: x86/aes-kl - Support AES algorithm using
+ Key Locker instructions
+To:     "Chang S. Bae" <chang.seok.bae@intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>, Borislav Petkov <bp@suse.de>,
+        Andrew Lutomirski <luto@kernel.org>, X86 ML <x86@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        "Ravi V. Shankar" <ravi.v.shankar@intel.com>, ning.sun@intel.com,
+        kumar.n.dwarakanath@intel.com,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 16, 2020 at 07:24:30PM +0800, Zhou Wang wrote:
-> On 2020/6/23 23:04, Bjorn Helgaas wrote:
-> > On Fri, Jun 19, 2020 at 10:26:54AM +0800, Zhangfei Gao wrote:
-> >> Have studied _DSM method, two issues we met comparing using quirk.
-> >>
-> >> 1. Need change definition of either pci_host_bridge or pci_dev, like adding
-> >> member can_stall,
-> >> while pci system does not know stall now.
-> >>
-> >> a, pci devices do not have uuid: uuid need be described in dsdt, while pci
-> >> devices are not defined in dsdt.
-> >>     so we have to use host bridge.
-> > 
-> > PCI devices *can* be described in the DSDT.  IIUC these particular
-> > devices are hardwired (not plug-in cards), so platform firmware can
-> > know about them and could describe them in the DSDT.
-> > 
-> >> b,  Parsing dsdt is in in pci subsystem.
-> >> Like drivers/acpi/pci_root.c:
-> >>        obj = acpi_evaluate_dsm(ACPI_HANDLE(bus->bridge), &pci_acpi_dsm_guid,
-> >> 1,
-> >>                                 IGNORE_PCI_BOOT_CONFIG_DSM, NULL);
-> >>
-> >> After parsing DSM in pci, we need record this info.
-> >> Currently, can_stall info is recorded in iommu_fwspec,
-> >> which is allocated in iommu_fwspec_init and called by iort_iommu_configure
-> >> for uefi.
-> > 
-> > You can look for a _DSM wherever it is convenient for you.  It could
-> > be in an AMBA shim layer.
-> > 
-> >> 2. Guest kernel also need support sva.
-> >> Using quirk, the guest can boot with sva enabled, since quirk is
-> >> self-contained by kernel.
-> >> If using  _DSM, a specific uefi or dtb has to be provided,
-> >> currently we can useQEMU_EFI.fd from apt install qemu-efi
-> > 
-> > I don't quite understand what this means, but as I mentioned before, a
-> > quirk for a *limited* number of devices is OK, as long as there is a
-> > plan that removes the need for a quirk for future devices.
-> > 
-> > E.g., if the next platform version ships with a DTB or firmware with a
-> > _DSM or other mechanism that enables the kernel to discover this
-> > information without a kernel change, it's fine to use a quirk to cover
-> > the early platform.
-> > 
-> > The principles are:
-> > 
-> >   - I don't want to have to update a quirk for every new Device ID
-> >     that needs this.
-> 
-> Hi Bjorn and Zhangfei,
-> 
-> We plan to use ATS/PRI to support SVA in future PCI devices. However, for
-> current devices, we need to add limited number of quirk to let them
-> work. The device IDs of current quirk needed devices are ZIP engine(0xa250, 0xa251),
-> SEC engine(0xa255, 0xa256), HPRE engine(0xa258, 0xa259), revision id are
-> 0x21 and 0x30.
-> 
-> Let's continue to upstream these quirks!
+On Wed, Dec 16, 2020 at 9:46 AM Chang S. Bae <chang.seok.bae@intel.com> wrote:
+>
+> Key Locker (KL) is Intel's new security feature that protects the AES key
+> at the time of data transformation. New AES SIMD instructions -- as a
+> successor of Intel's AES-NI -- are provided to encode an AES key and
+> reference it for the AES algorithm.
+>
+> New instructions support 128/256-bit keys. While it is not desirable to
+> receive any 192-bit key, AES-NI instructions are taken to serve this size.
+>
+> New instructions are operational in both 32-/64-bit modes.
+>
+> Add a set of new macros for the new instructions so that no new binutils
+> version is required.
+>
+> Implemented methods are for a single block as well as ECB, CBC, CTR, and
+> XTS modes. The methods are not compatible with other AES implementations as
+> accessing an encrypted key instead of the normal AES key.
+>
+> setkey() call encodes an AES key. User may displace the AES key once
+> encoded, as encrypt()/decrypt() methods do not need the key.
+>
+> Most C code follows the AES-NI implementation. It has higher priority than
+> the AES-NI as providing key protection.
 
-Please post the patches you propose.  I don't think the previous ones
-are in my queue.  Please include the lore URL for the previous
-posting(s) in the cover letter so we can connect the discussion.
+What does this patch *do*?
 
-> >   - I don't really want to have to manage non-PCI information in the
-> >     struct pci_dev.  If this is AMBA- or IOMMU-related, it should be
-> >     stored in a structure related to AMBA or the IOMMU.
-> > .
-> > 
+IKL gives a few special key slots that have certain restrictions and
+certain security properties.  What can you use them for?  With this
+series installed, what is the user-visible effect?  Is there a new
+API?  Do you use them with the netlink user crypto interface?  Do you
+use them for encrypting disks?  Swap?  How?  How do you allocate,
+reset, and free keys?  Who has permissions to use them?
