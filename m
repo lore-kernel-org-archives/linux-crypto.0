@@ -2,89 +2,135 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9167BC4361B
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Dec 2020 20:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2655C2BBD4
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Dec 2020 20:39:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4AAF1239FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Dec 2020 20:08:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74C3823A03
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Dec 2020 20:39:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726988AbgLQUIO (ORCPT
+        id S1726988AbgLQUit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Dec 2020 15:08:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60492 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725988AbgLQUIN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Dec 2020 15:08:13 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76981C0617A7
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Dec 2020 12:07:33 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id cw27so29916749edb.5
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Dec 2020 12:07:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JOmQk0x3ccvRlceWbWP6GlZsmAYEOiZMR0Q/yyY99OQ=;
-        b=bGdNtPX0MoCL7Rl8ZOlUUcr0begz62DKNFdyqODZRqutDa2Q6dORObDPEElCV3S+M3
-         tiLYNwcZ9Kuog9umRyLnJqJAoRSA3vmtGtMd7sdnYOok0Lu96IorEfCenRHF5dlMWa6T
-         6x7OuIuCydIYH1kr7i9ubxQFiW664ND4F/roXktfTkDQLmiQ6HQikuMjh8cWzWC+YNbW
-         M7HYZale6/TmiMU215cWVN+Lv9piP79nJrcL3zha3FC14d/pxEPo1gRrYgGf0ttRPOoM
-         lraQ3/y2lzGStkM4XAvwuqaIHgF3t+xGi7JtMbotzNVqu0CUlHqNYdhfESmu9gNsSJhQ
-         HjHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=JOmQk0x3ccvRlceWbWP6GlZsmAYEOiZMR0Q/yyY99OQ=;
-        b=JPnEs0YlsgfUhe3ZPuK9Jph+tvJt7C7//aDYPmFGpPvP1IIOFIUW2o/weR7grwTHeS
-         rxpq+vnERHZoW67cXRxbM5dmD+Lt4S3a7N+SY9IqFWNExFtNl8V40PAkCIREgm/KA9pb
-         55LyXEHH+wAYn0yzFFl5nThsz8bfo/gR7b3WrdMhfaPsw1Fut+XOqOK728fI7BBSUofh
-         iIhaFkxsypzEl4SZqujdHZcNkPxNvcE4rNi0B9iMUKBCUhyDrLW/riTszfBaRhHjC9i7
-         byvn+0MaRKYqWYKLiU4m3SlwQuUMBMMADITI5wzSsktiNJeffjnuJlkKNu6UpVeXrbld
-         fsxA==
-X-Gm-Message-State: AOAM531h9zDeh3j8qiGc7Wv2WDo0TJmnTySR8IqR4BQIpfFk6oYsPR3J
-        IZCrtOt7/UaUn4NxQdeI9P5PVamyzb+8If38ZC74sA==
-X-Google-Smtp-Source: ABdhPJwDePy04S+TEAbB/l0WUoCva/Xi7xKi/eubNc5Leg+G4l43zsZ/K98rDsbbM2EFRXtuSzl392zKo7dwdGlc4tc=
-X-Received: by 2002:aa7:cdc3:: with SMTP id h3mr1106955edw.52.1608235652067;
- Thu, 17 Dec 2020 12:07:32 -0800 (PST)
-MIME-Version: 1.0
-References: <20201216174146.10446-1-chang.seok.bae@intel.com> <X9utMeDKfjdghy1M@sol.localdomain>
-In-Reply-To: <X9utMeDKfjdghy1M@sol.localdomain>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Thu, 17 Dec 2020 12:07:22 -0800
-Message-ID: <CAPcyv4h6hiSiE5xC=eccrQcd6Zb+aQeEjQ7bbC5jb_6heQkEsA@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/8] x86: Support Intel Key Locker
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@kernel.org>, Borislav Petkov <bp@suse.de>,
-        Andy Lutomirski <luto@kernel.org>, X86 ML <x86@kernel.org>,
+        Thu, 17 Dec 2020 15:38:49 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38340 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726951AbgLQUit (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Dec 2020 15:38:49 -0500
+Date:   Thu, 17 Dec 2020 14:38:06 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1608237488;
+        bh=Rpq08eYW+DA58q5pcS/wXU0VbVBc1vYow6lIlzk55rU=;
+        h=From:To:Cc:Subject:In-Reply-To:From;
+        b=KqE949u41Nqk8wZdC73imrPNhV6iDujEFjRfkVjZScfGg5NLARgNksvDkk54oZI9i
+         mv/u6l2got64jOQ5WYUtngu2q9vI6xjHII+Jcy+PrjjE2gs1K6xgdwztx+nAvI4G2p
+         D/IUTUhGXYUo0T11xN0y5dzNNoaIntqhsq2soJ1qJZmtzmxSv5ozHe2eIvw5XczDhw
+         7imXx7N9zkX5LZaNE/XBXWbLBfgxWdq6WNk63Vd9f31kXpIWOfBj6C4mP+2GZruhTz
+         M32DBRPOd7HuNC1U2xW9CiDgiKPo9i9u/PExMcMNgvaVJ1cxp2OOgAAkXwohRF2CCU
+         mV7YA0/SGEecA==
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Zhou Wang <wangzhou1@hisilicon.com>
+Cc:     Zhangfei Gao <zhangfei.gao@linaro.org>,
+        Arnd Bergmann <arnd@arndb.de>, Joerg Roedel <joro@8bytes.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Hanjun Guo <guohanjun@huawei.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>,
+        jean-philippe <jean-philippe@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Ravi V Shankar <ravi.v.shankar@intel.com>,
-        ning sun <ning.sun@intel.com>,
-        Kumar N Dwarakanath <kumar.n.dwarakanath@intel.com>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        kenneth-lee-2012@foxmail.com,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "open list:IOMMU DRIVERS" <iommu@lists.linux-foundation.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-pci <linux-pci@vger.kernel.org>,
+        Thanu Rangarajan <Thanu.Rangarajan@arm.com>,
+        Souvik Chakravarty <Souvik.Chakravarty@arm.com>,
+        wanghuiqiang <wanghuiqiang@huawei.com>
+Subject: Re: [PATCH 0/2] Introduce PCI_FIXUP_IOMMU
+Message-ID: <20201217203806.GA20785@bjorn-Precision-5520>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5FD9EE6E.1040505@hisilicon.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 17, 2020 at 11:11 AM Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Wed, Dec 16, 2020 at 09:41:38AM -0800, Chang S. Bae wrote:
-> > [1] Intel Architecture Instruction Set Extensions Programming Reference:
-> >     https://software.intel.com/content/dam/develop/external/us/en/documents/architecture-instruction-set-$
+On Wed, Dec 16, 2020 at 07:24:30PM +0800, Zhou Wang wrote:
+> On 2020/6/23 23:04, Bjorn Helgaas wrote:
+> > On Fri, Jun 19, 2020 at 10:26:54AM +0800, Zhangfei Gao wrote:
+> >> Have studied _DSM method, two issues we met comparing using quirk.
+> >>
+> >> 1. Need change definition of either pci_host_bridge or pci_dev, like adding
+> >> member can_stall,
+> >> while pci system does not know stall now.
+> >>
+> >> a, pci devices do not have uuid: uuid need be described in dsdt, while pci
+> >> devices are not defined in dsdt.
+> >>     so we have to use host bridge.
+> > 
+> > PCI devices *can* be described in the DSDT.  IIUC these particular
+> > devices are hardwired (not plug-in cards), so platform firmware can
+> > know about them and could describe them in the DSDT.
+> > 
+> >> b,  Parsing dsdt is in in pci subsystem.
+> >> Like drivers/acpi/pci_root.c:
+> >>        obj = acpi_evaluate_dsm(ACPI_HANDLE(bus->bridge), &pci_acpi_dsm_guid,
+> >> 1,
+> >>                                 IGNORE_PCI_BOOT_CONFIG_DSM, NULL);
+> >>
+> >> After parsing DSM in pci, we need record this info.
+> >> Currently, can_stall info is recorded in iommu_fwspec,
+> >> which is allocated in iommu_fwspec_init and called by iort_iommu_configure
+> >> for uefi.
+> > 
+> > You can look for a _DSM wherever it is convenient for you.  It could
+> > be in an AMBA shim layer.
+> > 
+> >> 2. Guest kernel also need support sva.
+> >> Using quirk, the guest can boot with sva enabled, since quirk is
+> >> self-contained by kernel.
+> >> If using  _DSM, a specific uefi or dtb has to be provided,
+> >> currently we can useQEMU_EFI.fd from apt install qemu-efi
+> > 
+> > I don't quite understand what this means, but as I mentioned before, a
+> > quirk for a *limited* number of devices is OK, as long as there is a
+> > plan that removes the need for a quirk for future devices.
+> > 
+> > E.g., if the next platform version ships with a DTB or firmware with a
+> > _DSM or other mechanism that enables the kernel to discover this
+> > information without a kernel change, it's fine to use a quirk to cover
+> > the early platform.
+> > 
+> > The principles are:
+> > 
+> >   - I don't want to have to update a quirk for every new Device ID
+> >     that needs this.
+> 
+> Hi Bjorn and Zhangfei,
+> 
+> We plan to use ATS/PRI to support SVA in future PCI devices. However, for
+> current devices, we need to add limited number of quirk to let them
+> work. The device IDs of current quirk needed devices are ZIP engine(0xa250, 0xa251),
+> SEC engine(0xa255, 0xa256), HPRE engine(0xa258, 0xa259), revision id are
+> 0x21 and 0x30.
+> 
+> Let's continue to upstream these quirks!
 
-https://software.intel.com/content/dam/develop/external/us/en/documents/architecture-instruction-set-extensions-programming-reference.pdf
+Please post the patches you propose.  I don't think the previous ones
+are in my queue.  Please include the lore URL for the previous
+posting(s) in the cover letter so we can connect the discussion.
 
-> > [2] Intel Key Locker Specification:
-> >     https://software.intel.com/content/dam/develop/external/us/en/documents/343965-intel-key-locker-speci$
-
-https://software.intel.com/content/dam/develop/external/us/en/documents/343965-intel-key-locker-specification.pdf
+> >   - I don't really want to have to manage non-PCI information in the
+> >     struct pci_dev.  If this is AMBA- or IOMMU-related, it should be
+> >     stored in a structure related to AMBA or the IOMMU.
+> > .
+> > 
