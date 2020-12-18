@@ -2,101 +2,138 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5D3DC4361B
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Dec 2020 16:16:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CBF2C4361B
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Dec 2020 16:31:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9BE4823B70
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Dec 2020 16:16:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F53823B75
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Dec 2020 16:31:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725825AbgLRQPw (ORCPT
+        id S1728286AbgLRQbc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Dec 2020 11:15:52 -0500
-Received: from mail.zx2c4.com ([192.95.5.64]:39225 "EHLO mail.zx2c4.com"
+        Fri, 18 Dec 2020 11:31:32 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44174 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725797AbgLRQPw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Dec 2020 11:15:52 -0500
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 6a68cfe7
-        for <linux-crypto@vger.kernel.org>;
-        Fri, 18 Dec 2020 16:07:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=zw4wXqB9HP72y02N0j6ubp0kXb4=; b=irunY8
-        bgwZz2iFNTvI5C9RA4IUaCQ6Z9Dq7BMOKMCR+THys7QVfbfhPU2pPSXA6vJORFkg
-        7zWWtL4gEqz6unGrYcoPMM7BFJXPGVAdhq+HwJ+mLmGhRzDbUCyIFNCAEuAMNrzE
-        CnslK3PjqJsEABdqW2l0oLYog9mBMPHpriasiJfEUDQC4IfoYlpJ9CRnpnEWQVqI
-        /qcagHrniR0htGfU2vnv24atPE4CSB0Cw4m5TFOSANJcROddRBhC3lBIr0zxm01C
-        XdbwHgaxAM2nF9Z2BcC76qK1JM+028TMDxDRfQvMQZNVLBvng62dx9ZNT+NTJQu1
-        UohjMh11q/hT4fEw==
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 566a7765 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
-        for <linux-crypto@vger.kernel.org>;
-        Fri, 18 Dec 2020 16:07:16 +0000 (UTC)
-Received: by mail-yb1-f179.google.com with SMTP id a16so2384347ybh.5
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Dec 2020 08:15:10 -0800 (PST)
-X-Gm-Message-State: AOAM533C1korOAF7Of0kqDzRjQmIawYfcx+V5Q6HIJCp+lLJD7En2ge2
-        7M6z2KmsYjlj8js4bKkq66Dd7ZLC4MacG+dzuOI=
-X-Google-Smtp-Source: ABdhPJyIJVah3STIIIcCJNERzx2GmpF0dsHna2bPwuF9nngvL1lcwojoWvxXm9NPLrbteLXXMz/LM5xSF44nymeSIBg=
-X-Received: by 2002:a25:2cd6:: with SMTP id s205mr6815605ybs.279.1608308109522;
- Fri, 18 Dec 2020 08:15:09 -0800 (PST)
+        id S1726025AbgLRQbc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Dec 2020 11:31:32 -0500
+X-Gm-Message-State: AOAM530cWsZCWv3orX1Amq1I3Mx3EECxEQslgfVZSEVQLt2rJqx+ty4g
+        t8hoghLyBib8y0BOzYtsyVRMZIAQNgTiGYfBhZE=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1608309051;
+        bh=Qtlbub79eWyPb9JwaXzBthC9Q58WYy2vlqEJWss/9Zs=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=ZdFkPqvN4e52t6MgrvoQOHg69Xtg9Gp5CGVPbiXxTXIUrLt7ErOz4MgG5c9xK8ls5
+         UjKU2Wzq1mJLOxmjgOWKijcxQsjPQZl5HcJdAolJ5xAzVv3m1TAasn0NNh7XFGtnvh
+         ofyztZF7Ssc1o9RiqG22045sFcrfyI/MBlNJ1irKO/1nEZPkCm/wp1UTYMJCoHeLoF
+         aEICYsO5+oQg0lHwzdHWvdGBU4Gm92vAt9lhBrRuMMKYBo4MU5Mz3I2sFzBMPuUvuS
+         hObDlF/6nwY68P8PNCDXf6ky9IoDfABFRmkHOJplbkI3yVcNYbG9euDdHchXUo6ED6
+         R9LKpCusPEE+A==
+X-Google-Smtp-Source: ABdhPJyM1FoU4CTrk+dNHMZsY5g9rWZoxs202q0s5hz7yW/GGuA3gRN/TwA6GNcPo00lnRwiTBH5L9mR1SD8gpBohBs=
+X-Received: by 2002:a9d:12c:: with SMTP id 41mr3404124otu.77.1608309050629;
+ Fri, 18 Dec 2020 08:30:50 -0800 (PST)
 MIME-Version: 1.0
-References: <20201217222138.170526-1-ebiggers@kernel.org> <20201217222138.170526-10-ebiggers@kernel.org>
-In-Reply-To: <20201217222138.170526-10-ebiggers@kernel.org>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Fri, 18 Dec 2020 17:14:58 +0100
-X-Gmail-Original-Message-ID: <CAHmME9oW-_GXJ+nVwyiEV7wfjmzqBgqrSynnJ6xoN5UA_Nzh1Q@mail.gmail.com>
-Message-ID: <CAHmME9oW-_GXJ+nVwyiEV7wfjmzqBgqrSynnJ6xoN5UA_Nzh1Q@mail.gmail.com>
-Subject: Re: [PATCH v2 09/11] crypto: blake2s - share the "shash" API
- boilerplate code
+References: <20201217222138.170526-1-ebiggers@kernel.org>
+In-Reply-To: <20201217222138.170526-1-ebiggers@kernel.org>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Fri, 18 Dec 2020 17:30:39 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXEa5YaxdvgkYQEqOP8hpAs7mJsUhKoEpDHo7BRYKuqEkw@mail.gmail.com>
+Message-ID: <CAMj1kXEa5YaxdvgkYQEqOP8hpAs7mJsUhKoEpDHo7BRYKuqEkw@mail.gmail.com>
+Subject: Re: [PATCH v2 00/11] crypto: arm32-optimized BLAKE2b and BLAKE2s
 To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Ard Biesheuvel <ardb@kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         David Sterba <dsterba@suse.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
         Paul Crowley <paulcrowley@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 17, 2020 at 11:25 PM Eric Biggers <ebiggers@kernel.org> wrote:
+On Thu, 17 Dec 2020 at 23:24, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> From: Eric Biggers <ebiggers@google.com>
+> This patchset adds 32-bit ARM assembly language implementations of
+> BLAKE2b and BLAKE2s.
 >
-> Move the boilerplate code for setkey(), init(), update(), and final()
-> from blake2s_generic.ko into a new module blake2s_helpers.ko, and export
-> it so that it can be used by other shash implementations of BLAKE2s.
+> The BLAKE2b implementation is NEON-accelerated, while the BLAKE2s
+> implementation uses scalar instructions since NEON doesn't work very
+> well for it.  The BLAKE2b implementation is faster and is expected to be
+> useful as a replacement for SHA-1 in dm-verity, while the BLAKE2s
+> implementation would be useful for WireGuard which uses BLAKE2s.
 >
-> setkey() and init() are exported as-is, while update() and final() have
-> a blake2s_compress_t function pointer argument added.  This allows the
-> implementation of the compression function to be overridden, which is
-> the only part that optimized implementations really care about.
+> Both implementations are provided via the shash API, while BLAKE2s is
+> also provided via the library API.
 >
-> The helper functions are defined in a separate module blake2s_helpers.ko
-> (rather than just than in blake2s_generic.ko) because we can't simply
-> select CRYPTO_BLAKE2B from CRYPTO_BLAKE2S_X86.  Doing this selection
-> unconditionally would make the library API select the shash API, while
-> doing it conditionally on CRYPTO_HASH would create a recursive kconfig
-> dependency on CRYPTO_HASH.  As a bonus, using a separate module also
-> allows the generic implementation to be omitted when unneeded.
+> While adding these, I also reworked the generic implementations of
+> BLAKE2b and BLAKE2s to provide helper functions that make implementing
+> other "shash" providers for these algorithms much easier.
 >
-> These helper functions very closely match the ones I defined for
-> BLAKE2b, except the BLAKE2b ones didn't go in a separate module yet
-> because BLAKE2b isn't exposed through the library API yet.
+> See the individual commits for full details, including benchmarks.
 >
-> Finally, use these new helper functions in the x86 implementation of
-> BLAKE2s.  (This part should be a separate patch, but unfortunately the
-> x86 implementation used the exact same function names like
-> "crypto_blake2s_update()", so it had to be updated at the same time.)
+> This patchset was tested on a Raspberry Pi 2 (which uses a Cortex-A7
+> processor) with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y, plus other tests.
+>
+> This patchset applies to mainline commit 0c6c887835b5.
+>
+> Changed since v1:
+>    - Added BLAKE2s implementation.
+>    - Adjusted the BLAKE2b helper functions to be consistent with what I
+>      decided to do for BLAKE2s.
+>    - Fixed build error in blake2b-neon-core.S in some configurations.
+>
+> Eric Biggers (11):
+>   crypto: blake2b - rename constants for consistency with blake2s
+>   crypto: blake2b - define shash_alg structs using macros
+>   crypto: blake2b - export helpers for optimized implementations
+>   crypto: blake2b - update file comment
+>   crypto: arm/blake2b - add NEON-accelerated BLAKE2b
+>   crypto: blake2s - define shash_alg structs using macros
+>   crypto: x86/blake2s - define shash_alg structs using macros
+>   crypto: blake2s - remove unneeded includes
+>   crypto: blake2s - share the "shash" API boilerplate code
+>   crypto: arm/blake2s - add ARM scalar optimized BLAKE2s
+>   wireguard: Kconfig: select CRYPTO_BLAKE2S_ARM
+>
 
-There's a similar situation happening with chacha20poly1305 and with
-curve25519. Each of these uses a mildly different approach to how we
-split things up between library and crypto api code. The _helpers.ko
-is another one. There any opportunity here to take a more
-unified/consistant approach? Or is shash slightly different than the
-others and benefits from a third way?
+Very nice!
 
-Jason
+For the series,
+
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+
+
+>  arch/arm/crypto/Kconfig             |  20 ++
+>  arch/arm/crypto/Makefile            |   4 +
+>  arch/arm/crypto/blake2b-neon-core.S | 345 ++++++++++++++++++++++++++++
+>  arch/arm/crypto/blake2b-neon-glue.c | 105 +++++++++
+>  arch/arm/crypto/blake2s-core.S      | 272 ++++++++++++++++++++++
+>  arch/arm/crypto/blake2s-glue.c      |  78 +++++++
+>  arch/x86/crypto/blake2s-glue.c      | 150 +++---------
+>  crypto/Kconfig                      |   5 +
+>  crypto/Makefile                     |   1 +
+>  crypto/blake2b_generic.c            | 200 +++++++---------
+>  crypto/blake2s_generic.c            | 161 +++----------
+>  crypto/blake2s_helpers.c            |  87 +++++++
+>  drivers/net/Kconfig                 |   1 +
+>  include/crypto/blake2b.h            |  27 +++
+>  include/crypto/internal/blake2b.h   |  33 +++
+>  include/crypto/internal/blake2s.h   |  17 ++
+>  16 files changed, 1139 insertions(+), 367 deletions(-)
+>  create mode 100644 arch/arm/crypto/blake2b-neon-core.S
+>  create mode 100644 arch/arm/crypto/blake2b-neon-glue.c
+>  create mode 100644 arch/arm/crypto/blake2s-core.S
+>  create mode 100644 arch/arm/crypto/blake2s-glue.c
+>  create mode 100644 crypto/blake2s_helpers.c
+>  create mode 100644 include/crypto/blake2b.h
+>  create mode 100644 include/crypto/internal/blake2b.h
+>
+>
+> base-commit: 0c6c887835b59c10602add88057c9c06f265effe
+> --
+> 2.29.2
+>
