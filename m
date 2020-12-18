@@ -5,34 +5,34 @@ X-Spam-Level:
 X-Spam-Status: No, score=-21.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB7E9C3526B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA90BC3526D
 	for <linux-crypto@archiver.kernel.org>; Fri, 18 Dec 2020 21:07:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C38E23B88
+	by mail.kernel.org (Postfix) with ESMTP id C3C1323B88
 	for <linux-crypto@archiver.kernel.org>; Fri, 18 Dec 2020 21:07:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726351AbgLRVH2 (ORCPT
+        id S1726430AbgLRVHj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Dec 2020 16:07:28 -0500
-Received: from mga06.intel.com ([134.134.136.31]:16601 "EHLO mga06.intel.com"
+        Fri, 18 Dec 2020 16:07:39 -0500
+Received: from mga06.intel.com ([134.134.136.31]:16592 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726288AbgLRVH0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Dec 2020 16:07:26 -0500
-IronPort-SDR: 0u/oW4qsr73bXvY+WcjPI4k/hLAeAtBSC0i1TUlJYpFrElgS7SyknEvjwSeV2FGL3Ca42OfBNB
- 4q0D+MZb2nTg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9839"; a="237075266"
+        id S1726288AbgLRVHi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Dec 2020 16:07:38 -0500
+IronPort-SDR: pOkTBeu3qt1Ro5S2oFX/EfW0VZgO29LZ6v11Sp3nmPvr9UiiSFVSp93wwwmrasZ9mnoO61U5O4
+ G5xyuHFO7elw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9839"; a="237075268"
 X-IronPort-AV: E=Sophos;i="5.78,431,1599548400"; 
-   d="scan'208";a="237075266"
+   d="scan'208";a="237075268"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
   by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2020 13:06:42 -0800
-IronPort-SDR: 6kZE4fzuxuSWnR4vfEHiSPB65k3GCFtOl/+tB1iauXqjbSBulpNTp1N/DR0LnuGFs76XvhHkcL
- xoWcSproALAQ==
+IronPort-SDR: YzIsv9HfpXbx2zeA36XLYfoa4DKB/L8uzSyfTbxYdDyPWx7kcLoAwGuq54YCyHHm2mfcXW8UR/
+ UA50YDrRlq6Q==
 X-IronPort-AV: E=Sophos;i="5.78,431,1599548400"; 
-   d="scan'208";a="370785943"
+   d="scan'208";a="370785947"
 Received: from megha-z97x-ud7-th.sc.intel.com ([143.183.85.154])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-SHA; 18 Dec 2020 13:06:41 -0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-SHA; 18 Dec 2020 13:06:42 -0800
 From:   Megha Dey <megha.dey@intel.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -43,707 +43,1516 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         tomasz.kantecki@intel.com, ryan.d.saffores@intel.com,
         ilya.albrekht@intel.com, kyung.min.park@intel.com,
         tony.luck@intel.com, ira.weiny@intel.com
-Subject: [RFC V1 2/7] crypto: crct10dif - Accelerated CRC T10 DIF with vectorized instruction
-Date:   Fri, 18 Dec 2020 13:10:59 -0800
-Message-Id: <1608325864-4033-3-git-send-email-megha.dey@intel.com>
+Subject: [RFC V1 3/7] crypto: ghash - Optimized GHASH computations
+Date:   Fri, 18 Dec 2020 13:11:00 -0800
+Message-Id: <1608325864-4033-4-git-send-email-megha.dey@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1608325864-4033-1-git-send-email-megha.dey@intel.com>
 References: <1608325864-4033-1-git-send-email-megha.dey@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Kyung Min Park <kyung.min.park@intel.com>
 
-Update the crc_pcl function that calculates T10 Data Integrity Field
-CRC16 (CRC T10 DIF) using VPCLMULQDQ instruction. VPCLMULQDQ instruction
-with AVX-512F adds EVEX encoded 512 bit version of PCLMULQDQ instruction.
-The advantage comes from packing multiples of 4 * 128 bit data into AVX512
-reducing instruction latency.
+Optimize GHASH computations with the 512 bit wide VPCLMULQDQ instructions.
+The new instruction allows to work on 4 x 16 byte blocks at the time.
+For best parallelism and deeper out of order execution, the main loop of
+the code works on 16 x 16 byte blocks at the time and performs reduction
+every 48 x 16 byte blocks. Such approach needs 48 precomputed GHASH subkeys
+and the precompute operation has been optimized as well to leverage 512 bit
+registers, parallel carry less multiply and reduction.
 
-The glue code in crct10diff module overrides the existing PCLMULQDQ version
-with the VPCLMULQDQ version when the following criteria are met:
+VPCLMULQDQ instruction is used to accelerate the most time-consuming
+part of GHASH, carry-less multiplication. VPCLMULQDQ instruction
+with AVX-512F adds EVEX encoded 512 bit version of PCLMULQDQ instruction.
+
+The glue code in ghash_clmulni_intel module overrides existing PCLMULQDQ
+version with the VPCLMULQDQ version when the following criteria are met:
 At compile time:
 1. CONFIG_CRYPTO_AVX512 is enabled
 2. toolchain(assembler) supports VPCLMULQDQ instructions
 At runtime:
 1. VPCLMULQDQ and AVX512VL features are supported on a platform (currently
    only Icelake)
-2. If compiled as built-in module, crct10dif_pclmul.use_avx512 is set at
-   boot time or /sys/module/crct10dif_pclmul/parameters/use_avx512 is set
+2. If compiled as built-in module, ghash_clmulni_intel.use_avx512 is set at
+   boot time or /sys/module/ghash_clmulni_intel/parameters/use_avx512 is set
    to 1 after boot.
    If compiled as loadable module, use_avx512 module parameter must be set:
-   modprobe crct10dif_pclmul use_avx512=1
+   modprobe ghash_clmulni_intel use_avx512=1
 
-A typical run of tcrypt with CRC T10 DIF calculation with PCLMULQDQ
-instruction and VPCLMULQDQ instruction shows the following results:
-For bytes per update >= 1KB, we see the average improvement of 46%(~1.4x)
-For bytes per update < 1KB, we see the average improvement of 13%.
-Test was performed on an Icelake based platform with constant frequency
-set for CPU.
+With new implementation, tcrypt ghash speed test shows about 4x to 10x
+speedup improvement for GHASH calculation compared to the original
+implementation with PCLMULQDQ when the bytes per update size is 256 Bytes
+or above. Detailed results for a variety of block sizes and update
+sizes are in the table below. The test was performed on Icelake based
+platform with constant frequency set for CPU.
 
-Detailed results for a variety of block sizes and update sizes are in
-the table below.
+The average performance improvement of the AVX512 version over the current
+implementation is as follows:
+For bytes per update >= 1KB, we see the average improvement of 882%(~8.8x).
+For bytes per update < 1KB, we see the average improvement of 370%(~3.7x).
+
+A typical run of tcrypt with GHASH calculation with PCLMULQDQ instruction
+and VPCLMULQDQ instruction shows the following results.
 
 ---------------------------------------------------------------------------
 |            |            |         cycles/operation         |            |
 |            |            |       (the lower the better)     |            |
 |    byte    |   bytes    |----------------------------------| percentage |
-|   blocks   | per update |   CRC T10 DIF  |  CRC T10 DIF    | loss/gain  |
+|   blocks   | per update |   GHASH test   |   GHASH test    | loss/gain  |
 |            |            | with PCLMULQDQ | with VPCLMULQDQ |            |
 |------------|------------|----------------|-----------------|------------|
-|      16    |     16     |        77      |        106      |   -27.0    |
-|      64    |     16     |       411      |        390      |     5.4    |
-|      64    |     64     |        71      |         85      |   -16.0    |
-|     256    |     16     |      1224      |       1308      |    -6.4    |
-|     256    |     64     |       393      |        407      |    -3.4    |
-|     256    |    256     |        93      |         86      |     8.1    |
-|    1024    |     16     |      4564      |       5020      |    -9.0    |
-|    1024    |    256     |       486      |        475      |     2.3    |
-|    1024    |   1024     |       221      |        148      |    49.3    |
-|    2048    |     16     |      8945      |       9851      |    -9.1    |
-|    2048    |    256     |       982      |        951      |     3.3    |
-|    2048    |   1024     |       500      |        369      |    35.5    |
-|    2048    |   2048     |       413      |        265      |    55.8    |
-|    4096    |     16     |     17885      |      19351      |    -7.5    |
-|    4096    |    256     |      1828      |       1713      |     6.7    |
-|    4096    |   1024     |       968      |        805      |    20.0    |
-|    4096    |   4096     |       739      |        475      |    55.6    |
-|    8192    |     16     |     48339      |      41556      |    16.3    |
-|    8192    |    256     |      3494      |       3342      |     4.5    |
-|    8192    |   1024     |      1959      |       1462      |    34.0    |
-|    8192    |   4096     |      1561      |       1036      |    50.7    |
-|    8192    |   8192     |      1540      |       1004      |    53.4    |
+|      16    |     16     |       144      |        233      |   -38.0    |
+|      64    |     16     |       535      |        709      |   -24.5    |
+|      64    |     64     |       210      |        146      |    43.8    |
+|     256    |     16     |      1808      |       1911      |    -5.4    |
+|     256    |     64     |       865      |        581      |    48.9    |
+|     256    |    256     |       682      |        170      |   301.0    |
+|    1024    |     16     |      6746      |       6935      |    -2.7    |
+|    1024    |    256     |      2829      |        714      |   296.0    |
+|    1024    |   1024     |      2543      |        341      |   645.0    |
+|    2048    |     16     |     13219      |      13403      |    -1.3    |
+|    2048    |    256     |      5435      |       1408      |   286.0    |
+|    2048    |   1024     |      5218      |        685      |   661.0    |
+|    2048    |   2048     |      5061      |        565      |   796.0    |
+|    4096    |     16     |     40793      |      27615      |    47.8    |
+|    4096    |    256     |     10662      |       2689      |   297.0    |
+|    4096    |   1024     |     10196      |       1333      |   665.0    |
+|    4096    |   4096     |     10049      |       1011      |   894.0    |
+|    8192    |     16     |     51672      |      54599      |    -5.3    |
+|    8192    |    256     |     21228      |       5284      |   301.0    |
+|    8192    |   1024     |     20306      |       2556      |   694.0    |
+|    8192    |   4096     |     20076      |       2044      |   882.0    |
+|    8192    |   8192     |     20071      |       2017      |   895.0    |
 ---------------------------------------------------------------------------
 
-This work was inspired by the CRC T10 DIF AVX512 optimization published
-in Intel Intelligent Storage Acceleration Library.
-https://github.com/intel/isa-l/blob/master/crc/crc16_t10dif_by16_10.asm
+This work was inspired by the AES GCM mode optimization published
+in Intel Optimized IPSEC Cryptographic library.
+https://github.com/intel/intel-ipsec-mb/lib/avx512/gcm_vaes_avx512.asm
 
 Co-developed-by: Greg Tucker <greg.b.tucker@intel.com>
 Signed-off-by: Greg Tucker <greg.b.tucker@intel.com>
 Co-developed-by: Tomasz Kantecki <tomasz.kantecki@intel.com>
 Signed-off-by: Tomasz Kantecki <tomasz.kantecki@intel.com>
 Signed-off-by: Kyung Min Park <kyung.min.park@intel.com>
+Co-developed-by: Megha Dey <megha.dey@intel.com>
 Signed-off-by: Megha Dey <megha.dey@intel.com>
 ---
- arch/x86/crypto/Makefile                  |   1 +
- arch/x86/crypto/crct10dif-avx512-asm_64.S | 482 ++++++++++++++++++++++++++++++
- arch/x86/crypto/crct10dif-pclmul_glue.c   |  24 +-
- arch/x86/include/asm/disabled-features.h  |   8 +-
- crypto/Kconfig                            |  23 ++
- 5 files changed, 535 insertions(+), 3 deletions(-)
- create mode 100644 arch/x86/crypto/crct10dif-avx512-asm_64.S
+ arch/x86/crypto/Makefile                     |    1 +
+ arch/x86/crypto/avx512_vaes_common.S         | 1211 ++++++++++++++++++++++++++
+ arch/x86/crypto/ghash-clmulni-intel_avx512.S |   68 ++
+ arch/x86/crypto/ghash-clmulni-intel_glue.c   |   39 +-
+ crypto/Kconfig                               |   12 +
+ 5 files changed, 1329 insertions(+), 2 deletions(-)
+ create mode 100644 arch/x86/crypto/avx512_vaes_common.S
+ create mode 100644 arch/x86/crypto/ghash-clmulni-intel_avx512.S
 
 diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index a31de0c..bf0b0fc 100644
+index bf0b0fc..0a86cfb 100644
 --- a/arch/x86/crypto/Makefile
 +++ b/arch/x86/crypto/Makefile
-@@ -80,6 +80,7 @@ crc32-pclmul-y := crc32-pclmul_asm.o crc32-pclmul_glue.o
+@@ -70,6 +70,7 @@ blake2s-x86_64-y := blake2s-core.o blake2s-glue.o
  
- obj-$(CONFIG_CRYPTO_CRCT10DIF_PCLMUL) += crct10dif-pclmul.o
- crct10dif-pclmul-y := crct10dif-pcl-asm_64.o crct10dif-pclmul_glue.o
-+crct10dif-pclmul-$(CONFIG_CRYPTO_CRCT10DIF_AVX512) += crct10dif-avx512-asm_64.o
+ obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
+ ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
++ghash-clmulni-intel-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_AVX512) += ghash-clmulni-intel_avx512.o
  
- obj-$(CONFIG_CRYPTO_POLY1305_X86_64) += poly1305-x86_64.o
- poly1305-x86_64-y := poly1305-x86_64-cryptogams.o poly1305_glue.o
-diff --git a/arch/x86/crypto/crct10dif-avx512-asm_64.S b/arch/x86/crypto/crct10dif-avx512-asm_64.S
+ obj-$(CONFIG_CRYPTO_CRC32C_INTEL) += crc32c-intel.o
+ crc32c-intel-y := crc32c-intel_glue.o
+diff --git a/arch/x86/crypto/avx512_vaes_common.S b/arch/x86/crypto/avx512_vaes_common.S
 new file mode 100644
-index 0000000..07c9371
+index 0000000..f3ee898
 --- /dev/null
-+++ b/arch/x86/crypto/crct10dif-avx512-asm_64.S
-@@ -0,0 +1,482 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/* Copyright(c) 2020 Intel Corporation.
++++ b/arch/x86/crypto/avx512_vaes_common.S
+@@ -0,0 +1,1211 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright © 2020 Intel Corporation.
 + *
-+ * Implement CRC T10 DIF calculation with AVX512 instructions. (x86_64)
-+ *
-+ * This is CRC T10 DIF calculation with AVX512 instructions. It requires
-+ * the support of Intel(R) AVX512F and VPCLMULQDQ instructions.
++ * Collection of macros which can be used by any crypto code using VAES,
++ * VPCLMULQDQ and AVX512 optimizations.
 + */
 +
 +#include <linux/linkage.h>
++#include <asm/inst.h>
 +
-+.text
-+#define		init_crc	%edi
-+#define		buf		%rsi
-+#define		len		%rdx
-+#define		VARIABLE_OFFSET 16*2+8
++#define zmm31y ymm31
++#define zmm30y ymm30
++#define zmm29y ymm29
++#define zmm28y ymm28
++#define zmm27y ymm27
++#define zmm26y ymm26
++#define zmm25y ymm25
++#define zmm24y ymm24
++#define zmm23y ymm23
++#define zmm22y ymm22
++#define zmm21y ymm21
++#define zmm20y ymm20
++#define zmm19y ymm19
++#define zmm18y ymm18
++#define zmm17y ymm17
++#define zmm16y ymm16
++#define zmm15y ymm15
++#define zmm13y ymm13
++#define zmm12y ymm12
++#define zmm11y ymm11
++#define zmm10y ymm10
++#define zmm9y  ymm9
++#define zmm8y  ymm8
++#define zmm7y  ymm7
++#define zmm6y  ymm6
++#define zmm5y  ymm5
++#define zmm4y  ymm4
++#define zmm3y  ymm3
++#define zmm2y  ymm2
++#define zmm1y  ymm1
++#define zmm0y  ymm0
++
++#define zmm31x xmm31
++#define zmm30x xmm30
++#define zmm29x xmm29
++#define zmm28x xmm28
++#define zmm27x xmm27
++#define zmm26x xmm26
++#define zmm25x xmm25
++#define zmm24x xmm24
++#define zmm23x xmm23
++#define zmm22x xmm22
++#define zmm21x xmm21
++#define zmm20x xmm20
++#define zmm19x xmm19
++#define zmm18x xmm18
++#define zmm17x xmm17
++#define zmm16x xmm16
++#define zmm15x xmm15
++#define zmm14x xmm14
++#define zmm13x xmm13
++#define zmm12x xmm12
++#define zmm11x xmm11
++#define zmm10x xmm10
++#define zmm9x  xmm9
++#define zmm8x  xmm8
++#define zmm7x  xmm7
++#define zmm6x  xmm6
++#define zmm5x  xmm5
++#define zmm4x  xmm4
++#define zmm3x  xmm3
++#define zmm2x  xmm2
++#define zmm1x  xmm1
++#define zmm0x xmm0
++
++#define ymm5y ymm5
++#define ymm4y ymm4
++#define ymm3y ymm3
++#define ymm2y ymm2
++#define ymm1y ymm1
++
++#define ymm12x xmm12
++#define ymm11x xmm11
++#define ymm7x xmm7
++#define ymm6x xmm6
++#define ymm5x xmm5
++#define ymm4x xmm4
++#define ymm3x xmm3
++#define ymm2x xmm2
++#define ymm1x xmm1
++
++#define xmm14z zmm14
++#define xmm10z zmm10
++#define xmm2z zmm2
++#define xmm0z zmm0
++#define xmm5z zmm5
++#define xmm4z zmm4
++#define xmm3z zmm3
++#define xmm1z zmm1
++#define xmm6z zmm6
++#define xmm7z zmm7
++#define xmm8z zmm8
++#define xmm9z zmm9
++
++#define xmm11y ymm11
++#define xmm9y ymm9
++#define xmm5y ymm5
++#define xmm4y ymm4
++#define xmm3y ymm3
++#define xmm2y ymm2
++#define xmm1y ymm1
++#define xmm0y ymm0
++
++#define xmm14x xmm14
++#define xmm8x xmm8
++#define xmm7x xmm7
++#define xmm6x xmm6
++#define xmm5x xmm5
++#define xmm4x xmm4
++#define xmm3x xmm3
++#define xmm2x xmm2
++#define xmm1x xmm1
++#define xmm0x xmm0
++
++#define xmm0z  zmm0
++#define xmm0y  ymm0
++#define xmm0x  xmm0
++
++#define stringify(reg,y)       reg##y
++#define str(reg,y)	       stringify(reg,y)
++#define concat(reg,y)	       str(reg,y)
++
++#define YWORD(reg)     concat(reg, y)
++#define XWORD(reg)     concat(reg, x)
++#define ZWORD(reg)     concat(reg, z)
++#define DWORD(reg)     concat(reg, d)
++#define WORD(reg)      concat(reg, w)
++#define BYTE(reg)      concat(reg, b)
++
++#define arg1	%rdi
++#define arg2	%rsi
++#define arg3	%rdx
++#define arg4	%rcx
++#define arg5	%r8
++#define arg6	%r9
++
++#define STACK_LOCAL_OFFSET	  64
++#define LOCAL_STORAGE		  (48*16)	 //space for up to 128 AES blocks
++#define STACK_FRAME_SIZE_GHASH	  (STACK_LOCAL_OFFSET + LOCAL_STORAGE)
++
++#define HashKey_48	(16*0)
++#define HashKey_47	(16*1)
++#define HashKey_46	(16*2)
++#define HashKey_45	(16*3)
++#define HashKey_44	(16*4)
++#define HashKey_43	(16*5)
++#define HashKey_42	(16*6)
++#define HashKey_41	(16*7)
++#define HashKey_40	(16*8)
++#define HashKey_39	(16*9)
++#define HashKey_38	(16*10)
++#define HashKey_37	(16*11)
++#define HashKey_36	(16*12)
++#define HashKey_35	(16*13)
++#define HashKey_34	(16*14)
++#define HashKey_33	(16*15)
++#define HashKey_32	(16*16)
++#define HashKey_31	(16*17)
++#define HashKey_30	(16*18)
++#define HashKey_29	(16*19)
++#define HashKey_28	(16*20)
++#define HashKey_27	(16*21)
++#define HashKey_26	(16*22)
++#define HashKey_25	(16*23)
++#define HashKey_24	(16*24)
++#define HashKey_23	(16*25)
++#define HashKey_22     (16*26)
++#define HashKey_21     (16*27)
++#define HashKey_20     (16*28)
++#define HashKey_19     (16*29)
++#define HashKey_18     (16*30)
++#define HashKey_17     (16*31)
++#define HashKey_16	(16*32)
++#define HashKey_15	(16*33)
++#define HashKey_14	(16*34)
++#define HashKey_13	(16*35)
++#define HashKey_12	(16*36)
++#define HashKey_11	(16*37)
++#define HashKey_10	(16*38)
++#define HashKey_9      (16*39)
++#define HashKey_8      (16*40)
++#define HashKey_7      (16*41)
++#define HashKey_6      (16*42)
++#define HashKey_5      (16*43)
++#define HashKey_4      (16*44)
++#define HashKey_3      (16*45)
++#define HashKey_2      (16*46)
++#define HashKey_1      (16*47)
++#define HashKey      (16*47)
++
++.data
++
++.align 16
++ONE:
++.octa	0x00000000000000000000000000000001
++
++.align 16
++POLY:
++.octa	0xC2000000000000000000000000000001
++
++.align 16
++TWOONE:
++.octa	0x00000001000000000000000000000001
 +
 +/*
-+ * u16 crct10dif-avx512-asm_64(u16 init_crc, const u8 *buf, size_t len);
++ * Order of these constants should not change.
++ * ALL_F should follow SHIFT_MASK, ZERO should follow ALL_F
 + */
 +.align 16
-+SYM_FUNC_START(crct10dif_pcl_avx512)
++SHIFT_MASK:
++.octa	0x0f0e0d0c0b0a09080706050403020100
 +
-+	shl		$16, init_crc
-+	/*
-+	 * The code flow is exactly same as a 32-bit CRC. The only difference
-+	 * is before returning eax, we will shift it right 16 bits, to scale
-+	 * back to 16 bits.
-+	 */
-+	sub		$(VARIABLE_OFFSET), %rsp
++ALL_F:
++.octa	0xffffffffffffffffffffffffffffffff
 +
-+	vbroadcasti32x4 SHUF_MASK(%rip), %zmm18
-+
-+	/* For sizes less than 256 bytes, we can't fold 256 bytes at a time. */
-+	cmp		$256, len
-+	jl		.less_than_256
-+
-+	/* load the initial crc value */
-+	vmovd		init_crc, %xmm10
-+
-+	/*
-+	 * crc value does not need to be byte-reflected, but it needs to be
-+	 * moved to the high part of the register because data will be
-+	 * byte-reflected and will align with initial crc at correct place.
-+	 */
-+	vpslldq		$12, %xmm10, %xmm10
-+
-+	/* receive the initial 64B data, xor the initial crc value. */
-+	vmovdqu8	(buf), %zmm0
-+	vmovdqu8	16*4(buf), %zmm4
-+	vpshufb		%zmm18, %zmm0, %zmm0
-+	vpshufb		%zmm18, %zmm4, %zmm4
-+	vpxorq		%zmm10, %zmm0, %zmm0
-+	vbroadcasti32x4	rk3(%rip), %zmm10
-+
-+	sub		$256, len
-+	cmp		$256, len
-+	jl		.fold_128_B_loop
-+
-+	vmovdqu8	16*8(buf), %zmm7
-+	vmovdqu8	16*12(buf), %zmm8
-+	vpshufb		%zmm18, %zmm7, %zmm7
-+	vpshufb		%zmm18, %zmm8, %zmm8
-+	vbroadcasti32x4 rk_1(%rip), %zmm16
-+	sub		$256, len
-+
-+.fold_256_B_loop:
-+	add		$256, buf
-+	vmovdqu8	(buf), %zmm3
-+	vpshufb		%zmm18, %zmm3, %zmm3
-+	vpclmulqdq	$0x00, %zmm16, %zmm0, %zmm1
-+	vpclmulqdq	$0x11, %zmm16, %zmm0, %zmm2
-+	vpxorq		%zmm2, %zmm1, %zmm0
-+	vpxorq		%zmm3, %zmm0, %zmm0
-+
-+	vmovdqu8	16*4(buf), %zmm9
-+	vpshufb		%zmm18, %zmm9, %zmm9
-+	vpclmulqdq	$0x00, %zmm16, %zmm4, %zmm5
-+	vpclmulqdq	$0x11, %zmm16, %zmm4, %zmm6
-+	vpxorq		%zmm6, %zmm5, %zmm4
-+	vpxorq		%zmm9, %zmm4, %zmm4
-+
-+	vmovdqu8	16*8(buf), %zmm11
-+	vpshufb		%zmm18, %zmm11, %zmm11
-+	vpclmulqdq	$0x00, %zmm16, %zmm7, %zmm12
-+	vpclmulqdq	$0x11, %zmm16, %zmm7, %zmm13
-+	vpxorq		%zmm13, %zmm12, %zmm7
-+	vpxorq		%zmm11, %zmm7, %zmm7
-+
-+	vmovdqu8	16*12(buf), %zmm17
-+	vpshufb		%zmm18, %zmm17, %zmm17
-+	vpclmulqdq	$0x00, %zmm16, %zmm8, %zmm14
-+	vpclmulqdq	$0x11, %zmm16, %zmm8, %zmm15
-+	vpxorq		%zmm15, %zmm14, %zmm8
-+	vpxorq		%zmm17, %zmm8, %zmm8
-+
-+	sub		$256, len
-+	jge		.fold_256_B_loop
-+
-+	/* Fold 256 into 128 */
-+	add		$256, buf
-+	vpclmulqdq	$0x00, %zmm10, %zmm0, %zmm1
-+	vpclmulqdq	$0x11, %zmm10, %zmm0, %zmm2
-+	vpternlogq	$0x96, %zmm2, %zmm1, %zmm7
-+
-+	vpclmulqdq	$0x00, %zmm10, %zmm4, %zmm5
-+	vpclmulqdq	$0x11, %zmm10, %zmm4, %zmm6
-+	vpternlogq	$0x96, %zmm6, %zmm5, %zmm8
-+
-+	vmovdqa32	%zmm7, %zmm0
-+	vmovdqa32	%zmm8, %zmm4
-+
-+	add		$128, len
-+	jmp		.fold_128_B_register
-+
-+	/*
-+	 * At this section of the code, there is 128*x + y (0 <= y < 128) bytes
-+	 * of buffer. The fold_128_B_loop will fold 128B at a time until we have
-+	 * 128 + y Bytes of buffer.
-+	 * Fold 128B at a time. This section of the code folds 8 xmm registers
-+	 * in parallel.
-+	 */
-+.fold_128_B_loop:
-+	add		$128, buf
-+	vmovdqu8	(buf), %zmm8
-+	vpshufb		%zmm18, %zmm8, %zmm8
-+	vpclmulqdq	$0x00, %zmm10, %zmm0, %zmm2
-+	vpclmulqdq	$0x11, %zmm10, %zmm0, %zmm1
-+	vpxorq		%zmm1, %zmm2, %zmm0
-+	vpxorq		%zmm8, %zmm0, %zmm0
-+
-+	vmovdqu8	16*4(buf), %zmm9
-+	vpshufb		%zmm18, %zmm9, %zmm9
-+	vpclmulqdq	$0x00, %zmm10, %zmm4, %zmm5
-+	vpclmulqdq	$0x11, %zmm10, %zmm4, %zmm6
-+	vpxorq		%zmm6, %zmm5, %zmm4
-+	vpxorq		%zmm9, %zmm4, %zmm4
-+
-+	sub		$128, len
-+	jge		.fold_128_B_loop
-+
-+	add		$128, buf
-+
-+	/*
-+	 * At this point, the buffer pointer is pointing at the last y Bytes
-+	 * of the buffer, where 0 <= y < 128. The 128B of folded data is in
-+	 * 8 of the xmm registers: xmm0 - xmm7.
-+	 */
-+.fold_128_B_register:
-+	/* fold the 8 128b parts into 1 xmm register with different constant. */
-+	vmovdqu8	rk9(%rip), %zmm16
-+	vmovdqu8	rk17(%rip), %zmm11
-+	vpclmulqdq	$0x00, %zmm16, %zmm0, %zmm1
-+	vpclmulqdq	$0x11, %zmm16, %zmm0, %zmm2
-+	vextracti64x2	$3, %zmm4, %xmm7
-+
-+	vpclmulqdq	$0x00, %zmm11, %zmm4, %zmm5
-+	vpclmulqdq	$0x11, %zmm11, %zmm4, %zmm6
-+	vmovdqa		rk1(%rip), %xmm10
-+	vpternlogq	$0x96, %zmm5, %zmm2, %zmm1
-+	vpternlogq	$0x96, %zmm7, %zmm6, %zmm1
-+
-+	vshufi64x2      $0x4e, %zmm1, %zmm1, %zmm8
-+	vpxorq          %ymm1, %ymm8, %ymm8
-+	vextracti64x2   $1, %ymm8, %xmm5
-+	vpxorq          %xmm8, %xmm5, %xmm7
-+
-+	/*
-+	 * Instead of 128, we add 128 - 16 to the loop counter to save one
-+	 * instruction from the loop. Instead of a cmp instruction, we use
-+	 * the negative flag with the jl instruction.
-+	 */
-+	add		$(128 - 16), len
-+	jl		.final_reduction_for_128
-+
-+	/*
-+	 * Now we have 16 + y bytes left to reduce. 16 Bytes is in register xmm7
-+	 * and the rest is in memory we can fold 16 bytes at a time if y >= 16.
-+	 * continue folding 16B at a time.
-+	 */
-+.16B_reduction_loop:
-+	vpclmulqdq	$0x11, %xmm10, %xmm7, %xmm8
-+	vpclmulqdq	$0x00, %xmm10, %xmm7, %xmm7
-+	vpxor		%xmm8, %xmm7, %xmm7
-+	vmovdqu		(buf), %xmm0
-+	vpshufb		%xmm18, %xmm0, %xmm0
-+	vpxor		%xmm0, %xmm7, %xmm7
-+	add		$16, buf
-+	sub		$16, len
-+
-+	/*
-+	 * Instead of a cmp instruction, we utilize the flags with the jge
-+	 * instruction equivalent of: cmp len, 16-16. Check if there is any
-+	 * more 16B in the buffer to be able to fold.
-+	 */
-+	jge		.16B_reduction_loop
-+
-+	/*
-+	 * now we have 16+z bytes left to reduce, where 0 <= z < 16.
-+	 * first, we reduce the data in the xmm7 register.
-+	 */
-+.final_reduction_for_128:
-+	add		$16, len
-+	je		.128_done
-+
-+	/*
-+	 * Here we are getting data that is less than 16 bytes. since we know
-+	 * that there was data before the pointer, we can offset the input
-+	 * pointer before the actual point to receive exactly 16 bytes.
-+	 * After that, the registers need to be adjusted.
-+	 */
-+.get_last_two_xmms:
-+	vmovdqa		%xmm7, %xmm2
-+	vmovdqu		-16(buf, len), %xmm1
-+	vpshufb		%xmm18, %xmm1, %xmm1
-+
-+	/*
-+	 * get rid of the extra data that was loaded before.
-+	 * load the shift constant
-+	 */
-+	lea		16 + pshufb_shf_table(%rip), %rax
-+	sub		len, %rax
-+	vmovdqu		(%rax), %xmm0
-+
-+	vpshufb		%xmm0, %xmm2, %xmm2
-+	vpxor		mask1(%rip), %xmm0, %xmm0
-+	vpshufb		%xmm0, %xmm7, %xmm7
-+	vpblendvb	%xmm0, %xmm2, %xmm1, %xmm1
-+
-+	vpclmulqdq	$0x11, %xmm10, %xmm7, %xmm8
-+	vpclmulqdq	$0x00, %xmm10, %xmm7, %xmm7
-+	vpxor		%xmm8, %xmm7, %xmm7
-+	vpxor		%xmm1, %xmm7, %xmm7
-+
-+.128_done:
-+	/* compute crc of a 128-bit value. */
-+	vmovdqa		rk5(%rip), %xmm10
-+	vmovdqa		%xmm7, %xmm0
-+
-+	vpclmulqdq	$0x01, %xmm10, %xmm7, %xmm7
-+	vpslldq		$8, %xmm0, %xmm0
-+	vpxor		%xmm0, %xmm7, %xmm7
-+
-+	vmovdqa		%xmm7, %xmm0
-+	vpand		mask2(%rip), %xmm0, %xmm0
-+	vpsrldq		$12, %xmm7, %xmm7
-+	vpclmulqdq	$0x10, %xmm10, %xmm7, %xmm7
-+	vpxor		%xmm0, %xmm7, %xmm7
-+
-+	/* barrett reduction */
-+.barrett:
-+	vmovdqa		rk7(%rip), %xmm10
-+	vmovdqa		%xmm7, %xmm0
-+	vpclmulqdq	$0x01, %xmm10, %xmm7, %xmm7
-+	vpslldq		$4, %xmm7, %xmm7
-+	vpclmulqdq	$0x11, %xmm10, %xmm7, %xmm7
-+
-+	vpslldq		$4, %xmm7, %xmm7
-+	vpxor		%xmm0, %xmm7, %xmm7
-+	vpextrd		$1, %xmm7, %eax
-+
-+.cleanup:
-+	/* scale the result back to 16 bits. */
-+	shr		$16, %eax
-+	add		$(VARIABLE_OFFSET), %rsp
-+	ret
++ZERO:
++.octa	0x00000000000000000000000000000000
 +
 +.align 16
-+.less_than_256:
-+	/* check if there is enough buffer to be able to fold 16B at a time. */
-+	cmp		$32, len
-+	jl		.less_than_32
++ONEf:
++.octa	0x01000000000000000000000000000000
 +
-+	/* If there is, load the constants. */
-+	vmovdqa		rk1(%rip), %xmm10
-+
-+	/*
-+	 * get the initial crc value and align it to its correct place.
-+	 * And load the plaintext and byte-reflect it.
-+	 */
-+	vmovd		init_crc, %xmm0
-+	vpslldq		$12, %xmm0, %xmm0
-+	vmovdqu		(buf), %xmm7
-+	vpshufb		%xmm18, %xmm7, %xmm7
-+	vpxor		%xmm0, %xmm7, %xmm7
-+
-+	/* update the buffer pointer */
-+	add		$16, buf
-+
-+	/* subtract 32 instead of 16 to save one instruction from the loop */
-+	sub		$32, len
-+
-+	jmp		.16B_reduction_loop
-+
-+.align 16
-+.less_than_32:
-+	/*
-+	 * mov initial crc to the return value. This is necessary for
-+	 * zero-length buffers.
-+	 */
-+	mov		init_crc, %eax
-+	test		len, len
-+	je		.cleanup
-+
-+	vmovd		init_crc, %xmm0
-+	vpslldq		$12, %xmm0, %xmm0
-+
-+	cmp		$16, len
-+	je		.exact_16_left
-+	jl		.less_than_16_left
-+
-+	vmovdqu		(buf), %xmm7
-+	vpshufb		%xmm18, %xmm7, %xmm7
-+	vpxor		%xmm0, %xmm7, %xmm7
-+	add		$16, buf
-+	sub		$16, len
-+	vmovdqa		rk1(%rip), %xmm10
-+	jmp		.get_last_two_xmms
-+
-+.align 16
-+.less_than_16_left:
-+	/*
-+	 * use stack space to load data less than 16 bytes, zero-out the 16B
-+	 * in the memory first.
-+	 */
-+	vpxor		%xmm1, %xmm1, %xmm1
-+	mov		%rsp, %r11
-+	vmovdqa		%xmm1, (%r11)
-+
-+	cmp		$4, len
-+	jl		.only_less_than_4
-+
-+	mov		len, %r9
-+	cmp		$8, len
-+	jl		.less_than_8_left
-+
-+	mov		(buf), %rax
-+	mov		%rax, (%r11)
-+	add		$8, %r11
-+	sub		$8, len
-+	add		$8, buf
-+.less_than_8_left:
-+	cmp		$4, len
-+	jl		.less_than_4_left
-+
-+	mov		(buf), %eax
-+	mov		%eax, (%r11)
-+	add		$4, %r11
-+	sub		$4, len
-+	add		$4, buf
-+
-+.less_than_4_left:
-+	cmp		$2, len
-+	jl		.less_than_2_left
-+
-+	mov		(buf), %ax
-+	mov		%ax, (%r11)
-+	add		$2, %r11
-+	sub		$2, len
-+	add		$2, buf
-+.less_than_2_left:
-+	cmp		$1, len
-+	jl		.zero_left
-+
-+	mov		(buf), %al
-+	mov		%al, (%r11)
-+
-+.zero_left:
-+	vmovdqa		(%rsp), %xmm7
-+	vpshufb		%xmm18, %xmm7, %xmm7
-+	vpxor		%xmm0, %xmm7, %xmm7
-+
-+	lea		16 + pshufb_shf_table(%rip), %rax
-+	sub		%r9, %rax
-+	vmovdqu		(%rax), %xmm0
-+	vpxor		mask1(%rip), %xmm0, %xmm0
-+
-+	vpshufb		%xmm0,%xmm7, %xmm7
-+	jmp		.128_done
-+
-+.align 16
-+.exact_16_left:
-+	vmovdqu		(buf), %xmm7
-+	vpshufb		%xmm18, %xmm7, %xmm7
-+	vpxor		%xmm0, %xmm7, %xmm7
-+	jmp		.128_done
-+
-+.only_less_than_4:
-+	cmp		$3, len
-+	jl		.only_less_than_3
-+
-+	mov		(buf), %al
-+	mov		%al, (%r11)
-+
-+	mov		1(buf), %al
-+	mov		%al, 1(%r11)
-+
-+	mov		2(buf), %al
-+	mov		%al, 2(%r11)
-+
-+	vmovdqa		(%rsp), %xmm7
-+	vpshufb		%xmm18, %xmm7, %xmm7
-+	vpxor		%xmm0, %xmm7, %xmm7
-+
-+	vpsrldq		$5, %xmm7, %xmm7
-+	jmp		.barrett
-+
-+.only_less_than_3:
-+	cmp		$2, len
-+	jl		.only_less_than_2
-+
-+	mov		(buf), %al
-+	mov		%al, (%r11)
-+
-+	mov		1(buf), %al
-+	mov		%al, 1(%r11)
-+
-+	vmovdqa		(%rsp), %xmm7
-+	vpshufb		%xmm18, %xmm7, %xmm7
-+	vpxor		%xmm0, %xmm7, %xmm7
-+
-+	vpsrldq		$6, %xmm7, %xmm7
-+	jmp		.barrett
-+
-+.only_less_than_2:
-+	mov		(buf), %al
-+	mov		%al, (%r11)
-+
-+	vmovdqa		(%rsp), %xmm7
-+	vpshufb		%xmm18, %xmm7, %xmm7
-+	vpxor		%xmm0, %xmm7, %xmm7
-+
-+	vpsrldq		$7, %xmm7, %xmm7
-+	jmp		.barrett
-+SYM_FUNC_END(crct10dif_pcl_avx512)
-+
-+.section        .data
-+.align 32
-+rk_1:		.quad 0xdccf000000000000
-+rk_2:		.quad 0x4b0b000000000000
-+rk1:		.quad 0x2d56000000000000
-+rk2:		.quad 0x06df000000000000
-+rk3:		.quad 0x9d9d000000000000
-+rk4:		.quad 0x7cf5000000000000
-+rk5:		.quad 0x2d56000000000000
-+rk6:		.quad 0x1368000000000000
-+rk7:		.quad 0x00000001f65a57f8
-+rk8:		.quad 0x000000018bb70000
-+rk9:		.quad 0xceae000000000000
-+rk10:		.quad 0xbfd6000000000000
-+rk11:		.quad 0x1e16000000000000
-+rk12:		.quad 0x713c000000000000
-+rk13:		.quad 0xf7f9000000000000
-+rk14:		.quad 0x80a6000000000000
-+rk15:		.quad 0x044c000000000000
-+rk16:		.quad 0xe658000000000000
-+rk17:		.quad 0xad18000000000000
-+rk18:		.quad 0xa497000000000000
-+rk19:		.quad 0x6ee3000000000000
-+rk20:		.quad 0xe7b5000000000000
-+rk_1b:		.quad 0x2d56000000000000
-+rk_2b:		.quad 0x06df000000000000
-+		.quad 0x0000000000000000
-+		.quad 0x0000000000000000
-+
-+.align 16
-+mask1:
-+	.octa	0x80808080808080808080808080808080
-+
-+.align 16
-+mask2:
-+	.octa	0x00000000FFFFFFFFFFFFFFFFFFFFFFFF
-+
-+.align 16
++.align 64
 +SHUF_MASK:
-+	.octa	0x000102030405060708090A0B0C0D0E0F
++.octa	0x000102030405060708090A0B0C0D0E0F
++.octa	0x000102030405060708090A0B0C0D0E0F
++.octa	0x000102030405060708090A0B0C0D0E0F
++.octa	0x000102030405060708090A0B0C0D0E0F
++
++.align 64
++byte_len_to_mask_table:
++.quad	0x0007000300010000
++.quad	0x007f003f001f000f
++.quad	0x07ff03ff01ff00ff
++.quad	0x7fff3fff1fff0fff
++.quad	0xffff
++
++.align 64
++byte64_len_to_mask_table:
++.octa	0x00000000000000010000000000000000
++.octa	0x00000000000000070000000000000003
++.octa	0x000000000000001f000000000000000f
++.octa	0x000000000000007f000000000000003f
++.octa	0x00000000000001ff00000000000000ff
++.octa	0x00000000000007ff00000000000003ff
++.octa	0x0000000000001fff0000000000000fff
++.octa	0x0000000000007fff0000000000003fff
++.octa	0x000000000001ffff000000000000ffff
++.octa	0x000000000007ffff000000000003ffff
++.octa	0x00000000001fffff00000000000fffff
++.octa	0x00000000007fffff00000000003fffff
++.octa	0x0000000001ffffff0000000000ffffff
++.octa	0x0000000007ffffff0000000003ffffff
++.octa	0x000000001fffffff000000000fffffff
++.octa	0x000000007fffffff000000003fffffff
++.octa	0x00000001ffffffff00000000ffffffff
++.octa	0x00000007ffffffff00000003ffffffff
++.octa	0x0000001fffffffff0000000fffffffff
++.octa	0x0000007fffffffff0000003fffffffff
++.octa	0x000001ffffffffff000000ffffffffff
++.octa	0x000007ffffffffff000003ffffffffff
++.octa	0x00001fffffffffff00000fffffffffff
++.octa	0x00007fffffffffff00003fffffffffff
++.octa	0x0001ffffffffffff0000ffffffffffff
++.octa	0x0007ffffffffffff0003ffffffffffff
++.octa	0x001fffffffffffff000fffffffffffff
++.octa	0x007fffffffffffff003fffffffffffff
++.octa	0x01ffffffffffffff00ffffffffffffff
++.octa	0x07ffffffffffffff03ffffffffffffff
++.octa	0x1fffffffffffffff0fffffffffffffff
++.octa	0x7fffffffffffffff3fffffffffffffff
++.octa	0xffffffffffffffff
++
++.align 64
++mask_out_top_block:
++.octa	0xffffffffffffffffffffffffffffffff
++.octa	0xffffffffffffffffffffffffffffffff
++.octa	0xffffffffffffffffffffffffffffffff
++.octa	0x00000000000000000000000000000000
++
++.align 64
++ddq_add_1234:
++.octa	0x00000000000000000000000000000001
++.octa	0x00000000000000000000000000000002
++.octa	0x00000000000000000000000000000003
++.octa	0x00000000000000000000000000000004
++
++.align 64
++ddq_add_5678:
++.octa	0x00000000000000000000000000000005
++.octa	0x00000000000000000000000000000006
++.octa	0x00000000000000000000000000000007
++.octa	0x00000000000000000000000000000008
++
++.align 64
++ddq_add_4444:
++.octa	0x00000000000000000000000000000004
++.octa	0x00000000000000000000000000000004
++.octa	0x00000000000000000000000000000004
++.octa	0x00000000000000000000000000000004
++
++.align 64
++ddq_add_8888:
++.octa	0x00000000000000000000000000000008
++.octa	0x00000000000000000000000000000008
++.octa	0x00000000000000000000000000000008
++.octa	0x00000000000000000000000000000008
++
++.align 64
++ddq_addbe_1234:
++.octa	0x01000000000000000000000000000000
++.octa	0x02000000000000000000000000000000
++.octa	0x03000000000000000000000000000000
++.octa	0x04000000000000000000000000000000
++
++.align 64
++ddq_addbe_4444:
++.octa	0x04000000000000000000000000000000
++.octa	0x04000000000000000000000000000000
++.octa	0x04000000000000000000000000000000
++.octa	0x04000000000000000000000000000000
++
++.align 64
++ddq_addbe_8888:
++.octa	0x08000000000000000000000000000000
++.octa	0x08000000000000000000000000000000
++.octa	0x08000000000000000000000000000000
++.octa	0x08000000000000000000000000000000
++
++.align 64
++POLY2:
++.octa	0xC20000000000000000000001C2000000
++.octa	0xC20000000000000000000001C2000000
++.octa	0xC20000000000000000000001C2000000
++.octa	0xC20000000000000000000001C2000000
 +
 +.align 16
-+pshufb_shf_table:	.octa 0x8f8e8d8c8b8a89888786858483828100
-+			.octa 0x000e0d0c0b0a09080706050403020100
-+			.octa 0x0f0e0d0c0b0a09088080808080808080
-+			.octa 0x80808080808080808080808080808080
-diff --git a/arch/x86/crypto/crct10dif-pclmul_glue.c b/arch/x86/crypto/crct10dif-pclmul_glue.c
-index 71291d5a..26a6350 100644
---- a/arch/x86/crypto/crct10dif-pclmul_glue.c
-+++ b/arch/x86/crypto/crct10dif-pclmul_glue.c
-@@ -35,6 +35,16 @@
- #include <asm/simd.h>
++byteswap_const:
++.octa	0x000102030405060708090A0B0C0D0E0F
++
++.text
++
++/* Save register content for the caller */
++#define FUNC_SAVE_GHASH()			\
++	mov	%rsp, %rax;		\
++	sub	$STACK_FRAME_SIZE_GHASH, %rsp;\
++	and	$~63, %rsp;		\
++	mov	%r12, 0*8(%rsp);	\
++	mov	%r13, 1*8(%rsp);	\
++	mov	%r14, 2*8(%rsp);	\
++	mov	%r15, 3*8(%rsp);	\
++	mov	%rax, 4*8(%rsp);	\
++	mov	%rax, 4*8(%rsp);	\
++	mov	%rax, %r14;		\
++	mov	%rbp, 5*8(%rsp);	\
++	mov	%rbx, 6*8(%rsp);	\
++
++/* Restore register content for the caller */
++#define FUNC_RESTORE_GHASH()		  \
++	mov	5*8(%rsp), %rbp;	\
++	mov	6*8(%rsp), %rbx;	\
++	mov	0*8(%rsp), %r12;	\
++	mov	1*8(%rsp), %r13;	\
++	mov	2*8(%rsp), %r14;	\
++	mov	3*8(%rsp), %r15;	\
++	mov	4*8(%rsp), %rsp;	\
++
++/*
++ * GHASH school book multiplication
++ */
++#define GHASH_MUL(GH, HK, T1, T2, T3, T4, T5)			\
++	vpclmulqdq	$0x11, HK, GH, T1;			\
++	vpclmulqdq	$0x00, HK, GH, T2;			\
++	vpclmulqdq	$0x01, HK, GH, T3;			\
++	vpclmulqdq	$0x10, HK, GH, GH;			\
++	vpxorq		T3, GH, GH;				\
++	vpsrldq		$8, GH, T3;				\
++	vpslldq		$8, GH, GH;				\
++	vpxorq		T3, T1, T1;				\
++	vpxorq		T2, GH, GH;				\
++	vmovdqu64	POLY2(%rip), T3;			\
++	vpclmulqdq	$0x01, GH, T3, T2;			\
++	vpslldq		$8, T2, T2;				\
++	vpxorq		T2, GH, GH;				\
++	vpclmulqdq	$0x00, GH, T3, T2;			\
++	vpsrldq		$4, T2, T2;				\
++	vpclmulqdq	$0x10, GH, T3, GH;			\
++	vpslldq		$4, GH, GH;				\
++	vpternlogq	$0x96, T2, T1, GH;
++
++/*
++ * Precomputation of hash keys. These precomputated keys
++ * are saved in memory and reused for as many 8 blocks sets
++ * as necessary.
++ */
++#define PRECOMPUTE(GDATA, HK, T1, T2, T3, T4, T5, T6, T7, T8) \
++\
++	vmovdqa64	HK, T5; \
++	vinserti64x2	$3, HK, ZWORD(T7), ZWORD(T7); \
++	GHASH_MUL(T5, HK, T1, T3, T4, T6, T2) \
++	vmovdqu64	T5, HashKey_2(GDATA); \
++	vinserti64x2	$2, T5, ZWORD(T7), ZWORD(T7); \
++	GHASH_MUL(T5, HK, T1, T3, T4, T6, T2) \
++	vmovdqu64	T5, HashKey_3(GDATA); \
++	vinserti64x2	$1, T5, ZWORD(T7), ZWORD(T7); \
++	GHASH_MUL(T5, HK, T1, T3, T4, T6, T2) \
++	vmovdqu64	T5, HashKey_4(GDATA); \
++	vinserti64x2	$0, T5, ZWORD(T7), ZWORD(T7); \
++	vshufi64x2	$0x00, ZWORD(T5), ZWORD(T5), ZWORD(T5); \
++	vmovdqa64	ZWORD(T7), ZWORD(T8); \
++	GHASH_MUL(ZWORD(T7), ZWORD(T5), ZWORD(T1), ZWORD(T3), ZWORD(T4), ZWORD(T6), ZWORD(T2)) \
++	vmovdqu64	ZWORD(T7), HashKey_8(GDATA); \
++	vshufi64x2	$0x00, ZWORD(T7), ZWORD(T7), ZWORD(T5); \
++	GHASH_MUL(ZWORD(T8), ZWORD(T5), ZWORD(T1), ZWORD(T3), ZWORD(T4), ZWORD(T6), ZWORD(T2)) \
++	vmovdqu64 ZWORD(T8), HashKey_12(GDATA); \
++	GHASH_MUL(ZWORD(T7), ZWORD(T5), ZWORD(T1), ZWORD(T3), ZWORD(T4), ZWORD(T6), ZWORD(T2)) \
++	vmovdqu64 ZWORD(T7), HashKey_16(GDATA); \
++	GHASH_MUL(ZWORD(T8), ZWORD(T5), ZWORD(T1), ZWORD(T3), ZWORD(T4), ZWORD(T6), ZWORD(T2)) \
++	vmovdqu64 ZWORD(T8), HashKey_20(GDATA); \
++	GHASH_MUL(ZWORD(T7), ZWORD(T5), ZWORD(T1), ZWORD(T3), ZWORD(T4), ZWORD(T6), ZWORD(T2)) \
++	vmovdqu64 ZWORD(T7), HashKey_24(GDATA); \
++	GHASH_MUL(ZWORD(T8), ZWORD(T5), ZWORD(T1), ZWORD(T3), ZWORD(T4), ZWORD(T6), ZWORD(T2)) \
++	vmovdqu64 ZWORD(T8), HashKey_28(GDATA); \
++	GHASH_MUL(ZWORD(T7), ZWORD(T5), ZWORD(T1), ZWORD(T3), ZWORD(T4), ZWORD(T6), ZWORD(T2)) \
++	vmovdqu64 ZWORD(T7), HashKey_32(GDATA); \
++	GHASH_MUL(ZWORD(T8), ZWORD(T5), ZWORD(T1), ZWORD(T3), ZWORD(T4), ZWORD(T6), ZWORD(T2)) \
++	vmovdqu64 ZWORD(T8), HashKey_36(GDATA); \
++	GHASH_MUL(ZWORD(T7), ZWORD(T5), ZWORD(T1), ZWORD(T3), ZWORD(T4), ZWORD(T6), ZWORD(T2)) \
++	vmovdqu64 ZWORD(T7), HashKey_40(GDATA); \
++	GHASH_MUL(ZWORD(T8), ZWORD(T5), ZWORD(T1), ZWORD(T3), ZWORD(T4), ZWORD(T6), ZWORD(T2)) \
++	vmovdqu64 ZWORD(T8), HashKey_44(GDATA); \
++	GHASH_MUL(ZWORD(T7), ZWORD(T5), ZWORD(T1), ZWORD(T3), ZWORD(T4), ZWORD(T6), ZWORD(T2)) \
++	vmovdqu64 ZWORD(T7), HashKey_48(GDATA);
++
++#define VHPXORI4x128(REG,TMP)					\
++	vextracti64x4	$1, REG, YWORD(TMP);			\
++	vpxorq		YWORD(TMP), YWORD(REG), YWORD(REG);	\
++	vextracti32x4	$1, YWORD(REG), XWORD(TMP);		\
++	vpxorq		XWORD(TMP), XWORD(REG), XWORD(REG);
++
++#define VCLMUL_REDUCE(OUT, POLY, HI128, LO128, TMP0, TMP1)	\
++	vpclmulqdq	$0x01, LO128, POLY, TMP0;		\
++	vpslldq		$8, TMP0, TMP0;				\
++	vpxorq		TMP0, LO128, TMP0;			\
++	vpclmulqdq	$0x00, TMP0, POLY, TMP1;		\
++	vpsrldq		$4, TMP1, TMP1;				\
++	vpclmulqdq	$0x10, TMP0, POLY, OUT;			\
++	vpslldq		$4, OUT, OUT;				\
++	vpternlogq	$0x96, HI128, TMP1, OUT;
++
++/*
++ * GHASH 1 to 16 blocks of the input buffer.
++ *  - It performs reduction at the end.
++ *  - It can take intermediate GHASH sums as input.
++ */
++#define GHASH_1_TO_16(KP, OFFSET, GHASH, T1, T2, T3, T4, T5, T6, T7, T8, T9, AAD_HASH_IN, CIPHER_IN0, CIPHER_IN1, CIPHER_IN2, CIPHER_IN3, NUM_BLOCKS, BOOL, INSTANCE_TYPE, ROUND, HKEY_START, PREV_H, PREV_L, PREV_M1, PREV_M2) \
++.set	reg_idx, 0;	\
++.set	blocks_left, NUM_BLOCKS;	\
++.ifc INSTANCE_TYPE, single_call; \
++	.if BOOL == 1; \
++	.set	hashk, concat(HashKey_, NUM_BLOCKS);	\
++	.else; \
++	.set	hashk, concat(HashKey_, NUM_BLOCKS) + 0x11;	 \
++	.endif; \
++	.set	first_result, 1; \
++	.set	reduce, 1; \
++	vpxorq		AAD_HASH_IN, CIPHER_IN0, CIPHER_IN0; \
++.else;	\
++	.set	hashk, concat(HashKey_, HKEY_START);	\
++	.ifc ROUND, first; \
++		.set first_result, 1; \
++		.set reduce, 0; \
++		vpxorq		AAD_HASH_IN, CIPHER_IN0, CIPHER_IN0; \
++	.else; \
++		.ifc ROUND, mid; \
++		    .set first_result, 0; \
++		    .set reduce, 0; \
++		    vmovdqa64	    PREV_H, T1; \
++		    vmovdqa64	    PREV_L, T2; \
++		    vmovdqa64	    PREV_M1, T3; \
++		    vmovdqa64	    PREV_M2, T4; \
++		.else; \
++		    .set first_result, 0; \
++		    .set reduce, 1; \
++		    vmovdqa64	    PREV_H, T1; \
++		    vmovdqa64	    PREV_L, T2; \
++		    vmovdqa64	    PREV_M1, T3; \
++		    vmovdqa64	    PREV_M2, T4; \
++		.endif; \
++	.endif; \
++.endif; \
++.if NUM_BLOCKS < 4;	\
++	.if blocks_left == 1; \
++		.if first_result == 1;	\
++			vmovdqu64	hashk + OFFSET(KP), XWORD(T9); \
++			vpclmulqdq	$0x11, XWORD(T9), XWORD(CIPHER_IN0), XWORD(T1); \
++			vpclmulqdq	$0x00, XWORD(T9), XWORD(CIPHER_IN0), XWORD(T2); \
++			vpclmulqdq	$0x01, XWORD(T9), XWORD(CIPHER_IN0), XWORD(T3); \
++			vpclmulqdq	$0x10, XWORD(T9), XWORD(CIPHER_IN0), XWORD(T4); \
++		.else;	\
++			vmovdqu64	hashk + OFFSET(KP), XWORD(T9); \
++			vpclmulqdq	$0x11, XWORD(T9), XWORD(CIPHER_IN0), XWORD(T5); \
++			vpclmulqdq	$0x00, XWORD(T9), XWORD(CIPHER_IN0), XWORD(T6); \
++			vpclmulqdq	$0x01, XWORD(T9), XWORD(CIPHER_IN0), XWORD(T7); \
++			vpclmulqdq	$0x10, XWORD(T9), XWORD(CIPHER_IN0), XWORD(T8); \
++		.endif; \
++	.elseif blocks_left == 2; \
++		.if first_result == 1;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vpclmulqdq	$0x11, YWORD(T9), YWORD(CIPHER_IN0), YWORD(T1); \
++			vpclmulqdq	$0x00, YWORD(T9), YWORD(CIPHER_IN0), YWORD(T2); \
++			vpclmulqdq	$0x01, YWORD(T9), YWORD(CIPHER_IN0), YWORD(T3); \
++			vpclmulqdq	$0x10, YWORD(T9), YWORD(CIPHER_IN0), YWORD(T4); \
++		.else;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vpclmulqdq	$0x11, YWORD(T9), YWORD(CIPHER_IN0), YWORD(T5); \
++			vpclmulqdq	$0x00, YWORD(T9), YWORD(CIPHER_IN0), YWORD(T6); \
++			vpclmulqdq	$0x01, YWORD(T9), YWORD(CIPHER_IN0), YWORD(T7); \
++			vpclmulqdq	$0x10, YWORD(T9), YWORD(CIPHER_IN0), YWORD(T8); \
++		.endif; \
++	.elseif blocks_left == 3;	\
++		.if first_result == 1;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vinserti64x2	$2, 32 + hashk + OFFSET(KP), T9, T9; \
++			vpclmulqdq	$0x11, T9, CIPHER_IN0, T1; \
++			vpclmulqdq	$0x00, T9, CIPHER_IN0, T2; \
++			vpclmulqdq	$0x01, T9, CIPHER_IN0, T3; \
++			vpclmulqdq	$0x10, T9, CIPHER_IN0, T4; \
++		.else;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vinserti64x2	$2, 32 + hashk + OFFSET(KP), T9, T9; \
++			vpclmulqdq	$0x11, T9, CIPHER_IN0, T5; \
++			vpclmulqdq	$0x00, T9, CIPHER_IN0, T6; \
++			vpclmulqdq	$0x01, T9, CIPHER_IN0, T7; \
++			vpclmulqdq	$0x10, T9, CIPHER_IN0, T8; \
++		.endif; \
++	.endif; \
++	.if first_result != 1; \
++		 vpxorq		 T5, T1, T1; \
++		 vpxorq		 T6, T2, T2; \
++		 vpxorq		 T7, T3, T3; \
++		 vpxorq		 T8, T4, T4; \
++	.endif; \
++.elseif (NUM_BLOCKS >= 4) && (NUM_BLOCKS < 8); \
++	vmovdqu64	hashk + OFFSET(KP), T9; \
++	.if first_result == 1; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN0, T1; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN0, T2; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN0, T3; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN0, T4; \
++		.set first_result, 0; \
++	.else; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN0, T5; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN0, T6; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN0, T7; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN0, T8; \
++		vpxorq		T5, T1, T1; \
++		vpxorq		T6, T2, T2; \
++		vpxorq		T7, T3, T3; \
++		vpxorq		T8, T4, T4; \
++	.endif; \
++	.set hashk, hashk + 64; \
++	.set blocks_left, blocks_left - 4;	\
++	.set reg_idx, reg_idx + 1;	\
++	.if blocks_left > 0;	\
++	.if blocks_left == 1; \
++		.if first_result == 1;	\
++			vmovdqu64	hashk + OFFSET(KP), XWORD(T9); \
++			vpclmulqdq	$0x11, XWORD(T9), XWORD(CIPHER_IN1), XWORD(T1); \
++			vpclmulqdq	$0x00, XWORD(T9), XWORD(CIPHER_IN1), XWORD(T2); \
++			vpclmulqdq	$0x01, XWORD(T9), XWORD(CIPHER_IN1), XWORD(T3); \
++			vpclmulqdq	$0x10, XWORD(T9), XWORD(CIPHER_IN1), XWORD(T4); \
++		.else;	\
++			vmovdqu64	hashk + OFFSET(KP), XWORD(T9); \
++			vpclmulqdq	$0x11, XWORD(T9), XWORD(CIPHER_IN1), XWORD(T5); \
++			vpclmulqdq	$0x00, XWORD(T9), XWORD(CIPHER_IN1), XWORD(T6); \
++			vpclmulqdq	$0x01, XWORD(T9), XWORD(CIPHER_IN1), XWORD(T7); \
++			vpclmulqdq	$0x10, XWORD(T9), XWORD(CIPHER_IN1), XWORD(T8); \
++		.endif; \
++	.elseif blocks_left == 2; \
++		.if first_result == 1;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vpclmulqdq	$0x11, YWORD(T9), YWORD(CIPHER_IN1), YWORD(T1); \
++			vpclmulqdq	$0x00, YWORD(T9), YWORD(CIPHER_IN1), YWORD(T2); \
++			vpclmulqdq	$0x01, YWORD(T9), YWORD(CIPHER_IN1), YWORD(T3); \
++			vpclmulqdq	$0x10, YWORD(T9), YWORD(CIPHER_IN1), YWORD(T4); \
++		.else;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vpclmulqdq	$0x11, YWORD(T9), YWORD(CIPHER_IN1), YWORD(T5); \
++			vpclmulqdq	$0x00, YWORD(T9), YWORD(CIPHER_IN1), YWORD(T6); \
++			vpclmulqdq	$0x01, YWORD(T9), YWORD(CIPHER_IN1), YWORD(T7); \
++			vpclmulqdq	$0x10, YWORD(T9), YWORD(CIPHER_IN1), YWORD(T8); \
++		.endif; \
++	.elseif blocks_left == 3;  \
++		.if first_result == 1;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vinserti64x2	$2, 32 + hashk + OFFSET(KP), T9, T9; \
++			vpclmulqdq	$0x11, T9, CIPHER_IN1, T1; \
++			vpclmulqdq	$0x00, T9, CIPHER_IN1, T2; \
++			vpclmulqdq	$0x01, T9, CIPHER_IN1, T3; \
++			vpclmulqdq	$0x10, T9, CIPHER_IN1, T4; \
++		.else;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vinserti64x2	$2, 32 + hashk + OFFSET(KP), T9, T9; \
++			vpclmulqdq	$0x11, T9, CIPHER_IN1, T5; \
++			vpclmulqdq	$0x00, T9, CIPHER_IN1, T6; \
++			vpclmulqdq	$0x01, T9, CIPHER_IN1, T7; \
++			vpclmulqdq	$0x10, T9, CIPHER_IN1, T8; \
++		.endif; \
++	.endif; \
++	.if first_result != 1; \
++			vpxorq		T5, T1, T1; \
++			vpxorq		T6, T2, T2; \
++			vpxorq		T7, T3, T3; \
++			vpxorq		T8, T4, T4; \
++	.endif; \
++	.endif; \
++.elseif (NUM_BLOCKS >= 8) && (NUM_BLOCKS < 12); \
++	vmovdqu64	hashk + OFFSET(KP), T9; \
++	.if first_result == 1; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN0, T1; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN0, T2; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN0, T3; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN0, T4; \
++		.set first_result, 0; \
++	.else; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN0, T5; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN0, T6; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN0, T7; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN0, T8; \
++		vpxorq		T5, T1, T1; \
++		vpxorq		T6, T2, T2; \
++		vpxorq		T7, T3, T3; \
++		vpxorq		T8, T4, T4; \
++	.endif; \
++	.set hashk, hashk + 64; \
++	.set blocks_left, blocks_left - 4; \
++	.set reg_idx, reg_idx + 1;	\
++	vmovdqu64	hashk + OFFSET(KP), T9; \
++	.if first_result == 1; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN1, T1; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN1, T2; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN1, T3; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN1, T4; \
++		.set first_result, 0; \
++	.else; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN1, T5; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN1, T6; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN1, T7; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN1, T8; \
++		vpxorq		T5, T1, T1; \
++		vpxorq		T6, T2, T2; \
++		vpxorq		T7, T3, T3; \
++		vpxorq		T8, T4, T4; \
++	.endif; \
++	.set hashk, hashk + 64; \
++	.set blocks_left, blocks_left - 4; \
++	.set reg_idx, reg_idx + 1;	\
++	.if blocks_left > 0; \
++	.if blocks_left == 1; \
++		.if first_result == 1;	\
++			vmovdqu64	hashk + OFFSET(KP), XWORD(T9); \
++			vpclmulqdq	$0x11, XWORD(T9), XWORD(CIPHER_IN2), XWORD(T1); \
++			vpclmulqdq	$0x00, XWORD(T9), XWORD(CIPHER_IN2), XWORD(T2); \
++			vpclmulqdq	$0x01, XWORD(T9), XWORD(CIPHER_IN2), XWORD(T3); \
++			vpclmulqdq	$0x10, XWORD(T9), XWORD(CIPHER_IN2), XWORD(T4); \
++		.else;	\
++			vmovdqu64	hashk + OFFSET(KP), XWORD(T9); \
++			vpclmulqdq	$0x11, XWORD(T9), XWORD(CIPHER_IN2), XWORD(T5); \
++			vpclmulqdq	$0x00, XWORD(T9), XWORD(CIPHER_IN2), XWORD(T6); \
++			vpclmulqdq	$0x01, XWORD(T9), XWORD(CIPHER_IN2), XWORD(T7); \
++			vpclmulqdq	$0x10, XWORD(T9), XWORD(CIPHER_IN2), XWORD(T8); \
++		.endif; \
++	.elseif blocks_left == 2; \
++		.if first_result == 1;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vpclmulqdq	$0x11, YWORD(T9), YWORD(CIPHER_IN2), YWORD(T1); \
++			vpclmulqdq	$0x00, YWORD(T9), YWORD(CIPHER_IN2), YWORD(T2); \
++			vpclmulqdq	$0x01, YWORD(T9), YWORD(CIPHER_IN2), YWORD(T3); \
++			vpclmulqdq	$0x10, YWORD(T9), YWORD(CIPHER_IN2), YWORD(T4); \
++		.else;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vpclmulqdq	$0x11, YWORD(T9), YWORD(CIPHER_IN2), YWORD(T5); \
++			vpclmulqdq	$0x00, YWORD(T9), YWORD(CIPHER_IN2), YWORD(T6); \
++			vpclmulqdq	$0x01, YWORD(T9), YWORD(CIPHER_IN2), YWORD(T7); \
++			vpclmulqdq	$0x10, YWORD(T9), YWORD(CIPHER_IN2), YWORD(T8); \
++		.endif; \
++	.elseif blocks_left == 3;  \
++		.if first_result == 1;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vinserti64x2	$2, 32 + hashk + OFFSET(KP), T9, T9; \
++			vpclmulqdq	$0x11, T9, CIPHER_IN2, T1; \
++			vpclmulqdq	$0x00, T9, CIPHER_IN2, T2; \
++			vpclmulqdq	$0x01, T9, CIPHER_IN2, T3; \
++			vpclmulqdq	$0x10, T9, CIPHER_IN2, T4; \
++		.else;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vinserti64x2	$2, 32 + hashk + OFFSET(KP), T9, T9; \
++			vpclmulqdq	$0x11, T9, CIPHER_IN2, T5; \
++			vpclmulqdq	$0x00, T9, CIPHER_IN2, T6; \
++			vpclmulqdq	$0x01, T9, CIPHER_IN2, T7; \
++			vpclmulqdq	$0x10, T9, CIPHER_IN2, T8; \
++		.endif; \
++	.endif; \
++	.if first_result != 1; \
++		vpxorq		T5, T1, T1; \
++		vpxorq		T6, T2, T2; \
++		vpxorq		T7, T3, T3; \
++		vpxorq		T8, T4, T4; \
++	.endif; \
++	.endif; \
++.elseif (NUM_BLOCKS >= 12) && (NUM_BLOCKS < 16); \
++	vmovdqu64	hashk + OFFSET(KP), T9; \
++	.if first_result == 1; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN0, T1; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN0, T2; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN0, T3; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN0, T4; \
++		first_result = 0; \
++	.else; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN0, T5; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN0, T6; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN0, T7; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN0, T8; \
++		vpxorq		T5, T1, T1; \
++		vpxorq		T6, T2, T2; \
++		vpxorq		T7, T3, T3; \
++		vpxorq		T8, T4, T4; \
++	.endif; \
++	.set hashk, hashk + 64; \
++	.set blocks_left, blocks_left - 4; \
++	.set reg_idx, reg_idx + 1;	\
++	vmovdqu64	hashk + OFFSET(KP), T9; \
++	.if first_result == 1; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN1, T1; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN1, T2; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN1, T3; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN1, T4; \
++		first_result = 0; \
++	.else; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN1, T5; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN1, T6; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN1, T7; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN1, T8; \
++		vpxorq		T5, T1, T1; \
++		vpxorq		T6, T2, T2; \
++		vpxorq		T7, T3, T3; \
++		vpxorq		T8, T4, T4; \
++	.endif; \
++	.set hashk, hashk + 64; \
++	.set blocks_left, blocks_left - 4; \
++	.set reg_idx, reg_idx + 1;	\
++	vmovdqu64	hashk + OFFSET(KP), T9; \
++	.if first_result == 1; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN2, T1; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN2, T2; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN2, T3; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN2, T4; \
++		first_result = 0; \
++	.else; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN2, T5; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN2, T6; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN2, T7; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN2, T8; \
++		vpxorq		T5, T1, T1; \
++		vpxorq		T6, T2, T2; \
++		vpxorq		T7, T3, T3; \
++		vpxorq		T8, T4, T4; \
++	.endif; \
++	.set hashk, hashk + 64; \
++	.set blocks_left, blocks_left - 4; \
++	.set reg_idx, reg_idx + 1;	\
++	.if blocks_left > 0;	\
++	.if blocks_left == 1; \
++		.if first_result == 1;	\
++			vmovdqu64	hashk + OFFSET(KP), XWORD(T9); \
++			vpclmulqdq	$0x11, XWORD(T9), XWORD(CIPHER_IN3), XWORD(T1); \
++			vpclmulqdq	$0x00, XWORD(T9), XWORD(CIPHER_IN3), XWORD(T2); \
++			vpclmulqdq	$0x01, XWORD(T9), XWORD(CIPHER_IN3), XWORD(T3); \
++			vpclmulqdq	$0x10, XWORD(T9), XWORD(CIPHER_IN3), XWORD(T4); \
++		.else;	\
++			vmovdqu64	hashk + OFFSET(KP), XWORD(T9); \
++			vpclmulqdq	$0x11, XWORD(T9), XWORD(CIPHER_IN3), XWORD(T5); \
++			vpclmulqdq	$0x00, XWORD(T9), XWORD(CIPHER_IN3), XWORD(T6); \
++			vpclmulqdq	$0x01, XWORD(T9), XWORD(CIPHER_IN3), XWORD(T7); \
++			vpclmulqdq	$0x10, XWORD(T9), XWORD(CIPHER_IN3), XWORD(T8); \
++		.endif; \
++	.elseif blocks_left == 2; \
++		.if first_result == 1;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vpclmulqdq	$0x11, YWORD(T9), YWORD(CIPHER_IN3), YWORD(T1); \
++			vpclmulqdq	$0x00, YWORD(T9), YWORD(CIPHER_IN3), YWORD(T2); \
++			vpclmulqdq	$0x01, YWORD(T9), YWORD(CIPHER_IN3), YWORD(T3); \
++			vpclmulqdq	$0x10, YWORD(T9), YWORD(CIPHER_IN3), YWORD(T4); \
++		.else;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vpclmulqdq	$0x11, YWORD(T9), YWORD(CIPHER_IN3), YWORD(T5); \
++			vpclmulqdq	$0x00, YWORD(T9), YWORD(CIPHER_IN3), YWORD(T6); \
++			vpclmulqdq	$0x01, YWORD(T9), YWORD(CIPHER_IN3), YWORD(T7); \
++			vpclmulqdq	$0x10, YWORD(T9), YWORD(CIPHER_IN3), YWORD(T8); \
++		.endif; \
++	.elseif blocks_left == 3;  \
++		.if first_result == 1;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vinserti64x2	$2, 32 + hashk + OFFSET(KP), T9, T9; \
++			vpclmulqdq	$0x11, T9, CIPHER_IN3, T1; \
++			vpclmulqdq	$0x00, T9, CIPHER_IN3, T2; \
++			vpclmulqdq	$0x01, T9, CIPHER_IN3, T3; \
++			vpclmulqdq	$0x10, T9, CIPHER_IN3, T4; \
++		.else;	\
++			vmovdqu64	hashk + OFFSET(KP), YWORD(T9); \
++			vinserti64x2	$2, 32 + hashk + OFFSET(KP), T9, T9; \
++			vpclmulqdq	$0x11, T9, CIPHER_IN3, T5; \
++			vpclmulqdq	$0x00, T9, CIPHER_IN3, T6; \
++			vpclmulqdq	$0x01, T9, CIPHER_IN3, T7; \
++			vpclmulqdq	$0x10, T9, CIPHER_IN3, T8; \
++		.endif; \
++	.endif; \
++	.if first_result != 1; \
++			vpxorq		T5, T1, T1; \
++			vpxorq		T6, T2, T2; \
++			vpxorq		T7, T3, T3; \
++			vpxorq		T8, T4, T4; \
++	.endif; \
++	.endif; \
++.else;	\
++	vmovdqu64	hashk + OFFSET(KP), T9; \
++	.if first_result == 1; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN0, T1; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN0, T2; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN0, T3; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN0, T4; \
++		first_result = 0; \
++	.else; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN0, T5; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN0, T6; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN0, T7; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN0, T8; \
++		vpxorq		T5, T1, T1; \
++		vpxorq		T6, T2, T2; \
++		vpxorq		T7, T3, T3; \
++		vpxorq		T8, T4, T4; \
++	.endif; \
++	.set hashk, hashk + 64; \
++	.set blocks_left, blocks_left - 4; \
++	.set reg_idx, reg_idx + 1;     \
++	vmovdqu64	hashk + OFFSET(KP), T9; \
++	.if first_result == 1; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN1, T1; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN1, T2; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN1, T3; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN1, T4; \
++		first_result = 0; \
++	.else; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN1, T5; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN1, T6; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN1, T7; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN1, T8; \
++		vpxorq		T5, T1, T1; \
++		vpxorq		T6, T2, T2; \
++		vpxorq		T7, T3, T3; \
++		vpxorq		T8, T4, T4; \
++	.endif; \
++	.set hashk, hashk + 64; \
++	.set blocks_left, blocks_left - 4; \
++	.set reg_idx, reg_idx + 1;	\
++	vmovdqu64	hashk + OFFSET(KP), T9; \
++	.if first_result == 1; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN2, T1; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN2, T2; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN2, T3; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN2, T4; \
++		first_result = 0; \
++	.else; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN2, T5; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN2, T6; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN2, T7; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN2, T8; \
++		vpxorq		T5, T1, T1; \
++		vpxorq		T6, T2, T2; \
++		vpxorq		T7, T3, T3; \
++		vpxorq		T8, T4, T4; \
++	.endif; \
++	.set hashk, hashk + 64; \
++	.set blocks_left, blocks_left - 4; \
++	.set reg_idx, reg_idx + 1;	\
++	vmovdqu64	hashk + OFFSET(KP), T9; \
++	.if first_result == 1; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN3, T1; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN3, T2; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN3, T3; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN3, T4; \
++		first_result = 0; \
++	.else; \
++		vpclmulqdq	$0x11, T9, CIPHER_IN3, T5; \
++		vpclmulqdq	$0x00, T9, CIPHER_IN3, T6; \
++		vpclmulqdq	$0x01, T9, CIPHER_IN3, T7; \
++		vpclmulqdq	$0x10, T9, CIPHER_IN3, T8; \
++		vpxorq		T5, T1, T1; \
++		vpxorq		T6, T2, T2; \
++		vpxorq		T7, T3, T3; \
++		vpxorq		T8, T4, T4; \
++	.endif; \
++	.set hashk, hashk + 64; \
++	.set blocks_left, blocks_left - 4; \
++	.set reg_idx, reg_idx + 1;	\
++.endif; \
++.if reduce == 1; \
++	vpxorq		T4, T3, T3; \
++	vpsrldq		$8, T3, T7; \
++	vpslldq		$8, T3, T8; \
++	vpxorq		T7, T1, T1; \
++	vpxorq		T8, T2, T2; \
++	VHPXORI4x128(T1, T7); \
++	VHPXORI4x128(T2, T8); \
++	vmovdqa64	POLY2(%rip), XWORD(T9); \
++	VCLMUL_REDUCE(XWORD(GHASH), XWORD(T9), XWORD(T1), XWORD(T2), XWORD(T3), XWORD(T4)) \
++.else; \
++	vmovdqa64	T1, PREV_H; \
++	vmovdqa64	T2, PREV_L; \
++	vmovdqa64	T3, PREV_M1; \
++	vmovdqa64	T4, PREV_M2; \
++.endif;
++
++/*
++ * Calculates the hash of the data which will not be encrypted.
++ * Input: The input data (A_IN), that data's length (A_LEN), and the hash key (GDATA_KEY).
++ * Output: The hash of the data (AAD_HASH).
++ */
++#define CALC_AAD_HASH(A_IN, A_LEN, AAD_HASH, GDATA_KEY, ZT0, ZT1, ZT2, ZT3, ZT4, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZT13, ZT14, ZT15, ZT16, ZT17, T1, T2, T3, MASKREG, OFFSET) \
++	mov	A_IN, T1; \
++	mov	A_LEN, T2; \
++	or	T2, T2; \
++	jz	0f; \
++	vmovdqa64	SHUF_MASK(%rip), ZT13; \
++20:; \
++	cmp	$(48*16), T2; \
++	jl	21f; \
++	vmovdqu64	64*0(T1), ZT1; \
++	vmovdqu64	64*1(T1), ZT2; \
++	vmovdqu64	64*2(T1), ZT3; \
++	vmovdqu64	64*3(T1), ZT4; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	vpshufb ZT13, ZT3, ZT3; \
++	vpshufb ZT13, ZT4, ZT4; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZWORD(AAD_HASH), ZT1, ZT2, ZT3, ZT4, 16, 1, multi_call, first, 48, ZT14, ZT15, ZT16, ZT17) \
++	vmovdqu64     0 + 256(T1), ZT1; \
++	vmovdqu64     64 + 256(T1), ZT2; \
++	vmovdqu64     128 + 256(T1), ZT3; \
++	vmovdqu64     192 + 256(T1), ZT4; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	vpshufb ZT13, ZT3, ZT3; \
++	vpshufb ZT13, ZT4, ZT4; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZWORD(AAD_HASH), ZT1, ZT2, ZT3, ZT4, 16, 1, multi_call, mid, 32, ZT14, ZT15, ZT16, ZT17) \
++	vmovdqu64     0 + 512(T1), ZT1; \
++	vmovdqu64     64 + 512(T1), ZT2; \
++	vmovdqu64     128 + 512(T1), ZT3; \
++	vmovdqu64     192 + 512(T1), ZT4; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	vpshufb ZT13, ZT3, ZT3; \
++	vpshufb ZT13, ZT4, ZT4; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZWORD(AAD_HASH), ZT1, ZT2, ZT3, ZT4, 16, 1, multi_call, last, 16, ZT14, ZT15, ZT16, ZT17) \
++	sub	$(48*16), T2; \
++	je	0f; \
++	add	$(48*16), T1; \
++	jmp	20b; \
++21:; \
++	cmp	$(32*16), T2; \
++	jl	22f; \
++	vmovdqu64	64*0(T1), ZT1; \
++	vmovdqu64	64*1(T1), ZT2; \
++	vmovdqu64	64*2(T1), ZT3; \
++	vmovdqu64	64*3(T1), ZT4; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	vpshufb ZT13, ZT3, ZT3; \
++	vpshufb ZT13, ZT4, ZT4; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZWORD(AAD_HASH), ZT1, ZT2, ZT3, ZT4, 16, 1, multi_call, first, 32, ZT14, ZT15, ZT16, ZT17) \
++	vmovdqu64     0 + 256(T1), ZT1; \
++	vmovdqu64     64 + 256(T1), ZT2; \
++	vmovdqu64     128 + 256(T1), ZT3; \
++	vmovdqu64     192 + 256(T1), ZT4; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	vpshufb ZT13, ZT3, ZT3; \
++	vpshufb ZT13, ZT4, ZT4; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZWORD(AAD_HASH), ZT1, ZT2, ZT3, ZT4, 16, 1, multi_call, last, 16, ZT14, ZT15, ZT16, ZT17) \
++	sub	$(32*16), T2; \
++	je	0f; \
++	add	$(32*16), T1; \
++	jmp	23f; \
++22:; \
++	cmp	$(16*16), T2; \
++	jl	23f; \
++	vmovdqu64	64*0(T1), ZT1; \
++	vmovdqu64	64*1(T1), ZT2; \
++	vmovdqu64	64*2(T1), ZT3; \
++	vmovdqu64	64*3(T1), ZT4; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	vpshufb ZT13, ZT3, ZT3; \
++	vpshufb ZT13, ZT4, ZT4; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZWORD(AAD_HASH), ZT1, ZT2, ZT3, ZT4, 16, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	sub	$(16*16), T2; \
++	je	0f; \
++	add	$(16*16), T1; \
++23:; \
++	lea	byte64_len_to_mask_table(%rip), T3; \
++	lea	(T3, T2, 8), T3; \
++	add	$15, T2; \
++	and	$-16, T2; \
++	shr	$4, T2; \
++	cmp	$1, T2; \
++	je	1f; \
++	cmp	$2, T2; \
++	je	2f; \
++	cmp	$3, T2; \
++	je	3f; \
++	cmp	$4, T2; \
++	je	4f; \
++	cmp	$5, T2; \
++	je	5f; \
++	cmp	$6, T2; \
++	je	6f; \
++	cmp	$7, T2; \
++	je	7f; \
++	cmp	$8, T2; \
++	je	8f; \
++	cmp	$9, T2; \
++	je	9f; \
++	cmp	$10, T2; \
++	je	10f; \
++	cmp	$11, T2; \
++	je	11f; \
++	cmp	$12, T2; \
++	je	12f; \
++	cmp	$13, T2; \
++	je	13f; \
++	cmp	$14, T2; \
++	je	14f; \
++	cmp	$15, T2; \
++	je	15f; \
++16:; \
++	sub $(64*3*8), T3; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), ZT1; \
++	vmovdqu8  64*1(T1), ZT2; \
++	vmovdqu8  64*2(T1), ZT3; \
++	vmovdqu8  64*3(T1), ZT4{MASKREG}{z}; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	vpshufb ZT13, ZT3, ZT3; \
++	vpshufb ZT13, ZT4, ZT4; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZWORD(AAD_HASH), ZT1, ZT2, ZT3, ZT4, 16, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++15:; \
++	sub $(64*3*8), T3; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), ZT1; \
++	vmovdqu8  64*1(T1), ZT2; \
++	vmovdqu8  64*2(T1), ZT3; \
++	vmovdqu8  64*3(T1), ZT4{MASKREG}{z}; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	vpshufb ZT13, ZT3, ZT3; \
++	vpshufb ZT13, ZT4, ZT4; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZWORD(AAD_HASH), ZT1, ZT2, ZT3, ZT4, 15, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++14:; \
++	sub $(64*3*8), T3; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), ZT1; \
++	vmovdqu8  64*1(T1), ZT2; \
++	vmovdqu8  64*2(T1), ZT3; \
++	vmovdqu8  64*3(T1), ZT4{MASKREG}{z}; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	vpshufb ZT13, ZT3, ZT3; \
++	vpshufb ZT13, ZT4, ZT4; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZWORD(AAD_HASH), ZT1, ZT2, ZT3, ZT4, 14, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++13:; \
++	sub $(64*3*8), T3; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), ZT1; \
++	vmovdqu8  64*1(T1), ZT2; \
++	vmovdqu8  64*2(T1), ZT3; \
++	vmovdqu8  64*3(T1), ZT4{MASKREG}{z}; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	vpshufb ZT13, ZT3, ZT3; \
++	vpshufb ZT13, ZT4, ZT4; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZWORD(AAD_HASH), ZT1, ZT2, ZT3, ZT4, 13, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++12:; \
++	sub $(64*2*8), T3; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), ZT1; \
++	vmovdqu8  64*1(T1), ZT2; \
++	vmovdqu8  64*2(T1), ZT3{MASKREG}{z}; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	vpshufb ZT13, ZT3, ZT3; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZWORD(AAD_HASH), ZT1, ZT2, ZT3, no_zmm, 12, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++11:; \
++	sub $(64*2*8), T3; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), ZT1; \
++	vmovdqu8  64*1(T1), ZT2; \
++	vmovdqu8  64*2(T1), ZT3{MASKREG}{z}; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	vpshufb ZT13, ZT3, ZT3; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZWORD(AAD_HASH), ZT1, ZT2, ZT3, no_zmm, 11, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++10:; \
++	sub $(64*2*8), T3; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), ZT1; \
++	vmovdqu8  64*1(T1), ZT2; \
++	vmovdqu8  64*2(T1), ZT3{MASKREG}{z}; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	vpshufb ZT13, ZT3, ZT3; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZWORD(AAD_HASH), ZT1, ZT2, ZT3, no_zmm, 10, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++9:; \
++	sub $(64*2*8), T3; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), ZT1; \
++	vmovdqu8  64*1(T1), ZT2; \
++	vmovdqu8  64*2(T1), ZT3{MASKREG}{z}; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	vpshufb ZT13, ZT3, ZT3; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZT11, ZT12, ZWORD(AAD_HASH), ZT1, ZT2, ZT3, no_zmm, 9, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++8:; \
++	sub $(64*8), T3; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), ZT1; \
++	vmovdqu8  64*1(T1), ZT2{MASKREG}{z}; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT3, ZT4, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZWORD(AAD_HASH), ZT1, ZT2, no_zmm, no_zmm, 8, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++7:; \
++	sub $(64*8), T3; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), ZT1; \
++	vmovdqu8  64*1(T1), ZT2{MASKREG}{z}; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb ZT13, ZT2, ZT2; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT3, ZT4, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZWORD(AAD_HASH), ZT1, ZT2, no_zmm, no_zmm, 7, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++6:; \
++	sub $(64*8), T3; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), ZT1; \
++	vmovdqu8  64*1(T1), YWORD(ZT2){MASKREG}{z}; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb YWORD(ZT13), YWORD(ZT2), YWORD(ZT2); \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT3, ZT4, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZWORD(AAD_HASH), ZT1, ZT2, no_zmm, no_zmm, 6, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++5:; \
++	sub $(64*8), T3; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), ZT1; \
++	vmovdqu8  64*1(T1), XWORD(ZT2){MASKREG}{z}; \
++	vpshufb ZT13, ZT1, ZT1; \
++	vpshufb XWORD(ZT13), XWORD(ZT2), XWORD(ZT2); \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT3, ZT4, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZWORD(AAD_HASH), ZT1, ZT2, no_zmm, no_zmm, 5, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++4:; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), ZT1{MASKREG}{z}; \
++	vpshufb ZT13, ZT1, ZT1; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT3, ZT4, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZWORD(AAD_HASH), ZT1, no_zmm, no_zmm, no_zmm, 4, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++3:; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), ZT1{MASKREG}{z}; \
++	vpshufb ZT13, ZT1, ZT1; \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT3, ZT4, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZWORD(AAD_HASH), ZT1, no_zmm, no_zmm, no_zmm, 3, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++2:; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), YWORD(ZT1){MASKREG}{z}; \
++	vpshufb YWORD(ZT13), YWORD(ZT1), YWORD(ZT1); \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT3, ZT4, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZWORD(AAD_HASH), ZT1, no_zmm, no_zmm, no_zmm, 2, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++	jmp	0f; \
++1:; \
++	kmovq	(T3), MASKREG; \
++	vmovdqu8  64*0(T1), XWORD(ZT1){MASKREG}{z}; \
++	vpshufb XWORD(ZT13), XWORD(ZT1), XWORD(ZT1); \
++	GHASH_1_TO_16(GDATA_KEY, OFFSET, ZWORD(AAD_HASH), ZT0, ZT3, ZT4, ZT5, ZT6, ZT7, ZT8, ZT9, ZT10, ZWORD(AAD_HASH), ZT1, no_zmm, no_zmm, no_zmm, 1, 1, single_call, NULL, NULL, NULL, NULL, NULL, NULL) \
++0:;
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_avx512.S b/arch/x86/crypto/ghash-clmulni-intel_avx512.S
+new file mode 100644
+index 0000000..9cbc40f
+--- /dev/null
++++ b/arch/x86/crypto/ghash-clmulni-intel_avx512.S
+@@ -0,0 +1,68 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright © 2020 Intel Corporation.
++ *
++ * Implement GHASH calculation with AVX512 instructions. (x86_64)
++ *
++ * This is GHASH calculation with AVX512 instructions. It requires
++ * the support of Intel(R) AVX512F and VPCLMULQDQ instructions.
++ */
++
++#include "avx512_vaes_common.S"
++
++/*
++ * void ghash_precomp_avx512(u8 *key_data);
++ */
++SYM_FUNC_START(ghash_precomp_avx512)
++        FUNC_SAVE_GHASH()
++
++        /* move original key to xmm6 */
++        vmovdqu HashKey_1(arg1), %xmm6
++
++        vpshufb SHUF_MASK(%rip), %xmm6, %xmm6
++
++        vmovdqa %xmm6, %xmm2
++        vpsllq  $1, %xmm6, %xmm6
++        vpsrlq  $63, %xmm2, %xmm2
++        vmovdqa %xmm2, %xmm1
++        vpslldq $8, %xmm2, %xmm2
++        vpsrldq $8, %xmm1, %xmm1
++        vpor %xmm2, %xmm6, %xmm6
++        vpshufd $36, %xmm1, %xmm2
++        vpcmpeqd TWOONE(%rip), %xmm2, %xmm2
++        vpand POLY(%rip), %xmm2, %xmm2
++        vpxor %xmm2, %xmm6, %xmm6
++        vmovdqu %xmm6, HashKey_1(arg1)
++
++        PRECOMPUTE(arg1, %xmm6, %xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm7, %xmm8)
++
++        FUNC_RESTORE_GHASH()
++
++        ret
++SYM_FUNC_END(ghash_precomp_avx512)
++
++/*
++ * void clmul_ghash_update_avx512
++ *      (uint8_t *dst,
++ *       const uint8_t *src,
++ *       unsigned int srclen,
++ *       struct ghash_ctx_new *key_data);
++ */
++SYM_FUNC_START(clmul_ghash_update_avx512)
++        FUNC_SAVE_GHASH()
++
++        /* Read current hash value from dst */
++        vmovdqa (arg1), %xmm0
++
++        /* Bswap current hash value */
++        vpshufb SHUF_MASK(%rip), %xmm0, %xmm0
++
++        CALC_AAD_HASH(arg2, arg3, %xmm0, arg4, %zmm1, %zmm2, %zmm3, %zmm4, %zmm5, %zmm6, %zmm7, %zmm8, %zmm9, %zmm10, %zmm11, %zmm12, %zmm13, %zmm15, %zmm16, %zmm17, %zmm18, %zmm19, %r10, %r11, %r12, %k1, 0)
++
++        /* Bswap current hash value before storing */
++        vpshufb SHUF_MASK(%rip), %xmm0, %xmm0
++        vmovdqu %xmm0, (arg1)
++
++        FUNC_RESTORE_GHASH()
++
++        ret
++SYM_FUNC_END(clmul_ghash_update_avx512)
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+index 1f1a95f..3a3e8ea 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
++++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+@@ -22,18 +22,39 @@
  
- asmlinkage u16 crc_t10dif_pcl(u16 init_crc, const u8 *buf, size_t len);
-+#ifdef CONFIG_CRYPTO_CRCT10DIF_AVX512
-+asmlinkage u16 crct10dif_pcl_avx512(u16 init_crc, const u8 *buf, size_t len);
-+#else
-+static u16 crct10dif_pcl_avx512(u16 init_crc, const u8 *buf, size_t len)
-+{ return 0; }
-+#endif
+ #define GHASH_BLOCK_SIZE	16
+ #define GHASH_DIGEST_SIZE	16
++#define GHASH_KEY_LEN		16
 +
 +static bool use_avx512;
 +module_param(use_avx512, bool, 0644);
 +MODULE_PARM_DESC(use_avx512, "Use AVX512 optimized algorithm, if available");
  
- struct chksum_desc_ctx {
- 	__u16 crc;
-@@ -56,7 +66,12 @@ static int chksum_update(struct shash_desc *desc, const u8 *data,
+ void clmul_ghash_mul(char *dst, const u128 *shash);
  
- 	if (length >= 16 && crypto_simd_usable()) {
- 		kernel_fpu_begin();
--		ctx->crc = crc_t10dif_pcl(ctx->crc, data, length);
-+		if (IS_ENABLED(CONFIG_CRYPTO_CRCT10DIF_AVX512) &&
-+		    cpu_feature_enabled(X86_FEATURE_VPCLMULQDQ) &&
-+		    use_avx512)
-+			ctx->crc = crct10dif_pcl_avx512(ctx->crc, data, length);
-+		else
-+			ctx->crc = crc_t10dif_pcl(ctx->crc, data, length);
- 		kernel_fpu_end();
- 	} else
- 		ctx->crc = crc_t10dif_generic(ctx->crc, data, length);
-@@ -75,7 +90,12 @@ static int __chksum_finup(__u16 crc, const u8 *data, unsigned int len, u8 *out)
- {
- 	if (len >= 16 && crypto_simd_usable()) {
- 		kernel_fpu_begin();
--		*(__u16 *)out = crc_t10dif_pcl(crc, data, len);
-+		if (IS_ENABLED(CONFIG_CRYPTO_CRCT10DIF_AVX512) &&
-+		    cpu_feature_enabled(X86_FEATURE_VPCLMULQDQ) &&
-+		    use_avx512)
-+			*(__u16 *)out = crct10dif_pcl_avx512(crc, data, len);
-+		else
-+			*(__u16 *)out = crc_t10dif_pcl(crc, data, len);
- 		kernel_fpu_end();
- 	} else
- 		*(__u16 *)out = crc_t10dif_generic(crc, data, len);
-diff --git a/arch/x86/include/asm/disabled-features.h b/arch/x86/include/asm/disabled-features.h
-index 5861d34..1192dea 100644
---- a/arch/x86/include/asm/disabled-features.h
-+++ b/arch/x86/include/asm/disabled-features.h
-@@ -56,6 +56,12 @@
- # define DISABLE_PTI		(1 << (X86_FEATURE_PTI & 31))
- #endif
+ void clmul_ghash_update(char *dst, const char *src, unsigned int srclen,
+ 			const u128 *shash);
  
-+#if defined(CONFIG_AS_VPCLMULQDQ)
-+# define DISABLE_VPCLMULQDQ	0
++extern void ghash_precomp_avx512(u8 *key_data);
++#ifdef CONFIG_CRYPTO_GHASH_CLMUL_NI_AVX512
++extern void clmul_ghash_update_avx512(char *dst, const char *src, unsigned int srclen,
++				      u8 *shash);
 +#else
-+# define DISABLE_VPCLMULQDQ	(1 << (X86_FEATURE_VPCLMULQDQ & 31))
++static void clmul_ghash_update_avx512(char *dst, const char *src, unsigned int srclen,
++			       u8 *shash)
++{}
 +#endif
 +
- #ifdef CONFIG_IOMMU_SUPPORT
- # define DISABLE_ENQCMD	0
- #else
-@@ -82,7 +88,7 @@
- #define DISABLED_MASK14	0
- #define DISABLED_MASK15	0
- #define DISABLED_MASK16	(DISABLE_PKU|DISABLE_OSPKE|DISABLE_LA57|DISABLE_UMIP| \
--			 DISABLE_ENQCMD)
-+			 DISABLE_ENQCMD|DISABLE_VPCLMULQDQ)
- #define DISABLED_MASK17	0
- #define DISABLED_MASK18	0
- #define DISABLED_MASK_CHECK BUILD_BUG_ON_ZERO(NCAPINTS != 19)
+ struct ghash_async_ctx {
+ 	struct cryptd_ahash *cryptd_tfm;
+ };
+ 
++/*
++ * This is needed for schoolbook multiply purposes.
++ * (HashKey << 1 mod poly), (HashKey^2 << 1 mod poly), ...,
++ * (Hashkey^48 << 1 mod poly)
++ */
+ struct ghash_ctx {
+ 	u128 shash;
++	u8 hkey[GHASH_KEY_LEN * 48];
+ };
+ 
+ struct ghash_desc_ctx {
+@@ -56,6 +77,15 @@ static int ghash_setkey(struct crypto_shash *tfm,
+ 	struct ghash_ctx *ctx = crypto_shash_ctx(tfm);
+ 	be128 *x = (be128 *)key;
+ 	u64 a, b;
++	int i;
++
++	if (IS_ENABLED(CONFIG_CRYPTO_GHASH_CLMUL_NI_AVX512) &&
++	    cpu_feature_enabled(X86_FEATURE_VPCLMULQDQ) && use_avx512) {
++		for (i = 0; i < 16; i++)
++			ctx->hkey[(16 * 47) + i] = key[i];
++
++		ghash_precomp_avx512(ctx->hkey);
++	}
+ 
+ 	if (keylen != GHASH_BLOCK_SIZE)
+ 		return -EINVAL;
+@@ -94,8 +124,13 @@ static int ghash_update(struct shash_desc *desc,
+ 		if (!dctx->bytes)
+ 			clmul_ghash_mul(dst, &ctx->shash);
+ 	}
+-
+-	clmul_ghash_update(dst, src, srclen, &ctx->shash);
++	if (IS_ENABLED(CONFIG_CRYPTO_GHASH_CLMUL_NI_AVX512) &&
++	    cpu_feature_enabled(X86_FEATURE_VPCLMULQDQ) && use_avx512) {
++		/* Assembly code handles fragments in 16 byte multiples */
++		srclen = ALIGN_DOWN(srclen, 16);
++		clmul_ghash_update_avx512(dst, src, srclen, ctx->hkey);
++	} else
++		clmul_ghash_update(dst, src, srclen, &ctx->shash);
+ 	kernel_fpu_end();
+ 
+ 	if (srclen & 0xf) {
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index a367fcf..b090f14 100644
+index b090f14..70d1d35 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -613,6 +613,29 @@ config CRYPTO_CRC32C_VPMSUM
- 	  (vpmsum) instructions, introduced in POWER8. Enable on POWER8
- 	  and newer processors for improved performance.
+@@ -637,6 +637,18 @@ config CRYPTO_CRCT10DIF_AVX512
+ 	depends on CRYPTO_CRCT10DIF_PCLMUL
+ 	depends on AS_VPCLMULQDQ
  
-+config CRYPTO_AVX512
-+	bool "AVX512 hardware acceleration for crypto algorithms"
-+	depends on X86
-+	depends on 64BIT
-+	help
-+	  This option will compile in AVX512 hardware accelerated crypto
-+	  algorithms. These optimized algorithms provide substantial(2-10x)
-+	  improvements over existing crypto algorithms for large data size.
-+	  However, it may also incur a frequency penalty (aka. "bin drops")
-+	  and cause collateral damage to other workloads running on the
-+	  same core.
-+
-+# We default CRYPTO_CRCT10DIF_AVX512 to Y but depend on CRYPTO_AVX512 in
++# We default CRYPTO_GHASH_CLMUL_NI_AVX512 to Y but depend on CRYPTO_AVX512 in
 +# order to have a singular option (CRYPTO_AVX512) select multiple algorithms
 +# when supported. Specifically, if the platform and/or toolset does not
 +# support VPLMULQDQ. Then this algorithm should not be supported as part of
 +# the set that CRYPTO_AVX512 selects.
-+config CRYPTO_CRCT10DIF_AVX512
++config CRYPTO_GHASH_CLMUL_NI_AVX512
 +	bool
 +	default y
 +	depends on CRYPTO_AVX512
-+	depends on CRYPTO_CRCT10DIF_PCLMUL
++	depends on CRYPTO_GHASH_CLMUL_NI_INTEL
 +	depends on AS_VPCLMULQDQ
- 
++
  config CRYPTO_CRC32C_SPARC64
  	tristate "CRC32c CRC algorithm (SPARC64)"
+ 	depends on SPARC64
 -- 
 2.7.4
 
