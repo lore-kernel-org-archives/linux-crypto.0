@@ -2,166 +2,193 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09E13C2BBD4
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Dec 2020 10:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A06AC2BBCF
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Dec 2020 10:53:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD67923A7B
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Dec 2020 10:44:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDCF423A9A
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Dec 2020 10:53:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389136AbgLRKoC (ORCPT
+        id S2389078AbgLRKxX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Dec 2020 05:44:02 -0500
-Received: from mga17.intel.com ([192.55.52.151]:8878 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733203AbgLRKoC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Dec 2020 05:44:02 -0500
-IronPort-SDR: hj8NBBJ4itUeosBvIlhKFXdU+PZkQzsUMrofJno/ybkW5HFHZDAZ09ruPdafjyHFdJnVJHmQpu
- WSQoJ7kglOZQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9838"; a="155219341"
-X-IronPort-AV: E=Sophos;i="5.78,430,1599548400"; 
-   d="scan'208";a="155219341"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2020 02:43:21 -0800
-IronPort-SDR: SliPYRcW6PO2xPex3YY3vRk24Nh4V/QO8Q+wElDTpYW26Zqo8859m3KvcsxxEFy/xLGgLPM3vk
- 872yq74cCtGQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.78,430,1599548400"; 
-   d="scan'208";a="380410064"
-Received: from orsmsx605.amr.corp.intel.com ([10.22.229.18])
-  by orsmga007.jf.intel.com with ESMTP; 18 Dec 2020 02:43:21 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 18 Dec 2020 02:43:20 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
- via Frontend Transport; Fri, 18 Dec 2020 02:43:20 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.106)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.1713.5; Fri, 18 Dec 2020 02:43:20 -0800
+        Fri, 18 Dec 2020 05:53:23 -0500
+Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:59077 "EHLO
+        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2389113AbgLRKxS (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Dec 2020 05:53:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
+        t=1608288729;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dYUjn04ev/0h5j5SvHPrqsPxrHdN2rdocG8LM1nnKN8=;
+        b=HTKWRxloq3xgxHZsTz6iWcm6b2nAIfKRmK7rWfQEqikeZJ3u9u/Ad25qjwFrVGouRx83sY
+        RNmvsFL7oKKGUPr7eQf+5UDhekuOFjQZ8x7FKYFfewttfBkqhJ1BRVQhAWIrKfYX2xVezd
+        OR1RH0CfpfEfYpBQhfEGuEYmWPhLuY0=
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com
+ (mail-ve1eur01lp2059.outbound.protection.outlook.com [104.47.1.59]) (Using
+ TLS) by relay.mimecast.com with ESMTP id de-mta-9-QoMgbnJdPVSEE8xi7SAztA-1;
+ Fri, 18 Dec 2020 11:49:59 +0100
+X-MC-Unique: QoMgbnJdPVSEE8xi7SAztA-1
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DlWhLYM1qximnHuBXzQRW49QMc76DUlaCNANScR7z85OltNd7AE+OIPkj0y+FANsdX2ss6MjUeMXiRAU/s+VIJ368U1jFdQe5ZY/5ptqVpCpaADucoHccGKjypUIoULuLTik7Q7k/pKlwDN+Il6YVXSArNAAAsFAIM1LXCqHKRCQsrOwMFnkdO6IChuCQdWGmT1RFwnBM3Kmew3VuavWVSGNV60czuJGw5RPZxyMGRNOIJSe0p166Jvc5gupmciIS64ziNzpZTqui/HbQVpXrCLWN9H0WdIKtZ48VNQwuQTfy+62oaVqxLofR/C/KgTqdY6JFFcwUrcymVOVDOsOmw==
+ b=XFmfNyq4Z3rqhZwizvTyHZtG5a9cvZJ2u1nuupC8FF58c+3mQT8kO6JDoPFx2TASmRpf0c3gZmgj63InsUEzxv2HyHTnre/9F2DHOMLdjYoiB6qMeArpdrVdsD4ly5Mhb/j8zmbTNvtfS4/8eYnkd7gYxDYi/jOndQ6tGG1sJVKl44WFeNyRcuM5bWReYX/1bwoFZ/G6mVQNgoTPypcGyOmLqpNz7Ayk0sPDxw+C2kp2FGLCLvimb7fYNnVBQJN0Angwe7BEYkRtS+acXxlCFBscutwVY/WyXjssvDvM6gtThoql40MMXXSbrWA2rl5LXRvEiwnoEnhtggFMvq5n4g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mRAQzUMQs5hpo5iBWORKRz/N3TR1Tbb3ZAz+wwg4XsY=;
- b=U/fUwJ7PLbPn3lJN4+BGeSCP09U5sIftPNNrMgD+gZBXAUVGOLjcZECUB/2qRZNYiFfSIMyPZNSRQ2bJEbCKtgmoFNPhOzoJZxUre/nxFYrCrAISp8J6ry1ZRrOrS3ToYB2vCw6EILV6LRuh9CjHKJfvMwxNNgrwUNbvVO0Yq1Ab7mh5YYScWnfwjMtxlDXvv9HJtBZLaYSXbsL1xetygHf0XbjRzQ8rQOkOGrtuxmuzZ0PtTiW17lgtIUsRZU19S7gUKKw7WST40cMTWUXi4wLVzsCI/PmvX8fEM25ObMvjVpDYDqNr2B7B0dh4jfbodyIRfcY2kOlrNLgqpFkclw==
+ bh=8PBRUP8/x7G/Dw9riQ3ex7/iaqHYO7jgV8ld7H6bvMY=;
+ b=CHssSneXiYZf5vE3kbtRP6CFAwDukA1YYxUpPvoFsvcxT3u/9iKwW2k+DPUegvpl7uzvzeIWTU4k8id3jPGESxnaVGoGqopg9likf8GzbrGSD/eNx9KD+SGhtDDZv36gj9IrBItlVLUWP6zk8Zq+S0KXiVDL5ZokISQA/NcEinFfflAtMVsljci3NiN7QaR5lK8RYf7BawPazDmpM70em3JuLwQpZK2SbORHNCCa43KnvCyYAmBgl+fgyAZEsnvoxrbeog94JcH/XlH8S1YIQAzXLgylBmuHM6VN0ZXIcRWlho9X3DeJ/sqDreGBf1D1+E0PWp1Ewr9LoZMzaWeVBA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mRAQzUMQs5hpo5iBWORKRz/N3TR1Tbb3ZAz+wwg4XsY=;
- b=tQl+8drsGPbD91AyVUHIdxU36+AWai0WAruY26uZUbumnbGhxZ8TI0sNZyOWrY9F3uHfVL7A/B1so6PwHr0VkDDztXUCF1pN/l7tHLVHTdW7PB/CEmgSYq0+9KDAU2igOR9Acxc8CK8sKxmuCtUS/SRXOTogm8zXOtz2Yz2mn+0=
-Received: from BY5PR11MB4056.namprd11.prod.outlook.com (2603:10b6:a03:18c::17)
- by BY5PR11MB4209.namprd11.prod.outlook.com (2603:10b6:a03:1cc::22) with
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=suse.com;
+Received: from AM6PR04MB5366.eurprd04.prod.outlook.com (2603:10a6:20b:9d::19)
+ by AM6PR0402MB3317.eurprd04.prod.outlook.com (2603:10a6:209:a::30) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.12; Fri, 18 Dec
- 2020 10:43:18 +0000
-Received: from BY5PR11MB4056.namprd11.prod.outlook.com
- ([fe80::a556:7843:c77:936a]) by BY5PR11MB4056.namprd11.prod.outlook.com
- ([fe80::a556:7843:c77:936a%5]) with mapi id 15.20.3654.025; Fri, 18 Dec 2020
- 10:43:18 +0000
-From:   "Bae, Chang Seok" <chang.seok.bae@intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-CC:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "Shankar, Ravi V" <ravi.v.shankar@intel.com>,
-        "Sun, Ning" <ning.sun@intel.com>,
-        "Dwarakanath, Kumar N" <kumar.n.dwarakanath@intel.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-Subject: Re: [RFC PATCH 6/8] selftests/x86: Test Key Locker internal key
- maintenance
-Thread-Topic: [RFC PATCH 6/8] selftests/x86: Test Key Locker internal key
- maintenance
-Thread-Index: AQHW09NgX2Hb4aAMg0azd+toSyT6zKn8oUqAgAAMOQA=
-Date:   Fri, 18 Dec 2020 10:43:18 +0000
-Message-ID: <8ED5F7C0-B224-42E5-AE15-1891732C1076@intel.com>
-References: <20201216174146.10446-1-chang.seok.bae@intel.com>
- <20201216174146.10446-7-chang.seok.bae@intel.com>
- <20201218095927.GE3021@hirez.programming.kicks-ass.net>
-In-Reply-To: <20201218095927.GE3021@hirez.programming.kicks-ass.net>
-Accept-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3676.25; Fri, 18 Dec
+ 2020 10:49:58 +0000
+Received: from AM6PR04MB5366.eurprd04.prod.outlook.com
+ ([fe80::b58b:42d9:4e85:ddd1]) by AM6PR04MB5366.eurprd04.prod.outlook.com
+ ([fe80::b58b:42d9:4e85:ddd1%7]) with mapi id 15.20.3676.025; Fri, 18 Dec 2020
+ 10:49:58 +0000
+Subject: Re: [PATCH 1/2] hwrng: iproc-rng200: Fix disable of the block.
+To:     Scott Branden <scott.branden@broadcom.com>,
+        matthias.bgg@kernel.org, mpm@selenic.com,
+        herbert@gondor.apana.org.au, rjui@broadcom.com,
+        sbranden@broadcom.com, f.fainelli@gmail.com
+CC:     linux-kernel@vger.kernel.org, Julia.Lawall@inria.fr,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-arm-kernel@lists.infradead.org, nsaenzjulienne@suse.de,
+        linux-crypto@vger.kernel.org
+References: <20201214160454.22769-1-matthias.bgg@kernel.org>
+ <24e22e5a-7371-02b4-1636-2e03def420e3@broadcom.com>
+From:   Matthias Brugger <mbrugger@suse.com>
+Message-ID: <ab41dfe2-e244-f920-5d1f-bb34ac16fe8f@suse.com>
+Date:   Fri, 18 Dec 2020 11:49:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
+In-Reply-To: <24e22e5a-7371-02b4-1636-2e03def420e3@broadcom.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3608.120.23.2.4)
-authentication-results: infradead.org; dkim=none (message not signed)
- header.d=none;infradead.org; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [112.148.21.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b367a51a-6fc3-4275-1241-08d8a341bb57
-x-ms-traffictypediagnostic: BY5PR11MB4209:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr,ExtFwd
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BY5PR11MB4209F015B965C880C4DC24DED8C30@BY5PR11MB4209.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3513;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 6JXg3GeJrMLerTWFdTRQTrbTKNs++J87gIVSfsAHwsQVw+SO5eGpVEsrTI51Z7+h3vhShpiMQbMuZzNWv18An/ld/+Wmnr5WnR97cADbW9m4dbsELPkvf7+cBv/iAg+Kf+XAxiSj7DHPQVnPHarup5uEspThOB4ZlFcKU16BGfEkJOycW8NkLoCSSZKaJvxwIJ2jUOaquRzDJufghRzloi4dt9LX/s6Y4K10+uBiUQJO1D1lqwqlprK2NL15UBj0ewUcKfJfPo3svq5/oWDHe88yXEG/SVHb4frD+wEh9TIC/RWNpMeXnOqdm+/EmTtqTQA07HO86CAUppH/s/fh0/u2tGRH/TuxlB1aWuUTXEPpy1gDaech17EkG1HFDtD1
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR11MB4056.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(376002)(366004)(136003)(346002)(396003)(7416002)(2616005)(76116006)(2906002)(4744005)(54906003)(5660300002)(66946007)(8936002)(36756003)(316002)(6486002)(91956017)(33656002)(8676002)(4326008)(26005)(71200400001)(86362001)(478600001)(66446008)(66556008)(64756008)(66476007)(6512007)(6506007)(6916009)(53546011)(186003)(45980500001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?BSZQhr738QG/1y3FjuaHEo8ayEWmnx6564kkFeadQnH2bGGRlZHNvbNsLkim?=
- =?us-ascii?Q?VfqPvdkTplq1jQin/loHwUp4h+TJhPZXqRBPafhapLVTOIQE8xuYZl8CMHud?=
- =?us-ascii?Q?8gHImHg6jK6TRxYg4VLtT1FCsAM+nGF3PBm5HeRQWJAQKhQaj4NLaoqJ3cqz?=
- =?us-ascii?Q?RUy9NhqnK2wYPUvwjVlWbR6nbiNvx+ZlNS3c9j/q8BaCegK19YqfW24XZBNP?=
- =?us-ascii?Q?DGFo5GCXe/OSXlQoOLbFv8cJRK8ibCyp0xERLjHdREGYVolY50UCgEQgvuDr?=
- =?us-ascii?Q?LfZKVZmfz8gEN8LDRSY1z29n2EZc9uWmB814QqEL5+VXN9unyMtqdgOlLw4y?=
- =?us-ascii?Q?u3OA977BY/t7pwm5lloGdyQTG6ZMbEJjOOecoTKJjmWU2jTEB7VxqZWFaRH3?=
- =?us-ascii?Q?vt2ZOUoNDzOBpFYUl3OUOCDWlMClLgRH7NhWsmpFkDCmvoyA4Ips+MKXR887?=
- =?us-ascii?Q?rs4kA3ZeqnxILpv6R/Z+6B2DhYWC3u6pAdepS7KdWuRCq2EIiLrJcpuQPLn2?=
- =?us-ascii?Q?iUbcuQWRG+TUkttQiqU3yetf4yoKAP6kSgIY9ZyyDz8RPUNXLBhpT2pOZlli?=
- =?us-ascii?Q?hqd1evZIw/cG7zjB+KxFQH1sPdPE87YRwGW6cQScx3dZstYXTv2ke3axnB1e?=
- =?us-ascii?Q?tDohYF/OBuyyPKD5iVCGnNQQjBBFoAEi6HFasVxPOJHBjplFqS9PX6H/5RMj?=
- =?us-ascii?Q?v4JzpKQGV1cdSG9eM1AuE2oKiq7FfoMRkFLRj9uHUaedTahr90qjIqqcIINk?=
- =?us-ascii?Q?u6GdNiiGKTf5KKF1lDQXeu6Jb7YQxqCQY4BLORTo9/UXHbIPhU6WKhqj1C0R?=
- =?us-ascii?Q?jFwvGc+9VoGABaNVOXTRKu2y/TKRPoV+PeVdQGKOfVp78Xm8A1m7r4gEEs20?=
- =?us-ascii?Q?/8ImuzGXESVbGIOygc14MlPYVwOyn0k+WbIlaDdDoJ3+lGGoNuhky5P49xEV?=
- =?us-ascii?Q?u65e+qCTWA7tVtlwcv5qnX+WC/BpJRTXjVWmbzX8DIUOo+eGY6WYUx1gxzhF?=
- =?us-ascii?Q?pHKf?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <688F3AADED412E47B2BBB704871B7274@namprd11.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [213.195.126.134]
+X-ClientProxiedBy: AM9P191CA0027.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21c::32) To AM6PR04MB5366.eurprd04.prod.outlook.com
+ (2603:10a6:20b:9d::19)
 MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ziggy.stardust (213.195.126.134) by AM9P191CA0027.EURP191.PROD.OUTLOOK.COM (2603:10a6:20b:21c::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.12 via Frontend Transport; Fri, 18 Dec 2020 10:49:57 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 44c9bf06-6e1e-4763-ea16-08d8a342a98c
+X-MS-TrafficTypeDiagnostic: AM6PR0402MB3317:
+X-Microsoft-Antispam-PRVS: <AM6PR0402MB33179106C85719D2946FD594BAC30@AM6PR0402MB3317.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 92Oht/FqSva5H0lhbYP3mLnSM+3GDW1a4Wvgmt9BcLhXk3Pr9RboYN7moJ+xRgCx5Q8vlkXwetM/2UV6BHya0DqDKlxL3imOkeI7EDmZU58hEZM6Wg46IuPyPsmGI19qiBtupt2bX3eOT5SszqaOgP5kZA5SvBBwY159JXLorg9lG7xN2jUXrFCOnnb/rAkduF0CBN4ZuIyVjpb95a+Lf3oW0uJ4nzn3WhY15XBmQEWbAams6xN7PQk3mmP/5TTu3letVcb3A43EVi93agM9KaMqn4SkIj39OOoqg6aB8XTj9n/BQSDuLS6AQfg9d043+7hVJvDIHX0Yv339r1bjUt4vCh8pVMrphNHY1eef82REPgKGrlcIYhDUw+bEpyhH8BXW6S4AkC0uZLQdtu/oqBX8Gc6JMYYgN2ZLH7JAi6wJTlqI9O1QacrF7GXcuZM2aXOY+0z3QGACgIetIxlWs/hyhZ9hYa+4F3xL+zJwv8c=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM6PR04MB5366.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(39860400002)(136003)(376002)(366004)(346002)(16526019)(7416002)(2906002)(6506007)(186003)(36756003)(5660300002)(26005)(4326008)(53546011)(4001150100001)(31686004)(8676002)(66556008)(6486002)(52116002)(86362001)(2616005)(83380400001)(66476007)(956004)(316002)(31696002)(478600001)(8936002)(66946007)(6512007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?QzKTtl6nH+3djOlBG9A4mnMfeXvEGX+pUWKkZcUSiR/69JzEVoD0lhMldO09?=
+ =?us-ascii?Q?u4T6NYiYZTHwRV+iS0rmGCtmd9mh14ytg9Zy/WzdYm7squNZ6STCa9v3yAoS?=
+ =?us-ascii?Q?g9ZWEYDyXzguIveqXdHDseAw2aCDtzj7HzdVLm+JtRYVnf/iYU7bXffj4Isq?=
+ =?us-ascii?Q?KwjWZ3j66HuT6+QC6ncLySym/FEfnsDjVSzf74P8pfzap9OMWYOj41UGHFyM?=
+ =?us-ascii?Q?/kOwhcah5n2pouZUtVI5hRSghPg+l6MNJeWPxHTDYzcLTgsaw5aUfyqO20kD?=
+ =?us-ascii?Q?TD5sWKMfkcjxOHwMgIwsskW/X0aD3VoEeN/P3JgZCwcGIJyxItwEu/r3szQL?=
+ =?us-ascii?Q?qRQ0IrkpkPz9Cxr/JIh+yj2T6QGMKPxkip5UBeL6Nd3ugwrYjF2dUbj6TOnC?=
+ =?us-ascii?Q?Wd12XUk4MEXtEc9RXzaVx/MpP1uLF+jPcoTTe4gS/9ImshPZgNhDZ+jcpeXT?=
+ =?us-ascii?Q?AEkyA6c1nn/fKZReINR5N0bU1yuPTkUAGXVsLRPsJxt9h6CB1v1O/J88sXhh?=
+ =?us-ascii?Q?2PeEuRqG4yHqeIIL3EIopVaDNWxNtVBSnQ8qBFZwtzGV5aEkptlsX9gXeTWE?=
+ =?us-ascii?Q?GQ74rH6Wz8g/a2gDFV4CgQhunfhje81ZVRmwqRI/wX9f375wVgbz06BXM0hZ?=
+ =?us-ascii?Q?hteCY4darQYwAlWeNjm7TPiIxswOIaLoDqYel3fCwe44Js266oVUfSzLWVgr?=
+ =?us-ascii?Q?IUp7Wu2tDJbGaHlbg368wMHLivDkHhLBfWmweDDbCZQATIsW6Fx2blhL6vuf?=
+ =?us-ascii?Q?HqR3VMVW53JLYH46CIgJpOm7xTMPM6vuamDovR4e1vIPikpvKLkyYbKNlsMN?=
+ =?us-ascii?Q?INKFQUDA2j7GBHUHuVz0xbUbY0kt0ChbVEFiegdnSVtMXAPJIHB2snwdmM0u?=
+ =?us-ascii?Q?2sxSOiLd+eRtzCkVEd3Ajj5OUYJLUwg4D+2iwXFna1vx6nVsMutaU5mALmDM?=
+ =?us-ascii?Q?fvhLzestduwGgdReLNGnKpejj6f2312mHA5fLcax+hklEIYSB0VX3M/WoJYZ?=
+ =?us-ascii?Q?Gtec?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR04MB5366.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR11MB4056.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b367a51a-6fc3-4275-1241-08d8a341bb57
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Dec 2020 10:43:18.1993
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2020 10:49:57.9179
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: DC9gOL5fVLEYacnsfRPqkjAbRO/0U+yE0VnOPScWk92Omsi1lDwkR/Xt5BeHFnP3f5SMlXbzXlHvhOJmWC+5vZo8GqR6I8B9uV1VJ238zPs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR11MB4209
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-Network-Message-Id: 44c9bf06-6e1e-4763-ea16-08d8a342a98c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: E8aUwnk50lRr1bC62YIiQlp2Y1Aj/msG+zseU++Wv74IFjhua38bhiWAOXjmegYWs8yzFo9TCFMNctvX5OLKbg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR0402MB3317
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-> On Dec 18, 2020, at 18:59, Peter Zijlstra <peterz@infradead.org> wrote:
->=20
-> On Wed, Dec 16, 2020 at 09:41:44AM -0800, Chang S. Bae wrote:
->> +	/* ENCODEKEY128 %EAX */
->> +	asm volatile (".byte 0xf3, 0xf, 0x38, 0xfa, 0xc0");
->=20
-> This is lacking a binutils version number.
 
-I will add the version number when any new release begins to support
-this.
+On 14/12/2020 18:45, Scott Branden wrote:
+>=20
+>=20
+> On 2020-12-14 8:04 a.m., matthias.bgg@kernel.org wrote:
+>> From: Matthias Brugger <mbrugger@suse.com>
+>>
+>> When trying to disable the block we bitwise or the control
+>> register with value zero. This will leave the block always turned on.
+>> Fix this by setting the corresponding bit to zero.
+>>
+>> Fixes: c83d45d5685f ("hwrng: iproc-rng200 - Add Broadcom IPROC RNG drive=
+r")
+> Commit message needs to be re-written.
+> I don't think this is an actual fix as the ~RNG_CTL_RNG_RBGEN_MASK alread=
+y zeros the bit.=C2=A0 This is just a code change, which is fine because it=
+ makes things clearer
 
-Thanks,
-Chang
+Right, I'll reword it.
+
+>> Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+>> ---
+>>
+>>  drivers/char/hw_random/iproc-rng200.c | 5 ++---
+>>  1 file changed, 2 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/char/hw_random/iproc-rng200.c b/drivers/char/hw_ran=
+dom/iproc-rng200.c
+>> index 01583faf9893..e106ce3c0146 100644
+>> --- a/drivers/char/hw_random/iproc-rng200.c
+>> +++ b/drivers/char/hw_random/iproc-rng200.c
+>> @@ -28,7 +28,6 @@
+>>  #define RNG_CTRL_OFFSET					0x00
+>>  #define RNG_CTRL_RNG_RBGEN_MASK				0x00001FFF
+>>  #define RNG_CTRL_RNG_RBGEN_ENABLE			0x00000001
+>> -#define RNG_CTRL_RNG_RBGEN_DISABLE			0x00000000
+>> =20
+>>  #define RNG_SOFT_RESET_OFFSET				0x04
+>>  #define RNG_SOFT_RESET					0x00000001
+>> @@ -61,7 +60,7 @@ static void iproc_rng200_restart(void __iomem *rng_bas=
+e)
+>>  	/* Disable RBG */
+>>  	val =3D ioread32(rng_base + RNG_CTRL_OFFSET);
+>>  	val &=3D ~RNG_CTRL_RNG_RBGEN_MASK;
+> This mask will already zero the enable bit.
+>> -	val |=3D RNG_CTRL_RNG_RBGEN_DISABLE;
+>> +	val &=3D ~RNG_CTRL_RNG_RBGEN_ENABLE;
+
+Correct, so no need for this extra line. I'll delete it.
+
+>>  	iowrite32(val, rng_base + RNG_CTRL_OFFSET);
+>> =20
+>>  	/* Clear all interrupt status */
+>> @@ -174,7 +173,7 @@ static void iproc_rng200_cleanup(struct hwrng *rng)
+>>  	/* Disable RNG hardware */
+>>  	val =3D ioread32(priv->base + RNG_CTRL_OFFSET);
+>>  	val &=3D ~RNG_CTRL_RNG_RBGEN_MASK;
+>> -	val |=3D RNG_CTRL_RNG_RBGEN_DISABLE;
+>> +	val &=3D ~RNG_CTRL_RNG_RBGEN_ENABLE;
+>>  	iowrite32(val, priv->base + RNG_CTRL_OFFSET);
+>>  }
+>> =20
+>=20
+
