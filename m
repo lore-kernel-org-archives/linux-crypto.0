@@ -2,135 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 399AEC433E0
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Dec 2020 20:00:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F4126C433DB
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Dec 2020 22:02:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E2EA622AAA
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Dec 2020 20:00:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1F4A22A83
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Dec 2020 22:02:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725807AbgLUUAS (ORCPT
+        id S1726035AbgLUWCJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Dec 2020 15:00:18 -0500
-Received: from terminus.zytor.com ([198.137.202.136]:46061 "EHLO
-        terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725780AbgLUUAS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Dec 2020 15:00:18 -0500
-X-Greylist: delayed 1880 seconds by postgrey-1.27 at vger.kernel.org; Mon, 21 Dec 2020 15:00:16 EST
-Received: from [IPv6:2601:646:8680:a581:e440:f7b7:1011:93f7] ([IPv6:2601:646:8680:a581:e440:f7b7:1011:93f7])
-        (authenticated bits=0)
-        by mail.zytor.com (8.16.1/8.15.2) with ESMTPSA id 0BLJRg103956887
-        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-        Mon, 21 Dec 2020 11:27:45 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 0BLJRg103956887
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2020112401; t=1608578866;
-        bh=UGFdDjO1ECr35fGqPt/QpGBpk76YJYwXYZHdW1oqTfI=;
-        h=Date:In-Reply-To:References:Subject:To:CC:From:From;
-        b=c18Ac7stpi+aErtiz+rL4d7zg4tXPw8clABl0FJCmxq4MeNp4Y3KoyRuP7YDaqhoR
-         2H9gsC6zCzcQ3LDC5LdzQcCFozf6dSNYAmge4QWajnjgLYypP6a2nXdf2FqPtG+EbB
-         Hp8ViX7Kk649fd+An5jQUchRq6/Bg38QOoTi1H5dyTeNAQ07IXGM+ttknJasOpANkf
-         TSij0PgxI+xKbujCsKs3sBvAh2/lbDkymNiOgvUL20SCIPI3+ACFm0O3ah96Tn7DNG
-         bGTLWm8hEelGSrqTIGdFJEFKJ2NXfYp0WKw+ep7xvSV9paHM5AuCF12df9vX3UoxEd
-         YmX3o1xCQo7gw==
-Date:   Mon, 21 Dec 2020 11:27:33 -0800
-User-Agent: K-9 Mail for Android
-In-Reply-To: <345BC725-406B-40C6-88E9-747DBEBE0493@zhaoxin.com>
-References: <1607686144-2604-1-git-send-email-TonyWWang-oc@zhaoxin.com> <X9Ov3RWDpUik7gXo@sol.localdomain> <1f8d17bf-c1d9-6496-d2f8-5773633011fb@zhaoxin.com> <X9fN7mOMdn1Dxn63@sol.localdomain> <a95984ea-7451-78fe-88c5-b81f633fecdf@zhaoxin.com> <X9j43b+JPbUUvCrH@sol.localdomain> <345BC725-406B-40C6-88E9-747DBEBE0493@zhaoxin.com>
+        Mon, 21 Dec 2020 17:02:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36120 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725791AbgLUWCJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Dec 2020 17:02:09 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 241D722A83;
+        Mon, 21 Dec 2020 22:01:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1608588088;
+        bh=YRRPyKf8Lftmoy25LQ08I6W5DxDDr2G1YVAywJtCGM8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=e+G1lm5O2Y4qTSzfPnrWDUDjo4iwnM8On3x0qdHiyVUEkLv7gEgrPqUUpyb2w7j9A
+         R+SD45774ArcGAyyqO9h2aGemerIJe0FCdIrvdvDYk6/xp2yVcI30se9rfIk6qxppC
+         lN0CBOz00BfaHNHi0bX2RD3L2sbyXbFFaywu/Ddx51eDEriy/BX5bsXew0aIszvzP5
+         hNiXEDmkvNSGQtq0fOyYZK2VcBEjWP35zhLNfab6exZ2tzH0zWkd0AIROC2zriaqJI
+         Q/Q4NLuM3QODFMYQcwRRLyT7cH7g0Fkv4LAWrwl6CrVAQ+PJxmZg/Y0T4U8jFV3xdM
+         H+om5+ZUv+t5g==
+Date:   Mon, 21 Dec 2020 14:01:26 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/4] crypto: gcm-aes-ni cleanups
+Message-ID: <X+EbNj3HPZZ5ar1d@sol.localdomain>
+References: <20201212091700.11776-1-ardb@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH] crypto: x86/crc32c-intel - Don't match some Zhaoxin CPUs
-To:     tonywwang-oc@zhaoxin.com, Eric Biggers <ebiggers@kernel.org>
-CC:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        TimGuo-oc@zhaoxin.com, CooperYan@zhaoxin.com,
-        QiyuanWang@zhaoxin.com, HerryYang@zhaoxin.com,
-        CobeChen@zhaoxin.com, SilviaZhao@zhaoxin.com
-From:   hpa@zytor.com
-Message-ID: <AB43DE6C-BF23-4B72-B0C8-09FE0071B2C7@zytor.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201212091700.11776-1-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On December 20, 2020 6:46:25 PM PST, tonywwang-oc@zhaoxin=2Ecom wrote:
->On December 16, 2020 1:56:45 AM GMT+08:00, Eric Biggers
-><ebiggers@kernel=2Eorg> wrote:
->>On Tue, Dec 15, 2020 at 10:15:29AM +0800, Tony W Wang-oc wrote:
->>>=20
->>> On 15/12/2020 04:41, Eric Biggers wrote:
->>> > On Mon, Dec 14, 2020 at 10:28:19AM +0800, Tony W Wang-oc wrote:
->>> >> On 12/12/2020 01:43, Eric Biggers wrote:
->>> >>> On Fri, Dec 11, 2020 at 07:29:04PM +0800, Tony W Wang-oc wrote:
->>> >>>> The driver crc32c-intel match CPUs supporting
->>X86_FEATURE_XMM4_2=2E
->>> >>>> On platforms with Zhaoxin CPUs supporting this X86 feature,
->When
->>> >>>> crc32c-intel and crc32c-generic are both registered, system
->will
->>> >>>> use crc32c-intel because its =2Ecra_priority is greater than
->>> >>>> crc32c-generic=2E This case expect to use crc32c-generic driver
->>for
->>> >>>> some Zhaoxin CPUs to get performance gain, So remove these
->>Zhaoxin
->>> >>>> CPUs support from crc32c-intel=2E
->>> >>>>
->>> >>>> Signed-off-by: Tony W Wang-oc <TonyWWang-oc@zhaoxin=2Ecom>
->>> >>>
->>> >>> Does this mean that the performance of the crc32c instruction on
->>those CPUs is
->>> >>> actually slower than a regular C implementation?  That's very
->>weird=2E
->>> >>>
->>> >>
->>> >> From the lmbench3 Create and Delete file test on those chips, I
->>think yes=2E
->>> >>
->>> >=20
->>> > Did you try measuring the performance of the hashing itself, and
->>not some
->>> > higher-level filesystem operations?
->>> >=20
->>>=20
->>> Yes=2E Was testing on these Zhaoxin CPUs, the result is that with the
->>same
->>> input value the generic C implementation takes fewer time than the
->>> crc32c instruction implementation=2E
->>>=20
->>
->>And that is really "working as intended"?
->
->These CPU's crc32c instruction is not working as intended=2E
->
->  Why do these CPUs even
->>declare that
->>they support the crc32c instruction, when it is so slow?
->>
->
->The presence of crc32c and some other instructions supports are
->enumerated by CPUID=2E01:ECX[SSE4=2E2] =3D 1,  other instructions are ok
->except the crc32c instruction=2E
->
->>Are there any other instruction sets (AES-NI, PCLMUL, SSE, SSE2, AVX,
->>etc=2E) that
->>these CPUs similarly declare support for but they are uselessly slow?
->
->No=2E
->
->Sincerely
->Tonyw
->
->>
->>- Eric
+Hi Ard,
 
-Then the right thing to do is to disable the CPUID bit in the vendor-speci=
-fic startup code=2E
---=20
-Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
+On Sat, Dec 12, 2020 at 10:16:56AM +0100, Ard Biesheuvel wrote:
+> Clean up some issues and peculiarities in the gcm(aes-ni) driver.
+> 
+> Cc: Eric Biggers <ebiggers@google.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> Ard Biesheuvel (4):
+>   crypto: x86/gcm-aes-ni - prevent misaligned IV buffers on the stack
+>   crypto: x86/gcm-aes-ni - drop unused asm prototypes
+>   crypto: x86/gcm-aes-ni - clean up mapping of associated data
+>   crypto: x86/gcm-aes-ni - refactor scatterlist processing
+> 
+>  arch/x86/crypto/aesni-intel_glue.c | 238 ++++++--------------
+>  1 file changed, 74 insertions(+), 164 deletions(-)
+> 
+
+I get the following with this series applied:
+
+BUG: sleeping function called from invalid context at mm/page_alloc.c:4934
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 426, name: cryptomgr_test
+no locks held by cryptomgr_test/426.
+CPU: 0 PID: 426 Comm: cryptomgr_test Not tainted 5.10.0-12509-g8cc543a98aac #2
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ArchLinux 1.14.0-1 04/01/2014
+Call Trace:
+ show_stack+0x3d/0x3f arch/x86/kernel/dumpstack.c:318
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0xa4/0xd9 lib/dump_stack.c:120
+ ___might_sleep.cold+0x186/0x1b5 kernel/sched/core.c:7911
+ __might_sleep+0xa1/0x1a0 kernel/sched/core.c:7865
+ prepare_alloc_pages mm/page_alloc.c:4934 [inline]
+ __alloc_pages_nodemask+0x46f/0x6b0 mm/page_alloc.c:4978
+ alloc_pages_current+0x139/0x240 mm/mempolicy.c:2267
+ alloc_pages include/linux/gfp.h:547 [inline]
+ __get_free_pages+0x10/0xa0 mm/page_alloc.c:5031
+ skcipher_walk_next+0x736/0xd30 crypto/skcipher.c:370
+ skcipher_walk_first+0xc5/0x110 crypto/skcipher.c:445
+ skcipher_walk_aead_common+0x7f2/0xbe0 crypto/skcipher.c:544
+ skcipher_walk_aead_encrypt+0x6d/0xa0 crypto/skcipher.c:557
+ gcmaes_crypt_by_sg+0x3e2/0x740 arch/x86/crypto/aesni-intel_glue.c:655
+ gcmaes_encrypt+0xd2/0x260 arch/x86/crypto/aesni-intel_glue.c:694
+ helper_rfc4106_encrypt+0x213/0x4d0 arch/x86/crypto/aesni-intel_glue.c:755
+ crypto_aead_encrypt+0xf1/0x160 crypto/aead.c:94
+ simd_aead_encrypt+0x186/0x270 crypto/simd.c:328
+ crypto_aead_encrypt+0xf1/0x160 crypto/aead.c:94
+ test_aead_vec_cfg+0x9e0/0x1980 crypto/testmgr.c:2012
+ test_aead_vec+0x1e8/0x280 crypto/testmgr.c:2134
+ test_aead crypto/testmgr.c:2539 [inline]
+ alg_test_aead+0x1f7/0x410 crypto/testmgr.c:2585
+ alg_test+0x3fc/0x840 crypto/testmgr.c:5660
+ cryptomgr_test+0x5a/0x80 crypto/algboss.c:206
+ kthread+0x366/0x440 kernel/kthread.c:292
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
