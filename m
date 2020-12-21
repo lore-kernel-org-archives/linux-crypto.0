@@ -2,89 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEF4DC4361B
-	for <linux-crypto@archiver.kernel.org>; Sun, 20 Dec 2020 13:31:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF4EFC433E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Dec 2020 02:47:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 99D142078D
-	for <linux-crypto@archiver.kernel.org>; Sun, 20 Dec 2020 13:31:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 989C422DD6
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Dec 2020 02:47:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726901AbgLTNbM (ORCPT
+        id S1727036AbgLUCrQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 20 Dec 2020 08:31:12 -0500
-Received: from out28-220.mail.aliyun.com ([115.124.28.220]:38377 "EHLO
-        out28-220.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726886AbgLTNbM (ORCPT
+        Sun, 20 Dec 2020 21:47:16 -0500
+Received: from ZXSHCAS1.zhaoxin.com ([203.148.12.81]:39850 "EHLO
+        ZXSHCAS1.zhaoxin.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725497AbgLUCrQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Dec 2020 08:31:12 -0500
-X-Alimail-AntiSpam: AC=CONTINUE;BC=0.0916407|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_alarm|0.0169022-0.00133033-0.981767;FP=0|0|0|0|0|-1|-1|-1;HT=ay29a033018047194;MF=zhouyanjie@wanyeetech.com;NM=1;PH=DS;RN=7;RT=7;SR=0;TI=SMTPD_---.J9MmYQd_1608471027;
-Received: from 192.168.10.152(mailfrom:zhouyanjie@wanyeetech.com fp:SMTPD_---.J9MmYQd_1608471027)
-          by smtp.aliyun-inc.com(10.147.42.241);
-          Sun, 20 Dec 2020 21:30:28 +0800
-Subject: Re: [PATCH] hwrng: ingenic - Fix a resource leak in an error handling
- path
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        mpm@selenic.com, herbert@gondor.apana.org.au, aric.pzqi@ingenic.com
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-References: <20201219075207.176279-1-christophe.jaillet@wanadoo.fr>
-From:   Zhou Yanjie <zhouyanjie@wanyeetech.com>
-Message-ID: <c5bb8f9a-c4a7-7ecb-eccb-a31abc7316a2@wanyeetech.com>
-Date:   Sun, 20 Dec 2020 21:30:27 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Sun, 20 Dec 2020 21:47:16 -0500
+Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHCAS1.zhaoxin.com
+ (10.28.252.161) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Mon, 21 Dec
+ 2020 10:46:28 +0800
+Received: from [192.168.0.102] (113.201.128.11) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Mon, 21 Dec
+ 2020 10:46:26 +0800
+Date:   Mon, 21 Dec 2020 10:46:25 +0800
+From:   <tonywwang-oc@zhaoxin.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <x86@kernel.org>, <hpa@zytor.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <TimGuo-oc@zhaoxin.com>,
+        <CooperYan@zhaoxin.com>, <QiyuanWang@zhaoxin.com>,
+        <HerryYang@zhaoxin.com>, <CobeChen@zhaoxin.com>,
+        <SilviaZhao@zhaoxin.com>
+Subject: Re: [PATCH] crypto: x86/crc32c-intel - Don't match some Zhaoxin CPUs
+User-Agent: K-9 Mail for Android
+In-Reply-To: <X9j43b+JPbUUvCrH@sol.localdomain>
+References: <1607686144-2604-1-git-send-email-TonyWWang-oc@zhaoxin.com> <X9Ov3RWDpUik7gXo@sol.localdomain> <1f8d17bf-c1d9-6496-d2f8-5773633011fb@zhaoxin.com> <X9fN7mOMdn1Dxn63@sol.localdomain> <a95984ea-7451-78fe-88c5-b81f633fecdf@zhaoxin.com> <X9j43b+JPbUUvCrH@sol.localdomain>
+Message-ID: <345BC725-406B-40C6-88E9-747DBEBE0493@zhaoxin.com>
 MIME-Version: 1.0
-In-Reply-To: <20201219075207.176279-1-christophe.jaillet@wanadoo.fr>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+X-Originating-IP: [113.201.128.11]
+X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
+ zxbjmbx1.zhaoxin.com (10.29.252.163)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Christophe,
-
-On 2020/12/19 下午3:52, Christophe JAILLET wrote:
-> In case of error, we should call 'clk_disable_unprepare()' to undo a
-> previous 'clk_prepare_enable()' call, as already done in the remove
-> function.
+On December 16, 2020 1:56:45 AM GMT+08:00, Eric Biggers <ebiggers@kernel.org> wrote:
+>On Tue, Dec 15, 2020 at 10:15:29AM +0800, Tony W Wang-oc wrote:
+>> 
+>> On 15/12/2020 04:41, Eric Biggers wrote:
+>> > On Mon, Dec 14, 2020 at 10:28:19AM +0800, Tony W Wang-oc wrote:
+>> >> On 12/12/2020 01:43, Eric Biggers wrote:
+>> >>> On Fri, Dec 11, 2020 at 07:29:04PM +0800, Tony W Wang-oc wrote:
+>> >>>> The driver crc32c-intel match CPUs supporting
+>X86_FEATURE_XMM4_2.
+>> >>>> On platforms with Zhaoxin CPUs supporting this X86 feature, When
+>> >>>> crc32c-intel and crc32c-generic are both registered, system will
+>> >>>> use crc32c-intel because its .cra_priority is greater than
+>> >>>> crc32c-generic. This case expect to use crc32c-generic driver
+>for
+>> >>>> some Zhaoxin CPUs to get performance gain, So remove these
+>Zhaoxin
+>> >>>> CPUs support from crc32c-intel.
+>> >>>>
+>> >>>> Signed-off-by: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+>> >>>
+>> >>> Does this mean that the performance of the crc32c instruction on
+>those CPUs is
+>> >>> actually slower than a regular C implementation?  That's very
+>weird.
+>> >>>
+>> >>
+>> >> From the lmbench3 Create and Delete file test on those chips, I
+>think yes.
+>> >>
+>> > 
+>> > Did you try measuring the performance of the hashing itself, and
+>not some
+>> > higher-level filesystem operations?
+>> > 
+>> 
+>> Yes. Was testing on these Zhaoxin CPUs, the result is that with the
+>same
+>> input value the generic C implementation takes fewer time than the
+>> crc32c instruction implementation.
+>> 
 >
-> Fixes: 406346d22278 ("hwrng: ingenic - Add hardware TRNG for Ingenic X1830")
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
->   drivers/char/hw_random/ingenic-trng.c | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
+>And that is really "working as intended"?
+
+These CPU's crc32c instruction is not working as intended.
+
+  Why do these CPUs even
+>declare that
+>they support the crc32c instruction, when it is so slow?
+>
+
+The presence of crc32c and some other instructions supports are enumerated by CPUID.01:ECX[SSE4.2] = 1,  other instructions are ok except the crc32c instruction.
+
+>Are there any other instruction sets (AES-NI, PCLMUL, SSE, SSE2, AVX,
+>etc.) that
+>these CPUs similarly declare support for but they are uselessly slow?
+
+No.
+
+Sincerely
+Tonyw
+
+>
+>- Eric
 
 
-Thanks for fixing it, and apologize for my carelessness.
-
-Tested-by: 周琰杰 (Zhou Yanjie) <zhouyanjie@wanyeetech.com>
-
-
-> diff --git a/drivers/char/hw_random/ingenic-trng.c b/drivers/char/hw_random/ingenic-trng.c
-> index 954a8411d67d..0eb80f786f4d 100644
-> --- a/drivers/char/hw_random/ingenic-trng.c
-> +++ b/drivers/char/hw_random/ingenic-trng.c
-> @@ -113,13 +113,17 @@ static int ingenic_trng_probe(struct platform_device *pdev)
->   	ret = hwrng_register(&trng->rng);
->   	if (ret) {
->   		dev_err(&pdev->dev, "Failed to register hwrng\n");
-> -		return ret;
-> +		goto err_unprepare_clk;
->   	}
->   
->   	platform_set_drvdata(pdev, trng);
->   
->   	dev_info(&pdev->dev, "Ingenic DTRNG driver registered\n");
->   	return 0;
-> +
-> +err_unprepare_clk:
-> +	clk_disable_unprepare(trng->clk);
-> +	return ret;
->   }
->   
->   static int ingenic_trng_remove(struct platform_device *pdev)
