@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA658C43331
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 02:19:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7705C4332B
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 02:21:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 841FD22D57
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 02:19:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F30F23137
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 02:21:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727356AbgLWCTJ (ORCPT
+        id S1729323AbgLWCVX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Dec 2020 21:19:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:46424 "EHLO mail.kernel.org"
+        Tue, 22 Dec 2020 21:21:23 -0500
+Received: from mail.kernel.org ([198.145.29.99]:49842 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728506AbgLWCTI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Dec 2020 21:19:08 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5D5A822A99;
-        Wed, 23 Dec 2020 02:18:19 +0000 (UTC)
+        id S1729317AbgLWCVX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Dec 2020 21:21:23 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2B5AF22273;
+        Wed, 23 Dec 2020 02:21:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608689900;
-        bh=JhX3Fhq593qbaf1eCnr81V44C24UQsGbMZo5mTwfTDU=;
+        s=k20201202; t=1608690067;
+        bh=I6+4PO4FxZdbiw9cibz5i/Q33nyjRQiA2SAzjDjaScM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=IcYFZN8fML3gAE9SzRyQUg6Jw1QV1imqVbQqxFSv7yOz+GQAkqVVwEF+ZUYV7StNP
-         lFQfDqOadwljmpgDMRKiyM5yNdsR/OChujH1CshmDdT+kppWGaQx1k4zaDNswfSTKI
-         0cmw23Exq/JiudNVl0THBN22+ZMtSEK0W/i25zYrB/nDGwcWMa5enZ1aCM3cWjNhRM
-         Gb5ANB2V98MIaVQQkxX9aQvWGpYmJ0J1W+sqON8C2GO5Tqw7pyorfJGCGQUaQw7oDC
-         9pVUMhBYUoQcsZB6w6q5j4u60ha6DQBL0hDI/5YhTIBqqMajVlu/ADgVcanGuAVeTc
-         sU0u24oj1spLg==
+        b=KyXrZIQz30kRVXu4HOkb6UOgnjg1723PUPUrD4EnaNjFDboKHCHlsbR859+vlT3xY
+         olDKpL7IPvxnUYtfHFwN53mlD9hsY+ce1vUrzgXknv/ze8b96eQnyqU3gXuvGtHsmj
+         TjzXM+mfLV9eEBp6O39YFzScPtsOFt6RTaHY4RfGSvsnjaJitTip54oK/aVwp/LrK4
+         Tvxp8bvi2ohGS8NZfUQJ3/XYu6rV8RS0bYXgEX/BXcqS4PJh069DbkwDCJL2WZ/6m4
+         6uX59G5qi77HBjn2LiSs5sAH92juJBkI3W/dgfsJU7SK32yqWClvWHlsFsZUUpzxiI
+         Wkd5g226eqLqA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Zhang Qilong <zhangqilong3@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 005/130] crypto: omap-aes - fix the reference count leak of omap device
-Date:   Tue, 22 Dec 2020 21:16:08 -0500
-Message-Id: <20201223021813.2791612-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 03/87] crypto: omap-aes - fix the reference count leak of omap device
+Date:   Tue, 22 Dec 2020 21:19:39 -0500
+Message-Id: <20201223022103.2792705-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20201223021813.2791612-1-sashal@kernel.org>
-References: <20201223021813.2791612-1-sashal@kernel.org>
+In-Reply-To: <20201223022103.2792705-1-sashal@kernel.org>
+References: <20201223022103.2792705-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -67,10 +67,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 2f53fbb741001..2f81f347b8fe0 100644
+index 9019f6b67986b..080c7cf077053 100644
 --- a/drivers/crypto/omap-aes.c
 +++ b/drivers/crypto/omap-aes.c
-@@ -105,6 +105,7 @@ static int omap_aes_hw_init(struct omap_aes_dev *dd)
+@@ -109,6 +109,7 @@ static int omap_aes_hw_init(struct omap_aes_dev *dd)
  
  	err = pm_runtime_get_sync(dd->dev);
  	if (err < 0) {
