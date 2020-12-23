@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1105FC433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 314FFC433DB
 	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 22:39:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C6B7522571
+	by mail.kernel.org (Postfix) with ESMTP id E9F0B22955
 	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 22:39:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726047AbgLWWjm (ORCPT
+        id S1726279AbgLWWjp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Dec 2020 17:39:42 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59208 "EHLO mail.kernel.org"
+        Wed, 23 Dec 2020 17:39:45 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59228 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725811AbgLWWjm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Dec 2020 17:39:42 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BB3A322273;
-        Wed, 23 Dec 2020 22:38:58 +0000 (UTC)
+        id S1725811AbgLWWjo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Dec 2020 17:39:44 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4D0D9223E0;
+        Wed, 23 Dec 2020 22:39:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608763140;
-        bh=0MbCcCmyG2J0vKLMvj0T420mPbqg0OGMmaFqvD2qC+M=;
-        h=From:To:Cc:Subject:Date:From;
-        b=iCN/cs8nX9i/zsgLfpunfNkjsC+lJFZfoAIc0+ZkMHplaUyS1X665+6hXZEdQYNYV
-         t3ZjHfatim88YY3TOFvXr63ZPob5rjz5NDSSX8X+yhQVC+Y+iD6IlG89GVFoB77fV1
-         2AwQkff7/HempggHD9b3u0MAwif4421qsm6cJbj2pnMUBDM6jqZpXnVfoDxRg6qoSD
-         kq7deVSGkVuBQeb8l/iM6U1JyAF6P4SKvrf9hooA+urGR9fpzIeL76WFuSqEncjxm4
-         Rz+eZ3e+S79pn1oRwZxVZu5GeqVCjS3Nbv5eeT8fSuYH3kx9mxnxoPAjl8aL8mU2By
-         fkbZbv0Bry4xw==
+        s=k20201202; t=1608763143;
+        bh=FfOLsukuUAlU/P2uYv1a0PGd6ELkIxt7Ahgo3EMIxZA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=oJA66AmAcyFFjuNEvW4s1LB2sC9RMu6OcBQori5lBZMSpbpJo13uvx9sfe2q+pl1Q
+         3KYQX7IUUBNznq8qdrM1oksUP5aG8fUSP5bavURIEvRRVqlxpUn4qgI+HyfXRvxqPF
+         Y9LvAmYobMCQSYUAWAJ7iq0KZoalMELzKsHrBuUc+QHYY0lYnKBwupyj/L6omqSn+z
+         Af9DAZpiEH2ITaV8Ns6v1pMabAMtC6UGtZ3d+tYHRrJxWCWh+oV2FWUk0oTqPLuEC6
+         TGP2elNoc5neo7C9r9kwZmjAccNUAwcECTIcA189jEkq09Z5Zrhma6zt1iXae/Vwa0
+         Yh247fPj0j5ag==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     dm-devel@redhat.com, Ard Biesheuvel <ardb@kernel.org>,
@@ -40,212 +40,756 @@ Cc:     dm-devel@redhat.com, Ard Biesheuvel <ardb@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Milan Broz <gmazyland@gmail.com>,
         Mike Snitzer <snitzer@redhat.com>
-Subject: [RFC PATCH 00/10] crypto: x86 - remove XTS and CTR glue helper code
-Date:   Wed, 23 Dec 2020 23:38:31 +0100
-Message-Id: <20201223223841.11311-1-ardb@kernel.org>
+Subject: [RFC PATCH 01/10] crypto: x86/camellia - switch to XTS template
+Date:   Wed, 23 Dec 2020 23:38:32 +0100
+Message-Id: <20201223223841.11311-2-ardb@kernel.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20201223223841.11311-1-ardb@kernel.org>
+References: <20201223223841.11311-1-ardb@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-After applying my performance fixes for AES-NI in XTS mode, the only
-remaining users of the x86 glue helper module are the niche algorithms
-camellia, cast6, serpent and twofish.
+Now that the XTS template can wrap accelerated ECB modes, it can be
+used to implement Camellia in XTS mode as well, which turns out to
+be at least as fast, and sometimes even faster.
 
-It is not clear from the history why all these different versions of these
-algorithms in XTS and CTR modes were added in the first place: the only
-in-kernel references that seem to exist are to cbc(serpent), cbc(camellia)
-and cbc(twofish) in the IPsec stack. The XTS spec only mentions AES, and
-CTR modes don't seem to be widely used either.
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ arch/x86/crypto/camellia-aesni-avx-asm_64.S  | 180 -----------------
+ arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 206 --------------------
+ arch/x86/crypto/camellia_aesni_avx2_glue.c   |  70 -------
+ arch/x86/crypto/camellia_aesni_avx_glue.c    | 101 +---------
+ arch/x86/include/asm/crypto/camellia.h       |  18 --
+ 5 files changed, 1 insertion(+), 574 deletions(-)
 
-Since the glue helper code relies heavily on indirect calls for small chunks
-of in/output, it needs some work to recover from the performance hit caused
-by the retpoline changes. However, it makes sense to only expend the effort
-for algorithms that are being used in the first place, and this does not
-seem to be the case for XTS and CTR.
-
-CTR mode can simply be removed: it is not used in the kernel, and it is
-highly unlikely that it is being relied upon via algif_skcipher. And even
-if it was, the generic CTR mode driver can still provide the CTR transforms
-if necessary.
-
-XTS mode may actually be in use by dm-crypt users, so we cannot simply drop
-this code entirely. However, as it turns out, the XTS template wrapped
-around the ECB mode skciphers perform roughly on par *, and so there is no
-need to retain all the complicated XTS helper logic. In the unlikely case
-that dm-crypt users are relying on xts(camellia) or xts(serpent) in the
-field, they should not be impacted by these changes at all.
-
-As a follow-up, it makes sense to rework the ECB and CBC mode implementations
-to get rid of the indirect calls. Or perhaps we could drop [some of] these
-algorithms entirely ...
-
-* tcrypt results for various XTS implementations below, captured on a
-  Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz
-
-Cc: Megha Dey <megha.dey@intel.com>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Milan Broz <gmazyland@gmail.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-
-Ard Biesheuvel (10):
-  crypto: x86/camellia - switch to XTS template
-  crypto: x86/cast6 - switch to XTS template
-  crypto: x86/serpent- switch to XTS template
-  crypto: x86/twofish - switch to XTS template
-  crypto: x86/glue-helper - drop XTS helper routines
-  crypto: x86/camellia - drop CTR mode implementation
-  crypto: x86/cast6 - drop CTR mode implementation
-  crypto: x86/serpent - drop CTR mode implementation
-  crypto: x86/twofish - drop CTR mode implementation
-  crypto: x86/glue-helper - drop CTR helper routines
-
- arch/x86/crypto/camellia-aesni-avx-asm_64.S  | 297 ----------------
- arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 350 -------------------
- arch/x86/crypto/camellia_aesni_avx2_glue.c   | 111 ------
- arch/x86/crypto/camellia_aesni_avx_glue.c    | 141 +-------
- arch/x86/crypto/camellia_glue.c              |  68 ----
- arch/x86/crypto/cast6-avx-x86_64-asm_64.S    |  84 -----
- arch/x86/crypto/cast6_avx_glue.c             | 146 --------
- arch/x86/crypto/glue_helper-asm-avx.S        | 104 ------
- arch/x86/crypto/glue_helper-asm-avx2.S       | 136 -------
- arch/x86/crypto/glue_helper.c                | 226 ------------
- arch/x86/crypto/serpent-avx-x86_64-asm_64.S  |  68 ----
- arch/x86/crypto/serpent-avx2-asm_64.S        |  87 -----
- arch/x86/crypto/serpent_avx2_glue.c          | 110 ------
- arch/x86/crypto/serpent_avx_glue.c           | 152 --------
- arch/x86/crypto/serpent_sse2_glue.c          |  67 ----
- arch/x86/crypto/twofish-avx-x86_64-asm_64.S  |  80 -----
- arch/x86/crypto/twofish_avx_glue.c           | 136 -------
- arch/x86/crypto/twofish_glue_3way.c          |  72 ----
- arch/x86/include/asm/crypto/camellia.h       |  24 --
- arch/x86/include/asm/crypto/glue_helper.h    |  44 ---
- arch/x86/include/asm/crypto/serpent-avx.h    |  21 --
- arch/x86/include/asm/crypto/twofish.h        |   4 -
- 22 files changed, 1 insertion(+), 2527 deletions(-)
-
+diff --git a/arch/x86/crypto/camellia-aesni-avx-asm_64.S b/arch/x86/crypto/camellia-aesni-avx-asm_64.S
+index ecc0a9a905c4..1e0383a84247 100644
+--- a/arch/x86/crypto/camellia-aesni-avx-asm_64.S
++++ b/arch/x86/crypto/camellia-aesni-avx-asm_64.S
+@@ -593,10 +593,6 @@ SYM_FUNC_END(roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
+ .Lbswap128_mask:
+ 	.byte 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+ 
+-/* For XTS mode IV generation */
+-.Lxts_gf128mul_and_shl1_mask:
+-	.byte 0x87, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0
+-
+ /*
+  * pre-SubByte transform
+  *
+@@ -1111,179 +1107,3 @@ SYM_FUNC_START(camellia_ctr_16way)
+ 	FRAME_END
+ 	ret;
+ SYM_FUNC_END(camellia_ctr_16way)
+-
+-#define gf128mul_x_ble(iv, mask, tmp) \
+-	vpsrad $31, iv, tmp; \
+-	vpaddq iv, iv, iv; \
+-	vpshufd $0x13, tmp, tmp; \
+-	vpand mask, tmp, tmp; \
+-	vpxor tmp, iv, iv;
+-
+-.align 8
+-SYM_FUNC_START_LOCAL(camellia_xts_crypt_16way)
+-	/* input:
+-	 *	%rdi: ctx, CTX
+-	 *	%rsi: dst (16 blocks)
+-	 *	%rdx: src (16 blocks)
+-	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
+-	 *	%r8: index for input whitening key
+-	 *	%r9: pointer to  __camellia_enc_blk16 or __camellia_dec_blk16
+-	 */
+-	FRAME_BEGIN
+-
+-	subq $(16 * 16), %rsp;
+-	movq %rsp, %rax;
+-
+-	vmovdqa .Lxts_gf128mul_and_shl1_mask, %xmm14;
+-
+-	/* load IV */
+-	vmovdqu (%rcx), %xmm0;
+-	vpxor 0 * 16(%rdx), %xmm0, %xmm15;
+-	vmovdqu %xmm15, 15 * 16(%rax);
+-	vmovdqu %xmm0, 0 * 16(%rsi);
+-
+-	/* construct IVs */
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 1 * 16(%rdx), %xmm0, %xmm15;
+-	vmovdqu %xmm15, 14 * 16(%rax);
+-	vmovdqu %xmm0, 1 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 2 * 16(%rdx), %xmm0, %xmm13;
+-	vmovdqu %xmm0, 2 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 3 * 16(%rdx), %xmm0, %xmm12;
+-	vmovdqu %xmm0, 3 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 4 * 16(%rdx), %xmm0, %xmm11;
+-	vmovdqu %xmm0, 4 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 5 * 16(%rdx), %xmm0, %xmm10;
+-	vmovdqu %xmm0, 5 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 6 * 16(%rdx), %xmm0, %xmm9;
+-	vmovdqu %xmm0, 6 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 7 * 16(%rdx), %xmm0, %xmm8;
+-	vmovdqu %xmm0, 7 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 8 * 16(%rdx), %xmm0, %xmm7;
+-	vmovdqu %xmm0, 8 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 9 * 16(%rdx), %xmm0, %xmm6;
+-	vmovdqu %xmm0, 9 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 10 * 16(%rdx), %xmm0, %xmm5;
+-	vmovdqu %xmm0, 10 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 11 * 16(%rdx), %xmm0, %xmm4;
+-	vmovdqu %xmm0, 11 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 12 * 16(%rdx), %xmm0, %xmm3;
+-	vmovdqu %xmm0, 12 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 13 * 16(%rdx), %xmm0, %xmm2;
+-	vmovdqu %xmm0, 13 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 14 * 16(%rdx), %xmm0, %xmm1;
+-	vmovdqu %xmm0, 14 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vpxor 15 * 16(%rdx), %xmm0, %xmm15;
+-	vmovdqu %xmm15, 0 * 16(%rax);
+-	vmovdqu %xmm0, 15 * 16(%rsi);
+-
+-	gf128mul_x_ble(%xmm0, %xmm14, %xmm15);
+-	vmovdqu %xmm0, (%rcx);
+-
+-	/* inpack16_pre: */
+-	vmovq (key_table)(CTX, %r8, 8), %xmm15;
+-	vpshufb .Lpack_bswap, %xmm15, %xmm15;
+-	vpxor 0 * 16(%rax), %xmm15, %xmm0;
+-	vpxor %xmm1, %xmm15, %xmm1;
+-	vpxor %xmm2, %xmm15, %xmm2;
+-	vpxor %xmm3, %xmm15, %xmm3;
+-	vpxor %xmm4, %xmm15, %xmm4;
+-	vpxor %xmm5, %xmm15, %xmm5;
+-	vpxor %xmm6, %xmm15, %xmm6;
+-	vpxor %xmm7, %xmm15, %xmm7;
+-	vpxor %xmm8, %xmm15, %xmm8;
+-	vpxor %xmm9, %xmm15, %xmm9;
+-	vpxor %xmm10, %xmm15, %xmm10;
+-	vpxor %xmm11, %xmm15, %xmm11;
+-	vpxor %xmm12, %xmm15, %xmm12;
+-	vpxor %xmm13, %xmm15, %xmm13;
+-	vpxor 14 * 16(%rax), %xmm15, %xmm14;
+-	vpxor 15 * 16(%rax), %xmm15, %xmm15;
+-
+-	CALL_NOSPEC r9;
+-
+-	addq $(16 * 16), %rsp;
+-
+-	vpxor 0 * 16(%rsi), %xmm7, %xmm7;
+-	vpxor 1 * 16(%rsi), %xmm6, %xmm6;
+-	vpxor 2 * 16(%rsi), %xmm5, %xmm5;
+-	vpxor 3 * 16(%rsi), %xmm4, %xmm4;
+-	vpxor 4 * 16(%rsi), %xmm3, %xmm3;
+-	vpxor 5 * 16(%rsi), %xmm2, %xmm2;
+-	vpxor 6 * 16(%rsi), %xmm1, %xmm1;
+-	vpxor 7 * 16(%rsi), %xmm0, %xmm0;
+-	vpxor 8 * 16(%rsi), %xmm15, %xmm15;
+-	vpxor 9 * 16(%rsi), %xmm14, %xmm14;
+-	vpxor 10 * 16(%rsi), %xmm13, %xmm13;
+-	vpxor 11 * 16(%rsi), %xmm12, %xmm12;
+-	vpxor 12 * 16(%rsi), %xmm11, %xmm11;
+-	vpxor 13 * 16(%rsi), %xmm10, %xmm10;
+-	vpxor 14 * 16(%rsi), %xmm9, %xmm9;
+-	vpxor 15 * 16(%rsi), %xmm8, %xmm8;
+-	write_output(%xmm7, %xmm6, %xmm5, %xmm4, %xmm3, %xmm2, %xmm1, %xmm0,
+-		     %xmm15, %xmm14, %xmm13, %xmm12, %xmm11, %xmm10, %xmm9,
+-		     %xmm8, %rsi);
+-
+-	FRAME_END
+-	ret;
+-SYM_FUNC_END(camellia_xts_crypt_16way)
+-
+-SYM_FUNC_START(camellia_xts_enc_16way)
+-	/* input:
+-	 *	%rdi: ctx, CTX
+-	 *	%rsi: dst (16 blocks)
+-	 *	%rdx: src (16 blocks)
+-	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
+-	 */
+-	xorl %r8d, %r8d; /* input whitening key, 0 for enc */
+-
+-	leaq __camellia_enc_blk16, %r9;
+-
+-	jmp camellia_xts_crypt_16way;
+-SYM_FUNC_END(camellia_xts_enc_16way)
+-
+-SYM_FUNC_START(camellia_xts_dec_16way)
+-	/* input:
+-	 *	%rdi: ctx, CTX
+-	 *	%rsi: dst (16 blocks)
+-	 *	%rdx: src (16 blocks)
+-	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
+-	 */
+-
+-	cmpl $16, key_length(CTX);
+-	movl $32, %r8d;
+-	movl $24, %eax;
+-	cmovel %eax, %r8d;  /* input whitening key, last for dec */
+-
+-	leaq __camellia_dec_blk16, %r9;
+-
+-	jmp camellia_xts_crypt_16way;
+-SYM_FUNC_END(camellia_xts_dec_16way)
+diff --git a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
+index 0907243c501c..432bfaf54ff9 100644
+--- a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
++++ b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
+@@ -629,12 +629,6 @@ SYM_FUNC_END(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
+ .Lbswap128_mask:
+ 	.byte 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+ 
+-/* For XTS mode */
+-.Lxts_gf128mul_and_shl1_mask_0:
+-	.byte 0x87, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0
+-.Lxts_gf128mul_and_shl1_mask_1:
+-	.byte 0x0e, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0
+-
+ /*
+  * pre-SubByte transform
+  *
+@@ -1201,203 +1195,3 @@ SYM_FUNC_START(camellia_ctr_32way)
+ 	FRAME_END
+ 	ret;
+ SYM_FUNC_END(camellia_ctr_32way)
+-
+-#define gf128mul_x_ble(iv, mask, tmp) \
+-	vpsrad $31, iv, tmp; \
+-	vpaddq iv, iv, iv; \
+-	vpshufd $0x13, tmp, tmp; \
+-	vpand mask, tmp, tmp; \
+-	vpxor tmp, iv, iv;
+-
+-#define gf128mul_x2_ble(iv, mask1, mask2, tmp0, tmp1) \
+-	vpsrad $31, iv, tmp0; \
+-	vpaddq iv, iv, tmp1; \
+-	vpsllq $2, iv, iv; \
+-	vpshufd $0x13, tmp0, tmp0; \
+-	vpsrad $31, tmp1, tmp1; \
+-	vpand mask2, tmp0, tmp0; \
+-	vpshufd $0x13, tmp1, tmp1; \
+-	vpxor tmp0, iv, iv; \
+-	vpand mask1, tmp1, tmp1; \
+-	vpxor tmp1, iv, iv;
+-
+-.align 8
+-SYM_FUNC_START_LOCAL(camellia_xts_crypt_32way)
+-	/* input:
+-	 *	%rdi: ctx, CTX
+-	 *	%rsi: dst (32 blocks)
+-	 *	%rdx: src (32 blocks)
+-	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
+-	 *	%r8: index for input whitening key
+-	 *	%r9: pointer to  __camellia_enc_blk32 or __camellia_dec_blk32
+-	 */
+-	FRAME_BEGIN
+-
+-	vzeroupper;
+-
+-	subq $(16 * 32), %rsp;
+-	movq %rsp, %rax;
+-
+-	vbroadcasti128 .Lxts_gf128mul_and_shl1_mask_0, %ymm12;
+-
+-	/* load IV and construct second IV */
+-	vmovdqu (%rcx), %xmm0;
+-	vmovdqa %xmm0, %xmm15;
+-	gf128mul_x_ble(%xmm0, %xmm12, %xmm13);
+-	vbroadcasti128 .Lxts_gf128mul_and_shl1_mask_1, %ymm13;
+-	vinserti128 $1, %xmm0, %ymm15, %ymm0;
+-	vpxor 0 * 32(%rdx), %ymm0, %ymm15;
+-	vmovdqu %ymm15, 15 * 32(%rax);
+-	vmovdqu %ymm0, 0 * 32(%rsi);
+-
+-	/* construct IVs */
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 1 * 32(%rdx), %ymm0, %ymm15;
+-	vmovdqu %ymm15, 14 * 32(%rax);
+-	vmovdqu %ymm0, 1 * 32(%rsi);
+-
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 2 * 32(%rdx), %ymm0, %ymm15;
+-	vmovdqu %ymm15, 13 * 32(%rax);
+-	vmovdqu %ymm0, 2 * 32(%rsi);
+-
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 3 * 32(%rdx), %ymm0, %ymm15;
+-	vmovdqu %ymm15, 12 * 32(%rax);
+-	vmovdqu %ymm0, 3 * 32(%rsi);
+-
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 4 * 32(%rdx), %ymm0, %ymm11;
+-	vmovdqu %ymm0, 4 * 32(%rsi);
+-
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 5 * 32(%rdx), %ymm0, %ymm10;
+-	vmovdqu %ymm0, 5 * 32(%rsi);
+-
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 6 * 32(%rdx), %ymm0, %ymm9;
+-	vmovdqu %ymm0, 6 * 32(%rsi);
+-
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 7 * 32(%rdx), %ymm0, %ymm8;
+-	vmovdqu %ymm0, 7 * 32(%rsi);
+-
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 8 * 32(%rdx), %ymm0, %ymm7;
+-	vmovdqu %ymm0, 8 * 32(%rsi);
+-
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 9 * 32(%rdx), %ymm0, %ymm6;
+-	vmovdqu %ymm0, 9 * 32(%rsi);
+-
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 10 * 32(%rdx), %ymm0, %ymm5;
+-	vmovdqu %ymm0, 10 * 32(%rsi);
+-
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 11 * 32(%rdx), %ymm0, %ymm4;
+-	vmovdqu %ymm0, 11 * 32(%rsi);
+-
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 12 * 32(%rdx), %ymm0, %ymm3;
+-	vmovdqu %ymm0, 12 * 32(%rsi);
+-
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 13 * 32(%rdx), %ymm0, %ymm2;
+-	vmovdqu %ymm0, 13 * 32(%rsi);
+-
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 14 * 32(%rdx), %ymm0, %ymm1;
+-	vmovdqu %ymm0, 14 * 32(%rsi);
+-
+-	gf128mul_x2_ble(%ymm0, %ymm12, %ymm13, %ymm14, %ymm15);
+-	vpxor 15 * 32(%rdx), %ymm0, %ymm15;
+-	vmovdqu %ymm15, 0 * 32(%rax);
+-	vmovdqu %ymm0, 15 * 32(%rsi);
+-
+-	vextracti128 $1, %ymm0, %xmm0;
+-	gf128mul_x_ble(%xmm0, %xmm12, %xmm15);
+-	vmovdqu %xmm0, (%rcx);
+-
+-	/* inpack32_pre: */
+-	vpbroadcastq (key_table)(CTX, %r8, 8), %ymm15;
+-	vpshufb .Lpack_bswap, %ymm15, %ymm15;
+-	vpxor 0 * 32(%rax), %ymm15, %ymm0;
+-	vpxor %ymm1, %ymm15, %ymm1;
+-	vpxor %ymm2, %ymm15, %ymm2;
+-	vpxor %ymm3, %ymm15, %ymm3;
+-	vpxor %ymm4, %ymm15, %ymm4;
+-	vpxor %ymm5, %ymm15, %ymm5;
+-	vpxor %ymm6, %ymm15, %ymm6;
+-	vpxor %ymm7, %ymm15, %ymm7;
+-	vpxor %ymm8, %ymm15, %ymm8;
+-	vpxor %ymm9, %ymm15, %ymm9;
+-	vpxor %ymm10, %ymm15, %ymm10;
+-	vpxor %ymm11, %ymm15, %ymm11;
+-	vpxor 12 * 32(%rax), %ymm15, %ymm12;
+-	vpxor 13 * 32(%rax), %ymm15, %ymm13;
+-	vpxor 14 * 32(%rax), %ymm15, %ymm14;
+-	vpxor 15 * 32(%rax), %ymm15, %ymm15;
+-
+-	CALL_NOSPEC r9;
+-
+-	addq $(16 * 32), %rsp;
+-
+-	vpxor 0 * 32(%rsi), %ymm7, %ymm7;
+-	vpxor 1 * 32(%rsi), %ymm6, %ymm6;
+-	vpxor 2 * 32(%rsi), %ymm5, %ymm5;
+-	vpxor 3 * 32(%rsi), %ymm4, %ymm4;
+-	vpxor 4 * 32(%rsi), %ymm3, %ymm3;
+-	vpxor 5 * 32(%rsi), %ymm2, %ymm2;
+-	vpxor 6 * 32(%rsi), %ymm1, %ymm1;
+-	vpxor 7 * 32(%rsi), %ymm0, %ymm0;
+-	vpxor 8 * 32(%rsi), %ymm15, %ymm15;
+-	vpxor 9 * 32(%rsi), %ymm14, %ymm14;
+-	vpxor 10 * 32(%rsi), %ymm13, %ymm13;
+-	vpxor 11 * 32(%rsi), %ymm12, %ymm12;
+-	vpxor 12 * 32(%rsi), %ymm11, %ymm11;
+-	vpxor 13 * 32(%rsi), %ymm10, %ymm10;
+-	vpxor 14 * 32(%rsi), %ymm9, %ymm9;
+-	vpxor 15 * 32(%rsi), %ymm8, %ymm8;
+-	write_output(%ymm7, %ymm6, %ymm5, %ymm4, %ymm3, %ymm2, %ymm1, %ymm0,
+-		     %ymm15, %ymm14, %ymm13, %ymm12, %ymm11, %ymm10, %ymm9,
+-		     %ymm8, %rsi);
+-
+-	vzeroupper;
+-
+-	FRAME_END
+-	ret;
+-SYM_FUNC_END(camellia_xts_crypt_32way)
+-
+-SYM_FUNC_START(camellia_xts_enc_32way)
+-	/* input:
+-	 *	%rdi: ctx, CTX
+-	 *	%rsi: dst (32 blocks)
+-	 *	%rdx: src (32 blocks)
+-	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
+-	 */
+-
+-	xorl %r8d, %r8d; /* input whitening key, 0 for enc */
+-
+-	leaq __camellia_enc_blk32, %r9;
+-
+-	jmp camellia_xts_crypt_32way;
+-SYM_FUNC_END(camellia_xts_enc_32way)
+-
+-SYM_FUNC_START(camellia_xts_dec_32way)
+-	/* input:
+-	 *	%rdi: ctx, CTX
+-	 *	%rsi: dst (32 blocks)
+-	 *	%rdx: src (32 blocks)
+-	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
+-	 */
+-
+-	cmpl $16, key_length(CTX);
+-	movl $32, %r8d;
+-	movl $24, %eax;
+-	cmovel %eax, %r8d;  /* input whitening key, last for dec */
+-
+-	leaq __camellia_dec_blk32, %r9;
+-
+-	jmp camellia_xts_crypt_32way;
+-SYM_FUNC_END(camellia_xts_dec_32way)
+diff --git a/arch/x86/crypto/camellia_aesni_avx2_glue.c b/arch/x86/crypto/camellia_aesni_avx2_glue.c
+index ccda647422d6..d956d0473668 100644
+--- a/arch/x86/crypto/camellia_aesni_avx2_glue.c
++++ b/arch/x86/crypto/camellia_aesni_avx2_glue.c
+@@ -9,7 +9,6 @@
+ #include <asm/crypto/glue_helper.h>
+ #include <crypto/algapi.h>
+ #include <crypto/internal/simd.h>
+-#include <crypto/xts.h>
+ #include <linux/crypto.h>
+ #include <linux/err.h>
+ #include <linux/module.h>
+@@ -26,11 +25,6 @@ asmlinkage void camellia_cbc_dec_32way(const void *ctx, u8 *dst, const u8 *src);
+ asmlinkage void camellia_ctr_32way(const void *ctx, u8 *dst, const u8 *src,
+ 				   le128 *iv);
+ 
+-asmlinkage void camellia_xts_enc_32way(const void *ctx, u8 *dst, const u8 *src,
+-				       le128 *iv);
+-asmlinkage void camellia_xts_dec_32way(const void *ctx, u8 *dst, const u8 *src,
+-				       le128 *iv);
+-
+ static const struct common_glue_ctx camellia_enc = {
+ 	.num_funcs = 4,
+ 	.fpu_blocks_limit = CAMELLIA_AESNI_PARALLEL_BLOCKS,
+@@ -69,22 +63,6 @@ static const struct common_glue_ctx camellia_ctr = {
+ 	} }
+ };
+ 
+-static const struct common_glue_ctx camellia_enc_xts = {
+-	.num_funcs = 3,
+-	.fpu_blocks_limit = CAMELLIA_AESNI_PARALLEL_BLOCKS,
+-
+-	.funcs = { {
+-		.num_blocks = CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS,
+-		.fn_u = { .xts = camellia_xts_enc_32way }
+-	}, {
+-		.num_blocks = CAMELLIA_AESNI_PARALLEL_BLOCKS,
+-		.fn_u = { .xts = camellia_xts_enc_16way }
+-	}, {
+-		.num_blocks = 1,
+-		.fn_u = { .xts = camellia_xts_enc }
+-	} }
+-};
+-
+ static const struct common_glue_ctx camellia_dec = {
+ 	.num_funcs = 4,
+ 	.fpu_blocks_limit = CAMELLIA_AESNI_PARALLEL_BLOCKS,
+@@ -123,22 +101,6 @@ static const struct common_glue_ctx camellia_dec_cbc = {
+ 	} }
+ };
+ 
+-static const struct common_glue_ctx camellia_dec_xts = {
+-	.num_funcs = 3,
+-	.fpu_blocks_limit = CAMELLIA_AESNI_PARALLEL_BLOCKS,
+-
+-	.funcs = { {
+-		.num_blocks = CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS,
+-		.fn_u = { .xts = camellia_xts_dec_32way }
+-	}, {
+-		.num_blocks = CAMELLIA_AESNI_PARALLEL_BLOCKS,
+-		.fn_u = { .xts = camellia_xts_dec_16way }
+-	}, {
+-		.num_blocks = 1,
+-		.fn_u = { .xts = camellia_xts_dec }
+-	} }
+-};
+-
+ static int camellia_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			   unsigned int keylen)
+ {
+@@ -170,24 +132,6 @@ static int ctr_crypt(struct skcipher_request *req)
+ 	return glue_ctr_req_128bit(&camellia_ctr, req);
+ }
+ 
+-static int xts_encrypt(struct skcipher_request *req)
+-{
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct camellia_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+-
+-	return glue_xts_req_128bit(&camellia_enc_xts, req, camellia_enc_blk,
+-				   &ctx->tweak_ctx, &ctx->crypt_ctx, false);
+-}
+-
+-static int xts_decrypt(struct skcipher_request *req)
+-{
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct camellia_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+-
+-	return glue_xts_req_128bit(&camellia_dec_xts, req, camellia_enc_blk,
+-				   &ctx->tweak_ctx, &ctx->crypt_ctx, true);
+-}
+-
+ static struct skcipher_alg camellia_algs[] = {
+ 	{
+ 		.base.cra_name		= "__ecb(camellia)",
+@@ -231,20 +175,6 @@ static struct skcipher_alg camellia_algs[] = {
+ 		.setkey			= camellia_setkey,
+ 		.encrypt		= ctr_crypt,
+ 		.decrypt		= ctr_crypt,
+-	}, {
+-		.base.cra_name		= "__xts(camellia)",
+-		.base.cra_driver_name	= "__xts-camellia-aesni-avx2",
+-		.base.cra_priority	= 500,
+-		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+-		.base.cra_blocksize	= CAMELLIA_BLOCK_SIZE,
+-		.base.cra_ctxsize	= sizeof(struct camellia_xts_ctx),
+-		.base.cra_module	= THIS_MODULE,
+-		.min_keysize		= 2 * CAMELLIA_MIN_KEY_SIZE,
+-		.max_keysize		= 2 * CAMELLIA_MAX_KEY_SIZE,
+-		.ivsize			= CAMELLIA_BLOCK_SIZE,
+-		.setkey			= xts_camellia_setkey,
+-		.encrypt		= xts_encrypt,
+-		.decrypt		= xts_decrypt,
+ 	},
+ };
+ 
+diff --git a/arch/x86/crypto/camellia_aesni_avx_glue.c b/arch/x86/crypto/camellia_aesni_avx_glue.c
+index 4e5de6ef206e..44614f8a452c 100644
+--- a/arch/x86/crypto/camellia_aesni_avx_glue.c
++++ b/arch/x86/crypto/camellia_aesni_avx_glue.c
+@@ -9,7 +9,6 @@
+ #include <asm/crypto/glue_helper.h>
+ #include <crypto/algapi.h>
+ #include <crypto/internal/simd.h>
+-#include <crypto/xts.h>
+ #include <linux/crypto.h>
+ #include <linux/err.h>
+ #include <linux/module.h>
+@@ -31,26 +30,6 @@ asmlinkage void camellia_ctr_16way(const void *ctx, u8 *dst, const u8 *src,
+ 				   le128 *iv);
+ EXPORT_SYMBOL_GPL(camellia_ctr_16way);
+ 
+-asmlinkage void camellia_xts_enc_16way(const void *ctx, u8 *dst, const u8 *src,
+-				       le128 *iv);
+-EXPORT_SYMBOL_GPL(camellia_xts_enc_16way);
+-
+-asmlinkage void camellia_xts_dec_16way(const void *ctx, u8 *dst, const u8 *src,
+-				       le128 *iv);
+-EXPORT_SYMBOL_GPL(camellia_xts_dec_16way);
+-
+-void camellia_xts_enc(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
+-{
+-	glue_xts_crypt_128bit_one(ctx, dst, src, iv, camellia_enc_blk);
+-}
+-EXPORT_SYMBOL_GPL(camellia_xts_enc);
+-
+-void camellia_xts_dec(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
+-{
+-	glue_xts_crypt_128bit_one(ctx, dst, src, iv, camellia_dec_blk);
+-}
+-EXPORT_SYMBOL_GPL(camellia_xts_dec);
+-
+ static const struct common_glue_ctx camellia_enc = {
+ 	.num_funcs = 3,
+ 	.fpu_blocks_limit = CAMELLIA_AESNI_PARALLEL_BLOCKS,
+@@ -83,19 +62,6 @@ static const struct common_glue_ctx camellia_ctr = {
+ 	} }
+ };
+ 
+-static const struct common_glue_ctx camellia_enc_xts = {
+-	.num_funcs = 2,
+-	.fpu_blocks_limit = CAMELLIA_AESNI_PARALLEL_BLOCKS,
+-
+-	.funcs = { {
+-		.num_blocks = CAMELLIA_AESNI_PARALLEL_BLOCKS,
+-		.fn_u = { .xts = camellia_xts_enc_16way }
+-	}, {
+-		.num_blocks = 1,
+-		.fn_u = { .xts = camellia_xts_enc }
+-	} }
+-};
+-
+ static const struct common_glue_ctx camellia_dec = {
+ 	.num_funcs = 3,
+ 	.fpu_blocks_limit = CAMELLIA_AESNI_PARALLEL_BLOCKS,
+@@ -128,19 +94,6 @@ static const struct common_glue_ctx camellia_dec_cbc = {
+ 	} }
+ };
+ 
+-static const struct common_glue_ctx camellia_dec_xts = {
+-	.num_funcs = 2,
+-	.fpu_blocks_limit = CAMELLIA_AESNI_PARALLEL_BLOCKS,
+-
+-	.funcs = { {
+-		.num_blocks = CAMELLIA_AESNI_PARALLEL_BLOCKS,
+-		.fn_u = { .xts = camellia_xts_dec_16way }
+-	}, {
+-		.num_blocks = 1,
+-		.fn_u = { .xts = camellia_xts_dec }
+-	} }
+-};
+-
+ static int camellia_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			   unsigned int keylen)
+ {
+@@ -172,44 +125,6 @@ static int ctr_crypt(struct skcipher_request *req)
+ 	return glue_ctr_req_128bit(&camellia_ctr, req);
+ }
+ 
+-int xts_camellia_setkey(struct crypto_skcipher *tfm, const u8 *key,
+-			unsigned int keylen)
+-{
+-	struct camellia_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	int err;
+-
+-	err = xts_verify_key(tfm, key, keylen);
+-	if (err)
+-		return err;
+-
+-	/* first half of xts-key is for crypt */
+-	err = __camellia_setkey(&ctx->crypt_ctx, key, keylen / 2);
+-	if (err)
+-		return err;
+-
+-	/* second half of xts-key is for tweak */
+-	return __camellia_setkey(&ctx->tweak_ctx, key + keylen / 2, keylen / 2);
+-}
+-EXPORT_SYMBOL_GPL(xts_camellia_setkey);
+-
+-static int xts_encrypt(struct skcipher_request *req)
+-{
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct camellia_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+-
+-	return glue_xts_req_128bit(&camellia_enc_xts, req, camellia_enc_blk,
+-				   &ctx->tweak_ctx, &ctx->crypt_ctx, false);
+-}
+-
+-static int xts_decrypt(struct skcipher_request *req)
+-{
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct camellia_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+-
+-	return glue_xts_req_128bit(&camellia_dec_xts, req, camellia_enc_blk,
+-				   &ctx->tweak_ctx, &ctx->crypt_ctx, true);
+-}
+-
+ static struct skcipher_alg camellia_algs[] = {
+ 	{
+ 		.base.cra_name		= "__ecb(camellia)",
+@@ -253,21 +168,7 @@ static struct skcipher_alg camellia_algs[] = {
+ 		.setkey			= camellia_setkey,
+ 		.encrypt		= ctr_crypt,
+ 		.decrypt		= ctr_crypt,
+-	}, {
+-		.base.cra_name		= "__xts(camellia)",
+-		.base.cra_driver_name	= "__xts-camellia-aesni",
+-		.base.cra_priority	= 400,
+-		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+-		.base.cra_blocksize	= CAMELLIA_BLOCK_SIZE,
+-		.base.cra_ctxsize	= sizeof(struct camellia_xts_ctx),
+-		.base.cra_module	= THIS_MODULE,
+-		.min_keysize		= 2 * CAMELLIA_MIN_KEY_SIZE,
+-		.max_keysize		= 2 * CAMELLIA_MAX_KEY_SIZE,
+-		.ivsize			= CAMELLIA_BLOCK_SIZE,
+-		.setkey			= xts_camellia_setkey,
+-		.encrypt		= xts_encrypt,
+-		.decrypt		= xts_decrypt,
+-	},
++	}
+ };
+ 
+ static struct simd_skcipher_alg *camellia_simd_algs[ARRAY_SIZE(camellia_algs)];
+diff --git a/arch/x86/include/asm/crypto/camellia.h b/arch/x86/include/asm/crypto/camellia.h
+index f6d91861cb14..0e5f82adbaf9 100644
+--- a/arch/x86/include/asm/crypto/camellia.h
++++ b/arch/x86/include/asm/crypto/camellia.h
+@@ -19,18 +19,10 @@ struct camellia_ctx {
+ 	u32 key_length;
+ };
+ 
+-struct camellia_xts_ctx {
+-	struct camellia_ctx tweak_ctx;
+-	struct camellia_ctx crypt_ctx;
+-};
+-
+ extern int __camellia_setkey(struct camellia_ctx *cctx,
+ 			     const unsigned char *key,
+ 			     unsigned int key_len);
+ 
+-extern int xts_camellia_setkey(struct crypto_skcipher *tfm, const u8 *key,
+-			       unsigned int keylen);
+-
+ /* regular block cipher functions */
+ asmlinkage void __camellia_enc_blk(const void *ctx, u8 *dst, const u8 *src,
+ 				   bool xor);
+@@ -49,11 +41,6 @@ asmlinkage void camellia_cbc_dec_16way(const void *ctx, u8 *dst, const u8 *src);
+ asmlinkage void camellia_ctr_16way(const void *ctx, u8 *dst, const u8 *src,
+ 				   le128 *iv);
+ 
+-asmlinkage void camellia_xts_enc_16way(const void *ctx, u8 *dst, const u8 *src,
+-				       le128 *iv);
+-asmlinkage void camellia_xts_dec_16way(const void *ctx, u8 *dst, const u8 *src,
+-				       le128 *iv);
+-
+ static inline void camellia_enc_blk(const void *ctx, u8 *dst, const u8 *src)
+ {
+ 	__camellia_enc_blk(ctx, dst, src, false);
+@@ -83,9 +70,4 @@ extern void camellia_crypt_ctr(const void *ctx, u8 *dst, const u8 *src,
+ extern void camellia_crypt_ctr_2way(const void *ctx, u8 *dst, const u8 *src,
+ 				    le128 *iv);
+ 
+-extern void camellia_xts_enc(const void *ctx, u8 *dst, const u8 *src,
+-			     le128 *iv);
+-extern void camellia_xts_dec(const void *ctx, u8 *dst, const u8 *src,
+-			     le128 *iv);
+-
+ #endif /* ASM_X86_CAMELLIA_H */
 -- 
 2.17.1
 
-
-
-testing speed of async xts(camellia) (xts-camellia-aesni-avx2) encryption
-tcrypt: test 0 (256 bit key, 16 byte blocks): 4295101 operations in 1 seconds (68721616 bytes)
-tcrypt: test 1 (256 bit key, 64 byte blocks): 2029490 operations in 1 seconds (129887360 bytes)
-tcrypt: test 2 (256 bit key, 256 byte blocks): 1626076 operations in 1 seconds (416275456 bytes)
-tcrypt: test 3 (256 bit key, 1024 byte blocks): 732878 operations in 1 seconds (750467072 bytes)
-tcrypt: test 4 (256 bit key, 1424 byte blocks): 366313 operations in 1 seconds (521629712 bytes)
-tcrypt: test 5 (256 bit key, 4096 byte blocks): 161737 operations in 1 seconds (662474752 bytes)
-tcrypt: test 6 (512 bit key, 16 byte blocks): 3876371 operations in 1 seconds (62021936 bytes)
-tcrypt: test 7 (512 bit key, 64 byte blocks): 1787813 operations in 1 seconds (114420032 bytes)
-tcrypt: test 8 (512 bit key, 256 byte blocks): 1578834 operations in 1 seconds (404181504 bytes)
-tcrypt: test 9 (512 bit key, 1024 byte blocks): 766805 operations in 1 seconds (785208320 bytes)
-tcrypt: test 10 (512 bit key, 1424 byte blocks): 366645 operations in 1 seconds (522102480 bytes)
-tcrypt: test 11 (512 bit key, 4096 byte blocks): 151122 operations in 1 seconds (618995712 bytes)
-tcrypt: 
-
-
-testing speed of async xts(camellia) (xts(ecb-camellia-aesni-avx2)) encryption
-tcrypt: test 0 (256 bit key, 16 byte blocks): 3981536 operations in 1 seconds (63704576 bytes)
-tcrypt: test 1 (256 bit key, 64 byte blocks): 2696005 operations in 1 seconds (172544320 bytes)
-tcrypt: test 2 (256 bit key, 256 byte blocks): 1048119 operations in 1 seconds (268318464 bytes)
-tcrypt: test 3 (256 bit key, 1024 byte blocks): 716732 operations in 1 seconds (733933568 bytes)
-tcrypt: test 4 (256 bit key, 1424 byte blocks): 440474 operations in 1 seconds (627234976 bytes)
-tcrypt: test 5 (256 bit key, 4096 byte blocks): 178906 operations in 1 seconds (732798976 bytes)
-tcrypt: test 6 (512 bit key, 16 byte blocks): 3119162 operations in 1 seconds (49906592 bytes)
-tcrypt: test 7 (512 bit key, 64 byte blocks): 2286596 operations in 1 seconds (146342144 bytes)
-tcrypt: test 8 (512 bit key, 256 byte blocks): 1408661 operations in 1 seconds (360617216 bytes)
-tcrypt: test 9 (512 bit key, 1024 byte blocks): 669226 operations in 1 seconds (685287424 bytes)
-tcrypt: test 10 (512 bit key, 1424 byte blocks): 380543 operations in 1 seconds (541893232 bytes)
-tcrypt: test 11 (512 bit key, 4096 byte blocks): 144126 operations in 1 seconds (590340096 bytes)
-
-
-testing speed of async xts(camellia) (xts-camellia-aesni) encryption
-tcrypt: test 0 (256 bit key, 16 byte blocks): 3901755 operations in 1 seconds (62428080 bytes)
-tcrypt: test 1 (256 bit key, 64 byte blocks): 1719855 operations in 1 seconds (110070720 bytes)
-tcrypt: test 2 (256 bit key, 256 byte blocks): 1416991 operations in 1 seconds (362749696 bytes)
-tcrypt: test 3 (256 bit key, 1024 byte blocks): 481186 operations in 1 seconds (492734464 bytes)
-tcrypt: test 4 (256 bit key, 1424 byte blocks): 298401 operations in 1 seconds (424923024 bytes)
-tcrypt: test 5 (256 bit key, 4096 byte blocks): 120284 operations in 1 seconds (492683264 bytes)
-tcrypt: test 6 (512 bit key, 16 byte blocks): 3326174 operations in 1 seconds (53218784 bytes)
-tcrypt: test 7 (512 bit key, 64 byte blocks): 1428259 operations in 1 seconds (91408576 bytes)
-tcrypt: test 8 (512 bit key, 256 byte blocks): 1175894 operations in 1 seconds (301028864 bytes)
-tcrypt: test 9 (512 bit key, 1024 byte blocks): 407066 operations in 1 seconds (416835584 bytes)
-tcrypt: test 10 (512 bit key, 1424 byte blocks): 242931 operations in 1 seconds (345933744 bytes)
-tcrypt: test 11 (512 bit key, 4096 byte blocks): 95871 operations in 1 seconds (392687616 bytes)
-
-
-testing speed of async xts(camellia) (xts(ecb-camellia-aesni)) encryption
-tcrypt: test 0 (256 bit key, 16 byte blocks): 4004035 operations in 1 seconds (64064560 bytes)
-tcrypt: test 1 (256 bit key, 64 byte blocks): 2757081 operations in 1 seconds (176453184 bytes)
-tcrypt: test 2 (256 bit key, 256 byte blocks): 1626720 operations in 1 seconds (416440320 bytes)
-tcrypt: test 3 (256 bit key, 1024 byte blocks): 577725 operations in 1 seconds (591590400 bytes)
-tcrypt: test 4 (256 bit key, 1424 byte blocks): 393937 operations in 1 seconds (560966288 bytes)
-tcrypt: test 5 (256 bit key, 4096 byte blocks): 150055 operations in 1 seconds (614625280 bytes)
-tcrypt: test 6 (512 bit key, 16 byte blocks): 3427619 operations in 1 seconds (54841904 bytes)
-tcrypt: test 7 (512 bit key, 64 byte blocks): 2335827 operations in 1 seconds (149492928 bytes)
-tcrypt: test 8 (512 bit key, 256 byte blocks): 1412725 operations in 1 seconds (361657600 bytes)
-tcrypt: test 9 (512 bit key, 1024 byte blocks): 466635 operations in 1 seconds (477834240 bytes)
-tcrypt: test 10 (512 bit key, 1424 byte blocks): 314378 operations in 1 seconds (447674272 bytes)
-tcrypt: test 11 (512 bit key, 4096 byte blocks): 119159 operations in 1 seconds (488075264 bytes)
-
-
-testing speed of async xts(serpent) (xts-serpent-avx2) encryption
-tcrypt: test 0 (256 bit key, 16 byte blocks): 2665863 operations in 1 seconds (42653808 bytes)
-tcrypt: test 1 (256 bit key, 64 byte blocks): 1151015 operations in 1 seconds (73664960 bytes)
-tcrypt: test 2 (256 bit key, 256 byte blocks): 1824753 operations in 1 seconds (467136768 bytes)
-tcrypt: test 3 (256 bit key, 1024 byte blocks): 674375 operations in 1 seconds (690560000 bytes)
-tcrypt: test 4 (256 bit key, 1424 byte blocks): 434324 operations in 1 seconds (618477376 bytes)
-tcrypt: test 5 (256 bit key, 4096 byte blocks): 143875 operations in 1 seconds (589312000 bytes)
-tcrypt: test 6 (512 bit key, 16 byte blocks): 2676467 operations in 1 seconds (42823472 bytes)
-tcrypt: test 7 (512 bit key, 64 byte blocks): 1161001 operations in 1 seconds (74304064 bytes)
-tcrypt: test 8 (512 bit key, 256 byte blocks): 1830401 operations in 1 seconds (468582656 bytes)
-tcrypt: test 9 (512 bit key, 1024 byte blocks): 675560 operations in 1 seconds (691773440 bytes)
-tcrypt: test 10 (512 bit key, 1424 byte blocks): 431292 operations in 1 seconds (614159808 bytes)
-tcrypt: test 11 (512 bit key, 4096 byte blocks): 135674 operations in 1 seconds (555720704 bytes)
-
-
-testing speed of async xts(serpent) (xts(ecb-serpent-avx2)) encryption
-tcrypt: test 0 (256 bit key, 16 byte blocks): 2327282 operations in 1 seconds (37236512 bytes)
-tcrypt: test 1 (256 bit key, 64 byte blocks): 1121913 operations in 1 seconds (71802432 bytes)
-tcrypt: test 2 (256 bit key, 256 byte blocks): 1549949 operations in 1 seconds (396786944 bytes)
-tcrypt: test 3 (256 bit key, 1024 byte blocks): 597772 operations in 1 seconds (612118528 bytes)
-tcrypt: test 4 (256 bit key, 1424 byte blocks): 397386 operations in 1 seconds (565877664 bytes)
-tcrypt: test 5 (256 bit key, 4096 byte blocks): 140785 operations in 1 seconds (576655360 bytes)
-tcrypt: test 6 (512 bit key, 16 byte blocks): 2335122 operations in 1 seconds (37361952 bytes)
-tcrypt: test 7 (512 bit key, 64 byte blocks): 1123595 operations in 1 seconds (71910080 bytes)
-tcrypt: test 8 (512 bit key, 256 byte blocks): 1557279 operations in 1 seconds (398663424 bytes)
-tcrypt: test 9 (512 bit key, 1024 byte blocks): 595629 operations in 1 seconds (609924096 bytes)
-tcrypt: test 10 (512 bit key, 1424 byte blocks): 396338 operations in 1 seconds (564385312 bytes)
-tcrypt: test 11 (512 bit key, 4096 byte blocks): 139501 operations in 1 seconds (571396096 bytes)
-
-
-testing speed of async xts(serpent) (xts-serpent-avx) encryption
-tcrypt: test 0 (256 bit key, 16 byte blocks): 2718471 operations in 1 seconds (43495536 bytes)
-tcrypt: test 1 (256 bit key, 64 byte blocks): 1164397 operations in 1 seconds (74521408 bytes)
-tcrypt: test 2 (256 bit key, 256 byte blocks): 1189326 operations in 1 seconds (304467456 bytes)
-tcrypt: test 3 (256 bit key, 1024 byte blocks): 375279 operations in 1 seconds (384285696 bytes)
-tcrypt: test 4 (256 bit key, 1424 byte blocks): 260853 operations in 1 seconds (371454672 bytes)
-tcrypt: test 5 (256 bit key, 4096 byte blocks): 91367 operations in 1 seconds (374239232 bytes)
-tcrypt: test 6 (512 bit key, 16 byte blocks): 2679109 operations in 1 seconds (42865744 bytes)
-tcrypt: test 7 (512 bit key, 64 byte blocks): 1149832 operations in 1 seconds (73589248 bytes)
-tcrypt: test 8 (512 bit key, 256 byte blocks): 1180177 operations in 1 seconds (302125312 bytes)
-tcrypt: test 9 (512 bit key, 1024 byte blocks): 363975 operations in 1 seconds (372710400 bytes)
-tcrypt: test 10 (512 bit key, 1424 byte blocks): 267386 operations in 1 seconds (380757664 bytes)
-tcrypt: test 11 (512 bit key, 4096 byte blocks): 86933 operations in 1 seconds (356077568 bytes)
-
-
-testing speed of async xts(serpent) (xts(ecb-serpent-avx)) encryption
-tcrypt: test 0 (256 bit key, 16 byte blocks): 2408371 operations in 1 seconds (38533936 bytes)
-tcrypt: test 1 (256 bit key, 64 byte blocks): 1141626 operations in 1 seconds (73064064 bytes)
-tcrypt: test 2 (256 bit key, 256 byte blocks): 1072850 operations in 1 seconds (274649600 bytes)
-tcrypt: test 3 (256 bit key, 1024 byte blocks): 348694 operations in 1 seconds (357062656 bytes)
-tcrypt: test 4 (256 bit key, 1424 byte blocks): 250621 operations in 1 seconds (356884304 bytes)
-tcrypt: test 5 (256 bit key, 4096 byte blocks): 86043 operations in 1 seconds (352432128 bytes)
-tcrypt: test 6 (512 bit key, 16 byte blocks): 2406501 operations in 1 seconds (38504016 bytes)
-tcrypt: test 7 (512 bit key, 64 byte blocks): 1146211 operations in 1 seconds (73357504 bytes)
-tcrypt: test 8 (512 bit key, 256 byte blocks): 1075147 operations in 1 seconds (275237632 bytes)
-tcrypt: test 9 (512 bit key, 1024 byte blocks): 348007 operations in 1 seconds (356359168 bytes)
-tcrypt: test 10 (512 bit key, 1424 byte blocks): 250311 operations in 1 seconds (356442864 bytes)
-tcrypt: test 11 (512 bit key, 4096 byte blocks): 86062 operations in 1 seconds (352509952 bytes
