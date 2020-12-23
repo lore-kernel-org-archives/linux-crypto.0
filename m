@@ -7,31 +7,31 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B384C43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A78FC433E6
 	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 22:39:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 31BAF22A99
+	by mail.kernel.org (Postfix) with ESMTP id 130B122A83
 	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 22:39:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726292AbgLWWjt (ORCPT
+        id S1726282AbgLWWjr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Dec 2020 17:39:49 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59262 "EHLO mail.kernel.org"
+        Wed, 23 Dec 2020 17:39:47 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59244 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725811AbgLWWjt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Dec 2020 17:39:49 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0E9B2224B0;
-        Wed, 23 Dec 2020 22:39:05 +0000 (UTC)
+        id S1725811AbgLWWjq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Dec 2020 17:39:46 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C3B88224B2;
+        Wed, 23 Dec 2020 22:39:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608763148;
-        bh=OUWcXmad/NIGPN5jhyvEV3boVxRZsxOIoCLaTRrVHPo=;
+        s=k20201202; t=1608763145;
+        bh=u+uFryUmH+JxWzJkbheVciNMfp/q1G+YXDT1u1i8vCg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=IAQ7Xh5oTxmXx6AFbptW70q0STp9x1vcHXvPNFmt1FUUou40yrBz74NeMBDyN/aeS
-         SBqFPTHgYNSj4sZ4IKLr40xRagE2F3kR/47YVJURjW3cLuF0W21sFxiVUm0t3anQHj
-         pdFTMrvRFaLHvKQJ5RqJ8gPFGrnC4hBzU31JEdz1Jz7FZIxsQ8V/qM/3mfVEEi264w
-         jqQ+BY+xl4o8e2BKS+8PZi6G+KbXhGwhe7hFWBhghDjy7kGK8gqrMQ5nivNTY1Wk8e
-         4P3LTtQ+D/5bkKEv+UfqttpH4TKjCOt66N+rGHPcc4QOVPz8Sx6Sa+IC+aIQ+G/HDg
-         7yQ8ExW7CQLdA==
+        b=C/GEKf/BvlPfinxqSX1Nx8v+D7Vr5+UsHmYHJEPab+GXtuPJEidKOzkB+/Fw7dpEq
+         LTnVa7dF46bLnEi/jp9Z9bFsm3SmjDSP9T+e6JflQLZz1KwJyoSQGjuYYiJ+AqVXxc
+         MwHLUORXPmXTNOPqhhKCUSNCg6kyN4uMCy9cXfBWBUdPE320y4CHCNm4i//1yC/faz
+         /NIr3ZLWS8ecm+I7DFvfEzM6ouA8t3He678yCMJajzzkDEhIOz+YeCQSvULokFedaR
+         JjwaB6LCx5CHoKKtaALXWMSxJtsdAnu6UvveCUq8gGKW2+RxDF/9KpcqMQNuQjjGB1
+         S86AfUe2cbY8g==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     dm-devel@redhat.com, Ard Biesheuvel <ardb@kernel.org>,
@@ -40,9 +40,9 @@ Cc:     dm-devel@redhat.com, Ard Biesheuvel <ardb@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Milan Broz <gmazyland@gmail.com>,
         Mike Snitzer <snitzer@redhat.com>
-Subject: [RFC PATCH 03/10] crypto: x86/serpent- switch to XTS template
-Date:   Wed, 23 Dec 2020 23:38:34 +0100
-Message-Id: <20201223223841.11311-4-ardb@kernel.org>
+Subject: [RFC PATCH 02/10] crypto: x86/cast6 - switch to XTS template
+Date:   Wed, 23 Dec 2020 23:38:33 +0100
+Message-Id: <20201223223841.11311-3-ardb@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201223223841.11311-1-ardb@kernel.org>
 References: <20201223223841.11311-1-ardb@kernel.org>
@@ -54,329 +54,179 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 Now that the XTS template can wrap accelerated ECB modes, it can be
-used to implement Serpent in XTS mode as well, which turns out to
+used to implement CAST6 in XTS mode as well, which turns out to
 be at least as fast, and sometimes even faster
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/x86/crypto/serpent-avx-x86_64-asm_64.S |  48 ----------
- arch/x86/crypto/serpent-avx2-asm_64.S       |  62 ------------
- arch/x86/crypto/serpent_avx2_glue.c         |  72 --------------
- arch/x86/crypto/serpent_avx_glue.c          | 101 --------------------
- arch/x86/include/asm/crypto/serpent-avx.h   |  21 ----
- 5 files changed, 304 deletions(-)
+ arch/x86/crypto/cast6-avx-x86_64-asm_64.S | 56 -----------
+ arch/x86/crypto/cast6_avx_glue.c          | 98 --------------------
+ 2 files changed, 154 deletions(-)
 
-diff --git a/arch/x86/crypto/serpent-avx-x86_64-asm_64.S b/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
-index ba9e4c1e7f5c..6b41f46bcc76 100644
---- a/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
-+++ b/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
-@@ -18,10 +18,6 @@
+diff --git a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+index 932a3ce32a88..0c1ea836215a 100644
+--- a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+@@ -212,8 +212,6 @@
+ 
+ .section	.rodata.cst16, "aM", @progbits, 16
  .align 16
- .Lbswap128_mask:
- 	.byte 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
--.section	.rodata.cst16.xts_gf128mul_and_shl1_mask, "aM", @progbits, 16
--.align 16
 -.Lxts_gf128mul_and_shl1_mask:
 -	.byte 0x87, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0
- 
- .text
- 
-@@ -735,47 +731,3 @@ SYM_FUNC_START(serpent_ctr_8way_avx)
- 	FRAME_END
- 	ret;
- SYM_FUNC_END(serpent_ctr_8way_avx)
--
--SYM_FUNC_START(serpent_xts_enc_8way_avx)
--	/* input:
--	 *	%rdi: ctx, CTX
--	 *	%rsi: dst
--	 *	%rdx: src
--	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
--	 */
--	FRAME_BEGIN
--
--	/* regs <= src, dst <= IVs, regs <= regs xor IVs */
--	load_xts_8way(%rcx, %rdx, %rsi, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2,
--		      RK0, RK1, RK2, .Lxts_gf128mul_and_shl1_mask);
--
--	call __serpent_enc_blk8_avx;
--
--	/* dst <= regs xor IVs(in dst) */
--	store_xts_8way(%rsi, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
--
--	FRAME_END
--	ret;
--SYM_FUNC_END(serpent_xts_enc_8way_avx)
--
--SYM_FUNC_START(serpent_xts_dec_8way_avx)
--	/* input:
--	 *	%rdi: ctx, CTX
--	 *	%rsi: dst
--	 *	%rdx: src
--	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
--	 */
--	FRAME_BEGIN
--
--	/* regs <= src, dst <= IVs, regs <= regs xor IVs */
--	load_xts_8way(%rcx, %rdx, %rsi, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2,
--		      RK0, RK1, RK2, .Lxts_gf128mul_and_shl1_mask);
--
--	call __serpent_dec_blk8_avx;
--
--	/* dst <= regs xor IVs(in dst) */
--	store_xts_8way(%rsi, RC1, RD1, RB1, RE1, RC2, RD2, RB2, RE2);
--
--	FRAME_END
--	ret;
--SYM_FUNC_END(serpent_xts_dec_8way_avx)
-diff --git a/arch/x86/crypto/serpent-avx2-asm_64.S b/arch/x86/crypto/serpent-avx2-asm_64.S
-index c9648aeae705..a510a949f02f 100644
---- a/arch/x86/crypto/serpent-avx2-asm_64.S
-+++ b/arch/x86/crypto/serpent-avx2-asm_64.S
-@@ -20,16 +20,6 @@
+ .Lbswap_mask:
+ 	.byte 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12
  .Lbswap128_mask:
- 	.byte 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
- 
--.section	.rodata.cst16.xts_gf128mul_and_shl1_mask_0, "aM", @progbits, 16
--.align 16
--.Lxts_gf128mul_and_shl1_mask_0:
--	.byte 0x87, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0
--
--.section	.rodata.cst16.xts_gf128mul_and_shl1_mask_1, "aM", @progbits, 16
--.align 16
--.Lxts_gf128mul_and_shl1_mask_1:
--	.byte 0x0e, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0
--
- .text
- 
- #define CTX %rdi
-@@ -759,55 +749,3 @@ SYM_FUNC_START(serpent_ctr_16way)
+@@ -440,57 +438,3 @@ SYM_FUNC_START(cast6_ctr_8way)
  	FRAME_END
  	ret;
- SYM_FUNC_END(serpent_ctr_16way)
+ SYM_FUNC_END(cast6_ctr_8way)
 -
--SYM_FUNC_START(serpent_xts_enc_16way)
+-SYM_FUNC_START(cast6_xts_enc_8way)
 -	/* input:
 -	 *	%rdi: ctx, CTX
--	 *	%rsi: dst (16 blocks)
--	 *	%rdx: src (16 blocks)
+-	 *	%rsi: dst
+-	 *	%rdx: src
 -	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
 -	 */
 -	FRAME_BEGIN
+-	pushq %r15;
 -
--	vzeroupper;
+-	movq %rdi, CTX
+-	movq %rsi, %r11;
 -
--	load_xts_16way(%rcx, %rdx, %rsi, RA1, RB1, RC1, RD1, RA2, RB2, RC2,
--		       RD2, RK0, RK0x, RK1, RK1x, RK2, RK2x, RK3, RK3x, RNOT,
--		       .Lxts_gf128mul_and_shl1_mask_0,
--		       .Lxts_gf128mul_and_shl1_mask_1);
+-	/* regs <= src, dst <= IVs, regs <= regs xor IVs */
+-	load_xts_8way(%rcx, %rdx, %rsi, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2,
+-		      RX, RKR, RKM, .Lxts_gf128mul_and_shl1_mask);
 -
--	call __serpent_enc_blk16;
+-	call __cast6_enc_blk8;
 -
--	store_xts_16way(%rsi, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
+-	/* dst <= regs xor IVs(in dst) */
+-	store_xts_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
 -
--	vzeroupper;
--
+-	popq %r15;
 -	FRAME_END
 -	ret;
--SYM_FUNC_END(serpent_xts_enc_16way)
+-SYM_FUNC_END(cast6_xts_enc_8way)
 -
--SYM_FUNC_START(serpent_xts_dec_16way)
+-SYM_FUNC_START(cast6_xts_dec_8way)
 -	/* input:
 -	 *	%rdi: ctx, CTX
--	 *	%rsi: dst (16 blocks)
--	 *	%rdx: src (16 blocks)
+-	 *	%rsi: dst
+-	 *	%rdx: src
 -	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
 -	 */
 -	FRAME_BEGIN
+-	pushq %r15;
 -
--	vzeroupper;
+-	movq %rdi, CTX
+-	movq %rsi, %r11;
 -
--	load_xts_16way(%rcx, %rdx, %rsi, RA1, RB1, RC1, RD1, RA2, RB2, RC2,
--		       RD2, RK0, RK0x, RK1, RK1x, RK2, RK2x, RK3, RK3x, RNOT,
--		       .Lxts_gf128mul_and_shl1_mask_0,
--		       .Lxts_gf128mul_and_shl1_mask_1);
+-	/* regs <= src, dst <= IVs, regs <= regs xor IVs */
+-	load_xts_8way(%rcx, %rdx, %rsi, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2,
+-		      RX, RKR, RKM, .Lxts_gf128mul_and_shl1_mask);
 -
--	call __serpent_dec_blk16;
+-	call __cast6_dec_blk8;
 -
--	store_xts_16way(%rsi, RC1, RD1, RB1, RE1, RC2, RD2, RB2, RE2);
+-	/* dst <= regs xor IVs(in dst) */
+-	store_xts_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
 -
--	vzeroupper;
--
+-	popq %r15;
 -	FRAME_END
 -	ret;
--SYM_FUNC_END(serpent_xts_dec_16way)
-diff --git a/arch/x86/crypto/serpent_avx2_glue.c b/arch/x86/crypto/serpent_avx2_glue.c
-index f973ace44ad3..9cdf2c078e21 100644
---- a/arch/x86/crypto/serpent_avx2_glue.c
-+++ b/arch/x86/crypto/serpent_avx2_glue.c
-@@ -12,7 +12,6 @@
+-SYM_FUNC_END(cast6_xts_dec_8way)
+diff --git a/arch/x86/crypto/cast6_avx_glue.c b/arch/x86/crypto/cast6_avx_glue.c
+index 48e0f37796fa..5a21d3e9041c 100644
+--- a/arch/x86/crypto/cast6_avx_glue.c
++++ b/arch/x86/crypto/cast6_avx_glue.c
+@@ -15,7 +15,6 @@
  #include <crypto/algapi.h>
+ #include <crypto/cast6.h>
  #include <crypto/internal/simd.h>
- #include <crypto/serpent.h>
 -#include <crypto/xts.h>
  #include <asm/crypto/glue_helper.h>
- #include <asm/crypto/serpent-avx.h>
  
-@@ -25,11 +24,6 @@ asmlinkage void serpent_cbc_dec_16way(const void *ctx, u8 *dst, const u8 *src);
+ #define CAST6_PARALLEL_BLOCKS 8
+@@ -27,27 +26,12 @@ asmlinkage void cast6_cbc_dec_8way(const void *ctx, u8 *dst, const u8 *src);
+ asmlinkage void cast6_ctr_8way(const void *ctx, u8 *dst, const u8 *src,
+ 			       le128 *iv);
  
- asmlinkage void serpent_ctr_16way(const void *ctx, u8 *dst, const u8 *src,
- 				  le128 *iv);
--asmlinkage void serpent_xts_enc_16way(const void *ctx, u8 *dst, const u8 *src,
--				      le128 *iv);
--asmlinkage void serpent_xts_dec_16way(const void *ctx, u8 *dst, const u8 *src,
--				      le128 *iv);
+-asmlinkage void cast6_xts_enc_8way(const void *ctx, u8 *dst, const u8 *src,
+-				   le128 *iv);
+-asmlinkage void cast6_xts_dec_8way(const void *ctx, u8 *dst, const u8 *src,
+-				   le128 *iv);
 -
- static int serpent_setkey_skcipher(struct crypto_skcipher *tfm,
- 				   const u8 *key, unsigned int keylen)
+ static int cast6_setkey_skcipher(struct crypto_skcipher *tfm,
+ 				 const u8 *key, unsigned int keylen)
  {
-@@ -68,22 +62,6 @@ static const struct common_glue_ctx serpent_ctr = {
+ 	return cast6_setkey(&tfm->base, key, keylen);
+ }
+ 
+-static void cast6_xts_enc(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
+-{
+-	glue_xts_crypt_128bit_one(ctx, dst, src, iv, __cast6_encrypt);
+-}
+-
+-static void cast6_xts_dec(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
+-{
+-	glue_xts_crypt_128bit_one(ctx, dst, src, iv, __cast6_decrypt);
+-}
+-
+ static void cast6_crypt_ctr(const void *ctx, u8 *d, const u8 *s, le128 *iv)
+ {
+ 	be128 ctrblk;
+@@ -87,19 +71,6 @@ static const struct common_glue_ctx cast6_ctr = {
  	} }
  };
  
--static const struct common_glue_ctx serpent_enc_xts = {
--	.num_funcs = 3,
--	.fpu_blocks_limit = 8,
+-static const struct common_glue_ctx cast6_enc_xts = {
+-	.num_funcs = 2,
+-	.fpu_blocks_limit = CAST6_PARALLEL_BLOCKS,
 -
 -	.funcs = { {
--		.num_blocks = 16,
--		.fn_u = { .xts = serpent_xts_enc_16way }
--	}, {
--		.num_blocks = 8,
--		.fn_u = { .xts = serpent_xts_enc_8way_avx }
+-		.num_blocks = CAST6_PARALLEL_BLOCKS,
+-		.fn_u = { .xts = cast6_xts_enc_8way }
 -	}, {
 -		.num_blocks = 1,
--		.fn_u = { .xts = serpent_xts_enc }
+-		.fn_u = { .xts = cast6_xts_enc }
 -	} }
 -};
 -
- static const struct common_glue_ctx serpent_dec = {
- 	.num_funcs = 3,
- 	.fpu_blocks_limit = 8,
-@@ -116,22 +94,6 @@ static const struct common_glue_ctx serpent_dec_cbc = {
+ static const struct common_glue_ctx cast6_dec = {
+ 	.num_funcs = 2,
+ 	.fpu_blocks_limit = CAST6_PARALLEL_BLOCKS,
+@@ -126,19 +97,6 @@ static const struct common_glue_ctx cast6_dec_cbc = {
  	} }
  };
  
--static const struct common_glue_ctx serpent_dec_xts = {
--	.num_funcs = 3,
--	.fpu_blocks_limit = 8,
+-static const struct common_glue_ctx cast6_dec_xts = {
+-	.num_funcs = 2,
+-	.fpu_blocks_limit = CAST6_PARALLEL_BLOCKS,
 -
 -	.funcs = { {
--		.num_blocks = 16,
--		.fn_u = { .xts = serpent_xts_dec_16way }
--	}, {
--		.num_blocks = 8,
--		.fn_u = { .xts = serpent_xts_dec_8way_avx }
+-		.num_blocks = CAST6_PARALLEL_BLOCKS,
+-		.fn_u = { .xts = cast6_xts_dec_8way }
 -	}, {
 -		.num_blocks = 1,
--		.fn_u = { .xts = serpent_xts_dec }
+-		.fn_u = { .xts = cast6_xts_dec }
 -	} }
 -};
 -
  static int ecb_encrypt(struct skcipher_request *req)
  {
- 	return glue_ecb_req_128bit(&serpent_enc, req);
-@@ -157,26 +119,6 @@ static int ctr_crypt(struct skcipher_request *req)
- 	return glue_ctr_req_128bit(&serpent_ctr, req);
+ 	return glue_ecb_req_128bit(&cast6_enc, req);
+@@ -164,48 +122,6 @@ static int ctr_crypt(struct skcipher_request *req)
+ 	return glue_ctr_req_128bit(&cast6_ctr, req);
  }
  
--static int xts_encrypt(struct skcipher_request *req)
+-struct cast6_xts_ctx {
+-	struct cast6_ctx tweak_ctx;
+-	struct cast6_ctx crypt_ctx;
+-};
+-
+-static int xts_cast6_setkey(struct crypto_skcipher *tfm, const u8 *key,
+-			    unsigned int keylen)
 -{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct serpent_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
--
--	return glue_xts_req_128bit(&serpent_enc_xts, req,
--				   __serpent_encrypt, &ctx->tweak_ctx,
--				   &ctx->crypt_ctx, false);
--}
--
--static int xts_decrypt(struct skcipher_request *req)
--{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct serpent_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
--
--	return glue_xts_req_128bit(&serpent_dec_xts, req,
--				   __serpent_encrypt, &ctx->tweak_ctx,
--				   &ctx->crypt_ctx, true);
--}
--
- static struct skcipher_alg serpent_algs[] = {
- 	{
- 		.base.cra_name		= "__ecb(serpent)",
-@@ -220,20 +162,6 @@ static struct skcipher_alg serpent_algs[] = {
- 		.setkey			= serpent_setkey_skcipher,
- 		.encrypt		= ctr_crypt,
- 		.decrypt		= ctr_crypt,
--	}, {
--		.base.cra_name		= "__xts(serpent)",
--		.base.cra_driver_name	= "__xts-serpent-avx2",
--		.base.cra_priority	= 600,
--		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
--		.base.cra_blocksize	= SERPENT_BLOCK_SIZE,
--		.base.cra_ctxsize	= sizeof(struct serpent_xts_ctx),
--		.base.cra_module	= THIS_MODULE,
--		.min_keysize		= 2 * SERPENT_MIN_KEY_SIZE,
--		.max_keysize		= 2 * SERPENT_MAX_KEY_SIZE,
--		.ivsize			= SERPENT_BLOCK_SIZE,
--		.setkey			= xts_serpent_setkey,
--		.encrypt		= xts_encrypt,
--		.decrypt		= xts_decrypt,
- 	},
- };
- 
-diff --git a/arch/x86/crypto/serpent_avx_glue.c b/arch/x86/crypto/serpent_avx_glue.c
-index 7806d1cbe854..b17a08b57a91 100644
---- a/arch/x86/crypto/serpent_avx_glue.c
-+++ b/arch/x86/crypto/serpent_avx_glue.c
-@@ -15,7 +15,6 @@
- #include <crypto/algapi.h>
- #include <crypto/internal/simd.h>
- #include <crypto/serpent.h>
--#include <crypto/xts.h>
- #include <asm/crypto/glue_helper.h>
- #include <asm/crypto/serpent-avx.h>
- 
-@@ -36,14 +35,6 @@ asmlinkage void serpent_ctr_8way_avx(const void *ctx, u8 *dst, const u8 *src,
- 				     le128 *iv);
- EXPORT_SYMBOL_GPL(serpent_ctr_8way_avx);
- 
--asmlinkage void serpent_xts_enc_8way_avx(const void *ctx, u8 *dst,
--					 const u8 *src, le128 *iv);
--EXPORT_SYMBOL_GPL(serpent_xts_enc_8way_avx);
--
--asmlinkage void serpent_xts_dec_8way_avx(const void *ctx, u8 *dst,
--					 const u8 *src, le128 *iv);
--EXPORT_SYMBOL_GPL(serpent_xts_dec_8way_avx);
--
- void __serpent_crypt_ctr(const void *ctx, u8 *d, const u8 *s, le128 *iv)
- {
- 	be128 ctrblk;
-@@ -58,44 +49,12 @@ void __serpent_crypt_ctr(const void *ctx, u8 *d, const u8 *s, le128 *iv)
- }
- EXPORT_SYMBOL_GPL(__serpent_crypt_ctr);
- 
--void serpent_xts_enc(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
--{
--	glue_xts_crypt_128bit_one(ctx, dst, src, iv, __serpent_encrypt);
--}
--EXPORT_SYMBOL_GPL(serpent_xts_enc);
--
--void serpent_xts_dec(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
--{
--	glue_xts_crypt_128bit_one(ctx, dst, src, iv, __serpent_decrypt);
--}
--EXPORT_SYMBOL_GPL(serpent_xts_dec);
--
- static int serpent_setkey_skcipher(struct crypto_skcipher *tfm,
- 				   const u8 *key, unsigned int keylen)
- {
- 	return __serpent_setkey(crypto_skcipher_ctx(tfm), key, keylen);
- }
- 
--int xts_serpent_setkey(struct crypto_skcipher *tfm, const u8 *key,
--		       unsigned int keylen)
--{
--	struct serpent_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct cast6_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
 -	int err;
 -
 -	err = xts_verify_key(tfm, key, keylen);
@@ -384,144 +234,56 @@ index 7806d1cbe854..b17a08b57a91 100644
 -		return err;
 -
 -	/* first half of xts-key is for crypt */
--	err = __serpent_setkey(&ctx->crypt_ctx, key, keylen / 2);
+-	err = __cast6_setkey(&ctx->crypt_ctx, key, keylen / 2);
 -	if (err)
 -		return err;
 -
 -	/* second half of xts-key is for tweak */
--	return __serpent_setkey(&ctx->tweak_ctx, key + keylen / 2, keylen / 2);
+-	return __cast6_setkey(&ctx->tweak_ctx, key + keylen / 2, keylen / 2);
 -}
--EXPORT_SYMBOL_GPL(xts_serpent_setkey);
 -
- static const struct common_glue_ctx serpent_enc = {
- 	.num_funcs = 2,
- 	.fpu_blocks_limit = SERPENT_PARALLEL_BLOCKS,
-@@ -122,19 +81,6 @@ static const struct common_glue_ctx serpent_ctr = {
- 	} }
- };
- 
--static const struct common_glue_ctx serpent_enc_xts = {
--	.num_funcs = 2,
--	.fpu_blocks_limit = SERPENT_PARALLEL_BLOCKS,
--
--	.funcs = { {
--		.num_blocks = SERPENT_PARALLEL_BLOCKS,
--		.fn_u = { .xts = serpent_xts_enc_8way_avx }
--	}, {
--		.num_blocks = 1,
--		.fn_u = { .xts = serpent_xts_enc }
--	} }
--};
--
- static const struct common_glue_ctx serpent_dec = {
- 	.num_funcs = 2,
- 	.fpu_blocks_limit = SERPENT_PARALLEL_BLOCKS,
-@@ -161,19 +107,6 @@ static const struct common_glue_ctx serpent_dec_cbc = {
- 	} }
- };
- 
--static const struct common_glue_ctx serpent_dec_xts = {
--	.num_funcs = 2,
--	.fpu_blocks_limit = SERPENT_PARALLEL_BLOCKS,
--
--	.funcs = { {
--		.num_blocks = SERPENT_PARALLEL_BLOCKS,
--		.fn_u = { .xts = serpent_xts_dec_8way_avx }
--	}, {
--		.num_blocks = 1,
--		.fn_u = { .xts = serpent_xts_dec }
--	} }
--};
--
- static int ecb_encrypt(struct skcipher_request *req)
- {
- 	return glue_ecb_req_128bit(&serpent_enc, req);
-@@ -199,26 +132,6 @@ static int ctr_crypt(struct skcipher_request *req)
- 	return glue_ctr_req_128bit(&serpent_ctr, req);
- }
- 
 -static int xts_encrypt(struct skcipher_request *req)
 -{
 -	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct serpent_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct cast6_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
 -
--	return glue_xts_req_128bit(&serpent_enc_xts, req,
--				   __serpent_encrypt, &ctx->tweak_ctx,
--				   &ctx->crypt_ctx, false);
+-	return glue_xts_req_128bit(&cast6_enc_xts, req, __cast6_encrypt,
+-				   &ctx->tweak_ctx, &ctx->crypt_ctx, false);
 -}
 -
 -static int xts_decrypt(struct skcipher_request *req)
 -{
 -	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct serpent_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct cast6_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
 -
--	return glue_xts_req_128bit(&serpent_dec_xts, req,
--				   __serpent_encrypt, &ctx->tweak_ctx,
--				   &ctx->crypt_ctx, true);
+-	return glue_xts_req_128bit(&cast6_dec_xts, req, __cast6_encrypt,
+-				   &ctx->tweak_ctx, &ctx->crypt_ctx, true);
 -}
 -
- static struct skcipher_alg serpent_algs[] = {
+ static struct skcipher_alg cast6_algs[] = {
  	{
- 		.base.cra_name		= "__ecb(serpent)",
-@@ -262,20 +175,6 @@ static struct skcipher_alg serpent_algs[] = {
- 		.setkey			= serpent_setkey_skcipher,
+ 		.base.cra_name		= "__ecb(cast6)",
+@@ -249,20 +165,6 @@ static struct skcipher_alg cast6_algs[] = {
+ 		.setkey			= cast6_setkey_skcipher,
  		.encrypt		= ctr_crypt,
  		.decrypt		= ctr_crypt,
 -	}, {
--		.base.cra_name		= "__xts(serpent)",
--		.base.cra_driver_name	= "__xts-serpent-avx",
--		.base.cra_priority	= 500,
+-		.base.cra_name		= "__xts(cast6)",
+-		.base.cra_driver_name	= "__xts-cast6-avx",
+-		.base.cra_priority	= 200,
 -		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
--		.base.cra_blocksize	= SERPENT_BLOCK_SIZE,
--		.base.cra_ctxsize	= sizeof(struct serpent_xts_ctx),
+-		.base.cra_blocksize	= CAST6_BLOCK_SIZE,
+-		.base.cra_ctxsize	= sizeof(struct cast6_xts_ctx),
 -		.base.cra_module	= THIS_MODULE,
--		.min_keysize		= 2 * SERPENT_MIN_KEY_SIZE,
--		.max_keysize		= 2 * SERPENT_MAX_KEY_SIZE,
--		.ivsize			= SERPENT_BLOCK_SIZE,
--		.setkey			= xts_serpent_setkey,
+-		.min_keysize		= 2 * CAST6_MIN_KEY_SIZE,
+-		.max_keysize		= 2 * CAST6_MAX_KEY_SIZE,
+-		.ivsize			= CAST6_BLOCK_SIZE,
+-		.setkey			= xts_cast6_setkey,
 -		.encrypt		= xts_encrypt,
 -		.decrypt		= xts_decrypt,
  	},
  };
  
-diff --git a/arch/x86/include/asm/crypto/serpent-avx.h b/arch/x86/include/asm/crypto/serpent-avx.h
-index 251c2c89d7cf..23f3361a0e72 100644
---- a/arch/x86/include/asm/crypto/serpent-avx.h
-+++ b/arch/x86/include/asm/crypto/serpent-avx.h
-@@ -10,11 +10,6 @@ struct crypto_skcipher;
- 
- #define SERPENT_PARALLEL_BLOCKS 8
- 
--struct serpent_xts_ctx {
--	struct serpent_ctx tweak_ctx;
--	struct serpent_ctx crypt_ctx;
--};
--
- asmlinkage void serpent_ecb_enc_8way_avx(const void *ctx, u8 *dst,
- 					 const u8 *src);
- asmlinkage void serpent_ecb_dec_8way_avx(const void *ctx, u8 *dst,
-@@ -22,21 +17,5 @@ asmlinkage void serpent_ecb_dec_8way_avx(const void *ctx, u8 *dst,
- 
- asmlinkage void serpent_cbc_dec_8way_avx(const void *ctx, u8 *dst,
- 					 const u8 *src);
--asmlinkage void serpent_ctr_8way_avx(const void *ctx, u8 *dst, const u8 *src,
--				     le128 *iv);
--
--asmlinkage void serpent_xts_enc_8way_avx(const void *ctx, u8 *dst,
--					 const u8 *src, le128 *iv);
--asmlinkage void serpent_xts_dec_8way_avx(const void *ctx, u8 *dst,
--					 const u8 *src, le128 *iv);
--
--extern void __serpent_crypt_ctr(const void *ctx, u8 *dst, const u8 *src,
--				le128 *iv);
--
--extern void serpent_xts_enc(const void *ctx, u8 *dst, const u8 *src, le128 *iv);
--extern void serpent_xts_dec(const void *ctx, u8 *dst, const u8 *src, le128 *iv);
--
--extern int xts_serpent_setkey(struct crypto_skcipher *tfm, const u8 *key,
--			      unsigned int keylen);
- 
- #endif
 -- 
 2.17.1
 
