@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F4DC432C3
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 02:46:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AAE4C4321A
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 03:00:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DE78F229CA
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 02:46:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16DAE206F6
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 03:00:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729659AbgLWCWY (ORCPT
+        id S1731391AbgLWC7u (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Dec 2020 21:22:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:49802 "EHLO mail.kernel.org"
+        Tue, 22 Dec 2020 21:59:50 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45490 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729653AbgLWCWY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Dec 2020 21:22:24 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 58D1A2333F;
-        Wed, 23 Dec 2020 02:22:07 +0000 (UTC)
+        id S1728855AbgLWCUE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Dec 2020 21:20:04 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1AE3A22248;
+        Wed, 23 Dec 2020 02:19:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608690128;
-        bh=qgR2+42IlfG0tj6SzNlTxnZI4Uj/FSO1TGXLktEoijA=;
+        s=k20201202; t=1608689987;
+        bh=iZ9EnPp4I+VsiV/fkq4x3HqWHGBcJbtlzoXdQQkJY/o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FGSGWMuB0si4Dhp3G9/KFCvzaLI8xA2AgGATR/rS3xyAtS0m0gtf5UYXzUzKi9BeL
-         Z+RYKzJgLnTNukfwklDMFne4N/+KAX5rcFcSwb8qeNgyzf24OLg96SwUAIdyb4aY00
-         2XsRW7SZf3AAoPAwX5C+e7aM1DnddIGd6mIA830q/Zeg/OUWzlB0mBia6limz9tvNl
-         MAMGyIESHGjG5VPjBxbzfZAEv8Vx2mXIThjGAkTMKslJ3n1mPmsSXQVY5XsBJi/D/v
-         6LbJxxzdhB2fZ4KMro4ajhvtsFrPIdEvi+HAGbYNBCUk8HrO2wsQjdfFntfX0tcmX4
-         DBB8ifJmpCLew==
+        b=tyxqFqurXB1hMqxcqg7JUDnyhCzndFmeOBfRaO4dBR5NQ0+qYvHGNEDwK+qqErCiO
+         IDSfy4nPfgn9fJarMWKZJCIpHTwwIdGAC5aCU6BkmT3OrCuDXj/AOxuK4E+BYu9V1Q
+         5q3FVtiXvdmHLMBd7PWg9PgD0d7YzxVZJyCuMmCGVcDJHXc6jiWW6bh1extupU2nlP
+         UQ/gbY84m+ndWHWEMhCyWwGwGSgxRYqEWP3/E+XxSNlWp0GoZKiKgA1J//JZSpV+bf
+         hb6VPu1pV0U8PxunbLpXjcRbfzl7ob3XLd+cyQDfqIgQFmuZlAQwWbHyS2hNL2hWTM
+         NVVnPYCBkdveg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Thara Gopinath <thara.gopinath@linaro.org>,
         Bjorn Andersson <bjorn.andersson@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 52/87] crypto: qce - Fix SHA result buffer corruption issues
-Date:   Tue, 22 Dec 2020 21:20:28 -0500
-Message-Id: <20201223022103.2792705-52-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 073/130] crypto: qce - Fix SHA result buffer corruption issues
+Date:   Tue, 22 Dec 2020 21:17:16 -0500
+Message-Id: <20201223021813.2791612-73-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20201223022103.2792705-1-sashal@kernel.org>
-References: <20201223022103.2792705-1-sashal@kernel.org>
+In-Reply-To: <20201223021813.2791612-1-sashal@kernel.org>
+References: <20201223021813.2791612-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -71,10 +71,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-index d8a5db11b7ea1..49e29cb6d5b8d 100644
+index 0853e74583ade..981957e9db592 100644
 --- a/drivers/crypto/qce/sha.c
 +++ b/drivers/crypto/qce/sha.c
-@@ -55,7 +55,7 @@ static void qce_ahash_done(void *data)
+@@ -47,7 +47,7 @@ static void qce_ahash_done(void *data)
  	dma_unmap_sg(qce->dev, &rctx->result_sg, 1, DMA_FROM_DEVICE);
  
  	memcpy(rctx->digest, result->auth_iv, digestsize);
