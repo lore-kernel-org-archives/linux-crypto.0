@@ -4,50 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 794D4C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 09:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52658C433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 09:07:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A9F1224B1
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 09:06:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F11E207CD
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 09:07:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727920AbgLWJG5 (ORCPT
+        id S1727890AbgLWJHi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Dec 2020 04:06:57 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60678 "EHLO mail.kernel.org"
+        Wed, 23 Dec 2020 04:07:38 -0500
+Received: from mail.kernel.org ([198.145.29.99]:32872 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727892AbgLWJG4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Dec 2020 04:06:56 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E3EFE224B2
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Dec 2020 09:06:14 +0000 (UTC)
+        id S1727940AbgLWJHh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Dec 2020 04:07:37 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 41477207CD
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Dec 2020 09:06:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608714375;
-        bh=QK/D8jxuf6TshbGxawA6XrpG9KtXV6TnDe0bbsncAk4=;
+        s=k20201202; t=1608714416;
+        bh=02kZNEDLbTf74ZQw5TBK/SmUg9cNEWO6F2RbmGNGwBM=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=m8KEZ34efuQvPyd/B7jm+261MmZghrx+hcq/6tpYbm0ej9oQ2sOuiPmKme2dXh8b+
-         oCbtbP3HqRk51/zPfOC6qYUu2b1h/8XCD05x3GWPrsFZqgsoPvqABot0RsBDD9nuxI
-         p//j3imit9ue6oQMZbMU4u0bCP9W/nbtYJCc1WiPysGhJepNRPjXvpRsKz6WKTsxCk
-         dEaWtLr4Sa7Vr5Nv+8K6KxETGhJ3dbo7juEjc+JtDT+iHX35aM3rSOkNLJBM5ZeB/3
-         tTVjEaNIuR2/VVI5ZwFRSavB/lt4ZzkO+GD5ZUee8a/akkgPAofl0CC+z5EJFU8MaV
-         lHqw5qzE2oSIA==
-Received: by mail-oi1-f177.google.com with SMTP id s75so17644237oih.1
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Dec 2020 01:06:14 -0800 (PST)
-X-Gm-Message-State: AOAM5339bq2+2Kf6dOtSEZIF/b9SNedrS4X8gjqRgJLjh0zogj8JzfRf
-        Lg5uuNN3abAbaoSP7Dd0ymc43IqFluE/YXNIO/8=
-X-Google-Smtp-Source: ABdhPJxfY76iLDMdbOz8EFaECtFcdreKw4xieCVF+vec8uPxXDTRksAo/UUwhJFC4sD03EZXLTTEhfUhzqnt8KAWjr8=
-X-Received: by 2002:aca:d98a:: with SMTP id q132mr17137548oig.33.1608714374072;
- Wed, 23 Dec 2020 01:06:14 -0800 (PST)
+        b=a1MCjmYXdDSsDJ6jRro/zmoZuTe6vOW2tGs56MX5hh7ccLgI+RUXpO5gr9R1Ekg7x
+         baa90kLzrw6KEQdxov3AoXS6kTRkC9LrcP/HMDsm2dSO4G3op8rDnZ92IGzHVE3dKe
+         kKFOgf1Xlay5yWO63Pf7OFYoGElRce358vLy3WcqNmmZEpqxlKsZNddVW46Pr0fc/n
+         tn2KW4X+Hr0sNPjztMBvSt2w7nxdlLP54PqfOrvyNntNhWjbW41oWsZgQtLmula49M
+         W+kZSGEQVQYzLMVg1YupcEkLTc/fnca3aPSKOC7V3YO9fI0yN1tVY0LlJbxBZAOeV7
+         ZWYnkVpQm/8zg==
+Received: by mail-oi1-f181.google.com with SMTP id s75so17645749oih.1
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Dec 2020 01:06:56 -0800 (PST)
+X-Gm-Message-State: AOAM533htf7wK/VFouF6ggdWK39ybHvdvwBfHz6mNZv+K6Hk527BA+E4
+        /nZoIJPBSwq1GL1uDEmIBfkRLBu+103CYPIiD/M=
+X-Google-Smtp-Source: ABdhPJwFARdFj4DHOSqQciQ/rfbHNVXlyqoEVwJUueo5le+jj+/LCMSeHJ+yyoTTfTCFBGgFpHxXNXIChfq3O9tCENQ=
+X-Received: by 2002:aca:dd03:: with SMTP id u3mr17297513oig.47.1608714415591;
+ Wed, 23 Dec 2020 01:06:55 -0800 (PST)
 MIME-Version: 1.0
-References: <20201223081003.373663-1-ebiggers@kernel.org> <20201223081003.373663-6-ebiggers@kernel.org>
-In-Reply-To: <20201223081003.373663-6-ebiggers@kernel.org>
+References: <20201223081003.373663-1-ebiggers@kernel.org> <20201223081003.373663-7-ebiggers@kernel.org>
+In-Reply-To: <20201223081003.373663-7-ebiggers@kernel.org>
 From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 23 Dec 2020 10:06:03 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXEuoyBqExDiM3pssLhSwpTnE_3QV8_9eVVXwOYkYsimQQ@mail.gmail.com>
-Message-ID: <CAMj1kXEuoyBqExDiM3pssLhSwpTnE_3QV8_9eVVXwOYkYsimQQ@mail.gmail.com>
-Subject: Re: [PATCH v3 05/14] crypto: blake2s - share the "shash" API
- boilerplate code
+Date:   Wed, 23 Dec 2020 10:06:44 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXECQh_U+N2XqUdijy+rAfX035DWH+23ZBb7g49b8mdPog@mail.gmail.com>
+Message-ID: <CAMj1kXECQh_U+N2XqUdijy+rAfX035DWH+23ZBb7g49b8mdPog@mail.gmail.com>
+Subject: Re: [PATCH v3 06/14] crypto: blake2s - optimize blake2s initialization
 To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Linux ARM <linux-arm-kernel@lists.infradead.org>,
@@ -64,333 +63,132 @@ On Wed, 23 Dec 2020 at 09:12, Eric Biggers <ebiggers@kernel.org> wrote:
 >
 > From: Eric Biggers <ebiggers@google.com>
 >
-> Add helper functions for shash implementations of BLAKE2s to
-> include/crypto/internal/blake2s.h, taking advantage of
-> __blake2s_update() and __blake2s_final() that were added by the previous
-> patch to share more code between the library and shash implementations.
+> If no key was provided, then don't waste time initializing the block
+> buffer, as its initial contents won't be used.
 >
-> crypto_blake2s_setkey() and crypto_blake2s_init() are usable as
-> shash_alg::setkey and shash_alg::init directly, while
-> crypto_blake2s_update() and crypto_blake2s_final() take an extra
-> 'blake2s_compress_t' function pointer parameter.  This allows the
-> implementation of the compression function to be overridden, which is
-> the only part that optimized implementations really care about.
+> Also, make crypto_blake2s_init() and blake2s() call a single internal
+> function __blake2s_init() which treats the key as optional, rather than
+> conditionally calling blake2s_init() or blake2s_init_key().  This
+> reduces the compiled code size, as previously both blake2s_init() and
+> blake2s_init_key() were being inlined into these two callers, except
+> when the key size passed to blake2s() was a compile-time constant.
 >
-> The new functions are inline functions (similar to those in sha1_base.h,
-> sha256_base.h, and sm3_base.h) because this avoids needing to add a new
-> module blake2s_helpers.ko, they aren't *too* long, and this avoids
-> indirect calls which are expensive these days.  Note that they can't go
-> in blake2s_generic.ko, as that would require selecting CRYPTO_BLAKE2S
-> from CRYPTO_BLAKE2S_X86, which would cause a recursive dependency.
->
-> Finally, use these new helper functions in the x86 implementation of
-> BLAKE2s.  (This part should be a separate patch, but unfortunately the
-> x86 implementation used the exact same function names like
-> "crypto_blake2s_update()", so it had to be updated at the same time.)
+> These optimizations aren't that significant for BLAKE2s.  However, the
+> equivalent optimizations will be more significant for BLAKE2b, as
+> everything is twice as big in BLAKE2b.  And it's good to keep things
+> consistent rather than making optimizations for BLAKE2b but not BLAKE2s.
 >
 > Signed-off-by: Eric Biggers <ebiggers@google.com>
 
 Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
 > ---
->  arch/x86/crypto/blake2s-glue.c    | 74 +++---------------------------
->  crypto/blake2s_generic.c          | 76 ++++---------------------------
->  include/crypto/internal/blake2s.h | 65 ++++++++++++++++++++++++--
->  3 files changed, 76 insertions(+), 139 deletions(-)
+>  include/crypto/blake2s.h          | 53 ++++++++++++++++---------------
+>  include/crypto/internal/blake2s.h |  5 +--
+>  2 files changed, 28 insertions(+), 30 deletions(-)
 >
-> diff --git a/arch/x86/crypto/blake2s-glue.c b/arch/x86/crypto/blake2s-glue.c
-> index 4dcb2ee89efc9..a40365ab301ee 100644
-> --- a/arch/x86/crypto/blake2s-glue.c
-> +++ b/arch/x86/crypto/blake2s-glue.c
-> @@ -58,75 +58,15 @@ void blake2s_compress_arch(struct blake2s_state *state,
->  }
->  EXPORT_SYMBOL(blake2s_compress_arch);
+> diff --git a/include/crypto/blake2s.h b/include/crypto/blake2s.h
+> index b471deac28ff8..734ed22b7a6aa 100644
+> --- a/include/crypto/blake2s.h
+> +++ b/include/crypto/blake2s.h
+> @@ -43,29 +43,34 @@ enum blake2s_iv {
+>         BLAKE2S_IV7 = 0x5BE0CD19UL,
+>  };
 >
-> -static int crypto_blake2s_setkey(struct crypto_shash *tfm, const u8 *key,
-> -                                unsigned int keylen)
-> +static int crypto_blake2s_update_x86(struct shash_desc *desc,
-> +                                    const u8 *in, unsigned int inlen)
+> -void blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen);
+> -void blake2s_final(struct blake2s_state *state, u8 *out);
+> -
+> -static inline void blake2s_init_param(struct blake2s_state *state,
+> -                                     const u32 param)
+> +static inline void __blake2s_init(struct blake2s_state *state, size_t outlen,
+> +                                 const void *key, size_t keylen)
 >  {
-> -       struct blake2s_tfm_ctx *tctx = crypto_shash_ctx(tfm);
-> -
-> -       if (keylen == 0 || keylen > BLAKE2S_KEY_SIZE)
-> -               return -EINVAL;
-> -
-> -       memcpy(tctx->key, key, keylen);
-> -       tctx->keylen = keylen;
-> -
-> -       return 0;
-> -}
-> -
-> -static int crypto_blake2s_init(struct shash_desc *desc)
-> -{
-> -       struct blake2s_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
-> -       struct blake2s_state *state = shash_desc_ctx(desc);
-> -       const int outlen = crypto_shash_digestsize(desc->tfm);
-> -
-> -       if (tctx->keylen)
-> -               blake2s_init_key(state, outlen, tctx->key, tctx->keylen);
+> -       *state = (struct blake2s_state){{
+> -               BLAKE2S_IV0 ^ param,
+> -               BLAKE2S_IV1,
+> -               BLAKE2S_IV2,
+> -               BLAKE2S_IV3,
+> -               BLAKE2S_IV4,
+> -               BLAKE2S_IV5,
+> -               BLAKE2S_IV6,
+> -               BLAKE2S_IV7,
+> -       }};
+> +       state->h[0] = BLAKE2S_IV0 ^ (0x01010000 | keylen << 8 | outlen);
+> +       state->h[1] = BLAKE2S_IV1;
+> +       state->h[2] = BLAKE2S_IV2;
+> +       state->h[3] = BLAKE2S_IV3;
+> +       state->h[4] = BLAKE2S_IV4;
+> +       state->h[5] = BLAKE2S_IV5;
+> +       state->h[6] = BLAKE2S_IV6;
+> +       state->h[7] = BLAKE2S_IV7;
+> +       state->t[0] = 0;
+> +       state->t[1] = 0;
+> +       state->f[0] = 0;
+> +       state->f[1] = 0;
+> +       state->buflen = 0;
+> +       state->outlen = outlen;
+> +       if (keylen) {
+> +               memcpy(state->buf, key, keylen);
+> +               memset(&state->buf[keylen], 0, BLAKE2S_BLOCK_SIZE - keylen);
+> +               state->buflen = BLAKE2S_BLOCK_SIZE;
+> +       }
+>  }
+>
+>  static inline void blake2s_init(struct blake2s_state *state,
+>                                 const size_t outlen)
+>  {
+> -       blake2s_init_param(state, 0x01010000 | outlen);
+> -       state->outlen = outlen;
+> +       __blake2s_init(state, outlen, NULL, 0);
+>  }
+>
+>  static inline void blake2s_init_key(struct blake2s_state *state,
+> @@ -75,12 +80,12 @@ static inline void blake2s_init_key(struct blake2s_state *state,
+>         WARN_ON(IS_ENABLED(DEBUG) && (!outlen || outlen > BLAKE2S_HASH_SIZE ||
+>                 !key || !keylen || keylen > BLAKE2S_KEY_SIZE));
+>
+> -       blake2s_init_param(state, 0x01010000 | keylen << 8 | outlen);
+> -       memcpy(state->buf, key, keylen);
+> -       state->buflen = BLAKE2S_BLOCK_SIZE;
+> -       state->outlen = outlen;
+> +       __blake2s_init(state, outlen, key, keylen);
+>  }
+>
+> +void blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen);
+> +void blake2s_final(struct blake2s_state *state, u8 *out);
+> +
+>  static inline void blake2s(u8 *out, const u8 *in, const u8 *key,
+>                            const size_t outlen, const size_t inlen,
+>                            const size_t keylen)
+> @@ -91,11 +96,7 @@ static inline void blake2s(u8 *out, const u8 *in, const u8 *key,
+>                 outlen > BLAKE2S_HASH_SIZE || keylen > BLAKE2S_KEY_SIZE ||
+>                 (!key && keylen)));
+>
+> -       if (keylen)
+> -               blake2s_init_key(&state, outlen, key, keylen);
 > -       else
-> -               blake2s_init(state, outlen);
+> -               blake2s_init(&state, outlen);
 > -
-> -       return 0;
-> -}
-> -
-> -static int crypto_blake2s_update(struct shash_desc *desc, const u8 *in,
-> -                                unsigned int inlen)
-> -{
-> -       struct blake2s_state *state = shash_desc_ctx(desc);
-> -       const size_t fill = BLAKE2S_BLOCK_SIZE - state->buflen;
-> -
-> -       if (unlikely(!inlen))
-> -               return 0;
-> -       if (inlen > fill) {
-> -               memcpy(state->buf + state->buflen, in, fill);
-> -               blake2s_compress_arch(state, state->buf, 1, BLAKE2S_BLOCK_SIZE);
-> -               state->buflen = 0;
-> -               in += fill;
-> -               inlen -= fill;
-> -       }
-> -       if (inlen > BLAKE2S_BLOCK_SIZE) {
-> -               const size_t nblocks = DIV_ROUND_UP(inlen, BLAKE2S_BLOCK_SIZE);
-> -               /* Hash one less (full) block than strictly possible */
-> -               blake2s_compress_arch(state, in, nblocks - 1, BLAKE2S_BLOCK_SIZE);
-> -               in += BLAKE2S_BLOCK_SIZE * (nblocks - 1);
-> -               inlen -= BLAKE2S_BLOCK_SIZE * (nblocks - 1);
-> -       }
-> -       memcpy(state->buf + state->buflen, in, inlen);
-> -       state->buflen += inlen;
-> -
-> -       return 0;
-> +       return crypto_blake2s_update(desc, in, inlen, blake2s_compress_arch);
+> +       __blake2s_init(&state, outlen, key, keylen);
+>         blake2s_update(&state, in, inlen);
+>         blake2s_final(&state, out);
 >  }
->
-> -static int crypto_blake2s_final(struct shash_desc *desc, u8 *out)
-> +static int crypto_blake2s_final_x86(struct shash_desc *desc, u8 *out)
->  {
-> -       struct blake2s_state *state = shash_desc_ctx(desc);
-> -
-> -       blake2s_set_lastblock(state);
-> -       memset(state->buf + state->buflen, 0,
-> -              BLAKE2S_BLOCK_SIZE - state->buflen); /* Padding */
-> -       blake2s_compress_arch(state, state->buf, 1, state->buflen);
-> -       cpu_to_le32_array(state->h, ARRAY_SIZE(state->h));
-> -       memcpy(out, state->h, state->outlen);
-> -       memzero_explicit(state, sizeof(*state));
-> -
-> -       return 0;
-> +       return crypto_blake2s_final(desc, out, blake2s_compress_arch);
->  }
->
->  #define BLAKE2S_ALG(name, driver_name, digest_size)                    \
-> @@ -141,8 +81,8 @@ static int crypto_blake2s_final(struct shash_desc *desc, u8 *out)
->                 .digestsize             = digest_size,                  \
->                 .setkey                 = crypto_blake2s_setkey,        \
->                 .init                   = crypto_blake2s_init,          \
-> -               .update                 = crypto_blake2s_update,        \
-> -               .final                  = crypto_blake2s_final,         \
-> +               .update                 = crypto_blake2s_update_x86,    \
-> +               .final                  = crypto_blake2s_final_x86,     \
->                 .descsize               = sizeof(struct blake2s_state), \
->         }
->
-> diff --git a/crypto/blake2s_generic.c b/crypto/blake2s_generic.c
-> index b89536c3671cf..72fe480f9bd67 100644
-> --- a/crypto/blake2s_generic.c
-> +++ b/crypto/blake2s_generic.c
-> @@ -1,5 +1,7 @@
->  // SPDX-License-Identifier: GPL-2.0 OR MIT
->  /*
-> + * shash interface to the generic implementation of BLAKE2s
-> + *
->   * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
->   */
->
-> @@ -10,75 +12,15 @@
->  #include <linux/kernel.h>
->  #include <linux/module.h>
->
-> -static int crypto_blake2s_setkey(struct crypto_shash *tfm, const u8 *key,
-> -                                unsigned int keylen)
-> +static int crypto_blake2s_update_generic(struct shash_desc *desc,
-> +                                        const u8 *in, unsigned int inlen)
->  {
-> -       struct blake2s_tfm_ctx *tctx = crypto_shash_ctx(tfm);
-> -
-> -       if (keylen == 0 || keylen > BLAKE2S_KEY_SIZE)
-> -               return -EINVAL;
-> -
-> -       memcpy(tctx->key, key, keylen);
-> -       tctx->keylen = keylen;
-> -
-> -       return 0;
-> +       return crypto_blake2s_update(desc, in, inlen, blake2s_compress_generic);
->  }
->
-> -static int crypto_blake2s_init(struct shash_desc *desc)
-> +static int crypto_blake2s_final_generic(struct shash_desc *desc, u8 *out)
->  {
-> -       struct blake2s_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
-> -       struct blake2s_state *state = shash_desc_ctx(desc);
-> -       const int outlen = crypto_shash_digestsize(desc->tfm);
-> -
-> -       if (tctx->keylen)
-> -               blake2s_init_key(state, outlen, tctx->key, tctx->keylen);
-> -       else
-> -               blake2s_init(state, outlen);
-> -
-> -       return 0;
-> -}
-> -
-> -static int crypto_blake2s_update(struct shash_desc *desc, const u8 *in,
-> -                                unsigned int inlen)
-> -{
-> -       struct blake2s_state *state = shash_desc_ctx(desc);
-> -       const size_t fill = BLAKE2S_BLOCK_SIZE - state->buflen;
-> -
-> -       if (unlikely(!inlen))
-> -               return 0;
-> -       if (inlen > fill) {
-> -               memcpy(state->buf + state->buflen, in, fill);
-> -               blake2s_compress_generic(state, state->buf, 1, BLAKE2S_BLOCK_SIZE);
-> -               state->buflen = 0;
-> -               in += fill;
-> -               inlen -= fill;
-> -       }
-> -       if (inlen > BLAKE2S_BLOCK_SIZE) {
-> -               const size_t nblocks = DIV_ROUND_UP(inlen, BLAKE2S_BLOCK_SIZE);
-> -               /* Hash one less (full) block than strictly possible */
-> -               blake2s_compress_generic(state, in, nblocks - 1, BLAKE2S_BLOCK_SIZE);
-> -               in += BLAKE2S_BLOCK_SIZE * (nblocks - 1);
-> -               inlen -= BLAKE2S_BLOCK_SIZE * (nblocks - 1);
-> -       }
-> -       memcpy(state->buf + state->buflen, in, inlen);
-> -       state->buflen += inlen;
-> -
-> -       return 0;
-> -}
-> -
-> -static int crypto_blake2s_final(struct shash_desc *desc, u8 *out)
-> -{
-> -       struct blake2s_state *state = shash_desc_ctx(desc);
-> -
-> -       blake2s_set_lastblock(state);
-> -       memset(state->buf + state->buflen, 0,
-> -              BLAKE2S_BLOCK_SIZE - state->buflen); /* Padding */
-> -       blake2s_compress_generic(state, state->buf, 1, state->buflen);
-> -       cpu_to_le32_array(state->h, ARRAY_SIZE(state->h));
-> -       memcpy(out, state->h, state->outlen);
-> -       memzero_explicit(state, sizeof(*state));
-> -
-> -       return 0;
-> +       return crypto_blake2s_final(desc, out, blake2s_compress_generic);
->  }
->
->  #define BLAKE2S_ALG(name, driver_name, digest_size)                    \
-> @@ -93,8 +35,8 @@ static int crypto_blake2s_final(struct shash_desc *desc, u8 *out)
->                 .digestsize             = digest_size,                  \
->                 .setkey                 = crypto_blake2s_setkey,        \
->                 .init                   = crypto_blake2s_init,          \
-> -               .update                 = crypto_blake2s_update,        \
-> -               .final                  = crypto_blake2s_final,         \
-> +               .update                 = crypto_blake2s_update_generic, \
-> +               .final                  = crypto_blake2s_final_generic, \
->                 .descsize               = sizeof(struct blake2s_state), \
->         }
->
 > diff --git a/include/crypto/internal/blake2s.h b/include/crypto/internal/blake2s.h
-> index 42deba4b8ceef..2ea0a8f5e7f41 100644
+> index 2ea0a8f5e7f41..867ef3753f5c1 100644
 > --- a/include/crypto/internal/blake2s.h
 > +++ b/include/crypto/internal/blake2s.h
-> @@ -1,16 +1,16 @@
->  /* SPDX-License-Identifier: GPL-2.0 OR MIT */
-> +/*
-> + * Helper functions for BLAKE2s implementations.
-> + * Keep this in sync with the corresponding BLAKE2b header.
-> + */
+> @@ -93,10 +93,7 @@ static inline int crypto_blake2s_init(struct shash_desc *desc)
+>         struct blake2s_state *state = shash_desc_ctx(desc);
+>         unsigned int outlen = crypto_shash_digestsize(desc->tfm);
 >
->  #ifndef BLAKE2S_INTERNAL_H
->  #define BLAKE2S_INTERNAL_H
->
->  #include <crypto/blake2s.h>
-> +#include <crypto/internal/hash.h>
->  #include <linux/string.h>
->
-> -struct blake2s_tfm_ctx {
-> -       u8 key[BLAKE2S_KEY_SIZE];
-> -       unsigned int keylen;
-> -};
-> -
->  void blake2s_compress_generic(struct blake2s_state *state,const u8 *block,
->                               size_t nblocks, const u32 inc);
->
-> @@ -27,6 +27,8 @@ static inline void blake2s_set_lastblock(struct blake2s_state *state)
->  typedef void (*blake2s_compress_t)(struct blake2s_state *state,
->                                    const u8 *block, size_t nblocks, u32 inc);
->
-> +/* Helper functions for BLAKE2s shared by the library and shash APIs */
-> +
->  static inline void __blake2s_update(struct blake2s_state *state,
->                                     const u8 *in, size_t inlen,
->                                     blake2s_compress_t compress)
-> @@ -64,4 +66,57 @@ static inline void __blake2s_final(struct blake2s_state *state, u8 *out,
->         memcpy(out, state->h, state->outlen);
+> -       if (tctx->keylen)
+> -               blake2s_init_key(state, outlen, tctx->key, tctx->keylen);
+> -       else
+> -               blake2s_init(state, outlen);
+> +       __blake2s_init(state, outlen, tctx->key, tctx->keylen);
+>         return 0;
 >  }
 >
-> +/* Helper functions for shash implementations of BLAKE2s */
-> +
-> +struct blake2s_tfm_ctx {
-> +       u8 key[BLAKE2S_KEY_SIZE];
-> +       unsigned int keylen;
-> +};
-> +
-> +static inline int crypto_blake2s_setkey(struct crypto_shash *tfm,
-> +                                       const u8 *key, unsigned int keylen)
-> +{
-> +       struct blake2s_tfm_ctx *tctx = crypto_shash_ctx(tfm);
-> +
-> +       if (keylen == 0 || keylen > BLAKE2S_KEY_SIZE)
-> +               return -EINVAL;
-> +
-> +       memcpy(tctx->key, key, keylen);
-> +       tctx->keylen = keylen;
-> +
-> +       return 0;
-> +}
-> +
-> +static inline int crypto_blake2s_init(struct shash_desc *desc)
-> +{
-> +       const struct blake2s_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
-> +       struct blake2s_state *state = shash_desc_ctx(desc);
-> +       unsigned int outlen = crypto_shash_digestsize(desc->tfm);
-> +
-> +       if (tctx->keylen)
-> +               blake2s_init_key(state, outlen, tctx->key, tctx->keylen);
-> +       else
-> +               blake2s_init(state, outlen);
-> +       return 0;
-> +}
-> +
-> +static inline int crypto_blake2s_update(struct shash_desc *desc,
-> +                                       const u8 *in, unsigned int inlen,
-> +                                       blake2s_compress_t compress)
-> +{
-> +       struct blake2s_state *state = shash_desc_ctx(desc);
-> +
-> +       __blake2s_update(state, in, inlen, compress);
-> +       return 0;
-> +}
-> +
-> +static inline int crypto_blake2s_final(struct shash_desc *desc, u8 *out,
-> +                                      blake2s_compress_t compress)
-> +{
-> +       struct blake2s_state *state = shash_desc_ctx(desc);
-> +
-> +       __blake2s_final(state, out, compress);
-> +       return 0;
-> +}
-> +
->  #endif /* BLAKE2S_INTERNAL_H */
 > --
 > 2.29.2
 >
