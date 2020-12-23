@@ -7,31 +7,31 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27A45C433DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F0AC433E0
 	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 22:40:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF35F22571
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 22:40:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63CB622571
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 22:40:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726530AbgLWWkX (ORCPT
+        id S1725811AbgLWWkX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Wed, 23 Dec 2020 17:40:23 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59402 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:59400 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725811AbgLWWkX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726591AbgLWWkX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 23 Dec 2020 17:40:23 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A5C1C22518;
-        Wed, 23 Dec 2020 22:39:13 +0000 (UTC)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 0974C22510;
+        Wed, 23 Dec 2020 22:39:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608763155;
-        bh=RUgBlIROaaqZhVgN/VwC3vztdcDyoElX7C8viwgVp44=;
+        s=k20201202; t=1608763153;
+        bh=14o9YbGSg6kKuggE5LC/FoWcSIxH5Bif4kRBr566cLk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=M9jY/3mFy9hco+GNY4LoiBDunjTR8YIWsfHBFpebYSwvCTuk/0BnwZFsMXbm85QR9
-         ZkMcmYjiUWji2yUB3jSB+GPAvQSpyWngQPM+C612XuZu+c/JqzdvB7cVzIg1llvMAN
-         Css3NNjxu6NIzc5Few3jR2bQdUHvzk5Lx57Qo04/U2ytgtYlo6NhtsoLvY3HDrnv3E
-         vXo+EDgG6P/J9oUmo5LifH+wLCzu3NYBSgES7RuN75qujlOYxuIhKpwz79jtDCQ7+l
-         DaZmSc3kXkdkLyhQv2ZAfX3isc+BA8AVyLhELxMXnlu5ybk1XqXUtaX+G+94wPCeSk
-         pYmfCtL4749Mw==
+        b=lXmfQ95iBX+rwMbFRw6UUKsirChhuasNHk4hct3i1pgH74eC3KazJigxAbponltA/
+         rzY8LFdvZTyBNLyU5iZ8lBxuovbzOWnBQcUx/Ol+Jqayu0nwoys51Dq3W8lviFb8v+
+         7uv+Z5XgtuvqbPzWB5wOW/8zCSYd/TF4jIiA1KnrQyptjpM56A3I7x9TJ4jtPxbRnV
+         0Jkti9IS1rSbyuJnuLeDFlaO5aifYBRhJAX8J5hLm6iqb9GXPwIV3YXo6SQKqlITi5
+         bPTVA19W8rID56ZuGsqhUv98UWW5BO/XNp+4AlGJfLA6B3MWi/sZKK08yoosAI4jMF
+         3nTp/03Bz4dyw==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     dm-devel@redhat.com, Ard Biesheuvel <ardb@kernel.org>,
@@ -40,9 +40,9 @@ Cc:     dm-devel@redhat.com, Ard Biesheuvel <ardb@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Milan Broz <gmazyland@gmail.com>,
         Mike Snitzer <snitzer@redhat.com>
-Subject: [RFC PATCH 06/10] crypto: x86/camellia - drop CTR mode implementation
-Date:   Wed, 23 Dec 2020 23:38:37 +0100
-Message-Id: <20201223223841.11311-7-ardb@kernel.org>
+Subject: [RFC PATCH 05/10] crypto: x86/glue-helper - drop XTS helper routines
+Date:   Wed, 23 Dec 2020 23:38:36 +0100
+Message-Id: <20201223223841.11311-6-ardb@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201223223841.11311-1-ardb@kernel.org>
 References: <20201223223841.11311-1-ardb@kernel.org>
@@ -50,580 +50,376 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Camellia in CTR mode is never used by the kernel directly, and is highly
-unlikely to be relied upon by dm-crypt or algif_skcipher. So let's drop
-the accelerated CTR mode implementation, and instead, rely on the CTR
-template and the bare cipher.
+The glue helper's XTS routines are no longer used, so drop them.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/x86/crypto/camellia-aesni-avx-asm_64.S  | 117 ----------------
- arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 144 --------------------
- arch/x86/crypto/camellia_aesni_avx2_glue.c   |  41 ------
- arch/x86/crypto/camellia_aesni_avx_glue.c    |  40 ------
- arch/x86/crypto/camellia_glue.c              |  68 ---------
- arch/x86/include/asm/crypto/camellia.h       |   6 -
- 6 files changed, 416 deletions(-)
+ arch/x86/crypto/glue_helper-asm-avx.S     |  59 --------
+ arch/x86/crypto/glue_helper-asm-avx2.S    |  78 ----------
+ arch/x86/crypto/glue_helper.c             | 154 --------------------
+ arch/x86/include/asm/crypto/glue_helper.h |  12 --
+ 4 files changed, 303 deletions(-)
 
-diff --git a/arch/x86/crypto/camellia-aesni-avx-asm_64.S b/arch/x86/crypto/camellia-aesni-avx-asm_64.S
-index 1e0383a84247..ccac3822f4ea 100644
---- a/arch/x86/crypto/camellia-aesni-avx-asm_64.S
-+++ b/arch/x86/crypto/camellia-aesni-avx-asm_64.S
-@@ -589,10 +589,6 @@ SYM_FUNC_END(roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
- 	.long 0x80808080
- 	.long 0x80808080
+diff --git a/arch/x86/crypto/glue_helper-asm-avx.S b/arch/x86/crypto/glue_helper-asm-avx.S
+index d08fc575ef7f..a94511432803 100644
+--- a/arch/x86/crypto/glue_helper-asm-avx.S
++++ b/arch/x86/crypto/glue_helper-asm-avx.S
+@@ -79,62 +79,3 @@
+ 	vpxor (6*16)(src), x6, x6; \
+ 	vpxor (7*16)(src), x7, x7; \
+ 	store_8way(dst, x0, x1, x2, x3, x4, x5, x6, x7);
+-
+-#define gf128mul_x_ble(iv, mask, tmp) \
+-	vpsrad $31, iv, tmp; \
+-	vpaddq iv, iv, iv; \
+-	vpshufd $0x13, tmp, tmp; \
+-	vpand mask, tmp, tmp; \
+-	vpxor tmp, iv, iv;
+-
+-#define load_xts_8way(iv, src, dst, x0, x1, x2, x3, x4, x5, x6, x7, tiv, t0, \
+-		      t1, xts_gf128mul_and_shl1_mask) \
+-	vmovdqa xts_gf128mul_and_shl1_mask, t0; \
+-	\
+-	/* load IV */ \
+-	vmovdqu (iv), tiv; \
+-	vpxor (0*16)(src), tiv, x0; \
+-	vmovdqu tiv, (0*16)(dst); \
+-	\
+-	/* construct and store IVs, also xor with source */ \
+-	gf128mul_x_ble(tiv, t0, t1); \
+-	vpxor (1*16)(src), tiv, x1; \
+-	vmovdqu tiv, (1*16)(dst); \
+-	\
+-	gf128mul_x_ble(tiv, t0, t1); \
+-	vpxor (2*16)(src), tiv, x2; \
+-	vmovdqu tiv, (2*16)(dst); \
+-	\
+-	gf128mul_x_ble(tiv, t0, t1); \
+-	vpxor (3*16)(src), tiv, x3; \
+-	vmovdqu tiv, (3*16)(dst); \
+-	\
+-	gf128mul_x_ble(tiv, t0, t1); \
+-	vpxor (4*16)(src), tiv, x4; \
+-	vmovdqu tiv, (4*16)(dst); \
+-	\
+-	gf128mul_x_ble(tiv, t0, t1); \
+-	vpxor (5*16)(src), tiv, x5; \
+-	vmovdqu tiv, (5*16)(dst); \
+-	\
+-	gf128mul_x_ble(tiv, t0, t1); \
+-	vpxor (6*16)(src), tiv, x6; \
+-	vmovdqu tiv, (6*16)(dst); \
+-	\
+-	gf128mul_x_ble(tiv, t0, t1); \
+-	vpxor (7*16)(src), tiv, x7; \
+-	vmovdqu tiv, (7*16)(dst); \
+-	\
+-	gf128mul_x_ble(tiv, t0, t1); \
+-	vmovdqu tiv, (iv);
+-
+-#define store_xts_8way(dst, x0, x1, x2, x3, x4, x5, x6, x7) \
+-	vpxor (0*16)(dst), x0, x0; \
+-	vpxor (1*16)(dst), x1, x1; \
+-	vpxor (2*16)(dst), x2, x2; \
+-	vpxor (3*16)(dst), x3, x3; \
+-	vpxor (4*16)(dst), x4, x4; \
+-	vpxor (5*16)(dst), x5, x5; \
+-	vpxor (6*16)(dst), x6, x6; \
+-	vpxor (7*16)(dst), x7, x7; \
+-	store_8way(dst, x0, x1, x2, x3, x4, x5, x6, x7);
+diff --git a/arch/x86/crypto/glue_helper-asm-avx2.S b/arch/x86/crypto/glue_helper-asm-avx2.S
+index d84508c85c13..456bface1e5d 100644
+--- a/arch/x86/crypto/glue_helper-asm-avx2.S
++++ b/arch/x86/crypto/glue_helper-asm-avx2.S
+@@ -95,81 +95,3 @@
+ 	vpxor (6*32)(src), x6, x6; \
+ 	vpxor (7*32)(src), x7, x7; \
+ 	store_16way(dst, x0, x1, x2, x3, x4, x5, x6, x7);
+-
+-#define gf128mul_x_ble(iv, mask, tmp) \
+-	vpsrad $31, iv, tmp; \
+-	vpaddq iv, iv, iv; \
+-	vpshufd $0x13, tmp, tmp; \
+-	vpand mask, tmp, tmp; \
+-	vpxor tmp, iv, iv;
+-
+-#define gf128mul_x2_ble(iv, mask1, mask2, tmp0, tmp1) \
+-	vpsrad $31, iv, tmp0; \
+-	vpaddq iv, iv, tmp1; \
+-	vpsllq $2, iv, iv; \
+-	vpshufd $0x13, tmp0, tmp0; \
+-	vpsrad $31, tmp1, tmp1; \
+-	vpand mask2, tmp0, tmp0; \
+-	vpshufd $0x13, tmp1, tmp1; \
+-	vpxor tmp0, iv, iv; \
+-	vpand mask1, tmp1, tmp1; \
+-	vpxor tmp1, iv, iv;
+-
+-#define load_xts_16way(iv, src, dst, x0, x1, x2, x3, x4, x5, x6, x7, tiv, \
+-		       tivx, t0, t0x, t1, t1x, t2, t2x, t3, \
+-		       xts_gf128mul_and_shl1_mask_0, \
+-		       xts_gf128mul_and_shl1_mask_1) \
+-	vbroadcasti128 xts_gf128mul_and_shl1_mask_0, t1; \
+-	\
+-	/* load IV and construct second IV */ \
+-	vmovdqu (iv), tivx; \
+-	vmovdqa tivx, t0x; \
+-	gf128mul_x_ble(tivx, t1x, t2x); \
+-	vbroadcasti128 xts_gf128mul_and_shl1_mask_1, t2; \
+-	vinserti128 $1, tivx, t0, tiv; \
+-	vpxor (0*32)(src), tiv, x0; \
+-	vmovdqu tiv, (0*32)(dst); \
+-	\
+-	/* construct and store IVs, also xor with source */ \
+-	gf128mul_x2_ble(tiv, t1, t2, t0, t3); \
+-	vpxor (1*32)(src), tiv, x1; \
+-	vmovdqu tiv, (1*32)(dst); \
+-	\
+-	gf128mul_x2_ble(tiv, t1, t2, t0, t3); \
+-	vpxor (2*32)(src), tiv, x2; \
+-	vmovdqu tiv, (2*32)(dst); \
+-	\
+-	gf128mul_x2_ble(tiv, t1, t2, t0, t3); \
+-	vpxor (3*32)(src), tiv, x3; \
+-	vmovdqu tiv, (3*32)(dst); \
+-	\
+-	gf128mul_x2_ble(tiv, t1, t2, t0, t3); \
+-	vpxor (4*32)(src), tiv, x4; \
+-	vmovdqu tiv, (4*32)(dst); \
+-	\
+-	gf128mul_x2_ble(tiv, t1, t2, t0, t3); \
+-	vpxor (5*32)(src), tiv, x5; \
+-	vmovdqu tiv, (5*32)(dst); \
+-	\
+-	gf128mul_x2_ble(tiv, t1, t2, t0, t3); \
+-	vpxor (6*32)(src), tiv, x6; \
+-	vmovdqu tiv, (6*32)(dst); \
+-	\
+-	gf128mul_x2_ble(tiv, t1, t2, t0, t3); \
+-	vpxor (7*32)(src), tiv, x7; \
+-	vmovdqu tiv, (7*32)(dst); \
+-	\
+-	vextracti128 $1, tiv, tivx; \
+-	gf128mul_x_ble(tivx, t1x, t2x); \
+-	vmovdqu tivx, (iv);
+-
+-#define store_xts_16way(dst, x0, x1, x2, x3, x4, x5, x6, x7) \
+-	vpxor (0*32)(dst), x0, x0; \
+-	vpxor (1*32)(dst), x1, x1; \
+-	vpxor (2*32)(dst), x2, x2; \
+-	vpxor (3*32)(dst), x3, x3; \
+-	vpxor (4*32)(dst), x4, x4; \
+-	vpxor (5*32)(dst), x5, x5; \
+-	vpxor (6*32)(dst), x6, x6; \
+-	vpxor (7*32)(dst), x7, x7; \
+-	store_16way(dst, x0, x1, x2, x3, x4, x5, x6, x7);
+diff --git a/arch/x86/crypto/glue_helper.c b/arch/x86/crypto/glue_helper.c
+index d3d91a0abf88..786ffda1caf4 100644
+--- a/arch/x86/crypto/glue_helper.c
++++ b/arch/x86/crypto/glue_helper.c
+@@ -12,10 +12,8 @@
  
--/* For CTR-mode IV byteswap */
--.Lbswap128_mask:
--	.byte 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
--
- /*
-  * pre-SubByte transform
-  *
-@@ -994,116 +990,3 @@ SYM_FUNC_START(camellia_cbc_dec_16way)
- 	FRAME_END
- 	ret;
- SYM_FUNC_END(camellia_cbc_dec_16way)
--
--#define inc_le128(x, minus_one, tmp) \
--	vpcmpeqq minus_one, x, tmp; \
--	vpsubq minus_one, x, x; \
--	vpslldq $8, tmp, tmp; \
--	vpsubq tmp, x, x;
--
--SYM_FUNC_START(camellia_ctr_16way)
--	/* input:
--	 *	%rdi: ctx, CTX
--	 *	%rsi: dst (16 blocks)
--	 *	%rdx: src (16 blocks)
--	 *	%rcx: iv (little endian, 128bit)
--	 */
--	FRAME_BEGIN
--
--	subq $(16 * 16), %rsp;
--	movq %rsp, %rax;
--
--	vmovdqa .Lbswap128_mask, %xmm14;
--
--	/* load IV and byteswap */
--	vmovdqu (%rcx), %xmm0;
--	vpshufb %xmm14, %xmm0, %xmm15;
--	vmovdqu %xmm15, 15 * 16(%rax);
--
--	vpcmpeqd %xmm15, %xmm15, %xmm15;
--	vpsrldq $8, %xmm15, %xmm15; /* low: -1, high: 0 */
--
--	/* construct IVs */
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vpshufb %xmm14, %xmm0, %xmm13;
--	vmovdqu %xmm13, 14 * 16(%rax);
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vpshufb %xmm14, %xmm0, %xmm13;
--	vmovdqu %xmm13, 13 * 16(%rax);
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vpshufb %xmm14, %xmm0, %xmm12;
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vpshufb %xmm14, %xmm0, %xmm11;
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vpshufb %xmm14, %xmm0, %xmm10;
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vpshufb %xmm14, %xmm0, %xmm9;
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vpshufb %xmm14, %xmm0, %xmm8;
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vpshufb %xmm14, %xmm0, %xmm7;
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vpshufb %xmm14, %xmm0, %xmm6;
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vpshufb %xmm14, %xmm0, %xmm5;
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vpshufb %xmm14, %xmm0, %xmm4;
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vpshufb %xmm14, %xmm0, %xmm3;
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vpshufb %xmm14, %xmm0, %xmm2;
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vpshufb %xmm14, %xmm0, %xmm1;
--	inc_le128(%xmm0, %xmm15, %xmm13);
--	vmovdqa %xmm0, %xmm13;
--	vpshufb %xmm14, %xmm0, %xmm0;
--	inc_le128(%xmm13, %xmm15, %xmm14);
--	vmovdqu %xmm13, (%rcx);
--
--	/* inpack16_pre: */
--	vmovq (key_table)(CTX), %xmm15;
--	vpshufb .Lpack_bswap, %xmm15, %xmm15;
--	vpxor %xmm0, %xmm15, %xmm0;
--	vpxor %xmm1, %xmm15, %xmm1;
--	vpxor %xmm2, %xmm15, %xmm2;
--	vpxor %xmm3, %xmm15, %xmm3;
--	vpxor %xmm4, %xmm15, %xmm4;
--	vpxor %xmm5, %xmm15, %xmm5;
--	vpxor %xmm6, %xmm15, %xmm6;
--	vpxor %xmm7, %xmm15, %xmm7;
--	vpxor %xmm8, %xmm15, %xmm8;
--	vpxor %xmm9, %xmm15, %xmm9;
--	vpxor %xmm10, %xmm15, %xmm10;
--	vpxor %xmm11, %xmm15, %xmm11;
--	vpxor %xmm12, %xmm15, %xmm12;
--	vpxor 13 * 16(%rax), %xmm15, %xmm13;
--	vpxor 14 * 16(%rax), %xmm15, %xmm14;
--	vpxor 15 * 16(%rax), %xmm15, %xmm15;
--
--	call __camellia_enc_blk16;
--
--	addq $(16 * 16), %rsp;
--
--	vpxor 0 * 16(%rdx), %xmm7, %xmm7;
--	vpxor 1 * 16(%rdx), %xmm6, %xmm6;
--	vpxor 2 * 16(%rdx), %xmm5, %xmm5;
--	vpxor 3 * 16(%rdx), %xmm4, %xmm4;
--	vpxor 4 * 16(%rdx), %xmm3, %xmm3;
--	vpxor 5 * 16(%rdx), %xmm2, %xmm2;
--	vpxor 6 * 16(%rdx), %xmm1, %xmm1;
--	vpxor 7 * 16(%rdx), %xmm0, %xmm0;
--	vpxor 8 * 16(%rdx), %xmm15, %xmm15;
--	vpxor 9 * 16(%rdx), %xmm14, %xmm14;
--	vpxor 10 * 16(%rdx), %xmm13, %xmm13;
--	vpxor 11 * 16(%rdx), %xmm12, %xmm12;
--	vpxor 12 * 16(%rdx), %xmm11, %xmm11;
--	vpxor 13 * 16(%rdx), %xmm10, %xmm10;
--	vpxor 14 * 16(%rdx), %xmm9, %xmm9;
--	vpxor 15 * 16(%rdx), %xmm8, %xmm8;
--	write_output(%xmm7, %xmm6, %xmm5, %xmm4, %xmm3, %xmm2, %xmm1, %xmm0,
--		     %xmm15, %xmm14, %xmm13, %xmm12, %xmm11, %xmm10, %xmm9,
--		     %xmm8, %rsi);
--
--	FRAME_END
--	ret;
--SYM_FUNC_END(camellia_ctr_16way)
-diff --git a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
-index 432bfaf54ff9..963e04cd66b0 100644
---- a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
-+++ b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
-@@ -625,10 +625,6 @@ SYM_FUNC_END(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
- .section	.rodata.cst16, "aM", @progbits, 16
- .align 16
+ #include <linux/module.h>
+ #include <crypto/b128ops.h>
+-#include <crypto/gf128mul.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
+-#include <crypto/xts.h>
+ #include <asm/crypto/glue_helper.h>
  
--/* For CTR-mode IV byteswap */
--.Lbswap128_mask:
--	.byte 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
--
- /*
-  * pre-SubByte transform
-  *
-@@ -1055,143 +1051,3 @@ SYM_FUNC_START(camellia_cbc_dec_32way)
- 	FRAME_END
- 	ret;
- SYM_FUNC_END(camellia_cbc_dec_32way)
--
--#define inc_le128(x, minus_one, tmp) \
--	vpcmpeqq minus_one, x, tmp; \
--	vpsubq minus_one, x, x; \
--	vpslldq $8, tmp, tmp; \
--	vpsubq tmp, x, x;
--
--#define add2_le128(x, minus_one, minus_two, tmp1, tmp2) \
--	vpcmpeqq minus_one, x, tmp1; \
--	vpcmpeqq minus_two, x, tmp2; \
--	vpsubq minus_two, x, x; \
--	vpor tmp2, tmp1, tmp1; \
--	vpslldq $8, tmp1, tmp1; \
--	vpsubq tmp1, x, x;
--
--SYM_FUNC_START(camellia_ctr_32way)
--	/* input:
--	 *	%rdi: ctx, CTX
--	 *	%rsi: dst (32 blocks)
--	 *	%rdx: src (32 blocks)
--	 *	%rcx: iv (little endian, 128bit)
--	 */
--	FRAME_BEGIN
--
--	vzeroupper;
--
--	movq %rsp, %r10;
--	cmpq %rsi, %rdx;
--	je .Lctr_use_stack;
--
--	/* dst can be used as temporary storage, src is not overwritten. */
--	movq %rsi, %rax;
--	jmp .Lctr_continue;
--
--.Lctr_use_stack:
--	subq $(16 * 32), %rsp;
--	movq %rsp, %rax;
--
--.Lctr_continue:
--	vpcmpeqd %ymm15, %ymm15, %ymm15;
--	vpsrldq $8, %ymm15, %ymm15; /* ab: -1:0 ; cd: -1:0 */
--	vpaddq %ymm15, %ymm15, %ymm12; /* ab: -2:0 ; cd: -2:0 */
--
--	/* load IV and byteswap */
--	vmovdqu (%rcx), %xmm0;
--	vmovdqa %xmm0, %xmm1;
--	inc_le128(%xmm0, %xmm15, %xmm14);
--	vbroadcasti128 .Lbswap128_mask, %ymm14;
--	vinserti128 $1, %xmm0, %ymm1, %ymm0;
--	vpshufb %ymm14, %ymm0, %ymm13;
--	vmovdqu %ymm13, 15 * 32(%rax);
--
--	/* construct IVs */
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13); /* ab:le2 ; cd:le3 */
--	vpshufb %ymm14, %ymm0, %ymm13;
--	vmovdqu %ymm13, 14 * 32(%rax);
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
--	vpshufb %ymm14, %ymm0, %ymm13;
--	vmovdqu %ymm13, 13 * 32(%rax);
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
--	vpshufb %ymm14, %ymm0, %ymm13;
--	vmovdqu %ymm13, 12 * 32(%rax);
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
--	vpshufb %ymm14, %ymm0, %ymm13;
--	vmovdqu %ymm13, 11 * 32(%rax);
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
--	vpshufb %ymm14, %ymm0, %ymm10;
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
--	vpshufb %ymm14, %ymm0, %ymm9;
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
--	vpshufb %ymm14, %ymm0, %ymm8;
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
--	vpshufb %ymm14, %ymm0, %ymm7;
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
--	vpshufb %ymm14, %ymm0, %ymm6;
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
--	vpshufb %ymm14, %ymm0, %ymm5;
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
--	vpshufb %ymm14, %ymm0, %ymm4;
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
--	vpshufb %ymm14, %ymm0, %ymm3;
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
--	vpshufb %ymm14, %ymm0, %ymm2;
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
--	vpshufb %ymm14, %ymm0, %ymm1;
--	add2_le128(%ymm0, %ymm15, %ymm12, %ymm11, %ymm13);
--	vextracti128 $1, %ymm0, %xmm13;
--	vpshufb %ymm14, %ymm0, %ymm0;
--	inc_le128(%xmm13, %xmm15, %xmm14);
--	vmovdqu %xmm13, (%rcx);
--
--	/* inpack32_pre: */
--	vpbroadcastq (key_table)(CTX), %ymm15;
--	vpshufb .Lpack_bswap, %ymm15, %ymm15;
--	vpxor %ymm0, %ymm15, %ymm0;
--	vpxor %ymm1, %ymm15, %ymm1;
--	vpxor %ymm2, %ymm15, %ymm2;
--	vpxor %ymm3, %ymm15, %ymm3;
--	vpxor %ymm4, %ymm15, %ymm4;
--	vpxor %ymm5, %ymm15, %ymm5;
--	vpxor %ymm6, %ymm15, %ymm6;
--	vpxor %ymm7, %ymm15, %ymm7;
--	vpxor %ymm8, %ymm15, %ymm8;
--	vpxor %ymm9, %ymm15, %ymm9;
--	vpxor %ymm10, %ymm15, %ymm10;
--	vpxor 11 * 32(%rax), %ymm15, %ymm11;
--	vpxor 12 * 32(%rax), %ymm15, %ymm12;
--	vpxor 13 * 32(%rax), %ymm15, %ymm13;
--	vpxor 14 * 32(%rax), %ymm15, %ymm14;
--	vpxor 15 * 32(%rax), %ymm15, %ymm15;
--
--	call __camellia_enc_blk32;
--
--	movq %r10, %rsp;
--
--	vpxor 0 * 32(%rdx), %ymm7, %ymm7;
--	vpxor 1 * 32(%rdx), %ymm6, %ymm6;
--	vpxor 2 * 32(%rdx), %ymm5, %ymm5;
--	vpxor 3 * 32(%rdx), %ymm4, %ymm4;
--	vpxor 4 * 32(%rdx), %ymm3, %ymm3;
--	vpxor 5 * 32(%rdx), %ymm2, %ymm2;
--	vpxor 6 * 32(%rdx), %ymm1, %ymm1;
--	vpxor 7 * 32(%rdx), %ymm0, %ymm0;
--	vpxor 8 * 32(%rdx), %ymm15, %ymm15;
--	vpxor 9 * 32(%rdx), %ymm14, %ymm14;
--	vpxor 10 * 32(%rdx), %ymm13, %ymm13;
--	vpxor 11 * 32(%rdx), %ymm12, %ymm12;
--	vpxor 12 * 32(%rdx), %ymm11, %ymm11;
--	vpxor 13 * 32(%rdx), %ymm10, %ymm10;
--	vpxor 14 * 32(%rdx), %ymm9, %ymm9;
--	vpxor 15 * 32(%rdx), %ymm8, %ymm8;
--	write_output(%ymm7, %ymm6, %ymm5, %ymm4, %ymm3, %ymm2, %ymm1, %ymm0,
--		     %ymm15, %ymm14, %ymm13, %ymm12, %ymm11, %ymm10, %ymm9,
--		     %ymm8, %rsi);
--
--	vzeroupper;
--
--	FRAME_END
--	ret;
--SYM_FUNC_END(camellia_ctr_32way)
-diff --git a/arch/x86/crypto/camellia_aesni_avx2_glue.c b/arch/x86/crypto/camellia_aesni_avx2_glue.c
-index d956d0473668..8f25a2a6222e 100644
---- a/arch/x86/crypto/camellia_aesni_avx2_glue.c
-+++ b/arch/x86/crypto/camellia_aesni_avx2_glue.c
-@@ -22,8 +22,6 @@ asmlinkage void camellia_ecb_enc_32way(const void *ctx, u8 *dst, const u8 *src);
- asmlinkage void camellia_ecb_dec_32way(const void *ctx, u8 *dst, const u8 *src);
- 
- asmlinkage void camellia_cbc_dec_32way(const void *ctx, u8 *dst, const u8 *src);
--asmlinkage void camellia_ctr_32way(const void *ctx, u8 *dst, const u8 *src,
--				   le128 *iv);
- 
- static const struct common_glue_ctx camellia_enc = {
- 	.num_funcs = 4,
-@@ -44,25 +42,6 @@ static const struct common_glue_ctx camellia_enc = {
- 	} }
- };
- 
--static const struct common_glue_ctx camellia_ctr = {
--	.num_funcs = 4,
--	.fpu_blocks_limit = CAMELLIA_AESNI_PARALLEL_BLOCKS,
--
--	.funcs = { {
--		.num_blocks = CAMELLIA_AESNI_AVX2_PARALLEL_BLOCKS,
--		.fn_u = { .ctr = camellia_ctr_32way }
--	}, {
--		.num_blocks = CAMELLIA_AESNI_PARALLEL_BLOCKS,
--		.fn_u = { .ctr = camellia_ctr_16way }
--	}, {
--		.num_blocks = 2,
--		.fn_u = { .ctr = camellia_crypt_ctr_2way }
--	}, {
--		.num_blocks = 1,
--		.fn_u = { .ctr = camellia_crypt_ctr }
--	} }
--};
--
- static const struct common_glue_ctx camellia_dec = {
- 	.num_funcs = 4,
- 	.fpu_blocks_limit = CAMELLIA_AESNI_PARALLEL_BLOCKS,
-@@ -127,11 +106,6 @@ static int cbc_decrypt(struct skcipher_request *req)
- 	return glue_cbc_decrypt_req_128bit(&camellia_dec_cbc, req);
+ int glue_ecb_req_128bit(const struct common_glue_ctx *gctx,
+@@ -226,156 +224,4 @@ int glue_ctr_req_128bit(const struct common_glue_ctx *gctx,
  }
+ EXPORT_SYMBOL_GPL(glue_ctr_req_128bit);
  
--static int ctr_crypt(struct skcipher_request *req)
+-static unsigned int __glue_xts_req_128bit(const struct common_glue_ctx *gctx,
+-					  void *ctx,
+-					  struct skcipher_walk *walk)
 -{
--	return glue_ctr_req_128bit(&camellia_ctr, req);
--}
+-	const unsigned int bsize = 128 / 8;
+-	unsigned int nbytes = walk->nbytes;
+-	u128 *src = walk->src.virt.addr;
+-	u128 *dst = walk->dst.virt.addr;
+-	unsigned int num_blocks, func_bytes;
+-	unsigned int i;
 -
- static struct skcipher_alg camellia_algs[] = {
- 	{
- 		.base.cra_name		= "__ecb(camellia)",
-@@ -160,21 +134,6 @@ static struct skcipher_alg camellia_algs[] = {
- 		.setkey			= camellia_setkey,
- 		.encrypt		= cbc_encrypt,
- 		.decrypt		= cbc_decrypt,
--	}, {
--		.base.cra_name		= "__ctr(camellia)",
--		.base.cra_driver_name	= "__ctr-camellia-aesni-avx2",
--		.base.cra_priority	= 500,
--		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
--		.base.cra_blocksize	= 1,
--		.base.cra_ctxsize	= sizeof(struct camellia_ctx),
--		.base.cra_module	= THIS_MODULE,
--		.min_keysize		= CAMELLIA_MIN_KEY_SIZE,
--		.max_keysize		= CAMELLIA_MAX_KEY_SIZE,
--		.ivsize			= CAMELLIA_BLOCK_SIZE,
--		.chunksize		= CAMELLIA_BLOCK_SIZE,
--		.setkey			= camellia_setkey,
--		.encrypt		= ctr_crypt,
--		.decrypt		= ctr_crypt,
- 	},
- };
- 
-diff --git a/arch/x86/crypto/camellia_aesni_avx_glue.c b/arch/x86/crypto/camellia_aesni_avx_glue.c
-index 44614f8a452c..22a89cdfedfb 100644
---- a/arch/x86/crypto/camellia_aesni_avx_glue.c
-+++ b/arch/x86/crypto/camellia_aesni_avx_glue.c
-@@ -26,10 +26,6 @@ EXPORT_SYMBOL_GPL(camellia_ecb_dec_16way);
- asmlinkage void camellia_cbc_dec_16way(const void *ctx, u8 *dst, const u8 *src);
- EXPORT_SYMBOL_GPL(camellia_cbc_dec_16way);
- 
--asmlinkage void camellia_ctr_16way(const void *ctx, u8 *dst, const u8 *src,
--				   le128 *iv);
--EXPORT_SYMBOL_GPL(camellia_ctr_16way);
+-	/* Process multi-block batch */
+-	for (i = 0; i < gctx->num_funcs; i++) {
+-		num_blocks = gctx->funcs[i].num_blocks;
+-		func_bytes = bsize * num_blocks;
 -
- static const struct common_glue_ctx camellia_enc = {
- 	.num_funcs = 3,
- 	.fpu_blocks_limit = CAMELLIA_AESNI_PARALLEL_BLOCKS,
-@@ -46,22 +42,6 @@ static const struct common_glue_ctx camellia_enc = {
- 	} }
- };
- 
--static const struct common_glue_ctx camellia_ctr = {
--	.num_funcs = 3,
--	.fpu_blocks_limit = CAMELLIA_AESNI_PARALLEL_BLOCKS,
+-		if (nbytes >= func_bytes) {
+-			do {
+-				gctx->funcs[i].fn_u.xts(ctx, (u8 *)dst,
+-							(const u8 *)src,
+-							walk->iv);
 -
--	.funcs = { {
--		.num_blocks = CAMELLIA_AESNI_PARALLEL_BLOCKS,
--		.fn_u = { .ctr = camellia_ctr_16way }
--	}, {
--		.num_blocks = 2,
--		.fn_u = { .ctr = camellia_crypt_ctr_2way }
--	}, {
--		.num_blocks = 1,
--		.fn_u = { .ctr = camellia_crypt_ctr }
--	} }
--};
+-				src += num_blocks;
+-				dst += num_blocks;
+-				nbytes -= func_bytes;
+-			} while (nbytes >= func_bytes);
 -
- static const struct common_glue_ctx camellia_dec = {
- 	.num_funcs = 3,
- 	.fpu_blocks_limit = CAMELLIA_AESNI_PARALLEL_BLOCKS,
-@@ -120,11 +100,6 @@ static int cbc_decrypt(struct skcipher_request *req)
- 	return glue_cbc_decrypt_req_128bit(&camellia_dec_cbc, req);
- }
- 
--static int ctr_crypt(struct skcipher_request *req)
--{
--	return glue_ctr_req_128bit(&camellia_ctr, req);
--}
--
- static struct skcipher_alg camellia_algs[] = {
- 	{
- 		.base.cra_name		= "__ecb(camellia)",
-@@ -153,21 +128,6 @@ static struct skcipher_alg camellia_algs[] = {
- 		.setkey			= camellia_setkey,
- 		.encrypt		= cbc_encrypt,
- 		.decrypt		= cbc_decrypt,
--	}, {
--		.base.cra_name		= "__ctr(camellia)",
--		.base.cra_driver_name	= "__ctr-camellia-aesni",
--		.base.cra_priority	= 400,
--		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
--		.base.cra_blocksize	= 1,
--		.base.cra_ctxsize	= sizeof(struct camellia_ctx),
--		.base.cra_module	= THIS_MODULE,
--		.min_keysize		= CAMELLIA_MIN_KEY_SIZE,
--		.max_keysize		= CAMELLIA_MAX_KEY_SIZE,
--		.ivsize			= CAMELLIA_BLOCK_SIZE,
--		.chunksize		= CAMELLIA_BLOCK_SIZE,
--		.setkey			= camellia_setkey,
--		.encrypt		= ctr_crypt,
--		.decrypt		= ctr_crypt,
- 	}
- };
- 
-diff --git a/arch/x86/crypto/camellia_glue.c b/arch/x86/crypto/camellia_glue.c
-index 242c056e5fa8..fefeedf2b33d 100644
---- a/arch/x86/crypto/camellia_glue.c
-+++ b/arch/x86/crypto/camellia_glue.c
-@@ -1274,42 +1274,6 @@ void camellia_decrypt_cbc_2way(const void *ctx, u8 *d, const u8 *s)
- }
- EXPORT_SYMBOL_GPL(camellia_decrypt_cbc_2way);
- 
--void camellia_crypt_ctr(const void *ctx, u8 *d, const u8 *s, le128 *iv)
--{
--	be128 ctrblk;
--	u128 *dst = (u128 *)d;
--	const u128 *src = (const u128 *)s;
--
--	if (dst != src)
--		*dst = *src;
--
--	le128_to_be128(&ctrblk, iv);
--	le128_inc(iv);
--
--	camellia_enc_blk_xor(ctx, (u8 *)dst, (u8 *)&ctrblk);
--}
--EXPORT_SYMBOL_GPL(camellia_crypt_ctr);
--
--void camellia_crypt_ctr_2way(const void *ctx, u8 *d, const u8 *s, le128 *iv)
--{
--	be128 ctrblks[2];
--	u128 *dst = (u128 *)d;
--	const u128 *src = (const u128 *)s;
--
--	if (dst != src) {
--		dst[0] = src[0];
--		dst[1] = src[1];
+-			if (nbytes < bsize)
+-				goto done;
+-		}
 -	}
 -
--	le128_to_be128(&ctrblks[0], iv);
--	le128_inc(iv);
--	le128_to_be128(&ctrblks[1], iv);
--	le128_inc(iv);
--
--	camellia_enc_blk_xor_2way(ctx, (u8 *)dst, (u8 *)ctrblks);
+-done:
+-	return nbytes;
 -}
--EXPORT_SYMBOL_GPL(camellia_crypt_ctr_2way);
 -
- static const struct common_glue_ctx camellia_enc = {
- 	.num_funcs = 2,
- 	.fpu_blocks_limit = -1,
-@@ -1323,19 +1287,6 @@ static const struct common_glue_ctx camellia_enc = {
- 	} }
- };
- 
--static const struct common_glue_ctx camellia_ctr = {
--	.num_funcs = 2,
--	.fpu_blocks_limit = -1,
--
--	.funcs = { {
--		.num_blocks = 2,
--		.fn_u = { .ctr = camellia_crypt_ctr_2way }
--	}, {
--		.num_blocks = 1,
--		.fn_u = { .ctr = camellia_crypt_ctr }
--	} }
--};
--
- static const struct common_glue_ctx camellia_dec = {
- 	.num_funcs = 2,
- 	.fpu_blocks_limit = -1,
-@@ -1382,11 +1333,6 @@ static int cbc_decrypt(struct skcipher_request *req)
- 	return glue_cbc_decrypt_req_128bit(&camellia_dec_cbc, req);
- }
- 
--static int ctr_crypt(struct skcipher_request *req)
+-int glue_xts_req_128bit(const struct common_glue_ctx *gctx,
+-			struct skcipher_request *req,
+-			common_glue_func_t tweak_fn, void *tweak_ctx,
+-			void *crypt_ctx, bool decrypt)
 -{
--	return glue_ctr_req_128bit(&camellia_ctr, req);
--}
+-	const bool cts = (req->cryptlen % XTS_BLOCK_SIZE);
+-	const unsigned int bsize = 128 / 8;
+-	struct skcipher_request subreq;
+-	struct skcipher_walk walk;
+-	bool fpu_enabled = false;
+-	unsigned int nbytes, tail;
+-	int err;
 -
- static struct crypto_alg camellia_cipher_alg = {
- 	.cra_name		= "camellia",
- 	.cra_driver_name	= "camellia-asm",
-@@ -1433,20 +1379,6 @@ static struct skcipher_alg camellia_skcipher_algs[] = {
- 		.setkey			= camellia_setkey_skcipher,
- 		.encrypt		= cbc_encrypt,
- 		.decrypt		= cbc_decrypt,
--	}, {
--		.base.cra_name		= "ctr(camellia)",
--		.base.cra_driver_name	= "ctr-camellia-asm",
--		.base.cra_priority	= 300,
--		.base.cra_blocksize	= 1,
--		.base.cra_ctxsize	= sizeof(struct camellia_ctx),
--		.base.cra_module	= THIS_MODULE,
--		.min_keysize		= CAMELLIA_MIN_KEY_SIZE,
--		.max_keysize		= CAMELLIA_MAX_KEY_SIZE,
--		.ivsize			= CAMELLIA_BLOCK_SIZE,
--		.chunksize		= CAMELLIA_BLOCK_SIZE,
--		.setkey			= camellia_setkey_skcipher,
--		.encrypt		= ctr_crypt,
--		.decrypt		= ctr_crypt,
- 	}
+-	if (req->cryptlen < XTS_BLOCK_SIZE)
+-		return -EINVAL;
+-
+-	if (unlikely(cts)) {
+-		struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-
+-		tail = req->cryptlen % XTS_BLOCK_SIZE + XTS_BLOCK_SIZE;
+-
+-		skcipher_request_set_tfm(&subreq, tfm);
+-		skcipher_request_set_callback(&subreq,
+-					      crypto_skcipher_get_flags(tfm),
+-					      NULL, NULL);
+-		skcipher_request_set_crypt(&subreq, req->src, req->dst,
+-					   req->cryptlen - tail, req->iv);
+-		req = &subreq;
+-	}
+-
+-	err = skcipher_walk_virt(&walk, req, false);
+-	nbytes = walk.nbytes;
+-	if (err)
+-		return err;
+-
+-	/* set minimum length to bsize, for tweak_fn */
+-	fpu_enabled = glue_fpu_begin(bsize, gctx->fpu_blocks_limit,
+-				     &walk, fpu_enabled,
+-				     nbytes < bsize ? bsize : nbytes);
+-
+-	/* calculate first value of T */
+-	tweak_fn(tweak_ctx, walk.iv, walk.iv);
+-
+-	while (nbytes) {
+-		nbytes = __glue_xts_req_128bit(gctx, crypt_ctx, &walk);
+-
+-		err = skcipher_walk_done(&walk, nbytes);
+-		nbytes = walk.nbytes;
+-	}
+-
+-	if (unlikely(cts)) {
+-		u8 *next_tweak, *final_tweak = req->iv;
+-		struct scatterlist *src, *dst;
+-		struct scatterlist s[2], d[2];
+-		le128 b[2];
+-
+-		dst = src = scatterwalk_ffwd(s, req->src, req->cryptlen);
+-		if (req->dst != req->src)
+-			dst = scatterwalk_ffwd(d, req->dst, req->cryptlen);
+-
+-		if (decrypt) {
+-			next_tweak = memcpy(b, req->iv, XTS_BLOCK_SIZE);
+-			gf128mul_x_ble(b, b);
+-		} else {
+-			next_tweak = req->iv;
+-		}
+-
+-		skcipher_request_set_crypt(&subreq, src, dst, XTS_BLOCK_SIZE,
+-					   next_tweak);
+-
+-		err = skcipher_walk_virt(&walk, req, false) ?:
+-		      skcipher_walk_done(&walk,
+-				__glue_xts_req_128bit(gctx, crypt_ctx, &walk));
+-		if (err)
+-			goto out;
+-
+-		scatterwalk_map_and_copy(b, dst, 0, XTS_BLOCK_SIZE, 0);
+-		memcpy(b + 1, b, tail - XTS_BLOCK_SIZE);
+-		scatterwalk_map_and_copy(b, src, XTS_BLOCK_SIZE,
+-					 tail - XTS_BLOCK_SIZE, 0);
+-		scatterwalk_map_and_copy(b, dst, 0, tail, 1);
+-
+-		skcipher_request_set_crypt(&subreq, dst, dst, XTS_BLOCK_SIZE,
+-					   final_tweak);
+-
+-		err = skcipher_walk_virt(&walk, req, false) ?:
+-		      skcipher_walk_done(&walk,
+-				__glue_xts_req_128bit(gctx, crypt_ctx, &walk));
+-	}
+-
+-out:
+-	glue_fpu_end(fpu_enabled);
+-
+-	return err;
+-}
+-EXPORT_SYMBOL_GPL(glue_xts_req_128bit);
+-
+-void glue_xts_crypt_128bit_one(const void *ctx, u8 *dst, const u8 *src,
+-			       le128 *iv, common_glue_func_t fn)
+-{
+-	le128 ivblk = *iv;
+-
+-	/* generate next IV */
+-	gf128mul_x_ble(iv, &ivblk);
+-
+-	/* CC <- T xor C */
+-	u128_xor((u128 *)dst, (const u128 *)src, (u128 *)&ivblk);
+-
+-	/* PP <- D(Key2,CC) */
+-	fn(ctx, dst, dst);
+-
+-	/* P <- T xor PP */
+-	u128_xor((u128 *)dst, (u128 *)dst, (u128 *)&ivblk);
+-}
+-EXPORT_SYMBOL_GPL(glue_xts_crypt_128bit_one);
+-
+ MODULE_LICENSE("GPL");
+diff --git a/arch/x86/include/asm/crypto/glue_helper.h b/arch/x86/include/asm/crypto/glue_helper.h
+index 777c0f63418c..62680775d189 100644
+--- a/arch/x86/include/asm/crypto/glue_helper.h
++++ b/arch/x86/include/asm/crypto/glue_helper.h
+@@ -15,8 +15,6 @@ typedef void (*common_glue_func_t)(const void *ctx, u8 *dst, const u8 *src);
+ typedef void (*common_glue_cbc_func_t)(const void *ctx, u8 *dst, const u8 *src);
+ typedef void (*common_glue_ctr_func_t)(const void *ctx, u8 *dst, const u8 *src,
+ 				       le128 *iv);
+-typedef void (*common_glue_xts_func_t)(const void *ctx, u8 *dst, const u8 *src,
+-				       le128 *iv);
+ 
+ struct common_glue_func_entry {
+ 	unsigned int num_blocks; /* number of blocks that @fn will process */
+@@ -24,7 +22,6 @@ struct common_glue_func_entry {
+ 		common_glue_func_t ecb;
+ 		common_glue_cbc_func_t cbc;
+ 		common_glue_ctr_func_t ctr;
+-		common_glue_xts_func_t xts;
+ 	} fn_u;
  };
  
-diff --git a/arch/x86/include/asm/crypto/camellia.h b/arch/x86/include/asm/crypto/camellia.h
-index 0e5f82adbaf9..1dcea79e8f8e 100644
---- a/arch/x86/include/asm/crypto/camellia.h
-+++ b/arch/x86/include/asm/crypto/camellia.h
-@@ -38,8 +38,6 @@ asmlinkage void camellia_ecb_enc_16way(const void *ctx, u8 *dst, const u8 *src);
- asmlinkage void camellia_ecb_dec_16way(const void *ctx, u8 *dst, const u8 *src);
+@@ -106,13 +103,4 @@ extern int glue_cbc_decrypt_req_128bit(const struct common_glue_ctx *gctx,
+ extern int glue_ctr_req_128bit(const struct common_glue_ctx *gctx,
+ 			       struct skcipher_request *req);
  
- asmlinkage void camellia_cbc_dec_16way(const void *ctx, u8 *dst, const u8 *src);
--asmlinkage void camellia_ctr_16way(const void *ctx, u8 *dst, const u8 *src,
--				   le128 *iv);
- 
- static inline void camellia_enc_blk(const void *ctx, u8 *dst, const u8 *src)
- {
-@@ -65,9 +63,5 @@ static inline void camellia_enc_blk_xor_2way(const void *ctx, u8 *dst,
- 
- /* glue helpers */
- extern void camellia_decrypt_cbc_2way(const void *ctx, u8 *dst, const u8 *src);
--extern void camellia_crypt_ctr(const void *ctx, u8 *dst, const u8 *src,
--			       le128 *iv);
--extern void camellia_crypt_ctr_2way(const void *ctx, u8 *dst, const u8 *src,
--				    le128 *iv);
- 
- #endif /* ASM_X86_CAMELLIA_H */
+-extern int glue_xts_req_128bit(const struct common_glue_ctx *gctx,
+-			       struct skcipher_request *req,
+-			       common_glue_func_t tweak_fn, void *tweak_ctx,
+-			       void *crypt_ctx, bool decrypt);
+-
+-extern void glue_xts_crypt_128bit_one(const void *ctx, u8 *dst,
+-				      const u8 *src, le128 *iv,
+-				      common_glue_func_t fn);
+-
+ #endif /* _CRYPTO_GLUE_HELPER_H */
 -- 
 2.17.1
 
