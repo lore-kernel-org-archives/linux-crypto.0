@@ -4,34 +4,34 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC0E7C43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0B70C433E9
 	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 08:14:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A20DE224B0
+	by mail.kernel.org (Postfix) with ESMTP id 84518224B8
 	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 08:14:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727815AbgLWIOQ (ORCPT
+        id S1728000AbgLWIOP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Dec 2020 03:14:16 -0500
-Received: from mail.kernel.org ([198.145.29.99]:46948 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727976AbgLWIOP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 23 Dec 2020 03:14:15 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3042D22512;
-        Wed, 23 Dec 2020 08:12:58 +0000 (UTC)
+Received: from mail.kernel.org ([198.145.29.99]:46938 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727851AbgLWIOP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Dec 2020 03:14:15 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 21E37224DF;
+        Wed, 23 Dec 2020 08:12:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608711178;
-        bh=gZU5h+3+EaOoF4SX/C9e5RdZA4PwrlP/kPxt0AaR0Xo=;
+        s=k20201202; t=1608711177;
+        bh=hdS/nZMIHIRlLDU4jx0otHFHReXXhN43ibKqK9h7cxA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=iKhNh3FyKWUCsqIS29saRGqHsC5eS6qYKuPIwzYZsAgPBI3TrWygntpp7WRLNILJ7
-         xR29UuidItsqwjG879rJIulFsYJAqdWVgEv5iiezs73frIYde1IDKFXTNmjrUEvWku
-         ljjhtWYSejaV0u3ZAE1ZVNN2lIMrasdtF581j8GIlCUbc/dBsS0TN4Pg6z21Va3px4
-         1gL8pqO2iwpQP+VXJgrIMpZXbfmixtNn9nnxa63aLI5aOsb9h1F2S1iPUWEefX1nLc
-         E4AuoNrwrzm8y15kVLTmm2G6Ptrn/rRt0/NsCzp6UK5O6ie8YvzetTx941LcaXsr5a
-         YeBGDJwQw9xRw==
+        b=OgkNBHtTnftbt2Yj+NrWKD07vzQfqRiCOm5RYBPIAWygx4wk49tKLg9uxWVW8BapX
+         QShd3x1h26NWOwlSVXGibc8YCZ0VlCSh/ACErt1bh3qJE2TM9Rzj0GDkTT2iPKPC92
+         vV4ecO7uvjODQkAhWBRUsdx5JyDOgWOocYmeUd6sIjDo85udnTQ5ZTge6Tpv04BA8K
+         RoSanYrtI6Wecg48nt84HBLC+VFo6foFGLpq2geneq80fRwN7zzzsxDo6K/kr6MqCz
+         AJO/xTaRkwxSrNmZOindPqu18cqbH4w2kq1Nzke6SNKv5ak9h19bupG+w+7w7hgGYx
+         HQpo2hXw7N95w==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     linux-arm-kernel@lists.infradead.org,
@@ -40,9 +40,9 @@ Cc:     linux-arm-kernel@lists.infradead.org,
         David Sterba <dsterba@suse.com>,
         "Jason A . Donenfeld" <Jason@zx2c4.com>,
         Paul Crowley <paulcrowley@google.com>
-Subject: [PATCH v3 11/14] wireguard: Kconfig: select CRYPTO_BLAKE2S_ARM
-Date:   Wed, 23 Dec 2020 00:10:00 -0800
-Message-Id: <20201223081003.373663-12-ebiggers@kernel.org>
+Subject: [PATCH v3 09/14] crypto: blake2s - include <linux/bug.h> instead of <asm/bug.h>
+Date:   Wed, 23 Dec 2020 00:09:58 -0800
+Message-Id: <20201223081003.373663-10-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201223081003.373663-1-ebiggers@kernel.org>
 References: <20201223081003.373663-1-ebiggers@kernel.org>
@@ -54,28 +54,33 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-When available, select the new implementation of BLAKE2s for 32-bit ARM.
-This is faster than the generic C implementation.
+Address the following checkpatch warning:
 
-Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+	WARNING: Use #include <linux/bug.h> instead of <asm/bug.h>
+
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/net/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+ include/crypto/blake2s.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index 260f9f46668b8..672fcdd9aecbb 100644
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
-@@ -90,6 +90,7 @@ config WIREGUARD
- 	select CRYPTO_CHACHA20_NEON if (ARM || ARM64) && KERNEL_MODE_NEON
- 	select CRYPTO_POLY1305_NEON if ARM64 && KERNEL_MODE_NEON
- 	select CRYPTO_POLY1305_ARM if ARM
-+	select CRYPTO_BLAKE2S_ARM if ARM
- 	select CRYPTO_CURVE25519_NEON if ARM && KERNEL_MODE_NEON
- 	select CRYPTO_CHACHA_MIPS if CPU_MIPS32_R2
- 	select CRYPTO_POLY1305_MIPS if CPU_MIPS32 || (CPU_MIPS64 && 64BIT)
+diff --git a/include/crypto/blake2s.h b/include/crypto/blake2s.h
+index 3f06183c2d804..bc3fb59442ce5 100644
+--- a/include/crypto/blake2s.h
++++ b/include/crypto/blake2s.h
+@@ -6,12 +6,11 @@
+ #ifndef _CRYPTO_BLAKE2S_H
+ #define _CRYPTO_BLAKE2S_H
+ 
++#include <linux/bug.h>
+ #include <linux/types.h>
+ #include <linux/kernel.h>
+ #include <linux/string.h>
+ 
+-#include <asm/bug.h>
+-
+ enum blake2s_lengths {
+ 	BLAKE2S_BLOCK_SIZE = 64,
+ 	BLAKE2S_HASH_SIZE = 32,
 -- 
 2.29.2
 
