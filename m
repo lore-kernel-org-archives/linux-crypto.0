@@ -2,72 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40382C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 15:59:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 010A7C433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 16:01:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 023A822202
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 15:59:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC626221E2
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 16:01:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727183AbgLWP7L (ORCPT
+        id S1727147AbgLWQBp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Dec 2020 10:59:11 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:44118 "EHLO vps-vb.mhejs.net"
+        Wed, 23 Dec 2020 11:01:45 -0500
+Received: from mx2.suse.de ([195.135.220.15]:58788 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726885AbgLWP7L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Dec 2020 10:59:11 -0500
-X-Greylist: delayed 1243 seconds by postgrey-1.27 at vger.kernel.org; Wed, 23 Dec 2020 10:59:10 EST
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps (TLS1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-        (Exim 4.93.0.4)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1ks6Cp-0004Hq-UK; Wed, 23 Dec 2020 16:37:39 +0100
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To:     Ignat Korchagin <ignat@cloudflare.com>
-Cc:     agk@redhat.com, snitzer@redhat.com, dm-devel@redhat.com,
-        dm-crypt@saout.de, linux-kernel@vger.kernel.org,
-        ebiggers@kernel.org, Damien.LeMoal@wdc.com, mpatocka@redhat.com,
-        herbert@gondor.apana.org.au, kernel-team@cloudflare.com,
-        nobuto.murata@canonical.com, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        linux-crypto <linux-crypto@vger.kernel.org>
-References: <16ffadab-42ba-f9c7-8203-87fda3dc9b44@maciej.szmigiero.name>
-Subject: Re: dm-crypt with no_read_workqueue and no_write_workqueue + btrfs
- scrub = BUG()
-Message-ID: <74c7129b-a437-ebc4-1466-7fb9f034e006@maciej.szmigiero.name>
-Date:   Wed, 23 Dec 2020 16:37:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1726664AbgLWQBp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Dec 2020 11:01:45 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 43A63ACF1;
+        Wed, 23 Dec 2020 16:01:02 +0000 (UTC)
+Date:   Wed, 23 Dec 2020 17:00:57 +0100
+From:   Petr Tesarik <ptesarik@suse.cz>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Torsten Duwe <duwe@lst.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Stephan =?UTF-8?B?TcO8bGxlcg==?= <smueller@chronox.de>,
+        Willy Tarreau <w@1wt.eu>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Nicolai Stange <nstange@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        And y Lavr <andy.lavr@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>, simo@redhat.com
+Subject: Re: drivers/char/random.c needs a (new) maintainer
+Message-ID: <20201223170057.7c8fd710@ezekiel.suse.cz>
+In-Reply-To: <CAHmME9ooV1HRGO4bLsNKqv1EjDsUYsM6TcMbmEL=4CejTB+1ZQ@mail.gmail.com>
+References: <20201130151231.GA24862@lst.de>
+        <CAHmME9p4vFGWh7+CKF4f3dw5r+ru5PVG0-vP77JowX8sPhin1g@mail.gmail.com>
+        <20201130165339.GE5364@mit.edu>
+        <CAHmME9pksS8ec17RAwCNJimt4B0xZgd3qYHUPnaT4Bj4CF7n0A@mail.gmail.com>
+        <20201218132519.kj3nz7swsx7vvlr5@valinor.lan>
+        <20201223132851.55d19271@blackhole.lan>
+        <20201223151014.57caf98b@ezekiel.suse.cz>
+        <CAHmME9ooV1HRGO4bLsNKqv1EjDsUYsM6TcMbmEL=4CejTB+1ZQ@mail.gmail.com>
+Organization: SUSE Linux, s.r.o.
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <16ffadab-42ba-f9c7-8203-87fda3dc9b44@maciej.szmigiero.name>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/Z+YdJ+mMHvgvuEAz.pJLK3V";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 14.12.2020 19:11, Maciej S. Szmigiero wrote:
-> Hi,
-> 
-> I hit a reproducible BUG() when scrubbing a btrfs fs on top of
-> a dm-crypt device with no_read_workqueue and no_write_workqueue
-> flags enabled.
+--Sig_/Z+YdJ+mMHvgvuEAz.pJLK3V
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Still happens on the current torvalds/master.
+On Wed, 23 Dec 2020 15:32:55 +0100
+"Jason A. Donenfeld" <Jason@zx2c4.com> wrote:
 
-Due to this bug it is not possible to use btrfs on top of
-a dm-crypt device with no_read_workqueue and no_write_workqueue
-flags enabled.
+> On Wed, Dec 23, 2020 at 3:17 PM Petr Tesarik <ptesarik@suse.cz> wrote:
+> > Upfront, let me admit that SUSE has a vested interest in a FIPS-certifi=
+able Linux kernel. =20
+>=20
+> Sorry, but just because you have a "vested interest", or a financial
+> interest, or because you want it does not suddenly make it a good
+> idea. The idea is to have good crypto, not to merely check some boxes
 
-@Ignat:
-Can you have a look at this as the person who added these flags?
+I never suggested that this should serve as a supportive argument. I was ju=
+st trying to be honest about our motivations.
 
-It looks like to me that the skcipher API might not be safe to
-call from a softirq context, after all.
+I'm a bit sad that this discussion has quickly gone back to the choice of a=
+lgorithms and how they can be implemented. The real issue is that the RNG s=
+ubsystem has not developed as fast as it could. This had not been much of a=
+n issue as long as nobody was really interested in making any substantial c=
+hanges to that code, but it is more apparent now. Torsten believes it can b=
+e partly because of a maintainer who is too busy with other tasks, and he s=
+uggested we try to improve the situation by giving the RNG-related tasks to=
+ someone else.
 
-Maciej
+I have not seen a clear answer to this suggestion, except Jason offering hi=
+s helping hand with Nicolai's cleanup patches, but nothing wrt Stephan's pa=
+tches. So, what is the plan?
+
+Petr Tesarik
+SUSE HW Enablement Team
+
+--Sig_/Z+YdJ+mMHvgvuEAz.pJLK3V
+Content-Type: application/pgp-signature
+Content-Description: Digitální podpis OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEHl2YIZkIo5VO2MxYqlA7ya4PR6cFAl/jabkACgkQqlA7ya4P
+R6cEBgf+PcUW8Z/pkOT7Dc2JOAZJ5iMJXmOEGKLvG42J6pZ5P7f00bw7KP8fCBty
+H56op4nW/kpSJ57neekDzz0w84iaQwtSNCgBvpaDWayIXurrEcPNzpQknLSR8NHX
+qVfwQO6lLmYRJPHMcVHdiwDAD50mBzVpNuCCfJjQNVeVJXT5Qcq0H0cvj9WtU7HP
+IxxnEZmC++fukffpZvW3E4cBntb6BPTT3nVtQwKHcUPLgSNsnojKhCPYIxse8Tzz
+vum5nMTlhNhxnHkcblfqnk0Cnp9eS2eM6OeYlNQ+4LK1gF0ZcBvjBNCeoLw/5Nbx
+/1rXFSsJ8UsuJ9Wh1e0paTx8iyeVpA==
+=Sd6I
+-----END PGP SIGNATURE-----
+
+--Sig_/Z+YdJ+mMHvgvuEAz.pJLK3V--
