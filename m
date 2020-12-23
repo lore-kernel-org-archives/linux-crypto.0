@@ -4,43 +4,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AAE4C4321A
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 03:00:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 778C7C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 03:04:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 16DAE206F6
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 03:00:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34CC020757
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 03:04:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731391AbgLWC7u (ORCPT
+        id S1728630AbgLWCT1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Dec 2020 21:59:50 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45490 "EHLO mail.kernel.org"
+        Tue, 22 Dec 2020 21:19:27 -0500
+Received: from mail.kernel.org ([198.145.29.99]:46410 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728855AbgLWCUE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Dec 2020 21:20:04 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1AE3A22248;
-        Wed, 23 Dec 2020 02:19:47 +0000 (UTC)
+        id S1728620AbgLWCT0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Dec 2020 21:19:26 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5693923359;
+        Wed, 23 Dec 2020 02:18:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608689987;
-        bh=iZ9EnPp4I+VsiV/fkq4x3HqWHGBcJbtlzoXdQQkJY/o=;
+        s=k20201202; t=1608689927;
+        bh=YTtdSqMawXFVA+HPyBMMCI2ZrtMdgwZ0Zmbdxko0Y0Q=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=tyxqFqurXB1hMqxcqg7JUDnyhCzndFmeOBfRaO4dBR5NQ0+qYvHGNEDwK+qqErCiO
-         IDSfy4nPfgn9fJarMWKZJCIpHTwwIdGAC5aCU6BkmT3OrCuDXj/AOxuK4E+BYu9V1Q
-         5q3FVtiXvdmHLMBd7PWg9PgD0d7YzxVZJyCuMmCGVcDJHXc6jiWW6bh1extupU2nlP
-         UQ/gbY84m+ndWHWEMhCyWwGwGSgxRYqEWP3/E+XxSNlWp0GoZKiKgA1J//JZSpV+bf
-         hb6VPu1pV0U8PxunbLpXjcRbfzl7ob3XLd+cyQDfqIgQFmuZlAQwWbHyS2hNL2hWTM
-         NVVnPYCBkdveg==
+        b=DzJK3kTVpcMXzaWJ8JyS7LjqY5duRy86HL1S81SDPUcdFsvNzfFHrgLMIyW81+yCL
+         xlm/2eUHtkjtQT50vs83t5NRa+Eutn+3cV14Ui3bbV7LpY2DVbvuUYCyHgnJfwZQ83
+         He4KxiPZgBHBwKdpkvPdLa48b20kh/ca4zCNfWvzsUW3MAZ/DXRXRU/6OSravYCIA+
+         jFWzAKLMGCH9azElWznGFHrG+hV6kTY9fyluAXGV5NJTrgpAfz1xR6GmJZ/rMMbF7c
+         mswya15G41s0yFcgthIP+NjpBRlJ+2+27plfzvHj0zj5TFKr5CWrimGHP2QPMx3gFV
+         9xhYUTaGz37QQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Thara Gopinath <thara.gopinath@linaro.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 073/130] crypto: qce - Fix SHA result buffer corruption issues
-Date:   Tue, 22 Dec 2020 21:17:16 -0500
-Message-Id: <20201223021813.2791612-73-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 026/130] s390/trng: set quality to 1024
+Date:   Tue, 22 Dec 2020 21:16:29 -0500
+Message-Id: <20201223021813.2791612-26-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20201223021813.2791612-1-sashal@kernel.org>
 References: <20201223021813.2791612-1-sashal@kernel.org>
@@ -52,37 +52,51 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Thara Gopinath <thara.gopinath@linaro.org>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-[ Upstream commit 1148a9654b5a69611d33e14719251c6ec20f5f2c ]
+[ Upstream commit d041315ef75cf52df19613f56a2da2c5911c163c ]
 
-Partial hash was being copied into the final result buffer without the
-entire message block processed. Depending on how the end user processes
-this result buffer, errors vary from result buffer corruption to result
-buffer poisoing. Fix this issue by ensuring that only the final hash value
-is copied into the result buffer.
+The s390-trng does provide 100% entropy. The quality value is supported
+to be between 1 and 1024 and not 1..1000.  Use 1024 to make this driver
+the preferred one. If we ever have a better driver that has the same
+quality but is faster we can change this again when merging the new
+driver. No need to be conservative.
 
-Reviewed-by: Bjorn Andersson <bjorn.andersson@linaro.org>
-Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+This makes sure that the hw variant is preferred over things like
+virtio-rng, where the hypervisor has a potential to be misconfigured
+and thus should have a slightly lower confidence.
+
+Cc: Harald Freudenberger <freude@linux.ibm.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/qce/sha.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/char/hw_random/s390-trng.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-index 0853e74583ade..981957e9db592 100644
---- a/drivers/crypto/qce/sha.c
-+++ b/drivers/crypto/qce/sha.c
-@@ -47,7 +47,7 @@ static void qce_ahash_done(void *data)
- 	dma_unmap_sg(qce->dev, &rctx->result_sg, 1, DMA_FROM_DEVICE);
+diff --git a/drivers/char/hw_random/s390-trng.c b/drivers/char/hw_random/s390-trng.c
+index 413cacbb08e26..7c673afd72419 100644
+--- a/drivers/char/hw_random/s390-trng.c
++++ b/drivers/char/hw_random/s390-trng.c
+@@ -192,14 +192,15 @@ static int trng_hwrng_read(struct hwrng *rng, void *data, size_t max, bool wait)
  
- 	memcpy(rctx->digest, result->auth_iv, digestsize);
--	if (req->result)
-+	if (req->result && rctx->last_blk)
- 		memcpy(req->result, result->auth_iv, digestsize);
+ /*
+  * hwrng register struct
+- * The trng is suppost to have 100% entropy, and thus
+- * we register with a very high quality value.
++ * The trng is supposed to have 100% entropy, and thus we register with a very
++ * high quality value. If we ever have a better driver in the future, we should
++ * change this value again when we merge this driver.
+  */
+ static struct hwrng trng_hwrng_dev = {
+ 	.name		= "s390-trng",
+ 	.data_read	= trng_hwrng_data_read,
+ 	.read		= trng_hwrng_read,
+-	.quality	= 999,
++	.quality	= 1024,
+ };
  
- 	rctx->byte_count[0] = cpu_to_be32(result->auth_byte_count[0]);
+ 
 -- 
 2.27.0
 
