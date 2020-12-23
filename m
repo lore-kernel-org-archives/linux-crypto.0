@@ -7,31 +7,31 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09DE0C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E368C4332B
 	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 08:14:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C3379207D2
+	by mail.kernel.org (Postfix) with ESMTP id E421E224B0
 	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 08:14:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727851AbgLWIOQ (ORCPT
+        id S1728011AbgLWIOQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Wed, 23 Dec 2020 03:14:16 -0500
-Received: from mail.kernel.org ([198.145.29.99]:46936 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:46960 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727815AbgLWIOP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Dec 2020 03:14:15 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AA16B224D4;
-        Wed, 23 Dec 2020 08:12:56 +0000 (UTC)
+        id S1727976AbgLWIOQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Dec 2020 03:14:16 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1C3B122510;
+        Wed, 23 Dec 2020 08:12:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608711176;
-        bh=q4F9axpwjHT+hZCneYUehP2waWRDVZo8NQHm18Rvv8A=;
+        s=k20201202; t=1608711179;
+        bh=qS5odlNvKzcQ1NLPrL+sF+R4JtS6E6dFmblxMXhMlEI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bRgb0YHY7nLLWkRGRYheVHAwG0hkbfuZl72KhzElKOFinUleUQ4wTPZULrx1EOiS/
-         91+jd1LkKsWFcRWBQ6tw0Nu+k42lFGIkiCcMuuopKoNLR+ukNCuyykggGUqGbB/FeE
-         VF38QzIeILBMrE3hoJ6k1oMOLz75rn9WPCm0xM0TMtmCVEb1nGNGvUOW+h2FSqs+yX
-         LMKs71l1HfIu2jxyJc8b81qEWoHSHbVJax1NGm4Z1yalmGhd9ej3Zd7R7FXqilYTUj
-         +wVRwMdfL4Q+1oe/05+qbxglVphIa86kPAeP4w7yY+2d9xeK5CYXCnDtJDL/D9eWYB
-         NVfRIEmJURd2Q==
+        b=SkQPMYnRUb4z6xQnbpCKDKenc6E58KB7clteA90Q9gUGF2XAZWw1e17yNcZEio9Oy
+         khoIW0jbfw+D84scqPCSzdlBZYShgWWoWBrs8rYtF6BVE1qXlHWlRZk9w9q3xIwkqQ
+         D0wUj8Sq9xkyoJfts6qR4ExNDBrKDQAVQQRKtOJy4CzWj2Y0vnugoZKQaBFBpNlRRh
+         q7hIitMn8yMM3kTcQB+3ggVnXPkYD+91ZSQF//wpWXFOIufcEQLqycJIzNiLnIvtTy
+         pkGjyUxdDrkYHQzbSVr9jRK1L1pAm6VPd3V63bPewbpemh+KlY8QW2qEz8I0fMf9P2
+         mqsBm/b4t5P9Q==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     linux-arm-kernel@lists.infradead.org,
@@ -40,9 +40,9 @@ Cc:     linux-arm-kernel@lists.infradead.org,
         David Sterba <dsterba@suse.com>,
         "Jason A . Donenfeld" <Jason@zx2c4.com>,
         Paul Crowley <paulcrowley@google.com>
-Subject: [PATCH v3 08/14] crypto: blake2s - adjust include guard naming
-Date:   Wed, 23 Dec 2020 00:09:57 -0800
-Message-Id: <20201223081003.373663-9-ebiggers@kernel.org>
+Subject: [PATCH v3 13/14] crypto: blake2b - update file comment
+Date:   Wed, 23 Dec 2020 00:10:02 -0800
+Message-Id: <20201223081003.373663-14-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201223081003.373663-1-ebiggers@kernel.org>
 References: <20201223081003.373663-1-ebiggers@kernel.org>
@@ -54,57 +54,53 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Use the full path in the include guards for the BLAKE2s headers to avoid
-ambiguity and to match the convention for most files in include/crypto/.
+The file comment for blake2b_generic.c makes it sound like it's the
+reference implementation of BLAKE2b with only minor changes.  But it's
+actually been changed a lot.  Update the comment to make this clearer.
 
+Reviewed-by: David Sterba <dsterba@suse.com>
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- include/crypto/blake2s.h          | 6 +++---
- include/crypto/internal/blake2s.h | 6 +++---
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ crypto/blake2b_generic.c | 23 ++++++++++-------------
+ 1 file changed, 10 insertions(+), 13 deletions(-)
 
-diff --git a/include/crypto/blake2s.h b/include/crypto/blake2s.h
-index f1c8330a61a91..3f06183c2d804 100644
---- a/include/crypto/blake2s.h
-+++ b/include/crypto/blake2s.h
-@@ -3,8 +3,8 @@
-  * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+diff --git a/crypto/blake2b_generic.c b/crypto/blake2b_generic.c
+index 963f7fe0e4ea8..6704c03558896 100644
+--- a/crypto/blake2b_generic.c
++++ b/crypto/blake2b_generic.c
+@@ -1,21 +1,18 @@
+ // SPDX-License-Identifier: (GPL-2.0-only OR Apache-2.0)
+ /*
+- * BLAKE2b reference source code package - reference C implementations
++ * Generic implementation of the BLAKE2b digest algorithm.  Based on the BLAKE2b
++ * reference implementation, but it has been heavily modified for use in the
++ * kernel.  The reference implementation was:
+  *
+- * Copyright 2012, Samuel Neves <sneves@dei.uc.pt>.  You may use this under the
+- * terms of the CC0, the OpenSSL Licence, or the Apache Public License 2.0, at
+- * your option.  The terms of these licenses can be found at:
++ *	Copyright 2012, Samuel Neves <sneves@dei.uc.pt>.  You may use this under
++ *	the terms of the CC0, the OpenSSL Licence, or the Apache Public License
++ *	2.0, at your option.  The terms of these licenses can be found at:
+  *
+- * - CC0 1.0 Universal : http://creativecommons.org/publicdomain/zero/1.0
+- * - OpenSSL license   : https://www.openssl.org/source/license.html
+- * - Apache 2.0        : https://www.apache.org/licenses/LICENSE-2.0
++ *	- CC0 1.0 Universal : http://creativecommons.org/publicdomain/zero/1.0
++ *	- OpenSSL license   : https://www.openssl.org/source/license.html
++ *	- Apache 2.0        : https://www.apache.org/licenses/LICENSE-2.0
+  *
+- * More information about the BLAKE2 hash function can be found at
+- * https://blake2.net.
+- *
+- * Note: the original sources have been modified for inclusion in linux kernel
+- * in terms of coding style, using generic helpers and simplifications of error
+- * handling.
++ * More information about BLAKE2 can be found at https://blake2.net.
   */
  
--#ifndef BLAKE2S_H
--#define BLAKE2S_H
-+#ifndef _CRYPTO_BLAKE2S_H
-+#define _CRYPTO_BLAKE2S_H
- 
- #include <linux/types.h>
- #include <linux/kernel.h>
-@@ -105,4 +105,4 @@ static inline void blake2s(u8 *out, const u8 *in, const u8 *key,
- void blake2s256_hmac(u8 *out, const u8 *in, const u8 *key, const size_t inlen,
- 		     const size_t keylen);
- 
--#endif /* BLAKE2S_H */
-+#endif /* _CRYPTO_BLAKE2S_H */
-diff --git a/include/crypto/internal/blake2s.h b/include/crypto/internal/blake2s.h
-index 867ef3753f5c1..8e50d487500f2 100644
---- a/include/crypto/internal/blake2s.h
-+++ b/include/crypto/internal/blake2s.h
-@@ -4,8 +4,8 @@
-  * Keep this in sync with the corresponding BLAKE2b header.
-  */
- 
--#ifndef BLAKE2S_INTERNAL_H
--#define BLAKE2S_INTERNAL_H
-+#ifndef _CRYPTO_INTERNAL_BLAKE2S_H
-+#define _CRYPTO_INTERNAL_BLAKE2S_H
- 
- #include <crypto/blake2s.h>
- #include <crypto/internal/hash.h>
-@@ -116,4 +116,4 @@ static inline int crypto_blake2s_final(struct shash_desc *desc, u8 *out,
- 	return 0;
- }
- 
--#endif /* BLAKE2S_INTERNAL_H */
-+#endif /* _CRYPTO_INTERNAL_BLAKE2S_H */
+ #include <asm/unaligned.h>
 -- 
 2.29.2
 
