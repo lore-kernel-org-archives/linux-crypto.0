@@ -2,88 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1617C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 18:40:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88436C433E6
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 20:58:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7FF3F22287
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 18:40:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 521A8223E4
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 20:58:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725957AbgLWSkl (ORCPT
+        id S1728395AbgLWU6D (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Dec 2020 13:40:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:49122 "EHLO mail.kernel.org"
+        Wed, 23 Dec 2020 15:58:03 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:39024 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725907AbgLWSkk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Dec 2020 13:40:40 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id CD91522287
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Dec 2020 18:39:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608748799;
-        bh=vUX9x2rjJIpqCN27dCtMPBApRrG120cLfEn3C3MIebg=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=QdhntgnfinHKEZVAAaoto0H97bNAoJDmn1+ULGwArSqczsPCBwH1ZWKSGFs33Rh1k
-         IBTR838/BXEJUNE4uPsFMjvXbp53r+B2biQv209B8MzvOBjar+a0GpmVh6oIcdKXcW
-         Motw0LvuywnVusW1Z061KXVqT6fV2qTp/ZOye03lLtsNOGC7MiGGZ/y7Pq3ZroF+C4
-         MJRbxQN9PjO/pUyIBlxzD1renkIoW3aKoBozLGbKQEy3Efqt/uYDMmCRblSnsLHghH
-         sLVzmAcWuQv84OKSQobPZ7CbApCPeaPgMlRucsACFz/52KxrUkrwzQ7/2tG1J0MAKw
-         peeX4V6wASnRQ==
-Received: by mail-ot1-f53.google.com with SMTP id j12so15810286ota.7
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Dec 2020 10:39:59 -0800 (PST)
-X-Gm-Message-State: AOAM531+Yvm5ds/3EFnyUo4t4NyxeD/0LiGDJD480TSpLUa4c4E9fOim
-        oAbtiPyywf+1hzaBTMne/4JHa66LRxBYyK5ENB0=
-X-Google-Smtp-Source: ABdhPJxWJkOr49i97SRHcVokdrAKmYZCW7wVjty1rwOsRT6OWN3cAeXlb10fBE6M7+aj9uvaf/bfMtgzX7XW1a4vcCQ=
-X-Received: by 2002:a9d:12c:: with SMTP id 41mr20163321otu.77.1608748799155;
- Wed, 23 Dec 2020 10:39:59 -0800 (PST)
+        id S1727187AbgLWU6C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Dec 2020 15:58:02 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1ksBBa-0002fP-D7; Thu, 24 Dec 2020 07:56:43 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 24 Dec 2020 07:56:42 +1100
+Date:   Thu, 24 Dec 2020 07:56:42 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     Ignat Korchagin <ignat@cloudflare.com>, agk@redhat.com,
+        snitzer@redhat.com, dm-devel@redhat.com, dm-crypt@saout.de,
+        linux-kernel@vger.kernel.org, ebiggers@kernel.org,
+        Damien.LeMoal@wdc.com, mpatocka@redhat.com,
+        kernel-team@cloudflare.com, nobuto.murata@canonical.com,
+        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+        linux-crypto <linux-crypto@vger.kernel.org>
+Subject: Re: dm-crypt with no_read_workqueue and no_write_workqueue + btrfs
+ scrub = BUG()
+Message-ID: <20201223205642.GA19817@gondor.apana.org.au>
+References: <16ffadab-42ba-f9c7-8203-87fda3dc9b44@maciej.szmigiero.name>
+ <74c7129b-a437-ebc4-1466-7fb9f034e006@maciej.szmigiero.name>
 MIME-Version: 1.0
-References: <20201222130024.694558-1-marco.chiappero@intel.com>
-In-Reply-To: <20201222130024.694558-1-marco.chiappero@intel.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 23 Dec 2020 19:39:46 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGUBQX2HrGSS8OAC2zDS0_WyaiRQzxyFatpUG+Px+WcKQ@mail.gmail.com>
-Message-ID: <CAMj1kXGUBQX2HrGSS8OAC2zDS0_WyaiRQzxyFatpUG+Px+WcKQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: qat - add CRYPTO_AES to Kconfig dependencies
-To:     Marco Chiappero <marco.chiappero@intel.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        qat-linux <qat-linux@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <74c7129b-a437-ebc4-1466-7fb9f034e006@maciej.szmigiero.name>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 22 Dec 2020 at 13:39, Marco Chiappero <marco.chiappero@intel.com> wrote:
->
-> This patch includes a missing dependency (CRYPTO_AES) which may
-> lead to an "undefined reference to `aes_expandkey'" linking error.
->
-> Fixes: 5106dfeaeabe ("crypto: qat - add AES-XTS support for QAT GEN4 devices")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Marco Chiappero <marco.chiappero@intel.com>
-> ---
->  drivers/crypto/qat/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/crypto/qat/Kconfig b/drivers/crypto/qat/Kconfig
-> index beb379b23dc3..846a3d90b41a 100644
-> --- a/drivers/crypto/qat/Kconfig
-> +++ b/drivers/crypto/qat/Kconfig
-> @@ -11,6 +11,7 @@ config CRYPTO_DEV_QAT
->         select CRYPTO_SHA1
->         select CRYPTO_SHA256
->         select CRYPTO_SHA512
-> +       select CRYPTO_AES
->         select FW_LOADER
->
->  config CRYPTO_DEV_QAT_DH895xCC
-> --
-> 2.26.2
->
+On Wed, Dec 23, 2020 at 04:37:34PM +0100, Maciej S. Szmigiero wrote:
+> 
+> It looks like to me that the skcipher API might not be safe to
+> call from a softirq context, after all.
 
-This should be 'select CRYPTO_LIB_AES'
+skcipher is safe to use in a softirq.  The problem is only in
+dm-crypt where it tries to allocate memory with GFP_NOIO.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
