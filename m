@@ -2,61 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E44C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 14:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51750C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 15:26:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C8D621D79
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 14:34:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EFA82332A
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 15:26:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727441AbgLWOdu (ORCPT
+        id S1727141AbgLWP0Q (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Dec 2020 09:33:50 -0500
-Received: from mail.zx2c4.com ([192.95.5.64]:59529 "EHLO mail.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725957AbgLWOdu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Dec 2020 09:33:50 -0500
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id d384b19b;
-        Wed, 23 Dec 2020 14:24:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=Io97KoT2j7fFJotgUUvzrUqa2Fs=; b=W4yfNf
-        DK9bpU0jmM48T0SxjV+mlpxoJdqoVrWhV7FvACcDI7ZnpR7nrIEZmiHI7VkyjyEV
-        4YKwZPrWXBsR/izUJsioqXlrUfErXy6qr0gLUKzaYSojKrvoil8UWy4qwJkdV4vn
-        eP84gLsa0zmG+ZgqnJ5SutjLdLhuV/UraS0K1z/Vzg6KdJfdwpDv//JjRYtNCmkC
-        CETvOc7D77HhSoujAJbDdKJOp5hVLxB/F0tgbmlEitEekkMSN8ZaH4Z9SBqkYE/K
-        unFKyQB+Cvj+ldTlY/V+ic/kDJRNvQ5mlr4MLoaeeh1+zfGXO0xZRio4SPmDjzks
-        wLbNkZXJaRW0n9Bw==
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7db949a5 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Wed, 23 Dec 2020 14:24:35 +0000 (UTC)
-Received: by mail-yb1-f174.google.com with SMTP id a16so14747620ybh.5;
-        Wed, 23 Dec 2020 06:33:07 -0800 (PST)
-X-Gm-Message-State: AOAM532iUhGsJx2fpR7HHDz7Ku8oJQ+rzudBOoDt2fggfhA8GBwebKFk
-        g+jPWsevxS4EAL1Ai2usJUcuRrwW5d0+HCJj4p0=
-X-Google-Smtp-Source: ABdhPJw7i8d5iEIXttO/QVmZY12Qr9HAJyMwlDNwLzajdLyZHEmgxeBea/AGlLWEmrAt/27a69foGdtbtoXFZCLvBzg=
-X-Received: by 2002:a5b:78d:: with SMTP id b13mr36070834ybq.123.1608733985640;
- Wed, 23 Dec 2020 06:33:05 -0800 (PST)
-MIME-Version: 1.0
-References: <20201130151231.GA24862@lst.de> <CAHmME9p4vFGWh7+CKF4f3dw5r+ru5PVG0-vP77JowX8sPhin1g@mail.gmail.com>
- <20201130165339.GE5364@mit.edu> <CAHmME9pksS8ec17RAwCNJimt4B0xZgd3qYHUPnaT4Bj4CF7n0A@mail.gmail.com>
- <20201218132519.kj3nz7swsx7vvlr5@valinor.lan> <20201223132851.55d19271@blackhole.lan>
- <20201223151014.57caf98b@ezekiel.suse.cz>
-In-Reply-To: <20201223151014.57caf98b@ezekiel.suse.cz>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 23 Dec 2020 15:32:55 +0100
-X-Gmail-Original-Message-ID: <CAHmME9ooV1HRGO4bLsNKqv1EjDsUYsM6TcMbmEL=4CejTB+1ZQ@mail.gmail.com>
-Message-ID: <CAHmME9ooV1HRGO4bLsNKqv1EjDsUYsM6TcMbmEL=4CejTB+1ZQ@mail.gmail.com>
+        Wed, 23 Dec 2020 10:26:16 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.82]:35265 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727107AbgLWP0P (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Dec 2020 10:26:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1608737001;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:From:
+        Subject:Sender;
+        bh=GPaKSqAjiz95DFz0fxi4lWiKU6bB5zmTEZkR6+nVG1c=;
+        b=es7vzc8y7gbNc+Ea3R0xEEqWexvGwzwSCfeM5STGcWcDWjeckYuXqfnP9gv8kqTT6o
+        CNvVhtbKfUUulQeJUkf0R3r5OhuIXxJulQafmqtdvKDD+MVSfTnjePKSA1SN6YDf5HMd
+        tyky5+/WHAL0JqugZQ+lvrIRxuQbWuTBcC7HPdXTfprDnAqaZyp9SScVaSLfQZXrhR2a
+        yV496X8xe9h+VZLk3xkOClSh9ltrScsLX19jh+8vOZopY9abau7ykt2OogvdgEzXNQIP
+        lEXgIxhtLpq9X8QHAKnF4QmUMsPeWB3UznFAikXOPfd/jNZ0XAp9oaXdfku5zHbxg3Q3
+        vEIQ==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNzyCzy1Sfr67uExK884EC0GFGHavJSlFkMRfNUE="
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 47.10.7 SBL|AUTH)
+        with ESMTPSA id h02bd9wBNFMN0oq
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Wed, 23 Dec 2020 16:22:23 +0100 (CET)
+Message-ID: <e61c46f2ded9d8676c77beb40c78200df0ada928.camel@chronox.de>
 Subject: Re: drivers/char/random.c needs a (new) maintainer
-To:     Petr Tesarik <ptesarik@suse.cz>
+From:   Stephan Mueller <smueller@chronox.de>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Petr Tesarik <ptesarik@suse.cz>
 Cc:     Torsten Duwe <duwe@lst.de>,
         Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
         "Theodore Y. Ts'o" <tytso@mit.edu>,
         Linus Torvalds <torvalds@linux-foundation.org>,
-        =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>,
         Willy Tarreau <w@1wt.eu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Nicolai Stange <nstange@suse.de>,
@@ -82,29 +73,49 @@ Cc:     Torsten Duwe <duwe@lst.de>,
         And y Lavr <andy.lavr@gmail.com>,
         Eric Biggers <ebiggers@kernel.org>,
         Ard Biesheuvel <ardb@kernel.org>, simo@redhat.com
+Date:   Wed, 23 Dec 2020 16:22:22 +0100
+In-Reply-To: <CAHmME9ooV1HRGO4bLsNKqv1EjDsUYsM6TcMbmEL=4CejTB+1ZQ@mail.gmail.com>
+References: <20201130151231.GA24862@lst.de>
+         <CAHmME9p4vFGWh7+CKF4f3dw5r+ru5PVG0-vP77JowX8sPhin1g@mail.gmail.com>
+         <20201130165339.GE5364@mit.edu>
+         <CAHmME9pksS8ec17RAwCNJimt4B0xZgd3qYHUPnaT4Bj4CF7n0A@mail.gmail.com>
+         <20201218132519.kj3nz7swsx7vvlr5@valinor.lan>
+         <20201223132851.55d19271@blackhole.lan>
+         <20201223151014.57caf98b@ezekiel.suse.cz>
+         <CAHmME9ooV1HRGO4bLsNKqv1EjDsUYsM6TcMbmEL=4CejTB+1ZQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.2 (3.38.2-1.fc33) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 23, 2020 at 3:17 PM Petr Tesarik <ptesarik@suse.cz> wrote:
-> Upfront, let me admit that SUSE has a vested interest in a FIPS-certifiable Linux kernel.
+Am Mittwoch, dem 23.12.2020 um 15:32 +0100 schrieb Jason A. Donenfeld:
+> 
+> I would, however, be interested in a keccak-based construction. But
+> just using the keccak permutation does not automatically make it
+> "SHA-3", so we're back at the same issue again. FIPS is simply not
+> interesting for our requirements.
 
-Sorry, but just because you have a "vested interest", or a financial
-interest, or because you want it does not suddenly make it a good
-idea. The idea is to have good crypto, not to merely check some boxes
-for the bean counters.
+Your requirements? Interesting approach.
 
-For example, it's very unlikely that future kernel RNGs will move to
-using AES, due to the performance overhead involved on non-table-based
-implementations, and the lack of availability of FPU/AES-NI in all the
-contexts we need. NT's fortuna machine can use AES, because NT allows
-the FPU in all contexts. We don't have that luxury (or associated
-performance penalty).
+Using non-assessed cryptography? Sounds dangerous to me even though it may be
+based on some well-known construction.
 
-I would, however, be interested in a keccak-based construction. But
-just using the keccak permutation does not automatically make it
-"SHA-3", so we're back at the same issue again. FIPS is simply not
-interesting for our requirements.
+I thought Linux in general and crypto in particular is about allowing user (or
+the vendor) to decide about the used algorithm. So, let us have a mechanism
+that gives them this freedom.
 
-Jason
+Thus the proposed idea sounds to me like a dangerous proposition upon which
+almost all cryptography shall rest. This will surely invite even more
+fragmentation.
+
+Ciao
+Stephan
+
+PS: This entire discussion is NOT about the crypto side of the random numbers,
+but about how get the entropy for the random numbers.
+
+
+
