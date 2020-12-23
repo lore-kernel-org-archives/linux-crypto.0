@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52658C433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 09:07:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7629C433E9
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 09:08:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F11E207CD
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 09:07:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91D3C22482
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 09:08:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727890AbgLWJHi (ORCPT
+        id S1728306AbgLWJH4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Dec 2020 04:07:38 -0500
-Received: from mail.kernel.org ([198.145.29.99]:32872 "EHLO mail.kernel.org"
+        Wed, 23 Dec 2020 04:07:56 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33050 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727940AbgLWJHh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Dec 2020 04:07:37 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 41477207CD
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Dec 2020 09:06:56 +0000 (UTC)
+        id S1728192AbgLWJHz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Dec 2020 04:07:55 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D1D2620760
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Dec 2020 09:07:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608714416;
-        bh=02kZNEDLbTf74ZQw5TBK/SmUg9cNEWO6F2RbmGNGwBM=;
+        s=k20201202; t=1608714435;
+        bh=8MidONwWWze5P3m36JX1C/3bEdswDVgpMQR1AeneRSM=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=a1MCjmYXdDSsDJ6jRro/zmoZuTe6vOW2tGs56MX5hh7ccLgI+RUXpO5gr9R1Ekg7x
-         baa90kLzrw6KEQdxov3AoXS6kTRkC9LrcP/HMDsm2dSO4G3op8rDnZ92IGzHVE3dKe
-         kKFOgf1Xlay5yWO63Pf7OFYoGElRce358vLy3WcqNmmZEpqxlKsZNddVW46Pr0fc/n
-         tn2KW4X+Hr0sNPjztMBvSt2w7nxdlLP54PqfOrvyNntNhWjbW41oWsZgQtLmula49M
-         W+kZSGEQVQYzLMVg1YupcEkLTc/fnca3aPSKOC7V3YO9fI0yN1tVY0LlJbxBZAOeV7
-         ZWYnkVpQm/8zg==
-Received: by mail-oi1-f181.google.com with SMTP id s75so17645749oih.1
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Dec 2020 01:06:56 -0800 (PST)
-X-Gm-Message-State: AOAM533htf7wK/VFouF6ggdWK39ybHvdvwBfHz6mNZv+K6Hk527BA+E4
-        /nZoIJPBSwq1GL1uDEmIBfkRLBu+103CYPIiD/M=
-X-Google-Smtp-Source: ABdhPJwFARdFj4DHOSqQciQ/rfbHNVXlyqoEVwJUueo5le+jj+/LCMSeHJ+yyoTTfTCFBGgFpHxXNXIChfq3O9tCENQ=
-X-Received: by 2002:aca:dd03:: with SMTP id u3mr17297513oig.47.1608714415591;
- Wed, 23 Dec 2020 01:06:55 -0800 (PST)
+        b=qW3JdSdmt4dgIch0Qc+0z6khWfS4rI2WCIH0EkodnPLKvNeJ3LI7KsF8y9O4ds54P
+         V/DSiUwVtF1GU9wRtiFvHF+q/YZiPDkV0qTLroufa0xmfZXA7vBzl2NDllOCp64jTk
+         a9W4rAIvFRdnyLTuQV9UnhuyiV/93Uftsau7kDJlDJKq0sBxGJcl1FvfYSJe4Jr16u
+         AyjjuTcVdLT1CYDmmgB07CH59rQC28e4gPyELuTD3gUWmSivn4gogCbDpwLC0pox16
+         HSkTLgWhjuCOiBBJ6ZyIAxSM6y1HklGMeb7D2C6HsfsIG3mdrc549db6gSRFBUsZr3
+         2iTnGhgYZHFQg==
+Received: by mail-ot1-f54.google.com with SMTP id x13so14429602oto.8
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Dec 2020 01:07:14 -0800 (PST)
+X-Gm-Message-State: AOAM532Ucg8NO9tfW3fPDEDURcIZJN37JuGMFy2m/vNmjeG+1LWO3gr0
+        7DBiUSw6qtTugOvBPukXQoFgrWrXotGMxAQV/Vc=
+X-Google-Smtp-Source: ABdhPJzrqrY6BlMIn/yL86+o1SM0iLdj5OgZRMC8dw1IA7z80emEBME1npLJ8l+ZToQ5QGUdGnNp6JzxONrJhFcBFas=
+X-Received: by 2002:a05:6830:10d2:: with SMTP id z18mr18790670oto.90.1608714434115;
+ Wed, 23 Dec 2020 01:07:14 -0800 (PST)
 MIME-Version: 1.0
-References: <20201223081003.373663-1-ebiggers@kernel.org> <20201223081003.373663-7-ebiggers@kernel.org>
-In-Reply-To: <20201223081003.373663-7-ebiggers@kernel.org>
+References: <20201223081003.373663-1-ebiggers@kernel.org> <20201223081003.373663-8-ebiggers@kernel.org>
+In-Reply-To: <20201223081003.373663-8-ebiggers@kernel.org>
 From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 23 Dec 2020 10:06:44 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXECQh_U+N2XqUdijy+rAfX035DWH+23ZBb7g49b8mdPog@mail.gmail.com>
-Message-ID: <CAMj1kXECQh_U+N2XqUdijy+rAfX035DWH+23ZBb7g49b8mdPog@mail.gmail.com>
-Subject: Re: [PATCH v3 06/14] crypto: blake2s - optimize blake2s initialization
+Date:   Wed, 23 Dec 2020 10:07:03 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXHc8O0FxUqm5854f3o5dh+S13_smCQqorXeN7CVLdjWpw@mail.gmail.com>
+Message-ID: <CAMj1kXHc8O0FxUqm5854f3o5dh+S13_smCQqorXeN7CVLdjWpw@mail.gmail.com>
+Subject: Re: [PATCH v3 07/14] crypto: blake2s - add comment for blake2s_state fields
 To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Linux ARM <linux-arm-kernel@lists.infradead.org>,
@@ -63,132 +63,29 @@ On Wed, 23 Dec 2020 at 09:12, Eric Biggers <ebiggers@kernel.org> wrote:
 >
 > From: Eric Biggers <ebiggers@google.com>
 >
-> If no key was provided, then don't waste time initializing the block
-> buffer, as its initial contents won't be used.
->
-> Also, make crypto_blake2s_init() and blake2s() call a single internal
-> function __blake2s_init() which treats the key as optional, rather than
-> conditionally calling blake2s_init() or blake2s_init_key().  This
-> reduces the compiled code size, as previously both blake2s_init() and
-> blake2s_init_key() were being inlined into these two callers, except
-> when the key size passed to blake2s() was a compile-time constant.
->
-> These optimizations aren't that significant for BLAKE2s.  However, the
-> equivalent optimizations will be more significant for BLAKE2b, as
-> everything is twice as big in BLAKE2b.  And it's good to keep things
-> consistent rather than making optimizations for BLAKE2b but not BLAKE2s.
+> The first three fields of 'struct blake2s_state' are used in assembly
+> code, which isn't immediately obvious, so add a comment to this effect.
 >
 > Signed-off-by: Eric Biggers <ebiggers@google.com>
 
 Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
 > ---
->  include/crypto/blake2s.h          | 53 ++++++++++++++++---------------
->  include/crypto/internal/blake2s.h |  5 +--
->  2 files changed, 28 insertions(+), 30 deletions(-)
+>  include/crypto/blake2s.h | 1 +
+>  1 file changed, 1 insertion(+)
 >
 > diff --git a/include/crypto/blake2s.h b/include/crypto/blake2s.h
-> index b471deac28ff8..734ed22b7a6aa 100644
+> index 734ed22b7a6aa..f1c8330a61a91 100644
 > --- a/include/crypto/blake2s.h
 > +++ b/include/crypto/blake2s.h
-> @@ -43,29 +43,34 @@ enum blake2s_iv {
->         BLAKE2S_IV7 = 0x5BE0CD19UL,
+> @@ -24,6 +24,7 @@ enum blake2s_lengths {
 >  };
 >
-> -void blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen);
-> -void blake2s_final(struct blake2s_state *state, u8 *out);
-> -
-> -static inline void blake2s_init_param(struct blake2s_state *state,
-> -                                     const u32 param)
-> +static inline void __blake2s_init(struct blake2s_state *state, size_t outlen,
-> +                                 const void *key, size_t keylen)
->  {
-> -       *state = (struct blake2s_state){{
-> -               BLAKE2S_IV0 ^ param,
-> -               BLAKE2S_IV1,
-> -               BLAKE2S_IV2,
-> -               BLAKE2S_IV3,
-> -               BLAKE2S_IV4,
-> -               BLAKE2S_IV5,
-> -               BLAKE2S_IV6,
-> -               BLAKE2S_IV7,
-> -       }};
-> +       state->h[0] = BLAKE2S_IV0 ^ (0x01010000 | keylen << 8 | outlen);
-> +       state->h[1] = BLAKE2S_IV1;
-> +       state->h[2] = BLAKE2S_IV2;
-> +       state->h[3] = BLAKE2S_IV3;
-> +       state->h[4] = BLAKE2S_IV4;
-> +       state->h[5] = BLAKE2S_IV5;
-> +       state->h[6] = BLAKE2S_IV6;
-> +       state->h[7] = BLAKE2S_IV7;
-> +       state->t[0] = 0;
-> +       state->t[1] = 0;
-> +       state->f[0] = 0;
-> +       state->f[1] = 0;
-> +       state->buflen = 0;
-> +       state->outlen = outlen;
-> +       if (keylen) {
-> +               memcpy(state->buf, key, keylen);
-> +               memset(&state->buf[keylen], 0, BLAKE2S_BLOCK_SIZE - keylen);
-> +               state->buflen = BLAKE2S_BLOCK_SIZE;
-> +       }
->  }
->
->  static inline void blake2s_init(struct blake2s_state *state,
->                                 const size_t outlen)
->  {
-> -       blake2s_init_param(state, 0x01010000 | outlen);
-> -       state->outlen = outlen;
-> +       __blake2s_init(state, outlen, NULL, 0);
->  }
->
->  static inline void blake2s_init_key(struct blake2s_state *state,
-> @@ -75,12 +80,12 @@ static inline void blake2s_init_key(struct blake2s_state *state,
->         WARN_ON(IS_ENABLED(DEBUG) && (!outlen || outlen > BLAKE2S_HASH_SIZE ||
->                 !key || !keylen || keylen > BLAKE2S_KEY_SIZE));
->
-> -       blake2s_init_param(state, 0x01010000 | keylen << 8 | outlen);
-> -       memcpy(state->buf, key, keylen);
-> -       state->buflen = BLAKE2S_BLOCK_SIZE;
-> -       state->outlen = outlen;
-> +       __blake2s_init(state, outlen, key, keylen);
->  }
->
-> +void blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen);
-> +void blake2s_final(struct blake2s_state *state, u8 *out);
-> +
->  static inline void blake2s(u8 *out, const u8 *in, const u8 *key,
->                            const size_t outlen, const size_t inlen,
->                            const size_t keylen)
-> @@ -91,11 +96,7 @@ static inline void blake2s(u8 *out, const u8 *in, const u8 *key,
->                 outlen > BLAKE2S_HASH_SIZE || keylen > BLAKE2S_KEY_SIZE ||
->                 (!key && keylen)));
->
-> -       if (keylen)
-> -               blake2s_init_key(&state, outlen, key, keylen);
-> -       else
-> -               blake2s_init(&state, outlen);
-> -
-> +       __blake2s_init(&state, outlen, key, keylen);
->         blake2s_update(&state, in, inlen);
->         blake2s_final(&state, out);
->  }
-> diff --git a/include/crypto/internal/blake2s.h b/include/crypto/internal/blake2s.h
-> index 2ea0a8f5e7f41..867ef3753f5c1 100644
-> --- a/include/crypto/internal/blake2s.h
-> +++ b/include/crypto/internal/blake2s.h
-> @@ -93,10 +93,7 @@ static inline int crypto_blake2s_init(struct shash_desc *desc)
->         struct blake2s_state *state = shash_desc_ctx(desc);
->         unsigned int outlen = crypto_shash_digestsize(desc->tfm);
->
-> -       if (tctx->keylen)
-> -               blake2s_init_key(state, outlen, tctx->key, tctx->keylen);
-> -       else
-> -               blake2s_init(state, outlen);
-> +       __blake2s_init(state, outlen, tctx->key, tctx->keylen);
->         return 0;
->  }
->
+>  struct blake2s_state {
+> +       /* 'h', 't', and 'f' are used in assembly code, so keep them as-is. */
+>         u32 h[8];
+>         u32 t[2];
+>         u32 f[2];
 > --
 > 2.29.2
 >
