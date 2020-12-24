@@ -2,28 +2,27 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74E89C433E6
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Dec 2020 06:11:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 933B2C433E9
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Dec 2020 06:11:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2B20422AAC
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Dec 2020 06:11:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6683723331
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Dec 2020 06:11:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728230AbgLXGLS (ORCPT
+        id S1728147AbgLXGLR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Dec 2020 01:11:18 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:9642 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728122AbgLXGLR (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 24 Dec 2020 01:11:17 -0500
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4D1fmr55cYz15hwX;
-        Thu, 24 Dec 2020 14:09:48 +0800 (CST)
+Received: from szxga06-in.huawei.com ([45.249.212.32]:9480 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726060AbgLXGLQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 24 Dec 2020 01:11:16 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4D1fn14pT7zhwtQ;
+        Thu, 24 Dec 2020 14:09:57 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.24) by
  DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
  14.3.498.0; Thu, 24 Dec 2020 14:10:25 +0800
@@ -32,12 +31,10 @@ To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>, <yumeng18@huawei.com>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH v5 2/5] crypto: hisilicon/hpre - add algorithm type
-Date:   Thu, 24 Dec 2020 14:08:24 +0800
-Message-ID: <1608790107-32617-3-git-send-email-yumeng18@huawei.com>
+Subject: [PATCH v5 0/5] add ECDH and CURVE25519 algorithms support for Kunpeng 930
+Date:   Thu, 24 Dec 2020 14:08:22 +0800
+Message-ID: <1608790107-32617-1-git-send-email-yumeng18@huawei.com>
 X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1608790107-32617-1-git-send-email-yumeng18@huawei.com>
-References: <1608790107-32617-1-git-send-email-yumeng18@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.67.165.24]
@@ -46,123 +43,53 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Algorithm type is brought in to get hardware HPRE queue
-to support different algorithms.
+1. Move elliptic curve parameter definitions out to "include/crypto";
+2. Add some new elliptic curve parameters definitions, and reorder
+   ECC 'Curves IDs';
+3. Add ECDH and CURVE25519 algorithms support for Kunpeng 930.
 
-Signed-off-by: Meng Yu <yumeng18@huawei.com>
-Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
----
- drivers/crypto/hisilicon/hpre/hpre.h        | 10 +++++++++-
- drivers/crypto/hisilicon/hpre/hpre_crypto.c | 12 ++++++------
- drivers/crypto/hisilicon/hpre/hpre_main.c   | 11 +++++++++--
- 3 files changed, 24 insertions(+), 9 deletions(-)
+These patches depend on:
+[v2,1/6] crypto: hisilicon/hpre - add version adapt to new algorithms,
+https://patchwork.kernel.org/project/linux-crypto/patch/1607598607-8728-
+2-git-send-email-liulongfang@huawei.com/
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
-index cc50f23..02193e1 100644
---- a/drivers/crypto/hisilicon/hpre/hpre.h
-+++ b/drivers/crypto/hisilicon/hpre/hpre.h
-@@ -10,6 +10,14 @@
- #define HPRE_PF_DEF_Q_NUM		64
- #define HPRE_PF_DEF_Q_BASE		0
- 
-+/*
-+ * type used in qm sqc DW6.
-+ * 0 - Algorithm which has been supported in V2, like RSA, DH and so on;
-+ * 1 - ECC algorithm in V3.
-+ */
-+#define HPRE_V2_ALG_TYPE	0
-+#define HPRE_V3_ECC_ALG_TYPE	1
-+
- enum {
- 	HPRE_CLUSTER0,
- 	HPRE_CLUSTER1,
-@@ -92,7 +100,7 @@ struct hpre_sqe {
- 	__le32 rsvd1[_HPRE_SQE_ALIGN_EXT];
- };
- 
--struct hisi_qp *hpre_create_qp(void);
-+struct hisi_qp *hpre_create_qp(u8 type);
- int hpre_algs_register(struct hisi_qm *qm);
- void hpre_algs_unregister(struct hisi_qm *qm);
- 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index d89b2f5..712bea9 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -152,12 +152,12 @@ static void hpre_rm_req_from_ctx(struct hpre_asym_request *hpre_req)
- 	}
- }
- 
--static struct hisi_qp *hpre_get_qp_and_start(void)
-+static struct hisi_qp *hpre_get_qp_and_start(u8 type)
- {
- 	struct hisi_qp *qp;
- 	int ret;
- 
--	qp = hpre_create_qp();
-+	qp = hpre_create_qp(type);
- 	if (!qp) {
- 		pr_err("Can not create hpre qp!\n");
- 		return ERR_PTR(-ENODEV);
-@@ -422,11 +422,11 @@ static void hpre_alg_cb(struct hisi_qp *qp, void *resp)
- 	req->cb(ctx, resp);
- }
- 
--static int hpre_ctx_init(struct hpre_ctx *ctx)
-+static int hpre_ctx_init(struct hpre_ctx *ctx, u8 type)
- {
- 	struct hisi_qp *qp;
- 
--	qp = hpre_get_qp_and_start();
-+	qp = hpre_get_qp_and_start(type);
- 	if (IS_ERR(qp))
- 		return PTR_ERR(qp);
- 
-@@ -674,7 +674,7 @@ static int hpre_dh_init_tfm(struct crypto_kpp *tfm)
- {
- 	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
- 
--	return hpre_ctx_init(ctx);
-+	return hpre_ctx_init(ctx, HPRE_V2_ALG_TYPE);
- }
- 
- static void hpre_dh_exit_tfm(struct crypto_kpp *tfm)
-@@ -1100,7 +1100,7 @@ static int hpre_rsa_init_tfm(struct crypto_akcipher *tfm)
- 		return PTR_ERR(ctx->rsa.soft_tfm);
- 	}
- 
--	ret = hpre_ctx_init(ctx);
-+	ret = hpre_ctx_init(ctx, HPRE_V2_ALG_TYPE);
- 	if (ret)
- 		crypto_free_akcipher(ctx->rsa.soft_tfm);
- 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index fc7173a..1ae8fa1 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -209,13 +209,20 @@ static u32 vfs_num;
- module_param_cb(vfs_num, &vfs_num_ops, &vfs_num, 0444);
- MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63), 0(default)");
- 
--struct hisi_qp *hpre_create_qp(void)
-+struct hisi_qp *hpre_create_qp(u8 type)
- {
- 	int node = cpu_to_node(smp_processor_id());
- 	struct hisi_qp *qp = NULL;
- 	int ret;
- 
--	ret = hisi_qm_alloc_qps_node(&hpre_devices, 1, 0, node, &qp);
-+	if (type != HPRE_V2_ALG_TYPE && type != HPRE_V3_ECC_ALG_TYPE)
-+		return NULL;
-+
-+	/*
-+	 * type: 0 - RSA/DH. algorithm supported in V2,
-+	 *       1 - ECC algorithm in V3.
-+	 */
-+	ret = hisi_qm_alloc_qps_node(&hpre_devices, 1, type, node, &qp);
- 	if (!ret)
- 		return qp;
- 
+v4->v5: 
+- patch #4: delete P-128 and P-320 curve, as the few using case in the kernel
+
+v3 -> v4:
+- patch #3: add new, move ecc_curve params to "include/crypto"
+
+v2 -> v3:
+- patch #5: fix sparse warnings
+- patch #5: add 'CRYPTO_LIB_CURVE25519_GENERIC' in 'Kconfig'
+
+v1 -> v2:
+- patch #5: delete `curve25519_null_point'
+
+Hui Tang (1):
+  crypto: hisilicon/hpre - add some updates to adapt to Kunpeng 930
+
+Meng Yu (4):
+  crypto: hisilicon/hpre - add algorithm type
+  crypto: expose elliptic curve parameters as Crypto APIs
+  crypto: hisilicon/hpre - add 'ECDH' algorithm
+  crypto: hisilicon/hpre - add 'CURVE25519' algorithm
+
+ crypto/ecc.c                                |   5 +-
+ crypto/ecc.h                                |  37 +-
+ crypto/ecc_curve_defs.h                     |  57 --
+ crypto/ecrdsa_defs.h                        |   2 +-
+ crypto/testmgr.h                            |  12 +-
+ drivers/crypto/hisilicon/Kconfig            |   1 +
+ drivers/crypto/hisilicon/hpre/hpre.h        |  22 +-
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 860 +++++++++++++++++++++++++++-
+ drivers/crypto/hisilicon/hpre/hpre_main.c   | 105 ++--
+ include/crypto/ecc_curve_defs.h             | 212 +++++++
+ include/crypto/ecdh.h                       |   5 +-
+ 11 files changed, 1168 insertions(+), 150 deletions(-)
+ delete mode 100644 crypto/ecc_curve_defs.h
+ create mode 100644 include/crypto/ecc_curve_defs.h
+
 -- 
 2.8.1
 
