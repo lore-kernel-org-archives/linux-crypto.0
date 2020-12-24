@@ -2,290 +2,167 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F73CC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 22:40:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74E89C433E6
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Dec 2020 06:11:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E660225AC
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Dec 2020 22:40:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B20422AAC
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Dec 2020 06:11:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726885AbgLWWk2 (ORCPT
+        id S1728230AbgLXGLS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Dec 2020 17:40:28 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59410 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726662AbgLWWk2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Dec 2020 17:40:28 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 453E92253A;
-        Wed, 23 Dec 2020 22:39:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608763163;
-        bh=OIRH+BbthxHl/rjCstDZNorJmgFvhqADaPgq0/iYUDs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KuUDeROZPzcYguBMKUgMJTWwH5hvM9oqufAQwMgj7pQ1ELEspOlpGdLiki7kXdnRl
-         obsRBV3q/L2x7/uJWMHH5DgQqgjKIPGM9OOrngEqBkqg4DzKHpJv64eT+EkCxWrxLp
-         0BmGDb02sjtuI/R58yzRaws5Lmxpwq09Jx1wNk5go9zKulmLPrGJPP2XBDMnurj4Dd
-         QEfphAq+xhb8Cj4hOpZEiYvIldGYB6LUKpdLmLcpzpdYjct/J1uR5A16lguBWHO5ta
-         GZKi5DkXFy29IkTFqMvmFTLzcZlr+EnGtcnna/+TD6fa1I+QnPMTu7vpOqJ5ySc8GW
-         BZE5IUEc6geoA==
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     dm-devel@redhat.com, Ard Biesheuvel <ardb@kernel.org>,
-        Megha Dey <megha.dey@intel.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Milan Broz <gmazyland@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>
-Subject: [RFC PATCH 09/10] crypto: x86/twofish - drop CTR mode implementation
-Date:   Wed, 23 Dec 2020 23:38:40 +0100
-Message-Id: <20201223223841.11311-10-ardb@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20201223223841.11311-1-ardb@kernel.org>
-References: <20201223223841.11311-1-ardb@kernel.org>
+        Thu, 24 Dec 2020 01:11:18 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:9642 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728122AbgLXGLR (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 24 Dec 2020 01:11:17 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4D1fmr55cYz15hwX;
+        Thu, 24 Dec 2020 14:09:48 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.24) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 24 Dec 2020 14:10:25 +0800
+From:   Meng Yu <yumeng18@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
+        <wangzhou1@hisilicon.com>, <yumeng18@huawei.com>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH v5 2/5] crypto: hisilicon/hpre - add algorithm type
+Date:   Thu, 24 Dec 2020 14:08:24 +0800
+Message-ID: <1608790107-32617-3-git-send-email-yumeng18@huawei.com>
+X-Mailer: git-send-email 2.8.1
+In-Reply-To: <1608790107-32617-1-git-send-email-yumeng18@huawei.com>
+References: <1608790107-32617-1-git-send-email-yumeng18@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Twofish in CTR mode is never used by the kernel directly, and is highly
-unlikely to be relied upon by dm-crypt or algif_skcipher. So let's drop
-the accelerated CTR mode implementation, and instead, rely on the CTR
-template and the bare cipher.
+Algorithm type is brought in to get hardware HPRE queue
+to support different algorithms.
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Meng Yu <yumeng18@huawei.com>
+Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
 ---
- arch/x86/crypto/twofish-avx-x86_64-asm_64.S | 27 --------
- arch/x86/crypto/twofish_avx_glue.c          | 38 -----------
- arch/x86/crypto/twofish_glue_3way.c         | 72 --------------------
- arch/x86/include/asm/crypto/twofish.h       |  4 --
- 4 files changed, 141 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre.h        | 10 +++++++++-
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 12 ++++++------
+ drivers/crypto/hisilicon/hpre/hpre_main.c   | 11 +++++++++--
+ 3 files changed, 24 insertions(+), 9 deletions(-)
 
-diff --git a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
-index 84e61ef03638..37e63b3c664e 100644
---- a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
-+++ b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
-@@ -374,30 +374,3 @@ SYM_FUNC_START(twofish_cbc_dec_8way)
- 	FRAME_END
- 	ret;
- SYM_FUNC_END(twofish_cbc_dec_8way)
--
--SYM_FUNC_START(twofish_ctr_8way)
--	/* input:
--	 *	%rdi: ctx, CTX
--	 *	%rsi: dst
--	 *	%rdx: src
--	 *	%rcx: iv (little endian, 128bit)
--	 */
--	FRAME_BEGIN
--
--	pushq %r12;
--
--	movq %rsi, %r11;
--	movq %rdx, %r12;
--
--	load_ctr_8way(%rcx, .Lbswap128_mask, RA1, RB1, RC1, RD1, RA2, RB2, RC2,
--		      RD2, RX0, RX1, RY0);
--
--	call __twofish_enc_blk8;
--
--	store_ctr_8way(%r12, %r11, RC1, RD1, RA1, RB1, RC2, RD2, RA2, RB2);
--
--	popq %r12;
--
--	FRAME_END
--	ret;
--SYM_FUNC_END(twofish_ctr_8way)
-diff --git a/arch/x86/crypto/twofish_avx_glue.c b/arch/x86/crypto/twofish_avx_glue.c
-index 7b539bbb108f..13f810b61034 100644
---- a/arch/x86/crypto/twofish_avx_glue.c
-+++ b/arch/x86/crypto/twofish_avx_glue.c
-@@ -25,8 +25,6 @@ asmlinkage void twofish_ecb_enc_8way(const void *ctx, u8 *dst, const u8 *src);
- asmlinkage void twofish_ecb_dec_8way(const void *ctx, u8 *dst, const u8 *src);
+diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
+index cc50f23..02193e1 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre.h
++++ b/drivers/crypto/hisilicon/hpre/hpre.h
+@@ -10,6 +10,14 @@
+ #define HPRE_PF_DEF_Q_NUM		64
+ #define HPRE_PF_DEF_Q_BASE		0
  
- asmlinkage void twofish_cbc_dec_8way(const void *ctx, u8 *dst, const u8 *src);
--asmlinkage void twofish_ctr_8way(const void *ctx, u8 *dst, const u8 *src,
--				 le128 *iv);
- 
- static int twofish_setkey_skcipher(struct crypto_skcipher *tfm,
- 				   const u8 *key, unsigned int keylen)
-@@ -55,22 +53,6 @@ static const struct common_glue_ctx twofish_enc = {
- 	} }
++/*
++ * type used in qm sqc DW6.
++ * 0 - Algorithm which has been supported in V2, like RSA, DH and so on;
++ * 1 - ECC algorithm in V3.
++ */
++#define HPRE_V2_ALG_TYPE	0
++#define HPRE_V3_ECC_ALG_TYPE	1
++
+ enum {
+ 	HPRE_CLUSTER0,
+ 	HPRE_CLUSTER1,
+@@ -92,7 +100,7 @@ struct hpre_sqe {
+ 	__le32 rsvd1[_HPRE_SQE_ALIGN_EXT];
  };
  
--static const struct common_glue_ctx twofish_ctr = {
--	.num_funcs = 3,
--	.fpu_blocks_limit = TWOFISH_PARALLEL_BLOCKS,
--
--	.funcs = { {
--		.num_blocks = TWOFISH_PARALLEL_BLOCKS,
--		.fn_u = { .ctr = twofish_ctr_8way }
--	}, {
--		.num_blocks = 3,
--		.fn_u = { .ctr = twofish_enc_blk_ctr_3way }
--	}, {
--		.num_blocks = 1,
--		.fn_u = { .ctr = twofish_enc_blk_ctr }
--	} }
--};
--
- static const struct common_glue_ctx twofish_dec = {
- 	.num_funcs = 3,
- 	.fpu_blocks_limit = TWOFISH_PARALLEL_BLOCKS,
-@@ -123,11 +105,6 @@ static int cbc_decrypt(struct skcipher_request *req)
- 	return glue_cbc_decrypt_req_128bit(&twofish_dec_cbc, req);
+-struct hisi_qp *hpre_create_qp(void);
++struct hisi_qp *hpre_create_qp(u8 type);
+ int hpre_algs_register(struct hisi_qm *qm);
+ void hpre_algs_unregister(struct hisi_qm *qm);
+ 
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index d89b2f5..712bea9 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -152,12 +152,12 @@ static void hpre_rm_req_from_ctx(struct hpre_asym_request *hpre_req)
+ 	}
  }
  
--static int ctr_crypt(struct skcipher_request *req)
--{
--	return glue_ctr_req_128bit(&twofish_ctr, req);
--}
--
- static struct skcipher_alg twofish_algs[] = {
- 	{
- 		.base.cra_name		= "__ecb(twofish)",
-@@ -156,21 +133,6 @@ static struct skcipher_alg twofish_algs[] = {
- 		.setkey			= twofish_setkey_skcipher,
- 		.encrypt		= cbc_encrypt,
- 		.decrypt		= cbc_decrypt,
--	}, {
--		.base.cra_name		= "__ctr(twofish)",
--		.base.cra_driver_name	= "__ctr-twofish-avx",
--		.base.cra_priority	= 400,
--		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
--		.base.cra_blocksize	= 1,
--		.base.cra_ctxsize	= sizeof(struct twofish_ctx),
--		.base.cra_module	= THIS_MODULE,
--		.min_keysize		= TF_MIN_KEY_SIZE,
--		.max_keysize		= TF_MAX_KEY_SIZE,
--		.ivsize			= TF_BLOCK_SIZE,
--		.chunksize		= TF_BLOCK_SIZE,
--		.setkey			= twofish_setkey_skcipher,
--		.encrypt		= ctr_crypt,
--		.decrypt		= ctr_crypt,
- 	},
- };
+-static struct hisi_qp *hpre_get_qp_and_start(void)
++static struct hisi_qp *hpre_get_qp_and_start(u8 type)
+ {
+ 	struct hisi_qp *qp;
+ 	int ret;
  
-diff --git a/arch/x86/crypto/twofish_glue_3way.c b/arch/x86/crypto/twofish_glue_3way.c
-index 768af6075479..b70f757403a3 100644
---- a/arch/x86/crypto/twofish_glue_3way.c
-+++ b/arch/x86/crypto/twofish_glue_3way.c
-@@ -52,46 +52,6 @@ void twofish_dec_blk_cbc_3way(const void *ctx, u8 *d, const u8 *s)
- }
- EXPORT_SYMBOL_GPL(twofish_dec_blk_cbc_3way);
- 
--void twofish_enc_blk_ctr(const void *ctx, u8 *d, const u8 *s, le128 *iv)
--{
--	be128 ctrblk;
--	u128 *dst = (u128 *)d;
--	const u128 *src = (const u128 *)s;
--
--	if (dst != src)
--		*dst = *src;
--
--	le128_to_be128(&ctrblk, iv);
--	le128_inc(iv);
--
--	twofish_enc_blk(ctx, (u8 *)&ctrblk, (u8 *)&ctrblk);
--	u128_xor(dst, dst, (u128 *)&ctrblk);
--}
--EXPORT_SYMBOL_GPL(twofish_enc_blk_ctr);
--
--void twofish_enc_blk_ctr_3way(const void *ctx, u8 *d, const u8 *s, le128 *iv)
--{
--	be128 ctrblks[3];
--	u128 *dst = (u128 *)d;
--	const u128 *src = (const u128 *)s;
--
--	if (dst != src) {
--		dst[0] = src[0];
--		dst[1] = src[1];
--		dst[2] = src[2];
--	}
--
--	le128_to_be128(&ctrblks[0], iv);
--	le128_inc(iv);
--	le128_to_be128(&ctrblks[1], iv);
--	le128_inc(iv);
--	le128_to_be128(&ctrblks[2], iv);
--	le128_inc(iv);
--
--	twofish_enc_blk_xor_3way(ctx, (u8 *)dst, (u8 *)ctrblks);
--}
--EXPORT_SYMBOL_GPL(twofish_enc_blk_ctr_3way);
--
- static const struct common_glue_ctx twofish_enc = {
- 	.num_funcs = 2,
- 	.fpu_blocks_limit = -1,
-@@ -105,19 +65,6 @@ static const struct common_glue_ctx twofish_enc = {
- 	} }
- };
- 
--static const struct common_glue_ctx twofish_ctr = {
--	.num_funcs = 2,
--	.fpu_blocks_limit = -1,
--
--	.funcs = { {
--		.num_blocks = 3,
--		.fn_u = { .ctr = twofish_enc_blk_ctr_3way }
--	}, {
--		.num_blocks = 1,
--		.fn_u = { .ctr = twofish_enc_blk_ctr }
--	} }
--};
--
- static const struct common_glue_ctx twofish_dec = {
- 	.num_funcs = 2,
- 	.fpu_blocks_limit = -1,
-@@ -164,11 +111,6 @@ static int cbc_decrypt(struct skcipher_request *req)
- 	return glue_cbc_decrypt_req_128bit(&twofish_dec_cbc, req);
+-	qp = hpre_create_qp();
++	qp = hpre_create_qp(type);
+ 	if (!qp) {
+ 		pr_err("Can not create hpre qp!\n");
+ 		return ERR_PTR(-ENODEV);
+@@ -422,11 +422,11 @@ static void hpre_alg_cb(struct hisi_qp *qp, void *resp)
+ 	req->cb(ctx, resp);
  }
  
--static int ctr_crypt(struct skcipher_request *req)
--{
--	return glue_ctr_req_128bit(&twofish_ctr, req);
--}
--
- static struct skcipher_alg tf_skciphers[] = {
- 	{
- 		.base.cra_name		= "ecb(twofish)",
-@@ -195,20 +137,6 @@ static struct skcipher_alg tf_skciphers[] = {
- 		.setkey			= twofish_setkey_skcipher,
- 		.encrypt		= cbc_encrypt,
- 		.decrypt		= cbc_decrypt,
--	}, {
--		.base.cra_name		= "ctr(twofish)",
--		.base.cra_driver_name	= "ctr-twofish-3way",
--		.base.cra_priority	= 300,
--		.base.cra_blocksize	= 1,
--		.base.cra_ctxsize	= sizeof(struct twofish_ctx),
--		.base.cra_module	= THIS_MODULE,
--		.min_keysize		= TF_MIN_KEY_SIZE,
--		.max_keysize		= TF_MAX_KEY_SIZE,
--		.ivsize			= TF_BLOCK_SIZE,
--		.chunksize		= TF_BLOCK_SIZE,
--		.setkey			= twofish_setkey_skcipher,
--		.encrypt		= ctr_crypt,
--		.decrypt		= ctr_crypt,
- 	},
- };
+-static int hpre_ctx_init(struct hpre_ctx *ctx)
++static int hpre_ctx_init(struct hpre_ctx *ctx, u8 type)
+ {
+ 	struct hisi_qp *qp;
  
-diff --git a/arch/x86/include/asm/crypto/twofish.h b/arch/x86/include/asm/crypto/twofish.h
-index 2c377a8042e1..12df400e6d53 100644
---- a/arch/x86/include/asm/crypto/twofish.h
-+++ b/arch/x86/include/asm/crypto/twofish.h
-@@ -17,9 +17,5 @@ asmlinkage void twofish_dec_blk_3way(const void *ctx, u8 *dst, const u8 *src);
+-	qp = hpre_get_qp_and_start();
++	qp = hpre_get_qp_and_start(type);
+ 	if (IS_ERR(qp))
+ 		return PTR_ERR(qp);
  
- /* helpers from twofish_x86_64-3way module */
- extern void twofish_dec_blk_cbc_3way(const void *ctx, u8 *dst, const u8 *src);
--extern void twofish_enc_blk_ctr(const void *ctx, u8 *dst, const u8 *src,
--				le128 *iv);
--extern void twofish_enc_blk_ctr_3way(const void *ctx, u8 *dst, const u8 *src,
--				     le128 *iv);
+@@ -674,7 +674,7 @@ static int hpre_dh_init_tfm(struct crypto_kpp *tfm)
+ {
+ 	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
  
- #endif /* ASM_X86_TWOFISH_H */
+-	return hpre_ctx_init(ctx);
++	return hpre_ctx_init(ctx, HPRE_V2_ALG_TYPE);
+ }
+ 
+ static void hpre_dh_exit_tfm(struct crypto_kpp *tfm)
+@@ -1100,7 +1100,7 @@ static int hpre_rsa_init_tfm(struct crypto_akcipher *tfm)
+ 		return PTR_ERR(ctx->rsa.soft_tfm);
+ 	}
+ 
+-	ret = hpre_ctx_init(ctx);
++	ret = hpre_ctx_init(ctx, HPRE_V2_ALG_TYPE);
+ 	if (ret)
+ 		crypto_free_akcipher(ctx->rsa.soft_tfm);
+ 
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index fc7173a..1ae8fa1 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -209,13 +209,20 @@ static u32 vfs_num;
+ module_param_cb(vfs_num, &vfs_num_ops, &vfs_num, 0444);
+ MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63), 0(default)");
+ 
+-struct hisi_qp *hpre_create_qp(void)
++struct hisi_qp *hpre_create_qp(u8 type)
+ {
+ 	int node = cpu_to_node(smp_processor_id());
+ 	struct hisi_qp *qp = NULL;
+ 	int ret;
+ 
+-	ret = hisi_qm_alloc_qps_node(&hpre_devices, 1, 0, node, &qp);
++	if (type != HPRE_V2_ALG_TYPE && type != HPRE_V3_ECC_ALG_TYPE)
++		return NULL;
++
++	/*
++	 * type: 0 - RSA/DH. algorithm supported in V2,
++	 *       1 - ECC algorithm in V3.
++	 */
++	ret = hisi_qm_alloc_qps_node(&hpre_devices, 1, type, node, &qp);
+ 	if (!ret)
+ 		return qp;
+ 
 -- 
-2.17.1
+2.8.1
 
