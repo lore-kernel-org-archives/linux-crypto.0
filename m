@@ -2,107 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F781C433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Dec 2020 19:15:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F9CC433DB
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Dec 2020 19:21:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E55B222252
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Dec 2020 19:15:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D00B922252
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Dec 2020 19:21:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726656AbgLYTPS (ORCPT
+        id S1726082AbgLYTUu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Dec 2020 14:15:18 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53758 "EHLO mail.kernel.org"
+        Fri, 25 Dec 2020 14:20:50 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54056 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725935AbgLYTPR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Dec 2020 14:15:17 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1C56E22203;
-        Fri, 25 Dec 2020 19:14:37 +0000 (UTC)
+        id S1725935AbgLYTUt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 25 Dec 2020 14:20:49 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 739D3221F2;
+        Fri, 25 Dec 2020 19:20:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1608923677;
-        bh=QDqTtLgpDD7RDx1IC6Hh4p9gjvbSZQEsiOQofhn+YaI=;
+        s=k20201202; t=1608924008;
+        bh=x7HugvciPp6eNPDIlyvx1Z198aXmn2J5ADS+CB13jLw=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=FOMEgVuFI5hxwo+ioQIQrtmIMUkjxLj6Jgk/M9PEYgO1MAEUF95Mc2qUe+/RAkFPw
-         wy6zcIA3bZ1oiqsq2mWVBaAsNBd2Z+h2CLiJhWJBI70uTkg+fJy4Cd5lYI2bDh1wxB
-         4WhkwCQKYODn5tqCn/U9LPkMDPtJuqEz8LBS2pVflb0Rv9UneTKdQmmaR9KmsJwXpZ
-         HdrtFlxqrOUWTv/Fv9Y25GNupIUV92T499GrOddCYiSp0/gar5dmZgjszz1fZNT7wF
-         ywOquqBx38kkvTFmtDdM1GwU/P3ZrAEmWMzPChGv3SqmedUQ9YHvQEq1+rb8KGmHSj
-         +Tvwydin+f26Q==
-Date:   Fri, 25 Dec 2020 11:14:35 -0800
+        b=f1kENboFp3i2V3/OeXkz0GZRZ0y7cwv4wx4bGxPVF/3iBbJFD9wJrr50YWV1Q16xa
+         +/j87ql6oWFOREhUjXIWxCQhriUIdUyU3uW1+pAc90zoWtFpYXuJubcBe1TOqF3JzS
+         gt95t2fTBBQ+GcqB8JV3+g1kOe+coho0Io3Az0NAFKcE2z8dK2j/lc9M9Xg3RYLlpo
+         CF4//1y9vOrrOwJ27cJ2DdjLxtJf1n3qmldNhWrxHtvKZhGHuliJlNTsNP/D4tFlmp
+         Krhr+EuPSphE/Bhqf5l/gkis0xIsJIKPBtyk42wrhTJ1YY4SCDCSQXaInoYc+EqQ/n
+         WnC+mfkYyzFZg==
+Date:   Fri, 25 Dec 2020 11:20:06 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+Cc:     linux-crypto@vger.kernel.org, dm-devel@redhat.com,
         Megha Dey <megha.dey@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] crypto: x86/aes-ni-xts - recover and improve
- performance
-Message-ID: <X+Y6G0pHja1C61s9@sol.localdomain>
-References: <20201222160629.22268-1-ardb@kernel.org>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Milan Broz <gmazyland@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>
+Subject: Re: [RFC PATCH 00/10] crypto: x86 - remove XTS and CTR glue helper
+ code
+Message-ID: <X+Y7Zg8vMZbxMJgK@sol.localdomain>
+References: <20201223223841.11311-1-ardb@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201222160629.22268-1-ardb@kernel.org>
+In-Reply-To: <20201223223841.11311-1-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 22, 2020 at 05:06:27PM +0100, Ard Biesheuvel wrote:
-> The AES-NI implementation of XTS was impacted significantly by the retpoline
-> changes, which is due to the fact that both its asm helper and the chaining
-> mode glue library use indirect calls for processing small quantitities of
-> data
+On Wed, Dec 23, 2020 at 11:38:31PM +0100, Ard Biesheuvel wrote:
+> After applying my performance fixes for AES-NI in XTS mode, the only
+> remaining users of the x86 glue helper module are the niche algorithms
+> camellia, cast6, serpent and twofish.
 > 
-> So let's fix this, by:
-> - creating a minimal, backportable fix that recovers most of the performance,
->   by reducing the number of indirect calls substantially;
-> - for future releases, rewrite the XTS implementation completely, and replace
->   the glue helper with a core asm routine that is more flexible, making the C
->   code wrapper much more straight-forward.
+> It is not clear from the history why all these different versions of these
+> algorithms in XTS and CTR modes were added in the first place: the only
+> in-kernel references that seem to exist are to cbc(serpent), cbc(camellia)
+> and cbc(twofish) in the IPsec stack. The XTS spec only mentions AES, and
+> CTR modes don't seem to be widely used either.
 > 
-> This results in a substantial performance improvement: around ~2x for 1k and
-> 4k blocks, and more than 3x for ~1k blocks that require ciphertext stealing
-> (benchmarked using tcrypt using 1420 byte blocks - full results below)
+> Since the glue helper code relies heavily on indirect calls for small chunks
+> of in/output, it needs some work to recover from the performance hit caused
+> by the retpoline changes. However, it makes sense to only expend the effort
+> for algorithms that are being used in the first place, and this does not
+> seem to be the case for XTS and CTR.
 > 
-> It also allows us to enable the same driver for i386.
+> CTR mode can simply be removed: it is not used in the kernel, and it is
+> highly unlikely that it is being relied upon via algif_skcipher. And even
+> if it was, the generic CTR mode driver can still provide the CTR transforms
+> if necessary.
+> 
+> XTS mode may actually be in use by dm-crypt users, so we cannot simply drop
+> this code entirely. However, as it turns out, the XTS template wrapped
+> around the ECB mode skciphers perform roughly on par *, and so there is no
+> need to retain all the complicated XTS helper logic. In the unlikely case
+> that dm-crypt users are relying on xts(camellia) or xts(serpent) in the
+> field, they should not be impacted by these changes at all.
+> 
+> As a follow-up, it makes sense to rework the ECB and CBC mode implementations
+> to get rid of the indirect calls. Or perhaps we could drop [some of] these
+> algorithms entirely ...
+> 
+> * tcrypt results for various XTS implementations below, captured on a
+>   Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz
 > 
 > Cc: Megha Dey <megha.dey@intel.com>
 > Cc: Eric Biggers <ebiggers@kernel.org>
 > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Milan Broz <gmazyland@gmail.com>
+> Cc: Mike Snitzer <snitzer@redhat.com>
 > 
-> Ard Biesheuvel (2):
->   crypto: x86/aes-ni-xts - use direct calls to and 4-way stride
->   crypto: x86/aes-ni-xts - rewrite and drop indirections via glue helper
-> 
->  arch/x86/crypto/aesni-intel_asm.S  | 353 ++++++++++++++++----
->  arch/x86/crypto/aesni-intel_glue.c | 230 +++++++------
->  2 files changed, 412 insertions(+), 171 deletions(-)
-> 
-> -- 
-> 2.17.1
-> 
-> Benchmarked using tcrypt on a Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz.
+> Ard Biesheuvel (10):
+>   crypto: x86/camellia - switch to XTS template
+>   crypto: x86/cast6 - switch to XTS template
+>   crypto: x86/serpent- switch to XTS template
+>   crypto: x86/twofish - switch to XTS template
+>   crypto: x86/glue-helper - drop XTS helper routines
+>   crypto: x86/camellia - drop CTR mode implementation
+>   crypto: x86/cast6 - drop CTR mode implementation
+>   crypto: x86/serpent - drop CTR mode implementation
+>   crypto: x86/twofish - drop CTR mode implementation
+>   crypto: x86/glue-helper - drop CTR helper routines
 
-Thanks for doing this!  I didn't realize that there was such a big performance
-regression here.  Getting rid of these indirect calls looks like the right
-approach; this all seems to have been written for a world where indirect calls
-are much faster...
-
-I did some quick benchmarks on Zen ("AMD Ryzen Threadripper 1950X 16-Core
-Processor") with CONFIG_RETPOLINE=y and confirmed the speedup on 4096-byte
-blocks is around 2x there too.  (It's over 2x for AES-128-XTS and AES-192-XTS,
-and a bit under 2x for AES-256-XTS.  And most of the speedup comes from the
-first patch.)  Also, the extra self-tests are passing.
-
-So feel free to add:
-
-	Tested-by: Eric Biggers <ebiggers@google.com> # x86_64
-
-Note that this patch series didn't apply cleanly, as it seems to depend on some
-other patches you've sent out recently.  So I actually tested your
-"for-kernelci" branch instead of applying these directly.
+Acked-by: Eric Biggers <ebiggers@google.com>
 
 - Eric
