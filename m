@@ -2,305 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3D4CC43331
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Dec 2020 13:10:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 616E0C433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Dec 2020 21:35:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C4A7221FA
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Dec 2020 13:10:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FAFF2072E
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Dec 2020 21:35:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727196AbgL3NEx (ORCPT
+        id S1726214AbgL3Ves (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Dec 2020 08:04:53 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53866 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726710AbgL3NEt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Dec 2020 08:04:49 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1AAA122472;
-        Wed, 30 Dec 2020 13:03:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1609333419;
-        bh=eKCoLzrwcvJfZEJPxdbw6hs0kwNlAfV2WmIbhNMSVDM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UaCchE9rUcvB7WQPSKPvKH1wGAjvP2fm9RMqSxNE5+OMldEcSON37AxIQXDPgrJWi
-         Gfg22PZwCfpCsBO1eYx5P83OodxfRmcYhx7lnJVcFwiReZTlo9QPAmdVZ+5VTvwpd2
-         zLEm23j7FOX6Kb59S0FNTsK1TjNBn++g+DwICBNgLXglIs1K3+RHxaa8PBbG/m4osz
-         EEBkkEiucCwa0jZNn1KIk7yq7kFRKT0bwg8w1HMrjq6zLKSKtSxG50W9bGsPLHjNG+
-         rEyTWQhtyJKx+Rrsm3mg8nwJQ8Ad8bSlDkNu1TVFbR+i2UTjqhQzIfCFPIyOZC5N9J
-         nC4yzxsJxdTsQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christopher Obbard <chris.obbard@collabora.com>,
-        Alexander Neville <dark@volatile.bz>,
-        Sjoerd Simons <sjoerd.simons@collabora.co.uk>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Richard Weinberger <richard@nod.at>,
-        Sasha Levin <sashal@kernel.org>, linux-um@lists.infradead.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 18/31] um: random: Register random as hwrng-core device
-Date:   Wed, 30 Dec 2020 08:03:00 -0500
-Message-Id: <20201230130314.3636961-18-sashal@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20201230130314.3636961-1-sashal@kernel.org>
-References: <20201230130314.3636961-1-sashal@kernel.org>
+        Wed, 30 Dec 2020 16:34:48 -0500
+Received: from relay.sw.ru ([185.231.240.75]:56882 "EHLO relay3.sw.ru"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726197AbgL3Ves (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 30 Dec 2020 16:34:48 -0500
+Received: from [192.168.15.152]
+        by relay3.sw.ru with esmtp (Exim 4.94)
+        (envelope-from <ktkhai@virtuozzo.com>)
+        id 1kuj5h-00ExIG-La; Thu, 31 Dec 2020 00:33:09 +0300
+Subject: [PATCH v2] crypto: Fix divide error in do_xor_speed()
+To:     Ard Biesheuvel <ardb@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Douglas Anderson <dianders@chromium.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <160933061716.928967.463919628731790218.stgit@localhost.localdomain>
+ <CAMj1kXHTzafF5ZZR5Ornusjt6cd0K-Lczb0Z0FK54jBTv9cKsA@mail.gmail.com>
+From:   Kirill Tkhai <ktkhai@virtuozzo.com>
+Message-ID: <30381b78-8721-5b4e-e075-300c5af3f9fa@virtuozzo.com>
+Date:   Thu, 31 Dec 2020 00:33:18 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMj1kXHTzafF5ZZR5Ornusjt6cd0K-Lczb0Z0FK54jBTv9cKsA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Christopher Obbard <chris.obbard@collabora.com>
+crypto: Fix divide error in do_xor_speed()
 
-[ Upstream commit 72d3e093afae79611fa38f8f2cfab9a888fe66f2 ]
+From: Kirill Tkhai <ktkhai@virtuozzo.com>
 
-The UML random driver creates a dummy device under the guest,
-/dev/hw_random. When this file is read from the guest, the driver
-reads from the host machine's /dev/random, in-turn reading from
-the host kernel's entropy pool. This entropy pool could have been
-filled by a hardware random number generator or just the host
-kernel's internal software entropy generator.
+Latest (but not only latest) linux-next panics with divide
+error on my QEMU setup.
 
-Currently the driver does not fill the guests kernel entropy pool,
-this requires a userspace tool running inside the guest (like
-rng-tools) to read from the dummy device provided by this driver,
-which then would fill the guest's internal entropy pool.
+The patch at the bottom of this message fixes the problem.
 
-This all seems quite pointless when we are already reading from an
-entropy pool, so this patch aims to register the device as a hwrng
-device using the hwrng-core framework. This not only improves and
-cleans up the driver, but also fills the guest's entropy pool
-without having to resort to using extra userspace tools in the guest.
+xor: measuring software checksum speed
+divide error: 0000 [#1] PREEMPT SMP KASAN
+PREEMPT SMP KASAN
+CPU: 3 PID: 1 Comm: swapper/0 Not tainted 5.10.0-next-20201223+ #2177
+RIP: 0010:do_xor_speed+0xbb/0xf3
+Code: 41 ff cc 75 b5 bf 01 00 00 00 e8 3d 23 8b fe 65 8b 05 f6 49 83 7d 85 c0 75 05 e8
+ 84 70 81 fe b8 00 00 50 c3 31 d2 48 8d 7b 10 <f7> f5 41 89 c4 e8 58 07 a2 fe 44 89 63 10 48 8d 7b 08
+ e8 cb 07 a2
+RSP: 0000:ffff888100137dc8 EFLAGS: 00010246
+RAX: 00000000c3500000 RBX: ffffffff823f0160 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 0000000000000808 RDI: ffffffff823f0170
+RBP: 0000000000000000 R08: ffffffff8109c50f R09: ffffffff824bb6f7
+R10: fffffbfff04976de R11: 0000000000000001 R12: 0000000000000000
+R13: ffff888101997000 R14: ffff888101994000 R15: ffffffff823f0178
+FS:  0000000000000000(0000) GS:ffff8881f7780000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 000000000220e000 CR4: 00000000000006a0
+Call Trace:
+ calibrate_xor_blocks+0x13c/0x1c4
+ ? do_xor_speed+0xf3/0xf3
+ do_one_initcall+0xc1/0x1b7
+ ? start_kernel+0x373/0x373
+ ? unpoison_range+0x3a/0x60
+ kernel_init_freeable+0x1dd/0x238
+ ? rest_init+0xc6/0xc6
+ kernel_init+0x8/0x10a
+ ret_from_fork+0x1f/0x30
+---[ end trace 5bd3c1d0b77772da ]---
 
-This is typically a nuisance when booting a guest: the random pool
-takes a long time (~200s) to build up enough entropy since the dummy
-hwrng is not used to fill the guest's pool.
-
-This port was originally attempted by Alexander Neville "dark" (in CC,
-discussion in Link), but the conversation there stalled since the
-handling of -EAGAIN errors were no removed and longer handled by the
-driver. This patch attempts to use the existing method of error
-handling but utilises the new hwrng core.
-
-The issue can be noticed when booting a UML guest:
-
-    [    2.560000] random: fast init done
-    [  214.000000] random: crng init done
-
-With the patch applied, filling the pool becomes a lot quicker:
-
-    [    2.560000] random: fast init done
-    [   12.000000] random: crng init done
-
-Cc: Alexander Neville <dark@volatile.bz>
-Link: https://lore.kernel.org/lkml/20190828204609.02a7ff70@TheDarkness/
-Link: https://lore.kernel.org/lkml/20190829135001.6a5ff940@TheDarkness.local/
-Cc: Sjoerd Simons <sjoerd.simons@collabora.co.uk>
-Signed-off-by: Christopher Obbard <chris.obbard@collabora.com>
-Acked-by: Anton Ivanov <anton.ivanov@cambridgegreys.com>
-Signed-off-by: Richard Weinberger <richard@nod.at>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Fixes: c055e3eae0f1 ("crypto: xor - use ktime for template benchmarking")
+Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/um/drivers/random.c       | 101 ++++++++-------------------------
- drivers/char/hw_random/Kconfig |  16 +++---
- 2 files changed, 33 insertions(+), 84 deletions(-)
 
-diff --git a/arch/um/drivers/random.c b/arch/um/drivers/random.c
-index ce115fce52f02..e4b9b2ce9abf4 100644
---- a/arch/um/drivers/random.c
-+++ b/arch/um/drivers/random.c
-@@ -11,6 +11,7 @@
- #include <linux/fs.h>
- #include <linux/interrupt.h>
- #include <linux/miscdevice.h>
-+#include <linux/hw_random.h>
- #include <linux/delay.h>
- #include <linux/uaccess.h>
- #include <init.h>
-@@ -18,9 +19,8 @@
- #include <os.h>
- 
- /*
-- * core module and version information
-+ * core module information
-  */
--#define RNG_VERSION "1.0.0"
- #define RNG_MODULE_NAME "hw_random"
- 
- /* Changed at init time, in the non-modular case, and at module load
-@@ -28,88 +28,36 @@
-  * protects against a module being loaded twice at the same time.
-  */
- static int random_fd = -1;
--static DECLARE_WAIT_QUEUE_HEAD(host_read_wait);
-+static struct hwrng hwrng = { 0, };
-+static DECLARE_COMPLETION(have_data);
- 
--static int rng_dev_open (struct inode *inode, struct file *filp)
-+static int rng_dev_read(struct hwrng *rng, void *buf, size_t max, bool block)
- {
--	/* enforce read-only access to this chrdev */
--	if ((filp->f_mode & FMODE_READ) == 0)
--		return -EINVAL;
--	if ((filp->f_mode & FMODE_WRITE) != 0)
--		return -EINVAL;
-+	int ret;
- 
--	return 0;
--}
--
--static atomic_t host_sleep_count = ATOMIC_INIT(0);
--
--static ssize_t rng_dev_read (struct file *filp, char __user *buf, size_t size,
--			     loff_t *offp)
--{
--	u32 data;
--	int n, ret = 0, have_data;
--
--	while (size) {
--		n = os_read_file(random_fd, &data, sizeof(data));
--		if (n > 0) {
--			have_data = n;
--			while (have_data && size) {
--				if (put_user((u8) data, buf++)) {
--					ret = ret ? : -EFAULT;
--					break;
--				}
--				size--;
--				ret++;
--				have_data--;
--				data >>= 8;
--			}
--		}
--		else if (n == -EAGAIN) {
--			DECLARE_WAITQUEUE(wait, current);
--
--			if (filp->f_flags & O_NONBLOCK)
--				return ret ? : -EAGAIN;
--
--			atomic_inc(&host_sleep_count);
-+	for (;;) {
-+		ret = os_read_file(random_fd, buf, max);
-+		if (block && ret == -EAGAIN) {
- 			add_sigio_fd(random_fd);
- 
--			add_wait_queue(&host_read_wait, &wait);
--			set_current_state(TASK_INTERRUPTIBLE);
-+			ret = wait_for_completion_killable(&have_data);
- 
--			schedule();
--			remove_wait_queue(&host_read_wait, &wait);
-+			ignore_sigio_fd(random_fd);
-+			deactivate_fd(random_fd, RANDOM_IRQ);
- 
--			if (atomic_dec_and_test(&host_sleep_count)) {
--				ignore_sigio_fd(random_fd);
--				deactivate_fd(random_fd, RANDOM_IRQ);
--			}
-+			if (ret < 0)
-+				break;
-+		} else {
-+			break;
- 		}
--		else
--			return n;
--
--		if (signal_pending (current))
--			return ret ? : -ERESTARTSYS;
- 	}
--	return ret;
--}
- 
--static const struct file_operations rng_chrdev_ops = {
--	.owner		= THIS_MODULE,
--	.open		= rng_dev_open,
--	.read		= rng_dev_read,
--	.llseek		= noop_llseek,
--};
--
--/* rng_init shouldn't be called more than once at boot time */
--static struct miscdevice rng_miscdev = {
--	HWRNG_MINOR,
--	RNG_MODULE_NAME,
--	&rng_chrdev_ops,
--};
-+	return ret != -EAGAIN ? ret : 0;
-+}
- 
- static irqreturn_t random_interrupt(int irq, void *data)
- {
--	wake_up(&host_read_wait);
-+	complete(&have_data);
- 
- 	return IRQ_HANDLED;
- }
-@@ -126,18 +74,19 @@ static int __init rng_init (void)
- 		goto out;
- 
- 	random_fd = err;
--
- 	err = um_request_irq(RANDOM_IRQ, random_fd, IRQ_READ, random_interrupt,
- 			     0, "random", NULL);
- 	if (err)
- 		goto err_out_cleanup_hw;
- 
- 	sigio_broken(random_fd, 1);
-+	hwrng.name = RNG_MODULE_NAME;
-+	hwrng.read = rng_dev_read;
-+	hwrng.quality = 1024;
- 
--	err = misc_register (&rng_miscdev);
-+	err = hwrng_register(&hwrng);
- 	if (err) {
--		printk (KERN_ERR RNG_MODULE_NAME ": misc device register "
--			"failed\n");
-+		pr_err(RNG_MODULE_NAME " registering failed (%d)\n", err);
- 		goto err_out_cleanup_hw;
- 	}
- out:
-@@ -161,8 +110,8 @@ static void cleanup(void)
- 
- static void __exit rng_cleanup(void)
- {
-+	hwrng_unregister(&hwrng);
- 	os_close_file(random_fd);
--	misc_deregister (&rng_miscdev);
- }
- 
- module_init (rng_init);
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index e92c4d9469d82..5952210526aaa 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -540,15 +540,15 @@ endif # HW_RANDOM
- 
- config UML_RANDOM
- 	depends on UML
--	tristate "Hardware random number generator"
-+	select HW_RANDOM
-+	tristate "UML Random Number Generator support"
- 	help
- 	  This option enables UML's "hardware" random number generator.  It
- 	  attaches itself to the host's /dev/random, supplying as much entropy
- 	  as the host has, rather than the small amount the UML gets from its
--	  own drivers.  It registers itself as a standard hardware random number
--	  generator, major 10, minor 183, and the canonical device name is
--	  /dev/hwrng.
--	  The way to make use of this is to install the rng-tools package
--	  (check your distro, or download from
--	  http://sourceforge.net/projects/gkernel/).  rngd periodically reads
--	  /dev/hwrng and injects the entropy into /dev/random.
-+	  own drivers. It registers itself as a rng-core driver thus providing
-+	  a device which is usually called /dev/hwrng. This hardware random
-+	  number generator does feed into the kernel's random number generator
-+	  entropy pool.
-+
-+	  If unsure, say Y.
--- 
-2.27.0
+v2: New Year resend :) Added fixes tag.
+ crypto/xor.c |    2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/crypto/xor.c b/crypto/xor.c
+index eacbf4f93990..8f899f898ec9 100644
+--- a/crypto/xor.c
++++ b/crypto/xor.c
+@@ -107,6 +107,8 @@ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
+ 	preempt_enable();
+ 
+ 	// bytes/ns == GB/s, multiply by 1000 to get MB/s [not MiB/s]
++	if (!min)
++		min = 1;
+ 	speed = (1000 * REPS * BENCH_SIZE) / (unsigned int)ktime_to_ns(min);
+ 	tmpl->speed = speed;
+ 
