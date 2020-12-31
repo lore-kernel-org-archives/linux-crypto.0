@@ -2,108 +2,165 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 616E0C433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Dec 2020 21:35:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8951EC433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 31 Dec 2020 16:43:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1FAFF2072E
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Dec 2020 21:35:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F07920795
+	for <linux-crypto@archiver.kernel.org>; Thu, 31 Dec 2020 16:43:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726214AbgL3Ves (ORCPT
+        id S1727088AbgLaQmp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Dec 2020 16:34:48 -0500
-Received: from relay.sw.ru ([185.231.240.75]:56882 "EHLO relay3.sw.ru"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726197AbgL3Ves (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Dec 2020 16:34:48 -0500
-Received: from [192.168.15.152]
-        by relay3.sw.ru with esmtp (Exim 4.94)
-        (envelope-from <ktkhai@virtuozzo.com>)
-        id 1kuj5h-00ExIG-La; Thu, 31 Dec 2020 00:33:09 +0300
-Subject: [PATCH v2] crypto: Fix divide error in do_xor_speed()
-To:     Ard Biesheuvel <ardb@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Douglas Anderson <dianders@chromium.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <160933061716.928967.463919628731790218.stgit@localhost.localdomain>
- <CAMj1kXHTzafF5ZZR5Ornusjt6cd0K-Lczb0Z0FK54jBTv9cKsA@mail.gmail.com>
-From:   Kirill Tkhai <ktkhai@virtuozzo.com>
-Message-ID: <30381b78-8721-5b4e-e075-300c5af3f9fa@virtuozzo.com>
-Date:   Thu, 31 Dec 2020 00:33:18 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
-MIME-Version: 1.0
-In-Reply-To: <CAMj1kXHTzafF5ZZR5Ornusjt6cd0K-Lczb0Z0FK54jBTv9cKsA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Thu, 31 Dec 2020 11:42:45 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33006 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727048AbgLaQmp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 31 Dec 2020 11:42:45 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 744FD20798;
+        Thu, 31 Dec 2020 16:42:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1609432924;
+        bh=gALniMUSs2DvymYTnIhGco9GudAx5geJ0b9iioQM+UM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=hi1tyo1rrG0cUFwBX8om/k33B1CfE8VTUKH0tFhLvYhueomRb7BJJq7SVfJ2/4y2c
+         0SQahNyqLEfJFf/4ZeA+Tli4DI9XCnhkVQ/r3RdopaNEkT65sASDGkkYaHZq4yQ/o5
+         kvOQt1r4gZctep1As7x5RB4MKP70gkGgiDHxSR/kIMp7YEaD7yBe3z6KtNpjlrbpnt
+         VArwTdQcBBeZvSkfpa2HxF/VzJhAOvFkyk1SNLuBk7Gns5VRKJViIczMBLWgfJB2IV
+         191sCtXuJ/A8moFpKoQzZKLZIcyMrsdeAxvMnrfLbAW1xgWV7l7GJCofH4PCQz6Evt
+         JOSzN53hU3CJw==
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     Ard Biesheuvel <ardb@kernel.org>, Megha Dey <megha.dey@intel.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Uros Bizjak <ubizjak@gmail.com>
+Subject: [PATCH v2 0/2] crypto: x86/aes-ni-xts - recover and improve performance
+Date:   Thu, 31 Dec 2020 17:41:53 +0100
+Message-Id: <20201231164155.21792-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-crypto: Fix divide error in do_xor_speed()
+The AES-NI implementation of XTS was impacted significantly by the retpoline
+changes, which is due to the fact that both its asm helper and the chaining
+mode glue library use indirect calls for processing small quantitities of
+data
 
-From: Kirill Tkhai <ktkhai@virtuozzo.com>
+So let's fix this, by:
+- creating a minimal, backportable fix that recovers most of the performance,
+  by reducing the number of indirect calls substantially;
+- for future releases, rewrite the XTS implementation completely, and replace
+  the glue helper with a core asm routine that is more flexible, making the C
+  code wrapper much more straight-forward.
 
-Latest (but not only latest) linux-next panics with divide
-error on my QEMU setup.
+This results in a substantial performance improvement: around ~2x for 1k and
+4k blocks, and more than 3x for ~1k blocks that require ciphertext stealing
+(benchmarked using tcrypt using 1420 byte blocks - full results below)
 
-The patch at the bottom of this message fixes the problem.
+It also allows us to enable the same driver for i386.
 
-xor: measuring software checksum speed
-divide error: 0000 [#1] PREEMPT SMP KASAN
-PREEMPT SMP KASAN
-CPU: 3 PID: 1 Comm: swapper/0 Not tainted 5.10.0-next-20201223+ #2177
-RIP: 0010:do_xor_speed+0xbb/0xf3
-Code: 41 ff cc 75 b5 bf 01 00 00 00 e8 3d 23 8b fe 65 8b 05 f6 49 83 7d 85 c0 75 05 e8
- 84 70 81 fe b8 00 00 50 c3 31 d2 48 8d 7b 10 <f7> f5 41 89 c4 e8 58 07 a2 fe 44 89 63 10 48 8d 7b 08
- e8 cb 07 a2
-RSP: 0000:ffff888100137dc8 EFLAGS: 00010246
-RAX: 00000000c3500000 RBX: ffffffff823f0160 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000808 RDI: ffffffff823f0170
-RBP: 0000000000000000 R08: ffffffff8109c50f R09: ffffffff824bb6f7
-R10: fffffbfff04976de R11: 0000000000000001 R12: 0000000000000000
-R13: ffff888101997000 R14: ffff888101994000 R15: ffffffff823f0178
-FS:  0000000000000000(0000) GS:ffff8881f7780000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000000220e000 CR4: 00000000000006a0
-Call Trace:
- calibrate_xor_blocks+0x13c/0x1c4
- ? do_xor_speed+0xf3/0xf3
- do_one_initcall+0xc1/0x1b7
- ? start_kernel+0x373/0x373
- ? unpoison_range+0x3a/0x60
- kernel_init_freeable+0x1dd/0x238
- ? rest_init+0xc6/0xc6
- kernel_init+0x8/0x10a
- ret_from_fork+0x1f/0x30
----[ end trace 5bd3c1d0b77772da ]---
+Changes since v1:
+- use 'test LEN, LEN' instead of 'cmp $0, LEN' to get shorter opcodes, as
+  suggested by Uros
+- rebase to get rid of false dependencies on other changes that are in flight.
 
-Fixes: c055e3eae0f1 ("crypto: xor - use ktime for template benchmarking")
-Signed-off-by: Kirill Tkhai <ktkhai@virtuozzo.com>
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
----
+NOTE: patch #2 depends on [0], which provides the permutation table used for
+      ciphertext stealing
 
-v2: New Year resend :) Added fixes tag.
- crypto/xor.c |    2 ++
- 1 file changed, 2 insertions(+)
+[0] https://lore.kernel.org/linux-crypto/20201207233402.17472-1-ardb@kernel.org/
 
-diff --git a/crypto/xor.c b/crypto/xor.c
-index eacbf4f93990..8f899f898ec9 100644
---- a/crypto/xor.c
-+++ b/crypto/xor.c
-@@ -107,6 +107,8 @@ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
- 	preempt_enable();
- 
- 	// bytes/ns == GB/s, multiply by 1000 to get MB/s [not MiB/s]
-+	if (!min)
-+		min = 1;
- 	speed = (1000 * REPS * BENCH_SIZE) / (unsigned int)ktime_to_ns(min);
- 	tmpl->speed = speed;
- 
+Cc: Megha Dey <megha.dey@intel.com>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Uros Bizjak <ubizjak@gmail.com>
+
+Ard Biesheuvel (2):
+  crypto: x86/aes-ni-xts - use direct calls to and 4-way stride
+  crypto: x86/aes-ni-xts - rewrite and drop indirections via glue helper
+
+ arch/x86/crypto/aesni-intel_asm.S  | 353 ++++++++++++++++----
+ arch/x86/crypto/aesni-intel_glue.c | 229 +++++++------
+ crypto/Kconfig                     |   1 -
+ 3 files changed, 411 insertions(+), 172 deletions(-)
+
+-- 
+2.17.1
+
+Benchmarked using tcrypt on a Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz.
+Requires patch below to get tcrypt to benchmark 1420 byte blocks.
+
+BEFORE
+
+testing speed of async xts(aes) (xts-aes-aesni) encryption
+tcrypt: test 0 (256 bit key, 16 byte blocks): 8030565 operations in 1 seconds (128489040 bytes)
+tcrypt: test 1 (256 bit key, 64 byte blocks): 4760527 operations in 1 seconds (304673728 bytes)
+tcrypt: test 2 (256 bit key, 256 byte blocks): 5250541 operations in 1 seconds (1344138496 bytes)
+tcrypt: test 3 (256 bit key, 1024 byte blocks): 2163398 operations in 1 seconds (2215319552 bytes)
+tcrypt: test 4 (256 bit key, 1420 byte blocks): 1036396 operations in 1 seconds (1471682320 bytes)
+tcrypt: test 5 (256 bit key, 4096 byte blocks): 568192 operations in 1 seconds (2327314432 bytes)
+tcrypt: test 6 (512 bit key, 16 byte blocks): 7916395 operations in 1 seconds (126662320 bytes)
+tcrypt: test 7 (512 bit key, 64 byte blocks): 4783114 operations in 1 seconds (306119296 bytes)
+tcrypt: test 8 (512 bit key, 256 byte blocks): 4916568 operations in 1 seconds (1258641408 bytes)
+tcrypt: test 9 (512 bit key, 1024 byte blocks): 1898349 operations in 1 seconds (1943909376 bytes)
+tcrypt: test 10 (512 bit key, 1420 byte blocks): 970328 operations in 1 seconds (1377865760 bytes)
+tcrypt: test 11 (512 bit key, 4096 byte blocks): 499687 operations in 1 seconds (2046717952 bytes)
+
+
+AFTER
+
+testing speed of async xts(aes) (xts-aes-aesni) encryption
+tcrypt: test 0 (256 bit key, 16 byte blocks): 11977048 operations in 1 seconds (191632768 bytes)
+tcrypt: test 1 (256 bit key, 64 byte blocks): 10504479 operations in 1 seconds (672286656 bytes)
+tcrypt: test 2 (256 bit key, 256 byte blocks): 7929809 operations in 1 seconds (2030031104 bytes)
+tcrypt: test 3 (256 bit key, 1024 byte blocks): 3992118 operations in 1 seconds (4087928832 bytes)
+tcrypt: test 4 (256 bit key, 1420 byte blocks): 3160481 operations in 1 seconds (4487883020 bytes)
+tcrypt: test 5 (256 bit key, 4096 byte blocks): 1240437 operations in 1 seconds (5080829952 bytes)
+tcrypt: test 6 (512 bit key, 16 byte blocks): 11694652 operations in 1 seconds (187114432 bytes)
+tcrypt: test 7 (512 bit key, 64 byte blocks): 9739536 operations in 1 seconds (623330304 bytes)
+tcrypt: test 8 (512 bit key, 256 byte blocks): 6833613 operations in 1 seconds (1749404928 bytes)
+tcrypt: test 9 (512 bit key, 1024 byte blocks): 3121421 operations in 1 seconds (3196335104 bytes)
+tcrypt: test 10 (512 bit key, 1420 byte blocks): 2421563 operations in 1 seconds (3438619460 bytes)
+tcrypt: test 11 (512 bit key, 4096 byte blocks): 941964 operations in 1 seconds (3858284544 bytes)
+
+
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 2054cd6f55cf..ac8b0d087927 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -994,12 +994,13 @@ static struct skcipher_alg aesni_skciphers[] = {
+                        .cra_driver_name        = "__xts-aes-aesni",
+                        .cra_priority           = 401,
+                        .cra_flags              = CRYPTO_ALG_INTERNAL,
+-                       .cra_blocksize          = AES_BLOCK_SIZE,
++                       .cra_blocksize          = 1,//AES_BLOCK_SIZE,
+                        .cra_ctxsize            = XTS_AES_CTX_SIZE,
+                        .cra_module             = THIS_MODULE,
+                },
+                .min_keysize    = 2 * AES_MIN_KEY_SIZE,
+                .max_keysize    = 2 * AES_MAX_KEY_SIZE,
++               .chunksize      = AES_BLOCK_SIZE,
+                .ivsize         = AES_BLOCK_SIZE,
+                .setkey         = xts_aesni_setkey,
+                .encrypt        = xts_encrypt,
+diff --git a/crypto/xts.c b/crypto/xts.c
+index 6c12f30dbdd6..7ade682f1241 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -416,11 +416,12 @@ static int xts_create(struct crypto_template *tmpl, struct rtattr **tb)
+                goto err_free_inst;
+
+        inst->alg.base.cra_priority = alg->base.cra_priority;
+-       inst->alg.base.cra_blocksize = XTS_BLOCK_SIZE;
++       inst->alg.base.cra_blocksize = 1,//XTS_BLOCK_SIZE;
+        inst->alg.base.cra_alignmask = alg->base.cra_alignmask |
+                                       (__alignof__(u64) - 1);
+
+        inst->alg.ivsize = XTS_BLOCK_SIZE;
++       inst->alg.chunksize = XTS_BLOCK_SIZE;
+        inst->alg.min_keysize = crypto_skcipher_alg_min_keysize(alg) * 2;
+        inst->alg.max_keysize = crypto_skcipher_alg_max_keysize(alg) * 2;
