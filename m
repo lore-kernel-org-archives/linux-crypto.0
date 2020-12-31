@@ -4,34 +4,34 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCB2DC4332D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB8B0C4332B
 	for <linux-crypto@archiver.kernel.org>; Thu, 31 Dec 2020 17:25:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB02A2242A
+	by mail.kernel.org (Postfix) with ESMTP id 8A5122246B
 	for <linux-crypto@archiver.kernel.org>; Thu, 31 Dec 2020 17:25:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727029AbgLaRZT (ORCPT
+        id S1726540AbgLaRZS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 31 Dec 2020 12:25:19 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55084 "EHLO mail.kernel.org"
+        Thu, 31 Dec 2020 12:25:18 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55068 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726917AbgLaRZT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 31 Dec 2020 12:25:19 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 16B6A224B0;
-        Thu, 31 Dec 2020 17:24:15 +0000 (UTC)
+        id S1726917AbgLaRZR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 31 Dec 2020 12:25:17 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E4E1022482;
+        Thu, 31 Dec 2020 17:24:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1609435458;
-        bh=fKXmKV7pdES/OQRIcaMDkJbEJVlbbOHwf4jakfmXbDQ=;
+        s=k20201202; t=1609435452;
+        bh=MWJ+uVTwSBTinYo4I5XVzRSYZeX+sYaZRc5m+1X1ejs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=QopIQTLpit1qnAsn7GhhtK/76reefE38uMsASl86aFttrM/VitDeK64Jjl27QnuKH
-         w0cRBtZOhSJkpg1Rm1msv1DJPgxj0XgW4NwRI5cQ30s/1ASHWAKDvIbbocV6UI8QlP
-         KGKBfPiH1v00DhHVtibqxR3zIQ4jDZHSrhhHHJomQd98urrf8BvD3Q/HmbJYS4+vRF
-         sljm4HcVt5thSNtOXpNoHQo+8TNuuu3Ry2cdyL6C29MI4mWnu35+Z2xPdixUygjHck
-         B2zigR/b5s0EXKyBECZRbaZlw/WJrXt5R5Y7TfPnyM+3cbTOBtp4J2Y/yR+T2u60BE
-         VF5O5FX2wjunw==
+        b=aFTdPIhBuRYxHkC4+5wOEsBGTDIVrP5Ou67R4R1RyFAJYPlTQEg9KORT8D+ueHbMv
+         8+nM9XrafwG3eCpIYkXhYq2q1abuaG2Ztt1mr4S4R5IhIn1wd+kdcDD8vZVKpaD1Ck
+         A0zPc8lFJn56JfTvKvn2l+aXoykceAFPKjQC0vcQkVECI5kfEZesbnwoKjt7/PB9iy
+         k+DjZPm/9Eej1w0+n8U2AQQB8S6EBDsX2ufMzW3FAyag56okDEuCmiWEzcWWOa33lS
+         yRXlmmwVk+cJtw0Xl8F1AQzxw0vIqn9CoJEFqwS1auaetp+CT5gzb5xc30Jl2NUzim
+         AfPix/1gT+tsg==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ardb@kernel.org>, Megha Dey <megha.dey@intel.com>,
@@ -39,9 +39,9 @@ Cc:     Ard Biesheuvel <ardb@kernel.org>, Megha Dey <megha.dey@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Milan Broz <gmazyland@gmail.com>,
         Mike Snitzer <snitzer@redhat.com>
-Subject: [PATCH 12/21] crypto: x86/des - drop CTR mode implementation
-Date:   Thu, 31 Dec 2020 18:23:28 +0100
-Message-Id: <20201231172337.23073-13-ardb@kernel.org>
+Subject: [PATCH 10/21] crypto: x86/twofish - drop CTR mode implementation
+Date:   Thu, 31 Dec 2020 18:23:26 +0100
+Message-Id: <20201231172337.23073-11-ardb@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201231172337.23073-1-ardb@kernel.org>
 References: <20201231172337.23073-1-ardb@kernel.org>
@@ -49,155 +49,276 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DES or Triple DES in counter mode is never used in the kernel, so there
-is no point in keeping an accelerated implementation around.
+Twofish in CTR mode is never used by the kernel directly, and is highly
+unlikely to be relied upon by dm-crypt or algif_skcipher. So let's drop
+the accelerated CTR mode implementation, and instead, rely on the CTR
+template and the bare cipher.
 
+Acked-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/x86/crypto/des3_ede_glue.c | 104 --------------------
- crypto/Kconfig                  |   1 +
- 2 files changed, 1 insertion(+), 104 deletions(-)
+ arch/x86/crypto/twofish-avx-x86_64-asm_64.S | 27 -------
+ arch/x86/crypto/twofish_avx_glue.c          | 38 ----------
+ arch/x86/crypto/twofish_glue_3way.c         | 78 --------------------
+ arch/x86/include/asm/crypto/twofish.h       |  4 -
+ crypto/Kconfig                              |  2 +
+ 5 files changed, 2 insertions(+), 147 deletions(-)
 
-diff --git a/arch/x86/crypto/des3_ede_glue.c b/arch/x86/crypto/des3_ede_glue.c
-index 89830e531350..e7cb68a3db3b 100644
---- a/arch/x86/crypto/des3_ede_glue.c
-+++ b/arch/x86/crypto/des3_ede_glue.c
-@@ -6,8 +6,6 @@
-  *
-  * CBC & ECB parts based on code (crypto/cbc.c,ecb.c) by:
-  *   Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
-- * CTR part based on code (crypto/ctr.c) by:
-- *   (C) Copyright IBM Corp. 2007 - Joy Latten <latten@us.ibm.com>
-  */
+diff --git a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
+index 84e61ef03638..37e63b3c664e 100644
+--- a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
+@@ -374,30 +374,3 @@ SYM_FUNC_START(twofish_cbc_dec_8way)
+ 	FRAME_END
+ 	ret;
+ SYM_FUNC_END(twofish_cbc_dec_8way)
+-
+-SYM_FUNC_START(twofish_ctr_8way)
+-	/* input:
+-	 *	%rdi: ctx, CTX
+-	 *	%rsi: dst
+-	 *	%rdx: src
+-	 *	%rcx: iv (little endian, 128bit)
+-	 */
+-	FRAME_BEGIN
+-
+-	pushq %r12;
+-
+-	movq %rsi, %r11;
+-	movq %rdx, %r12;
+-
+-	load_ctr_8way(%rcx, .Lbswap128_mask, RA1, RB1, RC1, RD1, RA2, RB2, RC2,
+-		      RD2, RX0, RX1, RY0);
+-
+-	call __twofish_enc_blk8;
+-
+-	store_ctr_8way(%r12, %r11, RC1, RD1, RA1, RB1, RC2, RD2, RA2, RB2);
+-
+-	popq %r12;
+-
+-	FRAME_END
+-	ret;
+-SYM_FUNC_END(twofish_ctr_8way)
+diff --git a/arch/x86/crypto/twofish_avx_glue.c b/arch/x86/crypto/twofish_avx_glue.c
+index 7b539bbb108f..13f810b61034 100644
+--- a/arch/x86/crypto/twofish_avx_glue.c
++++ b/arch/x86/crypto/twofish_avx_glue.c
+@@ -25,8 +25,6 @@ asmlinkage void twofish_ecb_enc_8way(const void *ctx, u8 *dst, const u8 *src);
+ asmlinkage void twofish_ecb_dec_8way(const void *ctx, u8 *dst, const u8 *src);
  
- #include <crypto/algapi.h>
-@@ -253,94 +251,6 @@ static int cbc_decrypt(struct skcipher_request *req)
- 	return err;
+ asmlinkage void twofish_cbc_dec_8way(const void *ctx, u8 *dst, const u8 *src);
+-asmlinkage void twofish_ctr_8way(const void *ctx, u8 *dst, const u8 *src,
+-				 le128 *iv);
+ 
+ static int twofish_setkey_skcipher(struct crypto_skcipher *tfm,
+ 				   const u8 *key, unsigned int keylen)
+@@ -55,22 +53,6 @@ static const struct common_glue_ctx twofish_enc = {
+ 	} }
+ };
+ 
+-static const struct common_glue_ctx twofish_ctr = {
+-	.num_funcs = 3,
+-	.fpu_blocks_limit = TWOFISH_PARALLEL_BLOCKS,
+-
+-	.funcs = { {
+-		.num_blocks = TWOFISH_PARALLEL_BLOCKS,
+-		.fn_u = { .ctr = twofish_ctr_8way }
+-	}, {
+-		.num_blocks = 3,
+-		.fn_u = { .ctr = twofish_enc_blk_ctr_3way }
+-	}, {
+-		.num_blocks = 1,
+-		.fn_u = { .ctr = twofish_enc_blk_ctr }
+-	} }
+-};
+-
+ static const struct common_glue_ctx twofish_dec = {
+ 	.num_funcs = 3,
+ 	.fpu_blocks_limit = TWOFISH_PARALLEL_BLOCKS,
+@@ -123,11 +105,6 @@ static int cbc_decrypt(struct skcipher_request *req)
+ 	return glue_cbc_decrypt_req_128bit(&twofish_dec_cbc, req);
  }
  
--static void ctr_crypt_final(struct des3_ede_x86_ctx *ctx,
--			    struct skcipher_walk *walk)
--{
--	u8 *ctrblk = walk->iv;
--	u8 keystream[DES3_EDE_BLOCK_SIZE];
--	u8 *src = walk->src.virt.addr;
--	u8 *dst = walk->dst.virt.addr;
--	unsigned int nbytes = walk->nbytes;
--
--	des3_ede_enc_blk(ctx, keystream, ctrblk);
--	crypto_xor_cpy(dst, keystream, src, nbytes);
--
--	crypto_inc(ctrblk, DES3_EDE_BLOCK_SIZE);
--}
--
--static unsigned int __ctr_crypt(struct des3_ede_x86_ctx *ctx,
--				struct skcipher_walk *walk)
--{
--	unsigned int bsize = DES3_EDE_BLOCK_SIZE;
--	unsigned int nbytes = walk->nbytes;
--	__be64 *src = (__be64 *)walk->src.virt.addr;
--	__be64 *dst = (__be64 *)walk->dst.virt.addr;
--	u64 ctrblk = be64_to_cpu(*(__be64 *)walk->iv);
--	__be64 ctrblocks[3];
--
--	/* Process four block batch */
--	if (nbytes >= bsize * 3) {
--		do {
--			/* create ctrblks for parallel encrypt */
--			ctrblocks[0] = cpu_to_be64(ctrblk++);
--			ctrblocks[1] = cpu_to_be64(ctrblk++);
--			ctrblocks[2] = cpu_to_be64(ctrblk++);
--
--			des3_ede_enc_blk_3way(ctx, (u8 *)ctrblocks,
--					      (u8 *)ctrblocks);
--
--			dst[0] = src[0] ^ ctrblocks[0];
--			dst[1] = src[1] ^ ctrblocks[1];
--			dst[2] = src[2] ^ ctrblocks[2];
--
--			src += 3;
--			dst += 3;
--		} while ((nbytes -= bsize * 3) >= bsize * 3);
--
--		if (nbytes < bsize)
--			goto done;
--	}
--
--	/* Handle leftovers */
--	do {
--		ctrblocks[0] = cpu_to_be64(ctrblk++);
--
--		des3_ede_enc_blk(ctx, (u8 *)ctrblocks, (u8 *)ctrblocks);
--
--		dst[0] = src[0] ^ ctrblocks[0];
--
--		src += 1;
--		dst += 1;
--	} while ((nbytes -= bsize) >= bsize);
--
--done:
--	*(__be64 *)walk->iv = cpu_to_be64(ctrblk);
--	return nbytes;
--}
--
 -static int ctr_crypt(struct skcipher_request *req)
 -{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct des3_ede_x86_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct skcipher_walk walk;
--	unsigned int nbytes;
--	int err;
--
--	err = skcipher_walk_virt(&walk, req, false);
--
--	while ((nbytes = walk.nbytes) >= DES3_EDE_BLOCK_SIZE) {
--		nbytes = __ctr_crypt(ctx, &walk);
--		err = skcipher_walk_done(&walk, nbytes);
--	}
--
--	if (nbytes) {
--		ctr_crypt_final(ctx, &walk);
--		err = skcipher_walk_done(&walk, 0);
--	}
--
--	return err;
+-	return glue_ctr_req_128bit(&twofish_ctr, req);
 -}
 -
- static int des3_ede_x86_setkey(struct crypto_tfm *tfm, const u8 *key,
- 			       unsigned int keylen)
- {
-@@ -428,20 +338,6 @@ static struct skcipher_alg des3_ede_skciphers[] = {
- 		.setkey			= des3_ede_x86_setkey_skcipher,
+ static struct skcipher_alg twofish_algs[] = {
+ 	{
+ 		.base.cra_name		= "__ecb(twofish)",
+@@ -156,21 +133,6 @@ static struct skcipher_alg twofish_algs[] = {
+ 		.setkey			= twofish_setkey_skcipher,
  		.encrypt		= cbc_encrypt,
  		.decrypt		= cbc_decrypt,
 -	}, {
--		.base.cra_name		= "ctr(des3_ede)",
--		.base.cra_driver_name	= "ctr-des3_ede-asm",
--		.base.cra_priority	= 300,
+-		.base.cra_name		= "__ctr(twofish)",
+-		.base.cra_driver_name	= "__ctr-twofish-avx",
+-		.base.cra_priority	= 400,
+-		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
 -		.base.cra_blocksize	= 1,
--		.base.cra_ctxsize	= sizeof(struct des3_ede_x86_ctx),
+-		.base.cra_ctxsize	= sizeof(struct twofish_ctx),
 -		.base.cra_module	= THIS_MODULE,
--		.min_keysize		= DES3_EDE_KEY_SIZE,
--		.max_keysize		= DES3_EDE_KEY_SIZE,
--		.ivsize			= DES3_EDE_BLOCK_SIZE,
--		.chunksize		= DES3_EDE_BLOCK_SIZE,
--		.setkey			= des3_ede_x86_setkey_skcipher,
+-		.min_keysize		= TF_MIN_KEY_SIZE,
+-		.max_keysize		= TF_MAX_KEY_SIZE,
+-		.ivsize			= TF_BLOCK_SIZE,
+-		.chunksize		= TF_BLOCK_SIZE,
+-		.setkey			= twofish_setkey_skcipher,
 -		.encrypt		= ctr_crypt,
 -		.decrypt		= ctr_crypt,
- 	}
+ 	},
  };
  
+diff --git a/arch/x86/crypto/twofish_glue_3way.c b/arch/x86/crypto/twofish_glue_3way.c
+index 768af6075479..88252370db0a 100644
+--- a/arch/x86/crypto/twofish_glue_3way.c
++++ b/arch/x86/crypto/twofish_glue_3way.c
+@@ -30,12 +30,6 @@ static inline void twofish_enc_blk_3way(const void *ctx, u8 *dst, const u8 *src)
+ 	__twofish_enc_blk_3way(ctx, dst, src, false);
+ }
+ 
+-static inline void twofish_enc_blk_xor_3way(const void *ctx, u8 *dst,
+-					    const u8 *src)
+-{
+-	__twofish_enc_blk_3way(ctx, dst, src, true);
+-}
+-
+ void twofish_dec_blk_cbc_3way(const void *ctx, u8 *d, const u8 *s)
+ {
+ 	u128 ivs[2];
+@@ -52,46 +46,6 @@ void twofish_dec_blk_cbc_3way(const void *ctx, u8 *d, const u8 *s)
+ }
+ EXPORT_SYMBOL_GPL(twofish_dec_blk_cbc_3way);
+ 
+-void twofish_enc_blk_ctr(const void *ctx, u8 *d, const u8 *s, le128 *iv)
+-{
+-	be128 ctrblk;
+-	u128 *dst = (u128 *)d;
+-	const u128 *src = (const u128 *)s;
+-
+-	if (dst != src)
+-		*dst = *src;
+-
+-	le128_to_be128(&ctrblk, iv);
+-	le128_inc(iv);
+-
+-	twofish_enc_blk(ctx, (u8 *)&ctrblk, (u8 *)&ctrblk);
+-	u128_xor(dst, dst, (u128 *)&ctrblk);
+-}
+-EXPORT_SYMBOL_GPL(twofish_enc_blk_ctr);
+-
+-void twofish_enc_blk_ctr_3way(const void *ctx, u8 *d, const u8 *s, le128 *iv)
+-{
+-	be128 ctrblks[3];
+-	u128 *dst = (u128 *)d;
+-	const u128 *src = (const u128 *)s;
+-
+-	if (dst != src) {
+-		dst[0] = src[0];
+-		dst[1] = src[1];
+-		dst[2] = src[2];
+-	}
+-
+-	le128_to_be128(&ctrblks[0], iv);
+-	le128_inc(iv);
+-	le128_to_be128(&ctrblks[1], iv);
+-	le128_inc(iv);
+-	le128_to_be128(&ctrblks[2], iv);
+-	le128_inc(iv);
+-
+-	twofish_enc_blk_xor_3way(ctx, (u8 *)dst, (u8 *)ctrblks);
+-}
+-EXPORT_SYMBOL_GPL(twofish_enc_blk_ctr_3way);
+-
+ static const struct common_glue_ctx twofish_enc = {
+ 	.num_funcs = 2,
+ 	.fpu_blocks_limit = -1,
+@@ -105,19 +59,6 @@ static const struct common_glue_ctx twofish_enc = {
+ 	} }
+ };
+ 
+-static const struct common_glue_ctx twofish_ctr = {
+-	.num_funcs = 2,
+-	.fpu_blocks_limit = -1,
+-
+-	.funcs = { {
+-		.num_blocks = 3,
+-		.fn_u = { .ctr = twofish_enc_blk_ctr_3way }
+-	}, {
+-		.num_blocks = 1,
+-		.fn_u = { .ctr = twofish_enc_blk_ctr }
+-	} }
+-};
+-
+ static const struct common_glue_ctx twofish_dec = {
+ 	.num_funcs = 2,
+ 	.fpu_blocks_limit = -1,
+@@ -164,11 +105,6 @@ static int cbc_decrypt(struct skcipher_request *req)
+ 	return glue_cbc_decrypt_req_128bit(&twofish_dec_cbc, req);
+ }
+ 
+-static int ctr_crypt(struct skcipher_request *req)
+-{
+-	return glue_ctr_req_128bit(&twofish_ctr, req);
+-}
+-
+ static struct skcipher_alg tf_skciphers[] = {
+ 	{
+ 		.base.cra_name		= "ecb(twofish)",
+@@ -195,20 +131,6 @@ static struct skcipher_alg tf_skciphers[] = {
+ 		.setkey			= twofish_setkey_skcipher,
+ 		.encrypt		= cbc_encrypt,
+ 		.decrypt		= cbc_decrypt,
+-	}, {
+-		.base.cra_name		= "ctr(twofish)",
+-		.base.cra_driver_name	= "ctr-twofish-3way",
+-		.base.cra_priority	= 300,
+-		.base.cra_blocksize	= 1,
+-		.base.cra_ctxsize	= sizeof(struct twofish_ctx),
+-		.base.cra_module	= THIS_MODULE,
+-		.min_keysize		= TF_MIN_KEY_SIZE,
+-		.max_keysize		= TF_MAX_KEY_SIZE,
+-		.ivsize			= TF_BLOCK_SIZE,
+-		.chunksize		= TF_BLOCK_SIZE,
+-		.setkey			= twofish_setkey_skcipher,
+-		.encrypt		= ctr_crypt,
+-		.decrypt		= ctr_crypt,
+ 	},
+ };
+ 
+diff --git a/arch/x86/include/asm/crypto/twofish.h b/arch/x86/include/asm/crypto/twofish.h
+index 2c377a8042e1..12df400e6d53 100644
+--- a/arch/x86/include/asm/crypto/twofish.h
++++ b/arch/x86/include/asm/crypto/twofish.h
+@@ -17,9 +17,5 @@ asmlinkage void twofish_dec_blk_3way(const void *ctx, u8 *dst, const u8 *src);
+ 
+ /* helpers from twofish_x86_64-3way module */
+ extern void twofish_dec_blk_cbc_3way(const void *ctx, u8 *dst, const u8 *src);
+-extern void twofish_enc_blk_ctr(const void *ctx, u8 *dst, const u8 *src,
+-				le128 *iv);
+-extern void twofish_enc_blk_ctr_3way(const void *ctx, u8 *dst, const u8 *src,
+-				     le128 *iv);
+ 
+ #endif /* ASM_X86_TWOFISH_H */
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 606f94079f05..5e820a57d138 100644
+index 3f51c5dfc2a9..606f94079f05 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -1427,6 +1427,7 @@ config CRYPTO_DES3_EDE_X86_64
- 	depends on X86 && 64BIT
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_LIB_DES
+@@ -1680,6 +1680,7 @@ config CRYPTO_TWOFISH_586
+ 	depends on (X86 || UML_X86) && !64BIT
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_TWOFISH_COMMON
 +	imply CRYPTO_CTR
  	help
- 	  Triple DES EDE (FIPS 46-3) algorithm.
+ 	  Twofish cipher algorithm.
+ 
+@@ -1696,6 +1697,7 @@ config CRYPTO_TWOFISH_X86_64
+ 	depends on (X86 || UML_X86) && 64BIT
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_TWOFISH_COMMON
++	imply CRYPTO_CTR
+ 	help
+ 	  Twofish cipher algorithm (x86_64).
  
 -- 
 2.17.1
