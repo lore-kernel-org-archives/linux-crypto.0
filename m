@@ -7,31 +7,31 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A36EC433E9
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43FF1C433E6
 	for <linux-crypto@archiver.kernel.org>; Thu, 31 Dec 2020 17:24:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E9B42242A
+	by mail.kernel.org (Postfix) with ESMTP id 0D195223E4
 	for <linux-crypto@archiver.kernel.org>; Thu, 31 Dec 2020 17:24:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726743AbgLaRYl (ORCPT
+        id S1726661AbgLaRYg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 31 Dec 2020 12:24:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:54758 "EHLO mail.kernel.org"
+        Thu, 31 Dec 2020 12:24:36 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54722 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726540AbgLaRYk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 31 Dec 2020 12:24:40 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 234312242A;
-        Thu, 31 Dec 2020 17:23:57 +0000 (UTC)
+        id S1726540AbgLaRYg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 31 Dec 2020 12:24:36 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id F2B60223E4;
+        Thu, 31 Dec 2020 17:23:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1609435439;
-        bh=RVUOgzblhVxXipF+TH0F1dBrD2if8f5ZJNxV4J4xNV4=;
+        s=k20201202; t=1609435435;
+        bh=UUW+iE+Q72l+r3IpvgOdswPBKdJpAeXzpkMms7XMhY4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=k37Cem8O6+IRr0iM01P410y3YlQwpSR4lwRNSXFR2OkoWZkDHsW7MdbmG3qiz2hMQ
-         d3wECijLyiVWldSkxQo5r8wkj19sybYipqyZHgOZKP0w3/qjV65KPzXubVzF1lREly
-         rtWGsnlBIMY/ghxxSgg0x1c2ur3Cwi7/ZnWGyWRhI3GMm7LuA0HgMYHBNEt/Aa9J7W
-         /m41EQ5Y0kRBZowDg7JoE+6hbR7Gf2iu1jA6AhycV2xsUcJJM6w6L+rd3rYEY7MKaA
-         3er/fs0iS9iJqvJuVpIrBhN5OpADfj6qsIRmxVQsHx/ZNLyIZSm5fbRwQ2pOk8MTQQ
-         cPWxLqrqPlK3Q==
+        b=dKzjqP0kcy3Y3q2OwWB2YxSxUHYF7Hp77Q10A/3v3EKnM703DC6xjxUBm6Pxc487R
+         VS7T1Gg0MjFQaNg5XfokhKnuZHFu7kWlQam1m8ravgL8+wAi/uXhBXJxRd021Ts9hM
+         09HNoVS3j32p0BB81fk5LEADwSTRKYNi3tZqlyHEIsoXkJ0LWYqlWqFF6YC4xV78c+
+         Zerf6M5F+MruZbW9qRkYg5kbGxEqJ/aoExs1ZHdEb2IPRhrJ7OQU0vt9gFQ7Pea2IE
+         WlN1LomTEXj8DiOlxCGtobU0qNoxQ56XZft/6htpvZlUngBmz043cpl8UWl6S7QOK+
+         ePINAzBF3G9Tg==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ardb@kernel.org>, Megha Dey <megha.dey@intel.com>,
@@ -39,9 +39,9 @@ Cc:     Ard Biesheuvel <ardb@kernel.org>, Megha Dey <megha.dey@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Milan Broz <gmazyland@gmail.com>,
         Mike Snitzer <snitzer@redhat.com>
-Subject: [PATCH 04/21] crypto: x86/twofish - switch to XTS template
-Date:   Thu, 31 Dec 2020 18:23:20 +0100
-Message-Id: <20201231172337.23073-5-ardb@kernel.org>
+Subject: [PATCH 02/21] crypto: x86/cast6 - switch to XTS template
+Date:   Thu, 31 Dec 2020 18:23:18 +0100
+Message-Id: <20201231172337.23073-3-ardb@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201231172337.23073-1-ardb@kernel.org>
 References: <20201231172337.23073-1-ardb@kernel.org>
@@ -53,39 +53,36 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 Now that the XTS template can wrap accelerated ECB modes, it can be
-used to implement Twofish in XTS mode as well, which turns out to
+used to implement CAST6 in XTS mode as well, which turns out to
 be at least as fast, and sometimes even faster
 
 Acked-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/x86/crypto/twofish-avx-x86_64-asm_64.S | 53 -----------
- arch/x86/crypto/twofish_avx_glue.c          | 98 --------------------
- crypto/Kconfig                              |  1 +
- 3 files changed, 1 insertion(+), 151 deletions(-)
+ arch/x86/crypto/cast6-avx-x86_64-asm_64.S | 56 -----------
+ arch/x86/crypto/cast6_avx_glue.c          | 98 --------------------
+ crypto/Kconfig                            |  2 +-
+ 3 files changed, 1 insertion(+), 155 deletions(-)
 
-diff --git a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
-index a5151393bb2f..84e61ef03638 100644
---- a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
-+++ b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
-@@ -19,11 +19,6 @@
- .Lbswap128_mask:
- 	.byte 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+diff --git a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+index 932a3ce32a88..0c1ea836215a 100644
+--- a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+@@ -212,8 +212,6 @@
  
--.section	.rodata.cst16.xts_gf128mul_and_shl1_mask, "aM", @progbits, 16
--.align 16
+ .section	.rodata.cst16, "aM", @progbits, 16
+ .align 16
 -.Lxts_gf128mul_and_shl1_mask:
 -	.byte 0x87, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0
--
- .text
- 
- /* structure of crypto context */
-@@ -406,51 +401,3 @@ SYM_FUNC_START(twofish_ctr_8way)
+ .Lbswap_mask:
+ 	.byte 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12
+ .Lbswap128_mask:
+@@ -440,57 +438,3 @@ SYM_FUNC_START(cast6_ctr_8way)
  	FRAME_END
  	ret;
- SYM_FUNC_END(twofish_ctr_8way)
+ SYM_FUNC_END(cast6_ctr_8way)
 -
--SYM_FUNC_START(twofish_xts_enc_8way)
+-SYM_FUNC_START(cast6_xts_enc_8way)
 -	/* input:
 -	 *	%rdi: ctx, CTX
 -	 *	%rsi: dst
@@ -93,23 +90,26 @@ index a5151393bb2f..84e61ef03638 100644
 -	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
 -	 */
 -	FRAME_BEGIN
+-	pushq %r15;
 -
+-	movq %rdi, CTX
 -	movq %rsi, %r11;
 -
 -	/* regs <= src, dst <= IVs, regs <= regs xor IVs */
 -	load_xts_8way(%rcx, %rdx, %rsi, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2,
--		      RX0, RX1, RY0, .Lxts_gf128mul_and_shl1_mask);
+-		      RX, RKR, RKM, .Lxts_gf128mul_and_shl1_mask);
 -
--	call __twofish_enc_blk8;
+-	call __cast6_enc_blk8;
 -
 -	/* dst <= regs xor IVs(in dst) */
--	store_xts_8way(%r11, RC1, RD1, RA1, RB1, RC2, RD2, RA2, RB2);
+-	store_xts_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
 -
+-	popq %r15;
 -	FRAME_END
 -	ret;
--SYM_FUNC_END(twofish_xts_enc_8way)
+-SYM_FUNC_END(cast6_xts_enc_8way)
 -
--SYM_FUNC_START(twofish_xts_dec_8way)
+-SYM_FUNC_START(cast6_xts_dec_8way)
 -	/* input:
 -	 *	%rdi: ctx, CTX
 -	 *	%rsi: dst
@@ -117,68 +117,117 @@ index a5151393bb2f..84e61ef03638 100644
 -	 *	%rcx: iv (t ⊕ αⁿ ∈ GF(2¹²⁸))
 -	 */
 -	FRAME_BEGIN
+-	pushq %r15;
 -
+-	movq %rdi, CTX
 -	movq %rsi, %r11;
 -
 -	/* regs <= src, dst <= IVs, regs <= regs xor IVs */
--	load_xts_8way(%rcx, %rdx, %rsi, RC1, RD1, RA1, RB1, RC2, RD2, RA2, RB2,
--		      RX0, RX1, RY0, .Lxts_gf128mul_and_shl1_mask);
+-	load_xts_8way(%rcx, %rdx, %rsi, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2,
+-		      RX, RKR, RKM, .Lxts_gf128mul_and_shl1_mask);
 -
--	call __twofish_dec_blk8;
+-	call __cast6_dec_blk8;
 -
 -	/* dst <= regs xor IVs(in dst) */
 -	store_xts_8way(%r11, RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2);
 -
+-	popq %r15;
 -	FRAME_END
 -	ret;
--SYM_FUNC_END(twofish_xts_dec_8way)
-diff --git a/arch/x86/crypto/twofish_avx_glue.c b/arch/x86/crypto/twofish_avx_glue.c
-index 2dbc8ce3730e..7b539bbb108f 100644
---- a/arch/x86/crypto/twofish_avx_glue.c
-+++ b/arch/x86/crypto/twofish_avx_glue.c
+-SYM_FUNC_END(cast6_xts_dec_8way)
+diff --git a/arch/x86/crypto/cast6_avx_glue.c b/arch/x86/crypto/cast6_avx_glue.c
+index 48e0f37796fa..5a21d3e9041c 100644
+--- a/arch/x86/crypto/cast6_avx_glue.c
++++ b/arch/x86/crypto/cast6_avx_glue.c
 @@ -15,7 +15,6 @@
  #include <crypto/algapi.h>
+ #include <crypto/cast6.h>
  #include <crypto/internal/simd.h>
- #include <crypto/twofish.h>
 -#include <crypto/xts.h>
  #include <asm/crypto/glue_helper.h>
- #include <asm/crypto/twofish.h>
  
-@@ -29,11 +28,6 @@ asmlinkage void twofish_cbc_dec_8way(const void *ctx, u8 *dst, const u8 *src);
- asmlinkage void twofish_ctr_8way(const void *ctx, u8 *dst, const u8 *src,
- 				 le128 *iv);
+ #define CAST6_PARALLEL_BLOCKS 8
+@@ -27,27 +26,12 @@ asmlinkage void cast6_cbc_dec_8way(const void *ctx, u8 *dst, const u8 *src);
+ asmlinkage void cast6_ctr_8way(const void *ctx, u8 *dst, const u8 *src,
+ 			       le128 *iv);
  
--asmlinkage void twofish_xts_enc_8way(const void *ctx, u8 *dst, const u8 *src,
--				     le128 *iv);
--asmlinkage void twofish_xts_dec_8way(const void *ctx, u8 *dst, const u8 *src,
--				     le128 *iv);
+-asmlinkage void cast6_xts_enc_8way(const void *ctx, u8 *dst, const u8 *src,
+-				   le128 *iv);
+-asmlinkage void cast6_xts_dec_8way(const void *ctx, u8 *dst, const u8 *src,
+-				   le128 *iv);
 -
- static int twofish_setkey_skcipher(struct crypto_skcipher *tfm,
- 				   const u8 *key, unsigned int keylen)
+ static int cast6_setkey_skcipher(struct crypto_skcipher *tfm,
+ 				 const u8 *key, unsigned int keylen)
  {
-@@ -45,40 +39,6 @@ static inline void twofish_enc_blk_3way(const void *ctx, u8 *dst, const u8 *src)
- 	__twofish_enc_blk_3way(ctx, dst, src, false);
+ 	return cast6_setkey(&tfm->base, key, keylen);
  }
  
--static void twofish_xts_enc(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
+-static void cast6_xts_enc(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
 -{
--	glue_xts_crypt_128bit_one(ctx, dst, src, iv, twofish_enc_blk);
+-	glue_xts_crypt_128bit_one(ctx, dst, src, iv, __cast6_encrypt);
 -}
 -
--static void twofish_xts_dec(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
+-static void cast6_xts_dec(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
 -{
--	glue_xts_crypt_128bit_one(ctx, dst, src, iv, twofish_dec_blk);
+-	glue_xts_crypt_128bit_one(ctx, dst, src, iv, __cast6_decrypt);
 -}
 -
--struct twofish_xts_ctx {
--	struct twofish_ctx tweak_ctx;
--	struct twofish_ctx crypt_ctx;
+ static void cast6_crypt_ctr(const void *ctx, u8 *d, const u8 *s, le128 *iv)
+ {
+ 	be128 ctrblk;
+@@ -87,19 +71,6 @@ static const struct common_glue_ctx cast6_ctr = {
+ 	} }
+ };
+ 
+-static const struct common_glue_ctx cast6_enc_xts = {
+-	.num_funcs = 2,
+-	.fpu_blocks_limit = CAST6_PARALLEL_BLOCKS,
+-
+-	.funcs = { {
+-		.num_blocks = CAST6_PARALLEL_BLOCKS,
+-		.fn_u = { .xts = cast6_xts_enc_8way }
+-	}, {
+-		.num_blocks = 1,
+-		.fn_u = { .xts = cast6_xts_enc }
+-	} }
 -};
 -
--static int xts_twofish_setkey(struct crypto_skcipher *tfm, const u8 *key,
--			      unsigned int keylen)
+ static const struct common_glue_ctx cast6_dec = {
+ 	.num_funcs = 2,
+ 	.fpu_blocks_limit = CAST6_PARALLEL_BLOCKS,
+@@ -126,19 +97,6 @@ static const struct common_glue_ctx cast6_dec_cbc = {
+ 	} }
+ };
+ 
+-static const struct common_glue_ctx cast6_dec_xts = {
+-	.num_funcs = 2,
+-	.fpu_blocks_limit = CAST6_PARALLEL_BLOCKS,
+-
+-	.funcs = { {
+-		.num_blocks = CAST6_PARALLEL_BLOCKS,
+-		.fn_u = { .xts = cast6_xts_dec_8way }
+-	}, {
+-		.num_blocks = 1,
+-		.fn_u = { .xts = cast6_xts_dec }
+-	} }
+-};
+-
+ static int ecb_encrypt(struct skcipher_request *req)
+ {
+ 	return glue_ecb_req_128bit(&cast6_enc, req);
+@@ -164,48 +122,6 @@ static int ctr_crypt(struct skcipher_request *req)
+ 	return glue_ctr_req_128bit(&cast6_ctr, req);
+ }
+ 
+-struct cast6_xts_ctx {
+-	struct cast6_ctx tweak_ctx;
+-	struct cast6_ctx crypt_ctx;
+-};
+-
+-static int xts_cast6_setkey(struct crypto_skcipher *tfm, const u8 *key,
+-			    unsigned int keylen)
 -{
--	struct twofish_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct cast6_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
 -	int err;
 -
 -	err = xts_verify_key(tfm, key, keylen);
@@ -186,115 +235,69 @@ index 2dbc8ce3730e..7b539bbb108f 100644
 -		return err;
 -
 -	/* first half of xts-key is for crypt */
--	err = __twofish_setkey(&ctx->crypt_ctx, key, keylen / 2);
+-	err = __cast6_setkey(&ctx->crypt_ctx, key, keylen / 2);
 -	if (err)
 -		return err;
 -
 -	/* second half of xts-key is for tweak */
--	return __twofish_setkey(&ctx->tweak_ctx, key + keylen / 2, keylen / 2);
+-	return __cast6_setkey(&ctx->tweak_ctx, key + keylen / 2, keylen / 2);
 -}
 -
- static const struct common_glue_ctx twofish_enc = {
- 	.num_funcs = 3,
- 	.fpu_blocks_limit = TWOFISH_PARALLEL_BLOCKS,
-@@ -111,19 +71,6 @@ static const struct common_glue_ctx twofish_ctr = {
- 	} }
- };
- 
--static const struct common_glue_ctx twofish_enc_xts = {
--	.num_funcs = 2,
--	.fpu_blocks_limit = TWOFISH_PARALLEL_BLOCKS,
--
--	.funcs = { {
--		.num_blocks = TWOFISH_PARALLEL_BLOCKS,
--		.fn_u = { .xts = twofish_xts_enc_8way }
--	}, {
--		.num_blocks = 1,
--		.fn_u = { .xts = twofish_xts_enc }
--	} }
--};
--
- static const struct common_glue_ctx twofish_dec = {
- 	.num_funcs = 3,
- 	.fpu_blocks_limit = TWOFISH_PARALLEL_BLOCKS,
-@@ -156,19 +103,6 @@ static const struct common_glue_ctx twofish_dec_cbc = {
- 	} }
- };
- 
--static const struct common_glue_ctx twofish_dec_xts = {
--	.num_funcs = 2,
--	.fpu_blocks_limit = TWOFISH_PARALLEL_BLOCKS,
--
--	.funcs = { {
--		.num_blocks = TWOFISH_PARALLEL_BLOCKS,
--		.fn_u = { .xts = twofish_xts_dec_8way }
--	}, {
--		.num_blocks = 1,
--		.fn_u = { .xts = twofish_xts_dec }
--	} }
--};
--
- static int ecb_encrypt(struct skcipher_request *req)
- {
- 	return glue_ecb_req_128bit(&twofish_enc, req);
-@@ -194,24 +128,6 @@ static int ctr_crypt(struct skcipher_request *req)
- 	return glue_ctr_req_128bit(&twofish_ctr, req);
- }
- 
 -static int xts_encrypt(struct skcipher_request *req)
 -{
 -	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct twofish_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct cast6_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
 -
--	return glue_xts_req_128bit(&twofish_enc_xts, req, twofish_enc_blk,
+-	return glue_xts_req_128bit(&cast6_enc_xts, req, __cast6_encrypt,
 -				   &ctx->tweak_ctx, &ctx->crypt_ctx, false);
 -}
 -
 -static int xts_decrypt(struct skcipher_request *req)
 -{
 -	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct twofish_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct cast6_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
 -
--	return glue_xts_req_128bit(&twofish_dec_xts, req, twofish_enc_blk,
+-	return glue_xts_req_128bit(&cast6_dec_xts, req, __cast6_encrypt,
 -				   &ctx->tweak_ctx, &ctx->crypt_ctx, true);
 -}
 -
- static struct skcipher_alg twofish_algs[] = {
+ static struct skcipher_alg cast6_algs[] = {
  	{
- 		.base.cra_name		= "__ecb(twofish)",
-@@ -255,20 +171,6 @@ static struct skcipher_alg twofish_algs[] = {
- 		.setkey			= twofish_setkey_skcipher,
+ 		.base.cra_name		= "__ecb(cast6)",
+@@ -249,20 +165,6 @@ static struct skcipher_alg cast6_algs[] = {
+ 		.setkey			= cast6_setkey_skcipher,
  		.encrypt		= ctr_crypt,
  		.decrypt		= ctr_crypt,
 -	}, {
--		.base.cra_name		= "__xts(twofish)",
--		.base.cra_driver_name	= "__xts-twofish-avx",
--		.base.cra_priority	= 400,
+-		.base.cra_name		= "__xts(cast6)",
+-		.base.cra_driver_name	= "__xts-cast6-avx",
+-		.base.cra_priority	= 200,
 -		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
--		.base.cra_blocksize	= TF_BLOCK_SIZE,
--		.base.cra_ctxsize	= sizeof(struct twofish_xts_ctx),
+-		.base.cra_blocksize	= CAST6_BLOCK_SIZE,
+-		.base.cra_ctxsize	= sizeof(struct cast6_xts_ctx),
 -		.base.cra_module	= THIS_MODULE,
--		.min_keysize		= 2 * TF_MIN_KEY_SIZE,
--		.max_keysize		= 2 * TF_MAX_KEY_SIZE,
--		.ivsize			= TF_BLOCK_SIZE,
--		.setkey			= xts_twofish_setkey,
+-		.min_keysize		= 2 * CAST6_MIN_KEY_SIZE,
+-		.max_keysize		= 2 * CAST6_MAX_KEY_SIZE,
+-		.ivsize			= CAST6_BLOCK_SIZE,
+-		.setkey			= xts_cast6_setkey,
 -		.encrypt		= xts_encrypt,
 -		.decrypt		= xts_decrypt,
  	},
  };
  
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index ce69a5ae26b5..7ad9bf84f4a0 100644
+index b9ea4e262ebe..03e8468e57df 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -1731,6 +1731,7 @@ config CRYPTO_TWOFISH_AVX_X86_64
- 	select CRYPTO_TWOFISH_COMMON
- 	select CRYPTO_TWOFISH_X86_64
- 	select CRYPTO_TWOFISH_X86_64_3WAY
+@@ -1394,7 +1394,7 @@ config CRYPTO_CAST6_AVX_X86_64
+ 	select CRYPTO_CAST_COMMON
+ 	select CRYPTO_GLUE_HELPER_X86
+ 	select CRYPTO_SIMD
+-	select CRYPTO_XTS
 +	imply CRYPTO_XTS
  	help
- 	  Twofish cipher algorithm (x86_64/AVX).
- 
+ 	  The CAST6 encryption algorithm (synonymous with CAST-256) is
+ 	  described in RFC2612.
 -- 
 2.17.1
 
