@@ -5,49 +5,49 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F757C4332B
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 21:55:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8196C433E9
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 21:59:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 640502245C
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 21:55:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3B49224DF
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 21:59:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726502AbhADVzl (ORCPT
+        id S1726984AbhADV6v (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 Jan 2021 16:55:41 -0500
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.53]:34351 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726176AbhADVzk (ORCPT
+        Mon, 4 Jan 2021 16:58:51 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.83]:29503 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726289AbhADV6v (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Jan 2021 16:55:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1609797166;
+        Mon, 4 Jan 2021 16:58:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1609797356;
         s=strato-dkim-0002; d=chronox.de;
         h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:From:
         Subject:Sender;
-        bh=pAgy1otXzvJufKgLKh/aLwRJrmcHtfA9dc+JXv9QmgU=;
-        b=hSgc0+gW8AJFsleVQWhFQPRoRdajq+FeJVeDyMyisjLWpYYtYvwFPQiQTswcvylfii
-        /hoU3//gTOG5q2jaz9Axlp8mjNa4VcVGovdDNlEfmVsgwplNiRWS5FkYju4F4Zsd9N11
-        gpjmAErVapWza+9BcdwR+ysi5AgOwH3nWjPptlTTDf6PjMZHfokVgmCwjKgNskXVnEVf
-        EaSrbYs4oW8dI7FjyFoiVQ8Ho1PsJ0Cnx+ChwE2QIwYb+skotXKWMZ/JiQtsVU4WEaNk
-        23ur08WhARzSfxqUqvqTnCLLSn6fQ+DlH19yQT2GBxRbsr3tBMSpCfQ/UmHAbUtMiz8j
-        Rd0A==
+        bh=Fv0xQCZXlqRbniAGNRh2vwS+eu5R9RhCFOOwbL7qZRw=;
+        b=cDdD2NcSod8aoLtmLt3D+U/HK0wCZNIslOVsm9OtGy9y0AcO8f9Bohzpf8Dc2tPvbd
+        yA2kfjsUzL/mRroENX8Ui/+uWB7Cje9eC28Qi2AI692fog2wH5NU4j14/AvVwC+Evc8w
+        skcbJXNIssyACs9LAkBkG3PghCucSLeLU4QVuv2qzeuFaMYVUsE9rKjUosBuYxLzeuLB
+        SKso2bNuAAVZUoV5UrJxbiMoY18DESzXm4FhLZx10iUNOK9cEwr7WdAm3u6xi2M397t/
+        72CFYJ/0ERJwI79uSeiu5wJUVwgWpb8h+4hzS3zsxZmPtf9UOYrOUhdn927i4FXFeZ3Q
+        ckrA==
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaIvSZFqc="
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
         by smtp.strato.de (RZmta 47.10.7 DYNA|AUTH)
-        with ESMTPSA id h02bd9x04LqjxfK
+        with ESMTPSA id h02bd9x04LqkxfM
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-        Mon, 4 Jan 2021 22:52:45 +0100 (CET)
+        Mon, 4 Jan 2021 22:52:46 +0100 (CET)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         mathew.j.martineau@linux.intel.com, dhowells@redhat.com
 Cc:     linux-crypto@vger.kernel.org, linux-fscrypt@vger.kernel.org,
         linux-kernel@vger.kernel.org, keyrings@vger.kernel.org
-Subject: [PATCH 4/5] security: DH - use KDF implementation from crypto API
-Date:   Mon, 04 Jan 2021 22:49:50 +0100
-Message-ID: <3088284.aeNJFYEL58@positron.chronox.de>
+Subject: [PATCH 2/5] crypto: add SP800-108 counter key derivation function
+Date:   Mon, 04 Jan 2021 22:47:35 +0100
+Message-ID: <1771447.tdWV9SEqCh@positron.chronox.de>
 In-Reply-To: <4616980.31r3eYUQgx@positron.chronox.de>
 References: <4616980.31r3eYUQgx@positron.chronox.de>
 MIME-Version: 1.0
@@ -57,235 +57,285 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The kernel crypto API provides the SP800-108 counter KDF implementation.
-Thus, the separate implementation provided as part of the keys subsystem
-can be replaced with calls to the KDF offered by the kernel crypto API.
+SP800-108 defines three KDFs - this patch provides the counter KDF
+implementation.
 
-The keys subsystem uses the counter KDF with a hash cipher primitive.
-Thus, it only uses the call to crypto_kdf108_ctr_generate.
+The KDF is implemented as a service function where the caller has to
+maintain the hash / HMAC state. Apart from this hash/HMAC state, no
+additional state is required to be maintained by either the caller or
+the KDF implementation.
 
-The change removes the specific code that adds a zero padding that was
-intended to be invoked when the DH operation result was smaller than the
-modulus. However, this cannot occur any more these days because the
-function mpi_write_to_sgl is used in the code path that calculates the
-shared secret in dh_compute_value. This MPI service function guarantees
-that leading zeros are introduced as needed to ensure the resulting data
-is exactly as long as the modulus. This implies that the specific code
-to add zero padding is dead code which can be safely removed.
+The key for the KDF is set with the crypto_kdf108_setkey function which
+is intended to be invoked before the caller requests a key derivation
+operation via crypto_kdf108_ctr_generate.
+
+SP800-108 allows the use of either a HMAC or a hash as crypto primitive
+for the KDF. When a HMAC cipher primtive is intended to be used,
+crypto_kdf108_setkey must be used to set the HMAC key. Otherwise, for a
+hash crypto primitve crypto_kdf108_ctr_generate can be used immediately
+after allocating the cipher handle.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- security/keys/Kconfig |   2 +-
- security/keys/dh.c    | 118 ++++++------------------------------------
- 2 files changed, 17 insertions(+), 103 deletions(-)
+ crypto/Kconfig                |   7 ++
+ crypto/Makefile               |   5 ++
+ crypto/kdf_sp800108.c         | 149 ++++++++++++++++++++++++++++++++++
+ include/crypto/kdf_sp800108.h |  59 ++++++++++++++
+ 4 files changed, 220 insertions(+)
+ create mode 100644 crypto/kdf_sp800108.c
+ create mode 100644 include/crypto/kdf_sp800108.h
 
-diff --git a/security/keys/Kconfig b/security/keys/Kconfig
-index 83bc23409164..e6604499f0a8 100644
---- a/security/keys/Kconfig
-+++ b/security/keys/Kconfig
-@@ -106,7 +106,7 @@ config KEY_DH_OPERATIONS
-        bool "Diffie-Hellman operations on retained keys"
-        depends on KEYS
-        select CRYPTO
--       select CRYPTO_HASH
-+       select CRYPTO_KDF800108_CTR
-        select CRYPTO_DH
-        help
- 	 This option provides support for calculating Diffie-Hellman
-diff --git a/security/keys/dh.c b/security/keys/dh.c
-index 1abfa70ed6e1..46fa442b81ec 100644
---- a/security/keys/dh.c
-+++ b/security/keys/dh.c
-@@ -11,6 +11,7 @@
- #include <crypto/hash.h>
- #include <crypto/kpp.h>
- #include <crypto/dh.h>
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index a367fcfeb5d4..9f375c2350f5 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1862,6 +1862,13 @@ config CRYPTO_JITTERENTROPY
+ 	  random numbers. This Jitterentropy RNG registers with
+ 	  the kernel crypto API and can be used by any caller.
+ 
++config CRYPTO_KDF800108_CTR
++	tristate "Counter KDF (SP800-108)"
++	select CRYPTO_HASH
++	help
++	  Enable the key derivation function in counter mode compliant to
++	  SP800-108.
++
+ config CRYPTO_USER_API
+ 	tristate
+ 
+diff --git a/crypto/Makefile b/crypto/Makefile
+index b279483fba50..46845a70850d 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -197,3 +197,8 @@ obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) += asymmetric_keys/
+ obj-$(CONFIG_CRYPTO_HASH_INFO) += hash_info.o
+ crypto_simd-y := simd.o
+ obj-$(CONFIG_CRYPTO_SIMD) += crypto_simd.o
++
++#
++# Key derivation function
++#
++obj-$(CONFIG_CRYPTO_KDF800108_CTR) += kdf_sp800108.o
+diff --git a/crypto/kdf_sp800108.c b/crypto/kdf_sp800108.c
+new file mode 100644
+index 000000000000..325dbd9dba38
+--- /dev/null
++++ b/crypto/kdf_sp800108.c
+@@ -0,0 +1,149 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/*
++ * SP800-108 Key-derivation function
++ *
++ * Copyright (C) 2020, Stephan Mueller <smueller@chronox.de>
++ */
++
++#include <linux/module.h>
 +#include <crypto/kdf_sp800108.h>
- #include <keys/user-type.h>
- #include "internal.h"
- 
-@@ -79,16 +80,9 @@ static void dh_crypto_done(struct crypto_async_request *req, int err)
- 	complete(&compl->completion);
- }
- 
--struct kdf_sdesc {
--	struct shash_desc shash;
--	char ctx[];
--};
--
--static int kdf_alloc(struct kdf_sdesc **sdesc_ret, char *hashname)
-+static int kdf_alloc(struct crypto_shash **hash, char *hashname)
- {
- 	struct crypto_shash *tfm;
--	struct kdf_sdesc *sdesc;
--	int size;
- 	int err;
- 
- 	/* allocate synchronous hash */
-@@ -102,14 +96,7 @@ static int kdf_alloc(struct kdf_sdesc **sdesc_ret, char *hashname)
- 	if (crypto_shash_digestsize(tfm) == 0)
- 		goto out_free_tfm;
- 
--	err = -ENOMEM;
--	size = sizeof(struct shash_desc) + crypto_shash_descsize(tfm);
--	sdesc = kmalloc(size, GFP_KERNEL);
--	if (!sdesc)
--		goto out_free_tfm;
--	sdesc->shash.tfm = tfm;
--
--	*sdesc_ret = sdesc;
-+	*hash = tfm;
- 
- 	return 0;
- 
-@@ -118,92 +105,20 @@ static int kdf_alloc(struct kdf_sdesc **sdesc_ret, char *hashname)
- 	return err;
- }
- 
--static void kdf_dealloc(struct kdf_sdesc *sdesc)
--{
--	if (!sdesc)
--		return;
--
--	if (sdesc->shash.tfm)
--		crypto_free_shash(sdesc->shash.tfm);
--
--	kfree_sensitive(sdesc);
--}
--
--/*
-- * Implementation of the KDF in counter mode according to SP800-108 section 5.1
-- * as well as SP800-56A section 5.8.1 (Single-step KDF).
-- *
-- * SP800-56A:
-- * The src pointer is defined as Z || other info where Z is the shared secret
-- * from DH and other info is an arbitrary string (see SP800-56A section
-- * 5.8.1.2).
-- *
-- * 'dlen' must be a multiple of the digest size.
-- */
--static int kdf_ctr(struct kdf_sdesc *sdesc, const u8 *src, unsigned int slen,
--		   u8 *dst, unsigned int dlen, unsigned int zlen)
-+static void kdf_dealloc(struct crypto_shash *hash)
- {
--	struct shash_desc *desc = &sdesc->shash;
--	unsigned int h = crypto_shash_digestsize(desc->tfm);
--	int err = 0;
--	u8 *dst_orig = dst;
--	__be32 counter = cpu_to_be32(1);
--
--	while (dlen) {
--		err = crypto_shash_init(desc);
--		if (err)
--			goto err;
--
--		err = crypto_shash_update(desc, (u8 *)&counter, sizeof(__be32));
--		if (err)
--			goto err;
--
--		if (zlen && h) {
--			u8 tmpbuffer[32];
--			size_t chunk = min_t(size_t, zlen, sizeof(tmpbuffer));
--			memset(tmpbuffer, 0, chunk);
--
--			do {
--				err = crypto_shash_update(desc, tmpbuffer,
--							  chunk);
--				if (err)
--					goto err;
--
--				zlen -= chunk;
--				chunk = min_t(size_t, zlen, sizeof(tmpbuffer));
--			} while (zlen);
--		}
--
--		if (src && slen) {
--			err = crypto_shash_update(desc, src, slen);
--			if (err)
--				goto err;
--		}
--
--		err = crypto_shash_final(desc, dst);
--		if (err)
--			goto err;
--
--		dlen -= h;
--		dst += h;
--		counter = cpu_to_be32(be32_to_cpu(counter) + 1);
--	}
--
--	return 0;
--
--err:
--	memzero_explicit(dst_orig, dlen);
--	return err;
-+	if (hash)
-+		crypto_free_shash(hash);
- }
- 
--static int keyctl_dh_compute_kdf(struct kdf_sdesc *sdesc,
-+static int keyctl_dh_compute_kdf(struct crypto_shash *hash,
- 				 char __user *buffer, size_t buflen,
--				 uint8_t *kbuf, size_t kbuflen, size_t lzero)
-+				 uint8_t *kbuf, size_t kbuflen)
- {
-+	struct kvec kbuf_iov = { .iov_base = kbuf, .iov_len = kbuflen };
- 	uint8_t *outbuf = NULL;
- 	int ret;
--	size_t outbuf_len = roundup(buflen,
--				    crypto_shash_digestsize(sdesc->shash.tfm));
-+	size_t outbuf_len = roundup(buflen, crypto_shash_digestsize(hash));
- 
- 	outbuf = kmalloc(outbuf_len, GFP_KERNEL);
- 	if (!outbuf) {
-@@ -211,7 +126,7 @@ static int keyctl_dh_compute_kdf(struct kdf_sdesc *sdesc,
- 		goto err;
- 	}
- 
--	ret = kdf_ctr(sdesc, kbuf, kbuflen, outbuf, outbuf_len, lzero);
-+	ret = crypto_kdf108_ctr_generate(hash, &kbuf_iov, 1, outbuf, outbuf_len);
- 	if (ret)
- 		goto err;
- 
-@@ -240,7 +155,7 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
- 	struct kpp_request *req;
- 	uint8_t *secret;
- 	uint8_t *outbuf;
--	struct kdf_sdesc *sdesc = NULL;
-+	struct crypto_shash *hash = NULL;
- 
- 	if (!params || (!buffer && buflen)) {
- 		ret = -EINVAL;
-@@ -273,7 +188,7 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
- 		}
- 
- 		/* allocate KDF from the kernel crypto API */
--		ret = kdf_alloc(&sdesc, hashname);
-+		ret = kdf_alloc(&hash, hashname);
- 		kfree(hashname);
- 		if (ret)
- 			goto out1;
-@@ -383,9 +298,8 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
- 			goto out6;
- 		}
- 
--		ret = keyctl_dh_compute_kdf(sdesc, buffer, buflen, outbuf,
--					    req->dst_len + kdfcopy->otherinfolen,
--					    outlen - req->dst_len);
-+		ret = keyctl_dh_compute_kdf(hash, buffer, buflen, outbuf,
-+					    req->dst_len + kdfcopy->otherinfolen);
- 	} else if (copy_to_user(buffer, outbuf, req->dst_len) == 0) {
- 		ret = req->dst_len;
- 	} else {
-@@ -403,7 +317,7 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
- out2:
- 	dh_free_data(&dh_inputs);
- out1:
--	kdf_dealloc(sdesc);
-+	kdf_dealloc(hash);
- 	return ret;
- }
- 
++#include <crypto/internal/kdf_selftest.h>
++
++/*
++ * SP800-108 CTR KDF implementation
++ */
++int crypto_kdf108_ctr_generate(struct crypto_shash *kmd,
++			       const struct kvec *info, unsigned int info_nvec,
++			       u8 *dst, unsigned int dlen)
++{
++	SHASH_DESC_ON_STACK(desc, kmd);
++	__be32 counter = cpu_to_be32(1);
++	const unsigned int h = crypto_shash_digestsize(kmd);
++	unsigned int i;
++	int err = 0;
++	u8 *dst_orig = dst;
++
++	desc->tfm = kmd;
++
++	while (dlen) {
++		err = crypto_shash_init(desc);
++		if (err)
++			goto out;
++
++		err = crypto_shash_update(desc, (u8 *)&counter, sizeof(__be32));
++		if (err)
++			goto out;
++
++		for (i = 0; i < info_nvec; i++) {
++			err = crypto_shash_update(desc, info[i].iov_base,
++						  info[i].iov_len);
++			if (err)
++				goto out;
++		}
++
++		if (dlen < h) {
++			u8 tmpbuffer[HASH_MAX_DIGESTSIZE];
++
++			err = crypto_shash_final(desc, tmpbuffer);
++			if (err)
++				goto out;
++			memcpy(dst, tmpbuffer, dlen);
++			memzero_explicit(tmpbuffer, h);
++			goto out;
++		}
++
++		err = crypto_shash_final(desc, dst);
++		if (err)
++			goto out;
++
++		dlen -= h;
++		dst += h;
++		counter = cpu_to_be32(be32_to_cpu(counter) + 1);
++	}
++
++out:
++	if (err)
++		memzero_explicit(dst_orig, dlen);
++	shash_desc_zero(desc);
++	return err;
++}
++EXPORT_SYMBOL(crypto_kdf108_ctr_generate);
++
++/*
++ * The seeding of the KDF
++ */
++int crypto_kdf108_setkey(struct crypto_shash *kmd,
++			 const struct kvec *seed, unsigned int seed_nvec)
++{
++	unsigned int ds = crypto_shash_digestsize(kmd);
++
++	if (seed_nvec != 1)
++		return -EINVAL;
++
++	/* Check according to SP800-108 section 7.2 */
++	if (ds > seed[0].iov_len)
++		return -EINVAL;
++
++	/*
++	 * We require that we operate on a MAC -- if we do not operate on a
++	 * MAC, this function returns an error.
++	 */
++	return crypto_shash_setkey(kmd, seed[0].iov_base, seed[0].iov_len);
++}
++EXPORT_SYMBOL(crypto_kdf108_setkey);
++
++/*
++ * Test vector obtained from
++ * http://csrc.nist.gov/groups/STM/cavp/documents/KBKDF800-108/CounterMode.zip
++ */
++static const struct kdf_testvec kdf_ctr_hmac_sha256_tv_template[] = {
++	{
++		.seed = { {
++			/* K1 */
++			.iov_base = "\xdd\x1d\x91\xb7\xd9\x0b\x2b\xd3"
++				    "\x13\x85\x33\xce\x92\xb2\x72\xfb"
++				    "\xf8\xa3\x69\x31\x6a\xef\xe2\x42"
++				    "\xe6\x59\xcc\x0a\xe2\x38\xaf\xe0",
++			.iov_len  = 32,
++		} },
++		.seed_nvec	  = 1,
++		.info = {
++			.iov_base = "\x01\x32\x2b\x96\xb3\x0a\xcd\x19"
++				    "\x79\x79\x44\x4e\x46\x8e\x1c\x5c"
++				    "\x68\x59\xbf\x1b\x1c\xf9\x51\xb7"
++				    "\xe7\x25\x30\x3e\x23\x7e\x46\xb8"
++				    "\x64\xa1\x45\xfa\xb2\x5e\x51\x7b"
++				    "\x08\xf8\x68\x3d\x03\x15\xbb\x29"
++				    "\x11\xd8\x0a\x0e\x8a\xba\x17\xf3"
++				    "\xb4\x13\xfa\xac",
++			.iov_len  = 60
++		},
++		.expected	  = "\x10\x62\x13\x42\xbf\xb0\xfd\x40"
++				    "\x04\x6c\x0e\x29\xf2\xcf\xdb\xf0",
++		.expectedlen	  = 16
++	}
++};
++
++static int __init crypto_kdf108_init(void)
++{
++	int ret = kdf_test(&kdf_ctr_hmac_sha256_tv_template[0], "hmac(sha256)",
++			   crypto_kdf108_setkey, crypto_kdf108_ctr_generate);
++
++	if (ret)
++		pr_warn("alg: self-tests for CTR-KDF (hmac(sha256)) failed (rc=%d)\n",
++			ret);
++	else
++		pr_info("alg: self-tests for CTR-KDF (hmac(sha256)) passed\n");
++
++	return ret;
++}
++
++static void __exit crypto_kdf108_exit(void) { }
++
++module_init(crypto_kdf108_init);
++module_exit(crypto_kdf108_exit);
++
++MODULE_LICENSE("GPL v2");
++MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
++MODULE_DESCRIPTION("Key Derivation Function conformant to SP800-108");
+diff --git a/include/crypto/kdf_sp800108.h b/include/crypto/kdf_sp800108.h
+new file mode 100644
+index 000000000000..c13efe68bc7e
+--- /dev/null
++++ b/include/crypto/kdf_sp800108.h
+@@ -0,0 +1,59 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++/*
++ * Copyright (C) 2020, Stephan Mueller <smueller@chronox.de>
++ */
++
++#ifndef _CRYPTO_KDF108_H
++#define _CRYPTO_KDF108_H
++
++#include <crypto/hash.h>
++#include <linux/uio.h>
++
++/**
++ * Counter KDF generate operation according to SP800-108 section 5.1
++ * as well as SP800-56A section 5.8.1 (Single-step KDF).
++ *
++ * @kmd Keyed message digest whose key was set with crypto_kdf108_setkey or
++ *	unkeyed message digest
++ * @info optional context and application specific information - this may be
++ *	 NULL
++ * @info_vec number of optional context/application specific information entries
++ * @dst destination buffer that the caller already allocated
++ * @dlen length of the destination buffer - the KDF derives that amount of
++ *	 bytes.
++ *
++ * To comply with SP800-108, the caller must provide Label || 0x00 || Context
++ * in the info parameter.
++ *
++ * @return 0 on success, < 0 on error
++ */
++int crypto_kdf108_ctr_generate(struct crypto_shash *kmd,
++			       const struct kvec *info, unsigned int info_nvec,
++			       u8 *dst, unsigned int dlen);
++
++/**
++ * Counter KDF setkey operation
++ *
++ * @kmd Keyed message digest allocated by the caller. The key should not have
++ *	been set.
++ * @seed Seed key to be used to initialize the keyed message digest context.
++ *	 This kvec must contain exactly one entry pointing to the key value.
++ * @seed_nvec This value must be one.
++ *
++ * According to SP800-108 section 7.2, the seed key must be at least as large as
++ * the message digest size of the used keyed message digest. This limitation
++ * is enforced by the implementation.
++ *
++ * SP800-108 allows the use of either a HMAC or a hash cipher primitive. When
++ * the caller intends to use a hash cipher primitive, the call to
++ * crypto_kdf108_setkey is not required and the key derivation operation can
++ * immediately performed using crypto_kdf108_ctr_generate after allocating
++ * a cipher handle.
++ *
++ * @return 0 on success, < 0 on error
++ */
++int crypto_kdf108_setkey(struct crypto_shash *kmd,
++			 const struct kvec *seed, unsigned int seed_nvec);
++
++#endif /* _CRYPTO_KDF108_H */
 -- 
 2.26.2
 
