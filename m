@@ -2,96 +2,75 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA92C433E0
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 09:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02FC8C433E0
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 11:32:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8404D21D7F
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 09:37:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD2AF2225E
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 11:32:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726688AbhADJh1 (ORCPT
+        id S1726234AbhADLcn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 Jan 2021 04:37:27 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:10105 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726196AbhADJh0 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Jan 2021 04:37:26 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4D8VqD0vDczMFBN;
-        Mon,  4 Jan 2021 17:35:36 +0800 (CST)
-Received: from [10.67.103.10] (10.67.103.10) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.498.0; Mon, 4 Jan 2021
- 17:36:33 +0800
-Subject: Re: [PATCH v5 3/5] crypto: expose elliptic curve parameters as Crypto
- APIs
-To:     Daniele Alessandrelli <daniele.alessandrelli@intel.com>
-CC:     <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-        <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>,
-        <linux-kernel@vger.kernel.org>,
+        Mon, 4 Jan 2021 06:32:43 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:49760 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726148AbhADLcm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 4 Jan 2021 06:32:42 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1kwO5U-0005wX-Ds; Mon, 04 Jan 2021 22:31:49 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 04 Jan 2021 22:31:48 +1100
+Date:   Mon, 4 Jan 2021 22:31:48 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     "Reshetova, Elena" <elena.reshetova@intel.com>
+Cc:     Daniele Alessandrelli <daniele.alessandrelli@linux.intel.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Alessandrelli, Daniele" <daniele.alessandrelli@intel.com>,
         Mark Gross <mgross@linux.intel.com>,
-        "Prabhjot Khurana" <prabhjot.khurana@intel.com>,
-        Elena Reshetova <elena.reshetova@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-References: <1608790107-32617-1-git-send-email-yumeng18@huawei.com>
- <1608790107-32617-4-git-send-email-yumeng18@huawei.com>
- <20210102212929.GA1996@gondor.apana.org.au>
-From:   yumeng <yumeng18@huawei.com>
-Message-ID: <a260ceec-e3ca-8fbd-e80e-f08ddc2029a4@huawei.com>
-Date:   Mon, 4 Jan 2021 17:36:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
+        "Khurana, Prabhjot" <prabhjot.khurana@intel.com>
+Subject: Re: [RFC PATCH 0/6] Keem Bay OCS ECC crypto driver
+Message-ID: <20210104113148.GA20575@gondor.apana.org.au>
+References: <20201217172101.381772-1-daniele.alessandrelli@linux.intel.com>
+ <CY4PR1101MB2326ED0E6C23D1D868D53365E7D20@CY4PR1101MB2326.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20210102212929.GA1996@gondor.apana.org.au>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.103.10]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CY4PR1101MB2326ED0E6C23D1D868D53365E7D20@CY4PR1101MB2326.namprd11.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-ÔÚ 2021/1/3 5:29, Herbert Xu Ð´µÀ:
-> On Thu, Dec 24, 2020 at 02:08:25PM +0800, Meng Yu wrote:
->> Move elliptic curves definition to 'include/crypto/ecc_curve_defs.h',
->> so all can use it,
->>
->> Signed-off-by: Meng Yu <yumeng18@huawei.com>
->> Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
->> ---
->>   crypto/ecc.c                    |  1 -
->>   crypto/ecc.h                    | 37 +----------------
->>   crypto/ecc_curve_defs.h         | 57 -------------------------
->>   crypto/ecrdsa_defs.h            |  2 +-
->>   include/crypto/ecc_curve_defs.h | 92 +++++++++++++++++++++++++++++++++++++++++
->>   5 files changed, 95 insertions(+), 94 deletions(-)
->>   delete mode 100644 crypto/ecc_curve_defs.h
->>   create mode 100644 include/crypto/ecc_curve_defs.h
+On Mon, Jan 04, 2021 at 08:04:15AM +0000, Reshetova, Elena wrote:
+> > 2. The OCS ECC HW does not support the NIST P-192 curve. We were planning to
+> >    add SW fallback for P-192 in the driver, but the Intel Crypto team
+> >    (which, internally, has to approve any code involving cryptography)
+> >    advised against it, because they consider P-192 weak. As a result, the
+> >    driver is not passing crypto self-tests. Is there any possible solution
+> >    to this? Is it reasonable to change the self-tests to only test the
+> >    curves actually supported by the tested driver? (not fully sure how to do
+> >    that).
 > 
-> This conflicts with
-> 
-> https://patchwork.kernel.org/project/linux-crypto/patch/20201217172101.381772-3-daniele.alessandrelli@linux.intel.com/
-> 
-> Please discuss with each other on how you would like to proceed.
-> 
-> Thanks,
-> 
+> An additional reason against the P-192 SW fallback is the fact that it can 
+> potentially trigger unsafe behavior which is not even "visible" to the end user
+> of the ECC functionality. If I request (by my developer mistake) a P-192 
+> weaker curve from ECC Keem Bay HW driver, it is much safer to return a
+> "not supported" error that proceed behind my back with a SW code
+> implementation making me believe that I am actually getting a HW-backed up
+> functionality (since I don't think there is a way for me to check that I am using
+> SW fallback). 
 
-hello, Daniele,
+Sorry, but if you break the Crypto API requirement then your driver
+isn't getting merged.
 
-In my patch, I move elliptic curves definition to 
-'include/crypto/ecc_curve_defs.h',
-which include the P-384 curve you need, and you can easily import it to 
-your driver.
-
-And if you include 'crypto/ecc_curve_defs.h', 
-'drivers/crypto/keembay/ocs-ecc-curve-defs.h'
-is not needed.
-
-Could you think about it, to rely on my patchset?
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
