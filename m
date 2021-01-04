@@ -2,143 +2,200 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBF2FC433DB
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 14:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96DC1C433E9
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 14:41:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A97732072C
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 14:38:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BC79207BC
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 14:41:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725889AbhADOhr (ORCPT
+        id S1727040AbhADOl1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 Jan 2021 09:37:47 -0500
-Received: from mail-mw2nam10on2077.outbound.protection.outlook.com ([40.107.94.77]:19008
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725840AbhADOhq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Jan 2021 09:37:46 -0500
+        Mon, 4 Jan 2021 09:41:27 -0500
+Received: from mga17.intel.com ([192.55.52.151]:26364 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726925AbhADOl1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 4 Jan 2021 09:41:27 -0500
+IronPort-SDR: A9c2mIycfKXDDuefbfshRH/Maa52vH4cr6yx9VnvaM/q9F4fW4J1qnMedQ6k/Vfr6zZ5Ty3mj2
+ 9sGo6UuiwC5A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9853"; a="156748658"
+X-IronPort-AV: E=Sophos;i="5.78,474,1599548400"; 
+   d="scan'208";a="156748658"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2021 06:40:46 -0800
+IronPort-SDR: j8VPIfLP3oKZ/eXDnN+v+BuK3KtONSBYnZnfm+9UoXod+nazx5O8NT1CcIeaahm9IpGe9ZZG/c
+ zN9iytjfgnpg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.78,474,1599548400"; 
+   d="scan'208";a="421391082"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga001.jf.intel.com with ESMTP; 04 Jan 2021 06:40:45 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 4 Jan 2021 06:40:45 -0800
+Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 4 Jan 2021 06:40:44 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
+ via Frontend Transport; Mon, 4 Jan 2021 06:40:44 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.174)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.1713.5; Mon, 4 Jan 2021 06:40:44 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LM0l96H5jt9mCRGJfp9afXci99mOb24haaIjbPrdEZSYBoMF79aPoI44tXVR/Dmd6WyjBTBb5wHVEPcPT8SaqQ/fUzfm6oMVV/xOoogbIGpjwaxfCZeADDH5IPxZov+1vW36z2xjOCR6xY755wyKQgGJazoX9S9iHLRrZXevO/onQVaFFPt1H8N52YrTvew7IKgBrki3C8MWiUezHAMbsQcfP2UkaoVHI/gwXObfGPqwnlWDQKWABZkPlZiBTfEscNpzUZ+A7gghBCiIu8PjjhMZG32x2PpIO0qwYoqIUkUaeyyL9SMUQA06pc6TTqBnlrTQ11gQDQ51H2lp2Pr46w==
+ b=FFxX1WBCPOyCVRxCbqD5VDu879UM6KB+r0CBLVcV7k6/Jv4V4GD/fS17O08muC0D8iOwk+dgsvq9OjMksmSneYD3+u300GVcAYxYLA9lPRE7LGAkc8IEZq4Gu2euqgeqtt1z3PtkCoDtGBVdzjqsIAx+odr3rmc8JBiO82+oI3kjRm50r2N7+8EQY5mcSPZ6HAzdzepSl3JVTN2uzFokEb5tceIhtEEtpUya2Z6DpWIhJASLhzEsE5ZatAPcn2V++pJ7baZJGzYTPv5lyLC96JIMfcDpQUssTueKW6CfRyW3fEodWjXJnCheUDcd8pnQ/pM1ZxlCt5JntV7TsZfZ2w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hDcnNOe7tz0K0zPdFI9nM+FIYohKErZgYM1+QOOI4Ug=;
- b=IZVoCes5CWNQh+4UV8Sn5sGNz+zECoovqyIXBprb+uLN6Fz7Z4f77wOmOE8uI+yetvtcHsOF3EoTT7+lF2l8POTGSel8Tv8FcR7ztBVtn+i+06/Mj4eyiL8SKwBLy5Jh1fhf7ya73ylMuYQzGMH/J/KOfOAYbH1hAcSTcGtf5z1NqA1A2vkbBKmHyDdG1WwINg0SwvmcZwIL5f43rXiMi8GLsiCm9cqtgB6gHbVpzSWr8w1gMwP5QppaQLKJ7GxSle7JP9/wcFoUNCP7MNPEfkyAbCJXD/675JedZdcREYyzpOUhj0l3LbhZ6KYvV6pglPlFyU9jFO+VsKCSCG2F6A==
+ bh=8E26ROC4R4Hr2Kl9ZzOsFEpuQ9GQXXDYYG91rLxYbC4=;
+ b=TdnrwnHauB85om7MdlKBaRCR/Dag3rizI9lhEHk0xq1kpOdMoMRGNSvqdXAcl/fG06YfIM4IyvMt3bXx4PfN0hqNEjy/e94SVt5cIJdtIRIj7pk0m1pssKOJ36hBrPhR3aPPeKVeP/220ppkCo6dxV/uXG8/zKDYQcbxBbaYPS+Xvcf7OL/QD1GYfXAMu48l5J1r4MYANLj4eu+dNiYFyBsOYpd/VzjxZ8Mq6UIIkXV/CvhYNYNUF4OPZM3JPvBpo2x73q7oF9asLmzA2I3xw5gz2all3IfJ3QhKOxdlH+Mp6TGO9xANpH1zoBZsYOk1AIkWsNA4tFySfhUqXcWEdQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hDcnNOe7tz0K0zPdFI9nM+FIYohKErZgYM1+QOOI4Ug=;
- b=r6SYmxGWqAjXRWAWn4+g6Uuf/pV6Ewfr2EN0EJnaGmP9/gjOswWqTNdXbz8Iv+5Hjuw88i+8piFCAxhGzeeu4jaPp02z7D3xZdlaDixHHe4vPCaNSXNfrTbt2uSWWpQCpX8cxNcA7d9D5/sMYsQQrP7vyZH6IgkojwSc5QzVzqI=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB4043.namprd12.prod.outlook.com (2603:10b6:5:216::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3721.20; Mon, 4 Jan 2021 14:36:54 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::d95e:b9d:1d6a:e845]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::d95e:b9d:1d6a:e845%12]) with mapi id 15.20.3721.024; Mon, 4 Jan 2021
- 14:36:54 +0000
-Subject: Re: problem with ccp-crypto module on apu
-To:     John Allen <john.allen@amd.com>,
-        Domen Stangar <domen.stangar@gmail.com>
-Cc:     linux-crypto@vger.kernel.org
-References: <em96a2a8ae-80a7-4608-905e-5d932c0cf9bb@domen1-pc>
- <20201228152245.GA90548@nikka.amd.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <95c0d9f7-e8e9-0b71-1f0a-44230c3dbfe5@amd.com>
-Date:   Mon, 4 Jan 2021 08:36:52 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20201228152245.GA90548@nikka.amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+ bh=8E26ROC4R4Hr2Kl9ZzOsFEpuQ9GQXXDYYG91rLxYbC4=;
+ b=qmN9jlX+F/DGZit0V0QyRIqkouWXii+YbjQEQouALW9PIBd6gDfQwkd4luoxf5U9iZS/0GWqmsq7gk3Z1JNhVBOtRcjLV3iTR5QXbfXfOkyCFxNhcc2j+KVED8yD432pGvJP3Nnjug0aDQe7V/Y8ikBVhFzcZtxBenjTS22Q7HE=
+Received: from CY4PR1101MB2326.namprd11.prod.outlook.com
+ (2603:10b6:903:b3::23) by CY4PR11MB0054.namprd11.prod.outlook.com
+ (2603:10b6:910:79::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3721.24; Mon, 4 Jan
+ 2021 14:40:43 +0000
+Received: from CY4PR1101MB2326.namprd11.prod.outlook.com
+ ([fe80::b127:6209:1930:3b93]) by CY4PR1101MB2326.namprd11.prod.outlook.com
+ ([fe80::b127:6209:1930:3b93%3]) with mapi id 15.20.3721.024; Mon, 4 Jan 2021
+ 14:40:43 +0000
+From:   "Reshetova, Elena" <elena.reshetova@intel.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     Daniele Alessandrelli <daniele.alessandrelli@linux.intel.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Alessandrelli, Daniele" <daniele.alessandrelli@intel.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        "Khurana, Prabhjot" <prabhjot.khurana@intel.com>
+Subject: RE: [RFC PATCH 0/6] Keem Bay OCS ECC crypto driver
+Thread-Topic: [RFC PATCH 0/6] Keem Bay OCS ECC crypto driver
+Thread-Index: AQHW1JkZ8lMRowq1QUyYZqNdBK9VvaoXNMxwgAA8YgCAADFl8A==
+Date:   Mon, 4 Jan 2021 14:40:43 +0000
+Message-ID: <CY4PR1101MB23260DF5A317CA05BBA3C2F9E7D20@CY4PR1101MB2326.namprd11.prod.outlook.com>
+References: <20201217172101.381772-1-daniele.alessandrelli@linux.intel.com>
+ <CY4PR1101MB2326ED0E6C23D1D868D53365E7D20@CY4PR1101MB2326.namprd11.prod.outlook.com>
+ <20210104113148.GA20575@gondor.apana.org.au>
+In-Reply-To: <20210104113148.GA20575@gondor.apana.org.au>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [67.79.209.213]
-X-ClientProxiedBy: SN4PR0401CA0042.namprd04.prod.outlook.com
- (2603:10b6:803:2a::28) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: gondor.apana.org.au; dkim=none (message not signed)
+ header.d=none;gondor.apana.org.au; dmarc=none action=none
+ header.from=intel.com;
+x-originating-ip: [82.203.237.209]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 72a044f1-7a59-47e9-5ad9-08d8b0beb705
+x-ms-traffictypediagnostic: CY4PR11MB0054:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <CY4PR11MB0054F758E9550B427D63C270E7D20@CY4PR11MB0054.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5797;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: JUBJOhDkDm446TVle9kbd1bp1hdsMaIlayk/3VZrPZKuw7RFmNqNThxaR7V9R33Hp7fPzwQf+auDGSeM0SAo8D4ykeVtUw+p8N/2jqTE9WWgSFuHnmiSO6uamL/ce3EcECA8YOUYe9TJYuoKuvUmM0ySUy3boSdAaz0Czs2wMbus+5RFiXOTPndNTSSVXPS7ayAvn8TCH2wK7DIYYkTbKcsePgSD984Zr+H7MXr+zk/2H5dmqDGnaBA+91P/86feSnpqKMtrWcyBHXugAZiFp8bDPRM/QvhIXO8vyTv987KRpTtH3KYsex5bgpTLYVNYAjRcPvFxv5a3d1fNJdDaCD3blzMyoaGi/H36WUUT5PP5U43BC5hfdSUgJBrvNiH7iY0XqV8ESm6spBKRF4ypxg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR1101MB2326.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(366004)(39860400002)(346002)(376002)(396003)(316002)(6916009)(9686003)(83380400001)(4326008)(33656002)(7696005)(71200400001)(86362001)(5660300002)(52536014)(54906003)(8936002)(186003)(66946007)(26005)(8676002)(66476007)(66556008)(64756008)(478600001)(66446008)(55016002)(76116006)(6506007)(2906002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?VhpJjcdaWxiE3p9VQm8Jw9vhsfHGRBmYSEarwMehmmFH3rBNftIcRwIM9e43?=
+ =?us-ascii?Q?+kCALJs0nG+RVRZt1OgZe2ZMzCV1PpnYGcRL+PUruk6Kn1NIDlSkyNAlC+ZA?=
+ =?us-ascii?Q?oQwNOPiXMty9c099bLrxyxjcMPwsQyhENRBT/A3HrzTFavHSHhQsvXMtBLgX?=
+ =?us-ascii?Q?y9YDojnzCJ1Id/sFo6YyzaGePKuc76P+Mrm248Hid+KlHhWQh8f0EUQzh37F?=
+ =?us-ascii?Q?ewdUNNNpLd4sNe9oYHWQU3DV9048gonak+A/Ne4IHnponcBs3dP2JFoCaUpG?=
+ =?us-ascii?Q?zFFpnFDIV8AmTUVOyKYlNgGAtsJM1xFyup4TB5WiPHuPlMFZpnu6oX6XxiRP?=
+ =?us-ascii?Q?01YesZlU2uX10Fr8dwMhC3UjXjgkpa6EQDunRL23iIIPs0vzag/uNxffO/sg?=
+ =?us-ascii?Q?r0ox3DEgeQwe9CSpe3ROZak9Gvbu31c4AJoHgDleX5gq8/Ol/7jVoW6Hh/Iw?=
+ =?us-ascii?Q?uc9eyIftxCimqUBBO3iXfyvolfWyNrbIhcdrv1IcA2GWkuWYI20IR6HEUjm7?=
+ =?us-ascii?Q?lYMH//3YXy7jiHLSBRYN7Uq4uISpr5Cbc7htyr4nnPKlhY3OLEVCRvHr/4KQ?=
+ =?us-ascii?Q?y3MpcCla0dAbzStkYQesTw7ec5pBFfa5R0K9egetn2Rzcmt0TALlQYUnpkyF?=
+ =?us-ascii?Q?Omkt45/BNAPODo90s4Ig61N+dd2Uyz46pGDDDvvkneBAq+6/FF3jJyU1wg8C?=
+ =?us-ascii?Q?OAAQy5nraAKgMOkdGXizuomsVongmk7rihuvgJuPlh+LWfCdkL2pwqVX1wrv?=
+ =?us-ascii?Q?BF0fahqR4skVxtJSSPSh69zQeZnAB4HpL7nhvAzYflqtt3Dcb0nkfJ++q4Co?=
+ =?us-ascii?Q?JTH2bUCXtbZB778kQjPVH1TrfpDBxZGINpcHx8c+In+AZ57xZFzVBFaGXYWz?=
+ =?us-ascii?Q?o7OxPWrbYwDFV1v5QCXf4kmjkC3NumuXxNYFAFydrjwXCk2d1U5TFBUFIv4S?=
+ =?us-ascii?Q?KH/AdmpSN5uZhDCJhLFBVyGE/st/+UU8WQtgVZogKTM=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from office-linux.texastahm.com (67.79.209.213) by SN4PR0401CA0042.namprd04.prod.outlook.com (2603:10b6:803:2a::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3721.19 via Frontend Transport; Mon, 4 Jan 2021 14:36:54 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: c02409c9-f197-4944-1b10-08d8b0be2eac
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4043:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB4043C1B205BB68EBDFB2194BECD20@DM6PR12MB4043.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RqVhVSGmdJqnPhDjwN77oT14+yUDQJMWIcK6OCvcicuD0H8oZ1w3e9T8qWNKlQ9EPBjylOEmAgafEMDEyG1mYCKzZHckRKloZrIvNitIkzXc3tJPhhnIxxUwR5PjDra3x98gC5WeM1bY9RL/39/cjUjEbZqV/tuxduyi/gpBBQBSzPn2JQUxpmKqqu1EGBDCxEYz1XXoAOtF7ngv+crVdAa2o359n1Y8EnESpwa5+jmDBvd7zECz1QDQVnHAjCeZFEsA7kRVzZelpJMxpeHd8+AZuPIjuYC864EFcVSP5yvgyLKUbgLyqXNY1TtkdpPLfpZSqA3pQgTDwO7JdVy1ccP8Sgl5eb5EJOamFfuzv2UUID7Z7lmdkAe55yai4wKc0m5TSINDGLxhC9vgozuvb4POuwHDT4e4KwlBhi+niPhrJsM0fCMTNXrH8IHpNvH2qPdlU+kmQXu4DPeC1sNBzeTXlioCWuTvDSUfxMfWHDw=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(366004)(396003)(376002)(346002)(110136005)(2616005)(316002)(8936002)(8676002)(6486002)(31686004)(36756003)(478600001)(956004)(83380400001)(16526019)(2906002)(4744005)(26005)(66556008)(6506007)(53546011)(4326008)(186003)(66946007)(31696002)(6512007)(5660300002)(52116002)(86362001)(66476007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?MWZKZWtOKy9acDFYNUYxekZLWk1mNTJSNEY5elIySXhHTytPYS9xSWZPbTBq?=
- =?utf-8?B?N21GODRleVlaQ2FtNFlIcys3Slk0cXJFUmRZUC9DMTZ2dWY0WHpMaVhuYWJP?=
- =?utf-8?B?U2h5K1VsUnBJQWIzdEpyUmVrMGxuOUR3TERzOTJkN09rZnRWQkZUZFBudmF6?=
- =?utf-8?B?eERzZU81VUU1QWpBV2NZMGRBSjBiZ1B6L0dQblk0NEVuWEladHhDOUhqYith?=
- =?utf-8?B?bFVrYU0rOTFqckJLUlZrRTQ2OWZCakk5QlduOEpTSFNLMElZK282LzFObkRE?=
- =?utf-8?B?ZklieXRwblBPcE9SZFVoY0I5UjdOS0ljTzA3dy9kcWRXa1JDWlYxZVpqUnAv?=
- =?utf-8?B?VE1pWWh6RmQxeXBxZTVWWERoZERaYUlnTWlZRjE2MzROdU1aY1hoZFJmc3hW?=
- =?utf-8?B?MjBUSzY5VUFnOFVOc1ZxcWJUcGZiWldnTk9OcG8vekNrSGdoNHlibXZveDlp?=
- =?utf-8?B?dVZhdDdjRXNobFlFdmE4TEZxTlpjTG5xd0w3cm9tMTlLYVZJajdqdHB3enI5?=
- =?utf-8?B?bnBvVnZvYk0vRDVtc2JaTndsRVVGUnlmQS9ncFkyMzUrUlJIcWpXUjNVSzl3?=
- =?utf-8?B?TUpOdGRlQ3M5TDBNQytqaW10VmFoNzZqUFZFSkZMQmQ3cWp4dlJZQy9PMGIz?=
- =?utf-8?B?OHBRWVFZdGlTczhvcmZ6SFNxNnBtTkZiaU9IZEt2K2dBdWxXWlI4ZDBMb1ds?=
- =?utf-8?B?S3dVV21VQmx4U29tN3RuTHRiditzUlJKTmgyazFVNjM4OUU4SFJkRGQ5MnFr?=
- =?utf-8?B?cnlZc2F1dWRFYkpjN05jVUZUS2JRWk5vSktqV1VYdHBUc3hyV0gzTDd2S3Ew?=
- =?utf-8?B?cklEYVRpZVhxQ00rbDNYUHh3d2xHUFZUeXBuNDNUYUw4T2RFTzAxWXAwRFF0?=
- =?utf-8?B?Z3lMTDUyZ2FFR3dDS0V5c3ZhZ3ZVVVZDUmlXV2FaTWI4QmdEaXVhalRHY0Yy?=
- =?utf-8?B?S0p6TFhiNjBOZk9mTG1GTVo4cUU5dVFwdyt1cEdJY014dVVuWXdzY1BOa1FB?=
- =?utf-8?B?Rmh3WjU1T20vajhsTGd6c1JiS1hRbmJQbnBacFk4RmxtT2I0UzVFQ0J5RTho?=
- =?utf-8?B?WDJhTmVjT0UvcjVtaytIaktMK2F2QUR6K2RZcGhFMkNpZVh0eHIyKzZlMXZp?=
- =?utf-8?B?T1hsZlVJei9leGJNNStza1J3ci9jYno0R1ZjMmJrZDJqckFUZ25EWUtQcHY1?=
- =?utf-8?B?Y08wK243R1F4bGVNb0hyeWFSWGxablkrZzJiSE4xYnh4RmxFQkk3ZEdzMEZW?=
- =?utf-8?B?aDBnZCtGYUw5L2N3blU0L3p1aFdCbW5PSkFjT05xa3JkUkNsUkMwVDRTenlv?=
- =?utf-8?Q?yYGBByDhtOaNNLyLd8vZP8yK93j/jMChHJ?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2021 14:36:54.5301
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR1101MB2326.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 72a044f1-7a59-47e9-5ad9-08d8b0beb705
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jan 2021 14:40:43.2911
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-Network-Message-Id: c02409c9-f197-4944-1b10-08d8b0be2eac
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZnpU0QfiuTLi8OcJARnPDnbebh3EV4HMFJDCnyUzbQliB0hTBHm9TBe0x3cbazWJ6zh3hdOHQmhsY2kHybUCMw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4043
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: s8fZf2WCZEMrdDmlPP+di44CGiThBIFC79rs376jVyszusDHgqRbwQWZ3i1O22iCrzypzPCjtJv9Fg5R7jtVKDCXciI7c6pDwf/oWvHYE0s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR11MB0054
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 12/28/20 9:22 AM, John Allen wrote:
-> On Thu, Dec 17, 2020 at 07:42:52AM +0000, Domen Stangar wrote:
->> Hi,
->> I would like to report issue with ccp-crypto.
->> When I issue modprobe command, it would not continue, without SIGINT signal
->> (ctrl+c).
->> If module is compiled in kernel, boot doesn't finish.
->> Looks like problem is that ecb(aes) selftest do not finish ?
-> 
-> Hi Domen,
-> 
-> Thanks for reporting this issue. I'll look into this as soon as
-> possible. Once I can track down some hardware, I'll reproduce and debug.
+> On Mon, Jan 04, 2021 at 08:04:15AM +0000, Reshetova, Elena wrote:
+> > > 2. The OCS ECC HW does not support the NIST P-192 curve. We were plan=
+ning to
+> > >    add SW fallback for P-192 in the driver, but the Intel Crypto team
+> > >    (which, internally, has to approve any code involving cryptography=
+)
+> > >    advised against it, because they consider P-192 weak. As a result,=
+ the
+> > >    driver is not passing crypto self-tests. Is there any possible sol=
+ution
+> > >    to this? Is it reasonable to change the self-tests to only test th=
+e
+> > >    curves actually supported by the tested driver? (not fully sure ho=
+w to do
+> > >    that).
+> >
+> > An additional reason against the P-192 SW fallback is the fact that it =
+can
+> > potentially trigger unsafe behavior which is not even "visible" to the =
+end user
+> > of the ECC functionality. If I request (by my developer mistake) a P-19=
+2
+> > weaker curve from ECC Keem Bay HW driver, it is much safer to return a
+> > "not supported" error that proceed behind my back with a SW code
+> > implementation making me believe that I am actually getting a HW-backed=
+ up
+> > functionality (since I don't think there is a way for me to check that =
+I am using
+> > SW fallback).
+>=20
+> Sorry, but if you break the Crypto API requirement then your driver
+> isn't getting merged.
 
-Domen, do you have the debugfs support enabled? Could you supply the 
-output from /sys/kernel/debug/ccp/ccp-X/info (where X is replaced with 
-each of the present ccp ordinal values)?
+But should not we think what behavior would make sense for good crypto driv=
+ers in future?
+As cryptography moves forward (especially for the post quantum era), we wil=
+l have
+lengths for all existing algorithms increased (in addition to having a bunc=
+h of new ones),=20
+and we surely should not expect the new generation of HW drivers to impleme=
+nt
+the old/weaker lengths, so why there the requirement to support them? It is=
+ not a
+part of crypto API definition on what bit lengths should be supported, beca=
+use it
+cannot be part of API to begin with since it is always changing parameter (=
+algorithms and attacks
+develop all the time).=20
 
-Thanks,
-Tom
-
-> 
-> Thanks,
-> John
-> 
+Best Regards,
+Elena.
