@@ -2,246 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC977C433DB
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 15:57:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB2FC433E6
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 16:11:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C1F8207AE
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 15:57:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59F2520578
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jan 2021 16:11:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727800AbhADP5Z (ORCPT
+        id S1729457AbhADQLM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 Jan 2021 10:57:25 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35970 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727525AbhADP5Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Jan 2021 10:57:25 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4F397224DE;
-        Mon,  4 Jan 2021 15:56:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1609775772;
-        bh=XwkMj3UyhDAvM1CWdFbT9VpLilKcvxCu85BcKqLxzU0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=K3s3E77DL2M3JRLACawYBGu4x5xFGEO6D/1WFEIWqTTCjGGcbn+roFCYR2F0vs0b2
-         FQ1+gD5bAX878WNRXQdsTPND8ArRoQrJUci44Ki2QnfV+KPLbcE6kuHF+RjOm8Kywi
-         94m+IfGbEMnxN34xNkGIIG0N4oNBQWCplem9sC6iJLYhbgvklLWL5NU3kx33zpPgaL
-         fsITpuw0x3GLeqCpN7Nz9KC3d+3giD/WFkV9PlHiJhFkpoKKbKiXPLMMwjG1jE642B
-         Q86UJ2JHkV6acSpQYIPvE2bDPKYplyEYl2TxzwmB98bKJgrLoumhPXSP5UdXaQ0Pcd
-         orgFZImHbAebQ==
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     Ard Biesheuvel <ardb@kernel.org>, Megha Dey <megha.dey@intel.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH v2 5/5] crypto: x86/gcm-aes-ni - replace function pointers with static branches
-Date:   Mon,  4 Jan 2021 16:55:50 +0100
-Message-Id: <20210104155550.6359-6-ardb@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210104155550.6359-1-ardb@kernel.org>
-References: <20210104155550.6359-1-ardb@kernel.org>
+        Mon, 4 Jan 2021 11:11:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47456 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729446AbhADQLL (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 4 Jan 2021 11:11:11 -0500
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D539C061793
+        for <linux-crypto@vger.kernel.org>; Mon,  4 Jan 2021 08:10:30 -0800 (PST)
+Received: by mail-ej1-x634.google.com with SMTP id ga15so5360701ejb.4
+        for <linux-crypto@vger.kernel.org>; Mon, 04 Jan 2021 08:10:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:cc:date:message-id:in-reply-to:references:reply-to
+         :user-agent:mime-version:content-transfer-encoding;
+        bh=HxQ6rT9lhS65qk5Jh0AHKYsxUwAteYLwijXS+oeLOr8=;
+        b=Ns8rrvk9QKJSZBXKhguEOpt2QqyDrVjv21poDBBCgMEQXgjNkGTCz4psrXX6B8z16l
+         ZdEpLXKFPwVTUZnq+ssMSSPQ/RcfmBdtpBjo7iJv+XRpg8tGf+aph2nUlV9vEOGuutoe
+         GfLRLXEq6YQK5qoJn9DbhQYFxuDB1hwIwOnbF0YPVb64NHtf4ekU1QtEaklIt61gQYgH
+         pkBNKc+0beuimhRQ8OQ8WJwNIN1a0U+oos8rK4WWJjhzEJzKD7c/tyBUi+M8ParCgsgy
+         ROz/qTIwC18wQzZ56XNSfmzt3l8PiD8TThOpn6WxIgt8jkXqmjI9QyfXQuQXLVrZxGvC
+         +0Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:cc:date:message-id:in-reply-to
+         :references:reply-to:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=HxQ6rT9lhS65qk5Jh0AHKYsxUwAteYLwijXS+oeLOr8=;
+        b=t+flSzTiK6xaYBaV7Ye4biBvWxPUcAShxcQnnMEZuYVpUxfCYH+Wxvs6mSHSkWFQc+
+         8FhKTHMObjYHTxhl+2Pwl/ynoHPbIysENymbATWntU8O1oTotu519GlO/rT5Ruc30lQd
+         m+2Lg+EgYUJrHaa3su6weO8WiZnhRHho2Yp8ay7WK9tlyJAdVJetMT7PjEctcH/hJa3H
+         k3wt8Gj17zrYMxd36jrNsUt5oml0ICNmdfLq/j4QvhbpbXLonNk8eMgQ0ApinjgnpDvT
+         WnLaopCk+uMJScI5HYYzC7dGwRNecRaagf89iAQl/QJ25FIothuETr2pH2v1ANkkdvO5
+         iz3w==
+X-Gm-Message-State: AOAM530BK+WByJdRo0AvfiJ5Kt0kg/6wOpFriScVazQyMKxWLDYXvoMN
+        y8SGs50/gxrXp0CNwHeZBXM=
+X-Google-Smtp-Source: ABdhPJwzmQOw9suhX415P2usC5XaqivzJ3lrcEeQRio+tH0QS2kTuqlgOFxLiO5mEkNrMn/EW1k2wQ==
+X-Received: by 2002:a17:906:3949:: with SMTP id g9mr65130159eje.493.1609776628270;
+        Mon, 04 Jan 2021 08:10:28 -0800 (PST)
+Received: from [10.0.0.6] (213-229-210.static.cytanet.com.cy. [213.7.229.210])
+        by smtp.gmail.com with ESMTPSA id p22sm23695287ejx.59.2021.01.04.08.10.27
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 04 Jan 2021 08:10:27 -0800 (PST)
+From:   "Domen Stangar" <domen.stangar@gmail.com>
+To:     "Tom Lendacky" <thomas.lendacky@amd.com>,
+        "John Allen" <john.allen@amd.com>
+Subject: Re[2]: problem with ccp-crypto module on apu
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Date:   Mon, 04 Jan 2021 16:10:26 +0000
+Message-Id: <eme43aecb9-708c-4fda-ba76-a446ecc12790@domen-5950x>
+In-Reply-To: <95c0d9f7-e8e9-0b71-1f0a-44230c3dbfe5@amd.com>
+References: <em96a2a8ae-80a7-4608-905e-5d932c0cf9bb@domen1-pc>
+ <20201228152245.GA90548@nikka.amd.com>
+ <95c0d9f7-e8e9-0b71-1f0a-44230c3dbfe5@amd.com>
+Reply-To: "Domen Stangar" <domen.stangar@gmail.com>
+User-Agent: eM_Client/8.1.979.0
+Mime-Version: 1.0
+Content-Type: text/plain; format=flowed; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Replace the function pointers in the GCM implementation with static branches,
-which are based on code patching, which occurs only at module load time.
-This avoids the severe performance penalty caused by the use of retpolines.
+Device name: ccp-1
+    RNG name: ccp-1-rng
+    # Queues: 3
+      # Cmds: 0
+     Version: 5
+     Engines: AES 3DES SHA RSA ECC ZDE TRNG
+      Queues: 5
+LSB Entries: 128
 
-In order to retain the ability to switch between different versions of the
-implementation based on the input size on cores that support AVX and AVX2,
-use static branches instead of static calls.
+Let me know if you need anything else.
+Domen
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- arch/x86/crypto/aesni-intel_glue.c | 98 +++++++++++---------
- 1 file changed, 54 insertions(+), 44 deletions(-)
-
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index d0b4fa7bd2d0..fb17d4a2a5ca 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -31,6 +31,7 @@
- #include <crypto/internal/aead.h>
- #include <crypto/internal/simd.h>
- #include <crypto/internal/skcipher.h>
-+#include <linux/jump_label.h>
- #include <linux/workqueue.h>
- #include <linux/spinlock.h>
- 
-@@ -128,24 +129,6 @@ asmlinkage void aesni_gcm_finalize(void *ctx,
- 				   struct gcm_context_data *gdata,
- 				   u8 *auth_tag, unsigned long auth_tag_len);
- 
--static const struct aesni_gcm_tfm_s {
--	void (*init)(void *ctx, struct gcm_context_data *gdata, u8 *iv,
--		     u8 *hash_subkey, const u8 *aad, unsigned long aad_len);
--	void (*enc_update)(void *ctx, struct gcm_context_data *gdata, u8 *out,
--			   const u8 *in, unsigned long plaintext_len);
--	void (*dec_update)(void *ctx, struct gcm_context_data *gdata, u8 *out,
--			   const u8 *in, unsigned long ciphertext_len);
--	void (*finalize)(void *ctx, struct gcm_context_data *gdata,
--			 u8 *auth_tag, unsigned long auth_tag_len);
--} *aesni_gcm_tfm;
--
--static const struct aesni_gcm_tfm_s aesni_gcm_tfm_sse = {
--	.init = &aesni_gcm_init,
--	.enc_update = &aesni_gcm_enc_update,
--	.dec_update = &aesni_gcm_dec_update,
--	.finalize = &aesni_gcm_finalize,
--};
--
- asmlinkage void aes_ctr_enc_128_avx_by8(const u8 *in, u8 *iv,
- 		void *keys, u8 *out, unsigned int num_bytes);
- asmlinkage void aes_ctr_enc_192_avx_by8(const u8 *in, u8 *iv,
-@@ -175,13 +158,6 @@ asmlinkage void aesni_gcm_finalize_avx_gen2(void *ctx,
- 				   struct gcm_context_data *gdata,
- 				   u8 *auth_tag, unsigned long auth_tag_len);
- 
--static const struct aesni_gcm_tfm_s aesni_gcm_tfm_avx_gen2 = {
--	.init = &aesni_gcm_init_avx_gen2,
--	.enc_update = &aesni_gcm_enc_update_avx_gen2,
--	.dec_update = &aesni_gcm_dec_update_avx_gen2,
--	.finalize = &aesni_gcm_finalize_avx_gen2,
--};
--
- /*
-  * asmlinkage void aesni_gcm_init_avx_gen4()
-  * gcm_data *my_ctx_data, context data
-@@ -205,12 +181,8 @@ asmlinkage void aesni_gcm_finalize_avx_gen4(void *ctx,
- 				   struct gcm_context_data *gdata,
- 				   u8 *auth_tag, unsigned long auth_tag_len);
- 
--static const struct aesni_gcm_tfm_s aesni_gcm_tfm_avx_gen4 = {
--	.init = &aesni_gcm_init_avx_gen4,
--	.enc_update = &aesni_gcm_enc_update_avx_gen4,
--	.dec_update = &aesni_gcm_dec_update_avx_gen4,
--	.finalize = &aesni_gcm_finalize_avx_gen4,
--};
-+static __ro_after_init DEFINE_STATIC_KEY_FALSE(gcm_use_avx);
-+static __ro_after_init DEFINE_STATIC_KEY_FALSE(gcm_use_avx2);
- 
- static inline struct
- aesni_rfc4106_gcm_ctx *aesni_rfc4106_gcm_ctx_get(struct crypto_aead *tfm)
-@@ -641,12 +613,12 @@ static int gcmaes_crypt_by_sg(bool enc, struct aead_request *req,
- 			      u8 *iv, void *aes_ctx, u8 *auth_tag,
- 			      unsigned long auth_tag_len)
- {
--	const struct aesni_gcm_tfm_s *gcm_tfm = aesni_gcm_tfm;
- 	u8 databuf[sizeof(struct gcm_context_data) + (AESNI_ALIGN - 8)] __aligned(8);
- 	struct gcm_context_data *data = PTR_ALIGN((void *)databuf, AESNI_ALIGN);
- 	unsigned long left = req->cryptlen;
- 	struct scatter_walk assoc_sg_walk;
- 	struct skcipher_walk walk;
-+	bool do_avx, do_avx2;
- 	u8 *assocmem = NULL;
- 	u8 *assoc;
- 	int err;
-@@ -654,10 +626,8 @@ static int gcmaes_crypt_by_sg(bool enc, struct aead_request *req,
- 	if (!enc)
- 		left -= auth_tag_len;
- 
--	if (left < AVX_GEN4_OPTSIZE && gcm_tfm == &aesni_gcm_tfm_avx_gen4)
--		gcm_tfm = &aesni_gcm_tfm_avx_gen2;
--	if (left < AVX_GEN2_OPTSIZE && gcm_tfm == &aesni_gcm_tfm_avx_gen2)
--		gcm_tfm = &aesni_gcm_tfm_sse;
-+	do_avx = (left >= AVX_GEN2_OPTSIZE);
-+	do_avx2 = (left >= AVX_GEN4_OPTSIZE);
- 
- 	/* Linearize assoc, if not already linear */
- 	if (req->src->length >= assoclen && req->src->length) {
-@@ -677,7 +647,14 @@ static int gcmaes_crypt_by_sg(bool enc, struct aead_request *req,
- 	}
- 
- 	kernel_fpu_begin();
--	gcm_tfm->init(aes_ctx, data, iv, hash_subkey, assoc, assoclen);
-+	if (static_branch_likely(&gcm_use_avx2) && do_avx2)
-+		aesni_gcm_init_avx_gen4(aes_ctx, data, iv, hash_subkey, assoc,
-+					assoclen);
-+	else if (static_branch_likely(&gcm_use_avx) && do_avx)
-+		aesni_gcm_init_avx_gen2(aes_ctx, data, iv, hash_subkey, assoc,
-+					assoclen);
-+	else
-+		aesni_gcm_init(aes_ctx, data, iv, hash_subkey, assoc, assoclen);
- 	kernel_fpu_end();
- 
- 	if (!assocmem)
-@@ -690,9 +667,35 @@ static int gcmaes_crypt_by_sg(bool enc, struct aead_request *req,
- 
- 	while (walk.nbytes > 0) {
- 		kernel_fpu_begin();
--		(enc ? gcm_tfm->enc_update
--		     : gcm_tfm->dec_update)(aes_ctx, data, walk.dst.virt.addr,
--					    walk.src.virt.addr, walk.nbytes);
-+		if (static_branch_likely(&gcm_use_avx2) && do_avx2) {
-+			if (enc)
-+				aesni_gcm_enc_update_avx_gen4(aes_ctx, data,
-+							      walk.dst.virt.addr,
-+							      walk.src.virt.addr,
-+							      walk.nbytes);
-+			else
-+				aesni_gcm_dec_update_avx_gen4(aes_ctx, data,
-+							      walk.dst.virt.addr,
-+							      walk.src.virt.addr,
-+							      walk.nbytes);
-+		} else if (static_branch_likely(&gcm_use_avx) && do_avx) {
-+			if (enc)
-+				aesni_gcm_enc_update_avx_gen2(aes_ctx, data,
-+							      walk.dst.virt.addr,
-+							      walk.src.virt.addr,
-+							      walk.nbytes);
-+			else
-+				aesni_gcm_dec_update_avx_gen2(aes_ctx, data,
-+							      walk.dst.virt.addr,
-+							      walk.src.virt.addr,
-+							      walk.nbytes);
-+		} else if (enc) {
-+			aesni_gcm_enc_update(aes_ctx, data, walk.dst.virt.addr,
-+					     walk.src.virt.addr, walk.nbytes);
-+		} else {
-+			aesni_gcm_dec_update(aes_ctx, data, walk.dst.virt.addr,
-+					     walk.src.virt.addr, walk.nbytes);
-+		}
- 		kernel_fpu_end();
- 
- 		err = skcipher_walk_done(&walk, 0);
-@@ -702,7 +705,14 @@ static int gcmaes_crypt_by_sg(bool enc, struct aead_request *req,
- 		return err;
- 
- 	kernel_fpu_begin();
--	gcm_tfm->finalize(aes_ctx, data, auth_tag, auth_tag_len);
-+	if (static_branch_likely(&gcm_use_avx2) && do_avx2)
-+		aesni_gcm_finalize_avx_gen4(aes_ctx, data, auth_tag,
-+					    auth_tag_len);
-+	else if (static_branch_likely(&gcm_use_avx) && do_avx)
-+		aesni_gcm_finalize_avx_gen2(aes_ctx, data, auth_tag,
-+					    auth_tag_len);
-+	else
-+		aesni_gcm_finalize(aes_ctx, data, auth_tag, auth_tag_len);
- 	kernel_fpu_end();
- 
- 	return 0;
-@@ -1141,14 +1151,14 @@ static int __init aesni_init(void)
- #ifdef CONFIG_X86_64
- 	if (boot_cpu_has(X86_FEATURE_AVX2)) {
- 		pr_info("AVX2 version of gcm_enc/dec engaged.\n");
--		aesni_gcm_tfm = &aesni_gcm_tfm_avx_gen4;
-+		static_branch_enable(&gcm_use_avx);
-+		static_branch_enable(&gcm_use_avx2);
- 	} else
- 	if (boot_cpu_has(X86_FEATURE_AVX)) {
- 		pr_info("AVX version of gcm_enc/dec engaged.\n");
--		aesni_gcm_tfm = &aesni_gcm_tfm_avx_gen2;
-+		static_branch_enable(&gcm_use_avx);
- 	} else {
- 		pr_info("SSE version of gcm_enc/dec engaged.\n");
--		aesni_gcm_tfm = &aesni_gcm_tfm_sse;
- 	}
- 	aesni_ctr_enc_tfm = aesni_ctr_enc;
- 	if (boot_cpu_has(X86_FEATURE_AVX)) {
--- 
-2.17.1
+>Domen, do you have the debugfs support enabled? Could you supply the outpu=
+t from /sys/kernel/debug/ccp/ccp-X/info (where X is replaced with each of t=
+he present ccp ordinal values)?
+>
+>Thanks,
+>Tom
+>
 
