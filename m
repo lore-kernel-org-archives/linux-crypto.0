@@ -4,25 +4,25 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86D21C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 06:19:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5553FC433E6
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 06:19:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 20348227C3
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 06:19:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C1A9229F0
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 06:19:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726059AbhAEGTc (ORCPT
+        id S1726216AbhAEGTc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Tue, 5 Jan 2021 01:19:32 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:10385 "EHLO
-        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725776AbhAEGTa (ORCPT
+Received: from szxga04-in.huawei.com ([45.249.212.190]:9668 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725766AbhAEGTa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 5 Jan 2021 01:19:30 -0500
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4D92Nd6d5fz7PKj;
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4D92Nd2sywz15pCp;
         Tue,  5 Jan 2021 14:17:53 +0800 (CST)
 Received: from huawei.com (10.67.165.24) by DGGEMS412-HUB.china.huawei.com
  (10.3.19.212) with Microsoft SMTP Server id 14.3.498.0; Tue, 5 Jan 2021
@@ -30,9 +30,9 @@ Received: from huawei.com (10.67.165.24) by DGGEMS412-HUB.china.huawei.com
 From:   Kai Ye <yekai13@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH 1/3] crypto: hisilicon - add ZIP device using mode parameter
-Date:   Tue, 5 Jan 2021 14:16:42 +0800
-Message-ID: <1609827404-6024-2-git-send-email-yekai13@huawei.com>
+Subject: [PATCH 2/3] crypto: hisilicon/hpre - register HPRE device to uacce
+Date:   Tue, 5 Jan 2021 14:16:43 +0800
+Message-ID: <1609827404-6024-3-git-send-email-yekai13@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1609827404-6024-1-git-send-email-yekai13@huawei.com>
 References: <1609827404-6024-1-git-send-email-yekai13@huawei.com>
@@ -44,116 +44,122 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add 'uacce_mode' parameter for ZIP, which can be set as 0(default) or 1.
-'0' means ZIP is only registered to kernel crypto, and '1' means it's
-registered to both kernel crypto and UACCE.
+Register HPRE device to uacce framework for user space.
 
 Signed-off-by: Kai Ye <yekai13@huawei.com>
 Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c           |  2 +-
- drivers/crypto/hisilicon/qm.h           | 27 +++++++++++++++++++++++++++
- drivers/crypto/hisilicon/zip/zip_main.c | 14 ++++++++++++++
- 3 files changed, 42 insertions(+), 1 deletion(-)
+ drivers/crypto/hisilicon/hpre/hpre_main.c | 54 +++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 10a04ab..904b99a 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -2206,7 +2206,7 @@ static int qm_alloc_uacce(struct hisi_qm *qm)
- 	if (IS_ERR(uacce))
- 		return PTR_ERR(uacce);
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index e5c9919..ad8b691 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -10,6 +10,7 @@
+ #include <linux/module.h>
+ #include <linux/pci.h>
+ #include <linux/topology.h>
++#include <linux/uacce.h>
+ #include "hpre.h"
  
--	if (uacce->flags & UACCE_DEV_SVA) {
-+	if (uacce->flags & UACCE_DEV_SVA && qm->mode == UACCE_MODE_SVA) {
- 		qm->use_sva = true;
- 	} else {
- 		/* only consider sva case */
-diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
-index 8624d12..c1dd0fc 100644
---- a/drivers/crypto/hisilicon/qm.h
-+++ b/drivers/crypto/hisilicon/qm.h
-@@ -85,6 +85,11 @@
- /* page number for queue file region */
- #define QM_DOORBELL_PAGE_NR		1
- 
-+/* uacce mode of the driver */
-+#define UACCE_MODE_NOUACCE		0 /* don't use uacce */
-+#define UACCE_MODE_SVA			1 /* use uacce sva mode */
-+#define UACCE_MODE_DESC	"0(default) means only register to crypto, 1 means both register to crypto and uacce"
-+
- enum qm_stop_reason {
- 	QM_NORMAL,
- 	QM_SOFT_RESET,
-@@ -249,6 +254,7 @@ struct hisi_qm {
- 	resource_size_t phys_base;
- 	resource_size_t phys_size;
- 	struct uacce_device *uacce;
-+	int mode;
+ #define HPRE_QUEUE_NUM_V2		1024
+@@ -178,6 +179,19 @@ static const char *hpre_dfx_files[HPRE_DFX_FILE_NUM] = {
+ 	"invalid_req_cnt"
  };
  
- struct hisi_qp_status {
-@@ -333,6 +339,27 @@ static inline int vfs_num_set(const char *val, const struct kernel_param *kp)
- 	return param_set_int(val, kp);
- }
- 
-+static inline int mode_set(const char *val, const struct kernel_param *kp)
-+{
-+	u32 n;
-+	int ret;
-+
-+	if (!val)
-+		return -EINVAL;
-+
-+	ret = kstrtou32(val, 10, &n);
-+	if (ret != 0 || (n != UACCE_MODE_SVA &&
-+			 n != UACCE_MODE_NOUACCE))
-+		return -EINVAL;
-+
-+	return param_set_int(val, kp);
-+}
-+
-+static inline int uacce_mode_set(const char *val, const struct kernel_param *kp)
-+{
-+	return mode_set(val, kp);
-+}
-+
- static inline void hisi_qm_init_list(struct hisi_qm_list *qm_list)
- {
- 	INIT_LIST_HEAD(&qm_list->list);
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 4fb5a32b..9cdecff 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -211,6 +211,19 @@ static const struct debugfs_reg32 hzip_dfx_regs[] = {
- 	{"HZIP_DECOMP_LZ77_CURR_ST       ",  0x9cull},
- };
- 
-+static const struct kernel_param_ops zip_uacce_mode_ops = {
++static const struct kernel_param_ops hpre_uacce_mode_ops = {
 +	.set = uacce_mode_set,
 +	.get = param_get_int,
 +};
 +
 +/*
-+ * uacce_mode = 0 means zip only register to crypto,
-+ * uacce_mode = 1 means zip both register to crypto and uacce.
++ * uacce_mode = 0 means hpre only register to crypto,
++ * uacce_mode = 1 means hpre both register to crypto and uacce.
 + */
 +static u32 uacce_mode = UACCE_MODE_NOUACCE;
-+module_param_cb(uacce_mode, &zip_uacce_mode_ops, &uacce_mode, 0444);
++module_param_cb(uacce_mode, &hpre_uacce_mode_ops, &uacce_mode, 0444);
 +MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
 +
  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
  {
- 	return q_num_set(val, kp, PCI_DEVICE_ID_ZIP_PF);
-@@ -752,6 +765,7 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+ 	return q_num_set(val, kp, HPRE_PCI_DEVICE_ID);
+@@ -214,6 +228,30 @@ struct hisi_qp *hpre_create_qp(void)
+ 	return NULL;
+ }
+ 
++static void hpre_pasid_enable(struct hisi_qm *qm)
++{
++	u32 val;
++
++	val = readl_relaxed(qm->io_base + HPRE_DATA_RUSER_CFG);
++	val |= BIT(HPRE_PASID_EN_BIT);
++	writel_relaxed(val, qm->io_base + HPRE_DATA_RUSER_CFG);
++	val = readl_relaxed(qm->io_base + HPRE_DATA_WUSER_CFG);
++	val |= BIT(HPRE_PASID_EN_BIT);
++	writel_relaxed(val, qm->io_base + HPRE_DATA_WUSER_CFG);
++}
++
++static void hpre_pasid_disable(struct hisi_qm *qm)
++{
++	u32 val;
++
++	val = readl_relaxed(qm->io_base +  HPRE_DATA_RUSER_CFG);
++	val &= ~BIT(HPRE_PASID_EN_BIT);
++	writel_relaxed(val, qm->io_base + HPRE_DATA_RUSER_CFG);
++	val = readl_relaxed(qm->io_base + HPRE_DATA_WUSER_CFG);
++	val &= ~BIT(HPRE_PASID_EN_BIT);
++	writel_relaxed(val, qm->io_base + HPRE_DATA_WUSER_CFG);
++}
++
+ static int hpre_cfg_by_dsm(struct hisi_qm *qm)
+ {
+ 	struct device *dev = &qm->pdev->dev;
+@@ -279,6 +317,10 @@ static int hpre_set_user_domain_and_cache(struct hisi_qm *qm)
+ 	writel(0x0, HPRE_ADDR(qm, HPRE_COMM_CNT_CLR_CE));
+ 	writel(0x0, HPRE_ADDR(qm, HPRE_ECC_BYPASS));
+ 
++	/* Enable data buffer pasid */
++	if (qm->use_sva)
++		hpre_pasid_enable(qm);
++
+ 	writel(HPRE_BD_USR_MASK, HPRE_ADDR(qm, HPRE_BD_ARUSR_CFG));
+ 	writel(HPRE_BD_USR_MASK, HPRE_ADDR(qm, HPRE_BD_AWUSR_CFG));
+ 	writel(0x1, HPRE_ADDR(qm, HPRE_RDCHN_INI_CFG));
+@@ -734,6 +776,8 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+ 		return -EINVAL;
+ 	}
+ 
++	qm->algs = "rsa\ndh\n";
++	qm->mode = uacce_mode;
  	qm->pdev = pdev;
  	qm->ver = pdev->revision;
- 	qm->algs = "zlib\ngzip";
-+	qm->mode = uacce_mode;
- 	qm->sqe_size = HZIP_SQE_SIZE;
- 	qm->dev_name = hisi_zip_name;
+ 	qm->sqe_size = HPRE_SQE_SIZE;
+@@ -872,6 +916,14 @@ static int hpre_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		goto err_with_qm_start;
+ 	}
  
++	if (qm->uacce) {
++		ret = uacce_register(qm->uacce);
++		if (ret) {
++			pci_err(pdev, "failed to register uacce (%d)!\n", ret);
++			goto err_with_alg_register;
++		}
++	}
++
+ 	if (qm->fun_type == QM_HW_PF && vfs_num) {
+ 		ret = hisi_qm_sriov_enable(pdev, vfs_num);
+ 		if (ret < 0)
+@@ -911,6 +963,8 @@ static void hpre_remove(struct pci_dev *pdev)
+ 		}
+ 	}
+ 	if (qm->fun_type == QM_HW_PF) {
++		if (qm->use_sva)
++			hpre_pasid_disable(qm);
+ 		hpre_cnt_regs_clear(qm);
+ 		qm->debug.curr_qm_qp_num = 0;
+ 	}
 -- 
 2.8.1
 
