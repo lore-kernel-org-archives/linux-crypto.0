@@ -7,22 +7,22 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5553FC433E6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C3A6C433E9
 	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 06:19:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C1A9229F0
+	by mail.kernel.org (Postfix) with ESMTP id 3186E227C3
 	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 06:19:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726216AbhAEGTc (ORCPT
+        id S1725766AbhAEGTq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Jan 2021 01:19:32 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:9668 "EHLO
+        Tue, 5 Jan 2021 01:19:46 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:9670 "EHLO
         szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725766AbhAEGTa (ORCPT
+        with ESMTP id S1725868AbhAEGTq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Jan 2021 01:19:30 -0500
+        Tue, 5 Jan 2021 01:19:46 -0500
 Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4D92Nd2sywz15pCp;
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4D92Nd2j10z15pCm;
         Tue,  5 Jan 2021 14:17:53 +0800 (CST)
 Received: from huawei.com (10.67.165.24) by DGGEMS412-HUB.china.huawei.com
  (10.3.19.212) with Microsoft SMTP Server id 14.3.498.0; Tue, 5 Jan 2021
@@ -30,9 +30,9 @@ Received: from huawei.com (10.67.165.24) by DGGEMS412-HUB.china.huawei.com
 From:   Kai Ye <yekai13@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH 2/3] crypto: hisilicon/hpre - register HPRE device to uacce
-Date:   Tue, 5 Jan 2021 14:16:43 +0800
-Message-ID: <1609827404-6024-3-git-send-email-yekai13@huawei.com>
+Subject: [PATCH 3/3] crypto: hisilicon/sec - register SEC device to uacce
+Date:   Tue, 5 Jan 2021 14:16:44 +0800
+Message-ID: <1609827404-6024-4-git-send-email-yekai13@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1609827404-6024-1-git-send-email-yekai13@huawei.com>
 References: <1609827404-6024-1-git-send-email-yekai13@huawei.com>
@@ -44,122 +44,100 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Register HPRE device to uacce framework for user space.
+Register SEC device to uacce framework for user space.
 
 Signed-off-by: Kai Ye <yekai13@huawei.com>
 Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre_main.c | 54 +++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+ drivers/crypto/hisilicon/sec2/sec_main.c | 39 +++++++++++++++++++++++++++++++-
+ 1 file changed, 38 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index e5c9919..ad8b691 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -10,6 +10,7 @@
- #include <linux/module.h>
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index b35c1c2..4809c19 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -13,6 +13,7 @@
  #include <linux/pci.h>
+ #include <linux/seq_file.h>
  #include <linux/topology.h>
 +#include <linux/uacce.h>
- #include "hpre.h"
  
- #define HPRE_QUEUE_NUM_V2		1024
-@@ -178,6 +179,19 @@ static const char *hpre_dfx_files[HPRE_DFX_FILE_NUM] = {
- 	"invalid_req_cnt"
- };
+ #include "sec.h"
  
-+static const struct kernel_param_ops hpre_uacce_mode_ops = {
+@@ -74,6 +75,16 @@
+ 
+ #define SEC_USER0_SMMU_NORMAL		(BIT(23) | BIT(15))
+ #define SEC_USER1_SMMU_NORMAL		(BIT(31) | BIT(23) | BIT(15) | BIT(7))
++#define SEC_USER1_ENABLE_CONTEXT_SSV	BIT(24)
++#define SEC_USER1_ENABLE_DATA_SSV	BIT(16)
++#define SEC_USER1_WB_CONTEXT_SSV	BIT(8)
++#define SEC_USER1_WB_DATA_SSV		BIT(0)
++#define SEC_USER1_SVA_SET		(SEC_USER1_ENABLE_CONTEXT_SSV | \
++					SEC_USER1_ENABLE_DATA_SSV | \
++					SEC_USER1_WB_CONTEXT_SSV |  \
++					SEC_USER1_WB_DATA_SSV)
++#define SEC_USER1_SMMU_SVA		(SEC_USER1_SMMU_NORMAL | SEC_USER1_SVA_SET)
++#define SEC_USER1_SMMU_MASK		(~SEC_USER1_SVA_SET)
+ #define SEC_CORE_INT_STATUS_M_ECC	BIT(2)
+ 
+ #define SEC_DELAY_10_US			10
+@@ -233,6 +244,18 @@ struct hisi_qp **sec_create_qps(void)
+ 	return NULL;
+ }
+ 
++static const struct kernel_param_ops sec_uacce_mode_ops = {
 +	.set = uacce_mode_set,
 +	.get = param_get_int,
 +};
 +
 +/*
-+ * uacce_mode = 0 means hpre only register to crypto,
-+ * uacce_mode = 1 means hpre both register to crypto and uacce.
++ * uacce_mode = 0 means sec only register to crypto,
++ * uacce_mode = 1 means sec both register to crypto and uacce.
 + */
 +static u32 uacce_mode = UACCE_MODE_NOUACCE;
-+module_param_cb(uacce_mode, &hpre_uacce_mode_ops, &uacce_mode, 0444);
++module_param_cb(uacce_mode, &sec_uacce_mode_ops, &uacce_mode, 0444);
 +MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
-+
- static int pf_q_num_set(const char *val, const struct kernel_param *kp)
- {
- 	return q_num_set(val, kp, HPRE_PCI_DEVICE_ID);
-@@ -214,6 +228,30 @@ struct hisi_qp *hpre_create_qp(void)
- 	return NULL;
- }
  
-+static void hpre_pasid_enable(struct hisi_qm *qm)
-+{
-+	u32 val;
-+
-+	val = readl_relaxed(qm->io_base + HPRE_DATA_RUSER_CFG);
-+	val |= BIT(HPRE_PASID_EN_BIT);
-+	writel_relaxed(val, qm->io_base + HPRE_DATA_RUSER_CFG);
-+	val = readl_relaxed(qm->io_base + HPRE_DATA_WUSER_CFG);
-+	val |= BIT(HPRE_PASID_EN_BIT);
-+	writel_relaxed(val, qm->io_base + HPRE_DATA_WUSER_CFG);
-+}
-+
-+static void hpre_pasid_disable(struct hisi_qm *qm)
-+{
-+	u32 val;
-+
-+	val = readl_relaxed(qm->io_base +  HPRE_DATA_RUSER_CFG);
-+	val &= ~BIT(HPRE_PASID_EN_BIT);
-+	writel_relaxed(val, qm->io_base + HPRE_DATA_RUSER_CFG);
-+	val = readl_relaxed(qm->io_base + HPRE_DATA_WUSER_CFG);
-+	val &= ~BIT(HPRE_PASID_EN_BIT);
-+	writel_relaxed(val, qm->io_base + HPRE_DATA_WUSER_CFG);
-+}
-+
- static int hpre_cfg_by_dsm(struct hisi_qm *qm)
- {
- 	struct device *dev = &qm->pdev->dev;
-@@ -279,6 +317,10 @@ static int hpre_set_user_domain_and_cache(struct hisi_qm *qm)
- 	writel(0x0, HPRE_ADDR(qm, HPRE_COMM_CNT_CLR_CE));
- 	writel(0x0, HPRE_ADDR(qm, HPRE_ECC_BYPASS));
+ static const struct pci_device_id sec_dev_ids[] = {
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_PF_PCI_DEVICE_ID) },
+@@ -299,7 +322,11 @@ static int sec_engine_init(struct hisi_qm *qm)
+ 	writel_relaxed(reg, SEC_ADDR(qm, SEC_INTERFACE_USER_CTRL0_REG));
  
-+	/* Enable data buffer pasid */
+ 	reg = readl_relaxed(SEC_ADDR(qm, SEC_INTERFACE_USER_CTRL1_REG));
+-	reg |= SEC_USER1_SMMU_NORMAL;
++	reg &= SEC_USER1_SMMU_MASK;
 +	if (qm->use_sva)
-+		hpre_pasid_enable(qm);
-+
- 	writel(HPRE_BD_USR_MASK, HPRE_ADDR(qm, HPRE_BD_ARUSR_CFG));
- 	writel(HPRE_BD_USR_MASK, HPRE_ADDR(qm, HPRE_BD_AWUSR_CFG));
- 	writel(0x1, HPRE_ADDR(qm, HPRE_RDCHN_INI_CFG));
-@@ -734,6 +776,8 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- 		return -EINVAL;
- 	}
++		reg |= SEC_USER1_SMMU_SVA;
++	else
++		reg |= SEC_USER1_SMMU_NORMAL;
+ 	writel_relaxed(reg, SEC_ADDR(qm, SEC_INTERFACE_USER_CTRL1_REG));
  
-+	qm->algs = "rsa\ndh\n";
-+	qm->mode = uacce_mode;
+ 	writel(SEC_SINGLE_PORT_MAX_TRANS,
+@@ -758,6 +785,8 @@ static int sec_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+ 
  	qm->pdev = pdev;
  	qm->ver = pdev->revision;
- 	qm->sqe_size = HPRE_SQE_SIZE;
-@@ -872,6 +916,14 @@ static int hpre_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		goto err_with_qm_start;
++	qm->algs = "cipher\ndigest\naead\n";
++	qm->mode = uacce_mode;
+ 	qm->sqe_size = SEC_SQE_SIZE;
+ 	qm->dev_name = sec_name;
+ 
+@@ -885,6 +914,14 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		goto err_qm_stop;
  	}
  
 +	if (qm->uacce) {
 +		ret = uacce_register(qm->uacce);
 +		if (ret) {
 +			pci_err(pdev, "failed to register uacce (%d)!\n", ret);
-+			goto err_with_alg_register;
++			goto err_alg_unregister;
 +		}
 +	}
 +
  	if (qm->fun_type == QM_HW_PF && vfs_num) {
  		ret = hisi_qm_sriov_enable(pdev, vfs_num);
  		if (ret < 0)
-@@ -911,6 +963,8 @@ static void hpre_remove(struct pci_dev *pdev)
- 		}
- 	}
- 	if (qm->fun_type == QM_HW_PF) {
-+		if (qm->use_sva)
-+			hpre_pasid_disable(qm);
- 		hpre_cnt_regs_clear(qm);
- 		qm->debug.curr_qm_qp_num = 0;
- 	}
 -- 
 2.8.1
 
