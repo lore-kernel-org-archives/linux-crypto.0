@@ -7,23 +7,23 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D95AEC41620
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 14:05:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F8ADC41518
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 14:05:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C012822AAA
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 14:05:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D685A22AAB
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 14:05:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729467AbhAEOFI (ORCPT
+        id S1729371AbhAEOFW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Jan 2021 09:05:08 -0500
-Received: from mx2.suse.de ([195.135.220.15]:57644 "EHLO mx2.suse.de"
+        Tue, 5 Jan 2021 09:05:22 -0500
+Received: from mx2.suse.de ([195.135.220.15]:57718 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726059AbhAEOFA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Jan 2021 09:05:00 -0500
+        id S1729093AbhAEOFM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 5 Jan 2021 09:05:12 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 79861AEC1;
-        Tue,  5 Jan 2021 14:03:45 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 16936AEE0;
+        Tue,  5 Jan 2021 14:03:44 +0000 (UTC)
 From:   Thomas Bogendoerfer <tsbogend@alpha.franken.de>
 To:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -47,9 +47,9 @@ To:     Matt Mackall <mpm@selenic.com>,
         linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
         linux-rtc@vger.kernel.org, linux-spi@vger.kernel.org,
         linux-watchdog@vger.kernel.org, alsa-devel@alsa-project.org
-Subject: [PATCH 08/10] rtc: tx4939: Remove driver
-Date:   Tue,  5 Jan 2021 15:02:53 +0100
-Message-Id: <20210105140305.141401-9-tsbogend@alpha.franken.de>
+Subject: [PATCH 06/10] mtd: Remove drivers used by TX49xx
+Date:   Tue,  5 Jan 2021 15:02:51 +0100
+Message-Id: <20210105140305.141401-7-tsbogend@alpha.franken.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210105140305.141401-1-tsbogend@alpha.franken.de>
 References: <20210105140305.141401-1-tsbogend@alpha.franken.de>
@@ -59,355 +59,682 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CPU support for TX49xx is getting removed, so remove rtc driver for it.
+CPU support for TX49xx is getting removed, so remove MTD support for it.
 
 Signed-off-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
 ---
- drivers/rtc/Kconfig      |   7 -
- drivers/rtc/Makefile     |   1 -
- drivers/rtc/rtc-tx4939.c | 303 ---------------------------------------
- 3 files changed, 311 deletions(-)
- delete mode 100644 drivers/rtc/rtc-tx4939.c
+ drivers/mtd/maps/Kconfig                 |   6 -
+ drivers/mtd/maps/Makefile                |   1 -
+ drivers/mtd/maps/rbtx4939-flash.c        | 133 -------
+ drivers/mtd/nand/raw/Kconfig             |   7 -
+ drivers/mtd/nand/raw/Makefile            |   1 -
+ drivers/mtd/nand/raw/txx9ndfmc.c         | 423 -----------------------
+ include/linux/platform_data/txx9/ndfmc.h |  28 --
+ 7 files changed, 599 deletions(-)
+ delete mode 100644 drivers/mtd/maps/rbtx4939-flash.c
+ delete mode 100644 drivers/mtd/nand/raw/txx9ndfmc.c
+ delete mode 100644 include/linux/platform_data/txx9/ndfmc.h
 
-diff --git a/drivers/rtc/Kconfig b/drivers/rtc/Kconfig
-index 6123f9f4fbc9..3b5510c9bffa 100644
---- a/drivers/rtc/Kconfig
-+++ b/drivers/rtc/Kconfig
-@@ -1587,13 +1587,6 @@ config RTC_DRV_STARFIRE
- 	  If you say Y here you will get support for the RTC found on
- 	  Starfire systems.
+diff --git a/drivers/mtd/maps/Kconfig b/drivers/mtd/maps/Kconfig
+index 6650acbc961e..17579ce04922 100644
+--- a/drivers/mtd/maps/Kconfig
++++ b/drivers/mtd/maps/Kconfig
+@@ -380,12 +380,6 @@ config MTD_INTEL_VR_NOR
+ 	  Map driver for a NOR flash bank located on the Expansion Bus of the
+ 	  Intel Vermilion Range chipset.
  
--config RTC_DRV_TX4939
--	tristate "TX4939 SoC"
--	depends on SOC_TX4939 || COMPILE_TEST
+-config MTD_RBTX4939
+-	tristate "Map driver for RBTX4939 board"
+-	depends on TOSHIBA_RBTX4939 && MTD_CFI && MTD_COMPLEX_MAPPINGS
 -	help
--	  Driver for the internal RTC (Realtime Clock) module found on
--	  Toshiba TX4939 SoC.
+-	  Map driver for NOR flash chips on RBTX4939 board.
 -
- config RTC_DRV_MV
- 	tristate "Marvell SoC RTC"
- 	depends on ARCH_DOVE || ARCH_MVEBU || COMPILE_TEST
-diff --git a/drivers/rtc/Makefile b/drivers/rtc/Makefile
-index bb8f319b09fb..a020adde4bbd 100644
---- a/drivers/rtc/Makefile
-+++ b/drivers/rtc/Makefile
-@@ -171,7 +171,6 @@ obj-$(CONFIG_RTC_DRV_TPS6586X)	+= rtc-tps6586x.o
- obj-$(CONFIG_RTC_DRV_TPS65910)	+= rtc-tps65910.o
- obj-$(CONFIG_RTC_DRV_TPS80031)	+= rtc-tps80031.o
- obj-$(CONFIG_RTC_DRV_TWL4030)	+= rtc-twl.o
--obj-$(CONFIG_RTC_DRV_TX4939)	+= rtc-tx4939.o
- obj-$(CONFIG_RTC_DRV_V3020)	+= rtc-v3020.o
- obj-$(CONFIG_RTC_DRV_VR41XX)	+= rtc-vr41xx.o
- obj-$(CONFIG_RTC_DRV_VRTC)	+= rtc-mrst.o
-diff --git a/drivers/rtc/rtc-tx4939.c b/drivers/rtc/rtc-tx4939.c
+ config MTD_PLATRAM
+ 	tristate "Map driver for platform device RAM (mtd-ram)"
+ 	select MTD_RAM
+diff --git a/drivers/mtd/maps/Makefile b/drivers/mtd/maps/Makefile
+index 79f018cf412f..408a2217b0f2 100644
+--- a/drivers/mtd/maps/Makefile
++++ b/drivers/mtd/maps/Makefile
+@@ -43,6 +43,5 @@ obj-$(CONFIG_MTD_SCB2_FLASH)	+= scb2_flash.o
+ obj-$(CONFIG_MTD_IXP4XX)	+= ixp4xx.o
+ obj-$(CONFIG_MTD_PLATRAM)	+= plat-ram.o
+ obj-$(CONFIG_MTD_INTEL_VR_NOR)	+= intel_vr_nor.o
+-obj-$(CONFIG_MTD_RBTX4939)	+= rbtx4939-flash.o
+ obj-$(CONFIG_MTD_VMU)		+= vmu-flash.o
+ obj-$(CONFIG_MTD_LANTIQ)	+= lantiq-flash.o
+diff --git a/drivers/mtd/maps/rbtx4939-flash.c b/drivers/mtd/maps/rbtx4939-flash.c
 deleted file mode 100644
-index c3309db5448d..000000000000
---- a/drivers/rtc/rtc-tx4939.c
+index 39c86c0b0ec1..000000000000
+--- a/drivers/mtd/maps/rbtx4939-flash.c
 +++ /dev/null
-@@ -1,303 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
+@@ -1,133 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
 -/*
-- * TX4939 internal RTC driver
-- * Based on RBTX49xx patch from CELF patch archive.
+- * rbtx4939-flash (based on physmap.c)
 - *
-- * (C) Copyright TOSHIBA CORPORATION 2005-2007
+- * This is a simplified physmap driver with map_init callback function.
+- *
+- * Copyright (C) 2009 Atsushi Nemoto <anemo@mba.ocn.ne.jp>
 - */
--#include <linux/rtc.h>
--#include <linux/platform_device.h>
--#include <linux/interrupt.h>
+-
 -#include <linux/module.h>
--#include <linux/io.h>
--#include <linux/gfp.h>
+-#include <linux/types.h>
+-#include <linux/kernel.h>
+-#include <linux/slab.h>
+-#include <linux/device.h>
+-#include <linux/platform_device.h>
+-#include <linux/mtd/mtd.h>
+-#include <linux/mtd/map.h>
+-#include <linux/mtd/partitions.h>
+-#include <asm/txx9/rbtx4939.h>
 -
--#define TX4939_RTCCTL_ALME	0x00000080
--#define TX4939_RTCCTL_ALMD	0x00000040
--#define TX4939_RTCCTL_BUSY	0x00000020
--
--#define TX4939_RTCCTL_COMMAND	0x00000007
--#define TX4939_RTCCTL_COMMAND_NOP	0x00000000
--#define TX4939_RTCCTL_COMMAND_GETTIME	0x00000001
--#define TX4939_RTCCTL_COMMAND_SETTIME	0x00000002
--#define TX4939_RTCCTL_COMMAND_GETALARM	0x00000003
--#define TX4939_RTCCTL_COMMAND_SETALARM	0x00000004
--
--#define TX4939_RTCTBC_PM	0x00000080
--#define TX4939_RTCTBC_COMP	0x0000007f
--
--#define TX4939_RTC_REG_RAMSIZE	0x00000100
--#define TX4939_RTC_REG_RWBSIZE	0x00000006
--
--struct tx4939_rtc_reg {
--	__u32 ctl;
--	__u32 adr;
--	__u32 dat;
--	__u32 tbc;
+-struct rbtx4939_flash_info {
+-	struct mtd_info *mtd;
+-	struct map_info map;
 -};
 -
--struct tx4939rtc_plat_data {
--	struct rtc_device *rtc;
--	struct tx4939_rtc_reg __iomem *rtcreg;
--	spinlock_t lock;
--};
--
--static int tx4939_rtc_cmd(struct tx4939_rtc_reg __iomem *rtcreg, int cmd)
+-static int rbtx4939_flash_remove(struct platform_device *dev)
 -{
--	int i = 0;
+-	struct rbtx4939_flash_info *info;
 -
--	__raw_writel(cmd, &rtcreg->ctl);
--	/* This might take 30us (next 32.768KHz clock) */
--	while (__raw_readl(&rtcreg->ctl) & TX4939_RTCCTL_BUSY) {
--		/* timeout on approx. 100us (@ GBUS200MHz) */
--		if (i++ > 200 * 100)
--			return -EBUSY;
--		cpu_relax();
+-	info = platform_get_drvdata(dev);
+-	if (!info)
+-		return 0;
+-
+-	if (info->mtd) {
+-		mtd_device_unregister(info->mtd);
+-		map_destroy(info->mtd);
 -	}
 -	return 0;
 -}
 -
--static int tx4939_rtc_set_time(struct device *dev, struct rtc_time *tm)
+-static const char * const rom_probe_types[] = {
+-	"cfi_probe", "jedec_probe", NULL };
+-
+-static int rbtx4939_flash_probe(struct platform_device *dev)
 -{
--	struct tx4939rtc_plat_data *pdata = dev_get_drvdata(dev);
--	struct tx4939_rtc_reg __iomem *rtcreg = pdata->rtcreg;
--	unsigned long secs = rtc_tm_to_time64(tm);
--	int i, ret;
--	unsigned char buf[6];
+-	struct rbtx4939_flash_data *pdata;
+-	struct rbtx4939_flash_info *info;
+-	struct resource *res;
+-	const char * const *probe_type;
+-	int err = 0;
+-	unsigned long size;
 -
--	buf[0] = 0;
--	buf[1] = 0;
--	buf[2] = secs;
--	buf[3] = secs >> 8;
--	buf[4] = secs >> 16;
--	buf[5] = secs >> 24;
--	spin_lock_irq(&pdata->lock);
--	__raw_writel(0, &rtcreg->adr);
--	for (i = 0; i < 6; i++)
--		__raw_writel(buf[i], &rtcreg->dat);
--	ret = tx4939_rtc_cmd(rtcreg,
--			     TX4939_RTCCTL_COMMAND_SETTIME |
--			     (__raw_readl(&rtcreg->ctl) & TX4939_RTCCTL_ALME));
--	spin_unlock_irq(&pdata->lock);
--	return ret;
--}
--
--static int tx4939_rtc_read_time(struct device *dev, struct rtc_time *tm)
--{
--	struct tx4939rtc_plat_data *pdata = dev_get_drvdata(dev);
--	struct tx4939_rtc_reg __iomem *rtcreg = pdata->rtcreg;
--	int i, ret;
--	unsigned long sec;
--	unsigned char buf[6];
--
--	spin_lock_irq(&pdata->lock);
--	ret = tx4939_rtc_cmd(rtcreg,
--			     TX4939_RTCCTL_COMMAND_GETTIME |
--			     (__raw_readl(&rtcreg->ctl) & TX4939_RTCCTL_ALME));
--	if (ret) {
--		spin_unlock_irq(&pdata->lock);
--		return ret;
--	}
--	__raw_writel(2, &rtcreg->adr);
--	for (i = 2; i < 6; i++)
--		buf[i] = __raw_readl(&rtcreg->dat);
--	spin_unlock_irq(&pdata->lock);
--	sec = ((unsigned long)buf[5] << 24) | (buf[4] << 16) |
--		(buf[3] << 8) | buf[2];
--	rtc_time64_to_tm(sec, tm);
--	return 0;
--}
--
--static int tx4939_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alrm)
--{
--	struct tx4939rtc_plat_data *pdata = dev_get_drvdata(dev);
--	struct tx4939_rtc_reg __iomem *rtcreg = pdata->rtcreg;
--	int i, ret;
--	unsigned long sec;
--	unsigned char buf[6];
--
--	sec = rtc_tm_to_time64(&alrm->time);
--	buf[0] = 0;
--	buf[1] = 0;
--	buf[2] = sec;
--	buf[3] = sec >> 8;
--	buf[4] = sec >> 16;
--	buf[5] = sec >> 24;
--	spin_lock_irq(&pdata->lock);
--	__raw_writel(0, &rtcreg->adr);
--	for (i = 0; i < 6; i++)
--		__raw_writel(buf[i], &rtcreg->dat);
--	ret = tx4939_rtc_cmd(rtcreg, TX4939_RTCCTL_COMMAND_SETALARM |
--			     (alrm->enabled ? TX4939_RTCCTL_ALME : 0));
--	spin_unlock_irq(&pdata->lock);
--	return ret;
--}
--
--static int tx4939_rtc_read_alarm(struct device *dev, struct rtc_wkalrm *alrm)
--{
--	struct tx4939rtc_plat_data *pdata = dev_get_drvdata(dev);
--	struct tx4939_rtc_reg __iomem *rtcreg = pdata->rtcreg;
--	int i, ret;
--	unsigned long sec;
--	unsigned char buf[6];
--	u32 ctl;
--
--	spin_lock_irq(&pdata->lock);
--	ret = tx4939_rtc_cmd(rtcreg,
--			     TX4939_RTCCTL_COMMAND_GETALARM |
--			     (__raw_readl(&rtcreg->ctl) & TX4939_RTCCTL_ALME));
--	if (ret) {
--		spin_unlock_irq(&pdata->lock);
--		return ret;
--	}
--	__raw_writel(2, &rtcreg->adr);
--	for (i = 2; i < 6; i++)
--		buf[i] = __raw_readl(&rtcreg->dat);
--	ctl = __raw_readl(&rtcreg->ctl);
--	alrm->enabled = (ctl & TX4939_RTCCTL_ALME) ? 1 : 0;
--	alrm->pending = (ctl & TX4939_RTCCTL_ALMD) ? 1 : 0;
--	spin_unlock_irq(&pdata->lock);
--	sec = ((unsigned long)buf[5] << 24) | (buf[4] << 16) |
--		(buf[3] << 8) | buf[2];
--	rtc_time64_to_tm(sec, &alrm->time);
--	return rtc_valid_tm(&alrm->time);
--}
--
--static int tx4939_rtc_alarm_irq_enable(struct device *dev, unsigned int enabled)
--{
--	struct tx4939rtc_plat_data *pdata = dev_get_drvdata(dev);
--
--	spin_lock_irq(&pdata->lock);
--	tx4939_rtc_cmd(pdata->rtcreg,
--		       TX4939_RTCCTL_COMMAND_NOP |
--		       (enabled ? TX4939_RTCCTL_ALME : 0));
--	spin_unlock_irq(&pdata->lock);
--	return 0;
--}
--
--static irqreturn_t tx4939_rtc_interrupt(int irq, void *dev_id)
--{
--	struct tx4939rtc_plat_data *pdata = dev_get_drvdata(dev_id);
--	struct tx4939_rtc_reg __iomem *rtcreg = pdata->rtcreg;
--	unsigned long events = RTC_IRQF;
--
--	spin_lock(&pdata->lock);
--	if (__raw_readl(&rtcreg->ctl) & TX4939_RTCCTL_ALMD) {
--		events |= RTC_AF;
--		tx4939_rtc_cmd(rtcreg, TX4939_RTCCTL_COMMAND_NOP);
--	}
--	spin_unlock(&pdata->lock);
--	rtc_update_irq(pdata->rtc, 1, events);
--
--	return IRQ_HANDLED;
--}
--
--static const struct rtc_class_ops tx4939_rtc_ops = {
--	.read_time		= tx4939_rtc_read_time,
--	.read_alarm		= tx4939_rtc_read_alarm,
--	.set_alarm		= tx4939_rtc_set_alarm,
--	.set_time		= tx4939_rtc_set_time,
--	.alarm_irq_enable	= tx4939_rtc_alarm_irq_enable,
--};
--
--static int tx4939_nvram_read(void *priv, unsigned int pos, void *val,
--			     size_t bytes)
--{
--	struct tx4939rtc_plat_data *pdata = priv;
--	struct tx4939_rtc_reg __iomem *rtcreg = pdata->rtcreg;
--	u8 *buf = val;
--
--	spin_lock_irq(&pdata->lock);
--	for (; bytes; bytes--) {
--		__raw_writel(pos++, &rtcreg->adr);
--		*buf++ = __raw_readl(&rtcreg->dat);
--	}
--	spin_unlock_irq(&pdata->lock);
--	return 0;
--}
--
--static int tx4939_nvram_write(void *priv, unsigned int pos, void *val,
--			      size_t bytes)
--{
--	struct tx4939rtc_plat_data *pdata = priv;
--	struct tx4939_rtc_reg __iomem *rtcreg = pdata->rtcreg;
--	u8 *buf = val;
--
--	spin_lock_irq(&pdata->lock);
--	for (; bytes; bytes--) {
--		__raw_writel(pos++, &rtcreg->adr);
--		__raw_writel(*buf++, &rtcreg->dat);
--	}
--	spin_unlock_irq(&pdata->lock);
--	return 0;
--}
--
--static int __init tx4939_rtc_probe(struct platform_device *pdev)
--{
--	struct rtc_device *rtc;
--	struct tx4939rtc_plat_data *pdata;
--	int irq, ret;
--	struct nvmem_config nvmem_cfg = {
--		.name = "tx4939_nvram",
--		.size = TX4939_RTC_REG_RAMSIZE,
--		.reg_read = tx4939_nvram_read,
--		.reg_write = tx4939_nvram_write,
--	};
--
--	irq = platform_get_irq(pdev, 0);
--	if (irq < 0)
--		return -ENODEV;
--	pdata = devm_kzalloc(&pdev->dev, sizeof(*pdata), GFP_KERNEL);
+-	pdata = dev_get_platdata(&dev->dev);
 -	if (!pdata)
+-		return -ENODEV;
+-
+-	res = platform_get_resource(dev, IORESOURCE_MEM, 0);
+-	if (!res)
+-		return -ENODEV;
+-	info = devm_kzalloc(&dev->dev, sizeof(struct rbtx4939_flash_info),
+-			    GFP_KERNEL);
+-	if (!info)
 -		return -ENOMEM;
--	platform_set_drvdata(pdev, pdata);
 -
--	pdata->rtcreg = devm_platform_ioremap_resource(pdev, 0);
--	if (IS_ERR(pdata->rtcreg))
--		return PTR_ERR(pdata->rtcreg);
+-	platform_set_drvdata(dev, info);
 -
--	spin_lock_init(&pdata->lock);
--	tx4939_rtc_cmd(pdata->rtcreg, TX4939_RTCCTL_COMMAND_NOP);
--	if (devm_request_irq(&pdev->dev, irq, tx4939_rtc_interrupt,
--			     0, pdev->name, &pdev->dev) < 0)
+-	size = resource_size(res);
+-	pr_notice("rbtx4939 platform flash device: %pR\n", res);
+-
+-	if (!devm_request_mem_region(&dev->dev, res->start, size,
+-				     dev_name(&dev->dev)))
 -		return -EBUSY;
--	rtc = devm_rtc_allocate_device(&pdev->dev);
--	if (IS_ERR(rtc))
--		return PTR_ERR(rtc);
 -
--	rtc->ops = &tx4939_rtc_ops;
--	rtc->range_max = U32_MAX;
+-	info->map.name = dev_name(&dev->dev);
+-	info->map.phys = res->start;
+-	info->map.size = size;
+-	info->map.bankwidth = pdata->width;
 -
--	pdata->rtc = rtc;
+-	info->map.virt = devm_ioremap(&dev->dev, info->map.phys, size);
+-	if (!info->map.virt)
+-		return -EBUSY;
 -
--	nvmem_cfg.priv = pdata;
--	ret = devm_rtc_nvmem_register(rtc, &nvmem_cfg);
--	if (ret)
--		return ret;
+-	if (pdata->map_init)
+-		(*pdata->map_init)(&info->map);
+-	else
+-		simple_map_init(&info->map);
 -
--	return devm_rtc_register_device(rtc);
--}
+-	probe_type = rom_probe_types;
+-	for (; !info->mtd && *probe_type; probe_type++)
+-		info->mtd = do_map_probe(*probe_type, &info->map);
+-	if (!info->mtd) {
+-		dev_err(&dev->dev, "map_probe failed\n");
+-		err = -ENXIO;
+-		goto err_out;
+-	}
+-	info->mtd->dev.parent = &dev->dev;
+-	err = mtd_device_register(info->mtd, pdata->parts, pdata->nr_parts);
 -
--static int __exit tx4939_rtc_remove(struct platform_device *pdev)
--{
--	struct tx4939rtc_plat_data *pdata = platform_get_drvdata(pdev);
--
--	spin_lock_irq(&pdata->lock);
--	tx4939_rtc_cmd(pdata->rtcreg, TX4939_RTCCTL_COMMAND_NOP);
--	spin_unlock_irq(&pdata->lock);
+-	if (err)
+-		goto err_out;
 -	return 0;
+-
+-err_out:
+-	rbtx4939_flash_remove(dev);
+-	return err;
 -}
 -
--static struct platform_driver tx4939_rtc_driver = {
--	.remove		= __exit_p(tx4939_rtc_remove),
+-#ifdef CONFIG_PM
+-static void rbtx4939_flash_shutdown(struct platform_device *dev)
+-{
+-	struct rbtx4939_flash_info *info = platform_get_drvdata(dev);
+-
+-	if (mtd_suspend(info->mtd) == 0)
+-		mtd_resume(info->mtd);
+-}
+-#else
+-#define rbtx4939_flash_shutdown NULL
+-#endif
+-
+-static struct platform_driver rbtx4939_flash_driver = {
+-	.probe		= rbtx4939_flash_probe,
+-	.remove		= rbtx4939_flash_remove,
+-	.shutdown	= rbtx4939_flash_shutdown,
 -	.driver		= {
--		.name	= "tx4939rtc",
+-		.name	= "rbtx4939-flash",
 -	},
 -};
 -
--module_platform_driver_probe(tx4939_rtc_driver, tx4939_rtc_probe);
+-module_platform_driver(rbtx4939_flash_driver);
 -
--MODULE_AUTHOR("Atsushi Nemoto <anemo@mba.ocn.ne.jp>");
--MODULE_DESCRIPTION("TX4939 internal RTC driver");
--MODULE_LICENSE("GPL v2");
--MODULE_ALIAS("platform:tx4939rtc");
+-MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("RBTX4939 MTD map driver");
+-MODULE_ALIAS("platform:rbtx4939-flash");
+diff --git a/drivers/mtd/nand/raw/Kconfig b/drivers/mtd/nand/raw/Kconfig
+index 442a039b92f3..9e74a63b18a4 100644
+--- a/drivers/mtd/nand/raw/Kconfig
++++ b/drivers/mtd/nand/raw/Kconfig
+@@ -313,13 +313,6 @@ config MTD_NAND_DAVINCI
+ 	  Enable the driver for NAND flash chips on Texas Instruments
+ 	  DaVinci/Keystone processors.
+ 
+-config MTD_NAND_TXX9NDFMC
+-	tristate "TXx9 NAND controller"
+-	depends on SOC_TX4938 || SOC_TX4939 || COMPILE_TEST
+-	depends on HAS_IOMEM
+-	help
+-	  This enables the NAND flash controller on the TXx9 SoCs.
+-
+ config MTD_NAND_SOCRATES
+ 	tristate "Socrates NAND controller"
+ 	depends on SOCRATES
+diff --git a/drivers/mtd/nand/raw/Makefile b/drivers/mtd/nand/raw/Makefile
+index 32475a28d8f8..07cb86321403 100644
+--- a/drivers/mtd/nand/raw/Makefile
++++ b/drivers/mtd/nand/raw/Makefile
+@@ -37,7 +37,6 @@ obj-$(CONFIG_MTD_NAND_MLC_LPC32XX)      += lpc32xx_mlc.o
+ obj-$(CONFIG_MTD_NAND_SH_FLCTL)		+= sh_flctl.o
+ obj-$(CONFIG_MTD_NAND_MXC)		+= mxc_nand.o
+ obj-$(CONFIG_MTD_NAND_SOCRATES)		+= socrates_nand.o
+-obj-$(CONFIG_MTD_NAND_TXX9NDFMC)	+= txx9ndfmc.o
+ obj-$(CONFIG_MTD_NAND_MPC5121_NFC)	+= mpc5121_nfc.o
+ obj-$(CONFIG_MTD_NAND_VF610_NFC)	+= vf610_nfc.o
+ obj-$(CONFIG_MTD_NAND_RICOH)		+= r852.o
+diff --git a/drivers/mtd/nand/raw/txx9ndfmc.c b/drivers/mtd/nand/raw/txx9ndfmc.c
+deleted file mode 100644
+index 1a9449e53bf9..000000000000
+--- a/drivers/mtd/nand/raw/txx9ndfmc.c
++++ /dev/null
+@@ -1,423 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- * TXx9 NAND flash memory controller driver
+- * Based on RBTX49xx patch from CELF patch archive.
+- *
+- * (C) Copyright TOSHIBA CORPORATION 2004-2007
+- * All Rights Reserved.
+- */
+-#include <linux/err.h>
+-#include <linux/init.h>
+-#include <linux/slab.h>
+-#include <linux/module.h>
+-#include <linux/platform_device.h>
+-#include <linux/delay.h>
+-#include <linux/mtd/mtd.h>
+-#include <linux/mtd/rawnand.h>
+-#include <linux/mtd/partitions.h>
+-#include <linux/io.h>
+-#include <linux/platform_data/txx9/ndfmc.h>
+-
+-/* TXX9 NDFMC Registers */
+-#define TXX9_NDFDTR	0x00
+-#define TXX9_NDFMCR	0x04
+-#define TXX9_NDFSR	0x08
+-#define TXX9_NDFISR	0x0c
+-#define TXX9_NDFIMR	0x10
+-#define TXX9_NDFSPR	0x14
+-#define TXX9_NDFRSTR	0x18	/* not TX4939 */
+-
+-/* NDFMCR : NDFMC Mode Control */
+-#define TXX9_NDFMCR_WE	0x80
+-#define TXX9_NDFMCR_ECC_ALL	0x60
+-#define TXX9_NDFMCR_ECC_RESET	0x60
+-#define TXX9_NDFMCR_ECC_READ	0x40
+-#define TXX9_NDFMCR_ECC_ON	0x20
+-#define TXX9_NDFMCR_ECC_OFF	0x00
+-#define TXX9_NDFMCR_CE	0x10
+-#define TXX9_NDFMCR_BSPRT	0x04	/* TX4925/TX4926 only */
+-#define TXX9_NDFMCR_ALE	0x02
+-#define TXX9_NDFMCR_CLE	0x01
+-/* TX4939 only */
+-#define TXX9_NDFMCR_X16	0x0400
+-#define TXX9_NDFMCR_DMAREQ_MASK	0x0300
+-#define TXX9_NDFMCR_DMAREQ_NODMA	0x0000
+-#define TXX9_NDFMCR_DMAREQ_128	0x0100
+-#define TXX9_NDFMCR_DMAREQ_256	0x0200
+-#define TXX9_NDFMCR_DMAREQ_512	0x0300
+-#define TXX9_NDFMCR_CS_MASK	0x0c
+-#define TXX9_NDFMCR_CS(ch)	((ch) << 2)
+-
+-/* NDFMCR : NDFMC Status */
+-#define TXX9_NDFSR_BUSY	0x80
+-/* TX4939 only */
+-#define TXX9_NDFSR_DMARUN	0x40
+-
+-/* NDFMCR : NDFMC Reset */
+-#define TXX9_NDFRSTR_RST	0x01
+-
+-struct txx9ndfmc_priv {
+-	struct platform_device *dev;
+-	struct nand_chip chip;
+-	int cs;
+-	const char *mtdname;
+-};
+-
+-#define MAX_TXX9NDFMC_DEV	4
+-struct txx9ndfmc_drvdata {
+-	struct mtd_info *mtds[MAX_TXX9NDFMC_DEV];
+-	void __iomem *base;
+-	unsigned char hold;	/* in gbusclock */
+-	unsigned char spw;	/* in gbusclock */
+-	struct nand_controller controller;
+-};
+-
+-static struct platform_device *mtd_to_platdev(struct mtd_info *mtd)
+-{
+-	struct nand_chip *chip = mtd_to_nand(mtd);
+-	struct txx9ndfmc_priv *txx9_priv = nand_get_controller_data(chip);
+-	return txx9_priv->dev;
+-}
+-
+-static void __iomem *ndregaddr(struct platform_device *dev, unsigned int reg)
+-{
+-	struct txx9ndfmc_drvdata *drvdata = platform_get_drvdata(dev);
+-	struct txx9ndfmc_platform_data *plat = dev_get_platdata(&dev->dev);
+-
+-	return drvdata->base + (reg << plat->shift);
+-}
+-
+-static u32 txx9ndfmc_read(struct platform_device *dev, unsigned int reg)
+-{
+-	return __raw_readl(ndregaddr(dev, reg));
+-}
+-
+-static void txx9ndfmc_write(struct platform_device *dev,
+-			    u32 val, unsigned int reg)
+-{
+-	__raw_writel(val, ndregaddr(dev, reg));
+-}
+-
+-static uint8_t txx9ndfmc_read_byte(struct nand_chip *chip)
+-{
+-	struct platform_device *dev = mtd_to_platdev(nand_to_mtd(chip));
+-
+-	return txx9ndfmc_read(dev, TXX9_NDFDTR);
+-}
+-
+-static void txx9ndfmc_write_buf(struct nand_chip *chip, const uint8_t *buf,
+-				int len)
+-{
+-	struct platform_device *dev = mtd_to_platdev(nand_to_mtd(chip));
+-	void __iomem *ndfdtr = ndregaddr(dev, TXX9_NDFDTR);
+-	u32 mcr = txx9ndfmc_read(dev, TXX9_NDFMCR);
+-
+-	txx9ndfmc_write(dev, mcr | TXX9_NDFMCR_WE, TXX9_NDFMCR);
+-	while (len--)
+-		__raw_writel(*buf++, ndfdtr);
+-	txx9ndfmc_write(dev, mcr, TXX9_NDFMCR);
+-}
+-
+-static void txx9ndfmc_read_buf(struct nand_chip *chip, uint8_t *buf, int len)
+-{
+-	struct platform_device *dev = mtd_to_platdev(nand_to_mtd(chip));
+-	void __iomem *ndfdtr = ndregaddr(dev, TXX9_NDFDTR);
+-
+-	while (len--)
+-		*buf++ = __raw_readl(ndfdtr);
+-}
+-
+-static void txx9ndfmc_cmd_ctrl(struct nand_chip *chip, int cmd,
+-			       unsigned int ctrl)
+-{
+-	struct txx9ndfmc_priv *txx9_priv = nand_get_controller_data(chip);
+-	struct platform_device *dev = txx9_priv->dev;
+-	struct txx9ndfmc_platform_data *plat = dev_get_platdata(&dev->dev);
+-
+-	if (ctrl & NAND_CTRL_CHANGE) {
+-		u32 mcr = txx9ndfmc_read(dev, TXX9_NDFMCR);
+-
+-		mcr &= ~(TXX9_NDFMCR_CLE | TXX9_NDFMCR_ALE | TXX9_NDFMCR_CE);
+-		mcr |= ctrl & NAND_CLE ? TXX9_NDFMCR_CLE : 0;
+-		mcr |= ctrl & NAND_ALE ? TXX9_NDFMCR_ALE : 0;
+-		/* TXX9_NDFMCR_CE bit is 0:high 1:low */
+-		mcr |= ctrl & NAND_NCE ? TXX9_NDFMCR_CE : 0;
+-		if (txx9_priv->cs >= 0 && (ctrl & NAND_NCE)) {
+-			mcr &= ~TXX9_NDFMCR_CS_MASK;
+-			mcr |= TXX9_NDFMCR_CS(txx9_priv->cs);
+-		}
+-		txx9ndfmc_write(dev, mcr, TXX9_NDFMCR);
+-	}
+-	if (cmd != NAND_CMD_NONE)
+-		txx9ndfmc_write(dev, cmd & 0xff, TXX9_NDFDTR);
+-	if (plat->flags & NDFMC_PLAT_FLAG_DUMMYWRITE) {
+-		/* dummy write to update external latch */
+-		if ((ctrl & NAND_CTRL_CHANGE) && cmd == NAND_CMD_NONE)
+-			txx9ndfmc_write(dev, 0, TXX9_NDFDTR);
+-	}
+-}
+-
+-static int txx9ndfmc_dev_ready(struct nand_chip *chip)
+-{
+-	struct platform_device *dev = mtd_to_platdev(nand_to_mtd(chip));
+-
+-	return !(txx9ndfmc_read(dev, TXX9_NDFSR) & TXX9_NDFSR_BUSY);
+-}
+-
+-static int txx9ndfmc_calculate_ecc(struct nand_chip *chip, const uint8_t *dat,
+-				   uint8_t *ecc_code)
+-{
+-	struct platform_device *dev = mtd_to_platdev(nand_to_mtd(chip));
+-	int eccbytes;
+-	u32 mcr = txx9ndfmc_read(dev, TXX9_NDFMCR);
+-
+-	mcr &= ~TXX9_NDFMCR_ECC_ALL;
+-	txx9ndfmc_write(dev, mcr | TXX9_NDFMCR_ECC_OFF, TXX9_NDFMCR);
+-	txx9ndfmc_write(dev, mcr | TXX9_NDFMCR_ECC_READ, TXX9_NDFMCR);
+-	for (eccbytes = chip->ecc.bytes; eccbytes > 0; eccbytes -= 3) {
+-		ecc_code[1] = txx9ndfmc_read(dev, TXX9_NDFDTR);
+-		ecc_code[0] = txx9ndfmc_read(dev, TXX9_NDFDTR);
+-		ecc_code[2] = txx9ndfmc_read(dev, TXX9_NDFDTR);
+-		ecc_code += 3;
+-	}
+-	txx9ndfmc_write(dev, mcr | TXX9_NDFMCR_ECC_OFF, TXX9_NDFMCR);
+-	return 0;
+-}
+-
+-static int txx9ndfmc_correct_data(struct nand_chip *chip, unsigned char *buf,
+-				  unsigned char *read_ecc,
+-				  unsigned char *calc_ecc)
+-{
+-	int eccsize;
+-	int corrected = 0;
+-	int stat;
+-
+-	for (eccsize = chip->ecc.size; eccsize > 0; eccsize -= 256) {
+-		stat = rawnand_sw_hamming_correct(chip, buf, read_ecc,
+-						  calc_ecc);
+-		if (stat < 0)
+-			return stat;
+-		corrected += stat;
+-		buf += 256;
+-		read_ecc += 3;
+-		calc_ecc += 3;
+-	}
+-	return corrected;
+-}
+-
+-static void txx9ndfmc_enable_hwecc(struct nand_chip *chip, int mode)
+-{
+-	struct platform_device *dev = mtd_to_platdev(nand_to_mtd(chip));
+-	u32 mcr = txx9ndfmc_read(dev, TXX9_NDFMCR);
+-
+-	mcr &= ~TXX9_NDFMCR_ECC_ALL;
+-	txx9ndfmc_write(dev, mcr | TXX9_NDFMCR_ECC_RESET, TXX9_NDFMCR);
+-	txx9ndfmc_write(dev, mcr | TXX9_NDFMCR_ECC_OFF, TXX9_NDFMCR);
+-	txx9ndfmc_write(dev, mcr | TXX9_NDFMCR_ECC_ON, TXX9_NDFMCR);
+-}
+-
+-static void txx9ndfmc_initialize(struct platform_device *dev)
+-{
+-	struct txx9ndfmc_platform_data *plat = dev_get_platdata(&dev->dev);
+-	struct txx9ndfmc_drvdata *drvdata = platform_get_drvdata(dev);
+-	int tmout = 100;
+-
+-	if (plat->flags & NDFMC_PLAT_FLAG_NO_RSTR)
+-		; /* no NDFRSTR.  Write to NDFSPR resets the NDFMC. */
+-	else {
+-		/* reset NDFMC */
+-		txx9ndfmc_write(dev,
+-				txx9ndfmc_read(dev, TXX9_NDFRSTR) |
+-				TXX9_NDFRSTR_RST,
+-				TXX9_NDFRSTR);
+-		while (txx9ndfmc_read(dev, TXX9_NDFRSTR) & TXX9_NDFRSTR_RST) {
+-			if (--tmout == 0) {
+-				dev_err(&dev->dev, "reset failed.\n");
+-				break;
+-			}
+-			udelay(1);
+-		}
+-	}
+-	/* setup Hold Time, Strobe Pulse Width */
+-	txx9ndfmc_write(dev, (drvdata->hold << 4) | drvdata->spw, TXX9_NDFSPR);
+-	txx9ndfmc_write(dev,
+-			(plat->flags & NDFMC_PLAT_FLAG_USE_BSPRT) ?
+-			TXX9_NDFMCR_BSPRT : 0, TXX9_NDFMCR);
+-}
+-
+-#define TXX9NDFMC_NS_TO_CYC(gbusclk, ns) \
+-	DIV_ROUND_UP((ns) * DIV_ROUND_UP(gbusclk, 1000), 1000000)
+-
+-static int txx9ndfmc_attach_chip(struct nand_chip *chip)
+-{
+-	struct mtd_info *mtd = nand_to_mtd(chip);
+-
+-	if (chip->ecc.engine_type != NAND_ECC_ENGINE_TYPE_ON_HOST)
+-		return 0;
+-
+-	chip->ecc.strength = 1;
+-
+-	if (mtd->writesize >= 512) {
+-		chip->ecc.size = 512;
+-		chip->ecc.bytes = 6;
+-	} else {
+-		chip->ecc.size = 256;
+-		chip->ecc.bytes = 3;
+-	}
+-
+-	chip->ecc.calculate = txx9ndfmc_calculate_ecc;
+-	chip->ecc.correct = txx9ndfmc_correct_data;
+-	chip->ecc.hwctl = txx9ndfmc_enable_hwecc;
+-
+-	return 0;
+-}
+-
+-static const struct nand_controller_ops txx9ndfmc_controller_ops = {
+-	.attach_chip = txx9ndfmc_attach_chip,
+-};
+-
+-static int __init txx9ndfmc_probe(struct platform_device *dev)
+-{
+-	struct txx9ndfmc_platform_data *plat = dev_get_platdata(&dev->dev);
+-	int hold, spw;
+-	int i;
+-	struct txx9ndfmc_drvdata *drvdata;
+-	unsigned long gbusclk = plat->gbus_clock;
+-	struct resource *res;
+-
+-	drvdata = devm_kzalloc(&dev->dev, sizeof(*drvdata), GFP_KERNEL);
+-	if (!drvdata)
+-		return -ENOMEM;
+-	res = platform_get_resource(dev, IORESOURCE_MEM, 0);
+-	drvdata->base = devm_ioremap_resource(&dev->dev, res);
+-	if (IS_ERR(drvdata->base))
+-		return PTR_ERR(drvdata->base);
+-
+-	hold = plat->hold ?: 20; /* tDH */
+-	spw = plat->spw ?: 90; /* max(tREADID, tWP, tRP) */
+-
+-	hold = TXX9NDFMC_NS_TO_CYC(gbusclk, hold);
+-	spw = TXX9NDFMC_NS_TO_CYC(gbusclk, spw);
+-	if (plat->flags & NDFMC_PLAT_FLAG_HOLDADD)
+-		hold -= 2;	/* actual hold time : (HOLD + 2) BUSCLK */
+-	spw -= 1;	/* actual wait time : (SPW + 1) BUSCLK */
+-	hold = clamp(hold, 1, 15);
+-	drvdata->hold = hold;
+-	spw = clamp(spw, 1, 15);
+-	drvdata->spw = spw;
+-	dev_info(&dev->dev, "CLK:%ldMHz HOLD:%d SPW:%d\n",
+-		 (gbusclk + 500000) / 1000000, hold, spw);
+-
+-	nand_controller_init(&drvdata->controller);
+-	drvdata->controller.ops = &txx9ndfmc_controller_ops;
+-
+-	platform_set_drvdata(dev, drvdata);
+-	txx9ndfmc_initialize(dev);
+-
+-	for (i = 0; i < MAX_TXX9NDFMC_DEV; i++) {
+-		struct txx9ndfmc_priv *txx9_priv;
+-		struct nand_chip *chip;
+-		struct mtd_info *mtd;
+-
+-		if (!(plat->ch_mask & (1 << i)))
+-			continue;
+-		txx9_priv = kzalloc(sizeof(struct txx9ndfmc_priv),
+-				    GFP_KERNEL);
+-		if (!txx9_priv)
+-			continue;
+-		chip = &txx9_priv->chip;
+-		mtd = nand_to_mtd(chip);
+-		mtd->dev.parent = &dev->dev;
+-
+-		chip->legacy.read_byte = txx9ndfmc_read_byte;
+-		chip->legacy.read_buf = txx9ndfmc_read_buf;
+-		chip->legacy.write_buf = txx9ndfmc_write_buf;
+-		chip->legacy.cmd_ctrl = txx9ndfmc_cmd_ctrl;
+-		chip->legacy.dev_ready = txx9ndfmc_dev_ready;
+-		chip->legacy.chip_delay = 100;
+-		chip->controller = &drvdata->controller;
+-
+-		nand_set_controller_data(chip, txx9_priv);
+-		txx9_priv->dev = dev;
+-
+-		if (plat->ch_mask != 1) {
+-			txx9_priv->cs = i;
+-			txx9_priv->mtdname = kasprintf(GFP_KERNEL, "%s.%u",
+-						       dev_name(&dev->dev), i);
+-		} else {
+-			txx9_priv->cs = -1;
+-			txx9_priv->mtdname = kstrdup(dev_name(&dev->dev),
+-						     GFP_KERNEL);
+-		}
+-		if (!txx9_priv->mtdname) {
+-			kfree(txx9_priv);
+-			dev_err(&dev->dev, "Unable to allocate MTD name.\n");
+-			continue;
+-		}
+-		if (plat->wide_mask & (1 << i))
+-			chip->options |= NAND_BUSWIDTH_16;
+-
+-		if (nand_scan(chip, 1)) {
+-			kfree(txx9_priv->mtdname);
+-			kfree(txx9_priv);
+-			continue;
+-		}
+-		mtd->name = txx9_priv->mtdname;
+-
+-		mtd_device_register(mtd, NULL, 0);
+-		drvdata->mtds[i] = mtd;
+-	}
+-
+-	return 0;
+-}
+-
+-static int __exit txx9ndfmc_remove(struct platform_device *dev)
+-{
+-	struct txx9ndfmc_drvdata *drvdata = platform_get_drvdata(dev);
+-	int ret, i;
+-
+-	if (!drvdata)
+-		return 0;
+-	for (i = 0; i < MAX_TXX9NDFMC_DEV; i++) {
+-		struct mtd_info *mtd = drvdata->mtds[i];
+-		struct nand_chip *chip;
+-		struct txx9ndfmc_priv *txx9_priv;
+-
+-		if (!mtd)
+-			continue;
+-		chip = mtd_to_nand(mtd);
+-		txx9_priv = nand_get_controller_data(chip);
+-
+-		ret = mtd_device_unregister(nand_to_mtd(chip));
+-		WARN_ON(ret);
+-		nand_cleanup(chip);
+-		kfree(txx9_priv->mtdname);
+-		kfree(txx9_priv);
+-	}
+-	return 0;
+-}
+-
+-#ifdef CONFIG_PM
+-static int txx9ndfmc_resume(struct platform_device *dev)
+-{
+-	if (platform_get_drvdata(dev))
+-		txx9ndfmc_initialize(dev);
+-	return 0;
+-}
+-#else
+-#define txx9ndfmc_resume NULL
+-#endif
+-
+-static struct platform_driver txx9ndfmc_driver = {
+-	.remove		= __exit_p(txx9ndfmc_remove),
+-	.resume		= txx9ndfmc_resume,
+-	.driver		= {
+-		.name	= "txx9ndfmc",
+-	},
+-};
+-
+-module_platform_driver_probe(txx9ndfmc_driver, txx9ndfmc_probe);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("TXx9 SoC NAND flash controller driver");
+-MODULE_ALIAS("platform:txx9ndfmc");
+diff --git a/include/linux/platform_data/txx9/ndfmc.h b/include/linux/platform_data/txx9/ndfmc.h
+deleted file mode 100644
+index 7aaa4cd34d31..000000000000
+--- a/include/linux/platform_data/txx9/ndfmc.h
++++ /dev/null
+@@ -1,28 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-only */
+-/*
+- *
+- * (C) Copyright TOSHIBA CORPORATION 2007
+- */
+-#ifndef __TXX9_NDFMC_H
+-#define __TXX9_NDFMC_H
+-
+-#define NDFMC_PLAT_FLAG_USE_BSPRT	0x01
+-#define NDFMC_PLAT_FLAG_NO_RSTR		0x02
+-#define NDFMC_PLAT_FLAG_HOLDADD		0x04
+-#define NDFMC_PLAT_FLAG_DUMMYWRITE	0x08
+-
+-struct txx9ndfmc_platform_data {
+-	unsigned int shift;
+-	unsigned int gbus_clock;
+-	unsigned int hold;		/* hold time in nanosecond */
+-	unsigned int spw;		/* strobe pulse width in nanosecond */
+-	unsigned int flags;
+-	unsigned char ch_mask;		/* available channel bitmask */
+-	unsigned char wp_mask;		/* write-protect bitmask */
+-	unsigned char wide_mask;	/* 16bit-nand bitmask */
+-};
+-
+-void txx9_ndfmc_init(unsigned long baseaddr,
+-		     const struct txx9ndfmc_platform_data *plat_data);
+-
+-#endif /* __TXX9_NDFMC_H */
 -- 
 2.29.2
 
