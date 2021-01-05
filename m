@@ -7,31 +7,31 @@ X-Spam-Status: No, score=-19.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9289C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 16:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CE70C433DB
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 16:50:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9AA2022CBB
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 16:50:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EFD522CBE
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 16:50:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729629AbhAEQuW (ORCPT
+        id S1729936AbhAEQu2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Jan 2021 11:50:22 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44088 "EHLO mail.kernel.org"
+        Tue, 5 Jan 2021 11:50:28 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44034 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728776AbhAEQuS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Jan 2021 11:50:18 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BAEA522D08;
-        Tue,  5 Jan 2021 16:49:11 +0000 (UTC)
+        id S1729926AbhAEQu1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 5 Jan 2021 11:50:27 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3557F22D2C;
+        Tue,  5 Jan 2021 16:49:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1609865353;
-        bh=bMIOMOLbDLnSPoXGYkxPU0GuUV2bDg29aS76ANaEsXU=;
+        s=k20201202; t=1609865362;
+        bh=d9yUay/I+ZaBbGW12kziR2wKibLTa9hRopGJV4pm2mg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Ni6innpIrxZfvLSh26MHxDXrOO6Ub32iqL6rw5Q8PEKcSbGO4OiNvve1ZzS4+J46C
-         8Np0zFb1ZrPT/TaTwOmssUxY/Gkxd3VrY104R6+ZBWhSpGSJi0BW4ax/s6jOfdsOMW
-         c9lZa7PVfgHUobRwXRvLseN4DepvFq0YrEP786wDZqDVwUM6c+Qzos3HTUdI8Yo45E
-         1SC3YykZM/jVHpwJmbjyr0LGc82OxLYartSX7YlqmMBWESvH72UMl5kpQ6b/QNidv0
-         pj26pXA6259js9AEFbeMePWir9OYd007jMRw+FKgkwrJGcFLKDKR0AH/SL2wjTKRVd
-         vJ1lqpkTJNIrQ==
+        b=b57+J0aOAGj1zZiBNn5foo+c0qp5hgGx8H2fGHlCGDkisKG1D1lG7h0kmf7N7dMB5
+         Y+QDPvBaYKYyKA2c2Jw19DlmmunZ2Caq0ncXKKH74Z0W08TAnwDGxNqZiUvB9xhp5t
+         2v1KRWOr9jewAtEOGyRW+ddqKbga7DIWtcQgdBcKUIFzUJk4oJgzyGKrOzqRSJZu4E
+         5eQh1fbS6SDu1JosKPd+C5mzhbOXlgOiQYS68201ATTQ2YzWeG+uQlIaHg9c2dFtNS
+         YpZl9HMabQAGu+ORLeIwTMLbHqCAIKAnlZohGo4PbZ8gKB1nghfRPxbyNb/IkKL5pR
+         Rcr5slSocUBbw==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ardb@kernel.org>, Megha Dey <megha.dey@intel.com>,
@@ -39,9 +39,9 @@ Cc:     Ard Biesheuvel <ardb@kernel.org>, Megha Dey <megha.dey@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Milan Broz <gmazyland@gmail.com>,
         Mike Snitzer <snitzer@redhat.com>
-Subject: [PATCH v2 13/21] crypto: x86/blowfish - drop CTR mode implementation
-Date:   Tue,  5 Jan 2021 17:48:01 +0100
-Message-Id: <20210105164809.8594-14-ardb@kernel.org>
+Subject: [PATCH v2 18/21] crypto: x86/cast6 - drop dependency on glue helper
+Date:   Tue,  5 Jan 2021 17:48:06 +0100
+Message-Id: <20210105164809.8594-19-ardb@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210105164809.8594-1-ardb@kernel.org>
 References: <20210105164809.8594-1-ardb@kernel.org>
@@ -49,160 +49,121 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Blowfish in counter mode is never used in the kernel, so there
-is no point in keeping an accelerated implementation around.
+Replace the glue helper dependency with implementations of ECB and CBC
+based on the new CPP macros, which avoid the need for indirect calls.
 
 Acked-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/x86/crypto/blowfish_glue.c | 107 --------------------
- crypto/Kconfig                  |   1 +
- 2 files changed, 1 insertion(+), 107 deletions(-)
+ arch/x86/crypto/cast6_avx_glue.c | 61 ++++++--------------
+ crypto/Kconfig                   |  1 -
+ 2 files changed, 17 insertions(+), 45 deletions(-)
 
-diff --git a/arch/x86/crypto/blowfish_glue.c b/arch/x86/crypto/blowfish_glue.c
-index cedfdba69ce3..a880e0b1c255 100644
---- a/arch/x86/crypto/blowfish_glue.c
-+++ b/arch/x86/crypto/blowfish_glue.c
-@@ -6,8 +6,6 @@
-  *
-  * CBC & ECB parts based on code (crypto/cbc.c,ecb.c) by:
-  *   Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
-- * CTR part based on code (crypto/ctr.c) by:
-- *   (C) Copyright IBM Corp. 2007 - Joy Latten <latten@us.ibm.com>
-  */
- 
+diff --git a/arch/x86/crypto/cast6_avx_glue.c b/arch/x86/crypto/cast6_avx_glue.c
+index 790efcb6df3b..7e2aea372349 100644
+--- a/arch/x86/crypto/cast6_avx_glue.c
++++ b/arch/x86/crypto/cast6_avx_glue.c
+@@ -15,7 +15,8 @@
  #include <crypto/algapi.h>
-@@ -247,97 +245,6 @@ static int cbc_decrypt(struct skcipher_request *req)
- 	return err;
+ #include <crypto/cast6.h>
+ #include <crypto/internal/simd.h>
+-#include <asm/crypto/glue_helper.h>
++
++#include "ecb_cbc_helpers.h"
+ 
+ #define CAST6_PARALLEL_BLOCKS 8
+ 
+@@ -30,63 +31,35 @@ static int cast6_setkey_skcipher(struct crypto_skcipher *tfm,
+ 	return cast6_setkey(&tfm->base, key, keylen);
  }
  
--static void ctr_crypt_final(struct bf_ctx *ctx, struct skcipher_walk *walk)
--{
--	u8 *ctrblk = walk->iv;
--	u8 keystream[BF_BLOCK_SIZE];
--	u8 *src = walk->src.virt.addr;
--	u8 *dst = walk->dst.virt.addr;
--	unsigned int nbytes = walk->nbytes;
+-static const struct common_glue_ctx cast6_enc = {
+-	.num_funcs = 2,
+-	.fpu_blocks_limit = CAST6_PARALLEL_BLOCKS,
 -
--	blowfish_enc_blk(ctx, keystream, ctrblk);
--	crypto_xor_cpy(dst, keystream, src, nbytes);
--
--	crypto_inc(ctrblk, BF_BLOCK_SIZE);
--}
--
--static unsigned int __ctr_crypt(struct bf_ctx *ctx, struct skcipher_walk *walk)
--{
--	unsigned int bsize = BF_BLOCK_SIZE;
--	unsigned int nbytes = walk->nbytes;
--	u64 *src = (u64 *)walk->src.virt.addr;
--	u64 *dst = (u64 *)walk->dst.virt.addr;
--	u64 ctrblk = be64_to_cpu(*(__be64 *)walk->iv);
--	__be64 ctrblocks[4];
--
--	/* Process four block batch */
--	if (nbytes >= bsize * 4) {
--		do {
--			if (dst != src) {
--				dst[0] = src[0];
--				dst[1] = src[1];
--				dst[2] = src[2];
--				dst[3] = src[3];
--			}
--
--			/* create ctrblks for parallel encrypt */
--			ctrblocks[0] = cpu_to_be64(ctrblk++);
--			ctrblocks[1] = cpu_to_be64(ctrblk++);
--			ctrblocks[2] = cpu_to_be64(ctrblk++);
--			ctrblocks[3] = cpu_to_be64(ctrblk++);
--
--			blowfish_enc_blk_xor_4way(ctx, (u8 *)dst,
--						  (u8 *)ctrblocks);
--
--			src += 4;
--			dst += 4;
--		} while ((nbytes -= bsize * 4) >= bsize * 4);
--
--		if (nbytes < bsize)
--			goto done;
--	}
--
--	/* Handle leftovers */
--	do {
--		if (dst != src)
--			*dst = *src;
--
--		ctrblocks[0] = cpu_to_be64(ctrblk++);
--
--		blowfish_enc_blk_xor(ctx, (u8 *)dst, (u8 *)ctrblocks);
--
--		src += 1;
--		dst += 1;
--	} while ((nbytes -= bsize) >= bsize);
--
--done:
--	*(__be64 *)walk->iv = cpu_to_be64(ctrblk);
--	return nbytes;
--}
--
--static int ctr_crypt(struct skcipher_request *req)
--{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct bf_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct skcipher_walk walk;
--	unsigned int nbytes;
--	int err;
--
--	err = skcipher_walk_virt(&walk, req, false);
--
--	while ((nbytes = walk.nbytes) >= BF_BLOCK_SIZE) {
--		nbytes = __ctr_crypt(ctx, &walk);
--		err = skcipher_walk_done(&walk, nbytes);
--	}
--
--	if (nbytes) {
--		ctr_crypt_final(ctx, &walk);
--		err = skcipher_walk_done(&walk, 0);
--	}
--
--	return err;
--}
--
- static struct crypto_alg bf_cipher_alg = {
- 	.cra_name		= "blowfish",
- 	.cra_driver_name	= "blowfish-asm",
-@@ -384,20 +291,6 @@ static struct skcipher_alg bf_skcipher_algs[] = {
- 		.setkey			= blowfish_setkey_skcipher,
- 		.encrypt		= cbc_encrypt,
- 		.decrypt		= cbc_decrypt,
+-	.funcs = { {
+-		.num_blocks = CAST6_PARALLEL_BLOCKS,
+-		.fn_u = { .ecb = cast6_ecb_enc_8way }
 -	}, {
--		.base.cra_name		= "ctr(blowfish)",
--		.base.cra_driver_name	= "ctr-blowfish-asm",
--		.base.cra_priority	= 300,
--		.base.cra_blocksize	= 1,
--		.base.cra_ctxsize	= sizeof(struct bf_ctx),
--		.base.cra_module	= THIS_MODULE,
--		.min_keysize		= BF_MIN_KEY_SIZE,
--		.max_keysize		= BF_MAX_KEY_SIZE,
--		.ivsize			= BF_BLOCK_SIZE,
--		.chunksize		= BF_BLOCK_SIZE,
--		.setkey			= blowfish_setkey_skcipher,
--		.encrypt		= ctr_crypt,
--		.decrypt		= ctr_crypt,
- 	},
- };
+-		.num_blocks = 1,
+-		.fn_u = { .ecb = __cast6_encrypt }
+-	} }
+-};
+-
+-static const struct common_glue_ctx cast6_dec = {
+-	.num_funcs = 2,
+-	.fpu_blocks_limit = CAST6_PARALLEL_BLOCKS,
+-
+-	.funcs = { {
+-		.num_blocks = CAST6_PARALLEL_BLOCKS,
+-		.fn_u = { .ecb = cast6_ecb_dec_8way }
+-	}, {
+-		.num_blocks = 1,
+-		.fn_u = { .ecb = __cast6_decrypt }
+-	} }
+-};
+-
+-static const struct common_glue_ctx cast6_dec_cbc = {
+-	.num_funcs = 2,
+-	.fpu_blocks_limit = CAST6_PARALLEL_BLOCKS,
+-
+-	.funcs = { {
+-		.num_blocks = CAST6_PARALLEL_BLOCKS,
+-		.fn_u = { .cbc = cast6_cbc_dec_8way }
+-	}, {
+-		.num_blocks = 1,
+-		.fn_u = { .cbc = __cast6_decrypt }
+-	} }
+-};
+-
+ static int ecb_encrypt(struct skcipher_request *req)
+ {
+-	return glue_ecb_req_128bit(&cast6_enc, req);
++	ECB_WALK_START(req, CAST6_BLOCK_SIZE, CAST6_PARALLEL_BLOCKS);
++	ECB_BLOCK(CAST6_PARALLEL_BLOCKS, cast6_ecb_enc_8way);
++	ECB_BLOCK(1, __cast6_encrypt);
++	ECB_WALK_END();
+ }
  
+ static int ecb_decrypt(struct skcipher_request *req)
+ {
+-	return glue_ecb_req_128bit(&cast6_dec, req);
++	ECB_WALK_START(req, CAST6_BLOCK_SIZE, CAST6_PARALLEL_BLOCKS);
++	ECB_BLOCK(CAST6_PARALLEL_BLOCKS, cast6_ecb_dec_8way);
++	ECB_BLOCK(1, __cast6_decrypt);
++	ECB_WALK_END();
+ }
+ 
+ static int cbc_encrypt(struct skcipher_request *req)
+ {
+-	return glue_cbc_encrypt_req_128bit(__cast6_encrypt, req);
++	CBC_WALK_START(req, CAST6_BLOCK_SIZE, -1);
++	CBC_ENC_BLOCK(__cast6_encrypt);
++	CBC_WALK_END();
+ }
+ 
+ static int cbc_decrypt(struct skcipher_request *req)
+ {
+-	return glue_cbc_decrypt_req_128bit(&cast6_dec_cbc, req);
++	CBC_WALK_START(req, CAST6_BLOCK_SIZE, CAST6_PARALLEL_BLOCKS);
++	CBC_DEC_BLOCK(CAST6_PARALLEL_BLOCKS, cast6_cbc_dec_8way);
++	CBC_DEC_BLOCK(1, __cast6_decrypt);
++	CBC_WALK_END();
+ }
+ 
+ static struct skcipher_alg cast6_algs[] = {
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 5e820a57d138..24c0e001d06d 100644
+index 29dce7efc443..25101558acb5 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -1255,6 +1255,7 @@ config CRYPTO_BLOWFISH_X86_64
- 	depends on X86 && 64BIT
+@@ -1393,7 +1393,6 @@ config CRYPTO_CAST6_AVX_X86_64
  	select CRYPTO_SKCIPHER
- 	select CRYPTO_BLOWFISH_COMMON
-+	imply CRYPTO_CTR
- 	help
- 	  Blowfish cipher algorithm (x86_64), by Bruce Schneier.
- 
+ 	select CRYPTO_CAST6
+ 	select CRYPTO_CAST_COMMON
+-	select CRYPTO_GLUE_HELPER_X86
+ 	select CRYPTO_SIMD
+ 	imply CRYPTO_XTS
+ 	imply CRYPTO_CTR
 -- 
 2.17.1
 
