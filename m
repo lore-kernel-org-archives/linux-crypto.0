@@ -7,31 +7,31 @@ X-Spam-Status: No, score=-19.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FAF2C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 16:50:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D393CC433E9
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 16:50:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E0AF22CBB
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 16:50:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7E3922CBE
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jan 2021 16:50:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728418AbhAEQuL (ORCPT
+        id S1728657AbhAEQuN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Jan 2021 11:50:11 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44034 "EHLO mail.kernel.org"
+        Tue, 5 Jan 2021 11:50:13 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44044 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728499AbhAEQuL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Jan 2021 11:50:11 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BDA1922D00;
-        Tue,  5 Jan 2021 16:48:56 +0000 (UTC)
+        id S1728637AbhAEQuN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 5 Jan 2021 11:50:13 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5E0B522D03;
+        Tue,  5 Jan 2021 16:49:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1609865338;
-        bh=61mvMHq0AsNIhYbOTt+l55NM/1lXzwpdo+RutssceJQ=;
+        s=k20201202; t=1609865343;
+        bh=8FMH1cS81rBaYvbi5av1Um004QKITsAeeOkQmbr8LJw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=riC315/Ts7q7b3QafHSLwOrqE6yDxLjSRldP/lG7yt8OfOFYv7+wmPD+htQpYgonL
-         O6sON61awLnT6yKUCiq1vN5Ee9fynCLVmGyYx62y04+7APbuskXhVcec1vrF09an/2
-         3zIbl3Rxg9JB6Y2d9lsSygi4CSMXJ3PWQ+9ghCR5Y8yFGy6JszNtVAh9uRcs6qEIJJ
-         viK8wEbTa3NEP5EmJj/4bG/IWl50VqMO938eMruh28J1nqfn4QV9qJQCoJpKb1NYLc
-         Hl75acqLvQeIKnuJ7bh7RMLDEzL7h+S/ZdDSfFDsPmpDE3S19btPvkTBPYAZYogFhM
-         4rmEeoZnSyu4A==
+        b=sUqWKKJH1KrYftWbSVinPDPx6lWoVYIGmWiVIBWBNZ9maB5f31IDEro8/emJoZyry
+         3V8oplcglsX5mrHsdEmvow4rQSOFPKKAX/hWZvTbQcPoqr8sghx3VM0Mz4FGcblK1L
+         U/tfRn8cPMiWKelbblxjUEX9jfoGKKM5qPNFFIhSP+WK7XQvYGjTWdqju5mH9o8Zc1
+         Wi18AmHqUklYN+z9/yfae3F6H2CGa9q+0F6IxGo+LevoF1zXW5I8QXzBdcQ/aqTQOJ
+         aaJC8NcySoox1DsySVAQcFVhhvCOEIQVTGxzOoEeTURyLYd1NrkGYS90HQGKCBYpNg
+         t+lgxkQPbLORQ==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ardb@kernel.org>, Megha Dey <megha.dey@intel.com>,
@@ -39,9 +39,9 @@ Cc:     Ard Biesheuvel <ardb@kernel.org>, Megha Dey <megha.dey@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Milan Broz <gmazyland@gmail.com>,
         Mike Snitzer <snitzer@redhat.com>
-Subject: [PATCH v2 05/21] crypto: x86/glue-helper - drop XTS helper routines
-Date:   Tue,  5 Jan 2021 17:47:53 +0100
-Message-Id: <20210105164809.8594-6-ardb@kernel.org>
+Subject: [PATCH v2 08/21] crypto: x86/cast5 - drop CTR mode implementation
+Date:   Tue,  5 Jan 2021 17:47:56 +0100
+Message-Id: <20210105164809.8594-9-ardb@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210105164809.8594-1-ardb@kernel.org>
 References: <20210105164809.8594-1-ardb@kernel.org>
@@ -49,377 +49,158 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The glue helper's XTS routines are no longer used, so drop them.
+CAST5 in CTR mode is never used by the kernel directly, and is highly
+unlikely to be relied upon by dm-crypt or algif_skcipher. So let's drop
+the accelerated CTR mode implementation, and instead, rely on the CTR
+template and the bare cipher.
 
 Acked-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/x86/crypto/glue_helper-asm-avx.S     |  59 --------
- arch/x86/crypto/glue_helper-asm-avx2.S    |  78 ----------
- arch/x86/crypto/glue_helper.c             | 154 --------------------
- arch/x86/include/asm/crypto/glue_helper.h |  12 --
- 4 files changed, 303 deletions(-)
+ arch/x86/crypto/cast5_avx_glue.c | 103 --------------------
+ crypto/Kconfig                   |   1 +
+ 2 files changed, 1 insertion(+), 103 deletions(-)
 
-diff --git a/arch/x86/crypto/glue_helper-asm-avx.S b/arch/x86/crypto/glue_helper-asm-avx.S
-index d08fc575ef7f..a94511432803 100644
---- a/arch/x86/crypto/glue_helper-asm-avx.S
-+++ b/arch/x86/crypto/glue_helper-asm-avx.S
-@@ -79,62 +79,3 @@
- 	vpxor (6*16)(src), x6, x6; \
- 	vpxor (7*16)(src), x7, x7; \
- 	store_8way(dst, x0, x1, x2, x3, x4, x5, x6, x7);
--
--#define gf128mul_x_ble(iv, mask, tmp) \
--	vpsrad $31, iv, tmp; \
--	vpaddq iv, iv, iv; \
--	vpshufd $0x13, tmp, tmp; \
--	vpand mask, tmp, tmp; \
--	vpxor tmp, iv, iv;
--
--#define load_xts_8way(iv, src, dst, x0, x1, x2, x3, x4, x5, x6, x7, tiv, t0, \
--		      t1, xts_gf128mul_and_shl1_mask) \
--	vmovdqa xts_gf128mul_and_shl1_mask, t0; \
--	\
--	/* load IV */ \
--	vmovdqu (iv), tiv; \
--	vpxor (0*16)(src), tiv, x0; \
--	vmovdqu tiv, (0*16)(dst); \
--	\
--	/* construct and store IVs, also xor with source */ \
--	gf128mul_x_ble(tiv, t0, t1); \
--	vpxor (1*16)(src), tiv, x1; \
--	vmovdqu tiv, (1*16)(dst); \
--	\
--	gf128mul_x_ble(tiv, t0, t1); \
--	vpxor (2*16)(src), tiv, x2; \
--	vmovdqu tiv, (2*16)(dst); \
--	\
--	gf128mul_x_ble(tiv, t0, t1); \
--	vpxor (3*16)(src), tiv, x3; \
--	vmovdqu tiv, (3*16)(dst); \
--	\
--	gf128mul_x_ble(tiv, t0, t1); \
--	vpxor (4*16)(src), tiv, x4; \
--	vmovdqu tiv, (4*16)(dst); \
--	\
--	gf128mul_x_ble(tiv, t0, t1); \
--	vpxor (5*16)(src), tiv, x5; \
--	vmovdqu tiv, (5*16)(dst); \
--	\
--	gf128mul_x_ble(tiv, t0, t1); \
--	vpxor (6*16)(src), tiv, x6; \
--	vmovdqu tiv, (6*16)(dst); \
--	\
--	gf128mul_x_ble(tiv, t0, t1); \
--	vpxor (7*16)(src), tiv, x7; \
--	vmovdqu tiv, (7*16)(dst); \
--	\
--	gf128mul_x_ble(tiv, t0, t1); \
--	vmovdqu tiv, (iv);
--
--#define store_xts_8way(dst, x0, x1, x2, x3, x4, x5, x6, x7) \
--	vpxor (0*16)(dst), x0, x0; \
--	vpxor (1*16)(dst), x1, x1; \
--	vpxor (2*16)(dst), x2, x2; \
--	vpxor (3*16)(dst), x3, x3; \
--	vpxor (4*16)(dst), x4, x4; \
--	vpxor (5*16)(dst), x5, x5; \
--	vpxor (6*16)(dst), x6, x6; \
--	vpxor (7*16)(dst), x7, x7; \
--	store_8way(dst, x0, x1, x2, x3, x4, x5, x6, x7);
-diff --git a/arch/x86/crypto/glue_helper-asm-avx2.S b/arch/x86/crypto/glue_helper-asm-avx2.S
-index d84508c85c13..456bface1e5d 100644
---- a/arch/x86/crypto/glue_helper-asm-avx2.S
-+++ b/arch/x86/crypto/glue_helper-asm-avx2.S
-@@ -95,81 +95,3 @@
- 	vpxor (6*32)(src), x6, x6; \
- 	vpxor (7*32)(src), x7, x7; \
- 	store_16way(dst, x0, x1, x2, x3, x4, x5, x6, x7);
--
--#define gf128mul_x_ble(iv, mask, tmp) \
--	vpsrad $31, iv, tmp; \
--	vpaddq iv, iv, iv; \
--	vpshufd $0x13, tmp, tmp; \
--	vpand mask, tmp, tmp; \
--	vpxor tmp, iv, iv;
--
--#define gf128mul_x2_ble(iv, mask1, mask2, tmp0, tmp1) \
--	vpsrad $31, iv, tmp0; \
--	vpaddq iv, iv, tmp1; \
--	vpsllq $2, iv, iv; \
--	vpshufd $0x13, tmp0, tmp0; \
--	vpsrad $31, tmp1, tmp1; \
--	vpand mask2, tmp0, tmp0; \
--	vpshufd $0x13, tmp1, tmp1; \
--	vpxor tmp0, iv, iv; \
--	vpand mask1, tmp1, tmp1; \
--	vpxor tmp1, iv, iv;
--
--#define load_xts_16way(iv, src, dst, x0, x1, x2, x3, x4, x5, x6, x7, tiv, \
--		       tivx, t0, t0x, t1, t1x, t2, t2x, t3, \
--		       xts_gf128mul_and_shl1_mask_0, \
--		       xts_gf128mul_and_shl1_mask_1) \
--	vbroadcasti128 xts_gf128mul_and_shl1_mask_0, t1; \
--	\
--	/* load IV and construct second IV */ \
--	vmovdqu (iv), tivx; \
--	vmovdqa tivx, t0x; \
--	gf128mul_x_ble(tivx, t1x, t2x); \
--	vbroadcasti128 xts_gf128mul_and_shl1_mask_1, t2; \
--	vinserti128 $1, tivx, t0, tiv; \
--	vpxor (0*32)(src), tiv, x0; \
--	vmovdqu tiv, (0*32)(dst); \
--	\
--	/* construct and store IVs, also xor with source */ \
--	gf128mul_x2_ble(tiv, t1, t2, t0, t3); \
--	vpxor (1*32)(src), tiv, x1; \
--	vmovdqu tiv, (1*32)(dst); \
--	\
--	gf128mul_x2_ble(tiv, t1, t2, t0, t3); \
--	vpxor (2*32)(src), tiv, x2; \
--	vmovdqu tiv, (2*32)(dst); \
--	\
--	gf128mul_x2_ble(tiv, t1, t2, t0, t3); \
--	vpxor (3*32)(src), tiv, x3; \
--	vmovdqu tiv, (3*32)(dst); \
--	\
--	gf128mul_x2_ble(tiv, t1, t2, t0, t3); \
--	vpxor (4*32)(src), tiv, x4; \
--	vmovdqu tiv, (4*32)(dst); \
--	\
--	gf128mul_x2_ble(tiv, t1, t2, t0, t3); \
--	vpxor (5*32)(src), tiv, x5; \
--	vmovdqu tiv, (5*32)(dst); \
--	\
--	gf128mul_x2_ble(tiv, t1, t2, t0, t3); \
--	vpxor (6*32)(src), tiv, x6; \
--	vmovdqu tiv, (6*32)(dst); \
--	\
--	gf128mul_x2_ble(tiv, t1, t2, t0, t3); \
--	vpxor (7*32)(src), tiv, x7; \
--	vmovdqu tiv, (7*32)(dst); \
--	\
--	vextracti128 $1, tiv, tivx; \
--	gf128mul_x_ble(tivx, t1x, t2x); \
--	vmovdqu tivx, (iv);
--
--#define store_xts_16way(dst, x0, x1, x2, x3, x4, x5, x6, x7) \
--	vpxor (0*32)(dst), x0, x0; \
--	vpxor (1*32)(dst), x1, x1; \
--	vpxor (2*32)(dst), x2, x2; \
--	vpxor (3*32)(dst), x3, x3; \
--	vpxor (4*32)(dst), x4, x4; \
--	vpxor (5*32)(dst), x5, x5; \
--	vpxor (6*32)(dst), x6, x6; \
--	vpxor (7*32)(dst), x7, x7; \
--	store_16way(dst, x0, x1, x2, x3, x4, x5, x6, x7);
-diff --git a/arch/x86/crypto/glue_helper.c b/arch/x86/crypto/glue_helper.c
-index d3d91a0abf88..786ffda1caf4 100644
---- a/arch/x86/crypto/glue_helper.c
-+++ b/arch/x86/crypto/glue_helper.c
-@@ -12,10 +12,8 @@
+diff --git a/arch/x86/crypto/cast5_avx_glue.c b/arch/x86/crypto/cast5_avx_glue.c
+index 384ccb00f9e1..e0d1c7903b29 100644
+--- a/arch/x86/crypto/cast5_avx_glue.c
++++ b/arch/x86/crypto/cast5_avx_glue.c
+@@ -23,8 +23,6 @@ asmlinkage void cast5_ecb_dec_16way(struct cast5_ctx *ctx, u8 *dst,
+ 				    const u8 *src);
+ asmlinkage void cast5_cbc_dec_16way(struct cast5_ctx *ctx, u8 *dst,
+ 				    const u8 *src);
+-asmlinkage void cast5_ctr_16way(struct cast5_ctx *ctx, u8 *dst, const u8 *src,
+-				__be64 *iv);
  
- #include <linux/module.h>
- #include <crypto/b128ops.h>
--#include <crypto/gf128mul.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/scatterwalk.h>
--#include <crypto/xts.h>
- #include <asm/crypto/glue_helper.h>
- 
- int glue_ecb_req_128bit(const struct common_glue_ctx *gctx,
-@@ -226,156 +224,4 @@ int glue_ctr_req_128bit(const struct common_glue_ctx *gctx,
+ static int cast5_setkey_skcipher(struct crypto_skcipher *tfm, const u8 *key,
+ 				 unsigned int keylen)
+@@ -214,92 +212,6 @@ static int cbc_decrypt(struct skcipher_request *req)
+ 	return err;
  }
- EXPORT_SYMBOL_GPL(glue_ctr_req_128bit);
  
--static unsigned int __glue_xts_req_128bit(const struct common_glue_ctx *gctx,
--					  void *ctx,
--					  struct skcipher_walk *walk)
+-static void ctr_crypt_final(struct skcipher_walk *walk, struct cast5_ctx *ctx)
 -{
--	const unsigned int bsize = 128 / 8;
+-	u8 *ctrblk = walk->iv;
+-	u8 keystream[CAST5_BLOCK_SIZE];
+-	u8 *src = walk->src.virt.addr;
+-	u8 *dst = walk->dst.virt.addr;
 -	unsigned int nbytes = walk->nbytes;
--	u128 *src = walk->src.virt.addr;
--	u128 *dst = walk->dst.virt.addr;
--	unsigned int num_blocks, func_bytes;
--	unsigned int i;
+-
+-	__cast5_encrypt(ctx, keystream, ctrblk);
+-	crypto_xor_cpy(dst, keystream, src, nbytes);
+-
+-	crypto_inc(ctrblk, CAST5_BLOCK_SIZE);
+-}
+-
+-static unsigned int __ctr_crypt(struct skcipher_walk *walk,
+-				struct cast5_ctx *ctx)
+-{
+-	const unsigned int bsize = CAST5_BLOCK_SIZE;
+-	unsigned int nbytes = walk->nbytes;
+-	u64 *src = (u64 *)walk->src.virt.addr;
+-	u64 *dst = (u64 *)walk->dst.virt.addr;
 -
 -	/* Process multi-block batch */
--	for (i = 0; i < gctx->num_funcs; i++) {
--		num_blocks = gctx->funcs[i].num_blocks;
--		func_bytes = bsize * num_blocks;
+-	if (nbytes >= bsize * CAST5_PARALLEL_BLOCKS) {
+-		do {
+-			cast5_ctr_16way(ctx, (u8 *)dst, (u8 *)src,
+-					(__be64 *)walk->iv);
 -
--		if (nbytes >= func_bytes) {
--			do {
--				gctx->funcs[i].fn_u.xts(ctx, (u8 *)dst,
--							(const u8 *)src,
--							walk->iv);
+-			src += CAST5_PARALLEL_BLOCKS;
+-			dst += CAST5_PARALLEL_BLOCKS;
+-			nbytes -= bsize * CAST5_PARALLEL_BLOCKS;
+-		} while (nbytes >= bsize * CAST5_PARALLEL_BLOCKS);
 -
--				src += num_blocks;
--				dst += num_blocks;
--				nbytes -= func_bytes;
--			} while (nbytes >= func_bytes);
--
--			if (nbytes < bsize)
--				goto done;
--		}
+-		if (nbytes < bsize)
+-			goto done;
 -	}
+-
+-	/* Handle leftovers */
+-	do {
+-		u64 ctrblk;
+-
+-		if (dst != src)
+-			*dst = *src;
+-
+-		ctrblk = *(u64 *)walk->iv;
+-		be64_add_cpu((__be64 *)walk->iv, 1);
+-
+-		__cast5_encrypt(ctx, (u8 *)&ctrblk, (u8 *)&ctrblk);
+-		*dst ^= ctrblk;
+-
+-		src += 1;
+-		dst += 1;
+-		nbytes -= bsize;
+-	} while (nbytes >= bsize);
 -
 -done:
 -	return nbytes;
 -}
 -
--int glue_xts_req_128bit(const struct common_glue_ctx *gctx,
--			struct skcipher_request *req,
--			common_glue_func_t tweak_fn, void *tweak_ctx,
--			void *crypt_ctx, bool decrypt)
+-static int ctr_crypt(struct skcipher_request *req)
 -{
--	const bool cts = (req->cryptlen % XTS_BLOCK_SIZE);
--	const unsigned int bsize = 128 / 8;
--	struct skcipher_request subreq;
--	struct skcipher_walk walk;
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct cast5_ctx *ctx = crypto_skcipher_ctx(tfm);
 -	bool fpu_enabled = false;
--	unsigned int nbytes, tail;
+-	struct skcipher_walk walk;
+-	unsigned int nbytes;
 -	int err;
 -
--	if (req->cryptlen < XTS_BLOCK_SIZE)
--		return -EINVAL;
--
--	if (unlikely(cts)) {
--		struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--
--		tail = req->cryptlen % XTS_BLOCK_SIZE + XTS_BLOCK_SIZE;
--
--		skcipher_request_set_tfm(&subreq, tfm);
--		skcipher_request_set_callback(&subreq,
--					      crypto_skcipher_get_flags(tfm),
--					      NULL, NULL);
--		skcipher_request_set_crypt(&subreq, req->src, req->dst,
--					   req->cryptlen - tail, req->iv);
--		req = &subreq;
--	}
--
 -	err = skcipher_walk_virt(&walk, req, false);
--	nbytes = walk.nbytes;
--	if (err)
--		return err;
 -
--	/* set minimum length to bsize, for tweak_fn */
--	fpu_enabled = glue_fpu_begin(bsize, gctx->fpu_blocks_limit,
--				     &walk, fpu_enabled,
--				     nbytes < bsize ? bsize : nbytes);
--
--	/* calculate first value of T */
--	tweak_fn(tweak_ctx, walk.iv, walk.iv);
--
--	while (nbytes) {
--		nbytes = __glue_xts_req_128bit(gctx, crypt_ctx, &walk);
--
+-	while ((nbytes = walk.nbytes) >= CAST5_BLOCK_SIZE) {
+-		fpu_enabled = cast5_fpu_begin(fpu_enabled, &walk, nbytes);
+-		nbytes = __ctr_crypt(&walk, ctx);
 -		err = skcipher_walk_done(&walk, nbytes);
--		nbytes = walk.nbytes;
 -	}
 -
--	if (unlikely(cts)) {
--		u8 *next_tweak, *final_tweak = req->iv;
--		struct scatterlist *src, *dst;
--		struct scatterlist s[2], d[2];
--		le128 b[2];
+-	cast5_fpu_end(fpu_enabled);
 -
--		dst = src = scatterwalk_ffwd(s, req->src, req->cryptlen);
--		if (req->dst != req->src)
--			dst = scatterwalk_ffwd(d, req->dst, req->cryptlen);
--
--		if (decrypt) {
--			next_tweak = memcpy(b, req->iv, XTS_BLOCK_SIZE);
--			gf128mul_x_ble(b, b);
--		} else {
--			next_tweak = req->iv;
--		}
--
--		skcipher_request_set_crypt(&subreq, src, dst, XTS_BLOCK_SIZE,
--					   next_tweak);
--
--		err = skcipher_walk_virt(&walk, req, false) ?:
--		      skcipher_walk_done(&walk,
--				__glue_xts_req_128bit(gctx, crypt_ctx, &walk));
--		if (err)
--			goto out;
--
--		scatterwalk_map_and_copy(b, dst, 0, XTS_BLOCK_SIZE, 0);
--		memcpy(b + 1, b, tail - XTS_BLOCK_SIZE);
--		scatterwalk_map_and_copy(b, src, XTS_BLOCK_SIZE,
--					 tail - XTS_BLOCK_SIZE, 0);
--		scatterwalk_map_and_copy(b, dst, 0, tail, 1);
--
--		skcipher_request_set_crypt(&subreq, dst, dst, XTS_BLOCK_SIZE,
--					   final_tweak);
--
--		err = skcipher_walk_virt(&walk, req, false) ?:
--		      skcipher_walk_done(&walk,
--				__glue_xts_req_128bit(gctx, crypt_ctx, &walk));
+-	if (walk.nbytes) {
+-		ctr_crypt_final(&walk, ctx);
+-		err = skcipher_walk_done(&walk, 0);
 -	}
--
--out:
--	glue_fpu_end(fpu_enabled);
 -
 -	return err;
 -}
--EXPORT_SYMBOL_GPL(glue_xts_req_128bit);
 -
--void glue_xts_crypt_128bit_one(const void *ctx, u8 *dst, const u8 *src,
--			       le128 *iv, common_glue_func_t fn)
--{
--	le128 ivblk = *iv;
--
--	/* generate next IV */
--	gf128mul_x_ble(iv, &ivblk);
--
--	/* CC <- T xor C */
--	u128_xor((u128 *)dst, (const u128 *)src, (u128 *)&ivblk);
--
--	/* PP <- D(Key2,CC) */
--	fn(ctx, dst, dst);
--
--	/* P <- T xor PP */
--	u128_xor((u128 *)dst, (u128 *)dst, (u128 *)&ivblk);
--}
--EXPORT_SYMBOL_GPL(glue_xts_crypt_128bit_one);
--
- MODULE_LICENSE("GPL");
-diff --git a/arch/x86/include/asm/crypto/glue_helper.h b/arch/x86/include/asm/crypto/glue_helper.h
-index 777c0f63418c..62680775d189 100644
---- a/arch/x86/include/asm/crypto/glue_helper.h
-+++ b/arch/x86/include/asm/crypto/glue_helper.h
-@@ -15,8 +15,6 @@ typedef void (*common_glue_func_t)(const void *ctx, u8 *dst, const u8 *src);
- typedef void (*common_glue_cbc_func_t)(const void *ctx, u8 *dst, const u8 *src);
- typedef void (*common_glue_ctr_func_t)(const void *ctx, u8 *dst, const u8 *src,
- 				       le128 *iv);
--typedef void (*common_glue_xts_func_t)(const void *ctx, u8 *dst, const u8 *src,
--				       le128 *iv);
- 
- struct common_glue_func_entry {
- 	unsigned int num_blocks; /* number of blocks that @fn will process */
-@@ -24,7 +22,6 @@ struct common_glue_func_entry {
- 		common_glue_func_t ecb;
- 		common_glue_cbc_func_t cbc;
- 		common_glue_ctr_func_t ctr;
--		common_glue_xts_func_t xts;
- 	} fn_u;
+ static struct skcipher_alg cast5_algs[] = {
+ 	{
+ 		.base.cra_name		= "__ecb(cast5)",
+@@ -328,21 +240,6 @@ static struct skcipher_alg cast5_algs[] = {
+ 		.setkey			= cast5_setkey_skcipher,
+ 		.encrypt		= cbc_encrypt,
+ 		.decrypt		= cbc_decrypt,
+-	}, {
+-		.base.cra_name		= "__ctr(cast5)",
+-		.base.cra_driver_name	= "__ctr-cast5-avx",
+-		.base.cra_priority	= 200,
+-		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+-		.base.cra_blocksize	= 1,
+-		.base.cra_ctxsize	= sizeof(struct cast5_ctx),
+-		.base.cra_module	= THIS_MODULE,
+-		.min_keysize		= CAST5_MIN_KEY_SIZE,
+-		.max_keysize		= CAST5_MAX_KEY_SIZE,
+-		.ivsize			= CAST5_BLOCK_SIZE,
+-		.chunksize		= CAST5_BLOCK_SIZE,
+-		.setkey			= cast5_setkey_skcipher,
+-		.encrypt		= ctr_crypt,
+-		.decrypt		= ctr_crypt,
+ 	}
  };
  
-@@ -106,13 +103,4 @@ extern int glue_cbc_decrypt_req_128bit(const struct common_glue_ctx *gctx,
- extern int glue_ctr_req_128bit(const struct common_glue_ctx *gctx,
- 			       struct skcipher_request *req);
- 
--extern int glue_xts_req_128bit(const struct common_glue_ctx *gctx,
--			       struct skcipher_request *req,
--			       common_glue_func_t tweak_fn, void *tweak_ctx,
--			       void *crypt_ctx, bool decrypt);
--
--extern void glue_xts_crypt_128bit_one(const void *ctx, u8 *dst,
--				      const u8 *src, le128 *iv,
--				      common_glue_func_t fn);
--
- #endif /* _CRYPTO_GLUE_HELPER_H */
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index dd48c3bab3f5..fed73fff5a65 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1372,6 +1372,7 @@ config CRYPTO_CAST5_AVX_X86_64
+ 	select CRYPTO_CAST5
+ 	select CRYPTO_CAST_COMMON
+ 	select CRYPTO_SIMD
++	imply CRYPTO_CTR
+ 	help
+ 	  The CAST5 encryption algorithm (synonymous with CAST-128) is
+ 	  described in RFC2144.
 -- 
 2.17.1
 
