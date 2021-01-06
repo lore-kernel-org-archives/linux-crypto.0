@@ -2,103 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFFBEC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jan 2021 14:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68CD8C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jan 2021 15:29:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D5062311D
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jan 2021 14:59:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CB612311F
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jan 2021 15:29:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726780AbhAFO7W (ORCPT
+        id S1725803AbhAFP3q (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Jan 2021 09:59:22 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35098 "EHLO mail.kernel.org"
+        Wed, 6 Jan 2021 10:29:46 -0500
+Received: from mga02.intel.com ([134.134.136.20]:51394 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726326AbhAFO7W (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Jan 2021 09:59:22 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E5D8723110;
-        Wed,  6 Jan 2021 14:58:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1609945121;
-        bh=fs4tnAAHZc6P9CcCZmtXnqhshJdz+3INo0fDCULFaD8=;
-        h=From:To:In-Reply-To:References:Subject:Date:From;
-        b=grRap1qACe13qOi+OZcRSFbPBF+dIr/ws3L/0hIw9hJfGzIKvP7l6ogZ4IDw43yGy
-         2LHdh5/KkLIX5OZy0HUphNkwfKucd730v8Tp6LLuzacbNiujVv7S8AcFgKaat4EO7E
-         y+/PvinZw7ISykZaboaWt60Ak3aP6L6FH/2ur96+2LlVa2dRoeg/GHIVTXjbL9m+/N
-         lmUrNwQGiW3vl9pfoybJQC9JwzVTaaO03pya7nRF3kZVYLga8QDzM2brjULMEAV5En
-         tz4bM66daxGgVwHYO/b7ctz5giI8LEijCXhmI8MPhXeH67zs/Q6iAskX79k3QrpAy9
-         gww2PkLy1Faag==
-From:   Mark Brown <broonie@kernel.org>
-To:     Takashi Iwai <tiwai@suse.com>, linux-kernel@vger.kernel.org,
-        linux-mtd@lists.infradead.org, Guenter Roeck <linux@roeck-us.net>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        linux-rtc@vger.kernel.org,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        linux-spi@vger.kernel.org, linux-ide@vger.kernel.org,
-        Jaroslav Kysela <perex@perex.cz>, linux-crypto@vger.kernel.org,
-        linux-watchdog@vger.kernel.org,
-        Richard Weinberger <richard@nod.at>, dmaengine@vger.kernel.org,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        netdev@vger.kernel.org, Miquel Raynal <miquel.raynal@bootlin.com>,
-        Matt Mackall <mpm@selenic.com>, alsa-devel@alsa-project.org,
-        linux-mips@vger.kernel.org, Vignesh Raghavendra <vigneshr@ti.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alessandro Zummo <a.zummo@towertech.it>
-In-Reply-To: <20210105140305.141401-1-tsbogend@alpha.franken.de>
-References: <20210105140305.141401-1-tsbogend@alpha.franken.de>
-Subject: Re: (subset) [PATCH 00/10] Remove support for TX49xx
-Message-Id: <160994509314.52132.9683741232298303961.b4-ty@kernel.org>
-Date:   Wed, 06 Jan 2021 14:58:13 +0000
+        id S1725800AbhAFP3q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 6 Jan 2021 10:29:46 -0500
+IronPort-SDR: bQkhJ3ThyMxzDKlwvKT7Z42O5NXfpYBmOTRmG6gz83+qZpsmCY8Ghy073qyE8jbNlfXgfZInVb
+ py/XM1iW8SCQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9855"; a="164362339"
+X-IronPort-AV: E=Sophos;i="5.78,480,1599548400"; 
+   d="scan'208";a="164362339"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 07:28:00 -0800
+IronPort-SDR: wu4yYJoRtsxtQMpoRC/THZ8RmCEfUFv0d/eDvxZM2UWOSa5Dg79Jb/6jH2lVCXmzLA2bzQWuqb
+ BHAZE+I+7ymA==
+X-IronPort-AV: E=Sophos;i="5.78,480,1599548400"; 
+   d="scan'208";a="350884830"
+Received: from tbrady-mobl1.ger.corp.intel.com (HELO dalessan-mobl1.ir.intel.com) ([10.252.29.158])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 07:27:51 -0800
+From:   Daniele Alessandrelli <daniele.alessandrelli@linux.intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, daniele.alessandrelli@lintel.com
+Subject: [PATCH] crypto: keembay-ocs-hcu - Add dependency on HAS_IOMEM and ARCH_KEEMBAY
+Date:   Wed,  6 Jan 2021 15:27:33 +0000
+Message-Id: <20210106152733.572024-1-daniele.alessandrelli@linux.intel.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 5 Jan 2021 15:02:45 +0100, Thomas Bogendoerfer wrote:
-> I couldn't find any buyable product other than reference boards using
-> TX49xx CPUs. And since nobody showed interest in keeping support for
-> it, it's time to remove it.
-> 
-> I've split up the removal into seperate parts for different maintainers.
-> So if the patch fits your needs, please take it via your tree or
-> give me an ack so I can apply them  the mips-next tree.
-> 
-> [...]
+From: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
 
-Applied to
+Add the following additional dependencies for CRYPTO_DEV_KEEMBAY_OCS_HCU:
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/sound.git for-next
+- HAS_IOMEM to prevent build failures
 
-Thanks!
+- ARCH_KEEMBAY to prevent asking the user about this driver when
+  configuring a kernel without Intel Keem Bay platform support.
 
-[10/10] ASoC: txx9: Remove driver
-        commit: a8644292ea46064f990e4a3c4585bdb294c0d89a
+Signed-off-by: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+---
+ drivers/crypto/keembay/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
 
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent to Linus during
-the next merge window (or sooner if it is a bug fix), however if
-problems are discovered then the patch may be dropped or reverted.
+diff --git a/drivers/crypto/keembay/Kconfig b/drivers/crypto/keembay/Kconfig
+index e45f1b039380..00cf8f028cb9 100644
+--- a/drivers/crypto/keembay/Kconfig
++++ b/drivers/crypto/keembay/Kconfig
+@@ -43,6 +43,8 @@ config CRYPTO_DEV_KEEMBAY_OCS_HCU
+ 	tristate "Support for Intel Keem Bay OCS HCU HW acceleration"
+ 	select CRYPTO_HASH
+ 	select CRYPTO_ENGINE
++	depends on HAS_IOMEM
++	depends on ARCH_KEEMBAY || COMPILE_TEST
+ 	depends on OF || COMPILE_TEST
+ 	help
+ 	  Support for Intel Keem Bay Offload and Crypto Subsystem (OCS) Hash
+-- 
+2.26.2
 
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
-
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
-
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
-
-Thanks,
-Mark
