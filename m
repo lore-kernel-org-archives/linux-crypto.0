@@ -2,116 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DBB2C433E6
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jan 2021 08:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BCCDC433DB
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jan 2021 09:28:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3243921D93
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jan 2021 08:38:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2098323102
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jan 2021 09:28:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726590AbhAFIiE (ORCPT
+        id S1726297AbhAFJ2I (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Jan 2021 03:38:04 -0500
-Received: from mail-oo1-f48.google.com ([209.85.161.48]:42963 "EHLO
-        mail-oo1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726074AbhAFIiE (ORCPT
+        Wed, 6 Jan 2021 04:28:08 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:40104 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726133AbhAFJ2H (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Jan 2021 03:38:04 -0500
-Received: by mail-oo1-f48.google.com with SMTP id x203so586896ooa.9;
-        Wed, 06 Jan 2021 00:37:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7OzcDXMwatEtiJomNBi1fhi3zuuxEWhyROAP2OwThNY=;
-        b=EQ71xKWn6jEzk16xLKPw5tpURAioSNiH1WBf7m9kaDOShUYzWqDQ2s2wBGAg4P9H3J
-         Mn4cea36V3yDJZZrvHcNzPWnFPRSJt/NLvTmeFnFgsH0whYPMW6IM5yqwm8jTr01KMl9
-         ZZEi8CE6gy5fRn7AkvD+pvWO05miEnxQilI78QQh7PLj6v+I+0jCuNrUcUv+dhGZEZiv
-         v0c6RD3T94Qw07f4jhO5ADNuzjlIEToYcUiiqj4wivYB6ei9N9PpupqdcyyFF4eRsE0X
-         6gjpUPUB00Jm1SxknefDlc66XhPGX55zcpbDjCYhJR+gAdb4eHo6ri1rjep5ilymjGKm
-         mnxQ==
-X-Gm-Message-State: AOAM530lsAiSTA+Tt8ZbOkvKTVNeR7z6UzFGVNcIKOS+9jJv/Yr6Dj3n
-        xMVsCDhZjaRef2yEGQJb1xW7zzukJ5CfJtulSPc=
-X-Google-Smtp-Source: ABdhPJz+riLQ42T+q9EFB1XsbUqjCK7bS2nCYCFI4IXj5lNnjzpQBlfNrLzEuiXe37snmeLQrap5l7udgxcoLsEDH3o=
-X-Received: by 2002:a4a:8353:: with SMTP id q19mr2071403oog.40.1609922242555;
- Wed, 06 Jan 2021 00:37:22 -0800 (PST)
-MIME-Version: 1.0
-References: <20210105140305.141401-1-tsbogend@alpha.franken.de>
-In-Reply-To: <20210105140305.141401-1-tsbogend@alpha.franken.de>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Wed, 6 Jan 2021 09:37:11 +0100
-Message-ID: <CAMuHMdX=trGqj8RzV7r1iTneqDjWOc4e1T-X+R_B34rxxhJpbg@mail.gmail.com>
-Subject: Re: [PATCH 00/10] Remove support for TX49xx
-To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Cc:     Matt Mackall <mpm@selenic.com>,
+        Wed, 6 Jan 2021 04:28:07 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10698lHC006845;
+        Wed, 6 Jan 2021 09:27:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
+ bh=tasVWPVUrp4SJFLddlqIVMFe6AQVqT3bFOPJTpvyKoI=;
+ b=u8PD1avKZt4IvaRlfoDiB20/wemTPzzMruBzg6JVvatd9y6MBk3hFu1b+mNge+QsLJT8
+ V+qoyH6Fb4bwMf7Z/IpdgQumMqHiD6OgMkX2C9PvoQbyTN0szMruXjJfUyQXKQCIL2yS
+ gO3y5dlgsTZxJIzdCad01jRa4N5NC2KWYU/Ma34F5r9UCIDYz0jgTIVXbVeUpn6slTtp
+ //mELuGg9TJ0cLuT3mQf0/trJOQoYt+pR6uIWWF7jIZ5Whubu/acHY6GZDj5MjzQqwVX
+ mLXto42tRQ2sJFmZhO1vZMwHml3aJVQ/KuHPQ90la7MA2K+SkZXPg/hPdWTuUF7oCMCc UA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2130.oracle.com with ESMTP id 35w7p0gj88-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 06 Jan 2021 09:27:19 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1069Fpk3107740;
+        Wed, 6 Jan 2021 09:25:18 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 35w3qrqjd7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 06 Jan 2021 09:25:18 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 1069PHu7002390;
+        Wed, 6 Jan 2021 09:25:17 GMT
+Received: from mwanda (/102.36.221.92)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 06 Jan 2021 01:25:16 -0800
+Date:   Wed, 6 Jan 2021 12:25:08 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+Cc:     Declan Murphy <declan.murphy@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vinod Koul <vkoul@kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Mark Brown <broonie@kernel.org>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        dmaengine <dmaengine@vger.kernel.org>, linux-ide@vger.kernel.org,
-        MTD Maling List <linux-mtd@lists.infradead.org>,
-        netdev <netdev@vger.kernel.org>, linux-rtc@vger.kernel.org,
-        linux-spi <linux-spi@vger.kernel.org>,
-        Linux Watchdog Mailing List <linux-watchdog@vger.kernel.org>,
-        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
-        Atsushi Nemoto <anemo@mba.ocn.ne.jp>
-Content-Type: text/plain; charset="UTF-8"
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH] crypto: keembay-ocs-hcu - Fix a WARN() message
+Message-ID: <X/WB9IlpyIi+5p5s@mwanda>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9855 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0 mlxscore=0
+ spamscore=0 mlxlogscore=999 phishscore=0 bulkscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101060056
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9855 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 adultscore=0
+ lowpriorityscore=0 spamscore=0 suspectscore=0 impostorscore=0 mlxscore=0
+ priorityscore=1501 malwarescore=0 clxscore=1011 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101060056
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Thomas,
+The first argument to WARN() is a condition and the messages is the
+second argument is the string, so this WARN() will only display the
+__func__ part of the message.
 
-CC Nemoto-san (de-facto TX49XX maintainer)
+Fixes: ae832e329a8d ("crypto: keembay-ocs-hcu - Add HMAC support")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+ drivers/crypto/keembay/keembay-ocs-hcu-core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Tue, Jan 5, 2021 at 3:03 PM Thomas Bogendoerfer
-<tsbogend@alpha.franken.de> wrote:
-> I couldn't find any buyable product other than reference boards using
-> TX49xx CPUs. And since nobody showed interest in keeping support for
-> it, it's time to remove it.
+diff --git a/drivers/crypto/keembay/keembay-ocs-hcu-core.c b/drivers/crypto/keembay/keembay-ocs-hcu-core.c
+index d547af047131..c4b97b4160e9 100644
+--- a/drivers/crypto/keembay/keembay-ocs-hcu-core.c
++++ b/drivers/crypto/keembay/keembay-ocs-hcu-core.c
+@@ -388,7 +388,7 @@ static int prepare_ipad(struct ahash_request *req)
+ 	 * longer keys are hashed by kmb_ocs_hcu_setkey()).
+ 	 */
+ 	if (ctx->key_len > rctx->blk_sz) {
+-		WARN("%s: Invalid key length in tfm context\n", __func__);
++		WARN(1, "%s: Invalid key length in tfm context\n", __func__);
+ 		return -EINVAL;
+ 	}
+ 	memzero_explicit(&ctx->key[ctx->key_len],
+-- 
+2.29.2
 
-I have an RBTX4927 development board in my board farm, boot-test every
-bi-weekly renesas-drivers release on it, and fix kernel issues when they
-appear.
-
-Is that sufficient to keep it?
-
-TX49xx SoCs were used in Sony LocationFree base stations, running
-VxWorks. You can no longer buy them.
-I'm not aware of anyone ever porting Linux to them.
-https://en.wikipedia.org/wiki/LocationFree_Player
-
->   spi: txx9: Remove driver
-
-I only noticed the planned removal when I saw the SPI patch was applied.
-Doesn't matter for me, as SPI is only present on TX4938, not on TX4927 ;-)
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
