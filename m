@@ -7,34 +7,34 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D3AC433E0
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 12:17:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F98C43381
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 12:17:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C326723359
+	by mail.kernel.org (Postfix) with ESMTP id 46C3723359
 	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 12:17:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728064AbhAGMRe (ORCPT
+        id S1728050AbhAGMRe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 7 Jan 2021 07:17:34 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:9977 "EHLO
+Received: from szxga06-in.huawei.com ([45.249.212.32]:9975 "EHLO
         szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725974AbhAGMRd (ORCPT
+        with ESMTP id S1728045AbhAGMRb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Jan 2021 07:17:33 -0500
+        Thu, 7 Jan 2021 07:17:31 -0500
 Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DBQF0373Bzj3ZN;
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DBQF02W8Wzj3YR;
         Thu,  7 Jan 2021 20:16:04 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.24) by
  DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 7 Jan 2021 20:16:43 +0800
+ 14.3.498.0; Thu, 7 Jan 2021 20:16:42 +0800
 From:   Meng Yu <yumeng18@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>, <yumeng18@huawei.com>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH v6 4/6] crypto: expose elliptic curve parameters as Crypto APIs
-Date:   Thu, 7 Jan 2021 20:14:37 +0800
-Message-ID: <1610021679-56456-5-git-send-email-yumeng18@huawei.com>
+Subject: [PATCH v6 1/6] crypto: hisilicon/hpre - add version adapt to new algorithms
+Date:   Thu, 7 Jan 2021 20:14:34 +0800
+Message-ID: <1610021679-56456-2-git-send-email-yumeng18@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1610021679-56456-1-git-send-email-yumeng18@huawei.com>
 References: <1610021679-56456-1-git-send-email-yumeng18@huawei.com>
@@ -46,265 +46,184 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Move elliptic curves definition to 'include/crypto/ecc_curve_defs.h',
-so all can use it,
+A new generation of accelerator Kunpeng930 has appeared, and the
+corresponding driver needs to be updated to support some new
+algorithms of Kunpeng930. To be compatible with Kunpeng920, we
+add parameter 'struct hisi_qm *qm' to sec_algs_(un)register to
+identify the chip's version.
 
 Signed-off-by: Meng Yu <yumeng18@huawei.com>
 Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
+Reviewed-by: Longfang Liu <liulongfang@huawei.com>
 ---
- crypto/ecc.c                    |  1 -
- crypto/ecc.h                    | 37 +----------------
- crypto/ecc_curve_defs.h         | 57 -------------------------
- crypto/ecrdsa_defs.h            |  2 +-
- include/crypto/ecc_curve_defs.h | 92 +++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 95 insertions(+), 94 deletions(-)
- delete mode 100644 crypto/ecc_curve_defs.h
- create mode 100644 include/crypto/ecc_curve_defs.h
+ drivers/crypto/hisilicon/hpre/hpre.h        | 5 +++--
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 4 ++--
+ drivers/crypto/hisilicon/qm.c               | 4 ++--
+ drivers/crypto/hisilicon/qm.h               | 4 ++--
+ drivers/crypto/hisilicon/sec2/sec.h         | 4 ++--
+ drivers/crypto/hisilicon/sec2/sec_crypto.c  | 4 ++--
+ drivers/crypto/hisilicon/sec2/sec_crypto.h  | 4 ++--
+ drivers/crypto/hisilicon/zip/zip.h          | 4 ++--
+ drivers/crypto/hisilicon/zip/zip_crypto.c   | 4 ++--
+ 9 files changed, 19 insertions(+), 18 deletions(-)
 
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index c80aa25..f23efdd 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -35,7 +35,6 @@
- #include <linux/ratelimit.h>
+diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
+index f69252b..e784712 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre.h
++++ b/drivers/crypto/hisilicon/hpre/hpre.h
+@@ -91,7 +91,8 @@ struct hpre_sqe {
+ };
  
- #include "ecc.h"
--#include "ecc_curve_defs.h"
- 
- typedef struct {
- 	u64 m_low;
-diff --git a/crypto/ecc.h b/crypto/ecc.h
-index d4e546b..e5afaf3 100644
---- a/crypto/ecc.h
-+++ b/crypto/ecc.h
-@@ -26,6 +26,8 @@
- #ifndef _CRYPTO_ECC_H
- #define _CRYPTO_ECC_H
- 
-+#include <crypto/ecc_curve_defs.h>
+ struct hisi_qp *hpre_create_qp(void);
+-int hpre_algs_register(void);
+-void hpre_algs_unregister(void);
++int hpre_algs_register(struct hisi_qm *qm);
++void hpre_algs_unregister(struct hisi_qm *qm);
 +
- /* One digit is u64 qword. */
- #define ECC_CURVE_NIST_P192_DIGITS  3
- #define ECC_CURVE_NIST_P256_DIGITS  4
-@@ -33,44 +35,9 @@
  
- #define ECC_DIGITS_TO_BYTES_SHIFT 3
+ #endif
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index a87f990..d89b2f5 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -1154,7 +1154,7 @@ static struct kpp_alg dh = {
+ };
+ #endif
  
--/**
-- * struct ecc_point - elliptic curve point in affine coordinates
-- *
-- * @x:		X coordinate in vli form.
-- * @y:		Y coordinate in vli form.
-- * @ndigits:	Length of vlis in u64 qwords.
-- */
--struct ecc_point {
--	u64 *x;
--	u64 *y;
--	u8 ndigits;
--};
--
- #define ECC_POINT_INIT(x, y, ndigits)	(struct ecc_point) { x, y, ndigits }
+-int hpre_algs_register(void)
++int hpre_algs_register(struct hisi_qm *qm)
+ {
+ 	int ret;
  
- /**
-- * struct ecc_curve - definition of elliptic curve
-- *
-- * @name:	Short name of the curve.
-- * @g:		Generator point of the curve.
-- * @p:		Prime number, if Barrett's reduction is used for this curve
-- *		pre-calculated value 'mu' is appended to the @p after ndigits.
-- *		Use of Barrett's reduction is heuristically determined in
-- *		vli_mmod_fast().
-- * @n:		Order of the curve group.
-- * @a:		Curve parameter a.
-- * @b:		Curve parameter b.
-- */
--struct ecc_curve {
--	char *name;
--	struct ecc_point g;
--	u64 *p;
--	u64 *n;
--	u64 *a;
--	u64 *b;
--};
--
--/**
-  * ecc_is_key_valid() - Validate a given ECDH private key
-  *
-  * @curve_id:		id representing the curve to use
-diff --git a/crypto/ecc_curve_defs.h b/crypto/ecc_curve_defs.h
-deleted file mode 100644
-index 69be6c7..0000000
---- a/crypto/ecc_curve_defs.h
-+++ /dev/null
-@@ -1,57 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--#ifndef _CRYTO_ECC_CURVE_DEFS_H
--#define _CRYTO_ECC_CURVE_DEFS_H
--
--/* NIST P-192: a = p - 3 */
--static u64 nist_p192_g_x[] = { 0xF4FF0AFD82FF1012ull, 0x7CBF20EB43A18800ull,
--				0x188DA80EB03090F6ull };
--static u64 nist_p192_g_y[] = { 0x73F977A11E794811ull, 0x631011ED6B24CDD5ull,
--				0x07192B95FFC8DA78ull };
--static u64 nist_p192_p[] = { 0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFFFFFFFFFEull,
--				0xFFFFFFFFFFFFFFFFull };
--static u64 nist_p192_n[] = { 0x146BC9B1B4D22831ull, 0xFFFFFFFF99DEF836ull,
--				0xFFFFFFFFFFFFFFFFull };
--static u64 nist_p192_a[] = { 0xFFFFFFFFFFFFFFFCull, 0xFFFFFFFFFFFFFFFEull,
--				0xFFFFFFFFFFFFFFFFull };
--static u64 nist_p192_b[] = { 0xFEB8DEECC146B9B1ull, 0x0FA7E9AB72243049ull,
--				0x64210519E59C80E7ull };
--static struct ecc_curve nist_p192 = {
--	.name = "nist_192",
--	.g = {
--		.x = nist_p192_g_x,
--		.y = nist_p192_g_y,
--		.ndigits = 3,
--	},
--	.p = nist_p192_p,
--	.n = nist_p192_n,
--	.a = nist_p192_a,
--	.b = nist_p192_b
--};
--
--/* NIST P-256: a = p - 3 */
--static u64 nist_p256_g_x[] = { 0xF4A13945D898C296ull, 0x77037D812DEB33A0ull,
--				0xF8BCE6E563A440F2ull, 0x6B17D1F2E12C4247ull };
--static u64 nist_p256_g_y[] = { 0xCBB6406837BF51F5ull, 0x2BCE33576B315ECEull,
--				0x8EE7EB4A7C0F9E16ull, 0x4FE342E2FE1A7F9Bull };
--static u64 nist_p256_p[] = { 0xFFFFFFFFFFFFFFFFull, 0x00000000FFFFFFFFull,
--				0x0000000000000000ull, 0xFFFFFFFF00000001ull };
--static u64 nist_p256_n[] = { 0xF3B9CAC2FC632551ull, 0xBCE6FAADA7179E84ull,
--				0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFF00000000ull };
--static u64 nist_p256_a[] = { 0xFFFFFFFFFFFFFFFCull, 0x00000000FFFFFFFFull,
--				0x0000000000000000ull, 0xFFFFFFFF00000001ull };
--static u64 nist_p256_b[] = { 0x3BCE3C3E27D2604Bull, 0x651D06B0CC53B0F6ull,
--				0xB3EBBD55769886BCull, 0x5AC635D8AA3A93E7ull };
--static struct ecc_curve nist_p256 = {
--	.name = "nist_256",
--	.g = {
--		.x = nist_p256_g_x,
--		.y = nist_p256_g_y,
--		.ndigits = 4,
--	},
--	.p = nist_p256_p,
--	.n = nist_p256_n,
--	.a = nist_p256_a,
--	.b = nist_p256_b
--};
--
--#endif
-diff --git a/crypto/ecrdsa_defs.h b/crypto/ecrdsa_defs.h
-index 170baf0..2074099 100644
---- a/crypto/ecrdsa_defs.h
-+++ b/crypto/ecrdsa_defs.h
-@@ -13,7 +13,7 @@
- #ifndef _CRYTO_ECRDSA_DEFS_H
- #define _CRYTO_ECRDSA_DEFS_H
+@@ -1171,7 +1171,7 @@ int hpre_algs_register(void)
+ 	return ret;
+ }
  
--#include "ecc.h"
-+#include <crypto/ecc_curve_defs.h>
+-void hpre_algs_unregister(void)
++void hpre_algs_unregister(struct hisi_qm *qm)
+ {
+ 	crypto_unregister_akcipher(&rsa);
+ #ifdef CONFIG_CRYPTO_DH
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 10a04ab..9bbefe0 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -4015,7 +4015,7 @@ int hisi_qm_alg_register(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
+ 	mutex_unlock(&qm_list->lock);
  
- #define ECRDSA_MAX_SIG_SIZE (2 * 512 / 8)
- #define ECRDSA_MAX_DIGITS (512 / 64)
-diff --git a/include/crypto/ecc_curve_defs.h b/include/crypto/ecc_curve_defs.h
-new file mode 100644
-index 0000000..1080766
---- /dev/null
-+++ b/include/crypto/ecc_curve_defs.h
-@@ -0,0 +1,92 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _CRYTO_ECC_CURVE_DEFS_H
-+#define _CRYTO_ECC_CURVE_DEFS_H
-+
-+/**
-+ * struct ecc_point - elliptic curve point in affine coordinates
-+ *
-+ * @x:		X coordinate in vli form.
-+ * @y:		Y coordinate in vli form.
-+ * @ndigits:	Length of vlis in u64 qwords.
-+ */
-+struct ecc_point {
-+	u64 *x;
-+	u64 *y;
-+	u8 ndigits;
-+};
-+
-+/**
-+ * struct ecc_curve - definition of elliptic curve
-+ *
-+ * @name:	Short name of the curve.
-+ * @g:		Generator point of the curve.
-+ * @p:		Prime number, if Barrett's reduction is used for this curve
-+ *		pre-calculated value 'mu' is appended to the @p after ndigits.
-+ *		Use of Barrett's reduction is heuristically determined in
-+ *		vli_mmod_fast().
-+ * @n:		Order of the curve group.
-+ * @a:		Curve parameter a.
-+ * @b:		Curve parameter b.
-+ */
-+struct ecc_curve {
-+	char *name;
-+	struct ecc_point g;
-+	u64 *p;
-+	u64 *n;
-+	u64 *a;
-+	u64 *b;
-+};
-+
-+/* NIST P-192: a = p - 3 */
-+static u64 nist_p192_g_x[] = { 0xF4FF0AFD82FF1012ull, 0x7CBF20EB43A18800ull,
-+				0x188DA80EB03090F6ull };
-+static u64 nist_p192_g_y[] = { 0x73F977A11E794811ull, 0x631011ED6B24CDD5ull,
-+				0x07192B95FFC8DA78ull };
-+static u64 nist_p192_p[] = { 0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFFFFFFFFFEull,
-+				0xFFFFFFFFFFFFFFFFull };
-+static u64 nist_p192_n[] = { 0x146BC9B1B4D22831ull, 0xFFFFFFFF99DEF836ull,
-+				0xFFFFFFFFFFFFFFFFull };
-+static u64 nist_p192_a[] = { 0xFFFFFFFFFFFFFFFCull, 0xFFFFFFFFFFFFFFFEull,
-+				0xFFFFFFFFFFFFFFFFull };
-+static u64 nist_p192_b[] = { 0xFEB8DEECC146B9B1ull, 0x0FA7E9AB72243049ull,
-+				0x64210519E59C80E7ull };
-+static struct ecc_curve nist_p192 = {
-+	.name = "nist_192",
-+	.g = {
-+		.x = nist_p192_g_x,
-+		.y = nist_p192_g_y,
-+		.ndigits = 3,
-+	},
-+	.p = nist_p192_p,
-+	.n = nist_p192_n,
-+	.a = nist_p192_a,
-+	.b = nist_p192_b
-+};
-+
-+/* NIST P-256: a = p - 3 */
-+static u64 nist_p256_g_x[] = { 0xF4A13945D898C296ull, 0x77037D812DEB33A0ull,
-+				0xF8BCE6E563A440F2ull, 0x6B17D1F2E12C4247ull };
-+static u64 nist_p256_g_y[] = { 0xCBB6406837BF51F5ull, 0x2BCE33576B315ECEull,
-+				0x8EE7EB4A7C0F9E16ull, 0x4FE342E2FE1A7F9Bull };
-+static u64 nist_p256_p[] = { 0xFFFFFFFFFFFFFFFFull, 0x00000000FFFFFFFFull,
-+				0x0000000000000000ull, 0xFFFFFFFF00000001ull };
-+static u64 nist_p256_n[] = { 0xF3B9CAC2FC632551ull, 0xBCE6FAADA7179E84ull,
-+				0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFF00000000ull };
-+static u64 nist_p256_a[] = { 0xFFFFFFFFFFFFFFFCull, 0x00000000FFFFFFFFull,
-+				0x0000000000000000ull, 0xFFFFFFFF00000001ull };
-+static u64 nist_p256_b[] = { 0x3BCE3C3E27D2604Bull, 0x651D06B0CC53B0F6ull,
-+				0xB3EBBD55769886BCull, 0x5AC635D8AA3A93E7ull };
-+static struct ecc_curve nist_p256 = {
-+	.name = "nist_256",
-+	.g = {
-+		.x = nist_p256_g_x,
-+		.y = nist_p256_g_y,
-+		.ndigits = 4,
-+	},
-+	.p = nist_p256_p,
-+	.n = nist_p256_n,
-+	.a = nist_p256_a,
-+	.b = nist_p256_b
-+};
-+
-+#endif
+ 	if (flag) {
+-		ret = qm_list->register_to_crypto();
++		ret = qm_list->register_to_crypto(qm);
+ 		if (ret) {
+ 			mutex_lock(&qm_list->lock);
+ 			list_del(&qm->list);
+@@ -4046,7 +4046,7 @@ void hisi_qm_alg_unregister(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
+ 	mutex_unlock(&qm_list->lock);
+ 
+ 	if (list_empty(&qm_list->list))
+-		qm_list->unregister_from_crypto();
++		qm_list->unregister_from_crypto(qm);
+ }
+ EXPORT_SYMBOL_GPL(hisi_qm_alg_unregister);
+ 
+diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
+index 8624d12..a63256a 100644
+--- a/drivers/crypto/hisilicon/qm.h
++++ b/drivers/crypto/hisilicon/qm.h
+@@ -193,8 +193,8 @@ struct hisi_qm_err_ini {
+ struct hisi_qm_list {
+ 	struct mutex lock;
+ 	struct list_head list;
+-	int (*register_to_crypto)(void);
+-	void (*unregister_from_crypto)(void);
++	int (*register_to_crypto)(struct hisi_qm *qm);
++	void (*unregister_from_crypto)(struct hisi_qm *qm);
+ };
+ 
+ struct hisi_qm {
+diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
+index 0849191..17ddb20 100644
+--- a/drivers/crypto/hisilicon/sec2/sec.h
++++ b/drivers/crypto/hisilicon/sec2/sec.h
+@@ -183,6 +183,6 @@ struct sec_dev {
+ 
+ void sec_destroy_qps(struct hisi_qp **qps, int qp_num);
+ struct hisi_qp **sec_create_qps(void);
+-int sec_register_to_crypto(void);
+-void sec_unregister_from_crypto(void);
++int sec_register_to_crypto(struct hisi_qm *qm);
++void sec_unregister_from_crypto(struct hisi_qm *qm);
+ #endif
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 2eaa516..f835514 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -1634,7 +1634,7 @@ static struct aead_alg sec_aeads[] = {
+ 		     AES_BLOCK_SIZE, AES_BLOCK_SIZE, SHA512_DIGEST_SIZE),
+ };
+ 
+-int sec_register_to_crypto(void)
++int sec_register_to_crypto(struct hisi_qm *qm)
+ {
+ 	int ret;
+ 
+@@ -1651,7 +1651,7 @@ int sec_register_to_crypto(void)
+ 	return ret;
+ }
+ 
+-void sec_unregister_from_crypto(void)
++void sec_unregister_from_crypto(struct hisi_qm *qm)
+ {
+ 	crypto_unregister_skciphers(sec_skciphers,
+ 				    ARRAY_SIZE(sec_skciphers));
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.h b/drivers/crypto/hisilicon/sec2/sec_crypto.h
+index b2786e1..0e933e7 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.h
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.h
+@@ -211,6 +211,6 @@ struct sec_sqe {
+ 	struct sec_sqe_type2 type2;
+ };
+ 
+-int sec_register_to_crypto(void);
+-void sec_unregister_from_crypto(void);
++int sec_register_to_crypto(struct hisi_qm *qm);
++void sec_unregister_from_crypto(struct hisi_qm *qm);
+ #endif
+diff --git a/drivers/crypto/hisilicon/zip/zip.h b/drivers/crypto/hisilicon/zip/zip.h
+index 92397f9..9ed7461 100644
+--- a/drivers/crypto/hisilicon/zip/zip.h
++++ b/drivers/crypto/hisilicon/zip/zip.h
+@@ -62,6 +62,6 @@ struct hisi_zip_sqe {
+ };
+ 
+ int zip_create_qps(struct hisi_qp **qps, int ctx_num, int node);
+-int hisi_zip_register_to_crypto(void);
+-void hisi_zip_unregister_from_crypto(void);
++int hisi_zip_register_to_crypto(struct hisi_qm *qm);
++void hisi_zip_unregister_from_crypto(struct hisi_qm *qm);
+ #endif
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+index 08b4660..41f6966 100644
+--- a/drivers/crypto/hisilicon/zip/zip_crypto.c
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -665,7 +665,7 @@ static struct acomp_alg hisi_zip_acomp_gzip = {
+ 	}
+ };
+ 
+-int hisi_zip_register_to_crypto(void)
++int hisi_zip_register_to_crypto(struct hisi_qm *qm)
+ {
+ 	int ret;
+ 
+@@ -684,7 +684,7 @@ int hisi_zip_register_to_crypto(void)
+ 	return ret;
+ }
+ 
+-void hisi_zip_unregister_from_crypto(void)
++void hisi_zip_unregister_from_crypto(struct hisi_qm *qm)
+ {
+ 	crypto_unregister_acomp(&hisi_zip_acomp_gzip);
+ 	crypto_unregister_acomp(&hisi_zip_acomp_zlib);
 -- 
 2.8.1
 
