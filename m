@@ -2,94 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52EBAC433DB
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 01:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABCA9C433DB
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 06:20:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 021BE23125
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 01:20:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60FD722E00
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 06:20:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726009AbhAGBUK (ORCPT
+        id S1725763AbhAGGT7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Jan 2021 20:20:10 -0500
-Received: from mrdf0111.ocn.ad.jp ([125.206.160.167]:47912 "EHLO
-        mrdf0111.ocn.ad.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726301AbhAGBUJ (ORCPT
+        Thu, 7 Jan 2021 01:19:59 -0500
+Received: from ZXSHCAS1.zhaoxin.com ([203.148.12.81]:52807 "EHLO
+        ZXSHCAS1.zhaoxin.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725306AbhAGGT7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Jan 2021 20:20:09 -0500
-Received: from mogw5208.ocn.ad.jp (mogw5208.ocn.ad.jp [125.206.161.9])
-        by mrdf0111.ocn.ad.jp (Postfix) with ESMTP id D2B0C3E02EF;
-        Thu,  7 Jan 2021 10:18:51 +0900 (JST)
-Received: from mf-smf-unw005c1.ocn.ad.jp (mf-smf-unw005c1.ocn.ad.jp [153.138.219.78])
-        by mogw5208.ocn.ad.jp (Postfix) with ESMTP id 132CD2A041E;
-        Thu,  7 Jan 2021 10:17:34 +0900 (JST)
-Received: from ocn-vc-mts-201c1.ocn.ad.jp ([153.138.219.212])
-        by mf-smf-unw005c1.ocn.ad.jp with ESMTP
-        id xJu3kE3BKaeryxJvikLBIg; Thu, 07 Jan 2021 10:17:34 +0900
-Received: from smtp.ocn.ne.jp ([153.149.227.165])
-        by ocn-vc-mts-201c1.ocn.ad.jp with ESMTP
-        id xJvhkfc3Tf1TbxJvhkXnKU; Thu, 07 Jan 2021 10:17:34 +0900
-Received: from localhost (p1601136-ipoe.ipoe.ocn.ne.jp [114.172.254.135])
-        by smtp.ocn.ne.jp (Postfix) with ESMTPA;
-        Thu,  7 Jan 2021 10:17:33 +0900 (JST)
-Date:   Thu, 07 Jan 2021 10:17:29 +0900 (JST)
-Message-Id: <20210107.101729.1936921832901251107.anemo@mba.ocn.ne.jp>
-To:     geert@linux-m68k.org
-Cc:     tsbogend@alpha.franken.de, mpm@selenic.com,
-        herbert@gondor.apana.org.au, dan.j.williams@intel.com,
-        vkoul@kernel.org, davem@davemloft.net, miquel.raynal@bootlin.com,
-        richard@nod.at, vigneshr@ti.com, kuba@kernel.org,
-        a.zummo@towertech.it, alexandre.belloni@bootlin.com,
-        broonie@kernel.org, wim@linux-watchdog.org, linux@roeck-us.net,
-        lgirdwood@gmail.com, perex@perex.cz, tiwai@suse.com,
-        linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-mtd@lists.infradead.org,
-        netdev@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        alsa-devel@alsa-project.org
-Subject: Re: [PATCH 00/10] Remove support for TX49xx
-From:   Atsushi Nemoto <anemo@mba.ocn.ne.jp>
-In-Reply-To: <CAMuHMdV86BES7dmWr-7j1jbtoSy0bH1J0e5W41p8evagi0Nqcw@mail.gmail.com>
-References: <CAMuHMdX=trGqj8RzV7r1iTneqDjWOc4e1T-X+R_B34rxxhJpbg@mail.gmail.com>
-        <20210106184839.GA7773@alpha.franken.de>
-        <CAMuHMdV86BES7dmWr-7j1jbtoSy0bH1J0e5W41p8evagi0Nqcw@mail.gmail.com>
-X-Mailer: Mew version 6.7 on Emacs 24.5 / Mule 6.0 (HANACHIRUSATO)
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+        Thu, 7 Jan 2021 01:19:59 -0500
+Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHCAS1.zhaoxin.com
+ (10.28.252.161) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Thu, 7 Jan 2021
+ 14:19:15 +0800
+Received: from tony-HX002EA.zhaoxin.com (10.32.56.37) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Thu, 7 Jan 2021
+ 14:19:12 +0800
+From:   Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <x86@kernel.org>, <hpa@zytor.com>, <tony.luck@intel.com>,
+        <dave.hansen@intel.com>, <seanjc@google.com>,
+        <fenghua.yu@intel.com>, <thomas.lendacky@amd.com>,
+        <kyung.min.park@intel.com>, <kim.phillips@amd.com>,
+        <mgross@linux.intel.com>, <peterz@infradead.org>,
+        <krish.sadhukhan@oracle.com>, <liam.merwick@oracle.com>,
+        <mlevitsk@redhat.com>, <reinette.chatre@intel.com>,
+        <babu.moger@amd.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <TimGuo-oc@zhaoxin.com>, <CooperYan@zhaoxin.com>,
+        <QiyuanWang@zhaoxin.com>, <HerryYang@zhaoxin.com>,
+        <CobeChen@zhaoxin.com>, <SilviaZhao@zhaoxin.com>
+Subject: [PATCH v1 0/3] crypto: x86/crc32c-intel - Exclude some Zhaoxin CPUs
+Date:   Thu, 7 Jan 2021 14:19:05 +0800
+Message-ID: <1610000348-17316-1-git-send-email-TonyWWang-oc@zhaoxin.com>
+X-Mailer: git-send-email 2.7.4
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.32.56.37]
+X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
+ zxbjmbx1.zhaoxin.com (10.29.252.163)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 6 Jan 2021 21:41:24 +0100, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
->> > Is that sufficient to keep it?
->>
->> for me it is. But now we probaly need some reverts then...
-> 
-> Indeed. Fortunately not all of it, as some removals were TX4938-only.
+The driver crc32c-intel match CPUs supporting X86_FEATURE_XMM4_2.
+On platforms with Zhaoxin CPUs supporting this X86 feature, when
+crc32c-intel and crc32c-generic are both registered, system will
+use crc32c-intel because its .cra_priority is greater than
+crc32c-generic.
 
-These patches should not break RBTX4927:
+When doing lmbench3 Create and Delete file test on partitions with
+ext4 enabling metadata checksum, found using crc32c-generic driver
+could get about 20% performance gain than using the driver crc32c-intel
+on some Zhaoxin CPUs. Lower-level testing result is that with the same
+input value the generic C implementation takes fewer time than the crc32c
+instruction implementation on these CPUs. This case expect to use
+crc32c-generic driver for these CPUs to get performance gain.
 
-  net: tc35815: Drop support for TX49XX boards
-  spi: txx9: Remove driver
-  mtd: Remove drivers used by TX49xx
-  char: hw_random: Remove tx4939 driver
-  rtc: tx4939: Remove driver
-  ide: tx4938ide: Remove driver
+The presence of crc32c is enumerated by CPUID.01:ECX[SSE4.2] = 1, and
+these CPUs other SSE4.2 instructions is ok.
 
-And these patches just break audio-support only.
+Add a synthetic flag to indicates low performance CRC32C instruction
+implementation, set this flag in Zhaoxin CPUs specific init phase,
+and exclude CPUs which setting this flag from the driver crc32c-intel.
 
-  dma: tx49 removal
-  ASoC: txx9: Remove driver
+https://lkml.org/lkml/2020/12/21/789
 
-I think dma and ASoC drivers are hard to maintain now, and can be
-dropped for basic support for RBTX4927.
-(TX39 boards does not have audio-support, so dma txx9 driver can be
-dropped too)
+Tony W Wang-oc (3):
+  x86/cpufeatures: Add low performance CRC32C instruction CPU feature
+  x86/cpu: Set low performance CRC32C flag on some Zhaoxin CPUs
+  crypto: x86/crc32c-intel Exclude low performance CRC32C instruction
+    CPUs
 
----
-Atsushi Nemoto
+ arch/x86/crypto/crc32c-intel_glue.c | 5 +++++
+ arch/x86/include/asm/cpufeatures.h  | 1 +
+ arch/x86/kernel/cpu/centaur.c       | 7 +++++++
+ arch/x86/kernel/cpu/cpuid-deps.c    | 1 +
+ arch/x86/kernel/cpu/zhaoxin.c       | 6 ++++++
+ 5 files changed, 20 insertions(+)
+
+-- 
+2.7.4
+
