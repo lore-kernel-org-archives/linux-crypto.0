@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F012FC433E0
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 06:20:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EF1FC433E9
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 06:20:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5B0D22E00
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 06:20:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E5F8230F9
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 06:20:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726272AbhAGGUg (ORCPT
+        id S1726581AbhAGGUk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 7 Jan 2021 01:20:36 -0500
-Received: from ZXSHCAS1.zhaoxin.com ([203.148.12.81]:52908 "EHLO
-        ZXSHCAS1.zhaoxin.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726001AbhAGGUg (ORCPT
+        Thu, 7 Jan 2021 01:20:40 -0500
+Received: from ZXSHCAS2.zhaoxin.com ([203.148.12.82]:46132 "EHLO
+        ZXSHCAS2.zhaoxin.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726001AbhAGGUk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Jan 2021 01:20:36 -0500
-Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHCAS1.zhaoxin.com
- (10.28.252.161) with Microsoft SMTP Server (version=TLS1_2,
+        Thu, 7 Jan 2021 01:20:40 -0500
+Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHCAS2.zhaoxin.com
+ (10.28.252.162) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Thu, 7 Jan 2021
- 14:19:20 +0800
+ 14:19:22 +0800
 Received: from tony-HX002EA.zhaoxin.com (10.32.56.37) by zxbjmbx1.zhaoxin.com
  (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Thu, 7 Jan 2021
- 14:19:17 +0800
+ 14:19:19 +0800
 From:   Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
@@ -44,9 +44,9 @@ To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 CC:     <TimGuo-oc@zhaoxin.com>, <CooperYan@zhaoxin.com>,
         <QiyuanWang@zhaoxin.com>, <HerryYang@zhaoxin.com>,
         <CobeChen@zhaoxin.com>, <SilviaZhao@zhaoxin.com>
-Subject: [PATCH v1 2/3] x86/cpu: Set low performance CRC32C flag on some Zhaoxin CPUs
-Date:   Thu, 7 Jan 2021 14:19:07 +0800
-Message-ID: <1610000348-17316-3-git-send-email-TonyWWang-oc@zhaoxin.com>
+Subject: [PATCH v1 3/3] crypto: x86/crc32c-intel Exclude low performance CRC32C instruction CPUs
+Date:   Thu, 7 Jan 2021 14:19:08 +0800
+Message-ID: <1610000348-17316-4-git-send-email-TonyWWang-oc@zhaoxin.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1610000348-17316-1-git-send-email-TonyWWang-oc@zhaoxin.com>
 References: <1610000348-17316-1-git-send-email-TonyWWang-oc@zhaoxin.com>
@@ -59,52 +59,30 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Some Zhaoxin CPUs declare support SSE4.2 instruction sets but
-having a CRC32C instruction implementation that not working as
-intended. Set low performance CRC32C flag on these CPUs for later
-use.
+Low performance CRC32C instruction CPUs expect to use the driver
+crc32c-generic. So remove these CPUs support from crc32c-intel.
 
 Signed-off-by: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
 ---
- arch/x86/kernel/cpu/centaur.c | 7 +++++++
- arch/x86/kernel/cpu/zhaoxin.c | 6 ++++++
- 2 files changed, 13 insertions(+)
+ arch/x86/crypto/crc32c-intel_glue.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/x86/kernel/cpu/centaur.c b/arch/x86/kernel/cpu/centaur.c
-index 345f7d9..13e6fbe 100644
---- a/arch/x86/kernel/cpu/centaur.c
-+++ b/arch/x86/kernel/cpu/centaur.c
-@@ -109,6 +109,13 @@ static void early_init_centaur(struct cpuinfo_x86 *c)
- 		set_cpu_cap(c, X86_FEATURE_CONSTANT_TSC);
- 		set_cpu_cap(c, X86_FEATURE_NONSTOP_TSC);
- 	}
+diff --git a/arch/x86/crypto/crc32c-intel_glue.c b/arch/x86/crypto/crc32c-intel_glue.c
+index feccb52..1b6d289 100644
+--- a/arch/x86/crypto/crc32c-intel_glue.c
++++ b/arch/x86/crypto/crc32c-intel_glue.c
+@@ -224,6 +224,11 @@ static int __init crc32c_intel_mod_init(void)
+ {
+ 	if (!x86_match_cpu(crc32c_cpu_id))
+ 		return -ENODEV;
 +
-+	/*
-+	 * These CPUs declare support SSE4.2 instruction sets but
-+	 * having low performance CRC32C instruction implementation.
-+	 */
-+	if (c->x86 == 0x6 || (c->x86 == 0x7 && c->x86_model <= 0x3b))
-+		set_cpu_cap(c, X86_FEATURE_CRC32C);
- }
- 
- static void init_centaur(struct cpuinfo_x86 *c)
-diff --git a/arch/x86/kernel/cpu/zhaoxin.c b/arch/x86/kernel/cpu/zhaoxin.c
-index 05fa4ef..837ec65 100644
---- a/arch/x86/kernel/cpu/zhaoxin.c
-+++ b/arch/x86/kernel/cpu/zhaoxin.c
-@@ -79,6 +79,12 @@ static void early_init_zhaoxin(struct cpuinfo_x86 *c)
- 			c->x86_coreid_bits = get_count_order((ebx >> 16) & 0xff);
- 	}
- 
-+	/*
-+	 * These CPUs declare support SSE4.2 instruction sets but
-+	 * having low performance CRC32C instruction implementation.
-+	 */
-+	if (c->x86 == 0x6 || (c->x86 == 0x7 && c->x86_model <= 0x3b))
-+		set_cpu_cap(c, X86_FEATURE_CRC32C);
- }
- 
- static void init_zhaoxin(struct cpuinfo_x86 *c)
++	/* Don't merit use low performance CRC32C instruction */
++	if (boot_cpu_has(X86_FEATURE_CRC32C))
++		return -ENODEV;
++
+ #ifdef CONFIG_X86_64
+ 	if (boot_cpu_has(X86_FEATURE_PCLMULQDQ)) {
+ 		alg.update = crc32c_pcl_intel_update;
 -- 
 2.7.4
 
