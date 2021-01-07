@@ -2,191 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21F53C433DB
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 07:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8314C433E6
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 08:05:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC0F723138
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 07:59:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EF2E23137
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 08:05:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726699AbhAGH7M (ORCPT
+        id S1726352AbhAGIFf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 7 Jan 2021 02:59:12 -0500
-Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:38744 "EHLO
-        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725900AbhAGH7M (ORCPT
+        Thu, 7 Jan 2021 03:05:35 -0500
+Received: from mail-ot1-f41.google.com ([209.85.210.41]:37857 "EHLO
+        mail-ot1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725763AbhAGIFf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Jan 2021 02:59:12 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0UKzE4In_1610006306;
-Received: from 30.25.253.91(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UKzE4In_1610006306)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 07 Jan 2021 15:58:27 +0800
-Subject: Re: Null pointer dereference in public key verification (related to
- SM2 introduction)
-To:     Tee Hao Wei <angelsl@in04.sg>, linux-crypto@vger.kernel.org
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        Tobias Markus <tobias@markus-regensburg.de>,
-        David Howells <dhowells@redhat.com>
-References: <67250277-7903-2005-b94b-193bce0a3388@markus-regensburg.de>
- <3092220.1606727387@warthog.procyon.org.uk>
- <96474593-2882-60a1-0dcf-5b3dc7526bfa@markus-regensburg.de>
- <36413597-f802-5816-abff-0f30e86242fb@in04.sg>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <9f23662e-66b4-b12e-6476-55b0ea6e7c24@linux.alibaba.com>
-Date:   Thu, 7 Jan 2021 15:58:26 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.6.0
+        Thu, 7 Jan 2021 03:05:35 -0500
+Received: by mail-ot1-f41.google.com with SMTP id o11so5559124ote.4;
+        Thu, 07 Jan 2021 00:05:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0TPseVwGCXsOzziJOFXy0csIKxTAA1WaNx2ZI4idEKY=;
+        b=qYDm+V2g02amIBsejIlly/kxYZMeLMqAAWMKA2EUK5gv1L7jnv2NLfzICoHEdxUnP1
+         r2WOSvBfObTNpVann5meU4MrT14hGOru7v7n8piZWymfFYs22t2ibczE5g+JFwGnUdbP
+         5DdqseVimErO1P9Uv1Sh/EiDxVEMc0sewoLephTM465UtNZK+l5JTgsyK8TK8PZxVsNB
+         dBYpjLA2CRfJzvCEeswplZPcO7EwuZMbOi6jfHaMkpVLi/mJ1owEz0vly0C6vaL1uKzQ
+         29lgEfZPlIA1++r5fyuMfztUKA/BLpAYKkje993mcrMUTl0WD+jRImySMYxaJAz31Rb2
+         gMrw==
+X-Gm-Message-State: AOAM5333ii966ffPw5pRYuEBflSltJ4dtnAZIgRo9B4CoiQelLxc+dpi
+        J5T4y9B0rc8VrA02km+5hxviglCYU0gLa9flWQZ3K5io
+X-Google-Smtp-Source: ABdhPJzVAPf8/NQQQzT3zzrkoDzUv+P+SG+XgCFUWTKsU/u1ByX8ezoz8GuB2nVGz7LNk3BFgEKDp8LcWHb42uaO/Sc=
+X-Received: by 2002:a05:6830:1f5a:: with SMTP id u26mr5905584oth.250.1610006693990;
+ Thu, 07 Jan 2021 00:04:53 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <36413597-f802-5816-abff-0f30e86242fb@in04.sg>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: base64
+References: <CAMuHMdX=trGqj8RzV7r1iTneqDjWOc4e1T-X+R_B34rxxhJpbg@mail.gmail.com>
+ <20210106184839.GA7773@alpha.franken.de> <CAMuHMdV86BES7dmWr-7j1jbtoSy0bH1J0e5W41p8evagi0Nqcw@mail.gmail.com>
+ <20210107.101729.1936921832901251107.anemo@mba.ocn.ne.jp>
+In-Reply-To: <20210107.101729.1936921832901251107.anemo@mba.ocn.ne.jp>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Thu, 7 Jan 2021 09:04:43 +0100
+Message-ID: <CAMuHMdX6ptaO3r=b55zqwrrK8ADfSRWdunwHA5DYD08PMCAPaA@mail.gmail.com>
+Subject: Re: [PATCH 00/10] Remove support for TX49xx
+To:     Atsushi Nemoto <anemo@mba.ocn.ne.jp>
+Cc:     Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        "R, Vignesh" <vigneshr@ti.com>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Takashi Iwai <tiwai@suse.com>, linux-ide@vger.kernel.org,
+        MTD Maling List <linux-mtd@lists.infradead.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        linux-spi <linux-spi@vger.kernel.org>, linux-rtc@vger.kernel.org,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Richard Weinberger <richard@nod.at>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Linux Watchdog Mailing List <linux-watchdog@vger.kernel.org>,
+        Mark Brown <broonie@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        netdev <netdev@vger.kernel.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Vinod <vkoul@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        dmaengine <dmaengine@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SGksDQoNClNvcnJ5LCBJIGp1c3QgcmVhZCB0aGlzIGVtYWlsLiBJIHdpbGwgc3VibWl0IHRo
-ZSBmaXggcGF0Y2ggYXMgc29vbiBhcyANCnBvc3NpYmxlLiBUaGFua3MgZm9yIHJlcG9ydGlu
-Zy4NCg0KQmVzdCByZWdhcmRzLA0KVGlhbmppYQ0KDQoNCk9uIDEvNy8yMSAzOjI3IFBNLCBU
-ZWUgSGFvIFdlaSB3cm90ZToNCj4gT24gMi8xMi8yMCA4OjI0IHBtLCBUb2JpYXMgTWFya3Vz
-IHdyb3RlOg0KPj4gSGkgRGF2aWQsDQo+Pg0KPj4gSSdtIGFmcmFpZCBJIGNhbid0IHByb3Zp
-ZGUgYW4gZXhhY3RseSBtYXRjaGluZyBkaXNhc3NlbWJseSBvZiB0aGUgZnVuY3Rpb24gc2lu
-Y2UgSSd2ZSBzaW5jZSB1cGRhdGVkIHRvIG5ld2VyIC1yYyBrZXJuZWxzLg0KPj4gQW5vdGhl
-ciBkZWJ1Z2dpbmcgaHVyZGxlIGlzIHRoYXQgdGhlIHNwZWNpZmljIGtlcm5lbCBjb2RlIHBh
-dGggc2VlbXMgdG8gYmUgdHJpZ2dlcmVkIGJ5IGEgdmVyeSBzcGVjaWZpYyBpd2QgY29kZSBw
-YXRoIHRoYXQgaXdkIG9ubHkgdXNlcyBmb3IgODAyLjFYL0VBUC1zZWN1cmVkIG5ldHdvcmtz
-LCBhbmQgSSBzaW1wbHkgd2Fzbid0IG5lYXIgYW55IEVBUC1zZWN1cmVkIG5ldHdvcmtzIGlu
-IHRoZSBsYXN0IGZldyB3ZWVrcy4NCj4+IEkndmUgdHJpZWQgY3JlYXRpbmcgYSByZXByb2R1
-Y2VyIHVzaW5nIGEgYmFzaCBzY3JpcHQgY2FsbGluZyB2YXJpb3VzIGtleWN0bCBjb21tYW5k
-cyBidXQgdG8gbm8gc3VjY2Vzcz4NCj4+IERhdmlkIEhvd2VsbHMgd3JvdGU6DQo+Pj4gVG9i
-aWFzIE1hcmt1cyA8dG9iaWFzQG1hcmt1cy1yZWdlbnNidXJnLmRlPiB3cm90ZToNCj4+Pg0K
-Pj4+PiBrZXJuZWw6IFJJUDogMDAxMDpwdWJsaWNfa2V5X3ZlcmlmeV9zaWduYXR1cmUrMHgx
-ODkvMHgzZjANCj4+Pg0KPj4+IElzIGl0IHBvc3NpYmxlIGZvciB5b3UgdG8gcHJvdmlkZSBh
-IGRpc2Fzc2VtYmx5IG9mIHRoaXMgZnVuY3Rpb24gZnJvbSB0aGUNCj4+PiBrZXJuZWwgeW91
-IHdlcmUgdXNpbmc/ICBGb3IgdGhpcyB0byBvY2N1ciBvbiB0aGF0IGxpbmUsIGl0IGFwcGVh
-cnMgdGhhdCBzaWcNCj4+PiB3b3VsZCBuZWVkIHRvIGJlIE5VTEwgLSBidXQgdGhhdCBzaG91
-bGQgdHJpcCBhbiBhc3NlcnRpb24gYXQgdGhlIHRvcCBvZiB0aGUNCj4+PiBmdW5jdGlvbiAt
-IG9yIGEgdmVyeSBzbWFsbCBudW1iZXIgKHdoaWNoIGNvdWxkIGJlIFJDWCwgUjA5IG9yIFIx
-MSkuDQo+Pj4NCj4+PiBUaGFua3MsDQo+Pj4gRGF2aWQNCj4+Pg0KPiANCj4gVGhpcyBwcm9i
-bGVtIGlzIHN0aWxsIGluIDUuMTAuNCAod2l0aCBpd2QgMS4xMCk6DQo+IA0KPiAtLS0NCj4g
-a2VybmVsOiBCVUc6IGtlcm5lbCBOVUxMIHBvaW50ZXIgZGVyZWZlcmVuY2UsIGFkZHJlc3M6
-IDAwMDAwMDAwMDAwMDAwMDANCj4ga2VybmVsOiAjUEY6IHN1cGVydmlzb3IgcmVhZCBhY2Nl
-c3MgaW4ga2VybmVsIG1vZGUNCj4ga2VybmVsOiAjUEY6IGVycm9yX2NvZGUoMHgwMDAwKSAt
-IG5vdC1wcmVzZW50IHBhZ2UNCj4ga2VybmVsOiBQR0QgMCBQNEQgMA0KPiBrZXJuZWw6IE9v
-cHM6IDAwMDAgWyM2XSBQUkVFTVBUIFNNUCBQVEkNCj4ga2VybmVsOiBDUFU6IDcgUElEOiA2
-MDg5IENvbW06IGl3ZCBUYWludGVkOiBHIFMgICBVRCBXICBPRSAgICAgNS4xMC40LWFyY2gy
-LTEgIzENCj4ga2VybmVsOiBIYXJkd2FyZSBuYW1lOiBMRU5PVk8gMjBMN0NUTzFXVy8yMEw3
-Q1RPMVdXLCBCSU9TIE4yMkVUNjBQICgxLjM3ICkgMTEvMjUvMjAxOQ0KPiBrZXJuZWw6IFJJ
-UDogMDAxMDpwdWJsaWNfa2V5X3ZlcmlmeV9zaWduYXR1cmUrMHgxODkvMHg0MDANCj4ga2Vy
-bmVsOiBDb2RlOiA0OCA4YiA0MCBkMCA0NCA4OSBjYSA0YyA4OSBmZSA0YyA4OSBlNyBlOCBl
-ZiAzMyA5YiAwMCA4NSBjMCAwZiA4NSA4MCAwMSAwMCAwMCA0OCA4YiA3NSAzMCA0OCBjNyBj
-NyBmOCA4NCA5OSBiYSBiOSAwNCAwMCAwMCAwMCA8ZjM+IGE2IDBmIDk3IGMwIDFjIDAwIDg0
-IGMwIDc1IDBiIDhiIDQ1IDUwIDg1IGMwIDBmIDg1IGUwIDAxIDAwIDAwDQo+IGtlcm5lbDog
-UlNQOiAwMDE4OmZmZmZhZjZkODExYjNkNTAgRUZMQUdTOiAwMDAxMDI0Ng0KPiBrZXJuZWw6
-IFJBWDogMDAwMDAwMDAwMDAwMDAwMCBSQlg6IGZmZmY5OWQ2YTI0YmE1NDAgUkNYOiAwMDAw
-MDAwMDAwMDAwMDA0DQo+IGtlcm5lbDogUkRYOiBmZmZmOTlkNmEyNDM2YzAwIFJTSTogMDAw
-MDAwMDAwMDAwMDAwMCBSREk6IGZmZmZmZmZmYmE5OTg0ZjgNCj4ga2VybmVsOiBSQlA6IGZm
-ZmZhZjZkODExYjNlODggUjA4OiBmZmZmOTlkNjgxYjU4Y2MwIFIwOTogMDAwMDAwMDAwMDAw
-MDAwOA0KPiBrZXJuZWw6IFIxMDogMDAwMDAwMDAwMDAwMDAwMCBSMTE6IDAwMDAwMDAwMDAw
-MDAwMGEgUjEyOiBmZmZmOTlkNmEyNGJhYjQwDQo+IGtlcm5lbDogUjEzOiBmZmZmOTlkNmEy
-NDM3MjAwIFIxNDogZmZmZmFmNmQ4MTFiM2Q4OCBSMTU6IGZmZmY5OWQ1Y2UxMzQ4MDANCj4g
-a2VybmVsOiBGUzogIDAwMDA3ZjE0ZDE1Nzg3NDAoMDAwMCkgR1M6ZmZmZjk5ZGFjNzVjMDAw
-MCgwMDAwKSBrbmxHUzowMDAwMDAwMDAwMDAwMDAwDQo+IGtlcm5lbDogQ1M6ICAwMDEwIERT
-OiAwMDAwIEVTOiAwMDAwIENSMDogMDAwMDAwMDA4MDA1MDAzMw0KPiBrZXJuZWw6IENSMjog
-MDAwMDAwMDAwMDAwMDAwMCBDUjM6IDAwMDAwMDAxZTI2YWEwMDUgQ1I0OiAwMDAwMDAwMDAw
-MzcwNmUwDQo+IGtlcm5lbDogQ2FsbCBUcmFjZToNCj4ga2VybmVsOiAgYXN5bW1ldHJpY19r
-ZXlfdmVyaWZ5X3NpZ25hdHVyZSsweDVlLzB4ODANCj4ga2VybmVsOiAga2V5Y3RsX3BrZXlf
-dmVyaWZ5KzB4YzAvMHgxMjANCj4ga2VybmVsOiAgZG9fc3lzY2FsbF82NCsweDMzLzB4NDAN
-Cj4ga2VybmVsOiAgZW50cnlfU1lTQ0FMTF82NF9hZnRlcl9od2ZyYW1lKzB4NDQvMHhhOQ0K
-PiBrZXJuZWw6IFJJUDogMDAzMzoweDdmMTRkMTY3NWQ1ZA0KPiBrZXJuZWw6IENvZGU6IDAw
-IGMzIDY2IDJlIDBmIDFmIDg0IDAwIDAwIDAwIDAwIDAwIDkwIGYzIDBmIDFlIGZhIDQ4IDg5
-IGY4IDQ4IDg5IGY3IDQ4IDg5IGQ2IDQ4IDg5IGNhIDRkIDg5IGMyIDRkIDg5IGM4IDRjIDhi
-IDRjIDI0IDA4IDBmIDA1IDw0OD4gM2QgMDEgZjAgZmYgZmYgNzMgMDEgYzMgNDggOGIgMGQg
-ZTMgNzAgMGMgMDAgZjcgZDggNjQgODkgMDEgNDgNCj4ga2VybmVsOiBSU1A6IDAwMmI6MDAw
-MDdmZmNlNzZkYTcyOCBFRkxBR1M6IDAwMDAwMjQ2IE9SSUdfUkFYOiAwMDAwMDAwMDAwMDAw
-MGZhDQo+IGtlcm5lbDogUkFYOiBmZmZmZmZmZmZmZmZmZmRhIFJCWDogMDAwMDdmZmNlNzZk
-YTdiMCBSQ1g6IDAwMDA3ZjE0ZDE2NzVkNWQNCj4ga2VybmVsOiBSRFg6IDAwMDA1NjU0NTdk
-MDhhYzAgUlNJOiAwMDAwN2ZmY2U3NmRhNzMwIFJESTogMDAwMDAwMDAwMDAwMDAxYw0KPiBr
-ZXJuZWw6IFJCUDogMDAwMDU2NTQ1N2QwOGFjMCBSMDg6IDAwMDA1NjU0NTdkMGIyZGQgUjA5
-OiAwMDAwMDAzMDNlYzJjMDdhDQo+IGtlcm5lbDogUjEwOiAwMDAwN2ZmY2U3NmRhN2IwIFIx
-MTogMDAwMDAwMDAwMDAwMDI0NiBSMTI6IDAwMDA1NjU0NTdkMGIyZGQNCj4ga2VybmVsOiBS
-MTM6IDAwMDA3ZjE0ZDE3N2Q5YzAgUjE0OiAwMDAwNTY1NDU3ZDBiMjk0IFIxNTogMDAwMDdm
-ZmNlNzZkYTdiMA0KPiBrZXJuZWw6IE1vZHVsZXMgbGlua2VkIGluOiBibmVwIHV2Y3ZpZGVv
-IHZpZGVvYnVmMl92bWFsbG9jIHZpZGVvYnVmMl9tZW1vcHMgdmlkZW9idWYyX3Y0bDIgdmlk
-ZW9idWYyX2NvbW1vbiB2aWRlb2RldiBtYyBjY20gYWxnaWZfYWVhZCBkZXNfZ2VuZXJpYyBs
-aWJkZXMgZWNiIGFsZ2lmX3NrY2lwaGVyIGNtYWMgbWQ0IGFsZ2lmX2hhc2ggYWZfYWxnIGJ0
-dXNiIGJ0cnRsIGJ0YmNtIGJ0aW50ZWwgYmx1ZXRvb3RoIHNuZF9zb2Nfc2tsIGVsYW5faTJj
-IHNuZF9oZGFfY29kZWNfaGRtaSBzbmRfc29jX3NzdF9pcGMgc25kX3NvY19zc3RfZHNwIGVj
-ZGhfZ2VuZXJpYyBlY2MgaVRDT193ZHQgc25kX2hkYV9leHRfY29yZSBpd2xtdm0gaW50ZWxf
-cG1jX2J4dCBzbmRfc29jX2FjcGlfaW50ZWxfbWF0Y2ggbWVpX2hkY3AgZWUxMDA0IGlUQ09f
-dmVuZG9yX3N1cHBvcnQgc25kX2hkYV9jb2RlY19yZWFsdGVrIHNuZF9zb2NfYWNwaSB3bWlf
-Ym1vZiBpbnRlbF93bWlfdGh1bmRlcmJvbHQgc25kX2hkYV9jb2RlY19nZW5lcmljIGludGVs
-X3JhcGxfbXNyIHNuZF9oZGFfaW50ZWwgbWFjODAyMTEgc25kX2ludGVsX2RzcGNmZyBzb3Vu
-ZHdpcmVfaW50ZWwgc291bmR3aXJlX2dlbmVyaWNfYWxsb2NhdGlvbiBzb3VuZHdpcmVfY2Fk
-ZW5jZSBzbmRfaGRhX2NvZGVjIHg4Nl9wa2dfdGVtcF90aGVybWFsIGludGVsX3Bvd2VyY2xh
-bXAgY29yZXRlbXAgbGliYXJjNCBzbmRfaGRhX2NvcmUga3ZtX2ludGVsIHNuZF9od2RlcCBu
-bHNfaXNvODg1OV8xIHNvdW5kd2lyZV9idXMgdmZhdCBmYXQga3ZtIHNuZF9zb2NfY29yZSBp
-d2x3aWZpIHNuZF9jb21wcmVzcyBpcnFieXBhc3MgcmFwbCBhYzk3X2J1cyBpbnRlbF9jc3Rh
-dGUgc25kX3BjbV9kbWFlbmdpbmUgaW50ZWxfdW5jb3JlIGpveWRldiBzbmRfcGNtIGNmZzgw
-MjExIG1vdXNlZGV2IG1laV9tZSBwY3Nwa3IgZTEwMDBlIGkyY19pODAxIHNuZF90aW1lciBp
-MmNfc21idXMgbWVpIHByb2Nlc3Nvcl90aGVybWFsX2RldmljZQ0KPiBrZXJuZWw6ICBpbnRl
-bF94aGNpX3VzYl9yb2xlX3N3aXRjaCBpbnRlbF9yYXBsX2NvbW1vbiBpbnRlbF9wY2hfdGhl
-cm1hbCByb2xlcyBpbnRlbF9zb2NfZHRzX2lvc2YgdGhpbmtwYWRfYWNwaSB3bWkgbGVkdHJp
-Z19hdWRpbyByZmtpbGwgc25kIGludDM0MDNfdGhlcm1hbCBzb3VuZGNvcmUgaW50MzQweF90
-aGVybWFsX3pvbmUgaW50MzQwMF90aGVybWFsIGFjcGlfdGhlcm1hbF9yZWwgYWNwaV9wYWQg
-bWFjX2hpZCBwa2NzOF9rZXlfcGFyc2VyIGNyeXB0b191c2VyIGZ1c2UgYWNwaV9jYWxsKE9F
-KSBicGZfcHJlbG9hZCBpcF90YWJsZXMgeF90YWJsZXMgZXh0NCBjcmMzMmNfZ2VuZXJpYyBj
-cmMxNiBtYmNhY2hlIGpiZDIgdWFzIHVzYl9zdG9yYWdlIGRtX2NyeXB0IGNiYyBlbmNyeXB0
-ZWRfa2V5cyBkbV9tb2QgdHJ1c3RlZCB0cG0gcm5nX2NvcmUgY3JjdDEwZGlmX3BjbG11bCBj
-cmMzMl9wY2xtdWwgY3JjMzJjX2ludGVsIGdoYXNoX2NsbXVsbmlfaW50ZWwgYWVzbmlfaW50
-ZWwgY3J5cHRvX3NpbWQgY3J5cHRkIGdsdWVfaGVscGVyIHNlcmlvX3JhdyB4aGNpX3BjaSB4
-aGNpX3BjaV9yZW5lc2FzIGk5MTUgdmlkZW8gaW50ZWxfZ3R0IGkyY19hbGdvX2JpdCBkcm1f
-a21zX2hlbHBlciBzeXNjb3B5YXJlYSBzeXNmaWxscmVjdCBzeXNpbWdibHQgZmJfc3lzX2Zv
-cHMgY2VjIGRybSBhZ3BnYXJ0DQo+IGtlcm5lbDogQ1IyOiAwMDAwMDAwMDAwMDAwMDAwDQo+
-IGtlcm5lbDogLS0tWyBlbmQgdHJhY2UgZmNiYjQ4MmI1NDkyNTBiNiBdLS0tDQo+IGtlcm5l
-bDogUklQOiAwMDEwOnB1YmxpY19rZXlfdmVyaWZ5X3NpZ25hdHVyZSsweDE4OS8weDQwMA0K
-PiBrZXJuZWw6IENvZGU6IDQ4IDhiIDQwIGQwIDQ0IDg5IGNhIDRjIDg5IGZlIDRjIDg5IGU3
-IGU4IGVmIDMzIDliIDAwIDg1IGMwIDBmIDg1IDgwIDAxIDAwIDAwIDQ4IDhiIDc1IDMwIDQ4
-IGM3IGM3IGY4IDg0IDk5IGJhIGI5IDA0IDAwIDAwIDAwIDxmMz4gYTYgMGYgOTcgYzAgMWMg
-MDAgODQgYzAgNzUgMGIgOGIgNDUgNTAgODUgYzAgMGYgODUgZTAgMDEgMDAgMDANCj4ga2Vy
-bmVsOiBSU1A6IDAwMTg6ZmZmZmFmNmQ4MGFkN2Q1MCBFRkxBR1M6IDAwMDEwMjQ2DQo+IGtl
-cm5lbDogUkFYOiAwMDAwMDAwMDAwMDAwMDAwIFJCWDogZmZmZjk5ZDYxZjU2MTFjMCBSQ1g6
-IDAwMDAwMDAwMDAwMDAwMDQNCj4ga2VybmVsOiBSRFg6IGZmZmY5OWQ2NjcxNGNiMDAgUlNJ
-OiAwMDAwMDAwMDAwMDAwMDAwIFJESTogZmZmZmZmZmZiYTk5ODRmOA0KPiBrZXJuZWw6IFJC
-UDogZmZmZmFmNmQ4MGFkN2U4OCBSMDg6IGZmZmY5OWQ1YzYwZmU3NjAgUjA5OiAwMDAwMDAw
-MDAwMDAwMDA4DQo+IGtlcm5lbDogUjEwOiAwMDAwMDAwMDAwMDAwMDAwIFIxMTogMDAwMDAw
-MDAwMDAwMDAwYSBSMTI6IGZmZmY5OWQ1ZTk3YWZlYzANCj4ga2VybmVsOiBSMTM6IGZmZmY5
-OWQ2NjcxNGQ2MDAgUjE0OiBmZmZmYWY2ZDgwYWQ3ZDg4IFIxNTogZmZmZjk5ZDVjNmU5MGEw
-MA0KPiBrZXJuZWw6IEZTOiAgMDAwMDdmMTRkMTU3ODc0MCgwMDAwKSBHUzpmZmZmOTlkYWM3
-NWMwMDAwKDAwMDApIGtubEdTOjAwMDAwMDAwMDAwMDAwMDANCj4ga2VybmVsOiBDUzogIDAw
-MTAgRFM6IDAwMDAgRVM6IDAwMDAgQ1IwOiAwMDAwMDAwMDgwMDUwMDMzDQo+IGtlcm5lbDog
-Q1IyOiAwMDAwMDAwMDAwMDAwMDAwIENSMzogMDAwMDAwMDFlMjZhYTAwNSBDUjQ6IDAwMDAw
-MDAwMDAzNzA2ZTANCj4gc3lzdGVtZFsxXTogaXdkLnNlcnZpY2U6IE1haW4gcHJvY2VzcyBl
-eGl0ZWQsIGNvZGU9a2lsbGVkLCBzdGF0dXM9OS9LSUxMDQo+IHN5c3RlbWRbMV06IGl3ZC5z
-ZXJ2aWNlOiBGYWlsZWQgd2l0aCByZXN1bHQgJ3NpZ25hbCcuDQo+IC0tLQ0KPiANCj4gSGVy
-ZSBpcyB0aGUgZGlzYXNzZW1ibHkgb2YgcHVibGljX2tleV92ZXJpZnlfc2lnbmF0dXJlIGFy
-b3VuZCB0aGUgZmF1bHRpbmcgaW5zdHJ1Y3Rpb24NCj4gDQo+IC0tLQ0KPiAgICAgMHhmZmZm
-ZmZmZmI5YTRlYWY5Ogltb3YgICAgMHgzMCglcmJwKSwlcnNpDQo+ICAgICAweGZmZmZmZmZm
-YjlhNGVhZmQ6CW1vdiAgICAkMHhmZmZmZmZmZmJhOTk4NGY4LCVyZGkNCj4gICAgIDB4ZmZm
-ZmZmZmZiOWE0ZWIwNDoJbW92ICAgICQweDQsJWVjeA0KPiAgICAgMHhmZmZmZmZmZmI5YTRl
-YjA5OglyZXB6IGNtcHNiICVlczooJXJkaSksJWRzOiglcnNpKSAjIGZhdWx0IGhlcmUNCj4g
-ICAgIDB4ZmZmZmZmZmZiOWE0ZWIwYjoJc2V0YSAgICVhbA0KPiAgICAgMHhmZmZmZmZmZmI5
-YTRlYjBlOglzYmIgICAgJDB4MCwlYWwNCj4gICAgIDB4ZmZmZmZmZmZiOWE0ZWIxMDoJdGVz
-dCAgICVhbCwlYWwNCj4gICAgIDB4ZmZmZmZmZmZiOWE0ZWIxMjoJam5lICAgIDB4ZmZmZmZm
-ZmZiOWE0ZWIxZg0KPiAgICAgMHhmZmZmZmZmZmI5YTRlYjE0Ogltb3YgICAgMHg1MCglcmJw
-KSwlZWF4DQo+ICAgICAweGZmZmZmZmZmYjlhNGViMTc6CXRlc3QgICAlZWF4LCVlYXgNCj4g
-ICAgIDB4ZmZmZmZmZmZiOWE0ZWIxOToJam5lICAgIDB4ZmZmZmZmZmZiOWE0ZWNmZg0KPiAt
-LS0NCj4gDQo+IGNvcnJlc3BvbmRpbmcgdG8gdGhpczogaHR0cHM6Ly9lbGl4aXIuYm9vdGxp
-bi5jb20vbGludXgvdjUuMTAuNC9zb3VyY2UvY3J5cHRvL2FzeW1tZXRyaWNfa2V5cy9wdWJs
-aWNfa2V5LmMjTDM1OQ0KPiANCj4gLS0tDQo+IAlpZiAoc3RyY21wKHNpZy0+cGtleV9hbGdv
-LCAic20yIikgPT0gMCAmJiBzaWctPmRhdGFfc2l6ZSkgew0KPiAJCXJldCA9IGNlcnRfc2ln
-X2RpZ2VzdF91cGRhdGUoc2lnLCB0Zm0pOw0KPiAJCWlmIChyZXQpDQo+IAkJCWdvdG8gZXJy
-b3JfZnJlZV9rZXk7DQo+IAl9DQo+IC0tLQ0KPiANCj4gU28gaXQgc2VlbXMgbGlrZSBzaWct
-PnBrZXlfYWxnbyBpcyBudWxsLiBJIHdpbGwgdHJ5IHRvIGRlYnVnLCBidXQgSSBkb24ndCBn
-ZXQgYWNjZXNzIHRvIGFuIEVBUC1wcm90ZWN0ZWQgbmV0d29yayBvZnRlbiAobWF5YmUgb25j
-ZSBvciB0d2ljZSBhIHdlZWspLCBzbyBpdCBtaWdodCB0YWtlIGEgd2hpbGUuDQo+IA0K
+Hi Nemoto-san,
+
+On Thu, Jan 7, 2021 at 2:18 AM Atsushi Nemoto <anemo@mba.ocn.ne.jp> wrote:
+> On Wed, 6 Jan 2021 21:41:24 +0100, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> >> > Is that sufficient to keep it?
+> >>
+> >> for me it is. But now we probaly need some reverts then...
+> >
+> > Indeed. Fortunately not all of it, as some removals were TX4938-only.
+>
+> These patches should not break RBTX4927:
+>
+>   net: tc35815: Drop support for TX49XX boards
+>   spi: txx9: Remove driver
+>   mtd: Remove drivers used by TX49xx
+>   char: hw_random: Remove tx4939 driver
+>   rtc: tx4939: Remove driver
+>   ide: tx4938ide: Remove driver
+
+Indeed.
+
+> And these patches just break audio-support only.
+>
+>   dma: tx49 removal
+>   ASoC: txx9: Remove driver
+>
+> I think dma and ASoC drivers are hard to maintain now, and can be
+> dropped for basic support for RBTX4927.
+> (TX39 boards does not have audio-support, so dma txx9 driver can be
+> dropped too)
+
+Agreed, I don't test audio anyway, but I know it used to work (I had
+intended to use the board as an MPD media server, but never got beyond
+the prototyping phase).
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
