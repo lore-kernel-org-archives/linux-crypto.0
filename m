@@ -8,56 +8,56 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A23C433E6
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 12:31:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4552CC433E0
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 12:31:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CED9923356
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 12:31:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 196C023358
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jan 2021 12:31:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728097AbhAGMbS (ORCPT
+        id S1728111AbhAGMbg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 7 Jan 2021 07:31:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37990 "EHLO
+        Thu, 7 Jan 2021 07:31:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728103AbhAGMbR (ORCPT
+        with ESMTP id S1728118AbhAGMbg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Jan 2021 07:31:17 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48AE7C0612F9;
-        Thu,  7 Jan 2021 04:30:37 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id n7so4749512pgg.2;
-        Thu, 07 Jan 2021 04:30:37 -0800 (PST)
+        Thu, 7 Jan 2021 07:31:36 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10C66C0612F5;
+        Thu,  7 Jan 2021 04:30:55 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id j1so3414792pld.3;
+        Thu, 07 Jan 2021 04:30:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=IcYiMBsXjgXqsCUOACpj4n3qnT1OSjGqlWhB/zIbApI=;
-        b=q1b14DkzpJRGPgQ2ngw61EBHyRojXOhmeARI7hubXPHWZuJ3ZbCQfQzA+Vg00Ji7oN
-         eglKJajT/phzHNQdYRWyowE60icmapabNDIYHLcMsSGODXVR4fpdciDdCrO9q5WR2NbU
-         Q9p/jU8+M97ZgPsiDx95fcTwUWO7Aj8NfhkPCmfEjaAehVV0TfU+lG8hYT0bH6zWhp0v
-         e7EmYHPq+Pm8eCmjsyO8DmmO+Mp3YYK+9dT08gsLBSU8uvzy2wozGxVK4R+1O5tmkmvN
-         VZSAcN/R5jx/0FmSw+VwcZ3O8gih4wxKUiKLLMVFbDRo19UMdcyq/Mc6JLZ8zr2v9UtP
-         BmLg==
+        bh=1e1njK4JCLyF4BWRntmeMNLMXKX/535/WykRDF+9nqU=;
+        b=hbZxd8GMbWMwunv97wfH2Jf1oJf/8UcNY6xBKZcNSEUqzpSUI65LKuKQrxS91lf3JW
+         Bupw/mebNEqeQTlLLVwWk16hsX081CmCeM3mCGPFqAIt6Y15WaGH/KwDFlvfhr1Hgg9Z
+         XmJtwwBRs5RusKIVtDfejCw5hq1vLWEe1lHia/3otyEyWTKYI3bUsoZQF2D5pI0ztNQy
+         0/6+Z3Om5i4sHkVm60WuZFrh8e9eyF3U8Mo1nCSfMgurTh2MkeWCP5UWfGjtMH2pbNlQ
+         Pt9JtbYllg2QWQaoR9nfEhdPC6MM/gw25S4hDUm222XYCSreZw2frFc8N124MrS997zA
+         oqyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=IcYiMBsXjgXqsCUOACpj4n3qnT1OSjGqlWhB/zIbApI=;
-        b=rlgrEL9WfMwLyZi6mb4mXhkxRdsAnNeOU8SsANUiEZg5zRbKuLlXBvO3XRs5uJ+rxs
-         DVnHd0Ka1xFM/mOgiXeTt9N5uvR9R1ysVjigAMVi9jd8W6oc6s+cbPgWLd8Pfpp8tDQR
-         bKFxYjHC46jtZT8vmnUKWuGJujBhwqSnxRAP3MJkZ+Aous7R8i07ZvDR9NLIKuY0+WHT
-         eUxEN6nXMzRYa9wte9/rJjCkSd2qruCVCu2nYF9CsBQbeCeOhdCsbEAQD5D6rs2KuHbm
-         2Af8HjDFVR79n7q4EBpfP0DCrlnUduI00gM596QFLZR4aoa9fxsObWE1VqYrYSEDp7gq
-         G9Lw==
-X-Gm-Message-State: AOAM531TPE3tVOWCDwOhOlZKTfYvxs5bEdFSf3jEMTYPvf5Q/YN1hF2n
-        1x2XwvGsS6tnmOsIcaVAxvM=
-X-Google-Smtp-Source: ABdhPJwRdfOyuDoYxkXBo3Lx4+KPzBzDxEcsdT+IBiU4+pw8wU/dgoW9f8IkVaCL9kQ9AK1QuLGQMg==
-X-Received: by 2002:a63:605:: with SMTP id 5mr1620892pgg.144.1610022636869;
-        Thu, 07 Jan 2021 04:30:36 -0800 (PST)
+        bh=1e1njK4JCLyF4BWRntmeMNLMXKX/535/WykRDF+9nqU=;
+        b=nJsZgXJl58kihtvuLq5vsuKhOYDQ+cHnVAwhtkjA7/sC4WNGeEJbiC7sZPmbkqDpys
+         pmv2V0mH9Yx0VA+A21ysLorPCQajQVkSyPnPjowt3sHy9rsRgXwdyeI2XzWoRXZnag7N
+         prmTy2+lb0YTkZZNxgOLUAJ+D/TWFx7raa8lf72dM9FIynOv5oZYJYVZkMJssaRaqkak
+         N0CEhmNECXD/pvIEnVGoetMWNlNNYhF0d2rP9hiAA3TIOmfD4U8zOvn73DeRCKLfRQ4n
+         96UPuhubt3oO5gh/2NS/Ks/oPmy9K5HH8UIFxriOJmajZ1nACNVIib9QM6Bnbyd3dSdC
+         NODg==
+X-Gm-Message-State: AOAM53298L2bnAGQlxPdTGqCn2rMnapMqyLcykw4j2epBvhW+59VautZ
+        JtEHjK2WZZ6yBL9ftjHGgFRNwOw8AoY=
+X-Google-Smtp-Source: ABdhPJxNswk3UqAPRQFOECWMZZXKETLsDLgMohWjq2tJwnnMR19IXzXOUsAVBJnz8yZ5/DQIIMxoDA==
+X-Received: by 2002:a17:90a:b90c:: with SMTP id p12mr8705424pjr.135.1610022654721;
+        Thu, 07 Jan 2021 04:30:54 -0800 (PST)
 Received: from localhost.localdomain ([49.207.216.201])
-        by smtp.gmail.com with ESMTPSA id h12sm6356014pgk.70.2021.01.07.04.30.27
+        by smtp.gmail.com with ESMTPSA id h12sm6356014pgk.70.2021.01.07.04.30.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jan 2021 04:30:36 -0800 (PST)
+        Thu, 07 Jan 2021 04:30:54 -0800 (PST)
 From:   Allen Pais <allen.lkml@gmail.com>
 To:     herbert@gondor.apana.org.au
 Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
@@ -74,9 +74,9 @@ Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
         linux-samsung-soc@vger.kernel.org,
         Allen Pais <apais@linux.microsoft.com>,
         Romain Perier <romain.perier@gmail.com>
-Subject: [PATCH v2 08/19] crypto: hifn_795x: convert tasklets to use new tasklet_setup() API
-Date:   Thu,  7 Jan 2021 17:59:33 +0530
-Message-Id: <20210107122944.16363-5-allen.lkml@gmail.com>
+Subject: [PATCH v2 10/19] crypto: ixp4xx: convert tasklets to use new tasklet_setup() API
+Date:   Thu,  7 Jan 2021 17:59:35 +0530
+Message-Id: <20210107122944.16363-7-allen.lkml@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210107122944.16363-1-allen.lkml@gmail.com>
 References: <20210107122944.16363-1-allen.lkml@gmail.com>
@@ -96,34 +96,31 @@ and from_tasklet() to pass the tasklet pointer explicitly.
 Signed-off-by: Romain Perier <romain.perier@gmail.com>
 Signed-off-by: Allen Pais <apais@linux.microsoft.com>
 ---
- drivers/crypto/hifn_795x.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/crypto/ixp4xx_crypto.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
-index 7e7a8f01ea6b..47f7bb43477e 100644
---- a/drivers/crypto/hifn_795x.c
-+++ b/drivers/crypto/hifn_795x.c
-@@ -2445,9 +2445,9 @@ static int hifn_register_alg(struct hifn_device *dev)
- 	return err;
+diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
+index 8b0f17fc09fb..b783ab58d718 100644
+--- a/drivers/crypto/ixp4xx_crypto.c
++++ b/drivers/crypto/ixp4xx_crypto.c
+@@ -414,7 +414,7 @@ static void irqhandler(void *_unused)
+ 	tasklet_schedule(&crypto_done_tasklet);
  }
  
--static void hifn_tasklet_callback(unsigned long data)
-+static void hifn_tasklet_callback(struct tasklet_struct *t)
+-static void crypto_done_action(unsigned long arg)
++static void crypto_done_action(struct tasklet_struct *unused)
  {
--	struct hifn_device *dev = (struct hifn_device *)data;
-+	struct hifn_device *dev = from_tasklet(dev, t, tasklet);
+ 	int i;
  
- 	/*
- 	 * This is ok to call this without lock being held,
-@@ -2533,7 +2533,7 @@ static int hifn_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+@@ -497,7 +497,7 @@ static int init_ixp_crypto(struct device *dev)
+ 		goto err;
+ 	}
+ 	qmgr_set_irq(RECV_QID, QUEUE_IRQ_SRC_NOT_EMPTY, irqhandler, NULL);
+-	tasklet_init(&crypto_done_tasklet, crypto_done_action, 0);
++	tasklet_setup(&crypto_done_tasklet, crypto_done_action);
  
- 	pci_set_drvdata(pdev, dev);
- 
--	tasklet_init(&dev->tasklet, hifn_tasklet_callback, (unsigned long)dev);
-+	tasklet_setup(&dev->tasklet, hifn_tasklet_callback);
- 
- 	crypto_init_queue(&dev->queue, 1);
- 
+ 	qmgr_enable_irq(RECV_QID);
+ 	return 0;
 -- 
 2.25.1
 
