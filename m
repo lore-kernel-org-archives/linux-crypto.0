@@ -3,68 +3,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42C1BC43381
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jan 2021 20:37:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 511B9C43381
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jan 2021 21:17:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1CD6123A9C
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jan 2021 20:37:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0ECA523A80
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jan 2021 21:17:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729149AbhAHUgw (ORCPT
+        id S1729540AbhAHVRS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Jan 2021 15:36:52 -0500
-Received: from mail.kernel.org ([198.145.29.99]:48160 "EHLO mail.kernel.org"
+        Fri, 8 Jan 2021 16:17:18 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55098 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729342AbhAHUgr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Jan 2021 15:36:47 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 1B25D23AC0;
-        Fri,  8 Jan 2021 20:36:07 +0000 (UTC)
+        id S1729330AbhAHVRS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 8 Jan 2021 16:17:18 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id AA67423A80;
+        Fri,  8 Jan 2021 21:16:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610138167;
-        bh=suKmYRChMg59UeP8h5ovz4ks+SbFS4gN8LXaH+t3mpc=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=s2Zz0Ql0WP00aQbR4ydcsZh6+iX0pRZriHcgB7+n9tCdCH/Amx9NyotwORYa0YrLX
-         jGGEHPS17/lkLXvBTrWu/TcCnGpu0/7NQ53qj4sEHvs7g0EZBSGB9sarKBsWdMzdb+
-         8apfZadqYfmwqNeNaCWEaCBdJZo5sOQzKxnDKmMOLW6lHM3HjY+iKpWnUXnQArgbHF
-         1jBS7Zki7obNGlkaUiN64uKr/R12kZEpxerEvfaSDCDDIuPxilOTU7fdkyiVfqRjGW
-         NJZgjToZ3J/fS26PbLgfM0HnK8TFZ0D07cncRQ7/tRwflZUVOBbS1UR0Q6iGj0wfow
-         6GmeA7GKk5FtA==
-Subject: Re: [GIT PULL] Crypto Fixes for 5.11
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20210108035450.GA6191@gondor.apana.org.au>
-References: <20200803044024.GA6429@gondor.apana.org.au>
- <20200830223304.GA16882@gondor.apana.org.au>
- <20201026011159.GA2428@gondor.apana.org.au>
- <20201227113221.GA28744@gondor.apana.org.au> <20210108035450.GA6191@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20210108035450.GA6191@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: 0aa171e9b267ce7c52d3a3df7bc9c1fc0203dec5
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ea1c87c156d94dd78b4f5267ec40c403b2da7e14
-Message-Id: <161013816709.21693.17874596360461078655.pr-tracker-bot@kernel.org>
-Date:   Fri, 08 Jan 2021 20:36:07 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        s=k20201202; t=1610140597;
+        bh=bjigwf/89JSjEVHxRjfk2laNrhGqBpQX0mFubaEYXK4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=PSXY5/10M+CaVwDHwLXOBFKTWUgz1wlFmhUSA2wYDQcbe5VsSyDQ3dw68w2PF0O0l
+         Rm94rM7z9EhSX8bJvDadessVDdZcLlkAndL9OPFcG/lJbOjmncvt723W+yRt0nMjpi
+         h7JcyMmGi4pDZ4TURomy+8BFx+LeiRkOfS0AB+C166PbDQjnWs1aJzWnlfUFTpkh6Y
+         HMHfPL7haPtHD4yCzAOp31Bj2iJzEZe96U0n5pLRjYWJ97l4JI46M5ai+Bt6AKatiu
+         Nnq6gvH/zJQsG9NFFPwhoxviSh3p0kL2Cjs193B+RY1nApcreOCveq7wI1iJQKGx4V
+         3uE9y8G+q93og==
+Date:   Fri, 8 Jan 2021 13:16:36 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        herbert@gondor.apana.org.au, arnd@arndb.de
+Subject: Re: [PATCH v2] crypto: reduce minimum alignment of on-stack
+ structures
+Message-ID: <X/jLtI1m96DD+QLO@sol.localdomain>
+References: <20210108171706.10306-1-ardb@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210108171706.10306-1-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Fri, 8 Jan 2021 14:54:50 +1100:
+On Fri, Jan 08, 2021 at 06:17:06PM +0100, Ard Biesheuvel wrote:
+> diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+> index 6a733b171a5d..aa133dc3bf39 100644
+> --- a/include/crypto/skcipher.h
+> +++ b/include/crypto/skcipher.h
+> @@ -128,7 +128,7 @@ struct skcipher_alg {
+>  			     MAX_SYNC_SKCIPHER_REQSIZE + \
+>  			     (!(sizeof((struct crypto_sync_skcipher *)1 == \
+>  				       (typeof(tfm))1))) \
+> -			    ] CRYPTO_MINALIGN_ATTR; \
+> +			    ] __aligned(ARCH_SLAB_MINALIGN); \
+>  	struct skcipher_request *name = (void *)__##name##_desc
+>  
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+Are you sure this is okay?  __alignof__(struct skcipher_request) will still be
+CRYPTO_MINALIGN_ATTR, since it contains a field with that alignment.  So
+technically isn't the full alignment still needed, as the compiler can assume
+that struct skcipher_request is CRYPTO_MINALIGN_ATTR-aligned?
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ea1c87c156d94dd78b4f5267ec40c403b2da7e14
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+- Eric
