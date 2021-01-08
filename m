@@ -2,73 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC050C433E0
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jan 2021 04:44:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66B6BC4332E
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jan 2021 08:28:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A6F322DBF
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jan 2021 04:44:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 335D223435
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jan 2021 08:28:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727569AbhAHEnz (ORCPT
+        id S1727430AbhAHI2k (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 7 Jan 2021 23:43:55 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:40388 "EHLO fornost.hmeau.com"
+        Fri, 8 Jan 2021 03:28:40 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59414 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726869AbhAHEnz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Jan 2021 23:43:55 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kxjcB-0006jz-BN; Fri, 08 Jan 2021 15:43:08 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Jan 2021 15:43:07 +1100
-Date:   Fri, 8 Jan 2021 15:43:07 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Arnd Bergmann <arnd@kernel.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Tero Kristo <t-kristo@ti.com>, Arnd Bergmann <arnd@arndb.de>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: omap-sham - Fix link error without crypto-engine
-Message-ID: <20210108044307.GD12339@gondor.apana.org.au>
-References: <20210103140318.3902174-1-arnd@kernel.org>
+        id S1727418AbhAHI2k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 8 Jan 2021 03:28:40 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 0CC7A23435;
+        Fri,  8 Jan 2021 08:27:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1610094479;
+        bh=SAoDiXJG+49pPIJcmLEdT3YdpudMLb3tXzuV+M1ddMg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=EnEKOJIN+WnD4u6lFgo77faKCj54N+d/pFKhcGzW/Y3/Ccl68siuEONd2+MQVmWwA
+         g8i5J1Jp9PRFqP+bjh1UVHmW6ZNZoM79Em/nHN5DHOG6ps9hEvQuax6LdoYTVQba6R
+         W0M3rPvSPrbm/vYAaPU9CsppYeuXAhSoIAN8UGVK69VCDMDjU1FlkyeISfeCHTf0Cp
+         UrPLrlJpGz0S4tUYkZu+D7Yp8uZm4/13PvNs53jDnTG1yuR/TZx3S6Q2A5kjWrfu5R
+         w1MefWO2hD7veYyvb2xtc7eB2pAO3ZpInFWl5OgE2Cy2VRAsn/olPyc/xhF+bAgyze
+         9qY+rCVqge15w==
+Date:   Fri, 8 Jan 2021 13:57:54 +0530
+From:   Vinod Koul <vkoul@kernel.org>
+To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc:     Joe Perches <joe@perches.com>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dan Williams <dan.j.williams@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Mark Brown <broonie@kernel.org>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-mips@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
+        linux-rtc@vger.kernel.org, linux-spi@vger.kernel.org,
+        linux-watchdog@vger.kernel.org, alsa-devel@alsa-project.org
+Subject: Re: [PATCH 05/10] dma: tx49 removal
+Message-ID: <20210108082754.GW2771@vkoul-mobl>
+References: <20210105140305.141401-1-tsbogend@alpha.franken.de>
+ <20210105140305.141401-6-tsbogend@alpha.franken.de>
+ <b84dadc2e98b1986dc800c5f6f202880ed905b38.camel@perches.com>
+ <20210107164015.GA12533@alpha.franken.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20210103140318.3902174-1-arnd@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210107164015.GA12533@alpha.franken.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Jan 03, 2021 at 03:03:04PM +0100, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On 07-01-21, 17:40, Thomas Bogendoerfer wrote:
+> On Wed, Jan 06, 2021 at 11:10:38AM -0800, Joe Perches wrote:
+> > On Tue, 2021-01-05 at 15:02 +0100, Thomas Bogendoerfer wrote:
+> > > Signed-off-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+> > []
+> > > diff --git a/drivers/dma/txx9dmac.h b/drivers/dma/txx9dmac.h
+> > []
+> > > @@ -26,11 +26,6 @@
+> > >   * DMA channel.
+> > >   */
+> > >  
+> > > 
+> > > -#ifdef CONFIG_MACH_TX49XX
+> > > -static inline bool txx9_dma_have_SMPCHN(void)
+> > > -{
+> > > -	return true;
+> > > -}
+> > >  #define TXX9_DMA_USE_SIMPLE_CHAIN
+> > >  #else
+> > >  static inline bool txx9_dma_have_SMPCHN(void)
+> > 
+> > This doesn't look like it compiles as there's now an #else
+> > without an #if
 > 
-> The driver was converted to use the crypto engine helper
-> but is missing the corresponding Kconfig statement to ensure
-> it is available:
+> you are right, no idea what I had in mind while doing that.
 > 
-> arm-linux-gnueabi-ld: drivers/crypto/omap-sham.o: in function `omap_sham_probe':
-> omap-sham.c:(.text+0x374): undefined reference to `crypto_engine_alloc_init'
-> arm-linux-gnueabi-ld: omap-sham.c:(.text+0x384): undefined reference to `crypto_engine_start'
-> arm-linux-gnueabi-ld: omap-sham.c:(.text+0x510): undefined reference to `crypto_engine_exit'
-> arm-linux-gnueabi-ld: drivers/crypto/omap-sham.o: in function `omap_sham_finish_req':
-> omap-sham.c:(.text+0x98c): undefined reference to `crypto_finalize_hash_request'
-> arm-linux-gnueabi-ld: omap-sham.c:(.text+0x9a0): undefined reference to `crypto_transfer_hash_request_to_engine'
-> arm-linux-gnueabi-ld: drivers/crypto/omap-sham.o: in function `omap_sham_update':
-> omap-sham.c:(.text+0xf24): undefined reference to `crypto_transfer_hash_request_to_engine'
-> arm-linux-gnueabi-ld: drivers/crypto/omap-sham.o: in function `omap_sham_final':
-> omap-sham.c:(.text+0x1020): undefined reference to `crypto_transfer_hash_request_to_engine'
+> Vinod,
 > 
-> Fixes: 133c3d434d91 ("crypto: omap-sham - convert to use crypto engine")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  drivers/crypto/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
+> as this patch series found a still active user of the platform,
+> could you drop the patch from your tree, or do you want a revert
+> from me ?
 
-Patch applied.  Thanks.
+Dropped now
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+~Vinod
