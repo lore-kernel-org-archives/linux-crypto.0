@@ -2,274 +2,67 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47D6FC433E9
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 Jan 2021 17:34:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18B6DC43381
+	for <linux-crypto@archiver.kernel.org>; Sun, 10 Jan 2021 04:58:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F0B922507
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 Jan 2021 17:34:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAF2723603
+	for <linux-crypto@archiver.kernel.org>; Sun, 10 Jan 2021 04:58:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726364AbhAIRea (ORCPT
+        id S1726375AbhAJE6A (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 9 Jan 2021 12:34:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56522 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725942AbhAIRe3 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 9 Jan 2021 12:34:29 -0500
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 442BCC0617A2
-        for <linux-crypto@vger.kernel.org>; Sat,  9 Jan 2021 09:33:49 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id b64so11297601qkc.12
-        for <linux-crypto@vger.kernel.org>; Sat, 09 Jan 2021 09:33:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WIBhjrUJop7flf9QR2XhtZX9vVZhbTm8p1+uKOf0WUM=;
-        b=wT/OZtJvf1IdzYYBh57re8pdc9pO24OdSuf1F4RgkY1aDWGWT69IcCBzJ6SX2muCcj
-         l+L+AHM/zKQahAJwAC84fAjzjD0y82ZjIwZhfRCFLr88kocJBm2mqDkT03JR3f71uVFA
-         vf/IJuiD8vmB86Vgc1U93/sYT0pjXREKT0/wpmX5W471dA2N3EqDP8TS3wTCWmQPWcXi
-         vStAuvwZUK5l9d2bl83xM9eqtIGD+dH8UCLGogsGrfrnHcIcgX8sFRGJmet1Pc+M4W3L
-         J6bGIPcUVuVXqDEscSVpEFX0BybKrgqXEw5mX64L/MWEYZIBGpQLweZM/r+l1UhBh6rv
-         nmPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WIBhjrUJop7flf9QR2XhtZX9vVZhbTm8p1+uKOf0WUM=;
-        b=sucWbzBK2WjGTXfpNu4Bs17xD/eD8LOVbtRswXea/wSA3/ZknuAYR5MSdzT53ZqBgz
-         FaOQ+GAqEg8ldZaRAgRMj+XxCEiuDITv4x0P2SjIGgdhYGOOBhBNP9e2d2juxDuxBe5S
-         bt7nRX2me3f+MGkv1mRSKTXRzW/LQuzq9KnB6dnrzvMgM9UWmJn0we41yslGcW7/YjV9
-         vfHH9IFve9h009vY1dci98lhsLn3yF9UjLsA1jqhlZxgJPwn8VS1D37oeCCbpTunDGyC
-         tS20S3ow+NLgOiL0DKeoWaiTCf1i1T3O+rvoS2vBOK6meEJz4J6tPA4chs9s9mSLU6a8
-         9hFg==
-X-Gm-Message-State: AOAM531NsTr4YgrIxeX+zF+2476bXESnb9Qn4SUuKc1X12Q/K2+NvGAV
-        +fGuaOxfG6EHzuvGEEguu9wy332AEU+cffoYld/dAA==
-X-Google-Smtp-Source: ABdhPJwaMbmg7jOhk4a0MGYOH5nxdtI/EHr29+NGQwmnmVSprVJmou9UNUSBCqZn12zFbNrwdm/cpeA67NUATY4qhg8=
-X-Received: by 2002:a37:e10c:: with SMTP id c12mr9709644qkm.265.1610213628053;
- Sat, 09 Jan 2021 09:33:48 -0800 (PST)
-MIME-Version: 1.0
-References: <00000000000079365f05b877530b@google.com> <X/nkga4iirR8QKP2@sol.localdomain>
-In-Reply-To: <X/nkga4iirR8QKP2@sol.localdomain>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Sat, 9 Jan 2021 18:33:36 +0100
-Message-ID: <CACT4Y+bGasXBz1UNo+Se5Hc7r3N5ri8i8RO4MXdiLXaGFhGB6w@mail.gmail.com>
-Subject: Re: KMSAN: uninit-value in __crypto_memneq (2)
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        syzbot <syzbot+e0f501056b282add58a6@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
-        Alexander Potapenko <glider@google.com>,
+        Sat, 9 Jan 2021 23:58:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40890 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726253AbhAJE6A (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 9 Jan 2021 23:58:00 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C5B4322BE8;
+        Sun, 10 Jan 2021 04:57:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1610254640;
+        bh=IK3/xjM0zzN9SHLfPqLtfCKulyiYUQsXb1D9pfwab1s=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=KEW1tb0oJLHB+Hh4qPKu/yrGiu0Fi5DWUwkkQvUcpriz2HTlJ5CMBMvMQCB4lLD/P
+         qyzAud18YYmw6XIHpikjcOuEFvDYlItWq0db48UnlAGcndyOhD6LgKXk02qMZxdYFv
+         K4h/TI1+2tpYoH5FeeYT8Mj1LEeM1jLI3UAMlDjV3eBSoVbITvh28lx0tWQngxXPIz
+         k24GWL057ZO1f7OFM76byP4dsU0lMGrcLvpNjvJF6mcyKRo0eJ0x9bz20a9Zt45h3V
+         7Z9Gpua3dvlX4Qy7S0EnezYfKrXoJeiu5kxuT3cCZPUZ4Ajisxx7q0qXARk8TajIfu
+         ArkviRWIbbUnA==
+Date:   Sun, 10 Jan 2021 06:57:10 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
+Cc:     David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "David S . Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+        James Morris <jmorris@namei.org>,
+        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "Serge E . Hallyn" <serge@hallyn.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v2 0/5] Enable root to update the blacklist keyring
+Message-ID: <X/qJJsVe7+nP+gR6@kernel.org>
+References: <20201211190330.2586116-1-mic@digikod.net>
+ <67945fa6-2796-bfcd-5541-d54662e9802a@digikod.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <67945fa6-2796-bfcd-5541-d54662e9802a@digikod.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jan 9, 2021 at 6:14 PM Eric Biggers <ebiggers@kernel.org> wrote:
->
-> +Jason, since this looks WireGuard-related.
+On Tue, Jan 05, 2021 at 11:12:57AM +0100, Mickaël Salaün wrote:
+> Jarkko, David, what is the status of this patch series? Do you need help
+> to test it?
 
-I suspect that the uninit was created by geneve or batadv and then
-just handed off to wireguard, which couldn't deal with it at that
-point.
+Hi, a leave/vacation and the holiday period badly mixed my schedules.
 
-> On Sat, Jan 09, 2021 at 05:05:24AM -0800, syzbot wrote:
-> > Hello,
-> >
-> > syzbot found the following issue on:
-> >
-> > HEAD commit:    73d62e81 kmsan: random: prevent boot-time reports in _mix_..
-> > git tree:       https://github.com/google/kmsan.git master
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=142ab9c0d00000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=2cdf4151c9653e32
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=e0f501056b282add58a6
-> > compiler:       clang version 11.0.0 (https://github.com/llvm/llvm-project.git ca2dcbd030eadbf0aa9b660efe864ff08af6e18b)
-> >
-> > Unfortunately, I don't have any reproducer for this issue yet.
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > Reported-by: syzbot+e0f501056b282add58a6@syzkaller.appspotmail.com
-> >
-> > =====================================================
-> > BUG: KMSAN: uninit-value in __crypto_memneq_16 crypto/memneq.c:99 [inline]
-> > BUG: KMSAN: uninit-value in __crypto_memneq+0x42c/0x470 crypto/memneq.c:161
-> > CPU: 0 PID: 20526 Comm: kworker/0:3 Not tainted 5.10.0-rc4-syzkaller #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> > Workqueue: wg-crypt-wg1 wg_packet_decrypt_worker
-> > Call Trace:
-> >  __dump_stack lib/dump_stack.c:77 [inline]
-> >  dump_stack+0x21c/0x280 lib/dump_stack.c:118
-> >  kmsan_report+0xf7/0x1e0 mm/kmsan/kmsan_report.c:118
-> >  __msan_warning+0x5f/0xa0 mm/kmsan/kmsan_instr.c:197
-> >  __crypto_memneq_16 crypto/memneq.c:99 [inline]
-> >  __crypto_memneq+0x42c/0x470 crypto/memneq.c:161
-> >  crypto_memneq include/crypto/algapi.h:277 [inline]
-> >  chacha20poly1305_crypt_sg_inplace+0x1662/0x1cd0 lib/crypto/chacha20poly1305.c:311
-> >  chacha20poly1305_decrypt_sg_inplace+0x179/0x1d0 lib/crypto/chacha20poly1305.c:351
-> >  decrypt_packet drivers/net/wireguard/receive.c:284 [inline]
-> >  wg_packet_decrypt_worker+0x9cf/0x17d0 drivers/net/wireguard/receive.c:509
-> >  process_one_work+0x121c/0x1fc0 kernel/workqueue.c:2272
-> >  worker_thread+0x10cc/0x2740 kernel/workqueue.c:2418
-> >  kthread+0x51c/0x560 kernel/kthread.c:292
-> >  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
-> >
-> > Uninit was stored to memory at:
-> >  kmsan_save_stack_with_flags mm/kmsan/kmsan.c:121 [inline]
-> >  kmsan_internal_chain_origin+0xad/0x130 mm/kmsan/kmsan.c:289
-> >  __msan_chain_origin+0x57/0xa0 mm/kmsan/kmsan_instr.c:147
-> >  put_unaligned_le64 include/linux/unaligned/access_ok.h:50 [inline]
-> >  poly1305_core_emit+0x625/0x6a0 lib/crypto/poly1305-donna64.c:182
-> >  poly1305_final_generic+0xe2/0x280 lib/crypto/poly1305.c:71
-> >  poly1305_final include/crypto/poly1305.h:94 [inline]
-> >  chacha20poly1305_crypt_sg_inplace+0x15cf/0x1cd0 lib/crypto/chacha20poly1305.c:310
-> >  chacha20poly1305_decrypt_sg_inplace+0x179/0x1d0 lib/crypto/chacha20poly1305.c:351
-> >  decrypt_packet drivers/net/wireguard/receive.c:284 [inline]
-> >  wg_packet_decrypt_worker+0x9cf/0x17d0 drivers/net/wireguard/receive.c:509
-> >  process_one_work+0x121c/0x1fc0 kernel/workqueue.c:2272
-> >  worker_thread+0x10cc/0x2740 kernel/workqueue.c:2418
-> >  kthread+0x51c/0x560 kernel/kthread.c:292
-> >  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
-> >
-> > Uninit was stored to memory at:
-> >  kmsan_save_stack_with_flags mm/kmsan/kmsan.c:121 [inline]
-> >  kmsan_internal_chain_origin+0xad/0x130 mm/kmsan/kmsan.c:289
-> >  __msan_chain_origin+0x57/0xa0 mm/kmsan/kmsan_instr.c:147
-> >  poly1305_core_blocks+0x8f4/0x940 lib/crypto/poly1305-donna64.c:107
-> >  poly1305_update_generic+0x1a7/0x5a0 lib/crypto/poly1305.c:49
-> >  poly1305_update include/crypto/poly1305.h:83 [inline]
-> >  chacha20poly1305_crypt_sg_inplace+0x1496/0x1cd0 lib/crypto/chacha20poly1305.c:302
-> >  chacha20poly1305_decrypt_sg_inplace+0x179/0x1d0 lib/crypto/chacha20poly1305.c:351
-> >  decrypt_packet drivers/net/wireguard/receive.c:284 [inline]
-> >  wg_packet_decrypt_worker+0x9cf/0x17d0 drivers/net/wireguard/receive.c:509
-> >  process_one_work+0x121c/0x1fc0 kernel/workqueue.c:2272
-> >  worker_thread+0x10cc/0x2740 kernel/workqueue.c:2418
-> >  kthread+0x51c/0x560 kernel/kthread.c:292
-> >  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
-> >
-> > Uninit was stored to memory at:
-> >  kmsan_save_stack_with_flags mm/kmsan/kmsan.c:121 [inline]
-> >  kmsan_internal_chain_origin+0xad/0x130 mm/kmsan/kmsan.c:289
-> >  __msan_chain_origin+0x57/0xa0 mm/kmsan/kmsan_instr.c:147
-> >  poly1305_core_blocks+0x8f4/0x940 lib/crypto/poly1305-donna64.c:107
-> >  poly1305_update_generic+0x1a7/0x5a0 lib/crypto/poly1305.c:49
-> >  poly1305_update include/crypto/poly1305.h:83 [inline]
-> >  chacha20poly1305_crypt_sg_inplace+0xb4d/0x1cd0 lib/crypto/chacha20poly1305.c:263
-> >  chacha20poly1305_decrypt_sg_inplace+0x179/0x1d0 lib/crypto/chacha20poly1305.c:351
-> >  decrypt_packet drivers/net/wireguard/receive.c:284 [inline]
-> >  wg_packet_decrypt_worker+0x9cf/0x17d0 drivers/net/wireguard/receive.c:509
-> >  process_one_work+0x121c/0x1fc0 kernel/workqueue.c:2272
-> >  worker_thread+0x10cc/0x2740 kernel/workqueue.c:2418
-> >  kthread+0x51c/0x560 kernel/kthread.c:292
-> >  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
-> >
-> > Uninit was stored to memory at:
-> >  kmsan_save_stack_with_flags mm/kmsan/kmsan.c:121 [inline]
-> >  kmsan_internal_chain_origin+0xad/0x130 mm/kmsan/kmsan.c:289
-> >  __msan_chain_origin+0x57/0xa0 mm/kmsan/kmsan_instr.c:147
-> >  crypto_xor_cpy include/crypto/algapi.h:167 [inline]
-> >  chacha_crypt_generic+0x696/0x880 lib/crypto/libchacha.c:23
-> >  chacha_crypt include/crypto/chacha.h:90 [inline]
-> >  chacha20_crypt include/crypto/chacha.h:96 [inline]
-> >  chacha20poly1305_crypt_sg_inplace+0xda2/0x1cd0 lib/crypto/chacha20poly1305.c:280
-> >  chacha20poly1305_encrypt_sg_inplace+0x125/0x140 lib/crypto/chacha20poly1305.c:338
-> >  encrypt_packet drivers/net/wireguard/send.c:216 [inline]
-> >  wg_packet_encrypt_worker+0x1288/0x2680 drivers/net/wireguard/send.c:301
-> >  process_one_work+0x121c/0x1fc0 kernel/workqueue.c:2272
-> >  worker_thread+0x10cc/0x2740 kernel/workqueue.c:2418
-> >  kthread+0x51c/0x560 kernel/kthread.c:292
-> >  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
-> >
-> > Uninit was stored to memory at:
-> >  kmsan_save_stack_with_flags mm/kmsan/kmsan.c:121 [inline]
-> >  kmsan_internal_chain_origin+0xad/0x130 mm/kmsan/kmsan.c:289
-> >  kmsan_memcpy_memmove_metadata+0x25e/0x2d0 mm/kmsan/kmsan.c:226
-> >  kmsan_memcpy_metadata+0xb/0x10 mm/kmsan/kmsan.c:246
-> >  __msan_memcpy+0x46/0x60 mm/kmsan/kmsan_instr.c:110
-> >  pskb_expand_head+0x3eb/0x1df0 net/core/skbuff.c:1631
-> >  __skb_cow include/linux/skbuff.h:3165 [inline]
-> >  skb_cow_head include/linux/skbuff.h:3199 [inline]
-> >  geneve_build_skb+0x56e/0xf80 drivers/net/geneve.c:753
-> >  geneve6_xmit_skb drivers/net/geneve.c:1023 [inline]
-> >  geneve_xmit+0x2d86/0x3cc0 drivers/net/geneve.c:1056
-> >  __netdev_start_xmit include/linux/netdevice.h:4718 [inline]
-> >  netdev_start_xmit include/linux/netdevice.h:4732 [inline]
-> >  xmit_one+0x2b9/0x770 net/core/dev.c:3564
-> >  dev_hard_start_xmit net/core/dev.c:3580 [inline]
-> >  __dev_queue_xmit+0x33f2/0x4520 net/core/dev.c:4140
-> >  dev_queue_xmit+0x4b/0x60 net/core/dev.c:4173
-> >  batadv_send_skb_packet+0x622/0x970 net/batman-adv/send.c:108
-> >  batadv_send_broadcast_skb+0x76/0x90 net/batman-adv/send.c:127
-> >  batadv_iv_ogm_send_to_if net/batman-adv/bat_iv_ogm.c:394 [inline]
-> >  batadv_iv_ogm_emit net/batman-adv/bat_iv_ogm.c:420 [inline]
-> >  batadv_iv_send_outstanding_bat_ogm_packet+0xb3a/0xf00 net/batman-adv/bat_iv_ogm.c:1712
-> >  process_one_work+0x121c/0x1fc0 kernel/workqueue.c:2272
-> >  worker_thread+0x10cc/0x2740 kernel/workqueue.c:2418
-> >  kthread+0x51c/0x560 kernel/kthread.c:292
-> >  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
-> >
-> > Uninit was stored to memory at:
-> >  kmsan_save_stack_with_flags mm/kmsan/kmsan.c:121 [inline]
-> >  kmsan_internal_chain_origin+0xad/0x130 mm/kmsan/kmsan.c:289
-> >  kmsan_memcpy_memmove_metadata+0x25e/0x2d0 mm/kmsan/kmsan.c:226
-> >  kmsan_memcpy_metadata+0xb/0x10 mm/kmsan/kmsan.c:246
-> >  __msan_memcpy+0x46/0x60 mm/kmsan/kmsan_instr.c:110
-> >  pskb_expand_head+0x3eb/0x1df0 net/core/skbuff.c:1631
-> >  __skb_cow include/linux/skbuff.h:3165 [inline]
-> >  skb_cow_head include/linux/skbuff.h:3199 [inline]
-> >  batadv_skb_head_push+0x2ce/0x410 net/batman-adv/soft-interface.c:75
-> >  batadv_send_skb_packet+0x1ed/0x970 net/batman-adv/send.c:86
-> >  batadv_send_broadcast_skb+0x76/0x90 net/batman-adv/send.c:127
-> >  batadv_iv_ogm_send_to_if net/batman-adv/bat_iv_ogm.c:394 [inline]
-> >  batadv_iv_ogm_emit net/batman-adv/bat_iv_ogm.c:420 [inline]
-> >  batadv_iv_send_outstanding_bat_ogm_packet+0xb3a/0xf00 net/batman-adv/bat_iv_ogm.c:1712
-> >  process_one_work+0x121c/0x1fc0 kernel/workqueue.c:2272
-> >  worker_thread+0x10cc/0x2740 kernel/workqueue.c:2418
-> >  kthread+0x51c/0x560 kernel/kthread.c:292
-> >  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
-> >
-> > Uninit was created at:
-> >  kmsan_save_stack_with_flags+0x3c/0x90 mm/kmsan/kmsan.c:121
-> >  kmsan_alloc_page+0xd3/0x1f0 mm/kmsan/kmsan_shadow.c:274
-> >  __alloc_pages_nodemask+0x84e/0xfb0 mm/page_alloc.c:4989
-> >  __alloc_pages include/linux/gfp.h:511 [inline]
-> >  __alloc_pages_node include/linux/gfp.h:524 [inline]
-> >  alloc_pages_node include/linux/gfp.h:538 [inline]
-> >  __page_frag_cache_refill mm/page_alloc.c:5065 [inline]
-> >  page_frag_alloc+0x35b/0x890 mm/page_alloc.c:5095
-> >  __netdev_alloc_skb+0xbee/0xc50 net/core/skbuff.c:456
-> >  __netdev_alloc_skb_ip_align include/linux/skbuff.h:2846 [inline]
-> >  netdev_alloc_skb_ip_align include/linux/skbuff.h:2856 [inline]
-> >  batadv_iv_ogm_aggregate_new net/batman-adv/bat_iv_ogm.c:559 [inline]
-> >  batadv_iv_ogm_queue_add+0x143f/0x1cf0 net/batman-adv/bat_iv_ogm.c:671
-> >  batadv_iv_ogm_schedule_buff net/batman-adv/bat_iv_ogm.c:834 [inline]
-> >  batadv_iv_ogm_schedule+0xe4e/0x1670 net/batman-adv/bat_iv_ogm.c:870
-> >  batadv_iv_send_outstanding_bat_ogm_packet+0xd7b/0xf00 net/batman-adv/bat_iv_ogm.c:1724
-> >  process_one_work+0x121c/0x1fc0 kernel/workqueue.c:2272
-> >  worker_thread+0x10cc/0x2740 kernel/workqueue.c:2418
-> >  kthread+0x51c/0x560 kernel/kthread.c:292
-> >  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
-> > =====================================================
-> >
-> >
-> > ---
-> > This report is generated by a bot. It may contain errors.
-> > See https://goo.gl/tpsmEJ for more information about syzbot.
-> > syzbot engineers can be reached at syzkaller@googlegroups.com.
-> >
-> > syzbot will keep track of this issue. See:
-> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->
-> --
-> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/X/nkga4iirR8QKP2%40sol.localdomain.
+I'm testing this upcoming week.
+
+/Jarkko
