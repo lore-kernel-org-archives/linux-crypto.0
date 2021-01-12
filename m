@@ -8,56 +8,56 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62322C433DB
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jan 2021 01:48:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3608AC433E6
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jan 2021 01:49:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 28F5322EBE
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jan 2021 01:48:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 169E322E01
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jan 2021 01:49:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732847AbhALBsh (ORCPT
+        id S1732893AbhALBsr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Jan 2021 20:48:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42774 "EHLO
+        Mon, 11 Jan 2021 20:48:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732842AbhALBsh (ORCPT
+        with ESMTP id S1732842AbhALBsr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Jan 2021 20:48:37 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB5C9C061575;
-        Mon, 11 Jan 2021 17:47:56 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id w1so773503pjc.0;
-        Mon, 11 Jan 2021 17:47:56 -0800 (PST)
+        Mon, 11 Jan 2021 20:48:47 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E69EEC061786;
+        Mon, 11 Jan 2021 17:48:06 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id iq13so629596pjb.3;
+        Mon, 11 Jan 2021 17:48:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=qp9LBDTmnPZcn3zbp0ts8Zh1JyTpVMJr9nqNyHr6PFs=;
-        b=RSu8kgmud6C/CFnjaf+JN3itxTEQmYvZ33pymbzdN6j1JYCsd94paPaqMJZPl4yKMX
-         s6oOGxaPwpxA1kuBfyV3s6LgyypIFMO0Ku2pFgDkoO84VOMKp3KVkSUcK0Wuo91dYI3E
-         Fla8Dc4St8NFlhx8unKmNsJJzERwQmzxMQdJP6LbKRiwu8LFAGGvoplzmhu2RmXS+20w
-         q6NmQgGeybduoBzx+A+FNvKi+Z/HLN/1mej6KPrvfNeQyFSoa5oVZuhTG6DjUcoJcanq
-         KYiEnVCT21negngCXTUR52EljQ91rVTDr4MaxNwaqo7z3Vzh2GCYhsMUS2PZ9xWL+JgF
-         dN0w==
+        bh=X8fsop2xmYxltHA5D/rZSLD1hZ0w/2RK5zEw7HljbjI=;
+        b=FJsJoSoto67Bz6URfcf3VxYXvuNUukF1ubVd0kNrx4uGAdzDI9ObCG0R1GZYD0jacn
+         JZWM82zQ5evijkw1empC/X3ajLIRipd+KxjJjb9/i858M28t6qu8a7Hf35pKntTBIgpJ
+         9soI3eLZnM3G44pzWDqc5SJjsgI27WWYX1Z6pa2hUZaXcesIjlqlRoqD6nBSqPkkaNN1
+         +qBXrHRNgmCCT7tzcpExxTzckGa8S4hvh1ol+6jLc9P/TJlIGRcsrh8Ug6zD4Xq961Xa
+         ew7PeqpzYrTCkn6etVm+PLLyzAheFDbmWZkKh8dwrtP9uZNe2+1DjRANUK73yp9oaJyD
+         eSKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=qp9LBDTmnPZcn3zbp0ts8Zh1JyTpVMJr9nqNyHr6PFs=;
-        b=DMTG8pbhXJqNvW8jeYEuXqMIzBmTV6rToZC1TiEsOaZIDs+Xi+QckpagMdy6Y1SQgj
-         ishOy6QealX75VAVIGIu45diwH+ZKBtjCaNYkNFcpE+UHzFGU6jSgaJmfxprjRZHKHaT
-         QJXpwrSLN+R0L3z40Zki6elu0CrYumMy0lnrUzEFyZCmYmYiGV3TyQ1ONW6j79d16gv1
-         aFlSMZFnm01vkm31lRUTiwT9PJRayMiQpQq17TnPFvv5av0aja4dfEZtiG0rVHotif/T
-         Yv00ENTB4j65iGJWHKpck0+NzoZMagLCyhSL9VPZbE4l0tMTCjjTganK+x8iJbbLJ8a6
-         AHlw==
-X-Gm-Message-State: AOAM531CF+tlfbeMMnboYJw1ifoEskHfl0LfW4WKW8bWaqkNeuNFLr0C
-        GT/nG66QLQEKiKJw9vTTjPQ=
-X-Google-Smtp-Source: ABdhPJziTAtWqbi8fSkflnsG4p1kzAZdCqxrYnIkoerOvehnkgI2k1oWA/UzJaXm7HS7B/v0CUjW7g==
-X-Received: by 2002:a17:902:8c89:b029:dc:1e79:e74b with SMTP id t9-20020a1709028c89b02900dc1e79e74bmr2662422plo.58.1610416076491;
-        Mon, 11 Jan 2021 17:47:56 -0800 (PST)
+        bh=X8fsop2xmYxltHA5D/rZSLD1hZ0w/2RK5zEw7HljbjI=;
+        b=NIUMeifJc1sLYinslWnnOsiU8uB+5LNn3CFFv+F4MpV7kOaD4jbpEw4xYTT7QHrzjy
+         rrsCkum0G/mW1qZb5j9FCZdOOrfDGFDWuDZ13i4hMOYjEhtFtGb4IjfmMMsPl3UURIBj
+         vG43s/X439IwxMlR2hHO4WYio6v3tGe/cutqIjfyGs8AX5MR58QB5jcvDCa9CMhaEtJK
+         3DhuRodh34Y8S8WXFauiDnHmTOTG3aY6dMunZGBPv77VcR/eoGBtNeHUCFi8mB86zM0G
+         dOhF9oiYQRLDXBYJ+yxOgYLPrn9leoLhbM1loGt+Y75PEB+9lWfNdEw/UV8bALhSuhaS
+         S90g==
+X-Gm-Message-State: AOAM53047MfNFEdtVXBtjI5rfEpPiAOw2MLOHluhZkhwD6xeBF+JHayQ
+        ofS1/7+kP344L+atdql+hws=
+X-Google-Smtp-Source: ABdhPJxDHvtku7C1620pHFI9Yu42D/T+dfJYQvqLj3P5yFNOFqOPXqm3gj0v5Fn382ReKSGCh1hhDA==
+X-Received: by 2002:a17:90a:4208:: with SMTP id o8mr1812924pjg.224.1610416086514;
+        Mon, 11 Jan 2021 17:48:06 -0800 (PST)
 Received: from localhost.localdomain ([49.207.194.207])
-        by smtp.gmail.com with ESMTPSA id 14sm904376pfy.55.2021.01.11.17.47.46
+        by smtp.gmail.com with ESMTPSA id 14sm904376pfy.55.2021.01.11.17.47.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Jan 2021 17:47:55 -0800 (PST)
+        Mon, 11 Jan 2021 17:48:05 -0800 (PST)
 From:   Allen Pais <allen.lkml@gmail.com>
 To:     herbert@gondor.apana.org.au
 Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
@@ -74,9 +74,9 @@ Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
         linux-samsung-soc@vger.kernel.org,
         Allen Pais <apais@linux.microsoft.com>,
         Romain Perier <romain.perier@gmail.com>
-Subject: [PATCH v3 05/19] crypto: cavium: convert tasklets to use new tasklet_setup() API
-Date:   Tue, 12 Jan 2021 07:16:36 +0530
-Message-Id: <20210112014650.10887-6-allen.lkml@gmail.com>
+Subject: [PATCH v3 06/19] crypto: ccp: convert tasklets to use new tasklet_setup() API
+Date:   Tue, 12 Jan 2021 07:16:37 +0530
+Message-Id: <20210112014650.10887-7-allen.lkml@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210112014650.10887-1-allen.lkml@gmail.com>
 References: <20210112014650.10887-1-allen.lkml@gmail.com>
@@ -96,115 +96,107 @@ and from_tasklet() to pass the tasklet pointer explicitly.
 Signed-off-by: Romain Perier <romain.perier@gmail.com>
 Signed-off-by: Allen Pais <apais@linux.microsoft.com>
 ---
- drivers/crypto/cavium/cpt/cptvf_main.c       |  9 ++++-----
- drivers/crypto/cavium/nitrox/nitrox_common.h |  2 +-
- drivers/crypto/cavium/nitrox/nitrox_isr.c    | 13 +++++--------
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c |  4 ++--
- 4 files changed, 12 insertions(+), 16 deletions(-)
+ drivers/crypto/ccp/ccp-dev-v3.c    | 9 ++++-----
+ drivers/crypto/ccp/ccp-dev-v5.c    | 9 ++++-----
+ drivers/crypto/ccp/ccp-dmaengine.c | 7 +++----
+ 3 files changed, 11 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/crypto/cavium/cpt/cptvf_main.c b/drivers/crypto/cavium/cpt/cptvf_main.c
-index f016448e43bb..6424bcc74139 100644
---- a/drivers/crypto/cavium/cpt/cptvf_main.c
-+++ b/drivers/crypto/cavium/cpt/cptvf_main.c
-@@ -21,10 +21,10 @@ struct cptvf_wqe_info {
- 	struct cptvf_wqe vq_wqe[CPT_NUM_QS_PER_VF];
- };
- 
--static void vq_work_handler(unsigned long data)
-+static void vq_work_handler(struct tasklet_struct *t)
- {
--	struct cptvf_wqe_info *cwqe_info = (struct cptvf_wqe_info *)data;
--	struct cptvf_wqe *cwqe = &cwqe_info->vq_wqe[0];
-+	struct cptvf_wqe *cwqe = from_tasklet(cwqe, t, twork);
-+	struct cptvf_wqe_info *cwqe_info = container_of(cwqe, typeof(*cwqe_info), vq_wqe[0]);
- 
- 	vq_post_process(cwqe->cptvf, cwqe->qno);
- }
-@@ -45,8 +45,7 @@ static int init_worker_threads(struct cpt_vf *cptvf)
- 	}
- 
- 	for (i = 0; i < cptvf->nr_queues; i++) {
--		tasklet_init(&cwqe_info->vq_wqe[i].twork, vq_work_handler,
--			     (u64)cwqe_info);
-+		tasklet_setup(&cwqe_info->vq_wqe[i].twork, vq_work_handler);
- 		cwqe_info->vq_wqe[i].qno = i;
- 		cwqe_info->vq_wqe[i].cptvf = cptvf;
- 	}
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_common.h b/drivers/crypto/cavium/nitrox/nitrox_common.h
-index e4be69d7e6e5..f73ae8735272 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_common.h
-+++ b/drivers/crypto/cavium/nitrox/nitrox_common.h
-@@ -19,7 +19,7 @@ void nitrox_put_device(struct nitrox_device *ndev);
- int nitrox_common_sw_init(struct nitrox_device *ndev);
- void nitrox_common_sw_cleanup(struct nitrox_device *ndev);
- 
--void pkt_slc_resp_tasklet(unsigned long data);
-+void pkt_slc_resp_tasklet(struct tasklet_struct *t);
- int nitrox_process_se_request(struct nitrox_device *ndev,
- 			      struct se_crypto_request *req,
- 			      completion_t cb,
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_isr.c b/drivers/crypto/cavium/nitrox/nitrox_isr.c
-index 99b053094f5a..c6fb8b3263e1 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_isr.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_isr.c
-@@ -201,9 +201,9 @@ static void clear_bmi_err_intr(struct nitrox_device *ndev)
- 	dev_err_ratelimited(DEV(ndev), "BMI_INT  0x%016llx\n", value);
+diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
+index 0d5576f6ad21..858566867fa3 100644
+--- a/drivers/crypto/ccp/ccp-dev-v3.c
++++ b/drivers/crypto/ccp/ccp-dev-v3.c
+@@ -321,9 +321,9 @@ static void ccp_enable_queue_interrupts(struct ccp_device *ccp)
+ 	iowrite32(ccp->qim, ccp->io_regs + IRQ_MASK_REG);
  }
  
--static void nps_core_int_tasklet(unsigned long data)
-+static void nps_core_int_tasklet(struct tasklet_struct *t)
+-static void ccp_irq_bh(unsigned long data)
++static void ccp_irq_bh(struct tasklet_struct *t)
  {
--	struct nitrox_q_vector *qvec = (void *)(uintptr_t)(data);
-+	struct nitrox_q_vector *qvec = from_tasklet(qvec, t, resp_tasklet);
- 	struct nitrox_device *ndev = qvec->ndev;
+-	struct ccp_device *ccp = (struct ccp_device *)data;
++	struct ccp_device *ccp = from_tasklet(ccp, t, irq_tasklet);
+ 	struct ccp_cmd_queue *cmd_q;
+ 	u32 q_int, status;
+ 	unsigned int i;
+@@ -361,7 +361,7 @@ static irqreturn_t ccp_irq_handler(int irq, void *data)
+ 	if (ccp->use_tasklet)
+ 		tasklet_schedule(&ccp->irq_tasklet);
+ 	else
+-		ccp_irq_bh((unsigned long)ccp);
++		ccp_irq_bh(&ccp->irq_tasklet);
  
- 	/* if pf mode do queue recovery */
-@@ -343,8 +343,7 @@ int nitrox_register_interrupts(struct nitrox_device *ndev)
- 		cpu = qvec->ring % num_online_cpus();
- 		irq_set_affinity_hint(vec, get_cpu_mask(cpu));
+ 	return IRQ_HANDLED;
+ }
+@@ -457,8 +457,7 @@ static int ccp_init(struct ccp_device *ccp)
  
--		tasklet_init(&qvec->resp_tasklet, pkt_slc_resp_tasklet,
--			     (unsigned long)qvec);
-+		tasklet_setup(&qvec->resp_tasklet, pkt_slc_resp_tasklet);
- 		qvec->valid = true;
+ 	/* Initialize the ISR tasklet? */
+ 	if (ccp->use_tasklet)
+-		tasklet_init(&ccp->irq_tasklet, ccp_irq_bh,
+-			     (unsigned long)ccp);
++		tasklet_setup(&ccp->irq_tasklet, ccp_irq_bh);
+ 
+ 	dev_dbg(dev, "Starting threads...\n");
+ 	/* Create a kthread for each queue */
+diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
+index 7838f63bab32..e68b05a3169b 100644
+--- a/drivers/crypto/ccp/ccp-dev-v5.c
++++ b/drivers/crypto/ccp/ccp-dev-v5.c
+@@ -733,9 +733,9 @@ static void ccp5_enable_queue_interrupts(struct ccp_device *ccp)
+ 		iowrite32(SUPPORTED_INTERRUPTS, ccp->cmd_q[i].reg_int_enable);
+ }
+ 
+-static void ccp5_irq_bh(unsigned long data)
++static void ccp5_irq_bh(struct tasklet_struct *t)
+ {
+-	struct ccp_device *ccp = (struct ccp_device *)data;
++	struct ccp_device *ccp = from_tasklet(ccp, t, irq_tasklet);
+ 	u32 status;
+ 	unsigned int i;
+ 
+@@ -772,7 +772,7 @@ static irqreturn_t ccp5_irq_handler(int irq, void *data)
+ 	if (ccp->use_tasklet)
+ 		tasklet_schedule(&ccp->irq_tasklet);
+ 	else
+-		ccp5_irq_bh((unsigned long)ccp);
++		ccp5_irq_bh(&ccp->irq_tasklet);
+ 	return IRQ_HANDLED;
+ }
+ 
+@@ -894,8 +894,7 @@ static int ccp5_init(struct ccp_device *ccp)
  	}
+ 	/* Initialize the ISR tasklet */
+ 	if (ccp->use_tasklet)
+-		tasklet_init(&ccp->irq_tasklet, ccp5_irq_bh,
+-			     (unsigned long)ccp);
++		tasklet_setup(&ccp->irq_tasklet, ccp5_irq_bh);
  
-@@ -364,8 +363,7 @@ int nitrox_register_interrupts(struct nitrox_device *ndev)
- 	cpu = num_online_cpus();
- 	irq_set_affinity_hint(vec, get_cpu_mask(cpu));
+ 	dev_dbg(dev, "Loading LSB map...\n");
+ 	/* Copy the private LSB mask to the public registers */
+diff --git a/drivers/crypto/ccp/ccp-dmaengine.c b/drivers/crypto/ccp/ccp-dmaengine.c
+index 0770a83bf1a5..a85690866b05 100644
+--- a/drivers/crypto/ccp/ccp-dmaengine.c
++++ b/drivers/crypto/ccp/ccp-dmaengine.c
+@@ -121,9 +121,9 @@ static void ccp_cleanup_desc_resources(struct ccp_device *ccp,
+ 	}
+ }
  
--	tasklet_init(&qvec->resp_tasklet, nps_core_int_tasklet,
--		     (unsigned long)qvec);
-+	tasklet_setup(&qvec->resp_tasklet, nps_core_int_tasklet);
- 	qvec->valid = true;
- 
- 	return 0;
-@@ -442,8 +440,7 @@ int nitrox_sriov_register_interupts(struct nitrox_device *ndev)
- 	cpu = num_online_cpus();
- 	irq_set_affinity_hint(vec, get_cpu_mask(cpu));
- 
--	tasklet_init(&qvec->resp_tasklet, nps_core_int_tasklet,
--		     (unsigned long)qvec);
-+	tasklet_setup(&qvec->resp_tasklet, nps_core_int_tasklet);
- 	qvec->valid = true;
- 
- 	return 0;
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
-index 53ef06792133..676f3d00bf61 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
-@@ -580,9 +580,9 @@ static void process_response_list(struct nitrox_cmdq *cmdq)
- /**
-  * pkt_slc_resp_tasklet - post processing of SE responses
-  */
--void pkt_slc_resp_tasklet(unsigned long data)
-+void pkt_slc_resp_tasklet(struct tasklet_struct *t)
+-static void ccp_do_cleanup(unsigned long data)
++static void ccp_do_cleanup(struct tasklet_struct *t)
  {
--	struct nitrox_q_vector *qvec = (void *)(uintptr_t)(data);
-+	struct nitrox_q_vector *qvec = from_tasklet(qvec, t, resp_tasklet);
- 	struct nitrox_cmdq *cmdq = qvec->cmdq;
- 	union nps_pkt_slc_cnts slc_cnts;
+-	struct ccp_dma_chan *chan = (struct ccp_dma_chan *)data;
++	struct ccp_dma_chan *chan = from_tasklet(chan, t, cleanup_tasklet);
+ 	unsigned long flags;
  
+ 	dev_dbg(chan->ccp->dev, "%s - chan=%s\n", __func__,
+@@ -712,8 +712,7 @@ int ccp_dmaengine_register(struct ccp_device *ccp)
+ 		INIT_LIST_HEAD(&chan->active);
+ 		INIT_LIST_HEAD(&chan->complete);
+ 
+-		tasklet_init(&chan->cleanup_tasklet, ccp_do_cleanup,
+-			     (unsigned long)chan);
++		tasklet_setup(&chan->cleanup_tasklet, ccp_do_cleanup);
+ 
+ 		dma_chan->device = dma_dev;
+ 		dma_cookie_init(dma_chan);
 -- 
 2.25.1
 
