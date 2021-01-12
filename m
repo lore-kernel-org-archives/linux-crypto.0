@@ -2,114 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76275C433E9
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jan 2021 14:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB416C43332
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jan 2021 16:13:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2FAB122D73
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jan 2021 14:59:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E4282087D
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jan 2021 16:13:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725846AbhALO7W (ORCPT
+        id S2387818AbhALQMy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Jan 2021 09:59:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33313 "EHLO
+        Tue, 12 Jan 2021 11:12:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21844 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725843AbhALO7W (ORCPT
+        by vger.kernel.org with ESMTP id S2391926AbhALQMs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Jan 2021 09:59:22 -0500
+        Tue, 12 Jan 2021 11:12:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610463475;
+        s=mimecast20190719; t=1610467882;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XlUm2JYDUqrCFaqRZjf68KX2pnc8iKtDpFI9TKkiM18=;
-        b=auagODI4zlW3HFpZG8kb2MBX8YgOhXqJnJOzoHBdQFpjG0ZQzwTaSQbPVrXkGhLArXBotj
-        Q73UJiH3iKf0tdnP7yM7OJ4OKT9+4rKUJWYgbaMiAW7/kDp9sqUOFSTQV6hLXCZ8p3Rz2v
-        /tUWYk5ZrZUSapux3ZQCmTR4DKBIT84=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-323-mlPyzESvNF2x4AJowppFGg-1; Tue, 12 Jan 2021 09:57:54 -0500
-X-MC-Unique: mlPyzESvNF2x4AJowppFGg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3DD8803F4C;
-        Tue, 12 Jan 2021 14:57:49 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-112-8.rdu2.redhat.com [10.10.112.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9EA5D6B540;
-        Tue, 12 Jan 2021 14:57:45 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <E090372C-06A3-4991-8FC3-F06A0DA60729@oracle.com>
-References: <E090372C-06A3-4991-8FC3-F06A0DA60729@oracle.com> <20200916004927.64276-1-eric.snowberg@oracle.com> <1360578.1607593748@warthog.procyon.org.uk>
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     dhowells@redhat.com, dwmw2@infradead.org,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jmorris@namei.org, serge@hallyn.com, nayna@linux.ibm.com,
-        Mimi Zohar <zohar@linux.ibm.com>, erichte@linux.ibm.com,
-        mpe@ellerman.id.au, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v4] certs: Add EFI_CERT_X509_GUID support for dbx entries
+         content-transfer-encoding:content-transfer-encoding;
+        bh=7GrmVz3g5PnC6MejB1/FJv7gDiKaAZjfigOkKnsP7RY=;
+        b=gDfpJjm2Wic4KapOMGhAGjFavNgHiW9aV8jDp7SOAD3V3wjSJIsswtntqhiHKc+GI6STFH
+        aho4xLMjGqUi1GUPdnKlARYEuNLvMPrnkIHu3Y/BO2+eV94x8BZShGe7Selq8gnnmWjAOZ
+        YzPEm6QWYVARE0fdmgzy/P+rPXpED+4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-579-NVLciomDN8y4JMLnP10Wfw-1; Tue, 12 Jan 2021 11:11:20 -0500
+X-MC-Unique: NVLciomDN8y4JMLnP10Wfw-1
+Received: by mail-wr1-f69.google.com with SMTP id r8so1342193wro.22
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Jan 2021 08:11:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=7GrmVz3g5PnC6MejB1/FJv7gDiKaAZjfigOkKnsP7RY=;
+        b=cvP4Dew2/Qf3G+cX7VQtcBhcn5OmBExMXiRQCmiBtHvVb1sTsDlUQrKjQ9Zli0E2g6
+         MR49DYGmi4CMsPEcTWOKeUCBvXrIRTRBvpM4dC3quqq1wYLnaQpaJ2OdBN2fzyGMYhdM
+         Nt7kg0oYYdwJqRkipUthnKRPT8EIj7rDSTOvdUB2ZDqlNMWcfeIAm5JdKTNuA61n8yWV
+         MPNKnOhfcvpdNhGxffNw6oojcWXjf7TN4xzlzQh7DwZrnT6iCqaPFt2lonkkkCSRZk1G
+         jiS/m8yYYPN2C4J0dPnR2qQjmXx4t+hHz+9ULSyv4njS2GfOLepgATouJXlvyvM0UYzv
+         3YPA==
+X-Gm-Message-State: AOAM532xkewUrWxoJ6GhGXgybldhYkL9dxRAfDhNi+cp2q5LX2GG3LzF
+        Nhkuv+c0H2/s6keQMCQx5SfuinhmEbv+1UYjXbbfrpnBrTFFJF/Oo+tN/GtJh9DdB8pSB1B40N/
+        1pL6JVto7W0tAo2uaj/FH6RYw
+X-Received: by 2002:a1c:7d94:: with SMTP id y142mr4317087wmc.105.1610467879455;
+        Tue, 12 Jan 2021 08:11:19 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy9gtHso6LQWZ01xitLmZ7DVGmvVKcp38eals66lkxaBqWRIlrF6/TqEJ1hfzciMThkNCz2Iw==
+X-Received: by 2002:a1c:7d94:: with SMTP id y142mr4317069wmc.105.1610467879236;
+        Tue, 12 Jan 2021 08:11:19 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id e15sm5765658wrx.86.2021.01.12.08.11.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jan 2021 08:11:18 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+        id 2A2DF180322; Tue, 12 Jan 2021 17:11:17 +0100 (CET)
+From:   =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: [PATCH] crypto: public_key: check that pkey_algo is non-NULL before passing it to strcmp()
+Date:   Tue, 12 Jan 2021 17:10:44 +0100
+Message-Id: <20210112161044.3101-1-toke@redhat.com>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 12 Jan 2021 14:57:39 +0000
-Message-ID: <2442460.1610463459@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Eric Snowberg <eric.snowberg@oracle.com> wrote:
+When public_key_verify_signature() is called from
+asymmetric_key_verify_signature(), the pkey_algo field of struct
+public_key_signature will be NULL, which causes a NULL pointer dereference
+in the strcmp() check. Fix this by adding a NULL check.
 
-> > On Dec 10, 2020, at 2:49 AM, David Howells <dhowells@redhat.com> wrote:
-> >=20
-> > Eric Snowberg <eric.snowberg@oracle.com> wrote:
-> >=20
-> >> Add support for EFI_CERT_X509_GUID dbx entries. When a EFI_CERT_X509_G=
-UID
-> >> is found, it is added as an asymmetrical key to the .blacklist keyring.
-> >> Anytime the .platform keyring is used, the keys in the .blacklist keyr=
-ing
-> >> are referenced, if a matching key is found, the key will be rejected.
-> >=20
-> > Ummm...  Why this way and not as a blacklist key which takes up less sp=
-ace?
-> > I'm guessing that you're using the key chain matching logic.  We really=
- only
-> > need to blacklist the key IDs.
->=20
-> I implemented it this way so that certs in the dbx would only impact=20
-> the .platform keyring. I was under the impression we didn=E2=80=99t want =
-to have=20
-> Secure Boot UEFI db/dbx certs dictate keyring functionality within the ke=
-rnel
-> itself. Meaning if we have a matching dbx cert in any other keyring (buil=
-tin,
-> secondary, ima, etc.), it would be allowed. If that is not how you=E2=80=
-=99d like to=20
-> see it done, let me know and I=E2=80=99ll make the change.
+One visible manifestation of this is that userspace programs (such as the
+'iwd' WiFi daemon) will be killed when trying to verify a TLS key using the
+keyctl(2) interface.
 
-I wonder if that is that the right thing to do.  I guess this is a policy
-decision and may depend on the particular user.
+Cc: stable@vger.kernel.org
+Fixes: 215525639631 ("X.509: support OSCCA SM2-with-SM3 certificate verification")
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+---
+ crypto/asymmetric_keys/public_key.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > Also, what should happen if a revocation cert rejected by the blacklist?
->=20
-> I=E2=80=99m not sure I understand the question. How would it be rejected?
-
-The SHA256 of a revocation cert being loaded could match an
-already-blacklisted SHA256 sum, either compiled in or already loaded from
-UEFI.
-
-David
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 8892908ad58c..35b09e95a870 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -356,7 +356,7 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 	if (ret)
+ 		goto error_free_key;
+ 
+-	if (strcmp(sig->pkey_algo, "sm2") == 0 && sig->data_size) {
++	if (sig->pkey_algo && strcmp(sig->pkey_algo, "sm2") == 0 && sig->data_size) {
+ 		ret = cert_sig_digest_update(sig, tfm);
+ 		if (ret)
+ 			goto error_free_key;
+-- 
+2.30.0
 
