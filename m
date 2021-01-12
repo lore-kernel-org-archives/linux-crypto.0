@@ -2,237 +2,82 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2170C4332D
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jan 2021 19:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D1EC4332E
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jan 2021 23:35:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A2D8622DFA
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jan 2021 19:30:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 755822312A
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jan 2021 23:35:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404668AbhALTaZ (ORCPT
+        id S1733202AbhALXe3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Jan 2021 14:30:25 -0500
-Received: from mail.kernel.org ([198.145.29.99]:49516 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732921AbhALTaZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Jan 2021 14:30:25 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BCB422310A;
-        Tue, 12 Jan 2021 19:29:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610479784;
-        bh=6bfA0dRvEauC/I/vK5VpOdtBbRK35I684D0i0qoe0Zg=;
-        h=From:To:Cc:Subject:Date:From;
-        b=tBRPAtvn9raEIOwWZvI0n+bN7mfEMCypBnUSCzHLRvl9+uZh0/G6ip1lUrKJ+FdOX
-         lnnz2NfmcDJCjGu9fN0w9nwz+dhNnRWspkpegNW6g3j9M5HzwghLe3lqtR0VkVcZb+
-         2U09yOsZKtPscunHFOGO6RS6ogJtmPTD4HspsXxaJ8toVB/lIy9Dtn6hFVysQfl3q+
-         24rdsUk9NA0pkdfus2IGZn5sQdKdxMyIuehSj1+HGYzM081q74wHNGCpyOUpC8GLLf
-         KHQDHyagJGCsLz5tzlGMbB3Z5Sh3H4k1oQ78qgUQrTvC/A3SyJjFhDC2leIRLPYMbm
-         50Lmg4OFwRRsg==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Jann Horn <jannh@google.com>, Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH RESEND] random: remove dead code left over from blocking pool
-Date:   Tue, 12 Jan 2021 11:29:38 -0800
-Message-Id: <20210112192938.70666-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.30.0
+        Tue, 12 Jan 2021 18:34:29 -0500
+Received: from relay8-d.mail.gandi.net ([217.70.183.201]:36775 "EHLO
+        relay8-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733047AbhALXe2 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 12 Jan 2021 18:34:28 -0500
+X-Originating-IP: 86.202.109.140
+Received: from localhost (lfbn-lyo-1-13-140.w86-202.abo.wanadoo.fr [86.202.109.140])
+        (Authenticated sender: alexandre.belloni@bootlin.com)
+        by relay8-d.mail.gandi.net (Postfix) with ESMTPSA id A8AE81BF20B;
+        Tue, 12 Jan 2021 23:33:41 +0000 (UTC)
+From:   Alexandre Belloni <alexandre.belloni@bootlin.com>
+To:     Jaroslav Kysela <perex@perex.cz>, Matt Mackall <mpm@selenic.com>,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Vinod Koul <vkoul@kernel.org>, dmaengine@vger.kernel.org,
+        Dan Williams <dan.j.williams@intel.com>,
+        Richard Weinberger <richard@nod.at>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        "David S. Miller" <davem@davemloft.net>,
+        Mark Brown <broonie@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        linux-crypto@vger.kernel.org,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        linux-kernel@vger.kernel.org, linux-rtc@vger.kernel.org,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        linux-mips@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        alsa-devel@alsa-project.org,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        linux-ide@vger.kernel.org, linux-spi@vger.kernel.org
+Cc:     Alexandre Belloni <alexandre.belloni@bootlin.com>
+Subject: Re: (subset) [PATCH 00/10] Remove support for TX49xx
+Date:   Wed, 13 Jan 2021 00:33:30 +0100
+Message-Id: <161049432258.352381.2804715824942772218.b4-ty@bootlin.com>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210105140305.141401-1-tsbogend@alpha.franken.de>
+References: <20210105140305.141401-1-tsbogend@alpha.franken.de>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Tue, 5 Jan 2021 15:02:45 +0100, Thomas Bogendoerfer wrote:
+> I couldn't find any buyable product other than reference boards using
+> TX49xx CPUs. And since nobody showed interest in keeping support for
+> it, it's time to remove it.
+> 
+> I've split up the removal into seperate parts for different maintainers.
+> So if the patch fits your needs, please take it via your tree or
+> give me an ack so I can apply them  the mips-next tree.
+> 
+> [...]
 
-Remove some dead code that was left over following commit 90ea1c6436d2
-("random: remove the blocking pool").
+Applied, thanks!
 
-Cc: linux-crypto@vger.kernel.org
-Cc: Andy Lutomirski <luto@kernel.org>
-Cc: Jann Horn <jannh@google.com>
-Cc: Theodore Ts'o <tytso@mit.edu>
-Reviewed-by: Andy Lutomirski <luto@kernel.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
+[08/10] rtc: tx4939: Remove driver
+        commit: 446667df283002fdda0530523347ffd1cf053373
 
-Andrew, please consider taking this patch since the maintainer has been
-ignoring it for 4 months
-(https://lkml.kernel.org/lkml/20200916043652.96640-1-ebiggers@kernel.org/T/#u).
-
-
- drivers/char/random.c         | 17 ++-----
- include/trace/events/random.h | 83 -----------------------------------
- 2 files changed, 3 insertions(+), 97 deletions(-)
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index a894c0559a8cf..bbc5098b1a81f 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -500,7 +500,6 @@ struct entropy_store {
- 	unsigned short add_ptr;
- 	unsigned short input_rotate;
- 	int entropy_count;
--	unsigned int initialized:1;
- 	unsigned int last_data_init:1;
- 	__u8 last_data[EXTRACT_SIZE];
- };
-@@ -660,7 +659,7 @@ static void process_random_ready_list(void)
-  */
- static void credit_entropy_bits(struct entropy_store *r, int nbits)
- {
--	int entropy_count, orig, has_initialized = 0;
-+	int entropy_count, orig;
- 	const int pool_size = r->poolinfo->poolfracbits;
- 	int nfrac = nbits << ENTROPY_SHIFT;
- 
-@@ -717,23 +716,14 @@ static void credit_entropy_bits(struct entropy_store *r, int nbits)
- 	if (cmpxchg(&r->entropy_count, orig, entropy_count) != orig)
- 		goto retry;
- 
--	if (has_initialized) {
--		r->initialized = 1;
--		kill_fasync(&fasync, SIGIO, POLL_IN);
--	}
--
- 	trace_credit_entropy_bits(r->name, nbits,
- 				  entropy_count >> ENTROPY_SHIFT, _RET_IP_);
- 
- 	if (r == &input_pool) {
- 		int entropy_bits = entropy_count >> ENTROPY_SHIFT;
- 
--		if (crng_init < 2) {
--			if (entropy_bits < 128)
--				return;
-+		if (crng_init < 2 && entropy_bits >= 128)
- 			crng_reseed(&primary_crng, r);
--			entropy_bits = ENTROPY_BITS(r);
--		}
- 	}
- }
- 
-@@ -1385,8 +1375,7 @@ static size_t account(struct entropy_store *r, size_t nbytes, int min,
- }
- 
- /*
-- * This function does the actual extraction for extract_entropy and
-- * extract_entropy_user.
-+ * This function does the actual extraction for extract_entropy.
-  *
-  * Note: we assume that .poolwords is a multiple of 16 words.
-  */
-diff --git a/include/trace/events/random.h b/include/trace/events/random.h
-index 9570a10cb949b..3d7b432ca5f31 100644
---- a/include/trace/events/random.h
-+++ b/include/trace/events/random.h
-@@ -85,28 +85,6 @@ TRACE_EVENT(credit_entropy_bits,
- 		  __entry->entropy_count, (void *)__entry->IP)
- );
- 
--TRACE_EVENT(push_to_pool,
--	TP_PROTO(const char *pool_name, int pool_bits, int input_bits),
--
--	TP_ARGS(pool_name, pool_bits, input_bits),
--
--	TP_STRUCT__entry(
--		__field( const char *,	pool_name		)
--		__field(	  int,	pool_bits		)
--		__field(	  int,	input_bits		)
--	),
--
--	TP_fast_assign(
--		__entry->pool_name	= pool_name;
--		__entry->pool_bits	= pool_bits;
--		__entry->input_bits	= input_bits;
--	),
--
--	TP_printk("%s: pool_bits %d input_pool_bits %d",
--		  __entry->pool_name, __entry->pool_bits,
--		  __entry->input_bits)
--);
--
- TRACE_EVENT(debit_entropy,
- 	TP_PROTO(const char *pool_name, int debit_bits),
- 
-@@ -161,35 +139,6 @@ TRACE_EVENT(add_disk_randomness,
- 		  MINOR(__entry->dev), __entry->input_bits)
- );
- 
--TRACE_EVENT(xfer_secondary_pool,
--	TP_PROTO(const char *pool_name, int xfer_bits, int request_bits,
--		 int pool_entropy, int input_entropy),
--
--	TP_ARGS(pool_name, xfer_bits, request_bits, pool_entropy,
--		input_entropy),
--
--	TP_STRUCT__entry(
--		__field( const char *,	pool_name		)
--		__field(	  int,	xfer_bits		)
--		__field(	  int,	request_bits		)
--		__field(	  int,	pool_entropy		)
--		__field(	  int,	input_entropy		)
--	),
--
--	TP_fast_assign(
--		__entry->pool_name	= pool_name;
--		__entry->xfer_bits	= xfer_bits;
--		__entry->request_bits	= request_bits;
--		__entry->pool_entropy	= pool_entropy;
--		__entry->input_entropy	= input_entropy;
--	),
--
--	TP_printk("pool %s xfer_bits %d request_bits %d pool_entropy %d "
--		  "input_entropy %d", __entry->pool_name, __entry->xfer_bits,
--		  __entry->request_bits, __entry->pool_entropy,
--		  __entry->input_entropy)
--);
--
- DECLARE_EVENT_CLASS(random__get_random_bytes,
- 	TP_PROTO(int nbytes, unsigned long IP),
- 
-@@ -253,38 +202,6 @@ DEFINE_EVENT(random__extract_entropy, extract_entropy,
- 	TP_ARGS(pool_name, nbytes, entropy_count, IP)
- );
- 
--DEFINE_EVENT(random__extract_entropy, extract_entropy_user,
--	TP_PROTO(const char *pool_name, int nbytes, int entropy_count,
--		 unsigned long IP),
--
--	TP_ARGS(pool_name, nbytes, entropy_count, IP)
--);
--
--TRACE_EVENT(random_read,
--	TP_PROTO(int got_bits, int need_bits, int pool_left, int input_left),
--
--	TP_ARGS(got_bits, need_bits, pool_left, input_left),
--
--	TP_STRUCT__entry(
--		__field(	  int,	got_bits		)
--		__field(	  int,	need_bits		)
--		__field(	  int,	pool_left		)
--		__field(	  int,	input_left		)
--	),
--
--	TP_fast_assign(
--		__entry->got_bits	= got_bits;
--		__entry->need_bits	= need_bits;
--		__entry->pool_left	= pool_left;
--		__entry->input_left	= input_left;
--	),
--
--	TP_printk("got_bits %d still_needed_bits %d "
--		  "blocking_pool_entropy_left %d input_entropy_left %d",
--		  __entry->got_bits, __entry->got_bits, __entry->pool_left,
--		  __entry->input_left)
--);
--
- TRACE_EVENT(urandom_read,
- 	TP_PROTO(int got_bits, int pool_left, int input_left),
- 
+Best regards,
 -- 
-2.30.0
-
+Alexandre Belloni <alexandre.belloni@bootlin.com>
