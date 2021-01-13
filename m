@@ -2,82 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D1EC4332E
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jan 2021 23:35:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 708F6C433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jan 2021 02:40:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 755822312A
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jan 2021 23:35:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 399E82311D
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jan 2021 02:40:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733202AbhALXe3 (ORCPT
+        id S1726680AbhAMCkA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Jan 2021 18:34:29 -0500
-Received: from relay8-d.mail.gandi.net ([217.70.183.201]:36775 "EHLO
-        relay8-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733047AbhALXe2 (ORCPT
+        Tue, 12 Jan 2021 21:40:00 -0500
+Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:54024 "EHLO
+        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725843AbhAMCkA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Jan 2021 18:34:28 -0500
-X-Originating-IP: 86.202.109.140
-Received: from localhost (lfbn-lyo-1-13-140.w86-202.abo.wanadoo.fr [86.202.109.140])
-        (Authenticated sender: alexandre.belloni@bootlin.com)
-        by relay8-d.mail.gandi.net (Postfix) with ESMTPSA id A8AE81BF20B;
-        Tue, 12 Jan 2021 23:33:41 +0000 (UTC)
-From:   Alexandre Belloni <alexandre.belloni@bootlin.com>
-To:     Jaroslav Kysela <perex@perex.cz>, Matt Mackall <mpm@selenic.com>,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
+        Tue, 12 Jan 2021 21:40:00 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0ULZwVnh_1610505555;
+Received: from B-455UMD6M-2027.local(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0ULZwVnh_1610505555)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 13 Jan 2021 10:39:16 +0800
+Subject: Re: [PATCH] crypto: public_key: check that pkey_algo is non-NULL
+ before passing it to strcmp()
+To:     =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
+        David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Vinod Koul <vkoul@kernel.org>, dmaengine@vger.kernel.org,
-        Dan Williams <dan.j.williams@intel.com>,
-        Richard Weinberger <richard@nod.at>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        "David S. Miller" <davem@davemloft.net>,
-        Mark Brown <broonie@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        linux-crypto@vger.kernel.org,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        linux-kernel@vger.kernel.org, linux-rtc@vger.kernel.org,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        linux-mips@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        alsa-devel@alsa-project.org,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        linux-ide@vger.kernel.org, linux-spi@vger.kernel.org
-Cc:     Alexandre Belloni <alexandre.belloni@bootlin.com>
-Subject: Re: (subset) [PATCH 00/10] Remove support for TX49xx
-Date:   Wed, 13 Jan 2021 00:33:30 +0100
-Message-Id: <161049432258.352381.2804715824942772218.b4-ty@bootlin.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210105140305.141401-1-tsbogend@alpha.franken.de>
-References: <20210105140305.141401-1-tsbogend@alpha.franken.de>
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Gilad Ben-Yossef <gilad@benyossef.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, stable@vger.kernel.org
+References: <20210112161044.3101-1-toke@redhat.com>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Message-ID: <d7a50628-5559-a054-bc47-2d45746eb503@linux.alibaba.com>
+Date:   Wed, 13 Jan 2021 10:39:15 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20210112161044.3101-1-toke@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 5 Jan 2021 15:02:45 +0100, Thomas Bogendoerfer wrote:
-> I couldn't find any buyable product other than reference boards using
-> TX49xx CPUs. And since nobody showed interest in keeping support for
-> it, it's time to remove it.
-> 
-> I've split up the removal into seperate parts for different maintainers.
-> So if the patch fits your needs, please take it via your tree or
-> give me an ack so I can apply them  the mips-next tree.
-> 
-> [...]
+Hi,
 
-Applied, thanks!
-
-[08/10] rtc: tx4939: Remove driver
-        commit: 446667df283002fdda0530523347ffd1cf053373
+I have fixed this problem last week. Still thanks for your fixing.
+patch is here: https://lkml.org/lkml/2021/1/7/201
 
 Best regards,
--- 
-Alexandre Belloni <alexandre.belloni@bootlin.com>
+Tianjia
+
+On 1/13/21 12:10 AM, Toke Høiland-Jørgensen wrote:
+> When public_key_verify_signature() is called from
+> asymmetric_key_verify_signature(), the pkey_algo field of struct
+> public_key_signature will be NULL, which causes a NULL pointer dereference
+> in the strcmp() check. Fix this by adding a NULL check.
+> 
+> One visible manifestation of this is that userspace programs (such as the
+> 'iwd' WiFi daemon) will be killed when trying to verify a TLS key using the
+> keyctl(2) interface.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 215525639631 ("X.509: support OSCCA SM2-with-SM3 certificate verification")
+> Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+> ---
+>   crypto/asymmetric_keys/public_key.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+> index 8892908ad58c..35b09e95a870 100644
+> --- a/crypto/asymmetric_keys/public_key.c
+> +++ b/crypto/asymmetric_keys/public_key.c
+> @@ -356,7 +356,7 @@ int public_key_verify_signature(const struct public_key *pkey,
+>   	if (ret)
+>   		goto error_free_key;
+>   
+> -	if (strcmp(sig->pkey_algo, "sm2") == 0 && sig->data_size) {
+> +	if (sig->pkey_algo && strcmp(sig->pkey_algo, "sm2") == 0 && sig->data_size) {
+>   		ret = cert_sig_digest_update(sig, tfm);
+>   		if (ret)
+>   			goto error_free_key;
+> 
