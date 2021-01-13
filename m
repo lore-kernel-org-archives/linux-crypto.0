@@ -2,96 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99420C433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jan 2021 03:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1442C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jan 2021 06:27:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6455523134
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jan 2021 03:03:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A329023120
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jan 2021 06:27:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728766AbhAMDDZ (ORCPT
+        id S1725833AbhAMG1o (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Jan 2021 22:03:25 -0500
-Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:58515 "EHLO
-        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726499AbhAMDDZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Jan 2021 22:03:25 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0ULZk49v_1610506958;
-Received: from B-455UMD6M-2027.local(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0ULZk49v_1610506958)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 13 Jan 2021 11:02:39 +0800
-Subject: Re: [PATCH] X.509: Fix crash caused by NULL pointer
-To:     David Howells <dhowells@redhat.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Tobias Markus <tobias@markus-regensburg.de>,
-        Tee Hao Wei <angelsl@in04.sg>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-References: <20210107092855.76093-1-tianjia.zhang@linux.alibaba.com>
- <772253.1610017082@warthog.procyon.org.uk>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <8ff730e0-bf03-0fbf-41f6-8e06f8956929@linux.alibaba.com>
-Date:   Wed, 13 Jan 2021 11:02:38 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.6.0
+        Wed, 13 Jan 2021 01:27:44 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:37498 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725747AbhAMG1n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 13 Jan 2021 01:27:43 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1kzZcK-0008CB-GL; Wed, 13 Jan 2021 17:26:53 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 13 Jan 2021 17:26:52 +1100
+Date:   Wed, 13 Jan 2021 17:26:52 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH v2] crypto: reduce minimum alignment of on-stack
+ structures
+Message-ID: <20210113062652.GA12495@gondor.apana.org.au>
+References: <20210108171706.10306-1-ardb@kernel.org>
+ <X/jLtI1m96DD+QLO@sol.localdomain>
+ <CAMj1kXE8SPE+2HazN6whvYr5anZWJJ8n4UAVyotPV1XySkk0Rg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <772253.1610017082@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXE8SPE+2HazN6whvYr5anZWJJ8n4UAVyotPV1XySkk0Rg@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Fri, Jan 08, 2021 at 11:49:32PM +0100, Ard Biesheuvel wrote:
+>
+> The assumption is that ARCH_SLAB_MINALIGN should be sufficient for any
+> POD type, But I guess that in order to be fully correct, the actual
+> alignment of the struct type should be ARCH_SLAB_MINALIGN, and __ctx
+> should just be padded out so it appears at an offset that is a
+> multiple of ARCH_KMALLOC_ALIGN.
 
+How about just leaving the skcpiher alone for now and change shash
+only?
 
-On 1/7/21 6:58 PM, David Howells wrote:
-> Tianjia Zhang <tianjia.zhang@linux.alibaba.com> wrote:
-> 
->> On the following call path, `sig->pkey_algo` is not assigned
->> in asymmetric_key_verify_signature(), which causes runtime
->> crash in public_key_verify_signature().
->>
->>    keyctl_pkey_verify
->>      asymmetric_key_verify_signature
->>        verify_signature
->>          public_key_verify_signature
->>
->> This patch simply check this situation and fixes the crash
->> caused by NULL pointer.
->>
->> Fixes: 215525639631 ("X.509: support OSCCA SM2-with-SM3 certificate verification")
->> Cc: stable@vger.kernel.org # v5.10+
->> Reported-by: Tobias Markus <tobias@markus-regensburg.de>
->> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> 
-> Looks reasonable:
-> 
-> Acked-by: David Howells <dhowells@redhat.com>
-> 
-> I wonder, though, if cert_sig_digest_update() should be obtained by some sort
-> of function pointer.  It doesn't really seem to belong in this file.  But this
-> is a separate issue.
-> 
-> David
-> 
-
-Yes, this is indeed the logic of the SM2 module. I have tried to 
-dynamically load and obtain the pointer of this function through 
-`request_module` before, but this method still does not seem very 
-suitable. Here are some unfinished codes I tried before:
-
-https://github.com/uudiin/linux/commit/55bca48c6282415d94c53a7692622d544da99342
-
-It would be great if you have some good experience to share with me, I 
-will continue to try to optimize this code.
-
-Best regards,
-Tianjia
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
