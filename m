@@ -2,58 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5FD8C433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Jan 2021 06:47:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73708C433DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Jan 2021 06:48:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F82023976
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Jan 2021 06:47:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47E5523976
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Jan 2021 06:48:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726123AbhANGrW (ORCPT
+        id S1726428AbhANGrj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Jan 2021 01:47:22 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:42174 "EHLO fornost.hmeau.com"
+        Thu, 14 Jan 2021 01:47:39 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:42184 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725989AbhANGrW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Jan 2021 01:47:22 -0500
+        id S1725989AbhANGrj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 14 Jan 2021 01:47:39 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1kzwP2-00087i-E1; Thu, 14 Jan 2021 17:46:41 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 14 Jan 2021 17:46:40 +1100
-Date:   Thu, 14 Jan 2021 17:46:40 +1100
+        id 1kzwPA-00087n-LW; Thu, 14 Jan 2021 17:46:49 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 14 Jan 2021 17:46:48 +1100
+Date:   Thu, 14 Jan 2021 17:46:48 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com
-Subject: Re: [PATCH 0/3] crypto: qat - fix issues reported by smatch
-Message-ID: <20210114064640.GD12584@gondor.apana.org.au>
-References: <20210104172159.15489-1-giovanni.cabiddu@intel.com>
+To:     Jiri Olsa <jolsa@kernel.org>
+Cc:     "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        bpf@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Qais Yousef <qais.yousef@arm.com>,
+        Andrii Nakryiko <andriin@fb.com>,
+        Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH] crypto: Rename struct device_private to
+ bcm_device_private
+Message-ID: <20210114064648.GE12584@gondor.apana.org.au>
+References: <20210104230237.916064-1-jolsa@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210104172159.15489-1-giovanni.cabiddu@intel.com>
+In-Reply-To: <20210104230237.916064-1-jolsa@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 04, 2021 at 05:21:56PM +0000, Giovanni Cabiddu wrote:
-> Fix warnings and errors reported by the static analysis tool smatch in
-> the QAT driver.
+On Tue, Jan 05, 2021 at 12:02:37AM +0100, Jiri Olsa wrote:
+> Renaming 'struct device_private' to 'struct bcm_device_private',
+> because it clashes with 'struct device_private' from
+> 'drivers/base/base.h'.
 > 
-> Adam Guerin (3):
->   crypto: qat - fix potential spectre issue
->   crypto: qat - change format string and cast ring size
->   crypto: qat - reduce size of mapped region
+> While it's not a functional problem, it's causing two distinct
+> type hierarchies in BTF data. It also breaks build with options:
+>   CONFIG_DEBUG_INFO_BTF=y
+>   CONFIG_CRYPTO_DEV_BCM_SPU=y
 > 
->  drivers/crypto/qat/qat_common/adf_transport.c       |  2 ++
->  drivers/crypto/qat/qat_common/adf_transport_debug.c |  4 ++--
->  drivers/crypto/qat/qat_common/qat_asym_algs.c       | 12 ++++++------
->  3 files changed, 10 insertions(+), 8 deletions(-)
+> as reported by Qais Yousef [1].
+> 
+> [1] https://lore.kernel.org/lkml/20201229151352.6hzmjvu3qh6p2qgg@e107158-lin/
+> Signed-off-by: Jiri Olsa <jolsa@kernel.org>
+> ---
+>  drivers/crypto/bcm/cipher.c | 2 +-
+>  drivers/crypto/bcm/cipher.h | 4 ++--
+>  drivers/crypto/bcm/util.c   | 2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
