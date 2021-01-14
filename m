@@ -2,108 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7626DC43381
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Jan 2021 02:56:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E75C433E6
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Jan 2021 04:16:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3AA9523619
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Jan 2021 02:56:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51FCF238E2
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Jan 2021 04:16:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726438AbhANC4V (ORCPT
+        id S1726904AbhANEQL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Jan 2021 21:56:21 -0500
-Received: from mail.kernel.org ([198.145.29.99]:49896 "EHLO mail.kernel.org"
+        Wed, 13 Jan 2021 23:16:11 -0500
+Received: from mail.kernel.org ([198.145.29.99]:32928 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725902AbhANC4U (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Jan 2021 21:56:20 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1FB72235FA;
-        Thu, 14 Jan 2021 02:55:37 +0000 (UTC)
+        id S1725997AbhANEQK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 13 Jan 2021 23:16:10 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A9062221EA;
+        Thu, 14 Jan 2021 04:15:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610592940;
-        bh=pHW2B/FjsYZUeZYVTsSMdXSjTFntYNHNKbf3cLsyRII=;
+        s=k20201202; t=1610597730;
+        bh=5bNu9OxM9PUIxaOuedQwfOFYLhmDVNIPEZSAT3dGhb4=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=K2aGv3ZJ7mxc7qcpy7KfhtA+4m/6vmGaaCBtUXxI6su//MvljyyJl8AHka/C+qQTI
-         k+QVMikYV6svcGyOnzmVW8iwAmplQLivKfOxtNHHja93ukJY8OBXomwcGjzL45Jvoh
-         /Hkf+RDHneTlEdX6rbb3Y8lhUEqr80Lcu/y3A8qgNLnmG1+y35RoLQ2hdGu0jt8xDV
-         GgNYucOT9yoUUzz0T7njc1d/75A5hGggP21vyYN6Vrv402KwJtr5obQaF3cTtvjS0C
-         HA/XTjz/KNJMVrf+MALnmDrlEj2+dNZsBIo+wkVAgahSsLq4oogyoy3gFAFqOggSJA
-         QAxv5cCrS6XFg==
-Date:   Thu, 14 Jan 2021 04:55:34 +0200
+        b=lrSQCF9v7s7KHxfHt1nkxgsmvAit5IxBibLwjFe2veJ3/4mOHUNU1Z4GkBW3HKTfX
+         V5Vcy5OHNrVjf3NxqbB/STou7PmQ+6bK0zTLYvQieLffpEzIXdlAa3eMGytH4gxVoh
+         f/3+LsE4zIaW9espS0TlkNyF4vihVTAUORBcgS40TZDk2U/Pt3+4GV36s4mJ90qp6x
+         BmUWhC9474MZLGcxHWUG6uwhLPx/ECjuQ92VnC7nPZNhD+kXzamEL5TQbmzgUbDN2d
+         L0gmAdcGs8DocVDSD68w0WVDWbF+KNM4Gf1+s2XbynEQo9SR3QnfURob5hY+q2kRm8
+         H2ENi2WpF+SZg==
+Date:   Thu, 14 Jan 2021 06:15:24 +0200
 From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+To:     =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
+Cc:     David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "David S . Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: public_key: check that pkey_algo is non-NULL
- before passing it to strcmp()
-Message-ID: <X/+yphcab4AERQJS@kernel.org>
-References: <20210112161044.3101-1-toke@redhat.com>
- <2648795.1610536273@warthog.procyon.org.uk>
+        James Morris <jmorris@namei.org>,
+        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "Serge E . Hallyn" <serge@hallyn.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v2 0/5] Enable root to update the blacklist keyring
+Message-ID: <X//FXJjQNV/ElHQg@kernel.org>
+References: <20201211190330.2586116-1-mic@digikod.net>
+ <67945fa6-2796-bfcd-5541-d54662e9802a@digikod.net>
+ <X/qJJsVe7+nP+gR6@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <2648795.1610536273@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <X/qJJsVe7+nP+gR6@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 13, 2021 at 11:11:13AM +0000, David Howells wrote:
-> I'm intending to use Tianjia's patch.  Would you like to add a Reviewed-by?
+On Sun, Jan 10, 2021 at 06:57:10AM +0200, Jarkko Sakkinen wrote:
+> On Tue, Jan 05, 2021 at 11:12:57AM +0100, Mickaël Salaün wrote:
+> > Jarkko, David, what is the status of this patch series? Do you need help
+> > to test it?
 > 
-> David
+> Hi, a leave/vacation and the holiday period badly mixed my schedules.
+> 
+> I'm testing this upcoming week.
+> 
+> /Jarkko
 
-I can give.
+❯ git-pw series apply 400795
+Applying: certs: Make blacklist_vet_description() more strict
+error: sha1 information is lacking or useless (certs/blacklist.c).
+error: could not build fake ancestor
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+Patch failed at 0001 certs: Make blacklist_vet_description() more strict
+When you have resolved this problem, run "git am --continue".
+If you prefer to skip this patch, run "git am --skip" instead.
+To restore the original branch and stop patching, run "git am --abort".
 
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+Can you rebase to rc3 and resend? 
+
+Also, please add this to the patches 1-3:
+
+Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+
+Also, 4-5 look good but I hold for testing before acking further.
+
+Thanks, and apologies for such a long wait.
 
 /Jarkko
-
-> ---
-> commit 11078a592e6dcea6b9f30e822d3d30e3defc99ca
-> Author: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> Date:   Thu Jan 7 17:28:55 2021 +0800
-> 
->     X.509: Fix crash caused by NULL pointer
->     
->     On the following call path, `sig->pkey_algo` is not assigned
->     in asymmetric_key_verify_signature(), which causes runtime
->     crash in public_key_verify_signature().
->     
->       keyctl_pkey_verify
->         asymmetric_key_verify_signature
->           verify_signature
->             public_key_verify_signature
->     
->     This patch simply check this situation and fixes the crash
->     caused by NULL pointer.
->     
->     Fixes: 215525639631 ("X.509: support OSCCA SM2-with-SM3 certificate verification")
->     Cc: stable@vger.kernel.org # v5.10+
->     Reported-by: Tobias Markus <tobias@markus-regensburg.de>
->     Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->     Signed-off-by: David Howells <dhowells@redhat.com>
-> 
-> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-> index 8892908ad58c..788a4ba1e2e7 100644
-> --- a/crypto/asymmetric_keys/public_key.c
-> +++ b/crypto/asymmetric_keys/public_key.c
-> @@ -356,7 +356,8 @@ int public_key_verify_signature(const struct public_key *pkey,
->  	if (ret)
->  		goto error_free_key;
->  
-> -	if (strcmp(sig->pkey_algo, "sm2") == 0 && sig->data_size) {
-> +	if (sig->pkey_algo && strcmp(sig->pkey_algo, "sm2") == 0 &&
-> +	    sig->data_size) {
->  		ret = cert_sig_digest_update(sig, tfm);
->  		if (ret)
->  			goto error_free_key;
-> 
-> 
