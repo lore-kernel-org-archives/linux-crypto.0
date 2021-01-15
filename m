@@ -2,138 +2,149 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F38C4332D
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jan 2021 13:09:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DED0FC433DB
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jan 2021 13:53:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01CEE221FA
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jan 2021 13:09:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B254D23772
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jan 2021 13:53:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387900AbhAONJO (ORCPT
+        id S1729491AbhAONxg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Jan 2021 08:09:14 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20524 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1732697AbhAONJN (ORCPT
+        Fri, 15 Jan 2021 08:53:36 -0500
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:1638 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731425AbhAONxf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Jan 2021 08:09:13 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10FD4XRt124176;
-        Fri, 15 Jan 2021 08:08:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=llJi/OMxHgn3H9Db7HWf4+KNzFiqFCWEBYm3DrO1KZ8=;
- b=T2pgB+3ox1sTrn+4EPHbnVLShUJT7Z8S0dwBAul4yh1ZaeAJoqXYNp8GBBCaj5sQJnR3
- xXE4I/e+GKzIGTlvtWJkWRZ/Z5v6YDM1r+bfsYheuFqegqTH4UBNR1vCpefIkZuzAP/h
- 4TPgKCEUdl16vdVlqsD+q73MemzRAOOWxxHYvy9nD2kWxtYPMJZ158mUeyFW6LgpXcJy
- dboaMvfe9PA+r4moTHQw1RRqxdx+1Xotxqjwp93VyoUk+ExmA6m0YsQXzsmHTnToEQq/
- nmA1/qGSmXa/71TfE6JWo1yJk/9PqbsP3DQDsbm9JgayUpOUz8K9HRThqXtWpeWDBQAF Zw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 363af5t65b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 Jan 2021 08:08:01 -0500
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10FD5A5s127151;
-        Fri, 15 Jan 2021 08:07:23 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 363af5t5gu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 Jan 2021 08:07:23 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10FD6Wae005060;
-        Fri, 15 Jan 2021 13:07:04 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 35y448fr3a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 Jan 2021 13:07:04 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10FD71Ai35848662
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 Jan 2021 13:07:01 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9AEC64C04E;
-        Fri, 15 Jan 2021 13:07:01 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 56C6E4C046;
-        Fri, 15 Jan 2021 13:06:58 +0000 (GMT)
-Received: from sig-9-65-220-78.ibm.com (unknown [9.65.220.78])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 15 Jan 2021 13:06:58 +0000 (GMT)
-Message-ID: <e1c072eba237e75fc687e9318f65e7395e2ca00b.camel@linux.ibm.com>
-Subject: Re: [PATCH v3 09/10] certs: Allow root user to append signed hashes
- to the blacklist keyring
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <jmorris@namei.org>,
-        =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
-        "Serge E . Hallyn" <serge@hallyn.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
-Date:   Fri, 15 Jan 2021 08:06:57 -0500
-In-Reply-To: <20210114151909.2344974-10-mic@digikod.net>
-References: <20210114151909.2344974-1-mic@digikod.net>
-         <20210114151909.2344974-10-mic@digikod.net>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-14.el8) 
-Mime-Version: 1.0
+        Fri, 15 Jan 2021 08:53:35 -0500
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 10FDjouB003175;
+        Fri, 15 Jan 2021 05:52:48 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=6A7ewF/KD3i2UkQoTLJ6v/jhMuX0fNIhAG8zlnMZ/Nk=;
+ b=MdTfOjG+zoE0FpLVmkJLVC24yMaKSBJ17KvA4y6KFA79ywzIFPl+uEXQD8zJkfTHd9YC
+ soSO4LV9bZ6gn/Z1btwQMZw84s1TrWlNddOE6FCNmwnYaifKjTHW48SpuZB+qDJonbSx
+ HwDu7wndlvqTw6xHV3aF2owmy03yvMEzx/HZDIrucp9m1W8Qb3/g6Pzt+WM/r20/WuOx
+ +1EPtUSSOE0lQsYhRU5cLoWG1sbtIhf4oQVEtEsqXXT14N/YeYLB9s6/xF6UQdXJ8pgs
+ rQwPSwFYBiloFm8TAUkY3yrq6YzunrOVeFb6cCBcHG1fiKP+Ylw+1JS0PSjFpuO/XPaZ Ng== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+        by mx0a-0016f401.pphosted.com with ESMTP id 35yaqt2wk4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Fri, 15 Jan 2021 05:52:48 -0800
+Received: from SC-EXCH03.marvell.com (10.93.176.83) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 15 Jan
+ 2021 05:52:47 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by SC-EXCH03.marvell.com
+ (10.93.176.83) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 15 Jan
+ 2021 05:52:46 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Fri, 15 Jan 2021 05:52:46 -0800
+Received: from hyd1schalla-dt.caveonetworks.com.com (unknown [10.29.8.39])
+        by maili.marvell.com (Postfix) with ESMTP id 0162F3F703F;
+        Fri, 15 Jan 2021 05:52:44 -0800 (PST)
+From:   Srujana Challa <schalla@marvell.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+        <pathreya@marvell.com>, <jerinj@marvell.com>,
+        Srujana Challa <schalla@marvell.com>
+Subject: [PATCH v2 0/9] Add Support for Marvell OcteonTX2 CPT engine
+Date:   Fri, 15 Jan 2021 19:22:18 +0530
+Message-ID: <20210115135227.20909-1-schalla@marvell.com>
+X-Mailer: git-send-email 2.29.0
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
+Content-Type: text/plain
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
  definitions=2021-01-15_07:2021-01-15,2021-01-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 malwarescore=0
- bulkscore=0 mlxlogscore=834 lowpriorityscore=0 priorityscore=1501
- phishscore=0 adultscore=0 suspectscore=0 impostorscore=0 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101150077
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Mickaël,
+This series introduces crypto(CPT) drivers(PF & VF) for Marvell
+OcteonTX2 CN96XX Soc.
 
-On Thu, 2021-01-14 at 16:19 +0100, Mickaël Salaün wrote:
-> From: Mickaël Salaün <mic@linux.microsoft.com>
-> 
-> Add a kernel option SYSTEM_BLACKLIST_AUTH_UPDATE to enable the root user
-> to dynamically add new keys to the blacklist keyring.  This enables to
-> invalidate new certificates, either from being loaded in a keyring, or
-> from being trusted in a PKCS#7 certificate chain.  This also enables to
-> add new file hashes to be denied by the integrity infrastructure.
-> 
-> Being able to untrust a certificate which could have normaly been
-> trusted is a sensitive operation.  This is why adding new hashes to the
-> blacklist keyring is only allowed when these hashes are signed and
-> vouched by the builtin trusted keyring.  A blacklist hash is stored as a
-> key description.  The PKCS#7 signature of this description must be
-> provided as the key payload.
-> 
-> Marking a certificate as untrusted should be enforced while the system
-> is running.  It is then forbiden to remove such blacklist keys.
-> 
-> Update blacklist keyring and blacklist key access rights:
-> * allows the root user to search for a specific blacklisted hash, which
->   make sense because the descriptions are already viewable;
-> * forbids key update;
-> * restricts kernel rights on the blacklist keyring to align with the
->   root user rights.
-> 
-> See the help in tools/certs/print-cert-tbs-hash.sh provided by a
-> following commit.
+OcteonTX2 SOC's resource virtualization unit (RVU) supports multiple
+physical and virtual functions. Each of the PF/VF's functionality is
+determined by what kind of resources are attached to it. When the CPT
+block is attached to a VF, it can function as a security device.
 
-The design looks good.  I'm hoping to review/test at least this patch
-next week.
+The CPT PF driver is responsible for:
+- Forwarding messages to/from VFs from/to admin function(AF),
+- Enabling/disabling VFs,
+- Loading/unloading microcode (creation/deletion of engine groups).
 
-thanks,
+The CPT VF driver works as a crypto offload device.
 
-Mimi
+This patch series includes:
+- CPT PF driver patches that include AF<=>PF<=>VF mailbox communication,
+sriov_configure, and firmware load to the acceleration engines.
+- CPT VF driver patches that include VF<=>PF mailbox communication and
+crypto offload support through the kernel cryptographic API.
+
+This series is tested with CRYPTO_EXTRA_TESTS enabled and
+CRYPTO_DISABLE_TESTS disabled.
+
+Changes since v1:
+* Resolved compilation warning.
+
+
+Srujana Challa (9):
+  drivers: crypto: add Marvell OcteonTX2 CPT PF driver
+  crypto: octeontx2: add mailbox communication with AF
+  crypto: octeontx2: enable SR-IOV and mailbox communication with VF
+  crypto: octeontx2: load microcode and create engine groups
+  crypto: octeontx2: add LF framework
+  crypto: octeontx2: add support to get engine capabilities
+  crypto: octeontx2: add virtual function driver support
+  crypto: octeontx2: add support to process the crypto request
+  crypto: octeontx2: register with linux crypto framework
+
+ drivers/crypto/marvell/Kconfig                |   14 +
+ drivers/crypto/marvell/Makefile               |    1 +
+ drivers/crypto/marvell/octeontx2/Makefile     |   10 +
+ .../marvell/octeontx2/otx2_cpt_common.h       |  137 ++
+ .../marvell/octeontx2/otx2_cpt_hw_types.h     |  464 +++++
+ .../marvell/octeontx2/otx2_cpt_mbox_common.c  |  202 ++
+ .../marvell/octeontx2/otx2_cpt_reqmgr.h       |  197 ++
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.c |  429 ++++
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.h |  353 ++++
+ drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   61 +
+ .../marvell/octeontx2/otx2_cptpf_main.c       |  713 +++++++
+ .../marvell/octeontx2/otx2_cptpf_mbox.c       |  356 ++++
+ .../marvell/octeontx2/otx2_cptpf_ucode.c      | 1415 +++++++++++++
+ .../marvell/octeontx2/otx2_cptpf_ucode.h      |  162 ++
+ drivers/crypto/marvell/octeontx2/otx2_cptvf.h |   29 +
+ .../marvell/octeontx2/otx2_cptvf_algs.c       | 1758 +++++++++++++++++
+ .../marvell/octeontx2/otx2_cptvf_algs.h       |  178 ++
+ .../marvell/octeontx2/otx2_cptvf_main.c       |  410 ++++
+ .../marvell/octeontx2/otx2_cptvf_mbox.c       |  167 ++
+ .../marvell/octeontx2/otx2_cptvf_reqmgr.c     |  541 +++++
+ 20 files changed, 7597 insertions(+)
+ create mode 100644 drivers/crypto/marvell/octeontx2/Makefile
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptlf.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptlf.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.h
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
+ create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
+
+-- 
+2.29.0
 
