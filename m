@@ -2,136 +2,138 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DEA4C4332E
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jan 2021 09:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F38C4332D
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jan 2021 13:09:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D89323436
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jan 2021 09:29:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01CEE221FA
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jan 2021 13:09:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729208AbhAOJ3Y (ORCPT
+        id S2387900AbhAONJO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Jan 2021 04:29:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43310 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726852AbhAOJ3X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Jan 2021 04:29:23 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 685E923436;
-        Fri, 15 Jan 2021 09:28:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610702922;
-        bh=apGADtKlrfa4YYghHsGMEpjHQn9bjjZ8mMzl0uMAbUU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Jr3i3MiraGrjKs3dkoOrrhe26xY9WZ3gv63Y830+mFmZ9n0uMvXfHG5CfK0CSGga8
-         zL01ymSiNWnvu6IzJFAvpoE2annb2KlC3299fymNakZtiTOLxPTALNu35jM0mY3i8n
-         qX3R7NGB93+EHg7HbgW/NLExg7g6WT3KIj/RkUxthccdljsyQnz+PBYBHRH3TjgRL/
-         SS/TcvR+RqeWK0R8RasrsAY6JlMl7dLojuPzmSSzhZFMN8fe0yWSCODXxhzHcD6Na6
-         6vWWIm+8FEoeDL0D4swTkpWSqkBXBBgNfQH1/j8FyojawxRoGbSKfAUjS+qCP5o6it
-         uAjUDiy5Mklpg==
-Date:   Fri, 15 Jan 2021 11:28:35 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
-Cc:     David Howells <dhowells@redhat.com>,
+        Fri, 15 Jan 2021 08:09:14 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20524 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732697AbhAONJN (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 15 Jan 2021 08:09:13 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10FD4XRt124176;
+        Fri, 15 Jan 2021 08:08:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=llJi/OMxHgn3H9Db7HWf4+KNzFiqFCWEBYm3DrO1KZ8=;
+ b=T2pgB+3ox1sTrn+4EPHbnVLShUJT7Z8S0dwBAul4yh1ZaeAJoqXYNp8GBBCaj5sQJnR3
+ xXE4I/e+GKzIGTlvtWJkWRZ/Z5v6YDM1r+bfsYheuFqegqTH4UBNR1vCpefIkZuzAP/h
+ 4TPgKCEUdl16vdVlqsD+q73MemzRAOOWxxHYvy9nD2kWxtYPMJZ158mUeyFW6LgpXcJy
+ dboaMvfe9PA+r4moTHQw1RRqxdx+1Xotxqjwp93VyoUk+ExmA6m0YsQXzsmHTnToEQq/
+ nmA1/qGSmXa/71TfE6JWo1yJk/9PqbsP3DQDsbm9JgayUpOUz8K9HRThqXtWpeWDBQAF Zw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 363af5t65b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 Jan 2021 08:08:01 -0500
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10FD5A5s127151;
+        Fri, 15 Jan 2021 08:07:23 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 363af5t5gu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 Jan 2021 08:07:23 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10FD6Wae005060;
+        Fri, 15 Jan 2021 13:07:04 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 35y448fr3a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 Jan 2021 13:07:04 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10FD71Ai35848662
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 15 Jan 2021 13:07:01 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9AEC64C04E;
+        Fri, 15 Jan 2021 13:07:01 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 56C6E4C046;
+        Fri, 15 Jan 2021 13:06:58 +0000 (GMT)
+Received: from sig-9-65-220-78.ibm.com (unknown [9.65.220.78])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 15 Jan 2021 13:06:58 +0000 (GMT)
+Message-ID: <e1c072eba237e75fc687e9318f65e7395e2ca00b.camel@linux.ibm.com>
+Subject: Re: [PATCH v3 09/10] certs: Allow root user to append signed hashes
+ to the blacklist keyring
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+        David Howells <dhowells@redhat.com>,
         David Woodhouse <dwmw2@infradead.org>,
-        "David S . Miller" <davem@davemloft.net>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     "David S . Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         James Morris <jmorris@namei.org>,
-        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
+        =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
         "Serge E . Hallyn" <serge@hallyn.com>, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v3 00/10] Enable root to update the blacklist keyring
-Message-ID: <YAFgQ1SN24iFujjx@kernel.org>
+Date:   Fri, 15 Jan 2021 08:06:57 -0500
+In-Reply-To: <20210114151909.2344974-10-mic@digikod.net>
 References: <20210114151909.2344974-1-mic@digikod.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+         <20210114151909.2344974-10-mic@digikod.net>
+Content-Type: text/plain; charset="ISO-8859-15"
+X-Mailer: Evolution 3.28.5 (3.28.5-14.el8) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210114151909.2344974-1-mic@digikod.net>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-15_07:2021-01-15,2021-01-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 malwarescore=0
+ bulkscore=0 mlxlogscore=834 lowpriorityscore=0 priorityscore=1501
+ phishscore=0 adultscore=0 suspectscore=0 impostorscore=0 mlxscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101150077
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 14, 2021 at 04:18:59PM +0100, Mickaël Salaün wrote:
-> This third patch series includes back three fix patches taken from the first
-> series (and cherry-picked from David Howells's tree [1]), and one cosmetic fix
-> from Alex Shi which helps avoid future conflicts.  I also added some Acked-by
-> and improved comments.  As requested, this series is based on v5.11-rc3.
-> 
-> The goal of these patches is to add a new configuration option to enable the
-> root user to load signed keys in the blacklist keyring.  This keyring is useful
-> to "untrust" certificates or files.  Enabling to safely update this keyring
-> without recompiling the kernel makes it more usable.
-> 
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-fixes
-> 
-> Previous patch series:
-> https://lore.kernel.org/lkml/20201211190330.2586116-1-mic@digikod.net/
-> 
-> Regards,
-> 
-> Alex Shi (1):
->   certs/blacklist: fix kernel doc interface issue
-> 
-> David Howells (1):
->   certs: Fix blacklist flag type confusion
-> 
-> Mickaël Salaün (8):
->   certs: Fix blacklisted hexadecimal hash string check
->   PKCS#7: Fix missing include
->   certs: Replace K{U,G}IDT_INIT() with GLOBAL_ROOT_{U,G}ID
->   certs: Make blacklist_vet_description() more strict
->   certs: Factor out the blacklist hash creation
->   certs: Check that builtin blacklist hashes are valid
->   certs: Allow root user to append signed hashes to the blacklist
->     keyring
->   tools/certs: Add print-cert-tbs-hash.sh
-> 
->  MAINTAINERS                                   |   2 +
->  certs/.gitignore                              |   1 +
->  certs/Kconfig                                 |  10 +
->  certs/Makefile                                |  15 +-
->  certs/blacklist.c                             | 217 ++++++++++++++----
->  certs/system_keyring.c                        |   5 +-
->  crypto/asymmetric_keys/x509_public_key.c      |   3 +-
->  include/keys/system_keyring.h                 |  14 +-
->  include/linux/key.h                           |   1 +
->  include/linux/verification.h                  |   2 +
->  scripts/check-blacklist-hashes.awk            |  37 +++
->  security/integrity/ima/ima_mok.c              |   4 +-
->  .../platform_certs/keyring_handler.c          |  26 +--
->  security/keys/key.c                           |   2 +
->  tools/certs/print-cert-tbs-hash.sh            |  91 ++++++++
->  15 files changed, 345 insertions(+), 85 deletions(-)
->  create mode 100755 scripts/check-blacklist-hashes.awk
->  create mode 100755 tools/certs/print-cert-tbs-hash.sh
-> 
-> 
-> base-commit: 7c53f6b671f4aba70ff15e1b05148b10d58c2837
-> -- 
-> 2.30.0
-> 
-> 
+Hi Mickaël,
 
-Thank you. Unfortunately no time to review this anymore this week but I
-sanity checked that this applies cleanly now, so should be easy to get on
-testing this series next week:
+On Thu, 2021-01-14 at 16:19 +0100, Mickaël Salaün wrote:
+> From: Mickaël Salaün <mic@linux.microsoft.com>
+> 
+> Add a kernel option SYSTEM_BLACKLIST_AUTH_UPDATE to enable the root user
+> to dynamically add new keys to the blacklist keyring.  This enables to
+> invalidate new certificates, either from being loaded in a keyring, or
+> from being trusted in a PKCS#7 certificate chain.  This also enables to
+> add new file hashes to be denied by the integrity infrastructure.
+> 
+> Being able to untrust a certificate which could have normaly been
+> trusted is a sensitive operation.  This is why adding new hashes to the
+> blacklist keyring is only allowed when these hashes are signed and
+> vouched by the builtin trusted keyring.  A blacklist hash is stored as a
+> key description.  The PKCS#7 signature of this description must be
+> provided as the key payload.
+> 
+> Marking a certificate as untrusted should be enforced while the system
+> is running.  It is then forbiden to remove such blacklist keys.
+> 
+> Update blacklist keyring and blacklist key access rights:
+> * allows the root user to search for a specific blacklisted hash, which
+>   make sense because the descriptions are already viewable;
+> * forbids key update;
+> * restricts kernel rights on the blacklist keyring to align with the
+>   root user rights.
+> 
+> See the help in tools/certs/print-cert-tbs-hash.sh provided by a
+> following commit.
 
-$ git-pw series apply 414691
-Applying: certs/blacklist: fix kernel doc interface issue
-Applying: certs: Fix blacklisted hexadecimal hash string check
-Applying: PKCS#7: Fix missing include
-Applying: certs: Fix blacklist flag type confusion
-Applying: certs: Replace K{U,G}IDT_INIT() with GLOBAL_ROOT_{U,G}ID
-Applying: certs: Make blacklist_vet_description() more strict
-Applying: certs: Factor out the blacklist hash creation
-Applying: certs: Check that builtin blacklist hashes are valid
-Applying: certs: Allow root user to append signed hashes to the blacklist keyring
-Applying: tools/certs: Add print-cert-tbs-hash.sh
+The design looks good.  I'm hoping to review/test at least this patch
+next week.
 
-/Jarkko
+thanks,
+
+Mimi
+
