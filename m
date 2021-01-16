@@ -2,84 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F33CCC433E0
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 00:32:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0EEBC433E0
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 01:44:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C090C229C9
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 00:32:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F305212CC
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 01:44:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726472AbhAPAcc (ORCPT
+        id S1725919AbhAPBoG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Jan 2021 19:32:32 -0500
-Received: from mail.zx2c4.com ([167.71.246.149]:43924 "EHLO mail.zx2c4.com"
+        Fri, 15 Jan 2021 20:44:06 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35706 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726224AbhAPAcc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Jan 2021 19:32:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1610757107;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=n8iZPICWYsO+RYtUEO2xzdAJtVxcHhgNAS7/3a61bNc=;
-        b=hqXeTJOab5lSqGizo5Goq1JXQwiFXKNrkojE/Y2VllC0XhsfQ5WpIaQJlGTvnppYR6SLlX
-        02WtezXaeM56GtwvPSFV2SRWEoFmq2S021S0AGYyDV/tH1TUHb1PfHTzVwzrTDDXeZZd8a
-        U7CHyb9nhZsZgAqrb7T7gXOu/uqe8sE=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b9f0ebe2 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO)
-        for <linux-crypto@vger.kernel.org>;
-        Sat, 16 Jan 2021 00:31:47 +0000 (UTC)
-Received: by mail-yb1-f172.google.com with SMTP id x78so2220653ybe.11
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Jan 2021 16:31:47 -0800 (PST)
-X-Gm-Message-State: AOAM532lZvttp6iHs+Fq1AGGmmHTnEopwGeIfgbyJMiBcE1hZhzyaQWc
-        rgenI1x61wUgQG0UqNQD8u45k26+L3WGcjUv5Ss=
-X-Google-Smtp-Source: ABdhPJxDknOg1S42lhxITKXJO4locrrQIj3jBUR7BozAupYytAfbGWXOg9PCix+CvL/JDcoAki5SjvUeSshMekG4vR8=
-X-Received: by 2002:a25:c7d0:: with SMTP id w199mr18970424ybe.279.1610757106864;
- Fri, 15 Jan 2021 16:31:46 -0800 (PST)
+        id S1725815AbhAPBoG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 15 Jan 2021 20:44:06 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2D35823120;
+        Sat, 16 Jan 2021 01:43:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1610761406;
+        bh=F5udgBJ6Iub+SVPG8jhyLFZYdMP8H6k/zj+lJZG/UeQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=g1Vcmc17LgRbX0P+ycXC1ovEJ5lpf4c/nlmjewMR7/VLLWuWiFyi0KJYrfJ00UoKo
+         Nm4LDuuN20XE39yzrl8BSd6QP+GCc0t6D8cnh27+HOs5R7O4QTyvxaTMm8M1XGXZYr
+         /EVvEfRBxIAS0ACSPLD24yYqdvBglETQub1N7DCrAC/Z8deDUDNs7iJtX8FTAW/dur
+         4cgRDmp1HhHVybYsMgAt8G135bDHNgjGf2gCvT7VvmA8aqompQ7eV0MI6SX+DQEiAm
+         WmE2FJMLqwcucW06Xz5T+5bSAsGld+XVtQbVKoSC9JcvcJxge75JohQbCW4JGFxYgo
+         MV1wT/ZzCMjKg==
+Date:   Fri, 15 Jan 2021 17:43:23 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Dey, Megha" <megha.dey@intel.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        ravi.v.shankar@intel.com, tim.c.chen@intel.com,
+        andi.kleen@intel.com, dave.hansen@intel.com,
+        wajdi.k.feghali@intel.com, greg.b.tucker@intel.com,
+        robert.a.kasten@intel.com, rajendrakumar.chinnaiyan@intel.com,
+        tomasz.kantecki@intel.com, ryan.d.saffores@intel.com,
+        ilya.albrekht@intel.com, kyung.min.park@intel.com,
+        Tony Luck <tony.luck@intel.com>, ira.weiny@intel.com
+Subject: Re: [RFC V1 3/7] crypto: ghash - Optimized GHASH computations
+Message-ID: <YAJEu1esw0zPA7Qh@gmail.com>
+References: <1608325864-4033-1-git-send-email-megha.dey@intel.com>
+ <1608325864-4033-4-git-send-email-megha.dey@intel.com>
+ <CAMj1kXGhGopfg19at5N_9q89-UA4irSgMULyDXg+dKhnbRrCZQ@mail.gmail.com>
+ <dfb5f2e0-027d-2b9c-aec7-313ff0275381@intel.com>
 MIME-Version: 1.0
-References: <20210115171743.1559595-1-Jason@zx2c4.com> <20210115193012.3059929-1-Jason@zx2c4.com>
- <7628A3E4-B5AB-4C3C-9328-9E7F788E2928@oracle.com>
-In-Reply-To: <7628A3E4-B5AB-4C3C-9328-9E7F788E2928@oracle.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Sat, 16 Jan 2021 01:31:36 +0100
-X-Gmail-Original-Message-ID: <CAHmME9r+kdyF-rR6sG3TKUTo5T+zG_uaeL294vaKRMi+_TdXkQ@mail.gmail.com>
-Message-ID: <CAHmME9r+kdyF-rR6sG3TKUTo5T+zG_uaeL294vaKRMi+_TdXkQ@mail.gmail.com>
-Subject: Re: [PATCH v2] crypto: lib/chacha20poly1305 - define empty module
- exit function
-To:     John Donnelly <john.p.donnelly@oracle.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dfb5f2e0-027d-2b9c-aec7-313ff0275381@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jan 16, 2021 at 1:30 AM John Donnelly
-<john.p.donnelly@oracle.com> wrote:
->
->
->
-> > On Jan 15, 2021, at 1:30 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> >
-> > With no mod_exit function, users are unable to unload the module after
-> > use. I'm not aware of any reason why module unloading should be
-> > prohibited for this one, so this commit simply adds an empty exit
-> > function.
-> >
-> > Reported-and-tested-by: John Donnelly <john.p.donnelly@oracle.com>
-> > Acked-by: Ard Biesheuvel <ardb@kernel.org>
-> > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
->
-> Thanks!
->
-> Would someone be kind enough to remind when this appears and I will apply it to our product ? We like to use published commits when possible.
->
-> JD
+On Fri, Jan 15, 2021 at 04:14:40PM -0800, Dey, Megha wrote:
+> > Hello Megha,
+> > 
+> > What is the purpose of this separate GHASH module? GHASH is only used
+> > in combination with AES-CTR to produce GCM, and this series already
+> > contains a GCM driver.
+> > 
+> > Do cores exist that implement PCLMULQDQ but not AES-NI?
+> > 
+> > If not, I think we should be able to drop this patch (and remove the
+> > existing PCLMULQDQ GHASH driver as well)
+> 
+> AFAIK, dm-verity (authenticated but not encrypted file system) is one use
+> case for authentication only.
+> 
+> Although I am not sure if GHASH is specifically used for this or SHA?
+> 
+> Also, I do not know of any cores that implement PCLMULQDQ and not AES-NI.
+> 
 
-It'll show up in one of these two repos in a week or two:
-https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git/
-https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/
+dm-verity only uses unkeyed hash algorithms.  So no, it doesn't use GHASH.
+
+- Eric
