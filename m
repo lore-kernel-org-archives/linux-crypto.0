@@ -2,94 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EE3DC433E0
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 18:05:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC84CC433E6
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 18:36:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DD51122472
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 18:05:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A6B2227C3
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 18:36:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726114AbhAPSFH (ORCPT
+        id S1727691AbhAPSf6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Jan 2021 13:05:07 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40256 "EHLO mail.kernel.org"
+        Sat, 16 Jan 2021 13:35:58 -0500
+Received: from mga11.intel.com ([192.55.52.93]:34785 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726018AbhAPSFG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Jan 2021 13:05:06 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 358EF2339E
-        for <linux-crypto@vger.kernel.org>; Sat, 16 Jan 2021 15:37:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610811421;
-        bh=x4l1R8gCEd4dz4+3VSqSCWo48nh0BvgITV/Eyfeqkk4=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=il3FDsOsXPawNmBAj4NyVMR6qeFnMj5y5nlBbKHXjQHI/B/NfN+I/BkeDaQWlrFZI
-         ROuO0cTh6v/lOfgv075bMj/C31hadQNUNxXUukPeyhcS1RTaWCexBcHjGFUSxlBFnp
-         4DQzuSAKNCa9WvzTpj0/fF6kr1/NPzGcfErQhrPMAqyx65K9IczeEIbrhLcoiEcRsF
-         N0KUwq0DiAeD1C5nvHvk2O6fM9aIw85sW1dl5cBpLqqYFT+zk+0b/wpp56U7HaGFnO
-         F8zjTTLc2DufQGolP9shEHCc8842fXUM1+pk3zYqiMM20jo9lHo535bNcOUiwHO/R/
-         qeJW+dlOIHbcg==
-Received: by mail-ot1-f43.google.com with SMTP id q25so11718233otn.10
-        for <linux-crypto@vger.kernel.org>; Sat, 16 Jan 2021 07:37:01 -0800 (PST)
-X-Gm-Message-State: AOAM532fbVPSWU0IKpwnvO9GPZEtIXFD8cAr3f09VH7s1yBsI9pasV71
-        j1RFi4THyhhvQu17V+8KX2EU+DR/11nZBRNteTo=
-X-Google-Smtp-Source: ABdhPJzz80o1MaCOj5HW0Hp2A2E0kn95lxBT8fGlBkJHK/Z9C2eOXyrULwJQJFAOQK2f9sPxPN9OR1frSgv/b3rvIdk=
-X-Received: by 2002:a9d:7a4b:: with SMTP id z11mr12332724otm.305.1610811420486;
- Sat, 16 Jan 2021 07:37:00 -0800 (PST)
-MIME-Version: 1.0
-References: <202101160841.jUXjdS7j-lkp@intel.com> <YAJIhjzmvszXAXUb@gmail.com>
-In-Reply-To: <YAJIhjzmvszXAXUb@gmail.com>
-From:   Arnd Bergmann <arnd@kernel.org>
-Date:   Sat, 16 Jan 2021 16:36:44 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a1FTzwK=xK2eC5hiBSC+Xjq1eNO_cv3=CRB4csNiMpsUA@mail.gmail.com>
-Message-ID: <CAK8P3a1FTzwK=xK2eC5hiBSC+Xjq1eNO_cv3=CRB4csNiMpsUA@mail.gmail.com>
-Subject: Re: [linux-next:master 952/3956] crypto/blake2b_generic.c:73:13:
- warning: stack frame size of 9776 bytes in function 'blake2b_compress_one_generic'
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     kernel test robot <lkp@intel.com>, kbuild-all@lists.01.org,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Linux Memory Management List <linux-mm@kvack.org>,
+        id S1727663AbhAPSf6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 16 Jan 2021 13:35:58 -0500
+IronPort-SDR: OpYSYeQ+XoZ9OvXwmdjpRydNX3fNgSQrklvanCvXqMswQKN7zwQJzwHCwzP9Z7wzCuEcDfk/6K
+ qrTuoQhao6LQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9866"; a="175176646"
+X-IronPort-AV: E=Sophos;i="5.79,352,1602572400"; 
+   d="scan'208";a="175176646"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2021 10:35:17 -0800
+IronPort-SDR: GnY77fKiXYavFnIKZdk81hwMunvmCoQzDAPM0H4i+usCOE8dWoBfuJ9SwOnsWI/r4cv9nRxIAE
+ /nYvNVQ1YSNg==
+X-IronPort-AV: E=Sophos;i="5.79,352,1602572400"; 
+   d="scan'208";a="401634468"
+Received: from meghadey-mobl1.amr.corp.intel.com (HELO [10.212.36.189]) ([10.212.36.189])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2021 10:35:16 -0800
+Subject: Re: [RFC V1 0/7] Introduce AVX512 optimized crypto algorithms
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Kees Cook <keescook@chromium.org>,
-        Marco Elver <elver@google.com>,
-        George Popescu <georgepope@android.com>
-Content-Type: text/plain; charset="UTF-8"
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        ravi.v.shankar@intel.com, tim.c.chen@intel.com,
+        andi.kleen@intel.com, Dave Hansen <dave.hansen@intel.com>,
+        wajdi.k.feghali@intel.com, greg.b.tucker@intel.com,
+        robert.a.kasten@intel.com, rajendrakumar.chinnaiyan@intel.com,
+        tomasz.kantecki@intel.com, ryan.d.saffores@intel.com,
+        ilya.albrekht@intel.com, kyung.min.park@intel.com,
+        Tony Luck <tony.luck@intel.com>, ira.weiny@intel.com,
+        X86 ML <x86@kernel.org>
+References: <1608325864-4033-1-git-send-email-megha.dey@intel.com>
+ <X+Et0ubPcBVZOURL@sol.localdomain>
+ <caa90522-14ac-c674-b6f5-22a7d8359a3c@intel.com>
+ <CAMj1kXGFsQMpWCYCB8Vqeq2Kj+WBiXkVv=dom13PJhbR3EZKFQ@mail.gmail.com>
+From:   "Dey, Megha" <megha.dey@intel.com>
+Message-ID: <07b2cb98-1a3d-0bce-98ff-e0250220e9fd@intel.com>
+Date:   Sat, 16 Jan 2021 10:35:16 -0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
+MIME-Version: 1.0
+In-Reply-To: <CAMj1kXGFsQMpWCYCB8Vqeq2Kj+WBiXkVv=dom13PJhbR3EZKFQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jan 16, 2021 at 2:59 AM Eric Biggers <ebiggers@kernel.org> wrote:
-> On Sat, Jan 16, 2021 at 08:59:50AM +0800, kernel test robot wrote
->
-> Looks like the clang bug that causes large stack usage in this function
-> (https://bugs.llvm.org/show_bug.cgi?id=45803 which is still unfixed) got
-> triggered again.  Note that the function only has 264 bytes of local variables,
-> so there's no reason why it should use anywhere near 9776 bytes of stack space.
->
-> I'm not sure what we can do about this.  Last time the solution was commit
-> 0c0408e86dbe which randomly added a 'pragma nounroll' to the loop at the end.
->
-> Anyone have any better idea than randomly trying adding optimization pragmas and
-> seeing what makes the report go away?
->
-> Also this was reported with clang 12.0.0 which is a prerelease version, so I'm
-> not sure how much I'm supposed to care about this report.
+Hi Ard,
 
-I sent a workaround to disable UBSAN_UNSIGNED_OVERFLOW an
-x86-32, after showing that this did not affect arm32, arm64 or x86-64:
-27c287b41659 ("ubsan: disable unsigned-overflow check for i386")
-
-As the report is for ppc64, it appears that this is not just specific to x86-32
-after all. I have had no success in isolating the problem in clang, but I
-did not try too hard either. I see this .config also enables
-CONFIG_UBSAN_UNSIGNED_OVERFLOW=y, so it would be a
-reasonable assumption that this is the same problem as on x86-32.
-
-There is also another thread on CONFIG_UBSAN_UNSIGNED_OVERFLOW
-causing BUILD_BUG_ON() failures.
-
-        Arnd
+On 1/16/2021 8:52 AM, Ard Biesheuvel wrote:
+> On Mon, 28 Dec 2020 at 20:11, Dey, Megha <megha.dey@intel.com> wrote:
+>> Hi Eric,
+>>
+>> On 12/21/2020 3:20 PM, Eric Biggers wrote:
+>>> On Fri, Dec 18, 2020 at 01:10:57PM -0800, Megha Dey wrote:
+>>>> Optimize crypto algorithms using VPCLMULQDQ and VAES AVX512 instructions
+>>>> (first implemented on Intel's Icelake client and Xeon CPUs).
+>>>>
+>>>> These algorithms take advantage of the AVX512 registers to keep the CPU
+>>>> busy and increase memory bandwidth utilization. They provide substantial
+>>>> (2-10x) improvements over existing crypto algorithms when update data size
+>>>> is greater than 128 bytes and do not have any significant impact when used
+>>>> on small amounts of data.
+>>>>
+>>>> However, these algorithms may also incur a frequency penalty and cause
+>>>> collateral damage to other workloads running on the same core(co-scheduled
+>>>> threads). These frequency drops are also known as bin drops where 1 bin
+>>>> drop is around 100MHz. With the SpecCPU and ffmpeg benchmark, a 0-1 bin
+>>>> drop(0-100MHz) is observed on Icelake desktop and 0-2 bin drops (0-200Mhz)
+>>>> are observed on the Icelake server.
+>>>>
+>>> Do these new algorithms all pass the self-tests, including the fuzz tests that
+>>> are enabled when CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y?
+>> I had tested these algorithms with CRYPTO_MANAGER_DISABLE_TESTS=n and
+>> tcrypt, not with
+>> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y (I wasn't aware this existed, my bad).
+>> I see a couple of errors after enabling it and am working on fixing those.
+>>
+> Hello Megha,
+>
+> I think the GHASH changes can be dropped (as discussed in the other
+> thread), given the lack of a use case. The existing GHASH driver could
+> also be removed in the future, but I don't think it needs to be part
+> of this series.
+Ok, I will remove the GHASH patch from the next series.
+>
+> Could you please rebase this onto the latest AES-NI changes that are
+> in Herbert's tree? (as well as the ones I sent out today) They address
+> some issues with indirect calls and excessive disabling of preemption,
+> and your GCM and CTR changes are definitely going to be affected by
+> this as well.
+Yeah sure, will do, thanks for the headsup!
