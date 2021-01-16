@@ -2,121 +2,173 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA45C433E9
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jan 2021 23:03:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4A96C433DB
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 00:15:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F34323382
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jan 2021 23:03:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8559823A01
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 00:15:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728003AbhAOXDE (ORCPT
+        id S1728489AbhAPAP0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Jan 2021 18:03:04 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:39242 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727468AbhAOXDD (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Jan 2021 18:03:03 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10FMtUw5143992;
-        Fri, 15 Jan 2021 23:01:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2020-01-29; bh=vwI1S6MedWZIivl9RaecNBXX0A7OEkx5Ubykr5olZOY=;
- b=QVozDoSzkR77ZpD28RT3wkHZBsrO5gFb7tfRhMkHtHfUcy+3oHz5oOf+2sk/jw91w9yG
- TqQaXXuedfp7Jhhp5uadszlszE9HbnV+5mKaKwvUH7VzHkjsnnskEd5zsYLlhhrdJbFC
- 3CRjHlGTv9AwvQHHG6xjW4bsCI7vObA6qCUfyxSSNl2xPBWFN6KQrUh8ZLkUMx8HKpvu
- bbFTnoRMiQ/d44ZITtcdRCZn7NEdZD8oDsj5txBacf6kwMgTcxkg+WGoEgC8Pd+HeQXy
- FW94olgk/dy66ie9hpSOV5l4/9rHZpari6iIRoeBetkHqwFOJ6TRwNlVj+lIpWuH+FdS wg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 360kvkf07f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 Jan 2021 23:01:47 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10FMslXI130905;
-        Fri, 15 Jan 2021 22:59:47 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 360kfbp7ng-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 Jan 2021 22:59:47 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 10FMxdqI031193;
-        Fri, 15 Jan 2021 22:59:39 GMT
-Received: from dhcp-10-154-190-197.vpn.oracle.com (/10.154.190.197)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 15 Jan 2021 14:59:39 -0800
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v4] certs: Add EFI_CERT_X509_GUID support for dbx entries
-From:   Eric Snowberg <eric.snowberg@oracle.com>
-In-Reply-To: <0659f965b3321e793fee03136ae50cbbcd4a53bf.camel@HansenPartnership.com>
-Date:   Fri, 15 Jan 2021 16:01:00 -0700
-Cc:     David Howells <dhowells@redhat.com>, dwmw2@infradead.org,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jmorris@namei.org, serge@hallyn.com, nayna@linux.ibm.com,
-        Mimi Zohar <zohar@linux.ibm.com>, erichte@linux.ibm.com,
-        mpe@ellerman.id.au, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <C40CED72-E44A-47DF-A965-04BFFE440B3A@oracle.com>
-References: <20200916004927.64276-1-eric.snowberg@oracle.com>
- <0659f965b3321e793fee03136ae50cbbcd4a53bf.camel@HansenPartnership.com>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>
-X-Mailer: Apple Mail (2.3273)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9865 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- mlxlogscore=999 phishscore=0 bulkscore=0 spamscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101150138
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9865 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
- lowpriorityscore=0 bulkscore=0 priorityscore=1501 malwarescore=0
- clxscore=1015 impostorscore=0 spamscore=0 mlxscore=0 suspectscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101150138
+        Fri, 15 Jan 2021 19:15:26 -0500
+Received: from mga05.intel.com ([192.55.52.43]:8985 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728520AbhAPAP0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 15 Jan 2021 19:15:26 -0500
+IronPort-SDR: e+1kz1knSqm7q3/TI2R4rZDRyb3uqfqsZWZQcIKmHgHOIRAiLfnieRS/2GpWOwYKwQ/miazAaS
+ culiNnAD0sBA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9865"; a="263422576"
+X-IronPort-AV: E=Sophos;i="5.79,350,1602572400"; 
+   d="scan'208";a="263422576"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2021 16:14:44 -0800
+IronPort-SDR: t09QPpFEG1iLf7taOkfKoFA8biUcl4HaAflWlH6kKL3MCzhHQ2IPXbLKc6ONBRU1S+6SNnCMJj
+ Ux4X8DtqKrZA==
+X-IronPort-AV: E=Sophos;i="5.79,350,1602572400"; 
+   d="scan'208";a="425493706"
+Received: from meghadey-mobl1.amr.corp.intel.com (HELO [10.254.14.175]) ([10.254.14.175])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2021 16:14:42 -0800
+Subject: Re: [RFC V1 3/7] crypto: ghash - Optimized GHASH computations
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        ravi.v.shankar@intel.com, tim.c.chen@intel.com,
+        andi.kleen@intel.com, dave.hansen@intel.com,
+        wajdi.k.feghali@intel.com, greg.b.tucker@intel.com,
+        robert.a.kasten@intel.com, rajendrakumar.chinnaiyan@intel.com,
+        tomasz.kantecki@intel.com, ryan.d.saffores@intel.com,
+        ilya.albrekht@intel.com, kyung.min.park@intel.com,
+        Tony Luck <tony.luck@intel.com>, ira.weiny@intel.com
+References: <1608325864-4033-1-git-send-email-megha.dey@intel.com>
+ <1608325864-4033-4-git-send-email-megha.dey@intel.com>
+ <CAMj1kXGhGopfg19at5N_9q89-UA4irSgMULyDXg+dKhnbRrCZQ@mail.gmail.com>
+From:   "Dey, Megha" <megha.dey@intel.com>
+Message-ID: <dfb5f2e0-027d-2b9c-aec7-313ff0275381@intel.com>
+Date:   Fri, 15 Jan 2021 16:14:40 -0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
+MIME-Version: 1.0
+In-Reply-To: <CAMj1kXGhGopfg19at5N_9q89-UA4irSgMULyDXg+dKhnbRrCZQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Ard,
 
-> On Jan 15, 2021, at 10:21 AM, James Bottomley =
-<James.Bottomley@HansenPartnership.com> wrote:
->=20
-> On Tue, 2020-09-15 at 20:49 -0400, Eric Snowberg wrote:
->> The Secure Boot Forbidden Signature Database, dbx, contains a list of
->> now revoked signatures and keys previously approved to boot with UEFI
->> Secure Boot enabled.  The dbx is capable of containing any number of
->> EFI_CERT_X509_SHA256_GUID, EFI_CERT_SHA256_GUID, and
->> EFI_CERT_X509_GUID entries.
->>=20
->> Currently when EFI_CERT_X509_GUID are contained in the dbx, the
->> entries are skipped.
->>=20
->> Add support for EFI_CERT_X509_GUID dbx entries. When a
->> EFI_CERT_X509_GUID is found, it is added as an asymmetrical key to
->> the .blacklist keyring. Anytime the .platform keyring is used, the
->> keys in the .blacklist keyring are referenced, if a matching key is
->> found, the key will be rejected.
->>=20
->> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
->=20
-> If you're using shim, as most of our users are, you have no access to
-> dbx to blacklist certificates.  Plus our security envelope includes =
-the
-> Mok variables, so you should also be paying attestion to MokListX (or
-> it's RT equivalent: MokListXRT).
->=20
-> If you add this to the patch, we get something that is mechanistically
-> complete and which also allows users to add certs to their Mok
-> blacklist.
+On 12/19/2020 9:03 AM, Ard Biesheuvel wrote:
+> On Fri, 18 Dec 2020 at 22:07, Megha Dey <megha.dey@intel.com> wrote:
+>> From: Kyung Min Park <kyung.min.park@intel.com>
+>>
+>> Optimize GHASH computations with the 512 bit wide VPCLMULQDQ instructions.
+>> The new instruction allows to work on 4 x 16 byte blocks at the time.
+>> For best parallelism and deeper out of order execution, the main loop of
+>> the code works on 16 x 16 byte blocks at the time and performs reduction
+>> every 48 x 16 byte blocks. Such approach needs 48 precomputed GHASH subkeys
+>> and the precompute operation has been optimized as well to leverage 512 bit
+>> registers, parallel carry less multiply and reduction.
+>>
+>> VPCLMULQDQ instruction is used to accelerate the most time-consuming
+>> part of GHASH, carry-less multiplication. VPCLMULQDQ instruction
+>> with AVX-512F adds EVEX encoded 512 bit version of PCLMULQDQ instruction.
+>>
+>> The glue code in ghash_clmulni_intel module overrides existing PCLMULQDQ
+>> version with the VPCLMULQDQ version when the following criteria are met:
+>> At compile time:
+>> 1. CONFIG_CRYPTO_AVX512 is enabled
+>> 2. toolchain(assembler) supports VPCLMULQDQ instructions
+>> At runtime:
+>> 1. VPCLMULQDQ and AVX512VL features are supported on a platform (currently
+>>     only Icelake)
+>> 2. If compiled as built-in module, ghash_clmulni_intel.use_avx512 is set at
+>>     boot time or /sys/module/ghash_clmulni_intel/parameters/use_avx512 is set
+>>     to 1 after boot.
+>>     If compiled as loadable module, use_avx512 module parameter must be set:
+>>     modprobe ghash_clmulni_intel use_avx512=1
+>>
+>> With new implementation, tcrypt ghash speed test shows about 4x to 10x
+>> speedup improvement for GHASH calculation compared to the original
+>> implementation with PCLMULQDQ when the bytes per update size is 256 Bytes
+>> or above. Detailed results for a variety of block sizes and update
+>> sizes are in the table below. The test was performed on Icelake based
+>> platform with constant frequency set for CPU.
+>>
+>> The average performance improvement of the AVX512 version over the current
+>> implementation is as follows:
+>> For bytes per update >= 1KB, we see the average improvement of 882%(~8.8x).
+>> For bytes per update < 1KB, we see the average improvement of 370%(~3.7x).
+>>
+>> A typical run of tcrypt with GHASH calculation with PCLMULQDQ instruction
+>> and VPCLMULQDQ instruction shows the following results.
+>>
+>> ---------------------------------------------------------------------------
+>> |            |            |         cycles/operation         |            |
+>> |            |            |       (the lower the better)     |            |
+>> |    byte    |   bytes    |----------------------------------| percentage |
+>> |   blocks   | per update |   GHASH test   |   GHASH test    | loss/gain  |
+>> |            |            | with PCLMULQDQ | with VPCLMULQDQ |            |
+>> |------------|------------|----------------|-----------------|------------|
+>> |      16    |     16     |       144      |        233      |   -38.0    |
+>> |      64    |     16     |       535      |        709      |   -24.5    |
+>> |      64    |     64     |       210      |        146      |    43.8    |
+>> |     256    |     16     |      1808      |       1911      |    -5.4    |
+>> |     256    |     64     |       865      |        581      |    48.9    |
+>> |     256    |    256     |       682      |        170      |   301.0    |
+>> |    1024    |     16     |      6746      |       6935      |    -2.7    |
+>> |    1024    |    256     |      2829      |        714      |   296.0    |
+>> |    1024    |   1024     |      2543      |        341      |   645.0    |
+>> |    2048    |     16     |     13219      |      13403      |    -1.3    |
+>> |    2048    |    256     |      5435      |       1408      |   286.0    |
+>> |    2048    |   1024     |      5218      |        685      |   661.0    |
+>> |    2048    |   2048     |      5061      |        565      |   796.0    |
+>> |    4096    |     16     |     40793      |      27615      |    47.8    |
+>> |    4096    |    256     |     10662      |       2689      |   297.0    |
+>> |    4096    |   1024     |     10196      |       1333      |   665.0    |
+>> |    4096    |   4096     |     10049      |       1011      |   894.0    |
+>> |    8192    |     16     |     51672      |      54599      |    -5.3    |
+>> |    8192    |    256     |     21228      |       5284      |   301.0    |
+>> |    8192    |   1024     |     20306      |       2556      |   694.0    |
+>> |    8192    |   4096     |     20076      |       2044      |   882.0    |
+>> |    8192    |   8192     |     20071      |       2017      |   895.0    |
+>> ---------------------------------------------------------------------------
+>>
+>> This work was inspired by the AES GCM mode optimization published
+>> in Intel Optimized IPSEC Cryptographic library.
+>> https://github.com/intel/intel-ipsec-mb/lib/avx512/gcm_vaes_avx512.asm
+>>
+>> Co-developed-by: Greg Tucker <greg.b.tucker@intel.com>
+>> Signed-off-by: Greg Tucker <greg.b.tucker@intel.com>
+>> Co-developed-by: Tomasz Kantecki <tomasz.kantecki@intel.com>
+>> Signed-off-by: Tomasz Kantecki <tomasz.kantecki@intel.com>
+>> Signed-off-by: Kyung Min Park <kyung.min.park@intel.com>
+>> Co-developed-by: Megha Dey <megha.dey@intel.com>
+>> Signed-off-by: Megha Dey <megha.dey@intel.com>
+> Hello Megha,
+>
+> What is the purpose of this separate GHASH module? GHASH is only used
+> in combination with AES-CTR to produce GCM, and this series already
+> contains a GCM driver.
+>
+> Do cores exist that implement PCLMULQDQ but not AES-NI?
+>
+> If not, I think we should be able to drop this patch (and remove the
+> existing PCLMULQDQ GHASH driver as well)
 
-That make sense. I=E2=80=99ll work on a patch to add this ability.
+AFAIK, dm-verity (authenticated but not encrypted file system) is one 
+use case for authentication only.
+
+Although I am not sure if GHASH is specifically used for this or SHA?
+
+Also, I do not know of any cores that implement PCLMULQDQ and not AES-NI.
+
+Megha
 
