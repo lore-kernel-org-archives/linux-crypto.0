@@ -6,91 +6,106 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40324C433E6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50A15C433E9
 	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 17:20:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15E26227C3
+	by mail.kernel.org (Postfix) with ESMTP id 2B89220791
 	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 17:20:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727206AbhAPRUI (ORCPT
+        id S1725964AbhAPRUS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Jan 2021 12:20:08 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33408 "EHLO mail.kernel.org"
+        Sat, 16 Jan 2021 12:20:18 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33406 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726862AbhAPRUG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726957AbhAPRUG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 16 Jan 2021 12:20:06 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A3D2722C7D;
-        Sat, 16 Jan 2021 16:48:56 +0000 (UTC)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DD2A523359;
+        Sat, 16 Jan 2021 16:52:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610815736;
-        bh=pMRmEfmK5x7Y5a3dLDsXXNF4VdLrvyiV1rn4YphuYew=;
+        s=k20201202; t=1610815937;
+        bh=ZDSLu0JCfcOYuE9aL0IgQNet6XaP5vThHRTmm/vzuMc=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=fVkFxmC294BzdBLz+Ab4b4PULBzTa06oft8SvVS58cZs4UfrjHXkvlgzlF6TjhGCZ
-         9qNlLFJc9pVOhINFcnihOuB4CCHg9rdFXx69+mykiIbEg9sU62/87fsUgHVro54e3S
-         sIAj6MJXA7d7E5RGHfI3YPT6qcTcf1Fjouw8xczYyTfMqqPTVTaVVBP8KzLd92F6qo
-         H7Ousc4TfW9bMF0xV1P07iGBeV5aEQGNbYPmeUayd95jqLwBTBfEArWwdtXp8qQPBd
-         8jFXiQsmE1MMINm4zbeK4Y6+ZhWz88G3Mh/tAIRnEVGg6DWwqY7JrMO+blZou4Nst5
-         wx9r43sngMYnw==
-Received: by mail-oi1-f171.google.com with SMTP id d203so13088647oia.0;
-        Sat, 16 Jan 2021 08:48:56 -0800 (PST)
-X-Gm-Message-State: AOAM531L+ozTXRLzRP0eqR2D8NbTg7S6wNxlkhzhe8XM+JOoDiB0+x7x
-        Qzl4bulPQWCQio4bYPrKT4fGoxoKkvcR20Tkls8=
-X-Google-Smtp-Source: ABdhPJz3aVQKYdFzZAElS5YeQckBrqVvMe0bdcRA9AlrYV1YQTnLoqQQe8RJvABoARwVBurVSsndkjYP6gTvcIdcq1g=
-X-Received: by 2002:aca:210f:: with SMTP id 15mr8952220oiz.174.1610815736088;
- Sat, 16 Jan 2021 08:48:56 -0800 (PST)
+        b=rf6HIma/8HBkx/yapd0BlF0jmFJUj48+iYJlgrVuPgqOKC2ngssWuHUaoXHa3DJRI
+         EaIcxw6SV7vbbNuRD88NmNLOXvmCTOVN8lsCgGXktVwj0Z2DXzcHIG28MjOFGs5ZwJ
+         VL7BtgWdvqd0cCWYfMK1YO8R3nSixd9d6enVBsmlrABaLrMS1+SVAwipVRRdBeyZr1
+         6RSnQkt0l8MMedGRu1VhZfrPqwq/itJ2fAHGggBuFshu3VUvGIhP4YYj3HJZeQdHSP
+         63d2D4liVug3cRy3fUgResEba3FRhn4rNByj19lYY8JQ02kkp+rQjY5Zbp3FZqbeH2
+         QUnE8FxSvlwzQ==
+Received: by mail-ot1-f46.google.com with SMTP id o11so11876075ote.4;
+        Sat, 16 Jan 2021 08:52:16 -0800 (PST)
+X-Gm-Message-State: AOAM532nM9RrDPryCaRZjEJcl496BmGVwF488cpbYyD1RznF4TZfawBm
+        56hhYxCYmEpgSMuALSCyJzR052giw4c4H2duPj8=
+X-Google-Smtp-Source: ABdhPJzuUkG0CBnkY2jqz0+uDfkZr5i+JwP1UcUhW8LmXNEg8/XWke3dPKKlQWWfUJbeqTL26EvqjA2PzdQRpIKKMg0=
+X-Received: by 2002:a05:6830:10d2:: with SMTP id z18mr12528352oto.90.1610815936257;
+ Sat, 16 Jan 2021 08:52:16 -0800 (PST)
 MIME-Version: 1.0
 References: <1608325864-4033-1-git-send-email-megha.dey@intel.com>
- <1608325864-4033-4-git-send-email-megha.dey@intel.com> <CAMj1kXGhGopfg19at5N_9q89-UA4irSgMULyDXg+dKhnbRrCZQ@mail.gmail.com>
- <dfb5f2e0-027d-2b9c-aec7-313ff0275381@intel.com> <83d87dec-dd76-1ddc-1e20-4bf1c7db7918@intel.com>
- <YAJJmzWm3rPcdxMs@gmail.com> <7cdbce42-2d40-95bc-d719-62a1580d6ebf@intel.com>
-In-Reply-To: <7cdbce42-2d40-95bc-d719-62a1580d6ebf@intel.com>
+ <X+Et0ubPcBVZOURL@sol.localdomain> <caa90522-14ac-c674-b6f5-22a7d8359a3c@intel.com>
+In-Reply-To: <caa90522-14ac-c674-b6f5-22a7d8359a3c@intel.com>
 From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Sat, 16 Jan 2021 17:48:45 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXHVGQhMO83qtkVGBV9ghTDrYv+VRz4+vwp91bVoJFqGiw@mail.gmail.com>
-Message-ID: <CAMj1kXHVGQhMO83qtkVGBV9ghTDrYv+VRz4+vwp91bVoJFqGiw@mail.gmail.com>
-Subject: Re: [RFC V1 3/7] crypto: ghash - Optimized GHASH computations
-To:     Dave Hansen <dave.hansen@intel.com>
+Date:   Sat, 16 Jan 2021 17:52:05 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXGFsQMpWCYCB8Vqeq2Kj+WBiXkVv=dom13PJhbR3EZKFQ@mail.gmail.com>
+Message-ID: <CAMj1kXGFsQMpWCYCB8Vqeq2Kj+WBiXkVv=dom13PJhbR3EZKFQ@mail.gmail.com>
+Subject: Re: [RFC V1 0/7] Introduce AVX512 optimized crypto algorithms
+To:     "Dey, Megha" <megha.dey@intel.com>
 Cc:     Eric Biggers <ebiggers@kernel.org>,
-        "Dey, Megha" <megha.dey@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         ravi.v.shankar@intel.com, tim.c.chen@intel.com,
-        andi.kleen@intel.com, wajdi.k.feghali@intel.com,
-        greg.b.tucker@intel.com, robert.a.kasten@intel.com,
-        rajendrakumar.chinnaiyan@intel.com, tomasz.kantecki@intel.com,
-        ryan.d.saffores@intel.com, ilya.albrekht@intel.com,
-        kyung.min.park@intel.com, Tony Luck <tony.luck@intel.com>,
-        ira.weiny@intel.com
+        andi.kleen@intel.com, Dave Hansen <dave.hansen@intel.com>,
+        wajdi.k.feghali@intel.com, greg.b.tucker@intel.com,
+        robert.a.kasten@intel.com, rajendrakumar.chinnaiyan@intel.com,
+        tomasz.kantecki@intel.com, ryan.d.saffores@intel.com,
+        ilya.albrekht@intel.com, kyung.min.park@intel.com,
+        Tony Luck <tony.luck@intel.com>, ira.weiny@intel.com,
+        X86 ML <x86@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 16 Jan 2021 at 06:13, Dave Hansen <dave.hansen@intel.com> wrote:
+On Mon, 28 Dec 2020 at 20:11, Dey, Megha <megha.dey@intel.com> wrote:
 >
-> On 1/15/21 6:04 PM, Eric Biggers wrote:
-> > On Fri, Jan 15, 2021 at 04:20:44PM -0800, Dave Hansen wrote:
-> >> On 1/15/21 4:14 PM, Dey, Megha wrote:
-> >>> Also, I do not know of any cores that implement PCLMULQDQ and not AES-NI.
-> >> That's true, bit it's also possible that a hypervisor could enumerate
-> >> support for PCLMULQDQ and not AES-NI.  In general, we've tried to
-> >> implement x86 CPU features independently, even if they never show up in
-> >> a real CPU independently.
-> > We only add optimized implementations of crypto algorithms if they are actually
-> > useful, though.  If they would never be used in practice, that's not useful.
+> Hi Eric,
 >
-> Yes, totally agree.  If it's not of practical use, it doesn't get merged.
+> On 12/21/2020 3:20 PM, Eric Biggers wrote:
+> > On Fri, Dec 18, 2020 at 01:10:57PM -0800, Megha Dey wrote:
+> >> Optimize crypto algorithms using VPCLMULQDQ and VAES AVX512 instructions
+> >> (first implemented on Intel's Icelake client and Xeon CPUs).
+> >>
+> >> These algorithms take advantage of the AVX512 registers to keep the CPU
+> >> busy and increase memory bandwidth utilization. They provide substantial
+> >> (2-10x) improvements over existing crypto algorithms when update data size
+> >> is greater than 128 bytes and do not have any significant impact when used
+> >> on small amounts of data.
+> >>
+> >> However, these algorithms may also incur a frequency penalty and cause
+> >> collateral damage to other workloads running on the same core(co-scheduled
+> >> threads). These frequency drops are also known as bin drops where 1 bin
+> >> drop is around 100MHz. With the SpecCPU and ffmpeg benchmark, a 0-1 bin
+> >> drop(0-100MHz) is observed on Icelake desktop and 0-2 bin drops (0-200Mhz)
+> >> are observed on the Icelake server.
+> >>
+> > Do these new algorithms all pass the self-tests, including the fuzz tests that
+> > are enabled when CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y?
 >
-> I just wanted to share what we do for other related but independent CPU
-> features.
+> I had tested these algorithms with CRYPTO_MANAGER_DISABLE_TESTS=n and
+> tcrypt, not with
+> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y (I wasn't aware this existed, my bad).
+> I see a couple of errors after enabling it and am working on fixing those.
+>
 
-Thanks for the insight.
+Hello Megha,
 
-The issue with the current GHASH driver is that it uses infrastructure
-that we may decide to remove (the async cryptd helper [0]). So adding
-more dependencies on that without any proven benefit should obviously
-be avoided at this time as well.
+I think the GHASH changes can be dropped (as discussed in the other
+thread), given the lack of a use case. The existing GHASH driver could
+also be removed in the future, but I don't think it needs to be part
+of this series.
 
-[0] https://lore.kernel.org/linux-arm-kernel/20201218170106.23280-1-ardb@kernel.org/
+Could you please rebase this onto the latest AES-NI changes that are
+in Herbert's tree? (as well as the ones I sent out today) They address
+some issues with indirect calls and excessive disabling of preemption,
+and your GCM and CTR changes are definitely going to be affected by
+this as well.
