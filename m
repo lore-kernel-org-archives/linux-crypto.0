@@ -6,99 +6,121 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CA96C433E0
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 05:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F23E1C433E0
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 05:14:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4ED9623A50
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 05:08:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B705B23A34
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jan 2021 05:14:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725951AbhAPFIj (ORCPT
+        id S1725797AbhAPFOS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Jan 2021 00:08:39 -0500
-Received: from mga07.intel.com ([134.134.136.100]:8963 "EHLO mga07.intel.com"
+        Sat, 16 Jan 2021 00:14:18 -0500
+Received: from mga11.intel.com ([192.55.52.93]:63066 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725899AbhAPFIj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Jan 2021 00:08:39 -0500
-IronPort-SDR: WAYycEPBLpMpDfvR7PYwSmeH0US7LKOBIh+3RzlzlKETV7lkt/IK/ftBhI/nqr2JlVC9qzn59F
- kj+N8d5sYuHg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9865"; a="242714444"
+        id S1725767AbhAPFOR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 16 Jan 2021 00:14:17 -0500
+IronPort-SDR: JvhV61z+55KqT3N8oSC43R1AiTBw3uHAG8q2+slOmEoP8HfxdodA6o9qM6H+zogtzpvLSSXX8o
+ EBhbs/UpFy2Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9865"; a="175139043"
 X-IronPort-AV: E=Sophos;i="5.79,351,1602572400"; 
-   d="scan'208";a="242714444"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2021 21:07:54 -0800
-IronPort-SDR: u3td4UgxEexaKLnafZbBqA/S73h9dHPvHTMC7JKYrOF0EIbV5IUvaTzpzx4fVlfOk/XJkYTSTa
- OApCJGrWG7SA==
+   d="scan'208";a="175139043"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2021 21:13:35 -0800
+IronPort-SDR: VO+fWAxNMX9qXWNXppPU80NtrrzAshrDDmQCIsJ3+on3YPQpTRsNEF11y40mi0b4OyIscOD8hW
+ MDC5agiIMOPg==
 X-IronPort-AV: E=Sophos;i="5.79,351,1602572400"; 
-   d="scan'208";a="425552013"
-Received: from meghadey-mobl1.amr.corp.intel.com (HELO [10.254.14.175]) ([10.254.14.175])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2021 21:07:52 -0800
+   d="scan'208";a="405679921"
+Received: from arbindbx-mobl.amr.corp.intel.com (HELO [10.213.184.69]) ([10.213.184.69])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2021 21:13:34 -0800
 Subject: Re: [RFC V1 3/7] crypto: ghash - Optimized GHASH computations
 To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
+Cc:     "Dey, Megha" <megha.dey@intel.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         ravi.v.shankar@intel.com, tim.c.chen@intel.com,
-        andi.kleen@intel.com, dave.hansen@intel.com,
-        wajdi.k.feghali@intel.com, greg.b.tucker@intel.com,
-        robert.a.kasten@intel.com, rajendrakumar.chinnaiyan@intel.com,
-        tomasz.kantecki@intel.com, ryan.d.saffores@intel.com,
-        ilya.albrekht@intel.com, kyung.min.park@intel.com,
-        Tony Luck <tony.luck@intel.com>, ira.weiny@intel.com
+        andi.kleen@intel.com, wajdi.k.feghali@intel.com,
+        greg.b.tucker@intel.com, robert.a.kasten@intel.com,
+        rajendrakumar.chinnaiyan@intel.com, tomasz.kantecki@intel.com,
+        ryan.d.saffores@intel.com, ilya.albrekht@intel.com,
+        kyung.min.park@intel.com, Tony Luck <tony.luck@intel.com>,
+        ira.weiny@intel.com
 References: <1608325864-4033-1-git-send-email-megha.dey@intel.com>
  <1608325864-4033-4-git-send-email-megha.dey@intel.com>
  <CAMj1kXGhGopfg19at5N_9q89-UA4irSgMULyDXg+dKhnbRrCZQ@mail.gmail.com>
- <dfb5f2e0-027d-2b9c-aec7-313ff0275381@intel.com> <YAJEu1esw0zPA7Qh@gmail.com>
-From:   "Dey, Megha" <megha.dey@intel.com>
-Message-ID: <79ecc4a3-3bbb-77b2-4f2c-32ff17719086@intel.com>
-Date:   Fri, 15 Jan 2021 21:07:52 -0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ <dfb5f2e0-027d-2b9c-aec7-313ff0275381@intel.com>
+ <83d87dec-dd76-1ddc-1e20-4bf1c7db7918@intel.com> <YAJJmzWm3rPcdxMs@gmail.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <7cdbce42-2d40-95bc-d719-62a1580d6ebf@intel.com>
+Date:   Fri, 15 Jan 2021 21:13:33 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <YAJEu1esw0zPA7Qh@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <YAJJmzWm3rPcdxMs@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On 1/15/21 6:04 PM, Eric Biggers wrote:
+> On Fri, Jan 15, 2021 at 04:20:44PM -0800, Dave Hansen wrote:
+>> On 1/15/21 4:14 PM, Dey, Megha wrote:
+>>> Also, I do not know of any cores that implement PCLMULQDQ and not AES-NI.
+>> That's true, bit it's also possible that a hypervisor could enumerate
+>> support for PCLMULQDQ and not AES-NI.  In general, we've tried to
+>> implement x86 CPU features independently, even if they never show up in
+>> a real CPU independently.
+> We only add optimized implementations of crypto algorithms if they are actually
+> useful, though.  If they would never be used in practice, that's not useful.
 
-On 1/15/2021 5:43 PM, Eric Biggers wrote:
-> On Fri, Jan 15, 2021 at 04:14:40PM -0800, Dey, Megha wrote:
->>> Hello Megha,
->>>
->>> What is the purpose of this separate GHASH module? GHASH is only used
->>> in combination with AES-CTR to produce GCM, and this series already
->>> contains a GCM driver.
->>>
->>> Do cores exist that implement PCLMULQDQ but not AES-NI?
->>>
->>> If not, I think we should be able to drop this patch (and remove the
->>> existing PCLMULQDQ GHASH driver as well)
->> AFAIK, dm-verity (authenticated but not encrypted file system) is one use
->> case for authentication only.
->>
->> Although I am not sure if GHASH is specifically used for this or SHA?
->>
->> Also, I do not know of any cores that implement PCLMULQDQ and not AES-NI.
->>
-> dm-verity only uses unkeyed hash algorithms.  So no, it doesn't use GHASH.
+Yes, totally agree.  If it's not of practical use, it doesn't get merged.
 
-Hmm, I see. If that is the case, I am not aware of any other use case 
-apart from GCM.
-
-I see that the existing GHASH module in the kernel from 2009. I am not 
-sure if there was a use case then, which now is no longer valid.
-
-There many be out-of-tree kernel modules which may be using it but again 
-its only speculation.
-
-So, in the next version should I remove the existing GHASH module? (And 
-of course remove this patch as well?)
-
--Megha
-
->
-> - Eric
+I just wanted to share what we do for other related but independent CPU
+features.
