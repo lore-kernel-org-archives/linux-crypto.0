@@ -2,94 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0269BC433DB
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Jan 2021 07:12:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0182FC433E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Jan 2021 08:18:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B9783223E4
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Jan 2021 07:12:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7FEA22525
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Jan 2021 08:18:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731471AbhARHMa (ORCPT
+        id S2387600AbhARISe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Jan 2021 02:12:30 -0500
-Received: from linux.microsoft.com ([13.77.154.182]:54366 "EHLO
-        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726023AbhARHM3 (ORCPT
+        Mon, 18 Jan 2021 03:18:34 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:11107 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387572AbhARISd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Jan 2021 02:12:29 -0500
-Received: from [192.168.0.114] (unknown [49.207.196.48])
-        by linux.microsoft.com (Postfix) with ESMTPSA id C164420B7192;
-        Sun, 17 Jan 2021 23:11:39 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C164420B7192
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1610953908;
-        bh=V0aE8EFUyP+cRHKEGBZKB3N9pQMGLB+GauNbKYpryGM=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=onZZkLEwbqcSVkIiu80wnBdOjg1oMz34fTyp9AadBIPBFOlkNmZhdqzZOoew0UWUB
-         1MDe14FYNWYBi2KB6keTBrIjQKe/GbUIeDDEe4fawYqZyxTnheYg1iYqTEcNqkT1kh
-         hs9yeHxcILe9+i/L5pi6dsakpJvF01uEaVqAYrX8=
-Subject: Re: [PATCH v3 14/19] crypto: qat: convert tasklets to use new
- tasklet_setup() API
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Allen Pais <allen.lkml@gmail.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
-        ludovic.desroches@microchip.com, jesper.nilsson@axis.com,
-        lars.persson@axis.com, horia.geanta@nxp.com, aymen.sghaier@nxp.com,
-        gcherian@marvell.com, thomas.lendacky@amd.com, john.allen@amd.com,
-        gilad@benyossef.com, bbrezillon@kernel.org, arno@natisbad.org,
-        schalla@marvell.com, matthias.bgg@gmail.com, jamie@jamieiles.com,
-        heiko@sntech.de, krzk@kernel.org, vz@mleia.com,
-        k.konieczny@samsung.com, linux-crypto@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, qat-linux@intel.com,
-        linux-rockchip@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org,
-        Romain Perier <romain.perier@gmail.com>
-References: <20210112014650.10887-1-allen.lkml@gmail.com>
- <20210112014650.10887-15-allen.lkml@gmail.com>
- <20210114175109.GA8629@silpixa00400314>
-From:   Allen Pais <apais@linux.microsoft.com>
-Message-ID: <94926b18-2e1e-0b85-41b2-a7e894d21998@linux.microsoft.com>
-Date:   Mon, 18 Jan 2021 12:41:36 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Mon, 18 Jan 2021 03:18:33 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DK4Pn3LNNz15vKw;
+        Mon, 18 Jan 2021 16:16:45 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.24) by
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 18 Jan 2021 16:17:44 +0800
+From:   Hui Tang <tanghui20@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
+        <wangzhou1@hisilicon.com>, <tanghui20@huawei.com>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH] crypto: hisilicon/hpre - delete ECC 1bit error reported threshold
+Date:   Mon, 18 Jan 2021 16:15:40 +0800
+Message-ID: <1610957740-2989-1-git-send-email-tanghui20@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210114175109.GA8629@silpixa00400314>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Delete 'HPRE_RAS_ECC1BIT_TH' register setting of hpre,
+since register 'QM_RAS_CE_THRESHOLD' of qm has done this work.
 
+Signed-off-by: Hui Tang <tanghui20@huawei.com>
+Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
+---
+ drivers/crypto/hisilicon/hpre/hpre_main.c | 2 --
+ 1 file changed, 2 deletions(-)
 
->>
->> In preparation for unconditionally passing the
->> struct tasklet_struct pointer to all tasklet
->> callbacks, switch to using the new tasklet_setup()
->> and from_tasklet() to pass the tasklet pointer explicitly.
-> 
-> I have two minor comments:
->    * Patches to the qat driver have the following headline
->          crypto: qat -
->    * Checkpatch reports two alignment checks when it is run with --strict:
->          CHECK: Alignment should match open parenthesis
->          #33: FILE: drivers/crypto/qat/qat_common/adf_isr.c:248:
->          +               tasklet_setup(&priv_data->banks[i].resp_handler,
->          +                            adf_response_handler);
-> 
->          CHECK: Alignment should match open parenthesis
->          #62: FILE: drivers/crypto/qat/qat_common/adf_sriov.c:57:
->          +               tasklet_setup(&vf_info->vf2pf_bh_tasklet,
->          +                            adf_vf2pf_bh_handler);
-> 
->          total: 0 errors, 0 warnings, 2 checks, 83 lines checked
-> 
-> If you prefer I can resubmit this patch with these two changes.
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index ad8b691..bf1fa08 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -36,7 +36,6 @@
+ #define HPRE_INT_STATUS			0x301800
+ #define HPRE_CORE_INT_ENABLE		0
+ #define HPRE_CORE_INT_DISABLE		0x003fffff
+-#define HPRE_RAS_ECC_1BIT_TH		0x30140c
+ #define HPRE_RDCHN_INI_ST		0x301a00
+ #define HPRE_CLSTR_BASE			0x302000
+ #define HPRE_CORE_EN_OFFSET		0x04
+@@ -312,7 +311,6 @@ static int hpre_set_user_domain_and_cache(struct hisi_qm *qm)
+ 	writel(HPRE_QM_VFG_AX_MASK, HPRE_ADDR(qm, HPRE_VFG_AXCACHE));
+ 	writel(0x0, HPRE_ADDR(qm, HPRE_BD_ENDIAN));
+ 	writel(0x0, HPRE_ADDR(qm, HPRE_INT_MASK));
+-	writel(0x0, HPRE_ADDR(qm, HPRE_RAS_ECC_1BIT_TH));
+ 	writel(0x0, HPRE_ADDR(qm, HPRE_POISON_BYPASS));
+ 	writel(0x0, HPRE_ADDR(qm, HPRE_COMM_CNT_CLR_CE));
+ 	writel(0x0, HPRE_ADDR(qm, HPRE_ECC_BYPASS));
+-- 
+2.8.1
 
-Thank you. I will fix them and re-submit.
