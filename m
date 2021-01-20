@@ -2,60 +2,61 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97C6EC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 09:10:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BF3C433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 09:32:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4233D2313A
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 09:10:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2A4021D79
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 09:32:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728093AbhATJKd (ORCPT
+        id S1729042AbhATJKk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Jan 2021 04:10:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40084 "EHLO
+        Wed, 20 Jan 2021 04:10:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728918AbhATJGh (ORCPT
+        with ESMTP id S1728494AbhATJGq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Jan 2021 04:06:37 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 001E6C061575;
-        Wed, 20 Jan 2021 01:05:50 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id p15so1790480pjv.3;
-        Wed, 20 Jan 2021 01:05:50 -0800 (PST)
+        Wed, 20 Jan 2021 04:06:46 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EFEDC0613D3;
+        Wed, 20 Jan 2021 01:06:06 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id u4so1807702pjn.4;
+        Wed, 20 Jan 2021 01:06:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=8+hbDvQcQCM/KIbXRfTLR9tvWpT5dA5ahHEuu/uLRYw=;
-        b=baSPg0A27VbrtTre7HyDOcDiWhbS4pTRFCYs1iz7u2pPARZMkSsEUho0ahvUtLrDWy
-         Jq8FY2SInZfJ/63lAjVoXLtFJQZqYRRwVpTC9p20OLioAUswLFkiNQgtZf79KG3tx6AU
-         lMGc6sDC9XhbresIBJHodXyW+PTYm5plK1ZB5gB3PN/JddmIqWHbP7JPe2qTEzDKeJ+6
-         yrkeJfIj2UBiUod9HV8shT4WU9QUUfSvhLOtXYBpk0ydPAa4gpFkQLy62aei8cuf9rfh
-         +Foaf7mN3IvAxn9Pntk3MiN63wHMbjCnHyrim1xWSqgTO57aJVMATwAAwxmRCe61eB5f
-         Ur2g==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=QytjAJtOx4I9dfHfggs5vaGHYdTZvLqDyfwbAQPftuk=;
+        b=WhGW7MQyNaf9HfTbgyMoRuOE3npG4/10bEEbuiESAkdIEPxPsBznBAVnpVgLyiNZLB
+         jhxSEC85u080r+YFtcINW5EIOAmG41uEA0RKuXK3Uy4sd8J46mg7Dfe+arWpu28wZsry
+         O67JPwnZJEZj534+877cwujV73qhn9MC35tleVD0BF0KVNTBeLxxX4vpFLhy1b7INUzc
+         k8KemuCcpCAz39iMq4UrGbucS/SS9PCUvjRoR2eWr0fMkm7o1CJZx94ahrYDon7z+tt2
+         Yvl4fJVWizHBq+5nE/KP/dn05fncJmo2Fyono1sK0eF8O6Wm8KSnJbAkzJxL9H160iiI
+         Epyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=8+hbDvQcQCM/KIbXRfTLR9tvWpT5dA5ahHEuu/uLRYw=;
-        b=qqLaCxyzvttlaZJ0yBLqK8orep1MtDUjSbyWpUz5BLQUXTOc3yVZWJ4TNPhzowcvQr
-         BeWvX58vULiG6opNGDxfXnZYOv0VY8SJBhrAhvSDOgiWMYvHoBDkJYYhRlZ7bPJD8KMn
-         9GaocIF5Jzz05SDBVM2/aKqmWUSoKHht/sRs0OS4p/vYjQ9tBiCcuKYCGNkkC6zu39vB
-         /6Fk4SVnqNhKKQHWLIwucG8k4ghlYel8h9OQ5Bf63DHFUFS1lLTyH3Wd9G/sWFLrN6Ey
-         qK3r6jWJL151+PcvS5vz8jSPIb+ytXG/U1W3KO9WpAkvmiCQi45UYkUdirWAk3RzGnZ+
-         0q9g==
-X-Gm-Message-State: AOAM532S8zUgdaKECPNGhw+Cxrfx512cSF/9KOHKe/XB/3WQ2rfxRW3E
-        KRhUDF9zvjgLRYxwn7MxoEv6LFw1vsk=
-X-Google-Smtp-Source: ABdhPJwah8SgBw1IxtMB1DaZIgBo67jZI9AKRyppUZAwCcFKs3QrgVeVoduO5/wIGkLY551Z6RmeJw==
-X-Received: by 2002:a17:902:6bca:b029:dc:34e1:26b1 with SMTP id m10-20020a1709026bcab02900dc34e126b1mr9072654plt.52.1611133550522;
-        Wed, 20 Jan 2021 01:05:50 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=QytjAJtOx4I9dfHfggs5vaGHYdTZvLqDyfwbAQPftuk=;
+        b=REkYxV0xaVGlHtpVGscSqp5kHZLpNFBcxnCnaiEl6cr62ju0k9+z53BnRI4wJsv3Qq
+         bgoqlzrs5R7ZNRwzYTkJ22+wQbr5rH2z1tAP8SdzKiTL5+VKQSsWBdRHzZQSj7beVJhw
+         wgF6kuAykESvIVvpZSXdPrCnMYKNYMVUT98/mWAr9OGkDaXHfbO8Xc5pYeto4VR6MTmg
+         sojjjS6HE4y9uDhDwmo2shBEPgu1sbNTG35wDiCX0xYKZb8GHamN8yNPDuhLgaWsWW+r
+         wtg3mn/c7iDFwp1AFegh9fxlk3xiN07qypQQWe/hmumGiA1F/Mjnl11AD8Neu2cvZlu3
+         vamA==
+X-Gm-Message-State: AOAM53074rfwaQuTUrLZRIeF69oU48K0BZCE8gD6NXDbcDRBc6/blvD2
+        OoYOVwUDvOG8k7UKMXYHZts=
+X-Google-Smtp-Source: ABdhPJzvmWZxnHoxZUZV72dirk6VWntC3jPv5RuD7Solv0TTLMbV0J8Wi+WaDh2epuI0VGto3ddxbg==
+X-Received: by 2002:a17:90b:4acc:: with SMTP id mh12mr4683094pjb.10.1611133565634;
+        Wed, 20 Jan 2021 01:06:05 -0800 (PST)
 Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id z2sm1585226pgl.49.2021.01.20.01.05.45
+        by smtp.gmail.com with ESMTPSA id z2sm1585226pgl.49.2021.01.20.01.06.01
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 Jan 2021 01:05:49 -0800 (PST)
+        Wed, 20 Jan 2021 01:06:05 -0800 (PST)
 From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
 X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
 To:     David Howells <dhowells@redhat.com>
@@ -66,56 +67,36 @@ Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         Malte Gell <malte.gell@gmx.de>, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         "Lee, Chun-Yi" <jlee@suse.com>
-Subject: [PATCH v4 0/4] Check codeSigning extended key usage extension
-Date:   Wed, 20 Jan 2021 17:05:13 +0800
-Message-Id: <20210120090517.23851-1-jlee@suse.com>
+Subject: [PATCH 3/4] modsign: Add codeSigning EKU when generating X.509 key generation config
+Date:   Wed, 20 Jan 2021 17:05:16 +0800
+Message-Id: <20210120090517.23851-4-jlee@suse.com>
 X-Mailer: git-send-email 2.12.3
+In-Reply-To: <20210120090517.23851-1-jlee@suse.com>
+References: <20210120090517.23851-1-jlee@suse.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-NIAP PP_OS certification requests that the OS shall validate the
-CodeSigning extended key usage extension field for integrity
-verifiction of exectable code:
+Add codeSigning EKU to the X.509 key generation config for the build time
+autogenerated kernel key.
 
-    https://www.niap-ccevs.org/MMO/PP/-442-/
-        FIA_X509_EXT.1.1
+Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
+---
+ certs/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
-This patchset adds the logic for parsing the codeSigning EKU extension
-field in X.509. And checking the CodeSigning EKU when verifying
-signature of kernel module or kexec PE binary in PKCS#7.
-
-v4:
-Fixed the wording in patch description.
-
-v3:
-- Add codeSigning EKU to x509.genkey key generation config.
-- Add openssl command option example for generating CodeSign EKU to
-  module-signing.rst document. 
-
-v2:
-Changed the help wording in the Kconfig.
-
-Lee, Chun-Yi (4):
-  X.509: Add CodeSigning extended key usage parsing
-  PKCS#7: Check codeSigning EKU for kernel module and kexec pe
-    verification
-  modsign: Add codeSigning EKU when generating X.509 key generation
-    config
-  Documentation/admin-guide/module-signing.rst: add openssl command
-    option example for CodeSign EKU
-
- Documentation/admin-guide/module-signing.rst |  6 +++++
- certs/Makefile                               |  1 +
- certs/system_keyring.c                       |  2 +-
- crypto/asymmetric_keys/Kconfig               |  9 +++++++
- crypto/asymmetric_keys/pkcs7_trust.c         | 37 +++++++++++++++++++++++++---
- crypto/asymmetric_keys/x509_cert_parser.c    | 24 ++++++++++++++++++
- include/crypto/pkcs7.h                       |  3 ++-
- include/crypto/public_key.h                  |  1 +
- include/linux/oid_registry.h                 |  5 ++++
- 9 files changed, 83 insertions(+), 5 deletions(-)
-
+diff --git a/certs/Makefile b/certs/Makefile
+index f4c25b67aad9..1ef4d6ca43b7 100644
+--- a/certs/Makefile
++++ b/certs/Makefile
+@@ -88,6 +88,7 @@ $(obj)/x509.genkey:
+ 	@echo >>$@ "keyUsage=digitalSignature"
+ 	@echo >>$@ "subjectKeyIdentifier=hash"
+ 	@echo >>$@ "authorityKeyIdentifier=keyid"
++	@echo >>$@ "extendedKeyUsage=codeSigning"
+ endif # CONFIG_MODULE_SIG_KEY
+ 
+ $(eval $(call config_filename,MODULE_SIG_KEY))
 -- 
 2.16.4
 
