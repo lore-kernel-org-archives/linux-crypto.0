@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 922BDC433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 19:18:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09FD4C43381
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 19:19:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51FC6233EB
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 19:18:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF2B423403
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 19:19:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391917AbhATTSV (ORCPT
+        id S2392187AbhATTSp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Jan 2021 14:18:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52916 "EHLO
+        Wed, 20 Jan 2021 14:18:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392096AbhATSuu (ORCPT
+        with ESMTP id S2392093AbhATSuu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 20 Jan 2021 13:50:50 -0500
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FA7BC061795
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Jan 2021 10:48:50 -0800 (PST)
-Received: by mail-qt1-x82d.google.com with SMTP id d15so11590267qtw.12
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Jan 2021 10:48:50 -0800 (PST)
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B196C061786
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Jan 2021 10:48:48 -0800 (PST)
+Received: by mail-qt1-x830.google.com with SMTP id z9so7088357qtv.6
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Jan 2021 10:48:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=4ckoNO1YJt5QKI0zTcMaiAvFZHq1fWNUxmCXeDkmSik=;
-        b=sPpCMyU5a/KbiaJEZnuL75dHd3hNUe5y2Qm6K2Tygsn0dLPHKWCEcibvsA75MTKTpP
-         s8hUQV1RREpcP+iJBh4k2an/TDE6qPYsHXDCH0Lqh74plPbvzyS30bHiIc2iOmTjdySx
-         ZWS4BaBYfaUd3X6oN/ljIJSCwsQ0LaG+JpQdn72u3RspT1sdON+Nw8Ooq/bu9Hx7ucZ5
-         skjek77aXLjVyShV0pGYb+8CAf50A/aBn+my1BD0OqjNZM1/STccUR6yQTzfHfp+kSjd
-         smA5Z/s1tvK8hafVPNppx08HXa4YUz1SoBnm/5gAF6nNEL0ORirFKAc4F7CAjPH/k1xo
-         e20A==
+        bh=FzoTTNnCPyrLt8K8sPUqSR8uOcEXNVFa8VbUu/a/sAw=;
+        b=W91aASl733ZLAOz8W+VMfENwcB2YPmp1GP6Wgb63CXAmhQmR6LaS/yhs84yWRvx4Bu
+         tEdoA7BJSo9Nwrrs2m6QS31O5EjD9GmwUXaBTCrERFRKu1r5nI38LH0fVaB5qanAQuDV
+         UIAhK4d6cgWnm1ymFmaBl39JuRbGYpA9zkryhYv87Q+0uWrVVoefmulSoXPIp+8pm/AC
+         KQMr9nja785KJWnwJzrIRP3FyEg9k+KQWgdSRzwUs48cKKrFmgPNmj+f+2kgP1AVnlRS
+         fX3nSufc/rPl7aK0NFNjsbxGZ31QZdzr3GKRZNS9hNde/lttH0oLCjxZKiQ6T7pvtTu/
+         wVmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=4ckoNO1YJt5QKI0zTcMaiAvFZHq1fWNUxmCXeDkmSik=;
-        b=CpZh1eNPpwIdzBKdoasyJceFNWUeObCDDAaoG3eYyxval5p/yDhF5Ym4HU52OrheWG
-         z5cDwGrLvkq+59FUQtinbAs/PzqXn3d9YRhtyIQMEfsT82xfpklPkQxkDD0nGlwX//+A
-         gZy246A/dKFsb9byLI3eMN7JUuJaG/stSZFLpEJOwFwZbk9OsQChN1+QcFJAi3VIk8A7
-         cMHC3H59PjbmM/piP7oLZorxG9esQP3VdmpmLv3Fpa6/LhxWYWQImgYzIH5b1R/BPzaK
-         wKtWy6nizZTPL2VExWbhrNFxdcS1D66i9PbXeG7eo+p9me6K56nI7kSbvvCIFvMpDBjT
-         jo+A==
-X-Gm-Message-State: AOAM530RsRXeSUcR+SRQx6iDzPZdJR8eD1DGeA0hqOgWUO2mHsS/+f50
-        8dWXplL5jg0G6tvLvmv2t9RdUA==
-X-Google-Smtp-Source: ABdhPJxUwOEs2lcO5h+zfhLY+6rFbR/C19jbgImjc6kM5gI//Eqx33qYWRewdzyvcPdlg/yxiOtKSg==
-X-Received: by 2002:ac8:5852:: with SMTP id h18mr10039542qth.357.1611168529688;
-        Wed, 20 Jan 2021 10:48:49 -0800 (PST)
+        bh=FzoTTNnCPyrLt8K8sPUqSR8uOcEXNVFa8VbUu/a/sAw=;
+        b=lEzaWEFwQIoH0AF5TCSXNAr/4iOSKFDqs4KAitojWJHF/VS1A9Gr3dvA2TdcOEC8lS
+         Vo+17pfqDVVvI0sfHoBlFx8HYHtfTrQs0UsWcw0wKwPHUorQDjKuUUIMBiRg+QlJGCsr
+         sBqKzbueZvopNNL53tqB9JKQyWtDFAl/DT+e9GST43GzspuarVpO/TGG7aVdhd5niOj9
+         82C/pKcmeqWCF5YHIjYCXcJ3NXi6YO0ogVeEkUh7Q6vUU8Z4d1uiA3ZwTg/SG6Fx4drJ
+         F6/Whl9YC5Q8DulHMklvuVwBUr4SFkjYOH4AmDHv5prY507MxL2LPvtXR1/XFfp/j350
+         39/g==
+X-Gm-Message-State: AOAM532M5ulrfTcTzeeH7e3gSQcSx2ZyaFE1Oq80WXbghilYl7sOPd8j
+        rAdEK89UULYN6twJH8RxZs0RQA==
+X-Google-Smtp-Source: ABdhPJy5rOmfCLRTDFH2MY83BTNTodYg5uXwoV/VoN2KvO056MM5tgt/3PHObHhoV/E4xd14tpP3cA==
+X-Received: by 2002:aed:3629:: with SMTP id e38mr10150279qtb.354.1611168527314;
+        Wed, 20 Jan 2021 10:48:47 -0800 (PST)
 Received: from pop-os.fios-router.home (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.googlemail.com with ESMTPSA id w8sm1769903qts.50.2021.01.20.10.48.48
+        by smtp.googlemail.com with ESMTPSA id w8sm1769903qts.50.2021.01.20.10.48.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jan 2021 10:48:48 -0800 (PST)
+        Wed, 20 Jan 2021 10:48:46 -0800 (PST)
 From:   Thara Gopinath <thara.gopinath@linaro.org>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         bjorn.andersson@linaro.org
 Cc:     ebiggers@google.com, ardb@kernel.org, sivaprak@codeaurora.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 4/6] drivers: crypto: qce: common: Set data unit size to message length for AES XTS transformation
-Date:   Wed, 20 Jan 2021 13:48:41 -0500
-Message-Id: <20210120184843.3217775-5-thara.gopinath@linaro.org>
+Subject: [PATCH v3 2/6] drivers: crypto: qce: sha: Hold back a block of data to be transferred as part of final
+Date:   Wed, 20 Jan 2021 13:48:39 -0500
+Message-Id: <20210120184843.3217775-3-thara.gopinath@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210120184843.3217775-1-thara.gopinath@linaro.org>
 References: <20210120184843.3217775-1-thara.gopinath@linaro.org>
@@ -74,39 +74,52 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Set the register REG_ENCR_XTS_DU_SIZE to cryptlen for AES XTS
-transformation. Anything else causes the engine to return back
-wrong results.
+If the available data to transfer is exactly a multiple of block size, save
+the last block to be transferred in qce_ahash_final (with the last block
+bit set) if this is indeed the end of data stream. If not this saved block
+will be transferred as part of next update. If this block is not held back
+and if this is indeed the end of data stream, the digest obtained will be
+wrong since qce_ahash_final will see that rctx->buflen is 0 and return
+doing nothing which in turn means that a digest will not be copied to the
+destination result buffer.  qce_ahash_final cannot be made to alter this
+behavior and allowed to proceed if rctx->buflen is 0 because the crypto
+engine BAM does not allow for zero length transfers.
 
 Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
 ---
- drivers/crypto/qce/common.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/crypto/qce/sha.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/drivers/crypto/qce/common.c b/drivers/crypto/qce/common.c
-index a73db2a5637f..f7bc701a4aa2 100644
---- a/drivers/crypto/qce/common.c
-+++ b/drivers/crypto/qce/common.c
-@@ -295,15 +295,15 @@ static void qce_xtskey(struct qce_device *qce, const u8 *enckey,
- {
- 	u32 xtskey[QCE_MAX_CIPHER_KEY_SIZE / sizeof(u32)] = {0};
- 	unsigned int xtsklen = enckeylen / (2 * sizeof(u32));
--	unsigned int xtsdusize;
+diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
+index 08aed03e2b59..dd263c5e4dd8 100644
+--- a/drivers/crypto/qce/sha.c
++++ b/drivers/crypto/qce/sha.c
+@@ -216,6 +216,25 @@ static int qce_ahash_update(struct ahash_request *req)
  
- 	qce_cpu_to_be32p_array((__be32 *)xtskey, enckey + enckeylen / 2,
- 			       enckeylen / 2);
- 	qce_write_array(qce, REG_ENCR_XTS_KEY0, xtskey, xtsklen);
- 
--	/* xts du size 512B */
--	xtsdusize = min_t(u32, QCE_SECTOR_SIZE, cryptlen);
--	qce_write(qce, REG_ENCR_XTS_DU_SIZE, xtsdusize);
-+	/* Set data unit size to cryptlen. Anything else causes
-+	 * crypto engine to return back incorrect results.
+ 	/* calculate how many bytes will be hashed later */
+ 	hash_later = total % blocksize;
++
++	/*
++	 * At this point, there is more than one block size of data.  If
++	 * the available data to transfer is exactly a multiple of block
++	 * size, save the last block to be transferred in qce_ahash_final
++	 * (with the last block bit set) if this is indeed the end of data
++	 * stream. If not this saved block will be transferred as part of
++	 * next update. If this block is not held back and if this is
++	 * indeed the end of data stream, the digest obtained will be wrong
++	 * since qce_ahash_final will see that rctx->buflen is 0 and return
++	 * doing nothing which in turn means that a digest will not be
++	 * copied to the destination result buffer.  qce_ahash_final cannot
++	 * be made to alter this behavior and allowed to proceed if
++	 * rctx->buflen is 0 because the crypto engine BAM does not allow
++	 * for zero length transfers.
 +	 */
-+	qce_write(qce, REG_ENCR_XTS_DU_SIZE, cryptlen);
- }
- 
- static int qce_setup_regs_skcipher(struct crypto_async_request *async_req,
++	if (!hash_later)
++		hash_later = blocksize;
++
+ 	if (hash_later) {
+ 		unsigned int src_offset = req->nbytes - hash_later;
+ 		scatterwalk_map_and_copy(rctx->buf, req->src, src_offset,
 -- 
 2.25.1
 
