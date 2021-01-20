@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B2E7C433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 04:19:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 852B7C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 05:20:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5B9D23121
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 04:19:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5962623139
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 05:20:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727393AbhATES2 (ORCPT
+        id S1726388AbhATFUC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Jan 2021 23:18:28 -0500
-Received: from mail.kernel.org ([198.145.29.99]:48862 "EHLO mail.kernel.org"
+        Wed, 20 Jan 2021 00:20:02 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60040 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728134AbhATERL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Jan 2021 23:17:11 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3C8E623131;
-        Wed, 20 Jan 2021 04:16:27 +0000 (UTC)
+        id S1729206AbhATFQR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Jan 2021 00:16:17 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2C69A2311C;
+        Wed, 20 Jan 2021 05:15:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1611116190;
-        bh=xyjnizKJKYbTRv0UN0+Gwt4VTaFiAxMHtX+9p9eYe1s=;
+        s=k20201202; t=1611119736;
+        bh=0v5dSZdhQ0dpp0/V5fqVpZyRRfvlSjz+9GhAku29pu8=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ah7CzMikRzj9W9tCn1AXbZZE8R1ZZweT7ziyrwOtDpZNF2g4cVOr6PlWh5KRAFxsC
-         AsbyuxEJ7GBuwoXPbRq9GiQePaNVne4UT+gu7x4YV6Ov8TvIZ0Z/FAHEm6WoCE8U/o
-         x3tNJU7WNAdOBS6eYKCR3szPJBlq0AI3sjlazIcwBrqsJWGeK4ORLPxH3rMihm1ykE
-         Lr0r4acf4K5C7MoADs+SRSfn/OeKJ4tTs7cNgaqo330SvD6nYRKcsjP8u3Vf0m2zqy
-         Rs0SpKX5xSvb/Rg6JYz14DF23Yy5LF9BUa8F30nt64fgx+JITef2DSwaq5iXNc6OAk
-         XDQUGoZNZjTsA==
-Date:   Wed, 20 Jan 2021 06:16:23 +0200
+        b=YT/KcKBPZdtcxBxmCbPP+rcGEqthJpNc7NBg5K6OlkGkfF5rUonooybJv5j2vrzB7
+         72UKHnp1uAQK4N6eR99+Say0AjEKKiDLPM+7Vmq8/3plY6zA9yOIyi/mja9W739DAE
+         mMiM+pZ1FYTJ8jakaTTQyP1Xa/YbHGC0GNWZk00m/g4hlyg+eEXlII84Z2YEm7Dwr4
+         Zzp2Pqbr45dnOKach/X9hAvPRqx2I60U8sdq1iGGNWpVYzga8R5nVPcJ8qFAbmX6bS
+         grbZCOvdJD+HOFkZ78ZMwkvsvY49pG5+7aGAxwYgSwIgPZKyCq3BGrbI7lSvqp+amS
+         DGBJG+DQpLxXA==
+Date:   Wed, 20 Jan 2021 07:15:30 +0200
 From:   Jarkko Sakkinen <jarkko@kernel.org>
 To:     =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -45,39 +45,29 @@ Cc:     David Howells <dhowells@redhat.com>,
         "Serge E . Hallyn" <serge@hallyn.com>, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v3 06/10] certs: Make blacklist_vet_description() more
- strict
-Message-ID: <YAeul+B2x6QK0NVq@kernel.org>
+Subject: Re: [PATCH v3 05/10] certs: Replace K{U,G}IDT_INIT() with
+ GLOBAL_ROOT_{U,G}ID
+Message-ID: <YAe8cr7bS2Dn0RRn@kernel.org>
 References: <20210114151909.2344974-1-mic@digikod.net>
- <20210114151909.2344974-7-mic@digikod.net>
+ <20210114151909.2344974-6-mic@digikod.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210114151909.2344974-7-mic@digikod.net>
+In-Reply-To: <20210114151909.2344974-6-mic@digikod.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 14, 2021 at 04:19:05PM +0100, Mickaël Salaün wrote:
+On Thu, Jan 14, 2021 at 04:19:04PM +0100, Mickaël Salaün wrote:
 > From: Mickaël Salaün <mic@linux.microsoft.com>
 > 
-> Before exposing this new key type to user space, make sure that only
-> meaningful blacklisted hashes are accepted.  This is also checked for
-> builtin blacklisted hashes, but a following commit make sure that the
-> user will notice (at built time) and will fix the configuration if it
-> already included errors.
+> Align with the new macros and add appropriate include files.
 > 
-> Check that a blacklist key description starts with a valid prefix and
-> then a valid hexadecimal string.
-> 
-> Cc: David Howells <dhowells@redhat.com>
 > Cc: David Woodhouse <dwmw2@infradead.org>
 > Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
-> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+> Signed-off-by: David Howells <dhowells@redhat.com>
 
-In this I'm not as worried about ABI, i.e. you don't have any reason
-supply any other data, which doesn't follow these ruels, whereas there
-could very well be a script that does format hex "incorrectly".
+The commit message makes no sense. What you new macros?
 
 /Jarkko
