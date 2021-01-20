@@ -2,199 +2,236 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D37C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 15:28:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 927CAC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 17:23:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1883E2336D
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 15:28:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A20E23358
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 17:23:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731718AbhATP1v (ORCPT
+        id S1727190AbhATRWt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Jan 2021 10:27:51 -0500
-Received: from mail-eopbgr680055.outbound.protection.outlook.com ([40.107.68.55]:30531
-        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2403884AbhATPZz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Jan 2021 10:25:55 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CLgOJcBMyx5bxFJqoAGPFivI6+NwsMcpBW8sRNTuJDXOyp1kWEAksW9b5LXvdL9/EmfnKhMPp/mocFwS6BvVt0AHQ3PqOeQVAYcggO7yzd09zW7AMgwwQfQ0KtBmSKLrbI9VyC6l57m1aLCTjwJ6YNpUU/HxuQQmeylV5CDsJWKHKgMdGBrOmLSkjQAR4/INcso97jurW4EpRDsqIeHomPofsFf9lYD35VRGfb7DX3Tu6JvpTTq25voatr38jwolIcJwVX7goYiIwhrENCirwFfk6mL81JTiSjT+3PrFhye9vLXjuF5Yi+e5KPIGj85jQnNF0FP1/+m+3hf8q/95dA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zCr/qdLxEpNC0FHiou+7HIgv02CQUoVPSTjnucGU8jY=;
- b=faeqqVCupfRQ3HBkWA5tJ9+LG92IEh9fuuoGCfdgNmA9Vmv/Yrezl3TwGPoB49dvW2oXX0Nmvg2P/orLo79ut+eOkKwqzB4NZtca9azBhx7dazH7Xw24yOAa8E1g9QSF3X/CrSa7nKFgNZ84iCZByaCxhmz3RuhTkYLx0t2DmVbO9i+R0DjSUJqpAv+fm9uNs4fJAibjxszwJOzfjbmrYg7knb3bNDPohnY0WfLFoh6P1KQMTL31N9VpLDqfbizxARZyrTP7CSbm89eJ9AP3nJilUrtRRP6CSJnn99r0GiHeWvTUGLbM/Clot77jEC3V9aTc4W8V/m+6cbNKUJWsXA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zCr/qdLxEpNC0FHiou+7HIgv02CQUoVPSTjnucGU8jY=;
- b=Iaykhvo78li3AoMK1nGt1pgZvc87sQvPWbSurhCP2MzcggJDdMqWbOh7Epgm15EgFHeuK8ZmqxUqybLHM9UDUsBxhxZ7g8kNUNL5v6SU8w9zh7idkFt4cL3UJ7RdAKuhTVmeoradlJWh+oeeD2bmxNwPm7imAO/hrlrUOKjVAYc=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB4484.namprd12.prod.outlook.com (2603:10b6:5:28f::24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3763.9; Wed, 20 Jan 2021 15:25:07 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::d95e:b9d:1d6a:e845]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::d95e:b9d:1d6a:e845%12]) with mapi id 15.20.3763.014; Wed, 20 Jan 2021
- 15:25:07 +0000
-Subject: Re: problem with ccp-crypto module on apu
-To:     Domen Stangar <domen.stangar@gmail.com>,
-        John Allen <john.allen@amd.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-References: <em96a2a8ae-80a7-4608-905e-5d932c0cf9bb@domen1-pc>
- <20201228152245.GA90548@nikka.amd.com>
- <95c0d9f7-e8e9-0b71-1f0a-44230c3dbfe5@amd.com>
- <eme43aecb9-708c-4fda-ba76-a446ecc12790@domen-5950x>
- <20210107151050.GA30454@nikka.amd.com>
- <emf3681a05-10b5-44ad-b516-c8492fdf8f3a@domen-5950x>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <e4b683a5-28d3-ab4e-22eb-6f94e2799ea3@amd.com>
-Date:   Wed, 20 Jan 2021 09:25:06 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <emf3681a05-10b5-44ad-b516-c8492fdf8f3a@domen-5950x>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [67.79.209.213]
-X-ClientProxiedBy: SA0PR11CA0038.namprd11.prod.outlook.com
- (2603:10b6:806:d0::13) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+        Wed, 20 Jan 2021 12:22:49 -0500
+Received: from foss.arm.com ([217.140.110.172]:40710 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387613AbhATPpk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Jan 2021 10:45:40 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2976631B;
+        Wed, 20 Jan 2021 07:44:41 -0800 (PST)
+Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7882E3F68F;
+        Wed, 20 Jan 2021 07:44:39 -0800 (PST)
+Date:   Wed, 20 Jan 2021 15:44:23 +0000
+From:   Dave Martin <Dave.Martin@arm.com>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Mark Brown <broonie@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Will Deacon <will@kernel.org>, Ingo Molnar <mingo@kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [RFC PATCH 4/5] arm64: fpsimd: run kernel mode NEON with
+ softirqs disabled
+Message-ID: <20210120154422.GB1684@arm.com>
+References: <20201218170106.23280-1-ardb@kernel.org>
+ <20201218170106.23280-5-ardb@kernel.org>
+ <20210119160045.GA1684@arm.com>
+ <CAMj1kXGSB8AJRhftUxabQhaggWHukiVwrSkUR2i=XQcZ3dqynQ@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from office-linux.texastahm.com (67.79.209.213) by SA0PR11CA0038.namprd11.prod.outlook.com (2603:10b6:806:d0::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.12 via Frontend Transport; Wed, 20 Jan 2021 15:25:07 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 9f731698-ec24-4008-5025-08d8bd57917c
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4484:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB4484596070DC647E9362F6B0ECA20@DM6PR12MB4484.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +dvoFFx52jKHRsjVlVWOj00I6UDqKEi+4inm5Hq5pI58TrOPMmwN/VJj4N3Y4tHkJXXWuwkqrysqWwy22yxErwU+kk79PGb0PyMrOm9FuUkp/vJ6im6IbmZ0XSLxeZONxkWtGWfTF35I1xhP6hELjR+AAnQke6TlG4SGo3fay4q7gvDiKNGBmyXMPYjK4N0zwg15amFZmHNm4OlhcljCQtx4isBhpYMEb6KZuqVhacyxI/nO046gXCtAKIwKCVAMJTCLVXNlEDbUmLLN/7Tcorv0Y7yXJwt+0G+op68I03ZtbtjfZlOubWCgp0Pe1imroXEBLkrNriUlEFqspKZmYH/ibdxWSL1uIpfaWjIZ+W7+7S2LaL706rXbms4VN7sPpSWKuDcIwZsNSiK69WFLilea5p3YpS9CGbA2S/67dwYtgKVXUeRNSfrEJ2khXrIdU8IYRCJOjYW1VSfGiqa2uTSgrKIPIHNuYx22FIJDn3A=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(376002)(346002)(136003)(39860400002)(366004)(6486002)(8936002)(4326008)(478600001)(26005)(16526019)(2616005)(53546011)(31696002)(66946007)(8676002)(2906002)(66556008)(110136005)(5660300002)(186003)(956004)(6636002)(6512007)(6506007)(31686004)(36756003)(316002)(66476007)(86362001)(83380400001)(52116002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?VUFVUXR0Y3RsMHIvVkdhUktWOTMyVEZ1ZmpSeWJsWUhGUy84allFMHh2aDNX?=
- =?utf-8?B?c3NiVjMyMXpXdVRZREx4dmRZbnBXVkNHTUhvVGNGdUJJSi9JRkVobUsydllk?=
- =?utf-8?B?V1ExbHNKOGw4QXhXMmE4Y0hDZ1NEVW5hdW5jQU5leFEyTmVRQTJheFJKM0dM?=
- =?utf-8?B?OTRyU1dwbUVtMm5wblN6dWdiZ2JJS05EQW5OMG16dDJmL0VueDlzWHVTMXFP?=
- =?utf-8?B?TE0yUGxCd2lhTDkyTnVodkpDbFFacUhneUttdHpzUUZmMmdvZnd0Y0NtVkd6?=
- =?utf-8?B?ZjVQOWwwUHhabXRZenhod3pEYWJZcEFhanp2YnFoQ0VBbVpyRTkwYTNWT0FM?=
- =?utf-8?B?MHZhekNqQk5NbDByODEzV0cxY1hFeXlnYWVCY3QzVCtqcWdReGVlSkNGU0s5?=
- =?utf-8?B?OUUrajJRektUNVBvdWxhVlFDS0I3Snk3Ly9PbHhYUU9EbzRWQ280L2tGbEZN?=
- =?utf-8?B?Njg4dENsVlVKYUZQczNLR3hQWUFpVVNVVnpXVkkzWWdnUElPa2tLR2s0SEtk?=
- =?utf-8?B?VDRkVm1GTnFCQVFyWDIvdkZBYWtRejF6SEkrNCttMmFRUWZUYjMxSFJyR25B?=
- =?utf-8?B?S0pGRjVTSHNkbWY0aThFK2dVMG10RFo5WUQzZE1scC84MHRoNk5PTC8zV1Bz?=
- =?utf-8?B?bHNzZXVoeXBaWFA5dVY1dEJya3ZFWXZkK091bEU3TFFlRXk5S2ZtZDA1KzRW?=
- =?utf-8?B?aVhoVjVrS3N1WjREWStaZFZmMTQxK1dkWi9MbVAxQmwraU9EcncwNTcrQ2pr?=
- =?utf-8?B?aWFBUzRhSlczeGg3WUVDUjFSNnhVajdaam94ZU9JUXdaRFdPSjc1R1Vqc3ZX?=
- =?utf-8?B?dkx3QnRvb3BGQjg2c0grUDEzOE9wOXdEVCtTenphSlg5T3FlUWU3am9JKzht?=
- =?utf-8?B?NkZmRFhJdDlXRWZaVjRtK0xEV0EvWmpuWS9EZHA0THBLOTc0WWt6bHJZSHBB?=
- =?utf-8?B?YXJLZktLV2ErSk1zVlBZRGpOT1BnSjdkVktuNWR2ejNaNk1SUFpMTlNyRWNI?=
- =?utf-8?B?TWNhOVZydTc2Qk1lQTU4U1FyQTR3VUZGNnJPMFRxWXZ2dmVJL0pSNWdnT2hC?=
- =?utf-8?B?TTNoL0srd0pLT1ZKdnZZb1JFcXoyTEYzY2ZhV0p0Q1c4N09FZmJld3cxRDVR?=
- =?utf-8?B?d2gySGFKT1lMMUFEd2szREVPYlJscmJSa3ZJaGUyTm05OUpQbWRlLy9Wc3dz?=
- =?utf-8?B?a29uYnZzcE9JMitUTlpGbmJSZkF0dXoxdE1Lb1Y2TWIyZEhLR1FuRXhOdFNK?=
- =?utf-8?B?VU9nekljdm40RmdaYkZXVmNrVzJ1YUZyMk1XaXhtR3VTNlpuN1JjNFVCa3hZ?=
- =?utf-8?Q?BMJ36y2zz68oP0DPO8/zAryebtflcsMms8?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f731698-ec24-4008-5025-08d8bd57917c
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2021 15:25:07.4792
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: D34vH4NrBai58CFgMRd58VRmWbYlnpoP63dc92qf3bsO2sfZBV4oEMQHw4Lo0IijUttVgImI8WWr/J3xDbp61Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4484
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXGSB8AJRhftUxabQhaggWHukiVwrSkUR2i=XQcZ3dqynQ@mail.gmail.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 1/17/21 4:16 AM, Domen Stangar wrote:
-> Sorry for late answer, somewhat missed mail.
+On Tue, Jan 19, 2021 at 05:29:05PM +0100, Ard Biesheuvel wrote:
+> On Tue, 19 Jan 2021 at 17:01, Dave Martin <Dave.Martin@arm.com> wrote:
+> >
+> > On Fri, Dec 18, 2020 at 06:01:05PM +0100, Ard Biesheuvel wrote:
+> > > Kernel mode NEON can be used in task or softirq context, but only in
+> > > a non-nesting manner, i.e., softirq context is only permitted if the
+> > > interrupt was not taken at a point where the kernel was using the NEON
+> > > in task context.
+> > >
+> > > This means all users of kernel mode NEON have to be aware of this
+> > > limitation, and either need to provide scalar fallbacks that may be much
+> > > slower (up to 20x for AES instructions) and potentially less safe, or
+> > > use an asynchronous interface that defers processing to a later time
+> > > when the NEON is guaranteed to be available.
+> > >
+> > > Given that grabbing and releasing the NEON is cheap, we can relax this
+> > > restriction, by increasing the granularity of kernel mode NEON code, and
+> > > always disabling softirq processing while the NEON is being used in task
+> > > context.
+> > >
+> > > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> >
+> > Sorry for the slow reply on this...  it looks reasonable, but I have a
+> > few comments below.
+> >
 > 
-> dmesg last lines that where added
+> No worries - thanks for taking a look.
 > 
-> [  325.691756] ccp 0000:0a:00.2: enabling device (0000 -> 0002)
-> [  325.692217] ccp 0000:0a:00.2: ccp enabled
-> [  325.702401] ccp 0000:0a:00.2: tee enabled
-> [  325.702405] ccp 0000:0a:00.2: psp enabled
+> > > ---
+> > >  arch/arm64/include/asm/assembler.h | 19 +++++++++++++------
+> > >  arch/arm64/kernel/asm-offsets.c    |  2 ++
+> > >  arch/arm64/kernel/fpsimd.c         |  4 ++--
+> > >  3 files changed, 17 insertions(+), 8 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+> > > index ddbe6bf00e33..74ce46ed55ac 100644
+> > > --- a/arch/arm64/include/asm/assembler.h
+> > > +++ b/arch/arm64/include/asm/assembler.h
+> > > @@ -15,6 +15,7 @@
+> > >  #include <asm-generic/export.h>
+> > >
+> > >  #include <asm/asm-offsets.h>
+> > > +#include <asm/alternative.h>
+> > >  #include <asm/cpufeature.h>
+> > >  #include <asm/cputype.h>
+> > >  #include <asm/debug-monitors.h>
+> > > @@ -717,17 +718,23 @@ USER(\label, ic ivau, \tmp2)                    // invalidate I line PoU
+> > >       .endm
+> > >
+> > >       .macro          if_will_cond_yield_neon
+> > > -#ifdef CONFIG_PREEMPTION
+> > >       get_current_task        x0
+> > >       ldr             x0, [x0, #TSK_TI_PREEMPT]
+> > > -     sub             x0, x0, #PREEMPT_DISABLE_OFFSET
+> > > -     cbz             x0, .Lyield_\@
+> > > +#ifdef CONFIG_PREEMPTION
+> > > +     cmp             x0, #PREEMPT_DISABLE_OFFSET
+> > > +     beq             .Lyield_\@      // yield on need_resched in task context
+> > > +#endif
+> > > +     /* never yield while serving a softirq */
+> > > +     tbnz            x0, #SOFTIRQ_SHIFT, .Lnoyield_\@
+> >
+> > Can you explain the rationale here?
+> >
+> > Using if_will_cond_yield_neon suggests the algo thinks it may run for
+> > too long the stall preemption until completion, but we happily stall
+> > preemption _and_ softirqs here.
+> >
+> > Is it actually a bug to use the NEON conditional yield helpers in
+> > softirq context?
+> >
 > 
->   /sys/kernel/debug/ccp/ccp-1/stats
-> Total Interrupts Handled: 0
->          Total Operations: 1
->                       AES: 0
->                   XTS AES: 0
->                       SHA: 0
->                       SHA: 0
->                       RSA: 0
->                 Pass-Thru: 1
->                       ECC: 0
+> No, it is not. But calling kernel_neon_end() from softirq context will
+> not cause it to finish any faster, so there is really no point in
+> doing so.
 > 
-> interrupts output attached.
+> > Ideally, if processing in softirq context takes an unreasonable about of
+> > time, the work would be handed off to an asynchronous worker, but that
+> > does seem to conflict rather with the purpose of this series...
+> >
+> 
+> Agreed, but this is not something we can police at this level. If the
+> caller does an unreasonable amount of work from a softirq, no amount
+> of yielding is going to make a difference.
 
-Ok, the interrupts are not being delivered from the CCP (running in the 
-AMD Secure Processor or psp) to the x86. This is a BIOS/AGESA issue that 
-will require a BIOS fix. I don't know what level of AGESA it will be 
-delivered in and when your BIOS supplier would incorporate it, so my only 
-suggestion is to not use the ccp and ccp-crypto modules for now.
+Ack, just wanted to make sure I wasn't missing something.
 
-Thanks,
-Tom
+Anyone writing softirq code can starve preemption, so I agree that we
+should trust people to know what they're doing.
 
+
+> > > +
+> > > +     adr_l           x0, irq_stat + IRQ_CPUSTAT_SOFTIRQ_PENDING
+> > > +     this_cpu_offset x1
+> > > +     ldr             w0, [x0, x1]
+> > > +     cbnz            w0, .Lyield_\@  // yield on pending softirq in task context
+> > > +.Lnoyield_\@:
+> > >       /* fall through to endif_yield_neon */
+> > >       .subsection     1
+> > >  .Lyield_\@ :
+> > > -#else
+> > > -     .section        ".discard.cond_yield_neon", "ax"
+> > > -#endif
+> > >       .endm
+> > >
+> > >       .macro          do_cond_yield_neon
+> > > diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+> > > index 7d32fc959b1a..34ef70877de4 100644
+> > > --- a/arch/arm64/kernel/asm-offsets.c
+> > > +++ b/arch/arm64/kernel/asm-offsets.c
+> > > @@ -93,6 +93,8 @@ int main(void)
+> > >    DEFINE(DMA_FROM_DEVICE,    DMA_FROM_DEVICE);
+> > >    BLANK();
+> > >    DEFINE(PREEMPT_DISABLE_OFFSET, PREEMPT_DISABLE_OFFSET);
+> > > +  DEFINE(SOFTIRQ_SHIFT, SOFTIRQ_SHIFT);
+> > > +  DEFINE(IRQ_CPUSTAT_SOFTIRQ_PENDING, offsetof(irq_cpustat_t, __softirq_pending));
+> > >    BLANK();
+> > >    DEFINE(CPU_BOOT_STACK,     offsetof(struct secondary_data, stack));
+> > >    DEFINE(CPU_BOOT_TASK,              offsetof(struct secondary_data, task));
+> > > diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> > > index 062b21f30f94..823e3a8a8871 100644
+> > > --- a/arch/arm64/kernel/fpsimd.c
+> > > +++ b/arch/arm64/kernel/fpsimd.c
+> > > @@ -180,7 +180,7 @@ static void __get_cpu_fpsimd_context(void)
+> > >   */
+> > >  static void get_cpu_fpsimd_context(void)
+> > >  {
+> > > -     preempt_disable();
+> > > +     local_bh_disable();
+> > >       __get_cpu_fpsimd_context();
+> > >  }
+> > >
+> > > @@ -201,7 +201,7 @@ static void __put_cpu_fpsimd_context(void)
+> > >  static void put_cpu_fpsimd_context(void)
+> > >  {
+> > >       __put_cpu_fpsimd_context();
+> > > -     preempt_enable();
+> > > +     local_bh_enable();
+> > >  }
+> > >
+> > >  static bool have_cpu_fpsimd_context(void)
+> >
+> > I was concerned about catching all the relevant preempt_disable()s, but
+> > it had slipped my memory that Julien had factored these into one place.
+> >
+> > I can't see off the top of my head any reason why this shouldn't work.
+> >
 > 
-> Domen
+> Thanks.
 > 
-> ------ Original Message ------
-> From: "John Allen" <john.allen@amd.com>
-> To: "Domen Stangar" <domen.stangar@gmail.com>
-> Cc: "Tom Lendacky" <thomas.lendacky@amd.com>; 
-> "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-> Sent: 07/01/2021 17:10:50
-> Subject: Re: problem with ccp-crypto module on apu
+> >
+> > In threory, switching to local_bh_enable() here will add a check for
+> > pending softirqs onto context handling fast paths.  I haven't dug into
+> > how that works, so perhaps this is trivial on top of the preemption
+> > check in preempt_enable().  Do you see any difference in hackbench or
+> > similar benchmarks?
+> >
 > 
->> On Mon, Jan 04, 2021 at 04:10:26PM +0000, Domen Stangar wrote:
->>>  Device name: ccp-1
->>>     RNG name: ccp-1-rng
->>>     # Queues: 3
->>>       # Cmds: 0
->>>      Version: 5
->>>      Engines: AES 3DES SHA RSA ECC ZDE TRNG
->>>       Queues: 5
->>>  LSB Entries: 128
->>>
->>>  Let me know if you need anything else.
->>
->> Hi Domen,
->>
->> Looks like we may have a lead on this problem.
->>
->> Could you provide the following when you're loading the module?
->>
->> dmesg
->> /proc/interrupts
->> /sys/kernel/debug/ccp/ccp-1/stats
->>
->> Thanks,
->> John
->>
->>>  Domen
->>>
->>>  > Domen, do you have the debugfs support enabled? Could you supply the 
->>> output from /sys/kernel/debug/ccp/ccp-X/info (where X is replaced with 
->>> each of the present ccp ordinal values)?
->>>  >
->>>  > Thanks,
->>>  > Tom
->>>  >
->>>
+> I haven't tried, tbh. But by context handling fast paths, you mean
+> managing the FP/SIMD state at context switch time, right? Checking for
+> pending softirqs amounts to a single per-CPU load plus compare, so
+> that should be negligible AFAICT. Obviously, actually handling the
+
+Yes.  I've tended to assume, rather than prove, that this kind of thing
+is negligible -- so I confess I had not attempted to measure these
+effects when writing the original code.
+
+> softirq may take additional time, but that penalty has to be taken
+> somewhere - I don't see how that would create extra work that we
+> wouldn't have to do otherwise.
+> 
+> I'll do some experiments with hackbench once I get back to this series.
+
+That sounds fine.
+
+Probably you won't find a significant difference anyway.
+
+Cheers
+---Dave
