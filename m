@@ -2,97 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0060FC43381
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 05:32:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0844C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 05:32:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C36782313B
+	by mail.kernel.org (Postfix) with ESMTP id A45892313A
 	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 05:32:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729462AbhATFam (ORCPT
+        id S1730075AbhATFap (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Jan 2021 00:30:42 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33562 "EHLO mail.kernel.org"
+        Wed, 20 Jan 2021 00:30:45 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:45336 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730883AbhATFX4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Jan 2021 00:23:56 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 99CF923138;
-        Wed, 20 Jan 2021 05:23:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1611120195;
-        bh=3KSS8uEsk1AlA+jCg1dus/LI0smdN5vsCgO465xFWA8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=kFe/WaqM7/+B1qrIsS31+95ahPnnbSr0OzK7NKDO0s9K/10ZOqnVLVjNSCiOVe3PS
-         nW1sfqETAC7A7V/Yg6xZEryUpN9NsVWIpdfVtmSs0Lz77VOFlKlUpQxlccbEIpoWjK
-         fjh8iRpy/0ywZHMb/1zQjOYl2a/7dpGpuIfdYOXCf61A9IZDSvqrV+nTM7AqtJGGR/
-         3tWxpYbXYXO9H9jq+3KKo6VRI08NVuI7VVhy7f+52Ok3lWlZd5+nfirVBUrDsXKdCT
-         ntKxyl1xZK3GX1TlCWxZTd/+1u/BZlHfqaRbjdaBah7CrLSKbrxtHMxxtkOw3wsMNR
-         OG86mse8i8eVQ==
-Date:   Wed, 20 Jan 2021 07:23:09 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
-Cc:     David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <jmorris@namei.org>,
-        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "Serge E . Hallyn" <serge@hallyn.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v3 09/10] certs: Allow root user to append signed hashes
- to the blacklist keyring
-Message-ID: <YAe+PZHadpJcR0oc@kernel.org>
-References: <20210114151909.2344974-1-mic@digikod.net>
- <20210114151909.2344974-10-mic@digikod.net>
+        id S1730129AbhATF1Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Jan 2021 00:27:25 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1l260k-0005rv-1s; Wed, 20 Jan 2021 16:26:31 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 20 Jan 2021 16:26:29 +1100
+Date:   Wed, 20 Jan 2021 16:26:29 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Sven Auhagen <sven.auhagen@voleatech.de>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [BUG] marvell/cesa - Fix sparse warnings breaks driver
+Message-ID: <20210120052629.GA7040@gondor.apana.org.au>
+References: <20210118091808.3dlauqgbv5yk25oa@SvensMacbookPro.hq.voleatech.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210114151909.2344974-10-mic@digikod.net>
+In-Reply-To: <20210118091808.3dlauqgbv5yk25oa@SvensMacbookPro.hq.voleatech.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 14, 2021 at 04:19:08PM +0100, Mickaël Salaün wrote:
-> From: Mickaël Salaün <mic@linux.microsoft.com>
+On Mon, Jan 18, 2021 at 10:18:08AM +0100, Sven Auhagen wrote:
+>
+> Also on my 5.10 Kernel the hash tests are failing now
+> but this also happens when I remove your patch:
 > 
-> Add a kernel option SYSTEM_BLACKLIST_AUTH_UPDATE to enable the root user
-> to dynamically add new keys to the blacklist keyring.  This enables to
-> invalidate new certificates, either from being loaded in a keyring, or
-> from being trusted in a PKCS#7 certificate chain.  This also enables to
-> add new file hashes to be denied by the integrity infrastructure.
-> 
-> Being able to untrust a certificate which could have normaly been
-> trusted is a sensitive operation.  This is why adding new hashes to the
-> blacklist keyring is only allowed when these hashes are signed and
-> vouched by the builtin trusted keyring.  A blacklist hash is stored as a
-> key description.  The PKCS#7 signature of this description must be
-> provided as the key payload.
-> 
-> Marking a certificate as untrusted should be enforced while the system
-> is running.  It is then forbiden to remove such blacklist keys.
-> 
-> Update blacklist keyring and blacklist key access rights:
-> * allows the root user to search for a specific blacklisted hash, which
->   make sense because the descriptions are already viewable;
-> * forbids key update;
-> * restricts kernel rights on the blacklist keyring to align with the
->   root user rights.
-> 
-> See the help in tools/certs/print-cert-tbs-hash.sh provided by a
-> following commit.
+> [    6.859791] alg: ahash: mv-hmac-md5 test failed (wrong result) on test vector 0, cfg="init+update+final aligned buffer"
+> [    6.883144] alg: ahash: mv-hmac-sha1 test failed (wrong result) on test vector 0, cfg="init+update+final aligned buffer"
+> [    6.923069] alg: ahash: mv-hmac-sha256 test failed (wrong result) on test vector 0, cfg="init+update+final aligned buffer"
 
-Please re-order patches in a way that print-cert-tbs-hash.sh is
-available before this. That way we get rid of this useless remark.
+Are these errors with or without my patch?
 
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: David Woodhouse <dwmw2@infradead.org>
-> Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
+Is your machine big-endian or little-endian?
 
-/Jarkko
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
