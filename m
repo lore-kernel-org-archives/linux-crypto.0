@@ -8,56 +8,56 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E7B0C433E6
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:53:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B82BCC433E9
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:54:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFB98238E2
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:53:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6982F238E5
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:54:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726698AbhAUEwj (ORCPT
+        id S1726126AbhAUExK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Jan 2021 23:52:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39036 "EHLO
+        Wed, 20 Jan 2021 23:53:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732155AbhAUEnh (ORCPT
+        with ESMTP id S1731609AbhAUEnN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Jan 2021 23:43:37 -0500
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3863CC0613C1;
-        Wed, 20 Jan 2021 20:42:51 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id o20so794402pfu.0;
-        Wed, 20 Jan 2021 20:42:51 -0800 (PST)
+        Wed, 20 Jan 2021 23:43:13 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01AE3C061575;
+        Wed, 20 Jan 2021 20:42:33 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id t6so608044plq.1;
+        Wed, 20 Jan 2021 20:42:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=+bF0wgyuousrsBjw1bti5ZYiRgHZLvFxR0KyJROcYJo=;
-        b=rbNcyjH3IL4S4axnopSH3rjUZzG7W/bGtWViPzFEL1hiac5X86w8YnlDIgVeXJRr6F
-         OV2okXzwTQgN327lmN3MWR7Pcs4xBjG9pwYEIEKeU9D3X8lBYp4qqm6dF+b8BT2SaWAl
-         lWPZBptY6sjp4OGHAEP8cy6ijE9UJV/3cK27KWbwm9XBAQU4dxTAnoCYL7cPF9dwAnFH
-         FNQkM7sFo5pVX3xvjZB0ctPvnIFu1OIFqk+IS3j7h3bMRsD6j+mMxothtt+U9kHcx0aG
-         NrH2u6uZ1O2wqljS2HDaw2TxFOFvBFiE8CFlmgZSWvDDv27217mb4xd4OTz8AoBWm8gN
-         FGUQ==
+        bh=JIfhZma4t7M0QhjqQIwVj37Q6U0ytCyWa6sVJ86x3+E=;
+        b=kQ4IBs5RGnxInr65CELhjNbEAk272NcmVxA31yPCdWxsh8gHBtj49IutKuAasFo3yv
+         IdtGcXx3Q3UWwDKkTnk2CAP1OAQ7GGFvE40J/YUquxFskntsW1qmjzmfRDT+S5zcS13y
+         Bo6ZYhPz6IxuWtNbFtn71VbgYkYbSDIslmydhy28FcpM1O5hc67TIljw08KXfEdfWXkx
+         6REi5dh3N+ob5S1rWMXej9sjVQx/3gZoF1ozlxRVY5otuV/EbVRfZdpBS1a1Y/rUflCr
+         p8HeKv4E87J1PPExxLRnR+984RSHIJF44bnmjvs/mUwjJjHpZeQhmqHqjiT12urkowrr
+         dVpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=+bF0wgyuousrsBjw1bti5ZYiRgHZLvFxR0KyJROcYJo=;
-        b=tjnxWKyxMq5oTIIz3QGdetLzSuiTvsQsnP5jA6SL8R57DaT4tOiEGda09QzWrHeOcK
-         GqgDRIBtoKcTc707BJ7Ab9NlMFP6hqdGqXHyMT+EiOEl7JJAvzVt+HlegaRo2BsVt7AX
-         g4ijh5F8f94eVzLSFyEQE3/67UPR0bn9QpFcMXdKcPuPJEt8qTMGVOlF4HGNum7jneE9
-         TZsPyW/bm9T4mmhLa7g3ynBNjbLjzHAAvFax6A3elPlHb3G9T2gfZmlqThjiMr8mhfk3
-         E6ybVobDevjQs6oWg8qECC9S+onY1kUW/tv2HGoj9nKyYvpeegeudoqfyWgBAwWHAMFv
-         fo3Q==
-X-Gm-Message-State: AOAM533j69m5/7wjf3sS2jRyVcUdl8F+xgCFumvNT1aKb+g7lKeQnVJv
-        dvxK4ErR3GThz7fhCQMx1Sg=
-X-Google-Smtp-Source: ABdhPJx8Ln4+ICSJLbxBGsuZt0AxC2rUJSqiRj3gefyildSrFXv1NKr8mSZyvkyBDz5b8dUbD3/NTw==
-X-Received: by 2002:a62:87c9:0:b029:1a5:9d56:7e24 with SMTP id i192-20020a6287c90000b02901a59d567e24mr12007053pfe.56.1611204170775;
-        Wed, 20 Jan 2021 20:42:50 -0800 (PST)
+        bh=JIfhZma4t7M0QhjqQIwVj37Q6U0ytCyWa6sVJ86x3+E=;
+        b=LDDyd4KPmaMaFB4PmvwDOpKdxXhNdGXO18UJbVVP3aNq0zfxL1KGZ2efNuoYGfdxkZ
+         VJQR+/1D5qFKpRIstOiP8YJwp2l7SBCQigQHxEw761UznGrQCiv9A4aAizVX7TLte4D5
+         UgjySTeaJmFkk8FDxdul7xfNRV6Z3bOOUxaqxwUH9HvgBXGsnUytZ/W5yPLYlV061zRp
+         qkMGM9AZc1y4+u54yQiLUcspMosRg6xivpwbK3YKAcbdEd8xrV5aEq7bSGdZMplGRZ2P
+         xWvdihrcek5HxSL4/0goEbCc+Ld4I4mjSGbX+F+f+fiZPPoqFn8MJgEUrfQSEnZTSkxm
+         sPrQ==
+X-Gm-Message-State: AOAM532CYCcfA5cz4EsqI75DxohNbnqqdxCaJxsPoxir09mqAoiuAZ4T
+        fkd/8QAXsSa6/ogz/IRW7TM=
+X-Google-Smtp-Source: ABdhPJz3gROHw2YBVyuK/onSBCkTE15+V84IiSlj0HhFbNpYb33RBgymr84d61EoU4s8NU2jWYoi2g==
+X-Received: by 2002:a17:902:7088:b029:df:cbdb:a0a6 with SMTP id z8-20020a1709027088b02900dfcbdba0a6mr3010271plk.17.1611204152572;
+        Wed, 20 Jan 2021 20:42:32 -0800 (PST)
 Received: from localhost.localdomain ([49.207.210.174])
-        by smtp.gmail.com with ESMTPSA id jx15sm3916014pjb.17.2021.01.20.20.42.41
+        by smtp.gmail.com with ESMTPSA id jx15sm3916014pjb.17.2021.01.20.20.42.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jan 2021 20:42:50 -0800 (PST)
+        Wed, 20 Jan 2021 20:42:32 -0800 (PST)
 From:   Allen Pais <allen.lkml@gmail.com>
 To:     herbert@gondor.apana.org.au
 Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
@@ -74,13 +74,14 @@ Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
         linux-samsung-soc@vger.kernel.org,
         Allen Pais <apais@linux.microsoft.com>,
         Romain Perier <romain.perier@gmail.com>
-Subject: [PATCH v4 06/19] crypto: ccp: convert tasklets to use new tasklet_setup() API
-Date:   Thu, 21 Jan 2021 10:11:13 +0530
-Message-Id: <20210121044126.152274-7-allen.lkml@gmail.com>
+Subject: [PATCH v4 04/19] crypto: caam: convert tasklets to use new tasklet_setup() API
+Date:   Thu, 21 Jan 2021 10:11:11 +0530
+Message-Id: <20210121044126.152274-5-allen.lkml@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210121044126.152274-1-allen.lkml@gmail.com>
 References: <20210121044126.152274-1-allen.lkml@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -93,111 +94,49 @@ struct tasklet_struct pointer to all tasklet
 callbacks, switch to using the new tasklet_setup()
 and from_tasklet() to pass the tasklet pointer explicitly.
 
-Acked-by: John Allen <john.allen@amd.com>
+Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
 Signed-off-by: Romain Perier <romain.perier@gmail.com>
 Signed-off-by: Allen Pais <apais@linux.microsoft.com>
 ---
- drivers/crypto/ccp/ccp-dev-v3.c    | 9 ++++-----
- drivers/crypto/ccp/ccp-dev-v5.c    | 9 ++++-----
- drivers/crypto/ccp/ccp-dmaengine.c | 7 +++----
- 3 files changed, 11 insertions(+), 14 deletions(-)
+ drivers/crypto/caam/jr.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
-index 0d5576f6ad21..858566867fa3 100644
---- a/drivers/crypto/ccp/ccp-dev-v3.c
-+++ b/drivers/crypto/ccp/ccp-dev-v3.c
-@@ -321,9 +321,9 @@ static void ccp_enable_queue_interrupts(struct ccp_device *ccp)
- 	iowrite32(ccp->qim, ccp->io_regs + IRQ_MASK_REG);
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 7f2b1101f567..2903e1af0a56 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -9,6 +9,7 @@
+ 
+ #include <linux/of_irq.h>
+ #include <linux/of_address.h>
++#include <linux/interrupt.h>
+ 
+ #include "compat.h"
+ #include "ctrl.h"
+@@ -201,11 +202,11 @@ static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
  }
  
--static void ccp_irq_bh(unsigned long data)
-+static void ccp_irq_bh(struct tasklet_struct *t)
+ /* Deferred service handler, run as interrupt-fired tasklet */
+-static void caam_jr_dequeue(unsigned long devarg)
++static void caam_jr_dequeue(struct tasklet_struct *t)
  {
--	struct ccp_device *ccp = (struct ccp_device *)data;
-+	struct ccp_device *ccp = from_tasklet(ccp, t, irq_tasklet);
- 	struct ccp_cmd_queue *cmd_q;
- 	u32 q_int, status;
- 	unsigned int i;
-@@ -361,7 +361,7 @@ static irqreturn_t ccp_irq_handler(int irq, void *data)
- 	if (ccp->use_tasklet)
- 		tasklet_schedule(&ccp->irq_tasklet);
- 	else
--		ccp_irq_bh((unsigned long)ccp);
-+		ccp_irq_bh(&ccp->irq_tasklet);
+ 	int hw_idx, sw_idx, i, head, tail;
+-	struct device *dev = (struct device *)devarg;
+-	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
++	struct caam_drv_private_jr *jrp = from_tasklet(jrp, t, irqtask);
++	struct device *dev = jrp->dev;
+ 	void (*usercall)(struct device *dev, u32 *desc, u32 status, void *arg);
+ 	u32 *userdesc, userstatus;
+ 	void *userarg;
+@@ -483,7 +484,7 @@ static int caam_jr_init(struct device *dev)
+ 		      (JOBR_INTC_COUNT_THLD << JRCFG_ICDCT_SHIFT) |
+ 		      (JOBR_INTC_TIME_THLD << JRCFG_ICTT_SHIFT));
  
- 	return IRQ_HANDLED;
- }
-@@ -457,8 +457,7 @@ static int ccp_init(struct ccp_device *ccp)
+-	tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)dev);
++	tasklet_setup(&jrp->irqtask, caam_jr_dequeue);
  
- 	/* Initialize the ISR tasklet? */
- 	if (ccp->use_tasklet)
--		tasklet_init(&ccp->irq_tasklet, ccp_irq_bh,
--			     (unsigned long)ccp);
-+		tasklet_setup(&ccp->irq_tasklet, ccp_irq_bh);
- 
- 	dev_dbg(dev, "Starting threads...\n");
- 	/* Create a kthread for each queue */
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index 7838f63bab32..e68b05a3169b 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -733,9 +733,9 @@ static void ccp5_enable_queue_interrupts(struct ccp_device *ccp)
- 		iowrite32(SUPPORTED_INTERRUPTS, ccp->cmd_q[i].reg_int_enable);
- }
- 
--static void ccp5_irq_bh(unsigned long data)
-+static void ccp5_irq_bh(struct tasklet_struct *t)
- {
--	struct ccp_device *ccp = (struct ccp_device *)data;
-+	struct ccp_device *ccp = from_tasklet(ccp, t, irq_tasklet);
- 	u32 status;
- 	unsigned int i;
- 
-@@ -772,7 +772,7 @@ static irqreturn_t ccp5_irq_handler(int irq, void *data)
- 	if (ccp->use_tasklet)
- 		tasklet_schedule(&ccp->irq_tasklet);
- 	else
--		ccp5_irq_bh((unsigned long)ccp);
-+		ccp5_irq_bh(&ccp->irq_tasklet);
- 	return IRQ_HANDLED;
- }
- 
-@@ -894,8 +894,7 @@ static int ccp5_init(struct ccp_device *ccp)
- 	}
- 	/* Initialize the ISR tasklet */
- 	if (ccp->use_tasklet)
--		tasklet_init(&ccp->irq_tasklet, ccp5_irq_bh,
--			     (unsigned long)ccp);
-+		tasklet_setup(&ccp->irq_tasklet, ccp5_irq_bh);
- 
- 	dev_dbg(dev, "Loading LSB map...\n");
- 	/* Copy the private LSB mask to the public registers */
-diff --git a/drivers/crypto/ccp/ccp-dmaengine.c b/drivers/crypto/ccp/ccp-dmaengine.c
-index 0770a83bf1a5..a85690866b05 100644
---- a/drivers/crypto/ccp/ccp-dmaengine.c
-+++ b/drivers/crypto/ccp/ccp-dmaengine.c
-@@ -121,9 +121,9 @@ static void ccp_cleanup_desc_resources(struct ccp_device *ccp,
- 	}
- }
- 
--static void ccp_do_cleanup(unsigned long data)
-+static void ccp_do_cleanup(struct tasklet_struct *t)
- {
--	struct ccp_dma_chan *chan = (struct ccp_dma_chan *)data;
-+	struct ccp_dma_chan *chan = from_tasklet(chan, t, cleanup_tasklet);
- 	unsigned long flags;
- 
- 	dev_dbg(chan->ccp->dev, "%s - chan=%s\n", __func__,
-@@ -712,8 +712,7 @@ int ccp_dmaengine_register(struct ccp_device *ccp)
- 		INIT_LIST_HEAD(&chan->active);
- 		INIT_LIST_HEAD(&chan->complete);
- 
--		tasklet_init(&chan->cleanup_tasklet, ccp_do_cleanup,
--			     (unsigned long)chan);
-+		tasklet_setup(&chan->cleanup_tasklet, ccp_do_cleanup);
- 
- 		dma_chan->device = dma_dev;
- 		dma_cookie_init(dma_chan);
+ 	/* Connect job ring interrupt handler. */
+ 	error = devm_request_irq(dev, jrp->irq, caam_jr_interrupt, IRQF_SHARED,
 -- 
 2.25.1
 
