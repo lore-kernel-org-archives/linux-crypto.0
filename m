@@ -7,27 +7,26 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D466C433DB
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 15:56:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E267C43381
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 15:57:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 465F9230FC
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 15:56:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0663E23A1E
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 15:57:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731658AbhAUP4W (ORCPT
+        id S1728354AbhAUP5G (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Jan 2021 10:56:22 -0500
-Received: from smtp-1908.mail.infomaniak.ch ([185.125.25.8]:46925 "EHLO
-        smtp-1908.mail.infomaniak.ch" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730981AbhAUP4T (ORCPT
+        Thu, 21 Jan 2021 10:57:06 -0500
+Received: from smtp-bc0f.mail.infomaniak.ch ([45.157.188.15]:43541 "EHLO
+        smtp-bc0f.mail.infomaniak.ch" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731097AbhAUP4c (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Jan 2021 10:56:19 -0500
-X-Greylist: delayed 102624 seconds by postgrey-1.27 at vger.kernel.org; Thu, 21 Jan 2021 10:56:18 EST
+        Thu, 21 Jan 2021 10:56:32 -0500
 Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
-        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4DM6Rc2ptdzMprhV;
-        Thu, 21 Jan 2021 16:55:24 +0100 (CET)
+        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4DM6Rd4TrPzMr5H6;
+        Thu, 21 Jan 2021 16:55:25 +0100 (CET)
 Received: from localhost (unknown [23.97.221.149])
-        by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4DM6Rc0j8qzlh8TC;
-        Thu, 21 Jan 2021 16:55:24 +0100 (CET)
+        by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4DM6Rd2K7fzlh8TL;
+        Thu, 21 Jan 2021 16:55:25 +0100 (CET)
 From:   =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
 To:     David Howells <dhowells@redhat.com>,
         David Woodhouse <dwmw2@infradead.org>,
@@ -43,9 +42,9 @@ Cc:     =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
         keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-security-module@vger.kernel.org
-Subject: [PATCH v4 01/10] tools/certs: Add print-cert-tbs-hash.sh
-Date:   Thu, 21 Jan 2021 16:55:04 +0100
-Message-Id: <20210121155513.539519-2-mic@digikod.net>
+Subject: [PATCH v4 02/10] certs: Check that builtin blacklist hashes are valid
+Date:   Thu, 21 Jan 2021 16:55:05 +0100
+Message-Id: <20210121155513.539519-3-mic@digikod.net>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20210121155513.539519-1-mic@digikod.net>
 References: <20210121155513.539519-1-mic@digikod.net>
@@ -58,142 +57,159 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Mickaël Salaün <mic@linux.microsoft.com>
 
-Add a new helper print-cert-tbs-hash.sh to generate a TBSCertificate
-hash from a given certificate.  This is useful to generate a blacklist
-key description used to forbid loading a specific certificate in a
-keyring, or to invalidate a certificate provided by a PKCS#7 file.
+Add and use a check-blacklist-hashes.awk script to make sure that the
+builtin blacklist hashes set with CONFIG_SYSTEM_BLACKLIST_HASH_LIST will
+effectively be taken into account as blacklisted hashes.  This is useful
+to debug invalid hash formats, and it make sure that previous hashes
+which could have been loaded in the kernel, but silently ignored, are
+now noticed and deal with by the user at kernel build time.
 
-This kind of hash formatting is required to populate the file pointed
-out by CONFIG_SYSTEM_BLACKLIST_HASH_LIST, but only the kernel code was
-available to understand how to effectively create such hash.
+This also prevent stricter blacklist key description checking (provided
+by following commits) to failed for builtin hashes.
+
+Update CONFIG_SYSTEM_BLACKLIST_HASH_LIST help to explain the content of
+a hash string and how to generate certificate ones.
 
 Cc: David Howells <dhowells@redhat.com>
 Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: Jarkko Sakkinen <jarkko@kernel.org>
 Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
 ---
 
 Changes since v3:
-* Explain in the commit message that this kind of formating is not new
-  but it wasn't documented.
+* Improve commit description.
+* Update CONFIG_SYSTEM_BLACKLIST_HASH_LIST help.
+* Remove Acked-by Jarkko Sakkinen because of the above changes.
+
+Changes since v2:
+* Add Jarkko's Acked-by.
 
 Changes since v1:
-* Fix typo.
-* Use "if" block instead of "||" .
+* Prefix script path with $(scrtree)/ (suggested by David Howells).
+* Fix hexadecimal number check.
 ---
  MAINTAINERS                        |  1 +
- tools/certs/print-cert-tbs-hash.sh | 91 ++++++++++++++++++++++++++++++
- 2 files changed, 92 insertions(+)
- create mode 100755 tools/certs/print-cert-tbs-hash.sh
+ certs/.gitignore                   |  1 +
+ certs/Kconfig                      |  7 ++++--
+ certs/Makefile                     | 15 +++++++++++-
+ scripts/check-blacklist-hashes.awk | 37 ++++++++++++++++++++++++++++++
+ 5 files changed, 58 insertions(+), 3 deletions(-)
+ create mode 100755 scripts/check-blacklist-hashes.awk
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 00836f6452f0..773a362e807f 100644
+index 773a362e807f..a18fd3d283c6 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -4120,6 +4120,7 @@ F:	Documentation/admin-guide/module-signing.rst
+@@ -4118,6 +4118,7 @@ L:	keyrings@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/admin-guide/module-signing.rst
  F:	certs/
++F:	scripts/check-blacklist-hashes.awk
  F:	scripts/extract-cert.c
  F:	scripts/sign-file.c
-+F:	tools/certs/
+ F:	tools/certs/
+diff --git a/certs/.gitignore b/certs/.gitignore
+index 2a2483990686..42cc2ac24b93 100644
+--- a/certs/.gitignore
++++ b/certs/.gitignore
+@@ -1,2 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0-only
++blacklist_hashes_checked
+ x509_certificate_list
+diff --git a/certs/Kconfig b/certs/Kconfig
+index c94e93d8bccf..6d09dec4a9e3 100644
+--- a/certs/Kconfig
++++ b/certs/Kconfig
+@@ -80,7 +80,10 @@ config SYSTEM_BLACKLIST_HASH_LIST
+ 	help
+ 	  If set, this option should be the filename of a list of hashes in the
+ 	  form "<hash>", "<hash>", ... .  This will be included into a C
+-	  wrapper to incorporate the list into the kernel.  Each <hash> should
+-	  be a string of hex digits.
++	  wrapper to incorporate the list into the kernel.  Each <hash> must be a
++	  string starting with a prefix ("tbs" or "bin"), then a colon (":"), and
++	  finally an even number of hexadecimal lowercase characters (up to 128).
++	  Certificate hashes can be generated with
++	  tools/certs/print-cert-tbs-hash.sh .
  
- CFAG12864B LCD DRIVER
- M:	Miguel Ojeda Sandonis <miguel.ojeda.sandonis@gmail.com>
-diff --git a/tools/certs/print-cert-tbs-hash.sh b/tools/certs/print-cert-tbs-hash.sh
+ endmenu
+diff --git a/certs/Makefile b/certs/Makefile
+index f4c25b67aad9..eb45407ff282 100644
+--- a/certs/Makefile
++++ b/certs/Makefile
+@@ -6,7 +6,20 @@
+ obj-$(CONFIG_SYSTEM_TRUSTED_KEYRING) += system_keyring.o system_certificates.o
+ obj-$(CONFIG_SYSTEM_BLACKLIST_KEYRING) += blacklist.o
+ ifneq ($(CONFIG_SYSTEM_BLACKLIST_HASH_LIST),"")
++
++quiet_cmd_check_blacklist_hashes = CHECK   $(patsubst "%",%,$(2))
++      cmd_check_blacklist_hashes = $(AWK) -f $(srctree)/scripts/check-blacklist-hashes.awk $(2); touch $@
++
++$(eval $(call config_filename,SYSTEM_BLACKLIST_HASH_LIST))
++
++$(obj)/blacklist_hashes.o: $(obj)/blacklist_hashes_checked
++
++targets += blacklist_hashes_checked
++$(obj)/blacklist_hashes_checked: $(SYSTEM_BLACKLIST_HASH_LIST_SRCPREFIX)$(SYSTEM_BLACKLIST_HASH_LIST_FILENAME) scripts/check-blacklist-hashes.awk FORCE
++	$(call if_changed,check_blacklist_hashes,$(SYSTEM_BLACKLIST_HASH_LIST_SRCPREFIX)$(CONFIG_SYSTEM_BLACKLIST_HASH_LIST))
++
+ obj-$(CONFIG_SYSTEM_BLACKLIST_KEYRING) += blacklist_hashes.o
++
+ else
+ obj-$(CONFIG_SYSTEM_BLACKLIST_KEYRING) += blacklist_nohashes.o
+ endif
+@@ -29,7 +42,7 @@ $(obj)/x509_certificate_list: scripts/extract-cert $(SYSTEM_TRUSTED_KEYS_SRCPREF
+ 	$(call if_changed,extract_certs,$(SYSTEM_TRUSTED_KEYS_SRCPREFIX)$(CONFIG_SYSTEM_TRUSTED_KEYS))
+ endif # CONFIG_SYSTEM_TRUSTED_KEYRING
+ 
+-clean-files := x509_certificate_list .x509.list
++clean-files := x509_certificate_list .x509.list blacklist_hashes_checked
+ 
+ ifeq ($(CONFIG_MODULE_SIG),y)
+ ###############################################################################
+diff --git a/scripts/check-blacklist-hashes.awk b/scripts/check-blacklist-hashes.awk
 new file mode 100755
-index 000000000000..c93df5387ec9
+index 000000000000..107c1d3204d4
 --- /dev/null
-+++ b/tools/certs/print-cert-tbs-hash.sh
-@@ -0,0 +1,91 @@
-+#!/bin/bash
++++ b/scripts/check-blacklist-hashes.awk
+@@ -0,0 +1,37 @@
++#!/usr/bin/awk -f
 +# SPDX-License-Identifier: GPL-2.0
 +#
 +# Copyright © 2020, Microsoft Corporation. All rights reserved.
 +#
 +# Author: Mickaël Salaün <mic@linux.microsoft.com>
 +#
-+# Compute and print the To Be Signed (TBS) hash of a certificate.  This is used
-+# as description of keys in the blacklist keyring to identify certificates.
-+# This output should be redirected, without newline, in a file (hash0.txt) and
-+# signed to create a PKCS#7 file (hash0.p7s).  Both of these files can then be
-+# loaded in the kernel with.
-+#
-+# Exemple on a workstation:
-+# ./print-cert-tbs-hash.sh certificate-to-invalidate.pem > hash0.txt
-+# openssl smime -sign -in hash0.txt -inkey builtin-private-key.pem \
-+#               -signer builtin-certificate.pem -certfile certificate-chain.pem \
-+#               -noattr -binary -outform DER -out hash0.p7s
-+#
-+# Exemple on a managed system:
-+# keyctl padd blacklist "$(< hash0.txt)" %:.blacklist < hash0.p7s
++# Check that a CONFIG_SYSTEM_BLACKLIST_HASH_LIST file contains a valid array of
++# hash strings.  Such string must start with a prefix ("tbs" or "bin"), then a
++# colon (":"), and finally an even number of hexadecimal lowercase characters
++# (up to 128).
 +
-+set -u -e -o pipefail
-+
-+CERT="${1:-}"
-+BASENAME="$(basename -- "${BASH_SOURCE[0]}")"
-+
-+if [ $# -ne 1 ] || [ ! -f "${CERT}" ]; then
-+	echo "usage: ${BASENAME} <certificate>" >&2
-+	exit 1
-+fi
-+
-+# Checks that it is indeed a certificate (PEM or DER encoded) and exclude the
-+# optional PEM text header.
-+if ! PEM="$(openssl x509 -inform DER -in "${CERT}" 2>/dev/null || openssl x509 -in "${CERT}")"; then
-+	echo "ERROR: Failed to parse certificate" >&2
-+	exit 1
-+fi
-+
-+# TBSCertificate starts at the second entry.
-+# Cf. https://tools.ietf.org/html/rfc3280#section-4.1
-+#
-+# Exemple of first lines printed by openssl asn1parse:
-+#    0:d=0  hl=4 l= 763 cons: SEQUENCE
-+#    4:d=1  hl=4 l= 483 cons: SEQUENCE
-+#    8:d=2  hl=2 l=   3 cons: cont [ 0 ]
-+#   10:d=3  hl=2 l=   1 prim: INTEGER           :02
-+#   13:d=2  hl=2 l=  20 prim: INTEGER           :3CEB2CB8818D968AC00EEFE195F0DF9665328B7B
-+#   35:d=2  hl=2 l=  13 cons: SEQUENCE
-+#   37:d=3  hl=2 l=   9 prim: OBJECT            :sha256WithRSAEncryption
-+RANGE_AND_DIGEST_RE='
-+2s/^\s*\([0-9]\+\):d=\s*[0-9]\+\s\+hl=\s*[0-9]\+\s\+l=\s*\([0-9]\+\)\s\+cons:\s*SEQUENCE\s*$/\1 \2/p;
-+7s/^\s*[0-9]\+:d=\s*[0-9]\+\s\+hl=\s*[0-9]\+\s\+l=\s*[0-9]\+\s\+prim:\s*OBJECT\s*:\(.*\)$/\1/p;
-+'
-+
-+RANGE_AND_DIGEST=($(echo "${PEM}" | \
-+	openssl asn1parse -in - | \
-+	sed -n -e "${RANGE_AND_DIGEST_RE}"))
-+
-+if [ "${#RANGE_AND_DIGEST[@]}" != 3 ]; then
-+	echo "ERROR: Failed to parse TBSCertificate." >&2
-+	exit 1
-+fi
-+
-+OFFSET="${RANGE_AND_DIGEST[0]}"
-+END="$(( OFFSET + RANGE_AND_DIGEST[1] ))"
-+DIGEST="${RANGE_AND_DIGEST[2]}"
-+
-+# The signature hash algorithm is used by Linux to blacklist certificates.
-+# Cf. crypto/asymmetric_keys/x509_cert_parser.c:x509_note_pkey_algo()
-+DIGEST_MATCH=""
-+while read -r DIGEST_ITEM; do
-+	if [ -z "${DIGEST_ITEM}" ]; then
-+		break
-+	fi
-+	if echo "${DIGEST}" | grep -qiF "${DIGEST_ITEM}"; then
-+		DIGEST_MATCH="${DIGEST_ITEM}"
-+		break
-+	fi
-+done < <(openssl list -digest-commands | tr ' ' '\n' | sort -ur)
-+
-+if [ -z "${DIGEST_MATCH}" ]; then
-+	echo "ERROR: Unknown digest algorithm: ${DIGEST}" >&2
-+	exit 1
-+fi
-+
-+echo "${PEM}" | \
-+	openssl x509 -in - -outform DER | \
-+	dd "bs=1" "skip=${OFFSET}" "count=${END}" "status=none" | \
-+	openssl dgst "-${DIGEST_MATCH}" - | \
-+	awk '{printf "tbs:" $2}'
++BEGIN {
++	RS = ","
++}
++{
++	if (!match($0, "^[ \t\n\r]*\"([^\"]*)\"[ \t\n\r]*$", part1)) {
++		print "Not a string (item " NR "):", $0;
++		exit 1;
++	}
++	if (!match(part1[1], "^(tbs|bin):(.*)$", part2)) {
++		print "Unknown prefix (item " NR "):", part1[1];
++		exit 1;
++	}
++	if (!match(part2[2], "^([0-9a-f]+)$", part3)) {
++		print "Not a lowercase hexadecimal string (item " NR "):", part2[2];
++		exit 1;
++	}
++	if (length(part3[1]) > 128) {
++		print "Hash string too long (item " NR "):", part3[1];
++		exit 1;
++	}
++	if (length(part3[1]) % 2 == 1) {
++		print "Not an even number of hexadecimal characters (item " NR "):", part3[1];
++		exit 1;
++	}
++}
 -- 
 2.30.0
 
