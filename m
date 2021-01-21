@@ -2,279 +2,152 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86B1FC433E9
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 23:45:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD83C43381
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 00:54:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 529C62376F
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Jan 2021 23:45:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76A9E23750
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 00:54:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730144AbhATXnc (ORCPT
+        id S1728816AbhAUAxA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Jan 2021 18:43:32 -0500
-Received: from mga17.intel.com ([192.55.52.151]:4380 "EHLO mga17.intel.com"
+        Wed, 20 Jan 2021 19:53:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37546 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390802AbhATWzw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Jan 2021 17:55:52 -0500
-IronPort-SDR: udtxPOmhbx2EnIn62+SSmqrFLisLgr4uYKtb4FHV+EW0FTLM15GMcMq9Lvbu6GeFFeqjQbJYXq
- 6PDt+KiW9qpQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9870"; a="158962538"
-X-IronPort-AV: E=Sophos;i="5.79,362,1602572400"; 
-   d="scan'208";a="158962538"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2021 14:46:06 -0800
-IronPort-SDR: fLJ8GrFuJ7/9eBa2BFm2rnSpPQQb9shFgLk775NIbGuON/ZvYJrtze2Ah9pWPjVM0O+CKUOUe+
- 1AWjY7oL9XUQ==
-X-IronPort-AV: E=Sophos;i="5.79,362,1602572400"; 
-   d="scan'208";a="366540464"
-Received: from meghadey-mobl1.amr.corp.intel.com (HELO [10.255.228.129]) ([10.255.228.129])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2021 14:46:05 -0800
-Subject: Re: [RFC V1 2/7] crypto: crct10dif - Accelerated CRC T10 DIF with
- vectorized instruction
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        ravi.v.shankar@intel.com, tim.c.chen@intel.com,
-        andi.kleen@intel.com, Dave Hansen <dave.hansen@intel.com>,
-        wajdi.k.feghali@intel.com, greg.b.tucker@intel.com,
-        robert.a.kasten@intel.com, rajendrakumar.chinnaiyan@intel.com,
-        tomasz.kantecki@intel.com, ryan.d.saffores@intel.com,
-        ilya.albrekht@intel.com, kyung.min.park@intel.com,
-        Tony Luck <tony.luck@intel.com>, ira.weiny@intel.com
-References: <1608325864-4033-1-git-send-email-megha.dey@intel.com>
- <1608325864-4033-3-git-send-email-megha.dey@intel.com>
- <CAMj1kXGOiy8ohS6Wa90qm3Fct4UvwhnLZcGM9-4E_Jn=pur-ug@mail.gmail.com>
-From:   "Dey, Megha" <megha.dey@intel.com>
-Message-ID: <0fc1709e-085a-82e8-8e09-a19fa3c3abf0@intel.com>
-Date:   Wed, 20 Jan 2021 14:46:05 -0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        id S1727770AbhAUAhd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Jan 2021 19:37:33 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2B082224D1;
+        Thu, 21 Jan 2021 00:36:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1611189410;
+        bh=wQ8RTAAdqKPawygxmXduBoC5eOWU4KdTfxeWk7uby9o=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=RePUxeC/sF5jSjok7HRtFf8tz6/BH6MmHiMCw4vM67j1iIncx0gbwbvHPXIqnguzL
+         cR+t/k4/sFoEf49TaEj2iuB6W/TCzph7tNXE+P6K9ghJLHElc3IzDDCqrnnrd06xYS
+         RXwsfi2ensCprZqc51clJe7f3DbOppEiyr64TgqIGqcXPA9+1tREMO0hIIhcPZ2PDP
+         Fxw0rNc0u1khVNsOertQylIj1q7EHOBGUOm+ibTz/I40OUQfF1WSeyMd6cEIueBujC
+         coleKskonEc5FeEJuB0yyTOaJIExz6dSBRbl6ojz1ewBVZ36uDsjgbLRGJMXPH0vtT
+         h1qDMFAunbopg==
+Date:   Thu, 21 Jan 2021 02:36:43 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Eric Snowberg <eric.snowberg@oracle.com>
+Cc:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        David Howells <dhowells@redhat.com>, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jmorris@namei.org, serge@hallyn.com, nayna@linux.ibm.com,
+        Mimi Zohar <zohar@linux.ibm.com>, erichte@linux.ibm.com,
+        mpe@ellerman.id.au, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        James.Bottomley@hansenpartnership.com
+Subject: Re: [PATCH v4] certs: Add EFI_CERT_X509_GUID support for dbx entries
+Message-ID: <YAjMm9Gq/FFOzQYG@kernel.org>
+References: <E090372C-06A3-4991-8FC3-F06A0DA60729@oracle.com>
+ <20200916004927.64276-1-eric.snowberg@oracle.com>
+ <1360578.1607593748@warthog.procyon.org.uk>
+ <2442460.1610463459@warthog.procyon.org.uk>
+ <X/9a8naM8p4tT5sO@linux.intel.com>
+ <A05E3573-B1AF-474B-94A5-779E69E5880A@oracle.com>
+ <YAFdNiYZSWpB9vOw@kernel.org>
+ <CFBF6AEC-2832-44F7-9D7F-F20489498C33@oracle.com>
+ <YAgTawk3EENF/P6j@kernel.org>
+ <D9F5E0BD-E2FC-428F-91B3-35D2750493A0@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <CAMj1kXGOiy8ohS6Wa90qm3Fct4UvwhnLZcGM9-4E_Jn=pur-ug@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <D9F5E0BD-E2FC-428F-91B3-35D2750493A0@oracle.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Ard,
+On Wed, Jan 20, 2021 at 03:13:11PM -0700, Eric Snowberg wrote:
+> 
+> > On Jan 20, 2021, at 4:26 AM, Jarkko Sakkinen <jarkko@kernel.org> wrote:
+> > 
+> > On Fri, Jan 15, 2021 at 09:49:02AM -0700, Eric Snowberg wrote:
+> >> 
+> >>> On Jan 15, 2021, at 2:15 AM, Jarkko Sakkinen <jarkko@kernel.org> wrote:
+> >>> 
+> >>> On Wed, Jan 13, 2021 at 05:11:10PM -0700, Eric Snowberg wrote:
+> >>>> 
+> >>>>> On Jan 13, 2021, at 1:41 PM, Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com> wrote:
+> >>>>> 
+> >>>>> On Tue, Jan 12, 2021 at 02:57:39PM +0000, David Howells wrote:
+> >>>>>> Eric Snowberg <eric.snowberg@oracle.com> wrote:
+> >>>>>> 
+> >>>>>>>> On Dec 10, 2020, at 2:49 AM, David Howells <dhowells@redhat.com> wrote:
+> >>>>>>>> 
+> >>>>>>>> Eric Snowberg <eric.snowberg@oracle.com> wrote:
+> >>>>>>>> 
+> >>>>>>>>> Add support for EFI_CERT_X509_GUID dbx entries. When a EFI_CERT_X509_GUID
+> >>>>>>>>> is found, it is added as an asymmetrical key to the .blacklist keyring.
+> >>>>>>>>> Anytime the .platform keyring is used, the keys in the .blacklist keyring
+> >>>>>>>>> are referenced, if a matching key is found, the key will be rejected.
+> >>>>>>>> 
+> >>>>>>>> Ummm...  Why this way and not as a blacklist key which takes up less space?
+> >>>>>>>> I'm guessing that you're using the key chain matching logic.  We really only
+> >>>>>>>> need to blacklist the key IDs.
+> >>>>>>> 
+> >>>>>>> I implemented it this way so that certs in the dbx would only impact 
+> >>>>>>> the .platform keyring. I was under the impression we didn’t want to have 
+> >>>>>>> Secure Boot UEFI db/dbx certs dictate keyring functionality within the kernel
+> >>>>>>> itself. Meaning if we have a matching dbx cert in any other keyring (builtin,
+> >>>>>>> secondary, ima, etc.), it would be allowed. If that is not how you’d like to 
+> >>>>>>> see it done, let me know and I’ll make the change.
+> >>>>>> 
+> >>>>>> I wonder if that is that the right thing to do.  I guess this is a policy
+> >>>>>> decision and may depend on the particular user.
+> >>>>> 
+> >>>>> Why would you want to allow dbx entry in any keyring?
+> >>>> 
+> >>>> Today, DB and MOK certs go into the platform keyring.  These certs are only
+> >>>> referenced during kexec.  They can’t be used for other things like validating
+> >>>> kernel module signatures.  If we follow the same pattern, the DBX and MOKX entries
+> >>>> in the blacklist keyring should only impact kexec. 
+> >>>> 
+> >>>> Currently, Mickaël Salaün has another outstanding series to allow root to update 
+> >>>> the blacklist keyring.  I assume the use case for this is around certificates used 
+> >>>> within the kernel, for example revoking kernel module signatures.  The question I have
+> >>>> is, should another keyring be introduced?  One that carries DBX and MOKX, which just
+> >>>> correspond to certs/hashes in the platform keyring; this keyring would only be
+> >>>> referenced for kexec, just like the platform keyring is today. Then, the current
+> >>>> blacklist keyring would be used for everything internal to the kernel.
+> >>> 
+> >>> Right, I'm following actively that series.
+> >>> 
+> >>> Why couldn't user space drive this process and use that feature to do it?
+> >> 
+> >> I could see where the user would want to use both. With Mickaël Salaün’s
+> >> series, the blacklist keyring is updated immediately.  However it does
+> >> not survive a reboot.  With my patch, the blacklist keyring is updated
+> >> during boot, based on what is in the dbx. Neither approach needs a new 
+> >> kernel build.
+> > 
+> > I don't want to purposely challenge this, but why does it matter
+> > that it doesn't survive the boot? I'm referring here to the golden
+> > principle of kernel defining a mechanism, not policy. User space
+> > can do the population however it wants to for every boot.
+> > 
+> > E.g. systemd service could do this.
+> > 
+> > What am I missing here?
+> 
+> This change simply adds support for a missing type.  The kernel 
+> already supports cert and hash entries (EFI_CERT_X509_SHA256_GUID,
+> EFI_CERT_SHA256_GUID) that originate from the dbx and are loaded 
+> into the blacklist keyring during boot.  I’m not sure why a cert 
+> defined with EFI_CERT_X509_GUID should be handled in a different 
+> manner.
+> 
+> I suppose a user space tool could be created. But wouldn’t what is
+> currently done in the kernel in this area need to be removed?
 
-On 1/16/2021 9:00 AM, Ard Biesheuvel wrote:
-> On Fri, 18 Dec 2020 at 22:07, Megha Dey <megha.dey@intel.com> wrote:
->> From: Kyung Min Park <kyung.min.park@intel.com>
->>
->> Update the crc_pcl function that calculates T10 Data Integrity Field
->> CRC16 (CRC T10 DIF) using VPCLMULQDQ instruction. VPCLMULQDQ instruction
->> with AVX-512F adds EVEX encoded 512 bit version of PCLMULQDQ instruction.
->> The advantage comes from packing multiples of 4 * 128 bit data into AVX512
->> reducing instruction latency.
->>
->> The glue code in crct10diff module overrides the existing PCLMULQDQ version
->> with the VPCLMULQDQ version when the following criteria are met:
->> At compile time:
->> 1. CONFIG_CRYPTO_AVX512 is enabled
->> 2. toolchain(assembler) supports VPCLMULQDQ instructions
->> At runtime:
->> 1. VPCLMULQDQ and AVX512VL features are supported on a platform (currently
->>     only Icelake)
->> 2. If compiled as built-in module, crct10dif_pclmul.use_avx512 is set at
->>     boot time or /sys/module/crct10dif_pclmul/parameters/use_avx512 is set
->>     to 1 after boot.
->>     If compiled as loadable module, use_avx512 module parameter must be set:
->>     modprobe crct10dif_pclmul use_avx512=1
->>
->> A typical run of tcrypt with CRC T10 DIF calculation with PCLMULQDQ
->> instruction and VPCLMULQDQ instruction shows the following results:
->> For bytes per update >= 1KB, we see the average improvement of 46%(~1.4x)
->> For bytes per update < 1KB, we see the average improvement of 13%.
->> Test was performed on an Icelake based platform with constant frequency
->> set for CPU.
->>
->> Detailed results for a variety of block sizes and update sizes are in
->> the table below.
->>
->> ---------------------------------------------------------------------------
->> |            |            |         cycles/operation         |            |
->> |            |            |       (the lower the better)     |            |
->> |    byte    |   bytes    |----------------------------------| percentage |
->> |   blocks   | per update |   CRC T10 DIF  |  CRC T10 DIF    | loss/gain  |
->> |            |            | with PCLMULQDQ | with VPCLMULQDQ |            |
->> |------------|------------|----------------|-----------------|------------|
->> |      16    |     16     |        77      |        106      |   -27.0    |
->> |      64    |     16     |       411      |        390      |     5.4    |
->> |      64    |     64     |        71      |         85      |   -16.0    |
->> |     256    |     16     |      1224      |       1308      |    -6.4    |
->> |     256    |     64     |       393      |        407      |    -3.4    |
->> |     256    |    256     |        93      |         86      |     8.1    |
->> |    1024    |     16     |      4564      |       5020      |    -9.0    |
->> |    1024    |    256     |       486      |        475      |     2.3    |
->> |    1024    |   1024     |       221      |        148      |    49.3    |
->> |    2048    |     16     |      8945      |       9851      |    -9.1    |
->> |    2048    |    256     |       982      |        951      |     3.3    |
->> |    2048    |   1024     |       500      |        369      |    35.5    |
->> |    2048    |   2048     |       413      |        265      |    55.8    |
->> |    4096    |     16     |     17885      |      19351      |    -7.5    |
->> |    4096    |    256     |      1828      |       1713      |     6.7    |
->> |    4096    |   1024     |       968      |        805      |    20.0    |
->> |    4096    |   4096     |       739      |        475      |    55.6    |
->> |    8192    |     16     |     48339      |      41556      |    16.3    |
->> |    8192    |    256     |      3494      |       3342      |     4.5    |
->> |    8192    |   1024     |      1959      |       1462      |    34.0    |
->> |    8192    |   4096     |      1561      |       1036      |    50.7    |
->> |    8192    |   8192     |      1540      |       1004      |    53.4    |
->> ---------------------------------------------------------------------------
->>
->> This work was inspired by the CRC T10 DIF AVX512 optimization published
->> in Intel Intelligent Storage Acceleration Library.
->> https://github.com/intel/isa-l/blob/master/crc/crc16_t10dif_by16_10.asm
->>
->> Co-developed-by: Greg Tucker <greg.b.tucker@intel.com>
->> Signed-off-by: Greg Tucker <greg.b.tucker@intel.com>
->> Co-developed-by: Tomasz Kantecki <tomasz.kantecki@intel.com>
->> Signed-off-by: Tomasz Kantecki <tomasz.kantecki@intel.com>
->> Signed-off-by: Kyung Min Park <kyung.min.park@intel.com>
->> Signed-off-by: Megha Dey <megha.dey@intel.com>
->> ---
->>   arch/x86/crypto/Makefile                  |   1 +
->>   arch/x86/crypto/crct10dif-avx512-asm_64.S | 482 ++++++++++++++++++++++++++++++
->>   arch/x86/crypto/crct10dif-pclmul_glue.c   |  24 +-
->>   arch/x86/include/asm/disabled-features.h  |   8 +-
->>   crypto/Kconfig                            |  23 ++
->>   5 files changed, 535 insertions(+), 3 deletions(-)
->>   create mode 100644 arch/x86/crypto/crct10dif-avx512-asm_64.S
->>
-> ...
->> diff --git a/arch/x86/crypto/crct10dif-pclmul_glue.c b/arch/x86/crypto/crct10dif-pclmul_glue.c
->> index 71291d5a..26a6350 100644
->> --- a/arch/x86/crypto/crct10dif-pclmul_glue.c
->> +++ b/arch/x86/crypto/crct10dif-pclmul_glue.c
->> @@ -35,6 +35,16 @@
->>   #include <asm/simd.h>
->>
->>   asmlinkage u16 crc_t10dif_pcl(u16 init_crc, const u8 *buf, size_t len);
->> +#ifdef CONFIG_CRYPTO_CRCT10DIF_AVX512
->> +asmlinkage u16 crct10dif_pcl_avx512(u16 init_crc, const u8 *buf, size_t len);
->> +#else
->> +static u16 crct10dif_pcl_avx512(u16 init_crc, const u8 *buf, size_t len)
->> +{ return 0; }
->> +#endif
->> +
-> Please drop the alternative definition. If you code the references
-> correctly, the alternative is never called.
-ok.
->
->> +static bool use_avx512;
->> +module_param(use_avx512, bool, 0644);
->> +MODULE_PARM_DESC(use_avx512, "Use AVX512 optimized algorithm, if available");
->>
->>   struct chksum_desc_ctx {
->>          __u16 crc;
->> @@ -56,7 +66,12 @@ static int chksum_update(struct shash_desc *desc, const u8 *data,
->>
->>          if (length >= 16 && crypto_simd_usable()) {
->>                  kernel_fpu_begin();
->> -               ctx->crc = crc_t10dif_pcl(ctx->crc, data, length);
->> +               if (IS_ENABLED(CONFIG_CRYPTO_CRCT10DIF_AVX512) &&
->> +                   cpu_feature_enabled(X86_FEATURE_VPCLMULQDQ) &&
->> +                   use_avx512)
->> +                       ctx->crc = crct10dif_pcl_avx512(ctx->crc, data, length);
->> +               else
->> +                       ctx->crc = crc_t10dif_pcl(ctx->crc, data, length);
-> Please use a static call or static key here, and initialize its value
-> in the init code.
-Yeah, Ill make the change.
->
->>                  kernel_fpu_end();
->>          } else
->>                  ctx->crc = crc_t10dif_generic(ctx->crc, data, length);
->> @@ -75,7 +90,12 @@ static int __chksum_finup(__u16 crc, const u8 *data, unsigned int len, u8 *out)
->>   {
->>          if (len >= 16 && crypto_simd_usable()) {
->>                  kernel_fpu_begin();
->> -               *(__u16 *)out = crc_t10dif_pcl(crc, data, len);
->> +               if (IS_ENABLED(CONFIG_CRYPTO_CRCT10DIF_AVX512) &&
->> +                   cpu_feature_enabled(X86_FEATURE_VPCLMULQDQ) &&
->> +                   use_avx512)
->> +                       *(__u16 *)out = crct10dif_pcl_avx512(crc, data, len);
->> +               else
->> +                       *(__u16 *)out = crc_t10dif_pcl(crc, data, len);
-> Same here.
+Right. I don't think this was a great idea in the first place to
+do to the kernel but since it exists, I guess the patch does make
+sense.
 
-will do
-
--Megha
-
->
->>                  kernel_fpu_end();
->>          } else
->>                  *(__u16 *)out = crc_t10dif_generic(crc, data, len);
->> diff --git a/arch/x86/include/asm/disabled-features.h b/arch/x86/include/asm/disabled-features.h
->> index 5861d34..1192dea 100644
->> --- a/arch/x86/include/asm/disabled-features.h
->> +++ b/arch/x86/include/asm/disabled-features.h
->> @@ -56,6 +56,12 @@
->>   # define DISABLE_PTI           (1 << (X86_FEATURE_PTI & 31))
->>   #endif
->>
->> +#if defined(CONFIG_AS_VPCLMULQDQ)
->> +# define DISABLE_VPCLMULQDQ    0
->> +#else
->> +# define DISABLE_VPCLMULQDQ    (1 << (X86_FEATURE_VPCLMULQDQ & 31))
->> +#endif
->> +
->>   #ifdef CONFIG_IOMMU_SUPPORT
->>   # define DISABLE_ENQCMD        0
->>   #else
->> @@ -82,7 +88,7 @@
->>   #define DISABLED_MASK14        0
->>   #define DISABLED_MASK15        0
->>   #define DISABLED_MASK16        (DISABLE_PKU|DISABLE_OSPKE|DISABLE_LA57|DISABLE_UMIP| \
->> -                        DISABLE_ENQCMD)
->> +                        DISABLE_ENQCMD|DISABLE_VPCLMULQDQ)
->>   #define DISABLED_MASK17        0
->>   #define DISABLED_MASK18        0
->>   #define DISABLED_MASK_CHECK BUILD_BUG_ON_ZERO(NCAPINTS != 19)
->> diff --git a/crypto/Kconfig b/crypto/Kconfig
->> index a367fcf..b090f14 100644
->> --- a/crypto/Kconfig
->> +++ b/crypto/Kconfig
->> @@ -613,6 +613,29 @@ config CRYPTO_CRC32C_VPMSUM
->>            (vpmsum) instructions, introduced in POWER8. Enable on POWER8
->>            and newer processors for improved performance.
->>
->> +config CRYPTO_AVX512
->> +       bool "AVX512 hardware acceleration for crypto algorithms"
->> +       depends on X86
->> +       depends on 64BIT
->> +       help
->> +         This option will compile in AVX512 hardware accelerated crypto
->> +         algorithms. These optimized algorithms provide substantial(2-10x)
->> +         improvements over existing crypto algorithms for large data size.
->> +         However, it may also incur a frequency penalty (aka. "bin drops")
->> +         and cause collateral damage to other workloads running on the
->> +         same core.
->> +
->> +# We default CRYPTO_CRCT10DIF_AVX512 to Y but depend on CRYPTO_AVX512 in
->> +# order to have a singular option (CRYPTO_AVX512) select multiple algorithms
->> +# when supported. Specifically, if the platform and/or toolset does not
->> +# support VPLMULQDQ. Then this algorithm should not be supported as part of
->> +# the set that CRYPTO_AVX512 selects.
->> +config CRYPTO_CRCT10DIF_AVX512
->> +       bool
->> +       default y
->> +       depends on CRYPTO_AVX512
->> +       depends on CRYPTO_CRCT10DIF_PCLMUL
->> +       depends on AS_VPCLMULQDQ
->>
->>   config CRYPTO_CRC32C_SPARC64
->>          tristate "CRC32c CRC algorithm (SPARC64)"
->> --
->> 2.7.4
->>
+/Jarkko
