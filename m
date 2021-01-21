@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC39C433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 13:09:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C0D0C433DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 13:10:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4FF5E23A00
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 13:09:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90E9E239FF
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 13:10:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730328AbhAUNJ2 (ORCPT
+        id S1729589AbhAUNKQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Jan 2021 08:09:28 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37516 "EHLO mail.kernel.org"
+        Thu, 21 Jan 2021 08:10:16 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37594 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731831AbhAUNIf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Jan 2021 08:08:35 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AE60D23A1C;
-        Thu, 21 Jan 2021 13:07:50 +0000 (UTC)
+        id S1729541AbhAUNJN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 21 Jan 2021 08:09:13 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 46C3223A1E;
+        Thu, 21 Jan 2021 13:07:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1611234471;
-        bh=QywfgG1D7VlCi32MU+ls9YKkpq9qcqzMFv2+q6KCxpg=;
+        s=k20201202; t=1611234473;
+        bh=99dabNDyTSv296ZNZ1Tpc3VZYWOfKW+gr+/03gRsc0E=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TlIk8aSok2DA4OSW5uNfrwputlNcCylfJUVCpFYJ9E4isIZqYNQaGcC9aLS2FnooB
-         8gQzfW4aY1ftIDhBbJeybYet/t22fbAhBVy9vtOtLhRRj+RIQVfeXPn/YXApL6Bhef
-         kqIqGZOU0l+iwJzBKUFd+l37ruYAIhuNRWibJmtFB3uK+K6djRJUwz5gprEgO7pPNu
-         6bgVGnO5fuK3nB61m2uvXFICTyIBsubdiZK7WdCFzpA9YL3+t+W9R0xCfHmoz+Ma3t
-         JbDfYdRnG4Y+UJa4oDdYPLFnXaHxx6BUtFQICHzNMCAagqIHIA3XzdEetXnX8yMxNB
-         dWuYEB95LlE+Q==
+        b=KSKikkE9tznMj+r2lFi3WKrRIxEzcguEuThmoLx5uxQQXP66yV4IJav35OXmKcLAP
+         OF95lZqigSZ40cw15Wh1NdSrhKSX1uPGDOTBMuRNVkCskGFvyckgGY4jvPTCsFEcNn
+         VIvkdDd6Ep4ypgsUYGwtdo5otq9wMNXI9N+ltNV1zy4cuji5sabAdvnOk+2F/QMTxP
+         gxSs5EwJpulaZboXObQQHrNtR/vkQ3Ef+LCv1cL5M4TSLJcygAifqu6JEQ4cY4gO3s
+         ZLqBptcjgxc+jgRMbZagL1+0uMM8yz1o0XosImqwvZ0pndeU1ALSO4DfAl7TGOWB/Q
+         7eAqxmewukjoA==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ardb@kernel.org>,
         Eric Biggers <ebiggers@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 4/5] crypto: remove Tiger 128/160/192 hash algorithms
-Date:   Thu, 21 Jan 2021 14:07:32 +0100
-Message-Id: <20210121130733.1649-5-ardb@kernel.org>
+Subject: [PATCH 5/5] crypto: remove Salsa20 stream cipher algorithm
+Date:   Thu, 21 Jan 2021 14:07:33 +0100
+Message-Id: <20210121130733.1649-6-ardb@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210121130733.1649-1-ardb@kernel.org>
 References: <20210121130733.1649-1-ardb@kernel.org>
@@ -47,970 +47,1515 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Tiger is never referenced anywhere in the kernel, and unlikely
-to be depended upon by userspace via AF_ALG. So let's remove it.
+Salsa20 is not used anywhere in the kernel, is not suitable for disk
+encryption, and widely considered to have been superseded by ChaCha20.
+So let's remove it.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- crypto/Kconfig   |  13 -
- crypto/Makefile  |   1 -
- crypto/tcrypt.c  |  36 --
- crypto/testmgr.c |  18 -
- crypto/testmgr.h | 126 ----
- crypto/tgr192.c  | 682 --------------------
- 6 files changed, 876 deletions(-)
+ Documentation/admin-guide/device-mapper/dm-integrity.rst |    4 +-
+ crypto/Kconfig                                           |   12 -
+ crypto/Makefile                                          |    1 -
+ crypto/salsa20_generic.c                                 |  212 ----
+ crypto/tcrypt.c                                          |   11 +-
+ crypto/testmgr.c                                         |    6 -
+ crypto/testmgr.h                                         | 1162 --------------------
+ 7 files changed, 3 insertions(+), 1405 deletions(-)
 
+diff --git a/Documentation/admin-guide/device-mapper/dm-integrity.rst b/Documentation/admin-guide/device-mapper/dm-integrity.rst
+index 4e6f504474ac..d56112e2e354 100644
+--- a/Documentation/admin-guide/device-mapper/dm-integrity.rst
++++ b/Documentation/admin-guide/device-mapper/dm-integrity.rst
+@@ -143,8 +143,8 @@ recalculate
+ journal_crypt:algorithm(:key)	(the key is optional)
+ 	Encrypt the journal using given algorithm to make sure that the
+ 	attacker can't read the journal. You can use a block cipher here
+-	(such as "cbc(aes)") or a stream cipher (for example "chacha20",
+-	"salsa20" or "ctr(aes)").
++	(such as "cbc(aes)") or a stream cipher (for example "chacha20"
++	or "ctr(aes)").
+ 
+ 	The journal contains history of last writes to the block device,
+ 	an attacker reading the journal could see the last sector numbers
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index a32e25cca2b4..8d25d689a705 100644
+index 8d25d689a705..9779c7f7531f 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -1009,19 +1009,6 @@ config CRYPTO_STREEBOG
- 	  https://tc26.ru/upload/iblock/fed/feddbb4d26b685903faa2ba11aea43f6.pdf
- 	  https://tools.ietf.org/html/rfc6986
+@@ -1400,18 +1400,6 @@ config CRYPTO_KHAZAD
+ 	  See also:
+ 	  <http://www.larc.usp.br/~pbarreto/KhazadPage.html>
  
--config CRYPTO_TGR192
--	tristate "Tiger digest algorithms"
--	select CRYPTO_HASH
+-config CRYPTO_SALSA20
+-	tristate "Salsa20 stream cipher algorithm"
+-	select CRYPTO_SKCIPHER
 -	help
--	  Tiger hash algorithm 192, 160 and 128-bit hashes
+-	  Salsa20 stream cipher algorithm.
 -
--	  Tiger is a hash function optimized for 64-bit processors while
--	  still having decent performance on 32-bit processors.
--	  Tiger was developed by Ross Anderson and Eli Biham.
+-	  Salsa20 is a stream cipher submitted to eSTREAM, the ECRYPT
+-	  Stream Cipher Project. See <https://www.ecrypt.eu.org/stream/>
 -
--	  See also:
--	  <https://www.cs.technion.ac.il/~biham/Reports/Tiger/>.
+-	  The Salsa20 stream cipher algorithm is designed by Daniel J.
+-	  Bernstein <djb@cr.yp.to>. See <https://cr.yp.to/snuffle.html>
 -
- config CRYPTO_WP512
- 	tristate "Whirlpool digest algorithms"
- 	select CRYPTO_HASH
+ config CRYPTO_CHACHA20
+ 	tristate "ChaCha stream cipher algorithms"
+ 	select CRYPTO_LIB_CHACHA_GENERIC
 diff --git a/crypto/Makefile b/crypto/Makefile
-index 946e821f1874..6b9622f21f7f 100644
+index 6b9622f21f7f..cf23affb1678 100644
 --- a/crypto/Makefile
 +++ b/crypto/Makefile
-@@ -77,7 +77,6 @@ obj-$(CONFIG_CRYPTO_SM3) += sm3_generic.o
- obj-$(CONFIG_CRYPTO_STREEBOG) += streebog_generic.o
- obj-$(CONFIG_CRYPTO_WP512) += wp512.o
- CFLAGS_wp512.o := $(call cc-option,-fno-schedule-insns)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
--obj-$(CONFIG_CRYPTO_TGR192) += tgr192.o
- obj-$(CONFIG_CRYPTO_BLAKE2B) += blake2b_generic.o
- obj-$(CONFIG_CRYPTO_BLAKE2S) += blake2s_generic.o
- obj-$(CONFIG_CRYPTO_GF128MUL) += gf128mul.o
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index a231df72ca7d..696c44ef465e 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1815,18 +1815,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 		ret += tcrypt_test("cbc(anubis)");
- 		break;
- 
--	case 27:
--		ret += tcrypt_test("tgr192");
--		break;
--
--	case 28:
--		ret += tcrypt_test("tgr160");
--		break;
--
--	case 29:
--		ret += tcrypt_test("tgr128");
--		break;
--
- 	case 30:
- 		ret += tcrypt_test("ecb(xeta)");
- 		break;
-@@ -2377,18 +2365,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 		test_hash_speed("wp512", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
- 		fallthrough;
--	case 310:
--		test_hash_speed("tgr128", sec, generic_hash_speed_template);
--		if (mode > 300 && mode < 400) break;
--		fallthrough;
--	case 311:
--		test_hash_speed("tgr160", sec, generic_hash_speed_template);
--		if (mode > 300 && mode < 400) break;
--		fallthrough;
--	case 312:
--		test_hash_speed("tgr192", sec, generic_hash_speed_template);
--		if (mode > 300 && mode < 400) break;
--		fallthrough;
- 	case 313:
- 		test_hash_speed("sha224", sec, generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
-@@ -2489,18 +2465,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 		test_ahash_speed("wp512", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
- 		fallthrough;
--	case 410:
--		test_ahash_speed("tgr128", sec, generic_hash_speed_template);
--		if (mode > 400 && mode < 500) break;
--		fallthrough;
--	case 411:
--		test_ahash_speed("tgr160", sec, generic_hash_speed_template);
--		if (mode > 400 && mode < 500) break;
--		fallthrough;
--	case 412:
--		test_ahash_speed("tgr192", sec, generic_hash_speed_template);
--		if (mode > 400 && mode < 500) break;
--		fallthrough;
- 	case 413:
- 		test_ahash_speed("sha224", sec, generic_hash_speed_template);
- 		if (mode > 400 && mode < 500) break;
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index d12cec6ab003..b87802ffb554 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -5375,24 +5375,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.suite = {
- 			.hash = __VECS(streebog512_tv_template)
- 		}
--	}, {
--		.alg = "tgr128",
--		.test = alg_test_hash,
--		.suite = {
--			.hash = __VECS(tgr128_tv_template)
--		}
--	}, {
--		.alg = "tgr160",
--		.test = alg_test_hash,
--		.suite = {
--			.hash = __VECS(tgr160_tv_template)
--		}
--	}, {
--		.alg = "tgr192",
--		.test = alg_test_hash,
--		.suite = {
--			.hash = __VECS(tgr192_tv_template)
--		}
- 	}, {
- 		.alg = "vmac64(aes)",
- 		.test = alg_test_hash,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 5625164cda54..851c107a5584 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -4950,132 +4950,6 @@ static const struct hash_testvec wp256_tv_template[] = {
- 	},
- };
- 
--/*
-- * TIGER test vectors from Tiger website
-- */
--static const struct hash_testvec tgr192_tv_template[] = {
--	{
--		.plaintext = "",
--		.psize	= 0,
--		.digest = "\x24\xf0\x13\x0c\x63\xac\x93\x32"
--			  "\x16\x16\x6e\x76\xb1\xbb\x92\x5f"
--			  "\xf3\x73\xde\x2d\x49\x58\x4e\x7a",
--	}, {
--		.plaintext = "abc",
--		.psize	= 3,
--		.digest = "\xf2\x58\xc1\xe8\x84\x14\xab\x2a"
--			  "\x52\x7a\xb5\x41\xff\xc5\xb8\xbf"
--			  "\x93\x5f\x7b\x95\x1c\x13\x29\x51",
--	}, {
--		.plaintext = "Tiger",
--		.psize	= 5,
--		.digest = "\x9f\x00\xf5\x99\x07\x23\x00\xdd"
--			  "\x27\x6a\xbb\x38\xc8\xeb\x6d\xec"
--			  "\x37\x79\x0c\x11\x6f\x9d\x2b\xdf",
--	}, {
--		.plaintext = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-",
--		.psize	= 64,
--		.digest = "\x87\xfb\x2a\x90\x83\x85\x1c\xf7"
--			  "\x47\x0d\x2c\xf8\x10\xe6\xdf\x9e"
--			  "\xb5\x86\x44\x50\x34\xa5\xa3\x86",
--	}, {
--		.plaintext = "ABCDEFGHIJKLMNOPQRSTUVWXYZ=abcdefghijklmnopqrstuvwxyz+0123456789",
--		.psize	= 64,
--		.digest = "\x46\x7d\xb8\x08\x63\xeb\xce\x48"
--			  "\x8d\xf1\xcd\x12\x61\x65\x5d\xe9"
--			  "\x57\x89\x65\x65\x97\x5f\x91\x97",
--	}, {
--		.plaintext = "Tiger - A Fast New Hash Function, "
--			   "by Ross Anderson and Eli Biham, "
--			   "proceedings of Fast Software Encryption 3, "
--			   "Cambridge, 1996.",
--		.psize  = 125,
--		.digest = "\x3d\x9a\xeb\x03\xd1\xbd\x1a\x63"
--			  "\x57\xb2\x77\x4d\xfd\x6d\x5b\x24"
--			  "\xdd\x68\x15\x1d\x50\x39\x74\xfc",
--	},
--};
--
--static const struct hash_testvec tgr160_tv_template[] = {
--	{
--		.plaintext = "",
--		.psize	= 0,
--		.digest = "\x24\xf0\x13\x0c\x63\xac\x93\x32"
--			  "\x16\x16\x6e\x76\xb1\xbb\x92\x5f"
--			  "\xf3\x73\xde\x2d",
--	}, {
--		.plaintext = "abc",
--		.psize	= 3,
--		.digest = "\xf2\x58\xc1\xe8\x84\x14\xab\x2a"
--			  "\x52\x7a\xb5\x41\xff\xc5\xb8\xbf"
--			  "\x93\x5f\x7b\x95",
--	}, {
--		.plaintext = "Tiger",
--		.psize	= 5,
--		.digest = "\x9f\x00\xf5\x99\x07\x23\x00\xdd"
--			  "\x27\x6a\xbb\x38\xc8\xeb\x6d\xec"
--			  "\x37\x79\x0c\x11",
--	}, {
--		.plaintext = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-",
--		.psize	= 64,
--		.digest = "\x87\xfb\x2a\x90\x83\x85\x1c\xf7"
--			  "\x47\x0d\x2c\xf8\x10\xe6\xdf\x9e"
--			  "\xb5\x86\x44\x50",
--	}, {
--		.plaintext = "ABCDEFGHIJKLMNOPQRSTUVWXYZ=abcdefghijklmnopqrstuvwxyz+0123456789",
--		.psize	= 64,
--		.digest = "\x46\x7d\xb8\x08\x63\xeb\xce\x48"
--			  "\x8d\xf1\xcd\x12\x61\x65\x5d\xe9"
--			  "\x57\x89\x65\x65",
--	}, {
--		.plaintext = "Tiger - A Fast New Hash Function, "
--			   "by Ross Anderson and Eli Biham, "
--			   "proceedings of Fast Software Encryption 3, "
--			   "Cambridge, 1996.",
--		.psize  = 125,
--		.digest = "\x3d\x9a\xeb\x03\xd1\xbd\x1a\x63"
--			  "\x57\xb2\x77\x4d\xfd\x6d\x5b\x24"
--			  "\xdd\x68\x15\x1d",
--	},
--};
--
--static const struct hash_testvec tgr128_tv_template[] = {
--	{
--		.plaintext = "",
--		.psize	= 0,
--		.digest = "\x24\xf0\x13\x0c\x63\xac\x93\x32"
--			  "\x16\x16\x6e\x76\xb1\xbb\x92\x5f",
--	}, {
--		.plaintext = "abc",
--		.psize	= 3,
--		.digest = "\xf2\x58\xc1\xe8\x84\x14\xab\x2a"
--			  "\x52\x7a\xb5\x41\xff\xc5\xb8\xbf",
--	}, {
--		.plaintext = "Tiger",
--		.psize	= 5,
--		.digest = "\x9f\x00\xf5\x99\x07\x23\x00\xdd"
--			  "\x27\x6a\xbb\x38\xc8\xeb\x6d\xec",
--	}, {
--		.plaintext = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-",
--		.psize	= 64,
--		.digest = "\x87\xfb\x2a\x90\x83\x85\x1c\xf7"
--			  "\x47\x0d\x2c\xf8\x10\xe6\xdf\x9e",
--	}, {
--		.plaintext = "ABCDEFGHIJKLMNOPQRSTUVWXYZ=abcdefghijklmnopqrstuvwxyz+0123456789",
--		.psize	= 64,
--		.digest = "\x46\x7d\xb8\x08\x63\xeb\xce\x48"
--			  "\x8d\xf1\xcd\x12\x61\x65\x5d\xe9",
--	}, {
--		.plaintext = "Tiger - A Fast New Hash Function, "
--			   "by Ross Anderson and Eli Biham, "
--			   "proceedings of Fast Software Encryption 3, "
--			   "Cambridge, 1996.",
--		.psize  = 125,
--		.digest = "\x3d\x9a\xeb\x03\xd1\xbd\x1a\x63"
--			  "\x57\xb2\x77\x4d\xfd\x6d\x5b\x24",
--	},
--};
--
- static const struct hash_testvec ghash_tv_template[] =
- {
- 	{
-diff --git a/crypto/tgr192.c b/crypto/tgr192.c
+@@ -138,7 +138,6 @@ obj-$(CONFIG_CRYPTO_TEA) += tea.o
+ obj-$(CONFIG_CRYPTO_KHAZAD) += khazad.o
+ obj-$(CONFIG_CRYPTO_ANUBIS) += anubis.o
+ obj-$(CONFIG_CRYPTO_SEED) += seed.o
+-obj-$(CONFIG_CRYPTO_SALSA20) += salsa20_generic.o
+ obj-$(CONFIG_CRYPTO_CHACHA20) += chacha_generic.o
+ obj-$(CONFIG_CRYPTO_POLY1305) += poly1305_generic.o
+ obj-$(CONFIG_CRYPTO_DEFLATE) += deflate.o
+diff --git a/crypto/salsa20_generic.c b/crypto/salsa20_generic.c
 deleted file mode 100644
-index aa29c529b44e..000000000000
---- a/crypto/tgr192.c
+index 3418869dabef..000000000000
+--- a/crypto/salsa20_generic.c
 +++ /dev/null
-@@ -1,682 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
+@@ -1,212 +0,0 @@
 -/*
-- * Cryptographic API.
+- * Salsa20: Salsa20 stream cipher algorithm
 - *
-- * Tiger hashing Algorithm
+- * Copyright (c) 2007 Tan Swee Heng <thesweeheng@gmail.com>
 - *
-- *      Copyright (C) 1998 Free Software Foundation, Inc.
+- * Derived from:
+- * - salsa20.c: Public domain C code by Daniel J. Bernstein <djb@cr.yp.to>
 - *
-- * The Tiger algorithm was developed by Ross Anderson and Eli Biham.
-- * It was optimized for 64-bit processors while still delievering
-- * decent performance on 32 and 16-bit processors.
+- * Salsa20 is a stream cipher candidate in eSTREAM, the ECRYPT Stream
+- * Cipher Project. It is designed by Daniel J. Bernstein <djb@cr.yp.to>.
+- * More information about eSTREAM and Salsa20 can be found here:
+- *   https://www.ecrypt.eu.org/stream/
+- *   https://cr.yp.to/snuffle.html
 - *
-- * This version is derived from the GnuPG implementation and the
-- * Tiger-Perl interface written by Rafael Sevilla
+- * This program is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License as published by the Free
+- * Software Foundation; either version 2 of the License, or (at your option)
+- * any later version.
 - *
-- * Adapted for Linux Kernel Crypto  by Aaron Grothe 
-- * ajgrothe@yahoo.com, February 22, 2005
 - */
--#include <crypto/internal/hash.h>
--#include <linux/init.h>
--#include <linux/module.h>
--#include <linux/mm.h>
--#include <linux/types.h>
--#include <asm/byteorder.h>
+-
 -#include <asm/unaligned.h>
+-#include <crypto/internal/skcipher.h>
+-#include <linux/module.h>
 -
--#define TGR192_DIGEST_SIZE 24
--#define TGR160_DIGEST_SIZE 20
--#define TGR128_DIGEST_SIZE 16
+-#define SALSA20_IV_SIZE        8
+-#define SALSA20_MIN_KEY_SIZE  16
+-#define SALSA20_MAX_KEY_SIZE  32
+-#define SALSA20_BLOCK_SIZE    64
 -
--#define TGR192_BLOCK_SIZE  64
--
--struct tgr192_ctx {
--	u64 a, b, c;
--	u8 hash[64];
--	int count;
--	u32 nblocks;
+-struct salsa20_ctx {
+-	u32 initial_state[16];
 -};
 -
--static const u64 sbox1[256] = {
--	0x02aab17cf7e90c5eULL, 0xac424b03e243a8ecULL, 0x72cd5be30dd5fcd3ULL,
--	0x6d019b93f6f97f3aULL, 0xcd9978ffd21f9193ULL, 0x7573a1c9708029e2ULL,
--	0xb164326b922a83c3ULL, 0x46883eee04915870ULL, 0xeaace3057103ece6ULL,
--	0xc54169b808a3535cULL, 0x4ce754918ddec47cULL, 0x0aa2f4dfdc0df40cULL,
--	0x10b76f18a74dbefaULL, 0xc6ccb6235ad1ab6aULL, 0x13726121572fe2ffULL,
--	0x1a488c6f199d921eULL, 0x4bc9f9f4da0007caULL, 0x26f5e6f6e85241c7ULL,
--	0x859079dbea5947b6ULL, 0x4f1885c5c99e8c92ULL, 0xd78e761ea96f864bULL,
--	0x8e36428c52b5c17dULL, 0x69cf6827373063c1ULL, 0xb607c93d9bb4c56eULL,
--	0x7d820e760e76b5eaULL, 0x645c9cc6f07fdc42ULL, 0xbf38a078243342e0ULL,
--	0x5f6b343c9d2e7d04ULL, 0xf2c28aeb600b0ec6ULL, 0x6c0ed85f7254bcacULL,
--	0x71592281a4db4fe5ULL, 0x1967fa69ce0fed9fULL, 0xfd5293f8b96545dbULL,
--	0xc879e9d7f2a7600bULL, 0x860248920193194eULL, 0xa4f9533b2d9cc0b3ULL,
--	0x9053836c15957613ULL, 0xdb6dcf8afc357bf1ULL, 0x18beea7a7a370f57ULL,
--	0x037117ca50b99066ULL, 0x6ab30a9774424a35ULL, 0xf4e92f02e325249bULL,
--	0x7739db07061ccae1ULL, 0xd8f3b49ceca42a05ULL, 0xbd56be3f51382f73ULL,
--	0x45faed5843b0bb28ULL, 0x1c813d5c11bf1f83ULL, 0x8af0e4b6d75fa169ULL,
--	0x33ee18a487ad9999ULL, 0x3c26e8eab1c94410ULL, 0xb510102bc0a822f9ULL,
--	0x141eef310ce6123bULL, 0xfc65b90059ddb154ULL, 0xe0158640c5e0e607ULL,
--	0x884e079826c3a3cfULL, 0x930d0d9523c535fdULL, 0x35638d754e9a2b00ULL,
--	0x4085fccf40469dd5ULL, 0xc4b17ad28be23a4cULL, 0xcab2f0fc6a3e6a2eULL,
--	0x2860971a6b943fcdULL, 0x3dde6ee212e30446ULL, 0x6222f32ae01765aeULL,
--	0x5d550bb5478308feULL, 0xa9efa98da0eda22aULL, 0xc351a71686c40da7ULL,
--	0x1105586d9c867c84ULL, 0xdcffee85fda22853ULL, 0xccfbd0262c5eef76ULL,
--	0xbaf294cb8990d201ULL, 0xe69464f52afad975ULL, 0x94b013afdf133e14ULL,
--	0x06a7d1a32823c958ULL, 0x6f95fe5130f61119ULL, 0xd92ab34e462c06c0ULL,
--	0xed7bde33887c71d2ULL, 0x79746d6e6518393eULL, 0x5ba419385d713329ULL,
--	0x7c1ba6b948a97564ULL, 0x31987c197bfdac67ULL, 0xde6c23c44b053d02ULL,
--	0x581c49fed002d64dULL, 0xdd474d6338261571ULL, 0xaa4546c3e473d062ULL,
--	0x928fce349455f860ULL, 0x48161bbacaab94d9ULL, 0x63912430770e6f68ULL,
--	0x6ec8a5e602c6641cULL, 0x87282515337ddd2bULL, 0x2cda6b42034b701bULL,
--	0xb03d37c181cb096dULL, 0xe108438266c71c6fULL, 0x2b3180c7eb51b255ULL,
--	0xdf92b82f96c08bbcULL, 0x5c68c8c0a632f3baULL, 0x5504cc861c3d0556ULL,
--	0xabbfa4e55fb26b8fULL, 0x41848b0ab3baceb4ULL, 0xb334a273aa445d32ULL,
--	0xbca696f0a85ad881ULL, 0x24f6ec65b528d56cULL, 0x0ce1512e90f4524aULL,
--	0x4e9dd79d5506d35aULL, 0x258905fac6ce9779ULL, 0x2019295b3e109b33ULL,
--	0xf8a9478b73a054ccULL, 0x2924f2f934417eb0ULL, 0x3993357d536d1bc4ULL,
--	0x38a81ac21db6ff8bULL, 0x47c4fbf17d6016bfULL, 0x1e0faadd7667e3f5ULL,
--	0x7abcff62938beb96ULL, 0xa78dad948fc179c9ULL, 0x8f1f98b72911e50dULL,
--	0x61e48eae27121a91ULL, 0x4d62f7ad31859808ULL, 0xeceba345ef5ceaebULL,
--	0xf5ceb25ebc9684ceULL, 0xf633e20cb7f76221ULL, 0xa32cdf06ab8293e4ULL,
--	0x985a202ca5ee2ca4ULL, 0xcf0b8447cc8a8fb1ULL, 0x9f765244979859a3ULL,
--	0xa8d516b1a1240017ULL, 0x0bd7ba3ebb5dc726ULL, 0xe54bca55b86adb39ULL,
--	0x1d7a3afd6c478063ULL, 0x519ec608e7669eddULL, 0x0e5715a2d149aa23ULL,
--	0x177d4571848ff194ULL, 0xeeb55f3241014c22ULL, 0x0f5e5ca13a6e2ec2ULL,
--	0x8029927b75f5c361ULL, 0xad139fabc3d6e436ULL, 0x0d5df1a94ccf402fULL,
--	0x3e8bd948bea5dfc8ULL, 0xa5a0d357bd3ff77eULL, 0xa2d12e251f74f645ULL,
--	0x66fd9e525e81a082ULL, 0x2e0c90ce7f687a49ULL, 0xc2e8bcbeba973bc5ULL,
--	0x000001bce509745fULL, 0x423777bbe6dab3d6ULL, 0xd1661c7eaef06eb5ULL,
--	0xa1781f354daacfd8ULL, 0x2d11284a2b16affcULL, 0xf1fc4f67fa891d1fULL,
--	0x73ecc25dcb920adaULL, 0xae610c22c2a12651ULL, 0x96e0a810d356b78aULL,
--	0x5a9a381f2fe7870fULL, 0xd5ad62ede94e5530ULL, 0xd225e5e8368d1427ULL,
--	0x65977b70c7af4631ULL, 0x99f889b2de39d74fULL, 0x233f30bf54e1d143ULL,
--	0x9a9675d3d9a63c97ULL, 0x5470554ff334f9a8ULL, 0x166acb744a4f5688ULL,
--	0x70c74caab2e4aeadULL, 0xf0d091646f294d12ULL, 0x57b82a89684031d1ULL,
--	0xefd95a5a61be0b6bULL, 0x2fbd12e969f2f29aULL, 0x9bd37013feff9fe8ULL,
--	0x3f9b0404d6085a06ULL, 0x4940c1f3166cfe15ULL, 0x09542c4dcdf3defbULL,
--	0xb4c5218385cd5ce3ULL, 0xc935b7dc4462a641ULL, 0x3417f8a68ed3b63fULL,
--	0xb80959295b215b40ULL, 0xf99cdaef3b8c8572ULL, 0x018c0614f8fcb95dULL,
--	0x1b14accd1a3acdf3ULL, 0x84d471f200bb732dULL, 0xc1a3110e95e8da16ULL,
--	0x430a7220bf1a82b8ULL, 0xb77e090d39df210eULL, 0x5ef4bd9f3cd05e9dULL,
--	0x9d4ff6da7e57a444ULL, 0xda1d60e183d4a5f8ULL, 0xb287c38417998e47ULL,
--	0xfe3edc121bb31886ULL, 0xc7fe3ccc980ccbefULL, 0xe46fb590189bfd03ULL,
--	0x3732fd469a4c57dcULL, 0x7ef700a07cf1ad65ULL, 0x59c64468a31d8859ULL,
--	0x762fb0b4d45b61f6ULL, 0x155baed099047718ULL, 0x68755e4c3d50baa6ULL,
--	0xe9214e7f22d8b4dfULL, 0x2addbf532eac95f4ULL, 0x32ae3909b4bd0109ULL,
--	0x834df537b08e3450ULL, 0xfa209da84220728dULL, 0x9e691d9b9efe23f7ULL,
--	0x0446d288c4ae8d7fULL, 0x7b4cc524e169785bULL, 0x21d87f0135ca1385ULL,
--	0xcebb400f137b8aa5ULL, 0x272e2b66580796beULL, 0x3612264125c2b0deULL,
--	0x057702bdad1efbb2ULL, 0xd4babb8eacf84be9ULL, 0x91583139641bc67bULL,
--	0x8bdc2de08036e024ULL, 0x603c8156f49f68edULL, 0xf7d236f7dbef5111ULL,
--	0x9727c4598ad21e80ULL, 0xa08a0896670a5fd7ULL, 0xcb4a8f4309eba9cbULL,
--	0x81af564b0f7036a1ULL, 0xc0b99aa778199abdULL, 0x959f1ec83fc8e952ULL,
--	0x8c505077794a81b9ULL, 0x3acaaf8f056338f0ULL, 0x07b43f50627a6778ULL,
--	0x4a44ab49f5eccc77ULL, 0x3bc3d6e4b679ee98ULL, 0x9cc0d4d1cf14108cULL,
--	0x4406c00b206bc8a0ULL, 0x82a18854c8d72d89ULL, 0x67e366b35c3c432cULL,
--	0xb923dd61102b37f2ULL, 0x56ab2779d884271dULL, 0xbe83e1b0ff1525afULL,
--	0xfb7c65d4217e49a9ULL, 0x6bdbe0e76d48e7d4ULL, 0x08df828745d9179eULL,
--	0x22ea6a9add53bd34ULL, 0xe36e141c5622200aULL, 0x7f805d1b8cb750eeULL,
--	0xafe5c7a59f58e837ULL, 0xe27f996a4fb1c23cULL, 0xd3867dfb0775f0d0ULL,
--	0xd0e673de6e88891aULL, 0x123aeb9eafb86c25ULL, 0x30f1d5d5c145b895ULL,
--	0xbb434a2dee7269e7ULL, 0x78cb67ecf931fa38ULL, 0xf33b0372323bbf9cULL,
--	0x52d66336fb279c74ULL, 0x505f33ac0afb4eaaULL, 0xe8a5cd99a2cce187ULL,
--	0x534974801e2d30bbULL, 0x8d2d5711d5876d90ULL, 0x1f1a412891bc038eULL,
--	0xd6e2e71d82e56648ULL, 0x74036c3a497732b7ULL, 0x89b67ed96361f5abULL,
--	0xffed95d8f1ea02a2ULL, 0xe72b3bd61464d43dULL, 0xa6300f170bdc4820ULL,
--	0xebc18760ed78a77aULL
--};
--
--static const u64 sbox2[256] = {
--	0xe6a6be5a05a12138ULL, 0xb5a122a5b4f87c98ULL, 0x563c6089140b6990ULL,
--	0x4c46cb2e391f5dd5ULL, 0xd932addbc9b79434ULL, 0x08ea70e42015aff5ULL,
--	0xd765a6673e478cf1ULL, 0xc4fb757eab278d99ULL, 0xdf11c6862d6e0692ULL,
--	0xddeb84f10d7f3b16ULL, 0x6f2ef604a665ea04ULL, 0x4a8e0f0ff0e0dfb3ULL,
--	0xa5edeef83dbcba51ULL, 0xfc4f0a2a0ea4371eULL, 0xe83e1da85cb38429ULL,
--	0xdc8ff882ba1b1ce2ULL, 0xcd45505e8353e80dULL, 0x18d19a00d4db0717ULL,
--	0x34a0cfeda5f38101ULL, 0x0be77e518887caf2ULL, 0x1e341438b3c45136ULL,
--	0xe05797f49089ccf9ULL, 0xffd23f9df2591d14ULL, 0x543dda228595c5cdULL,
--	0x661f81fd99052a33ULL, 0x8736e641db0f7b76ULL, 0x15227725418e5307ULL,
--	0xe25f7f46162eb2faULL, 0x48a8b2126c13d9feULL, 0xafdc541792e76eeaULL,
--	0x03d912bfc6d1898fULL, 0x31b1aafa1b83f51bULL, 0xf1ac2796e42ab7d9ULL,
--	0x40a3a7d7fcd2ebacULL, 0x1056136d0afbbcc5ULL, 0x7889e1dd9a6d0c85ULL,
--	0xd33525782a7974aaULL, 0xa7e25d09078ac09bULL, 0xbd4138b3eac6edd0ULL,
--	0x920abfbe71eb9e70ULL, 0xa2a5d0f54fc2625cULL, 0xc054e36b0b1290a3ULL,
--	0xf6dd59ff62fe932bULL, 0x3537354511a8ac7dULL, 0xca845e9172fadcd4ULL,
--	0x84f82b60329d20dcULL, 0x79c62ce1cd672f18ULL, 0x8b09a2add124642cULL,
--	0xd0c1e96a19d9e726ULL, 0x5a786a9b4ba9500cULL, 0x0e020336634c43f3ULL,
--	0xc17b474aeb66d822ULL, 0x6a731ae3ec9baac2ULL, 0x8226667ae0840258ULL,
--	0x67d4567691caeca5ULL, 0x1d94155c4875adb5ULL, 0x6d00fd985b813fdfULL,
--	0x51286efcb774cd06ULL, 0x5e8834471fa744afULL, 0xf72ca0aee761ae2eULL,
--	0xbe40e4cdaee8e09aULL, 0xe9970bbb5118f665ULL, 0x726e4beb33df1964ULL,
--	0x703b000729199762ULL, 0x4631d816f5ef30a7ULL, 0xb880b5b51504a6beULL,
--	0x641793c37ed84b6cULL, 0x7b21ed77f6e97d96ULL, 0x776306312ef96b73ULL,
--	0xae528948e86ff3f4ULL, 0x53dbd7f286a3f8f8ULL, 0x16cadce74cfc1063ULL,
--	0x005c19bdfa52c6ddULL, 0x68868f5d64d46ad3ULL, 0x3a9d512ccf1e186aULL,
--	0x367e62c2385660aeULL, 0xe359e7ea77dcb1d7ULL, 0x526c0773749abe6eULL,
--	0x735ae5f9d09f734bULL, 0x493fc7cc8a558ba8ULL, 0xb0b9c1533041ab45ULL,
--	0x321958ba470a59bdULL, 0x852db00b5f46c393ULL, 0x91209b2bd336b0e5ULL,
--	0x6e604f7d659ef19fULL, 0xb99a8ae2782ccb24ULL, 0xccf52ab6c814c4c7ULL,
--	0x4727d9afbe11727bULL, 0x7e950d0c0121b34dULL, 0x756f435670ad471fULL,
--	0xf5add442615a6849ULL, 0x4e87e09980b9957aULL, 0x2acfa1df50aee355ULL,
--	0xd898263afd2fd556ULL, 0xc8f4924dd80c8fd6ULL, 0xcf99ca3d754a173aULL,
--	0xfe477bacaf91bf3cULL, 0xed5371f6d690c12dULL, 0x831a5c285e687094ULL,
--	0xc5d3c90a3708a0a4ULL, 0x0f7f903717d06580ULL, 0x19f9bb13b8fdf27fULL,
--	0xb1bd6f1b4d502843ULL, 0x1c761ba38fff4012ULL, 0x0d1530c4e2e21f3bULL,
--	0x8943ce69a7372c8aULL, 0xe5184e11feb5ce66ULL, 0x618bdb80bd736621ULL,
--	0x7d29bad68b574d0bULL, 0x81bb613e25e6fe5bULL, 0x071c9c10bc07913fULL,
--	0xc7beeb7909ac2d97ULL, 0xc3e58d353bc5d757ULL, 0xeb017892f38f61e8ULL,
--	0xd4effb9c9b1cc21aULL, 0x99727d26f494f7abULL, 0xa3e063a2956b3e03ULL,
--	0x9d4a8b9a4aa09c30ULL, 0x3f6ab7d500090fb4ULL, 0x9cc0f2a057268ac0ULL,
--	0x3dee9d2dedbf42d1ULL, 0x330f49c87960a972ULL, 0xc6b2720287421b41ULL,
--	0x0ac59ec07c00369cULL, 0xef4eac49cb353425ULL, 0xf450244eef0129d8ULL,
--	0x8acc46e5caf4deb6ULL, 0x2ffeab63989263f7ULL, 0x8f7cb9fe5d7a4578ULL,
--	0x5bd8f7644e634635ULL, 0x427a7315bf2dc900ULL, 0x17d0c4aa2125261cULL,
--	0x3992486c93518e50ULL, 0xb4cbfee0a2d7d4c3ULL, 0x7c75d6202c5ddd8dULL,
--	0xdbc295d8e35b6c61ULL, 0x60b369d302032b19ULL, 0xce42685fdce44132ULL,
--	0x06f3ddb9ddf65610ULL, 0x8ea4d21db5e148f0ULL, 0x20b0fce62fcd496fULL,
--	0x2c1b912358b0ee31ULL, 0xb28317b818f5a308ULL, 0xa89c1e189ca6d2cfULL,
--	0x0c6b18576aaadbc8ULL, 0xb65deaa91299fae3ULL, 0xfb2b794b7f1027e7ULL,
--	0x04e4317f443b5bebULL, 0x4b852d325939d0a6ULL, 0xd5ae6beefb207ffcULL,
--	0x309682b281c7d374ULL, 0xbae309a194c3b475ULL, 0x8cc3f97b13b49f05ULL,
--	0x98a9422ff8293967ULL, 0x244b16b01076ff7cULL, 0xf8bf571c663d67eeULL,
--	0x1f0d6758eee30da1ULL, 0xc9b611d97adeb9b7ULL, 0xb7afd5887b6c57a2ULL,
--	0x6290ae846b984fe1ULL, 0x94df4cdeacc1a5fdULL, 0x058a5bd1c5483affULL,
--	0x63166cc142ba3c37ULL, 0x8db8526eb2f76f40ULL, 0xe10880036f0d6d4eULL,
--	0x9e0523c9971d311dULL, 0x45ec2824cc7cd691ULL, 0x575b8359e62382c9ULL,
--	0xfa9e400dc4889995ULL, 0xd1823ecb45721568ULL, 0xdafd983b8206082fULL,
--	0xaa7d29082386a8cbULL, 0x269fcd4403b87588ULL, 0x1b91f5f728bdd1e0ULL,
--	0xe4669f39040201f6ULL, 0x7a1d7c218cf04adeULL, 0x65623c29d79ce5ceULL,
--	0x2368449096c00bb1ULL, 0xab9bf1879da503baULL, 0xbc23ecb1a458058eULL,
--	0x9a58df01bb401eccULL, 0xa070e868a85f143dULL, 0x4ff188307df2239eULL,
--	0x14d565b41a641183ULL, 0xee13337452701602ULL, 0x950e3dcf3f285e09ULL,
--	0x59930254b9c80953ULL, 0x3bf299408930da6dULL, 0xa955943f53691387ULL,
--	0xa15edecaa9cb8784ULL, 0x29142127352be9a0ULL, 0x76f0371fff4e7afbULL,
--	0x0239f450274f2228ULL, 0xbb073af01d5e868bULL, 0xbfc80571c10e96c1ULL,
--	0xd267088568222e23ULL, 0x9671a3d48e80b5b0ULL, 0x55b5d38ae193bb81ULL,
--	0x693ae2d0a18b04b8ULL, 0x5c48b4ecadd5335fULL, 0xfd743b194916a1caULL,
--	0x2577018134be98c4ULL, 0xe77987e83c54a4adULL, 0x28e11014da33e1b9ULL,
--	0x270cc59e226aa213ULL, 0x71495f756d1a5f60ULL, 0x9be853fb60afef77ULL,
--	0xadc786a7f7443dbfULL, 0x0904456173b29a82ULL, 0x58bc7a66c232bd5eULL,
--	0xf306558c673ac8b2ULL, 0x41f639c6b6c9772aULL, 0x216defe99fda35daULL,
--	0x11640cc71c7be615ULL, 0x93c43694565c5527ULL, 0xea038e6246777839ULL,
--	0xf9abf3ce5a3e2469ULL, 0x741e768d0fd312d2ULL, 0x0144b883ced652c6ULL,
--	0xc20b5a5ba33f8552ULL, 0x1ae69633c3435a9dULL, 0x97a28ca4088cfdecULL,
--	0x8824a43c1e96f420ULL, 0x37612fa66eeea746ULL, 0x6b4cb165f9cf0e5aULL,
--	0x43aa1c06a0abfb4aULL, 0x7f4dc26ff162796bULL, 0x6cbacc8e54ed9b0fULL,
--	0xa6b7ffefd2bb253eULL, 0x2e25bc95b0a29d4fULL, 0x86d6a58bdef1388cULL,
--	0xded74ac576b6f054ULL, 0x8030bdbc2b45805dULL, 0x3c81af70e94d9289ULL,
--	0x3eff6dda9e3100dbULL, 0xb38dc39fdfcc8847ULL, 0x123885528d17b87eULL,
--	0xf2da0ed240b1b642ULL, 0x44cefadcd54bf9a9ULL, 0x1312200e433c7ee6ULL,
--	0x9ffcc84f3a78c748ULL, 0xf0cd1f72248576bbULL, 0xec6974053638cfe4ULL,
--	0x2ba7b67c0cec4e4cULL, 0xac2f4df3e5ce32edULL, 0xcb33d14326ea4c11ULL,
--	0xa4e9044cc77e58bcULL, 0x5f513293d934fcefULL, 0x5dc9645506e55444ULL,
--	0x50de418f317de40aULL, 0x388cb31a69dde259ULL, 0x2db4a83455820a86ULL,
--	0x9010a91e84711ae9ULL, 0x4df7f0b7b1498371ULL, 0xd62a2eabc0977179ULL,
--	0x22fac097aa8d5c0eULL
--};
--
--static const u64 sbox3[256] = {
--	0xf49fcc2ff1daf39bULL, 0x487fd5c66ff29281ULL, 0xe8a30667fcdca83fULL,
--	0x2c9b4be3d2fcce63ULL, 0xda3ff74b93fbbbc2ULL, 0x2fa165d2fe70ba66ULL,
--	0xa103e279970e93d4ULL, 0xbecdec77b0e45e71ULL, 0xcfb41e723985e497ULL,
--	0xb70aaa025ef75017ULL, 0xd42309f03840b8e0ULL, 0x8efc1ad035898579ULL,
--	0x96c6920be2b2abc5ULL, 0x66af4163375a9172ULL, 0x2174abdcca7127fbULL,
--	0xb33ccea64a72ff41ULL, 0xf04a4933083066a5ULL, 0x8d970acdd7289af5ULL,
--	0x8f96e8e031c8c25eULL, 0xf3fec02276875d47ULL, 0xec7bf310056190ddULL,
--	0xf5adb0aebb0f1491ULL, 0x9b50f8850fd58892ULL, 0x4975488358b74de8ULL,
--	0xa3354ff691531c61ULL, 0x0702bbe481d2c6eeULL, 0x89fb24057deded98ULL,
--	0xac3075138596e902ULL, 0x1d2d3580172772edULL, 0xeb738fc28e6bc30dULL,
--	0x5854ef8f63044326ULL, 0x9e5c52325add3bbeULL, 0x90aa53cf325c4623ULL,
--	0xc1d24d51349dd067ULL, 0x2051cfeea69ea624ULL, 0x13220f0a862e7e4fULL,
--	0xce39399404e04864ULL, 0xd9c42ca47086fcb7ULL, 0x685ad2238a03e7ccULL,
--	0x066484b2ab2ff1dbULL, 0xfe9d5d70efbf79ecULL, 0x5b13b9dd9c481854ULL,
--	0x15f0d475ed1509adULL, 0x0bebcd060ec79851ULL, 0xd58c6791183ab7f8ULL,
--	0xd1187c5052f3eee4ULL, 0xc95d1192e54e82ffULL, 0x86eea14cb9ac6ca2ULL,
--	0x3485beb153677d5dULL, 0xdd191d781f8c492aULL, 0xf60866baa784ebf9ULL,
--	0x518f643ba2d08c74ULL, 0x8852e956e1087c22ULL, 0xa768cb8dc410ae8dULL,
--	0x38047726bfec8e1aULL, 0xa67738b4cd3b45aaULL, 0xad16691cec0dde19ULL,
--	0xc6d4319380462e07ULL, 0xc5a5876d0ba61938ULL, 0x16b9fa1fa58fd840ULL,
--	0x188ab1173ca74f18ULL, 0xabda2f98c99c021fULL, 0x3e0580ab134ae816ULL,
--	0x5f3b05b773645abbULL, 0x2501a2be5575f2f6ULL, 0x1b2f74004e7e8ba9ULL,
--	0x1cd7580371e8d953ULL, 0x7f6ed89562764e30ULL, 0xb15926ff596f003dULL,
--	0x9f65293da8c5d6b9ULL, 0x6ecef04dd690f84cULL, 0x4782275fff33af88ULL,
--	0xe41433083f820801ULL, 0xfd0dfe409a1af9b5ULL, 0x4325a3342cdb396bULL,
--	0x8ae77e62b301b252ULL, 0xc36f9e9f6655615aULL, 0x85455a2d92d32c09ULL,
--	0xf2c7dea949477485ULL, 0x63cfb4c133a39ebaULL, 0x83b040cc6ebc5462ULL,
--	0x3b9454c8fdb326b0ULL, 0x56f56a9e87ffd78cULL, 0x2dc2940d99f42bc6ULL,
--	0x98f7df096b096e2dULL, 0x19a6e01e3ad852bfULL, 0x42a99ccbdbd4b40bULL,
--	0xa59998af45e9c559ULL, 0x366295e807d93186ULL, 0x6b48181bfaa1f773ULL,
--	0x1fec57e2157a0a1dULL, 0x4667446af6201ad5ULL, 0xe615ebcacfb0f075ULL,
--	0xb8f31f4f68290778ULL, 0x22713ed6ce22d11eULL, 0x3057c1a72ec3c93bULL,
--	0xcb46acc37c3f1f2fULL, 0xdbb893fd02aaf50eULL, 0x331fd92e600b9fcfULL,
--	0xa498f96148ea3ad6ULL, 0xa8d8426e8b6a83eaULL, 0xa089b274b7735cdcULL,
--	0x87f6b3731e524a11ULL, 0x118808e5cbc96749ULL, 0x9906e4c7b19bd394ULL,
--	0xafed7f7e9b24a20cULL, 0x6509eadeeb3644a7ULL, 0x6c1ef1d3e8ef0edeULL,
--	0xb9c97d43e9798fb4ULL, 0xa2f2d784740c28a3ULL, 0x7b8496476197566fULL,
--	0x7a5be3e6b65f069dULL, 0xf96330ed78be6f10ULL, 0xeee60de77a076a15ULL,
--	0x2b4bee4aa08b9bd0ULL, 0x6a56a63ec7b8894eULL, 0x02121359ba34fef4ULL,
--	0x4cbf99f8283703fcULL, 0x398071350caf30c8ULL, 0xd0a77a89f017687aULL,
--	0xf1c1a9eb9e423569ULL, 0x8c7976282dee8199ULL, 0x5d1737a5dd1f7abdULL,
--	0x4f53433c09a9fa80ULL, 0xfa8b0c53df7ca1d9ULL, 0x3fd9dcbc886ccb77ULL,
--	0xc040917ca91b4720ULL, 0x7dd00142f9d1dcdfULL, 0x8476fc1d4f387b58ULL,
--	0x23f8e7c5f3316503ULL, 0x032a2244e7e37339ULL, 0x5c87a5d750f5a74bULL,
--	0x082b4cc43698992eULL, 0xdf917becb858f63cULL, 0x3270b8fc5bf86ddaULL,
--	0x10ae72bb29b5dd76ULL, 0x576ac94e7700362bULL, 0x1ad112dac61efb8fULL,
--	0x691bc30ec5faa427ULL, 0xff246311cc327143ULL, 0x3142368e30e53206ULL,
--	0x71380e31e02ca396ULL, 0x958d5c960aad76f1ULL, 0xf8d6f430c16da536ULL,
--	0xc8ffd13f1be7e1d2ULL, 0x7578ae66004ddbe1ULL, 0x05833f01067be646ULL,
--	0xbb34b5ad3bfe586dULL, 0x095f34c9a12b97f0ULL, 0x247ab64525d60ca8ULL,
--	0xdcdbc6f3017477d1ULL, 0x4a2e14d4decad24dULL, 0xbdb5e6d9be0a1eebULL,
--	0x2a7e70f7794301abULL, 0xdef42d8a270540fdULL, 0x01078ec0a34c22c1ULL,
--	0xe5de511af4c16387ULL, 0x7ebb3a52bd9a330aULL, 0x77697857aa7d6435ULL,
--	0x004e831603ae4c32ULL, 0xe7a21020ad78e312ULL, 0x9d41a70c6ab420f2ULL,
--	0x28e06c18ea1141e6ULL, 0xd2b28cbd984f6b28ULL, 0x26b75f6c446e9d83ULL,
--	0xba47568c4d418d7fULL, 0xd80badbfe6183d8eULL, 0x0e206d7f5f166044ULL,
--	0xe258a43911cbca3eULL, 0x723a1746b21dc0bcULL, 0xc7caa854f5d7cdd3ULL,
--	0x7cac32883d261d9cULL, 0x7690c26423ba942cULL, 0x17e55524478042b8ULL,
--	0xe0be477656a2389fULL, 0x4d289b5e67ab2da0ULL, 0x44862b9c8fbbfd31ULL,
--	0xb47cc8049d141365ULL, 0x822c1b362b91c793ULL, 0x4eb14655fb13dfd8ULL,
--	0x1ecbba0714e2a97bULL, 0x6143459d5cde5f14ULL, 0x53a8fbf1d5f0ac89ULL,
--	0x97ea04d81c5e5b00ULL, 0x622181a8d4fdb3f3ULL, 0xe9bcd341572a1208ULL,
--	0x1411258643cce58aULL, 0x9144c5fea4c6e0a4ULL, 0x0d33d06565cf620fULL,
--	0x54a48d489f219ca1ULL, 0xc43e5eac6d63c821ULL, 0xa9728b3a72770dafULL,
--	0xd7934e7b20df87efULL, 0xe35503b61a3e86e5ULL, 0xcae321fbc819d504ULL,
--	0x129a50b3ac60bfa6ULL, 0xcd5e68ea7e9fb6c3ULL, 0xb01c90199483b1c7ULL,
--	0x3de93cd5c295376cULL, 0xaed52edf2ab9ad13ULL, 0x2e60f512c0a07884ULL,
--	0xbc3d86a3e36210c9ULL, 0x35269d9b163951ceULL, 0x0c7d6e2ad0cdb5faULL,
--	0x59e86297d87f5733ULL, 0x298ef221898db0e7ULL, 0x55000029d1a5aa7eULL,
--	0x8bc08ae1b5061b45ULL, 0xc2c31c2b6c92703aULL, 0x94cc596baf25ef42ULL,
--	0x0a1d73db22540456ULL, 0x04b6a0f9d9c4179aULL, 0xeffdafa2ae3d3c60ULL,
--	0xf7c8075bb49496c4ULL, 0x9cc5c7141d1cd4e3ULL, 0x78bd1638218e5534ULL,
--	0xb2f11568f850246aULL, 0xedfabcfa9502bc29ULL, 0x796ce5f2da23051bULL,
--	0xaae128b0dc93537cULL, 0x3a493da0ee4b29aeULL, 0xb5df6b2c416895d7ULL,
--	0xfcabbd25122d7f37ULL, 0x70810b58105dc4b1ULL, 0xe10fdd37f7882a90ULL,
--	0x524dcab5518a3f5cULL, 0x3c9e85878451255bULL, 0x4029828119bd34e2ULL,
--	0x74a05b6f5d3ceccbULL, 0xb610021542e13ecaULL, 0x0ff979d12f59e2acULL,
--	0x6037da27e4f9cc50ULL, 0x5e92975a0df1847dULL, 0xd66de190d3e623feULL,
--	0x5032d6b87b568048ULL, 0x9a36b7ce8235216eULL, 0x80272a7a24f64b4aULL,
--	0x93efed8b8c6916f7ULL, 0x37ddbff44cce1555ULL, 0x4b95db5d4b99bd25ULL,
--	0x92d3fda169812fc0ULL, 0xfb1a4a9a90660bb6ULL, 0x730c196946a4b9b2ULL,
--	0x81e289aa7f49da68ULL, 0x64669a0f83b1a05fULL, 0x27b3ff7d9644f48bULL,
--	0xcc6b615c8db675b3ULL, 0x674f20b9bcebbe95ULL, 0x6f31238275655982ULL,
--	0x5ae488713e45cf05ULL, 0xbf619f9954c21157ULL, 0xeabac46040a8eae9ULL,
--	0x454c6fe9f2c0c1cdULL, 0x419cf6496412691cULL, 0xd3dc3bef265b0f70ULL,
--	0x6d0e60f5c3578a9eULL
--};
--
--static const u64 sbox4[256] = {
--	0x5b0e608526323c55ULL, 0x1a46c1a9fa1b59f5ULL, 0xa9e245a17c4c8ffaULL,
--	0x65ca5159db2955d7ULL, 0x05db0a76ce35afc2ULL, 0x81eac77ea9113d45ULL,
--	0x528ef88ab6ac0a0dULL, 0xa09ea253597be3ffULL, 0x430ddfb3ac48cd56ULL,
--	0xc4b3a67af45ce46fULL, 0x4ececfd8fbe2d05eULL, 0x3ef56f10b39935f0ULL,
--	0x0b22d6829cd619c6ULL, 0x17fd460a74df2069ULL, 0x6cf8cc8e8510ed40ULL,
--	0xd6c824bf3a6ecaa7ULL, 0x61243d581a817049ULL, 0x048bacb6bbc163a2ULL,
--	0xd9a38ac27d44cc32ULL, 0x7fddff5baaf410abULL, 0xad6d495aa804824bULL,
--	0xe1a6a74f2d8c9f94ULL, 0xd4f7851235dee8e3ULL, 0xfd4b7f886540d893ULL,
--	0x247c20042aa4bfdaULL, 0x096ea1c517d1327cULL, 0xd56966b4361a6685ULL,
--	0x277da5c31221057dULL, 0x94d59893a43acff7ULL, 0x64f0c51ccdc02281ULL,
--	0x3d33bcc4ff6189dbULL, 0xe005cb184ce66af1ULL, 0xff5ccd1d1db99beaULL,
--	0xb0b854a7fe42980fULL, 0x7bd46a6a718d4b9fULL, 0xd10fa8cc22a5fd8cULL,
--	0xd31484952be4bd31ULL, 0xc7fa975fcb243847ULL, 0x4886ed1e5846c407ULL,
--	0x28cddb791eb70b04ULL, 0xc2b00be2f573417fULL, 0x5c9590452180f877ULL,
--	0x7a6bddfff370eb00ULL, 0xce509e38d6d9d6a4ULL, 0xebeb0f00647fa702ULL,
--	0x1dcc06cf76606f06ULL, 0xe4d9f28ba286ff0aULL, 0xd85a305dc918c262ULL,
--	0x475b1d8732225f54ULL, 0x2d4fb51668ccb5feULL, 0xa679b9d9d72bba20ULL,
--	0x53841c0d912d43a5ULL, 0x3b7eaa48bf12a4e8ULL, 0x781e0e47f22f1ddfULL,
--	0xeff20ce60ab50973ULL, 0x20d261d19dffb742ULL, 0x16a12b03062a2e39ULL,
--	0x1960eb2239650495ULL, 0x251c16fed50eb8b8ULL, 0x9ac0c330f826016eULL,
--	0xed152665953e7671ULL, 0x02d63194a6369570ULL, 0x5074f08394b1c987ULL,
--	0x70ba598c90b25ce1ULL, 0x794a15810b9742f6ULL, 0x0d5925e9fcaf8c6cULL,
--	0x3067716cd868744eULL, 0x910ab077e8d7731bULL, 0x6a61bbdb5ac42f61ULL,
--	0x93513efbf0851567ULL, 0xf494724b9e83e9d5ULL, 0xe887e1985c09648dULL,
--	0x34b1d3c675370cfdULL, 0xdc35e433bc0d255dULL, 0xd0aab84234131be0ULL,
--	0x08042a50b48b7eafULL, 0x9997c4ee44a3ab35ULL, 0x829a7b49201799d0ULL,
--	0x263b8307b7c54441ULL, 0x752f95f4fd6a6ca6ULL, 0x927217402c08c6e5ULL,
--	0x2a8ab754a795d9eeULL, 0xa442f7552f72943dULL, 0x2c31334e19781208ULL,
--	0x4fa98d7ceaee6291ULL, 0x55c3862f665db309ULL, 0xbd0610175d53b1f3ULL,
--	0x46fe6cb840413f27ULL, 0x3fe03792df0cfa59ULL, 0xcfe700372eb85e8fULL,
--	0xa7be29e7adbce118ULL, 0xe544ee5cde8431ddULL, 0x8a781b1b41f1873eULL,
--	0xa5c94c78a0d2f0e7ULL, 0x39412e2877b60728ULL, 0xa1265ef3afc9a62cULL,
--	0xbcc2770c6a2506c5ULL, 0x3ab66dd5dce1ce12ULL, 0xe65499d04a675b37ULL,
--	0x7d8f523481bfd216ULL, 0x0f6f64fcec15f389ULL, 0x74efbe618b5b13c8ULL,
--	0xacdc82b714273e1dULL, 0xdd40bfe003199d17ULL, 0x37e99257e7e061f8ULL,
--	0xfa52626904775aaaULL, 0x8bbbf63a463d56f9ULL, 0xf0013f1543a26e64ULL,
--	0xa8307e9f879ec898ULL, 0xcc4c27a4150177ccULL, 0x1b432f2cca1d3348ULL,
--	0xde1d1f8f9f6fa013ULL, 0x606602a047a7ddd6ULL, 0xd237ab64cc1cb2c7ULL,
--	0x9b938e7225fcd1d3ULL, 0xec4e03708e0ff476ULL, 0xfeb2fbda3d03c12dULL,
--	0xae0bced2ee43889aULL, 0x22cb8923ebfb4f43ULL, 0x69360d013cf7396dULL,
--	0x855e3602d2d4e022ULL, 0x073805bad01f784cULL, 0x33e17a133852f546ULL,
--	0xdf4874058ac7b638ULL, 0xba92b29c678aa14aULL, 0x0ce89fc76cfaadcdULL,
--	0x5f9d4e0908339e34ULL, 0xf1afe9291f5923b9ULL, 0x6e3480f60f4a265fULL,
--	0xeebf3a2ab29b841cULL, 0xe21938a88f91b4adULL, 0x57dfeff845c6d3c3ULL,
--	0x2f006b0bf62caaf2ULL, 0x62f479ef6f75ee78ULL, 0x11a55ad41c8916a9ULL,
--	0xf229d29084fed453ULL, 0x42f1c27b16b000e6ULL, 0x2b1f76749823c074ULL,
--	0x4b76eca3c2745360ULL, 0x8c98f463b91691bdULL, 0x14bcc93cf1ade66aULL,
--	0x8885213e6d458397ULL, 0x8e177df0274d4711ULL, 0xb49b73b5503f2951ULL,
--	0x10168168c3f96b6bULL, 0x0e3d963b63cab0aeULL, 0x8dfc4b5655a1db14ULL,
--	0xf789f1356e14de5cULL, 0x683e68af4e51dac1ULL, 0xc9a84f9d8d4b0fd9ULL,
--	0x3691e03f52a0f9d1ULL, 0x5ed86e46e1878e80ULL, 0x3c711a0e99d07150ULL,
--	0x5a0865b20c4e9310ULL, 0x56fbfc1fe4f0682eULL, 0xea8d5de3105edf9bULL,
--	0x71abfdb12379187aULL, 0x2eb99de1bee77b9cULL, 0x21ecc0ea33cf4523ULL,
--	0x59a4d7521805c7a1ULL, 0x3896f5eb56ae7c72ULL, 0xaa638f3db18f75dcULL,
--	0x9f39358dabe9808eULL, 0xb7defa91c00b72acULL, 0x6b5541fd62492d92ULL,
--	0x6dc6dee8f92e4d5bULL, 0x353f57abc4beea7eULL, 0x735769d6da5690ceULL,
--	0x0a234aa642391484ULL, 0xf6f9508028f80d9dULL, 0xb8e319a27ab3f215ULL,
--	0x31ad9c1151341a4dULL, 0x773c22a57bef5805ULL, 0x45c7561a07968633ULL,
--	0xf913da9e249dbe36ULL, 0xda652d9b78a64c68ULL, 0x4c27a97f3bc334efULL,
--	0x76621220e66b17f4ULL, 0x967743899acd7d0bULL, 0xf3ee5bcae0ed6782ULL,
--	0x409f753600c879fcULL, 0x06d09a39b5926db6ULL, 0x6f83aeb0317ac588ULL,
--	0x01e6ca4a86381f21ULL, 0x66ff3462d19f3025ULL, 0x72207c24ddfd3bfbULL,
--	0x4af6b6d3e2ece2ebULL, 0x9c994dbec7ea08deULL, 0x49ace597b09a8bc4ULL,
--	0xb38c4766cf0797baULL, 0x131b9373c57c2a75ULL, 0xb1822cce61931e58ULL,
--	0x9d7555b909ba1c0cULL, 0x127fafdd937d11d2ULL, 0x29da3badc66d92e4ULL,
--	0xa2c1d57154c2ecbcULL, 0x58c5134d82f6fe24ULL, 0x1c3ae3515b62274fULL,
--	0xe907c82e01cb8126ULL, 0xf8ed091913e37fcbULL, 0x3249d8f9c80046c9ULL,
--	0x80cf9bede388fb63ULL, 0x1881539a116cf19eULL, 0x5103f3f76bd52457ULL,
--	0x15b7e6f5ae47f7a8ULL, 0xdbd7c6ded47e9ccfULL, 0x44e55c410228bb1aULL,
--	0xb647d4255edb4e99ULL, 0x5d11882bb8aafc30ULL, 0xf5098bbb29d3212aULL,
--	0x8fb5ea14e90296b3ULL, 0x677b942157dd025aULL, 0xfb58e7c0a390acb5ULL,
--	0x89d3674c83bd4a01ULL, 0x9e2da4df4bf3b93bULL, 0xfcc41e328cab4829ULL,
--	0x03f38c96ba582c52ULL, 0xcad1bdbd7fd85db2ULL, 0xbbb442c16082ae83ULL,
--	0xb95fe86ba5da9ab0ULL, 0xb22e04673771a93fULL, 0x845358c9493152d8ULL,
--	0xbe2a488697b4541eULL, 0x95a2dc2dd38e6966ULL, 0xc02c11ac923c852bULL,
--	0x2388b1990df2a87bULL, 0x7c8008fa1b4f37beULL, 0x1f70d0c84d54e503ULL,
--	0x5490adec7ece57d4ULL, 0x002b3c27d9063a3aULL, 0x7eaea3848030a2bfULL,
--	0xc602326ded2003c0ULL, 0x83a7287d69a94086ULL, 0xc57a5fcb30f57a8aULL,
--	0xb56844e479ebe779ULL, 0xa373b40f05dcbce9ULL, 0xd71a786e88570ee2ULL,
--	0x879cbacdbde8f6a0ULL, 0x976ad1bcc164a32fULL, 0xab21e25e9666d78bULL,
--	0x901063aae5e5c33cULL, 0x9818b34448698d90ULL, 0xe36487ae3e1e8abbULL,
--	0xafbdf931893bdcb4ULL, 0x6345a0dc5fbbd519ULL, 0x8628fe269b9465caULL,
--	0x1e5d01603f9c51ecULL, 0x4de44006a15049b7ULL, 0xbf6c70e5f776cbb1ULL,
--	0x411218f2ef552bedULL, 0xcb0c0708705a36a3ULL, 0xe74d14754f986044ULL,
--	0xcd56d9430ea8280eULL, 0xc12591d7535f5065ULL, 0xc83223f1720aef96ULL,
--	0xc3a0396f7363a51fULL
--};
--
--
--static void tgr192_round(u64 * ra, u64 * rb, u64 * rc, u64 x, int mul)
+-static void salsa20_block(u32 *state, __le32 *stream)
 -{
--	u64 a = *ra;
--	u64 b = *rb;
--	u64 c = *rc;
--
--	c ^= x;
--	a -= sbox1[c         & 0xff] ^ sbox2[(c >> 16) & 0xff]
--	   ^ sbox3[(c >> 32) & 0xff] ^ sbox4[(c >> 48) & 0xff];
--	b += sbox4[(c >>  8) & 0xff] ^ sbox3[(c >> 24) & 0xff]
--	   ^ sbox2[(c >> 40) & 0xff] ^ sbox1[(c >> 56) & 0xff];
--	b *= mul;
--
--	*ra = a;
--	*rb = b;
--	*rc = c;
--}
--
--
--static void tgr192_pass(u64 * ra, u64 * rb, u64 * rc, u64 * x, int mul)
--{
--	u64 a = *ra;
--	u64 b = *rb;
--	u64 c = *rc;
--
--	tgr192_round(&a, &b, &c, x[0], mul);
--	tgr192_round(&b, &c, &a, x[1], mul);
--	tgr192_round(&c, &a, &b, x[2], mul);
--	tgr192_round(&a, &b, &c, x[3], mul);
--	tgr192_round(&b, &c, &a, x[4], mul);
--	tgr192_round(&c, &a, &b, x[5], mul);
--	tgr192_round(&a, &b, &c, x[6], mul);
--	tgr192_round(&b, &c, &a, x[7], mul);
--
--	*ra = a;
--	*rb = b;
--	*rc = c;
--}
--
--
--static void tgr192_key_schedule(u64 * x)
--{
--	x[0] -= x[7] ^ 0xa5a5a5a5a5a5a5a5ULL;
--	x[1] ^= x[0];
--	x[2] += x[1];
--	x[3] -= x[2] ^ ((~x[1]) << 19);
--	x[4] ^= x[3];
--	x[5] += x[4];
--	x[6] -= x[5] ^ ((~x[4]) >> 23);
--	x[7] ^= x[6];
--	x[0] += x[7];
--	x[1] -= x[0] ^ ((~x[7]) << 19);
--	x[2] ^= x[1];
--	x[3] += x[2];
--	x[4] -= x[3] ^ ((~x[2]) >> 23);
--	x[5] ^= x[4];
--	x[6] += x[5];
--	x[7] -= x[6] ^ 0x0123456789abcdefULL;
--}
--
--
--/****************
-- * Transform the message DATA which consists of 512 bytes (8 words)
-- */
--
--static void tgr192_transform(struct tgr192_ctx *tctx, const u8 * data)
--{
--	u64 a, b, c, aa, bb, cc;
--	u64 x[8];
+-	u32 x[16];
 -	int i;
 -
--	for (i = 0; i < 8; i++)
--		x[i] = get_unaligned_le64(data + i * sizeof(__le64));
+-	memcpy(x, state, sizeof(x));
 -
--	/* save */
--	a = aa = tctx->a;
--	b = bb = tctx->b;
--	c = cc = tctx->c;
+-	for (i = 0; i < 20; i += 2) {
+-		x[ 4] ^= rol32((x[ 0] + x[12]),  7);
+-		x[ 8] ^= rol32((x[ 4] + x[ 0]),  9);
+-		x[12] ^= rol32((x[ 8] + x[ 4]), 13);
+-		x[ 0] ^= rol32((x[12] + x[ 8]), 18);
+-		x[ 9] ^= rol32((x[ 5] + x[ 1]),  7);
+-		x[13] ^= rol32((x[ 9] + x[ 5]),  9);
+-		x[ 1] ^= rol32((x[13] + x[ 9]), 13);
+-		x[ 5] ^= rol32((x[ 1] + x[13]), 18);
+-		x[14] ^= rol32((x[10] + x[ 6]),  7);
+-		x[ 2] ^= rol32((x[14] + x[10]),  9);
+-		x[ 6] ^= rol32((x[ 2] + x[14]), 13);
+-		x[10] ^= rol32((x[ 6] + x[ 2]), 18);
+-		x[ 3] ^= rol32((x[15] + x[11]),  7);
+-		x[ 7] ^= rol32((x[ 3] + x[15]),  9);
+-		x[11] ^= rol32((x[ 7] + x[ 3]), 13);
+-		x[15] ^= rol32((x[11] + x[ 7]), 18);
+-		x[ 1] ^= rol32((x[ 0] + x[ 3]),  7);
+-		x[ 2] ^= rol32((x[ 1] + x[ 0]),  9);
+-		x[ 3] ^= rol32((x[ 2] + x[ 1]), 13);
+-		x[ 0] ^= rol32((x[ 3] + x[ 2]), 18);
+-		x[ 6] ^= rol32((x[ 5] + x[ 4]),  7);
+-		x[ 7] ^= rol32((x[ 6] + x[ 5]),  9);
+-		x[ 4] ^= rol32((x[ 7] + x[ 6]), 13);
+-		x[ 5] ^= rol32((x[ 4] + x[ 7]), 18);
+-		x[11] ^= rol32((x[10] + x[ 9]),  7);
+-		x[ 8] ^= rol32((x[11] + x[10]),  9);
+-		x[ 9] ^= rol32((x[ 8] + x[11]), 13);
+-		x[10] ^= rol32((x[ 9] + x[ 8]), 18);
+-		x[12] ^= rol32((x[15] + x[14]),  7);
+-		x[13] ^= rol32((x[12] + x[15]),  9);
+-		x[14] ^= rol32((x[13] + x[12]), 13);
+-		x[15] ^= rol32((x[14] + x[13]), 18);
+-	}
 -
--	tgr192_pass(&a, &b, &c, x, 5);
--	tgr192_key_schedule(x);
--	tgr192_pass(&c, &a, &b, x, 7);
--	tgr192_key_schedule(x);
--	tgr192_pass(&b, &c, &a, x, 9);
+-	for (i = 0; i < 16; i++)
+-		stream[i] = cpu_to_le32(x[i] + state[i]);
 -
--
--	/* feedforward */
--	a ^= aa;
--	b -= bb;
--	c += cc;
--	/* store */
--	tctx->a = a;
--	tctx->b = b;
--	tctx->c = c;
+-	if (++state[8] == 0)
+-		state[9]++;
 -}
 -
--static int tgr192_init(struct shash_desc *desc)
+-static void salsa20_docrypt(u32 *state, u8 *dst, const u8 *src,
+-			    unsigned int bytes)
 -{
--	struct tgr192_ctx *tctx = shash_desc_ctx(desc);
+-	__le32 stream[SALSA20_BLOCK_SIZE / sizeof(__le32)];
 -
--	tctx->a = 0x0123456789abcdefULL;
--	tctx->b = 0xfedcba9876543210ULL;
--	tctx->c = 0xf096a5b4c3b2e187ULL;
--	tctx->nblocks = 0;
--	tctx->count = 0;
+-	while (bytes >= SALSA20_BLOCK_SIZE) {
+-		salsa20_block(state, stream);
+-		crypto_xor_cpy(dst, src, (const u8 *)stream,
+-			       SALSA20_BLOCK_SIZE);
+-		bytes -= SALSA20_BLOCK_SIZE;
+-		dst += SALSA20_BLOCK_SIZE;
+-		src += SALSA20_BLOCK_SIZE;
+-	}
+-	if (bytes) {
+-		salsa20_block(state, stream);
+-		crypto_xor_cpy(dst, src, (const u8 *)stream, bytes);
+-	}
+-}
+-
+-static void salsa20_init(u32 *state, const struct salsa20_ctx *ctx,
+-			 const u8 *iv)
+-{
+-	memcpy(state, ctx->initial_state, sizeof(ctx->initial_state));
+-	state[6] = get_unaligned_le32(iv + 0);
+-	state[7] = get_unaligned_le32(iv + 4);
+-}
+-
+-static int salsa20_setkey(struct crypto_skcipher *tfm, const u8 *key,
+-			  unsigned int keysize)
+-{
+-	static const char sigma[16] = "expand 32-byte k";
+-	static const char tau[16] = "expand 16-byte k";
+-	struct salsa20_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	const char *constants;
+-
+-	if (keysize != SALSA20_MIN_KEY_SIZE &&
+-	    keysize != SALSA20_MAX_KEY_SIZE)
+-		return -EINVAL;
+-
+-	ctx->initial_state[1] = get_unaligned_le32(key + 0);
+-	ctx->initial_state[2] = get_unaligned_le32(key + 4);
+-	ctx->initial_state[3] = get_unaligned_le32(key + 8);
+-	ctx->initial_state[4] = get_unaligned_le32(key + 12);
+-	if (keysize == 32) { /* recommended */
+-		key += 16;
+-		constants = sigma;
+-	} else { /* keysize == 16 */
+-		constants = tau;
+-	}
+-	ctx->initial_state[11] = get_unaligned_le32(key + 0);
+-	ctx->initial_state[12] = get_unaligned_le32(key + 4);
+-	ctx->initial_state[13] = get_unaligned_le32(key + 8);
+-	ctx->initial_state[14] = get_unaligned_le32(key + 12);
+-	ctx->initial_state[0]  = get_unaligned_le32(constants + 0);
+-	ctx->initial_state[5]  = get_unaligned_le32(constants + 4);
+-	ctx->initial_state[10] = get_unaligned_le32(constants + 8);
+-	ctx->initial_state[15] = get_unaligned_le32(constants + 12);
+-
+-	/* space for the nonce; it will be overridden for each request */
+-	ctx->initial_state[6] = 0;
+-	ctx->initial_state[7] = 0;
+-
+-	/* initial block number */
+-	ctx->initial_state[8] = 0;
+-	ctx->initial_state[9] = 0;
 -
 -	return 0;
 -}
 -
--
--/* Update the message digest with the contents
-- * of INBUF with length INLEN. */
--static int tgr192_update(struct shash_desc *desc, const u8 *inbuf,
--			  unsigned int len)
+-static int salsa20_crypt(struct skcipher_request *req)
 -{
--	struct tgr192_ctx *tctx = shash_desc_ctx(desc);
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	const struct salsa20_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct skcipher_walk walk;
+-	u32 state[16];
+-	int err;
 -
--	if (tctx->count == 64) {	/* flush the buffer */
--		tgr192_transform(tctx, tctx->hash);
--		tctx->count = 0;
--		tctx->nblocks++;
--	}
--	if (!inbuf) {
--		return 0;
--	}
--	if (tctx->count) {
--		for (; len && tctx->count < 64; len--) {
--			tctx->hash[tctx->count++] = *inbuf++;
--		}
--		tgr192_update(desc, NULL, 0);
--		if (!len) {
--			return 0;
--		}
+-	err = skcipher_walk_virt(&walk, req, false);
 -
--	}
+-	salsa20_init(state, ctx, req->iv);
 -
--	while (len >= 64) {
--		tgr192_transform(tctx, inbuf);
--		tctx->count = 0;
--		tctx->nblocks++;
--		len -= 64;
--		inbuf += 64;
--	}
--	for (; len && tctx->count < 64; len--) {
--		tctx->hash[tctx->count++] = *inbuf++;
+-	while (walk.nbytes > 0) {
+-		unsigned int nbytes = walk.nbytes;
+-
+-		if (nbytes < walk.total)
+-			nbytes = round_down(nbytes, walk.stride);
+-
+-		salsa20_docrypt(state, walk.dst.virt.addr, walk.src.virt.addr,
+-				nbytes);
+-		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
 -	}
 -
--	return 0;
+-	return err;
 -}
 -
+-static struct skcipher_alg alg = {
+-	.base.cra_name		= "salsa20",
+-	.base.cra_driver_name	= "salsa20-generic",
+-	.base.cra_priority	= 100,
+-	.base.cra_blocksize	= 1,
+-	.base.cra_ctxsize	= sizeof(struct salsa20_ctx),
+-	.base.cra_module	= THIS_MODULE,
 -
+-	.min_keysize		= SALSA20_MIN_KEY_SIZE,
+-	.max_keysize		= SALSA20_MAX_KEY_SIZE,
+-	.ivsize			= SALSA20_IV_SIZE,
+-	.chunksize		= SALSA20_BLOCK_SIZE,
+-	.setkey			= salsa20_setkey,
+-	.encrypt		= salsa20_crypt,
+-	.decrypt		= salsa20_crypt,
+-};
 -
--/* The routine terminates the computation */
--static int tgr192_final(struct shash_desc *desc, u8 * out)
+-static int __init salsa20_generic_mod_init(void)
 -{
--	struct tgr192_ctx *tctx = shash_desc_ctx(desc);
--	__be64 *dst = (__be64 *)out;
--	__be64 *be64p;
--	__le32 *le32p;
--	u32 t, msb, lsb;
--
--	tgr192_update(desc, NULL, 0); /* flush */
--
--	msb = 0;
--	t = tctx->nblocks;
--	if ((lsb = t << 6) < t) { /* multiply by 64 to make a byte count */
--		msb++;
--	}
--	msb += t >> 26;
--	t = lsb;
--	if ((lsb = t + tctx->count) < t) {	/* add the count */
--		msb++;
--	}
--	t = lsb;
--	if ((lsb = t << 3) < t)	{ /* multiply by 8 to make a bit count */
--		msb++;
--	}
--	msb += t >> 29;
--
--	if (tctx->count < 56) {	/* enough room */
--		tctx->hash[tctx->count++] = 0x01;	/* pad */
--		while (tctx->count < 56) {
--			tctx->hash[tctx->count++] = 0;	/* pad */
--		}
--	} else {		/* need one extra block */
--		tctx->hash[tctx->count++] = 0x01;	/* pad character */
--		while (tctx->count < 64) {
--			tctx->hash[tctx->count++] = 0;
--		}
--		tgr192_update(desc, NULL, 0); /* flush */
--		memset(tctx->hash, 0, 56);    /* fill next block with zeroes */
--	}
--	/* append the 64 bit count */
--	le32p = (__le32 *)&tctx->hash[56];
--	le32p[0] = cpu_to_le32(lsb);
--	le32p[1] = cpu_to_le32(msb);
--
--	tgr192_transform(tctx, tctx->hash);
--
--	be64p = (__be64 *)tctx->hash;
--	dst[0] = be64p[0] = cpu_to_be64(tctx->a);
--	dst[1] = be64p[1] = cpu_to_be64(tctx->b);
--	dst[2] = be64p[2] = cpu_to_be64(tctx->c);
--
--	return 0;
+-	return crypto_register_skcipher(&alg);
 -}
 -
--static int tgr160_final(struct shash_desc *desc, u8 * out)
+-static void __exit salsa20_generic_mod_fini(void)
 -{
--	u8 D[64];
--
--	tgr192_final(desc, D);
--	memcpy(out, D, TGR160_DIGEST_SIZE);
--	memzero_explicit(D, TGR192_DIGEST_SIZE);
--
--	return 0;
+-	crypto_unregister_skcipher(&alg);
 -}
 -
--static int tgr128_final(struct shash_desc *desc, u8 * out)
--{
--	u8 D[64];
--
--	tgr192_final(desc, D);
--	memcpy(out, D, TGR128_DIGEST_SIZE);
--	memzero_explicit(D, TGR192_DIGEST_SIZE);
--
--	return 0;
--}
--
--static struct shash_alg tgr_algs[3] = { {
--	.digestsize	=	TGR192_DIGEST_SIZE,
--	.init		=	tgr192_init,
--	.update		=	tgr192_update,
--	.final		=	tgr192_final,
--	.descsize	=	sizeof(struct tgr192_ctx),
--	.base		=	{
--		.cra_name	 =	"tgr192",
--		.cra_driver_name =	"tgr192-generic",
--		.cra_blocksize	 =	TGR192_BLOCK_SIZE,
--		.cra_module	 =	THIS_MODULE,
--	}
--}, {
--	.digestsize	=	TGR160_DIGEST_SIZE,
--	.init		=	tgr192_init,
--	.update		=	tgr192_update,
--	.final		=	tgr160_final,
--	.descsize	=	sizeof(struct tgr192_ctx),
--	.base		=	{
--		.cra_name	 =	"tgr160",
--		.cra_driver_name =	"tgr160-generic",
--		.cra_blocksize	 =	TGR192_BLOCK_SIZE,
--		.cra_module	 =	THIS_MODULE,
--	}
--}, {
--	.digestsize	=	TGR128_DIGEST_SIZE,
--	.init		=	tgr192_init,
--	.update		=	tgr192_update,
--	.final		=	tgr128_final,
--	.descsize	=	sizeof(struct tgr192_ctx),
--	.base		=	{
--		.cra_name	 =	"tgr128",
--		.cra_driver_name =	"tgr128-generic",
--		.cra_blocksize	 =	TGR192_BLOCK_SIZE,
--		.cra_module	 =	THIS_MODULE,
--	}
--} };
--
--static int __init tgr192_mod_init(void)
--{
--	return crypto_register_shashes(tgr_algs, ARRAY_SIZE(tgr_algs));
--}
--
--static void __exit tgr192_mod_fini(void)
--{
--	crypto_unregister_shashes(tgr_algs, ARRAY_SIZE(tgr_algs));
--}
--
--MODULE_ALIAS_CRYPTO("tgr192");
--MODULE_ALIAS_CRYPTO("tgr160");
--MODULE_ALIAS_CRYPTO("tgr128");
--
--subsys_initcall(tgr192_mod_init);
--module_exit(tgr192_mod_fini);
+-subsys_initcall(salsa20_generic_mod_init);
+-module_exit(salsa20_generic_mod_fini);
 -
 -MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Tiger Message Digest Algorithm");
+-MODULE_DESCRIPTION ("Salsa20 stream cipher algorithm");
+-MODULE_ALIAS_CRYPTO("salsa20");
+-MODULE_ALIAS_CRYPTO("salsa20-generic");
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 696c44ef465e..2877b88cfa45 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -71,7 +71,7 @@ static const char *check[] = {
+ 	"blowfish", "twofish", "serpent", "sha384", "sha512", "md4", "aes",
+ 	"cast6", "arc4", "michael_mic", "deflate", "crc32c", "tea", "xtea",
+ 	"khazad", "wp512", "wp384", "wp256", "tnepres", "xeta",  "fcrypt",
+-	"camellia", "seed", "salsa20", "rmd160",
++	"camellia", "seed", "rmd160",
+ 	"lzo", "lzo-rle", "cts", "sha3-224", "sha3-256", "sha3-384",
+ 	"sha3-512", "streebog256", "streebog512",
+ 	NULL
+@@ -1835,10 +1835,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 		ret += tcrypt_test("sha224");
+ 		break;
+ 
+-	case 34:
+-		ret += tcrypt_test("salsa20");
+-		break;
+-
+ 	case 35:
+ 		ret += tcrypt_test("gcm(aes)");
+ 		break;
+@@ -2153,11 +2149,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 				speed_template_32_48_64);
+ 		break;
+ 
+-	case 206:
+-		test_cipher_speed("salsa20", ENCRYPT, sec, NULL, 0,
+-				  speed_template_16_32);
+-		break;
+-
+ 	case 207:
+ 		test_cipher_speed("ecb(serpent)", ENCRYPT, sec, NULL, 0,
+ 				  speed_template_16_32);
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index b87802ffb554..1a4103b1b202 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -5282,12 +5282,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.akcipher = __VECS(rsa_tv_template)
+ 		}
+-	}, {
+-		.alg = "salsa20",
+-		.test = alg_test_skcipher,
+-		.suite = {
+-			.cipher = __VECS(salsa20_stream_tv_template)
+-		}
+ 	}, {
+ 		.alg = "sha1",
+ 		.test = alg_test_hash,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 851c107a5584..99aca08263d2 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -24409,1168 +24409,6 @@ static const struct cipher_testvec seed_tv_template[] = {
+ 	}
+ };
+ 
+-static const struct cipher_testvec salsa20_stream_tv_template[] = {
+-	/*
+-	* Testvectors from verified.test-vectors submitted to ECRYPT.
+-	* They are truncated to size 39, 64, 111, 129 to test a variety
+-	* of input length.
+-	*/
+-	{ /* Set 3, vector 0 */
+-		.key	= "\x00\x01\x02\x03\x04\x05\x06\x07"
+-			"\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F",
+-		.klen	= 16,
+-		.iv     = "\x00\x00\x00\x00\x00\x00\x00\x00",
+-		.ptext	= "\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00",
+-		.ctext	= "\x2D\xD5\xC3\xF7\xBA\x2B\x20\xF7"
+-			 "\x68\x02\x41\x0C\x68\x86\x88\x89"
+-			 "\x5A\xD8\xC1\xBD\x4E\xA6\xC9\xB1"
+-			 "\x40\xFB\x9B\x90\xE2\x10\x49\xBF"
+-			 "\x58\x3F\x52\x79\x70\xEB\xC1",
+-		.len	= 39,
+-	}, { /* Set 5, vector 0 */
+-		.key	= "\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00",
+-		.klen	= 16,
+-		.iv     = "\x80\x00\x00\x00\x00\x00\x00\x00",
+-		.ptext	= "\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00",
+-		.ctext	= "\xB6\x6C\x1E\x44\x46\xDD\x95\x57"
+-			 "\xE5\x78\xE2\x23\xB0\xB7\x68\x01"
+-			 "\x7B\x23\xB2\x67\xBB\x02\x34\xAE"
+-			 "\x46\x26\xBF\x44\x3F\x21\x97\x76"
+-			 "\x43\x6F\xB1\x9F\xD0\xE8\x86\x6F"
+-			 "\xCD\x0D\xE9\xA9\x53\x8F\x4A\x09"
+-			 "\xCA\x9A\xC0\x73\x2E\x30\xBC\xF9"
+-			 "\x8E\x4F\x13\xE4\xB9\xE2\x01\xD9",
+-		.len	= 64,
+-	}, { /* Set 3, vector 27 */
+-		.key	= "\x1B\x1C\x1D\x1E\x1F\x20\x21\x22"
+-			"\x23\x24\x25\x26\x27\x28\x29\x2A"
+-			"\x2B\x2C\x2D\x2E\x2F\x30\x31\x32"
+-			"\x33\x34\x35\x36\x37\x38\x39\x3A",
+-		.klen	= 32,
+-		.iv     = "\x00\x00\x00\x00\x00\x00\x00\x00",
+-		.ptext	= "\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00",
+-		.ctext	= "\xAE\x39\x50\x8E\xAC\x9A\xEC\xE7"
+-			 "\xBF\x97\xBB\x20\xB9\xDE\xE4\x1F"
+-			 "\x87\xD9\x47\xF8\x28\x91\x35\x98"
+-			 "\xDB\x72\xCC\x23\x29\x48\x56\x5E"
+-			 "\x83\x7E\x0B\xF3\x7D\x5D\x38\x7B"
+-			 "\x2D\x71\x02\xB4\x3B\xB5\xD8\x23"
+-			 "\xB0\x4A\xDF\x3C\xEC\xB6\xD9\x3B"
+-			 "\x9B\xA7\x52\xBE\xC5\xD4\x50\x59"
+-			 "\x15\x14\xB4\x0E\x40\xE6\x53\xD1"
+-			 "\x83\x9C\x5B\xA0\x92\x29\x6B\x5E"
+-			 "\x96\x5B\x1E\x2F\xD3\xAC\xC1\x92"
+-			 "\xB1\x41\x3F\x19\x2F\xC4\x3B\xC6"
+-			 "\x95\x46\x45\x54\xE9\x75\x03\x08"
+-			 "\x44\xAF\xE5\x8A\x81\x12\x09",
+-		.len	= 111,
+-	}, { /* Set 5, vector 27 */
+-		.key	= "\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00",
+-		.klen	= 32,
+-		.iv     = "\x00\x00\x00\x10\x00\x00\x00\x00",
+-		.ptext	= "\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00",
+-		.ctext	= "\xD2\xDB\x1A\x5C\xF1\xC1\xAC\xDB"
+-			 "\xE8\x1A\x7A\x43\x40\xEF\x53\x43"
+-			 "\x5E\x7F\x4B\x1A\x50\x52\x3F\x8D"
+-			 "\x28\x3D\xCF\x85\x1D\x69\x6E\x60"
+-			 "\xF2\xDE\x74\x56\x18\x1B\x84\x10"
+-			 "\xD4\x62\xBA\x60\x50\xF0\x61\xF2"
+-			 "\x1C\x78\x7F\xC1\x24\x34\xAF\x58"
+-			 "\xBF\x2C\x59\xCA\x90\x77\xF3\xB0"
+-			 "\x5B\x4A\xDF\x89\xCE\x2C\x2F\xFC"
+-			 "\x67\xF0\xE3\x45\xE8\xB3\xB3\x75"
+-			 "\xA0\x95\x71\xA1\x29\x39\x94\xCA"
+-			 "\x45\x2F\xBD\xCB\x10\xB6\xBE\x9F"
+-			 "\x8E\xF9\xB2\x01\x0A\x5A\x0A\xB7"
+-			 "\x6B\x9D\x70\x8E\x4B\xD6\x2F\xCD"
+-			 "\x2E\x40\x48\x75\xE9\xE2\x21\x45"
+-			 "\x0B\xC9\xB6\xB5\x66\xBC\x9A\x59"
+-			 "\x5A",
+-		.len	= 129,
+-	}, { /* large test vector generated using Crypto++ */
+-		.key =  "\x00\x01\x02\x03\x04\x05\x06\x07"
+-			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+-			"\x10\x11\x12\x13\x14\x15\x16\x17"
+-			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
+-		.klen = 32,
+-		.iv =	"\x00\x00\x00\x00\x00\x00\x00\x00"
+-			"\x00\x00\x00\x00\x00\x00\x00\x00",
+-		.ptext =
+-			"\x00\x01\x02\x03\x04\x05\x06\x07"
+-			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+-			"\x10\x11\x12\x13\x14\x15\x16\x17"
+-			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
+-			"\x20\x21\x22\x23\x24\x25\x26\x27"
+-			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
+-			"\x30\x31\x32\x33\x34\x35\x36\x37"
+-			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
+-			"\x40\x41\x42\x43\x44\x45\x46\x47"
+-			"\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
+-			"\x50\x51\x52\x53\x54\x55\x56\x57"
+-			"\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
+-			"\x60\x61\x62\x63\x64\x65\x66\x67"
+-			"\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f"
+-			"\x70\x71\x72\x73\x74\x75\x76\x77"
+-			"\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f"
+-			"\x80\x81\x82\x83\x84\x85\x86\x87"
+-			"\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f"
+-			"\x90\x91\x92\x93\x94\x95\x96\x97"
+-			"\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f"
+-			"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7"
+-			"\xa8\xa9\xaa\xab\xac\xad\xae\xaf"
+-			"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7"
+-			"\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"
+-			"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7"
+-			"\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf"
+-			"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7"
+-			"\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf"
+-			"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7"
+-			"\xe8\xe9\xea\xeb\xec\xed\xee\xef"
+-			"\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7"
+-			"\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff"
+-			"\x00\x03\x06\x09\x0c\x0f\x12\x15"
+-			"\x18\x1b\x1e\x21\x24\x27\x2a\x2d"
+-			"\x30\x33\x36\x39\x3c\x3f\x42\x45"
+-			"\x48\x4b\x4e\x51\x54\x57\x5a\x5d"
+-			"\x60\x63\x66\x69\x6c\x6f\x72\x75"
+-			"\x78\x7b\x7e\x81\x84\x87\x8a\x8d"
+-			"\x90\x93\x96\x99\x9c\x9f\xa2\xa5"
+-			"\xa8\xab\xae\xb1\xb4\xb7\xba\xbd"
+-			"\xc0\xc3\xc6\xc9\xcc\xcf\xd2\xd5"
+-			"\xd8\xdb\xde\xe1\xe4\xe7\xea\xed"
+-			"\xf0\xf3\xf6\xf9\xfc\xff\x02\x05"
+-			"\x08\x0b\x0e\x11\x14\x17\x1a\x1d"
+-			"\x20\x23\x26\x29\x2c\x2f\x32\x35"
+-			"\x38\x3b\x3e\x41\x44\x47\x4a\x4d"
+-			"\x50\x53\x56\x59\x5c\x5f\x62\x65"
+-			"\x68\x6b\x6e\x71\x74\x77\x7a\x7d"
+-			"\x80\x83\x86\x89\x8c\x8f\x92\x95"
+-			"\x98\x9b\x9e\xa1\xa4\xa7\xaa\xad"
+-			"\xb0\xb3\xb6\xb9\xbc\xbf\xc2\xc5"
+-			"\xc8\xcb\xce\xd1\xd4\xd7\xda\xdd"
+-			"\xe0\xe3\xe6\xe9\xec\xef\xf2\xf5"
+-			"\xf8\xfb\xfe\x01\x04\x07\x0a\x0d"
+-			"\x10\x13\x16\x19\x1c\x1f\x22\x25"
+-			"\x28\x2b\x2e\x31\x34\x37\x3a\x3d"
+-			"\x40\x43\x46\x49\x4c\x4f\x52\x55"
+-			"\x58\x5b\x5e\x61\x64\x67\x6a\x6d"
+-			"\x70\x73\x76\x79\x7c\x7f\x82\x85"
+-			"\x88\x8b\x8e\x91\x94\x97\x9a\x9d"
+-			"\xa0\xa3\xa6\xa9\xac\xaf\xb2\xb5"
+-			"\xb8\xbb\xbe\xc1\xc4\xc7\xca\xcd"
+-			"\xd0\xd3\xd6\xd9\xdc\xdf\xe2\xe5"
+-			"\xe8\xeb\xee\xf1\xf4\xf7\xfa\xfd"
+-			"\x00\x05\x0a\x0f\x14\x19\x1e\x23"
+-			"\x28\x2d\x32\x37\x3c\x41\x46\x4b"
+-			"\x50\x55\x5a\x5f\x64\x69\x6e\x73"
+-			"\x78\x7d\x82\x87\x8c\x91\x96\x9b"
+-			"\xa0\xa5\xaa\xaf\xb4\xb9\xbe\xc3"
+-			"\xc8\xcd\xd2\xd7\xdc\xe1\xe6\xeb"
+-			"\xf0\xf5\xfa\xff\x04\x09\x0e\x13"
+-			"\x18\x1d\x22\x27\x2c\x31\x36\x3b"
+-			"\x40\x45\x4a\x4f\x54\x59\x5e\x63"
+-			"\x68\x6d\x72\x77\x7c\x81\x86\x8b"
+-			"\x90\x95\x9a\x9f\xa4\xa9\xae\xb3"
+-			"\xb8\xbd\xc2\xc7\xcc\xd1\xd6\xdb"
+-			"\xe0\xe5\xea\xef\xf4\xf9\xfe\x03"
+-			"\x08\x0d\x12\x17\x1c\x21\x26\x2b"
+-			"\x30\x35\x3a\x3f\x44\x49\x4e\x53"
+-			"\x58\x5d\x62\x67\x6c\x71\x76\x7b"
+-			"\x80\x85\x8a\x8f\x94\x99\x9e\xa3"
+-			"\xa8\xad\xb2\xb7\xbc\xc1\xc6\xcb"
+-			"\xd0\xd5\xda\xdf\xe4\xe9\xee\xf3"
+-			"\xf8\xfd\x02\x07\x0c\x11\x16\x1b"
+-			"\x20\x25\x2a\x2f\x34\x39\x3e\x43"
+-			"\x48\x4d\x52\x57\x5c\x61\x66\x6b"
+-			"\x70\x75\x7a\x7f\x84\x89\x8e\x93"
+-			"\x98\x9d\xa2\xa7\xac\xb1\xb6\xbb"
+-			"\xc0\xc5\xca\xcf\xd4\xd9\xde\xe3"
+-			"\xe8\xed\xf2\xf7\xfc\x01\x06\x0b"
+-			"\x10\x15\x1a\x1f\x24\x29\x2e\x33"
+-			"\x38\x3d\x42\x47\x4c\x51\x56\x5b"
+-			"\x60\x65\x6a\x6f\x74\x79\x7e\x83"
+-			"\x88\x8d\x92\x97\x9c\xa1\xa6\xab"
+-			"\xb0\xb5\xba\xbf\xc4\xc9\xce\xd3"
+-			"\xd8\xdd\xe2\xe7\xec\xf1\xf6\xfb"
+-			"\x00\x07\x0e\x15\x1c\x23\x2a\x31"
+-			"\x38\x3f\x46\x4d\x54\x5b\x62\x69"
+-			"\x70\x77\x7e\x85\x8c\x93\x9a\xa1"
+-			"\xa8\xaf\xb6\xbd\xc4\xcb\xd2\xd9"
+-			"\xe0\xe7\xee\xf5\xfc\x03\x0a\x11"
+-			"\x18\x1f\x26\x2d\x34\x3b\x42\x49"
+-			"\x50\x57\x5e\x65\x6c\x73\x7a\x81"
+-			"\x88\x8f\x96\x9d\xa4\xab\xb2\xb9"
+-			"\xc0\xc7\xce\xd5\xdc\xe3\xea\xf1"
+-			"\xf8\xff\x06\x0d\x14\x1b\x22\x29"
+-			"\x30\x37\x3e\x45\x4c\x53\x5a\x61"
+-			"\x68\x6f\x76\x7d\x84\x8b\x92\x99"
+-			"\xa0\xa7\xae\xb5\xbc\xc3\xca\xd1"
+-			"\xd8\xdf\xe6\xed\xf4\xfb\x02\x09"
+-			"\x10\x17\x1e\x25\x2c\x33\x3a\x41"
+-			"\x48\x4f\x56\x5d\x64\x6b\x72\x79"
+-			"\x80\x87\x8e\x95\x9c\xa3\xaa\xb1"
+-			"\xb8\xbf\xc6\xcd\xd4\xdb\xe2\xe9"
+-			"\xf0\xf7\xfe\x05\x0c\x13\x1a\x21"
+-			"\x28\x2f\x36\x3d\x44\x4b\x52\x59"
+-			"\x60\x67\x6e\x75\x7c\x83\x8a\x91"
+-			"\x98\x9f\xa6\xad\xb4\xbb\xc2\xc9"
+-			"\xd0\xd7\xde\xe5\xec\xf3\xfa\x01"
+-			"\x08\x0f\x16\x1d\x24\x2b\x32\x39"
+-			"\x40\x47\x4e\x55\x5c\x63\x6a\x71"
+-			"\x78\x7f\x86\x8d\x94\x9b\xa2\xa9"
+-			"\xb0\xb7\xbe\xc5\xcc\xd3\xda\xe1"
+-			"\xe8\xef\xf6\xfd\x04\x0b\x12\x19"
+-			"\x20\x27\x2e\x35\x3c\x43\x4a\x51"
+-			"\x58\x5f\x66\x6d\x74\x7b\x82\x89"
+-			"\x90\x97\x9e\xa5\xac\xb3\xba\xc1"
+-			"\xc8\xcf\xd6\xdd\xe4\xeb\xf2\xf9"
+-			"\x00\x09\x12\x1b\x24\x2d\x36\x3f"
+-			"\x48\x51\x5a\x63\x6c\x75\x7e\x87"
+-			"\x90\x99\xa2\xab\xb4\xbd\xc6\xcf"
+-			"\xd8\xe1\xea\xf3\xfc\x05\x0e\x17"
+-			"\x20\x29\x32\x3b\x44\x4d\x56\x5f"
+-			"\x68\x71\x7a\x83\x8c\x95\x9e\xa7"
+-			"\xb0\xb9\xc2\xcb\xd4\xdd\xe6\xef"
+-			"\xf8\x01\x0a\x13\x1c\x25\x2e\x37"
+-			"\x40\x49\x52\x5b\x64\x6d\x76\x7f"
+-			"\x88\x91\x9a\xa3\xac\xb5\xbe\xc7"
+-			"\xd0\xd9\xe2\xeb\xf4\xfd\x06\x0f"
+-			"\x18\x21\x2a\x33\x3c\x45\x4e\x57"
+-			"\x60\x69\x72\x7b\x84\x8d\x96\x9f"
+-			"\xa8\xb1\xba\xc3\xcc\xd5\xde\xe7"
+-			"\xf0\xf9\x02\x0b\x14\x1d\x26\x2f"
+-			"\x38\x41\x4a\x53\x5c\x65\x6e\x77"
+-			"\x80\x89\x92\x9b\xa4\xad\xb6\xbf"
+-			"\xc8\xd1\xda\xe3\xec\xf5\xfe\x07"
+-			"\x10\x19\x22\x2b\x34\x3d\x46\x4f"
+-			"\x58\x61\x6a\x73\x7c\x85\x8e\x97"
+-			"\xa0\xa9\xb2\xbb\xc4\xcd\xd6\xdf"
+-			"\xe8\xf1\xfa\x03\x0c\x15\x1e\x27"
+-			"\x30\x39\x42\x4b\x54\x5d\x66\x6f"
+-			"\x78\x81\x8a\x93\x9c\xa5\xae\xb7"
+-			"\xc0\xc9\xd2\xdb\xe4\xed\xf6\xff"
+-			"\x08\x11\x1a\x23\x2c\x35\x3e\x47"
+-			"\x50\x59\x62\x6b\x74\x7d\x86\x8f"
+-			"\x98\xa1\xaa\xb3\xbc\xc5\xce\xd7"
+-			"\xe0\xe9\xf2\xfb\x04\x0d\x16\x1f"
+-			"\x28\x31\x3a\x43\x4c\x55\x5e\x67"
+-			"\x70\x79\x82\x8b\x94\x9d\xa6\xaf"
+-			"\xb8\xc1\xca\xd3\xdc\xe5\xee\xf7"
+-			"\x00\x0b\x16\x21\x2c\x37\x42\x4d"
+-			"\x58\x63\x6e\x79\x84\x8f\x9a\xa5"
+-			"\xb0\xbb\xc6\xd1\xdc\xe7\xf2\xfd"
+-			"\x08\x13\x1e\x29\x34\x3f\x4a\x55"
+-			"\x60\x6b\x76\x81\x8c\x97\xa2\xad"
+-			"\xb8\xc3\xce\xd9\xe4\xef\xfa\x05"
+-			"\x10\x1b\x26\x31\x3c\x47\x52\x5d"
+-			"\x68\x73\x7e\x89\x94\x9f\xaa\xb5"
+-			"\xc0\xcb\xd6\xe1\xec\xf7\x02\x0d"
+-			"\x18\x23\x2e\x39\x44\x4f\x5a\x65"
+-			"\x70\x7b\x86\x91\x9c\xa7\xb2\xbd"
+-			"\xc8\xd3\xde\xe9\xf4\xff\x0a\x15"
+-			"\x20\x2b\x36\x41\x4c\x57\x62\x6d"
+-			"\x78\x83\x8e\x99\xa4\xaf\xba\xc5"
+-			"\xd0\xdb\xe6\xf1\xfc\x07\x12\x1d"
+-			"\x28\x33\x3e\x49\x54\x5f\x6a\x75"
+-			"\x80\x8b\x96\xa1\xac\xb7\xc2\xcd"
+-			"\xd8\xe3\xee\xf9\x04\x0f\x1a\x25"
+-			"\x30\x3b\x46\x51\x5c\x67\x72\x7d"
+-			"\x88\x93\x9e\xa9\xb4\xbf\xca\xd5"
+-			"\xe0\xeb\xf6\x01\x0c\x17\x22\x2d"
+-			"\x38\x43\x4e\x59\x64\x6f\x7a\x85"
+-			"\x90\x9b\xa6\xb1\xbc\xc7\xd2\xdd"
+-			"\xe8\xf3\xfe\x09\x14\x1f\x2a\x35"
+-			"\x40\x4b\x56\x61\x6c\x77\x82\x8d"
+-			"\x98\xa3\xae\xb9\xc4\xcf\xda\xe5"
+-			"\xf0\xfb\x06\x11\x1c\x27\x32\x3d"
+-			"\x48\x53\x5e\x69\x74\x7f\x8a\x95"
+-			"\xa0\xab\xb6\xc1\xcc\xd7\xe2\xed"
+-			"\xf8\x03\x0e\x19\x24\x2f\x3a\x45"
+-			"\x50\x5b\x66\x71\x7c\x87\x92\x9d"
+-			"\xa8\xb3\xbe\xc9\xd4\xdf\xea\xf5"
+-			"\x00\x0d\x1a\x27\x34\x41\x4e\x5b"
+-			"\x68\x75\x82\x8f\x9c\xa9\xb6\xc3"
+-			"\xd0\xdd\xea\xf7\x04\x11\x1e\x2b"
+-			"\x38\x45\x52\x5f\x6c\x79\x86\x93"
+-			"\xa0\xad\xba\xc7\xd4\xe1\xee\xfb"
+-			"\x08\x15\x22\x2f\x3c\x49\x56\x63"
+-			"\x70\x7d\x8a\x97\xa4\xb1\xbe\xcb"
+-			"\xd8\xe5\xf2\xff\x0c\x19\x26\x33"
+-			"\x40\x4d\x5a\x67\x74\x81\x8e\x9b"
+-			"\xa8\xb5\xc2\xcf\xdc\xe9\xf6\x03"
+-			"\x10\x1d\x2a\x37\x44\x51\x5e\x6b"
+-			"\x78\x85\x92\x9f\xac\xb9\xc6\xd3"
+-			"\xe0\xed\xfa\x07\x14\x21\x2e\x3b"
+-			"\x48\x55\x62\x6f\x7c\x89\x96\xa3"
+-			"\xb0\xbd\xca\xd7\xe4\xf1\xfe\x0b"
+-			"\x18\x25\x32\x3f\x4c\x59\x66\x73"
+-			"\x80\x8d\x9a\xa7\xb4\xc1\xce\xdb"
+-			"\xe8\xf5\x02\x0f\x1c\x29\x36\x43"
+-			"\x50\x5d\x6a\x77\x84\x91\x9e\xab"
+-			"\xb8\xc5\xd2\xdf\xec\xf9\x06\x13"
+-			"\x20\x2d\x3a\x47\x54\x61\x6e\x7b"
+-			"\x88\x95\xa2\xaf\xbc\xc9\xd6\xe3"
+-			"\xf0\xfd\x0a\x17\x24\x31\x3e\x4b"
+-			"\x58\x65\x72\x7f\x8c\x99\xa6\xb3"
+-			"\xc0\xcd\xda\xe7\xf4\x01\x0e\x1b"
+-			"\x28\x35\x42\x4f\x5c\x69\x76\x83"
+-			"\x90\x9d\xaa\xb7\xc4\xd1\xde\xeb"
+-			"\xf8\x05\x12\x1f\x2c\x39\x46\x53"
+-			"\x60\x6d\x7a\x87\x94\xa1\xae\xbb"
+-			"\xc8\xd5\xe2\xef\xfc\x09\x16\x23"
+-			"\x30\x3d\x4a\x57\x64\x71\x7e\x8b"
+-			"\x98\xa5\xb2\xbf\xcc\xd9\xe6\xf3"
+-			"\x00\x0f\x1e\x2d\x3c\x4b\x5a\x69"
+-			"\x78\x87\x96\xa5\xb4\xc3\xd2\xe1"
+-			"\xf0\xff\x0e\x1d\x2c\x3b\x4a\x59"
+-			"\x68\x77\x86\x95\xa4\xb3\xc2\xd1"
+-			"\xe0\xef\xfe\x0d\x1c\x2b\x3a\x49"
+-			"\x58\x67\x76\x85\x94\xa3\xb2\xc1"
+-			"\xd0\xdf\xee\xfd\x0c\x1b\x2a\x39"
+-			"\x48\x57\x66\x75\x84\x93\xa2\xb1"
+-			"\xc0\xcf\xde\xed\xfc\x0b\x1a\x29"
+-			"\x38\x47\x56\x65\x74\x83\x92\xa1"
+-			"\xb0\xbf\xce\xdd\xec\xfb\x0a\x19"
+-			"\x28\x37\x46\x55\x64\x73\x82\x91"
+-			"\xa0\xaf\xbe\xcd\xdc\xeb\xfa\x09"
+-			"\x18\x27\x36\x45\x54\x63\x72\x81"
+-			"\x90\x9f\xae\xbd\xcc\xdb\xea\xf9"
+-			"\x08\x17\x26\x35\x44\x53\x62\x71"
+-			"\x80\x8f\x9e\xad\xbc\xcb\xda\xe9"
+-			"\xf8\x07\x16\x25\x34\x43\x52\x61"
+-			"\x70\x7f\x8e\x9d\xac\xbb\xca\xd9"
+-			"\xe8\xf7\x06\x15\x24\x33\x42\x51"
+-			"\x60\x6f\x7e\x8d\x9c\xab\xba\xc9"
+-			"\xd8\xe7\xf6\x05\x14\x23\x32\x41"
+-			"\x50\x5f\x6e\x7d\x8c\x9b\xaa\xb9"
+-			"\xc8\xd7\xe6\xf5\x04\x13\x22\x31"
+-			"\x40\x4f\x5e\x6d\x7c\x8b\x9a\xa9"
+-			"\xb8\xc7\xd6\xe5\xf4\x03\x12\x21"
+-			"\x30\x3f\x4e\x5d\x6c\x7b\x8a\x99"
+-			"\xa8\xb7\xc6\xd5\xe4\xf3\x02\x11"
+-			"\x20\x2f\x3e\x4d\x5c\x6b\x7a\x89"
+-			"\x98\xa7\xb6\xc5\xd4\xe3\xf2\x01"
+-			"\x10\x1f\x2e\x3d\x4c\x5b\x6a\x79"
+-			"\x88\x97\xa6\xb5\xc4\xd3\xe2\xf1"
+-			"\x00\x11\x22\x33\x44\x55\x66\x77"
+-			"\x88\x99\xaa\xbb\xcc\xdd\xee\xff"
+-			"\x10\x21\x32\x43\x54\x65\x76\x87"
+-			"\x98\xa9\xba\xcb\xdc\xed\xfe\x0f"
+-			"\x20\x31\x42\x53\x64\x75\x86\x97"
+-			"\xa8\xb9\xca\xdb\xec\xfd\x0e\x1f"
+-			"\x30\x41\x52\x63\x74\x85\x96\xa7"
+-			"\xb8\xc9\xda\xeb\xfc\x0d\x1e\x2f"
+-			"\x40\x51\x62\x73\x84\x95\xa6\xb7"
+-			"\xc8\xd9\xea\xfb\x0c\x1d\x2e\x3f"
+-			"\x50\x61\x72\x83\x94\xa5\xb6\xc7"
+-			"\xd8\xe9\xfa\x0b\x1c\x2d\x3e\x4f"
+-			"\x60\x71\x82\x93\xa4\xb5\xc6\xd7"
+-			"\xe8\xf9\x0a\x1b\x2c\x3d\x4e\x5f"
+-			"\x70\x81\x92\xa3\xb4\xc5\xd6\xe7"
+-			"\xf8\x09\x1a\x2b\x3c\x4d\x5e\x6f"
+-			"\x80\x91\xa2\xb3\xc4\xd5\xe6\xf7"
+-			"\x08\x19\x2a\x3b\x4c\x5d\x6e\x7f"
+-			"\x90\xa1\xb2\xc3\xd4\xe5\xf6\x07"
+-			"\x18\x29\x3a\x4b\x5c\x6d\x7e\x8f"
+-			"\xa0\xb1\xc2\xd3\xe4\xf5\x06\x17"
+-			"\x28\x39\x4a\x5b\x6c\x7d\x8e\x9f"
+-			"\xb0\xc1\xd2\xe3\xf4\x05\x16\x27"
+-			"\x38\x49\x5a\x6b\x7c\x8d\x9e\xaf"
+-			"\xc0\xd1\xe2\xf3\x04\x15\x26\x37"
+-			"\x48\x59\x6a\x7b\x8c\x9d\xae\xbf"
+-			"\xd0\xe1\xf2\x03\x14\x25\x36\x47"
+-			"\x58\x69\x7a\x8b\x9c\xad\xbe\xcf"
+-			"\xe0\xf1\x02\x13\x24\x35\x46\x57"
+-			"\x68\x79\x8a\x9b\xac\xbd\xce\xdf"
+-			"\xf0\x01\x12\x23\x34\x45\x56\x67"
+-			"\x78\x89\x9a\xab\xbc\xcd\xde\xef"
+-			"\x00\x13\x26\x39\x4c\x5f\x72\x85"
+-			"\x98\xab\xbe\xd1\xe4\xf7\x0a\x1d"
+-			"\x30\x43\x56\x69\x7c\x8f\xa2\xb5"
+-			"\xc8\xdb\xee\x01\x14\x27\x3a\x4d"
+-			"\x60\x73\x86\x99\xac\xbf\xd2\xe5"
+-			"\xf8\x0b\x1e\x31\x44\x57\x6a\x7d"
+-			"\x90\xa3\xb6\xc9\xdc\xef\x02\x15"
+-			"\x28\x3b\x4e\x61\x74\x87\x9a\xad"
+-			"\xc0\xd3\xe6\xf9\x0c\x1f\x32\x45"
+-			"\x58\x6b\x7e\x91\xa4\xb7\xca\xdd"
+-			"\xf0\x03\x16\x29\x3c\x4f\x62\x75"
+-			"\x88\x9b\xae\xc1\xd4\xe7\xfa\x0d"
+-			"\x20\x33\x46\x59\x6c\x7f\x92\xa5"
+-			"\xb8\xcb\xde\xf1\x04\x17\x2a\x3d"
+-			"\x50\x63\x76\x89\x9c\xaf\xc2\xd5"
+-			"\xe8\xfb\x0e\x21\x34\x47\x5a\x6d"
+-			"\x80\x93\xa6\xb9\xcc\xdf\xf2\x05"
+-			"\x18\x2b\x3e\x51\x64\x77\x8a\x9d"
+-			"\xb0\xc3\xd6\xe9\xfc\x0f\x22\x35"
+-			"\x48\x5b\x6e\x81\x94\xa7\xba\xcd"
+-			"\xe0\xf3\x06\x19\x2c\x3f\x52\x65"
+-			"\x78\x8b\x9e\xb1\xc4\xd7\xea\xfd"
+-			"\x10\x23\x36\x49\x5c\x6f\x82\x95"
+-			"\xa8\xbb\xce\xe1\xf4\x07\x1a\x2d"
+-			"\x40\x53\x66\x79\x8c\x9f\xb2\xc5"
+-			"\xd8\xeb\xfe\x11\x24\x37\x4a\x5d"
+-			"\x70\x83\x96\xa9\xbc\xcf\xe2\xf5"
+-			"\x08\x1b\x2e\x41\x54\x67\x7a\x8d"
+-			"\xa0\xb3\xc6\xd9\xec\xff\x12\x25"
+-			"\x38\x4b\x5e\x71\x84\x97\xaa\xbd"
+-			"\xd0\xe3\xf6\x09\x1c\x2f\x42\x55"
+-			"\x68\x7b\x8e\xa1\xb4\xc7\xda\xed"
+-			"\x00\x15\x2a\x3f\x54\x69\x7e\x93"
+-			"\xa8\xbd\xd2\xe7\xfc\x11\x26\x3b"
+-			"\x50\x65\x7a\x8f\xa4\xb9\xce\xe3"
+-			"\xf8\x0d\x22\x37\x4c\x61\x76\x8b"
+-			"\xa0\xb5\xca\xdf\xf4\x09\x1e\x33"
+-			"\x48\x5d\x72\x87\x9c\xb1\xc6\xdb"
+-			"\xf0\x05\x1a\x2f\x44\x59\x6e\x83"
+-			"\x98\xad\xc2\xd7\xec\x01\x16\x2b"
+-			"\x40\x55\x6a\x7f\x94\xa9\xbe\xd3"
+-			"\xe8\xfd\x12\x27\x3c\x51\x66\x7b"
+-			"\x90\xa5\xba\xcf\xe4\xf9\x0e\x23"
+-			"\x38\x4d\x62\x77\x8c\xa1\xb6\xcb"
+-			"\xe0\xf5\x0a\x1f\x34\x49\x5e\x73"
+-			"\x88\x9d\xb2\xc7\xdc\xf1\x06\x1b"
+-			"\x30\x45\x5a\x6f\x84\x99\xae\xc3"
+-			"\xd8\xed\x02\x17\x2c\x41\x56\x6b"
+-			"\x80\x95\xaa\xbf\xd4\xe9\xfe\x13"
+-			"\x28\x3d\x52\x67\x7c\x91\xa6\xbb"
+-			"\xd0\xe5\xfa\x0f\x24\x39\x4e\x63"
+-			"\x78\x8d\xa2\xb7\xcc\xe1\xf6\x0b"
+-			"\x20\x35\x4a\x5f\x74\x89\x9e\xb3"
+-			"\xc8\xdd\xf2\x07\x1c\x31\x46\x5b"
+-			"\x70\x85\x9a\xaf\xc4\xd9\xee\x03"
+-			"\x18\x2d\x42\x57\x6c\x81\x96\xab"
+-			"\xc0\xd5\xea\xff\x14\x29\x3e\x53"
+-			"\x68\x7d\x92\xa7\xbc\xd1\xe6\xfb"
+-			"\x10\x25\x3a\x4f\x64\x79\x8e\xa3"
+-			"\xb8\xcd\xe2\xf7\x0c\x21\x36\x4b"
+-			"\x60\x75\x8a\x9f\xb4\xc9\xde\xf3"
+-			"\x08\x1d\x32\x47\x5c\x71\x86\x9b"
+-			"\xb0\xc5\xda\xef\x04\x19\x2e\x43"
+-			"\x58\x6d\x82\x97\xac\xc1\xd6\xeb"
+-			"\x00\x17\x2e\x45\x5c\x73\x8a\xa1"
+-			"\xb8\xcf\xe6\xfd\x14\x2b\x42\x59"
+-			"\x70\x87\x9e\xb5\xcc\xe3\xfa\x11"
+-			"\x28\x3f\x56\x6d\x84\x9b\xb2\xc9"
+-			"\xe0\xf7\x0e\x25\x3c\x53\x6a\x81"
+-			"\x98\xaf\xc6\xdd\xf4\x0b\x22\x39"
+-			"\x50\x67\x7e\x95\xac\xc3\xda\xf1"
+-			"\x08\x1f\x36\x4d\x64\x7b\x92\xa9"
+-			"\xc0\xd7\xee\x05\x1c\x33\x4a\x61"
+-			"\x78\x8f\xa6\xbd\xd4\xeb\x02\x19"
+-			"\x30\x47\x5e\x75\x8c\xa3\xba\xd1"
+-			"\xe8\xff\x16\x2d\x44\x5b\x72\x89"
+-			"\xa0\xb7\xce\xe5\xfc\x13\x2a\x41"
+-			"\x58\x6f\x86\x9d\xb4\xcb\xe2\xf9"
+-			"\x10\x27\x3e\x55\x6c\x83\x9a\xb1"
+-			"\xc8\xdf\xf6\x0d\x24\x3b\x52\x69"
+-			"\x80\x97\xae\xc5\xdc\xf3\x0a\x21"
+-			"\x38\x4f\x66\x7d\x94\xab\xc2\xd9"
+-			"\xf0\x07\x1e\x35\x4c\x63\x7a\x91"
+-			"\xa8\xbf\xd6\xed\x04\x1b\x32\x49"
+-			"\x60\x77\x8e\xa5\xbc\xd3\xea\x01"
+-			"\x18\x2f\x46\x5d\x74\x8b\xa2\xb9"
+-			"\xd0\xe7\xfe\x15\x2c\x43\x5a\x71"
+-			"\x88\x9f\xb6\xcd\xe4\xfb\x12\x29"
+-			"\x40\x57\x6e\x85\x9c\xb3\xca\xe1"
+-			"\xf8\x0f\x26\x3d\x54\x6b\x82\x99"
+-			"\xb0\xc7\xde\xf5\x0c\x23\x3a\x51"
+-			"\x68\x7f\x96\xad\xc4\xdb\xf2\x09"
+-			"\x20\x37\x4e\x65\x7c\x93\xaa\xc1"
+-			"\xd8\xef\x06\x1d\x34\x4b\x62\x79"
+-			"\x90\xa7\xbe\xd5\xec\x03\x1a\x31"
+-			"\x48\x5f\x76\x8d\xa4\xbb\xd2\xe9"
+-			"\x00\x19\x32\x4b\x64\x7d\x96\xaf"
+-			"\xc8\xe1\xfa\x13\x2c\x45\x5e\x77"
+-			"\x90\xa9\xc2\xdb\xf4\x0d\x26\x3f"
+-			"\x58\x71\x8a\xa3\xbc\xd5\xee\x07"
+-			"\x20\x39\x52\x6b\x84\x9d\xb6\xcf"
+-			"\xe8\x01\x1a\x33\x4c\x65\x7e\x97"
+-			"\xb0\xc9\xe2\xfb\x14\x2d\x46\x5f"
+-			"\x78\x91\xaa\xc3\xdc\xf5\x0e\x27"
+-			"\x40\x59\x72\x8b\xa4\xbd\xd6\xef"
+-			"\x08\x21\x3a\x53\x6c\x85\x9e\xb7"
+-			"\xd0\xe9\x02\x1b\x34\x4d\x66\x7f"
+-			"\x98\xb1\xca\xe3\xfc\x15\x2e\x47"
+-			"\x60\x79\x92\xab\xc4\xdd\xf6\x0f"
+-			"\x28\x41\x5a\x73\x8c\xa5\xbe\xd7"
+-			"\xf0\x09\x22\x3b\x54\x6d\x86\x9f"
+-			"\xb8\xd1\xea\x03\x1c\x35\x4e\x67"
+-			"\x80\x99\xb2\xcb\xe4\xfd\x16\x2f"
+-			"\x48\x61\x7a\x93\xac\xc5\xde\xf7"
+-			"\x10\x29\x42\x5b\x74\x8d\xa6\xbf"
+-			"\xd8\xf1\x0a\x23\x3c\x55\x6e\x87"
+-			"\xa0\xb9\xd2\xeb\x04\x1d\x36\x4f"
+-			"\x68\x81\x9a\xb3\xcc\xe5\xfe\x17"
+-			"\x30\x49\x62\x7b\x94\xad\xc6\xdf"
+-			"\xf8\x11\x2a\x43\x5c\x75\x8e\xa7"
+-			"\xc0\xd9\xf2\x0b\x24\x3d\x56\x6f"
+-			"\x88\xa1\xba\xd3\xec\x05\x1e\x37"
+-			"\x50\x69\x82\x9b\xb4\xcd\xe6\xff"
+-			"\x18\x31\x4a\x63\x7c\x95\xae\xc7"
+-			"\xe0\xf9\x12\x2b\x44\x5d\x76\x8f"
+-			"\xa8\xc1\xda\xf3\x0c\x25\x3e\x57"
+-			"\x70\x89\xa2\xbb\xd4\xed\x06\x1f"
+-			"\x38\x51\x6a\x83\x9c\xb5\xce\xe7"
+-			"\x00\x1b\x36\x51\x6c\x87\xa2\xbd"
+-			"\xd8\xf3\x0e\x29\x44\x5f\x7a\x95"
+-			"\xb0\xcb\xe6\x01\x1c\x37\x52\x6d"
+-			"\x88\xa3\xbe\xd9\xf4\x0f\x2a\x45"
+-			"\x60\x7b\x96\xb1\xcc\xe7\x02\x1d"
+-			"\x38\x53\x6e\x89\xa4\xbf\xda\xf5"
+-			"\x10\x2b\x46\x61\x7c\x97\xb2\xcd"
+-			"\xe8\x03\x1e\x39\x54\x6f\x8a\xa5"
+-			"\xc0\xdb\xf6\x11\x2c\x47\x62\x7d"
+-			"\x98\xb3\xce\xe9\x04\x1f\x3a\x55"
+-			"\x70\x8b\xa6\xc1\xdc\xf7\x12\x2d"
+-			"\x48\x63\x7e\x99\xb4\xcf\xea\x05"
+-			"\x20\x3b\x56\x71\x8c\xa7\xc2\xdd"
+-			"\xf8\x13\x2e\x49\x64\x7f\x9a\xb5"
+-			"\xd0\xeb\x06\x21\x3c\x57\x72\x8d"
+-			"\xa8\xc3\xde\xf9\x14\x2f\x4a\x65"
+-			"\x80\x9b\xb6\xd1\xec\x07\x22\x3d"
+-			"\x58\x73\x8e\xa9\xc4\xdf\xfa\x15"
+-			"\x30\x4b\x66\x81\x9c\xb7\xd2\xed"
+-			"\x08\x23\x3e\x59\x74\x8f\xaa\xc5"
+-			"\xe0\xfb\x16\x31\x4c\x67\x82\x9d"
+-			"\xb8\xd3\xee\x09\x24\x3f\x5a\x75"
+-			"\x90\xab\xc6\xe1\xfc\x17\x32\x4d"
+-			"\x68\x83\x9e\xb9\xd4\xef\x0a\x25"
+-			"\x40\x5b\x76\x91\xac\xc7\xe2\xfd"
+-			"\x18\x33\x4e\x69\x84\x9f\xba\xd5"
+-			"\xf0\x0b\x26\x41\x5c\x77\x92\xad"
+-			"\xc8\xe3\xfe\x19\x34\x4f\x6a\x85"
+-			"\xa0\xbb\xd6\xf1\x0c\x27\x42\x5d"
+-			"\x78\x93\xae\xc9\xe4\xff\x1a\x35"
+-			"\x50\x6b\x86\xa1\xbc\xd7\xf2\x0d"
+-			"\x28\x43\x5e\x79\x94\xaf\xca\xe5"
+-			"\x00\x1d\x3a\x57\x74\x91\xae\xcb"
+-			"\xe8\x05\x22\x3f\x5c\x79\x96\xb3"
+-			"\xd0\xed\x0a\x27\x44\x61\x7e\x9b"
+-			"\xb8\xd5\xf2\x0f\x2c\x49\x66\x83"
+-			"\xa0\xbd\xda\xf7\x14\x31\x4e\x6b"
+-			"\x88\xa5\xc2\xdf\xfc\x19\x36\x53"
+-			"\x70\x8d\xaa\xc7\xe4\x01\x1e\x3b"
+-			"\x58\x75\x92\xaf\xcc\xe9\x06\x23"
+-			"\x40\x5d\x7a\x97\xb4\xd1\xee\x0b"
+-			"\x28\x45\x62\x7f\x9c\xb9\xd6\xf3"
+-			"\x10\x2d\x4a\x67\x84\xa1\xbe\xdb"
+-			"\xf8\x15\x32\x4f\x6c\x89\xa6\xc3"
+-			"\xe0\xfd\x1a\x37\x54\x71\x8e\xab"
+-			"\xc8\xe5\x02\x1f\x3c\x59\x76\x93"
+-			"\xb0\xcd\xea\x07\x24\x41\x5e\x7b"
+-			"\x98\xb5\xd2\xef\x0c\x29\x46\x63"
+-			"\x80\x9d\xba\xd7\xf4\x11\x2e\x4b"
+-			"\x68\x85\xa2\xbf\xdc\xf9\x16\x33"
+-			"\x50\x6d\x8a\xa7\xc4\xe1\xfe\x1b"
+-			"\x38\x55\x72\x8f\xac\xc9\xe6\x03"
+-			"\x20\x3d\x5a\x77\x94\xb1\xce\xeb"
+-			"\x08\x25\x42\x5f\x7c\x99\xb6\xd3"
+-			"\xf0\x0d\x2a\x47\x64\x81\x9e\xbb"
+-			"\xd8\xf5\x12\x2f\x4c\x69\x86\xa3"
+-			"\xc0\xdd\xfa\x17\x34\x51\x6e\x8b"
+-			"\xa8\xc5\xe2\xff\x1c\x39\x56\x73"
+-			"\x90\xad\xca\xe7\x04\x21\x3e\x5b"
+-			"\x78\x95\xb2\xcf\xec\x09\x26\x43"
+-			"\x60\x7d\x9a\xb7\xd4\xf1\x0e\x2b"
+-			"\x48\x65\x82\x9f\xbc\xd9\xf6\x13"
+-			"\x30\x4d\x6a\x87\xa4\xc1\xde\xfb"
+-			"\x18\x35\x52\x6f\x8c\xa9\xc6\xe3"
+-			"\x00\x1f\x3e\x5d\x7c\x9b\xba\xd9"
+-			"\xf8\x17\x36\x55\x74\x93\xb2\xd1"
+-			"\xf0\x0f\x2e\x4d\x6c\x8b\xaa\xc9"
+-			"\xe8\x07\x26\x45\x64\x83\xa2\xc1"
+-			"\xe0\xff\x1e\x3d\x5c\x7b\x9a\xb9"
+-			"\xd8\xf7\x16\x35\x54\x73\x92\xb1"
+-			"\xd0\xef\x0e\x2d\x4c\x6b\x8a\xa9"
+-			"\xc8\xe7\x06\x25\x44\x63\x82\xa1"
+-			"\xc0\xdf\xfe\x1d\x3c\x5b\x7a\x99"
+-			"\xb8\xd7\xf6\x15\x34\x53\x72\x91"
+-			"\xb0\xcf\xee\x0d\x2c\x4b\x6a\x89"
+-			"\xa8\xc7\xe6\x05\x24\x43\x62\x81"
+-			"\xa0\xbf\xde\xfd\x1c\x3b\x5a\x79"
+-			"\x98\xb7\xd6\xf5\x14\x33\x52\x71"
+-			"\x90\xaf\xce\xed\x0c\x2b\x4a\x69"
+-			"\x88\xa7\xc6\xe5\x04\x23\x42\x61"
+-			"\x80\x9f\xbe\xdd\xfc\x1b\x3a\x59"
+-			"\x78\x97\xb6\xd5\xf4\x13\x32\x51"
+-			"\x70\x8f\xae\xcd\xec\x0b\x2a\x49"
+-			"\x68\x87\xa6\xc5\xe4\x03\x22\x41"
+-			"\x60\x7f\x9e\xbd\xdc\xfb\x1a\x39"
+-			"\x58\x77\x96\xb5\xd4\xf3\x12\x31"
+-			"\x50\x6f\x8e\xad\xcc\xeb\x0a\x29"
+-			"\x48\x67\x86\xa5\xc4\xe3\x02\x21"
+-			"\x40\x5f\x7e\x9d\xbc\xdb\xfa\x19"
+-			"\x38\x57\x76\x95\xb4\xd3\xf2\x11"
+-			"\x30\x4f\x6e\x8d\xac\xcb\xea\x09"
+-			"\x28\x47\x66\x85\xa4\xc3\xe2\x01"
+-			"\x20\x3f\x5e\x7d\x9c\xbb\xda\xf9"
+-			"\x18\x37\x56\x75\x94\xb3\xd2\xf1"
+-			"\x10\x2f\x4e\x6d\x8c\xab\xca\xe9"
+-			"\x08\x27\x46\x65\x84\xa3\xc2\xe1"
+-			"\x00\x21\x42\x63",
+-		.ctext =
+-			"\xb5\x81\xf5\x64\x18\x73\xe3\xf0"
+-			"\x4c\x13\xf2\x77\x18\x60\x65\x5e"
+-			"\x29\x01\xce\x98\x55\x53\xf9\x0c"
+-			"\x2a\x08\xd5\x09\xb3\x57\x55\x56"
+-			"\xc5\xe9\x56\x90\xcb\x6a\xa3\xc0"
+-			"\xff\xc4\x79\xb4\xd2\x97\x5d\xc4"
+-			"\x43\xd1\xfe\x94\x7b\x88\x06\x5a"
+-			"\xb2\x9e\x2c\xfc\x44\x03\xb7\x90"
+-			"\xa0\xc1\xba\x6a\x33\xb8\xc7\xb2"
+-			"\x9d\xe1\x12\x4f\xc0\x64\xd4\x01"
+-			"\xfe\x8c\x7a\x66\xf7\xe6\x5a\x91"
+-			"\xbb\xde\x56\x86\xab\x65\x21\x30"
+-			"\x00\x84\x65\x24\xa5\x7d\x85\xb4"
+-			"\xe3\x17\xed\x3a\xb7\x6f\xb4\x0b"
+-			"\x0b\xaf\x15\xae\x5a\x8f\xf2\x0c"
+-			"\x2f\x27\xf4\x09\xd8\xd2\x96\xb7"
+-			"\x71\xf2\xc5\x99\x4d\x7e\x7f\x75"
+-			"\x77\x89\x30\x8b\x59\xdb\xa2\xb2"
+-			"\xa0\xf3\x19\x39\x2b\xc5\x7e\x3f"
+-			"\x4f\xd9\xd3\x56\x28\x97\x44\xdc"
+-			"\xc0\x8b\x77\x24\xd9\x52\xe7\xc5"
+-			"\xaf\xf6\x7d\x59\xb2\x44\x05\x1d"
+-			"\xb1\xb0\x11\xa5\x0f\xec\x33\xe1"
+-			"\x6d\x1b\x4e\x1f\xff\x57\x91\xb4"
+-			"\x5b\x9a\x96\xc5\x53\xbc\xae\x20"
+-			"\x3c\xbb\x14\xe2\xe8\x22\x33\xc1"
+-			"\x5e\x76\x9e\x46\x99\xf6\x2a\x15"
+-			"\xc6\x97\x02\xa0\x66\x43\xd1\xa6"
+-			"\x31\xa6\x9f\xfb\xf4\xd3\x69\xe5"
+-			"\xcd\x76\x95\xb8\x7a\x82\x7f\x21"
+-			"\x45\xff\x3f\xce\x55\xf6\x95\x10"
+-			"\x08\x77\x10\x43\xc6\xf3\x09\xe5"
+-			"\x68\xe7\x3c\xad\x00\x52\x45\x0d"
+-			"\xfe\x2d\xc6\xc2\x94\x8c\x12\x1d"
+-			"\xe6\x25\xae\x98\x12\x8e\x19\x9c"
+-			"\x81\x68\xb1\x11\xf6\x69\xda\xe3"
+-			"\x62\x08\x18\x7a\x25\x49\x28\xac"
+-			"\xba\x71\x12\x0b\xe4\xa2\xe5\xc7"
+-			"\x5d\x8e\xec\x49\x40\x21\xbf\x5a"
+-			"\x98\xf3\x02\x68\x55\x03\x7f\x8a"
+-			"\xe5\x94\x0c\x32\x5c\x07\x82\x63"
+-			"\xaf\x6f\x91\x40\x84\x8e\x52\x25"
+-			"\xd0\xb0\x29\x53\x05\xe2\x50\x7a"
+-			"\x34\xeb\xc9\x46\x20\xa8\x3d\xde"
+-			"\x7f\x16\x5f\x36\xc5\x2e\xdc\xd1"
+-			"\x15\x47\xc7\x50\x40\x6d\x91\xc5"
+-			"\xe7\x93\x95\x1a\xd3\x57\xbc\x52"
+-			"\x33\xee\x14\x19\x22\x52\x89\xa7"
+-			"\x4a\x25\x56\x77\x4b\xca\xcf\x0a"
+-			"\xe1\xf5\x35\x85\x30\x7e\x59\x4a"
+-			"\xbd\x14\x5b\xdf\xe3\x46\xcb\xac"
+-			"\x1f\x6c\x96\x0e\xf4\x81\xd1\x99"
+-			"\xca\x88\x63\x3d\x02\x58\x6b\xa9"
+-			"\xe5\x9f\xb3\x00\xb2\x54\xc6\x74"
+-			"\x1c\xbf\x46\xab\x97\xcc\xf8\x54"
+-			"\x04\x07\x08\x52\xe6\xc0\xda\x93"
+-			"\x74\x7d\x93\x99\x5d\x78\x68\xa6"
+-			"\x2e\x6b\xd3\x6a\x69\xcc\x12\x6b"
+-			"\xd4\xc7\xa5\xc6\xe7\xf6\x03\x04"
+-			"\x5d\xcd\x61\x5e\x17\x40\xdc\xd1"
+-			"\x5c\xf5\x08\xdf\x5c\x90\x85\xa4"
+-			"\xaf\xf6\x78\xbb\x0d\xf1\xf4\xa4"
+-			"\x54\x26\x72\x9e\x61\xfa\x86\xcf"
+-			"\xe8\x9e\xa1\xe0\xc7\x48\x23\xae"
+-			"\x5a\x90\xae\x75\x0a\x74\x18\x89"
+-			"\x05\xb1\x92\xb2\x7f\xd0\x1b\xa6"
+-			"\x62\x07\x25\x01\xc7\xc2\x4f\xf9"
+-			"\xe8\xfe\x63\x95\x80\x07\xb4\x26"
+-			"\xcc\xd1\x26\xb6\xc4\x3f\x9e\xcb"
+-			"\x8e\x3b\x2e\x44\x16\xd3\x10\x9a"
+-			"\x95\x08\xeb\xc8\xcb\xeb\xbf\x6f"
+-			"\x0b\xcd\x1f\xc8\xca\x86\xaa\xec"
+-			"\x33\xe6\x69\xf4\x45\x25\x86\x3a"
+-			"\x22\x94\x4f\x00\x23\x6a\x44\xc2"
+-			"\x49\x97\x33\xab\x36\x14\x0a\x70"
+-			"\x24\xc3\xbe\x04\x3b\x79\xa0\xf9"
+-			"\xb8\xe7\x76\x29\x22\x83\xd7\xf2"
+-			"\x94\xf4\x41\x49\xba\x5f\x7b\x07"
+-			"\xb5\xfb\xdb\x03\x1a\x9f\xb6\x4c"
+-			"\xc2\x2e\x37\x40\x49\xc3\x38\x16"
+-			"\xe2\x4f\x77\x82\xb0\x68\x4c\x71"
+-			"\x1d\x57\x61\x9c\xd9\x4e\x54\x99"
+-			"\x47\x13\x28\x73\x3c\xbb\x00\x90"
+-			"\xf3\x4d\xc9\x0e\xfd\xe7\xb1\x71"
+-			"\xd3\x15\x79\xbf\xcc\x26\x2f\xbd"
+-			"\xad\x6c\x50\x69\x6c\x3e\x6d\x80"
+-			"\x9a\xea\x78\xaf\x19\xb2\x0d\x4d"
+-			"\xad\x04\x07\xae\x22\x90\x4a\x93"
+-			"\x32\x0e\x36\x9b\x1b\x46\xba\x3b"
+-			"\xb4\xac\xc6\xd1\xa2\x31\x53\x3b"
+-			"\x2a\x3d\x45\xfe\x03\x61\x10\x85"
+-			"\x17\x69\xa6\x78\xcc\x6c\x87\x49"
+-			"\x53\xf9\x80\x10\xde\x80\xa2\x41"
+-			"\x6a\xc3\x32\x02\xad\x6d\x3c\x56"
+-			"\x00\x71\x51\x06\xa7\xbd\xfb\xef"
+-			"\x3c\xb5\x9f\xfc\x48\x7d\x53\x7c"
+-			"\x66\xb0\x49\x23\xc4\x47\x10\x0e"
+-			"\xe5\x6c\x74\x13\xe6\xc5\x3f\xaa"
+-			"\xde\xff\x07\x44\xdd\x56\x1b\xad"
+-			"\x09\x77\xfb\x5b\x12\xb8\x0d\x38"
+-			"\x17\x37\x35\x7b\x9b\xbc\xfe\xd4"
+-			"\x7e\x8b\xda\x7e\x5b\x04\xa7\x22"
+-			"\xa7\x31\xa1\x20\x86\xc7\x1b\x99"
+-			"\xdb\xd1\x89\xf4\x94\xa3\x53\x69"
+-			"\x8d\xe7\xe8\x74\x11\x8d\x74\xd6"
+-			"\x07\x37\x91\x9f\xfd\x67\x50\x3a"
+-			"\xc9\xe1\xf4\x36\xd5\xa0\x47\xd1"
+-			"\xf9\xe5\x39\xa3\x31\xac\x07\x36"
+-			"\x23\xf8\x66\x18\x14\x28\x34\x0f"
+-			"\xb8\xd0\xe7\x29\xb3\x04\x4b\x55"
+-			"\x01\x41\xb2\x75\x8d\xcb\x96\x85"
+-			"\x3a\xfb\xab\x2b\x9e\xfa\x58\x20"
+-			"\x44\x1f\xc0\x14\x22\x75\x61\xe8"
+-			"\xaa\x19\xcf\xf1\x82\x56\xf4\xd7"
+-			"\x78\x7b\x3d\x5f\xb3\x9e\x0b\x8a"
+-			"\x57\x50\xdb\x17\x41\x65\x4d\xa3"
+-			"\x02\xc9\x9c\x9c\x53\xfb\x39\x39"
+-			"\x9b\x1d\x72\x24\xda\xb7\x39\xbe"
+-			"\x13\x3b\xfa\x29\xda\x9e\x54\x64"
+-			"\x6e\xba\xd8\xa1\xcb\xb3\x36\xfa"
+-			"\xcb\x47\x85\xe9\x61\x38\xbc\xbe"
+-			"\xc5\x00\x38\x2a\x54\xf7\xc4\xb9"
+-			"\xb3\xd3\x7b\xa0\xa0\xf8\x72\x7f"
+-			"\x8c\x8e\x82\x0e\xc6\x1c\x75\x9d"
+-			"\xca\x8e\x61\x87\xde\xad\x80\xd2"
+-			"\xf5\xf9\x80\xef\x15\x75\xaf\xf5"
+-			"\x80\xfb\xff\x6d\x1e\x25\xb7\x40"
+-			"\x61\x6a\x39\x5a\x6a\xb5\x31\xab"
+-			"\x97\x8a\x19\x89\x44\x40\xc0\xa6"
+-			"\xb4\x4e\x30\x32\x7b\x13\xe7\x67"
+-			"\xa9\x8b\x57\x04\xc2\x01\xa6\xf4"
+-			"\x28\x99\xad\x2c\x76\xa3\x78\xc2"
+-			"\x4a\xe6\xca\x5c\x50\x6a\xc1\xb0"
+-			"\x62\x4b\x10\x8e\x7c\x17\x43\xb3"
+-			"\x17\x66\x1c\x3e\x8d\x69\xf0\x5a"
+-			"\x71\xf5\x97\xdc\xd1\x45\xdd\x28"
+-			"\xf3\x5d\xdf\x53\x7b\x11\xe5\xbc"
+-			"\x4c\xdb\x1b\x51\x6b\xe9\xfb\x3d"
+-			"\xc1\xc3\x2c\xb9\x71\xf5\xb6\xb2"
+-			"\x13\x36\x79\x80\x53\xe8\xd3\xa6"
+-			"\x0a\xaf\xfd\x56\x97\xf7\x40\x8e"
+-			"\x45\xce\xf8\xb0\x9e\x5c\x33\x82"
+-			"\xb0\x44\x56\xfc\x05\x09\xe9\x2a"
+-			"\xac\x26\x80\x14\x1d\xc8\x3a\x35"
+-			"\x4c\x82\x97\xfd\x76\xb7\xa9\x0a"
+-			"\x35\x58\x79\x8e\x0f\x66\xea\xaf"
+-			"\x51\x6c\x09\xa9\x6e\x9b\xcb\x9a"
+-			"\x31\x47\xa0\x2f\x7c\x71\xb4\x4a"
+-			"\x11\xaa\x8c\x66\xc5\x64\xe6\x3a"
+-			"\x54\xda\x24\x6a\xc4\x41\x65\x46"
+-			"\x82\xa0\x0a\x0f\x5f\xfb\x25\xd0"
+-			"\x2c\x91\xa7\xee\xc4\x81\x07\x86"
+-			"\x75\x5e\x33\x69\x97\xe4\x2c\xa8"
+-			"\x9d\x9f\x0b\x6a\xbe\xad\x98\xda"
+-			"\x6d\x94\x41\xda\x2c\x1e\x89\xc4"
+-			"\xc2\xaf\x1e\x00\x05\x0b\x83\x60"
+-			"\xbd\x43\xea\x15\x23\x7f\xb9\xac"
+-			"\xee\x4f\x2c\xaf\x2a\xf3\xdf\xd0"
+-			"\xf3\x19\x31\xbb\x4a\x74\x84\x17"
+-			"\x52\x32\x2c\x7d\x61\xe4\xcb\xeb"
+-			"\x80\x38\x15\x52\xcb\x6f\xea\xe5"
+-			"\x73\x9c\xd9\x24\x69\xc6\x95\x32"
+-			"\x21\xc8\x11\xe4\xdc\x36\xd7\x93"
+-			"\x38\x66\xfb\xb2\x7f\x3a\xb9\xaf"
+-			"\x31\xdd\x93\x75\x78\x8a\x2c\x94"
+-			"\x87\x1a\x58\xec\x9e\x7d\x4d\xba"
+-			"\xe1\xe5\x4d\xfc\xbc\xa4\x2a\x14"
+-			"\xef\xcc\xa7\xec\xab\x43\x09\x18"
+-			"\xd3\xab\x68\xd1\x07\x99\x44\x47"
+-			"\xd6\x83\x85\x3b\x30\xea\xa9\x6b"
+-			"\x63\xea\xc4\x07\xfb\x43\x2f\xa4"
+-			"\xaa\xb0\xab\x03\x89\xce\x3f\x8c"
+-			"\x02\x7c\x86\x54\xbc\x88\xaf\x75"
+-			"\xd2\xdc\x63\x17\xd3\x26\xf6\x96"
+-			"\xa9\x3c\xf1\x61\x8c\x11\x18\xcc"
+-			"\xd6\xea\x5b\xe2\xcd\xf0\xf1\xb2"
+-			"\xe5\x35\x90\x1f\x85\x4c\x76\x5b"
+-			"\x66\xce\x44\xa4\x32\x9f\xe6\x7b"
+-			"\x71\x6e\x9f\x58\x15\x67\x72\x87"
+-			"\x64\x8e\x3a\x44\x45\xd4\x76\xfa"
+-			"\xc2\xf6\xef\x85\x05\x18\x7a\x9b"
+-			"\xba\x41\x54\xac\xf0\xfc\x59\x12"
+-			"\x3f\xdf\xa0\xe5\x8a\x65\xfd\x3a"
+-			"\x62\x8d\x83\x2c\x03\xbe\x05\x76"
+-			"\x2e\x53\x49\x97\x94\x33\xae\x40"
+-			"\x81\x15\xdb\x6e\xad\xaa\xf5\x4b"
+-			"\xe3\x98\x70\xdf\xe0\x7c\xcd\xdb"
+-			"\x02\xd4\x7d\x2f\xc1\xe6\xb4\xf3"
+-			"\xd7\x0d\x7a\xd9\x23\x9e\x87\x2d"
+-			"\xce\x87\xad\xcc\x72\x05\x00\x29"
+-			"\xdc\x73\x7f\x64\xc1\x15\x0e\xc2"
+-			"\xdf\xa7\x5f\xeb\x41\xa1\xcd\xef"
+-			"\x5c\x50\x79\x2a\x56\x56\x71\x8c"
+-			"\xac\xc0\x79\x50\x69\xca\x59\x32"
+-			"\x65\xf2\x54\xe4\x52\x38\x76\xd1"
+-			"\x5e\xde\x26\x9e\xfb\x75\x2e\x11"
+-			"\xb5\x10\xf4\x17\x73\xf5\x89\xc7"
+-			"\x4f\x43\x5c\x8e\x7c\xb9\x05\x52"
+-			"\x24\x40\x99\xfe\x9b\x85\x0b\x6c"
+-			"\x22\x3e\x8b\xae\x86\xa1\xd2\x79"
+-			"\x05\x68\x6b\xab\xe3\x41\x49\xed"
+-			"\x15\xa1\x8d\x40\x2d\x61\xdf\x1a"
+-			"\x59\xc9\x26\x8b\xef\x30\x4c\x88"
+-			"\x4b\x10\xf8\x8d\xa6\x92\x9f\x4b"
+-			"\xf3\xc4\x53\x0b\x89\x5d\x28\x92"
+-			"\xcf\x78\xb2\xc0\x5d\xed\x7e\xfc"
+-			"\xc0\x12\x23\x5f\x5a\x78\x86\x43"
+-			"\x6e\x27\xf7\x5a\xa7\x6a\xed\x19"
+-			"\x04\xf0\xb3\x12\xd1\xbd\x0e\x89"
+-			"\x6e\xbc\x96\xa8\xd8\x49\x39\x9f"
+-			"\x7e\x67\xf0\x2e\x3e\x01\xa9\xba"
+-			"\xec\x8b\x62\x8e\xcb\x4a\x70\x43"
+-			"\xc7\xc2\xc4\xca\x82\x03\x73\xe9"
+-			"\x11\xdf\xcf\x54\xea\xc9\xb0\x95"
+-			"\x51\xc0\x13\x3d\x92\x05\xfa\xf4"
+-			"\xa9\x34\xc8\xce\x6c\x3d\x54\xcc"
+-			"\xc4\xaf\xf1\xdc\x11\x44\x26\xa2"
+-			"\xaf\xf1\x85\x75\x7d\x03\x61\x68"
+-			"\x4e\x78\xc6\x92\x7d\x86\x7d\x77"
+-			"\xdc\x71\x72\xdb\xc6\xae\xa1\xcb"
+-			"\x70\x9a\x0b\x19\xbe\x4a\x6c\x2a"
+-			"\xe2\xba\x6c\x64\x9a\x13\x28\xdf"
+-			"\x85\x75\xe6\x43\xf6\x87\x08\x68"
+-			"\x6e\xba\x6e\x79\x9f\x04\xbc\x23"
+-			"\x50\xf6\x33\x5c\x1f\x24\x25\xbe"
+-			"\x33\x47\x80\x45\x56\xa3\xa7\xd7"
+-			"\x7a\xb1\x34\x0b\x90\x3c\x9c\xad"
+-			"\x44\x5f\x9e\x0e\x9d\xd4\xbd\x93"
+-			"\x5e\xfa\x3c\xe0\xb0\xd9\xed\xf3"
+-			"\xd6\x2e\xff\x24\xd8\x71\x6c\xed"
+-			"\xaf\x55\xeb\x22\xac\x93\x68\x32"
+-			"\x05\x5b\x47\xdd\xc6\x4a\xcb\xc7"
+-			"\x10\xe1\x3c\x92\x1a\xf3\x23\x78"
+-			"\x2b\xa1\xd2\x80\xf4\x12\xb1\x20"
+-			"\x8f\xff\x26\x35\xdd\xfb\xc7\x4e"
+-			"\x78\xf1\x2d\x50\x12\x77\xa8\x60"
+-			"\x7c\x0f\xf5\x16\x2f\x63\x70\x2a"
+-			"\xc0\x96\x80\x4e\x0a\xb4\x93\x35"
+-			"\x5d\x1d\x3f\x56\xf7\x2f\xbb\x90"
+-			"\x11\x16\x8f\xa2\xec\x47\xbe\xac"
+-			"\x56\x01\x26\x56\xb1\x8c\xb2\x10"
+-			"\xf9\x1a\xca\xf5\xd1\xb7\x39\x20"
+-			"\x63\xf1\x69\x20\x4f\x13\x12\x1f"
+-			"\x5b\x65\xfc\x98\xf7\xc4\x7a\xbe"
+-			"\xf7\x26\x4d\x2b\x84\x7b\x42\xad"
+-			"\xd8\x7a\x0a\xb4\xd8\x74\xbf\xc1"
+-			"\xf0\x6e\xb4\x29\xa3\xbb\xca\x46"
+-			"\x67\x70\x6a\x2d\xce\x0e\xa2\x8a"
+-			"\xa9\x87\xbf\x05\xc4\xc1\x04\xa3"
+-			"\xab\xd4\x45\x43\x8c\xb6\x02\xb0"
+-			"\x41\xc8\xfc\x44\x3d\x59\xaa\x2e"
+-			"\x44\x21\x2a\x8d\x88\x9d\x57\xf4"
+-			"\xa0\x02\x77\xb8\xa6\xa0\xe6\x75"
+-			"\x5c\x82\x65\x3e\x03\x5c\x29\x8f"
+-			"\x38\x55\xab\x33\x26\xef\x9f\x43"
+-			"\x52\xfd\x68\xaf\x36\xb4\xbb\x9a"
+-			"\x58\x09\x09\x1b\xc3\x65\x46\x46"
+-			"\x1d\xa7\x94\x18\x23\x50\x2c\xca"
+-			"\x2c\x55\x19\x97\x01\x9d\x93\x3b"
+-			"\x63\x86\xf2\x03\x67\x45\xd2\x72"
+-			"\x28\x52\x6c\xf4\xe3\x1c\xb5\x11"
+-			"\x13\xf1\xeb\x21\xc7\xd9\x56\x82"
+-			"\x2b\x82\x39\xbd\x69\x54\xed\x62"
+-			"\xc3\xe2\xde\x73\xd4\x6a\x12\xae"
+-			"\x13\x21\x7f\x4b\x5b\xfc\xbf\xe8"
+-			"\x2b\xbe\x56\xba\x68\x8b\x9a\xb1"
+-			"\x6e\xfa\xbf\x7e\x5a\x4b\xf1\xac"
+-			"\x98\x65\x85\xd1\x93\x53\xd3\x7b"
+-			"\x09\xdd\x4b\x10\x6d\x84\xb0\x13"
+-			"\x65\xbd\xcf\x52\x09\xc4\x85\xe2"
+-			"\x84\x74\x15\x65\xb7\xf7\x51\xaf"
+-			"\x55\xad\xa4\xd1\x22\x54\x70\x94"
+-			"\xa0\x1c\x90\x41\xfd\x99\xd7\x5a"
+-			"\x31\xef\xaa\x25\xd0\x7f\x4f\xea"
+-			"\x1d\x55\x42\xe5\x49\xb0\xd0\x46"
+-			"\x62\x36\x43\xb2\x82\x15\x75\x50"
+-			"\xa4\x72\xeb\x54\x27\x1f\x8a\xe4"
+-			"\x7d\xe9\x66\xc5\xf1\x53\xa4\xd1"
+-			"\x0c\xeb\xb8\xf8\xbc\xd4\xe2\xe7"
+-			"\xe1\xf8\x4b\xcb\xa9\xa1\xaf\x15"
+-			"\x83\xcb\x72\xd0\x33\x79\x00\x2d"
+-			"\x9f\xd7\xf1\x2e\x1e\x10\xe4\x45"
+-			"\xc0\x75\x3a\x39\xea\x68\xf7\x5d"
+-			"\x1b\x73\x8f\xe9\x8e\x0f\x72\x47"
+-			"\xae\x35\x0a\x31\x7a\x14\x4d\x4a"
+-			"\x6f\x47\xf7\x7e\x91\x6e\x74\x8b"
+-			"\x26\x47\xf9\xc3\xf9\xde\x70\xf5"
+-			"\x61\xab\xa9\x27\x9f\x82\xe4\x9c"
+-			"\x89\x91\x3f\x2e\x6a\xfd\xb5\x49"
+-			"\xe9\xfd\x59\x14\x36\x49\x40\x6d"
+-			"\x32\xd8\x85\x42\xf3\xa5\xdf\x0c"
+-			"\xa8\x27\xd7\x54\xe2\x63\x2f\xf2"
+-			"\x7e\x8b\x8b\xe7\xf1\x9a\x95\x35"
+-			"\x43\xdc\x3a\xe4\xb6\xf4\xd0\xdf"
+-			"\x9c\xcb\x94\xf3\x21\xa0\x77\x50"
+-			"\xe2\xc6\xc4\xc6\x5f\x09\x64\x5b"
+-			"\x92\x90\xd8\xe1\xd1\xed\x4b\x42"
+-			"\xd7\x37\xaf\x65\x3d\x11\x39\xb6"
+-			"\x24\x8a\x60\xae\xd6\x1e\xbf\x0e"
+-			"\x0d\xd7\xdc\x96\x0e\x65\x75\x4e"
+-			"\x29\x06\x9d\xa4\x51\x3a\x10\x63"
+-			"\x8f\x17\x07\xd5\x8e\x3c\xf4\x28"
+-			"\x00\x5a\x5b\x05\x19\xd8\xc0\x6c"
+-			"\xe5\x15\xe4\x9c\x9d\x71\x9d\x5e"
+-			"\x94\x29\x1a\xa7\x80\xfa\x0e\x33"
+-			"\x03\xdd\xb7\x3e\x9a\xa9\x26\x18"
+-			"\x37\xa9\x64\x08\x4d\x94\x5a\x88"
+-			"\xca\x35\xce\x81\x02\xe3\x1f\x1b"
+-			"\x89\x1a\x77\x85\xe3\x41\x6d\x32"
+-			"\x42\x19\x23\x7d\xc8\x73\xee\x25"
+-			"\x85\x0d\xf8\x31\x25\x79\x1b\x6f"
+-			"\x79\x25\xd2\xd8\xd4\x23\xfd\xf7"
+-			"\x82\x36\x6a\x0c\x46\x22\x15\xe9"
+-			"\xff\x72\x41\x91\x91\x7d\x3a\xb7"
+-			"\xdd\x65\x99\x70\xf6\x8d\x84\xf8"
+-			"\x67\x15\x20\x11\xd6\xb2\x55\x7b"
+-			"\xdb\x87\xee\xef\x55\x89\x2a\x59"
+-			"\x2b\x07\x8f\x43\x8a\x59\x3c\x01"
+-			"\x8b\x65\x54\xa1\x66\xd5\x38\xbd"
+-			"\xc6\x30\xa9\xcc\x49\xb6\xa8\x1b"
+-			"\xb8\xc0\x0e\xe3\x45\x28\xe2\xff"
+-			"\x41\x9f\x7e\x7c\xd1\xae\x9e\x25"
+-			"\x3f\x4c\x7c\x7c\xf4\xa8\x26\x4d"
+-			"\x5c\xfd\x4b\x27\x18\xf9\x61\x76"
+-			"\x48\xba\x0c\x6b\xa9\x4d\xfc\xf5"
+-			"\x3b\x35\x7e\x2f\x4a\xa9\xc2\x9a"
+-			"\xae\xab\x86\x09\x89\xc9\xc2\x40"
+-			"\x39\x2c\x81\xb3\xb8\x17\x67\xc2"
+-			"\x0d\x32\x4a\x3a\x67\x81\xd7\x1a"
+-			"\x34\x52\xc5\xdb\x0a\xf5\x63\x39"
+-			"\xea\x1f\xe1\x7c\xa1\x9e\xc1\x35"
+-			"\xe3\xb1\x18\x45\x67\xf9\x22\x38"
+-			"\x95\xd9\x34\x34\x86\xc6\x41\x94"
+-			"\x15\xf9\x5b\x41\xa6\x87\x8b\xf8"
+-			"\xd5\xe1\x1b\xe2\x5b\xf3\x86\x10"
+-			"\xff\xe6\xae\x69\x76\xbc\x0d\xb4"
+-			"\x09\x90\x0c\xa2\x65\x0c\xad\x74"
+-			"\xf5\xd7\xff\xda\xc1\xce\x85\xbe"
+-			"\x00\xa7\xff\x4d\x2f\x65\xd3\x8c"
+-			"\x86\x2d\x05\xe8\xed\x3e\x6b\x8b"
+-			"\x0f\x3d\x83\x8c\xf1\x1d\x5b\x96"
+-			"\x2e\xb1\x9c\xc2\x98\xe1\x70\xb9"
+-			"\xba\x5c\x8a\x43\xd6\x34\xa7\x2d"
+-			"\xc9\x92\xae\xf2\xa5\x7b\x05\x49"
+-			"\xa7\x33\x34\x86\xca\xe4\x96\x23"
+-			"\x76\x5b\xf2\xc6\xf1\x51\x28\x42"
+-			"\x7b\xcc\x76\x8f\xfa\xa2\xad\x31"
+-			"\xd4\xd6\x7a\x6d\x25\x25\x54\xe4"
+-			"\x3f\x50\x59\xe1\x5c\x05\xb7\x27"
+-			"\x48\xbf\x07\xec\x1b\x13\xbe\x2b"
+-			"\xa1\x57\x2b\xd5\xab\xd7\xd0\x4c"
+-			"\x1e\xcb\x71\x9b\xc5\x90\x85\xd3"
+-			"\xde\x59\xec\x71\xeb\x89\xbb\xd0"
+-			"\x09\x50\xe1\x16\x3f\xfd\x1c\x34"
+-			"\xc3\x1c\xa1\x10\x77\x53\x98\xef"
+-			"\xf2\xfd\xa5\x01\x59\xc2\x9b\x26"
+-			"\xc7\x42\xd9\x49\xda\x58\x2b\x6e"
+-			"\x9f\x53\x19\x76\x7e\xd9\xc9\x0e"
+-			"\x68\xc8\x7f\x51\x22\x42\xef\x49"
+-			"\xa4\x55\xb6\x36\xac\x09\xc7\x31"
+-			"\x88\x15\x4b\x2e\x8f\x3a\x08\xf7"
+-			"\xd8\xf7\xa8\xc5\xa9\x33\xa6\x45"
+-			"\xe4\xc4\x94\x76\xf3\x0d\x8f\x7e"
+-			"\xc8\xf6\xbc\x23\x0a\xb6\x4c\xd3"
+-			"\x6a\xcd\x36\xc2\x90\x5c\x5c\x3c"
+-			"\x65\x7b\xc2\xd6\xcc\xe6\x0d\x87"
+-			"\x73\x2e\x71\x79\x16\x06\x63\x28"
+-			"\x09\x15\xd8\x89\x38\x38\x3d\xb5"
+-			"\x42\x1c\x08\x24\xf7\x2a\xd2\x9d"
+-			"\xc8\xca\xef\xf9\x27\xd8\x07\x86"
+-			"\xf7\x43\x0b\x55\x15\x3f\x9f\x83"
+-			"\xef\xdc\x49\x9d\x2a\xc1\x54\x62"
+-			"\xbd\x9b\x66\x55\x9f\xb7\x12\xf3"
+-			"\x1b\x4d\x9d\x2a\x5c\xed\x87\x75"
+-			"\x87\x26\xec\x61\x2c\xb4\x0f\x89"
+-			"\xb0\xfb\x2e\x68\x5d\x15\xc7\x8d"
+-			"\x2e\xc0\xd9\xec\xaf\x4f\xd2\x25"
+-			"\x29\xe8\xd2\x26\x2b\x67\xe9\xfc"
+-			"\x2b\xa8\x67\x96\x12\x1f\x5b\x96"
+-			"\xc6\x14\x53\xaf\x44\xea\xd6\xe2"
+-			"\x94\x98\xe4\x12\x93\x4c\x92\xe0"
+-			"\x18\xa5\x8d\x2d\xe4\x71\x3c\x47"
+-			"\x4c\xf7\xe6\x47\x9e\xc0\x68\xdf"
+-			"\xd4\xf5\x5a\x74\xb1\x2b\x29\x03"
+-			"\x19\x07\xaf\x90\x62\x5c\x68\x98"
+-			"\x48\x16\x11\x02\x9d\xee\xb4\x9b"
+-			"\xe5\x42\x7f\x08\xfd\x16\x32\x0b"
+-			"\xd0\xb3\xfa\x2b\xb7\x99\xf9\x29"
+-			"\xcd\x20\x45\x9f\xb3\x1a\x5d\xa2"
+-			"\xaf\x4d\xe0\xbd\x42\x0d\xbc\x74"
+-			"\x99\x9c\x8e\x53\x1a\xb4\x3e\xbd"
+-			"\xa2\x9a\x2d\xf7\xf8\x39\x0f\x67"
+-			"\x63\xfc\x6b\xc0\xaf\xb3\x4b\x4f"
+-			"\x55\xc4\xcf\xa7\xc8\x04\x11\x3e"
+-			"\x14\x32\xbb\x1b\x38\x77\xd6\x7f"
+-			"\x54\x4c\xdf\x75\xf3\x07\x2d\x33"
+-			"\x9b\xa8\x20\xe1\x7b\x12\xb5\xf3"
+-			"\xef\x2f\xce\x72\xe5\x24\x60\xc1"
+-			"\x30\xe2\xab\xa1\x8e\x11\x09\xa8"
+-			"\x21\x33\x44\xfe\x7f\x35\x32\x93"
+-			"\x39\xa7\xad\x8b\x79\x06\xb2\xcb"
+-			"\x4e\xa9\x5f\xc7\xba\x74\x29\xec"
+-			"\x93\xa0\x4e\x54\x93\xc0\xbc\x55"
+-			"\x64\xf0\x48\xe5\x57\x99\xee\x75"
+-			"\xd6\x79\x0f\x66\xb7\xc6\x57\x76"
+-			"\xf7\xb7\xf3\x9c\xc5\x60\xe8\x7f"
+-			"\x83\x76\xd6\x0e\xaa\xe6\x90\x39"
+-			"\x1d\xa6\x32\x6a\x34\xe3\x55\xf8"
+-			"\x58\xa0\x58\x7d\x33\xe0\x22\x39"
+-			"\x44\x64\x87\x86\x5a\x2f\xa7\x7e"
+-			"\x0f\x38\xea\xb0\x30\xcc\x61\xa5"
+-			"\x6a\x32\xae\x1e\xf7\xe9\xd0\xa9"
+-			"\x0c\x32\x4b\xb5\x49\x28\xab\x85"
+-			"\x2f\x8e\x01\x36\x38\x52\xd0\xba"
+-			"\xd6\x02\x78\xf8\x0e\x3e\x9c\x8b"
+-			"\x6b\x45\x99\x3f\x5c\xfe\x58\xf1"
+-			"\x5c\x94\x04\xe1\xf5\x18\x6d\x51"
+-			"\xb2\x5d\x18\x20\xb6\xc2\x9a\x42"
+-			"\x1d\xb3\xab\x3c\xb6\x3a\x13\x03"
+-			"\xb2\x46\x82\x4f\xfc\x64\xbc\x4f"
+-			"\xca\xfa\x9c\xc0\xd5\xa7\xbd\x11"
+-			"\xb7\xe4\x5a\xf6\x6f\x4d\x4d\x54"
+-			"\xea\xa4\x98\x66\xd4\x22\x3b\xd3"
+-			"\x8f\x34\x47\xd9\x7c\xf4\x72\x3b"
+-			"\x4d\x02\x77\xf6\xd6\xdd\x08\x0a"
+-			"\x81\xe1\x86\x89\x3e\x56\x10\x3c"
+-			"\xba\xd7\x81\x8c\x08\xbc\x8b\xe2"
+-			"\x53\xec\xa7\x89\xee\xc8\x56\xb5"
+-			"\x36\x2c\xb2\x03\xba\x99\xdd\x7c"
+-			"\x48\xa0\xb0\xbc\x91\x33\xe9\xa8"
+-			"\xcb\xcd\xcf\x59\x5f\x1f\x15\xe2"
+-			"\x56\xf5\x4e\x01\x35\x27\x45\x77"
+-			"\x47\xc8\xbc\xcb\x7e\x39\xc1\x97"
+-			"\x28\xd3\x84\xfc\x2c\x3e\xc8\xad"
+-			"\x9c\xf8\x8a\x61\x9c\x28\xaa\xc5"
+-			"\x99\x20\x43\x85\x9d\xa5\xe2\x8b"
+-			"\xb8\xae\xeb\xd0\x32\x0d\x52\x78"
+-			"\x09\x56\x3f\xc7\xd8\x7e\x26\xfc"
+-			"\x37\xfb\x6f\x04\xfc\xfa\x92\x10"
+-			"\xac\xf8\x3e\x21\xdc\x8c\x21\x16"
+-			"\x7d\x67\x6e\xf6\xcd\xda\xb6\x98"
+-			"\x23\xab\x23\x3c\xb2\x10\xa0\x53"
+-			"\x5a\x56\x9f\xc5\xd0\xff\xbb\xe4"
+-			"\x98\x3c\x69\x1e\xdb\x38\x8f\x7e"
+-			"\x0f\xd2\x98\x88\x81\x8b\x45\x67"
+-			"\xea\x33\xf1\xeb\xe9\x97\x55\x2e"
+-			"\xd9\xaa\xeb\x5a\xec\xda\xe1\x68"
+-			"\xa8\x9d\x3c\x84\x7c\x05\x3d\x62"
+-			"\x87\x8f\x03\x21\x28\x95\x0c\x89"
+-			"\x25\x22\x4a\xb0\x93\xa9\x50\xa2"
+-			"\x2f\x57\x6e\x18\x42\x19\x54\x0c"
+-			"\x55\x67\xc6\x11\x49\xf4\x5c\xd2"
+-			"\xe9\x3d\xdd\x8b\x48\x71\x21\x00"
+-			"\xc3\x9a\x6c\x85\x74\x28\x83\x4a"
+-			"\x1b\x31\x05\xe1\x06\x92\xe7\xda"
+-			"\x85\x73\x78\x45\x20\x7f\xae\x13"
+-			"\x7c\x33\x06\x22\xf4\x83\xf9\x35"
+-			"\x3f\x6c\x71\xa8\x4e\x48\xbe\x9b"
+-			"\xce\x8a\xba\xda\xbe\x28\x08\xf7"
+-			"\xe2\x14\x8c\x71\xea\x72\xf9\x33"
+-			"\xf2\x88\x3f\xd7\xbb\x69\x6c\x29"
+-			"\x19\xdc\x84\xce\x1f\x12\x4f\xc8"
+-			"\xaf\xa5\x04\xba\x5a\xab\xb0\xd9"
+-			"\x14\x1f\x6c\x68\x98\x39\x89\x7a"
+-			"\xd9\xd8\x2f\xdf\xa8\x47\x4a\x25"
+-			"\xe2\xfb\x33\xf4\x59\x78\xe1\x68"
+-			"\x85\xcf\xfe\x59\x20\xd4\x05\x1d"
+-			"\x80\x99\xae\xbc\xca\xae\x0f\x2f"
+-			"\x65\x43\x34\x8e\x7e\xac\xd3\x93"
+-			"\x2f\xac\x6d\x14\x3d\x02\x07\x70"
+-			"\x9d\xa4\xf3\x1b\x5c\x36\xfc\x01"
+-			"\x73\x34\x85\x0c\x6c\xd6\xf1\xbd"
+-			"\x3f\xdf\xee\xf5\xd9\xba\x56\xef"
+-			"\xf4\x9b\x6b\xee\x9f\x5a\x78\x6d"
+-			"\x32\x19\xf4\xf7\xf8\x4c\x69\x0b"
+-			"\x4b\xbc\xbb\xb7\xf2\x85\xaf\x70"
+-			"\x75\x24\x6c\x54\xa7\x0e\x4d\x1d"
+-			"\x01\xbf\x08\xac\xcf\x7f\x2c\xe3"
+-			"\x14\x89\x5e\x70\x5a\x99\x92\xcd"
+-			"\x01\x84\xc8\xd2\xab\xe5\x4f\x58"
+-			"\xe7\x0f\x2f\x0e\xff\x68\xea\xfd"
+-			"\x15\xb3\x17\xe6\xb0\xe7\x85\xd8"
+-			"\x23\x2e\x05\xc7\xc9\xc4\x46\x1f"
+-			"\xe1\x9e\x49\x20\x23\x24\x4d\x7e"
+-			"\x29\x65\xff\xf4\xb6\xfd\x1a\x85"
+-			"\xc4\x16\xec\xfc\xea\x7b\xd6\x2c"
+-			"\x43\xf8\xb7\xbf\x79\xc0\x85\xcd"
+-			"\xef\xe1\x98\xd3\xa5\xf7\x90\x8c"
+-			"\xe9\x7f\x80\x6b\xd2\xac\x4c\x30"
+-			"\xa7\xc6\x61\x6c\xd2\xf9\x2c\xff"
+-			"\x30\xbc\x22\x81\x7d\x93\x12\xe4"
+-			"\x0a\xcd\xaf\xdd\xe8\xab\x0a\x1e"
+-			"\x13\xa4\x27\xc3\x5f\xf7\x4b\xbb"
+-			"\x37\x09\x4b\x91\x6f\x92\x4f\xaf"
+-			"\x52\xee\xdf\xef\x09\x6f\xf7\x5c"
+-			"\x6e\x12\x17\x72\x63\x57\xc7\xba"
+-			"\x3b\x6b\x38\x32\x73\x1b\x9c\x80"
+-			"\xc1\x7a\xc6\xcf\xcd\x35\xc0\x6b"
+-			"\x31\x1a\x6b\xe9\xd8\x2c\x29\x3f"
+-			"\x96\xfb\xb6\xcd\x13\x91\x3b\xc2"
+-			"\xd2\xa3\x31\x8d\xa4\xcd\x57\xcd"
+-			"\x13\x3d\x64\xfd\x06\xce\xe6\xdc"
+-			"\x0c\x24\x43\x31\x40\x57\xf1\x72"
+-			"\x17\xe3\x3a\x63\x6d\x35\xcf\x5d"
+-			"\x97\x40\x59\xdd\xf7\x3c\x02\xf7"
+-			"\x1c\x7e\x05\xbb\xa9\x0d\x01\xb1"
+-			"\x8e\xc0\x30\xa9\x53\x24\xc9\x89"
+-			"\x84\x6d\xaa\xd0\xcd\x91\xc2\x4d"
+-			"\x91\xb0\x89\xe2\xbf\x83\x44\xaa"
+-			"\x28\x72\x23\xa0\xc2\xad\xad\x1c"
+-			"\xfc\x3f\x09\x7a\x0b\xdc\xc5\x1b"
+-			"\x87\x13\xc6\x5b\x59\x8d\xf2\xc8"
+-			"\xaf\xdf\x11\x95",
+-		.len	= 4100,
+-	},
+-};
+-
+ static const struct cipher_testvec chacha20_tv_template[] = {
+ 	{ /* RFC7539 A.2. Test Vector #1 */
+ 		.key	= "\x00\x00\x00\x00\x00\x00\x00\x00"
 -- 
 2.17.1
 
