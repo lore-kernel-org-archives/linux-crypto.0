@@ -8,56 +8,56 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C8D5C433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C1AC433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:52:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2EEBC238E2
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:52:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B5B1238E2
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:52:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726603AbhAUEvt (ORCPT
+        id S1726665AbhAUEvv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Jan 2021 23:51:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38964 "EHLO
+        Wed, 20 Jan 2021 23:51:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727317AbhAUEpA (ORCPT
+        with ESMTP id S1727559AbhAUEoy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Jan 2021 23:45:00 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7311CC061798;
-        Wed, 20 Jan 2021 20:44:14 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id x18so588473pln.6;
-        Wed, 20 Jan 2021 20:44:14 -0800 (PST)
+        Wed, 20 Jan 2021 23:44:54 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09D83C061796;
+        Wed, 20 Jan 2021 20:43:56 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id 31so570408plb.10;
+        Wed, 20 Jan 2021 20:43:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=gQh2IwNxftbR34HfI9l3nT7vPGQ8lmvW4dX0b9EAc7Y=;
-        b=BupZcrXhhNK8Ef6ojLlQM42EwDg3c1oTSVd8H+/oHXiemqGl5WEzw5ar1WiOZx+iC1
-         jvVMgDVDYdxjTtfxYu78QrlC0iD6CqYMsHQO14d3u/k/FzKXX6SQP2XOINno1iXJgCld
-         4rZ5ayp0ch64tHhDbqoBufiU0rftkrB4lzOgJvHfBiRYnwclH042wfAC1IOVo8or3EvO
-         JrX4jA2FS/PZ0Oi6MEceS+MYxaga4gy2lmJSbASRPTx+WtxyunTISoxeVi7oSbv5GNe+
-         oHPTQXwPGwEWVuhWPI9AHbUS2BYxMiz7KP0iypNrPDePZi/GniAt/ru7X3bHn5ZdOkwi
-         5zVw==
+        bh=u19NxDApfMXx+Y8pGP/iF30yq+dZf2FG4hiZfFrFBcE=;
+        b=YcZEALK88C6Ie3UfV/NxIVW467onUG7DeIDhOp7jC+bX302hPlWbEVlnebgdCBbwFj
+         LOfHF9OGgUlWjLj4wIBvH5lDknvO/fNQBpFbxTx5hQvmZSvg2FI4T7wq1SWUY8IjDElq
+         tBHXoMkG1PrFIM2bBualHC6DrvMNzuLL9tHtzO17KvRwOgIGCG+A2n3xsYGLTrmsLLtL
+         FHVZQ9zJrNd9rMoLlJb4wRfv3cynMP8nKgEOaTz0LCxKtAv4ZNEvaaowW6LA42qsA6j2
+         OvGmfqDHs0jWX+Zrk2Zl+2+I0+uX3UV62B0QiQn2Ff0gKlNEE9LyANJMLdDJvz9Hb2A1
+         WuFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=gQh2IwNxftbR34HfI9l3nT7vPGQ8lmvW4dX0b9EAc7Y=;
-        b=um+o6HckUMgmvlRn3y9CUtEGK1KrHOs05ng1CRw+/p6zVhMIVKYprfuM9haWD/U7hA
-         TOzxvBYqmHnYDBdoM7kICYXsiwnQxhYt/pvjSomf9ylSojiPs8PvXEb+8eAYvukvVkiq
-         K0CuTluJ1/Wn6l5pHboSVxHCOSQj9W+pGygUn0EV2Ot1+8Lu48RbOHsYzrA0uCZBdOhn
-         mmhMPmbeFZhBFoXd8LzoHhH33gjLChDyvCT4jIEXQER2y9EQINHvDsomUk2yvZt3OOfU
-         XlDEGT3ttDJMT8S84A/yC0JU3G1DGMCuYbPV14vlDY2IUFW/bxB4GzAGd8wwGtFGtYPI
-         Od9Q==
-X-Gm-Message-State: AOAM531WjaKknG18zP68W4MIqjiGcmpv7lzgcdAcraqrTAj0jBhWl8hi
-        zJ0rHAzeDJ+QZnZ1gE8JeAM=
-X-Google-Smtp-Source: ABdhPJxihhD7rtz9KUgJnDNb27lJMLl+Qqb3jgEHtXH3KDbu2VD5PkvZTpN9Xi673Iz88wL6BF/1ZA==
-X-Received: by 2002:a17:902:a501:b029:dc:3e1d:4ddb with SMTP id s1-20020a170902a501b02900dc3e1d4ddbmr13240061plq.60.1611204254054;
-        Wed, 20 Jan 2021 20:44:14 -0800 (PST)
+        bh=u19NxDApfMXx+Y8pGP/iF30yq+dZf2FG4hiZfFrFBcE=;
+        b=nt7Xx8RVEye0jjxnSl8dEKYVfhKeqBcKELefxzsbAvwVnbKjE70PMdWzmvbd225VcK
+         IUMlmih1WnmzeXHNYnliJJTUoNuy23huoenHSpe51se/S1GJtJK2XzQaYcmgLfvMw1DO
+         v+4sAgyND8+UR0qweoPQRGkgnpn3dDVRvAo19ndjPsw7pZzG3Qewl+UjgCNFFW2jwYq7
+         n9AxibHGS6soXTK5/qrTHrqtUhhWlhNLB6/3ncOwDwTOUqENUbdJ4yC5oLNvJFHMU+y6
+         B/7eTKNH7uBKwj2OgrW63fK/W+G/OaCNKzbBA9ZmoQpdu0K0q+EBqnoCdH3k5XEXbo54
+         WPLQ==
+X-Gm-Message-State: AOAM5316ar7fA2g+UbpDWRfEjtsl6e/QJMjdYf3j9JJtOefcp0nat5U/
+        mfhB3p4J9VdSO7IIIDQshm8=
+X-Google-Smtp-Source: ABdhPJz55X807cU8264jB4dLtQ3vVAqYFPxZ8roblYo9YlKQHa5BhE7/TMsNFZx5ohRE85FkNMi7zA==
+X-Received: by 2002:a17:90a:9ac:: with SMTP id 41mr9635853pjo.46.1611204235611;
+        Wed, 20 Jan 2021 20:43:55 -0800 (PST)
 Received: from localhost.localdomain ([49.207.210.174])
-        by smtp.gmail.com with ESMTPSA id jx15sm3916014pjb.17.2021.01.20.20.44.05
+        by smtp.gmail.com with ESMTPSA id jx15sm3916014pjb.17.2021.01.20.20.43.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jan 2021 20:44:13 -0800 (PST)
+        Wed, 20 Jan 2021 20:43:55 -0800 (PST)
 From:   Allen Pais <allen.lkml@gmail.com>
 To:     herbert@gondor.apana.org.au
 Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
@@ -74,9 +74,9 @@ Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
         linux-samsung-soc@vger.kernel.org,
         Allen Pais <apais@linux.microsoft.com>,
         Romain Perier <romain.perier@gmail.com>
-Subject: [PATCH v4 15/19] crypto: qce: convert tasklets to use new tasklet_setup() API
-Date:   Thu, 21 Jan 2021 10:11:22 +0530
-Message-Id: <20210121044126.152274-16-allen.lkml@gmail.com>
+Subject: [PATCH v4 13/19] crypto: picoxcell: convert tasklets to use new tasklet_setup() API
+Date:   Thu, 21 Jan 2021 10:11:20 +0530
+Message-Id: <20210121044126.152274-14-allen.lkml@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210121044126.152274-1-allen.lkml@gmail.com>
 References: <20210121044126.152274-1-allen.lkml@gmail.com>
@@ -96,35 +96,35 @@ and from_tasklet() to pass the tasklet pointer explicitly.
 Signed-off-by: Romain Perier <romain.perier@gmail.com>
 Signed-off-by: Allen Pais <apais@linux.microsoft.com>
 ---
- drivers/crypto/qce/core.c | 7 +++----
+ drivers/crypto/picoxcell_crypto.c | 7 +++----
  1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-index 80b75085c265..374281e9d6b9 100644
---- a/drivers/crypto/qce/core.c
-+++ b/drivers/crypto/qce/core.c
-@@ -116,9 +116,9 @@ static int qce_handle_queue(struct qce_device *qce,
- 	return ret;
+diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
+index 84f9c16d984c..e64fa3e22521 100644
+--- a/drivers/crypto/picoxcell_crypto.c
++++ b/drivers/crypto/picoxcell_crypto.c
+@@ -1137,9 +1137,9 @@ static int spacc_req_submit(struct spacc_req *req)
+ 		return spacc_ablk_submit(req);
  }
  
--static void qce_tasklet_req_done(unsigned long data)
-+static void qce_tasklet_req_done(struct tasklet_struct *t)
+-static void spacc_spacc_complete(unsigned long data)
++static void spacc_spacc_complete(struct tasklet_struct *t)
  {
--	struct qce_device *qce = (struct qce_device *)data;
-+	struct qce_device *qce = from_tasklet(qce, t, done_tasklet);
- 	struct crypto_async_request *req;
+-	struct spacc_engine *engine = (struct spacc_engine *)data;
++	struct spacc_engine *engine = from_tasklet(engine, t, complete);
+ 	struct spacc_req *req, *tmp;
  	unsigned long flags;
+ 	LIST_HEAD(completed);
+@@ -1649,8 +1649,7 @@ static int spacc_probe(struct platform_device *pdev)
+ 		return -ENXIO;
+ 	}
  
-@@ -235,8 +235,7 @@ static int qce_crypto_probe(struct platform_device *pdev)
- 		goto err_clks;
+-	tasklet_init(&engine->complete, spacc_spacc_complete,
+-		     (unsigned long)engine);
++	tasklet_setup(&engine->complete, spacc_spacc_complete);
  
- 	spin_lock_init(&qce->lock);
--	tasklet_init(&qce->done_tasklet, qce_tasklet_req_done,
--		     (unsigned long)qce);
-+	tasklet_setup(&qce->done_tasklet, qce_tasklet_req_done);
- 	crypto_init_queue(&qce->queue, QCE_QUEUE_LENGTH);
- 
- 	qce->async_req_enqueue = qce_async_request_enqueue;
+ 	ret = devm_add_action(&pdev->dev, spacc_tasklet_kill,
+ 			      &engine->complete);
 -- 
 2.25.1
 
