@@ -8,56 +8,56 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64EB0C433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:44:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BBB5C433E6
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:45:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22C2B238E5
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:44:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3188A206FA
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:45:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727802AbhAUEof (ORCPT
+        id S1727708AbhAUEoy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Jan 2021 23:44:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38894 "EHLO
+        Wed, 20 Jan 2021 23:44:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727008AbhAUEmy (ORCPT
+        with ESMTP id S1732044AbhAUEnh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Jan 2021 23:42:54 -0500
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DF3FC0613D6;
-        Wed, 20 Jan 2021 20:42:13 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id 11so779063pfu.4;
-        Wed, 20 Jan 2021 20:42:13 -0800 (PST)
+        Wed, 20 Jan 2021 23:43:37 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E225BC061757;
+        Wed, 20 Jan 2021 20:42:41 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id m5so800247pjv.5;
+        Wed, 20 Jan 2021 20:42:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=ChEdTs09dQ0RBgzbeZxLNBVFnUFhvXMwpM6L2ZZDSyQ=;
-        b=KvShdbpgZQGFjlp8uI4TxtE3bEvUl7eJ9+58vQiV7UUWClefgys6P5UWJOeFfOO4s6
-         iXE9k4/KpixLotFwX6CMkUhXEekcidnYyf7r0yEqgWdEJHRU96y3mZdOrc0NMjmPMppz
-         0BVjikc/C20sfVpR1yIWdtVMubc91biFMOw6SUaCKHmHl6pxVHilYmWo3iu39cl4Jszh
-         WvG29NwzTRxDrp46j5d6awW+vmidYwLfcBMb4x+ifBHDMliBM/x6ckV9kKf1dXWEJfVx
-         W/to4otL5oaeptkREa8FNq1jzqCCeEQ4pqcwWBHj4xL1jdTe+f8rapVyb19i9oupEpzC
-         n7hg==
+        bh=qp9LBDTmnPZcn3zbp0ts8Zh1JyTpVMJr9nqNyHr6PFs=;
+        b=o/lkqyQFzs4RW/ABushd5cU3kQqz7E7fIT81eyzErV+QAgEJY6dGrscoZ3gFte+H41
+         owcmN/qzhGHjLzwF8A6OSyvAyYflWMrxM6jdvQIl3jeNB9nemBQtFFozFcaJUDmDZQEI
+         KglKxLIlti4D8ZajrrLab+uRm+kLkcj/T5actvFG59pi3EpNjUVLLVRYUUTg+4llPtdk
+         ua10pw/atw5AQHJEjdCuAGvnEyqAuanMTrJ21AwpOUIljw7o37D0LockJH2oMGGdrBiY
+         0248Im7oGZSr+M37u8gJO9mzV32nqbxBJM7Ys5LP3pqaCiyL5Xx962skK9n3TSQQAyFy
+         yIMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ChEdTs09dQ0RBgzbeZxLNBVFnUFhvXMwpM6L2ZZDSyQ=;
-        b=HZKD0SdCmAErBGxgAWOvogyuk79YfXlFZlFjzSIMJ5YqWCoIcFFc9a62LHOgRklrds
-         AXcnwuYjvrxK2iceOecxH9lwGanJMe1UC/FsMr1eOdODkksHrZQJBXoiCRdbT3bR9DU9
-         7fytscxO0Qp5rqQ+GQq4LufsGsJfsHcVUuKgrBkgYZdETf/lx4MidJjJpdeU0FscHr0y
-         2wqbs/l6fAa2d4KdUBHVBkGpd2TjXHV9q/YUmKfh5Xi5vBm2CR4a/bJFYx/gcHnIpFJd
-         VmpL+eb4hRHCuzRMBg1H5vPhnaU4hdhOZozD+namMSEcvSJp4Vkgyt5jdN8bj5ffqoa/
-         g2FQ==
-X-Gm-Message-State: AOAM532yrxi9EkqKZzoH8+EcjbT4Q76H/J6o0NKPZK2ayfyuJ5lSM8V9
-        vK+UTZumQ0GK2tTlpLZG5ts=
-X-Google-Smtp-Source: ABdhPJyU28grIyTHLl0ka3Qi5jVmnSsmWrSzIblQ0aYXzCs/hgUfCfjr+KJ3CsYlTQa6ciboZK20ng==
-X-Received: by 2002:a62:6341:0:b029:1ba:d55d:1d0a with SMTP id x62-20020a6263410000b02901bad55d1d0amr6199934pfb.79.1611204132571;
-        Wed, 20 Jan 2021 20:42:12 -0800 (PST)
+        bh=qp9LBDTmnPZcn3zbp0ts8Zh1JyTpVMJr9nqNyHr6PFs=;
+        b=tnUpKXpGk2I+hMEW3X6PuiRDD3oFYhvMadDZvgnsRCTP5Gh64xqJSXuaAomHPbJ9CQ
+         gYwnT29cYOVRuttO5gLhLZ3HJ/NogIKb7wS95cAuF1qcuG7qUMApEriGCVOVCn0T4rvb
+         UNN2ITV53dAmFfSf0xfUBqaX1laKfBuA24BBC6vEwGZ6VbaSyNUmFatb0iOEHQQbG5ef
+         ukQZ3iq9n2m0UYG5aGGdeF+DQD+RtA4uV1D+FvdQrCis7lCTXTtaazU9xzGjO7tcae2H
+         qQb1GmJJfnLe45ZlYEMOXVkBDfOF+Vyiixwz2D6KUsriRNndheAvEyCeEqvqRa+nzUfO
+         3z5g==
+X-Gm-Message-State: AOAM532hTpOazg0ISO9mAWL0brsmvRAt4P3Gqw/04bQHkB/FaWJCHp9K
+        njX6SQeTLoxJqxnpifim5BA=
+X-Google-Smtp-Source: ABdhPJylCAvW3LVkG69kqT8x4LlWGA1fRRD/pBOTSoyitwyxD0N4zC7hjGUBGUhnQRnL3TdYZ3CEaQ==
+X-Received: by 2002:a17:902:ff06:b029:de:362c:bd0b with SMTP id f6-20020a170902ff06b02900de362cbd0bmr12827667plj.13.1611204161491;
+        Wed, 20 Jan 2021 20:42:41 -0800 (PST)
 Received: from localhost.localdomain ([49.207.210.174])
-        by smtp.gmail.com with ESMTPSA id jx15sm3916014pjb.17.2021.01.20.20.42.03
+        by smtp.gmail.com with ESMTPSA id jx15sm3916014pjb.17.2021.01.20.20.42.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jan 2021 20:42:11 -0800 (PST)
+        Wed, 20 Jan 2021 20:42:40 -0800 (PST)
 From:   Allen Pais <allen.lkml@gmail.com>
 To:     herbert@gondor.apana.org.au
 Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
@@ -74,9 +74,9 @@ Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
         linux-samsung-soc@vger.kernel.org,
         Allen Pais <apais@linux.microsoft.com>,
         Romain Perier <romain.perier@gmail.com>
-Subject: [PATCH v4 02/19] crypto: atmel: convert tasklets to use new tasklet_setup() API
-Date:   Thu, 21 Jan 2021 10:11:09 +0530
-Message-Id: <20210121044126.152274-3-allen.lkml@gmail.com>
+Subject: [PATCH v4 05/19] crypto: cavium: convert tasklets to use new tasklet_setup() API
+Date:   Thu, 21 Jan 2021 10:11:12 +0530
+Message-Id: <20210121044126.152274-6-allen.lkml@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210121044126.152274-1-allen.lkml@gmail.com>
 References: <20210121044126.152274-1-allen.lkml@gmail.com>
@@ -96,127 +96,114 @@ and from_tasklet() to pass the tasklet pointer explicitly.
 Signed-off-by: Romain Perier <romain.perier@gmail.com>
 Signed-off-by: Allen Pais <apais@linux.microsoft.com>
 ---
- drivers/crypto/atmel-aes.c  | 14 ++++++--------
- drivers/crypto/atmel-sha.c  | 14 ++++++--------
- drivers/crypto/atmel-tdes.c | 14 ++++++--------
- 3 files changed, 18 insertions(+), 24 deletions(-)
+ drivers/crypto/cavium/cpt/cptvf_main.c       |  9 ++++-----
+ drivers/crypto/cavium/nitrox/nitrox_common.h |  2 +-
+ drivers/crypto/cavium/nitrox/nitrox_isr.c    | 13 +++++--------
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c |  4 ++--
+ 4 files changed, 12 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index b1d286004295..804e6a5a39d4 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -2300,16 +2300,16 @@ static void atmel_aes_dma_cleanup(struct atmel_aes_dev *dd)
- 	dma_release_channel(dd->src.chan);
- }
- 
--static void atmel_aes_queue_task(unsigned long data)
-+static void atmel_aes_queue_task(struct tasklet_struct *t)
- {
--	struct atmel_aes_dev *dd = (struct atmel_aes_dev *)data;
-+	struct atmel_aes_dev *dd = from_tasklet(dd, t, queue_task);
- 
- 	atmel_aes_handle_queue(dd, NULL);
- }
- 
--static void atmel_aes_done_task(unsigned long data)
-+static void atmel_aes_done_task(struct tasklet_struct *t)
- {
--	struct atmel_aes_dev *dd = (struct atmel_aes_dev *)data;
-+	struct atmel_aes_dev *dd = from_tasklet(dd, t, done_task);
- 
- 	dd->is_async = true;
- 	(void)dd->resume(dd);
-@@ -2499,10 +2499,8 @@ static int atmel_aes_probe(struct platform_device *pdev)
- 	INIT_LIST_HEAD(&aes_dd->list);
- 	spin_lock_init(&aes_dd->lock);
- 
--	tasklet_init(&aes_dd->done_task, atmel_aes_done_task,
--					(unsigned long)aes_dd);
--	tasklet_init(&aes_dd->queue_task, atmel_aes_queue_task,
--					(unsigned long)aes_dd);
-+	tasklet_setup(&aes_dd->done_task, atmel_aes_done_task);
-+	tasklet_setup(&aes_dd->queue_task, atmel_aes_queue_task);
- 
- 	crypto_init_queue(&aes_dd->queue, ATMEL_AES_QUEUE_LENGTH);
- 
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 352d80cb5ae9..8ec8a32606e8 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -1314,9 +1314,9 @@ static struct ahash_alg sha_384_512_algs[] = {
- },
+diff --git a/drivers/crypto/cavium/cpt/cptvf_main.c b/drivers/crypto/cavium/cpt/cptvf_main.c
+index f016448e43bb..6424bcc74139 100644
+--- a/drivers/crypto/cavium/cpt/cptvf_main.c
++++ b/drivers/crypto/cavium/cpt/cptvf_main.c
+@@ -21,10 +21,10 @@ struct cptvf_wqe_info {
+ 	struct cptvf_wqe vq_wqe[CPT_NUM_QS_PER_VF];
  };
  
--static void atmel_sha_queue_task(unsigned long data)
-+static void atmel_sha_queue_task(struct tasklet_struct *t)
+-static void vq_work_handler(unsigned long data)
++static void vq_work_handler(struct tasklet_struct *t)
  {
--	struct atmel_sha_dev *dd = (struct atmel_sha_dev *)data;
-+	struct atmel_sha_dev *dd = from_tasklet(dd, t, queue_task);
+-	struct cptvf_wqe_info *cwqe_info = (struct cptvf_wqe_info *)data;
+-	struct cptvf_wqe *cwqe = &cwqe_info->vq_wqe[0];
++	struct cptvf_wqe *cwqe = from_tasklet(cwqe, t, twork);
++	struct cptvf_wqe_info *cwqe_info = container_of(cwqe, typeof(*cwqe_info), vq_wqe[0]);
  
- 	atmel_sha_handle_queue(dd, NULL);
+ 	vq_post_process(cwqe->cptvf, cwqe->qno);
  }
-@@ -1353,9 +1353,9 @@ static int atmel_sha_done(struct atmel_sha_dev *dd)
- 	return err;
- }
+@@ -45,8 +45,7 @@ static int init_worker_threads(struct cpt_vf *cptvf)
+ 	}
  
--static void atmel_sha_done_task(unsigned long data)
-+static void atmel_sha_done_task(struct tasklet_struct *t)
- {
--	struct atmel_sha_dev *dd = (struct atmel_sha_dev *)data;
-+	struct atmel_sha_dev *dd = from_tasklet(dd, t, done_task);
+ 	for (i = 0; i < cptvf->nr_queues; i++) {
+-		tasklet_init(&cwqe_info->vq_wqe[i].twork, vq_work_handler,
+-			     (u64)cwqe_info);
++		tasklet_setup(&cwqe_info->vq_wqe[i].twork, vq_work_handler);
+ 		cwqe_info->vq_wqe[i].qno = i;
+ 		cwqe_info->vq_wqe[i].cptvf = cptvf;
+ 	}
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_common.h b/drivers/crypto/cavium/nitrox/nitrox_common.h
+index e4be69d7e6e5..f73ae8735272 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_common.h
++++ b/drivers/crypto/cavium/nitrox/nitrox_common.h
+@@ -19,7 +19,7 @@ void nitrox_put_device(struct nitrox_device *ndev);
+ int nitrox_common_sw_init(struct nitrox_device *ndev);
+ void nitrox_common_sw_cleanup(struct nitrox_device *ndev);
  
- 	dd->is_async = true;
- 	(void)dd->resume(dd);
-@@ -2570,10 +2570,8 @@ static int atmel_sha_probe(struct platform_device *pdev)
- 	INIT_LIST_HEAD(&sha_dd->list);
- 	spin_lock_init(&sha_dd->lock);
- 
--	tasklet_init(&sha_dd->done_task, atmel_sha_done_task,
--					(unsigned long)sha_dd);
--	tasklet_init(&sha_dd->queue_task, atmel_sha_queue_task,
--					(unsigned long)sha_dd);
-+	tasklet_setup(&sha_dd->done_task, atmel_sha_done_task);
-+	tasklet_setup(&sha_dd->queue_task, atmel_sha_queue_task);
- 
- 	crypto_init_queue(&sha_dd->queue, ATMEL_SHA_QUEUE_LENGTH);
- 
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index 4d63cb13a54f..b7a734f666ae 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
-@@ -1049,16 +1049,16 @@ static struct skcipher_alg tdes_algs[] = {
- },
- };
- 
--static void atmel_tdes_queue_task(unsigned long data)
-+static void atmel_tdes_queue_task(struct tasklet_struct *t)
- {
--	struct atmel_tdes_dev *dd = (struct atmel_tdes_dev *)data;
-+	struct atmel_tdes_dev *dd = from_tasklet(dd, t, queue_task);
- 
- 	atmel_tdes_handle_queue(dd, NULL);
+-void pkt_slc_resp_tasklet(unsigned long data);
++void pkt_slc_resp_tasklet(struct tasklet_struct *t);
+ int nitrox_process_se_request(struct nitrox_device *ndev,
+ 			      struct se_crypto_request *req,
+ 			      completion_t cb,
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_isr.c b/drivers/crypto/cavium/nitrox/nitrox_isr.c
+index 99b053094f5a..c6fb8b3263e1 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_isr.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_isr.c
+@@ -201,9 +201,9 @@ static void clear_bmi_err_intr(struct nitrox_device *ndev)
+ 	dev_err_ratelimited(DEV(ndev), "BMI_INT  0x%016llx\n", value);
  }
  
--static void atmel_tdes_done_task(unsigned long data)
-+static void atmel_tdes_done_task(struct tasklet_struct *t)
+-static void nps_core_int_tasklet(unsigned long data)
++static void nps_core_int_tasklet(struct tasklet_struct *t)
  {
--	struct atmel_tdes_dev *dd = (struct atmel_tdes_dev *) data;
-+	struct atmel_tdes_dev *dd = from_tasklet(dd, t, done_task);
- 	int err;
+-	struct nitrox_q_vector *qvec = (void *)(uintptr_t)(data);
++	struct nitrox_q_vector *qvec = from_tasklet(qvec, t, resp_tasklet);
+ 	struct nitrox_device *ndev = qvec->ndev;
  
- 	if (!(dd->flags & TDES_FLAGS_DMA))
-@@ -1177,10 +1177,8 @@ static int atmel_tdes_probe(struct platform_device *pdev)
- 	INIT_LIST_HEAD(&tdes_dd->list);
- 	spin_lock_init(&tdes_dd->lock);
+ 	/* if pf mode do queue recovery */
+@@ -343,8 +343,7 @@ int nitrox_register_interrupts(struct nitrox_device *ndev)
+ 		cpu = qvec->ring % num_online_cpus();
+ 		irq_set_affinity_hint(vec, get_cpu_mask(cpu));
  
--	tasklet_init(&tdes_dd->done_task, atmel_tdes_done_task,
--					(unsigned long)tdes_dd);
--	tasklet_init(&tdes_dd->queue_task, atmel_tdes_queue_task,
--					(unsigned long)tdes_dd);
-+	tasklet_setup(&tdes_dd->done_task, atmel_tdes_done_task);
-+	tasklet_setup(&tdes_dd->queue_task, atmel_tdes_queue_task);
+-		tasklet_init(&qvec->resp_tasklet, pkt_slc_resp_tasklet,
+-			     (unsigned long)qvec);
++		tasklet_setup(&qvec->resp_tasklet, pkt_slc_resp_tasklet);
+ 		qvec->valid = true;
+ 	}
  
- 	crypto_init_queue(&tdes_dd->queue, ATMEL_TDES_QUEUE_LENGTH);
+@@ -364,8 +363,7 @@ int nitrox_register_interrupts(struct nitrox_device *ndev)
+ 	cpu = num_online_cpus();
+ 	irq_set_affinity_hint(vec, get_cpu_mask(cpu));
+ 
+-	tasklet_init(&qvec->resp_tasklet, nps_core_int_tasklet,
+-		     (unsigned long)qvec);
++	tasklet_setup(&qvec->resp_tasklet, nps_core_int_tasklet);
+ 	qvec->valid = true;
+ 
+ 	return 0;
+@@ -442,8 +440,7 @@ int nitrox_sriov_register_interupts(struct nitrox_device *ndev)
+ 	cpu = num_online_cpus();
+ 	irq_set_affinity_hint(vec, get_cpu_mask(cpu));
+ 
+-	tasklet_init(&qvec->resp_tasklet, nps_core_int_tasklet,
+-		     (unsigned long)qvec);
++	tasklet_setup(&qvec->resp_tasklet, nps_core_int_tasklet);
+ 	qvec->valid = true;
+ 
+ 	return 0;
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
+index 53ef06792133..676f3d00bf61 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
+@@ -580,9 +580,9 @@ static void process_response_list(struct nitrox_cmdq *cmdq)
+ /**
+  * pkt_slc_resp_tasklet - post processing of SE responses
+  */
+-void pkt_slc_resp_tasklet(unsigned long data)
++void pkt_slc_resp_tasklet(struct tasklet_struct *t)
+ {
+-	struct nitrox_q_vector *qvec = (void *)(uintptr_t)(data);
++	struct nitrox_q_vector *qvec = from_tasklet(qvec, t, resp_tasklet);
+ 	struct nitrox_cmdq *cmdq = qvec->cmdq;
+ 	union nps_pkt_slc_cnts slc_cnts;
  
 -- 
 2.25.1
