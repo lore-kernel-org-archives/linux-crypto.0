@@ -8,56 +8,56 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D6D3C433E9
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C8D5C433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:52:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 024A723715
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:51:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2EEBC238E2
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jan 2021 04:52:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726176AbhAUEux (ORCPT
+        id S1726603AbhAUEvt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Jan 2021 23:50:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39484 "EHLO
+        Wed, 20 Jan 2021 23:51:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732513AbhAUEpc (ORCPT
+        with ESMTP id S1727317AbhAUEpA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Jan 2021 23:45:32 -0500
+        Wed, 20 Jan 2021 23:45:00 -0500
 Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FD13C061575;
-        Wed, 20 Jan 2021 20:44:52 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id q4so584259plr.7;
-        Wed, 20 Jan 2021 20:44:52 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7311CC061798;
+        Wed, 20 Jan 2021 20:44:14 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id x18so588473pln.6;
+        Wed, 20 Jan 2021 20:44:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=nmGD8HgPe/79+tkqFpZtuKTtNUxMt+0Wii+rdB2TPJ0=;
-        b=eS/1ggdFWLmfnsVYZXAbwW1SmBRdM7h+i8u7eMxYshtdJMIwvsuLM6yn9GZBZ9S/K8
-         KPB7IXVkvHseo+uWh3JXdsekkzlPnpD1fO5nonseXf9GOWYDGdR+HhSALKkTBW2yHqxA
-         vhNiTnb6elTC+ROHAMTVxAmqh54NOFG8AXMg5XK2ZaPgk0Zkawh6ZbuAdmEfdFkEhZm2
-         1UIpxFwDL7fAY+OlhacieGmRlqtZX1Sk/wWXzHNgZL3wH6FTjfH0lEmZHOzXOWK4oZol
-         FrhZLsRXZ91FD1PC349AL88h5bApuFeMzE3PJ1YZJKXFQ8yXe/V3L7GGuSfN9S3XXoFM
-         SpOA==
+        bh=gQh2IwNxftbR34HfI9l3nT7vPGQ8lmvW4dX0b9EAc7Y=;
+        b=BupZcrXhhNK8Ef6ojLlQM42EwDg3c1oTSVd8H+/oHXiemqGl5WEzw5ar1WiOZx+iC1
+         jvVMgDVDYdxjTtfxYu78QrlC0iD6CqYMsHQO14d3u/k/FzKXX6SQP2XOINno1iXJgCld
+         4rZ5ayp0ch64tHhDbqoBufiU0rftkrB4lzOgJvHfBiRYnwclH042wfAC1IOVo8or3EvO
+         JrX4jA2FS/PZ0Oi6MEceS+MYxaga4gy2lmJSbASRPTx+WtxyunTISoxeVi7oSbv5GNe+
+         oHPTQXwPGwEWVuhWPI9AHbUS2BYxMiz7KP0iypNrPDePZi/GniAt/ru7X3bHn5ZdOkwi
+         5zVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=nmGD8HgPe/79+tkqFpZtuKTtNUxMt+0Wii+rdB2TPJ0=;
-        b=cqRFmP4HCr6x+0vWBHmYc/FCT8RzKVW7gSjVc41N132gmYrqJJAZGYpVjEK7/hn5sA
-         b33dUNiZpvpS2ckgshygcjIrQ1Y/soWDOuJJ2z/ev+U9yf12YE61tBd8TOuZU/FEECnP
-         y9RJBNvDD07GDon1FkYel7rg5KAliqdbWfYGVSIHAJrPf26YlLtT4ANT7UF99v8HDgCW
-         OIl0FJigRiKVzKV9M0eyIunN6fO2q9OqiavGqp2JAVBLnYwimoQnTOKqtYzVfGND/gDU
-         4tTapBj8Qq+/JCXz1Vv6W0EOCvv3QD0Bbx5uhj5zWrL5KfYQerMcPNBPr5oe1+ma3LBY
-         ROMQ==
-X-Gm-Message-State: AOAM531Y9x1F3fwANvASbT4JMnl4HnGiOHsGPcJOyAGyuZG068+NBmZU
-        uDsJXrJsGV3v5k2qkwAcg+g=
-X-Google-Smtp-Source: ABdhPJwK12yN+Nm/X1Li1WBmyUtsyI++TR5W0kfCfg/xipnswNtdqtNaye9X6xF+P0AT5ihT3NrvwA==
-X-Received: by 2002:a17:902:8549:b029:de:8aaa:b012 with SMTP id d9-20020a1709028549b02900de8aaab012mr13199334plo.34.1611204292055;
-        Wed, 20 Jan 2021 20:44:52 -0800 (PST)
+        bh=gQh2IwNxftbR34HfI9l3nT7vPGQ8lmvW4dX0b9EAc7Y=;
+        b=um+o6HckUMgmvlRn3y9CUtEGK1KrHOs05ng1CRw+/p6zVhMIVKYprfuM9haWD/U7hA
+         TOzxvBYqmHnYDBdoM7kICYXsiwnQxhYt/pvjSomf9ylSojiPs8PvXEb+8eAYvukvVkiq
+         K0CuTluJ1/Wn6l5pHboSVxHCOSQj9W+pGygUn0EV2Ot1+8Lu48RbOHsYzrA0uCZBdOhn
+         mmhMPmbeFZhBFoXd8LzoHhH33gjLChDyvCT4jIEXQER2y9EQINHvDsomUk2yvZt3OOfU
+         XlDEGT3ttDJMT8S84A/yC0JU3G1DGMCuYbPV14vlDY2IUFW/bxB4GzAGd8wwGtFGtYPI
+         Od9Q==
+X-Gm-Message-State: AOAM531WjaKknG18zP68W4MIqjiGcmpv7lzgcdAcraqrTAj0jBhWl8hi
+        zJ0rHAzeDJ+QZnZ1gE8JeAM=
+X-Google-Smtp-Source: ABdhPJxihhD7rtz9KUgJnDNb27lJMLl+Qqb3jgEHtXH3KDbu2VD5PkvZTpN9Xi673Iz88wL6BF/1ZA==
+X-Received: by 2002:a17:902:a501:b029:dc:3e1d:4ddb with SMTP id s1-20020a170902a501b02900dc3e1d4ddbmr13240061plq.60.1611204254054;
+        Wed, 20 Jan 2021 20:44:14 -0800 (PST)
 Received: from localhost.localdomain ([49.207.210.174])
-        by smtp.gmail.com with ESMTPSA id jx15sm3916014pjb.17.2021.01.20.20.44.43
+        by smtp.gmail.com with ESMTPSA id jx15sm3916014pjb.17.2021.01.20.20.44.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jan 2021 20:44:51 -0800 (PST)
+        Wed, 20 Jan 2021 20:44:13 -0800 (PST)
 From:   Allen Pais <allen.lkml@gmail.com>
 To:     herbert@gondor.apana.org.au
 Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
@@ -72,10 +72,11 @@ Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
         linux-crypto@vger.kernel.org, linux-mediatek@lists.infradead.org,
         qat-linux@intel.com, linux-rockchip@lists.infradead.org,
         linux-samsung-soc@vger.kernel.org,
-        Allen Pais <apais@linux.microsoft.com>
-Subject: [PATCH v4 19/19] crypto: octeontx: convert tasklets to use new tasklet_setup() API
-Date:   Thu, 21 Jan 2021 10:11:26 +0530
-Message-Id: <20210121044126.152274-20-allen.lkml@gmail.com>
+        Allen Pais <apais@linux.microsoft.com>,
+        Romain Perier <romain.perier@gmail.com>
+Subject: [PATCH v4 15/19] crypto: qce: convert tasklets to use new tasklet_setup() API
+Date:   Thu, 21 Jan 2021 10:11:22 +0530
+Message-Id: <20210121044126.152274-16-allen.lkml@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210121044126.152274-1-allen.lkml@gmail.com>
 References: <20210121044126.152274-1-allen.lkml@gmail.com>
@@ -92,42 +93,38 @@ struct tasklet_struct pointer to all tasklet
 callbacks, switch to using the new tasklet_setup()
 and from_tasklet() to pass the tasklet pointer explicitly.
 
+Signed-off-by: Romain Perier <romain.perier@gmail.com>
 Signed-off-by: Allen Pais <apais@linux.microsoft.com>
 ---
- drivers/crypto/marvell/octeontx/otx_cptvf_main.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/crypto/qce/core.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_main.c b/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
-index c076d0b3ad5f..831550123719 100644
---- a/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
-+++ b/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
-@@ -17,11 +17,12 @@
- #define DRV_NAME	"octeontx-cptvf"
- #define DRV_VERSION	"1.0"
- 
--static void vq_work_handler(unsigned long data)
-+static void vq_work_handler(struct tasklet_struct *t)
- {
--	struct otx_cptvf_wqe_info *cwqe_info =
--					(struct otx_cptvf_wqe_info *) data;
--
-+	struct otx_cptvf_wqe *cwqe = from_tasklet(cwqe, t, twork);
-+	struct otx_cptvf_wqe_info *cwqe_info = container_of(cwqe,
-+							typeof(*cwqe_info),
-+							vq_wqe[0]);
- 	otx_cpt_post_process(&cwqe_info->vq_wqe[0]);
+diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+index 80b75085c265..374281e9d6b9 100644
+--- a/drivers/crypto/qce/core.c
++++ b/drivers/crypto/qce/core.c
+@@ -116,9 +116,9 @@ static int qce_handle_queue(struct qce_device *qce,
+ 	return ret;
  }
  
-@@ -41,8 +42,7 @@ static int init_worker_threads(struct otx_cptvf *cptvf)
- 	}
+-static void qce_tasklet_req_done(unsigned long data)
++static void qce_tasklet_req_done(struct tasklet_struct *t)
+ {
+-	struct qce_device *qce = (struct qce_device *)data;
++	struct qce_device *qce = from_tasklet(qce, t, done_tasklet);
+ 	struct crypto_async_request *req;
+ 	unsigned long flags;
  
- 	for (i = 0; i < cptvf->num_queues; i++) {
--		tasklet_init(&cwqe_info->vq_wqe[i].twork, vq_work_handler,
--			     (u64)cwqe_info);
-+		tasklet_setup(&cwqe_info->vq_wqe[i].twork, vq_work_handler);
- 		cwqe_info->vq_wqe[i].cptvf = cptvf;
- 	}
- 	cptvf->wqe_info = cwqe_info;
+@@ -235,8 +235,7 @@ static int qce_crypto_probe(struct platform_device *pdev)
+ 		goto err_clks;
+ 
+ 	spin_lock_init(&qce->lock);
+-	tasklet_init(&qce->done_tasklet, qce_tasklet_req_done,
+-		     (unsigned long)qce);
++	tasklet_setup(&qce->done_tasklet, qce_tasklet_req_done);
+ 	crypto_init_queue(&qce->queue, QCE_QUEUE_LENGTH);
+ 
+ 	qce->async_req_enqueue = qce_async_request_enqueue;
 -- 
 2.25.1
 
