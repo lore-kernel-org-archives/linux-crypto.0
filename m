@@ -2,67 +2,74 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8110EC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Jan 2021 06:22:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35AACC433DB
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Jan 2021 06:22:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 458D123106
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Jan 2021 06:22:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E42FB23106
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Jan 2021 06:22:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726072AbhAVGWP (ORCPT
+        id S1726129AbhAVGWV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Jan 2021 01:22:15 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:54146 "EHLO fornost.hmeau.com"
+        Fri, 22 Jan 2021 01:22:21 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:54150 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726065AbhAVGWO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Jan 2021 01:22:14 -0500
+        id S1726065AbhAVGWU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Jan 2021 01:22:20 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1l2pov-000229-VQ; Fri, 22 Jan 2021 17:21:23 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Jan 2021 17:21:21 +1100
-Date:   Fri, 22 Jan 2021 17:21:21 +1100
+        id 1l2pp5-00022K-T9; Fri, 22 Jan 2021 17:21:33 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Jan 2021 17:21:31 +1100
+Date:   Fri, 22 Jan 2021 17:21:31 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ovidiu Panait <ovidiu.panait@windriver.com>
-Cc:     daniele.alessandrelli@intel.com, linux-crypto@vger.kernel.org,
-        davem@davemloft.net
-Subject: Re: [PATCH] crypto: keembay: ocs-aes: use 64-bit arithmetic for
- computing bit_len
-Message-ID: <20210122062121.GE1217@gondor.apana.org.au>
-References: <20210115204605.36834-1-ovidiu.panait@windriver.com>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, Megha Dey <megha.dey@intel.com>,
+        Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH 0/2] crypto: aesni - fix more FPU handling and indirect
+ call issues
+Message-ID: <20210122062131.GF1217@gondor.apana.org.au>
+References: <20210116164810.21192-1-ardb@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210115204605.36834-1-ovidiu.panait@windriver.com>
+In-Reply-To: <20210116164810.21192-1-ardb@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jan 15, 2021 at 10:46:05PM +0200, Ovidiu Panait wrote:
-> src_size and aad_size are defined as u32, so the following expressions are
-> currently being evaluated using 32-bit arithmetic:
+On Sat, Jan 16, 2021 at 05:48:08PM +0100, Ard Biesheuvel wrote:
+> My recent patches to the AES-NI driver addressed all the instances of
+> indirect calls occurring in the XTS and GCM drivers, and while at it,
+> limited the scope of FPU enabled/preemption disabled regions not to
+> cover the work that goes on inside the skcipher walk API. This gets rid
+> of scheduling latency spikes for large skcipher/aead inputs, which are
+> more common these days after the introduction of s/w kTLS.
 > 
-> bit_len = src_size * 8;
-> ...
-> bit_len = aad_size * 8;
+> Let's address the other modes in this driver as well: ECB, CBC and CTR,
+> all of which currently keep the FPU enabled (and thus preemption disabled)
+> for the entire skcipher request, which is unnecessary, and potentially
+> problematic for workloads that are sensitive to scheduling latency.
 > 
-> However, bit_len is used afterwards in a context that expects a valid
-> 64-bit value (the lower and upper 32-bit words of bit_len are extracted
-> and written to hw).
+> Let's also switch to a static call for the CTR mode asm helper, which
+> gets chosen once at driver init time.
 > 
-> In order to make sure the correct bit length is generated and the 32-bit
-> multiplication does not wrap around, cast src_size and aad_size to u64.
+> Cc: Megha Dey <megha.dey@intel.com>
+> Cc: Eric Biggers <ebiggers@google.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
 > 
-> Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
-> ---
->  drivers/crypto/keembay/ocs-aes.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Ard Biesheuvel (2):
+>   crypto: aesni - replace CTR function pointer with static call
+>   crypto: aesni - release FPU during skcipher walk API calls
+> 
+>  arch/x86/crypto/aesni-intel_glue.c | 78 +++++++++-----------
+>  1 file changed, 35 insertions(+), 43 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
