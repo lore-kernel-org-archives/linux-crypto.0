@@ -2,206 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAD06C433DB
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jan 2021 16:35:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C0FC433E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jan 2021 17:28:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E1FC22583
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jan 2021 16:35:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69E5B21707
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jan 2021 17:28:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730776AbhAYQfQ (ORCPT
+        id S1731059AbhAYR2J (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Jan 2021 11:35:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43830 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730778AbhAYQfG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Jan 2021 11:35:06 -0500
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 232B0C06178A
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Jan 2021 08:34:26 -0800 (PST)
-Received: by mail-oi1-x229.google.com with SMTP id d18so6039315oic.3
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Jan 2021 08:34:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=IzcX4KEe4k8MwWgjN00hmk2HbqHi/ERZ8/ypGsuqBDk=;
-        b=jCrVnRF/Q9ht2J9+rWWhrEp1DmYm2wmHsI8fUBG5rkbxf5DIA05mLLazPfp+ntr71c
-         u+EiOz1X/dn0Xvc8l1qYNLQMShek63SveoofT4JxP7KCg0Cr0NZCpJNO3WJtIChaDRq5
-         HH6FSjuBC9JvZrZmmNAvAvHOHC4Gr2x1Paj2+KoUTmHexp2ggr2Sry7jfPCC9jO/KWkd
-         Kb1KCYiBcpksswv7Kg9Vgi7jRlS0N3UPU7d851bxveDCJEnGSftzca8w/6aIr+yof1EK
-         5a6CwkcIEiBW7l/5XMawgMlVzUsBoGR8VkByfYFyLBHD48QN2ewy8FiJOwoO4600/YCa
-         fz9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=IzcX4KEe4k8MwWgjN00hmk2HbqHi/ERZ8/ypGsuqBDk=;
-        b=WimaskxqzVo9A8IG389/XEu0Ty5ZSVKRlUCqKhtPm+5PenqiuHLLM4xm5/k5UaKxZv
-         5byYb4Yu1OxrOyfFjoMG/0970FXBxXwemqdegiHTZ0EahxwTC0nliA0xlva02sCwRcKc
-         uDrEeJKj71Z4I5nhfJWbiZRESgGq1jf6LuqMZ2/5J4dJ1LHJB0RptZwdMb1b1jvw+QYD
-         V7Bcqv0cMFMaLMTRjstijIDk4HD13PvCzv8SUEfssR7ZzZKv0Px7MaUo8fIQImGz26pq
-         QcrDcxnyfOj1SS/VULyKuBQtH6vvK43B8c8tbuMmUxV+eVzENNBgof6QtmeOQIXuHCVh
-         z9Yw==
-X-Gm-Message-State: AOAM533JK9c2JBfOdl52FamvfypkluZXlhePLSfYr8x2OHp5FLpV5P1P
-        /AG0052jZkFF7cJmgJxLNjXZTOH2RTumSg==
-X-Google-Smtp-Source: ABdhPJyWrMJWD3mzNRrRqJiyDpFS3aKhsj5396TIk2Jgl1VojA+HGq4/m/VFgkJFZB/BgoVLv0eJ6w==
-X-Received: by 2002:aca:add7:: with SMTP id w206mr643177oie.86.1611592465558;
-        Mon, 25 Jan 2021 08:34:25 -0800 (PST)
-Received: from builder.lan (104-57-184-186.lightspeed.austtx.sbcglobal.net. [104.57.184.186])
-        by smtp.gmail.com with ESMTPSA id q26sm2389731otn.67.2021.01.25.08.34.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jan 2021 08:34:24 -0800 (PST)
-Date:   Mon, 25 Jan 2021 10:34:23 -0600
-From:   Bjorn Andersson <bjorn.andersson@linaro.org>
-To:     Thara Gopinath <thara.gopinath@linaro.org>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        ebiggers@google.com, ardb@kernel.org, sivaprak@codeaurora.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 6/6] drivers: crypto: qce: Remove totallen and offset
- in qce_start
-Message-ID: <YA7zD8EpiEUB+nLv@builder.lan>
-References: <20210120184843.3217775-1-thara.gopinath@linaro.org>
- <20210120184843.3217775-7-thara.gopinath@linaro.org>
+        Mon, 25 Jan 2021 12:28:09 -0500
+Received: from mga14.intel.com ([192.55.52.115]:23788 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731062AbhAYR2B (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 25 Jan 2021 12:28:01 -0500
+IronPort-SDR: rbOFEJSHMUuUTB/pQNPPwcQ2a2byk6mzKGBn3MoR9wsLm62D44X+CVhp4QqUT88DhsXKItVTi4
+ 0fIuvf+10xrw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9875"; a="178988848"
+X-IronPort-AV: E=Sophos;i="5.79,374,1602572400"; 
+   d="scan'208";a="178988848"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 09:27:07 -0800
+IronPort-SDR: 8iZXsOaFESCDXCkP8W3jUKMKNjIhc25UJ4qSw3shleed1H1IQ3oiRc/58jQzo/thwJPhUF5o65
+ BW77fYw2PUZA==
+X-IronPort-AV: E=Sophos;i="5.79,374,1602572400"; 
+   d="scan'208";a="361596469"
+Received: from stalawai-desk.amr.corp.intel.com (HELO [10.254.124.248]) ([10.254.124.248])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 09:27:05 -0800
+Subject: Re: [RFC V2 0/5] Introduce AVX512 optimized crypto algorithms
+To:     Megha Dey <megha.dey@intel.com>, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     ravi.v.shankar@intel.com, tim.c.chen@intel.com,
+        andi.kleen@intel.com, greg.b.tucker@intel.com,
+        robert.a.kasten@intel.com, rajendrakumar.chinnaiyan@intel.com,
+        tomasz.kantecki@intel.com, ryan.d.saffores@intel.com,
+        ilya.albrekht@intel.com, kyung.min.park@intel.com,
+        tony.luck@intel.com, ira.weiny@intel.com, ebiggers@kernel.org,
+        ardb@kernel.org, x86@kernel.org
+References: <1611386920-28579-1-git-send-email-megha.dey@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <081cd7f7-e6b6-6f10-49e1-c62f066104ae@intel.com>
+Date:   Mon, 25 Jan 2021 09:27:04 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210120184843.3217775-7-thara.gopinath@linaro.org>
+In-Reply-To: <1611386920-28579-1-git-send-email-megha.dey@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed 20 Jan 12:48 CST 2021, Thara Gopinath wrote:
+On 1/22/21 11:28 PM, Megha Dey wrote:
+> Other implementations of these crypto algorithms are possible, which would
+> result in lower crypto performance but would not cause collateral damage
+> from frequency drops (AVX512L vs AVX512VL).
 
-> totallen is used to get the size of the data to be transformed.
-> This is also available via nbytes or cryptlen in the qce_sha_reqctx
-> and qce_cipher_ctx. Similarly offset convey nothing for the supported
-> encryption and authentication transformations and is always 0.
-> Remove these two redundant parameters in qce_start.
-> 
-
-Please drop "drivers: " from $subject.
-
-Reviewed-by: Bjorn Andersson <bjorn.andersson@linaro.org>
-
-Regards,
-Bjorn
-
-> Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
-> ---
->  drivers/crypto/qce/common.c   | 17 +++++++----------
->  drivers/crypto/qce/common.h   |  3 +--
->  drivers/crypto/qce/sha.c      |  2 +-
->  drivers/crypto/qce/skcipher.c |  2 +-
->  4 files changed, 10 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/crypto/qce/common.c b/drivers/crypto/qce/common.c
-> index f7bc701a4aa2..dceb9579d87a 100644
-> --- a/drivers/crypto/qce/common.c
-> +++ b/drivers/crypto/qce/common.c
-> @@ -140,8 +140,7 @@ static u32 qce_auth_cfg(unsigned long flags, u32 key_size)
->  	return cfg;
->  }
->  
-> -static int qce_setup_regs_ahash(struct crypto_async_request *async_req,
-> -				u32 totallen, u32 offset)
-> +static int qce_setup_regs_ahash(struct crypto_async_request *async_req)
->  {
->  	struct ahash_request *req = ahash_request_cast(async_req);
->  	struct crypto_ahash *ahash = __crypto_ahash_cast(async_req->tfm);
-> @@ -306,8 +305,7 @@ static void qce_xtskey(struct qce_device *qce, const u8 *enckey,
->  	qce_write(qce, REG_ENCR_XTS_DU_SIZE, cryptlen);
->  }
->  
-> -static int qce_setup_regs_skcipher(struct crypto_async_request *async_req,
-> -				     u32 totallen, u32 offset)
-> +static int qce_setup_regs_skcipher(struct crypto_async_request *async_req)
->  {
->  	struct skcipher_request *req = skcipher_request_cast(async_req);
->  	struct qce_cipher_reqctx *rctx = skcipher_request_ctx(req);
-> @@ -367,7 +365,7 @@ static int qce_setup_regs_skcipher(struct crypto_async_request *async_req,
->  
->  	qce_write(qce, REG_ENCR_SEG_CFG, encr_cfg);
->  	qce_write(qce, REG_ENCR_SEG_SIZE, rctx->cryptlen);
-> -	qce_write(qce, REG_ENCR_SEG_START, offset & 0xffff);
-> +	qce_write(qce, REG_ENCR_SEG_START, 0);
->  
->  	if (IS_CTR(flags)) {
->  		qce_write(qce, REG_CNTR_MASK, ~0);
-> @@ -376,7 +374,7 @@ static int qce_setup_regs_skcipher(struct crypto_async_request *async_req,
->  		qce_write(qce, REG_CNTR_MASK2, ~0);
->  	}
->  
-> -	qce_write(qce, REG_SEG_SIZE, totallen);
-> +	qce_write(qce, REG_SEG_SIZE, rctx->cryptlen);
->  
->  	/* get little endianness */
->  	config = qce_config_reg(qce, 1);
-> @@ -388,17 +386,16 @@ static int qce_setup_regs_skcipher(struct crypto_async_request *async_req,
->  }
->  #endif
->  
-> -int qce_start(struct crypto_async_request *async_req, u32 type, u32 totallen,
-> -	      u32 offset)
-> +int qce_start(struct crypto_async_request *async_req, u32 type)
->  {
->  	switch (type) {
->  #ifdef CONFIG_CRYPTO_DEV_QCE_SKCIPHER
->  	case CRYPTO_ALG_TYPE_SKCIPHER:
-> -		return qce_setup_regs_skcipher(async_req, totallen, offset);
-> +		return qce_setup_regs_skcipher(async_req);
->  #endif
->  #ifdef CONFIG_CRYPTO_DEV_QCE_SHA
->  	case CRYPTO_ALG_TYPE_AHASH:
-> -		return qce_setup_regs_ahash(async_req, totallen, offset);
-> +		return qce_setup_regs_ahash(async_req);
->  #endif
->  	default:
->  		return -EINVAL;
-> diff --git a/drivers/crypto/qce/common.h b/drivers/crypto/qce/common.h
-> index 85ba16418a04..3bc244bcca2d 100644
-> --- a/drivers/crypto/qce/common.h
-> +++ b/drivers/crypto/qce/common.h
-> @@ -94,7 +94,6 @@ struct qce_alg_template {
->  void qce_cpu_to_be32p_array(__be32 *dst, const u8 *src, unsigned int len);
->  int qce_check_status(struct qce_device *qce, u32 *status);
->  void qce_get_version(struct qce_device *qce, u32 *major, u32 *minor, u32 *step);
-> -int qce_start(struct crypto_async_request *async_req, u32 type, u32 totallen,
-> -	      u32 offset);
-> +int qce_start(struct crypto_async_request *async_req, u32 type);
->  
->  #endif /* _COMMON_H_ */
-> diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-> index dd263c5e4dd8..a079e92b4e75 100644
-> --- a/drivers/crypto/qce/sha.c
-> +++ b/drivers/crypto/qce/sha.c
-> @@ -113,7 +113,7 @@ static int qce_ahash_async_req_handle(struct crypto_async_request *async_req)
->  
->  	qce_dma_issue_pending(&qce->dma);
->  
-> -	ret = qce_start(async_req, tmpl->crypto_alg_type, 0, 0);
-> +	ret = qce_start(async_req, tmpl->crypto_alg_type);
->  	if (ret)
->  		goto error_terminate;
->  
-> diff --git a/drivers/crypto/qce/skcipher.c b/drivers/crypto/qce/skcipher.c
-> index d78b932441ab..a93fd3fd5f1a 100644
-> --- a/drivers/crypto/qce/skcipher.c
-> +++ b/drivers/crypto/qce/skcipher.c
-> @@ -143,7 +143,7 @@ qce_skcipher_async_req_handle(struct crypto_async_request *async_req)
->  
->  	qce_dma_issue_pending(&qce->dma);
->  
-> -	ret = qce_start(async_req, tmpl->crypto_alg_type, req->cryptlen, 0);
-> +	ret = qce_start(async_req, tmpl->crypto_alg_type);
->  	if (ret)
->  		goto error_terminate;
->  
-> -- 
-> 2.25.1
-> 
+I don't think you told us anywhere what AVX512L and AVX512VL are, or why
+they matter here.
