@@ -2,138 +2,164 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B25E2C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jan 2021 19:09:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47D1CC433DB
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jan 2021 22:37:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8817E22CE3
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jan 2021 19:09:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10C0220679
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jan 2021 22:37:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727460AbhAZF6t (ORCPT
+        id S1727902AbhAZWea (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Jan 2021 00:58:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40516 "EHLO
+        Tue, 26 Jan 2021 17:34:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730685AbhAYQTz (ORCPT
+        with ESMTP id S1732265AbhAZRFZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Jan 2021 11:19:55 -0500
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87356C061786
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Jan 2021 08:19:14 -0800 (PST)
-Received: by mail-ot1-x32c.google.com with SMTP id a109so13277534otc.1
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Jan 2021 08:19:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Y9Fsn2jfHkFIrA5bW8cDuY4amagOU6WxYdUpBc0EWbM=;
-        b=f35foE0Cx8SIvXwYd5AkZ+rsJeccF30iQEEwXO431gw0SAwNAQm0hmRcG9zIA7Z083
-         vD8apYXgsSy1FYJxluAJulpwxPE3pAsniGqVP7qCHdW/ScZDklDyQ+Cs3Oj24TcQIa0Q
-         ysy+iulClvS1IK3/8tpzS2f7y8Bcehyr27C1QlHDcpmyiMli/ON363G/8Qq9y5WKRCs2
-         3Y5e/qbcyTejJhDfhEzF1P+huIagPcuabgqatjDyvqeLa3SZrAPvwqxrcqIeuwiI2uL8
-         T6R+VJSn+MS68/mXa5dZjuV5wuQd6KtUIvimQW7B9lt1wOin2DJN/SKaIbbo48KTQeeI
-         zidw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Y9Fsn2jfHkFIrA5bW8cDuY4amagOU6WxYdUpBc0EWbM=;
-        b=GgXUx7hwKG6RTxMVqkZtvcbPprGfeGuG0U4KTlcbx4va2MsMmzH2o07HP3ErBnYEVE
-         Z7mXE7qFagjIOO9phSaIrZkO9iS/eSZnCXyRXigsL4dqYCeeF+2NAq/gkhk0iVDf24qJ
-         tK15OWOYD8BLy2g4mSPDcRCepULCozmDzI+DxWZYyFtDqdRj74NFRoFAgT8BMf/ifFtT
-         7Jd4lvHdXVU8cYlJuS/r1N6nzUtR4gFYzZtm/n8E2Ko8K0F2wsSndZbf0wNWk5LfqOD2
-         BUly4+WuD9rpCu8Zvgxz3gsWVzCgxEvI0RxAniOVVhGOgWvC7zUWo+LQ3j8ZKAAhDuzM
-         JLjg==
-X-Gm-Message-State: AOAM532ph+a/FxSk91r7tMjCe+HruV5DCFH9wDo4z71R29ecdvg1KwfG
-        9mJOB1rj0is3snfB7KhENVz0TQ==
-X-Google-Smtp-Source: ABdhPJzFaIphTGrsrxOU+aDKm6mW1PpqUVSACH6ly/1sYqZSzfa8zNY6JYtn/CFZvIl7Hdtannv60Q==
-X-Received: by 2002:a9d:347:: with SMTP id 65mr989868otv.4.1611591553963;
-        Mon, 25 Jan 2021 08:19:13 -0800 (PST)
-Received: from builder.lan (104-57-184-186.lightspeed.austtx.sbcglobal.net. [104.57.184.186])
-        by smtp.gmail.com with ESMTPSA id d3sm313238ooi.42.2021.01.25.08.19.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jan 2021 08:19:13 -0800 (PST)
-Date:   Mon, 25 Jan 2021 10:19:11 -0600
-From:   Bjorn Andersson <bjorn.andersson@linaro.org>
-To:     Thara Gopinath <thara.gopinath@linaro.org>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        ebiggers@google.com, ardb@kernel.org, sivaprak@codeaurora.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/6] drivers: crypto: qce: sha: Hold back a block of
- data to be transferred as part of final
-Message-ID: <YA7vf9ilbeI9fskA@builder.lan>
-References: <20210120184843.3217775-1-thara.gopinath@linaro.org>
- <20210120184843.3217775-3-thara.gopinath@linaro.org>
+        Tue, 26 Jan 2021 12:05:25 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F350FC061352
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jan 2021 09:01:19 -0800 (PST)
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1l4RgD-00045p-EA; Tue, 26 Jan 2021 17:59:01 +0100
+Received: from ukl by ptx.hi.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1l4Rg3-0003hY-Ft; Tue, 26 Jan 2021 17:58:51 +0100
+From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+To:     Russell King <linux@armlinux.org.uk>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Vinod Koul <vkoul@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Mark Brown <broonie@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc:     linux-kernel@vger.kernel.org, kernel@pengutronix.de,
+        =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig.org@pengutronix.de>,
+        Mike Leach <mike.leach@linaro.org>,
+        Leo Yan <leo.yan@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, coresight@lists.linaro.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-watchdog@vger.kernel.org, alsa-devel@alsa-project.org
+Subject: [PATCH v3 0/5] amba: minor fix and various cleanups
+Date:   Tue, 26 Jan 2021 17:58:30 +0100
+Message-Id: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210120184843.3217775-3-thara.gopinath@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed 20 Jan 12:48 CST 2021, Thara Gopinath wrote:
+From: Uwe Kleine-König <u.kleine-koenig.org@pengutronix.de
 
-> If the available data to transfer is exactly a multiple of block size, save
-> the last block to be transferred in qce_ahash_final (with the last block
-> bit set) if this is indeed the end of data stream. If not this saved block
-> will be transferred as part of next update. If this block is not held back
-> and if this is indeed the end of data stream, the digest obtained will be
-> wrong since qce_ahash_final will see that rctx->buflen is 0 and return
-> doing nothing which in turn means that a digest will not be copied to the
-> destination result buffer.  qce_ahash_final cannot be made to alter this
-> behavior and allowed to proceed if rctx->buflen is 0 because the crypto
-> engine BAM does not allow for zero length transfers.
-> 
+Hello,
 
-Please drop "drivers: " from $subject.
+Changes since v2 sent with Message-Id:
+20201124133139.3072124-1-uwe@kleine-koenig.org:
 
-Apart from that this looks good.
+ - Rebase to v5.11-rc1 (which resulted in a few conflicts in
+   drivers/hwtracing).
+ - Add various Acks.
+ - Send to more maintainers directly (which I think is one of the
+   reasons why there are so few Acks).
 
-Reviewed-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+For my taste patch 4 needs some more acks (drivers/char/hw_random,
+drivers/dma, drivers/gpu/drm/pl111, drivers/i2c, drivers/mmc,
+drivers/vfio, drivers/watchdog and sound/arm have no maintainer feedback
+yet).
 
-Regards,
-Bjorn
+My suggestion is to let this series go in via Russell King (who cares
+for amba). Once enough Acks are there I can also provide a tag for
+merging into different trees. Just tell me if you prefer this solution.
 
-> Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
-> ---
->  drivers/crypto/qce/sha.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
-> 
-> diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-> index 08aed03e2b59..dd263c5e4dd8 100644
-> --- a/drivers/crypto/qce/sha.c
-> +++ b/drivers/crypto/qce/sha.c
-> @@ -216,6 +216,25 @@ static int qce_ahash_update(struct ahash_request *req)
->  
->  	/* calculate how many bytes will be hashed later */
->  	hash_later = total % blocksize;
-> +
-> +	/*
-> +	 * At this point, there is more than one block size of data.  If
-> +	 * the available data to transfer is exactly a multiple of block
-> +	 * size, save the last block to be transferred in qce_ahash_final
-> +	 * (with the last block bit set) if this is indeed the end of data
-> +	 * stream. If not this saved block will be transferred as part of
-> +	 * next update. If this block is not held back and if this is
-> +	 * indeed the end of data stream, the digest obtained will be wrong
-> +	 * since qce_ahash_final will see that rctx->buflen is 0 and return
-> +	 * doing nothing which in turn means that a digest will not be
-> +	 * copied to the destination result buffer.  qce_ahash_final cannot
-> +	 * be made to alter this behavior and allowed to proceed if
-> +	 * rctx->buflen is 0 because the crypto engine BAM does not allow
-> +	 * for zero length transfers.
-> +	 */
-> +	if (!hash_later)
-> +		hash_later = blocksize;
-> +
->  	if (hash_later) {
->  		unsigned int src_offset = req->nbytes - hash_later;
->  		scatterwalk_map_and_copy(rctx->buf, req->src, src_offset,
-> -- 
-> 2.25.1
-> 
+Would be great if this could make it for v5.12, but I'm aware it's
+already late in the v5.11 cycle so it might have to wait for v5.13.
+
+Best regards
+Uwe
+
+Uwe Kleine-König (5):
+  amba: Fix resource leak for drivers without .remove
+  amba: reorder functions
+  vfio: platform: simplify device removal
+  amba: Make the remove callback return void
+  amba: Make use of bus_type functions
+
+ drivers/amba/bus.c                            | 234 +++++++++---------
+ drivers/char/hw_random/nomadik-rng.c          |   3 +-
+ drivers/dma/pl330.c                           |   3 +-
+ drivers/gpu/drm/pl111/pl111_drv.c             |   4 +-
+ drivers/hwtracing/coresight/coresight-catu.c  |   3 +-
+ .../hwtracing/coresight/coresight-cpu-debug.c |   4 +-
+ .../hwtracing/coresight/coresight-cti-core.c  |   4 +-
+ drivers/hwtracing/coresight/coresight-etb10.c |   4 +-
+ .../coresight/coresight-etm3x-core.c          |   4 +-
+ .../coresight/coresight-etm4x-core.c          |   4 +-
+ .../hwtracing/coresight/coresight-funnel.c    |   4 +-
+ .../coresight/coresight-replicator.c          |   4 +-
+ drivers/hwtracing/coresight/coresight-stm.c   |   4 +-
+ .../hwtracing/coresight/coresight-tmc-core.c  |   4 +-
+ drivers/hwtracing/coresight/coresight-tpiu.c  |   4 +-
+ drivers/i2c/busses/i2c-nomadik.c              |   4 +-
+ drivers/input/serio/ambakmi.c                 |   3 +-
+ drivers/memory/pl172.c                        |   4 +-
+ drivers/memory/pl353-smc.c                    |   4 +-
+ drivers/mmc/host/mmci.c                       |   4 +-
+ drivers/rtc/rtc-pl030.c                       |   4 +-
+ drivers/rtc/rtc-pl031.c                       |   4 +-
+ drivers/spi/spi-pl022.c                       |   5 +-
+ drivers/tty/serial/amba-pl010.c               |   4 +-
+ drivers/tty/serial/amba-pl011.c               |   3 +-
+ drivers/vfio/platform/vfio_amba.c             |  15 +-
+ drivers/video/fbdev/amba-clcd.c               |   4 +-
+ drivers/watchdog/sp805_wdt.c                  |   4 +-
+ include/linux/amba/bus.h                      |   2 +-
+ sound/arm/aaci.c                              |   4 +-
+ 30 files changed, 157 insertions(+), 198 deletions(-)
+
+
+base-commit: 5c8fe583cce542aa0b84adc939ce85293de36e5e
+-- 
+2.29.2
+
