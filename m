@@ -2,150 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9576BC4332B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0153C4332E
 	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jan 2021 22:37:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6CE4620679
+	by mail.kernel.org (Postfix) with ESMTP id A3B8920679
 	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jan 2021 22:37:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728209AbhAZWfU (ORCPT
+        id S1728520AbhAZWfj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Jan 2021 17:35:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60000 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731183AbhAZRF0 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Jan 2021 12:05:26 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10QH2lnF142817;
-        Tue, 26 Jan 2021 12:04:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=lQXCXlAY16ryEQoXpRWuEDcQKmEETRmymadtYc+qZrs=;
- b=C/KlOrKJtLTy6EcLuJ1+SlqtkB2GgV4SdHTI+0+d6Ax8GqTIFBd9js3oxdPMhzQdpcUA
- F5qQX5Y1Ir70lyLAhpNp39KlbF92nAdJhvZuSJL/ZcXGFLkqS4uEM/DKY6U6kiXSy+X5
- UXdjGA48LmloJNB1UYe2OeAm7h3n9OUCe/1tWagCKOGtnTCfLjYWIU0T4j3wonZxh24Q
- UwT/VwEZ4uRQ98pkYrHGzT2Nrg3LIyFQP4YnSEfkFfwUELaCkUQP3dRD60S4fj2L9c3p
- 0wePGH5w2ZTvPhYP+gum/UKIdvaSckD5MorqJFwxsW+2yufBbeZHSY+/Ny6CvMJA67ro 9A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36apuf8h6b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Jan 2021 12:04:06 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10QH3Oar146027;
-        Tue, 26 Jan 2021 12:04:05 -0500
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36apuf8h5w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Jan 2021 12:04:05 -0500
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10QGvucH010073;
-        Tue, 26 Jan 2021 17:04:05 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma01wdc.us.ibm.com with ESMTP id 36a8uh4qy2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Jan 2021 17:04:05 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10QH42Ei31064556
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Jan 2021 17:04:02 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 21FA4124058;
-        Tue, 26 Jan 2021 17:04:02 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 128E9124052;
-        Tue, 26 Jan 2021 17:04:02 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 26 Jan 2021 17:04:01 +0000 (GMT)
-From:   Stefan Berger <stefanb@linux.vnet.ibm.com>
-To:     dhowells@redhat.com, keyrings@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        patrick@puiterwijk.org, Stefan Berger <stefanb@linux.ibm.com>
-Subject: [PATCH 0/3] Add support for x509 certs with NIST p256 and p192 keys
-Date:   Tue, 26 Jan 2021 12:03:56 -0500
-Message-Id: <20210126170359.363969-1-stefanb@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.26.2
+        Tue, 26 Jan 2021 17:35:39 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37158 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388864AbhAZRbZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 Jan 2021 12:31:25 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D541121919;
+        Tue, 26 Jan 2021 17:30:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1611682245;
+        bh=p9tGPF9ccd/d++aM4n9LyAfYAIV1RaM4Dz9iiSI4D3c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=upI/kMhl7eE4+5uUph8S2tnMemQz5UbOopsKlNTDclqyTUBBILQcZKMXkwORHX8Yq
+         cJWujimFLxD3PUXP3Q6R5vs2zcoQMtooqvBAs2SfrBJr86tAjNEuPYdfB5MvusQjhA
+         rfnXzeJTXEVfQT42qqoxlu/1tgXRz2T+JTiZP73bnjiQwVao3xvBwc5M7G4UXf469U
+         VF6liyETyFxIuLw+hAqs6DjITpSX4hILsnFHO/EYiFxk0F2hgX4ucJit2xkGTa6SJ/
+         LEzImN7uvO2sCqNSCL4qH0V6E+R6lLaPerEq4KlBRAb7BizMVwvcu+25e7achCvt2Z
+         DlVP64TyyHfRA==
+Date:   Tue, 26 Jan 2021 23:00:40 +0530
+From:   Vinod Koul <vkoul@kernel.org>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Russell King <linux@armlinux.org.uk>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Mark Brown <broonie@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-kernel@vger.kernel.org,
+        kernel@pengutronix.de, Mike Leach <mike.leach@linaro.org>,
+        Leo Yan <leo.yan@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, coresight@lists.linaro.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-watchdog@vger.kernel.org, alsa-devel@alsa-project.org
+Subject: Re: [PATCH v3 4/5] amba: Make the remove callback return void
+Message-ID: <20210126173040.GY2771@vkoul-mobl>
+References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
+ <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-26_09:2021-01-26,2021-01-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- malwarescore=0 suspectscore=0 bulkscore=0 spamscore=0 impostorscore=0
- lowpriorityscore=0 priorityscore=1501 mlxlogscore=999 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101260086
+In-Reply-To: <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Stefan Berger <stefanb@linux.ibm.com>
+On 26-01-21, 17:58, Uwe Kleine-König wrote:
+> All amba drivers return 0 in their remove callback. Together with the
+> driver core ignoring the return value anyhow, it doesn't make sense to
+> return a value here.
+> 
+> Change the remove prototype to return void, which makes it explicit that
+> returning an error value doesn't work as expected. This simplifies changing
+> the core remove callback to return void, too.
+> 
+> Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
+> Reviewed-by: Arnd Bergmann <arnd@arndb.de>
+> Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+> Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> Acked-by: Krzysztof Kozlowski <krzk@kernel.org> # for drivers/memory
+> Acked-by: Mark Brown <broonie@kernel.org>
+> Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> Acked-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> ---
+>  drivers/amba/bus.c                                 | 5 ++---
+>  drivers/char/hw_random/nomadik-rng.c               | 3 +--
+>  drivers/dma/pl330.c                                | 3 +--
 
-This series of patches adds support for x509 certificates signed by a CA
-that uses NIST p256 or p192 keys for signing. It also adds support for
-certificates where the public key is a NIST p256 or p192 key. The math
-for ECDSA signature verification is also added.
+For dmaengine:
 
-Since self-signed certificates are verified upon loading, the following
-script can be used for testing:
-
-keyctrl newring test @u
-
-while :; do
-	for hash in sha1 sha224 sha256 sha384 sha512; do
-		openssl req \
-			-x509 \
-			-${hash} \
-			-newkey ec \
-			-pkeyopt ec_paramgen_curve:prime256v1 \
-			-keyout key.pem \
-			-days 365 \
-			-subj '/CN=test' \
-			-nodes \
-			-outform der \
-			-out cert.der
-		keyctl padd asymmetric testkey %keyring:test < cert.der
-		if [ $? -ne 0 ]; then
-			echo "ERROR"
-			exit 1
-		fi
-	done
-done
-
-It also works with restricted keyrings where an RSA key is used to sign
-a NIST P256/P192 key:
-
-
-
-The ECDSA signature verification will be used by IMA Appraisal where ECDSA
-file signatures stored in RPM packages will use substantially less space
-than if RSA signatures were to be used.
-
-   Stefan
-
-Stefan Berger (3):
-  x509: Add support for parsing x509 certs with NIST p256 keys
-  x509: Add support for NIST p192 keys in certificates and akcipher
-  x509: Detect sm2 keys by their parameters OID
-
- crypto/Makefile                           |   9 +-
- crypto/asymmetric_keys/public_key.c       |  19 ++
- crypto/asymmetric_keys/x509_cert_parser.c |  45 ++-
- crypto/ecc.c                              | 331 ++++++++++++++++++++++
- crypto/ecc.h                              |   2 +
- crypto/ecc_curve_defs.h                   |   4 +
- crypto/eccsignature.asn1                  |   4 +
- include/linux/oid_registry.h              |   6 +
- 8 files changed, 417 insertions(+), 3 deletions(-)
- create mode 100644 crypto/eccsignature.asn1
+Acked-By: Vinod Koul <vkoul@kernel.org>
 
 -- 
-2.25.4
-
+~Vinod
