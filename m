@@ -2,113 +2,196 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BBC7C433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jan 2021 13:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F4A2C433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jan 2021 13:32:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C68A207B3
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jan 2021 13:31:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 70899207B1
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jan 2021 13:32:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S313357AbhAZWfg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Jan 2021 17:35:36 -0500
-Received: from foss.arm.com ([217.140.110.172]:48778 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729902AbhAZRL2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Jan 2021 12:11:28 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 843DFD6E;
-        Tue, 26 Jan 2021 09:08:55 -0800 (PST)
-Received: from [10.57.40.145] (unknown [10.57.40.145])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 099A63F66E;
-        Tue, 26 Jan 2021 09:08:45 -0800 (PST)
-Subject: Re: [PATCH v3 4/5] amba: Make the remove callback return void
-To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
-        Russell King <linux@armlinux.org.uk>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Vinod Koul <vkoul@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Mark Brown <broonie@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc:     linux-kernel@vger.kernel.org, kernel@pengutronix.de,
-        Mike Leach <mike.leach@linaro.org>,
-        Leo Yan <leo.yan@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, coresight@lists.linaro.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-watchdog@vger.kernel.org, alsa-devel@alsa-project.org
-References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
- <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
-From:   Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <3e42b2ea-c713-31b2-9c86-c49a70d8e1f4@arm.com>
-Date:   Tue, 26 Jan 2021 17:08:40 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        id S313220AbhAZWeu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Jan 2021 17:34:50 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31948 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731168AbhAZRFZ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 Jan 2021 12:05:25 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10QH3OSq062665;
+        Tue, 26 Jan 2021 12:04:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=nH/KOZhxc3+G7TQa160noAJ40uv2p4KujvCr5h12ylM=;
+ b=dvqirsDLHFTyFZfjYzvyyoOyVp14UngJV/L5rsRZ2hBKwD2bmtmwYdDt5nJPkEMUD/G/
+ MKUVL6LJkWMgwgxwItUfEE+gGzgD4lWBkqQgvtl/si5YqucO3X8/Lb5gv+KKubRfPmdU
+ UTIb5kvgYNiStPVeH6KIVt7vkkwWv+/J4CcQsFOkb7+eC0kQFVwusy5wwgBFe+SKs5nH
+ PH8GD79jK//9q/QlmxIUywp2aNacZSLoru5RuHPg8m6B97tLLei667a9QS6NkmhSzblq
+ 6Y2IU6uhP4aL8cImVovFJRmHZaD4Xk7TceBRCTv2iocXkvy+8iqLPj6nbapeYg+Q69RN UA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36apv08hch-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Jan 2021 12:04:04 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10QH3VHH063558;
+        Tue, 26 Jan 2021 12:04:04 -0500
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36apv08hbp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Jan 2021 12:04:04 -0500
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10QGvlMA010029;
+        Tue, 26 Jan 2021 17:04:02 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma03wdc.us.ibm.com with ESMTP id 36a0t2fpqy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Jan 2021 17:04:02 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10QH42Rc31064562
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 26 Jan 2021 17:04:02 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5E56D124053;
+        Tue, 26 Jan 2021 17:04:02 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 58DCE124058;
+        Tue, 26 Jan 2021 17:04:02 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue, 26 Jan 2021 17:04:02 +0000 (GMT)
+From:   Stefan Berger <stefanb@linux.vnet.ibm.com>
+To:     dhowells@redhat.com, keyrings@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        patrick@puiterwijk.org, Stefan Berger <stefanb@linux.ibm.com>
+Subject: [PATCH 2/3] x509: Add support for NIST p192 keys in certificates and akcipher
+Date:   Tue, 26 Jan 2021 12:03:58 -0500
+Message-Id: <20210126170359.363969-3-stefanb@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210126170359.363969-1-stefanb@linux.vnet.ibm.com>
+References: <20210126170359.363969-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-26_09:2021-01-26,2021-01-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ priorityscore=1501 impostorscore=0 bulkscore=0 malwarescore=0
+ suspectscore=0 phishscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
+ mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101260088
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi
+From: Stefan Berger <stefanb@linux.ibm.com>
 
-On 1/26/21 4:58 PM, Uwe Kleine-König wrote:
-> All amba drivers return 0 in their remove callback. Together with the
-> driver core ignoring the return value anyhow, it doesn't make sense to
-> return a value here.
-> 
-> Change the remove prototype to return void, which makes it explicit that
-> returning an error value doesn't work as expected. This simplifies changing
-> the core remove callback to return void, too.
-> 
-> Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
-> Reviewed-by: Arnd Bergmann <arnd@arndb.de>
-> Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
-> Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> Acked-by: Krzysztof Kozlowski <krzk@kernel.org> # for drivers/memory
-> Acked-by: Mark Brown <broonie@kernel.org>
-  > Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> Acked-by: Linus Walleij <linus.walleij@linaro.org>
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Add support for NIST p192 keys in x509 certificates and support it in
+'akcipher'.
 
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ crypto/asymmetric_keys/public_key.c       |  3 ++
+ crypto/asymmetric_keys/x509_cert_parser.c |  1 +
+ crypto/ecc.c                              | 36 ++++++++++++++++++++++-
+ include/linux/oid_registry.h              |  1 +
+ 4 files changed, 40 insertions(+), 1 deletion(-)
 
->   drivers/hwtracing/coresight/coresight-etm4x-core.c | 4 +---
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 0fcbaec0ded0..bb4a7cc0e3c8 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -98,6 +98,9 @@ int software_key_determine_akcipher(const char *encoding,
+ 
+ 		oid = look_up_OID(pkey->params + 2, pkey->paramlen - 2);
+ 		switch (oid) {
++		case OID_id_prime192v1:
++			strcpy(alg_name, "nist_p192");
++			return 0;
+ 		case OID_id_prime256v1:
+ 			strcpy(alg_name, "nist_p256");
+ 			return 0;
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index 44bae5ccb475..720cc7977077 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -501,6 +501,7 @@ int x509_extract_key_data(void *context, size_t hdrlen,
+ 			enum OID oid = look_up_OID(ctx->params + 2,
+ 						   ctx->params_size - 2);
+ 			switch (oid) {
++			case OID_id_prime192v1:
+ 			case OID_id_prime256v1:
+ 				ctx->cert->pub->pkey_algo = "ecdsa";
+ 				break;
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index fb8370720350..79df35a23a61 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -1826,13 +1826,47 @@ static struct akcipher_alg ecc_nist_p256 = {
+ 	},
+ };
+ 
++static unsigned int ecc_nist_p192_max_size(struct crypto_akcipher *tfm)
++{
++	return NIST_P192_KEY_SIZE;
++}
++
++static int ecc_nist_p192_init_tfm(struct crypto_akcipher *tfm)
++{
++	struct ecc_ctx *ctx = akcipher_tfm_ctx(tfm);
++
++	return ecc_ec_ctx_init(ctx, ECC_CURVE_NIST_P192);
++}
++
++static struct akcipher_alg ecc_nist_p192 = {
++	.verify = ecdsa_verify,
++	.set_pub_key = ecc_set_pub_key,
++	.max_size = ecc_nist_p192_max_size,
++	.init = ecc_nist_p192_init_tfm,
++	.exit = ecc_exit_tfm,
++	.base = {
++		.cra_name = "nist_p192",
++		.cra_driver_name = "ecc-nist-p192",
++		.cra_priority = 100,
++		.cra_module = THIS_MODULE,
++		.cra_ctxsize = sizeof(struct ecc_ctx),
++	},
++};
++
+ static int ecc_init(void)
+ {
+-	return crypto_register_akcipher(&ecc_nist_p256);
++	int ret;
++
++	ret = crypto_register_akcipher(&ecc_nist_p256);
++	if (ret)
++		return ret;
++
++	return crypto_register_akcipher(&ecc_nist_p192);
+ }
+ 
+ static void ecc_exit(void)
+ {
++	crypto_unregister_akcipher(&ecc_nist_p192);
+ 	crypto_unregister_akcipher(&ecc_nist_p256);
+ }
+ 
+diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
+index 9060f19c80eb..e8071133d0e2 100644
+--- a/include/linux/oid_registry.h
++++ b/include/linux/oid_registry.h
+@@ -21,6 +21,7 @@ enum OID {
+ 	OID_id_dsa,			/* 1.2.840.10040.4.1 */
+ 	OID_id_ecdsa_with_sha1,		/* 1.2.840.10045.4.1 */
+ 	OID_id_ecPublicKey,		/* 1.2.840.10045.2.1 */
++	OID_id_prime192v1,		/* 1.2.840.10045.3.1.1 */
+ 	OID_id_prime256v1,		/* 1.2.840.10045.3.1.7 */
+ 	OID_id_ecdsa_with_sha224,	/* 1.2.840.10045.4.3.1 */
+ 	OID_id_ecdsa_with_sha256,	/* 1.2.840.10045.4.3.2 */
+-- 
+2.25.4
 
-You are most likely to have a conflict for the above file, with what is
-in coresight/next. It should be easy to resolve.
-
-Otherwise, the changes look good for the drivers/hwtracing/coresight/*
-
-Acked-by: Suzuki K Poulose <suzuki.poulose@arm.com>
