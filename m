@@ -2,164 +2,148 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47D1CC433DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 819E0C433E9
 	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jan 2021 22:37:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10C0220679
+	by mail.kernel.org (Postfix) with ESMTP id 4A073204EF
 	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jan 2021 22:37:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727902AbhAZWea (ORCPT
+        id S1728032AbhAZWfJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Jan 2021 17:34:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50966 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732265AbhAZRFZ (ORCPT
+        Tue, 26 Jan 2021 17:35:09 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22458 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731228AbhAZRF0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Jan 2021 12:05:25 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F350FC061352
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Jan 2021 09:01:19 -0800 (PST)
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1l4RgD-00045p-EA; Tue, 26 Jan 2021 17:59:01 +0100
-Received: from ukl by ptx.hi.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1l4Rg3-0003hY-Ft; Tue, 26 Jan 2021 17:58:51 +0100
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Russell King <linux@armlinux.org.uk>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Vinod Koul <vkoul@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Mark Brown <broonie@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc:     linux-kernel@vger.kernel.org, kernel@pengutronix.de,
-        =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig.org@pengutronix.de>,
-        Mike Leach <mike.leach@linaro.org>,
-        Leo Yan <leo.yan@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, coresight@lists.linaro.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-watchdog@vger.kernel.org, alsa-devel@alsa-project.org
-Subject: [PATCH v3 0/5] amba: minor fix and various cleanups
-Date:   Tue, 26 Jan 2021 17:58:30 +0100
-Message-Id: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.29.2
+        Tue, 26 Jan 2021 12:05:26 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10QH203v075883;
+        Tue, 26 Jan 2021 12:04:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=0825v1EbrhFAES/Br9Z3x90qJ+sI4FzkH07mA0tswA4=;
+ b=N7Zy4Wd1Oqj1cz+/CI+KmO0Hb+55dbzvZjz3SQlRPdVdG/BFKiMwM2IlHlaTGz2ndSR/
+ PFQX2Ju3K+K0Py1vMnjutuhn19tvHOOzTFP2EhTywiSgU3vNAgg9pgBsof40A49UUrch
+ qCG6hQ+v4GCJmoqqCLF4Tj+J7dNRU0W4x2m2OSlYXVwk1HBQRyWUyr4WgQ/haLtsZfEx
+ KaAuphPmJ8wlvDMNSgYnR6cTuADqoBuSuaSJ0cGRzM2th+CCSru86uGUclr/TKtOnP5g
+ uA39tuIDBRWsk0+cw/DlTpti+lNEMTuBi8TTf+Fp9SikuaWOazFvBTJcZULgOhxAx217 gA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36am6rpb37-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Jan 2021 12:04:04 -0500
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10QH3Mn8084702;
+        Tue, 26 Jan 2021 12:04:04 -0500
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36am6rpb2p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Jan 2021 12:04:04 -0500
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10QGup6u027829;
+        Tue, 26 Jan 2021 17:04:03 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma01dal.us.ibm.com with ESMTP id 36adttm512-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Jan 2021 17:04:03 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10QH42Dl24117710
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 26 Jan 2021 17:04:02 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7F263124052;
+        Tue, 26 Jan 2021 17:04:02 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 70D65124055;
+        Tue, 26 Jan 2021 17:04:02 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue, 26 Jan 2021 17:04:02 +0000 (GMT)
+From:   Stefan Berger <stefanb@linux.vnet.ibm.com>
+To:     dhowells@redhat.com, keyrings@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        patrick@puiterwijk.org, Stefan Berger <stefanb@linux.ibm.com>
+Subject: [PATCH 3/3] x509: Detect sm2 keys by their parameters OID
+Date:   Tue, 26 Jan 2021 12:03:59 -0500
+Message-Id: <20210126170359.363969-4-stefanb@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210126170359.363969-1-stefanb@linux.vnet.ibm.com>
+References: <20210126170359.363969-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-26_09:2021-01-26,2021-01-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
+ impostorscore=0 suspectscore=0 malwarescore=0 mlxlogscore=999 adultscore=0
+ bulkscore=0 lowpriorityscore=0 mlxscore=0 spamscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101260086
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Uwe Kleine-König <u.kleine-koenig.org@pengutronix.de
+From: Stefan Berger <stefanb@linux.ibm.com>
 
-Hello,
+Detect whether a key is a sm2 type of key by its OID in the parameters
+array.
 
-Changes since v2 sent with Message-Id:
-20201124133139.3072124-1-uwe@kleine-koenig.org:
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ crypto/asymmetric_keys/x509_cert_parser.c | 27 +++++++++++++----------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
- - Rebase to v5.11-rc1 (which resulted in a few conflicts in
-   drivers/hwtracing).
- - Add various Acks.
- - Send to more maintainers directly (which I think is one of the
-   reasons why there are so few Acks).
-
-For my taste patch 4 needs some more acks (drivers/char/hw_random,
-drivers/dma, drivers/gpu/drm/pl111, drivers/i2c, drivers/mmc,
-drivers/vfio, drivers/watchdog and sound/arm have no maintainer feedback
-yet).
-
-My suggestion is to let this series go in via Russell King (who cares
-for amba). Once enough Acks are there I can also provide a tag for
-merging into different trees. Just tell me if you prefer this solution.
-
-Would be great if this could make it for v5.12, but I'm aware it's
-already late in the v5.11 cycle so it might have to wait for v5.13.
-
-Best regards
-Uwe
-
-Uwe Kleine-König (5):
-  amba: Fix resource leak for drivers without .remove
-  amba: reorder functions
-  vfio: platform: simplify device removal
-  amba: Make the remove callback return void
-  amba: Make use of bus_type functions
-
- drivers/amba/bus.c                            | 234 +++++++++---------
- drivers/char/hw_random/nomadik-rng.c          |   3 +-
- drivers/dma/pl330.c                           |   3 +-
- drivers/gpu/drm/pl111/pl111_drv.c             |   4 +-
- drivers/hwtracing/coresight/coresight-catu.c  |   3 +-
- .../hwtracing/coresight/coresight-cpu-debug.c |   4 +-
- .../hwtracing/coresight/coresight-cti-core.c  |   4 +-
- drivers/hwtracing/coresight/coresight-etb10.c |   4 +-
- .../coresight/coresight-etm3x-core.c          |   4 +-
- .../coresight/coresight-etm4x-core.c          |   4 +-
- .../hwtracing/coresight/coresight-funnel.c    |   4 +-
- .../coresight/coresight-replicator.c          |   4 +-
- drivers/hwtracing/coresight/coresight-stm.c   |   4 +-
- .../hwtracing/coresight/coresight-tmc-core.c  |   4 +-
- drivers/hwtracing/coresight/coresight-tpiu.c  |   4 +-
- drivers/i2c/busses/i2c-nomadik.c              |   4 +-
- drivers/input/serio/ambakmi.c                 |   3 +-
- drivers/memory/pl172.c                        |   4 +-
- drivers/memory/pl353-smc.c                    |   4 +-
- drivers/mmc/host/mmci.c                       |   4 +-
- drivers/rtc/rtc-pl030.c                       |   4 +-
- drivers/rtc/rtc-pl031.c                       |   4 +-
- drivers/spi/spi-pl022.c                       |   5 +-
- drivers/tty/serial/amba-pl010.c               |   4 +-
- drivers/tty/serial/amba-pl011.c               |   3 +-
- drivers/vfio/platform/vfio_amba.c             |  15 +-
- drivers/video/fbdev/amba-clcd.c               |   4 +-
- drivers/watchdog/sp805_wdt.c                  |   4 +-
- include/linux/amba/bus.h                      |   2 +-
- sound/arm/aaci.c                              |   4 +-
- 30 files changed, 157 insertions(+), 198 deletions(-)
-
-
-base-commit: 5c8fe583cce542aa0b84adc939ce85293de36e5e
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index 720cc7977077..82e331da5041 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -485,6 +485,7 @@ int x509_extract_key_data(void *context, size_t hdrlen,
+ 			  const void *value, size_t vlen)
+ {
+ 	struct x509_parse_context *ctx = context;
++	enum OID oid;
+ 
+ 	ctx->key_algo = ctx->last_oid;
+ 	switch (ctx->last_oid) {
+@@ -496,18 +497,20 @@ int x509_extract_key_data(void *context, size_t hdrlen,
+ 		ctx->cert->pub->pkey_algo = "ecrdsa";
+ 		break;
+ 	case OID_id_ecPublicKey:
+-		ctx->cert->pub->pkey_algo = "sm2";
+-		if (ctx->params_size > 2) {
+-			enum OID oid = look_up_OID(ctx->params + 2,
+-						   ctx->params_size - 2);
+-			switch (oid) {
+-			case OID_id_prime192v1:
+-			case OID_id_prime256v1:
+-				ctx->cert->pub->pkey_algo = "ecdsa";
+-				break;
+-			default:
+-				break;
+-			}
++		if (ctx->params_size < 2)
++			return -ENOPKG;
++
++		oid = look_up_OID(ctx->params + 2, ctx->params_size - 2);
++		switch (oid) {
++		case OID_id_prime192v1:
++		case OID_id_prime256v1:
++			ctx->cert->pub->pkey_algo = "ecdsa";
++			break;
++		case OID_sm2:
++			ctx->cert->pub->pkey_algo = "sm2";
++			break;
++		default:
++			return -ENOPKG;
+ 		}
+ 		break;
+ 	default:
 -- 
-2.29.2
+2.25.4
 
