@@ -2,105 +2,179 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06CE2C433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jan 2021 05:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BBB5C433E9
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jan 2021 06:52:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE61E2070E
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jan 2021 05:56:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5644F20724
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jan 2021 06:52:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231175AbhA0Fzv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Jan 2021 00:55:51 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:45204 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234162AbhA0F1U (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Jan 2021 00:27:20 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10R5PYKW113719;
-        Wed, 27 Jan 2021 05:26:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=fD+gGvKUrCI8keFPMfuW6njiJLLrpkcUGKk1anPewWE=;
- b=UivqKjQjesX1rwU19z2nOcPhv4omol6/J/3KGYEd1DpCfGOwpWn4yRoSD0lAfgodmqXZ
- j46EG0qKnM0UAzQrXHtC4Czmqyw9CShvYO2GH/1jRnwUqIQFgvAu5J/VbDbWTlFANV6w
- 1mRsVgL0VgPgiKxZwEjrLGu0ObWG4VYcxIO/GANZldd8sSG6mKxp4LGM8wiSGS2ef1A+
- moMgi7PHx4t7XudVvkr2LEcEd3U9xsd5tALdwonHobnYlABJDGSwfVL5FycsQKQxH/F/
- DoeXMKGXrQ62rl02R7P/PZeR6IZgYfdD4SODIp9C2VcioEDXAMaLggiB0JCEuvat6NGn UA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 368brkn5mu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Jan 2021 05:26:13 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10R5P5Nx086079;
-        Wed, 27 Jan 2021 05:26:12 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 368wcntcca-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Jan 2021 05:26:12 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 10R5Q7gc011660;
-        Wed, 27 Jan 2021 05:26:08 GMT
-Received: from mwanda (/102.36.221.92)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 26 Jan 2021 21:26:07 -0800
-Date:   Wed, 27 Jan 2021 08:25:59 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Boris Brezillon <bbrezillon@kernel.org>
-Cc:     Arnaud Ebalard <arno@natisbad.org>,
-        Srujana Challa <schalla@marvell.com>,
+        id S231616AbhA0Gv1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Jan 2021 01:51:27 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41084 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231916AbhA0GsF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 27 Jan 2021 01:48:05 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6EB692072C;
+        Wed, 27 Jan 2021 06:47:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1611730042;
+        bh=SMf/sTVmFizoaTCRhZKOzJIDd9pG2drSndbHjehSYHI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=eIxDYowELLXJdzjiGwaNPG2hkaUmupGzw2zEemwVvQomvLqzMvseCF/SkUiqZIduO
+         Gvf8oKij0ja051ihFnNxn1vEEmr2V7Rezxly/hz1a2DfgLLDiHYVnu7ywJbmKoZ/1n
+         jTjUvD1r6r/xOuNkE/io5HVCc6JZfMxpD46Zw0pDJW3S6qcXerAxfVIO9YzZfcx8BZ
+         7abmVKMgGR50oOPfV4GFaWENi4Ss/oJanPtz4wNs5YcT6fz7mNssNUbap4x9DqDp7k
+         94/V6xmo4VOiVFFF3CTluEAGGxMwLkYC3YD81tj+qqyC0M53/29Mjt0KM9D41YabCf
+         I2bnFL90rxHIw==
+Date:   Wed, 27 Jan 2021 07:47:15 +0100
+From:   Wolfram Sang <wsa@kernel.org>
+To:     Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+Cc:     Russell King <linux@armlinux.org.uk>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Suheil Chandran <schandran@marvell.com>,
-        Lukasz Bartosik <lbartosik@marvell.com>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] crypto: octeontx2 - fix signedness bug in
- cptvf_register_interrupts()
-Message-ID: <YBD5Z11GeYlJGuTh@mwanda>
+        Vinod Koul <vkoul@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Mark Brown <broonie@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-kernel@vger.kernel.org,
+        kernel@pengutronix.de, Mike Leach <mike.leach@linaro.org>,
+        Leo Yan <leo.yan@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, coresight@lists.linaro.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-watchdog@vger.kernel.org, alsa-devel@alsa-project.org
+Subject: Re: [PATCH v3 4/5] amba: Make the remove callback return void
+Message-ID: <20210127064715.GA981@kunai>
+Mail-Followup-To: Wolfram Sang <wsa@kernel.org>,
+        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+        Russell King <linux@armlinux.org.uk>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Vinod Koul <vkoul@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Mark Brown <broonie@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+        linux-kernel@vger.kernel.org, kernel@pengutronix.de,
+        Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        dmaengine@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com, linux-i2c@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-rtc@vger.kernel.org, linux-spi@vger.kernel.org,
+        linux-serial@vger.kernel.org, kvm@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        alsa-devel@alsa-project.org
+References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
+ <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="huq684BweRXVnRxX"
 Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9876 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 suspectscore=0
- phishscore=0 mlxlogscore=951 bulkscore=0 malwarescore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101270031
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9876 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 impostorscore=0
- phishscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=892
- lowpriorityscore=0 spamscore=0 mlxscore=0 suspectscore=0 malwarescore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101270031
+In-Reply-To: <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The "num_vec" has to be signed for the error handling to work.
 
-Fixes: 19d8e8c7be15 ("crypto: octeontx2 - add virtual function driver support")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+--huq684BweRXVnRxX
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
-index 9663be38ee40..47f378731024 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
-@@ -34,7 +34,7 @@ static void cptvf_disable_pfvf_mbox_intrs(struct otx2_cptvf_dev *cptvf)
- static int cptvf_register_interrupts(struct otx2_cptvf_dev *cptvf)
- {
- 	int ret, irq;
--	u32 num_vec;
-+	int num_vec;
- 
- 	num_vec = pci_msix_vec_count(cptvf->pdev);
- 	if (num_vec <= 0)
--- 
-2.29.2
+On Tue, Jan 26, 2021 at 05:58:34PM +0100, Uwe Kleine-K=C3=B6nig wrote:
+> All amba drivers return 0 in their remove callback. Together with the
+> driver core ignoring the return value anyhow, it doesn't make sense to
+> return a value here.
+>=20
+> Change the remove prototype to return void, which makes it explicit that
+> returning an error value doesn't work as expected. This simplifies changi=
+ng
+> the core remove callback to return void, too.
+>=20
+> Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
+> Reviewed-by: Arnd Bergmann <arnd@arndb.de>
+> Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+> Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> Acked-by: Krzysztof Kozlowski <krzk@kernel.org> # for drivers/memory
+> Acked-by: Mark Brown <broonie@kernel.org>
+> Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> Acked-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
 
+Acked-by: Wolfram Sang <wsa@kernel.org> # for I2C
+
+
+--huq684BweRXVnRxX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmARDG8ACgkQFA3kzBSg
+KbZUgg/+MkBwxjwkME0XbCPEYMUsJ9F6QLP4gXXTqGleAgxMVqSLG5XG/rJgCfPv
+BB3X116hBgVOZZBTz+uWxpOSy90WrhLh3HrOb/SGB6hmKn/a0fYdB2/YXhVOXKyN
+OlhKbYBl0Ev0PM+m8xV4sr0sQYOn1wOs0NMHoMvmK+TlnCX1GDxHBVuElpNWo8Wj
+/nFLnpq9eUGt+i4eAsKoTj/1l8Ak4cOihHe2cRWxVUC3NDRTJBL9HgZwD38wVl5v
+u/iwGQG5Zram49KLbGoBFpd60hrifA1X3Cwx2qhwZ+cm/ks3n+NwIQPvpoRyJ8Ny
+gK5+QKowfQvOtSP8PFC1QE/u+oLVpYJ4rVT3DmXddPj89l3Peo17VAS08AoPk3hO
+McIAFelbN1FmcjCpZ0ELpjCo/G6S1pKx9uAtFLbbMf80CoREU5ucCPzzWbf9unQv
+5xhIdK1xkszSC1kGjHABw1zBy/ZAEoy+x3yktPjX2nU1L8Ni/vKjR6+w27G7pspU
+WZwk2lkCFEnt8gFnRI4MFhjGagpiyiEfq0QeD1O452zgZimiPvfKjMLnWArfWzF0
+25EngNXoizDEZMYZX46drnzfUfIDKBVkCbj1CWcQLFivpp4pj7+7n4D5lJlgwNvE
+kqhQNlLLFbibwI0LNt/LqCbC/SggaYOUfYQ8XefoTe0Z6dH/+J0=
+=FyXm
+-----END PGP SIGNATURE-----
+
+--huq684BweRXVnRxX--
