@@ -3,157 +3,196 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E262C433E9
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jan 2021 12:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 731E4C433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jan 2021 12:38:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10029207A0
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jan 2021 12:38:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E23220798
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jan 2021 12:38:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237939AbhA0Mhs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Jan 2021 07:37:48 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:19704 "EHLO
+        id S1343608AbhA0Mh6 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Jan 2021 07:37:58 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21240 "EHLO
         mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1343518AbhA0Mex (ORCPT
+        by vger.kernel.org with ESMTP id S1343521AbhA0Mex (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 27 Jan 2021 07:34:53 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10RCVNDd134379;
-        Wed, 27 Jan 2021 07:33:55 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10RCVPdf155394;
+        Wed, 27 Jan 2021 07:34:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=IGrrrNYvITiLLwmEvTEKqx9468YFWQGSYuHwIhpwLD8=;
- b=IMo2Fp2US9fM9hoT7kBc4GkdOyRzCcxVLyIgPRy8gYPlsG9PRMmBrFUyDYgIIsMjMfPk
- fAoBqM/PNmd++7cFq0kSocNNYALsOYz80fkb49lbg6PqGH+Mn2cUUfu8oX5lSEPF969M
- plE+3ZeNM7mOZR8fqttGmnUXrPUr/WiX3bqrMcVkRhyrpCpuxf9olEVN9CBvC8CejYhL
- E+qU5SWXbm0jBScv6D3zbhjEClQDQN/kMGyh10z/sTbsM9bSjBXYT7v5Aqe/MyMle4jI
- pJ5qy89PF1cSplfy7qDHJYSXrMOVJx91oVsXbql8zrf4ziNop1JGM4WknnLeeT+oSZHK HQ== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=190U7YO5U37cBKzA+7A2pZbX+zJ2W+2fQfdGyg1LzAc=;
+ b=s6x+wREz+wUYVKnUHSRXs6omQwDKVjFbWYdKx/c8PC6NmjOVY3mHqfHKsB3eWpVN8nW1
+ ncTiYcy0mqB1OKMZCAnZKVSn7hMYNlUZVBP9sabD9LKLhovhyrKwa3SEa8YcEEPW1mzX
+ RNQfrH1kZgJ6mKY3JDUHaXrg9LWEzXREtyZrdS/Ag6Qs8R32biDV7nxS1i2hXMMe919f
+ HuPwZjcq5stjZt73pdSvoahyAajUvl/HdCIxkEKdNTbPwnKUaDBzlp6pt5+QXyNY0r17
+ OUwZDlem19AxjQVjvL29uKANCc3P/cDlOzQ1ZJkccHqnJMd24ltmHp0+owmswj3YMmNV sA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36ayn8dbq1-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36b5t43vty-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Jan 2021 07:33:55 -0500
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10RCVYf0135008;
-        Wed, 27 Jan 2021 07:33:54 -0500
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36ayn8dbpq-1
+        Wed, 27 Jan 2021 07:34:00 -0500
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10RCVZ15155770;
+        Wed, 27 Jan 2021 07:33:59 -0500
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36b5t43vsp-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Jan 2021 07:33:54 -0500
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10RCWnR3002862;
-        Wed, 27 Jan 2021 12:33:53 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma05wdc.us.ibm.com with ESMTP id 36a3qbve97-1
+        Wed, 27 Jan 2021 07:33:59 -0500
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10RCWdqY010801;
+        Wed, 27 Jan 2021 12:33:56 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma03dal.us.ibm.com with ESMTP id 368be9ckhk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Jan 2021 12:33:53 +0000
+        Wed, 27 Jan 2021 12:33:56 +0000
 Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10RCXqT937749046
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10RCXtO527918648
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Jan 2021 12:33:53 GMT
+        Wed, 27 Jan 2021 12:33:55 GMT
 Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D5CCC136059;
-        Wed, 27 Jan 2021 12:33:52 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 6C037136055;
+        Wed, 27 Jan 2021 12:33:55 +0000 (GMT)
 Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 282F113604F;
-        Wed, 27 Jan 2021 12:33:52 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id B3194136059;
+        Wed, 27 Jan 2021 12:33:54 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
         by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed, 27 Jan 2021 12:33:51 +0000 (GMT)
+        Wed, 27 Jan 2021 12:33:54 +0000 (GMT)
 From:   Stefan Berger <stefanb@linux.vnet.ibm.com>
 To:     dhowells@redhat.com, keyrings@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
         davem@davemloft.net, linux-crypto@vger.kernel.org,
         patrick@puiterwijk.org, Stefan Berger <stefanb@linux.ibm.com>
-Subject: [PATCH v3 0/3] Add support for x509 certs with NIST p256 and p192 keys
-Date:   Wed, 27 Jan 2021 07:33:47 -0500
-Message-Id: <20210127123350.817593-1-stefanb@linux.vnet.ibm.com>
+Subject: [PATCH v3 3/3] x509: Add support for NIST p192 keys in certificates and akcipher
+Date:   Wed, 27 Jan 2021 07:33:50 -0500
+Message-Id: <20210127123350.817593-4-stefanb@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210127123350.817593-1-stefanb@linux.vnet.ibm.com>
+References: <20210127123350.817593-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
  definitions=2021-01-27_05:2021-01-27,2021-01-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- suspectscore=0 adultscore=0 spamscore=0 priorityscore=1501 impostorscore=0
- lowpriorityscore=0 bulkscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101270067
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
+ phishscore=0 adultscore=0 clxscore=1015 suspectscore=0 lowpriorityscore=0
+ mlxscore=0 mlxlogscore=999 priorityscore=1501 malwarescore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101270067
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Stefan Berger <stefanb@linux.ibm.com>
 
-This series of patches adds support for x509 certificates signed by a CA
-that uses NIST p256 or p192 keys for signing. It also adds support for
-certificates where the public key is a NIST p256 or p192 key. The math
-for ECDSA signature verification is also added.
+Add support for NIST p192 keys in x509 certificates and support it in
+'akcipher'.
 
-Since self-signed certificates are verified upon loading, the following
-script can be used for testing:
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ crypto/asymmetric_keys/public_key.c       |  3 ++
+ crypto/asymmetric_keys/x509_cert_parser.c |  1 +
+ crypto/ecc.c                              | 36 ++++++++++++++++++++++-
+ include/linux/oid_registry.h              |  1 +
+ 4 files changed, 40 insertions(+), 1 deletion(-)
 
-k=$(keyctrl newring test @u)
-
-while :; do
-	for hash in sha1 sha224 sha256 sha384 sha512; do
-		openssl req \
-			-x509 \
-			-${hash} \
-			-newkey ec \
-			-pkeyopt ec_paramgen_curve:prime256v1 \
-			-keyout key.pem \
-			-days 365 \
-			-subj '/CN=test' \
-			-nodes \
-			-outform der \
-			-out cert.der
-		keyctl padd asymmetric testkey $k < cert.der
-		if [ $? -ne 0 ]; then
-			echo "ERROR"
-			exit 1
-		fi
-	done
-done
-
-It also works with restricted keyrings where an RSA key is used to sign
-a NIST P256/P192 key. Scripts for testing are here:
-
-https://github.com/stefanberger/eckey-testing
-
-The ECDSA signature verification will be used by IMA Appraisal where ECDSA
-file signatures stored in RPM packages will use substantially less space
-than if RSA signatures were to be used.
-
-   Stefan
-
-v2->v3:
-  - patch 2 now includes linux/scatterlist.h
-
-v1->v2:
-  - using faster vli_sub rather than newly added vli_mod_fast to 'reduce'
-    result
-  - rearranged switch statements to follow after RSA
-  - 3rd patch from 1st posting is now 1st patch
-
-Stefan Berger (3):
-  x509: Detect sm2 keys by their parameters OID
-  x509: Add support for parsing x509 certs with NIST p256 keys
-  x509: Add support for NIST p192 keys in certificates and akcipher
-
- crypto/Makefile                           |   9 +-
- crypto/asymmetric_keys/public_key.c       |  19 ++
- crypto/asymmetric_keys/x509_cert_parser.c |  45 ++-
- crypto/ecc.c                              | 318 ++++++++++++++++++++++
- crypto/ecc.h                              |   2 +
- crypto/ecc_curve_defs.h                   |   4 +
- crypto/eccsignature.asn1                  |   4 +
- include/linux/oid_registry.h              |   6 +
- 8 files changed, 404 insertions(+), 3 deletions(-)
- create mode 100644 crypto/eccsignature.asn1
-
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 0fcbaec0ded0..bb4a7cc0e3c8 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -98,6 +98,9 @@ int software_key_determine_akcipher(const char *encoding,
+ 
+ 		oid = look_up_OID(pkey->params + 2, pkey->paramlen - 2);
+ 		switch (oid) {
++		case OID_id_prime192v1:
++			strcpy(alg_name, "nist_p192");
++			return 0;
+ 		case OID_id_prime256v1:
+ 			strcpy(alg_name, "nist_p256");
+ 			return 0;
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index 50f6ecc70d8b..5ff891f8235d 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -505,6 +505,7 @@ int x509_extract_key_data(void *context, size_t hdrlen,
+ 		case OID_sm2:
+ 			ctx->cert->pub->pkey_algo = "sm2";
+ 			break;
++		case OID_id_prime192v1:
+ 		case OID_id_prime256v1:
+ 			ctx->cert->pub->pkey_algo = "ecdsa";
+ 			break;
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index 98577ed99aaf..0690c37f74e3 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -1813,13 +1813,47 @@ static struct akcipher_alg ecc_nist_p256 = {
+ 	},
+ };
+ 
++static unsigned int ecc_nist_p192_max_size(struct crypto_akcipher *tfm)
++{
++	return NIST_P192_KEY_SIZE;
++}
++
++static int ecc_nist_p192_init_tfm(struct crypto_akcipher *tfm)
++{
++	struct ecc_ctx *ctx = akcipher_tfm_ctx(tfm);
++
++	return ecc_ec_ctx_init(ctx, ECC_CURVE_NIST_P192);
++}
++
++static struct akcipher_alg ecc_nist_p192 = {
++	.verify = ecdsa_verify,
++	.set_pub_key = ecc_set_pub_key,
++	.max_size = ecc_nist_p192_max_size,
++	.init = ecc_nist_p192_init_tfm,
++	.exit = ecc_exit_tfm,
++	.base = {
++		.cra_name = "nist_p192",
++		.cra_driver_name = "ecc-nist-p192",
++		.cra_priority = 100,
++		.cra_module = THIS_MODULE,
++		.cra_ctxsize = sizeof(struct ecc_ctx),
++	},
++};
++
+ static int ecc_init(void)
+ {
+-	return crypto_register_akcipher(&ecc_nist_p256);
++	int ret;
++
++	ret = crypto_register_akcipher(&ecc_nist_p256);
++	if (ret)
++		return ret;
++
++	return crypto_register_akcipher(&ecc_nist_p192);
+ }
+ 
+ static void ecc_exit(void)
+ {
++	crypto_unregister_akcipher(&ecc_nist_p192);
+ 	crypto_unregister_akcipher(&ecc_nist_p256);
+ }
+ 
+diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
+index 9060f19c80eb..e8071133d0e2 100644
+--- a/include/linux/oid_registry.h
++++ b/include/linux/oid_registry.h
+@@ -21,6 +21,7 @@ enum OID {
+ 	OID_id_dsa,			/* 1.2.840.10040.4.1 */
+ 	OID_id_ecdsa_with_sha1,		/* 1.2.840.10045.4.1 */
+ 	OID_id_ecPublicKey,		/* 1.2.840.10045.2.1 */
++	OID_id_prime192v1,		/* 1.2.840.10045.3.1.1 */
+ 	OID_id_prime256v1,		/* 1.2.840.10045.3.1.7 */
+ 	OID_id_ecdsa_with_sha224,	/* 1.2.840.10045.4.3.1 */
+ 	OID_id_ecdsa_with_sha256,	/* 1.2.840.10045.4.3.2 */
 -- 
 2.25.4
 
