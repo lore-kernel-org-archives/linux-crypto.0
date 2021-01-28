@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-19.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8382DC433DB
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 13:08:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A75CC433E6
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 13:08:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 412FC64DCE
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 13:08:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F96D64DCE
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 13:08:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231736AbhA1NII (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Jan 2021 08:08:08 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33748 "EHLO mail.kernel.org"
+        id S231465AbhA1NIM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 28 Jan 2021 08:08:12 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33756 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229885AbhA1NID (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Jan 2021 08:08:03 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E8D3864DE1;
-        Thu, 28 Jan 2021 13:06:53 +0000 (UTC)
+        id S231346AbhA1NIE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 28 Jan 2021 08:08:04 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C414464DE4;
+        Thu, 28 Jan 2021 13:07:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1611839216;
-        bh=uJWDrD5rQzLnCd/a0JIrE53ldn+CZvw9kgi0laWoSpk=;
+        s=k20201202; t=1611839223;
+        bh=VHI3ezZ/OOOtOGSCo9bV++yT604xmpYfvp4A/7yEDvU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pSDvBBrE1+PT+/ZtXYAtSh7OnUNBKlDsC/n8xxjOBhCk6rA+4eiM6oSwMDAG5+9c4
-         qwVLMwA5wxb2cjWFFDCTR6fuh1NJJl1nWMWpAX9R0gdF1F3jQ+XXBx7nRg6t4kA1rt
-         dsLnoDg4XPrR7YQSs9rC47b43Wt62U1N9YbwyKNRvDnpqQK7v/adjENqQiD3uo/KWY
-         bFARlTVtGMKF6EjnuVgCUSnEfd7Y300h08eocLewNmp+GQavlb/opiMElgbo9Dg6qi
-         ok+GAdEn9o6mxLvvXTmUwOeMUFvH9dA6OHohzENGJY800Wgoaw8gs3DmQ6LoqNNHNA
-         wWVjAKKC1w9Mg==
+        b=FqAL21fsqWEOqbWDxSB4DHjFabDfwnczaWJ5IiMPzY1Kfnkd3c4IHpGbH+Z1IezOd
+         uhD1qt4H4+zv4cAH6LSV5SNLRn746t5Z75bjjq+zHIggSLqJdeF3vWCm0kqB5A+QPQ
+         qLNrGSvhAoVBzRZtwB7veIxnPhJB97QYir0DgolqVa35PDjkiYIA2KMd/gAXqd9Kto
+         7jnqPLiNqNmUPyFT2joYS3dtsFWZihsXKy7bSsTs+EI8JTPvgQFQBlKQMhQSZDWNIh
+         P+5+Oq9PCKPdinJzEmr8TaS3vSQM3kS5Dm5baznfLv8XYzvowz4d399mR0VVxLT5k1
+         4KJrn3QHIQ99Q==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
@@ -38,9 +38,9 @@ Cc:     herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ardb@kernel.org>,
         Dave Martin <dave.martin@arm.com>,
         Eric Biggers <ebiggers@google.com>
-Subject: [PATCH 6/9] crypto: arm64/aes-neonbs - remove NEON yield calls
-Date:   Thu, 28 Jan 2021 14:06:22 +0100
-Message-Id: <20210128130625.54076-7-ardb@kernel.org>
+Subject: [PATCH 9/9] arm64: assembler: remove conditional NEON yield macros
+Date:   Thu, 28 Jan 2021 14:06:25 +0100
+Message-Id: <20210128130625.54076-10-ardb@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210128130625.54076-1-ardb@kernel.org>
 References: <20210128130625.54076-1-ardb@kernel.org>
@@ -50,70 +50,96 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There is no need for elaborate yield handling in the bit-sliced NEON
-implementation of AES, given that skciphers are naturally bounded by the
-size of the chunks returned by the skcipher_walk API. So remove the
-yield calls from the asm code.
+The users of the conditional NEON yield macros have all been switched to
+the simplified cond_yield macro, and so the NEON specific ones can be
+removed.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/arm64/crypto/aes-neonbs-core.S | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/assembler.h | 70 --------------------
+ 1 file changed, 70 deletions(-)
 
-diff --git a/arch/arm64/crypto/aes-neonbs-core.S b/arch/arm64/crypto/aes-neonbs-core.S
-index 63a52ad9a75c..a3405b8c344b 100644
---- a/arch/arm64/crypto/aes-neonbs-core.S
-+++ b/arch/arm64/crypto/aes-neonbs-core.S
-@@ -613,7 +613,6 @@ SYM_FUNC_END(aesbs_decrypt8)
- 	st1		{\o7\().16b}, [x19], #16
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index 5f977a7c6b43..ae90fdf37d15 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -675,76 +675,6 @@ USER(\label, ic	ivau, \tmp2)			// invalidate I line PoU
+ 	.endif
+ 	.endm
  
- 	cbz		x23, 1f
--	cond_yield_neon
- 	b		99b
- 
- 1:	frame_pop
-@@ -715,7 +714,6 @@ SYM_FUNC_START(aesbs_cbc_decrypt)
- 1:	st1		{v24.16b}, [x24]		// store IV
- 
- 	cbz		x23, 2f
--	cond_yield_neon
- 	b		99b
- 
- 2:	frame_pop
-@@ -801,7 +799,7 @@ SYM_FUNC_END(__xts_crypt8)
- 	mov		x23, x4
- 	mov		x24, x5
- 
--0:	movi		v30.2s, #0x1
-+	movi		v30.2s, #0x1
- 	movi		v25.2s, #0x87
- 	uzp1		v30.4s, v30.4s, v25.4s
- 	ld1		{v25.16b}, [x24]
-@@ -846,7 +844,6 @@ SYM_FUNC_END(__xts_crypt8)
- 	cbz		x23, 1f
- 	st1		{v25.16b}, [x24]
- 
--	cond_yield_neon	0b
- 	b		99b
- 
- 1:	st1		{v25.16b}, [x24]
-@@ -889,7 +886,7 @@ SYM_FUNC_START(aesbs_ctr_encrypt)
- 	cset		x26, ne
- 	add		x23, x23, x26		// do one extra block if final
- 
--98:	ldp		x7, x8, [x24]
-+	ldp		x7, x8, [x24]
- 	ld1		{v0.16b}, [x24]
- CPU_LE(	rev		x7, x7		)
- CPU_LE(	rev		x8, x8		)
-@@ -967,7 +964,6 @@ CPU_LE(	rev		x8, x8		)
- 	st1		{v0.16b}, [x24]
- 	cbz		x23, .Lctr_done
- 
--	cond_yield_neon	98b
- 	b		99b
- 
- .Lctr_done:
+-/*
+- * Check whether to yield to another runnable task from kernel mode NEON code
+- * (which runs with preemption disabled).
+- *
+- * if_will_cond_yield_neon
+- *        // pre-yield patchup code
+- * do_cond_yield_neon
+- *        // post-yield patchup code
+- * endif_yield_neon    <label>
+- *
+- * where <label> is optional, and marks the point where execution will resume
+- * after a yield has been performed. If omitted, execution resumes right after
+- * the endif_yield_neon invocation. Note that the entire sequence, including
+- * the provided patchup code, will be omitted from the image if
+- * CONFIG_PREEMPTION is not defined.
+- *
+- * As a convenience, in the case where no patchup code is required, the above
+- * sequence may be abbreviated to
+- *
+- * cond_yield_neon <label>
+- *
+- * Note that the patchup code does not support assembler directives that change
+- * the output section, any use of such directives is undefined.
+- *
+- * The yield itself consists of the following:
+- * - Check whether the preempt count is exactly 1 and a reschedule is also
+- *   needed. If so, calling of preempt_enable() in kernel_neon_end() will
+- *   trigger a reschedule. If it is not the case, yielding is pointless.
+- * - Disable and re-enable kernel mode NEON, and branch to the yield fixup
+- *   code.
+- *
+- * This macro sequence may clobber all CPU state that is not guaranteed by the
+- * AAPCS to be preserved across an ordinary function call.
+- */
+-
+-	.macro		cond_yield_neon, lbl
+-	if_will_cond_yield_neon
+-	do_cond_yield_neon
+-	endif_yield_neon	\lbl
+-	.endm
+-
+-	.macro		if_will_cond_yield_neon
+-#ifdef CONFIG_PREEMPTION
+-	get_current_task	x0
+-	ldr		x0, [x0, #TSK_TI_PREEMPT]
+-	sub		x0, x0, #PREEMPT_DISABLE_OFFSET
+-	cbz		x0, .Lyield_\@
+-	/* fall through to endif_yield_neon */
+-	.subsection	1
+-.Lyield_\@ :
+-#else
+-	.section	".discard.cond_yield_neon", "ax"
+-#endif
+-	.endm
+-
+-	.macro		do_cond_yield_neon
+-	bl		kernel_neon_end
+-	bl		kernel_neon_begin
+-	.endm
+-
+-	.macro		endif_yield_neon, lbl
+-	.ifnb		\lbl
+-	b		\lbl
+-	.else
+-	b		.Lyield_out_\@
+-	.endif
+-	.previous
+-.Lyield_out_\@ :
+-	.endm
+-
+ 	/*
+ 	 * Check whether preempt-disabled code should yield as soon as it
+ 	 * is able. This is the case if re-enabling preemption a single
 -- 
 2.29.2
 
