@@ -2,87 +2,152 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5E2FC433E6
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 18:02:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83E15C433E9
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 20:11:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB4B764E1B
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 18:02:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59A8B64E05
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 20:11:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231214AbhA1SCB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Jan 2021 13:02:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60318 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231206AbhA1SBP (ORCPT
+        id S231313AbhA1ULq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 28 Jan 2021 15:11:46 -0500
+Received: from antares.kleine-koenig.org ([94.130.110.236]:45986 "EHLO
+        antares.kleine-koenig.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229953AbhA1UJf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Jan 2021 13:01:15 -0500
-Received: from smtp-42ab.mail.infomaniak.ch (smtp-42ab.mail.infomaniak.ch [IPv6:2001:1600:3:17::42ab])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10C02C0613D6
-        for <linux-crypto@vger.kernel.org>; Thu, 28 Jan 2021 10:00:30 -0800 (PST)
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
-        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4DRSth2VGKzMqm0V;
-        Thu, 28 Jan 2021 19:00:28 +0100 (CET)
-Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
-        by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4DRStg1w48zlh8TK;
-        Thu, 28 Jan 2021 19:00:27 +0100 (CET)
-Subject: Re: [PATCH v4 00/10] Enable root to update the blacklist keyring
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-To:     David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     David Woodhouse <dwmw2@infradead.org>,
-        "David S . Miller" <davem@davemloft.net>,
+        Thu, 28 Jan 2021 15:09:35 -0500
+X-Greylist: delayed 80298 seconds by postgrey-1.27 at vger.kernel.org; Thu, 28 Jan 2021 15:09:34 EST
+Received: from antares.kleine-koenig.org (localhost [127.0.0.1])
+        by antares.kleine-koenig.org (Postfix) with ESMTP id 2969DAE1E57;
+        Thu, 28 Jan 2021 21:08:43 +0100 (CET)
+Received: from antares.kleine-koenig.org ([94.130.110.236])
+        by antares.kleine-koenig.org (antares.kleine-koenig.org [94.130.110.236]) (amavisd-new, port 10024)
+        with ESMTP id NYAo-JJQbWWS; Thu, 28 Jan 2021 21:08:40 +0100 (CET)
+Received: from taurus.defre.kleine-koenig.org (unknown [IPv6:2a02:8071:b5ad:20fc:2b29:ca75:841e:b14c])
+        by antares.kleine-koenig.org (Postfix) with ESMTPSA;
+        Thu, 28 Jan 2021 21:08:40 +0100 (CET)
+Subject: Re: [PATCH] vio: make remove callback return void
+To:     Sukadev Bhattiprolu <sukadev@linux.ibm.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jens Axboe <axboe@kernel.dk>, Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <jmorris@namei.org>,
-        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "Serge E . Hallyn" <serge@hallyn.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-References: <20210121155513.539519-1-mic@digikod.net>
- <3613306.1611852751@warthog.procyon.org.uk>
- <03ddd243-db25-a054-489d-e64ead4d6f59@digikod.net>
-Message-ID: <09376843-a55f-476a-7073-91aacc9ebdc8@digikod.net>
-Date:   Thu, 28 Jan 2021 19:00:33 +0100
-User-Agent: 
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Haren Myneni <haren@us.ibm.com>,
+        =?UTF-8?Q?Breno_Leit=c3=a3o?= <leitao@debian.org>,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        Steven Royer <seroyer@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Cristobal Forno <cforno12@linux.ibm.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Dany Madden <drt@linux.ibm.com>, Lijun Pan <ljp@linux.ibm.com>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Michael Cyr <mikecyr@linux.ibm.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        netdev@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org
+References: <20210127215010.99954-1-uwe@kleine-koenig.org>
+ <20210128190750.GA490196@us.ibm.com>
+From:   =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <uwe@kleine-koenig.org>
+Message-ID: <f3655d10-26ba-5f9f-761e-2f48d13d0b11@kleine-koenig.org>
+Date:   Thu, 28 Jan 2021 21:08:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-In-Reply-To: <03ddd243-db25-a054-489d-e64ead4d6f59@digikod.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210128190750.GA490196@us.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="0WS2s8Dj7oAQDuvcAexs4Jz4r6U02PT15"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I noticed that commits in your branch are not up to date with latest
-Jarkoo reviews on my patches (see changes since v2). There is no
-conflict if you replace conflicting patches from your branch by patches
-from this series. Could you replace your duplicate commits with this
-patch series?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0WS2s8Dj7oAQDuvcAexs4Jz4r6U02PT15
+Content-Type: multipart/mixed; boundary="C8P4GGVXo3CFpsOyigcYdiPTK9L9mB3i8";
+ protected-headers="v1"
+From: =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <uwe@kleine-koenig.org>
+To: Sukadev Bhattiprolu <sukadev@linux.ibm.com>
+Cc: Michael Ellerman <mpe@ellerman.id.au>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Paul Mackerras <paulus@samba.org>, "David S. Miller" <davem@davemloft.net>,
+ Jens Axboe <axboe@kernel.dk>, Matt Mackall <mpm@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Peter Huewe <peterhuewe@gmx.de>,
+ Jarkko Sakkinen <jarkko@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Haren Myneni <haren@us.ibm.com>, =?UTF-8?Q?Breno_Leit=c3=a3o?=
+ <leitao@debian.org>, Nayna Jain <nayna@linux.ibm.com>,
+ Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+ Steven Royer <seroyer@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Cristobal Forno <cforno12@linux.ibm.com>, Jakub Kicinski <kuba@kernel.org>,
+ Dany Madden <drt@linux.ibm.com>, Lijun Pan <ljp@linux.ibm.com>,
+ Tyrel Datwyler <tyreld@linux.ibm.com>,
+ "James E.J. Bottomley" <jejb@linux.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Michael Cyr <mikecyr@linux.ibm.com>, Jiri Slaby <jirislaby@kernel.org>,
+ linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+ netdev@vger.kernel.org, linux-scsi@vger.kernel.org,
+ target-devel@vger.kernel.org
+Message-ID: <f3655d10-26ba-5f9f-761e-2f48d13d0b11@kleine-koenig.org>
+Subject: Re: [PATCH] vio: make remove callback return void
+References: <20210127215010.99954-1-uwe@kleine-koenig.org>
+ <20210128190750.GA490196@us.ibm.com>
+In-Reply-To: <20210128190750.GA490196@us.ibm.com>
+
+--C8P4GGVXo3CFpsOyigcYdiPTK9L9mB3i8
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+Hello Sukadev,
+
+On 1/28/21 8:07 PM, Sukadev Bhattiprolu wrote:
+> Slightly off-topic, should ndo_stop() also return a void? Its return va=
+lue
+> seems to be mostly ignored and [...]
+
+I don't know enough about the network stack to tell. Probably it's a=20
+good idea to start a separate thread for this and address this to the=20
+netdev list only.
+
+Best regards
+Uwe
 
 
-On 28/01/2021 18:38, Mickaël Salaün wrote:
-> 
-> 
-> On 28/01/2021 17:52, David Howells wrote:
->>
->> Hi Mickaël,
-> Hi David,
-> 
->>
->> I could pull your patches (unless Jarkko wants to), but can you please drop
->> the patches that are also in my keys-misc branch lest one or other (or both)
->> of our branches get dropped in the next merge window due to conflicts?
->>
->> Ideally, can you base your branch on my keys-misc branch?
-> 
-> Sure, I'm rebasing and testing a new patch series.
-> 
->>
->> Thanks,
->> David
->>
+
+--C8P4GGVXo3CFpsOyigcYdiPTK9L9mB3i8--
+
+--0WS2s8Dj7oAQDuvcAexs4Jz4r6U02PT15
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmATGcQACgkQwfwUeK3K
+7AljPggAhaj+JnoGN++1YO/4Nz81FEvRKFR9Eky+A4TCDGs8NvV1eVbhztqchotk
+bm71ZlCLS23+/m5xoA/4bjOHPxc0ETs8V37z86n9Tcf/QTiwI1eN4UYU0l7cPqGO
+cxuT/eLxm7WQ/kKwlJucUUHREWVCXH5NNTw4/zH9r+qc3MVQ++uUrKjtF94cnkGa
+iOO8nW+fhP+e8bVENm+gcTwONaL45UG+qABpFj9mXiWMrA7L0kSEyqG4wUMgeKb3
+YUtPKsAuS8xpUhT5C/zEQJ6qWI3rXkGCPEMUMcpWk+ut4McB9mE+TP6XWC36nfFy
+uq8ofa7nTpO48ZQIj/PU3d+UIzp2eQ==
+=XsiK
+-----END PGP SIGNATURE-----
+
+--0WS2s8Dj7oAQDuvcAexs4Jz4r6U02PT15--
