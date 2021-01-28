@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-19.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D67C433E9
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 13:07:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA7F6C4332D
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 13:07:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D03364DDF
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 13:07:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 823F364D9F
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 13:07:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231383AbhA1NHc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Jan 2021 08:07:32 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33536 "EHLO mail.kernel.org"
+        id S229728AbhA1NHk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 28 Jan 2021 08:07:40 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33626 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231250AbhA1NH0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Jan 2021 08:07:26 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4A1DB64DDE;
-        Thu, 28 Jan 2021 13:06:43 +0000 (UTC)
+        id S231736AbhA1NHf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 28 Jan 2021 08:07:35 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 58B5C64DCE;
+        Thu, 28 Jan 2021 13:06:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1611839205;
-        bh=KQN/gA+dpOmqhXJ/wI2m4mkSVNJwoojNwK1S+MlXa0I=;
+        s=k20201202; t=1611839213;
+        bh=C83nzGZUUKSkv/8BI2w4723y++kWv7r8HeCsJgHyjds=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=c/9sjlB31KKsxSzpwo2yVvDkfbeCxV2MhfPZG2GUjzSCJYz9TjF3okzIZhGtvfdE+
-         33P/sUsBzewWBaX4D4vIHORHYtY0CJhOMJa5FHRE69ELu5qLu+o+hPVEr2b0961f75
-         GGmHGIekLgjbPPyxTpgmOW+y7Uzl2boLMAc4XQ0LL2DeSLnDtS4OBiP3Rc/tXkpM10
-         nqtM1sju9Z5FbsSPCo16QObnm4YWg3IATRSwreKMNG9roDErq8KxpAurqAPYj8iaGR
-         oct8TTbxn14ipPTDuXvbFDQa7Y4SIGEHyfkweWKhgbmbM4MOqX95gpUVRmYaZddJWf
-         5O13qmlOALHgA==
+        b=OjUCAn1/xVCtiktoSxX7AiIbWmEkg4IkgMOCRgYNkHLMTG98CmKkoenz7voVnANdo
+         xuB5ns5A7yVaygKM5JmNRruwqqEEnWvX+3Xcr7TzQFAAToQQMFLZ0XOUX/mFjhavHx
+         SLsUuarc5iCw4TJtR7JGGBPknz5U4DHkAHcE5Lt96mhvCIukYOW8EcdgdHVAmrFRZ0
+         VnxN7Jon4D/GCHWWe5s3tnINCEY1oobjBR4t7va1ot3s5xhsxSHgbJ0Z7rXHKHeB+X
+         xaUhykTaK0ephMm9uK8/cTEOkXw+8v02NxGj5Hpi45Eu553ZqgEdkQSVpQ4ZZQjeOU
+         zfltMRobYH2Fg==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
@@ -38,9 +38,9 @@ Cc:     herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ardb@kernel.org>,
         Dave Martin <dave.martin@arm.com>,
         Eric Biggers <ebiggers@google.com>
-Subject: [PATCH 2/9] crypto: arm64/sha1-ce - simplify NEON yield
-Date:   Thu, 28 Jan 2021 14:06:18 +0100
-Message-Id: <20210128130625.54076-3-ardb@kernel.org>
+Subject: [PATCH 5/9] crypto: arm64/sha512-ce - simplify NEON yield
+Date:   Thu, 28 Jan 2021 14:06:21 +0100
+Message-Id: <20210128130625.54076-6-ardb@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210128130625.54076-1-ardb@kernel.org>
 References: <20210128130625.54076-1-ardb@kernel.org>
@@ -56,175 +56,156 @@ task mode and a reschedule is pending, perform only the preempt count
 check in assembler, but simply return early in this case, and let the C
 code deal with the consequences.
 
-This reverts commit 7df8d164753e6e6f229b72767595072bc6a71f48.
+This reverts commit 6caf7adc5e458f77f550b6c6ca8effa152d61b4a.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/arm64/crypto/sha1-ce-core.S | 47 +++++++-------------
- arch/arm64/crypto/sha1-ce-glue.c | 22 ++++-----
- 2 files changed, 29 insertions(+), 40 deletions(-)
+ arch/arm64/crypto/sha512-ce-core.S | 29 +++--------
+ arch/arm64/crypto/sha512-ce-glue.c | 53 ++++++++++----------
+ 2 files changed, 34 insertions(+), 48 deletions(-)
 
-diff --git a/arch/arm64/crypto/sha1-ce-core.S b/arch/arm64/crypto/sha1-ce-core.S
-index 92d0d2753e81..8c02bbc2684e 100644
---- a/arch/arm64/crypto/sha1-ce-core.S
-+++ b/arch/arm64/crypto/sha1-ce-core.S
-@@ -62,40 +62,34 @@
- 	.endm
- 
- 	/*
--	 * void sha1_ce_transform(struct sha1_ce_state *sst, u8 const *src,
--	 *			  int blocks)
-+	 * int sha1_ce_transform(struct sha1_ce_state *sst, u8 const *src,
-+	 *			 int blocks)
+diff --git a/arch/arm64/crypto/sha512-ce-core.S b/arch/arm64/crypto/sha512-ce-core.S
+index cde606c0323e..d6e7f6c95fa6 100644
+--- a/arch/arm64/crypto/sha512-ce-core.S
++++ b/arch/arm64/crypto/sha512-ce-core.S
+@@ -107,23 +107,17 @@
  	 */
- SYM_FUNC_START(sha1_ce_transform)
+ 	.text
+ SYM_FUNC_START(sha512_ce_transform)
 -	frame_push	3
 -
 -	mov		x19, x0
 -	mov		x20, x1
 -	mov		x21, x2
 -
- 	/* load round constants */
--0:	loadrc		k0.4s, 0x5a827999, w6
-+	loadrc		k0.4s, 0x5a827999, w6
- 	loadrc		k1.4s, 0x6ed9eba1, w6
- 	loadrc		k2.4s, 0x8f1bbcdc, w6
- 	loadrc		k3.4s, 0xca62c1d6, w6
- 
  	/* load state */
--	ld1		{dgav.4s}, [x19]
--	ldr		dgb, [x19, #16]
-+	ld1		{dgav.4s}, [x0]
-+	ldr		dgb, [x0, #16]
+-0:	ld1		{v8.2d-v11.2d}, [x19]
++	ld1		{v8.2d-v11.2d}, [x0]
  
- 	/* load sha1_ce_state::finalize */
- 	ldr_l		w4, sha1_ce_offsetof_finalize, x4
--	ldr		w4, [x19, x4]
-+	ldr		w4, [x0, x4]
+ 	/* load first 4 round constants */
+ 	adr_l		x3, .Lsha512_rcon
+ 	ld1		{v20.2d-v23.2d}, [x3], #64
  
  	/* load input */
--1:	ld1		{v8.4s-v11.4s}, [x20], #64
+-1:	ld1		{v12.2d-v15.2d}, [x20], #64
+-	ld1		{v16.2d-v19.2d}, [x20], #64
 -	sub		w21, w21, #1
-+0:	ld1		{v8.4s-v11.4s}, [x1], #64
++0:	ld1		{v12.2d-v15.2d}, [x1], #64
++	ld1		{v16.2d-v19.2d}, [x1], #64
 +	sub		w2, w2, #1
  
- CPU_LE(	rev32		v8.16b, v8.16b		)
- CPU_LE(	rev32		v9.16b, v9.16b		)
- CPU_LE(	rev32		v10.16b, v10.16b	)
- CPU_LE(	rev32		v11.16b, v11.16b	)
+ CPU_LE(	rev64		v12.16b, v12.16b	)
+ CPU_LE(	rev64		v13.16b, v13.16b	)
+@@ -201,19 +195,12 @@ CPU_LE(	rev64		v19.16b, v19.16b	)
+ 	add		v10.2d, v10.2d, v2.2d
+ 	add		v11.2d, v11.2d, v3.2d
  
--2:	add		t0.4s, v8.4s, k0.4s
-+1:	add		t0.4s, v8.4s, k0.4s
- 	mov		dg0v.16b, dgav.16b
- 
- 	add_update	c, ev, k0,  8,  9, 10, 11, dgb
-@@ -126,25 +120,18 @@ CPU_LE(	rev32		v11.16b, v11.16b	)
- 	add		dgbv.2s, dgbv.2s, dg1v.2s
- 	add		dgav.4s, dgav.4s, dg0v.4s
- 
++	cond_yield	3f, x4
+ 	/* handled all input blocks? */
 -	cbz		w21, 3f
 -
 -	if_will_cond_yield_neon
--	st1		{dgav.4s}, [x19]
--	str		dgb, [x19, #16]
+-	st1		{v8.2d-v11.2d}, [x19]
 -	do_cond_yield_neon
-+	cbz		w2, 2f
-+	cond_yield	3f, x5
- 	b		0b
+-	b		0b
 -	endif_yield_neon
 -
 -	b		1b
- 
- 	/*
- 	 * Final block: add padding and total bit count.
- 	 * Skip if the input size was not a round multiple of the block size,
- 	 * the padding is handled by the C code in that case.
- 	 */
--3:	cbz		x4, 4f
-+2:	cbz		x4, 3f
- 	ldr_l		w4, sha1_ce_offsetof_count, x4
--	ldr		x4, [x19, x4]
-+	ldr		x4, [x0, x4]
- 	movi		v9.2d, #0
- 	mov		x8, #0x80000000
- 	movi		v10.2d, #0
-@@ -153,11 +140,11 @@ CPU_LE(	rev32		v11.16b, v11.16b	)
- 	mov		x4, #0
- 	mov		v11.d[0], xzr
- 	mov		v11.d[1], x7
--	b		2b
-+	b		1b
++	cbnz		w2, 0b
  
  	/* store new state */
--4:	st1		{dgav.4s}, [x19]
--	str		dgb, [x19, #16]
+-3:	st1		{v8.2d-v11.2d}, [x19]
 -	frame_pop
-+3:	st1		{dgav.4s}, [x0]
-+	str		dgb, [x0, #16]
++3:	st1		{v8.2d-v11.2d}, [x0]
 +	mov		w0, w2
  	ret
- SYM_FUNC_END(sha1_ce_transform)
-diff --git a/arch/arm64/crypto/sha1-ce-glue.c b/arch/arm64/crypto/sha1-ce-glue.c
-index c1362861765f..71fa4f1122d7 100644
---- a/arch/arm64/crypto/sha1-ce-glue.c
-+++ b/arch/arm64/crypto/sha1-ce-glue.c
-@@ -29,14 +29,22 @@ struct sha1_ce_state {
- extern const u32 sha1_ce_offsetof_count;
- extern const u32 sha1_ce_offsetof_finalize;
+ SYM_FUNC_END(sha512_ce_transform)
+diff --git a/arch/arm64/crypto/sha512-ce-glue.c b/arch/arm64/crypto/sha512-ce-glue.c
+index a6b1adf31c56..e62a094a9d52 100644
+--- a/arch/arm64/crypto/sha512-ce-glue.c
++++ b/arch/arm64/crypto/sha512-ce-glue.c
+@@ -26,11 +26,25 @@ MODULE_LICENSE("GPL v2");
+ MODULE_ALIAS_CRYPTO("sha384");
+ MODULE_ALIAS_CRYPTO("sha512");
  
--asmlinkage void sha1_ce_transform(struct sha1_ce_state *sst, u8 const *src,
--				  int blocks);
-+asmlinkage int sha1_ce_transform(struct sha1_ce_state *sst, u8 const *src,
-+				 int blocks);
+-asmlinkage void sha512_ce_transform(struct sha512_state *sst, u8 const *src,
+-				    int blocks);
++asmlinkage int sha512_ce_transform(struct sha512_state *sst, u8 const *src,
++				   int blocks);
  
- static void __sha1_ce_transform(struct sha1_state *sst, u8 const *src,
- 				int blocks)
- {
--	sha1_ce_transform(container_of(sst, struct sha1_ce_state, sst), src,
--			  blocks);
+ asmlinkage void sha512_block_data_order(u64 *digest, u8 const *src, int blocks);
+ 
++static void __sha512_ce_transform(struct sha512_state *sst, u8 const *src,
++				  int blocks)
++{
 +	while (blocks) {
 +		int rem;
 +
 +		kernel_neon_begin();
-+		rem = sha1_ce_transform(container_of(sst, struct sha1_ce_state,
-+						     sst), src, blocks);
++		rem = sha512_ce_transform(sst, src, blocks);
 +		kernel_neon_end();
-+		src += (blocks - rem) * SHA1_BLOCK_SIZE;
++		src += (blocks - rem) * SHA512_BLOCK_SIZE;
 +		blocks = rem;
 +	}
- }
- 
- const u32 sha1_ce_offsetof_count = offsetof(struct sha1_ce_state, sst.count);
-@@ -51,9 +59,7 @@ static int sha1_ce_update(struct shash_desc *desc, const u8 *data,
- 		return crypto_sha1_update(desc, data, len);
- 
- 	sctx->finalize = 0;
++}
++
+ static void __sha512_block_data_order(struct sha512_state *sst, u8 const *src,
+ 				      int blocks)
+ {
+@@ -40,45 +54,30 @@ static void __sha512_block_data_order(struct sha512_state *sst, u8 const *src,
+ static int sha512_ce_update(struct shash_desc *desc, const u8 *data,
+ 			    unsigned int len)
+ {
+-	if (!crypto_simd_usable())
+-		return sha512_base_do_update(desc, data, len,
+-					     __sha512_block_data_order);
+-
 -	kernel_neon_begin();
- 	sha1_base_do_update(desc, data, len, __sha1_ce_transform);
+-	sha512_base_do_update(desc, data, len, sha512_ce_transform);
 -	kernel_neon_end();
++	sha512_block_fn *fn = crypto_simd_usable() ? __sha512_ce_transform
++						   : __sha512_block_data_order;
  
++	sha512_base_do_update(desc, data, len, fn);
  	return 0;
  }
-@@ -73,11 +79,9 @@ static int sha1_ce_finup(struct shash_desc *desc, const u8 *data,
- 	 */
- 	sctx->finalize = finalize;
+ 
+ static int sha512_ce_finup(struct shash_desc *desc, const u8 *data,
+ 			   unsigned int len, u8 *out)
+ {
+-	if (!crypto_simd_usable()) {
+-		if (len)
+-			sha512_base_do_update(desc, data, len,
+-					      __sha512_block_data_order);
+-		sha512_base_do_finalize(desc, __sha512_block_data_order);
+-		return sha512_base_finish(desc, out);
+-	}
++	sha512_block_fn *fn = crypto_simd_usable() ? __sha512_ce_transform
++						   : __sha512_block_data_order;
  
 -	kernel_neon_begin();
- 	sha1_base_do_update(desc, data, len, __sha1_ce_transform);
- 	if (!finalize)
- 		sha1_base_do_finalize(desc, __sha1_ce_transform);
+-	sha512_base_do_update(desc, data, len, sha512_ce_transform);
+-	sha512_base_do_finalize(desc, sha512_ce_transform);
 -	kernel_neon_end();
- 	return sha1_base_finish(desc, out);
++	sha512_base_do_update(desc, data, len, fn);
++	sha512_base_do_finalize(desc, fn);
+ 	return sha512_base_finish(desc, out);
  }
  
-@@ -89,9 +93,7 @@ static int sha1_ce_final(struct shash_desc *desc, u8 *out)
- 		return crypto_sha1_finup(desc, NULL, 0, out);
+ static int sha512_ce_final(struct shash_desc *desc, u8 *out)
+ {
+-	if (!crypto_simd_usable()) {
+-		sha512_base_do_finalize(desc, __sha512_block_data_order);
+-		return sha512_base_finish(desc, out);
+-	}
++	sha512_block_fn *fn = crypto_simd_usable() ? __sha512_ce_transform
++						   : __sha512_block_data_order;
  
- 	sctx->finalize = 0;
 -	kernel_neon_begin();
- 	sha1_base_do_finalize(desc, __sha1_ce_transform);
+-	sha512_base_do_finalize(desc, sha512_ce_transform);
 -	kernel_neon_end();
- 	return sha1_base_finish(desc, out);
++	sha512_base_do_finalize(desc, fn);
+ 	return sha512_base_finish(desc, out);
  }
  
 -- 
