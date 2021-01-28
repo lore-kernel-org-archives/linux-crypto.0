@@ -3,62 +3,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C2AC433DB
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 00:15:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3BB5C433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 00:15:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 02F4E64DCC
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 00:15:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4FF064DCE
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 00:15:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231358AbhA1APD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Jan 2021 19:15:03 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28830 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231312AbhA1APB (ORCPT
+        id S231249AbhA1APO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Jan 2021 19:15:14 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55890 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231139AbhA1APC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Jan 2021 19:15:01 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10S03WgE158634;
-        Wed, 27 Jan 2021 19:14:19 -0500
+        Wed, 27 Jan 2021 19:15:02 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10S02cd5111408;
+        Wed, 27 Jan 2021 19:14:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=Sgy7dj6DVYCig6LOMExYxbK1i7XfwPMuOGVMsg/dbas=;
- b=jLyeSI3EXPWxumM5ee0gyS6v26ijhv1CaQl6xjaOPr7XfAdfdrxUE6KPDiT/G6N5HRud
- gRdK0DyCO/w75A2GVSE/Kp5fHDeIHNlZjHDfwca85sNIIYlSRG1mc/B+OTZCeg9avQSY
- 18RfmMYGRate/ovEqeh1ls9P7UIubRL5jXrPf7aG7KrvEl7taU+qAhtpGIRnKFgkcTvQ
- LXCFCswCok1tZetKadpHSezxiu2K6N4hVbU7jDw6Tm1qGArK25+/fmNxLol098EXe5ec
- 3ZrO2qWUz2hzAlyoY2TDKbhlrdMahwHURXvrKH17dZL+ofpXRIj6WUczJIQA2EdPJIti 7w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36bde801a3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Jan 2021 19:14:19 -0500
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10S03hF6159256;
-        Wed, 27 Jan 2021 19:14:19 -0500
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=fvL6HWXjYHfv/LTVuHa7/61wGfMjY1n63JroHZ8llkI=;
+ b=Cdg22Vaqw8mmOyY7tjS07TW+b3+8QOy57/wzKLF4CND3PpLVp9CeA/l5f+gCPqxzjPkn
+ eCjFCwOH2WFqeGyB9BX+vOLr2JNElemXZPlWNNEBfVrnmdA/1B3BGAHxmWu+JZhls1OM
+ +90o0imRrvbDw9kjsQYf1F6vE799aRj4Aky30AbCirrWnzC/K9WEKLQnPJyOHCTUbLmV
+ j8zat3K82W4Yr133P672Ly6uVwJcqxLHjynBzsZLyRORUWg08IccyJSoxDNGv4q7KAl+
+ KZYCyP8sxmByL/QsL1NrcB0gRP5JqBuQSiODz8cnyTeh4tIcOautYZgmPGfW0tEIdg3G 0w== 
 Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36bde8019s-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36b4g97cp5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Jan 2021 19:14:19 -0500
+        Wed, 27 Jan 2021 19:14:18 -0500
 Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10S08eat029783;
+        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10S08eVv029776;
         Thu, 28 Jan 2021 00:14:18 GMT
 Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma03dal.us.ibm.com with ESMTP id 368be9hmgf-1
+        by ppma03dal.us.ibm.com with ESMTP id 368be9hmge-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 28 Jan 2021 00:14:18 +0000
 Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10S0EH7f27001208
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10S0EH6u32768358
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Thu, 28 Jan 2021 00:14:17 GMT
 Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C5B29AE060;
+        by IMSVA (Postfix) with ESMTP id 64A88AE05F;
         Thu, 28 Jan 2021 00:14:17 +0000 (GMT)
 Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 86CD0AE05F;
+        by IMSVA (Postfix) with ESMTP id 4CC3BAE060;
         Thu, 28 Jan 2021 00:14:17 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
         by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
@@ -66,72 +58,98 @@ Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
 From:   Stefan Berger <stefanb@linux.vnet.ibm.com>
 To:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        David Howells <dhowells@redhat.com>
-Subject: [PATCH v4 2/3] x509: Detect sm2 keys by their parameters OID
-Date:   Wed, 27 Jan 2021 19:14:11 -0500
-Message-Id: <20210128001412.822048-3-stefanb@linux.vnet.ibm.com>
+        Stefan Berger <stefanb@linux.ibm.com>
+Subject: [PATCH v4 0/3] Add support for x509 certs with NIST p256 and p192 keys
+Date:   Wed, 27 Jan 2021 19:14:09 -0500
+Message-Id: <20210128001412.822048-1-stefanb@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20210128001412.822048-1-stefanb@linux.vnet.ibm.com>
-References: <20210128001412.822048-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-27_09:2021-01-27,2021-01-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- phishscore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=999 mlxscore=0
- malwarescore=0 bulkscore=0 priorityscore=1501 suspectscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101270116
+ definitions=2021-01-27_10:2021-01-27,2021-01-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 adultscore=0 mlxlogscore=999 suspectscore=0
+ priorityscore=1501 mlxscore=0 phishscore=0 lowpriorityscore=0 bulkscore=0
+ clxscore=1015 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101270116
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Stefan Berger <stefanb@linux.ibm.com>
 
-Detect whether a key is an sm2 type of key by its OID in the parameters
-array rather than assuming that everything under OID_id_ecPublicKey
-is sm2, which is not the case.
+This series of patches adds support for x509 certificates signed by a CA
+that uses NIST p256 or p192 keys for signing. It also adds support for
+certificates where the public key is a NIST p256 or p192 key. The math
+for ECDSA signature verification is also added.
 
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-Cc: David Howells <dhowells@redhat.com>
-Cc: keyrings@vger.kernel.org
----
- crypto/asymmetric_keys/x509_cert_parser.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+Since self-signed certificates are verified upon loading, the following
+script can be used for testing:
 
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index 52c9b455fc7d..4643fe5ed69a 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -459,6 +459,7 @@ int x509_extract_key_data(void *context, size_t hdrlen,
- 			  const void *value, size_t vlen)
- {
- 	struct x509_parse_context *ctx = context;
-+	enum OID oid;
- 
- 	ctx->key_algo = ctx->last_oid;
- 	switch (ctx->last_oid) {
-@@ -470,7 +471,17 @@ int x509_extract_key_data(void *context, size_t hdrlen,
- 		ctx->cert->pub->pkey_algo = "ecrdsa";
- 		break;
- 	case OID_id_ecPublicKey:
--		ctx->cert->pub->pkey_algo = "sm2";
-+		if (ctx->params_size < 2)
-+			return -ENOPKG;
-+
-+		oid = look_up_OID(ctx->params + 2, ctx->params_size - 2);
-+		switch (oid) {
-+		case OID_sm2:
-+			ctx->cert->pub->pkey_algo = "sm2";
-+			break;
-+		default:
-+			return -ENOPKG;
-+		}
- 		break;
- 	default:
- 		return -ENOPKG;
+k=$(keyctl newring test @u)
+
+while :; do
+	for hash in sha1 sha224 sha256 sha384 sha512; do
+		openssl req \
+			-x509 \
+			-${hash} \
+			-newkey ec \
+			-pkeyopt ec_paramgen_curve:prime256v1 \
+			-keyout key.pem \
+			-days 365 \
+			-subj '/CN=test' \
+			-nodes \
+			-outform der \
+			-out cert.der
+		keyctl padd asymmetric testkey $k < cert.der
+		if [ $? -ne 0 ]; then
+			echo "ERROR"
+			exit 1
+		fi
+	done
+done
+
+It also works with restricted keyrings where an RSA key is used to sign
+a NIST P256/P192 key. Scripts for testing are here:
+
+https://github.com/stefanberger/eckey-testing
+
+The ECDSA signature verification will be used by IMA Appraisal where ECDSA
+file signatures stored in RPM packages will use substantially less space
+than if RSA signatures were to be used.
+
+   Stefan
+
+v3->v4:
+  - split off of ecdsa crypto part; registering akcipher as "ecdsa" and
+    deriving used curve from digits in parsed key
+
+v2->v3:
+  - patch 2 now includes linux/scatterlist.h
+
+v1->v2:
+  - using faster vli_sub rather than newly added vli_mod_fast to 'reduce'
+    result
+  - rearranged switch statements to follow after RSA
+  - 3rd patch from 1st posting is now 1st patch
+
+
+Stefan Berger (3):
+  crypto: Add support for ECDSA signature verification
+  x509: Detect sm2 keys by their parameters OID
+  x509: Add support for parsing x509 certs with ECDSA keys
+
+ crypto/Makefile                           |   9 +-
+ crypto/asymmetric_keys/public_key.c       |  17 ++
+ crypto/asymmetric_keys/x509_cert_parser.c |  45 +++-
+ crypto/ecc.c                              | 279 ++++++++++++++++++++++
+ crypto/ecc.h                              |   2 +
+ crypto/ecdsasignature.asn1                |   4 +
+ include/linux/oid_registry.h              |   6 +
+ 7 files changed, 359 insertions(+), 3 deletions(-)
+ create mode 100644 crypto/ecdsasignature.asn1
+
 -- 
 2.26.2
 
