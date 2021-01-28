@@ -2,69 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E434C433E9
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 09:30:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A9A4C433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 10:31:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDDB764DE6
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 09:30:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 215D864DCE
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jan 2021 10:31:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231811AbhA1JaY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Jan 2021 04:30:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44351 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231848AbhA1JVX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Jan 2021 04:21:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611825597;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BnmVGKIvsnH3KiFsOG7CdLvqfhvMHJo37XYIQD3By1w=;
-        b=MxpSQWVs8Uau2ITXF7pOkAV61Uo7j6o3GmOnXDV4UFijOiC7xoG1vYSJ4QdJ79MQ7YOKQ/
-        qZHuxxNmx7M6ag3XP5xHC7X98vj9TxYmZ8FsfN99L5aT+N3cGPz9xLErZxw1Ub23XPPgBl
-        VWPVSFGtC4DTob9lL8agEE/IgJBR1JI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-520-uqtLZuADMF2qhdEiUX5iIA-1; Thu, 28 Jan 2021 04:19:55 -0500
-X-MC-Unique: uqtLZuADMF2qhdEiUX5iIA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E28D98049C0;
-        Thu, 28 Jan 2021 09:19:53 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B7E8D7771E;
-        Thu, 28 Jan 2021 09:19:52 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20210128001412.822048-1-stefanb@linux.vnet.ibm.com>
-References: <20210128001412.822048-1-stefanb@linux.vnet.ibm.com>
-To:     Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc:     dhowells@redhat.com, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        patrick@puiterwijk.org, Stefan Berger <stefanb@linux.ibm.com>
-Subject: Re: [PATCH v4 0/3] Add support for x509 certs with NIST p256 and p192 keys
+        id S232448AbhA1Kb3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 28 Jan 2021 05:31:29 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34012 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232361AbhA1KbR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 28 Jan 2021 05:31:17 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D733064DD8;
+        Thu, 28 Jan 2021 10:30:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1611829836;
+        bh=5KExjknD5ROY6MJJH4AMpEpBg69K6IyRGy7DJFghQSU=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=MAYXKQPj7Phr0zKfdsdjR2NowUBYLccrkv2I6+gY2N6398NJOihK8JG+nh7rdDN8V
+         SAQ9k+8cyUM+Zco07Q03Q5gkTVDYH5k7z0yTlatTFg4YLRFRJqZsYWXzI1Jqp542mS
+         NLSHH7IrIPoBBOZ//T4vvZlkleINnEAFVTLK1gnFBP1aUqUWPqbaAmlPEpNcGRwQ0E
+         tk272i1ALAQnXZu07LkjIt+U7AQYw50nPr0lOeQCEMFWNxFLjCoJ5UzLX5LLUZb6R9
+         scnMfik+RQOt3rsjsv0X+OItouKYfbm6WDq4vq4Jr5RYKKMIxx6mqAfYYelMVo4M3Z
+         2CGguzMFcf1qg==
+Received: by mail-oo1-f41.google.com with SMTP id y72so1291889ooa.5;
+        Thu, 28 Jan 2021 02:30:35 -0800 (PST)
+X-Gm-Message-State: AOAM5324UhQmKWy2NI0HD3t2eUZSb4IWhlsxGagUNbE8jg0s8PttIeuy
+        66TcRrKqJVFqWjdGfQEHmm3DyPZR7QrybAvCBzM=
+X-Google-Smtp-Source: ABdhPJzHSC9XdWNrOQmX/yAuApqLH5pt/bDJz3I4uMWJFHE/10Ziwa+/MLdS5Z2Vg/1oxN0YXzDF1qdzso9mCWNhdLM=
+X-Received: by 2002:a4a:e1e4:: with SMTP id u4mr565755ood.41.1611829835089;
+ Thu, 28 Jan 2021 02:30:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3451835.1611825591.1@warthog.procyon.org.uk>
-Date:   Thu, 28 Jan 2021 09:19:51 +0000
-Message-ID: <3451836.1611825591@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <1611299395-675-1-git-send-email-yumeng18@huawei.com>
+ <1611299395-675-5-git-send-email-yumeng18@huawei.com> <20210128050354.GA30874@gondor.apana.org.au>
+In-Reply-To: <20210128050354.GA30874@gondor.apana.org.au>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 28 Jan 2021 11:30:23 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXHvY9JveFyhtETALCH=AFGMGVbGGFMNDGc6ZVngEKbyDQ@mail.gmail.com>
+Message-ID: <CAMj1kXHvY9JveFyhtETALCH=AFGMGVbGGFMNDGc6ZVngEKbyDQ@mail.gmail.com>
+Subject: Re: [PATCH v7 4/7] crypto: add ecc curve and expose them
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Meng Yu <yumeng18@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Zaibo Xu <xuzaibo@huawei.com>, wangzhou1@hisilicon.com,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Daniele Alessandrelli <daniele.alessandrelli@linux.intel.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        "Khurana, Prabhjot" <prabhjot.khurana@intel.com>,
+        "Reshetova, Elena" <elena.reshetova@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This (sub)set is intended to go through the keyrings tree or is it all going
-through the crypto tree now?
+On Thu, 28 Jan 2021 at 06:04, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Fri, Jan 22, 2021 at 03:09:52PM +0800, Meng Yu wrote:
+> > 1. Add ecc curves(P224, P384, P521) for ECDH;
+>
+> OK I think this is getting unwieldy.
+>
+> In light of the fact that we already have hardware that supports
+> a specific subset of curves, I think perhaps it would be better
+> to move the curve ID from the key into the algorithm name instead.
+>
+> IOW, instead of allocating ecdh, you would allocate ecdh-nist-pXXX.
+>
+> Any comments?
+>
 
-David
+Agreed. Bluetooth appears to be the only in-kernel user at the moment,
+and it is hard coded to use p256, so it can be easily updated.
 
+But this also begs the question which ecdh-nist-pXXX implementations
+we actually need? Why are we exposing these curves in the first place?
