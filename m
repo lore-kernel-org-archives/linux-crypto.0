@@ -2,91 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA4CC433DB
-	for <linux-crypto@archiver.kernel.org>; Sat, 30 Jan 2021 21:27:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05399C43381
+	for <linux-crypto@archiver.kernel.org>; Sat, 30 Jan 2021 22:56:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4269364E1D
-	for <linux-crypto@archiver.kernel.org>; Sat, 30 Jan 2021 21:27:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B6C9864E18
+	for <linux-crypto@archiver.kernel.org>; Sat, 30 Jan 2021 22:56:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231855AbhA3V1V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 30 Jan 2021 16:27:21 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55484 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231690AbhA3V1V (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 30 Jan 2021 16:27:21 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E8DDB60234;
-        Sat, 30 Jan 2021 21:26:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612042000;
-        bh=bw/P+2VsfMk32PiR9DYyk44JSGogJ5Ltc51M+OxLiUM=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=G4SinYpxrXAcFvEqWLeIc3DBnYXKx4K8g9W+ygN+Y285NYKHPBWSpNMFEeHHc3Nl0
-         sBnrggsDpngu4vPPPhrfDy+yZEeiP0thHBtz0QXHELMq5KVV6U91bdc1Az6hSVC1aa
-         B1r249FN2D2le+nEAnDUkmI1VXwcn790OSUXb+VUY24Via7C9t6+KigVfMiLDsMR8m
-         hyK6TvHuNPZv7W2ZKGl9LGt+HMUDu6SZx3DFr3arayuU7bZzyCc9xMP5dUHelhpCJ6
-         Jfxf5pS+oTVM2rrIehhdEPShq2ALYHBfajI+KoA3nYpi0c5jVtEFSRk4PBv7rBcPW9
-         Pz10Jw5ua6h2A==
-Message-ID: <689c44925d60238181390e775b52809e89e0b26a.camel@kernel.org>
-Subject: Re: [PATCH v3 1/3] x509: Detect sm2 keys by their parameters OID
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Stefan Berger <stefanb@linux.vnet.ibm.com>, dhowells@redhat.com,
-        keyrings@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        patrick@puiterwijk.org, Stefan Berger <stefanb@linux.ibm.com>
-Date:   Sat, 30 Jan 2021 23:26:35 +0200
-In-Reply-To: <20210127123350.817593-2-stefanb@linux.vnet.ibm.com>
-References: <20210127123350.817593-1-stefanb@linux.vnet.ibm.com>
-         <20210127123350.817593-2-stefanb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.38.3 
+        id S232164AbhA3W4j (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 30 Jan 2021 17:56:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32978 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230168AbhA3W4i (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 30 Jan 2021 17:56:38 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2A16C06174A;
+        Sat, 30 Jan 2021 14:55:58 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id z9so179077pjl.5;
+        Sat, 30 Jan 2021 14:55:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=stXEhWN78gX0wZAuci159YKXelu5PMT12Nbz0FBmmqg=;
+        b=sCbA5uJ3YPl1RDbG9qmR3CeRIV1aD5Gs71QcMHfswJExgQGWKuL6zxznHD+TyDactT
+         9HJihYTpwtRcb0YCLKAPWo+zuY2b/w8m8amXRBMA+zxKYquzij7Eab7aQHGUDJaGXEgf
+         9ocWtTFEZJ8IUgOpk5ZCnaGhrma2wFxp4x0drAWy+Rmi2umWZuSl7++A+M4o3HLXmsu1
+         gBFKolze/cZbXJ7GMIC+6dtFiQVU4Vs4s5bYyfkbwiQhQelwT7QrsRlhGJ5MXLmLWyUz
+         hmXGFeE1fjQWEPeJo/r/WTk2PUYGDH9pY2IdXXQ0zXmlvOLQrLuKdw0BZs54uaTnY95B
+         ndCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=stXEhWN78gX0wZAuci159YKXelu5PMT12Nbz0FBmmqg=;
+        b=WzfnElwmtA1Gy2Ie15eBPsqOU06qMh+z5OiXaTLQcPLrOWku8zhdnIrnGqiOa4p91h
+         +57AEk0uIeSYsl+IKael0ernaCBIP5Dt8yRJ7j0w46J2vgF3dGT1z+20j5GbtidC9Fbz
+         ZcvRmwetnrMgcunEW48MA+//DD8Fm/iUvT2j6uORvUU3HVbmKlWT2VqTZHWA/DlOswjl
+         dgmFA5O8Ganym514eDtBNDRK7TCj0+ID46WD/lD/Q1jl141R+LqcvP9e/WgffHAl6r+r
+         3tOcsuI4YjAMPnQ70olF3AfUlW+nl2VzXh0CuyfOk6Q2bTt8kDCiq1vdrz3m7b0FPDat
+         Ps1Q==
+X-Gm-Message-State: AOAM530GxaiZ6SRTFFIxmwbkYToXXRxL/0eXn3vEiIEx2oPZzagS++5y
+        nR2qCagOkxIMxCFTjr2fJGjFAKGphMc=
+X-Google-Smtp-Source: ABdhPJzNlHrRcMfVuScNiyw939Ox1QwPsAE+geydGYM/euYpMITxt0FE6sprk/qDdFlmdo1Z0e1J9g==
+X-Received: by 2002:a17:90a:bd0f:: with SMTP id y15mr10651561pjr.141.1612047357880;
+        Sat, 30 Jan 2021 14:55:57 -0800 (PST)
+Received: from 1G5JKC2.Broadcom.net ([192.19.228.250])
+        by smtp.gmail.com with ESMTPSA id 14sm12989104pfy.55.2021.01.30.14.55.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 30 Jan 2021 14:55:57 -0800 (PST)
+From:   Florian Fainelli <f.fainelli@gmail.com>
+To:     linux-kernel@vger.kernel.org, arndb@kernel.org
+Cc:     kbuild-all@lists.01.org, Florian Fainelli <f.fainelli@gmail.com>,
+        kernel test robot <lkp@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org (open list:CRYPTO API)
+Subject: [PATCH 2/2] crypto: crypto4xx - Avoid linking failure with HW_RANDOM=m
+Date:   Sat, 30 Jan 2021 14:55:38 -0800
+Message-Id: <20210130225540.1639-2-f.fainelli@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210130225540.1639-1-f.fainelli@gmail.com>
+References: <20210130225540.1639-1-f.fainelli@gmail.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-T24gV2VkLCAyMDIxLTAxLTI3IGF0IDA3OjMzIC0wNTAwLCBTdGVmYW4gQmVyZ2VyIHdyb3RlOgo+
-IEZyb206IFN0ZWZhbiBCZXJnZXIgPHN0ZWZhbmJAbGludXguaWJtLmNvbT4KPiAKPiBEZXRlY3Qg
-d2hldGhlciBhIGtleSBpcyBhbiBzbTIgdHlwZSBvZiBrZXkgYnkgaXRzIE9JRCBpbiB0aGUgcGFy
-YW1ldGVycwo+IGFycmF5IHJhdGhlciB0aGFuIGFzc3VtaW5nIHRoYXQgZXZlcnl0aGluZyB1bmRl
-ciBPSURfaWRfZWNQdWJsaWNLZXkKPiBpcyBzbTIsIHdoaWNoIGlzIG5vdCB0aGUgY2FzZS4KPiAK
-PiBTaWduZWQtb2ZmLWJ5OiBTdGVmYW4gQmVyZ2VyIDxzdGVmYW5iQGxpbnV4LmlibS5jb20+Cj4g
-LS0tCj4gwqBjcnlwdG8vYXN5bW1ldHJpY19rZXlzL3g1MDlfY2VydF9wYXJzZXIuYyB8IDEzICsr
-KysrKysrKysrKy0KPiDCoDEgZmlsZSBjaGFuZ2VkLCAxMiBpbnNlcnRpb25zKCspLCAxIGRlbGV0
-aW9uKC0pCj4gCj4gZGlmZiAtLWdpdCBhL2NyeXB0by9hc3ltbWV0cmljX2tleXMveDUwOV9jZXJ0
-X3BhcnNlci5jIGIvY3J5cHRvL2FzeW1tZXRyaWNfa2V5cy94NTA5X2NlcnRfcGFyc2VyLmMKPiBp
-bmRleCA1MmM5YjQ1NWZjN2QuLjQ2NDNmZTVlZDY5YSAxMDA2NDQKPiAtLS0gYS9jcnlwdG8vYXN5
-bW1ldHJpY19rZXlzL3g1MDlfY2VydF9wYXJzZXIuYwo+ICsrKyBiL2NyeXB0by9hc3ltbWV0cmlj
-X2tleXMveDUwOV9jZXJ0X3BhcnNlci5jCj4gQEAgLTQ1OSw2ICs0NTksNyBAQCBpbnQgeDUwOV9l
-eHRyYWN0X2tleV9kYXRhKHZvaWQgKmNvbnRleHQsIHNpemVfdCBoZHJsZW4sCj4gwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY29uc3Qgdm9pZCAqdmFs
-dWUsIHNpemVfdCB2bGVuKQo+IMKgewo+IMKgwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgeDUwOV9wYXJz
-ZV9jb250ZXh0ICpjdHggPSBjb250ZXh0Owo+ICvCoMKgwqDCoMKgwqDCoGVudW0gT0lEIG9pZDsK
-PiDCoAo+IMKgwqDCoMKgwqDCoMKgwqBjdHgtPmtleV9hbGdvID0gY3R4LT5sYXN0X29pZDsKPiDC
-oMKgwqDCoMKgwqDCoMKgc3dpdGNoIChjdHgtPmxhc3Rfb2lkKSB7Cj4gQEAgLTQ3MCw3ICs0NzEs
-MTcgQEAgaW50IHg1MDlfZXh0cmFjdF9rZXlfZGF0YSh2b2lkICpjb250ZXh0LCBzaXplX3QgaGRy
-bGVuLAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgY3R4LT5jZXJ0LT5wdWItPnBr
-ZXlfYWxnbyA9ICJlY3Jkc2EiOwo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgYnJl
-YWs7Cj4gwqDCoMKgwqDCoMKgwqDCoGNhc2UgT0lEX2lkX2VjUHVibGljS2V5Ogo+IC3CoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBjdHgtPmNlcnQtPnB1Yi0+cGtleV9hbGdvID0gInNtMiI7
-Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmIChjdHgtPnBhcmFtc19zaXplIDwg
-MikKCkVpdGhlciBhIG5hbWVkIGNvbnN0YW50LCBvciBhdCBsZWFzdCBhIGNvbW1lbnQgaW5zdGVh
-ZCBvZiBqdXN0ICcyJy4KCgo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgcmV0dXJuIC1FTk9QS0c7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqBvaWQgPSBsb29rX3VwX09JRChjdHgtPnBhcmFtcyArIDIsIGN0eC0+cGFyYW1zX3NpemUg
-LSAyKTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgc3dpdGNoIChvaWQpIHsKPiAr
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgY2FzZSBPSURfc20yOgo+ICvCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgY3R4LT5jZXJ0LT5wdWItPnBrZXlf
-YWxnbyA9ICJzbTIiOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgYnJlYWs7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGRlZmF1bHQ6Cj4g
-K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gLUVO
-T1BLRzsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgfQo+IMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgYnJlYWs7Cj4gwqDCoMKgwqDCoMKgwqDCoGRlZmF1bHQ6Cj4gwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gLUVOT1BLRzsKCi9KYXJra28K
+It is currently possible to build CONFIG_HW_RANDOM_PPC4XX=y with
+CONFIG_HW_RANDOM=m which would lead to the inability of linking with
+devm_hwrng_{register,unregister}. We cannot have the framework modular
+and the consumer of that framework built-in, so make that dependency
+explicit.
+
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+---
+ drivers/crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index e535f28a8028..c833ac08ea81 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -348,7 +348,7 @@ config CRYPTO_DEV_PPC4XX
+ 
+ config HW_RANDOM_PPC4XX
+ 	bool "PowerPC 4xx generic true random number generator support"
+-	depends on CRYPTO_DEV_PPC4XX && HW_RANDOM
++	depends on CRYPTO_DEV_PPC4XX && HW_RANDOM=y
+ 	default y
+ 	help
+ 	 This option provides the kernel-side support for the TRNG hardware
+-- 
+2.25.1
 
