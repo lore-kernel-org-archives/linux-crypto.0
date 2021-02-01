@@ -2,149 +2,182 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88326C433E9
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 15:18:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3CA9C433DB
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 15:20:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A9AA64EA0
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 15:18:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86A6064EA0
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 15:20:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231310AbhBAPR6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Feb 2021 10:17:58 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39472 "EHLO
+        id S231610AbhBAPUT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Feb 2021 10:20:19 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62142 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229696AbhBAO46 (ORCPT
+        by vger.kernel.org with ESMTP id S231152AbhBAPUL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Feb 2021 09:56:58 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 111Egd34047211;
-        Mon, 1 Feb 2021 09:54:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=Eco68iy3KXQeX5Y/LC/T9Vir6Vx7EB+4u8SHI3aJZHQ=;
- b=NTBuo+1CI0zvbH4KTihNd622laVsQgzLx00UKb3CsGbIm82bWscCOvyif3NP7Ak9HKhN
- jEMUNyn5QwIiEsRYHcfz6b7nrHFK8W/Dz8BOpFSNk6yIG2u9/t3U0B0UCugZ6Da6fevo
- sv0S3KRbdFEdpr4b61xWwKwTE1Lpkw67fniLmV9UEZEQxP4FavF0T0a9cJOmN3BWsBFZ
- hM8tj0Js/NoMP9l82KXNzr8Bt+iPaB8VGRH8AzFSgXJoKMJrl9O3iQmBIVSe3XXnf/B0
- 0TQGeFiF2dUpoDSzGEn3bFkNkqufGcbp53h/BBH+fFstiqDfEU+artzRft0OnnmLybRB aQ== 
+        Mon, 1 Feb 2021 10:20:11 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 111F6NRe130181;
+        Mon, 1 Feb 2021 10:19:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=FkYuYW0lpNE5sfqJVu9Oc3er1eHA0pKAzOO57Ilbh0E=;
+ b=DlYcbnZPAVLKtgERoxQY80cXxkV8lVjhgnuKBvLaaJJtQAI7B6VnWVfttIo3EhGmkswO
+ iL3dwyL47DsuuGgLut2uVndpw9lBTQaak1NUc7a85UPaBYEoAfGq3EaJ24WLqufekJXr
+ nRO3oS32W9CP/uKkPhhZ438bphWj+MkOeUFnH8jUvQdwL4WLVENkag+fV9em2q4lX7ot
+ iWAtTIh3fChM/QQbdwm4MyD+hkhrP3af3VXq3k5gN0H/gRXHlo2eiBqoSlDzBoo6UJMw
+ NMaQbiKPghIXayCd0Jv4BtzWeehjAoTzZAhwx/Ki4mv9E2R37QvO+AgHvJGMKDyMbSD8 QA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36ekn20dyu-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36eks8gusq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 09:54:51 -0500
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 111EiiFF057240;
-        Mon, 1 Feb 2021 09:54:51 -0500
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36ekn20dy1-1
+        Mon, 01 Feb 2021 10:19:24 -0500
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 111F6diY131536;
+        Mon, 1 Feb 2021 10:19:24 -0500
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36eks8guqn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 09:54:50 -0500
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 111Esnf2028698;
-        Mon, 1 Feb 2021 14:54:49 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma01fra.de.ibm.com with ESMTP id 36cy37s0g6-1
+        Mon, 01 Feb 2021 10:19:23 -0500
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 111FEe6M019257;
+        Mon, 1 Feb 2021 15:19:21 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma02wdc.us.ibm.com with ESMTP id 36cy38yawb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 14:54:49 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 111Eskbq40436012
+        Mon, 01 Feb 2021 15:19:20 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 111FJJBq23265754
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Feb 2021 14:54:46 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BAA8142042;
-        Mon,  1 Feb 2021 14:54:46 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7BC4B42041;
-        Mon,  1 Feb 2021 14:54:44 +0000 (GMT)
-Received: from sig-9-65-218-191.ibm.com (unknown [9.65.218.191])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  1 Feb 2021 14:54:44 +0000 (GMT)
-Message-ID: <58935b00f65e389e9ae3da2425d06bd88d280e43.camel@linux.ibm.com>
-Subject: Re: [PATCH v5 2/4] x509: Detect sm2 keys by their parameters OID
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Stefan Berger <stefanb@linux.ibm.com>,
-        David Howells <dhowells@redhat.com>
-Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
+        Mon, 1 Feb 2021 15:19:19 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 35ED46E05B;
+        Mon,  1 Feb 2021 15:19:19 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C44E46E062;
+        Mon,  1 Feb 2021 15:19:17 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon,  1 Feb 2021 15:19:17 +0000 (GMT)
+From:   Stefan Berger <stefanb@linux.ibm.com>
+To:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, herbert@gondor.apana.org.au,
+        dhowells@redhat.com, zohar@linux.ibm.com
+Cc:     linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
         linux-integrity@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>
-Date:   Mon, 01 Feb 2021 09:54:43 -0500
-In-Reply-To: <71a77d10-e645-194f-5073-ebf180a8d70e@linux.ibm.com>
-References: <20210129150355.850093-3-stefanb@linux.vnet.ibm.com>
-         <20210129150355.850093-1-stefanb@linux.vnet.ibm.com>
-         <4162801.1612185801@warthog.procyon.org.uk>
-         <71a77d10-e645-194f-5073-ebf180a8d70e@linux.ibm.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-14.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Stefan Berger <stefanb@linux.ibm.com>,
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH v7 2/4] x509: Detect sm2 keys by their parameters OID
+Date:   Mon,  1 Feb 2021 10:19:08 -0500
+Message-Id: <20210201151910.1465705-3-stefanb@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210201151910.1465705-1-stefanb@linux.ibm.com>
+References: <20210201151910.1465705-1-stefanb@linux.ibm.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
  definitions=2021-02-01_05:2021-01-29,2021-02-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
- phishscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0 malwarescore=0
- priorityscore=1501 adultscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102010073
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 mlxscore=0 malwarescore=0 suspectscore=0 adultscore=0
+ mlxlogscore=999 clxscore=1015 spamscore=0 phishscore=0 bulkscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102010077
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2021-02-01 at 09:35 -0500, Stefan Berger wrote:
-> On 2/1/21 8:23 AM, David Howells wrote:
-> > Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
-> >
-> >> From: Stefan Berger <stefanb@linux.ibm.com>
-> >>
-> >> Detect whether a key is an sm2 type of key by its OID in the parameters
-> >> array rather than assuming that everything under OID_id_ecPublicKey
-> >> is sm2, which is not the case.
-> >>
-> >> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> >> Cc: David Howells <dhowells@redhat.com>
-> >> Cc: keyrings@vger.kernel.org
-> > I presume these cc's are intentionally not on the first patch or the cover (if
-> > there is one)?
-> 
-> No, this is not intentional. I guess this is a case of wrong use of cc: 
-> versus mailing lists - my bad. I posted the whole series to 
-> linux-crypto, linux-integrity, keyrings and lkml.
-> 
-> V6 is at least visible here now:
-> 
-> - https://lkml.org/lkml/2021/1/31/323
-> 
-> - https://marc.info/?l=linux-crypto-vger&m=161213604618722&w=2
-> 
-> - 
-> https://lore.kernel.org/linux-integrity/20210131233301.1301787-1-stefanb@linux.ibm.com/T/#mbc9fae5facb4178f64c1145e2654258c0af8fa96
-> 
-> - https://marc.info/?l=linux-keyrings&m=161213608818735&w=2
-> 
-> 
-> 
-> >
-> > Do you have a branch you want me to pull or did you want me to take just
-> > patches 2-4?
-> 
-> Please take it from the mailing list. If there are requests for more 
-> changes on the crypto level, I will send another series. I personally am 
-> waiting for some sort of verdict on the crypto level...
+Detect whether a key is an sm2 type of key by its OID in the parameters
+array rather than assuming that everything under OID_id_ecPublicKey
+is sm2, which is not the case.
 
-The entire patch set should be upstreamed as a single patch set, after
-having each of the maintainer's Ack it.  In addition, the v6 version is
-missing some Reviewed-by tags.  (Stefan will re-post a v7 patch set.)
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc: David Howells <dhowells@redhat.com>
+Cc: keyrings@vger.kernel.org
+---
+ crypto/asymmetric_keys/x509_cert_parser.c | 12 +++++++++++-
+ include/linux/oid_registry.h              |  1 +
+ lib/oid_registry.c                        | 13 +++++++++++++
+ 3 files changed, 25 insertions(+), 1 deletion(-)
 
-David, I don't have problem with this patch set being upstreamed via
-the keys subsystem, assuming it's been tested.
-
-thanks,
-
-Mimi
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index 52c9b455fc7d..1621ceaf5c95 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -459,6 +459,7 @@ int x509_extract_key_data(void *context, size_t hdrlen,
+ 			  const void *value, size_t vlen)
+ {
+ 	struct x509_parse_context *ctx = context;
++	enum OID oid;
+ 
+ 	ctx->key_algo = ctx->last_oid;
+ 	switch (ctx->last_oid) {
+@@ -470,7 +471,16 @@ int x509_extract_key_data(void *context, size_t hdrlen,
+ 		ctx->cert->pub->pkey_algo = "ecrdsa";
+ 		break;
+ 	case OID_id_ecPublicKey:
+-		ctx->cert->pub->pkey_algo = "sm2";
++		if (parse_OID(ctx->params, ctx->params_size, &oid) != 0)
++			return -EBADMSG;
++
++		switch (oid) {
++		case OID_sm2:
++			ctx->cert->pub->pkey_algo = "sm2";
++			break;
++		default:
++			return -ENOPKG;
++		}
+ 		break;
+ 	default:
+ 		return -ENOPKG;
+diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
+index 59ad6109f918..f3b2c097c886 100644
+--- a/include/linux/oid_registry.h
++++ b/include/linux/oid_registry.h
+@@ -121,6 +121,7 @@ enum OID {
+ };
+ 
+ extern enum OID look_up_OID(const void *data, size_t datasize);
++extern int parse_OID(const void *data, size_t datasize, enum OID *oid);
+ extern int sprint_oid(const void *, size_t, char *, size_t);
+ extern int sprint_OID(enum OID, char *, size_t);
+ 
+diff --git a/lib/oid_registry.c b/lib/oid_registry.c
+index f7ad43f28579..508e0b34b5f0 100644
+--- a/lib/oid_registry.c
++++ b/lib/oid_registry.c
+@@ -11,6 +11,7 @@
+ #include <linux/kernel.h>
+ #include <linux/errno.h>
+ #include <linux/bug.h>
++#include <linux/asn1.h>
+ #include "oid_registry_data.c"
+ 
+ MODULE_DESCRIPTION("OID Registry");
+@@ -92,6 +93,18 @@ enum OID look_up_OID(const void *data, size_t datasize)
+ }
+ EXPORT_SYMBOL_GPL(look_up_OID);
+ 
++int parse_OID(const void *data, size_t datasize, enum OID *oid)
++{
++	const unsigned char *v = data;
++
++	if (datasize < 2 || v[0] != ASN1_OID || v[1] != datasize - 2)
++		return -EBADMSG;
++
++	*oid = look_up_OID(data + 2, datasize - 2);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(parse_OID);
++
+ /*
+  * sprint_OID - Print an Object Identifier into a buffer
+  * @data: The encoded OID to print
+-- 
+2.29.2
 
