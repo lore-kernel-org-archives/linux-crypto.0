@@ -2,140 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E09C433DB
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 18:48:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55CB1C433E0
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 19:52:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 287AA64DA8
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 18:48:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DAFD64EC8
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 19:52:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229981AbhBASsL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Feb 2021 13:48:11 -0500
-Received: from mail-eopbgr50065.outbound.protection.outlook.com ([40.107.5.65]:15139
-        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229612AbhBASsK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Feb 2021 13:48:10 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CNN1FXyxCZuL5He7DgQytxNMvtofcRipML+0q0jI49bJ5q9DK6NXlkTcswH7BwXzzyf7FrYUa+BP8rs449D2jOecZALeYypjijQ5wIFVjuLbnwJIEbaznzLaIRE088P3MWXRYk8zbpkC0X2Aqjq0K4UcoikNlMKYzHMkCVuwefo0Wz75wKqk7WRnRtsJCZBOK0T+H43IZmCFAiHFL0oICTTP2yMyoTMMCrt8jCbqeZ88b1X/TbIO3A3zMB8wC6gVlqkug3rAbSDPQQOauo3QhiVXEIMeZ4tTz4xJ6MTDbOdxE4OITOsuYXkAqma5ZxPYFzmMTgrBtrpfNC211xiJtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5C2AhSyJJBbnCtNcayIM6QdFhmXCsfTVVyAjVWdVue4=;
- b=ZmScggqAIOeEzOuSQU13w64Bc2IZMKipY9KcE/TuE6LkPXLAC2tO7PEQGDiF/j5P5trXaxjxU3jZoKHZXwa6wZWEwAPFoEKDbRKiSuE43u+uo51Hh86cX1H8yXhi81w+/InD3C5/2Yr5/0ELecsau1A3m0q2qdz3RyYoWJk9h2rugVmGJY9vaY5Je2s+qFEscXIPCcQ8H3tgNW1J8Dj8+D/v00CwaAsVVhS8iwVQYXQCsnl/ls3ya07MP9bpJHm0H1GBRYVcugvEMle7c7cdH05qkauAZKjJ59fyXP00Aj7qLQ+5weUelRTjzwwfgN9IcjtOnipwA1DiBWmY97vVDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5C2AhSyJJBbnCtNcayIM6QdFhmXCsfTVVyAjVWdVue4=;
- b=Rh/JaW441XvrvTOpVdqDGvhzd3U79K2PKFJaA2Y3vKzpDAopprcSaBJL/GF8X5S1ZMHIazHxQZ1hymwAjTRFAxzpudzf62NLvPW/xlgb1Skj5ue/ovXpBgyzeQLf8RXj5W/SYlyP3IIth89l5AMKmGFvsuNdm7OitQuFLGFLFlA=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=nxp.com;
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
- by VI1PR04MB7181.eurprd04.prod.outlook.com (2603:10a6:800:12a::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17; Mon, 1 Feb
- 2021 18:47:22 +0000
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::f02d:1e2b:185:c4e1]) by VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::f02d:1e2b:185:c4e1%6]) with mapi id 15.20.3805.019; Mon, 1 Feb 2021
- 18:47:22 +0000
-Subject: Re: [PATCH] crypto: caam -Replace DEFINE_SIMPLE_ATTRIBUTE with
- DEFINE_DEBUGFS_ATTRIBUTE
-To:     Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <1612167611-15297-1-git-send-email-jiapeng.chong@linux.alibaba.com>
-From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
-Message-ID: <e14c3c3a-60df-eba6-cb2c-29d475a3c3eb@nxp.com>
-Date:   Mon, 1 Feb 2021 20:47:19 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
-In-Reply-To: <1612167611-15297-1-git-send-email-jiapeng.chong@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [78.97.206.147]
-X-ClientProxiedBy: AM0PR04CA0077.eurprd04.prod.outlook.com
- (2603:10a6:208:be::18) To VI1PR04MB4046.eurprd04.prod.outlook.com
- (2603:10a6:803:4d::29)
+        id S232146AbhBATwg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Feb 2021 14:52:36 -0500
+Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:53354 "EHLO
+        5.mo179.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232747AbhBATv0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 1 Feb 2021 14:51:26 -0500
+X-Greylist: delayed 3220 seconds by postgrey-1.27 at vger.kernel.org; Mon, 01 Feb 2021 14:51:26 EST
+Received: from player738.ha.ovh.net (unknown [10.108.35.103])
+        by mo179.mail-out.ovh.net (Postfix) with ESMTP id 12866184AC5
+        for <linux-crypto@vger.kernel.org>; Mon,  1 Feb 2021 19:57:02 +0100 (CET)
+Received: from 3mdeb.com (85-222-117-222.dynamic.chello.pl [85.222.117.222])
+        (Authenticated sender: maciej.pijanowski@3mdeb.com)
+        by player738.ha.ovh.net (Postfix) with ESMTPSA id 782691ABC6B7F;
+        Mon,  1 Feb 2021 18:56:59 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass (GARM-104R00576929ea7-fcdd-4d42-a833-2bb3b8c411a5,
+                    ACE63DF45BB0D0C5B239E883FB7766019137A65F) smtp.auth=maciej.pijanowski@3mdeb.com
+X-OVh-ClientIp: 85.222.117.222
+Subject: Re: safexcel driver for EIP197 and mini firmware features
+From:   Maciej Pijanowski <maciej.pijanowski@3mdeb.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     atenart@kernel.org, pascalvanl@gmail.com,
+        =?UTF-8?Q?Piotr_Kr=c3=b3l?= <piotr.krol@3mdeb.com>
+References: <d90956cf-5340-cbe4-1254-771c18b7e46d@3mdeb.com>
+Message-ID: <7f954208-e2a4-937a-a2c7-16634d6aa431@3mdeb.com>
+Date:   Mon, 1 Feb 2021 19:56:58 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.0.129] (78.97.206.147) by AM0PR04CA0077.eurprd04.prod.outlook.com (2603:10a6:208:be::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17 via Frontend Transport; Mon, 1 Feb 2021 18:47:21 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: a803b946-c9e7-4636-ceb9-08d8c6e1cf57
-X-MS-TrafficTypeDiagnostic: VI1PR04MB7181:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR04MB7181BD12FBA8AFEA2D2E919098B69@VI1PR04MB7181.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:510;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: P7uyxxQvD+Ihwab0KvBhYq3OO4TsV8pYh8BbJE/Mg41Gun+ZtBEQoapDnUPtq04FuzS6/oXUtgLVxXvIYNohMGYXxylvOzeHPiYJsI1bF69iN0O2wdA6tPOEMHzKdBVGUtrW/ZwjaEsJsWWbxYLBTbcOChumC5YdDmwWTYjXPjd3m3npgUTcJWhNBO6GRvhEB3Mw4JbirAat4R2H88neyYSTapG2+u+vX9LVFe6dj6FOBI2LmMzE4JqwjKYf6zC7Au5itmybwhwl0QSjbFM9xcDK8HG3PfQ6crHB0UB6kYCwjZCnYcgWk4/nzy1b1WLiAkJqBaDin5eVrRG4b+Y5A/9GiGUBf2+uI0Z3I4YjyHi9HFBkZoyJuvAXrUv5axrpwPtJ/lXo3RKmYhLpZJslJTVgWCcnH7cNRLe4loSjKr6u0UYQHppSlKLiRUPB2TzYO9H9OU+nFgNfJpeKCwCtpkMTc711u56N7m4rEGFoJ6Y3Riwj7kPWb94XfnPg/z6sXq7G4B4WEqbV85Zuaa11iooI+qo//SQ7w1LiH4YubQwXEnOth1p0+I7BPktUmiDTzYFoqRl3e6txJ3RNUImC+0VWakV+0loeUc8T9fJV6wQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(136003)(39860400002)(396003)(366004)(66476007)(36756003)(4744005)(956004)(2616005)(6486002)(31686004)(4326008)(8936002)(66556008)(66946007)(26005)(186003)(53546011)(16526019)(83380400001)(52116002)(8676002)(6916009)(16576012)(54906003)(2906002)(31696002)(316002)(478600001)(5660300002)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?ZmYyd0pzaEdZV0U2TGRrZk9uVndBMmRMLy9OUEJzUXFIb1VTZXNSMXVSaVVC?=
- =?utf-8?B?bzBiaUYvZmU0bTU5T0FtRVpyT3cwSDRyZzNHVXBybld2K3l2aGlETFVydDlp?=
- =?utf-8?B?YmNYWDBRR2hXVzVYOTk4YnRaaVRaNzMycnVHalJBT0R4aVZQRWZmRGNyc3lN?=
- =?utf-8?B?ZGpSeElLNjh3ZTMwdjIvTGFwaGVFRnR4K0U5QUlBRVR5T05uMUZWbjlydnRs?=
- =?utf-8?B?WG1oNlRKRFV5MlEvcEJicnBWdHA5blV6cldPZGNiZktGMXlNUjcwSXVBRHV0?=
- =?utf-8?B?THZaa2JyYkswUkZLd2dUeDhEaU9DNlovVTRhR0x5UmJTRWwwSEJiNDNrUDFQ?=
- =?utf-8?B?RVIwdFVaU3l2eFFSdVFyZGFoalVBbVZIejJvSFBOT3Y1Z2VWK0V5RHcyWFBY?=
- =?utf-8?B?WUhacXgxN1A4ZjA0V29MWmlmMHl4aGxrQWhBa0h4NUE5ZVp2Sm9rQjNIVHZ3?=
- =?utf-8?B?VmdONVhQU0VGYzFvbzFBdnM0QW5HV3F1elJ3VVEzZW1ITW4rWHJ4aGt2SHpP?=
- =?utf-8?B?enh1Rmt4bThQcFYwem52K3NRZDdkZ1NpM0hVbEQyUUxVcFhkWWVBNW5nSzJG?=
- =?utf-8?B?QzFBTmIzaGtXemVObG1qcVVZWE1KWHFOa1B4SWZQSHRMTEd6ak4yTXdzRVEw?=
- =?utf-8?B?WkxqUjRyMlpZTklUajcxV09hR3U4Y01MYXB2UmJoWUtadXpxSmw3YnlqMUVj?=
- =?utf-8?B?Z0FPQjIrdVdVUEFmSklyd0RoOUJycFAyZzZuTldzQ1pXek0rQWQzakNwdmhD?=
- =?utf-8?B?ZndmYlRpeTdhenZrRm5heWVMU0I2MDNkdEcyS2RzTWxKeVJjbXBRdndwR1hp?=
- =?utf-8?B?OGRkNlZFOHg1MndOUGxIMTMxSWlTeEZDWUppMmR6bnZORkY4a1pkSUYyY3Rs?=
- =?utf-8?B?SDNva1laR1RNbThmbGNkbXVaNEthMWF6TjlTVFlZbmx3WUgzVXRhVlNVMjBu?=
- =?utf-8?B?TkZRanFwTEZVRU13eERXTURUcTZRamt6UXRnYmRqUE9uWmdIa1RiaXZtbGti?=
- =?utf-8?B?Rmk3VlhTY20ycUg0S1RFNzJGRTJ3Q1BkRldLU3ZZQmFsdU9YaWg4YWg1V0gz?=
- =?utf-8?B?NWI1VVlJMHhTTnl5SXMyUWlpSXlMOGgzY2xPREU3SW5McGd4bDhMSGZUQ3lS?=
- =?utf-8?B?VFRGQ1pvaFZncTdpR0J3U1h5T0tYQk1OR1Nsd25DRENXamx0cHpReGZIREty?=
- =?utf-8?B?MUpvc0VtR0kzTVRHNWkraXlzeXJIcDd5R0psZXNkZ2UzMGU3bU84eUozSWlw?=
- =?utf-8?B?WDMzc3E3OXovRU1wUldyRERPVXRxUy9OWHQrYkRoSDZ3ZFhBVitOVW9Hemsv?=
- =?utf-8?B?b2cwejVqMVlOd25KQ3RJbTJidytaUWVSNU5BWDlFcHM0dDVWMFNoa3pKZVdo?=
- =?utf-8?B?Q0RRZTlLNzJBRlJYZysxT0NuSS83OXdVWGZweHZBTGJXQTBDb1BYbkxybFI4?=
- =?utf-8?Q?lE0cY2z3?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a803b946-c9e7-4636-ceb9-08d8c6e1cf57
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB4046.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2021 18:47:22.4832
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vmzZoyNUQeT+KvCavtT4vHQp6eauUNi7bCdxEYOXNEKdr5hRxn4Whm4l4pkrDFvoHtsYH73QnJASCrUFLyABJA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7181
+In-Reply-To: <d90956cf-5340-cbe4-1254-771c18b7e46d@3mdeb.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Ovh-Tracer-Id: 5691986981401145036
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -83
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduledrfeekgdduudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnegfrhhlucfvnfffucdludejmdenucfjughrpefuhffvfhfkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeforggtihgvjhcurfhijhgrnhhofihskhhiuceomhgrtghivghjrdhpihhjrghnohifshhkihesfehmuggvsgdrtghomheqnecuggftrfgrthhtvghrnhepffejudduvddtheejieegheevtdelleeuffdukeekleejgffgteetudehveekjeetnecuffhomhgrihhnpehsohhlihguqdhruhhnrdgtohhmpdhsohhlihguqdgsuhhilhgurdighiiipdhkvghrnhgvlhdrohhrghdpfehmuggvsgdrtghomhenucfkpheptddrtddrtddrtddpkeehrddvvddvrdduudejrddvvddvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeefkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehmrggtihgvjhdrphhijhgrnhhofihskhhiseefmhguvggsrdgtohhmpdhrtghpthhtoheplhhinhhugidqtghrhihpthhosehvghgvrhdrkhgvrhhnvghlrdhorhhg
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/1/2021 10:20 AM, Jiapeng Chong wrote:
-> Fix the following coccicheck warning:
-> 
-> ./drivers/crypto/caam/debugfs.c:23:0-23: WARNING: caam_fops_u64_ro
-> should be defined with DEFINE_DEBUGFS_ATTRIBUTE.
-> 
-> ./drivers/crypto/caam/debugfs.c:22:0-23: WARNING: caam_fops_u32_ro
-> should be defined with DEFINE_DEBUGFS_ATTRIBUTE.
-> 
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+Add Antoine correct e-mail.
 
-Patch title nitpick:
-s/crypto: caam -Replace/crypto: caam - Replace
+On 01.02.2021 19:52, Maciej Pijanowski wrote:
+> Hello,
+>
+> I am interested in using the EIP197 crypto accelerator. I am aware 
+> that it requires an NDA
+> to obtain the firmware for it, but I found out that there is some kind 
+> of "minifw" as well
+> in the linux-firmware tree [3]. I found no description of it - I would 
+> like to learn what
+> are the features and limitations of this "minifw".
+>
+> I started with using it on the Debian image from board vendor [2]. The 
+> kernel here is
+> 5.1.0. The firmware is loaded, but the ALG tests are all failing:
+>
+> [14785.750246] crypto-safexcel f2800000.crypto: firmware: 
+> direct-loading firmware inside-secure/eip197b/ifpp.bin
+> [14785.762765] crypto-safexcel f2800000.crypto: firmware: 
+> direct-loading firmware inside-secure/eip197b/ipue.bin
+> [14785.777978] alg: skcipher: safexcel-cbc-des encryption test failed 
+> (wrong output IV) on test vector 0, cfg="in-place"
+> [14785.788661] 00000000: fe dc ba 98 76 54 32 10
+> [14785.800606] alg: skcipher: safexcel-cbc-des3_ede encryption test 
+> failed (wrong output IV) on test vector 0, cfg="in-place"
+> [14785.811720] 00000000: 7d 33 88 93 0f 93 b2 42
+> [14785.823734] alg: skcipher: safexcel-cbc-aes encryption test failed 
+> (wrong output IV) on test vector 0, cfg="in-place"
+> [14785.834439] 00000000: 3d af ba 42 9d 9e b4 30 b4 22 da 80 2c 9f ac 41
+> [14785.884568] alg: hash: safexcel-hmac-sha224 test failed (wrong 
+> result) on test vector 3, cfg="init+update+update+final two even splits"
+> [14785.901836] alg: hash: safexcel-hmac-sha256 test failed (wrong 
+> result) on test vector 2, cfg="import/export"
+> [14785.926693] alg: aead: safexcel-authenc-hmac-sha1-cbc-aes 
+> encryption test failed (wrong result) on test vector 0, 
+> cfg="misaligned splits crossing pages, inplace"
+> [14785.944430] alg: No test for authenc(hmac(sha224),cbc(aes)) 
+> (safexcel-authenc-hmac-sha224-cbc-aes)
+> [14785.956978] alg: aead: safexcel-authenc-hmac-sha256-cbc-aes 
+> encryption test failed (wrong result) on test vector 0, cfg="two even 
+> aligned splits"
+> [14785.973472] alg: No test for authenc(hmac(sha384),cbc(aes)) 
+> (safexcel-authenc-hmac-sha384-cbc-aes)
+> [14785.986103] alg: aead: safexcel-authenc-hmac-sha512-cbc-aes 
+> encryption test failed (wrong result) on test vector 0, cfg="two even 
+> aligned splits"
+>
+>
+> I am going to test it with more recent, mainline kernel as well, but 
+> it would be still nice to learn
+> a little bit more about this "minifw", it's features, and what could 
+> be possibly achieved on this
+> board without proprietary (and behind NDA) crypto firmware.
+>
+> Thank you,
+>
+>
+> [1] 
+> https://www.solid-run.com/embedded-networking/marvell-armada-family/clearfog-gt-8k/
+> [2] https://images.solid-build.xyz/8040/Debian/
+> [3] 
+> https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/inside-secure/eip197_minifw/ifpp.bin?id=eefb5f7410150c00d0ab5c41c5d817ae9bf449b3
+>
+-- 
+Maciej Pijanowski
+Embedded Systems Engineer
+GPG: 9963C36AAC3B2B46
+https://3mdeb.com | @3mdeb_com
 
-Thanks,
-Horia
