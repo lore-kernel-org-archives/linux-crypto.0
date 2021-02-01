@@ -2,141 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A810C43381
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 14:36:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF6A9C433E6
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 15:09:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7007F64E50
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 14:36:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 883BC64DAF
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 15:09:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231145AbhBAOf7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Feb 2021 09:35:59 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60930 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230210AbhBAOf5 (ORCPT
+        id S231491AbhBAPJ0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Feb 2021 10:09:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39485 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231473AbhBAPJK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Feb 2021 09:35:57 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 111EVi23006364;
-        Mon, 1 Feb 2021 09:35:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=NH960khcaH5kqbSEa5tOHjMKvP9yY4aVTJT8WCDyZtY=;
- b=jLXfQy+gulAmt53VGsFZBMHFQxQj5iTt7F9Nm8WILDOLj57uTkOUBZtplv3TM25kUu6p
- qE0LcZozT1HSFIg5qcRaNoIPkIqfDlMl9oSUV92e5RopAF4Yo5XbX6w3bd+hos6lvciL
- bpP1yTiXpQfuvTWujdSMY1bAgtDBhzD9KgsaaeHn0itgIac5jFsO7cvj8bhuafl9Dqo6
- B2d4PISyuwW0KGTCV0Lj/zByLjMKVO2XInjFnS7PLl1BA//S7F+LhrE6qTLr7ZajUZwK
- zWFAbHL5tzdpHgwZ4uhtkttrZb0eoBn/ZWLQrdakuzaJSIo/oryGlRBh7gjj9ysr+s1N Dg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36ejbp2rcg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 09:35:10 -0500
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 111EWvYJ012960;
-        Mon, 1 Feb 2021 09:35:09 -0500
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36ejbp2ray-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 09:35:09 -0500
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 111EOsCB015586;
-        Mon, 1 Feb 2021 14:35:08 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma02wdc.us.ibm.com with ESMTP id 36cy38y1ue-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 14:35:08 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 111EZ7Mn16318802
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Feb 2021 14:35:07 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A5E9EAC065;
-        Mon,  1 Feb 2021 14:35:07 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9310AAC05E;
-        Mon,  1 Feb 2021 14:35:07 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  1 Feb 2021 14:35:07 +0000 (GMT)
-Subject: Re: [PATCH v5 2/4] x509: Detect sm2 keys by their parameters OID
-To:     David Howells <dhowells@redhat.com>,
-        Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Mon, 1 Feb 2021 10:09:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612192064;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=rJ1BNHbLyBivT85os4ZEgQB+CLLa83qJkWROJrNOKGM=;
+        b=hd6oXuz3QwPFYtttQmMAH2ZKjqQCCme/1I8tBfqk76NMiP0Cacd2rGcx09XrREkJSjrx8A
+        9O/pskuXaNL2h0pe6k7ug4xIlTNsu4ILbKM4NRk12WhmG4Dd13rSFmyMv6vBWl02gjqyW7
+        FU4rhIc9u8yG/0XqgIYVNK4BqKuM7qc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-447-RvKMTgIPPmaxLkH-Yb_XOQ-1; Mon, 01 Feb 2021 10:07:40 -0500
+X-MC-Unique: RvKMTgIPPmaxLkH-Yb_XOQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB8F0801817;
+        Mon,  1 Feb 2021 15:07:38 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D38EA5C1A1;
+        Mon,  1 Feb 2021 15:07:36 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <58935b00f65e389e9ae3da2425d06bd88d280e43.camel@linux.ibm.com>
+References: <58935b00f65e389e9ae3da2425d06bd88d280e43.camel@linux.ibm.com> <20210129150355.850093-3-stefanb@linux.vnet.ibm.com> <20210129150355.850093-1-stefanb@linux.vnet.ibm.com> <4162801.1612185801@warthog.procyon.org.uk> <71a77d10-e645-194f-5073-ebf180a8d70e@linux.ibm.com>
+To:     Mimi Zohar <zohar@linux.ibm.com>
+Cc:     dhowells@redhat.com, Stefan Berger <stefanb@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
         linux-integrity@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
         Mimi Zohar <zohar@linux.vnet.ibm.com>
-References: <20210129150355.850093-3-stefanb@linux.vnet.ibm.com>
- <20210129150355.850093-1-stefanb@linux.vnet.ibm.com>
- <4162801.1612185801@warthog.procyon.org.uk>
-From:   Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <71a77d10-e645-194f-5073-ebf180a8d70e@linux.ibm.com>
-Date:   Mon, 1 Feb 2021 09:35:07 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+Subject: Re: [PATCH v5 2/4] x509: Detect sm2 keys by their parameters OID
 MIME-Version: 1.0
-In-Reply-To: <4162801.1612185801@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-01_05:2021-01-29,2021-02-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 impostorscore=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 mlxscore=0 malwarescore=0 suspectscore=0 clxscore=1015
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2102010073
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <4170407.1612192055.1@warthog.procyon.org.uk>
+Date:   Mon, 01 Feb 2021 15:07:35 +0000
+Message-ID: <4170408.1612192055@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/1/21 8:23 AM, David Howells wrote:
-> Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
->
->> From: Stefan Berger <stefanb@linux.ibm.com>
->>
->> Detect whether a key is an sm2 type of key by its OID in the parameters
->> array rather than assuming that everything under OID_id_ecPublicKey
->> is sm2, which is not the case.
->>
->> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
->> Cc: David Howells <dhowells@redhat.com>
->> Cc: keyrings@vger.kernel.org
-> I presume these cc's are intentionally not on the first patch or the cover (if
-> there is one)?
+Mimi Zohar <zohar@linux.ibm.com> wrote:
 
-No, this is not intentional. I guess this is a case of wrong use of cc: 
-versus mailing lists - my bad. I posted the whole series to 
-linux-crypto, linux-integrity, keyrings and lkml.
+> > > Do you have a branch you want me to pull or did you want me to take just
+> > > patches 2-4?
+> > 
+> > Please take it from the mailing list. If there are requests for more 
+> > changes on the crypto level, I will send another series. I personally am 
+> > waiting for some sort of verdict on the crypto level...
+> 
+> The entire patch set should be upstreamed as a single patch set, after
+> having each of the maintainer's Ack it.  In addition, the v6 version is
+> missing some Reviewed-by tags.  (Stefan will re-post a v7 patch set.)
+> 
+> David, I don't have problem with this patch set being upstreamed via
+> the keys subsystem, assuming it's been tested.
 
-V6 is at least visible here now:
+Herbert wants the first patch to go through the crypto tree.  Maybe all of
+them should proceed by that route if Herbert is willing?
 
-- https://lkml.org/lkml/2021/1/31/323
+What do patches 2-4 do if patch 1 isn't applied?
 
-- https://marc.info/?l=linux-crypto-vger&m=161213604618722&w=2
-
-- 
-https://lore.kernel.org/linux-integrity/20210131233301.1301787-1-stefanb@linux.ibm.com/T/#mbc9fae5facb4178f64c1145e2654258c0af8fa96
-
-- https://marc.info/?l=linux-keyrings&m=161213608818735&w=2
-
-
-
->
-> Do you have a branch you want me to pull or did you want me to take just
-> patches 2-4?
-
-Please take it from the mailing list. If there are requests for more 
-changes on the crypto level, I will send another series. I personally am 
-waiting for some sort of verdict on the crypto level...
-
-    Stefan
-
+David
 
