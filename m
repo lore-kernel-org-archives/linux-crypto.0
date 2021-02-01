@@ -2,69 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06B14C433E6
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 07:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3445FC433E6
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 08:21:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C49FD64E2F
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 07:25:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA45964E2B
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 08:21:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231879AbhBAHZj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Feb 2021 02:25:39 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:11662 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231992AbhBAHZM (ORCPT
+        id S232452AbhBAIVG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Feb 2021 03:21:06 -0500
+Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:49345 "EHLO
+        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232443AbhBAIVF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Feb 2021 02:25:12 -0500
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DTfY32nbvzlDjj;
-        Mon,  1 Feb 2021 15:22:47 +0800 (CST)
-Received: from [10.67.103.10] (10.67.103.10) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.498.0; Mon, 1 Feb 2021
- 15:24:23 +0800
-Subject: Re: [PATCH v6 1/4] crypto: Add support for ECDSA signature
- verification
-To:     Stefan Berger <stefanb@linux.ibm.com>, <keyrings@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-CC:     <linux-kernel@vger.kernel.org>, <patrick@puiterwijk.org>,
-        <linux-integrity@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>
-References: <20210131233301.1301787-1-stefanb@linux.ibm.com>
- <20210131233301.1301787-2-stefanb@linux.ibm.com>
-From:   yumeng <yumeng18@huawei.com>
-Message-ID: <289ef2ac-d653-47b3-7771-5d8a7342ad21@huawei.com>
-Date:   Mon, 1 Feb 2021 15:24:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
-MIME-Version: 1.0
-In-Reply-To: <20210131233301.1301787-2-stefanb@linux.ibm.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.103.10]
-X-CFilter-Loop: Reflected
+        Mon, 1 Feb 2021 03:21:05 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=jiapeng.chong@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0UNWxyjP_1612167612;
+Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:jiapeng.chong@linux.alibaba.com fp:SMTPD_---0UNWxyjP_1612167612)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 01 Feb 2021 16:20:20 +0800
+From:   Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+To:     horia.geanta@nxp.com
+Cc:     aymen.sghaier@nxp.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+Subject: [PATCH] crypto: caam -Replace DEFINE_SIMPLE_ATTRIBUTE with DEFINE_DEBUGFS_ATTRIBUTE
+Date:   Mon,  1 Feb 2021 16:20:11 +0800
+Message-Id: <1612167611-15297-1-git-send-email-jiapeng.chong@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Fix the following coccicheck warning:
 
+./drivers/crypto/caam/debugfs.c:23:0-23: WARNING: caam_fops_u64_ro
+should be defined with DEFINE_DEBUGFS_ATTRIBUTE.
 
-ÔÚ 2021/2/1 7:32, Stefan Berger Ð´µÀ:
-> +/**
-> + * ecc_get_curve()  - Get a curve given its curve_id
-> + *
-> + * @curve_id:  Id of the curve
-> + *
-> + * Returns pointer to the curve data, NULL if curve is not available
-> + */
-> +const struct ecc_curve *ecc_get_curve(unsigned int curve_id);
-> +
->   /**
->    * ecc_is_key_valid() - Validate a given ECDH private key
+./drivers/crypto/caam/debugfs.c:22:0-23: WARNING: caam_fops_u32_ro
+should be defined with DEFINE_DEBUGFS_ATTRIBUTE.
 
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+---
+ drivers/crypto/caam/debugfs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Shall we move this definition to 'include/crypto'? Other drivers may 
-also want to use it.
+diff --git a/drivers/crypto/caam/debugfs.c b/drivers/crypto/caam/debugfs.c
+index 8ebf183..806bb20 100644
+--- a/drivers/crypto/caam/debugfs.c
++++ b/drivers/crypto/caam/debugfs.c
+@@ -19,8 +19,8 @@ static int caam_debugfs_u32_get(void *data, u64 *val)
+ 	return 0;
+ }
+ 
+-DEFINE_SIMPLE_ATTRIBUTE(caam_fops_u32_ro, caam_debugfs_u32_get, NULL, "%llu\n");
+-DEFINE_SIMPLE_ATTRIBUTE(caam_fops_u64_ro, caam_debugfs_u64_get, NULL, "%llu\n");
++DEFINE_DEBUGFS_ATTRIBUTE(caam_fops_u32_ro, caam_debugfs_u32_get, NULL, "%llu\n");
++DEFINE_DEBUGFS_ATTRIBUTE(caam_fops_u64_ro, caam_debugfs_u64_get, NULL, "%llu\n");
+ 
+ #ifdef CONFIG_CAAM_QI
+ /*
+-- 
+1.8.3.1
+
