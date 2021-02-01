@@ -2,81 +2,124 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB08C433E9
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 16:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB75C433E9
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 16:46:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B563264EA7
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 16:38:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A331E60234
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 16:46:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229500AbhBAQin (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Feb 2021 11:38:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47096 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229866AbhBAQij (ORCPT
+        id S229557AbhBAQqK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Feb 2021 11:46:10 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24922 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229481AbhBAQqH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Feb 2021 11:38:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612197433;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+jj6jBCfn7J2yyMR8iYzgdgBFCJ5rUe4Q6xL1K3yPjY=;
-        b=dH6HSja85j1F6xTIq/0ZTGT/ktEjOkuCVXenrBoIsqGIcOygznL3PLu1pDCLxB7KThb9//
-        aOEmGEwrjbOakmYxy1mtW1SG4nMzmeTk/G9LU8ErZwxf897Be5f8t8BLBPXxscSJ5q/bi0
-        Hn5KhgVNiLjrNTesUiMBDW1RQK4dUrU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-522-LR-6CSGbPh6f-swe8BxKjg-1; Mon, 01 Feb 2021 11:37:06 -0500
-X-MC-Unique: LR-6CSGbPh6f-swe8BxKjg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B73248799FA;
-        Mon,  1 Feb 2021 16:36:55 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D22E460D06;
-        Mon,  1 Feb 2021 16:36:53 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <7836898a-0a42-5c9b-3a42-7ff4c7a03ea4@linux.ibm.com>
-References: <7836898a-0a42-5c9b-3a42-7ff4c7a03ea4@linux.ibm.com> <20210201151910.1465705-1-stefanb@linux.ibm.com> <32177.1612196003@warthog.procyon.org.uk>
-To:     Stefan Berger <stefanb@linux.ibm.com>
-Cc:     dhowells@redhat.com, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, davem@davemloft.net,
-        herbert@gondor.apana.org.au, zohar@linux.ibm.com,
-        linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
-        linux-integrity@vger.kernel.org
-Subject: Re: [PATCH v7 0/4] Add support for x509 certs with NIST p256 and p192 keys
+        Mon, 1 Feb 2021 11:46:07 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 111Gglek185560;
+        Mon, 1 Feb 2021 11:45:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=AcO6AiELQYVzU/NtbPhwlafqcsadvk236o3R/X784Ic=;
+ b=Zyi2lmuL8zX1+xhRtZJ6JVIOIDUgsVhZjH9IXP+OxGzwVebqa/Y4mXWMwl1+ywUW4wrP
+ OQNT66ew7p9D+tXq4PTM7MlCvF3bd+eNyFPx4q8tnZGFzS1bT9ADYGP3MAnDc6HSFgIR
+ HgS+1jrrB13gLRcvXiOzUJiee/tVXFb9K063zNDuQCCwgaVwjJX6JfaxDnBSip2QnuZ5
+ T/T4ig5IwpiS276mz0INUVbpt2R9EowPo3ehNU/Rdj2sLR4u5dfbMG0M2If9AV3I4DLn
+ IhjeHxyA6uU2ygTZc1XVKI85gfLQiP9tC+MkDBPuDvDK/iYaAjhRdpcqN46IXxUKuRPU 3w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36enae097p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 01 Feb 2021 11:45:21 -0500
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 111Gh8v5187594;
+        Mon, 1 Feb 2021 11:45:20 -0500
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36enae096k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 01 Feb 2021 11:45:20 -0500
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 111GJLc9009785;
+        Mon, 1 Feb 2021 16:45:18 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma02wdc.us.ibm.com with ESMTP id 36cy38ywrj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 01 Feb 2021 16:45:18 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 111GjI4x7275104
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 1 Feb 2021 16:45:18 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3C214AC068;
+        Mon,  1 Feb 2021 16:45:18 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 11256AC05B;
+        Mon,  1 Feb 2021 16:45:16 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon,  1 Feb 2021 16:45:16 +0000 (GMT)
+Subject: Re: [PATCH v7 0/4] Add support for x509 certs with NIST p256 and p192
+ keys
+To:     David Howells <dhowells@redhat.com>
+Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, herbert@gondor.apana.org.au,
+        zohar@linux.ibm.com, linux-kernel@vger.kernel.org,
+        patrick@puiterwijk.org, linux-integrity@vger.kernel.org
+References: <7836898a-0a42-5c9b-3a42-7ff4c7a03ea4@linux.ibm.com>
+ <20210201151910.1465705-1-stefanb@linux.ibm.com>
+ <32177.1612196003@warthog.procyon.org.uk>
+ <33903.1612197412@warthog.procyon.org.uk>
+From:   Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <ab3f4f96-6aec-4586-21fa-318fcee997a5@linux.ibm.com>
+Date:   Mon, 1 Feb 2021 11:45:16 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <33902.1612197412.1@warthog.procyon.org.uk>
-Date:   Mon, 01 Feb 2021 16:36:52 +0000
-Message-ID: <33903.1612197412@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <33903.1612197412@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
+ definitions=2021-02-01_06:2021-01-29,2021-02-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 spamscore=0 suspectscore=0 impostorscore=0 mlxscore=0
+ adultscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0 malwarescore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102010084
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Stefan Berger <stefanb@linux.ibm.com> wrote:
+On 2/1/21 11:36 AM, David Howells wrote:
+> Stefan Berger <stefanb@linux.ibm.com> wrote:
+>
+>> 1) the whole series goes through the crypto tree
+>>
+>> 2) I make the OIDs addition patch 1 that both keyrings and crypto take
+>> separately?
+> The first might be easiest, but 2 is okay also.  You'll just need to give
+> myself and Herbert separate branches to pull, rooted on the same commit.
+>
+> Btw, what do patches 2-4 do if patch 1 isn't applied?
 
-> 1) the whole series goes through the crypto tree
-> 
-> 2) I make the OIDs addition patch 1 that both keyrings and crypto take
-> separately?
+With the crypto module missing in the kernel you will get an error 
+trying to load an x509 certificate that needs the algorithm to verify 
+the self-signed signature.
 
-The first might be easiest, but 2 is okay also.  You'll just need to give
-myself and Herbert separate branches to pull, rooted on the same commit.
+Before I post yet another series I hope that Herbert can say whether 
+option 1) would work for him.
 
-Btw, what do patches 2-4 do if patch 1 isn't applied?
+    Stefan
 
 
-David
+>
+>
+> David
+>
 
