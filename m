@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A1FDC433DB
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 18:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E186C433E0
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 18:03:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4124364EA0
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 18:03:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2EADB64E9C
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 18:03:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229793AbhBASDm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Feb 2021 13:03:42 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53896 "EHLO mail.kernel.org"
+        id S230000AbhBASDs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Feb 2021 13:03:48 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53910 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229831AbhBASDl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Feb 2021 13:03:41 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 300F564EA0;
-        Mon,  1 Feb 2021 18:02:59 +0000 (UTC)
+        id S229555AbhBASDm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 1 Feb 2021 13:03:42 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 97E3464EB8;
+        Mon,  1 Feb 2021 18:03:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612202580;
-        bh=YULinnlkuCAewuzhstFApRJ5DhxdsVgZHgBAlOivg18=;
+        s=k20201202; t=1612202581;
+        bh=F8NI4gGlhEPKGSsSKx1da+fnX3qID97zd5EPihO9rf0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GghINnXtjTrGjyv77GvlmxIC07QRqAZbKvcRa1VA8u655bZjEl1gAVCvbmiI0PjbZ
-         Q6t2op79nIe/AAkPdEpt4U19ex2Mzp2wfEEfktnGXjd/0PB/e/vu920Frhsg3a4LbS
-         KHeSMXEDVEySsVOY1yl0yAeYKT1AuIvDH+m4LKraBHWgYWpFoRpxFi+DU4Uz4ETe+L
-         3Qz2EERB+9qbG2S7JepzRm+YugWg1KPNEIfaqTEfqn6/V2C80ptG0u9LE8E5X8nT/X
-         +D6qUM6oGvQyCQGu0i+ufK+Q+Gaf31EYoKihLikYPlj3u6wf89tRcfahRYNwXzJfWn
-         nae/znKfHvqmw==
+        b=helaF0sQI5XQDh8TvY4B1wpk8rk7DLnNy3GJFFkL81Twa1idM45VmYPx3peXl1YqR
+         Lr2VZK7aYoic7rmm/85YUPtkBBM0snHVrr2HU4cPCz3+Xi3Fd8KQkCuV4xZUQLWvlP
+         GvgTbKJsrBEtiAOfHRboPDmLFLLTwIiBzADAoCZBE46GPYwrhHYMbxyv6enx0ffRIe
+         nEIHC4/3O1PQulSq6GgS+KaWD5WRK1qQIMHCA6z0Myn0HXKpn83OYGkmCW1cj1Y+Y0
+         lYDtk4OJwgx10ZIx8mS/WwQ5LYLc87AWew/7f6BpCQzLL9l6EN44m5rNASJandlG2z
+         BXQ+VyU7RNIEQ==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH 3/9] crypto: serpent - use unaligned accessors instead of alignmask
-Date:   Mon,  1 Feb 2021 19:02:31 +0100
-Message-Id: <20210201180237.3171-4-ardb@kernel.org>
+Subject: [PATCH 4/9] crypto: blowfish - use unaligned accessors instead of alignmask
+Date:   Mon,  1 Feb 2021 19:02:32 +0100
+Message-Id: <20210201180237.3171-5-ardb@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210201180237.3171-1-ardb@kernel.org>
 References: <20210201180237.3171-1-ardb@kernel.org>
@@ -47,111 +47,88 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Instead of using an alignmask of 0x3 to ensure 32-bit alignment of the
-Serpent input and output blocks, which propagates to mode drivers, and
-results in pointless copying on architectures that don't care about
+Instead of using an alignmask of 0x3 to ensure 32-bit alignment of
+the Blowfish input and output blocks, which propagates to mode drivers,
+and results in pointless copying on architectures that don't care about
 alignment, use the unaligned accessors, which will do the right thing on
 each respective architecture, avoiding the need for double buffering.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- crypto/serpent_generic.c | 44 ++++++++------------
- 1 file changed, 17 insertions(+), 27 deletions(-)
+ crypto/blowfish_generic.c | 23 ++++++++------------
+ 1 file changed, 9 insertions(+), 14 deletions(-)
 
-diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
-index a932e0b2964f..236c87547a17 100644
---- a/crypto/serpent_generic.c
-+++ b/crypto/serpent_generic.c
-@@ -10,7 +10,7 @@
+diff --git a/crypto/blowfish_generic.c b/crypto/blowfish_generic.c
+index c3c2041fe0c5..003b52c6880e 100644
+--- a/crypto/blowfish_generic.c
++++ b/crypto/blowfish_generic.c
+@@ -14,7 +14,7 @@
  #include <linux/init.h>
  #include <linux/module.h>
- #include <linux/errno.h>
+ #include <linux/mm.h>
 -#include <asm/byteorder.h>
 +#include <asm/unaligned.h>
  #include <linux/crypto.h>
  #include <linux/types.h>
- #include <crypto/serpent.h>
-@@ -448,19 +448,12 @@ void __serpent_encrypt(const void *c, u8 *dst, const u8 *src)
+ #include <crypto/blowfish.h>
+@@ -36,12 +36,10 @@
+ static void bf_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
  {
- 	const struct serpent_ctx *ctx = c;
- 	const u32 *k = ctx->expkey;
--	const __le32 *s = (const __le32 *)src;
--	__le32	*d = (__le32 *)dst;
- 	u32	r0, r1, r2, r3, r4;
+ 	struct bf_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const __be32 *in_blk = (const __be32 *)src;
+-	__be32 *const out_blk = (__be32 *)dst;
+ 	const u32 *P = ctx->p;
+ 	const u32 *S = ctx->s;
+-	u32 yl = be32_to_cpu(in_blk[0]);
+-	u32 yr = be32_to_cpu(in_blk[1]);
++	u32 yl = get_unaligned_be32(src);
++	u32 yr = get_unaligned_be32(src + 4);
  
--/*
-- * Note: The conversions between u8* and u32* might cause trouble
-- * on architectures with stricter alignment rules than x86
-- */
--
--	r0 = le32_to_cpu(s[0]);
--	r1 = le32_to_cpu(s[1]);
--	r2 = le32_to_cpu(s[2]);
--	r3 = le32_to_cpu(s[3]);
-+	r0 = get_unaligned_le32(src);
-+	r1 = get_unaligned_le32(src + 4);
-+	r2 = get_unaligned_le32(src + 8);
-+	r3 = get_unaligned_le32(src + 12);
+ 	ROUND(yr, yl, 0);
+ 	ROUND(yl, yr, 1);
+@@ -63,19 +61,17 @@ static void bf_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ 	yl ^= P[16];
+ 	yr ^= P[17];
  
- 					K(r0, r1, r2, r3, 0);
- 	S0(r0, r1, r2, r3, r4);		LK(r2, r1, r3, r0, r4, 1);
-@@ -496,10 +489,10 @@ void __serpent_encrypt(const void *c, u8 *dst, const u8 *src)
- 	S6(r0, r1, r3, r2, r4);		LK(r3, r4, r1, r2, r0, 31);
- 	S7(r3, r4, r1, r2, r0);		K(r0, r1, r2, r3, 32);
- 
--	d[0] = cpu_to_le32(r0);
--	d[1] = cpu_to_le32(r1);
--	d[2] = cpu_to_le32(r2);
--	d[3] = cpu_to_le32(r3);
-+	put_unaligned_le32(r0, dst);
-+	put_unaligned_le32(r1, dst + 4);
-+	put_unaligned_le32(r2, dst + 8);
-+	put_unaligned_le32(r3, dst + 12);
+-	out_blk[0] = cpu_to_be32(yr);
+-	out_blk[1] = cpu_to_be32(yl);
++	put_unaligned_be32(yr, dst);
++	put_unaligned_be32(yl, dst + 4);
  }
- EXPORT_SYMBOL_GPL(__serpent_encrypt);
  
-@@ -514,14 +507,12 @@ void __serpent_decrypt(const void *c, u8 *dst, const u8 *src)
+ static void bf_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
  {
- 	const struct serpent_ctx *ctx = c;
- 	const u32 *k = ctx->expkey;
--	const __le32 *s = (const __le32 *)src;
--	__le32	*d = (__le32 *)dst;
- 	u32	r0, r1, r2, r3, r4;
+ 	struct bf_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const __be32 *in_blk = (const __be32 *)src;
+-	__be32 *const out_blk = (__be32 *)dst;
+ 	const u32 *P = ctx->p;
+ 	const u32 *S = ctx->s;
+-	u32 yl = be32_to_cpu(in_blk[0]);
+-	u32 yr = be32_to_cpu(in_blk[1]);
++	u32 yl = get_unaligned_be32(src);
++	u32 yr = get_unaligned_be32(src + 4);
  
--	r0 = le32_to_cpu(s[0]);
--	r1 = le32_to_cpu(s[1]);
--	r2 = le32_to_cpu(s[2]);
--	r3 = le32_to_cpu(s[3]);
-+	r0 = get_unaligned_le32(src);
-+	r1 = get_unaligned_le32(src + 4);
-+	r2 = get_unaligned_le32(src + 8);
-+	r3 = get_unaligned_le32(src + 12);
+ 	ROUND(yr, yl, 17);
+ 	ROUND(yl, yr, 16);
+@@ -97,8 +93,8 @@ static void bf_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ 	yl ^= P[1];
+ 	yr ^= P[0];
  
- 					K(r0, r1, r2, r3, 32);
- 	SI7(r0, r1, r2, r3, r4);	KL(r1, r3, r0, r4, r2, 31);
-@@ -557,10 +548,10 @@ void __serpent_decrypt(const void *c, u8 *dst, const u8 *src)
- 	SI1(r3, r1, r2, r0, r4);	KL(r4, r1, r2, r0, r3, 1);
- 	SI0(r4, r1, r2, r0, r3);	K(r2, r3, r1, r4, 0);
- 
--	d[0] = cpu_to_le32(r2);
--	d[1] = cpu_to_le32(r3);
--	d[2] = cpu_to_le32(r1);
--	d[3] = cpu_to_le32(r4);
-+	put_unaligned_le32(r2, dst);
-+	put_unaligned_le32(r3, dst + 4);
-+	put_unaligned_le32(r1, dst + 8);
-+	put_unaligned_le32(r4, dst + 12);
+-	out_blk[0] = cpu_to_be32(yr);
+-	out_blk[1] = cpu_to_be32(yl);
++	put_unaligned_be32(yr, dst);
++	put_unaligned_be32(yl, dst + 4);
  }
- EXPORT_SYMBOL_GPL(__serpent_decrypt);
  
-@@ -578,7 +569,6 @@ static struct crypto_alg srp_alg = {
+ static struct crypto_alg alg = {
+@@ -108,7 +104,6 @@ static struct crypto_alg alg = {
  	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
- 	.cra_blocksize		=	SERPENT_BLOCK_SIZE,
- 	.cra_ctxsize		=	sizeof(struct serpent_ctx),
+ 	.cra_blocksize		=	BF_BLOCK_SIZE,
+ 	.cra_ctxsize		=	sizeof(struct bf_ctx),
 -	.cra_alignmask		=	3,
  	.cra_module		=	THIS_MODULE,
  	.cra_u			=	{ .cipher = {
- 	.cia_min_keysize	=	SERPENT_MIN_KEY_SIZE,
+ 	.cia_min_keysize	=	BF_MIN_KEY_SIZE,
 -- 
 2.20.1
 
