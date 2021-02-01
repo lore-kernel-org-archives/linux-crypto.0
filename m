@@ -2,81 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9184EC433DB
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 17:12:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4FC9C433E6
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 18:03:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B23D64EA2
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 17:12:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8029964EBA
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 18:03:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231664AbhBARLo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Feb 2021 12:11:44 -0500
-Received: from mga04.intel.com ([192.55.52.120]:58930 "EHLO mga04.intel.com"
+        id S229612AbhBASDh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Feb 2021 13:03:37 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53860 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231284AbhBARLf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Feb 2021 12:11:35 -0500
-IronPort-SDR: GsAfh9fYpW+M4YAYDVi33Kntmm86+5S13BrGdLYHP3Zi1rQnB983ZAO+YJnDyLzw9lGCG8EshA
- XxoXATWa/5YA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9882"; a="178155736"
-X-IronPort-AV: E=Sophos;i="5.79,393,1602572400"; 
-   d="scan'208";a="178155736"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2021 09:09:49 -0800
-IronPort-SDR: 7g/nrfiQHaZNp5laeul/q4onJMeUVAA3thjEDrpRMpjApx57DJGIKyCqiXa9xg5u/Ctxv8DCfU
- B2j0dimBY5dA==
-X-IronPort-AV: E=Sophos;i="5.79,393,1602572400"; 
-   d="scan'208";a="391001227"
-Received: from ljfrost-mobl1.amr.corp.intel.com ([10.252.14.106])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2021 09:09:45 -0800
-Message-ID: <c3c3d47edbfd61c338deea5a10a4fb39e2ace68a.camel@linux.intel.com>
-Subject: Re: [PATCH v7 4/7] crypto: add ecc curve and expose them
-From:   Daniele Alessandrelli <daniele.alessandrelli@linux.intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        id S229555AbhBASDg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 1 Feb 2021 13:03:36 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A707A64E97;
+        Mon,  1 Feb 2021 18:02:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1612202575;
+        bh=5bmG3DrObbBsorygQbM4OMpUSRXQja88+z5HvrThGlI=;
+        h=From:To:Cc:Subject:Date:From;
+        b=d8mt8oBpHLZCkTpy4/xU1phLJjOtHgxmtKR954M4bZq5v+HjLNfhckYIrz+nqSqXp
+         I6tAIN3MdWBjF0GgkbIELyYhXFn0Ny9p2FeZ5aStt/7IiUA7XRLM9UE7odrjkQionj
+         FA3zuWK1WpVBcldtumnwLT/ZH3es5ZWTiEmwj78TS1Lq93lDHryeYY2dLVULq409JJ
+         wJ9+z3t1xzesBYtlfw/hjs0EtTANmJEchIiR4rHOIzFeHyn/XsRdiNH9r3Q5KnNnCw
+         Gfcl1IsG6fjNovLLh3ueGPxEWgmXXMlO6GXnfGhDhW9SmDxL1Dny5TzZReFoZgojsj
+         xaxVwahIAvR3g==
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         Ard Biesheuvel <ardb@kernel.org>
-Cc:     Meng Yu <yumeng18@huawei.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Zaibo Xu <xuzaibo@huawei.com>, wangzhou1@hisilicon.com,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Mark Gross <mgross@linux.intel.com>,
-        "Khurana, Prabhjot" <prabhjot.khurana@intel.com>,
-        "Reshetova, Elena" <elena.reshetova@intel.com>,
-        Daniele Alessandrelli <daniele.alessandrelli@intel.com>
-Date:   Mon, 01 Feb 2021 17:09:41 +0000
-In-Reply-To: <20210128103908.GA32495@gondor.apana.org.au>
-References: <1611299395-675-1-git-send-email-yumeng18@huawei.com>
-         <1611299395-675-5-git-send-email-yumeng18@huawei.com>
-         <20210128050354.GA30874@gondor.apana.org.au>
-         <CAMj1kXHvY9JveFyhtETALCH=AFGMGVbGGFMNDGc6ZVngEKbyDQ@mail.gmail.com>
-         <20210128103908.GA32495@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+Subject: [PATCH 0/9] crypto: fix alignmask handling
+Date:   Mon,  1 Feb 2021 19:02:28 +0100
+Message-Id: <20210201180237.3171-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 2021-01-28 at 21:39 +1100, Herbert Xu wrote:
-> Once they're distinct algorithms, we can then make sure that only
-> the ones that are used in the kernel is added, even if some hardware
-> may support more curves.
+Some generic implementations of vintage ciphers rely on alignmasks to
+ensure that the input is presented with the right alignment. Given that
+these are all C implementations, which may execute on architectures that
+don't care about alignment in the first place, it is better to use the
+unaligned accessors, which will deal with the misalignment in a way that
+is appropriate for the architecture in question (and in many cases, this
+means simply ignoring the misalignment, as the hardware doesn't care either)
 
-I like the idea of having different algorithms names (ecdh-nist-
-pXXX) for different curves, but I'm not fully convinced by the above
-statement.
+So fix this across a number of implementations. Patch #1 stands out because
+michael_mic.c was broken in spite of the alignmask. Patch #2 removes tnepres
+instead of updating it, given that there is no point in keeping it.
 
-What's the downside of letting device drivers enable all the curves
-supported by the HW (with the exception of obsolete curves /
-algorithms), even if there is (currently) no user of such curves in the
-kernel? Code size and maintainability?
+The remaining patches all update generic ciphers that are outdated but still
+used, and which are the only implementations available on most architectures
+other than x86.
 
-I think that once there is support for certain curves, it's more likely
-that drivers / modules using them will appear.
 
-Also, even if there are no in-tree users, there might be a few out-of-
-tree ones.
+
+Ard Biesheuvel (9):
+  crypto: michael_mic - fix broken misalignment handling
+  crypto: serpent - get rid of obsolete tnepres variant
+  crypto: serpent - use unaligned accessors instead of alignmask
+  crypto: blowfish - use unaligned accessors instead of alignmask
+  crypto: camellia - use unaligned accessors instead of alignmask
+  crypto: cast5 - use unaligned accessors instead of alignmask
+  crypto: cast6 - use unaligned accessors instead of alignmask
+  crypto: fcrypt - drop unneeded alignmask
+  crypto: twofish - use unaligned accessors instead of alignmask
+
+ crypto/Kconfig            |   3 +-
+ crypto/blowfish_generic.c |  23 ++--
+ crypto/camellia_generic.c |  45 +++----
+ crypto/cast5_generic.c    |  23 ++--
+ crypto/cast6_generic.c    |  39 +++---
+ crypto/fcrypt.c           |   1 -
+ crypto/michael_mic.c      |  31 ++---
+ crypto/serpent_generic.c  | 126 ++++----------------
+ crypto/tcrypt.c           |   6 +-
+ crypto/testmgr.c          |   6 -
+ crypto/testmgr.h          |  79 ------------
+ crypto/twofish_generic.c  |  11 +-
+ 12 files changed, 90 insertions(+), 303 deletions(-)
+
+-- 
+2.20.1
 
