@@ -2,79 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC43C433DB
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 16:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C915C433E6
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 17:10:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D988D64ED7
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 16:53:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23E5064EA2
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 17:10:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231476AbhBAQws (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Feb 2021 11:52:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59266 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231771AbhBAQwG (ORCPT
+        id S230094AbhBARKN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Feb 2021 12:10:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48903 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231659AbhBARKM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Feb 2021 11:52:06 -0500
-Received: from smtp-42a9.mail.infomaniak.ch (smtp-42a9.mail.infomaniak.ch [IPv6:2001:1600:3:17::42a9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC207C061573;
-        Mon,  1 Feb 2021 08:51:16 -0800 (PST)
-Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
-        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4DTv8z06B5zMqCNG;
-        Mon,  1 Feb 2021 17:51:15 +0100 (CET)
-Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
-        by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4DTv8w3YSxzlh8Td;
-        Mon,  1 Feb 2021 17:51:12 +0100 (CET)
-Subject: Re: [PATCH v5 0/5] Enable root to update the blacklist keyring
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-To:     David Howells <dhowells@redhat.com>
-Cc:     David Woodhouse <dwmw2@infradead.org>,
+        Mon, 1 Feb 2021 12:10:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612199320;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pW3FtlUJS2fN56E7BRK6xYg8pzPm9uc4qoRwK8ELBPM=;
+        b=cPwkdBFDaH55ywT2wjtZFFGQ2M5CK8wcqzHVS1sFQDKe033kOQdkofM/pOpzE+hbR8Iuej
+        RISyy+uY3hAGq19KEwF+Bpsk2CHPiqNfie9qMwxUSUxoCwdD/X3iv02OfzmhTTbHtnzwv6
+        L5OhdL23RLMTM27DUkAI3jsAFCDNkJU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-61-n5sR1x5xMNSY4bwcGtO9dA-1; Mon, 01 Feb 2021 12:08:36 -0500
+X-MC-Unique: n5sR1x5xMNSY4bwcGtO9dA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B36B801B1D;
+        Mon,  1 Feb 2021 17:08:34 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0A2B960C7A;
+        Mon,  1 Feb 2021 17:08:30 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <702232df-e229-a716-b688-918fe7e168e8@digikod.net>
+References: <702232df-e229-a716-b688-918fe7e168e8@digikod.net> <20210128191705.3568820-1-mic@digikod.net> <4160652.1612184844@warthog.procyon.org.uk> <9d95ec74-cc89-9e0c-dac8-c05ea52991ac@digikod.net>
+To:     =?us-ascii?Q?=3D=3FUTF-8=3FQ=3FMicka=3Dc3=3Dabl=5FSala=3Dc3=3Dbcn=3F?=
+         =?us-ascii?Q?=3D?= <mic@digikod.net>
+Cc:     dhowells@redhat.com, David Woodhouse <dwmw2@infradead.org>,
         Jarkko Sakkinen <jarkko@kernel.org>,
         "David S . Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         James Morris <jmorris@namei.org>,
-        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
+        =?us-ascii?Q?=3D=3FUTF-8=3FQ=3FMicka=3Dc3=3Dabl?=
+         =?us-ascii?Q?=5FSala=3Dc3=3Dbcn=3F=3D?= <mic@linux.microsoft.com>,
         Mimi Zohar <zohar@linux.ibm.com>,
         "Serge E . Hallyn" <serge@hallyn.com>,
         Tyler Hicks <tyhicks@linux.microsoft.com>,
         keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-security-module@vger.kernel.org
-References: <20210128191705.3568820-1-mic@digikod.net>
- <4160652.1612184844@warthog.procyon.org.uk>
- <9d95ec74-cc89-9e0c-dac8-c05ea52991ac@digikod.net>
-Message-ID: <702232df-e229-a716-b688-918fe7e168e8@digikod.net>
-Date:   Mon, 1 Feb 2021 17:51:11 +0100
-User-Agent: 
+Subject: Re: [PATCH v5 0/5] Enable root to update the blacklist keyring
 MIME-Version: 1.0
-In-Reply-To: <9d95ec74-cc89-9e0c-dac8-c05ea52991ac@digikod.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+Date:   Mon, 01 Feb 2021 17:08:30 +0000
+Message-ID: <36340.1612199310@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-It doesn't contain Jarkko's Tested-by and Reviewed-by tags though.
+Micka=C3=ABl Sala=C3=BCn <mic@digikod.net> wrote:
 
-On 01/02/2021 17:48, Mickaël Salaün wrote:
-> Hi,
-> 
-> Yes, you can pull this patchset from here:
-> https://github.com/l0kod/linux branch dyn-auth-blacklist-v5 (commit
-> 33b94bcd56843b4235c6ba4a44157b3c5a8792f1).
-> 
->  Mickaël
-> 
-> 
-> On 01/02/2021 14:07, David Howells wrote:
->>
->> Hi Mickaël,
->>
->> Do you have a public branch somewhere I can pull from?
->>
->> David
->>
+> It doesn't contain Jarkko's Tested-by and Reviewed-by tags though.
+
+I can add that in the merge.
+
+David
+
