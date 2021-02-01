@@ -2,145 +2,142 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE032C433E6
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 10:40:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89F44C433E0
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 13:03:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B28764E98
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 10:40:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FF7664DDE
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 13:03:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233300AbhBAKkc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Feb 2021 05:40:32 -0500
-Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:46948 "EHLO
-        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233296AbhBAKjw (ORCPT
+        id S231594AbhBANDK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Feb 2021 08:03:10 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35556 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231407AbhBANDI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Feb 2021 05:39:52 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0UNYB3r1_1612175940;
-Received: from B-455UMD6M-2027.local(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UNYB3r1_1612175940)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 01 Feb 2021 18:39:01 +0800
+        Mon, 1 Feb 2021 08:03:08 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 111D1QCm081851;
+        Mon, 1 Feb 2021 08:02:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ZigMs+1+OGFbFSIyjvMcFvWe6jq3VvhSgTQtQqwSDi0=;
+ b=atNROLZxC41VitSLou85LOJRynReYFXzJYQNGOD2fZv81OTgynnPPA5Xq370d/Alqgr5
+ TDRaKHA3W+9jtFfqYH8hqw8XBPqdrTpCpZL88X0aSEEB6bmuEmkNug++RVXwVJYiEHYP
+ +RXK8t6DbPSnO9ivxzYckpBh62swtsMns1To1HSMgdKXmh/2alty4l/974d6OUYMrK5V
+ 5eOEvUwtHz+J763ZF0iMIyEs5yIJC+nRsi0sYApAnDo75weGEWTx3CHe6aj3k4xvRGYV
+ s3ZcE3kGWgugbrvXVjekDqNIRxadVGmSUEzcjGKZH3u+lm/XmtaukBd9Pkaym+syoUjR ig== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36ehe81bpp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 01 Feb 2021 08:02:24 -0500
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 111D1j6Q083550;
+        Mon, 1 Feb 2021 08:02:22 -0500
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36ehe81bp3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 01 Feb 2021 08:02:22 -0500
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 111Cv49C029932;
+        Mon, 1 Feb 2021 13:02:21 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma05wdc.us.ibm.com with ESMTP id 36cy38pfkf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 01 Feb 2021 13:02:21 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 111D2LoF6882014
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 1 Feb 2021 13:02:21 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 69050AC05E;
+        Mon,  1 Feb 2021 13:02:21 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 59DC6AC059;
+        Mon,  1 Feb 2021 13:02:21 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon,  1 Feb 2021 13:02:21 +0000 (GMT)
 Subject: Re: [PATCH v6 2/4] x509: Detect sm2 keys by their parameters OID
-To:     Stefan Berger <stefanb@linux.ibm.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
         linux-integrity@vger.kernel.org,
         David Howells <dhowells@redhat.com>
 References: <20210131233301.1301787-1-stefanb@linux.ibm.com>
  <20210131233301.1301787-3-stefanb@linux.ibm.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <75a8ff37-3c23-6cf1-f844-cf692eb8adfc@linux.alibaba.com>
-Date:   Mon, 1 Feb 2021 18:39:00 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.0
+ <75a8ff37-3c23-6cf1-f844-cf692eb8adfc@linux.alibaba.com>
+From:   Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <ace09744-e6c9-32da-27d8-accadd5d0252@linux.ibm.com>
+Date:   Mon, 1 Feb 2021 08:02:21 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210131233301.1301787-3-stefanb@linux.ibm.com>
+In-Reply-To: <75a8ff37-3c23-6cf1-f844-cf692eb8adfc@linux.alibaba.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
+ definitions=2021-02-01_05:2021-01-29,2021-02-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
+ phishscore=0 spamscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
+ adultscore=0 bulkscore=0 lowpriorityscore=0 mlxlogscore=999 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2102010065
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On 2/1/21 5:39 AM, Tianjia Zhang wrote:
+>
+>> index f7ad43f28579..508e0b34b5f0 100644
+>> --- a/lib/oid_registry.c
+>> +++ b/lib/oid_registry.c
+>> @@ -11,6 +11,7 @@
+>>   #include <linux/kernel.h>
+>>   #include <linux/errno.h>
+>>   #include <linux/bug.h>
+>> +#include <linux/asn1.h>
+>>   #include "oid_registry_data.c"
+>>     MODULE_DESCRIPTION("OID Registry");
+>> @@ -92,6 +93,18 @@ enum OID look_up_OID(const void *data, size_t 
+>> datasize)
+>>   }
+>>   EXPORT_SYMBOL_GPL(look_up_OID);
+>>   +int parse_OID(const void *data, size_t datasize, enum OID *oid)
+>> +{
+>> +    const unsigned char *v = data;
+>> +
+>> +    if (datasize < 2 || v[0] != ASN1_OID || v[1] != datasize - 2)
+>> +        return -EBADMSG;
+>> +
+>> +    *oid = look_up_OID(data + 2, datasize - 2);
+>> +    return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(parse_OID);
+>> +
+>>   /*
+>>    * sprint_OID - Print an Object Identifier into a buffer
+>>    * @data: The encoded OID to print
+>>
+>
+> Great job, I'm just curious why we need to add a new function, this 
+> seems unnecessary, if possible, please add
 
 
-On 2/1/21 7:32 AM, Stefan Berger wrote:
-> Detect whether a key is an sm2 type of key by its OID in the parameters
-> array rather than assuming that everything under OID_id_ecPublicKey
-> is sm2, which is not the case.
-> 
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: keyrings@vger.kernel.org
-> ---
->   crypto/asymmetric_keys/x509_cert_parser.c | 12 +++++++++++-
->   include/linux/oid_registry.h              |  1 +
->   lib/oid_registry.c                        | 13 +++++++++++++
->   3 files changed, 25 insertions(+), 1 deletion(-)
-> 
-> diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-> index 52c9b455fc7d..1621ceaf5c95 100644
-> --- a/crypto/asymmetric_keys/x509_cert_parser.c
-> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> @@ -459,6 +459,7 @@ int x509_extract_key_data(void *context, size_t hdrlen,
->   			  const void *value, size_t vlen)
->   {
->   	struct x509_parse_context *ctx = context;
-> +	enum OID oid;
->   
->   	ctx->key_algo = ctx->last_oid;
->   	switch (ctx->last_oid) {
-> @@ -470,7 +471,16 @@ int x509_extract_key_data(void *context, size_t hdrlen,
->   		ctx->cert->pub->pkey_algo = "ecrdsa";
->   		break;
->   	case OID_id_ecPublicKey:
-> -		ctx->cert->pub->pkey_algo = "sm2";
-> +		if (parse_OID(ctx->params, ctx->params_size, &oid) != 0)
-> +			return -EBADMSG;
-> +
-> +		switch (oid) {
-> +		case OID_sm2:
-> +			ctx->cert->pub->pkey_algo = "sm2";
-> +			break;
-> +		default:
-> +			return -ENOPKG;
-> +		}
->   		break;
->   	default:
->   		return -ENOPKG;
-> diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
-> index 4462ed2c18cd..d4982e42c0d2 100644
-> --- a/include/linux/oid_registry.h
-> +++ b/include/linux/oid_registry.h
-> @@ -117,6 +117,7 @@ enum OID {
->   };
->   
->   extern enum OID look_up_OID(const void *data, size_t datasize);
-> +extern int parse_OID(const void *data, size_t datasize, enum OID *oid);
->   extern int sprint_oid(const void *, size_t, char *, size_t);
->   extern int sprint_OID(enum OID, char *, size_t);
->   
-> diff --git a/lib/oid_registry.c b/lib/oid_registry.c
-> index f7ad43f28579..508e0b34b5f0 100644
-> --- a/lib/oid_registry.c
-> +++ b/lib/oid_registry.c
-> @@ -11,6 +11,7 @@
->   #include <linux/kernel.h>
->   #include <linux/errno.h>
->   #include <linux/bug.h>
-> +#include <linux/asn1.h>
->   #include "oid_registry_data.c"
->   
->   MODULE_DESCRIPTION("OID Registry");
-> @@ -92,6 +93,18 @@ enum OID look_up_OID(const void *data, size_t datasize)
->   }
->   EXPORT_SYMBOL_GPL(look_up_OID);
->   
-> +int parse_OID(const void *data, size_t datasize, enum OID *oid)
-> +{
-> +	const unsigned char *v = data;
-> +
-> +	if (datasize < 2 || v[0] != ASN1_OID || v[1] != datasize - 2)
-> +		return -EBADMSG;
-> +
-> +	*oid = look_up_OID(data + 2, datasize - 2);
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(parse_OID);
-> +
->   /*
->    * sprint_OID - Print an Object Identifier into a buffer
->    * @data: The encoded OID to print
-> 
+Thanks. I call this function in two places now. I thought it was 'worth it'.
 
-Great job, I'm just curious why we need to add a new function, this 
-seems unnecessary, if possible, please add
 
-Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>
+> Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>
+> Best regards,
+> Tianjia
 
-Best regards,
-Tianjia
+
