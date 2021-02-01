@@ -2,83 +2,141 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C9EC433DB
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 13:45:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A810C43381
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 14:36:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C874D64E7A
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 13:45:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7007F64E50
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 14:36:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231475AbhBANpR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Feb 2021 08:45:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47384 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231776AbhBANpQ (ORCPT
+        id S231145AbhBAOf7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Feb 2021 09:35:59 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60930 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230210AbhBAOf5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Feb 2021 08:45:16 -0500
-Received: from andre.telenet-ops.be (andre.telenet-ops.be [IPv6:2a02:1800:120:4::f00:15])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 189E1C061573
-        for <linux-crypto@vger.kernel.org>; Mon,  1 Feb 2021 05:44:35 -0800 (PST)
-Received: from ramsan.of.borg ([84.195.186.194])
-        by andre.telenet-ops.be with bizsmtp
-        id PpkZ240064C55Sk01pkZ5E; Mon, 01 Feb 2021 14:44:34 +0100
-Received: from rox.of.borg ([192.168.97.57])
-        by ramsan.of.borg with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.93)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1l6ZVI-002TCq-LI; Mon, 01 Feb 2021 14:44:32 +0100
-Received: from geert by rox.of.borg with local (Exim 4.93)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1l6ZVI-002vxi-24; Mon, 01 Feb 2021 14:44:32 +0100
-From:   Geert Uytterhoeven <geert+renesas@glider.be>
-To:     Srujana Challa <schalla@marvell.com>,
-        Suheil Chandran <schandran@marvell.com>,
-        Lukasz Bartosik <lbartosik@marvell.com>,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        Arnaud Ebalard <arno@natisbad.org>,
+        Mon, 1 Feb 2021 09:35:57 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 111EVi23006364;
+        Mon, 1 Feb 2021 09:35:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=NH960khcaH5kqbSEa5tOHjMKvP9yY4aVTJT8WCDyZtY=;
+ b=jLXfQy+gulAmt53VGsFZBMHFQxQj5iTt7F9Nm8WILDOLj57uTkOUBZtplv3TM25kUu6p
+ qE0LcZozT1HSFIg5qcRaNoIPkIqfDlMl9oSUV92e5RopAF4Yo5XbX6w3bd+hos6lvciL
+ bpP1yTiXpQfuvTWujdSMY1bAgtDBhzD9KgsaaeHn0itgIac5jFsO7cvj8bhuafl9Dqo6
+ B2d4PISyuwW0KGTCV0Lj/zByLjMKVO2XInjFnS7PLl1BA//S7F+LhrE6qTLr7ZajUZwK
+ zWFAbHL5tzdpHgwZ4uhtkttrZb0eoBn/ZWLQrdakuzaJSIo/oryGlRBh7gjj9ysr+s1N Dg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36ejbp2rcg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 01 Feb 2021 09:35:10 -0500
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 111EWvYJ012960;
+        Mon, 1 Feb 2021 09:35:09 -0500
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36ejbp2ray-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 01 Feb 2021 09:35:09 -0500
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 111EOsCB015586;
+        Mon, 1 Feb 2021 14:35:08 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma02wdc.us.ibm.com with ESMTP id 36cy38y1ue-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 01 Feb 2021 14:35:08 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 111EZ7Mn16318802
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 1 Feb 2021 14:35:07 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A5E9EAC065;
+        Mon,  1 Feb 2021 14:35:07 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9310AAC05E;
+        Mon,  1 Feb 2021 14:35:07 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon,  1 Feb 2021 14:35:07 +0000 (GMT)
+Subject: Re: [PATCH v5 2/4] x509: Detect sm2 keys by their parameters OID
+To:     David Howells <dhowells@redhat.com>,
+        Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
+        linux-integrity@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH] crypto: marvell - CRYPTO_DEV_OCTEONTX2_CPT should depend on ARCH_THUNDER2
-Date:   Mon,  1 Feb 2021 14:44:31 +0100
-Message-Id: <20210201134431.699419-1-geert+renesas@glider.be>
-X-Mailer: git-send-email 2.25.1
+        "davem@davemloft.net" <davem@davemloft.net>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>
+References: <20210129150355.850093-3-stefanb@linux.vnet.ibm.com>
+ <20210129150355.850093-1-stefanb@linux.vnet.ibm.com>
+ <4162801.1612185801@warthog.procyon.org.uk>
+From:   Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <71a77d10-e645-194f-5073-ebf180a8d70e@linux.ibm.com>
+Date:   Mon, 1 Feb 2021 09:35:07 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
+In-Reply-To: <4162801.1612185801@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
+ definitions=2021-02-01_05:2021-01-29,2021-02-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 impostorscore=0 bulkscore=0 phishscore=0
+ lowpriorityscore=0 mlxscore=0 malwarescore=0 suspectscore=0 clxscore=1015
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2102010073
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Marvell OcteonTX2 CPT physical function PCI device is present only
-on OcteonTx2 SoC, and not available as an independent PCIe endpoint.
-Hence add a dependency on ARCH_THUNDER2, to prevent asking the user
-about this driver when configuring a kernel without OcteonTx2 platform
-support.
+On 2/1/21 8:23 AM, David Howells wrote:
+> Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+>
+>> From: Stefan Berger <stefanb@linux.ibm.com>
+>>
+>> Detect whether a key is an sm2 type of key by its OID in the parameters
+>> array rather than assuming that everything under OID_id_ecPublicKey
+>> is sm2, which is not the case.
+>>
+>> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+>> Cc: David Howells <dhowells@redhat.com>
+>> Cc: keyrings@vger.kernel.org
+> I presume these cc's are intentionally not on the first patch or the cover (if
+> there is one)?
 
-Fixes: 5e8ce8334734c5f2 ("crypto: marvell - add Marvell OcteonTX2 CPT PF driver")
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- drivers/crypto/marvell/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+No, this is not intentional. I guess this is a case of wrong use of cc: 
+versus mailing lists - my bad. I posted the whole series to 
+linux-crypto, linux-integrity, keyrings and lkml.
 
-diff --git a/drivers/crypto/marvell/Kconfig b/drivers/crypto/marvell/Kconfig
-index 2efbd79180ce4b22..d4c4433c8db8244a 100644
---- a/drivers/crypto/marvell/Kconfig
-+++ b/drivers/crypto/marvell/Kconfig
-@@ -38,7 +38,7 @@ config CRYPTO_DEV_OCTEONTX_CPT
- 
- config CRYPTO_DEV_OCTEONTX2_CPT
- 	tristate "Marvell OcteonTX2 CPT driver"
--	depends on ARM64 || COMPILE_TEST
-+	depends on ARCH_THUNDER2 || COMPILE_TEST
- 	depends on PCI_MSI && 64BIT
- 	depends on CRYPTO_LIB_AES
- 	select OCTEONTX2_MBOX
--- 
-2.25.1
+V6 is at least visible here now:
+
+- https://lkml.org/lkml/2021/1/31/323
+
+- https://marc.info/?l=linux-crypto-vger&m=161213604618722&w=2
+
+- 
+https://lore.kernel.org/linux-integrity/20210131233301.1301787-1-stefanb@linux.ibm.com/T/#mbc9fae5facb4178f64c1145e2654258c0af8fa96
+
+- https://marc.info/?l=linux-keyrings&m=161213608818735&w=2
+
+
+
+>
+> Do you have a branch you want me to pull or did you want me to take just
+> patches 2-4?
+
+Please take it from the mailing list. If there are requests for more 
+changes on the crypto level, I will send another series. I personally am 
+waiting for some sort of verdict on the crypto level...
+
+    Stefan
+
 
