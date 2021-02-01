@@ -2,84 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C915C433E6
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 17:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9184EC433DB
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 17:12:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23E5064EA2
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 17:10:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B23D64EA2
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Feb 2021 17:12:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230094AbhBARKN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Feb 2021 12:10:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48903 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231659AbhBARKM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Feb 2021 12:10:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612199320;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pW3FtlUJS2fN56E7BRK6xYg8pzPm9uc4qoRwK8ELBPM=;
-        b=cPwkdBFDaH55ywT2wjtZFFGQ2M5CK8wcqzHVS1sFQDKe033kOQdkofM/pOpzE+hbR8Iuej
-        RISyy+uY3hAGq19KEwF+Bpsk2CHPiqNfie9qMwxUSUxoCwdD/X3iv02OfzmhTTbHtnzwv6
-        L5OhdL23RLMTM27DUkAI3jsAFCDNkJU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-n5sR1x5xMNSY4bwcGtO9dA-1; Mon, 01 Feb 2021 12:08:36 -0500
-X-MC-Unique: n5sR1x5xMNSY4bwcGtO9dA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B36B801B1D;
-        Mon,  1 Feb 2021 17:08:34 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0A2B960C7A;
-        Mon,  1 Feb 2021 17:08:30 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <702232df-e229-a716-b688-918fe7e168e8@digikod.net>
-References: <702232df-e229-a716-b688-918fe7e168e8@digikod.net> <20210128191705.3568820-1-mic@digikod.net> <4160652.1612184844@warthog.procyon.org.uk> <9d95ec74-cc89-9e0c-dac8-c05ea52991ac@digikod.net>
-To:     =?us-ascii?Q?=3D=3FUTF-8=3FQ=3FMicka=3Dc3=3Dabl=5FSala=3Dc3=3Dbcn=3F?=
-         =?us-ascii?Q?=3D?= <mic@digikod.net>
-Cc:     dhowells@redhat.com, David Woodhouse <dwmw2@infradead.org>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <jmorris@namei.org>,
-        =?us-ascii?Q?=3D=3FUTF-8=3FQ=3FMicka=3Dc3=3Dabl?=
-         =?us-ascii?Q?=5FSala=3Dc3=3Dbcn=3F=3D?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "Serge E . Hallyn" <serge@hallyn.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v5 0/5] Enable root to update the blacklist keyring
+        id S231664AbhBARLo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Feb 2021 12:11:44 -0500
+Received: from mga04.intel.com ([192.55.52.120]:58930 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231284AbhBARLf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 1 Feb 2021 12:11:35 -0500
+IronPort-SDR: GsAfh9fYpW+M4YAYDVi33Kntmm86+5S13BrGdLYHP3Zi1rQnB983ZAO+YJnDyLzw9lGCG8EshA
+ XxoXATWa/5YA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9882"; a="178155736"
+X-IronPort-AV: E=Sophos;i="5.79,393,1602572400"; 
+   d="scan'208";a="178155736"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2021 09:09:49 -0800
+IronPort-SDR: 7g/nrfiQHaZNp5laeul/q4onJMeUVAA3thjEDrpRMpjApx57DJGIKyCqiXa9xg5u/Ctxv8DCfU
+ B2j0dimBY5dA==
+X-IronPort-AV: E=Sophos;i="5.79,393,1602572400"; 
+   d="scan'208";a="391001227"
+Received: from ljfrost-mobl1.amr.corp.intel.com ([10.252.14.106])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2021 09:09:45 -0800
+Message-ID: <c3c3d47edbfd61c338deea5a10a4fb39e2ace68a.camel@linux.intel.com>
+Subject: Re: [PATCH v7 4/7] crypto: add ecc curve and expose them
+From:   Daniele Alessandrelli <daniele.alessandrelli@linux.intel.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ardb@kernel.org>
+Cc:     Meng Yu <yumeng18@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Zaibo Xu <xuzaibo@huawei.com>, wangzhou1@hisilicon.com,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Mark Gross <mgross@linux.intel.com>,
+        "Khurana, Prabhjot" <prabhjot.khurana@intel.com>,
+        "Reshetova, Elena" <elena.reshetova@intel.com>,
+        Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+Date:   Mon, 01 Feb 2021 17:09:41 +0000
+In-Reply-To: <20210128103908.GA32495@gondor.apana.org.au>
+References: <1611299395-675-1-git-send-email-yumeng18@huawei.com>
+         <1611299395-675-5-git-send-email-yumeng18@huawei.com>
+         <20210128050354.GA30874@gondor.apana.org.au>
+         <CAMj1kXHvY9JveFyhtETALCH=AFGMGVbGGFMNDGc6ZVngEKbyDQ@mail.gmail.com>
+         <20210128103908.GA32495@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date:   Mon, 01 Feb 2021 17:08:30 +0000
-Message-ID: <36340.1612199310@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Micka=C3=ABl Sala=C3=BCn <mic@digikod.net> wrote:
+On Thu, 2021-01-28 at 21:39 +1100, Herbert Xu wrote:
+> Once they're distinct algorithms, we can then make sure that only
+> the ones that are used in the kernel is added, even if some hardware
+> may support more curves.
 
-> It doesn't contain Jarkko's Tested-by and Reviewed-by tags though.
+I like the idea of having different algorithms names (ecdh-nist-
+pXXX) for different curves, but I'm not fully convinced by the above
+statement.
 
-I can add that in the merge.
+What's the downside of letting device drivers enable all the curves
+supported by the HW (with the exception of obsolete curves /
+algorithms), even if there is (currently) no user of such curves in the
+kernel? Code size and maintainability?
 
-David
+I think that once there is support for certain curves, it's more likely
+that drivers / modules using them will appear.
+
+Also, even if there are no in-tree users, there might be a few out-of-
+tree ones.
 
