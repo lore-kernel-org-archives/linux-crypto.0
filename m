@@ -2,162 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6E21C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 14:21:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7319CC433DB
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 15:20:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AEE8264E27
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 14:21:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 428B664EBF
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 15:20:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234039AbhBBOUA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Feb 2021 09:20:00 -0500
-Received: from mail.kernel.org ([198.145.29.99]:51458 "EHLO mail.kernel.org"
+        id S235337AbhBBPTm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Feb 2021 10:19:42 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41200 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231624AbhBBORv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Feb 2021 09:17:51 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2821F64DD5;
-        Tue,  2 Feb 2021 14:06:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1612274769;
-        bh=ucOE/Mmv9i2CWEnQ7wz77HidV63/GBxg2zd12rEmpdc=;
+        id S235415AbhBBPRr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Feb 2021 10:17:47 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3836764EBF;
+        Tue,  2 Feb 2021 15:17:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1612279025;
+        bh=gsqH5R2MIBk8ennetSW+5uxOlY9Y3VrMrn7TTPDHofU=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mtk8Q3WRW8e4rAGIMqVSBpBvOYwFo0HFhgAeLGXuNjXjEG35zPmakj7dmP3Hp3Xxb
-         nLQvz66M8T/SeJkpoklGcHv/kplvfAQlGnleUXc+nPaJbcAYzR2bE146XmrkoL8bC8
-         WACPjj7XeQXWdVU5Y4Gh/La16odwgfVrinCkNWdA=
-Date:   Tue, 2 Feb 2021 15:06:05 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Russell King <linux+pull@armlinux.org.uk>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        linux-fbdev@vger.kernel.org, kvm@vger.kernel.org,
-        alsa-devel@alsa-project.org, dri-devel@lists.freedesktop.org,
-        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig.org@pengutronix.de>, linux-i2c@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-rtc@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-input@vger.kernel.org, Mike Leach <mike.leach@linaro.org>,
-        linux-watchdog@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
-        linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-crypto@vger.kernel.org,
-        kernel@pengutronix.de, Leo Yan <leo.yan@linaro.org>,
-        dmaengine@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Vinod Koul <vkoul@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Mark Brown <broonie@kernel.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Subject: Re: [GIT PULL] immutable branch for amba changes targeting v5.12-rc1
-Message-ID: <YBlcTXlxemmC2lgr@kroah.com>
-References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
- <20210202135350.36nj3dmcoq3t7gcf@pengutronix.de>
+        b=CFneDKyiNp/x1cpnR5unToS/CuwUXHXJEVCQdz92PdwdNubg8GGIf5DFIUJxv/cFX
+         SUMlzfH3SqgpbjIf64QxC56MT+TDwD6gVrdhv5SSH9/CMHjS78KR7SPmVAGE+wqaU1
+         Kp2LvNItkEyd3h4QFpvWVyPZEIAQHBxz4Iwp3R8oQXvgMP7Sa4zU6OImzZdgBGyZcu
+         UyfBoeC1KXYczlJrb6ze/DeC52nRFQYCtNOyYMFfTOVI0GAB+9Z0jvKqroDMk8rxZw
+         cJuZRND0porSFY2zcQKH9JPSANa9HIqHBeslgrZ3K7AOV4v5wBV9eIB2WfNU1FoYXM
+         Iclmbsp1jEhoA==
+Date:   Tue, 2 Feb 2021 17:16:58 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Stefan Berger <stefanb@linux.ibm.com>
+Cc:     Stefan Berger <stefanb@linux.vnet.ibm.com>, dhowells@redhat.com,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, patrick@puiterwijk.org
+Subject: Re: [PATCH v3 1/3] x509: Detect sm2 keys by their parameters OID
+Message-ID: <YBls6paPlQ9L797n@kernel.org>
+References: <20210127123350.817593-1-stefanb@linux.vnet.ibm.com>
+ <20210127123350.817593-2-stefanb@linux.vnet.ibm.com>
+ <689c44925d60238181390e775b52809e89e0b26a.camel@kernel.org>
+ <e975bd1e-5256-ea8f-2247-fc362302e647@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210202135350.36nj3dmcoq3t7gcf@pengutronix.de>
+In-Reply-To: <e975bd1e-5256-ea8f-2247-fc362302e647@linux.ibm.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Feb 02, 2021 at 02:53:50PM +0100, Uwe Kleine-König wrote:
-> Hello,
-> 
-> the following changes since commit 5c8fe583cce542aa0b84adc939ce85293de36e5e:
-> 
->   Linux 5.11-rc1 (2020-12-27 15:30:22 -0800)
-> 
-> are available in the Git repository at:
-> 
->   https://git.pengutronix.de/git/ukl/linux tags/amba-make-remove-return-void
-> 
-> for you to fetch changes up to f170b59fedd733b92f58c4d7c8357fbf7601d623:
-> 
->   amba: Make use of bus_type functions (2021-02-02 14:26:02 +0100)
-> 
-> I expect this tag to be merged by Russell King as amba maintainer and by
-> Mathieu Poirier (or Greg Kroah-Hartman?) for coresight as there are some
-> pending conflicting changes. These are not hard to resolve but also
-> non-trivial. Tell me if you need assistance for resolving, also if it's only a
-> second pair of eyes to judge your resolution.
-> 
-> Best regards,
-> Uwe
-> 
-> ----------------------------------------------------------------
-> Tag for adaptions to struct amba_driver::remove changing prototype
-> 
-> ----------------------------------------------------------------
-> Uwe Kleine-König (5):
->       amba: Fix resource leak for drivers without .remove
->       amba: reorder functions
->       vfio: platform: simplify device removal
->       amba: Make the remove callback return void
->       amba: Make use of bus_type functions
-> 
->  drivers/amba/bus.c                                 | 234 +++++++++++++++++++++++++++++++++------------------------------
->  drivers/char/hw_random/nomadik-rng.c               |   3 +-
->  drivers/dma/pl330.c                                |   3 +-
->  drivers/gpu/drm/pl111/pl111_drv.c                  |   4 +-
->  drivers/hwtracing/coresight/coresight-catu.c       |   3 +-
->  drivers/hwtracing/coresight/coresight-cpu-debug.c  |   4 +-
->  drivers/hwtracing/coresight/coresight-cti-core.c   |   4 +-
->  drivers/hwtracing/coresight/coresight-etb10.c      |   4 +-
->  drivers/hwtracing/coresight/coresight-etm3x-core.c |   4 +-
->  drivers/hwtracing/coresight/coresight-etm4x-core.c |   4 +-
->  drivers/hwtracing/coresight/coresight-funnel.c     |   4 +-
->  drivers/hwtracing/coresight/coresight-replicator.c |   4 +-
->  drivers/hwtracing/coresight/coresight-stm.c        |   4 +-
->  drivers/hwtracing/coresight/coresight-tmc-core.c   |   4 +-
->  drivers/hwtracing/coresight/coresight-tpiu.c       |   4 +-
->  drivers/i2c/busses/i2c-nomadik.c                   |   4 +-
->  drivers/input/serio/ambakmi.c                      |   3 +-
->  drivers/memory/pl172.c                             |   4 +-
->  drivers/memory/pl353-smc.c                         |   4 +-
->  drivers/mmc/host/mmci.c                            |   4 +-
->  drivers/rtc/rtc-pl030.c                            |   4 +-
->  drivers/rtc/rtc-pl031.c                            |   4 +-
->  drivers/spi/spi-pl022.c                            |   5 +-
->  drivers/tty/serial/amba-pl010.c                    |   4 +-
->  drivers/tty/serial/amba-pl011.c                    |   3 +-
->  drivers/vfio/platform/vfio_amba.c                  |  15 ++--
->  drivers/video/fbdev/amba-clcd.c                    |   4 +-
->  drivers/watchdog/sp805_wdt.c                       |   4 +-
->  include/linux/amba/bus.h                           |   2 +-
->  sound/arm/aaci.c                                   |   4 +-
->  30 files changed, 157 insertions(+), 198 deletions(-)
+On Sat, Jan 30, 2021 at 09:57:40PM -0500, Stefan Berger wrote:
+> On 1/30/21 4:26 PM, Jarkko Sakkinen wrote:
+> > On Wed, 2021-01-27 at 07:33 -0500, Stefan Berger wrote:
+> > > From: Stefan Berger <stefanb@linux.ibm.com>
+> > > 
+> > > Detect whether a key is an sm2 type of key by its OID in the parameters
+> > > array rather than assuming that everything under OID_id_ecPublicKey
+> > > is sm2, which is not the case.
+> > > 
+> > > Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+> > > ---
+> > >   crypto/asymmetric_keys/x509_cert_parser.c | 13 ++++++++++++-
+> > >   1 file changed, 12 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+> > > index 52c9b455fc7d..4643fe5ed69a 100644
+> > > --- a/crypto/asymmetric_keys/x509_cert_parser.c
+> > > +++ b/crypto/asymmetric_keys/x509_cert_parser.c
+> > > @@ -459,6 +459,7 @@ int x509_extract_key_data(void *context, size_t hdrlen,
+> > >                            const void *value, size_t vlen)
+> > >   {
+> > >          struct x509_parse_context *ctx = context;
+> > > +       enum OID oid;
+> > >          ctx->key_algo = ctx->last_oid;
+> > >          switch (ctx->last_oid) {
+> > > @@ -470,7 +471,17 @@ int x509_extract_key_data(void *context, size_t hdrlen,
+> > >                  ctx->cert->pub->pkey_algo = "ecrdsa";
+> > >                  break;
+> > >          case OID_id_ecPublicKey:
+> > > -               ctx->cert->pub->pkey_algo = "sm2";
+> > > +               if (ctx->params_size < 2)
+> > Either a named constant, or at least a comment instead of just '2'.
 > 
 > 
+> I will look at the 2 entries whether they contain the expected values:
+> ASN1_OID and length
+> 
+> Thanks!
+> 
+>    Stefan
 
+Just add inline comment that explains that.
 
-I'm glad to take this through my char/misc tree, as that's where the
-other coresight changes flow through.  So if no one else objects, I will
-do so...
-
-thanks,
-
-greg k-h
+/Jarkko
