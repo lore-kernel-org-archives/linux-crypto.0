@@ -2,83 +2,140 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C2E3C433DB
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 10:17:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EAB8C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 10:51:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 024A264F37
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 10:17:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D3ACE64EE0
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 10:51:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230057AbhBBKRp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Feb 2021 05:17:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36329 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229910AbhBBKRo (ORCPT
+        id S229657AbhBBKvk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Feb 2021 05:51:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37114 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229537AbhBBKvj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Feb 2021 05:17:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612260978;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UWa3LXPXqIVneiRS3QkAQMD91cENY/6/bkRppJ2Ix0w=;
-        b=MsOE8XZzBlmvueRhYV6b0dbN2nd8FCQwzhqV+FkXl6Vh1virEpKNooD/yvxlDYjq1dETks
-        XTlhyab03u61yXlwNwmB4kZdclDAnSCjrB7RsL25pTgw2sq88iS6xzLbnkhEv02DVeSpUg
-        gJLj0QxivpbsIWXhRXKYirnUUzyen4c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-BQlfz_MOONuY-4HtmZ_-eA-1; Tue, 02 Feb 2021 05:16:14 -0500
-X-MC-Unique: BQlfz_MOONuY-4HtmZ_-eA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5AB7A1005E61;
-        Tue,  2 Feb 2021 10:16:13 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A0D5010016FB;
-        Tue,  2 Feb 2021 10:16:11 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20210202094241.GB28856@gondor.apana.org.au>
-References: <20210202094241.GB28856@gondor.apana.org.au> <20210202085537.GA28682@gondor.apana.org.au> <20210202035655.GA26997@gondor.apana.org.au> <58935b00f65e389e9ae3da2425d06bd88d280e43.camel@linux.ibm.com> <20210129150355.850093-3-stefanb@linux.vnet.ibm.com> <20210129150355.850093-1-stefanb@linux.vnet.ibm.com> <4162801.1612185801@warthog.procyon.org.uk> <71a77d10-e645-194f-5073-ebf180a8d70e@linux.ibm.com> <4170408.1612192055@warthog.procyon.org.uk> <110279.1612254455@warthog.procyon.org.uk> <114435.1612258403@warthog.procyon.org.uk>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     dhowells@redhat.com, Mimi Zohar <zohar@linux.ibm.com>,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
-        linux-integrity@vger.kernel.org,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: Re: [PATCH v5 2/4] x509: Detect sm2 keys by their parameters OID
+        Tue, 2 Feb 2021 05:51:39 -0500
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51DB0C061573;
+        Tue,  2 Feb 2021 02:50:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+        Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+        Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=QUFoL1M4pevTeMyLwnDogHEMlQrHMZssskb6wG1LFcA=; b=wg2o6QP/gHbhqBuIhn1RZoUGj
+        2iHotGU7ufXkLAWPw4UwYFPNHzUu8ddsLF6ZH7DAZK9ibPxZPao37pY3QUiSj2kNvPg18QoU3RIbp
+        SB9YdTsgzRp09KPTWE899TVtBN6b7+9uCVpM084z3RB+393ttTKlzy9IbXmuACxRaE7AQP1axErmx
+        9bdLyqL5Tzp+2AR1s8H8Ra8HKPn+VaEgvK7MKLCh/WvBYIcLxWRrMqhYn6+wAR7lOhqYiExSBYnla
+        2ZSGKUuSlOCD0mvUg9A5mz9A1bzzWPt0jeQ/XhpyrV3IGp6JHZ9fsbmIMsvJ8Mev9a6w8QLTZD9/a
+        CRpSMItzA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38176)
+        by pandora.armlinux.org.uk with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <linux@armlinux.org.uk>)
+        id 1l6tFN-0004FH-LS; Tue, 02 Feb 2021 10:49:25 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.92)
+        (envelope-from <linux@shell.armlinux.org.uk>)
+        id 1l6tFE-0002yZ-0J; Tue, 02 Feb 2021 10:49:16 +0000
+Date:   Tue, 2 Feb 2021 10:49:15 +0000
+From:   Russell King - ARM Linux admin <linux@armlinux.org.uk>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Vinod Koul <vkoul@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Mark Brown <broonie@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-kernel@vger.kernel.org,
+        kernel@pengutronix.de,
+        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig.org@pengutronix.de>,
+        Mike Leach <mike.leach@linaro.org>,
+        Leo Yan <leo.yan@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, coresight@lists.linaro.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-watchdog@vger.kernel.org, alsa-devel@alsa-project.org
+Subject: Re: [PATCH v3 0/5] amba: minor fix and various cleanups
+Message-ID: <20210202104915.GK1463@shell.armlinux.org.uk>
+References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <224266.1612260970.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 02 Feb 2021 10:16:10 +0000
-Message-ID: <224267.1612260970@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Sender: Russell King - ARM Linux admin <linux@armlinux.org.uk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Tue, Jan 26, 2021 at 05:58:30PM +0100, Uwe Kleine-König wrote:
+> From: Uwe Kleine-König <u.kleine-koenig.org@pengutronix.de
+> 
+> Hello,
+> 
+> Changes since v2 sent with Message-Id:
+> 20201124133139.3072124-1-uwe@kleine-koenig.org:
+> 
+>  - Rebase to v5.11-rc1 (which resulted in a few conflicts in
+>    drivers/hwtracing).
+>  - Add various Acks.
+>  - Send to more maintainers directly (which I think is one of the
+>    reasons why there are so few Acks).
+> 
+> For my taste patch 4 needs some more acks (drivers/char/hw_random,
+> drivers/dma, drivers/gpu/drm/pl111, drivers/i2c, drivers/mmc,
+> drivers/vfio, drivers/watchdog and sound/arm have no maintainer feedback
+> yet).
+> 
+> My suggestion is to let this series go in via Russell King (who cares
+> for amba). Once enough Acks are there I can also provide a tag for
+> merging into different trees. Just tell me if you prefer this solution.
+> 
+> Would be great if this could make it for v5.12, but I'm aware it's
+> already late in the v5.11 cycle so it might have to wait for v5.13.
 
-> > No idea.  It seems straightforward enough, at least on the keyrings si=
-de, that
-> > I was going to add it.
-> =
+I think you need to have a 6th patch which moves the
+probe/remove/shutdown methods into the bus_type - if you're setting
+them for every struct device_driver, then there's no point doing that
+and they may as well be in the bus_type.
 
-> In that case please wait for the discussion on how we handle curves
-> to be finalised.
+Apart from that, it looks good.
 
-Sure.  Will do.
-
-David
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
