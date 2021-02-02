@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A5A1C433E9
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 15:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E25ADC43381
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 15:54:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB93B64DD6
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 15:48:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4CC864F4B
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 15:54:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232580AbhBBPrL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Feb 2021 10:47:11 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38256 "EHLO mail.kernel.org"
+        id S235875AbhBBPyf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Feb 2021 10:54:35 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39434 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234897AbhBBPNf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Feb 2021 10:13:35 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B3A7A64F96;
-        Tue,  2 Feb 2021 15:07:18 +0000 (UTC)
+        id S234314AbhBBPMZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Feb 2021 10:12:25 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 872EE64F83;
+        Tue,  2 Feb 2021 15:06:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612278439;
-        bh=oJfyoLsy9Z5KwuKPh05Zd9pPRALtStDgdIMxx2am3yQ=;
+        s=k20201202; t=1612278418;
+        bh=Xoc3D3Vb9QytZoLID/45JrYSj/6qztyL6T52HDnzfL8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qb7nODvTH8JHJY5YfT7WT87h5ctUnEXQBhqX9T862Zm0RoOJ8QSQoUxU4GGFPbD1M
-         CUurK0ZFBAcTbxRgqaHF65u+ix+giuMKV/DXngH38UAd63e33330Iqol100NgghPU6
-         G8nDLCRWKXF5CC4m47Phn0dk6w5Dl1PDn3RlDhg5MZmQbrx5wDGkdgysXxfIO7FODs
-         IJtRHBXmLKjsyRqDXQYKcBTMnorR2txyveylDrqNBFyWST3y5L4VMhPMC+Oq6h+EWm
-         0XhHBFRUbHmQ2GSm51fptzuOq+/kTO2RAvovsLHD3hBx/2dm+As+PT3+NbGlCTTvGL
-         iPoKtS/mXF3sg==
+        b=S7BCvTFPxIKAV7uWXKBwrExnfjFqErGgmZ6DoP0CN7wL8wRh+GB6v6O5fEIlK1tgj
+         mGUAEKcg7iQatOr5Y9aDnpnykHxaLaKuqtaS+LHkQCjT/E7SpQd5zxoZrpy1tvCxlW
+         IA2F6ZKRU6AWBOx8/AliFoypwTEspVnFwVtYiutauCFlge4WXbMY4QfoyrLGAL94JZ
+         tY6Gyc9jPPcvM8wsAmNG+daIp23B1TVnUHkJjHsy79IflROzRiBI8Gc81j8eUNefma
+         l4pnRXRfh1JiJZ5VLhsBtOLv+Lvvzqe4RLBeLX70c5gdCVb3TtEeB4iSYulTUfuSZL
+         I9Tv/tY4EzWhA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Pan Bian <bianpan2016@163.com>, Jakub Kicinski <kuba@kernel.org>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 03/10] chtls: Fix potential resource leak
-Date:   Tue,  2 Feb 2021 10:07:07 -0500
-Message-Id: <20210202150715.1864614-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 05/17] chtls: Fix potential resource leak
+Date:   Tue,  2 Feb 2021 10:06:39 -0500
+Message-Id: <20210202150651.1864426-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210202150715.1864614-1-sashal@kernel.org>
-References: <20210202150715.1864614-1-sashal@kernel.org>
+In-Reply-To: <20210202150651.1864426-1-sashal@kernel.org>
+References: <20210202150651.1864426-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -66,11 +66,11 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/chelsio/chtls/chtls_cm.c b/drivers/crypto/chelsio/chtls/chtls_cm.c
-index fd3092a4378e4..08ed3ff8b255f 100644
+index eddc6d1bdb2d1..82b76df43ae57 100644
 --- a/drivers/crypto/chelsio/chtls/chtls_cm.c
 +++ b/drivers/crypto/chelsio/chtls/chtls_cm.c
-@@ -1051,11 +1051,9 @@ static struct sock *chtls_recv_sock(struct sock *lsk,
- 	tcph = (struct tcphdr *)(iph + 1);
+@@ -1047,11 +1047,9 @@ static struct sock *chtls_recv_sock(struct sock *lsk,
+ 
  	n = dst_neigh_lookup(dst, &iph->saddr);
  	if (!n || !n->dev)
 -		goto free_sk;
