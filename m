@@ -2,79 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 638D9C4332B
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 09:35:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA3E4C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 09:44:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 34F4264F6A
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 09:35:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62E5264DA8
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 09:44:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232948AbhBBJfd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Feb 2021 04:35:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58986 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232741AbhBBJe5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Feb 2021 04:34:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612258411;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6LJM+19s3E1PYrGOVy7eL/hPhE6m39946JYABim2wbg=;
-        b=TLUgtyfA5WxmBZlYYTbLTGfxhr2jeNbb7eJOX+oH00vy0UtoShfheFrpViK6Z+hpIrqQhy
-        4X1ZHHev/AzoBaHjYas4SeoBMxWUxjahUukiVNcg6LbcNfYE71Rf+SCwwIwBWG0xK3CH3Y
-        EpylkSmhmlr2c367JvXZXa3FkFAl1a4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-vRaAA1sZOWiQWGE52tiRRg-1; Tue, 02 Feb 2021 04:33:27 -0500
-X-MC-Unique: vRaAA1sZOWiQWGE52tiRRg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC624190B2A1;
-        Tue,  2 Feb 2021 09:33:25 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E07B519717;
-        Tue,  2 Feb 2021 09:33:23 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20210202085537.GA28682@gondor.apana.org.au>
-References: <20210202085537.GA28682@gondor.apana.org.au> <20210202035655.GA26997@gondor.apana.org.au> <58935b00f65e389e9ae3da2425d06bd88d280e43.camel@linux.ibm.com> <20210129150355.850093-3-stefanb@linux.vnet.ibm.com> <20210129150355.850093-1-stefanb@linux.vnet.ibm.com> <4162801.1612185801@warthog.procyon.org.uk> <71a77d10-e645-194f-5073-ebf180a8d70e@linux.ibm.com> <4170408.1612192055@warthog.procyon.org.uk> <110279.1612254455@warthog.procyon.org.uk>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     dhowells@redhat.com, Mimi Zohar <zohar@linux.ibm.com>,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
-        linux-integrity@vger.kernel.org,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: Re: [PATCH v5 2/4] x509: Detect sm2 keys by their parameters OID
+        id S229593AbhBBJo0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Feb 2021 04:44:26 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:44810 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229557AbhBBJnH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Feb 2021 04:43:07 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1l6sCB-0006Z7-K4; Tue, 02 Feb 2021 20:42:04 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 02 Feb 2021 20:42:03 +1100
+Date:   Tue, 2 Feb 2021 20:42:03 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     "Alessandrelli, Daniele" <daniele.alessandrelli@intel.com>
+Cc:     "Khurana, Prabhjot" <prabhjot.khurana@intel.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "Reshetova, Elena" <elena.reshetova@intel.com>,
+        "mgross@linux.intel.com" <mgross@linux.intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "xuzaibo@huawei.com" <xuzaibo@huawei.com>,
+        "wangzhou1@hisilicon.com" <wangzhou1@hisilicon.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "yumeng18@huawei.com" <yumeng18@huawei.com>
+Subject: Re: [PATCH v7 4/7] crypto: add ecc curve and expose them
+Message-ID: <20210202094203.GA28856@gondor.apana.org.au>
+References: <1611299395-675-1-git-send-email-yumeng18@huawei.com>
+ <1611299395-675-5-git-send-email-yumeng18@huawei.com>
+ <20210128050354.GA30874@gondor.apana.org.au>
+ <CAMj1kXHvY9JveFyhtETALCH=AFGMGVbGGFMNDGc6ZVngEKbyDQ@mail.gmail.com>
+ <20210128103908.GA32495@gondor.apana.org.au>
+ <c3c3d47edbfd61c338deea5a10a4fb39e2ace68a.camel@linux.intel.com>
+ <20210202051346.GB27641@gondor.apana.org.au>
+ <f239c77dd510c860254189b65fa297d039041490.camel@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <114434.1612258403.1@warthog.procyon.org.uk>
-Date:   Tue, 02 Feb 2021 09:33:23 +0000
-Message-ID: <114435.1612258403@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f239c77dd510c860254189b65fa297d039041490.camel@intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Tue, Feb 02, 2021 at 09:27:33AM +0000, Alessandrelli, Daniele wrote:
+>
+> I see. Just to clarify: does the in-kernel user requirement also apply
+> to the case when the author of a device driver also provides the
+> software implementation for the new algorithms supported by device
+> driver / HW?
 
-> > Should I defer it till the next merge window?
-> 
-> Is there any specific reason why this has to be in the current
-> one?
+Yes we need an actual user.  For example, if your algorithm is used
+by the Security Subsystem (IMA) that would be sufficient.
 
-No idea.  It seems straightforward enough, at least on the keyrings side, that
-I was going to add it.
-
-David
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
