@@ -2,65 +2,64 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEA6BC433DB
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 03:18:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD77AC433DB
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 03:58:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A0F2464E9C
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 03:18:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E97D64ED4
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Feb 2021 03:58:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229624AbhBBDSS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Feb 2021 22:18:18 -0500
-Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:49330 "EHLO
-        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231356AbhBBDSS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Feb 2021 22:18:18 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0UNdkwIN_1612235852;
-Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0UNdkwIN_1612235852)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 02 Feb 2021 11:17:32 +0800
-From:   Yang Li <yang.lee@linux.alibaba.com>
-To:     herbert@gondor.apana.org.au
-Cc:     davem@davemloft.net, mpe@ellerman.id.au, benh@kernel.crashing.org,
-        paulus@samba.org, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        Yang Li <yang.lee@linux.alibaba.com>
-Subject: [PATCH] crypto: powerpc: remove unneeded semicolon
-Date:   Tue,  2 Feb 2021 11:17:30 +0800
-Message-Id: <1612235850-87446-1-git-send-email-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S231434AbhBBD5v (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Feb 2021 22:57:51 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:43600 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231194AbhBBD5v (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 1 Feb 2021 22:57:51 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1l6moB-0000J9-Is; Tue, 02 Feb 2021 14:56:56 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 02 Feb 2021 14:56:55 +1100
+Date:   Tue, 2 Feb 2021 14:56:55 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Mimi Zohar <zohar@linux.ibm.com>,
+        Stefan Berger <stefanb@linux.ibm.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
+        linux-integrity@vger.kernel.org,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [PATCH v5 2/4] x509: Detect sm2 keys by their parameters OID
+Message-ID: <20210202035655.GA26997@gondor.apana.org.au>
+References: <58935b00f65e389e9ae3da2425d06bd88d280e43.camel@linux.ibm.com>
+ <20210129150355.850093-3-stefanb@linux.vnet.ibm.com>
+ <20210129150355.850093-1-stefanb@linux.vnet.ibm.com>
+ <4162801.1612185801@warthog.procyon.org.uk>
+ <71a77d10-e645-194f-5073-ebf180a8d70e@linux.ibm.com>
+ <4170408.1612192055@warthog.procyon.org.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4170408.1612192055@warthog.procyon.org.uk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Eliminate the following coccicheck warning:
-./arch/powerpc/crypto/sha256-spe-glue.c:132:2-3: Unneeded
-semicolon
+On Mon, Feb 01, 2021 at 03:07:35PM +0000, David Howells wrote:
+>
+> Herbert wants the first patch to go through the crypto tree.  Maybe all of
+> them should proceed by that route if Herbert is willing?
 
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
----
- arch/powerpc/crypto/sha256-spe-glue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I'm not actually all that fussed about where it goes through.  It's
+just the first patch happens to touch an area that is still under
+discussion for the Crypto API.  So once that's settled I'm more than
+happy for it to go through your tree if that's the easiest way to go.
 
-diff --git a/arch/powerpc/crypto/sha256-spe-glue.c b/arch/powerpc/crypto/sha256-spe-glue.c
-index a6e650a..ffedea7 100644
---- a/arch/powerpc/crypto/sha256-spe-glue.c
-+++ b/arch/powerpc/crypto/sha256-spe-glue.c
-@@ -129,7 +129,7 @@ static int ppc_spe_sha256_update(struct shash_desc *desc, const u8 *data,
- 
- 		src += bytes;
- 		len -= bytes;
--	};
-+	}
- 
- 	memcpy((char *)sctx->buf, src, len);
- 	return 0;
+Cheers,
 -- 
-1.8.3.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
