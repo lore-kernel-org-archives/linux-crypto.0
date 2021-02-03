@@ -2,166 +2,73 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9930C433E9
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 08:23:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6515DC433DB
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 09:28:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 678E464F69
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 08:23:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CA7964F95
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 09:28:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232784AbhBCIXU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Feb 2021 03:23:20 -0500
-Received: from new3-smtp.messagingengine.com ([66.111.4.229]:59043 "EHLO
-        new3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232445AbhBCIXS (ORCPT
+        id S233406AbhBCJ1u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 3 Feb 2021 04:27:50 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:12408 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233448AbhBCJZ6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Feb 2021 03:23:18 -0500
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailnew.nyi.internal (Postfix) with ESMTP id CDA5E5801CA;
-        Wed,  3 Feb 2021 03:22:31 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Wed, 03 Feb 2021 03:22:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cerno.tech; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm2; bh=UWp3cTR8UlCtxWWrylu98BqrLP6
-        gokgH/+UUDAES7bc=; b=izBbaIxXq3u1WterMcXA8m478hwLEeJutIS8a7YuYeZ
-        Vi42oiGsRDqrSULcHG4xVSAcpkY2A6VtaJRm+E10OqdMwfujpp4DItI6jMUiv27W
-        RGmEiChWp37gV/KSCL5kJtvUmeezEQQ+B0bg4eBrX9Ahsk5I7QTaJzW9ekWX7h2y
-        QFzAfml9CQjZ3FKCgWLYtFoAhzWdrQfr2rIGL5xDp+d2LLJqgwoKjSDeOGsjR2rP
-        Fm2pPQHoj22jpf1RufSNs4FYfJrP0PI2Rw/X59WziKhkRKDgKDC5lZRpb39NIzZp
-        vcAGde6weuPh658VEl9059ls9Uu/Vi1AvALTccKurkA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=UWp3cT
-        R8UlCtxWWrylu98BqrLP6gokgH/+UUDAES7bc=; b=t1KBEuFc49+xMxqyXKoA8/
-        3WulD3tIJgeVT7eIlcnWMsTdXmZB6jEs0TTx1IWwOhZ9dFEQ0dFcSuMicV6ydQx8
-        iu8rMQyX2ej1yEI2wkUSvDpWum0PQTLN8s5pyFRQBcTsKGEzK8sSnm1BrjKbQjqP
-        eSoEWze8EyVg+zYeYpnxcX3NeVQGARYhkm2Vi5AR3/oj94MHf2xCwOW4PM9dBnvu
-        xmyYMwqcexvQGIBcW/BFr3KBbHQl0WIm2ab/sdLmnmaryM1x4LWmagh5WQBwNSFu
-        x5qWRhy1aPzLiKnrPQRGC60avUBAVBRELf3vfo4zXU8VsUY+3YrgE/k8dPrLbxIg
-        ==
-X-ME-Sender: <xms:QV0aYFcXyYQ5TRYF7WGlLELFRJ1yQrOtHhDhPTipbdc2SMX1x6avng>
-    <xme:QV0aYDKbQJPLw9pI2uDq_kM1o2gSVmuw6NUgK-0koA0owfmY95Lzv5Weugu-XmQH9
-    93sR2yeFpxpTbVhM1Q>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrgedugdduudelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvffukfhfgggtuggjsehgtderredttddvnecuhfhrohhmpeforgigihhm
-    vgcutfhiphgrrhguuceomhgrgihimhgvsegtvghrnhhordhtvggthheqnecuggftrfgrth
-    htvghrnhepleekgeehhfdutdeljefgleejffehfffgieejhffgueefhfdtveetgeehieeh
-    gedunecukfhppeeltddrkeelrdeikedrjeeinecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepmhgrgihimhgvsegtvghrnhhordhtvggthh
-X-ME-Proxy: <xmx:QV0aYLb1Lc2GX4BVZHDPMIXgosvMbTnsa4utNq8m25HOwmKHKexoSw>
-    <xmx:QV0aYGsPxsALW4VvASQluws1JKhNT-dddtY-lQD2QtZfe8BSp71ccA>
-    <xmx:QV0aYAu80RUvGgUCDStecBY7uxawxEupGRT2YOBtRmQT3b7gK2f1tA>
-    <xmx:R10aYMJuTiGgAhdHzPiQSUSFePWiskGLbKXQEI-JgoTQwKfIw7bxkg>
-Received: from localhost (lfbn-tou-1-1502-76.w90-89.abo.wanadoo.fr [90.89.68.76])
-        by mail.messagingengine.com (Postfix) with ESMTPA id D9835240066;
-        Wed,  3 Feb 2021 03:22:24 -0500 (EST)
-Date:   Wed, 3 Feb 2021 09:22:22 +0100
-From:   Maxime Ripard <maxime@cerno.tech>
-To:     Rob Herring <robh@kernel.org>
-Cc:     devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Stephen Boyd <sboyd@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Daniel Palmer <daniel@thingy.jp>,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
-        Avi Fishman <avifishman70@gmail.com>,
-        Tomer Maimon <tmaimon77@gmail.com>,
-        Tali Perry <tali.perry1@gmail.com>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Joel Stanley <joel@jms.id.au>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Vincent Cheng <vincent.cheng.xh@renesas.com>,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-watchdog@vger.kernel.org,
-        Eric Anholt <eric@anholt.net>,
-        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Pavel Machek <pavel@ucw.cz>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        dri-devel@lists.freedesktop.org, linux-leds@vger.kernel.org,
-        linux-mmc@vger.kernel.org
-Subject: Re: [PATCH 3/3] dt-bindings: Fix errors in 'if' schemas
-Message-ID: <20210203082222.z27map6smi2x7ry7@gilmour>
-References: <20210202205544.24812-1-robh@kernel.org>
- <20210202205544.24812-3-robh@kernel.org>
+        Wed, 3 Feb 2021 04:25:58 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DVx8B0ZGszjHHh;
+        Wed,  3 Feb 2021 17:24:10 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.498.0; Wed, 3 Feb 2021 17:25:09 +0800
+From:   Tian Tao <tiantao6@hisilicon.com>
+To:     <sumit.garg@linaro.org>, <herbert@gondor.apana.org.au>
+CC:     <op-tee@lists.trustedfirmware.org>, <linux-crypto@vger.kernel.org>
+Subject: [PATCH] hwrng: optee -: Use device-managed registration API
+Date:   Wed, 3 Feb 2021 17:24:48 +0800
+Message-ID: <1612344288-12201-1-git-send-email-tiantao6@hisilicon.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="mkorhjmes6qelxs4"
-Content-Disposition: inline
-In-Reply-To: <20210202205544.24812-3-robh@kernel.org>
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Use devm_hwrng_register to get rid of manual unregistration.
 
---mkorhjmes6qelxs4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
+---
+ drivers/char/hw_random/optee-rng.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-On Tue, Feb 02, 2021 at 02:55:44PM -0600, Rob Herring wrote:
-> Properties in if/then schemas weren't getting checked by the meta-schemas.
-> Enabling meta-schema checks finds several errors.
->=20
-> The use of an 'items' schema (as opposed to the list form) is wrong in
-> some cases as it applies to all entries. 'contains' is the correct schema
-> to use in the case of multiple entries.
->=20
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Maxime Ripard <mripard@kernel.org>
-> Cc: Chen-Yu Tsai <wens@csie.org>
-> Cc: Eric Anholt <eric@anholt.net>
-> Cc: Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
-> Cc: Florian Fainelli <f.fainelli@gmail.com>
-> Cc: Ray Jui <rjui@broadcom.com>
-> Cc: Scott Branden <sbranden@broadcom.com>
-> Cc: Pavel Machek <pavel@ucw.cz>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> Cc: Kishon Vijay Abraham I <kishon@ti.com>
-> Cc: Vinod Koul <vkoul@kernel.org>
-> Cc: Geert Uytterhoeven <geert+renesas@glider.be>
-> Cc: Linus Walleij <linus.walleij@linaro.org>
-> Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: dri-devel@lists.freedesktop.org
-> Cc: linux-leds@vger.kernel.org
-> Cc: linux-mmc@vger.kernel.org
-> Cc: linux-gpio@vger.kernel.org
-> Signed-off-by: Rob Herring <robh@kernel.org>
+diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
+index a99d829..135a825 100644
+--- a/drivers/char/hw_random/optee-rng.c
++++ b/drivers/char/hw_random/optee-rng.c
+@@ -243,7 +243,7 @@ static int optee_rng_probe(struct device *dev)
+ 	if (err)
+ 		goto out_sess;
+ 
+-	err = hwrng_register(&pvt_data.optee_rng);
++	err = devm_hwrng_register(dev, &pvt_data.optee_rng);
+ 	if (err) {
+ 		dev_err(dev, "hwrng registration failed (%d)\n", err);
+ 		goto out_sess;
+@@ -263,7 +263,6 @@ static int optee_rng_probe(struct device *dev)
+ 
+ static int optee_rng_remove(struct device *dev)
+ {
+-	hwrng_unregister(&pvt_data.optee_rng);
+ 	tee_client_close_session(pvt_data.ctx, pvt_data.session_id);
+ 	tee_client_close_context(pvt_data.ctx);
+ 
+-- 
+2.7.4
 
-Acked-by: Maxime Ripard <mripard@kernel.org>
-
-Maxime
-
---mkorhjmes6qelxs4
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRcEzekXsqa64kGDp7j7w1vZxhRxQUCYBpdPgAKCRDj7w1vZxhR
-xRUtAP94Y18dPhOCV8TVxavL7kG7XsboIrsPGFEgK0eLh1EFVgD/Z52O0dog31tF
-YkN66sClBd92y+lqf0Ark2e+vBrqFwU=
-=Zd51
------END PGP SIGNATURE-----
-
---mkorhjmes6qelxs4--
