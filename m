@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 987FFC433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAFFC433E6
 	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 14:35:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5A6A464F8D
+	by mail.kernel.org (Postfix) with ESMTP id A12FF64D5D
 	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 14:35:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233041AbhBCOfh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Feb 2021 09:35:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56206 "EHLO
+        id S232901AbhBCOfm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 3 Feb 2021 09:35:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232725AbhBCOes (ORCPT
+        with ESMTP id S233014AbhBCOfN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Feb 2021 09:34:48 -0500
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36B96C061351
-        for <linux-crypto@vger.kernel.org>; Wed,  3 Feb 2021 06:33:17 -0800 (PST)
-Received: by mail-qt1-x82c.google.com with SMTP id e11so30628qtg.6
-        for <linux-crypto@vger.kernel.org>; Wed, 03 Feb 2021 06:33:17 -0800 (PST)
+        Wed, 3 Feb 2021 09:35:13 -0500
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94DDBC061352
+        for <linux-crypto@vger.kernel.org>; Wed,  3 Feb 2021 06:33:18 -0800 (PST)
+Received: by mail-qt1-x832.google.com with SMTP id n8so9286707qtp.5
+        for <linux-crypto@vger.kernel.org>; Wed, 03 Feb 2021 06:33:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=KjZ2FfLW1/QZmo1tCtVZh16jkU5d2sBI2rN7J1hvIYw=;
-        b=qAx/D5BiFOnHn97BwkyayC1pEdlp7lg77Shm0+zyftyMKEovfrABt1m7MxpP79jjje
-         KPXkPgBjt/8U0iwg8lE/T2xE+Dg8QuAhVg/y4pkK0tCUVLamzZLRd578KdhzBlr2Pr4C
-         puSlgFZfFMwbRyCF1ztVHI3blsfqH458We9sol4zp2Pca+ijbrZnCwHk8+aFJU/F5P2p
-         TnJ2MDQ46kEpZdpwD/w+1a1uQ5gvXNE8GYISkqXswP7YbMJ2PW4jfj8dvV1mU4UyjyDb
-         GlqLh0AK8LZpLGV+at6AesnQWxLCw1ZQRZRlpkRdZ3w7JigOo01gOLhl8IXEgyPm6uTC
-         1cWA==
+        bh=KOavuKeXCTpivEkIf3Cid67Tg4gQisaxPtYIjIwqF5A=;
+        b=tjXUrpvU7pHWfvrvXYj/S15x4BbX3W+mjPb6BS8ryOz/85daM47ObxCtHodeYCxQrs
+         5H2IowtHfDUNpKVD9BWvigJOS4NTjFhJ3PnNxCZhvwcWHbRkVGHHI/DRpNZD2yKnHZjP
+         5E3hngtmLEV8rcf4BdcUFJUUAGzj3yrCo5aBDdkj9BRSVHsZdZzABtBeidTjwio/YfeI
+         jcdBUdhQNK0gv+EIiSCAHEblbtKVrIjPmeiX5FVLCAflU/5FQKb/4hSuCa/XIpEi7gWP
+         VfGo8MOKtpiWBoKL0NOG8tV4nXEP0IO/HM+ODDmAgp7JZgvKrIVhyROilTzfwTulVxgo
+         +2Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=KjZ2FfLW1/QZmo1tCtVZh16jkU5d2sBI2rN7J1hvIYw=;
-        b=l8tsmZLBYjUQSr8XkLkY9BYtz7uYs7bySlKA9gLncfgaydWmBn5XV424I9tNlfqlEE
-         tKjYTClZV0UC7rlkpqJ5DGfchBlRPAqNQxQ0lYIpoRcdkHTUV1h05RBZNlCVHvBq8hdk
-         qjUKmwxcF/t5hrWPbWofHt2TesVMr2xRKcsV6XS3xIM2wu1lp0ABz+l+iCoI7k4B1Rsk
-         SzIOGP1gnLMp8RQkitBfQGjuAq6ysfV9P9Sm37z6yR9m9aJPnqV40QxK585/RqRkwALb
-         yXEAQ15I6YC/hlqaA+ZYeX1+kRsEhozvZXK/3GeXDRSxRj2xUqIVjt+NFxyLJcuUEzT3
-         CtGg==
-X-Gm-Message-State: AOAM531tGku2ebpKXk/5NjXCvC6DBsvU/YBWaWdMEfAnbmpoBVKUZ7cK
-        VgJvOqR+VPzhMUbRw3/ea0KG4Q==
-X-Google-Smtp-Source: ABdhPJyGTyzCp2GcprImfbxOpOGqHMbDBWnrcqGGWqNA2JyY99Gwid+Drcm45EP97wXKbPmXMgvkIA==
-X-Received: by 2002:ac8:5ac9:: with SMTP id d9mr2534250qtd.123.1612362796444;
-        Wed, 03 Feb 2021 06:33:16 -0800 (PST)
+        bh=KOavuKeXCTpivEkIf3Cid67Tg4gQisaxPtYIjIwqF5A=;
+        b=ebLB6RF4Fg8uk8wynZDvS/b9CrTVEd2puT/MTEsEY6pyhDOK6Za9WZZpD4i/zyVcTr
+         wMLWEh0Ny6JN/3gRwT4HH2HP+XeoREKWxtW5YJQpuwZ3WlqW39YLq0XhAec2zA9S32E6
+         53jGCt+g3pkANOJS0/fJNot4C74Y40KzNJvVlG5Zz5ckWoWpbLriL1nJudnZ7AXj96o1
+         6df+DV1lzmTNSkTJwAeKgThDcFO9isgpJqkZYYAIAMWxsFvOURpdHkCCj/7izLsQ+MSk
+         rwM2X/SCarHeQb8G4cKnWnSJmD/+hsnWsgN9WB672LBUACD3xK9WcwbaTo9JNGvXOqZl
+         k/kA==
+X-Gm-Message-State: AOAM533PXLog0jGJ7i2esfcNlajql0LORiQKNrjPOZKMkXQPJO1/h/iZ
+        kzhyrgo2N2AW/V/X9Cru0i18KdWgZbTxUw==
+X-Google-Smtp-Source: ABdhPJya8VcEXlABKEPBA544rBPRKObiaVqJx5U86UGjhsGhwW8JWAWTlsLJOCbvohVfEmmm2+Xmtw==
+X-Received: by 2002:ac8:5a0e:: with SMTP id n14mr2670962qta.370.1612362797856;
+        Wed, 03 Feb 2021 06:33:17 -0800 (PST)
 Received: from pop-os.fios-router.home (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.googlemail.com with ESMTPSA id v15sm1775433qkv.36.2021.02.03.06.33.15
+        by smtp.googlemail.com with ESMTPSA id v15sm1775433qkv.36.2021.02.03.06.33.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Feb 2021 06:33:15 -0800 (PST)
+        Wed, 03 Feb 2021 06:33:17 -0800 (PST)
 From:   Thara Gopinath <thara.gopinath@linaro.org>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         bjorn.andersson@linaro.org
 Cc:     ebiggers@google.com, ardb@kernel.org, sivaprak@codeaurora.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v4 07/11] crypto: qce: skcipher: Set ivsize to 0 for ecb(aes)
-Date:   Wed,  3 Feb 2021 09:33:03 -0500
-Message-Id: <20210203143307.1351563-8-thara.gopinath@linaro.org>
+Subject: [PATCH v4 08/11] crypto: qce: skcipher: Improve the conditions for requesting AES fallback cipher
+Date:   Wed,  3 Feb 2021 09:33:04 -0500
+Message-Id: <20210203143307.1351563-9-thara.gopinath@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210203143307.1351563-1-thara.gopinath@linaro.org>
 References: <20210203143307.1351563-1-thara.gopinath@linaro.org>
@@ -73,27 +73,49 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-ECB transformations do not have an IV and hence set the ivsize to 0 for
-ecb(aes).
+The following are the conditions for requesting AES fallback cipher.
+	-  AES-192
+	- AES-XTS request with len <= 512 byte (Allow messages of length
+	  less than 512 bytes for all other AES encryption algorithms other
+	  than AES XTS)
+	- AES-XTS request with len > QCE_SECTOR_SIZE and is not a multiple
+	  of it
 
 Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
 ---
- drivers/crypto/qce/skcipher.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/qce/skcipher.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/crypto/qce/skcipher.c b/drivers/crypto/qce/skcipher.c
-index 28bea9584c33..10e85b1fc0fd 100644
+index 10e85b1fc0fd..8599250946b7 100644
 --- a/drivers/crypto/qce/skcipher.c
 +++ b/drivers/crypto/qce/skcipher.c
-@@ -356,7 +356,7 @@ static const struct qce_skcipher_def skcipher_def[] = {
- 		.name		= "ecb(aes)",
- 		.drv_name	= "ecb-aes-qce",
- 		.blocksize	= AES_BLOCK_SIZE,
--		.ivsize		= AES_BLOCK_SIZE,
-+		.ivsize		= 0,
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
- 	},
+@@ -277,14 +277,19 @@ static int qce_skcipher_crypt(struct skcipher_request *req, int encrypt)
+ 		if (!IS_ALIGNED(req->cryptlen, blocksize))
+ 			return -EINVAL;
+ 
+-	/* qce is hanging when AES-XTS request len > QCE_SECTOR_SIZE and
+-	 * is not a multiple of it; pass such requests to the fallback
++	/*
++	 * Conditions for requesting a fallback cipher
++	 * AES-192 (not supported by crypto engine (CE))
++	 * AES-XTS request with len <= 512 byte (not recommended to use CE)
++	 * AES-XTS request with len > QCE_SECTOR_SIZE and
++	 * is not a multiple of it.(Revisit this condition to check if it is
++	 * needed in all versions of CE)
+ 	 */
+ 	if (IS_AES(rctx->flags) &&
+-	    (((keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_256) ||
+-	      req->cryptlen <= aes_sw_max_len) ||
+-	     (IS_XTS(rctx->flags) && req->cryptlen > QCE_SECTOR_SIZE &&
+-	      req->cryptlen % QCE_SECTOR_SIZE))) {
++	    ((keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_256) ||
++	    (IS_XTS(rctx->flags) && ((req->cryptlen <= aes_sw_max_len) ||
++	    (req->cryptlen > QCE_SECTOR_SIZE &&
++	    req->cryptlen % QCE_SECTOR_SIZE))))) {
+ 		skcipher_request_set_tfm(&rctx->fallback_req, ctx->fallback);
+ 		skcipher_request_set_callback(&rctx->fallback_req,
+ 					      req->base.flags,
 -- 
 2.25.1
 
