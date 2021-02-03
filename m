@@ -2,100 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-14.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9F36C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 21:10:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C42CC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 21:32:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C58361477
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 21:10:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21ADA64F72
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 21:32:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232432AbhBCVKa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Feb 2021 16:10:30 -0500
-Received: from mail-oi1-f169.google.com ([209.85.167.169]:44300 "EHLO
-        mail-oi1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232366AbhBCVKW (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Feb 2021 16:10:22 -0500
-Received: by mail-oi1-f169.google.com with SMTP id n7so1354343oic.11;
-        Wed, 03 Feb 2021 13:10:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nNasvnVnGdaLNC1X/0gD5+vaBF/Bt3/vdbxlWRVVcDU=;
-        b=O5upervxwVl4Ceyf+pXuc0ZYb/O+1lVY+Gk+TECHazXZJNY9z0TYszPje3gWC9ZaBH
-         Rr4J9hoLT83QEQekIEjjZCgtxHgvK/sqFhZb/k/h1J59QnE2e5jiydEdTZQIL5o9rNv9
-         fsZvug8Ze4PEs76Ege1YqK4TGFM1emEdXktxGC02BCwP4LaqkRJ/BIbA20z58SpsceHu
-         igNQ8Uo/WmfdwdWS3j+AF7Y+6xRkeApPP7uqdnozham34M5r/wI1+A/mp3qw28TWweF+
-         hW/j9GQ5iGvZTZU/u3x+KQ0DnoSMHnI73nUJsi7A+UYcXucpm+TbIldtog0QSKLGGSHc
-         6UyA==
-X-Gm-Message-State: AOAM533wZGF1NyO7NkuD/N98WdaitSaDSOBzAZPNFw441PVtt7351PK+
-        iPSVA1l5Pps1452jwiJcyX37i2pg4A==
-X-Google-Smtp-Source: ABdhPJziQ1MGayJwHSZF4XHn8QPqAgRmZ9o049qxfBV9fRup24v2U17idXkjmSVNyup8I87aVF/jeg==
-X-Received: by 2002:aca:1808:: with SMTP id h8mr3234854oih.150.1612386581033;
-        Wed, 03 Feb 2021 13:09:41 -0800 (PST)
-Received: from robh.at.kernel.org (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
-        by smtp.gmail.com with ESMTPSA id x9sm663527ota.23.2021.02.03.13.09.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Feb 2021 13:09:40 -0800 (PST)
-Received: (nullmailer pid 2451645 invoked by uid 1000);
-        Wed, 03 Feb 2021 21:09:38 -0000
-Date:   Wed, 3 Feb 2021 15:09:38 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Stephen Boyd <sboyd@kernel.org>
-Cc:     devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Daniel Palmer <daniel@thingy.jp>,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
-        Avi Fishman <avifishman70@gmail.com>,
-        Tomer Maimon <tmaimon77@gmail.com>,
-        Tali Perry <tali.perry1@gmail.com>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Joel Stanley <joel@jms.id.au>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Vincent Cheng <vincent.cheng.xh@renesas.com>,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-watchdog@vger.kernel.org
-Subject: Re: [PATCH 1/3] dt-bindings: Fix undocumented compatible strings in
- examples
-Message-ID: <20210203210938.GE3706951@robh.at.kernel.org>
-References: <20210202205544.24812-1-robh@kernel.org>
- <161231243653.76967.3231080427102153199@swboyd.mtv.corp.google.com>
+        id S232203AbhBCVcV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 3 Feb 2021 16:32:21 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39440 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230139AbhBCVcU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 Feb 2021 16:32:20 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 945CF64F5F;
+        Wed,  3 Feb 2021 21:31:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1612387899;
+        bh=Co480oVhsgCAw1FshXDDT0AN/4L+VqPG9bJVyxbDMyw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=jC0+83IWvBPsPg1QaOH6AHq4XcI1jV80IlPMMfou9YbzEnHPmRz5P74KV1T04jiSi
+         ppk0M4PfYylZhB/oXl29jl5v84BNBAjYadq1MQKx727VMjUFRxojZ+NhCNEwr0gw0a
+         6P5VxJ4zWoYHfXo4uPP339ttQdWnEuG4gP+KGTuAYR/5TZufFZbXZ1tTL6O+HJ9stC
+         42GVALzMyS0mu1xSTSaQI5m/W1lhAQ3FyWtSn1VOKxY/aZCBzCXkHYxMSWqaGDYeW9
+         2cRrsm6wKRfHH/g9xwQKVNOF5dGXaE0KLGqeM8CAT3zcotNq9pNWCLfvNf+/nD7TjG
+         ewWYOfUAyuXUg==
+From:   Will Deacon <will@kernel.org>
+To:     Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org
+Cc:     catalin.marinas@arm.com, kernel-team@android.com,
+        Will Deacon <will@kernel.org>, mark.rutland@arm.com,
+        Dave Martin <dave.martin@arm.com>,
+        Eric Biggers <ebiggers@google.com>,
+        herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org
+Subject: (subset) Re: [PATCH v2 0/9] arm64: rework NEON yielding to avoid scheduling from asm code
+Date:   Wed,  3 Feb 2021 21:31:31 +0000
+Message-Id: <161238528350.1984862.12324465919265084208.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20210203113626.220151-1-ardb@kernel.org>
+References: <20210203113626.220151-1-ardb@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <161231243653.76967.3231080427102153199@swboyd.mtv.corp.google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Feb 02, 2021 at 04:33:56PM -0800, Stephen Boyd wrote:
-> Quoting Rob Herring (2021-02-02 12:55:42)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/clock/allwinner,sun9i-a80-usb-clocks.yaml b/Documentation/devicetree/bindings/clock/allwinner,sun9i-a80-usb-clocks.yaml
-> > index fa0ee03a527f..53cc6df0df96 100644
-> > --- a/Documentation/devicetree/bindings/clock/allwinner,sun9i-a80-usb-clocks.yaml
-> > +++ b/Documentation/devicetree/bindings/clock/allwinner,sun9i-a80-usb-clocks.yaml
-> > @@ -18,7 +18,7 @@ properties:
-> >      const: 1
-> >  
-> >    compatible:
-> > -    const: allwinner,sun9i-a80-usb-clocks
-> > +    const: allwinner,sun9i-a80-usb-clks
+On Wed, 3 Feb 2021 12:36:17 +0100, Ard Biesheuvel wrote:
+> Given how kernel mode NEON code disables preemption (to ensure that the
+> FP/SIMD register state is protected without having to context switch it),
+> we need to take care not to let those algorithms operate on unbounded
+> input data, or we may end up with excessive scheduling blackouts on
+> CONFIG_PREEMPT kernels.
 > 
-> Should the file name change too?
+> This is currently handled by the cond_yield_neon macros, which check the
+> preempt count and the TIF_NEED_RESCHED flag from assembler code, and call
+> into kernel_neon_end()+kernel_neon_begin(), triggering a reschedule.
+> This works as expected, but is a bit messy, given how much of the state
+> preserve/restore code in the algorithm needs to be duplicated, as well as
+> causing the need to manage the stack frame explicitly. All of this is better
+> handled by the compiler, especially now that we have enabled features such
+> as the shadow call stack and BTI, and are working to improve call stack
+> validation.
+> 
+> [...]
 
-Yes, I'll fix that while applying.
+Applied first patch only to arm64 (for-next/crypto), thanks!
 
-Rob
+[1/9] arm64: assembler: add cond_yield macro
+      https://git.kernel.org/arm64/c/d13c613f136c
+
+This is the only patch on the branch, so I'm happy for it to be pulled
+into the crypto tree too if it enables some of the other patches to land
+in 5.12.
+
+Cheers,
+-- 
+Will
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
