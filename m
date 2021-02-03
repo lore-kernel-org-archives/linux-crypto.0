@@ -2,63 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E689C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 11:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27867C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 11:23:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5943164F68
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 11:20:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F324C64F67
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 11:23:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234046AbhBCLUn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Feb 2021 06:20:43 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:48546 "EHLO fornost.hmeau.com"
+        id S234130AbhBCLXa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 3 Feb 2021 06:23:30 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34424 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234052AbhBCLUl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Feb 2021 06:20:41 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1l7GCO-0002IK-OO; Wed, 03 Feb 2021 22:19:53 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 03 Feb 2021 22:19:52 +1100
-Date:   Wed, 3 Feb 2021 22:19:52 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 0/9] crypto: fix alignmask handling
-Message-ID: <20210203111952.GA3285@gondor.apana.org.au>
-References: <20210201180237.3171-1-ardb@kernel.org>
- <YBnQF3KU9Y5YKSmp@gmail.com>
- <CAMj1kXGh0RgK79QWO_VVHKWJiL_50UuXtxHD=nm+pEPDmwzSAw@mail.gmail.com>
+        id S234198AbhBCLXI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 Feb 2021 06:23:08 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B73E164DE8;
+        Wed,  3 Feb 2021 11:22:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1612351346;
+        bh=wGQw7gT3qnKCIXEO+rxqRvVbPbNtV92xRV2Pv+Ej3+o=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=MrJAtf5mnK1C4Q4ZyKjla2kAdXf633/lnbrk7VmF4rTw8ELv9cY7AI3lYFHz5IvTs
+         gW1JO8UMu0KWxpiE11pDElcoFi2aScKR/6EtEhTveStAUFXYmhZ/2VkMZcgd1/0YfE
+         ni15CbrfkH0uB9TmCzEv5FfL+g5ymnw5CEbyZXJD4ppEFij+lOdgpYmtLPj5YnxQt2
+         S89UXBGzveoZJe7weH0eyO7487Q9x29lPyzQEfs7eq9AcnO8mCcpuFXjNyVKHYr8yx
+         p+BAk8A9gP2L8aa7Eyu5laiQUOjkYC5JRKTNmmv8FsKcsF1NgygkcixHo6F7gFSZQG
+         dH3CVM+A3lgnQ==
+Date:   Wed, 3 Feb 2021 16:52:22 +0530
+From:   Vinod Koul <vkoul@kernel.org>
+To:     Rob Herring <robh@kernel.org>
+Cc:     devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Stephen Boyd <sboyd@kernel.org>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Daniel Palmer <daniel@thingy.jp>,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+        Avi Fishman <avifishman70@gmail.com>,
+        Tomer Maimon <tmaimon77@gmail.com>,
+        Tali Perry <tali.perry1@gmail.com>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Joel Stanley <joel@jms.id.au>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Vincent Cheng <vincent.cheng.xh@renesas.com>,
+        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-watchdog@vger.kernel.org,
+        Eric Anholt <eric@anholt.net>,
+        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Pavel Machek <pavel@ucw.cz>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        dri-devel@lists.freedesktop.org, linux-leds@vger.kernel.org,
+        linux-mmc@vger.kernel.org
+Subject: Re: [PATCH 3/3] dt-bindings: Fix errors in 'if' schemas
+Message-ID: <20210203112222.GO2771@vkoul-mobl>
+References: <20210202205544.24812-1-robh@kernel.org>
+ <20210202205544.24812-3-robh@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMj1kXGh0RgK79QWO_VVHKWJiL_50UuXtxHD=nm+pEPDmwzSAw@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210202205544.24812-3-robh@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 03, 2021 at 10:37:10AM +0100, Ard Biesheuvel wrote:
->
-> One thing that became apparent to me while looking into this stuff is
-> that the skcipher encrypt/decrypt API ignores alignmasks altogether,
-> so this is something we should probably look into at some point, i.e.,
-> whether the alignmask handling in the core API is still worth it, and
-> if it is, make skcipher calls honour them.
+On 02-02-21, 14:55, Rob Herring wrote:
+> Properties in if/then schemas weren't getting checked by the meta-schemas.
+> Enabling meta-schema checks finds several errors.
 > 
-> In the ablkcipher->skcipher conversion I did, I was not aware of this,
-> but I don't remember seeing any issues being reported in this area
-> either, so I wonder how many cases actually exist where alignmasks
-> actually matter.
+> The use of an 'items' schema (as opposed to the list form) is wrong in
+> some cases as it applies to all entries. 'contains' is the correct schema
+> to use in the case of multiple entries.
+> 
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Maxime Ripard <mripard@kernel.org>
+> Cc: Chen-Yu Tsai <wens@csie.org>
+> Cc: Eric Anholt <eric@anholt.net>
+> Cc: Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
+> Cc: Florian Fainelli <f.fainelli@gmail.com>
+> Cc: Ray Jui <rjui@broadcom.com>
+> Cc: Scott Branden <sbranden@broadcom.com>
+> Cc: Pavel Machek <pavel@ucw.cz>
+> Cc: Ulf Hansson <ulf.hansson@linaro.org>
+> Cc: Kishon Vijay Abraham I <kishon@ti.com>
+> Cc: Vinod Koul <vkoul@kernel.org>
+> Cc: Geert Uytterhoeven <geert+renesas@glider.be>
+> Cc: Linus Walleij <linus.walleij@linaro.org>
+> Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: dri-devel@lists.freedesktop.org
+> Cc: linux-leds@vger.kernel.org
+> Cc: linux-mmc@vger.kernel.org
+> Cc: linux-gpio@vger.kernel.org
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+>  .../devicetree/bindings/crypto/allwinner,sun8i-ce.yaml   | 3 +--
+>  .../devicetree/bindings/display/brcm,bcm2835-hvs.yaml    | 2 +-
+>  Documentation/devicetree/bindings/leds/ti,tca6507.yaml   | 1 +
+>  Documentation/devicetree/bindings/mmc/renesas,sdhi.yaml  | 2 +-
+>  Documentation/devicetree/bindings/phy/brcm,sata-phy.yaml | 3 +--
+>  .../devicetree/bindings/phy/renesas,usb2-phy.yaml        | 5 ++---
 
-What do you mean? With both ablkcipher/skcipher the alignmask was
-usually enforced through the walker mechanism.
+For phy:
 
-Cheers,
+Acked-By: Vinod Koul <vkoul@kernel.org>
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+~Vinod
