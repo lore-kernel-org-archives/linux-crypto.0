@@ -2,786 +2,314 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF92FC433DB
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 13:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08BFFC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 13:47:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3CD6F64E41
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 13:20:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B058364F67
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Feb 2021 13:47:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231663AbhBCNUR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Feb 2021 08:20:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25030 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230248AbhBCNUM (ORCPT
+        id S232069AbhBCNrT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 3 Feb 2021 08:47:19 -0500
+Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:60719 "EHLO
+        3.mo68.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232195AbhBCNrP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Feb 2021 08:20:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612358324;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GfOeK+GJ+WZeCaBc/vmK/kqIwLcDnRzahovrDJ1VGzs=;
-        b=JrFw4XPTeEMezqwtdSWveFSHWn/CQI8l4EESDpL0BksJQlpqWs7lLjiEBSrb+pmcTX2G+w
-        70o6RrJOCM8gbKc/BNMnYcr/rMD8bIMPvl3yoS497gvss6gFF3PfQWoXHO50OlGc9UyP/H
-        sW/MO1kHGCdVViaxEWwlkpIoqUqkqlo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-hY4Eg69-PPyRN9ruMO2ZKQ-1; Wed, 03 Feb 2021 08:18:42 -0500
-X-MC-Unique: hY4Eg69-PPyRN9ruMO2ZKQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3695A107ACFC;
-        Wed,  3 Feb 2021 13:18:35 +0000 (UTC)
-Received: from [10.36.113.43] (ovpn-113-43.ams2.redhat.com [10.36.113.43])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 85F17709AD;
-        Wed,  3 Feb 2021 13:18:21 +0000 (UTC)
-Subject: Re: [PATCH v3 4/5] amba: Make the remove callback return void
-To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
-        Russell King <linux@armlinux.org.uk>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Vinod Koul <vkoul@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Mark Brown <broonie@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc:     linux-kernel@vger.kernel.org, kernel@pengutronix.de,
-        Mike Leach <mike.leach@linaro.org>,
-        Leo Yan <leo.yan@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, coresight@lists.linaro.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-watchdog@vger.kernel.org, alsa-devel@alsa-project.org
-References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
- <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <5f5d69ce-3e51-3880-8768-b401a9f57858@redhat.com>
-Date:   Wed, 3 Feb 2021 14:18:20 +0100
+        Wed, 3 Feb 2021 08:47:15 -0500
+X-Greylist: delayed 6601 seconds by postgrey-1.27 at vger.kernel.org; Wed, 03 Feb 2021 08:47:12 EST
+Received: from player773.ha.ovh.net (unknown [10.109.146.166])
+        by mo68.mail-out.ovh.net (Postfix) with ESMTP id 5A4B318ABA6
+        for <linux-crypto@vger.kernel.org>; Wed,  3 Feb 2021 12:20:13 +0100 (CET)
+Received: from 3mdeb.com (85-222-117-222.dynamic.chello.pl [85.222.117.222])
+        (Authenticated sender: maciej.pijanowski@3mdeb.com)
+        by player773.ha.ovh.net (Postfix) with ESMTPSA id C59D71AC6F16E;
+        Wed,  3 Feb 2021 11:20:05 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass (GARM-105G0068bf7c86b-0460-4f3d-997e-362dcfc28bbf,
+                    A904709882BAC92BF98D1AE3FFD10888713C2FF7) smtp.auth=maciej.pijanowski@3mdeb.com
+X-OVh-ClientIp: 85.222.117.222
+Subject: Re: safexcel driver for EIP197 and mini firmware features
+To:     "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Cc:     "atenart@kernel.org" <atenart@kernel.org>,
+        "pascalvanl@gmail.com" <pascalvanl@gmail.com>,
+        =?UTF-8?Q?Piotr_Kr=c3=b3l?= <piotr.krol@3mdeb.com>
+References: <d90956cf-5340-cbe4-1254-771c18b7e46d@3mdeb.com>
+ <CY4PR0401MB3652D787A7DE6E19E937A392C3B59@CY4PR0401MB3652.namprd04.prod.outlook.com>
+ <afbde2f9-1ae0-c2be-37c2-8e6eb9c58b82@3mdeb.com>
+ <46894c5f-83ea-bb55-ea1b-6e789a944bc7@3mdeb.com>
+ <CY4PR0401MB36525895B3BAB48C72A649C7C3B49@CY4PR0401MB3652.namprd04.prod.outlook.com>
+From:   Maciej Pijanowski <maciej.pijanowski@3mdeb.com>
+Message-ID: <f2523563-8488-8132-3d0b-bdaa8db84206@3mdeb.com>
+Date:   Wed, 3 Feb 2021 12:20:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <CY4PR0401MB36525895B3BAB48C72A649C7C3B49@CY4PR0401MB3652.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Language: en-US
+X-Ovh-Tracer-Id: 9722427174117125836
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -83
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduledrgedvgddviecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfghrlhcuvffnffculddujedmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepofgrtghivghjucfrihhjrghnohifshhkihcuoehmrggtihgvjhdrphhijhgrnhhofihskhhiseefmhguvggsrdgtohhmqeenucggtffrrghtthgvrhhnpeeiveeivdeukeeigeffhfffhfffhfevueetleejuedugfelkeevhfeiudelvddvgfenucffohhmrghinhepsghoohhtlhhinhdrtghomhdpshholhhiugdqrhhunhdrtghomhdpshholhhiugdqsghuihhlugdrgiihiidpkhgvrhhnvghlrdhorhhgpdefmhguvggsrdgtohhmpdhrrghmsghushdrtghomhenucfkpheptddrtddrtddrtddpkeehrddvvddvrdduudejrddvvddvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejfedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehmrggtihgvjhdrphhijhgrnhhofihskhhiseefmhguvggsrdgtohhmpdhrtghpthhtoheplhhinhhugidqtghrhihpthhosehvghgvrhdrkhgvrhhnvghlrdhorhhg
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Uwe,
 
-On 1/26/21 5:58 PM, Uwe Kleine-König wrote:
-> All amba drivers return 0 in their remove callback. Together with the
-> driver core ignoring the return value anyhow, it doesn't make sense to
-> return a value here.
-> 
-> Change the remove prototype to return void, which makes it explicit that
-> returning an error value doesn't work as expected. This simplifies changing
-> the core remove callback to return void, too.
-> 
-> Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
-> Reviewed-by: Arnd Bergmann <arnd@arndb.de>
-> Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
-> Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> Acked-by: Krzysztof Kozlowski <krzk@kernel.org> # for drivers/memory
-> Acked-by: Mark Brown <broonie@kernel.org>
-> Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> Acked-by: Linus Walleij <linus.walleij@linaro.org>
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> ---
->  drivers/amba/bus.c                                 | 5 ++---
->  drivers/char/hw_random/nomadik-rng.c               | 3 +--
->  drivers/dma/pl330.c                                | 3 +--
->  drivers/gpu/drm/pl111/pl111_drv.c                  | 4 +---
->  drivers/hwtracing/coresight/coresight-catu.c       | 3 +--
->  drivers/hwtracing/coresight/coresight-cpu-debug.c  | 4 +---
->  drivers/hwtracing/coresight/coresight-cti-core.c   | 4 +---
->  drivers/hwtracing/coresight/coresight-etb10.c      | 4 +---
->  drivers/hwtracing/coresight/coresight-etm3x-core.c | 4 +---
->  drivers/hwtracing/coresight/coresight-etm4x-core.c | 4 +---
->  drivers/hwtracing/coresight/coresight-funnel.c     | 4 ++--
->  drivers/hwtracing/coresight/coresight-replicator.c | 4 ++--
->  drivers/hwtracing/coresight/coresight-stm.c        | 4 +---
->  drivers/hwtracing/coresight/coresight-tmc-core.c   | 4 +---
->  drivers/hwtracing/coresight/coresight-tpiu.c       | 4 +---
->  drivers/i2c/busses/i2c-nomadik.c                   | 4 +---
->  drivers/input/serio/ambakmi.c                      | 3 +--
->  drivers/memory/pl172.c                             | 4 +---
->  drivers/memory/pl353-smc.c                         | 4 +---
->  drivers/mmc/host/mmci.c                            | 4 +---
->  drivers/rtc/rtc-pl030.c                            | 4 +---
->  drivers/rtc/rtc-pl031.c                            | 4 +---
->  drivers/spi/spi-pl022.c                            | 5 ++---
->  drivers/tty/serial/amba-pl010.c                    | 4 +---
->  drivers/tty/serial/amba-pl011.c                    | 3 +--
->  drivers/vfio/platform/vfio_amba.c                  | 3 +--
->  drivers/video/fbdev/amba-clcd.c                    | 4 +---
->  drivers/watchdog/sp805_wdt.c                       | 4 +---
->  include/linux/amba/bus.h                           | 2 +-
->  sound/arm/aaci.c                                   | 4 +---
->  30 files changed, 34 insertions(+), 80 deletions(-)
-> 
-> diff --git a/drivers/amba/bus.c b/drivers/amba/bus.c
-> index 8c4a42df47c6..48b5d4b4e889 100644
-> --- a/drivers/amba/bus.c
-> +++ b/drivers/amba/bus.c
-> @@ -300,11 +300,10 @@ static int amba_remove(struct device *dev)
->  {
->  	struct amba_device *pcdev = to_amba_device(dev);
->  	struct amba_driver *drv = to_amba_driver(dev->driver);
-> -	int ret = 0;
->  
->  	pm_runtime_get_sync(dev);
->  	if (drv->remove)
-> -		ret = drv->remove(pcdev);
-> +		drv->remove(pcdev);
->  	pm_runtime_put_noidle(dev);
->  
->  	/* Undo the runtime PM settings in amba_probe() */
-> @@ -315,7 +314,7 @@ static int amba_remove(struct device *dev)
->  	amba_put_disable_pclk(pcdev);
->  	dev_pm_domain_detach(dev, true);
->  
-> -	return ret;
-> +	return 0;
->  }
->  
->  static void amba_shutdown(struct device *dev)
-> diff --git a/drivers/char/hw_random/nomadik-rng.c b/drivers/char/hw_random/nomadik-rng.c
-> index b0ded41eb865..67947a19aa22 100644
-> --- a/drivers/char/hw_random/nomadik-rng.c
-> +++ b/drivers/char/hw_random/nomadik-rng.c
-> @@ -69,11 +69,10 @@ static int nmk_rng_probe(struct amba_device *dev, const struct amba_id *id)
->  	return ret;
->  }
->  
-> -static int nmk_rng_remove(struct amba_device *dev)
-> +static void nmk_rng_remove(struct amba_device *dev)
->  {
->  	amba_release_regions(dev);
->  	clk_disable(rng_clk);
-> -	return 0;
->  }
->  
->  static const struct amba_id nmk_rng_ids[] = {
-> diff --git a/drivers/dma/pl330.c b/drivers/dma/pl330.c
-> index bc0f66af0f11..fd8d2bc3be9f 100644
-> --- a/drivers/dma/pl330.c
-> +++ b/drivers/dma/pl330.c
-> @@ -3195,7 +3195,7 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
->  	return ret;
->  }
->  
-> -static int pl330_remove(struct amba_device *adev)
-> +static void pl330_remove(struct amba_device *adev)
->  {
->  	struct pl330_dmac *pl330 = amba_get_drvdata(adev);
->  	struct dma_pl330_chan *pch, *_p;
-> @@ -3235,7 +3235,6 @@ static int pl330_remove(struct amba_device *adev)
->  
->  	if (pl330->rstc)
->  		reset_control_assert(pl330->rstc);
-> -	return 0;
->  }
->  
->  static const struct amba_id pl330_ids[] = {
-> diff --git a/drivers/gpu/drm/pl111/pl111_drv.c b/drivers/gpu/drm/pl111/pl111_drv.c
-> index 40e6708fbbe2..1fb5eacefd2d 100644
-> --- a/drivers/gpu/drm/pl111/pl111_drv.c
-> +++ b/drivers/gpu/drm/pl111/pl111_drv.c
-> @@ -320,7 +320,7 @@ static int pl111_amba_probe(struct amba_device *amba_dev,
->  	return ret;
->  }
->  
-> -static int pl111_amba_remove(struct amba_device *amba_dev)
-> +static void pl111_amba_remove(struct amba_device *amba_dev)
->  {
->  	struct device *dev = &amba_dev->dev;
->  	struct drm_device *drm = amba_get_drvdata(amba_dev);
-> @@ -331,8 +331,6 @@ static int pl111_amba_remove(struct amba_device *amba_dev)
->  		drm_panel_bridge_remove(priv->bridge);
->  	drm_dev_put(drm);
->  	of_reserved_mem_device_release(dev);
-> -
-> -	return 0;
->  }
->  
->  /*
-> diff --git a/drivers/hwtracing/coresight/coresight-catu.c b/drivers/hwtracing/coresight/coresight-catu.c
-> index a61313f320bd..8e19e8cdcce5 100644
-> --- a/drivers/hwtracing/coresight/coresight-catu.c
-> +++ b/drivers/hwtracing/coresight/coresight-catu.c
-> @@ -567,12 +567,11 @@ static int catu_probe(struct amba_device *adev, const struct amba_id *id)
->  	return ret;
->  }
->  
-> -static int catu_remove(struct amba_device *adev)
-> +static void catu_remove(struct amba_device *adev)
->  {
->  	struct catu_drvdata *drvdata = dev_get_drvdata(&adev->dev);
->  
->  	coresight_unregister(drvdata->csdev);
-> -	return 0;
->  }
->  
->  static struct amba_id catu_ids[] = {
-> diff --git a/drivers/hwtracing/coresight/coresight-cpu-debug.c b/drivers/hwtracing/coresight/coresight-cpu-debug.c
-> index e1d232411d8d..2dcf13de751f 100644
-> --- a/drivers/hwtracing/coresight/coresight-cpu-debug.c
-> +++ b/drivers/hwtracing/coresight/coresight-cpu-debug.c
-> @@ -627,7 +627,7 @@ static int debug_probe(struct amba_device *adev, const struct amba_id *id)
->  	return ret;
->  }
->  
-> -static int debug_remove(struct amba_device *adev)
-> +static void debug_remove(struct amba_device *adev)
->  {
->  	struct device *dev = &adev->dev;
->  	struct debug_drvdata *drvdata = amba_get_drvdata(adev);
-> @@ -642,8 +642,6 @@ static int debug_remove(struct amba_device *adev)
->  
->  	if (!--debug_count)
->  		debug_func_exit();
-> -
-> -	return 0;
->  }
->  
->  static const struct amba_cs_uci_id uci_id_debug[] = {
-> diff --git a/drivers/hwtracing/coresight/coresight-cti-core.c b/drivers/hwtracing/coresight/coresight-cti-core.c
-> index 61dbc1afd8da..30e48809ba00 100644
-> --- a/drivers/hwtracing/coresight/coresight-cti-core.c
-> +++ b/drivers/hwtracing/coresight/coresight-cti-core.c
-> @@ -836,7 +836,7 @@ static void cti_device_release(struct device *dev)
->  	if (drvdata->csdev_release)
->  		drvdata->csdev_release(dev);
->  }
-> -static int cti_remove(struct amba_device *adev)
-> +static void cti_remove(struct amba_device *adev)
->  {
->  	struct cti_drvdata *drvdata = dev_get_drvdata(&adev->dev);
->  
-> @@ -845,8 +845,6 @@ static int cti_remove(struct amba_device *adev)
->  	mutex_unlock(&ect_mutex);
->  
->  	coresight_unregister(drvdata->csdev);
-> -
-> -	return 0;
->  }
->  
->  static int cti_probe(struct amba_device *adev, const struct amba_id *id)
-> diff --git a/drivers/hwtracing/coresight/coresight-etb10.c b/drivers/hwtracing/coresight/coresight-etb10.c
-> index 0cf6f0b947b6..51c801c05e5c 100644
-> --- a/drivers/hwtracing/coresight/coresight-etb10.c
-> +++ b/drivers/hwtracing/coresight/coresight-etb10.c
-> @@ -803,7 +803,7 @@ static int etb_probe(struct amba_device *adev, const struct amba_id *id)
->  	return ret;
->  }
->  
-> -static int etb_remove(struct amba_device *adev)
-> +static void etb_remove(struct amba_device *adev)
->  {
->  	struct etb_drvdata *drvdata = dev_get_drvdata(&adev->dev);
->  
-> @@ -814,8 +814,6 @@ static int etb_remove(struct amba_device *adev)
->  	 */
->  	misc_deregister(&drvdata->miscdev);
->  	coresight_unregister(drvdata->csdev);
-> -
-> -	return 0;
->  }
->  
->  #ifdef CONFIG_PM
-> diff --git a/drivers/hwtracing/coresight/coresight-etm3x-core.c b/drivers/hwtracing/coresight/coresight-etm3x-core.c
-> index 5bf5a5a4ce6d..683a69e88efd 100644
-> --- a/drivers/hwtracing/coresight/coresight-etm3x-core.c
-> +++ b/drivers/hwtracing/coresight/coresight-etm3x-core.c
-> @@ -909,7 +909,7 @@ static void clear_etmdrvdata(void *info)
->  	etmdrvdata[cpu] = NULL;
->  }
->  
-> -static int etm_remove(struct amba_device *adev)
-> +static void etm_remove(struct amba_device *adev)
->  {
->  	struct etm_drvdata *drvdata = dev_get_drvdata(&adev->dev);
->  
-> @@ -932,8 +932,6 @@ static int etm_remove(struct amba_device *adev)
->  	cpus_read_unlock();
->  
->  	coresight_unregister(drvdata->csdev);
-> -
-> -	return 0;
->  }
->  
->  #ifdef CONFIG_PM
-> diff --git a/drivers/hwtracing/coresight/coresight-etm4x-core.c b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-> index b20b6ff17cf6..82787cba537d 100644
-> --- a/drivers/hwtracing/coresight/coresight-etm4x-core.c
-> +++ b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-> @@ -1680,7 +1680,7 @@ static void clear_etmdrvdata(void *info)
->  	etmdrvdata[cpu] = NULL;
->  }
->  
-> -static int etm4_remove(struct amba_device *adev)
-> +static void etm4_remove(struct amba_device *adev)
->  {
->  	struct etmv4_drvdata *drvdata = dev_get_drvdata(&adev->dev);
->  
-> @@ -1703,8 +1703,6 @@ static int etm4_remove(struct amba_device *adev)
->  	cpus_read_unlock();
->  
->  	coresight_unregister(drvdata->csdev);
-> -
-> -	return 0;
->  }
->  
->  static const struct amba_id etm4_ids[] = {
-> diff --git a/drivers/hwtracing/coresight/coresight-funnel.c b/drivers/hwtracing/coresight/coresight-funnel.c
-> index 071c723227db..01f8f9285168 100644
-> --- a/drivers/hwtracing/coresight/coresight-funnel.c
-> +++ b/drivers/hwtracing/coresight/coresight-funnel.c
-> @@ -370,9 +370,9 @@ static int dynamic_funnel_probe(struct amba_device *adev,
->  	return funnel_probe(&adev->dev, &adev->res);
->  }
->  
-> -static int dynamic_funnel_remove(struct amba_device *adev)
-> +static void dynamic_funnel_remove(struct amba_device *adev)
->  {
-> -	return funnel_remove(&adev->dev);
-> +	funnel_remove(&adev->dev);
->  }
->  
->  static const struct amba_id dynamic_funnel_ids[] = {
-> diff --git a/drivers/hwtracing/coresight/coresight-replicator.c b/drivers/hwtracing/coresight/coresight-replicator.c
-> index 7e2a2b7f503f..34fc2f6f3ea9 100644
-> --- a/drivers/hwtracing/coresight/coresight-replicator.c
-> +++ b/drivers/hwtracing/coresight/coresight-replicator.c
-> @@ -388,9 +388,9 @@ static int dynamic_replicator_probe(struct amba_device *adev,
->  	return replicator_probe(&adev->dev, &adev->res);
->  }
->  
-> -static int dynamic_replicator_remove(struct amba_device *adev)
-> +static void dynamic_replicator_remove(struct amba_device *adev)
->  {
-> -	return replicator_remove(&adev->dev);
-> +	replicator_remove(&adev->dev);
->  }
->  
->  static const struct amba_id dynamic_replicator_ids[] = {
-> diff --git a/drivers/hwtracing/coresight/coresight-stm.c b/drivers/hwtracing/coresight/coresight-stm.c
-> index 99791773f682..423df0d30d9c 100644
-> --- a/drivers/hwtracing/coresight/coresight-stm.c
-> +++ b/drivers/hwtracing/coresight/coresight-stm.c
-> @@ -951,15 +951,13 @@ static int stm_probe(struct amba_device *adev, const struct amba_id *id)
->  	return ret;
->  }
->  
-> -static int stm_remove(struct amba_device *adev)
-> +static void stm_remove(struct amba_device *adev)
->  {
->  	struct stm_drvdata *drvdata = dev_get_drvdata(&adev->dev);
->  
->  	coresight_unregister(drvdata->csdev);
->  
->  	stm_unregister_device(&drvdata->stm);
-> -
-> -	return 0;
->  }
->  
->  #ifdef CONFIG_PM
-> diff --git a/drivers/hwtracing/coresight/coresight-tmc-core.c b/drivers/hwtracing/coresight/coresight-tmc-core.c
-> index 8169dff5a9f6..e29b3914fc0f 100644
-> --- a/drivers/hwtracing/coresight/coresight-tmc-core.c
-> +++ b/drivers/hwtracing/coresight/coresight-tmc-core.c
-> @@ -559,7 +559,7 @@ static void tmc_shutdown(struct amba_device *adev)
->  	spin_unlock_irqrestore(&drvdata->spinlock, flags);
->  }
->  
-> -static int tmc_remove(struct amba_device *adev)
-> +static void tmc_remove(struct amba_device *adev)
->  {
->  	struct tmc_drvdata *drvdata = dev_get_drvdata(&adev->dev);
->  
-> @@ -570,8 +570,6 @@ static int tmc_remove(struct amba_device *adev)
->  	 */
->  	misc_deregister(&drvdata->miscdev);
->  	coresight_unregister(drvdata->csdev);
-> -
-> -	return 0;
->  }
->  
->  static const struct amba_id tmc_ids[] = {
-> diff --git a/drivers/hwtracing/coresight/coresight-tpiu.c b/drivers/hwtracing/coresight/coresight-tpiu.c
-> index d5dfee9ee556..f77c4b0ea4aa 100644
-> --- a/drivers/hwtracing/coresight/coresight-tpiu.c
-> +++ b/drivers/hwtracing/coresight/coresight-tpiu.c
-> @@ -173,13 +173,11 @@ static int tpiu_probe(struct amba_device *adev, const struct amba_id *id)
->  	return PTR_ERR(drvdata->csdev);
->  }
->  
-> -static int tpiu_remove(struct amba_device *adev)
-> +static void tpiu_remove(struct amba_device *adev)
->  {
->  	struct tpiu_drvdata *drvdata = dev_get_drvdata(&adev->dev);
->  
->  	coresight_unregister(drvdata->csdev);
-> -
-> -	return 0;
->  }
->  
->  #ifdef CONFIG_PM
-> diff --git a/drivers/i2c/busses/i2c-nomadik.c b/drivers/i2c/busses/i2c-nomadik.c
-> index d4b1b0865f67..a3363b20f168 100644
-> --- a/drivers/i2c/busses/i2c-nomadik.c
-> +++ b/drivers/i2c/busses/i2c-nomadik.c
-> @@ -1055,7 +1055,7 @@ static int nmk_i2c_probe(struct amba_device *adev, const struct amba_id *id)
->  	return ret;
->  }
->  
-> -static int nmk_i2c_remove(struct amba_device *adev)
-> +static void nmk_i2c_remove(struct amba_device *adev)
->  {
->  	struct resource *res = &adev->res;
->  	struct nmk_i2c_dev *dev = amba_get_drvdata(adev);
-> @@ -1068,8 +1068,6 @@ static int nmk_i2c_remove(struct amba_device *adev)
->  	i2c_clr_bit(dev->virtbase + I2C_CR, I2C_CR_PE);
->  	clk_disable_unprepare(dev->clk);
->  	release_mem_region(res->start, resource_size(res));
-> -
-> -	return 0;
->  }
->  
->  static struct i2c_vendor_data vendor_stn8815 = {
-> diff --git a/drivers/input/serio/ambakmi.c b/drivers/input/serio/ambakmi.c
-> index ecdeca147ed7..4408245b61d2 100644
-> --- a/drivers/input/serio/ambakmi.c
-> +++ b/drivers/input/serio/ambakmi.c
-> @@ -159,7 +159,7 @@ static int amba_kmi_probe(struct amba_device *dev,
->  	return ret;
->  }
->  
-> -static int amba_kmi_remove(struct amba_device *dev)
-> +static void amba_kmi_remove(struct amba_device *dev)
->  {
->  	struct amba_kmi_port *kmi = amba_get_drvdata(dev);
->  
-> @@ -168,7 +168,6 @@ static int amba_kmi_remove(struct amba_device *dev)
->  	iounmap(kmi->base);
->  	kfree(kmi);
->  	amba_release_regions(dev);
-> -	return 0;
->  }
->  
->  static int __maybe_unused amba_kmi_resume(struct device *dev)
-> diff --git a/drivers/memory/pl172.c b/drivers/memory/pl172.c
-> index 575fadbffa30..9eb8cc7de494 100644
-> --- a/drivers/memory/pl172.c
-> +++ b/drivers/memory/pl172.c
-> @@ -273,14 +273,12 @@ static int pl172_probe(struct amba_device *adev, const struct amba_id *id)
->  	return ret;
->  }
->  
-> -static int pl172_remove(struct amba_device *adev)
-> +static void pl172_remove(struct amba_device *adev)
->  {
->  	struct pl172_data *pl172 = amba_get_drvdata(adev);
->  
->  	clk_disable_unprepare(pl172->clk);
->  	amba_release_regions(adev);
-> -
-> -	return 0;
->  }
->  
->  static const struct amba_id pl172_ids[] = {
-> diff --git a/drivers/memory/pl353-smc.c b/drivers/memory/pl353-smc.c
-> index 73bd3023202f..3b5b1045edd9 100644
-> --- a/drivers/memory/pl353-smc.c
-> +++ b/drivers/memory/pl353-smc.c
-> @@ -426,14 +426,12 @@ static int pl353_smc_probe(struct amba_device *adev, const struct amba_id *id)
->  	return err;
->  }
->  
-> -static int pl353_smc_remove(struct amba_device *adev)
-> +static void pl353_smc_remove(struct amba_device *adev)
->  {
->  	struct pl353_smc_data *pl353_smc = amba_get_drvdata(adev);
->  
->  	clk_disable_unprepare(pl353_smc->memclk);
->  	clk_disable_unprepare(pl353_smc->aclk);
-> -
-> -	return 0;
->  }
->  
->  static const struct amba_id pl353_ids[] = {
-> diff --git a/drivers/mmc/host/mmci.c b/drivers/mmc/host/mmci.c
-> index b5a41a7ce165..32f52d070bbd 100644
-> --- a/drivers/mmc/host/mmci.c
-> +++ b/drivers/mmc/host/mmci.c
-> @@ -2195,7 +2195,7 @@ static int mmci_probe(struct amba_device *dev,
->  	return ret;
->  }
->  
-> -static int mmci_remove(struct amba_device *dev)
-> +static void mmci_remove(struct amba_device *dev)
->  {
->  	struct mmc_host *mmc = amba_get_drvdata(dev);
->  
-> @@ -2223,8 +2223,6 @@ static int mmci_remove(struct amba_device *dev)
->  		clk_disable_unprepare(host->clk);
->  		mmc_free_host(mmc);
->  	}
-> -
-> -	return 0;
->  }
->  
->  #ifdef CONFIG_PM
-> diff --git a/drivers/rtc/rtc-pl030.c b/drivers/rtc/rtc-pl030.c
-> index 5a880516f3e8..39038c0754ee 100644
-> --- a/drivers/rtc/rtc-pl030.c
-> +++ b/drivers/rtc/rtc-pl030.c
-> @@ -137,7 +137,7 @@ static int pl030_probe(struct amba_device *dev, const struct amba_id *id)
->  	return ret;
->  }
->  
-> -static int pl030_remove(struct amba_device *dev)
-> +static void pl030_remove(struct amba_device *dev)
->  {
->  	struct pl030_rtc *rtc = amba_get_drvdata(dev);
->  
-> @@ -146,8 +146,6 @@ static int pl030_remove(struct amba_device *dev)
->  	free_irq(dev->irq[0], rtc);
->  	iounmap(rtc->base);
->  	amba_release_regions(dev);
-> -
-> -	return 0;
->  }
->  
->  static struct amba_id pl030_ids[] = {
-> diff --git a/drivers/rtc/rtc-pl031.c b/drivers/rtc/rtc-pl031.c
-> index 224bbf096262..620c8dc33647 100644
-> --- a/drivers/rtc/rtc-pl031.c
-> +++ b/drivers/rtc/rtc-pl031.c
-> @@ -280,7 +280,7 @@ static int pl031_set_alarm(struct device *dev, struct rtc_wkalrm *alarm)
->  	return 0;
->  }
->  
-> -static int pl031_remove(struct amba_device *adev)
-> +static void pl031_remove(struct amba_device *adev)
->  {
->  	struct pl031_local *ldata = dev_get_drvdata(&adev->dev);
->  
-> @@ -289,8 +289,6 @@ static int pl031_remove(struct amba_device *adev)
->  	if (adev->irq[0])
->  		free_irq(adev->irq[0], ldata);
->  	amba_release_regions(adev);
-> -
-> -	return 0;
->  }
->  
->  static int pl031_probe(struct amba_device *adev, const struct amba_id *id)
-> diff --git a/drivers/spi/spi-pl022.c b/drivers/spi/spi-pl022.c
-> index d1776fea287e..fd74ddfbb686 100644
-> --- a/drivers/spi/spi-pl022.c
-> +++ b/drivers/spi/spi-pl022.c
-> @@ -2314,13 +2314,13 @@ static int pl022_probe(struct amba_device *adev, const struct amba_id *id)
->  	return status;
->  }
->  
-> -static int
-> +static void
->  pl022_remove(struct amba_device *adev)
->  {
->  	struct pl022 *pl022 = amba_get_drvdata(adev);
->  
->  	if (!pl022)
-> -		return 0;
-> +		return;
->  
->  	/*
->  	 * undo pm_runtime_put() in probe.  I assume that we're not
-> @@ -2335,7 +2335,6 @@ pl022_remove(struct amba_device *adev)
->  	clk_disable_unprepare(pl022->clk);
->  	amba_release_regions(adev);
->  	tasklet_disable(&pl022->pump_transfers);
-> -	return 0;
->  }
->  
->  #ifdef CONFIG_PM_SLEEP
-> diff --git a/drivers/tty/serial/amba-pl010.c b/drivers/tty/serial/amba-pl010.c
-> index 3284f34e9dfe..3f96edfe569c 100644
-> --- a/drivers/tty/serial/amba-pl010.c
-> +++ b/drivers/tty/serial/amba-pl010.c
-> @@ -754,7 +754,7 @@ static int pl010_probe(struct amba_device *dev, const struct amba_id *id)
->  	return ret;
->  }
->  
-> -static int pl010_remove(struct amba_device *dev)
-> +static void pl010_remove(struct amba_device *dev)
->  {
->  	struct uart_amba_port *uap = amba_get_drvdata(dev);
->  	int i;
-> @@ -770,8 +770,6 @@ static int pl010_remove(struct amba_device *dev)
->  
->  	if (!busy)
->  		uart_unregister_driver(&amba_reg);
-> -
-> -	return 0;
->  }
->  
->  #ifdef CONFIG_PM_SLEEP
-> diff --git a/drivers/tty/serial/amba-pl011.c b/drivers/tty/serial/amba-pl011.c
-> index c255476cce28..4ead0c9048a8 100644
-> --- a/drivers/tty/serial/amba-pl011.c
-> +++ b/drivers/tty/serial/amba-pl011.c
-> @@ -2679,13 +2679,12 @@ static int pl011_probe(struct amba_device *dev, const struct amba_id *id)
->  	return pl011_register_port(uap);
->  }
->  
-> -static int pl011_remove(struct amba_device *dev)
-> +static void pl011_remove(struct amba_device *dev)
->  {
->  	struct uart_amba_port *uap = amba_get_drvdata(dev);
->  
->  	uart_remove_one_port(&amba_reg, &uap->port);
->  	pl011_unregister_port(uap);
-> -	return 0;
->  }
->  
->  #ifdef CONFIG_PM_SLEEP
-> diff --git a/drivers/vfio/platform/vfio_amba.c b/drivers/vfio/platform/vfio_amba.c
-> index 7b3ebf1558e1..3626c2150101 100644
-> --- a/drivers/vfio/platform/vfio_amba.c
-> +++ b/drivers/vfio/platform/vfio_amba.c
-> @@ -71,14 +71,13 @@ static int vfio_amba_probe(struct amba_device *adev, const struct amba_id *id)
->  	return ret;
->  }
->  
-> -static int vfio_amba_remove(struct amba_device *adev)
-> +static void vfio_amba_remove(struct amba_device *adev)
->  {
->  	struct vfio_platform_device *vdev =
->  		vfio_platform_remove_common(&adev->dev);
->  
->  	kfree(vdev->name);
->  	kfree(vdev);
-> -	return 0;
->  }
->  
->  static const struct amba_id pl330_ids[] = {
-> diff --git a/drivers/video/fbdev/amba-clcd.c b/drivers/video/fbdev/amba-clcd.c
-> index b7682de412d8..33595cc4778e 100644
-> --- a/drivers/video/fbdev/amba-clcd.c
-> +++ b/drivers/video/fbdev/amba-clcd.c
-> @@ -925,7 +925,7 @@ static int clcdfb_probe(struct amba_device *dev, const struct amba_id *id)
->  	return ret;
->  }
->  
-> -static int clcdfb_remove(struct amba_device *dev)
-> +static void clcdfb_remove(struct amba_device *dev)
->  {
->  	struct clcd_fb *fb = amba_get_drvdata(dev);
->  
-> @@ -942,8 +942,6 @@ static int clcdfb_remove(struct amba_device *dev)
->  	kfree(fb);
->  
->  	amba_release_regions(dev);
-> -
-> -	return 0;
->  }
->  
->  static const struct amba_id clcdfb_id_table[] = {
-> diff --git a/drivers/watchdog/sp805_wdt.c b/drivers/watchdog/sp805_wdt.c
-> index 958dc32a708f..58a00e1ab23b 100644
-> --- a/drivers/watchdog/sp805_wdt.c
-> +++ b/drivers/watchdog/sp805_wdt.c
-> @@ -305,14 +305,12 @@ sp805_wdt_probe(struct amba_device *adev, const struct amba_id *id)
->  	return ret;
->  }
->  
-> -static int sp805_wdt_remove(struct amba_device *adev)
-> +static void sp805_wdt_remove(struct amba_device *adev)
->  {
->  	struct sp805_wdt *wdt = amba_get_drvdata(adev);
->  
->  	watchdog_unregister_device(&wdt->wdd);
->  	watchdog_set_drvdata(&wdt->wdd, NULL);
-> -
-> -	return 0;
->  }
->  
->  static int __maybe_unused sp805_wdt_suspend(struct device *dev)
-> diff --git a/include/linux/amba/bus.h b/include/linux/amba/bus.h
-> index 0bbfd647f5c6..6cc93ab5b809 100644
-> --- a/include/linux/amba/bus.h
-> +++ b/include/linux/amba/bus.h
-> @@ -76,7 +76,7 @@ struct amba_device {
->  struct amba_driver {
->  	struct device_driver	drv;
->  	int			(*probe)(struct amba_device *, const struct amba_id *);
-> -	int			(*remove)(struct amba_device *);
-> +	void			(*remove)(struct amba_device *);
->  	void			(*shutdown)(struct amba_device *);
->  	const struct amba_id	*id_table;
->  };
-> diff --git a/sound/arm/aaci.c b/sound/arm/aaci.c
-> index a0996c47e58f..b326a5f5f0d5 100644
-> --- a/sound/arm/aaci.c
-> +++ b/sound/arm/aaci.c
-> @@ -1055,7 +1055,7 @@ static int aaci_probe(struct amba_device *dev,
->  	return ret;
->  }
->  
-> -static int aaci_remove(struct amba_device *dev)
-> +static void aaci_remove(struct amba_device *dev)
->  {
->  	struct snd_card *card = amba_get_drvdata(dev);
->  
-> @@ -1066,8 +1066,6 @@ static int aaci_remove(struct amba_device *dev)
->  		snd_card_free(card);
->  		amba_release_regions(dev);
->  	}
-> -
-> -	return 0;
->  }
->  
->  static struct amba_id aaci_ids[] = {
-> 
-for vfio-amba,
-Acked-by: Eric Auger <eric.auger@redhat.com>
+On 03.02.2021 12:04, Van Leeuwen, Pascal wrote:
+>> -----Original Message-----
+>> From: Maciej Pijanowski <maciej.pijanowski@3mdeb.com>
+>> Sent: Wednesday, February 3, 2021 11:00 AM
+>> To: Van Leeuwen, Pascal <pvanleeuwen@rambus.com>; linux-crypto@vger.kernel.org
+>> Cc: atenart@kernel.org; pascalvanl@gmail.com; Piotr Król <piotr.krol@3mdeb.com>
+>> Subject: Re: safexcel driver for EIP197 and mini firmware features
+>>
+>> <<< External Email >>>
+>>
+>> On 02.02.2021 10:15, Maciej Pijanowski wrote:
+>>> On 02.02.2021 09:48, Van Leeuwen, Pascal wrote:
+>>>> Hello Maciej,
+>>> Hello,
+>>>>> -----Original Message-----
+>>>>> From: Maciej Pijanowski <maciej.pijanowski@3mdeb.com>
+>>>>> Sent: Monday, February 1, 2021 7:53 PM
+>>>>> To: linux-crypto@vger.kernel.org
+>>>>> Cc: antoine.tenart@bootlin.com; pascalvanl@gmail.com; Piotr Król
+>>>>> <piotr.krol@3mdeb.com>
+>>>>> Subject: safexcel driver for EIP197 and mini firmware features
+>>>>>
+>>>>> <<< External Email >>>
+>>>>> Hello,
+>>>>>
+>>>>> I am interested in using the EIP197 crypto accelerator. I am aware that
+>>>>> it requires an NDA
+>>>>> to obtain the firmware for it, but I found out that there is some kind
+>>>>> of "minifw" as well
+>>>>> in the linux-firmware tree [3]. I found no description of it - I would
+>>>>> like to learn what
+>>>>> are the features and limitations of this "minifw".
+>>>>>
+>>>> Actually, from the perspective of what that firmware normally does,
+>>>> it does not have any features
+>>>> at all :-) Ok, except for cache invalidates, which the EIP-197 requires.
+>>>> It just bypasses everything from the inputs to the internal crypto
+>>>> engine, effectively turning the
+>>>> EIP-197 into an EIP-97 with caches & prefetching.
+>>>>
+>>>> But that's OK for the Linux kernel driver, because that was using the
+>>>> EIP-197 in EIP-97 backward
+>>>> compatibility mode anyway. It does not support any advanced EIP-197
+>>>> firmware features.
+>>>> So from the perspective of the current Linux driver: no limitations.
+>>> Thank you very much for the response. That is much more clear now.
+>>>>> I started with using it on the Debian image from board vendor [2]. The
+>>>>> kernel here is
+>>>>> 5.1.0. The firmware is loaded, but the ALG tests are all failing:
+>>>>>
+>>>>> [14785.750246] crypto-safexcel f2800000.crypto: firmware:
+>>>>> direct-loading
+>>>>> firmware inside-secure/eip197b/ifpp.bin
+>>>>> [14785.762765] crypto-safexcel f2800000.crypto: firmware:
+>>>>> direct-loading
+>>>>> firmware inside-secure/eip197b/ipue.bin
+>>>>> [14785.777978] alg: skcipher: safexcel-cbc-des encryption test failed
+>>>>> (wrong output IV) on test vector 0, cfg="in-place"
+>>>>> [14785.788661] 00000000: fe dc ba 98 76 54 32 10
+>>>>> [14785.800606] alg: skcipher: safexcel-cbc-des3_ede encryption test
+>>>>> failed (wrong output IV) on test vector 0, cfg="in-place"
+>>>>> [14785.811720] 00000000: 7d 33 88 93 0f 93 b2 42
+>>>>> [14785.823734] alg: skcipher: safexcel-cbc-aes encryption test failed
+>>>>> (wrong output IV) on test vector 0, cfg="in-place"
+>>>>> [14785.834439] 00000000: 3d af ba 42 9d 9e b4 30 b4 22 da 80 2c 9f
+>>>>> ac 41
+>>>>> [14785.884568] alg: hash: safexcel-hmac-sha224 test failed (wrong
+>>>>> result) on test vector 3, cfg="init+update+update+final two even
+>>>>> splits"
+>>>>> [14785.901836] alg: hash: safexcel-hmac-sha256 test failed (wrong
+>>>>> result) on test vector 2, cfg="import/export"
+>>>>> [14785.926693] alg: aead: safexcel-authenc-hmac-sha1-cbc-aes encryption
+>>>>> test failed (wrong result) on test vector 0, cfg="misaligned splits
+>>>>> crossing pages, inplace"
+>>>>> [14785.944430] alg: No test for authenc(hmac(sha224),cbc(aes))
+>>>>> (safexcel-authenc-hmac-sha224-cbc-aes)
+>>>>> [14785.956978] alg: aead: safexcel-authenc-hmac-sha256-cbc-aes
+>>>>> encryption test failed (wrong result) on test vector 0, cfg="two even
+>>>>> aligned splits"
+>>>>> [14785.973472] alg: No test for authenc(hmac(sha384),cbc(aes))
+>>>>> (safexcel-authenc-hmac-sha384-cbc-aes)
+>>>>> [14785.986103] alg: aead: safexcel-authenc-hmac-sha512-cbc-aes
+>>>>> encryption test failed (wrong result) on test vector 0, cfg="two even
+>>>>> aligned splits"
+>>>>>
+>>>> Ok, that is unexpected. Although I know there is one particular
+>>>> kernel version that was broken.
+>>>> So you might want to try a slightly newer one.
+>>>> (I'd love to try 5.1 myself but I don't have access to the hardware
+>>>> right now, working from home)
+>>> I am going to try with 5.10.12 and let you know with the results.
+>> This is the first result with 5.10.12 mainline kernel:
+>>
+>> [    1.678251] mmcblk0rpmb: mmc0:0001 8GTF4R partition 3 512 KiB,
+>> chardev (239:0)
+>> [  182.882113] random: fast init done
+>> [  185.308594] crypto-safexcel f2800000.crypto: HW init failed (-11)
+>> [  185.314737] ------------[ cut here ]------------
+>> [  185.319379] WARNING: CPU: 2 PID: 1 at kernel/irq/manage.c:1777
+>> free_irq+0x31c/0x350
+>> [  185.327065] Modules linked in:
+>> [  185.330134] CPU: 2 PID: 1 Comm: swapper/0 Not tainted 5.10.12-dirty #1
+>> [  185.336687] Hardware name: SolidRun ClearFog GT 8K (DT)
+>> [  185.341934] pstate: 60000085 (nZCv daIf -PAN -UAO -TCO BTYPE=--)
+>> [  185.347964] pc : free_irq+0x31c/0x350
+>> [  185.351640] lr : free_irq+0x300/0x350
+>> [  185.355315] sp : ffff80001160baf0
+>> [  185.358641] x29: ffff80001160baf0 x28: 0000000000000000
+>> [  185.363976] x27: ffff8000111d1078 x26: ffff8000111404b8
+>> [  185.369310] x25: 000000000000002d x24: ffff0001016036dc
+>> [  185.374644] x23: ffff000101603790 x22: ffff0001015db180
+>> [  185.379978] x21: 0000000000000000 x20: ffff0001015da700
+>> [  185.385313] x19: ffff000101603600 x18: 0000000000000010
+>> [  185.390647] x17: 00000000000000a9 x16: 0000000000000087
+>> [  185.395981] x15: ffff000100078478 x14: 0000000000000102
+>> [  185.401316] x13: ffff000100078478 x12: 00000000ffffffea
+>> [  185.406649] x11: 0000000000000040 x10: ffff8000114322a0
+>> [  185.411983] x9 : ffff800011432298 x8 : ffff000100400270
+>> [  185.417318] x7 : 0000000000000000 x6 : 0000000000000000
+>> [  185.422651] x5 : ffff000100400248 x4 : ffff8000115b0000
+>> [  185.427985] x3 : ffff8000115b0188 x2 : 0000000000020000
+>> [  185.433319] x1 : ffff000101603600 x0 : ffff800010c87198
+>> [  185.438654] Call trace:
+>> [  185.441109]  free_irq+0x31c/0x350
+>> [  185.444437]  devm_irq_release+0x18/0x28
+>> [  185.448289]  release_nodes+0x1b0/0x228
+>> [  185.452052]  devres_release_all+0x38/0x60
+>> [  185.456077]  really_probe+0x1e4/0x3b0
+>> [  185.459753]  driver_probe_device+0x58/0xb8
+>> [  185.463865]  device_driver_attach+0x74/0x80
+>> [  185.468063]  __driver_attach+0x58/0xe0
+>> [  185.471827]  bus_for_each_dev+0x70/0xc8
+>> [  185.475677]  driver_attach+0x24/0x30
+>> [  185.479265]  bus_add_driver+0x14c/0x1f0
+>> [  185.483116]  driver_register+0x64/0x120
+>> [  185.486965]  __platform_driver_register+0x48/0x58
+>> [  185.491690]  safexcel_init+0x48/0x70
+>> [  185.495279]  do_one_initcall+0x54/0x1b8
+>> [  185.499130]  kernel_init_freeable+0x1d4/0x23c
+>> [  185.503505]  kernel_init+0x14/0x118
+>> [  185.507005]  ret_from_fork+0x10/0x34
+>> [  185.510596] ---[ end trace a5f4f63f649fa735 ]---
+>> [  185.515370] crypto-safexcel: probe of f2800000.crypto failed with
+>> error -11
+>> [  185.522632] usbcore: registered new interface driver usbhid
+>>
+>> The "HW init failed" comes from here:
+>> https://elixir.bootlin.com/linux/v5.10.12/source/drivers/crypto/inside-secure/safexcel.c#L1692
+>> Interestingly, I cannot see in the driver code (at least at a first
+>> glance) where the (-11)
+>> error code would come from.
+>>
+>> Any hints?
+>>
+> It's a weird error code indeed. -11 would be ... EAGAIN? That's certainly not something local.
+> So it must be some error code passed on from some Linux kernel API function call.
+> My best guess at the moment would be the firmware load call (firmware_request_nowarn).
+> But it would have been helpful to see the driver logging _prior_ to HW init failed, to see
+> which parts of the initialization _did_ succeed properly.
+>
+>> Do you have a known working kernel version for this driver?
+>>
+> I've seen a lot of kernel versions work just fine in the past.
+>
+> 5.4 - 5.8 should definitely work just fine.  Last time I tried was September of last year,
+> when I tried to get some fix in for a customer of ours. (but had to give up due to the patch
+> not being accepted as such and me not having the time to redo it as suggested)
+> In any case, whatever was in development (5.10?) at the time still worked fine on my side.
+>
+> In any case, I only know of one older kernel version that was truly broken. Could be the 5.1
+> you tried, don't remember exactly ...
+I will try with one of these suggested versions and maybe add some
+logging in the initialization as suggested above. Thanks.
+>
+>> Thank you,
+>>
+>>>>> I am going to test it with more recent, mainline kernel as well, but it
+>>>>> would be still nice to learn
+>>>>> a little bit more about this "minifw", it's features, and what could be
+>>>>> possibly achieved on this
+>>>>> board without proprietary (and behind NDA) crypto firmware.
+>>>>>
+>>>> Everything the kernel driver currently supports.
+>>>> The real firmware is for doing full protocol offload (like IPsec,
+>>>> DTLS, etc.) which the Linux kernel
+>>>> does not currently support anyway. (unfortunately, I might add)
+>>> Are you aware of any other system (OS) or implementation which takes
+>>> advantage of more of the EIP197 features (like the mentioned IPsec
+>>> offload)?
+>>>>> Thank you,
+>>>>>
+>>>>>
+>>>>> [1]
+>>>>> https://www.solid-run.com/embedded-networking/marvell-armada-family/clearfog-gt-8k/
+>>>>>
+>>>>> [2] https://images.solid-build.xyz/8040/Debian/
+>>>>> [3]
+>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/inside-
+>>>>>
+>>>>> secure/eip197_minifw/ifpp.bin?id=eefb5f7410150c00d0ab5c41c5d817ae9bf449b3
+>>>>>
+>>>>>
+>>>>> --
+>>>>> Maciej Pijanowski
+>>>>> Embedded Systems Engineer
+>>>>> GPG: 9963C36AAC3B2B46
+>>>>> https://3mdeb.com | @3mdeb_com
+>>>> Regards,
+>>>> Pascal van Leeuwen
+>>>> Silicon IP Architect Multi-Protocol Engines, Rambus Security
+>>>> Rambus ROTW Holding BV
+>>>> +31-73 6581953
+>>>>
+>>>> Note: The Inside Secure/Verimatrix Silicon IP team was recently
+>>>> acquired by Rambus.
+>>>> Please be so kind to update your e-mail address book with my new
+>>>> e-mail address.
+>>>>
+>>>>
+>>>> ** This message and any attachments are for the sole use of the
+>>>> intended recipient(s). It may contain information that is
+>>>> confidential and privileged. If you are not the intended recipient of
+>>>> this message, you are prohibited from printing, copying, forwarding
+>>>> or saving it. Please delete the message and attachments and notify
+>>>> the sender immediately. **
+>>>>
+>>>> Rambus Inc.<http://www.rambus.com>
+>> --
+>> Maciej Pijanowski
+>> Embedded Systems Engineer
+>> GPG: 9963C36AAC3B2B46
+>> https://3mdeb.com | @3mdeb_com
+> Regards,
+> Pascal van Leeuwen
+> Silicon IP Architect Multi-Protocol Engines, Rambus Security
+> Rambus ROTW Holding BV
+> +31-73 6581953
+>
+> Note: The Inside Secure/Verimatrix Silicon IP team was recently acquired by Rambus.
+> Please be so kind to update your e-mail address book with my new e-mail address.
+>
+>
+> ** This message and any attachments are for the sole use of the intended recipient(s). It may contain information that is confidential and privileged. If you are not the intended recipient of this message, you are prohibited from printing, copying, forwarding or saving it. Please delete the message and attachments and notify the sender immediately. **
+>
+> Rambus Inc.<http://www.rambus.com>
 
-Thanks
-
-Eric
+-- 
+Maciej Pijanowski
+Embedded Systems Engineer
+GPG: 9963C36AAC3B2B46
+https://3mdeb.com | @3mdeb_com
 
