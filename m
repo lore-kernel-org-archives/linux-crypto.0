@@ -7,76 +7,68 @@ X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15BF7C433E0
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:15:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C45C433DB
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:16:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD8AF64F5C
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:15:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E786E64F60
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:16:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235677AbhBDLPL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Feb 2021 06:15:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40210 "EHLO
+        id S235788AbhBDLPx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Feb 2021 06:15:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235614AbhBDLMo (ORCPT
+        with ESMTP id S235749AbhBDLNX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Feb 2021 06:12:44 -0500
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7218C0611C1
-        for <linux-crypto@vger.kernel.org>; Thu,  4 Feb 2021 03:10:24 -0800 (PST)
-Received: by mail-wr1-x435.google.com with SMTP id a1so3006625wrq.6
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Feb 2021 03:10:24 -0800 (PST)
+        Thu, 4 Feb 2021 06:13:23 -0500
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD59EC061A10
+        for <linux-crypto@vger.kernel.org>; Thu,  4 Feb 2021 03:10:29 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id w4so2744954wmi.4
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Feb 2021 03:10:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=WH1ZkfxgQ3lo4eJG51Uh12VlkOp1jMaFfnNoEjI139M=;
-        b=Fwbq732n3XUVYiF70e2xZk4Vv0WePzbXGtV9K9CQP0xq5MmYe2c1lY5kO8By5tRjBe
-         h/KA0K8rJ45UbLKMQLzOekJPUNVk5R0Om5p11Ff0vp99wZakGBPCBj8dWsHSAvV/t1Jy
-         Em53nt90VnSrtADHul75DC0T1PvBiYW6mxchyjXt+UDaBOqcW3io+1cHBqMULe5ZSN9k
-         9VaxajxrSgxEtiTW6jkWSFCATt4sKdT1RhryJqH+6qBX9rzO/9FE9T8WR7IlAugxKF4f
-         AKRQOxG56UXsyGqq9pkdFUnBuY5dZU6VpUrZCTdsDpJvbLR08WYPESgjONFzBpadKw1x
-         3MPQ==
+        bh=hrNr+lBWtFId4EzjUkysKAYnQC+wg9XBY1JaRyhRGmU=;
+        b=wCl0IaHIQhVpYAG4G1XGZ11OJZCpT+nf40JxNtK/yc+i2oMo9dm0aJhJzAqrUs5tZq
+         FvFd5kcpNZcSkMIkXUKXojCIAXax2YYl6f3UUb7+IcUKpRf4nxy2ZTwBCW79IwyBXPxe
+         nopVLMan39vBhud+20LlTluJ6uScxi/yGDBBp/YSapWUhKBRLo35hbP6iqXDZBnKJcbC
+         CFwip/DRDdTdyItXEtbWAmYNzhJE8Vvg7y6c3IcP5y2n5d0INnR0TZodPX/41Y5ytAoQ
+         RaM+Ba3HalHyJBPImyICoe+EABpG6OYlwTQ/m0DC5KZBtguzx6yVEoQh2iE7p8a7P0UZ
+         abBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=WH1ZkfxgQ3lo4eJG51Uh12VlkOp1jMaFfnNoEjI139M=;
-        b=TTuqBn5LYKDq1tmhr/zsZYkiTFe9BTMo0YYFLkSJzN7ZfJg+v+QYy3YCjAyAkSikx8
-         ZAwcqJXeoMTCyvu5JohM9s1OTNw2kKNIzzY0GPPnPFdgKhxC8UXdo9FynI5jmLwyvNcS
-         aSNaXtT2O46ehTUXE7UjectkieE+5NJbqEv6YEPR/Uu25p9yqLQjcO2HQwabQPprKfs+
-         qsu9X43Zw3mc6kLdcow4IqflpZlwIGSK+SDlcL5JwLQJwDedmE0/hD3Eown9NHwgvXoU
-         ne8+l4CuAOqj//53sbpq7NuB9ThsoWgibcXhxYZa6ebMybsPbU6Gkf6nv5gpc6PRRRSq
-         LMbA==
-X-Gm-Message-State: AOAM533nJmest3aFp95VWUt0Uhh+F9UbAoyYpbXIRQBFo0Cm5H1NhHEn
-        FtcgJjqUmxCwbx/ZYR/5fJsSzQ==
-X-Google-Smtp-Source: ABdhPJzjUp9+e7p/dg0UnaZ0rUY3UY0nKqEvrLN6uQoqxKKkifC3adrh0/+QNGokJy751vuZFU+CFw==
-X-Received: by 2002:a5d:420d:: with SMTP id n13mr8658453wrq.320.1612437023472;
-        Thu, 04 Feb 2021 03:10:23 -0800 (PST)
+        bh=hrNr+lBWtFId4EzjUkysKAYnQC+wg9XBY1JaRyhRGmU=;
+        b=UypXwHa7zEC4vRfs1hOd8Etp0T+MxhHH5VSUqFKyzbNfZbtzMxyMEBhETZydy9izEi
+         7dh9An/n5n+nie0YIxjcQkZiKkyQHELL113bOXbpuvsMQQGW0xSBfYd4YJo9/N0LqNx8
+         etFhZU6VFjR4v7PzeSnPkttKlGsZeyLL0Yd4hNI2SNNsNauu96CQn1EunTzPq3e/fZYr
+         0YHoJTFUV499UYTsH3D1BUS/3oeMMFpMXBnHSWexpmUXNqTwCf6MwRmi216JXSuu1DLE
+         yZA+MPv367xJsnGim0BmIwh2kMrc1UcZQr1159TL4+yS+siA3g2Wek0XvMfPz2YJCwZn
+         Uweg==
+X-Gm-Message-State: AOAM5337TqzxsRgeK6B3i1bihCaLOuOPMjnTJNhPZINaXV0Ldp2OmnUa
+        DZnvwNuOzQVDkmGj2vqqWuIf2A==
+X-Google-Smtp-Source: ABdhPJyQt1sKw0ek1Sz27bkoNIJ4Dc3TqSZmz3zCEA0n7R042NG3hUP1E6LQ8QMiCibzFOUbIpWBnA==
+X-Received: by 2002:a1c:9ec9:: with SMTP id h192mr7238710wme.28.1612437028668;
+        Thu, 04 Feb 2021 03:10:28 -0800 (PST)
 Received: from dell.default ([91.110.221.188])
-        by smtp.gmail.com with ESMTPSA id y18sm7696218wrt.19.2021.02.04.03.10.22
+        by smtp.gmail.com with ESMTPSA id y18sm7696218wrt.19.2021.02.04.03.10.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Feb 2021 03:10:22 -0800 (PST)
+        Thu, 04 Feb 2021 03:10:27 -0800 (PST)
 From:   Lee Jones <lee.jones@linaro.org>
 To:     lee.jones@linaro.org
 Cc:     linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Breno=20Leit=C3=A3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Kent Yoder <yoder1@us.ibm.com>, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH 17/20] crypto: nx: nx-aes-cbc: Headers comments should not be kernel-doc
-Date:   Thu,  4 Feb 2021 11:09:57 +0000
-Message-Id: <20210204111000.2800436-18-lee.jones@linaro.org>
+        linux-crypto@vger.kernel.org
+Subject: [PATCH 20/20] crypto: cavium: nitrox_isr: Demote non-compliant kernel-doc headers
+Date:   Thu,  4 Feb 2021 11:10:00 +0000
+Message-Id: <20210204111000.2800436-21-lee.jones@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210204111000.2800436-1-lee.jones@linaro.org>
 References: <20210204111000.2800436-1-lee.jones@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -84,38 +76,40 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Fixes the following W=1 kernel build warning(s):
 
- drivers/crypto/nx/nx-aes-cbc.c:24: warning: Function parameter or member 'tfm' not described in 'cbc_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-cbc.c:24: warning: Function parameter or member 'in_key' not described in 'cbc_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-cbc.c:24: warning: Function parameter or member 'key_len' not described in 'cbc_aes_nx_set_key'
- drivers/crypto/nx/nx-aes-cbc.c:24: warning: expecting prototype for Nest Accelerators driver(). Prototype was for cbc_aes_nx_set_key() instead
+ drivers/crypto/cavium/nitrox/nitrox_isr.c:17: warning: expecting prototype for One vector for each type of ring(). Prototype was for NR_RING_VECTORS() instead
+ drivers/crypto/cavium/nitrox/nitrox_isr.c:224: warning: Function parameter or member 'irq' not described in 'nps_core_int_isr'
+ drivers/crypto/cavium/nitrox/nitrox_isr.c:224: warning: Function parameter or member 'data' not described in 'nps_core_int_isr'
 
-Cc: "Breno Leitão" <leitao@debian.org>
-Cc: Nayna Jain <nayna@linux.ibm.com>
-Cc: Paulo Flabiano Smorigo <pfsmorigo@gmail.com>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Paul Mackerras <paulus@samba.org>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Kent Yoder <yoder1@us.ibm.com>
 Cc: linux-crypto@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org
 Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- drivers/crypto/nx/nx-aes-cbc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/cavium/nitrox/nitrox_isr.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-aes-cbc.c b/drivers/crypto/nx/nx-aes-cbc.c
-index 92e921eceed75..d6314ea9ae896 100644
---- a/drivers/crypto/nx/nx-aes-cbc.c
-+++ b/drivers/crypto/nx/nx-aes-cbc.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0-only
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_isr.c b/drivers/crypto/cavium/nitrox/nitrox_isr.c
+index 99b053094f5af..c288c4b51783d 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_isr.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_isr.c
+@@ -10,7 +10,7 @@
+ #include "nitrox_isr.h"
+ #include "nitrox_mbx.h"
+ 
 -/**
 +/*
-  * AES CBC routines supporting the Power 7+ Nest Accelerators driver
-  *
-  * Copyright (C) 2011-2012 International Business Machines Inc.
+  * One vector for each type of ring
+  *  - NPS packet ring, AQMQ ring and ZQMQ ring
+  */
+@@ -216,7 +216,7 @@ static void nps_core_int_tasklet(unsigned long data)
+ 	}
+ }
+ 
+-/**
++/*
+  * nps_core_int_isr - interrupt handler for NITROX errors and
+  *   mailbox communication
+  */
 -- 
 2.25.1
 
