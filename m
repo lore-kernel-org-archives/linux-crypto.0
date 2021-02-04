@@ -4,73 +4,105 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FE2DC433DB
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 16:00:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30063C433E6
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 16:13:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BEFEC61477
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 16:00:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01DAC64F4E
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 16:13:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237589AbhBDQAl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Feb 2021 11:00:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38516 "EHLO mail.kernel.org"
+        id S237837AbhBDQJi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Feb 2021 11:09:38 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41506 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237279AbhBDQAA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Feb 2021 11:00:00 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E102961477;
-        Thu,  4 Feb 2021 15:59:19 +0000 (UTC)
+        id S237835AbhBDQJa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 4 Feb 2021 11:09:30 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B37B264F6A;
+        Thu,  4 Feb 2021 16:08:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1612454360;
-        bh=VNqcEDt8Zreb5i6SAVqO2ZC/dbmMeeu5CNyA6xfGbSY=;
+        s=korg; t=1612454929;
+        bh=3IAPQCCNYn5V60zzmVrr36a9HtGkWRc99HBODO496rg=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=tWgQrE8MM0nu1QtIP1ffhUPqvkkEd2O658aSFmnvWhkexewcMOfEsTRW0Tjqwfhjh
-         g6bcICEYkHjX6xn2VbH+wjUlpC6qe+hgV3q6yc6wNpfmqsNW4ZVrl0e2PKa3Y5mF2S
-         m1lvqMaSCVN3MnYhSodP3YgWAqXtrj0vBGXxOKos=
-Date:   Thu, 4 Feb 2021 16:59:17 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Andy Lutomirski <luto@kernel.org>,
-        Jann Horn <jannh@google.com>, Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH RESEND] random: fix the RNDRESEEDCRNG ioctl
-Message-ID: <YBwZ1a0VIdpTDNuD@kroah.com>
-References: <20210112192818.69921-1-ebiggers@kernel.org>
- <YBiEJ9Md60HjAWJg@sol.localdomain>
+        b=SbGXD2TYulwmiUQymxa1aJ6E9gI3aWMtXnHBN5sPgXVrkpXtCbu+v0ZHPxelGg3kf
+         OCEK7Js2lxNP6OULdJSFxzpq9FfVDxZmJCQNHvO0+GZx0qC8q1M2tspWFbV3CM2ebX
+         7vYTxzaaKedXFZO77mr+R3l5UMy2ORCNsruSabzc=
+Date:   Thu, 4 Feb 2021 17:08:46 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <uwe@kleine-koenig.org>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jens Axboe <axboe@kernel.dk>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Haren Myneni <haren@us.ibm.com>,
+        Breno =?iso-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        Steven Royer <seroyer@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Cristobal Forno <cforno12@linux.ibm.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Dany Madden <drt@linux.ibm.com>, Lijun Pan <ljp@linux.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Michael Cyr <mikecyr@linux.ibm.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        netdev@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org
+Subject: Re: [PATCH] vio: make remove callback return void
+Message-ID: <YBwcDmtefa2WmS90@kroah.com>
+References: <20210127215010.99954-1-uwe@kleine-koenig.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <YBiEJ9Md60HjAWJg@sol.localdomain>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210127215010.99954-1-uwe@kleine-koenig.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 01, 2021 at 02:43:51PM -0800, Eric Biggers wrote:
-> On Tue, Jan 12, 2021 at 11:28:18AM -0800, Eric Biggers wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > The RNDRESEEDCRNG ioctl reseeds the primary_crng from itself, which
-> > doesn't make sense.  Reseed it from the input_pool instead.
-> > 
-> > Fixes: d848e5f8e1eb ("random: add new ioctl RNDRESEEDCRNG")
-> > Cc: stable@vger.kernel.org
-> > Cc: linux-crypto@vger.kernel.org
-> > Cc: Andy Lutomirski <luto@kernel.org>
-> > Cc: Jann Horn <jannh@google.com>
-> > Cc: Theodore Ts'o <tytso@mit.edu>
-> > Reviewed-by: Jann Horn <jannh@google.com>
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > ---
-> > 
-> > Andrew, please consider taking this patch since the maintainer has been
-> > ignoring it for 4 months
-> > (https://lkml.kernel.org/lkml/20200916041908.66649-1-ebiggers@kernel.org/T/#u).
+On Wed, Jan 27, 2021 at 10:50:10PM +0100, Uwe Kleine-König wrote:
+> The driver core ignores the return value of struct bus_type::remove()
+> because there is only little that can be done. To simplify the quest to
+> make this function return void, let struct vio_driver::remove() return
+> void, too. All users already unconditionally return 0, this commit makes
+> it obvious that returning an error code is a bad idea and makes it
+> obvious for future driver authors that returning an error code isn't
+> intended.
 > 
-> Ping.
+> Note there are two nominally different implementations for a vio bus:
+> one in arch/sparc/kernel/vio.c and the other in
+> arch/powerpc/platforms/pseries/vio.c. I didn't care to check which
+> driver is using which of these busses (or if even some of them can be
+> used with both) and simply adapt all drivers and the two bus codes in
+> one go.
+> 
+> Note that for the powerpc implementation there is a semantical change:
+> Before this patch for a device that was bound to a driver without a
+> remove callback vio_cmo_bus_remove(viodev) wasn't called. As the device
+> core still considers the device unbound after vio_bus_remove() returns
+> calling this unconditionally is the consistent behaviour which is
+> implemented here.
+> 
+> Signed-off-by: Uwe Kleine-König <uwe@kleine-koenig.org>
+> ---
+> Hello,
+> 
+> note that this change depends on
+> https://lore.kernel.org/r/20210121062005.53271-1-ljp@linux.ibm.com which removes
+> an (ignored) return -EBUSY in drivers/net/ethernet/ibm/ibmvnic.c.
+> I don't know when/if this latter patch will be applied, so it might take
+> some time until my patch can go in.
 
-Given the lack of response, I'll take this now...
-
-thanks,
-greg k-h
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
