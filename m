@@ -5,73 +5,72 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8387FC433DB
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:12:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC8AC433E0
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:13:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 56AD164F60
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:12:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F378364F5C
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:13:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235739AbhBDLMl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Feb 2021 06:12:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39926 "EHLO
+        id S235748AbhBDLNU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Feb 2021 06:13:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235682AbhBDLLu (ORCPT
+        with ESMTP id S235705AbhBDLMM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Feb 2021 06:11:50 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1DB6C0612F2
-        for <linux-crypto@vger.kernel.org>; Thu,  4 Feb 2021 03:10:16 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id v15so3019270wrx.4
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Feb 2021 03:10:16 -0800 (PST)
+        Thu, 4 Feb 2021 06:12:12 -0500
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C713C061352
+        for <linux-crypto@vger.kernel.org>; Thu,  4 Feb 2021 03:10:14 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id j11so2752102wmi.3
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Feb 2021 03:10:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=avN1u0Er/3jjbceQj3GDRB5KtHhfEhx0wpHOx8svPCg=;
-        b=tbTk9psUc52Wwl90sZuJm/3vqked4L4RjNIaBf8tRL3qUxnaYWAE+Ijgg+Mwqge9mh
-         C+lQ2LAaNUd9Jby+KXE88A9m6VnjNMqHu3U+EsZWNpHpUszlyKG37cJ9SOo0WjV/mT/H
-         xJ020nufrEvJlN3WnYNB8z0mFMgP2fOISxcMVHdZUIxQtwUjbPr3FrvLIJtN3NyLBrZZ
-         lk03+BTzI04dXjyjLMiY6b+JWk4ZeMOBhbROzr4VHLi+VTfY902xPc80ZK5aJsSZQb2n
-         p0AALHyUhOwxR8ahBOkzU2+qOXqLDLRKm4bZwq+Seczaee2tiX+pXxfT6FVQn4Ic5JY4
-         pG/g==
+        bh=jD3fDhqrGmZlQJN4sE5tqUAObb8EheXiffPU2HNHONI=;
+        b=SZwwWIeVUbG3QySuaV0bjefGVojXmvsBnf9OYpQkKUvrnDCTOz+SDdZdx557SGy7El
+         E5ZPs6j/XSEL0D9wmKBdkDNTySxzq7Vl49xedFQDnrCEJgbQ0EHVSWrfHHw492aotv79
+         dsEeAEPP5du/ijeMImA+bpaUTWR6LihUNwMRIHRtnNX2w5vTdds2aC/l7z/HBN9VKjoN
+         7FMf1ohwJF0XNhE6UhUhflqOFeQl46S78SZdtcf42pFpO8iBsgjvfiybhLV7g5Gsq7lZ
+         kG6ah3FwOu28XQyE91aJ22X5TQkQ8NGIKw5HmYmygpAe0sBXNdgqLD6U16BiIuAn3rAG
+         QmLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=avN1u0Er/3jjbceQj3GDRB5KtHhfEhx0wpHOx8svPCg=;
-        b=YmTjSDlTVNjLqxarN0P5y61SjEDCOWo1vToHH+c4CbK/r/mE6LRp1mW+VPiRP6WAP3
-         Fa9A30VMJ3J0Nue3GPlWTviAvdzhq5gQ0jZW2XMgp7GP8h0fl/EQuDK2qCo4KTHVd6/0
-         QeqT/GrW+nWYuRNHNCDujWaqiiU8vnRTgf1MXEFmB6OX5xe2F9QISjaHo1L3ezah4kti
-         25q9Vs+2rf8CvD13EE/9BViVneZsGk1Q8w5U93YbMPqSXWjgpnN6pf8DPYn5I2R+/TK9
-         UY0JwsWIGN/VGpiFvP+M9t068Wgm/AAMHG87/9S2TVD1u2mc84h9VpXMNxu6/W0d1sy6
-         8idg==
-X-Gm-Message-State: AOAM533tEUcKOpqVuVNz+AsFhn/X9aZhFD+HeEOYDVE0JaqXGBsV4K0E
-        7ErNy0YX7uOTI3uB+WSqw76nxw==
-X-Google-Smtp-Source: ABdhPJzTMVni3uUeJoJsuMcvVIXormUpRYGc5uC7YJqFJZbIZqsofBqllUbt0pYWV02sTZYFmPC61g==
-X-Received: by 2002:adf:dd05:: with SMTP id a5mr8572303wrm.402.1612437015406;
-        Thu, 04 Feb 2021 03:10:15 -0800 (PST)
+        bh=jD3fDhqrGmZlQJN4sE5tqUAObb8EheXiffPU2HNHONI=;
+        b=eOFQ9B6X8WUkJyZ9cjLYFYSVBEK9CP9htTxWmPtKRqWtah8A/z5aVra3zQsFSVxu+q
+         cJmKpkuwOSQUT+1i6y7zTDz2mZV+8eQawEWAFrFha8FE1PgSml9SWMfNYklnMPIlOUnz
+         imZTDlJrQgT2UxwOGvPL/3mFGFxF3EKIQpkJVZno22RxgZ6UO2MQtKP+vAE9tGY0lSq9
+         W1aA2GOZ05XtZRUHLKiM1yrASyIRXp0lNUw5euCE8/LuAovCRkvmVZIxLIWBsKEks2qU
+         DmhMdN7/BRgGRbA7fF4i247QPQj9tIJDEOD1lRZNXnEP4kzCy0a+m/4BOBrXSuXlXJWq
+         e5rA==
+X-Gm-Message-State: AOAM533q177SNU15A0VvZW6JVG5P3/8E+pEvzyo/CUIXBiqcYlBrHFMr
+        hZOtqEpuD4CfAF6yEgcJV066gA==
+X-Google-Smtp-Source: ABdhPJzVT/7n6AdOU6B1akQQoIhqbYcrMOm6Gs+rjqT0lZnEi6yTeq/L26AxS87ReLE9AQ6SRbroOg==
+X-Received: by 2002:a1c:1b15:: with SMTP id b21mr3910742wmb.116.1612437013148;
+        Thu, 04 Feb 2021 03:10:13 -0800 (PST)
 Received: from dell.default ([91.110.221.188])
-        by smtp.gmail.com with ESMTPSA id y18sm7696218wrt.19.2021.02.04.03.10.14
+        by smtp.gmail.com with ESMTPSA id y18sm7696218wrt.19.2021.02.04.03.10.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Feb 2021 03:10:14 -0800 (PST)
+        Thu, 04 Feb 2021 03:10:12 -0800 (PST)
 From:   Lee Jones <lee.jones@linaro.org>
 To:     lee.jones@linaro.org
 Cc:     linux-kernel@vger.kernel.org,
-        Ayush Sawal <ayush.sawal@chelsio.com>,
-        Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
-        Rohit Maheshwari <rohitm@chelsio.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Manoj Malviya <manojmalviya@chelsio.com>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Jitendra Lulla <jlulla@chelsio.com>,
-        M R Gowda <yeshaswi@chelsio.com>,
-        Harsh Jain <harsh@chelsio.com>, linux-crypto@vger.kernel.org
-Subject: [PATCH 10/20] crypto: chelsio: chcr_algo: Fix a couple of kernel-doc issues caused by doc-rot
-Date:   Thu,  4 Feb 2021 11:09:50 +0000
-Message-Id: <20210204111000.2800436-11-lee.jones@linaro.org>
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Shujuan Chen <shujuan.chen@stericsson.com>,
+        Jonas Linde <jonas.linde@stericsson.com>,
+        Niklas Hernaeus <niklas.hernaeus@stericsson.com>,
+        Joakim Bech <joakim.xx.bech@stericsson.com>,
+        Berne Hebark <berne.herbark@stericsson.com>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH 08/20] crypto: ux500: cryp: Demote some conformant non-kernel headers fix another
+Date:   Thu,  4 Feb 2021 11:09:48 +0000
+Message-Id: <20210204111000.2800436-9-lee.jones@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210204111000.2800436-1-lee.jones@linaro.org>
 References: <20210204111000.2800436-1-lee.jones@linaro.org>
@@ -83,56 +82,53 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Fixes the following W=1 kernel build warning(s):
 
- drivers/crypto/chelsio/chcr_algo.c:806: warning: Function parameter or member 'wrparam' not described in 'create_cipher_wr'
- drivers/crypto/chelsio/chcr_algo.c:806: warning: Excess function parameter 'req' description in 'create_cipher_wr'
- drivers/crypto/chelsio/chcr_algo.c:806: warning: Excess function parameter 'ctx' description in 'create_cipher_wr'
- drivers/crypto/chelsio/chcr_algo.c:806: warning: Excess function parameter 'qid' description in 'create_cipher_wr'
- drivers/crypto/chelsio/chcr_algo.c:806: warning: Excess function parameter 'op_type' description in 'create_cipher_wr'
- drivers/crypto/chelsio/chcr_algo.c:1566: warning: Function parameter or member 'req' not described in 'create_hash_wr'
- drivers/crypto/chelsio/chcr_algo.c:1566: warning: Function parameter or member 'param' not described in 'create_hash_wr'
+ drivers/crypto/ux500/cryp/cryp.c:19: warning: Incorrect use of kernel-doc format:  * cryp_wait_until_done - wait until the device logic is not busy
+ drivers/crypto/ux500/cryp/cryp.c:22: warning: Function parameter or member 'device_data' not described in 'cryp_wait_until_done'
+ drivers/crypto/ux500/cryp/cryp.c:22: warning: expecting prototype for ST(). Prototype was for cryp_wait_until_done() instead
+ drivers/crypto/ux500/cryp/cryp.c:292: warning: Function parameter or member 'cryp_mode' not described in 'cryp_save_device_context'
 
-Cc: Ayush Sawal <ayush.sawal@chelsio.com>
-Cc: Vinay Kumar Yadav <vinay.yadav@chelsio.com>
-Cc: Rohit Maheshwari <rohitm@chelsio.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Manoj Malviya <manojmalviya@chelsio.com>
-Cc: Atul Gupta <atul.gupta@chelsio.com>
-Cc: Jitendra Lulla <jlulla@chelsio.com>
-Cc: M R Gowda <yeshaswi@chelsio.com>
-Cc: Harsh Jain <harsh@chelsio.com>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Shujuan Chen <shujuan.chen@stericsson.com>
+Cc: Jonas Linde <jonas.linde@stericsson.com>
+Cc: Niklas Hernaeus <niklas.hernaeus@stericsson.com>
+Cc: Joakim Bech <joakim.xx.bech@stericsson.com>
+Cc: Berne Hebark <berne.herbark@stericsson.com>
 Cc: linux-crypto@vger.kernel.org
 Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- drivers/crypto/chelsio/chcr_algo.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ drivers/crypto/ux500/cryp/cryp.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index f5a336634daa6..f77d3fd962bf8 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -797,10 +797,7 @@ static inline void create_wreq(struct chcr_context *ctx,
+diff --git a/drivers/crypto/ux500/cryp/cryp.c b/drivers/crypto/ux500/cryp/cryp.c
+index 9866c2a5e9a70..759d0d9786fd1 100644
+--- a/drivers/crypto/ux500/cryp/cryp.c
++++ b/drivers/crypto/ux500/cryp/cryp.c
+@@ -1,5 +1,5 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-/**
++/*
+  * Copyright (C) ST-Ericsson SA 2010
+  * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
+  * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
+@@ -15,7 +15,7 @@
+ #include "cryp_p.h"
+ #include "cryp.h"
  
- /**
-  *	create_cipher_wr - form the WR for cipher operations
-- *	@req: cipher req.
-- *	@ctx: crypto driver context of the request.
-- *	@qid: ingress qid where response of this WR should be received.
-- *	@op_type:	encryption or decryption
-+ *	@wrparam: Container for create_cipher_wr()'s parameters
+-/**
++/*
+  * cryp_wait_until_done - wait until the device logic is not busy
   */
- static struct sk_buff *create_cipher_wr(struct cipher_wr_param *wrparam)
- {
-@@ -1559,7 +1556,8 @@ static inline void chcr_free_shash(struct crypto_shash *base_hash)
- 
- /**
-  *	create_hash_wr - Create hash work request
-- *	@req - Cipher req base
-+ *	@req: Cipher req base
-+ *	@param: Container for create_hash_wr()'s parameters
+ void cryp_wait_until_done(struct cryp_device_data *device_data)
+@@ -285,6 +285,7 @@ int cryp_configure_init_vector(struct cryp_device_data *device_data,
+  *				other device context parameter
+  * @device_data: Pointer to the device data struct for base address.
+  * @ctx: Crypto device context
++ * @cryp_mode: Mode: Polling, Interrupt or DMA
   */
- static struct sk_buff *create_hash_wr(struct ahash_request *req,
- 				      struct hash_wr_param *param)
+ void cryp_save_device_context(struct cryp_device_data *device_data,
+ 			      struct cryp_device_context *ctx,
 -- 
 2.25.1
 
