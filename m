@@ -2,146 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE42C433E6
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 05:44:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E9C2C433E0
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 07:21:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7EFF964F64
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 05:44:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D38F364DDC
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 07:21:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230252AbhBDFoe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Feb 2021 00:44:34 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38284 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229508AbhBDFoc (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Feb 2021 00:44:32 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 1145VwUw161726;
-        Thu, 4 Feb 2021 00:43:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=H1K8keCfYd88y6FeSveP1pC8C27fc39xWe+VR3onYlE=;
- b=CJEcxLIDhyqyfdt2Jix9eiA87XNU5WkfN0+j22NxH0FBsy0j2cbcUajnfttUTwTXGGZq
- Nn6Pyleb4h4dnuylf6XjytZw6IOkI9k4d1OR6uB78DmrjD7VvXKPOGF/VODvk6JHvhUI
- hi7hP+w1wNOqUlNs1TjhcIQBuOY7TzOVGUGCoshj++646AJOfj9oKBp3YP6d6hrSGDyY
- sBAiXe69Yi+fESxAt6y5BnjTXnzNoj2jXZ+mwxN31NH6qV4/LlrBbbkVVN3042GMtY2w
- uFBw8P2PPhqteme3WIkN1rOPhgoOenFVdjaN1UIGV553GozY2MLKMDHdz7TWMISqeyMh Gw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36gams0kjq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Feb 2021 00:43:45 -0500
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 1145Wx5e165902;
-        Thu, 4 Feb 2021 00:43:44 -0500
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36gams0kje-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Feb 2021 00:43:44 -0500
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 1145SKiv016451;
-        Thu, 4 Feb 2021 05:43:44 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma02wdc.us.ibm.com with ESMTP id 36cy39kxwe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Feb 2021 05:43:44 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1145hhl641550302
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 4 Feb 2021 05:43:43 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5A341124054;
-        Thu,  4 Feb 2021 05:43:43 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 47CE3124053;
-        Thu,  4 Feb 2021 05:43:43 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu,  4 Feb 2021 05:43:43 +0000 (GMT)
-Subject: Re: [PATCH v7 1/4] crypto: Add support for ECDSA signature
- verification
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Saulo Alessandre <saulo.alessandre@gmail.com>
-Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, dhowells@redhat.com, zohar@linux.ibm.com,
-        linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
-        linux-integrity@vger.kernel.org
-References: <20210201151910.1465705-1-stefanb@linux.ibm.com>
- <20210201151910.1465705-2-stefanb@linux.ibm.com>
- <20210204052738.GA7086@gondor.apana.org.au>
-From:   Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <652c922b-a231-b1ab-43ce-d4d670c90eef@linux.ibm.com>
-Date:   Thu, 4 Feb 2021 00:43:43 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
-MIME-Version: 1.0
-In-Reply-To: <20210204052738.GA7086@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-04_02:2021-02-03,2021-02-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- bulkscore=0 mlxlogscore=999 spamscore=0 mlxscore=0 malwarescore=0
- adultscore=0 priorityscore=1501 lowpriorityscore=0 impostorscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102040029
+        id S230270AbhBDHUr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Feb 2021 02:20:47 -0500
+Received: from smtp21.cstnet.cn ([159.226.251.21]:43262 "EHLO cstnet.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S234165AbhBDHUh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 4 Feb 2021 02:20:37 -0500
+X-Greylist: delayed 481 seconds by postgrey-1.27 at vger.kernel.org; Thu, 04 Feb 2021 02:20:36 EST
+Received: from localhost.localdomain (unknown [124.16.141.242])
+        by APP-01 (Coremail) with SMTP id qwCowAD351gonhtgg8BBAQ--.50122S2;
+        Thu, 04 Feb 2021 15:11:36 +0800 (CST)
+From:   Xu Wang <vulab@iscas.ac.cn>
+To:     gcherian@marvell.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: cavium: remove casting dma_alloc_coherent
+Date:   Thu,  4 Feb 2021 07:11:33 +0000
+Message-Id: <20210204071133.83921-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: qwCowAD351gonhtgg8BBAQ--.50122S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Xw15CFyxGw1ktF48Jw17trb_yoWDWFb_ur
+        18ZFZ3Xr1qg3yrArn5KrWa9rWvv39a9F97u3ZY9rW3ta47JwnFg347Xrn3Zr4UZa97uay3
+        Z393tr42kr1UujkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb2AYjsxI4VWkKwAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I
+        6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM2
+        8CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0
+        cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I
+        8E87Iv6xkF7I0E14v26F4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+        0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Gr0_Cr
+        1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkIecxEwVAFwVW8CwCF04k2
+        0xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI
+        8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41l
+        IxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIx
+        AIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvE
+        x4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07bFg4hUUUUU=
+X-Originating-IP: [124.16.141.242]
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBgcCA10Te9wtQQAAsF
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/4/21 12:27 AM, Herbert Xu wrote:
-> On Mon, Feb 01, 2021 at 10:19:07AM -0500, Stefan Berger wrote:
->> Add support for parsing the parameters of a NIST P256 or NIST P192 key.
->> Enable signature verification using these keys. The new module is
->> enabled with CONFIG_ECDSA:
->>    Elliptic Curve Digital Signature Algorithm (NIST P192, P256 etc.)
->>    is A NIST cryptographic standard algorithm. Only signature verification
->>    is implemented.
->>
->> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
->> Cc: Herbert Xu <herbert@gondor.apana.org.au>
->> Cc: "David S. Miller" <davem@davemloft.net>
->> Cc: linux-crypto@vger.kernel.org
->> ---
->>   crypto/Kconfig               |  10 +
->>   crypto/Makefile              |   6 +
->>   crypto/ecc.c                 |  13 +-
->>   crypto/ecc.h                 |  28 +++
->>   crypto/ecdsa.c               | 361 +++++++++++++++++++++++++++++++++++
->>   crypto/ecdsasignature.asn1   |   4 +
->>   crypto/testmgr.c             |  12 ++
->>   crypto/testmgr.h             | 267 ++++++++++++++++++++++++++
->>   include/linux/oid_registry.h |   4 +
->>   9 files changed, 694 insertions(+), 11 deletions(-)
->>   create mode 100644 crypto/ecdsa.c
->>   create mode 100644 crypto/ecdsasignature.asn1
-> Saulo Alessandre is implementing ecdsa with signing so you two
-> should coordinate on this.
+Remove casting the values returned by dma_alloc_coherent.
 
-Hello Saulo,
+Signed-off-by: Xu Wang <vulab@iscas.ac.cn>
+---
+ drivers/crypto/cavium/cpt/cptvf_main.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-  so this series here supports NIST P256 and NIST P192 for usage by IMA 
-for example. It looks like you want to support more elliptic curves than 
-these: p384 and even p521. Do you have any suggestion on how to proceed? 
-Would you want to add patches with your additional curves on top of this 
-series?
-
-I have a project here with some test scripts that may also be relevant 
-for your case: https://github.com/stefanberger/eckey-testing
-
-
-     Stefan
-
-
->
-> Thanks,
-
+diff --git a/drivers/crypto/cavium/cpt/cptvf_main.c b/drivers/crypto/cavium/cpt/cptvf_main.c
+index f016448e43bb..112b12a32542 100644
+--- a/drivers/crypto/cavium/cpt/cptvf_main.c
++++ b/drivers/crypto/cavium/cpt/cptvf_main.c
+@@ -233,10 +233,10 @@ static int alloc_command_queues(struct cpt_vf *cptvf,
+ 
+ 			c_size = (rem_q_size > qcsize_bytes) ? qcsize_bytes :
+ 					rem_q_size;
+-			curr->head = (u8 *)dma_alloc_coherent(&pdev->dev,
+-							      c_size + CPT_NEXT_CHUNK_PTR_SIZE,
+-							      &curr->dma_addr,
+-							      GFP_KERNEL);
++			curr->head = dma_alloc_coherent(&pdev->dev,
++							c_size + CPT_NEXT_CHUNK_PTR_SIZE,
++							&curr->dma_addr,
++							GFP_KERNEL);
+ 			if (!curr->head) {
+ 				dev_err(&pdev->dev, "Command Q (%d) chunk (%d) allocation failed\n",
+ 					i, queue->nchunks);
+-- 
+2.17.1
 
