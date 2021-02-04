@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27D61C433E0
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 15:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ADB8C433E0
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 15:45:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E18F064F64
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 15:44:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CDC864F4A
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 15:45:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237469AbhBDPny (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Feb 2021 10:43:54 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33162 "EHLO mail.kernel.org"
+        id S237596AbhBDPo0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Feb 2021 10:44:26 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33444 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237168AbhBDPnQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Feb 2021 10:43:16 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 671D664F4D;
-        Thu,  4 Feb 2021 15:42:33 +0000 (UTC)
+        id S237583AbhBDPoO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 4 Feb 2021 10:44:14 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id AB7AD64F51;
+        Thu,  4 Feb 2021 15:43:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612453355;
-        bh=EU2GB+SDJu3n1HEJNYfa0RUxpSUsohAvo/RCzjgzAGE=;
-        h=From:To:Cc:Subject:Date:From;
-        b=VASP5nnEDUJGGbJFGfnAdjemfxE7GLDMZ0oUaAd4SL5n+OlyfnEjEk+wg80IOADgo
-         LjKRvbMkxjCMH74dmBs3UPnAxA0D7FxqMt11fjv9eX6R4/038/Hs+vdHG6dBMnYqwj
-         ysxqB+JuqQl+4gUmtlIqlVHlljz9f5N3F9ZC+wUl08czrwOyNgh6ihEoTGCWKwzzo0
-         RXtiDP6N8qQxuZUxGGMN1yTBTmwSH6gyRORRSkMVeVLkehsde33zmeGdE4PgTMWhgU
-         0wa/A5D4GQIOGZtLpHYUNOlJFEw/MyhBiz+oUxBx94paBcVdjBo/sueH8i9Mg3rSwZ
-         6IwZ3uQ1a8gIw==
+        s=k20201202; t=1612453412;
+        bh=Knd66ZMj8z26HZKnCluD4hTJCYpgA55COiNsYhL+2aM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=a5RpB5y0amAulQ4cMshw2Oo2q5k9Q0BbADggF08XSDmXR3LClBaeyk5GSMdWJX4HU
+         kaKMLZoIGUG8mUvFapfy3JZaQTJ0m2Mee/wDYsmER0MBEZQQthW6Lj3E7Y2Occi405
+         1nUIdSUFh350gHDqblf4WvHjtcFqRTcjkRIAB1iuedTZ3NL8jniKqlh0VfQXXxmFSj
+         ei2exN43t76UVC69llwPswApJ1pleHXJB+vIx8sIFoNkd8xST5J+YNj9UEjK7P/Ls6
+         EyCBKxQVUPqziRVC4TZn47yBqi9fbBzExpR71p+/59vMhA0FsLvlf0KzOGrovYs8VA
+         pIi5ey4lgRDwA==
 From:   Arnd Bergmann <arnd@kernel.org>
 To:     Boris Brezillon <bbrezillon@kernel.org>,
         Arnaud Ebalard <arno@natisbad.org>,
         Srujana Challa <schalla@marvell.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Suheil Chandran <schandran@marvell.com>,
-        Lukasz Bartosik <lbartosik@marvell.com>
+        Lukasz Bartosik <lbartosik@marvell.com>,
+        Suheil Chandran <schandran@marvell.com>
 Cc:     Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: [PATCH 1/2] crypto: octeontx2 - fix -Wpointer-bool-conversion warning
-Date:   Thu,  4 Feb 2021 16:42:15 +0100
-Message-Id: <20210204154230.1702563-1-arnd@kernel.org>
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] crypto: marvell - fix ethernet driver dependency
+Date:   Thu,  4 Feb 2021 16:42:16 +0100
+Message-Id: <20210204154230.1702563-2-arnd@kernel.org>
 X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210204154230.1702563-1-arnd@kernel.org>
+References: <20210204154230.1702563-1-arnd@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -55,42 +55,39 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-When CONFIG_CPUMASK_OFFSTACK is disabled, clang reports a warning
-about a bogus condition:
+The OcteonTX2 CPT driver force-enables the OCTEONTX2_MBOX symbol,
+which fails when network drivers are disabled globally
 
-drivers/crypto/marvell/octeontx2/otx2_cptlf.c:334:21: error: address of array 'lfs->lf[slot].affinity_mask' will always evaluate to 'true' [-Werror,-Wpointer-bool-conversion]
-                if (lfs->lf[slot].affinity_mask)
-                ~~  ~~~~~~~~~~~~~~^~~~~~~~~~~~~
+WARNING: unmet direct dependencies detected for OCTEONTX2_MBOX
+  Depends on [n]: NETDEVICES [=n] && ETHERNET [=n] && NET_VENDOR_MARVELL [=n]
+  Selected by [y]:
+  - CRYPTO_DEV_OCTEONTX2_CPT [=y] && CRYPTO [=y] && CRYPTO_HW [=y] && (ARM64 [=y] || COMPILE_TEST [=y]) && PCI_MSI [=y] && 64BIT [=y] && CRYPTO_LIB_AES [=y]
 
-In this configuration, the free_cpumask_var() function does nothing,
-so the condition could be skipped.
+The crypto driver actually fails to link without the ethernet side,
+so this is a hard dependency. Change the 'select' into 'depends on'
+to make it build reliably without warnings.
 
-When the option is enabled, there is no warning, but the check
-is also redundant because free_cpumask_var() falls back to kfree(),
-which is documented as ignoring NULL pointers.
-
-Remove the check to avoid the warning.
-
-Fixes: 64506017030d ("crypto: octeontx2 - add LF framework")
+Fixes: 5e8ce8334734 ("crypto: marvell - add Marvell OcteonTX2 CPT PF driver")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/crypto/marvell/octeontx2/otx2_cptlf.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/crypto/marvell/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptlf.c b/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-index e27ea8909368..823a4571fd67 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-@@ -331,8 +331,7 @@ void otx2_cptlf_free_irqs_affinity(struct otx2_cptlfs_info *lfs)
- 			irq_set_affinity_hint(pci_irq_vector(lfs->pdev,
- 					      lfs->lf[slot].msix_offset +
- 					      offs), NULL);
--		if (lfs->lf[slot].affinity_mask)
--			free_cpumask_var(lfs->lf[slot].affinity_mask);
-+		free_cpumask_var(lfs->lf[slot].affinity_mask);
- 	}
- }
- 
+diff --git a/drivers/crypto/marvell/Kconfig b/drivers/crypto/marvell/Kconfig
+index 2efbd79180ce..576d9e46fb88 100644
+--- a/drivers/crypto/marvell/Kconfig
++++ b/drivers/crypto/marvell/Kconfig
+@@ -39,9 +39,9 @@ config CRYPTO_DEV_OCTEONTX_CPT
+ config CRYPTO_DEV_OCTEONTX2_CPT
+ 	tristate "Marvell OcteonTX2 CPT driver"
+ 	depends on ARM64 || COMPILE_TEST
++	depends on OCTEONTX2_MBOX
+ 	depends on PCI_MSI && 64BIT
+ 	depends on CRYPTO_LIB_AES
+-	select OCTEONTX2_MBOX
+ 	select CRYPTO_DEV_MARVELL
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_HASH
 -- 
 2.29.2
 
