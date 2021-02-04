@@ -7,36 +7,34 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 226A0C433E9
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 09:03:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA9FC433DB
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 09:05:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6E9D64F4D
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 09:03:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EEFE264F44
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 09:05:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234620AbhBDJDX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Feb 2021 04:03:23 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:12024 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233567AbhBDJCq (ORCPT
+        id S234769AbhBDJEu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Feb 2021 04:04:50 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:12398 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234692AbhBDJDf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Feb 2021 04:02:46 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DWXZc2vYMzjJlJ;
-        Thu,  4 Feb 2021 17:00:40 +0800 (CST)
+        Thu, 4 Feb 2021 04:03:35 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DWXbY3wk6z7gdH;
+        Thu,  4 Feb 2021 17:01:29 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 4 Feb 2021 17:01:50 +0800
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 4 Feb 2021 17:02:36 +0800
 From:   Hui Tang <tanghui20@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>, <tanghui20@huawei.com>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH 2/4] crypto: hisilicon/hpre - tiny fix
-Date:   Thu, 4 Feb 2021 16:59:34 +0800
-Message-ID: <1612429176-28084-3-git-send-email-tanghui20@huawei.com>
+Subject: [PATCH] crypto: hisilicon/hpre - enable Elliptic curve cryptography
+Date:   Thu, 4 Feb 2021 17:00:24 +0800
+Message-ID: <1612429224-30388-1-git-send-email-tanghui20@huawei.com>
 X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1612429176-28084-1-git-send-email-tanghui20@huawei.com>
-References: <1612429176-28084-1-git-send-email-tanghui20@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.67.165.24]
@@ -45,45 +43,40 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Update since some special settings only for Kunpeng920.
+Enable x25519/x448/ecdh/ecdsa/sm2 algorithm on Kunpeng 930.
 
 Signed-off-by: Hui Tang <tanghui20@huawei.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre_main.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_main.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index 0045261..06448b8 100644
+index 67f1fca..db170fc 100644
 --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
 +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -318,7 +318,7 @@ static int hpre_set_cluster(struct hisi_qm *qm)
- }
+@@ -30,6 +30,8 @@
+ #define HPRE_BD_ARUSR_CFG		0x301030
+ #define HPRE_BD_AWUSR_CFG		0x301034
+ #define HPRE_TYPES_ENB			0x301038
++#define HPRE_RSA_ENB			BIT(0)
++#define HPRE_ECC_ENB			BIT(1)
+ #define HPRE_DATA_RUSER_CFG		0x30103c
+ #define HPRE_DATA_WUSER_CFG		0x301040
+ #define HPRE_INT_MASK			0x301400
+@@ -348,7 +350,12 @@ static int hpre_set_user_domain_and_cache(struct hisi_qm *qm)
+ 	val |= BIT(HPRE_TIMEOUT_ABNML_BIT);
+ 	writel_relaxed(val, HPRE_ADDR(qm, HPRE_QM_ABNML_INT_MASK));
 
- /*
-- * For Hi1620, we shoul disable FLR triggered by hardware (BME/PM/SRIOV).
-+ * For Kunpeng 920, we shoul disable FLR triggered by hardware (BME/PM/SRIOV).
-  * Or it may stay in D3 state when we bind and unbind hpre quickly,
-  * as it does FLR triggered by hardware.
-  */
-@@ -376,11 +376,14 @@ static int hpre_set_user_domain_and_cache(struct hisi_qm *qm)
- 	if (ret)
- 		return -ETIMEDOUT;
-
--	ret = hpre_cfg_by_dsm(qm);
--	if (ret)
--		dev_err(dev, "acpi_evaluate_dsm err.\n");
-+	/* This setting is only needed by Kunpeng 920. */
-+	if (qm->ver == QM_HW_V2) {
-+		ret = hpre_cfg_by_dsm(qm);
-+		if (ret)
-+			dev_err(dev, "acpi_evaluate_dsm err.\n");
-
--	disable_flr_of_bme(qm);
-+		disable_flr_of_bme(qm);
-+	}
-
- 	return ret;
- }
+-	writel(0x1, HPRE_ADDR(qm, HPRE_TYPES_ENB));
++	if (qm->ver >= QM_HW_V3)
++		writel(HPRE_RSA_ENB | HPRE_ECC_ENB,
++			HPRE_ADDR(qm, HPRE_TYPES_ENB));
++	else
++		writel(HPRE_RSA_ENB, HPRE_ADDR(qm, HPRE_TYPES_ENB));
++
+ 	writel(HPRE_QM_VFG_AX_MASK, HPRE_ADDR(qm, HPRE_VFG_AXCACHE));
+ 	writel(0x0, HPRE_ADDR(qm, HPRE_BD_ENDIAN));
+ 	writel(0x0, HPRE_ADDR(qm, HPRE_INT_MASK));
 --
 2.8.1
 
