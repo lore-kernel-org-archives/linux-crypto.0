@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA2EFC433E0
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 09:03:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA2CC43381
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 09:03:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A346464F4D
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 09:03:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0944D64F53
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 09:03:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231367AbhBDJDV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Feb 2021 04:03:21 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:12025 "EHLO
+        id S234627AbhBDJDY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Feb 2021 04:03:24 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:12026 "EHLO
         szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234020AbhBDJCq (ORCPT
+        with ESMTP id S233043AbhBDJCr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Feb 2021 04:02:46 -0500
+        Thu, 4 Feb 2021 04:02:47 -0500
 Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DWXZc3KW7zjJnF;
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DWXZc3kW0zjJnk;
         Thu,  4 Feb 2021 17:00:40 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.24) by
  DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 4 Feb 2021 17:01:49 +0800
+ 14.3.498.0; Thu, 4 Feb 2021 17:01:50 +0800
 From:   Hui Tang <tanghui20@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>, <tanghui20@huawei.com>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH 1/4] crypto: hisilicon/hpre - adapt the number of clusters
-Date:   Thu, 4 Feb 2021 16:59:33 +0800
-Message-ID: <1612429176-28084-2-git-send-email-tanghui20@huawei.com>
+Subject: [PATCH 3/4] crypto: hisilicon/qm - fix use of 'dma_map_single'
+Date:   Thu, 4 Feb 2021 16:59:35 +0800
+Message-ID: <1612429176-28084-4-git-send-email-tanghui20@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1612429176-28084-1-git-send-email-tanghui20@huawei.com>
 References: <1612429176-28084-1-git-send-email-tanghui20@huawei.com>
@@ -45,180 +45,129 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-HPRE of Kunpeng 930 is updated on cluster numbers,
-so we try to update this driver to make it running
-okay on Kunpeng920/Kunpeng930 chips.
+From: Weili Qian <qianweili@huawei.com>
 
+Calling 'dma_map_single' after the data is written to
+ensure that the cpu cache and dma cache are consistent.
+
+Signed-off-by: Weili Qian <qianweili@huawei.com>
 Signed-off-by: Hui Tang <tanghui20@huawei.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre.h      |  8 ++--
- drivers/crypto/hisilicon/hpre/hpre_main.c | 71 ++++++++++++++++++++-----------
- 2 files changed, 52 insertions(+), 27 deletions(-)
+ drivers/crypto/hisilicon/qm.c | 50 +++++++++++++++++++++++--------------------
+ 1 file changed, 27 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
-index f69252b..181c109 100644
---- a/drivers/crypto/hisilicon/hpre/hpre.h
-+++ b/drivers/crypto/hisilicon/hpre/hpre.h
-@@ -14,8 +14,7 @@ enum {
- 	HPRE_CLUSTER0,
- 	HPRE_CLUSTER1,
- 	HPRE_CLUSTER2,
--	HPRE_CLUSTER3,
--	HPRE_CLUSTERS_NUM,
-+	HPRE_CLUSTER3
- };
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 904b99a..93d4a21 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -1747,12 +1747,6 @@ static int qm_sq_ctx_cfg(struct hisi_qp *qp, int qp_id, u32 pasid)
+ 	sqc = kzalloc(sizeof(struct qm_sqc), GFP_KERNEL);
+ 	if (!sqc)
+ 		return -ENOMEM;
+-	sqc_dma = dma_map_single(dev, sqc, sizeof(struct qm_sqc),
+-				 DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, sqc_dma)) {
+-		kfree(sqc);
+-		return -ENOMEM;
+-	}
 
- enum hpre_ctrl_dbgfs_file {
-@@ -36,7 +35,10 @@ enum hpre_dfx_dbgfs_file {
- 	HPRE_DFX_FILE_NUM
- };
+ 	INIT_QC_COMMON(sqc, qp->sqe_dma, pasid);
+ 	if (ver == QM_HW_V1) {
+@@ -1765,6 +1759,13 @@ static int qm_sq_ctx_cfg(struct hisi_qp *qp, int qp_id, u32 pasid)
+ 	sqc->cq_num = cpu_to_le16(qp_id);
+ 	sqc->w13 = cpu_to_le16(QM_MK_SQC_W13(0, 1, qp->alg_type));
 
--#define HPRE_DEBUGFS_FILE_NUM    (HPRE_DEBUG_FILE_NUM + HPRE_CLUSTERS_NUM - 1)
-+#define HPRE_CLUSTERS_NUM_V2		(HPRE_CLUSTER3 + 1)
-+#define HPRE_CLUSTERS_NUM_V3		1
-+#define HPRE_CLUSTERS_NUM_MAX		HPRE_CLUSTERS_NUM_V2
-+#define HPRE_DEBUGFS_FILE_NUM (HPRE_DEBUG_FILE_NUM + HPRE_CLUSTERS_NUM_MAX - 1)
-
- struct hpre_debugfs_file {
- 	int index;
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index 3b3481e..0045261 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -73,7 +73,8 @@
- #define HPRE_QM_AXI_CFG_MASK		0xffff
- #define HPRE_QM_VFG_AX_MASK		0xff
- #define HPRE_BD_USR_MASK		0x3
--#define HPRE_CLUSTER_CORE_MASK		0xf
-+#define HPRE_CLUSTER_CORE_MASK_V2	0xf
-+#define HPRE_CLUSTER_CORE_MASK_V3	0xff
-
- #define HPRE_AM_OOO_SHUTDOWN_ENB	0x301044
- #define HPRE_AM_OOO_SHUTDOWN_ENABLE	BIT(0)
-@@ -86,6 +87,11 @@
- #define HPRE_QM_PM_FLR			BIT(11)
- #define HPRE_QM_SRIOV_FLR		BIT(12)
-
-+#define HPRE_CLUSTERS_NUM(qm)		\
-+	(((qm)->ver >= QM_HW_V3) ? HPRE_CLUSTERS_NUM_V3 : HPRE_CLUSTERS_NUM_V2)
-+#define HPRE_CLUSTER_CORE_MASK(qm)	\
-+	(((qm)->ver >= QM_HW_V3) ? HPRE_CLUSTER_CORE_MASK_V3 :\
-+		HPRE_CLUSTER_CORE_MASK_V2)
- #define HPRE_VIA_MSI_DSM		1
- #define HPRE_SQE_MASK_OFFSET		8
- #define HPRE_SQE_MASK_LEN		24
-@@ -279,6 +285,38 @@ static int hpre_cfg_by_dsm(struct hisi_qm *qm)
- 	return 0;
- }
-
-+static int hpre_set_cluster(struct hisi_qm *qm)
-+{
-+	u32 cluster_core_mask = HPRE_CLUSTER_CORE_MASK(qm);
-+	u8 clusters_num = HPRE_CLUSTERS_NUM(qm);
-+	struct device *dev = &qm->pdev->dev;
-+	unsigned long offset;
-+	u32 val = 0;
-+	int ret, i;
-+
-+	for (i = 0; i < clusters_num; i++) {
-+		offset = i * HPRE_CLSTR_ADDR_INTRVL;
-+
-+		/* clusters initiating */
-+		writel(cluster_core_mask,
-+		       HPRE_ADDR(qm, offset + HPRE_CORE_ENB));
-+		writel(0x1, HPRE_ADDR(qm, offset + HPRE_CORE_INI_CFG));
-+		ret = readl_relaxed_poll_timeout(HPRE_ADDR(qm, offset +
-+					HPRE_CORE_INI_STATUS), val,
-+					((val & cluster_core_mask) ==
-+					cluster_core_mask),
-+					HPRE_REG_RD_INTVRL_US,
-+					HPRE_REG_RD_TMOUT_US);
-+		if (ret) {
-+			dev_err(dev,
-+				"cluster %d int st status timeout!\n", i);
-+			return -ETIMEDOUT;
-+		}
++	sqc_dma = dma_map_single(dev, sqc, sizeof(struct qm_sqc),
++				 DMA_TO_DEVICE);
++	if (dma_mapping_error(dev, sqc_dma)) {
++		kfree(sqc);
++		return -ENOMEM;
 +	}
 +
-+	return 0;
-+}
-+
- /*
-  * For Hi1620, we shoul disable FLR triggered by hardware (BME/PM/SRIOV).
-  * Or it may stay in D3 state when we bind and unbind hpre quickly,
-@@ -298,9 +336,8 @@ static void disable_flr_of_bme(struct hisi_qm *qm)
- static int hpre_set_user_domain_and_cache(struct hisi_qm *qm)
- {
- 	struct device *dev = &qm->pdev->dev;
--	unsigned long offset;
--	int ret, i;
- 	u32 val;
-+	int ret;
-
- 	writel(HPRE_QM_USR_CFG_MASK, HPRE_ADDR(qm, QM_ARUSER_M_CFG_ENABLE));
- 	writel(HPRE_QM_USR_CFG_MASK, HPRE_ADDR(qm, QM_AWUSER_M_CFG_ENABLE));
-@@ -335,25 +372,9 @@ static int hpre_set_user_domain_and_cache(struct hisi_qm *qm)
- 		return -ETIMEDOUT;
- 	}
-
--	for (i = 0; i < HPRE_CLUSTERS_NUM; i++) {
--		offset = i * HPRE_CLSTR_ADDR_INTRVL;
--
--		/* clusters initiating */
--		writel(HPRE_CLUSTER_CORE_MASK,
--		       HPRE_ADDR(qm, offset + HPRE_CORE_ENB));
--		writel(0x1, HPRE_ADDR(qm, offset + HPRE_CORE_INI_CFG));
--		ret = readl_relaxed_poll_timeout(HPRE_ADDR(qm, offset +
--					HPRE_CORE_INI_STATUS), val,
--					((val & HPRE_CLUSTER_CORE_MASK) ==
--					HPRE_CLUSTER_CORE_MASK),
--					HPRE_REG_RD_INTVRL_US,
--					HPRE_REG_RD_TMOUT_US);
--		if (ret) {
--			dev_err(dev,
--				"cluster %d int st status timeout!\n", i);
--			return -ETIMEDOUT;
--		}
+ 	ret = qm_mb(qm, QM_MB_CMD_SQC, sqc_dma, qp_id, 0);
+ 	dma_unmap_single(dev, sqc_dma, sizeof(struct qm_sqc), DMA_TO_DEVICE);
+ 	kfree(sqc);
+@@ -1784,12 +1785,6 @@ static int qm_cq_ctx_cfg(struct hisi_qp *qp, int qp_id, u32 pasid)
+ 	cqc = kzalloc(sizeof(struct qm_cqc), GFP_KERNEL);
+ 	if (!cqc)
+ 		return -ENOMEM;
+-	cqc_dma = dma_map_single(dev, cqc, sizeof(struct qm_cqc),
+-				 DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, cqc_dma)) {
+-		kfree(cqc);
+-		return -ENOMEM;
 -	}
-+	ret = hpre_set_cluster(qm);
-+	if (ret)
-+		return -ETIMEDOUT;
 
- 	ret = hpre_cfg_by_dsm(qm);
- 	if (ret)
-@@ -366,6 +387,7 @@ static int hpre_set_user_domain_and_cache(struct hisi_qm *qm)
-
- static void hpre_cnt_regs_clear(struct hisi_qm *qm)
- {
-+	u8 clusters_num = HPRE_CLUSTERS_NUM(qm);
- 	unsigned long offset;
- 	int i;
-
-@@ -374,7 +396,7 @@ static void hpre_cnt_regs_clear(struct hisi_qm *qm)
- 	writel(0x0, qm->io_base + QM_DFX_DB_CNT_VF);
-
- 	/* clear clusterX/cluster_ctrl */
--	for (i = 0; i < HPRE_CLUSTERS_NUM; i++) {
-+	for (i = 0; i < clusters_num; i++) {
- 		offset = HPRE_CLSTR_BASE + i * HPRE_CLSTR_ADDR_INTRVL;
- 		writel(0x0, qm->io_base + offset + HPRE_CLUSTER_INQURY);
+ 	INIT_QC_COMMON(cqc, qp->cqe_dma, pasid);
+ 	if (ver == QM_HW_V1) {
+@@ -1802,6 +1797,13 @@ static int qm_cq_ctx_cfg(struct hisi_qp *qp, int qp_id, u32 pasid)
  	}
-@@ -673,13 +695,14 @@ static int hpre_pf_comm_regs_debugfs_init(struct hisi_qm *qm)
+ 	cqc->dw6 = cpu_to_le32(1 << QM_CQ_PHASE_SHIFT | 1 << QM_CQ_FLAG_SHIFT);
 
- static int hpre_cluster_debugfs_init(struct hisi_qm *qm)
- {
-+	u8 clusters_num = HPRE_CLUSTERS_NUM(qm);
- 	struct device *dev = &qm->pdev->dev;
- 	char buf[HPRE_DBGFS_VAL_MAX_LEN];
- 	struct debugfs_regset32 *regset;
- 	struct dentry *tmp_d;
- 	int i, ret;
++	cqc_dma = dma_map_single(dev, cqc, sizeof(struct qm_cqc),
++				 DMA_TO_DEVICE);
++	if (dma_mapping_error(dev, cqc_dma)) {
++		kfree(cqc);
++		return -ENOMEM;
++	}
++
+ 	ret = qm_mb(qm, QM_MB_CMD_CQC, cqc_dma, qp_id, 0);
+ 	dma_unmap_single(dev, cqc_dma, sizeof(struct qm_cqc), DMA_TO_DEVICE);
+ 	kfree(cqc);
+@@ -2558,15 +2560,9 @@ static int qm_eq_ctx_cfg(struct hisi_qm *qm)
+ 	dma_addr_t eqc_dma;
+ 	int ret;
 
--	for (i = 0; i < HPRE_CLUSTERS_NUM; i++) {
-+	for (i = 0; i < clusters_num; i++) {
- 		ret = snprintf(buf, HPRE_DBGFS_VAL_MAX_LEN, "cluster%d", i);
- 		if (ret < 0)
- 			return -EINVAL;
+-	eqc = kzalloc(sizeof(struct qm_eqc), GFP_KERNEL); //todo
++	eqc = kzalloc(sizeof(struct qm_eqc), GFP_KERNEL);
+ 	if (!eqc)
+ 		return -ENOMEM;
+-	eqc_dma = dma_map_single(dev, eqc, sizeof(struct qm_eqc),
+-				 DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, eqc_dma)) {
+-		kfree(eqc);
+-		return -ENOMEM;
+-	}
+
+ 	eqc->base_l = cpu_to_le32(lower_32_bits(qm->eqe_dma));
+ 	eqc->base_h = cpu_to_le32(upper_32_bits(qm->eqe_dma));
+@@ -2574,6 +2570,13 @@ static int qm_eq_ctx_cfg(struct hisi_qm *qm)
+ 		eqc->dw3 = cpu_to_le32(QM_EQE_AEQE_SIZE);
+ 	eqc->dw6 = cpu_to_le32((QM_EQ_DEPTH - 1) | (1 << QM_EQC_PHASE_SHIFT));
+
++	eqc_dma = dma_map_single(dev, eqc, sizeof(struct qm_eqc),
++				 DMA_TO_DEVICE);
++	if (dma_mapping_error(dev, eqc_dma)) {
++		kfree(eqc);
++		return -ENOMEM;
++	}
++
+ 	ret = qm_mb(qm, QM_MB_CMD_EQC, eqc_dma, 0, 0);
+ 	dma_unmap_single(dev, eqc_dma, sizeof(struct qm_eqc), DMA_TO_DEVICE);
+ 	kfree(eqc);
+@@ -2591,6 +2594,11 @@ static int qm_aeq_ctx_cfg(struct hisi_qm *qm)
+ 	aeqc = kzalloc(sizeof(struct qm_aeqc), GFP_KERNEL);
+ 	if (!aeqc)
+ 		return -ENOMEM;
++
++	aeqc->base_l = cpu_to_le32(lower_32_bits(qm->aeqe_dma));
++	aeqc->base_h = cpu_to_le32(upper_32_bits(qm->aeqe_dma));
++	aeqc->dw6 = cpu_to_le32((QM_Q_DEPTH - 1) | (1 << QM_EQC_PHASE_SHIFT));
++
+ 	aeqc_dma = dma_map_single(dev, aeqc, sizeof(struct qm_aeqc),
+ 				  DMA_TO_DEVICE);
+ 	if (dma_mapping_error(dev, aeqc_dma)) {
+@@ -2598,10 +2606,6 @@ static int qm_aeq_ctx_cfg(struct hisi_qm *qm)
+ 		return -ENOMEM;
+ 	}
+
+-	aeqc->base_l = cpu_to_le32(lower_32_bits(qm->aeqe_dma));
+-	aeqc->base_h = cpu_to_le32(upper_32_bits(qm->aeqe_dma));
+-	aeqc->dw6 = cpu_to_le32((QM_Q_DEPTH - 1) | (1 << QM_EQC_PHASE_SHIFT));
+-
+ 	ret = qm_mb(qm, QM_MB_CMD_AEQC, aeqc_dma, 0, 0);
+ 	dma_unmap_single(dev, aeqc_dma, sizeof(struct qm_aeqc), DMA_TO_DEVICE);
+ 	kfree(aeqc);
 --
 2.8.1
 
