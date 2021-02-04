@@ -5,65 +5,65 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D713C433E9
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 21:45:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A3CDC433DB
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 21:45:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4347964E4E
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 21:45:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9A9C64E4E
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 21:45:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229970AbhBDVo7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Feb 2021 16:44:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35216 "EHLO
+        id S229500AbhBDVpa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Feb 2021 16:45:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbhBDVon (ORCPT
+        with ESMTP id S229823AbhBDVpX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Feb 2021 16:44:43 -0500
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82EF2C06178A
-        for <linux-crypto@vger.kernel.org>; Thu,  4 Feb 2021 13:44:02 -0800 (PST)
-Received: by mail-qk1-x72e.google.com with SMTP id a12so4901292qkh.10
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Feb 2021 13:44:02 -0800 (PST)
+        Thu, 4 Feb 2021 16:45:23 -0500
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64F0EC06178C
+        for <linux-crypto@vger.kernel.org>; Thu,  4 Feb 2021 13:44:03 -0800 (PST)
+Received: by mail-qk1-x733.google.com with SMTP id n15so4918416qkh.8
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Feb 2021 13:44:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=aN4Ar0ko3Rto1g1pRIsQic5bApXWaoyHtlgB9BLpWjA=;
-        b=yUMuvKiBaGvWTtXR69jwfs1lH+chT2TiyqXcS9n/roPUX8Qq4e6SzDSN/klWgUgB4t
-         gmrySONcyLl7VpLN3BRQBAh0w66aPu//TWU5yl2BorlRPIYUicZbze8+rv/1CvGbyO8o
-         4MHJK4QYDnStgmNPo3YPfTlSwogAnWO/ENtPvsix/JNvegprLPF8/nK6ccm1O885I0DD
-         h07aHyRQBnAsUXT+CvQq74oQnFbJld5mOfNlJbPooBBppy3mzgKkhRGC3L8q2GO6FUgU
-         Gwjk5nDy72mCE1OQDIYK1RGT5ha5UlACUhJvh4nEaa0hKj3Kk5xX17aKLq9yPcm++zVW
-         zCiw==
+        bh=QL7UCH32HRfcwYFo/OihKYejmQ9XVroK1tPKK/3bNQ0=;
+        b=LnP8z+oMAn848LJIEfdOqDBRJds5HSWKBf6vcIKvI4CiADXTlE+/N/zNNkHCrIhLAY
+         VTnY0I4xXiXCCK5k2VfTkPZn2rie5BlnPXqovi1k1P1LnF23GdUuBQfgx8oYknHJSjYQ
+         wGR3Bt/8er4TGA3nLtM0hHK3K4Z3Pl95Nlhwz6yzWtVgoVIkzAA+lx44rV/cZkM6PWG5
+         aSGnvDIUsEt16bCvEo6zj/EdwYg+QNp2B7C1vnR5BgxazIQzWS9pp5oTRDdKGpGuxTmj
+         NDdBY0bPPi3X/3nVVvjSzb86atdmKAsX7D+MQIEYE+FPn5rhSny22sSuEeL+KfMo7YMh
+         499Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=aN4Ar0ko3Rto1g1pRIsQic5bApXWaoyHtlgB9BLpWjA=;
-        b=R26ZNa9gQXdocr/aNZZtBVeH/MbcawP2jxjqUimLTp5H20FS+RJdjGqVsbV8vLN5MB
-         g/Il20tj4bxJgF0InTPKTg6hir58s/NVGq1XRKV/rtINEHL4iZX7drFV9jIjGfv1MYAU
-         8Q4Rx+P2b1ixqpTm9p6ldqE1T01rsGGoy1B8ZAFacDBNrrYRG8zIY2/gBpgd2enmZ3Wv
-         LVUV3Pc73RsYvsF5BS0qoW/7Brlt0AgODQ/bahvC8aq8Om9qKZv98PpabU/jUfUTgvPV
-         kc4wFliU1bWK0DLJuS9FBO0Xv/ThkAUx2HIPdXPpTYKSRjHypCU5TgpzezOvcm1UK2M7
-         fCmw==
-X-Gm-Message-State: AOAM532sYBWS065p5U82/sfLC0HhBIi27OuIlAdrjH0zzEsmfoazJ9ao
-        PFIbeASLoU7elaRfISmH+a7kag==
-X-Google-Smtp-Source: ABdhPJz1XvpME+zlV4NeMZc9KPZIVYiNs6JWkdHOcYUmt9d9L6bTG6DBF50RLeUcl804L11rUMKscQ==
-X-Received: by 2002:a37:345:: with SMTP id 66mr1245842qkd.358.1612475041699;
-        Thu, 04 Feb 2021 13:44:01 -0800 (PST)
+        bh=QL7UCH32HRfcwYFo/OihKYejmQ9XVroK1tPKK/3bNQ0=;
+        b=fC8kHmiMvVv9AOHS22tkodMFu7dGjhD+ZddJwaJYK7GPM7JFVfwe4OQw5eXooHDmgb
+         3bBFVNywbz59n0GLO3uM1xmRqzKEdEBcXSTNUlmxjIlg8XPMFHW8RKpAVyshz8enebMD
+         ycYH4RBaJOaQj+oeavsx4fm2uq2qdLTvFYrBKj3L1kn5wKlwcj5wKkxXz7R1PPFMDhvR
+         ljAiKd+lY07hqEfqtqGAP80CE9ytcXfR2kGqDJGmN/XTMyfHvUa3Q7EoPELD5a70pkRV
+         q4dX7q/bHWUCvh8XsD1q9MmNn26I/TlRrS7S/lDV4ywrR6bdFo6+XuGPi+n8UDabT7Up
+         FlDQ==
+X-Gm-Message-State: AOAM530lrgdRpTwZh8myASMUPDDd7oPHL9cMqFW2ceoptrLz4/u6Ds/O
+        lORGxDyI057qL1vBuDNyyeuiCw==
+X-Google-Smtp-Source: ABdhPJypVtm7Ihf8UyWm4gadnLJUCzEwK7haktRwJbjOn3uSzjpJCP7SOwfdF6gRig6XXJRkEsJsTw==
+X-Received: by 2002:a37:a753:: with SMTP id q80mr1285453qke.29.1612475042611;
+        Thu, 04 Feb 2021 13:44:02 -0800 (PST)
 Received: from pop-os.fios-router.home (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.googlemail.com with ESMTPSA id h185sm6353858qkd.122.2021.02.04.13.44.00
+        by smtp.googlemail.com with ESMTPSA id h185sm6353858qkd.122.2021.02.04.13.44.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Feb 2021 13:44:01 -0800 (PST)
+        Thu, 04 Feb 2021 13:44:02 -0800 (PST)
 From:   Thara Gopinath <thara.gopinath@linaro.org>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         bjorn.andersson@linaro.org
 Cc:     ebiggers@google.com, ardb@kernel.org, sivaprak@codeaurora.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v5 01/11] crypto: qce: sha: Restore/save ahash state with custom struct in export/import
-Date:   Thu,  4 Feb 2021 16:43:49 -0500
-Message-Id: <20210204214359.1993065-2-thara.gopinath@linaro.org>
+Subject: [PATCH v5 02/11] crypto: qce: sha: Hold back a block of data to be transferred as part of final
+Date:   Thu,  4 Feb 2021 16:43:50 -0500
+Message-Id: <20210204214359.1993065-3-thara.gopinath@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210204214359.1993065-1-thara.gopinath@linaro.org>
 References: <20210204214359.1993065-1-thara.gopinath@linaro.org>
@@ -73,218 +73,53 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Export and import interfaces save and restore partial transformation
-states. The partial states were being stored and restored in struct
-sha1_state for sha1/hmac(sha1) transformations and sha256_state for
-sha256/hmac(sha256) transformations.This led to a bunch of corner cases
-where improper state was being stored and restored. A few of the corner
-cases that turned up during testing are:
+If the available data to transfer is exactly a multiple of block size, save
+the last block to be transferred in qce_ahash_final (with the last block
+bit set) if this is indeed the end of data stream. If not this saved block
+will be transferred as part of next update. If this block is not held back
+and if this is indeed the end of data stream, the digest obtained will be
+wrong since qce_ahash_final will see that rctx->buflen is 0 and return
+doing nothing which in turn means that a digest will not be copied to the
+destination result buffer.  qce_ahash_final cannot be made to alter this
+behavior and allowed to proceed if rctx->buflen is 0 because the crypto
+engine BAM does not allow for zero length transfers.
 
-- wrong byte_count restored if export/import is called twice without h/w
-transaction in between
-- wrong buflen restored back if the pending buffer
-length is exactly the block size.
-- wrong state restored if buffer length is 0.
-
-To fix these issues, save and restore the partial transformation state
-using the newly introduced qce_sha_saved_state struct. This ensures that
-all the pieces required to properly restart the transformation is captured
-and restored back
-
+Reviewed-by: Bjorn Andersson <bjorn.andersson@linaro.org>
 Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
 ---
-
-v4->v5:
-	- Fixed build warning/error in patch for wrong assignment of const
-	  pointer as reported by kernel test robot <lkp@intel.com>.
-v1->v2:
-	- Introduced custom struct qce_sha_saved_state to store and
-	  restore partial sha transformation. v1 was re-using
-	  qce_sha_reqctx to save and restore partial states and this
-	  could lead to potential memcpy issues around pointer copying.
-
-
- drivers/crypto/qce/sha.c | 122 +++++++++++----------------------------
- 1 file changed, 34 insertions(+), 88 deletions(-)
+ drivers/crypto/qce/sha.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
 diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-index 61c418c12345..7da562dca740 100644
+index 7da562dca740..2813c9a27a6e 100644
 --- a/drivers/crypto/qce/sha.c
 +++ b/drivers/crypto/qce/sha.c
-@@ -12,9 +12,15 @@
- #include "core.h"
- #include "sha.h"
+@@ -216,6 +216,25 @@ static int qce_ahash_update(struct ahash_request *req)
  
--/* crypto hw padding constant for first operation */
--#define SHA_PADDING		64
--#define SHA_PADDING_MASK	(SHA_PADDING - 1)
-+struct qce_sha_saved_state {
-+	u8 pending_buf[QCE_SHA_MAX_BLOCKSIZE];
-+	u8 partial_digest[QCE_SHA_MAX_DIGESTSIZE];
-+	__be32 byte_count[2];
-+	unsigned int pending_buflen;
-+	unsigned int flags;
-+	u64 count;
-+	bool first_blk;
-+};
- 
- static LIST_HEAD(ahash_algs);
- 
-@@ -139,97 +145,37 @@ static int qce_ahash_init(struct ahash_request *req)
- 
- static int qce_ahash_export(struct ahash_request *req, void *out)
- {
--	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
- 	struct qce_sha_reqctx *rctx = ahash_request_ctx(req);
--	unsigned long flags = rctx->flags;
--	unsigned int digestsize = crypto_ahash_digestsize(ahash);
--	unsigned int blocksize =
--			crypto_tfm_alg_blocksize(crypto_ahash_tfm(ahash));
--
--	if (IS_SHA1(flags) || IS_SHA1_HMAC(flags)) {
--		struct sha1_state *out_state = out;
--
--		out_state->count = rctx->count;
--		qce_cpu_to_be32p_array((__be32 *)out_state->state,
--				       rctx->digest, digestsize);
--		memcpy(out_state->buffer, rctx->buf, blocksize);
--	} else if (IS_SHA256(flags) || IS_SHA256_HMAC(flags)) {
--		struct sha256_state *out_state = out;
--
--		out_state->count = rctx->count;
--		qce_cpu_to_be32p_array((__be32 *)out_state->state,
--				       rctx->digest, digestsize);
--		memcpy(out_state->buf, rctx->buf, blocksize);
--	} else {
--		return -EINVAL;
--	}
--
--	return 0;
--}
--
--static int qce_import_common(struct ahash_request *req, u64 in_count,
--			     const u32 *state, const u8 *buffer, bool hmac)
--{
--	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
--	struct qce_sha_reqctx *rctx = ahash_request_ctx(req);
--	unsigned int digestsize = crypto_ahash_digestsize(ahash);
--	unsigned int blocksize;
--	u64 count = in_count;
--
--	blocksize = crypto_tfm_alg_blocksize(crypto_ahash_tfm(ahash));
--	rctx->count = in_count;
--	memcpy(rctx->buf, buffer, blocksize);
--
--	if (in_count <= blocksize) {
--		rctx->first_blk = 1;
--	} else {
--		rctx->first_blk = 0;
--		/*
--		 * For HMAC, there is a hardware padding done when first block
--		 * is set. Therefore the byte_count must be incremened by 64
--		 * after the first block operation.
--		 */
--		if (hmac)
--			count += SHA_PADDING;
--	}
-+	struct qce_sha_saved_state *export_state = out;
- 
--	rctx->byte_count[0] = (__force __be32)(count & ~SHA_PADDING_MASK);
--	rctx->byte_count[1] = (__force __be32)(count >> 32);
--	qce_cpu_to_be32p_array((__be32 *)rctx->digest, (const u8 *)state,
--			       digestsize);
--	rctx->buflen = (unsigned int)(in_count & (blocksize - 1));
-+	memcpy(export_state->pending_buf, rctx->buf, rctx->buflen);
-+	memcpy(export_state->partial_digest, rctx->digest, sizeof(rctx->digest));
-+	export_state->byte_count[0] = rctx->byte_count[0];
-+	export_state->byte_count[1] = rctx->byte_count[1];
-+	export_state->pending_buflen = rctx->buflen;
-+	export_state->count = rctx->count;
-+	export_state->first_blk = rctx->first_blk;
-+	export_state->flags = rctx->flags;
- 
- 	return 0;
- }
- 
- static int qce_ahash_import(struct ahash_request *req, const void *in)
- {
--	struct qce_sha_reqctx *rctx;
--	unsigned long flags;
--	bool hmac;
--	int ret;
--
--	ret = qce_ahash_init(req);
--	if (ret)
--		return ret;
--
--	rctx = ahash_request_ctx(req);
--	flags = rctx->flags;
--	hmac = IS_SHA_HMAC(flags);
--
--	if (IS_SHA1(flags) || IS_SHA1_HMAC(flags)) {
--		const struct sha1_state *state = in;
--
--		ret = qce_import_common(req, state->count, state->state,
--					state->buffer, hmac);
--	} else if (IS_SHA256(flags) || IS_SHA256_HMAC(flags)) {
--		const struct sha256_state *state = in;
-+	struct qce_sha_reqctx *rctx = ahash_request_ctx(req);
-+	const struct qce_sha_saved_state *import_state = in;
- 
--		ret = qce_import_common(req, state->count, state->state,
--					state->buf, hmac);
--	}
-+	memset(rctx, 0, sizeof(*rctx));
-+	rctx->count = import_state->count;
-+	rctx->buflen = import_state->pending_buflen;
-+	rctx->first_blk = import_state->first_blk;
-+	rctx->flags = import_state->flags;
-+	rctx->byte_count[0] = import_state->byte_count[0];
-+	rctx->byte_count[1] = import_state->byte_count[1];
-+	memcpy(rctx->buf, import_state->pending_buf, rctx->buflen);
-+	memcpy(rctx->digest, import_state->partial_digest, sizeof(rctx->digest));
- 
--	return ret;
-+	return 0;
- }
- 
- static int qce_ahash_update(struct ahash_request *req)
-@@ -450,7 +396,7 @@ static const struct qce_ahash_def ahash_def[] = {
- 		.drv_name	= "sha1-qce",
- 		.digestsize	= SHA1_DIGEST_SIZE,
- 		.blocksize	= SHA1_BLOCK_SIZE,
--		.statesize	= sizeof(struct sha1_state),
-+		.statesize	= sizeof(struct qce_sha_saved_state),
- 		.std_iv		= std_iv_sha1,
- 	},
- 	{
-@@ -459,7 +405,7 @@ static const struct qce_ahash_def ahash_def[] = {
- 		.drv_name	= "sha256-qce",
- 		.digestsize	= SHA256_DIGEST_SIZE,
- 		.blocksize	= SHA256_BLOCK_SIZE,
--		.statesize	= sizeof(struct sha256_state),
-+		.statesize	= sizeof(struct qce_sha_saved_state),
- 		.std_iv		= std_iv_sha256,
- 	},
- 	{
-@@ -468,7 +414,7 @@ static const struct qce_ahash_def ahash_def[] = {
- 		.drv_name	= "hmac-sha1-qce",
- 		.digestsize	= SHA1_DIGEST_SIZE,
- 		.blocksize	= SHA1_BLOCK_SIZE,
--		.statesize	= sizeof(struct sha1_state),
-+		.statesize	= sizeof(struct qce_sha_saved_state),
- 		.std_iv		= std_iv_sha1,
- 	},
- 	{
-@@ -477,7 +423,7 @@ static const struct qce_ahash_def ahash_def[] = {
- 		.drv_name	= "hmac-sha256-qce",
- 		.digestsize	= SHA256_DIGEST_SIZE,
- 		.blocksize	= SHA256_BLOCK_SIZE,
--		.statesize	= sizeof(struct sha256_state),
-+		.statesize	= sizeof(struct qce_sha_saved_state),
- 		.std_iv		= std_iv_sha256,
- 	},
- };
+ 	/* calculate how many bytes will be hashed later */
+ 	hash_later = total % blocksize;
++
++	/*
++	 * At this point, there is more than one block size of data.  If
++	 * the available data to transfer is exactly a multiple of block
++	 * size, save the last block to be transferred in qce_ahash_final
++	 * (with the last block bit set) if this is indeed the end of data
++	 * stream. If not this saved block will be transferred as part of
++	 * next update. If this block is not held back and if this is
++	 * indeed the end of data stream, the digest obtained will be wrong
++	 * since qce_ahash_final will see that rctx->buflen is 0 and return
++	 * doing nothing which in turn means that a digest will not be
++	 * copied to the destination result buffer.  qce_ahash_final cannot
++	 * be made to alter this behavior and allowed to proceed if
++	 * rctx->buflen is 0 because the crypto engine BAM does not allow
++	 * for zero length transfers.
++	 */
++	if (!hash_later)
++		hash_later = blocksize;
++
+ 	if (hash_later) {
+ 		unsigned int src_offset = req->nbytes - hash_later;
+ 		scatterwalk_map_and_copy(rctx->buf, req->src, src_offset,
 -- 
 2.25.1
 
