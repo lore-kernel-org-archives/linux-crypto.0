@@ -7,71 +7,74 @@ X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A557FC433E0
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:18:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D0CFC433E6
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:18:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 802E164DBA
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:18:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B0AF64DBA
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:18:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235558AbhBDLSE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Feb 2021 06:18:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39982 "EHLO
+        id S235574AbhBDLSM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Feb 2021 06:18:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235712AbhBDLMQ (ORCPT
+        with ESMTP id S235710AbhBDLMP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Feb 2021 06:12:16 -0500
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58561C061223
-        for <linux-crypto@vger.kernel.org>; Thu,  4 Feb 2021 03:10:21 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id o10so5705546wmc.1
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Feb 2021 03:10:21 -0800 (PST)
+        Thu, 4 Feb 2021 06:12:15 -0500
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5C30C06121C
+        for <linux-crypto@vger.kernel.org>; Thu,  4 Feb 2021 03:10:17 -0800 (PST)
+Received: by mail-wm1-x334.google.com with SMTP id j11so2752253wmi.3
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Feb 2021 03:10:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=uyplMPucg3iOrY2nniY7G/Evy8Npfc2vFaJnW0PI2LM=;
-        b=ekSQxHuxk0xtv21ZbQcl2ycKHt8Ml1KkajwaP+MZ+rkIEOSQZN9fbTd68tzTYsXJQ9
-         +rQ0llJvLZ8qiSdH/lZPKwZNHsU3cdD+iyEO0eNGKU4JOpzZwnGJJaZ+DDtr5MH6ZZX/
-         S8d31UtxU4seUHnrcDhWzqwl0aZcR6YZVZV7M+IvYbDsaRwSgiB987TrWAqzH7pmJVfA
-         MfI8emBtsqNE+bdcIo9IVdA0IRz3IANyq3P5wIJHyCQdfz35SGGo6ttWiPDa2cQ7EV8x
-         iiYDsDd5ifoCTI86AVcyAe31nuMsbq60tYKq9eTidpAbJ0pDdOS207XZUJ6SjA36ko+4
-         eg0A==
+        bh=zBZEiBnCpDze/1GuNJ3i38XwYi6MurOqLTEFwMePbaw=;
+        b=P9bFnE5keghdh3BWBUni3jDga4wzhgq6MltnIId6KX0E3x3XTkggNsmjWbaYy/CbvQ
+         5PI5SiqqrEnylEv2Kb2BcDmwoSuuXytdIbhaWuHUEO5NJfsqGHMa7rdAJlKyTTteJWAF
+         HwM4Ugjfd4P2UIcA1Kl1XU9+6uwaaD/gGJdRQMeTu91HD0lmmBjgqQ1myxJPJy3ap0li
+         xFQOKxmaMFOsMlKGvAYN/AOLw+npaUZLgWIBHgg9YzLiJpn3jN1UgpZd78eT63HMxGJR
+         76KYyHGu36j2+iTkHinJ49RIPRe9Nqp1HKCUTwijHUr9fZ7c2HW8y/nlBGeOBx9zMUK3
+         mVsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=uyplMPucg3iOrY2nniY7G/Evy8Npfc2vFaJnW0PI2LM=;
-        b=eQnmpYXj2ziLaaNmbAzwpjM+E86VPlAizGLOvAT9srHe9mwGjMJl7YyXhb2uOc2qZw
-         bXwPRuEOVPJSxE1vjlYOPyvSzA55EB7SItPSdb+kaHVEjsynCcKoZZNewdR68ySjpopV
-         l2AHBL5L9YtpPMIYXAJVSEyry/oscepLVUh9lHsiRnHjja6LwKMNqPurK8z8TnK4JPEc
-         sIbxyIJFX8wg2OZXBOT9hPCSa1hKJvP8zmlxE4ArYk0DHLKDqhLJ30rwPrgd766NmtJd
-         9Pyihe3lH1UAPe27jQlJzmvIOoW75xrrP6lMY2fyGzJQY3EmFxMqBmgbn9KxSzwDgyl7
-         CAAw==
-X-Gm-Message-State: AOAM532Pp6y25qEKe5I1zui5S5a4TiBloPJjEpgXJyH+wMZeTjlD3mdv
-        Ixl8I5rJ9GKjK4cSrtaVzvrXFw==
-X-Google-Smtp-Source: ABdhPJy1JNJu3m4t+MVtGxQYZO5Rm/NID114zcurjbrW+Yzs0lZ8GlMJ8K6ULDLLoxf2mMqmiHtcWQ==
-X-Received: by 2002:a1c:720d:: with SMTP id n13mr6860166wmc.103.1612437019961;
-        Thu, 04 Feb 2021 03:10:19 -0800 (PST)
+        bh=zBZEiBnCpDze/1GuNJ3i38XwYi6MurOqLTEFwMePbaw=;
+        b=O1CbzhLMXhXRybvK/dsLa3hfhVQvAYwJDsBivqV/usfEibkjzESkslSNB+Uxpi71gg
+         qu+JBWZcL5Af8lKz3VwbfB/J5J0Cs8B9IMSRusH3gATp3pLXr/gSeBhNIfKIZCgyAPuB
+         YXd5tBBY7oQOGLEBvYPtLLqyjsWn1OJh16ja2UReQZ3z6o+nEaaN/yaSu2PE6a5KF1Nb
+         lResyFnjGMejI2N2Lv+y4aD8L7kS0c2BpeP6IIUWzgQiEp7LG9bgGpeZaa5SjYvNH5S4
+         xJXPL2B185HJcNz5T7+Jy8zk9y8Q/qSHHbSdVVMiNGZK6oX3atf4h6HqHZJhAbwa7wTt
+         tDIg==
+X-Gm-Message-State: AOAM530U9QG7nWaef076AuL45qTO5LIo2HKgXSbItwij8aqQtE/wd+WJ
+        3jW0Ibiurpgeek8/VQ8qAMhejQ==
+X-Google-Smtp-Source: ABdhPJxa0jBjTk9Ppr0Vm14I1WsrfGS8lDuYZwfoumBJ/YUQ89k6+Y07+/2DRivZIeayEMmQPc1/wg==
+X-Received: by 2002:a1c:f70f:: with SMTP id v15mr6821220wmh.38.1612437016576;
+        Thu, 04 Feb 2021 03:10:16 -0800 (PST)
 Received: from dell.default ([91.110.221.188])
-        by smtp.gmail.com with ESMTPSA id y18sm7696218wrt.19.2021.02.04.03.10.18
+        by smtp.gmail.com with ESMTPSA id y18sm7696218wrt.19.2021.02.04.03.10.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Feb 2021 03:10:19 -0800 (PST)
+        Thu, 04 Feb 2021 03:10:15 -0800 (PST)
 From:   Lee Jones <lee.jones@linaro.org>
 To:     lee.jones@linaro.org
 Cc:     linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
+        Shujuan Chen <shujuan.chen@stericsson.com>,
+        Joakim Bech <joakim.xx.bech@stericsson.com>,
+        Berne Hebark <berne.herbark@stericsson.com>,
+        Niklas Hernaeus <niklas.hernaeus@stericsson.com>,
+        Jonas Linde <jonas.linde@stericsson.com>,
+        Andreas Westin <andreas.westin@stericsson.com>,
         linux-crypto@vger.kernel.org
-Subject: [PATCH 14/20] crypto: caam: caampkc: Provide the name of the function
-Date:   Thu,  4 Feb 2021 11:09:54 +0000
-Message-Id: <20210204111000.2800436-15-lee.jones@linaro.org>
+Subject: [PATCH 11/20] crypto: ux500: cryp_core: Fix formatting issue and add description for 'session_id'
+Date:   Thu,  4 Feb 2021 11:09:51 +0000
+Message-Id: <20210204111000.2800436-12-lee.jones@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210204111000.2800436-1-lee.jones@linaro.org>
 References: <20210204111000.2800436-1-lee.jones@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -79,32 +82,52 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Fixes the following W=1 kernel build warning(s):
 
- drivers/crypto/caam/caampkc.c:199: warning: expecting prototype for from a given scatterlist(). Prototype was for caam_rsa_count_leading_zeros() instead
+ drivers/crypto/ux500/cryp/cryp_core.c:42: warning: expecting prototype for ST(). Prototype was for CRYP_MAX_KEY_SIZE() instead
+ drivers/crypto/ux500/cryp/cryp_core.c:91: warning: Function parameter or member 'key' not described in 'cryp_ctx'
+ drivers/crypto/ux500/cryp/cryp_core.c:91: warning: Function parameter or member 'session_id' not described in 'cryp_ctx'
 
-Cc: "Horia Geantă" <horia.geanta@nxp.com>
-Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Shujuan Chen <shujuan.chen@stericsson.com>
+Cc: Joakim Bech <joakim.xx.bech@stericsson.com>
+Cc: Berne Hebark <berne.herbark@stericsson.com>
+Cc: Niklas Hernaeus <niklas.hernaeus@stericsson.com>
+Cc: Jonas Linde <jonas.linde@stericsson.com>
+Cc: Andreas Westin <andreas.westin@stericsson.com>
 Cc: linux-crypto@vger.kernel.org
 Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- drivers/crypto/caam/caampkc.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/crypto/ux500/cryp/cryp_core.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
-index dd5f101e43f83..e313233ec6de7 100644
---- a/drivers/crypto/caam/caampkc.c
-+++ b/drivers/crypto/caam/caampkc.c
-@@ -187,7 +187,8 @@ static void rsa_priv_f_done(struct device *dev, u32 *desc, u32 err,
- }
- 
+diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+index c3adeb2e58232..25ce56d05084e 100644
+--- a/drivers/crypto/ux500/cryp/cryp_core.c
++++ b/drivers/crypto/ux500/cryp/cryp_core.c
+@@ -1,5 +1,5 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-/**
++/*
+  * Copyright (C) ST-Ericsson SA 2010
+  * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
+  * Author: Joakim Bech <joakim.xx.bech@stericsson.com> for ST-Ericsson.
+@@ -62,7 +62,7 @@ struct cryp_driver_data {
  /**
-- * Count leading zeros, need it to strip, from a given scatterlist
-+ * caam_rsa_count_leading_zeros - Count leading zeros, need it to strip,
-+ *                                from a given scatterlist
-  *
-  * @sgl   : scatterlist to count zeros from
-  * @nbytes: number of zeros, in bytes, to strip
+  * struct cryp_ctx - Crypto context
+  * @config: Crypto mode.
+- * @key[CRYP_MAX_KEY_SIZE]: Key.
++ * @key: Key array.
+  * @keylen: Length of key.
+  * @iv: Pointer to initialization vector.
+  * @indata: Pointer to indata.
+@@ -73,6 +73,7 @@ struct cryp_driver_data {
+  * @updated: Updated flag.
+  * @dev_ctx: Device dependent context.
+  * @device: Pointer to the device.
++ * @session_id: Atomic session ID.
+  */
+ struct cryp_ctx {
+ 	struct cryp_config config;
 -- 
 2.25.1
 
