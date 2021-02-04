@@ -5,70 +5,73 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C45C433DB
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:16:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 306F7C433DB
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:17:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E786E64F60
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:16:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E117E64DBA
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 11:17:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235788AbhBDLPx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Feb 2021 06:15:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39932 "EHLO
+        id S235680AbhBDLRU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Feb 2021 06:17:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235749AbhBDLNX (ORCPT
+        with ESMTP id S235715AbhBDLMR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Feb 2021 06:13:23 -0500
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD59EC061A10
-        for <linux-crypto@vger.kernel.org>; Thu,  4 Feb 2021 03:10:29 -0800 (PST)
-Received: by mail-wm1-x32c.google.com with SMTP id w4so2744954wmi.4
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Feb 2021 03:10:29 -0800 (PST)
+        Thu, 4 Feb 2021 06:12:17 -0500
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32AF1C061225
+        for <linux-crypto@vger.kernel.org>; Thu,  4 Feb 2021 03:10:22 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id i9so2643446wmq.1
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Feb 2021 03:10:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=hrNr+lBWtFId4EzjUkysKAYnQC+wg9XBY1JaRyhRGmU=;
-        b=wCl0IaHIQhVpYAG4G1XGZ11OJZCpT+nf40JxNtK/yc+i2oMo9dm0aJhJzAqrUs5tZq
-         FvFd5kcpNZcSkMIkXUKXojCIAXax2YYl6f3UUb7+IcUKpRf4nxy2ZTwBCW79IwyBXPxe
-         nopVLMan39vBhud+20LlTluJ6uScxi/yGDBBp/YSapWUhKBRLo35hbP6iqXDZBnKJcbC
-         CFwip/DRDdTdyItXEtbWAmYNzhJE8Vvg7y6c3IcP5y2n5d0INnR0TZodPX/41Y5ytAoQ
-         RaM+Ba3HalHyJBPImyICoe+EABpG6OYlwTQ/m0DC5KZBtguzx6yVEoQh2iE7p8a7P0UZ
-         abBQ==
+        bh=cxGJzZpz6qA+xiFT2fhj08K+AKiamZQBAjKu1cuB41g=;
+        b=jyzJD24RWHuFc5gDwgp323TJgiD6YaBqxMG6JkMwvjTxcEH7LlCcpHG82W+8onqbfD
+         IAfOefk8CiqkWG36lQ28CVBCphq/KgkKuepfBF0mbuniWh5ZtkKIbyo+prC9vXxRF2eb
+         fFtE0vGQ/sNuTSjxnXD8iI5P6qI7On5v1kbxDeS2yUQ1G5T5G1rrl2SI694sSjiuhbrz
+         LgxPl/W8gdORHLo+1GHLho7+XoF9aRSOax5OeXK9lyNMoP37DsfhkerUXNewLL8qtm4z
+         i7JGhPPFCuPiavkerDwp4Cs1LhpGQzAQVKjx2gOF7SDXB5Ph0TtQA136NQ6vnyj2KD0D
+         Ll4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=hrNr+lBWtFId4EzjUkysKAYnQC+wg9XBY1JaRyhRGmU=;
-        b=UypXwHa7zEC4vRfs1hOd8Etp0T+MxhHH5VSUqFKyzbNfZbtzMxyMEBhETZydy9izEi
-         7dh9An/n5n+nie0YIxjcQkZiKkyQHELL113bOXbpuvsMQQGW0xSBfYd4YJo9/N0LqNx8
-         etFhZU6VFjR4v7PzeSnPkttKlGsZeyLL0Yd4hNI2SNNsNauu96CQn1EunTzPq3e/fZYr
-         0YHoJTFUV499UYTsH3D1BUS/3oeMMFpMXBnHSWexpmUXNqTwCf6MwRmi216JXSuu1DLE
-         yZA+MPv367xJsnGim0BmIwh2kMrc1UcZQr1159TL4+yS+siA3g2Wek0XvMfPz2YJCwZn
-         Uweg==
-X-Gm-Message-State: AOAM5337TqzxsRgeK6B3i1bihCaLOuOPMjnTJNhPZINaXV0Ldp2OmnUa
-        DZnvwNuOzQVDkmGj2vqqWuIf2A==
-X-Google-Smtp-Source: ABdhPJyQt1sKw0ek1Sz27bkoNIJ4Dc3TqSZmz3zCEA0n7R042NG3hUP1E6LQ8QMiCibzFOUbIpWBnA==
-X-Received: by 2002:a1c:9ec9:: with SMTP id h192mr7238710wme.28.1612437028668;
-        Thu, 04 Feb 2021 03:10:28 -0800 (PST)
+        bh=cxGJzZpz6qA+xiFT2fhj08K+AKiamZQBAjKu1cuB41g=;
+        b=J1CrUYiQGuyfNs8h2v8UUgCDjgx/r5f/ln4W9SALqrYJEFY+b3Shx04F3lgJDO0D1l
+         bAFRVMYAazFi07PoNFrXgJLqHYIIURqaSDlW40MeQdv9Jo8+X5kDK9ptmflAtMlgJ4Ou
+         QSBS7D0LgIygjhmqfU+a+zZy54qkA1l6sQ0GHCMAIjQaU/u2GIrJp8WEHpTQL7gf80d6
+         BxhKJfyJbqXSaQrt60MUQQmAdka6a4D8dlaMKrHG1XfRsEJb40XVvUW0y55ni6Wpz7h/
+         Z4N2JsFVODfSDYdmLBS6fO1kKgUi11zgTvixbb228bkPDhZGvojixrIT67TpumVv12c+
+         6MhA==
+X-Gm-Message-State: AOAM530hM6b5c7sxgfxmUmkbIa+LKZzMKPtdgJrrDZFbBInWLSr+sfS1
+        KcsyKCjfsgv0bRorQDlAubdFpw==
+X-Google-Smtp-Source: ABdhPJwd9xdvyO+0bCKJVzM+EKxnNtd4uas/Onrew1JvEjI4x3rojBBg47BW4DbMHR4XwYf9F06qlg==
+X-Received: by 2002:a1c:1b15:: with SMTP id b21mr3911278wmb.116.1612437020990;
+        Thu, 04 Feb 2021 03:10:20 -0800 (PST)
 Received: from dell.default ([91.110.221.188])
-        by smtp.gmail.com with ESMTPSA id y18sm7696218wrt.19.2021.02.04.03.10.27
+        by smtp.gmail.com with ESMTPSA id y18sm7696218wrt.19.2021.02.04.03.10.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Feb 2021 03:10:27 -0800 (PST)
+        Thu, 04 Feb 2021 03:10:20 -0800 (PST)
 From:   Lee Jones <lee.jones@linaro.org>
 To:     lee.jones@linaro.org
 Cc:     linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org
-Subject: [PATCH 20/20] crypto: cavium: nitrox_isr: Demote non-compliant kernel-doc headers
-Date:   Thu,  4 Feb 2021 11:10:00 +0000
-Message-Id: <20210204111000.2800436-21-lee.jones@linaro.org>
+Subject: [PATCH 15/20] crypto: caam: caamalg_qi2: Supply a couple of 'fallback' related descriptions
+Date:   Thu,  4 Feb 2021 11:09:55 +0000
+Message-Id: <20210204111000.2800436-16-lee.jones@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210204111000.2800436-1-lee.jones@linaro.org>
 References: <20210204111000.2800436-1-lee.jones@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -76,40 +79,32 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Fixes the following W=1 kernel build warning(s):
 
- drivers/crypto/cavium/nitrox/nitrox_isr.c:17: warning: expecting prototype for One vector for each type of ring(). Prototype was for NR_RING_VECTORS() instead
- drivers/crypto/cavium/nitrox/nitrox_isr.c:224: warning: Function parameter or member 'irq' not described in 'nps_core_int_isr'
- drivers/crypto/cavium/nitrox/nitrox_isr.c:224: warning: Function parameter or member 'data' not described in 'nps_core_int_isr'
+ drivers/crypto/caam/caamalg_qi2.c:87: warning: Function parameter or member 'xts_key_fallback' not described in 'caam_ctx'
+ drivers/crypto/caam/caamalg_qi2.c:87: warning: Function parameter or member 'fallback' not described in 'caam_ctx'
 
+Cc: "Horia Geantă" <horia.geanta@nxp.com>
+Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: linux-crypto@vger.kernel.org
 Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- drivers/crypto/cavium/nitrox/nitrox_isr.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/caam/caamalg_qi2.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_isr.c b/drivers/crypto/cavium/nitrox/nitrox_isr.c
-index 99b053094f5af..c288c4b51783d 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_isr.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_isr.c
-@@ -10,7 +10,7 @@
- #include "nitrox_isr.h"
- #include "nitrox_mbx.h"
- 
--/**
-+/*
-  * One vector for each type of ring
-  *  - NPS packet ring, AQMQ ring and ZQMQ ring
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index a780e627838ae..22e45c5bf2023 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -71,6 +71,8 @@ struct caam_skcipher_alg {
+  * @adata: authentication algorithm details
+  * @cdata: encryption algorithm details
+  * @authsize: authentication tag (a.k.a. ICV / MAC) size
++ * @xts_key_fallback: whether to set the fallback key
++ * @fallback: the fallback key
   */
-@@ -216,7 +216,7 @@ static void nps_core_int_tasklet(unsigned long data)
- 	}
- }
- 
--/**
-+/*
-  * nps_core_int_isr - interrupt handler for NITROX errors and
-  *   mailbox communication
-  */
+ struct caam_ctx {
+ 	struct caam_flc flc[NUM_OP];
 -- 
 2.25.1
 
