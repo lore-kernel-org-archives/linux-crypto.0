@@ -2,91 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E53C433E9
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 16:27:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD7F4C433E9
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 16:54:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7254864F4E
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 16:27:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8881464F47
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Feb 2021 16:54:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236737AbhBDPC3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Feb 2021 10:02:29 -0500
-Received: from mail.kernel.org ([198.145.29.99]:46994 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237042AbhBDPAW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Feb 2021 10:00:22 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D9E1864F60;
-        Thu,  4 Feb 2021 14:58:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612450711;
-        bh=Gkl5QjMLL9cstN7D689exW6RO9F/yfq6ZQ1XMZN1V+k=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=r1FvdF0heZuFmuqdo0dHu3sLr8/I8cmWlT2CSDUdGkPM/JF0RyifSAFkwLaPLumqI
-         4sOOu4MH1lODcMRT4j5Ncjve0F5oGTNNamwSzKrdbYhzmd0K+5Dpc3nIuqaGI3OSpI
-         B4/xOw4I5xKsdGR9v6dqRwSDaPIPO2cNTrO9aZPONvd6sS+ksHXU56ovqPJk8Xqz4Y
-         9xuDQiz32W/CoLoiLjgOEBiuyUQOGW9A32jKRkPor9SCx9+Pw67Gs8PhhwKgifCOVy
-         RYyy7eTRduNvneoqUyJui+ZV1Jm2w2TNAJ+N+Nd2FbmMIKndRxSup9Fr7QAzNh8+Ga
-         AdXSDhTqCNbtA==
-Date:   Thu, 4 Feb 2021 16:58:23 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Stefan Berger <stefanb@linux.ibm.com>,
-        Saulo Alessandre <saulo.alessandre@gmail.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, dhowells@redhat.com, zohar@linux.ibm.com,
-        linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
-        linux-integrity@vger.kernel.org
-Subject: Re: [PATCH v7 1/4] crypto: Add support for ECDSA signature
- verification
-Message-ID: <YBwLj+8kHIHMA3xH@kernel.org>
-References: <20210201151910.1465705-1-stefanb@linux.ibm.com>
- <20210201151910.1465705-2-stefanb@linux.ibm.com>
- <20210204052738.GA7086@gondor.apana.org.au>
+        id S238216AbhBDQyX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Feb 2021 11:54:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56810 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238191AbhBDQxo (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 4 Feb 2021 11:53:44 -0500
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BD47C06178B;
+        Thu,  4 Feb 2021 08:52:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=rU7kGtAV6x4h9PYVWyoXz+PtjR1Ekd/aEUlrk7YawjA=; b=VTPukyRsHKDa6AiBC7g1A33pB
+        SwzVRoY12CgfihopuGU84sVuVRYsUfiv6b3Emwm8BDSGMl47NJ4gm0qIsiqAwyM3pSwTIf2l6vha2
+        cDzPmBjk1ljXfebW71uB6xJtMeptgxH+fOQ7FkYaFWun/B6T1rfINwGd+rlb8M/Klezy3l/ReCdrv
+        V0d4qDQKYRRMYic1iTAdlcZh5yvqjMKyuvjs8Wsy37fKFKVUMlPg8hW+P5sXiwO/tuao+vtETwe0A
+        yHWeGg7btn+Meuk+vfx/5ICUUCrM+vrThjyBDk8k7p21ma/Hklw+jYC+vHctVDNhR+i6P6uievpnI
+        PK8/XvaQg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39164)
+        by pandora.armlinux.org.uk with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <linux@armlinux.org.uk>)
+        id 1l7hrw-0006on-3V; Thu, 04 Feb 2021 16:52:36 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.92)
+        (envelope-from <linux@shell.armlinux.org.uk>)
+        id 1l7hrk-0005Ka-VR; Thu, 04 Feb 2021 16:52:24 +0000
+Date:   Thu, 4 Feb 2021 16:52:24 +0000
+From:   Russell King - ARM Linux admin <linux@armlinux.org.uk>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        linux-fbdev@vger.kernel.org, kvm@vger.kernel.org,
+        alsa-devel@alsa-project.org, dri-devel@lists.freedesktop.org,
+        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig.org@pengutronix.de>, linux-i2c@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-rtc@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-input@vger.kernel.org, Mike Leach <mike.leach@linaro.org>,
+        linux-watchdog@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+        linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-crypto@vger.kernel.org,
+        kernel@pengutronix.de, Leo Yan <leo.yan@linaro.org>,
+        dmaengine@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Vinod Koul <vkoul@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Mark Brown <broonie@kernel.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Subject: Re: [GIT PULL] immutable branch for amba changes targeting v5.12-rc1
+Message-ID: <20210204165224.GA1463@shell.armlinux.org.uk>
+References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
+ <20210202135350.36nj3dmcoq3t7gcf@pengutronix.de>
+ <YBlcTXlxemmC2lgr@kroah.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210204052738.GA7086@gondor.apana.org.au>
+In-Reply-To: <YBlcTXlxemmC2lgr@kroah.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Sender: Russell King - ARM Linux admin <linux@armlinux.org.uk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 04, 2021 at 04:27:39PM +1100, Herbert Xu wrote:
-> On Mon, Feb 01, 2021 at 10:19:07AM -0500, Stefan Berger wrote:
-> > Add support for parsing the parameters of a NIST P256 or NIST P192 key.
-> > Enable signature verification using these keys. The new module is
-> > enabled with CONFIG_ECDSA:
-> >   Elliptic Curve Digital Signature Algorithm (NIST P192, P256 etc.)
-> >   is A NIST cryptographic standard algorithm. Only signature verification
-> >   is implemented.
-> > 
-> > Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Cc: linux-crypto@vger.kernel.org
-> > ---
-> >  crypto/Kconfig               |  10 +
-> >  crypto/Makefile              |   6 +
-> >  crypto/ecc.c                 |  13 +-
-> >  crypto/ecc.h                 |  28 +++
-> >  crypto/ecdsa.c               | 361 +++++++++++++++++++++++++++++++++++
-> >  crypto/ecdsasignature.asn1   |   4 +
-> >  crypto/testmgr.c             |  12 ++
-> >  crypto/testmgr.h             | 267 ++++++++++++++++++++++++++
-> >  include/linux/oid_registry.h |   4 +
-> >  9 files changed, 694 insertions(+), 11 deletions(-)
-> >  create mode 100644 crypto/ecdsa.c
-> >  create mode 100644 crypto/ecdsasignature.asn1
+On Tue, Feb 02, 2021 at 03:06:05PM +0100, Greg Kroah-Hartman wrote:
+> I'm glad to take this through my char/misc tree, as that's where the
+> other coresight changes flow through.  So if no one else objects, I will
+> do so...
 
+Greg, did you end up pulling this after all? If not, Uwe produced a v2.
+I haven't merged v2 yet as I don't know what you've done.
 
-Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+Thanks.
 
-Great, ECDSA has been lacking for a way too long. Just wanted to
-acknowledge support for this, I just now also skimmed the change
-from patchwrok (way too quickly for reviewed-by but well enough
-for ack).
-
-/Jarkko
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
