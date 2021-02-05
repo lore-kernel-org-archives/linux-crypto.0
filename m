@@ -2,467 +2,345 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25434C433E6
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Feb 2021 23:19:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFAC6C433E0
+	for <linux-crypto@archiver.kernel.org>; Sat,  6 Feb 2021 02:40:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D21CF64F99
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Feb 2021 23:19:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 699FB64FE4
+	for <linux-crypto@archiver.kernel.org>; Sat,  6 Feb 2021 02:40:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231809AbhBEXTc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Feb 2021 18:19:32 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:12440 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231175AbhBEKOY (ORCPT
+        id S231249AbhBFCjP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 Feb 2021 21:39:15 -0500
+Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:3938 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231300AbhBFChL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Feb 2021 05:14:24 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DXB6h72XpzjJ6k;
-        Fri,  5 Feb 2021 18:12:12 +0800 (CST)
-Received: from huawei.com (10.67.165.24) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.498.0; Fri, 5 Feb 2021
- 18:13:11 +0800
-From:   Longfang Liu <liulongfang@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <wangzhou1@hisilicon.com>,
-        <xuzaibo@huawei.com>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH 1/3] crypto: hisilicon/sec - fixes some log printing style
-Date:   Fri, 5 Feb 2021 18:10:55 +0800
-Message-ID: <1612519857-30714-2-git-send-email-liulongfang@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1612519857-30714-1-git-send-email-liulongfang@huawei.com>
-References: <1612519857-30714-1-git-send-email-liulongfang@huawei.com>
+        Fri, 5 Feb 2021 21:37:11 -0500
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+        by mx0b-0016f401.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 115MfQHM030586;
+        Fri, 5 Feb 2021 14:51:21 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-type; s=pfpt0220; bh=Ot5WpBZu0btcHw4uKMHtVdEZ78DUEOLlJuQ3edRvHBA=;
+ b=dG4odzKhyTVzoH0ucATIv7GRakRxPqEc4QFD5qJS9v+QU90OlaLjVWxoRMC6rwnUgqfJ
+ 9P+ri9Bt49hErIO/L0ehbYYl/9YuK3y88+ZXYcH4TYNQTFANFhKJ0j8zbM7aNWCOQ7kN
+ 51DXm3Dx1pXa/1eNdnzWzImFiQ5VIhA4aHVRxlyW5amFt3OZS8zRNEEZ5810huijA4Qw
+ hqafL3JmuDxuY1mfFEsUfiiI75MA7+RH410Dtskf/IXDNbqnz1PwDYuVc3eYys16WxF1
+ 3SnXC9MpjeKshPVXoRtfyK5oYjSW7kYW2smcoHuIBEzPpPLRlkfODy0FKegigApv7auE lQ== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+        by mx0b-0016f401.pphosted.com with ESMTP id 36fnr6ag1w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Fri, 05 Feb 2021 14:51:21 -0800
+Received: from SC-EXCH01.marvell.com (10.93.176.81) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 5 Feb
+ 2021 14:51:19 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by SC-EXCH01.marvell.com
+ (10.93.176.81) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 5 Feb
+ 2021 14:51:18 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Fri, 5 Feb 2021 14:51:18 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+        by maili.marvell.com (Postfix) with ESMTP id B7B0A3F7040;
+        Fri,  5 Feb 2021 14:51:14 -0800 (PST)
+From:   Geetha sowjanya <gakula@marvell.com>
+To:     <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+CC:     <sgoutham@marvell.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>, <jerinj@marvell.com>,
+        <lcherian@marvell.com>, <bbrezillon@kernel.org>,
+        <arno@natisbad.org>, <schalla@marvell.com>,
+        Geetha sowjanya <gakula@marvell.com>
+Subject: [net-next v4 04/14] octeontx2-af: cn10k: Update NIX and NPA context in debugfs
+Date:   Sat, 6 Feb 2021 04:20:03 +0530
+Message-ID: <20210205225013.15961-5-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210205225013.15961-1-gakula@marvell.com>
+References: <20210205225013.15961-1-gakula@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
+ definitions=2021-02-05_13:2021-02-05,2021-02-05 signatures=0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-1. Fix a problem of error log printing
-2. Modify error log printing style
+On CN10K platform NPA and NIX context structure bit fields
+had changed to support new features like bandwidth steering etc.
+This patch dumps approprate context for CN10K platform.
 
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+Signed-off-by: Sunil Goutham <sgoutham@marvell.com>
 ---
- drivers/crypto/hisilicon/sec2/sec.h        |  5 +-
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 82 +++++++++++++++---------------
- drivers/crypto/hisilicon/sec2/sec_crypto.h |  2 -
- 3 files changed, 42 insertions(+), 47 deletions(-)
+ .../ethernet/marvell/octeontx2/af/rvu_debugfs.c    | 177 ++++++++++++++++++++-
+ 1 file changed, 175 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 0849191..a8c10e3 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -4,8 +4,6 @@
- #ifndef __HISI_SEC_V2_H
- #define __HISI_SEC_V2_H
- 
--#include <linux/list.h>
--
- #include "../qm.h"
- #include "sec_crypto.h"
- 
-@@ -50,7 +48,7 @@ struct sec_req {
- 
- 	int err_type;
- 	int req_id;
--	int flag;
-+	u32 flag;
- 
- 	/* Status of the SEC request */
- 	bool fake_busy;
-@@ -139,6 +137,7 @@ struct sec_ctx {
- 	bool pbuf_supported;
- 	struct sec_cipher_ctx c_ctx;
- 	struct sec_auth_ctx a_ctx;
-+	struct device *dev;
- };
- 
- enum sec_endian {
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 2eaa516..d2c4a2c 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -43,7 +43,6 @@
- 
- #define SEC_TOTAL_IV_SZ		(SEC_IV_SIZE * QM_Q_DEPTH)
- #define SEC_SGL_SGE_NR		128
--#define SEC_CTX_DEV(ctx)	(&(ctx)->sec->qm.pdev->dev)
- #define SEC_CIPHER_AUTH		0xfe
- #define SEC_AUTH_CIPHER		0x1
- #define SEC_MAX_MAC_LEN		64
-@@ -96,7 +95,7 @@ static int sec_alloc_req_id(struct sec_req *req, struct sec_qp_ctx *qp_ctx)
- 				  0, QM_Q_DEPTH, GFP_ATOMIC);
- 	mutex_unlock(&qp_ctx->req_lock);
- 	if (unlikely(req_id < 0)) {
--		dev_err(SEC_CTX_DEV(req->ctx), "alloc req id fail!\n");
-+		dev_err(req->ctx->dev, "alloc req id fail!\n");
- 		return req_id;
- 	}
- 
-@@ -112,7 +111,7 @@ static void sec_free_req_id(struct sec_req *req)
- 	int req_id = req->req_id;
- 
- 	if (unlikely(req_id < 0 || req_id >= QM_Q_DEPTH)) {
--		dev_err(SEC_CTX_DEV(req->ctx), "free request id invalid!\n");
-+		dev_err(req->ctx->dev, "free request id invalid!\n");
- 		return;
- 	}
- 
-@@ -138,7 +137,7 @@ static int sec_aead_verify(struct sec_req *req)
- 				aead_req->cryptlen + aead_req->assoclen -
- 				authsize);
- 	if (unlikely(sz != authsize || memcmp(mac_out, mac, sz))) {
--		dev_err(SEC_CTX_DEV(req->ctx), "aead verify failure!\n");
-+		dev_err(req->ctx->dev, "aead verify failure!\n");
- 		return -EBADMSG;
- 	}
- 
-@@ -177,7 +176,7 @@ static void sec_req_cb(struct hisi_qp *qp, void *resp)
- 	if (unlikely(req->err_type || done != SEC_SQE_DONE ||
- 	    (ctx->alg_type == SEC_SKCIPHER && flag != SEC_SQE_CFLAG) ||
- 	    (ctx->alg_type == SEC_AEAD && flag != SEC_SQE_AEAD_FLAG))) {
--		dev_err(SEC_CTX_DEV(ctx),
-+		dev_err_ratelimited(ctx->dev,
- 			"err_type[%d],done[%d],flag[%d]\n",
- 			req->err_type, done, flag);
- 		err = -EIO;
-@@ -326,8 +325,8 @@ static int sec_alloc_pbuf_resource(struct device *dev, struct sec_alg_res *res)
- static int sec_alg_resource_alloc(struct sec_ctx *ctx,
- 				  struct sec_qp_ctx *qp_ctx)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+index 80e9643..02775d4 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+@@ -449,6 +449,7 @@ RVU_DEBUG_SEQ_FOPS(npa_qsize, npa_qsize_display, npa_qsize_write);
+ static void print_npa_aura_ctx(struct seq_file *m, struct npa_aq_enq_rsp *rsp)
  {
--	struct device *dev = SEC_CTX_DEV(ctx);
- 	struct sec_alg_res *res = qp_ctx->res;
-+	struct device *dev = ctx->dev;
- 	int ret;
+ 	struct npa_aura_s *aura = &rsp->aura;
++	struct rvu *rvu = m->private;
  
- 	ret = sec_alloc_civ_resource(dev, res);
-@@ -360,7 +359,7 @@ static int sec_alg_resource_alloc(struct sec_ctx *ctx,
- static void sec_alg_resource_free(struct sec_ctx *ctx,
- 				  struct sec_qp_ctx *qp_ctx)
- {
--	struct device *dev = SEC_CTX_DEV(ctx);
-+	struct device *dev = ctx->dev;
+ 	seq_printf(m, "W0: Pool addr\t\t%llx\n", aura->pool_addr);
  
- 	sec_free_civ_resource(dev, qp_ctx->res);
+@@ -468,6 +469,9 @@ static void print_npa_aura_ctx(struct seq_file *m, struct npa_aq_enq_rsp *rsp)
  
-@@ -373,7 +372,7 @@ static void sec_alg_resource_free(struct sec_ctx *ctx,
- static int sec_create_qp_ctx(struct hisi_qm *qm, struct sec_ctx *ctx,
- 			     int qp_ctx_id, int alg_type)
- {
--	struct device *dev = SEC_CTX_DEV(ctx);
-+	struct device *dev = ctx->dev;
- 	struct sec_qp_ctx *qp_ctx;
- 	struct hisi_qp *qp;
- 	int ret = -ENOMEM;
-@@ -428,7 +427,7 @@ static int sec_create_qp_ctx(struct hisi_qm *qm, struct sec_ctx *ctx,
- static void sec_release_qp_ctx(struct sec_ctx *ctx,
- 			       struct sec_qp_ctx *qp_ctx)
- {
--	struct device *dev = SEC_CTX_DEV(ctx);
-+	struct device *dev = ctx->dev;
+ 	seq_printf(m, "W3: limit\t\t%llu\nW3: bp\t\t\t%d\nW3: fc_ena\t\t%d\n",
+ 		   (u64)aura->limit, aura->bp, aura->fc_ena);
++
++	if (!is_rvu_otx2(rvu))
++		seq_printf(m, "W3: fc_be\t\t%d\n", aura->fc_be);
+ 	seq_printf(m, "W3: fc_up_crossing\t%d\nW3: fc_stype\t\t%d\n",
+ 		   aura->fc_up_crossing, aura->fc_stype);
+ 	seq_printf(m, "W3: fc_hyst_bits\t%d\n", aura->fc_hyst_bits);
+@@ -485,12 +489,15 @@ static void print_npa_aura_ctx(struct seq_file *m, struct npa_aq_enq_rsp *rsp)
+ 	seq_printf(m, "W5: err_qint_idx \t%d\n", aura->err_qint_idx);
  
- 	hisi_qm_stop_qp(qp_ctx->qp);
- 	sec_alg_resource_free(ctx, qp_ctx);
-@@ -452,6 +451,7 @@ static int sec_ctx_base_init(struct sec_ctx *ctx)
- 
- 	sec = container_of(ctx->qps[0]->qm, struct sec_dev, qm);
- 	ctx->sec = sec;
-+	ctx->dev = &sec->qm.pdev->dev;
- 	ctx->hlf_q_num = sec->ctx_q_num >> 1;
- 
- 	ctx->pbuf_supported = ctx->sec->iommu_used;
-@@ -476,11 +476,9 @@ static int sec_ctx_base_init(struct sec_ctx *ctx)
- err_sec_release_qp_ctx:
- 	for (i = i - 1; i >= 0; i--)
- 		sec_release_qp_ctx(ctx, &ctx->qp_ctx[i]);
--
- 	kfree(ctx->qp_ctx);
- err_destroy_qps:
- 	sec_destroy_qps(ctx->qps, sec->ctx_q_num);
--
- 	return ret;
+ 	seq_printf(m, "W6: thresh\t\t%llu\n", (u64)aura->thresh);
++	if (!is_rvu_otx2(rvu))
++		seq_printf(m, "W6: fc_msh_dst\t\t%d\n", aura->fc_msh_dst);
  }
  
-@@ -499,7 +497,7 @@ static int sec_cipher_init(struct sec_ctx *ctx)
+ /* Dumps given NPA Pool's context */
+ static void print_npa_pool_ctx(struct seq_file *m, struct npa_aq_enq_rsp *rsp)
  {
- 	struct sec_cipher_ctx *c_ctx = &ctx->c_ctx;
+ 	struct npa_pool_s *pool = &rsp->pool;
++	struct rvu *rvu = m->private;
  
--	c_ctx->c_key = dma_alloc_coherent(SEC_CTX_DEV(ctx), SEC_MAX_KEY_SIZE,
-+	c_ctx->c_key = dma_alloc_coherent(ctx->dev, SEC_MAX_KEY_SIZE,
- 					  &c_ctx->c_key_dma, GFP_KERNEL);
- 	if (!c_ctx->c_key)
- 		return -ENOMEM;
-@@ -512,7 +510,7 @@ static void sec_cipher_uninit(struct sec_ctx *ctx)
- 	struct sec_cipher_ctx *c_ctx = &ctx->c_ctx;
+ 	seq_printf(m, "W0: Stack base\t\t%llx\n", pool->stack_base);
  
- 	memzero_explicit(c_ctx->c_key, SEC_MAX_KEY_SIZE);
--	dma_free_coherent(SEC_CTX_DEV(ctx), SEC_MAX_KEY_SIZE,
-+	dma_free_coherent(ctx->dev, SEC_MAX_KEY_SIZE,
- 			  c_ctx->c_key, c_ctx->c_key_dma);
+@@ -512,6 +519,8 @@ static void print_npa_pool_ctx(struct seq_file *m, struct npa_aq_enq_rsp *rsp)
+ 		   pool->avg_con, pool->fc_ena, pool->fc_stype);
+ 	seq_printf(m, "W4: fc_hyst_bits\t%d\nW4: fc_up_crossing\t%d\n",
+ 		   pool->fc_hyst_bits, pool->fc_up_crossing);
++	if (!is_rvu_otx2(rvu))
++		seq_printf(m, "W4: fc_be\t\t%d\n", pool->fc_be);
+ 	seq_printf(m, "W4: update_time\t\t%d\n", pool->update_time);
+ 
+ 	seq_printf(m, "W5: fc_addr\t\t%llx\n", pool->fc_addr);
+@@ -525,8 +534,10 @@ static void print_npa_pool_ctx(struct seq_file *m, struct npa_aq_enq_rsp *rsp)
+ 	seq_printf(m, "W8: thresh_int\t\t%d\n", pool->thresh_int);
+ 	seq_printf(m, "W8: thresh_int_ena\t%d\nW8: thresh_up\t\t%d\n",
+ 		   pool->thresh_int_ena, pool->thresh_up);
+-	seq_printf(m, "W8: thresh_qint_idx\t%d\nW8: err_qint_idx\t\t%d\n",
++	seq_printf(m, "W8: thresh_qint_idx\t%d\nW8: err_qint_idx\t%d\n",
+ 		   pool->thresh_qint_idx, pool->err_qint_idx);
++	if (!is_rvu_otx2(rvu))
++		seq_printf(m, "W8: fc_msh_dst\t\t%d\n", pool->fc_msh_dst);
  }
  
-@@ -520,7 +518,7 @@ static int sec_auth_init(struct sec_ctx *ctx)
+ /* Reads aura/pool's ctx from admin queue */
+@@ -910,11 +921,78 @@ static int rvu_dbg_nix_ndc_tx_hits_miss_display(struct seq_file *filp,
+ 
+ RVU_DEBUG_SEQ_FOPS(nix_ndc_tx_hits_miss, nix_ndc_tx_hits_miss_display, NULL);
+ 
++static void print_nix_cn10k_sq_ctx(struct seq_file *m,
++				   struct nix_cn10k_sq_ctx_s *sq_ctx)
++{
++	seq_printf(m, "W0: ena \t\t\t%d\nW0: qint_idx \t\t\t%d\n",
++		   sq_ctx->ena, sq_ctx->qint_idx);
++	seq_printf(m, "W0: substream \t\t\t0x%03x\nW0: sdp_mcast \t\t\t%d\n",
++		   sq_ctx->substream, sq_ctx->sdp_mcast);
++	seq_printf(m, "W0: cq \t\t\t\t%d\nW0: sqe_way_mask \t\t%d\n\n",
++		   sq_ctx->cq, sq_ctx->sqe_way_mask);
++
++	seq_printf(m, "W1: smq \t\t\t%d\nW1: cq_ena \t\t\t%d\nW1: xoff\t\t\t%d\n",
++		   sq_ctx->smq, sq_ctx->cq_ena, sq_ctx->xoff);
++	seq_printf(m, "W1: sso_ena \t\t\t%d\nW1: smq_rr_weight\t\t%d\n",
++		   sq_ctx->sso_ena, sq_ctx->smq_rr_weight);
++	seq_printf(m, "W1: default_chan\t\t%d\nW1: sqb_count\t\t\t%d\n\n",
++		   sq_ctx->default_chan, sq_ctx->sqb_count);
++
++	seq_printf(m, "W2: smq_rr_count_lb \t\t%d\n", sq_ctx->smq_rr_count_lb);
++	seq_printf(m, "W2: smq_rr_count_ub \t\t%d\n", sq_ctx->smq_rr_count_ub);
++	seq_printf(m, "W2: sqb_aura \t\t\t%d\nW2: sq_int \t\t\t%d\n",
++		   sq_ctx->sqb_aura, sq_ctx->sq_int);
++	seq_printf(m, "W2: sq_int_ena \t\t\t%d\nW2: sqe_stype \t\t\t%d\n",
++		   sq_ctx->sq_int_ena, sq_ctx->sqe_stype);
++
++	seq_printf(m, "W3: max_sqe_size\t\t%d\nW3: cq_limit\t\t\t%d\n",
++		   sq_ctx->max_sqe_size, sq_ctx->cq_limit);
++	seq_printf(m, "W3: lmt_dis \t\t\t%d\nW3: mnq_dis \t\t\t%d\n",
++		   sq_ctx->mnq_dis, sq_ctx->lmt_dis);
++	seq_printf(m, "W3: smq_next_sq\t\t\t%d\nW3: smq_lso_segnum\t\t%d\n",
++		   sq_ctx->smq_next_sq, sq_ctx->smq_lso_segnum);
++	seq_printf(m, "W3: tail_offset \t\t%d\nW3: smenq_offset\t\t%d\n",
++		   sq_ctx->tail_offset, sq_ctx->smenq_offset);
++	seq_printf(m, "W3: head_offset\t\t\t%d\nW3: smenq_next_sqb_vld\t\t%d\n\n",
++		   sq_ctx->head_offset, sq_ctx->smenq_next_sqb_vld);
++
++	seq_printf(m, "W4: next_sqb \t\t\t%llx\n\n", sq_ctx->next_sqb);
++	seq_printf(m, "W5: tail_sqb \t\t\t%llx\n\n", sq_ctx->tail_sqb);
++	seq_printf(m, "W6: smenq_sqb \t\t\t%llx\n\n", sq_ctx->smenq_sqb);
++	seq_printf(m, "W7: smenq_next_sqb \t\t%llx\n\n",
++		   sq_ctx->smenq_next_sqb);
++
++	seq_printf(m, "W8: head_sqb\t\t\t%llx\n\n", sq_ctx->head_sqb);
++
++	seq_printf(m, "W9: vfi_lso_total\t\t%d\n", sq_ctx->vfi_lso_total);
++	seq_printf(m, "W9: vfi_lso_sizem1\t\t%d\nW9: vfi_lso_sb\t\t\t%d\n",
++		   sq_ctx->vfi_lso_sizem1, sq_ctx->vfi_lso_sb);
++	seq_printf(m, "W9: vfi_lso_mps\t\t\t%d\nW9: vfi_lso_vlan0_ins_ena\t%d\n",
++		   sq_ctx->vfi_lso_mps, sq_ctx->vfi_lso_vlan0_ins_ena);
++	seq_printf(m, "W9: vfi_lso_vlan1_ins_ena\t%d\nW9: vfi_lso_vld \t\t%d\n\n",
++		   sq_ctx->vfi_lso_vld, sq_ctx->vfi_lso_vlan1_ins_ena);
++
++	seq_printf(m, "W10: scm_lso_rem \t\t%llu\n\n",
++		   (u64)sq_ctx->scm_lso_rem);
++	seq_printf(m, "W11: octs \t\t\t%llu\n\n", (u64)sq_ctx->octs);
++	seq_printf(m, "W12: pkts \t\t\t%llu\n\n", (u64)sq_ctx->pkts);
++	seq_printf(m, "W14: dropped_octs \t\t%llu\n\n",
++		   (u64)sq_ctx->dropped_octs);
++	seq_printf(m, "W15: dropped_pkts \t\t%llu\n\n",
++		   (u64)sq_ctx->dropped_pkts);
++}
++
+ /* Dumps given nix_sq's context */
+ static void print_nix_sq_ctx(struct seq_file *m, struct nix_aq_enq_rsp *rsp)
  {
- 	struct sec_auth_ctx *a_ctx = &ctx->a_ctx;
+ 	struct nix_sq_ctx_s *sq_ctx = &rsp->sq;
++	struct nix_hw *nix_hw = m->private;
++	struct rvu *rvu = nix_hw->rvu;
  
--	a_ctx->a_key = dma_alloc_coherent(SEC_CTX_DEV(ctx), SEC_MAX_KEY_SIZE,
-+	a_ctx->a_key = dma_alloc_coherent(ctx->dev, SEC_MAX_KEY_SIZE,
- 					  &a_ctx->a_key_dma, GFP_KERNEL);
- 	if (!a_ctx->a_key)
- 		return -ENOMEM;
-@@ -533,7 +531,7 @@ static void sec_auth_uninit(struct sec_ctx *ctx)
- 	struct sec_auth_ctx *a_ctx = &ctx->a_ctx;
- 
- 	memzero_explicit(a_ctx->a_key, SEC_MAX_KEY_SIZE);
--	dma_free_coherent(SEC_CTX_DEV(ctx), SEC_MAX_KEY_SIZE,
-+	dma_free_coherent(ctx->dev, SEC_MAX_KEY_SIZE,
- 			  a_ctx->a_key, a_ctx->a_key_dma);
++	if (!is_rvu_otx2(rvu)) {
++		print_nix_cn10k_sq_ctx(m, (struct nix_cn10k_sq_ctx_s *)sq_ctx);
++		return;
++	}
+ 	seq_printf(m, "W0: sqe_way_mask \t\t%d\nW0: cq \t\t\t\t%d\n",
+ 		   sq_ctx->sqe_way_mask, sq_ctx->cq);
+ 	seq_printf(m, "W0: sdp_mcast \t\t\t%d\nW0: substream \t\t\t0x%03x\n",
+@@ -974,10 +1052,94 @@ static void print_nix_sq_ctx(struct seq_file *m, struct nix_aq_enq_rsp *rsp)
+ 		   (u64)sq_ctx->dropped_pkts);
  }
  
-@@ -546,7 +544,7 @@ static int sec_skcipher_init(struct crypto_skcipher *tfm)
- 	crypto_skcipher_set_reqsize(tfm, sizeof(struct sec_req));
- 	ctx->c_ctx.ivsize = crypto_skcipher_ivsize(tfm);
- 	if (ctx->c_ctx.ivsize > SEC_IV_SIZE) {
--		dev_err(SEC_CTX_DEV(ctx), "get error skcipher iv size!\n");
-+		pr_err("get error skcipher iv size!\n");
- 		return -EINVAL;
- 	}
- 
-@@ -633,12 +631,13 @@ static int sec_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
++static void print_nix_cn10k_rq_ctx(struct seq_file *m,
++				   struct nix_cn10k_rq_ctx_s *rq_ctx)
++{
++	seq_printf(m, "W0: ena \t\t\t%d\nW0: sso_ena \t\t\t%d\n",
++		   rq_ctx->ena, rq_ctx->sso_ena);
++	seq_printf(m, "W0: ipsech_ena \t\t\t%d\nW0: ena_wqwd \t\t\t%d\n",
++		   rq_ctx->ipsech_ena, rq_ctx->ena_wqwd);
++	seq_printf(m, "W0: cq \t\t\t\t%d\nW0: lenerr_dis \t\t\t%d\n",
++		   rq_ctx->cq, rq_ctx->lenerr_dis);
++	seq_printf(m, "W0: csum_il4_dis \t\t%d\nW0: csum_ol4_dis \t\t%d\n",
++		   rq_ctx->csum_il4_dis, rq_ctx->csum_ol4_dis);
++	seq_printf(m, "W0: len_il4_dis \t\t%d\nW0: len_il3_dis \t\t%d\n",
++		   rq_ctx->len_il4_dis, rq_ctx->len_il3_dis);
++	seq_printf(m, "W0: len_ol4_dis \t\t%d\nW0: len_ol3_dis \t\t%d\n",
++		   rq_ctx->len_ol4_dis, rq_ctx->len_ol3_dis);
++	seq_printf(m, "W0: wqe_aura \t\t\t%d\n\n", rq_ctx->wqe_aura);
++
++	seq_printf(m, "W1: spb_aura \t\t\t%d\nW1: lpb_aura \t\t\t%d\n",
++		   rq_ctx->spb_aura, rq_ctx->lpb_aura);
++	seq_printf(m, "W1: spb_aura \t\t\t%d\n", rq_ctx->spb_aura);
++	seq_printf(m, "W1: sso_grp \t\t\t%d\nW1: sso_tt \t\t\t%d\n",
++		   rq_ctx->sso_grp, rq_ctx->sso_tt);
++	seq_printf(m, "W1: pb_caching \t\t\t%d\nW1: wqe_caching \t\t%d\n",
++		   rq_ctx->pb_caching, rq_ctx->wqe_caching);
++	seq_printf(m, "W1: xqe_drop_ena \t\t%d\nW1: spb_drop_ena \t\t%d\n",
++		   rq_ctx->xqe_drop_ena, rq_ctx->spb_drop_ena);
++	seq_printf(m, "W1: lpb_drop_ena \t\t%d\nW1: pb_stashing \t\t%d\n",
++		   rq_ctx->lpb_drop_ena, rq_ctx->pb_stashing);
++	seq_printf(m, "W1: ipsecd_drop_ena \t\t%d\nW1: chi_ena \t\t\t%d\n\n",
++		   rq_ctx->ipsecd_drop_ena, rq_ctx->chi_ena);
++
++	seq_printf(m, "W2: band_prof_id \t\t%d\n", rq_ctx->band_prof_id);
++	seq_printf(m, "W2: policer_ena \t\t%d\n", rq_ctx->policer_ena);
++	seq_printf(m, "W2: spb_sizem1 \t\t\t%d\n", rq_ctx->spb_sizem1);
++	seq_printf(m, "W2: wqe_skip \t\t\t%d\nW2: sqb_ena \t\t\t%d\n",
++		   rq_ctx->wqe_skip, rq_ctx->spb_ena);
++	seq_printf(m, "W2: lpb_size1 \t\t\t%d\nW2: first_skip \t\t\t%d\n",
++		   rq_ctx->lpb_sizem1, rq_ctx->first_skip);
++	seq_printf(m, "W2: later_skip\t\t\t%d\nW2: xqe_imm_size\t\t%d\n",
++		   rq_ctx->later_skip, rq_ctx->xqe_imm_size);
++	seq_printf(m, "W2: xqe_imm_copy \t\t%d\nW2: xqe_hdr_split \t\t%d\n\n",
++		   rq_ctx->xqe_imm_copy, rq_ctx->xqe_hdr_split);
++
++	seq_printf(m, "W3: xqe_drop \t\t\t%d\nW3: xqe_pass \t\t\t%d\n",
++		   rq_ctx->xqe_drop, rq_ctx->xqe_pass);
++	seq_printf(m, "W3: wqe_pool_drop \t\t%d\nW3: wqe_pool_pass \t\t%d\n",
++		   rq_ctx->wqe_pool_drop, rq_ctx->wqe_pool_pass);
++	seq_printf(m, "W3: spb_pool_drop \t\t%d\nW3: spb_pool_pass \t\t%d\n",
++		   rq_ctx->spb_pool_drop, rq_ctx->spb_pool_pass);
++	seq_printf(m, "W3: spb_aura_drop \t\t%d\nW3: spb_aura_pass \t\t%d\n\n",
++		   rq_ctx->spb_aura_pass, rq_ctx->spb_aura_drop);
++
++	seq_printf(m, "W4: lpb_aura_drop \t\t%d\nW3: lpb_aura_pass \t\t%d\n",
++		   rq_ctx->lpb_aura_pass, rq_ctx->lpb_aura_drop);
++	seq_printf(m, "W4: lpb_pool_drop \t\t%d\nW3: lpb_pool_pass \t\t%d\n",
++		   rq_ctx->lpb_pool_drop, rq_ctx->lpb_pool_pass);
++	seq_printf(m, "W4: rq_int \t\t\t%d\nW4: rq_int_ena\t\t\t%d\n",
++		   rq_ctx->rq_int, rq_ctx->rq_int_ena);
++	seq_printf(m, "W4: qint_idx \t\t\t%d\n\n", rq_ctx->qint_idx);
++
++	seq_printf(m, "W5: ltag \t\t\t%d\nW5: good_utag \t\t\t%d\n",
++		   rq_ctx->ltag, rq_ctx->good_utag);
++	seq_printf(m, "W5: bad_utag \t\t\t%d\nW5: flow_tagw \t\t\t%d\n",
++		   rq_ctx->bad_utag, rq_ctx->flow_tagw);
++	seq_printf(m, "W5: ipsec_vwqe \t\t\t%d\nW5: vwqe_ena \t\t\t%d\n",
++		   rq_ctx->ipsec_vwqe, rq_ctx->vwqe_ena);
++	seq_printf(m, "W5: vwqe_wait \t\t\t%d\nW5: max_vsize_exp\t\t%d\n",
++		   rq_ctx->vwqe_wait, rq_ctx->max_vsize_exp);
++	seq_printf(m, "W5: vwqe_skip \t\t\t%d\n\n", rq_ctx->vwqe_skip);
++
++	seq_printf(m, "W6: octs \t\t\t%llu\n\n", (u64)rq_ctx->octs);
++	seq_printf(m, "W7: pkts \t\t\t%llu\n\n", (u64)rq_ctx->pkts);
++	seq_printf(m, "W8: drop_octs \t\t\t%llu\n\n", (u64)rq_ctx->drop_octs);
++	seq_printf(m, "W9: drop_pkts \t\t\t%llu\n\n", (u64)rq_ctx->drop_pkts);
++	seq_printf(m, "W10: re_pkts \t\t\t%llu\n", (u64)rq_ctx->re_pkts);
++}
++
+ /* Dumps given nix_rq's context */
+ static void print_nix_rq_ctx(struct seq_file *m, struct nix_aq_enq_rsp *rsp)
  {
- 	struct sec_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	struct sec_cipher_ctx *c_ctx = &ctx->c_ctx;
-+	struct device *dev = ctx->dev;
- 	int ret;
+ 	struct nix_rq_ctx_s *rq_ctx = &rsp->rq;
++	struct nix_hw *nix_hw = m->private;
++	struct rvu *rvu = nix_hw->rvu;
++
++	if (!is_rvu_otx2(rvu)) {
++		print_nix_cn10k_rq_ctx(m, (struct nix_cn10k_rq_ctx_s *)rq_ctx);
++		return;
++	}
  
- 	if (c_mode == SEC_CMODE_XTS) {
- 		ret = xts_verify_key(tfm, key, keylen);
- 		if (ret) {
--			dev_err(SEC_CTX_DEV(ctx), "xts mode key err!\n");
-+			dev_err(dev, "xts mode key err!\n");
- 			return ret;
- 		}
- 	}
-@@ -659,7 +658,7 @@ static int sec_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 	}
+ 	seq_printf(m, "W0: wqe_aura \t\t\t%d\nW0: substream \t\t\t0x%03x\n",
+ 		   rq_ctx->wqe_aura, rq_ctx->substream);
+@@ -1551,6 +1713,9 @@ static void rvu_dbg_cgx_init(struct rvu *rvu)
+ 	char dname[20];
+ 	void *cgx;
  
- 	if (ret) {
--		dev_err(SEC_CTX_DEV(ctx), "set sec key err!\n");
-+		dev_err(dev, "set sec key err!\n");
- 		return ret;
- 	}
++	if (!cgx_get_cgxcnt_max())
++		return;
++
+ 	rvu->rvu_dbg.cgx_root = debugfs_create_dir("cgx", rvu->rvu_dbg.root);
  
-@@ -691,7 +690,7 @@ static int sec_cipher_pbuf_map(struct sec_ctx *ctx, struct sec_req *req,
- 	struct aead_request *aead_req = req->aead_req.aead_req;
- 	struct sec_cipher_req *c_req = &req->c_req;
- 	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
--	struct device *dev = SEC_CTX_DEV(ctx);
-+	struct device *dev = ctx->dev;
- 	int copy_size, pbuf_length;
- 	int req_id = req->req_id;
- 
-@@ -701,9 +700,8 @@ static int sec_cipher_pbuf_map(struct sec_ctx *ctx, struct sec_req *req,
- 		copy_size = c_req->c_len;
- 
- 	pbuf_length = sg_copy_to_buffer(src, sg_nents(src),
--				qp_ctx->res[req_id].pbuf,
--				copy_size);
--
-+							qp_ctx->res[req_id].pbuf,
-+							copy_size);
- 	if (unlikely(pbuf_length != copy_size)) {
- 		dev_err(dev, "copy src data to pbuf error!\n");
- 		return -EINVAL;
-@@ -727,7 +725,7 @@ static void sec_cipher_pbuf_unmap(struct sec_ctx *ctx, struct sec_req *req,
- 	struct aead_request *aead_req = req->aead_req.aead_req;
- 	struct sec_cipher_req *c_req = &req->c_req;
- 	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
--	struct device *dev = SEC_CTX_DEV(ctx);
-+	struct device *dev = ctx->dev;
- 	int copy_size, pbuf_length;
- 	int req_id = req->req_id;
- 
-@@ -737,11 +735,9 @@ static void sec_cipher_pbuf_unmap(struct sec_ctx *ctx, struct sec_req *req,
- 		copy_size = c_req->c_len;
- 
- 	pbuf_length = sg_copy_from_buffer(dst, sg_nents(dst),
--				qp_ctx->res[req_id].pbuf,
--				copy_size);
--
-+			qp_ctx->res[req_id].pbuf, copy_size);
- 	if (unlikely(pbuf_length != copy_size))
--		dev_err(dev, "copy pbuf data to dst error!\n");
-+		dev_err(ctx->dev, "copy pbuf data to dst error!\n");
+ 	for (i = 0; i < cgx_get_cgxcnt_max(); i++) {
+@@ -2128,9 +2293,17 @@ static void rvu_dbg_cpt_init(struct rvu *rvu, int blkaddr)
+ 			    &rvu_dbg_cpt_err_info_fops);
  }
  
- static int sec_cipher_map(struct sec_ctx *ctx, struct sec_req *req,
-@@ -751,7 +747,7 @@ static int sec_cipher_map(struct sec_ctx *ctx, struct sec_req *req,
- 	struct sec_aead_req *a_req = &req->aead_req;
- 	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
- 	struct sec_alg_res *res = &qp_ctx->res[req->req_id];
--	struct device *dev = SEC_CTX_DEV(ctx);
-+	struct device *dev = ctx->dev;
- 	int ret;
- 
- 	if (req->use_pbuf) {
-@@ -806,7 +802,7 @@ static void sec_cipher_unmap(struct sec_ctx *ctx, struct sec_req *req,
- 			     struct scatterlist *src, struct scatterlist *dst)
++static const char *rvu_get_dbg_dir_name(struct rvu *rvu)
++{
++	if (!is_rvu_otx2(rvu))
++		return "cn10k";
++	else
++		return "octeontx2";
++}
++
+ void rvu_dbg_init(struct rvu *rvu)
  {
- 	struct sec_cipher_req *c_req = &req->c_req;
--	struct device *dev = SEC_CTX_DEV(ctx);
-+	struct device *dev = ctx->dev;
+-	rvu->rvu_dbg.root = debugfs_create_dir(DEBUGFS_DIR_NAME, NULL);
++	rvu->rvu_dbg.root = debugfs_create_dir(rvu_get_dbg_dir_name(rvu), NULL);
  
- 	if (req->use_pbuf) {
- 		sec_cipher_pbuf_unmap(ctx, req, dst);
-@@ -891,6 +887,7 @@ static int sec_aead_setkey(struct crypto_aead *tfm, const u8 *key,
- {
- 	struct sec_ctx *ctx = crypto_aead_ctx(tfm);
- 	struct sec_cipher_ctx *c_ctx = &ctx->c_ctx;
-+	struct device *dev = ctx->dev;
- 	struct crypto_authenc_keys keys;
- 	int ret;
- 
-@@ -904,13 +901,13 @@ static int sec_aead_setkey(struct crypto_aead *tfm, const u8 *key,
- 
- 	ret = sec_aead_aes_set_key(c_ctx, &keys);
- 	if (ret) {
--		dev_err(SEC_CTX_DEV(ctx), "set sec cipher key err!\n");
-+		dev_err(dev, "set sec cipher key err!\n");
- 		goto bad_key;
- 	}
- 
- 	ret = sec_aead_auth_set_key(&ctx->a_ctx, &keys);
- 	if (ret) {
--		dev_err(SEC_CTX_DEV(ctx), "set sec auth key err!\n");
-+		dev_err(dev, "set sec auth key err!\n");
- 		goto bad_key;
- 	}
- 
-@@ -1062,7 +1059,7 @@ static void sec_update_iv(struct sec_req *req, enum sec_alg_type alg_type)
- 	sz = sg_pcopy_to_buffer(sgl, sg_nents(sgl), iv, iv_size,
- 				cryptlen - iv_size);
- 	if (unlikely(sz != iv_size))
--		dev_err(SEC_CTX_DEV(req->ctx), "copy output iv error!\n");
-+		dev_err(req->ctx->dev, "copy output iv error!\n");
- }
- 
- static struct sec_req *sec_back_req_clear(struct sec_ctx *ctx,
-@@ -1160,7 +1157,7 @@ static int sec_aead_bd_fill(struct sec_ctx *ctx, struct sec_req *req)
- 
- 	ret = sec_skcipher_bd_fill(ctx, req);
- 	if (unlikely(ret)) {
--		dev_err(SEC_CTX_DEV(ctx), "skcipher bd fill is error!\n");
-+		dev_err(ctx->dev, "skcipher bd fill is error!\n");
- 		return ret;
- 	}
- 
-@@ -1194,7 +1191,7 @@ static void sec_aead_callback(struct sec_ctx *c, struct sec_req *req, int err)
- 					  a_req->assoclen);
- 
- 		if (unlikely(sz != authsize)) {
--			dev_err(SEC_CTX_DEV(req->ctx), "copy out mac err!\n");
-+			dev_err(c->dev, "copy out mac err!\n");
- 			err = -EINVAL;
- 		}
- 	}
-@@ -1259,7 +1256,7 @@ static int sec_process(struct sec_ctx *ctx, struct sec_req *req)
- 	ret = ctx->req_op->bd_send(ctx, req);
- 	if (unlikely((ret != -EBUSY && ret != -EINPROGRESS) ||
- 		(ret == -EBUSY && !(req->flag & CRYPTO_TFM_REQ_MAY_BACKLOG)))) {
--		dev_err_ratelimited(SEC_CTX_DEV(ctx), "send sec request failed!\n");
-+		dev_err_ratelimited(ctx->dev, "send sec request failed!\n");
- 		goto err_send_req;
- 	}
- 
-@@ -1325,7 +1322,7 @@ static int sec_aead_init(struct crypto_aead *tfm)
- 	ctx->alg_type = SEC_AEAD;
- 	ctx->c_ctx.ivsize = crypto_aead_ivsize(tfm);
- 	if (ctx->c_ctx.ivsize > SEC_IV_SIZE) {
--		dev_err(SEC_CTX_DEV(ctx), "get error aead iv size!\n");
-+		dev_err(ctx->dev, "get error aead iv size!\n");
- 		return -EINVAL;
- 	}
- 
-@@ -1374,7 +1371,7 @@ static int sec_aead_ctx_init(struct crypto_aead *tfm, const char *hash_name)
- 
- 	auth_ctx->hash_tfm = crypto_alloc_shash(hash_name, 0, 0);
- 	if (IS_ERR(auth_ctx->hash_tfm)) {
--		dev_err(SEC_CTX_DEV(ctx), "aead alloc shash error!\n");
-+		dev_err(ctx->dev, "aead alloc shash error!\n");
- 		sec_aead_exit(tfm);
- 		return PTR_ERR(auth_ctx->hash_tfm);
- 	}
-@@ -1408,7 +1405,7 @@ static int sec_aead_sha512_ctx_init(struct crypto_aead *tfm)
- static int sec_skcipher_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
- {
- 	struct skcipher_request *sk_req = sreq->c_req.sk_req;
--	struct device *dev = SEC_CTX_DEV(ctx);
-+	struct device *dev = ctx->dev;
- 	u8 c_alg = ctx->c_ctx.c_alg;
- 
- 	if (unlikely(!sk_req->src || !sk_req->dst)) {
-@@ -1531,14 +1528,15 @@ static struct skcipher_alg sec_skciphers[] = {
- 
- static int sec_aead_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
- {
--	u8 c_alg = ctx->c_ctx.c_alg;
- 	struct aead_request *req = sreq->aead_req.aead_req;
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	size_t authsize = crypto_aead_authsize(tfm);
-+	struct device *dev = ctx->dev;
-+	u8 c_alg = ctx->c_ctx.c_alg;
- 
- 	if (unlikely(!req->src || !req->dst || !req->cryptlen ||
- 		req->assoclen > SEC_MAX_AAD_LEN)) {
--		dev_err(SEC_CTX_DEV(ctx), "aead input param error!\n");
-+		dev_err(dev, "aead input param error!\n");
- 		return -EINVAL;
- 	}
- 
-@@ -1550,7 +1548,7 @@ static int sec_aead_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
- 
- 	/* Support AES only */
- 	if (unlikely(c_alg != SEC_CALG_AES)) {
--		dev_err(SEC_CTX_DEV(ctx), "aead crypto alg error!\n");
-+		dev_err(dev, "aead crypto alg error!\n");
- 		return -EINVAL;
- 	}
- 	if (sreq->c_req.encrypt)
-@@ -1559,7 +1557,7 @@ static int sec_aead_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
- 		sreq->c_req.c_len = req->cryptlen - authsize;
- 
- 	if (unlikely(sreq->c_req.c_len & (AES_BLOCK_SIZE - 1))) {
--		dev_err(SEC_CTX_DEV(ctx), "aead crypto length error!\n");
-+		dev_err(dev, "aead crypto length error!\n");
- 		return -EINVAL;
- 	}
- 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.h b/drivers/crypto/hisilicon/sec2/sec_crypto.h
-index b2786e1..1db2ae4 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.h
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.h
-@@ -64,7 +64,6 @@ enum sec_addr_type {
- };
- 
- struct sec_sqe_type2 {
--
- 	/*
- 	 * mac_len: 0~4 bits
- 	 * a_key_len: 5~10 bits
-@@ -120,7 +119,6 @@ struct sec_sqe_type2 {
- 	/* c_pad_len_field: 0~1 bits */
- 	__le16 c_pad_len_field;
- 
--
- 	__le64 long_a_data_len;
- 	__le64 a_ivin_addr;
- 	__le64 a_key_addr;
+ 	debugfs_create_file("rsrc_alloc", 0444, rvu->rvu_dbg.root, rvu,
+ 			    &rvu_dbg_rsrc_status_fops);
 -- 
-2.8.1
+2.7.4
 
