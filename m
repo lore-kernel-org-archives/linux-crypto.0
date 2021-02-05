@@ -2,110 +2,132 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D59C433DB
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Feb 2021 12:28:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA287C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Feb 2021 13:12:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9646E64FDC
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Feb 2021 12:28:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D8A164FBC
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Feb 2021 13:12:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232126AbhBEM2K (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Feb 2021 07:28:10 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29544 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232046AbhBEMZh (ORCPT
+        id S229864AbhBENMJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 Feb 2021 08:12:09 -0500
+Received: from antares.kleine-koenig.org ([94.130.110.236]:34562 "EHLO
+        antares.kleine-koenig.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231284AbhBENJ7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Feb 2021 07:25:37 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 115C3GPJ130347;
-        Fri, 5 Feb 2021 07:24:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=UXMTnONaM1M6hPx6NdQOBybyrZ8DbchDfplowPWQEDo=;
- b=TqePX8K6Tyu+ITrsknKNyn3o8sz0j2weSoIEzb0UQb1tAHBuzDJw0YI1bP/gq5iBeaj+
- qleHcXYkpklEDQEjOQ9F9IMLNVyn8d0RZfPVgtkGULf3NAX693GtML/6B35jLSpmRSLb
- fSXuDA4eylD7ytGs+M3m9QddKC3KHdUneyuI/ILS6fIvv8ksvjYJDuv4VXblK3sg6A7F
- pEDWg90Vjw8wbrxrHz3BQxLKJWqC8f/hbrjDy25w6eU8JRjsE3jfb8iKIXj7XfBOyUhB
- mqhHWy64Gjt2yQehAmGjbaP0wVZ4294O0tiiqQIkKJc1t/NerLsvM29Wb6niG08YFmgX 0A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36h5n90twh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Feb 2021 07:24:45 -0500
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 115C4NsH138342;
-        Fri, 5 Feb 2021 07:24:44 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36h5n90tvu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Feb 2021 07:24:44 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 115CCvka002358;
-        Fri, 5 Feb 2021 12:24:42 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 36cy38nw77-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Feb 2021 12:24:42 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 115COU5137224878
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 5 Feb 2021 12:24:30 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E09E942041;
-        Fri,  5 Feb 2021 12:24:39 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 28E824203F;
-        Fri,  5 Feb 2021 12:24:37 +0000 (GMT)
-Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.9.149])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  5 Feb 2021 12:24:36 +0000 (GMT)
-Message-ID: <5cb27bdb74e394a9048af702a7d8acfa181b4d9b.camel@linux.ibm.com>
-Subject: Re: [PATCH v7 4/4] ima: Support EC keys for signature verification
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Stefan Berger <stefanb@linux.ibm.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, davem@davemloft.net,
-        herbert@gondor.apana.org.au, dhowells@redhat.com
-Cc:     linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
-        linux-integrity@vger.kernel.org, Vitaly Chikunov <vt@altlinux.org>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
-Date:   Fri, 05 Feb 2021 07:24:36 -0500
-In-Reply-To: <20210201151910.1465705-5-stefanb@linux.ibm.com>
-References: <20210201151910.1465705-1-stefanb@linux.ibm.com>
-         <20210201151910.1465705-5-stefanb@linux.ibm.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-14.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-05_06:2021-02-05,2021-02-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 bulkscore=0 mlxlogscore=999 spamscore=0 impostorscore=0
- mlxscore=0 adultscore=0 priorityscore=1501 clxscore=1015 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102050076
+        Fri, 5 Feb 2021 08:09:59 -0500
+Received: by antares.kleine-koenig.org (Postfix, from userid 1000)
+        id D67A7AED6A1; Fri,  5 Feb 2021 14:08:50 +0100 (CET)
+From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        kvm@vger.kernel.org, David Airlie <airlied@linux.ie>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        Jaroslav Kysela <perex@perex.cz>,
+        Eric Anholt <eric@anholt.net>,
+        =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig.org@pengutronix.de>, linux-i2c@vger.kernel.org,
+        Jiri Slaby <jirislaby@kernel.org>,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-watchdog@vger.kernel.org, linux-rtc@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Takashi Iwai <tiwai@suse.com>,
+        Russell King - ARM Linux admin <linux@armlinux.org.uk>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        linux-serial@vger.kernel.org, linux-input@vger.kernel.org,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Mike Leach <mike.leach@linaro.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        alsa-devel@alsa-project.org,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        coresight@lists.linaro.org, Vladimir Zapolskiy <vz@mleia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org,
+        Vinod Koul <vkoul@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        linux-crypto@vger.kernel.org, Daniel Vetter <daniel@ffwll.ch>,
+        Leo Yan <leo.yan@linaro.org>, dmaengine@vger.kernel.org
+Subject: [PATCH] coresight: etm4x: Fix merge resolution for amba rework
+Date:   Fri,  5 Feb 2021 14:08:47 +0100
+Message-Id: <20210205130848.20009-1-uwe@kleine-koenig.org>
+X-Mailer: git-send-email 2.29.2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2021-02-01 at 10:19 -0500, Stefan Berger wrote:
-> Add support for IMA signature verification for EC keys. Since SHA type
-> of hashes can be used by RSA and ECDSA signature schemes we need to
-> look at the key and derive from the key which signature scheme to use.
-> Since this can be applied to all types of keys, we change the selection
-> of the encoding type to be driven by the key's signature scheme rather
-> than by the hash type.
+This was non-trivial to get right because commits
+c23bc382ef0e ("coresight: etm4x: Refactor probing routine") and
+5214b563588e ("coresight: etm4x: Add support for sysreg only devices")
+changed the code flow considerably. With this change the driver can be
+built again.
+
+Fixes: 0573d3fa4864 ("Merge branch 'devel-stable' of git://git.armlinux.org.uk/~rmk/linux-arm into char-misc-next")
+Signed-off-by: Uwe Kleine-König <uwe@kleine-koenig.org>
+---
+On Fri, Feb 05, 2021 at 12:07:09PM +0100, Greg Kroah-Hartman wrote:
+> On Fri, Feb 05, 2021 at 11:56:15AM +0100, Uwe Kleine-König wrote:
+> > I didn't compile test, but I'm willing to bet your resolution is wrong.
+> > You have no return statement in etm4_remove_dev() but its return type is
+> > int and etm4_remove_amba() still returns int but should return void.
 > 
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
-> Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> Can you send a patch to fix this up?
 
-Thanks, Stefan!
+Sure, here it comes. As I'm unsure if you want to squash it into the
+merge or want to keep it separate I crafted a commit message. If you
+prefer squashing feel free to do so.
 
-Acked-by: Mimi Zohar <zohar@linux.ibm.com>
+This change corresponds to the merge resolution I suggested before.
+
+Best regards
+Uwe
+
+ drivers/hwtracing/coresight/coresight-etm4x-core.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/hwtracing/coresight/coresight-etm4x-core.c b/drivers/hwtracing/coresight/coresight-etm4x-core.c
+index bc55b261af23..c8ecd91e289e 100644
+--- a/drivers/hwtracing/coresight/coresight-etm4x-core.c
++++ b/drivers/hwtracing/coresight/coresight-etm4x-core.c
+@@ -1906,15 +1906,16 @@ static int __exit etm4_remove_dev(struct etmv4_drvdata *drvdata)
+ 	cpus_read_unlock();
+ 
+ 	coresight_unregister(drvdata->csdev);
++
++	return 0;
+ }
+ 
+-static int __exit etm4_remove_amba(struct amba_device *adev)
++static void __exit etm4_remove_amba(struct amba_device *adev)
+ {
+ 	struct etmv4_drvdata *drvdata = dev_get_drvdata(&adev->dev);
+ 
+ 	if (drvdata)
+-		return etm4_remove_dev(drvdata);
+-	return 0;
++		etm4_remove_dev(drvdata);
+ }
+ 
+ static int __exit etm4_remove_platform_dev(struct platform_device *pdev)
+-- 
+2.29.2
 
