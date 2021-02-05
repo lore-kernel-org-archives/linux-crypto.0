@@ -2,146 +2,169 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 910F4C433E0
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Feb 2021 10:18:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77323C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Feb 2021 10:22:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2BC1A64FF4
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Feb 2021 10:18:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 319E364E51
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Feb 2021 10:22:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231312AbhBEKS3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Feb 2021 05:18:29 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:12137 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231277AbhBEKQH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Feb 2021 05:16:07 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DXB8r3Bc8z164xV;
-        Fri,  5 Feb 2021 18:14:04 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 5 Feb 2021 18:15:14 +0800
-From:   Weili Qian <qianweili@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH 6/6] crypto: hisilicon/qm - fix printing format issue
-Date:   Fri, 5 Feb 2021 18:12:58 +0800
-Message-ID: <1612519978-33340-7-git-send-email-qianweili@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1612519978-33340-1-git-send-email-qianweili@huawei.com>
-References: <1612519978-33340-1-git-send-email-qianweili@huawei.com>
+        id S231318AbhBEKWP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 Feb 2021 05:22:15 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54648 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231328AbhBEKTb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 5 Feb 2021 05:19:31 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id CEC5A64FED;
+        Fri,  5 Feb 2021 10:18:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1612520300;
+        bh=s6zOJkZnJEbm1xu0sX2TF5RgsugvUfGcTGQRbF8fYFQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=l8kKbOl3cDdM3E0eg11Cb78ojX1U42q1MLOpEbO9ohJ6ZsUhbIINgE9AGpi57xg07
+         nrjjNaNlf57dKR3WfAKi/M4HzTfRDGroizd8ACmJPeidm7+lvaabIXe7cQPaeWn9o/
+         A7dwUkMkXN6n1qunw/7DRnw+YFcS0Z5Mmkh9/ecc=
+Date:   Fri, 5 Feb 2021 11:18:17 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Russell King - ARM Linux admin <linux@armlinux.org.uk>,
+        linux-fbdev@vger.kernel.org,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        kvm@vger.kernel.org,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        alsa-devel@alsa-project.org, dri-devel@lists.freedesktop.org,
+        Jaroslav Kysela <perex@perex.cz>,
+        Eric Anholt <eric@anholt.net>,
+        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig.org@pengutronix.de>, linux-i2c@vger.kernel.org,
+        linux-spi@vger.kernel.org, Jiri Slaby <jirislaby@kernel.org>,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-watchdog@vger.kernel.org, linux-rtc@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        David Airlie <airlied@linux.ie>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        linux-serial@vger.kernel.org, linux-input@vger.kernel.org,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Mike Leach <mike.leach@linaro.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        coresight@lists.linaro.org, Vladimir Zapolskiy <vz@mleia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>, linux-mmc@vger.kernel.org,
+        Takashi Iwai <tiwai@suse.com>, linux-kernel@vger.kernel.org,
+        Vinod Koul <vkoul@kernel.org>, linux-crypto@vger.kernel.org,
+        Daniel Vetter <daniel@ffwll.ch>, Leo Yan <leo.yan@linaro.org>,
+        dmaengine@vger.kernel.org
+Subject: Re: [GIT PULL] immutable branch for amba changes targeting v5.12-rc1
+Message-ID: <YB0baUzgvpd+EoO6@kroah.com>
+References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
+ <20210202135350.36nj3dmcoq3t7gcf@pengutronix.de>
+ <YBlcTXlxemmC2lgr@kroah.com>
+ <20210204165224.GA1463@shell.armlinux.org.uk>
+ <YBwnUrQqlAz2LDPI@kroah.com>
+ <20210204165951.GB1463@shell.armlinux.org.uk>
+ <20210204181551.ethtuzm65flujmwe@pengutronix.de>
+ <20210205093744.kr4rc7yvfiq6wimq@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210205093744.kr4rc7yvfiq6wimq@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch fixes inconsistent of printing format with argument type.
+On Fri, Feb 05, 2021 at 10:37:44AM +0100, Uwe Kleine-König wrote:
+> Hello Russell, hello Greg,
+> 
+> On Thu, Feb 04, 2021 at 07:15:51PM +0100, Uwe Kleine-König wrote:
+> > On Thu, Feb 04, 2021 at 04:59:51PM +0000, Russell King - ARM Linux admin wrote:
+> > > On Thu, Feb 04, 2021 at 05:56:50PM +0100, Greg Kroah-Hartman wrote:
+> > > > On Thu, Feb 04, 2021 at 04:52:24PM +0000, Russell King - ARM Linux admin wrote:
+> > > > > On Tue, Feb 02, 2021 at 03:06:05PM +0100, Greg Kroah-Hartman wrote:
+> > > > > > I'm glad to take this through my char/misc tree, as that's where the
+> > > > > > other coresight changes flow through.  So if no one else objects, I will
+> > > > > > do so...
+> > > > > 
+> > > > > Greg, did you end up pulling this after all? If not, Uwe produced a v2.
+> > > > > I haven't merged v2 yet as I don't know what you've done.
+> > > > 
+> > > > I thought you merged this?
+> > > 
+> > > I took v1, and put it in a branch I've promised in the past not to
+> > > rebase/rewind. Uwe is now asking for me to take a v2 or apply a patch
+> > > on top.
+> > > 
+> > > The only reason to produce an "immutable" branch is if it's the basis
+> > > for some dependent work and you need that branch merged into other
+> > > people's trees... so the whole "lets produce a v2" is really odd
+> > > workflow... I'm confused about what I should do, and who has to be
+> > > informed which option I take.
+> > > 
+> > > I'm rather lost here too.
+> > 
+> > Sorry to have cause this confusion. After I saw that my initial tag
+> > missed to adapt a driver I wanted to make it easy for you to fix the
+> > situation.
+> > So I created a patch to fix it and created a second tag with the patch
+> > squashed in. Obviously only one of them have to be picked and I hoped
+> > you (= Russell + Greg) would agree which option to pick.
+> > 
+> > My preference would be if you both pick up v2 of the tag to yield a
+> > history that is bisectable without build problems, but if Russell (who
+> > already picked up the broken tag) considers his tree immutable and so
+> > isn't willing to rebase, then picking up the patch is the way to go.
+> 
+> OK, the current state is that Russell applied the patch fixing
+> drivers/mailbox/arm_mhuv2.c on top of merging my first tag.
+> 
+> So the way forward now is that Greg pulls
+> 
+> 	git://git.armlinux.org.uk/~rmk/linux-arm.git devel-stable
+> 
+> which currently points to 
+> 
+> 	860660fd829e ("ARM: 9055/1: mailbox: arm_mhuv2: make remove callback return void")
+> 
+> , into his tree that contains the hwtracing changes that conflict with my
+> changes. @Greg: Is this good enough, or do you require a dedicated tag
+> to pull that?
+> 
+> I think these conflicting hwtracing changes are not yet in any of Greg's
+> trees (at least they are not in next).
+> 
+> When I pull
+> 
+> 	https://git.kernel.org/pub/scm/linux/kernel/git/coresight/linux.git next
+> 
+> (currently pointing to 4e73ff249184 ("coresight: etm4x: Handle accesses
+> to TRCSTALLCTLR")) into 860660fd829e, I get a conflict in
+> drivers/hwtracing/coresight/coresight-etm4x-core.c as expected. My
+> resolution looks as follows:
 
-Signed-off-by: Weili Qian <qianweili@huawei.com>
-Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
----
- drivers/crypto/hisilicon/qm.c | 16 ++++++++--------
- drivers/crypto/hisilicon/qm.h |  2 +-
- 2 files changed, 9 insertions(+), 9 deletions(-)
+Ok, my resolution looked a bit different.
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 5dbc054..47df981 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -723,7 +723,7 @@ static irqreturn_t qm_aeq_irq(int irq, void *data)
- 			dev_err(&qm->pdev->dev, "%s overflow\n",
- 				qm_fifo_overflow[type]);
- 		else
--			dev_err(&qm->pdev->dev, "unknown error type %d\n",
-+			dev_err(&qm->pdev->dev, "unknown error type %u\n",
- 				type);
- 
- 		if (qm->status.aeq_head == QM_Q_DEPTH - 1) {
-@@ -1127,7 +1127,7 @@ static int dump_show(struct hisi_qm *qm, void *info,
- 
- 	dev_info(dev, "%s DUMP\n", info_name);
- 	for (i = 0; i < info_size; i += BYTE_PER_DW) {
--		pr_info("DW%d: %02X%02X %02X%02X\n", i / BYTE_PER_DW,
-+		pr_info("DW%u: %02X%02X %02X%02X\n", i / BYTE_PER_DW,
- 			info_buf[i], info_buf[i + 1UL],
- 			info_buf[i + 2UL], info_buf[i + 3UL]);
- 	}
-@@ -1160,7 +1160,7 @@ static int qm_sqc_dump(struct hisi_qm *qm, const char *s)
- 
- 	ret = kstrtou32(s, 0, &qp_id);
- 	if (ret || qp_id >= qm->qp_num) {
--		dev_err(dev, "Please input qp num (0-%d)", qm->qp_num - 1);
-+		dev_err(dev, "Please input qp num (0-%u)", qm->qp_num - 1);
- 		return -EINVAL;
- 	}
- 
-@@ -1206,7 +1206,7 @@ static int qm_cqc_dump(struct hisi_qm *qm, const char *s)
- 
- 	ret = kstrtou32(s, 0, &qp_id);
- 	if (ret || qp_id >= qm->qp_num) {
--		dev_err(dev, "Please input qp num (0-%d)", qm->qp_num - 1);
-+		dev_err(dev, "Please input qp num (0-%u)", qm->qp_num - 1);
- 		return -EINVAL;
- 	}
- 
-@@ -1285,7 +1285,7 @@ static int q_dump_param_parse(struct hisi_qm *qm, char *s,
- 
- 	ret = kstrtou32(presult, 0, q_id);
- 	if (ret || *q_id >= qp_num) {
--		dev_err(dev, "Please input qp num (0-%d)", qp_num - 1);
-+		dev_err(dev, "Please input qp num (0-%u)", qp_num - 1);
- 		return -EINVAL;
- 	}
- 
-@@ -2714,7 +2714,7 @@ int hisi_qm_start(struct hisi_qm *qm)
- 		return -EPERM;
- 	}
- 
--	dev_dbg(dev, "qm start with %d queue pairs\n", qm->qp_num);
-+	dev_dbg(dev, "qm start with %u queue pairs\n", qm->qp_num);
- 
- 	if (!qm->qp_num) {
- 		dev_err(dev, "qp_num should not be 0\n");
-@@ -3149,7 +3149,7 @@ int hisi_qm_alloc_qps_node(struct hisi_qm_list *qm_list, int qp_num,
- 
- 	mutex_unlock(&qm_list->lock);
- 	if (ret)
--		pr_info("Failed to create qps, node[%d], alg[%d], qp[%d]!\n",
-+		pr_info("Failed to create qps, node[%d], alg[%u], qp[%d]!\n",
- 			node, alg_type, qp_num);
- 
- err:
-@@ -3357,7 +3357,7 @@ pci_ers_result_t hisi_qm_dev_err_detected(struct pci_dev *pdev,
- 	if (pdev->is_virtfn)
- 		return PCI_ERS_RESULT_NONE;
- 
--	pci_info(pdev, "PCI error detected, state(=%d)!!\n", state);
-+	pci_info(pdev, "PCI error detected, state(=%u)!!\n", state);
- 	if (state == pci_channel_io_perm_failure)
- 		return PCI_ERS_RESULT_DISCONNECT;
- 
-diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
-index 6be5338..46e3a67 100644
---- a/drivers/crypto/hisilicon/qm.h
-+++ b/drivers/crypto/hisilicon/qm.h
-@@ -306,7 +306,7 @@ static inline int q_num_set(const char *val, const struct kernel_param *kp,
- 
- 	if (!pdev) {
- 		q_num = min_t(u32, QM_QNUM_V1, QM_QNUM_V2);
--		pr_info("No device found currently, suppose queue number is %d\n",
-+		pr_info("No device found currently, suppose queue number is %u\n",
- 			q_num);
- 	} else {
- 		if (pdev->revision == QM_HW_V1)
--- 
-2.8.1
+Can you pull my char-misc-testing branch and verify I got this all
+pulled in correctly?
 
+thanks,
+
+greg k-h
