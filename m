@@ -7,21 +7,21 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFA2C433E0
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Feb 2021 10:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E17C7C433DB
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Feb 2021 10:33:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5985B64F3F
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Feb 2021 10:32:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9984A64F3B
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Feb 2021 10:33:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230526AbhBEKci (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Feb 2021 05:32:38 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:12855 "EHLO
+        id S230466AbhBEKdA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 Feb 2021 05:33:00 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:12856 "EHLO
         szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231261AbhBEKQD (ORCPT
+        with ESMTP id S230377AbhBEKQC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Feb 2021 05:16:03 -0500
+        Fri, 5 Feb 2021 05:16:02 -0500
 Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DXB8l50HSz7h4T;
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DXB8l5fqQz7hTw;
         Fri,  5 Feb 2021 18:13:59 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.24) by
  DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
@@ -30,9 +30,9 @@ From:   Weili Qian <qianweili@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH 3/6] crypto: hisilicon/qm - fix the value of 'QM_SQC_VFT_BASE_MASK_V2'
-Date:   Fri, 5 Feb 2021 18:12:55 +0800
-Message-ID: <1612519978-33340-4-git-send-email-qianweili@huawei.com>
+Subject: [PATCH 2/6] crypto: hisilicon/qm - fix request missing error
+Date:   Fri, 5 Feb 2021 18:12:54 +0800
+Message-ID: <1612519978-33340-3-git-send-email-qianweili@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1612519978-33340-1-git-send-email-qianweili@huawei.com>
 References: <1612519978-33340-1-git-send-email-qianweili@huawei.com>
@@ -44,28 +44,67 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since the size of base number is 16 bits, update the value of
-'QM_SQC_VFT_BASE_MASK_V2' as 'GENMASK(15, 0)'.
+Add 'qp_stop_fail_cb' to ensure it is called as device is resetting.
 
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/hisilicon/qm.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
 diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 108fc0e..908a13f 100644
+index e659436..108fc0e 100644
 --- a/drivers/crypto/hisilicon/qm.c
 +++ b/drivers/crypto/hisilicon/qm.c
-@@ -120,7 +120,7 @@
- #define QM_CQC_VFT_VALID		(1ULL << 28)
+@@ -622,6 +622,9 @@ static void qm_cq_head_update(struct hisi_qp *qp)
  
- #define QM_SQC_VFT_BASE_SHIFT_V2	28
--#define QM_SQC_VFT_BASE_MASK_V2		GENMASK(5, 0)
-+#define QM_SQC_VFT_BASE_MASK_V2		GENMASK(15, 0)
- #define QM_SQC_VFT_NUM_SHIFT_V2		45
- #define QM_SQC_VFT_NUM_MASK_v2		GENMASK(9, 0)
+ static void qm_poll_qp(struct hisi_qp *qp, struct hisi_qm *qm)
+ {
++	if (unlikely(atomic_read(&qp->qp_status.flags) == QP_STOP))
++		return;
++
+ 	if (qp->event_cb) {
+ 		qp->event_cb(qp);
+ 		return;
+@@ -1868,6 +1871,28 @@ int hisi_qm_start_qp(struct hisi_qp *qp, unsigned long arg)
+ EXPORT_SYMBOL_GPL(hisi_qm_start_qp);
  
+ /**
++ * qp_stop_fail_cb() - call request cb.
++ * @qp: stopped failed qp.
++ *
++ * Callback function should be called whether task completed or not.
++ */
++static void qp_stop_fail_cb(struct hisi_qp *qp)
++{
++	int qp_used = atomic_read(&qp->qp_status.used);
++	u16 cur_tail = qp->qp_status.sq_tail;
++	u16 cur_head = (cur_tail + QM_Q_DEPTH - qp_used) % QM_Q_DEPTH;
++	struct hisi_qm *qm = qp->qm;
++	u16 pos;
++	int i;
++
++	for (i = 0; i < qp_used; i++) {
++		pos = (i + cur_head) % QM_Q_DEPTH;
++		qp->req_cb(qp, qp->sqe + (u32)(qm->sqe_size * pos));
++		atomic_dec(&qp->qp_status.used);
++	}
++}
++
++/**
+  * qm_drain_qp() - Drain a qp.
+  * @qp: The qp we want to drain.
+  *
+@@ -1962,6 +1987,9 @@ static int qm_stop_qp_nolock(struct hisi_qp *qp)
+ 	else
+ 		flush_work(&qp->qm->work);
+ 
++	if (unlikely(qp->is_resetting && atomic_read(&qp->qp_status.used)))
++		qp_stop_fail_cb(qp);
++
+ 	dev_dbg(dev, "stop queue %u!", qp->qp_id);
+ 
+ 	return 0;
 -- 
 2.8.1
 
