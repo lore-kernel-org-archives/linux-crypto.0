@@ -2,146 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F049EC43381
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 20:02:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B94BC433DB
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 21:29:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9CE8B64EB6
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 20:02:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9A0164E26
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 21:29:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236573AbhBHUBd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Feb 2021 15:01:33 -0500
-Received: from namei.org ([65.99.196.166]:43100 "EHLO mail.namei.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236506AbhBHUBL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Feb 2021 15:01:11 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by mail.namei.org (Postfix) with ESMTPS id C33199C4;
-        Mon,  8 Feb 2021 19:59:01 +0000 (UTC)
-Date:   Tue, 9 Feb 2021 06:59:01 +1100 (AEDT)
-From:   James Morris <jmorris@namei.org>
-To:     linux-security-module@vger.kernel.org
-cc:     linux-kernel@vger.kernel.org, lwn@lwn.net,
-        fedora-selinux-list@redhat.com, linux-crypto@vger.kernel.org,
-        kernel-hardening@lists.openwall.com,
-        linux-integrity@vger.kernel.org, selinux@vger.kernel.org,
-        Audit-ML <linux-audit@redhat.com>, gentoo-hardened@gentoo.org,
-        keyrings@linux-nfs.org, tpmdd-devel@lists.sourceforge.net,
-        Linux Security Summit Program Committee 
-        <lss-pc@lists.linuxfoundation.org>
-Subject: [ANNOUNCE][CFP] Linux Security Summit 2021
-Message-ID: <c244f77-56a1-c089-521d-2e670488c10@namei.org>
+        id S236128AbhBHV2h (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 8 Feb 2021 16:28:37 -0500
+Received: from vmicros1.altlinux.org ([194.107.17.57]:39638 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236320AbhBHV2b (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 8 Feb 2021 16:28:31 -0500
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+        by vmicros1.altlinux.org (Postfix) with ESMTP id 2849772C8B4;
+        Tue,  9 Feb 2021 00:27:46 +0300 (MSK)
+Received: from altlinux.org (sole.flsd.net [185.75.180.6])
+        by imap.altlinux.org (Postfix) with ESMTPSA id 05B704A474B;
+        Tue,  9 Feb 2021 00:27:46 +0300 (MSK)
+Date:   Tue, 9 Feb 2021 00:27:45 +0300
+From:   Vitaly Chikunov <vt@altlinux.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Stefan Berger <stefanb@linux.ibm.com>,
+        Meng Yu <yumeng18@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Zaibo Xu <xuzaibo@huawei.com>, wangzhou1@hisilicon.com,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Daniele Alessandrelli <daniele.alessandrelli@linux.intel.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        "Khurana, Prabhjot" <prabhjot.khurana@intel.com>,
+        "Reshetova, Elena" <elena.reshetova@intel.com>,
+        Patrick Uiterwijk <patrick@puiterwijk.org>
+Subject: Re: [PATCH v7 4/7] crypto: add ecc curve and expose them
+Message-ID: <20210208212745.yi5shr4gkmdqy4xl@altlinux.org>
+References: <1611299395-675-1-git-send-email-yumeng18@huawei.com>
+ <1611299395-675-5-git-send-email-yumeng18@huawei.com>
+ <20210128050354.GA30874@gondor.apana.org.au>
+ <CAMj1kXHvY9JveFyhtETALCH=AFGMGVbGGFMNDGc6ZVngEKbyDQ@mail.gmail.com>
+ <ff63fffd-2d65-337f-d802-adcf4352fdc3@linux.ibm.com>
+ <20210129030004.GA3463@gondor.apana.org.au>
+ <20210208063541.ribifj3445djxfy5@altlinux.org>
+ <CAMj1kXF18T11WQm6coYOO8yD7g=AxSBDP1QjWghWRVAp6dCJ8w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=koi8-r
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXF18T11WQm6coYOO8yD7g=AxSBDP1QjWghWRVAp6dCJ8w@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-==============================================================================
-                   ANNOUNCEMENT AND CALL FOR PARTICIPATION
+Ard,
 
-                         LINUX SECURITY SUMMIT 2021
-                             
-                              27-29 September
-                              Dublin, Ireland
-==============================================================================
+On Mon, Feb 08, 2021 at 07:47:44AM +0100, Ard Biesheuvel wrote:
+> On Mon, 8 Feb 2021 at 07:37, Vitaly Chikunov <vt@altlinux.org> wrote:
+> >
+> > Herbert,
+> >
+> > On Fri, Jan 29, 2021 at 02:00:04PM +1100, Herbert Xu wrote:
+> > > On Thu, Jan 28, 2021 at 09:49:41PM -0500, Stefan Berger wrote:
+> > > >
+> > > > In my patch series I initially had registered the akciphers under the names
+> > > > ecc-nist-p192 and ecc-nist-p256 but now, in V4, joined them together as
+> > > > 'ecdsa'. This may be too generic for a name. Maybe it should be called
+> > > > ecsda-nist for the NIST family.
+> > >
+> > > What I'm proposing is specifying the curve in the name as well, i.e.,
+> > > ecdsa-nist-p192 instead of just ecdsa or ecdsa-nist.
+> > >
+> > > This simplifies the task of handling hardware that only supports a
+> > > subset of curves.
+> >
+> > So, if some implementation supports multiple curves (like EC-RDSA
+> > currently supports 5 curves), it should add 5 ecrdsa-{a,b,c,..}
+> > algorithms with actually the same top level implementation?
+> > Right?
+> >
+> 
+> Yes. The only difference will be the init() function, which can be
+> used to set the TFM properties that define which curve is being used.
+> The other routines can be generic, and refer to those properties if
+> the behavior is curve-specific.
 
-DESCRIPTION
- 
-Linux Security Summit (LSS) is a technical forum for collaboration between
-Linux developers, researchers, and end-users.  Its primary aim is to foster
-community efforts in analyzing and solving Linux security challenges.
+Thanks. This may be good!
 
- The program committee currently seeks proposals for:
- 
-   * Refereed Presentations:
-     45 minutes in length.
- 
-   * Panel Discussion Topics:
-     45 minutes in length.
- 
-   * Short Topics:
-     30 minutes in total, including at least 10 minutes discussion.
- 
-   * Tutorials
-     90 minutes in length.
- 
-Tutorial sessions should be focused on advanced Linux security defense
-topics within areas such as the kernel, compiler, and security-related
-libraries.  Priority will be given to tutorials created for this conference,
-and those where the presenter a leading subject matter expert on the topic.
- 
-Topic areas include, but are not limited to:
- 
-   * Kernel self-protection
-   * Access control
-   * Cryptography and key management
-   * Integrity policy and enforcement
-   * Hardware Security
-   * IoT and embedded security
-   * Virtualization and containers
-   * System-specific system hardening
-   * Case studies
-   * Security tools
-   * Security UX
-   * Emerging technologies, threats & techniques
-
-  Proposals should be submitted via:
-    https://events.linuxfoundation.org/linux-security-summit-europe/program/cfp/
-
-
-** Note that for 2021, the North American and European events are combined into
-a single event planned for Dublin, Ireland. **
- 
-
-DATES
- 
-  * CFP close:            June 27
-  * CFP notifications:    July 20
-  * Schedule announced:   July 22
-  * Event:                September 27-29
-
-WHO SHOULD ATTEND
- 
-We're seeking a diverse range of attendees and welcome participation by
-people involved in Linux security development, operations, and research.
- 
-LSS is a unique global event that provides the opportunity to present and
-discuss your work or research with key Linux security community members and
-maintainers.  It's also useful for those who wish to keep up with the latest
-in Linux security development and to provide input to the development
-process.
-
-WEB SITE
-
-    https://events.linuxfoundation.org/linux-security-summit-europe/
-
-TWITTER
-
-  For event updates and announcements, follow:
-
-    https://twitter.com/LinuxSecSummit
-  
-    #linuxsecuritysummit
-
-PROGRAM COMMITTEE
-
-  The program committee for LSS 2021 is:
-
-    * James Morris, Microsoft
-    * Serge Hallyn, Cisco
-    * Paul Moore, Cisco
-    * Stephen Smalley, NSA
-    * Elena Reshetova, Intel
-    * John Johansen, Canonical
-    * Kees Cook, Google
-    * Casey Schaufler, Intel
-    * Mimi Zohar, IBM
-    * David A. Wheeler, Institute for Defense Analyses
-
-  The program committee may be contacted as a group via email:
-    lss-pc () lists.linuxfoundation.org
+JFYI. There is possible non-hardware accelerated implementations
+for ECC algorithms which (perhaps) may never go to the kernel source,
+because they are generated code. For example
+  https://gitlab.com/nisec/ecckiila
 
