@@ -5,58 +5,58 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 957B2C433E0
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79222C433DB
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:50:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 53A8864E9A
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:49:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C13364E9E
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:50:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231907AbhBHJt0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Feb 2021 04:49:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37796 "EHLO
+        id S231910AbhBHJtq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 8 Feb 2021 04:49:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231929AbhBHJrH (ORCPT
+        with ESMTP id S231925AbhBHJrH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 8 Feb 2021 04:47:07 -0500
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CCCEC06174A;
-        Mon,  8 Feb 2021 01:44:46 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id w18so9350925pfu.9;
-        Mon, 08 Feb 2021 01:44:46 -0800 (PST)
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8657CC061221;
+        Mon,  8 Feb 2021 01:44:27 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id l18so8465681pji.3;
+        Mon, 08 Feb 2021 01:44:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=gZKtlD6nuAorTKG2PqNJjMaym8CBQGfY80Jr0aK5tbM=;
-        b=sncZSedkGPp3KI68xMMM9IyFrnpLjoz+D0gMdTtAY//NojejIBYLdKPDZtirAWGQA1
-         hal0exLPTGlamwQRa1w5G7QS3+fin0sC+rpr/LqpArJG8R3m/ED/21u/qVM14yizM2oB
-         QAhiMxqBhAu+fO/Hr6j8gsUSWcRnxFx93o+SN/FGUtYeYyU7q6aADg1qdCHUnTJ3XgoN
-         m97kE5OvqWE+H7AJnY7QoB2aRY45O3+KY5cv8lmnGzjM2GQKrF1fgE4j77kczSoHwXSQ
-         IPRfcAl/8xSyzTFwGvTLOfEuCLU9tJFPK7oxWzGSVtz/XxS4ZYF/Nglea3J8p533cL1k
-         d8dA==
+        bh=HNZLvmQAqbtAqMEvJP1wVGbLyEu2FmrY5NiRBOEZCk0=;
+        b=E9UVi4abvaxsbLhlHYyDlxF8WRm6Eu0gMRiLrkvvtuXqnPnqW6bL/KOZ5PtwqvI7L0
+         rr/mjZFilH2Hx/ngpK5+H81e3vqpySwZoJTo+05vSEiLs6urR/Pk7xeEkQq3955cfLQy
+         PDniBGHgBVTpAvBzFgL6HTS1Z1XXrDbvdPMxB1lKgQ6a6LDsJOiauZP9MYqaavtk3SfN
+         n2agapT/l7OsKweIbp61n2EXJS4S7anhuLKppP7bPX4HAQ7oHxxBu04I7PZ85idFkDjW
+         oNUFRt9BJ72Nx85EdziKeK/dIrL9M8B5gXEnis4KZQdrUUH5mSjubnWGQ5Ljme7a7Z/p
+         JMxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=gZKtlD6nuAorTKG2PqNJjMaym8CBQGfY80Jr0aK5tbM=;
-        b=hfwM2tciPOVONg+juhtNvNm+47RlKKYWV5f78KSz/LsseNndR6iNB/mJK74UOae7o2
-         eLVxAFNZmhwue4JtSbLMQIebajQ0UW6zrRfjD7rqOk4hxaMi2dvqI0wiQBtc2zPf5LJ0
-         TwZgMQ6QZeybynWlDjYVlxR9rUMday6wzzKRaC4P9HJmsqgny5tWxrObk+YCodQMR6eC
-         DzscT9qFVje5nJDsp/0WVDNmvZtBnsIxnpKzD29rAz2ercKSaCrbCiWORIlyQGHPWrD5
-         wGqWfboFuZiNF0hgBCNFU9B6gqGxutNl9yayuGrwg30chQmhfFV2zJJTjdCtB6kS423b
-         rJwg==
-X-Gm-Message-State: AOAM533cR7AsLy+4EqbEn1c6pvM/Xpi++ODhNHixQaxWlN4XWpjtkDCo
-        og8V6So+APYyfq79N+9tA94=
-X-Google-Smtp-Source: ABdhPJx2Y1Nr368OsPVno1TmPMUHQDDOeTBV59p1sw6VoCH9O2r2Ojchl/dH+HRALw658hHuHRaNyw==
-X-Received: by 2002:a05:6a00:15d2:b029:1b7:30c1:8495 with SMTP id o18-20020a056a0015d2b02901b730c18495mr16867681pfu.32.1612777485801;
-        Mon, 08 Feb 2021 01:44:45 -0800 (PST)
+        bh=HNZLvmQAqbtAqMEvJP1wVGbLyEu2FmrY5NiRBOEZCk0=;
+        b=K3YsjEOdRg2mIIRc8DpTKGFpv6mKJqEl0k2qmGg4zm+DWpCpcK1StaBHrO0Hk0YC6K
+         XFIvRro99+cyvWbJ5tlrf52ehhLAnABIQFWlq+XA6RvVXhDIL2fFWhmyKCBaAxEByKz0
+         BYn62hqkVZ5ne+lp+7is+4jFJvUUHzfEyAM1B0Xonzt+10iIp/f+BitOiVLd3mEGoKyw
+         u179OKIjXAqQfmvppM7sr8BKpYNFhEjmauqj6Shapl9KeOvQqOic6R2NQ3fll5LMXQaz
+         iRk3uenyxrN6DexZSj0V/KDN1pY64mQquC3xI7Gx706qLJx9oRGEB5AzesY8bf5dUpg/
+         svQw==
+X-Gm-Message-State: AOAM533OvInGEF5z2S1VHXtmnPQbhs6cLpGwUSWcs/Jw/PStUsGebT3V
+        0qQd2A8vs+vb8+DpEO9bgY0=
+X-Google-Smtp-Source: ABdhPJwlG5OBJ0kvO2nRWf/monva/qL5NPmob87P7q3hiCtrCSN8PWpMlZ3xPHLxm8XYV9X9uwnvWA==
+X-Received: by 2002:a17:902:ed95:b029:e2:d080:7e0e with SMTP id e21-20020a170902ed95b02900e2d0807e0emr6794449plj.85.1612777467166;
+        Mon, 08 Feb 2021 01:44:27 -0800 (PST)
 Received: from localhost.localdomain ([49.207.205.214])
-        by smtp.gmail.com with ESMTPSA id k69sm12208958pfd.4.2021.02.08.01.44.36
+        by smtp.gmail.com with ESMTPSA id k69sm12208958pfd.4.2021.02.08.01.44.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Feb 2021 01:44:45 -0800 (PST)
+        Mon, 08 Feb 2021 01:44:26 -0800 (PST)
 From:   Allen Pais <allen.lkml@gmail.com>
 To:     herbert@gondor.apana.org.au
 Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
@@ -73,9 +73,9 @@ Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
         linux-samsung-soc@vger.kernel.org,
         Allen Pais <apais@linux.microsoft.com>,
         Romain Perier <romain.perier@gmail.com>
-Subject: [PATCH v5 11/19] crypto: mediatek: convert tasklets to use new tasklet_setup() API
-Date:   Mon,  8 Feb 2021 15:12:30 +0530
-Message-Id: <20210208094238.571015-12-allen.lkml@gmail.com>
+Subject: [PATCH v5 09/19] crypto: img-hash: convert tasklets to use new tasklet_setup() API
+Date:   Mon,  8 Feb 2021 15:12:28 +0530
+Message-Id: <20210208094238.571015-10-allen.lkml@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210208094238.571015-1-allen.lkml@gmail.com>
 References: <20210208094238.571015-1-allen.lkml@gmail.com>
@@ -95,86 +95,48 @@ and from_tasklet() to pass the tasklet pointer explicitly.
 Signed-off-by: Romain Perier <romain.perier@gmail.com>
 Signed-off-by: Allen Pais <apais@linux.microsoft.com>
 ---
- drivers/crypto/mediatek/mtk-aes.c | 14 ++++++--------
- drivers/crypto/mediatek/mtk-sha.c | 14 ++++++--------
- 2 files changed, 12 insertions(+), 16 deletions(-)
+ drivers/crypto/img-hash.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/mediatek/mtk-aes.c b/drivers/crypto/mediatek/mtk-aes.c
-index 7323066724c3..fa49bb5b043b 100644
---- a/drivers/crypto/mediatek/mtk-aes.c
-+++ b/drivers/crypto/mediatek/mtk-aes.c
-@@ -1080,16 +1080,16 @@ static struct aead_alg aes_gcm_alg = {
- 	},
- };
- 
--static void mtk_aes_queue_task(unsigned long data)
-+static void mtk_aes_queue_task(struct tasklet_struct *t)
- {
--	struct mtk_aes_rec *aes = (struct mtk_aes_rec *)data;
-+	struct mtk_aes_rec *aes = from_tasklet(aes, t, queue_task);
- 
- 	mtk_aes_handle_queue(aes->cryp, aes->id, NULL);
+diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
+index e813115d5432..72b65cdff856 100644
+--- a/drivers/crypto/img-hash.c
++++ b/drivers/crypto/img-hash.c
+@@ -355,9 +355,9 @@ static int img_hash_dma_init(struct img_hash_dev *hdev)
+ 	return 0;
  }
  
--static void mtk_aes_done_task(unsigned long data)
-+static void mtk_aes_done_task(struct tasklet_struct *t)
+-static void img_hash_dma_task(unsigned long d)
++static void img_hash_dma_task(struct tasklet_struct *t)
  {
--	struct mtk_aes_rec *aes = (struct mtk_aes_rec *)data;
-+	struct mtk_aes_rec *aes = from_tasklet(aes, t, done_task);
- 	struct mtk_cryp *cryp = aes->cryp;
- 
- 	mtk_aes_unmap(cryp, aes);
-@@ -1142,10 +1142,8 @@ static int mtk_aes_record_init(struct mtk_cryp *cryp)
- 		spin_lock_init(&aes[i]->lock);
- 		crypto_init_queue(&aes[i]->queue, AES_QUEUE_SIZE);
- 
--		tasklet_init(&aes[i]->queue_task, mtk_aes_queue_task,
--			     (unsigned long)aes[i]);
--		tasklet_init(&aes[i]->done_task, mtk_aes_done_task,
--			     (unsigned long)aes[i]);
-+		tasklet_setup(&aes[i]->queue_task, mtk_aes_queue_task);
-+		tasklet_setup(&aes[i]->done_task, mtk_aes_done_task);
- 	}
- 
- 	/* Link to ring0 and ring1 respectively */
-diff --git a/drivers/crypto/mediatek/mtk-sha.c b/drivers/crypto/mediatek/mtk-sha.c
-index f55aacdafbef..c241762aa23b 100644
---- a/drivers/crypto/mediatek/mtk-sha.c
-+++ b/drivers/crypto/mediatek/mtk-sha.c
-@@ -1164,16 +1164,16 @@ static struct ahash_alg algs_sha384_sha512[] = {
- },
- };
- 
--static void mtk_sha_queue_task(unsigned long data)
-+static void mtk_sha_queue_task(struct tasklet_struct *t)
- {
--	struct mtk_sha_rec *sha = (struct mtk_sha_rec *)data;
-+	struct mtk_sha_rec *sha = from_tasklet(sha, t, queue_task);
- 
- 	mtk_sha_handle_queue(sha->cryp, sha->id - MTK_RING2, NULL);
+-	struct img_hash_dev *hdev = (struct img_hash_dev *)d;
++	struct img_hash_dev *hdev = from_tasklet(hdev, t, dma_task);
+ 	struct img_hash_request_ctx *ctx = ahash_request_ctx(hdev->req);
+ 	u8 *addr;
+ 	size_t nbytes, bleft, wsend, len, tbc;
+@@ -887,9 +887,9 @@ static int img_unregister_algs(struct img_hash_dev *hdev)
+ 	return 0;
  }
  
--static void mtk_sha_done_task(unsigned long data)
-+static void mtk_sha_done_task(struct tasklet_struct *t)
+-static void img_hash_done_task(unsigned long data)
++static void img_hash_done_task(struct tasklet_struct *t)
  {
--	struct mtk_sha_rec *sha = (struct mtk_sha_rec *)data;
-+	struct mtk_sha_rec *sha = from_tasklet(sha, t, done_task);
- 	struct mtk_cryp *cryp = sha->cryp;
+-	struct img_hash_dev *hdev = (struct img_hash_dev *)data;
++	struct img_hash_dev *hdev = from_tasklet(hdev, t, done_task);
+ 	int err = 0;
  
- 	mtk_sha_unmap(cryp, sha);
-@@ -1219,10 +1219,8 @@ static int mtk_sha_record_init(struct mtk_cryp *cryp)
- 		spin_lock_init(&sha[i]->lock);
- 		crypto_init_queue(&sha[i]->queue, SHA_QUEUE_SIZE);
+ 	if (hdev->err == -EINVAL) {
+@@ -954,8 +954,8 @@ static int img_hash_probe(struct platform_device *pdev)
  
--		tasklet_init(&sha[i]->queue_task, mtk_sha_queue_task,
--			     (unsigned long)sha[i]);
--		tasklet_init(&sha[i]->done_task, mtk_sha_done_task,
--			     (unsigned long)sha[i]);
-+		tasklet_setup(&sha[i]->queue_task, mtk_sha_queue_task);
-+		tasklet_setup(&sha[i]->done_task, mtk_sha_done_task);
- 	}
+ 	INIT_LIST_HEAD(&hdev->list);
  
- 	/* Link to ring2 and ring3 respectively */
+-	tasklet_init(&hdev->done_task, img_hash_done_task, (unsigned long)hdev);
+-	tasklet_init(&hdev->dma_task, img_hash_dma_task, (unsigned long)hdev);
++	tasklet_setup(&hdev->done_task, img_hash_done_task);
++	tasklet_setup(&hdev->dma_task, img_hash_dma_task);
+ 
+ 	crypto_init_queue(&hdev->queue, IMG_HASH_QUEUE_LENGTH);
+ 
 -- 
 2.25.1
 
