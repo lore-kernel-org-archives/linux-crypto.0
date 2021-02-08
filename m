@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1EB0C433E0
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:50:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CAE1C433E6
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:50:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68E2064E9E
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:50:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C454464E9D
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:50:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231828AbhBHJuN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Feb 2021 04:50:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38426 "EHLO
+        id S231947AbhBHJuQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 8 Feb 2021 04:50:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231947AbhBHJrc (ORCPT
+        with ESMTP id S231951AbhBHJrc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 8 Feb 2021 04:47:32 -0500
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D68BC06178C;
-        Mon,  8 Feb 2021 01:45:05 -0800 (PST)
-Received: by mail-pf1-x42c.google.com with SMTP id 189so339793pfy.6;
-        Mon, 08 Feb 2021 01:45:05 -0800 (PST)
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEC22C0611C0;
+        Mon,  8 Feb 2021 01:45:32 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id e12so7525830pls.4;
+        Mon, 08 Feb 2021 01:45:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=u19NxDApfMXx+Y8pGP/iF30yq+dZf2FG4hiZfFrFBcE=;
-        b=ApWKweDrKDpU0fMRsdEf4+d0CAZUN1Q9h5p/1AUF6cRmIcqnX/F5krvog7HtwIPzwi
-         NwvS5QfVzkFbS+VWJ3/2gt3mb5+6U1ug8Np95HumVaXEKyXVwyrJsA0ZKmwv38ldzhKB
-         kiHCliyObcPQY70peNC+v4hmFuc9nx+2ajKZAL8JMm5iqOvLr+rErtpqubV41Ft7DW3m
-         OHOvcOXx0xHDKR0w5N7ack48m7+blXzymg4mV63CUx0oVuNKWroUkk/Rb6HVMScdC9mK
-         Qa4PEY6i8RA7f9sCPdpI6OKoJy78KK3Z2hthvyU5bCrxyBi3UpcGOi/igw+wAGg/dUdN
-         Xb5g==
+        bh=YEPwpL8tIwFQ2pgUdTDSsmDRSKgoB9OQrqIbywK9g6k=;
+        b=YJvUNAJ5yWFhEd1FkVQ6qf8rEdQqScIkeeQBVSNUj5gip2ZMX3Nmh8TkHYZvVL2eD8
+         gM907Th6gGlpZMg1RHLSQk4Scfgu30CDgZZ0yrLoHlgO4bLoRzBovvZdQ+7igAtbXnJZ
+         87Wnr1TTAKaxdSTeZ29gOyMEvNdOBa6nUKVajbeU+8A3cMrjugRHUWev5DQX1n9PHP5+
+         F7be1ctOV3F05l8Idlmv5rFtb3SyhyqhqtCELmSVOwyaWpGLM4idq3vX4gcQznfil2FP
+         zKeXVV9oGhAD3Rd4jK302fvRGzBacP5ZR8JNrX/0xrxZfP6Hte/ldS5nwYo3urGe2r7r
+         hcNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=u19NxDApfMXx+Y8pGP/iF30yq+dZf2FG4hiZfFrFBcE=;
-        b=W+SaWpFVTI7usHuo5pvrKKQbWc6xWndqFk7PG12jvr+Z/J8sO/SToGOTeGaQCNecKq
-         nKtgBEeuI90/CZpAeyOT6PbFmUofX8PJXzIyQSkvo9QGsHMbiWBvlWzP2CTk2OSAYKHM
-         uNDXAmqxKDjX07zFlUntpCTDU8C9bY8ITjLuZTK2sAOqz6kD4t5M5MANXbmWl6Oc1+P5
-         7x/z6bjJq3GvzXfd6/Dtwpf8XlDKRFqbvHD2iZBFS5KvlxRMsp1DnEDuBlO9x1z6V7oO
-         bxZ3h+mjPCzV/RYECRyvJ7Q4KBZy+7lpK7Js50oXX0yz0ngPqXIhedCRlmPZSf2dvz9P
-         tslQ==
-X-Gm-Message-State: AOAM533mr5pg52dtpwRQuaiFQVZkdjT9BfmCuBvxQHhuaB/4kGWzx1bT
-        WXpaHHfMeoneeTwUlXul/+w=
-X-Google-Smtp-Source: ABdhPJyZCCeRkcGMY1ZBPc5avbbzvh2aZ0DbxTjeVcri3Zq/yzhqHPofVINcOAchEvAi1Y3gv9u3Tw==
-X-Received: by 2002:a63:1c13:: with SMTP id c19mr15713787pgc.359.1612777504785;
-        Mon, 08 Feb 2021 01:45:04 -0800 (PST)
+        bh=YEPwpL8tIwFQ2pgUdTDSsmDRSKgoB9OQrqIbywK9g6k=;
+        b=DRNdLCRfGuE+8LODFz6QLlAZytInlj4jLIKqYEWZt/UIC5oS+XSCWdIqm3k4CJuXZW
+         HjLoUJl/hMs8YyV7VaenEKDbs2BCWEcBFf6GNZLf4csLnZCKQjhUWJAixDn7TfZfXBY/
+         +MOASNdkpwS84qiiNRtI4VPym6qktJ87p7QRrxFoOdvzjKUItPXWh/qQt0510jP9bg42
+         vf5PHFVUfO6Dd7PILQYJsuHZHVLX721sr0hh8YV2h6kElzV6cwIxD9cxJUmRdohk0Ufr
+         VJki3B4jSBRHiEycw11UT+t4j6Vxqm9bVWBoSCYdzvu+NJhy7tc7SZiStVmlPdzlJLZN
+         IS8Q==
+X-Gm-Message-State: AOAM533VLCp6a3OoteW/7zZ8k2U3p8B/3I1iO+UG3IMrAy0TD8o/5Uo5
+        HUzVDy1WI5AGPRAO1q7jEVQ=
+X-Google-Smtp-Source: ABdhPJz7y1k4HMKwSV/qwtnFW2t8QcmgRok8+6x1gYzOq1twN+xAwp84b0pcXY3xoQs9EvkDcT8ZDw==
+X-Received: by 2002:a17:902:fe09:b029:e1:6964:98dc with SMTP id g9-20020a170902fe09b02900e1696498dcmr16012094plj.24.1612777532604;
+        Mon, 08 Feb 2021 01:45:32 -0800 (PST)
 Received: from localhost.localdomain ([49.207.205.214])
-        by smtp.gmail.com with ESMTPSA id k69sm12208958pfd.4.2021.02.08.01.44.55
+        by smtp.gmail.com with ESMTPSA id k69sm12208958pfd.4.2021.02.08.01.45.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Feb 2021 01:45:04 -0800 (PST)
+        Mon, 08 Feb 2021 01:45:32 -0800 (PST)
 From:   Allen Pais <allen.lkml@gmail.com>
 To:     herbert@gondor.apana.org.au
 Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
@@ -73,9 +73,9 @@ Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
         linux-samsung-soc@vger.kernel.org,
         Allen Pais <apais@linux.microsoft.com>,
         Romain Perier <romain.perier@gmail.com>
-Subject: [PATCH v5 13/19] crypto: picoxcell: convert tasklets to use new tasklet_setup() API
-Date:   Mon,  8 Feb 2021 15:12:32 +0530
-Message-Id: <20210208094238.571015-14-allen.lkml@gmail.com>
+Subject: [PATCH v5 16/19] crypto: rockchip: convert tasklets to use new tasklet_setup() API
+Date:   Mon,  8 Feb 2021 15:12:35 +0530
+Message-Id: <20210208094238.571015-17-allen.lkml@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210208094238.571015-1-allen.lkml@gmail.com>
 References: <20210208094238.571015-1-allen.lkml@gmail.com>
@@ -95,35 +95,50 @@ and from_tasklet() to pass the tasklet pointer explicitly.
 Signed-off-by: Romain Perier <romain.perier@gmail.com>
 Signed-off-by: Allen Pais <apais@linux.microsoft.com>
 ---
- drivers/crypto/picoxcell_crypto.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ drivers/crypto/rockchip/rk3288_crypto.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
-index 84f9c16d984c..e64fa3e22521 100644
---- a/drivers/crypto/picoxcell_crypto.c
-+++ b/drivers/crypto/picoxcell_crypto.c
-@@ -1137,9 +1137,9 @@ static int spacc_req_submit(struct spacc_req *req)
- 		return spacc_ablk_submit(req);
+diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
+index 35d73061d156..85f314c79734 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto.c
++++ b/drivers/crypto/rockchip/rk3288_crypto.c
+@@ -201,9 +201,9 @@ static int rk_crypto_enqueue(struct rk_crypto_info *dev,
+ 	return ret;
  }
  
--static void spacc_spacc_complete(unsigned long data)
-+static void spacc_spacc_complete(struct tasklet_struct *t)
+-static void rk_crypto_queue_task_cb(unsigned long data)
++static void rk_crypto_queue_task_cb(struct tasklet_struct *t)
  {
--	struct spacc_engine *engine = (struct spacc_engine *)data;
-+	struct spacc_engine *engine = from_tasklet(engine, t, complete);
- 	struct spacc_req *req, *tmp;
+-	struct rk_crypto_info *dev = (struct rk_crypto_info *)data;
++	struct rk_crypto_info *dev = from_tasklet(dev, t, queue_task);
+ 	struct crypto_async_request *async_req, *backlog;
  	unsigned long flags;
- 	LIST_HEAD(completed);
-@@ -1649,8 +1649,7 @@ static int spacc_probe(struct platform_device *pdev)
- 		return -ENXIO;
- 	}
+ 	int err = 0;
+@@ -231,9 +231,9 @@ static void rk_crypto_queue_task_cb(unsigned long data)
+ 		dev->complete(dev->async_req, err);
+ }
  
--	tasklet_init(&engine->complete, spacc_spacc_complete,
--		     (unsigned long)engine);
-+	tasklet_setup(&engine->complete, spacc_spacc_complete);
+-static void rk_crypto_done_task_cb(unsigned long data)
++static void rk_crypto_done_task_cb(struct tasklet_struct *t)
+ {
+-	struct rk_crypto_info *dev = (struct rk_crypto_info *)data;
++	struct rk_crypto_info *dev = from_tasklet(dev, t, done_task);
  
- 	ret = devm_add_action(&pdev->dev, spacc_tasklet_kill,
- 			      &engine->complete);
+ 	if (dev->err) {
+ 		dev->complete(dev->async_req, dev->err);
+@@ -389,10 +389,8 @@ static int rk_crypto_probe(struct platform_device *pdev)
+ 	crypto_info->dev = &pdev->dev;
+ 	platform_set_drvdata(pdev, crypto_info);
+ 
+-	tasklet_init(&crypto_info->queue_task,
+-		     rk_crypto_queue_task_cb, (unsigned long)crypto_info);
+-	tasklet_init(&crypto_info->done_task,
+-		     rk_crypto_done_task_cb, (unsigned long)crypto_info);
++	tasklet_setup(&crypto_info->queue_task, rk_crypto_queue_task_cb);
++	tasklet_setup(&crypto_info->done_task, rk_crypto_done_task_cb);
+ 	crypto_init_queue(&crypto_info->queue, 50);
+ 
+ 	crypto_info->enable_clk = rk_crypto_enable_clk;
 -- 
 2.25.1
 
