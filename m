@@ -2,164 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50862C433E0
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:47:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D98C433E6
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:48:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 09FE864E92
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:47:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5920C64E9A
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:48:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231759AbhBHJrB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Feb 2021 04:47:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37796 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231764AbhBHJou (ORCPT
+        id S231750AbhBHJrf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 8 Feb 2021 04:47:35 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:12497 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230425AbhBHJp1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Feb 2021 04:44:50 -0500
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0380CC0617A9;
-        Mon,  8 Feb 2021 01:43:02 -0800 (PST)
-Received: by mail-pg1-x530.google.com with SMTP id z21so9860154pgj.4;
-        Mon, 08 Feb 2021 01:43:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=txs7p2lUu3mQQNGb4QbINzzk0t98H9jYcM78Yvdl14E=;
-        b=Zq+lhqnt/wmGY4lc0sgTrXURXAgtEIkPTFhDeyad7JOR3m30IE2hJGI88ASsxFunb5
-         3vSm2yaRvnvMTpqPon/ESv4xh9G5PScWb9VhC4zV3o1r7IPbkszZBKL5Q14vFpfxtrPp
-         Mgz3UK3GkoEtYQ4lh08j6YrJL0yqPh9rrpO9M1KFCyWiP6AixP5oTDCUPK+qA85ZD2Wg
-         3uAngYnAtvfWAn6otF3R78lGmmLHKRWHa2m6S3YSzWJC4AfY8HwRwm4Wir3h/KKrXSPt
-         ARbOKdu1pnj+7y3kygj8h6RHb+x76pjnIMTCl2tozg+ck4CvztXvVoFpJGfYaBvMOcby
-         ohTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=txs7p2lUu3mQQNGb4QbINzzk0t98H9jYcM78Yvdl14E=;
-        b=U+OS/6GGSyPKMCMx8pQ1fdr+RZxRGX0bt5kOHPA5Nw4sYDrVzM8oh/qtdj6TlOJdqI
-         zXyp92eRO0J+Syut+tDmrgO197srXeDzbJAukRyNkR0Yd39N4Qj4zzlEMb0nkRmsfvX7
-         FLQjsevVZv7I2NHvdXiZDxzRjcwa/YVhjT4dey8xChG0h3p9226xFs37U/ISyuUtpWwB
-         oEGJRgJjY9XFols15MhjQSneJXUUiiXh1vrXXCmnc5+5quQNVDGdq8SzS81u/IUngL30
-         CES0y1FMaMwwxveza2Nz2jXPbu3p6nB6XyrX8fGetmY0zVxKcyduDCWaZSs1i4i5vKYr
-         bisA==
-X-Gm-Message-State: AOAM530y9kdggYcFob47VF0fCt8Q4WpSuPv7PSkB2Rfo1tX+FFRMNQHj
-        Xnb77gDvtSSCMp+ZfL4GZTI=
-X-Google-Smtp-Source: ABdhPJwk+dGrDJOWa2ATJE4AdcYPlJ7+xZZSyryXD2QxZfkecl1zsiWHwa/5y3X0lnMPMwKzOXfo2g==
-X-Received: by 2002:a05:6a00:15d2:b029:1b7:30c1:8495 with SMTP id o18-20020a056a0015d2b02901b730c18495mr16861944pfu.32.1612777381616;
-        Mon, 08 Feb 2021 01:43:01 -0800 (PST)
-Received: from localhost.localdomain ([49.207.205.214])
-        by smtp.gmail.com with ESMTPSA id k69sm12208958pfd.4.2021.02.08.01.42.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Feb 2021 01:43:01 -0800 (PST)
-From:   Allen Pais <allen.lkml@gmail.com>
-To:     herbert@gondor.apana.org.au
-Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
-        alexandre.belloni@bootlin.com, ludovic.desroches@microchip.com,
-        jesper.nilsson@axis.com, lars.persson@axis.com,
-        horia.geanta@nxp.com, aymen.sghaier@nxp.com, gcherian@marvell.com,
-        thomas.lendacky@amd.com, john.allen@amd.com, gilad@benyossef.com,
-        bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
-        matthias.bgg@gmail.com, jamie@jamieiles.com,
-        giovanni.cabiddu@intel.com, heiko@sntech.de, krzk@kernel.org,
-        vz@mleia.com, k.konieczny@samsung.com,
-        linux-crypto@vger.kernel.org, linux-mediatek@lists.infradead.org,
-        qat-linux@intel.com, linux-rockchip@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org,
-        Allen Pais <apais@linux.microsoft.com>
-Subject: [PATCH v5 00/19]crypto: convert tasklets to use new tasklet_setup API()
-Date:   Mon,  8 Feb 2021 15:12:19 +0530
-Message-Id: <20210208094238.571015-1-allen.lkml@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        Mon, 8 Feb 2021 04:45:27 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DZ1GJ2N4XzjL0D;
+        Mon,  8 Feb 2021 17:40:08 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.24) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 8 Feb 2021 17:41:21 +0800
+From:   Meng Yu <yumeng18@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <tudor.ambarus@microchip.com>
+CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
+        <wangzhou1@hisilicon.com>, <yumeng18@huawei.com>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH v8 8/9] crypto: add curve25519 params and expose them
+Date:   Mon, 8 Feb 2021 17:38:56 +0800
+Message-ID: <1612777137-51067-9-git-send-email-yumeng18@huawei.com>
+X-Mailer: git-send-email 2.8.1
+In-Reply-To: <1612777137-51067-1-git-send-email-yumeng18@huawei.com>
+References: <1612777137-51067-1-git-send-email-yumeng18@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Allen Pais <apais@linux.microsoft.com>
+1. Add curve 25519 parameters;
+2. Add curve25519 function 'ecc_get_curve25519_param', to make
+   its parameters be exposed to everyone in kernel tree.
 
-Commit 12cc923f1ccc ("tasklet: Introduce new initialization API")
-introduced a new tasklet initialization API. This series converts
-all the crypto modules to use the new tasklet_setup() API
+Signed-off-by: Meng Yu <yumeng18@huawei.com>
+Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
+---
+ crypto/ecc.c               |  6 ++++++
+ crypto/ecc_curve_defs.h    | 18 ++++++++++++++++++
+ include/crypto/ecc_curve.h |  7 +++++++
+ 3 files changed, 31 insertions(+)
 
-The series is based on v5.11-rc4 (19c329f68089)
-v5:
-  - Fix amcc build failure. 
-
-v4:
-  - added acks
-  - fixed checkpatch errors(Giovanni Cabiddu)
-
-v3:
-  - fixed rockchip driver(Emil Renner Berthing)
-
-v2:
-  - added acks
-  - addressed comments [Krzysztof and Gilad]
-
-Allen Pais (19):
-  crypto: amcc: convert tasklets to use new tasklet_setup() API
-  crypto: atmel: convert tasklets to use new tasklet_setup() API
-  crypto: axis: convert tasklets to use new tasklet_setup() API
-  crypto: caam: convert tasklets to use new tasklet_setup() API
-  crypto: cavium: convert tasklets to use new tasklet_setup() API
-  crypto: ccp: convert tasklets to use new tasklet_setup() API
-  crypto: ccree: convert tasklets to use new tasklet_setup() API
-  crypto: hifn_795x: convert tasklets to use new tasklet_setup() API
-  crypto: img-hash: convert tasklets to use new tasklet_setup() API
-  crypto: ixp4xx: convert tasklets to use new tasklet_setup() API
-  crypto: mediatek: convert tasklets to use new tasklet_setup() API
-  crypto: omap: convert tasklets to use new tasklet_setup() API
-  crypto: picoxcell: convert tasklets to use new tasklet_setup() API
-  crypto: qat: convert tasklets to use new tasklet_setup() API
-  crypto: qce: convert tasklets to use new tasklet_setup() API
-  crypto: rockchip: convert tasklets to use new tasklet_setup() API
-  crypto: s5p: convert tasklets to use new tasklet_setup() API
-  crypto: talitos: convert tasklets to use new tasklet_setup() API
-  crypto: octeontx: convert tasklets to use new tasklet_setup() API
-
- drivers/crypto/amcc/crypto4xx_core.c          | 10 ++---
- drivers/crypto/atmel-aes.c                    | 14 +++----
- drivers/crypto/atmel-sha.c                    | 14 +++----
- drivers/crypto/atmel-tdes.c                   | 14 +++----
- drivers/crypto/axis/artpec6_crypto.c          |  7 ++--
- drivers/crypto/caam/jr.c                      |  9 ++--
- drivers/crypto/cavium/cpt/cptvf_main.c        |  9 ++--
- drivers/crypto/cavium/nitrox/nitrox_common.h  |  2 +-
- drivers/crypto/cavium/nitrox/nitrox_isr.c     | 13 +++---
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c  |  4 +-
- drivers/crypto/ccp/ccp-dev-v3.c               |  9 ++--
- drivers/crypto/ccp/ccp-dev-v5.c               |  9 ++--
- drivers/crypto/ccp/ccp-dmaengine.c            |  7 ++--
- drivers/crypto/ccree/cc_fips.c                |  8 ++--
- drivers/crypto/ccree/cc_request_mgr.c         | 12 +++---
- drivers/crypto/hifn_795x.c                    |  6 +--
- drivers/crypto/img-hash.c                     | 12 +++---
- drivers/crypto/ixp4xx_crypto.c                |  4 +-
- .../crypto/marvell/octeontx/otx_cptvf_main.c  | 12 +++---
- drivers/crypto/mediatek/mtk-aes.c             | 14 +++----
- drivers/crypto/mediatek/mtk-sha.c             | 14 +++----
- drivers/crypto/omap-aes.c                     |  6 +--
- drivers/crypto/omap-des.c                     |  6 +--
- drivers/crypto/omap-sham.c                    |  6 +--
- drivers/crypto/picoxcell_crypto.c             |  7 ++--
- drivers/crypto/qat/qat_common/adf_isr.c       |  5 +--
- drivers/crypto/qat/qat_common/adf_sriov.c     | 10 ++---
- drivers/crypto/qat/qat_common/adf_transport.c |  4 +-
- .../qat/qat_common/adf_transport_internal.h   |  2 +-
- drivers/crypto/qat/qat_common/adf_vf_isr.c    | 11 +++--
- drivers/crypto/qce/core.c                     |  7 ++--
- drivers/crypto/rockchip/rk3288_crypto.c       | 14 +++----
- drivers/crypto/s5p-sss.c                      | 13 +++---
- drivers/crypto/talitos.c                      | 42 +++++++++----------
- 34 files changed, 154 insertions(+), 182 deletions(-)
-
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index a631d3e..d8dbe7a 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -43,6 +43,12 @@ typedef struct {
+ 	u64 m_high;
+ } uint128_t;
+ 
++/* Returns curv25519 curve param */
++const struct ecc_curve *ecc_get_curve25519(void)
++{
++	return &ecc_25519;
++}
++EXPORT_SYMBOL(ecc_get_curve25519);
+ 
+ const struct ecc_curve *ecc_get_curve(unsigned int curve_id)
+ {
+diff --git a/crypto/ecc_curve_defs.h b/crypto/ecc_curve_defs.h
+index bcd7b58..f37eced 100644
+--- a/crypto/ecc_curve_defs.h
++++ b/crypto/ecc_curve_defs.h
+@@ -160,4 +160,22 @@ static struct ecc_curve nist_p521 = {
+ 	.b = nist_p521_b
+ };
+ 
++/* curve25519 */
++static u64 curve25519_g_x[] = { 0x0000000000000009, 0x0000000000000000,
++				0x0000000000000000, 0x0000000000000000 };
++static u64 curve25519_p[] = { 0xffffffffffffffed, 0xffffffffffffffff,
++				0xffffffffffffffff, 0x7fffffffffffffff };
++static u64 curve25519_a[] = { 0x000000000001DB41, 0x0000000000000000,
++				0x0000000000000000, 0x0000000000000000 };
++static const struct ecc_curve ecc_25519 = {
++	.name = "curve25519",
++	.g = {
++		.x = curve25519_g_x,
++		.ndigits = 4,
++	},
++	.p = curve25519_p,
++	.a = curve25519_a,
++};
++
++
+ #endif
+diff --git a/include/crypto/ecc_curve.h b/include/crypto/ecc_curve.h
+index 19a35da..7096478 100644
+--- a/include/crypto/ecc_curve.h
++++ b/include/crypto/ecc_curve.h
+@@ -50,4 +50,11 @@ struct ecc_curve {
+  */
+ const struct ecc_curve *ecc_get_curve(unsigned int curve_id);
+ 
++/**
++ * ecc_get_curve25519() - get curve25519 curve;
++ *
++ * Returns curve25519
++ */
++const struct ecc_curve *ecc_get_curve25519(void);
++
+ #endif
 -- 
-2.25.1
+2.8.1
 
