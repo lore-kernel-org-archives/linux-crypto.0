@@ -2,528 +2,131 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0823C433E0
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:46:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 738ACC433DB
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:47:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 80D5164E92
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:46:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 377D564E27
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Feb 2021 09:47:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231744AbhBHJqF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Feb 2021 04:46:05 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:12492 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231860AbhBHJmi (ORCPT
+        id S231915AbhBHJrF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 8 Feb 2021 04:47:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37800 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231802AbhBHJou (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Feb 2021 04:42:38 -0500
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DZ1GJ1FT9zjKfN;
-        Mon,  8 Feb 2021 17:40:08 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 8 Feb 2021 17:41:21 +0800
-From:   Meng Yu <yumeng18@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <tudor.ambarus@microchip.com>
-CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
-        <wangzhou1@hisilicon.com>, <yumeng18@huawei.com>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH v8 9/9] crypto: hisilicon/hpre - add 'CURVE25519' algorithm
-Date:   Mon, 8 Feb 2021 17:38:57 +0800
-Message-ID: <1612777137-51067-10-git-send-email-yumeng18@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1612777137-51067-1-git-send-email-yumeng18@huawei.com>
-References: <1612777137-51067-1-git-send-email-yumeng18@huawei.com>
+        Mon, 8 Feb 2021 04:44:50 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 761F5C0617AB;
+        Mon,  8 Feb 2021 01:43:11 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id z9so8460838pjl.5;
+        Mon, 08 Feb 2021 01:43:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=Z1ChG13UjjztSNVmWKm8LG/tQ4bXSFaATn/TncVbdO0=;
+        b=T5syCcXJp9ECpk82vm2+7hmGJKlYvipt8MdeOw+1/OIDLPUbkXXgxcUrrvsAicXl3P
+         NOAU/R88AzwgDeJJFH+QneZY9b3yysAkcQDNGtZcVN48FmGDhrAjmwLex8KfdfPtJcRb
+         rit9eexydLejDaVGwC67hL0KBUWKQyF5xmgVp8K1GdHMAHiEJBSkNugAl2KkbNV+sYag
+         GiRy9tU0ec1Vkw4WJ5bivAe6cfenmvq0gtLil0aOyRh45bDTFPYtYpl2wO2nEXsAV25+
+         hONX2zevYi4gULbYBV49qLviLnzGJ4ySTAzVUHaNs8jDGD4gDoPF2tKEv2ZunH7NoYjF
+         AjLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Z1ChG13UjjztSNVmWKm8LG/tQ4bXSFaATn/TncVbdO0=;
+        b=M0PHr8uzCI8+elXVXcroUfehFPgBBV3X9+C/HvSNr53INeYdiT+TDccHqHeZknGSOO
+         ymi1d0/teiL9w0TR0NLn+CGyQqcpq8WSMngvElG/5nM+Qbyr2IpSC8N/ViqPoDXrL//f
+         oIt2Wzwgx+1UGlnT6knykDkjBP6rYXNGN/C4Ue+/B+/swILsC+YE6pbCcxLzxXZH43in
+         zjuangxotDsX1WgU7djFKdpuCzLNStCcBDSoSCOpMRzu+MFzf2H4BHMkR9cWKrCbhuhS
+         kfYcdjfpb2v1Lv5RzRhOCbTu9PgIYVoQ1kxnGxvdx3kxfoGr7j5eD4rk8Jo3uO3q/Gpv
+         kfAw==
+X-Gm-Message-State: AOAM531AKLUa9CjMHObu0nWFSy9DxOPPHp+jDtfs8PbVXyaX5kNLws80
+        SGPE49MxW7lYJU+Wpqo4N/s=
+X-Google-Smtp-Source: ABdhPJyywK9e9JjwWEAMufqCNgRCmU+pUvue7JS13f8T1Q7Y0jGVZuJNjqTfq/4k+vGVYxmKblWfzA==
+X-Received: by 2002:a17:902:26a:b029:da:af47:77c7 with SMTP id 97-20020a170902026ab02900daaf4777c7mr15598456plc.10.1612777391098;
+        Mon, 08 Feb 2021 01:43:11 -0800 (PST)
+Received: from localhost.localdomain ([49.207.205.214])
+        by smtp.gmail.com with ESMTPSA id k69sm12208958pfd.4.2021.02.08.01.43.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Feb 2021 01:43:10 -0800 (PST)
+From:   Allen Pais <allen.lkml@gmail.com>
+To:     herbert@gondor.apana.org.au
+Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
+        alexandre.belloni@bootlin.com, ludovic.desroches@microchip.com,
+        jesper.nilsson@axis.com, lars.persson@axis.com,
+        horia.geanta@nxp.com, aymen.sghaier@nxp.com, gcherian@marvell.com,
+        thomas.lendacky@amd.com, john.allen@amd.com, gilad@benyossef.com,
+        bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
+        matthias.bgg@gmail.com, jamie@jamieiles.com,
+        giovanni.cabiddu@intel.com, heiko@sntech.de, krzk@kernel.org,
+        vz@mleia.com, k.konieczny@samsung.com,
+        linux-crypto@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        qat-linux@intel.com, linux-rockchip@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org,
+        Allen Pais <apais@linux.microsoft.com>,
+        Romain Perier <romain.perier@gmail.com>
+Subject: [PATCH v5 01/19] crypto: amcc: convert tasklets to use new tasklet_setup() API
+Date:   Mon,  8 Feb 2021 15:12:20 +0530
+Message-Id: <20210208094238.571015-2-allen.lkml@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210208094238.571015-1-allen.lkml@gmail.com>
+References: <20210208094238.571015-1-allen.lkml@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Enable 'CURVE25519' algorithm in Kunpeng 930.
+From: Allen Pais <apais@linux.microsoft.com>
 
-Signed-off-by: Meng Yu <yumeng18@huawei.com>
-Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
+In preparation for unconditionally passing the
+struct tasklet_struct pointer to all tasklet
+callbacks, switch to using the new tasklet_setup()
+and from_tasklet() to pass the tasklet pointer explicitly.
+
+Signed-off-by: Romain Perier <romain.perier@gmail.com>
+Signed-off-by: Allen Pais <apais@linux.microsoft.com>
 ---
- drivers/crypto/hisilicon/Kconfig            |   1 +
- drivers/crypto/hisilicon/hpre/hpre.h        |   2 +
- drivers/crypto/hisilicon/hpre/hpre_crypto.c | 366 +++++++++++++++++++++++++++-
- 3 files changed, 361 insertions(+), 8 deletions(-)
+ drivers/crypto/amcc/crypto4xx_core.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index 8431926..c45adb1 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -65,6 +65,7 @@ config CRYPTO_DEV_HISI_HPRE
- 	depends on UACCE || UACCE=n
- 	depends on ARM64 || (COMPILE_TEST && 64BIT)
- 	depends on ACPI
-+	select CRYPTO_LIB_CURVE25519_GENERIC
- 	select CRYPTO_DEV_HISI_QM
- 	select CRYPTO_DH
- 	select CRYPTO_RSA
-diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
-index 5a8091a..53a2832 100644
---- a/drivers/crypto/hisilicon/hpre/hpre.h
-+++ b/drivers/crypto/hisilicon/hpre/hpre.h
-@@ -82,6 +82,8 @@ enum hpre_alg_type {
- 	HPRE_ALG_DH_G2 = 0x4,
- 	HPRE_ALG_DH = 0x5,
- 	HPRE_ALG_ECC_MUL = 0xD,
-+	/* shared by x25519 and x448, but x448 is not supported now */
-+	HPRE_ALG_CURVE25519_MUL = 0x10,
- };
- 
- struct hpre_sqe {
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index 49df0ab..a8fc2b4 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Copyright (c) 2019 HiSilicon Limited. */
- #include <crypto/akcipher.h>
-+#include <crypto/curve25519.h>
- #include <crypto/dh.h>
- #include <crypto/ecc_curve.h>
- #include <crypto/ecdh.h>
-@@ -96,6 +97,16 @@ struct hpre_ecdh_ctx {
- 	dma_addr_t dma_g;
- };
- 
-+struct hpre_curve25519_ctx {
-+	/* low address: p->a->k */
-+	unsigned char *p;
-+	dma_addr_t dma_p;
-+
-+	/* gx coordinate */
-+	unsigned char *g;
-+	dma_addr_t dma_g;
-+};
-+
- struct hpre_ctx {
- 	struct hisi_qp *qp;
- 	struct hpre_asym_request **req_list;
-@@ -108,6 +119,7 @@ struct hpre_ctx {
- 		struct hpre_rsa_ctx rsa;
- 		struct hpre_dh_ctx dh;
- 		struct hpre_ecdh_ctx ecdh;
-+		struct hpre_curve25519_ctx curve25519;
- 	};
- 	/* for ecc algorithms */
- 	unsigned int curve_id;
-@@ -122,6 +134,7 @@ struct hpre_asym_request {
- 		struct akcipher_request *rsa;
- 		struct kpp_request *dh;
- 		struct kpp_request *ecdh;
-+		struct kpp_request *curve25519;
- 	} areq;
- 	int err;
- 	int req_id;
-@@ -444,7 +457,6 @@ static void hpre_alg_cb(struct hisi_qp *qp, void *resp)
- 	struct hpre_sqe *sqe = resp;
- 	struct hpre_asym_request *req = ctx->req_list[le16_to_cpu(sqe->tag)];
- 
--
- 	if (unlikely(!req)) {
- 		atomic64_inc(&dfx[HPRE_INVALID_REQ_CNT].value);
- 		return;
-@@ -1174,6 +1186,12 @@ static void hpre_ecc_clear_ctx(struct hpre_ctx *ctx, bool is_clear_all,
- 		memzero_explicit(ctx->ecdh.p + shift, sz);
- 		dma_free_coherent(dev, sz << 3, ctx->ecdh.p, ctx->ecdh.dma_p);
- 		ctx->ecdh.p = NULL;
-+	} else if (!is_ecdh && ctx->curve25519.p) {
-+		/* curve25519: p->a->k */
-+		memzero_explicit(ctx->curve25519.p + shift, sz);
-+		dma_free_coherent(dev, sz << 2, ctx->curve25519.p,
-+				  ctx->curve25519.dma_p);
-+		ctx->curve25519.p = NULL;
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index 8d1b918a0533..721ccf850f0b 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -1072,10 +1072,11 @@ static void crypto4xx_unregister_alg(struct crypto4xx_device *sec_dev)
  	}
- 
- 	hpre_ctx_clear(ctx, is_clear_all);
-@@ -1601,6 +1619,312 @@ static void hpre_ecdh_exit_tfm(struct crypto_kpp *tfm)
- 	hpre_ecc_clear_ctx(ctx, true, true);
  }
  
-+static void hpre_curve25519_fill_curve(struct hpre_ctx *ctx, const void *buf,
-+				       unsigned int len)
-+{
-+	u8 secret[CURVE25519_KEY_SIZE] = { 0 };
-+	unsigned int sz = ctx->key_sz;
-+	const struct ecc_curve *curve;
-+	unsigned int shift = sz << 1;
-+	void *p;
-+
-+	/*
-+	 * The key from 'buf' is in little-endian, we should preprocess it as
-+	 * the description in rfc7748: "k[0] &= 248, k[31] &= 127, k[31] |= 64",
-+	 * then convert it to big endian. Only in this way, the result can be
-+	 * the same as the software curve-25519 that exists in crypto.
-+	 */
-+	memcpy(secret, buf, len);
-+	curve25519_clamp_secret(secret);
-+	hpre_key_to_big_end(secret, CURVE25519_KEY_SIZE);
-+
-+	p = ctx->curve25519.p + sz - len;
-+
-+	curve = ecc_get_curve25519();
-+
-+	/* fill curve parameters */
-+	fill_curve_param(p, curve->p, len, curve->g.ndigits);
-+	fill_curve_param(p + sz, curve->a, len, curve->g.ndigits);
-+	memcpy(p + shift, secret, len);
-+	fill_curve_param(p + shift + sz, curve->g.x, len, curve->g.ndigits);
-+	memzero_explicit(secret, CURVE25519_KEY_SIZE);
-+}
-+
-+static int hpre_curve25519_set_param(struct hpre_ctx *ctx, const void *buf,
-+				     unsigned int len)
-+{
-+	struct device *dev = HPRE_DEV(ctx);
-+	unsigned int sz = ctx->key_sz;
-+	unsigned int shift = sz << 1;
-+
-+	/* p->a->k->gx */
-+	if (!ctx->curve25519.p) {
-+		ctx->curve25519.p = dma_alloc_coherent(dev, sz << 2,
-+						       &ctx->curve25519.dma_p,
-+						       GFP_KERNEL);
-+		if (!ctx->curve25519.p)
-+			return -ENOMEM;
-+	}
-+
-+	ctx->curve25519.g = ctx->curve25519.p + shift + sz;
-+	ctx->curve25519.dma_g = ctx->curve25519.dma_p + shift + sz;
-+
-+	hpre_curve25519_fill_curve(ctx, buf, len);
-+
-+	return 0;
-+}
-+
-+static int hpre_curve25519_set_secret(struct crypto_kpp *tfm, const void *buf,
-+				      unsigned int len)
-+{
-+	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
-+	struct device *dev = HPRE_DEV(ctx);
-+	int ret = -EINVAL;
-+
-+	if (len != CURVE25519_KEY_SIZE ||
-+	    !crypto_memneq(buf, curve25519_null_point, CURVE25519_KEY_SIZE)) {
-+		dev_err(dev, "key is null or key len is not 32bytes!\n");
-+		return ret;
-+	}
-+
-+	/* Free old secret if any */
-+	hpre_ecc_clear_ctx(ctx, false, false);
-+
-+	ctx->key_sz = CURVE25519_KEY_SIZE;
-+	ret = hpre_curve25519_set_param(ctx, buf, CURVE25519_KEY_SIZE);
-+	if (ret) {
-+		dev_err(dev, "failed to set curve25519 param, ret = %d!\n", ret);
-+		hpre_ecc_clear_ctx(ctx, false, false);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static void hpre_curve25519_hw_data_clr_all(struct hpre_ctx *ctx,
-+					    struct hpre_asym_request *req,
-+					    struct scatterlist *dst,
-+					    struct scatterlist *src)
-+{
-+	struct device *dev = HPRE_DEV(ctx);
-+	struct hpre_sqe *sqe = &req->req;
-+	dma_addr_t dma;
-+
-+	dma = le64_to_cpu(sqe->in);
-+	if (unlikely(!dma))
-+		return;
-+
-+	if (src && req->src)
-+		dma_free_coherent(dev, ctx->key_sz, req->src, dma);
-+
-+	dma = le64_to_cpu(sqe->out);
-+	if (unlikely(!dma))
-+		return;
-+
-+	if (req->dst)
-+		dma_free_coherent(dev, ctx->key_sz, req->dst, dma);
-+	if (dst)
-+		dma_unmap_single(dev, dma, ctx->key_sz, DMA_FROM_DEVICE);
-+}
-+
-+static void hpre_curve25519_cb(struct hpre_ctx *ctx, void *resp)
-+{
-+	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
-+	struct hpre_asym_request *req = NULL;
-+	struct kpp_request *areq;
-+	u64 overtime_thrhld;
-+	int ret;
-+
-+	ret = hpre_alg_res_post_hf(ctx, resp, (void **)&req);
-+	areq = req->areq.curve25519;
-+	areq->dst_len = ctx->key_sz;
-+
-+	overtime_thrhld = atomic64_read(&dfx[HPRE_OVERTIME_THRHLD].value);
-+	if (overtime_thrhld && hpre_is_bd_timeout(req, overtime_thrhld))
-+		atomic64_inc(&dfx[HPRE_OVER_THRHLD_CNT].value);
-+
-+	hpre_key_to_big_end(sg_virt(areq->dst), CURVE25519_KEY_SIZE);
-+
-+	hpre_curve25519_hw_data_clr_all(ctx, req, areq->dst, areq->src);
-+	kpp_request_complete(areq, ret);
-+
-+	atomic64_inc(&dfx[HPRE_RECV_CNT].value);
-+}
-+
-+static int hpre_curve25519_msg_request_set(struct hpre_ctx *ctx,
-+					   struct kpp_request *req)
-+{
-+	struct hpre_asym_request *h_req;
-+	struct hpre_sqe *msg;
-+	int req_id;
-+	void *tmp;
-+
-+	if (unlikely(req->dst_len < ctx->key_sz)) {
-+		req->dst_len = ctx->key_sz;
-+		return -EINVAL;
-+	}
-+
-+	tmp = kpp_request_ctx(req);
-+	h_req = PTR_ALIGN(tmp, HPRE_ALIGN_SZ);
-+	h_req->cb = hpre_curve25519_cb;
-+	h_req->areq.curve25519 = req;
-+	msg = &h_req->req;
-+	memset(msg, 0, sizeof(*msg));
-+	msg->key = cpu_to_le64(ctx->curve25519.dma_p);
-+
-+	msg->dw0 |= cpu_to_le32(0x1U << HPRE_SQE_DONE_SHIFT);
-+	msg->task_len1 = (ctx->key_sz >> HPRE_BITS_2_BYTES_SHIFT) - 1;
-+	h_req->ctx = ctx;
-+
-+	req_id = hpre_add_req_to_ctx(h_req);
-+	if (req_id < 0)
-+		return -EBUSY;
-+
-+	msg->tag = cpu_to_le16((u16)req_id);
-+	return 0;
-+}
-+
-+static int hpre_curve25519_src_init(struct hpre_asym_request *hpre_req,
-+				    struct scatterlist *data, unsigned int len)
-+{
-+	struct hpre_sqe *msg = &hpre_req->req;
-+	struct hpre_ctx *ctx = hpre_req->ctx;
-+	struct device *dev = HPRE_DEV(ctx);
-+	u8 p[CURVE25519_KEY_SIZE] = { 0 };
-+	const struct ecc_curve *curve;
-+	dma_addr_t dma = 0;
-+	u8 *ptr;
-+
-+	if (len != CURVE25519_KEY_SIZE) {
-+		dev_err(dev, "sourc_data len is not 32bytes, len = %u!\n", len);
-+		return -EINVAL;
-+	}
-+
-+	ptr = dma_alloc_coherent(dev, ctx->key_sz, &dma, GFP_KERNEL);
-+	if (unlikely(!ptr))
-+		return -ENOMEM;
-+
-+	scatterwalk_map_and_copy(ptr, data, 0, len, 0);
-+
-+	if (!crypto_memneq(ptr, curve25519_null_point, CURVE25519_KEY_SIZE)) {
-+		dev_err(dev, "gx is null!\n");
-+		goto err;
-+	}
-+
-+	/*
-+	 * Src_data(gx) is in little-endian order, MSB in the final byte should
-+	 * be masked as discribed in RFC7748, then transform it to big-endian
-+	 * form, then hisi_hpre can use the data.
-+	 */
-+	ptr[31] &= 0x7f;
-+	hpre_key_to_big_end(ptr, CURVE25519_KEY_SIZE);
-+
-+	curve = ecc_get_curve25519();
-+
-+	fill_curve_param(p, curve->p, CURVE25519_KEY_SIZE, curve->g.ndigits);
-+	if (memcmp(ptr, p, ctx->key_sz) >= 0) {
-+		dev_err(dev, "gx is out of p!\n");
-+		goto err;
-+	}
-+
-+	hpre_req->src = ptr;
-+	msg->in = cpu_to_le64(dma);
-+	return 0;
-+
-+err:
-+	dma_free_coherent(dev, ctx->key_sz, ptr, dma);
-+	return -EINVAL;
-+}
-+
-+static int hpre_curve25519_dst_init(struct hpre_asym_request *hpre_req,
-+				    struct scatterlist *data, unsigned int len)
-+{
-+	struct hpre_sqe *msg = &hpre_req->req;
-+	struct hpre_ctx *ctx = hpre_req->ctx;
-+	struct device *dev = HPRE_DEV(ctx);
-+	dma_addr_t dma = 0;
-+
-+	if (!data || !sg_is_last(data) || len != ctx->key_sz) {
-+		dev_err(dev, "data or data length is illegal!\n");
-+		return -EINVAL;
-+	}
-+
-+	hpre_req->dst = NULL;
-+	dma = dma_map_single(dev, sg_virt(data), len, DMA_FROM_DEVICE);
-+	if (unlikely(dma_mapping_error(dev, dma))) {
-+		dev_err(dev, "dma map data err!\n");
-+		return -ENOMEM;
-+	}
-+
-+	msg->out = cpu_to_le64(dma);
-+	return 0;
-+}
-+
-+static int hpre_curve25519_compute_value(struct kpp_request *req)
-+{
-+	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
-+	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
-+	struct device *dev = HPRE_DEV(ctx);
-+	void *tmp = kpp_request_ctx(req);
-+	struct hpre_asym_request *hpre_req = PTR_ALIGN(tmp, HPRE_ALIGN_SZ);
-+	struct hpre_sqe *msg = &hpre_req->req;
-+	int ret;
-+
-+	ret = hpre_curve25519_msg_request_set(ctx, req);
-+	if (unlikely(ret)) {
-+		dev_err(dev, "failed to set curve25519 request, ret = %d!\n", ret);
-+		return ret;
-+	}
-+
-+	if (req->src) {
-+		ret = hpre_curve25519_src_init(hpre_req, req->src, req->src_len);
-+		if (unlikely(ret)) {
-+			dev_err(dev, "failed to init src data, ret = %d!\n",
-+				ret);
-+			goto clear_all;
-+		}
-+	} else {
-+		msg->in = cpu_to_le64(ctx->curve25519.dma_g);
-+	}
-+
-+	ret = hpre_curve25519_dst_init(hpre_req, req->dst, req->dst_len);
-+	if (unlikely(ret)) {
-+		dev_err(dev, "failed to init dst data, ret = %d!\n", ret);
-+		goto clear_all;
-+	}
-+
-+	msg->dw0 = cpu_to_le32(le32_to_cpu(msg->dw0) | HPRE_ALG_CURVE25519_MUL);
-+	ret = hpre_send(ctx, msg);
-+	if (likely(!ret))
-+		return -EINPROGRESS;
-+
-+clear_all:
-+	hpre_rm_req_from_ctx(hpre_req);
-+	hpre_curve25519_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
-+	return ret;
-+}
-+
-+static unsigned int hpre_curve25519_max_size(struct crypto_kpp *tfm)
-+{
-+	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
-+
-+	return ctx->key_sz;
-+}
-+
-+static int hpre_curve25519_init_tfm(struct crypto_kpp *tfm)
-+{
-+	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
-+
-+	return hpre_ctx_init(ctx, HPRE_V3_ECC_ALG_TYPE);
-+}
-+
-+static void hpre_curve25519_exit_tfm(struct crypto_kpp *tfm)
-+{
-+	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
-+
-+	hpre_ecc_clear_ctx(ctx, true, false);
-+}
-+
- static struct akcipher_alg rsa = {
- 	.sign = hpre_rsa_dec,
- 	.verify = hpre_rsa_enc,
-@@ -1725,6 +2049,24 @@ static struct kpp_alg ecdh_nist_p521 = {
- 	},
- };
- 
-+static struct kpp_alg curve25519_alg = {
-+	.set_secret = hpre_curve25519_set_secret,
-+	.generate_public_key = hpre_curve25519_compute_value,
-+	.compute_shared_secret = hpre_curve25519_compute_value,
-+	.max_size = hpre_curve25519_max_size,
-+	.init = hpre_curve25519_init_tfm,
-+	.exit = hpre_curve25519_exit_tfm,
-+	.reqsize = sizeof(struct hpre_asym_request) + HPRE_ALIGN_SZ,
-+	.base = {
-+		.cra_ctxsize = sizeof(struct hpre_ctx),
-+		.cra_priority = HPRE_CRYPTO_ALG_PRI,
-+		.cra_name = "curve25519",
-+		.cra_driver_name = "hpre-curve25519",
-+		.cra_module = THIS_MODULE,
-+	},
-+};
-+
-+
- static int hpre_register_ecdh(void)
+-static void crypto4xx_bh_tasklet_cb(unsigned long data)
++static void crypto4xx_bh_tasklet_cb(struct tasklet_struct *t)
  {
- 	int ret;
-@@ -1789,22 +2131,30 @@ int hpre_algs_register(struct hisi_qm *qm)
+-	struct device *dev = (struct device *)data;
+-	struct crypto4xx_core_device *core_dev = dev_get_drvdata(dev);
++	struct crypto4xx_core_device *core_dev = from_tasklet(core_dev, t,
++							      tasklet);
++	struct device *dev = core_dev->device;
+ 	struct pd_uinfo *pd_uinfo;
+ 	struct ce_pd *pd;
+ 	u32 tail = core_dev->dev->pdr_tail;
+@@ -1452,8 +1453,7 @@ static int crypto4xx_probe(struct platform_device *ofdev)
+ 		goto err_build_sdr;
  
- 	if (qm->ver >= QM_HW_V3) {
- 		ret = hpre_register_ecdh();
-+		if (ret)
-+			goto reg_err;
-+		ret = crypto_register_kpp(&curve25519_alg);
- 		if (ret) {
--#ifdef CONFIG_CRYPTO_DH
--			crypto_unregister_kpp(&dh);
--#endif
--			crypto_unregister_akcipher(&rsa);
--			return ret;
-+			hpre_unregister_ecdh();
-+			goto reg_err;
- 		}
- 	}
--
- 	return 0;
-+
-+reg_err:
-+#ifdef CONFIG_CRYPTO_DH
-+	crypto_unregister_kpp(&dh);
-+#endif
-+	crypto_unregister_akcipher(&rsa);
-+	return ret;
- }
+ 	/* Init tasklet for bottom half processing */
+-	tasklet_init(&core_dev->tasklet, crypto4xx_bh_tasklet_cb,
+-		     (unsigned long) dev);
++	tasklet_setup(&core_dev->tasklet, crypto4xx_bh_tasklet_cb);
  
- void hpre_algs_unregister(struct hisi_qm *qm)
- {
--	if (qm->ver >= QM_HW_V3)
-+	if (qm->ver >= QM_HW_V3) {
-+		crypto_unregister_kpp(&curve25519_alg);
- 		hpre_unregister_ecdh();
-+	}
- 
- #ifdef CONFIG_CRYPTO_DH
- 	crypto_unregister_kpp(&dh);
+ 	core_dev->dev->ce_base = of_iomap(ofdev->dev.of_node, 0);
+ 	if (!core_dev->dev->ce_base) {
 -- 
-2.8.1
+2.25.1
 
