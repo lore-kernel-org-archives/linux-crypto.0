@@ -2,59 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B9DC433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 07:22:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC38BC433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 07:23:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A452064E42
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 07:22:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A609F64E02
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 07:23:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230357AbhBJHWt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Feb 2021 02:22:49 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:50194 "EHLO fornost.hmeau.com"
+        id S232359AbhBJHW7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Feb 2021 02:22:59 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:50190 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232346AbhBJHWr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Feb 2021 02:22:47 -0500
+        id S232342AbhBJHWw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Feb 2021 02:22:52 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1l9jou-0001Ez-Sb; Wed, 10 Feb 2021 18:21:54 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 10 Feb 2021 18:21:52 +1100
-Date:   Wed, 10 Feb 2021 18:21:52 +1100
+        id 1l9jp5-0001F4-LI; Wed, 10 Feb 2021 18:22:04 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 10 Feb 2021 18:22:03 +1100
+Date:   Wed, 10 Feb 2021 18:22:03 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Jan Henrik Weinstock <jan.weinstock@rwth-aachen.de>
-Cc:     mpm@selenic.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] hw_random/timeriomem-rng: Fix cooldown period calculation
-Message-ID: <20210210072152.GB4493@gondor.apana.org.au>
-References: <947aa0ab-1f0c-44d6-943a-cf83a56ac5b8@rwthex-s2-a.rwth-ad.de>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, ebiggers@kernel.org
+Subject: Re: [PATCH 0/9] crypto: fix alignmask handling
+Message-ID: <20210210072203.GC4493@gondor.apana.org.au>
+References: <20210201180237.3171-1-ardb@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <947aa0ab-1f0c-44d6-943a-cf83a56ac5b8@rwthex-s2-a.rwth-ad.de>
+In-Reply-To: <20210201180237.3171-1-ardb@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 01, 2021 at 04:14:59PM +0100, Jan Henrik Weinstock wrote:
-> Ensure cooldown period tolerance of 1% is actually accounted for.
+On Mon, Feb 01, 2021 at 07:02:28PM +0100, Ard Biesheuvel wrote:
+> Some generic implementations of vintage ciphers rely on alignmasks to
+> ensure that the input is presented with the right alignment. Given that
+> these are all C implementations, which may execute on architectures that
+> don't care about alignment in the first place, it is better to use the
+> unaligned accessors, which will deal with the misalignment in a way that
+> is appropriate for the architecture in question (and in many cases, this
+> means simply ignoring the misalignment, as the hardware doesn't care either)
 > 
-> Signed-off-by: Jan Henrik Weinstock <jan.weinstock@rwth-aachen.de>
-> ---
+> So fix this across a number of implementations. Patch #1 stands out because
+> michael_mic.c was broken in spite of the alignmask. Patch #2 removes tnepres
+> instead of updating it, given that there is no point in keeping it.
 > 
-> Before patch, if period_us was less than 100us, no extra sleep time was
-> added. If it was more than 100us, only 1us extra time (and not 1%) is slept.
+> The remaining patches all update generic ciphers that are outdated but still
+> used, and which are the only implementations available on most architectures
+> other than x86.
 > 
->  drivers/char/hw_random/timeriomem-rng.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> 
+> Ard Biesheuvel (9):
+>   crypto: michael_mic - fix broken misalignment handling
+>   crypto: serpent - get rid of obsolete tnepres variant
+>   crypto: serpent - use unaligned accessors instead of alignmask
+>   crypto: blowfish - use unaligned accessors instead of alignmask
+>   crypto: camellia - use unaligned accessors instead of alignmask
+>   crypto: cast5 - use unaligned accessors instead of alignmask
+>   crypto: cast6 - use unaligned accessors instead of alignmask
+>   crypto: fcrypt - drop unneeded alignmask
+>   crypto: twofish - use unaligned accessors instead of alignmask
+> 
+>  crypto/Kconfig            |   3 +-
+>  crypto/blowfish_generic.c |  23 ++--
+>  crypto/camellia_generic.c |  45 +++----
+>  crypto/cast5_generic.c    |  23 ++--
+>  crypto/cast6_generic.c    |  39 +++---
+>  crypto/fcrypt.c           |   1 -
+>  crypto/michael_mic.c      |  31 ++---
+>  crypto/serpent_generic.c  | 126 ++++----------------
+>  crypto/tcrypt.c           |   6 +-
+>  crypto/testmgr.c          |   6 -
+>  crypto/testmgr.h          |  79 ------------
+>  crypto/twofish_generic.c  |  11 +-
+>  12 files changed, 90 insertions(+), 303 deletions(-)
 
-Patch applied.  Thanks.
-
-BTW your patch was space corrupted so I had to apply it by hand.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
