@@ -2,105 +2,195 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53EC1C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 14:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79EF8C433E6
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 15:01:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15B1A64E0B
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 14:26:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4101764EA6
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 15:01:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231587AbhBJO0W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Feb 2021 09:26:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40788 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231553AbhBJO0T (ORCPT
+        id S231478AbhBJPB2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Feb 2021 10:01:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33195 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231876AbhBJPBM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Feb 2021 09:26:19 -0500
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E219C06174A
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Feb 2021 06:25:39 -0800 (PST)
-Received: by mail-wr1-x42b.google.com with SMTP id g10so2833833wrx.1
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Feb 2021 06:25:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=4XM+OC4tEMQhllExIWHM2Z90/SpwG0aE0vvUDH0ec1c=;
-        b=qcyDNs5cQ0Gxvt4YcpPKri0nPrNJWIL6mtGae+kml9AyzGfK+ORzRHgLg3PuxvKvOu
-         DZfcqjGVFRcXVkTFVyfymASTAIZEspb/z4QQl8BtQlLwIAHed6ZA8OAQcAO4P5v4uJRq
-         j/OhDGMAWQkN0U4YannT3lG4SJeZvbFatsy5ELrKu886meKkOMnbAh6WRRhl5wmZ/+yP
-         FYq6foW2pb/9wEa6/ZpJOIqywykqDw7m+p+ekUEVrlhWDhEpiAieF3Earb1q310ZW6pl
-         qnx6rg3HxbwP4oN+M++Bp5TyIlmxwo+P8mHmtHNJyTPjQIcX62gHSYqomAoeGt6I4Sdn
-         slMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=4XM+OC4tEMQhllExIWHM2Z90/SpwG0aE0vvUDH0ec1c=;
-        b=aXrYdexn51k/Cj1Axfo7kPjGYZNWeK1FGwFJqArN1rhIvNKC7jMDVXaD7wADvi+0rB
-         6yeKzoSpGgwhJn440FhU3ZSuT/d2cM/s2jBualrj34zu8c9yqJApJVvAqkx+qsfGXYXU
-         QgLYOoFi5OPG54d9/5PaM6QOXzV9TbtrK8o8x3u6401BkC4nP/87SrDgvIyF1UAJW9W0
-         2akWq76Qe8pCKokco7bKSu1Fp3FZEK0RaqrldQerq8EA1Vn3n1YKTOsJcJPri6Ep9ABX
-         0O1gc6A6GDn7grZ/X0BJTHXacxQzF8u9Ze0bK7Yk0zMIdYvNco5BnHB9kcFZIXtxL1f4
-         dX1w==
-X-Gm-Message-State: AOAM531Bz3t5IQFzmqVIwFxTCHLfob4AntqulaB7GK6a3RA9iQ/ou191
-        CZOBp33SA3i/CKtEjdle8vI=
-X-Google-Smtp-Source: ABdhPJzE5GWdUN+WrfLFY5s3mKRaG8sZJcSml+ZtRlkfPOrJ1KZceJjRPZlTO+itsJbsbfunSHpvOQ==
-X-Received: by 2002:adf:fe0d:: with SMTP id n13mr3951209wrr.258.1612967138014;
-        Wed, 10 Feb 2021 06:25:38 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id 17sm2675288wmf.32.2021.02.10.06.25.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Feb 2021 06:25:37 -0800 (PST)
-Date:   Wed, 10 Feb 2021 15:25:35 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     chenxiang <chenxiang66@hisilicon.com>
-Cc:     clabbe@baylibre.com, gcherian@marvell.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linuxarm@openeuler.org,
-        prime.zeng@huawei.com
-Subject: Re: [PATCH 4/4] crypto: allwinner - Fix the parameter of
- dma_unmap_sg()
-Message-ID: <YCPs3wAF8D0yDKZN@Red>
-References: <1612853965-67777-1-git-send-email-chenxiang66@hisilicon.com>
- <1612853965-67777-5-git-send-email-chenxiang66@hisilicon.com>
+        Wed, 10 Feb 2021 10:01:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612969184;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=z2dPGwBXCWSVZ5g1pGm6UIqGI0ADcDy1IxFOAnmlTEE=;
+        b=AelKfLknNFdyA5KVYElplYnlKIi6cFRBdOXRzPzGGgu78Dhot5Lo/W7N22RGoWokXPez3L
+        KaLZSBfSQmZkBTbXLbewuIhtPr8S/aWUOtm/o/CPNM3pZQyuTiHOZ7RWf0s1CMuGwcI1Dq
+        H9OjjyVLqnklwIq2r7XCOXa+xL/1/iY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-297-mJ4p5JH4Ntiknlw1hnpfrw-1; Wed, 10 Feb 2021 09:59:42 -0500
+X-MC-Unique: mJ4p5JH4Ntiknlw1hnpfrw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DB76CC622;
+        Wed, 10 Feb 2021 14:59:38 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BA00710016F5;
+        Wed, 10 Feb 2021 14:59:34 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     torvalds@linux-foundation.org
+cc:     dhowells@redhat.com, Jarkko Sakkinen <jarkko@kernel.org>,
+        "Alexander A. Klimov" <grandmaster@al2klimov.de>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Alex Shi <alex.shi@linux.alibaba.com>,
+        Ben Boeckel <mathstuf@gmail.com>,
+        Denis Efremov <efremov@linux.com>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Jann Horn <jannh@google.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@linux.microsoft.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Tom Rix <trix@redhat.com>, YueHaibing <yuehaibing@huawei.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: [GIT PULL] keys: Collected minor fixes and cleanups
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1612853965-67777-5-git-send-email-chenxiang66@hisilicon.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date:   Wed, 10 Feb 2021 14:59:34 +0000
+Message-ID: <1322896.1612969174@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Tue, Feb 09, 2021 at 02:59:25PM +0800, chenxiang a écrit :
-> From: Xiang Chen <chenxiang66@hisilicon.com>
-> 
-> For function dma_unmap_sg(), the <nents> parameter should be number of
-> elements in the scatterlist prior to the mapping, not after the mapping.
-> So fix this usage.
-> 
-> Signed-off-by: Xiang Chen <chenxiang66@hisilicon.com>
-> ---
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 9 ++++++---
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   | 3 ++-
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 9 ++++++---
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c   | 3 ++-
->  4 files changed, 16 insertions(+), 8 deletions(-)
-> 
 
-Hello
+Hi Linus,
 
-Acked-by: Corentin LABBE <clabbe.montjoie@gmail.com>
-Tested-by: Corentin LABBE <clabbe.montjoie@gmail.com>
-Tested-on: sun8i-a83t-bananapi-m3
-Tested-on: sun50i-h6-pine-h64
-Tested-on: sun50i-h6-orangepi-one-plus
+Here's a set of minor keyrings fixes/cleanups that I've collected from
+various people for the upcoming merge window.
 
-Thanks
+A couple of them might, in theory, be visible to userspace:
+
+ (*) Make blacklist_vet_description() reject uppercase letters as they
+     don't match the all-lowercase hex string generated for a blacklist
+     search.
+
+     This may want reconsideration in the future, but, currently, you can't
+     add to the blacklist keyring from userspace and the only source of
+     blacklist keys generates lowercase descriptions.
+
+ (*) Fix blacklist_init() to use a new KEY_ALLOC_* flag to indicate that it
+     wants KEY_FLAG_KEEP to be set rather than passing KEY_FLAG_KEEP into
+     keyring_alloc() as KEY_FLAG_KEEP isn't a valid alloc flag.
+
+     This isn't currently a problem as the blacklist keyring isn't
+     currently writable by userspace.
+
+The rest of the patches are cleanups and I don't think they should have any
+visible effect.
+
+I've fixed the compilation error, added another patch and rebased to
+v5.11-rc4 since the last request.
+
+David
+---
+The following changes since commit 19c329f6808995b142b3966301f217c831e7cf31:
+
+  Linux 5.11-rc4 (2021-01-17 16:37:05 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/=
+keys-misc-20210126
+
+for you to fetch changes up to 8f0bfc25c907f38e7f9dc498e8f43000d77327ef:
+
+  watch_queue: rectify kernel-doc for init_watch() (2021-01-26 11:16:34 +00=
+00)
+
+----------------------------------------------------------------
+Keyrings miscellany
+
+----------------------------------------------------------------
+Alex Shi (2):
+      PKCS#7: drop function from kernel-doc pkcs7_validate_trust_one
+      certs/blacklist: fix kernel doc interface issue
+
+Alexander A. Klimov (1):
+      encrypted-keys: Replace HTTP links with HTTPS ones
+
+David Howells (1):
+      certs: Fix blacklist flag type confusion
+
+Denis Efremov (1):
+      security/keys: use kvfree_sensitive()
+
+Gabriel Krisman Bertazi (1):
+      watch_queue: Drop references to /dev/watch_queue
+
+Gustavo A. R. Silva (1):
+      security: keys: Fix fall-through warnings for Clang
+
+Jann Horn (1):
+      keys: Remove outdated __user annotations
+
+Krzysztof Kozlowski (1):
+      KEYS: asymmetric: Fix kerneldoc
+
+Lukas Bulwahn (1):
+      watch_queue: rectify kernel-doc for init_watch()
+
+Micka=C3=ABl Sala=C3=BCn (3):
+      certs: Fix blacklisted hexadecimal hash string check
+      PKCS#7: Fix missing include
+      certs: Replace K{U,G}IDT_INIT() with GLOBAL_ROOT_{U,G}ID
+
+Randy Dunlap (2):
+      security: keys: delete repeated words in comments
+      crypto: asymmetric_keys: fix some comments in pkcs7_parser.h
+
+Tianjia Zhang (1):
+      crypto: public_key: Remove redundant header file from public_key.h
+
+Tom Rix (2):
+      KEYS: remove redundant memset
+      keys: remove trailing semicolon in macro definition
+
+YueHaibing (1):
+      crypto: pkcs7: Use match_string() helper to simplify the code
+
+ Documentation/security/keys/core.rst     |  4 ++--
+ certs/blacklist.c                        | 10 +++++-----
+ certs/system_keyring.c                   |  5 +++--
+ crypto/asymmetric_keys/asymmetric_type.c |  6 ++++--
+ crypto/asymmetric_keys/pkcs7_parser.h    |  5 ++---
+ crypto/asymmetric_keys/pkcs7_trust.c     |  2 +-
+ crypto/asymmetric_keys/pkcs7_verify.c    |  9 ++++-----
+ include/crypto/public_key.h              |  1 -
+ include/keys/encrypted-type.h            |  2 +-
+ include/linux/key.h                      |  5 +++--
+ include/linux/verification.h             |  2 ++
+ kernel/watch_queue.c                     |  2 +-
+ samples/Kconfig                          |  2 +-
+ samples/watch_queue/watch_test.c         |  2 +-
+ security/integrity/ima/ima_mok.c         |  5 ++---
+ security/keys/Kconfig                    |  8 ++++----
+ security/keys/big_key.c                  |  9 +++------
+ security/keys/key.c                      |  2 ++
+ security/keys/keyctl.c                   |  2 +-
+ security/keys/keyctl_pkey.c              |  2 --
+ security/keys/keyring.c                  | 10 +++++-----
+ security/keys/process_keys.c             |  1 +
+ 22 files changed, 48 insertions(+), 48 deletions(-)
+
