@@ -7,59 +7,54 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE22C433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 07:22:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B9DC433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 07:22:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7E4F64E2A
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 07:22:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A452064E42
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 07:22:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232317AbhBJHW3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Feb 2021 02:22:29 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:50174 "EHLO fornost.hmeau.com"
+        id S230357AbhBJHWt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Feb 2021 02:22:49 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:50194 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232180AbhBJHW2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Feb 2021 02:22:28 -0500
+        id S232346AbhBJHWr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Feb 2021 02:22:47 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1l9joV-0001En-JY; Wed, 10 Feb 2021 18:21:28 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 10 Feb 2021 18:21:27 +1100
-Date:   Wed, 10 Feb 2021 18:21:27 +1100
+        id 1l9jou-0001Ez-Sb; Wed, 10 Feb 2021 18:21:54 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 10 Feb 2021 18:21:52 +1100
+Date:   Wed, 10 Feb 2021 18:21:52 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Geert Uytterhoeven <geert+renesas@glider.be>
-Cc:     Srujana Challa <schalla@marvell.com>,
-        Suheil Chandran <schandran@marvell.com>,
-        Lukasz Bartosik <lbartosik@marvell.com>,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: marvell - CRYPTO_DEV_OCTEONTX2_CPT should depend
- on ARCH_THUNDER2
-Message-ID: <20210210072127.GA4493@gondor.apana.org.au>
-References: <20210201134431.699419-1-geert+renesas@glider.be>
+To:     Jan Henrik Weinstock <jan.weinstock@rwth-aachen.de>
+Cc:     mpm@selenic.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] hw_random/timeriomem-rng: Fix cooldown period calculation
+Message-ID: <20210210072152.GB4493@gondor.apana.org.au>
+References: <947aa0ab-1f0c-44d6-943a-cf83a56ac5b8@rwthex-s2-a.rwth-ad.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210201134431.699419-1-geert+renesas@glider.be>
+In-Reply-To: <947aa0ab-1f0c-44d6-943a-cf83a56ac5b8@rwthex-s2-a.rwth-ad.de>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 01, 2021 at 02:44:31PM +0100, Geert Uytterhoeven wrote:
-> The Marvell OcteonTX2 CPT physical function PCI device is present only
-> on OcteonTx2 SoC, and not available as an independent PCIe endpoint.
-> Hence add a dependency on ARCH_THUNDER2, to prevent asking the user
-> about this driver when configuring a kernel without OcteonTx2 platform
-> support.
+On Mon, Feb 01, 2021 at 04:14:59PM +0100, Jan Henrik Weinstock wrote:
+> Ensure cooldown period tolerance of 1% is actually accounted for.
 > 
-> Fixes: 5e8ce8334734c5f2 ("crypto: marvell - add Marvell OcteonTX2 CPT PF driver")
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Signed-off-by: Jan Henrik Weinstock <jan.weinstock@rwth-aachen.de>
 > ---
->  drivers/crypto/marvell/Kconfig | 2 +-
+> 
+> Before patch, if period_us was less than 100us, no extra sleep time was
+> added. If it was more than 100us, only 1us extra time (and not 1%) is slept.
+> 
+>  drivers/char/hw_random/timeriomem-rng.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
+
+BTW your patch was space corrupted so I had to apply it by hand.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
