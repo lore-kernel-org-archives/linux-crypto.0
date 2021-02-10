@@ -3,32 +3,29 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 710D8C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 12:07:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22701C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 12:07:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26C4464E31
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 12:07:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF1B664E3B
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 12:07:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231253AbhBJMHJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Feb 2021 07:07:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38538 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230470AbhBJMFA (ORCPT
+        id S230470AbhBJMHL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Feb 2021 07:07:11 -0500
+Received: from smtp-bc0e.mail.infomaniak.ch ([45.157.188.14]:58901 "EHLO
+        smtp-bc0e.mail.infomaniak.ch" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231195AbhBJMFD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Feb 2021 07:05:00 -0500
-Received: from smtp-8fad.mail.infomaniak.ch (smtp-8fad.mail.infomaniak.ch [IPv6:2001:1600:3:17::8fad])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E8C7C0613D6
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Feb 2021 04:03:56 -0800 (PST)
-Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
-        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4DbJM90QZBzMqW88;
-        Wed, 10 Feb 2021 13:03:49 +0100 (CET)
+        Wed, 10 Feb 2021 07:05:03 -0500
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4DbJMJ3SkwzMpnnY;
+        Wed, 10 Feb 2021 13:03:56 +0100 (CET)
 Received: from localhost (unknown [23.97.221.149])
-        by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4DbJM65mq6zlh8Tk;
-        Wed, 10 Feb 2021 13:03:46 +0100 (CET)
+        by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4DbJMJ1RH9zlh8TM;
+        Wed, 10 Feb 2021 13:03:56 +0100 (CET)
 From:   =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
 To:     David Howells <dhowells@redhat.com>,
         David Woodhouse <dwmw2@infradead.org>,
@@ -45,10 +42,12 @@ Cc:     =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
         keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-security-module@vger.kernel.org
-Subject: [PATCH v6 0/5] Enable root to update the blacklist keyring
-Date:   Wed, 10 Feb 2021 13:04:05 +0100
-Message-Id: <20210210120410.471693-1-mic@digikod.net>
+Subject: [PATCH v6 5/5] certs: Allow root user to append signed hashes to the blacklist keyring
+Date:   Wed, 10 Feb 2021 13:04:10 +0100
+Message-Id: <20210210120410.471693-6-mic@digikod.net>
 X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20210210120410.471693-1-mic@digikod.net>
+References: <20210210120410.471693-1-mic@digikod.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -56,52 +55,247 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This new patch series is a rebase on David Howells's keys-misc branch.
-This mainly fixes UEFI DBX and the new Eric Snowberg's feature to import
-asymmetric keys to the blacklist keyring.
-I successfully tested this patch series with the 186 entries from
-https://uefi.org/sites/default/files/resources/dbxupdate_x64.bin (184
-binary hashes and 2 certificates).
+From: Mickaël Salaün <mic@linux.microsoft.com>
 
-The goal of these patches is to add a new configuration option to enable the
-root user to load signed keys in the blacklist keyring.  This keyring is useful
-to "untrust" certificates or files.  Enabling to safely update this keyring
-without recompiling the kernel makes it more usable.
+Add a kernel option SYSTEM_BLACKLIST_AUTH_UPDATE to enable the root user
+to dynamically add new keys to the blacklist keyring.  This enables to
+invalidate new certificates, either from being loaded in a keyring, or
+from being trusted in a PKCS#7 certificate chain.  This also enables to
+add new file hashes to be denied by the integrity infrastructure.
 
-This can be applied on top of David Howells's keys-next branch:
-https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-next
-Git commits can be found in https://github.com/l0kod/linux branch
-dyn-auth-blacklist-v6 commit fcf976b74ffcd4551683e6b70dbf5fb102cf9906 .
+Being able to untrust a certificate which could have normaly been
+trusted is a sensitive operation.  This is why adding new hashes to the
+blacklist keyring is only allowed when these hashes are signed and
+vouched by the builtin trusted keyring.  A blacklist hash is stored as a
+key description.  The PKCS#7 signature of this description must be
+provided as the key payload.
 
-Previous patch series:
-https://lore.kernel.org/lkml/20210128191705.3568820-1-mic@digikod.net/
+Marking a certificate as untrusted should be enforced while the system
+is running.  It is then forbiden to remove such blacklist keys.
 
-Regards,
+Update blacklist keyring, blacklist key and revoked certificate access rights:
+* allows the root user to search for a specific blacklisted hash, which
+  make sense because the descriptions are already viewable;
+* forbids key update (blacklist and asymmetric ones);
+* restricts kernel rights on the blacklist keyring to align with the
+  root user rights.
 
-Mickaël Salaün (5):
-  tools/certs: Add print-cert-tbs-hash.sh
-  certs: Check that builtin blacklist hashes are valid
-  certs: Make blacklist_vet_description() more strict
-  certs: Factor out the blacklist hash creation
-  certs: Allow root user to append signed hashes to the blacklist
-    keyring
+See help in tools/certs/print-cert-tbs-hash.sh .
 
- MAINTAINERS                                   |   2 +
- certs/.gitignore                              |   1 +
- certs/Kconfig                                 |  17 +-
- certs/Makefile                                |  17 +-
- certs/blacklist.c                             | 218 ++++++++++++++----
- crypto/asymmetric_keys/x509_public_key.c      |   3 +-
- include/keys/system_keyring.h                 |  14 +-
- scripts/check-blacklist-hashes.awk            |  37 +++
- .../platform_certs/keyring_handler.c          |  26 +--
- tools/certs/print-cert-tbs-hash.sh            |  91 ++++++++
- 10 files changed, 346 insertions(+), 80 deletions(-)
- create mode 100755 scripts/check-blacklist-hashes.awk
- create mode 100755 tools/certs/print-cert-tbs-hash.sh
+Cc: David Howells <dhowells@redhat.com>
+Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: Eric Snowberg <eric.snowberg@oracle.com>
+Cc: Jarkko Sakkinen <jarkko@kernel.org>
+Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
+---
 
+Changes since v5:
+* Rebase on keys-next, fix Kconfig conflict, and update the asymmetric
+  key rights added to the blacklist keyring by the new
+  add_key_to_revocation_list(): align with blacklist key rights by
+  removing KEY_POS_WRITE as a safeguard, and add
+  KEY_ALLOC_BYPASS_RESTRICTION to not be subject to
+  restrict_link_for_blacklist() that only allows blacklist key types to
+  be added to the keyring.
+* Change the return code for restrict_link_for_blacklist() from -EPERM
+  to -EOPNOTSUPP to align with asymmetric key keyrings.
 
-base-commit: 5bcd72358a7d7794ade0452ed12919b8c4d6ffc7
+Changes since v3:
+* Update commit message for print-cert-tbs-hash.sh .
+
+Changes since v2:
+* Add comment for blacklist_key_instantiate().
+---
+ certs/Kconfig     | 10 +++++
+ certs/blacklist.c | 96 ++++++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 85 insertions(+), 21 deletions(-)
+
+diff --git a/certs/Kconfig b/certs/Kconfig
+index 139940b54207..555491fdde0e 100644
+--- a/certs/Kconfig
++++ b/certs/Kconfig
+@@ -94,4 +94,14 @@ config SYSTEM_REVOCATION_KEYS
+ 	  containing X.509 certificates to be included in the default blacklist
+ 	  keyring.
+ 
++config SYSTEM_BLACKLIST_AUTH_UPDATE
++	bool "Allow root to add signed blacklist keys"
++	depends on SYSTEM_BLACKLIST_KEYRING
++	depends on SYSTEM_DATA_VERIFICATION
++	help
++	  If set, provide the ability to load new blacklist keys at run time if
++	  they are signed and vouched by a certificate from the builtin trusted
++	  keyring.  The PKCS#7 signature of the description is set in the key
++	  payload.  Blacklist keys cannot be removed.
++
+ endmenu
+diff --git a/certs/blacklist.c b/certs/blacklist.c
+index 9fe79597bda7..731e8e5bb6d8 100644
+--- a/certs/blacklist.c
++++ b/certs/blacklist.c
+@@ -15,6 +15,7 @@
+ #include <linux/err.h>
+ #include <linux/seq_file.h>
+ #include <linux/uidgid.h>
++#include <linux/verification.h>
+ #include <keys/system_keyring.h>
+ #include "blacklist.h"
+ #include "common.h"
+@@ -26,6 +27,9 @@
+  */
+ #define MAX_HASH_LEN	128
+ 
++#define BLACKLIST_KEY_PERM (KEY_POS_SEARCH | KEY_POS_VIEW | \
++			    KEY_USR_SEARCH | KEY_USR_VIEW)
++
+ static const char tbs_prefix[] = "tbs";
+ static const char bin_prefix[] = "bin";
+ 
+@@ -78,19 +82,51 @@ static int blacklist_vet_description(const char *desc)
+ 	return 0;
+ }
+ 
+-/*
+- * The hash to be blacklisted is expected to be in the description.  There will
+- * be no payload.
+- */
+-static int blacklist_preparse(struct key_preparsed_payload *prep)
++static int blacklist_key_instantiate(struct key *key,
++		struct key_preparsed_payload *prep)
+ {
+-	if (prep->datalen > 0)
+-		return -EINVAL;
+-	return 0;
++#ifdef CONFIG_SYSTEM_BLACKLIST_AUTH_UPDATE
++	int err;
++#endif
++
++	/* Sets safe default permissions for keys loaded by user space. */
++	key->perm = BLACKLIST_KEY_PERM;
++
++	/*
++	 * Skips the authentication step for builtin hashes, they are not
++	 * signed but still trusted.
++	 */
++	if (key->flags & (1 << KEY_FLAG_BUILTIN))
++		goto out;
++
++#ifdef CONFIG_SYSTEM_BLACKLIST_AUTH_UPDATE
++	/*
++	 * Verifies the description's PKCS#7 signature against the builtin
++	 * trusted keyring.
++	 */
++	err = verify_pkcs7_signature(key->description,
++			strlen(key->description), prep->data, prep->datalen,
++			NULL, VERIFYING_UNSPECIFIED_SIGNATURE, NULL, NULL);
++	if (err)
++		return err;
++#else
++	/*
++	 * It should not be possible to come here because the keyring doesn't
++	 * have KEY_USR_WRITE and the only other way to call this function is
++	 * for builtin hashes.
++	 */
++	WARN_ON_ONCE(1);
++	return -EPERM;
++#endif
++
++out:
++	return generic_key_instantiate(key, prep);
+ }
+ 
+-static void blacklist_free_preparse(struct key_preparsed_payload *prep)
++static int blacklist_key_update(struct key *key,
++		struct key_preparsed_payload *prep)
+ {
++	return -EPERM;
+ }
+ 
+ static void blacklist_describe(const struct key *key, struct seq_file *m)
+@@ -101,9 +137,8 @@ static void blacklist_describe(const struct key *key, struct seq_file *m)
+ static struct key_type key_type_blacklist = {
+ 	.name			= "blacklist",
+ 	.vet_description	= blacklist_vet_description,
+-	.preparse		= blacklist_preparse,
+-	.free_preparse		= blacklist_free_preparse,
+-	.instantiate		= generic_key_instantiate,
++	.instantiate		= blacklist_key_instantiate,
++	.update			= blacklist_key_update,
+ 	.describe		= blacklist_describe,
+ };
+ 
+@@ -152,8 +187,7 @@ static int mark_raw_hash_blacklisted(const char *hash)
+ 				   hash,
+ 				   NULL,
+ 				   0,
+-				   ((KEY_POS_ALL & ~KEY_POS_SETATTR) |
+-				    KEY_USR_VIEW),
++				   BLACKLIST_KEY_PERM,
+ 				   KEY_ALLOC_NOT_IN_QUOTA |
+ 				   KEY_ALLOC_BUILT_IN);
+ 	if (IS_ERR(key)) {
+@@ -172,8 +206,10 @@ int add_key_to_revocation_list(const char *data, size_t size)
+ 				   NULL,
+ 				   data,
+ 				   size,
+-				   ((KEY_POS_ALL & ~KEY_POS_SETATTR) | KEY_USR_VIEW),
+-				   KEY_ALLOC_NOT_IN_QUOTA | KEY_ALLOC_BUILT_IN);
++				   KEY_POS_VIEW | KEY_POS_READ | KEY_POS_SEARCH
++				   | KEY_USR_VIEW,
++				   KEY_ALLOC_NOT_IN_QUOTA | KEY_ALLOC_BUILT_IN
++				   | KEY_ALLOC_BYPASS_RESTRICTION);
+ 
+ 	if (IS_ERR(key)) {
+ 		pr_err("Problem with revocation key (%ld)\n", PTR_ERR(key));
+@@ -247,25 +283,43 @@ int is_binary_blacklisted(const u8 *hash, size_t hash_len)
+ }
+ EXPORT_SYMBOL_GPL(is_binary_blacklisted);
+ 
++static int restrict_link_for_blacklist(struct key *dest_keyring,
++		const struct key_type *type, const union key_payload *payload,
++		struct key *restrict_key)
++{
++	if (type == &key_type_blacklist)
++		return 0;
++	return -EOPNOTSUPP;
++}
++
+ /*
+  * Initialise the blacklist
+  */
+ static int __init blacklist_init(void)
+ {
+ 	const char *const *bl;
++	struct key_restriction *restriction;
+ 
+ 	if (register_key_type(&key_type_blacklist) < 0)
+ 		panic("Can't allocate system blacklist key type\n");
+ 
++	restriction = kzalloc(sizeof(*restriction), GFP_KERNEL);
++	if (!restriction)
++		panic("Can't allocate blacklist keyring restriction\n");
++	restriction->check = restrict_link_for_blacklist;
++
+ 	blacklist_keyring =
+ 		keyring_alloc(".blacklist",
+ 			      GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, current_cred(),
+-			      (KEY_POS_ALL & ~KEY_POS_SETATTR) |
+-			      KEY_USR_VIEW | KEY_USR_READ |
+-			      KEY_USR_SEARCH,
+-			      KEY_ALLOC_NOT_IN_QUOTA |
++			      KEY_POS_VIEW | KEY_POS_READ | KEY_POS_SEARCH |
++			      KEY_POS_WRITE |
++			      KEY_USR_VIEW | KEY_USR_READ | KEY_USR_SEARCH
++#ifdef CONFIG_SYSTEM_BLACKLIST_AUTH_UPDATE
++			      | KEY_USR_WRITE
++#endif
++			      , KEY_ALLOC_NOT_IN_QUOTA |
+ 			      KEY_ALLOC_SET_KEEP,
+-			      NULL, NULL);
++			      restriction, NULL);
+ 	if (IS_ERR(blacklist_keyring))
+ 		panic("Can't allocate system blacklist keyring\n");
+ 
 -- 
 2.30.0
 
