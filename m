@@ -2,314 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57B7AC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 12:09:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53EC1C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 14:26:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 034D764E0D
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 12:09:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15B1A64E0B
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 14:26:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230043AbhBJMJq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Feb 2021 07:09:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39196 "EHLO
+        id S231587AbhBJO0W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Feb 2021 09:26:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231261AbhBJMHp (ORCPT
+        with ESMTP id S231553AbhBJO0T (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Feb 2021 07:07:45 -0500
-Received: from smtp-42a8.mail.infomaniak.ch (smtp-42a8.mail.infomaniak.ch [IPv6:2001:1600:4:17::42a8])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76D8EC061793
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Feb 2021 04:04:01 -0800 (PST)
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
-        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4DbJMH1cf2zMprgS;
-        Wed, 10 Feb 2021 13:03:55 +0100 (CET)
-Received: from localhost (unknown [23.97.221.149])
-        by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4DbJMG6J1Zzlh8TN;
-        Wed, 10 Feb 2021 13:03:54 +0100 (CET)
-From:   =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
-To:     David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Snowberg <eric.snowberg@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <jmorris@namei.org>,
-        =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "Serge E . Hallyn" <serge@hallyn.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: [PATCH v6 4/5] certs: Factor out the blacklist hash creation
-Date:   Wed, 10 Feb 2021 13:04:09 +0100
-Message-Id: <20210210120410.471693-5-mic@digikod.net>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20210210120410.471693-1-mic@digikod.net>
-References: <20210210120410.471693-1-mic@digikod.net>
+        Wed, 10 Feb 2021 09:26:19 -0500
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E219C06174A
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Feb 2021 06:25:39 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id g10so2833833wrx.1
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Feb 2021 06:25:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=4XM+OC4tEMQhllExIWHM2Z90/SpwG0aE0vvUDH0ec1c=;
+        b=qcyDNs5cQ0Gxvt4YcpPKri0nPrNJWIL6mtGae+kml9AyzGfK+ORzRHgLg3PuxvKvOu
+         DZfcqjGVFRcXVkTFVyfymASTAIZEspb/z4QQl8BtQlLwIAHed6ZA8OAQcAO4P5v4uJRq
+         j/OhDGMAWQkN0U4YannT3lG4SJeZvbFatsy5ELrKu886meKkOMnbAh6WRRhl5wmZ/+yP
+         FYq6foW2pb/9wEa6/ZpJOIqywykqDw7m+p+ekUEVrlhWDhEpiAieF3Earb1q310ZW6pl
+         qnx6rg3HxbwP4oN+M++Bp5TyIlmxwo+P8mHmtHNJyTPjQIcX62gHSYqomAoeGt6I4Sdn
+         slMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=4XM+OC4tEMQhllExIWHM2Z90/SpwG0aE0vvUDH0ec1c=;
+        b=aXrYdexn51k/Cj1Axfo7kPjGYZNWeK1FGwFJqArN1rhIvNKC7jMDVXaD7wADvi+0rB
+         6yeKzoSpGgwhJn440FhU3ZSuT/d2cM/s2jBualrj34zu8c9yqJApJVvAqkx+qsfGXYXU
+         QgLYOoFi5OPG54d9/5PaM6QOXzV9TbtrK8o8x3u6401BkC4nP/87SrDgvIyF1UAJW9W0
+         2akWq76Qe8pCKokco7bKSu1Fp3FZEK0RaqrldQerq8EA1Vn3n1YKTOsJcJPri6Ep9ABX
+         0O1gc6A6GDn7grZ/X0BJTHXacxQzF8u9Ze0bK7Yk0zMIdYvNco5BnHB9kcFZIXtxL1f4
+         dX1w==
+X-Gm-Message-State: AOAM531Bz3t5IQFzmqVIwFxTCHLfob4AntqulaB7GK6a3RA9iQ/ou191
+        CZOBp33SA3i/CKtEjdle8vI=
+X-Google-Smtp-Source: ABdhPJzE5GWdUN+WrfLFY5s3mKRaG8sZJcSml+ZtRlkfPOrJ1KZceJjRPZlTO+itsJbsbfunSHpvOQ==
+X-Received: by 2002:adf:fe0d:: with SMTP id n13mr3951209wrr.258.1612967138014;
+        Wed, 10 Feb 2021 06:25:38 -0800 (PST)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id 17sm2675288wmf.32.2021.02.10.06.25.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Feb 2021 06:25:37 -0800 (PST)
+Date:   Wed, 10 Feb 2021 15:25:35 +0100
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     chenxiang <chenxiang66@hisilicon.com>
+Cc:     clabbe@baylibre.com, gcherian@marvell.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linuxarm@openeuler.org,
+        prime.zeng@huawei.com
+Subject: Re: [PATCH 4/4] crypto: allwinner - Fix the parameter of
+ dma_unmap_sg()
+Message-ID: <YCPs3wAF8D0yDKZN@Red>
+References: <1612853965-67777-1-git-send-email-chenxiang66@hisilicon.com>
+ <1612853965-67777-5-git-send-email-chenxiang66@hisilicon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <1612853965-67777-5-git-send-email-chenxiang66@hisilicon.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Mickaël Salaün <mic@linux.microsoft.com>
+Le Tue, Feb 09, 2021 at 02:59:25PM +0800, chenxiang a �crit :
+> From: Xiang Chen <chenxiang66@hisilicon.com>
+> 
+> For function dma_unmap_sg(), the <nents> parameter should be number of
+> elements in the scatterlist prior to the mapping, not after the mapping.
+> So fix this usage.
+> 
+> Signed-off-by: Xiang Chen <chenxiang66@hisilicon.com>
+> ---
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 9 ++++++---
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   | 3 ++-
+>  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 9 ++++++---
+>  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c   | 3 ++-
+>  4 files changed, 16 insertions(+), 8 deletions(-)
+> 
 
-Factor out the blacklist hash creation with the get_raw_hash() helper.
-This also centralize the "tbs" and "bin" prefixes and make them private,
-which help to manage them consistently.
+Hello
 
-Cc: David Howells <dhowells@redhat.com>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: David Woodhouse <dwmw2@infradead.org>
-Cc: Eric Snowberg <eric.snowberg@oracle.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Jarkko Sakkinen <jarkko@kernel.org>
-Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
----
+Acked-by: Corentin LABBE <clabbe.montjoie@gmail.com>
+Tested-by: Corentin LABBE <clabbe.montjoie@gmail.com>
+Tested-on: sun8i-a83t-bananapi-m3
+Tested-on: sun50i-h6-pine-h64
+Tested-on: sun50i-h6-orangepi-one-plus
 
-Changes since v5:
-* Rebase on keys-next and fix conflict as previously done by David
-  Howells.
-* Fix missing part to effectively handle UEFI DBX blacklisting.
-* Remove Jarkko's Acked-by because of the above changes.
-
-Changes since v2:
-* Add Jarkko's Acked-by.
----
- certs/blacklist.c                             | 76 ++++++++++++++-----
- crypto/asymmetric_keys/x509_public_key.c      |  3 +-
- include/keys/system_keyring.h                 | 14 +++-
- .../platform_certs/keyring_handler.c          | 26 +------
- 4 files changed, 73 insertions(+), 46 deletions(-)
-
-diff --git a/certs/blacklist.c b/certs/blacklist.c
-index 069d1dd0fa05..9fe79597bda7 100644
---- a/certs/blacklist.c
-+++ b/certs/blacklist.c
-@@ -107,11 +107,43 @@ static struct key_type key_type_blacklist = {
- 	.describe		= blacklist_describe,
- };
- 
-+static char *get_raw_hash(const u8 *hash, size_t hash_len,
-+		enum blacklist_hash_type hash_type)
-+{
-+	size_t type_len;
-+	const char *type_prefix;
-+	char *buffer, *p;
-+
-+	switch (hash_type) {
-+	case BLACKLIST_HASH_X509_TBS:
-+		type_len = sizeof(tbs_prefix) - 1;
-+		type_prefix = tbs_prefix;
-+		break;
-+	case BLACKLIST_HASH_BINARY:
-+		type_len = sizeof(bin_prefix) - 1;
-+		type_prefix = bin_prefix;
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+		return ERR_PTR(-EINVAL);
-+	}
-+	buffer = kmalloc(type_len + 1 + hash_len * 2 + 1, GFP_KERNEL);
-+	if (!buffer)
-+		return ERR_PTR(-ENOMEM);
-+	p = memcpy(buffer, type_prefix, type_len);
-+	p += type_len;
-+	*p++ = ':';
-+	bin2hex(p, hash, hash_len);
-+	p += hash_len * 2;
-+	*p = '\0';
-+	return buffer;
-+}
-+
- /**
-- * mark_hash_blacklisted - Add a hash to the system blacklist
-+ * mark_raw_hash_blacklisted - Add a hash to the system blacklist
-  * @hash: The hash as a hex string with a type prefix (eg. "tbs:23aa429783")
-  */
--int mark_hash_blacklisted(const char *hash)
-+static int mark_raw_hash_blacklisted(const char *hash)
- {
- 	key_ref_t key;
- 
-@@ -163,29 +195,36 @@ int is_key_on_revocation_list(struct pkcs7_message *pkcs7)
- 	return -ENOKEY;
- }
- 
-+int mark_hash_blacklisted(const u8 *hash, size_t hash_len,
-+		enum blacklist_hash_type hash_type)
-+{
-+	const char *buffer;
-+	int err;
-+
-+	buffer = get_raw_hash(hash, hash_len, hash_type);
-+	if (IS_ERR(buffer))
-+		return PTR_ERR(buffer);
-+	err = mark_raw_hash_blacklisted(buffer);
-+	kfree(buffer);
-+	return err;
-+}
-+
- /**
-  * is_hash_blacklisted - Determine if a hash is blacklisted
-  * @hash: The hash to be checked as a binary blob
-  * @hash_len: The length of the binary hash
-- * @type: Type of hash
-+ * @hash_type: Type of hash
-  */
--int is_hash_blacklisted(const u8 *hash, size_t hash_len, const char *type)
-+int is_hash_blacklisted(const u8 *hash, size_t hash_len,
-+		enum blacklist_hash_type hash_type)
- {
- 	key_ref_t kref;
--	size_t type_len = strlen(type);
--	char *buffer, *p;
-+	const char *buffer;
- 	int ret = 0;
- 
--	buffer = kmalloc(type_len + 1 + hash_len * 2 + 1, GFP_KERNEL);
--	if (!buffer)
--		return -ENOMEM;
--	p = memcpy(buffer, type, type_len);
--	p += type_len;
--	*p++ = ':';
--	bin2hex(p, hash, hash_len);
--	p += hash_len * 2;
--	*p = 0;
--
-+	buffer = get_raw_hash(hash, hash_len, hash_type);
-+	if (IS_ERR(buffer))
-+		return PTR_ERR(buffer);
- 	kref = keyring_search(make_key_ref(blacklist_keyring, true),
- 			      &key_type_blacklist, buffer, false);
- 	if (!IS_ERR(kref)) {
-@@ -200,7 +239,8 @@ EXPORT_SYMBOL_GPL(is_hash_blacklisted);
- 
- int is_binary_blacklisted(const u8 *hash, size_t hash_len)
- {
--	if (is_hash_blacklisted(hash, hash_len, "bin") == -EKEYREJECTED)
-+	if (is_hash_blacklisted(hash, hash_len, BLACKLIST_HASH_BINARY) ==
-+			-EKEYREJECTED)
- 		return -EPERM;
- 
- 	return 0;
-@@ -230,7 +270,7 @@ static int __init blacklist_init(void)
- 		panic("Can't allocate system blacklist keyring\n");
- 
- 	for (bl = blacklist_hashes; *bl; bl++)
--		if (mark_hash_blacklisted(*bl) < 0)
-+		if (mark_raw_hash_blacklisted(*bl) < 0)
- 			pr_err("- blacklisting failed\n");
- 	return 0;
- }
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index ae450eb8be14..3b7dba5e4cd9 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -81,7 +81,8 @@ int x509_get_sig_params(struct x509_certificate *cert)
- 	if (ret < 0)
- 		goto error_2;
- 
--	ret = is_hash_blacklisted(sig->digest, sig->digest_size, "tbs");
-+	ret = is_hash_blacklisted(sig->digest, sig->digest_size,
-+				  BLACKLIST_HASH_X509_TBS);
- 	if (ret == -EKEYREJECTED) {
- 		pr_err("Cert %*phN is blacklisted\n",
- 		       sig->digest_size, sig->digest);
-diff --git a/include/keys/system_keyring.h b/include/keys/system_keyring.h
-index 61f98739e8b1..f9125135969e 100644
---- a/include/keys/system_keyring.h
-+++ b/include/keys/system_keyring.h
-@@ -10,6 +10,13 @@
- 
- #include <linux/key.h>
- 
-+enum blacklist_hash_type {
-+	/* TBSCertificate hash */
-+	BLACKLIST_HASH_X509_TBS = 1,
-+	/* Raw data hash */
-+	BLACKLIST_HASH_BINARY = 2,
-+};
-+
- #ifdef CONFIG_SYSTEM_TRUSTED_KEYRING
- 
- extern int restrict_link_by_builtin_trusted(struct key *keyring,
-@@ -33,15 +40,16 @@ extern int restrict_link_by_builtin_and_secondary_trusted(
- 
- extern struct pkcs7_message *pkcs7;
- #ifdef CONFIG_SYSTEM_BLACKLIST_KEYRING
--extern int mark_hash_blacklisted(const char *hash);
-+extern int mark_hash_blacklisted(const u8 *hash, size_t hash_len,
-+			       enum blacklist_hash_type hash_type);
- extern int add_key_to_revocation_list(const char *data, size_t size);
- extern int is_hash_blacklisted(const u8 *hash, size_t hash_len,
--			       const char *type);
-+			       enum blacklist_hash_type hash_type);
- extern int is_binary_blacklisted(const u8 *hash, size_t hash_len);
- extern int is_key_on_revocation_list(struct pkcs7_message *pkcs7);
- #else
- static inline int is_hash_blacklisted(const u8 *hash, size_t hash_len,
--				      const char *type)
-+				      enum blacklist_hash_type hash_type)
- {
- 	return 0;
- }
-diff --git a/security/integrity/platform_certs/keyring_handler.c b/security/integrity/platform_certs/keyring_handler.c
-index 5604bd57c990..9e4f156b356e 100644
---- a/security/integrity/platform_certs/keyring_handler.c
-+++ b/security/integrity/platform_certs/keyring_handler.c
-@@ -15,35 +15,13 @@ static efi_guid_t efi_cert_x509_sha256_guid __initdata =
- 	EFI_CERT_X509_SHA256_GUID;
- static efi_guid_t efi_cert_sha256_guid __initdata = EFI_CERT_SHA256_GUID;
- 
--/*
-- * Blacklist a hash.
-- */
--static __init void uefi_blacklist_hash(const char *source, const void *data,
--				       size_t len, const char *type,
--				       size_t type_len)
--{
--	char *hash, *p;
--
--	hash = kmalloc(type_len + len * 2 + 1, GFP_KERNEL);
--	if (!hash)
--		return;
--	p = memcpy(hash, type, type_len);
--	p += type_len;
--	bin2hex(p, data, len);
--	p += len * 2;
--	*p = 0;
--
--	mark_hash_blacklisted(hash);
--	kfree(hash);
--}
--
- /*
-  * Blacklist an X509 TBS hash.
-  */
- static __init void uefi_blacklist_x509_tbs(const char *source,
- 					   const void *data, size_t len)
- {
--	uefi_blacklist_hash(source, data, len, "tbs:", 4);
-+	mark_hash_blacklisted(data, len, BLACKLIST_HASH_X509_TBS);
- }
- 
- /*
-@@ -52,7 +30,7 @@ static __init void uefi_blacklist_x509_tbs(const char *source,
- static __init void uefi_blacklist_binary(const char *source,
- 					 const void *data, size_t len)
- {
--	uefi_blacklist_hash(source, data, len, "bin:", 4);
-+	mark_hash_blacklisted(data, len, BLACKLIST_HASH_BINARY);
- }
- 
- /*
--- 
-2.30.0
-
+Thanks
