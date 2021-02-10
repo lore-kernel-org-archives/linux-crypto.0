@@ -2,195 +2,127 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79EF8C433E6
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 15:01:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92E57C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 16:00:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4101764EA6
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 15:01:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5938E64D79
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 16:00:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231478AbhBJPB2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Feb 2021 10:01:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33195 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231876AbhBJPBM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Feb 2021 10:01:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612969184;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=z2dPGwBXCWSVZ5g1pGm6UIqGI0ADcDy1IxFOAnmlTEE=;
-        b=AelKfLknNFdyA5KVYElplYnlKIi6cFRBdOXRzPzGGgu78Dhot5Lo/W7N22RGoWokXPez3L
-        KaLZSBfSQmZkBTbXLbewuIhtPr8S/aWUOtm/o/CPNM3pZQyuTiHOZ7RWf0s1CMuGwcI1Dq
-        H9OjjyVLqnklwIq2r7XCOXa+xL/1/iY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-mJ4p5JH4Ntiknlw1hnpfrw-1; Wed, 10 Feb 2021 09:59:42 -0500
-X-MC-Unique: mJ4p5JH4Ntiknlw1hnpfrw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DB76CC622;
-        Wed, 10 Feb 2021 14:59:38 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BA00710016F5;
-        Wed, 10 Feb 2021 14:59:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     torvalds@linux-foundation.org
-cc:     dhowells@redhat.com, Jarkko Sakkinen <jarkko@kernel.org>,
-        "Alexander A. Klimov" <grandmaster@al2klimov.de>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Alex Shi <alex.shi@linux.alibaba.com>,
-        Ben Boeckel <mathstuf@gmail.com>,
-        Denis Efremov <efremov@linux.com>,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Jann Horn <jannh@google.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Tom Rix <trix@redhat.com>, YueHaibing <yuehaibing@huawei.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: [GIT PULL] keys: Collected minor fixes and cleanups
+        id S232052AbhBJQAU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Feb 2021 11:00:20 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53014 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232071AbhBJQAO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Feb 2021 11:00:14 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DC59864D99
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Feb 2021 15:59:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1612972774;
+        bh=OheMS+Crw4DV6H79TF/EQ4bAVw8DHnMKZ8VK2n9Z+K0=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=gq3zydeHmg1YSrSXq3JmS4O1Yf/Eljpw1UeqShLA8DLl5UPgJMwiRtzXsMMrgZEaQ
+         HYvS7JXCGmNYo8YzATIRrHm777c5P/yG2zyQY+F2C180sUI2J3y4Wxg7UOtxq0UgHg
+         AQ1cwt4tXRRqgdnAPv0KAxLVVG9lD2obqLPyoS44mvgbuy6Ixjqq620GN/EQhe7mfE
+         WtOtNRgSpFFbIDd8no15b6a4uocFJ8W5R3+tFJ/8OTKxIrfVEDgHU4O8QYuiFmMg09
+         ISg+VwmUB6cTykNKTSlthrz3jpA5fJhYnb/iKpFlRDrpgWvcy8B1YtzSpwrWneJcl5
+         BYyWoXhy9zaZw==
+Received: by mail-oi1-f181.google.com with SMTP id 18so2515140oiz.7
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Feb 2021 07:59:33 -0800 (PST)
+X-Gm-Message-State: AOAM530eAb3NbAQXC/gTDIy9jhtit7VgPVr+YfAAq1CM05nO5ZZ1i+iV
+        vzjRjO8mI8OWpf+7Svuz3X8Csqj0CMycev/dSUg=
+X-Google-Smtp-Source: ABdhPJz4WMkxFVIoivofDpIjsJ72koUc3UyqSVbtWCg2LGI2L5hmvjiDfO3+ZMExyQwTlRsQlUc7iiz5VLcTy8xB/CU=
+X-Received: by 2002:aca:4bd1:: with SMTP id y200mr2616840oia.33.1612972773229;
+ Wed, 10 Feb 2021 07:59:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date:   Wed, 10 Feb 2021 14:59:34 +0000
-Message-ID: <1322896.1612969174@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <20210210071556.GA24991@gondor.apana.org.au>
+In-Reply-To: <20210210071556.GA24991@gondor.apana.org.au>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 10 Feb 2021 16:59:22 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXF=HVGmQYjiDiYJTi3fgZWPakfgT3PujsaxyCi_j6Bv-Q@mail.gmail.com>
+Message-ID: <CAMj1kXF=HVGmQYjiDiYJTi3fgZWPakfgT3PujsaxyCi_j6Bv-Q@mail.gmail.com>
+Subject: Re: [PATCH] crypto: serpent - Fix sparse byte order warnings
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, 10 Feb 2021 at 08:16, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> This patch fixes the byte order markings in serpent.
+>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Hi Linus,
+Tested-by: Ard Biesheuvel <ardb@kernel.org> # arm64 big-endian
 
-Here's a set of minor keyrings fixes/cleanups that I've collected from
-various people for the upcoming merge window.
-
-A couple of them might, in theory, be visible to userspace:
-
- (*) Make blacklist_vet_description() reject uppercase letters as they
-     don't match the all-lowercase hex string generated for a blacklist
-     search.
-
-     This may want reconsideration in the future, but, currently, you can't
-     add to the blacklist keyring from userspace and the only source of
-     blacklist keys generates lowercase descriptions.
-
- (*) Fix blacklist_init() to use a new KEY_ALLOC_* flag to indicate that it
-     wants KEY_FLAG_KEEP to be set rather than passing KEY_FLAG_KEEP into
-     keyring_alloc() as KEY_FLAG_KEEP isn't a valid alloc flag.
-
-     This isn't currently a problem as the blacklist keyring isn't
-     currently writable by userspace.
-
-The rest of the patches are cleanups and I don't think they should have any
-visible effect.
-
-I've fixed the compilation error, added another patch and rebased to
-v5.11-rc4 since the last request.
-
-David
----
-The following changes since commit 19c329f6808995b142b3966301f217c831e7cf31:
-
-  Linux 5.11-rc4 (2021-01-17 16:37:05 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/=
-keys-misc-20210126
-
-for you to fetch changes up to 8f0bfc25c907f38e7f9dc498e8f43000d77327ef:
-
-  watch_queue: rectify kernel-doc for init_watch() (2021-01-26 11:16:34 +00=
-00)
-
-----------------------------------------------------------------
-Keyrings miscellany
-
-----------------------------------------------------------------
-Alex Shi (2):
-      PKCS#7: drop function from kernel-doc pkcs7_validate_trust_one
-      certs/blacklist: fix kernel doc interface issue
-
-Alexander A. Klimov (1):
-      encrypted-keys: Replace HTTP links with HTTPS ones
-
-David Howells (1):
-      certs: Fix blacklist flag type confusion
-
-Denis Efremov (1):
-      security/keys: use kvfree_sensitive()
-
-Gabriel Krisman Bertazi (1):
-      watch_queue: Drop references to /dev/watch_queue
-
-Gustavo A. R. Silva (1):
-      security: keys: Fix fall-through warnings for Clang
-
-Jann Horn (1):
-      keys: Remove outdated __user annotations
-
-Krzysztof Kozlowski (1):
-      KEYS: asymmetric: Fix kerneldoc
-
-Lukas Bulwahn (1):
-      watch_queue: rectify kernel-doc for init_watch()
-
-Micka=C3=ABl Sala=C3=BCn (3):
-      certs: Fix blacklisted hexadecimal hash string check
-      PKCS#7: Fix missing include
-      certs: Replace K{U,G}IDT_INIT() with GLOBAL_ROOT_{U,G}ID
-
-Randy Dunlap (2):
-      security: keys: delete repeated words in comments
-      crypto: asymmetric_keys: fix some comments in pkcs7_parser.h
-
-Tianjia Zhang (1):
-      crypto: public_key: Remove redundant header file from public_key.h
-
-Tom Rix (2):
-      KEYS: remove redundant memset
-      keys: remove trailing semicolon in macro definition
-
-YueHaibing (1):
-      crypto: pkcs7: Use match_string() helper to simplify the code
-
- Documentation/security/keys/core.rst     |  4 ++--
- certs/blacklist.c                        | 10 +++++-----
- certs/system_keyring.c                   |  5 +++--
- crypto/asymmetric_keys/asymmetric_type.c |  6 ++++--
- crypto/asymmetric_keys/pkcs7_parser.h    |  5 ++---
- crypto/asymmetric_keys/pkcs7_trust.c     |  2 +-
- crypto/asymmetric_keys/pkcs7_verify.c    |  9 ++++-----
- include/crypto/public_key.h              |  1 -
- include/keys/encrypted-type.h            |  2 +-
- include/linux/key.h                      |  5 +++--
- include/linux/verification.h             |  2 ++
- kernel/watch_queue.c                     |  2 +-
- samples/Kconfig                          |  2 +-
- samples/watch_queue/watch_test.c         |  2 +-
- security/integrity/ima/ima_mok.c         |  5 ++---
- security/keys/Kconfig                    |  8 ++++----
- security/keys/big_key.c                  |  9 +++------
- security/keys/key.c                      |  2 ++
- security/keys/keyctl.c                   |  2 +-
- security/keys/keyctl_pkey.c              |  2 --
- security/keys/keyring.c                  | 10 +++++-----
- security/keys/process_keys.c             |  1 +
- 22 files changed, 48 insertions(+), 48 deletions(-)
-
+>
+> diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
+> index 236c87547a17..45f98b750053 100644
+> --- a/crypto/serpent_generic.c
+> +++ b/crypto/serpent_generic.c
+> @@ -272,6 +272,7 @@ int __serpent_setkey(struct serpent_ctx *ctx, const u8 *key,
+>         u32 *k = ctx->expkey;
+>         u8  *k8 = (u8 *)k;
+>         u32 r0, r1, r2, r3, r4;
+> +       __le32 *lk;
+>         int i;
+>
+>         /* Copy key, add padding */
+> @@ -283,22 +284,32 @@ int __serpent_setkey(struct serpent_ctx *ctx, const u8 *key,
+>         while (i < SERPENT_MAX_KEY_SIZE)
+>                 k8[i++] = 0;
+>
+> +       lk = (__le32 *)k;
+> +       k[0] = le32_to_cpu(lk[0]);
+> +       k[1] = le32_to_cpu(lk[1]);
+> +       k[2] = le32_to_cpu(lk[2]);
+> +       k[3] = le32_to_cpu(lk[3]);
+> +       k[4] = le32_to_cpu(lk[4]);
+> +       k[5] = le32_to_cpu(lk[5]);
+> +       k[6] = le32_to_cpu(lk[6]);
+> +       k[7] = le32_to_cpu(lk[7]);
+> +
+>         /* Expand key using polynomial */
+>
+> -       r0 = le32_to_cpu(k[3]);
+> -       r1 = le32_to_cpu(k[4]);
+> -       r2 = le32_to_cpu(k[5]);
+> -       r3 = le32_to_cpu(k[6]);
+> -       r4 = le32_to_cpu(k[7]);
+> -
+> -       keyiter(le32_to_cpu(k[0]), r0, r4, r2, 0, 0);
+> -       keyiter(le32_to_cpu(k[1]), r1, r0, r3, 1, 1);
+> -       keyiter(le32_to_cpu(k[2]), r2, r1, r4, 2, 2);
+> -       keyiter(le32_to_cpu(k[3]), r3, r2, r0, 3, 3);
+> -       keyiter(le32_to_cpu(k[4]), r4, r3, r1, 4, 4);
+> -       keyiter(le32_to_cpu(k[5]), r0, r4, r2, 5, 5);
+> -       keyiter(le32_to_cpu(k[6]), r1, r0, r3, 6, 6);
+> -       keyiter(le32_to_cpu(k[7]), r2, r1, r4, 7, 7);
+> +       r0 = k[3];
+> +       r1 = k[4];
+> +       r2 = k[5];
+> +       r3 = k[6];
+> +       r4 = k[7];
+> +
+> +       keyiter(k[0], r0, r4, r2, 0, 0);
+> +       keyiter(k[1], r1, r0, r3, 1, 1);
+> +       keyiter(k[2], r2, r1, r4, 2, 2);
+> +       keyiter(k[3], r3, r2, r0, 3, 3);
+> +       keyiter(k[4], r4, r3, r1, 4, 4);
+> +       keyiter(k[5], r0, r4, r2, 5, 5);
+> +       keyiter(k[6], r1, r0, r3, 6, 6);
+> +       keyiter(k[7], r2, r1, r4, 7, 7);
+>
+>         keyiter(k[0], r3, r2, r0, 8, 8);
+>         keyiter(k[1], r4, r3, r1, 9, 9);
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
