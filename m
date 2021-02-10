@@ -2,54 +2,74 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8FE5C4332D
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 07:26:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F349EC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 07:36:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8910F64E45
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 07:26:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A220464E42
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 07:36:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232626AbhBJH0J (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Feb 2021 02:26:09 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:50370 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232539AbhBJHZV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Feb 2021 02:25:21 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1l9jrS-0001J0-4X; Wed, 10 Feb 2021 18:24:31 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 10 Feb 2021 18:24:30 +1100
-Date:   Wed, 10 Feb 2021 18:24:30 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tian Tao <tiantao6@hisilicon.com>
-Cc:     mpm@selenic.com, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] hw_random: timeriomem_rng: Use device-managed
- registration API
-Message-ID: <20210210072429.GO4493@gondor.apana.org.au>
-References: <1612665545-43612-1-git-send-email-tiantao6@hisilicon.com>
+        id S229650AbhBJHgL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Feb 2021 02:36:11 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:12889 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232364AbhBJHgK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Feb 2021 02:36:10 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DbBMw240vz7jXv
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Feb 2021 15:34:04 +0800 (CST)
+Received: from localhost.localdomain (10.175.102.38) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.498.0; Wed, 10 Feb 2021 15:35:17 +0800
+From:   Wei Yongjun <weiyongjun1@huawei.com>
+To:     Hulk Robot <hulkci@huawei.com>,
+        Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
+        Declan Murphy <declan.murphy@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC:     Wei Yongjun <weiyongjun1@huawei.com>,
+        <linux-crypto@vger.kernel.org>
+Subject: [PATCH -next] crypto: keembay-ocs-hcu - Fix error return code in kmb_ocs_hcu_probe()
+Date:   Wed, 10 Feb 2021 07:43:50 +0000
+Message-ID: <20210210074350.867341-1-weiyongjun1@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1612665545-43612-1-git-send-email-tiantao6@hisilicon.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type:   text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+X-Originating-IP: [10.175.102.38]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Feb 07, 2021 at 10:39:05AM +0800, Tian Tao wrote:
-> Use devm_hwrng_register to get rid of manual unregistration.
-> 
-> Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
-> ---
->  drivers/char/hw_random/timeriomem-rng.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+Fix to return negative error code -ENOMEM from the error handling
+case instead of 0, as done elsewhere in this function.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Fixes: 472b04444cd3 ("crypto: keembay - Add Keem Bay OCS HCU driver")
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+---
+ drivers/crypto/keembay/keembay-ocs-hcu-core.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/keembay/keembay-ocs-hcu-core.c b/drivers/crypto/keembay/keembay-ocs-hcu-core.c
+index c4b97b4160e9..322c51a6936f 100644
+--- a/drivers/crypto/keembay/keembay-ocs-hcu-core.c
++++ b/drivers/crypto/keembay/keembay-ocs-hcu-core.c
+@@ -1220,8 +1220,10 @@ static int kmb_ocs_hcu_probe(struct platform_device *pdev)
+ 
+ 	/* Initialize crypto engine */
+ 	hcu_dev->engine = crypto_engine_alloc_init(dev, 1);
+-	if (!hcu_dev->engine)
++	if (!hcu_dev->engine) {
++		rc = -ENOMEM;
+ 		goto list_del;
++	}
+ 
+ 	rc = crypto_engine_start(hcu_dev->engine);
+ 	if (rc) {
+
