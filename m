@@ -7,54 +7,50 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BC7FC433DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBCB2C433E6
 	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 07:23:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3AA3E64E42
+	by mail.kernel.org (Postfix) with ESMTP id 8EA2864E02
 	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 07:23:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232389AbhBJHXb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Feb 2021 02:23:31 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:50240 "EHLO fornost.hmeau.com"
+        id S232405AbhBJHXe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Feb 2021 02:23:34 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:50234 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232341AbhBJHXa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Feb 2021 02:23:30 -0500
+        id S232395AbhBJHXc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Feb 2021 02:23:32 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1l9jpj-0001FV-19; Wed, 10 Feb 2021 18:22:44 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 10 Feb 2021 18:22:42 +1100
-Date:   Wed, 10 Feb 2021 18:22:42 +1100
+        id 1l9jpb-0001FL-HF; Wed, 10 Feb 2021 18:22:36 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 10 Feb 2021 18:22:35 +1100
+Date:   Wed, 10 Feb 2021 18:22:35 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Daniele Alessandrelli <daniele.alessandrelli@linux.intel.com>
-Cc:     daniele.alessandrelli@intel.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: ecdh_helper - Ensure 'len >= secret.len' in
- decode_key()
-Message-ID: <20210210072242.GF4493@gondor.apana.org.au>
-References: <20210203112837.203732-1-daniele.alessandrelli@linux.intel.com>
+To:     Yang Li <yang.lee@linux.alibaba.com>
+Cc:     davem@davemloft.net, mpe@ellerman.id.au, benh@kernel.crashing.org,
+        paulus@samba.org, linux-crypto@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: powerpc: remove unneeded semicolon
+Message-ID: <20210210072235.GE4493@gondor.apana.org.au>
+References: <1612235850-87446-1-git-send-email-yang.lee@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210203112837.203732-1-daniele.alessandrelli@linux.intel.com>
+In-Reply-To: <1612235850-87446-1-git-send-email-yang.lee@linux.alibaba.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 03, 2021 at 11:28:37AM +0000, Daniele Alessandrelli wrote:
-> From: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+On Tue, Feb 02, 2021 at 11:17:30AM +0800, Yang Li wrote:
+> Eliminate the following coccicheck warning:
+> ./arch/powerpc/crypto/sha256-spe-glue.c:132:2-3: Unneeded
+> semicolon
 > 
-> The length ('len' parameter) passed to crypto_ecdh_decode_key() is never
-> checked against the length encoded in the passed buffer ('buf'
-> parameter). This could lead to an out-of-bounds access when the passed
-> length is less than the encoded length.
-> 
-> Add a check to prevent that.
-> 
-> Signed-off-by: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
 > ---
->  crypto/ecdh_helper.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  arch/powerpc/crypto/sha256-spe-glue.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
