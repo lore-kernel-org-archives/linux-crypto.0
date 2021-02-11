@@ -7,47 +7,46 @@ X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02413C433DB
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Feb 2021 16:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C9F4C433DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Feb 2021 16:10:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C58BF64E87
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Feb 2021 16:05:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40B9A64E87
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Feb 2021 16:10:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229617AbhBKQFL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Feb 2021 11:05:11 -0500
-Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:64722 "EHLO
+        id S231216AbhBKQJ4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 11 Feb 2021 11:09:56 -0500
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:14672 "EHLO
         mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230200AbhBKQBM (ORCPT
+        by vger.kernel.org with ESMTP id S231258AbhBKQAw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Feb 2021 11:01:12 -0500
+        Thu, 11 Feb 2021 11:00:52 -0500
 Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-        by mx0a-0016f401.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11BFuYDp009078;
-        Thu, 11 Feb 2021 08:00:19 -0800
+        by mx0a-0016f401.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11BFuZX0009103;
+        Thu, 11 Feb 2021 08:00:07 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pfpt0220;
- bh=tkrDR/76BCAwOsjLb8JXNueXEW3t7nf+ie6o48yrmUA=;
- b=f4Cm22FKxwR+jpxeAliy8tY1/aoM4j9QHrkcPbXMxnJuI0hAMbxYBzP1HZMSoUEGn+Br
- z21vKIkzBl73RsClkMkI+f7g+IVmxq5XeXJ/X0ZPIRkhtzC+G7jGwhlbka5nx3OnuEJv
- lMRUokjv5vv97GK6BpiegMbeg4le28iNcUIYj2Uk05P3AsOW1nLCeXLviSif3V3nABWo
- ZfYloVxX+jn2KFR+yGbqsXC6LXQCpU+N6I/L7H/jdcT3RMVdSf4HwsvqieYBuObVevFL
- dbVsv3GhJQe5WYDiY4HcGejbMqgsa2aN2MadolpU2G7U1WYZV21A9x4ujQGc5zQRZhvq rg== 
+ content-type; s=pfpt0220; bh=AJBSpGnKNUa+nD4zgs0IsdxDLbuL/yHjAmN1WJEM690=;
+ b=Rcr+NI0BzOTW/g+RNALyiOV+7wzQ2vT5/j8rJbh94rVQLMZ7nckSIiNhErIllUIHLOim
+ YI2+Ips4/GjP3FGmlb0KYKBYwWzDYA8oZpEAGcMyYDJhRYjB89RqBIJg9iEOy6NIFLw+
+ bD38Jhgi2gLfk6+dI6QisV5SOaMU54v2vrrypRs24/avzYLr1q0AjoGWuYPcSQ4SEY3Z
+ hPUnQtELPeByUMn/5ufp2TX3Mpc54ORqumi5F2+OaK8PFFpaIEsyX04u5hY0KVApEv+p
+ c3erx5vd5fVQoR7FpvqNXbuj1SwoUeEVZQ0j4TyNiIc5+pPEOcYOHTNcFLcccFsQg9tB sg== 
 Received: from dc5-exch01.marvell.com ([199.233.59.181])
-        by mx0a-0016f401.pphosted.com with ESMTP id 36hsbrqjnw-3
+        by mx0a-0016f401.pphosted.com with ESMTP id 36hsbrqjm3-3
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Thu, 11 Feb 2021 08:00:19 -0800
-Received: from SC-EXCH01.marvell.com (10.93.176.81) by DC5-EXCH01.marvell.com
+        Thu, 11 Feb 2021 08:00:07 -0800
+Received: from SC-EXCH02.marvell.com (10.93.176.82) by DC5-EXCH01.marvell.com
  (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 11 Feb
- 2021 08:00:16 -0800
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by SC-EXCH01.marvell.com
- (10.93.176.81) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 11 Feb
- 2021 08:00:16 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Thu, 11 Feb 2021 08:00:16 -0800
+ 2021 08:00:06 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by SC-EXCH02.marvell.com
+ (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 11 Feb
+ 2021 08:00:05 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Thu, 11 Feb 2021 08:00:05 -0800
 Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-        by maili.marvell.com (Postfix) with ESMTP id 128E63F704E;
-        Thu, 11 Feb 2021 08:00:11 -0800 (PST)
+        by maili.marvell.com (Postfix) with ESMTP id 5B1753F7044;
+        Thu, 11 Feb 2021 07:59:59 -0800 (PST)
 From:   Geetha sowjanya <gakula@marvell.com>
 To:     <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-crypto@vger.kernel.org>
@@ -55,17 +54,15 @@ CC:     <davem@davemloft.net>, <kuba@kernel.org>, <sgoutham@marvell.com>,
         <lcherian@marvell.com>, <hkelam@marvell.com>,
         <sbhatta@marvell.com>, <jerinj@marvell.com>,
         <bbrezillon@kernel.org>, <arno@natisbad.org>,
-        <schalla@marvell.com>, Geetha sowjanya <gakula@marvell.com>,
-        "Sunil Kovvuri Goutham" <Sunil.Goutham@cavium.com>
-Subject: [net-next v6 13/14] octeontx2-af: cn10k: Add RPM Rx/Tx stats support
-Date:   Thu, 11 Feb 2021 21:28:33 +0530
-Message-ID: <20210211155834.31874-14-gakula@marvell.com>
+        <schalla@marvell.com>, Geetha sowjanya <gakula@marvell.com>
+Subject: [net-next v6 11/14] octeontx2-pf: cn10k: Get max mtu supported from admin function
+Date:   Thu, 11 Feb 2021 21:28:31 +0530
+Message-ID: <20210211155834.31874-12-gakula@marvell.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210211155834.31874-1-gakula@marvell.com>
 References: <20210211155834.31874-1-gakula@marvell.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
  definitions=2021-02-11_07:2021-02-11,2021-02-11 signatures=0
 Precedence: bulk
@@ -74,509 +71,264 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Hariprasad Kelam <hkelam@marvell.com>
 
-RPM supports below list of counters as an extension to existing counters
- *  class based flow control pause frames
- *  vlan/jabber/fragmented packets
- *  fcs/alignment/oversized error packets
+CN10K supports max MTU of 16K on LMAC links and 64k on LBK
+links and Octeontx2 silicon supports 9K mtu on both links.
+Get the same from nix_get_hw_info mbox message in netdev probe.
 
-This patch adds support to display supported RPM counters via debugfs
-and define new mbox rpm_stats to read all support counters.
+This patch also calculates receive buffer size required based
+on the MTU set.
 
 Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
 Signed-off-by: Geetha sowjanya <gakula@marvell.com>
-Signed-off-by: Sunil Kovvuri Goutham <Sunil.Goutham@cavium.com>
+Signed-off-by: Sunil Goutham <sgoutham@marvell.com>
 ---
- .../net/ethernet/marvell/octeontx2/af/cgx.c   |  10 +-
- .../net/ethernet/marvell/octeontx2/af/cgx.h   |   4 +-
- .../marvell/octeontx2/af/lmac_common.h        |  16 ++-
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |  13 ++-
- .../net/ethernet/marvell/octeontx2/af/rpm.c   |  57 ++++++++-
- .../net/ethernet/marvell/octeontx2/af/rpm.h   |   9 +-
- .../ethernet/marvell/octeontx2/af/rvu_cgx.c   |  36 ++++--
- .../marvell/octeontx2/af/rvu_debugfs.c        | 108 ++++++++++++++++--
- 8 files changed, 227 insertions(+), 26 deletions(-)
+ .../ethernet/marvell/octeontx2/nic/cn10k.c    |  2 +-
+ .../marvell/octeontx2/nic/otx2_common.c       | 45 +++++++++++++++++--
+ .../marvell/octeontx2/nic/otx2_common.h       |  2 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 35 +++++++++++++--
+ .../marvell/octeontx2/nic/otx2_txrx.c         | 28 +++++++++---
+ .../marvell/octeontx2/nic/otx2_txrx.h         |  1 -
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  2 +-
+ 7 files changed, 97 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-index 88203a2635ef..0368d762bcff 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-@@ -331,10 +331,8 @@ void cgx_lmac_enadis_rx_pause_fwding(void *cgxd, int lmac_id, bool enable)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
+index d6ca809edaed..9ec0313f13fc 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
+@@ -108,7 +108,7 @@ int cn10k_sq_aq_init(void *dev, u16 qidx, u16 sqb_aura)
+ 	/* Only one SMQ is allocated, map all SQ's to that SMQ  */
+ 	aq->sq.smq = pfvf->hw.txschq_list[NIX_TXSCH_LVL_SMQ][0];
+ 	/* FIXME: set based on NIX_AF_DWRR_RPM_MTU*/
+-	aq->sq.smq_rr_weight = OTX2_MAX_MTU;
++	aq->sq.smq_rr_weight = pfvf->netdev->mtu;
+ 	aq->sq.default_chan = pfvf->hw.tx_chan_base;
+ 	aq->sq.sqe_stype = NIX_STYPE_STF; /* Cache SQB */
+ 	aq->sq.sqb_aura = sqb_aura;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 2779802eed84..cf7875d51d87 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -230,7 +230,6 @@ int otx2_hw_set_mtu(struct otx2_nic *pfvf, int mtu)
+ 		return -ENOMEM;
+ 	}
  
- int cgx_get_rx_stats(void *cgxd, int lmac_id, int idx, u64 *rx_stat)
- {
--	struct mac_ops *mac_ops;
- 	struct cgx *cgx = cgxd;
+-	pfvf->max_frs = mtu +  OTX2_ETH_HLEN;
+ 	req->maxlen = pfvf->max_frs;
  
--	mac_ops = cgx->mac_ops;
- 	if (!is_lmac_valid(cgx, lmac_id))
- 		return -ENODEV;
- 	*rx_stat =  cgx_read(cgx, lmac_id, CGXX_CMRX_RX_STAT0 + (idx * 8));
-@@ -343,10 +341,8 @@ int cgx_get_rx_stats(void *cgxd, int lmac_id, int idx, u64 *rx_stat)
+ 	err = otx2_sync_mbox_msg(&pfvf->mbox);
+@@ -606,8 +605,8 @@ int otx2_txschq_config(struct otx2_nic *pfvf, int lvl)
+ 	/* Set topology e.t.c configuration */
+ 	if (lvl == NIX_TXSCH_LVL_SMQ) {
+ 		req->reg[0] = NIX_AF_SMQX_CFG(schq);
+-		req->regval[0] = ((OTX2_MAX_MTU + OTX2_ETH_HLEN) << 8) |
+-				   OTX2_MIN_MTU;
++		req->regval[0] = ((pfvf->netdev->max_mtu + OTX2_ETH_HLEN) << 8)
++				  | OTX2_MIN_MTU;
  
- int cgx_get_tx_stats(void *cgxd, int lmac_id, int idx, u64 *tx_stat)
- {
--	struct mac_ops *mac_ops;
- 	struct cgx *cgx = cgxd;
+ 		req->regval[0] |= (0x20ULL << 51) | (0x80ULL << 39) |
+ 				  (0x2ULL << 36);
+@@ -1637,6 +1636,46 @@ void otx2_set_cints_affinity(struct otx2_nic *pfvf)
+ 	}
+ }
  
--	mac_ops = cgx->mac_ops;
- 	if (!is_lmac_valid(cgx, lmac_id))
- 		return -ENODEV;
- 	*tx_stat = cgx_read(cgx, lmac_id, CGXX_CMRX_TX_STAT0 + (idx * 8));
-@@ -1303,7 +1299,11 @@ static struct mac_ops	cgx_mac_ops    = {
- 	.int_ena_bit    =       FW_CGX_INT,
- 	.lmac_fwi	=	CGX_LMAC_FWI,
- 	.non_contiguous_serdes_lane = false,
-+	.rx_stats_cnt   =       9,
-+	.tx_stats_cnt   =       18,
- 	.get_nr_lmacs	=	cgx_get_nr_lmacs,
-+	.mac_get_rx_stats  =	cgx_get_rx_stats,
-+	.mac_get_tx_stats  =	cgx_get_tx_stats,
- 	.mac_enadis_rx_pause_fwding =	cgx_lmac_enadis_rx_pause_fwding,
- 	.mac_get_pause_frm_status =	cgx_lmac_get_pause_frm_status,
- 	.mac_enadis_pause_frm =		cgx_lmac_enadis_pause_frm,
-@@ -1376,6 +1376,8 @@ static int cgx_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- 	cgx_populate_features(cgx);
- 
-+	mutex_init(&cgx->lock);
++u16 otx2_get_max_mtu(struct otx2_nic *pfvf)
++{
++	struct nix_hw_info *rsp;
++	struct msg_req *req;
++	u16 max_mtu;
++	int rc;
 +
- 	err = cgx_lmac_init(cgx);
- 	if (err)
- 		goto err_release_lmac;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.h b/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
-index 33ba235e14d0..12521262164a 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
-@@ -41,7 +41,7 @@
- #define FW_CGX_INT			BIT_ULL(1)
- #define CGXX_CMRX_INT_ENA_W1S		0x058
- #define CGXX_CMRX_RX_ID_MAP		0x060
--#define CGXX_CMRX_RX_STAT0		(0x070 + mac_ops->csr_offset)
-+#define CGXX_CMRX_RX_STAT0		0x070
- #define CGXX_CMRX_RX_LMACS		0x128
- #define CGXX_CMRX_RX_DMAC_CTL0		(0x1F8 + mac_ops->csr_offset)
- #define CGX_DMAC_CTL0_CAM_ENABLE	BIT_ULL(3)
-@@ -52,7 +52,7 @@
- #define CGX_DMAC_CAM_ADDR_ENABLE	BIT_ULL(48)
- #define CGXX_CMRX_RX_DMAC_CAM1		0x400
- #define CGX_RX_DMAC_ADR_MASK		GENMASK_ULL(47, 0)
--#define CGXX_CMRX_TX_STAT0		(0x700 + mac_ops->csr_offset)
-+#define CGXX_CMRX_TX_STAT0		0x700
- #define CGXX_SCRATCH0_REG		0x1050
- #define CGXX_SCRATCH1_REG		0x1058
- #define CGX_CONST			0x2000
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/lmac_common.h b/drivers/net/ethernet/marvell/octeontx2/af/lmac_common.h
-index b4eb337ccbdd..fea230393782 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/lmac_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/lmac_common.h
-@@ -63,15 +63,25 @@ struct mac_ops {
- 	u8			lmac_fwi;
- 	u32			fifo_len;
- 	bool			non_contiguous_serdes_lane;
-+	/* RPM & CGX differs in number of Receive/transmit stats */
-+	u8			rx_stats_cnt;
-+	u8			tx_stats_cnt;
- 	/* Incase of RPM get number of lmacs from RPMX_CMR_RX_LMACS[LMAC_EXIST]
- 	 * number of setbits in lmac_exist tells number of lmacs
- 	 */
- 	int			(*get_nr_lmacs)(void *cgx);
- 
-+	/* Register Stats related functions */
-+	int			(*mac_get_rx_stats)(void *cgx, int lmac_id,
-+						    int idx, u64 *rx_stat);
-+	int			(*mac_get_tx_stats)(void *cgx, int lmac_id,
-+						    int idx, u64 *tx_stat);
++	mutex_lock(&pfvf->mbox.lock);
 +
- 	/* Enable LMAC Pause Frame Configuration */
- 	void			(*mac_enadis_rx_pause_fwding)(void *cgxd,
- 							      int lmac_id,
- 							      bool enable);
++	req = otx2_mbox_alloc_msg_nix_get_hw_info(&pfvf->mbox);
++	if (!req) {
++		rc =  -ENOMEM;
++		goto out;
++	}
 +
- 	int			(*mac_get_pause_frm_status)(void *cgxd,
- 							    int lmac_id,
- 							    u8 *tx_pause,
-@@ -81,10 +91,10 @@ struct mac_ops {
- 							int lmac_id,
- 							u8 tx_pause,
- 							u8 rx_pause);
++	rc = otx2_sync_mbox_msg(&pfvf->mbox);
++	if (!rc) {
++		rsp = (struct nix_hw_info *)
++		       otx2_mbox_get_rsp(&pfvf->mbox.mbox, 0, &req->hdr);
 +
- 	void			(*mac_pause_frm_config)(void  *cgxd,
- 							int lmac_id,
- 							bool enable);
++		/* HW counts VLAN insertion bytes (8 for double tag)
++		 * irrespective of whether SQE is requesting to insert VLAN
++		 * in the packet or not. Hence these 8 bytes have to be
++		 * discounted from max packet size otherwise HW will throw
++		 * SMQ errors
++		 */
++		max_mtu = rsp->max_mtu - 8 - OTX2_ETH_HLEN;
++	}
++
++out:
++	mutex_unlock(&pfvf->mbox.lock);
++	if (rc) {
++		dev_warn(pfvf->dev,
++			 "Failed to get MTU from hardware setting default value(1500)\n");
++		max_mtu = 1500;
++	}
++	return max_mtu;
++}
++EXPORT_SYMBOL(otx2_get_max_mtu);
++
+ #define M(_name, _id, _fn_name, _req_type, _rsp_type)			\
+ int __weak								\
+ otx2_mbox_up_handler_ ## _fn_name(struct otx2_nic *pfvf,		\
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index 51aaa6ae0fd3..4c472646a0ac 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -798,5 +798,5 @@ int otx2_del_macfilter(struct net_device *netdev, const u8 *mac);
+ int otx2_add_macfilter(struct net_device *netdev, const u8 *mac);
+ int otx2_enable_rxvlan(struct otx2_nic *pf, bool enable);
+ int otx2_install_rxvlan_offload_flow(struct otx2_nic *pfvf);
 -
- };
++u16 otx2_get_max_mtu(struct otx2_nic *pfvf);
+ #endif /* OTX2_COMMON_H */
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index f87cfcfc2832..53ab1814d74b 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -1288,6 +1288,33 @@ static void otx2_free_sq_res(struct otx2_nic *pf)
+ 	}
+ }
  
- struct cgx {
-@@ -99,6 +109,10 @@ struct cgx {
- 	u64			hw_features;
- 	struct mac_ops		*mac_ops;
- 	unsigned long		lmac_bmap; /* bitmap of enabled lmacs */
-+	/* Lock to serialize read/write of global csrs like
-+	 * RPMX_MTI_STAT_DATA_HI_CDC etc
++static int otx2_get_rbuf_size(struct otx2_nic *pf, int mtu)
++{
++	int frame_size;
++	int total_size;
++	int rbuf_size;
++
++	/* The data transferred by NIX to memory consists of actual packet
++	 * plus additional data which has timestamp and/or EDSA/HIGIG2
++	 * headers if interface is configured in corresponding modes.
++	 * NIX transfers entire data using 6 segments/buffers and writes
++	 * a CQE_RX descriptor with those segment addresses. First segment
++	 * has additional data prepended to packet. Also software omits a
++	 * headroom of 128 bytes and sizeof(struct skb_shared_info) in
++	 * each segment. Hence the total size of memory needed
++	 * to receive a packet with 'mtu' is:
++	 * frame size =  mtu + additional data;
++	 * memory = frame_size + (headroom + struct skb_shared_info size) * 6;
++	 * each receive buffer size = memory / 6;
 +	 */
-+	struct mutex		lock;
- };
- 
- typedef struct cgx rpm_t;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index af4057b20415..ea456099b33c 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -161,6 +161,7 @@ M(CGX_SET_LINK_MODE,	0x214, cgx_set_link_mode, cgx_set_link_mode_req,\
- 			       cgx_set_link_mode_rsp)	\
- M(CGX_FEATURES_GET,	0x215, cgx_features_get, msg_req,		\
- 			       cgx_features_info_msg)			\
-+M(RPM_STATS,		0x216, rpm_stats, msg_req, rpm_stats_rsp)	\
-  /* NPA mbox IDs (range 0x400 - 0x5FF) */				\
- /* NPA mbox IDs (range 0x400 - 0x5FF) */				\
- M(NPA_LF_ALLOC,		0x400, npa_lf_alloc,				\
-@@ -490,14 +491,22 @@ struct cgx_set_link_mode_rsp {
- #define RVU_LMAC_FEAT_FC		BIT_ULL(0) /* pause frames */
- #define RVU_LMAC_FEAT_PTP		BIT_ULL(1) /* precison time protocol */
- #define RVU_MAC_VERSION			BIT_ULL(2)
--#define RVU_MAC_CGX			0
--#define RVU_MAC_RPM			1
-+#define RVU_MAC_CGX			BIT_ULL(3)
-+#define RVU_MAC_RPM			BIT_ULL(4)
- 
- struct cgx_features_info_msg {
- 	struct mbox_msghdr hdr;
- 	u64    lmac_features;
- };
- 
-+struct rpm_stats_rsp {
-+	struct mbox_msghdr hdr;
-+#define RPM_RX_STATS_COUNT		43
-+#define RPM_TX_STATS_COUNT		34
-+	u64 rx_stats[RPM_RX_STATS_COUNT];
-+	u64 tx_stats[RPM_TX_STATS_COUNT];
-+};
++	frame_size = mtu + OTX2_ETH_HLEN + OTX2_HW_TIMESTAMP_LEN;
++	total_size = frame_size + (OTX2_HEAD_ROOM +
++		     OTX2_DATA_ALIGN(sizeof(struct skb_shared_info))) * 6;
++	rbuf_size = total_size / 6;
 +
- /* NPA mbox message formats */
- 
- /* NPA mailbox error codes
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rpm.c b/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-index 8a4241abaa2a..3870cd436683 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-@@ -18,7 +18,11 @@ static struct mac_ops	rpm_mac_ops   = {
- 	.int_ena_bit    =       BIT_ULL(0),
- 	.lmac_fwi	=	RPM_LMAC_FWI,
- 	.non_contiguous_serdes_lane = true,
-+	.rx_stats_cnt   =       43,
-+	.tx_stats_cnt   =       34,
- 	.get_nr_lmacs	=	rpm_get_nr_lmacs,
-+	.mac_get_rx_stats  =	rpm_get_rx_stats,
-+	.mac_get_tx_stats  =	rpm_get_tx_stats,
- 	.mac_enadis_rx_pause_fwding =	rpm_lmac_enadis_rx_pause_fwding,
- 	.mac_get_pause_frm_status =	rpm_lmac_get_pause_frm_status,
- 	.mac_enadis_pause_frm =		rpm_lmac_enadis_pause_frm,
-@@ -49,7 +53,7 @@ int rpm_get_nr_lmacs(void *rpmd)
- 
- void rpm_lmac_enadis_rx_pause_fwding(void *rpmd, int lmac_id, bool enable)
++	return ALIGN(rbuf_size, 2048);
++}
++
+ static int otx2_init_hw_resources(struct otx2_nic *pf)
  {
--	struct cgx *rpm = rpmd;
-+	rpm_t *rpm = rpmd;
- 	u64 cfg;
+ 	struct nix_lf_free_req *free_req;
+@@ -1304,9 +1331,9 @@ static int otx2_init_hw_resources(struct otx2_nic *pf)
+ 	hw->sqpool_cnt = hw->tx_queues;
+ 	hw->pool_cnt = hw->rqpool_cnt + hw->sqpool_cnt;
  
- 	if (!rpm)
-@@ -171,3 +175,54 @@ void rpm_lmac_pause_frm_config(void *rpmd, int lmac_id, bool enable)
- 		rpm_write(rpm, lmac_id, RPMX_MTI_MAC100X_COMMAND_CONFIG, cfg);
+-	/* Get the size of receive buffers to allocate */
+-	pf->rbsize = RCV_FRAG_LEN(OTX2_HW_TIMESTAMP_LEN + pf->netdev->mtu +
+-				  OTX2_ETH_HLEN);
++	pf->max_frs = pf->netdev->mtu + OTX2_ETH_HLEN + OTX2_HW_TIMESTAMP_LEN;
++
++	pf->rbsize = otx2_get_rbuf_size(pf, pf->netdev->mtu);
+ 
+ 	mutex_lock(&mbox->lock);
+ 	/* NPA init */
+@@ -2429,7 +2456,7 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 
+ 	/* MTU range: 64 - 9190 */
+ 	netdev->min_mtu = OTX2_MIN_MTU;
+-	netdev->max_mtu = OTX2_MAX_MTU;
++	netdev->max_mtu = otx2_get_max_mtu(pf);
+ 
+ 	err = register_netdev(netdev);
+ 	if (err) {
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+index 59a7bd88d907..3f778fc054b5 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+@@ -257,12 +257,11 @@ static bool otx2_check_rcv_errors(struct otx2_nic *pfvf,
+ 		/* For now ignore all the NPC parser errors and
+ 		 * pass the packets to stack.
+ 		 */
+-		if (cqe->sg.segs == 1)
+-			return false;
++		return false;
  	}
- }
-+
-+int rpm_get_rx_stats(void *rpmd, int lmac_id, int idx, u64 *rx_stat)
-+{
-+	rpm_t *rpm = rpmd;
-+	u64 val_lo, val_hi;
-+
-+	if (!rpm || lmac_id >= rpm->lmac_count)
-+		return -ENODEV;
-+
-+	mutex_lock(&rpm->lock);
-+
-+	/* Update idx to point per lmac Rx statistics page */
-+	idx += lmac_id * rpm->mac_ops->rx_stats_cnt;
-+
-+	/* Read lower 32 bits of counter */
-+	val_lo = rpm_read(rpm, 0, RPMX_MTI_STAT_RX_STAT_PAGES_COUNTERX +
-+			  (idx * 8));
-+
-+	/* upon read of lower 32 bits, higher 32 bits are written
-+	 * to RPMX_MTI_STAT_DATA_HI_CDC
-+	 */
-+	val_hi = rpm_read(rpm, 0, RPMX_MTI_STAT_DATA_HI_CDC);
-+
-+	*rx_stat = (val_hi << 32 | val_lo);
-+
-+	mutex_unlock(&rpm->lock);
-+	return 0;
-+}
-+
-+int rpm_get_tx_stats(void *rpmd, int lmac_id, int idx, u64 *tx_stat)
-+{
-+	rpm_t *rpm = rpmd;
-+	u64 val_lo, val_hi;
-+
-+	if (!rpm || lmac_id >= rpm->lmac_count)
-+		return -ENODEV;
-+
-+	mutex_lock(&rpm->lock);
-+
-+	/* Update idx to point per lmac Tx statistics page */
-+	idx += lmac_id * rpm->mac_ops->tx_stats_cnt;
-+
-+	val_lo = rpm_read(rpm, 0, RPMX_MTI_STAT_TX_STAT_PAGES_COUNTERX +
-+			    (idx * 8));
-+	val_hi = rpm_read(rpm, 0, RPMX_MTI_STAT_DATA_HI_CDC);
-+
-+	*tx_stat = (val_hi << 32 | val_lo);
-+
-+	mutex_unlock(&rpm->lock);
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rpm.h b/drivers/net/ethernet/marvell/octeontx2/af/rpm.h
-index 0e8b4560b3c3..c939302308b5 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rpm.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rpm.h
-@@ -18,6 +18,7 @@
- #define RPMX_CMRX_SW_INT_W1S            0x188
- #define RPMX_CMRX_SW_INT_ENA_W1S        0x198
- #define RPMX_CMRX_LINK_CFG		0x1070
-+#define RPMX_MTI_LPCSX_CONTROL(id)     (0x30000 | ((id) * 0x100))
  
- #define RPMX_CMRX_LINK_RANGE_MASK	GENMASK_ULL(19, 16)
- #define RPMX_CMRX_LINK_BASE_MASK	GENMASK_ULL(11, 0)
-@@ -32,14 +33,20 @@
- #define RPMX_CMR_RX_OVR_BP		0x4120
- #define RPMX_CMR_RX_OVR_BP_EN(x)	BIT_ULL((x) + 8)
- #define RPMX_CMR_RX_OVR_BP_BP(x)	BIT_ULL((x) + 4)
-+#define RPMX_MTI_STAT_RX_STAT_PAGES_COUNTERX 0x12000
-+#define RPMX_MTI_STAT_TX_STAT_PAGES_COUNTERX 0x13000
-+#define RPMX_MTI_STAT_DATA_HI_CDC            0x10038
-+
- #define RPM_LMAC_FWI			0xa
+ 	/* If RXALL is enabled pass on packets to stack. */
+-	if (cqe->sg.segs == 1 && (pfvf->netdev->features & NETIF_F_RXALL))
++	if (pfvf->netdev->features & NETIF_F_RXALL)
+ 		return false;
  
- /* Function Declarations */
-+int rpm_get_nr_lmacs(void *rpmd);
- void rpm_lmac_enadis_rx_pause_fwding(void *rpmd, int lmac_id, bool enable);
- int rpm_lmac_get_pause_frm_status(void *cgxd, int lmac_id, u8 *tx_pause,
- 				  u8 *rx_pause);
- void rpm_lmac_pause_frm_config(void *rpmd, int lmac_id, bool enable);
- int rpm_lmac_enadis_pause_frm(void *rpmd, int lmac_id, u8 tx_pause,
- 			      u8 rx_pause);
--int rpm_get_nr_lmacs(void *cgxd);
-+int rpm_get_tx_stats(void *rpmd, int lmac_id, int idx, u64 *tx_stat);
-+int rpm_get_rx_stats(void *rpmd, int lmac_id, int idx, u64 *rx_stat);
- #endif /* RPM_H */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-index ca8d7be01264..0667ab3cfdae 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-@@ -453,10 +453,11 @@ int rvu_mbox_handler_cgx_stop_rxtx(struct rvu *rvu, struct msg_req *req,
- 	return 0;
- }
- 
--int rvu_mbox_handler_cgx_stats(struct rvu *rvu, struct msg_req *req,
--			       struct cgx_stats_rsp *rsp)
-+static int rvu_lmac_get_stats(struct rvu *rvu, struct msg_req *req,
-+			      void *rsp)
+ 	/* Free buffer back to pool */
+@@ -277,9 +276,14 @@ static void otx2_rcv_pkt_handler(struct otx2_nic *pfvf,
+ 				 struct nix_cqe_rx_s *cqe)
  {
- 	int pf = rvu_get_pf(req->hdr.pcifunc);
-+	struct mac_ops *mac_ops;
- 	int stat = 0, err = 0;
- 	u64 tx_stat, rx_stat;
- 	u8 cgx_idx, lmac;
-@@ -467,28 +468,47 @@ int rvu_mbox_handler_cgx_stats(struct rvu *rvu, struct msg_req *req,
+ 	struct nix_rx_parse_s *parse = &cqe->parse;
++	struct nix_rx_sg_s *sg = &cqe->sg;
+ 	struct sk_buff *skb = NULL;
++	void *end, *start;
++	u64 *seg_addr;
++	u16 *seg_size;
++	int seg;
  
- 	rvu_get_cgx_lmac_id(rvu->pf2cgxlmac_map[pf], &cgx_idx, &lmac);
- 	cgxd = rvu_cgx_pdata(cgx_idx, rvu);
-+	mac_ops = get_mac_ops(cgxd);
- 
- 	/* Rx stats */
--	while (stat < CGX_RX_STATS_COUNT) {
--		err = cgx_get_rx_stats(cgxd, lmac, stat, &rx_stat);
-+	while (stat < mac_ops->rx_stats_cnt) {
-+		err = mac_ops->mac_get_rx_stats(cgxd, lmac, stat, &rx_stat);
- 		if (err)
- 			return err;
--		rsp->rx_stats[stat] = rx_stat;
-+		if (mac_ops->rx_stats_cnt == RPM_RX_STATS_COUNT)
-+			((struct rpm_stats_rsp *)rsp)->rx_stats[stat] = rx_stat;
-+		else
-+			((struct cgx_stats_rsp *)rsp)->rx_stats[stat] = rx_stat;
- 		stat++;
+-	if (unlikely(parse->errlev || parse->errcode || cqe->sg.segs > 1)) {
++	if (unlikely(parse->errlev || parse->errcode)) {
+ 		if (otx2_check_rcv_errors(pfvf, cqe, cq->cq_idx))
+ 			return;
  	}
+@@ -288,9 +292,19 @@ static void otx2_rcv_pkt_handler(struct otx2_nic *pfvf,
+ 	if (unlikely(!skb))
+ 		return;
  
- 	/* Tx stats */
- 	stat = 0;
--	while (stat < CGX_TX_STATS_COUNT) {
--		err = cgx_get_tx_stats(cgxd, lmac, stat, &tx_stat);
-+	while (stat < mac_ops->tx_stats_cnt) {
-+		err = mac_ops->mac_get_tx_stats(cgxd, lmac, stat, &tx_stat);
- 		if (err)
- 			return err;
--		rsp->tx_stats[stat] = tx_stat;
-+		if (mac_ops->tx_stats_cnt == RPM_TX_STATS_COUNT)
-+			((struct rpm_stats_rsp *)rsp)->tx_stats[stat] = tx_stat;
-+		else
-+			((struct cgx_stats_rsp *)rsp)->tx_stats[stat] = tx_stat;
- 		stat++;
- 	}
- 	return 0;
- }
+-	otx2_skb_add_frag(pfvf, skb, cqe->sg.seg_addr, cqe->sg.seg_size, parse);
+-	cq->pool_ptrs++;
+-
++	start = (void *)sg;
++	end = start + ((cqe->parse.desc_sizem1 + 1) * 16);
++	while (start < end) {
++		sg = (struct nix_rx_sg_s *)start;
++		seg_addr = &sg->seg_addr;
++		seg_size = (void *)sg;
++		for (seg = 0; seg < sg->segs; seg++, seg_addr++) {
++			otx2_skb_add_frag(pfvf, skb, *seg_addr, seg_size[seg],
++					  parse);
++			cq->pool_ptrs++;
++		}
++		start += sizeof(*sg);
++	}
+ 	otx2_set_rxhash(pfvf, cqe, skb);
  
-+int rvu_mbox_handler_cgx_stats(struct rvu *rvu, struct msg_req *req,
-+			       struct cgx_stats_rsp *rsp)
-+{
-+	return rvu_lmac_get_stats(rvu, req, (void *)rsp);
-+}
-+
-+int rvu_mbox_handler_rpm_stats(struct rvu *rvu, struct msg_req *req,
-+			       struct rpm_stats_rsp *rsp)
-+{
-+	return rvu_lmac_get_stats(rvu, req, (void *)rsp);
-+}
-+
- int rvu_mbox_handler_cgx_fec_stats(struct rvu *rvu,
- 				   struct msg_req *req,
- 				   struct cgx_fec_stats_rsp *rsp)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index 96ae6f79568d..dfeea587a27e 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -110,6 +110,89 @@ static char *cgx_tx_stats_fields[] = {
- 	[CGX_STAT17]	= "Control/PAUSE packets sent",
- };
+ 	skb_record_rx_queue(skb, cq->cq_idx);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
+index d2b26b3357f3..52486c1f0973 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
+@@ -24,7 +24,6 @@
  
-+static char *rpm_rx_stats_fields[] = {
-+	"Octets of received packets",
-+	"Octets of received packets with out error",
-+	"Received packets with alignment errors",
-+	"Control/PAUSE packets received",
-+	"Packets received with Frame too long Errors",
-+	"Packets received with a1nrange length Errors",
-+	"Received packets",
-+	"Packets received with FrameCheckSequenceErrors",
-+	"Packets received with VLAN header",
-+	"Error packets",
-+	"Packets recievd with unicast DMAC",
-+	"Packets received with multicast DMAC",
-+	"Packets received with broadcast DMAC",
-+	"Dropped packets",
-+	"Total frames received on interface",
-+	"Packets received with an octet count < 64",
-+	"Packets received with an octet count == 64",
-+	"Packets received with an octet count of 65â127",
-+	"Packets received with an octet count of 128-255",
-+	"Packets received with an octet count of 256-511",
-+	"Packets received with an octet count of 512-1023",
-+	"Packets received with an octet count of 1024-1518",
-+	"Packets received with an octet count of > 1518",
-+	"Oversized Packets",
-+	"Jabber Packets",
-+	"Fragmented Packets",
-+	"CBFC(class based flow control) pause frames received for class 0",
-+	"CBFC pause frames received for class 1",
-+	"CBFC pause frames received for class 2",
-+	"CBFC pause frames received for class 3",
-+	"CBFC pause frames received for class 4",
-+	"CBFC pause frames received for class 5",
-+	"CBFC pause frames received for class 6",
-+	"CBFC pause frames received for class 7",
-+	"CBFC pause frames received for class 8",
-+	"CBFC pause frames received for class 9",
-+	"CBFC pause frames received for class 10",
-+	"CBFC pause frames received for class 11",
-+	"CBFC pause frames received for class 12",
-+	"CBFC pause frames received for class 13",
-+	"CBFC pause frames received for class 14",
-+	"CBFC pause frames received for class 15",
-+	"MAC control packets received",
-+};
-+
-+static char *rpm_tx_stats_fields[] = {
-+	"Total octets sent on the interface",
-+	"Total octets transmitted OK",
-+	"Control/Pause frames sent",
-+	"Total frames transmitted OK",
-+	"Total frames sent with VLAN header",
-+	"Error Packets",
-+	"Packets sent to unicast DMAC",
-+	"Packets sent to the multicast DMAC",
-+	"Packets sent to a broadcast DMAC",
-+	"Packets sent with an octet count == 64",
-+	"Packets sent with an octet count of 65â127",
-+	"Packets sent with an octet count of 128-255",
-+	"Packets sent with an octet count of 256-511",
-+	"Packets sent with an octet count of 512-1023",
-+	"Packets sent with an octet count of 1024-1518",
-+	"Packets sent with an octet count of > 1518",
-+	"CBFC(class based flow control) pause frames transmitted for class 0",
-+	"CBFC pause frames transmitted for class 1",
-+	"CBFC pause frames transmitted for class 2",
-+	"CBFC pause frames transmitted for class 3",
-+	"CBFC pause frames transmitted for class 4",
-+	"CBFC pause frames transmitted for class 5",
-+	"CBFC pause frames transmitted for class 6",
-+	"CBFC pause frames transmitted for class 7",
-+	"CBFC pause frames transmitted for class 8",
-+	"CBFC pause frames transmitted for class 9",
-+	"CBFC pause frames transmitted for class 10",
-+	"CBFC pause frames transmitted for class 11",
-+	"CBFC pause frames transmitted for class 12",
-+	"CBFC pause frames transmitted for class 13",
-+	"CBFC pause frames transmitted for class 14",
-+	"CBFC pause frames transmitted for class 15",
-+	"MAC control packets sent",
-+	"Total frames sent on the interface"
-+};
-+
- enum cpt_eng_type {
- 	CPT_AE_TYPE = 1,
- 	CPT_SE_TYPE = 2,
-@@ -1676,23 +1759,34 @@ static int cgx_print_stats(struct seq_file *s, int lmac_id)
+ #define	OTX2_ETH_HLEN		(VLAN_ETH_HLEN + VLAN_HLEN)
+ #define	OTX2_MIN_MTU		64
+-#define	OTX2_MAX_MTU		(9212 - OTX2_ETH_HLEN)
  
- 	/* Rx stats */
- 	seq_printf(s, "\n=======%s RX_STATS======\n\n", mac_ops->name);
--	while (stat < CGX_RX_STATS_COUNT) {
--		err = cgx_get_rx_stats(cgxd, lmac_id, stat, &rx_stat);
-+	while (stat < mac_ops->rx_stats_cnt) {
-+		err = mac_ops->mac_get_rx_stats(cgxd, lmac_id, stat, &rx_stat);
- 		if (err)
- 			return err;
--		seq_printf(s, "%s: %llu\n", cgx_rx_stats_fields[stat], rx_stat);
-+		if (is_rvu_otx2(rvu))
-+			seq_printf(s, "%s: %llu\n", cgx_rx_stats_fields[stat],
-+				   rx_stat);
-+		else
-+			seq_printf(s, "%s: %llu\n", rpm_rx_stats_fields[stat],
-+				   rx_stat);
- 		stat++;
- 	}
+ #define OTX2_MAX_GSO_SEGS	255
+ #define OTX2_MAX_FRAGS_IN_SQE	9
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+index 31e03253e612..085be90a03eb 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+@@ -586,7 +586,7 @@ static int otx2vf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
  
- 	/* Tx stats */
- 	stat = 0;
- 	seq_printf(s, "\n=======%s TX_STATS======\n\n", mac_ops->name);
--	while (stat < CGX_TX_STATS_COUNT) {
--		err = cgx_get_tx_stats(cgxd, lmac_id, stat, &tx_stat);
-+	while (stat < mac_ops->tx_stats_cnt) {
-+		err = mac_ops->mac_get_tx_stats(cgxd, lmac_id, stat, &tx_stat);
- 		if (err)
- 			return err;
--		seq_printf(s, "%s: %llu\n", cgx_tx_stats_fields[stat], tx_stat);
--		stat++;
-+
-+	if (is_rvu_otx2(rvu))
-+		seq_printf(s, "%s: %llu\n", cgx_tx_stats_fields[stat],
-+			   tx_stat);
-+	else
-+		seq_printf(s, "%s: %llu\n", rpm_tx_stats_fields[stat],
-+			   tx_stat);
-+	stat++;
- 	}
+ 	/* MTU range: 68 - 9190 */
+ 	netdev->min_mtu = OTX2_MIN_MTU;
+-	netdev->max_mtu = OTX2_MAX_MTU;
++	netdev->max_mtu = otx2_get_max_mtu(vf);
  
- 	return err;
+ 	INIT_WORK(&vf->reset_task, otx2vf_reset_task);
+ 
 -- 
 2.17.1
 
