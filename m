@@ -2,127 +2,165 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92E57C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 16:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BE5C433DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Feb 2021 01:48:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5938E64D79
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Feb 2021 16:00:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7102564E42
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Feb 2021 01:48:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232052AbhBJQAU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Feb 2021 11:00:20 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53014 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232071AbhBJQAO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Feb 2021 11:00:14 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id DC59864D99
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Feb 2021 15:59:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612972774;
-        bh=OheMS+Crw4DV6H79TF/EQ4bAVw8DHnMKZ8VK2n9Z+K0=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=gq3zydeHmg1YSrSXq3JmS4O1Yf/Eljpw1UeqShLA8DLl5UPgJMwiRtzXsMMrgZEaQ
-         HYvS7JXCGmNYo8YzATIRrHm777c5P/yG2zyQY+F2C180sUI2J3y4Wxg7UOtxq0UgHg
-         AQ1cwt4tXRRqgdnAPv0KAxLVVG9lD2obqLPyoS44mvgbuy6Ixjqq620GN/EQhe7mfE
-         WtOtNRgSpFFbIDd8no15b6a4uocFJ8W5R3+tFJ/8OTKxIrfVEDgHU4O8QYuiFmMg09
-         ISg+VwmUB6cTykNKTSlthrz3jpA5fJhYnb/iKpFlRDrpgWvcy8B1YtzSpwrWneJcl5
-         BYyWoXhy9zaZw==
-Received: by mail-oi1-f181.google.com with SMTP id 18so2515140oiz.7
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Feb 2021 07:59:33 -0800 (PST)
-X-Gm-Message-State: AOAM530eAb3NbAQXC/gTDIy9jhtit7VgPVr+YfAAq1CM05nO5ZZ1i+iV
-        vzjRjO8mI8OWpf+7Svuz3X8Csqj0CMycev/dSUg=
-X-Google-Smtp-Source: ABdhPJz4WMkxFVIoivofDpIjsJ72koUc3UyqSVbtWCg2LGI2L5hmvjiDfO3+ZMExyQwTlRsQlUc7iiz5VLcTy8xB/CU=
-X-Received: by 2002:aca:4bd1:: with SMTP id y200mr2616840oia.33.1612972773229;
- Wed, 10 Feb 2021 07:59:33 -0800 (PST)
+        id S229517AbhBKBrq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Feb 2021 20:47:46 -0500
+Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:12014 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229564AbhBKBrp (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Feb 2021 20:47:45 -0500
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+        by mx0b-0016f401.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11B1kgKj000429;
+        Wed, 10 Feb 2021 17:46:59 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=gs6fyn9yfF9dI/JDXWijLIK39SNU6Aw87aWCNNpRHU0=;
+ b=bYJ3su/hlGpEMUhNca6TwrHXFO1qJiPz5+7zKTVzKHz7qBpiDS7euJw3bCU40PZS49XJ
+ HU5SYM6s11Hwd7a93HueqQdVBhtGzP0HqI324SmWxPtnfnrWXFW2zBDPR2XqZOMw3MfX
+ /4qzI+xyw9n3NUg5qp+e8A004GokDRQYXP4h6lVBp1ISRvgc6Zaxrs+tD0XWBkD45htn
+ FtOZn4DRpwxNYDmCpzhIUmLPOaXb9isFOsJh3lv5FUf35J6PA4mu7NJqtWv897+M/F2W
+ 7e7iS1S2pW9xnv6dZOwQXrIsDvOGTF8u/zZ/SslDlfo3qLRhHHp0WE+p6PlFWhkvYlmp VQ== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+        by mx0b-0016f401.pphosted.com with ESMTP id 36hugqdhb1-2
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Wed, 10 Feb 2021 17:46:59 -0800
+Received: from SC-EXCH04.marvell.com (10.93.176.84) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 10 Feb
+ 2021 17:46:58 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by SC-EXCH04.marvell.com
+ (10.93.176.84) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 10 Feb
+ 2021 17:46:57 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Wed, 10 Feb 2021 17:46:57 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+        by maili.marvell.com (Postfix) with ESMTP id D3DEA3F7040;
+        Wed, 10 Feb 2021 17:46:53 -0800 (PST)
+From:   Geetha sowjanya <gakula@marvell.com>
+To:     <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+CC:     <davem@davemloft.net>, <kuba@kernel.org>, <sgoutham@marvell.com>,
+        <lcherian@marvell.com>, <hkelam@marvell.com>,
+        <sbhatta@marvell.com>, <jerinj@marvell.com>,
+        <bbrezillon@kernel.org>, <arno@natisbad.org>,
+        <schalla@marvell.com>, Geetha sowjanya <gakula@marvell.com>
+Subject: [net-next v5 00/14] Add Marvell CN10K support
+Date:   Thu, 11 Feb 2021 07:16:17 +0530
+Message-ID: <20210211014631.9578-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-References: <20210210071556.GA24991@gondor.apana.org.au>
-In-Reply-To: <20210210071556.GA24991@gondor.apana.org.au>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 10 Feb 2021 16:59:22 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXF=HVGmQYjiDiYJTi3fgZWPakfgT3PujsaxyCi_j6Bv-Q@mail.gmail.com>
-Message-ID: <CAMj1kXF=HVGmQYjiDiYJTi3fgZWPakfgT3PujsaxyCi_j6Bv-Q@mail.gmail.com>
-Subject: Re: [PATCH] crypto: serpent - Fix sparse byte order warnings
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
+ definitions=2021-02-10_11:2021-02-10,2021-02-10 signatures=0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 10 Feb 2021 at 08:16, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> This patch fixes the byte order markings in serpent.
->
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+The current admin function (AF) driver and the netdev driver supports
+OcteonTx2 silicon variants. The same OcteonTx2's
+Resource Virtualization Unit (RVU) is carried forward to the next-gen
+silicon ie OcteonTx3, with some changes and feature enhancements.
 
-Tested-by: Ard Biesheuvel <ardb@kernel.org> # arm64 big-endian
+This patch set adds support for OcteonTx3 (CN10K) silicon and gets
+the drivers to the same level as OcteonTx2. No new OcteonTx3 specific
+features are added.
 
->
-> diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
-> index 236c87547a17..45f98b750053 100644
-> --- a/crypto/serpent_generic.c
-> +++ b/crypto/serpent_generic.c
-> @@ -272,6 +272,7 @@ int __serpent_setkey(struct serpent_ctx *ctx, const u8 *key,
->         u32 *k = ctx->expkey;
->         u8  *k8 = (u8 *)k;
->         u32 r0, r1, r2, r3, r4;
-> +       __le32 *lk;
->         int i;
->
->         /* Copy key, add padding */
-> @@ -283,22 +284,32 @@ int __serpent_setkey(struct serpent_ctx *ctx, const u8 *key,
->         while (i < SERPENT_MAX_KEY_SIZE)
->                 k8[i++] = 0;
->
-> +       lk = (__le32 *)k;
-> +       k[0] = le32_to_cpu(lk[0]);
-> +       k[1] = le32_to_cpu(lk[1]);
-> +       k[2] = le32_to_cpu(lk[2]);
-> +       k[3] = le32_to_cpu(lk[3]);
-> +       k[4] = le32_to_cpu(lk[4]);
-> +       k[5] = le32_to_cpu(lk[5]);
-> +       k[6] = le32_to_cpu(lk[6]);
-> +       k[7] = le32_to_cpu(lk[7]);
-> +
->         /* Expand key using polynomial */
->
-> -       r0 = le32_to_cpu(k[3]);
-> -       r1 = le32_to_cpu(k[4]);
-> -       r2 = le32_to_cpu(k[5]);
-> -       r3 = le32_to_cpu(k[6]);
-> -       r4 = le32_to_cpu(k[7]);
-> -
-> -       keyiter(le32_to_cpu(k[0]), r0, r4, r2, 0, 0);
-> -       keyiter(le32_to_cpu(k[1]), r1, r0, r3, 1, 1);
-> -       keyiter(le32_to_cpu(k[2]), r2, r1, r4, 2, 2);
-> -       keyiter(le32_to_cpu(k[3]), r3, r2, r0, 3, 3);
-> -       keyiter(le32_to_cpu(k[4]), r4, r3, r1, 4, 4);
-> -       keyiter(le32_to_cpu(k[5]), r0, r4, r2, 5, 5);
-> -       keyiter(le32_to_cpu(k[6]), r1, r0, r3, 6, 6);
-> -       keyiter(le32_to_cpu(k[7]), r2, r1, r4, 7, 7);
-> +       r0 = k[3];
-> +       r1 = k[4];
-> +       r2 = k[5];
-> +       r3 = k[6];
-> +       r4 = k[7];
-> +
-> +       keyiter(k[0], r0, r4, r2, 0, 0);
-> +       keyiter(k[1], r1, r0, r3, 1, 1);
-> +       keyiter(k[2], r2, r1, r4, 2, 2);
-> +       keyiter(k[3], r3, r2, r0, 3, 3);
-> +       keyiter(k[4], r4, r3, r1, 4, 4);
-> +       keyiter(k[5], r0, r4, r2, 5, 5);
-> +       keyiter(k[6], r1, r0, r3, 6, 6);
-> +       keyiter(k[7], r2, r1, r4, 7, 7);
->
->         keyiter(k[0], r3, r2, r0, 8, 8);
->         keyiter(k[1], r4, r3, r1, 9, 9);
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Changes cover below HW level differences
+- PCIe BAR address changes wrt shared mailbox memory region
+- Receive buffer freeing to HW
+- Transmit packet's descriptor submission to HW
+- Programmable HW interface identifiers (channels)
+- Increased MTU support
+- A Serdes MAC block (RPM) configuration
+
+v4-v5
+Fixed sparse warnings.
+
+v3-v4
+Fixed compiler warnings.
+
+v2-v3
+Reposting as a single thread.
+Rebased on top latest net-next branch.
+
+v1-v2
+Fixed check-patch reported issues.
+
+
+Geetha sowjanya (5):
+  octeontx2-af: cn10k: Update NIX/NPA context structure
+  octeontx2-af: cn10k: Update NIX and NPA context in debugfs
+  octeontx2-pf: cn10k: Initialise NIX context
+  octeontx2-pf: cn10k: Map LMTST region
+  octeontx2-pf: cn10k: Use LMTST lines for NPA/NIX operations
+
+Hariprasad Kelam (5):
+  octeontx2-af: cn10k: Add RPM MAC support
+  octeontx2-af: cn10K: Add MTU configuration
+  octeontx2-pf: cn10k: Get max mtu supported from admin function
+  octeontx2-af: cn10k: Add RPM Rx/Tx stats support
+  octeontx2-af: cn10k: MAC internal loopback support
+
+Rakesh Babu (1):
+  octeontx2-af: cn10k: Add RPM LMAC pause frame support
+
+Subbaraya Sundeep (3):
+  octeontx2-af: cn10k: Add mbox support for CN10K platform
+  octeontx2-pf: cn10k: Add mbox support for CN10K
+  octeontx2-af: cn10k: Add support for programmable channels
+
+ MAINTAINERS                                   |   2 +
+ .../ethernet/marvell/octeontx2/af/Makefile    |  10 +-
+ .../net/ethernet/marvell/octeontx2/af/cgx.c   | 315 ++++++---
+ .../net/ethernet/marvell/octeontx2/af/cgx.h   |  15 +-
+ .../ethernet/marvell/octeontx2/af/cgx_fw_if.h |   1 +
+ .../ethernet/marvell/octeontx2/af/common.h    |   5 +
+ .../marvell/octeontx2/af/lmac_common.h        | 131 ++++
+ .../net/ethernet/marvell/octeontx2/af/mbox.c  |  59 +-
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  70 +-
+ .../net/ethernet/marvell/octeontx2/af/ptp.c   |  12 +
+ .../net/ethernet/marvell/octeontx2/af/rpm.c   | 272 ++++++++
+ .../net/ethernet/marvell/octeontx2/af/rpm.h   |  57 ++
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   | 159 ++++-
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  71 ++
+ .../ethernet/marvell/octeontx2/af/rvu_cgx.c   | 134 +++-
+ .../ethernet/marvell/octeontx2/af/rvu_cn10k.c | 261 ++++++++
+ .../marvell/octeontx2/af/rvu_debugfs.c        | 339 +++++++++-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   | 112 +++-
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   |   4 +-
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |  24 +
+ .../marvell/octeontx2/af/rvu_struct.h         | 604 ++++++------------
+ .../ethernet/marvell/octeontx2/nic/Makefile   |  10 +-
+ .../ethernet/marvell/octeontx2/nic/cn10k.c    | 182 ++++++
+ .../ethernet/marvell/octeontx2/nic/cn10k.h    |  17 +
+ .../marvell/octeontx2/nic/otx2_common.c       | 147 +++--
+ .../marvell/octeontx2/nic/otx2_common.h       | 111 +++-
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  73 ++-
+ .../ethernet/marvell/octeontx2/nic/otx2_reg.h |   4 +
+ .../marvell/octeontx2/nic/otx2_struct.h       |  10 +-
+ .../marvell/octeontx2/nic/otx2_txrx.c         |  72 ++-
+ .../marvell/octeontx2/nic/otx2_txrx.h         |   8 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  52 +-
+ include/linux/soc/marvell/octeontx2/asm.h     |   8 +
+ 33 files changed, 2612 insertions(+), 739 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/lmac_common.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rpm.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rpm.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/cn10k.h
+
+-- 
+2.17.1
+
