@@ -2,96 +2,102 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38F6DC433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Feb 2021 20:06:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0CDEC433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Feb 2021 23:11:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E9F2464DB2
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Feb 2021 20:06:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 70BE664DFF
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Feb 2021 23:10:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230353AbhBKUGX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Feb 2021 15:06:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55472 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230315AbhBKUEM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Feb 2021 15:04:12 -0500
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D583CC061222
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Feb 2021 12:01:39 -0800 (PST)
-Received: by mail-qk1-x731.google.com with SMTP id x14so6532159qkm.2
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Feb 2021 12:01:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=YJE2aPOEkLIKEj61l27Ctrd7+4+SFwAw4jzWQDD0G1c=;
-        b=DGSt07jo66PKKAE7l+SyIEMKfRHrgcFo/8QAJwD5aMsR2TU3gdrwcxHsgkcnBKdMCi
-         4McoN6vQs0WGQwjyp2hofGeYIjjqAwR3a1Bc5ZS7HGmAm+e9M8bTRRnrpF0l8JTQgy+l
-         V7bSVHHJKM/GRukriyE4Jsmx//OLVWakimzO8oC/S9rbuEawAKlBti/mQGTOLkYaqNI6
-         cLmxHn+sUkMu13u0kikJCKX8e1kVV6QSr+c8y9+BZD84swd92hICfSi+2FPI2zF14HDr
-         w7vsl1y54gZCjde/36GGPI+vbFi0KV6T5FveXT+FV9IUYcT6cBxHI7ytOZ3a/dAOrB4N
-         vvkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=YJE2aPOEkLIKEj61l27Ctrd7+4+SFwAw4jzWQDD0G1c=;
-        b=cB9o2O06ko+zjvPQNcocG+69LOdXVwTyf77ppbHspru89hZ+6PJJvtZU8FRS4KZFJV
-         8Y64PiT6ofRgqT+S90B6jj3uK8/G99VhvNQN/BwFWR7CHemAfZts0Dq0MXeYybtVwzmq
-         aMM1UYxSLCe1o/s2trRSmuC7divWFttGHTz9tybhoIy0tyUrJk+swNstSIZfob0GqhkY
-         BpjdKCYFEia9gpfD8jxGOAaI96nva6O4piDZcA9htV3zFNKhwuJBizMWHieJUHakYaBy
-         pt3RTsPea4j63lvCs65fba1lJAtpYhUG6Pm/t1u8ngCaIkx2wSF41dYa5tLpBGPwrKcj
-         COgw==
-X-Gm-Message-State: AOAM532ERxRHME+m26SxeOPCuKouoGeg65Uv1FYHeYNhkBFIjlxuuMR9
-        Jji5diZ4/3H/+ek//dF7YpK7eZrno0iuGg==
-X-Google-Smtp-Source: ABdhPJznaAdNRp8Nki5n7arEtus622c0UfOBooWLUDPIt7dVUvPvrCgBa4QmZFyovNp1sN1PP6i+Jg==
-X-Received: by 2002:a05:620a:2281:: with SMTP id o1mr9856106qkh.313.1613073699132;
-        Thu, 11 Feb 2021 12:01:39 -0800 (PST)
-Received: from pop-os.fios-router.home (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.googlemail.com with ESMTPSA id 17sm4496243qtu.23.2021.02.11.12.01.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Feb 2021 12:01:38 -0800 (PST)
-From:   Thara Gopinath <thara.gopinath@linaro.org>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        bjorn.andersson@linaro.org
-Cc:     ebiggers@google.com, ardb@kernel.org, sivaprak@codeaurora.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v7 10/11] crypto: qce: Remover src_tbl from qce_cipher_reqctx
-Date:   Thu, 11 Feb 2021 15:01:27 -0500
-Message-Id: <20210211200128.2886388-11-thara.gopinath@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210211200128.2886388-1-thara.gopinath@linaro.org>
-References: <20210211200128.2886388-1-thara.gopinath@linaro.org>
+        id S230019AbhBKXK5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 11 Feb 2021 18:10:57 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47662 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229997AbhBKXK4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 11 Feb 2021 18:10:56 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 791BE64DFF;
+        Thu, 11 Feb 2021 23:10:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1613085015;
+        bh=hCLyUZbsNpnyDEkMy8y+vxPQWhHD/lh8S3pd0CdsZGI=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=lVaIPX8NockC5O25q0p4d/jHAEghS3qACYByM+4B7C372ccUnb2es4FGpxTMHptmB
+         KC4Hljpm6Vpa8KlYzDGjubmU5JBAtmMaK1Dfu8mgCQaRqs2UCAZySnMot5oCDh6Dc8
+         OH+tukIhBoJizWomzQsakgCP1Ttz47EYi4mZXE8CVjzFKV7Mc3mhbry6dOv7a58z/B
+         NK+oJcWq5TaMyZZQSaejFXJ85NxPdM+XfpWJRQMVqEcxHMadjzg/5AZlIWd+nFl1bt
+         g6LDQD1SZxeePCyZnuTQuy/ez67P+0ZqBPnfMoccO/281HJRWeEppU6NVbxotmHJCk
+         XoZFBauUkYsLg==
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next v6 00/14] Add Marvell CN10K support
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <161308501539.27196.9695165685515441633.git-patchwork-notify@kernel.org>
+Date:   Thu, 11 Feb 2021 23:10:15 +0000
+References: <20210211155834.31874-1-gakula@marvell.com>
+In-Reply-To: <20210211155834.31874-1-gakula@marvell.com>
+To:     Geetha sowjanya <gakula@marvell.com>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+        sgoutham@marvell.com, lcherian@marvell.com, hkelam@marvell.com,
+        sbhatta@marvell.com, jerinj@marvell.com, bbrezillon@kernel.org,
+        arno@natisbad.org, schalla@marvell.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-src_table is unused and hence remove it from struct qce_cipher_reqctx
+Hello:
 
-Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
----
- drivers/crypto/qce/cipher.h | 1 -
- 1 file changed, 1 deletion(-)
+This series was applied to netdev/net-next.git (refs/heads/master):
 
-diff --git a/drivers/crypto/qce/cipher.h b/drivers/crypto/qce/cipher.h
-index cffa9fc628ff..850f257d00f3 100644
---- a/drivers/crypto/qce/cipher.h
-+++ b/drivers/crypto/qce/cipher.h
-@@ -40,7 +40,6 @@ struct qce_cipher_reqctx {
- 	struct scatterlist result_sg;
- 	struct sg_table dst_tbl;
- 	struct scatterlist *dst_sg;
--	struct sg_table src_tbl;
- 	struct scatterlist *src_sg;
- 	unsigned int cryptlen;
- 	struct skcipher_request fallback_req;	// keep at the end
--- 
-2.25.1
+On Thu, 11 Feb 2021 21:28:20 +0530 you wrote:
+> The current admin function (AF) driver and the netdev driver supports
+> OcteonTx2 silicon variants. The same OcteonTx2's
+> Resource Virtualization Unit (RVU) is carried forward to the next-gen
+> silicon ie OcteonTx3, with some changes and feature enhancements.
+> 
+> This patch set adds support for OcteonTx3 (CN10K) silicon and gets
+> the drivers to the same level as OcteonTx2. No new OcteonTx3 specific
+> features are added.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v6,01/14] octeontx2-af: cn10k: Add mbox support for CN10K platform
+    https://git.kernel.org/netdev/net-next/c/98c561116360
+  - [net-next,v6,02/14] octeontx2-pf: cn10k: Add mbox support for CN10K
+    https://git.kernel.org/netdev/net-next/c/facede8209ef
+  - [net-next,v6,03/14] octeontx2-af: cn10k: Update NIX/NPA context structure
+    https://git.kernel.org/netdev/net-next/c/30077d210c83
+  - [net-next,v6,04/14] octeontx2-af: cn10k: Update NIX and NPA context in debugfs
+    https://git.kernel.org/netdev/net-next/c/3feac505fb31
+  - [net-next,v6,05/14] octeontx2-pf: cn10k: Initialise NIX context
+    https://git.kernel.org/netdev/net-next/c/d21a857562ad
+  - [net-next,v6,06/14] octeontx2-pf: cn10k: Map LMTST region
+    https://git.kernel.org/netdev/net-next/c/6e8ad4387da5
+  - [net-next,v6,07/14] octeontx2-pf: cn10k: Use LMTST lines for NPA/NIX operations
+    https://git.kernel.org/netdev/net-next/c/4c236d5dc8b8
+  - [net-next,v6,08/14] octeontx2-af: cn10k: Add RPM MAC support
+    https://git.kernel.org/netdev/net-next/c/91c6945ea1f9
+  - [net-next,v6,09/14] octeontx2-af: cn10k: Add support for programmable channels
+    https://git.kernel.org/netdev/net-next/c/242da439214b
+  - [net-next,v6,10/14] octeontx2-af: cn10K: Add MTU configuration
+    https://git.kernel.org/netdev/net-next/c/6e54e1c5399a
+  - [net-next,v6,11/14] octeontx2-pf: cn10k: Get max mtu supported from admin function
+    https://git.kernel.org/netdev/net-next/c/ab58a416c93f
+  - [net-next,v6,12/14] octeontx2-af: cn10k: Add RPM LMAC pause frame support
+    https://git.kernel.org/netdev/net-next/c/1845ada47f6d
+  - [net-next,v6,13/14] octeontx2-af: cn10k: Add RPM Rx/Tx stats support
+    https://git.kernel.org/netdev/net-next/c/ce7a6c3106de
+  - [net-next,v6,14/14] octeontx2-af: cn10k: MAC internal loopback support
+    https://git.kernel.org/netdev/net-next/c/3ad3f8f93c81
+
+You are awesome, thank you!
+--
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
