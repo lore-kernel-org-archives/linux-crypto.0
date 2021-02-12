@@ -2,102 +2,102 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0CDEC433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Feb 2021 23:11:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8358EC433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Feb 2021 08:46:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 70BE664DFF
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Feb 2021 23:10:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B9D764E65
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Feb 2021 08:46:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230019AbhBKXK5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Feb 2021 18:10:57 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47662 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229997AbhBKXK4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Feb 2021 18:10:56 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 791BE64DFF;
-        Thu, 11 Feb 2021 23:10:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1613085015;
-        bh=hCLyUZbsNpnyDEkMy8y+vxPQWhHD/lh8S3pd0CdsZGI=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=lVaIPX8NockC5O25q0p4d/jHAEghS3qACYByM+4B7C372ccUnb2es4FGpxTMHptmB
-         KC4Hljpm6Vpa8KlYzDGjubmU5JBAtmMaK1Dfu8mgCQaRqs2UCAZySnMot5oCDh6Dc8
-         OH+tukIhBoJizWomzQsakgCP1Ttz47EYi4mZXE8CVjzFKV7Mc3mhbry6dOv7a58z/B
-         NK+oJcWq5TaMyZZQSaejFXJ85NxPdM+XfpWJRQMVqEcxHMadjzg/5AZlIWd+nFl1bt
-         g6LDQD1SZxeePCyZnuTQuy/ez67P+0ZqBPnfMoccO/281HJRWeEppU6NVbxotmHJCk
-         XoZFBauUkYsLg==
-Content-Type: text/plain; charset="utf-8"
+        id S229653AbhBLIq4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Feb 2021 03:46:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49270 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229617AbhBLIqz (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Feb 2021 03:46:55 -0500
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC188C061574;
+        Fri, 12 Feb 2021 00:46:14 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id o24so193153wmh.5;
+        Fri, 12 Feb 2021 00:46:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9W0viwdJntP7gI+dWPYfiMlk5bPjrilUkTfpNlZbWxk=;
+        b=gDOwGzS//QQJgRI7onTiuqDZ2keD2N0xTf5WETdLTC4niVcPBQ/y4qJfImZxtt7VfD
+         BHIRE9jJd7uEB25PsY+IerSaRj57+4WCVpI6MI5fgxhaAJvjRp6NXlrJW0TeRxz2kIr1
+         vpw5nBw/lChSH0zzq/3yoeYHJGtik4UpwZgR1aCtEOmtHP3qWq/KitaBt7dKyxzKRkgV
+         U9D77Rcv4rEr1qS6m0uryq+0WO5M0Xw3D8GmyJJpOB92l64AP1NWFndFDk5lv5QGDQnO
+         wN230x38G3ZxE4j2Wey71OqksHpHo9Uvt1UnYfor2F8KDPjGy5u3UyLIYM1LkIc94teE
+         F1+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9W0viwdJntP7gI+dWPYfiMlk5bPjrilUkTfpNlZbWxk=;
+        b=JsdRviqMrDqNre28KRqN98/u+ICgObF29WLAQnVZINJs/ur4TcRLvb+qzrLyoOxg8I
+         aKQJ5dGXR5OAlLOTwpCtJ4BkczKJT0KYFErJBx8aF9gOrsra/3JGgXM0kZZLeOHbTYwH
+         PLgs8w0DUtQ7NDL6+48d9P93TQah0bS6l8Z3Ru97MQoY3S14O636FcXHOXZQmDm/CO8/
+         x1n39ehp4KYGzM3Sh6V44Lk4BhXfz78lY5BrJKmhXCb9/qC8LqeJhx6MNXXo66d6zSKT
+         WEdCYvVYKWQIfEhGxqy+Oc4JO+9I7GxOQaB5jAb7NBnYnKXz/O4dJvOVQaRF1sA7R8Pf
+         OHcw==
+X-Gm-Message-State: AOAM5338WJuN+SMZm5jTvOr94kmhqa5+FNS29h2RgobIcebolj/S1+OF
+        dwNSDxcuxxfuwuFsTJPtyF0=
+X-Google-Smtp-Source: ABdhPJyZJ/a5SmKJ8hCB2zTiNZ74x4e3yd/e+MIQVJgA8wy1CfdzxlCjp8o+jiyH8VB1DdClpjgubw==
+X-Received: by 2002:a1c:2905:: with SMTP id p5mr1639409wmp.156.1613119573516;
+        Fri, 12 Feb 2021 00:46:13 -0800 (PST)
+Received: from Red.localdomain ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id j17sm12895530wmc.28.2021.02.12.00.46.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Feb 2021 00:46:13 -0800 (PST)
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     dan.carpenter@oracle.com, davem@davemloft.net,
+        herbert@gondor.apana.org.au, jernej.skrabec@siol.net,
+        lkp@intel.com, mripard@kernel.org, wens@csie.org
+Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH] crypto: sun8i-ss: fix result memory leak on error path
+Date:   Fri, 12 Feb 2021 09:46:10 +0100
+Message-Id: <20210212084610.32185-1-clabbe.montjoie@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next v6 00/14] Add Marvell CN10K support
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <161308501539.27196.9695165685515441633.git-patchwork-notify@kernel.org>
-Date:   Thu, 11 Feb 2021 23:10:15 +0000
-References: <20210211155834.31874-1-gakula@marvell.com>
-In-Reply-To: <20210211155834.31874-1-gakula@marvell.com>
-To:     Geetha sowjanya <gakula@marvell.com>
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-        sgoutham@marvell.com, lcherian@marvell.com, hkelam@marvell.com,
-        sbhatta@marvell.com, jerinj@marvell.com, bbrezillon@kernel.org,
-        arno@natisbad.org, schalla@marvell.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello:
+This patch fixes a memory leak on an error path.
 
-This series was applied to netdev/net-next.git (refs/heads/master):
+Fixes: d9b45418a917 ("crypto: sun8i-ss - support hash algorithms")
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+---
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Thu, 11 Feb 2021 21:28:20 +0530 you wrote:
-> The current admin function (AF) driver and the netdev driver supports
-> OcteonTx2 silicon variants. The same OcteonTx2's
-> Resource Virtualization Unit (RVU) is carried forward to the next-gen
-> silicon ie OcteonTx3, with some changes and feature enhancements.
-> 
-> This patch set adds support for OcteonTx3 (CN10K) silicon and gets
-> the drivers to the same level as OcteonTx2. No new OcteonTx3 specific
-> features are added.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v6,01/14] octeontx2-af: cn10k: Add mbox support for CN10K platform
-    https://git.kernel.org/netdev/net-next/c/98c561116360
-  - [net-next,v6,02/14] octeontx2-pf: cn10k: Add mbox support for CN10K
-    https://git.kernel.org/netdev/net-next/c/facede8209ef
-  - [net-next,v6,03/14] octeontx2-af: cn10k: Update NIX/NPA context structure
-    https://git.kernel.org/netdev/net-next/c/30077d210c83
-  - [net-next,v6,04/14] octeontx2-af: cn10k: Update NIX and NPA context in debugfs
-    https://git.kernel.org/netdev/net-next/c/3feac505fb31
-  - [net-next,v6,05/14] octeontx2-pf: cn10k: Initialise NIX context
-    https://git.kernel.org/netdev/net-next/c/d21a857562ad
-  - [net-next,v6,06/14] octeontx2-pf: cn10k: Map LMTST region
-    https://git.kernel.org/netdev/net-next/c/6e8ad4387da5
-  - [net-next,v6,07/14] octeontx2-pf: cn10k: Use LMTST lines for NPA/NIX operations
-    https://git.kernel.org/netdev/net-next/c/4c236d5dc8b8
-  - [net-next,v6,08/14] octeontx2-af: cn10k: Add RPM MAC support
-    https://git.kernel.org/netdev/net-next/c/91c6945ea1f9
-  - [net-next,v6,09/14] octeontx2-af: cn10k: Add support for programmable channels
-    https://git.kernel.org/netdev/net-next/c/242da439214b
-  - [net-next,v6,10/14] octeontx2-af: cn10K: Add MTU configuration
-    https://git.kernel.org/netdev/net-next/c/6e54e1c5399a
-  - [net-next,v6,11/14] octeontx2-pf: cn10k: Get max mtu supported from admin function
-    https://git.kernel.org/netdev/net-next/c/ab58a416c93f
-  - [net-next,v6,12/14] octeontx2-af: cn10k: Add RPM LMAC pause frame support
-    https://git.kernel.org/netdev/net-next/c/1845ada47f6d
-  - [net-next,v6,13/14] octeontx2-af: cn10k: Add RPM Rx/Tx stats support
-    https://git.kernel.org/netdev/net-next/c/ce7a6c3106de
-  - [net-next,v6,14/14] octeontx2-af: cn10k: MAC internal loopback support
-    https://git.kernel.org/netdev/net-next/c/3ad3f8f93c81
-
-You are awesome, thank you!
---
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
+index 11cbcbc83a7b..0b9aa24a5edd 100644
+--- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
++++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
+@@ -438,8 +438,8 @@ int sun8i_ss_hash_run(struct crypto_engine *engine, void *breq)
+ 	kfree(pad);
+ 
+ 	memcpy(areq->result, result, algt->alg.hash.halg.digestsize);
+-	kfree(result);
+ theend:
++	kfree(result);
+ 	crypto_finalize_hash_request(engine, breq, err);
+ 	return 0;
+ }
+-- 
+2.26.2
 
