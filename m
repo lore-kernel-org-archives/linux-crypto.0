@@ -2,570 +2,149 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31FB5C433DB
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Feb 2021 02:48:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC0B0C433E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Feb 2021 12:54:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CF0F364D8F
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Feb 2021 02:48:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79D2964DEC
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Feb 2021 12:54:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229729AbhBOCsZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 14 Feb 2021 21:48:25 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:46706 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229631AbhBOCsT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 14 Feb 2021 21:48:19 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lBTuz-0000hn-J9; Mon, 15 Feb 2021 13:47:22 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 15 Feb 2021 13:47:21 +1100
-Date:   Mon, 15 Feb 2021 13:47:21 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Update for 5.12
-Message-ID: <20210215024721.GA20593@gondor.apana.org.au>
-References: <20200803044024.GA6429@gondor.apana.org.au>
- <20201012033249.GA25179@gondor.apana.org.au>
- <20201214055515.GA14196@gondor.apana.org.au>
+        id S230257AbhBOMx5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Feb 2021 07:53:57 -0500
+Received: from mail-eopbgr20128.outbound.protection.outlook.com ([40.107.2.128]:52325
+        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230456AbhBOMxb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Feb 2021 07:53:31 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F6U5t/eIQfK0S5wwAJpuyThyFK/vsjy2sRBxW9ui4PjaciTvzKtezGdP1Al4p26ZFj1HuDY9w6XQX/8uEESG+FkSJexPvlIZM3e9PvgS67WrlOYcbKluqyq44HfuKl2UWpypGr9Ihfe4EXXhxlMCedtu1qmeNCWjXEunnCV/DZ6Ue+j3vgJkgyEUbuAaxw08LnBL4QREsmAQLItsNv3r/2fdJjqZ2q7w+3NI+SIWd66K+my6H/Rb4nljtf6F0a6nLOedC/dwK2/UPvKVqNLz8quXtcehmyJrYuwMzrxhM9FfVpCoZ5ke+0XnmCyEdhv0N7uj+zMD3Z2BQBaAj2UweA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/upXFrg4tWd+jfdGiQrzMXYiaGC68t2I2alvbkAl31A=;
+ b=T5qkpl4iujfXRG3AE2gdait74lu69vu0H7ISnQNDPt5ibDU9Zi4oQwYIlvJSowUqpt7VjLdx76cyTOZKHW/bfYsXR6j8xwhqp+Li0iNesbJNs+JEpSqMA+o3wo51/Lm4DevdSnCyktogAolkni4eK/Wzv9no8sAZdpp3dyZgI0di66POEB+fd55xb/yEi/BMxijDVLvUGDVhePY6nWNhu7iE4TyTLan+2T/XzvQe8Yy4xeQT2eOXowTZh/I0Ml9idWXlSFLeG5blbv1A75F30Lgln8Nd6ThOZlPhY7xps1srGdkU5pykUv7dkOpFT4A52MNUwQ7osf3XquPTN7Uiog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=hitachi-powergrids.com; dmarc=pass action=none
+ header.from=hitachi-powergrids.com; dkim=pass
+ header.d=hitachi-powergrids.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=hitachi-powergrids.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/upXFrg4tWd+jfdGiQrzMXYiaGC68t2I2alvbkAl31A=;
+ b=icaVLfmnMdZSggoVO0L/SOY+ecXWQOBNr0eOR4NAW2NkNm2GMoLoYujBCDQenjZGd0TUazBHilQKtLc9HJZgxwl7P2MtJ6aXJ38plPH42C9oP68xg5H/2n6aHs/jkk1hw6GFq4M2MW4N/Th413wfA5/MoMdYhgQLhA6dUP84LMA=
+Received: from AM6PR06MB5400.eurprd06.prod.outlook.com (2603:10a6:20b:85::31)
+ by AM6PR06MB5495.eurprd06.prod.outlook.com (2603:10a6:20b:99::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.26; Mon, 15 Feb
+ 2021 12:52:41 +0000
+Received: from AM6PR06MB5400.eurprd06.prod.outlook.com
+ ([fe80::dd3e:69ec:a4e4:5c7d]) by AM6PR06MB5400.eurprd06.prod.outlook.com
+ ([fe80::dd3e:69ec:a4e4:5c7d%7]) with mapi id 15.20.3846.039; Mon, 15 Feb 2021
+ 12:52:41 +0000
+From:   Luca Dariz <luca.dariz@hitachi-powergrids.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Holger Brunck <holger.brunck@hitachi-powergrids.com>,
+        Valentin Longchamp <valentin.longchamp@hitachi-powergrids.com>
+Subject: RE: [PATCH v2] hwrng: fix khwrng lifecycle
+Thread-Topic: [PATCH v2] hwrng: fix khwrng lifecycle
+Thread-Index: AQHW05qFV0ZE+WiQXUGvKi1k/RGcnaoU8hoAgERxIBA=
+Date:   Mon, 15 Feb 2021 12:52:41 +0000
+Message-ID: <AM6PR06MB5400DAFE0551F1D468B728FBAB889@AM6PR06MB5400.eurprd06.prod.outlook.com>
+References: <20201216105906.6607-1-luca.dariz@hitachi-powergrids.com>
+ <20210102211720.GA1788@gondor.apana.org.au>
+In-Reply-To: <20210102211720.GA1788@gondor.apana.org.au>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-processedbytemplafy: true
+authentication-results: gondor.apana.org.au; dkim=none (message not signed)
+ header.d=none;gondor.apana.org.au; dmarc=none action=none
+ header.from=hitachi-powergrids.com;
+x-originating-ip: [31.10.139.103]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 2f25386e-cb7f-4209-a660-08d8d1b094f1
+x-ms-traffictypediagnostic: AM6PR06MB5495:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR06MB54958AFCDEC22092BF45F562AB889@AM6PR06MB5495.eurprd06.prod.outlook.com>
+x-abb-o365-outbound: ABBOUTBOUND1
+x-ms-oob-tlc-oobclassifiers: OLM:5516;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: yOKLZ8jkYgdE2CvZVN3MKVV57/AOQpM7GhG4rPI/gB2ODqYZozUxPE2j1Dry72MdyPFr8NpQqgN2DLbAOxRvYvzCnXPhsykPCamaHSVuqpLLQEof+R/7vzL5Ptv8UF1p+7jju7ysDfmT60BN6tXHg1kZN1ZNhaCy+3d8/ntEukMlXR2UcGM5AOvjMs3o9DFNiNvoLIdCgYrW9ntoDU/cjMv9TtADKiJ96GTy+hHcvuEW5ynzwZrrND9hIYHZzWcAxnEhFIpTaFi9SRYNST+tHgYyeuEH9yLlwgngo5bLcrJusyVr3tjj1EqT4TZinDFiqG0w/OXSgoJIIs35cbyU5c6ZE+HBVH+cbRK78almN0M7MY3WJVqlLa1NKHlU/vtTWFgc+8rMafly0WT2kZJn0yhA9AyC9Fh/06NHGiW4YRYKomR5nOFGSm66SarGshe3IYe2C2MElAQawugdu2m6FJw2B9eg9ytogy9lEHpzMFsNPCyO6IZFdtrwGEDB/GWjOhBYKG67YLF2QwRdmf2CQRS4VfTgEXbUWVEc9rlYUQ6zdj1iwk0yl8F57LeLHryc
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM6PR06MB5400.eurprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(376002)(346002)(39860400002)(396003)(6506007)(55016002)(71200400001)(52536014)(8676002)(2906002)(4744005)(7696005)(8936002)(44832011)(5660300002)(186003)(26005)(86362001)(4326008)(316002)(9686003)(33656002)(66556008)(66446008)(66946007)(64756008)(66476007)(107886003)(6916009)(478600001)(76116006)(54906003)(40753002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?Dt3yDIzTdlw06u9AQAhipFYytj4qQVpHQa9FUM77l8Fcgfcj4K4PM9aTNaDD?=
+ =?us-ascii?Q?SSxFeuvhJTqiTtlpgqPbja6rafuDc+bzcjh4URDpEHMmZhDDNy3yUiogvrMV?=
+ =?us-ascii?Q?zwBXd46IujBanNaFoaGxri9+J/PY0uGDpAV7lr7er19WLlNB+x+f+gcOfYUL?=
+ =?us-ascii?Q?0CpO1bskJ7ZCvCkIfrgtpOgfdVkMWbupfrGx28Sd0Jfb/FhRs2TAD8gsnEgk?=
+ =?us-ascii?Q?W92ovFhWQVMiOnaBlzAcrYnPVCMwZccqy19+aNfejdIPaNPlsVzjgUewMuwE?=
+ =?us-ascii?Q?Jx0Nv88oy4BwufV97w/Ubt5DiLORuqUXxVT6Kka1rqw+oSSEBe1gBSabeSXB?=
+ =?us-ascii?Q?9g5kmCNn3dkIDTPWidoZxFeTmZLL64v5BD5DxvpHqSn8SMt6zGLLRKTguAPn?=
+ =?us-ascii?Q?jIEyKuIe318ewZYrikjR2zwlkqcm4g2cIA7/emWUuWKbtf6drMbeMv2tJcwg?=
+ =?us-ascii?Q?NyZC/xwwV9urCMmM0oVrE+j+0Z9Xetg2+Ks6BNymkdg2WqLIGyxDZ2xLRY76?=
+ =?us-ascii?Q?NGGiJFW2YtjvWU+CWZx9PIg5pkLUnB2mmM7OHVYB1QswmbSjPdmqxvfd0TPL?=
+ =?us-ascii?Q?GRZHk4Tq5peG6z57nOcVH9FsAjPiDNwAHu8eYbXUrUXj0UDyfWRQ1JI+XnUK?=
+ =?us-ascii?Q?m8zvWsqPWsasVjH5XbyxQQGHLXQmsfz7Gk/QyuTA71PuxAyHcFFtWIKWp8Yz?=
+ =?us-ascii?Q?uP7xshRqNA/NIduPk9LhpbgZAckSCa8bsFUwnaSaOtp6G+JkCphkhxIkzv1X?=
+ =?us-ascii?Q?NuquPR5MUOWVxh6P6HHdNhY3hRUAftHHFzrQkmp5lV7lQwgIM8tqxp7tPgsl?=
+ =?us-ascii?Q?Tlve6FhgIUdZU3ah0cnf82698CUrNeZO2cg9akBT7pIUsEqHEo+INsI6IOOt?=
+ =?us-ascii?Q?ZsiMBaCTD2o5O82juhQIRJDHmq4e+d+VqHRLRFqlvP7JeMw+vpvDP48/QGX8?=
+ =?us-ascii?Q?knlNuzOoY8/Eft4HHBtFcCcZpCGo6kZrsWtLjpiWj0PN883KZgIRVibDtrEv?=
+ =?us-ascii?Q?PE0h5LjODj9Qd/5Q6CjMv08dL1UM09df8wEL9sXe6slpSsKKDv/Eha8JLFMi?=
+ =?us-ascii?Q?K/Wg21z9hjBQdtSIQXYeNzhjd8gV/+i13npN6oGZ4/nES18Ta+XNMt5X0jJ6?=
+ =?us-ascii?Q?2UpsBqjETeDAhgOcXe8nAhOVpKnvSR7ALSkKG1I5WMY0PrHrOKKIILRj4U4G?=
+ =?us-ascii?Q?8R2yKcQFGJFtZkVhWYx/eIQ5DgveV2i+drlWm2OELOKmE0mQyZeWhK3ORveI?=
+ =?us-ascii?Q?P7NuFppybSym2F1Cclwa/l3XjClO4/9R9gZZj7MwU65X38Xu3HaqETnVqQbJ?=
+ =?us-ascii?Q?n1qyTBLBGwpa0XUjQb4vKZ22?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201214055515.GA14196@gondor.apana.org.au>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-OriginatorOrg: hitachi-powergrids.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR06MB5400.eurprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2f25386e-cb7f-4209-a660-08d8d1b094f1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Feb 2021 12:52:41.5119
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 7831e6d9-dc6c-4cd1-9ec6-1dc2b4133195
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Fxi7u1Me1sYsu0mG+OuY9X3W1r2tCpvYiOYxre/9D9vxcLpI/mF2a5jNyz86BO/pKw9pJ0aNtEVXpe0Jf9FdrSa00Ts18sxXvt7sT7TYw5NhARgRvbRXXNi3AYYW0NfZ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR06MB5495
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+>On Wed, Dec 16, 2020 at 11:59:06AM +0100, Luca Dariz wrote:
+>>
+>> @@ -432,12 +433,15 @@ static int hwrng_fillfn(void *unused)  {
+>>       long rc;
+>>
+>> +     complete(&hwrng_started);
+>>       while (!kthread_should_stop()) {
+>>               struct hwrng *rng;
+>>
+>>               rng =3D get_current_rng();
+>> -             if (IS_ERR(rng) || !rng)
+>> -                     break;
+>> +             if (IS_ERR(rng) || !rng) {
+>> +                     msleep_interruptible(10);
+>> +                     continue;
+>
+>Please fix this properly with reference counting.
 
-API:
+I thought a bit more about it, but I always find a potential race condition=
+ with kthread_stop() and the hwrng_fill NULL pointer check.
+In my opinion the thread termination should be only triggered with kthread_=
+stop(), otherwise it might be called with an invalid or NULL hwrng_fill.
+Am I missing something?
 
-- Restrict crypto_cipher to internal API users only.
+Thanks
+Luca
 
-Algorithms:
-
-- Add x86 aesni acceleration for cts.
-- Improve x86 aesni acceleration for xts.
-- Remove x86 acceleration of some uncommon algorithms.
-- Remove RIPE-MD, Tiger and Salsa20.
-- Remove tnepres.
-- Add ARM acceleration for BLAKE2s and BLAKE2b.
-
-Drivers:
-
-- Add Keem Bay OCS HCU driver.
-- Add Marvell OcteonTX2 CPT PF driver.
-- Remove PicoXcell driver.
-- Remove mediatek driver.
-
-The following changes since commit 0aa171e9b267ce7c52d3a3df7bc9c1fc0203dec5:
-
-  crypto: ecdh - avoid buffer overflow in ecdh_set_secret() (2021-01-03 08:35:35 +1100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus 
-
-for you to fetch changes up to 0de9dc80625b0ca1cb9730c5ed1c5a8cab538369:
-
-  hwrng: timeriomem - Use device-managed registration API (2021-02-10 17:56:01 +1100)
-
-----------------------------------------------------------------
-Adam Guerin (3):
-      crypto: qat - fix potential spectre issue
-      crypto: qat - change format string and cast ring size
-      crypto: qat - reduce size of mapped region
-
-Ard Biesheuvel (60):
-      crypto: aesni - implement support for cts(cbc(aes))
-      crypto: tcrypt - avoid signed overflow in byte count
-      chcr_ktls: use AES library for single use cipher
-      crypto: remove cipher routines from public crypto API
-      crypto: arm64/aes-ce - really hide slower algos when faster ones are enabled
-      crypto: arm64/aes-ctr - improve tail handling
-      crypto: x86/aes-ni-xts - use direct calls to and 4-way stride
-      crypto: x86/aes-ni-xts - rewrite and drop indirections via glue helper
-      crypto: aesni - prevent misaligned buffers on the stack
-      crypto: aesni - drop unused asm prototypes
-      crypto: aesni - clean up mapping of associated data
-      crypto: aesni - refactor scatterlist processing
-      crypto: aesni - replace function pointers with static branches
-      crypto: x86/camellia - switch to XTS template
-      crypto: x86/cast6 - switch to XTS template
-      crypto: x86/serpent- switch to XTS template
-      crypto: x86/twofish - switch to XTS template
-      crypto: x86/glue-helper - drop XTS helper routines
-      crypto: x86/camellia - drop CTR mode implementation
-      crypto: x86/serpent - drop CTR mode implementation
-      crypto: x86/cast5 - drop CTR mode implementation
-      crypto: x86/cast6 - drop CTR mode implementation
-      crypto: x86/twofish - drop CTR mode implementation
-      crypto: x86/glue-helper - drop CTR helper routines
-      crypto: x86/des - drop CTR mode implementation
-      crypto: x86/blowfish - drop CTR mode implementation
-      crypto: x86 - add some helper macros for ECB and CBC modes
-      crypto: x86/camellia - drop dependency on glue helper
-      crypto: x86/serpent - drop dependency on glue helper
-      crypto: x86/cast5 - drop dependency on glue helper
-      crypto: x86/cast6 - drop dependency on glue helper
-      crypto: x86/twofish - drop dependency on glue helper
-      crypto: x86 - remove glue helper module
-      crypto: x86 - use local headers for x86 specific shared declarations
-      crypto - shash: reduce minimum alignment of shash_desc structure
-      crypto: arm64/sha - add missing module aliases
-      crypto: aesni - replace CTR function pointer with static call
-      crypto: aesni - release FPU during skcipher walk API calls
-      crypto: rmd128 - remove RIPE-MD 128 hash algorithm
-      crypto: rmd256 - remove RIPE-MD 256 hash algorithm
-      crypto: rmd320 - remove RIPE-MD 320 hash algorithm
-      crypto: tgr192 - remove Tiger 128/160/192 hash algorithms
-      crypto: salsa20 - remove Salsa20 stream cipher algorithm
-      arm64: assembler: add cond_yield macro
-      crypto: michael_mic - fix broken misalignment handling
-      crypto: serpent - get rid of obsolete tnepres variant
-      crypto: serpent - use unaligned accessors instead of alignmask
-      crypto: blowfish - use unaligned accessors instead of alignmask
-      crypto: camellia - use unaligned accessors instead of alignmask
-      crypto: cast5 - use unaligned accessors instead of alignmask
-      crypto: cast6 - use unaligned accessors instead of alignmask
-      crypto: fcrypt - drop unneeded alignmask
-      crypto: twofish - use unaligned accessors instead of alignmask
-      crypto: arm64/sha1-ce - simplify NEON yield
-      crypto: arm64/sha2-ce - simplify NEON yield
-      crypto: arm64/sha3-ce - simplify NEON yield
-      crypto: arm64/sha512-ce - simplify NEON yield
-      crypto: arm64/aes-neonbs - remove NEON yield calls
-      crypto: arm64/aes-ce-mac - simplify NEON yield
-      crypto: arm64/crc-t10dif - move NEON yield to C code
-
-Arnd Bergmann (1):
-      crypto: octeontx2 - fix -Wpointer-bool-conversion warning
-
-Bhaskar Chowdhury (2):
-      crypto: marvell/cesa - Fix a spelling s/fautly/faultly/ in comment
-      crypto: xor - Fix typo of optimization
-
-Christophe JAILLET (1):
-      hwrng: ingenic - Fix a resource leak in an error handling path
-
-Christophe Leroy (2):
-      crypto: talitos - Work around SEC6 ERRATA (AES-CTR mode data size error)
-      crypto: talitos - Fix ctr(aes) on SEC1
-
-Corentin Labbe (8):
-      crypto: sun4i-ss - linearize buffers content must be kept
-      crypto: sun4i-ss - checking sg length is not sufficient
-      crypto: sun4i-ss - IV register does not work on A10 and A13
-      crypto: sun4i-ss - handle BigEndian for cipher
-      crypto: sun4i-ss - initialize need_fallback
-      crypto: sun4i-ss - fix kmap usage
-      crypto: sun4i-ss - enabled stats via debugfs
-      crypto: sun4i-ss - add SPDX header and remove blank lines
-
-Dan Carpenter (2):
-      crypto: keembay-ocs-hcu - Fix a WARN() message
-      crypto: octeontx2 - fix signedness bug in cptvf_register_interrupts()
-
-Daniele Alessandrelli (6):
-      crypto: keembay-ocs-hcu - Add HMAC support
-      crypto: keembay-ocs-hcu - Add optional support for sha224
-      MAINTAINERS: Add maintainers for Keem Bay OCS HCU driver
-      crypto: keembay-ocs-hcu - Add dependency on HAS_IOMEM and ARCH_KEEMBAY
-      crypto: ecdh_helper - Ensure 'len >= secret.len' in decode_key()
-      crypto: keembay-ocs-aes - Fix 'q' assignment during CCM B0 generation
-
-Declan Murphy (2):
-      dt-bindings: crypto: Add Keem Bay OCS HCU bindings
-      crypto: keembay - Add Keem Bay OCS HCU driver
-
-Eric Biggers (14):
-      crypto: blake2s - define shash_alg structs using macros
-      crypto: x86/blake2s - define shash_alg structs using macros
-      crypto: blake2s - remove unneeded includes
-      crypto: blake2s - move update and final logic to internal/blake2s.h
-      crypto: blake2s - share the "shash" API boilerplate code
-      crypto: blake2s - optimize blake2s initialization
-      crypto: blake2s - add comment for blake2s_state fields
-      crypto: blake2s - adjust include guard naming
-      crypto: blake2s - include <linux/bug.h> instead of <asm/bug.h>
-      crypto: arm/blake2s - add ARM scalar optimized BLAKE2s
-      wireguard: Kconfig: select CRYPTO_BLAKE2S_ARM
-      crypto: blake2b - sync with blake2s implementation
-      crypto: blake2b - update file comment
-      crypto: arm/blake2b - add NEON-accelerated BLAKE2b
-
-Fabio Estevam (1):
-      crypto: sahara - Remove unused .id_table support
-
-Florian Fainelli (1):
-      crypto: crypto4xx - Avoid linking failure with HW_RANDOM=m
-
-Geert Uytterhoeven (1):
-      crypto: marvell - CRYPTO_DEV_OCTEONTX2_CPT should depend on ARCH_THUNDER2
-
-Herbert Xu (6):
-      crypto: vmx - Move extern declarations into header file
-      crypto: stm32 - Fix last sparse warning in stm32_cryp_check_ctr_counter
-      crypto: bcm - Fix sparse warnings
-      crypto: marvell/cesa - Fix use of sg_pcopy on iomem pointer
-      crypto: octeontx2 - Add dependency on NET_VENDOR_MARVELL
-      Merge git://git.kernel.org/.../arm64/linux for-next/crypto
-
-Hui Tang (6):
-      crypto: hisilicon/hpre - delete ECC 1bit error reported threshold
-      crypto: hisilicon/hpre - add two RAS correctable errors processing
-      crypto: hisilicon/hpre - add ecc algorithm inqury for uacce device
-      crypto: hisilicon/hpre - adapt the number of clusters
-      crypto: hisilicon/hpre - tiny fix
-      crypto: hisilicon/hpre - enable Elliptic curve cryptography
-
-Jan Henrik Weinstock (1):
-      hwrng: timeriomem - Fix cooldown period calculation
-
-Jason A. Donenfeld (1):
-      crypto: lib/chacha20poly1305 - define empty module exit function
-
-Jiapeng Chong (1):
-      crypto: caam - Replace DEFINE_SIMPLE_ATTRIBUTE with DEFINE_DEBUGFS_ATTRIBUTE
-
-Jiri Olsa (1):
-      crypto: bcm - Rename struct device_private to bcm_device_private
-
-Kai Ye (4):
-      crypto: hisilicon/qm - SVA bugfixed on Kunpeng920
-      crypto: hisilicon - add ZIP device using mode parameter
-      crypto: hisilicon/hpre - register HPRE device to uacce
-      crypto: hisilicon/sec - register SEC device to uacce
-
-Krzysztof Kozlowski (1):
-      MAINTAINERS: crypto: s5p-sss: drop Kamil Konieczny
-
-Marco Chiappero (1):
-      crypto: qat - replace CRYPTO_AES with CRYPTO_LIB_AES in Kconfig
-
-Matthias Brugger (2):
-      hwrng: iproc-rng200 - Fix disable of the block.
-      hwrng: iproc-rng200 - Move enable/disable in separate function
-
-Ovidiu Panait (1):
-      crypto: keembay - use 64-bit arithmetic for computing bit_len
-
-Rob Herring (1):
-      crypto: picoxcell - Remove PicoXcell driver
-
-Sihang Chen (1):
-      crypto: hisilicon/qm - update irqflag
-
-Srujana Challa (9):
-      crypto: marvell - add Marvell OcteonTX2 CPT PF driver
-      crypto: octeontx2 - add mailbox communication with AF
-      crypto: octeontx2 - enable SR-IOV and mailbox communication with VF
-      crypto: octeontx2 - load microcode and create engine groups
-      crypto: octeontx2 - add LF framework
-      crypto: octeontx2 - add support to get engine capabilities
-      crypto: octeontx2 - add virtual function driver support
-      crypto: octeontx2 - add support to process the crypto request
-      crypto: octeontx2 - register with linux crypto framework
-
-Tian Tao (4):
-      crypto: ccree - remove unused including <linux/version.h>
-      crypto: inside-secure - fix platform_get_irq.cocci warnings
-      hwrng: optee - Use device-managed registration API
-      hwrng: timeriomem - Use device-managed registration API
-
-Vic Wu (1):
-      crypto: mediatek - remove obsolete driver
-
-Weili Qian (7):
-      crypto: hisilicon/qm - fix use of 'dma_map_single'
-      crypto: hisilicon - PASID fixed on Kunpeng 930
-      crypto: hisilicon/qm - removing driver after reset
-      crypto: hisilicon/qm - fix request missing error
-      crypto: hisilicon/qm - fix the value of 'QM_SQC_VFT_BASE_MASK_V2'
-      crypto: hisilicon/qm - do not reset hardware when CE happens
-      crypto: hisilicon/qm - fix printing format issue
-
-Wojciech Ziemba (1):
-      crypto: qat - configure arbiter mapping based on engines enabled
-
-Xu Wang (1):
-      crypto: cpt - remove casting dma_alloc_coherent
-
-Yang Li (1):
-      crypto: powerpc/sha256 - remove unneeded semicolon
-
-dingsenjie (1):
-      crypto: ccree - fix spelling typo of allocated
-
- .mailmap                                           |    1 -
- .../admin-guide/device-mapper/dm-integrity.rst     |    4 +-
- Documentation/crypto/api-skcipher.rst              |    4 +-
- .../bindings/crypto/intel,keembay-ocs-hcu.yaml     |   46 +
- .../bindings/crypto/samsung-slimsss.yaml           |    1 -
- .../devicetree/bindings/crypto/samsung-sss.yaml    |    1 -
- MAINTAINERS                                        |   12 +-
- arch/arm/crypto/Kconfig                            |   19 +
- arch/arm/crypto/Makefile                           |    4 +
- arch/arm/crypto/aes-neonbs-glue.c                  |    3 +
- arch/arm/crypto/blake2b-neon-core.S                |  347 ++++
- arch/arm/crypto/blake2b-neon-glue.c                |  105 ++
- arch/arm/crypto/blake2s-core.S                     |  285 +++
- arch/arm/crypto/blake2s-glue.c                     |   78 +
- arch/arm64/crypto/aes-glue.c                       |   71 +-
- arch/arm64/crypto/aes-modes.S                      |  217 ++-
- arch/arm64/crypto/aes-neonbs-core.S                |    8 +-
- arch/arm64/crypto/crct10dif-ce-core.S              |   43 +-
- arch/arm64/crypto/crct10dif-ce-glue.c              |   30 +-
- arch/arm64/crypto/sha1-ce-core.S                   |   47 +-
- arch/arm64/crypto/sha1-ce-glue.c                   |   23 +-
- arch/arm64/crypto/sha2-ce-core.S                   |   38 +-
- arch/arm64/crypto/sha2-ce-glue.c                   |   24 +-
- arch/arm64/crypto/sha3-ce-core.S                   |   81 +-
- arch/arm64/crypto/sha3-ce-glue.c                   |   18 +-
- arch/arm64/crypto/sha512-ce-core.S                 |   29 +-
- arch/arm64/crypto/sha512-ce-glue.c                 |   55 +-
- arch/arm64/include/asm/assembler.h                 |   16 +
- arch/powerpc/crypto/sha256-spe-glue.c              |    2 +-
- arch/s390/crypto/aes_s390.c                        |    2 +
- arch/x86/crypto/Makefile                           |    2 -
- arch/x86/crypto/aesni-intel_asm.S                  |  482 +++++-
- arch/x86/crypto/aesni-intel_glue.c                 |  753 ++++----
- arch/x86/crypto/blake2s-glue.c                     |  150 +-
- arch/x86/crypto/blowfish_glue.c                    |  107 --
- arch/x86/crypto/camellia-aesni-avx-asm_64.S        |  298 ----
- arch/x86/crypto/camellia-aesni-avx2-asm_64.S       |  351 ----
- arch/x86/{include/asm => }/crypto/camellia.h       |   24 -
- arch/x86/crypto/camellia_aesni_avx2_glue.c         |  198 +--
- arch/x86/crypto/camellia_aesni_avx_glue.c          |  216 +--
- arch/x86/crypto/camellia_glue.c                    |  145 +-
- arch/x86/crypto/cast5_avx_glue.c                   |  287 +---
- arch/x86/crypto/cast6-avx-x86_64-asm_64.S          |   84 -
- arch/x86/crypto/cast6_avx_glue.c                   |  207 +--
- arch/x86/crypto/des3_ede_glue.c                    |  104 --
- arch/x86/crypto/ecb_cbc_helpers.h                  |   76 +
- arch/x86/crypto/glue_helper-asm-avx.S              |  104 --
- arch/x86/crypto/glue_helper-asm-avx2.S             |  136 --
- arch/x86/crypto/glue_helper.c                      |  381 -----
- arch/x86/crypto/serpent-avx-x86_64-asm_64.S        |   68 -
- arch/x86/crypto/serpent-avx.h                      |   21 +
- arch/x86/crypto/serpent-avx2-asm_64.S              |   87 -
- arch/x86/{include/asm => }/crypto/serpent-sse2.h   |    0
- arch/x86/crypto/serpent_avx2_glue.c                |  185 +-
- arch/x86/crypto/serpent_avx_glue.c                 |  215 +--
- arch/x86/crypto/serpent_sse2_glue.c                |  150 +-
- arch/x86/crypto/twofish-avx-x86_64-asm_64.S        |   80 -
- arch/x86/{include/asm => }/crypto/twofish.h        |    4 -
- arch/x86/crypto/twofish_avx_glue.c                 |  211 +--
- arch/x86/crypto/twofish_glue_3way.c                |  160 +-
- arch/x86/include/asm/crypto/glue_helper.h          |  118 --
- arch/x86/include/asm/crypto/serpent-avx.h          |   42 -
- crypto/Kconfig                                     |   96 +-
- crypto/Makefile                                    |    4 -
- crypto/adiantum.c                                  |    2 +
- crypto/ansi_cprng.c                                |    2 +
- crypto/blake2b_generic.c                           |  249 +--
- crypto/blake2s_generic.c                           |  158 +-
- crypto/blowfish_generic.c                          |   23 +-
- crypto/camellia_generic.c                          |   45 +-
- crypto/cast5_generic.c                             |   23 +-
- crypto/cast6_generic.c                             |   39 +-
- crypto/cbc.c                                       |    1 +
- crypto/ccm.c                                       |    2 +
- crypto/cfb.c                                       |    2 +
- crypto/cipher.c                                    |    7 +-
- crypto/cmac.c                                      |    2 +
- crypto/ctr.c                                       |    2 +
- crypto/drbg.c                                      |    2 +
- crypto/ecb.c                                       |    1 +
- crypto/ecdh_helper.c                               |    3 +
- crypto/essiv.c                                     |    2 +
- crypto/fcrypt.c                                    |    1 -
- crypto/keywrap.c                                   |    2 +
- crypto/michael_mic.c                               |   31 +-
- crypto/ofb.c                                       |    2 +
- crypto/pcbc.c                                      |    2 +
- crypto/ripemd.h                                    |   14 -
- crypto/rmd128.c                                    |  323 ----
- crypto/rmd256.c                                    |  342 ----
- crypto/rmd320.c                                    |  391 -----
- crypto/salsa20_generic.c                           |  212 ---
- crypto/serpent_generic.c                           |  126 +-
- crypto/skcipher.c                                  |    8 +-
- crypto/tcrypt.c                                    |  113 +-
- crypto/testmgr.c                                   |   57 +-
- crypto/testmgr.h                                   | 1632 ------------------
- crypto/tgr192.c                                    |  682 --------
- crypto/twofish_generic.c                           |   11 +-
- crypto/vmac.c                                      |    2 +
- crypto/xcbc.c                                      |    2 +
- crypto/xor.c                                       |    2 +-
- crypto/xts.c                                       |    2 +
- drivers/char/hw_random/ingenic-trng.c              |    6 +-
- drivers/char/hw_random/iproc-rng200.c              |   38 +-
- drivers/char/hw_random/optee-rng.c                 |    3 +-
- drivers/char/hw_random/timeriomem-rng.c            |    5 +-
- drivers/crypto/Kconfig                             |   35 +-
- drivers/crypto/Makefile                            |    2 -
- drivers/crypto/allwinner/Kconfig                   |    9 +
- .../crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c    |  196 ++-
- drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c  |   52 +
- drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c  |    6 +
- drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c  |    6 +
- drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h       |    8 +
- drivers/crypto/bcm/cipher.c                        |    6 +-
- drivers/crypto/bcm/cipher.h                        |    4 +-
- drivers/crypto/bcm/spu.c                           |   20 +-
- drivers/crypto/bcm/spu2.c                          |    6 +-
- drivers/crypto/bcm/spu2.h                          |    8 +-
- drivers/crypto/bcm/spum.h                          |   22 +-
- drivers/crypto/bcm/util.c                          |    4 +-
- drivers/crypto/bcm/util.h                          |   26 +-
- drivers/crypto/caam/debugfs.c                      |    4 +-
- drivers/crypto/cavium/cpt/cptvf_main.c             |    8 +-
- drivers/crypto/ccree/cc_cipher.c                   |    2 +-
- drivers/crypto/ccree/cc_driver.h                   |    1 -
- drivers/crypto/geode-aes.c                         |    2 +
- drivers/crypto/hisilicon/hpre/hpre.h               |    8 +-
- drivers/crypto/hisilicon/hpre/hpre_main.c          |  169 +-
- drivers/crypto/hisilicon/qm.c                      |  193 ++-
- drivers/crypto/hisilicon/qm.h                      |   33 +-
- drivers/crypto/hisilicon/sec2/sec_main.c           |   42 +-
- drivers/crypto/hisilicon/zip/zip_main.c            |   23 +-
- drivers/crypto/inside-secure/safexcel.c            |    6 +-
- drivers/crypto/inside-secure/safexcel_hash.c       |    1 +
- drivers/crypto/keembay/Kconfig                     |   31 +
- drivers/crypto/keembay/Makefile                    |    3 +
- drivers/crypto/keembay/keembay-ocs-hcu-core.c      | 1264 ++++++++++++++
- drivers/crypto/keembay/ocs-aes.c                   |   10 +-
- drivers/crypto/keembay/ocs-hcu.c                   |  840 +++++++++
- drivers/crypto/keembay/ocs-hcu.h                   |  106 ++
- drivers/crypto/marvell/Kconfig                     |   15 +
- drivers/crypto/marvell/Makefile                    |    1 +
- drivers/crypto/marvell/cesa/cesa.c                 |   10 +-
- drivers/crypto/marvell/cesa/cesa.h                 |   31 +-
- drivers/crypto/marvell/cesa/cipher.c               |   34 +-
- drivers/crypto/marvell/cesa/hash.c                 |   59 +-
- drivers/crypto/marvell/cesa/tdma.c                 |   52 +-
- drivers/crypto/marvell/octeontx2/Makefile          |   10 +
- drivers/crypto/marvell/octeontx2/otx2_cpt_common.h |  137 ++
- .../crypto/marvell/octeontx2/otx2_cpt_hw_types.h   |  464 +++++
- .../marvell/octeontx2/otx2_cpt_mbox_common.c       |  202 +++
- drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h |  197 +++
- drivers/crypto/marvell/octeontx2/otx2_cptlf.c      |  428 +++++
- drivers/crypto/marvell/octeontx2/otx2_cptlf.h      |  353 ++++
- drivers/crypto/marvell/octeontx2/otx2_cptpf.h      |   61 +
- drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c |  713 ++++++++
- drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c |  356 ++++
- .../crypto/marvell/octeontx2/otx2_cptpf_ucode.c    | 1415 +++++++++++++++
- .../crypto/marvell/octeontx2/otx2_cptpf_ucode.h    |  162 ++
- drivers/crypto/marvell/octeontx2/otx2_cptvf.h      |   29 +
- drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c | 1758 +++++++++++++++++++
- drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.h |  178 ++
- drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c |  410 +++++
- drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c |  167 ++
- .../crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c   |  541 ++++++
- drivers/crypto/mediatek/Makefile                   |    3 -
- drivers/crypto/mediatek/mtk-aes.c                  | 1271 --------------
- drivers/crypto/mediatek/mtk-platform.c             |  586 -------
- drivers/crypto/mediatek/mtk-platform.h             |  231 ---
- drivers/crypto/mediatek/mtk-regs.h                 |  190 --
- drivers/crypto/mediatek/mtk-sha.c                  | 1353 ---------------
- drivers/crypto/picoxcell_crypto.c                  | 1807 --------------------
- drivers/crypto/picoxcell_crypto_regs.h             |  115 --
- drivers/crypto/qat/Kconfig                         |    2 +-
- drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c     |   14 +-
- drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |   17 +-
- drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c     |   27 +-
- drivers/crypto/qat/qat_common/adf_accel_devices.h  |    3 +-
- drivers/crypto/qat/qat_common/adf_ctl_drv.c        |    1 +
- drivers/crypto/qat/qat_common/adf_hw_arbiter.c     |    8 +-
- drivers/crypto/qat/qat_common/adf_transport.c      |    2 +
- .../crypto/qat/qat_common/adf_transport_debug.c    |    4 +-
- drivers/crypto/qat/qat_common/qat_algs.c           |    1 +
- drivers/crypto/qat/qat_common/qat_asym_algs.c      |   12 +-
- .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c |   28 +-
- drivers/crypto/sahara.c                            |    7 -
- drivers/crypto/stm32/stm32-cryp.c                  |    2 +-
- drivers/crypto/talitos.c                           |   50 +-
- drivers/crypto/talitos.h                           |    1 +
- drivers/crypto/vmx/aes.c                           |    1 +
- drivers/crypto/vmx/aesp8-ppc.h                     |    6 +
- drivers/crypto/vmx/vmx.c                           |    7 +-
- drivers/net/Kconfig                                |    1 +
- drivers/net/ethernet/chelsio/inline_crypto/Kconfig |    1 +
- .../chelsio/inline_crypto/ch_ktls/chcr_ktls.c      |   19 +-
- include/crypto/algapi.h                            |   39 -
- include/crypto/blake2b.h                           |   67 +
- include/crypto/blake2s.h                           |   63 +-
- include/crypto/hash.h                              |    8 +-
- include/crypto/internal/blake2b.h                  |  115 ++
- include/crypto/internal/blake2s.h                  |  109 +-
- include/crypto/internal/cipher.h                   |  218 +++
- include/crypto/internal/skcipher.h                 |    2 +-
- include/linux/crypto.h                             |  172 +-
- lib/crypto/blake2s.c                               |   48 +-
- lib/crypto/chacha20poly1305.c                      |    5 +
- 208 files changed, 13977 insertions(+), 15312 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/crypto/intel,keembay-ocs-hcu.yaml
- create mode 100644 arch/arm/crypto/blake2b-neon-core.S
- create mode 100644 arch/arm/crypto/blake2b-neon-glue.c
- create mode 100644 arch/arm/crypto/blake2s-core.S
- create mode 100644 arch/arm/crypto/blake2s-glue.c
- rename arch/x86/{include/asm => }/crypto/camellia.h (69%)
- create mode 100644 arch/x86/crypto/ecb_cbc_helpers.h
- delete mode 100644 arch/x86/crypto/glue_helper.c
- create mode 100644 arch/x86/crypto/serpent-avx.h
- rename arch/x86/{include/asm => }/crypto/serpent-sse2.h (100%)
- rename arch/x86/{include/asm => }/crypto/twofish.h (80%)
- delete mode 100644 arch/x86/include/asm/crypto/glue_helper.h
- delete mode 100644 arch/x86/include/asm/crypto/serpent-avx.h
- delete mode 100644 crypto/rmd128.c
- delete mode 100644 crypto/rmd256.c
- delete mode 100644 crypto/rmd320.c
- delete mode 100644 crypto/salsa20_generic.c
- delete mode 100644 crypto/tgr192.c
- create mode 100644 drivers/crypto/keembay/keembay-ocs-hcu-core.c
- create mode 100644 drivers/crypto/keembay/ocs-hcu.c
- create mode 100644 drivers/crypto/keembay/ocs-hcu.h
- create mode 100644 drivers/crypto/marvell/octeontx2/Makefile
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptlf.c
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptlf.h
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf.h
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.h
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf.h
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.h
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
- create mode 100644 drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
- delete mode 100644 drivers/crypto/mediatek/Makefile
- delete mode 100644 drivers/crypto/mediatek/mtk-aes.c
- delete mode 100644 drivers/crypto/mediatek/mtk-platform.c
- delete mode 100644 drivers/crypto/mediatek/mtk-platform.h
- delete mode 100644 drivers/crypto/mediatek/mtk-regs.h
- delete mode 100644 drivers/crypto/mediatek/mtk-sha.c
- delete mode 100644 drivers/crypto/picoxcell_crypto.c
- delete mode 100644 drivers/crypto/picoxcell_crypto_regs.h
- create mode 100644 include/crypto/blake2b.h
- create mode 100644 include/crypto/internal/blake2b.h
- create mode 100644 include/crypto/internal/cipher.h
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
