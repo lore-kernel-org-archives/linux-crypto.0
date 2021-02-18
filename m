@@ -2,76 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03B1EC433DB
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Feb 2021 02:08:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA4BC433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Feb 2021 02:16:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE2D76146D
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Feb 2021 02:08:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E442964D74
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Feb 2021 02:16:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229874AbhBRCHt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Feb 2021 21:07:49 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:34530 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229806AbhBRCHt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Feb 2021 21:07:49 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lCYiN-0006Z3-Cy; Thu, 18 Feb 2021 13:06:48 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 18 Feb 2021 13:06:47 +1100
-Date:   Thu, 18 Feb 2021 13:06:47 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     liulongfang <liulongfang@huawei.com>
-Cc:     wangzhou1@hisilicon.com, xuzaibo@huawei.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] crypto: hisilicon/sec - fixes shash test error
-Message-ID: <20210218020647.GB30659@gondor.apana.org.au>
-References: <1612692280-11386-1-git-send-email-liulongfang@huawei.com>
- <1612692280-11386-4-git-send-email-liulongfang@huawei.com>
- <20210210064328.GA15849@gondor.apana.org.au>
- <0afaed85-eeb0-236c-817f-a0f9cf02c65a@huawei.com>
+        id S229937AbhBRCQJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 17 Feb 2021 21:16:09 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:12180 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229746AbhBRCQH (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Feb 2021 21:16:07 -0500
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DgytL0V8LzlLgj;
+        Thu, 18 Feb 2021 10:13:30 +0800 (CST)
+Received: from [10.67.103.10] (10.67.103.10) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.498.0; Thu, 18 Feb 2021
+ 10:15:14 +0800
+Subject: Re: [PATCH v8 3/9] crypto: atmel-ecc - move curve_id of ECDH from the
+ key to algorithm name
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     <davem@davemloft.net>, <marcel@holtmann.org>,
+        <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
+        <tudor.ambarus@microchip.com>, <linux-crypto@vger.kernel.org>,
+        <xuzaibo@huawei.com>, <wangzhou1@hisilicon.com>,
+        <linux-kernel@vger.kernel.org>
+References: <1612777137-51067-1-git-send-email-yumeng18@huawei.com>
+ <1612777137-51067-4-git-send-email-yumeng18@huawei.com>
+ <20210210045630.GA7510@gondor.apana.org.au>
+From:   yumeng <yumeng18@huawei.com>
+Message-ID: <656bfe6b-7e38-bc9e-ffc6-24aae83e0a56@huawei.com>
+Date:   Thu, 18 Feb 2021 10:14:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0afaed85-eeb0-236c-817f-a0f9cf02c65a@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210210045630.GA7510@gondor.apana.org.au>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.103.10]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 18, 2021 at 10:01:58AM +0800, liulongfang wrote:
->
-> >> diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-> >> index d2c4a2c..988faf7 100644
-> >> --- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-> >> +++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-> >> @@ -7,6 +7,7 @@
-> >>  #include <crypto/des.h>
-> >>  #include <crypto/hash.h>
-> >>  #include <crypto/internal/aead.h>
-> >> +#include <crypto/internal/hash.h>
-> > 
-> > Please explain what exactly in this file needs this header file.
-> > 
-> > As it stands you could just be hiding real bugs.
-> > 
-> > Thanks,
-> > 
-> The crypto_alloc_shash() interface in the header file
-> will be used in the function sec_aead_ctx_init(),
-> If this header file is not added, calling the interface
-> crypto_alloc_shash() during the initialization of the
-> aead algorithm will return an error.
 
-This makes no sense whatsoever as crypto_alloc_shash is defiend
-by crypto/hash.h and you've already included that.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ÔÚ 2021/2/10 12:56, Herbert Xu Ð´µÀ:
+> On Mon, Feb 08, 2021 at 05:38:51PM +0800, Meng Yu wrote:
+>> As curve id of ECDH will be moved from its key into algorithm name,
+>> we cannot use 'curve_id' in 'struct ecdh', so we should modify ECDH
+>> driver in atmel, and make ECDH algorithm name be the same as crypto
+>> (like 'ecdh-nist-pxxx');
+>>
+>> Signed-off-by: Meng Yu <yumeng18@huawei.com>
+>> Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
+>> ---
+>>   drivers/crypto/atmel-ecc.c | 14 +++++++-------
+>>   1 file changed, 7 insertions(+), 7 deletions(-)
+> 
+> Patches 3-5 need to be squashed into one in order to avoid future
+> bisection failures.
+> 
+> The alternative is to let the new/old names coexist but it's probably
+> not worth it for this case as the number of drivers impacted is small.
+> 
+> Thanks,
+> 
+
+OK, thanks.
