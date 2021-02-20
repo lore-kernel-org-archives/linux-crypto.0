@@ -8,67 +8,65 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE9FC433DB
-	for <linux-crypto@archiver.kernel.org>; Sat, 20 Feb 2021 17:48:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ACB8C433E0
+	for <linux-crypto@archiver.kernel.org>; Sat, 20 Feb 2021 18:30:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C0B464EC0
-	for <linux-crypto@archiver.kernel.org>; Sat, 20 Feb 2021 17:48:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E24E164DE9
+	for <linux-crypto@archiver.kernel.org>; Sat, 20 Feb 2021 18:30:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229887AbhBTRs2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 20 Feb 2021 12:48:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53284 "EHLO
+        id S229784AbhBTSaW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 20 Feb 2021 13:30:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229842AbhBTRs2 (ORCPT
+        with ESMTP id S229937AbhBTSaT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 20 Feb 2021 12:48:28 -0500
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 592DBC061574;
-        Sat, 20 Feb 2021 09:47:45 -0800 (PST)
-Received: by mail-wr1-x42f.google.com with SMTP id v15so14381048wrx.4;
-        Sat, 20 Feb 2021 09:47:45 -0800 (PST)
+        Sat, 20 Feb 2021 13:30:19 -0500
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 629E6C06178B;
+        Sat, 20 Feb 2021 10:29:39 -0800 (PST)
+Received: by mail-wm1-x32a.google.com with SMTP id a132so9905482wmc.0;
+        Sat, 20 Feb 2021 10:29:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=a1BxLT6TTwR7kgXfpKHC0HTJGnheN1Wm7GXvvk+jB+Y=;
-        b=uMW3cRB1DkbL39Ci6QxiBQIjIcYRu/1aG4KKIoyItDROE8XmHTW75sUkW2urRgS+DA
-         aRMpayha90JQJaTcC0j7+RoZIYejr3n8M1EkOL9+YnQ95YAAplxpBOpb8qe1bpPmwNnS
-         fmIB2PPzgzniPU8H6kndz9n4xVnGEtlxTkusQjGhHyiNPjPOMAA26+hDWV87E5Q+eF03
-         CNo+0Q0G/Tfi+Kl1y5SpaVOifjKjky3YpOdodzFpp+7ywg6y534SxXiqlIG4JY9rchFe
-         NW0Tczs7SkqYekvMoex/TFZUL/6FD8L1L9vcsoJ4brVU5ZCl4ox7Jqc3Cz+8EGVDVDKg
-         AO3g==
+        bh=6hWDTEdBAXwx+lO4Qg45K9E7WWGnRAxPBEtbtmemIXY=;
+        b=GG9eJKfYJsmV/mlV/H+/A8relxB+8IhsUxXDHYFDWub62SPeIwOJrz2FWJUsB53XIU
+         DXv1bmRKJQidzIxsrXic1x4VFiOZ4st5ZaoHzo9ZCoMvgaLRpFwlL9WhhmceqDVG2UcK
+         OyooWMrTPLpHuqRNy4YWHm17iGp4siBhe6rxPhSKkXIrQGIQS1UnNsTr1Mdougbxq9BX
+         RI08Z6Lpr98Lc15i/KfZ7RTuA7GKRYitaFjnHkBiL+v6NMdOSDWTg04FDjr8M9NzOp+t
+         sRqE8TZzjSplj3TXXpQ6nsaeEKueaOu3ZfPMwlzHuUnn3cD1MOKwfudFtr3oegKWmSKv
+         G1UA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=a1BxLT6TTwR7kgXfpKHC0HTJGnheN1Wm7GXvvk+jB+Y=;
-        b=el6KVekPYAJeZ9PZ5v1lJeupKwUIUavRAwe9PlRq8+7/Ujyc/CUlWcMg3/hliEagOn
-         ML++nHcUj622nmo3M1GhCpjCUn++jKJCQFwgbEWCtE7JsqOKHkJ2qIOE5tAxmjxyiy4Z
-         9m3vWmfaC9OCAK8dOXtVSvj9suAs9ITCatsNAKihFoIGTAcH7BiE9EgJaPh2DKrjr5Sk
-         3e8NdqpH+CnIQv8SGxE9u9aGV/rNLBS3thEx+A17Br+f6FSw9b2SoCXUyOHKerft0VXg
-         lHNJchvCBSmqGeOGWpR0fxBm+OxrE6BUoC2FCJpkrTEk/zdb+qlBP9c5wBLu10p6gLX6
-         rzYg==
-X-Gm-Message-State: AOAM530TTJ4Zmn9x1Q0dADLMakSL01xRueRQIz4z0KW3klKhP3UFvHY1
-        +OLw+J0PlLkvMwFVmWsIK78=
-X-Google-Smtp-Source: ABdhPJyJq7oTgyPIzNjMsvHM/GF5ZcPuKuzQYDKYmPp78cTcvZM6aOMkhcLR18NdhtKrE6nzdrWqcQ==
-X-Received: by 2002:adf:ed87:: with SMTP id c7mr741974wro.113.1613843264108;
-        Sat, 20 Feb 2021 09:47:44 -0800 (PST)
+        bh=6hWDTEdBAXwx+lO4Qg45K9E7WWGnRAxPBEtbtmemIXY=;
+        b=aw7ado+YUrRlcmDlJszKClGLH2ArwlBpv5xY7sKNsSi9ngpcIGO8h3GK8Nw7RKH4bH
+         anDwExiuM1eCVenc2DoscNsrPF4xziey1x26mAMefmK/8SX2T/Rmj/+wSZEbk0Z9Q5u0
+         oWiNd6A0wwR4mu9Kj/kGvy20iWCkZS0i+osfp3XSPQ+03w5x++I9wh8rjPeSf4HJ8mfJ
+         ZMw9R/gUo5QQEf4uxqmwqIYSI2l/Se/tzQMX8e89pbGWWJTf8J6IHfPIOlfGMhP6DD4Z
+         9sDj5ia4JqxICeUperxfS/YoLhrZzFDramohKEL9cGIHfOlKIwUILROtqA019FIjfWBf
+         zObA==
+X-Gm-Message-State: AOAM530b8jsZG+zNnvgzrcFwaYiZecC0iSG62E7q3A3cxShtjhGrEkZa
+        f13XWectwdGOlmipxKbwCVQ=
+X-Google-Smtp-Source: ABdhPJwOD0GvdhATabqqxveaXLZg4sDfX87LYDDwtZqkQNmfiy8UKmnnWeOXSalXHUQDxLvZWWEv8Q==
+X-Received: by 2002:a1c:9d51:: with SMTP id g78mr13750396wme.5.1613845778047;
+        Sat, 20 Feb 2021 10:29:38 -0800 (PST)
 Received: from skynet.lan (23.red-2-137-25.dynamicip.rima-tde.net. [2.137.25.23])
-        by smtp.gmail.com with ESMTPSA id t15sm17903083wmi.48.2021.02.20.09.47.42
+        by smtp.gmail.com with ESMTPSA id w81sm18038448wmb.3.2021.02.20.10.29.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Feb 2021 09:47:43 -0800 (PST)
+        Sat, 20 Feb 2021 10:29:37 -0800 (PST)
 From:   =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= 
         <noltari@gmail.com>
-To:     mpm@selenic.com, herbert@gondor.apana.org.au,
-        nsaenzjulienne@suse.de, f.fainelli@gmail.com, rjui@broadcom.com,
+To:     mpm@selenic.com, herbert@gondor.apana.org.au, rjui@broadcom.com,
         sbranden@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
-        rikard.falkeborn@gmail.com, noltari@gmail.com,
-        linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        stijn@linux-ipv6.be, ynezz@true.cz
-Subject: [PATCH] hwrng: bcm2835: set quality to 1000
-Date:   Sat, 20 Feb 2021 18:47:40 +0100
-Message-Id: <20210220174741.23665-1-noltari@gmail.com>
+        Julia.Lawall@inria.fr, noltari@gmail.com, f.fainelli@gmail.com,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] hwrng: iproc: set quality to 1000
+Date:   Sat, 20 Feb 2021 19:29:35 +0100
+Message-Id: <20210220182935.11247-1-noltari@gmail.com>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -77,26 +75,25 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This allows devices without a high precission timer to reduce boot from >100s
-to <30s.
+This allows khwrngd to make use of iproc-rng200.
 
 Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
 ---
- drivers/char/hw_random/bcm2835-rng.c | 1 +
+ drivers/char/hw_random/iproc-rng200.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-index 1a7c43b43c6b..4b48cb7176b0 100644
---- a/drivers/char/hw_random/bcm2835-rng.c
-+++ b/drivers/char/hw_random/bcm2835-rng.c
-@@ -163,6 +163,7 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
- 	priv->rng.init = bcm2835_rng_init;
- 	priv->rng.read = bcm2835_rng_read;
- 	priv->rng.cleanup = bcm2835_rng_cleanup;
+diff --git a/drivers/char/hw_random/iproc-rng200.c b/drivers/char/hw_random/iproc-rng200.c
+index 01583faf9893..e49868dd9b96 100644
+--- a/drivers/char/hw_random/iproc-rng200.c
++++ b/drivers/char/hw_random/iproc-rng200.c
+@@ -199,6 +199,7 @@ static int iproc_rng200_probe(struct platform_device *pdev)
+ 	priv->rng.read = iproc_rng200_read;
+ 	priv->rng.init = iproc_rng200_init;
+ 	priv->rng.cleanup = iproc_rng200_cleanup;
 +	priv->rng.quality = 1000;
  
- 	if (dev_of_node(dev)) {
- 		rng_id = of_match_node(bcm2835_rng_of_match, dev->of_node);
+ 	/* Register driver */
+ 	ret = devm_hwrng_register(dev, &priv->rng);
 -- 
 2.20.1
 
