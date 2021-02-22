@@ -2,183 +2,137 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 708E9C433E0
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Feb 2021 19:51:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E1AC433DB
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Feb 2021 20:27:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 16A8B64E31
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Feb 2021 19:51:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E769264E31
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Feb 2021 20:27:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232908AbhBVTvZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Feb 2021 14:51:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43862 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231326AbhBVTvY (ORCPT
+        id S232761AbhBVU11 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 Feb 2021 15:27:27 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51398 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S230194AbhBVU11 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Feb 2021 14:51:24 -0500
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02DBCC061786;
-        Mon, 22 Feb 2021 11:50:44 -0800 (PST)
-Received: by mail-wm1-x334.google.com with SMTP id i9so349375wml.5;
-        Mon, 22 Feb 2021 11:50:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=MfN9Cgym1FbsMVOmP8YcLwSJUz55n9T6vsrfPvdXcUk=;
-        b=EZcjwsDZ8hKOkl4+hJ1+TzRFkoBNFQeFzt/9YNFA72zbPtAUu5F42HJelDudXgXz2E
-         oU6hqvYlAFTy0NuoNedM6NlEuHOGvVXFFp2aoyUjPXPrTU50xe5nO8UsniTpKf2yX5ld
-         A9faKDe8lW6S4089xdILMSCao51emUGKi9EC7sO7CZl87k88bX00rzgXxuNJDZ9PapTM
-         5DTPG/+ugwj0OafqSyQ1LlQTLxdIlh+SGiA+fQwHxEOjyTbeA5RYfy2DH7xu0ddGorIE
-         fNMtwQZk9Shj2clEqEwCY11BaaiDF+bo9/6G0XqFplGp6yYhXV03kz5dFyCo5RTktzT0
-         AQ6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=MfN9Cgym1FbsMVOmP8YcLwSJUz55n9T6vsrfPvdXcUk=;
-        b=JHsqwyBEgl4i0sthe8e0CkmqpoDiaRU31UjV+yBKRHTwwGtuLQ2V1jMuTHZYiHUDHu
-         AGkc18y82qfIZ16KbPNfPfkGUicf1WkPskPvFPD+sUe+XWyEjNMem7X28JjWR0hon4zH
-         BfhNNnTPL+C9O5Ho6DRy9DrcW53lXOxXXIVR1FKA38RNOW75itKPK99le6xh6FaswyIT
-         rzWT6I3pUk7RMsY2RB/jk3xNF2PKD4KF/uYsLTodXrT8v72KJKI+eN7GLlxl6FbPAsmL
-         UT4cGyagy8b8Gej9StCYb4YQ2lMPjhKkeW3Atgu5vcA1d+DfzHOgatdbVL2H1tRxpujw
-         abOA==
-X-Gm-Message-State: AOAM531XbYQsNDRewRgz1onJfXT44FoaERlN2sfNAO/YhlRpJUF75oH0
-        pyVDsNmp+vz6DCGFRkhlov4=
-X-Google-Smtp-Source: ABdhPJy2ifgy8J+cwpkeeQYb40XpclKC9lDt6RF4Y3BvYOmHi6zm4x3CP/D/ulT0lNWGPVs5nMeGgQ==
-X-Received: by 2002:a05:600c:350c:: with SMTP id h12mr21264827wmq.39.1614023442747;
-        Mon, 22 Feb 2021 11:50:42 -0800 (PST)
-Received: from skynet.lan (170.red-88-1-105.dynamicip.rima-tde.net. [88.1.105.170])
-        by smtp.gmail.com with ESMTPSA id o15sm302426wmh.39.2021.02.22.11.50.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Feb 2021 11:50:42 -0800 (PST)
-From:   =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= 
-        <noltari@gmail.com>
-To:     mpm@selenic.com, herbert@gondor.apana.org.au,
-        nsaenzjulienne@suse.de, f.fainelli@gmail.com, rjui@broadcom.com,
-        sbranden@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
-        rikard.falkeborn@gmail.com, noltari@gmail.com,
-        linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        stijn@linux-ipv6.be, ynezz@true.cz
-Subject: [PATCH v3] hwrng: bcm2835: set quality
-Date:   Mon, 22 Feb 2021 20:50:40 +0100
-Message-Id: <20210222195040.16900-1-noltari@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210220195748.3153-1-noltari@gmail.com>
-References: <20210220195748.3153-1-noltari@gmail.com>
+        Mon, 22 Feb 2021 15:27:27 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11MKEe5J139109;
+        Mon, 22 Feb 2021 15:26:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=tVmELn3VsCgeksMVtevqHAXOUtGg56LbMNv5Twg88uQ=;
+ b=EkDjDcI2/uMtZ0wunrDGnlGtnLnkoFMGQk2BsOrvEAD9wyjJ8OKwPMMqil/U51eHsF0W
+ OsR2i6/ITcUflF/SEGcXEtMghe8IX2YHAwZyuY9DIOwH/nOnmf75PCx7i8YBv4MQ3KXf
+ PkmeiZdFtsq2kBqskXreSaTs9Aa1kyI5uRveAe3AbeFgLrwsQIfl1K3d57UtWEockzOH
+ JAcItK4SK7o/zAIesHp9K3yEXgSNyleOS+kGUp0u2MAygm6Hs3ehIktR6I6nXpu8sn23
+ A2MQoorvD5edbhgZqyNxqMkEC2RWBkQpq7vJ7ByBji7TvFYNJVnC6lGPKlteeQMaPYxE ow== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36vkehs4mw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 22 Feb 2021 15:26:34 -0500
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11MKGTOe030143;
+        Mon, 22 Feb 2021 15:26:32 -0500
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36vkehs441-9
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 22 Feb 2021 15:26:31 -0500
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11MIMwBG014578;
+        Mon, 22 Feb 2021 18:37:44 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma02wdc.us.ibm.com with ESMTP id 36tt28rky0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 22 Feb 2021 18:37:44 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11MIbhQS35389714
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 22 Feb 2021 18:37:43 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 992F578060;
+        Mon, 22 Feb 2021 18:37:43 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5F9DC7805E;
+        Mon, 22 Feb 2021 18:37:42 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon, 22 Feb 2021 18:37:42 +0000 (GMT)
+Subject: Re: [PATCH v2 1/3] add params and ids to support nist_p384
+To:     Saulo Alessandre <saulo.alessandre@gmail.com>
+Cc:     davem@davemloft.net, dhowells@redhat.com,
+        herbert@gondor.apana.org.au, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
+        zohar@linux.ibm.com, Saulo Alessandre <saulo.alessandre@tse.jus.br>
+References: <20210215162532.1077098-1-stefanb@linux.ibm.com>
+ <20210222175850.1131780-1-saulo.alessandre@gmail.com>
+From:   Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <2e829730-bb0c-47eb-70f2-731c184eba33@linux.ibm.com>
+Date:   Mon, 22 Feb 2021 13:37:41 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20210222175850.1131780-1-saulo.alessandre@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-02-22_07:2021-02-22,2021-02-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ clxscore=1015 bulkscore=0 impostorscore=0 phishscore=0 mlxlogscore=999
+ lowpriorityscore=0 suspectscore=0 spamscore=0 priorityscore=1501
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102220173
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This allows devices without a high precission timer to speed up boot from
-more than 100s to lest than 30s.
+On 2/22/21 12:58 PM, Saulo Alessandre wrote:
+> From: Saulo Alessandre <saulo.alessandre@tse.jus.br>
+>
+> * crypto/asymmetric_keys/x509_cert_parser.c
+>    - prepare x509 parser to load nist_secp384r1
+>
+> * crypto/ecc_curve_defs.h
+>    - add nist_p384 params
+>
+> * include/crypto/ecdh.h
+>    - add ECC_CURVE_NIST_P384
+>
+> * include/linux/oid_registry.h
+>    - reorder OID_id_ecdsa_with_sha1
+>    - add OID_id_secp384r1
+>
+> Signed-off-by: Saulo Alessandre <saulo.alessandre@tse.jus.br>
 
-BCM2835 rngtest:
-root@OpenWrt:/# cat /dev/hwrng | rngtest -c 1000
-rngtest 6.10
-Copyright (c) 2004 by Henrique de Moraes Holschuh
-This is free software; see the source for copying conditions.  There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+I would separate this patch into an x509: and certs: part since it 
+touches two subsystems.
 
-rngtest: starting FIPS tests...
-rngtest: bits received from input: 20000032
-rngtest: FIPS 140-2 successes: 996
-rngtest: FIPS 140-2 failures: 4
-rngtest: FIPS 140-2(2001-10-10) Monobit: 0
-rngtest: FIPS 140-2(2001-10-10) Poker: 0
-rngtest: FIPS 140-2(2001-10-10) Runs: 1
-rngtest: FIPS 140-2(2001-10-10) Long run: 3
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=146.002; avg=349.394;
-max=1302083.333)Kibits/s
-rngtest: FIPS tests speed: (min=12.126; avg=22.750; max=23.432)Mibits/s
-rngtest: Program run time: 56826982 microseconds
+I can take this series of patches and post my v9 including them at the 
+end. This would make it easier for others to test. I would massage them 
+a bit, including the separation of the 1st patch into 2 patches, if you 
+don't mind, preserving your Signed-off-by. I need to fix something in my 
+v8 regarding registration failure handling. Let me know whether this is 
+fine with you.
 
-996 successes and 4 failures -> 99.6% success rate
-1024 * 99.6% = 1019 (rounded down to 1000)
+I had tested your patches over the weekend with my endless test tool 
+creating keys in user space and loading them into the kernel. It worked 
+fine for NIST p256 & p384. Also signing kernel modules with NIST p384 is 
+working fine.
 
-BCM6368 rngtest:
-root@OpenWrt:/# root@OpenWrt:/# cat /dev/hwrng | rngtest -c 1000
-rngtest 6.10
-Copyright (c) 2004 by Henrique de Moraes Holschuh
-This is free software; see the source for copying conditions.  There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+So, for the series:
 
-rngtest: starting FIPS tests...
-rngtest: bits received from input: 20000032
-rngtest: FIPS 140-2 successes: 751
-rngtest: FIPS 140-2 failures: 249
-rngtest: FIPS 140-2(2001-10-10) Monobit: 0
-rngtest: FIPS 140-2(2001-10-10) Poker: 34
-rngtest: FIPS 140-2(2001-10-10) Runs: 245
-rngtest: FIPS 140-2(2001-10-10) Long run: 0
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=1.202; avg=16.434; max=1003.868)Mibits/s
-rngtest: FIPS tests speed: (min=761.155; avg=8343.383; max=15662.590)Kibits/s
-rngtest: Program run time: 3539183 microseconds
-cat: write error: Broken pipe
+Tested-by: Stefan Berger <stefanb@linux.ibm.com>
 
-Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
----
- v3: set different qualities for each SoC
- v2: add jusftification
+Regards,
 
- drivers/char/hw_random/bcm2835-rng.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+     Stefan
 
-diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-index 1a7c43b43c6b..a6121a04f624 100644
---- a/drivers/char/hw_random/bcm2835-rng.c
-+++ b/drivers/char/hw_random/bcm2835-rng.c
-@@ -121,6 +121,15 @@ static void bcm2835_rng_cleanup(struct hwrng *rng)
- 
- struct bcm2835_rng_of_data {
- 	bool mask_interrupts;
-+	unsigned short quality;
-+};
-+
-+static const struct bcm2835_rng_of_data bcm283x_rng_of_data = {
-+	.quality = 1000,
-+};
-+
-+static const struct bcm2835_rng_of_data bcm6368_rng_of_data = {
-+	.quality = 700,
- };
- 
- static const struct bcm2835_rng_of_data nsp_rng_of_data = {
-@@ -128,10 +137,10 @@ static const struct bcm2835_rng_of_data nsp_rng_of_data = {
- };
- 
- static const struct of_device_id bcm2835_rng_of_match[] = {
--	{ .compatible = "brcm,bcm2835-rng"},
-+	{ .compatible = "brcm,bcm2835-rng", .data = &bcm283x_rng_of_data },
- 	{ .compatible = "brcm,bcm-nsp-rng", .data = &nsp_rng_of_data },
- 	{ .compatible = "brcm,bcm5301x-rng", .data = &nsp_rng_of_data },
--	{ .compatible = "brcm,bcm6368-rng"},
-+	{ .compatible = "brcm,bcm6368-rng", .data = &bcm6368_rng_of_data },
- 	{},
- };
- 
-@@ -171,8 +180,10 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
- 
- 		/* Check for rng init function, execute it */
- 		of_data = rng_id->data;
--		if (of_data)
-+		if (of_data) {
- 			priv->mask_interrupts = of_data->mask_interrupts;
-+			priv->rng.quality = of_data->quality;
-+		}
- 	}
- 
- 	/* register driver */
--- 
-2.20.1
 
