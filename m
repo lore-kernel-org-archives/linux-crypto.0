@@ -5,58 +5,58 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A85FC43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF85C4332D
 	for <linux-crypto@archiver.kernel.org>; Tue, 23 Feb 2021 17:01:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D514D64E85
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Feb 2021 17:01:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11A1B64EC8
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Feb 2021 17:01:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233633AbhBWRAz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Feb 2021 12:00:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33368 "EHLO
+        id S233660AbhBWRA6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 Feb 2021 12:00:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233551AbhBWRAy (ORCPT
+        with ESMTP id S233619AbhBWRAz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Feb 2021 12:00:54 -0500
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3673CC061786;
-        Tue, 23 Feb 2021 09:00:13 -0800 (PST)
-Received: by mail-wr1-x435.google.com with SMTP id n4so23331814wrx.1;
-        Tue, 23 Feb 2021 09:00:13 -0800 (PST)
+        Tue, 23 Feb 2021 12:00:55 -0500
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95C0DC06178A;
+        Tue, 23 Feb 2021 09:00:14 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id v1so23291037wrd.6;
+        Tue, 23 Feb 2021 09:00:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=OEwefO5s7q5tH8TqEcawfPCkw0BmTmIeA1fwlofl6+E=;
-        b=Bvq5kq6G7MCxav6SCKRj9tVkSW2MxAaxSfktzpSeV0/O3T/obTjyqum3K1iDlWWgct
-         9mQZdnU3aioarFsdGaE3X+JrK+oMGiw08deIiIyeAeXVkQZOWLbi6SkORHSRJb1p3dDr
-         jgPxkYRdGb6B5OvJHA7HV7TPM5DiciIPKAUoG0dr1hx3LfRAs7ZyslpT0buRQQRkUn5e
-         OLctdS0KvBHXbhNVv3NG74BEZ+HftDSqtPkB+JhWG/56xeOTiKlJqW50sOstCqqOqMos
-         cZKfq02U6vyRINuBwxANrC621kkx6V6jXumyLuZskLPen2rbsOCziVdyVSRs591haCby
-         4t0g==
+        bh=LiTCa6DBif/PzMmCMLr4DjB3Hi0VKw857tDOttZsLNE=;
+        b=kvsOcWcgEK3QmhXthFAy5GwObgwYPEF1evtOsjmM1OlqsrMz9ykUBiMTT84HNzvxNe
+         w6bPFW61/yt7h3aq8HEoKS6xhsJ0r5oUEuyyi07LMZEpZorhCGwhwN3dvt7Ilf9Jt8Cf
+         +tcJsKnGVUaHMfVrEayhOSmnIalYFkGjB8IGyRAqPjcMKxpvk2su23+TuacMIdCMU3oa
+         QpM8PLvtt40xHrkGze0uVqXBiye72Zudcb0UUBMgTS5iMr3fsM+T8RHueEaWQhYmSBoB
+         Y9x2zJdpFoH0ZHQaSn796fspvcM8rtSPCMba4baFkllc8vJueFM0IrJkg/OnGkZXIJVL
+         k0uQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=OEwefO5s7q5tH8TqEcawfPCkw0BmTmIeA1fwlofl6+E=;
-        b=Oo/iTp/Pe47A6LIgJvbGoimQvxOIJ47UtvmbbcjmyyaifKmb6hFzApv6qsB8SsFrNA
-         hsGGqFWly0ci/cKWnYjd2a+yf9lzo4ehFs/ie1tUMdzpUjHRPwOyJNKN5f5Rq16SZUgW
-         Xt1Af5LgYWg+IZNtmJh0Zw7CEVv1YScUimSAnH1dp6aw45kgbNFGfSPby9tFCA8kH51U
-         CSPzkrUhOoYTw+OySXBNKhYg8uK7CHuzzzbd9Wq5qZ9WhBrkCzGvbuRnlqTJ7346Sxzb
-         pCr64ySrdrHdrmwg0t7jEkhrG9sINKegnOSv+dxpY8jEb2n6oXMLT6PYfIZWf/m0rpuA
-         +CTw==
-X-Gm-Message-State: AOAM533eg+R/URqH3XwTz3MyB5p3OAsAby9ppl/Cbbj4aRKNw+bEU+2R
-        Auf3kRX+9CodBdWJJHB6x4EsU5kLrBtUsYUY
-X-Google-Smtp-Source: ABdhPJxzcvsA9J78p039E9gaxjTRycu1+O26r/KZPd+kCOMtGAsEnxNg6N9CcEyvyOY3R0lUAHANeg==
-X-Received: by 2002:a5d:58fb:: with SMTP id f27mr26949829wrd.119.1614099611881;
-        Tue, 23 Feb 2021 09:00:11 -0800 (PST)
+        bh=LiTCa6DBif/PzMmCMLr4DjB3Hi0VKw857tDOttZsLNE=;
+        b=DjiiPkUHgN0JvU5R0XDsUwIV8W3uhqD8z2qaHLJow/2M7SLEFrRhpMb2OHla/LT8a9
+         TkkD9NLuS/DE5b6IvOQRW7N5AQYZxjDza4GIp300P4vaWuwqojDKKH1D0qEGEGCO5qHu
+         Qs5OsvE1H0iqBKKvVyrjEayGYErgdi/lNSs1+yiDS3FY5yQz/o17IS32RroWfzEku5bV
+         VR3AlJ6uKdgGhBEJTKXeu4nYJrCi9wVAZtMYOkKPv7RZWMA1+CfmGXwhh3K5mH6HN8as
+         lcoLi5uEwlauxR9mB8lEa6pEEJBbmkSfhAUGFKCCDY+/BGnM2lJZwGnzr4o3SNhKcE2S
+         gpNA==
+X-Gm-Message-State: AOAM533/CD/EMkMVfZpShzDuYh0LgVOXcL7zGoMwIuDSoQUdwXLlTEbc
+        3/l0T2wxIa/x4FoXRQucBDMbzYtd2APWHO5U
+X-Google-Smtp-Source: ABdhPJykd3acZCrN6qeMOXqXvbtu9EKp9Em3ZBixIDwhCWnn+rgjhXGqBROKFqyF3KHZe7UtaEEBIQ==
+X-Received: by 2002:a5d:404d:: with SMTP id w13mr396623wrp.230.1614099613369;
+        Tue, 23 Feb 2021 09:00:13 -0800 (PST)
 Received: from skynet.lan (170.red-88-1-105.dynamicip.rima-tde.net. [88.1.105.170])
-        by smtp.gmail.com with ESMTPSA id u12sm3057190wmq.38.2021.02.23.09.00.10
+        by smtp.gmail.com with ESMTPSA id u12sm3057190wmq.38.2021.02.23.09.00.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Feb 2021 09:00:11 -0800 (PST)
+        Tue, 23 Feb 2021 09:00:12 -0800 (PST)
 From:   =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= 
         <noltari@gmail.com>
 To:     Matt Mackall <mpm@selenic.com>,
@@ -79,9 +79,9 @@ To:     Matt Mackall <mpm@selenic.com>,
         linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-rpi-kernel@lists.infradead.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 1/2] dt-bindings: rng: bcm2835: document reset support
-Date:   Tue, 23 Feb 2021 18:00:05 +0100
-Message-Id: <20210223170006.29558-2-noltari@gmail.com>
+Subject: [PATCH v3 2/2] hwrng: bcm2835: add reset support
+Date:   Tue, 23 Feb 2021 18:00:06 +0100
+Message-Id: <20210223170006.29558-3-noltari@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210223170006.29558-1-noltari@gmail.com>
 References: <20210222194510.14004-1-noltari@gmail.com>
@@ -93,50 +93,77 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Some devices may need to perform a reset before using the RNG, such as the
-BCM6368.
+BCM6368 devices need to reset the in order to generate true random numbers.
+This is what BCM6368 produces without a reset:
+root@OpenWrt:/# cat /dev/hwrng | rngtest -c 1000
+rngtest 6.10
+Copyright (c) 2004 by Henrique de Moraes Holschuh
+This is free software; see the source for copying conditions.  There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+rngtest: starting FIPS tests...
+rngtest: bits received from input: 20000032
+rngtest: FIPS 140-2 successes: 0
+rngtest: FIPS 140-2 failures: 1000
+rngtest: FIPS 140-2(2001-10-10) Monobit: 2
+rngtest: FIPS 140-2(2001-10-10) Poker: 1000
+rngtest: FIPS 140-2(2001-10-10) Runs: 1000
+rngtest: FIPS 140-2(2001-10-10) Long run: 30
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=37.253; avg=320.827; max=635.783)Mibits/s
+rngtest: FIPS tests speed: (min=12.141; avg=15.034; max=16.428)Mibits/s
+rngtest: Program run time: 1336176 microseconds
+cat: write error: Broken pipe
 
 Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
 ---
- v3: make resets required if brcm,bcm6368-rng.
- v2: document reset support.
+ v3: no changes.
+ v2: no changes.
 
- .../devicetree/bindings/rng/brcm,bcm2835.yaml   | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ drivers/char/hw_random/bcm2835-rng.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml b/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
-index c147900f9041..11c23e1f6988 100644
---- a/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
-+++ b/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
-@@ -37,6 +37,21 @@ required:
+diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+index 1a7c43b43c6b..1b93a896d8e8 100644
+--- a/drivers/char/hw_random/bcm2835-rng.c
++++ b/drivers/char/hw_random/bcm2835-rng.c
+@@ -13,6 +13,7 @@
+ #include <linux/platform_device.h>
+ #include <linux/printk.h>
+ #include <linux/clk.h>
++#include <linux/reset.h>
  
- additionalProperties: false
+ #define RNG_CTRL	0x0
+ #define RNG_STATUS	0x4
+@@ -32,6 +33,7 @@ struct bcm2835_rng_priv {
+ 	void __iomem *base;
+ 	bool mask_interrupts;
+ 	struct clk *clk;
++	struct reset_control *reset;
+ };
  
-+if:
-+  properties:
-+    compatible:
-+      enum:
-+        - brcm,bcm6368-rng
-+then:
-+  properties:
-+    resets:
-+      maxItems: 1
-+  required:
-+    - resets
-+else:
-+  properties:
-+    resets: false
+ static inline struct bcm2835_rng_priv *to_rng_priv(struct hwrng *rng)
+@@ -94,6 +96,10 @@ static int bcm2835_rng_init(struct hwrng *rng)
+ 			return ret;
+ 	}
+ 
++	ret = reset_control_reset(priv->reset);
++	if (ret)
++		return ret;
 +
- examples:
-   - |
-     rng@7e104000 {
-@@ -58,4 +73,6 @@ examples:
+ 	if (priv->mask_interrupts) {
+ 		/* mask the interrupt */
+ 		val = rng_readl(priv, RNG_INT_MASK);
+@@ -159,6 +165,10 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+ 	if (PTR_ERR(priv->clk) == -EPROBE_DEFER)
+ 		return -EPROBE_DEFER;
  
-         clocks = <&periph_clk 18>;
-         clock-names = "ipsec";
++	priv->reset = devm_reset_control_get_optional_exclusive(dev, NULL);
++	if (IS_ERR(priv->reset))
++		return PTR_ERR(priv->reset);
 +
-+        resets = <&periph_rst 4>;
-     };
+ 	priv->rng.name = pdev->name;
+ 	priv->rng.init = bcm2835_rng_init;
+ 	priv->rng.read = bcm2835_rng_read;
 -- 
 2.20.1
 
