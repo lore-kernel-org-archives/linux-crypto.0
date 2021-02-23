@@ -2,122 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3926C433E6
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Feb 2021 17:23:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89069C433DB
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Feb 2021 19:35:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C48664EC1
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Feb 2021 17:23:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AECA64E61
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Feb 2021 19:35:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233737AbhBWRW5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Feb 2021 12:22:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38118 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233061AbhBWRW4 (ORCPT
+        id S234049AbhBWTe5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 Feb 2021 14:34:57 -0500
+Received: from mail-ot1-f45.google.com ([209.85.210.45]:34324 "EHLO
+        mail-ot1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234041AbhBWTe4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Feb 2021 12:22:56 -0500
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1CCEC06178A;
-        Tue, 23 Feb 2021 09:22:15 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id x16so3183547wmk.3;
-        Tue, 23 Feb 2021 09:22:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=EaX5p5UPuTekYiXa10smOCPJuQoIdYNBNNKlPwDQoIw=;
-        b=L2ExbvjtqbSYd6Z4BLFj7QppJJtr04m2tmQa4eq/AdspS/bMn6RGU0ab6qYxp37rjM
-         jXq8pZE08iisojwN+2NcgiMtCzBgetBCIXbLjX7UQ3hDn0lF/2s+1EuvESH6ScTZiRmY
-         scESElzSej0ZbOhuQu2avYH335ihr19oPxQpgxSMqh1VoyQo0VSp9p1NRkcKOOSdoGR5
-         4J201N79nc/t4eYe3QCx8TintIeOMSxWndKm9IRPqTU4cM1uN9pJNNeAl4rhRQWG8r1R
-         f65nW8jnp+GvOgx6l30YfXl9wBoe3kr3RS7z7wBgLn65ZfTFx2DnamZrcbI8a9z+kewg
-         IRGA==
+        Tue, 23 Feb 2021 14:34:56 -0500
+Received: by mail-ot1-f45.google.com with SMTP id b16so16819478otq.1;
+        Tue, 23 Feb 2021 11:34:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=EaX5p5UPuTekYiXa10smOCPJuQoIdYNBNNKlPwDQoIw=;
-        b=qryaimKT8YeLDxGr5kBSyaBXj+GTmS+KB4PDG4v3cfYJ0aJ9qAhfMLPs/bSdPQm+br
-         UlZYKJ4Yd4wsZFVNKU9mGdacOezNw4CbJT1gKf16k6vgH+voalmpbj19koUfzs9Ih9K3
-         /CbJDKWic1ucPUUUFXp6aoMKzixrzSYPvDcWmbA9NLIBBYlC107F/8y6XQ50/aSN0xkg
-         qoFnbkgwGG0HIJ6YSn6wp23nJKmJVGKV4/ubs8OCv5xzGdzTPyn0G4VDjv4Pw5vFD5xE
-         CqPd7qqNLYOcRgV7ErWyyZ11hIzDjjEEmLKOh9hxiMxpWo6xPCQp1Mu+0FI78VjyGwrz
-         6UYw==
-X-Gm-Message-State: AOAM532t8htQHnCQjckl3KT5M3xjGg8Y2r2d5gRX2STI14KjuaQyGlmA
-        M66/NDGyPUgxpwPSNvc6svsp2DSpSjeL9Poi
-X-Google-Smtp-Source: ABdhPJymfVnvLYj6gmqlN/GCzYyIAkPBbG7VFBpvS13m6zCAi9+YtXqstsO2jMc2r/8H8q4zIFN2zA==
-X-Received: by 2002:a1c:ba05:: with SMTP id k5mr24935188wmf.111.1614100934162;
-        Tue, 23 Feb 2021 09:22:14 -0800 (PST)
-Received: from [192.168.1.10] (170.red-88-1-105.dynamicip.rima-tde.net. [88.1.105.170])
-        by smtp.gmail.com with ESMTPSA id m4sm17653589wrb.87.2021.02.23.09.22.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Feb 2021 09:22:13 -0800 (PST)
-Subject: Re: [PATCH 1/2] dt-bindings: rng: bcm2835: document reset support
-To:     Scott Branden <scott.branden@broadcom.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>, Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Alexandru Ardelean <alexandru.ardelean@analog.com>,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        Lee Jones <lee.jones@linaro.org>,
-        =?UTF-8?B?TsOtY29sYXMgRi4gUi4gQS4gUHJhZG8=?= 
-        <nfraprado@protonmail.com>,
-        Rikard Falkeborn <rikard.falkeborn@gmail.com>,
-        Stefan Wahren <stefan.wahren@i2se.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject:date
+         :message-id;
+        bh=jzoiYbxpGL9e8WsQqrLwB9sTS+xjumdfM5quc7WjraA=;
+        b=JgZQFB/0HbPE4LIHjD2xvXj3RJ/8nMk0r0FsWiC2P0j9Gd04UYm4ARdvm6za/PGD5f
+         RIqm2qLxFppfb2okqG3VEV4Blzjjh/Ls33bocdzbw21myZ6kEYNcMT+w3snN4zWHNMdF
+         ecqAWmBvYw5Xu3cFss5Aw2U58SUvSne+dvCGgXc9vvLR2rO36m++vIFJdnXk5/mylNqf
+         I9XldAWuGHwP5ySwPJZsa4EkK2oKtp7Tu+9Cs944xNynmexNbnN3zB4Sp1vk31FmCPBN
+         4AiLfl1kTKRhwDlinBpmoeq8we+PDIJl0/u/KsNzSCBm91/aQcWf7qFSWJ+iymD2iGBQ
+         SqOg==
+X-Gm-Message-State: AOAM531ltxDrKsVnfZkD/YT/PCEDYxNu7p7QabJoajHWFk+Atnb7wili
+        ij9OppLDUWL0WQCEeFObEg==
+X-Google-Smtp-Source: ABdhPJwj76JeAWZQEdKJSqs6KXqu/e1xzLx2WR5ir1KgpkRjXIMDERCdN92Jr+TLNAQe0oqLmlaClw==
+X-Received: by 2002:a9d:618a:: with SMTP id g10mr20959934otk.34.1614108855332;
+        Tue, 23 Feb 2021 11:34:15 -0800 (PST)
+Received: from robh.at.kernel.org (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id j5sm4445295oij.48.2021.02.23.11.34.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Feb 2021 11:34:14 -0800 (PST)
+Received: (nullmailer pid 4116107 invoked by uid 1000);
+        Tue, 23 Feb 2021 19:34:10 -0000
+From:   Rob Herring <robh@kernel.org>
+To:     =?utf-8?q?=C3=81lvaro_Fern=C3=A1ndez_Rojas?= <noltari@gmail.com>
+Cc:     Guenter Roeck <linux@roeck-us.net>,
         linux-rpi-kernel@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20210222194510.14004-1-noltari@gmail.com>
- <20210223160131.29053-1-noltari@gmail.com>
- <20210223160131.29053-2-noltari@gmail.com>
- <1b854f38-9322-71ee-5745-ee650ae92c9b@gmail.com>
- <23b28f9f-786d-8cdc-338f-efb4b23020a9@broadcom.com>
-From:   =?UTF-8?Q?=c3=81lvaro_Fern=c3=a1ndez_Rojas?= <noltari@gmail.com>
-Message-ID: <110b59a6-2359-89e1-5f20-7d2e1fd32a2f@gmail.com>
-Date:   Tue, 23 Feb 2021 18:22:11 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
-MIME-Version: 1.0
-In-Reply-To: <23b28f9f-786d-8cdc-338f-efb4b23020a9@broadcom.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: es-ES
-Content-Transfer-Encoding: 8bit
+        Matt Mackall <mpm@selenic.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        =?utf-8?b?TsOtY29sYXMgRi4gUi4gQS4gUHJhZG8=?= 
+        <nfraprado@protonmail.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        linux-crypto@vger.kernel.org,
+        bcm-kernel-feedback-list@broadcom.com,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rikard Falkeborn <rikard.falkeborn@gmail.com>,
+        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
+        linux-arm-kernel@lists.infradead.org,
+        Scott Branden <sbranden@broadcom.com>,
+        Mark Brown <broonie@kernel.org>, Ray Jui <rjui@broadcom.com>,
+        Rob Herring <robh+dt@kernel.org>, devicetree@vger.kernel.org,
+        Stefan Wahren <stefan.wahren@i2se.com>
+In-Reply-To: <20210223170006.29558-2-noltari@gmail.com>
+References: <20210222194510.14004-1-noltari@gmail.com> <20210223170006.29558-1-noltari@gmail.com> <20210223170006.29558-2-noltari@gmail.com>
+Subject: Re: [PATCH v3 1/2] dt-bindings: rng: bcm2835: document reset support
+Date:   Tue, 23 Feb 2021 13:34:10 -0600
+Message-Id: <1614108850.556529.4116106.nullmailer@robh.at.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Scott,
-
-El 23/02/2021 a las 18:17, Scott Branden escribió:
-> On 2021-02-23 8:36 a.m., Florian Fainelli wrote:
->>
->>
->> On 2/23/2021 8:01 AM, Álvaro Fernández Rojas wrote:
->>> Some devices may need to perform a reset before using the RNG, such as the
->>> BCM6368.
->>>
->>> Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
->>
->> Since the reset is unique to the 6368, you may want to make the property
->> mandatory for the 6368 compatible string and optional otherwise.
->>
-> Perhaps the reset could be done at an earlier boot stage as well and then the
-> reset would even be optional on 6368?
+On Tue, 23 Feb 2021 18:00:05 +0100, Álvaro Fernández Rojas wrote:
+> Some devices may need to perform a reset before using the RNG, such as the
+> BCM6368.
+> 
+> Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
+> ---
+>  v3: make resets required if brcm,bcm6368-rng.
+>  v2: document reset support.
+> 
+>  .../devicetree/bindings/rng/brcm,bcm2835.yaml   | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
 > 
 
-No, this isn't possible on bmips, which is device tree only.
-However, it's how is done in bcm63xx, which is why it wasn't needed before.
+My bot found errors running 'make dt_binding_check' on your patch:
 
-Best regards,
-Álvaro.
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/rng/brcm,bcm2835.example.dt.yaml: rng@10004180: 'resets' does not match any of the regexes: 'pinctrl-[0-9]+'
+	From schema: /builds/robherring/linux-dt-review/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
+
+See https://patchwork.ozlabs.org/patch/1443582
+
+This check can fail if there are any dependencies. The base for a patch
+series is generally the most recent rc1.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit.
+
