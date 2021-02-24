@@ -2,110 +2,161 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95260C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 17:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDFF1C433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 17:43:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6506264F03
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 17:11:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A5BBE64E90
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 17:43:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229954AbhBXRLP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Feb 2021 12:11:15 -0500
-Received: from mail.kernel.org ([198.145.29.99]:49228 "EHLO mail.kernel.org"
+        id S234567AbhBXRnR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Feb 2021 12:43:17 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53704 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231439AbhBXRLO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Feb 2021 12:11:14 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7AD5864F0B;
-        Wed, 24 Feb 2021 17:10:32 +0000 (UTC)
+        id S229594AbhBXRnQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Feb 2021 12:43:16 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 697EE64EC4
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Feb 2021 17:42:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614186632;
-        bh=SJ5Rru5hG1o1K/jlMvVzI1qjCrEGLO45OJ/U+7040fc=;
+        s=k20201202; t=1614188555;
+        bh=X1ac+OpvnCT+uyEuBgb8T0Qwu4OjvGB9QsfK/vP2hP0=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=HSPR/wWgNMbRQ+S4wYUT05rHBo4pCnm4/8aBrtKFABWfY75ExJsX5cSEMqDXmZkVk
-         B3wtKyPJBOp7d2e5rTI2UQBIRgYeSLMvBWeSkumFH7Sqw7b68djTOmIxt+dZc8ApuP
-         TdKCWjOtexw6313xPABgbZSohP010+hAp7Im7P3sstnrETat77/nOIu7K6qwGP35cc
-         AkH5FFiwidjLOdh4SLs/EOa6oFWqrxlCBCWiGA9f0U5ecLE46Q30Ab3nVY+diRIF+r
-         qcWkWYr1vb+xlHekc0exE6bYBNMNBxFD5mfVilO3H87fa7htEyq5BbVC6f637BMJYi
-         4lHqKDqQ7NClw==
-Received: by mail-ot1-f49.google.com with SMTP id s107so2828668otb.8;
-        Wed, 24 Feb 2021 09:10:32 -0800 (PST)
-X-Gm-Message-State: AOAM5314sw8vasSt/UKqk2Hl7gEQW2A3R8wzueJUUC4Nie7rX3Xl7eA+
-        csIHZ20/vKN6z5iv1vNFTioZl9/k1GHTvxjOUI0=
-X-Google-Smtp-Source: ABdhPJz5tsY3F8T09dNXv8JnxGazL++sEU1h6wwPeb3AK0KRDtvuCHcYpTFjaYYOXIdA5S3OKoKOP24SjVd8wbZsicU=
-X-Received: by 2002:a05:6830:135a:: with SMTP id r26mr9309607otq.77.1614186631597;
- Wed, 24 Feb 2021 09:10:31 -0800 (PST)
+        b=nrKeEP749PtolT0EsjpmIeAWrR70W+dN+2JYGV4X0Nx5fvzfhX0P63CYSdxYoNCXt
+         nwkhAZ34yy0sZ0ZW4wePrQEIR9Fl4iLWn1esdomOMiG473EidJCPkeJ2RpBrmRZCWV
+         ARvUVhSAKt0oEBsFbopYSqkTLq10U4FwTcg7aMtQcjjqX9p+KWKfXldE1iKPLUgg4T
+         5wZmKQZEskOr0TCHbwG4+oM2po1KloLlVkW6jxRrl9aHlHJJJzw5HQEu73MGrmUhdy
+         vIHtAc6r+jJJ9eBzKvm2cISS5SS7/2scOOfNm9BxW5vICJgRHYsDMg+6cNMWDezWrT
+         HGS9ET1m2QAZQ==
+Received: by mail-ed1-f45.google.com with SMTP id h10so3599306edl.6
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Feb 2021 09:42:35 -0800 (PST)
+X-Gm-Message-State: AOAM533rp3QU5aRkClh+3syc99TSGLdY8Mzw/XJ6Xz4RrHAkr9HJAp5i
+        4hS/po6/N0b5UqjJn0OWMqYkfBYe5vdo/bX1tBIDGQ==
+X-Google-Smtp-Source: ABdhPJx38CugYF/AbeapHGaaQYAavclW1nNIgt2STBDnyFQG7di+0KHd8Lzs/ON4SWvvkaZW3l0vFRLS8s51m4uvnXE=
+X-Received: by 2002:a05:6402:27cd:: with SMTP id c13mr34122575ede.263.1614188553686;
+ Wed, 24 Feb 2021 09:42:33 -0800 (PST)
 MIME-Version: 1.0
-References: <cover.1614182415.git.jpoimboe@redhat.com>
-In-Reply-To: <cover.1614182415.git.jpoimboe@redhat.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 24 Feb 2021 18:10:20 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXFnfH2OMA=JhzXuM=gT3pGci2=wpmjic-AbxoJLZnEexA@mail.gmail.com>
-Message-ID: <CAMj1kXFnfH2OMA=JhzXuM=gT3pGci2=wpmjic-AbxoJLZnEexA@mail.gmail.com>
-Subject: Re: [PATCH 00/13] x86/crypto/asm: objtool support
-To:     Josh Poimboeuf <jpoimboe@redhat.com>
-Cc:     X86 ML <x86@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
+References: <1611386920-28579-1-git-send-email-megha.dey@intel.com>
+ <CALCETrU06cuvUF5NDSm8--dy3dOkxYQ88cGWaakOQUE4Vkz88w@mail.gmail.com> <3878af8d-ac1e-522a-7c9f-fda4a1f5b967@intel.com>
+In-Reply-To: <3878af8d-ac1e-522a-7c9f-fda4a1f5b967@intel.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Wed, 24 Feb 2021 09:42:21 -0800
+X-Gmail-Original-Message-ID: <CALCETrUWgLwp6yfu9ODY1UYufHeAgsnOOCOAwXZQK6FJk_YdUA@mail.gmail.com>
+Message-ID: <CALCETrUWgLwp6yfu9ODY1UYufHeAgsnOOCOAwXZQK6FJk_YdUA@mail.gmail.com>
+Subject: Re: [RFC V2 0/5] Introduce AVX512 optimized crypto algorithms
+To:     "Dey, Megha" <megha.dey@intel.com>
+Cc:     Andy Lutomirski <luto@kernel.org>, Tony Luck <tony.luck@intel.com>,
+        Asit K Mallick <asit.k.mallick@intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "David S . Miller" <davem@davemloft.net>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Ravi V. Shankar" <ravi.v.shankar@intel.com>,
+        "Chen, Tim C" <tim.c.chen@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>, greg.b.tucker@intel.com,
+        "Kasten, Robert A" <robert.a.kasten@intel.com>,
+        rajendrakumar.chinnaiyan@intel.com, tomasz.kantecki@intel.com,
+        ryan.d.saffores@intel.com, ilya.albrekht@intel.com,
+        Kyung Min Park <kyung.min.park@intel.com>,
+        Weiny Ira <ira.weiny@intel.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>, X86 ML <x86@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 24 Feb 2021 at 17:29, Josh Poimboeuf <jpoimboe@redhat.com> wrote:
+On Tue, Feb 23, 2021 at 4:54 PM Dey, Megha <megha.dey@intel.com> wrote:
 >
-> Standardize the crypto asm to make it resemble compiler-generated code,
-> so that objtool can understand it.
+> Hi Andy,
 >
-> This magically enables ORC unwinding from crypto code.  It also fixes
-> the last known remaining objtool warnings on vmlinux.o, for LTO and
-> more.
+> On 1/24/2021 8:23 AM, Andy Lutomirski wrote:
+> > On Fri, Jan 22, 2021 at 11:29 PM Megha Dey <megha.dey@intel.com> wrote:
+> >> Optimize crypto algorithms using AVX512 instructions - VAES and VPCLMU=
+LQDQ
+> >> (first implemented on Intel's Icelake client and Xeon CPUs).
+> >>
+> >> These algorithms take advantage of the AVX512 registers to keep the CP=
+U
+> >> busy and increase memory bandwidth utilization. They provide substanti=
+al
+> >> (2-10x) improvements over existing crypto algorithms when update data =
+size
+> >> is greater than 128 bytes and do not have any significant impact when =
+used
+> >> on small amounts of data.
+> >>
+> >> However, these algorithms may also incur a frequency penalty and cause
+> >> collateral damage to other workloads running on the same core(co-sched=
+uled
+> >> threads). These frequency drops are also known as bin drops where 1 bi=
+n
+> >> drop is around 100MHz. With the SpecCPU and ffmpeg benchmark, a 0-1 bi=
+n
+> >> drop(0-100MHz) is observed on Icelake desktop and 0-2 bin drops (0-200=
+Mhz)
+> >> are observed on the Icelake server.
+> >>
+> >> The AVX512 optimization are disabled by default to avoid impact on oth=
+er
+> >> workloads. In order to use these optimized algorithms:
+> >> 1. At compile time:
+> >>     a. User must enable CONFIG_CRYPTO_AVX512 option
+> >>     b. Toolchain(assembler) must support VPCLMULQDQ and VAES instructi=
+ons
+> >> 2. At run time:
+> >>     a. User must set module parameter use_avx512 at boot time
+> >>     b. Platform must support VPCLMULQDQ and VAES features
+> >>
+> >> N.B. It is unclear whether these coarse grain controls(global module
+> >> parameter) would meet all user needs. Perhaps some per-thread control =
+might
+> >> be useful? Looking for guidance here.
+> >
+> > I've just been looking at some performance issues with in-kernel AVX,
+> > and I have a whole pile of questions that I think should be answered
+> > first:
+> >
+> > What is the impact of using an AVX-512 instruction on the logical
+> > thread, its siblings, and other cores on the package?
+> >
+> > Does the impact depend on whether it=E2=80=99s a 512-bit insn or a shor=
+ter EVEX insn?
+> >
+> > What is the impact on subsequent shorter EVEX, VEX, and legacy
+> > SSE(2,3, etc) insns?
+> >
+> > How does VZEROUPPER figure in?  I can find an enormous amount of
+> > misinformation online, but nothing authoritative.
+> >
+> > What is the effect of the AVX-512 states (5-7) being =E2=80=9Cin use=E2=
+=80=9D?  As far
+> > as I can tell, the only operations that clear XINUSE[5-7] are XRSTOR
+> > and its variants.  Is this correct?
+> >
+> > On AVX-512 capable CPUs, do we ever get a penalty for executing a
+> > non-VEX insn followed by a large-width EVEX insn without an
+> > intervening VZEROUPPER?  The docs suggest no, since Broadwell and
+> > before don=E2=80=99t support EVEX, but I=E2=80=99d like to know for sur=
+e.
+> >
+> >
+> > My current opinion is that we should not enable AVX-512 in-kernel
+> > except on CPUs that we determine have good AVX-512 support.  Based on
+> > some reading, that seems to mean Ice Lake Client and not anything
+> > before it.  I also think a bunch of the above questions should be
+> > answered before we do any of this.  Right now we have a regression of
+> > unknown impact in regular AVX support in-kernel, we will have
+> > performance issues in-kernel depending on what user code has done
+> > recently, and I'm still trying to figure out what to do about it.
+> > Throwing AVX-512 into the mix without real information is not going to
+> > improve the situation.
 >
-> Josh Poimboeuf (13):
->   objtool: Support asm jump tables
->   x86/crypto/aesni-intel_avx: Remove unused macros
->   x86/crypto/aesni-intel_avx: Fix register usage comments
->   x86/crypto/aesni-intel_avx: Standardize stack alignment prologue
->   x86/crypto/camellia-aesni-avx2: Unconditionally allocate stack buffer
->   x86/crypto/crc32c-pcl-intel: Standardize jump table
->   x86/crypto/sha_ni: Standardize stack alignment prologue
->   x86/crypto/sha1_avx2: Standardize stack alignment prologue
->   x86/crypto/sha256-avx2: Standardize stack alignment prologue
->   x86/crypto/sha512-avx: Standardize stack alignment prologue
->   x86/crypto/sha512-avx2: Standardize stack alignment prologue
->   x86/crypto/sha512-ssse3: Standardize stack alignment prologue
->   x86/crypto: Enable objtool in crypto code
->
+> We are currently working on providing you with answers on the questions
+> you have raised regarding AVX.
 
-I gave this series a spin with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y,
-and all the tests still pass.
-
-Tested-by: Ard Biesheuvel <ardb@kernel.org>
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
-
-
-
->  arch/x86/crypto/Makefile                     |  2 -
->  arch/x86/crypto/aesni-intel_avx-x86_64.S     | 28 +++++--------
->  arch/x86/crypto/camellia-aesni-avx2-asm_64.S |  5 +--
->  arch/x86/crypto/crc32c-pcl-intel-asm_64.S    |  7 +---
->  arch/x86/crypto/sha1_avx2_x86_64_asm.S       |  8 ++--
->  arch/x86/crypto/sha1_ni_asm.S                |  8 ++--
->  arch/x86/crypto/sha256-avx2-asm.S            | 13 +++---
->  arch/x86/crypto/sha512-avx-asm.S             | 41 +++++++++----------
->  arch/x86/crypto/sha512-avx2-asm.S            | 42 ++++++++++----------
->  arch/x86/crypto/sha512-ssse3-asm.S           | 41 +++++++++----------
->  tools/objtool/check.c                        | 14 ++++++-
->  11 files changed, 98 insertions(+), 111 deletions(-)
->
-> --
-> 2.29.2
->
+Thanks!
