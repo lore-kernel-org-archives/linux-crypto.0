@@ -2,56 +2,45 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_40,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C59D7C433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 15:56:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 074DEC433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 16:18:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7C8DA64ED4
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 15:56:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B272E64EDD
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 16:18:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233331AbhBXPz6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Feb 2021 10:55:58 -0500
-Received: from mail-02.mail-europe.com ([51.89.119.103]:48940 "EHLO
-        mail-02.mail-europe.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237410AbhBXPAM (ORCPT
+        id S232394AbhBXQSj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Feb 2021 11:18:39 -0500
+Received: from mail.antaris-organics.com ([91.227.220.155]:48530 "EHLO
+        mail.antaris-organics.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234633AbhBXQQL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Feb 2021 10:00:12 -0500
-Date:   Wed, 24 Feb 2021 14:57:27 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail; t=1614178654;
-        bh=9f9GIuhf2hS61SeaImYhYv8s0/Hi503HzYX0LoKMyzE=;
-        h=Date:To:From:Cc:Reply-To:Subject:From;
-        b=gLhepiYNxOpbxWldO8/g/bTQYYsDrkJvDPzY1naS0cXNXmvVRl1GMbzQrdMmih7hu
-         JVwi1ElCZsLzqjVjyYHRrfQZruyREAWvUWrhPohOPdjqChdNGq6LUDTgvC7EENNr6N
-         cIUdXP6rpqHNjyWkcd22voF7lV0WR8tEJ78YCy4Y=
+        Wed, 24 Feb 2021 11:16:11 -0500
+X-Greylist: delayed 627 seconds by postgrey-1.27 at vger.kernel.org; Wed, 24 Feb 2021 11:16:11 EST
+Date:   Wed, 24 Feb 2021 17:04:43 +0100
+From:   Markus Reichelt <ml@mareichelt.com>
 To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-From:   Jari Ruusu <jariruusu@protonmail.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Reply-To: Jari Ruusu <jariruusu@protonmail.com>
-Subject: Announce loop-AES-v3.7t file/swap crypto package
-Message-ID: <ps5Cel96vhDqLDwRW9Lou3Hh8Y7jt6TdiKM7AeGsKYfXv7dwl-zuEtuUu2g67S9hJIcwrQD_xm6Du2SqCIdHrpTLNiZb9yCgo9dpu3FESEs=@protonmail.com>
+Subject: Re: Announce loop-AES-v3.7t file/swap crypto package
+Message-ID: <20210224160443.GB12958@pc21.mareichelt.com>
+Mail-Followup-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+References: <ps5Cel96vhDqLDwRW9Lou3Hh8Y7jt6TdiKM7AeGsKYfXv7dwl-zuEtuUu2g67S9hJIcwrQD_xm6Du2SqCIdHrpTLNiZb9yCgo9dpu3FESEs=@protonmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ps5Cel96vhDqLDwRW9Lou3Hh8Y7jt6TdiKM7AeGsKYfXv7dwl-zuEtuUu2g67S9hJIcwrQD_xm6Du2SqCIdHrpTLNiZb9yCgo9dpu3FESEs=@protonmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-loop-AES changes since previous release:
-- Worked around kernel interface changes on 5.11 kernels
+* Jari Ruusu <jariruusu@protonmail.com> wrote:
 
-bzip2 compressed tarball is here:
+> loop-AES changes since previous release:
+> - Worked around kernel interface changes on 5.11 kernels
 
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7t.tar.bz2
-    md5sum 974a0705207d97772b8c1388c43aee58
+thank you!
 
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7t.tar.bz2.sign
-
---
-Jari Ruusu=C2=A0 4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD=C2=A0 ACDF F073 3C=
-80 8132 F189
-
+-- 
+left blank, right bald
