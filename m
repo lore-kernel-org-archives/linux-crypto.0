@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E25DC433E6
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 16:34:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 594FAC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 16:36:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AEA4E64F02
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 16:34:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0390064EF5
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 16:36:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234493AbhBXQeg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Feb 2021 11:34:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49830 "EHLO
+        id S235353AbhBXQfs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Feb 2021 11:35:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57547 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234450AbhBXQcf (ORCPT
+        by vger.kernel.org with ESMTP id S235268AbhBXQdk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Feb 2021 11:32:35 -0500
+        Wed, 24 Feb 2021 11:33:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614184265;
+        s=mimecast20190719; t=1614184324;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bBgJZbU8XJohBWogHzPnPQnzXHFLyp1Xf0dJOi3AIyQ=;
-        b=Ug+m+ZEheT/Kg5bsr1sgdiwRRaUNkGA53w773Ml5BzYa7vw3JgEG9EdtHmfDxKGZqoyGUU
-        eqPBZqlTkbH/0lP1GTTlSJGaanfy+FL9atH3WWHGAAT/EZZAQcU/M5+fFuJyZXOlORv2TL
-        st81Uh12MiWgLwfj/pFkFQCggVJb6YM=
+        bh=AuvWSaJ9jqWTQR6peCcPaZV/0nyJwPI7/KUXsD2VZRA=;
+        b=RuLvmd2bph2Xgh7JoGsT0u9mrTZ8LUaDRgL0EzJ4keDSPBIo9c7+gU5K0WikovJ/Wgc4ip
+        VwvSIyVehWh/97HxnHhCx//G3bSsSLKhVHnK3JcIKVayEOa1UDEvwe7X1JlhaqlUMOvhH9
+        gcJSs/1v01LiJyH7rMX07eFpiUwQiPg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-262-Xj6PoKWAOfu6p6elvNLZnA-1; Wed, 24 Feb 2021 11:29:42 -0500
-X-MC-Unique: Xj6PoKWAOfu6p6elvNLZnA-1
+ us-mta-37-qtnbYkXpOa2FDxm45LwWDA-1; Wed, 24 Feb 2021 11:29:46 -0500
+X-MC-Unique: qtnbYkXpOa2FDxm45LwWDA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D97DB107ACE6;
-        Wed, 24 Feb 2021 16:29:39 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 798931005501;
+        Wed, 24 Feb 2021 16:29:44 +0000 (UTC)
 Received: from treble.redhat.com (ovpn-118-134.rdu2.redhat.com [10.10.118.134])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3A9B960862;
-        Wed, 24 Feb 2021 16:29:38 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 40F5960862;
+        Wed, 24 Feb 2021 16:29:43 +0000 (UTC)
 From:   Josh Poimboeuf <jpoimboe@redhat.com>
 To:     x86@kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     linux-kernel@vger.kernel.org, Miroslav Benes <mbenes@suse.cz>,
@@ -51,9 +51,9 @@ Cc:     linux-kernel@vger.kernel.org, Miroslav Benes <mbenes@suse.cz>,
         Sami Tolvanen <samitolvanen@google.com>,
         linux-crypto@vger.kernel.org,
         "David S . Miller" <davem@davemloft.net>
-Subject: [PATCH 05/13] x86/crypto/camellia-aesni-avx2: Unconditionally allocate stack buffer
-Date:   Wed, 24 Feb 2021 10:29:18 -0600
-Message-Id: <85ac96613ee5784b6239c18d3f68b1f3c509caa3.1614182415.git.jpoimboe@redhat.com>
+Subject: [PATCH 08/13] x86/crypto/sha1_avx2: Standardize stack alignment prologue
+Date:   Wed, 24 Feb 2021 10:29:21 -0600
+Message-Id: <fdaaf8670ed1f52f55ba9a6bbac98c1afddc1af6.1614182415.git.jpoimboe@redhat.com>
 In-Reply-To: <cover.1614182415.git.jpoimboe@redhat.com>
 References: <cover.1614182415.git.jpoimboe@redhat.com>
 MIME-Version: 1.0
@@ -63,61 +63,44 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A conditional stack allocation violates traditional unwinding
-requirements when a single instruction can have differing stack layouts.
+Use a more standard prologue for saving the stack pointer before
+realigning the stack.
 
-There's no benefit in allocating the stack buffer conditionally.  Just
-do it unconditionally.
+This enables ORC unwinding by allowing objtool to understand the stack
+realignment.
 
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ arch/x86/crypto/sha1_avx2_x86_64_asm.S | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
-index 782e9712a1ec..706f70829a07 100644
---- a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
-+++ b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
-@@ -990,6 +990,7 @@ SYM_FUNC_START(camellia_cbc_dec_32way)
- 	 *	%rdx: src (32 blocks)
- 	 */
- 	FRAME_BEGIN
-+	subq $(16 * 32), %rsp;
+diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+index 1e594d60afa5..5eed620f4676 100644
+--- a/arch/x86/crypto/sha1_avx2_x86_64_asm.S
++++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+@@ -645,9 +645,9 @@ _loop3:
+ 	RESERVE_STACK  = (W_SIZE*4 + 8+24)
  
- 	vzeroupper;
+ 	/* Align stack */
+-	mov	%rsp, %rbx
++	push	%rbp
++	mov	%rsp, %rbp
+ 	and	$~(0x20-1), %rsp
+-	push	%rbx
+ 	sub	$RESERVE_STACK, %rsp
  
-@@ -1002,7 +1003,6 @@ SYM_FUNC_START(camellia_cbc_dec_32way)
- 		     %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14,
- 		     %ymm15, %rdx, (key_table)(CTX, %r8, 8));
+ 	avx2_zeroupper
+@@ -665,8 +665,8 @@ _loop3:
  
--	movq %rsp, %r10;
- 	cmpq %rsi, %rdx;
- 	je .Lcbc_dec_use_stack;
+ 	avx2_zeroupper
  
-@@ -1015,7 +1015,6 @@ SYM_FUNC_START(camellia_cbc_dec_32way)
- 	 * dst still in-use (because dst == src), so use stack for temporary
- 	 * storage.
- 	 */
--	subq $(16 * 32), %rsp;
- 	movq %rsp, %rax;
+-	add	$RESERVE_STACK, %rsp
+-	pop	%rsp
++	mov	%rbp, %rsp
++	pop	%rbp
  
- .Lcbc_dec_continue:
-@@ -1025,7 +1024,6 @@ SYM_FUNC_START(camellia_cbc_dec_32way)
- 	vpxor %ymm7, %ymm7, %ymm7;
- 	vinserti128 $1, (%rdx), %ymm7, %ymm7;
- 	vpxor (%rax), %ymm7, %ymm7;
--	movq %r10, %rsp;
- 	vpxor (0 * 32 + 16)(%rdx), %ymm6, %ymm6;
- 	vpxor (1 * 32 + 16)(%rdx), %ymm5, %ymm5;
- 	vpxor (2 * 32 + 16)(%rdx), %ymm4, %ymm4;
-@@ -1047,6 +1045,7 @@ SYM_FUNC_START(camellia_cbc_dec_32way)
- 
- 	vzeroupper;
- 
-+	addq $(16 * 32), %rsp;
- 	FRAME_END
- 	ret;
- SYM_FUNC_END(camellia_cbc_dec_32way)
+ 	pop	%r15
+ 	pop	%r14
 -- 
 2.29.2
 
