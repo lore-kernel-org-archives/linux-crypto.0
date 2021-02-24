@@ -2,46 +2,46 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D815EC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 16:33:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85723C4332D
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 16:33:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90D0164F00
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 16:33:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 464F164EBA
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 16:33:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234680AbhBXQcz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Feb 2021 11:32:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29740 "EHLO
+        id S234875AbhBXQdC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Feb 2021 11:33:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44163 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234717AbhBXQbU (ORCPT
+        by vger.kernel.org with ESMTP id S234878AbhBXQbV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Feb 2021 11:31:20 -0500
+        Wed, 24 Feb 2021 11:31:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614184186;
+        s=mimecast20190719; t=1614184193;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=eOHOjeFiMtzP9OGzSSHIXYUBmM19lsPz/JuM7QoJPBE=;
-        b=TgLQCDy2bgsRVBHmbKeIYGLmStUd1Ogi9NQAC3rVtSH+4TgAP7LSwW4YytPKZu6lJd0yE5
-        kp2dHgzV08+385U7V0axuoodY9T9HAPCgEr3WcYHVU6gJGmDajbVs5PQeU0+O6zpdNQYlK
-        8Md705a3C2MuHgD5lU6ZycnO49JbqTE=
+        bh=I38yLyos8nKXeXwG/pZDKWvlhlgiM/lKSNW5bUlm4hQ=;
+        b=gsRB0do+6lPRA2pjONY+G6PZcKeRrQADayUseL9bRte54WNIA1oJx4kveZj8x/WQMgiH3c
+        S+Yop1PttFeOlNmjMs2y5a/lVyreWOuvKMnUqwO29uDSI7sNP9qGODcb84Gj9nHT5O0XfK
+        YonFRFdf/6CIyBpDck0HOmmT/oDpEmk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-1h4Bbw7aMJuFblwKAqeTwQ-1; Wed, 24 Feb 2021 11:29:45 -0500
-X-MC-Unique: 1h4Bbw7aMJuFblwKAqeTwQ-1
+ us-mta-434-XTKiW_nXPWmbyaYOqBO0Hw-1; Wed, 24 Feb 2021 11:29:49 -0500
+X-MC-Unique: XTKiW_nXPWmbyaYOqBO0Hw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F3FF79EC1;
-        Wed, 24 Feb 2021 16:29:43 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D1431936B71;
+        Wed, 24 Feb 2021 16:29:47 +0000 (UTC)
 Received: from treble.redhat.com (ovpn-118-134.rdu2.redhat.com [10.10.118.134])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BA4DA60862;
-        Wed, 24 Feb 2021 16:29:41 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2154460CE7;
+        Wed, 24 Feb 2021 16:29:46 +0000 (UTC)
 From:   Josh Poimboeuf <jpoimboe@redhat.com>
 To:     x86@kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     linux-kernel@vger.kernel.org, Miroslav Benes <mbenes@suse.cz>,
@@ -51,9 +51,9 @@ Cc:     linux-kernel@vger.kernel.org, Miroslav Benes <mbenes@suse.cz>,
         Sami Tolvanen <samitolvanen@google.com>,
         linux-crypto@vger.kernel.org,
         "David S . Miller" <davem@davemloft.net>
-Subject: [PATCH 07/13] x86/crypto/sha_ni: Standardize stack alignment prologue
-Date:   Wed, 24 Feb 2021 10:29:20 -0600
-Message-Id: <5033e1a79867dff1b18e1b4d0783c38897d3f223.1614182415.git.jpoimboe@redhat.com>
+Subject: [PATCH 10/13] x86/crypto/sha512-avx: Standardize stack alignment prologue
+Date:   Wed, 24 Feb 2021 10:29:23 -0600
+Message-Id: <d36e9ea1c819d87fa89b3df3fa83e2a1ede18146.1614182415.git.jpoimboe@redhat.com>
 In-Reply-To: <cover.1614182415.git.jpoimboe@redhat.com>
 References: <cover.1614182415.git.jpoimboe@redhat.com>
 MIME-Version: 1.0
@@ -71,42 +71,82 @@ realignment.
 
 Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
 ---
- arch/x86/crypto/sha1_ni_asm.S | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/x86/crypto/sha512-avx-asm.S | 41 +++++++++++++++-----------------
+ 1 file changed, 19 insertions(+), 22 deletions(-)
 
-diff --git a/arch/x86/crypto/sha1_ni_asm.S b/arch/x86/crypto/sha1_ni_asm.S
-index 11efe3a45a1f..5d8415f482bd 100644
---- a/arch/x86/crypto/sha1_ni_asm.S
-+++ b/arch/x86/crypto/sha1_ni_asm.S
-@@ -59,8 +59,6 @@
- #define DATA_PTR	%rsi	/* 2nd arg */
- #define NUM_BLKS	%rdx	/* 3rd arg */
+diff --git a/arch/x86/crypto/sha512-avx-asm.S b/arch/x86/crypto/sha512-avx-asm.S
+index 684d58c8bc4f..3d8f0fd4eea8 100644
+--- a/arch/x86/crypto/sha512-avx-asm.S
++++ b/arch/x86/crypto/sha512-avx-asm.S
+@@ -76,14 +76,10 @@ tmp0	= %rax
+ W_SIZE = 80*8
+ # W[t] + K[t] | W[t+1] + K[t+1]
+ WK_SIZE = 2*8
+-RSPSAVE_SIZE = 1*8
+-GPRSAVE_SIZE = 5*8
  
--#define RSPSAVE		%rax
+ frame_W = 0
+ frame_WK = frame_W + W_SIZE
+-frame_RSPSAVE = frame_WK + WK_SIZE
+-frame_GPRSAVE = frame_RSPSAVE + RSPSAVE_SIZE
+-frame_size = frame_GPRSAVE + GPRSAVE_SIZE
++frame_size = frame_WK + WK_SIZE
+ 
+ # Useful QWORD "arrays" for simpler memory references
+ # MSG, DIGEST, K_t, W_t are arrays
+@@ -281,18 +277,18 @@ SYM_FUNC_START(sha512_transform_avx)
+ 	test msglen, msglen
+ 	je nowork
+ 
++	# Save GPRs
++	push	%rbx
++	push	%r12
++	push	%r13
++	push	%r14
++	push	%r15
++
+ 	# Allocate Stack Space
+-	mov	%rsp, %rax
++	push	%rbp
++	mov	%rsp, %rbp
+ 	sub     $frame_size, %rsp
+ 	and	$~(0x20 - 1), %rsp
+-	mov	%rax, frame_RSPSAVE(%rsp)
 -
- /* gcc conversion */
- #define FRAME_SIZE	32	/* space for 2x16 bytes */
+-	# Save GPRs
+-	mov     %rbx, frame_GPRSAVE(%rsp)
+-	mov     %r12, frame_GPRSAVE +8*1(%rsp)
+-	mov     %r13, frame_GPRSAVE +8*2(%rsp)
+-	mov     %r14, frame_GPRSAVE +8*3(%rsp)
+-	mov     %r15, frame_GPRSAVE +8*4(%rsp)
  
-@@ -96,7 +94,8 @@
- .text
- .align 32
- SYM_FUNC_START(sha1_ni_transform)
--	mov		%rsp, RSPSAVE
-+	push		%rbp
-+	mov		%rsp, %rbp
- 	sub		$FRAME_SIZE, %rsp
- 	and		$~0xF, %rsp
+ updateblock:
  
-@@ -288,7 +287,8 @@ SYM_FUNC_START(sha1_ni_transform)
- 	pextrd		$3, E0, 1*16(DIGEST_PTR)
+@@ -353,15 +349,16 @@ updateblock:
+ 	dec     msglen
+ 	jnz     updateblock
  
- .Ldone_hash:
--	mov		RSPSAVE, %rsp
-+	mov		%rbp, %rsp
-+	pop		%rbp
+-	# Restore GPRs
+-	mov     frame_GPRSAVE(%rsp),      %rbx
+-	mov     frame_GPRSAVE +8*1(%rsp), %r12
+-	mov     frame_GPRSAVE +8*2(%rsp), %r13
+-	mov     frame_GPRSAVE +8*3(%rsp), %r14
+-	mov     frame_GPRSAVE +8*4(%rsp), %r15
+-
+ 	# Restore Stack Pointer
+-	mov	frame_RSPSAVE(%rsp), %rsp
++	mov	%rbp, %rsp
++	pop	%rbp
++
++	# Restore GPRs
++	pop	%r15
++	pop	%r14
++	pop	%r13
++	pop	%r12
++	pop	%rbx
  
+ nowork:
  	ret
- SYM_FUNC_END(sha1_ni_transform)
 -- 
 2.29.2
 
