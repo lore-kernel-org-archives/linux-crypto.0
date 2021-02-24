@@ -2,88 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 263EBC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 01:33:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4646BC433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 06:55:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C821264E6F
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 01:33:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED49C64EC9
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 06:55:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229769AbhBXBdR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Feb 2021 20:33:17 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:12948 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232389AbhBXBa1 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Feb 2021 20:30:27 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DldbW1Q3hzjQpq;
-        Wed, 24 Feb 2021 09:28:23 +0800 (CST)
-Received: from [10.67.103.10] (10.67.103.10) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.498.0; Wed, 24 Feb 2021
- 09:29:34 +0800
-Subject: Re: [PATCH v9 3/7] crypto: move curve_id of ECDH from the key to
- algorithm name
-To:     <Tudor.Ambarus@microchip.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <marcel@holtmann.org>,
-        <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>
-CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
-        <wangzhou1@hisilicon.com>, <linux-kernel@vger.kernel.org>,
-        <Nicolas.Ferre@microchip.com>
-References: <1614064219-40701-1-git-send-email-yumeng18@huawei.com>
- <1614064219-40701-4-git-send-email-yumeng18@huawei.com>
- <8b96c136-dca9-5b6a-2221-e906d265c40b@microchip.com>
-From:   yumeng <yumeng18@huawei.com>
-Message-ID: <fd3b7c0f-d7f2-3d27-cfef-98ec3614dd1a@huawei.com>
-Date:   Wed, 24 Feb 2021 09:29:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
+        id S231881AbhBXGzy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Feb 2021 01:55:54 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52036 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231627AbhBXGzr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Feb 2021 01:55:47 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C0B1264D99;
+        Wed, 24 Feb 2021 06:54:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1614149700;
+        bh=7qGuelNU0pGE7JhnH6i9pfp1fcQxCsHNvaRbRe4VfIA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=bOk2SZh+3M7eyWeoqVBSPaLAQPz9QFDlNCq18qHcLM6gr0usU04FcswSKeHrP5P63
+         SQu0XuYbsT8YoySOG3QyUlcEhAwY1qnWmLSLz1OIixgAAUavFoAcWsYihSsg65/ixN
+         UmZiRrBzJhVyHk9gM9SSBqahoLqDXWs96UB+i7pSI7yIRo7hTGciuU3i+oOjHZ7boN
+         +cDCtgJ9ZQ9xPBKjlWxCtKQuodJWTQrW3oaVvbQ78TW9C6m/Dl0UNnsba22RYILBMy
+         6NWKNct3lbuafW+Z5Y0McvubraHnBQUd8yEq/N+w3CmJdtTMjWqVN7csFvfWEYXUR5
+         lBE/8SlERRy6g==
+Date:   Tue, 23 Feb 2021 22:54:58 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Kai Ye <yekai13@huawei.com>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: testmgr - delete some redundant code
+Message-ID: <YDX4Qr9RgVT+wBky@sol.localdomain>
+References: <1614051724-31694-1-git-send-email-yekai13@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <8b96c136-dca9-5b6a-2221-e906d265c40b@microchip.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.103.10]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1614051724-31694-1-git-send-email-yekai13@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-在 2021/2/23 18:44, Tudor.Ambarus@microchip.com 写道:
-> Hi,
+On Tue, Feb 23, 2021 at 11:42:04AM +0800, Kai Ye wrote:
+> Delete sg_data function, because sg_data function definition same as
+> sg_virt(), so need to delete it and use sg_virt() replace to sg_data().
 > 
-> On 2/23/21 9:10 AM, Meng Yu wrote:
->> --- a/drivers/crypto/atmel-ecc.c
->> +++ b/drivers/crypto/atmel-ecc.c
->> @@ -104,7 +104,7 @@ static int atmel_ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
->>                  return -EINVAL;
->>          }
->>
->> -       ctx->n_sz = atmel_ecdh_supported_curve(params.curve_id);
->> +       ctx->n_sz = atmel_ecdh_supported_curve(ctx->curve_id);
->>          if (!ctx->n_sz || params.key_size) {
->>                  /* fallback to ecdh software implementation */
->>                  ctx->do_fallback = true;
+> Signed-off-by: Kai Ye <yekai13@huawei.com>
+> ---
+>  crypto/testmgr.c | 11 +++--------
+>  1 file changed, 3 insertions(+), 8 deletions(-)
 > 
-> Now that you moved the curve id info into the alg name, and it is
-> no longer dynamically discovered when decoding the key, does it
-> still make sense to keep the curve id, the key size checks, and
-> the fallback to the software implementation?
->I think we can keep the curve id, the key size check if 'atmel-ecc' may
-support other curves in the future, and if you're sure P256 is the only
-curve 'atmel-ecc' uses, and it will be changed, we can delete it.
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index 9335999..e13e73c 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -1168,11 +1168,6 @@ static inline int check_shash_op(const char *op, int err,
+>  	return err;
+>  }
+>  
+> -static inline const void *sg_data(struct scatterlist *sg)
+> -{
+> -	return page_address(sg_page(sg)) + sg->offset;
+> -}
+> -
+>  /* Test one hash test vector in one configuration, using the shash API */
+>  static int test_shash_vec_cfg(const struct hash_testvec *vec,
+>  			      const char *vec_name,
+> @@ -1230,7 +1225,7 @@ static int test_shash_vec_cfg(const struct hash_testvec *vec,
+>  			return 0;
+>  		if (cfg->nosimd)
+>  			crypto_disable_simd_for_test();
+> -		err = crypto_shash_digest(desc, sg_data(&tsgl->sgl[0]),
+> +		err = crypto_shash_digest(desc, sg_virt(&tsgl->sgl[0]),
+>  					  tsgl->sgl[0].length, result);
+>  		if (cfg->nosimd)
+>  			crypto_reenable_simd_for_test();
+> @@ -1266,7 +1261,7 @@ static int test_shash_vec_cfg(const struct hash_testvec *vec,
+>  		    cfg->finalization_type == FINALIZATION_TYPE_FINUP) {
+>  			if (divs[i]->nosimd)
+>  				crypto_disable_simd_for_test();
+> -			err = crypto_shash_finup(desc, sg_data(&tsgl->sgl[i]),
+> +			err = crypto_shash_finup(desc, sg_virt(&tsgl->sgl[i]),
+>  						 tsgl->sgl[i].length, result);
+>  			if (divs[i]->nosimd)
+>  				crypto_reenable_simd_for_test();
+> @@ -1278,7 +1273,7 @@ static int test_shash_vec_cfg(const struct hash_testvec *vec,
+>  		}
+>  		if (divs[i]->nosimd)
+>  			crypto_disable_simd_for_test();
+> -		err = crypto_shash_update(desc, sg_data(&tsgl->sgl[i]),
+> +		err = crypto_shash_update(desc, sg_virt(&tsgl->sgl[i]),
+>  					  tsgl->sgl[i].length);
+>  		if (divs[i]->nosimd)
+>  			crypto_reenable_simd_for_test();
+> -- 
 
-And fallback to ecdh software implementation is needed when
-params.key_size is zero.
+Looks good,
 
-> I don't have an atecc508 at hand to test the changes, but I expect
-> your changes won't affect the functionality.
-> 
+Reviewed-by: Eric Biggers <ebiggers@google.com>
 
-OK, if you or your team members have an atecc508, please help test.
-
+- Eric
