@@ -2,78 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC92FC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 01:21:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B7DFC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 01:30:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A66B64E3F
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 01:21:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4897664E6F
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 01:30:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232392AbhBXBUo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Feb 2021 20:20:44 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36619 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231591AbhBXBGZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Feb 2021 20:06:25 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 79C2764EC3;
-        Wed, 24 Feb 2021 00:32:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614126737;
-        bh=jOJmSCxtenO1WTtfL7d1uP4jeqm3TLos+sg+rh3P7pI=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=q/R/xA7ZNgWlqegXEi6CPoImKZT00/Ze/oDKl4UUpwwlit1kqYViSzgwJ0WN7cu49
-         F7daU7OqW/5l8IuazW/f6t8gn2YoVjAEZ79/NYaY7x0Wg7koIenIPWja3ybzzSfneL
-         CObP3rokZiK66bM1xtWtu4hX4qJbXxhrn+Tl5+sUABFqpbTDGfXFqsmfX9jSkGvxcv
-         3STQXzSvyx83oLSfVHOxNTUqN5MiwwG5tHLnSEatGT7zJkVNl8vpwzY1svqsWrG7vs
-         BaFLuITpYs4s3ULokcvOmCVy1bxYeAOVRpQ0ic2XsfRwf2SWri7aPbpi2Q5v4btWg1
-         FYaAe+VsXb08A==
-Subject: Re: [GIT PULL] keys: Collected minor fixes and cleanups
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <1322896.1612969174@warthog.procyon.org.uk>
-References: <1322896.1612969174@warthog.procyon.org.uk>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <1322896.1612969174@warthog.procyon.org.uk>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/keys-misc-20210126
-X-PR-Tracked-Commit-Id: 8f0bfc25c907f38e7f9dc498e8f43000d77327ef
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: c03c21ba6f4e95e406a1a7b4c34ef334b977c194
-Message-Id: <161412673735.16978.8992204250231676229.pr-tracker-bot@kernel.org>
-Date:   Wed, 24 Feb 2021 00:32:17 +0000
-To:     David Howells <dhowells@redhat.com>
-Cc:     torvalds@linux-foundation.org, dhowells@redhat.com,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        "Alexander A. Klimov" <grandmaster@al2klimov.de>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Alex Shi <alex.shi@linux.alibaba.com>,
-        Ben Boeckel <mathstuf@gmail.com>,
-        Denis Efremov <efremov@linux.com>,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Jann Horn <jannh@google.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Tom Rix <trix@redhat.com>, YueHaibing <yuehaibing@huawei.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
+        id S231974AbhBXBaG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 Feb 2021 20:30:06 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:12992 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232156AbhBXBUp (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Feb 2021 20:20:45 -0500
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DldMK1ZKDzjRlK;
+        Wed, 24 Feb 2021 09:17:49 +0800 (CST)
+Received: from [10.67.103.10] (10.67.103.10) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.498.0; Wed, 24 Feb 2021
+ 09:19:13 +0800
+Subject: Re: [PATCH v9 3/7] crypto: move curve_id of ECDH from the key to
+ algorithm name
+To:     <Tudor.Ambarus@microchip.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <marcel@holtmann.org>,
+        <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>
+CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
+        <wangzhou1@hisilicon.com>, <linux-kernel@vger.kernel.org>,
+        <Nicolas.Ferre@microchip.com>
+References: <1614064219-40701-1-git-send-email-yumeng18@huawei.com>
+ <1614064219-40701-4-git-send-email-yumeng18@huawei.com>
+ <8b96c136-dca9-5b6a-2221-e906d265c40b@microchip.com>
+From:   yumeng <yumeng18@huawei.com>
+Message-ID: <4f16302b-7002-fd96-f08c-245f49e3233c@huawei.com>
+Date:   Wed, 24 Feb 2021 09:19:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
+MIME-Version: 1.0
+In-Reply-To: <8b96c136-dca9-5b6a-2221-e906d265c40b@microchip.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.103.10]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Wed, 10 Feb 2021 14:59:34 +0000:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/keys-misc-20210126
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/c03c21ba6f4e95e406a1a7b4c34ef334b977c194
+在 2021/2/23 18:44, Tudor.Ambarus@microchip.com 写道:
+> Hi,
+> 
+> On 2/23/21 9:10 AM, Meng Yu wrote:
+>> --- a/drivers/crypto/atmel-ecc.c
+>> +++ b/drivers/crypto/atmel-ecc.c
+>> @@ -104,7 +104,7 @@ static int atmel_ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
+>>                  return -EINVAL;
+>>          }
+>>
+>> -       ctx->n_sz = atmel_ecdh_supported_curve(params.curve_id);
+>> +       ctx->n_sz = atmel_ecdh_supported_curve(ctx->curve_id);
+>>          if (!ctx->n_sz || params.key_size) {
+>>                  /* fallback to ecdh software implementation */
+>>                  ctx->do_fallback = true;
+> 
+> Now that you moved the curve id info into the alg name, and it is
+> no longer dynamically discovered when decoding the key, does it
+> still make sense to keep the curve id, the key size checks, and
+> the fallback to the software implementation?
+> 
+Yes, I think we can keep this code if 'atmel-ecc' may support
+new other curves at future, and if you're sure P256 is the only curve 
+'atmel-ecc' uses, and it will never be changed, we can delete it.
 
-Thank you!
+> I don't have an atecc508 at hand to test the changes, but I expect
+> your changes won't affect the functionality.
+> 
+OK, when you or your team members have an atecc508, please help test.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
