@@ -2,129 +2,132 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C04DC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 11:02:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C26CC433E6
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 12:55:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BDB8C60C41
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 11:02:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 27AEF64E05
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 12:55:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234927AbhBXLCQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Feb 2021 06:02:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39080 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234385AbhBXLB6 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Feb 2021 06:01:58 -0500
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F23DBC061574;
-        Wed, 24 Feb 2021 03:01:17 -0800 (PST)
-Received: by mail-yb1-xb2b.google.com with SMTP id u3so1443540ybk.6;
-        Wed, 24 Feb 2021 03:01:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=q5EBUPu7DHD+FuA5SGZ+0iNoNfQivrRarTOBbjTJdyk=;
-        b=PpKt4nXgl8dkkxBzxuaLrjlXX0hqqCr8wUyXp2yPXNJFwryHemyu90dCsMWVBumO+n
-         1RL9h3nYbcv61lEowunFuKgz64z7Yzeh8Lgpc+qhcQk3o47Q8vXTa/1JqCs0I07wh3ha
-         Uz5wfupBLDaMNbhfqzaE3k0qhkd7I5DtWuNC4bkQLJKrI5aDDHXPPyyYB1y2GQNdUs5T
-         5kHhKZrfhGu76w2/xSocoV9KQw24jWXlmIw0Kwd03g0L4j4RAnepznV2u3xE8Gs6fLMU
-         EAMzIh826mV8TtupQHPvIlfwN+/s/AhkuamaO0KCG5dcOHlst96H3i75lGMtPG9LM+IU
-         /Deg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=q5EBUPu7DHD+FuA5SGZ+0iNoNfQivrRarTOBbjTJdyk=;
-        b=IzZAkbHDJe/QJxIrdWGAU7lMkIiSCp/M20ACbkl7H7Z5BowIQYipLWV7JJ9QJkuuW2
-         kN2KRYe5dcOGCPBVIqqtcpQ61KZsSSD49GQu1czAov4HVUKBslbkpxTCRC1XGaG8D9dQ
-         ZYREryi2RCLrupnbYaye33/JzV03zilCFZANV0ekc+HR+M2kCOielz1OJJbYbmjFROlV
-         60DsShvsNHn70F56NyAX11S9HJTj3eZYrSGBsScWRdo1g6LeIwZGjKLQm6pulRX5oyT6
-         RAeGJM735uA3Q0JYf6Gf6WJFtZe1M6Mw4q6QIop2j9K6Rt1xV21x8c9mIz6PtGJdr9aS
-         K5Fg==
-X-Gm-Message-State: AOAM53144j2dPkZAsYro/5kmeOUcS4zkYpsR/piAqpI8etuM+Yil6d4v
-        lJLETuMZhNYS//i8LnwTuWMrGnELvGVAkZyE49I=
-X-Google-Smtp-Source: ABdhPJxhiCfGjIzPOx2Fqgi7qb3IEYMwNvLkNSu5A5vWCLP2a0ja0byv/ganfMSniEGrB2L8iDsLWc4l18D5rmld2Ec=
-X-Received: by 2002:a25:324b:: with SMTP id y72mr46115248yby.233.1614164477289;
- Wed, 24 Feb 2021 03:01:17 -0800 (PST)
-MIME-Version: 1.0
-References: <20210224072516.74696-1-uwe@kleine-koenig.org>
-In-Reply-To: <20210224072516.74696-1-uwe@kleine-koenig.org>
-From:   Anatoly Pugachev <matorola@gmail.com>
-Date:   Wed, 24 Feb 2021 14:01:06 +0300
-Message-ID: <CADxRZqzG7jtNwYsdnO1xm8FLes_+GqTB=2naxaUTP2MNkzGG3g@mail.gmail.com>
-Subject: Re: [PATCH v2] vio: make remove callback return void
-To:     =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <uwe@kleine-koenig.org>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jens Axboe <axboe@kernel.dk>, Matt Mackall <mpm@selenic.com>,
+        id S234059AbhBXMyd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Feb 2021 07:54:33 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50301 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232746AbhBXMwd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Feb 2021 07:52:33 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C1D4864F15;
+        Wed, 24 Feb 2021 12:51:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1614171065;
+        bh=HF84UwZ0abikhsS6ww7lKnzi8JNPGkQuP+2U4pdT06U=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=MS8kone9uqLL1JwG5CD2NdQbj36X4l5ObuK8acDySG+znts916GZOUJxhOm3qO6oW
+         DtFRJZ9DkNSRr+/qLy3OD8zD7TIwuazUlDPyfWB0SD7fInJpk7BVyyC6uWZEIl1eh+
+         p0DpD6LIy1ak00kAGrEKAQuKPr6i1vCRxqGZ0/rAtlb3XD63CfBX8tIIiXfrR1ochf
+         cjJwlhRmNTHkJ0J4txDGoKYoU9YsPdLD+czvDACB0GnTaIYhuyo/JCe+UbD2V+czTE
+         NpiKl3Jo6KqKag507GZcc2Ucu3hVp3+JXlSGu+l3hOQr9u1wOq8W1ZMTyipeAe65n3
+         q3p7zQgm/+wrw==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Peter Huewe <peterhuewe@gmx.de>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Haren Myneni <haren@us.ibm.com>,
-        =?UTF-8?Q?Breno_Leit=C3=A3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        Steven Royer <seroyer@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Cristobal Forno <cforno12@linux.ibm.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Dany Madden <drt@linux.ibm.com>, Lijun Pan <ljp@linux.ibm.com>,
-        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
-        Tyrel Datwyler <tyreld@linux.ibm.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Michael Cyr <mikecyr@linux.ibm.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        linuxppc-dev@lists.ozlabs.org,
-        Linux Kernel list <linux-kernel@vger.kernel.org>,
-        Sparc kernel list <sparclinux@vger.kernel.org>,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, netdev@vger.kernel.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.11 28/67] crypto: tcrypt - avoid signed overflow in byte count
+Date:   Wed, 24 Feb 2021 07:49:46 -0500
+Message-Id: <20210224125026.481804-28-sashal@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20210224125026.481804-1-sashal@kernel.org>
+References: <20210224125026.481804-1-sashal@kernel.org>
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 24, 2021 at 11:17 AM Uwe Kleine-K=C3=B6nig <uwe@kleine-koenig.o=
-rg> wrote:
->
-> The driver core ignores the return value of struct bus_type::remove()
-> because there is only little that can be done. To simplify the quest to
-> make this function return void, let struct vio_driver::remove() return
-> void, too. All users already unconditionally return 0, this commit makes
-> it obvious that returning an error code is a bad idea and makes it
-> obvious for future driver authors that returning an error code isn't
-> intended.
->
-> Note there are two nominally different implementations for a vio bus:
-> one in arch/sparc/kernel/vio.c and the other in
-> arch/powerpc/platforms/pseries/vio.c. I didn't care to check which
-> driver is using which of these busses (or if even some of them can be
-> used with both) and simply adapt all drivers and the two bus codes in
-> one go.
+From: Ard Biesheuvel <ardb@kernel.org>
 
-Applied over current git kernel, boots on my sparc64 LDOM (sunvdc
-block driver which uses vio).
-Linux ttip 5.11.0-10201-gc03c21ba6f4e-dirty #189 SMP Wed Feb 24
-13:48:37 MSK 2021 sparc64 GNU/Linux
-boot logs (and kernel config) on [1] for "5.11.0-10201-gc03c21ba6f4e-dirty"=
-.
-Up to you to add "tested-by".
-Thanks.
+[ Upstream commit 303fd3e1c771077e32e96e5788817f025f0067e2 ]
 
-1. https://github.com/mator/sparc64-dmesg
+The signed long type used for printing the number of bytes processed in
+tcrypt benchmarks limits the range to -/+ 2 GiB, which is not sufficient
+to cover the performance of common accelerated ciphers such as AES-NI
+when benchmarked with sec=1. So switch to u64 instead.
 
-PS: going to check with ppc64 later as well on LPAR (uses vio).
+While at it, fix up a missing printk->pr_cont conversion in the AEAD
+benchmark.
+
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ crypto/tcrypt.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index a647bb298fbce..a4a11d2b57bd8 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -199,8 +199,8 @@ static int test_mb_aead_jiffies(struct test_mb_aead_data *data, int enc,
+ 			goto out;
+ 	}
+ 
+-	pr_cont("%d operations in %d seconds (%ld bytes)\n",
+-		bcount * num_mb, secs, (long)bcount * blen * num_mb);
++	pr_cont("%d operations in %d seconds (%llu bytes)\n",
++		bcount * num_mb, secs, (u64)bcount * blen * num_mb);
+ 
+ out:
+ 	kfree(rc);
+@@ -471,8 +471,8 @@ static int test_aead_jiffies(struct aead_request *req, int enc,
+ 			return ret;
+ 	}
+ 
+-	printk("%d operations in %d seconds (%ld bytes)\n",
+-	       bcount, secs, (long)bcount * blen);
++	pr_cont("%d operations in %d seconds (%llu bytes)\n",
++	        bcount, secs, (u64)bcount * blen);
+ 	return 0;
+ }
+ 
+@@ -764,8 +764,8 @@ static int test_mb_ahash_jiffies(struct test_mb_ahash_data *data, int blen,
+ 			goto out;
+ 	}
+ 
+-	pr_cont("%d operations in %d seconds (%ld bytes)\n",
+-		bcount * num_mb, secs, (long)bcount * blen * num_mb);
++	pr_cont("%d operations in %d seconds (%llu bytes)\n",
++		bcount * num_mb, secs, (u64)bcount * blen * num_mb);
+ 
+ out:
+ 	kfree(rc);
+@@ -1201,8 +1201,8 @@ static int test_mb_acipher_jiffies(struct test_mb_skcipher_data *data, int enc,
+ 			goto out;
+ 	}
+ 
+-	pr_cont("%d operations in %d seconds (%ld bytes)\n",
+-		bcount * num_mb, secs, (long)bcount * blen * num_mb);
++	pr_cont("%d operations in %d seconds (%llu bytes)\n",
++		bcount * num_mb, secs, (u64)bcount * blen * num_mb);
+ 
+ out:
+ 	kfree(rc);
+@@ -1441,8 +1441,8 @@ static int test_acipher_jiffies(struct skcipher_request *req, int enc,
+ 			return ret;
+ 	}
+ 
+-	pr_cont("%d operations in %d seconds (%ld bytes)\n",
+-		bcount, secs, (long)bcount * blen);
++	pr_cont("%d operations in %d seconds (%llu bytes)\n",
++		bcount, secs, (u64)bcount * blen);
+ 	return 0;
+ }
+ 
+-- 
+2.27.0
+
