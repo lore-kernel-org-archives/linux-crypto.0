@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A08DFC433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 14:06:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5581AC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 14:07:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5AC0464E90
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 14:06:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 17F8464EC3
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 14:07:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231638AbhBXOA5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Feb 2021 09:00:57 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56136 "EHLO mail.kernel.org"
+        id S232349AbhBXOCi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Feb 2021 09:02:38 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58438 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232706AbhBXM7c (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Feb 2021 07:59:32 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8F6CF64F47;
-        Wed, 24 Feb 2021 12:52:41 +0000 (UTC)
+        id S235712AbhBXNFC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Feb 2021 08:05:02 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B088B64F7B;
+        Wed, 24 Feb 2021 12:54:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614171162;
-        bh=9iybXoSVat2uiKFUggf7OPTt8L9mgjEpaZ1Dm8yjXiQ=;
+        s=k20201202; t=1614171242;
+        bh=CbtLJBjPW04CHToB/xRnlOVVoQA1aptjneT2df6DPJo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XFdK9ItUjtwb1TMkDYg66UfMT+PbfE0oRGlY33q1GMiPRCapgkSy+LPYMXokCq++p
-         1JBShA0J8gBngGEvV9RfHXfMrtH64kZsRa8DghkgjxSik0QEjvII/qOSgokaNuth9M
-         AddAPLkwRKZQlglaXxS7keJ2sytudfN24TrbxZa4iX5U0O0RoQDvNwrFfzg0/WlmKI
-         tEgEPOJzzOn7SiGiC9j4ygE7pyzQDToYKVHUQa8N/dA6Lrk6Zf0yYDOc0u9oE7M3Vo
-         uwqawDotGpoOzJlC04rNuabetZst5tUo/Lc50bvPhXYTThZ0Z05i91fqjd0OaylWb6
-         VPaRO5GsD6FHg==
+        b=KOZIBCsQsHtsPSTOPvKnCYVGLrEkPkXv3aBRysRKmJ0Alh8gbqPSMAOfk2/VnYZOS
+         h2VN38ngfaBK5W2okWN8gfConNsKv3AusKgBtnneTz18Lra3emxeONrssYJNbuk0mI
+         FkAkQcpGhQI0tKs4gV8k53ov7Uw0M64nv834UCwXb4ZZPf4se4sA1q7rLueeCKUokH
+         WyAUD7FBBbdoUdiZ8BZfb8z4+RubSY8TsM8wIGek4TYURiO9QT6gS+CIoPdXpIydRI
+         QEfDLjAd2dXnmbwdtMXC9fiUEGL4Gy29f3NVsNWeAI177SX3fpsYMVFN6XkfGypGoE
+         w94s98LsZ0VGw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ard Biesheuvel <ardb@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 22/56] crypto: tcrypt - avoid signed overflow in byte count
-Date:   Wed, 24 Feb 2021 07:51:38 -0500
-Message-Id: <20210224125212.482485-22-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 16/40] crypto: tcrypt - avoid signed overflow in byte count
+Date:   Wed, 24 Feb 2021 07:53:16 -0500
+Message-Id: <20210224125340.483162-16-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210224125212.482485-1-sashal@kernel.org>
-References: <20210224125212.482485-1-sashal@kernel.org>
+In-Reply-To: <20210224125340.483162-1-sashal@kernel.org>
+References: <20210224125340.483162-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -70,10 +70,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index eea0f453cfb6e..8609174e036e8 100644
+index 83ad0b1fab30a..0cece1f883ebe 100644
 --- a/crypto/tcrypt.c
 +++ b/crypto/tcrypt.c
-@@ -199,8 +199,8 @@ static int test_mb_aead_jiffies(struct test_mb_aead_data *data, int enc,
+@@ -198,8 +198,8 @@ static int test_mb_aead_jiffies(struct test_mb_aead_data *data, int enc,
  			goto out;
  	}
  
@@ -84,7 +84,7 @@ index eea0f453cfb6e..8609174e036e8 100644
  
  out:
  	kfree(rc);
-@@ -469,8 +469,8 @@ static int test_aead_jiffies(struct aead_request *req, int enc,
+@@ -468,8 +468,8 @@ static int test_aead_jiffies(struct aead_request *req, int enc,
  			return ret;
  	}
  
@@ -95,7 +95,7 @@ index eea0f453cfb6e..8609174e036e8 100644
  	return 0;
  }
  
-@@ -760,8 +760,8 @@ static int test_mb_ahash_jiffies(struct test_mb_ahash_data *data, int blen,
+@@ -759,8 +759,8 @@ static int test_mb_ahash_jiffies(struct test_mb_ahash_data *data, int blen,
  			goto out;
  	}
  
@@ -106,7 +106,7 @@ index eea0f453cfb6e..8609174e036e8 100644
  
  out:
  	kfree(rc);
-@@ -1197,8 +1197,8 @@ static int test_mb_acipher_jiffies(struct test_mb_skcipher_data *data, int enc,
+@@ -1196,8 +1196,8 @@ static int test_mb_acipher_jiffies(struct test_mb_skcipher_data *data, int enc,
  			goto out;
  	}
  
@@ -117,7 +117,7 @@ index eea0f453cfb6e..8609174e036e8 100644
  
  out:
  	kfree(rc);
-@@ -1435,8 +1435,8 @@ static int test_acipher_jiffies(struct skcipher_request *req, int enc,
+@@ -1434,8 +1434,8 @@ static int test_acipher_jiffies(struct skcipher_request *req, int enc,
  			return ret;
  	}
  
