@@ -2,245 +2,391 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CB5CC433E6
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 18:29:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE2A6C433DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 22:20:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D0F864F21
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 18:29:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7593564F47
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 22:20:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233502AbhBYS3n (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Feb 2021 13:29:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48492 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232394AbhBYS3B (ORCPT
+        id S231591AbhBYWUq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Feb 2021 17:20:46 -0500
+Received: from antares.kleine-koenig.org ([94.130.110.236]:40596 "EHLO
+        antares.kleine-koenig.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231843AbhBYWT1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Feb 2021 13:29:01 -0500
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53173C06121D
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Feb 2021 10:27:24 -0800 (PST)
-Received: by mail-qv1-xf34.google.com with SMTP id 2so3270172qvd.0
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Feb 2021 10:27:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=K8qzTDRvDqE8beEmzlw5Ro8ITdxfmMURdYMnM5S+IyE=;
-        b=h+Q1XSl04Nzrd+2U2F0w6/LaJqEAvLRf+WZmIxdkjyk1DLN1dygniaGYvNl0sVQ0FM
-         AOj99fJI8uTPVhfy38PSj6uBbnmvPnsOYC0aMhet8dDzhUADC4fV3H+bvfazVieOFafw
-         dgAb8WwcbiWPMhzTAFyKeAkRbvHe/Z+evdApivRPuCqsPP3leyM879JxXJmV117UD0xW
-         //VUqP1GG1uGO8MR3jInaDy+tA40KBfWDxZ267/vtWQzkfglFXrBuu+pppvrErIDjO74
-         fhnb+Myys7oELCLBvJ0bh/aF3mdsyE7C4QnKdq11TWwFEtwhcNf8S/nFG1OlDaF4NenE
-         GG7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=K8qzTDRvDqE8beEmzlw5Ro8ITdxfmMURdYMnM5S+IyE=;
-        b=jeGmqskhdtPQ5KaXAPqdBc2z/vlArmR+2UVd9JK5B/agk55HNy31Y3ZF3fsAqUztZL
-         uZon6ymxA/Tb7H54SK+QBHaHUBwO9JcoEhkhksajQKnrGKPDRkIuRo/kFsEM7Q6+B+KP
-         ljyI/0G0S8b1Ba5MXIwBmglh9awubTRBeWx46sXWsDs1KondJ+jje+A1rvsnSfTiid3a
-         iwZzOKaOLncLOdCe3iV60HhAAG2uyvT0zPTQZ5o/7kll8NTagITvzgprOHFnbEaPudRD
-         x5zEYJoyCvyonXzxerN9OXqjLsCv/QjII8ZojolJb3pBuv1D77Fls5AhfGIsQxtoBGKl
-         o+BQ==
-X-Gm-Message-State: AOAM530W57iYIXqRgbc+5KF2inSNEQmWPuqXcf7jTAJysDieI1loLdIy
-        oZX1hIkO+/IijIvavhkMtY67jA==
-X-Google-Smtp-Source: ABdhPJxAfE2GJd/EajpQ676kFpKi8geeoB+J3n/FsuReVJ4Ig9YwxjEG7KFNFP/MaWQXfKDWCkdjSQ==
-X-Received: by 2002:a0c:eac9:: with SMTP id y9mr2955448qvp.58.1614277643557;
-        Thu, 25 Feb 2021 10:27:23 -0800 (PST)
-Received: from pop-os.fios-router.home (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.googlemail.com with ESMTPSA id l65sm4519678qkf.113.2021.02.25.10.27.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Feb 2021 10:27:23 -0800 (PST)
-From:   Thara Gopinath <thara.gopinath@linaro.org>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        bjorn.andersson@linaro.org
-Cc:     ebiggers@google.com, ardb@kernel.org, sivaprak@codeaurora.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 7/7] crypto: qce: aead: Schedule fallback algorithm
-Date:   Thu, 25 Feb 2021 13:27:16 -0500
-Message-Id: <20210225182716.1402449-8-thara.gopinath@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210225182716.1402449-1-thara.gopinath@linaro.org>
-References: <20210225182716.1402449-1-thara.gopinath@linaro.org>
+        Thu, 25 Feb 2021 17:19:27 -0500
+Received: by antares.kleine-koenig.org (Postfix, from userid 1000)
+        id 7EA30B147A1; Thu, 25 Feb 2021 23:18:36 +0100 (CET)
+From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Haren Myneni <haren@us.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        =?UTF-8?q?Breno=20Leit=C3=A3o?= <leitao@debian.org>,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        Steven Royer <seroyer@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Cristobal Forno <cforno12@linux.ibm.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Dany Madden <drt@linux.ibm.com>, Lijun Pan <ljp@linux.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Michael Cyr <mikecyr@linux.ibm.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        netdev@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: [PATCH v2] vio: make remove callback return void
+Date:   Thu, 25 Feb 2021 23:18:34 +0100
+Message-Id: <20210225221834.160083-1-uwe@kleine-koenig.org>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Qualcomm crypto engine does not handle the following scenarios and
-will issue an abort. In such cases, pass on the transformation to
-a fallback algorithm.
+The driver core ignores the return value of struct bus_type::remove()
+because there is only little that can be done. To simplify the quest to
+make this function return void, let struct vio_driver::remove() return
+void, too. All users already unconditionally return 0, this commit makes
+it obvious that returning an error code is a bad idea.
 
-- DES3 algorithms with all three keys same.
-- AES192 algorithms.
-- 0 length messages.
+Note there are two nominally different implementations for a vio bus:
+one in arch/sparc/kernel/vio.c and the other in
+arch/powerpc/platforms/pseries/vio.c. This patch only adapts the powerpc
+one.
 
-Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
+Before this patch for a device that was bound to a driver without a
+remove callback vio_cmo_bus_remove(viodev) wasn't called. As the device
+core still considers the device unbound after vio_bus_remove() returns
+calling this unconditionally is the consistent behaviour which is
+implemented here.
+
+Reviewed-by: Tyrel Datwyler <tyreld@linux.ibm.com>
+Acked-by: Lijun Pan <ljp@linux.ibm.com>
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Uwe Kleine-König <uwe@kleine-koenig.org>
 ---
- drivers/crypto/qce/aead.c | 58 ++++++++++++++++++++++++++++++++-------
- drivers/crypto/qce/aead.h |  3 ++
- 2 files changed, 51 insertions(+), 10 deletions(-)
+Hello,
 
-diff --git a/drivers/crypto/qce/aead.c b/drivers/crypto/qce/aead.c
-index b594c4bb2640..4c2d024e5296 100644
---- a/drivers/crypto/qce/aead.c
-+++ b/drivers/crypto/qce/aead.c
-@@ -492,7 +492,20 @@ static int qce_aead_crypt(struct aead_request *req, int encrypt)
- 	/* CE does not handle 0 length messages */
- 	if (!rctx->cryptlen) {
- 		if (!(IS_CCM(rctx->flags) && IS_DECRYPT(rctx->flags)))
--			return -EINVAL;
-+			ctx->need_fallback = true;
-+	}
-+
-+	/* If fallback is needed, schedule and exit */
-+	if (ctx->need_fallback) {
-+		aead_request_set_tfm(&rctx->fallback_req, ctx->fallback);
-+		aead_request_set_callback(&rctx->fallback_req, req->base.flags,
-+					  req->base.complete, req->base.data);
-+		aead_request_set_crypt(&rctx->fallback_req, req->src,
-+				       req->dst, req->cryptlen, req->iv);
-+		aead_request_set_ad(&rctx->fallback_req, req->assoclen);
-+
-+		return encrypt ? crypto_aead_encrypt(&rctx->fallback_req) :
-+				 crypto_aead_decrypt(&rctx->fallback_req);
- 	}
+I dropped the sparc specific files (i.e. all that Michael Ellerman
+didn't characterize as powerpc specific and verified that they are
+indeed sparc-only).
+
+The commit log is adapted accordingly.
+
+Best regards
+Uwe
+
+ arch/powerpc/include/asm/vio.h           | 2 +-
+ arch/powerpc/platforms/pseries/vio.c     | 7 +++----
+ drivers/char/hw_random/pseries-rng.c     | 3 +--
+ drivers/char/tpm/tpm_ibmvtpm.c           | 4 +---
+ drivers/crypto/nx/nx-842-pseries.c       | 4 +---
+ drivers/crypto/nx/nx.c                   | 4 +---
+ drivers/misc/ibmvmc.c                    | 4 +---
+ drivers/net/ethernet/ibm/ibmveth.c       | 4 +---
+ drivers/net/ethernet/ibm/ibmvnic.c       | 4 +---
+ drivers/scsi/ibmvscsi/ibmvfc.c           | 3 +--
+ drivers/scsi/ibmvscsi/ibmvscsi.c         | 4 +---
+ drivers/scsi/ibmvscsi_tgt/ibmvscsi_tgt.c | 4 +---
+ drivers/tty/hvc/hvcs.c                   | 3 +--
+ 13 files changed, 15 insertions(+), 35 deletions(-)
+
+diff --git a/arch/powerpc/include/asm/vio.h b/arch/powerpc/include/asm/vio.h
+index 0cf52746531b..721c0d6715ac 100644
+--- a/arch/powerpc/include/asm/vio.h
++++ b/arch/powerpc/include/asm/vio.h
+@@ -113,7 +113,7 @@ struct vio_driver {
+ 	const char *name;
+ 	const struct vio_device_id *id_table;
+ 	int (*probe)(struct vio_dev *dev, const struct vio_device_id *id);
+-	int (*remove)(struct vio_dev *dev);
++	void (*remove)(struct vio_dev *dev);
+ 	/* A driver must have a get_desired_dma() function to
+ 	 * be loaded in a CMO environment if it uses DMA.
+ 	 */
+diff --git a/arch/powerpc/platforms/pseries/vio.c b/arch/powerpc/platforms/pseries/vio.c
+index b2797cfe4e2b..9cb4fc839fd5 100644
+--- a/arch/powerpc/platforms/pseries/vio.c
++++ b/arch/powerpc/platforms/pseries/vio.c
+@@ -1261,7 +1261,6 @@ static int vio_bus_remove(struct device *dev)
+ 	struct vio_dev *viodev = to_vio_dev(dev);
+ 	struct vio_driver *viodrv = to_vio_driver(dev->driver);
+ 	struct device *devptr;
+-	int ret = 1;
  
  	/*
-@@ -533,7 +546,7 @@ static int qce_aead_ccm_setkey(struct crypto_aead *tfm, const u8 *key,
- 		memcpy(ctx->ccm4309_salt, key + keylen, QCE_CCM4309_SALT_SIZE);
- 	}
+ 	 * Hold a reference to the device after the remove function is called
+@@ -1270,13 +1269,13 @@ static int vio_bus_remove(struct device *dev)
+ 	devptr = get_device(dev);
  
--	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_256)
-+	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_256 && keylen != AES_KEYSIZE_192)
- 		return -EINVAL;
+ 	if (viodrv->remove)
+-		ret = viodrv->remove(viodev);
++		viodrv->remove(viodev);
  
- 	ctx->enc_keylen = keylen;
-@@ -542,7 +555,12 @@ static int qce_aead_ccm_setkey(struct crypto_aead *tfm, const u8 *key,
- 	memcpy(ctx->enc_key, key, keylen);
- 	memcpy(ctx->auth_key, key, keylen);
+-	if (!ret && firmware_has_feature(FW_FEATURE_CMO))
++	if (firmware_has_feature(FW_FEATURE_CMO))
+ 		vio_cmo_bus_remove(viodev);
  
--	return 0;
-+	if (keylen == AES_KEYSIZE_192)
-+		ctx->need_fallback = true;
-+
-+	return IS_CCM_RFC4309(flags) ?
-+		crypto_aead_setkey(ctx->fallback, key, keylen + QCE_CCM4309_SALT_SIZE) :
-+		crypto_aead_setkey(ctx->fallback, key, keylen);
+ 	put_device(devptr);
+-	return ret;
++	return 0;
  }
  
- static int qce_aead_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int keylen)
-@@ -573,20 +591,21 @@ static int qce_aead_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int
- 		 * The crypto engine does not support any two keys
- 		 * being the same for triple des algorithms. The
- 		 * verify_skcipher_des3_key does not check for all the
--		 * below conditions. Return -EINVAL in case any two keys
--		 * are the same. Revisit to see if a fallback cipher
--		 * is needed to handle this condition.
-+		 * below conditions. Schedule fallback in this case.
- 		 */
- 		memcpy(_key, authenc_keys.enckey, DES3_EDE_KEY_SIZE);
- 		if (!((_key[0] ^ _key[2]) | (_key[1] ^ _key[3])) ||
- 		    !((_key[2] ^ _key[4]) | (_key[3] ^ _key[5])) ||
- 		    !((_key[0] ^ _key[4]) | (_key[1] ^ _key[5])))
--			return -EINVAL;
-+			ctx->need_fallback = true;
- 	} else if (IS_AES(flags)) {
- 		/* No random key sizes */
- 		if (authenc_keys.enckeylen != AES_KEYSIZE_128 &&
-+		    authenc_keys.enckeylen != AES_KEYSIZE_192 &&
- 		    authenc_keys.enckeylen != AES_KEYSIZE_256)
- 			return -EINVAL;
-+		if (authenc_keys.enckeylen == AES_KEYSIZE_192)
-+			ctx->need_fallback = true;
- 	}
- 
- 	ctx->enc_keylen = authenc_keys.enckeylen;
-@@ -597,7 +616,7 @@ static int qce_aead_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int
- 	memset(ctx->auth_key, 0, sizeof(ctx->auth_key));
- 	memcpy(ctx->auth_key, authenc_keys.authkey, authenc_keys.authkeylen);
- 
--	return 0;
-+	return crypto_aead_setkey(ctx->fallback, key, keylen);
+ /**
+diff --git a/drivers/char/hw_random/pseries-rng.c b/drivers/char/hw_random/pseries-rng.c
+index 8038a8a9fb58..f4949b689bd5 100644
+--- a/drivers/char/hw_random/pseries-rng.c
++++ b/drivers/char/hw_random/pseries-rng.c
+@@ -54,10 +54,9 @@ static int pseries_rng_probe(struct vio_dev *dev,
+ 	return hwrng_register(&pseries_rng);
  }
  
- static int qce_aead_setauthsize(struct crypto_aead *tfm, unsigned int authsize)
-@@ -612,15 +631,32 @@ static int qce_aead_setauthsize(struct crypto_aead *tfm, unsigned int authsize)
- 			return -EINVAL;
- 	}
- 	ctx->authsize = authsize;
--	return 0;
-+
-+	return crypto_aead_setauthsize(ctx->fallback, authsize);
- }
- 
- static int qce_aead_init(struct crypto_aead *tfm)
+-static int pseries_rng_remove(struct vio_dev *dev)
++static void pseries_rng_remove(struct vio_dev *dev)
  {
-+	struct qce_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+
-+	ctx->need_fallback = false;
-+	ctx->fallback = crypto_alloc_aead(crypto_tfm_alg_name(&tfm->base),
-+					  0, CRYPTO_ALG_NEED_FALLBACK);
-+
-+	if (IS_ERR(ctx->fallback))
-+		return PTR_ERR(ctx->fallback);
-+
- 	crypto_aead_set_reqsize(tfm, sizeof(struct qce_aead_reqctx));
+ 	hwrng_unregister(&pseries_rng);
+-	return 0;
+ }
+ 
+ static const struct vio_device_id pseries_rng_driver_ids[] = {
+diff --git a/drivers/char/tpm/tpm_ibmvtpm.c b/drivers/char/tpm/tpm_ibmvtpm.c
+index 994385bf37c0..903604769de9 100644
+--- a/drivers/char/tpm/tpm_ibmvtpm.c
++++ b/drivers/char/tpm/tpm_ibmvtpm.c
+@@ -343,7 +343,7 @@ static int ibmvtpm_crq_send_init_complete(struct ibmvtpm_dev *ibmvtpm)
+  *
+  * Return: Always 0.
+  */
+-static int tpm_ibmvtpm_remove(struct vio_dev *vdev)
++static void tpm_ibmvtpm_remove(struct vio_dev *vdev)
+ {
+ 	struct tpm_chip *chip = dev_get_drvdata(&vdev->dev);
+ 	struct ibmvtpm_dev *ibmvtpm = dev_get_drvdata(&chip->dev);
+@@ -372,8 +372,6 @@ static int tpm_ibmvtpm_remove(struct vio_dev *vdev)
+ 	kfree(ibmvtpm);
+ 	/* For tpm_ibmvtpm_get_desired_dma */
+ 	dev_set_drvdata(&vdev->dev, NULL);
+-
+-	return 0;
+ }
+ 
+ /**
+diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
+index 2de5e3672e42..cc8dd3072b8b 100644
+--- a/drivers/crypto/nx/nx-842-pseries.c
++++ b/drivers/crypto/nx/nx-842-pseries.c
+@@ -1042,7 +1042,7 @@ static int nx842_probe(struct vio_dev *viodev,
+ 	return ret;
+ }
+ 
+-static int nx842_remove(struct vio_dev *viodev)
++static void nx842_remove(struct vio_dev *viodev)
+ {
+ 	struct nx842_devdata *old_devdata;
+ 	unsigned long flags;
+@@ -1063,8 +1063,6 @@ static int nx842_remove(struct vio_dev *viodev)
+ 	if (old_devdata)
+ 		kfree(old_devdata->counters);
+ 	kfree(old_devdata);
+-
+-	return 0;
+ }
+ 
+ static const struct vio_device_id nx842_vio_driver_ids[] = {
+diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
+index 0d2dc5be7f19..1d0e8a1ba160 100644
+--- a/drivers/crypto/nx/nx.c
++++ b/drivers/crypto/nx/nx.c
+@@ -783,7 +783,7 @@ static int nx_probe(struct vio_dev *viodev, const struct vio_device_id *id)
+ 	return nx_register_algs();
+ }
+ 
+-static int nx_remove(struct vio_dev *viodev)
++static void nx_remove(struct vio_dev *viodev)
+ {
+ 	dev_dbg(&viodev->dev, "entering nx_remove for UA 0x%x\n",
+ 		viodev->unit_address);
+@@ -811,8 +811,6 @@ static int nx_remove(struct vio_dev *viodev)
+ 		nx_unregister_skcipher(&nx_ecb_aes_alg, NX_FC_AES,
+ 				       NX_MODE_AES_ECB);
+ 	}
+-
+-	return 0;
+ }
+ 
+ 
+diff --git a/drivers/misc/ibmvmc.c b/drivers/misc/ibmvmc.c
+index 2d778d0f011e..c0fe3295c330 100644
+--- a/drivers/misc/ibmvmc.c
++++ b/drivers/misc/ibmvmc.c
+@@ -2288,15 +2288,13 @@ static int ibmvmc_probe(struct vio_dev *vdev, const struct vio_device_id *id)
+ 	return -EPERM;
+ }
+ 
+-static int ibmvmc_remove(struct vio_dev *vdev)
++static void ibmvmc_remove(struct vio_dev *vdev)
+ {
+ 	struct crq_server_adapter *adapter = dev_get_drvdata(&vdev->dev);
+ 
+ 	dev_info(adapter->dev, "Entering remove for UA 0x%x\n",
+ 		 vdev->unit_address);
+ 	ibmvmc_release_crq_queue(adapter);
+-
+-	return 0;
+ }
+ 
+ static struct vio_device_id ibmvmc_device_table[] = {
+diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
+index c3ec9ceed833..7fea9ae60f13 100644
+--- a/drivers/net/ethernet/ibm/ibmveth.c
++++ b/drivers/net/ethernet/ibm/ibmveth.c
+@@ -1758,7 +1758,7 @@ static int ibmveth_probe(struct vio_dev *dev, const struct vio_device_id *id)
  	return 0;
  }
  
-+static void qce_aead_exit(struct crypto_aead *tfm)
-+{
-+	struct qce_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+
-+	crypto_free_aead(ctx->fallback);
-+}
-+
- struct qce_aead_def {
+-static int ibmveth_remove(struct vio_dev *dev)
++static void ibmveth_remove(struct vio_dev *dev)
+ {
+ 	struct net_device *netdev = dev_get_drvdata(&dev->dev);
+ 	struct ibmveth_adapter *adapter = netdev_priv(netdev);
+@@ -1771,8 +1771,6 @@ static int ibmveth_remove(struct vio_dev *dev)
+ 
+ 	free_netdev(netdev);
+ 	dev_set_drvdata(&dev->dev, NULL);
+-
+-	return 0;
+ }
+ 
+ static struct attribute veth_active_attr;
+diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
+index 118a4bd3f877..eb39318766f6 100644
+--- a/drivers/net/ethernet/ibm/ibmvnic.c
++++ b/drivers/net/ethernet/ibm/ibmvnic.c
+@@ -5396,7 +5396,7 @@ static int ibmvnic_probe(struct vio_dev *dev, const struct vio_device_id *id)
+ 	return rc;
+ }
+ 
+-static int ibmvnic_remove(struct vio_dev *dev)
++static void ibmvnic_remove(struct vio_dev *dev)
+ {
+ 	struct net_device *netdev = dev_get_drvdata(&dev->dev);
+ 	struct ibmvnic_adapter *adapter = netdev_priv(netdev);
+@@ -5437,8 +5437,6 @@ static int ibmvnic_remove(struct vio_dev *dev)
+ 	device_remove_file(&dev->dev, &dev_attr_failover);
+ 	free_netdev(netdev);
+ 	dev_set_drvdata(&dev->dev, NULL);
+-
+-	return 0;
+ }
+ 
+ static ssize_t failover_store(struct device *dev, struct device_attribute *attr,
+diff --git a/drivers/scsi/ibmvscsi/ibmvfc.c b/drivers/scsi/ibmvscsi/ibmvfc.c
+index 755313b766b9..e663085a8944 100644
+--- a/drivers/scsi/ibmvscsi/ibmvfc.c
++++ b/drivers/scsi/ibmvscsi/ibmvfc.c
+@@ -6038,7 +6038,7 @@ static int ibmvfc_probe(struct vio_dev *vdev, const struct vio_device_id *id)
+  * Return value:
+  * 	0
+  **/
+-static int ibmvfc_remove(struct vio_dev *vdev)
++static void ibmvfc_remove(struct vio_dev *vdev)
+ {
+ 	struct ibmvfc_host *vhost = dev_get_drvdata(&vdev->dev);
+ 	LIST_HEAD(purge);
+@@ -6070,7 +6070,6 @@ static int ibmvfc_remove(struct vio_dev *vdev)
+ 	spin_unlock(&ibmvfc_driver_lock);
+ 	scsi_host_put(vhost->host);
+ 	LEAVE;
+-	return 0;
+ }
+ 
+ /**
+diff --git a/drivers/scsi/ibmvscsi/ibmvscsi.c b/drivers/scsi/ibmvscsi/ibmvscsi.c
+index 29fcc44be2d5..77fafb1bc173 100644
+--- a/drivers/scsi/ibmvscsi/ibmvscsi.c
++++ b/drivers/scsi/ibmvscsi/ibmvscsi.c
+@@ -2335,7 +2335,7 @@ static int ibmvscsi_probe(struct vio_dev *vdev, const struct vio_device_id *id)
+ 	return -1;
+ }
+ 
+-static int ibmvscsi_remove(struct vio_dev *vdev)
++static void ibmvscsi_remove(struct vio_dev *vdev)
+ {
+ 	struct ibmvscsi_host_data *hostdata = dev_get_drvdata(&vdev->dev);
+ 
+@@ -2356,8 +2356,6 @@ static int ibmvscsi_remove(struct vio_dev *vdev)
+ 	spin_unlock(&ibmvscsi_driver_lock);
+ 
+ 	scsi_host_put(hostdata->host);
+-
+-	return 0;
+ }
+ 
+ /**
+diff --git a/drivers/scsi/ibmvscsi_tgt/ibmvscsi_tgt.c b/drivers/scsi/ibmvscsi_tgt/ibmvscsi_tgt.c
+index cc3908c2d2f9..9abd9e253af6 100644
+--- a/drivers/scsi/ibmvscsi_tgt/ibmvscsi_tgt.c
++++ b/drivers/scsi/ibmvscsi_tgt/ibmvscsi_tgt.c
+@@ -3595,7 +3595,7 @@ static int ibmvscsis_probe(struct vio_dev *vdev,
+ 	return rc;
+ }
+ 
+-static int ibmvscsis_remove(struct vio_dev *vdev)
++static void ibmvscsis_remove(struct vio_dev *vdev)
+ {
+ 	struct scsi_info *vscsi = dev_get_drvdata(&vdev->dev);
+ 
+@@ -3622,8 +3622,6 @@ static int ibmvscsis_remove(struct vio_dev *vdev)
+ 	list_del(&vscsi->list);
+ 	spin_unlock_bh(&ibmvscsis_dev_lock);
+ 	kfree(vscsi);
+-
+-	return 0;
+ }
+ 
+ static ssize_t system_id_show(struct device *dev,
+diff --git a/drivers/tty/hvc/hvcs.c b/drivers/tty/hvc/hvcs.c
+index c90848919644..01fc97e3c5c8 100644
+--- a/drivers/tty/hvc/hvcs.c
++++ b/drivers/tty/hvc/hvcs.c
+@@ -819,7 +819,7 @@ static int hvcs_probe(
+ 	return 0;
+ }
+ 
+-static int hvcs_remove(struct vio_dev *dev)
++static void hvcs_remove(struct vio_dev *dev)
+ {
+ 	struct hvcs_struct *hvcsd = dev_get_drvdata(&dev->dev);
  	unsigned long flags;
- 	const char *name;
-@@ -718,11 +754,13 @@ static int qce_aead_register_one(const struct qce_aead_def *def, struct qce_devi
- 	alg->encrypt			= qce_aead_encrypt;
- 	alg->decrypt			= qce_aead_decrypt;
- 	alg->init			= qce_aead_init;
-+	alg->exit			= qce_aead_exit;
+@@ -849,7 +849,6 @@ static int hvcs_remove(struct vio_dev *dev)
  
- 	alg->base.cra_priority		= 300;
- 	alg->base.cra_flags		= CRYPTO_ALG_ASYNC |
- 					  CRYPTO_ALG_ALLOCATES_MEMORY |
--					  CRYPTO_ALG_KERN_DRIVER_ONLY;
-+					  CRYPTO_ALG_KERN_DRIVER_ONLY |
-+					  CRYPTO_ALG_NEED_FALLBACK;
- 	alg->base.cra_ctxsize		= sizeof(struct qce_aead_ctx);
- 	alg->base.cra_alignmask		= 0;
- 	alg->base.cra_module		= THIS_MODULE;
-diff --git a/drivers/crypto/qce/aead.h b/drivers/crypto/qce/aead.h
-index 3d1f2039930b..efb8477cc088 100644
---- a/drivers/crypto/qce/aead.h
-+++ b/drivers/crypto/qce/aead.h
-@@ -19,6 +19,8 @@ struct qce_aead_ctx {
- 	unsigned int enc_keylen;
- 	unsigned int auth_keylen;
- 	unsigned int authsize;
-+	bool need_fallback;
-+	struct crypto_aead *fallback;
+ 	printk(KERN_INFO "HVCS: vty-server@%X removed from the"
+ 			" vio bus.\n", dev->unit_address);
+-	return 0;
  };
  
- struct qce_aead_reqctx {
-@@ -39,6 +41,7 @@ struct qce_aead_reqctx {
- 	u8 ccm_nonce[QCE_MAX_NONCE];
- 	u8 ccmresult_buf[QCE_BAM_BURST_SIZE];
- 	u8 ccm_rfc4309_iv[QCE_MAX_IV_SIZE];
-+	struct aead_request fallback_req;
- };
- 
- static inline struct qce_alg_template *to_aead_tmpl(struct crypto_aead *tfm)
+ static struct vio_driver hvcs_vio_driver = {
+
+base-commit: 2c87f7a38f930ef6f6a7bdd04aeb82ce3971b54b
 -- 
-2.25.1
+2.30.0
 
