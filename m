@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B215C433DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2CACC433E6
 	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 18:28:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 35F3F64E6C
+	by mail.kernel.org (Postfix) with ESMTP id 561B564F26
 	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 18:28:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233007AbhBYS2W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Feb 2021 13:28:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48254 "EHLO
+        id S233043AbhBYS2Z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Feb 2021 13:28:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233043AbhBYS2B (ORCPT
+        with ESMTP id S232929AbhBYS2V (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Feb 2021 13:28:01 -0500
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8129AC061788
+        Thu, 25 Feb 2021 13:28:21 -0500
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 934AEC06178B
         for <linux-crypto@vger.kernel.org>; Thu, 25 Feb 2021 10:27:20 -0800 (PST)
-Received: by mail-qt1-x82b.google.com with SMTP id s15so4837137qtq.0
+Received: by mail-qk1-x736.google.com with SMTP id z128so6543418qkc.12
         for <linux-crypto@vger.kernel.org>; Thu, 25 Feb 2021 10:27:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=iTjTmQs8FYf7whYqEO4Ey2Ll+wNPA9ydSS+PI2wxbPs=;
-        b=LQs/7wSi5ayT1xC3drFlgo5hTOQxq4lCUpUfFb+Gtgzmy5L0AibS0IH4ahRWb/YAEc
-         /SJoertEMDV5n6fNkek2XzsV2cwY2UM2Lbl1soJrlYOF9oHZn64foAUH3qKRkjz5dhQt
-         0jv1zMLV7an/HY4sBvW/G8cuvZ583Fsz/4Qbvqf5D8rquvabFaULkSwYS/d+0+1W/mH7
-         sXmJrYsUWc33rqK0d15VdAmHu9MD9Ivcc4w8rGZgOpY7a/8Mx5xC4jE06CP7vnlzS+Ze
-         yYdtTsWmuMpWk3ntdoXOgAV1urtkPLd6vAgWA9rjsFd7tbNdHm1jt9xRxY+gy1R5mG+f
-         m3qw==
+        bh=JQJdSOWgWhcKarBNWRMV6VTAdv1Rbh5d+ABZaoC/+W4=;
+        b=ieGfgpWtW+joVg+4cYRKzAzmyjHDhD/RbPnvpA0pTSDhSgZMN5sutEVKWuQE8IPrRk
+         /tVi09ePFnUFgc8JbDUDR23avTi0pES3XhofNKSQXpVDgzPMDhPxjpBwSWThO1MWfXvu
+         MHXzMAJgKpTRGcNDLcabQUlnI4bnKaOnzvtoBnNCuVKaJmqQ7Ibwx1t2bFiYBMEOXq+L
+         YEMeQRbo8AyVSLQ4xnVbyQUoPMAu46W38ApntOdqDJbloy1nsDd8uex7XQfrWT7RpC+I
+         h7OqLpbB2/a65pMsf/+6c9REufx4/KTmFLBJcO8lIPe4oup3uTWcl08MTNkfczv+Plog
+         HdKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=iTjTmQs8FYf7whYqEO4Ey2Ll+wNPA9ydSS+PI2wxbPs=;
-        b=pR+JABaPuTSmpkFJ/074AP11md5HE9cUUWIaiM3RMBzsU4IEmAjpYP4DW9cbt5R9w1
-         HpjKqQgljQZ2b30Vcfh8Du3s5m73Cex78weC2gTU2VlU3/q0gbxTstKSn2Z9+ZVEyQ6E
-         QNwuTHgUp9xHKOEzQJqFVOpBQjfVtl9RjXxQ/JmmKQ/n4NiO2VOszQEGJWs4s9rdsnJv
-         pwyG+pfZXoDY3BQATOKsH7Bg7ptGhiO/99Ik3FZk53SZYuLIxQNposHk6mmX/4VYdl/L
-         ouhH4HX0dGOBU2dJMiUo8q17SSg1rXv+x3LhsajXo34wORVcuDizgA/9LvvA1Iaga1MY
-         iLNQ==
-X-Gm-Message-State: AOAM530l41HIaOVaT/hGNj/2FfnZZM854xHqg3u8CLXr2ck114LByb9S
-        Dmp+WZUI67mknHk7FcWJFqylDw==
-X-Google-Smtp-Source: ABdhPJyQJjXZZ5cwzDHIlznxiqFJzrPtgWFiI3nerx5wly5TlY6YgvpDC4565MqcifGjpcpas9IauA==
-X-Received: by 2002:ac8:3902:: with SMTP id s2mr3780784qtb.26.1614277638261;
-        Thu, 25 Feb 2021 10:27:18 -0800 (PST)
+        bh=JQJdSOWgWhcKarBNWRMV6VTAdv1Rbh5d+ABZaoC/+W4=;
+        b=aEN6t9CIYRXwJorh6orzk2iBGNMI+OS4TpOa+KOi2oo0zNZRsV/FLUrqTNkGczmdol
+         s5IW2utrhOf9+8HfHeqOY1FasuaHJo5IsHESwGz+W6EkeEXkxeaeBFMip4xNYtYdGXDF
+         UN6vDYvEKebOSFRYLvGvVmCawW/sV8Y1NHerzmxWKuim+BsPeo+gg815tTxJ3xWmgUPI
+         EOpOFEUpQ8AuSfVQV0vwk62q+wxgZ6xnnBIwzTATXgu9NMZe/ZPOdQnXD6mA6LJKuRCx
+         nRg8Kh5gJ5UgJV4jc4WqVRsECSkxQ5wGP5sfDbBt9D0GsaAr1Y4/fgVLwVmtPB81pGP4
+         BQ/w==
+X-Gm-Message-State: AOAM5317KAO9uwEzfBjnviS+Y0qT1xkCaCuUXXFo/UIDguSwNTm5Si/s
+        bQ4mc1cfalOv5BHq1Ir36fgwrw==
+X-Google-Smtp-Source: ABdhPJygSa8Hfmj+rZKtTtUiwOmK6QJAzpsGh2jwbEfFREVNB4elNGMHIel+sWrk/VjzPLJ3wLvvAg==
+X-Received: by 2002:a05:620a:a19:: with SMTP id i25mr4037095qka.136.1614277639762;
+        Thu, 25 Feb 2021 10:27:19 -0800 (PST)
 Received: from pop-os.fios-router.home (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.googlemail.com with ESMTPSA id l65sm4519678qkf.113.2021.02.25.10.27.17
+        by smtp.googlemail.com with ESMTPSA id l65sm4519678qkf.113.2021.02.25.10.27.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Feb 2021 10:27:17 -0800 (PST)
+        Thu, 25 Feb 2021 10:27:19 -0800 (PST)
 From:   Thara Gopinath <thara.gopinath@linaro.org>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         bjorn.andersson@linaro.org
 Cc:     ebiggers@google.com, ardb@kernel.org, sivaprak@codeaurora.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/7] crypto: qce: common: Add MAC failed error checking
-Date:   Thu, 25 Feb 2021 13:27:10 -0500
-Message-Id: <20210225182716.1402449-2-thara.gopinath@linaro.org>
+Subject: [PATCH 3/7] crypto: qce: Add mode for rfc4309
+Date:   Thu, 25 Feb 2021 13:27:12 -0500
+Message-Id: <20210225182716.1402449-4-thara.gopinath@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210225182716.1402449-1-thara.gopinath@linaro.org>
 References: <20210225182716.1402449-1-thara.gopinath@linaro.org>
@@ -73,44 +73,41 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-MAC_FAILED gets set in the status register if authenthication fails
-for ccm algorithms(during decryption). Add support to catch and flag
-this error.
+rf4309 is the specification that uses aes ccm algorithms with IPsec
+security packets. Add a submode to identify rfc4309 ccm(aes) algorithm
+in the crypto driver.
 
 Signed-off-by: Thara Gopinath <thara.gopinath@linaro.org>
 ---
- drivers/crypto/qce/common.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ drivers/crypto/qce/common.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/qce/common.c b/drivers/crypto/qce/common.c
-index dceb9579d87a..7c3cb483749e 100644
---- a/drivers/crypto/qce/common.c
-+++ b/drivers/crypto/qce/common.c
-@@ -403,7 +403,8 @@ int qce_start(struct crypto_async_request *async_req, u32 type)
- }
+diff --git a/drivers/crypto/qce/common.h b/drivers/crypto/qce/common.h
+index 3bc244bcca2d..3ffe719b79e4 100644
+--- a/drivers/crypto/qce/common.h
++++ b/drivers/crypto/qce/common.h
+@@ -51,9 +51,11 @@
+ #define QCE_MODE_CCM			BIT(12)
+ #define QCE_MODE_MASK			GENMASK(12, 8)
  
- #define STATUS_ERRORS	\
--		(BIT(SW_ERR_SHIFT) | BIT(AXI_ERR_SHIFT) | BIT(HSD_ERR_SHIFT))
-+		(BIT(SW_ERR_SHIFT) | BIT(AXI_ERR_SHIFT) |	\
-+		 BIT(HSD_ERR_SHIFT) | BIT(MAC_FAILED_SHIFT))
++#define QCE_MODE_CCM_RFC4309		BIT(13)
++
+ /* cipher encryption/decryption operations */
+-#define QCE_ENCRYPT			BIT(13)
+-#define QCE_DECRYPT			BIT(14)
++#define QCE_ENCRYPT			BIT(14)
++#define QCE_DECRYPT			BIT(15)
  
- int qce_check_status(struct qce_device *qce, u32 *status)
- {
-@@ -417,8 +418,12 @@ int qce_check_status(struct qce_device *qce, u32 *status)
- 	 * use result_status from result dump the result_status needs to be byte
- 	 * swapped, since we set the device to little endian.
- 	 */
--	if (*status & STATUS_ERRORS || !(*status & BIT(OPERATION_DONE_SHIFT)))
--		ret = -ENXIO;
-+	if (*status & STATUS_ERRORS || !(*status & BIT(OPERATION_DONE_SHIFT))) {
-+		if (*status & BIT(MAC_FAILED_SHIFT))
-+			ret = -EBADMSG;
-+		else
-+			ret = -ENXIO;
-+	}
+ #define IS_DES(flags)			(flags & QCE_ALG_DES)
+ #define IS_3DES(flags)			(flags & QCE_ALG_3DES)
+@@ -73,6 +75,7 @@
+ #define IS_CTR(mode)			(mode & QCE_MODE_CTR)
+ #define IS_XTS(mode)			(mode & QCE_MODE_XTS)
+ #define IS_CCM(mode)			(mode & QCE_MODE_CCM)
++#define IS_CCM_RFC4309(mode)		((mode) & QCE_MODE_CCM_RFC4309)
  
- 	return ret;
- }
+ #define IS_ENCRYPT(dir)			(dir & QCE_ENCRYPT)
+ #define IS_DECRYPT(dir)			(dir & QCE_DECRYPT)
 -- 
 2.25.1
 
