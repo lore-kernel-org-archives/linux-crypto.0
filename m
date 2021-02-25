@@ -2,123 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C27C433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 13:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A8D1C433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 14:02:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A68DC64ED3
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 13:32:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 158BA64F13
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 14:02:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230459AbhBYNcQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Feb 2021 08:32:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59498 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232631AbhBYNbO (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Feb 2021 08:31:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614259787;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7jn5Amsy9xajDPP8CtJSHk8QDGEDNn4uy9XFsJJ8gS0=;
-        b=hNtck25KLwafc491iSQmXIlNq1vylWxJ2/XyhIX1io2t+ilKBBi9KXDoVaBGw4b+IABozN
-        oHWJ25PzeH4p2AtLD0lvIB2jyQaSiVcACB7UD1rFOGHNcak6jqG0gBbCPJEN23E0w/xNPk
-        OKn7/Lax2GkFNfjjXK8YKZ7FkcNdxVs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-449-z4rg568tNPGg-_hd800Gcg-1; Thu, 25 Feb 2021 08:29:45 -0500
-X-MC-Unique: z4rg568tNPGg-_hd800Gcg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7AC0F100CCC6;
-        Thu, 25 Feb 2021 13:29:43 +0000 (UTC)
-Received: from treble (ovpn-118-134.rdu2.redhat.com [10.10.118.134])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 164205D9DD;
-        Thu, 25 Feb 2021 13:29:41 +0000 (UTC)
-Date:   Thu, 25 Feb 2021 07:29:40 -0600
-From:   Josh Poimboeuf <jpoimboe@redhat.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     x86@kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-kernel@vger.kernel.org, Miroslav Benes <mbenes@suse.cz>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        linux-crypto@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>
-Subject: Re: [PATCH 00/13] x86/crypto/asm: objtool support
-Message-ID: <20210225132940.6pfztfephoptoh7y@treble>
-References: <cover.1614182415.git.jpoimboe@redhat.com>
- <YDdyEKqDEKmdg9yW@hirez.programming.kicks-ass.net>
+        id S231274AbhBYOCY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Feb 2021 09:02:24 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44314 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230467AbhBYOCY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Feb 2021 09:02:24 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 33D3764F1B;
+        Thu, 25 Feb 2021 14:01:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1614261702;
+        bh=gB6SQ75V2Rk37+UKLUfmsXNjtKCUUEXnmz4FEJPQVQY=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=iGKh9gRLvR8o04SWuKsCmipjtlzTrYuO47BWoJKHisDTteOpg/JDJDJJNnt+rGTTb
+         0rw4Z/+2u64PifagBhihDsPlyJ67Y3oQmsZn/oOul3KOK4yi2rGalMnkTSGw0hDAQu
+         5UCXh/aLF+AKNOXFFYPj9pbvUcZ+cJQXjOePkvmGZX37GfJUD/b8DZYdke/mmAKvZT
+         fAGvXP4lcs8maCpu0ckyrKPIoHkrpGb6cRtLNo09qQE/bWR08AfpprntjG9xmxGdei
+         eNSETbirr5t3ogcQ9xtRSswYiW1kh8gzy8rrgKIT9HRwylXF4qapcoQRRth0EghGpX
+         ctCpWU8hVtI2A==
+Received: by mail-oo1-f51.google.com with SMTP id x10so1389976oor.3;
+        Thu, 25 Feb 2021 06:01:42 -0800 (PST)
+X-Gm-Message-State: AOAM530YQNSUY6DI1p/w+oMByG+xrschcT2x6xk2C68fFUBMnyNwDQQJ
+        HRKQc6KM13zEsopqRnEASZN4oYZnOLKbfAR4rYM=
+X-Google-Smtp-Source: ABdhPJy0Z8oAC8F3qvd9r/HrjNWv0zSRZwzOF/sqWqHtbHpdIOPcLKBh4nK6FxEKGL+hdddWAENt07LK/yhwcmvgmrE=
+X-Received: by 2002:a4a:870c:: with SMTP id z12mr2391944ooh.15.1614261701193;
+ Thu, 25 Feb 2021 06:01:41 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <YDdyEKqDEKmdg9yW@hirez.programming.kicks-ass.net>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20210224072516.74696-1-uwe@kleine-koenig.org> <87sg5ks6xp.fsf@mpe.ellerman.id.au>
+In-Reply-To: <87sg5ks6xp.fsf@mpe.ellerman.id.au>
+From:   Arnd Bergmann <arnd@kernel.org>
+Date:   Thu, 25 Feb 2021 15:01:25 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a1q=zqyOxBgV-nprpN3jBczZWexupkA1Wy6g+AEW6rQqw@mail.gmail.com>
+Message-ID: <CAK8P3a1q=zqyOxBgV-nprpN3jBczZWexupkA1Wy6g+AEW6rQqw@mail.gmail.com>
+Subject: Re: [PATCH v2] vio: make remove callback return void
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <uwe@kleine-koenig.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jens Axboe <axboe@kernel.dk>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Haren Myneni <haren@us.ibm.com>,
+        =?UTF-8?Q?Breno_Leit=C3=A3o?= <leitao@debian.org>,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        Steven Royer <seroyer@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Cristobal Forno <cforno12@linux.ibm.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Dany Madden <drt@linux.ibm.com>, Lijun Pan <ljp@linux.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Michael Cyr <mikecyr@linux.ibm.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        sparclinux <sparclinux@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, linux-integrity@vger.kernel.org,
+        Networking <netdev@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        target-devel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 25, 2021 at 10:46:56AM +0100, Peter Zijlstra wrote:
-> On Wed, Feb 24, 2021 at 10:29:13AM -0600, Josh Poimboeuf wrote:
-> > Standardize the crypto asm to make it resemble compiler-generated code,
-> > so that objtool can understand it.
-> > 
-> > This magically enables ORC unwinding from crypto code.  It also fixes
-> > the last known remaining objtool warnings on vmlinux.o, for LTO and
-> > more.
-> > 
-> > Josh Poimboeuf (13):
-> >   objtool: Support asm jump tables
-> >   x86/crypto/aesni-intel_avx: Remove unused macros
-> >   x86/crypto/aesni-intel_avx: Fix register usage comments
-> >   x86/crypto/aesni-intel_avx: Standardize stack alignment prologue
-> >   x86/crypto/camellia-aesni-avx2: Unconditionally allocate stack buffer
-> >   x86/crypto/crc32c-pcl-intel: Standardize jump table
-> >   x86/crypto/sha_ni: Standardize stack alignment prologue
-> >   x86/crypto/sha1_avx2: Standardize stack alignment prologue
-> >   x86/crypto/sha256-avx2: Standardize stack alignment prologue
-> >   x86/crypto/sha512-avx: Standardize stack alignment prologue
-> >   x86/crypto/sha512-avx2: Standardize stack alignment prologue
-> >   x86/crypto/sha512-ssse3: Standardize stack alignment prologue
-> >   x86/crypto: Enable objtool in crypto code
-> > 
-> >  arch/x86/crypto/Makefile                     |  2 -
-> >  arch/x86/crypto/aesni-intel_avx-x86_64.S     | 28 +++++--------
-> >  arch/x86/crypto/camellia-aesni-avx2-asm_64.S |  5 +--
-> >  arch/x86/crypto/crc32c-pcl-intel-asm_64.S    |  7 +---
-> >  arch/x86/crypto/sha1_avx2_x86_64_asm.S       |  8 ++--
-> >  arch/x86/crypto/sha1_ni_asm.S                |  8 ++--
-> >  arch/x86/crypto/sha256-avx2-asm.S            | 13 +++---
-> >  arch/x86/crypto/sha512-avx-asm.S             | 41 +++++++++----------
-> >  arch/x86/crypto/sha512-avx2-asm.S            | 42 ++++++++++----------
-> >  arch/x86/crypto/sha512-ssse3-asm.S           | 41 +++++++++----------
-> >  tools/objtool/check.c                        | 14 ++++++-
-> >  11 files changed, 98 insertions(+), 111 deletions(-)
-> 
-> One nit, there's lots and lots of:
-> 
-> 	mov %rbp, %rsp
-> 	pop %rbp
-> 
-> and we have this 'leave' instruction that does exactly that, should we
-> be using it?
+On Thu, Feb 25, 2021 at 12:52 PM Michael Ellerman <mpe@ellerman.id.au> wrot=
+e:
+>
+> Uwe Kleine-K=C3=B6nig <uwe@kleine-koenig.org> writes:
+> > The driver core ignores the return value of struct bus_type::remove()
+> > because there is only little that can be done. To simplify the quest to
+> > make this function return void, let struct vio_driver::remove() return
+> > void, too. All users already unconditionally return 0, this commit make=
+s
+> > it obvious that returning an error code is a bad idea and makes it
+> > obvious for future driver authors that returning an error code isn't
+> > intended.
+> >
+> > Note there are two nominally different implementations for a vio bus:
+> > one in arch/sparc/kernel/vio.c and the other in
+> > arch/powerpc/platforms/pseries/vio.c. I didn't care to check which
+> > driver is using which of these busses (or if even some of them can be
+> > used with both) and simply adapt all drivers and the two bus codes in
+> > one go.
+>
+> I'm 99% sure there's no connection between the two implementations,
+> other than the name.
+>
+> So splitting the patch by arch would make it easier to merge. I'm
+> reluctant to merge changes to sparc code.
 
-I'd considered that, but LEAVE is more cryptic (no pun intended).  This
-code often has "surprises", so I prefer the readability of the more
-explicit instructions.
+The sparc subsystem clearly started out as a copy of the powerpc
+version, and serves roughly the same purpose, but the communication
+with the hypervisor is quite different.
 
-> Otherwise:
-> 
-> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+As there are only four drivers for the sparc vio subsystem:
+drivers/block/sunvdc.c
+drivers/net/ethernet/sun/ldmvsw.c
+drivers/net/ethernet/sun/sunvnet.c
+drivers/tty/vcc.c
+maybe it would make sense to rename those to use distinct
+identifiers now?
 
-Thanks.
-
--- 
-Josh
-
+       Arnd
