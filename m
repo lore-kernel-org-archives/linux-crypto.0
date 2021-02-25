@@ -2,176 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02AA4C433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 22:34:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 247D3C433DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 00:58:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A9A3164EDD
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Feb 2021 22:34:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5DE464EF1
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 00:58:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234453AbhBXWeB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Feb 2021 17:34:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46582 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229961AbhBXWeB (ORCPT
+        id S232161AbhBYA6K (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Feb 2021 19:58:10 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:12997 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236664AbhBYA5w (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Feb 2021 17:34:01 -0500
-Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 003D9C061574
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Feb 2021 14:33:20 -0800 (PST)
-Received: by mail-qk1-x72f.google.com with SMTP id z128so3859408qkc.12
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Feb 2021 14:33:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=+G6Mfwk+58XO0Kv7YBTIXzchf5cSSAWYKhZa1MTn4wI=;
-        b=gJxM0NiMNdzZLbhJ04WmIAQqEO3cWXKgESPdlBJ4eNzsw7qPQjO4wU00xk075Uhz8P
-         /fyxZT+Q3k7USkIlqqI2jY4mfxKguY3SM+9z2sLYjuicsgKgLfdP1jj3FXCLUQpQNDzp
-         hOFEBuYMh8uOJ+8DGac8VuTNs2XPeOb+oq6TcODlL9f6Jg13ijqO8/ajtiC7SqSJb+1F
-         2J72I66B7YVZnFLqCEl1rtD5fvPcbiwoFDmgj3IZp4z6I3iDTcqboO/OwaWXSJL2S8tI
-         D7Mw4PPkjusZdkzJu3eJzifBJFarD3omUXWS/xzII8jZCJB2KzuQFIoqhh+ELi7KIJ6O
-         8T4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+G6Mfwk+58XO0Kv7YBTIXzchf5cSSAWYKhZa1MTn4wI=;
-        b=Dk8iRyWcpbPYSpgQdVOcZFuKC9B5M2I0z84Oepg4sqFcDhzCnxOUApb7Q4BqdM5ZXA
-         IxscUTbZfhWvDHJFDpEX7n3boZYkN8fx1dXvUqqxTMO3CYOtrfUscHsqDI3wFS2bMuT4
-         3b1IpzMIvuyT8ZlfbxDGRR+d8tuEqLxdE6OuHLktstxrVAUOBMDzW7OstC6R46wwfJQx
-         YEcUBQxL4hdRwhaC4WB66zatv+0RRyhi37quyABJaORlJAObnciAq4ZoFTzfCcHWsMxC
-         3tOTRX5hR7N2XvZnQoRLQG8UOSYTuaYDn05J/g496s8CFef93mKqcs5U8e+waj7obGYi
-         x2wg==
-X-Gm-Message-State: AOAM532Zs986erX/kje1C4MUIkZcia/XC3ExZZaLSpqq7wh+NkEe2KAt
-        EDSatIEKiVkIP1FlQE6sBlskkA==
-X-Google-Smtp-Source: ABdhPJxop4blgYQ3TmVzEcJLlV2hqoAF0KvSEU8K7/LmcpxgIHoNICCvtm8ULH723Nmf5YXGNxGDVQ==
-X-Received: by 2002:a05:620a:131c:: with SMTP id o28mr168349qkj.483.1614206000231;
-        Wed, 24 Feb 2021 14:33:20 -0800 (PST)
-Received: from [192.168.1.93] (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.gmail.com with ESMTPSA id c127sm2645331qkd.87.2021.02.24.14.33.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Feb 2021 14:33:19 -0800 (PST)
-Subject: Re: [PATCH v7 00/11] Regression fixes/clean ups in the Qualcomm
- crypto engine driver
-From:   Thara Gopinath <thara.gopinath@linaro.org>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        bjorn.andersson@linaro.org
-Cc:     ebiggers@google.com, ardb@kernel.org, sivaprak@codeaurora.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210211200128.2886388-1-thara.gopinath@linaro.org>
-Message-ID: <7fc0db6b-995f-6ede-cc45-9b9e87b768da@linaro.org>
-Date:   Wed, 24 Feb 2021 17:33:18 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Wed, 24 Feb 2021 19:57:52 -0500
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DmDq81WnszjS6b;
+        Thu, 25 Feb 2021 08:55:32 +0800 (CST)
+Received: from [10.67.103.10] (10.67.103.10) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.498.0; Thu, 25 Feb 2021
+ 08:57:01 +0800
+Subject: Re: [PATCH v9 3/7] crypto: move curve_id of ECDH from the key to
+ algorithm name
+To:     <Tudor.Ambarus@microchip.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <marcel@holtmann.org>,
+        <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>
+CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
+        <wangzhou1@hisilicon.com>, <linux-kernel@vger.kernel.org>,
+        <Nicolas.Ferre@microchip.com>
+References: <1614064219-40701-1-git-send-email-yumeng18@huawei.com>
+ <1614064219-40701-4-git-send-email-yumeng18@huawei.com>
+ <8b96c136-dca9-5b6a-2221-e906d265c40b@microchip.com>
+ <fd3b7c0f-d7f2-3d27-cfef-98ec3614dd1a@huawei.com>
+ <e3b4c883-d2f3-0bf0-ffab-42ff5ffe31b8@microchip.com>
+From:   yumeng <yumeng18@huawei.com>
+Message-ID: <ced696e8-c7f8-d360-5470-9fa8f61e886a@huawei.com>
+Date:   Thu, 25 Feb 2021 08:56:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
 MIME-Version: 1.0
-In-Reply-To: <20210211200128.2886388-1-thara.gopinath@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <e3b4c883-d2f3-0bf0-ffab-42ff5ffe31b8@microchip.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.103.10]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 
-On 2/11/21 3:01 PM, Thara Gopinath wrote:
-> This patch series is a result of running kernel crypto fuzz tests (by
-> enabling CONFIG_CRYPTO_MANAGER_EXTRA_TESTS) on the transformations
-> currently supported via the Qualcomm crypto engine on sdm845.  The first
-> nine patches are fixes for various regressions found during testing. The
-> last two patches are minor clean ups of unused variable and parameters.
-
-Hi Herbert,
-
-This version has all the comments from you and rest of the community 
-fixed. Do you think you can merge this ?
-
+在 2021/2/24 18:15, Tudor.Ambarus@microchip.com 写道:
+> On 2/24/21 3:29 AM, yumeng wrote:
+>> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+>>
+>> 在 2021/2/23 18:44, Tudor.Ambarus@microchip.com 写道:
+>>> Hi,
+>>>
+>>> On 2/23/21 9:10 AM, Meng Yu wrote:
+>>>> --- a/drivers/crypto/atmel-ecc.c
+>>>> +++ b/drivers/crypto/atmel-ecc.c
+>>>> @@ -104,7 +104,7 @@ static int atmel_ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
+>>>>                   return -EINVAL;
+>>>>           }
+>>>>
+>>>> -       ctx->n_sz = atmel_ecdh_supported_curve(params.curve_id);
+>>>> +       ctx->n_sz = atmel_ecdh_supported_curve(ctx->curve_id);
+>>>>           if (!ctx->n_sz || params.key_size) {
+>>>>                   /* fallback to ecdh software implementation */
+>>>>                   ctx->do_fallback = true;
+>>>
+>>> Now that you moved the curve id info into the alg name, and it is
+>>> no longer dynamically discovered when decoding the key, does it
+>>> still make sense to keep the curve id, the key size checks, and
+>>> the fallback to the software implementation?
+>>> I think we can keep the curve id, the key size check if 'atmel-ecc' may
+>> support other curves in the future, and if you're sure P256 is the only
+>> curve 'atmel-ecc' uses, and it will be changed, we can delete it.
+>>
+>> And fallback to ecdh software implementation is needed when
+>> params.key_size is zero.
+>>
 > 
-> v6->v7:
-> 	- Fixed sparse warning in patch 4 as pointed out by Herbert Xu.
-> 	  This means the checking if any two keys are same for triple
-> 	  des algorithms has been reverted back to using conditional OR
-> 	  instead of using bitwise OR.
-> 	- Rebased to 5.11-rc7.
+> I've read the code again, now I remember. The fallback is needed indeed,
+> but for other reason. ecdh-nist-p256 will be handled in the crypto IP
+> only when its user provides a zero length private key: we will use a
+> pre-provisioned private key that can't be read outside of the device.
+> The fallback was needed for ecdh-nist-p256 when the user provides a
+> non-zero private key, or for other curve IDs.
 > 
-> v5->v6:
-> 	- Return 0 for zero length messages instead of -EOPNOTSUPP in the
-> 	  cipher algorithms as pointed out by Eric Biggers.
-> 	- Remove the wrong TODO in patch 6 which implied that AES CBC can
-> 	  do partial block sizes when it is actually CTS mode that can as
-> 	  pointed out my Eric Biggers.
-> 
-> v4->v5:
-> 	- Fixed build warning/error in patch for wrong assignment of const
-> 	  pointer as reported by kernel test robot <lkp@intel.com>.
-> 	- Rebased to 5.11-rc6.
-> v3->v4:
-> 	- Fixed the bug where only two bytes of byte_count were getting
-> 	  saved and restored instead of all eight bytes. Thanks Bjorn for
-> 	  catching this.
-> 	- Split patch 3 "Fix regressions found during fuzz testing" into
-> 	  6 patches as requested by Bjorn.
-> 	- Dropped crypto from all subject headers.
-> 	- Rebased to 5.11-rc5
-> v2->v3:
->          - Made the comparison between keys to check if any two keys are
->            same for triple des algorithms constant-time as per
->            Nym Seddon's suggestion.
->          - Rebased to 5.11-rc4.
-> v1->v2:
->          - Introduced custom struct qce_sha_saved_state to store and restore
->            partial sha transformation.
->          - Rebased to 5.11-rc3.
-> 
-> Thara Gopinath (11):
->    crypto: qce: sha: Restore/save ahash state with custom struct in
->      export/import
->    crypto: qce: sha: Hold back a block of data to be transferred as part
->      of final
->    crypto: qce: skcipher: Return unsupported if key1 and key 2 are same
->      for AES XTS algorithm
->    crypto: qce: skcipher: Return unsupported if any three keys are same
->      for DES3 algorithms
->    crypto: qce: skcipher: Return error for zero length messages
->    crypto: qce: skcipher: Return error for non-blocksize data(ECB/CBC
->      algorithms)
->    crypto: qce: skcipher: Set ivsize to 0 for ecb(aes)
-> *** BLURB HERE ***
-> 
-> Thara Gopinath (11):
->    crypto: qce: sha: Restore/save ahash state with custom struct in
->      export/import
->    crypto: qce: sha: Hold back a block of data to be transferred as part
->      of final
->    crypto: qce: skcipher: Return unsupported if key1 and key 2 are same
->      for AES XTS algorithm
->    crypto: qce: skcipher: Return unsupported if any three keys are same
->      for DES3 algorithms
->    crypto: qce: skcipher: Return error for zero length messages
->    crypto: qce: skcipher: Return error for non-blocksize data(ECB/CBC
->      algorithms)
->    crypto: qce: skcipher: Set ivsize to 0 for ecb(aes)
->    crypto: qce: skcipher: Improve the conditions for requesting AES
->      fallback cipher
->    crypto: qce: common: Set data unit size to message length for AES XTS
->      transformation
->    crypto: qce: Remover src_tbl from qce_cipher_reqctx
->    crypto: qce: Remove totallen and offset in qce_start
-> 
->   drivers/crypto/qce/cipher.h   |   1 -
->   drivers/crypto/qce/common.c   |  25 +++---
->   drivers/crypto/qce/common.h   |   3 +-
->   drivers/crypto/qce/sha.c      | 143 +++++++++++++---------------------
->   drivers/crypto/qce/skcipher.c |  69 +++++++++++++---
->   5 files changed, 126 insertions(+), 115 deletions(-)
+> Since the atecc508 and atecc608 (for which there isn't support in kernel
+> as of now) both support just NIST Standard P256 Elliptic Curve, and the
+> curve id is now unique per alg, the ctx->curve_id handling does no longer
+> make sense. So please remove the ctx->curve_id handling. ctx->n_sz can be
+> removed too and use instead directly ATMEL_ECC_NIST_P256_N_SIZE, similar
+> to how ATMEL_ECC_PUBKEY_SIZE is used.
 > 
 
--- 
-Warm Regards
-Thara
+OK, thanks, I will remove it. But I'd like to wait 2 more days, as maybe 
+the owners of other modules (like crypto or bluetooth) have any comments.
+
+thanks.
