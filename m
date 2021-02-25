@@ -2,85 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E63A4C433DB
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 11:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4783C433DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 11:50:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9E5B664F10
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 11:16:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CDF164F16
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Feb 2021 11:50:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233571AbhBYLQg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Feb 2021 06:16:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40448 "EHLO
+        id S232761AbhBYLuv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Feb 2021 06:50:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233660AbhBYLQf (ORCPT
+        with ESMTP id S229961AbhBYLut (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Feb 2021 06:16:35 -0500
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A96ADC061574;
-        Thu, 25 Feb 2021 03:15:54 -0800 (PST)
+        Thu, 25 Feb 2021 06:50:49 -0500
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0769C06174A;
+        Thu, 25 Feb 2021 03:50:08 -0800 (PST)
 Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4DmVZr71ldz9sBy;
-        Thu, 25 Feb 2021 22:15:48 +1100 (AEDT)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4DmWLG6r0dz9sVF;
+        Thu, 25 Feb 2021 22:49:58 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1614251751;
-        bh=Vca/imfcO2yn/YdTghwR8DqtTxd3FAFwqDWZTbVefq4=;
+        s=201909; t=1614253805;
+        bh=/SYtgE5qENlSC96VzcIwZTaGUmL6HCYNrQHwHPYZSs4=;
         h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=l8g3SqNmOf5alYyLAsWGsuOdqzrJtVJj4EJ6aKNBYE4wELIlH1+ejvW9kSQyaxuqX
-         /JME0W7NjR4gvc5TZ8X+Pmu0aJ3RI+WvleS4b40NwCo+3OBwh5EpP+pJ8q2+LggIjZ
-         V8ycZ2v23ZkcE6LEQpJT0knqp9OG2YMPwaSlBmpvzYPx1bo8OEOg8b1YlzvDkfQC8q
-         PdeABa2WJRDW12/Mq3gQmB1vjzY6/bkq1y20EOd/X+Kl45PjgOIu+rmLa16Lxqcwnz
-         Si9rFvNiSTJgGxcYsbALHAvSuneDoY2ed/VXVLP2kx0c/+cUvN1uhLfYD4+JrHdumW
-         QZgzAwZOuMSGw==
+        b=iSkCaS/DJVPQlH0gbL+LD45kazqnKgdUXrGSiY0t5rVH7XgWyEZ3dVcZQMrrdzWxb
+         5MgqcVG9pQkFcrHW+MXEpmHj5iL5Dc/O0Q3xerdpbA7nNL2QioWinUYOGNO1CftmBu
+         foAGxV0uCzTC0mgQqEJOVDt+y1/5VQz2b92Jel0/OqIMCucyj2A49/JmP77ew5X9ex
+         7ocZxtF4Q7Ij1XMzTR+G4KGixhAD12BQzG5y3VyTqzm+g5IL6UR67JPFL4nCBTOTxL
+         1NBGWLbvxkYV3zB/XybDZ47lwrc8H7FUaYmZhnqcTWr1RcqeZBKCgq+EBQqZHvNLXS
+         lfxhg1WNI9+Mg==
 From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Yang Li <yang.lee@linux.alibaba.com>, herbert@gondor.apana.org.au
-Cc:     davem@davemloft.net, benh@kernel.crashing.org, paulus@samba.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, Yang Li <yang.lee@linux.alibaba.com>
-Subject: Re: [PATCH] crypto/nx: add missing call to of_node_put()
-In-Reply-To: <1614243417-48556-1-git-send-email-yang.lee@linux.alibaba.com>
-References: <1614243417-48556-1-git-send-email-yang.lee@linux.alibaba.com>
-Date:   Thu, 25 Feb 2021 22:15:45 +1100
-Message-ID: <87v9ags8im.fsf@mpe.ellerman.id.au>
+To:     Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jens Axboe <axboe@kernel.dk>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Haren Myneni <haren@us.ibm.com>,
+        Breno =?utf-8?Q?Leit?= =?utf-8?Q?=C3=A3o?= <leitao@debian.org>,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        Steven Royer <seroyer@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Cristobal Forno <cforno12@linux.ibm.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Dany Madden <drt@linux.ibm.com>, Lijun Pan <ljp@linux.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Michael Cyr <mikecyr@linux.ibm.com>,
+        Jiri Slaby <jirislaby@kernel.org>
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        netdev@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org
+Subject: Re: [PATCH v2] vio: make remove callback return void
+In-Reply-To: <20210224072516.74696-1-uwe@kleine-koenig.org>
+References: <20210224072516.74696-1-uwe@kleine-koenig.org>
+Date:   Thu, 25 Feb 2021 22:49:54 +1100
+Message-ID: <87sg5ks6xp.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Yang Li <yang.lee@linux.alibaba.com> writes:
-> In one of the error paths of the for_each_child_of_node() loop,
-> add missing call to of_node_put().
+Uwe Kleine-K=C3=B6nig <uwe@kleine-koenig.org> writes:
+> The driver core ignores the return value of struct bus_type::remove()
+> because there is only little that can be done. To simplify the quest to
+> make this function return void, let struct vio_driver::remove() return
+> void, too. All users already unconditionally return 0, this commit makes
+> it obvious that returning an error code is a bad idea and makes it
+> obvious for future driver authors that returning an error code isn't
+> intended.
 >
-> Fix the following coccicheck warning:
-> ./drivers/crypto/nx/nx-common-powernv.c:927:1-23: WARNING: Function
-> "for_each_child_of_node" should have of_node_put() before return around
-> line 936.
->
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
-> ---
->  drivers/crypto/nx/nx-common-powernv.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/crypto/nx/nx-common-powernv.c b/drivers/crypto/nx/nx-common-powernv.c
-> index 13c65de..b43c457 100644
-> --- a/drivers/crypto/nx/nx-common-powernv.c
-> +++ b/drivers/crypto/nx/nx-common-powernv.c
-> @@ -933,6 +933,7 @@ static int __init nx_powernv_probe_vas(struct device_node *pn)
->  				NX_CT_GZIP, "ibm,p9-nx-gzip", &ct_gzip);
->  
->  		if (ret)
-> +			of_node_put(dn);
->  			return ret;
+> Note there are two nominally different implementations for a vio bus:
+> one in arch/sparc/kernel/vio.c and the other in
+> arch/powerpc/platforms/pseries/vio.c. I didn't care to check which
+> driver is using which of these busses (or if even some of them can be
+> used with both) and simply adapt all drivers and the two bus codes in
+> one go.
 
-Sorry this is wrong, the if needs braces.
+I'm 99% sure there's no connection between the two implementations,
+other than the name.
+
+So splitting the patch by arch would make it easier to merge. I'm
+reluctant to merge changes to sparc code.
+
+The list of powerpc specific drivers is:
+
+  drivers/char/hw_random/pseries-rng.c
+  drivers/char/tpm/tpm_ibmvtpm.c
+  drivers/crypto/nx/nx-842-pseries.c
+  drivers/crypto/nx/nx.c
+  drivers/misc/ibmvmc.c
+  drivers/net/ethernet/ibm/ibmveth.c
+  drivers/net/ethernet/ibm/ibmvnic.c
+  drivers/scsi/ibmvscsi/ibmvfc.c
+  drivers/scsi/ibmvscsi/ibmvscsi.c
+  drivers/scsi/ibmvscsi_tgt/ibmvscsi_tgt.c
+  drivers/tty/hvc/hvcs.c
 
 cheers
