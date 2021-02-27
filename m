@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DC14C43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22155C4332D
 	for <linux-crypto@archiver.kernel.org>; Sat, 27 Feb 2021 13:45:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE44864ECE
-	for <linux-crypto@archiver.kernel.org>; Sat, 27 Feb 2021 13:45:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 06E8B64ED5
+	for <linux-crypto@archiver.kernel.org>; Sat, 27 Feb 2021 13:45:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230153AbhB0Npf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 27 Feb 2021 08:45:35 -0500
-Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.120]:9798 "EHLO
+        id S230165AbhB0Npg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 27 Feb 2021 08:45:36 -0500
+Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.223]:33571 "EHLO
         mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230086AbhB0Npb (ORCPT
+        with ESMTP id S230104AbhB0Npb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 27 Feb 2021 08:45:31 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1614433260; cv=none;
+ARC-Seal: i=1; a=rsa-sha256; t=1614433254; cv=none;
     d=strato.com; s=strato-dkim-0002;
-    b=rsgGfwK95gtKDP84gVWXob04G0Iu0N0aPB+l8P5yPF6UST4739haqG9VMyOcuTOa8W
-    SWotbH3Iu79gLP7J+68D8l7KES4CKtDhZwe0Z3tl8+qbAEzZgph5vYdApxXLhja9XVl/
-    ut+cd+EVjXaFyWHYtfrUgalS3OktCTRlASYX8Ys8kvbuCa0q7xuffEl3s4S3dARmWgvO
-    3kMJ9Oi+jmqUG2oFIA3aQiDjODZa24XxCXd5Wi9lZXj180rzQcpokVKw33nEQXTZb4xo
-    W4+6fMSrBjBvOmDMKSDtyfvCK4BgCcJRbgW8/dd3KD5i7dPTLwwUn4advC3D/+i3hPka
-    WyOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1614433260;
+    b=gU6DtqvlO0SNinuWaaRVtYcigI943JySLb3IZycmKYnPptbbsncJy5+lD1Hi4b+O3X
+    3d7DxvmbA6zpsuDxsy2D0nmo4IG1Z+y5OcHcMbjLJhjgnb+QNxK6yAn8lpSMBLlZKCBZ
+    Mr1gZHXG04fsOb1Mhmvn9WUSMyXd3Er8htsypIi8mbhRF1X8YQw/XQmTuXWij0V1mh9V
+    r8LruPvCxlMeYxZ3k8rlQcLcFYVZqC+dSE/lozYGhltyqXmd/BDHM3rL5TnosgCU76Fu
+    EcjXXOkSyx90o0TOaYnfYcKN7CdSY3ee5q9jxoBLgMnOZm+TaGce3Fhffe8Khac7EkoX
+    QD6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1614433254;
     s=strato-dkim-0002; d=strato.com;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=qrRxyN7LadI7uDd8DHSxjsKLqYjaf6fPgrPfK6HpFbk=;
-    b=j8XRCEhNlaXLJpq3IUetpevBMOWLxZZvuudv2FZkclE9QOOJJXw0pemT6wgIrnEylA
-    3Wf/S/53PvxjRpqbsd90arq3RTWI3LEmSungKF7WCf87gC3vbmPVMULyA7O+Kh/ed/k8
-    7ILWxW9kMvaU7dwXY566Gj2PSnWnwBtruGAzQLxE/1q9cHot7ElLcfaUmvIKeE5vm+zH
-    yiveTYYmDmPEh8vvx3CGz+R9T87YPtEtKTrz9Uv20Ig+YuJ5a6nywlmJCd2Wu1rMHUa9
-    9O3pdSBe+RWyOjTX8eezdnCAIpew9LVWvaiSZJkqimSQvLO+lvYIEhMxg71fXm4iuQje
-    U0LQ==
+    bh=zUOsyRRfbos48445EcYQlU6wb1AVbDctctNHCq2VxOE=;
+    b=hkrRZ/9OtZdjlnDoE+SwJr/FaCQ9xdtrm8/4vaH+U2o4PVeY3xH43Vd9KacL0zDOkw
+    7252+RaIyRMT7X9ahnzwLPcOfYOiUbUFWbhdCQORRHO+KtPpvizGuemoM6ZZDnuLurP8
+    gBt5NO7wTjIW2jgcBq2DBRa1bILdD0tWCe8PoQmAMPzyrKrslmztOpYwzO+5zBpcis88
+    Oka7PSoiMm/MOn0RMT0GSTNlCvqBZM77SWUNj7sMUP9aXHIup30OKyqfiLtaQwPsrzo3
+    9QuMxGlYNyDs3619OEAdj4qy/4EPOBp9mOsz3Dc6c83BrurM7NqWX+NCGE2Vhq+bxUNw
+    x3DA==
 ARC-Authentication-Results: i=1; strato.com;
     dkim=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1614433260;
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1614433254;
     s=strato-dkim-0002; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=qrRxyN7LadI7uDd8DHSxjsKLqYjaf6fPgrPfK6HpFbk=;
-    b=ceUmtRkgb1F5PnSkScd6gw828XFun3tVIDQ4UK0I6AmUfhaLbVxTiGBmXS6rsysG4x
-    tjcjfigSo4ZxWZyXAxVJBH1dgHzxnK66MJ7nmiO2tAOIOZTof+zCYJFTZNkaGisgjEVR
-    HL86HixohE0p7M69Mai3KISDg56cCBiBS6mPgj0YZDLEpFMA+N7sT01CEuSrgJtg8h6X
-    ehE2oK13u17inz6U4ZlkgC/n3pvsKvDger3uPwtU5Ak3WHXdNwFbmWpkktedkrHOa8UO
-    g2joUFmze59+jz+RBQZgDT7hegheAwhngiAsTIkT1aFH3cw9GeBLpn1UaIXZrHraNDdL
-    h1+w==
+    bh=zUOsyRRfbos48445EcYQlU6wb1AVbDctctNHCq2VxOE=;
+    b=GmY+quFQkdeWo6bqIIuDR7VpRZYFkf3FfDNo5L0+93fvU5Vzc0zLRm15wKLEB7QUxo
+    zx5mHSMk9tC1aAHpNNtz57s/LbpQBlZ7+sfY4QTIxoKmaJnDY44CaPwch0A3QuWH2xQg
+    DT1YMT4ApNtkB4HYhR1W4KSwOBQfFJR+jCUauoVLBtGvF93tUCglK5isMdtzm+yL/mu6
+    MTdK5KbwalcGxxG6E1VKRH0mkuJ5+YzIQw6fnHe0S67+673XO+0YT1h1TGs6AYImLySF
+    xyh2YbNRjJoCR+eZdedIIHMU5XF6WT3uIgZnB+LU8Mz/kA6zr5mFtPD13a4aDZwse260
+    nKHg==
 Authentication-Results: strato.com;
     dkim=none
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZIfSc8k+7"
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
     by smtp.strato.de (RZmta 47.19.0 DYNA|AUTH)
-    with ESMTPSA id 608030x1RDexUDK
+    with ESMTPSA id 608030x1RDerUDF
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-    Sat, 27 Feb 2021 14:40:59 +0100 (CET)
+    Sat, 27 Feb 2021 14:40:53 +0100 (CET)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
 Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
@@ -91,9 +91,9 @@ Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Petr Tesarik <ptesarik@suse.cz>,
         John Haxby <john.haxby@oracle.com>
-Subject: [PATCH v38 02/13] LRNG - allocate one DRNG instance per NUMA node
-Date:   Sat, 27 Feb 2021 14:35:05 +0100
-Message-ID: <4090020.ejJDZkT8p0@positron.chronox.de>
+Subject: [PATCH v38 06/13] crypto: DRBG - externalize DRBG functions for LRNG
+Date:   Sat, 27 Feb 2021 14:36:57 +0100
+Message-ID: <107631716.nniJfEyVGO@positron.chronox.de>
 In-Reply-To: <3277560.QJadu78ljV@positron.chronox.de>
 References: <3277560.QJadu78ljV@positron.chronox.de>
 MIME-Version: 1.0
@@ -103,21 +103,8 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In order to improve NUMA-locality when serving getrandom(2) requests,
-allocate one DRNG instance per node.
-
-The DRNG instance that is present right from the start of the kernel is
-reused as the first per-NUMA-node DRNG. For all remaining online NUMA
-nodes a new DRNG instance is allocated.
-
-During boot time, the multiple DRNG instances are seeded sequentially.
-With this, the first DRNG instance (referenced as the initial DRNG
-in the code) is completely seeded with 256 bits of entropy before the
-next DRNG instance is completely seeded.
-
-When random numbers are requested, the NUMA-node-local DRNG is checked
-whether it has been already fully seeded. If this is not the case, the
-initial DRNG is used to serve the request.
+This patch allows several DRBG functions to be called by the LRNG kernel
+code paths outside the drbg.c file.
 
 CC: Torsten Duwe <duwe@lst.de>
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
@@ -136,176 +123,128 @@ CC: Andy Lutomirski <luto@kernel.org>
 CC: Florian Weimer <fweimer@redhat.com>
 CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
-CC: Eric Biggers <ebiggers@kernel.org>
-Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
 Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
 Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Tested-by: Neil Horman <nhorman@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 =2D--
- drivers/char/lrng/Makefile        |   2 +
- drivers/char/lrng/lrng_internal.h |   5 ++
- drivers/char/lrng/lrng_numa.c     | 120 ++++++++++++++++++++++++++++++
- 3 files changed, 127 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_numa.c
+ crypto/drbg.c         | 16 ++++++++++------
+ include/crypto/drbg.h |  7 +++++++
+ 2 files changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index e72e01c15bb9..29724c65287d 100644
-=2D-- a/drivers/char/lrng/Makefile
-+++ b/drivers/char/lrng/Makefile
-@@ -7,3 +7,5 @@ obj-y				+=3D lrng_pool.o lrng_aux.o \
- 				   lrng_sw_noise.o lrng_archrandom.o \
- 				   lrng_drng.o lrng_chacha20.o \
- 				   lrng_interfaces.o
-+
-+obj-$(CONFIG_NUMA)		+=3D lrng_numa.o
-diff --git a/drivers/char/lrng/lrng_internal.h b/drivers/char/lrng/lrng_int=
-ernal.h
-index d398ac6b5674..1bfb3710c767 100644
-=2D-- a/drivers/char/lrng/lrng_internal.h
-+++ b/drivers/char/lrng/lrng_internal.h
-@@ -214,8 +214,13 @@ int lrng_drng_get_sleep(u8 *outbuf, u32 outbuflen);
- void lrng_drng_force_reseed(void);
- void lrng_drng_seed_work(struct work_struct *dummy);
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 3132967a1749..58b1de903def 100644
+=2D-- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -113,7 +113,7 @@
+  * the SHA256 / AES 256 over other ciphers. Thus, the favored
+  * DRBGs are the latest entries in this array.
+  */
+=2Dstatic const struct drbg_core drbg_cores[] =3D {
++const struct drbg_core drbg_cores[] =3D {
+ #ifdef CONFIG_CRYPTO_DRBG_CTR
+ 	{
+ 		.flags =3D DRBG_CTR | DRBG_STRENGTH128,
+@@ -190,6 +190,7 @@ static const struct drbg_core drbg_cores[] =3D {
+ 	},
+ #endif /* CONFIG_CRYPTO_DRBG_HMAC */
+ };
++EXPORT_SYMBOL(drbg_cores);
 =20
-+#ifdef CONFIG_NUMA
-+struct lrng_drng **lrng_drng_instances(void);
-+void lrng_drngs_numa_alloc(void);
-+#else	/* CONFIG_NUMA */
- static inline struct lrng_drng **lrng_drng_instances(void) { return NULL; }
- static inline void lrng_drngs_numa_alloc(void) { return; }
-+#endif /* CONFIG_NUMA */
+ static int drbg_uninstantiate(struct drbg_state *drbg);
 =20
- /************************** Entropy pool management **********************=
-*****/
+@@ -205,7 +206,7 @@ static int drbg_uninstantiate(struct drbg_state *drbg);
+  * Return: normalized strength in *bytes* value or 32 as default
+  *	   to counter programming errors
+  */
+=2Dstatic inline unsigned short drbg_sec_strength(drbg_flag_t flags)
++unsigned short drbg_sec_strength(drbg_flag_t flags)
+ {
+ 	switch (flags & DRBG_STRENGTH_MASK) {
+ 	case DRBG_STRENGTH128:
+@@ -218,6 +219,7 @@ static inline unsigned short drbg_sec_strength(drbg_fla=
+g_t flags)
+ 		return 32;
+ 	}
+ }
++EXPORT_SYMBOL(drbg_sec_strength);
 =20
-diff --git a/drivers/char/lrng/lrng_numa.c b/drivers/char/lrng/lrng_numa.c
-new file mode 100644
-index 000000000000..37817771b97a
-=2D-- /dev/null
-+++ b/drivers/char/lrng/lrng_numa.c
-@@ -0,0 +1,120 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
-+/*
-+ * LRNG NUMA support
-+ *
-+ * Copyright (C) 2016 - 2021, Stephan Mueller <smueller@chronox.de>
-+ */
+ /*
+  * FIPS 140-2 continuous self test for the noise source
+@@ -1214,7 +1216,7 @@ static int drbg_seed(struct drbg_state *drbg, struct =
+drbg_string *pers,
+ }
+=20
+ /* Free all substructures in a DRBG state without the DRBG state structure=
+ */
+=2Dstatic inline void drbg_dealloc_state(struct drbg_state *drbg)
++void drbg_dealloc_state(struct drbg_state *drbg)
+ {
+ 	if (!drbg)
+ 		return;
+@@ -1235,12 +1237,13 @@ static inline void drbg_dealloc_state(struct drbg_s=
+tate *drbg)
+ 		drbg->fips_primed =3D false;
+ 	}
+ }
++EXPORT_SYMBOL(drbg_dealloc_state);
+=20
+ /*
+  * Allocate all sub-structures for a DRBG state.
+  * The DRBG state structure must already be allocated.
+  */
+=2Dstatic inline int drbg_alloc_state(struct drbg_state *drbg)
++int drbg_alloc_state(struct drbg_state *drbg)
+ {
+ 	int ret =3D -ENOMEM;
+ 	unsigned int sb_size =3D 0;
+@@ -1321,6 +1324,7 @@ static inline int drbg_alloc_state(struct drbg_state =
+*drbg)
+ 	drbg_dealloc_state(drbg);
+ 	return ret;
+ }
++EXPORT_SYMBOL(drbg_alloc_state);
+=20
+ /*************************************************************************
+  * DRBG interface functions
+@@ -1890,8 +1894,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+  *
+  * return: flags
+  */
+=2Dstatic inline void drbg_convert_tfm_core(const char *cra_driver_name,
+=2D					 int *coreref, bool *pr)
++void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref, bool=
+ *pr)
+ {
+ 	int i =3D 0;
+ 	size_t start =3D 0;
+@@ -1918,6 +1921,7 @@ static inline void drbg_convert_tfm_core(const char *=
+cra_driver_name,
+ 		}
+ 	}
+ }
++EXPORT_SYMBOL(drbg_convert_tfm_core);
+=20
+ static int drbg_kcapi_init(struct crypto_tfm *tfm)
+ {
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index c4165126937e..71d53e028e6d 100644
+=2D-- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -278,4 +278,11 @@ enum drbg_prefixes {
+ 	DRBG_PREFIX3
+ };
+=20
++extern int drbg_alloc_state(struct drbg_state *drbg);
++extern void drbg_dealloc_state(struct drbg_state *drbg);
++extern void drbg_convert_tfm_core(const char *cra_driver_name, int *corere=
+f,
++				  bool *pr);
++extern const struct drbg_core drbg_cores[];
++extern unsigned short drbg_sec_strength(drbg_flag_t flags);
 +
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/lrng.h>
-+#include <linux/slab.h>
-+
-+#include "lrng_internal.h"
-+
-+static struct lrng_drng **lrng_drng __read_mostly =3D NULL;
-+
-+struct lrng_drng **lrng_drng_instances(void)
-+{
-+	return smp_load_acquire(&lrng_drng);
-+}
-+
-+/* Allocate the data structures for the per-NUMA node DRNGs */
-+static void _lrng_drngs_numa_alloc(struct work_struct *work)
-+{
-+	struct lrng_drng **drngs;
-+	struct lrng_drng *lrng_drng_init =3D lrng_drng_init_instance();
-+	u32 node;
-+	bool init_drng_used =3D false;
-+
-+	mutex_lock(&lrng_crypto_cb_update);
-+
-+	/* per-NUMA-node DRNGs are already present */
-+	if (lrng_drng)
-+		goto unlock;
-+
-+	drngs =3D kcalloc(nr_node_ids, sizeof(void *), GFP_KERNEL|__GFP_NOFAIL);
-+	for_each_online_node(node) {
-+		struct lrng_drng *drng;
-+
-+		if (!init_drng_used) {
-+			drngs[node] =3D lrng_drng_init;
-+			init_drng_used =3D true;
-+			continue;
-+		}
-+
-+		drng =3D kmalloc_node(sizeof(struct lrng_drng),
-+				     GFP_KERNEL|__GFP_NOFAIL, node);
-+		memset(drng, 0, sizeof(lrng_drng));
-+
-+		drng->crypto_cb =3D lrng_drng_init->crypto_cb;
-+		drng->drng =3D drng->crypto_cb->lrng_drng_alloc(
-+					LRNG_DRNG_SECURITY_STRENGTH_BYTES);
-+		if (IS_ERR(drng->drng)) {
-+			kfree(drng);
-+			goto err;
-+		}
-+
-+		drng->hash =3D drng->crypto_cb->lrng_hash_alloc();
-+		if (IS_ERR(drng->hash)) {
-+			drng->crypto_cb->lrng_drng_dealloc(drng->drng);
-+			kfree(drng);
-+			goto err;
-+		}
-+
-+		mutex_init(&drng->lock);
-+		spin_lock_init(&drng->spin_lock);
-+		rwlock_init(&drng->hash_lock);
-+
-+		/*
-+		 * Switch the hash used by the per-CPU pool.
-+		 * We do not need to lock the new hash as it is not usable yet
-+		 * due to **drngs not yet being initialized.
-+		 */
-+		if (lrng_pcpu_switch_hash(node, drng->crypto_cb, drng->hash,
-+					  &lrng_cc20_crypto_cb))
-+			goto err;
-+
-+		/*
-+		 * No reseeding of NUMA DRNGs from previous DRNGs as this
-+		 * would complicate the code. Let it simply reseed.
-+		 */
-+		lrng_drng_reset(drng);
-+		drngs[node] =3D drng;
-+
-+		lrng_pool_inc_numa_node();
-+		pr_info("DRNG and entropy pool read hash for NUMA node %d allocated\n",
-+			node);
-+	}
-+
-+	/* counterpart to smp_load_acquire in lrng_drng_instances */
-+	if (!cmpxchg_release(&lrng_drng, NULL, drngs))
-+		goto unlock;
-+
-+err:
-+	for_each_online_node(node) {
-+		struct lrng_drng *drng =3D drngs[node];
-+
-+		if (drng =3D=3D lrng_drng_init)
-+			continue;
-+
-+		if (drng) {
-+			lrng_pcpu_switch_hash(node, &lrng_cc20_crypto_cb, NULL,
-+					      drng->crypto_cb);
-+			drng->crypto_cb->lrng_hash_dealloc(drng->hash);
-+			drng->crypto_cb->lrng_drng_dealloc(drng->drng);
-+			kfree(drng);
-+		}
-+	}
-+	kfree(drngs);
-+
-+unlock:
-+	mutex_unlock(&lrng_crypto_cb_update);
-+}
-+
-+static DECLARE_WORK(lrng_drngs_numa_alloc_work, _lrng_drngs_numa_alloc);
-+
-+void lrng_drngs_numa_alloc(void)
-+{
-+	schedule_work(&lrng_drngs_numa_alloc_work);
-+}
+ #endif /* _DRBG_H */
 =2D-=20
 2.29.2
 
