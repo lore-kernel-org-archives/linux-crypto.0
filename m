@@ -3,351 +3,579 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB26C433DB
-	for <linux-crypto@archiver.kernel.org>; Sat, 27 Feb 2021 09:34:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A737C433DB
+	for <linux-crypto@archiver.kernel.org>; Sat, 27 Feb 2021 13:45:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E2B364E4E
-	for <linux-crypto@archiver.kernel.org>; Sat, 27 Feb 2021 09:34:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C619664EB7
+	for <linux-crypto@archiver.kernel.org>; Sat, 27 Feb 2021 13:45:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230049AbhB0JeR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 27 Feb 2021 04:34:17 -0500
-Received: from vulcan.natalenko.name ([104.207.131.136]:59144 "EHLO
-        vulcan.natalenko.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230010AbhB0JeO (ORCPT
+        id S230122AbhB0NpN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 27 Feb 2021 08:45:13 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.82]:28983 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229912AbhB0NpI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 27 Feb 2021 04:34:14 -0500
-Received: from localhost (kaktus.kanapka.ml [151.237.229.131])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by vulcan.natalenko.name (Postfix) with ESMTPSA id 644429B230D;
-        Sat, 27 Feb 2021 10:33:20 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
-        s=dkim-20170712; t=1614418400;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QcJypWcCuL78hRHAlISMRw7nAhYWTCY5Lq3ma6FxYuY=;
-        b=UUMOWHs8CzeAE9y8ezxkJdta0INmCZwf82IXv8Mrqyy04Ldo4H5tfmOBDP7uHvMoQwbveJ
-        X6a9Pd5sFOTuoaFzuInmL1+sPmSnN4Xw7ovyxlu3+560Jq6QnliKVKfDiyLKzcuMOv/sa/
-        v2kqphQQQQ9GIIeDfoXPoX/lHZxXarA=
-Date:   Sat, 27 Feb 2021 10:33:19 +0100
-From:   Oleksandr Natalenko <oleksandr@natalenko.name>
-To:     Nick Terrell <nickrterrell@gmail.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        squashfs-devel@lists.sourceforge.net,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-kernel@vger.kernel.org, Kernel Team <Kernel-team@fb.com>,
-        Nick Terrell <terrelln@fb.com>, Chris Mason <clm@fb.com>,
-        Petr Malat <oss@malat.biz>, Johannes Weiner <jweiner@fb.com>,
-        Niket Agarwal <niketa@fb.com>, Yann Collet <cyan@fb.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>
-Subject: Re: [PATCH v7 0/3] Update to zstd-1.4.6
-Message-ID: <20210227093319.tgzmg6di5zlmrnik@spock.localdomain>
-References: <20201203205114.1395668-1-nickrterrell@gmail.com>
+        Sat, 27 Feb 2021 08:45:08 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1614433243; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=WiPmoGpFFYay1lk0Q1WajIxyP0KkBn6MBPQh0GF3SBapv5xpiKMjdIGaig3Y8XJ4e1
+    fUg8vVyX+CUBdkyVisRMsnKvMdt4XiHj42v4BkYRYAtzQ6uiVyQMOZBNxCBuSRtfgWIp
+    LmQ0wsYffILZ/HOMrwhh+Cv9UOqLDgrS/Tvx0TzIvoC3DMES0LD3uNVe3xJBLK9xZQQX
+    gE1Iy60Gd1QUWvbuNTVE956EWB83R1IAjbrt4ZvGg9sAQH1wbzBdW3/jJ3v4IeSUi1XK
+    XDp76a2r2ShNHgsgye+9eUGATC70OwJ751tAn5AAd06ypGKUlhBsVPb1gNMQc07uGOGE
+    YCSA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1614433243;
+    s=strato-dkim-0002; d=strato.com;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=h27lAza3jPNukzH1apwBhF2m7iUz+7DFBLmWxmFr4v4=;
+    b=tpuHfeWJZUSaUwUq9aH+LwDMAGpMmdDes52bzBwxsEqZ1/PvFX3nhZsYPayiNbSIlc
+    gmHPbXzjFc6YP0GUBdN1Zrp335BD1UDVYFpWtTdC1KfofLtPUavVb8UKWcuO3pvc5KoJ
+    HEO9sWhmYw8CRyAeL6I0ib3E84JI9L9+e4zCyuDB3RWErLI3BrphnUcM9YDtMhVjI17s
+    1Z0GkwyTyaD+EQ0dyP36DWLLYK9zaD60DuBMloYGzsz5EZsvC3FI81e8s7EZk5848wNq
+    rJ9qBJXEkiiA8e9MBINFDM+57AVh5bMH5zRRRjkfc+bSGzluIZzdKXztNNoNmKsoS2MP
+    kRRA==
+ARC-Authentication-Results: i=1; strato.com;
+    dkim=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1614433243;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=h27lAza3jPNukzH1apwBhF2m7iUz+7DFBLmWxmFr4v4=;
+    b=AYCDich0q5Ci3et57yM1yD8B7DLbvyer9/M10WSbinI2PUKCO67dDJ2soalekTcxF+
+    AkDHWQ6D8BWHWyQt0FNCTnU4An9+WDBrE+hwiVic6mwEbsl9+CTx7ZO2+6dARgdj0Mw1
+    KrMW+Hw9LKrnDaFOkXyhNvSsR0ut/AM7H7gVrylNG7/K11pU7OjiZ4YzCLcSrlp1gchn
+    4A2bFbiB6dp3YesQ4ljbzoLhNVh6ufD4llpp6WdEjPbJnY7QpMHhcW9hzvrb2TOIr0Zh
+    dMRt+UH9vYSGYIF+9ALjz5rfSFhXeE5Lzk/4NTwo9NqzfoGz6UYSTC4m5tuRfOwGGWka
+    gJGA==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZIfSc8k+7"
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+    by smtp.strato.de (RZmta 47.19.0 DYNA|AUTH)
+    with ESMTPSA id 608030x1RDefUD7
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Sat, 27 Feb 2021 14:40:41 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
+Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        John Haxby <john.haxby@oracle.com>
+Subject: [PATCH v38 13/13] LRNG - add power-on and runtime self-tests
+Date:   Sat, 27 Feb 2021 14:40:05 +0100
+Message-ID: <2911737.CbtlEUcBR6@positron.chronox.de>
+In-Reply-To: <3277560.QJadu78ljV@positron.chronox.de>
+References: <3277560.QJadu78ljV@positron.chronox.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201203205114.1395668-1-nickrterrell@gmail.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi.
+Parts of the LRNG are already covered by self-tests, including:
 
-On Thu, Dec 03, 2020 at 12:51:11PM -0800, Nick Terrell wrote:
-> From: Nick Terrell <terrelln@fb.com>
-> 
-> Please pull from
-> 
->   git@github.com:terrelln/linux.git tags/v7-zstd-1.4.6
-> 
-> to get these changes. Alternatively the patchset is included.
-> 
-> This patchset upgrades the zstd library to the latest upstream release. The
-> current zstd version in the kernel is a modified version of upstream zstd-1.3.1.
-> At the time it was integrated, zstd wasn't ready to be used in the kernel as-is.
-> But, it is now possible to use upstream zstd directly in the kernel.
-> 
-> I have not yet released zstd-1.4.6 upstream. I want the zstd version in the
-> kernel to match up with a known upstream release, so we know exactly what code
-> is running. Whenever this patchset is ready for merge, I will cut a release at
-> the upstream commit that gets merged. This should not be necessary for future
-> releases.
-> 
-> The kernel zstd library is automatically generated from upstream zstd. A script
-> makes the necessary changes and imports it into the kernel. The changes are:
-> 
-> 1. Replace all libc dependencies with kernel replacements and rewrite includes.
-> 2. Remove unncessary portability macros like: #if defined(_MSC_VER).
-> 3. Use the kernel xxhash instead of bundling it.
-> 
-> This automation gets tested every commit by upstream's continuous integration.
-> When we cut a new zstd release, we will submit a patch to the kernel to update
-> the zstd version in the kernel.
-> 
-> I've updated zstd to upstream with one big patch because every commit must build,
-> so that precludes partial updates. Since the commit is 100% generated, I hope the
-> review burden is lightened. I considered replaying upstream commits, but that is
-> not possible because there have been ~3500 upstream commits since the last zstd
-> import, and the commits don't all build individually. The bulk update preserves
-> bisectablity because bugs can be bisected to the zstd version update. At that
-> point the update can be reverted, and we can work with upstream to find and fix
-> the bug. After this big switch in how the kernel consumes zstd, future patches
-> will be smaller, because they will only have one upstream release worth of
-> changes each.
-> 
-> This patchset adds a new kernel-style wrapper around zstd. This wrapper API is
-> functionally equivalent to the subset of the current zstd API that is currently
-> used. The wrapper API changes to be kernel style so that the symbols don't
-> collide with zstd's symbols. The update to zstd-1.4.6 maintains the same API
-> and preserves the semantics, so that none of the callers need to be updated.
-> 
-> This patchset comes in 2 parts:
-> 1. The first 2 patches prepare for the zstd upgrade. The first patch adds the
->    new kernel style API so zstd can be upgraded without modifying any callers.
->    The second patch adds an indirection for the lib/decompress_unzstd.c
->    including of all decompression source files.
-> 2. Import zstd-1.4.6. This patch is completely generated from upstream using
->    automated tooling.
-> 
-> I tested every caller of zstd on x86_64. I tested both after the 1.4.6 upgrade
-> using the compatibility wrapper, and after the final patch in this series. 
-> 
-> I tested kernel and initramfs decompression in i386 and arm.
-> 
-> I ran benchmarks to compare the current zstd in the kernel with zstd-1.4.6.
-> I benchmarked on x86_64 using QEMU with KVM enabled on an Intel i9-9900k.
-> I found:
-> * BtrFS zstd compression at levels 1 and 3 is 5% faster
-> * BtrFS zstd decompression+read is 15% faster
-> * SquashFS zstd decompression+read is 15% faster
-> * F2FS zstd compression+write at level 3 is 8% faster
-> * F2FS zstd decompression+read is 20% faster
-> * ZRAM decompression+read is 30% faster
-> * Kernel zstd decompression is 35% faster
-> * Initramfs zstd decompression+build is 5% faster
-> 
-> The latest zstd also offers bug fixes and a 1 KB reduction in stack uage during
-> compression. For example the recent problem with large kernel decompression has
-> been fixed upstream for over 2 years https://lkml.org/lkml/2020/9/29/27.
-> 
-> Please let me know if there is anything that I can do to ease the way for these
-> patches. I think it is important because it gets large performance improvements,
-> contains bug fixes, and is switching to a more maintainable model of consuming
-> upstream zstd directly, making it easy to keep up to date.
-> 
-> Best,
-> Nick Terrell
-> 
-> v1 -> v2:
-> * Successfully tested F2FS with help from Chao Yu to fix my test.
-> * (1/9) Fix ZSTD_initCStream() wrapper to handle pledged_src_size=0 means unknown.
->   This fixes F2FS with the zstd-1.4.6 compatibility wrapper, exposed by the test.
-> 
-> v2 -> v3:
-> * (3/9) Silence warnings by Kernel Test Robot:
->   https://github.com/facebook/zstd/pull/2324
->   Stack size warnings remain, but these aren't new, and the functions it warns on
->   are either unused or not in the maximum stack path. This patchset reduces zstd
->   compression stack usage by 1 KB overall. I've gotten the low hanging fruit, and
->   more stack reduction would require significant changes that have the potential
->   to introduce new bugs. However, I do hope to continue to reduce zstd stack
->   usage in future versions.
-> 
-> v3 -> v4:
-> * (3/9) Fix errors and warnings reported by Kernel Test Robot:
->   https://github.com/facebook/zstd/pull/2326
->   - Replace mem.h with a custom kernel implementation that matches the current
->     lib/zstd/mem.h in the kernel. This avoids calls to __builtin_bswap*() which
->     don't work on certain architectures, as exposed by the Kernel Test Robot.
->   - Remove ASAN/MSAN (un)poisoning code which doesn't work in the kernel, as
->     exposed by the Kernel Test Robot.
->   - I've fixed all of the valid cppcheck warnings reported, but there were many
->     false positives, where cppcheck was incorrectly analyzing the situation,
->     which I did not fix. I don't believe it is reasonable to expect that upstream
->     zstd silences all the static analyzer false positives. Upstream zstd uses
->     clang scan-build for its static analysis. We find that supporting multiple
->     static analysis tools multiplies the burden of silencing false positives,
->     without providing enough marginal value over running a single static analysis
->     tool.
-> 
-> v4 -> v5:
-> * Rebase onto v5.10-rc2
-> * (6/9) Merge with other F2FS changes (no functional change in patch).
-> 
-> v5 -> v6:
-> * Rebase onto v5.10-rc6.
-> * Switch to using a kernel style wrapper API as suggested by Cristoph.
-> 
-> v6 -> v7:
-> * Expose the upstream library header as `include/linux/zstd_lib.h`.
->   Instead of creating new structs mirroring the upstream zstd structs
->   use upstream's structs directly with a typedef to get a kernel style name.
->   This removes the memcpy cruft.
-> * (1/3) Undo ZSTD_WINDOWLOG_MAX and handle_zstd_error changes.
-> * (3/3) Expose zstd_errors.h as `include/linux/zstd_errors.h` because it
->   is needed by the kernel wrapper API.
-> 
-> 
-> Nick Terrell (3):
->   lib: zstd: Add kernel-specific API
->   lib: zstd: Add decompress_sources.h for decompress_unzstd
->   lib: zstd: Upgrade to latest upstream zstd version 1.4.6
-> 
->  crypto/zstd.c                                 |   28 +-
->  fs/btrfs/zstd.c                               |   68 +-
->  fs/f2fs/compress.c                            |   56 +-
->  fs/pstore/platform.c                          |    2 +-
->  fs/squashfs/zstd_wrapper.c                    |   16 +-
->  include/linux/zstd.h                          | 1225 +----
->  include/linux/zstd_errors.h                   |   76 +
->  include/linux/zstd_lib.h                      | 2104 +++++++++
->  lib/decompress_unzstd.c                       |   48 +-
->  lib/zstd/Makefile                             |   35 +-
->  lib/zstd/bitstream.h                          |  379 --
->  lib/zstd/common/bitstream.h                   |  437 ++
->  lib/zstd/common/compiler.h                    |  150 +
->  lib/zstd/common/cpu.h                         |  194 +
->  lib/zstd/common/debug.c                       |   24 +
->  lib/zstd/common/debug.h                       |  101 +
->  lib/zstd/common/entropy_common.c              |  355 ++
->  lib/zstd/common/error_private.c               |   55 +
->  lib/zstd/common/error_private.h               |   66 +
->  lib/zstd/common/fse.h                         |  709 +++
->  lib/zstd/common/fse_decompress.c              |  380 ++
->  lib/zstd/common/huf.h                         |  352 ++
->  lib/zstd/common/mem.h                         |  258 +
->  lib/zstd/common/zstd_common.c                 |   83 +
->  lib/zstd/common/zstd_deps.h                   |  124 +
->  lib/zstd/common/zstd_internal.h               |  438 ++
->  lib/zstd/compress.c                           | 3485 --------------
->  lib/zstd/compress/fse_compress.c              |  625 +++
->  lib/zstd/compress/hist.c                      |  165 +
->  lib/zstd/compress/hist.h                      |   75 +
->  lib/zstd/compress/huf_compress.c              |  764 +++
->  lib/zstd/compress/zstd_compress.c             | 4157 +++++++++++++++++
->  lib/zstd/compress/zstd_compress_internal.h    | 1103 +++++
->  lib/zstd/compress/zstd_compress_literals.c    |  158 +
->  lib/zstd/compress/zstd_compress_literals.h    |   29 +
->  lib/zstd/compress/zstd_compress_sequences.c   |  433 ++
->  lib/zstd/compress/zstd_compress_sequences.h   |   54 +
->  lib/zstd/compress/zstd_compress_superblock.c  |  849 ++++
->  lib/zstd/compress/zstd_compress_superblock.h  |   32 +
->  lib/zstd/compress/zstd_cwksp.h                |  465 ++
->  lib/zstd/compress/zstd_double_fast.c          |  521 +++
->  lib/zstd/compress/zstd_double_fast.h          |   32 +
->  lib/zstd/compress/zstd_fast.c                 |  496 ++
->  lib/zstd/compress/zstd_fast.h                 |   31 +
->  lib/zstd/compress/zstd_lazy.c                 | 1138 +++++
->  lib/zstd/compress/zstd_lazy.h                 |   61 +
->  lib/zstd/compress/zstd_ldm.c                  |  619 +++
->  lib/zstd/compress/zstd_ldm.h                  |  104 +
->  lib/zstd/compress/zstd_opt.c                  | 1200 +++++
->  lib/zstd/compress/zstd_opt.h                  |   50 +
->  lib/zstd/decompress.c                         | 2531 ----------
->  lib/zstd/decompress/huf_decompress.c          | 1205 +++++
->  lib/zstd/decompress/zstd_ddict.c              |  241 +
->  lib/zstd/decompress/zstd_ddict.h              |   44 +
->  lib/zstd/decompress/zstd_decompress.c         | 1836 ++++++++
->  lib/zstd/decompress/zstd_decompress_block.c   | 1540 ++++++
->  lib/zstd/decompress/zstd_decompress_block.h   |   62 +
->  .../decompress/zstd_decompress_internal.h     |  195 +
->  lib/zstd/decompress_sources.h                 |   19 +
->  lib/zstd/entropy_common.c                     |  243 -
->  lib/zstd/error_private.h                      |   53 -
->  lib/zstd/fse.h                                |  575 ---
->  lib/zstd/fse_compress.c                       |  795 ----
->  lib/zstd/fse_decompress.c                     |  325 --
->  lib/zstd/huf.h                                |  212 -
->  lib/zstd/huf_compress.c                       |  772 ---
->  lib/zstd/huf_decompress.c                     |  960 ----
->  lib/zstd/mem.h                                |  151 -
->  lib/zstd/zstd_common.c                        |   75 -
->  lib/zstd/zstd_compress_module.c               |  103 +
->  lib/zstd/zstd_decompress_module.c             |   96 +
->  lib/zstd/zstd_internal.h                      |  273 --
->  lib/zstd/zstd_opt.h                           | 1014 ----
->  73 files changed, 24800 insertions(+), 12929 deletions(-)
->  create mode 100644 include/linux/zstd_errors.h
->  create mode 100644 include/linux/zstd_lib.h
->  delete mode 100644 lib/zstd/bitstream.h
->  create mode 100644 lib/zstd/common/bitstream.h
->  create mode 100644 lib/zstd/common/compiler.h
->  create mode 100644 lib/zstd/common/cpu.h
->  create mode 100644 lib/zstd/common/debug.c
->  create mode 100644 lib/zstd/common/debug.h
->  create mode 100644 lib/zstd/common/entropy_common.c
->  create mode 100644 lib/zstd/common/error_private.c
->  create mode 100644 lib/zstd/common/error_private.h
->  create mode 100644 lib/zstd/common/fse.h
->  create mode 100644 lib/zstd/common/fse_decompress.c
->  create mode 100644 lib/zstd/common/huf.h
->  create mode 100644 lib/zstd/common/mem.h
->  create mode 100644 lib/zstd/common/zstd_common.c
->  create mode 100644 lib/zstd/common/zstd_deps.h
->  create mode 100644 lib/zstd/common/zstd_internal.h
->  delete mode 100644 lib/zstd/compress.c
->  create mode 100644 lib/zstd/compress/fse_compress.c
->  create mode 100644 lib/zstd/compress/hist.c
->  create mode 100644 lib/zstd/compress/hist.h
->  create mode 100644 lib/zstd/compress/huf_compress.c
->  create mode 100644 lib/zstd/compress/zstd_compress.c
->  create mode 100644 lib/zstd/compress/zstd_compress_internal.h
->  create mode 100644 lib/zstd/compress/zstd_compress_literals.c
->  create mode 100644 lib/zstd/compress/zstd_compress_literals.h
->  create mode 100644 lib/zstd/compress/zstd_compress_sequences.c
->  create mode 100644 lib/zstd/compress/zstd_compress_sequences.h
->  create mode 100644 lib/zstd/compress/zstd_compress_superblock.c
->  create mode 100644 lib/zstd/compress/zstd_compress_superblock.h
->  create mode 100644 lib/zstd/compress/zstd_cwksp.h
->  create mode 100644 lib/zstd/compress/zstd_double_fast.c
->  create mode 100644 lib/zstd/compress/zstd_double_fast.h
->  create mode 100644 lib/zstd/compress/zstd_fast.c
->  create mode 100644 lib/zstd/compress/zstd_fast.h
->  create mode 100644 lib/zstd/compress/zstd_lazy.c
->  create mode 100644 lib/zstd/compress/zstd_lazy.h
->  create mode 100644 lib/zstd/compress/zstd_ldm.c
->  create mode 100644 lib/zstd/compress/zstd_ldm.h
->  create mode 100644 lib/zstd/compress/zstd_opt.c
->  create mode 100644 lib/zstd/compress/zstd_opt.h
->  delete mode 100644 lib/zstd/decompress.c
->  create mode 100644 lib/zstd/decompress/huf_decompress.c
->  create mode 100644 lib/zstd/decompress/zstd_ddict.c
->  create mode 100644 lib/zstd/decompress/zstd_ddict.h
->  create mode 100644 lib/zstd/decompress/zstd_decompress.c
->  create mode 100644 lib/zstd/decompress/zstd_decompress_block.c
->  create mode 100644 lib/zstd/decompress/zstd_decompress_block.h
->  create mode 100644 lib/zstd/decompress/zstd_decompress_internal.h
->  create mode 100644 lib/zstd/decompress_sources.h
->  delete mode 100644 lib/zstd/entropy_common.c
->  delete mode 100644 lib/zstd/error_private.h
->  delete mode 100644 lib/zstd/fse.h
->  delete mode 100644 lib/zstd/fse_compress.c
->  delete mode 100644 lib/zstd/fse_decompress.c
->  delete mode 100644 lib/zstd/huf.h
->  delete mode 100644 lib/zstd/huf_compress.c
->  delete mode 100644 lib/zstd/huf_decompress.c
->  delete mode 100644 lib/zstd/mem.h
->  delete mode 100644 lib/zstd/zstd_common.c
->  create mode 100644 lib/zstd/zstd_compress_module.c
->  create mode 100644 lib/zstd/zstd_decompress_module.c
->  delete mode 100644 lib/zstd/zstd_internal.h
->  delete mode 100644 lib/zstd/zstd_opt.h
-> 
-> -- 
-> 2.29.2
-> 
+* Self-test of SP800-90A DRBG provided by the Linux kernel crypto API.
 
-So, what's the fate of this submission please?
+* Self-test of the PRNG provided by the Linux kernel crypto API.
 
-Thanks.
+* Raw noise source data testing including SP800-90B compliant
+  tests when enabling CONFIG_LRNG_HEALTH_TESTS
 
+This patch adds the self-tests for the remaining critical functions of
+the LRNG that are essential to maintain entropy and provide
+cryptographic strong random numbers. The following self-tests are
+implemented:
+
+* Self-test of the time array maintenance. This test verifies whether
+the time stamp array management to store multiple values in one integer
+implements a concatenation of the data.
+
+* Self-test of the software hash implementation ensures that this
+function operates compliant to the FIPS 180-4 specification. The
+self-test performs a hash operation of a zeroized per-CPU data array.
+
+* Self-test of the ChaCha20 DRNG is based on the self-tests that are
+already present and implemented with the stand-alone user space
+ChaCha20 DRNG implementation available at [1]. The self-tests cover
+different use cases of the DRNG seeded with known seed data.
+
+The status of the LRNG self-tests is provided with the selftest_status
+SysFS file. If the file contains a zero, the self-tests passed. The
+value 0xffffffff means that the self-tests were not executed. Any other
+value indicates a self-test failure.
+
+The self-test may be compiled to panic the system if the self-test
+fails.
+
+All self-tests operate on private state data structures. This implies
+that none of the self-tests have any impact on the regular LRNG
+operations. This allows the self-tests to be repeated at runtime by
+writing anything into the selftest_status SysFS file.
+
+[1] https://www.chronox.de/chacha20.html
+
+CC: Torsten Duwe <duwe@lst.de>
+CC: "Eric W. Biederman" <ebiederm@xmission.com>
+CC: "Alexander E. Patrakov" <patrakov@gmail.com>
+CC: "Ahmed S. Darwish" <darwish.07@gmail.com>
+CC: "Theodore Y. Ts'o" <tytso@mit.edu>
+CC: Willy Tarreau <w@1wt.eu>
+CC: Matthew Garrett <mjg59@srcf.ucam.org>
+CC: Vito Caputo <vcaputo@pengaru.com>
+CC: Andreas Dilger <adilger.kernel@dilger.ca>
+CC: Jan Kara <jack@suse.cz>
+CC: Ray Strode <rstrode@redhat.com>
+CC: William Jon McCann <mccann@jhu.edu>
+CC: zhangjs <zachary@baishancloud.com>
+CC: Andy Lutomirski <luto@kernel.org>
+CC: Florian Weimer <fweimer@redhat.com>
+CC: Lennart Poettering <mzxreary@0pointer.de>
+CC: Nicolai Stange <nstange@suse.de>
+CC: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+CC: Neil Horman <nhorman@redhat.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ drivers/char/lrng/Kconfig         |  26 +++
+ drivers/char/lrng/Makefile        |   1 +
+ drivers/char/lrng/lrng_selftest.c | 351 ++++++++++++++++++++++++++++++
+ 3 files changed, 378 insertions(+)
+ create mode 100644 drivers/char/lrng/lrng_selftest.c
+
+diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
+index 3e57068ccdff..2a7347e25834 100644
+--- a/drivers/char/lrng/Kconfig
++++ b/drivers/char/lrng/Kconfig
+@@ -374,4 +374,30 @@ config LRNG_TESTING
+ 
+ endif #LRNG_TESTING_MENU
+ 
++config LRNG_SELFTEST
++	bool "Enable power-on and on-demand self-tests"
++	help
++	  The power-on self-tests are executed during boot time
++	  covering the ChaCha20 DRNG, the hash operation used for
++	  processing the entropy pools and the auxiliary pool, and
++	  the time stamp management of the LRNG.
++
++	  The on-demand self-tests are triggered by writing any
++	  value into the SysFS file selftest_status. At the same
++	  time, when reading this file, the test status is
++	  returned. A zero indicates that all tests were executed
++	  successfully.
++
++	  If unsure, say Y.
++
++if LRNG_SELFTEST
++
++config LRNG_SELFTEST_PANIC
++	bool "Panic the kernel upon self-test failure"
++	help
++	  If the option is enabled, the kernel is terminated if an
++	  LRNG power-on self-test failure is detected.
++
++endif # LRNG_SELFTEST
++
+ endif # LRNG
+diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
+index 532501b38a00..a633638af991 100644
+--- a/drivers/char/lrng/Makefile
++++ b/drivers/char/lrng/Makefile
+@@ -17,3 +17,4 @@ obj-$(CONFIG_LRNG_KCAPI)	+= lrng_kcapi.o
+ obj-$(CONFIG_LRNG_JENT)		+= lrng_jent.o
+ obj-$(CONFIG_LRNG_HEALTH_TESTS)	+= lrng_health.o
+ obj-$(CONFIG_LRNG_TESTING)	+= lrng_testing.o
++obj-$(CONFIG_LRNG_SELFTEST)	+= lrng_selftest.o
+diff --git a/drivers/char/lrng/lrng_selftest.c b/drivers/char/lrng/lrng_selftest.c
+new file mode 100644
+index 000000000000..9540424cd073
+--- /dev/null
++++ b/drivers/char/lrng/lrng_selftest.c
+@@ -0,0 +1,351 @@
++// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
++/*
++ * LRNG power-on and on-demand self-test
++ *
++ * Copyright (C) 2016 - 2021, Stephan Mueller <smueller@chronox.de>
++ */
++
++/*
++ * In addition to the self-tests below, the following LRNG components
++ * are covered with self-tests during regular operation:
++ *
++ * * power-on self-test: SP800-90A DRBG provided by the Linux kernel crypto API
++ * * power-on self-test: PRNG provided by the Linux kernel crypto API
++ * * runtime test: Raw noise source data testing including SP800-90B compliant
++ *		   tests when enabling CONFIG_LRNG_HEALTH_TESTS
++ *
++ * Additional developer tests present with LRNG code:
++ * * SP800-90B APT and RCT test enforcement validation when enabling
++ *   CONFIG_LRNG_APT_BROKEN or CONFIG_LRNG_RCT_BROKEN.
++ * * Collection of raw entropy from the interrupt noise source when enabling
++ *   CONFIG_LRNG_TESTING and pulling the data from the kernel with the provided
++ *   interface.
++ */
++
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
++#include <linux/module.h>
++#include <linux/lrng.h>
++#include <linux/slab.h>
++
++#include "lrng_chacha20.h"
++#include "lrng_internal.h"
++#include "lrng_sw_noise.h"
++
++#define LRNG_SELFTEST_PASSED		0
++#define LRNG_SEFLTEST_ERROR_TIME	(1 << 0)
++#define LRNG_SEFLTEST_ERROR_CHACHA20	(1 << 1)
++#define LRNG_SEFLTEST_ERROR_HASH	(1 << 2)
++#define LRNG_SELFTEST_NOT_EXECUTED	0xffffffff
++
++static u32 lrng_data_selftest_ptr = 0;
++static u32 lrng_data_selftest[LRNG_DATA_ARRAY_SIZE];
++
++static unsigned int lrng_selftest_status = LRNG_SELFTEST_NOT_EXECUTED;
++
++static inline void lrng_selftest_bswap32(u32 *ptr, u32 words)
++{
++	u32 i;
++
++	/* Byte-swap data which is an LE representation */
++	for (i = 0; i < words; i++) {
++		__le32 *p = (__le32 *)ptr;
++
++		*p = cpu_to_le32(*ptr);
++		ptr++;
++	}
++}
++
++static inline void lrng_data_process_selftest_insert(u32 time)
++{
++	u32 ptr = lrng_data_selftest_ptr++ & LRNG_DATA_WORD_MASK;
++	unsigned int array = lrng_data_idx2array(ptr);
++	unsigned int slot = lrng_data_idx2slot(ptr);
++
++	/* zeroization of slot to ensure the following OR adds the data */
++	lrng_data_selftest[array] &=
++		~(lrng_data_slot_val(0xffffffff & LRNG_DATA_SLOTSIZE_MASK,
++				     slot));
++	lrng_data_selftest[array] |=
++		lrng_data_slot_val(time & LRNG_DATA_SLOTSIZE_MASK, slot);
++}
++
++static inline void lrng_data_process_selftest_u32(u32 data)
++{
++	u32 pre_ptr, ptr, mask;
++	unsigned int pre_array;
++
++	/* Increment pointer by number of slots taken for input value */
++	lrng_data_selftest_ptr += LRNG_DATA_SLOTS_PER_UINT;
++
++	/* ptr to current unit */
++	ptr = lrng_data_selftest_ptr;
++
++	lrng_pcpu_split_u32(&ptr, &pre_ptr, &mask);
++
++	/* MSB of data go into previous unit */
++	pre_array = lrng_data_idx2array(pre_ptr);
++	/* zeroization of slot to ensure the following OR adds the data */
++	lrng_data_selftest[pre_array] &= ~(0xffffffff &~ mask);
++	lrng_data_selftest[pre_array] |= data & ~mask;
++
++	/* LSB of data go into current unit */
++	lrng_data_selftest[lrng_data_idx2array(ptr)] = data & mask;
++}
++
++static unsigned int lrng_data_process_selftest(void)
++{
++	u32 time;
++	u32 idx_zero_compare = (0 << 0) | (1 << 8) | (2 << 16) | (3 << 24);
++	u32 idx_one_compare  = (4 << 0) | (5 << 8) | (6 << 16) | (7 << 24);
++	u32 idx_last_compare =
++		(((LRNG_DATA_NUM_VALUES - 4) & LRNG_DATA_SLOTSIZE_MASK) << 0)  |
++		(((LRNG_DATA_NUM_VALUES - 3) & LRNG_DATA_SLOTSIZE_MASK) << 8)  |
++		(((LRNG_DATA_NUM_VALUES - 2) & LRNG_DATA_SLOTSIZE_MASK) << 16) |
++		(((LRNG_DATA_NUM_VALUES - 1) & LRNG_DATA_SLOTSIZE_MASK) << 24);
++
++	(void)idx_one_compare;
++
++	/* "poison" the array to verify the operation of the zeroization */
++	lrng_data_selftest[0] = 0xffffffff;
++	lrng_data_selftest[1] = 0xffffffff;
++
++	lrng_data_process_selftest_insert(0);
++	/*
++	 * Note, when using lrng_data_process_u32() on unaligned ptr,
++	 * the first slots will go into next word, and the last slots go
++	 * into the previous word.
++	 */
++	lrng_data_process_selftest_u32((4 << 0) | (1 << 8) | (2 << 16) |
++				       (3 << 24));
++	lrng_data_process_selftest_insert(5);
++	lrng_data_process_selftest_insert(6);
++	lrng_data_process_selftest_insert(7);
++
++	if ((lrng_data_selftest[0] != idx_zero_compare) ||
++	    (lrng_data_selftest[1] != idx_one_compare))
++		goto err;
++
++	/* Reset for next test */
++	lrng_data_selftest[0] = 0;
++	lrng_data_selftest[1] = 0;
++	lrng_data_selftest_ptr = 0;
++
++	for (time = 0; time < LRNG_DATA_NUM_VALUES; time++)
++		lrng_data_process_selftest_insert(time);
++
++	if ((lrng_data_selftest[0] != idx_zero_compare) ||
++	    (lrng_data_selftest[1] != idx_one_compare)  ||
++	    (lrng_data_selftest[LRNG_DATA_ARRAY_SIZE - 1] != idx_last_compare))
++		goto err;
++
++	return LRNG_SELFTEST_PASSED;
++
++err:
++	pr_err("LRNG data array self-test FAILED\n");
++	return LRNG_SEFLTEST_ERROR_TIME;
++}
++
++/* The test vectors are taken from crypto/testmgr.h */
++static unsigned int lrng_hash_selftest(void)
++{
++	SHASH_DESC_ON_STACK(shash, NULL);
++	const struct lrng_crypto_cb *crypto_cb = &lrng_cc20_crypto_cb;
++	static const u8 lrng_hash_selftest_result[] =
++#ifdef CONFIG_CRYPTO_LIB_SHA256
++		{ 0xba, 0x78, 0x16, 0xbf, 0x8f, 0x01, 0xcf, 0xea,
++		  0x41, 0x41, 0x40, 0xde, 0x5d, 0xae, 0x22, 0x23,
++		  0xb0, 0x03, 0x61, 0xa3, 0x96, 0x17, 0x7a, 0x9c,
++		  0xb4, 0x10, 0xff, 0x61, 0xf2, 0x00, 0x15, 0xad };
++#else /* CONFIG_CRYPTO_LIB_SHA256 */
++		{ 0xa9, 0x99, 0x3e, 0x36, 0x47, 0x06, 0x81, 0x6a, 0xba, 0x3e,
++		  0x25, 0x71, 0x78, 0x50, 0xc2, 0x6c, 0x9c, 0xd0, 0xd8, 0x9d };
++#endif /* CONFIG_CRYPTO_LIB_SHA256 */
++	static const u8 hash_input[] = { 0x61, 0x62, 0x63 }; /* "abc" */
++	u8 digest[sizeof(lrng_hash_selftest_result)] __aligned(sizeof(u32));
++
++	BUG_ON(sizeof(digest) != crypto_cb->lrng_hash_digestsize(NULL));
++
++	if (!crypto_cb->lrng_hash_init(shash, NULL) &&
++	    !crypto_cb->lrng_hash_update(shash, hash_input,
++					 sizeof(hash_input)) &&
++	    !crypto_cb->lrng_hash_final(shash, digest) &&
++	    !memcmp(digest, lrng_hash_selftest_result, sizeof(digest)))
++		return 0;
++
++	pr_err("LRNG %s Hash self-test FAILED\n", crypto_cb->lrng_hash_name());
++	return LRNG_SEFLTEST_ERROR_HASH;
++}
++
++/*
++ * The test vectors were generated using the ChaCha20 DRNG from
++ * https://www.chronox.de/chacha20.html
++ */
++static unsigned int lrng_chacha20_drng_selftest(void)
++{
++	const struct lrng_crypto_cb *crypto_cb = &lrng_cc20_crypto_cb;
++	u8 seed[CHACHA_KEY_SIZE * 2] = {
++		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
++		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
++		0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
++		0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
++		0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
++		0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
++		0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
++	};
++	struct chacha20_block chacha20;
++	int ret;
++	u8 outbuf[CHACHA_KEY_SIZE * 2] __aligned(sizeof(u32));
++
++	/*
++	 * Expected result when ChaCha20 DRNG state is zero:
++	 *	* constants are set to "expand 32-byte k"
++	 *	* remaining state is 0
++	 * and pulling one half ChaCha20 DRNG block.
++	 */
++	static const u8 expected_halfblock[CHACHA_KEY_SIZE] = {
++		0x76, 0xb8, 0xe0, 0xad, 0xa0, 0xf1, 0x3d, 0x90,
++		0x40, 0x5d, 0x6a, 0xe5, 0x53, 0x86, 0xbd, 0x28,
++		0xbd, 0xd2, 0x19, 0xb8, 0xa0, 0x8d, 0xed, 0x1a,
++		0xa8, 0x36, 0xef, 0xcc, 0x8b, 0x77, 0x0d, 0xc7 };
++
++	/*
++	 * Expected result when ChaCha20 DRNG state is zero:
++	 *	* constants are set to "expand 32-byte k"
++	 *	* remaining state is 0
++	 * followed by a reseed with two keyblocks
++	 *	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++	 *	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
++	 *	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
++	 *	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
++	 *	0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
++	 *	0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
++	 *	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
++	 *	0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f
++	 * and pulling one ChaCha20 DRNG block.
++	 */
++	static const u8 expected_oneblock[CHACHA_KEY_SIZE * 2] = {
++		0xf5, 0xb4, 0xb6, 0x5a, 0xec, 0xcd, 0x5a, 0x65,
++		0x87, 0x56, 0xe3, 0x86, 0x51, 0x54, 0xfc, 0x90,
++		0x56, 0xff, 0x5e, 0xae, 0x58, 0xf2, 0x01, 0x88,
++		0xb1, 0x7e, 0xb8, 0x2e, 0x17, 0x9a, 0x27, 0xe6,
++		0x86, 0xb3, 0xed, 0x33, 0xf7, 0xb9, 0x06, 0x05,
++		0x8a, 0x2d, 0x1a, 0x93, 0xc9, 0x0b, 0x80, 0x04,
++		0x03, 0xaa, 0x60, 0xaf, 0xd5, 0x36, 0x40, 0x11,
++		0x67, 0x89, 0xb1, 0x66, 0xd5, 0x88, 0x62, 0x6d };
++
++	/*
++	 * Expected result when ChaCha20 DRNG state is zero:
++	 *	* constants are set to "expand 32-byte k"
++	 *	* remaining state is 0
++	 * followed by a reseed with one key block plus one byte
++	 *	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++	 *	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
++	 *	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
++	 *	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
++	 *	0x20
++	 * and pulling less than one ChaCha20 DRNG block.
++	 */
++	static const u8 expected_block_nonalinged[CHACHA_KEY_SIZE + 4] = {
++		0x9d, 0xdd, 0x4f, 0xbe, 0x97, 0xcd, 0x8e, 0x15,
++		0xb3, 0xc4, 0x1a, 0x17, 0x49, 0x29, 0x32, 0x7c,
++		0xb3, 0x84, 0xa4, 0x9b, 0xa7, 0x14, 0xb3, 0xc1,
++		0x5b, 0x3b, 0xfb, 0xa1, 0xe4, 0x23, 0x42, 0x8e,
++		0x08, 0x1f, 0x53, 0xa2 };
++
++	BUILD_BUG_ON(sizeof(seed) % sizeof(u32));
++
++	memset(&chacha20, 0, sizeof(chacha20));
++	lrng_cc20_init_rfc7539(&chacha20);
++	lrng_selftest_bswap32((u32 *)seed, sizeof(seed) / sizeof(u32));
++
++	/* Generate with zero state */
++	ret = crypto_cb->lrng_drng_generate_helper(&chacha20, outbuf,
++						   sizeof(expected_halfblock));
++	if (ret != sizeof(expected_halfblock))
++		goto err;
++	if (memcmp(outbuf, expected_halfblock, sizeof(expected_halfblock)))
++		goto err;
++
++	/* Clear state of DRNG */
++	memset(&chacha20.key.u[0], 0, 48);
++
++	/* Reseed with 2 key blocks */
++	ret = crypto_cb->lrng_drng_seed_helper(&chacha20, seed,
++					       sizeof(expected_oneblock));
++	if (ret < 0)
++		goto err;
++	ret = crypto_cb->lrng_drng_generate_helper(&chacha20, outbuf,
++						   sizeof(expected_oneblock));
++	if (ret != sizeof(expected_oneblock))
++		goto err;
++	if (memcmp(outbuf, expected_oneblock, sizeof(expected_oneblock)))
++		goto err;
++
++	/* Clear state of DRNG */
++	memset(&chacha20.key.u[0], 0, 48);
++
++	/* Reseed with 1 key block and one byte */
++	ret = crypto_cb->lrng_drng_seed_helper(&chacha20, seed,
++					sizeof(expected_block_nonalinged));
++	if (ret < 0)
++		goto err;
++	ret = crypto_cb->lrng_drng_generate_helper(&chacha20, outbuf,
++					sizeof(expected_block_nonalinged));
++	if (ret != sizeof(expected_block_nonalinged))
++		goto err;
++	if (memcmp(outbuf, expected_block_nonalinged,
++		   sizeof(expected_block_nonalinged)))
++		goto err;
++
++	return LRNG_SELFTEST_PASSED;
++
++err:
++	pr_err("LRNG ChaCha20 DRNG self-test FAILED\n");
++	return LRNG_SEFLTEST_ERROR_CHACHA20;
++}
++
++static int lrng_selftest(void)
++{
++	unsigned int ret = lrng_data_process_selftest();
++
++	ret |= lrng_chacha20_drng_selftest();
++	ret |= lrng_hash_selftest();
++
++	if (ret) {
++		if (IS_ENABLED(CONFIG_LRNG_SELFTEST_PANIC))
++			panic("LRNG self-tests failed: %u\n", ret);
++	} else {
++		pr_info("LRNG self-tests passed\n");
++	}
++
++	lrng_selftest_status = ret;
++
++	if (lrng_selftest_status)
++		return -EFAULT;
++	return 0;
++}
++
++#ifdef CONFIG_SYSFS
++/* Re-perform self-test when any value is written to the sysfs file. */
++static int lrng_selftest_sysfs_set(const char *val,
++				   const struct kernel_param *kp)
++{
++	return lrng_selftest();
++}
++
++static const struct kernel_param_ops lrng_selftest_sysfs = {
++	.set = lrng_selftest_sysfs_set,
++	.get = param_get_uint,
++};
++module_param_cb(selftest_status, &lrng_selftest_sysfs, &lrng_selftest_status,
++		0644);
++#endif	/* CONFIG_SYSFS */
++
++static int __init lrng_selftest_init(void)
++{
++	return lrng_selftest();
++}
++
++module_init(lrng_selftest_init);
 -- 
-  Oleksandr Natalenko (post-factum)
+2.29.2
+
+
+
+
