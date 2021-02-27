@@ -2,83 +2,76 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 734E9C433DB
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Feb 2021 17:41:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C108C433E6
+	for <linux-crypto@archiver.kernel.org>; Sat, 27 Feb 2021 03:36:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 35DF164F22
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Feb 2021 17:41:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12FF564F1F
+	for <linux-crypto@archiver.kernel.org>; Sat, 27 Feb 2021 03:36:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229999AbhBZRks convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Feb 2021 12:40:48 -0500
-Received: from mail-io1-f70.google.com ([209.85.166.70]:34495 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229586AbhBZRkq (ORCPT
+        id S230014AbhB0DgL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 Feb 2021 22:36:11 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:12213 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229967AbhB0DgL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Feb 2021 12:40:46 -0500
-Received: by mail-io1-f70.google.com with SMTP id c3so7798572ioa.1
-        for <linux-crypto@vger.kernel.org>; Fri, 26 Feb 2021 09:40:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to:content-transfer-encoding;
-        bh=PQUkYOPypd5QA7wH0ZiOCBAtaTuHt1m0uYa+QbCHJ6U=;
-        b=uepZrno6IeGktAcXhkv/T/cP9fjLmvSrIs4YOXVi12d1SbUU3bS4RwbolmONrGlHgr
-         hSmhZS4ufpw828BxWD+kcl6YfzDdaqZlbEhbZKuhJN665NqkEuHtDbHGlhL2qUGNRNLP
-         Xp9EaxEIqzlQ5CvbGvZ4OUvicdbGJsMK9nOXCl89STUA7rMEWfZrKjUs1Op+I36yfgQx
-         ngi8JoCfuI6AgmA/ey/QJiE47urVnf4h8LyRiTAjW5XSrKqn2h71NUxeNa7s9YrgP5aL
-         o6nqkXS8I2h+xSsZ57ZIUiJYHieQb+GM4NxMB63dHw7wbvsrC2hC3VeCOO4m3tD5mGR/
-         ULqw==
-X-Gm-Message-State: AOAM531JGocHBLP1ioKnS3quw620snZtEnoVopu2MNTxapTGBh6GE15w
-        r+razT6yhKKIts1qg6FzxLMFW+PdBivDP0Hlt2TEqrWYWfpv
-X-Google-Smtp-Source: ABdhPJwjcrDY3M3NySdVXsyY9Thnn/YytagkgN3LVwDBc1JZluRM0uR02sC/B0mrZ5cqBEHumS98eeNLfegZzpqZCSWbSUsV2Gd/
+        Fri, 26 Feb 2021 22:36:11 -0500
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DnXDN4xGGzlNm5;
+        Sat, 27 Feb 2021 11:33:24 +0800 (CST)
+Received: from [10.67.103.10] (10.67.103.10) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.498.0; Sat, 27 Feb 2021
+ 11:35:25 +0800
+Subject: Re: [PATCH v9 9/9] certs: Add support for using elliptic curve keys
+ for signing modules
+To:     Stefan Berger <stefanb@linux.vnet.ibm.com>,
+        <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <davem@davemloft.net>, <herbert@gondor.apana.org.au>,
+        <dhowells@redhat.com>, <zohar@linux.ibm.com>
+CC:     <linux-kernel@vger.kernel.org>, <patrick@puiterwijk.org>,
+        <linux-integrity@vger.kernel.org>,
+        Stefan Berger <stefanb@linux.ibm.com>
+References: <20210225160802.2478700-1-stefanb@linux.vnet.ibm.com>
+ <20210225160802.2478700-10-stefanb@linux.vnet.ibm.com>
+From:   yumeng <yumeng18@huawei.com>
+Message-ID: <ce098224-893c-fba8-5995-a7bac90f82c2@huawei.com>
+Date:   Sat, 27 Feb 2021 11:35:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:f06:: with SMTP id x6mr3067247ilj.287.1614361205201;
- Fri, 26 Feb 2021 09:40:05 -0800 (PST)
-Date:   Fri, 26 Feb 2021 09:40:05 -0800
-In-Reply-To: <000000000000b2d35705b7f31599@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000002ce0d905bc40c2df@google.com>
-Subject: Re: INFO: task hung in virtio_cleanup
-From:   syzbot <syzbot+1db88381b64aaa929ef6@syzkaller.appspotmail.com>
-To:     andreyknvl@google.com, benjamin.tissoires@redhat.com,
-        gregkh@linuxfoundation.org, hdanton@sina.com,
-        herbert@gondor.apana.org.au, jikos@kernel.org, jkosina@suse.cz,
-        linux-crypto@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-        mpm@selenic.com, mst@redhat.com, rafael@kernel.org,
-        rikard.falkeborn@gmail.com, sammko@sammserver.com,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <20210225160802.2478700-10-stefanb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.103.10]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-syzbot has bisected this issue to:
 
-commit 77a36a3ab4ff17fad23831192e3694a3c5a1750d
-Author: Samuel ÄŒavoj <sammko@sammserver.com>
-Date:   Fri Mar 13 02:12:38 2020 +0000
+ÔÚ 2021/2/26 0:08, Stefan Berger Ð´µÀ:
+> From: Stefan Berger <stefanb@linux.ibm.com>
+> 
 
-    HID: Add driver fixing Glorious PC Gaming Race mouse report descriptor
+> diff --git a/certs/Makefile b/certs/Makefile
+> index 3fe6b73786fa..c487d7021c54 100644
+> --- a/certs/Makefile
+> +++ b/certs/Makefile
+> @@ -69,6 +69,18 @@ else
+>   SIGNER = -signkey $(obj)/signing_key.key
+>   endif # CONFIG_IMA_APPRAISE_MODSIG
+>   
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=129959ccd00000
-start commit:   f40ddce8 Linux 5.11
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=119959ccd00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=169959ccd00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e53d04227c52a0df
-dashboard link: https://syzkaller.appspot.com/bug?extid=1db88381b64aaa929ef6
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12277728d00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1135e198d00000
+Is there anything wrong in this patch?
+I can't apply it when I use 'git am '.
+errors like below:
 
-Reported-by: syzbot+1db88381b64aaa929ef6@syzkaller.appspotmail.com
-Fixes: 77a36a3ab4ff ("HID: Add driver fixing Glorious PC Gaming Race mouse report descriptor")
+error: certs/Kconfig: does not match index
+error: patch failed: certs/Makefile:69
+error: certs/Makefile: patch does not apply
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Thanks
