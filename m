@@ -2,66 +2,66 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A737C433DB
-	for <linux-crypto@archiver.kernel.org>; Sat, 27 Feb 2021 13:45:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3BB7C433E0
+	for <linux-crypto@archiver.kernel.org>; Sat, 27 Feb 2021 13:45:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C619664EB7
-	for <linux-crypto@archiver.kernel.org>; Sat, 27 Feb 2021 13:45:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C46A64EBC
+	for <linux-crypto@archiver.kernel.org>; Sat, 27 Feb 2021 13:45:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230122AbhB0NpN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 27 Feb 2021 08:45:13 -0500
-Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.82]:28983 "EHLO
-        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229912AbhB0NpI (ORCPT
+        id S229912AbhB0Npb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 27 Feb 2021 08:45:31 -0500
+Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.177]:27120 "EHLO
+        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230102AbhB0Npa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 27 Feb 2021 08:45:08 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1614433243; cv=none;
+        Sat, 27 Feb 2021 08:45:30 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1614433259; cv=none;
     d=strato.com; s=strato-dkim-0002;
-    b=WiPmoGpFFYay1lk0Q1WajIxyP0KkBn6MBPQh0GF3SBapv5xpiKMjdIGaig3Y8XJ4e1
-    fUg8vVyX+CUBdkyVisRMsnKvMdt4XiHj42v4BkYRYAtzQ6uiVyQMOZBNxCBuSRtfgWIp
-    LmQ0wsYffILZ/HOMrwhh+Cv9UOqLDgrS/Tvx0TzIvoC3DMES0LD3uNVe3xJBLK9xZQQX
-    gE1Iy60Gd1QUWvbuNTVE956EWB83R1IAjbrt4ZvGg9sAQH1wbzBdW3/jJ3v4IeSUi1XK
-    XDp76a2r2ShNHgsgye+9eUGATC70OwJ751tAn5AAd06ypGKUlhBsVPb1gNMQc07uGOGE
-    YCSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1614433243;
+    b=OKJbVmiU9Z89hzfbqyHcD6e198GO2JUfUGoZgxRfFFUp9vVPZjE9JcS8z6BEba3CvE
+    2Ub2Qc4vk4cEPXqlQE7ewyLclJSUfkPXpAyo0zF0rO1sCeUHRgMGJMhqKgveAfprhz9P
+    tMEcA2zyVMYaaXO60JU4r6bFgDD+e6IcsYjq+GIUvCYnG4V12jwDIrZe+U0WVfhuiGcX
+    No+/2OkTS1B5XoF/MQqeh9kjqG2lF/KZvLRZOPyHFoJngw6f2VwTkamsUhV81NOJir1v
+    4bFmhYYY7/9AvIH2a5ZVICYJvHokwkarH4bL5u4c9G5A8G/F0JXUin6o7vw/KuARK86c
+    Ubfg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1614433259;
     s=strato-dkim-0002; d=strato.com;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=h27lAza3jPNukzH1apwBhF2m7iUz+7DFBLmWxmFr4v4=;
-    b=tpuHfeWJZUSaUwUq9aH+LwDMAGpMmdDes52bzBwxsEqZ1/PvFX3nhZsYPayiNbSIlc
-    gmHPbXzjFc6YP0GUBdN1Zrp335BD1UDVYFpWtTdC1KfofLtPUavVb8UKWcuO3pvc5KoJ
-    HEO9sWhmYw8CRyAeL6I0ib3E84JI9L9+e4zCyuDB3RWErLI3BrphnUcM9YDtMhVjI17s
-    1Z0GkwyTyaD+EQ0dyP36DWLLYK9zaD60DuBMloYGzsz5EZsvC3FI81e8s7EZk5848wNq
-    rJ9qBJXEkiiA8e9MBINFDM+57AVh5bMH5zRRRjkfc+bSGzluIZzdKXztNNoNmKsoS2MP
-    kRRA==
+    bh=bVwbrLTWDiRymsY9m3ShBMD93WrfDDhmROGLTUcpmO8=;
+    b=qsOGc4Vh5uFxfJ40zcRH3CVYsOSK1i3he5uUy+MzvJ04mZA9ig6cus8R0dBJ9U2OYt
+    tDzaswRx75cN5VGWT3kX4R9SC6i7ADjaL7iQNCBFdkhrrevy82UHafRmAt6Mvb3WgkbN
+    Rz6E5Q0L8akwcR2o+3wkW1JuUWl8W1jCK0s4pC1/F/VR+REoP94Ze0K0IB061UeFVlLL
+    d4tn9ZqZCkLvdEWNxVwHnTPFI73yOjAyfuGXbPMGWm0tg8kBNq0rtal4kfxGMFvsFNvb
+    pY92ni+bAEOvRvcyB3KX3oJzNrxB6anKX9T4Y2OW9mPcEjv1xA/eNLdbF5zGnsCLGxYI
+    SFvQ==
 ARC-Authentication-Results: i=1; strato.com;
     dkim=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1614433243;
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1614433259;
     s=strato-dkim-0002; d=chronox.de;
     h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
     From:Subject:Sender;
-    bh=h27lAza3jPNukzH1apwBhF2m7iUz+7DFBLmWxmFr4v4=;
-    b=AYCDich0q5Ci3et57yM1yD8B7DLbvyer9/M10WSbinI2PUKCO67dDJ2soalekTcxF+
-    AkDHWQ6D8BWHWyQt0FNCTnU4An9+WDBrE+hwiVic6mwEbsl9+CTx7ZO2+6dARgdj0Mw1
-    KrMW+Hw9LKrnDaFOkXyhNvSsR0ut/AM7H7gVrylNG7/K11pU7OjiZ4YzCLcSrlp1gchn
-    4A2bFbiB6dp3YesQ4ljbzoLhNVh6ufD4llpp6WdEjPbJnY7QpMHhcW9hzvrb2TOIr0Zh
-    dMRt+UH9vYSGYIF+9ALjz5rfSFhXeE5Lzk/4NTwo9NqzfoGz6UYSTC4m5tuRfOwGGWka
-    gJGA==
+    bh=bVwbrLTWDiRymsY9m3ShBMD93WrfDDhmROGLTUcpmO8=;
+    b=S1Is8ss7+yjX5AZa7qIl666SGjAR5y2+fKNMR8n7nxyxXJyNpGzLuj3tedEjF8m66U
+    bFMiJM1Q0txWHV/uHm7LHzgqS34+uHvQ9eXCKC6JJp8azB1ubRJFlGRnMoDc01zXyj6f
+    Gx2mAsPJIYTR/5HGaFFA6zABJkXrlTrRWSdj8bx0Oz08cSE7jpol6CffkSrL8fEsJ0L1
+    6WNIRRF9YUztDSmENj3NoOUeDSPblNF0TVtFCS//4YBPkkNChFAKypIj79jEKv2h+4MO
+    kkMQzTXOZtA2YHwGbC4a6GZtJZj0WqTWsekY8jHIu86XMv/9gNUJ5AL4AxVtmstSvuEd
+    Jyqw==
 Authentication-Results: strato.com;
     dkim=none
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZIfSc8k+7"
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
     by smtp.strato.de (RZmta 47.19.0 DYNA|AUTH)
-    with ESMTPSA id 608030x1RDefUD7
+    with ESMTPSA id 608030x1RDewUDI
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-    Sat, 27 Feb 2021 14:40:41 +0100 (CET)
+    Sat, 27 Feb 2021 14:40:58 +0100 (CET)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Tso Ted <tytso@mit.edu>, linux-crypto@vger.kernel.org
 Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
@@ -91,59 +91,48 @@ Cc:     Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Petr Tesarik <ptesarik@suse.cz>,
         John Haxby <john.haxby@oracle.com>
-Subject: [PATCH v38 13/13] LRNG - add power-on and runtime self-tests
-Date:   Sat, 27 Feb 2021 14:40:05 +0100
-Message-ID: <2911737.CbtlEUcBR6@positron.chronox.de>
+Subject: [PATCH v38 03/13] LRNG - sysctls and /proc interface
+Date:   Sat, 27 Feb 2021 14:35:35 +0100
+Message-ID: <3408825.R56niFO833@positron.chronox.de>
 In-Reply-To: <3277560.QJadu78ljV@positron.chronox.de>
 References: <3277560.QJadu78ljV@positron.chronox.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Parts of the LRNG are already covered by self-tests, including:
+The LRNG sysctl interface provides the same controls as the existing
+/dev/random implementation. These sysctls behave identically and are
+implemented identically. The goal is to allow a possible merge of the
+existing /dev/random implementation with this implementation which
+implies that this patch tries have a very close similarity. Yet, all
+sysctls are documented at [1].
 
-* Self-test of SP800-90A DRBG provided by the Linux kernel crypto API.
+In addition, it provides the file lrng_type which provides details about
+the LRNG:
 
-* Self-test of the PRNG provided by the Linux kernel crypto API.
+=2D the name of the DRNG that produces the random numbers for /dev/random,
+/dev/urandom, getrandom(2)
 
-* Raw noise source data testing including SP800-90B compliant
-  tests when enabling CONFIG_LRNG_HEALTH_TESTS
+=2D the hash used to produce random numbers from the entropy pool
 
-This patch adds the self-tests for the remaining critical functions of
-the LRNG that are essential to maintain entropy and provide
-cryptographic strong random numbers. The following self-tests are
-implemented:
+=2D the number of secondary DRNG instances
 
-* Self-test of the time array maintenance. This test verifies whether
-the time stamp array management to store multiple values in one integer
-implements a concatenation of the data.
+=2D indicator whether the LRNG operates SP800-90B compliant
 
-* Self-test of the software hash implementation ensures that this
-function operates compliant to the FIPS 180-4 specification. The
-self-test performs a hash operation of a zeroized per-CPU data array.
+=2D indicator whether a high-resolution timer is identified - only with a
+high-resolution timer the interrupt noise source will deliver sufficient
+entropy
 
-* Self-test of the ChaCha20 DRNG is based on the self-tests that are
-already present and implemented with the stand-alone user space
-ChaCha20 DRNG implementation available at [1]. The self-tests cover
-different use cases of the DRNG seeded with known seed data.
+=2D indicator whether the LRNG has been minimally seeded (i.e. is the
+secondary DRNG seeded with at least 128 bits of of entropy)
 
-The status of the LRNG self-tests is provided with the selftest_status
-SysFS file. If the file contains a zero, the self-tests passed. The
-value 0xffffffff means that the self-tests were not executed. Any other
-value indicates a self-test failure.
+=2D indicator whether the LRNG has been fully seeded (i.e. is the
+secondary DRNG seeded with at least 256 bits of entropy)
 
-The self-test may be compiled to panic the system if the self-test
-fails.
-
-All self-tests operate on private state data structures. This implies
-that none of the self-tests have any impact on the regular LRNG
-operations. This allows the self-tests to be repeated at runtime by
-writing anything into the selftest_status SysFS file.
-
-[1] https://www.chronox.de/chacha20.html
+[1] https://www.chronox.de/lrng.html
 
 CC: Torsten Duwe <duwe@lst.de>
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
@@ -162,418 +151,255 @@ CC: Andy Lutomirski <luto@kernel.org>
 CC: Florian Weimer <fweimer@redhat.com>
 CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
-CC: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-CC: Neil Horman <nhorman@redhat.com>
+Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
+Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
+Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Tested-by: Neil Horman <nhorman@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- drivers/char/lrng/Kconfig         |  26 +++
- drivers/char/lrng/Makefile        |   1 +
- drivers/char/lrng/lrng_selftest.c | 351 ++++++++++++++++++++++++++++++
- 3 files changed, 378 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_selftest.c
+=2D--
+ drivers/char/lrng/Makefile          |   1 +
+ drivers/char/lrng/lrng_interfaces.c |   2 -
+ drivers/char/lrng/lrng_internal.h   |   4 +
+ drivers/char/lrng/lrng_proc.c       | 184 ++++++++++++++++++++++++++++
+ 4 files changed, 189 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/char/lrng/lrng_proc.c
 
-diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-index 3e57068ccdff..2a7347e25834 100644
---- a/drivers/char/lrng/Kconfig
-+++ b/drivers/char/lrng/Kconfig
-@@ -374,4 +374,30 @@ config LRNG_TESTING
- 
- endif #LRNG_TESTING_MENU
- 
-+config LRNG_SELFTEST
-+	bool "Enable power-on and on-demand self-tests"
-+	help
-+	  The power-on self-tests are executed during boot time
-+	  covering the ChaCha20 DRNG, the hash operation used for
-+	  processing the entropy pools and the auxiliary pool, and
-+	  the time stamp management of the LRNG.
-+
-+	  The on-demand self-tests are triggered by writing any
-+	  value into the SysFS file selftest_status. At the same
-+	  time, when reading this file, the test status is
-+	  returned. A zero indicates that all tests were executed
-+	  successfully.
-+
-+	  If unsure, say Y.
-+
-+if LRNG_SELFTEST
-+
-+config LRNG_SELFTEST_PANIC
-+	bool "Panic the kernel upon self-test failure"
-+	help
-+	  If the option is enabled, the kernel is terminated if an
-+	  LRNG power-on self-test failure is detected.
-+
-+endif # LRNG_SELFTEST
-+
- endif # LRNG
 diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 532501b38a00..a633638af991 100644
---- a/drivers/char/lrng/Makefile
+index 29724c65287d..ac97f0b11cb7 100644
+=2D-- a/drivers/char/lrng/Makefile
 +++ b/drivers/char/lrng/Makefile
-@@ -17,3 +17,4 @@ obj-$(CONFIG_LRNG_KCAPI)	+= lrng_kcapi.o
- obj-$(CONFIG_LRNG_JENT)		+= lrng_jent.o
- obj-$(CONFIG_LRNG_HEALTH_TESTS)	+= lrng_health.o
- obj-$(CONFIG_LRNG_TESTING)	+= lrng_testing.o
-+obj-$(CONFIG_LRNG_SELFTEST)	+= lrng_selftest.o
-diff --git a/drivers/char/lrng/lrng_selftest.c b/drivers/char/lrng/lrng_selftest.c
+@@ -9,3 +9,4 @@ obj-y				+=3D lrng_pool.o lrng_aux.o \
+ 				   lrng_interfaces.o
+=20
+ obj-$(CONFIG_NUMA)		+=3D lrng_numa.o
++obj-$(CONFIG_SYSCTL)		+=3D lrng_proc.o
+diff --git a/drivers/char/lrng/lrng_interfaces.c b/drivers/char/lrng/lrng_i=
+nterfaces.c
+index efcadcfa79f2..8121ba495844 100644
+=2D-- a/drivers/char/lrng/lrng_interfaces.c
++++ b/drivers/char/lrng/lrng_interfaces.c
+@@ -38,8 +38,6 @@ static DECLARE_WAIT_QUEUE_HEAD(lrng_write_wait);
+ static DECLARE_WAIT_QUEUE_HEAD(lrng_init_wait);
+ static struct fasync_struct *fasync;
+=20
+=2Dstruct ctl_table random_table[];
+=2D
+ /********************************** Helper *******************************=
+****/
+=20
+ /* Is the DRNG seed level too low? */
+diff --git a/drivers/char/lrng/lrng_internal.h b/drivers/char/lrng/lrng_int=
+ernal.h
+index 1bfb3710c767..0a9af852a8fe 100644
+=2D-- a/drivers/char/lrng/lrng_internal.h
++++ b/drivers/char/lrng/lrng_internal.h
+@@ -108,7 +108,11 @@ void lrng_cc20_init_state_boot(struct chacha20_state *=
+state);
+=20
+ /********************************** /proc ********************************=
+*****/
+=20
++#ifdef CONFIG_SYSCTL
++void lrng_pool_inc_numa_node(void);
++#else
+ static inline void lrng_pool_inc_numa_node(void) { }
++#endif
+=20
+ /****************************** LRNG interfaces **************************=
+*****/
+=20
+diff --git a/drivers/char/lrng/lrng_proc.c b/drivers/char/lrng/lrng_proc.c
 new file mode 100644
-index 000000000000..9540424cd073
---- /dev/null
-+++ b/drivers/char/lrng/lrng_selftest.c
-@@ -0,0 +1,351 @@
+index 000000000000..244681679b39
+=2D-- /dev/null
++++ b/drivers/char/lrng/lrng_proc.c
+@@ -0,0 +1,184 @@
 +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
 +/*
-+ * LRNG power-on and on-demand self-test
++ * LRNG proc and sysctl interfaces
 + *
 + * Copyright (C) 2016 - 2021, Stephan Mueller <smueller@chronox.de>
 + */
 +
-+/*
-+ * In addition to the self-tests below, the following LRNG components
-+ * are covered with self-tests during regular operation:
-+ *
-+ * * power-on self-test: SP800-90A DRBG provided by the Linux kernel crypto API
-+ * * power-on self-test: PRNG provided by the Linux kernel crypto API
-+ * * runtime test: Raw noise source data testing including SP800-90B compliant
-+ *		   tests when enabling CONFIG_LRNG_HEALTH_TESTS
-+ *
-+ * Additional developer tests present with LRNG code:
-+ * * SP800-90B APT and RCT test enforcement validation when enabling
-+ *   CONFIG_LRNG_APT_BROKEN or CONFIG_LRNG_RCT_BROKEN.
-+ * * Collection of raw entropy from the interrupt noise source when enabling
-+ *   CONFIG_LRNG_TESTING and pulling the data from the kernel with the provided
-+ *   interface.
-+ */
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/module.h>
 +#include <linux/lrng.h>
-+#include <linux/slab.h>
++#include <linux/proc_fs.h>
++#include <linux/seq_file.h>
++#include <linux/sysctl.h>
++#include <linux/uuid.h>
 +
-+#include "lrng_chacha20.h"
 +#include "lrng_internal.h"
 +#include "lrng_sw_noise.h"
 +
-+#define LRNG_SELFTEST_PASSED		0
-+#define LRNG_SEFLTEST_ERROR_TIME	(1 << 0)
-+#define LRNG_SEFLTEST_ERROR_CHACHA20	(1 << 1)
-+#define LRNG_SEFLTEST_ERROR_HASH	(1 << 2)
-+#define LRNG_SELFTEST_NOT_EXECUTED	0xffffffff
-+
-+static u32 lrng_data_selftest_ptr = 0;
-+static u32 lrng_data_selftest[LRNG_DATA_ARRAY_SIZE];
-+
-+static unsigned int lrng_selftest_status = LRNG_SELFTEST_NOT_EXECUTED;
-+
-+static inline void lrng_selftest_bswap32(u32 *ptr, u32 words)
-+{
-+	u32 i;
-+
-+	/* Byte-swap data which is an LE representation */
-+	for (i = 0; i < words; i++) {
-+		__le32 *p = (__le32 *)ptr;
-+
-+		*p = cpu_to_le32(*ptr);
-+		ptr++;
-+	}
-+}
-+
-+static inline void lrng_data_process_selftest_insert(u32 time)
-+{
-+	u32 ptr = lrng_data_selftest_ptr++ & LRNG_DATA_WORD_MASK;
-+	unsigned int array = lrng_data_idx2array(ptr);
-+	unsigned int slot = lrng_data_idx2slot(ptr);
-+
-+	/* zeroization of slot to ensure the following OR adds the data */
-+	lrng_data_selftest[array] &=
-+		~(lrng_data_slot_val(0xffffffff & LRNG_DATA_SLOTSIZE_MASK,
-+				     slot));
-+	lrng_data_selftest[array] |=
-+		lrng_data_slot_val(time & LRNG_DATA_SLOTSIZE_MASK, slot);
-+}
-+
-+static inline void lrng_data_process_selftest_u32(u32 data)
-+{
-+	u32 pre_ptr, ptr, mask;
-+	unsigned int pre_array;
-+
-+	/* Increment pointer by number of slots taken for input value */
-+	lrng_data_selftest_ptr += LRNG_DATA_SLOTS_PER_UINT;
-+
-+	/* ptr to current unit */
-+	ptr = lrng_data_selftest_ptr;
-+
-+	lrng_pcpu_split_u32(&ptr, &pre_ptr, &mask);
-+
-+	/* MSB of data go into previous unit */
-+	pre_array = lrng_data_idx2array(pre_ptr);
-+	/* zeroization of slot to ensure the following OR adds the data */
-+	lrng_data_selftest[pre_array] &= ~(0xffffffff &~ mask);
-+	lrng_data_selftest[pre_array] |= data & ~mask;
-+
-+	/* LSB of data go into current unit */
-+	lrng_data_selftest[lrng_data_idx2array(ptr)] = data & mask;
-+}
-+
-+static unsigned int lrng_data_process_selftest(void)
-+{
-+	u32 time;
-+	u32 idx_zero_compare = (0 << 0) | (1 << 8) | (2 << 16) | (3 << 24);
-+	u32 idx_one_compare  = (4 << 0) | (5 << 8) | (6 << 16) | (7 << 24);
-+	u32 idx_last_compare =
-+		(((LRNG_DATA_NUM_VALUES - 4) & LRNG_DATA_SLOTSIZE_MASK) << 0)  |
-+		(((LRNG_DATA_NUM_VALUES - 3) & LRNG_DATA_SLOTSIZE_MASK) << 8)  |
-+		(((LRNG_DATA_NUM_VALUES - 2) & LRNG_DATA_SLOTSIZE_MASK) << 16) |
-+		(((LRNG_DATA_NUM_VALUES - 1) & LRNG_DATA_SLOTSIZE_MASK) << 24);
-+
-+	(void)idx_one_compare;
-+
-+	/* "poison" the array to verify the operation of the zeroization */
-+	lrng_data_selftest[0] = 0xffffffff;
-+	lrng_data_selftest[1] = 0xffffffff;
-+
-+	lrng_data_process_selftest_insert(0);
-+	/*
-+	 * Note, when using lrng_data_process_u32() on unaligned ptr,
-+	 * the first slots will go into next word, and the last slots go
-+	 * into the previous word.
-+	 */
-+	lrng_data_process_selftest_u32((4 << 0) | (1 << 8) | (2 << 16) |
-+				       (3 << 24));
-+	lrng_data_process_selftest_insert(5);
-+	lrng_data_process_selftest_insert(6);
-+	lrng_data_process_selftest_insert(7);
-+
-+	if ((lrng_data_selftest[0] != idx_zero_compare) ||
-+	    (lrng_data_selftest[1] != idx_one_compare))
-+		goto err;
-+
-+	/* Reset for next test */
-+	lrng_data_selftest[0] = 0;
-+	lrng_data_selftest[1] = 0;
-+	lrng_data_selftest_ptr = 0;
-+
-+	for (time = 0; time < LRNG_DATA_NUM_VALUES; time++)
-+		lrng_data_process_selftest_insert(time);
-+
-+	if ((lrng_data_selftest[0] != idx_zero_compare) ||
-+	    (lrng_data_selftest[1] != idx_one_compare)  ||
-+	    (lrng_data_selftest[LRNG_DATA_ARRAY_SIZE - 1] != idx_last_compare))
-+		goto err;
-+
-+	return LRNG_SELFTEST_PASSED;
-+
-+err:
-+	pr_err("LRNG data array self-test FAILED\n");
-+	return LRNG_SEFLTEST_ERROR_TIME;
-+}
-+
-+/* The test vectors are taken from crypto/testmgr.h */
-+static unsigned int lrng_hash_selftest(void)
-+{
-+	SHASH_DESC_ON_STACK(shash, NULL);
-+	const struct lrng_crypto_cb *crypto_cb = &lrng_cc20_crypto_cb;
-+	static const u8 lrng_hash_selftest_result[] =
-+#ifdef CONFIG_CRYPTO_LIB_SHA256
-+		{ 0xba, 0x78, 0x16, 0xbf, 0x8f, 0x01, 0xcf, 0xea,
-+		  0x41, 0x41, 0x40, 0xde, 0x5d, 0xae, 0x22, 0x23,
-+		  0xb0, 0x03, 0x61, 0xa3, 0x96, 0x17, 0x7a, 0x9c,
-+		  0xb4, 0x10, 0xff, 0x61, 0xf2, 0x00, 0x15, 0xad };
-+#else /* CONFIG_CRYPTO_LIB_SHA256 */
-+		{ 0xa9, 0x99, 0x3e, 0x36, 0x47, 0x06, 0x81, 0x6a, 0xba, 0x3e,
-+		  0x25, 0x71, 0x78, 0x50, 0xc2, 0x6c, 0x9c, 0xd0, 0xd8, 0x9d };
-+#endif /* CONFIG_CRYPTO_LIB_SHA256 */
-+	static const u8 hash_input[] = { 0x61, 0x62, 0x63 }; /* "abc" */
-+	u8 digest[sizeof(lrng_hash_selftest_result)] __aligned(sizeof(u32));
-+
-+	BUG_ON(sizeof(digest) != crypto_cb->lrng_hash_digestsize(NULL));
-+
-+	if (!crypto_cb->lrng_hash_init(shash, NULL) &&
-+	    !crypto_cb->lrng_hash_update(shash, hash_input,
-+					 sizeof(hash_input)) &&
-+	    !crypto_cb->lrng_hash_final(shash, digest) &&
-+	    !memcmp(digest, lrng_hash_selftest_result, sizeof(digest)))
-+		return 0;
-+
-+	pr_err("LRNG %s Hash self-test FAILED\n", crypto_cb->lrng_hash_name());
-+	return LRNG_SEFLTEST_ERROR_HASH;
-+}
-+
 +/*
-+ * The test vectors were generated using the ChaCha20 DRNG from
-+ * https://www.chronox.de/chacha20.html
++ * This function is used to return both the bootid UUID, and random
++ * UUID.  The difference is in whether table->data is NULL; if it is,
++ * then a new UUID is generated and returned to the user.
++ *
++ * If the user accesses this via the proc interface, the UUID will be
++ * returned as an ASCII string in the standard UUID format; if via the
++ * sysctl system call, as 16 bytes of binary data.
 + */
-+static unsigned int lrng_chacha20_drng_selftest(void)
++static int lrng_proc_do_uuid(struct ctl_table *table, int write,
++			     void *buffer, size_t *lenp, loff_t *ppos)
 +{
-+	const struct lrng_crypto_cb *crypto_cb = &lrng_cc20_crypto_cb;
-+	u8 seed[CHACHA_KEY_SIZE * 2] = {
-+		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-+		0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-+		0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
-+		0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
-+		0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
-+		0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
-+	};
-+	struct chacha20_block chacha20;
-+	int ret;
-+	u8 outbuf[CHACHA_KEY_SIZE * 2] __aligned(sizeof(u32));
++	struct ctl_table fake_table;
++	unsigned char buf[64], tmp_uuid[16], *uuid;
 +
-+	/*
-+	 * Expected result when ChaCha20 DRNG state is zero:
-+	 *	* constants are set to "expand 32-byte k"
-+	 *	* remaining state is 0
-+	 * and pulling one half ChaCha20 DRNG block.
-+	 */
-+	static const u8 expected_halfblock[CHACHA_KEY_SIZE] = {
-+		0x76, 0xb8, 0xe0, 0xad, 0xa0, 0xf1, 0x3d, 0x90,
-+		0x40, 0x5d, 0x6a, 0xe5, 0x53, 0x86, 0xbd, 0x28,
-+		0xbd, 0xd2, 0x19, 0xb8, 0xa0, 0x8d, 0xed, 0x1a,
-+		0xa8, 0x36, 0xef, 0xcc, 0x8b, 0x77, 0x0d, 0xc7 };
-+
-+	/*
-+	 * Expected result when ChaCha20 DRNG state is zero:
-+	 *	* constants are set to "expand 32-byte k"
-+	 *	* remaining state is 0
-+	 * followed by a reseed with two keyblocks
-+	 *	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+	 *	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+	 *	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-+	 *	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-+	 *	0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
-+	 *	0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
-+	 *	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
-+	 *	0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f
-+	 * and pulling one ChaCha20 DRNG block.
-+	 */
-+	static const u8 expected_oneblock[CHACHA_KEY_SIZE * 2] = {
-+		0xf5, 0xb4, 0xb6, 0x5a, 0xec, 0xcd, 0x5a, 0x65,
-+		0x87, 0x56, 0xe3, 0x86, 0x51, 0x54, 0xfc, 0x90,
-+		0x56, 0xff, 0x5e, 0xae, 0x58, 0xf2, 0x01, 0x88,
-+		0xb1, 0x7e, 0xb8, 0x2e, 0x17, 0x9a, 0x27, 0xe6,
-+		0x86, 0xb3, 0xed, 0x33, 0xf7, 0xb9, 0x06, 0x05,
-+		0x8a, 0x2d, 0x1a, 0x93, 0xc9, 0x0b, 0x80, 0x04,
-+		0x03, 0xaa, 0x60, 0xaf, 0xd5, 0x36, 0x40, 0x11,
-+		0x67, 0x89, 0xb1, 0x66, 0xd5, 0x88, 0x62, 0x6d };
-+
-+	/*
-+	 * Expected result when ChaCha20 DRNG state is zero:
-+	 *	* constants are set to "expand 32-byte k"
-+	 *	* remaining state is 0
-+	 * followed by a reseed with one key block plus one byte
-+	 *	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+	 *	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+	 *	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-+	 *	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-+	 *	0x20
-+	 * and pulling less than one ChaCha20 DRNG block.
-+	 */
-+	static const u8 expected_block_nonalinged[CHACHA_KEY_SIZE + 4] = {
-+		0x9d, 0xdd, 0x4f, 0xbe, 0x97, 0xcd, 0x8e, 0x15,
-+		0xb3, 0xc4, 0x1a, 0x17, 0x49, 0x29, 0x32, 0x7c,
-+		0xb3, 0x84, 0xa4, 0x9b, 0xa7, 0x14, 0xb3, 0xc1,
-+		0x5b, 0x3b, 0xfb, 0xa1, 0xe4, 0x23, 0x42, 0x8e,
-+		0x08, 0x1f, 0x53, 0xa2 };
-+
-+	BUILD_BUG_ON(sizeof(seed) % sizeof(u32));
-+
-+	memset(&chacha20, 0, sizeof(chacha20));
-+	lrng_cc20_init_rfc7539(&chacha20);
-+	lrng_selftest_bswap32((u32 *)seed, sizeof(seed) / sizeof(u32));
-+
-+	/* Generate with zero state */
-+	ret = crypto_cb->lrng_drng_generate_helper(&chacha20, outbuf,
-+						   sizeof(expected_halfblock));
-+	if (ret != sizeof(expected_halfblock))
-+		goto err;
-+	if (memcmp(outbuf, expected_halfblock, sizeof(expected_halfblock)))
-+		goto err;
-+
-+	/* Clear state of DRNG */
-+	memset(&chacha20.key.u[0], 0, 48);
-+
-+	/* Reseed with 2 key blocks */
-+	ret = crypto_cb->lrng_drng_seed_helper(&chacha20, seed,
-+					       sizeof(expected_oneblock));
-+	if (ret < 0)
-+		goto err;
-+	ret = crypto_cb->lrng_drng_generate_helper(&chacha20, outbuf,
-+						   sizeof(expected_oneblock));
-+	if (ret != sizeof(expected_oneblock))
-+		goto err;
-+	if (memcmp(outbuf, expected_oneblock, sizeof(expected_oneblock)))
-+		goto err;
-+
-+	/* Clear state of DRNG */
-+	memset(&chacha20.key.u[0], 0, 48);
-+
-+	/* Reseed with 1 key block and one byte */
-+	ret = crypto_cb->lrng_drng_seed_helper(&chacha20, seed,
-+					sizeof(expected_block_nonalinged));
-+	if (ret < 0)
-+		goto err;
-+	ret = crypto_cb->lrng_drng_generate_helper(&chacha20, outbuf,
-+					sizeof(expected_block_nonalinged));
-+	if (ret != sizeof(expected_block_nonalinged))
-+		goto err;
-+	if (memcmp(outbuf, expected_block_nonalinged,
-+		   sizeof(expected_block_nonalinged)))
-+		goto err;
-+
-+	return LRNG_SELFTEST_PASSED;
-+
-+err:
-+	pr_err("LRNG ChaCha20 DRNG self-test FAILED\n");
-+	return LRNG_SEFLTEST_ERROR_CHACHA20;
-+}
-+
-+static int lrng_selftest(void)
-+{
-+	unsigned int ret = lrng_data_process_selftest();
-+
-+	ret |= lrng_chacha20_drng_selftest();
-+	ret |= lrng_hash_selftest();
-+
-+	if (ret) {
-+		if (IS_ENABLED(CONFIG_LRNG_SELFTEST_PANIC))
-+			panic("LRNG self-tests failed: %u\n", ret);
++	uuid =3D table->data;
++	if (!uuid) {
++		uuid =3D tmp_uuid;
++		generate_random_uuid(uuid);
 +	} else {
-+		pr_info("LRNG self-tests passed\n");
++		static DEFINE_SPINLOCK(bootid_spinlock);
++
++		spin_lock(&bootid_spinlock);
++		if (!uuid[8])
++			generate_random_uuid(uuid);
++		spin_unlock(&bootid_spinlock);
 +	}
 +
-+	lrng_selftest_status = ret;
++	sprintf(buf, "%pU", uuid);
 +
-+	if (lrng_selftest_status)
-+		return -EFAULT;
++	fake_table.data =3D buf;
++	fake_table.maxlen =3D sizeof(buf);
++
++	return proc_dostring(&fake_table, write, buffer, lenp, ppos);
++}
++
++static int lrng_proc_do_entropy(struct ctl_table *table, int write,
++				void *buffer, size_t *lenp, loff_t *ppos)
++{
++	struct ctl_table fake_table;
++	int entropy_count;
++
++	entropy_count =3D lrng_avail_entropy();
++
++	fake_table.data =3D &entropy_count;
++	fake_table.maxlen =3D sizeof(entropy_count);
++
++	return proc_dointvec(&fake_table, write, buffer, lenp, ppos);
++}
++
++static int lrng_proc_do_poolsize(struct ctl_table *table, int write,
++				 void *buffer, size_t *lenp, loff_t *ppos)
++{
++	struct ctl_table fake_table;
++	int entropy_count;
++
++	/* LRNG can at most retain entropy in per-CPU pools and aux pool */
++	entropy_count =3D lrng_get_digestsize() + lrng_pcpu_avail_pool_size();
++
++	fake_table.data =3D &entropy_count;
++	fake_table.maxlen =3D sizeof(entropy_count);
++
++	return proc_dointvec(&fake_table, write, buffer, lenp, ppos);
++}
++
++static int lrng_min_write_thresh;
++static int lrng_max_write_thresh =3D LRNG_MAX_DIGESTSIZE;
++static char lrng_sysctl_bootid[16];
++static int lrng_drng_reseed_max_min;
++
++struct ctl_table random_table[] =3D {
++	{
++		.procname	=3D "poolsize",
++		.maxlen		=3D sizeof(int),
++		.mode		=3D 0444,
++		.proc_handler	=3D lrng_proc_do_poolsize,
++	},
++	{
++		.procname	=3D "entropy_avail",
++		.maxlen		=3D sizeof(int),
++		.mode		=3D 0444,
++		.proc_handler	=3D lrng_proc_do_entropy,
++	},
++	{
++		.procname	=3D "write_wakeup_threshold",
++		.data		=3D &lrng_write_wakeup_bits,
++		.maxlen		=3D sizeof(int),
++		.mode		=3D 0644,
++		.proc_handler	=3D proc_dointvec_minmax,
++		.extra1		=3D &lrng_min_write_thresh,
++		.extra2		=3D &lrng_max_write_thresh,
++	},
++	{
++		.procname	=3D "boot_id",
++		.data		=3D &lrng_sysctl_bootid,
++		.maxlen		=3D 16,
++		.mode		=3D 0444,
++		.proc_handler	=3D lrng_proc_do_uuid,
++	},
++	{
++		.procname	=3D "uuid",
++		.maxlen		=3D 16,
++		.mode		=3D 0444,
++		.proc_handler	=3D lrng_proc_do_uuid,
++	},
++	{
++		.procname       =3D "urandom_min_reseed_secs",
++		.data           =3D &lrng_drng_reseed_max_time,
++		.maxlen         =3D sizeof(int),
++		.mode           =3D 0644,
++		.proc_handler   =3D proc_dointvec,
++		.extra1		=3D &lrng_drng_reseed_max_min,
++	},
++	{ }
++};
++
++/* Number of online DRNGs */
++static u32 numa_drngs =3D 1;
++
++void lrng_pool_inc_numa_node(void)
++{
++	numa_drngs++;
++}
++
++static int lrng_proc_type_show(struct seq_file *m, void *v)
++{
++	struct lrng_drng *lrng_drng_init =3D lrng_drng_init_instance();
++	unsigned long flags =3D 0;
++	unsigned char buf[365];
++
++	lrng_drng_lock(lrng_drng_init, &flags);
++	snprintf(buf, sizeof(buf),
++		 "DRNG name: %s\n"
++		 "Hash for reading entropy pool: %s\n"
++		 "Hash for operating aux entropy pool: %s\n"
++		 "LRNG security strength in bits: %d\n"
++		 "per-CPU interrupt collection size: %u\n"
++		 "number of DRNG instances: %u\n"
++		 "SP800-90B compliance: %s\n"
++		 "High-resolution timer: %s\n"
++		 "LRNG minimally seeded: %s\n"
++		 "LRNG fully seeded: %s\n"
++		 "Continuous compression: %s\n",
++		 lrng_drng_init->crypto_cb->lrng_drng_name(),
++		 lrng_drng_init->crypto_cb->lrng_hash_name(),
++		 lrng_drng_init->crypto_cb->lrng_hash_name(),
++		 lrng_security_strength(),
++		 LRNG_DATA_NUM_VALUES,
++		 numa_drngs,
++		 lrng_sp80090b_compliant() ? "true" : "false",
++		 lrng_pool_highres_timer() ? "true" : "false",
++		 lrng_state_min_seeded() ? "true" : "false",
++		 lrng_state_fully_seeded() ? "true" : "false",
++		 lrng_pcpu_continuous_compression_state() ? "true" : "false");
++	lrng_drng_unlock(lrng_drng_init, &flags);
++
++	seq_write(m, buf, strlen(buf));
++
 +	return 0;
 +}
 +
-+#ifdef CONFIG_SYSFS
-+/* Re-perform self-test when any value is written to the sysfs file. */
-+static int lrng_selftest_sysfs_set(const char *val,
-+				   const struct kernel_param *kp)
++static int __init lrng_proc_type_init(void)
 +{
-+	return lrng_selftest();
++	proc_create_single("lrng_type", 0444, NULL, &lrng_proc_type_show);
++	return 0;
 +}
 +
-+static const struct kernel_param_ops lrng_selftest_sysfs = {
-+	.set = lrng_selftest_sysfs_set,
-+	.get = param_get_uint,
-+};
-+module_param_cb(selftest_status, &lrng_selftest_sysfs, &lrng_selftest_status,
-+		0644);
-+#endif	/* CONFIG_SYSFS */
-+
-+static int __init lrng_selftest_init(void)
-+{
-+	return lrng_selftest();
-+}
-+
-+module_init(lrng_selftest_init);
--- 
++module_init(lrng_proc_type_init);
+=2D-=20
 2.29.2
 
 
