@@ -2,120 +2,131 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D64BCC433DB
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 10:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF57C433E9
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 13:12:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1A8B64E37
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 10:37:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C3B564E07
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 13:12:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232421AbhCAKhL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Mar 2021 05:37:11 -0500
-Received: from pegase1.c-s.fr ([93.17.236.30]:48273 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233287AbhCAKgj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Mar 2021 05:36:39 -0500
-Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 4DpxVj596vz9tx3x;
-        Mon,  1 Mar 2021 11:35:41 +0100 (CET)
-X-Virus-Scanned: Debian amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id 3uLz0sfECZb6; Mon,  1 Mar 2021 11:35:41 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 4DpxVj4CNbz9tx3v;
-        Mon,  1 Mar 2021 11:35:41 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id B6EA78B795;
-        Mon,  1 Mar 2021 11:35:46 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id EfdrfbCBUR78; Mon,  1 Mar 2021 11:35:46 +0100 (CET)
-Received: from [172.25.230.103] (po15451.idsi0.si.c-s.fr [172.25.230.103])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 5FB748B75B;
-        Mon,  1 Mar 2021 11:35:46 +0100 (CET)
-Subject: Re: [PATCH] crypto: sun8i-ce: rename kfree() to kfree_sensitive()
-To:     Yang Li <yang.lee@linux.alibaba.com>, clabbe.montjoie@gmail.com
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        mripard@kernel.org, wens@csie.org, jernej.skrabec@siol.net,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-References: <1614594641-35606-1-git-send-email-yang.lee@linux.alibaba.com>
-From:   Christophe Leroy <christophe.leroy@csgroup.eu>
-Message-ID: <4f448ec8-3694-b918-30eb-641d473c85ff@csgroup.eu>
-Date:   Mon, 1 Mar 2021 11:35:41 +0100
-User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
-MIME-Version: 1.0
-In-Reply-To: <1614594641-35606-1-git-send-email-yang.lee@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
+        id S235420AbhCANMa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Mar 2021 08:12:30 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1620 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235381AbhCANM2 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 1 Mar 2021 08:12:28 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 121D47DD154971;
+        Mon, 1 Mar 2021 08:11:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=tJ9ufPL3b03q4eIjrN7DuEgd4aWZDYb3QhchfQ4FRbI=;
+ b=j8Y2IacpCeG31mBIQisurejZbgnX9kjSdByPP/jdWaxfRURSVQmyv+2d+E+ShnbJOM1z
+ ODjptmUvTr34UxjNOtJt5eBCh8ksvv1fJ7thC1R9cdbq9vsvPigIjuIn/1zueRNZM/XH
+ s5fntKr1877MaedAD+IKBcgPE7dq6rnAvRVoMBtKKKHuKiOyjOqyX0RqiHIu1KwVUNcG
+ NxGn0wvA9Lvk7Y6GcUTszd19HhqjO1n4bvOaaGHQp6yxE1U0VE9PtClV9XCeK836rMcD
+ 9BkNGa7e8AyK7W8R9aPxrqYsIu4g7a2GyEQofsC/N5HkxQu6jkd30ppTg2RIxyIpNL3u dA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3710tk0a9w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 01 Mar 2021 08:11:34 -0500
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 121D4RKT161377;
+        Mon, 1 Mar 2021 08:11:34 -0500
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3710tk0a8v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 01 Mar 2021 08:11:34 -0500
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 121D7nsY002485;
+        Mon, 1 Mar 2021 13:11:31 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma02fra.de.ibm.com with ESMTP id 36yj530w1k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 01 Mar 2021 13:11:31 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 121DBSGG30343558
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 1 Mar 2021 13:11:28 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BDA174C04E;
+        Mon,  1 Mar 2021 13:11:28 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ADCCE4C046;
+        Mon,  1 Mar 2021 13:11:25 +0000 (GMT)
+Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.211.103.165])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  1 Mar 2021 13:11:25 +0000 (GMT)
+Message-ID: <8618fdb7107ec6ec1aeb4e37faf82421050bdf91.camel@linux.ibm.com>
+Subject: Re: [PATCH v9 9/9] certs: Add support for using elliptic curve keys
+ for signing modules
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     yumeng <yumeng18@huawei.com>,
+        Stefan Berger <stefanb@linux.vnet.ibm.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, herbert@gondor.apana.org.au,
+        dhowells@redhat.com
+Cc:     linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
+        linux-integrity@vger.kernel.org,
+        Stefan Berger <stefanb@linux.ibm.com>
+Date:   Mon, 01 Mar 2021 08:11:24 -0500
+In-Reply-To: <ce098224-893c-fba8-5995-a7bac90f82c2@huawei.com>
+References: <20210225160802.2478700-1-stefanb@linux.vnet.ibm.com>
+         <20210225160802.2478700-10-stefanb@linux.vnet.ibm.com>
+         <ce098224-893c-fba8-5995-a7bac90f82c2@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-14.el8) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-01_08:2021-03-01,2021-03-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 suspectscore=0 phishscore=0 spamscore=0 impostorscore=0
+ malwarescore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=999 mlxscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103010108
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-Le 01/03/2021 à 11:30, Yang Li a écrit :
-> Rename kfree() to kfree_sensitive() to  make the intention of the API
-> more explicit.
-
-As far as I understand, you are not renaming kfree() to kfree_sensitive().
-
-You are making a change to use kfree_sensitive() instead of using kfree().
-
-Christophe
-
+On Sat, 2021-02-27 at 11:35 +0800, yumeng wrote:
+> 在 2021/2/26 0:08, Stefan Berger 写道:
+> > From: Stefan Berger <stefanb@linux.ibm.com>
+> > 
 > 
-> fixed the following coccicheck:
-> ./drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c:30:16-17: WARNING
-> opportunity for kfree_sensitive/kvfree_sensitive (memset at line 29)
-> ./drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c:42:16-17: WARNING
-> opportunity for kfree_sensitive/kvfree_sensitive (memset at line 41)
-> ./drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c:161:8-9: WARNING
-> opportunity for kfree_sensitive/kvfree_sensitive (memset at line 109)
+> > diff --git a/certs/Makefile b/certs/Makefile
+> > index 3fe6b73786fa..c487d7021c54 100644
+> > --- a/certs/Makefile
+> > +++ b/certs/Makefile
+> > @@ -69,6 +69,18 @@ else
+> >   SIGNER = -signkey $(obj)/signing_key.key
+> >   endif # CONFIG_IMA_APPRAISE_MODSIG
+> >   
 > 
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
-> ---
->   drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
+> Is there anything wrong in this patch?
+> I can't apply it when I use 'git am '.
+> errors like below:
 > 
-> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-> index cfde9ee..8259d52 100644
-> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-> @@ -27,7 +27,7 @@ void sun8i_ce_prng_exit(struct crypto_tfm *tfm)
->   	struct sun8i_ce_rng_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
->   
->   	memzero_explicit(ctx->seed, ctx->slen);
-> -	kfree(ctx->seed);
-> +	kfree_sensitive(ctx->seed);
->   	ctx->seed = NULL;
->   	ctx->slen = 0;
->   }
-> @@ -39,7 +39,7 @@ int sun8i_ce_prng_seed(struct crypto_rng *tfm, const u8 *seed,
->   
->   	if (ctx->seed && ctx->slen != slen) {
->   		memzero_explicit(ctx->seed, ctx->slen);
-> -		kfree(ctx->seed);
-> +		kfree_sensitive(ctx->seed);
->   		ctx->slen = 0;
->   		ctx->seed = NULL;
->   	}
-> @@ -158,7 +158,7 @@ int sun8i_ce_prng_generate(struct crypto_rng *tfm, const u8 *src,
->   	}
->   	memzero_explicit(d, todo);
->   err_iv:
-> -	kfree(d);
-> +	kfree_sensitive(d);
->   err_mem:
->   	return err;
->   }
+> error: certs/Kconfig: does not match index
+> error: patch failed: certs/Makefile:69
+> error: certs/Makefile: patch does not apply
 > 
+> Thanks
+
+Nothing wrong with the patch, just a dependency.  From the Change log:
+   - This patch builds on top Nayna's series for 'kernel build support
+   for loading the kernel module signing key'.
+   - https://lkml.org/lkml/2021/2/18/856
+
+thanks,
+
+Mimi
+
+
