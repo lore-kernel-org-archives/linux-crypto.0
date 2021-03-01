@@ -2,165 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBE86C43381
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Feb 2021 17:13:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68E40C433DB
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 15:23:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B172B64ECE
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Feb 2021 17:13:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3015164DFB
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 15:23:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231309AbhB1RMo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 Feb 2021 12:12:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49154 "EHLO
+        id S237177AbhCAPX3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Mar 2021 10:23:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230461AbhB1RMj (ORCPT
+        with ESMTP id S236673AbhCAPXO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Feb 2021 12:12:39 -0500
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10048C06174A;
-        Sun, 28 Feb 2021 09:11:58 -0800 (PST)
-Received: by mail-ej1-x635.google.com with SMTP id g5so23843438ejt.2;
-        Sun, 28 Feb 2021 09:11:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dfQ46OGWItLgoKPUR/Czwfd0qqTUSj25+jf5yrElG/4=;
-        b=GzeA/aDB2UBhnNVhm++I/Jk3Up7Sjll8FWko6UUVrR8GbwUj6tdWvj7U7T3p1JnaWE
-         tuDT5n8KyfWwgonEFcDAlbP9Wnm/lzI5ynLZd5zXrmZLcqy0e5qJFV+Ury6tgPUdhcIC
-         ZnUpySrUVv3A0oExsLsVOkNej6wDTO/NVed1e1lRxfeovoJIixufVCuML3LKRgEXHaK6
-         AQIpA41ncR2vIctG/YIpRBR7PPh4Vs9caRlig7rCLuPUPKUXlteysI6kNYwN/3Yc//ci
-         tD2NQsug/MYd9mQ+dWSVvw0ZV+w1YK/V6hQL8df04yN35+nWGaht76tutf0kiQ1Fxgq5
-         E6Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dfQ46OGWItLgoKPUR/Czwfd0qqTUSj25+jf5yrElG/4=;
-        b=DFk3PQk4Tg5+x/JyUn1GIB9WRKbs4ZjvCjYZr9JKO8621MT6/JMbxVEVcdDoUwHVL+
-         For3KnKO03QZ25kxJo4JrfZHSkIeuz8ttxAxFkjgF2q6WYdlaegFsyL7pwebxMCJOuh/
-         NrMre9pjnYhb6I4oOeQe6UNOpaC6IPz2m13QnfLeVZ2YZGlmr1DYxmPi+bvVPkKasB7e
-         u9RBjICZzwxg7kg714yWmesb+O+Rtbcpc99VRzJxNj+AhqwCvcU1kFYQqrqosKdGeMu3
-         qv1KRTCKEbd/EDeY1ITs68EsyfQGwPqrqB4AdfJhZ2zoof+PofoZAtTFpktFx3ZcE2nA
-         XTjg==
-X-Gm-Message-State: AOAM5304vRkhWj/qH8naxa3syBxpk1crx5yAp/FsV3b7mRkxQxwuuOcN
-        4SYwXjH8z05UBhk34i8rBvOfdoP18tGg
-X-Google-Smtp-Source: ABdhPJw5sLbCUCcgxkhNvC6IgO3vmNaTgOeasYPBEho60Poa4WNRXoZ/cPiXNkLCHgbgyBJUziViqw==
-X-Received: by 2002:a17:906:acb:: with SMTP id z11mr3855755ejf.193.1614532316774;
-        Sun, 28 Feb 2021 09:11:56 -0800 (PST)
-Received: from localhost.localdomain ([46.53.249.223])
-        by smtp.gmail.com with ESMTPSA id fw3sm6654338ejb.82.2021.02.28.09.11.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Feb 2021 09:11:56 -0800 (PST)
-Date:   Sun, 28 Feb 2021 20:11:54 +0300
-From:   Alexey Dobriyan <adobriyan@gmail.com>
-To:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        akpm@linux-foundation.org, linux-arch@vger.kernel.org
-Subject: [PATCH 12/11] pragma once: scripted treewide conversion
-Message-ID: <YDvO2kmidKZaK26j@localhost.localdomain>
-References: <YDvLYzsGu+l1pQ2y@localhost.localdomain>
+        Mon, 1 Mar 2021 10:23:14 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1999BC061756
+        for <linux-crypto@vger.kernel.org>; Mon,  1 Mar 2021 07:22:33 -0800 (PST)
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <sha@pengutronix.de>)
+        id 1lGkNU-0005ir-6h; Mon, 01 Mar 2021 16:22:32 +0100
+Received: from sha by ptx.hi.pengutronix.de with local (Exim 4.92)
+        (envelope-from <sha@pengutronix.de>)
+        id 1lGkNT-000394-OS; Mon, 01 Mar 2021 16:22:31 +0100
+Date:   Mon, 1 Mar 2021 16:22:31 +0100
+To:     linux-crypto@vger.kernel.org
+Cc:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>, kernel@pengutronix.de
+Subject: CAAM: kernel BUG at drivers/crypto/caam/jr.c:230!
+Message-ID: <20210301152231.GC5549@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YDvLYzsGu+l1pQ2y@localhost.localdomain>
+X-Sent-From: Pengutronix Hildesheim
+X-URL:  http://www.pengutronix.de/
+X-IRC:  #ptxdist @freenode
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-Uptime: 16:18:25 up 11 days, 18:42, 82 users,  load average: 0.02, 0.12,
+ 0.16
+User-Agent: Mutt/1.10.1 (2018-07-13)
+From:   Sascha Hauer <sha@pengutronix.de>
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-[  Bcc a lot of lists so that people understand what's this is all         ]
-[  about without creating uber-cc-thread.                                  ]
-[  Apologies if I missed your subsystem                                    ]
-[  Please see [PATCH 11/11: pragma once: conversion script (in Python 2)]  ]
+Hi All,
 
-Hi, Linus.
+I am on a Layerscape LS1046a using Linux-5.11. The CAAM driver sometimes
+crashes during the run-time self tests with:
 
-Please run the script below from top-level directory, it will convert
-most kernel headers to #pragma once directive advancing them into
-21-st century.
+> kernel BUG at drivers/crypto/caam/jr.c:247!
+> Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
+> Modules linked in:
+> CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.11.0-20210225-3-00039-g434215968816-dirty #12
+> Hardware name: TQ TQMLS1046A SoM on Arkona AT1130 (C300) board (DT)
+> pstate: 60000005 (nZCv daif -PAN -UAO -TCO BTYPE=--)
+> pc : caam_jr_dequeue+0x98/0x57c
+> lr : caam_jr_dequeue+0x98/0x57c
+> sp : ffff800010003d50
+> x29: ffff800010003d50 x28: ffff8000118d4000
+> x27: ffff8000118d4328 x26: 00000000000001f0
+> x25: ffff0008022be480 x24: ffff0008022c6410
+> x23: 00000000000001f1 x22: ffff8000118d4329
+> x21: 0000000000004d80 x20: 00000000000001f1
+> x19: 0000000000000001 x18: 0000000000000020
+> x17: 0000000000000000 x16: 0000000000000015
+> x15: ffff800011690230 x14: 2e2e2e2e2e2e2e2e
+> x13: 2e2e2e2e2e2e2020 x12: 3030303030303030
+> x11: ffff800011700a38 x10: 00000000fffff000
+> x9 : ffff8000100ada30 x8 : ffff8000116a8a38
+> x7 : 0000000000000001 x6 : 0000000000000000
+> x5 : 0000000000000000 x4 : 0000000000000000
+> x3 : 00000000ffffffff x2 : 0000000000000000
+> x1 : 0000000000000000 x0 : 0000000000001800
+> Call trace:
+>  caam_jr_dequeue+0x98/0x57c
+>  tasklet_action_common.constprop.0+0x164/0x18c
+>  tasklet_action+0x44/0x54
+>  __do_softirq+0x160/0x454
+>  __irq_exit_rcu+0x164/0x16c
+>  irq_exit+0x1c/0x30
+>  __handle_domain_irq+0xc0/0x13c
+>  gic_handle_irq+0x5c/0xf0
+>  el1_irq+0xb4/0x180
+>  arch_cpu_idle+0x18/0x30
+>  default_idle_call+0x3c/0x1c0
+>  do_idle+0x23c/0x274
+>  cpu_startup_entry+0x34/0x70
+>  rest_init+0xdc/0xec
+>  arch_call_rest_init+0x1c/0x28
+>  start_kernel+0x4ac/0x4e4
+> Code: 91392021 912c2000 d377d8c6 97f24d96 (d4210000)
 
-The advantages are:
+The driver iterates over the descriptors in the output ring and matches them
+with the ones it has previously queued. If it doesn't find a matching
+descriptor it complains with the BUG_ON() seen above. What I see sometimes is
+that the address in the output ring is 0x0, the job status in this case is
+0x40000006 (meaning DECO Invalid KEY command). It seems that the CAAM doesn't
+write the descriptor address to the output ring at least in some error cases.
+When we don't have the descriptor address of the failed descriptor we have no
+way to find it in the list of queued descriptors, thus we also can't find the
+callback for that descriptor. This looks very unfortunate, anyone else seen
+this or has an idea what to do about it?
 
-* less LOC
+I haven't investigated yet which job actually fails and why. Of course that would
+be my ultimate goal to find that out.
 
-	18087 files changed, 18878 insertions(+), 99804 deletions(-)
-	= -81 kLOC (give or take)
+Sascha
 
-* less mental tax on developers forced to name things which aren't even
-  real code
-
-* less junk in preprocessor hashtables and editors/IDEs autocompletion
-  lists
-
-There are two bit exceptions: UAPI headers and ACPICA.
-Given ubiquity of #pragma once, I personally think even these subsystems
-should be converted in the future.
-
-Compile tested on alpha, arc, arm, arm64, h8300, ia64, m68k, microblaze,
-mips, nios2, parisc, powerpc, riscv, s390, sh, sparc, um-i386, um-x86_64,
-i386, x86_64, xtensa (allnoconfig, all defconfigs, allmodconfig with or
-without SMP/DEBUG_KERNEL + misc stuff).
-
-Not compile tested on csky, hexagon, nds32, openrisc. 
-
-Love,
-	Alexey
-
-Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
-
-
-
-#!/bin/sh -x
-find . -type f -name '*.h' -print	|\
-LC_ALL=C sort				|\
-sed -e 's#^./##g'			|\
-xargs ./scripts/pragma-once.py
-
-find . -type d -name 'uapi' | xargs git checkout -f
-git checkout -f arch/alpha/include/asm/cmpxchg.h
-git checkout -f arch/arm/mach-imx/hardware.h
-git checkout -f arch/arm/mach-ixp4xx/include/mach/hardware.h
-git checkout -f arch/arm/mach-sa1100/include/mach/hardware.h
-git checkout -f arch/mips/include/asm/mips-cps.h
-git checkout -f arch/x86/boot/boot.h
-git checkout -f arch/x86/boot/ctype.h
-git checkout -f arch/x86/include/asm/cpufeatures.h
-git checkout -f arch/x86/include/asm/disabled-features.h
-git checkout -f arch/x86/include/asm/required-features.h
-git checkout -f arch/x86/include/asm/vmxfeatures.h
-git checkout -f arch/x86/include/asm/vvar.h
-git checkout -f drivers/acpi/acpica/
-git checkout -f drivers/gpu/drm/amd/pm/inc/vega10_ppsmc.h
-git checkout -f drivers/gpu/drm/amd/pm/powerplay/ppsmc.h
-git checkout -f drivers/input/misc/yealink.h
-git checkout -f drivers/media/usb/dvb-usb-v2/mxl111sf-demod.h
-git checkout -f drivers/media/usb/dvb-usb-v2/mxl111sf-tuner.h
-git checkout -f drivers/pcmcia/yenta_socket.h
-git checkout -f drivers/staging/rtl8723bs/include/hal_com_h2c.h
-git checkout -f include/linux/acpi.h
-git checkout -f include/linux/bitops.h
-git checkout -f include/linux/compiler_types.h
-git checkout -f include/linux/device.h
-git checkout -f include/linux/kbuild.h
-git checkout -f include/linux/libfdt_env.h
-git checkout -f include/linux/local_lock.h
-git checkout -f include/linux/spinlock.h
-git checkout -f include/linux/spinlock_api_smp.h
-git checkout -f include/linux/spinlock_types.h
-git checkout -f include/linux/tracepoint.h
-git checkout -f mm/gup_test.h
-git checkout -f net/batman-adv/main.h
-git checkout -f scripts/dtc/
-git checkout -f tools/include/linux/bitops.h
-git checkout -f tools/include/linux/compiler.h
-git checkout -f tools/testing/selftests/clone3/clone3_selftests.h
-git checkout -f tools/testing/selftests/futex/include/atomic.h
-git checkout -f tools/testing/selftests/futex/include/futextest.h
-git checkout -f tools/testing/selftests/futex/include/logging.h
-git checkout -f tools/testing/selftests/kselftest.h
-git checkout -f tools/testing/selftests/kselftest_harness.h
-git checkout -f tools/testing/selftests/pidfd/pidfd.h
-git checkout -f tools/testing/selftests/x86/helpers.h
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
