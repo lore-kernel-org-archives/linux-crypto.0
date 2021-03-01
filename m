@@ -4,47 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 280ACC433E0
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 10:33:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D64BCC433DB
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 10:37:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E071E600CC
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 10:33:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1A8B64E37
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 10:37:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234518AbhCAKd2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Mar 2021 05:33:28 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:53890 "EHLO fornost.hmeau.com"
+        id S232421AbhCAKhL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Mar 2021 05:37:11 -0500
+Received: from pegase1.c-s.fr ([93.17.236.30]:48273 "EHLO pegase1.c-s.fr"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233287AbhCAKdY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Mar 2021 05:33:24 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lGfqU-0003D7-Mj; Mon, 01 Mar 2021 21:32:11 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 01 Mar 2021 21:32:10 +1100
-Date:   Mon, 1 Mar 2021 21:32:10 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Yang Li <yang.lee@linux.alibaba.com>
-Cc:     clabbe.montjoie@gmail.com, davem@davemloft.net, mripard@kernel.org,
-        wens@csie.org, jernej.skrabec@siol.net,
+        id S233287AbhCAKgj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 1 Mar 2021 05:36:39 -0500
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 4DpxVj596vz9tx3x;
+        Mon,  1 Mar 2021 11:35:41 +0100 (CET)
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id 3uLz0sfECZb6; Mon,  1 Mar 2021 11:35:41 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 4DpxVj4CNbz9tx3v;
+        Mon,  1 Mar 2021 11:35:41 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id B6EA78B795;
+        Mon,  1 Mar 2021 11:35:46 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id EfdrfbCBUR78; Mon,  1 Mar 2021 11:35:46 +0100 (CET)
+Received: from [172.25.230.103] (po15451.idsi0.si.c-s.fr [172.25.230.103])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 5FB748B75B;
+        Mon,  1 Mar 2021 11:35:46 +0100 (CET)
+Subject: Re: [PATCH] crypto: sun8i-ce: rename kfree() to kfree_sensitive()
+To:     Yang Li <yang.lee@linux.alibaba.com>, clabbe.montjoie@gmail.com
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        mripard@kernel.org, wens@csie.org, jernej.skrabec@siol.net,
         linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: sun8i-ce: rename kfree() to kfree_sensitive()
-Message-ID: <20210301103210.GA30054@gondor.apana.org.au>
 References: <1614594641-35606-1-git-send-email-yang.lee@linux.alibaba.com>
+From:   Christophe Leroy <christophe.leroy@csgroup.eu>
+Message-ID: <4f448ec8-3694-b918-30eb-641d473c85ff@csgroup.eu>
+Date:   Mon, 1 Mar 2021 11:35:41 +0100
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <1614594641-35606-1-git-send-email-yang.lee@linux.alibaba.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 01, 2021 at 06:30:41PM +0800, Yang Li wrote:
+
+
+Le 01/03/2021 à 11:30, Yang Li a écrit :
 > Rename kfree() to kfree_sensitive() to  make the intention of the API
 > more explicit.
+
+As far as I understand, you are not renaming kfree() to kfree_sensitive().
+
+You are making a change to use kfree_sensitive() instead of using kfree().
+
+Christophe
+
 > 
 > fixed the following coccicheck:
 > ./drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c:30:16-17: WARNING
@@ -57,24 +84,38 @@ On Mon, Mar 01, 2021 at 06:30:41PM +0800, Yang Li wrote:
 > Reported-by: Abaci Robot <abaci@linux.alibaba.com>
 > Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
 > ---
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>   drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
 > 
 > diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
 > index cfde9ee..8259d52 100644
 > --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
 > +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
 > @@ -27,7 +27,7 @@ void sun8i_ce_prng_exit(struct crypto_tfm *tfm)
->  	struct sun8i_ce_rng_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
->  
->  	memzero_explicit(ctx->seed, ctx->slen);
+>   	struct sun8i_ce_rng_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
+>   
+>   	memzero_explicit(ctx->seed, ctx->slen);
 > -	kfree(ctx->seed);
 > +	kfree_sensitive(ctx->seed);
-
-Any reason why you're keeping the memzero?
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>   	ctx->seed = NULL;
+>   	ctx->slen = 0;
+>   }
+> @@ -39,7 +39,7 @@ int sun8i_ce_prng_seed(struct crypto_rng *tfm, const u8 *seed,
+>   
+>   	if (ctx->seed && ctx->slen != slen) {
+>   		memzero_explicit(ctx->seed, ctx->slen);
+> -		kfree(ctx->seed);
+> +		kfree_sensitive(ctx->seed);
+>   		ctx->slen = 0;
+>   		ctx->seed = NULL;
+>   	}
+> @@ -158,7 +158,7 @@ int sun8i_ce_prng_generate(struct crypto_rng *tfm, const u8 *src,
+>   	}
+>   	memzero_explicit(d, todo);
+>   err_iv:
+> -	kfree(d);
+> +	kfree_sensitive(d);
+>   err_mem:
+>   	return err;
+>   }
+> 
