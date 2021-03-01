@@ -5,29 +5,29 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC48C4332B
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 17:30:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC40C43381
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 18:40:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9135F65279
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 17:30:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4361E60233
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 18:40:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231352AbhCAR36 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Mar 2021 12:29:58 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45402 "EHLO mail.kernel.org"
+        id S236551AbhCASkO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Mar 2021 13:40:14 -0500
+Received: from mail.kernel.org ([198.145.29.99]:49686 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237840AbhCARVT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Mar 2021 12:21:19 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AB95D65058;
-        Mon,  1 Mar 2021 16:47:41 +0000 (UTC)
+        id S240360AbhCASit (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 1 Mar 2021 13:38:49 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 037BE64FAB;
+        Mon,  1 Mar 2021 17:34:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1614617262;
-        bh=KIBWAFby9eWBBclJ7Q5+UuWIkuxO2Pq4bgx/Ct3+gOw=;
+        s=korg; t=1614620065;
+        bh=csma62ucd/N2Z7+ni/Ibcnfb/n5NZO5kSEDmfrmXfoI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WBJ3Hb77kIFh1zwahEFduEtwi6e+9ydFi/TzieOnoAI46hzKBE/R3/0UM9oWnnbcp
-         6lr20ih8Z3E01MPHcaM9HviVUNgWzEgDqloRbVpBVASZdrOINbMRNfFQYiR337rT1f
-         yiG8lubfKHb6GxL/D191TBDjMeaTPbbCMDQEiXcs=
+        b=jMGtvzCdQBSVXWLAeqtVUHrg4/TeIuHbOFI+F/LojusDoqyH6tNuL5YTJO7bfSjA2
+         U42OcMJ9s40f2iK4wCZ3gNmS231o2/+1XNyMIwtFYePo3bD8Pxowsext5Jmnrjujpa
+         B4QbwGP5yQC0H8erj650ilX7t1sqz5zkK7t3vJxY=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -36,12 +36,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Jann Horn <jannh@google.com>, Theodore Tso <tytso@mit.edu>,
         Ard Biesheuvel <ardb@kernel.org>,
         Eric Biggers <ebiggers@google.com>
-Subject: [PATCH 5.4 012/340] random: fix the RNDRESEEDCRNG ioctl
-Date:   Mon,  1 Mar 2021 17:09:16 +0100
-Message-Id: <20210301161048.913920766@linuxfoundation.org>
+Subject: [PATCH 5.11 018/775] random: fix the RNDRESEEDCRNG ioctl
+Date:   Mon,  1 Mar 2021 17:03:06 +0100
+Message-Id: <20210301161202.616954884@linuxfoundation.org>
 X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210301161048.294656001@linuxfoundation.org>
-References: <20210301161048.294656001@linuxfoundation.org>
+In-Reply-To: <20210301161201.679371205@linuxfoundation.org>
+References: <20210301161201.679371205@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -74,7 +74,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -2149,7 +2149,7 @@ static long random_ioctl(struct file *f,
+@@ -1972,7 +1972,7 @@ static long random_ioctl(struct file *f,
  			return -EPERM;
  		if (crng_init < 2)
  			return -ENODATA;
