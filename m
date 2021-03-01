@@ -2,76 +2,75 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19176C433DB
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Feb 2021 12:29:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C0D3C433DB
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 02:44:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D594064E59
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Feb 2021 12:29:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3320964E09
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 02:44:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230144AbhB1M3O (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 Feb 2021 07:29:14 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38184 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230045AbhB1M3O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Feb 2021 07:29:14 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EDB0A64E56;
-        Sun, 28 Feb 2021 12:28:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614515313;
-        bh=01W+dreAZY78xHV76wyDXov0ZLJ+CfiKyMbxabOuw7Y=;
-        h=From:To:Cc:Subject:Date:From;
-        b=eu1tAUHYLImR8Q5VIVcDnNdu2zbkq3ektii8VUhUd3iXL9df7gyRYpzqnu3YU1rQU
-         GJX7izxhgefHnsvfJxktDCKNbX8gRYtnP2UdCLty3PicM/HB9XZSPMK/f6kbVnEtyI
-         90ktAYpl/A1TyX3kdsWwEwIprGKmb9obXcMBko8rGmZcL1uug9ut7m3ppGjtEKRuwL
-         q24XtuGRDx5u2EvbA7KkI564oXh+07AbpiYWRDnfwQd7xteJ2C1oz3Cw2egipX6Nt2
-         0tqpNBVqsExC6KoN5gpKIf03yE3dgW/eaXbmPaLDwFcD1Tpb+W2U5SiKNlG8ztp0OK
-         pLmNB282im0KA==
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>,
-        syzbot+12cf5fbfdeba210a89dd@syzkaller.appspotmail.com
-Subject: [PATCH] crypto: api - check for ERR pointers in crypto_destroy_tfm()
-Date:   Sun, 28 Feb 2021 13:28:24 +0100
-Message-Id: <20210228122824.5441-1-ardb@kernel.org>
-X-Mailer: git-send-email 2.30.1
+        id S231756AbhCACnq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 28 Feb 2021 21:43:46 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:13011 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231835AbhCACnp (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 28 Feb 2021 21:43:45 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DpkzP2DpTzjTZb;
+        Mon,  1 Mar 2021 10:41:21 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 1 Mar 2021 10:42:58 +0800
+From:   Tian Tao <tiantao6@hisilicon.com>
+To:     <hadar.gat@arm.com>, <mpm@selenic.com>,
+        <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>
+Subject: [PATCH] hwrng: cctrng - Use device-managed registration API
+Date:   Mon, 1 Mar 2021 10:43:48 +0800
+Message-ID: <1614566628-52886-1-git-send-email-tiantao6@hisilicon.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Given that crypto_alloc_tfm() may return ERR pointers, and to avoid
-crashes on obscure error paths where such pointers are presented to
-crypto_destroy_tfm() (such as [0]), add an ERR_PTR check there
-before dereferencing the second argument as a struct crypto_tfm
-pointer.
+Use devm_hwrng_register to get rid of manual unregistration.
 
-[0] https://lore.kernel.org/linux-crypto/000000000000de949705bc59e0f6@google.com/
-
-Reported-by: syzbot+12cf5fbfdeba210a89dd@syzkaller.appspotmail.com
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
 ---
- crypto/api.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/char/hw_random/cctrng.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/crypto/api.c b/crypto/api.c
-index ed08cbd5b9d3..c4eda56cff89 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -562,7 +562,7 @@ void crypto_destroy_tfm(void *mem, struct crypto_tfm *tfm)
- {
- 	struct crypto_alg *alg;
+diff --git a/drivers/char/hw_random/cctrng.c b/drivers/char/hw_random/cctrng.c
+index 7a293f2..0efb37a 100644
+--- a/drivers/char/hw_random/cctrng.c
++++ b/drivers/char/hw_random/cctrng.c
+@@ -585,7 +585,7 @@ static int cctrng_probe(struct platform_device *pdev)
+ 	atomic_set(&drvdata->pending_hw, 1);
  
--	if (unlikely(!mem))
-+	if (IS_ERR_OR_NULL(mem))
- 		return;
+ 	/* registration of the hwrng device */
+-	rc = hwrng_register(&drvdata->rng);
++	rc = devm_hwrng_register(dev, &drvdata->rng);
+ 	if (rc) {
+ 		dev_err(dev, "Could not register hwrng device.\n");
+ 		goto post_pm_err;
+@@ -618,8 +618,6 @@ static int cctrng_remove(struct platform_device *pdev)
  
- 	alg = tfm->__crt_alg;
+ 	dev_dbg(dev, "Releasing cctrng resources...\n");
+ 
+-	hwrng_unregister(&drvdata->rng);
+-
+ 	cc_trng_pm_fini(drvdata);
+ 
+ 	cc_trng_clk_fini(drvdata);
 -- 
-2.30.1
+2.7.4
 
