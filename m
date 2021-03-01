@@ -2,123 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98D1CC433DB
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 21:28:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C7CC433E9
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 22:13:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C9B360233
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 21:28:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11809601FF
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Mar 2021 22:13:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231640AbhCAV1f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Mar 2021 16:27:35 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35910 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S236903AbhCAVVX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Mar 2021 16:21:23 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 121L5C2K043314;
-        Mon, 1 Mar 2021 16:19:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=bPdwz9xFSopP3gWyKd2EGm5vl/YJynNlL1UC6MxIubU=;
- b=Jr2suGvMJ+lZlBgjT0aXd0epRwqeFozlihoOEjnv2Zz61Stn6BfA/6uB3y+IiDmbwXA4
- YozXgwuWJ6a3FiNwzLnNzo+Rev1Dt3x+p3lrIj+S11kRzkx43Xm2DhKIatks+sJSjsIt
- IGzm3JXmQ+ri/dRt0OrEtllkGt6jKlz/7G0ZE6KzzqjgS0Uev7NL8wx9s2NjzW1z1exP
- VV4AdP3lxjdWPWegN5xKKtnRuOQj9J4damZ7+l2o/9K1mBNPqCC2MV5iPc1jIu3pk1Wc
- 3aA+1v7Oy+ltoTL4v05s4ZMGIkwTgJeH4WJZyf8AZj7AshvmvUh+pHG8XPoGi3xjSNRg EQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3717cf173p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Mar 2021 16:19:58 -0500
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 121L7HqF052227;
-        Mon, 1 Mar 2021 16:19:58 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3717cf1738-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Mar 2021 16:19:58 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 121LC5de024690;
-        Mon, 1 Mar 2021 21:19:57 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma03dal.us.ibm.com with ESMTP id 37103vv3ah-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Mar 2021 21:19:57 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 121LJvhl24510740
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Mar 2021 21:19:57 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ECFADAC059;
-        Mon,  1 Mar 2021 21:19:56 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DA31DAC062;
-        Mon,  1 Mar 2021 21:19:56 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  1 Mar 2021 21:19:56 +0000 (GMT)
-Subject: Re: [PATCH v9 9/9] certs: Add support for using elliptic curve keys
- for signing modules
-To:     yumeng <yumeng18@huawei.com>,
-        Stefan Berger <stefanb@linux.vnet.ibm.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, herbert@gondor.apana.org.au,
-        dhowells@redhat.com, zohar@linux.ibm.com
-Cc:     linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
-        linux-integrity@vger.kernel.org
-References: <20210225160802.2478700-1-stefanb@linux.vnet.ibm.com>
- <20210225160802.2478700-10-stefanb@linux.vnet.ibm.com>
- <ce098224-893c-fba8-5995-a7bac90f82c2@huawei.com>
-From:   Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <bb9fafb2-90f5-35b0-5c72-f3879d6efcb2@linux.ibm.com>
-Date:   Mon, 1 Mar 2021 16:19:56 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S235796AbhCAWN0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Mar 2021 17:13:26 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59208 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237022AbhCAWKr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 1 Mar 2021 17:10:47 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 05F5A60231;
+        Mon,  1 Mar 2021 22:09:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1614636589;
+        bh=2EyZztf+czU2hOx+uTf8aKFtuzHaAtkh8pbrMOtqHck=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Mq7gqc1WOBkF1FtIqgG1YAlQZa5UaGLoY9snM5Goqellv1liOk0NYJp3i4rEasgll
+         q2bKfgpm0HkPkJPJJBLKJETtqoneVefXgQ+L3H+uXK9Kb6waOOc42FkJIvXK/we7TL
+         HKzs+tnaxCh/1ha/7XVLLLPN9qjJajw0dZF3RYw+YzVSdMek4MfjNNdawmXiAgsg8n
+         /AX89Gdef1a0Gi8grxW1kx+XnMZX4oQMN0rPSxqq/fwkEMFNWJRIpUNRrWsSy4eVbN
+         nVoDnuBwCs6spIVnC8SNm2W2cb8fJKt+1jdqAOxwFdcgnqbE31XhVQyalDhAWPBnbY
+         79NudbDItP2lw==
+Date:   Mon, 1 Mar 2021 14:09:47 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: expose needs_key in procfs
+Message-ID: <YD1mK8HseZpiCWDU@gmail.com>
+References: <20210301165917.2576180-1-christoph.boehmwalder@linbit.com>
+ <YD02vJhFkFiARX0q@gmail.com>
+ <e82c30b0-e96f-d5cd-f7a3-d97f4e049b83@linbit.com>
 MIME-Version: 1.0
-In-Reply-To: <ce098224-893c-fba8-5995-a7bac90f82c2@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-01_13:2021-03-01,2021-03-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- priorityscore=1501 mlxlogscore=999 spamscore=0 malwarescore=0
- lowpriorityscore=0 suspectscore=0 mlxscore=0 adultscore=0 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103010171
+In-Reply-To: <e82c30b0-e96f-d5cd-f7a3-d97f4e049b83@linbit.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/26/21 10:35 PM, yumeng wrote:
->
-> 在 2021/2/26 0:08, Stefan Berger 写道:
->> From: Stefan Berger <stefanb@linux.ibm.com>
->>
->
->> diff --git a/certs/Makefile b/certs/Makefile
->> index 3fe6b73786fa..c487d7021c54 100644
->> --- a/certs/Makefile
->> +++ b/certs/Makefile
->> @@ -69,6 +69,18 @@ else
->>   SIGNER = -signkey $(obj)/signing_key.key
->>   endif # CONFIG_IMA_APPRAISE_MODSIG
->
-> Is there anything wrong in this patch?
-> I can't apply it when I use 'git am '.
-> errors like below:
+On Mon, Mar 01, 2021 at 09:51:56PM +0100, Christoph Böhmwalder wrote:
+> > Do you have a specific use case in mind for this information?  Normally, users
+> > should already know which algorithm they want to use (or set of algorithms they
+> > might want to use).
+> 
+> I have a pretty specific use case in mind, yes. For DRBD, we use crypto
+> algorithms for peer authentication and for the online-verify mechanism (to
+> verify data integrity). The peer authentication algos require a shared
+> secret (HMAC), while the verify algorithms are just hash functions without
+> keys (we don't configure a shared secret here, so these must explicitly be
+> "keyless").
+> 
+> Now, we also have a solution which sits on top of DRBD (LINSTOR), which
+> resides purely in userspace. We recently implemented a feature where LINSTOR
+> automatically chooses the "best" verify algorithm for all nodes in a
+> cluster. It does this by parsing /proc/crypto and prioritizing accordingly.
+> The problem is that /proc/crypto currently doesn't contain information about
+> whether or not an algorithm requires a key – i.e. whether or not it is
+> suitable for DRBD's online-verify mechanism.
+> 
+> See this commit for some context:
+> https://github.com/LINBIT/drbd/commit/34ee32e6922994c8e9390859e1790ca
 
-This patch builds on top Nayna's series for 'kernel build support for
-loading the kernel module signing key'.
--https://lkml.org/lkml/2021/2/18/856
+Shouldn't you know ahead of time which algorithm you are using (or set of
+algorithms which you might use), and not be parsing /proc/crypto and choosing
+some random one (which might be a non-cryptographic algorithm like CRC-32, or
+something known to be insecure like MD5)?
 
-      Stefan
+Using the algorithm attributes in /proc/crypto only really makes sense if the
+decision of which algorithm to use is punted to a higher level and the program
+just needs to be able to pass through *any* algorithm available in Linux -- like
+how 'cryptsetup' works.  But it's preferable to avoid that sort of design, as it
+invites users to start depending on weird or insecure things.
 
+> > 
+> > Also, what about algorithms such as blake2b-256 which optionally take a key (as
+> > indicated by CRYPTO_ALG_OPTIONAL_KEY being set)?  So it's not really "yes" or
+> > "no"; there is a third state as well.
+> 
+> Correct me if I'm missing something, but crypto_shash_alg_needs_key reads:
+> 
+> static inline bool crypto_shash_alg_needs_key(struct shash_alg *alg)
+> {
+> 	return crypto_shash_alg_has_setkey(alg) &&
+> 		!(alg->base.cra_flags & CRYPTO_ALG_OPTIONAL_KEY);
+> }
+> 
+> So this already accounts for optional keys. It just returns "no" for an
+> optional key, which seems like reasonable behavior to me (it doesn't *need*
+> a key after all).
+> 
+> Another option would be to make it "yes/no/optional". I'm not sure if that's
+> more desirable for most people.
+> 
 
+BLAKE2 does need a key if it is being used as a keyed hash algorithm.  So it
+depends on the user, not the algorithm per se.
+
+- Eric
