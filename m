@@ -2,190 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ECADC4161F
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Mar 2021 01:43:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 752E7C4160E
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Mar 2021 01:43:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2A0F64E90
+	by mail.kernel.org (Postfix) with ESMTP id 4389564EBD
 	for <linux-crypto@archiver.kernel.org>; Wed,  3 Mar 2021 01:43:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239924AbhCCBic (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Mar 2021 20:38:32 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44436 "EHLO mail.kernel.org"
+        id S239570AbhCCBhj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Mar 2021 20:37:39 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55688 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1350835AbhCBUdz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Mar 2021 15:33:55 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E755564F23;
-        Tue,  2 Mar 2021 20:33:11 +0000 (UTC)
+        id S245418AbhCBRkL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Mar 2021 12:40:11 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 9095B64F12;
+        Tue,  2 Mar 2021 17:39:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614717193;
-        bh=kOGpn7B0El3iWcbwMgXqlMPv33O/KqTJt4D4zojxdSA=;
-        h=From:To:Cc:Subject:Date:From;
-        b=R11F7+Z+BpaEAogY7HTFRO2/OQ8HLAO418fyoNcfQqQPtN1a9DHE+eir2Ago+mA7Z
-         DlfiVndNKHJhUKGbORfxRRMRp/ySkQnvRfc1cpEwTxflzgkUWQjsIi7CxzOkYEuXe/
-         IBlqloQf/k19PTonQiTwjOQNQaBGuEcEq1W4VliC4984g1xMcis+GNA/oSM9cgdoX0
-         gbcZKB2SlkyNGjLOkPwQY2xc1k6dSYXw6mTkWQD+0jStY1CYfUfbbifSZMiS+Vf96+
-         6SZ+YzivISMehFR9tprPxWw6SNGVrIsb6qIjEOmjpHatUiXlvaSttkDnDoqCFEWbcc
-         auSKS7xgUd4vQ==
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>,
-        syzbot+12cf5fbfdeba210a89dd@syzkaller.appspotmail.com,
-        Eric Biggers <ebiggers@google.com>
-Subject: [PATCH v3] crypto: api - check for ERR pointers in crypto_destroy_tfm()
-Date:   Tue,  2 Mar 2021 21:33:03 +0100
-Message-Id: <20210302203303.40881-1-ardb@kernel.org>
-X-Mailer: git-send-email 2.30.1
+        s=k20201202; t=1614706768;
+        bh=4PXtG4bGHaK3TW0WRz7auQNev9K7TX4p38IsgAbYnD8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=saP8zQTEbv/NcJLYrTMmiXD6bkhHfu2t2/LvegFwZ9NBF6Fx7unIYUj7Y7EN84RAd
+         GiQh3MctYKRRPCF20js89xqPIstrwfCGWxJ6SEluS2A1cXpm1EL9HKf/uIMJdeYPph
+         WHw17HpKN2iDcgH3fPg28FKzWcbWJxtZdNmET8+ia4rw3waf9qqgDLF2gnutcOxOr6
+         3vA+jNrIurUdRNfPfLFescY7CrwSzEChFSC2gueMwl3nkpEuDC2GEr5cvNZo5oe+ly
+         cTTNdrTfy1yDkSHoKQowA94FYP36M8eT9RvYswsnOWCi+Lr6jy0sAlEvgs7bF/IJ8A
+         NZtpnSFUHs0NQ==
+Date:   Tue, 2 Mar 2021 09:39:27 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        syzbot+12cf5fbfdeba210a89dd@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2] crypto: api - check for ERR pointers in
+ crypto_destroy_tfm()
+Message-ID: <YD54T+WRkGIrpuTM@sol.localdomain>
+References: <20210302075530.29315-1-ardb@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210302075530.29315-1-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Given that crypto_alloc_tfm() may return ERR pointers, and to avoid
-crashes on obscure error paths where such pointers are presented to
-crypto_destroy_tfm() (such as [0]), add an ERR_PTR check there
-before dereferencing the second argument as a struct crypto_tfm
-pointer.
+On Tue, Mar 02, 2021 at 08:55:30AM +0100, Ard Biesheuvel wrote:
+> diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+> index 13f8a6a54ca8..f065dbe2205c 100644
+> --- a/include/crypto/hash.h
+> +++ b/include/crypto/hash.h
+> @@ -281,6 +281,8 @@ static inline struct crypto_tfm *crypto_ahash_tfm(struct crypto_ahash *tfm)
+>  /**
+>   * crypto_free_ahash() - zeroize and free the ahash handle
+>   * @tfm: cipher handle to be freed
+> + *
+> + * If @tfm is a NULL or error pointer, this function does nothing.
+>   */
+>  static inline void crypto_free_ahash(struct crypto_ahash *tfm)
+>  {
 
-[0] https://lore.kernel.org/linux-crypto/000000000000de949705bc59e0f6@google.com/
+You missed crypto_free_shash().
 
-Reported-by: syzbot+12cf5fbfdeba210a89dd@syzkaller.appspotmail.com
+Otherwise this looks good, feel free to add:
+
 Reviewed-by: Eric Biggers <ebiggers@google.com>
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
-v3: missed crypto_free_shash() in v2
-    add Eric's Rb
-v2: update kerneldoc comments of callers to crypto_destroy_tfm() that NULL or
-    error pointers are ignored.
 
- crypto/api.c               | 2 +-
- include/crypto/acompress.h | 2 ++
- include/crypto/aead.h      | 2 ++
- include/crypto/akcipher.h  | 2 ++
- include/crypto/hash.h      | 4 ++++
- include/crypto/kpp.h       | 2 ++
- include/crypto/rng.h       | 2 ++
- include/crypto/skcipher.h  | 2 ++
- 8 files changed, 17 insertions(+), 1 deletion(-)
-
-diff --git a/crypto/api.c b/crypto/api.c
-index ed08cbd5b9d3..c4eda56cff89 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -562,7 +562,7 @@ void crypto_destroy_tfm(void *mem, struct crypto_tfm *tfm)
- {
- 	struct crypto_alg *alg;
- 
--	if (unlikely(!mem))
-+	if (IS_ERR_OR_NULL(mem))
- 		return;
- 
- 	alg = tfm->__crt_alg;
-diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
-index fcde59c65a81..cb3d6b1c655d 100644
---- a/include/crypto/acompress.h
-+++ b/include/crypto/acompress.h
-@@ -165,6 +165,8 @@ static inline struct crypto_acomp *crypto_acomp_reqtfm(struct acomp_req *req)
-  * crypto_free_acomp() -- free ACOMPRESS tfm handle
-  *
-  * @tfm:	ACOMPRESS tfm handle allocated with crypto_alloc_acomp()
-+ *
-+ * If @tfm is a NULL or error pointer, this function does nothing.
-  */
- static inline void crypto_free_acomp(struct crypto_acomp *tfm)
- {
-diff --git a/include/crypto/aead.h b/include/crypto/aead.h
-index fcc12c593ef8..e728469c4ccc 100644
---- a/include/crypto/aead.h
-+++ b/include/crypto/aead.h
-@@ -185,6 +185,8 @@ static inline struct crypto_tfm *crypto_aead_tfm(struct crypto_aead *tfm)
- /**
-  * crypto_free_aead() - zeroize and free aead handle
-  * @tfm: cipher handle to be freed
-+ *
-+ * If @tfm is a NULL or error pointer, this function does nothing.
-  */
- static inline void crypto_free_aead(struct crypto_aead *tfm)
- {
-diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
-index 1d3aa252caba..5764b46bd1ec 100644
---- a/include/crypto/akcipher.h
-+++ b/include/crypto/akcipher.h
-@@ -174,6 +174,8 @@ static inline struct crypto_akcipher *crypto_akcipher_reqtfm(
-  * crypto_free_akcipher() - free AKCIPHER tfm handle
-  *
-  * @tfm: AKCIPHER tfm handle allocated with crypto_alloc_akcipher()
-+ *
-+ * If @tfm is a NULL or error pointer, this function does nothing.
-  */
- static inline void crypto_free_akcipher(struct crypto_akcipher *tfm)
- {
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 13f8a6a54ca8..b2bc1e46e86a 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -281,6 +281,8 @@ static inline struct crypto_tfm *crypto_ahash_tfm(struct crypto_ahash *tfm)
- /**
-  * crypto_free_ahash() - zeroize and free the ahash handle
-  * @tfm: cipher handle to be freed
-+ *
-+ * If @tfm is a NULL or error pointer, this function does nothing.
-  */
- static inline void crypto_free_ahash(struct crypto_ahash *tfm)
- {
-@@ -724,6 +726,8 @@ static inline struct crypto_tfm *crypto_shash_tfm(struct crypto_shash *tfm)
- /**
-  * crypto_free_shash() - zeroize and free the message digest handle
-  * @tfm: cipher handle to be freed
-+ *
-+ * If @tfm is a NULL or error pointer, this function does nothing.
-  */
- static inline void crypto_free_shash(struct crypto_shash *tfm)
- {
-diff --git a/include/crypto/kpp.h b/include/crypto/kpp.h
-index 88b591215d5c..cccceadc164b 100644
---- a/include/crypto/kpp.h
-+++ b/include/crypto/kpp.h
-@@ -154,6 +154,8 @@ static inline void crypto_kpp_set_flags(struct crypto_kpp *tfm, u32 flags)
-  * crypto_free_kpp() - free KPP tfm handle
-  *
-  * @tfm: KPP tfm handle allocated with crypto_alloc_kpp()
-+ *
-+ * If @tfm is a NULL or error pointer, this function does nothing.
-  */
- static inline void crypto_free_kpp(struct crypto_kpp *tfm)
- {
-diff --git a/include/crypto/rng.h b/include/crypto/rng.h
-index 8b4b844b4eef..17bb3673d3c1 100644
---- a/include/crypto/rng.h
-+++ b/include/crypto/rng.h
-@@ -111,6 +111,8 @@ static inline struct rng_alg *crypto_rng_alg(struct crypto_rng *tfm)
- /**
-  * crypto_free_rng() - zeroize and free RNG handle
-  * @tfm: cipher handle to be freed
-+ *
-+ * If @tfm is a NULL or error pointer, this function does nothing.
-  */
- static inline void crypto_free_rng(struct crypto_rng *tfm)
- {
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index 6a733b171a5d..ef0fc9ed4342 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -196,6 +196,8 @@ static inline struct crypto_tfm *crypto_skcipher_tfm(
- /**
-  * crypto_free_skcipher() - zeroize and free cipher handle
-  * @tfm: cipher handle to be freed
-+ *
-+ * If @tfm is a NULL or error pointer, this function does nothing.
-  */
- static inline void crypto_free_skcipher(struct crypto_skcipher *tfm)
- {
--- 
-2.30.1
-
+- Eric
