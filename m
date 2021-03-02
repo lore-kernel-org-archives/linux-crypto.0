@@ -2,95 +2,178 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF263C433E9
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Mar 2021 01:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD551C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Mar 2021 01:31:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 81E2964E62
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Mar 2021 01:28:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ACCE064E28
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Mar 2021 01:31:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233643AbhCCBSk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Mar 2021 20:18:40 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:13031 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378363AbhCBBFm (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Mar 2021 20:05:42 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DqJlG4Vp7zMgM3;
-        Tue,  2 Mar 2021 09:02:50 +0800 (CST)
-Received: from [10.67.103.10] (10.67.103.10) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.498.0; Tue, 2 Mar 2021
- 09:04:53 +0800
-Subject: [PATCH v9 9/9] certs: Add support for using elliptic curve keys for
- signing modules
-To:     Mimi Zohar <zohar@linux.ibm.com>,
-        Stefan Berger <stefanb@linux.vnet.ibm.com>,
-        <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <davem@davemloft.net>, <herbert@gondor.apana.org.au>,
-        <dhowells@redhat.com>
-CC:     <linux-kernel@vger.kernel.org>, <patrick@puiterwijk.org>,
-        <linux-integrity@vger.kernel.org>,
-        Stefan Berger <stefanb@linux.ibm.com>
-References: <20210225160802.2478700-1-stefanb@linux.vnet.ibm.com>
- <20210225160802.2478700-10-stefanb@linux.vnet.ibm.com>
- <ce098224-893c-fba8-5995-a7bac90f82c2@huawei.com>
- <8618fdb7107ec6ec1aeb4e37faf82421050bdf91.camel@linux.ibm.com>
-From:   yumeng <yumeng18@huawei.com>
-Message-ID: <f49f8d88-d7c1-3a78-115f-07b93d2eb160@huawei.com>
-Date:   Tue, 2 Mar 2021 09:04:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
+        id S233204AbhCCB0r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Mar 2021 20:26:47 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34948 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1376795AbhCBH4g (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Mar 2021 02:56:36 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 838BA64DE5;
+        Tue,  2 Mar 2021 07:55:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1614671741;
+        bh=U52npwZXvOiYHgDjNITsEfJDzhXXBzaGfsDnn9Jv/co=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Q8gbzPSLwCq7CM19bgtQxFKZDPat9ro4lnl2qTUoKa/N5Mp2oWqSXO67zWTb0/u5Z
+         9eJJc2fJkJzhAwM1/IT7w4ncXjGQsVyAGq6Ij0gh7PsO8bgyT8wCn6hPtnlofMMnLb
+         yojn58BPxFTyCan0/aa1BqrHjYozApdD85JE7p23L4lvDUGIDr+H8hFua2Jgi75l8b
+         rT8x+E3a4um6Aq15V8xb/8H/MTWJ/FMz+5efXLKVaDJyWiIwCz+E6CeO1PTP7F4zLU
+         E8aqdSTlu9V3NJaxD2Fjr4qXQK9cTFMxpXrQmM5RUWxGYmHSKrZL9YAlSij0MsM/5A
+         KWdJTSf0XhoWQ==
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
+        Ard Biesheuvel <ardb@kernel.org>,
+        syzbot+12cf5fbfdeba210a89dd@syzkaller.appspotmail.com
+Subject: [PATCH v2] crypto: api - check for ERR pointers in crypto_destroy_tfm()
+Date:   Tue,  2 Mar 2021 08:55:30 +0100
+Message-Id: <20210302075530.29315-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.30.1
 MIME-Version: 1.0
-In-Reply-To: <8618fdb7107ec6ec1aeb4e37faf82421050bdf91.camel@linux.ibm.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.103.10]
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Given that crypto_alloc_tfm() may return ERR pointers, and to avoid
+crashes on obscure error paths where such pointers are presented to
+crypto_destroy_tfm() (such as [0]), add an ERR_PTR check there
+before dereferencing the second argument as a struct crypto_tfm
+pointer.
 
+[0] https://lore.kernel.org/linux-crypto/000000000000de949705bc59e0f6@google.com/
 
-在 2021/3/1 21:11, Mimi Zohar 写道:
-> On Sat, 2021-02-27 at 11:35 +0800, yumeng wrote:
->> 在 2021/2/26 0:08, Stefan Berger 写道:
->>> From: Stefan Berger <stefanb@linux.ibm.com>
->>>
->>
->>> diff --git a/certs/Makefile b/certs/Makefile
->>> index 3fe6b73786fa..c487d7021c54 100644
->>> --- a/certs/Makefile
->>> +++ b/certs/Makefile
->>> @@ -69,6 +69,18 @@ else
->>>    SIGNER = -signkey $(obj)/signing_key.key
->>>    endif # CONFIG_IMA_APPRAISE_MODSIG
->>>    
->>
->> Is there anything wrong in this patch?
->> I can't apply it when I use 'git am '.
->> errors like below:
->>
->> error: certs/Kconfig: does not match index
->> error: patch failed: certs/Makefile:69
->> error: certs/Makefile: patch does not apply
->>
->> Thanks
-> 
-> Nothing wrong with the patch, just a dependency.  From the Change log:
->     - This patch builds on top Nayna's series for 'kernel build support
->     for loading the kernel module signing key'.
->     - https://lkml.org/lkml/2021/2/18/856
-> 
-> thanks,
-> 
-> Mimi
-> 
-> 
+Reported-by: syzbot+12cf5fbfdeba210a89dd@syzkaller.appspotmail.com
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+v2: update kerneldoc comments of callers to crypto_destroy_tfm() that NULL or
+    error pointers are ignored.
 
-OK, thank you. Sorry for the noise.
+ crypto/api.c               | 2 +-
+ include/crypto/acompress.h | 2 ++
+ include/crypto/aead.h      | 2 ++
+ include/crypto/akcipher.h  | 2 ++
+ include/crypto/hash.h      | 2 ++
+ include/crypto/kpp.h       | 2 ++
+ include/crypto/rng.h       | 2 ++
+ include/crypto/skcipher.h  | 2 ++
+ 8 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/api.c b/crypto/api.c
+index ed08cbd5b9d3..c4eda56cff89 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -562,7 +562,7 @@ void crypto_destroy_tfm(void *mem, struct crypto_tfm *tfm)
+ {
+ 	struct crypto_alg *alg;
+ 
+-	if (unlikely(!mem))
++	if (IS_ERR_OR_NULL(mem))
+ 		return;
+ 
+ 	alg = tfm->__crt_alg;
+diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
+index fcde59c65a81..cb3d6b1c655d 100644
+--- a/include/crypto/acompress.h
++++ b/include/crypto/acompress.h
+@@ -165,6 +165,8 @@ static inline struct crypto_acomp *crypto_acomp_reqtfm(struct acomp_req *req)
+  * crypto_free_acomp() -- free ACOMPRESS tfm handle
+  *
+  * @tfm:	ACOMPRESS tfm handle allocated with crypto_alloc_acomp()
++ *
++ * If @tfm is a NULL or error pointer, this function does nothing.
+  */
+ static inline void crypto_free_acomp(struct crypto_acomp *tfm)
+ {
+diff --git a/include/crypto/aead.h b/include/crypto/aead.h
+index fcc12c593ef8..e728469c4ccc 100644
+--- a/include/crypto/aead.h
++++ b/include/crypto/aead.h
+@@ -185,6 +185,8 @@ static inline struct crypto_tfm *crypto_aead_tfm(struct crypto_aead *tfm)
+ /**
+  * crypto_free_aead() - zeroize and free aead handle
+  * @tfm: cipher handle to be freed
++ *
++ * If @tfm is a NULL or error pointer, this function does nothing.
+  */
+ static inline void crypto_free_aead(struct crypto_aead *tfm)
+ {
+diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
+index 1d3aa252caba..5764b46bd1ec 100644
+--- a/include/crypto/akcipher.h
++++ b/include/crypto/akcipher.h
+@@ -174,6 +174,8 @@ static inline struct crypto_akcipher *crypto_akcipher_reqtfm(
+  * crypto_free_akcipher() - free AKCIPHER tfm handle
+  *
+  * @tfm: AKCIPHER tfm handle allocated with crypto_alloc_akcipher()
++ *
++ * If @tfm is a NULL or error pointer, this function does nothing.
+  */
+ static inline void crypto_free_akcipher(struct crypto_akcipher *tfm)
+ {
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 13f8a6a54ca8..f065dbe2205c 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -281,6 +281,8 @@ static inline struct crypto_tfm *crypto_ahash_tfm(struct crypto_ahash *tfm)
+ /**
+  * crypto_free_ahash() - zeroize and free the ahash handle
+  * @tfm: cipher handle to be freed
++ *
++ * If @tfm is a NULL or error pointer, this function does nothing.
+  */
+ static inline void crypto_free_ahash(struct crypto_ahash *tfm)
+ {
+diff --git a/include/crypto/kpp.h b/include/crypto/kpp.h
+index 88b591215d5c..cccceadc164b 100644
+--- a/include/crypto/kpp.h
++++ b/include/crypto/kpp.h
+@@ -154,6 +154,8 @@ static inline void crypto_kpp_set_flags(struct crypto_kpp *tfm, u32 flags)
+  * crypto_free_kpp() - free KPP tfm handle
+  *
+  * @tfm: KPP tfm handle allocated with crypto_alloc_kpp()
++ *
++ * If @tfm is a NULL or error pointer, this function does nothing.
+  */
+ static inline void crypto_free_kpp(struct crypto_kpp *tfm)
+ {
+diff --git a/include/crypto/rng.h b/include/crypto/rng.h
+index 8b4b844b4eef..17bb3673d3c1 100644
+--- a/include/crypto/rng.h
++++ b/include/crypto/rng.h
+@@ -111,6 +111,8 @@ static inline struct rng_alg *crypto_rng_alg(struct crypto_rng *tfm)
+ /**
+  * crypto_free_rng() - zeroize and free RNG handle
+  * @tfm: cipher handle to be freed
++ *
++ * If @tfm is a NULL or error pointer, this function does nothing.
+  */
+ static inline void crypto_free_rng(struct crypto_rng *tfm)
+ {
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 6a733b171a5d..ef0fc9ed4342 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -196,6 +196,8 @@ static inline struct crypto_tfm *crypto_skcipher_tfm(
+ /**
+  * crypto_free_skcipher() - zeroize and free cipher handle
+  * @tfm: cipher handle to be freed
++ *
++ * If @tfm is a NULL or error pointer, this function does nothing.
+  */
+ static inline void crypto_free_skcipher(struct crypto_skcipher *tfm)
+ {
+-- 
+2.30.1
+
