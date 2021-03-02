@@ -2,79 +2,290 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=BAYES_05,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DD98C28D13
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Mar 2021 01:43:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDC45C4332B
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Mar 2021 01:42:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C84B764E09
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Mar 2021 01:43:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE0F164E09
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Mar 2021 01:42:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239845AbhCCBiV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Mar 2021 20:38:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41390 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1835416AbhCBTGL (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Mar 2021 14:06:11 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D73FAC06178A
-        for <linux-crypto@vger.kernel.org>; Tue,  2 Mar 2021 10:54:08 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id l7so10204811pfd.3
-        for <linux-crypto@vger.kernel.org>; Tue, 02 Mar 2021 10:54:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=Hx49CiFVsjWXhYMbQ1MybklMKVdncil6IRYeMIiiiqg=;
-        b=IOq/9c9L0kzgvANyoP9GDYC6E3xdNFils1b7k1X3vXSsznefMdGMk77uKXcIkVbbI2
-         QoZQF1b1/GJQKW4R6tq1MFo4aNmbBMbPvn3Hhy5DRrb977w6+3aM+ygpzrW9xyb2gYVl
-         QDWNIp+yCFYLGXLqlpd47jfD4H2gKTnv6vQPbFzTYQOQ9G5PF1si8mBoNiIlA3Y1XeXV
-         7VA3D6N3MfHXPMmzaG6LeTo+gK3W+T45RvygqSejIhaY3m+oUbZx2zYNmJZybMATZ63f
-         6TYzXDD9aRsbYKACg2/TIywE2vgY0Dp1ga0k2CgyxAknSaNLqCOziIArkOpe2KXNGl/K
-         mrCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=Hx49CiFVsjWXhYMbQ1MybklMKVdncil6IRYeMIiiiqg=;
-        b=RtkQ+cXvh2nru5PWGRVmaTx/wVwFpAzMYGW836iJMBy03cMeKVokdMqFGtS4pwm8t2
-         OxmF7G3vNyiYIWZUu02JBPpUWwmDOT5595/w5EzzfZz9kZ83GM3+GGmb9RxJYsTVQys4
-         8q4OwC/kBaINrdtaW+F8x3zAUTxstsroETnXa0SMAxlE91vdnXHsESrOctQnzsTBRKvE
-         yI4qZ3ACKKchwa2Ihp92zfxDs9CVz8s/35OmBHLAdMcXjnCW6TVkpDynR7K0iQ63csrk
-         g8Hi/kfk7rjMPqpncVqGmpSL9op0YuFYyyQ3iZwPXCOcgn8LCRv3RsStKUGRtotNXxDB
-         ZeNw==
-X-Gm-Message-State: AOAM531S7BHt/JBCsJb9y+8wOicTTLXbYz5M/mcEtHzPOL/wZ1TU1q3T
-        D0EaFANFYxe6DQ2ktcfyqhJrb0lCNt12cieeSWYXzvrR
-X-Google-Smtp-Source: ABdhPJwsqpHgfXIqGPh/eVJkp2YbDOmdSK3JIynDeFDBT5dgvAXheaZfPIEQtP2M5qs7cAS6ZbEj1elH4c6uQQp2T1s=
-X-Received: by 2002:a62:c301:0:b029:1ed:c3d5:54d6 with SMTP id
- v1-20020a62c3010000b02901edc3d554d6mr4503449pfg.18.1614711248173; Tue, 02 Mar
- 2021 10:54:08 -0800 (PST)
-MIME-Version: 1.0
-From:   Arthur Sakayan <asvdem@gmail.com>
-Date:   Tue, 2 Mar 2021 18:53:57 +0000
-Message-ID: <CADkYWuQhB_3CxYoyg-d0qNywGMU-TQwG0cobpJGKAxJv01Q45A@mail.gmail.com>
-Subject: Beginner's questions
+        id S233627AbhCCBaf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Mar 2021 20:30:35 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40218 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1378884AbhCBJFl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Mar 2021 04:05:41 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 870D464EFB;
+        Tue,  2 Mar 2021 09:02:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1614675753;
+        bh=QeSb1vakkawfHlAePTVlRzeExwYx/qD8bH6IzcpQYBg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=MM4uRcPyouWovTGj/tiLHUJkKqxwS15Te6ggpgAiDKruPOqTH4exhms/59Se0e1fF
+         e2twlaaRKJmwZjGrYF5OZUYdCMT2KQsQBnmPMGIDO2UCCe1iW+l6D0KdD/6FeZtX2g
+         EQPWFlmYnFx65n4wBmuVUWOIA0X+EDZo29t9zYgmgiahjDDFvjLNbAZ+8yvvCLlyF3
+         tyaY9srB30mTRT1SEl79TaHqXJ/T+BpibKHUgUcGSdTZhnJsGi5QFSlsc9TAO4T+UA
+         ms4eYyarQrW6Di+SosgYRuNj2viERspkKzcxbcHo5Nm9T599AchSsKAOKZDUwtR4v1
+         FtOYtVsoy+d5A==
+From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Cc:     linux-arm-kernel@lists.infradead.org,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Dave Martin <dave.martin@arm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>
+Subject: [PATCH v2 9/9] crypto: arm64/aes-neonbs - stop using SIMD helper for skciphers
+Date:   Tue,  2 Mar 2021 10:01:18 +0100
+Message-Id: <20210302090118.30666-10-ardb@kernel.org>
+X-Mailer: git-send-email 2.30.1
+In-Reply-To: <20210302090118.30666-1-ardb@kernel.org>
+References: <20210302090118.30666-1-ardb@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello everyone!
+Calls into the skcipher API can only occur from contexts where the SIMD
+unit is available, so there is no need for the SIMD helper.
 
-I have a very great interest in improving the linux kernel, with
-special regards to cryptography.
-However, due to my lack of knowledge, I do not know exactly how can I do so.
-Thus, I have a few questions regarding this:
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ arch/arm64/crypto/Kconfig           |   1 -
+ arch/arm64/crypto/aes-neonbs-glue.c | 122 ++------------------
+ 2 files changed, 9 insertions(+), 114 deletions(-)
 
-How exactly do I start contributing to the linux-crypto subsystem?
-Where can I find a list of bugs (or other issues, for that matter)
-that need to be addressed?
-What should I know in order to be able to contribute to the
-linux-crypto subsystem?
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index 1a4374ed70fa..dbbbc9a0a9b4 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -122,6 +122,5 @@ config CRYPTO_AES_ARM64_BS
+ 	select CRYPTO_AES_ARM64_NEON_BLK
+ 	select CRYPTO_AES_ARM64
+ 	select CRYPTO_LIB_AES
+-	select CRYPTO_SIMD
+ 
+ endif
+diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
+index fb507d569922..8df6ad8cb09d 100644
+--- a/arch/arm64/crypto/aes-neonbs-glue.c
++++ b/arch/arm64/crypto/aes-neonbs-glue.c
+@@ -63,11 +63,6 @@ struct aesbs_cbc_ctx {
+ 	u32			enc[AES_MAX_KEYLENGTH_U32];
+ };
+ 
+-struct aesbs_ctr_ctx {
+-	struct aesbs_ctx	key;		/* must be first member */
+-	struct crypto_aes_ctx	fallback;
+-};
+-
+ struct aesbs_xts_ctx {
+ 	struct aesbs_ctx	key;
+ 	u32			twkey[AES_MAX_KEYLENGTH_U32];
+@@ -207,25 +202,6 @@ static int cbc_decrypt(struct skcipher_request *req)
+ 	return err;
+ }
+ 
+-static int aesbs_ctr_setkey_sync(struct crypto_skcipher *tfm, const u8 *in_key,
+-				 unsigned int key_len)
+-{
+-	struct aesbs_ctr_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	int err;
+-
+-	err = aes_expandkey(&ctx->fallback, in_key, key_len);
+-	if (err)
+-		return err;
+-
+-	ctx->key.rounds = 6 + key_len / 4;
+-
+-	kernel_neon_begin();
+-	aesbs_convert_key(ctx->key.rk, ctx->fallback.key_enc, ctx->key.rounds);
+-	kernel_neon_end();
+-
+-	return 0;
+-}
+-
+ static int ctr_encrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+@@ -292,29 +268,6 @@ static int aesbs_xts_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
+ 	return aesbs_setkey(tfm, in_key, key_len);
+ }
+ 
+-static void ctr_encrypt_one(struct crypto_skcipher *tfm, const u8 *src, u8 *dst)
+-{
+-	struct aesbs_ctr_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	unsigned long flags;
+-
+-	/*
+-	 * Temporarily disable interrupts to avoid races where
+-	 * cachelines are evicted when the CPU is interrupted
+-	 * to do something else.
+-	 */
+-	local_irq_save(flags);
+-	aes_encrypt(&ctx->fallback, dst, src);
+-	local_irq_restore(flags);
+-}
+-
+-static int ctr_encrypt_sync(struct skcipher_request *req)
+-{
+-	if (!crypto_simd_usable())
+-		return crypto_ctr_encrypt_walk(req, ctr_encrypt_one);
+-
+-	return ctr_encrypt(req);
+-}
+-
+ static int __xts_crypt(struct skcipher_request *req, bool encrypt,
+ 		       void (*fn)(u8 out[], u8 const in[], u8 const rk[],
+ 				  int rounds, int blocks, u8 iv[]))
+@@ -431,13 +384,12 @@ static int xts_decrypt(struct skcipher_request *req)
+ }
+ 
+ static struct skcipher_alg aes_algs[] = { {
+-	.base.cra_name		= "__ecb(aes)",
+-	.base.cra_driver_name	= "__ecb-aes-neonbs",
++	.base.cra_name		= "ecb(aes)",
++	.base.cra_driver_name	= "ecb-aes-neonbs",
+ 	.base.cra_priority	= 250,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct aesbs_ctx),
+ 	.base.cra_module	= THIS_MODULE,
+-	.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 
+ 	.min_keysize		= AES_MIN_KEY_SIZE,
+ 	.max_keysize		= AES_MAX_KEY_SIZE,
+@@ -446,13 +398,12 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.encrypt		= ecb_encrypt,
+ 	.decrypt		= ecb_decrypt,
+ }, {
+-	.base.cra_name		= "__cbc(aes)",
+-	.base.cra_driver_name	= "__cbc-aes-neonbs",
++	.base.cra_name		= "cbc(aes)",
++	.base.cra_driver_name	= "cbc-aes-neonbs",
+ 	.base.cra_priority	= 250,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct aesbs_cbc_ctx),
+ 	.base.cra_module	= THIS_MODULE,
+-	.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 
+ 	.min_keysize		= AES_MIN_KEY_SIZE,
+ 	.max_keysize		= AES_MAX_KEY_SIZE,
+@@ -462,13 +413,12 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.encrypt		= cbc_encrypt,
+ 	.decrypt		= cbc_decrypt,
+ }, {
+-	.base.cra_name		= "__ctr(aes)",
+-	.base.cra_driver_name	= "__ctr-aes-neonbs",
++	.base.cra_name		= "ctr(aes)",
++	.base.cra_driver_name	= "ctr-aes-neonbs",
+ 	.base.cra_priority	= 250,
+ 	.base.cra_blocksize	= 1,
+ 	.base.cra_ctxsize	= sizeof(struct aesbs_ctx),
+ 	.base.cra_module	= THIS_MODULE,
+-	.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 
+ 	.min_keysize		= AES_MIN_KEY_SIZE,
+ 	.max_keysize		= AES_MAX_KEY_SIZE,
+@@ -479,29 +429,12 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.encrypt		= ctr_encrypt,
+ 	.decrypt		= ctr_encrypt,
+ }, {
+-	.base.cra_name		= "ctr(aes)",
+-	.base.cra_driver_name	= "ctr-aes-neonbs",
+-	.base.cra_priority	= 250 - 1,
+-	.base.cra_blocksize	= 1,
+-	.base.cra_ctxsize	= sizeof(struct aesbs_ctr_ctx),
+-	.base.cra_module	= THIS_MODULE,
+-
+-	.min_keysize		= AES_MIN_KEY_SIZE,
+-	.max_keysize		= AES_MAX_KEY_SIZE,
+-	.chunksize		= AES_BLOCK_SIZE,
+-	.walksize		= 8 * AES_BLOCK_SIZE,
+-	.ivsize			= AES_BLOCK_SIZE,
+-	.setkey			= aesbs_ctr_setkey_sync,
+-	.encrypt		= ctr_encrypt_sync,
+-	.decrypt		= ctr_encrypt_sync,
+-}, {
+-	.base.cra_name		= "__xts(aes)",
+-	.base.cra_driver_name	= "__xts-aes-neonbs",
++	.base.cra_name		= "xts(aes)",
++	.base.cra_driver_name	= "xts-aes-neonbs",
+ 	.base.cra_priority	= 250,
+ 	.base.cra_blocksize	= AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize	= sizeof(struct aesbs_xts_ctx),
+ 	.base.cra_module	= THIS_MODULE,
+-	.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+ 
+ 	.min_keysize		= 2 * AES_MIN_KEY_SIZE,
+ 	.max_keysize		= 2 * AES_MAX_KEY_SIZE,
+@@ -512,54 +445,17 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.decrypt		= xts_decrypt,
+ } };
+ 
+-static struct simd_skcipher_alg *aes_simd_algs[ARRAY_SIZE(aes_algs)];
+-
+ static void aes_exit(void)
+ {
+-	int i;
+-
+-	for (i = 0; i < ARRAY_SIZE(aes_simd_algs); i++)
+-		if (aes_simd_algs[i])
+-			simd_skcipher_free(aes_simd_algs[i]);
+-
+ 	crypto_unregister_skciphers(aes_algs, ARRAY_SIZE(aes_algs));
+ }
+ 
+ static int __init aes_init(void)
+ {
+-	struct simd_skcipher_alg *simd;
+-	const char *basename;
+-	const char *algname;
+-	const char *drvname;
+-	int err;
+-	int i;
+-
+ 	if (!cpu_have_named_feature(ASIMD))
+ 		return -ENODEV;
+ 
+-	err = crypto_register_skciphers(aes_algs, ARRAY_SIZE(aes_algs));
+-	if (err)
+-		return err;
+-
+-	for (i = 0; i < ARRAY_SIZE(aes_algs); i++) {
+-		if (!(aes_algs[i].base.cra_flags & CRYPTO_ALG_INTERNAL))
+-			continue;
+-
+-		algname = aes_algs[i].base.cra_name + 2;
+-		drvname = aes_algs[i].base.cra_driver_name + 2;
+-		basename = aes_algs[i].base.cra_driver_name;
+-		simd = simd_skcipher_create_compat(algname, drvname, basename);
+-		err = PTR_ERR(simd);
+-		if (IS_ERR(simd))
+-			goto unregister_simds;
+-
+-		aes_simd_algs[i] = simd;
+-	}
+-	return 0;
+-
+-unregister_simds:
+-	aes_exit();
+-	return err;
++	return crypto_register_skciphers(aes_algs, ARRAY_SIZE(aes_algs));
+ }
+ 
+ module_init(aes_init);
+-- 
+2.30.1
 
-Sincerely,
-
-Arthur
