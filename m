@@ -2,389 +2,164 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CFEDC001C7
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 00:08:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F2CBC4332D
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 00:08:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F3B864F8F
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 00:08:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D82C64FA0
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 00:08:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235312AbhCDAHh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Mar 2021 19:07:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41594 "EHLO
+        id S1354249AbhCDAHt (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 3 Mar 2021 19:07:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444146AbhCCPBU (ORCPT
+        with ESMTP id S1352989AbhCDACy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Mar 2021 10:01:20 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F33C6C061225
-        for <linux-crypto@vger.kernel.org>; Wed,  3 Mar 2021 06:34:58 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id h98so23906120wrh.11
-        for <linux-crypto@vger.kernel.org>; Wed, 03 Mar 2021 06:34:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=erPTjshbhLchKwQuh0XQUk+wc12RIGoz2km1xclT6d4=;
-        b=EZo0F/vKAXWlIQpH9PKqPP4VUz1vgWxjmgaL0A6IOrX4Zm0mz5zh/eOsJsT7Ux1gDE
-         0axE6MsOpRohAXChk1J5cnJWf7/gDUt2CVNwx30l8yc5VjW7th/ct4aaoqAZEwEtvDG+
-         mmbx22dFlouq+ky0S9Htp2vFGaRw08CdjsDXm82grykQNcw2DJYMK40jMC0GZYNEFFYa
-         +aiNEQak2YYfkMoanJIjD2hCSRejCvGH9cRrD576TpYHImXZG3w6yXlcW/wwB1/u2zau
-         bHCjf0S9B7APGQqDcwzzwqG7ISsbitDdvaVbBwBxHIvZf7+pn7rSxVtQr1cyf6h2rNVg
-         Kb8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=erPTjshbhLchKwQuh0XQUk+wc12RIGoz2km1xclT6d4=;
-        b=k5o3DYnwu2pL//uJSWeOwFVz8565VVXGK/q1F4556tU4dJMi22HnrEQ7Z7tAbjZMh7
-         jbVfyL2iKt2/LVy2l17Gbtpe4TMormKt65S7HlK+PQh0QZjuz4/s0EbIopjVu8Zqms6S
-         QWHMkHCsi2Lcw00k9197rdfnweMNwMh6w3xEP71BFlqdgef4DxhHI8kabxVrvx334tlA
-         qY7ZVLd6E9hrgQfEcIc7Uf4lE9pAA7QVoCIwaitELcIC/59wsXzPpBPJSNebLHxq7TMa
-         bSfMWvTrTvB4PdMYowpfDa0yHo3l+EFYEkPps55mbbdJwBHszxQxm7FF3EUNpi/SKyDv
-         LCXw==
-X-Gm-Message-State: AOAM533Av3U44Un6MlWUw2mispmeWV4/E5De0QBPU9zU7ZnI2jz9wADV
-        uIUAcH1J07ZU50We9iBD+W6tsA==
-X-Google-Smtp-Source: ABdhPJysfJFi1Ht/iBLsCA6KO+d9zXB1Q5jZOY/aNyGPlLgX2TCgqkySNK0y6vBlm2Yqk6SIU3NEPQ==
-X-Received: by 2002:adf:fbce:: with SMTP id d14mr26519347wrs.44.1614782097568;
-        Wed, 03 Mar 2021 06:34:57 -0800 (PST)
-Received: from dell.default ([91.110.221.155])
-        by smtp.gmail.com with ESMTPSA id f16sm31475923wrt.21.2021.03.03.06.34.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Mar 2021 06:34:56 -0800 (PST)
-From:   Lee Jones <lee.jones@linaro.org>
-To:     lee.jones@linaro.org
-Cc:     linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        Wed, 3 Mar 2021 19:02:54 -0500
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam08on2061f.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e8b::61f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4098DC061756
+        for <linux-crypto@vger.kernel.org>; Wed,  3 Mar 2021 15:11:51 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LHELIum9YK8Avs3Eh7xIGmWXRXeAOxGfqR5adW94f1SSDwvGZy/ai2n9hhhLSq/9V89pNBCp2lMoN7yU64AeaVPlHMfXt2l4aRjO56meQrW/cPwB/Zik7fHT6bx+IU0jMkTFhqJZTjHfAx0QxaqG2nZy3zkk7MhoLp5sphWemrcP6XSc9jpmTPMxtM3RtdjxESSiUO3a315uu0e9y9WOKRhn96e13wVltW8t/12aotDyhdIp7JGE6uZuo9JbHDYxsF1Te95wNe+/+j8pGMX+llY1iRqWO4oUHRlll7ah0mpitKbHHi1/EeFrpEF5pQMDPW+iFuy/fe4ngGRa+iFwpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2R9rZO0rcRjtBxCKKH8XBtcYOWGegVd6s8RxCM5X2Us=;
+ b=HTEdIycJ/8qc4Xkcv5cefPvCBIld8NTrr1NlHlm4Q2j1X8UqTerTXV3vcVqg2WbYfTfmnTJt0EztDTjsliXt6Wbcv6A/KWtym4vreWvYpbIK8LwZ8VBMrX+AaBAbMdlRpfYr83eB+08SKDRNcVZH3U1gaO4KtuZe72dXCFleecEMpVEbs5oqgw3LvVr+Z9CBv+w78P0r0iElEp+3q9jAce+wnLYfUwopXHds3sP27MtkQyhW0s7XT4uQaCqehqzlNODtgz1ffCWoQijwUXEEWQqYlzEwDWUEyftXa2HTsJ/GWeM32yHr11hkoSjyf+ZN6NN4AI16uF0MK2mjm98thA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2R9rZO0rcRjtBxCKKH8XBtcYOWGegVd6s8RxCM5X2Us=;
+ b=0sYDkSc0sRi+E89t512BYFY1xAJYX5SPSGysLdyg8DriZH/JRaTr3NCF0/tyOJNyheYQ4E5T/ys/ks8P1jbKX/6v/7BWTNoNtwN4B8iX4Yb98ckC9lnddz9r7QH3jva9Oz5In2VSEtwWtV4Hedawn3Ccr9cfd9CN5Xk+driU7R0=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM5PR1201MB0027.namprd12.prod.outlook.com (2603:10b6:4:59::21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3890.28; Wed, 3 Mar 2021 22:31:21 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::c9b6:a9ce:b253:db70]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::c9b6:a9ce:b253:db70%6]) with mapi id 15.20.3912.017; Wed, 3 Mar 2021
+ 22:31:21 +0000
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Rob Rice <rob.rice@broadcom.com>, linux-crypto@vger.kernel.org
-Subject: [PATCH 02/10] crypto: bcm: Fix a whole host of kernel-doc misdemeanours
-Date:   Wed,  3 Mar 2021 14:34:41 +0000
-Message-Id: <20210303143449.3170813-3-lee.jones@linaro.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210303143449.3170813-1-lee.jones@linaro.org>
-References: <20210303143449.3170813-1-lee.jones@linaro.org>
+        John Allen <john.allen@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH] crypto: ccp - Don't initialize SEV support without the SEV feature
+Date:   Wed,  3 Mar 2021 16:31:09 -0600
+Message-Id: <c1ea9899e6169bf3a3042866e165a2f90bda3ebd.1614810669.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.30.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: SN4PR0601CA0022.namprd06.prod.outlook.com
+ (2603:10b6:803:2f::32) To DM5PR12MB1355.namprd12.prod.outlook.com
+ (2603:10b6:3:6e::7)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from tlendack-t1.amdoffice.net (165.204.77.1) by SN4PR0601CA0022.namprd06.prod.outlook.com (2603:10b6:803:2f::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend Transport; Wed, 3 Mar 2021 22:31:20 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 1e1df150-ab7a-4a94-f070-08d8de9411a4
+X-MS-TrafficTypeDiagnostic: DM5PR1201MB0027:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM5PR1201MB0027680047C733E289F2DD44EC989@DM5PR1201MB0027.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bKFonX3xT19/D5Fft0E2E+CEThQ6wIAqOqOqe67QzMo3PdA7PUwhSaCwD4DqYSPEVRUr6XGRENZvbKIx1UgaZiWYnkmcszpOQ21MvvfOW3NmG2eH/ZIm88o5mqLtsTafucumNJXfMLmuIfqg/sU8ayiaCByrJLIjvzSMZ2fzYBhExVpKByG/1VidUcanCVURdpi0mE9X80XSXUV0m+GaMpQJxI+/OXrY1bZdX/A5XlZMYoIZIObYJJZc/HNflFSuLQcjgAAV1pHrIoINoy/9cacd1tvJH6HZeOqZ1uTj7BwctEcCDyaYCgMsUgP8bI3n49shLREYpNwR8EzXPn6xKnSr0csJC8K8+/huZ1KWiWJ+Hzs65nISIARU/BPUuRK0hX0p20D5SKCzP0m7Zv28IqNAISsu4VPCiDq5xqW5y6yfF2Ca4UtrSmiAdwPpoDH1oGa1deo4gp/XTOv0PTfiqWPN8QdojVj4LGXWHMkP/AFELPZNwziXzTBuGzskaq0I8Zejzenwwd+cZVwH55glwA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(376002)(396003)(136003)(366004)(346002)(6506007)(26005)(36756003)(8676002)(16526019)(186003)(478600001)(6666004)(956004)(52116002)(66476007)(4326008)(2906002)(66946007)(8936002)(83380400001)(86362001)(5660300002)(66556008)(2616005)(54906003)(316002)(6512007)(6486002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?GqjgYUplNz1M1VxwekRbcjkhpNSJwald1vJctZ1OlxkNqGFOhOEpJpao/nxj?=
+ =?us-ascii?Q?trCGzma0biAMHXlQiaES/TmcB1pHuja7Dbn6fbzhR6bBSv9LzIFsV/9Y+r0A?=
+ =?us-ascii?Q?IobOoEqa+z+G158VsB91UIjo0pGT9LsUXojszosfPUMwle3+JPMz5QVtAvkO?=
+ =?us-ascii?Q?JmhX8oka7hhYM8AagC9kLi6+pqxbNGEs8CT1uWi3/PplDJvUvWNf4p+Xf1rn?=
+ =?us-ascii?Q?aPWw4QU/hqgTW7t00lfwhrUJHovTvK8bs0zWTxEXZ4q9KnCK1QDl4QWgTVn+?=
+ =?us-ascii?Q?NlLcEa/rIlN/00OycaHu6FDG5xjJor0U9aVu0RT0+pFqISqs4Tm8MZ5U4OZJ?=
+ =?us-ascii?Q?1MTByyDHi+m7qgUAK6/T6+neo7CQqRmFvDlYeNVK7tTd0X3G4c2/XORj3Tr5?=
+ =?us-ascii?Q?2xdYOL022hQP9jELOsbKJzv6JQ60ihz+CpuJpEVRaqDM4q+mNB5+zG2P8L+n?=
+ =?us-ascii?Q?eiNrCL6lf6MTEKgycHEPhl6y5vEeZiMhHLVQtYQ4xzFqY+Ge846flxxItMcg?=
+ =?us-ascii?Q?xFurQ8d8IPdiWQZ1V5BQ9a5nPBEG3yvvt7psFHUfFrWkyhl+Bbx7MMAmMIAq?=
+ =?us-ascii?Q?ce3MqeQCPF/84KSJVSorMIJwN6dlJ3GlyMDCc/2rdjSj+Mpx+xdRjIStjctf?=
+ =?us-ascii?Q?l08vBaq6vx/Dv1bDDaIKc6HIol1cgEdAk64w/avmYdRrEVYiBL3wGPh5LCLE?=
+ =?us-ascii?Q?Zdzmx/kaVgITCTGLggJPFUUXov616mUa+t/sLMZLtOkXXFB0KFCE+wNFpWrf?=
+ =?us-ascii?Q?jGtdrpROu80BF7pIjQL1tY44G6jerIvm97P7JuVPqOKvZ6yEa6Q/TH69BRvK?=
+ =?us-ascii?Q?9UBTQBcGwlipx7vaVU0Xd6Hgk1Z73TKxO5TzSp5DWAlyvsBstpTmS54JpNiI?=
+ =?us-ascii?Q?kLJOcJUKusfv8q5wtt1Fzs1LDZbDbn+KjtkXgQgIYLmUfYXTDKwuMtOTuRj3?=
+ =?us-ascii?Q?BmYkHdcR92ztI8bBl/YCsAl6CLsmCrRovv00OvHUfc6Bck63yb2uIDSS1JCi?=
+ =?us-ascii?Q?k+OvWpReaaxNsn29fap4eAGZW8lpxEBjMv9IhxrYDXue7tSZogteP6gXu8Pv?=
+ =?us-ascii?Q?sJwfhE+DiXs2kEoDFYrviy0C1iuqcpBmcpFIYFJ62gjEax6NqFWebUhRiLjL?=
+ =?us-ascii?Q?RIZ7M1odmFsRwWx3o3xobMLSZ+w8VqWgngI/z/OZi5roz9wvZb4KvqR1eS7L?=
+ =?us-ascii?Q?TlggcBTthaqFtytxaoe/YwK62tVw+SoYMTCLOgC+dRyS/GBrcA5fgZtmFRbM?=
+ =?us-ascii?Q?mlMP0eYxnXfgAx4ZhsSW5KPYEzvaMqzYasTO4TlwbOSeKiSXIzn6BvKnMubW?=
+ =?us-ascii?Q?ADi8qFJFQexX7mfhdACAU/53?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e1df150-ab7a-4a94-f070-08d8de9411a4
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2021 22:31:20.9121
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: z6DO2S0aorVFYYY7Z9XUbPhPF7pV6/MO+SyoMgFUet7Ac9vWs2Gh3eEcx/CYA/YrApsrLtBcO9S4xuFKJaYmzQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB0027
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fixes the following W=1 kernel build warning(s):
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
- drivers/crypto/bcm/util.c:136: warning: Function parameter or member 'from_nents' not described in 'spu_msg_sg_add'
- drivers/crypto/bcm/util.c:136: warning: Function parameter or member 'length' not described in 'spu_msg_sg_add'
- drivers/crypto/bcm/spu.c:464: warning: Excess function parameter 'Return' description in 'spum_gcm_ccm_pad_len'
- drivers/crypto/bcm/spu.c:524: warning: Function parameter or member 'iv_len' not described in 'spum_aead_ivlen'
- drivers/crypto/bcm/spu.c:524: warning: expecting prototype for spu_aead_ivlen(). Prototype was for spum_aead_ivlen() instead
- drivers/crypto/bcm/spu.c:556: warning: Function parameter or member 'alg_digest_size' not described in 'spum_digest_size'
- drivers/crypto/bcm/spu.c:556: warning: Function parameter or member 'alg' not described in 'spum_digest_size'
- drivers/crypto/bcm/spu.c:556: warning: Function parameter or member 'htype' not described in 'spum_digest_size'
- drivers/crypto/bcm/spu.c:583: warning: bad line:
- drivers/crypto/bcm/spu.c:927: warning: Function parameter or member 'is_inbound' not described in 'spum_cipher_req_finish'
- drivers/crypto/bcm/spu.c:927: warning: Excess function parameter 'isInbound' description in 'spum_cipher_req_finish'
- drivers/crypto/bcm/spu2.c:557: warning: Function parameter or member 'fmd' not described in 'spu2_fmd_init'
- drivers/crypto/bcm/spu2.c:557: warning: Function parameter or member 'spu2_type' not described in 'spu2_fmd_init'
- drivers/crypto/bcm/spu2.c:557: warning: Excess function parameter 'spu2_cipher_type' description in 'spu2_fmd_init'
- drivers/crypto/bcm/spu2.c:615: warning: Function parameter or member 'auth_first' not described in 'spu2_fmd_ctrl0_write'
- drivers/crypto/bcm/spu2.c:615: warning: Excess function parameter 'authFirst' description in 'spu2_fmd_ctrl0_write'
- drivers/crypto/bcm/spu2.c:666: warning: Function parameter or member 'is_inbound' not described in 'spu2_fmd_ctrl1_write'
- drivers/crypto/bcm/spu2.c:803: warning: expecting prototype for spu_payload_length(). Prototype was for spu2_payload_length() instead
- drivers/crypto/bcm/spu2.c:825: warning: Function parameter or member 'is_hash' not described in 'spu2_response_hdr_len'
- drivers/crypto/bcm/spu2.c:825: warning: expecting prototype for spu_response_hdr_len(). Prototype was for spu2_response_hdr_len() instead
- drivers/crypto/bcm/spu2.c:843: warning: expecting prototype for spu_hash_pad_len(). Prototype was for spu2_hash_pad_len() instead
- drivers/crypto/bcm/spu2.c:855: warning: Function parameter or member 'cipher_mode' not described in 'spu2_gcm_ccm_pad_len'
- drivers/crypto/bcm/spu2.c:855: warning: Function parameter or member 'data_size' not described in 'spu2_gcm_ccm_pad_len'
- drivers/crypto/bcm/spu2.c:855: warning: expecting prototype for spu2_gcm_ccm_padlen(). Prototype was for spu2_gcm_ccm_pad_len() instead
- drivers/crypto/bcm/spu2.c:872: warning: expecting prototype for spu_assoc_resp_len(). Prototype was for spu2_assoc_resp_len() instead
- drivers/crypto/bcm/spu2.c:919: warning: Function parameter or member 'alg_digest_size' not described in 'spu2_digest_size'
- drivers/crypto/bcm/spu2.c:919: warning: Function parameter or member 'alg' not described in 'spu2_digest_size'
- drivers/crypto/bcm/spu2.c:919: warning: Function parameter or member 'htype' not described in 'spu2_digest_size'
- drivers/crypto/bcm/spu2.c:945: warning: expecting prototype for spu_create_request(). Prototype was for spu2_create_request() instead
- drivers/crypto/bcm/spu2.c:1122: warning: expecting prototype for spu_cipher_req_init(). Prototype was for spu2_cipher_req_init() instead
- drivers/crypto/bcm/spu2.c:1182: warning: Function parameter or member 'is_inbound' not described in 'spu2_cipher_req_finish'
- drivers/crypto/bcm/spu2.c:1182: warning: expecting prototype for spu_cipher_req_finish(). Prototype was for spu2_cipher_req_finish() instead
- drivers/crypto/bcm/spu2.c:1243: warning: expecting prototype for spu_request_pad(). Prototype was for spu2_request_pad() instead
- drivers/crypto/bcm/spu2.c:1321: warning: expecting prototype for spu_status_process(). Prototype was for spu2_status_process() instead
- drivers/crypto/bcm/cipher.c:1048: warning: Function parameter or member 'req' not described in 'spu_aead_rx_sg_create'
- drivers/crypto/bcm/cipher.c:2966: warning: Function parameter or member 'cipher' not described in 'rfc4543_gcm_esp_setkey'
- drivers/crypto/bcm/cipher.c:2966: warning: Function parameter or member 'key' not described in 'rfc4543_gcm_esp_setkey'
- drivers/crypto/bcm/cipher.c:2966: warning: Function parameter or member 'keylen' not described in 'rfc4543_gcm_esp_setkey'
+If SEV has been disabled (e.g. through BIOS), the driver probe will still
+issue SEV firmware commands. The SEV INIT firmware command will return an
+error in this situation, but the error code is a general error code that
+doesn't highlight the exact reason.
 
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Rob Rice <rob.rice@broadcom.com>
-Cc: linux-crypto@vger.kernel.org
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
+Add a check for X86_FEATURE_SEV in sev_dev_init() and emit a meaningful
+message and skip attempting to initialize the SEV firmware if the feature
+is not enabled. Since building the SEV code is dependent on X86_64, adding
+the check won't cause any build problems.
+
+Cc: John Allen <john.allen@amd.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- drivers/crypto/bcm/cipher.c |  7 +++---
- drivers/crypto/bcm/spu.c    | 16 +++++++-------
- drivers/crypto/bcm/spu2.c   | 43 +++++++++++++++++++++----------------
- drivers/crypto/bcm/util.c   |  4 ++--
- 4 files changed, 38 insertions(+), 32 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index 851b149f71701..053315e260c22 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -1019,6 +1019,7 @@ static void handle_ahash_resp(struct iproc_reqctx_s *rctx)
-  * a SPU response message for an AEAD request. Includes buffers to catch SPU
-  * message headers and the response data.
-  * @mssg:	mailbox message containing the receive sg
-+ * @req:	Crypto API request
-  * @rctx:	crypto request context
-  * @rx_frag_num: number of scatterlist elements required to hold the
-  *		SPU response message
-@@ -2952,9 +2953,9 @@ static int aead_gcm_esp_setkey(struct crypto_aead *cipher,
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 476113e12489..b9fc8d7aca73 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -21,6 +21,7 @@
+ #include <linux/ccp.h>
+ #include <linux/firmware.h>
+ #include <linux/gfp.h>
++#include <linux/cpufeature.h>
  
- /**
-  * rfc4543_gcm_esp_setkey() - setkey operation for RFC4543 variant of GCM/GMAC.
-- * cipher: AEAD structure
-- * key:    Key followed by 4 bytes of salt
-- * keylen: Length of key plus salt, in bytes
-+ * @cipher: AEAD structure
-+ * @key:    Key followed by 4 bytes of salt
-+ * @keylen: Length of key plus salt, in bytes
-  *
-  * Extracts salt from key and stores it to be prepended to IV on each request.
-  * Digest is always 16 bytes
-diff --git a/drivers/crypto/bcm/spu.c b/drivers/crypto/bcm/spu.c
-index 007abf92cc05b..6283e8c6d51d3 100644
---- a/drivers/crypto/bcm/spu.c
-+++ b/drivers/crypto/bcm/spu.c
-@@ -457,7 +457,7 @@ u16 spum_hash_pad_len(enum hash_alg hash_alg, enum hash_mode hash_mode,
-  * @cipher_mode:	Algo type
-  * @data_size:		Length of plaintext (bytes)
-  *
-- * @Return: Length of padding, in bytes
-+ * Return: Length of padding, in bytes
-  */
- u32 spum_gcm_ccm_pad_len(enum spu_cipher_mode cipher_mode,
- 			 unsigned int data_size)
-@@ -510,10 +510,10 @@ u32 spum_assoc_resp_len(enum spu_cipher_mode cipher_mode,
- }
+ #include <asm/smp.h>
  
- /**
-- * spu_aead_ivlen() - Calculate the length of the AEAD IV to be included
-+ * spum_aead_ivlen() - Calculate the length of the AEAD IV to be included
-  * in a SPU request after the AAD and before the payload.
-  * @cipher_mode:  cipher mode
-- * @iv_ctr_len:   initialization vector length in bytes
-+ * @iv_len:   initialization vector length in bytes
-  *
-  * In Linux ~4.2 and later, the assoc_data sg includes the IV. So no need
-  * to include the IV as a separate field in the SPU request msg.
-@@ -543,9 +543,9 @@ enum hash_type spum_hash_type(u32 src_sent)
- /**
-  * spum_digest_size() - Determine the size of a hash digest to expect the SPU to
-  * return.
-- * alg_digest_size: Number of bytes in the final digest for the given algo
-- * alg:             The hash algorithm
-- * htype:           Type of hash operation (init, update, full, etc)
-+ * @alg_digest_size: Number of bytes in the final digest for the given algo
-+ * @alg:             The hash algorithm
-+ * @htype:           Type of hash operation (init, update, full, etc)
-  *
-  * When doing incremental hashing for an algorithm with a truncated hash
-  * (e.g., SHA224), the SPU returns the full digest so that it can be fed back as
-@@ -580,7 +580,7 @@ u32 spum_digest_size(u32 alg_digest_size, enum hash_alg alg,
-  * @aead_parms:   Parameters related to AEAD operation
-  * @data_size:    Length of data to be encrypted or authenticated. If AEAD, does
-  *		  not include length of AAD.
--
-+ *
-  * Return: the length of the SPU header in bytes. 0 if an error occurs.
-  */
- u32 spum_create_request(u8 *spu_hdr,
-@@ -911,7 +911,7 @@ u16 spum_cipher_req_init(u8 *spu_hdr, struct spu_cipher_parms *cipher_parms)
-  * setkey() time in spu_cipher_req_init().
-  * @spu_hdr:         Start of the request message header (MH field)
-  * @spu_req_hdr_len: Length in bytes of the SPU request header
-- * @isInbound:       0 encrypt, 1 decrypt
-+ * @is_inbound:      0 encrypt, 1 decrypt
-  * @cipher_parms:    Parameters describing cipher operation to be performed
-  * @data_size:       Length of the data in the BD field
-  *
-diff --git a/drivers/crypto/bcm/spu2.c b/drivers/crypto/bcm/spu2.c
-index 2db35b5ccaa24..07989bb8c220a 100644
---- a/drivers/crypto/bcm/spu2.c
-+++ b/drivers/crypto/bcm/spu2.c
-@@ -543,7 +543,8 @@ void spu2_dump_msg_hdr(u8 *buf, unsigned int buf_len)
- /**
-  * spu2_fmd_init() - At setkey time, initialize the fixed meta data for
-  * subsequent skcipher requests for this context.
-- * @spu2_cipher_type:  Cipher algorithm
-+ * @fmd:               Start of FMD field to be written
-+ * @spu2_type:         Cipher algorithm
-  * @spu2_mode:         Cipher mode
-  * @cipher_key_len:    Length of cipher key, in bytes
-  * @cipher_iv_len:     Length of cipher initialization vector, in bytes
-@@ -598,7 +599,7 @@ static int spu2_fmd_init(struct SPU2_FMD *fmd,
-  * SPU request packet.
-  * @fmd:            Start of FMD field to be written
-  * @is_inbound:     true if decrypting. false if encrypting.
-- * @authFirst:      true if alg authenticates before encrypting
-+ * @auth_first:     true if alg authenticates before encrypting
-  * @protocol:       protocol selector
-  * @cipher_type:    cipher algorithm
-  * @cipher_mode:    cipher mode
-@@ -640,6 +641,7 @@ static void spu2_fmd_ctrl0_write(struct SPU2_FMD *fmd,
-  * spu2_fmd_ctrl1_write() - Write ctrl1 field in fixed metadata (FMD) field of
-  * SPU request packet.
-  * @fmd:            Start of FMD field to be written
-+ * @is_inbound:     true if decrypting. false if encrypting.
-  * @assoc_size:     Length of additional associated data, in bytes
-  * @auth_key_len:   Length of authentication key, in bytes
-  * @cipher_key_len: Length of cipher key, in bytes
-@@ -793,7 +795,7 @@ u32 spu2_ctx_max_payload(enum spu_cipher_alg cipher_alg,
- }
+@@ -971,6 +972,11 @@ int sev_dev_init(struct psp_device *psp)
+ 	struct sev_device *sev;
+ 	int ret = -ENOMEM;
  
- /**
-- * spu_payload_length() -  Given a SPU2 message header, extract the payload
-+ * spu2_payload_length() -  Given a SPU2 message header, extract the payload
-  * length.
-  * @spu_hdr:  Start of SPU message header (FMD)
-  *
-@@ -812,10 +814,11 @@ u32 spu2_payload_length(u8 *spu_hdr)
- }
- 
- /**
-- * spu_response_hdr_len() - Determine the expected length of a SPU response
-+ * spu2_response_hdr_len() - Determine the expected length of a SPU response
-  * header.
-  * @auth_key_len:  Length of authentication key, in bytes
-  * @enc_key_len:   Length of encryption key, in bytes
-+ * @is_hash:       Unused
-  *
-  * For SPU2, includes just FMD. OMD is never requested.
-  *
-@@ -827,7 +830,7 @@ u16 spu2_response_hdr_len(u16 auth_key_len, u16 enc_key_len, bool is_hash)
- }
- 
- /**
-- * spu_hash_pad_len() - Calculate the length of hash padding required to extend
-+ * spu2_hash_pad_len() - Calculate the length of hash padding required to extend
-  * data to a full block size.
-  * @hash_alg:        hash algorithm
-  * @hash_mode:       hash mode
-@@ -845,8 +848,10 @@ u16 spu2_hash_pad_len(enum hash_alg hash_alg, enum hash_mode hash_mode,
- }
- 
- /**
-- * spu2_gcm_ccm_padlen() -  Determine the length of GCM/CCM padding for either
-+ * spu2_gcm_ccm_pad_len() -  Determine the length of GCM/CCM padding for either
-  * the AAD field or the data.
-+ * @cipher_mode:  Unused
-+ * @data_size:    Unused
-  *
-  * Return:  0. Unlike SPU-M, SPU2 hardware does any GCM/CCM padding required.
-  */
-@@ -857,7 +862,7 @@ u32 spu2_gcm_ccm_pad_len(enum spu_cipher_mode cipher_mode,
- }
- 
- /**
-- * spu_assoc_resp_len() - Determine the size of the AAD2 buffer needed to catch
-+ * spu2_assoc_resp_len() - Determine the size of the AAD2 buffer needed to catch
-  * associated data in a SPU2 output packet.
-  * @cipher_mode:   cipher mode
-  * @assoc_len:     length of additional associated data, in bytes
-@@ -878,11 +883,11 @@ u32 spu2_assoc_resp_len(enum spu_cipher_mode cipher_mode,
- 	return resp_len;
- }
- 
--/*
-- * spu_aead_ivlen() - Calculate the length of the AEAD IV to be included
-+/**
-+ * spu2_aead_ivlen() - Calculate the length of the AEAD IV to be included
-  * in a SPU request after the AAD and before the payload.
-  * @cipher_mode:  cipher mode
-- * @iv_ctr_len:   initialization vector length in bytes
-+ * @iv_len:   initialization vector length in bytes
-  *
-  * For SPU2, AEAD IV is included in OMD and does not need to be repeated
-  * prior to the payload.
-@@ -909,9 +914,9 @@ enum hash_type spu2_hash_type(u32 src_sent)
- /**
-  * spu2_digest_size() - Determine the size of a hash digest to expect the SPU to
-  * return.
-- * alg_digest_size: Number of bytes in the final digest for the given algo
-- * alg:             The hash algorithm
-- * htype:           Type of hash operation (init, update, full, etc)
-+ * @alg_digest_size: Number of bytes in the final digest for the given algo
-+ * @alg:             The hash algorithm
-+ * @htype:           Type of hash operation (init, update, full, etc)
-  *
-  */
- u32 spu2_digest_size(u32 alg_digest_size, enum hash_alg alg,
-@@ -921,7 +926,7 @@ u32 spu2_digest_size(u32 alg_digest_size, enum hash_alg alg,
- }
- 
- /**
-- * spu_create_request() - Build a SPU2 request message header, includint FMD and
-+ * spu2_create_request() - Build a SPU2 request message header, includint FMD and
-  * OMD.
-  * @spu_hdr: Start of buffer where SPU request header is to be written
-  * @req_opts: SPU request message options
-@@ -1105,7 +1110,7 @@ u32 spu2_create_request(u8 *spu_hdr,
- }
- 
- /**
-- * spu_cipher_req_init() - Build an skcipher SPU2 request message header,
-+ * spu2_cipher_req_init() - Build an skcipher SPU2 request message header,
-  * including FMD and OMD.
-  * @spu_hdr:       Location of start of SPU request (FMD field)
-  * @cipher_parms:  Parameters describing cipher request
-@@ -1162,11 +1167,11 @@ u16 spu2_cipher_req_init(u8 *spu_hdr, struct spu_cipher_parms *cipher_parms)
- }
- 
- /**
-- * spu_cipher_req_finish() - Finish building a SPU request message header for a
-+ * spu2_cipher_req_finish() - Finish building a SPU request message header for a
-  * block cipher request.
-  * @spu_hdr:         Start of the request message header (MH field)
-  * @spu_req_hdr_len: Length in bytes of the SPU request header
-- * @isInbound:       0 encrypt, 1 decrypt
-+ * @is_inbound:      0 encrypt, 1 decrypt
-  * @cipher_parms:    Parameters describing cipher operation to be performed
-  * @data_size:       Length of the data in the BD field
-  *
-@@ -1222,7 +1227,7 @@ void spu2_cipher_req_finish(u8 *spu_hdr,
- }
- 
- /**
-- * spu_request_pad() - Create pad bytes at the end of the data.
-+ * spu2_request_pad() - Create pad bytes at the end of the data.
-  * @pad_start:      Start of buffer where pad bytes are to be written
-  * @gcm_padding:    Length of GCM padding, in bytes
-  * @hash_pad_len:   Number of bytes of padding extend data to full block
-@@ -1311,7 +1316,7 @@ u8 spu2_rx_status_len(void)
- }
- 
- /**
-- * spu_status_process() - Process the status from a SPU response message.
-+ * spu2_status_process() - Process the status from a SPU response message.
-  * @statp:  start of STATUS word
-  *
-  * Return:  0 - if status is good and response should be processed
-diff --git a/drivers/crypto/bcm/util.c b/drivers/crypto/bcm/util.c
-index c4669a96eaecf..d5d9cabea55aa 100644
---- a/drivers/crypto/bcm/util.c
-+++ b/drivers/crypto/bcm/util.c
-@@ -119,8 +119,8 @@ int spu_sg_count(struct scatterlist *sg_list, unsigned int skip, int nbytes)
-  * @from_skip:   number of bytes to skip in from_sg. Non-zero when previous
-  *		 request included part of the buffer in entry in from_sg.
-  *		 Assumes from_skip < from_sg->length.
-- * @from_nents   number of entries in from_sg
-- * @length       number of bytes to copy. may reach this limit before exhausting
-+ * @from_nents:  number of entries in from_sg
-+ * @length:      number of bytes to copy. may reach this limit before exhausting
-  *		 from_sg.
-  *
-  * Copies the entries themselves, not the data in the entries. Assumes to_sg has
++	if (!boot_cpu_has(X86_FEATURE_SEV)) {
++		dev_info_once(dev, "SEV: memory encryption not enabled by BIOS\n");
++		return 0;
++	}
++
+ 	sev = devm_kzalloc(dev, sizeof(*sev), GFP_KERNEL);
+ 	if (!sev)
+ 		goto e_err;
 -- 
-2.27.0
+2.30.0
 
