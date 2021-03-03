@@ -2,262 +2,267 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AEEAC43603
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 00:08:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F19BFC15500
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 00:08:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 013C764FD9
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 00:08:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D266864FD2
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 00:08:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239938AbhCDAHV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Mar 2021 19:07:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36286 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243811AbhCCOhq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Mar 2021 09:37:46 -0500
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 086A9C0611C2
-        for <linux-crypto@vger.kernel.org>; Wed,  3 Mar 2021 06:35:02 -0800 (PST)
-Received: by mail-wr1-x42e.google.com with SMTP id v15so23937116wrx.4
-        for <linux-crypto@vger.kernel.org>; Wed, 03 Mar 2021 06:35:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=GVJx+OIpfKowVFAHFOdCV34ApK3YA2W1l4+0ZHpyDsw=;
-        b=OneTgoj343vuzv6eLpdMk7KlamRIjQ+zwEP4ByQvLTClzJw/vompYIPqNAcX0/eHud
-         mRoCZExt2LM8evV6Eev/Q5a+ox3XLp0K7SeWY51eZThyFmxBmjDn/xBsEvp2Z5E/4oai
-         39uATGESAQRWkd+4/eTtsZ3kpZb2BTvPmoarJIOKQ28ovA4Xz9duL2iFsPxBM8qFxfyo
-         aYLYwVJ8Q1htY77gm/0prxmwzZDJ9Nd7Jo+v3SABrWCoUECnIyXfWsifBKTw2E/GJKtZ
-         MWu3kWfOxYTe6mgt5d2L0mJJdmeabHqm6HkszCOF3zwlFU+VWGf3v/OvWYok948++aoA
-         NPcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=GVJx+OIpfKowVFAHFOdCV34ApK3YA2W1l4+0ZHpyDsw=;
-        b=rXE4QAFmYQ5gDeAZuSP7Pn4XSJiPXsRPBH8ICkE13pbS6qQYZl0iep2ZQzDWTXCnCU
-         zBSSUlC20T9VPSXHh7a/y0oz3u0GaCxBIjGqKuoWUJin0gh6ORBXCJj35Tg/+s18mt8R
-         KNfTs4uvfx0YIcuc2aj7fSWqXE+DeOzoV4oQ7L9ZojM2whzKQEFMv6tHVluelrkbBWPc
-         grbnNSljTb1qdrUK2XjU+3WsKTLK1tq2FyrMjCt/tdO9n9GcueNJTYjAj1PDQ1N4ORlK
-         c0xfwkq/i6Ro9/lK8/WKN3x79a80tYBuJVs+dz8mZEUrW5WIdoCfClBGMokYihewiiCd
-         52mg==
-X-Gm-Message-State: AOAM533GGcjDKwhh3pv4azZez+P4msZosQLf42HoSDDa6Qi7PSrF7g2J
-        o3oYG3gUYkIf0RCMfq7502CB/w==
-X-Google-Smtp-Source: ABdhPJzUkciQgQog+DC6TbpnIgltWimTaFk7AuH45YonszOYy8CXN9P2wxC7WYmPGKQXA4xp88Oisw==
-X-Received: by 2002:a05:6000:1788:: with SMTP id e8mr28068298wrg.171.1614782100775;
-        Wed, 03 Mar 2021 06:35:00 -0800 (PST)
-Received: from dell.default ([91.110.221.155])
-        by smtp.gmail.com with ESMTPSA id f16sm31475923wrt.21.2021.03.03.06.34.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Mar 2021 06:34:59 -0800 (PST)
-From:   Lee Jones <lee.jones@linaro.org>
-To:     lee.jones@linaro.org
-Cc:     linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Shujuan Chen <shujuan.chen@stericsson.com>,
-        Joakim Bech <joakim.xx.bech@stericsson.com>,
-        Berne Hebark <berne.herbark@stericsson.com>,
-        Niklas Hernaeus <niklas.hernaeus@stericsson.com>,
-        Jonas Linde <jonas.linde@stericsson.com>,
-        Andreas Westin <andreas.westin@stericsson.com>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH 04/10] crypto: ux500: hash: hash_core: Fix worthy kernel-doc headers and remove others
-Date:   Wed,  3 Mar 2021 14:34:43 +0000
-Message-Id: <20210303143449.3170813-5-lee.jones@linaro.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210303143449.3170813-1-lee.jones@linaro.org>
-References: <20210303143449.3170813-1-lee.jones@linaro.org>
-MIME-Version: 1.0
+        id S1357316AbhCDAHj (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 3 Mar 2021 19:07:39 -0500
+Received: from mail-eopbgr50079.outbound.protection.outlook.com ([40.107.5.79]:34624
+        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S235870AbhCCQFw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 Mar 2021 11:05:52 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VH2LYN/+yDDhTR1fQQq5ZuvAd3MNl9/X14UUeZQ6m/FZzpXd3VpqfMsSfHOOPX5xqgTN6oF7Xl2JMPjw4ej0SWcfRHMgKQ4WWKbsglx/IC55YJOmFlZisaSzti6+ndOThg2qEPZ0zgwBKgGbxh4cXm+YKtnLFbMXlPAAGQKgLWnZ0/bRDLsRiYLXMTOMecT4C34IEjDQhbXMhYZByGBdQ1BnO79qMfxfG3tKHpO2qX3rH1aLFHhcxB63HtQILcrWa1B9vVvFuO0ojATINlhElvWTuSZV1ZSpYkqNrVbZtdWaPIo2oQ4XUZk6+99BK/eeSNG9SurtZNvKOwQpdbjoUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yXTAyg/vaUOZs3eq4IaQPZq6AQsOJ4fCdlyJrAR/N/c=;
+ b=H+D+sbRN8hko8SJEsXl2GItN8N7TZMWQsOfWvfwdfiraYmuEdiRGYmY6AsnDvDWrrBL0cnSU1W3JPGJy+v8jLFJf8OFPoonyhsHWA2QpANaoJooRyO4EzIGskkg57KbZ4KteJwnRAEE813eJTAcfCKq3vZo/liYYE04sDV0WZhj/Xl05rTWTHEnYXgpjAUZdFsAylulTnAHvWXcBBeFMdQrIJWeoGzho/x8ZEnTPkzqI8orI4hRedDKh7QNiU1MbteqE/zz5p6CUKmihtyZ76BAvd8VmCxrM0Za2yOAdHuVp1dX7gQviU60iJ8wbQqGBnW+VStso0ou8OaWDHpU3kw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yXTAyg/vaUOZs3eq4IaQPZq6AQsOJ4fCdlyJrAR/N/c=;
+ b=gY1cs6OwGjF2+/pXYiVwzBFM+6uHRJFan/blZ6b+/N7zx5Zkp7uz9U6hycI0d6EMw/Nx5TeIMDzsEJBsQ7ZlcJPgwF0IIyPNTzReHlQ4E+9rNVcUujPmyfr4AQFFujFPMyTjh0ixXK+5JyYU1/ww126f7y10n1HmtJqrvJpFGXs=
+Authentication-Results: lists.infradead.org; dkim=none (message not signed)
+ header.d=none;lists.infradead.org; dmarc=none action=none
+ header.from=nxp.com;
+Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
+ by VI1PR04MB6989.eurprd04.prod.outlook.com (2603:10a6:803:131::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17; Wed, 3 Mar
+ 2021 16:04:21 +0000
+Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
+ ([fe80::29a6:a7ec:c1d:47ba]) by VI1PR04MB4046.eurprd04.prod.outlook.com
+ ([fe80::29a6:a7ec:c1d:47ba%5]) with mapi id 15.20.3912.017; Wed, 3 Mar 2021
+ 16:04:21 +0000
+Subject: Re: CAAM: kernel BUG at drivers/crypto/caam/jr.c:230! (and
+ dma-coherent query)
+To:     Robin Murphy <robin.murphy@arm.com>,
+        Sascha Hauer <sha@pengutronix.de>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        Greg Ungerer <gerg@linux-m68k.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+References: <20210301152231.GC5549@pengutronix.de>
+ <a52e0a0f-a784-2430-4b37-fb9fdcf3692b@nxp.com>
+ <a5d6cc26-cd23-7c31-f56e-f6d535ea39b0@arm.com>
+From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
+Message-ID: <a1f8b4db-42e3-3719-070b-7e2143134af1@nxp.com>
+Date:   Wed, 3 Mar 2021 18:04:17 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
+In-Reply-To: <a5d6cc26-cd23-7c31-f56e-f6d535ea39b0@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [78.97.206.147]
+X-ClientProxiedBy: AM0PR01CA0100.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:10e::41) To VI1PR04MB4046.eurprd04.prod.outlook.com
+ (2603:10a6:803:4d::29)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.0.213] (78.97.206.147) by AM0PR01CA0100.eurprd01.prod.exchangelabs.com (2603:10a6:208:10e::41) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend Transport; Wed, 3 Mar 2021 16:04:19 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 584ee782-a78a-4d50-4aca-08d8de5e019e
+X-MS-TrafficTypeDiagnostic: VI1PR04MB6989:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR04MB698923BA1382D7D388EA265C98989@VI1PR04MB6989.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: FFH2GoEdreJqImRJgGt5vzwV6xyrmFfZo7sywUamGE4Scc+LCCBxtifYyuKDf79YaaLh/LI8bZt8FIAaYPmUuw1RDeSSbBiwJ62UlAmWcSmgkXm4VoMFP4uo8FG5biyYbKHoOVJnZqjeN326ljzU7EKdPQkJ6axkREdqRA0Kojo5fdmmbGdQ3HfvyNtOWFqCDXJX/yvgE7MowXp9p914wYGVXzp2L/GT5PKEVRhZr2RQtMEDv3TTY9Z73XYPbQVa7NSYeGZ0j8+Nd9F+9VEl7ZUuL9HlSzs+CSNrCpV6bx+DT/yMh2X/JlhiavuXJb2H98/Av+XJLwGCyW/4WMcoa6SpmIbUS+4MCPp1p58Y7/9JKECmtkP3KEGRpmWbHp4i7Nl96V4Nzw1c5nnqQX0PV+PoAhqtK4EKuceTOhy4yTHxdfcqZrNINFpO+RxfjmcIYw8EglVz7elucBI1xfndqXktDLA2/f+E76OrMChqKEF1wMdoMpGaJ74/XK7TWsBPl6ZAX3KzJg40HJWNZz+Ald/IBui9wdsdrRkUp+EcCFMQe1kjAQ8MgM84o5h/BTTfVPzyyMYeNb2J34MRx36KUxnE2bW44GkxsZ+DKFkU29RkTgWxFfJnv7Ul2ehXZwDqdA2eN6fPS3Ns0UujA+LLCyzEkrP8rw8uaIH61lhNRac=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(396003)(346002)(39860400002)(366004)(83380400001)(45080400002)(54906003)(16576012)(66556008)(66476007)(110136005)(5660300002)(66946007)(316002)(966005)(53546011)(2616005)(16526019)(478600001)(2906002)(186003)(26005)(52116002)(86362001)(31696002)(956004)(8676002)(4326008)(31686004)(8936002)(6486002)(36756003)(7416002)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?U3ZnT0Q3dEV5bGdmL3JSci91cDFkN0dXNHA2TU43MjcxQlBBbXlVRmVGd2ZD?=
+ =?utf-8?B?USt0eldnS1lkSFVtT3dQdUVCT0YxSVVxOHVoUy8yblRIemFFSlc4akszRXlO?=
+ =?utf-8?B?dkQvRmNmWTJIb3ZpM0RRY3RGVTd6UHFKMzg4RWhoSDl2WXJ1UDROcXppTGN1?=
+ =?utf-8?B?eGNYbS9MZDA5dmwvdWVjajl1RW11cmtzVk5oMExnK2JIMHdqaWcyVGhXVkFk?=
+ =?utf-8?B?MmM3K2hoTktxbVhkS0JxaUtxTHM3bnJiZTErbGd0MWpOQ1hHRkJ0RGVpL0xQ?=
+ =?utf-8?B?MFY0VTAzdU5QdyttZGhmWjVyeFpCVTlyaXJ1WmRJK1ZOM1ZzazZCRE1EcVVV?=
+ =?utf-8?B?blY5OEJLS0ozdXIyaElyTU00UXRubC93UXBPdDJiSEJGdkxSdmY0N0xzaHZV?=
+ =?utf-8?B?RWpkRnJGRG5XcFoyU3ZWTFYxVGVxRFV6S2xrT2JxaGRldG83aUZCRGJWZ2FG?=
+ =?utf-8?B?NEpEMVFJbktFanhEOEdPd3dHUkw4bmdTOHQ5ZGRReHRDTTdBM0JIRE1HTTJy?=
+ =?utf-8?B?Y3MvYWw2QUJsU1ZrbmZPaEtPdVE1T0taM0VLQ3dRQlNpaHg3MXZrdFNTc2tv?=
+ =?utf-8?B?b1p3N25adjUxdldNYk5GUEt1ekxzdkpaazV0bjNudnRjcG1aZTBrYjdTQW05?=
+ =?utf-8?B?UThrVnl1N0lLYWVSWVVEQ1Y5MUFuWTVEa281WVNkWi9KNjJvUjB4dllGalZy?=
+ =?utf-8?B?ZFF5TTR4c1gwSEVtdDZuaUw3WEhjWHhSMWFmOVhSZGFSRTUvUExhTmRPbzFi?=
+ =?utf-8?B?NTlqd0cxT0JjbnFtVnhSM1VyZ016UkRWZFkzNDFuUGNhWUk0VXN6dGw2NXdU?=
+ =?utf-8?B?MFpJUjVxSmVDTWpPRERmRFFVQ2RCTDRJc0pEM1BXdzZvM3hDLzQ4MytGK1k3?=
+ =?utf-8?B?RllKQkhMcTNKZFF5VmRRb2hLeW5JeFg1N0pESnRYUmxldzV0SnAwK0ZWK3d2?=
+ =?utf-8?B?OFIzT1FwSUM2RjRnWnVUbHR0RWdIdnB1M1VhNHAvVkdMcmhCMnpIOVVFSTlT?=
+ =?utf-8?B?RTJaUEZJM2lyNUU3cmlQWWc5OXMwWE1yL0RQd3pkMjFIdm9jRFdLUkZET3E0?=
+ =?utf-8?B?TzVjbmRHdEpVbEVIN0FDeUxnRDExQ0tKVFd3djBWalcrS2ZrTm9xeFdleWFB?=
+ =?utf-8?B?WXpkTFpkUGEyVnZqcnY3bU1zK3RpQmVURUpMN09xMmt2UEhOMThXR3dpR2pS?=
+ =?utf-8?B?WU1QVXdJKzEvSkFFQWJqL1VGblg3S1hxY2Z4cUR4V0grVFZ3UGNuTUE4M243?=
+ =?utf-8?B?WWk0YnhyTnpwOVBNNCtxLzVqMVMvbU45SUY1T1J3QXZmSUtGZWtCYlZyRFYw?=
+ =?utf-8?B?TEJVNExONmdYOFVLd2RvR3J6QkpSd2hEVDg2ajRDOThDVXQyTHNJN2E5K2xi?=
+ =?utf-8?B?a1dCbUtBa253Z0pVMWhKZU4wZmVhWFRsSTFrWis1NFZNajZ6bjV0NldhdGUw?=
+ =?utf-8?B?dkdjWCtvcjZRczNnYjlabWM4akhKVjk4eVhZV1JXc1lLTFVZdDFvaFI0aE50?=
+ =?utf-8?B?UVBycHBndndtSUo5MjFLd0J0U25VQ1ZhWTRIR1cyYmMwbjJIN0hqMFVHTmpW?=
+ =?utf-8?B?R1JvYjNhTlVlcGVVWEM1RXlMTU9SVk9ma3g5d1Baa0creFpsMHV1UG5BM1Jj?=
+ =?utf-8?B?K0RkRVZicEFaSFJYNGhvUTRmM1pVTkRCR08xQ29WTzkxdlZhNFZ0d3lURDcv?=
+ =?utf-8?B?NkE0QmwvVmtXdXJzZWJJRmk1dVlBRmtuNHB1TmNCNHhabXRTaFI5RDZTdkl1?=
+ =?utf-8?Q?0JfE2qq3I8nZ/7aQ1C7eMK8IrYtRLVwFJx54lXb?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 584ee782-a78a-4d50-4aca-08d8de5e019e
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB4046.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2021 16:04:21.1866
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ShZYSaIkHQPHT1w0mH72he0PUMTpCDj8xElqfc9vGr6UgsHIRNSjXO0xEP9lvpDO0FQw6MrrPhzbEFV4isy92Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6989
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The ones remove here not only fail to conform to kernel-doc, but also
-provide no value, so let's remove them completely in this case.
+On 3/3/2021 2:07 PM, Robin Murphy wrote:
+> On 2021-03-03 10:26, Horia Geantă wrote:
+>> Adding some people in the loop, maybe they could help in understanding
+>> why lack of "dma-coherent" property for a HW-coherent device could lead to
+>> unexpected / strange side effects.
+>>
+>> On 3/1/2021 5:22 PM, Sascha Hauer wrote:
+>>> Hi All,
+>>>
+>>> I am on a Layerscape LS1046a using Linux-5.11. The CAAM driver sometimes
+>>> crashes during the run-time self tests with:
+>>>
+>>>> kernel BUG at drivers/crypto/caam/jr.c:247!
+>>>> Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
+>>>> Modules linked in:
+>>>> CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.11.0-20210225-3-00039-g434215968816-dirty #12
+>>>> Hardware name: TQ TQMLS1046A SoM on Arkona AT1130 (C300) board (DT)
+>>>> pstate: 60000005 (nZCv daif -PAN -UAO -TCO BTYPE=--)
+>>>> pc : caam_jr_dequeue+0x98/0x57c
+>>>> lr : caam_jr_dequeue+0x98/0x57c
+>>>> sp : ffff800010003d50
+>>>> x29: ffff800010003d50 x28: ffff8000118d4000
+>>>> x27: ffff8000118d4328 x26: 00000000000001f0
+>>>> x25: ffff0008022be480 x24: ffff0008022c6410
+>>>> x23: 00000000000001f1 x22: ffff8000118d4329
+>>>> x21: 0000000000004d80 x20: 00000000000001f1
+>>>> x19: 0000000000000001 x18: 0000000000000020
+>>>> x17: 0000000000000000 x16: 0000000000000015
+>>>> x15: ffff800011690230 x14: 2e2e2e2e2e2e2e2e
+>>>> x13: 2e2e2e2e2e2e2020 x12: 3030303030303030
+>>>> x11: ffff800011700a38 x10: 00000000fffff000
+>>>> x9 : ffff8000100ada30 x8 : ffff8000116a8a38
+>>>> x7 : 0000000000000001 x6 : 0000000000000000
+>>>> x5 : 0000000000000000 x4 : 0000000000000000
+>>>> x3 : 00000000ffffffff x2 : 0000000000000000
+>>>> x1 : 0000000000000000 x0 : 0000000000001800
+>>>> Call trace:
+>>>>   caam_jr_dequeue+0x98/0x57c
+>>>>   tasklet_action_common.constprop.0+0x164/0x18c
+>>>>   tasklet_action+0x44/0x54
+>>>>   __do_softirq+0x160/0x454
+>>>>   __irq_exit_rcu+0x164/0x16c
+>>>>   irq_exit+0x1c/0x30
+>>>>   __handle_domain_irq+0xc0/0x13c
+>>>>   gic_handle_irq+0x5c/0xf0
+>>>>   el1_irq+0xb4/0x180
+>>>>   arch_cpu_idle+0x18/0x30
+>>>>   default_idle_call+0x3c/0x1c0
+>>>>   do_idle+0x23c/0x274
+>>>>   cpu_startup_entry+0x34/0x70
+>>>>   rest_init+0xdc/0xec
+>>>>   arch_call_rest_init+0x1c/0x28
+>>>>   start_kernel+0x4ac/0x4e4
+>>>> Code: 91392021 912c2000 d377d8c6 97f24d96 (d4210000)
+>>>
+>>> The driver iterates over the descriptors in the output ring and matches them
+>>> with the ones it has previously queued. If it doesn't find a matching
+>>> descriptor it complains with the BUG_ON() seen above. What I see sometimes is
+>>> that the address in the output ring is 0x0, the job status in this case is
+>>> 0x40000006 (meaning DECO Invalid KEY command). It seems that the CAAM doesn't
+>>> write the descriptor address to the output ring at least in some error cases.
+>>> When we don't have the descriptor address of the failed descriptor we have no
+>>> way to find it in the list of queued descriptors, thus we also can't find the
+>>> callback for that descriptor. This looks very unfortunate, anyone else seen
+>>> this or has an idea what to do about it?
+>>>
+>>> I haven't investigated yet which job actually fails and why. Of course that would
+>>> be my ultimate goal to find that out.
+>>>
+>> This looks very similar to an earlier report from Greg.
+>> He confirmed that adding "dma-coherent" property to the "crypto" DT node
+>> fixes the issue:
+>> https://lore.kernel.org/linux-crypto/74f664f5-5433-d322-4789-3c78bdb814d8@kernel.org
+>> Patch rebased on v5.11 is at the bottom. Does it work for you too?
+>>
+>> What I don't understand (and the reason I've postponed upstreaming it) is
+>> _why_ exactly this patch is working.
+>> I would have expected that a HW-coherent device to work fine even without
+>> the "dma-coherent" DT property in the corresponding node.
+>> I've found what seems related discussions involving eSDHC, but still I am trying
+>> to figure out what's happening. I'd really appreciate a clarification on what
+>> could go wrong (e.g. interactions with SW-based cache management etc.):
+>> https://lore.kernel.org/linux-mmc/20190916171509.GG25745@shell.armlinux.org.uk
+>> https://lore.kernel.org/lkml/20191010083503.250941866@linuxfoundation.org
+>> https://lore.kernel.org/linux-mmc/AM7PR04MB688507B5B4D84EB266738891F8320@AM7PR04MB6885.eurprd04.prod.outlook.com
+> 
+> Consider the flow for a non-coherent DMA_FROM_DEVICE transfer:
+> 
+> 1: dma_map_page() - cleans and invalidates caches to prevent any dirty 
+> lines being written back during the transfer
+> 2: CPU cache may prefetch the buffer back in at any time from now on 
+> (e.g. if other threads access nearby memory), but that's OK since the 
+> CPU must not actually access it until after step 4, and clean lines 
+> don't get written back
+> 3: device writes to buffer - non-coherent so goes straight to DRAM
+> 4: dma_unmap_page() - invalidates caches to discard any clean lines 
+> speculatively fetched since step 1
+> 5: CPU reads from buffer - fetches new data into cache, all is well
+> 
+> Now consider what can happen if the device is secretly coherent, but the 
+> DMA API still uses the same non-coherent flow:
+> 
+> 1: dma_map_page() - cleans and invalidates caches to prevent any dirty 
+> lines being written back during the transfer
+> 2: CPU cache *does* happen to prefetch the buffer back in
+> 3: device writes to buffer - write snoop hits in cache so data goes 
+> there instead of DRAM
+> 4: dma_unmap_page() - invalidates caches, unknowingly destroying new data
+> 5: CPU reads from page - fetches whatever old data was cleaned to DRAM 
+> in step 1, hilarity ensues.
+> 
+> Note that it still *can* work out OK in the (likely) case that the 
+> prefetch at step 2 doesn't happen, so in step 3 the snoop doesn't hit 
+> and the data does end up going to DRAM, or (less likely) the updated 
+> dirty lines are naturally evicted and written back between steps 3 and 4.
+> 
+> Similarly, if a buffer is mmap'ed to userspace (or remapped for coherent 
+> DMA) with non-cacheable attributes on the assumption that the device is 
+> non-coherent - the cacheable alias from the kernel linear map can still 
+> be present in caches, so coherent device accesses can unexpectedly hit 
+> that and fail to observe CPU reads and writes going straight to/from 
+> DRAM via the non-cacheable alias. We hit this case with Panfrost on some 
+> Amlogic platforms not too long ago.
+> 
+> Hope that helps clarify things.
+> 
+Thanks Robin.
+Indeed this example shows how things can go awry.
 
-Fixes the following W=1 kernel build warning(s):
-
- drivers/crypto/ux500/hash/hash_core.c:368: warning: Function parameter or member 'ctx' not described in 'hash_get_device_data'
- drivers/crypto/ux500/hash/hash_core.c:368: warning: Excess function parameter 'hash_ctx' description in 'hash_get_device_data'
- drivers/crypto/ux500/hash/hash_core.c:551: warning: expecting prototype for hash_init(). Prototype was for ux500_hash_init() instead
- drivers/crypto/ux500/hash/hash_core.c:592: warning: Function parameter or member 'length' not described in 'hash_processblock'
- drivers/crypto/ux500/hash/hash_core.c:1302: warning: expecting prototype for hash_update(). Prototype was for ahash_update() instead
- drivers/crypto/ux500/hash/hash_core.c:1322: warning: expecting prototype for hash_final(). Prototype was for ahash_final() instead
- drivers/crypto/ux500/hash/hash_core.c:1622: warning: Function parameter or member 'device_data' not described in 'ahash_algs_register_all'
- drivers/crypto/ux500/hash/hash_core.c:1622: warning: expecting prototype for hash_algs_register_all(). Prototype was for ahash_algs_register_all() instead
- drivers/crypto/ux500/hash/hash_core.c:1647: warning: Function parameter or member 'device_data' not described in 'ahash_algs_unregister_all'
- drivers/crypto/ux500/hash/hash_core.c:1647: warning: expecting prototype for hash_algs_unregister_all(). Prototype was for ahash_algs_unregister_all() instead
- drivers/crypto/ux500/cryp/cryp.c:19: warning: Incorrect use of kernel-doc format:  * cryp_wait_until_done - wait until the device logic is not busy
- drivers/crypto/ux500/cryp/cryp.c:22: warning: Function parameter or member 'device_data' not described in 'cryp_wait_until_done'
- drivers/crypto/ux500/cryp/cryp.c:22: warning: expecting prototype for ST(). Prototype was for cryp_wait_until_done() instead
- drivers/crypto/ux500/cryp/cryp.c:292: warning: Function parameter or member 'cryp_mode' not described in 'cryp_save_device_context'
- drivers/crypto/ux500/cryp/cryp_irq.c:21: warning: Function parameter or member 'device_data' not described in 'cryp_enable_irq_src'
- drivers/crypto/ux500/cryp/cryp_irq.c:21: warning: Function parameter or member 'irq_src' not described in 'cryp_enable_irq_src'
- drivers/crypto/ux500/cryp/cryp_irq.c:21: warning: expecting prototype for ST(). Prototype was for cryp_enable_irq_src() instead
- drivers/crypto/ux500/cryp/cryp_core.c:42: warning: expecting prototype for ST(). Prototype was for CRYP_MAX_KEY_SIZE() instead
- drivers/crypto/ux500/cryp/cryp_core.c:91: warning: Function parameter or member 'key' not described in 'cryp_ctx'
- drivers/crypto/ux500/cryp/cryp_core.c:91: warning: Function parameter or member 'session_id' not described in 'cryp_ctx'
-
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Shujuan Chen <shujuan.chen@stericsson.com>
-Cc: Joakim Bech <joakim.xx.bech@stericsson.com>
-Cc: Berne Hebark <berne.herbark@stericsson.com>
-Cc: Niklas Hernaeus <niklas.hernaeus@stericsson.com>
-Cc: Jonas Linde <jonas.linde@stericsson.com>
-Cc: Andreas Westin <andreas.westin@stericsson.com>
-Cc: linux-crypto@vger.kernel.org
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
----
- drivers/crypto/ux500/cryp/cryp.c      |  5 +++--
- drivers/crypto/ux500/cryp/cryp_core.c |  5 +++--
- drivers/crypto/ux500/cryp/cryp_irq.c  |  2 +-
- drivers/crypto/ux500/hash/hash_core.c | 15 +++++----------
- 4 files changed, 12 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/crypto/ux500/cryp/cryp.c b/drivers/crypto/ux500/cryp/cryp.c
-index 9866c2a5e9a70..759d0d9786fd1 100644
---- a/drivers/crypto/ux500/cryp/cryp.c
-+++ b/drivers/crypto/ux500/cryp/cryp.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0-only
--/**
-+/*
-  * Copyright (C) ST-Ericsson SA 2010
-  * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-  * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-@@ -15,7 +15,7 @@
- #include "cryp_p.h"
- #include "cryp.h"
- 
--/**
-+/*
-  * cryp_wait_until_done - wait until the device logic is not busy
-  */
- void cryp_wait_until_done(struct cryp_device_data *device_data)
-@@ -285,6 +285,7 @@ int cryp_configure_init_vector(struct cryp_device_data *device_data,
-  *				other device context parameter
-  * @device_data: Pointer to the device data struct for base address.
-  * @ctx: Crypto device context
-+ * @cryp_mode: Mode: Polling, Interrupt or DMA
-  */
- void cryp_save_device_context(struct cryp_device_data *device_data,
- 			      struct cryp_device_context *ctx,
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index c3adeb2e58232..25ce56d05084e 100644
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0-only
--/**
-+/*
-  * Copyright (C) ST-Ericsson SA 2010
-  * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-  * Author: Joakim Bech <joakim.xx.bech@stericsson.com> for ST-Ericsson.
-@@ -62,7 +62,7 @@ struct cryp_driver_data {
- /**
-  * struct cryp_ctx - Crypto context
-  * @config: Crypto mode.
-- * @key[CRYP_MAX_KEY_SIZE]: Key.
-+ * @key: Key array.
-  * @keylen: Length of key.
-  * @iv: Pointer to initialization vector.
-  * @indata: Pointer to indata.
-@@ -73,6 +73,7 @@ struct cryp_driver_data {
-  * @updated: Updated flag.
-  * @dev_ctx: Device dependent context.
-  * @device: Pointer to the device.
-+ * @session_id: Atomic session ID.
-  */
- struct cryp_ctx {
- 	struct cryp_config config;
-diff --git a/drivers/crypto/ux500/cryp/cryp_irq.c b/drivers/crypto/ux500/cryp/cryp_irq.c
-index 7ebde69e8c76b..6d2f07bec98a7 100644
---- a/drivers/crypto/ux500/cryp/cryp_irq.c
-+++ b/drivers/crypto/ux500/cryp/cryp_irq.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0-only
--/**
-+/*
-  * Copyright (C) ST-Ericsson SA 2010
-  * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-  * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index da284b0ea1b26..bcaf6ba3e9235 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -356,7 +356,7 @@ static int hash_enable_power(struct hash_device_data *device_data,
- 
- /**
-  * hash_get_device_data - Checks for an available hash device and return it.
-- * @hash_ctx:		Structure for the hash context.
-+ * @ctx:		Structure for the hash context.
-  * @device_data:	Structure for the hash device.
-  *
-  * This function check for an available hash device and return it to
-@@ -542,7 +542,7 @@ static bool hash_dma_valid_data(struct scatterlist *sg, int datasize)
- }
- 
- /**
-- * hash_init - Common hash init function for SHA1/SHA2 (SHA256).
-+ * ux500_hash_init - Common hash init function for SHA1/SHA2 (SHA256).
-  * @req: The hash request for the job.
-  *
-  * Initialize structures.
-@@ -585,6 +585,7 @@ static int ux500_hash_init(struct ahash_request *req)
-  * @device_data:	Structure for the hash device.
-  * @message:		Block (512 bits) of message to be written to
-  *			the HASH hardware.
-+ * @length:		Message length
-  *
-  */
- static void hash_processblock(struct hash_device_data *device_data,
-@@ -1295,7 +1296,7 @@ void hash_get_digest(struct hash_device_data *device_data,
- }
- 
- /**
-- * hash_update - The hash update function for SHA1/SHA2 (SHA256).
-+ * ahash_update - The hash update function for SHA1/SHA2 (SHA256).
-  * @req: The hash request for the job.
-  */
- static int ahash_update(struct ahash_request *req)
-@@ -1315,7 +1316,7 @@ static int ahash_update(struct ahash_request *req)
- }
- 
- /**
-- * hash_final - The hash final function for SHA1/SHA2 (SHA256).
-+ * ahash_final - The hash final function for SHA1/SHA2 (SHA256).
-  * @req:	The hash request for the job.
-  */
- static int ahash_final(struct ahash_request *req)
-@@ -1615,9 +1616,6 @@ static struct hash_algo_template hash_algs[] = {
- 	}
- };
- 
--/**
-- * hash_algs_register_all -
-- */
- static int ahash_algs_register_all(struct hash_device_data *device_data)
- {
- 	int ret;
-@@ -1640,9 +1638,6 @@ static int ahash_algs_register_all(struct hash_device_data *device_data)
- 	return ret;
- }
- 
--/**
-- * hash_algs_unregister_all -
-- */
- static void ahash_algs_unregister_all(struct hash_device_data *device_data)
- {
- 	int i;
--- 
-2.27.0
-
+Horia
