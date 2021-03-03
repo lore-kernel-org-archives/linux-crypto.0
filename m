@@ -2,115 +2,164 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3538C001C7
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 00:07:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19717C15509
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 00:07:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BDDC764F5E
+	by mail.kernel.org (Postfix) with ESMTP id D522364F77
 	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 00:07:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351879AbhCDAHb (ORCPT
+        id S1357272AbhCDAHe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Mar 2021 19:07:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36194 "EHLO
+        Wed, 3 Mar 2021 19:07:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1383500AbhCCOjF (ORCPT
+        with ESMTP id S244877AbhCCO6y (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Mar 2021 09:39:05 -0500
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA91C061A30
-        for <linux-crypto@vger.kernel.org>; Wed,  3 Mar 2021 06:35:09 -0800 (PST)
-Received: by mail-wr1-x432.google.com with SMTP id b18so17443336wrn.6
-        for <linux-crypto@vger.kernel.org>; Wed, 03 Mar 2021 06:35:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=TY1HutZnteRyydV5Ih0Egjx6tbg8POtzIYYu0tZ9gLI=;
-        b=ZrZtPbhtMvfSfUn1CpaM/MJoaOHiS73bOkPE4fNSZTfjUEZOFTPG9QWcs/aeegYLFS
-         f44kVN1zeKnnoyhuhPS7kUznosUtF1IH/wbGXk1tF/7blzw6ufR/lKeIBHYgXs8R7GB+
-         S2JCCq7ed4tqHQQ6IhWJowxYnpBMk7bqNuS5OHFXDSJgUldfEl+BoB6s1HerOOMayVRA
-         UsCLzhOh3MeXhozA5M4RdFT3sj5ZdhaftbNm3zAGZLlm3+v1ElhiHtH3jdQ8LbiVTWW/
-         c/ZCG2Jb6uwxjh9KwFVVtPEqBGoitNp6y/WyY7ciBAbNTxs4Y6/Y9Tk/WiESIVPn6KI9
-         vKlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=TY1HutZnteRyydV5Ih0Egjx6tbg8POtzIYYu0tZ9gLI=;
-        b=MPpLU7DbyDKqriorZtNX6pd2sdIfEVUPTxBBhtAES1m6RmIjSGyVXpQIVaq0+y3Tzn
-         LtP431Jv1UNF4xe9cyosGkm5wf3s/fIaPMraNzYzBCIlMchHrTwwGbpx9T8mO6ufZLEy
-         dNFNFIWxcPUAMCIZgTpN9bLQnyazB9zWQ1fNjvFZRW0PlLJ4mIm0/hE3p3T4KSHxyj4V
-         1xhKu0gndsqdH7orIOZUso1PDXW/+D9PTkVJkrdevV5U/dplGIRRLEtM1N1zqWkopSkw
-         IpmK0e7GB9MZSFWUWr3Tp7/ZFFBOaJTP5SgICIt9Pog2orsNi26/qOmFA1G5YHckHu0e
-         1GUA==
-X-Gm-Message-State: AOAM532v/MKcWiMjRCKZRbfw6vLjmMw45PZ4a4+u2IkFKDzp0C+BjIQO
-        zrNeXKByqrhmY6nnERtd62Ppgg==
-X-Google-Smtp-Source: ABdhPJzDZbGYGKGfQpxNOw+Cx28KOumuLa28Wak6NvF82YGJcdRai/Jr3G9CMfQtP+SeizwIrtJtHw==
-X-Received: by 2002:adf:dbc2:: with SMTP id e2mr26742037wrj.227.1614782108194;
-        Wed, 03 Mar 2021 06:35:08 -0800 (PST)
-Received: from dell.default ([91.110.221.155])
-        by smtp.gmail.com with ESMTPSA id f16sm31475923wrt.21.2021.03.03.06.35.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Mar 2021 06:35:07 -0800 (PST)
-From:   Lee Jones <lee.jones@linaro.org>
-To:     lee.jones@linaro.org
-Cc:     linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH 10/10] crypto: cavium: nitrox_isr: Demote non-compliant kernel-doc headers
-Date:   Wed,  3 Mar 2021 14:34:49 +0000
-Message-Id: <20210303143449.3170813-11-lee.jones@linaro.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210303143449.3170813-1-lee.jones@linaro.org>
-References: <20210303143449.3170813-1-lee.jones@linaro.org>
+        Wed, 3 Mar 2021 09:58:54 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5B23C061761
+        for <linux-crypto@vger.kernel.org>; Wed,  3 Mar 2021 06:56:59 -0800 (PST)
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <sha@pengutronix.de>)
+        id 1lHSvq-00062H-C8; Wed, 03 Mar 2021 15:56:58 +0100
+Received: from sha by ptx.hi.pengutronix.de with local (Exim 4.92)
+        (envelope-from <sha@pengutronix.de>)
+        id 1lHSvo-0000GX-Gc; Wed, 03 Mar 2021 15:56:56 +0100
+Date:   Wed, 3 Mar 2021 15:56:56 +0100
+From:   Sascha Hauer <sha@pengutronix.de>
+To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Christoph Hellwig <hch@lst.de>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Greg Ungerer <gerg@linux-m68k.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        Marek Szyprowski <m.szyprowski@samsung.com>
+Subject: Re: CAAM: kernel BUG at drivers/crypto/caam/jr.c:230! (and
+ dma-coherent query)
+Message-ID: <20210303145656.GL5549@pengutronix.de>
+References: <20210301152231.GC5549@pengutronix.de>
+ <a52e0a0f-a784-2430-4b37-fb9fdcf3692b@nxp.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <a52e0a0f-a784-2430-4b37-fb9fdcf3692b@nxp.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL:  http://www.pengutronix.de/
+X-IRC:  #ptxdist @freenode
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-Uptime: 15:38:04 up 13 days, 18:01, 77 users,  load average: 0.09, 0.12,
+ 0.14
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fixes the following W=1 kernel build warning(s):
+On Wed, Mar 03, 2021 at 12:26:32PM +0200, Horia Geantă wrote:
+> Adding some people in the loop, maybe they could help in understanding
+> why lack of "dma-coherent" property for a HW-coherent device could lead to
+> unexpected / strange side effects.
+> 
+> On 3/1/2021 5:22 PM, Sascha Hauer wrote:
+> > Hi All,
+> > 
+> > I am on a Layerscape LS1046a using Linux-5.11. The CAAM driver sometimes
+> > crashes during the run-time self tests with:
+> > 
+> >> kernel BUG at drivers/crypto/caam/jr.c:247!
+> >> Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
+> >> Modules linked in:
+> >> CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.11.0-20210225-3-00039-g434215968816-dirty #12
+> >> Hardware name: TQ TQMLS1046A SoM on Arkona AT1130 (C300) board (DT)
+> >> pstate: 60000005 (nZCv daif -PAN -UAO -TCO BTYPE=--)
+> >> pc : caam_jr_dequeue+0x98/0x57c
+> >> lr : caam_jr_dequeue+0x98/0x57c
+> >> sp : ffff800010003d50
+> >> x29: ffff800010003d50 x28: ffff8000118d4000
+> >> x27: ffff8000118d4328 x26: 00000000000001f0
+> >> x25: ffff0008022be480 x24: ffff0008022c6410
+> >> x23: 00000000000001f1 x22: ffff8000118d4329
+> >> x21: 0000000000004d80 x20: 00000000000001f1
+> >> x19: 0000000000000001 x18: 0000000000000020
+> >> x17: 0000000000000000 x16: 0000000000000015
+> >> x15: ffff800011690230 x14: 2e2e2e2e2e2e2e2e
+> >> x13: 2e2e2e2e2e2e2020 x12: 3030303030303030
+> >> x11: ffff800011700a38 x10: 00000000fffff000
+> >> x9 : ffff8000100ada30 x8 : ffff8000116a8a38
+> >> x7 : 0000000000000001 x6 : 0000000000000000
+> >> x5 : 0000000000000000 x4 : 0000000000000000
+> >> x3 : 00000000ffffffff x2 : 0000000000000000
+> >> x1 : 0000000000000000 x0 : 0000000000001800
+> >> Call trace:
+> >>  caam_jr_dequeue+0x98/0x57c
+> >>  tasklet_action_common.constprop.0+0x164/0x18c
+> >>  tasklet_action+0x44/0x54
+> >>  __do_softirq+0x160/0x454
+> >>  __irq_exit_rcu+0x164/0x16c
+> >>  irq_exit+0x1c/0x30
+> >>  __handle_domain_irq+0xc0/0x13c
+> >>  gic_handle_irq+0x5c/0xf0
+> >>  el1_irq+0xb4/0x180
+> >>  arch_cpu_idle+0x18/0x30
+> >>  default_idle_call+0x3c/0x1c0
+> >>  do_idle+0x23c/0x274
+> >>  cpu_startup_entry+0x34/0x70
+> >>  rest_init+0xdc/0xec
+> >>  arch_call_rest_init+0x1c/0x28
+> >>  start_kernel+0x4ac/0x4e4
+> >> Code: 91392021 912c2000 d377d8c6 97f24d96 (d4210000)
+> > 
+> > The driver iterates over the descriptors in the output ring and matches them
+> > with the ones it has previously queued. If it doesn't find a matching
+> > descriptor it complains with the BUG_ON() seen above. What I see sometimes is
+> > that the address in the output ring is 0x0, the job status in this case is
+> > 0x40000006 (meaning DECO Invalid KEY command). It seems that the CAAM doesn't
+> > write the descriptor address to the output ring at least in some error cases.
+> > When we don't have the descriptor address of the failed descriptor we have no
+> > way to find it in the list of queued descriptors, thus we also can't find the
+> > callback for that descriptor. This looks very unfortunate, anyone else seen
+> > this or has an idea what to do about it?
+> > 
+> > I haven't investigated yet which job actually fails and why. Of course that would
+> > be my ultimate goal to find that out.
+> > 
+> This looks very similar to an earlier report from Greg.
+> He confirmed that adding "dma-coherent" property to the "crypto" DT node
+> fixes the issue:
+> https://lore.kernel.org/linux-crypto/74f664f5-5433-d322-4789-3c78bdb814d8@kernel.org
+> Patch rebased on v5.11 is at the bottom. Does it work for you too?
 
- drivers/crypto/cavium/nitrox/nitrox_isr.c:17: warning: expecting prototype for One vector for each type of ring(). Prototype was for NR_RING_VECTORS() instead
- drivers/crypto/cavium/nitrox/nitrox_isr.c:224: warning: Function parameter or member 'irq' not described in 'nps_core_int_isr'
- drivers/crypto/cavium/nitrox/nitrox_isr.c:224: warning: Function parameter or member 'data' not described in 'nps_core_int_isr'
+Indeed this seems to solve it for me as well, you can add my
 
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
----
- drivers/crypto/cavium/nitrox/nitrox_isr.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Tested-by: Sascha Hauer <s.hauer@pengutronix.de>
 
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_isr.c b/drivers/crypto/cavium/nitrox/nitrox_isr.c
-index 99b053094f5af..c288c4b51783d 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_isr.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_isr.c
-@@ -10,7 +10,7 @@
- #include "nitrox_isr.h"
- #include "nitrox_mbx.h"
- 
--/**
-+/*
-  * One vector for each type of ring
-  *  - NPS packet ring, AQMQ ring and ZQMQ ring
-  */
-@@ -216,7 +216,7 @@ static void nps_core_int_tasklet(unsigned long data)
- 	}
- }
- 
--/**
-+/*
-  * nps_core_int_isr - interrupt handler for NITROX errors and
-  *   mailbox communication
-  */
+However, there seem to be two problems: First that "DECO Invalid KEY
+command" actually occurs and second that the deqeueue code currently
+can't handle a NULL pointer in the output ring.
+Do you think that the occurence of a NULL pointer is also a coherency
+issue?
+
+Sascha
+
 -- 
-2.27.0
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
