@@ -7,25 +7,25 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1BCBC4332E
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 06:40:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C548C4321A
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 06:40:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB25B64F18
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 06:40:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 606E864F02
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 06:40:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235386AbhCDGja (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S234419AbhCDGja (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 4 Mar 2021 01:39:30 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:13471 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235364AbhCDGjG (ORCPT
+Received: from szxga04-in.huawei.com ([45.249.212.190]:12685 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235365AbhCDGjH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Mar 2021 01:39:06 -0500
+        Thu, 4 Mar 2021 01:39:07 -0500
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Drh3Z4FTKzjW5P;
-        Thu,  4 Mar 2021 14:36:42 +0800 (CST)
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Drh334fRczlSXY;
+        Thu,  4 Mar 2021 14:36:15 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.24) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 4 Mar 2021 14:38:14 +0800
+ 14.3.498.0; Thu, 4 Mar 2021 14:38:15 +0800
 From:   Meng Yu <yumeng18@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
@@ -33,9 +33,9 @@ To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>, <yumeng18@huawei.com>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH v10 5/7] crypto: hisilicon/hpre - add 'ECDH' algorithm
-Date:   Thu, 4 Mar 2021 14:35:48 +0800
-Message-ID: <1614839750-29670-6-git-send-email-yumeng18@huawei.com>
+Subject: [PATCH v10 7/7] crypto: hisilicon/hpre - add 'CURVE25519' algorithm
+Date:   Thu, 4 Mar 2021 14:35:50 +0800
+Message-ID: <1614839750-29670-8-git-send-email-yumeng18@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1614839750-29670-1-git-send-email-yumeng18@huawei.com>
 References: <1614839750-29670-1-git-send-email-yumeng18@huawei.com>
@@ -47,82 +47,64 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-1. Enable 'ECDH' algorithm in Kunpeng 930;
-2. HPRE ECDH Support: ecdh-nist-p192, ecdh-nist-p256.
+Enable 'CURVE25519' algorithm in Kunpeng 930.
 
 Signed-off-by: Meng Yu <yumeng18@huawei.com>
 Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
+Reported-by: kernel test robot <lkp@intel.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre.h        |   2 +-
- drivers/crypto/hisilicon/hpre/hpre_crypto.c | 515 +++++++++++++++++++++++++++-
- drivers/crypto/hisilicon/hpre/hpre_main.c   |   1 +
- 3 files changed, 513 insertions(+), 5 deletions(-)
+ drivers/crypto/hisilicon/Kconfig            |   1 +
+ drivers/crypto/hisilicon/hpre/hpre.h        |   2 +
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 366 +++++++++++++++++++++++++++-
+ 3 files changed, 361 insertions(+), 8 deletions(-)
 
+diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
+index 8431926..c45adb1 100644
+--- a/drivers/crypto/hisilicon/Kconfig
++++ b/drivers/crypto/hisilicon/Kconfig
+@@ -65,6 +65,7 @@ config CRYPTO_DEV_HISI_HPRE
+ 	depends on UACCE || UACCE=n
+ 	depends on ARM64 || (COMPILE_TEST && 64BIT)
+ 	depends on ACPI
++	select CRYPTO_LIB_CURVE25519_GENERIC
+ 	select CRYPTO_DEV_HISI_QM
+ 	select CRYPTO_DH
+ 	select CRYPTO_RSA
 diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
-index 02193e1..50e6b2e 100644
+index 50e6b2e..92892e3 100644
 --- a/drivers/crypto/hisilicon/hpre/hpre.h
 +++ b/drivers/crypto/hisilicon/hpre/hpre.h
-@@ -83,6 +83,7 @@ enum hpre_alg_type {
- 	HPRE_ALG_KG_CRT = 0x3,
+@@ -84,6 +84,8 @@ enum hpre_alg_type {
  	HPRE_ALG_DH_G2 = 0x4,
  	HPRE_ALG_DH = 0x5,
-+	HPRE_ALG_ECC_MUL = 0xD,
+ 	HPRE_ALG_ECC_MUL = 0xD,
++	/* shared by x25519 and x448, but x448 is not supported now */
++	HPRE_ALG_CURVE25519_MUL = 0x10,
  };
  
  struct hpre_sqe {
-@@ -104,5 +105,4 @@ struct hisi_qp *hpre_create_qp(u8 type);
- int hpre_algs_register(struct hisi_qm *qm);
- void hpre_algs_unregister(struct hisi_qm *qm);
- 
--
- #endif
 diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index 712bea9..a6010b1 100644
+index a6010b1..53068d2 100644
 --- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
 +++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -2,6 +2,8 @@
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
  /* Copyright (c) 2019 HiSilicon Limited. */
  #include <crypto/akcipher.h>
++#include <crypto/curve25519.h>
  #include <crypto/dh.h>
-+#include <crypto/ecc_curve.h>
-+#include <crypto/ecdh.h>
- #include <crypto/internal/akcipher.h>
- #include <crypto/internal/kpp.h>
- #include <crypto/internal/rsa.h>
-@@ -36,6 +38,13 @@ struct hpre_ctx;
- #define HPRE_DFX_SEC_TO_US	1000000
- #define HPRE_DFX_US_TO_NS	1000
- 
-+/* size in bytes of the n prime */
-+#define HPRE_ECC_NIST_P192_N_SIZE	24
-+#define HPRE_ECC_NIST_P256_N_SIZE	32
-+
-+/* size in bytes */
-+#define HPRE_ECC_HW256_KSZ_B	32
-+
- typedef void (*hpre_cb)(struct hpre_ctx *ctx, void *sqe);
- 
- struct hpre_rsa_ctx {
-@@ -61,14 +70,25 @@ struct hpre_dh_ctx {
- 	 * else if base if the counterpart public key we
- 	 * compute the shared secret
- 	 *	ZZ = yb^xa mod p; [RFC2631 sec 2.1.1]
-+	 * low address: d--->n, please refer to Hisilicon HPRE UM
- 	 */
--	char *xa_p; /* low address: d--->n, please refer to Hisilicon HPRE UM */
-+	char *xa_p;
- 	dma_addr_t dma_xa_p;
- 
- 	char *g; /* m */
+ #include <crypto/ecc_curve.h>
+ #include <crypto/ecdh.h>
+@@ -89,6 +90,16 @@ struct hpre_ecdh_ctx {
  	dma_addr_t dma_g;
  };
  
-+struct hpre_ecdh_ctx {
-+	/* low address: p->a->k->b */
++struct hpre_curve25519_ctx {
++	/* low address: p->a->k */
 +	unsigned char *p;
 +	dma_addr_t dma_p;
 +
-+	/* low address: x->y */
++	/* gx coordinate */
 +	unsigned char *g;
 +	dma_addr_t dma_g;
 +};
@@ -130,226 +112,133 @@ index 712bea9..a6010b1 100644
  struct hpre_ctx {
  	struct hisi_qp *qp;
  	struct hpre_asym_request **req_list;
-@@ -80,7 +100,10 @@ struct hpre_ctx {
- 	union {
+@@ -101,6 +112,7 @@ struct hpre_ctx {
  		struct hpre_rsa_ctx rsa;
  		struct hpre_dh_ctx dh;
-+		struct hpre_ecdh_ctx ecdh;
+ 		struct hpre_ecdh_ctx ecdh;
++		struct hpre_curve25519_ctx curve25519;
  	};
-+	/* for ecc algorithms */
-+	unsigned int curve_id;
- };
- 
- struct hpre_asym_request {
-@@ -91,6 +114,7 @@ struct hpre_asym_request {
- 	union {
+ 	/* for ecc algorithms */
+ 	unsigned int curve_id;
+@@ -115,6 +127,7 @@ struct hpre_asym_request {
  		struct akcipher_request *rsa;
  		struct kpp_request *dh;
-+		struct kpp_request *ecdh;
+ 		struct kpp_request *ecdh;
++		struct kpp_request *curve25519;
  	} areq;
  	int err;
  	int req_id;
-@@ -1115,6 +1139,416 @@ static void hpre_rsa_exit_tfm(struct crypto_akcipher *tfm)
- 	crypto_free_akcipher(ctx->rsa.soft_tfm);
+@@ -437,7 +450,6 @@ static void hpre_alg_cb(struct hisi_qp *qp, void *resp)
+ 	struct hpre_sqe *sqe = resp;
+ 	struct hpre_asym_request *req = ctx->req_list[le16_to_cpu(sqe->tag)];
+ 
+-
+ 	if (unlikely(!req)) {
+ 		atomic64_inc(&dfx[HPRE_INVALID_REQ_CNT].value);
+ 		return;
+@@ -1167,6 +1179,12 @@ static void hpre_ecc_clear_ctx(struct hpre_ctx *ctx, bool is_clear_all,
+ 		memzero_explicit(ctx->ecdh.p + shift, sz);
+ 		dma_free_coherent(dev, sz << 3, ctx->ecdh.p, ctx->ecdh.dma_p);
+ 		ctx->ecdh.p = NULL;
++	} else if (!is_ecdh && ctx->curve25519.p) {
++		/* curve25519: p->a->k */
++		memzero_explicit(ctx->curve25519.p + shift, sz);
++		dma_free_coherent(dev, sz << 2, ctx->curve25519.p,
++				  ctx->curve25519.dma_p);
++		ctx->curve25519.p = NULL;
+ 	}
+ 
+ 	hpre_ctx_clear(ctx, is_clear_all);
+@@ -1549,6 +1567,312 @@ static void hpre_ecdh_exit_tfm(struct crypto_kpp *tfm)
+ 	hpre_ecc_clear_ctx(ctx, true, true);
  }
  
-+static void hpre_key_to_big_end(u8 *data, int len)
++static void hpre_curve25519_fill_curve(struct hpre_ctx *ctx, const void *buf,
++				       unsigned int len)
 +{
-+	int i, j;
-+	u8 tmp;
++	u8 secret[CURVE25519_KEY_SIZE] = { 0 };
++	unsigned int sz = ctx->key_sz;
++	const struct ecc_curve *curve;
++	unsigned int shift = sz << 1;
++	void *p;
 +
-+	for (i = 0; i < len / 2; i++) {
-+		j = len - i - 1;
-+		tmp = data[j];
-+		data[j] = data[i];
-+		data[i] = tmp;
-+	}
++	/*
++	 * The key from 'buf' is in little-endian, we should preprocess it as
++	 * the description in rfc7748: "k[0] &= 248, k[31] &= 127, k[31] |= 64",
++	 * then convert it to big endian. Only in this way, the result can be
++	 * the same as the software curve-25519 that exists in crypto.
++	 */
++	memcpy(secret, buf, len);
++	curve25519_clamp_secret(secret);
++	hpre_key_to_big_end(secret, CURVE25519_KEY_SIZE);
++
++	p = ctx->curve25519.p + sz - len;
++
++	curve = ecc_get_curve25519();
++
++	/* fill curve parameters */
++	fill_curve_param(p, curve->p, len, curve->g.ndigits);
++	fill_curve_param(p + sz, curve->a, len, curve->g.ndigits);
++	memcpy(p + shift, secret, len);
++	fill_curve_param(p + shift + sz, curve->g.x, len, curve->g.ndigits);
++	memzero_explicit(secret, CURVE25519_KEY_SIZE);
 +}
 +
-+static void hpre_ecc_clear_ctx(struct hpre_ctx *ctx, bool is_clear_all,
-+			       bool is_ecdh)
++static int hpre_curve25519_set_param(struct hpre_ctx *ctx, const void *buf,
++				     unsigned int len)
 +{
 +	struct device *dev = HPRE_DEV(ctx);
 +	unsigned int sz = ctx->key_sz;
 +	unsigned int shift = sz << 1;
 +
-+	if (is_clear_all)
-+		hisi_qm_stop_qp(ctx->qp);
-+
-+	if (is_ecdh && ctx->ecdh.p) {
-+		/* ecdh: p->a->k->b */
-+		memzero_explicit(ctx->ecdh.p + shift, sz);
-+		dma_free_coherent(dev, sz << 3, ctx->ecdh.p, ctx->ecdh.dma_p);
-+		ctx->ecdh.p = NULL;
-+	}
-+
-+	hpre_ctx_clear(ctx, is_clear_all);
-+}
-+
-+static unsigned int hpre_ecdh_supported_curve(unsigned short id)
-+{
-+	switch (id) {
-+	case ECC_CURVE_NIST_P192:
-+	case ECC_CURVE_NIST_P256:
-+		return HPRE_ECC_HW256_KSZ_B;
-+	default:
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
-+static void fill_curve_param(void *addr, u64 *param, unsigned int cur_sz, u8 ndigits)
-+{
-+	unsigned int sz = cur_sz - (ndigits - 1) * sizeof(u64);
-+	u8 i = 0;
-+
-+	while (i < ndigits - 1) {
-+		memcpy(addr + sizeof(u64) * i, &param[i], sizeof(u64));
-+		i++;
-+	}
-+
-+	memcpy(addr + sizeof(u64) * i, &param[ndigits - 1], sz);
-+	hpre_key_to_big_end((u8 *)addr, cur_sz);
-+}
-+
-+static int hpre_ecdh_fill_curve(struct hpre_ctx *ctx, struct ecdh *params,
-+				unsigned int cur_sz)
-+{
-+	unsigned int shifta = ctx->key_sz << 1;
-+	unsigned int shiftb = ctx->key_sz << 2;
-+	void *p = ctx->ecdh.p + ctx->key_sz - cur_sz;
-+	void *a = ctx->ecdh.p + shifta - cur_sz;
-+	void *b = ctx->ecdh.p + shiftb - cur_sz;
-+	void *x = ctx->ecdh.g + ctx->key_sz - cur_sz;
-+	void *y = ctx->ecdh.g + shifta - cur_sz;
-+	const struct ecc_curve *curve = ecc_get_curve(ctx->curve_id);
-+	char *n;
-+
-+	if (unlikely(!curve))
-+		return -EINVAL;
-+
-+	n = kzalloc(ctx->key_sz, GFP_KERNEL);
-+	if (!n)
-+		return -ENOMEM;
-+
-+	fill_curve_param(p, curve->p, cur_sz, curve->g.ndigits);
-+	fill_curve_param(a, curve->a, cur_sz, curve->g.ndigits);
-+	fill_curve_param(b, curve->b, cur_sz, curve->g.ndigits);
-+	fill_curve_param(x, curve->g.x, cur_sz, curve->g.ndigits);
-+	fill_curve_param(y, curve->g.y, cur_sz, curve->g.ndigits);
-+	fill_curve_param(n, curve->n, cur_sz, curve->g.ndigits);
-+
-+	if (params->key_size == cur_sz && memcmp(params->key, n, cur_sz) >= 0) {
-+		kfree(n);
-+		return -EINVAL;
-+	}
-+
-+	kfree(n);
-+	return 0;
-+}
-+
-+static unsigned int hpre_ecdh_get_curvesz(unsigned short id)
-+{
-+	switch (id) {
-+	case ECC_CURVE_NIST_P192:
-+		return HPRE_ECC_NIST_P192_N_SIZE;
-+	case ECC_CURVE_NIST_P256:
-+		return HPRE_ECC_NIST_P256_N_SIZE;
-+	default:
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
-+static int hpre_ecdh_set_param(struct hpre_ctx *ctx, struct ecdh *params)
-+{
-+	struct device *dev = HPRE_DEV(ctx);
-+	unsigned int sz, shift, curve_sz;
-+	int ret;
-+
-+	ctx->key_sz = hpre_ecdh_supported_curve(ctx->curve_id);
-+	if (!ctx->key_sz)
-+		return -EINVAL;
-+
-+	curve_sz = hpre_ecdh_get_curvesz(ctx->curve_id);
-+	if (!curve_sz || params->key_size > curve_sz)
-+		return -EINVAL;
-+
-+	sz = ctx->key_sz;
-+
-+	if (!ctx->ecdh.p) {
-+		ctx->ecdh.p = dma_alloc_coherent(dev, sz << 3, &ctx->ecdh.dma_p,
-+						 GFP_KERNEL);
-+		if (!ctx->ecdh.p)
++	/* p->a->k->gx */
++	if (!ctx->curve25519.p) {
++		ctx->curve25519.p = dma_alloc_coherent(dev, sz << 2,
++						       &ctx->curve25519.dma_p,
++						       GFP_KERNEL);
++		if (!ctx->curve25519.p)
 +			return -ENOMEM;
 +	}
 +
-+	shift = sz << 2;
-+	ctx->ecdh.g = ctx->ecdh.p + shift;
-+	ctx->ecdh.dma_g = ctx->ecdh.dma_p + shift;
++	ctx->curve25519.g = ctx->curve25519.p + shift + sz;
++	ctx->curve25519.dma_g = ctx->curve25519.dma_p + shift + sz;
 +
-+	ret = hpre_ecdh_fill_curve(ctx, params, curve_sz);
-+	if (ret) {
-+		dev_err(dev, "failed to fill curve_param, ret = %d!\n", ret);
-+		dma_free_coherent(dev, sz << 3, ctx->ecdh.p, ctx->ecdh.dma_p);
-+		ctx->ecdh.p = NULL;
-+		return ret;
-+	}
++	hpre_curve25519_fill_curve(ctx, buf, len);
 +
 +	return 0;
 +}
 +
-+static bool hpre_key_is_zero(char *key, unsigned short key_sz)
-+{
-+	int i;
-+
-+	for (i = 0; i < key_sz; i++)
-+		if (key[i])
-+			return false;
-+
-+	return true;
-+}
-+
-+static int hpre_ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
-+				unsigned int len)
++static int hpre_curve25519_set_secret(struct crypto_kpp *tfm, const void *buf,
++				      unsigned int len)
 +{
 +	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
 +	struct device *dev = HPRE_DEV(ctx);
-+	unsigned int sz, sz_shift;
-+	struct ecdh params;
-+	int ret;
++	int ret = -EINVAL;
 +
-+	if (crypto_ecdh_decode_key(buf, len, &params) < 0) {
-+		dev_err(dev, "failed to decode ecdh key!\n");
-+		return -EINVAL;
-+	}
-+
-+	if (hpre_key_is_zero(params.key, params.key_size)) {
-+		dev_err(dev, "Invalid hpre key!\n");
-+		return -EINVAL;
-+	}
-+
-+	hpre_ecc_clear_ctx(ctx, false, true);
-+
-+	ret = hpre_ecdh_set_param(ctx, &params);
-+	if (ret < 0) {
-+		dev_err(dev, "failed to set hpre param, ret = %d!\n", ret);
++	if (len != CURVE25519_KEY_SIZE ||
++	    !crypto_memneq(buf, curve25519_null_point, CURVE25519_KEY_SIZE)) {
++		dev_err(dev, "key is null or key len is not 32bytes!\n");
 +		return ret;
 +	}
 +
-+	sz = ctx->key_sz;
-+	sz_shift = (sz << 1) + sz - params.key_size;
-+	memcpy(ctx->ecdh.p + sz_shift, params.key, params.key_size);
++	/* Free old secret if any */
++	hpre_ecc_clear_ctx(ctx, false, false);
++
++	ctx->key_sz = CURVE25519_KEY_SIZE;
++	ret = hpre_curve25519_set_param(ctx, buf, CURVE25519_KEY_SIZE);
++	if (ret) {
++		dev_err(dev, "failed to set curve25519 param, ret = %d!\n", ret);
++		hpre_ecc_clear_ctx(ctx, false, false);
++		return ret;
++	}
 +
 +	return 0;
 +}
 +
-+static void hpre_ecdh_hw_data_clr_all(struct hpre_ctx *ctx,
-+				      struct hpre_asym_request *req,
-+				      struct scatterlist *dst,
-+				      struct scatterlist *src)
++static void hpre_curve25519_hw_data_clr_all(struct hpre_ctx *ctx,
++					    struct hpre_asym_request *req,
++					    struct scatterlist *dst,
++					    struct scatterlist *src)
 +{
 +	struct device *dev = HPRE_DEV(ctx);
 +	struct hpre_sqe *sqe = &req->req;
@@ -360,66 +249,62 @@ index 712bea9..a6010b1 100644
 +		return;
 +
 +	if (src && req->src)
-+		dma_free_coherent(dev, ctx->key_sz << 2, req->src, dma);
++		dma_free_coherent(dev, ctx->key_sz, req->src, dma);
 +
 +	dma = le64_to_cpu(sqe->out);
 +	if (unlikely(!dma))
 +		return;
 +
 +	if (req->dst)
-+		dma_free_coherent(dev, ctx->key_sz << 1, req->dst, dma);
++		dma_free_coherent(dev, ctx->key_sz, req->dst, dma);
 +	if (dst)
-+		dma_unmap_single(dev, dma, ctx->key_sz << 1, DMA_FROM_DEVICE);
++		dma_unmap_single(dev, dma, ctx->key_sz, DMA_FROM_DEVICE);
 +}
 +
-+static void hpre_ecdh_cb(struct hpre_ctx *ctx, void *resp)
++static void hpre_curve25519_cb(struct hpre_ctx *ctx, void *resp)
 +{
-+	unsigned int curve_sz = hpre_ecdh_get_curvesz(ctx->curve_id);
 +	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
 +	struct hpre_asym_request *req = NULL;
 +	struct kpp_request *areq;
 +	u64 overtime_thrhld;
-+	char *p;
 +	int ret;
 +
 +	ret = hpre_alg_res_post_hf(ctx, resp, (void **)&req);
-+	areq = req->areq.ecdh;
-+	areq->dst_len = ctx->key_sz << 1;
++	areq = req->areq.curve25519;
++	areq->dst_len = ctx->key_sz;
 +
 +	overtime_thrhld = atomic64_read(&dfx[HPRE_OVERTIME_THRHLD].value);
 +	if (overtime_thrhld && hpre_is_bd_timeout(req, overtime_thrhld))
 +		atomic64_inc(&dfx[HPRE_OVER_THRHLD_CNT].value);
 +
-+	p = sg_virt(areq->dst);
-+	memmove(p, p + ctx->key_sz - curve_sz, curve_sz);
-+	memmove(p + curve_sz, p + areq->dst_len - curve_sz, curve_sz);
++	hpre_key_to_big_end(sg_virt(areq->dst), CURVE25519_KEY_SIZE);
 +
-+	hpre_ecdh_hw_data_clr_all(ctx, req, areq->dst, areq->src);
++	hpre_curve25519_hw_data_clr_all(ctx, req, areq->dst, areq->src);
 +	kpp_request_complete(areq, ret);
 +
 +	atomic64_inc(&dfx[HPRE_RECV_CNT].value);
 +}
 +
-+static int hpre_ecdh_msg_request_set(struct hpre_ctx *ctx,
-+				     struct kpp_request *req)
++static int hpre_curve25519_msg_request_set(struct hpre_ctx *ctx,
++					   struct kpp_request *req)
 +{
 +	struct hpre_asym_request *h_req;
 +	struct hpre_sqe *msg;
 +	int req_id;
 +	void *tmp;
 +
-+	if (req->dst_len < ctx->key_sz << 1) {
-+		req->dst_len = ctx->key_sz << 1;
++	if (unlikely(req->dst_len < ctx->key_sz)) {
++		req->dst_len = ctx->key_sz;
 +		return -EINVAL;
 +	}
 +
 +	tmp = kpp_request_ctx(req);
 +	h_req = PTR_ALIGN(tmp, HPRE_ALIGN_SZ);
-+	h_req->cb = hpre_ecdh_cb;
-+	h_req->areq.ecdh = req;
++	h_req->cb = hpre_curve25519_cb;
++	h_req->areq.curve25519 = req;
 +	msg = &h_req->req;
 +	memset(msg, 0, sizeof(*msg));
-+	msg->key = cpu_to_le64(ctx->ecdh.dma_p);
++	msg->key = cpu_to_le64(ctx->curve25519.dma_p);
 +
 +	msg->dw0 |= cpu_to_le32(0x1U << HPRE_SQE_DONE_SHIFT);
 +	msg->task_len1 = (ctx->key_sz >> HPRE_BITS_2_BYTES_SHIFT) - 1;
@@ -433,45 +318,67 @@ index 712bea9..a6010b1 100644
 +	return 0;
 +}
 +
-+static int hpre_ecdh_src_data_init(struct hpre_asym_request *hpre_req,
-+				   struct scatterlist *data, unsigned int len)
++static int hpre_curve25519_src_init(struct hpre_asym_request *hpre_req,
++				    struct scatterlist *data, unsigned int len)
 +{
 +	struct hpre_sqe *msg = &hpre_req->req;
 +	struct hpre_ctx *ctx = hpre_req->ctx;
 +	struct device *dev = HPRE_DEV(ctx);
-+	unsigned int tmpshift;
++	u8 p[CURVE25519_KEY_SIZE] = { 0 };
++	const struct ecc_curve *curve;
 +	dma_addr_t dma = 0;
-+	void *ptr;
-+	int shift;
++	u8 *ptr;
 +
-+	/* Src_data include gx and gy. */
-+	shift = ctx->key_sz - (len >> 1);
-+	if (unlikely(shift < 0))
++	if (len != CURVE25519_KEY_SIZE) {
++		dev_err(dev, "sourc_data len is not 32bytes, len = %u!\n", len);
 +		return -EINVAL;
++	}
 +
-+	ptr = dma_alloc_coherent(dev, ctx->key_sz << 2, &dma, GFP_KERNEL);
++	ptr = dma_alloc_coherent(dev, ctx->key_sz, &dma, GFP_KERNEL);
 +	if (unlikely(!ptr))
 +		return -ENOMEM;
 +
-+	tmpshift = ctx->key_sz << 1;
-+	scatterwalk_map_and_copy(ptr + tmpshift, data, 0, len, 0);
-+	memcpy(ptr + shift, ptr + tmpshift, len >> 1);
-+	memcpy(ptr + ctx->key_sz + shift, ptr + tmpshift + (len >> 1), len >> 1);
++	scatterwalk_map_and_copy(ptr, data, 0, len, 0);
++
++	if (!crypto_memneq(ptr, curve25519_null_point, CURVE25519_KEY_SIZE)) {
++		dev_err(dev, "gx is null!\n");
++		goto err;
++	}
++
++	/*
++	 * Src_data(gx) is in little-endian order, MSB in the final byte should
++	 * be masked as discribed in RFC7748, then transform it to big-endian
++	 * form, then hisi_hpre can use the data.
++	 */
++	ptr[31] &= 0x7f;
++	hpre_key_to_big_end(ptr, CURVE25519_KEY_SIZE);
++
++	curve = ecc_get_curve25519();
++
++	fill_curve_param(p, curve->p, CURVE25519_KEY_SIZE, curve->g.ndigits);
++	if (memcmp(ptr, p, ctx->key_sz) >= 0) {
++		dev_err(dev, "gx is out of p!\n");
++		goto err;
++	}
 +
 +	hpre_req->src = ptr;
 +	msg->in = cpu_to_le64(dma);
 +	return 0;
++
++err:
++	dma_free_coherent(dev, ctx->key_sz, ptr, dma);
++	return -EINVAL;
 +}
 +
-+static int hpre_ecdh_dst_data_init(struct hpre_asym_request *hpre_req,
-+				   struct scatterlist *data, unsigned int len)
++static int hpre_curve25519_dst_init(struct hpre_asym_request *hpre_req,
++				    struct scatterlist *data, unsigned int len)
 +{
 +	struct hpre_sqe *msg = &hpre_req->req;
 +	struct hpre_ctx *ctx = hpre_req->ctx;
 +	struct device *dev = HPRE_DEV(ctx);
 +	dma_addr_t dma = 0;
 +
-+	if (unlikely(!data || !sg_is_last(data) || len != ctx->key_sz << 1)) {
++	if (!data || !sg_is_last(data) || len != ctx->key_sz) {
 +		dev_err(dev, "data or data length is illegal!\n");
 +		return -EINVAL;
 +	}
@@ -487,7 +394,7 @@ index 712bea9..a6010b1 100644
 +	return 0;
 +}
 +
-+static int hpre_ecdh_compute_value(struct kpp_request *req)
++static int hpre_curve25519_compute_value(struct kpp_request *req)
 +{
 +	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
 +	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
@@ -497,186 +404,127 @@ index 712bea9..a6010b1 100644
 +	struct hpre_sqe *msg = &hpre_req->req;
 +	int ret;
 +
-+	ret = hpre_ecdh_msg_request_set(ctx, req);
++	ret = hpre_curve25519_msg_request_set(ctx, req);
 +	if (unlikely(ret)) {
-+		dev_err(dev, "failed to set ecdh request, ret = %d!\n", ret);
++		dev_err(dev, "failed to set curve25519 request, ret = %d!\n", ret);
 +		return ret;
 +	}
 +
 +	if (req->src) {
-+		ret = hpre_ecdh_src_data_init(hpre_req, req->src, req->src_len);
++		ret = hpre_curve25519_src_init(hpre_req, req->src, req->src_len);
 +		if (unlikely(ret)) {
-+			dev_err(dev, "failed to init src data, ret = %d!\n", ret);
++			dev_err(dev, "failed to init src data, ret = %d!\n",
++				ret);
 +			goto clear_all;
 +		}
 +	} else {
-+		msg->in = cpu_to_le64(ctx->ecdh.dma_g);
++		msg->in = cpu_to_le64(ctx->curve25519.dma_g);
 +	}
 +
-+	ret = hpre_ecdh_dst_data_init(hpre_req, req->dst, req->dst_len);
++	ret = hpre_curve25519_dst_init(hpre_req, req->dst, req->dst_len);
 +	if (unlikely(ret)) {
 +		dev_err(dev, "failed to init dst data, ret = %d!\n", ret);
 +		goto clear_all;
 +	}
 +
-+	msg->dw0 = cpu_to_le32(le32_to_cpu(msg->dw0) | HPRE_ALG_ECC_MUL);
++	msg->dw0 = cpu_to_le32(le32_to_cpu(msg->dw0) | HPRE_ALG_CURVE25519_MUL);
 +	ret = hpre_send(ctx, msg);
 +	if (likely(!ret))
 +		return -EINPROGRESS;
 +
 +clear_all:
 +	hpre_rm_req_from_ctx(hpre_req);
-+	hpre_ecdh_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
++	hpre_curve25519_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
 +	return ret;
 +}
 +
-+static unsigned int hpre_ecdh_max_size(struct crypto_kpp *tfm)
++static unsigned int hpre_curve25519_max_size(struct crypto_kpp *tfm)
 +{
 +	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
 +
-+	/* max size is the pub_key_size, include x and y */
-+	return ctx->key_sz << 1;
++	return ctx->key_sz;
 +}
 +
-+static int hpre_ecdh_nist_p192_init_tfm(struct crypto_kpp *tfm)
++static int hpre_curve25519_init_tfm(struct crypto_kpp *tfm)
 +{
 +	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
-+
-+	ctx->curve_id = ECC_CURVE_NIST_P192;
 +
 +	return hpre_ctx_init(ctx, HPRE_V3_ECC_ALG_TYPE);
 +}
 +
-+static int hpre_ecdh_nist_p256_init_tfm(struct crypto_kpp *tfm)
++static void hpre_curve25519_exit_tfm(struct crypto_kpp *tfm)
 +{
 +	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
 +
-+	ctx->curve_id = ECC_CURVE_NIST_P256;
-+
-+	return hpre_ctx_init(ctx, HPRE_V3_ECC_ALG_TYPE);
-+}
-+
-+static void hpre_ecdh_exit_tfm(struct crypto_kpp *tfm)
-+{
-+	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
-+
-+	hpre_ecc_clear_ctx(ctx, true, true);
++	hpre_ecc_clear_ctx(ctx, true, false);
 +}
 +
  static struct akcipher_alg rsa = {
  	.sign = hpre_rsa_dec,
  	.verify = hpre_rsa_enc,
-@@ -1154,6 +1588,63 @@ static struct kpp_alg dh = {
+@@ -1622,6 +1946,24 @@ static struct kpp_alg ecdh_nist_p256 = {
+ 	},
  };
- #endif
  
-+static struct kpp_alg ecdh_nist_p192 = {
-+	.set_secret = hpre_ecdh_set_secret,
-+	.generate_public_key = hpre_ecdh_compute_value,
-+	.compute_shared_secret = hpre_ecdh_compute_value,
-+	.max_size = hpre_ecdh_max_size,
-+	.init = hpre_ecdh_nist_p192_init_tfm,
-+	.exit = hpre_ecdh_exit_tfm,
++static struct kpp_alg curve25519_alg = {
++	.set_secret = hpre_curve25519_set_secret,
++	.generate_public_key = hpre_curve25519_compute_value,
++	.compute_shared_secret = hpre_curve25519_compute_value,
++	.max_size = hpre_curve25519_max_size,
++	.init = hpre_curve25519_init_tfm,
++	.exit = hpre_curve25519_exit_tfm,
 +	.reqsize = sizeof(struct hpre_asym_request) + HPRE_ALIGN_SZ,
 +	.base = {
 +		.cra_ctxsize = sizeof(struct hpre_ctx),
 +		.cra_priority = HPRE_CRYPTO_ALG_PRI,
-+		.cra_name = "ecdh-nist-p192",
-+		.cra_driver_name = "hpre-ecdh",
++		.cra_name = "curve25519",
++		.cra_driver_name = "hpre-curve25519",
 +		.cra_module = THIS_MODULE,
 +	},
 +};
 +
-+static struct kpp_alg ecdh_nist_p256 = {
-+	.set_secret = hpre_ecdh_set_secret,
-+	.generate_public_key = hpre_ecdh_compute_value,
-+	.compute_shared_secret = hpre_ecdh_compute_value,
-+	.max_size = hpre_ecdh_max_size,
-+	.init = hpre_ecdh_nist_p256_init_tfm,
-+	.exit = hpre_ecdh_exit_tfm,
-+	.reqsize = sizeof(struct hpre_asym_request) + HPRE_ALIGN_SZ,
-+	.base = {
-+		.cra_ctxsize = sizeof(struct hpre_ctx),
-+		.cra_priority = HPRE_CRYPTO_ALG_PRI,
-+		.cra_name = "ecdh-nist-p256",
-+		.cra_driver_name = "hpre-ecdh",
-+		.cra_module = THIS_MODULE,
-+	},
-+};
 +
-+static int hpre_register_ecdh(void)
-+{
-+	int ret;
-+
-+	ret = crypto_register_kpp(&ecdh_nist_p192);
-+	if (ret)
-+		return ret;
-+
-+	ret = crypto_register_kpp(&ecdh_nist_p256);
-+	if (ret) {
-+		crypto_unregister_kpp(&ecdh_nist_p192);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static void hpre_unregister_ecdh(void)
-+{
-+	crypto_unregister_kpp(&ecdh_nist_p256);
-+	crypto_unregister_kpp(&ecdh_nist_p192);
-+}
-+
- int hpre_algs_register(struct hisi_qm *qm)
+ static int hpre_register_ecdh(void)
  {
  	int ret;
-@@ -1164,17 +1655,33 @@ int hpre_algs_register(struct hisi_qm *qm)
- 		return ret;
- #ifdef CONFIG_CRYPTO_DH
- 	ret = crypto_register_kpp(&dh);
--	if (ret)
-+	if (ret) {
- 		crypto_unregister_akcipher(&rsa);
-+		return ret;
-+	}
- #endif
+@@ -1663,22 +2005,30 @@ int hpre_algs_register(struct hisi_qm *qm)
  
--	return ret;
-+	if (qm->ver >= QM_HW_V3) {
-+		ret = hpre_register_ecdh();
-+		if (ret) {
-+#ifdef CONFIG_CRYPTO_DH
-+			crypto_unregister_kpp(&dh);
-+#endif
-+			crypto_unregister_akcipher(&rsa);
-+			return ret;
-+		}
-+	}
+ 	if (qm->ver >= QM_HW_V3) {
+ 		ret = hpre_register_ecdh();
++		if (ret)
++			goto reg_err;
++		ret = crypto_register_kpp(&curve25519_alg);
+ 		if (ret) {
+-#ifdef CONFIG_CRYPTO_DH
+-			crypto_unregister_kpp(&dh);
+-#endif
+-			crypto_unregister_akcipher(&rsa);
+-			return ret;
++			hpre_unregister_ecdh();
++			goto reg_err;
+ 		}
+ 	}
+-
+ 	return 0;
 +
-+	return 0;
++reg_err:
++#ifdef CONFIG_CRYPTO_DH
++	crypto_unregister_kpp(&dh);
++#endif
++	crypto_unregister_akcipher(&rsa);
++	return ret;
  }
  
  void hpre_algs_unregister(struct hisi_qm *qm)
  {
--	crypto_unregister_akcipher(&rsa);
-+	if (qm->ver >= QM_HW_V3)
-+		hpre_unregister_ecdh();
-+
+-	if (qm->ver >= QM_HW_V3)
++	if (qm->ver >= QM_HW_V3) {
++		crypto_unregister_kpp(&curve25519_alg);
+ 		hpre_unregister_ecdh();
++	}
+ 
  #ifdef CONFIG_CRYPTO_DH
  	crypto_unregister_kpp(&dh);
- #endif
-+	crypto_unregister_akcipher(&rsa);
- }
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index 76f0a87..87e8f4d 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -1082,4 +1082,5 @@ module_exit(hpre_exit);
- 
- MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR("Zaibo Xu <xuzaibo@huawei.com>");
-+MODULE_AUTHOR("Meng Yu <yumeng18@huawei.com>");
- MODULE_DESCRIPTION("Driver for HiSilicon HPRE accelerator");
 -- 
 2.8.1
 
