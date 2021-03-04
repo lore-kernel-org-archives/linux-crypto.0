@@ -2,316 +2,76 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E6AC4332B
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 06:22:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8094C433DB
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 06:29:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 205DC64F0B
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 06:22:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 775CE64F0A
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Mar 2021 06:29:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234978AbhCDGWR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Mar 2021 01:22:17 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:13053 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232259AbhCDGWA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Mar 2021 01:22:00 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DrggJ4L51zMhpk;
-        Thu,  4 Mar 2021 14:19:08 +0800 (CST)
-Received: from huawei.com (10.67.165.24) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.498.0; Thu, 4 Mar 2021
- 14:21:10 +0800
-From:   Longfang Liu <liulongfang@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <wangzhou1@hisilicon.com>,
-        <xuzaibo@huawei.com>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 2/2] crypto: hisilicon/sec - fixes some driver coding style
-Date:   Thu, 4 Mar 2021 14:18:55 +0800
-Message-ID: <1614838735-52668-3-git-send-email-liulongfang@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1614838735-52668-1-git-send-email-liulongfang@huawei.com>
-References: <1614838735-52668-1-git-send-email-liulongfang@huawei.com>
+        id S235180AbhCDG2s (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Mar 2021 01:28:48 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:52116 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235216AbhCDG2i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 4 Mar 2021 01:28:38 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1lHhRd-0007I3-Am; Thu, 04 Mar 2021 17:26:46 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 04 Mar 2021 17:26:44 +1100
+Date:   Thu, 4 Mar 2021 17:26:44 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Allen Pais <allen.lkml@gmail.com>
+Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
+        alexandre.belloni@bootlin.com, ludovic.desroches@microchip.com,
+        jesper.nilsson@axis.com, lars.persson@axis.com,
+        horia.geanta@nxp.com, aymen.sghaier@nxp.com, gcherian@marvell.com,
+        thomas.lendacky@amd.com, john.allen@amd.com, gilad@benyossef.com,
+        bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
+        matthias.bgg@gmail.com, jamie@jamieiles.com,
+        giovanni.cabiddu@intel.com, heiko@sntech.de, krzk@kernel.org,
+        vz@mleia.com, k.konieczny@samsung.com,
+        linux-crypto@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        qat-linux@intel.com, linux-rockchip@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org,
+        Allen Pais <apais@linux.microsoft.com>,
+        Romain Perier <romain.perier@gmail.com>
+Subject: Re: [PATCH v5 01/19] crypto: amcc: convert tasklets to use new
+ tasklet_setup() API
+Message-ID: <20210304062644.GA5107@gondor.apana.org.au>
+References: <20210208094238.571015-1-allen.lkml@gmail.com>
+ <20210208094238.571015-2-allen.lkml@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210208094238.571015-2-allen.lkml@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-cleanup static check errors for SEC
+On Mon, Feb 08, 2021 at 03:12:20PM +0530, Allen Pais wrote:
+> From: Allen Pais <apais@linux.microsoft.com>
+> 
+> In preparation for unconditionally passing the
+> struct tasklet_struct pointer to all tasklet
+> callbacks, switch to using the new tasklet_setup()
+> and from_tasklet() to pass the tasklet pointer explicitly.
+> 
+> Signed-off-by: Romain Perier <romain.perier@gmail.com>
+> Signed-off-by: Allen Pais <apais@linux.microsoft.com>
+> ---
+>  drivers/crypto/amcc/crypto4xx_core.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
----
- drivers/crypto/hisilicon/sec2/sec_main.c | 131 ++++++++++++++++++-------------
- 1 file changed, 76 insertions(+), 55 deletions(-)
+This introduces a compiler warning with C=1 W=1.
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index dc68ba7..78a6043 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -35,15 +35,13 @@
- #define SEC_CTX_Q_NUM_MAX		32
- 
- #define SEC_CTRL_CNT_CLR_CE		0x301120
--#define SEC_CTRL_CNT_CLR_CE_BIT		BIT(0)
--#define SEC_ENGINE_PF_CFG_OFF		0x300000
--#define SEC_ACC_COMMON_REG_OFF		0x1000
-+#define SEC_CTRL_CNT_CLR_CE_BIT	BIT(0)
- #define SEC_CORE_INT_SOURCE		0x301010
- #define SEC_CORE_INT_MASK		0x301000
- #define SEC_CORE_INT_STATUS		0x301008
- #define SEC_CORE_SRAM_ECC_ERR_INFO	0x301C14
--#define SEC_ECC_NUM(err)			(((err) >> 16) & 0xFF)
--#define SEC_ECC_ADDR(err)			((err) >> 0)
-+#define SEC_ECC_NUM			16
-+#define SEC_ECC_MASH			0xFF
- #define SEC_CORE_INT_DISABLE		0x0
- #define SEC_CORE_INT_ENABLE		0x1ff
- #define SEC_CORE_INT_CLEAR		0x1ff
-@@ -55,23 +53,23 @@
- #define SEC_RAS_CE_ENB_MSK		0x88
- #define SEC_RAS_FE_ENB_MSK		0x0
- #define SEC_RAS_NFE_ENB_MSK		0x177
--#define SEC_RAS_DISABLE			0x0
--#define SEC_MEM_START_INIT_REG		0x0100
--#define SEC_MEM_INIT_DONE_REG		0x0104
-+#define SEC_RAS_DISABLE		0x0
-+#define SEC_MEM_START_INIT_REG	0x301100
-+#define SEC_MEM_INIT_DONE_REG		0x301104
- 
--#define SEC_CONTROL_REG			0x0200
-+#define SEC_CONTROL_REG		0x301200
- #define SEC_TRNG_EN_SHIFT		8
- #define SEC_CLK_GATE_ENABLE		BIT(3)
- #define SEC_CLK_GATE_DISABLE		(~BIT(3))
- #define SEC_AXI_SHUTDOWN_ENABLE	BIT(12)
- #define SEC_AXI_SHUTDOWN_DISABLE	0xFFFFEFFF
- 
--#define SEC_INTERFACE_USER_CTRL0_REG	0x0220
--#define SEC_INTERFACE_USER_CTRL1_REG	0x0224
--#define SEC_SAA_EN_REG					0x0270
--#define SEC_BD_ERR_CHK_EN_REG0		0x0380
--#define SEC_BD_ERR_CHK_EN_REG1		0x0384
--#define SEC_BD_ERR_CHK_EN_REG3		0x038c
-+#define SEC_INTERFACE_USER_CTRL0_REG	0x301220
-+#define SEC_INTERFACE_USER_CTRL1_REG	0x301224
-+#define SEC_SAA_EN_REG			0x301270
-+#define SEC_BD_ERR_CHK_EN_REG0		0x301380
-+#define SEC_BD_ERR_CHK_EN_REG1		0x301384
-+#define SEC_BD_ERR_CHK_EN_REG3		0x30138c
- 
- #define SEC_USER0_SMMU_NORMAL		(BIT(23) | BIT(15))
- #define SEC_USER1_SMMU_NORMAL		(BIT(31) | BIT(23) | BIT(15) | BIT(7))
-@@ -95,9 +93,6 @@
- #define SEC_SQE_MASK_OFFSET		64
- #define SEC_SQE_MASK_LEN		48
- 
--#define SEC_ADDR(qm, offset) ((qm)->io_base + (offset) + \
--			     SEC_ENGINE_PF_CFG_OFF + SEC_ACC_COMMON_REG_OFF)
--
- struct sec_hw_error {
- 	u32 int_msk;
- 	const char *msg;
-@@ -117,16 +112,43 @@ static struct hisi_qm_list sec_devices = {
- };
- 
- static const struct sec_hw_error sec_hw_errors[] = {
--	{.int_msk = BIT(0), .msg = "sec_axi_rresp_err_rint"},
--	{.int_msk = BIT(1), .msg = "sec_axi_bresp_err_rint"},
--	{.int_msk = BIT(2), .msg = "sec_ecc_2bit_err_rint"},
--	{.int_msk = BIT(3), .msg = "sec_ecc_1bit_err_rint"},
--	{.int_msk = BIT(4), .msg = "sec_req_trng_timeout_rint"},
--	{.int_msk = BIT(5), .msg = "sec_fsm_hbeat_rint"},
--	{.int_msk = BIT(6), .msg = "sec_channel_req_rng_timeout_rint"},
--	{.int_msk = BIT(7), .msg = "sec_bd_err_rint"},
--	{.int_msk = BIT(8), .msg = "sec_chain_buff_err_rint"},
--	{ /* sentinel */ }
-+	{
-+		.int_msk = BIT(0),
-+		.msg = "sec_axi_rresp_err_rint"
-+	},
-+	{
-+		.int_msk = BIT(1),
-+		.msg = "sec_axi_bresp_err_rint"
-+	},
-+	{
-+		.int_msk = BIT(2),
-+		.msg = "sec_ecc_2bit_err_rint"
-+	},
-+	{
-+		.int_msk = BIT(3),
-+		.msg = "sec_ecc_1bit_err_rint"
-+	},
-+	{
-+		.int_msk = BIT(4),
-+		.msg = "sec_req_trng_timeout_rint"
-+	},
-+	{
-+		.int_msk = BIT(5),
-+		.msg = "sec_fsm_hbeat_rint"
-+	},
-+	{
-+		.int_msk = BIT(6),
-+		.msg = "sec_channel_req_rng_timeout_rint"
-+	},
-+	{
-+		.int_msk = BIT(7),
-+		.msg = "sec_bd_err_rint"
-+	},
-+	{
-+		.int_msk = BIT(8),
-+		.msg = "sec_chain_buff_err_rint"
-+	},
-+	{}
- };
- 
- static const char * const sec_dbg_file_name[] = {
-@@ -277,9 +299,7 @@ static u8 sec_get_endian(struct hisi_qm *qm)
- 				    "cannot access a register in VF!\n");
- 		return SEC_LE;
- 	}
--	reg = readl_relaxed(qm->io_base + SEC_ENGINE_PF_CFG_OFF +
--			    SEC_ACC_COMMON_REG_OFF + SEC_CONTROL_REG);
--
-+	reg = readl_relaxed(qm->io_base + SEC_CONTROL_REG);
- 	/* BD little endian mode */
- 	if (!(reg & BIT(0)))
- 		return SEC_LE;
-@@ -299,13 +319,13 @@ static int sec_engine_init(struct hisi_qm *qm)
- 	u32 reg;
- 
- 	/* disable clock gate control */
--	reg = readl_relaxed(SEC_ADDR(qm, SEC_CONTROL_REG));
-+	reg = readl_relaxed(qm->io_base + SEC_CONTROL_REG);
- 	reg &= SEC_CLK_GATE_DISABLE;
--	writel_relaxed(reg, SEC_ADDR(qm, SEC_CONTROL_REG));
-+	writel_relaxed(reg, qm->io_base + SEC_CONTROL_REG);
- 
--	writel_relaxed(0x1, SEC_ADDR(qm, SEC_MEM_START_INIT_REG));
-+	writel_relaxed(0x1, qm->io_base + SEC_MEM_START_INIT_REG);
- 
--	ret = readl_relaxed_poll_timeout(SEC_ADDR(qm, SEC_MEM_INIT_DONE_REG),
-+	ret = readl_relaxed_poll_timeout(qm->io_base + SEC_MEM_INIT_DONE_REG,
- 					 reg, reg & 0x1, SEC_DELAY_10_US,
- 					 SEC_POLL_TIMEOUT_US);
- 	if (ret) {
-@@ -313,40 +333,40 @@ static int sec_engine_init(struct hisi_qm *qm)
- 		return ret;
- 	}
- 
--	reg = readl_relaxed(SEC_ADDR(qm, SEC_CONTROL_REG));
-+	reg = readl_relaxed(qm->io_base + SEC_CONTROL_REG);
- 	reg |= (0x1 << SEC_TRNG_EN_SHIFT);
--	writel_relaxed(reg, SEC_ADDR(qm, SEC_CONTROL_REG));
-+	writel_relaxed(reg, qm->io_base + SEC_CONTROL_REG);
- 
--	reg = readl_relaxed(SEC_ADDR(qm, SEC_INTERFACE_USER_CTRL0_REG));
-+	reg = readl_relaxed(qm->io_base + SEC_INTERFACE_USER_CTRL0_REG);
- 	reg |= SEC_USER0_SMMU_NORMAL;
--	writel_relaxed(reg, SEC_ADDR(qm, SEC_INTERFACE_USER_CTRL0_REG));
-+	writel_relaxed(reg, qm->io_base + SEC_INTERFACE_USER_CTRL0_REG);
- 
--	reg = readl_relaxed(SEC_ADDR(qm, SEC_INTERFACE_USER_CTRL1_REG));
-+	reg = readl_relaxed(qm->io_base + SEC_INTERFACE_USER_CTRL1_REG);
- 	reg &= SEC_USER1_SMMU_MASK;
- 	if (qm->use_sva && qm->ver == QM_HW_V2)
- 		reg |= SEC_USER1_SMMU_SVA;
- 	else
- 		reg |= SEC_USER1_SMMU_NORMAL;
--	writel_relaxed(reg, SEC_ADDR(qm, SEC_INTERFACE_USER_CTRL1_REG));
-+	writel_relaxed(reg, qm->io_base + SEC_INTERFACE_USER_CTRL1_REG);
- 
- 	writel(SEC_SINGLE_PORT_MAX_TRANS,
- 	       qm->io_base + AM_CFG_SINGLE_PORT_MAX_TRANS);
- 
--	writel(SEC_SAA_ENABLE, SEC_ADDR(qm, SEC_SAA_EN_REG));
-+	writel(SEC_SAA_ENABLE, qm->io_base + SEC_SAA_EN_REG);
- 
- 	/* Enable sm4 extra mode, as ctr/ecb */
- 	writel_relaxed(SEC_BD_ERR_CHK_EN0,
--		       SEC_ADDR(qm, SEC_BD_ERR_CHK_EN_REG0));
-+		       qm->io_base + SEC_BD_ERR_CHK_EN_REG0);
- 	/* Enable sm4 xts mode multiple iv */
- 	writel_relaxed(SEC_BD_ERR_CHK_EN1,
--		       SEC_ADDR(qm, SEC_BD_ERR_CHK_EN_REG1));
-+		       qm->io_base + SEC_BD_ERR_CHK_EN_REG1);
- 	writel_relaxed(SEC_BD_ERR_CHK_EN3,
--		       SEC_ADDR(qm, SEC_BD_ERR_CHK_EN_REG3));
-+		       qm->io_base + SEC_BD_ERR_CHK_EN_REG3);
- 
- 	/* config endian */
--	reg = readl_relaxed(SEC_ADDR(qm, SEC_CONTROL_REG));
-+	reg = readl_relaxed(qm->io_base + SEC_CONTROL_REG);
- 	reg |= sec_get_endian(qm);
--	writel_relaxed(reg, SEC_ADDR(qm, SEC_CONTROL_REG));
-+	writel_relaxed(reg, qm->io_base + SEC_CONTROL_REG);
- 
- 	return 0;
- }
-@@ -406,7 +426,7 @@ static void sec_hw_error_enable(struct hisi_qm *qm)
- 		return;
- 	}
- 
--	val = readl(SEC_ADDR(qm, SEC_CONTROL_REG));
-+	val = readl(qm->io_base + SEC_CONTROL_REG);
- 
- 	/* clear SEC hw error source if having */
- 	writel(SEC_CORE_INT_CLEAR, qm->io_base + SEC_CORE_INT_SOURCE);
-@@ -422,14 +442,14 @@ static void sec_hw_error_enable(struct hisi_qm *qm)
- 	/* enable SEC block master OOO when m-bit error occur */
- 	val = val | SEC_AXI_SHUTDOWN_ENABLE;
- 
--	writel(val, SEC_ADDR(qm, SEC_CONTROL_REG));
-+	writel(val, qm->io_base + SEC_CONTROL_REG);
- }
- 
- static void sec_hw_error_disable(struct hisi_qm *qm)
- {
- 	u32 val;
- 
--	val = readl(SEC_ADDR(qm, SEC_CONTROL_REG));
-+	val = readl(qm->io_base + SEC_CONTROL_REG);
- 
- 	/* disable RAS int */
- 	writel(SEC_RAS_DISABLE, qm->io_base + SEC_RAS_CE_REG);
-@@ -442,7 +462,7 @@ static void sec_hw_error_disable(struct hisi_qm *qm)
- 	/* disable SEC block master OOO when m-bit error occur */
- 	val = val & SEC_AXI_SHUTDOWN_DISABLE;
- 
--	writel(val, SEC_ADDR(qm, SEC_CONTROL_REG));
-+	writel(val, qm->io_base + SEC_CONTROL_REG);
- }
- 
- static u32 sec_current_qm_read(struct sec_debug_file *file)
-@@ -712,7 +732,8 @@ static void sec_log_hw_error(struct hisi_qm *qm, u32 err_sts)
- 				err_val = readl(qm->io_base +
- 						SEC_CORE_SRAM_ECC_ERR_INFO);
- 				dev_err(dev, "multi ecc sram num=0x%x\n",
--						SEC_ECC_NUM(err_val));
-+						((err_val) >> SEC_ECC_NUM) &
-+						SEC_ECC_MASH);
- 			}
- 		}
- 		errs++;
-@@ -733,9 +754,9 @@ static void sec_open_axi_master_ooo(struct hisi_qm *qm)
- {
- 	u32 val;
- 
--	val = readl(SEC_ADDR(qm, SEC_CONTROL_REG));
--	writel(val & SEC_AXI_SHUTDOWN_DISABLE, SEC_ADDR(qm, SEC_CONTROL_REG));
--	writel(val | SEC_AXI_SHUTDOWN_ENABLE, SEC_ADDR(qm, SEC_CONTROL_REG));
-+	val = readl(qm->io_base + SEC_CONTROL_REG);
-+	writel(val & SEC_AXI_SHUTDOWN_DISABLE, qm->io_base + SEC_CONTROL_REG);
-+	writel(val | SEC_AXI_SHUTDOWN_ENABLE, qm->io_base + SEC_CONTROL_REG);
- }
- 
- static const struct hisi_qm_err_ini sec_err_ini = {
+Cheers,
 -- 
-2.8.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
