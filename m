@@ -2,146 +2,168 @@ Return-Path: <SRS0=OkhN=ID=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E790C433DB
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 21:01:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C58C3C433DB
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 22:17:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A9CD65079
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 21:01:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C9EF65068
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 22:17:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230150AbhCEVAy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Mar 2021 16:00:54 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64146 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229651AbhCEVAV (ORCPT
+        id S229591AbhCEWQ0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 Mar 2021 17:16:26 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40406 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229576AbhCEWPv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Mar 2021 16:00:21 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 125KXLkM182717;
-        Fri, 5 Mar 2021 16:00:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=fiZsSRFRiO57Q/ctX3IRQ7U1I0yk/Kl43WdugbbhNts=;
- b=s4JUuqhZ52rROvXmYWHv35ke54KHCQagPEaosLZyBeNRZJ+lKYSnSFbkIerKvIqny1XA
- NT+cApoYyFQmYdneIjTmgiNchk4l4tl9jJdTRzY8oJxa/c034fLTKxq8Cod93nBg4U+p
- QeGpWG2WsalzQRn6KgZyyZwHG69aStvj09gj6WPeOq0eK/EUYLc8uQ9g3KwLYeaziJiu
- GsJZ8tiHADLHj2WoRSk/FMpCO/wqgyoTzucMkjmoksifSWSziPTHqM8ah1sdfeO2vpoF
- s3owc/gNEzZF5+XwqEtu/aGPxckANunHqvJrAD7Wa1uky+RNLZW4wGEzBysTUHBFh/yG hA== 
+        Fri, 5 Mar 2021 17:15:51 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 125M5LcM049164;
+        Fri, 5 Mar 2021 17:15:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=VAzirJe/Hk/A2gCMur0L8RjwwmeZlMeq9cZyz2PGjEw=;
+ b=bM+NyN1PJ3UAim5D3wAptX1h+/xc074+OPS9f5qvFsX+MtIAUhhjre8/BPbDIKgpHO3C
+ K3pcmEeJOFP2xZmef4rhbAtWVudoTTEPFVfINYeSngV58UDPtUxa03xWzV8bojBSkpXj
+ 0jKXBUAe0Wrg68RXrcgVYT43l3tjgpVHEr5xIcOvJT5uzrELWcYcFU9/aRB6ZWUnNhO5
+ Nu4ARkCbVCw/nRD0DylOg6LSgKWQXFBO5nE6c61GYh46mC68FG8B6/Oni0SfMCwLkKfD
+ xco1XmOGKBdaWj+fp2W58N4Z1Jxl8pljAvCrevN0GJ4VU60++45ZwOh3XF97GRQtJHpm EA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 373usj0h0c-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 373tntuuxs-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Mar 2021 16:00:12 -0500
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 125KYCOa184670;
-        Fri, 5 Mar 2021 16:00:11 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 373usj0gyg-1
+        Fri, 05 Mar 2021 17:15:41 -0500
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 125M78Q3057284;
+        Fri, 5 Mar 2021 17:15:41 -0500
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 373tntuuxa-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Mar 2021 16:00:11 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 125KqhX2014298;
-        Fri, 5 Mar 2021 21:00:10 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma02dal.us.ibm.com with ESMTP id 3710srkqs1-1
+        Fri, 05 Mar 2021 17:15:41 -0500
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 125MCQ0m012336;
+        Fri, 5 Mar 2021 22:15:40 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma03dal.us.ibm.com with ESMTP id 3720r14th5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Mar 2021 21:00:10 +0000
+        Fri, 05 Mar 2021 22:15:40 +0000
 Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 125L08Y828443120
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 125MFd2N12583468
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 5 Mar 2021 21:00:08 GMT
+        Fri, 5 Mar 2021 22:15:39 GMT
 Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 72345BE061;
-        Fri,  5 Mar 2021 21:00:08 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id EFA13BE086;
+        Fri,  5 Mar 2021 22:15:38 +0000 (GMT)
 Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AA2D5BE05D;
-        Fri,  5 Mar 2021 21:00:07 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id EAC52BE054;
+        Fri,  5 Mar 2021 22:15:37 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
         by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri,  5 Mar 2021 21:00:07 +0000 (GMT)
-From:   Stefan Berger <stefanb@linux.vnet.ibm.com>
-To:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Fri,  5 Mar 2021 22:15:37 +0000 (GMT)
+Subject: Re: [PATCH v10 1/9] crypto: Add support for ECDSA signature
+ verification
+To:     Vitaly Chikunov <vt@altlinux.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     Stefan Berger <stefanb@linux.vnet.ibm.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
         davem@davemloft.net, herbert@gondor.apana.org.au,
-        dhowells@redhat.com, zohar@linux.ibm.com, jarkko@kernel.org
-Cc:     linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
-        linux-integrity@vger.kernel.org,
-        Saulo Alessandre <saulo.alessandre@tse.jus.br>,
-        Stefan Berger <stefanb@linux.ibm.com>
-Subject: [PATCH v11 09/10] x509: Add OID for NIST P384 and extend parser for it
-Date:   Fri,  5 Mar 2021 15:59:55 -0500
-Message-Id: <20210305205956.3594375-10-stefanb@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20210305205956.3594375-1-stefanb@linux.vnet.ibm.com>
-References: <20210305205956.3594375-1-stefanb@linux.vnet.ibm.com>
+        dhowells@redhat.com, zohar@linux.ibm.com,
+        linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
+        linux-integrity@vger.kernel.org
+References: <20210305005203.3547587-1-stefanb@linux.vnet.ibm.com>
+ <20210305005203.3547587-2-stefanb@linux.vnet.ibm.com>
+ <YEJk44FXEl0+mEPr@kernel.org> <20210305194640.nnerhdadoczqyta3@altlinux.org>
+From:   Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <4abdc777-03a9-bee1-3ae1-93d77e14eea0@linux.ibm.com>
+Date:   Fri, 5 Mar 2021 17:15:37 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
+In-Reply-To: <20210305194640.nnerhdadoczqyta3@altlinux.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
  definitions=2021-03-05_14:2021-03-03,2021-03-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
- mlxscore=0 clxscore=1015 spamscore=0 impostorscore=0 malwarescore=0
- lowpriorityscore=0 phishscore=0 priorityscore=1501 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103050103
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ priorityscore=1501 malwarescore=0 spamscore=0 bulkscore=0 impostorscore=0
+ mlxscore=0 suspectscore=0 mlxlogscore=712 phishscore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103050112
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Saulo Alessandre <saulo.alessandre@tse.jus.br>
+On 3/5/21 2:46 PM, Vitaly Chikunov wrote:
+> Jarkko,
+>
+> On Fri, Mar 05, 2021 at 07:05:39PM +0200, Jarkko Sakkinen wrote:
+>>> +// SPDX-License-Identifier: GPL-2.0+
+>>> +/*
+>>> + * Copyright (c) 2021 IBM Corporation
+>>> + *
+>>> + * Redistribution and use in source and binary forms, with or without
+>>> + * modification, are permitted provided that the following conditions are
+>>> + * met:
+>>> + *  * Redistributions of source code must retain the above copyright
+>>> + *   notice, this list of conditions and the following disclaimer.
+>>> + *  * Redistributions in binary form must reproduce the above copyright
+>>> + *    notice, this list of conditions and the following disclaimer in the
+>>> + *    documentation and/or other materials provided with the distribution.
+>>> + *
+>>> + * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+>>> + * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+>>> + * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+>>> + * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+>>> + * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+>>> + * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+>>> + * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+>>> + * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+>>> + * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+>>> + * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+>>> + * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+>>> + */
+>> This license platter is redundant, given SPDX.
+> I think SPDX identifier supplements license plate and is machine readable
+> identifier, but it does not replace or making adding of license plate
+> redundant.
+>
+> - Quoting https://spdx.dev/ids/
+>
+>    "When a license defines a recommended notice to attach to files under
+>    that license (sometimes called a “standard header”), the SPDX project
+>    recommends that the standard header be included in the files, in
+>    addition to an SPDX ID.
+>
+>    Additionally, when a file already contains a standard header or other
+>    license notice, the SPDX project recommends that those existing
+>    notices should not be removed. The SPDX ID is recommended to be used
+>    to supplement, not replace, existing notices in files."
+>
+> - GPL license text have section on "How to Apply These Terms to Your New
+>    Programs" which says to add license boilerplate text and it does not
+>    say SPDX identifier is enough.
+>
+> - Also, page https://www.kernel.org/doc/html/latest/process/license-rules.html
+>    does not forbid adding license plate text. (Even though it misguidedly
+>    says "alternative to boilerplate text" is the use of SPDX.)
+>
+> - License text is a readable text and not just identifier.
+>    I think SPDX tag could be not legally binding in all jurisdictions.
+>
+> By there reasons I believe you cannot request removing license platter
+> from the source and this should be author's decision.
+>
+> Thanks,
+>
+Thanks for looking into this. I am fine with the SPDX identifier.
 
-Prepare the x509 parser to accept NIST P384 certificates and add the
-OID for ansip384r1, which is the identifier for NIST P384.
+Regards,
 
-Summary of changes:
+    Stefan
 
-* crypto/asymmetric_keys/x509_cert_parser.c
-  - prepare x509 parser to load NIST P384
-
-* include/linux/oid_registry.h
-  - add OID_ansip384r1
-
-Signed-off-by: Saulo Alessandre <saulo.alessandre@tse.jus.br>
-Tested-by: Stefan Berger <stefanb@linux.ibm.com>
-
----
-
-v10->v11:
- - renamed OID_id_secp384r1 to OID_id_ansip384r1 (spec name)
----
- crypto/asymmetric_keys/x509_cert_parser.c | 3 +++
- include/linux/oid_registry.h              | 1 +
- 2 files changed, 4 insertions(+)
-
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index f5d547c6dfb5..6d003096b5bc 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -510,6 +510,9 @@ int x509_extract_key_data(void *context, size_t hdrlen,
- 		case OID_id_prime256v1:
- 			ctx->cert->pub->pkey_algo = "ecdsa-nist-p256";
- 			break;
-+		case OID_id_ansip384r1:
-+			ctx->cert->pub->pkey_algo = "ecdsa-nist-p384";
-+			break;
- 		default:
- 			return -ENOPKG;
- 		}
-diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
-index 3583908cf1ca..cc64d9419746 100644
---- a/include/linux/oid_registry.h
-+++ b/include/linux/oid_registry.h
-@@ -64,6 +64,7 @@ enum OID {
- 
- 	OID_certAuthInfoAccess,		/* 1.3.6.1.5.5.7.1.1 */
- 	OID_sha1,			/* 1.3.14.3.2.26 */
-+	OID_id_ansip384r1,		/* 1.3.132.0.34 */
- 	OID_sha256,			/* 2.16.840.1.101.3.4.2.1 */
- 	OID_sha384,			/* 2.16.840.1.101.3.4.2.2 */
- 	OID_sha512,			/* 2.16.840.1.101.3.4.2.3 */
--- 
-2.29.2
 
