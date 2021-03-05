@@ -2,148 +2,152 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32673C433E6
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 07:39:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97ADFC433DB
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 08:08:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E7AFE64FFD
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 07:39:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66B0F64FEA
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 08:08:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229526AbhCEHjM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Mar 2021 02:39:12 -0500
-Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:55838 "EHLO
-        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229446AbhCEHjL (ORCPT
+        id S229517AbhCEIIL convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 Mar 2021 03:08:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37206 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229464AbhCEIIG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Mar 2021 02:39:11 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0UQWlSZB_1614929947;
-Received: from B-455UMD6M-2027.local(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UQWlSZB_1614929947)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 05 Mar 2021 15:39:08 +0800
-Subject: Re: [PATCH v10 5/9] x509: Detect sm2 keys by their parameters OID
-To:     Stefan Berger <stefanb@linux.vnet.ibm.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, herbert@gondor.apana.org.au,
-        dhowells@redhat.com, zohar@linux.ibm.com
-Cc:     linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
-        linux-integrity@vger.kernel.org,
-        Stefan Berger <stefanb@linux.ibm.com>
-References: <20210305005203.3547587-1-stefanb@linux.vnet.ibm.com>
- <20210305005203.3547587-6-stefanb@linux.vnet.ibm.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <ea02d751-ec82-8df6-475b-bd3e7ded3e0e@linux.alibaba.com>
-Date:   Fri, 5 Mar 2021 15:39:07 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.1
+        Fri, 5 Mar 2021 03:08:06 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9517C061574
+        for <linux-crypto@vger.kernel.org>; Fri,  5 Mar 2021 00:08:06 -0800 (PST)
+Received: from lupine.hi.pengutronix.de ([2001:67c:670:100:3ad5:47ff:feaf:1a17] helo=lupine)
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <p.zabel@pengutronix.de>)
+        id 1lI5Ux-0004nt-Hu; Fri, 05 Mar 2021 09:07:47 +0100
+Received: from pza by lupine with local (Exim 4.92)
+        (envelope-from <p.zabel@pengutronix.de>)
+        id 1lI5Uj-0003Ld-FI; Fri, 05 Mar 2021 09:07:33 +0100
+Message-ID: <22817e0d7f266ebf2d8e6b28495736cdb9c6d6f3.camel@pengutronix.de>
+Subject: Re: [PATCH v6 3/3] hwrng: bcm2835: add reset support
+From:   Philipp Zabel <p.zabel@pengutronix.de>
+To:     =?ISO-8859-1?Q?=C1lvaro_Fern=E1ndez?= Rojas <noltari@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        Lee Jones <lee.jones@linaro.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Alexandru Ardelean <alexandru.ardelean@analog.com>,
+        Rikard Falkeborn <rikard.falkeborn@gmail.com>,
+        Tian Tao <tiantao6@hisilicon.com>,
+        Stefan Wahren <stefan.wahren@i2se.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Date:   Fri, 05 Mar 2021 09:07:33 +0100
+In-Reply-To: <20210305070132.2986-4-noltari@gmail.com>
+References: <20210305070132.2986-1-noltari@gmail.com>
+         <20210305070132.2986-4-noltari@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+User-Agent: Evolution 3.30.5-1.1 
 MIME-Version: 1.0
-In-Reply-To: <20210305005203.3547587-6-stefanb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2001:67c:670:100:3ad5:47ff:feaf:1a17
+X-SA-Exim-Mail-From: p.zabel@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+On Fri, 2021-03-05 at 08:01 +0100, Álvaro Fernández Rojas wrote:
+> BCM6368 devices need to reset the IPSEC controller in order to generate true
+> random numbers.
+> 
+> This is what BCM6368 produces without a reset:
+> root@OpenWrt:/# cat /dev/hwrng | rngtest -c 1000
+> rngtest 6.10
+> Copyright (c) 2004 by Henrique de Moraes Holschuh
+> This is free software; see the source for copying conditions.  There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+> 
+> rngtest: starting FIPS tests...
+> rngtest: bits received from input: 20000032
+> rngtest: FIPS 140-2 successes: 0
+> rngtest: FIPS 140-2 failures: 1000
+> rngtest: FIPS 140-2(2001-10-10) Monobit: 2
+> rngtest: FIPS 140-2(2001-10-10) Poker: 1000
+> rngtest: FIPS 140-2(2001-10-10) Runs: 1000
+> rngtest: FIPS 140-2(2001-10-10) Long run: 30
+> rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+> rngtest: input channel speed: (min=37.253; avg=320.827; max=635.783)Mibits/s
+> rngtest: FIPS tests speed: (min=12.141; avg=15.034; max=16.428)Mibits/s
+> rngtest: Program run time: 1336176 microseconds
+> 
+> Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
 
-On 3/5/21 8:51 AM, Stefan Berger wrote:
-> From: Stefan Berger <stefanb@linux.ibm.com>
-> 
-> Detect whether a key is an sm2 type of key by its OID in the parameters
-> array rather than assuming that everything under OID_id_ecPublicKey
-> is sm2, which is not the case.
-> 
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: keyrings@vger.kernel.org
-> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-> Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Reviewed-by: Philipp Zabel <p.zabel@pengutronix.de>
+
+regards
+Philipp
+
 > ---
->   crypto/asymmetric_keys/x509_cert_parser.c | 12 +++++++++++-
->   include/linux/oid_registry.h              |  1 +
->   lib/oid_registry.c                        | 13 +++++++++++++
->   3 files changed, 25 insertions(+), 1 deletion(-)
+>  v6: fix commit description.
+>  v5: remove reset_control_rearm().
+>  v4: add reset_control_rearm().
+>  v3: no changes.
+>  v2: no changes.
 > 
-> diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-> index 52c9b455fc7d..1621ceaf5c95 100644
-> --- a/crypto/asymmetric_keys/x509_cert_parser.c
-> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> @@ -459,6 +459,7 @@ int x509_extract_key_data(void *context, size_t hdrlen,
->   			  const void *value, size_t vlen)
->   {
->   	struct x509_parse_context *ctx = context;
-> +	enum OID oid;
->   
->   	ctx->key_algo = ctx->last_oid;
->   	switch (ctx->last_oid) {
-> @@ -470,7 +471,16 @@ int x509_extract_key_data(void *context, size_t hdrlen,
->   		ctx->cert->pub->pkey_algo = "ecrdsa";
->   		break;
->   	case OID_id_ecPublicKey:
-> -		ctx->cert->pub->pkey_algo = "sm2";
-> +		if (parse_OID(ctx->params, ctx->params_size, &oid) != 0)
-> +			return -EBADMSG;
-> +
-> +		switch (oid) {
-> +		case OID_sm2:
-> +			ctx->cert->pub->pkey_algo = "sm2";
-> +			break;
-> +		default:
-> +			return -ENOPKG;
-> +		}
->   		break;
->   	default:
->   		return -ENOPKG;
-> diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
-> index b504e2f36b25..f32d91895e4d 100644
-> --- a/include/linux/oid_registry.h
-> +++ b/include/linux/oid_registry.h
-> @@ -121,6 +121,7 @@ enum OID {
->   };
->   
->   extern enum OID look_up_OID(const void *data, size_t datasize);
-> +extern int parse_OID(const void *data, size_t datasize, enum OID *oid);
->   extern int sprint_oid(const void *, size_t, char *, size_t);
->   extern int sprint_OID(enum OID, char *, size_t);
->   
-> diff --git a/lib/oid_registry.c b/lib/oid_registry.c
-> index f7ad43f28579..508e0b34b5f0 100644
-> --- a/lib/oid_registry.c
-> +++ b/lib/oid_registry.c
-> @@ -11,6 +11,7 @@
->   #include <linux/kernel.h>
->   #include <linux/errno.h>
->   #include <linux/bug.h>
-> +#include <linux/asn1.h>
->   #include "oid_registry_data.c"
->   
->   MODULE_DESCRIPTION("OID Registry");
-> @@ -92,6 +93,18 @@ enum OID look_up_OID(const void *data, size_t datasize)
->   }
->   EXPORT_SYMBOL_GPL(look_up_OID);
->   
-> +int parse_OID(const void *data, size_t datasize, enum OID *oid)
-> +{
-> +	const unsigned char *v = data;
-> +
-> +	if (datasize < 2 || v[0] != ASN1_OID || v[1] != datasize - 2)
-> +		return -EBADMSG;
-> +
-> +	*oid = look_up_OID(data + 2, datasize - 2);
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(parse_OID);
-> +
->   /*
->    * sprint_OID - Print an Object Identifier into a buffer
->    * @data: The encoded OID to print
+>  drivers/char/hw_random/bcm2835-rng.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 > 
-
-Tested-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-
-Best regards,
-Tianjia
+> diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+> index be5be395b341..e7dd457e9b22 100644
+> --- a/drivers/char/hw_random/bcm2835-rng.c
+> +++ b/drivers/char/hw_random/bcm2835-rng.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/platform_device.h>
+>  #include <linux/printk.h>
+>  #include <linux/clk.h>
+> +#include <linux/reset.h>
+>  
+>  #define RNG_CTRL	0x0
+>  #define RNG_STATUS	0x4
+> @@ -32,6 +33,7 @@ struct bcm2835_rng_priv {
+>  	void __iomem *base;
+>  	bool mask_interrupts;
+>  	struct clk *clk;
+> +	struct reset_control *reset;
+>  };
+>  
+>  static inline struct bcm2835_rng_priv *to_rng_priv(struct hwrng *rng)
+> @@ -92,6 +94,10 @@ static int bcm2835_rng_init(struct hwrng *rng)
+>  	if (ret)
+>  		return ret;
+>  
+> +	ret = reset_control_reset(priv->reset);
+> +	if (ret)
+> +		return ret;
+> +
+>  	if (priv->mask_interrupts) {
+>  		/* mask the interrupt */
+>  		val = rng_readl(priv, RNG_INT_MASK);
+> @@ -156,6 +162,10 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+>  	if (IS_ERR(priv->clk))
+>  		return PTR_ERR(priv->clk);
+>  
+> +	priv->reset = devm_reset_control_get_optional_exclusive(dev, NULL);
+> +	if (IS_ERR(priv->reset))
+> +		return PTR_ERR(priv->reset);
+> +
+>  	priv->rng.name = pdev->name;
+>  	priv->rng.init = bcm2835_rng_init;
+>  	priv->rng.read = bcm2835_rng_read;
