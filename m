@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21660C4332B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10541C43381
 	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 07:01:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA8C565016
+	by mail.kernel.org (Postfix) with ESMTP id CE59865019
 	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 07:01:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229573AbhCEHBm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Mar 2021 02:01:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51208 "EHLO
+        id S229580AbhCEHBn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 Mar 2021 02:01:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229564AbhCEHBj (ORCPT
+        with ESMTP id S229446AbhCEHBk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Mar 2021 02:01:39 -0500
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10B0FC061756;
+        Fri, 5 Mar 2021 02:01:40 -0500
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E84D2C06175F;
         Thu,  4 Mar 2021 23:01:38 -0800 (PST)
-Received: by mail-wr1-x42d.google.com with SMTP id b18so892418wrn.6;
-        Thu, 04 Mar 2021 23:01:37 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id a18so864075wrc.13;
+        Thu, 04 Mar 2021 23:01:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=cpm1I6vNvcl3kiHD76Q0yTBdgdimTTTYjPonH8WEMdM=;
-        b=TPc2LhWikM0HlIzyp8G+Z7A4JSdGI36TpxSDLCMjFqYBpJ+DHw+yq+awAVu4z7A7g+
-         wJeANx9HDW8742DaWNDzxdaWWD7LzH4HNiZ5oLBMj4S3LREsQO2souLqhv4DcaAB9eo4
-         R0umYixu2f9iVZDOz43UgviYGOa3Ql6PRsxyUqAFef1z8VzJ8kd8X1DPE4kNmgw4BcA0
-         j3clZrbd+uDbT06MZjYLyuKlwLma9vV0vGF+i4UBK53nK1NP27/330zvL8+Omh3ZYqJ4
-         G01tNdAfyQcRXhWyz5kdde2ypOwRu6xPnqORVDgQkaQ2CF8b1vuUpcL+we7vmvR8zRzm
-         02DA==
+        bh=z1XetKjHCD1nkGlnf/Dumzc1flLXCFdZJxrK1LQl/AU=;
+        b=AncSwcHaKNhaUNvGU/ZDEHzZwdWwZWWSSJWgBASMhdDbzmmsxO75PY9Pgdp41K5p2Z
+         wzwndus7xmuAK+ZSgL9pgoir6UA5gN5ehlvu61j6E1vLwWMbdnRI8wlCKnC5UFwRaG43
+         aWhpqDD2D4eRB6FIZVf/XWj/QJFJCSNp8/5PrssVOEA1caVP/AgmadhAMHq7fgiy29nU
+         Ef2sEf7BTBJ8E01fhP2dEyRNzOQ5qKTDClCiqgEMlozwcdsb5ycQx/57+jwEnjOycDvp
+         DKTeNcjPujRu8+hUncggvndEGaccke+9+og1uIpQJTGeB9wvQ9WLGWr84A3uQotAjgME
+         HfCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=cpm1I6vNvcl3kiHD76Q0yTBdgdimTTTYjPonH8WEMdM=;
-        b=DHj/7eYnpvnrlnDSKlJu6u1Y0yLpsV9Dk51tlJg1/YotbHBrITZ2kF2F+o7h5Fsiqf
-         uEDQf3zSSe5ifOpxdU8qaNtJ8URftOi71aWi5Ctsn3IUSEcvpQ2XNdtbe0D4qcGxgOEM
-         5fP05+4JNA+Zhg5JCAb/SfolAFlcBwiAmFSx+jOL6Uk6/aNb+MZ9QEFc+bIGCKdDWHXv
-         Q/Qu25QzEX+A9puc1sCdeEvVl6esU/cWGlGXybe/+QNSbSF5pv6ghn4hEArvTKMc8F6L
-         0G9DJvM4TmyYbJNS7vJWMY7tOFKxXvtRVLJa8IhgRtqe1C3X9bzNTvgnUtTZOJHx7UnD
-         Cl3Q==
-X-Gm-Message-State: AOAM531qGc6HDjt8p3sMp01aqAU2UMIHQ8vOGy2dDPBTWsMRpFDv4mtZ
-        /ioFA+lq3PgFD2QLDFEkQ1Y=
-X-Google-Smtp-Source: ABdhPJyETTsqP++VXP0jCDPXYUXNHuIEzrElpImRKuJZ6o7dZkQMRX1O1T+s7L6/DSY5UkvZEv58Lg==
-X-Received: by 2002:a05:6000:245:: with SMTP id m5mr7909261wrz.284.1614927696736;
-        Thu, 04 Mar 2021 23:01:36 -0800 (PST)
+        bh=z1XetKjHCD1nkGlnf/Dumzc1flLXCFdZJxrK1LQl/AU=;
+        b=p0uoQAvdPN9JRx+DS/OjnN3+7/PPPzT+NM9zB3Fk/M2hpYnSdajhn/jAlIvDiG+kzR
+         1qCOStgFpa3SiUrw5qABEdjd63k0nvXD8qoKnxhmq5Oa1ba6pS/sl9Lc6hVk/hOpiP2u
+         wy6y69hS0nXovj44x0VEu2+OWAxpOO49aPMlf/8v9RYDZv2PSRJAr3fC0uCM3YedtWSH
+         uZy+wnRG3UYI1c8Jmn6B+PTSISPeTgLIOlb3waqni5TGVNvTEdILNsJcgpWANSFToRmt
+         M2fD+cHAEAyZuaEp2kclH2qaKYBIjJDButc3JIhujEiJ0o3r8tEkXacmlC53wsv7mjII
+         KqKw==
+X-Gm-Message-State: AOAM531E8UUhL+6xNL9a01qwckyioIcq7mYw1Z7pQI4tiGZTcoe4iNQD
+        nm+PttChRp0Un/QKG8o3fY0=
+X-Google-Smtp-Source: ABdhPJyBljkf3jOAJ6LZyQb5bqYgFgIUFjzoDgfhnXSg5I23sThciOmq9Cxh/hEeu1Jt4qFsUfpbZA==
+X-Received: by 2002:adf:a418:: with SMTP id d24mr7554007wra.187.1614927697667;
+        Thu, 04 Mar 2021 23:01:37 -0800 (PST)
 Received: from skynet.lan (170.red-88-1-105.dynamicip.rima-tde.net. [88.1.105.170])
-        by smtp.gmail.com with ESMTPSA id y18sm2799220wrq.61.2021.03.04.23.01.35
+        by smtp.gmail.com with ESMTPSA id y18sm2799220wrq.61.2021.03.04.23.01.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Mar 2021 23:01:36 -0800 (PST)
+        Thu, 04 Mar 2021 23:01:37 -0800 (PST)
 From:   =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= 
         <noltari@gmail.com>
 To:     Matt Mackall <mpm@selenic.com>,
@@ -78,9 +78,9 @@ To:     Matt Mackall <mpm@selenic.com>,
         linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-rpi-kernel@lists.infradead.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v6 2/3] dt-bindings: rng: bcm2835: document reset support
-Date:   Fri,  5 Mar 2021 08:01:31 +0100
-Message-Id: <20210305070132.2986-3-noltari@gmail.com>
+Subject: [PATCH v6 3/3] hwrng: bcm2835: add reset support
+Date:   Fri,  5 Mar 2021 08:01:32 +0100
+Message-Id: <20210305070132.2986-4-noltari@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210305070132.2986-1-noltari@gmail.com>
 References: <20210305070132.2986-1-noltari@gmail.com>
@@ -91,54 +91,81 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-brcm,bcm6368-rng controllers require resetting the IPSEC clock in order to get
-a functional RNG.
+BCM6368 devices need to reset the IPSEC controller in order to generate true
+random numbers.
+
+This is what BCM6368 produces without a reset:
+root@OpenWrt:/# cat /dev/hwrng | rngtest -c 1000
+rngtest 6.10
+Copyright (c) 2004 by Henrique de Moraes Holschuh
+This is free software; see the source for copying conditions.  There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+rngtest: starting FIPS tests...
+rngtest: bits received from input: 20000032
+rngtest: FIPS 140-2 successes: 0
+rngtest: FIPS 140-2 failures: 1000
+rngtest: FIPS 140-2(2001-10-10) Monobit: 2
+rngtest: FIPS 140-2(2001-10-10) Poker: 1000
+rngtest: FIPS 140-2(2001-10-10) Runs: 1000
+rngtest: FIPS 140-2(2001-10-10) Long run: 30
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=37.253; avg=320.827; max=635.783)Mibits/s
+rngtest: FIPS tests speed: (min=12.141; avg=15.034; max=16.428)Mibits/s
+rngtest: Program run time: 1336176 microseconds
 
 Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
 ---
- v6: fix dt-bindings warnings.
- v5: no changes.
- v4: pass dt_binding_check.
- v3: make resets required if brcm,bcm6368-rng.
- v2: document reset support.
+ v6: fix commit description.
+ v5: remove reset_control_rearm().
+ v4: add reset_control_rearm().
+ v3: no changes.
+ v2: no changes.
 
- .../devicetree/bindings/rng/brcm,bcm2835.yaml         | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ drivers/char/hw_random/bcm2835-rng.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml b/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
-index 5174492e22f3..6da674666d45 100644
---- a/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
-+++ b/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
-@@ -28,6 +28,12 @@ properties:
-   clock-names:
-     const: ipsec
+diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+index be5be395b341..e7dd457e9b22 100644
+--- a/drivers/char/hw_random/bcm2835-rng.c
++++ b/drivers/char/hw_random/bcm2835-rng.c
+@@ -13,6 +13,7 @@
+ #include <linux/platform_device.h>
+ #include <linux/printk.h>
+ #include <linux/clk.h>
++#include <linux/reset.h>
  
-+  resets:
-+    maxItems: 1
+ #define RNG_CTRL	0x0
+ #define RNG_STATUS	0x4
+@@ -32,6 +33,7 @@ struct bcm2835_rng_priv {
+ 	void __iomem *base;
+ 	bool mask_interrupts;
+ 	struct clk *clk;
++	struct reset_control *reset;
+ };
+ 
+ static inline struct bcm2835_rng_priv *to_rng_priv(struct hwrng *rng)
+@@ -92,6 +94,10 @@ static int bcm2835_rng_init(struct hwrng *rng)
+ 	if (ret)
+ 		return ret;
+ 
++	ret = reset_control_reset(priv->reset);
++	if (ret)
++		return ret;
 +
-+  reset-names:
-+    const: ipsec
+ 	if (priv->mask_interrupts) {
+ 		/* mask the interrupt */
+ 		val = rng_readl(priv, RNG_INT_MASK);
+@@ -156,6 +162,10 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+ 	if (IS_ERR(priv->clk))
+ 		return PTR_ERR(priv->clk);
+ 
++	priv->reset = devm_reset_control_get_optional_exclusive(dev, NULL);
++	if (IS_ERR(priv->reset))
++		return PTR_ERR(priv->reset);
 +
-   interrupts:
-     maxItems: 1
- 
-@@ -44,6 +50,8 @@ then:
-   required:
-     - clocks
-     - clock-names
-+    - resets
-+    - reset-names
- 
- additionalProperties: false
- 
-@@ -68,4 +76,7 @@ examples:
- 
-         clocks = <&periph_clk 18>;
-         clock-names = "ipsec";
-+
-+        resets = <&periph_rst 4>;
-+        reset-names = "ipsec";
-     };
+ 	priv->rng.name = pdev->name;
+ 	priv->rng.init = bcm2835_rng_init;
+ 	priv->rng.read = bcm2835_rng_read;
 -- 
 2.20.1
 
