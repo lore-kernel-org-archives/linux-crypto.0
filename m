@@ -2,127 +2,150 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF903C433DB
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 06:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E94A9C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 06:37:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D16564F4C
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 06:26:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE31D65013
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 06:37:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229464AbhCEG0e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Mar 2021 01:26:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43670 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbhCEG0d (ORCPT
+        id S229578AbhCEGha (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 Mar 2021 01:37:30 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:13437 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229475AbhCEGha (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Mar 2021 01:26:33 -0500
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF37AC061574;
-        Thu,  4 Mar 2021 22:26:32 -0800 (PST)
-Received: by mail-wm1-x335.google.com with SMTP id o2so417148wme.5;
-        Thu, 04 Mar 2021 22:26:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=NNNoVrG5d7tOM41mvwYb60m8dYDHF6mZjSC7fCCIN1A=;
-        b=Dm/OS2p4akwEji3N23M8kqsSx89IRPazBAgfT1S8RhLIGtWAGCRGwXPjPp2bB4hPYx
-         AQKRV92rdvMIRXFGCQPw/HMlORVGbMVKjTRCVFaXJ7h71q6xqdjRvF59tKNUtSfWkIPh
-         1vZ+l8ZLX24504HMOeTPFfh9vgNJNfHnL1wmqt+QizK0oOyLIE3RCHO93LEXWEFfmYGA
-         UCoV9wZ8pGtXKXYyI/m3pErwsypP/5VbRXs4ho6m4On1upzL3Y30pDgRocAy45b1bTr0
-         WJnIAY+gIEf84+r1ZU7AzyS6e1fz9XHv+G4VKXT3qmtUFZQK/TJq+DLJei95Ji04ohBF
-         4J/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=NNNoVrG5d7tOM41mvwYb60m8dYDHF6mZjSC7fCCIN1A=;
-        b=Hq5XnIa0tY+Uq47JsbQ3h24U3ZQ93mer34TmNmzSKxgsjFZMrYYk+QGMQEsCgnDidZ
-         E5P65pFtvsHrxQOHxP+jVbSle2c2W/9P/d5Mt4qO9uiwMKH5/YPN7hIf3Pg4QQUTjPgv
-         r8w+X9vwRW/8n+CwFBTC+pMlVjzIrmOw7jlnqzyGO79Bibjn1+9jIKucwAe+xXYiRWDl
-         wn18+1lsUr+S1u1gpRC0WmqZkclMv4xuPOzJhGzjknXMbcMS43V6BCHwnWBz3QB1ppgu
-         BLjUMTfj4hsJtbVoC6uYAhowUB5jNHb3z4Lwgb97RzqkOKcITfwq4qoffG96g5ULLprM
-         uVdg==
-X-Gm-Message-State: AOAM53008aLbUtleQHpBVrMWojFrKDpes7Pr6GkkQW0kOYvZ846cINTA
-        haX6nSCL3d72D0Tp1zFiP9g=
-X-Google-Smtp-Source: ABdhPJxPzDs6HeUpfqwXJ7krgAyG4WR5WyH9O4SZwe4iqskvtgG5yPgiivWaJBtlfdCHuau9C4UDrg==
-X-Received: by 2002:a1c:df8a:: with SMTP id w132mr7112323wmg.53.1614925591409;
-        Thu, 04 Mar 2021 22:26:31 -0800 (PST)
-Received: from macbook-pro-alvaro.lan (170.red-88-1-105.dynamicip.rima-tde.net. [88.1.105.170])
-        by smtp.gmail.com with ESMTPSA id f126sm2796782wmf.17.2021.03.04.22.26.30
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 04 Mar 2021 22:26:31 -0800 (PST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
-Subject: Re: [PATCH] hwrng: bcm2835: set quality to 1000
-From:   =?utf-8?Q?=C3=81lvaro_Fern=C3=A1ndez_Rojas?= <noltari@gmail.com>
-In-Reply-To: <b0cf1be0-4c7c-57ee-fea5-789fe215b85d@gmail.com>
-Date:   Fri, 5 Mar 2021 07:26:29 +0100
-Cc:     Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Andrew Lunn <andrew@lunn.ch>, Matt Mackall <mpm@selenic.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        Rikard Falkeborn <rikard.falkeborn@gmail.com>,
-        linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Stijn Tintel <stijn@linux-ipv6.be>, ynezz@true.cz
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <6D1459DF-A7E1-422C-AA05-655156AEBA23@gmail.com>
-References: <20210220174741.23665-1-noltari@gmail.com>
- <YDFeao/bOxvoXI9D@lunn.ch> <9b86c773-7153-1e18-472a-f66b01c83173@gmail.com>
- <20210303092019.GB8134@gondor.apana.org.au>
- <66AED5A4-3227-47CA-A4A2-B5AD6A571AAC@gmail.com>
- <c76c82668142710ba5a7a8454759c9aa2423d72f.camel@suse.de>
- <b0cf1be0-4c7c-57ee-fea5-789fe215b85d@gmail.com>
-To:     Florian Fainelli <f.fainelli@gmail.com>
-X-Mailer: Apple Mail (2.3654.60.0.2.21)
+        Fri, 5 Mar 2021 01:37:30 -0500
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DsJ0N2vvSzjVjr;
+        Fri,  5 Mar 2021 14:36:04 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.24) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 5 Mar 2021 14:37:18 +0800
+From:   Hui Tang <tanghui20@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <marco.chiappero@intel.com>, <ebiggers@google.com>,
+        <tomaszx.kowalik@intel.com>
+CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
+        <wangzhou1@hisilicon.com>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2 2/2] crypto: qat - fix use of 'dma_map_single'
+Date:   Fri, 5 Mar 2021 14:35:02 +0800
+Message-ID: <1614926102-44388-3-git-send-email-tanghui20@huawei.com>
+X-Mailer: git-send-email 2.8.1
+In-Reply-To: <1614926102-44388-1-git-send-email-tanghui20@huawei.com>
+References: <1614926102-44388-1-git-send-email-tanghui20@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Florian,
+DMA_TO_DEVICE synchronisation must be done after the last modification
+of the memory region by the software and before it is handed off to
+the device.
 
-> El 4 mar 2021, a las 23:28, Florian Fainelli <f.fainelli@gmail.com> =
-escribi=C3=B3:
->=20
-> On 3/4/21 7:11 AM, Nicolas Saenz Julienne wrote:
->> On Wed, 2021-03-03 at 10:29 +0100, =C3=81lvaro Fern=C3=A1ndez Rojas =
-wrote:
->>> Hi Herbert,
->>>=20
->>>> El 3 mar 2021, a las 10:20, Herbert Xu =
-<herbert@gondor.apana.org.au> escribi=C3=B3:
->>>>=20
->>>> On Sat, Feb 20, 2021 at 08:12:45PM +0100, =C3=81lvaro Fern=C3=A1ndez =
-Rojas wrote:
->>>>>=20
->>>>> I ran rngtest and this is what I got:
->>>>=20
->>>> This is meaningless except for sources that have not been whitened.
->>>>=20
->>>> Your justification needs to be based on what the hardware does or
->>>> is documented to do.
->>>=20
->>> Ok, so I guess that we=E2=80=99re never setting that value to =
-anything since there=E2=80=99s
->>> no public documentation about that =C2=AF\_(=E3=83=84)_/=C2=AF.
->>=20
->> @Florian, is there a way you might be able to get the official value?
->=20
-> I will be looking into the documentation this weekend and let you know
-> whether we can change the driver's quality accordingly.
+Signed-off-by: Hui Tang <tanghui20@huawei.com>
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+ drivers/crypto/qat/qat_common/qat_algs.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
-Could you do that for iproc-rng200.c too?
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+index ea1c689..f998ed5 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -718,8 +718,8 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 	int n = sg_nents(sgl);
+ 	struct qat_alg_buf_list *bufl;
+ 	struct qat_alg_buf_list *buflout = NULL;
+-	dma_addr_t blp;
+-	dma_addr_t bloutp;
++	dma_addr_t blp = DMA_MAPPING_ERROR;
++	dma_addr_t bloutp = DMA_MAPPING_ERROR;
+ 	struct scatterlist *sg;
+ 	size_t sz_out, sz = struct_size(bufl, bufers, n + 1);
 
-> --=20
-> Florian
+@@ -734,10 +734,6 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 	for_each_sg(sgl, sg, n, i)
+ 		bufl->bufers[i].addr = DMA_MAPPING_ERROR;
 
-Best regards,
-=C3=81lvaro.=
+-	blp = dma_map_single(dev, bufl, sz, DMA_TO_DEVICE);
+-	if (unlikely(dma_mapping_error(dev, blp)))
+-		goto err_in;
+-
+ 	for_each_sg(sgl, sg, n, i) {
+ 		int y = sg_nctr;
+
+@@ -753,6 +749,9 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 		sg_nctr++;
+ 	}
+ 	bufl->num_bufs = sg_nctr;
++	blp = dma_map_single(dev, bufl, sz, DMA_TO_DEVICE);
++	if (unlikely(dma_mapping_error(dev, blp)))
++		goto err_in;
+ 	qat_req->buf.bl = bufl;
+ 	qat_req->buf.blp = blp;
+ 	qat_req->buf.sz = sz;
+@@ -772,9 +771,6 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 		for_each_sg(sglout, sg, n, i)
+ 			bufers[i].addr = DMA_MAPPING_ERROR;
+
+-		bloutp = dma_map_single(dev, buflout, sz_out, DMA_TO_DEVICE);
+-		if (unlikely(dma_mapping_error(dev, bloutp)))
+-			goto err_out;
+ 		for_each_sg(sglout, sg, n, i) {
+ 			int y = sg_nctr;
+
+@@ -791,6 +787,9 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 		}
+ 		buflout->num_bufs = sg_nctr;
+ 		buflout->num_mapped_bufs = sg_nctr;
++		bloutp = dma_map_single(dev, buflout, sz_out, DMA_TO_DEVICE);
++		if (unlikely(dma_mapping_error(dev, bloutp)))
++			goto err_out;
+ 		qat_req->buf.blout = buflout;
+ 		qat_req->buf.bloutp = bloutp;
+ 		qat_req->buf.sz_out = sz_out;
+@@ -802,17 +801,21 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 	return 0;
+
+ err_out:
++	if (!dma_mapping_error(dev, bloutp))
++		dma_unmap_single(dev, bloutp, sz_out, DMA_TO_DEVICE);
++
+ 	n = sg_nents(sglout);
+ 	for (i = 0; i < n; i++)
+ 		if (!dma_mapping_error(dev, buflout->bufers[i].addr))
+ 			dma_unmap_single(dev, buflout->bufers[i].addr,
+ 					 buflout->bufers[i].len,
+ 					 DMA_BIDIRECTIONAL);
+-	if (!dma_mapping_error(dev, bloutp))
+-		dma_unmap_single(dev, bloutp, sz_out, DMA_TO_DEVICE);
+ 	kfree(buflout);
+
+ err_in:
++	if (!dma_mapping_error(dev, blp))
++		dma_unmap_single(dev, blp, sz, DMA_TO_DEVICE);
++
+ 	n = sg_nents(sgl);
+ 	for (i = 0; i < n; i++)
+ 		if (!dma_mapping_error(dev, bufl->bufers[i].addr))
+@@ -820,8 +823,6 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 					 bufl->bufers[i].len,
+ 					 DMA_BIDIRECTIONAL);
+
+-	if (!dma_mapping_error(dev, blp))
+-		dma_unmap_single(dev, blp, sz, DMA_TO_DEVICE);
+ 	kfree(bufl);
+
+ 	dev_err(dev, "Failed to map buf for dma\n");
+--
+2.8.1
+
