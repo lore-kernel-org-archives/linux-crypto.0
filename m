@@ -4,76 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA0E1C4332E
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 00:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC4AC4361B
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 00:52:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6308165011
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 00:52:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97C9A64FD3
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Mar 2021 00:52:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231607AbhCEAwY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Mar 2021 19:52:24 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7948 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231486AbhCEAwW (ORCPT
+        id S231917AbhCEAwe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Mar 2021 19:52:34 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29234 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231536AbhCEAwY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Mar 2021 19:52:22 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1250k0Q4032833;
-        Thu, 4 Mar 2021 19:52:12 -0500
+        Thu, 4 Mar 2021 19:52:24 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1250YIYt007234;
+        Thu, 4 Mar 2021 19:52:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=y1ScCbNO32+vE5xhcOysSmqJVHVaaE2o8H1E4B0AgZU=;
- b=hU06qqDg+69p/I/IG34ql0fo2ge8nNAYDIE+3yf/5UoHuT9L2Lxdrmz6kTi+khddKnmF
- IjhajdOw8C7x4ahBjFwy4QefjE0JG0P6dr9cY27LY/VNVgN/ATgBOKYlRz5xGBTvqp7a
- ztOoCzMh5sAn+UrmJ5Rj7DqoJoeliWbyfnn+1ajqiF8DSCw5c0Ng63K412LjeuBEgaF+
- pu3kn2vJLkYySKybJEj0FDrns05joz4bn96rpkw10K341XBBNqJiW9uxGhhSUDPdIDEJ
- mbWLMXvq2VkkPoYnhGhQqp+6DnbMgO6c/+kPcuGqEpdaqRgES/IvK3CngipcNzg+RKuf xw== 
+ bh=cE8n6p7NfpHkdHH79K8ZHgKcwWw0EIPVajaZ2DL2LJA=;
+ b=sLPJrFqDfMMFOufVWQo8rIedKuqzSGiFg1vGDDR1uwMfTUOhqjMvEqnSv81buvcCM3Hk
+ BvYVaregRmRUHOfEKTtRrbygq9mDOJNy9UoJQ4xI6pZ7W3W3LswqDAgnnBzyUZln4snq
+ P/xaJeBCnUplsWX+DYovir41VzIC+OlnNrlDYSUJNl+NY1yQiX4xYF4MZX/ZEV5LkGoG
+ bx5G62B9btSmwiNWVo6m1+RotF6Y9CE7FvRE1j18FylKrm3qA1SUahcsYHjfBGUuxfwb
+ 4Ffoe3LheQ/8uIxZnedtUASJycGFFXH6tgfiSvrx+Obv0gHhpAthcB3s/LWID+MWxhyA Qw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 373ad10493-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 373a2cgjbr-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Mar 2021 19:52:11 -0500
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1250jxgd032798;
-        Thu, 4 Mar 2021 19:52:11 -0500
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 373ad1048r-1
+        Thu, 04 Mar 2021 19:52:13 -0500
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1250YIl6007255;
+        Thu, 4 Mar 2021 19:52:13 -0500
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 373a2cgjbg-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Mar 2021 19:52:11 -0500
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 1250X1O3025640;
-        Fri, 5 Mar 2021 00:52:10 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma01dal.us.ibm.com with ESMTP id 371qmv0yv2-1
+        Thu, 04 Mar 2021 19:52:13 -0500
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 1250WeH0002279;
+        Fri, 5 Mar 2021 00:52:12 GMT
+Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
+        by ppma02dal.us.ibm.com with ESMTP id 3710srbv94-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Mar 2021 00:52:10 +0000
+        Fri, 05 Mar 2021 00:52:12 +0000
 Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1250q8k430736864
+        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1250qAGQ25297226
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 5 Mar 2021 00:52:08 GMT
+        Fri, 5 Mar 2021 00:52:10 GMT
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A7627C605A;
-        Fri,  5 Mar 2021 00:52:08 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id C54C4C6057;
+        Fri,  5 Mar 2021 00:52:10 +0000 (GMT)
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F3C4DC6055;
-        Fri,  5 Mar 2021 00:52:07 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 31776C6055;
+        Fri,  5 Mar 2021 00:52:10 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
         by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri,  5 Mar 2021 00:52:07 +0000 (GMT)
+        Fri,  5 Mar 2021 00:52:10 +0000 (GMT)
 From:   Stefan Berger <stefanb@linux.vnet.ibm.com>
 To:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
         davem@davemloft.net, herbert@gondor.apana.org.au,
         dhowells@redhat.com, zohar@linux.ibm.com
 Cc:     linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
         linux-integrity@vger.kernel.org,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Subject: [PATCH v10 1/9] crypto: Add support for ECDSA signature verification
-Date:   Thu,  4 Mar 2021 19:51:55 -0500
-Message-Id: <20210305005203.3547587-2-stefanb@linux.vnet.ibm.com>
+        Saulo Alessandre <saulo.alessandre@tse.jus.br>,
+        Stefan Berger <stefanb@linux.ibm.com>
+Subject: [PATCH v10 4/9] ecdsa: Register NIST P384 and extend test suite
+Date:   Thu,  4 Mar 2021 19:51:58 -0500
+Message-Id: <20210305005203.3547587-5-stefanb@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210305005203.3547587-1-stefanb@linux.vnet.ibm.com>
 References: <20210305005203.3547587-1-stefanb@linux.vnet.ibm.com>
@@ -82,847 +82,280 @@ Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
  definitions=2021-03-04_09:2021-03-03,2021-03-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 spamscore=0 priorityscore=1501 suspectscore=0
- clxscore=1015 mlxscore=0 phishscore=0 bulkscore=0 lowpriorityscore=0
- adultscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2103050001
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ malwarescore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0
+ priorityscore=1501 spamscore=0 impostorscore=0 phishscore=0 bulkscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103050001
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Stefan Berger <stefanb@linux.ibm.com>
+From: Saulo Alessandre <saulo.alessandre@tse.jus.br>
 
-Add support for parsing the parameters of a NIST P256 or NIST P192 key.
-Enable signature verification using these keys. The new module is
-enabled with CONFIG_ECDSA:
-  Elliptic Curve Digital Signature Algorithm (NIST P192, P256 etc.)
-  is A NIST cryptographic standard algorithm. Only signature verification
-  is implemented.
+* crypto/ecdsa.c
+  - add ecdsa_nist_p384_init_tfm
+  - register and unregister P384 tfm
 
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+* crypto/testmgr.c
+  - add test vector for P384 on vector of tests
 
+* crypto/testmgr.h
+  - add test vector params for P384(sha1, sha224, sha256, sha384
+    and sha512)
+
+Signed-off-by: Saulo Alessandre <saulo.alessandre@tse.jus.br>
+Tested-by: Stefan Berger <stefanb@linux.ibm.com>
 ---
-v8->v9:
-  - unregister nist_p192 curve if nist_p256 cannot be registered
----
- crypto/Kconfig               |  10 +
- crypto/Makefile              |   6 +
- crypto/ecc.c                 |  13 +-
- crypto/ecc.h                 |  28 +++
- crypto/ecdsa.c               | 369 +++++++++++++++++++++++++++++++++++
- crypto/ecdsasignature.asn1   |   4 +
- crypto/testmgr.c             |  12 ++
- crypto/testmgr.h             | 267 +++++++++++++++++++++++++
- include/linux/oid_registry.h |   6 +-
- 9 files changed, 703 insertions(+), 12 deletions(-)
- create mode 100644 crypto/ecdsa.c
- create mode 100644 crypto/ecdsasignature.asn1
+ crypto/ecdsa.c   |  33 +++++++++-
+ crypto/testmgr.c |   6 ++
+ crypto/testmgr.h | 157 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 195 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index a367fcfeb5d4..a31df40591f5 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -247,6 +247,16 @@ config CRYPTO_ECDH
- 	help
- 	  Generic implementation of the ECDH algorithm
- 
-+config CRYPTO_ECDSA
-+	tristate "ECDSA (NIST P192, P256 etc.) algorithm"
-+	select CRYPTO_ECC
-+	select CRYPTO_AKCIPHER
-+	select ASN1
-+	help
-+	  Elliptic Curve Digital Signature Algorithm (NIST P192, P256 etc.)
-+	  is A NIST cryptographic standard algorithm. Only signature verification
-+	  is implemented.
-+
- config CRYPTO_ECRDSA
- 	tristate "EC-RDSA (GOST 34.10) algorithm"
- 	select CRYPTO_ECC
-diff --git a/crypto/Makefile b/crypto/Makefile
-index b279483fba50..982066c6bdfb 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -50,6 +50,12 @@ sm2_generic-y += sm2.o
- 
- obj-$(CONFIG_CRYPTO_SM2) += sm2_generic.o
- 
-+$(obj)/ecdsasignature.asn1.o: $(obj)/ecdsasignature.asn1.c $(obj)/ecdsasignature.asn1.h
-+$(obj)/ecdsa.o: $(obj)/ecdsasignature.asn1.h
-+ecdsa_generic-y += ecdsa.o
-+ecdsa_generic-y += ecdsasignature.asn1.o
-+obj-$(CONFIG_CRYPTO_ECDSA) += ecdsa_generic.o
-+
- crypto_acompress-y := acompress.o
- crypto_acompress-y += scompress.o
- obj-$(CONFIG_CRYPTO_ACOMP2) += crypto_acompress.o
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index c80aa25994a0..25e79fd70566 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -42,7 +42,7 @@ typedef struct {
- 	u64 m_high;
- } uint128_t;
- 
--static inline const struct ecc_curve *ecc_get_curve(unsigned int curve_id)
-+const struct ecc_curve *ecc_get_curve(unsigned int curve_id)
- {
- 	switch (curve_id) {
- 	/* In FIPS mode only allow P256 and higher */
-@@ -54,6 +54,7 @@ static inline const struct ecc_curve *ecc_get_curve(unsigned int curve_id)
- 		return NULL;
- 	}
- }
-+EXPORT_SYMBOL(ecc_get_curve);
- 
- static u64 *ecc_alloc_digits_space(unsigned int ndigits)
- {
-@@ -1281,16 +1282,6 @@ void ecc_point_mult_shamir(const struct ecc_point *result,
- }
- EXPORT_SYMBOL(ecc_point_mult_shamir);
- 
--static inline void ecc_swap_digits(const u64 *in, u64 *out,
--				   unsigned int ndigits)
--{
--	const __be64 *src = (__force __be64 *)in;
--	int i;
--
--	for (i = 0; i < ndigits; i++)
--		out[i] = be64_to_cpu(src[ndigits - 1 - i]);
--}
--
- static int __ecc_is_key_valid(const struct ecc_curve *curve,
- 			      const u64 *private_key, unsigned int ndigits)
- {
-diff --git a/crypto/ecc.h b/crypto/ecc.h
-index d4e546b9ad79..2ea86dfb5cf7 100644
---- a/crypto/ecc.h
-+++ b/crypto/ecc.h
-@@ -33,6 +33,8 @@
- 
- #define ECC_DIGITS_TO_BYTES_SHIFT 3
- 
-+#define ECC_MAX_BYTES (ECC_MAX_DIGITS << ECC_DIGITS_TO_BYTES_SHIFT)
-+
- /**
-  * struct ecc_point - elliptic curve point in affine coordinates
-  *
-@@ -70,6 +72,32 @@ struct ecc_curve {
- 	u64 *b;
- };
- 
-+/**
-+ * ecc_swap_digits() - Copy ndigits from big endian array to native array
-+ *
-+ * @in:       input array
-+ * @out:      output array
-+ * @ndigits:  number of digits to copy
-+ */
-+static inline void ecc_swap_digits(const u64 *in, u64 *out,
-+				   unsigned int ndigits)
-+{
-+	const __be64 *src = (__force __be64 *)in;
-+	int i;
-+
-+	for (i = 0; i < ndigits; i++)
-+		out[i] = be64_to_cpu(src[ndigits - 1 - i]);
-+}
-+
-+/**
-+ * ecc_get_curve()  - Get a curve given its curve_id
-+ *
-+ * @curve_id:  Id of the curve
-+ *
-+ * Returns pointer to the curve data, NULL if curve is not available
-+ */
-+const struct ecc_curve *ecc_get_curve(unsigned int curve_id);
-+
- /**
-  * ecc_is_key_valid() - Validate a given ECDH private key
-  *
 diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
-new file mode 100644
-index 000000000000..04fbb3d2abc5
---- /dev/null
+index 04fbb3d2abc5..8cce80e4154e 100644
+--- a/crypto/ecdsa.c
 +++ b/crypto/ecdsa.c
-@@ -0,0 +1,369 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*
-+ * Copyright (c) 2021 IBM Corporation
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions are
-+ * met:
-+ *  * Redistributions of source code must retain the above copyright
-+ *   notice, this list of conditions and the following disclaimer.
-+ *  * Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in the
-+ *    documentation and/or other materials provided with the distribution.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ */
-+
-+#include <linux/module.h>
-+#include <crypto/internal/akcipher.h>
-+#include <crypto/akcipher.h>
-+#include <crypto/ecdh.h>
-+#include <linux/asn1_decoder.h>
-+#include <linux/scatterlist.h>
-+
-+#include "ecc.h"
-+#include "ecdsasignature.asn1.h"
-+
-+struct ecc_ctx {
-+	unsigned int curve_id;
-+	const struct ecc_curve *curve;
-+
-+	bool pub_key_set;
-+	u64 x[ECC_MAX_DIGITS]; /* pub key x and y coordinates */
-+	u64 y[ECC_MAX_DIGITS];
-+	struct ecc_point pub_key;
-+};
-+
-+struct ecdsa_signature_ctx {
-+	const struct ecc_curve *curve;
-+	u64 r[ECC_MAX_DIGITS];
-+	u64 s[ECC_MAX_DIGITS];
-+};
-+
-+/*
-+ * Get the r and s components of a signature from the X509 certificate.
-+ */
-+static int ecdsa_get_signature_rs(u64 *dest, size_t hdrlen, unsigned char tag,
-+				  const void *value, size_t vlen,
-+				  unsigned int ndigits)
-+{
-+	size_t keylen = ndigits * sizeof(u64);
-+	ssize_t diff = vlen - keylen;
-+	const char *d = value;
-+	u8 rs[ECC_MAX_BYTES];
-+
-+	if (!value || !vlen)
-+		return -EINVAL;
-+
-+	/* diff = 0: 'value' has exacly the right size
-+	 * diff > 0: 'value' has too many bytes; one leading zero is allowed that
-+	 *           makes the value a positive integer; error on more
-+	 * diff < 0: 'value' is missing leading zeros, which we add
-+	 */
-+	if (diff > 0) {
-+		/* skip over leading zeros that make 'value' a positive int */
-+		if (*d == 0) {
-+			vlen -= 1;
-+			diff--;
-+			d++;
-+		}
-+		if (diff)
-+			return -EINVAL;
-+	}
-+	if (-diff >= keylen)
-+		return -EINVAL;
-+
-+	if (diff) {
-+		/* leading zeros not given in 'value' */
-+		memset(rs, 0, -diff);
-+	}
-+
-+	memcpy(&rs[-diff], d, vlen);
-+
-+	ecc_swap_digits((u64 *)rs, dest, ndigits);
-+
-+	return 0;
-+}
-+
-+int ecdsa_get_signature_r(void *context, size_t hdrlen, unsigned char tag,
-+			const void *value, size_t vlen)
-+{
-+	struct ecdsa_signature_ctx *sig = context;
-+
-+	return ecdsa_get_signature_rs(sig->r, hdrlen, tag, value, vlen,
-+				      sig->curve->g.ndigits);
-+}
-+
-+int ecdsa_get_signature_s(void *context, size_t hdrlen, unsigned char tag,
-+			  const void *value, size_t vlen)
-+{
-+	struct ecdsa_signature_ctx *sig = context;
-+
-+	return ecdsa_get_signature_rs(sig->s, hdrlen, tag, value, vlen,
-+				      sig->curve->g.ndigits);
-+}
-+
-+static int _ecdsa_verify(struct ecc_ctx *ctx, const u64 *hash,
-+			 const u64 *r, const u64 *s)
-+{
-+	const struct ecc_curve *curve = ctx->curve;
-+	unsigned int ndigits = curve->g.ndigits;
-+	u64 s1[ECC_MAX_DIGITS];
-+	u64 u1[ECC_MAX_DIGITS];
-+	u64 u2[ECC_MAX_DIGITS];
-+	u64 x1[ECC_MAX_DIGITS];
-+	u64 y1[ECC_MAX_DIGITS];
-+	struct ecc_point res = ECC_POINT_INIT(x1, y1, ndigits);
-+
-+	/* 0 < r < n  and 0 < s < n */
-+	if (vli_is_zero(r, ndigits) || vli_cmp(r, curve->n, ndigits) >= 0 ||
-+	    vli_is_zero(s, ndigits) || vli_cmp(s, curve->n, ndigits) >= 0)
-+		return -EBADMSG;
-+
-+	/* hash is given */
-+	pr_devel("hash : %016llx %016llx ... %016llx\n",
-+		 hash[ndigits - 1], hash[ndigits - 2], hash[0]);
-+
-+	/* s1 = (s^-1) mod n */
-+	vli_mod_inv(s1, s, curve->n, ndigits);
-+	/* u1 = (hash * s1) mod n */
-+	vli_mod_mult_slow(u1, hash, s1, curve->n, ndigits);
-+	/* u2 = (r * s1) mod n */
-+	vli_mod_mult_slow(u2, r, s1, curve->n, ndigits);
-+	/* res = u1*G + u2 * pub_key */
-+	ecc_point_mult_shamir(&res, u1, &curve->g, u2, &ctx->pub_key, curve);
-+
-+	/* res.x = res.x mod n (if res.x > order) */
-+	if (unlikely(vli_cmp(res.x, curve->n, ndigits) == 1))
-+		/* faster alternative for NIST p256 & p192 */
-+		vli_sub(res.x, res.x, curve->n, ndigits);
-+
-+	if (!vli_cmp(res.x, r, ndigits))
-+		return 0;
-+
-+	return -EKEYREJECTED;
-+}
-+
-+/*
-+ * Verify an ECDSA signature.
-+ */
-+static int ecdsa_verify(struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct ecc_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	size_t keylen = ctx->curve->g.ndigits * sizeof(u64);
-+	struct ecdsa_signature_ctx sig_ctx = {
-+		.curve = ctx->curve,
-+	};
-+	u8 rawhash[ECC_MAX_BYTES];
-+	u64 hash[ECC_MAX_DIGITS];
-+	unsigned char *buffer;
-+	ssize_t diff;
-+	int ret;
-+
-+	if (unlikely(!ctx->pub_key_set))
-+		return -EINVAL;
-+
-+	buffer = kmalloc(req->src_len + req->dst_len, GFP_KERNEL);
-+	if (!buffer)
-+		return -ENOMEM;
-+
-+	sg_pcopy_to_buffer(req->src,
-+		sg_nents_for_len(req->src, req->src_len + req->dst_len),
-+		buffer, req->src_len + req->dst_len, 0);
-+
-+	ret = asn1_ber_decoder(&ecdsasignature_decoder, &sig_ctx,
-+			       buffer, req->src_len);
-+	if (ret < 0)
-+		goto error;
-+
-+	/* if the hash is shorter then we will add leading zeros to fit to ndigits */
-+	diff = keylen - req->dst_len;
-+	if (diff >= 0) {
-+		if (diff)
-+			memset(rawhash, 0, diff);
-+		memcpy(&rawhash[diff], buffer + req->src_len, req->dst_len);
-+	} else if (diff < 0) {
-+		/* given hash is longer, we take the left-most bytes */
-+		memcpy(&rawhash, buffer + req->src_len, keylen);
-+	}
-+
-+	ecc_swap_digits((u64 *)rawhash, hash, ctx->curve->g.ndigits);
-+
-+	ret = _ecdsa_verify(ctx, hash, sig_ctx.r, sig_ctx.s);
-+
-+error:
-+	kfree(buffer);
-+
-+	return ret;
-+}
-+
-+static int ecdsa_ecc_ctx_init(struct ecc_ctx *ctx, unsigned int curve_id)
-+{
-+	ctx->curve_id = curve_id;
-+	ctx->curve = ecc_get_curve(curve_id);
-+	if (!ctx->curve)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+
-+static void ecdsa_ecc_ctx_deinit(struct ecc_ctx *ctx)
-+{
-+	ctx->pub_key_set = false;
-+}
-+
-+static int ecdsa_ecc_ctx_reset(struct ecc_ctx *ctx)
-+{
-+	unsigned int curve_id = ctx->curve_id;
-+	int ret;
-+
-+	ecdsa_ecc_ctx_deinit(ctx);
-+	ret = ecdsa_ecc_ctx_init(ctx, curve_id);
-+	if (ret == 0)
-+		ctx->pub_key = ECC_POINT_INIT(ctx->x, ctx->y,
-+					      ctx->curve->g.ndigits);
-+	return ret;
-+}
-+
-+/*
-+ * Set the public key given the raw uncompressed key data from an X509
-+ * certificate. The key data contain the concatenated X and Y coordinates of
-+ * the public key.
-+ */
-+static int ecdsa_set_pub_key(struct crypto_akcipher *tfm,
-+			     const void *key, unsigned int keylen)
-+{
-+	struct ecc_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	const unsigned char *d = key;
-+	const u64 *digits = (const u64 *)&d[1];
-+	unsigned int ndigits;
-+	int ret;
-+
-+	ret = ecdsa_ecc_ctx_reset(ctx);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (keylen < 1 || (((keylen - 1) >> 1) % sizeof(u64)) != 0)
-+		return -EINVAL;
-+	/* we only accept uncompressed format indicated by '4' */
-+	if (d[0] != 4)
-+		return -EINVAL;
-+
-+	keylen--;
-+	ndigits = (keylen >> 1) / sizeof(u64);
-+	if (ndigits != ctx->curve->g.ndigits)
-+		return -EINVAL;
-+
-+	ecc_swap_digits(digits, ctx->pub_key.x, ndigits);
-+	ecc_swap_digits(&digits[ndigits], ctx->pub_key.y, ndigits);
-+	ret = ecc_is_pubkey_valid_full(ctx->curve, &ctx->pub_key);
-+
-+	ctx->pub_key_set = ret == 0;
-+
-+	return ret;
-+}
-+
-+static void ecdsa_exit_tfm(struct crypto_akcipher *tfm)
+@@ -145,7 +145,7 @@ static int _ecdsa_verify(struct ecc_ctx *ctx, const u64 *hash,
+ 
+ 	/* res.x = res.x mod n (if res.x > order) */
+ 	if (unlikely(vli_cmp(res.x, curve->n, ndigits) == 1))
+-		/* faster alternative for NIST p256 & p192 */
++		/* faster alternative for NIST p384, p256 & p192 */
+ 		vli_sub(res.x, res.x, curve->n, ndigits);
+ 
+ 	if (!vli_cmp(res.x, r, ndigits))
+@@ -289,6 +289,28 @@ static unsigned int ecdsa_max_size(struct crypto_akcipher *tfm)
+ 	return ctx->pub_key.ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
+ }
+ 
++static int ecdsa_nist_p384_init_tfm(struct crypto_akcipher *tfm)
 +{
 +	struct ecc_ctx *ctx = akcipher_tfm_ctx(tfm);
 +
-+	ecdsa_ecc_ctx_deinit(ctx);
++	return ecdsa_ecc_ctx_init(ctx, ECC_CURVE_NIST_P384);
 +}
 +
-+static unsigned int ecdsa_max_size(struct crypto_akcipher *tfm)
-+{
-+	struct ecc_ctx *ctx = akcipher_tfm_ctx(tfm);
-+
-+	return ctx->pub_key.ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
-+}
-+
-+static int ecdsa_nist_p256_init_tfm(struct crypto_akcipher *tfm)
-+{
-+	struct ecc_ctx *ctx = akcipher_tfm_ctx(tfm);
-+
-+	return ecdsa_ecc_ctx_init(ctx, ECC_CURVE_NIST_P256);
-+}
-+
-+static struct akcipher_alg ecdsa_nist_p256 = {
++static struct akcipher_alg ecdsa_nist_p384 = {
 +	.verify = ecdsa_verify,
 +	.set_pub_key = ecdsa_set_pub_key,
 +	.max_size = ecdsa_max_size,
-+	.init = ecdsa_nist_p256_init_tfm,
++	.init = ecdsa_nist_p384_init_tfm,
 +	.exit = ecdsa_exit_tfm,
 +	.base = {
-+		.cra_name = "ecdsa-nist-p256",
-+		.cra_driver_name = "ecdsa-nist-p256-generic",
++		.cra_name = "ecdsa-nist-p384",
++		.cra_driver_name = "ecdsa-nist-p384-generic",
 +		.cra_priority = 100,
 +		.cra_module = THIS_MODULE,
 +		.cra_ctxsize = sizeof(struct ecc_ctx),
 +	},
 +};
 +
-+static int ecdsa_nist_p192_init_tfm(struct crypto_akcipher *tfm)
-+{
-+	struct ecc_ctx *ctx = akcipher_tfm_ctx(tfm);
+ static int ecdsa_nist_p256_init_tfm(struct crypto_akcipher *tfm)
+ {
+ 	struct ecc_ctx *ctx = akcipher_tfm_ctx(tfm);
+@@ -345,8 +367,16 @@ static int ecdsa_init(void)
+ 	ret = crypto_register_akcipher(&ecdsa_nist_p256);
+ 	if (ret)
+ 		goto nist_p256_error;
 +
-+	return ecdsa_ecc_ctx_init(ctx, ECC_CURVE_NIST_P192);
-+}
-+
-+static struct akcipher_alg ecdsa_nist_p192 = {
-+	.verify = ecdsa_verify,
-+	.set_pub_key = ecdsa_set_pub_key,
-+	.max_size = ecdsa_max_size,
-+	.init = ecdsa_nist_p192_init_tfm,
-+	.exit = ecdsa_exit_tfm,
-+	.base = {
-+		.cra_name = "ecdsa-nist-p192",
-+		.cra_driver_name = "ecdsa-nist-p192-generic",
-+		.cra_priority = 100,
-+		.cra_module = THIS_MODULE,
-+		.cra_ctxsize = sizeof(struct ecc_ctx),
-+	},
-+};
-+static bool ecdsa_nist_p192_registered;
-+
-+static int ecdsa_init(void)
-+{
-+	int ret;
-+
-+	/* NIST p192 may not be available in FIPS mode */
-+	ret = crypto_register_akcipher(&ecdsa_nist_p192);
-+	ecdsa_nist_p192_registered = ret == 0;
-+
-+	ret = crypto_register_akcipher(&ecdsa_nist_p256);
++	ret = crypto_register_akcipher(&ecdsa_nist_p384);
 +	if (ret)
-+		goto nist_p256_error;
-+	return 0;
++		goto nist_p384_error;
 +
-+nist_p256_error:
-+	if (ecdsa_nist_p192_registered)
-+		crypto_unregister_akcipher(&ecdsa_nist_p192);
-+	return ret;
-+}
-+
-+static void ecdsa_exit(void)
-+{
-+	if (ecdsa_nist_p192_registered)
-+		crypto_unregister_akcipher(&ecdsa_nist_p192);
+ 	return 0;
+ 
++nist_p384_error:
 +	crypto_unregister_akcipher(&ecdsa_nist_p256);
-+}
 +
-+subsys_initcall(ecdsa_init);
-+module_exit(ecdsa_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Stefan Berger <stefanb@linux.ibm.com>");
-+MODULE_DESCRIPTION("ECDSA generic algorithm");
-+MODULE_ALIAS_CRYPTO("ecdsa-generic");
-diff --git a/crypto/ecdsasignature.asn1 b/crypto/ecdsasignature.asn1
-new file mode 100644
-index 000000000000..621ab754fb9f
---- /dev/null
-+++ b/crypto/ecdsasignature.asn1
-@@ -0,0 +1,4 @@
-+ECDSASignature ::= SEQUENCE {
-+	r	INTEGER ({ ecdsa_get_signature_r }),
-+	s	INTEGER ({ ecdsa_get_signature_s })
-+}
+ nist_p256_error:
+ 	if (ecdsa_nist_p192_registered)
+ 		crypto_unregister_akcipher(&ecdsa_nist_p192);
+@@ -358,6 +388,7 @@ static void ecdsa_exit(void)
+ 	if (ecdsa_nist_p192_registered)
+ 		crypto_unregister_akcipher(&ecdsa_nist_p192);
+ 	crypto_unregister_akcipher(&ecdsa_nist_p256);
++	crypto_unregister_akcipher(&ecdsa_nist_p384);
+ }
+ 
+ subsys_initcall(ecdsa_init);
 diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 321e38eef51b..2607602f9de5 100644
+index 2607602f9de5..08f85719338a 100644
 --- a/crypto/testmgr.c
 +++ b/crypto/testmgr.c
-@@ -4913,6 +4913,18 @@ static const struct alg_test_desc alg_test_descs[] = {
+@@ -4925,6 +4925,12 @@ static const struct alg_test_desc alg_test_descs[] = {
  		.suite = {
- 			.kpp = __VECS(ecdh_tv_template)
+ 			.akcipher = __VECS(ecdsa_nist_p256_tv_template)
  		}
 +	}, {
-+		.alg = "ecdsa-nist-p192",
++		.alg = "ecdsa-nist-p384",
 +		.test = alg_test_akcipher,
 +		.suite = {
-+			.akcipher = __VECS(ecdsa_nist_p192_tv_template)
-+		}
-+	}, {
-+		.alg = "ecdsa-nist-p256",
-+		.test = alg_test_akcipher,
-+		.suite = {
-+			.akcipher = __VECS(ecdsa_nist_p256_tv_template)
++			.akcipher = __VECS(ecdsa_nist_p384_tv_template)
 +		}
  	}, {
  		.alg = "ecrdsa",
  		.test = alg_test_akcipher,
 diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 8c83811c0e35..2adcc0dc0bdd 100644
+index 2adcc0dc0bdd..e63a760aca2d 100644
 --- a/crypto/testmgr.h
 +++ b/crypto/testmgr.h
-@@ -566,6 +566,273 @@ static const struct akcipher_testvec rsa_tv_template[] = {
- 	}
+@@ -833,6 +833,163 @@ static const struct akcipher_testvec ecdsa_nist_p256_tv_template[] = {
+ 	},
  };
  
-+/*
-+ * ECDSA test vectors.
-+ */
-+static const struct akcipher_testvec ecdsa_nist_p192_tv_template[] = {
++static const struct akcipher_testvec ecdsa_nist_p384_tv_template[] = {
 +	{
-+	.key =
-+	"\x04\xf7\x46\xf8\x2f\x15\xf6\x22\x8e\xd7\x57\x4f\xcc\xe7\xbb\xc1"
-+	"\xd4\x09\x73\xcf\xea\xd0\x15\x07\x3d\xa5\x8a\x8a\x95\x43\xe4\x68"
-+	"\xea\xc6\x25\xc1\xc1\x01\x25\x4c\x7e\xc3\x3c\xa6\x04\x0a\xe7\x08"
-+	"\x98",
-+	.key_len = 49,
++	.key = /* secp384r1(sha1) */
++	"\x04\x89\x25\xf3\x97\x88\xcb\xb0\x78\xc5\x72\x9a\x14\x6e\x7a\xb1"
++	"\x5a\xa5\x24\xf1\x95\x06\x9e\x28\xfb\xc4\xb9\xbe\x5a\x0d\xd9\x9f"
++	"\xf3\xd1\x4d\x2d\x07\x99\xbd\xda\xa7\x66\xec\xbb\xea\xba\x79\x42"
++	"\xc9\x34\x89\x6a\xe7\x0b\xc3\xf2\xfe\x32\x30\xbe\xba\xf9\xdf\x7e"
++	"\x4b\x6a\x07\x8e\x26\x66\x3f\x1d\xec\xa2\x57\x91\x51\xdd\x17\x0e"
++	"\x0b\x25\xd6\x80\x5c\x3b\xe6\x1a\x98\x48\x91\x45\x7a\x73\xb0\xc3"
++	"\xf1",
++	.key_len = 97,
 +	.params =
-+	"\x30\x13\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x08\x2a\x86\x48"
-+	"\xce\x3d\x03\x01\x01",
-+	.param_len = 21,
++	"\x30\x10\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x05\x2b\x81\x04"
++	"\x00\x22",
++	.param_len = 18,
 +	.m =
-+	"\xcd\xb9\xd2\x1c\xb7\x6f\xcd\x44\xb3\xfd\x63\xea\xa3\x66\x7f\xae"
-+	"\x63\x85\xe7\x82",
++	"\x12\x55\x28\xf0\x77\xd5\xb6\x21\x71\x32\x48\xcd\x28\xa8\x25\x22"
++	"\x3a\x69\xc1\x93",
 +	.m_size = 20,
 +	.algo = OID_id_ecdsa_with_sha1,
 +	.c =
-+	"\x30\x35\x02\x19\x00\xba\xe5\x93\x83\x6e\xb6\x3b\x63\xa0\x27\x91"
-+	"\xc6\xf6\x7f\xc3\x09\xad\x59\xad\x88\x27\xd6\x92\x6b\x02\x18\x10"
-+	"\x68\x01\x9d\xba\xce\x83\x08\xef\x95\x52\x7b\xa0\x0f\xe4\x18\x86"
-+	"\x80\x6f\xa5\x79\x77\xda\xd0",
-+	.c_size = 55,
++	"\x30\x66\x02\x31\x00\xf5\x0f\x24\x4c\x07\x93\x6f\x21\x57\x55\x07"
++	"\x20\x43\x30\xde\xa0\x8d\x26\x8e\xae\x63\x3f\xbc\x20\x3a\xc6\xf1"
++	"\x32\x3c\xce\x70\x2b\x78\xf1\x4c\x26\xe6\x5b\x86\xcf\xec\x7c\x7e"
++	"\xd0\x87\xd7\xd7\x6e\x02\x31\x00\xcd\xbb\x7e\x81\x5d\x8f\x63\xc0"
++	"\x5f\x63\xb1\xbe\x5e\x4c\x0e\xa1\xdf\x28\x8c\x1b\xfa\xf9\x95\x88"
++	"\x74\xa0\x0f\xbf\xaf\xc3\x36\x76\x4a\xa1\x59\xf1\x1c\xa4\x58\x26"
++	"\x79\x12\x2a\xb7\xc5\x15\x92\xc5",
++	.c_size = 104,
 +	.public_key_vec = true,
 +	.siggen_sigver_test = true,
 +	}, {
-+	.key =
-+	"\x04\xb6\x4b\xb1\xd1\xac\xba\x24\x8f\x65\xb2\x60\x00\x90\xbf\xbd"
-+	"\x78\x05\x73\xe9\x79\x1d\x6f\x7c\x0b\xd2\xc3\x93\xa7\x28\xe1\x75"
-+	"\xf7\xd5\x95\x1d\x28\x10\xc0\x75\x50\x5c\x1a\x4f\x3f\x8f\xa5\xee"
++	.key = /* secp384r1(sha224) */
++	"\x04\x69\x6c\xcf\x62\xee\xd0\x0d\xe5\xb5\x2f\x70\x54\xcf\x26\xa0"
++	"\xd9\x98\x8d\x92\x2a\xab\x9b\x11\xcb\x48\x18\xa1\xa9\x0d\xd5\x18"
++	"\x3e\xe8\x29\x6e\xf6\xe4\xb5\x8e\xc7\x4a\xc2\x5f\x37\x13\x99\x05"
++	"\xb6\xa4\x9d\xf9\xfb\x79\x41\xe7\xd7\x96\x9f\x73\x3b\x39\x43\xdc"
++	"\xda\xf4\x06\xb9\xa5\x29\x01\x9d\x3b\xe1\xd8\x68\x77\x2a\xf4\x50"
++	"\x6b\x93\x99\x6c\x66\x4c\x42\x3f\x65\x60\x6c\x1c\x0b\x93\x9b\x9d"
++	"\xe0",
++	.key_len = 97,
++	.params =
++	"\x30\x10\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x05\x2b\x81\x04"
++	"\x00\x22",
++	.param_len = 18,
++	.m =
++	"\x12\x80\xb6\xeb\x25\xe2\x3d\xf0\x21\x32\x96\x17\x3a\x38\x39\xfd"
++	"\x1f\x05\x34\x7b\xb8\xf9\x71\x66\x03\x4f\xd5\xe5",
++	.m_size = 28,
++	.algo = OID_id_ecdsa_with_sha224,
++	.c =
++	"\x30\x66\x02\x31\x00\x8a\x51\x84\xce\x13\x1e\xd2\xdc\xec\xcb\xe4"
++	"\x89\x47\xb2\xf7\xbc\x97\xf1\xc8\x72\x26\xcf\x5a\x5e\xc5\xda\xb4"
++	"\xe3\x93\x07\xe0\x99\xc9\x9c\x11\xb8\x10\x01\xc5\x41\x3f\xdd\x15"
++	"\x1b\x68\x2b\x9d\x8b\x02\x31\x00\x8b\x03\x2c\xfc\x1f\xd1\xa9\xa4"
++	"\x4b\x00\x08\x31\x6c\xf5\xd5\xf6\xdf\xd8\x68\xa2\x64\x42\x65\xf3"
++	"\x4d\xd0\xc6\x6e\xb0\xe9\xfc\x14\x9f\x19\xd0\x42\x8b\x93\xc2\x11"
++	"\x88\x2b\x82\x26\x5e\x1c\xda\xfb",
++	.c_size = 104,
++	.public_key_vec = true,
++	.siggen_sigver_test = true,
++	}, {
++	.key = /* secp384r1(sha256) */
++	"\x04\xee\xd6\xda\x3e\x94\x90\x00\x27\xed\xf8\x64\x55\xd6\x51\x9a"
++	"\x1f\x52\x00\x63\x78\xf1\xa9\xfd\x75\x4c\x9e\xb2\x20\x1a\x91\x5a"
++	"\xba\x7a\xa3\xe5\x6c\xb6\x25\x68\x4b\xe8\x13\xa6\x54\x87\x2c\x0e"
++	"\xd0\x83\x95\xbc\xbf\xc5\x28\x4f\x77\x1c\x46\xa6\xf0\xbc\xd4\xa4"
++	"\x8d\xc2\x8f\xb3\x32\x37\x40\xd6\xca\xf8\xae\x07\x34\x52\x39\x52"
++	"\x17\xc3\x34\x29\xd6\x40\xea\x5c\xb9\x3f\xfb\x32\x2e\x12\x33\xbc"
++	"\xab",
++	.key_len = 97,
++	.params =
++	"\x30\x10\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x05\x2b\x81\x04"
++	"\x00\x22",
++	.param_len = 18,
++	.m =
++	"\xaa\xe7\xfd\x03\x26\xcb\x94\x71\xe4\xce\x0f\xc5\xff\xa6\x29\xa3"
++	"\xe1\xcc\x4c\x35\x4e\xde\xca\x80\xab\x26\x0c\x25\xe6\x68\x11\xc2",
++	.m_size = 32,
++	.algo = OID_id_ecdsa_with_sha256,
++	.c =
++	"\x30\x64\x02\x30\x08\x09\x12\x9d\x6e\x96\x64\xa6\x8e\x3f\x7e\xce"
++	"\x0a\x9b\xaa\x59\xcc\x47\x53\x87\xbc\xbd\x83\x3f\xaf\x06\x3f\x84"
++	"\x04\xe2\xf9\x67\xb6\xc6\xfc\x70\x2e\x66\x3c\x77\xc8\x8d\x2c\x79"
++	"\x3a\x8e\x32\xc4\x02\x30\x40\x34\xb8\x90\xa9\x80\xab\x47\x26\xa2"
++	"\xb0\x89\x42\x0a\xda\xd9\xdd\xce\xbc\xb2\x97\xf4\x9c\xf3\x15\x68"
++	"\xc0\x75\x3e\x23\x5e\x36\x4f\x8d\xde\x1e\x93\x8d\x95\xbb\x10\x0e"
++	"\xf4\x1f\x39\xca\x4d\x43",
++	.c_size = 102,
++	.public_key_vec = true,
++	.siggen_sigver_test = true,
++	}, {
++	.key = /* secp384r1(sha384) */
++	"\x04\x3a\x2f\x62\xe7\x1a\xcf\x24\xd0\x0b\x7c\xe0\xed\x46\x0a\x4f"
++	"\x74\x16\x43\xe9\x1a\x25\x7c\x55\xff\xf0\x29\x68\x66\x20\x91\xf9"
++	"\xdb\x2b\xf6\xb3\x6c\x54\x01\xca\xc7\x6a\x5c\x0d\xeb\x68\xd9\x3c"
++	"\xf1\x01\x74\x1f\xf9\x6c\xe5\x5b\x60\xe9\x7f\x5d\xb3\x12\x80\x2a"
++	"\xd8\x67\x92\xc9\x0e\x4c\x4c\x6b\xa1\xb2\xa8\x1e\xac\x1c\x97\xd9"
++	"\x21\x67\xe5\x1b\x5a\x52\x31\x68\xd6\xee\xf0\x19\xb0\x55\xed\x89"
++	"\x9e",
++	.key_len = 97,
++	.params =
++	"\x30\x10\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x05\x2b\x81\x04"
++	"\x00\x22",
++	.param_len = 18,
++	.m =
++	"\x8d\xf2\xc0\xe9\xa8\xf3\x8e\x44\xc4\x8c\x1a\xa0\xb8\xd7\x17\xdf"
++	"\xf2\x37\x1b\xc6\xe3\xf5\x62\xcc\x68\xf5\xd5\x0b\xbf\x73\x2b\xb1"
++	"\xb0\x4c\x04\x00\x31\xab\xfe\xc8\xd6\x09\xc8\xf2\xea\xd3\x28\xff",
++	.m_size = 48,
++	.algo = OID_id_ecdsa_with_sha384,
++	.c =
++	"\x30\x66\x02\x31\x00\x9b\x28\x68\xc0\xa1\xea\x8c\x50\xee\x2e\x62"
++	"\x35\x46\xfa\x00\xd8\x2d\x7a\x91\x5f\x49\x2d\x22\x08\x29\xe6\xfb"
++	"\xca\x8c\xd6\xb6\xb4\x3b\x1f\x07\x8f\x15\x02\xfe\x1d\xa2\xa4\xc8"
++	"\xf2\xea\x9d\x11\x1f\x02\x31\x00\xfc\x50\xf6\x43\xbd\x50\x82\x0e"
++	"\xbf\xe3\x75\x24\x49\xac\xfb\xc8\x71\xcd\x8f\x18\x99\xf0\x0f\x13"
++	"\x44\x92\x8c\x86\x99\x65\xb3\x97\x96\x17\x04\xc9\x05\x77\xf1\x8e"
++	"\xab\x8d\x4e\xde\xe6\x6d\x9b\x66",
++	.c_size = 104,
++	.public_key_vec = true,
++	.siggen_sigver_test = true,
++	}, {
++	.key = /* secp384r1(sha512) */
++	"\x04\xb4\xe7\xc1\xeb\x64\x25\x22\x46\xc3\x86\x61\x80\xbe\x1e\x46"
++	"\xcb\xf6\x05\xc2\xee\x73\x83\xbc\xea\x30\x61\x4d\x40\x05\x41\xf4"
++	"\x8c\xe3\x0e\x5c\xf0\x50\xf2\x07\x19\xe8\x4f\x25\xbe\xee\x0c\x95"
++	"\x54\x36\x86\xec\xc2\x20\x75\xf3\x89\xb5\x11\xa1\xb7\xf5\xaf\xbe"
++	"\x81\xe4\xc3\x39\x06\xbd\xe4\xfe\x68\x1c\x6d\x99\x2b\x1b\x63\xfa"
++	"\xdf\x42\x5c\xc2\x5a\xc7\x0c\xf4\x15\xf7\x1b\xa3\x2e\xd7\x00\xac"
 +	"\xa3",
-+	.key_len = 49,
++	.key_len = 97,
 +	.params =
-+	"\x30\x13\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x08\x2a\x86\x48"
-+	"\xce\x3d\x03\x01\x01",
-+	.param_len = 21,
++	"\x30\x10\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x05\x2b\x81\x04"
++	"\x00\x22",
++	.param_len = 18,
 +	.m =
-+	"\x8d\xd6\xb8\x3e\xe5\xff\x23\xf6\x25\xa2\x43\x42\x74\x45\xa7\x40"
-+	"\x3a\xff\x2f\xe1\xd3\xf6\x9f\xe8\x33\xcb\x12\x11",
-+	.m_size = 28,
-+	.algo = OID_id_ecdsa_with_sha224,
-+	.c =
-+	"\x30\x34\x02\x18\x5a\x8b\x82\x69\x7e\x8a\x0a\x09\x14\xf8\x11\x2b"
-+	"\x55\xdc\xae\x37\x83\x7b\x12\xe6\xb6\x5b\xcb\xd4\x02\x18\x6a\x14"
-+	"\x4f\x53\x75\xc8\x02\x48\xeb\xc3\x92\x0f\x1e\x72\xee\xc4\xa3\xe3"
-+	"\x5c\x99\xdb\x92\x5b\x36",
-+	.c_size = 54,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	}, {
-+	.key =
-+	"\x04\xe2\x51\x24\x9b\xf7\xb6\x32\x82\x39\x66\x3d\x5b\xec\x3b\xae"
-+	"\x0c\xd5\xf2\x67\xd1\xc7\xe1\x02\xe4\xbf\x90\x62\xb8\x55\x75\x56"
-+	"\x69\x20\x5e\xcb\x4e\xca\x33\xd6\xcb\x62\x6b\x94\xa9\xa2\xe9\x58"
-+	"\x91",
-+	.key_len = 49,
-+	.params =
-+	"\x30\x13\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x08\x2a\x86\x48"
-+	"\xce\x3d\x03\x01\x01",
-+	.param_len = 21,
-+	.m =
-+	"\x35\xec\xa1\xa0\x9e\x14\xde\x33\x03\xb6\xf6\xbd\x0c\x2f\xb2\xfd"
-+	"\x1f\x27\x82\xa5\xd7\x70\x3f\xef\xa0\x82\x69\x8e\x73\x31\x8e\xd7",
-+	.m_size = 32,
-+	.algo = OID_id_ecdsa_with_sha256,
-+	.c =
-+	"\x30\x35\x02\x18\x3f\x72\x3f\x1f\x42\xd2\x3f\x1d\x6b\x1a\x58\x56"
-+	"\xf1\x8f\xf7\xfd\x01\x48\xfb\x5f\x72\x2a\xd4\x8f\x02\x19\x00\xb3"
-+	"\x69\x43\xfd\x48\x19\x86\xcf\x32\xdd\x41\x74\x6a\x51\xc7\xd9\x7d"
-+	"\x3a\x97\xd9\xcd\x1a\x6a\x49",
-+	.c_size = 55,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	}, {
-+	.key =
-+	"\x04\x5a\x13\xfe\x68\x86\x4d\xf4\x17\xc7\xa4\xe5\x8c\x65\x57\xb7"
-+	"\x03\x73\x26\x57\xfb\xe5\x58\x40\xd8\xfd\x49\x05\xab\xf1\x66\x1f"
-+	"\xe2\x9d\x93\x9e\xc2\x22\x5a\x8b\x4f\xf3\x77\x22\x59\x7e\xa6\x4e"
-+	"\x8b",
-+	.key_len = 49,
-+	.params =
-+	"\x30\x13\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x08\x2a\x86\x48"
-+	"\xce\x3d\x03\x01\x01",
-+	.param_len = 21,
-+	.m =
-+	"\x9d\x2e\x1a\x8f\xed\x6c\x4b\x61\xae\xac\xd5\x19\x79\xce\x67\xf9"
-+	"\xa0\x34\xeb\xb0\x81\xf9\xd9\xdc\x6e\xb3\x5c\xa8\x69\xfc\x8a\x61"
-+	"\x39\x81\xfb\xfd\x5c\x30\x6b\xa8\xee\xed\x89\xaf\xa3\x05\xe4\x78",
-+	.m_size = 48,
-+	.algo = OID_id_ecdsa_with_sha384,
-+	.c =
-+	"\x30\x35\x02\x19\x00\xf0\xa3\x38\xce\x2b\xf8\x9d\x1a\xcf\x7f\x34"
-+	"\xb4\xb4\xe5\xc5\x00\xdd\x15\xbb\xd6\x8c\xa7\x03\x78\x02\x18\x64"
-+	"\xbc\x5a\x1f\x82\x96\x61\xd7\xd1\x01\x77\x44\x5d\x53\xa4\x7c\x93"
-+	"\x12\x3b\x3b\x28\xfb\x6d\xe1",
-+	.c_size = 55,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	}, {
-+	.key =
-+	"\x04\xd5\xf2\x6e\xc3\x94\x5c\x52\xbc\xdf\x86\x6c\x14\xd1\xca\xea"
-+	"\xcc\x72\x3a\x8a\xf6\x7a\x3a\x56\x36\x3b\xca\xc6\x94\x0e\x17\x1d"
-+	"\x9e\xa0\x58\x28\xf9\x4b\xe6\xd1\xa5\x44\x91\x35\x0d\xe7\xf5\x11"
-+	"\x57",
-+	.key_len = 49,
-+	.params =
-+	"\x30\x13\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x08\x2a\x86\x48"
-+	"\xce\x3d\x03\x01\x01",
-+	.param_len = 21,
-+	.m =
-+	"\xd5\x4b\xe9\x36\xda\xd8\x6e\xc0\x50\x03\xbe\x00\x43\xff\xf0\x23"
-+	"\xac\xa2\x42\xe7\x37\x77\x79\x52\x8f\x3e\xc0\x16\xc1\xfc\x8c\x67"
-+	"\x16\xbc\x8a\x5d\x3b\xd3\x13\xbb\xb6\xc0\x26\x1b\xeb\x33\xcc\x70"
-+	"\x4a\xf2\x11\x37\xe8\x1b\xba\x55\xac\x69\xe1\x74\x62\x7c\x6e\xb5",
++	"\xe8\xb7\x52\x7d\x1a\x44\x20\x05\x53\x6b\x3a\x68\xf2\xe7\x6c\xa1"
++	"\xae\x9d\x84\xbb\xba\x52\x43\x3e\x2c\x42\x78\x49\xbf\x78\xb2\x71"
++	"\xeb\xe1\xe0\xe8\x42\x7b\x11\xad\x2b\x99\x05\x1d\x36\xe6\xac\xfc"
++	"\x55\x73\xf0\x15\x63\x39\xb8\x6a\x6a\xc5\x91\x5b\xca\x6a\xa8\x0e",
 +	.m_size = 64,
 +	.algo = OID_id_ecdsa_with_sha512,
 +	.c =
-+	"\x30\x35\x02\x19\x00\x88\x5b\x8f\x59\x43\xbf\xcf\xc6\xdd\x3f\x07"
-+	"\x87\x12\xa0\xd4\xac\x2b\x11\x2d\x1c\xb6\x06\xc9\x6c\x02\x18\x73"
-+	"\xb4\x22\x9a\x98\x73\x3c\x83\xa9\x14\x2a\x5e\xf5\xe5\xfb\x72\x28"
-+	"\x6a\xdf\x97\xfd\x82\x76\x24",
-+	.c_size = 55,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	},
-+};
-+
-+static const struct akcipher_testvec ecdsa_nist_p256_tv_template[] = {
-+	{
-+	.key =
-+	"\x04\xb9\x7b\xbb\xd7\x17\x64\xd2\x7e\xfc\x81\x5d\x87\x06\x83\x41"
-+	"\x22\xd6\x9a\xaa\x87\x17\xec\x4f\x63\x55\x2f\x94\xba\xdd\x83\xe9"
-+	"\x34\x4b\xf3\xe9\x91\x13\x50\xb6\xcb\xca\x62\x08\xe7\x3b\x09\xdc"
-+	"\xc3\x63\x4b\x2d\xb9\x73\x53\xe4\x45\xe6\x7c\xad\xe7\x6b\xb0\xe8"
-+	"\xaf",
-+	.key_len = 65,
-+	.params =
-+	"\x30\x13\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x08\x2a\x86\x48"
-+	"\xce\x3d\x03\x01\x07",
-+	.param_len = 21,
-+	.m =
-+	"\xc2\x2b\x5f\x91\x78\x34\x26\x09\x42\x8d\x6f\x51\xb2\xc5\xaf\x4c"
-+	"\x0b\xde\x6a\x42",
-+	.m_size = 20,
-+	.algo = OID_id_ecdsa_with_sha1,
-+	.c =
-+	"\x30\x46\x02\x21\x00\xf9\x25\xce\x9f\x3a\xa6\x35\x81\xcf\xd4\xe7"
-+	"\xb7\xf0\x82\x56\x41\xf7\xd4\xad\x8d\x94\x5a\x69\x89\xee\xca\x6a"
-+	"\x52\x0e\x48\x4d\xcc\x02\x21\x00\xd7\xe4\xef\x52\x66\xd3\x5b\x9d"
-+	"\x8a\xfa\x54\x93\x29\xa7\x70\x86\xf1\x03\x03\xf3\x3b\xe2\x73\xf7"
-+	"\xfb\x9d\x8b\xde\xd4\x8d\x6f\xad",
-+	.c_size = 72,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	}, {
-+	.key =
-+	"\x04\x8b\x6d\xc0\x33\x8e\x2d\x8b\x67\xf5\xeb\xc4\x7f\xa0\xf5\xd9"
-+	"\x7b\x03\xa5\x78\x9a\xb5\xea\x14\xe4\x23\xd0\xaf\xd7\x0e\x2e\xa0"
-+	"\xc9\x8b\xdb\x95\xf8\xb3\xaf\xac\x00\x2c\x2c\x1f\x7a\xfd\x95\x88"
-+	"\x43\x13\xbf\xf3\x1c\x05\x1a\x14\x18\x09\x3f\xd6\x28\x3e\xc5\xa0"
-+	"\xd4",
-+	.key_len = 65,
-+	.params =
-+	"\x30\x13\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x08\x2a\x86\x48"
-+	"\xce\x3d\x03\x01\x07",
-+	.param_len = 21,
-+	.m =
-+	"\x1a\x15\xbc\xa3\xe4\xed\x3a\xb8\x23\x67\xc6\xc4\x34\xf8\x6c\x41"
-+	"\x04\x0b\xda\xc5\x77\xfa\x1c\x2d\xe6\x2c\x3b\xe0",
-+	.m_size = 28,
-+	.algo = OID_id_ecdsa_with_sha224,
-+	.c =
-+	"\x30\x44\x02\x20\x20\x43\xfa\xc0\x9f\x9d\x7b\xe7\xae\xce\x77\x59"
-+	"\x1a\xdb\x59\xd5\x34\x62\x79\xcb\x6a\x91\x67\x2e\x7d\x25\xd8\x25"
-+	"\xf5\x81\xd2\x1e\x02\x20\x5f\xf8\x74\xf8\x57\xd0\x5e\x54\x76\x20"
-+	"\x4a\x77\x22\xec\xc8\x66\xbf\x50\x05\x58\x39\x0e\x26\x92\xce\xd5"
-+	"\x2e\x8b\xde\x5a\x04\x0e",
-+	.c_size = 70,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	}, {
-+	.key =
-+	"\x04\xf1\xea\xc4\x53\xf3\xb9\x0e\x9f\x7e\xad\xe3\xea\xd7\x0e\x0f"
-+	"\xd6\x98\x9a\xca\x92\x4d\x0a\x80\xdb\x2d\x45\xc7\xec\x4b\x97\x00"
-+	"\x2f\xe9\x42\x6c\x29\xdc\x55\x0e\x0b\x53\x12\x9b\x2b\xad\x2c\xe9"
-+	"\x80\xe6\xc5\x43\xc2\x1d\x5e\xbb\x65\x21\x50\xb6\x37\xb0\x03\x8e"
-+	"\xb8",
-+	.key_len = 65,
-+	.params =
-+	"\x30\x13\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x08\x2a\x86\x48"
-+	"\xce\x3d\x03\x01\x07",
-+	.param_len = 21,
-+	.m =
-+	"\x8f\x43\x43\x46\x64\x8f\x6b\x96\xdf\x89\xdd\xa9\x01\xc5\x17\x6b"
-+	"\x10\xa6\xd8\x39\x61\xdd\x3c\x1a\xc8\x8b\x59\xb2\xdc\x32\x7a\xa4",
-+	.m_size = 32,
-+	.algo = OID_id_ecdsa_with_sha256,
-+	.c =
-+	"\x30\x45\x02\x20\x08\x31\xfa\x74\x0d\x1d\x21\x5d\x09\xdc\x29\x63"
-+	"\xa8\x1a\xad\xfc\xac\x44\xc3\xe8\x24\x11\x2d\xa4\x91\xdc\x02\x67"
-+	"\xdc\x0c\xd0\x82\x02\x21\x00\xbd\xff\xce\xee\x42\xc3\x97\xff\xf9"
-+	"\xa9\x81\xac\x4a\x50\xd0\x91\x0a\x6e\x1b\xc4\xaf\xe1\x83\xc3\x4f"
-+	"\x2a\x65\x35\x23\xe3\x1d\xfa",
-+	.c_size = 71,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	}, {
-+	.key =
-+	"\x04\xc5\xc6\xea\x60\xc9\xce\xad\x02\x8d\xf5\x3e\x24\xe3\x52\x1d"
-+	"\x28\x47\x3b\xc3\x6b\xa4\x99\x35\x99\x11\x88\x88\xc8\xf4\xee\x7e"
-+	"\x8c\x33\x8f\x41\x03\x24\x46\x2b\x1a\x82\xf9\x9f\xe1\x97\x1b\x00"
-+	"\xda\x3b\x24\x41\xf7\x66\x33\x58\x3d\x3a\x81\xad\xcf\x16\xe9\xe2"
-+	"\x7c",
-+	.key_len = 65,
-+	.params =
-+	"\x30\x13\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x08\x2a\x86\x48"
-+	"\xce\x3d\x03\x01\x07",
-+	.param_len = 21,
-+	.m =
-+	"\x3e\x78\x70\xfb\xcd\x66\xba\x91\xa1\x79\xff\x1e\x1c\x6b\x78\xe6"
-+	"\xc0\x81\x3a\x65\x97\x14\x84\x36\x14\x1a\x9a\xb7\xc5\xab\x84\x94"
-+	"\x5e\xbb\x1b\x34\x71\xcb\x41\xe1\xf6\xfc\x92\x7b\x34\xbb\x86\xbb",
-+	.m_size = 48,
-+	.algo = OID_id_ecdsa_with_sha384,
-+	.c =
-+	"\x30\x46\x02\x21\x00\x8e\xf3\x6f\xdc\xf8\x69\xa6\x2e\xd0\x2e\x95"
-+	"\x54\xd1\x95\x64\x93\x08\xb2\x6b\x24\x94\x48\x46\x5e\xf2\xe4\x6c"
-+	"\xc7\x94\xb1\xd5\xfe\x02\x21\x00\xeb\xa7\x80\x26\xdc\xf9\x3a\x44"
-+	"\x19\xfb\x5f\x92\xf4\xc9\x23\x37\x69\xf4\x3b\x4f\x47\xcf\x9b\x16"
-+	"\xc0\x60\x11\x92\xdc\x17\x89\x12",
-+	.c_size = 72,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	}, {
-+	.key =
-+	"\x04\xd7\x27\x46\x49\xf6\x26\x85\x12\x40\x76\x8e\xe2\xe6\x2a\x7a"
-+	"\x83\xb1\x4e\x7a\xeb\x3b\x5c\x67\x4a\xb5\xa4\x92\x8c\x69\xff\x38"
-+	"\xee\xd9\x4e\x13\x29\x59\xad\xde\x6b\xbb\x45\x31\xee\xfd\xd1\x1b"
-+	"\x64\xd3\xb5\xfc\xaf\x9b\x4b\x88\x3b\x0e\xb7\xd6\xdf\xf1\xd5\x92"
-+	"\xbf",
-+	.key_len = 65,
-+	.params =
-+	"\x30\x13\x06\x07\x2a\x86\x48\xce\x3d\x02\x01\x06\x08\x2a\x86\x48"
-+	"\xce\x3d\x03\x01\x07",
-+	.param_len = 21,
-+	.m =
-+	"\x57\xb7\x9e\xe9\x05\x0a\x8c\x1b\xc9\x13\xe5\x4a\x24\xc7\xe2\xe9"
-+	"\x43\xc3\xd1\x76\x62\xf4\x98\x1a\x9c\x13\xb0\x20\x1b\xe5\x39\xca"
-+	"\x4f\xd9\x85\x34\x95\xa2\x31\xbc\xbb\xde\xdd\x76\xbb\x61\xe3\xcf"
-+	"\x9d\xc0\x49\x7a\xf3\x7a\xc4\x7d\xa8\x04\x4b\x8d\xb4\x4d\x5b\xd6",
-+	.m_size = 64,
-+	.algo = OID_id_ecdsa_with_sha512,
-+	.c =
-+	"\x30\x45\x02\x21\x00\xb8\x6d\x87\x81\x43\xdf\xfb\x9f\x40\xea\x44"
-+	"\x81\x00\x4e\x29\x08\xed\x8c\x73\x30\x6c\x22\xb3\x97\x76\xf6\x04"
-+	"\x99\x09\x37\x4d\xfa\x02\x20\x1e\xb9\x75\x31\xf6\x04\xa5\x4d\xf8"
-+	"\x00\xdd\xab\xd4\xc0\x2b\xe6\x5c\xad\xc3\x78\x1c\xc2\xc1\x19\x76"
-+	"\x31\x79\x4a\xe9\x81\x6a\xee",
-+	.c_size = 71,
++	"\x30\x63\x02\x2f\x1d\x20\x94\x77\xfe\x31\xfa\x4d\xc6\xef\xda\x02"
++	"\xe7\x0f\x52\x9a\x02\xde\x93\xe8\x83\xe4\x84\x4c\xfc\x6f\x80\xe3"
++	"\xaf\xb3\xd9\xdc\x2b\x43\x0e\x6a\xb3\x53\x6f\x3e\xb3\xc7\xa8\xb3"
++	"\x17\x77\xd1\x02\x30\x63\xf6\xf0\x3d\x5f\x5f\x99\x3f\xde\x3a\x3d"
++	"\x16\xaf\xb4\x52\x6a\xec\x63\xe3\x0c\xec\x50\xdc\xcc\xc4\x6a\x03"
++	"\x5f\x8d\x7a\xf9\xfb\x34\xe4\x8b\x80\xa5\xb6\xda\x2c\x4e\x45\xcf"
++	"\x3c\x93\xff\x50\x5d",
++	.c_size = 101,
 +	.public_key_vec = true,
 +	.siggen_sigver_test = true,
 +	},
@@ -931,24 +364,6 @@ index 8c83811c0e35..2adcc0dc0bdd 100644
  /*
   * EC-RDSA test vectors are generated by gost-engine.
   */
-diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
-index 4462ed2c18cd..b504e2f36b25 100644
---- a/include/linux/oid_registry.h
-+++ b/include/linux/oid_registry.h
-@@ -19,8 +19,12 @@
- enum OID {
- 	OID_id_dsa_with_sha1,		/* 1.2.840.10030.4.3 */
- 	OID_id_dsa,			/* 1.2.840.10040.4.1 */
--	OID_id_ecdsa_with_sha1,		/* 1.2.840.10045.4.1 */
- 	OID_id_ecPublicKey,		/* 1.2.840.10045.2.1 */
-+	OID_id_ecdsa_with_sha1,		/* 1.2.840.10045.4.1 */
-+	OID_id_ecdsa_with_sha224,	/* 1.2.840.10045.4.3.1 */
-+	OID_id_ecdsa_with_sha256,	/* 1.2.840.10045.4.3.2 */
-+	OID_id_ecdsa_with_sha384,	/* 1.2.840.10045.4.3.3 */
-+	OID_id_ecdsa_with_sha512,	/* 1.2.840.10045.4.3.4 */
- 
- 	/* PKCS#1 {iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-1(1)} */
- 	OID_rsaEncryption,		/* 1.2.840.113549.1.1.1 */
 -- 
 2.29.2
 
