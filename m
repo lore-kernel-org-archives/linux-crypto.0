@@ -2,166 +2,101 @@ Return-Path: <SRS0=gJ+M=IF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E02C433E9
-	for <linux-crypto@archiver.kernel.org>; Sun,  7 Mar 2021 01:22:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFA37C433DB
+	for <linux-crypto@archiver.kernel.org>; Sun,  7 Mar 2021 15:04:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9AC61650DB
-	for <linux-crypto@archiver.kernel.org>; Sun,  7 Mar 2021 01:22:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B03D8650F7
+	for <linux-crypto@archiver.kernel.org>; Sun,  7 Mar 2021 15:04:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230094AbhCGBVk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 6 Mar 2021 20:21:40 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51248 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229853AbhCGBVU (ORCPT
+        id S229922AbhCGPDc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 7 Mar 2021 10:03:32 -0500
+Received: from wout3-smtp.messagingengine.com ([64.147.123.19]:40519 "EHLO
+        wout3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230063AbhCGPDJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 6 Mar 2021 20:21:20 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12712fQF190420;
-        Sat, 6 Mar 2021 20:21:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=G5mSRo0y5jOHQ4SXS4quhgDX4tam3PZzn1nNJxhlcSo=;
- b=S08sys6rivGCNZFAvih1RzaTteVf8UsXNCivpW3FcxpOc10CQNu2D7vYhAY21kEfqzkp
- oDFfqzmNT0mfDgka+RTr0Jigvu2CwFWpUBoQBwVuQ+pOqZXJ7ZcnX2h5YmMsgDZE4Pk1
- K+u1W0AAqiggRgMn3gntgGnxykZn7isBhhtxhUEDO6z3N3k6cf6OAspwKITGdw0nA8e8
- Dr3UOf+goLBCMksm/8MGUj6jmzWvcVmL5JkgOtw3O8qrJjdEMMKMT3X0erroY1qRCj3E
- AHgtIyZKY4x+cPpwU08hi3j45fa7mQ5yLDxdXSqPU6UNhZBxIytaJMFTW0nSpI9dM2Fa vw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 374gk549yb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 06 Mar 2021 20:21:04 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12712gOL190496;
-        Sat, 6 Mar 2021 20:21:04 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 374gk549y6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 06 Mar 2021 20:21:04 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 1271Gih8005996;
-        Sun, 7 Mar 2021 01:21:03 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma02dal.us.ibm.com with ESMTP id 3741c8pjg3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 07 Mar 2021 01:21:03 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1271L1JN38535614
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 7 Mar 2021 01:21:02 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E28AD136055;
-        Sun,  7 Mar 2021 01:21:01 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DFDD5136053;
-        Sun,  7 Mar 2021 01:21:00 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Sun,  7 Mar 2021 01:21:00 +0000 (GMT)
-Subject: Re: [PATCH v10 3/9] crypto: Add math to support fast NIST P384
-To:     Vitaly Chikunov <vt@altlinux.org>
-Cc:     Stefan Berger <stefanb@linux.vnet.ibm.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, herbert@gondor.apana.org.au,
-        dhowells@redhat.com, zohar@linux.ibm.com,
-        linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
-        linux-integrity@vger.kernel.org,
-        Saulo Alessandre <saulo.alessandre@tse.jus.br>
-References: <20210305005203.3547587-1-stefanb@linux.vnet.ibm.com>
- <20210305005203.3547587-4-stefanb@linux.vnet.ibm.com>
- <20210306192553.lxy5w262g2vs2hvv@altlinux.org>
- <9ac456d7-a5e1-9e42-5d34-7dc1c70082e0@linux.ibm.com>
- <20210307000310.ytes6la73x5bkori@altlinux.org>
-From:   Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <340a3176-05a2-6a4a-7c19-6c2aa2667083@linux.ibm.com>
-Date:   Sat, 6 Mar 2021 20:21:00 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        Sun, 7 Mar 2021 10:03:09 -0500
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailout.west.internal (Postfix) with ESMTP id 57F962408;
+        Sun,  7 Mar 2021 10:03:08 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Sun, 07 Mar 2021 10:03:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm3; bh=lMpMG5VZVPZqrn7upzdH0uShBQN
+        ra/BfJs8BBOkLjSA=; b=dwNrRd2PVc5wF4XvK0qSaB7/lFkTGI7t5k4YBRpYV8f
+        B1NH8ielaHKFHj7jw1k+qqBSfKaqYnYX+d0/bklemMUKwH3Bx8kGgTh73kF0v2uJ
+        tcIy7Vv8JaSJBWagiPOGbUZUw0ci17Kc63N5JLuTKBdwydBSg/SxpYhLEKEGUamW
+        BEjhM+k3WpYyu+eoXcoIXLDgTgJI6053hlFhJBHg0s0jT9hV1wfSvc8UkLaTIq3q
+        LiVtK7drleZJEoJmIWcTERj0yNR+OTgmvtp1TVWquiitT+pCFSWXRtDsImmfRQf3
+        44iR4ucS+95RW2Tp3CwtHSO6ATMaFXrlJ1foKPAhz8w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=lMpMG5
+        VZVPZqrn7upzdH0uShBQNra/BfJs8BBOkLjSA=; b=m78rVVxQQRRezjiBN45iX9
+        Eps3l02slc9vXWDqnaGLQjRIKrS80NRHiKulQv++EO0Df60CwkV7/5mHuAV1H0Tw
+        YOK9NjPU20MwKc0RVrd2Rr9O8BcCCJ/NiluleO4FAvpWZRC2GVmrXBk3O4OB9sHf
+        EV+YgWn30SAKp3qgFTh7fyC3Fp3cXACSNfzwYHF9oiCC7cqGD/eP37a+fxQkLrr7
+        jiAG19wDijw0JpzFasq/in/iUoShRNdNZfM/NX2NWBFqf47gVf9G1ve7UMLZY/HY
+        lus970zAYd16ovQdvvvnd68U7RIipgUqpWc6YQmp0EXA7QbLrpbarui4FrwwxxJw
+        ==
+X-ME-Sender: <xms:K-tEYJgrtIiZiYUe0Rr05b8kszdsOK9bOtsT2-okOBb7ZVqPNXvbcg>
+    <xme:K-tEYOA791ulNgeaSU39QFpi68RmzIMuZ1fX-yIvsJ7olQuzzS4M1STCcC6PJVUBR
+    SBOvh5TM4pV3A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledruddutddgieefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvffukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
+    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeevueehje
+    fgfffgiedvudekvdektdelleelgefhleejieeugeegveeuuddukedvteenucfkphepkeef
+    rdekiedrjeegrdeigeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrih
+    hlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomh
+X-ME-Proxy: <xmx:K-tEYJEW8LFTzbD0ukWw4CIdvgQZdXAyrDfFlC1nJ1EWZP9DbHXFXA>
+    <xmx:K-tEYORND0jOsK9gXTlAUM6-hIx80tY9svdKFQzRKCqlYZBK7TQ8tQ>
+    <xmx:K-tEYGzG8jC6sHr5QQSFhFkfCsIqEJwxgnwTRkglGFkulk6vCMgS5w>
+    <xmx:K-tEYNqZrh0wYIzRVN1CowyCXt4pNCKajX6SOYTs3Kjv87VPCsc_CA>
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        by mail.messagingengine.com (Postfix) with ESMTPA id B4BF31080057;
+        Sun,  7 Mar 2021 10:03:06 -0500 (EST)
+Date:   Sun, 7 Mar 2021 16:03:04 +0100
+From:   Greg KH <greg@kroah.com>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     stable@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Android Kernel Team <kernel-team@android.com>
+Subject: Re: please apply 660d2062190db131 to v5.4+
+Message-ID: <YETrKGcENSBg5WT6@kroah.com>
+References: <CAMj1kXFhAmy746r+2VqtLHSwtM4-hcKsqqQRRMsFJkrQ99Yf2g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210307000310.ytes6la73x5bkori@altlinux.org>
-Content-Type: text/plain; charset=koi8-r; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-06_08:2021-03-03,2021-03-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 mlxscore=0 malwarescore=0 mlxlogscore=999 clxscore=1015
- impostorscore=0 priorityscore=1501 adultscore=0 bulkscore=0 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103070004
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXFhAmy746r+2VqtLHSwtM4-hcKsqqQRRMsFJkrQ99Yf2g@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 3/6/21 7:03 PM, Vitaly Chikunov wrote:
-> Stefan,
->
-> On Sat, Mar 06, 2021 at 06:29:18PM -0500, Stefan Berger wrote:
->> On 3/6/21 2:25 PM, Vitaly Chikunov wrote:
->>> On Thu, Mar 04, 2021 at 07:51:57PM -0500, Stefan Berger wrote:
->>>> From: Saulo Alessandre <saulo.alessandre@tse.jus.br>
->>>>
->>>> * crypto/ecc.c
->>>>     - add vli_mmod_fast_384
->>>>     - change some routines to pass ecc_curve forward until vli_mmod_fast
->>>>
->>>> * crypto/ecc.h
->>>>     - add ECC_CURVE_NIST_P384_DIGITS
->>>>     - change ECC_MAX_DIGITS to P384 size
->>>>
->>>> Signed-off-by: Saulo Alessandre <saulo.alessandre@tse.jus.br>
->>>> Tested-by: Stefan Berger <stefanb@linux.ibm.com>
->>>> ---
->>>>    crypto/ecc.c | 266 +++++++++++++++++++++++++++++++++++++--------------
->>>>    crypto/ecc.h |   3 +-
->>>>    2 files changed, 194 insertions(+), 75 deletions(-)
->>>>
->>>> diff --git a/crypto/ecc.c b/crypto/ecc.c
->>>> index f6cef5a7942d..c125576cda6b 100644
->>>> --- a/crypto/ecc.c
->>>> +++ b/crypto/ecc.c
->>>> @@ -778,18 +778,133 @@ static void vli_mmod_fast_256(u64 *result, const u64 *product,
->>>>    ...
->>>>    /* Computes result = product % curve_prime for different curve_primes.
->>>>     *
->>>>     * Note that curve_primes are distinguished just by heuristic check and
->>>>     * not by complete conformance check.
->>>>     */
->>>>    static bool vli_mmod_fast(u64 *result, u64 *product,
->>>> -			  const u64 *curve_prime, unsigned int ndigits)
->>>> +			  const struct ecc_curve *curve)
->>>>    {
->>>>    	u64 tmp[2 * ECC_MAX_DIGITS];
->>>> +	const u64 *curve_prime = curve->p;
->>>> +	const unsigned int ndigits = curve->g.ndigits;
->>>> -	/* Currently, both NIST primes have -1 in lowest qword. */
->>>> -	if (curve_prime[0] != -1ull) {
->>>> +	/* Currently, all NIST have name nist_.* */
->>>> +	if (strncmp(curve->name, "nist_", 5) != 0) {
->>> I am not sure, but maybe this strncmp should not be optimized somehow,
->>> since vli_mmod_fast could be called quite frequently. Perhaps by integer
->>> algo id or even callback?
->> Should be optimized or should not be? You seem to say both.
-> Excuse me for the typo. I meant "should be optimized". I think, maybe
-> it's time to add algo selector id (for the case statement, for example
-> instead of `switch (ndigits)') or just callback for a low level mmod
-> function.
->
-> If you think this would not impact performance then nevermind.
+On Fri, Mar 05, 2021 at 01:48:26PM +0100, Ard Biesheuvel wrote:
+> Please consider applying the following upstream patch to stable trees
+> v5.4 and up
+> 
+> commit 660d2062190db131d2feaf19914e90f868fe285c
+> Author: Ard Biesheuvel <ardb@kernel.org>
+> Date:   Wed Jan 13 10:11:35 2021 +0100
+> 
+> crypto - shash: reduce minimum alignment of shash_desc structure
+> 
+> On architectures such as arm64, it reduces the worst case memory
+> footprint of a SHASH_DESC_ON_STACK() allocation (which reserves space
+> for two struct shash_desc instances) by ~350 bytes.
 
-I think it would only be a few cycles. Of course we could introduce a 
-flag to indicate nist functions (rather than using strncmp on the name) 
-or work with the callbacks (only for the nist functions?) as you 
-mentioned, but maybe that's something we could do after? Either way we 
-would have to pass the ecc_curve pointer all the way into vli_mmod_fast. 
-So this change here is preparing for this as well.
+Now queued up, thanks.
 
- š Stefan
-
-
+greg k-h
