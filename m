@@ -2,95 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DEBDC433E0
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Mar 2021 21:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02603C433E6
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Mar 2021 22:01:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 50A8564FFD
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Mar 2021 21:54:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C70BD6516F
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Mar 2021 22:01:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231142AbhCHVxg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Mar 2021 16:53:36 -0500
-Received: from mail-il1-f182.google.com ([209.85.166.182]:41148 "EHLO
-        mail-il1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230457AbhCHVxZ (ORCPT
+        id S230047AbhCHWBJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 8 Mar 2021 17:01:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42596 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229650AbhCHWAu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Mar 2021 16:53:25 -0500
-Received: by mail-il1-f182.google.com with SMTP id c10so10266044ilo.8;
-        Mon, 08 Mar 2021 13:53:24 -0800 (PST)
+        Mon, 8 Mar 2021 17:00:50 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C550BC06174A;
+        Mon,  8 Mar 2021 14:00:50 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id w18so8002065pfu.9;
+        Mon, 08 Mar 2021 14:00:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=6z4njqmMZ+DwPOGmWJZIpqGepW0eHMQJ/pIsjwxEZLk=;
+        b=holCDmIXdIHZxMwwDTqjo4oLDs+wJi7GiE4T/V4gofktpeVHUS9zljHZCp6RHTJ4HX
+         zJSwAgdxk4sZDIU1oOG6QaC0wn8w+vHUgn8/A2bRCHL6ALeDivZwOJaRo431fX3yfhY9
+         pepBDk7Tb4VmgSVi1sxcPQqpQAIuUd1bU/HGt/edej2xZl9ne1kDVuu4QaFIoI3CC7QQ
+         M5Fxachme2Mai22nDOThNgZyvxnhnIleExyZPYpDri0kwOdpK5JulwoEyYzHoKQpHwJm
+         JELbctlGlwKd3nfiaXdJGRyAE4JtsG84loXQ7yiEQ7O6HEVI4pLDMJr4GZOTUejMznF2
+         Q4gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=LX5PpicIOZawGnwZFfoDpkcC/MADa83hSMM3P3xoxmo=;
-        b=dzCm9T5PtHkGXEvDTDcc3nmTv8pqEKwYiMVB5WLzQ/4yWKCAApgqYLy/SnQUTzTfpC
-         izYADNWNgEQDbPe6G6NDLtaefP65WlO9vSB+cBZHAz45zUn2r/J1+qP4aGvzVPHY63jx
-         iUPvPTvot+TlHHd5O9unTRq8LsIOu3dL+MbnSgOfJInd3TK0XdqQUx2OMqyTuQhAItvv
-         7g3f1Tw8rghSG0rXyiGS5eMaz/H5LPyxOKhiMQyvLMDo1r20gjkf9Q3XwEo/QuWLlBFb
-         /BYl5WSMcvbbfPd/TZmEoE51SbJwDzKeQC0fxnnTuONuZRRHMMdWHdqK3WPjqiHSUY/o
-         hB0g==
-X-Gm-Message-State: AOAM530Oi/+1cR56dCVoeQGfRSrmkkShCxGQuGbaTa+u1OVz/SbaQIv8
-        o6cQoPi2lTuP/IIywbNDYA==
-X-Google-Smtp-Source: ABdhPJyN7vXM8TddFG1CDCKGglHi9zZzgm+iG3VF4UQDAI4HFs6mqLB3lobOg7yIiXWp5nsUuZjtLw==
-X-Received: by 2002:a05:6e02:1c2a:: with SMTP id m10mr21383555ilh.17.1615240404507;
-        Mon, 08 Mar 2021 13:53:24 -0800 (PST)
-Received: from robh.at.kernel.org ([64.188.179.253])
-        by smtp.gmail.com with ESMTPSA id u15sm6845506iln.84.2021.03.08.13.53.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Mar 2021 13:53:24 -0800 (PST)
-Received: (nullmailer pid 3019369 invoked by uid 1000);
-        Mon, 08 Mar 2021 21:53:22 -0000
-Date:   Mon, 8 Mar 2021 14:53:22 -0700
-From:   Rob Herring <robh@kernel.org>
-To:     =?iso-8859-1?Q?=C1lvaro_Fern=E1ndez?= Rojas <noltari@gmail.com>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        devicetree@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com,
-        Rikard Falkeborn <rikard.falkeborn@gmail.com>,
-        linux-rpi-kernel@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org,
-        Stefan Wahren <stefan.wahren@i2se.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Scott Branden <sbranden@broadcom.com>,
-        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
-        Tian Tao <tiantao6@hisilicon.com>, Ray Jui <rjui@broadcom.com>,
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=6z4njqmMZ+DwPOGmWJZIpqGepW0eHMQJ/pIsjwxEZLk=;
+        b=DyqTZ+clg10ddqdzA4x27aZMVZqSNuwkC8rNjv+h4WpW5YddBwEaRv7jsElIQleJzw
+         Q14xQe6TLGgo9NaiDFNlTO1RUFARkiac+zmE7XK6WitHtk7lXcmjj8AXUcdrVTHMeh0j
+         30V82MGojjUfSVM25kGRLTVhFYX7ASCzCPUD1s45LJ00Cp5qVazfSc6r/PegPP5WhH7l
+         G1LXyg1h1fxiiF6gGcp2jLhDx2dhKeC5uP9NUGnchZuIWhHx6UZ+B9LHXpfK7XdNwTtX
+         9QgYv5Ad7eukpQVjytZT+gJ4WzggEgQemF2/MxfTPf+LvK36BWNZefPijV5uF6gn/shs
+         5O4Q==
+X-Gm-Message-State: AOAM531j5C/mzgXdIROcg/P4kX8TkHaYHwWCk8+YRZZ9jQLLhvH2KSC9
+        urouxTcQoFmGwEC5C8Ylv23LaAMyv28=
+X-Google-Smtp-Source: ABdhPJywAeKzFawn0EKfgcKGFbomGus3wQHovVhP+cXvqYZgKoek4JIzkzvCda5UsHWUgxUsuFYwSQ==
+X-Received: by 2002:a63:fd01:: with SMTP id d1mr21337894pgh.319.1615240849966;
+        Mon, 08 Mar 2021 14:00:49 -0800 (PST)
+Received: from [10.67.49.104] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id 133sm11524949pfa.130.2021.03.08.14.00.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Mar 2021 14:00:49 -0800 (PST)
+Subject: Re: [PATCH v6 3/3] hwrng: bcm2835: add reset support
+To:     =?UTF-8?Q?=c3=81lvaro_Fern=c3=a1ndez_Rojas?= <noltari@gmail.com>,
         Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Lee Jones <lee.jones@linaro.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
         Alexandru Ardelean <alexandru.ardelean@analog.com>,
-        Lee Jones <lee.jones@linaro.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 2/3] dt-bindings: rng: bcm2835: document reset support
-Message-ID: <20210308215322.GA3019335@robh.at.kernel.org>
+        Rikard Falkeborn <rikard.falkeborn@gmail.com>,
+        Tian Tao <tiantao6@hisilicon.com>,
+        Stefan Wahren <stefan.wahren@i2se.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 References: <20210305070132.2986-1-noltari@gmail.com>
- <20210305070132.2986-3-noltari@gmail.com>
+ <20210305070132.2986-4-noltari@gmail.com>
+From:   Florian Fainelli <f.fainelli@gmail.com>
+Message-ID: <23d9ea3e-4eb2-a327-2b3c-bfb78a46007f@gmail.com>
+Date:   Mon, 8 Mar 2021 14:00:46 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <20210305070132.2986-4-noltari@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210305070132.2986-3-noltari@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 05 Mar 2021 08:01:31 +0100, ¡lvaro Fern·ndez Rojas wrote:
-> brcm,bcm6368-rng controllers require resetting the IPSEC clock in order to get
-> a functional RNG.
+On 3/4/21 11:01 PM, √Ålvaro Fern√°ndez Rojas wrote:
+> BCM6368 devices need to reset the IPSEC controller in order to generate true
+> random numbers.
 > 
-> Signed-off-by: ¡lvaro Fern·ndez Rojas <noltari@gmail.com>
-> ---
->  v6: fix dt-bindings warnings.
->  v5: no changes.
->  v4: pass dt_binding_check.
->  v3: make resets required if brcm,bcm6368-rng.
->  v2: document reset support.
+> This is what BCM6368 produces without a reset:
+> root@OpenWrt:/# cat /dev/hwrng | rngtest -c 1000
+> rngtest 6.10
+> Copyright (c) 2004 by Henrique de Moraes Holschuh
+> This is free software; see the source for copying conditions.  There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 > 
->  .../devicetree/bindings/rng/brcm,bcm2835.yaml         | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+> rngtest: starting FIPS tests...
+> rngtest: bits received from input: 20000032
+> rngtest: FIPS 140-2 successes: 0
+> rngtest: FIPS 140-2 failures: 1000
+> rngtest: FIPS 140-2(2001-10-10) Monobit: 2
+> rngtest: FIPS 140-2(2001-10-10) Poker: 1000
+> rngtest: FIPS 140-2(2001-10-10) Runs: 1000
+> rngtest: FIPS 140-2(2001-10-10) Long run: 30
+> rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+> rngtest: input channel speed: (min=37.253; avg=320.827; max=635.783)Mibits/s
+> rngtest: FIPS tests speed: (min=12.141; avg=15.034; max=16.428)Mibits/s
+> rngtest: Program run time: 1336176 microseconds
 > 
+> Signed-off-by: √Ålvaro Fern√°ndez Rojas <noltari@gmail.com>
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+Acked-by: Florian Fainelli <f.fainelli@gmail.com>
+-- 
+Florian
