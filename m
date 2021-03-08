@@ -2,192 +2,208 @@ Return-Path: <SRS0=SeGX=IG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F2FDC433DB
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Mar 2021 06:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18759C433E6
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Mar 2021 09:38:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 16392651EF
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Mar 2021 06:59:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5736651F1
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Mar 2021 09:38:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229829AbhCHG65 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Mar 2021 01:58:57 -0500
-Received: from out30-44.freemail.mail.aliyun.com ([115.124.30.44]:37923 "EHLO
-        out30-44.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229494AbhCHG65 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Mar 2021 01:58:57 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R911e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0UQr4yhY_1615186732;
-Received: from B-455UMD6M-2027.local(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UQr4yhY_1615186732)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 08 Mar 2021 14:58:53 +0800
-Subject: Re: [PATCH v9 2/9] x509: Detect sm2 keys by their parameters OID
-To:     Stefan Berger <stefanb@linux.ibm.com>
-Cc:     linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        David Howells <dhowells@redhat.com>,
-        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-References: <20210225160802.2478700-1-stefanb@linux.vnet.ibm.com>
- <20210225160802.2478700-3-stefanb@linux.vnet.ibm.com>
- <048e22c7-45e3-022c-cd5b-a6bc127958d3@linux.ibm.com>
- <4e584fe5-966f-a0e8-3542-8ef01d647101@linux.alibaba.com>
- <1b8e63ad-faa0-4b19-c515-32cbb160763a@linux.ibm.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <7590b698-3609-8061-6a06-dee1a338e16c@linux.alibaba.com>
-Date:   Mon, 8 Mar 2021 14:58:52 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.1
+        id S229813AbhCHJh5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 8 Mar 2021 04:37:57 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47010 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229671AbhCHJhr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 8 Mar 2021 04:37:47 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 54756651DE;
+        Mon,  8 Mar 2021 09:37:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1615196267;
+        bh=1wHBwyIuDfL2yqNrbWMWe8Hk65x6usXJSpXQMxbCLu8=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=b3UlCqrh62gp8/Ed3LvGNMofdzpnUw9Uv6N33lgz/UjWuUgB+HA33awBEIUo4/OHj
+         v97s6SPeP13wIwh3MJHRs6Aav+zN6YffM8/gTrfgjk7ogzXOv+yhhoIEBMCKRYKbG/
+         Np2qXNRRWe0XZ/TwIYh6LNZDC25pK+U4g6BGSfcqxYcrlFP+LdMxF904PLUO8qW1cz
+         x34sh74MqnIH7f4eEKxIJBLgQreQAkrISnz9IORhCcVPmaF36N1om6H+TloOrxvF1t
+         EE1RHJfeY1CkG7ZtLt63H2N7TO8sH9mBB29C/46cXGz1eUTJvMqsuOsfOkcP0ZbJyf
+         fS586nkIqTdGw==
+Received: by mail-oi1-f173.google.com with SMTP id v192so2752105oia.5;
+        Mon, 08 Mar 2021 01:37:47 -0800 (PST)
+X-Gm-Message-State: AOAM531l4R+S4lzMi9CJvc10BAJUTUziQmBzHEZjcVuBQ9bbkWNTRtCR
+        8OhQDJT6AaRw302CaY3Mwpz2t/Sygse7pwiBKjg=
+X-Google-Smtp-Source: ABdhPJzyEI02NLl9npoUaZhoVMPLCRyBpDqs6EFppsnk4m18f+wYCTuoOUf6+gVkrLFpQLdka9VZ9YeLmGTeieuiUDA=
+X-Received: by 2002:aca:538c:: with SMTP id h134mr16365025oib.174.1615196266632;
+ Mon, 08 Mar 2021 01:37:46 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1b8e63ad-faa0-4b19-c515-32cbb160763a@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <202102280353.5krQC7aq-lkp@intel.com> <20210308054132.GA14854@gondor.apana.org.au>
+In-Reply-To: <20210308054132.GA14854@gondor.apana.org.au>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Mon, 8 Mar 2021 10:37:35 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXHhCnxzkUYvF51cbaYJZz+6vAH5WVBqr__Oa_85bUFrNg@mail.gmail.com>
+Message-ID: <CAMj1kXHhCnxzkUYvF51cbaYJZz+6vAH5WVBqr__Oa_85bUFrNg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: aegis128 - Move simd prototypes into aegis.h
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     kernel test robot <lkp@intel.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        kbuild-all@lists.01.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+On Mon, 8 Mar 2021 at 06:42, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Sun, Feb 28, 2021 at 03:14:55AM +0800, kernel test robot wrote:
+> > tree:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+> > head:   5695e51619745d4fe3ec2506a2f0cd982c5e27a4
+> > commit: a4397635afea5d127548d64e0055ed471ef2d5be crypto: aegis128 - provide a SIMD implementation based on NEON intrinsics
+> > date:   1 year, 6 months ago
+> > config: arm64-randconfig-r035-20210226 (attached as .config)
+> > compiler: aarch64-linux-gcc (GCC) 9.3.0
+> > reproduce (this is a W=1 build):
+> >         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+> >         chmod +x ~/bin/make.cross
+> >         # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a4397635afea5d127548d64e0055ed471ef2d5be
+> >         git remote add linus https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+> >         git fetch --no-tags linus master
+> >         git checkout a4397635afea5d127548d64e0055ed471ef2d5be
+> >         # save the attached .config to linux build tree
+> >         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-9.3.0 make.cross ARCH=arm64
+> >
+> > If you fix the issue, kindly add following tag as appropriate
+> > Reported-by: kernel test robot <lkp@intel.com>
+> >
+> > All warnings (new ones prefixed by >>):
+> >
+> > >> crypto/aegis128-neon.c:17:6: warning: no previous prototype for 'crypto_aegis128_have_simd' [-Wmissing-prototypes]
+> >       17 | bool crypto_aegis128_have_simd(void)
+> >          |      ^~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> ---8<---
+> This patch fixes missing prototype warnings in crypto/aegis128-neon.c.
+>
+> Fixes: a4397635afea ("crypto: aegis128 - provide a SIMD...")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-On 3/5/21 11:04 PM, Stefan Berger wrote:
-> On 3/5/21 2:37 AM, Tianjia Zhang wrote:
->> Hi,
->>
->> On 3/4/21 7:46 AM, Stefan Berger wrote:
->>> Tianjia,
->>>
->>>     can you say whether SM2 support works for you before and after 
->>> applying this patch? I cannot verify it with an sm2 key I have 
->>> created using a sequence of commands like this:
->>>
->>>  > modprobe sm2_generic
->>>  > id=$(keyctl newring test @u)
->>>  > keyctl padd asymmetric "" $id < sm2.der
->>> add_key: Key was rejected by service
->>>  > keyctl padd asymmetric "" $id < eckeys/cert-prime192v1-0.der
->>> 88506426
->>>
->>> The sm2 key is reject but the pime192v1 key works just fine. SM2 
->>> support neither worked for me before nor after this patch here. The 
->>> difference is that before it returned 'add_key: Package not installed'.
->>>
->>> This is my sm2 cert:
->>>
->>>  > base64 < sm2.der
->>> MIIBbzCCARWgAwIBAgIUfqwndeAy7reymWLwvCHOgYPU2YUwCgYIKoZIzj0EAwIwDTELMAkGA1UE 
->>>
->>> AwwCbWUwHhcNMjEwMTI0MTgwNjQ3WhcNMjIwMTI0MTgwNjQ3WjANMQswCQYDVQQDDAJtZTBZMBMG 
->>>
->>> ByqGSM49AgEGCCqBHM9VAYItA0IABEtiMaczdk46MEugmOsY/u+puf5qoi7JdLd/w3VpdixvDd26 
->>>
->>> vrxLKL7lCTVn5w3a07G7QB1dgdMDpzIRgWrVXC6jUzBRMB0GA1UdDgQWBBSxOVnE7ihvTb6Nczb4 
->>>
->>> /mow+HIc9TAfBgNVHSMEGDAWgBSxOVnE7ihvTb6Nczb4/mow+HIc9TAPBgNVHRMBAf8EBTADAQH/ 
->>>
->>> MAoGCCqGSM49BAMCA0gAMEUCIE1kiji2ABUy663NANe0iCPjCeeqg02Yk4b3K+Ci/Qh4AiEA/cFB 
->>>
->>> eJEVklyveRMvuTP7BN7FG4U8iRdtedjiX+YrNio=
->>>
->>> Regards,
->>>     Stefan
->>>
->>
->> Yes, it works fine here. Your test method may be wrong. First of all, 
->> the certificate looks wrong, I don’t know if it is not sent 
->> completely. Secondly, the SM2 algorithm must be compiled with builtin. 
->> There will be a problem when it is compiled into a module. This is a 
->> restriction for SM2 signature with Za. you may refer to this discussion:
->>
->> https://lkml.org/lkml/2021/1/12/1736
->>
->> In addition, give you a self-signed root certificate for my test:
->>
->> -----BEGIN CERTIFICATE-----
->> MIICLjCCAdWgAwIBAgIUEoozP6LzMYWh4gCpcWlzsUyfgsIwCgYIKoEcz1UBg3Uw
->> bTELMAkGA1UEBhMCQ04xCzAJBgNVBAgMAkdTMQswCQYDVQQHDAJHdDENMAsGA1UE
->> CgwEYmFiYTELMAkGA1UECwwCT1MxCzAJBgNVBAMMAmNhMRswGQYJKoZIhvcNAQkB
->> FgxjYUB3b3JsZC5jb20wHhcNMjAwNDE1MTE1NDA3WhcNMzAwNDEzMTE1NDA3WjBt
->> MQswCQYDVQQGEwJDTjELMAkGA1UECAwCR1MxCzAJBgNVBAcMAkd0MQ0wCwYDVQQK
->> DARiYWJhMQswCQYDVQQLDAJPUzELMAkGA1UEAwwCY2ExGzAZBgkqhkiG9w0BCQEW
->> DGNhQHdvcmxkLmNvbTBZMBMGByqGSM49AgEGCCqBHM9VAYItA0IABMTGRiHezKm5
->> MiKHlyfa5Bv5jLxge/WRRG0nLNsZx1yf0XQTQBR/tFFjPGePEr7+Fa1CPgYpXExx
->> i44coYMmQT6jUzBRMB0GA1UdDgQWBBSjd9GWIe98Ll9J0dquxgCktp9DrTAfBgNV
->> HSMEGDAWgBSjd9GWIe98Ll9J0dquxgCktp9DrTAPBgNVHRMBAf8EBTADAQH/MAoG
->> CCqBHM9VAYN1A0cAMEQCIAvLWIfGFq85u/vVMLc5H1D/DnrNS0VhSkQA4daRO4tc
->> AiABbeWENcQZDZLWTuqG9P2KDPOoNqV/QV/+0XjMAVblhg==
->> -----END CERTIFICATE-----
->>
->> If you can, please add:
->>
->> Tested-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->>
->> good luck!
-> 
-> 
-> It works with your certificate! When I create the sm2 with OpenSSL on 
-> Ubuntu, which seems to have sm2 support, or so one may think, I get this 
-> type of signature:
-> 
-> 
-> I cannot create it with sm3, if that's how this is supposed to be signed:
-> 
->  > # openssl req -x509 -sm3 -newkey ec -pkeyopt ec_paramgen_curve:sm2 
-> -keyout sm2key.pem -days 365 -subj '/CN=test' -nodes -outform der -out 
-> sm2.der
-> parameter error "ec_paramgen_curve:sm2"
-> 140735899258064:error:100AE081:elliptic curve 
-> routines:EC_GROUP_new_by_curve_name:unknown group:crypto/ec/ec_curve.c:418:
-> 140735899258064:error:100C508D:elliptic curve 
-> routines:pkey_ec_ctrl:invalid curve:crypto/ec/ec_pmeth.c:231:
-> 
-> 
-> Using sha256 instead, which is the mistake:
-> 
->  > openssl req -x509 -sha256 -newkey ec -pkeyopt ec_paramgen_curve:sm2 
-> -keyout sm2key.pem -days 365 -subj '/CN=test' -nodes -outform der -out 
-> sm2-2nd.der
-> 
->  > openssl x509 -inform der -in sm2-2nd.der -noout -text
-> 
-> [...]
-> 
->      Signature Algorithm: ecdsa-with-SHA256
->           30:45:02:20:05:72:15:b0:e8:f5:5a:27:d2:fb:f9:de:de:35:
->           05:b2:76:8a:6f:84:c1:54:db:c2:38:8c:d2:64:8b:67:23:01:
->           02:21:00:97:77:9e:42:fa:41:3d:d4:81:5e:5b:ad:9e:56:ad:
->           46:fc:5e:94:92:a6:07:2d:af:62:d2:2d:39:7b:71:f1:4a
-> 
-> 
-> Yours has this type of signature:
-> 
->      Signature Algorithm: 1.2.156.10197.1.501
->           30:44:02:20:0b:cb:58:87:c6:16:af:39:bb:fb:d5:30:b7:39:
->           1f:50:ff:0e:7a:cd:4b:45:61:4a:44:00:e1:d6:91:3b:8b:5c:
->           02:20:01:6d:e5:84:35:c4:19:0d:92:d6:4e:ea:86:f4:fd:8a:
->           0c:f3:a8:36:a5:7f:41:5f:fe:d1:78:cc:01:56:e5:86
-> 
-> Thanks anyway!
-> 
-> 
->     Stefan
-> 
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
-I guess it may be that your openssl version is too low. At present, only 
-openssl 3.0.0 (still in the alpha stage and not yet officially released) 
-can support the certificate of the SM2-with-SM3 algorithm combination.
-
-This is the command I used in openssl-3.0.0-alpha6:
-
-openssl ecparam -genkey -name SM2 -text -out ca.key
-openssl req -new \
-     -x509 -days 3650 \
-     -sm3 -sigopt "distid:1234567812345678" \
-     -key ca.key \
-     -out ca.crt \
-     -subj "/C=CN/ST=GS/L=Gt/O=baba/OU=OS/CN=ca/emailAddress=ca@world.com"
+>
+> diff --git a/crypto/aegis.h b/crypto/aegis.h
+> index 6920ebe77679..6ef9c174c973 100644
+> --- a/crypto/aegis.h
+> +++ b/crypto/aegis.h
+> @@ -21,9 +21,28 @@ union aegis_block {
+>         u8 bytes[AEGIS_BLOCK_SIZE];
+>  };
+>
+> +struct aegis_state;
+> +
+> +extern int aegis128_have_aes_insn;
+> +
+>  #define AEGIS_BLOCK_ALIGN (__alignof__(union aegis_block))
+>  #define AEGIS_ALIGNED(p) IS_ALIGNED((uintptr_t)p, AEGIS_BLOCK_ALIGN)
+>
+> +bool crypto_aegis128_have_simd(void);
+> +void crypto_aegis128_update_simd(struct aegis_state *state, const void *msg);
+> +void crypto_aegis128_init_simd(struct aegis_state *state,
+> +                              const union aegis_block *key,
+> +                              const u8 *iv);
+> +void crypto_aegis128_encrypt_chunk_simd(struct aegis_state *state, u8 *dst,
+> +                                       const u8 *src, unsigned int size);
+> +void crypto_aegis128_decrypt_chunk_simd(struct aegis_state *state, u8 *dst,
+> +                                       const u8 *src, unsigned int size);
+> +int crypto_aegis128_final_simd(struct aegis_state *state,
+> +                              union aegis_block *tag_xor,
+> +                              unsigned int assoclen,
+> +                              unsigned int cryptlen,
+> +                              unsigned int authsize);
+> +
+>  static __always_inline void crypto_aegis_block_xor(union aegis_block *dst,
+>                                                    const union aegis_block *src)
+>  {
+> diff --git a/crypto/aegis128-core.c b/crypto/aegis128-core.c
+> index 89dc1c559689..c4f1bfa1d04f 100644
+> --- a/crypto/aegis128-core.c
+> +++ b/crypto/aegis128-core.c
+> @@ -58,21 +58,6 @@ static bool aegis128_do_simd(void)
+>         return false;
+>  }
+>
+> -bool crypto_aegis128_have_simd(void);
+> -void crypto_aegis128_update_simd(struct aegis_state *state, const void *msg);
+> -void crypto_aegis128_init_simd(struct aegis_state *state,
+> -                              const union aegis_block *key,
+> -                              const u8 *iv);
+> -void crypto_aegis128_encrypt_chunk_simd(struct aegis_state *state, u8 *dst,
+> -                                       const u8 *src, unsigned int size);
+> -void crypto_aegis128_decrypt_chunk_simd(struct aegis_state *state, u8 *dst,
+> -                                       const u8 *src, unsigned int size);
+> -int crypto_aegis128_final_simd(struct aegis_state *state,
+> -                              union aegis_block *tag_xor,
+> -                              unsigned int assoclen,
+> -                              unsigned int cryptlen,
+> -                              unsigned int authsize);
+> -
+>  static void crypto_aegis128_update(struct aegis_state *state)
+>  {
+>         union aegis_block tmp;
+> diff --git a/crypto/aegis128-neon.c b/crypto/aegis128-neon.c
+> index 94d591a002a4..a7856915ec85 100644
+> --- a/crypto/aegis128-neon.c
+> +++ b/crypto/aegis128-neon.c
+> @@ -30,7 +30,7 @@ bool crypto_aegis128_have_simd(void)
+>         return IS_ENABLED(CONFIG_ARM64);
+>  }
+>
+> -void crypto_aegis128_init_simd(union aegis_block *state,
+> +void crypto_aegis128_init_simd(struct aegis_state *state,
+>                                const union aegis_block *key,
+>                                const u8 *iv)
+>  {
+> @@ -39,14 +39,14 @@ void crypto_aegis128_init_simd(union aegis_block *state,
+>         kernel_neon_end();
+>  }
+>
+> -void crypto_aegis128_update_simd(union aegis_block *state, const void *msg)
+> +void crypto_aegis128_update_simd(struct aegis_state *state, const void *msg)
+>  {
+>         kernel_neon_begin();
+>         crypto_aegis128_update_neon(state, msg);
+>         kernel_neon_end();
+>  }
+>
+> -void crypto_aegis128_encrypt_chunk_simd(union aegis_block *state, u8 *dst,
+> +void crypto_aegis128_encrypt_chunk_simd(struct aegis_state *state, u8 *dst,
+>                                         const u8 *src, unsigned int size)
+>  {
+>         kernel_neon_begin();
+> @@ -54,7 +54,7 @@ void crypto_aegis128_encrypt_chunk_simd(union aegis_block *state, u8 *dst,
+>         kernel_neon_end();
+>  }
+>
+> -void crypto_aegis128_decrypt_chunk_simd(union aegis_block *state, u8 *dst,
+> +void crypto_aegis128_decrypt_chunk_simd(struct aegis_state *state, u8 *dst,
+>                                         const u8 *src, unsigned int size)
+>  {
+>         kernel_neon_begin();
+> @@ -62,7 +62,7 @@ void crypto_aegis128_decrypt_chunk_simd(union aegis_block *state, u8 *dst,
+>         kernel_neon_end();
+>  }
+>
+> -int crypto_aegis128_final_simd(union aegis_block *state,
+> +int crypto_aegis128_final_simd(struct aegis_state *state,
+>                                union aegis_block *tag_xor,
+>                                unsigned int assoclen,
+>                                unsigned int cryptlen,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
