@@ -1,209 +1,133 @@
-Return-Path: <SRS0=SeGX=IG=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18759C433E6
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Mar 2021 09:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEAB1C433DB
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Mar 2021 17:05:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E5736651F1
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Mar 2021 09:38:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78D1364FB8
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Mar 2021 17:05:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229813AbhCHJh5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Mar 2021 04:37:57 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47010 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229671AbhCHJhr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Mar 2021 04:37:47 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 54756651DE;
-        Mon,  8 Mar 2021 09:37:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615196267;
-        bh=1wHBwyIuDfL2yqNrbWMWe8Hk65x6usXJSpXQMxbCLu8=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=b3UlCqrh62gp8/Ed3LvGNMofdzpnUw9Uv6N33lgz/UjWuUgB+HA33awBEIUo4/OHj
-         v97s6SPeP13wIwh3MJHRs6Aav+zN6YffM8/gTrfgjk7ogzXOv+yhhoIEBMCKRYKbG/
-         Np2qXNRRWe0XZ/TwIYh6LNZDC25pK+U4g6BGSfcqxYcrlFP+LdMxF904PLUO8qW1cz
-         x34sh74MqnIH7f4eEKxIJBLgQreQAkrISnz9IORhCcVPmaF36N1om6H+TloOrxvF1t
-         EE1RHJfeY1CkG7ZtLt63H2N7TO8sH9mBB29C/46cXGz1eUTJvMqsuOsfOkcP0ZbJyf
-         fS586nkIqTdGw==
-Received: by mail-oi1-f173.google.com with SMTP id v192so2752105oia.5;
-        Mon, 08 Mar 2021 01:37:47 -0800 (PST)
-X-Gm-Message-State: AOAM531l4R+S4lzMi9CJvc10BAJUTUziQmBzHEZjcVuBQ9bbkWNTRtCR
-        8OhQDJT6AaRw302CaY3Mwpz2t/Sygse7pwiBKjg=
-X-Google-Smtp-Source: ABdhPJzyEI02NLl9npoUaZhoVMPLCRyBpDqs6EFppsnk4m18f+wYCTuoOUf6+gVkrLFpQLdka9VZ9YeLmGTeieuiUDA=
-X-Received: by 2002:aca:538c:: with SMTP id h134mr16365025oib.174.1615196266632;
- Mon, 08 Mar 2021 01:37:46 -0800 (PST)
+        id S229690AbhCHREe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 8 Mar 2021 12:04:34 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53884 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229650AbhCHRET (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 8 Mar 2021 12:04:19 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 128H3sGJ125483;
+        Mon, 8 Mar 2021 12:04:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=j3z0BrGwRD1VmA8bd9vyTkFINn0wCAo42neIz5HC674=;
+ b=ob5SVBsJ5cVnWL0bq2cx2uOBadY2j3EAteR1bS+7/+l5GOtmEKA0tBeQTkWv1AhNfRJy
+ x3MbNm+AuCbrDB4Q1fFDycHwsJXZz5SiaqWEOcqUbyB6EsVk+IRISg/5/AdPBqTnMGHN
+ mx4uEu5GOZ5LMmxrbXQe9+KGeLCOf3+a5M/Rs6b+zFSrDyM68rRgXIprS/ZzeBc3p6bo
+ Jy15xqPJZ352hlij/JnfXJ8MzYF8e1WY86A3Eop+bSKZL6rzvVluqGG2hPW547OUQIB3
+ 9j0D0mgg9g7Q9Gk0ta4C0E8dE9DbnRsh+ThKMC9OTjEQ+4gD9RnD1ioqU/lD1cs3lHcV nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 375qh6rkku-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Mar 2021 12:04:06 -0500
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 128H404r125898;
+        Mon, 8 Mar 2021 12:04:05 -0500
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 375qh6rjqg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Mar 2021 12:04:05 -0500
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 128Gaqkp015654;
+        Mon, 8 Mar 2021 17:00:07 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma01wdc.us.ibm.com with ESMTP id 3741c883b0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Mar 2021 17:00:07 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 128H06Xw42664236
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 8 Mar 2021 17:00:06 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 26BD813605E;
+        Mon,  8 Mar 2021 17:00:06 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 93254136068;
+        Mon,  8 Mar 2021 17:00:05 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon,  8 Mar 2021 17:00:05 +0000 (GMT)
+Subject: Re: [PATCH v11 02/10] crypto: Add support for ECDSA signature
+ verification
+To:     Stefan Berger <stefanb@linux.vnet.ibm.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, herbert@gondor.apana.org.au,
+        dhowells@redhat.com, zohar@linux.ibm.com, jarkko@kernel.org
+Cc:     linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
+        linux-integrity@vger.kernel.org
+References: <20210305205956.3594375-1-stefanb@linux.vnet.ibm.com>
+ <20210305205956.3594375-3-stefanb@linux.vnet.ibm.com>
+From:   Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <8d7b4ee1-cf71-ce2d-abaf-2ad1e472f1af@linux.ibm.com>
+Date:   Mon, 8 Mar 2021 12:00:05 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-References: <202102280353.5krQC7aq-lkp@intel.com> <20210308054132.GA14854@gondor.apana.org.au>
-In-Reply-To: <20210308054132.GA14854@gondor.apana.org.au>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Mon, 8 Mar 2021 10:37:35 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXHhCnxzkUYvF51cbaYJZz+6vAH5WVBqr__Oa_85bUFrNg@mail.gmail.com>
-Message-ID: <CAMj1kXHhCnxzkUYvF51cbaYJZz+6vAH5WVBqr__Oa_85bUFrNg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: aegis128 - Move simd prototypes into aegis.h
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     kernel test robot <lkp@intel.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        kbuild-all@lists.01.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210305205956.3594375-3-stefanb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-08_14:2021-03-08,2021-03-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=999 bulkscore=0 phishscore=0 priorityscore=1501 suspectscore=0
+ mlxscore=0 spamscore=0 impostorscore=0 adultscore=0 lowpriorityscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103080091
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 8 Mar 2021 at 06:42, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Sun, Feb 28, 2021 at 03:14:55AM +0800, kernel test robot wrote:
-> > tree:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
-> > head:   5695e51619745d4fe3ec2506a2f0cd982c5e27a4
-> > commit: a4397635afea5d127548d64e0055ed471ef2d5be crypto: aegis128 - provide a SIMD implementation based on NEON intrinsics
-> > date:   1 year, 6 months ago
-> > config: arm64-randconfig-r035-20210226 (attached as .config)
-> > compiler: aarch64-linux-gcc (GCC) 9.3.0
-> > reproduce (this is a W=1 build):
-> >         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-> >         chmod +x ~/bin/make.cross
-> >         # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a4397635afea5d127548d64e0055ed471ef2d5be
-> >         git remote add linus https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-> >         git fetch --no-tags linus master
-> >         git checkout a4397635afea5d127548d64e0055ed471ef2d5be
-> >         # save the attached .config to linux build tree
-> >         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-9.3.0 make.cross ARCH=arm64
-> >
-> > If you fix the issue, kindly add following tag as appropriate
-> > Reported-by: kernel test robot <lkp@intel.com>
-> >
-> > All warnings (new ones prefixed by >>):
-> >
-> > >> crypto/aegis128-neon.c:17:6: warning: no previous prototype for 'crypto_aegis128_have_simd' [-Wmissing-prototypes]
-> >       17 | bool crypto_aegis128_have_simd(void)
-> >          |      ^~~~~~~~~~~~~~~~~~~~~~~~~
->
-> ---8<---
-> This patch fixes missing prototype warnings in crypto/aegis128-neon.c.
->
-> Fixes: a4397635afea ("crypto: aegis128 - provide a SIMD...")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+On 3/5/21 3:59 PM, Stefan Berger wrote:
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index a367fcfeb5d4..a31df40591f5 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -247,6 +247,16 @@ config CRYPTO_ECDH
+>   	help
+>   	  Generic implementation of the ECDH algorithm
+>   
+> @@ -70,6 +72,30 @@ struct ecc_curve {
+>   	u64 *b;
+>   };
+>   
+> +/**
+> + * ecc_swap_digits() - Copy ndigits from big endian array to native array
+> + * @in:       Input array
+> + * @out:      Output array
+> + * @ndigits:  Number of digits to copy
+> + */
+> +static inline void ecc_swap_digits(const u64 *in, u64 *out, unsigned int ndigits)
+> +{
+> +	const __be64 *src = (__force __be64 *)in;
+> +	int i;
+> +
+> +	for (i = 0; i < ndigits; i++)
+> +		out[i] = be64_to_cpu(src[ndigits - 1 - i]);
+> +}
+> +
+> +/**
+> + * ecc_get_curve()  - Get a curve given its curve_id
+> + *
 
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+There's still an additional empty line here (as is the case with other 
+existing functions in this file). I will fix this one in v12.
 
->
-> diff --git a/crypto/aegis.h b/crypto/aegis.h
-> index 6920ebe77679..6ef9c174c973 100644
-> --- a/crypto/aegis.h
-> +++ b/crypto/aegis.h
-> @@ -21,9 +21,28 @@ union aegis_block {
->         u8 bytes[AEGIS_BLOCK_SIZE];
->  };
->
-> +struct aegis_state;
-> +
-> +extern int aegis128_have_aes_insn;
-> +
->  #define AEGIS_BLOCK_ALIGN (__alignof__(union aegis_block))
->  #define AEGIS_ALIGNED(p) IS_ALIGNED((uintptr_t)p, AEGIS_BLOCK_ALIGN)
->
-> +bool crypto_aegis128_have_simd(void);
-> +void crypto_aegis128_update_simd(struct aegis_state *state, const void *msg);
-> +void crypto_aegis128_init_simd(struct aegis_state *state,
-> +                              const union aegis_block *key,
-> +                              const u8 *iv);
-> +void crypto_aegis128_encrypt_chunk_simd(struct aegis_state *state, u8 *dst,
-> +                                       const u8 *src, unsigned int size);
-> +void crypto_aegis128_decrypt_chunk_simd(struct aegis_state *state, u8 *dst,
-> +                                       const u8 *src, unsigned int size);
-> +int crypto_aegis128_final_simd(struct aegis_state *state,
-> +                              union aegis_block *tag_xor,
-> +                              unsigned int assoclen,
-> +                              unsigned int cryptlen,
-> +                              unsigned int authsize);
-> +
->  static __always_inline void crypto_aegis_block_xor(union aegis_block *dst,
->                                                    const union aegis_block *src)
->  {
-> diff --git a/crypto/aegis128-core.c b/crypto/aegis128-core.c
-> index 89dc1c559689..c4f1bfa1d04f 100644
-> --- a/crypto/aegis128-core.c
-> +++ b/crypto/aegis128-core.c
-> @@ -58,21 +58,6 @@ static bool aegis128_do_simd(void)
->         return false;
->  }
->
-> -bool crypto_aegis128_have_simd(void);
-> -void crypto_aegis128_update_simd(struct aegis_state *state, const void *msg);
-> -void crypto_aegis128_init_simd(struct aegis_state *state,
-> -                              const union aegis_block *key,
-> -                              const u8 *iv);
-> -void crypto_aegis128_encrypt_chunk_simd(struct aegis_state *state, u8 *dst,
-> -                                       const u8 *src, unsigned int size);
-> -void crypto_aegis128_decrypt_chunk_simd(struct aegis_state *state, u8 *dst,
-> -                                       const u8 *src, unsigned int size);
-> -int crypto_aegis128_final_simd(struct aegis_state *state,
-> -                              union aegis_block *tag_xor,
-> -                              unsigned int assoclen,
-> -                              unsigned int cryptlen,
-> -                              unsigned int authsize);
-> -
->  static void crypto_aegis128_update(struct aegis_state *state)
->  {
->         union aegis_block tmp;
-> diff --git a/crypto/aegis128-neon.c b/crypto/aegis128-neon.c
-> index 94d591a002a4..a7856915ec85 100644
-> --- a/crypto/aegis128-neon.c
-> +++ b/crypto/aegis128-neon.c
-> @@ -30,7 +30,7 @@ bool crypto_aegis128_have_simd(void)
->         return IS_ENABLED(CONFIG_ARM64);
->  }
->
-> -void crypto_aegis128_init_simd(union aegis_block *state,
-> +void crypto_aegis128_init_simd(struct aegis_state *state,
->                                const union aegis_block *key,
->                                const u8 *iv)
->  {
-> @@ -39,14 +39,14 @@ void crypto_aegis128_init_simd(union aegis_block *state,
->         kernel_neon_end();
->  }
->
-> -void crypto_aegis128_update_simd(union aegis_block *state, const void *msg)
-> +void crypto_aegis128_update_simd(struct aegis_state *state, const void *msg)
->  {
->         kernel_neon_begin();
->         crypto_aegis128_update_neon(state, msg);
->         kernel_neon_end();
->  }
->
-> -void crypto_aegis128_encrypt_chunk_simd(union aegis_block *state, u8 *dst,
-> +void crypto_aegis128_encrypt_chunk_simd(struct aegis_state *state, u8 *dst,
->                                         const u8 *src, unsigned int size)
->  {
->         kernel_neon_begin();
-> @@ -54,7 +54,7 @@ void crypto_aegis128_encrypt_chunk_simd(union aegis_block *state, u8 *dst,
->         kernel_neon_end();
->  }
->
-> -void crypto_aegis128_decrypt_chunk_simd(union aegis_block *state, u8 *dst,
-> +void crypto_aegis128_decrypt_chunk_simd(struct aegis_state *state, u8 *dst,
->                                         const u8 *src, unsigned int size)
->  {
->         kernel_neon_begin();
-> @@ -62,7 +62,7 @@ void crypto_aegis128_decrypt_chunk_simd(union aegis_block *state, u8 *dst,
->         kernel_neon_end();
->  }
->
-> -int crypto_aegis128_final_simd(union aegis_block *state,
-> +int crypto_aegis128_final_simd(struct aegis_state *state,
->                                union aegis_block *tag_xor,
->                                unsigned int assoclen,
->                                unsigned int cryptlen,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
