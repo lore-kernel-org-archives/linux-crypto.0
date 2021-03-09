@@ -2,127 +2,140 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52326C433E6
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Mar 2021 06:46:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A99CC433DB
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Mar 2021 08:13:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0DEB765299
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Mar 2021 06:46:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0991865287
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Mar 2021 08:13:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229764AbhCIGqC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Mar 2021 01:46:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42828 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229637AbhCIGqA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Mar 2021 01:46:00 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EFD0C06174A;
-        Mon,  8 Mar 2021 22:46:00 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id l12so13972562wry.2;
-        Mon, 08 Mar 2021 22:46:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=HSvFlw53ZQJ3UGmAhTTbZ6eZK5u9qhEy+Nh7KExbccc=;
-        b=fy29+zfeZNIkS+o2CIi1qqh67fyRSIUwPGasxaXHbIs1vlhVx7gySfrZ+K0eFbadlf
-         zVLHFAAHorvgDakN77jc+PQ19hU883vh3XcFLWHj7YE85LlfWIOArDAfSn0Nb3f0sWCM
-         9pBaipmXlVkS/8KYbssiaNZoA20jxxYeEoFzBBCfpmLfpiaqJSSeyBVCntTmm4tupAla
-         ZQ3l4N11Yn//zKlIWyYcS23CAcYgaaC1T5PtGnmEUM+emhvWdxGai7eXPHoHIOl71HUY
-         9agn4bqkO+X4hmVXjrxyyKIfKRoCqdebXJm3KxV7dkeq6BAdGrJsNET8BueHiTTdeIZE
-         TG0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=HSvFlw53ZQJ3UGmAhTTbZ6eZK5u9qhEy+Nh7KExbccc=;
-        b=tY+Dm50klBacBZ5iHrhsy/wAmWyyQ+v9PSkWLuds6k8D4HBrwIQRFZ9xYAhQwO7I5f
-         j1uu4p1Zj/xssi67noS/dTmWKwSILcSvt8PQPwJJc1glQomkuOO7vnDRxquj0iAuJrRj
-         TdUSBVjTWrkt0DskzQtmts1j1U/h/4mQeNKKBgLoKUuUU1oCD3djbT9F9qAOfpS+Ggvp
-         vnGJ9+CZhEHeS/C43SE58M36VN0nLlMyEXb0nYpzLcNAxwKH+sv1w8IqKH3R+s9US+7i
-         wdbOQsxA8D3gDOuUajTLQjVVp84RuepzOiidS4dsrMnG3Gz/aPK2xdeTmCipgSDLCow1
-         eezw==
-X-Gm-Message-State: AOAM531StwEm5oVVvndmpc/o2BDtFp//0Pc7cQjFnV9fb5CB9MGtUK+O
-        tBULK9ZuYkyE1OjaDMlqkXQ=
-X-Google-Smtp-Source: ABdhPJzUHnqLkbm99mxf5QOHQ/QZEt2V1WJETLm9RyVeVyR3yjzlOIJJysXauA9TXWSPw+wEDKUPEA==
-X-Received: by 2002:a05:6000:1547:: with SMTP id 7mr26513480wry.301.1615272359215;
-        Mon, 08 Mar 2021 22:45:59 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id c128sm2414351wma.37.2021.03.08.22.45.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Mar 2021 22:45:58 -0800 (PST)
-Date:   Tue, 9 Mar 2021 07:45:57 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Colin King <colin.king@canonical.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        id S229599AbhCIIM1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 Mar 2021 03:12:27 -0500
+Received: from mail-co1nam11on2064.outbound.protection.outlook.com ([40.107.220.64]:5550
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229480AbhCIILt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 9 Mar 2021 03:11:49 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ivz1iX4xyH/7yXOnl773/sgkIePGTImLHiqpC2FAeFrM1ieq+YmrUwwRL/dMgCG6NGqqhKMT9LEOuQslViPsf9GhVS6i360LVfbO6kBq6p9GSPUL66a442Wv8WX5zmbpoA/6r0c9EeRLzMM3OmIorP6kT9uEueOnwsps1ewgownr9jEr0Pp7jbwTxPBZp8Kuyf8riOI4uuFtTTO7xOb77DEs5ZnGshWMsivGwG0bp31nlloMfip7i45ys8b+0IRbdORfyyLJ21A+UZVwPMc8nDFP6mKb37Ro2PGddSIYahwxBRKUuh/I6tdV1XXS76PCskxJdfr+SEPt0ZpK7ATPaQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qQGvOkESHeegcylNM+DfLV/WmquY+oXdUmvZKBiVEbc=;
+ b=niJk+HcSkLVbx7anoNf1dm3CmnL437RoC+kpUIkNFSsj6gO7GTWa2SeTU+vlpUPTTZkdAYeL1sJJjA4cG5w/zfj36fUF+ZnwFzvy4GvDpXbnQcwXlrVzYFd8ig+DxfErITJkYej8qDUJxoPtrpPZitzLY2gJbv6VSh7m9osGvcm+ZwbbiDvqXMCOEeRBgAQIURO3rzfeN/uCDemGpzus088lFtOym9i0AaiqVRxgEeneXQV3LkIfsagDazurDMupHCKEt5pnEaf12S2LndXzdpo29/YRieBKCrJnr1MbBUGv11NCCVNjg2nknWZPZWH0dRVeNjkh5pX0f+mPshFYaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qQGvOkESHeegcylNM+DfLV/WmquY+oXdUmvZKBiVEbc=;
+ b=3UvP0FG9YCE74MN5c0YRBJltrtN6pPoAcMxs/Ug6t++sPPyxui+o1+3/pAT4jdbQQyvKUIBrB2hiux01Khj0V3lnsuh6ROuPr5fwJkAKUNH0gv5ZETu2Jt6OZ+oy+8CXLyvHi005FiS6MPN2kur8ow6Naou4VKXbRC4U8dlAb4k=
+Authentication-Results: amd.com; dkim=none (message not signed)
+ header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB4719.namprd12.prod.outlook.com (2603:10b6:805:e9::25)
+ by SA0PR12MB4397.namprd12.prod.outlook.com (2603:10b6:806:93::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.20; Tue, 9 Mar
+ 2021 08:11:45 +0000
+Received: from SN6PR12MB4719.namprd12.prod.outlook.com
+ ([fe80::c32:245b:4812:ee03]) by SN6PR12MB4719.namprd12.prod.outlook.com
+ ([fe80::c32:245b:4812:ee03%3]) with mapi id 15.20.3912.027; Tue, 9 Mar 2021
+ 08:11:45 +0000
+From:   Rijo Thomas <Rijo-john.Thomas@amd.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Jernej Skrabec <jernej.skrabec@siol.net>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: sun8i-ss: Fix memory leak of object d when
- dma_iv fails to map
-Message-ID: <YEcZpUg1WJBm2/1S@Red>
-References: <20210302163446.21047-1-colin.king@canonical.com>
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     Rijo Thomas <Rijo-john.Thomas@amd.com>,
+        Mythri Pandeshwara krishna <mythri.pandeshwarakrishna@amd.com>,
+        Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 0/3] PSP TEE driver update and bug fixes
+Date:   Tue,  9 Mar 2021 13:41:10 +0530
+Message-Id: <cover.1615276206.git.Rijo-john.Thomas@amd.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-Originating-IP: [165.204.156.251]
+X-ClientProxiedBy: MA1PR0101CA0068.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a00:20::30) To SN6PR12MB4719.namprd12.prod.outlook.com
+ (2603:10b6:805:e9::25)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210302163446.21047-1-colin.king@canonical.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from andbang6.amd.com (165.204.156.251) by MA1PR0101CA0068.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:20::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend Transport; Tue, 9 Mar 2021 08:11:41 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: c1209ffc-2aab-48eb-9984-08d8e2d2faa4
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4397:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4397C7CEC01BA44B85BB44ADCF929@SA0PR12MB4397.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: piRcKQf1/ClWV3Wn7Y9aBzrspLdUyaJVj75AMe1CEpkAstmF5L4bd3JR9BZKbCjzLISynvOeB7j1sX2n2gOoxfSCgf0XhCyvewZsRHG8OpB3mWecELzqDIWNhju5KcpNimJPkmizP1IZsCO25++QM8TWUjHWAoeKFedLm8ePlRaPRO0fgW2v+Omb5wH6/UTYw02tEePiwBv2XRuBPwANDcgyuKUqPV/f04Qo/SZ/cPn2KKVLBMVwwo/hW6DMGF8Udv+Ri08jxpFHiM3xmUJi8P8DDnsaKNNKbDSIugonYszFGZqeMp8/tBk+0PeUFtsXuxjbuySkUYdSlORsr2ZtE5c4XU+AHxbg2D2BEs6D9sVnRyiUtMyzlJvowSpZNrEoBb+TpJEwEKWNxLSOGFLXl9f/t4xqaKouid9B4aNbnv3sLTR8ZLTe7eJLKqn4guIKtm6sm6gOjvCv+sHkk5kmt8a8AyTP2LkWnLxgfYjESHhZxFBvVKRFMyCI2fZmbTa9foNMqWwTDdB9zkEErQU/TA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB4719.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(346002)(396003)(39860400002)(136003)(66476007)(15650500001)(8936002)(5660300002)(4326008)(66556008)(2616005)(956004)(316002)(54906003)(26005)(2906002)(6666004)(8676002)(110136005)(6486002)(83380400001)(66946007)(36756003)(4744005)(86362001)(186003)(478600001)(16526019)(52116002)(7696005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?8cbh95Lo9wg3VEk3brtGyOFFszowtmZ3ZnAUXPkPZST42eJNpDTu15OhZxys?=
+ =?us-ascii?Q?uqNsFT0w04iDLZlsxo5tpaElhln9MA9Fs51TbugMSfaGBLOw6eb1UngUXibf?=
+ =?us-ascii?Q?6/eZpW8WPgBHBElTn54s+EIxuD4MXWrknFKEc7vpMMfZuLASWSK8Dug4HBdm?=
+ =?us-ascii?Q?eJsvvPTCb+ciN19506rRtLAxSdpdxnkrCRFJ0fEalCpoxKuFrEJ91aDI7E2j?=
+ =?us-ascii?Q?a4afFwyi8TUKgzHdkUgjyD+xBjZpCALgLexO9ETOlXtxSZ7cU7Hwg3RY2a+9?=
+ =?us-ascii?Q?Ap1mJYWsWbzw4IMisBlV2a/YdO56rjAbTwMQnh6NOJlcgrzpWFYYnx5tIMou?=
+ =?us-ascii?Q?8wreuuFiSSq2FnLnb9iTrL6tWwONWinCBPcsA94o8m1YQAUfVP2SEvoyYnSY?=
+ =?us-ascii?Q?vIU8Au/qtZkCFp85U6B69w0fANl9ydluB+912QUPEPdUokCVAakOkD8spedj?=
+ =?us-ascii?Q?wPTM6Gfk53w5DbjxarwoQ26S5RFPHd2TLFY3xRc1k/GhvFbUwbCasQ/yk7TN?=
+ =?us-ascii?Q?xnT4Iq9vjBVwJl44oHFaz4rvOxICSYTa86wbYpZw/YSk3RdmhflalHMB0JuR?=
+ =?us-ascii?Q?0JyXXu7ln6G0OeukmHC8XJlHDojaBDHC0uGrxetVUglvl7c4STyVxBJFOSN1?=
+ =?us-ascii?Q?PBqoL2lj6NQPmwCciz3lvruw8tcWMDEmgfePnBwyVi3PowQxJbxhl2nKFD7n?=
+ =?us-ascii?Q?FNiaLkJhBbI+QuIsM+5yAXCyuKoV1hpKyGxeJtNVjBMBbGvvJPq4+9CjEEm8?=
+ =?us-ascii?Q?A22t8MaFJ22PHKcGenTJvOiRbTlUxfJ+LxH/HPDiybCYAEw5lSeTi7gWplWb?=
+ =?us-ascii?Q?MSsttYvv63+jkxiCBRzU171/At0MIAVvT08XTQdckrtDYgVt8abd69uqzcwn?=
+ =?us-ascii?Q?9FivFk3jLnGuzWqMuIz15kV4jCAw6u3wC2KPH2dDpJiTWFPWhzX6FaJDC7p4?=
+ =?us-ascii?Q?oByh3eVs0k+m7Z9sMyittroQG0nG7fzHdQeJN3WlY7MpJPlkj2j1G07RQXc9?=
+ =?us-ascii?Q?XZqy2Tpou4IHsB1s3YZk1/pdPHupBAr8wOl0iG/lSIny8UQ4zNDjdvHk+gLu?=
+ =?us-ascii?Q?xQ0y2Ao68DiV2lnZM74tzVdW8NB4Zsib0WWs8c4cBZzHgjel7mJec2Ws8AQt?=
+ =?us-ascii?Q?WQT1Rvoo1Oi9gj3NaoT/gRpyvOZsuphQeXHJBwZzxDr8a6Epig3amZVfYux6?=
+ =?us-ascii?Q?lYZttTdRzIL4eCtuBtvRJuoGn9+wbGyErRE12rXo3VtlYqgccVkoAvO+2o5Y?=
+ =?us-ascii?Q?3ckJLPouAUKr4ipcDQ80jew0NxR2kterIHVby5Mqy2VJu7ubzpNXmvuGnTJL?=
+ =?us-ascii?Q?lgT4Sjr6zy3sboKwHmq1Qhu8?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c1209ffc-2aab-48eb-9984-08d8e2d2faa4
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB4719.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2021 08:11:45.5182
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qFI+a7pUyA2a7VWQ4K9IkIPyI7VvFxhZ1DeN6FqUHIuGKX0Z5AQ45XQBYKiXZNTuV1IygEYa+ZmmCxB1IwM3rA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4397
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Tue, Mar 02, 2021 at 04:34:46PM +0000, Colin King a écrit :
-> From: Colin Ian King <colin.king@canonical.com>
-> 
-> In the case where the dma_iv mapping fails, the return error path leaks
-> the memory allocated to object d.  Fix this by adding a new error return
-> label and jumping to this to ensure d is free'd before the return.
-> 
-> Addresses-Coverity: ("Resource leak")
-> Fixes: ac2614d721de ("crypto: sun8i-ss - Add support for the PRNG")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
-> index 08a1473b2145..3191527928e4 100644
-> --- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
-> +++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
-> @@ -103,7 +103,8 @@ int sun8i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
->  	dma_iv = dma_map_single(ss->dev, ctx->seed, ctx->slen, DMA_TO_DEVICE);
->  	if (dma_mapping_error(ss->dev, dma_iv)) {
->  		dev_err(ss->dev, "Cannot DMA MAP IV\n");
-> -		return -EFAULT;
-> +		err = -EFAULT;
-> +		goto err_free;
->  	}
->  
->  	dma_dst = dma_map_single(ss->dev, d, todo, DMA_FROM_DEVICE);
-> @@ -167,6 +168,7 @@ int sun8i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
->  		memcpy(ctx->seed, d + dlen, ctx->slen);
->  	}
->  	memzero_explicit(d, todo);
-> +err_free:
->  	kfree(d);
->  
->  	return err;
-> -- 
-> 2.30.0
-> 
-Hello
+The first patch helps to improve the response time by reducing the
+polling time of the tee command status variable.
 
-Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Second patch is a bug fix to handle multi-threaded use-case.
+During testing, race condition was seen due to missing synchronisation
+in writes to the TEE ring buffer. This patch helps to resolve that.
 
-Thanks
+Third patch is to update the copyright year for the tee driver files.
+
+Rijo Thomas (3):
+  crypto: ccp - reduce tee command status polling interval from 5ms to
+    1ms
+  crypto: ccp - fix command queuing to TEE ring buffer
+  crypto: ccp - update copyright year for tee
+
+ drivers/crypto/ccp/tee-dev.c | 57 ++++++++++++++++++++++++------------
+ drivers/crypto/ccp/tee-dev.h | 20 +++++++++++--
+ 2 files changed, 57 insertions(+), 20 deletions(-)
+
+-- 
+2.17.1
+
