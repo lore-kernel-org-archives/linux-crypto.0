@@ -2,105 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-24.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24991C43332
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Mar 2021 09:12:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE785C433DB
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Mar 2021 09:30:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0701165149
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Mar 2021 09:12:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8FD526525D
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Mar 2021 09:30:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230070AbhCIJL4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Mar 2021 04:11:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46074 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230045AbhCIJLc (ORCPT
+        id S229872AbhCIJaZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 Mar 2021 04:30:25 -0500
+Received: from linux.microsoft.com ([13.77.154.182]:57906 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229691AbhCIJaD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Mar 2021 04:11:32 -0500
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 846D0C06174A;
-        Tue,  9 Mar 2021 01:11:32 -0800 (PST)
-Received: by mail-pg1-x530.google.com with SMTP id p21so8346235pgl.12;
-        Tue, 09 Mar 2021 01:11:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=wB1I6Nqq7AfdRuGhioLL2RWvT/EvSUrtBmeOoGNpC4c=;
-        b=e6FOS+NacLfH/xWKXxkeAAl8YYsBU2mL4UMX6ikAkgoSs8yPJVmUIHx4/QxTYE7fw0
-         w1ZHyv2GTZ/sZH0ktGLEAcY9a6ElhPgegk3vcOiSJ59PQbnGcuBEFKe6ix5bDKH60vTd
-         ohs2TH4haNKwYDw8GY3L6JlMx2FWPsr52kbeGiLqCmYqEL/tp+s3Bpyh9FblH9Ba6dKs
-         lEcuLqrhCNP20MShXa2M3UJkt387aYsqSMbnTFOQv8I4leMji6uZ/F5vPbZ8P7XG0qf5
-         nDMdjI6r3ElkvoHfOay4uOTrV+d41TqT/cdppn1HaCzE5kO+KET84M7lFqb0X0/pCkdh
-         e9yA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=wB1I6Nqq7AfdRuGhioLL2RWvT/EvSUrtBmeOoGNpC4c=;
-        b=aqn6uIwCULQHA4eeUsSf0Yzbh95pNyTABmcMFNW9y1TDsZA4lo4nABTTcpDL7242ar
-         i9q32839fBhhElCQ+YYFxwQdKMDk1aDJ0Jg5PXWh6l85xwruqC4g8ep9HCO6tYJqWNDg
-         o/c3942p+bh0EYXWSYFPE1DWAls9kS6Ej+Bz3ZnhMLWdwX8KCrjRST+hCXEqPYzJNMSV
-         XGcsiuqV/WtSVFBYS0dcY2FNf9PwO1Yp/mHSMfAP+MJ6IyBVpkUwjLKrR4m54xrtFmzH
-         bbzd3PFqi41gJeYq2gxloSuJn/thK7buf3ZXmYfzdogp07vL9rSfIeLm+Pdq+sWdu+jE
-         ca+Q==
-X-Gm-Message-State: AOAM530MFH+ZI9WPCasY6G7wkwgiznCgQmCxav0iVhfoMurWXjDaxgnh
-        j6Yt5JJHsdtML1diiAUc/Bw=
-X-Google-Smtp-Source: ABdhPJy79MblW78n0Euz3R9cSKXRk+Qbo1KkS1pr1AsyVwJFY6AjUqYDYZLO4jOyJPm0b9F9vDFHYw==
-X-Received: by 2002:a63:c0a:: with SMTP id b10mr24874934pgl.251.1615281092137;
-        Tue, 09 Mar 2021 01:11:32 -0800 (PST)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id js16sm2094860pjb.21.2021.03.09.01.11.30
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 09 Mar 2021 01:11:31 -0800 (PST)
-From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ben Boeckel <me@benboeckel.net>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Malte Gell <malte.gell@gmx.de>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Lee, Chun-Yi" <jlee@suse.com>
-Subject: [PATCH 4/4] Documentation/admin-guide/module-signing.rst: add openssl command option example for CodeSign EKU
-Date:   Tue,  9 Mar 2021 17:10:44 +0800
-Message-Id: <20210309091044.2298-5-jlee@suse.com>
-X-Mailer: git-send-email 2.12.3
-In-Reply-To: <20210309091044.2298-1-jlee@suse.com>
-References: <20210309091044.2298-1-jlee@suse.com>
+        Tue, 9 Mar 2021 04:30:03 -0500
+Received: from [192.168.0.114] (unknown [49.207.210.77])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 0CE1B20B26C5;
+        Tue,  9 Mar 2021 01:29:53 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0CE1B20B26C5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1615282202;
+        bh=CDYqG2GIuZVR5z0oqm1GZmaheRjDizkca+UJHZd+0GI=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=NVeEjgcK9BRcMfN+1DWoFPF7F0iWQG11DSKd1RS7RpOgd96fzaUGJsKVno8QnpaQh
+         A/m2/byHvmbLabts1yxTAYtkMEDvIRO8cGdyLneaxrB82B6YrMMlcZwAuAVn2++s2j
+         aD8AJWIqe1JXOP7k7Vxz9IhcBEcfAUYNFaPJZwbs=
+Subject: Re: [PATCH v5 01/19] crypto: amcc: convert tasklets to use new
+ tasklet_setup() API
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Allen Pais <allen.lkml@gmail.com>
+Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
+        alexandre.belloni@bootlin.com, ludovic.desroches@microchip.com,
+        jesper.nilsson@axis.com, lars.persson@axis.com,
+        horia.geanta@nxp.com, aymen.sghaier@nxp.com, gcherian@marvell.com,
+        thomas.lendacky@amd.com, john.allen@amd.com, gilad@benyossef.com,
+        bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
+        matthias.bgg@gmail.com, jamie@jamieiles.com,
+        giovanni.cabiddu@intel.com, heiko@sntech.de, krzk@kernel.org,
+        vz@mleia.com, k.konieczny@samsung.com,
+        linux-crypto@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        qat-linux@intel.com, linux-rockchip@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org,
+        Romain Perier <romain.perier@gmail.com>
+References: <20210208094238.571015-1-allen.lkml@gmail.com>
+ <20210208094238.571015-2-allen.lkml@gmail.com>
+ <20210304062644.GA5107@gondor.apana.org.au>
+From:   Allen Pais <apais@linux.microsoft.com>
+Message-ID: <2e2604a3-b0b1-92f2-aa7b-f413fae4cb51@linux.microsoft.com>
+Date:   Tue, 9 Mar 2021 14:59:51 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20210304062644.GA5107@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add an openssl command option example for generating CodeSign extended
-key usage in X.509 when CONFIG_CHECK_CODESIGN_EKU is enabled.
 
-Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
----
- Documentation/admin-guide/module-signing.rst | 6 ++++++
- 1 file changed, 6 insertions(+)
+>>
+>> In preparation for unconditionally passing the
+>> struct tasklet_struct pointer to all tasklet
+>> callbacks, switch to using the new tasklet_setup()
+>> and from_tasklet() to pass the tasklet pointer explicitly.
+>>
+>> Signed-off-by: Romain Perier <romain.perier@gmail.com>
+>> Signed-off-by: Allen Pais <apais@linux.microsoft.com>
+>> ---
+>>   drivers/crypto/amcc/crypto4xx_core.c | 10 +++++-----
+>>   1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> This introduces a compiler warning with C=1 W=1.
 
-diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation/admin-guide/module-signing.rst
-index 7d7c7c8a545c..ca3b8f19466c 100644
---- a/Documentation/admin-guide/module-signing.rst
-+++ b/Documentation/admin-guide/module-signing.rst
-@@ -170,6 +170,12 @@ generate the public/private key files::
- 	   -config x509.genkey -outform PEM -out kernel_key.pem \
- 	   -keyout kernel_key.pem
- 
-+When ``CONFIG_CHECK_CODESIGN_EKU`` option is enabled, the following openssl
-+command option should be added where for generating CodeSign extended key usage
-+in X.509::
-+
-+        -addext "extendedKeyUsage=codeSigning"
-+
- The full pathname for the resulting kernel_key.pem file can then be specified
- in the ``CONFIG_MODULE_SIG_KEY`` option, and the certificate and key therein will
- be used instead of an autogenerated keypair.
--- 
-2.16.4
+Okay. I will check and send out a fix.
 
+Thanks.
