@@ -2,78 +2,67 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1349DC433E6
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Mar 2021 12:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F369C43381
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Mar 2021 15:36:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA22B64FF7
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Mar 2021 12:03:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E02D564FC5
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Mar 2021 15:36:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230214AbhCJMCn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Mar 2021 07:02:43 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58702 "EHLO mail.kernel.org"
+        id S229574AbhCJPf6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Mar 2021 10:35:58 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50840 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232650AbhCJMCS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Mar 2021 07:02:18 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id DD80F64FD7;
-        Wed, 10 Mar 2021 12:02:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1615377737;
-        bh=/eEinG3KxIZMrWrXYSrji41H6Uu/4J7UuAOlOdWiTj0=;
+        id S232284AbhCJPfu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Mar 2021 10:35:50 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DC1DF64F60;
+        Wed, 10 Mar 2021 15:35:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1615390550;
+        bh=Z19GmIJOXieWNF0O3qJvJtLNYCuOeCwhaVAkd22uoM4=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=cLgPQkud3EZJAvUe8zTGtf9xZy75Cp1zn83QLkvBV1FE4dLkX1gt9C37RBEjyt/7X
-         r/oiUJHp50bjwh3fChkvKQ+OH2E18j3d2DWsLtfJTPDVmAxMkUQRrgL/tDbpebk4fF
-         on4e+Ug7qQTiNR6ytW+d0cJR7xRRfpMzSogQO8gA=
-Date:   Wed, 10 Mar 2021 13:02:14 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: public_key: check that pkey_algo is non-NULL
- before passing it to strcmp()
-Message-ID: <YEi1RgPgwfT7qHQM@kroah.com>
-References: <875z419ihk.fsf@toke.dk>
- <20210112161044.3101-1-toke@redhat.com>
- <2648795.1610536273@warthog.procyon.org.uk>
- <2656681.1610542679@warthog.procyon.org.uk>
- <87sg6yqich.fsf@toke.dk>
+        b=ue0qIPIbDRYctYoMi9aQP6HHHTm11avT3wDQ+W8KE3MXgBy7Ne6pFwKJTcCMW2ORF
+         /dmt9EbgT+B4P+vAef8UVaqc+DE5mSsSIfS3TC70osM+QQG3r/Sc8niWJtMyzCnzBC
+         ZF8i3tdqCjArRFJ5mpva6qXkHO2c/ZDDKV/DQCDlpfnGvQuz5hi0sqobnNfJ5BrX5s
+         AyIjJS7P3hb6eQLnoTw3TqAw5ubHgIXifHOGUhChN7n2F+9OnuymS5N4Eq0CjOalPM
+         lrS81siKcFV+gDLsfIwK0/1DInt+Xu+q8VGdK+lhtzhDbeRCarQYoymfzDN35JT7En
+         KC35T52yi9lSA==
+Date:   Wed, 10 Mar 2021 17:35:25 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, herbert@gondor.apana.org.au,
+        dhowells@redhat.com, zohar@linux.ibm.com,
+        linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
+        linux-integrity@vger.kernel.org,
+        Stefan Berger <stefanb@linux.ibm.com>
+Subject: Re: [PATCH v11 01/10] oid_registry: Add OIDs for ECDSA with
+ sha224/256/384/512
+Message-ID: <YEjnPZOVit+U9YcG@kernel.org>
+References: <20210305205956.3594375-1-stefanb@linux.vnet.ibm.com>
+ <20210305205956.3594375-2-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87sg6yqich.fsf@toke.dk>
+In-Reply-To: <20210305205956.3594375-2-stefanb@linux.vnet.ibm.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 18, 2021 at 06:13:02PM +0100, Toke Høiland-Jørgensen wrote:
-> David Howells <dhowells@redhat.com> writes:
+On Fri, Mar 05, 2021 at 03:59:47PM -0500, Stefan Berger wrote:
+> From: Stefan Berger <stefanb@linux.ibm.com>
 > 
-> > Toke Høiland-Jørgensen <toke@redhat.com> wrote:
-> >
-> >> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
-> >> 
-> >> and also, if you like:
-> >> 
-> >> Tested-by: Toke Høiland-Jørgensen <toke@redhat.com>
-> >
-> > Thanks!
+> Add OIDs for ECDSA with sha224/256/384/512.
+
+Nit: SHA224/256/384/512 (sorry cannot help myself with these, have been
+doing this way too much, consider me as a bot :-) )
+
 > 
-> Any chance of that patch getting into -stable anytime soon? Would be
-> nice to have working WiFi without having to compile my own kernels ;)
+> Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+ 
+Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-What ever happened to this patch?  I can't seem to find it in Linus's
-tree anywhere :(
-
-thanks,
-
-greg k-h
+/Jarkko
