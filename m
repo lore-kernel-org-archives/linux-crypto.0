@@ -2,140 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9D8DC433DB
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 04:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A6BEC43381
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 07:45:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B9EE264F94
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 04:53:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23D0A64F84
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 07:45:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231929AbhCLEwp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Mar 2021 23:52:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47718 "EHLO
+        id S231611AbhCLHoy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Mar 2021 02:44:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231912AbhCLEwa (ORCPT
+        with ESMTP id S231660AbhCLHog (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Mar 2021 23:52:30 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E637DC061574;
-        Thu, 11 Mar 2021 20:52:29 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id q204so1016901pfq.10;
-        Thu, 11 Mar 2021 20:52:29 -0800 (PST)
+        Fri, 12 Mar 2021 02:44:36 -0500
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 042E4C061574;
+        Thu, 11 Mar 2021 23:44:36 -0800 (PST)
+Received: by mail-qk1-x735.google.com with SMTP id x10so23404703qkm.8;
+        Thu, 11 Mar 2021 23:44:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ZyZIkybO9SxVwDwL8RwkKTDFi+dXqtciO35Y0No2LCo=;
-        b=cz8rzGqvx+1E0Z4Oyw5vbTDSn5NWLKSP+l0BQtXFVCguq7eBSdfmiLNKAwGILEFBK/
-         OkFR4dYE5ZrGCAJfWDm/8iVNwgSfzJfhxZDqz4f5vPWMQTKJi19d3/iSLIaBE6tGHAcU
-         9cM4Y1WWOs0AjQNdiQdZZSfdbXQ9Jg/lkNX/aNbwNiItGGe+LbF4qkT0/3EVRxytcNH8
-         GyE4VnQQ2Q0ePbjCDHdxJ3vxNe6QGu0Zb76KxjKNW3LMaTtZ+UX/AP2GmVGvuttLNLz4
-         UA0PbEGSAb11uhC8XOzbVN59Me6hyL9b4j/PY/VjqbRncLm5+ZsnQQpV57Zq3RgtAhuT
-         mLIg==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Rjn0Pz3RzJWBncUJzOzdy1sylD8mz24+3HjRzAckFMA=;
+        b=eXstlHf43HalrgSZAtsav0+dbeIzwJwS1gKzNPHjvCvtr/VNzZuSb4Y/HqbPWI7Vk1
+         K56hhNxr6xPZpwPR0W6LRFMFCr8bQxYmxEhst48vtR5PlmabL8+U7ftmE3EIFC5CcLx7
+         ieL6mOxxytO1Wde2yeMAebMy6wdcT2RrLbDK+bsT6tE4GTRtVxpWnFUHUDRe4EkhIV+l
+         uVXI2cyRoxAx5LSNz8pLc0uelADRjVbH7+XUgBcC1TBoyIOiVOfOxq7JzU+iFQk3H1uy
+         1t9EPaWb3gh4pD2CisqPltkL4M15fJvUbCs0BEv9rjsGErIZxXlEaPTmn6eMzfc7m4er
+         lQPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=ZyZIkybO9SxVwDwL8RwkKTDFi+dXqtciO35Y0No2LCo=;
-        b=AWhfj/yGfp6fMvLiWto/VDtqbVAtoRonn2fBmYY1bUjCwppnrsw0aenG/SlEDMuWXI
-         u9d0H+D4AJ9As9gZl01cCajKKnDQ3zM30hSuWtZQVzptKSDZoCBL1rYKblfDZ4RXckpv
-         D0y/oIUunRAQjYKrU/qiuM+noFi6XvtNYqtT0c1HAmi2pNJuoUHzNWAVRnS0vMUtMDo7
-         eUZIZ6FDirr/EAs5kIZhqa63DvPqPyH+WRu5IazGxaaH3t09+N68NqkeeGaGfsVZheX+
-         zuM9CFdusmTCMFmHHgYm7aEYjds7d96HuFj2OgXXeg5IZCritNmzGjr1LLt5JwfjDLBW
-         qgmw==
-X-Gm-Message-State: AOAM532Vq14R3/4ciukXyu2uH09hntPHEXi9jDHdo0Dwkhj+vADzFhch
-        GHBmhpnbX1aAR+bkiSal9GtCTlINkM4=
-X-Google-Smtp-Source: ABdhPJyWHWMWF5PyeVDaqgyY9OiUQgsUChZnVS0fX54wJz6JswyP0/mFO6uDEV9J7IZ7xCXOCOODqg==
-X-Received: by 2002:a63:2214:: with SMTP id i20mr9846875pgi.189.1615524743541;
-        Thu, 11 Mar 2021 20:52:23 -0800 (PST)
-Received: from [10.230.29.30] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id g5sm4367970pfb.77.2021.03.11.20.52.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Mar 2021 20:52:23 -0800 (PST)
-Subject: Re: [PATCH] hwrng: bcm2835: set quality to 1000
-To:     =?UTF-8?Q?=c3=81lvaro_Fern=c3=a1ndez_Rojas?= <noltari@gmail.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Stephan Mueller <smueller@chronox.de>
-Cc:     Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
+        bh=Rjn0Pz3RzJWBncUJzOzdy1sylD8mz24+3HjRzAckFMA=;
+        b=UEvpofisE1YlFDr+ZjYjyaVByXMGO2IWbPNA3RwNWEpQrb7mFFJG/1r2BhGFssG/xd
+         H9M97skxbicv1msuqsUYgS6v9fzA/PpezEv+KIqbgAVv5gG+pYU02Et5AlZVWBOHbIBC
+         jcMJ+5sz7fYVlXeqX18ILkedl19P0btaE05oKHa4dCiDKpElMzxjEYJTrel5GFz/WBwN
+         FU+gfjNlJR+3LBy7ENm14UWuG78gnwbOkV7uXuHF2ncI+X0p4UFRkTo5ZgwWH3spRPGn
+         ePnNrjoTvHDrWrT7P+EARvKS/Hmo1hKku5NtV/Fo+9N/VrYGQyan3XZa6E9Sl+5snqo0
+         h0fQ==
+X-Gm-Message-State: AOAM5309Rddz2QaQUxt77YR6MgCPI/hzVBYubPToIFDLGIdAAhtrTYDg
+        dCFldTPeQSS1On+1xFuwsfA=
+X-Google-Smtp-Source: ABdhPJzLOkcNp8XM9H2g2JVp3FDQKKCLP9oVuTUlvW9W8f8onq0zMMHjrNVfONT1asXt42pruf1ZOA==
+X-Received: by 2002:a05:620a:45:: with SMTP id t5mr11703161qkt.17.1615535075131;
+        Thu, 11 Mar 2021 23:44:35 -0800 (PST)
+Received: from tong-desktop.local ([2601:5c0:c200:27c6:b9e0:c84:da81:d749])
+        by smtp.googlemail.com with ESMTPSA id e2sm3434089qto.50.2021.03.11.23.44.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Mar 2021 23:44:34 -0800 (PST)
+From:   Tong Zhang <ztong0001@gmail.com>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Andrew Lunn <andrew@lunn.ch>, Matt Mackall <mpm@selenic.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        Rikard Falkeborn <rikard.falkeborn@gmail.com>,
-        linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Stijn Tintel <stijn@linux-ipv6.be>, ynezz@true.cz
-References: <20210220174741.23665-1-noltari@gmail.com>
- <YDFeao/bOxvoXI9D@lunn.ch> <9b86c773-7153-1e18-472a-f66b01c83173@gmail.com>
- <20210303092019.GB8134@gondor.apana.org.au>
- <66AED5A4-3227-47CA-A4A2-B5AD6A571AAC@gmail.com>
- <c76c82668142710ba5a7a8454759c9aa2423d72f.camel@suse.de>
- <b0cf1be0-4c7c-57ee-fea5-789fe215b85d@gmail.com>
- <6D1459DF-A7E1-422C-AA05-655156AEBA23@gmail.com>
-From:   Florian Fainelli <f.fainelli@gmail.com>
-Message-ID: <c8d9602f-682d-a82f-abb4-3f3f37ec9f02@gmail.com>
-Date:   Thu, 11 Mar 2021 20:52:20 -0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.8.1
+        "David S. Miller" <davem@davemloft.net>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Fiona Trahe <fiona.trahe@intel.com>,
+        Tong Zhang <ztong0001@gmail.com>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] crypto: qat: fix couple crashes duing error handling
+Date:   Fri, 12 Mar 2021 02:43:56 -0500
+Message-Id: <20210312074357.2384087-1-ztong0001@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <6D1459DF-A7E1-422C-AA05-655156AEBA23@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+There are a couple of issues in qat error handling. Those drivers tries to
+release resources that is not initialized. This patch series tries to fix
+crashes caused by incorrect error handling.
 
+Tong Zhang (2):
+  crypto: qat - dont release uninitialized resources
+  crypto: qat: ADF_STATUS_PF_RUNNING should be set after adf_dev_init
 
-On 3/4/2021 10:26 PM, Álvaro Fernández Rojas wrote:
-> Hi Florian,
-> 
->> El 4 mar 2021, a las 23:28, Florian Fainelli <f.fainelli@gmail.com> escribió:
->>
->> On 3/4/21 7:11 AM, Nicolas Saenz Julienne wrote:
->>> On Wed, 2021-03-03 at 10:29 +0100, Álvaro Fernández Rojas wrote:
->>>> Hi Herbert,
->>>>
->>>>> El 3 mar 2021, a las 10:20, Herbert Xu <herbert@gondor.apana.org.au> escribió:
->>>>>
->>>>> On Sat, Feb 20, 2021 at 08:12:45PM +0100, Álvaro Fernández Rojas wrote:
->>>>>>
->>>>>> I ran rngtest and this is what I got:
->>>>>
->>>>> This is meaningless except for sources that have not been whitened.
->>>>>
->>>>> Your justification needs to be based on what the hardware does or
->>>>> is documented to do.
->>>>
->>>> Ok, so I guess that we’re never setting that value to anything since there’s
->>>> no public documentation about that ¯\_(ツ)_/¯.
->>>
->>> @Florian, is there a way you might be able to get the official value?
->>
->> I will be looking into the documentation this weekend and let you know
->> whether we can change the driver's quality accordingly.
-> 
-> Could you do that for iproc-rng200.c too?
+ drivers/crypto/qat/qat_c3xxxvf/adf_drv.c    |  4 ++--
+ drivers/crypto/qat/qat_c62xvf/adf_drv.c     |  4 ++--
+ drivers/crypto/qat/qat_common/adf_vf_isr.c  | 17 +++++++++++++----
+ drivers/crypto/qat/qat_dh895xccvf/adf_drv.c |  4 ++--
+ 4 files changed, 19 insertions(+), 10 deletions(-)
 
-From looking at some documentation and the design of the 6368 RNG which
-is supposedly the same as the Raspberry Pi 1/2/3 RNG, this appears to be
-a random number generator that does not go through any post-processing
-and just collects random bits into a FIFO.
-
-The rbg200 is also similar except that it is integrated into a wrapper
-called the rng200 which supposedly only accepts data that has passed
-"NIST industry standard random data quality algorithm" without being
-specific. So it seems to me you may be able to set the quality field for
-bcm2835-rng, but not for iproc-rng200.
-
-Stephan does that sound right?
 -- 
-Florian
+2.25.1
+
