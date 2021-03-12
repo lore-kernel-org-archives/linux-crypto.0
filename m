@@ -2,71 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AC08C433DB
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 13:00:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13EABC433DB
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 13:03:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0D2B64FDC
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 13:00:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E062964FE0
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 13:03:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230447AbhCLM7u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Mar 2021 07:59:50 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:54334 "EHLO fornost.hmeau.com"
+        id S229891AbhCLNCb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Mar 2021 08:02:31 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:54378 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229909AbhCLM7i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Mar 2021 07:59:38 -0500
+        id S231245AbhCLNCH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Mar 2021 08:02:07 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lKhNu-0005xD-BK; Fri, 12 Mar 2021 23:59:19 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Mar 2021 23:59:18 +1100
-Date:   Fri, 12 Mar 2021 23:59:18 +1100
+        id 1lKhQM-000605-HG; Sat, 13 Mar 2021 00:01:51 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 13 Mar 2021 00:01:50 +1100
+Date:   Sat, 13 Mar 2021 00:01:50 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Longfang Liu <liulongfang@huawei.com>
-Cc:     wangzhou1@hisilicon.com, xuzaibo@huawei.com,
+To:     Thara Gopinath <thara.gopinath@linaro.org>
+Cc:     davem@davemloft.net, bjorn.andersson@linaro.org,
+        ebiggers@google.com, ardb@kernel.org, sivaprak@codeaurora.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] crypto: hisilicon/sec - fixes some log printing
- style
-Message-ID: <20210312125918.GA12149@gondor.apana.org.au>
-References: <1614838735-52668-1-git-send-email-liulongfang@huawei.com>
- <1614838735-52668-2-git-send-email-liulongfang@huawei.com>
+Subject: Re: [PATCH 4/7] crypto: qce: Add support for AEAD algorithms
+Message-ID: <20210312130150.GA17238@gondor.apana.org.au>
+References: <20210225182716.1402449-1-thara.gopinath@linaro.org>
+ <20210225182716.1402449-5-thara.gopinath@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1614838735-52668-2-git-send-email-liulongfang@huawei.com>
+In-Reply-To: <20210225182716.1402449-5-thara.gopinath@linaro.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Mar 04, 2021 at 02:18:54PM +0800, Longfang Liu wrote:
+On Thu, Feb 25, 2021 at 01:27:13PM -0500, Thara Gopinath wrote:
 >
-> @@ -727,7 +725,7 @@ static void sec_cipher_pbuf_unmap(struct sec_ctx *ctx, struct sec_req *req,
->  	struct aead_request *aead_req = req->aead_req.aead_req;
->  	struct sec_cipher_req *c_req = &req->c_req;
->  	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
-> -	struct device *dev = SEC_CTX_DEV(ctx);
-> +	struct device *dev = ctx->dev;
->  	int copy_size, pbuf_length;
->  	int req_id = req->req_id;
->  
-> @@ -737,11 +735,9 @@ static void sec_cipher_pbuf_unmap(struct sec_ctx *ctx, struct sec_req *req,
->  		copy_size = c_req->c_len;
->  
->  	pbuf_length = sg_copy_from_buffer(dst, sg_nents(dst),
-> -				qp_ctx->res[req_id].pbuf,
-> -				copy_size);
-> -
-> +			qp_ctx->res[req_id].pbuf, copy_size);
->  	if (unlikely(pbuf_length != copy_size))
-> -		dev_err(dev, "copy pbuf data to dst error!\n");
-> +		dev_err(ctx->dev, "copy pbuf data to dst error!\n");
->  }
+> +static int
+> +qce_aead_async_req_handle(struct crypto_async_request *async_req)
+> +{
+> +	struct aead_request *req = aead_request_cast(async_req);
+> +	struct qce_aead_reqctx *rctx = aead_request_ctx(req);
+> +	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+> +	struct qce_aead_ctx *ctx = crypto_tfm_ctx(async_req->tfm);
+> +	struct qce_alg_template *tmpl = to_aead_tmpl(crypto_aead_reqtfm(req));
+> +	struct qce_device *qce = tmpl->qce;
+> +	enum dma_data_direction dir_src, dir_dst;
+> +	unsigned int totallen;
+> +	bool diff_dst;
+> +	int ret;
+> +
+> +	if (IS_CCM_RFC4309(rctx->flags)) {
+> +		memset(rctx->ccm_rfc4309_iv, 0, QCE_MAX_IV_SIZE);
+> +		rctx->ccm_rfc4309_iv[0] = 3;
+> +		memcpy(&rctx->ccm_rfc4309_iv[1], ctx->ccm4309_salt, QCE_CCM4309_SALT_SIZE);
+> +		memcpy(&rctx->ccm_rfc4309_iv[4], req->iv, 8);
+> +		rctx->iv = rctx->ccm_rfc4309_iv;
+> +		rctx->ivsize = AES_BLOCK_SIZE;
+> +	} else {
+> +		rctx->iv = req->iv;
+> +		rctx->ivsize = crypto_aead_ivsize(tfm);
+> +	}
+> +	if (IS_CCM_RFC4309(rctx->flags))
+> +		rctx->assoclen = req->assoclen - 8;
+> +	else
+> +		rctx->assoclen = req->assoclen;
+> +
+> +	totallen = rctx->cryptlen + rctx->assoclen;
 
-This triggers an unused warning on dev.  Please fix.
+This triggers a warning on totallen not being used.  Please fix.
 
 Thanks,
 -- 
