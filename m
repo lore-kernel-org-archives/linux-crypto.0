@@ -7,45 +7,58 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9453AC433E9
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 13:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F1AC433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 13:13:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64C5664FA7
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 13:12:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80AE064FD6
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 13:13:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229677AbhCLNLj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Mar 2021 08:11:39 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:54446 "EHLO fornost.hmeau.com"
+        id S231285AbhCLNMn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Mar 2021 08:12:43 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:54490 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230256AbhCLNLI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Mar 2021 08:11:08 -0500
+        id S231450AbhCLNMW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Mar 2021 08:12:22 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lKhZF-0006DK-0E; Sat, 13 Mar 2021 00:11:02 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 13 Mar 2021 00:11:00 +1100
-Date:   Sat, 13 Mar 2021 00:11:00 +1100
+        id 1lKhaJ-0006ES-2N; Sat, 13 Mar 2021 00:12:08 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 13 Mar 2021 00:12:06 +1100
+Date:   Sat, 13 Mar 2021 00:12:06 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tian Tao <tiantao6@hisilicon.com>
-Cc:     mpm@selenic.com, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] hwrng: pic32 - Use device-managed registration API
-Message-ID: <20210312131100.GB31502@gondor.apana.org.au>
-References: <1614569093-31192-1-git-send-email-tiantao6@hisilicon.com>
+To:     Colin King <colin.king@canonical.com>
+Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@siol.net>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: sun8i-ss: Fix memory leak of object d when
+ dma_iv fails to map
+Message-ID: <20210312131206.GE31502@gondor.apana.org.au>
+References: <20210302163446.21047-1-colin.king@canonical.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1614569093-31192-1-git-send-email-tiantao6@hisilicon.com>
+In-Reply-To: <20210302163446.21047-1-colin.king@canonical.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 01, 2021 at 11:24:53AM +0800, Tian Tao wrote:
-> Use devm_hwrng_register to get rid of manual unregistration.
+On Tue, Mar 02, 2021 at 04:34:46PM +0000, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
+> In the case where the dma_iv mapping fails, the return error path leaks
+> the memory allocated to object d.  Fix this by adding a new error return
+> label and jumping to this to ensure d is free'd before the return.
+> 
+> Addresses-Coverity: ("Resource leak")
+> Fixes: ac2614d721de ("crypto: sun8i-ss - Add support for the PRNG")
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 > ---
->  drivers/char/hw_random/pic32-rng.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
