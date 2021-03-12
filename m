@@ -2,68 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC5E9C433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 09:32:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E7BC433DB
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 11:33:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C09FE64FD5
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 09:32:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF6D864F78
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 11:33:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232795AbhCLJcW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Mar 2021 04:32:22 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:51232 "EHLO fornost.hmeau.com"
+        id S229549AbhCLLci (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Mar 2021 06:32:38 -0500
+Received: from mga01.intel.com ([192.55.52.88]:5629 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232975AbhCLJcM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Mar 2021 04:32:12 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lKe8y-0001Q4-8r; Fri, 12 Mar 2021 20:31:41 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Mar 2021 20:31:40 +1100
-Date:   Fri, 12 Mar 2021 20:31:40 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc:     dan.carpenter@oracle.com, davem@davemloft.net,
-        jernej.skrabec@siol.net, mripard@kernel.org, wens@csie.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
-        kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH] crypto: sun8i-ss: fix result memory leak on error path
-Message-ID: <20210312093139.GA728@gondor.apana.org.au>
-References: <20210302164145.28552-1-clabbe.montjoie@gmail.com>
+        id S233742AbhCLLcK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Mar 2021 06:32:10 -0500
+IronPort-SDR: PiyDYWHhTZfSn09pBaD8PQI+D8q7AhBz3uNCvpAyUVRxhywYJCBQX4J9ROT775ucV0PsnIx5cP
+ pa2C2Pv/ZMnQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9920"; a="208658799"
+X-IronPort-AV: E=Sophos;i="5.81,243,1610438400"; 
+   d="scan'208";a="208658799"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2021 03:32:10 -0800
+IronPort-SDR: GetBU+v9+PpTFxa0SNpQdMuINbqrpXRN7JVNCBQ+GF9128MpNFsLePtw7OM0ulZuO22cvIlqOw
+ P1oBQNlcg/PQ==
+X-IronPort-AV: E=Sophos;i="5.81,243,1610438400"; 
+   d="scan'208";a="387326040"
+Received: from smile.fi.intel.com (HELO smile) ([10.237.68.40])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2021 03:32:07 -0800
+Received: from andy by smile with local (Exim 4.94)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1lKg1U-00BpyJ-TL; Fri, 12 Mar 2021 13:32:04 +0200
+Date:   Fri, 12 Mar 2021 13:32:04 +0200
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Tong Zhang <ztong0001@gmail.com>
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        Fiona Trahe <fiona.trahe@intel.com>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] crypto: qat: fix couple crashes duing error handling
+Message-ID: <YEtRNIFD3Ff8fq5O@smile.fi.intel.com>
+References: <20210312074357.2384087-1-ztong0001@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210302164145.28552-1-clabbe.montjoie@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210312074357.2384087-1-ztong0001@gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 02, 2021 at 05:41:45PM +0100, Corentin Labbe wrote:
-> This patch fixes a memory leak on an error path.
-> 
-> Fixes: d9b45418a917 ("crypto: sun8i-ss - support hash algorithms")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-> Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-> ---
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Fri, Mar 12, 2021 at 02:43:56AM -0500, Tong Zhang wrote:
+> There are a couple of issues in qat error handling. Those drivers tries to
+> release resources that is not initialized. This patch series tries to fix
+> crashes caused by incorrect error handling.
 
-This patch was already merged a month ago:
+Please, in this series and everywhere else use a common sense, when put
+backtraces, oopses, etc in the commit message, i.e. leave only ~2-3
+(significant) lines instead of 20-30.
 
-commit 1dbc6a1e25be8575d6c4114d1d2b841a796507f7
-Author: Corentin Labbe <clabbe.montjoie@gmail.com>
-Date:   Fri Feb 12 09:46:10 2021 +0100
-
-    crypto: sun8i-ss - fix result memory leak on error path
-
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+With Best Regards,
+Andy Shevchenko
+
+
