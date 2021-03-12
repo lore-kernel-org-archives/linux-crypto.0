@@ -2,70 +2,74 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E7BC433DB
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 11:33:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AC08C433DB
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 13:00:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EF6D864F78
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 11:33:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0D2B64FDC
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Mar 2021 13:00:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229549AbhCLLci (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Mar 2021 06:32:38 -0500
-Received: from mga01.intel.com ([192.55.52.88]:5629 "EHLO mga01.intel.com"
+        id S230447AbhCLM7u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 Mar 2021 07:59:50 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:54334 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233742AbhCLLcK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Mar 2021 06:32:10 -0500
-IronPort-SDR: PiyDYWHhTZfSn09pBaD8PQI+D8q7AhBz3uNCvpAyUVRxhywYJCBQX4J9ROT775ucV0PsnIx5cP
- pa2C2Pv/ZMnQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9920"; a="208658799"
-X-IronPort-AV: E=Sophos;i="5.81,243,1610438400"; 
-   d="scan'208";a="208658799"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2021 03:32:10 -0800
-IronPort-SDR: GetBU+v9+PpTFxa0SNpQdMuINbqrpXRN7JVNCBQ+GF9128MpNFsLePtw7OM0ulZuO22cvIlqOw
- P1oBQNlcg/PQ==
-X-IronPort-AV: E=Sophos;i="5.81,243,1610438400"; 
-   d="scan'208";a="387326040"
-Received: from smile.fi.intel.com (HELO smile) ([10.237.68.40])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2021 03:32:07 -0800
-Received: from andy by smile with local (Exim 4.94)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1lKg1U-00BpyJ-TL; Fri, 12 Mar 2021 13:32:04 +0200
-Date:   Fri, 12 Mar 2021 13:32:04 +0200
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Tong Zhang <ztong0001@gmail.com>
-Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Fiona Trahe <fiona.trahe@intel.com>, qat-linux@intel.com,
+        id S229909AbhCLM7i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Mar 2021 07:59:38 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1lKhNu-0005xD-BK; Fri, 12 Mar 2021 23:59:19 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 Mar 2021 23:59:18 +1100
+Date:   Fri, 12 Mar 2021 23:59:18 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Longfang Liu <liulongfang@huawei.com>
+Cc:     wangzhou1@hisilicon.com, xuzaibo@huawei.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] crypto: qat: fix couple crashes duing error handling
-Message-ID: <YEtRNIFD3Ff8fq5O@smile.fi.intel.com>
-References: <20210312074357.2384087-1-ztong0001@gmail.com>
+Subject: Re: [PATCH v3 1/2] crypto: hisilicon/sec - fixes some log printing
+ style
+Message-ID: <20210312125918.GA12149@gondor.apana.org.au>
+References: <1614838735-52668-1-git-send-email-liulongfang@huawei.com>
+ <1614838735-52668-2-git-send-email-liulongfang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210312074357.2384087-1-ztong0001@gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+In-Reply-To: <1614838735-52668-2-git-send-email-liulongfang@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Mar 12, 2021 at 02:43:56AM -0500, Tong Zhang wrote:
-> There are a couple of issues in qat error handling. Those drivers tries to
-> release resources that is not initialized. This patch series tries to fix
-> crashes caused by incorrect error handling.
+On Thu, Mar 04, 2021 at 02:18:54PM +0800, Longfang Liu wrote:
+>
+> @@ -727,7 +725,7 @@ static void sec_cipher_pbuf_unmap(struct sec_ctx *ctx, struct sec_req *req,
+>  	struct aead_request *aead_req = req->aead_req.aead_req;
+>  	struct sec_cipher_req *c_req = &req->c_req;
+>  	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
+> -	struct device *dev = SEC_CTX_DEV(ctx);
+> +	struct device *dev = ctx->dev;
+>  	int copy_size, pbuf_length;
+>  	int req_id = req->req_id;
+>  
+> @@ -737,11 +735,9 @@ static void sec_cipher_pbuf_unmap(struct sec_ctx *ctx, struct sec_req *req,
+>  		copy_size = c_req->c_len;
+>  
+>  	pbuf_length = sg_copy_from_buffer(dst, sg_nents(dst),
+> -				qp_ctx->res[req_id].pbuf,
+> -				copy_size);
+> -
+> +			qp_ctx->res[req_id].pbuf, copy_size);
+>  	if (unlikely(pbuf_length != copy_size))
+> -		dev_err(dev, "copy pbuf data to dst error!\n");
+> +		dev_err(ctx->dev, "copy pbuf data to dst error!\n");
+>  }
 
-Please, in this series and everywhere else use a common sense, when put
-backtraces, oopses, etc in the commit message, i.e. leave only ~2-3
-(significant) lines instead of 20-30.
+This triggers an unused warning on dev.  Please fix.
 
+Thanks,
 -- 
-With Best Regards,
-Andy Shevchenko
-
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
