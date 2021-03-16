@@ -2,155 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A89C433E6
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 12:29:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0375C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 12:34:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC6E565033
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 12:29:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7EDB365040
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 12:34:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231584AbhCPM2e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Mar 2021 08:28:34 -0400
-Received: from mail-40131.protonmail.ch ([185.70.40.131]:42547 "EHLO
-        mail-40131.protonmail.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231538AbhCPM2W (ORCPT
+        id S229548AbhCPMe0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Mar 2021 08:34:26 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:13965 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231927AbhCPMdt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Mar 2021 08:28:22 -0400
-Date:   Tue, 16 Mar 2021 12:28:09 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tmb.nu;
-        s=protonmail; t=1615897699;
-        bh=rdxx40UCRxDfNqh5+8Fouwmc//n/uVv1F0nAQbbsXbE=;
-        h=Date:To:From:Cc:Reply-To:Subject:In-Reply-To:References:From;
-        b=ESq2QZ/DDqxY0SnSvUNFe2HGkjegDMgWujqh6k8WJrrJ976imrM2XVzUVO9uzoBHg
-         bEr3u8dDCiFH+huEwRJEyoHF2DlFXmbNA+o20o9wMEkr0cpA1M3rPVPoeo7YdV87fm
-         U+9kmxSZOZRdOQ0VE212KFGuF+qsoF64IYBNESYA=
-To:     Ard Biesheuvel <ardb@kernel.org>
-From:   Thomas Backlund <tmb@tmb.nu>
-Cc:     "# 3.4.x" <stable@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Reply-To: Thomas Backlund <tmb@tmb.nu>
-Subject: Re: stable request
-Message-ID: <9493dced-908e-a9bd-009a-6b20a8422ec1@tmb.nu>
-In-Reply-To: <1e6eb02b-e699-d1ff-9cfb-4ef77255e244@tmb.nu>
-References: <d5c825ba-cdcb-29eb-c434-83ef4db05ee0@tmb.nu> <CAMj1kXEM76Dejv1fTZ-1EmXpSsE-ZtKWf19dPNTSBRuPcAkreA@mail.gmail.com> <1e6eb02b-e699-d1ff-9cfb-4ef77255e244@tmb.nu>
+        Tue, 16 Mar 2021 08:33:49 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4F0CMt5nd6zrTtX
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Mar 2021 20:31:54 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.498.0; Tue, 16 Mar 2021 20:33:36 +0800
+From:   Jay Fang <f.fangjian@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
+CC:     <tangzihao1@hisilicon.com>, <huangdaode@huawei.com>
+Subject: [PATCH] hwrng: core - convert sysfs sprintf/snprintf family to sysfs_emit
+Date:   Tue, 16 Mar 2021 20:34:12 +0800
+Message-ID: <1615898052-31279-1-git-send-email-f.fangjian@huawei.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+From: Zihao Tang <tangzihao1@hisilicon.com>
 
-Den 16.3.2021 kl. 14:15, skrev Thomas Backlund:
->
-> Den 16.3.2021 kl. 12:17, skrev Ard Biesheuvel:
->> On Tue, 16 Mar 2021 at 10:21, Thomas Backlund <tmb@tmb.nu> wrote:
->>> Den 16.3.2021 kl. 08:37, skrev Ard Biesheuvel:
->>>> Please consider backporting commit
->>>>
->>>> 86ad60a65f29dd862a11c22bb4b5be28d6c5cef1
->>>> crypto: x86/aes-ni-xts - use direct calls to and 4-way stride
->>>>
->>>> to stable. It addresses a rather substantial retpoline-related
->>>> performance regression in the AES-NI XTS code, which is a widely used
->>>> disk encryption algorithm on x86.
->>>>
->>> To get all the nice bits, we added the following in Mageia 5.10 / 5.11
->>> series kerenels (the 2 first is needed to get the third to apply/build
->>> nicely):
->>>
->> I will leave it up to the -stable maintainers to decide, but I will
->> point out that none of the additional patches fix any bugs, so this
->> may violate the stable kernel rules. In fact, I deliberately split the
->> XTS changes into two  patches so that the first one could be
->> backported individually.
->
-> Yes, I understand that.
->
-> but commit
->
-> 86ad60a65f29dd862a11c22bb4b5be28d6c5cef1
-> crypto: x86/aes-ni-xts - use direct calls to and 4-way stride
->
-> only applies cleanly on 5.11.
->
->
-> So if it's wanted in 5.10 you need the 2 others too... unless you intend =
-to provide a tested backport...
-> and IIRC GregKH prefers 1:1 matching of patches between -stable and linus=
- tree unless they are too intrusive.
->
->
-> As for the last one I seem to remember comments that it too was part of t=
-he "affects performance", but I might be remembering wrong... and since you=
- are Author of them I assume you know better about the facts :)
->
->
-> That's why I listed them as an extra "hopefully helfpful" info and datapo=
-int that they work...
-> We have been carrying them in 5.10 series since we rebased to 5.10.8 on J=
-anuary 17th, 2021
->
->
-> but in the end it's up to the -stable maintainers as you point out...
+Fix the following coccicheck warning:
 
+drivers/char/hw_random/core.c:399:8-16: WARNING: use scnprintf or sprintf.
 
-and now=C2=A0 I re-checked...
+Signed-off-by: Zihao Tang <tangzihao1@hisilicon.com>
+Signed-off-by: Jay Fang <f.fangjian@huawei.com>
+---
+ drivers/char/hw_random/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Only the first is needed to get your fix to apply cleanly on 5.10
-
-
-the second came in as a pre-req for the fourth patch...
-
---
-
-Thomas
-
-
-
-> --
-> Thomas
->
->> --
->> Ard.
->>
->>
->>> applied in this order:
->>>
->>>    From 032d049ea0f45b45c21f3f02b542aa18bc6b6428 Mon Sep 17 00:00:00 20=
-01
->>> From: Uros Bizjak <ubizjak@gmail.com>
->>> Date: Fri, 27 Nov 2020 10:44:52 +0100
->>> Subject: [PATCH] crypto: aesni - Use TEST %reg,%reg instead of CMP $0,%=
-reg
->>>
->>>    From ddf169a98f01d6fd46295ec0dd4c1d6385be65d4 Mon Sep 17 00:00:00 20=
-01
->>> From: Ard Biesheuvel <ardb@kernel.org>
->>> Date: Tue, 8 Dec 2020 00:34:02 +0100
->>> Subject: [PATCH] crypto: aesni - implement support for cts(cbc(aes))
->>>
->>>    From 86ad60a65f29dd862a11c22bb4b5be28d6c5cef1 Mon Sep 17 00:00:00 20=
-01
->>> From: Ard Biesheuvel <ardb@kernel.org>
->>> Date: Thu, 31 Dec 2020 17:41:54 +0100
->>> Subject: [PATCH] crypto: x86/aes-ni-xts - use direct calls to and 4-way
->>> stride
->>>
->>>    From 2481104fe98d5b016fdd95d649b1235f21e491ba Mon Sep 17 00:00:00 20=
-01
->>> From: Ard Biesheuvel <ardb@kernel.org>
->>> Date: Thu, 31 Dec 2020 17:41:55 +0100
->>> Subject: [PATCH] crypto: x86/aes-ni-xts - rewrite and drop indirections
->>> via glue helper
->>>
->>> --
->>> Thomas
->>>
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 8c1c47d..adb3c2b 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -396,7 +396,7 @@ static ssize_t hwrng_attr_selected_show(struct device *dev,
+ 					struct device_attribute *attr,
+ 					char *buf)
+ {
+-	return snprintf(buf, PAGE_SIZE, "%d\n", cur_rng_set_by_user);
++	return sysfs_emit(buf, "%d\n", cur_rng_set_by_user);
+ }
+ 
+ static DEVICE_ATTR(rng_current, S_IRUGO | S_IWUSR,
+-- 
+2.7.4
 
