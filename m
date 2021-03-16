@@ -6,143 +6,125 @@ X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2579AC433DB
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 22:07:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 716A9C433DB
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 22:29:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E8A1464F8A
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 22:06:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44BA264F01
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 22:29:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230269AbhCPWGW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Mar 2021 18:06:22 -0400
-Received: from mail-il1-f180.google.com ([209.85.166.180]:34833 "EHLO
-        mail-il1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230286AbhCPWGC (ORCPT
+        id S231243AbhCPW2b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Mar 2021 18:28:31 -0400
+Received: from mail-il1-f177.google.com ([209.85.166.177]:37976 "EHLO
+        mail-il1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231219AbhCPW2a (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Mar 2021 18:06:02 -0400
-Received: by mail-il1-f180.google.com with SMTP id h18so14194031ils.2;
-        Tue, 16 Mar 2021 15:06:02 -0700 (PDT)
+        Tue, 16 Mar 2021 18:28:30 -0400
+Received: by mail-il1-f177.google.com with SMTP id f10so14220731ilq.5;
+        Tue, 16 Mar 2021 15:28:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=X+25j3LtI83/Mlwrw+Su7Sg0G8Kk4KU5YFjDf73z7Tc=;
-        b=Sn7PgJaeMZd7MTUi9JeSg0KIOTkhE1yzzFCXrb2MTqxWEzr54CuCTEwTSqKtahkNpH
-         tlv6pdvFXcUKjKsp3sfX6AyACYnYpAaLuWw9NzVguTzY9LN6tX+smRmO6eA7Uq6f7Iqb
-         9Od5S0jgh+IJmAuNLpCo12ejZQRia0BwcyrdOCwJWskbHaee2q0V51XWxMJiZ92yNJXI
-         eEBN0VpJP1yFFBGJImYRzmXwO271UzTtgkHi4W17/L1JRLK1mPQfOTyUTTK66XsLzzRu
-         kXc12ayftq++3GiVfsPhvZtf5pjVKSmxnu30Kf/H2xtueugnTzgObEo3ZOEER2DT4lAU
-         +MWQ==
-X-Gm-Message-State: AOAM532yxHmGamJGzR/FVpt0dgQauyaMPIj34gvF0SIs3Ai4yknLkPDJ
-        gNJ6nfBYhPcXmhZyixdrGw==
-X-Google-Smtp-Source: ABdhPJw8gqo3WwzUPjdGontwxsD24GlSGV/KjNJ/XjEoHTx6WbbUHwUt3bW0rpGvbcl6dFfqE/09tA==
-X-Received: by 2002:a92:c24a:: with SMTP id k10mr5330643ilo.284.1615932362354;
-        Tue, 16 Mar 2021 15:06:02 -0700 (PDT)
+        bh=KZF2IUAZVdcUGG23s3R2g6WJv4TZQM/Lti0qI3yptWc=;
+        b=LocLgHjLfH5OrNjgVJWTVT4z4gSaL3S8J/TC79XbgnWrx5i69gzABLe7+BQ9wa1PUs
+         KYSA1tYA4HekDtsIcxXXa0PfoPmUhXXRGm7frhAlod0EHBbCj0DWRk+jLYaJ7+2cYYcB
+         n2ZpAjOXOLefM3K72Hoz7KWBUl17AuN+bDNMorHtRexA8MXG8J8hASJDcJbN6X9OT2ad
+         MDGuCUL0PB3LgmiqGNYjOeOZWKfv0ZMxzrcMZzyLn6KCVW4iwdiurApWt33Yx2agSSJg
+         h/1RzsIWdFJfVfFQ2lfRn6F4gk4gXHeS/vlhG8Ig7eLBAgYip8eJlCZ1BS4p33s4Q/yu
+         26iQ==
+X-Gm-Message-State: AOAM533EBGwRiK2bUPZrZeFowY9p+8eT5NqBdwi+gd6vRIRDaDMUKHiG
+        et8iQiTviOtxHwTX/I2WoQ==
+X-Google-Smtp-Source: ABdhPJwh3xw/09JpuwcCGh+7MpZW+l36DoUCtfOz7o2ub5/Q7DpAbPKwpLRdckE8SGmnfOuRX2FMTA==
+X-Received: by 2002:a05:6e02:178e:: with SMTP id y14mr5303720ilu.175.1615933709855;
+        Tue, 16 Mar 2021 15:28:29 -0700 (PDT)
 Received: from robh.at.kernel.org ([64.188.179.253])
-        by smtp.gmail.com with ESMTPSA id a5sm10125189ilk.14.2021.03.16.15.05.59
+        by smtp.gmail.com with ESMTPSA id c18sm10296673ild.37.2021.03.16.15.28.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Mar 2021 15:06:01 -0700 (PDT)
-Received: (nullmailer pid 3762495 invoked by uid 1000);
-        Tue, 16 Mar 2021 22:05:58 -0000
-Date:   Tue, 16 Mar 2021 16:05:58 -0600
+        Tue, 16 Mar 2021 15:28:29 -0700 (PDT)
+Received: (nullmailer pid 3798476 invoked by uid 1000);
+        Tue, 16 Mar 2021 22:28:25 -0000
+Date:   Tue, 16 Mar 2021 16:28:25 -0600
 From:   Rob Herring <robh@kernel.org>
-To:     Vaibhav Gupta <vaibhavgupta40@gmail.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Kishon Vijay Abraham <kishon@ti.com>,
-        Sekhar Nori <nsekhar@ti.com>,
-        Lokesh Vutla <lokeshvutla@ti.com>,
-        Praneeth Bajjuri <praneeth@ti.com>,
-        Gowtham Tammana <g-tammana@ti.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Peter Ujfalusi <peter.ujfalusi@ti.com>,
-        Vaibhav Gupta <v_gupta@ti.com>
-Subject: Re: [PATCH v1 1/3] dt-bindings: crypto: ti,sa2ul: Add new compatible
- for AM64
-Message-ID: <20210316220558.GA3754419@robh.at.kernel.org>
-References: <20210308202005.243228-1-vaibhavgupta40@gmail.com>
- <20210308202005.243228-2-vaibhavgupta40@gmail.com>
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     linux-arm-msm@vger.kernel.org,
+        Thara Gopinath <thara.gopinath@linaro.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bhupesh.linux@gmail.com
+Subject: Re: [PATCH 2/8] dt-bindings: crypto : Add new compatible strings for
+ qcom-qce
+Message-ID: <20210316222825.GA3792517@robh.at.kernel.org>
+References: <20210310052503.3618486-1-bhupesh.sharma@linaro.org>
+ <20210310052503.3618486-3-bhupesh.sharma@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210308202005.243228-2-vaibhavgupta40@gmail.com>
+In-Reply-To: <20210310052503.3618486-3-bhupesh.sharma@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 09, 2021 at 01:50:03AM +0530, Vaibhav Gupta wrote:
-> From: Peter Ujfalusi <peter.ujfalusi@ti.com>
+On Wed, Mar 10, 2021 at 10:54:57AM +0530, Bhupesh Sharma wrote:
+> Newer qcom chips support newer versions of the qce IP, so add
+> new compatible strings for qcom-qce (in addition to the existing
+> "qcom,crypto-v5.1").
 > 
-> Add the AM64 version of sa2ul to the compatible list.
+> With [1], Thara tried to add the support for new compatible strings,
+> but we couldn't conclude on the approach to be used. Since we have
+> a number of new qcom arm64 SoCs available now, several of which
+> support the same crypto IP version, so it makes more sense to use
+> the IP version for the compatible string, rather than using the soc
+> name as the compatible string.
 > 
-> [v_gupta@ti.com: Conditional dma-coherent requirement, clocks]
-> Signed-off-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
-> Signed-off-by: Vaibhav Gupta <v_gupta@ti.com>
+> [1]. https://lore.kernel.org/linux-arm-msm/20201119155233.3974286-7-thara.gopinath@linaro.org/
+> 
+> Cc: Thara Gopinath <thara.gopinath@linaro.org>
+> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
+> Cc: Rob Herring <robh+dt@kernel.org>
+> Cc: Andy Gross <agross@kernel.org>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Stephen Boyd <sboyd@kernel.org>
+> Cc: Michael Turquette <mturquette@baylibre.com>
+> Cc: linux-clk@vger.kernel.org
+> Cc: linux-crypto@vger.kernel.org
+> Cc: devicetree@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: bhupesh.linux@gmail.com
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
 > ---
->  .../devicetree/bindings/crypto/ti,sa2ul.yaml  | 40 +++++++++++++++----
->  1 file changed, 33 insertions(+), 7 deletions(-)
+>  Documentation/devicetree/bindings/crypto/qcom-qce.txt | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 > 
-> diff --git a/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml b/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
-> index 1d48ac712b23..6eb9acd564c2 100644
-> --- a/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
-> @@ -14,6 +14,7 @@ properties:
->      enum:
->        - ti,j721e-sa2ul
->        - ti,am654-sa2ul
-> +      - ti,am64-sa2ul
+> diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.txt b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
+> index 07ee1b12000b..217b37dbd58a 100644
+> --- a/Documentation/devicetree/bindings/crypto/qcom-qce.txt
+> +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
+> @@ -2,7 +2,11 @@ Qualcomm crypto engine driver
 >  
->    reg:
->      maxItems: 1
-> @@ -45,19 +46,44 @@ properties:
->      description:
->        Address translation for the possible RNG child node for SA2UL
+>  Required properties:
 >  
-> +  clocks:
-> +    items:
-> +      - description: Clock used by PKA
-> +      - description: Main Input Clock
-> +      - description: Clock used by rng
-> +
-> +  clock-names:
-> +    items:
-> +      - const: pka_in_clk
-> +      - const: x1_clk
-> +      - const: x2_clk
-> +
->  patternProperties:
->    "^rng@[a-f0-9]+$":
->      type: object
->      description:
->        Child RNG node for SA2UL
->  
-> -required:
-> -  - compatible
-> -  - reg
-> -  - power-domains
-> -  - dmas
-> -  - dma-names
-> -  - dma-coherent
-> +if:
-> +  properties:
-> +    compatible:
-> +      const: ti,am64-sa2ul
-> +then:
-> +  required:
-> +    - compatible
-> +    - reg
-> +    - power-domains
-> +    - dmas
-> +    - dma-names
-> +
-> +else:
-> +  required:
-> +    - compatible
-> +    - reg
-> +    - power-domains
-> +    - dmas
-> +    - dma-names
-> +    - dma-coherent
+> -- compatible  : should be "qcom,crypto-v5.1"
+> +- compatible  : Supported versions are:
+> +		- "qcom,crypto-v5.1", for ipq6018
+> +		- "qcom,crypto-v5.4", for sdm845, sm8150
 
-The only difference is 'dma-coherent'. You can simplify the if/then to 
-just that.
+2 SoCs sharing 1 version doesn't convince me on using version numbers. 
+Having 4 versions for 5 SoCs further convinces me you should stick with 
+SoC specific compatibles as *everyone* else does (including most QCom 
+bindings).
+
+> +		- "qcom,crypto-v5.5", for sm8250
+> +		- "qcom,crypto-v5.6", for sm8350
+>  - reg         : specifies base physical address and size of the registers map
+>  - clocks      : phandle to clock-controller plus clock-specifier pair
+>  - clock-names : "iface" clocks register interface
+> -- 
+> 2.29.2
+> 
