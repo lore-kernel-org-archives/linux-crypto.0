@@ -2,42 +2,40 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD3A1C433DB
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 02:00:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19211C433E6
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 02:00:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 956AA65011
+	by mail.kernel.org (Postfix) with ESMTP id C2ADC64F6A
 	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 02:00:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234065AbhCPB7x (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Mar 2021 21:59:53 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:13619 "EHLO
+        id S233801AbhCPB7y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Mar 2021 21:59:54 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:13618 "EHLO
         szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231876AbhCPB7v (ORCPT
+        with ESMTP id S233878AbhCPB7v (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 15 Mar 2021 21:59:51 -0400
 Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DzxJK4P51z17Lk1;
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DzxJK4ds7z17LlX;
         Tue, 16 Mar 2021 09:57:53 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.58) by
  DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 16 Mar 2021 09:59:36 +0800
+ 14.3.498.0; Tue, 16 Mar 2021 09:59:35 +0800
 From:   chenxiang <chenxiang66@hisilicon.com>
 To:     <clabbe.montjoie@gmail.com>, <clabbe@baylibre.com>,
         <gcherian@marvell.com>, <herbert@gondor.apana.org.au>,
         <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <linuxarm@openeuler.org>,
         Xiang Chen <chenxiang66@hisilicon.com>
-Subject: [PATCH v2 3/4] crypto: ux500 - Fix the parameter of dma_unmap_sg()
-Date:   Tue, 16 Mar 2021 09:55:25 +0800
-Message-ID: <1615859726-57062-4-git-send-email-chenxiang66@hisilicon.com>
+Subject: [PATCH v2 0/4] Fix the parameter of dma_map_sg()
+Date:   Tue, 16 Mar 2021 09:55:22 +0800
+Message-ID: <1615859726-57062-1-git-send-email-chenxiang66@hisilicon.com>
 X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1615859726-57062-1-git-send-email-chenxiang66@hisilicon.com>
-References: <1615859726-57062-1-git-send-email-chenxiang66@hisilicon.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.69.192.58]
@@ -48,48 +46,47 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Xiang Chen <chenxiang66@hisilicon.com>
 
-For function dma_unmap_sg(), the <nents> parameter should be number of
-elements in the scatterlist prior to the mapping, not after the mapping.
-So fix this usage.
+According to Documentation/core-api/dma-api-howto.rst, the parameters
+of dma_unmap_sg() must be the same as those which are passed in to the
+scatter/gather mapping API.
+But for some drivers under crypto, the <nents> parameter of dma_unmap_sg()
+is number of elements after mapping. So fix them.
 
-Signed-off-by: Xiang Chen <chenxiang66@hisilicon.com>
----
- drivers/crypto/ux500/cryp/cryp_core.c | 4 ++--
- drivers/crypto/ux500/hash/hash_core.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+Part of the document is as follows:
 
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index c3adeb2..9abf00e 100644
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -608,12 +608,12 @@ static void cryp_dma_done(struct cryp_ctx *ctx)
- 	chan = ctx->device->dma.chan_mem2cryp;
- 	dmaengine_terminate_all(chan);
- 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg_src,
--		     ctx->device->dma.sg_src_len, DMA_TO_DEVICE);
-+		     ctx->device->dma.nents_src, DMA_TO_DEVICE);
- 
- 	chan = ctx->device->dma.chan_cryp2mem;
- 	dmaengine_terminate_all(chan);
- 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg_dst,
--		     ctx->device->dma.sg_dst_len, DMA_FROM_DEVICE);
-+		     ctx->device->dma.nents_dst, DMA_FROM_DEVICE);
- }
- 
- static int cryp_dma_write(struct cryp_ctx *ctx, struct scatterlist *sg,
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index da284b0..67b1237 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -190,7 +190,7 @@ static void hash_dma_done(struct hash_ctx *ctx)
- 	chan = ctx->device->dma.chan_mem2hash;
- 	dmaengine_terminate_all(chan);
- 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg,
--		     ctx->device->dma.sg_len, DMA_TO_DEVICE);
-+		     ctx->device->dma.nents, DMA_TO_DEVICE);
- }
- 
- static int hash_dma_write(struct hash_ctx *ctx,
+To unmap a scatterlist, just call::
+
+        dma_unmap_sg(dev, sglist, nents, direction);
+	
+Again, make sure DMA activity has already finished.
+	
+        .. note::
+		
+	    The 'nents' argument to the dma_unmap_sg call must be
+	    the _same_ one you passed into the dma_map_sg call,
+	    it should _NOT_ be the 'count' value _returned_ from the
+	    dma_map_sg call.
+
+Change Log:
+v1 -> v2: Remove changing the count passed to create_sg_component 
+in driver cavium;
+
+Xiang Chen (4):
+  crypto: amlogic - Fix the parameter of dma_unmap_sg()
+  crypto: cavium - Fix the parameter of dma_unmap_sg()
+  crypto: ux500 - Fix the parameter of dma_unmap_sg()
+  crypto: allwinner - Fix the parameter of dma_unmap_sg()
+
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 9 ++++++---
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   | 3 ++-
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 9 ++++++---
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c   | 3 ++-
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c         | 6 +++---
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c        | 9 +++++----
+ drivers/crypto/ux500/cryp/cryp_core.c               | 4 ++--
+ drivers/crypto/ux500/hash/hash_core.c               | 2 +-
+ 8 files changed, 27 insertions(+), 18 deletions(-)
+
 -- 
 2.8.1
 
