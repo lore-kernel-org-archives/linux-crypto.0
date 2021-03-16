@@ -2,275 +2,231 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE910C433DB
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 19:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24661C43381
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 21:08:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8074E65061
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 19:23:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDF0F64F9F
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 21:08:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236733AbhCPTWs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Mar 2021 15:22:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59742 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234990AbhCPTWk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Mar 2021 15:22:40 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E870D65061;
-        Tue, 16 Mar 2021 19:22:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615922559;
-        bh=zg65Pn1r3cXmZ68Zj9qDDZ2iLpobA6DjNNZemVWYfXg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HpoautR6qNDWPE2QlXP5cZF13tXQgMfXBEoaqM/R32UyMWeeuXXUGEoQz85frM8GG
-         ebu0MBOo1S8ciNndBDKlI26RwrhnBv4fhnktaQoWISiVL6Mx8fMJnYFyTVHjdi+YYi
-         zdxRn0pNDuTAzSUzzVv3T5JI9rhcLSV1pFPVsorfyDWDMxUkwZdfBGqTIXRJj02SCV
-         S0IBACa7l3uqHAk+CdOoOpadvNkP+1lRUIVu9OIkyuH0XvOPMxDM4q3wdKON03HIxT
-         RkK0nZrnUqjGeHNhdhQYnCwB9aL7mEph5OhSCIWXRY/uKmDvDbGAd6iQR4R024Kdgo
-         PNP2TdxzKrpgw==
-Date:   Tue, 16 Mar 2021 21:22:14 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>, kernel@pengutronix.de,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Udit Agarwal <udit.agarwal@nxp.com>,
-        Jan Luebbe <j.luebbe@penutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Franck LENORMAND <franck.lenormand@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v1 3/3] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
-Message-ID: <YFEFZujgsMpX7VbU@kernel.org>
-References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
- <319e558e1bd19b80ad6447c167a2c3942bdafea2.1615914058.git-series.a.fatoum@pengutronix.de>
+        id S232403AbhCPVIR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Mar 2021 17:08:17 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31718 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231637AbhCPVIF (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Mar 2021 17:08:05 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12GL3xME088307;
+        Tue, 16 Mar 2021 17:07:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=bZNfzwg0HLbPIyIeLJh/4+HqQLwJNrPUav2V/TkNJWQ=;
+ b=rhkMCkrfWa5Z0++xDm1lf3X2yjsm4KJbiNDVU/8li9kTzwIaMvAIQ11LkUV+fkMPdn3U
+ Iv2CFdK02V55QKkR1EeNNh6TUhzXMvHkusJ3uq6v5nXQyRlvvyajORxhb874bzydKzUo
+ yXbERW+1E7f25T1Kf+tmHad2E63S4ROKxFFNS2mGJYfF/m4gNp8zYrYMQXcEQe3nlWSH
+ VCfF/yVeVLAzBiI0dPbqtE0iEVWJUgOmrJsdDboukWkiT6B6dfMoCJF9w7hKZea7jweQ
+ u5htuqm+qOV3E1eQcrszQ0qRvYrpp9vjLObYTRtE1eozfjjYqtGRIvtRGzABfU5AONR6 xQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37b0rcdyub-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Mar 2021 17:07:59 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12GL4Ljs092796;
+        Tue, 16 Mar 2021 17:07:59 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37b0rcdyu2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Mar 2021 17:07:59 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12GKpoMk020779;
+        Tue, 16 Mar 2021 21:07:58 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma01wdc.us.ibm.com with ESMTP id 378n1924n2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Mar 2021 21:07:58 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12GL7vtf11207082
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Mar 2021 21:07:57 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 148E313604F;
+        Tue, 16 Mar 2021 21:07:57 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 46C4913605D;
+        Tue, 16 Mar 2021 21:07:56 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.47.158.152])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 16 Mar 2021 21:07:56 +0000 (GMT)
+From:   Stefan Berger <stefanb@linux.ibm.com>
+To:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, herbert@gondor.apana.org.au,
+        dhowells@redhat.com, zohar@linux.ibm.com, jarkko@kernel.org
+Cc:     linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, patrick@puiterwijk.org,
+        Stefan Berger <stefanb@linux.ibm.com>
+Subject: [PATCH v12 07/10] x509: Add support for parsing x509 certs with ECDSA keys
+Date:   Tue, 16 Mar 2021 17:07:37 -0400
+Message-Id: <20210316210740.1592994-8-stefanb@linux.ibm.com>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210316210740.1592994-1-stefanb@linux.ibm.com>
+References: <20210316210740.1592994-1-stefanb@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <319e558e1bd19b80ad6447c167a2c3942bdafea2.1615914058.git-series.a.fatoum@pengutronix.de>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-16_08:2021-03-16,2021-03-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 spamscore=0 clxscore=1015 priorityscore=1501
+ impostorscore=0 phishscore=0 bulkscore=0 adultscore=0 suspectscore=0
+ malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103160135
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 16, 2021 at 06:01:18PM +0100, Ahmad Fatoum wrote:
-> The Cryptographic Acceleration and Assurance Module (CAAM) is an IP core
-> built into many newer i.MX and QorIQ SoCs by NXP.
-> 
-> The CAAM does crypto acceleration, hardware number generation and
-> has a blob mechanism for encapsulation/decapsulation of sensitive material.
-> 
-> This blob mechanism depends on a device specific random 256-bit One Time
-> Programmable Master Key that is fused in each SoC at manufacturing
-> time. This key is unreadable and can only be used by the CAAM for AES
-> encryption/decryption of user data.
-> 
-> This makes it a suitable backend (source) for kernel trusted keys.
-> 
-> Previous commits generalized trusted keys to support multiple backends
-> and added an API to access the CAAM blob mechanism. Based on these,
-> provide the necessary glue to use the CAAM for trusted keys.
-> 
-> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-> ---
-> To: Jonathan Corbet <corbet@lwn.net>
-> To: David Howells <dhowells@redhat.com>
-> To: Jarkko Sakkinen <jarkko@kernel.org>
-> To: James Bottomley <jejb@linux.ibm.com>
-> To: Mimi Zohar <zohar@linux.ibm.com>
-> Cc: James Morris <jmorris@namei.org>
-> Cc: "Serge E. Hallyn" <serge@hallyn.com>
-> Cc: "Horia Geantă" <horia.geanta@nxp.com>
-> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Udit Agarwal <udit.agarwal@nxp.com>
-> Cc: Jan Luebbe <j.luebbe@penutronix.de>
-> Cc: David Gstir <david@sigma-star.at>
-> Cc: Franck LENORMAND <franck.lenormand@nxp.com>
-> Cc: Sumit Garg <sumit.garg@linaro.org>
-> Cc: keyrings@vger.kernel.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-doc@vger.kernel.org
-> Cc: linux-integrity@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-security-module@vger.kernel.org
-> ---
->  Documentation/admin-guide/kernel-parameters.txt |  1 +-
->  include/keys/trusted_caam.h                     | 11 +++-
->  security/keys/trusted-keys/Makefile             |  1 +-
->  security/keys/trusted-keys/trusted_caam.c       | 74 ++++++++++++++++++-
->  security/keys/trusted-keys/trusted_core.c       |  6 +-
->  5 files changed, 92 insertions(+), 1 deletion(-)
->  create mode 100644 include/keys/trusted_caam.h
->  create mode 100644 security/keys/trusted-keys/trusted_caam.c
-> 
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index c8bad1762cba..382e911389aa 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -5469,6 +5469,7 @@
->  			sources:
->  			- "tpm"
->  			- "tee"
-> +			- "caam"
->  			If not specified then it defaults to iterating through
->  			the trust source list starting with TPM and assigns the
->  			first trust source as a backend which is initialized
-> diff --git a/include/keys/trusted_caam.h b/include/keys/trusted_caam.h
-> new file mode 100644
-> index 000000000000..2fba0996b0b0
-> --- /dev/null
-> +++ b/include/keys/trusted_caam.h
-> @@ -0,0 +1,11 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2021 Pengutronix, Ahmad Fatoum <kernel@pengutronix.de>
-> + */
-> +
-> +#ifndef __CAAM_TRUSTED_KEY_H
-> +#define __CAAM_TRUSTED_KEY_H
-> +
-> +extern struct trusted_key_ops caam_trusted_key_ops;
-> +
-> +#endif
-> diff --git a/security/keys/trusted-keys/Makefile b/security/keys/trusted-keys/Makefile
-> index feb8b6c3cc79..050370690abd 100644
-> --- a/security/keys/trusted-keys/Makefile
-> +++ b/security/keys/trusted-keys/Makefile
-> @@ -12,3 +12,4 @@ trusted-y += trusted_tpm2.o
->  trusted-y += tpm2key.asn1.o
->  
->  trusted-$(CONFIG_TEE) += trusted_tee.o
-> +trusted-$(CONFIG_CRYPTO_DEV_FSL_CAAM_BLOB_GEN) += trusted_caam.o
-> diff --git a/security/keys/trusted-keys/trusted_caam.c b/security/keys/trusted-keys/trusted_caam.c
-> new file mode 100644
-> index 000000000000..fc2e3dde9e06
-> --- /dev/null
-> +++ b/security/keys/trusted-keys/trusted_caam.c
-> @@ -0,0 +1,74 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2021 Pengutronix, Ahmad Fatoum <kernel@pengutronix.de>
-> + */
-> +
-> +#include <keys/trusted_caam.h>
-> +#include <keys/trusted-type.h>
-> +#include <linux/build_bug.h>
-> +#include <linux/key-type.h>
-> +#include <soc/fsl/caam-blob.h>
-> +
-> +struct caam_blob_priv *blobifier;
-> +
-> +#define KEYMOD "kernel:trusted"
-> +
-> +static_assert(MAX_KEY_SIZE + CAAM_BLOB_OVERHEAD <= CAAM_BLOB_MAX_LEN);
-> +static_assert(MAX_BLOB_SIZE <= CAAM_BLOB_MAX_LEN);
-> +
-> +static int trusted_caam_seal(struct trusted_key_payload *p, char *datablob)
-> +{
-> +	int length = p->key_len + CAAM_BLOB_OVERHEAD;
-> +	int ret;
-> +
-> +	ret = caam_encap_blob(blobifier, KEYMOD, p->key, p->blob, length);
-> +	if (ret)
-> +		return ret;
-> +
-> +	p->blob_len = length;
-> +	return 0;
-> +}
-> +
-> +static int trusted_caam_unseal(struct trusted_key_payload *p, char *datablob)
-> +{
-> +	int length = p->blob_len;
-> +	int ret;
-> +
-> +	ret = caam_decap_blob(blobifier, KEYMOD, p->blob, p->key, length);
-> +	if (ret)
-> +		return ret;
-> +
-> +	p->key_len = length - CAAM_BLOB_OVERHEAD;
-> +	return 0;
-> +}
-> +
-> +static int trusted_caam_init(void)
-> +{
-> +	int ret;
-> +
-> +	blobifier = caam_blob_gen_init();
-> +	if (IS_ERR(blobifier)) {
-> +		pr_err("Job Ring Device allocation for transform failed\n");
-> +		return PTR_ERR(blobifier);
-> +	}
-> +
-> +	ret = register_key_type(&key_type_trusted);
-> +	if (ret)
-> +		caam_blob_gen_exit(blobifier);
-> +
-> +	return ret;
-> +}
-> +
-> +static void trusted_caam_exit(void)
-> +{
-> +	unregister_key_type(&key_type_trusted);
-> +	caam_blob_gen_exit(blobifier);
-> +}
-> +
-> +struct trusted_key_ops caam_trusted_key_ops = {
-> +	.migratable = 0, /* non-migratable */
-> +	.init = trusted_caam_init,
-> +	.seal = trusted_caam_seal,
-> +	.unseal = trusted_caam_unseal,
-> +	.exit = trusted_caam_exit,
-> +};
-> diff --git a/security/keys/trusted-keys/trusted_core.c b/security/keys/trusted-keys/trusted_core.c
-> index 5f92323efedf..e9bfb1bbc014 100644
-> --- a/security/keys/trusted-keys/trusted_core.c
-> +++ b/security/keys/trusted-keys/trusted_core.c
-> @@ -9,6 +9,7 @@
->  #include <keys/user-type.h>
->  #include <keys/trusted-type.h>
->  #include <keys/trusted_tee.h>
-> +#include <keys/trusted_caam.h>
->  #include <keys/trusted_tpm.h>
->  #include <linux/capability.h>
->  #include <linux/err.h>
-> @@ -25,7 +26,7 @@
->  
->  static char *trusted_key_source;
->  module_param_named(source, trusted_key_source, charp, 0);
-> -MODULE_PARM_DESC(source, "Select trusted keys source (tpm or tee)");
-> +MODULE_PARM_DESC(source, "Select trusted keys source (tpm, tee or caam)");
->  
->  static const struct trusted_key_source trusted_key_sources[] = {
->  #if defined(CONFIG_TCG_TPM)
-> @@ -34,6 +35,9 @@ static const struct trusted_key_source trusted_key_sources[] = {
->  #if defined(CONFIG_TEE)
->  	{ "tee", &trusted_key_tee_ops },
->  #endif
-> +#if defined(CONFIG_CRYPTO_DEV_FSL_CAAM_BLOB_GEN)
-> +	{ "caam", &caam_trusted_key_ops },
-> +#endif
->  };
->  
->  DEFINE_STATIC_CALL_NULL(trusted_key_init, *trusted_key_sources[0].ops->init);
-> -- 
-> git-series 0.9.1
-> 
+Add support for parsing of x509 certificates that contain ECDSA keys,
+such as NIST P256, that have been signed by a CA using any of the
+current SHA hash algorithms.
 
-Too early to ack, as I've not included the TEE thing to any PR yet.
+Cc: David Howells <dhowells@redhat.com>
+Cc: keyrings@vger.kernel.org
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 
-/Jarkko
+---
+
+v7->v8:
+ - do not detect key algo using parse_OID() in public_key.c but set
+   pkey_algo to the key type 'ecdsa-nist-p192/256' when parsing cert
+---
+ crypto/asymmetric_keys/public_key.c       |  4 ++-
+ crypto/asymmetric_keys/x509_cert_parser.c | 34 ++++++++++++++++++++++-
+ crypto/asymmetric_keys/x509_public_key.c  |  4 ++-
+ include/linux/oid_registry.h              |  2 ++
+ 4 files changed, 41 insertions(+), 3 deletions(-)
+
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 788a4ba1e2e7..4fefb219bfdc 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -14,6 +14,7 @@
+ #include <linux/slab.h>
+ #include <linux/seq_file.h>
+ #include <linux/scatterlist.h>
++#include <linux/asn1.h>
+ #include <keys/asymmetric-subtype.h>
+ #include <crypto/public_key.h>
+ #include <crypto/akcipher.h>
+@@ -85,7 +86,8 @@ int software_key_determine_akcipher(const char *encoding,
+ 		return n >= CRYPTO_MAX_ALG_NAME ? -EINVAL : 0;
+ 	}
+ 
+-	if (strcmp(encoding, "raw") == 0) {
++	if (strcmp(encoding, "raw") == 0 ||
++	    strcmp(encoding, "x962") == 0) {
+ 		strcpy(alg_name, pkey->pkey_algo);
+ 		return 0;
+ 	}
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index 1621ceaf5c95..f5d547c6dfb5 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -227,6 +227,26 @@ int x509_note_pkey_algo(void *context, size_t hdrlen,
+ 		ctx->cert->sig->hash_algo = "sha224";
+ 		goto rsa_pkcs1;
+ 
++	case OID_id_ecdsa_with_sha1:
++		ctx->cert->sig->hash_algo = "sha1";
++		goto ecdsa;
++
++	case OID_id_ecdsa_with_sha224:
++		ctx->cert->sig->hash_algo = "sha224";
++		goto ecdsa;
++
++	case OID_id_ecdsa_with_sha256:
++		ctx->cert->sig->hash_algo = "sha256";
++		goto ecdsa;
++
++	case OID_id_ecdsa_with_sha384:
++		ctx->cert->sig->hash_algo = "sha384";
++		goto ecdsa;
++
++	case OID_id_ecdsa_with_sha512:
++		ctx->cert->sig->hash_algo = "sha512";
++		goto ecdsa;
++
+ 	case OID_gost2012Signature256:
+ 		ctx->cert->sig->hash_algo = "streebog256";
+ 		goto ecrdsa;
+@@ -255,6 +275,11 @@ int x509_note_pkey_algo(void *context, size_t hdrlen,
+ 	ctx->cert->sig->encoding = "raw";
+ 	ctx->algo_oid = ctx->last_oid;
+ 	return 0;
++ecdsa:
++	ctx->cert->sig->pkey_algo = "ecdsa";
++	ctx->cert->sig->encoding = "x962";
++	ctx->algo_oid = ctx->last_oid;
++	return 0;
+ }
+ 
+ /*
+@@ -276,7 +301,8 @@ int x509_note_signature(void *context, size_t hdrlen,
+ 
+ 	if (strcmp(ctx->cert->sig->pkey_algo, "rsa") == 0 ||
+ 	    strcmp(ctx->cert->sig->pkey_algo, "ecrdsa") == 0 ||
+-	    strcmp(ctx->cert->sig->pkey_algo, "sm2") == 0) {
++	    strcmp(ctx->cert->sig->pkey_algo, "sm2") == 0 ||
++	    strcmp(ctx->cert->sig->pkey_algo, "ecdsa") == 0) {
+ 		/* Discard the BIT STRING metadata */
+ 		if (vlen < 1 || *(const u8 *)value != 0)
+ 			return -EBADMSG;
+@@ -478,6 +504,12 @@ int x509_extract_key_data(void *context, size_t hdrlen,
+ 		case OID_sm2:
+ 			ctx->cert->pub->pkey_algo = "sm2";
+ 			break;
++		case OID_id_prime192v1:
++			ctx->cert->pub->pkey_algo = "ecdsa-nist-p192";
++			break;
++		case OID_id_prime256v1:
++			ctx->cert->pub->pkey_algo = "ecdsa-nist-p256";
++			break;
+ 		default:
+ 			return -ENOPKG;
+ 		}
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index ae450eb8be14..3d45161b271a 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -129,7 +129,9 @@ int x509_check_for_self_signed(struct x509_certificate *cert)
+ 	}
+ 
+ 	ret = -EKEYREJECTED;
+-	if (strcmp(cert->pub->pkey_algo, cert->sig->pkey_algo) != 0)
++	if (strcmp(cert->pub->pkey_algo, cert->sig->pkey_algo) != 0 &&
++	    (strncmp(cert->pub->pkey_algo, "ecdsa-", 6) != 0 ||
++	     strcmp(cert->sig->pkey_algo, "ecdsa") != 0))
+ 		goto out;
+ 
+ 	ret = public_key_verify_signature(cert->pub, cert->sig);
+diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
+index f32d91895e4d..3583908cf1ca 100644
+--- a/include/linux/oid_registry.h
++++ b/include/linux/oid_registry.h
+@@ -20,6 +20,8 @@ enum OID {
+ 	OID_id_dsa_with_sha1,		/* 1.2.840.10030.4.3 */
+ 	OID_id_dsa,			/* 1.2.840.10040.4.1 */
+ 	OID_id_ecPublicKey,		/* 1.2.840.10045.2.1 */
++	OID_id_prime192v1,		/* 1.2.840.10045.3.1.1 */
++	OID_id_prime256v1,		/* 1.2.840.10045.3.1.7 */
+ 	OID_id_ecdsa_with_sha1,		/* 1.2.840.10045.4.1 */
+ 	OID_id_ecdsa_with_sha224,	/* 1.2.840.10045.4.3.1 */
+ 	OID_id_ecdsa_with_sha256,	/* 1.2.840.10045.4.3.2 */
+-- 
+2.29.2
+
