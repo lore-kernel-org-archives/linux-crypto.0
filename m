@@ -2,129 +2,141 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 716A9C433DB
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 22:29:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3964AC433DB
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 23:12:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 44BA264F01
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 22:29:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C23164F73
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 23:12:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231243AbhCPW2b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Mar 2021 18:28:31 -0400
-Received: from mail-il1-f177.google.com ([209.85.166.177]:37976 "EHLO
-        mail-il1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231219AbhCPW2a (ORCPT
+        id S229548AbhCPXLg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Mar 2021 19:11:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52080 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229524AbhCPXLG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Mar 2021 18:28:30 -0400
-Received: by mail-il1-f177.google.com with SMTP id f10so14220731ilq.5;
-        Tue, 16 Mar 2021 15:28:30 -0700 (PDT)
+        Tue, 16 Mar 2021 19:11:06 -0400
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C0E4C06174A;
+        Tue, 16 Mar 2021 16:11:06 -0700 (PDT)
+Received: by mail-qt1-x836.google.com with SMTP id u7so100443qtq.12;
+        Tue, 16 Mar 2021 16:11:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=q/UaZC+XXVUcVdTveyndzmJ58HNMu0OJHwUaCal2y4I=;
+        b=DWIL2oGg7zQM/EYvfmH+wg1SfR48ysllZF1J4pLop4dQhVRrYYZ+27DsrMmrMqfZNk
+         lwIksI+Z9vmnWeE4i2C9m+95ayXZvdr2E5Yt/A/rVBxKZ5iMPFSDVopZFzK17v8xlNta
+         Q1n5CEtyRnvPRClsZ/XS3BLdcRLMzh45zVBoPafx7skLLIOX95CKDTy8JseNCLSiDs9r
+         SGDhYWajiaBY+qYrZ37wZqCRh/dOvxhUBOdyJTiQBRxm+L9f/pMXN6UMwyj10ON4gelV
+         RirPhySNpMVXgzw2y1tGBd1AucsKVn5V7B/S0ERKDL1vR4u18IoMWXvyiYSoi+8x/tSo
+         6reA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KZF2IUAZVdcUGG23s3R2g6WJv4TZQM/Lti0qI3yptWc=;
-        b=LocLgHjLfH5OrNjgVJWTVT4z4gSaL3S8J/TC79XbgnWrx5i69gzABLe7+BQ9wa1PUs
-         KYSA1tYA4HekDtsIcxXXa0PfoPmUhXXRGm7frhAlod0EHBbCj0DWRk+jLYaJ7+2cYYcB
-         n2ZpAjOXOLefM3K72Hoz7KWBUl17AuN+bDNMorHtRexA8MXG8J8hASJDcJbN6X9OT2ad
-         MDGuCUL0PB3LgmiqGNYjOeOZWKfv0ZMxzrcMZzyLn6KCVW4iwdiurApWt33Yx2agSSJg
-         h/1RzsIWdFJfVfFQ2lfRn6F4gk4gXHeS/vlhG8Ig7eLBAgYip8eJlCZ1BS4p33s4Q/yu
-         26iQ==
-X-Gm-Message-State: AOAM533EBGwRiK2bUPZrZeFowY9p+8eT5NqBdwi+gd6vRIRDaDMUKHiG
-        et8iQiTviOtxHwTX/I2WoQ==
-X-Google-Smtp-Source: ABdhPJwh3xw/09JpuwcCGh+7MpZW+l36DoUCtfOz7o2ub5/Q7DpAbPKwpLRdckE8SGmnfOuRX2FMTA==
-X-Received: by 2002:a05:6e02:178e:: with SMTP id y14mr5303720ilu.175.1615933709855;
-        Tue, 16 Mar 2021 15:28:29 -0700 (PDT)
-Received: from robh.at.kernel.org ([64.188.179.253])
-        by smtp.gmail.com with ESMTPSA id c18sm10296673ild.37.2021.03.16.15.28.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Mar 2021 15:28:29 -0700 (PDT)
-Received: (nullmailer pid 3798476 invoked by uid 1000);
-        Tue, 16 Mar 2021 22:28:25 -0000
-Date:   Tue, 16 Mar 2021 16:28:25 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc:     linux-arm-msm@vger.kernel.org,
-        Thara Gopinath <thara.gopinath@linaro.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bhupesh.linux@gmail.com
-Subject: Re: [PATCH 2/8] dt-bindings: crypto : Add new compatible strings for
- qcom-qce
-Message-ID: <20210316222825.GA3792517@robh.at.kernel.org>
-References: <20210310052503.3618486-1-bhupesh.sharma@linaro.org>
- <20210310052503.3618486-3-bhupesh.sharma@linaro.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=q/UaZC+XXVUcVdTveyndzmJ58HNMu0OJHwUaCal2y4I=;
+        b=fcu2G+moP4pR7s9eqGMbdA+aoZYiFIALoGvjHVf0FLw9WZvx2iMZJ0YqzNaD1/sOe2
+         vz8Vcnd2uii76N2ovY9zrEIEQQxWvg0847xgYaRFKT1iZsYAxx6UROaC2qSJ/0NbHG1Y
+         t8/3TJiQ6r1a6/b7+6LBGMrKUQJvnQzO2QOanxDOiWq57X62lP1UcldHeqf5NF4lmo9s
+         MrJUR3baXXpIJ+IZ1j8h2e8c0n1VEqlRhaMu2SopHQzpRSwP0IErkmiLpdGOVU33nYli
+         85SKsadvdDRQO035YZmvmg+UewbkTuQVGjl10oUEb3QB52UZua/D42Gd8kMhUK9o7tnP
+         p8WA==
+X-Gm-Message-State: AOAM531NjIK7UQNuOVCFh41skrv9pxCsE6QyRAXFcTMFGnJJWDp0r5iZ
+        4qqVzvKMEOBmnIl4npaW/WCIDr+Roedydsk/SD0=
+X-Google-Smtp-Source: ABdhPJxBFEdBNeCzBmhwsG1aiJERpTBfwg0fFaw3iI8a5NkF1tW33vYv8sNXVeRPlYiFnXqtWtTHy9R3MmjOrn3/z5c=
+X-Received: by 2002:ac8:544:: with SMTP id c4mr1170921qth.245.1615936265576;
+ Tue, 16 Mar 2021 16:11:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210310052503.3618486-3-bhupesh.sharma@linaro.org>
+References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
+In-Reply-To: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
+From:   Richard Weinberger <richard.weinberger@gmail.com>
+Date:   Wed, 17 Mar 2021 00:10:54 +0100
+Message-ID: <CAFLxGvzWLje+_HFeb+hKNch4U1f5uypVUOuP=QrEPn_JNM+scg@mail.gmail.com>
+Subject: Re: [PATCH v1 0/3] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
+        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        James Bottomley <jejb@linux.ibm.com>, kernel@pengutronix.de,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Udit Agarwal <udit.agarwal@nxp.com>,
+        Jan Luebbe <j.luebbe@penutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        LSM <linux-security-module@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 10, 2021 at 10:54:57AM +0530, Bhupesh Sharma wrote:
-> Newer qcom chips support newer versions of the qce IP, so add
-> new compatible strings for qcom-qce (in addition to the existing
-> "qcom,crypto-v5.1").
-> 
-> With [1], Thara tried to add the support for new compatible strings,
-> but we couldn't conclude on the approach to be used. Since we have
-> a number of new qcom arm64 SoCs available now, several of which
-> support the same crypto IP version, so it makes more sense to use
-> the IP version for the compatible string, rather than using the soc
-> name as the compatible string.
-> 
-> [1]. https://lore.kernel.org/linux-arm-msm/20201119155233.3974286-7-thara.gopinath@linaro.org/
-> 
-> Cc: Thara Gopinath <thara.gopinath@linaro.org>
-> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-> Cc: Rob Herring <robh+dt@kernel.org>
-> Cc: Andy Gross <agross@kernel.org>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Stephen Boyd <sboyd@kernel.org>
-> Cc: Michael Turquette <mturquette@baylibre.com>
-> Cc: linux-clk@vger.kernel.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: devicetree@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: bhupesh.linux@gmail.com
-> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> ---
->  Documentation/devicetree/bindings/crypto/qcom-qce.txt | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.txt b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
-> index 07ee1b12000b..217b37dbd58a 100644
-> --- a/Documentation/devicetree/bindings/crypto/qcom-qce.txt
-> +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
-> @@ -2,7 +2,11 @@ Qualcomm crypto engine driver
->  
->  Required properties:
->  
-> -- compatible  : should be "qcom,crypto-v5.1"
-> +- compatible  : Supported versions are:
-> +		- "qcom,crypto-v5.1", for ipq6018
-> +		- "qcom,crypto-v5.4", for sdm845, sm8150
+Ahmad,
 
-2 SoCs sharing 1 version doesn't convince me on using version numbers. 
-Having 4 versions for 5 SoCs further convinces me you should stick with 
-SoC specific compatibles as *everyone* else does (including most QCom 
-bindings).
+On Tue, Mar 16, 2021 at 6:24 PM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>
+> The Cryptographic Acceleration and Assurance Module (CAAM) is an IP core
+> built into many newer i.MX and QorIQ SoCs by NXP.
+>
+> Its blob mechanism can AES encrypt/decrypt user data using a unique
+> never-disclosed device-specific key. There has been multiple
+> discussions on how to represent this within the kernel:
+>
+>  - [RFC] crypto: caam - add red blobifier
+>    Steffen implemented[1] a PoC sysfs driver to start a discussion on how to
+>    best integrate the blob mechanism.
+>    Mimi suggested that it could be used to implement trusted keys.
+>    Trusted keys back then were a TPM-only feature.
+>
+>  - security/keys/secure_key: Adds the secure key support based on CAAM.
+>    Udit added[2] a new "secure" key type with the CAAM as backend. The key
+>    material stays within the kernel only.
+>    Mimi and James agreed that this needs a generic interface, not specific
+>    to CAAM. Mimi suggested trusted keys. Jan noted that this could serve as
+>    basis for TEE-backed keys.
+>
+>  - [RFC] drivers: crypto: caam: key: Add caam_tk key type
+>    Franck added[3] a new "caam_tk" key type based on Udit's work. The key
+>    material stays within the kernel only, but can optionally be user-set
+>    instead of coming from RNG. James voiced the opinion that there should
+>    be just one user-facing generic wrap/unwrap key type with multiple
+>    possible handlers. David suggested trusted keys.
+>
+>  - Introduce TEE based Trusted Keys support
+>    Sumit reworked[4] trusted keys to support multiple possible backends with
+>    one chosen at boot time and added a new TEE backend along with TPM.
+>    This now sits in Jarkko's master branch to be sent out for v5.13
+>
+> This patch series builds on top of Sumit's rework to have the CAAM as yet another
+> trusted key backend.
+>
+> The CAAM bits are based on Steffen's initial patch from 2015. His work had been
+> used in the field for some years now, so I preferred not to deviate too much from it.
+>
+> This series has been tested with dmcrypt[5] on an i.MX6DL.
 
-> +		- "qcom,crypto-v5.5", for sm8250
-> +		- "qcom,crypto-v5.6", for sm8350
->  - reg         : specifies base physical address and size of the registers map
->  - clocks      : phandle to clock-controller plus clock-specifier pair
->  - clock-names : "iface" clocks register interface
-> -- 
-> 2.29.2
-> 
+Do have this series also in a git repo to pull from?
+I'd like to give it a test on various systems.
+
+> Looking forward to your feedback.
+
+Thanks for working on this! David and I will have a closer look these days.
+
+-- 
+Thanks,
+//richard
