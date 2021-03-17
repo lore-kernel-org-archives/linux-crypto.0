@@ -2,113 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E1A8C433E9
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 23:15:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D1BDC433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Mar 2021 02:03:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E7D6364F6A
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Mar 2021 23:15:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47C5364EF6
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Mar 2021 02:03:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229564AbhCPXPY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Mar 2021 19:15:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52914 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229698AbhCPXPC (ORCPT
+        id S229545AbhCQCCn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Mar 2021 22:02:43 -0400
+Received: from sender4-pp-o95.zoho.com ([136.143.188.95]:25577 "EHLO
+        sender4-pp-o95.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229505AbhCQCC2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Mar 2021 19:15:02 -0400
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E8B0C06174A;
-        Tue, 16 Mar 2021 16:15:01 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id m7so109832qtq.11;
-        Tue, 16 Mar 2021 16:15:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qdxv2gEJ6NgRGsYoTFeE+bXdNCpfPV/ug1iqUQGuyWs=;
-        b=I+Juq/fA7D46g+cZuc71bhSV0g0OVRQu1A93eJc+s8DYgtXURo9Mv47FobjHzYthC2
-         csQrEUlxfCxMyAzaPhssL3tuKHz8iRoghRqENHS61qdMGCgU/JQ7m/gGD+AbJ67C4Ym+
-         x37zGDX0Gdi7xWlYnx8+7Vi/QWHyRcQ/3RoEG51ZjMcTCPx+E+H2MpCXLYx892MSM0Z3
-         bFSWCg2VqQy769wdZ829cDzcGDxd6FGmuRKpwzNfOxq8gfSChrc13wxnT1Gh5vpXJ29P
-         D8f3PKvsxlWm1JTg3CF1Z9J76d49C42Dy9ia42dILj5pEAHwqJxHXLmw+hcL+1ZOo8un
-         tdSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qdxv2gEJ6NgRGsYoTFeE+bXdNCpfPV/ug1iqUQGuyWs=;
-        b=WmA9PITm8OGVF9V2ffUPD/xaX2okedqh0vwweS0K3g7tOsLSbPWwYMAgoi67/iiw6d
-         WIO0cdK/NkHGekjUW/tVG+siJn8cpnHWwsnjkiGsuLNODdLspgrIoCLW8VID1tnE76AM
-         XlDueAt8/sSP02+ln/Cz6A7Veab00brv4dqfJIMiRFsyaD6I4H7CUrQtChVWJ1KiNNOL
-         3WneWDjE7grbOzgz8egqOXhbNxC34vjb6WBE0AYvFK+BxtmyaqrODnZpOwEdRIdZmJ92
-         usGvDMwbio2fWnFYO6G3FFzm4nl2d/stnzk/WBjEBWn5iJhxwMOKT87MZV5i5403Kcto
-         jaig==
-X-Gm-Message-State: AOAM532XYQ+UBL9Mf7pRXwt/CBwDdrYbSEqp8+WeM4/SCY4WeQkU59ga
-        gWX2Y10QhI9H7mhlDazv7KFJ+w9MTrTvm1s4Ex8=
-X-Google-Smtp-Source: ABdhPJwSFSqoHDR8eyiSz11ijj/2UuGYRbaQnoudReFeMhDR6IrY2/TG4DcGrS0dkJAifeY0YoopbnEbIffDmuGrwPk=
-X-Received: by 2002:ac8:4d59:: with SMTP id x25mr1251534qtv.82.1615936500550;
- Tue, 16 Mar 2021 16:15:00 -0700 (PDT)
+        Tue, 16 Mar 2021 22:02:28 -0400
+X-Greylist: delayed 914 seconds by postgrey-1.27 at vger.kernel.org; Tue, 16 Mar 2021 22:02:28 EDT
+ARC-Seal: i=1; a=rsa-sha256; t=1615945596; cv=none; 
+        d=zohomail.com; s=zohoarc; 
+        b=jQujIYenm+uEskiMdWH9EjdpbkdCXhDdn16aT9QYMbeIg6czdfhsS5kv7aCTVbobHK1Qm7AQfNs5LRZlrUNYUDGKQCjqDzPwSdf9gtIq1VrdxTfLSFyBjkxe4TrKE6nx8O6ph6Id6JmKWjXe0zkydhvUgwTNX5lmVaNR5Pg+I1o=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+        t=1615945596; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:MIME-Version:Message-ID:Subject:To; 
+        bh=2obGIsLfOvr84VxtUdYijf03Zt+ZtbbyKcwXCUtqlMA=; 
+        b=U5wNc40naZaNTOxgeF/prIZWhs7/FHwO/qevFb64ZzEeV2Aqr7XuleH2ysxftFYFrOf+XgGpiIDMmsBDirbKAbwRjb1ezECr973TIQ/7kMw7YNY28851i/qDeefyeVUVD1IBMOkKGRTuJjsxsxFcrUxPLadKx3QJMjJ9yO8eU28=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+        dkim=pass  header.i=zohomail.com;
+        spf=pass  smtp.mailfrom=mdjurovic@zohomail.com;
+        dmarc=pass header.from=<mdjurovic@zohomail.com> header.from=<mdjurovic@zohomail.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1615945596;
+        s=zm2020; d=zohomail.com; i=mdjurovic@zohomail.com;
+        h=From:To:Cc:Message-ID:Subject:Date:MIME-Version:Content-Transfer-Encoding:Content-Type;
+        bh=2obGIsLfOvr84VxtUdYijf03Zt+ZtbbyKcwXCUtqlMA=;
+        b=lsAYpJpNsdr+kASVvv84O/qXwBOmxq++ZBAIn5bRlkFWI/mh+JNlj7xdiNQ4DKuG
+        QPkmMwZwB0Rw+KM419vuagcgMZwqPiSzHWJlbu+yTq/NGuCwP+OAQ8payWRBJvwui6N
+        Tf9R3pgh8jZ19R7EizTqgkVL0RgHnZGLo4VM4QDI=
+Received: from milan-pc.attlocal.net (107-220-151-69.lightspeed.sntcca.sbcglobal.net [107.220.151.69]) by mx.zohomail.com
+        with SMTPS id 1615945594255152.57083268336862; Tue, 16 Mar 2021 18:46:34 -0700 (PDT)
+From:   Milan Djurovic <mdjurovic@zohomail.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org,
+        Milan Djurovic <mdjurovic@zohomail.com>
+Message-ID: <20210317014403.12742-1-mdjurovic@zohomail.com>
+Subject: [PATCH] crypto: jitterentropy: Put constants on the right side of the expression
+Date:   Tue, 16 Mar 2021 18:44:03 -0700
+X-Mailer: git-send-email 2.30.1
 MIME-Version: 1.0
-References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
- <319e558e1bd19b80ad6447c167a2c3942bdafea2.1615914058.git-series.a.fatoum@pengutronix.de>
-In-Reply-To: <319e558e1bd19b80ad6447c167a2c3942bdafea2.1615914058.git-series.a.fatoum@pengutronix.de>
-From:   Richard Weinberger <richard.weinberger@gmail.com>
-Date:   Wed, 17 Mar 2021 00:14:49 +0100
-Message-ID: <CAFLxGvxmRcvkweGSRSLGEm5MJDM4M7nzkp9FwOwmhZ+h2RE0vA@mail.gmail.com>
-Subject: Re: [PATCH v1 3/3] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>, kernel@pengutronix.de,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Udit Agarwal <udit.agarwal@nxp.com>,
-        Jan Luebbe <j.luebbe@penutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Franck LENORMAND <franck.lenormand@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>, keyrings@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        LSM <linux-security-module@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-ZohoMailClient: External
+Content-Type: text/plain; charset=utf8
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Ahmad,
+This patch fixes the following checkpatch.pl warnings:
 
-On Tue, Mar 16, 2021 at 6:24 PM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> +#include <keys/trusted_caam.h>
-> +#include <keys/trusted-type.h>
-> +#include <linux/build_bug.h>
-> +#include <linux/key-type.h>
-> +#include <soc/fsl/caam-blob.h>
-> +
-> +struct caam_blob_priv *blobifier;
+crypto/jitterentropy.c:600: WARNING: Comparisons should place the constant =
+on the right side of the test
+crypto/jitterentropy.c:681: WARNING: Comparisons should place the constant =
+on the right side of the test
+crypto/jitterentropy.c:772: WARNING: Comparisons should place the constant =
+on the right side of the test
+crypto/jitterentropy.c:829: WARNING: Comparisons should place the constant =
+on the right side of the test
 
-Who is using this pointer too?
-Otherwise I'd suggest marking it static.
+Signed-off-by: Milan Djurovic <mdjurovic@zohomail.com>
+---
+ crypto/jitterentropy.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
->  module_param_named(source, trusted_key_source, charp, 0);
-> -MODULE_PARM_DESC(source, "Select trusted keys source (tpm or tee)");
-> +MODULE_PARM_DESC(source, "Select trusted keys source (tpm, tee or caam)");
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index 6e147c43fc18..a11b3208760f 100644
+--- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -597,7 +597,7 @@ int jent_read_entropy(struct rand_data *ec, unsigned ch=
+ar *data,
+ =09if (!ec)
+ =09=09return -1;
+=20
+-=09while (0 < len) {
++=09while (len > 0) {
+ =09=09unsigned int tocopy;
+=20
+ =09=09jent_gen_entropy(ec);
+@@ -678,7 +678,7 @@ struct rand_data *jent_entropy_collector_alloc(unsigned=
+ int osr,
+ =09}
+=20
+ =09/* verify and set the oversampling rate */
+-=09if (0 =3D=3D osr)
++=09if (osr =3D=3D 0)
+ =09=09osr =3D 1; /* minimum sampling rate is 1 */
+ =09entropy_collector->osr =3D osr;
+=20
+@@ -769,7 +769,7 @@ int jent_entropy_init(void)
+ =09=09 * etc. with the goal to clear it to get the worst case
+ =09=09 * measurements.
+ =09=09 */
+-=09=09if (CLEARCACHE > i)
++=09=09if (i < CLEARCACHE)
+ =09=09=09continue;
+=20
+ =09=09if (stuck)
+@@ -826,7 +826,7 @@ int jent_entropy_init(void)
+ =09 * should not fail. The value of 3 should cover the NTP case being
+ =09 * performed during our test run.
+ =09 */
+-=09if (3 < time_backwards)
++=09if (time_backwards > 3)
+ =09=09return JENT_ENOMONOTONIC;
+=20
+ =09/*
+--=20
+2.30.1
 
-I didn't closely follow the previous discussions, but is a module
-parameter really the right approach?
-Is there also a way to set it via something like device tree?
 
--- 
-Thanks,
-//richard
