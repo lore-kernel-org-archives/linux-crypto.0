@@ -2,176 +2,263 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87976C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Mar 2021 14:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 986AAC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Mar 2021 14:49:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E3C564F4D
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Mar 2021 14:26:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93AB764F75
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Mar 2021 14:49:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231583AbhCQO0L (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Mar 2021 10:26:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54340 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231730AbhCQO0B (ORCPT
+        id S231184AbhCQOtB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 17 Mar 2021 10:49:01 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:38896 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231981AbhCQOs6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Mar 2021 10:26:01 -0400
-Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB46AC061762
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Mar 2021 07:26:00 -0700 (PDT)
-Received: by mail-qv1-xf2f.google.com with SMTP id q9so1434513qvm.6
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Mar 2021 07:26:00 -0700 (PDT)
+        Wed, 17 Mar 2021 10:48:58 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12HEmATW046038;
+        Wed, 17 Mar 2021 14:48:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ subject : from : in-reply-to : date : cc : content-transfer-encoding :
+ message-id : references : to : mime-version; s=corp-2020-01-29;
+ bh=H80uWJ85hSUk/gfcf4mEvpDUHB+7aV5CzVURGW2W5h4=;
+ b=B3S6S6rhOHImHDxkr2OFQH5w1rO65c1+dNNeocTp19rUsjcgW4arte6TJ44TgMp7p7iy
+ nVhqbx2+OYO81GxEoRx2/VSqDMxQBOhBDaEddEjpFJY2EtjM81EMftWXxmmT9cX8/BjW
+ TqTY5x2qgPt46m9opC4qq/GI2RUNLpN+eYDUEFa2/QszHASzsNtIDts+5dy7iJNB60SA
+ 1ix2UpBQ8erJAOX2RxGQ+8FRqzrBIVozxr1c3uCnPfiOVkmkfcU+C0Lyp2Nr7JBpIR1o
+ YFoQAIvnfPWVMbhZXWPpXVq47p2Xt5hqVYOb71o3IoAnWMaD1kLQ+t6DLLIokGccWdVd MA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2130.oracle.com with ESMTP id 378jwbmdmf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 17 Mar 2021 14:48:17 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12HEQjqG028670;
+        Wed, 17 Mar 2021 14:48:17 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2171.outbound.protection.outlook.com [104.47.59.171])
+        by aserp3030.oracle.com with ESMTP id 3796yuwyra-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 17 Mar 2021 14:48:16 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Fklojk6W/vHFduyY1ATSWaOPvHWNTQ8+38iL2haV+yGOwz5sZkBFRaCoMw0xxZVu8CCoUH2LkvgrZGxCb38YwYhKYnAMnVKp3Syo9GDgYxS4cKlJAj7bIVasTOhPJnDUeOhx1accmBI3gxcychHRn0vSh9s6EIn7cvLMTSnC62bjmGq2YylG/yqJFike7hku9vgeyFGUhA4bWHoPjzIYEwbsI+qzUYRENTu6cSq25E3l2SFjuSUo0ICcAlvkXsem7NIczkYeNez+pbauY+LR028BEjzr2EXleqqouh9S6Ca7sSZeL8NNjyFr2ZqxvtbEeqP4ttkaDU2wpq+MDrV5XA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H80uWJ85hSUk/gfcf4mEvpDUHB+7aV5CzVURGW2W5h4=;
+ b=UubbqyLflUZhXPhj2Xoab+SpH9eWQjPbYU7BtvHWH76wMfFHCRpVdHKG3Pf2BwEN5/Ri8Y246u2RSqFCf+xcphbj4zxNqUDLqr6nmCBdkn+MEcsYmxW2ye76UOCy9HyuiCBQqVRrlRXnwbEAkFgXk0g6c0/IoZ0YmdGuFtXHnJHHw3crjX8aBcWyE5Aad236+yiuwwMA71bHA12BFAGacD7MbPNcTl7R4MP/KNkz+KPZroMevTCfrU66XGzVlVjdQBY+xQSqhEfywsQOXxG2P/c/CfTXRjCZrDhIOiXt1rK7EzX2VAT+l+7rBYHTBIIdTFTm/n1btmg/ybBtKoP5VA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Oac/DlVej6hY85el0HaXgLiTpQUzb79aFBt4IEthyz0=;
-        b=GKM4NaIxpRPCpBQcQWSGyqYsfZU/PTZSYW3A0Jz0vsRsLiAsfw410A2D0WKTa2PslS
-         rey3lj5hAfeS+D7i4uvXO9e3pg/iTbD5dQK3yQdgHMC8eyafGpCBjlQtjGbHI1QnNWkt
-         uMG8yr4WwyDUIoFrSkPn0k5vG1xR4Q/3C0++5tkOATQ87QqTDYb93hoh8pYj5GerQPxT
-         YNXfPCyOyKNobP7NObSiJKhF+3ZXL7DNXLsuIo1oWUoASEUeeTZviIoeeJIarbj819/Y
-         8z+EOoMylKhzK8v76auJzF+9+yT6JWsbl5eh0Tw51Vxr3LIVT65m+mye92QDidHQmLps
-         WMWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Oac/DlVej6hY85el0HaXgLiTpQUzb79aFBt4IEthyz0=;
-        b=HVP1ij5SbUX6iNhF6JUQXHO/VUgPBrFHIQoSzGw8HgPUNmziFrYyFq7MfJ44fIiHfs
-         2Na8db6/ePuwaAOWk2hcTS7agGrEZRWhEmLIME7CqSc5Qi/i7AoiCFiT/ZH/9Sm4z09Y
-         1RR1gjVcBaWL/FcEX8+ZtBWlVOdIAGToL+No2AwvwAkPrYURRvAJ9zNDNxZIRYwFEzqB
-         wlD1pS0bG+4WXwClafHCYqODOUI0WvdA4GJHytpQPA1jqvi2Yuse7ZWjzlOoevuTORW5
-         d4LT8LeYs31/OvYG31T5lXJjkEM3b9m9fLVYyXF0DwuCXiVFKZjfYVqvUPCQzfr6Afgf
-         +YuA==
-X-Gm-Message-State: AOAM531jv1cqNllRz/uIjoyLc5yHRBZ+0n2aDyd6GZ90+/PsT+i8d14h
-        W4c/fgLPbW4NiHVa7gttg+h/ZQ==
-X-Google-Smtp-Source: ABdhPJwUz2llOCCtPaylYmaDAP5eIdLpLfqeSpbLBQJXQonnkq+QeBs5NJ2NXWpytzPxXJWA4IU/SQ==
-X-Received: by 2002:a0c:c248:: with SMTP id w8mr5675492qvh.58.1615991159804;
-        Wed, 17 Mar 2021 07:25:59 -0700 (PDT)
-Received: from [192.168.1.93] (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
-        by smtp.gmail.com with ESMTPSA id y9sm17232696qkm.19.2021.03.17.07.25.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Mar 2021 07:25:59 -0700 (PDT)
-Subject: Re: [PATCH 2/8] dt-bindings: crypto : Add new compatible strings for
- qcom-qce
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Rob Herring <robh@kernel.org>
-Cc:     linux-arm-msm@vger.kernel.org,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H80uWJ85hSUk/gfcf4mEvpDUHB+7aV5CzVURGW2W5h4=;
+ b=sjgaCO4XAS3YkDnzHm3PGIlaeZ0F3zGEqUKgdwQyqKfcf6LQT4OgZpbkjvkm/gCDCJdnc+HKP/HF6xGVSK3OPUbXYIQMeEo63GwKNG/dptXpv6NXO4hd449V6gziUw9iTtKCpQlg+LpyXlrCvCNEKyBxz7RsdmC5mDXH7ieY/JM=
+Authentication-Results: digikod.net; dkim=none (message not signed)
+ header.d=none;digikod.net; dmarc=none action=none header.from=oracle.com;
+Received: from CH2PR10MB4150.namprd10.prod.outlook.com (2603:10b6:610:ac::13)
+ by CH0PR10MB5180.namprd10.prod.outlook.com (2603:10b6:610:db::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.18; Wed, 17 Mar
+ 2021 14:48:14 +0000
+Received: from CH2PR10MB4150.namprd10.prod.outlook.com
+ ([fe80::95df:950e:af4c:a5df]) by CH2PR10MB4150.namprd10.prod.outlook.com
+ ([fe80::95df:950e:af4c:a5df%9]) with mapi id 15.20.3933.032; Wed, 17 Mar 2021
+ 14:48:14 +0000
+Content-Type: text/plain; charset=utf-8
+Subject: Re: [PATCH v7 5/5] certs: Allow root user to append signed hashes to
+ the blacklist keyring
+From:   Eric Snowberg <eric.snowberg@oracle.com>
+In-Reply-To: <bd28dd0b-b183-44bd-1928-59e3e1274045@digikod.net>
+Date:   Wed, 17 Mar 2021 08:48:11 -0600
+Cc:     David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
         "David S . Miller" <davem@davemloft.net>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bhupesh.linux@gmail.com
-References: <20210310052503.3618486-1-bhupesh.sharma@linaro.org>
- <20210310052503.3618486-3-bhupesh.sharma@linaro.org>
- <20210316222825.GA3792517@robh.at.kernel.org>
- <CAH=2Ntw2dMaSYsx-Q=mXx_mMBr5PcmwhhBvTcmPYYKmy=rcCqw@mail.gmail.com>
-From:   Thara Gopinath <thara.gopinath@linaro.org>
-Message-ID: <525bea31-b377-6f64-5cc2-827c738df372@linaro.org>
-Date:   Wed, 17 Mar 2021 10:25:58 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <jmorris@namei.org>,
+        =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@linux.microsoft.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity <linux-integrity@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5111D396-9910-48E9-8D91-6433E719EDB5@oracle.com>
+References: <20210312171232.2681989-1-mic@digikod.net>
+ <20210312171232.2681989-6-mic@digikod.net>
+ <A4CD568A-6D8E-4043-971B-8E79FFB58709@oracle.com>
+ <bd28dd0b-b183-44bd-1928-59e3e1274045@digikod.net>
+To:     =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+X-Mailer: Apple Mail (2.3273)
+X-Originating-IP: [24.52.35.144]
+X-ClientProxiedBy: SJ0PR05CA0154.namprd05.prod.outlook.com
+ (2603:10b6:a03:339::9) To CH2PR10MB4150.namprd10.prod.outlook.com
+ (2603:10b6:610:ac::13)
 MIME-Version: 1.0
-In-Reply-To: <CAH=2Ntw2dMaSYsx-Q=mXx_mMBr5PcmwhhBvTcmPYYKmy=rcCqw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [172.16.177.128] (24.52.35.144) by SJ0PR05CA0154.namprd05.prod.outlook.com (2603:10b6:a03:339::9) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.9 via Frontend Transport; Wed, 17 Mar 2021 14:48:12 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 14650e86-42a3-4284-2e66-08d8e953b1a3
+X-MS-TrafficTypeDiagnostic: CH0PR10MB5180:
+X-Microsoft-Antispam-PRVS: <CH0PR10MB5180DA44D5672A4B73A1FB75876A9@CH0PR10MB5180.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: jK7P5S7fWMp7OcSMuWheab5wpMBCNr+A6nHJEjoPQBZPyaZHKHz7e2OHqabwgx/Ci6/SK1GDxDn1fJ0iVut4ZAomH0hJVebJtKsDSKGf2YSAlrO81sbjboCOnlNC+npyXMiHRn4TrjDTmH482GsH5domU9CbyP8mWIegQDceYmrVh0JBGKpMA3y8JheAIq0UcZKSmSEUU14a1Is5b2lGAe59ZXnEo0ZESoQ2qyhzI0pSu/JVkaLWZmT6ujx2etustJelgLcoYtPuFHzaY2zq4b4PLg55L7LVeOXCi9M1S7F/DsJZJlhxL9exQebwTxX0HVF/QwTY1N5nZLySMyZB+e51UVWwlVvGKyqnN9FAQWgGPYLSnZoZtjI9UsnvQsXzt7lzoAIhqi6ZVp1sQy3YFQYJzznDM+0Zw12HAZrwmilGGVC+9LoQYnYszRxLTykvecJmwAycKnStCdAf2t1E2D5xJ9EbITP3/PjUGquUf89mnSHmUAyUI3bAz5et/LtB7XGO163xJn+vtOIG93Wk0pEYYVsfMjdAQy5Gd0aFR60dp15ixCSj2uQT14LohZICRg4if23bjmeEOpqQsZoELlZ8C7xz7z05HQxnX4jY/9PUI8SiT7z4tHdr9/Ou6KiElL6ByzPS8jQrtiWIAUwiX78Dxi8FZ6WnW9qYQwokA604FR5F6yVEIKb8x/VCqXHS
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(366004)(376002)(39860400002)(136003)(346002)(316002)(36756003)(44832011)(5660300002)(16576012)(6916009)(6486002)(52116002)(66946007)(66556008)(66476007)(54906003)(53546011)(2616005)(956004)(8676002)(2906002)(7416002)(66574015)(8936002)(26005)(4326008)(16526019)(186003)(86362001)(33656002)(966005)(83380400001)(478600001)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?eExSbnA4NDdOUG5KN25zUEhQa1NuUXEwUEhTN2ZpSVhrWlo0NVFJZ29TOEo3?=
+ =?utf-8?B?b2RENVdkcTZoUHFzRk9HU2F1WU9KUjVVUlgxYWNGN0FacnM4VStya2lhUU1U?=
+ =?utf-8?B?Y0cvR0FLSHBhSmNKeGhSS3I3bVg1OENwMVd2Z3lSM2Q2Qmo0eFp3UVIrYlFk?=
+ =?utf-8?B?aHdKL21HUFdXNS8xdnBRZUJTOWpBWnVEYk1qVTZjSUVXblM3dmViZnZlMTlt?=
+ =?utf-8?B?UzcydHVkRnRwQkU0YXN1ZkVabzRVNFNRZzVDL2FrZWZ1NVVhWkg2Z2tZcno1?=
+ =?utf-8?B?c3orU2s0TFdGOFJuaUZMWG1WNWROd2tJLzNWYXZOU3l5NEVqLzRzZjdNLzYw?=
+ =?utf-8?B?U0NjWVJKTXdzbVQybk14M0ZlZDZuUTA1cVZXRHBPZlJlZWxjcVV1K0pBY0ZO?=
+ =?utf-8?B?eHBLN25YRGMxSGpxYlFvL2g5ZkhaRnNDTWluWnZTSHRGRzRuVURSRFR6a0lT?=
+ =?utf-8?B?TzgvVnJEWDh4UjJMVDN5ZEFKSUhlQklmOTl4WS9YODdVSjJacEM3KzQrV1lH?=
+ =?utf-8?B?b1o4YUxxWktKZnRrRVBucjJjMndtdG5Wd0xwRjdDZzdqNFNMbXo1UVhDRWtM?=
+ =?utf-8?B?aHk0SE1pWmZlNTZXSzhKMmowbVhacVIwVE1RU1FDK0pwcWR2UHdqSGh5Mk1n?=
+ =?utf-8?B?K0xYR0RKVEQrUHRzdlk5M1ZxWGpINEFUdnhxVU5EZEx1b3Z1KzNWVVhsN01F?=
+ =?utf-8?B?eFFRUlpkb1M1K1lJNDZYSEwyUEludFNhRVdlL0FSUERDMUxpNEhVOThoZWxI?=
+ =?utf-8?B?N1VxT2w1dVZxMFgrdTNCbExHdmliWVJmdFN6RnVXelVOYTl3cjIxbWFLcjBV?=
+ =?utf-8?B?TWpOaFB1ZU1sRDBHV1AvdjF4ZEJqK1FxTnVXY05zRHFQZlV1Tzg3RWQrZzFy?=
+ =?utf-8?B?cnV6cmVpYms0N1BVZFBTYm91alk1dVB5ZGRQcFhvQzZGM2YyMEM2NGJYSkM1?=
+ =?utf-8?B?bTlIbFExNkJXMHpTSS95ZnRjd2lFUHM1UHEvaG1TT25PNzNCelE3TjNrWmsr?=
+ =?utf-8?B?VmtZSlAvbUMzWkViWjRtWlliS0k3VHdtVnY5SVhJZ3VML1E5WmNYdmloQ1pF?=
+ =?utf-8?B?WTNabVRJZjFheERiV2JYRHEzYWhlV1ZaVTFPZ0FLY1BKMGdJYWYveHBQVjdx?=
+ =?utf-8?B?T1VLaFZpQ0lKaTNYZlpQSGRCNG9SUjJXRTZrRFJjbmQ4RythRFRqRC9haVJF?=
+ =?utf-8?B?ZmFJbHYzRDlFUjFtdmtxcEJ0QllFa1QvYXhGNGdNU1E2dnVlV2MzaE9QL2NX?=
+ =?utf-8?B?Tml0Wm9EakdRcS91VkRGeXBMMS9odk9BZVNPbFFNWVMzSHpzWlAxQkp0YktO?=
+ =?utf-8?B?dG9BcGtrekdJamt1RklnRDNmQnNOQ01ZczBiQ1dZVWVkYzdhVzJhR08vVS9o?=
+ =?utf-8?B?dmdYRndCWUkyLzZpOVl3V0xGT0w5a2RzUGJtU2UwV2luMFNPZ0dxQldPRkRS?=
+ =?utf-8?B?Yy9BUHlNUFNlUjVaQmQyUzU0SG5UUXRtZk01eXhvWmlObkxXcmtUMjBhb1B1?=
+ =?utf-8?B?aGlkVzY4MHpkWVZSa281eTBBVm1lYTFqSFVmaFMrdlhFNFZ6b1dNQnFQUXBn?=
+ =?utf-8?B?S3VLQzBKUkx2cXR6RDFvdllUZzlnMzZRRkVSVWF0aCtIdWlsQ3AvbXc2ZXBD?=
+ =?utf-8?B?L0h2YkhwbGJ6akJ5dC9JZkx2ZkRWd0hHMTNRdHpOYzlXdEx1REVxQ1BsaTBy?=
+ =?utf-8?B?WFhaTWw4SjFhYVRWWFRSOVhjODhvZkxiUHVmQUp4eENjU3RXZld4cEJha3ZN?=
+ =?utf-8?Q?XOYnZU8N7ThSV2N8RcZOHL+6y0LyedbDkKqCefr?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 14650e86-42a3-4284-2e66-08d8e953b1a3
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4150.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2021 14:48:14.6984
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jeFky3Qd8hAflBaUCAWqwcSua0FPf9SPl8r8Uu6ZYiP7FBHdRXbhdB6tflKnspMHiYPLpY935/BPLmAy42jG6JUl1UL2dXhXiFJiTAQpGCo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR10MB5180
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9926 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 malwarescore=0 spamscore=0
+ bulkscore=0 mlxlogscore=999 mlxscore=0 suspectscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103170109
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9926 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=999
+ spamscore=0 mlxscore=0 bulkscore=0 suspectscore=0 priorityscore=1501
+ lowpriorityscore=0 clxscore=1015 adultscore=0 phishscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103170110
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
+> On Mar 15, 2021, at 12:01 PM, Micka=C3=ABl Sala=C3=BCn <mic@digikod.net> =
+wrote:
+>=20
+>=20
+> On 15/03/2021 17:59, Eric Snowberg wrote:
+>>=20
+>>> On Mar 12, 2021, at 10:12 AM, Micka=C3=ABl Sala=C3=BCn <mic@digikod.net=
+> wrote:
+>>>=20
+>>> From: Micka=C3=ABl Sala=C3=BCn <mic@linux.microsoft.com>
+>>>=20
+>>> Add a kernel option SYSTEM_BLACKLIST_AUTH_UPDATE to enable the root use=
+r
+>>> to dynamically add new keys to the blacklist keyring.  This enables to
+>>> invalidate new certificates, either from being loaded in a keyring, or
+>>> from being trusted in a PKCS#7 certificate chain.  This also enables to
+>>> add new file hashes to be denied by the integrity infrastructure.
+>>>=20
+>>> Being able to untrust a certificate which could have normaly been
+>>> trusted is a sensitive operation.  This is why adding new hashes to the
+>>> blacklist keyring is only allowed when these hashes are signed and
+>>> vouched by the builtin trusted keyring.  A blacklist hash is stored as =
+a
+>>> key description.  The PKCS#7 signature of this description must be
+>>> provided as the key payload.
+>>>=20
+>>> Marking a certificate as untrusted should be enforced while the system
+>>> is running.  It is then forbiden to remove such blacklist keys.
+>>>=20
+>>> Update blacklist keyring, blacklist key and revoked certificate access =
+rights:
+>>> * allows the root user to search for a specific blacklisted hash, which
+>>> make sense because the descriptions are already viewable;
+>>> * forbids key update (blacklist and asymmetric ones);
+>>> * restricts kernel rights on the blacklist keyring to align with the
+>>> root user rights.
+>>>=20
+>>> See help in tools/certs/print-cert-tbs-hash.sh .
+>>>=20
+>>> Cc: David Howells <dhowells@redhat.com>
+>>> Cc: David Woodhouse <dwmw2@infradead.org>
+>>> Cc: Eric Snowberg <eric.snowberg@oracle.com>
+>>> Cc: Jarkko Sakkinen <jarkko@kernel.org>
+>>> Signed-off-by: Micka=C3=ABl Sala=C3=BCn <mic@linux.microsoft.com>
+>>> Link: https://lore.kernel.org/r/20210312171232.2681989-6-mic@digikod.ne=
+t
+>>=20
+>> I tried testing this, it doesn=E2=80=99t work as I would expect. =20
+>> Here is my test setup:
+>>=20
+>> Kernel built with two keys compiled into the builtin_trusted_keys keyrin=
+g
+>>=20
+>> Generated a tbs cert from one of the keys and signed it with the other k=
+ey
+>>=20
+>> As root, added the tbs cert hash to the blacklist keyring
+>>=20
+>> Verified the tbs hash is in the blacklist keyring
+>>=20
+>> Enabled lockdown to enforce kernel module signature checking
+>>=20
+>> Signed a kernel module with the key I just blacklisted
+>>=20
+>> Load the kernel module=20
+>>=20
+>> I=E2=80=99m seeing the kernel module load, I would expect this to fail, =
+since the=20
+>> key is now blacklisted.  Or is this change just supposed to prevent new =
+keys=20
+>> from being added in the future?
+>=20
+> This is the expected behavior and the way the blacklist keyring is
+> currently used, as explained in the commit message:
+> "This enables to invalidate new certificates, either from being loaded
+> in a keyring, or from being trusted in a PKCS#7 certificate chain."
+>=20
+> If you want a (trusted root) key to be untrusted, you need to remove it
+> from the keyring, which is not allowed for the builtin trusted keyring.
 
-On 3/17/21 9:20 AM, Bhupesh Sharma wrote:
-> Hi Rob,
-> 
-> Thanks for your review.
-> 
-> On Wed, 17 Mar 2021 at 03:58, Rob Herring <robh@kernel.org> wrote:
->>
->> On Wed, Mar 10, 2021 at 10:54:57AM +0530, Bhupesh Sharma wrote:
->>> Newer qcom chips support newer versions of the qce IP, so add
->>> new compatible strings for qcom-qce (in addition to the existing
->>> "qcom,crypto-v5.1").
->>>
->>> With [1], Thara tried to add the support for new compatible strings,
->>> but we couldn't conclude on the approach to be used. Since we have
->>> a number of new qcom arm64 SoCs available now, several of which
->>> support the same crypto IP version, so it makes more sense to use
->>> the IP version for the compatible string, rather than using the soc
->>> name as the compatible string.
->>>
->>> [1]. https://lore.kernel.org/linux-arm-msm/20201119155233.3974286-7-thara.gopinath@linaro.org/
->>>
->>> Cc: Thara Gopinath <thara.gopinath@linaro.org>
->>> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
->>> Cc: Rob Herring <robh+dt@kernel.org>
->>> Cc: Andy Gross <agross@kernel.org>
->>> Cc: Herbert Xu <herbert@gondor.apana.org.au>
->>> Cc: David S. Miller <davem@davemloft.net>
->>> Cc: Stephen Boyd <sboyd@kernel.org>
->>> Cc: Michael Turquette <mturquette@baylibre.com>
->>> Cc: linux-clk@vger.kernel.org
->>> Cc: linux-crypto@vger.kernel.org
->>> Cc: devicetree@vger.kernel.org
->>> Cc: linux-kernel@vger.kernel.org
->>> Cc: bhupesh.linux@gmail.com
->>> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
->>> ---
->>>   Documentation/devicetree/bindings/crypto/qcom-qce.txt | 6 +++++-
->>>   1 file changed, 5 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.txt b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
->>> index 07ee1b12000b..217b37dbd58a 100644
->>> --- a/Documentation/devicetree/bindings/crypto/qcom-qce.txt
->>> +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
->>> @@ -2,7 +2,11 @@ Qualcomm crypto engine driver
->>>
->>>   Required properties:
->>>
->>> -- compatible  : should be "qcom,crypto-v5.1"
->>> +- compatible  : Supported versions are:
->>> +             - "qcom,crypto-v5.1", for ipq6018
->>> +             - "qcom,crypto-v5.4", for sdm845, sm8150
->>
->> 2 SoCs sharing 1 version doesn't convince me on using version numbers.
->> Having 4 versions for 5 SoCs further convinces me you should stick with
->> SoC specific compatibles as *everyone* else does (including most QCom
->> bindings).
+Is there a non technical reason why this can not be changed to also apply t=
+o
+builtin trusted keys? If a user had the same tbs cert hash in their dbx and=
+=20
+soon mokx, the hash would show up in the .blacklist keyring and invalidate=
+=20
+any key in the builtin_trusted_keys keyring. After adding the same hash wit=
+h=20
+this series, it shows up in the .blacklist_keyring but the value is ignored=
+=20
+by operations using the builtin_trusted_keys keyring.  It just seems=20
+incomplete to me, or did I miss an earlier discussion on this topic?
 
-Hi!
-
-So, it is 2 SoCs today. But we do have a bunch of SoCs for each version 
-and these could be added in future. I think I have asked this question 
-before as well,how about "qcom,sdm845-crypto", "qcom,crypto-v5.4" and 
-have only "qcom,crypto-<version>" in the driver ? I see this being done 
-by some Qcom bindings.
-
-
-> Fair enough. I will add SoC specific compatibles in v2, which should
-> be out shortly.
-> 
-> Regards,
-> Bhupesh
-> 
->>> +             - "qcom,crypto-v5.5", for sm8250
->>> +             - "qcom,crypto-v5.6", for sm8350
->>>   - reg         : specifies base physical address and size of the registers map
->>>   - clocks      : phandle to clock-controller plus clock-specifier pair
->>>   - clock-names : "iface" clocks register interface
->>> --
->>> 2.29.2
->>>
-
--- 
-Warm Regards
-Thara
