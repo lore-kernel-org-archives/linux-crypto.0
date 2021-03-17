@@ -2,152 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 044C2C4321A
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Mar 2021 15:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6475C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Mar 2021 17:35:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CBDFF64FAB
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Mar 2021 15:49:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C579D64EC4
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Mar 2021 17:35:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232133AbhCQPss (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Mar 2021 11:48:48 -0400
-Received: from smtp-190c.mail.infomaniak.ch ([185.125.25.12]:39239 "EHLO
-        smtp-190c.mail.infomaniak.ch" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232479AbhCQPsM (ORCPT
+        id S229944AbhCQRek (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 17 Mar 2021 13:34:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38758 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229710AbhCQRef (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Mar 2021 11:48:12 -0400
-X-Greylist: delayed 164777 seconds by postgrey-1.27 at vger.kernel.org; Wed, 17 Mar 2021 11:48:12 EDT
-Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
-        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4F0vcV0fJ8zMpyqM;
-        Wed, 17 Mar 2021 16:45:14 +0100 (CET)
-Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
-        by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4F0vcR1dBNzlh8TS;
-        Wed, 17 Mar 2021 16:45:11 +0100 (CET)
-Subject: Re: [PATCH v7 5/5] certs: Allow root user to append signed hashes to
- the blacklist keyring
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <jmorris@namei.org>,
-        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "Serge E . Hallyn" <serge@hallyn.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity <linux-integrity@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
-References: <20210312171232.2681989-1-mic@digikod.net>
- <20210312171232.2681989-6-mic@digikod.net>
- <A4CD568A-6D8E-4043-971B-8E79FFB58709@oracle.com>
- <bd28dd0b-b183-44bd-1928-59e3e1274045@digikod.net>
- <5111D396-9910-48E9-8D91-6433E719EDB5@oracle.com>
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-Message-ID: <1ad221c1-d540-1c7c-27cb-d90a94f46aab@digikod.net>
-Date:   Wed, 17 Mar 2021 16:45:18 +0100
-User-Agent: 
+        Wed, 17 Mar 2021 13:34:35 -0400
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1234::107])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A349C06174A;
+        Wed, 17 Mar 2021 10:34:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
+        Reply-To:Cc:Content-ID:Content-Description;
+        bh=899uy+opuBYMan6yzLPG9/V5iogxQaeqI/5Fsy2GYy8=; b=pPunVPMIc6x2/TQzWdqa6GjxNe
+        snj+Qpc884RUynHAwC08mrBSdj/rbnbg0UhhHxF0Zm+HSqI1usAX0XDRtzw3rXtoe7kGczwf9V7PM
+        53ziD1KW8Crr9UjlcRhGH8orc0I19W/q1QGOLAeZKF0gEG5kjcv3KgizMv980TDLThM9bVYtSBEvT
+        csccGPHMXlo05mhemj2Vxwligt7Hc7T95dlQ21ziQK6zCKffmPRHqMhCIXVUC4yqqm87MnMajflrR
+        LLe8BB30Q0j9inBdWupmlsqPCWZB78Tkjt3mA1OHRCyqDRAuecO2z4zyLE8QkDX00Q8CEnIOM5SLa
+        aUPqQlNA==;
+Received: from [2601:1c0:6280:3f0::9757]
+        by merlin.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lMa3z-001fW4-EO; Wed, 17 Mar 2021 17:34:31 +0000
+Subject: Re: [PATCH] crypto: inside-secure: Minor typo fix in the file
+ safexcel.c
+To:     Bhaskar Chowdhury <unixbhaskar@gmail.com>, atenart@kernel.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210317091445.614865-1-unixbhaskar@gmail.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <2b589f48-164b-2079-a1a7-5befa66a3564@infradead.org>
+Date:   Wed, 17 Mar 2021 10:34:28 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <5111D396-9910-48E9-8D91-6433E719EDB5@oracle.com>
+In-Reply-To: <20210317091445.614865-1-unixbhaskar@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-On 17/03/2021 15:48, Eric Snowberg wrote:
+On 3/17/21 2:14 AM, Bhaskar Chowdhury wrote:
 > 
->> On Mar 15, 2021, at 12:01 PM, Mickaël Salaün <mic@digikod.net> wrote:
->>
->>
->> On 15/03/2021 17:59, Eric Snowberg wrote:
->>>
->>>> On Mar 12, 2021, at 10:12 AM, Mickaël Salaün <mic@digikod.net> wrote:
->>>>
->>>> From: Mickaël Salaün <mic@linux.microsoft.com>
->>>>
->>>> Add a kernel option SYSTEM_BLACKLIST_AUTH_UPDATE to enable the root user
->>>> to dynamically add new keys to the blacklist keyring.  This enables to
->>>> invalidate new certificates, either from being loaded in a keyring, or
->>>> from being trusted in a PKCS#7 certificate chain.  This also enables to
->>>> add new file hashes to be denied by the integrity infrastructure.
->>>>
->>>> Being able to untrust a certificate which could have normaly been
->>>> trusted is a sensitive operation.  This is why adding new hashes to the
->>>> blacklist keyring is only allowed when these hashes are signed and
->>>> vouched by the builtin trusted keyring.  A blacklist hash is stored as a
->>>> key description.  The PKCS#7 signature of this description must be
->>>> provided as the key payload.
->>>>
->>>> Marking a certificate as untrusted should be enforced while the system
->>>> is running.  It is then forbiden to remove such blacklist keys.
->>>>
->>>> Update blacklist keyring, blacklist key and revoked certificate access rights:
->>>> * allows the root user to search for a specific blacklisted hash, which
->>>> make sense because the descriptions are already viewable;
->>>> * forbids key update (blacklist and asymmetric ones);
->>>> * restricts kernel rights on the blacklist keyring to align with the
->>>> root user rights.
->>>>
->>>> See help in tools/certs/print-cert-tbs-hash.sh .
->>>>
->>>> Cc: David Howells <dhowells@redhat.com>
->>>> Cc: David Woodhouse <dwmw2@infradead.org>
->>>> Cc: Eric Snowberg <eric.snowberg@oracle.com>
->>>> Cc: Jarkko Sakkinen <jarkko@kernel.org>
->>>> Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
->>>> Link: https://lore.kernel.org/r/20210312171232.2681989-6-mic@digikod.net
->>>
->>> I tried testing this, it doesn’t work as I would expect.  
->>> Here is my test setup:
->>>
->>> Kernel built with two keys compiled into the builtin_trusted_keys keyring
->>>
->>> Generated a tbs cert from one of the keys and signed it with the other key
->>>
->>> As root, added the tbs cert hash to the blacklist keyring
->>>
->>> Verified the tbs hash is in the blacklist keyring
->>>
->>> Enabled lockdown to enforce kernel module signature checking
->>>
->>> Signed a kernel module with the key I just blacklisted
->>>
->>> Load the kernel module 
->>>
->>> I’m seeing the kernel module load, I would expect this to fail, since the 
->>> key is now blacklisted.  Or is this change just supposed to prevent new keys 
->>> from being added in the future?
->>
->> This is the expected behavior and the way the blacklist keyring is
->> currently used, as explained in the commit message:
->> "This enables to invalidate new certificates, either from being loaded
->> in a keyring, or from being trusted in a PKCS#7 certificate chain."
->>
->> If you want a (trusted root) key to be untrusted, you need to remove it
->> from the keyring, which is not allowed for the builtin trusted keyring.
+> s/procesing/processing/
 > 
-> Is there a non technical reason why this can not be changed to also apply to
-> builtin trusted keys? If a user had the same tbs cert hash in their dbx and 
-> soon mokx, the hash would show up in the .blacklist keyring and invalidate 
-> any key in the builtin_trusted_keys keyring. After adding the same hash with 
-> this series, it shows up in the .blacklist_keyring but the value is ignored 
-> by operations using the builtin_trusted_keys keyring.  It just seems 
-> incomplete to me, or did I miss an earlier discussion on this topic?
+> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
 
-The purpose of the blacklist keyring is to block new keys from being
-loaded in the kernel. For builtin and dbx/mokx hashes, they are loaded
-in the blacklist keyring before builtin certificates are loaded in the
-trusted builtin keyring, which can reject them if there is a match. I
-think that being able to load a blocked hash at run time should not
-change the semantic of the blacklist keyring, which is to block the
-loading of certificates. If someone wants to change this semantic, I
-think it should be configurable. Indeed, we should keep in mind the
-temporal dimension and the hierarchy of trust: dbx/mokx -> builtin
-hashes -> run time hashes.
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
+
+> ---
+>  drivers/crypto/inside-secure/safexcel.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+> index 6364583b88b2..9ff885d50edf 100644
+> --- a/drivers/crypto/inside-secure/safexcel.c
+> +++ b/drivers/crypto/inside-secure/safexcel.c
+> @@ -688,7 +688,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+>  		/* Leave the DSE threads reset state */
+>  		writel(0, EIP197_HIA_DSE_THR(priv) + EIP197_HIA_DSE_THR_CTRL(pe));
+> 
+> -		/* Configure the procesing engine thresholds */
+> +		/* Configure the processing engine thresholds */
+>  		writel(EIP197_PE_OUT_DBUF_THRES_MIN(opbuflo) |
+>  		       EIP197_PE_OUT_DBUF_THRES_MAX(opbufhi),
+>  		       EIP197_PE(priv) + EIP197_PE_OUT_DBUF_THRES(pe));
+> --
+
+
+-- 
+~Randy
+
