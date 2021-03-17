@@ -2,120 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D1BDC433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Mar 2021 02:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9CEEC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Mar 2021 02:09:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 47C5364EF6
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Mar 2021 02:03:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6690D64F8B
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Mar 2021 02:09:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229545AbhCQCCn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Mar 2021 22:02:43 -0400
-Received: from sender4-pp-o95.zoho.com ([136.143.188.95]:25577 "EHLO
-        sender4-pp-o95.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbhCQCC2 (ORCPT
+        id S229587AbhCQCIm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Mar 2021 22:08:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35188 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229756AbhCQCIl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Mar 2021 22:02:28 -0400
-X-Greylist: delayed 914 seconds by postgrey-1.27 at vger.kernel.org; Tue, 16 Mar 2021 22:02:28 EDT
-ARC-Seal: i=1; a=rsa-sha256; t=1615945596; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=jQujIYenm+uEskiMdWH9EjdpbkdCXhDdn16aT9QYMbeIg6czdfhsS5kv7aCTVbobHK1Qm7AQfNs5LRZlrUNYUDGKQCjqDzPwSdf9gtIq1VrdxTfLSFyBjkxe4TrKE6nx8O6ph6Id6JmKWjXe0zkydhvUgwTNX5lmVaNR5Pg+I1o=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1615945596; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:MIME-Version:Message-ID:Subject:To; 
-        bh=2obGIsLfOvr84VxtUdYijf03Zt+ZtbbyKcwXCUtqlMA=; 
-        b=U5wNc40naZaNTOxgeF/prIZWhs7/FHwO/qevFb64ZzEeV2Aqr7XuleH2ysxftFYFrOf+XgGpiIDMmsBDirbKAbwRjb1ezECr973TIQ/7kMw7YNY28851i/qDeefyeVUVD1IBMOkKGRTuJjsxsxFcrUxPLadKx3QJMjJ9yO8eU28=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=zohomail.com;
-        spf=pass  smtp.mailfrom=mdjurovic@zohomail.com;
-        dmarc=pass header.from=<mdjurovic@zohomail.com> header.from=<mdjurovic@zohomail.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1615945596;
-        s=zm2020; d=zohomail.com; i=mdjurovic@zohomail.com;
-        h=From:To:Cc:Message-ID:Subject:Date:MIME-Version:Content-Transfer-Encoding:Content-Type;
-        bh=2obGIsLfOvr84VxtUdYijf03Zt+ZtbbyKcwXCUtqlMA=;
-        b=lsAYpJpNsdr+kASVvv84O/qXwBOmxq++ZBAIn5bRlkFWI/mh+JNlj7xdiNQ4DKuG
-        QPkmMwZwB0Rw+KM419vuagcgMZwqPiSzHWJlbu+yTq/NGuCwP+OAQ8payWRBJvwui6N
-        Tf9R3pgh8jZ19R7EizTqgkVL0RgHnZGLo4VM4QDI=
-Received: from milan-pc.attlocal.net (107-220-151-69.lightspeed.sntcca.sbcglobal.net [107.220.151.69]) by mx.zohomail.com
-        with SMTPS id 1615945594255152.57083268336862; Tue, 16 Mar 2021 18:46:34 -0700 (PDT)
-From:   Milan Djurovic <mdjurovic@zohomail.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org,
-        Milan Djurovic <mdjurovic@zohomail.com>
-Message-ID: <20210317014403.12742-1-mdjurovic@zohomail.com>
-Subject: [PATCH] crypto: jitterentropy: Put constants on the right side of the expression
-Date:   Tue, 16 Mar 2021 18:44:03 -0700
-X-Mailer: git-send-email 2.30.1
+        Tue, 16 Mar 2021 22:08:41 -0400
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAA16C06174A
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Mar 2021 19:08:40 -0700 (PDT)
+Received: by mail-qk1-x736.google.com with SMTP id x10so37445545qkm.8
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Mar 2021 19:08:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=5K+i9EB30YDCBf5Ec7nN0Kmlxn8dBvWA2QPUBF4tmM0=;
+        b=ZKtMYKT3DClvewV7ca7X458r647Gl63Q2Y28BVG0C9oKSr1btE07Eo0tVaR4IRhZJG
+         IJpFOKKwhuRdcy2O+0UeHmfAKU5CeJEf6++TP9YgjMBtg/KBLlMgg1bnReMIT/asVE88
+         Ey3oB2IA00vUJwztNsH3fiQKB7gg8eEvQrDT3F71NHFo7z4ACNQwoV19Y2QEhIE6/IKs
+         z9pRZ5N1pShZXWmZ8OC2CzPq3fkOp51QjOSnHtrQo9Yu8m+7rOJH0a6aLbkxjPIx65ju
+         VlE9f2Hd4l4jktA7pTHef9vLPQ7ZMMXCZigmP2zdHRgjxrtF0sTPMuOaS2tKkbTfSk5C
+         U3YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5K+i9EB30YDCBf5Ec7nN0Kmlxn8dBvWA2QPUBF4tmM0=;
+        b=MjHdW/xhQQwuKBAr9WiaQ2w7cB/MF9I4VMEZW2fXKyR+NuDoCVmSbbRLRgXDiTP8Q1
+         646xQqWbe01V9V70iPBuZsshkgVsJnJQ98AdSM4y7LHpaeNFCfOxp0o+RvUjJ+BvDw8I
+         FM5TTSioWOw19bkwmknaNXGLp8fiNPGW36zsEh6fqu4I3jQMtQZuqlbhu8ClbyyT2Fvl
+         EJiLBZLDyLTZ9KGVfwHwkzZhsMxoTZjLO6Yx56MMCehihxhbi5r/uyGK+siavZxdMGBd
+         pXzDEYKvU1DaJsT9D2Uu7cnfxU6CVn4LxWc69nIBRwYne0oF1YahkhNUh2DF3+1oKsyo
+         avCw==
+X-Gm-Message-State: AOAM533r48LoOfQugBCcfurvj5iY0o8Z1smAB1qFNAVzCMnkeS5Ucf4h
+        giGgYQaQpYevrOzqiIYVRlclFA==
+X-Google-Smtp-Source: ABdhPJyqKJsLFZkTCPWcsm5q4dBZRSraW2bsrajiGbsdcfZ/rP9PVKt5GCeNE7n50dmUAxIoFOhiUA==
+X-Received: by 2002:a05:620a:55a:: with SMTP id o26mr2267267qko.43.1615946920091;
+        Tue, 16 Mar 2021 19:08:40 -0700 (PDT)
+Received: from [192.168.1.93] (pool-71-163-245-5.washdc.fios.verizon.net. [71.163.245.5])
+        by smtp.gmail.com with ESMTPSA id t5sm12956454qkt.66.2021.03.16.19.08.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Mar 2021 19:08:39 -0700 (PDT)
+Subject: Re: [PATCH 0/7] Add support for AEAD algorithms in Qualcomm Crypto
+ Engine driver
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     davem@davemloft.net, Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Eric Biggers <ebiggers@google.com>, ardb@kernel.org,
+        sivaprak@codeaurora.org, linux-crypto@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+References: <20210225182716.1402449-1-thara.gopinath@linaro.org>
+ <20210304053027.GC25972@gondor.apana.org.au>
+ <CALD-y_y8qidsypp7=F-5OLitaq3B1E==c+eQgyqq7hv9t3xcmw@mail.gmail.com>
+ <20210312130221.GB17238@gondor.apana.org.au>
+From:   Thara Gopinath <thara.gopinath@linaro.org>
+Message-ID: <35ef6e54-7865-4587-49b5-711b63b38319@linaro.org>
+Date:   Tue, 16 Mar 2021 22:08:38 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-ZohoMailClient: External
-Content-Type: text/plain; charset=utf8
+In-Reply-To: <20210312130221.GB17238@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch fixes the following checkpatch.pl warnings:
-
-crypto/jitterentropy.c:600: WARNING: Comparisons should place the constant =
-on the right side of the test
-crypto/jitterentropy.c:681: WARNING: Comparisons should place the constant =
-on the right side of the test
-crypto/jitterentropy.c:772: WARNING: Comparisons should place the constant =
-on the right side of the test
-crypto/jitterentropy.c:829: WARNING: Comparisons should place the constant =
-on the right side of the test
-
-Signed-off-by: Milan Djurovic <mdjurovic@zohomail.com>
----
- crypto/jitterentropy.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
-index 6e147c43fc18..a11b3208760f 100644
---- a/crypto/jitterentropy.c
-+++ b/crypto/jitterentropy.c
-@@ -597,7 +597,7 @@ int jent_read_entropy(struct rand_data *ec, unsigned ch=
-ar *data,
- =09if (!ec)
- =09=09return -1;
-=20
--=09while (0 < len) {
-+=09while (len > 0) {
- =09=09unsigned int tocopy;
-=20
- =09=09jent_gen_entropy(ec);
-@@ -678,7 +678,7 @@ struct rand_data *jent_entropy_collector_alloc(unsigned=
- int osr,
- =09}
-=20
- =09/* verify and set the oversampling rate */
--=09if (0 =3D=3D osr)
-+=09if (osr =3D=3D 0)
- =09=09osr =3D 1; /* minimum sampling rate is 1 */
- =09entropy_collector->osr =3D osr;
-=20
-@@ -769,7 +769,7 @@ int jent_entropy_init(void)
- =09=09 * etc. with the goal to clear it to get the worst case
- =09=09 * measurements.
- =09=09 */
--=09=09if (CLEARCACHE > i)
-+=09=09if (i < CLEARCACHE)
- =09=09=09continue;
-=20
- =09=09if (stuck)
-@@ -826,7 +826,7 @@ int jent_entropy_init(void)
- =09 * should not fail. The value of 3 should cover the NTP case being
- =09 * performed during our test run.
- =09 */
--=09if (3 < time_backwards)
-+=09if (time_backwards > 3)
- =09=09return JENT_ENOMONOTONIC;
-=20
- =09/*
---=20
-2.30.1
 
 
+On 3/12/21 8:02 AM, Herbert Xu wrote:
+> On Thu, Mar 04, 2021 at 01:41:15PM -0500, Thara Gopinath wrote:
+>>
+>> Yes it did. The last patch adds fallback for unsupported cases and
+>> this will make it pass the fuzz tests.
+> 
+> Please include this information in the next round.
+
+I will. Thanks!
+> 
+> Thanks,
+> 
+
+-- 
+Warm Regards
+Thara
