@@ -2,77 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE947C433E6
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 16:24:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC4AC433DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 16:43:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88D9364F40
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 16:24:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 06FE564ED2
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 16:43:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231806AbhCRQXc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Mar 2021 12:23:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50902 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231925AbhCRQXH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Mar 2021 12:23:07 -0400
-Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC6E3C06174A;
-        Thu, 18 Mar 2021 09:23:06 -0700 (PDT)
-Received: by mail-il1-x12c.google.com with SMTP id z9so5396093ilb.4;
-        Thu, 18 Mar 2021 09:23:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0x7tcZe8hlmMUN/W+gzK7BvYODRvOL+XfP6k+eIgadg=;
-        b=sZoQtg066poITjhwH0q/brYwoeDq3JAhLt3YJCsTssP/4jZPa894NUtFt/DRGW2U9/
-         5VqwiO68mztTapLm6J0ejfIU10q+Xoqk2UhMRFEi3FT+LbOwqE7eh4ByZpeLQixyTXow
-         BDoOg3zm8WQmMIyfbyoPhK0US5bNvx+URqegX3Ddl426ZhTNG2tOzGZNqciQINAUjuOS
-         hldDluoqzLzNVznk4UVV/9jJgrnTqA7UJFrtZ/m88000r1zF1kjT8G3zYz+MX/nmry5f
-         mI7UROzLqiiWY1RRazegy6DWv4a+JczIpdaOD3i8OPjvXOAgOhxaYAjGRWB0+p0yGG0z
-         UJSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0x7tcZe8hlmMUN/W+gzK7BvYODRvOL+XfP6k+eIgadg=;
-        b=HtKQBI1cEeRZ2PHtRBE+y0BxSAd95o+XpEgZFmMO4qFNNagASB0dcstLaBnGhXVwvg
-         1YPlGoU8Mj05NeZIEU1JOb9OJQo8H5aEqJb/RJ2kGMaQnvM1UQUmna5GyX/v3YA1kVfE
-         fioEuaSLwKOz5xFzmR5gs4oTW03MYxxubDJt6uBtrMgJnHrQTgyxbzXlbC5ytTSpZ3cP
-         rcVLfYuvZxWZtDrFfH8wrR/6MfWwuizZxTaLmuasLEWZ64hmGnecrOOK27degKHGAQFy
-         72ukx+IncGPbJsddKuWZYWEa/eb+vV4pXqS01JIM/1ZjuskPE4VSK3+8ZGKcypyLABlz
-         WTJA==
-X-Gm-Message-State: AOAM5303Nekq9CpmcGxD/jgkt/3gIPNPMv37qdaD6VsMVvijDpn0HUrp
-        BgDyfJN2U8GWng7A1Z7ygZDYN0SddqQj0k9YVQmLhANeS4Y=
-X-Google-Smtp-Source: ABdhPJxIUB9184z1Vgcgji2Zb9OKkFoVio/Y58VTn4cto0Zw+VFLWVoJ4A88jc+htFYweqErWX83xDctC8N1FsQZxq8=
-X-Received: by 2002:a92:5214:: with SMTP id g20mr2904374ilb.260.1616084586217;
- Thu, 18 Mar 2021 09:23:06 -0700 (PDT)
+        id S232091AbhCRQnD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 18 Mar 2021 12:43:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35438 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232069AbhCRQmv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Mar 2021 12:42:51 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7255D64E20;
+        Thu, 18 Mar 2021 16:42:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616085771;
+        bh=6gXB2FWqFCIJGxnEQusd1j2r934ubPSgjAWKKMgxyGE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JKeDwqoVTZ4oHT4WTN7DgZ9cPLeanqv2IHDDpA3PuXByeB1i93SHENdeSpoV0DIRy
+         +DQIz5heGAZ2Eu3TKbNcXpaf8VHxM964pVCwdFGY1rcdrwkyhZVfcB7b/78Ocy2h4A
+         4tVRQuF7rhYnqN7g+YhDsGmdiYYWG9FSIZCpvMX6os4bcx6UT4nRUSAg7npTW5kTAu
+         7q66x8+Vl0yjMewf2Yej2l3TQAb3yKl7JqFbttn5N4d46fXyFeQhJBN+mGjZZhRZvf
+         hDLTUGOqy2V+8wI3r9FlcWhzxUTtb68aLPSZNDwFvLIr9c/ADNM6kcUO04+13SjwsB
+         +fp40dX/SPb2Q==
+Date:   Thu, 18 Mar 2021 12:42:50 -0400
+From:   Sasha Levin <sashal@kernel.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Thomas Backlund <tmb@tmb.nu>, "# 3.4.x" <stable@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: stable request
+Message-ID: <YFODCo5hbvO+Vp5x@sashalap>
+References: <d5c825ba-cdcb-29eb-c434-83ef4db05ee0@tmb.nu>
+ <CAMj1kXEM76Dejv1fTZ-1EmXpSsE-ZtKWf19dPNTSBRuPcAkreA@mail.gmail.com>
+ <1e6eb02b-e699-d1ff-9cfb-4ef77255e244@tmb.nu>
+ <9493dced-908e-a9bd-009a-6b20a8422ec1@tmb.nu>
+ <CAMj1kXHzEEU2-mVxVD8g=P_Py_WJMOn0q8m+k-txUUioS+2ajQ@mail.gmail.com>
+ <YFNPiHAvEwDpGLrv@sashalap>
+ <CAMj1kXG_D_Aw+kyrz7ShMuPaMhpnMhTRZ8tsqKUf0koq_UPSnw@mail.gmail.com>
 MIME-Version: 1.0
-References: <20210312162203.2416149-1-ztong0001@gmail.com> <20210312162203.2416149-2-ztong0001@gmail.com>
- <YFN3X6q8dzEaUp27@silpixa00400314> <YFN6hlz/L7erLO0H@silpixa00400314>
-In-Reply-To: <YFN6hlz/L7erLO0H@silpixa00400314>
-From:   Tong Zhang <ztong0001@gmail.com>
-Date:   Thu, 18 Mar 2021 12:22:55 -0400
-Message-ID: <CAA5qM4DJ7N=fR5T-VtuF0qr8jUPtRWbQMNiWQbQ2ysaDrAefQg@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] crypto: qat - dont release uninitialized resources
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Fiona Trahe <fiona.trahe@intel.com>, qat-linux@intel.com,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXG_D_Aw+kyrz7ShMuPaMhpnMhTRZ8tsqKUf0koq_UPSnw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thanks!
-I have fixed typos and resent them as v4.
-- Tong
+On Thu, Mar 18, 2021 at 03:15:35PM +0100, Ard Biesheuvel wrote:
+>On Thu, 18 Mar 2021 at 14:03, Sasha Levin <sashal@kernel.org> wrote:
+>> What about anything older than 5.10? Looks like it's needed there too?
+>>
+>
+>Yes, 4.19 and 5.4 should probably get this too. They should apply with
+>minimal effort, afaict. The only conflicting change is
+>34fdce6981b96920ced4e0ee56e9db3fb03a33f0, which changed
+>
+>--- a/arch/x86/crypto/aesni-intel_asm.S
+>+++ b/arch/x86/crypto/aesni-intel_asm.S
+>@@ -2758,7 +2758,7 @@ SYM_FUNC_START(aesni_xts_crypt8)
+>        pxor INC, STATE4
+>        movdqu IV, 0x30(OUTP)
+>
+>-       CALL_NOSPEC %r11
+>+       CALL_NOSPEC r11
+>
+>        movdqu 0x00(OUTP), INC
+>        pxor INC, STATE1
+>@@ -2803,7 +2803,7 @@ SYM_FUNC_START(aesni_xts_crypt8)
+>        _aesni_gf128mul_x_ble()
+>        movups IV, (IVP)
+>
+>-       CALL_NOSPEC %r11
+>+       CALL_NOSPEC r11
+>
+>        movdqu 0x40(OUTP), INC
+>        pxor INC, STATE1
+>
+>but those CALL_NOSPEC calls are being removed by this patch anyway, so
+>that shouldn't matter.
+
+Hm, I'm seeing a lot more conflicts on 5.4 that I'm not too comfortable
+with resolving.
+
+I should be taking just these two, right?
+
+	032d049ea0f4 ("crypto: aesni - Use TEST %reg,%reg instead of CMP $0,%reg")
+	86ad60a65f29 ("crypto: x86/aes-ni-xts - use direct calls to and 4-way stride")
+
+-- 
+Thanks,
+Sasha
