@@ -2,157 +2,350 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D071C433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 17:19:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD35C433E6
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 17:42:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CB44A64E37
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 17:19:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2EB5064F24
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 17:42:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229964AbhCRRSf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Mar 2021 13:18:35 -0400
-Received: from mga18.intel.com ([134.134.136.126]:58225 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229810AbhCRRSS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Mar 2021 13:18:18 -0400
-IronPort-SDR: UvTxcHt4Vsdk1hdjXa0diSh3nWG3qT/3dOutm04MFqKI4YLcBPCeEv+PR7iE6j8lsjf2gpsUcp
- p0V1Law5DbRg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9927"; a="177324702"
-X-IronPort-AV: E=Sophos;i="5.81,259,1610438400"; 
-   d="scan'208";a="177324702"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2021 10:18:17 -0700
-IronPort-SDR: Y5pBJNPKrRhFMTmbtbvLo2dX46i+dZJzhWk3kQVXCWiRbCGhDqhOUaMGIozoh3xj03y4V7uGax
- pcaEfzf5hmNw==
-X-IronPort-AV: E=Sophos;i="5.81,259,1610438400"; 
-   d="scan'208";a="389323632"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.51])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2021 10:17:57 -0700
-Date:   Thu, 18 Mar 2021 17:17:50 +0000
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Tong Zhang <ztong0001@gmail.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Tadeusz Struk <tadeusz.struk@intel.com>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>
-Subject: Re: [PATCH v4 2/2] crypto: qat: ADF_STATUS_PF_RUNNING should be set
- after adf_dev_init
-Message-ID: <YFOLPn31KF7bW6T/@silpixa00400314>
-References: <YFN6hlz/L7erLO0H@silpixa00400314>
- <20210318162105.378239-3-ztong0001@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210318162105.378239-3-ztong0001@gmail.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+        id S229524AbhCRRmT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 18 Mar 2021 13:42:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40196 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230365AbhCRRl6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Mar 2021 13:41:58 -0400
+Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59F3AC06174A
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Mar 2021 10:41:58 -0700 (PDT)
+Received: by mail-wm1-x34a.google.com with SMTP id c7so12151181wml.8
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Mar 2021 10:41:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=ntc30WV4GSBivpKXAO0fv9xRX/AwV5t/Z4pOy4QLsWI=;
+        b=KYtRYvcj2Cxv3+iUqa5Sz3mmqq6AOQvslOqGQXKVPTOKmmyb+2hIbHioq0Nr9FdMal
+         mLrLr6F4j3PYCduhOvyZ35fzJnnwv5iEmmkMr73FZWV06P10PUu8rQ6GSSQLynh0wPkG
+         7/I+aUsH1r2UeU0K8YP9hNg7Mui2hg8iNGm7pCYllyaFQgQvR4vnayDF+KW4px5DQK1L
+         IYpIKjcow6RgOSvOgPkEeDyX6r7rJKfp8TwuCxEsBWtr652+pnoqydK52207d4lpDkjI
+         1XPXswXwubD1tBSoTad7bH4+Dv3orpsNfcjTT0JR0Nfd+B5fX//U41ZbjwOy5rxX3D+3
+         VJ+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=ntc30WV4GSBivpKXAO0fv9xRX/AwV5t/Z4pOy4QLsWI=;
+        b=ceazdfCV4/2Sf5MJUxWZwC4MNUHuTfCWWTcXi1KdcES+o0/zXHZ//MCa/f2zjaeJMA
+         TKC/g6CO5gCRxlogBHkeSRx6uoVF3cC+redcqjn4SeRrx4ak1LOiLQqhJ4RQMSICGseK
+         xepXa3aU0zCkJ6PcC4AmSHMCy1dYkpELLY48pNuh1RtbA5vli6Ui8G8NS/SF4N7TQDhG
+         G1EAFeteazE4HrardqSLR7H9Du9IO51BXQr4yZi4mtf0w2E8XXmKwdXfM8HT/kjaA3VV
+         ed/qVN+xUcooG/iHlbVfeMWL+gfbagE09DaVUNOH0NB56Enru180c6rOcf1nKYIEt5kP
+         zSwQ==
+X-Gm-Message-State: AOAM530soI8+cNrbA3lL5j2NI+5z/lYEpiBclXx2ayMEDInGA88Yih71
+        IoRaHC6IHIdLA3wCTZ74eyfvXOu8
+X-Google-Smtp-Source: ABdhPJx5rKkvaKRfg/4ogkG9nqQ337eo80EUEkVXr/atS4jsc38hUerjTVFL3Ez4vSXacsmeD/uhrIfP
+X-Received: from palermo.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:118a])
+ (user=ardb job=sendgmr) by 2002:a05:600c:3650:: with SMTP id
+ y16mr291597wmq.182.1616089315378; Thu, 18 Mar 2021 10:41:55 -0700 (PDT)
+Date:   Thu, 18 Mar 2021 17:41:51 +0000
+Message-Id: <20210318174151.2164335-1-ardb@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
+Subject: [PATCH for-stable-5.4] crypto: x86/aes-ni-xts - use direct calls to
+ and 4-way stride
+From:   Ard Biesheuvel <ardb@google.com>
+To:     stable@vger.kernel.org
+Cc:     linux-crypto@vger.kernel.org, tmb@tmb.nu, sashal@kernel.org,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Just a minor comment on the commit message:
-crypto: qat: ADF_STATUS_PF_RUNNING ...
-           ^
-Patches to the qat driver have the following headline:
-        crypto: qat -
-not
-        crypto: qat :
+From: Ard Biesheuvel <ardb@kernel.org>
 
-Regards,
+Upstream commit 86ad60a65f29dd862a11c22bb4b5be28d6c5cef1
 
+The XTS asm helper arrangement is a bit odd: the 8-way stride helper
+consists of back-to-back calls to the 4-way core transforms, which
+are called indirectly, based on a boolean that indicates whether we
+are performing encryption or decryption.
+
+Given how costly indirect calls are on x86, let's switch to direct
+calls, and given how the 8-way stride doesn't really add anything
+substantial, use a 4-way stride instead, and make the asm core
+routine deal with any multiple of 4 blocks. Since 512 byte sectors
+or 4 KB blocks are the typical quantities XTS operates on, increase
+the stride exported to the glue helper to 512 bytes as well.
+
+As a result, the number of indirect calls is reduced from 3 per 64 bytes
+of in/output to 1 per 512 bytes of in/output, which produces a 65% speedup
+when operating on 1 KB blocks (measured on a Intel(R) Core(TM) i7-8650U CPU)
+
+Fixes: 9697fa39efd3f ("x86/retpoline/crypto: Convert crypto assembler indirect jumps")
+Tested-by: Eric Biggers <ebiggers@google.com> # x86_64
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+[ardb: rebase onto stable/linux-5.4.y]
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+
+Please apply on top of backports of
+
+9c1e8836edbb crypto: x86 - Regularize glue function prototypes
+032d049ea0f4 crypto: aesni - Use TEST %reg,%reg instead of CMP $0,%reg
+
+ arch/x86/crypto/aesni-intel_asm.S  | 115 ++++++++++++++++++-----------
+ arch/x86/crypto/aesni-intel_glue.c |  25 ++++---
+ 2 files changed, 84 insertions(+), 56 deletions(-)
+
+diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
+index f10f044c887c..dd954d8db629 100644
+--- a/arch/x86/crypto/aesni-intel_asm.S
++++ b/arch/x86/crypto/aesni-intel_asm.S
+@@ -2726,25 +2726,18 @@ ENDPROC(aesni_ctr_enc)
+ 	pxor CTR, IV;
+ 
+ /*
+- * void aesni_xts_crypt8(const struct crypto_aes_ctx *ctx, u8 *dst,
+- *			 const u8 *src, bool enc, le128 *iv)
++ * void aesni_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *dst,
++ *			  const u8 *src, unsigned int len, le128 *iv)
+  */
+-ENTRY(aesni_xts_crypt8)
++ENTRY(aesni_xts_encrypt)
+ 	FRAME_BEGIN
+-	testb %cl, %cl
+-	movl $0, %ecx
+-	movl $240, %r10d
+-	leaq _aesni_enc4, %r11
+-	leaq _aesni_dec4, %rax
+-	cmovel %r10d, %ecx
+-	cmoveq %rax, %r11
+ 
+ 	movdqa .Lgf128mul_x_ble_mask, GF128MUL_MASK
+ 	movups (IVP), IV
+ 
+ 	mov 480(KEYP), KLEN
+-	addq %rcx, KEYP
+ 
++.Lxts_enc_loop4:
+ 	movdqa IV, STATE1
+ 	movdqu 0x00(INP), INC
+ 	pxor INC, STATE1
+@@ -2768,71 +2761,103 @@ ENTRY(aesni_xts_crypt8)
+ 	pxor INC, STATE4
+ 	movdqu IV, 0x30(OUTP)
+ 
+-	CALL_NOSPEC %r11
++	call _aesni_enc4
+ 
+ 	movdqu 0x00(OUTP), INC
+ 	pxor INC, STATE1
+ 	movdqu STATE1, 0x00(OUTP)
+ 
+-	_aesni_gf128mul_x_ble()
+-	movdqa IV, STATE1
+-	movdqu 0x40(INP), INC
+-	pxor INC, STATE1
+-	movdqu IV, 0x40(OUTP)
+-
+ 	movdqu 0x10(OUTP), INC
+ 	pxor INC, STATE2
+ 	movdqu STATE2, 0x10(OUTP)
+ 
+-	_aesni_gf128mul_x_ble()
+-	movdqa IV, STATE2
+-	movdqu 0x50(INP), INC
+-	pxor INC, STATE2
+-	movdqu IV, 0x50(OUTP)
+-
+ 	movdqu 0x20(OUTP), INC
+ 	pxor INC, STATE3
+ 	movdqu STATE3, 0x20(OUTP)
+ 
+-	_aesni_gf128mul_x_ble()
+-	movdqa IV, STATE3
+-	movdqu 0x60(INP), INC
+-	pxor INC, STATE3
+-	movdqu IV, 0x60(OUTP)
+-
+ 	movdqu 0x30(OUTP), INC
+ 	pxor INC, STATE4
+ 	movdqu STATE4, 0x30(OUTP)
+ 
+ 	_aesni_gf128mul_x_ble()
+-	movdqa IV, STATE4
+-	movdqu 0x70(INP), INC
+-	pxor INC, STATE4
+-	movdqu IV, 0x70(OUTP)
+ 
+-	_aesni_gf128mul_x_ble()
++	add $64, INP
++	add $64, OUTP
++	sub $64, LEN
++	ja .Lxts_enc_loop4
++
+ 	movups IV, (IVP)
+ 
+-	CALL_NOSPEC %r11
++	FRAME_END
++	ret
++ENDPROC(aesni_xts_encrypt)
++
++/*
++ * void aesni_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *dst,
++ *			  const u8 *src, unsigned int len, le128 *iv)
++ */
++ENTRY(aesni_xts_decrypt)
++	FRAME_BEGIN
++
++	movdqa .Lgf128mul_x_ble_mask, GF128MUL_MASK
++	movups (IVP), IV
++
++	mov 480(KEYP), KLEN
++	add $240, KEYP
+ 
+-	movdqu 0x40(OUTP), INC
++.Lxts_dec_loop4:
++	movdqa IV, STATE1
++	movdqu 0x00(INP), INC
+ 	pxor INC, STATE1
+-	movdqu STATE1, 0x40(OUTP)
++	movdqu IV, 0x00(OUTP)
+ 
+-	movdqu 0x50(OUTP), INC
++	_aesni_gf128mul_x_ble()
++	movdqa IV, STATE2
++	movdqu 0x10(INP), INC
++	pxor INC, STATE2
++	movdqu IV, 0x10(OUTP)
++
++	_aesni_gf128mul_x_ble()
++	movdqa IV, STATE3
++	movdqu 0x20(INP), INC
++	pxor INC, STATE3
++	movdqu IV, 0x20(OUTP)
++
++	_aesni_gf128mul_x_ble()
++	movdqa IV, STATE4
++	movdqu 0x30(INP), INC
++	pxor INC, STATE4
++	movdqu IV, 0x30(OUTP)
++
++	call _aesni_dec4
++
++	movdqu 0x00(OUTP), INC
++	pxor INC, STATE1
++	movdqu STATE1, 0x00(OUTP)
++
++	movdqu 0x10(OUTP), INC
+ 	pxor INC, STATE2
+-	movdqu STATE2, 0x50(OUTP)
++	movdqu STATE2, 0x10(OUTP)
+ 
+-	movdqu 0x60(OUTP), INC
++	movdqu 0x20(OUTP), INC
+ 	pxor INC, STATE3
+-	movdqu STATE3, 0x60(OUTP)
++	movdqu STATE3, 0x20(OUTP)
+ 
+-	movdqu 0x70(OUTP), INC
++	movdqu 0x30(OUTP), INC
+ 	pxor INC, STATE4
+-	movdqu STATE4, 0x70(OUTP)
++	movdqu STATE4, 0x30(OUTP)
++
++	_aesni_gf128mul_x_ble()
++
++	add $64, INP
++	add $64, OUTP
++	sub $64, LEN
++	ja .Lxts_dec_loop4
++
++	movups IV, (IVP)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(aesni_xts_crypt8)
++ENDPROC(aesni_xts_decrypt)
+ 
+ #endif
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index f795310d3da7..18cfb76daa23 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -97,6 +97,12 @@ asmlinkage void aesni_cbc_dec(struct crypto_aes_ctx *ctx, u8 *out,
+ #define AVX_GEN2_OPTSIZE 640
+ #define AVX_GEN4_OPTSIZE 4096
+ 
++asmlinkage void aesni_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *out,
++				  const u8 *in, unsigned int len, u8 *iv);
++
++asmlinkage void aesni_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *out,
++				  const u8 *in, unsigned int len, u8 *iv);
++
+ #ifdef CONFIG_X86_64
+ 
+ static void (*aesni_ctr_enc_tfm)(struct crypto_aes_ctx *ctx, u8 *out,
+@@ -104,9 +110,6 @@ static void (*aesni_ctr_enc_tfm)(struct crypto_aes_ctx *ctx, u8 *out,
+ asmlinkage void aesni_ctr_enc(struct crypto_aes_ctx *ctx, u8 *out,
+ 			      const u8 *in, unsigned int len, u8 *iv);
+ 
+-asmlinkage void aesni_xts_crypt8(const struct crypto_aes_ctx *ctx, u8 *out,
+-				 const u8 *in, bool enc, le128 *iv);
+-
+ /* asmlinkage void aesni_gcm_enc()
+  * void *ctx,  AES Key schedule. Starts on a 16 byte boundary.
+  * struct gcm_context_data.  May be uninitialized.
+@@ -558,14 +561,14 @@ static void aesni_xts_dec(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
+ 	glue_xts_crypt_128bit_one(ctx, dst, src, iv, aesni_dec);
+ }
+ 
+-static void aesni_xts_enc8(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
++static void aesni_xts_enc32(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
+ {
+-	aesni_xts_crypt8(ctx, dst, src, true, iv);
++	aesni_xts_encrypt(ctx, dst, src, 32 * AES_BLOCK_SIZE, (u8 *)iv);
+ }
+ 
+-static void aesni_xts_dec8(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
++static void aesni_xts_dec32(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
+ {
+-	aesni_xts_crypt8(ctx, dst, src, false, iv);
++	aesni_xts_decrypt(ctx, dst, src, 32 * AES_BLOCK_SIZE, (u8 *)iv);
+ }
+ 
+ static const struct common_glue_ctx aesni_enc_xts = {
+@@ -573,8 +576,8 @@ static const struct common_glue_ctx aesni_enc_xts = {
+ 	.fpu_blocks_limit = 1,
+ 
+ 	.funcs = { {
+-		.num_blocks = 8,
+-		.fn_u = { .xts = aesni_xts_enc8 }
++		.num_blocks = 32,
++		.fn_u = { .xts = aesni_xts_enc32 }
+ 	}, {
+ 		.num_blocks = 1,
+ 		.fn_u = { .xts = aesni_xts_enc }
+@@ -586,8 +589,8 @@ static const struct common_glue_ctx aesni_dec_xts = {
+ 	.fpu_blocks_limit = 1,
+ 
+ 	.funcs = { {
+-		.num_blocks = 8,
+-		.fn_u = { .xts = aesni_xts_dec8 }
++		.num_blocks = 32,
++		.fn_u = { .xts = aesni_xts_dec32 }
+ 	}, {
+ 		.num_blocks = 1,
+ 		.fn_u = { .xts = aesni_xts_dec }
 -- 
-Giovanni
+2.31.0.rc2.261.g7f71774620-goog
 
-On Thu, Mar 18, 2021 at 12:21:05PM -0400, Tong Zhang wrote:
-> ADF_STATUS_PF_RUNNING is (only) used and checked by adf_vf2pf_shutdown()
-> before calling adf_iov_putmsg()->mutex_lock(vf2pf_lock), however the
-> vf2pf_lock is initialized in adf_dev_init(), which can fail and when it
-> fail, the vf2pf_lock is either not initialized or destroyed, a subsequent
-> use of vf2pf_lock will cause issue.
-> To fix this issue, only set this flag if adf_dev_init() returns 0.
-> 
-> [    7.178404] BUG: KASAN: user-memory-access in __mutex_lock.isra.0+0x1ac/0x7c0
-> [    7.180345] Call Trace:
-> [    7.182576]  mutex_lock+0xc9/0xd0
-> [    7.183257]  adf_iov_putmsg+0x118/0x1a0 [intel_qat]
-> [    7.183541]  adf_vf2pf_shutdown+0x4d/0x7b [intel_qat]
-> [    7.183834]  adf_dev_shutdown+0x172/0x2b0 [intel_qat]
-> [    7.184127]  adf_probe+0x5e9/0x600 [qat_dh895xccvf]
-> 
-> Signed-off-by: Tong Zhang <ztong0001@gmail.com>
-> Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-> Fixes: 25c6ffb249f6 ("crypto: qat - check if PF is running")
-> Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> ---
->  drivers/crypto/qat/qat_c3xxxvf/adf_drv.c    | 4 ++--
->  drivers/crypto/qat/qat_c62xvf/adf_drv.c     | 4 ++--
->  drivers/crypto/qat/qat_dh895xccvf/adf_drv.c | 4 ++--
->  3 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-> index 1d1532e8fb6d..067ca5e17d38 100644
-> --- a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-> +++ b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-> @@ -184,12 +184,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	if (ret)
->  		goto out_err_free_reg;
->  
-> -	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
-> -
->  	ret = adf_dev_init(accel_dev);
->  	if (ret)
->  		goto out_err_dev_shutdown;
->  
-> +	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
-> +
->  	ret = adf_dev_start(accel_dev);
->  	if (ret)
->  		goto out_err_dev_stop;
-> diff --git a/drivers/crypto/qat/qat_c62xvf/adf_drv.c b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-> index 04742a6d91ca..51ea88c0b17d 100644
-> --- a/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-> +++ b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-> @@ -184,12 +184,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	if (ret)
->  		goto out_err_free_reg;
->  
-> -	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
-> -
->  	ret = adf_dev_init(accel_dev);
->  	if (ret)
->  		goto out_err_dev_shutdown;
->  
-> +	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
-> +
->  	ret = adf_dev_start(accel_dev);
->  	if (ret)
->  		goto out_err_dev_stop;
-> diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-> index c972554a755e..29999da716cc 100644
-> --- a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-> +++ b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-> @@ -184,12 +184,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	if (ret)
->  		goto out_err_free_reg;
->  
-> -	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
-> -
->  	ret = adf_dev_init(accel_dev);
->  	if (ret)
->  		goto out_err_dev_shutdown;
->  
-> +	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
-> +
->  	ret = adf_dev_start(accel_dev);
->  	if (ret)
->  		goto out_err_dev_stop;
-> -- 
-> 2.25.1
-> 
