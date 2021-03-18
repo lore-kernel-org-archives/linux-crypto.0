@@ -2,131 +2,164 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAED7C433DB
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 13:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A54CC433DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 14:16:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E52664F6B
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 13:03:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDF9364F38
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 14:16:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230498AbhCRNDZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Mar 2021 09:03:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56332 "EHLO mail.kernel.org"
+        id S230519AbhCROQB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 18 Mar 2021 10:16:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40236 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230169AbhCRNDG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Mar 2021 09:03:06 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C238564DFB;
-        Thu, 18 Mar 2021 13:03:05 +0000 (UTC)
+        id S231408AbhCROPr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Mar 2021 10:15:47 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2D48564F24;
+        Thu, 18 Mar 2021 14:15:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616072586;
-        bh=H6FwzdcR6qvs2S3lGFKitAunGXBMVAggNXohomzWTJs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bWfYlaL4e1wy5J/8tv/4LjIWO/K7eY8EjaTBE/nDluRODRc5fduBkAl7zzAetXb8U
-         XK9eGBiz5utE1KB3LXXa/51FX6ZbMO+ul1HPVovxuLuWWDJ8HxSNlDhka7Xm3XQLmW
-         NKw2oFRSGFqr+Q1KESoI/8kyj84TsDr9IyUq5fgLuBrYnbtxWVKV3ECuVaBkblubWr
-         KP7q2pkPrTISrjGPvUt0Kt39ge5k42zQaRQ/P6bvA3t5P1nZqSHtEwT1dNk1wyYOnI
-         tCGsiapEGLcXXCYA6yJpHZYo/DUsR+5Ux1cgvcHBmfXpKAtmAY7K3lmX6uEzuXhG8v
-         fw8xrkkV7hljQ==
-Date:   Thu, 18 Mar 2021 09:03:04 -0400
-From:   Sasha Levin <sashal@kernel.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
+        s=k20201202; t=1616076947;
+        bh=gaH7KOpqa0mh8Td2vFO8Q9uJaIe40TCSMBkbNqSg+R0=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=L++pIO1kLRARcA+NCpzuHGudtAdtwgx2QLANmUyb3vndLyelFxURtMJh3EJBQ05ja
+         s5ArnWcHWLflLAauq87tku82sGhdB2vqsuI823kwWRbuBz1Fx5j6NEiU8FEOQKOGu7
+         hn+8jXRL8QhHInG9ebGu8v9HwNgzbkuH/hylpUSFU4kCbuDtnm7XQh/OoXK5IkyDoe
+         lR4oYd5LpCzcZkPF22JZPq5auyFvYzhWX/136pWiBuRw2gDjw1XebCrbatX2dOOo8T
+         FagaOvdUaHybUkDd1+p+COA4vhg3PJeN9KG8VpqhpC4aFM3UAb7FS3sKv+6dQac6SR
+         i5BFeCykBm6rw==
+Received: by mail-ot1-f41.google.com with SMTP id h6-20020a0568300346b02901b71a850ab4so5315405ote.6;
+        Thu, 18 Mar 2021 07:15:47 -0700 (PDT)
+X-Gm-Message-State: AOAM531H4UjQf45VLZlhwNVBr1Kt/e5gSaX70M/jwnLOYyzVEDoGUh+G
+        aDqaZs/VROn+UARKZahaXZCrEWP53GUaujuKqAk=
+X-Google-Smtp-Source: ABdhPJzAnAlsSlpVebKZ3lyjrI7JeKROhZXVtYuFJrV41ko7Liu7GFD25Xz0rbl8O7HOAbrna5TulhXfcOlP5V1bjxM=
+X-Received: by 2002:a9d:42c:: with SMTP id 41mr7407978otc.108.1616076946466;
+ Thu, 18 Mar 2021 07:15:46 -0700 (PDT)
+MIME-Version: 1.0
+References: <d5c825ba-cdcb-29eb-c434-83ef4db05ee0@tmb.nu> <CAMj1kXEM76Dejv1fTZ-1EmXpSsE-ZtKWf19dPNTSBRuPcAkreA@mail.gmail.com>
+ <1e6eb02b-e699-d1ff-9cfb-4ef77255e244@tmb.nu> <9493dced-908e-a9bd-009a-6b20a8422ec1@tmb.nu>
+ <CAMj1kXHzEEU2-mVxVD8g=P_Py_WJMOn0q8m+k-txUUioS+2ajQ@mail.gmail.com> <YFNPiHAvEwDpGLrv@sashalap>
+In-Reply-To: <YFNPiHAvEwDpGLrv@sashalap>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 18 Mar 2021 15:15:35 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXG_D_Aw+kyrz7ShMuPaMhpnMhTRZ8tsqKUf0koq_UPSnw@mail.gmail.com>
+Message-ID: <CAMj1kXG_D_Aw+kyrz7ShMuPaMhpnMhTRZ8tsqKUf0koq_UPSnw@mail.gmail.com>
+Subject: Re: stable request
+To:     Sasha Levin <sashal@kernel.org>
 Cc:     Thomas Backlund <tmb@tmb.nu>, "# 3.4.x" <stable@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Eric Biggers <ebiggers@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: stable request
-Message-ID: <YFNPiHAvEwDpGLrv@sashalap>
-References: <d5c825ba-cdcb-29eb-c434-83ef4db05ee0@tmb.nu>
- <CAMj1kXEM76Dejv1fTZ-1EmXpSsE-ZtKWf19dPNTSBRuPcAkreA@mail.gmail.com>
- <1e6eb02b-e699-d1ff-9cfb-4ef77255e244@tmb.nu>
- <9493dced-908e-a9bd-009a-6b20a8422ec1@tmb.nu>
- <CAMj1kXHzEEU2-mVxVD8g=P_Py_WJMOn0q8m+k-txUUioS+2ajQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXHzEEU2-mVxVD8g=P_Py_WJMOn0q8m+k-txUUioS+2ajQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 16, 2021 at 01:35:40PM +0100, Ard Biesheuvel wrote:
->On Tue, 16 Mar 2021 at 13:28, Thomas Backlund <tmb@tmb.nu> wrote:
->>
->>
->> Den 16.3.2021 kl. 14:15, skrev Thomas Backlund:
->> >
->> > Den 16.3.2021 kl. 12:17, skrev Ard Biesheuvel:
->> >> On Tue, 16 Mar 2021 at 10:21, Thomas Backlund <tmb@tmb.nu> wrote:
->> >>> Den 16.3.2021 kl. 08:37, skrev Ard Biesheuvel:
->> >>>> Please consider backporting commit
->> >>>>
->> >>>> 86ad60a65f29dd862a11c22bb4b5be28d6c5cef1
->> >>>> crypto: x86/aes-ni-xts - use direct calls to and 4-way stride
->> >>>>
->> >>>> to stable. It addresses a rather substantial retpoline-related
->> >>>> performance regression in the AES-NI XTS code, which is a widely used
->> >>>> disk encryption algorithm on x86.
->> >>>>
->> >>> To get all the nice bits, we added the following in Mageia 5.10 / 5.11
->> >>> series kerenels (the 2 first is needed to get the third to apply/build
->> >>> nicely):
->> >>>
->> >> I will leave it up to the -stable maintainers to decide, but I will
->> >> point out that none of the additional patches fix any bugs, so this
->> >> may violate the stable kernel rules. In fact, I deliberately split the
->> >> XTS changes into two  patches so that the first one could be
->> >> backported individually.
->> >
->> > Yes, I understand that.
->> >
->> > but commit
->> >
->> > 86ad60a65f29dd862a11c22bb4b5be28d6c5cef1
->> > crypto: x86/aes-ni-xts - use direct calls to and 4-way stride
->> >
->> > only applies cleanly on 5.11.
->> >
->> >
->> > So if it's wanted in 5.10 you need the 2 others too... unless you intend to provide a tested backport...
->> > and IIRC GregKH prefers 1:1 matching of patches between -stable and linus tree unless they are too intrusive.
->> >
->> >
->> > As for the last one I seem to remember comments that it too was part of the "affects performance", but I might be remembering wrong... and since you are Author of them I assume you know better about the facts :)
->> >
->> >
->> > That's why I listed them as an extra "hopefully helfpful" info and datapoint that they work...
->> > We have been carrying them in 5.10 series since we rebased to 5.10.8 on January 17th, 2021
->> >
->> >
->> > but in the end it's up to the -stable maintainers as you point out...
->>
->>
->> and now  I re-checked...
->>
->> Only the first is needed to get your fix to apply cleanly on 5.10
->>
->>
->> the second came in as a pre-req for the fourth patch...
->>
+On Thu, 18 Mar 2021 at 14:03, Sasha Levin <sashal@kernel.org> wrote:
 >
->OK so that would be
+> On Tue, Mar 16, 2021 at 01:35:40PM +0100, Ard Biesheuvel wrote:
+> >On Tue, 16 Mar 2021 at 13:28, Thomas Backlund <tmb@tmb.nu> wrote:
+> >>
+> >>
+> >> Den 16.3.2021 kl. 14:15, skrev Thomas Backlund:
+> >> >
+> >> > Den 16.3.2021 kl. 12:17, skrev Ard Biesheuvel:
+> >> >> On Tue, 16 Mar 2021 at 10:21, Thomas Backlund <tmb@tmb.nu> wrote:
+> >> >>> Den 16.3.2021 kl. 08:37, skrev Ard Biesheuvel:
+> >> >>>> Please consider backporting commit
+> >> >>>>
+> >> >>>> 86ad60a65f29dd862a11c22bb4b5be28d6c5cef1
+> >> >>>> crypto: x86/aes-ni-xts - use direct calls to and 4-way stride
+> >> >>>>
+> >> >>>> to stable. It addresses a rather substantial retpoline-related
+> >> >>>> performance regression in the AES-NI XTS code, which is a widely used
+> >> >>>> disk encryption algorithm on x86.
+> >> >>>>
+> >> >>> To get all the nice bits, we added the following in Mageia 5.10 / 5.11
+> >> >>> series kerenels (the 2 first is needed to get the third to apply/build
+> >> >>> nicely):
+> >> >>>
+> >> >> I will leave it up to the -stable maintainers to decide, but I will
+> >> >> point out that none of the additional patches fix any bugs, so this
+> >> >> may violate the stable kernel rules. In fact, I deliberately split the
+> >> >> XTS changes into two  patches so that the first one could be
+> >> >> backported individually.
+> >> >
+> >> > Yes, I understand that.
+> >> >
+> >> > but commit
+> >> >
+> >> > 86ad60a65f29dd862a11c22bb4b5be28d6c5cef1
+> >> > crypto: x86/aes-ni-xts - use direct calls to and 4-way stride
+> >> >
+> >> > only applies cleanly on 5.11.
+> >> >
+> >> >
+> >> > So if it's wanted in 5.10 you need the 2 others too... unless you intend to provide a tested backport...
+> >> > and IIRC GregKH prefers 1:1 matching of patches between -stable and linus tree unless they are too intrusive.
+> >> >
+> >> >
+> >> > As for the last one I seem to remember comments that it too was part of the "affects performance", but I might be remembering wrong... and since you are Author of them I assume you know better about the facts :)
+> >> >
+> >> >
+> >> > That's why I listed them as an extra "hopefully helfpful" info and datapoint that they work...
+> >> > We have been carrying them in 5.10 series since we rebased to 5.10.8 on January 17th, 2021
+> >> >
+> >> >
+> >> > but in the end it's up to the -stable maintainers as you point out...
+> >>
+> >>
+> >> and now  I re-checked...
+> >>
+> >> Only the first is needed to get your fix to apply cleanly on 5.10
+> >>
+> >>
+> >> the second came in as a pre-req for the fourth patch...
+> >>
+> >
+> >OK so that would be
+> >
+> >032d049ea0f45b45c21f3f02b542aa18bc6b6428
+> >Uros Bizjak <ubizjak@gmail.com>
+> >crypto: aesni - Use TEST %reg,%reg instead of CMP $0,%reg
+> >
+> >which is already in 5.11, but needs to be backported as well for the
+> >originally requested backport to apply cleanly to 5.10 and earlier.
+> >
+> >Thanks for digging that up.
 >
->032d049ea0f45b45c21f3f02b542aa18bc6b6428
->Uros Bizjak <ubizjak@gmail.com>
->crypto: aesni - Use TEST %reg,%reg instead of CMP $0,%reg
+> Queued up for 5.10 and 5.11.
 >
->which is already in 5.11, but needs to be backported as well for the
->originally requested backport to apply cleanly to 5.10 and earlier.
+> What about anything older than 5.10? Looks like it's needed there too?
 >
->Thanks for digging that up.
 
-Queued up for 5.10 and 5.11.
+Yes, 4.19 and 5.4 should probably get this too. They should apply with
+minimal effort, afaict. The only conflicting change is
+34fdce6981b96920ced4e0ee56e9db3fb03a33f0, which changed
 
-What about anything older than 5.10? Looks like it's needed there too?
+--- a/arch/x86/crypto/aesni-intel_asm.S
++++ b/arch/x86/crypto/aesni-intel_asm.S
+@@ -2758,7 +2758,7 @@ SYM_FUNC_START(aesni_xts_crypt8)
+        pxor INC, STATE4
+        movdqu IV, 0x30(OUTP)
 
--- 
-Thanks,
-Sasha
+-       CALL_NOSPEC %r11
++       CALL_NOSPEC r11
+
+        movdqu 0x00(OUTP), INC
+        pxor INC, STATE1
+@@ -2803,7 +2803,7 @@ SYM_FUNC_START(aesni_xts_crypt8)
+        _aesni_gf128mul_x_ble()
+        movups IV, (IVP)
+
+-       CALL_NOSPEC %r11
++       CALL_NOSPEC r11
+
+        movdqu 0x40(OUTP), INC
+        pxor INC, STATE1
+
+but those CALL_NOSPEC calls are being removed by this patch anyway, so
+that shouldn't matter.
