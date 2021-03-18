@@ -2,106 +2,157 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75339C433E9
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 17:14:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D071C433E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 17:19:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4DFB864EF2
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 17:14:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB44A64E37
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Mar 2021 17:19:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232088AbhCRRNo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Mar 2021 13:13:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43002 "EHLO mail.kernel.org"
+        id S229964AbhCRRSf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 18 Mar 2021 13:18:35 -0400
+Received: from mga18.intel.com ([134.134.136.126]:58225 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232184AbhCRRNj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Mar 2021 13:13:39 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A767864F2A;
-        Thu, 18 Mar 2021 17:13:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616087618;
-        bh=z1ZMt5lGKNPLJj7HI9Z0FIQQiYjuUQW4fPVR4s1Xopw=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=O7WuWJGvmQ032Tqgf0oEcyorvMaPeCDPRMQYmrHdttaqcIaCldlujExtjb84rQg8t
-         I7SsplQPViqMGKvi6hK/ZntPkDWIiZ5MbB3Ly5yen0tqbq61hSW1ZRRwzPfb/b+ALf
-         28ZPitbe3SGDBqwJTHD8frDk8YYijKIEFIR24/T7nyAnC1G3YEisojxoHK16NSGI/q
-         GfbaY38KS9atSb+QzeOw1D1SfmbXAryAzmXScSBQFy5LzzMVzNqllWqAL3bZxVL0D7
-         S6BLPOEEDE8iXPVG55IhAQI2KQZw5P8h8TM+3ozLpaJxY+WovJwKwkT7Ta+udqJKTh
-         PyjQiSSDAygDA==
-Received: by mail-ot1-f44.google.com with SMTP id h6-20020a0568300346b02901b71a850ab4so5881674ote.6;
-        Thu, 18 Mar 2021 10:13:38 -0700 (PDT)
-X-Gm-Message-State: AOAM533Z9+/SO8x+9ckXKaOokeC+wnEPeQ3SHLm8KOnKMPyRLTtkIM6f
-        bucWfSEQA0jyL2MsH42EmjfGEpFSGfOSuRmYNOE=
-X-Google-Smtp-Source: ABdhPJzLfO7LUDij8Fb+lDuJv0KI1RtWO+fKmIadGan291DfvxQzbt+eWyhCgNuUJwwVhMg89PGiKFhHDfobLYtZiTE=
-X-Received: by 2002:a9d:6e15:: with SMTP id e21mr8121413otr.77.1616087618036;
- Thu, 18 Mar 2021 10:13:38 -0700 (PDT)
+        id S229810AbhCRRSS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Mar 2021 13:18:18 -0400
+IronPort-SDR: UvTxcHt4Vsdk1hdjXa0diSh3nWG3qT/3dOutm04MFqKI4YLcBPCeEv+PR7iE6j8lsjf2gpsUcp
+ p0V1Law5DbRg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9927"; a="177324702"
+X-IronPort-AV: E=Sophos;i="5.81,259,1610438400"; 
+   d="scan'208";a="177324702"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2021 10:18:17 -0700
+IronPort-SDR: Y5pBJNPKrRhFMTmbtbvLo2dX46i+dZJzhWk3kQVXCWiRbCGhDqhOUaMGIozoh3xj03y4V7uGax
+ pcaEfzf5hmNw==
+X-IronPort-AV: E=Sophos;i="5.81,259,1610438400"; 
+   d="scan'208";a="389323632"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.51])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2021 10:17:57 -0700
+Date:   Thu, 18 Mar 2021 17:17:50 +0000
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Tong Zhang <ztong0001@gmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        Fiona Trahe <fiona.trahe@intel.com>,
+        Tadeusz Struk <tadeusz.struk@intel.com>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>
+Subject: Re: [PATCH v4 2/2] crypto: qat: ADF_STATUS_PF_RUNNING should be set
+ after adf_dev_init
+Message-ID: <YFOLPn31KF7bW6T/@silpixa00400314>
+References: <YFN6hlz/L7erLO0H@silpixa00400314>
+ <20210318162105.378239-3-ztong0001@gmail.com>
 MIME-Version: 1.0
-References: <d5c825ba-cdcb-29eb-c434-83ef4db05ee0@tmb.nu> <CAMj1kXEM76Dejv1fTZ-1EmXpSsE-ZtKWf19dPNTSBRuPcAkreA@mail.gmail.com>
- <1e6eb02b-e699-d1ff-9cfb-4ef77255e244@tmb.nu> <9493dced-908e-a9bd-009a-6b20a8422ec1@tmb.nu>
- <CAMj1kXHzEEU2-mVxVD8g=P_Py_WJMOn0q8m+k-txUUioS+2ajQ@mail.gmail.com>
- <YFNPiHAvEwDpGLrv@sashalap> <CAMj1kXG_D_Aw+kyrz7ShMuPaMhpnMhTRZ8tsqKUf0koq_UPSnw@mail.gmail.com>
- <YFODCo5hbvO+Vp5x@sashalap>
-In-Reply-To: <YFODCo5hbvO+Vp5x@sashalap>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 18 Mar 2021 18:13:26 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXEcmx09BsH140qoUTVLLsoxqUh7=x5OwKdLZMSGEHtEVg@mail.gmail.com>
-Message-ID: <CAMj1kXEcmx09BsH140qoUTVLLsoxqUh7=x5OwKdLZMSGEHtEVg@mail.gmail.com>
-Subject: Re: stable request
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     Thomas Backlund <tmb@tmb.nu>, "# 3.4.x" <stable@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210318162105.378239-3-ztong0001@gmail.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 18 Mar 2021 at 17:42, Sasha Levin <sashal@kernel.org> wrote:
->
-> On Thu, Mar 18, 2021 at 03:15:35PM +0100, Ard Biesheuvel wrote:
-> >On Thu, 18 Mar 2021 at 14:03, Sasha Levin <sashal@kernel.org> wrote:
-> >> What about anything older than 5.10? Looks like it's needed there too?
-> >>
-> >
-> >Yes, 4.19 and 5.4 should probably get this too. They should apply with
-> >minimal effort, afaict. The only conflicting change is
-> >34fdce6981b96920ced4e0ee56e9db3fb03a33f0, which changed
-> >
-> >--- a/arch/x86/crypto/aesni-intel_asm.S
-> >+++ b/arch/x86/crypto/aesni-intel_asm.S
-> >@@ -2758,7 +2758,7 @@ SYM_FUNC_START(aesni_xts_crypt8)
-> >        pxor INC, STATE4
-> >        movdqu IV, 0x30(OUTP)
-> >
-> >-       CALL_NOSPEC %r11
-> >+       CALL_NOSPEC r11
-> >
-> >        movdqu 0x00(OUTP), INC
-> >        pxor INC, STATE1
-> >@@ -2803,7 +2803,7 @@ SYM_FUNC_START(aesni_xts_crypt8)
-> >        _aesni_gf128mul_x_ble()
-> >        movups IV, (IVP)
-> >
-> >-       CALL_NOSPEC %r11
-> >+       CALL_NOSPEC r11
-> >
-> >        movdqu 0x40(OUTP), INC
-> >        pxor INC, STATE1
-> >
-> >but those CALL_NOSPEC calls are being removed by this patch anyway, so
-> >that shouldn't matter.
->
-> Hm, I'm seeing a lot more conflicts on 5.4 that I'm not too comfortable
-> with resolving.
->
-> I should be taking just these two, right?
->
->         032d049ea0f4 ("crypto: aesni - Use TEST %reg,%reg instead of CMP $0,%reg")
->         86ad60a65f29 ("crypto: x86/aes-ni-xts - use direct calls to and 4-way stride")
->
+Just a minor comment on the commit message:
+crypto: qat: ADF_STATUS_PF_RUNNING ...
+           ^
+Patches to the qat driver have the following headline:
+        crypto: qat -
+not
+        crypto: qat :
 
-I'll take a look into this, and send separate 5.4 and 4.19 backports
-if feasible, or forget about it otherwise.
+Regards,
+
+-- 
+Giovanni
+
+On Thu, Mar 18, 2021 at 12:21:05PM -0400, Tong Zhang wrote:
+> ADF_STATUS_PF_RUNNING is (only) used and checked by adf_vf2pf_shutdown()
+> before calling adf_iov_putmsg()->mutex_lock(vf2pf_lock), however the
+> vf2pf_lock is initialized in adf_dev_init(), which can fail and when it
+> fail, the vf2pf_lock is either not initialized or destroyed, a subsequent
+> use of vf2pf_lock will cause issue.
+> To fix this issue, only set this flag if adf_dev_init() returns 0.
+> 
+> [    7.178404] BUG: KASAN: user-memory-access in __mutex_lock.isra.0+0x1ac/0x7c0
+> [    7.180345] Call Trace:
+> [    7.182576]  mutex_lock+0xc9/0xd0
+> [    7.183257]  adf_iov_putmsg+0x118/0x1a0 [intel_qat]
+> [    7.183541]  adf_vf2pf_shutdown+0x4d/0x7b [intel_qat]
+> [    7.183834]  adf_dev_shutdown+0x172/0x2b0 [intel_qat]
+> [    7.184127]  adf_probe+0x5e9/0x600 [qat_dh895xccvf]
+> 
+> Signed-off-by: Tong Zhang <ztong0001@gmail.com>
+> Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+> Fixes: 25c6ffb249f6 ("crypto: qat - check if PF is running")
+> Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> ---
+>  drivers/crypto/qat/qat_c3xxxvf/adf_drv.c    | 4 ++--
+>  drivers/crypto/qat/qat_c62xvf/adf_drv.c     | 4 ++--
+>  drivers/crypto/qat/qat_dh895xccvf/adf_drv.c | 4 ++--
+>  3 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
+> index 1d1532e8fb6d..067ca5e17d38 100644
+> --- a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
+> +++ b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
+> @@ -184,12 +184,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	if (ret)
+>  		goto out_err_free_reg;
+>  
+> -	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
+> -
+>  	ret = adf_dev_init(accel_dev);
+>  	if (ret)
+>  		goto out_err_dev_shutdown;
+>  
+> +	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
+> +
+>  	ret = adf_dev_start(accel_dev);
+>  	if (ret)
+>  		goto out_err_dev_stop;
+> diff --git a/drivers/crypto/qat/qat_c62xvf/adf_drv.c b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
+> index 04742a6d91ca..51ea88c0b17d 100644
+> --- a/drivers/crypto/qat/qat_c62xvf/adf_drv.c
+> +++ b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
+> @@ -184,12 +184,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	if (ret)
+>  		goto out_err_free_reg;
+>  
+> -	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
+> -
+>  	ret = adf_dev_init(accel_dev);
+>  	if (ret)
+>  		goto out_err_dev_shutdown;
+>  
+> +	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
+> +
+>  	ret = adf_dev_start(accel_dev);
+>  	if (ret)
+>  		goto out_err_dev_stop;
+> diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
+> index c972554a755e..29999da716cc 100644
+> --- a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
+> +++ b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
+> @@ -184,12 +184,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	if (ret)
+>  		goto out_err_free_reg;
+>  
+> -	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
+> -
+>  	ret = adf_dev_init(accel_dev);
+>  	if (ret)
+>  		goto out_err_dev_shutdown;
+>  
+> +	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
+> +
+>  	ret = adf_dev_start(accel_dev);
+>  	if (ret)
+>  		goto out_err_dev_stop;
+> -- 
+> 2.25.1
+> 
