@@ -2,120 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37949C433E6
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 10:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC901C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 10:47:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1583964F6F
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 10:33:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E3AC64F10
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 10:47:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229979AbhCSKdN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 Mar 2021 06:33:13 -0400
-Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:48359 "EHLO
-        wout1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229524AbhCSKcv (ORCPT
+        id S229834AbhCSKrX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 Mar 2021 06:47:23 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:14385 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229638AbhCSKqu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Mar 2021 06:32:51 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailout.west.internal (Postfix) with ESMTP id D203C1603;
-        Fri, 19 Mar 2021 06:32:50 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Fri, 19 Mar 2021 06:32:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm3; bh=8gucYTvp7x2/B0oG/OUcBwA0zrC
-        1U7rEi/7Qrp41oeY=; b=XI+LIQOWbegppsUuzzr+iDfwx3cNGzDL6d+TNam4HIf
-        Z1LpxoaMslhDSyWA750IR1dwPR/pffzkPYBy+OzzUoYE9NXCUzf52zd4WWU9CPq3
-        b6frx6eFHaTkqoarSDBf8efAGV2tP9IquIgQUYMpoX8iSa6dt+7L/M+Eb6v53jxd
-        rybtfyYDLyWx8vBSRLdPQW0b3EDrCHPIXYQXcd7ioOXvFiT2QurTOzW2YZoK5BZS
-        ySUCEWxC5qQLxeESISGTT3SBfzNbyNcBU3WJAiB5Mt1RxDL+dJsBkgwjsC10QIh5
-        MVcT9zKICqS0KN1kHjpAsTTE+OD89mYMvwy6dij++oQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=8gucYT
-        vp7x2/B0oG/OUcBwA0zrC1U7rEi/7Qrp41oeY=; b=eSIEfZLxaJAL47VK48o1TZ
-        vnXI3CDz2TTK5pUgUYFGb2ZlS/3GoF8DqdLGW9AMBAdv/y29l4TpBrao+nGC+fD6
-        5IV2HsyIUo4KJcwmnqgdeONMgINVo8IvVEbMToI3rKglCtSY8lYOQhyB6WYT66FP
-        RGJ+ZPGBIODH5ChbhOxOb3t6OM3RlisTfPp1hPrv0+ldiu6QszxFe2Td7OyL5LJ0
-        dgnPcBAgIcxVg9NZ6YguW+8fZxhgeNhnw6x6VUuMJM1SGOKVeKOaXFw38fK2EFdE
-        S0wyJxj4EcVvOdbIsEbb2veC6FHxiZcSPYEF73PDEW1KkP1uJKTZq1KbwXeZseng
-        ==
-X-ME-Sender: <xms:0X1UYOsEajTgaZKzGjbLmQNwAJhu8Iq74lHawdhK2u7mtmaSxdGjHQ>
-    <xme:0X1UYDdWKSwMAUwsZymjsMPDoo3VDxayk0vqG9pipr9fzbxijBG7JvTkgnd3u9gY5
-    LvxKz3foJNrgw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrudefkedgudekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvffukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
-    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeevueehje
-    fgfffgiedvudekvdektdelleelgefhleejieeugeegveeuuddukedvteenucfkphepkeef
-    rdekiedrjeegrdeigeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrih
-    hlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomh
-X-ME-Proxy: <xmx:0X1UYJx3IxUnuV4if88CXuGER17ZgnEImjPiQbOt5EtWSTBAd1pqUQ>
-    <xmx:0X1UYJOBQ65ruzU1oDKzOZXlZ96h5OSNL9BLWWQpyonfCaEFMUobMw>
-    <xmx:0X1UYO8B8AJcGIvbxGvXBqBhR0evaUiXLth9pPMZjX1qvmRa4u1rng>
-    <xmx:0n1UYFmu8q2X0CHNI_y9a7LtSnrZI_t246Hjd9UVz-iVxqqwOU3XWQ>
-Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
-        by mail.messagingengine.com (Postfix) with ESMTPA id E75B924005E;
-        Fri, 19 Mar 2021 06:32:48 -0400 (EDT)
-Date:   Fri, 19 Mar 2021 11:32:47 +0100
-From:   Greg KH <greg@kroah.com>
-To:     Ard Biesheuvel <ardb@google.com>
-Cc:     stable@vger.kernel.org, linux-crypto@vger.kernel.org, tmb@tmb.nu,
-        sashal@kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH for-stable-5.4] crypto: x86/aes-ni-xts - use direct calls
- to and 4-way stride
-Message-ID: <YFR9z5xqrsq0gZAS@kroah.com>
-References: <20210318174151.2164335-1-ardb@google.com>
+        Fri, 19 Mar 2021 06:46:50 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4F20s15D9zz91DM;
+        Fri, 19 Mar 2021 18:44:53 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.24) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 19 Mar 2021 18:46:42 +0800
+From:   Hui Tang <tanghui20@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
+        <wangzhou1@hisilicon.com>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH 1/2] crypto: hisilicon/hpre - delete wrap of 'CONFIG_CRYPTO_DH'
+Date:   Fri, 19 Mar 2021 18:44:18 +0800
+Message-ID: <1616150659-10756-2-git-send-email-tanghui20@huawei.com>
+X-Mailer: git-send-email 2.8.1
+In-Reply-To: <1616150659-10756-1-git-send-email-tanghui20@huawei.com>
+References: <1616150659-10756-1-git-send-email-tanghui20@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210318174151.2164335-1-ardb@google.com>
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Mar 18, 2021 at 05:41:51PM +0000, Ard Biesheuvel wrote:
-> From: Ard Biesheuvel <ardb@kernel.org>
-> 
-> Upstream commit 86ad60a65f29dd862a11c22bb4b5be28d6c5cef1
-> 
-> The XTS asm helper arrangement is a bit odd: the 8-way stride helper
-> consists of back-to-back calls to the 4-way core transforms, which
-> are called indirectly, based on a boolean that indicates whether we
-> are performing encryption or decryption.
-> 
-> Given how costly indirect calls are on x86, let's switch to direct
-> calls, and given how the 8-way stride doesn't really add anything
-> substantial, use a 4-way stride instead, and make the asm core
-> routine deal with any multiple of 4 blocks. Since 512 byte sectors
-> or 4 KB blocks are the typical quantities XTS operates on, increase
-> the stride exported to the glue helper to 512 bytes as well.
-> 
-> As a result, the number of indirect calls is reduced from 3 per 64 bytes
-> of in/output to 1 per 512 bytes of in/output, which produces a 65% speedup
-> when operating on 1 KB blocks (measured on a Intel(R) Core(TM) i7-8650U CPU)
-> 
-> Fixes: 9697fa39efd3f ("x86/retpoline/crypto: Convert crypto assembler indirect jumps")
-> Tested-by: Eric Biggers <ebiggers@google.com> # x86_64
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> [ardb: rebase onto stable/linux-5.4.y]
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
-> 
-> Please apply on top of backports of
-> 
-> 9c1e8836edbb crypto: x86 - Regularize glue function prototypes
-> 032d049ea0f4 crypto: aesni - Use TEST %reg,%reg instead of CMP $0,%reg
+'CRYPTO_DH' has selected in 'Kconfig', so delete 'CONFIG_CRYPTO_DH'.
 
-Now queued up, thanks.
+Signed-off-by: Hui Tang <tanghui20@huawei.com>
+---
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
-greg k-h
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index 53068d2..50ccd10 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -546,7 +546,6 @@ static int hpre_send(struct hpre_ctx *ctx, struct hpre_sqe *msg)
+ 	return ret;
+ }
+ 
+-#ifdef CONFIG_CRYPTO_DH
+ static int hpre_dh_compute_value(struct kpp_request *req)
+ {
+ 	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
+@@ -719,7 +718,6 @@ static void hpre_dh_exit_tfm(struct crypto_kpp *tfm)
+ 
+ 	hpre_dh_clear_ctx(ctx, true);
+ }
+-#endif
+ 
+ static void hpre_rsa_drop_leading_zeros(const char **ptr, size_t *len)
+ {
+@@ -1893,7 +1891,6 @@ static struct akcipher_alg rsa = {
+ 	},
+ };
+ 
+-#ifdef CONFIG_CRYPTO_DH
+ static struct kpp_alg dh = {
+ 	.set_secret = hpre_dh_set_secret,
+ 	.generate_public_key = hpre_dh_compute_value,
+@@ -1910,7 +1907,6 @@ static struct kpp_alg dh = {
+ 		.cra_module = THIS_MODULE,
+ 	},
+ };
+-#endif
+ 
+ static struct kpp_alg ecdh_nist_p192 = {
+ 	.set_secret = hpre_ecdh_set_secret,
+@@ -1995,13 +1991,12 @@ int hpre_algs_register(struct hisi_qm *qm)
+ 	ret = crypto_register_akcipher(&rsa);
+ 	if (ret)
+ 		return ret;
+-#ifdef CONFIG_CRYPTO_DH
++
+ 	ret = crypto_register_kpp(&dh);
+ 	if (ret) {
+ 		crypto_unregister_akcipher(&rsa);
+ 		return ret;
+ 	}
+-#endif
+ 
+ 	if (qm->ver >= QM_HW_V3) {
+ 		ret = hpre_register_ecdh();
+@@ -2016,9 +2011,7 @@ int hpre_algs_register(struct hisi_qm *qm)
+ 	return 0;
+ 
+ reg_err:
+-#ifdef CONFIG_CRYPTO_DH
+ 	crypto_unregister_kpp(&dh);
+-#endif
+ 	crypto_unregister_akcipher(&rsa);
+ 	return ret;
+ }
+@@ -2030,8 +2023,6 @@ void hpre_algs_unregister(struct hisi_qm *qm)
+ 		hpre_unregister_ecdh();
+ 	}
+ 
+-#ifdef CONFIG_CRYPTO_DH
+ 	crypto_unregister_kpp(&dh);
+-#endif
+ 	crypto_unregister_akcipher(&rsa);
+ }
+-- 
+2.8.1
+
