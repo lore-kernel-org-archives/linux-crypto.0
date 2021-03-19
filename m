@@ -2,56 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B1EDC433E9
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 11:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FBCCC433DB
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 12:11:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 56A5364F6B
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 11:06:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E0E0264F65
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 12:11:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229937AbhCSLFb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 Mar 2021 07:05:31 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:60796 "EHLO fornost.hmeau.com"
+        id S229847AbhCSMLB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 Mar 2021 08:11:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54434 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229944AbhCSLEz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Mar 2021 07:04:55 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lNCvq-0008B2-Un; Fri, 19 Mar 2021 22:04:44 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 19 Mar 2021 22:04:42 +1100
-Date:   Fri, 19 Mar 2021 22:04:42 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Wang Qing <wangqing@vivo.com>
-Cc:     Hadar Gat <hadar.gat@arm.com>, Matt Mackall <mpm@selenic.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] char: hw_random: delete redundant printing of return
- value
-Message-ID: <20210319110442.GE8367@gondor.apana.org.au>
-References: <1615621663-1948-1-git-send-email-wangqing@vivo.com>
+        id S229736AbhCSMKe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 19 Mar 2021 08:10:34 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4E2DA64F04;
+        Fri, 19 Mar 2021 12:10:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616155834;
+        bh=loxjt5Kt1K2yJiDF3zmLfNFmkIuApn0Q5LY4uyTMqxY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=L0BGQkpPD4e9cML7GxYxIFTJyZRJQbLG/0doBUkvuRoEKsxONb3zRKIJaOzzI04S/
+         8VBsIa7tkfaiiOiSSxqenurFTUe7dtw99KnWmVGN9kgPvt4eIw2+MD0ZNfKWoco+3o
+         ykLRVXtASVvkV9OSxZl9dHrrh3C1IF2LZR/JdRRxcpqhf+tSY5g6WlqXaORnYNA1mM
+         rryBlAb7SoAmo0r47MzNvZzLLFaz3BL2lVKsL7sSi38VQu/Y+SfTUFOqIlQt1s453x
+         jF7F1PZmIUNJccjkCa5BvKj6y+FJZHr8E978svSMIPHfXanMJykdn+8y7W479Nbml3
+         cc7nctj3AU5zA==
+Date:   Fri, 19 Mar 2021 08:10:33 -0400
+From:   Sasha Levin <sashal@kernel.org>
+To:     Greg KH <greg@kroah.com>
+Cc:     Thomas Backlund <tmb@tmb.nu>, Ard Biesheuvel <ardb@kernel.org>,
+        "# 3.4.x" <stable@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: stable request
+Message-ID: <YFSUuRCbjmpdSOhW@sashalap>
+References: <d5c825ba-cdcb-29eb-c434-83ef4db05ee0@tmb.nu>
+ <CAMj1kXEM76Dejv1fTZ-1EmXpSsE-ZtKWf19dPNTSBRuPcAkreA@mail.gmail.com>
+ <1e6eb02b-e699-d1ff-9cfb-4ef77255e244@tmb.nu>
+ <9493dced-908e-a9bd-009a-6b20a8422ec1@tmb.nu>
+ <CAMj1kXHzEEU2-mVxVD8g=P_Py_WJMOn0q8m+k-txUUioS+2ajQ@mail.gmail.com>
+ <YFNPiHAvEwDpGLrv@sashalap>
+ <a39ebdf9-c7c3-990f-3d9d-81f138e55d94@tmb.nu>
+ <YFSB3iLXC/DDtN1U@kroah.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <1615621663-1948-1-git-send-email-wangqing@vivo.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <YFSB3iLXC/DDtN1U@kroah.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Mar 13, 2021 at 03:47:42PM +0800, Wang Qing wrote:
-> platform_get_irq() has already checked and printed the return value, 
-> the printing here is nothing special, it is not necessary at all.
-> 
-> Signed-off-by: Wang Qing <wangqing@vivo.com>
-> ---
->  drivers/char/hw_random/cctrng.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+On Fri, Mar 19, 2021 at 11:50:06AM +0100, Greg KH wrote:
+>On Fri, Mar 19, 2021 at 07:35:44AM +0000, Thomas Backlund wrote:
+>> Den 18-03-2021 kl. 15:03, skrev Sasha Levin:
+>> >
+>> > On Tue, Mar 16, 2021 at 01:35:40PM +0100, Ard Biesheuvel wrote:
+>> >> On Tue, 16 Mar 2021 at 13:28, Thomas Backlund <tmb@tmb.nu> wrote:
+>> >>>
+>> >>>
+>> >>> Den 16.3.2021 kl. 14:15, skrev Thomas Backlund:
+>> >>>>
+>> >>>> Den 16.3.2021 kl. 12:17, skrev Ard Biesheuvel:
+>> >>>>> On Tue, 16 Mar 2021 at 10:21, Thomas Backlund <tmb@tmb.nu> wrote:
+>> >>>>>> Den 16.3.2021 kl. 08:37, skrev Ard Biesheuvel:
+>> >>>>>>> Please consider backporting commit
+>> >>>>>>>
+>> >>>>>>> 86ad60a65f29dd862a11c22bb4b5be28d6c5cef1
+>> >>>>>>> crypto: x86/aes-ni-xts - use direct calls to and 4-way stride
+>>
+>>
+>> >
+>> > Queued up for 5.10 and 5.11.
+>> >
+>>
+>> I dont see:
+>> 86ad60a65f29 ("crypto: x86/aes-ni-xts - use direct calls to and 4-way
+>> stride")
+>>
+>> in 5.11 queue.
+>
+>Now added by me, Sasha might have forgotten to push his queue...
 
-Patch applied.  Thanks.
+Thanks Greg, yes - it was sitting locally waiting for my build tests to
+finish.
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks,
+Sasha
