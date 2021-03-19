@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29E49C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52D2EC433DB
 	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 03:41:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F36BD64DE2
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 03:41:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2648064F30
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 03:41:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233583AbhCSDks (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Mar 2021 23:40:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56746 "EHLO
+        id S233590AbhCSDkt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 18 Mar 2021 23:40:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233569AbhCSDkQ (ORCPT
+        with ESMTP id S232935AbhCSDkT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Mar 2021 23:40:16 -0400
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B50DAC06174A;
-        Thu, 18 Mar 2021 20:40:15 -0700 (PDT)
-Received: by mail-qk1-x735.google.com with SMTP id c3so1588469qkc.5;
-        Thu, 18 Mar 2021 20:40:15 -0700 (PDT)
+        Thu, 18 Mar 2021 23:40:19 -0400
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E1DAC06174A;
+        Thu, 18 Mar 2021 20:40:19 -0700 (PDT)
+Received: by mail-qt1-x82e.google.com with SMTP id r14so5804455qtt.7;
+        Thu, 18 Mar 2021 20:40:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=R0Wyu6JtDk3sKuQzQotniaU+SO/8poiFBmzfwHY3Ipo=;
-        b=KfpFzhx+5t/tF8GxycVacXrOtQ+6S2S2c89rlcSftJFhWJZFXW5z+GebDccZYUkT3Z
-         MtO8pE1SAUFKKoTVzIAubCeVubKp9dPFTD/GygDNgCaPP/zapEMgk+GBTBrshnmF/qZy
-         qskpVsZ979s8nsqZ20rnJLiY9S3wTIBC2ss5hxupLXnq7yx6zjmqbm5xqJ8WkGYx+XLK
-         oKU987fXs3JVbp2/9xrpo/0dJOHzK1CM8kCRcxW40Q1L6oZjWlwhNAAQP1tff3MDi0mK
-         wyJYZtwKYDw2eM54xuJ/bZBc51Evc5gN+cgSME9Q5prbSQjVPbQCG80kjSVtHq0mGlf6
-         9c6g==
+        bh=v5j6GsQ8vHTvN2BKBHKR/KZ/Jo+Q52naC77HAhp4AOM=;
+        b=pRI2dvsKz4oBMf9IHQoTRN0k1Vuzmiduruu5qBxF1Uyf1MSLZcyeurQ27Eyx+0Wpht
+         X4yy8ibi7LDb4XiojM1FJ8adJSZLba4Q0usTFvsaxC+7/tG3YeH/TDPvT5AeOqWx5Kg5
+         pCWie51GDzxu5CbiD7WJ4KMQWgIj0bZEg4qj3J0LEqz2AknEt+dcuiTUgAQOPDWZBEsq
+         sM7K3Y0VOGqILB/qtp5jXezmdgmiOHlMzzTJ1R0Imu9YyDJUS7gow7N3mlaDTNkHYLHo
+         7LXkQxO+aqBgiOoFK45IrU0WdQolPvpGfMc5v82c1rfg5x87l87MsTOh8uNb7iLnsxY5
+         7qPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=R0Wyu6JtDk3sKuQzQotniaU+SO/8poiFBmzfwHY3Ipo=;
-        b=It1z6X9eDxxKw4QVfGoVFuTQzh42HcKk3YQkvwQJ/jXA8R0mFiNZAFI1Y0xI/ypqvD
-         qHKAEq2uZfkjpPJUzA5zRGsPjpkJfF+0PPGq0T1QwsJXTBfppP5Zsjcaau2aI9g7a2ZS
-         PrRQKk5dIycdHDRzM4+V0GjH469YUzKlF8SqIOPqNTNv5SQkGjcJQh2vpF5wGURhnIcI
-         STIQbvvOWktqlqxb3XC2aCoMr44kbpTwcPEpAUx3RCXfrc0hMLbZj6Vn2T+LbUXXdp5p
-         mVSKKJr71A6bN1qLaf2nt6kDAV+3l95sX0cjiCCL5zJ6C6XsCu33JKhSrZZLCnVsQE48
-         +GnQ==
-X-Gm-Message-State: AOAM5322pOx3wSZAUg2s8/WFbUO80rXXlqibBFMDDXpPVH+t10t6Y8pa
-        TcCrb8U+A81+X2Gbd7uSGu0=
-X-Google-Smtp-Source: ABdhPJzOdJoftYPx1xIp9ZEJtBHcdQPASttN4IrkgoT7XByaaVpXiqe06Y/u/sOdtq/vcNAKWl/Fgw==
-X-Received: by 2002:a37:a282:: with SMTP id l124mr7467658qke.37.1616125214990;
-        Thu, 18 Mar 2021 20:40:14 -0700 (PDT)
+        bh=v5j6GsQ8vHTvN2BKBHKR/KZ/Jo+Q52naC77HAhp4AOM=;
+        b=XLkbCqCQsEdTQoQ409zfqxsLYTmapJecn3nC5t51EwPxK/2K+/SKUbrFKuwOlWWyqB
+         01hqndKjEars8H7ffBMd6lOdqVnvi5AHJuFQNsYA3V94eHc+Hz5oz2OkXVSuHZOYoiAk
+         rT0RiWklTDM7Cnls5U9BbY3IOm6M7Ygqp6y3n2VqpZiq7/jyj99qD9VX3VmWnInH6eAN
+         sk88A4oWQkrA3u2pM+9dAn66Fkjoub0sfx7xHaqCDZewbU+zQV6spvjIga8c+DkhxngN
+         ZkOJ4xvdYHrcM6switSlyUD13DY/CsfVitwtogYJPFtz5dIlik+c61SUwW+7JeV+N3By
+         yrtA==
+X-Gm-Message-State: AOAM530LOxz1f3qTHNGz9ER+ae2XnCOnUF5v+9SZbghjQmyhcAm3PHgW
+        UVxcMlEkUmZHx5yt29gL0gU=
+X-Google-Smtp-Source: ABdhPJwkK3XMsWVCfGa2lTsToA+u2RUJORIt/ULMdDTTGaSCIHwvumEcTHz3IXFGHEmtY801A+N1Bw==
+X-Received: by 2002:ac8:519a:: with SMTP id c26mr6586313qtn.342.1616125218604;
+        Thu, 18 Mar 2021 20:40:18 -0700 (PDT)
 Received: from tong-desktop.local ([2601:5c0:c200:27c6:ed59:df3e:7ad8:c600])
-        by smtp.googlemail.com with ESMTPSA id 19sm3344621qkv.95.2021.03.18.20.40.14
+        by smtp.googlemail.com with ESMTPSA id 19sm3344621qkv.95.2021.03.18.20.40.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Mar 2021 20:40:14 -0700 (PDT)
+        Thu, 18 Mar 2021 20:40:18 -0700 (PDT)
 From:   Tong Zhang <ztong0001@gmail.com>
 To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -65,10 +65,11 @@ To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Wojciech Ziemba <wojciech.ziemba@intel.com>,
         Tong Zhang <ztong0001@gmail.com>,
         Tadeusz Struk <tadeusz.struk@intel.com>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v5 1/2] crypto: qat - don't release uninitialized resources
-Date:   Thu, 18 Mar 2021 23:39:59 -0400
-Message-Id: <20210319034001.435117-2-ztong0001@gmail.com>
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Fiona Trahe <fiona.trahe@intel.com>
+Subject: [PATCH v5 2/2] crypto: qat - ADF_STATUS_PF_RUNNING should be set after adf_dev_init
+Date:   Thu, 18 Mar 2021 23:40:00 -0400
+Message-Id: <20210319034001.435117-3-ztong0001@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210319034001.435117-1-ztong0001@gmail.com>
 References: <YFOLPn31KF7bW6T/@silpixa00400314>
@@ -79,60 +80,88 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-adf_vf_isr_resource_alloc() is not unwinding correctly when error
-happens and it want to release uninitialized resources.
-To fix this, only release initialized resources.
+ADF_STATUS_PF_RUNNING is (only) used and checked by adf_vf2pf_shutdown()
+before calling adf_iov_putmsg()->mutex_lock(vf2pf_lock), however the
+vf2pf_lock is initialized in adf_dev_init(), which can fail and when it
+fail, the vf2pf_lock is either not initialized or destroyed, a subsequent
+use of vf2pf_lock will cause issue.
+To fix this issue, only set this flag if adf_dev_init() returns 0.
 
-[    1.792845] Trying to free already-free IRQ 11
-[    1.793091] WARNING: CPU: 0 PID: 182 at kernel/irq/manage.c:1821 free_irq+0x202/0x380
-[    1.801340] Call Trace:
-[    1.801477]  adf_vf_isr_resource_free+0x32/0xb0 [intel_qat]
-[    1.801785]  adf_vf_isr_resource_alloc+0x14d/0x150 [intel_qat]
-[    1.802105]  adf_dev_init+0xba/0x140 [intel_qat]
+[    7.178404] BUG: KASAN: user-memory-access in __mutex_lock.isra.0+0x1ac/0x7c0
+[    7.180345] Call Trace:
+[    7.182576]  mutex_lock+0xc9/0xd0
+[    7.183257]  adf_iov_putmsg+0x118/0x1a0 [intel_qat]
+[    7.183541]  adf_vf2pf_shutdown+0x4d/0x7b [intel_qat]
+[    7.183834]  adf_dev_shutdown+0x172/0x2b0 [intel_qat]
+[    7.184127]  adf_probe+0x5e9/0x600 [qat_dh895xccvf]
 
 Signed-off-by: Tong Zhang <ztong0001@gmail.com>
 Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Fixes: dd0f368398ea ("crypto: qat - Add qat dh895xcc VF driver")
+Fixes: 25c6ffb249f6 ("crypto: qat - check if PF is running")
 Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/qat/qat_common/adf_vf_isr.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ drivers/crypto/qat/qat_c3xxxvf/adf_drv.c    | 4 ++--
+ drivers/crypto/qat/qat_c62xvf/adf_drv.c     | 4 ++--
+ drivers/crypto/qat/qat_dh895xccvf/adf_drv.c | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_vf_isr.c b/drivers/crypto/qat/qat_common/adf_vf_isr.c
-index 38d316a42ba6..888388acb6bd 100644
---- a/drivers/crypto/qat/qat_common/adf_vf_isr.c
-+++ b/drivers/crypto/qat/qat_common/adf_vf_isr.c
-@@ -261,17 +261,26 @@ int adf_vf_isr_resource_alloc(struct adf_accel_dev *accel_dev)
- 		goto err_out;
+diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
+index 1d1532e8fb6d..067ca5e17d38 100644
+--- a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
++++ b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
+@@ -184,12 +184,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (ret)
+ 		goto out_err_free_reg;
  
- 	if (adf_setup_pf2vf_bh(accel_dev))
--		goto err_out;
-+		goto err_disable_msi;
+-	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
+-
+ 	ret = adf_dev_init(accel_dev);
+ 	if (ret)
+ 		goto out_err_dev_shutdown;
  
- 	if (adf_setup_bh(accel_dev))
--		goto err_out;
-+		goto err_cleanup_pf2vf_bh;
++	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
++
+ 	ret = adf_dev_start(accel_dev);
+ 	if (ret)
+ 		goto out_err_dev_stop;
+diff --git a/drivers/crypto/qat/qat_c62xvf/adf_drv.c b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
+index 04742a6d91ca..51ea88c0b17d 100644
+--- a/drivers/crypto/qat/qat_c62xvf/adf_drv.c
++++ b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
+@@ -184,12 +184,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (ret)
+ 		goto out_err_free_reg;
  
- 	if (adf_request_msi_irq(accel_dev))
--		goto err_out;
-+		goto err_cleanup_bh;
+-	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
+-
+ 	ret = adf_dev_init(accel_dev);
+ 	if (ret)
+ 		goto out_err_dev_shutdown;
  
- 	return 0;
++	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
 +
-+err_cleanup_bh:
-+	adf_cleanup_bh(accel_dev);
+ 	ret = adf_dev_start(accel_dev);
+ 	if (ret)
+ 		goto out_err_dev_stop;
+diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
+index c972554a755e..29999da716cc 100644
+--- a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
++++ b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
+@@ -184,12 +184,12 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (ret)
+ 		goto out_err_free_reg;
+ 
+-	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
+-
+ 	ret = adf_dev_init(accel_dev);
+ 	if (ret)
+ 		goto out_err_dev_shutdown;
+ 
++	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
 +
-+err_cleanup_pf2vf_bh:
-+	adf_cleanup_pf2vf_bh(accel_dev);
-+
-+err_disable_msi:
-+	adf_disable_msi(accel_dev);
-+
- err_out:
--	adf_vf_isr_resource_free(accel_dev);
- 	return -EFAULT;
- }
- EXPORT_SYMBOL_GPL(adf_vf_isr_resource_alloc);
+ 	ret = adf_dev_start(accel_dev);
+ 	if (ret)
+ 		goto out_err_dev_stop;
 -- 
 2.25.1
 
