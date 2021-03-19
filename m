@@ -2,318 +2,76 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0359AC4332B
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 07:33:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AAA2C433E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 07:36:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CAF8364F70
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 07:33:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5282B64F42
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 07:36:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234157AbhCSHdK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 Mar 2021 03:33:10 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:13996 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234101AbhCSHc4 (ORCPT
+        id S234092AbhCSHgW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 Mar 2021 03:36:22 -0400
+Received: from mail-40131.protonmail.ch ([185.70.40.131]:35184 "EHLO
+        mail-40131.protonmail.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234078AbhCSHfy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Mar 2021 03:32:56 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4F1wYB02k6zrYTH;
-        Fri, 19 Mar 2021 15:30:54 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 19 Mar 2021 15:32:39 +0800
-From:   Yang Shen <shenyang39@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>
-Subject: [PATCH 3/4] crypto: hisilicon/zip - initialize operations about 'sqe' in 'acomp_alg.init'
-Date:   Fri, 19 Mar 2021 15:33:06 +0800
-Message-ID: <1616139187-63425-4-git-send-email-shenyang39@huawei.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1616139187-63425-1-git-send-email-shenyang39@huawei.com>
-References: <1616139187-63425-1-git-send-email-shenyang39@huawei.com>
+        Fri, 19 Mar 2021 03:35:54 -0400
+Date:   Fri, 19 Mar 2021 07:35:44 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tmb.nu;
+        s=protonmail; t=1616139347;
+        bh=VA+is5LeWi9h2GKvlIGi2doPXuZf10NEWefk9OB/HFM=;
+        h=Date:To:From:Cc:Reply-To:Subject:In-Reply-To:References:From;
+        b=ufu/RXYcP7riTV0gKgyjGu8TUtxS0LkvHAuJj1BNMD98fBv49lrMO5DgqdkKdM4qD
+         cK/QkHs16KKQKQNqAYMtTFoduqkEKv9yKZ9o4QGWqi3dpeNgKP1/O3IWkZf/bk9d9C
+         HrLXhE/o/SroqE5KR2u40BP9Qlz1EJk1fGdhgJls=
+To:     Sasha Levin <sashal@kernel.org>, Ard Biesheuvel <ardb@kernel.org>
+From:   Thomas Backlund <tmb@tmb.nu>
+Cc:     "# 3.4.x" <stable@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Reply-To: Thomas Backlund <tmb@tmb.nu>
+Subject: Re: stable request
+Message-ID: <a39ebdf9-c7c3-990f-3d9d-81f138e55d94@tmb.nu>
+In-Reply-To: <YFNPiHAvEwDpGLrv@sashalap>
+References: <d5c825ba-cdcb-29eb-c434-83ef4db05ee0@tmb.nu> <CAMj1kXEM76Dejv1fTZ-1EmXpSsE-ZtKWf19dPNTSBRuPcAkreA@mail.gmail.com> <1e6eb02b-e699-d1ff-9cfb-4ef77255e244@tmb.nu> <9493dced-908e-a9bd-009a-6b20a8422ec1@tmb.nu> <CAMj1kXHzEEU2-mVxVD8g=P_Py_WJMOn0q8m+k-txUUioS+2ajQ@mail.gmail.com> <YFNPiHAvEwDpGLrv@sashalap>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The operations about 'sqe' are different on some hardwares. Add a struct
-'hisi_zip_sqe_ops' to describe the operations in a hardware. And choose the
-'ops' in 'hisi_zip_acomp_init' according to the hardware.
+Den 18-03-2021 kl. 15:03, skrev Sasha Levin:
+>
+> On Tue, Mar 16, 2021 at 01:35:40PM +0100, Ard Biesheuvel wrote:
+>> On Tue, 16 Mar 2021 at 13:28, Thomas Backlund <tmb@tmb.nu> wrote:
+>>>
+>>>
+>>> Den 16.3.2021 kl. 14:15, skrev Thomas Backlund:
+>>>>
+>>>> Den 16.3.2021 kl. 12:17, skrev Ard Biesheuvel:
+>>>>> On Tue, 16 Mar 2021 at 10:21, Thomas Backlund <tmb@tmb.nu> wrote:
+>>>>>> Den 16.3.2021 kl. 08:37, skrev Ard Biesheuvel:
+>>>>>>> Please consider backporting commit
+>>>>>>>
+>>>>>>> 86ad60a65f29dd862a11c22bb4b5be28d6c5cef1
+>>>>>>> crypto: x86/aes-ni-xts - use direct calls to and 4-way stride
 
-Signed-off-by: Yang Shen <shenyang39@huawei.com>
----
- drivers/crypto/hisilicon/zip/zip_crypto.c | 141 +++++++++++++++++++++++-------
- 1 file changed, 110 insertions(+), 31 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-index 3bc2148..85dcf6a 100644
---- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-+++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-@@ -10,6 +10,7 @@
- #define HZIP_BD_STATUS_M			GENMASK(7, 0)
- /* hisi_zip_sqe dw7 */
- #define HZIP_IN_SGE_DATA_OFFSET_M		GENMASK(23, 0)
-+#define HZIP_SQE_TYPE_M				GENMASK(31, 28)
- /* hisi_zip_sqe dw8 */
- #define HZIP_OUT_SGE_DATA_OFFSET_M		GENMASK(23, 0)
- /* hisi_zip_sqe dw9 */
-@@ -91,8 +92,22 @@ struct hisi_zip_qp_ctx {
- 	struct hisi_zip_ctx *ctx;
- };
- 
-+struct hisi_zip_sqe_ops {
-+	u8 sqe_type;
-+	void (*fill_addr)(struct hisi_zip_sqe *sqe, struct hisi_zip_req *req);
-+	void (*fill_buf_size)(struct hisi_zip_sqe *sqe, struct hisi_zip_req *req);
-+	void (*fill_buf_type)(struct hisi_zip_sqe *sqe, u8 buf_type);
-+	void (*fill_req_type)(struct hisi_zip_sqe *sqe, u8 req_type);
-+	void (*fill_tag)(struct hisi_zip_sqe *sqe, struct hisi_zip_req *req);
-+	void (*fill_sqe_type)(struct hisi_zip_sqe *sqe, u8 sqe_type);
-+	u32 (*get_tag)(struct hisi_zip_sqe *sqe);
-+	u32 (*get_status)(struct hisi_zip_sqe *sqe);
-+	u32 (*get_dstlen)(struct hisi_zip_sqe *sqe);
-+};
-+
- struct hisi_zip_ctx {
- 	struct hisi_zip_qp_ctx qp_ctx[HZIP_CTX_Q_NUM];
-+	const struct hisi_zip_sqe_ops *ops;
- };
- 
- static int sgl_sge_nr_set(const char *val, const struct kernel_param *kp)
-@@ -242,35 +257,69 @@ static void hisi_zip_remove_req(struct hisi_zip_qp_ctx *qp_ctx,
- 	write_unlock(&req_q->req_lock);
- }
- 
--static void hisi_zip_config_buf_type(struct hisi_zip_sqe *sqe, u8 buf_type)
-+static void hisi_zip_fill_addr(struct hisi_zip_sqe *sqe, struct hisi_zip_req *req)
-+{
-+	sqe->source_addr_l = lower_32_bits(req->dma_src);
-+	sqe->source_addr_h = upper_32_bits(req->dma_src);
-+	sqe->dest_addr_l = lower_32_bits(req->dma_dst);
-+	sqe->dest_addr_h = upper_32_bits(req->dma_dst);
-+}
-+
-+static void hisi_zip_fill_buf_size(struct hisi_zip_sqe *sqe, struct hisi_zip_req *req)
-+{
-+	struct acomp_req *a_req = req->req;
-+
-+	sqe->input_data_length = a_req->slen - req->sskip;
-+	sqe->dest_avail_out = a_req->dlen - req->dskip;
-+	sqe->dw7 = FIELD_PREP(HZIP_IN_SGE_DATA_OFFSET_M, req->sskip);
-+	sqe->dw8 = FIELD_PREP(HZIP_OUT_SGE_DATA_OFFSET_M, req->dskip);
-+}
-+
-+static void hisi_zip_fill_buf_type(struct hisi_zip_sqe *sqe, u8 buf_type)
- {
- 	u32 val;
- 
--	val = (sqe->dw9) & ~HZIP_BUF_TYPE_M;
-+	val = sqe->dw9 & ~HZIP_BUF_TYPE_M;
- 	val |= FIELD_PREP(HZIP_BUF_TYPE_M, buf_type);
- 	sqe->dw9 = val;
- }
- 
--static void hisi_zip_config_tag(struct hisi_zip_sqe *sqe, u32 tag)
-+static void hisi_zip_fill_req_type(struct hisi_zip_sqe *sqe, u8 req_type)
- {
--	sqe->dw13 = tag;
-+	u32 val;
-+
-+	val = sqe->dw9 & ~HZIP_REQ_TYPE_M;
-+	val |= FIELD_PREP(HZIP_REQ_TYPE_M, req_type);
-+	sqe->dw9 = val;
- }
- 
--static void hisi_zip_fill_sqe(struct hisi_zip_sqe *sqe, u8 req_type,
--			      dma_addr_t s_addr, dma_addr_t d_addr, u32 slen,
--			      u32 dlen, u32 sskip, u32 dskip)
-+static void hisi_zip_fill_tag_v1(struct hisi_zip_sqe *sqe, struct hisi_zip_req *req)
- {
-+	sqe->dw13 = req->req_id;
-+}
-+
-+static void hisi_zip_fill_sqe_type(struct hisi_zip_sqe *sqe, u8 sqe_type)
-+{
-+	u32 val;
-+
-+	val = sqe->dw7 & ~HZIP_SQE_TYPE_M;
-+	val |= FIELD_PREP(HZIP_SQE_TYPE_M, sqe_type);
-+	sqe->dw7 = val;
-+}
-+
-+static void hisi_zip_fill_sqe(struct hisi_zip_ctx *ctx, struct hisi_zip_sqe *sqe,
-+			      u8 req_type, struct hisi_zip_req *req)
-+{
-+	const struct hisi_zip_sqe_ops *ops = ctx->ops;
-+
- 	memset(sqe, 0, sizeof(struct hisi_zip_sqe));
- 
--	sqe->input_data_length = slen - sskip;
--	sqe->dw7 = FIELD_PREP(HZIP_IN_SGE_DATA_OFFSET_M, sskip);
--	sqe->dw8 = FIELD_PREP(HZIP_OUT_SGE_DATA_OFFSET_M, dskip);
--	sqe->dw9 = FIELD_PREP(HZIP_REQ_TYPE_M, req_type);
--	sqe->dest_avail_out = dlen - dskip;
--	sqe->source_addr_l = lower_32_bits(s_addr);
--	sqe->source_addr_h = upper_32_bits(s_addr);
--	sqe->dest_addr_l = lower_32_bits(d_addr);
--	sqe->dest_addr_h = upper_32_bits(d_addr);
-+	ops->fill_addr(sqe, req);
-+	ops->fill_buf_size(sqe, req);
-+	ops->fill_buf_type(sqe, HZIP_SGL);
-+	ops->fill_req_type(sqe, req_type);
-+	ops->fill_tag(sqe, req);
-+	ops->fill_sqe_type(sqe, ops->sqe_type);
- }
- 
- static int hisi_zip_do_work(struct hisi_zip_req *req,
-@@ -282,36 +331,30 @@ static int hisi_zip_do_work(struct hisi_zip_req *req,
- 	struct hisi_qp *qp = qp_ctx->qp;
- 	struct device *dev = &qp->qm->pdev->dev;
- 	struct hisi_zip_sqe zip_sqe;
--	dma_addr_t input, output;
- 	int ret;
- 
- 	if (!a_req->src || !a_req->slen || !a_req->dst || !a_req->dlen)
- 		return -EINVAL;
- 
- 	req->hw_src = hisi_acc_sg_buf_map_to_hw_sgl(dev, a_req->src, pool,
--						    req->req_id << 1, &input);
-+						    req->req_id << 1, &req->dma_src);
- 	if (IS_ERR(req->hw_src)) {
- 		dev_err(dev, "failed to map the src buffer to hw sgl (%ld)!\n",
- 			PTR_ERR(req->hw_src));
- 		return PTR_ERR(req->hw_src);
- 	}
--	req->dma_src = input;
- 
- 	req->hw_dst = hisi_acc_sg_buf_map_to_hw_sgl(dev, a_req->dst, pool,
- 						    (req->req_id << 1) + 1,
--						    &output);
-+						    &req->dma_dst);
- 	if (IS_ERR(req->hw_dst)) {
- 		ret = PTR_ERR(req->hw_dst);
- 		dev_err(dev, "failed to map the dst buffer to hw slg (%d)!\n",
- 			ret);
- 		goto err_unmap_input;
- 	}
--	req->dma_dst = output;
- 
--	hisi_zip_fill_sqe(&zip_sqe, qp->req_type, input, output, a_req->slen,
--			  a_req->dlen, req->sskip, req->dskip);
--	hisi_zip_config_buf_type(&zip_sqe, HZIP_SGL);
--	hisi_zip_config_tag(&zip_sqe, req->req_id);
-+	hisi_zip_fill_sqe(qp_ctx->ctx, &zip_sqe, qp->req_type, req);
- 
- 	/* send command to start a task */
- 	atomic64_inc(&dfx->send_cnt);
-@@ -332,20 +375,37 @@ static int hisi_zip_do_work(struct hisi_zip_req *req,
- 	return ret;
- }
- 
-+static u32 hisi_zip_get_tag_v1(struct hisi_zip_sqe *sqe)
-+{
-+	return sqe->dw13;
-+}
-+
-+static u32 hisi_zip_get_status(struct hisi_zip_sqe *sqe)
-+{
-+	return sqe->dw3 & HZIP_BD_STATUS_M;
-+}
-+
-+static u32 hisi_zip_get_dstlen(struct hisi_zip_sqe *sqe)
-+{
-+	return sqe->produced;
-+}
-+
- static void hisi_zip_acomp_cb(struct hisi_qp *qp, void *data)
- {
- 	struct hisi_zip_qp_ctx *qp_ctx = qp->qp_ctx;
-+	const struct hisi_zip_sqe_ops *ops = qp_ctx->ctx->ops;
- 	struct hisi_zip_dfx *dfx = &qp_ctx->zip_dev->dfx;
- 	struct hisi_zip_req_q *req_q = &qp_ctx->req_q;
- 	struct device *dev = &qp->qm->pdev->dev;
- 	struct hisi_zip_sqe *sqe = data;
--	struct hisi_zip_req *req = req_q->q + sqe->dw13;
-+	u32 tag = ops->get_tag(sqe);
-+	struct hisi_zip_req *req = req_q->q + tag;
- 	struct acomp_req *acomp_req = req->req;
- 	u32 status, dlen, head_size;
- 	int err = 0;
- 
- 	atomic64_inc(&dfx->recv_cnt);
--	status = sqe->dw3 & HZIP_BD_STATUS_M;
-+	status = ops->get_status(sqe);
- 	if (status != 0 && status != HZIP_NC_ERR) {
- 		dev_err(dev, "%scompress fail in qp%u: %u, output: %u\n",
- 			(qp->alg_type == 0) ? "" : "de", qp->qp_id, status,
-@@ -353,7 +413,8 @@ static void hisi_zip_acomp_cb(struct hisi_qp *qp, void *data)
- 		atomic64_inc(&dfx->err_bd_cnt);
- 		err = -EIO;
- 	}
--	dlen = sqe->produced;
-+
-+	dlen = ops->get_dstlen(sqe);
- 
- 	hisi_acc_sg_buf_unmap(dev, acomp_req->src, req->hw_src);
- 	hisi_acc_sg_buf_unmap(dev, acomp_req->dst, req->hw_dst);
-@@ -453,9 +514,23 @@ static void hisi_zip_release_qp(struct hisi_zip_qp_ctx *ctx)
- 	hisi_qm_release_qp(ctx->qp);
- }
- 
-+const struct hisi_zip_sqe_ops hisi_zip_ops_v1 = {
-+	.sqe_type		= 0,
-+	.fill_addr		= hisi_zip_fill_addr,
-+	.fill_buf_size		= hisi_zip_fill_buf_size,
-+	.fill_buf_type		= hisi_zip_fill_buf_type,
-+	.fill_req_type		= hisi_zip_fill_req_type,
-+	.fill_tag		= hisi_zip_fill_tag_v1,
-+	.fill_sqe_type		= hisi_zip_fill_sqe_type,
-+	.get_tag		= hisi_zip_get_tag_v1,
-+	.get_status		= hisi_zip_get_status,
-+	.get_dstlen		= hisi_zip_get_dstlen,
-+};
-+
- static int hisi_zip_ctx_init(struct hisi_zip_ctx *hisi_zip_ctx, u8 req_type, int node)
- {
- 	struct hisi_qp *qps[HZIP_CTX_Q_NUM] = { NULL };
-+	struct hisi_zip_qp_ctx *qp_ctx;
- 	struct hisi_zip *hisi_zip;
- 	int ret, i, j;
- 
-@@ -469,8 +544,9 @@ static int hisi_zip_ctx_init(struct hisi_zip_ctx *hisi_zip_ctx, u8 req_type, int
- 
- 	for (i = 0; i < HZIP_CTX_Q_NUM; i++) {
- 		/* alg_type = 0 for compress, 1 for decompress in hw sqe */
--		ret = hisi_zip_start_qp(qps[i], &hisi_zip_ctx->qp_ctx[i], i,
--					req_type);
-+		qp_ctx = &hisi_zip_ctx->qp_ctx[i];
-+		qp_ctx->ctx = hisi_zip_ctx;
-+		ret = hisi_zip_start_qp(qps[i], qp_ctx, i, req_type);
- 		if (ret) {
- 			for (j = i - 1; j >= 0; j--)
- 				hisi_qm_stop_qp(hisi_zip_ctx->qp_ctx[j].qp);
-@@ -479,9 +555,12 @@ static int hisi_zip_ctx_init(struct hisi_zip_ctx *hisi_zip_ctx, u8 req_type, int
- 			return ret;
- 		}
- 
--		hisi_zip_ctx->qp_ctx[i].zip_dev = hisi_zip;
-+		qp_ctx->zip_dev = hisi_zip;
- 	}
- 
-+	if (hisi_zip->qm.ver < QM_HW_V3)
-+		hisi_zip_ctx->ops = &hisi_zip_ops_v1;
-+
- 	return 0;
- }
- 
--- 
-2.7.4
+>
+> Queued up for 5.10 and 5.11.
+>
+
+I dont see:
+86ad60a65f29 ("crypto: x86/aes-ni-xts - use direct calls to and 4-way
+stride")
+
+in 5.11 queue.
+
+--
+Thomas
 
