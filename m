@@ -7,21 +7,21 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BB91C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A683CC433E6
 	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 07:33:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0392564E28
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 07:33:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 718FA64F69
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Mar 2021 07:33:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234148AbhCSHdJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S234018AbhCSHdJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 19 Mar 2021 03:33:09 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:13994 "EHLO
+Received: from szxga05-in.huawei.com ([45.249.212.191]:13995 "EHLO
         szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234082AbhCSHcz (ORCPT
+        with ESMTP id S234076AbhCSHcw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Mar 2021 03:32:55 -0400
+        Fri, 19 Mar 2021 03:32:52 -0400
 Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4F1wY96ldHzrYPc;
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4F1wY96XCTzrYJk;
         Fri, 19 Mar 2021 15:30:53 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
@@ -30,9 +30,9 @@ From:   Yang Shen <shenyang39@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <wangzhou1@hisilicon.com>
-Subject: [PATCH 4/4] crypto: hisilicon/zip - support new 'sqe' type in Kunpeng930
-Date:   Fri, 19 Mar 2021 15:33:07 +0800
-Message-ID: <1616139187-63425-5-git-send-email-shenyang39@huawei.com>
+Subject: [PATCH 2/4] crypto: hisilicon/zip - add comments for 'hisi_zip_sqe'
+Date:   Fri, 19 Mar 2021 15:33:05 +0800
+Message-ID: <1616139187-63425-3-git-send-email-shenyang39@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1616139187-63425-1-git-send-email-shenyang39@huawei.com>
 References: <1616139187-63425-1-git-send-email-shenyang39@huawei.com>
@@ -44,84 +44,105 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Kunpeng930 changes some field meanings in 'sqe'. So add a new
-'hisi_zip_sqe_ops' to describe the 'sqe' operations.
+Some fields of 'hisi_zip_sqe' are unused, and some fields have misc
+utilities. So add comments for used fields and make others unnamed.
 
 Signed-off-by: Yang Shen <shenyang39@huawei.com>
 ---
- drivers/crypto/hisilicon/zip/zip.h        |  1 +
- drivers/crypto/hisilicon/zip/zip_crypto.c | 25 +++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+ drivers/crypto/hisilicon/zip/zip.h        | 45 ++++++++++++++++++++++---------
+ drivers/crypto/hisilicon/zip/zip_crypto.c |  4 +--
+ 2 files changed, 34 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/crypto/hisilicon/zip/zip.h b/drivers/crypto/hisilicon/zip/zip.h
-index b4d3e03..517fdbd 100644
+index 9ed7461..b4d3e03 100644
 --- a/drivers/crypto/hisilicon/zip/zip.h
 +++ b/drivers/crypto/hisilicon/zip/zip.h
-@@ -75,6 +75,7 @@ struct hisi_zip_sqe {
- 	u32 dw23;
- 	u32 dw24;
- 	u32 dw25;
-+	/* tag: in sqe type 3 */
- 	u32 dw26;
- 	u32 dw27;
+@@ -33,31 +33,50 @@ struct hisi_zip_sqe {
+ 	u32 consumed;
+ 	u32 produced;
+ 	u32 comp_data_length;
++	/*
++	 * status: 0~7 bits
++	 * rsvd: 8~31 bits
++	 */
+ 	u32 dw3;
+ 	u32 input_data_length;
+-	u32 lba_l;
+-	u32 lba_h;
++	u32 dw5;
++	u32 dw6;
++	/*
++	 * in_sge_data_offset: 0~23 bits
++	 * rsvd: 24~27 bits
++	 * sqe_type: 29~31 bits
++	 */
+ 	u32 dw7;
++	/*
++	 * out_sge_data_offset: 0~23 bits
++	 * rsvd: 24~31 bits
++	 */
+ 	u32 dw8;
++	/*
++	 * request_type: 0~7 bits
++	 * buffer_type: 8~11 bits
++	 * rsvd: 13~31 bits
++	 */
+ 	u32 dw9;
+ 	u32 dw10;
+-	u32 priv_info;
++	u32 dw11;
+ 	u32 dw12;
+-	u32 tag;
++	/* tag: in sqe type 0 */
++	u32 dw13;
+ 	u32 dest_avail_out;
+-	u32 rsvd0;
+-	u32 comp_head_addr_l;
+-	u32 comp_head_addr_h;
++	u32 dw15;
++	u32 dw16;
++	u32 dw17;
+ 	u32 source_addr_l;
+ 	u32 source_addr_h;
+ 	u32 dest_addr_l;
+ 	u32 dest_addr_h;
+-	u32 stream_ctx_addr_l;
+-	u32 stream_ctx_addr_h;
+-	u32 cipher_key1_addr_l;
+-	u32 cipher_key1_addr_h;
+-	u32 cipher_key2_addr_l;
+-	u32 cipher_key2_addr_h;
++	u32 dw22;
++	u32 dw23;
++	u32 dw24;
++	u32 dw25;
++	u32 dw26;
++	u32 dw27;
  	u32 rsvd1[4];
-diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-index 85dcf6a..4bd41a4 100644
---- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-+++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-@@ -298,6 +298,11 @@ static void hisi_zip_fill_tag_v1(struct hisi_zip_sqe *sqe, struct hisi_zip_req *
- 	sqe->dw13 = req->req_id;
- }
- 
-+static void hisi_zip_fill_tag_v2(struct hisi_zip_sqe *sqe, struct hisi_zip_req *req)
-+{
-+	sqe->dw26 = req->req_id;
-+}
-+
- static void hisi_zip_fill_sqe_type(struct hisi_zip_sqe *sqe, u8 sqe_type)
- {
- 	u32 val;
-@@ -380,6 +385,11 @@ static u32 hisi_zip_get_tag_v1(struct hisi_zip_sqe *sqe)
- 	return sqe->dw13;
- }
- 
-+static u32 hisi_zip_get_tag_v2(struct hisi_zip_sqe *sqe)
-+{
-+	return sqe->dw26;
-+}
-+
- static u32 hisi_zip_get_status(struct hisi_zip_sqe *sqe)
- {
- 	return sqe->dw3 & HZIP_BD_STATUS_M;
-@@ -527,6 +537,19 @@ const struct hisi_zip_sqe_ops hisi_zip_ops_v1 = {
- 	.get_dstlen		= hisi_zip_get_dstlen,
  };
  
-+const struct hisi_zip_sqe_ops hisi_zip_ops_v2 = {
-+	.sqe_type		= 0x3,
-+	.fill_addr		= hisi_zip_fill_addr,
-+	.fill_buf_size		= hisi_zip_fill_buf_size,
-+	.fill_buf_type		= hisi_zip_fill_buf_type,
-+	.fill_req_type		= hisi_zip_fill_req_type,
-+	.fill_tag		= hisi_zip_fill_tag_v2,
-+	.fill_sqe_type		= hisi_zip_fill_sqe_type,
-+	.get_tag		= hisi_zip_get_tag_v2,
-+	.get_status		= hisi_zip_get_status,
-+	.get_dstlen		= hisi_zip_get_dstlen,
-+};
-+
- static int hisi_zip_ctx_init(struct hisi_zip_ctx *hisi_zip_ctx, u8 req_type, int node)
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+index 989b273..3bc2148 100644
+--- a/drivers/crypto/hisilicon/zip/zip_crypto.c
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -253,7 +253,7 @@ static void hisi_zip_config_buf_type(struct hisi_zip_sqe *sqe, u8 buf_type)
+ 
+ static void hisi_zip_config_tag(struct hisi_zip_sqe *sqe, u32 tag)
  {
- 	struct hisi_qp *qps[HZIP_CTX_Q_NUM] = { NULL };
-@@ -560,6 +583,8 @@ static int hisi_zip_ctx_init(struct hisi_zip_ctx *hisi_zip_ctx, u8 req_type, int
- 
- 	if (hisi_zip->qm.ver < QM_HW_V3)
- 		hisi_zip_ctx->ops = &hisi_zip_ops_v1;
-+	else
-+		hisi_zip_ctx->ops = &hisi_zip_ops_v2;
- 
- 	return 0;
+-	sqe->tag = tag;
++	sqe->dw13 = tag;
  }
+ 
+ static void hisi_zip_fill_sqe(struct hisi_zip_sqe *sqe, u8 req_type,
+@@ -339,7 +339,7 @@ static void hisi_zip_acomp_cb(struct hisi_qp *qp, void *data)
+ 	struct hisi_zip_req_q *req_q = &qp_ctx->req_q;
+ 	struct device *dev = &qp->qm->pdev->dev;
+ 	struct hisi_zip_sqe *sqe = data;
+-	struct hisi_zip_req *req = req_q->q + sqe->tag;
++	struct hisi_zip_req *req = req_q->q + sqe->dw13;
+ 	struct acomp_req *acomp_req = req->req;
+ 	u32 status, dlen, head_size;
+ 	int err = 0;
 -- 
 2.7.4
 
