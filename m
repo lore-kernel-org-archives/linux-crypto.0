@@ -8,63 +8,65 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 374AEC433C1
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Mar 2021 12:10:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E46C6C433C1
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Mar 2021 12:31:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0198661931
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Mar 2021 12:10:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5BEB61944
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Mar 2021 12:31:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229870AbhCUMJ4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Mar 2021 08:09:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47488 "EHLO
+        id S229865AbhCUMa5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 21 Mar 2021 08:30:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229865AbhCUMJV (ORCPT
+        with ESMTP id S229784AbhCUMaY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Mar 2021 08:09:21 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71A42C061574;
-        Sun, 21 Mar 2021 05:09:21 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id kk2-20020a17090b4a02b02900c777aa746fso7087142pjb.3;
-        Sun, 21 Mar 2021 05:09:21 -0700 (PDT)
+        Sun, 21 Mar 2021 08:30:24 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99953C061574;
+        Sun, 21 Mar 2021 05:30:21 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id w8so6944302pjf.4;
+        Sun, 21 Mar 2021 05:30:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id;
-        bh=65xS++HGiZkujdsZR4AQVb+3YXoj/1io84bOdJMhmhE=;
-        b=bX3lXOrO99s+3URCG1rF3xz08Ldc7x+dIV0nXOWv60xnvaHBCA2XKu/37JqTJAS4Eb
-         o9Y7s5NB/uVox+SOei06QbwVEbdkLsvAt8pDUTMwZ2zvMIuO42JO2b0LmokFl/oWSQCi
-         TlYOUENU67DT/L/AvN6g994qx8C6k/9vP/HjhaFOdEDrZtu2ui7F3Fofi6iCb80PAl50
-         CMp+zjL7/K3HegSe8iU4V+DfJkN+qX/JDKge1Bw2JuBMkMwDizMGb8DF0NWsZRCaUzWD
-         oULps5sVbquDI+slsmrOx5kMiPMMRGOGhSp24togDpNGhHzCwJVhK2LhurGH/mxmu+t9
-         0X8g==
+        bh=KfMzPZjWj4vEWxC64jkBmTku/Bg4RYDhn1mRma2jDt8=;
+        b=hegytKpYdRSuP2KRtRXvnXoxRL6o5TUG6vOY4yeXASkte2gkTvZzYhTtSmPnxAq+v9
+         9Hcn68jY5tETkaXali7jJZwmv0qJJ4qKDuqsQ8a/7ddrRCBVr6rqHtAjCCWEmMoSxQ8C
+         xj4AvwuHiarQk0OF3AUhT21yIOgrguIaVndkjaXXDmonXpLrs+xulUoFFlHr7JvvfuqQ
+         ag67lyTseGR3cQkkgmZO5w9Kb3IY4mII+7z3Mz3U8K+LLGglSTA5zny0fZLXhXRrIChW
+         GDcrbjaL8URhLtnkfkr4BuqnJBntGZJ1y1NI4r8LA9fGb9CHVhb0KibU1KZ7Z6Jt34zb
+         AAJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=65xS++HGiZkujdsZR4AQVb+3YXoj/1io84bOdJMhmhE=;
-        b=j+BEDGZLxygca8Ldzj8/PiRTAErwIaHHPpaWAGdgC51h+muGmpEaO3PmAvKwIlbVdB
-         woHqA7hgyKmKWSS0O6X4kRNjgS1FUfC/Fh4OOOpH9r0klocnCLWlcchx3x61CyvHDu8Q
-         DqV3nzMWZasVqPushhrsXnbQa4HOIolsYfRWqDrofUcbz4rJfQ+eqjSn8yZeN/87HoEu
-         5OS9Tc/WiI4jxvFInvY2CqCOKwxyoCKzgade+pYNMIdQGfdByOPH6+3QNmsECr12qWmN
-         2EtAt2NwzZWM6c8Td+Ya5YL62FKmovOaapp8Oi9hRDHMMrzlVnGJzf3sSBNQVC/F3mf8
-         rG/g==
-X-Gm-Message-State: AOAM531yHdlB3PUlE2WxLjp3+rW48rrGr/V8E3oVGGwSJBy1t9PfIks3
-        palBemB+Dvn5SQNxCHVZymU=
-X-Google-Smtp-Source: ABdhPJyWQ0F9qunwou6ZDyiMMtoHuyGgMdWrBXh1xagauBYeVvDzAz3d4QbAnuNvcal40z3iFpqWFw==
-X-Received: by 2002:a17:90b:33c7:: with SMTP id lk7mr8038357pjb.95.1616328560906;
-        Sun, 21 Mar 2021 05:09:20 -0700 (PDT)
+        bh=KfMzPZjWj4vEWxC64jkBmTku/Bg4RYDhn1mRma2jDt8=;
+        b=ly/6mNKY3JtSmjp5KZCjhid67A0cPJ9USF/tExkuwPgNPxlPcpuMqhIeon/IKU3iUD
+         WZH/TIXkG6zQP8GFvVx2SzbjA7YNPfv2FN2W59YAwxbv1VMqGpWvC0IKqUOdRWOHNaLm
+         1jDIJ5TN2SJfX0nU3aI324j9q961gOUHlP5gUr3U5jbimpQO0t+1uFLy7P7XKNECeBxA
+         UpgWP7UFxmEp138H1O4xiErcpgHxBO0NLnLQnbuQFPbLLjc3T9NHXQZNcm6HXABGKjhU
+         u4CVt+l/EFMf/sgaG13BhhdxF1aX6vaQUhDckMBN5Y7z+K/4SnWNaSVOlNc2QAa6+XSK
+         AosQ==
+X-Gm-Message-State: AOAM533ff/iBBcxCyFvaWPKuO0Y2MvGn6YDJPi9R4hmfzarg8CBKCpoG
+        F0EwMkkoLhHBiCTCxIScfcrK/5p0lcx5hfo0
+X-Google-Smtp-Source: ABdhPJxrZpRtLJ/jkSAjBSxfQgEgy62uvjYCzEAtSUy2I9ELjZgwt4OUC4GFVa3L3gPwSN14gkfhNg==
+X-Received: by 2002:a17:90a:8c08:: with SMTP id a8mr8252584pjo.136.1616329820543;
+        Sun, 21 Mar 2021 05:30:20 -0700 (PDT)
 Received: from localhost.localdomain ([2405:201:600d:a089:4cb7:d0cb:1241:5cf8])
-        by smtp.googlemail.com with ESMTPSA id f11sm10080642pga.34.2021.03.21.05.09.16
+        by smtp.googlemail.com with ESMTPSA id f135sm10627171pfa.102.2021.03.21.05.30.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Mar 2021 05:09:20 -0700 (PDT)
+        Sun, 21 Mar 2021 05:30:20 -0700 (PDT)
 From:   Aditya Srivastava <yashsri421@gmail.com>
-To:     herbert@gondor.apana.org.au
+To:     linux-kernel@vger.kernel.org
 Cc:     yashsri421@gmail.com, lukas.bulwahn@gmail.com, corbet@lwn.net,
         rdunlap@infradead.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: ux500: fix incorrect kernel-doc comment syntax
-Date:   Sun, 21 Mar 2021 17:39:12 +0530
-Message-Id: <20210321120912.12905-1-yashsri421@gmail.com>
+        linux-kernel-mentees@lists.linuxfoundation.org, leitao@debian.org,
+        nayna@linux.ibm.com, pfsmorigo@gmail.com, mpe@ellerman.id.au,
+        benh@kernel.crashing.org, paulus@samba.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH] crypto: nx: fix incorrect kernel-doc comment syntax in files
+Date:   Sun, 21 Mar 2021 18:00:07 +0530
+Message-Id: <20210321123007.15505-1-yashsri421@gmail.com>
 X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -72,16 +74,16 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 The opening comment mark '/**' is used for highlighting the beginning of
 kernel-doc comments.
-There are certain files in drivers/crypto/ux500, which follow this syntax,
+There are certain files in drivers/crypto/nx, which follow this syntax,
 but the content inside does not comply with kernel-doc.
 Such lines were probably not meant for kernel-doc parsing, but are parsed
 due to the presence of kernel-doc like comment syntax(i.e, '/**'), which
 causes unexpected warnings from kernel-doc.
 
 E.g., presence of kernel-doc like comment in the header lines for
-drivers/crypto/ux500/cryp/cryp.h at header causes this warning:
-
-"warning: expecting prototype for ST(). Prototype was for _CRYP_H_() instead"
+drivers/crypto/nx/nx-sha256.c at header causes these warnings:
+"warning: Function parameter or member 'tfm' not described in 'nx_crypto_ctx_sha256_init'"
+"warning: expecting prototype for SHA(). Prototype was for nx_crypto_ctx_sha256_init() instead"
 
 Similarly for other files too.
 
@@ -90,164 +92,130 @@ format, i.e. '/*', to prevent kernel-doc from parsing it.
 
 Signed-off-by: Aditya Srivastava <yashsri421@gmail.com>
 ---
- drivers/crypto/ux500/cryp/cryp.c      |  2 +-
- drivers/crypto/ux500/cryp/cryp.h      |  2 +-
- drivers/crypto/ux500/cryp/cryp_core.c |  2 +-
- drivers/crypto/ux500/cryp/cryp_irq.c  |  2 +-
- drivers/crypto/ux500/cryp/cryp_irq.h  |  4 ++--
- drivers/crypto/ux500/cryp/cryp_irqp.h |  4 ++--
- drivers/crypto/ux500/cryp/cryp_p.h    | 14 +++++++-------
- 7 files changed, 15 insertions(+), 15 deletions(-)
+* Applies perfectly on next-20210319
 
-diff --git a/drivers/crypto/ux500/cryp/cryp.c b/drivers/crypto/ux500/cryp/cryp.c
-index 9866c2a5e9a7..2b9436723d57 100644
---- a/drivers/crypto/ux500/cryp/cryp.c
-+++ b/drivers/crypto/ux500/cryp/cryp.c
+ drivers/crypto/nx/nx-aes-cbc.c  | 2 +-
+ drivers/crypto/nx/nx-aes-ccm.c  | 2 +-
+ drivers/crypto/nx/nx-aes-ctr.c  | 2 +-
+ drivers/crypto/nx/nx-aes-ecb.c  | 2 +-
+ drivers/crypto/nx/nx-aes-gcm.c  | 2 +-
+ drivers/crypto/nx/nx-aes-xcbc.c | 2 +-
+ drivers/crypto/nx/nx-sha256.c   | 2 +-
+ drivers/crypto/nx/nx-sha512.c   | 2 +-
+ drivers/crypto/nx/nx.c          | 2 +-
+ drivers/crypto/nx/nx_debugfs.c  | 2 +-
+ 10 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/crypto/nx/nx-aes-cbc.c b/drivers/crypto/nx/nx-aes-cbc.c
+index 92e921eceed7..d6314ea9ae89 100644
+--- a/drivers/crypto/nx/nx-aes-cbc.c
++++ b/drivers/crypto/nx/nx-aes-cbc.c
 @@ -1,5 +1,5 @@
  // SPDX-License-Identifier: GPL-2.0-only
 -/**
 +/*
-  * Copyright (C) ST-Ericsson SA 2010
-  * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-  * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-diff --git a/drivers/crypto/ux500/cryp/cryp.h b/drivers/crypto/ux500/cryp/cryp.h
-index 8da7f87b339b..db5713d7c940 100644
---- a/drivers/crypto/ux500/cryp/cryp.h
-+++ b/drivers/crypto/ux500/cryp/cryp.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0-only */
--/**
-+/*
-  * Copyright (C) ST-Ericsson SA 2010
-  * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-  * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index c3adeb2e5823..df68b7bd0a7a 100644
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0-only
--/**
-+/*
-  * Copyright (C) ST-Ericsson SA 2010
-  * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-  * Author: Joakim Bech <joakim.xx.bech@stericsson.com> for ST-Ericsson.
-diff --git a/drivers/crypto/ux500/cryp/cryp_irq.c b/drivers/crypto/ux500/cryp/cryp_irq.c
-index 7ebde69e8c76..6d2f07bec98a 100644
---- a/drivers/crypto/ux500/cryp/cryp_irq.c
-+++ b/drivers/crypto/ux500/cryp/cryp_irq.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0-only
--/**
-+/*
-  * Copyright (C) ST-Ericsson SA 2010
-  * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-  * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-diff --git a/drivers/crypto/ux500/cryp/cryp_irq.h b/drivers/crypto/ux500/cryp/cryp_irq.h
-index 1984f30100ff..da90029ea141 100644
---- a/drivers/crypto/ux500/cryp/cryp_irq.h
-+++ b/drivers/crypto/ux500/cryp/cryp_irq.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0-only */
--/**
-+/*
-  * Copyright (C) ST-Ericsson SA 2010
-  * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-  * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-@@ -19,7 +19,7 @@ enum cryp_irq_src_id {
- 	CRYP_IRQ_SRC_ALL = 0x3
- };
- 
--/**
-+/*
-  * M0 Funtions
-  */
- void cryp_enable_irq_src(struct cryp_device_data *device_data, u32 irq_src);
-diff --git a/drivers/crypto/ux500/cryp/cryp_irqp.h b/drivers/crypto/ux500/cryp/cryp_irqp.h
-index 879ed68a12d7..4981a3f461e5 100644
---- a/drivers/crypto/ux500/cryp/cryp_irqp.h
-+++ b/drivers/crypto/ux500/cryp/cryp_irqp.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0-only */
--/**
-+/*
-  * Copyright (C) ST-Ericsson SA 2010
-  * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-  * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-@@ -13,7 +13,7 @@
- 
- #include "cryp_irq.h"
- 
--/**
-+/*
+  * AES CBC routines supporting the Power 7+ Nest Accelerators driver
   *
-  * CRYP Registers - Offset mapping
-  *     +-----------------+
-diff --git a/drivers/crypto/ux500/cryp/cryp_p.h b/drivers/crypto/ux500/cryp/cryp_p.h
-index 0df84eaa8531..ba17b1ffd94d 100644
---- a/drivers/crypto/ux500/cryp/cryp_p.h
-+++ b/drivers/crypto/ux500/cryp/cryp_p.h
+  * Copyright (C) 2011-2012 International Business Machines Inc.
+diff --git a/drivers/crypto/nx/nx-aes-ccm.c b/drivers/crypto/nx/nx-aes-ccm.c
+index 4c9362eebefd..e7384d107573 100644
+--- a/drivers/crypto/nx/nx-aes-ccm.c
++++ b/drivers/crypto/nx/nx-aes-ccm.c
 @@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0-only */
+ // SPDX-License-Identifier: GPL-2.0-only
 -/**
 +/*
-  * Copyright (C) ST-Ericsson SA 2010
-  * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-  * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-@@ -17,7 +17,7 @@
- #include "cryp.h"
- #include "cryp_irqp.h"
- 
+  * AES CCM routines supporting the Power 7+ Nest Accelerators driver
+  *
+  * Copyright (C) 2012 International Business Machines Inc.
+diff --git a/drivers/crypto/nx/nx-aes-ctr.c b/drivers/crypto/nx/nx-aes-ctr.c
+index 6d5ce1a66f1e..13f518802343 100644
+--- a/drivers/crypto/nx/nx-aes-ctr.c
++++ b/drivers/crypto/nx/nx-aes-ctr.c
+@@ -1,5 +1,5 @@
+ // SPDX-License-Identifier: GPL-2.0-only
 -/**
 +/*
-  * Generic Macros
-  */
- #define CRYP_SET_BITS(reg_name, mask) \
-@@ -34,7 +34,7 @@
- 	writel_relaxed(((readl_relaxed(reg) & ~(mask)) | \
- 		(((u32)val << shift) & (mask))), reg)
- 
+  * AES CTR routines supporting the Power 7+ Nest Accelerators driver
+  *
+  * Copyright (C) 2011-2012 International Business Machines Inc.
+diff --git a/drivers/crypto/nx/nx-aes-ecb.c b/drivers/crypto/nx/nx-aes-ecb.c
+index 77e338dc33f1..7a729dc2bc17 100644
+--- a/drivers/crypto/nx/nx-aes-ecb.c
++++ b/drivers/crypto/nx/nx-aes-ecb.c
+@@ -1,5 +1,5 @@
+ // SPDX-License-Identifier: GPL-2.0-only
 -/**
 +/*
-  * CRYP specific Macros
-  */
- #define CRYP_PERIPHERAL_ID0		0xE3
-@@ -48,7 +48,7 @@
- #define CRYP_PCELL_ID2			0x05
- #define CRYP_PCELL_ID3			0xB1
- 
+  * AES ECB routines supporting the Power 7+ Nest Accelerators driver
+  *
+  * Copyright (C) 2011-2012 International Business Machines Inc.
+diff --git a/drivers/crypto/nx/nx-aes-gcm.c b/drivers/crypto/nx/nx-aes-gcm.c
+index 19c6ed5baea4..fc9baca13920 100644
+--- a/drivers/crypto/nx/nx-aes-gcm.c
++++ b/drivers/crypto/nx/nx-aes-gcm.c
+@@ -1,5 +1,5 @@
+ // SPDX-License-Identifier: GPL-2.0-only
 -/**
 +/*
-  * CRYP register default values
-  */
- #define MAX_DEVICE_SUPPORT		2
-@@ -62,7 +62,7 @@
- #define CRYP_KEY_DEFAULT		0x0
- #define CRYP_INIT_VECT_DEFAULT		0x0
- 
+  * AES GCM routines supporting the Power 7+ Nest Accelerators driver
+  *
+  * Copyright (C) 2012 International Business Machines Inc.
+diff --git a/drivers/crypto/nx/nx-aes-xcbc.c b/drivers/crypto/nx/nx-aes-xcbc.c
+index 48dc1c98ca52..eb5c8f689360 100644
+--- a/drivers/crypto/nx/nx-aes-xcbc.c
++++ b/drivers/crypto/nx/nx-aes-xcbc.c
+@@ -1,5 +1,5 @@
+ // SPDX-License-Identifier: GPL-2.0-only
 -/**
 +/*
-  * CRYP Control register specific mask
-  */
- #define CRYP_CR_SECURE_MASK		BIT(0)
-@@ -91,7 +91,7 @@
- #define CRYP_SR_IFEM_MASK		BIT(0)
- #define CRYP_SR_BUSY_MASK		BIT(4)
- 
+  * AES XCBC routines supporting the Power 7+ Nest Accelerators driver
+  *
+  * Copyright (C) 2011-2012 International Business Machines Inc.
+diff --git a/drivers/crypto/nx/nx-sha256.c b/drivers/crypto/nx/nx-sha256.c
+index 90d9a37a57f6..b0ad665e4bda 100644
+--- a/drivers/crypto/nx/nx-sha256.c
++++ b/drivers/crypto/nx/nx-sha256.c
+@@ -1,5 +1,5 @@
+ // SPDX-License-Identifier: GPL-2.0-only
 -/**
 +/*
-  * Bit position used while setting bits in register
-  */
- #define CRYP_CR_PRLG_POS		1
-@@ -107,7 +107,7 @@
- 
- #define CRYP_SR_BUSY_POS		4
- 
+  * SHA-256 routines supporting the Power 7+ Nest Accelerators driver
+  *
+  * Copyright (C) 2011-2012 International Business Machines Inc.
+diff --git a/drivers/crypto/nx/nx-sha512.c b/drivers/crypto/nx/nx-sha512.c
+index eb8627a0f317..c29103a1a0b6 100644
+--- a/drivers/crypto/nx/nx-sha512.c
++++ b/drivers/crypto/nx/nx-sha512.c
+@@ -1,5 +1,5 @@
+ // SPDX-License-Identifier: GPL-2.0-only
 -/**
 +/*
-  * CRYP PCRs------PC_NAND control register
-  * BIT_MASK
-  */
+  * SHA-512 routines supporting the Power 7+ Nest Accelerators driver
+  *
+  * Copyright (C) 2011-2012 International Business Machines Inc.
+diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
+index 1d0e8a1ba160..13bb705ba6a4 100644
+--- a/drivers/crypto/nx/nx.c
++++ b/drivers/crypto/nx/nx.c
+@@ -1,5 +1,5 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-/**
++/*
+  * Routines supporting the Power 7+ Nest Accelerators driver
+  *
+  * Copyright (C) 2011-2012 International Business Machines Inc.
+diff --git a/drivers/crypto/nx/nx_debugfs.c b/drivers/crypto/nx/nx_debugfs.c
+index 1975bcbee997..ee7cd88bb10a 100644
+--- a/drivers/crypto/nx/nx_debugfs.c
++++ b/drivers/crypto/nx/nx_debugfs.c
+@@ -1,5 +1,5 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-/**
++/*
+  * debugfs routines supporting the Power 7+ Nest Accelerators driver
+  *
+  * Copyright (C) 2011-2012 International Business Machines Inc.
 -- 
 2.17.1
 
