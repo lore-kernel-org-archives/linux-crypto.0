@@ -2,108 +2,242 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07AE7C433E8
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 13:09:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C669DC433E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 17:06:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E499A6192D
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 13:09:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97D52619A8
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 17:06:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231806AbhCVNJO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Mar 2021 09:09:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59278 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232845AbhCVNFr (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Mar 2021 09:05:47 -0400
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E0B2C061756;
-        Mon, 22 Mar 2021 06:05:47 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id y5so8820286qkl.9;
-        Mon, 22 Mar 2021 06:05:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=801QFsuMh5/bXT7iDGLM8P3LIQI2jpvEZ62QIecOMdw=;
-        b=g7aI/jvx2znrl1EyXPcFMm56+a5ShivFYZZ9ennJJNFYkMLttLz8Vj7hCqf7nA8MIf
-         NcOoj3cd0rR8rYJYFNH2wrHub0iLAhwMp16IPriKiNqC1ohnCWyQJzC6btBsnbM0JPej
-         p4o4sMERKZVv0dJbh6m2Qk1p0OP+OmbDq/VDd6UKcsdCwhn76ypRmjNmrtFgnUlJ9vxK
-         //DULu3p9tfRRIswQxfQG9bTpGs2N4qi+yGzLYtNGrfpt/m8b2FaEqev5Q8/XwlhW4R6
-         ikoygTYVztwcUI3QDjbiT7BDZBVI5V6p2Tyz89jvbBBPSpnw4KxN7/1uU6/sm/an/F0k
-         cYWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=801QFsuMh5/bXT7iDGLM8P3LIQI2jpvEZ62QIecOMdw=;
-        b=HB2OPEx2NkJ/w61fZdCDmyTIe5IaV0iJeKk0lvZf4N8/TWQQzi0wubyup0fgXB/TdH
-         IxgQ3PAUg7mzwzaMZX2kQ98t8A+LSYcGrIHbRzmZVB7wh0NfPvECqo0h0+jNkgfX1dKg
-         MOSROBcCQTX5mz7QvThgq4NDeC5eBYQnMVg8cVJ/K1Fwns8ByDVw5mujzIdo5G8w2085
-         +f89pyqgd/PNjtFivxjWXoPPeZZS5CaO7ycWE0ILHamOXyQcCwcA4wHAXmKEu9ZqPVnE
-         3TpEVVtwNG8Z9zmqNtluqx1vuRs/3qKVl8kXvr8/MV1zAV8B1PZ2HxOwDHeO1TftavfO
-         RT0Q==
-X-Gm-Message-State: AOAM531FKLPaPH93nNtFWjcJvVrSVzuhMKlD+bNUNfEc143pGnz4APUA
-        gJeKK7jGOx7WRyppuj2jqj4=
-X-Google-Smtp-Source: ABdhPJyEEhJj8SFIQBJSsr3d4eJcQbj9s3I/grK8x+/NEg7D0hoRx+x1KVAgNoIEtF5eSZAqa3Yv3g==
-X-Received: by 2002:a05:620a:553:: with SMTP id o19mr2511279qko.491.1616418346402;
-        Mon, 22 Mar 2021 06:05:46 -0700 (PDT)
-Received: from localhost.localdomain ([143.244.44.200])
-        by smtp.gmail.com with ESMTPSA id r125sm10703324qkf.132.2021.03.22.06.05.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Mar 2021 06:05:45 -0700 (PDT)
-From:   Bhaskar Chowdhury <unixbhaskar@gmail.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        hca@linux.ibm.com, gor@linux.ibm.com, borntraeger@de.ibm.com,
-        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     rdunlap@infradead.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: [PATCH] s390/crc32-vx: Couple of typo fixes
-Date:   Mon, 22 Mar 2021 18:35:33 +0530
-Message-Id: <20210322130533.3805976-1-unixbhaskar@gmail.com>
-X-Mailer: git-send-email 2.31.0
+        id S231313AbhCVRGE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 Mar 2021 13:06:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41712 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232110AbhCVRFu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Mar 2021 13:05:50 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id AB609619A4;
+        Mon, 22 Mar 2021 17:05:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616432749;
+        bh=PKLOobpob5JmNqoCPmm+ghhVZ/0dRKl7lczhmQX5p5k=;
+        h=From:To:Cc:Subject:Date:From;
+        b=uR//tcQTy5RhYfdZ5Y8WJWBKyQ5/Fkhb00TM9w7dXuAigu53AmYICge794j7jfMP1
+         sJCiQiFNd/TRBNO582A6waDXssUcvFYVze7N6TaS1/kJHQPFTm30C6SspOBKWAl3EH
+         ZVE1Sn6Fcil7iYL8K5b/zeyoczUex6QFblr1FHImoxhQt6E5cO8o3AkIZK5AMHWCCf
+         aPevfTbQRt6iN82nj8Y0QeWHQ1Z6f3A3Y35H9GQDG2yAGLEPFa0EhjCzzl+Mz1fwGf
+         v8SEFv08rtrdbDmiP/trQ686RIzsoGaQaUcdnzj3XKXC6U3TTFF8cvUn+G5/imZvl7
+         2cVhehF2Jx6pg==
+From:   Arnd Bergmann <arnd@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Eric Biggers <ebiggers@google.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org
+Subject: [PATCH] crypto: poly1305: fix poly1305_core_setkey() declaration
+Date:   Mon, 22 Mar 2021 18:05:15 +0100
+Message-Id: <20210322170542.1791154-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+From: Arnd Bergmann <arnd@arndb.de>
 
-s/defintions/definitions/
-s/intermedate/intermediate/
+gcc-11 points out a mismatch between the declaration and the definition
+of poly1305_core_setkey():
 
-Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+lib/crypto/poly1305-donna32.c:13:67: error: argument 2 of type ‘const u8[16]’ {aka ‘const unsigned char[16]’} with mismatched bound [-Werror=array-parameter=]
+   13 | void poly1305_core_setkey(struct poly1305_core_key *key, const u8 raw_key[16])
+      |                                                          ~~~~~~~~~^~~~~~~~~~~
+In file included from lib/crypto/poly1305-donna32.c:11:
+include/crypto/internal/poly1305.h:21:68: note: previously declared as ‘const u8 *’ {aka ‘const unsigned char *’}
+   21 | void poly1305_core_setkey(struct poly1305_core_key *key, const u8 *raw_key);
+
+This is harmless in principle, as the calling conventions are the same,
+but the more specific prototype allows better type checking in the
+caller.
+
+Change the declaration to match the actual function definition.
+The poly1305_simd_init() is a bit suspicious here, as it previously
+had a 32-byte argument type, but looks like it needs to take the
+16-byte POLY1305_BLOCK_SIZE array instead.
+
+Fixes: 1c08a104360f ("crypto: poly1305 - add new 32 and 64-bit generic versions")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/s390/crypto/crc32be-vx.S | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm/crypto/poly1305-glue.c    | 2 +-
+ arch/arm64/crypto/poly1305-glue.c  | 2 +-
+ arch/mips/crypto/poly1305-glue.c   | 2 +-
+ arch/x86/crypto/poly1305_glue.c    | 6 +++---
+ include/crypto/internal/poly1305.h | 3 ++-
+ include/crypto/poly1305.h          | 6 ++++--
+ lib/crypto/poly1305-donna32.c      | 3 ++-
+ lib/crypto/poly1305-donna64.c      | 3 ++-
+ lib/crypto/poly1305.c              | 3 ++-
+ 9 files changed, 18 insertions(+), 12 deletions(-)
 
-diff --git a/arch/s390/crypto/crc32be-vx.S b/arch/s390/crypto/crc32be-vx.S
-index 0099044e2c86..6b3d1009c392 100644
---- a/arch/s390/crypto/crc32be-vx.S
-+++ b/arch/s390/crypto/crc32be-vx.S
-@@ -32,7 +32,7 @@
-  * process particular chunks of the input data stream in parallel.
-  *
-  * For the CRC-32 variants, the constants are precomputed according to
-- * these defintions:
-+ * these definitions:
-  *
-  *	R1 = x4*128+64 mod P(x)
-  *	R2 = x4*128    mod P(x)
-@@ -189,7 +189,7 @@ ENTRY(crc32_be_vgfm_16)
- 	 * Note: To compensate the division by x^32, use the vector unpack
- 	 * instruction to move the leftmost word into the leftmost doubleword
- 	 * of the vector register.  The rightmost doubleword is multiplied
--	 * with zero to not contribute to the intermedate results.
-+	 * with zero to not contribute to the intermediate results.
- 	 */
-
- 	/* T1(x) = floor( R(x) / x^32 ) GF2MUL u */
---
-2.31.0
+diff --git a/arch/arm/crypto/poly1305-glue.c b/arch/arm/crypto/poly1305-glue.c
+index 3023c1acfa19..c31bd8f7c092 100644
+--- a/arch/arm/crypto/poly1305-glue.c
++++ b/arch/arm/crypto/poly1305-glue.c
+@@ -29,7 +29,7 @@ void __weak poly1305_blocks_neon(void *state, const u8 *src, u32 len, u32 hibit)
+ 
+ static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
+ 
+-void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 *key)
++void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 key[POLY1305_KEY_SIZE])
+ {
+ 	poly1305_init_arm(&dctx->h, key);
+ 	dctx->s[0] = get_unaligned_le32(key + 16);
+diff --git a/arch/arm64/crypto/poly1305-glue.c b/arch/arm64/crypto/poly1305-glue.c
+index 683de671741a..9c3d86e397bf 100644
+--- a/arch/arm64/crypto/poly1305-glue.c
++++ b/arch/arm64/crypto/poly1305-glue.c
+@@ -25,7 +25,7 @@ asmlinkage void poly1305_emit(void *state, u8 *digest, const u32 *nonce);
+ 
+ static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
+ 
+-void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 *key)
++void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 key[POLY1305_KEY_SIZE])
+ {
+ 	poly1305_init_arm64(&dctx->h, key);
+ 	dctx->s[0] = get_unaligned_le32(key + 16);
+diff --git a/arch/mips/crypto/poly1305-glue.c b/arch/mips/crypto/poly1305-glue.c
+index fc881b46d911..bc6110fb98e0 100644
+--- a/arch/mips/crypto/poly1305-glue.c
++++ b/arch/mips/crypto/poly1305-glue.c
+@@ -17,7 +17,7 @@ asmlinkage void poly1305_init_mips(void *state, const u8 *key);
+ asmlinkage void poly1305_blocks_mips(void *state, const u8 *src, u32 len, u32 hibit);
+ asmlinkage void poly1305_emit_mips(void *state, u8 *digest, const u32 *nonce);
+ 
+-void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 *key)
++void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 key[POLY1305_KEY_SIZE])
+ {
+ 	poly1305_init_mips(&dctx->h, key);
+ 	dctx->s[0] = get_unaligned_le32(key + 16);
+diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
+index 646da46e8d10..1dfb8af48a3c 100644
+--- a/arch/x86/crypto/poly1305_glue.c
++++ b/arch/x86/crypto/poly1305_glue.c
+@@ -16,7 +16,7 @@
+ #include <asm/simd.h>
+ 
+ asmlinkage void poly1305_init_x86_64(void *ctx,
+-				     const u8 key[POLY1305_KEY_SIZE]);
++				     const u8 key[POLY1305_BLOCK_SIZE]);
+ asmlinkage void poly1305_blocks_x86_64(void *ctx, const u8 *inp,
+ 				       const size_t len, const u32 padbit);
+ asmlinkage void poly1305_emit_x86_64(void *ctx, u8 mac[POLY1305_DIGEST_SIZE],
+@@ -81,7 +81,7 @@ static void convert_to_base2_64(void *ctx)
+ 	state->is_base2_26 = 0;
+ }
+ 
+-static void poly1305_simd_init(void *ctx, const u8 key[POLY1305_KEY_SIZE])
++static void poly1305_simd_init(void *ctx, const u8 key[POLY1305_BLOCK_SIZE])
+ {
+ 	poly1305_init_x86_64(ctx, key);
+ }
+@@ -129,7 +129,7 @@ static void poly1305_simd_emit(void *ctx, u8 mac[POLY1305_DIGEST_SIZE],
+ 		poly1305_emit_avx(ctx, mac, nonce);
+ }
+ 
+-void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 *key)
++void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 key[POLY1305_KEY_SIZE])
+ {
+ 	poly1305_simd_init(&dctx->h, key);
+ 	dctx->s[0] = get_unaligned_le32(&key[16]);
+diff --git a/include/crypto/internal/poly1305.h b/include/crypto/internal/poly1305.h
+index 064e52ca5248..196aa769f296 100644
+--- a/include/crypto/internal/poly1305.h
++++ b/include/crypto/internal/poly1305.h
+@@ -18,7 +18,8 @@
+  * only the ε-almost-∆-universal hash function (not the full MAC) is computed.
+  */
+ 
+-void poly1305_core_setkey(struct poly1305_core_key *key, const u8 *raw_key);
++void poly1305_core_setkey(struct poly1305_core_key *key,
++			  const u8 raw_key[POLY1305_BLOCK_SIZE]);
+ static inline void poly1305_core_init(struct poly1305_state *state)
+ {
+ 	*state = (struct poly1305_state){};
+diff --git a/include/crypto/poly1305.h b/include/crypto/poly1305.h
+index f1f67fc749cf..090692ec3bc7 100644
+--- a/include/crypto/poly1305.h
++++ b/include/crypto/poly1305.h
+@@ -58,8 +58,10 @@ struct poly1305_desc_ctx {
+ 	};
+ };
+ 
+-void poly1305_init_arch(struct poly1305_desc_ctx *desc, const u8 *key);
+-void poly1305_init_generic(struct poly1305_desc_ctx *desc, const u8 *key);
++void poly1305_init_arch(struct poly1305_desc_ctx *desc,
++			const u8 key[POLY1305_KEY_SIZE]);
++void poly1305_init_generic(struct poly1305_desc_ctx *desc,
++			   const u8 key[POLY1305_KEY_SIZE]);
+ 
+ static inline void poly1305_init(struct poly1305_desc_ctx *desc, const u8 *key)
+ {
+diff --git a/lib/crypto/poly1305-donna32.c b/lib/crypto/poly1305-donna32.c
+index 3cc77d94390b..7fb71845cc84 100644
+--- a/lib/crypto/poly1305-donna32.c
++++ b/lib/crypto/poly1305-donna32.c
+@@ -10,7 +10,8 @@
+ #include <asm/unaligned.h>
+ #include <crypto/internal/poly1305.h>
+ 
+-void poly1305_core_setkey(struct poly1305_core_key *key, const u8 raw_key[16])
++void poly1305_core_setkey(struct poly1305_core_key *key,
++			  const u8 raw_key[POLY1305_BLOCK_SIZE])
+ {
+ 	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
+ 	key->key.r[0] = (get_unaligned_le32(&raw_key[0])) & 0x3ffffff;
+diff --git a/lib/crypto/poly1305-donna64.c b/lib/crypto/poly1305-donna64.c
+index 6ae181bb4345..d34cf4053668 100644
+--- a/lib/crypto/poly1305-donna64.c
++++ b/lib/crypto/poly1305-donna64.c
+@@ -12,7 +12,8 @@
+ 
+ typedef __uint128_t u128;
+ 
+-void poly1305_core_setkey(struct poly1305_core_key *key, const u8 raw_key[16])
++void poly1305_core_setkey(struct poly1305_core_key *key,
++			  const u8 raw_key[POLY1305_BLOCK_SIZE])
+ {
+ 	u64 t0, t1;
+ 
+diff --git a/lib/crypto/poly1305.c b/lib/crypto/poly1305.c
+index 9d2d14df0fee..26d87fc3823e 100644
+--- a/lib/crypto/poly1305.c
++++ b/lib/crypto/poly1305.c
+@@ -12,7 +12,8 @@
+ #include <linux/module.h>
+ #include <asm/unaligned.h>
+ 
+-void poly1305_init_generic(struct poly1305_desc_ctx *desc, const u8 *key)
++void poly1305_init_generic(struct poly1305_desc_ctx *desc,
++			   const u8 key[POLY1305_KEY_SIZE])
+ {
+ 	poly1305_core_setkey(&desc->core_r, key);
+ 	desc->s[0] = get_unaligned_le32(key + 16);
+-- 
+2.29.2
 
