@@ -2,300 +2,100 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F6D7C433DB
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 18:53:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D4E3C433DB
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 19:27:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0CCDA61998
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 18:53:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0F8D61984
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 19:27:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231660AbhCVSwb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Mar 2021 14:52:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36406 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231264AbhCVSwA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Mar 2021 14:52:00 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0504761998;
-        Mon, 22 Mar 2021 18:51:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616439120;
-        bh=2fS+/Livsn8MwVQQPP8+bbzUCI4zhar3EDmM0iAhvjg=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=oMY1f8u/nYkN7rwfWVWIPU3qOBj2iwk1B11OkIX+fu5y4FQyVsyuIw6Q1UyYZUiI+
-         x0RfQ6YXOS8C03ktJfHNq6iDFl3cvRsUdgaqe/EWlI91QQTyERXplXo9qeXqPy6XdV
-         tqFP7ukR5U39YhVmv7gRG4LJeqtqQVSYRsXzOUtpSRspheU7/ZnVWGOkT/gxZoKy9+
-         mbnElav8V4g1SEryS7MAN/I9V+r4HJn7apnUANOj+kpv8Ce+EMARlvFXRiOepBTFBS
-         J+iYlNxkWcEXweI1Awwauuok/laM9xZ9lwO6C4yGuSzPb5/uX004uhrhwWiVyJ+2VS
-         JruYM0RF0mUHw==
-Received: by mail-ot1-f48.google.com with SMTP id k14-20020a9d7dce0000b02901b866632f29so17011270otn.1;
-        Mon, 22 Mar 2021 11:51:59 -0700 (PDT)
-X-Gm-Message-State: AOAM531Kv0CGZjXVJMfzH6D8m1j7/jnPHH+PVXTla1cq3d311oNu4Xup
-        sIPgcnZNu4f9VeieZgaa65aQMyn2Beb/GMFa/SM=
-X-Google-Smtp-Source: ABdhPJxLN/vBjt2z77f4DHwfHWzR/2c4/ffbtlZ0Ogy2F1NFJ1rx4iLFRHoD7QGLJ0jOhdalSmkq+RMlp09MYFIqV4Q=
-X-Received: by 2002:a9d:57cb:: with SMTP id q11mr1065771oti.108.1616439119206;
- Mon, 22 Mar 2021 11:51:59 -0700 (PDT)
+        id S231965AbhCVT0w (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 Mar 2021 15:26:52 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29004 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231676AbhCVT0d (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Mar 2021 15:26:33 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12MJ3bjF061866;
+        Mon, 22 Mar 2021 15:26:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=ZXzOB4AtbWH6ok2w4tbefXFbVHdFar+z3GCtgxuZ1R4=;
+ b=tGgzK/ibORyg3Hbr6sj6NsfK3REKIDPR/W6JmfJOj4H/FCMO7W8HqMVdBGxZClQX/spz
+ 5YcZd3NQm34+AnB3GheG/fe/oJ7RjMKarabESwym/v5bKh1wWRUT875+a2ttRxa1TiU6
+ Rl8bmve3qCgoLguXagsIAHMmhJNYcRLiGsb6UNeWNXUBRHHzUjEvjKEEIk/oC8GqVmOh
+ Dh/NO6ztWW++3HGsFIUpKKhsehs/4tsbOohjEGqYDu2ydnX3msyfCk8UNwpcVt+u4ExM
+ w7uUw1xhgxaUCTmgWGoT+Lj7ZQD1TwbIS4khPYaclR0ss+5eAM+f6jkrY2R44qwM2yeS mg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37dxc9t8nv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 22 Mar 2021 15:26:18 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12MJ3vSd062996;
+        Mon, 22 Mar 2021 15:26:17 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37dxc9t8nb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 22 Mar 2021 15:26:17 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12MJNRlo019308;
+        Mon, 22 Mar 2021 19:26:16 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 37df68a85p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 22 Mar 2021 19:26:15 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12MJQDw049021402
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 22 Mar 2021 19:26:13 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 076FB42041;
+        Mon, 22 Mar 2021 19:26:13 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 90F4942042;
+        Mon, 22 Mar 2021 19:26:12 +0000 (GMT)
+Received: from osiris (unknown [9.171.41.112])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 22 Mar 2021 19:26:12 +0000 (GMT)
+Date:   Mon, 22 Mar 2021 20:26:11 +0100
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        gor@linux.ibm.com, borntraeger@de.ibm.com,
+        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rdunlap@infradead.org
+Subject: Re: [PATCH] s390/crc32-vx: Couple of typo fixes
+Message-ID: <YFjvU0ocfwa9WLA7@osiris>
+References: <20210322130533.3805976-1-unixbhaskar@gmail.com>
 MIME-Version: 1.0
-References: <20210322170542.1791154-1-arnd@kernel.org>
-In-Reply-To: <20210322170542.1791154-1-arnd@kernel.org>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Mon, 22 Mar 2021 19:51:47 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGj+autwGM-Me7qNoORsux9Xz_1-P=7w4m-9vGMXwDq4Q@mail.gmail.com>
-Message-ID: <CAMj1kXGj+autwGM-Me7qNoORsux9Xz_1-P=7w4m-9vGMXwDq4Q@mail.gmail.com>
-Subject: Re: [PATCH] crypto: poly1305: fix poly1305_core_setkey() declaration
-To:     Arnd Bergmann <arnd@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210322130533.3805976-1-unixbhaskar@gmail.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-22_11:2021-03-22,2021-03-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=816
+ lowpriorityscore=0 phishscore=0 spamscore=0 priorityscore=1501
+ impostorscore=0 suspectscore=0 mlxscore=0 bulkscore=0 malwarescore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103220138
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 22 Mar 2021 at 18:05, Arnd Bergmann <arnd@kernel.org> wrote:
->
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> gcc-11 points out a mismatch between the declaration and the definition
-> of poly1305_core_setkey():
->
-> lib/crypto/poly1305-donna32.c:13:67: error: argument 2 of type =E2=80=98c=
-onst u8[16]=E2=80=99 {aka =E2=80=98const unsigned char[16]=E2=80=99} with m=
-ismatched bound [-Werror=3Darray-parameter=3D]
->    13 | void poly1305_core_setkey(struct poly1305_core_key *key, const u8=
- raw_key[16])
->       |                                                          ~~~~~~~~=
-~^~~~~~~~~~~
-> In file included from lib/crypto/poly1305-donna32.c:11:
-> include/crypto/internal/poly1305.h:21:68: note: previously declared as =
-=E2=80=98const u8 *=E2=80=99 {aka =E2=80=98const unsigned char *=E2=80=99}
->    21 | void poly1305_core_setkey(struct poly1305_core_key *key, const u8=
- *raw_key);
->
-> This is harmless in principle, as the calling conventions are the same,
-> but the more specific prototype allows better type checking in the
-> caller.
->
-> Change the declaration to match the actual function definition.
-> The poly1305_simd_init() is a bit suspicious here, as it previously
-> had a 32-byte argument type, but looks like it needs to take the
-> 16-byte POLY1305_BLOCK_SIZE array instead.
->
-
-This looks ok to me. For historical reasons, the Poly1305 integration
-is based on an unkeyed shash, and both the Poly1305 key and nonce are
-passed as ordinary input, prepended to the actual data.
-poly1305_simd_init() takes only the key but not the nonce, so it
-should only be passed 16 bytes.
-
-> Fixes: 1c08a104360f ("crypto: poly1305 - add new 32 and 64-bit generic ve=
-rsions")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-
+On Mon, Mar 22, 2021 at 06:35:33PM +0530, Bhaskar Chowdhury wrote:
+> 
+> s/defintions/definitions/
+> s/intermedate/intermediate/
+> 
+> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
 > ---
->  arch/arm/crypto/poly1305-glue.c    | 2 +-
->  arch/arm64/crypto/poly1305-glue.c  | 2 +-
->  arch/mips/crypto/poly1305-glue.c   | 2 +-
->  arch/x86/crypto/poly1305_glue.c    | 6 +++---
->  include/crypto/internal/poly1305.h | 3 ++-
->  include/crypto/poly1305.h          | 6 ++++--
->  lib/crypto/poly1305-donna32.c      | 3 ++-
->  lib/crypto/poly1305-donna64.c      | 3 ++-
->  lib/crypto/poly1305.c              | 3 ++-
->  9 files changed, 18 insertions(+), 12 deletions(-)
->
-> diff --git a/arch/arm/crypto/poly1305-glue.c b/arch/arm/crypto/poly1305-g=
-lue.c
-> index 3023c1acfa19..c31bd8f7c092 100644
-> --- a/arch/arm/crypto/poly1305-glue.c
-> +++ b/arch/arm/crypto/poly1305-glue.c
-> @@ -29,7 +29,7 @@ void __weak poly1305_blocks_neon(void *state, const u8 =
-*src, u32 len, u32 hibit)
->
->  static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
->
-> -void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 *key)
-> +void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 key[POL=
-Y1305_KEY_SIZE])
->  {
->         poly1305_init_arm(&dctx->h, key);
->         dctx->s[0] =3D get_unaligned_le32(key + 16);
-> diff --git a/arch/arm64/crypto/poly1305-glue.c b/arch/arm64/crypto/poly13=
-05-glue.c
-> index 683de671741a..9c3d86e397bf 100644
-> --- a/arch/arm64/crypto/poly1305-glue.c
-> +++ b/arch/arm64/crypto/poly1305-glue.c
-> @@ -25,7 +25,7 @@ asmlinkage void poly1305_emit(void *state, u8 *digest, =
-const u32 *nonce);
->
->  static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
->
-> -void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 *key)
-> +void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 key[POL=
-Y1305_KEY_SIZE])
->  {
->         poly1305_init_arm64(&dctx->h, key);
->         dctx->s[0] =3D get_unaligned_le32(key + 16);
-> diff --git a/arch/mips/crypto/poly1305-glue.c b/arch/mips/crypto/poly1305=
--glue.c
-> index fc881b46d911..bc6110fb98e0 100644
-> --- a/arch/mips/crypto/poly1305-glue.c
-> +++ b/arch/mips/crypto/poly1305-glue.c
-> @@ -17,7 +17,7 @@ asmlinkage void poly1305_init_mips(void *state, const u=
-8 *key);
->  asmlinkage void poly1305_blocks_mips(void *state, const u8 *src, u32 len=
-, u32 hibit);
->  asmlinkage void poly1305_emit_mips(void *state, u8 *digest, const u32 *n=
-once);
->
-> -void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 *key)
-> +void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 key[POL=
-Y1305_KEY_SIZE])
->  {
->         poly1305_init_mips(&dctx->h, key);
->         dctx->s[0] =3D get_unaligned_le32(key + 16);
-> diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_g=
-lue.c
-> index 646da46e8d10..1dfb8af48a3c 100644
-> --- a/arch/x86/crypto/poly1305_glue.c
-> +++ b/arch/x86/crypto/poly1305_glue.c
-> @@ -16,7 +16,7 @@
->  #include <asm/simd.h>
->
->  asmlinkage void poly1305_init_x86_64(void *ctx,
-> -                                    const u8 key[POLY1305_KEY_SIZE]);
-> +                                    const u8 key[POLY1305_BLOCK_SIZE]);
->  asmlinkage void poly1305_blocks_x86_64(void *ctx, const u8 *inp,
->                                        const size_t len, const u32 padbit=
-);
->  asmlinkage void poly1305_emit_x86_64(void *ctx, u8 mac[POLY1305_DIGEST_S=
-IZE],
-> @@ -81,7 +81,7 @@ static void convert_to_base2_64(void *ctx)
->         state->is_base2_26 =3D 0;
->  }
->
-> -static void poly1305_simd_init(void *ctx, const u8 key[POLY1305_KEY_SIZE=
-])
-> +static void poly1305_simd_init(void *ctx, const u8 key[POLY1305_BLOCK_SI=
-ZE])
->  {
->         poly1305_init_x86_64(ctx, key);
->  }
-> @@ -129,7 +129,7 @@ static void poly1305_simd_emit(void *ctx, u8 mac[POLY=
-1305_DIGEST_SIZE],
->                 poly1305_emit_avx(ctx, mac, nonce);
->  }
->
-> -void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 *key)
-> +void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 key[POL=
-Y1305_KEY_SIZE])
->  {
->         poly1305_simd_init(&dctx->h, key);
->         dctx->s[0] =3D get_unaligned_le32(&key[16]);
-> diff --git a/include/crypto/internal/poly1305.h b/include/crypto/internal=
-/poly1305.h
-> index 064e52ca5248..196aa769f296 100644
-> --- a/include/crypto/internal/poly1305.h
-> +++ b/include/crypto/internal/poly1305.h
-> @@ -18,7 +18,8 @@
->   * only the =CE=B5-almost-=E2=88=86-universal hash function (not the ful=
-l MAC) is computed.
->   */
->
-> -void poly1305_core_setkey(struct poly1305_core_key *key, const u8 *raw_k=
-ey);
-> +void poly1305_core_setkey(struct poly1305_core_key *key,
-> +                         const u8 raw_key[POLY1305_BLOCK_SIZE]);
->  static inline void poly1305_core_init(struct poly1305_state *state)
->  {
->         *state =3D (struct poly1305_state){};
-> diff --git a/include/crypto/poly1305.h b/include/crypto/poly1305.h
-> index f1f67fc749cf..090692ec3bc7 100644
-> --- a/include/crypto/poly1305.h
-> +++ b/include/crypto/poly1305.h
-> @@ -58,8 +58,10 @@ struct poly1305_desc_ctx {
->         };
->  };
->
-> -void poly1305_init_arch(struct poly1305_desc_ctx *desc, const u8 *key);
-> -void poly1305_init_generic(struct poly1305_desc_ctx *desc, const u8 *key=
-);
-> +void poly1305_init_arch(struct poly1305_desc_ctx *desc,
-> +                       const u8 key[POLY1305_KEY_SIZE]);
-> +void poly1305_init_generic(struct poly1305_desc_ctx *desc,
-> +                          const u8 key[POLY1305_KEY_SIZE]);
->
->  static inline void poly1305_init(struct poly1305_desc_ctx *desc, const u=
-8 *key)
->  {
-> diff --git a/lib/crypto/poly1305-donna32.c b/lib/crypto/poly1305-donna32.=
-c
-> index 3cc77d94390b..7fb71845cc84 100644
-> --- a/lib/crypto/poly1305-donna32.c
-> +++ b/lib/crypto/poly1305-donna32.c
-> @@ -10,7 +10,8 @@
->  #include <asm/unaligned.h>
->  #include <crypto/internal/poly1305.h>
->
-> -void poly1305_core_setkey(struct poly1305_core_key *key, const u8 raw_ke=
-y[16])
-> +void poly1305_core_setkey(struct poly1305_core_key *key,
-> +                         const u8 raw_key[POLY1305_BLOCK_SIZE])
->  {
->         /* r &=3D 0xffffffc0ffffffc0ffffffc0fffffff */
->         key->key.r[0] =3D (get_unaligned_le32(&raw_key[0])) & 0x3ffffff;
-> diff --git a/lib/crypto/poly1305-donna64.c b/lib/crypto/poly1305-donna64.=
-c
-> index 6ae181bb4345..d34cf4053668 100644
-> --- a/lib/crypto/poly1305-donna64.c
-> +++ b/lib/crypto/poly1305-donna64.c
-> @@ -12,7 +12,8 @@
->
->  typedef __uint128_t u128;
->
-> -void poly1305_core_setkey(struct poly1305_core_key *key, const u8 raw_ke=
-y[16])
-> +void poly1305_core_setkey(struct poly1305_core_key *key,
-> +                         const u8 raw_key[POLY1305_BLOCK_SIZE])
->  {
->         u64 t0, t1;
->
-> diff --git a/lib/crypto/poly1305.c b/lib/crypto/poly1305.c
-> index 9d2d14df0fee..26d87fc3823e 100644
-> --- a/lib/crypto/poly1305.c
-> +++ b/lib/crypto/poly1305.c
-> @@ -12,7 +12,8 @@
->  #include <linux/module.h>
->  #include <asm/unaligned.h>
->
-> -void poly1305_init_generic(struct poly1305_desc_ctx *desc, const u8 *key=
-)
-> +void poly1305_init_generic(struct poly1305_desc_ctx *desc,
-> +                          const u8 key[POLY1305_KEY_SIZE])
->  {
->         poly1305_core_setkey(&desc->core_r, key);
->         desc->s[0] =3D get_unaligned_le32(key + 16);
-> --
-> 2.29.2
->
+>  arch/s390/crypto/crc32be-vx.S | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+
+Applied, thanks.
