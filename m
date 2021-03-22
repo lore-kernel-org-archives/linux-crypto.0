@@ -4,41 +4,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0B4C433C1
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 05:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00840C433E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 05:14:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE52161930
+	by mail.kernel.org (Postfix) with ESMTP id C5D3961937
 	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 05:14:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229455AbhCVFON (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Mar 2021 01:14:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43880 "EHLO mail.kernel.org"
+        id S229548AbhCVFOE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 Mar 2021 01:14:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43856 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229547AbhCVFOD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Mar 2021 01:14:03 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 228EE61966;
-        Mon, 22 Mar 2021 05:14:03 +0000 (UTC)
+        id S229455AbhCVFN4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Mar 2021 01:13:56 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id EAA5561930;
+        Mon, 22 Mar 2021 05:13:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616390043;
-        bh=kvzUarcK5ql0ZCwi4iYGL+4ZF5ovTepKQPphb29B/zw=;
+        s=k20201202; t=1616390036;
+        bh=swuzV5EcaNZWS3RrTQ3X/7Hc8ZdWHJlVaGVOm4GrSVg=;
         h=From:To:Cc:Subject:Date:From;
-        b=Ouusz8aa/JfyyLv5IsUnBfS4leVXVO8pUKNA2XGUsG0hxH1bIpG0u6EQENnrwjp0U
-         FdI03Dy1VGZ6jIECYoTMZR4VHAGnS4kE9zC1DlQHRKsVqc26qQr/GbR5eDJ4JnXdo/
-         wPHW8UUwB5QlIK7woIo2vOv4CNv0ewe0xy1VMRtB3wEo1DV78g5X/Ga9MbzgL9poyT
-         GTDxRm3K8uhI71GNxaqjWX2GZwQVyNSA5hg1F1ajUahyvF8mJ3B276AHGcngOndH7J
-         y+WfWeefFdXQ8R1e9lYAhIKm1PvYmEsUA0IkF7wDjesaEnYQiNz8QWSxf534AArqEv
-         WYXSngtXh1RxA==
+        b=BqLzlYPtWWJqI9Vh+X/fgywOFGwaoqqxGWUiA+ziLU5+fkuf+EK5ZEkHHQM+zZrn0
+         OFaCj5Pabg5gX6yDwuB7iwu+4vBKzinAHeznBt/S2Kps9B/DVH2Wvw3BV6+sfxtQCx
+         3/lQQzsED+KSFuViY1Nt/xICJUMtFME9TyzJ6brd2l6Kjy8nNi22Bv0lZlCem+6Si1
+         X6Si0jjR3TTSaDewjuy9rcM0/ZEAXsn0mJx6BxJsoYIjFa9/Z3EZXTzLP9KoHKmYDH
+         kVwywfTLCMiHqNvM2xijxxTf0fuXjlJrW4dOWavmqju9noTXAIQNGkX/6feqk1Q3xm
+         puT14p6BuVahQ==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Theodore Ts'o <tytso@mit.edu>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Andy Lutomirski <luto@kernel.org>,
-        Jann Horn <jannh@google.com>, Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH RESEND] random: remove dead code left over from blocking pool
-Date:   Sun, 21 Mar 2021 22:14:00 -0700
-Message-Id: <20210322051400.266903-1-ebiggers@kernel.org>
+        Jann Horn <jannh@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH RESEND] random: initialize ChaCha20 constants with correct endianness
+Date:   Sun, 21 Mar 2021 22:13:47 -0700
+Message-Id: <20210322051347.266831-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.31.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -48,185 +50,71 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Remove some dead code that was left over following commit 90ea1c6436d2
-("random: remove the blocking pool").
+On big endian CPUs, the ChaCha20-based CRNG is using the wrong
+endianness for the ChaCha20 constants.
+
+This doesn't matter cryptographically, but technically it means it's not
+ChaCha20 anymore.  Fix it to always use the standard constants.
 
 Cc: linux-crypto@vger.kernel.org
 Cc: Andy Lutomirski <luto@kernel.org>
 Cc: Jann Horn <jannh@google.com>
 Cc: Theodore Ts'o <tytso@mit.edu>
-Reviewed-by: Andy Lutomirski <luto@kernel.org>
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 Acked-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/char/random.c         | 17 ++-----
- include/trace/events/random.h | 83 -----------------------------------
- 2 files changed, 3 insertions(+), 97 deletions(-)
+ drivers/char/random.c   | 4 ++--
+ include/crypto/chacha.h | 9 +++++++--
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 5d6acfecd919b..605969ed0f965 100644
+index 0fe9e200e4c84..5d6acfecd919b 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -500,7 +500,6 @@ struct entropy_store {
- 	unsigned short add_ptr;
- 	unsigned short input_rotate;
- 	int entropy_count;
--	unsigned int initialized:1;
- 	unsigned int last_data_init:1;
- 	__u8 last_data[EXTRACT_SIZE];
- };
-@@ -660,7 +659,7 @@ static void process_random_ready_list(void)
-  */
- static void credit_entropy_bits(struct entropy_store *r, int nbits)
+@@ -819,7 +819,7 @@ static bool __init crng_init_try_arch_early(struct crng_state *crng)
+ 
+ static void __maybe_unused crng_initialize_secondary(struct crng_state *crng)
  {
--	int entropy_count, orig, has_initialized = 0;
-+	int entropy_count, orig;
- 	const int pool_size = r->poolinfo->poolfracbits;
- 	int nfrac = nbits << ENTROPY_SHIFT;
+-	memcpy(&crng->state[0], "expand 32-byte k", 16);
++	chacha_init_consts(crng->state);
+ 	_get_random_bytes(&crng->state[4], sizeof(__u32) * 12);
+ 	crng_init_try_arch(crng);
+ 	crng->init_time = jiffies - CRNG_RESEED_INTERVAL - 1;
+@@ -827,7 +827,7 @@ static void __maybe_unused crng_initialize_secondary(struct crng_state *crng)
  
-@@ -717,23 +716,14 @@ static void credit_entropy_bits(struct entropy_store *r, int nbits)
- 	if (cmpxchg(&r->entropy_count, orig, entropy_count) != orig)
- 		goto retry;
- 
--	if (has_initialized) {
--		r->initialized = 1;
--		kill_fasync(&fasync, SIGIO, POLL_IN);
--	}
--
- 	trace_credit_entropy_bits(r->name, nbits,
- 				  entropy_count >> ENTROPY_SHIFT, _RET_IP_);
- 
- 	if (r == &input_pool) {
- 		int entropy_bits = entropy_count >> ENTROPY_SHIFT;
- 
--		if (crng_init < 2) {
--			if (entropy_bits < 128)
--				return;
-+		if (crng_init < 2 && entropy_bits >= 128)
- 			crng_reseed(&primary_crng, r);
--			entropy_bits = ENTROPY_BITS(r);
--		}
- 	}
+ static void __init crng_initialize_primary(struct crng_state *crng)
+ {
+-	memcpy(&crng->state[0], "expand 32-byte k", 16);
++	chacha_init_consts(crng->state);
+ 	_extract_entropy(&input_pool, &crng->state[4], sizeof(__u32) * 12, 0);
+ 	if (crng_init_try_arch_early(crng) && trust_cpu) {
+ 		invalidate_batched_entropy();
+diff --git a/include/crypto/chacha.h b/include/crypto/chacha.h
+index 3a1c72fdb7cf5..dabaee6987186 100644
+--- a/include/crypto/chacha.h
++++ b/include/crypto/chacha.h
+@@ -47,13 +47,18 @@ static inline void hchacha_block(const u32 *state, u32 *out, int nrounds)
+ 		hchacha_block_generic(state, out, nrounds);
  }
  
-@@ -1372,8 +1362,7 @@ static size_t account(struct entropy_store *r, size_t nbytes, int min,
- }
- 
- /*
-- * This function does the actual extraction for extract_entropy and
-- * extract_entropy_user.
-+ * This function does the actual extraction for extract_entropy.
-  *
-  * Note: we assume that .poolwords is a multiple of 16 words.
-  */
-diff --git a/include/trace/events/random.h b/include/trace/events/random.h
-index 9570a10cb949b..3d7b432ca5f31 100644
---- a/include/trace/events/random.h
-+++ b/include/trace/events/random.h
-@@ -85,28 +85,6 @@ TRACE_EVENT(credit_entropy_bits,
- 		  __entry->entropy_count, (void *)__entry->IP)
- );
- 
--TRACE_EVENT(push_to_pool,
--	TP_PROTO(const char *pool_name, int pool_bits, int input_bits),
--
--	TP_ARGS(pool_name, pool_bits, input_bits),
--
--	TP_STRUCT__entry(
--		__field( const char *,	pool_name		)
--		__field(	  int,	pool_bits		)
--		__field(	  int,	input_bits		)
--	),
--
--	TP_fast_assign(
--		__entry->pool_name	= pool_name;
--		__entry->pool_bits	= pool_bits;
--		__entry->input_bits	= input_bits;
--	),
--
--	TP_printk("%s: pool_bits %d input_pool_bits %d",
--		  __entry->pool_name, __entry->pool_bits,
--		  __entry->input_bits)
--);
--
- TRACE_EVENT(debit_entropy,
- 	TP_PROTO(const char *pool_name, int debit_bits),
- 
-@@ -161,35 +139,6 @@ TRACE_EVENT(add_disk_randomness,
- 		  MINOR(__entry->dev), __entry->input_bits)
- );
- 
--TRACE_EVENT(xfer_secondary_pool,
--	TP_PROTO(const char *pool_name, int xfer_bits, int request_bits,
--		 int pool_entropy, int input_entropy),
--
--	TP_ARGS(pool_name, xfer_bits, request_bits, pool_entropy,
--		input_entropy),
--
--	TP_STRUCT__entry(
--		__field( const char *,	pool_name		)
--		__field(	  int,	xfer_bits		)
--		__field(	  int,	request_bits		)
--		__field(	  int,	pool_entropy		)
--		__field(	  int,	input_entropy		)
--	),
--
--	TP_fast_assign(
--		__entry->pool_name	= pool_name;
--		__entry->xfer_bits	= xfer_bits;
--		__entry->request_bits	= request_bits;
--		__entry->pool_entropy	= pool_entropy;
--		__entry->input_entropy	= input_entropy;
--	),
--
--	TP_printk("pool %s xfer_bits %d request_bits %d pool_entropy %d "
--		  "input_entropy %d", __entry->pool_name, __entry->xfer_bits,
--		  __entry->request_bits, __entry->pool_entropy,
--		  __entry->input_entropy)
--);
--
- DECLARE_EVENT_CLASS(random__get_random_bytes,
- 	TP_PROTO(int nbytes, unsigned long IP),
- 
-@@ -253,38 +202,6 @@ DEFINE_EVENT(random__extract_entropy, extract_entropy,
- 	TP_ARGS(pool_name, nbytes, entropy_count, IP)
- );
- 
--DEFINE_EVENT(random__extract_entropy, extract_entropy_user,
--	TP_PROTO(const char *pool_name, int nbytes, int entropy_count,
--		 unsigned long IP),
--
--	TP_ARGS(pool_name, nbytes, entropy_count, IP)
--);
--
--TRACE_EVENT(random_read,
--	TP_PROTO(int got_bits, int need_bits, int pool_left, int input_left),
--
--	TP_ARGS(got_bits, need_bits, pool_left, input_left),
--
--	TP_STRUCT__entry(
--		__field(	  int,	got_bits		)
--		__field(	  int,	need_bits		)
--		__field(	  int,	pool_left		)
--		__field(	  int,	input_left		)
--	),
--
--	TP_fast_assign(
--		__entry->got_bits	= got_bits;
--		__entry->need_bits	= need_bits;
--		__entry->pool_left	= pool_left;
--		__entry->input_left	= input_left;
--	),
--
--	TP_printk("got_bits %d still_needed_bits %d "
--		  "blocking_pool_entropy_left %d input_entropy_left %d",
--		  __entry->got_bits, __entry->got_bits, __entry->pool_left,
--		  __entry->input_left)
--);
--
- TRACE_EVENT(urandom_read,
- 	TP_PROTO(int got_bits, int pool_left, int input_left),
- 
+-void chacha_init_arch(u32 *state, const u32 *key, const u8 *iv);
+-static inline void chacha_init_generic(u32 *state, const u32 *key, const u8 *iv)
++static inline void chacha_init_consts(u32 *state)
+ {
+ 	state[0]  = 0x61707865; /* "expa" */
+ 	state[1]  = 0x3320646e; /* "nd 3" */
+ 	state[2]  = 0x79622d32; /* "2-by" */
+ 	state[3]  = 0x6b206574; /* "te k" */
++}
++
++void chacha_init_arch(u32 *state, const u32 *key, const u8 *iv);
++static inline void chacha_init_generic(u32 *state, const u32 *key, const u8 *iv)
++{
++	chacha_init_consts(state);
+ 	state[4]  = key[0];
+ 	state[5]  = key[1];
+ 	state[6]  = key[2];
 -- 
 2.31.0
 
