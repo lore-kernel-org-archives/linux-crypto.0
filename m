@@ -2,114 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB90CC433C1
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 12:14:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07AE7C433E8
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 13:09:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9745E6196F
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 12:14:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E499A6192D
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 13:09:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229987AbhCVMNt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Mar 2021 08:13:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48022 "EHLO
+        id S231806AbhCVNJO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 Mar 2021 09:09:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230273AbhCVMNa (ORCPT
+        with ESMTP id S232845AbhCVNFr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Mar 2021 08:13:30 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1158CC061574
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Mar 2021 05:13:30 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id k8so16429926wrc.3
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Mar 2021 05:13:29 -0700 (PDT)
+        Mon, 22 Mar 2021 09:05:47 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E0B2C061756;
+        Mon, 22 Mar 2021 06:05:47 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id y5so8820286qkl.9;
+        Mon, 22 Mar 2021 06:05:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=2HcrXIExH/hOwxD80m/t9IkqnA/KCu9VJTjas/G/8LI=;
-        b=xA1rFWCsfcNlAqosV+4FnNOHlYiOvFTp4IjEjp3AlNGTEXQluKB2CD4VW06ynDsX+S
-         VxLYlMx16Am1JSWNAhNA2MPR4YoBYAPdiiPVTUAHhTV829kf+892HQgybyrPwYJXTu9O
-         DdV0tsrr9Tux+F+P5kOCRbdfb73DRuQPWrHAERP9IcEYvb8gADHPIxyhiV83x86BGLr9
-         wn6rAfAPk7TQ0QkAsKWr+glk0kfFJpBRfg4t7+nvP+jJWW6gOJSIADIN6GINHcVg0U3j
-         EI6+FaxyiAZjn+2lwZXK3LIREN0XC6j+8iiEJpdI7oCoPPGyZ1C51FJJxabUAfJvuG/x
-         QIlA==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=801QFsuMh5/bXT7iDGLM8P3LIQI2jpvEZ62QIecOMdw=;
+        b=g7aI/jvx2znrl1EyXPcFMm56+a5ShivFYZZ9ennJJNFYkMLttLz8Vj7hCqf7nA8MIf
+         NcOoj3cd0rR8rYJYFNH2wrHub0iLAhwMp16IPriKiNqC1ohnCWyQJzC6btBsnbM0JPej
+         p4o4sMERKZVv0dJbh6m2Qk1p0OP+OmbDq/VDd6UKcsdCwhn76ypRmjNmrtFgnUlJ9vxK
+         //DULu3p9tfRRIswQxfQG9bTpGs2N4qi+yGzLYtNGrfpt/m8b2FaEqev5Q8/XwlhW4R6
+         ikoygTYVztwcUI3QDjbiT7BDZBVI5V6p2Tyz89jvbBBPSpnw4KxN7/1uU6/sm/an/F0k
+         cYWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=2HcrXIExH/hOwxD80m/t9IkqnA/KCu9VJTjas/G/8LI=;
-        b=gU0Wn3giYgtZufSrMTrtNybykHdpKuJhVmfmsjc/YcJcqkc3BfMq9mnrhDGhu+CB/O
-         /0BZ0nb3p6R6PiuEnD4p4h1P5SZCiH/FYxj0Lqd8bpD+3Y2buncuLnVNrOnujyesNni7
-         N1VMp/9eNyro5JNzAoFrufHUwrt8KYWpfEm66LHRDSLcDR6GzTkWa+pNfpt56WXJeb2p
-         +qQ8+9MiuikjSfQNqFqYF4G4Q5Oy7bpH0huqj7k7g3g4F4KXijEw46LMubTm9GpiPj2d
-         n0ggK6Rms0+sWEQXql4Elm79gzaZ6W2osZwTHlHs1VnwjCGdy1j5O9qJT1oJJQ6sxT/0
-         w+vA==
-X-Gm-Message-State: AOAM5317m7pF1n3KXWowLuAdZi2K/KUXEOApCTjCHlWxw47MbHhkqtBJ
-        fOJ/o3jOM5dSHOY0U3R4atj/1c5aAUPEDg==
-X-Google-Smtp-Source: ABdhPJw1pu78Z9PTOGydU1yvQBgmFxs9om6BIzyzIOVfwYuim161rGZPabgMxoMNXrADm9K0qjneeg==
-X-Received: by 2002:adf:d4ca:: with SMTP id w10mr18650232wrk.146.1616415208835;
-        Mon, 22 Mar 2021 05:13:28 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id p14sm16659640wmc.30.2021.03.22.05.13.27
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=801QFsuMh5/bXT7iDGLM8P3LIQI2jpvEZ62QIecOMdw=;
+        b=HB2OPEx2NkJ/w61fZdCDmyTIe5IaV0iJeKk0lvZf4N8/TWQQzi0wubyup0fgXB/TdH
+         IxgQ3PAUg7mzwzaMZX2kQ98t8A+LSYcGrIHbRzmZVB7wh0NfPvECqo0h0+jNkgfX1dKg
+         MOSROBcCQTX5mz7QvThgq4NDeC5eBYQnMVg8cVJ/K1Fwns8ByDVw5mujzIdo5G8w2085
+         +f89pyqgd/PNjtFivxjWXoPPeZZS5CaO7ycWE0ILHamOXyQcCwcA4wHAXmKEu9ZqPVnE
+         3TpEVVtwNG8Z9zmqNtluqx1vuRs/3qKVl8kXvr8/MV1zAV8B1PZ2HxOwDHeO1TftavfO
+         RT0Q==
+X-Gm-Message-State: AOAM531FKLPaPH93nNtFWjcJvVrSVzuhMKlD+bNUNfEc143pGnz4APUA
+        gJeKK7jGOx7WRyppuj2jqj4=
+X-Google-Smtp-Source: ABdhPJyEEhJj8SFIQBJSsr3d4eJcQbj9s3I/grK8x+/NEg7D0hoRx+x1KVAgNoIEtF5eSZAqa3Yv3g==
+X-Received: by 2002:a05:620a:553:: with SMTP id o19mr2511279qko.491.1616418346402;
+        Mon, 22 Mar 2021 06:05:46 -0700 (PDT)
+Received: from localhost.localdomain ([143.244.44.200])
+        by smtp.gmail.com with ESMTPSA id r125sm10703324qkf.132.2021.03.22.06.05.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Mar 2021 05:13:28 -0700 (PDT)
-Date:   Mon, 22 Mar 2021 13:13:26 +0100
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
-        Neil Horman <nhorman@tuxdriver.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: rng - fix crypto_rng_reset() refcounting when
- !CRYPTO_STATS
-Message-ID: <YFiJ5hnKfXzlAtQi@Red>
-References: <20210322050748.265604-1-ebiggers@kernel.org>
- <20210322054522.GC1667@kadam>
- <YFgyaeeY6k6Pltw7@sol.localdomain>
- <20210322073300.GF1667@kadam>
+        Mon, 22 Mar 2021 06:05:45 -0700 (PDT)
+From:   Bhaskar Chowdhury <unixbhaskar@gmail.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        hca@linux.ibm.com, gor@linux.ibm.com, borntraeger@de.ibm.com,
+        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     rdunlap@infradead.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Subject: [PATCH] s390/crc32-vx: Couple of typo fixes
+Date:   Mon, 22 Mar 2021 18:35:33 +0530
+Message-Id: <20210322130533.3805976-1-unixbhaskar@gmail.com>
+X-Mailer: git-send-email 2.31.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210322073300.GF1667@kadam>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Mon, Mar 22, 2021 at 10:33:01AM +0300, Dan Carpenter a écrit :
-> On Sun, Mar 21, 2021 at 11:00:09PM -0700, Eric Biggers wrote:
-> > On Mon, Mar 22, 2021 at 08:45:22AM +0300, Dan Carpenter wrote:
-> > > On Sun, Mar 21, 2021 at 10:07:48PM -0700, Eric Biggers wrote:
-> > > > From: Eric Biggers <ebiggers@google.com>
-> > > > 
-> > > > crypto_stats_get() is a no-op when the kernel is compiled without
-> > > > CONFIG_CRYPTO_STATS, so pairing it with crypto_alg_put() unconditionally
-> > > > (as crypto_rng_reset() does) is wrong.
-> > > > 
-> > > 
-> > > Presumably the intention was that _get() and _put() should always pair.
-> > > It's really ugly and horrible that they don't. We could have
-> > > predicted bug like this would happen and will continue to happen until
-> > > the crypto_stats_get() is renamed.
-> > > 
-> > 
-> > Well, the crypto stats stuff has always been pretty broken, so I don't think
-> > people have looked at it too closely.  Currently crypto_stats_get() pairs with
-> > one of the functions that tallies the statistics, such as
-> > crypto_stats_rng_seed() or crypto_stats_aead_encrypt().  What change are you
-> > suggesting, exactly?  Maybe moving the conditional crypto_alg_put() into a new
-> > function crypto_stats_put() and moving it into the callers?  Or do you think the
-> > functions should just be renamed to something like crypto_stats_begin() and
-> > crypto_stats_end_{rng_seed,aead_encrypt}()?
-> 
-> To be honest, I misread the crypto_alg_put() thinking that it was
-> crypto_*stats*_put().  My favourite fix would be to introduce a
-> crypto_stats_put() which is a mirror of crypto_stats_get() and ifdeffed
-> out if we don't have CONFIG_CRYPTO_STATS.
-> 
 
-I agree it will be better.
-I can work on adding crypto_stats_put() if you want.
+s/defintions/definitions/
+s/intermedate/intermediate/
 
-Regards
+Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+---
+ arch/s390/crypto/crc32be-vx.S | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/s390/crypto/crc32be-vx.S b/arch/s390/crypto/crc32be-vx.S
+index 0099044e2c86..6b3d1009c392 100644
+--- a/arch/s390/crypto/crc32be-vx.S
++++ b/arch/s390/crypto/crc32be-vx.S
+@@ -32,7 +32,7 @@
+  * process particular chunks of the input data stream in parallel.
+  *
+  * For the CRC-32 variants, the constants are precomputed according to
+- * these defintions:
++ * these definitions:
+  *
+  *	R1 = x4*128+64 mod P(x)
+  *	R2 = x4*128    mod P(x)
+@@ -189,7 +189,7 @@ ENTRY(crc32_be_vgfm_16)
+ 	 * Note: To compensate the division by x^32, use the vector unpack
+ 	 * instruction to move the leftmost word into the leftmost doubleword
+ 	 * of the vector register.  The rightmost doubleword is multiplied
+-	 * with zero to not contribute to the intermedate results.
++	 * with zero to not contribute to the intermediate results.
+ 	 */
+
+ 	/* T1(x) = floor( R(x) / x^32 ) GF2MUL u */
+--
+2.31.0
+
