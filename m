@@ -2,77 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EABBC433C1
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 06:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10650C433C1
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 07:34:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BAE576196C
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 06:52:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1CC56192B
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 07:34:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229692AbhCVGvt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Mar 2021 02:51:49 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:14052 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230018AbhCVGvT (ORCPT
+        id S229574AbhCVHeQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 Mar 2021 03:34:16 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:33054 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229665AbhCVHdw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Mar 2021 02:51:19 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4F3lTD1FT1zNpsw
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Mar 2021 14:48:48 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 22 Mar 2021 14:51:15 +0800
-From:   Tian Tao <tiantao6@hisilicon.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>
-Subject: [PATCH] hwrng: omap - Use of_device_get_match_data() helper
-Date:   Mon, 22 Mar 2021 14:51:51 +0800
-Message-ID: <1616395911-36618-1-git-send-email-tiantao6@hisilicon.com>
-X-Mailer: git-send-email 2.7.4
+        Mon, 22 Mar 2021 03:33:52 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12M7U80T008974;
+        Mon, 22 Mar 2021 07:33:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=ZAfDjcEFlK46WfpvHzKLQiUHKKe+9veHjui7gcLUIOI=;
+ b=qmIQBxwUQFYU4r09Q9qBLZyDgN/qVOfmBCTRS9YjVPFlauLCz3v73oscCIsj25/TfD+U
+ A1+DXM+dPYZKTMrHejvnOp2dHk9wHgnXka7ZhQew9L4ByV7Ot/X0GXs6ETHUd15CcaZ2
+ uCECCvQvJwSW3zFvvdg5TWSRaGQyqP7FE15iRvIh4QPyLMKpFjfQIN7or7JPW1baL1y1
+ 0rbnZN71eVQ6erXRRUemo0QI1COCBPCA9bqc3eHzRqOMD+rlJApjWOj19KoXzF+NseSv
+ wKtB7rTuzUm/62pzoiDzedSYu8n9lwHJhetHxnaNdTj7M7JX6DW+9qxlNHilhRd3G1L6 iQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2130.oracle.com with ESMTP id 37d6jbaptn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 22 Mar 2021 07:33:13 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12M7UXci069828;
+        Mon, 22 Mar 2021 07:33:11 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 37dtyvrhje-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 22 Mar 2021 07:33:11 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 12M7X94j022561;
+        Mon, 22 Mar 2021 07:33:09 GMT
+Received: from kadam (/102.36.221.92)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 22 Mar 2021 00:33:08 -0700
+Date:   Mon, 22 Mar 2021 10:33:01 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, Neil Horman <nhorman@tuxdriver.com>,
+        Corentin Labbe <clabbe@baylibre.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: rng - fix crypto_rng_reset() refcounting when
+ !CRYPTO_STATS
+Message-ID: <20210322073300.GF1667@kadam>
+References: <20210322050748.265604-1-ebiggers@kernel.org>
+ <20210322054522.GC1667@kadam>
+ <YFgyaeeY6k6Pltw7@sol.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YFgyaeeY6k6Pltw7@sol.localdomain>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-IMR: 1
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9930 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 phishscore=0
+ mlxlogscore=999 suspectscore=0 spamscore=0 malwarescore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103220056
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9930 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0
+ lowpriorityscore=0 suspectscore=0 clxscore=1015 priorityscore=1501
+ spamscore=0 adultscore=0 impostorscore=0 mlxlogscore=999 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103220056
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use the of_device_get_match_data() helper instead of open coding.
+On Sun, Mar 21, 2021 at 11:00:09PM -0700, Eric Biggers wrote:
+> On Mon, Mar 22, 2021 at 08:45:22AM +0300, Dan Carpenter wrote:
+> > On Sun, Mar 21, 2021 at 10:07:48PM -0700, Eric Biggers wrote:
+> > > From: Eric Biggers <ebiggers@google.com>
+> > > 
+> > > crypto_stats_get() is a no-op when the kernel is compiled without
+> > > CONFIG_CRYPTO_STATS, so pairing it with crypto_alg_put() unconditionally
+> > > (as crypto_rng_reset() does) is wrong.
+> > > 
+> > 
+> > Presumably the intention was that _get() and _put() should always pair.
+> > It's really ugly and horrible that they don't. We could have
+> > predicted bug like this would happen and will continue to happen until
+> > the crypto_stats_get() is renamed.
+> > 
+> 
+> Well, the crypto stats stuff has always been pretty broken, so I don't think
+> people have looked at it too closely.  Currently crypto_stats_get() pairs with
+> one of the functions that tallies the statistics, such as
+> crypto_stats_rng_seed() or crypto_stats_aead_encrypt().  What change are you
+> suggesting, exactly?  Maybe moving the conditional crypto_alg_put() into a new
+> function crypto_stats_put() and moving it into the callers?  Or do you think the
+> functions should just be renamed to something like crypto_stats_begin() and
+> crypto_stats_end_{rng_seed,aead_encrypt}()?
 
-Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
----
- drivers/char/hw_random/omap-rng.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+To be honest, I misread the crypto_alg_put() thinking that it was
+crypto_*stats*_put().  My favourite fix would be to introduce a
+crypto_stats_put() which is a mirror of crypto_stats_get() and ifdeffed
+out if we don't have CONFIG_CRYPTO_STATS.
 
-diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-index 4380c23..cede9f1 100644
---- a/drivers/char/hw_random/omap-rng.c
-+++ b/drivers/char/hw_random/omap-rng.c
-@@ -377,16 +377,13 @@ MODULE_DEVICE_TABLE(of, omap_rng_of_match);
- static int of_get_omap_rng_device_details(struct omap_rng_dev *priv,
- 					  struct platform_device *pdev)
- {
--	const struct of_device_id *match;
- 	struct device *dev = &pdev->dev;
- 	int irq, err;
- 
--	match = of_match_device(of_match_ptr(omap_rng_of_match), dev);
--	if (!match) {
--		dev_err(dev, "no compatible OF match\n");
--		return -EINVAL;
--	}
--	priv->pdata = match->data;
-+	priv->pdata = of_device_get_match_data(dev);
-+	if (!priv->pdata)
-+		return -ENODEV;
-+
- 
- 	if (of_device_is_compatible(dev->of_node, "ti,omap4-rng") ||
- 	    of_device_is_compatible(dev->of_node, "inside-secure,safexcel-eip76")) {
--- 
-2.7.4
+regards,
+dan carpenter
 
