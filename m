@@ -2,70 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21755C433E0
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 02:03:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E458C433DB
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 05:09:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E1B6B61943
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 02:03:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FF7561934
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 05:09:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229883AbhCVCDP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Mar 2021 22:03:15 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:14117 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229894AbhCVCDM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Mar 2021 22:03:12 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4F3d5P2QbWz19GY9
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Mar 2021 10:01:13 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 22 Mar 2021 10:02:48 +0800
-From:   Tian Tao <tiantao6@hisilicon.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>
-Subject: [PATCH] hwrng: cctrng - remove the redundant log
-Date:   Mon, 22 Mar 2021 10:03:24 +0800
-Message-ID: <1616378604-35134-1-git-send-email-tiantao6@hisilicon.com>
-X-Mailer: git-send-email 2.7.4
+        id S229764AbhCVFJ0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 Mar 2021 01:09:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43464 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229746AbhCVFJK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Mar 2021 01:09:10 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 764F261924;
+        Mon, 22 Mar 2021 05:09:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616389749;
+        bh=suu6mNgZOnCVzT4QdfXxKiTmiuK9LXZ9LoMgZcHk18E=;
+        h=From:To:Cc:Subject:Date:From;
+        b=gLz7Xtd5o8gAf/yYS3Rq871q7SEsl094SNnIakhVstMUZ+VTIT6EDGoYHe3g2NA/W
+         34XzyoUzAd37m+T9c1FPbMiM5afPN0ByKudacVzlJgtFVL9B1yv7Z7Zuz3qxgIW4cL
+         LcVe7CMejgAgZkrCTGWcXvolYVlFf6UMOwKASz7xhPrn8hNTPKQzu0TCshZZaj2udB
+         ajztQZ1TzHvOdUv0AXod+toMMIOpB25tKHmIPApUV85+0Bl9/IfX17F+f626RMR2NX
+         DuILuyjApAfRvAoZi+FgZZIr5p1K2FIsDmZpm0RPoqsDPDwdAY9XO7va2p2J0t183Y
+         EznsgilmRneQg==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        Corentin Labbe <clabbe@baylibre.com>, stable@vger.kernel.org
+Subject: [PATCH] crypto: rng - fix crypto_rng_reset() refcounting when !CRYPTO_STATS
+Date:   Sun, 21 Mar 2021 22:07:48 -0700
+Message-Id: <20210322050748.265604-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.31.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix the following coccicheck warning:
-drivers/char/hw_random//cctrng.c:531:2-9: line 531 is redundant because
-platform_get_irq() already prints an error.
+From: Eric Biggers <ebiggers@google.com>
 
-Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
+crypto_stats_get() is a no-op when the kernel is compiled without
+CONFIG_CRYPTO_STATS, so pairing it with crypto_alg_put() unconditionally
+(as crypto_rng_reset() does) is wrong.
+
+Fix this by moving the call to crypto_stats_get() to just before the
+actual algorithm operation which might need it.  This makes it always
+paired with crypto_stats_rng_seed().
+
+Fixes: eed74b3eba9e ("crypto: rng - Fix a refcounting bug in crypto_rng_reset()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/char/hw_random/cctrng.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ crypto/rng.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/char/hw_random/cctrng.c b/drivers/char/hw_random/cctrng.c
-index 0efb37a..ae0621f 100644
---- a/drivers/char/hw_random/cctrng.c
-+++ b/drivers/char/hw_random/cctrng.c
-@@ -527,10 +527,8 @@ static int cctrng_probe(struct platform_device *pdev)
+diff --git a/crypto/rng.c b/crypto/rng.c
+index a888d84b524a4..fea082b25fe4b 100644
+--- a/crypto/rng.c
++++ b/crypto/rng.c
+@@ -34,22 +34,18 @@ int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
+ 	u8 *buf = NULL;
+ 	int err;
  
- 	/* Then IRQ */
- 	irq = platform_get_irq(pdev, 0);
--	if (irq < 0) {
--		dev_err(dev, "Failed getting IRQ resource\n");
-+	if (irq < 0)
- 		return irq;
--	}
+-	crypto_stats_get(alg);
+ 	if (!seed && slen) {
+ 		buf = kmalloc(slen, GFP_KERNEL);
+-		if (!buf) {
+-			crypto_alg_put(alg);
++		if (!buf)
+ 			return -ENOMEM;
+-		}
  
- 	/* parse sampling rate from device tree */
- 	rc = cc_trng_parse_sampling_ratio(drvdata);
+ 		err = get_random_bytes_wait(buf, slen);
+-		if (err) {
+-			crypto_alg_put(alg);
++		if (err)
+ 			goto out;
+-		}
+ 		seed = buf;
+ 	}
+ 
++	crypto_stats_get(alg);
+ 	err = crypto_rng_alg(tfm)->seed(tfm, seed, slen);
+ 	crypto_stats_rng_seed(alg, err);
+ out:
 -- 
-2.7.4
+2.31.0
 
