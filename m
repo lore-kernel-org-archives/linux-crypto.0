@@ -2,96 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F8FC433C1
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 05:46:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 897C9C433DB
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 06:01:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B622A61606
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 05:46:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E6F76192E
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 06:01:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229482AbhCVFqP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Mar 2021 01:46:15 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:37258 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229621AbhCVFqE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Mar 2021 01:46:04 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12M5isjs043843;
-        Mon, 22 Mar 2021 05:45:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=6lqeceNwNjvLIvI4KG2Mzz1t5DsQN3/hObHOkdaqajk=;
- b=BPFsK4L7FOeZ5xC1VGWYZ6uRVeYG1eLYglHjoFQYCFnFsYv1vyyMPEV4/cOxM6FC9rmd
- W3Djc+YxxpJeQT5/I5VGkDkXNc2zRmX+vX8+UnHyqh4BjK7pUQ92mDatjQSihLkRmY3a
- dNvB6WFD2L5cZsSko6+d+lw1zoTdIiIjAoJnZChu5YTfq7q6Bk1qvvseVwRyr5f+K/q/
- /NwnUzUNntw8YqeQg+wM19+Kky4YPYHsFBlVS5RCHJImVMMFMtOOyW7OLNNcWeDFNh3g
- oO2pO/LrdaM27ZQgD5FZQ3JJWIPih04Rv2aKAPtue/Lq2nmrfi2mESnX26zXiAh2UJZ0 1A== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 37d8fr2cbd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 Mar 2021 05:45:33 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12M5eHj5129213;
-        Mon, 22 Mar 2021 05:45:31 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 37dtxwj09v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 Mar 2021 05:45:31 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 12M5jUZE018654;
-        Mon, 22 Mar 2021 05:45:30 GMT
-Received: from kadam (/102.36.221.92)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 21 Mar 2021 22:45:29 -0700
-Date:   Mon, 22 Mar 2021 08:45:22 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Eric Biggers <ebiggers@kernel.org>
+        id S229665AbhCVGAv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 Mar 2021 02:00:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49802 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229548AbhCVGAY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Mar 2021 02:00:24 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B741F61925;
+        Mon, 22 Mar 2021 06:00:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616392823;
+        bh=Da2kIHXdeLQLxHVtJ1X0RBS7P/w99Xfmpvej3S/icEo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Ef48nPH3zvBkOLkb8veTf+jCHcnWBykU8Ac3RV5+FbxXDznhcvKjRUEjAopcfAi9G
+         haCtYyjCzvhAtn3YvyQOx6Bu1g3AbngUwd6NpspUKciyvPfBuzajkHYrLWzUOz881O
+         i4KPu6DF1CwvV0yffu/mwPdFA5eFZuZkRpNKZwcQXPMpuGVDgRsrIbPRyk2hEf5eAM
+         aULf7xN3htptwMY4qm53AAxyNPINN1Wim2bk/nihZEqYWaeyXIPXQJDStDRNVmJQZ6
+         rtaifP/D4mLPNJsftTuYePga44YSQHv6Ru7TPDhBac3Ci8ClHOqSRhuiWu5iZ3YJIv
+         ZNaN6f4pJqG6g==
+Date:   Sun, 21 Mar 2021 23:00:09 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
 Cc:     linux-crypto@vger.kernel.org, Neil Horman <nhorman@tuxdriver.com>,
         Corentin Labbe <clabbe@baylibre.com>, stable@vger.kernel.org
 Subject: Re: [PATCH] crypto: rng - fix crypto_rng_reset() refcounting when
  !CRYPTO_STATS
-Message-ID: <20210322054522.GC1667@kadam>
+Message-ID: <YFgyaeeY6k6Pltw7@sol.localdomain>
 References: <20210322050748.265604-1-ebiggers@kernel.org>
+ <20210322054522.GC1667@kadam>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210322050748.265604-1-ebiggers@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-IMR: 1
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9930 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
- malwarescore=0 phishscore=0 bulkscore=0 mlxscore=0 suspectscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103220044
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9930 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 priorityscore=1501
- impostorscore=0 spamscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999
- phishscore=0 bulkscore=0 adultscore=0 malwarescore=0 clxscore=1011
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2103220045
+In-Reply-To: <20210322054522.GC1667@kadam>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Mar 21, 2021 at 10:07:48PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Mon, Mar 22, 2021 at 08:45:22AM +0300, Dan Carpenter wrote:
+> On Sun, Mar 21, 2021 at 10:07:48PM -0700, Eric Biggers wrote:
+> > From: Eric Biggers <ebiggers@google.com>
+> > 
+> > crypto_stats_get() is a no-op when the kernel is compiled without
+> > CONFIG_CRYPTO_STATS, so pairing it with crypto_alg_put() unconditionally
+> > (as crypto_rng_reset() does) is wrong.
+> > 
 > 
-> crypto_stats_get() is a no-op when the kernel is compiled without
-> CONFIG_CRYPTO_STATS, so pairing it with crypto_alg_put() unconditionally
-> (as crypto_rng_reset() does) is wrong.
+> Presumably the intention was that _get() and _put() should always pair.
+> It's really ugly and horrible that they don't. We could have
+> predicted bug like this would happen and will continue to happen until
+> the crypto_stats_get() is renamed.
 > 
 
-Presumably the intention was that _get() and _put() should always pair.
-It's really ugly and horrible that they don't. We could have
-predicted bug like this would happen and will continue to happen until
-the crypto_stats_get() is renamed.
+Well, the crypto stats stuff has always been pretty broken, so I don't think
+people have looked at it too closely.  Currently crypto_stats_get() pairs with
+one of the functions that tallies the statistics, such as
+crypto_stats_rng_seed() or crypto_stats_aead_encrypt().  What change are you
+suggesting, exactly?  Maybe moving the conditional crypto_alg_put() into a new
+function crypto_stats_put() and moving it into the callers?  Or do you think the
+functions should just be renamed to something like crypto_stats_begin() and
+crypto_stats_end_{rng_seed,aead_encrypt}()?
 
-regards,
-dan carpenter
+Another issue is that a lot of operations (such as the rng one in question here)
+don't actually need the get/put at all because they are never asynchronous.  I
+didn't aim to address that in my patch though...
 
+- Eric
