@@ -2,119 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00840C433E0
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 05:14:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F8FC433C1
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 05:46:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C5D3961937
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 05:14:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B622A61606
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 05:46:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbhCVFOE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Mar 2021 01:14:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43856 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229455AbhCVFN4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Mar 2021 01:13:56 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EAA5561930;
-        Mon, 22 Mar 2021 05:13:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616390036;
-        bh=swuzV5EcaNZWS3RrTQ3X/7Hc8ZdWHJlVaGVOm4GrSVg=;
-        h=From:To:Cc:Subject:Date:From;
-        b=BqLzlYPtWWJqI9Vh+X/fgywOFGwaoqqxGWUiA+ziLU5+fkuf+EK5ZEkHHQM+zZrn0
-         OFaCj5Pabg5gX6yDwuB7iwu+4vBKzinAHeznBt/S2Kps9B/DVH2Wvw3BV6+sfxtQCx
-         3/lQQzsED+KSFuViY1Nt/xICJUMtFME9TyzJ6brd2l6Kjy8nNi22Bv0lZlCem+6Si1
-         X6Si0jjR3TTSaDewjuy9rcM0/ZEAXsn0mJx6BxJsoYIjFa9/Z3EZXTzLP9KoHKmYDH
-         kVwywfTLCMiHqNvM2xijxxTf0fuXjlJrW4dOWavmqju9noTXAIQNGkX/6feqk1Q3xm
-         puT14p6BuVahQ==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Jann Horn <jannh@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH RESEND] random: initialize ChaCha20 constants with correct endianness
-Date:   Sun, 21 Mar 2021 22:13:47 -0700
-Message-Id: <20210322051347.266831-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.31.0
+        id S229482AbhCVFqP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 Mar 2021 01:46:15 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:37258 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229621AbhCVFqE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Mar 2021 01:46:04 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12M5isjs043843;
+        Mon, 22 Mar 2021 05:45:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=6lqeceNwNjvLIvI4KG2Mzz1t5DsQN3/hObHOkdaqajk=;
+ b=BPFsK4L7FOeZ5xC1VGWYZ6uRVeYG1eLYglHjoFQYCFnFsYv1vyyMPEV4/cOxM6FC9rmd
+ W3Djc+YxxpJeQT5/I5VGkDkXNc2zRmX+vX8+UnHyqh4BjK7pUQ92mDatjQSihLkRmY3a
+ dNvB6WFD2L5cZsSko6+d+lw1zoTdIiIjAoJnZChu5YTfq7q6Bk1qvvseVwRyr5f+K/q/
+ /NwnUzUNntw8YqeQg+wM19+Kky4YPYHsFBlVS5RCHJImVMMFMtOOyW7OLNNcWeDFNh3g
+ oO2pO/LrdaM27ZQgD5FZQ3JJWIPih04Rv2aKAPtue/Lq2nmrfi2mESnX26zXiAh2UJZ0 1A== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 37d8fr2cbd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 22 Mar 2021 05:45:33 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12M5eHj5129213;
+        Mon, 22 Mar 2021 05:45:31 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 37dtxwj09v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 22 Mar 2021 05:45:31 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 12M5jUZE018654;
+        Mon, 22 Mar 2021 05:45:30 GMT
+Received: from kadam (/102.36.221.92)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sun, 21 Mar 2021 22:45:29 -0700
+Date:   Mon, 22 Mar 2021 08:45:22 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, Neil Horman <nhorman@tuxdriver.com>,
+        Corentin Labbe <clabbe@baylibre.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: rng - fix crypto_rng_reset() refcounting when
+ !CRYPTO_STATS
+Message-ID: <20210322054522.GC1667@kadam>
+References: <20210322050748.265604-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210322050748.265604-1-ebiggers@kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-IMR: 1
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9930 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
+ malwarescore=0 phishscore=0 bulkscore=0 mlxscore=0 suspectscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103220044
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9930 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 priorityscore=1501
+ impostorscore=0 spamscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999
+ phishscore=0 bulkscore=0 adultscore=0 malwarescore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103220045
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Sun, Mar 21, 2021 at 10:07:48PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> crypto_stats_get() is a no-op when the kernel is compiled without
+> CONFIG_CRYPTO_STATS, so pairing it with crypto_alg_put() unconditionally
+> (as crypto_rng_reset() does) is wrong.
+> 
 
-On big endian CPUs, the ChaCha20-based CRNG is using the wrong
-endianness for the ChaCha20 constants.
+Presumably the intention was that _get() and _put() should always pair.
+It's really ugly and horrible that they don't. We could have
+predicted bug like this would happen and will continue to happen until
+the crypto_stats_get() is renamed.
 
-This doesn't matter cryptographically, but technically it means it's not
-ChaCha20 anymore.  Fix it to always use the standard constants.
-
-Cc: linux-crypto@vger.kernel.org
-Cc: Andy Lutomirski <luto@kernel.org>
-Cc: Jann Horn <jannh@google.com>
-Cc: Theodore Ts'o <tytso@mit.edu>
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- drivers/char/random.c   | 4 ++--
- include/crypto/chacha.h | 9 +++++++--
- 2 files changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 0fe9e200e4c84..5d6acfecd919b 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -819,7 +819,7 @@ static bool __init crng_init_try_arch_early(struct crng_state *crng)
- 
- static void __maybe_unused crng_initialize_secondary(struct crng_state *crng)
- {
--	memcpy(&crng->state[0], "expand 32-byte k", 16);
-+	chacha_init_consts(crng->state);
- 	_get_random_bytes(&crng->state[4], sizeof(__u32) * 12);
- 	crng_init_try_arch(crng);
- 	crng->init_time = jiffies - CRNG_RESEED_INTERVAL - 1;
-@@ -827,7 +827,7 @@ static void __maybe_unused crng_initialize_secondary(struct crng_state *crng)
- 
- static void __init crng_initialize_primary(struct crng_state *crng)
- {
--	memcpy(&crng->state[0], "expand 32-byte k", 16);
-+	chacha_init_consts(crng->state);
- 	_extract_entropy(&input_pool, &crng->state[4], sizeof(__u32) * 12, 0);
- 	if (crng_init_try_arch_early(crng) && trust_cpu) {
- 		invalidate_batched_entropy();
-diff --git a/include/crypto/chacha.h b/include/crypto/chacha.h
-index 3a1c72fdb7cf5..dabaee6987186 100644
---- a/include/crypto/chacha.h
-+++ b/include/crypto/chacha.h
-@@ -47,13 +47,18 @@ static inline void hchacha_block(const u32 *state, u32 *out, int nrounds)
- 		hchacha_block_generic(state, out, nrounds);
- }
- 
--void chacha_init_arch(u32 *state, const u32 *key, const u8 *iv);
--static inline void chacha_init_generic(u32 *state, const u32 *key, const u8 *iv)
-+static inline void chacha_init_consts(u32 *state)
- {
- 	state[0]  = 0x61707865; /* "expa" */
- 	state[1]  = 0x3320646e; /* "nd 3" */
- 	state[2]  = 0x79622d32; /* "2-by" */
- 	state[3]  = 0x6b206574; /* "te k" */
-+}
-+
-+void chacha_init_arch(u32 *state, const u32 *key, const u8 *iv);
-+static inline void chacha_init_generic(u32 *state, const u32 *key, const u8 *iv)
-+{
-+	chacha_init_consts(state);
- 	state[4]  = key[0];
- 	state[5]  = key[1];
- 	state[6]  = key[2];
--- 
-2.31.0
+regards,
+dan carpenter
 
