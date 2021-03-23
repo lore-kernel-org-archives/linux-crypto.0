@@ -2,129 +2,121 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2319C433C1
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 16:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30BA0C433DB
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 16:46:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B8174619C2
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 16:41:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 04CA3619C8
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 16:46:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233340AbhCWQlS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Mar 2021 12:41:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49546 "EHLO
+        id S233300AbhCWQpe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 Mar 2021 12:45:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233337AbhCWQlL (ORCPT
+        with ESMTP id S233299AbhCWQpM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Mar 2021 12:41:11 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27E89C061574
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Mar 2021 09:41:11 -0700 (PDT)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1lOk5c-0005iX-20; Tue, 23 Mar 2021 17:41:08 +0100
-Subject: Re: [PATCH v1 1/3] crypto: caam - add in-kernel interface for blob
- generator
-To:     =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
+        Tue, 23 Mar 2021 12:45:12 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C94C0C061574;
+        Tue, 23 Mar 2021 09:45:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
+        Reply-To:Cc:Content-ID:Content-Description;
+        bh=zzu/xcn7sghWXmeoDI7Yw3IsP/Ljt8YacCwRazpIVIs=; b=FDBnzXOE4hpdcNK/uHISdHlTJL
+        pE5bGCV+YPuJzn5Q0N336UFsRNRyt04ZEaeH4nomMbZFpqNXuYglGSmQmrqkd6siRDQEvi8oaKZOq
+        OOk1zHPQoVuNA/AFJe6vzHkPxT21pKEzqX7IT8G559O61wUlqjGsil9VzzylhjwS2+nCogn/GrdUW
+        NBM+rylskcYIC4aw80702/sRWJL4p/r9DdHJpZZ82V7+/uTAG442ynAPZJLyEz6edmTfEiv89QPVp
+        Uotuxnt4XDlGObVV5DCbJ07ZRRVD0yCaOxAM1x4KoGBjrMr0GMBhv403zWmEXs4/3ZDFi3FGebj1f
+        uT9HE14A==;
+Received: from [2601:1c0:6280:3f0::3ba4]
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lOk87-00AIWN-H4; Tue, 23 Mar 2021 16:44:04 +0000
+Subject: Re: [PATCH] init/Kconfig: Support sign module with SM3 hash algorithm
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
         David Howells <dhowells@redhat.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Udit Agarwal <udit.agarwal@nxp.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
- <420d2319e533ac97965fb826a70bdb023af2a844.1615914058.git-series.a.fatoum@pengutronix.de>
- <76cd2a74-f522-34c0-eb8c-3047e3cab5cd@nxp.com>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-Message-ID: <880516db-5939-d4cd-100c-69cd85532d39@pengutronix.de>
-Date:   Tue, 23 Mar 2021 17:41:06 +0100
+        David Woodhouse <dwmw2@infradead.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Valentin Schneider <valentin.schneider@arm.com>,
+        Nick Terrell <terrelln@fb.com>, KP Singh <kpsingh@google.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Vlastimil Babka <vbabka@suse.cz>, keyrings@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Jia Zhang <zhang.jia@linux.alibaba.com>
+References: <20210323083528.25678-1-tianjia.zhang@linux.alibaba.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <28d3a339-6210-ffd2-950f-ea5340ac23b7@infradead.org>
+Date:   Tue, 23 Mar 2021 09:43:35 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <76cd2a74-f522-34c0-eb8c-3047e3cab5cd@nxp.com>
+In-Reply-To: <20210323083528.25678-1-tianjia.zhang@linux.alibaba.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Horia,
+On 3/23/21 1:35 AM, Tianjia Zhang wrote:
+> The kernel module signature supports the option to use the SM3
+> secure hash (OSCCA GM/T 0004-2012 SM3).
+> 
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> ---
+>  Documentation/admin-guide/module-signing.rst | 5 +++--
+>  crypto/asymmetric_keys/pkcs7_parser.c        | 7 +++++++
+>  init/Kconfig                                 | 5 +++++
+>  3 files changed, 15 insertions(+), 2 deletions(-)
+> 
 
-On 21.03.21 21:46, Horia Geantă wrote:
-> On 3/16/2021 7:01 PM, Ahmad Fatoum wrote:
->> +	init_job_desc(desc, 0);
->> +	append_key_as_imm(desc, keymod, keymod_len, keymod_len,
->> +			  CLASS_2 | KEY_DEST_CLASS_REG);
->> +	append_seq_in_ptr(desc, dma_in, length - CAAM_BLOB_OVERHEAD, 0);
->> +	append_seq_out_ptr(desc, dma_out, length, 0);
-> In case length is known to be < 2^16, it's recommended to use instead
-> append_seq_in_ptr_intlen, append_seq_out_ptr_intlen.
+> diff --git a/init/Kconfig b/init/Kconfig
+> index 5f5c776ef192..fed9236078e4 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -2202,6 +2202,10 @@ config MODULE_SIG_SHA512
+>  	bool "Sign modules with SHA-512"
+>  	select CRYPTO_SHA512
+>  
+> +config MODULE_SIG_SM3
+> +	bool "Sign modules with SM3"
+> +	select CRYPTO_SM3
+> +
+>  endchoice
+>  
+>  config MODULE_SIG_HASH
+> @@ -2212,6 +2216,7 @@ config MODULE_SIG_HASH
+>  	default "sha256" if MODULE_SIG_SHA256
+>  	default "sha384" if MODULE_SIG_SHA384
+>  	default "sha512" if MODULE_SIG_SHA512
+> +	default "sm3" if MODULE_SIG_SM3
+>  
+>  config MODULE_COMPRESS
+>  	bool "Compress modules on installation"
+> 
 
-Didn't know about this one. Will look into using it for v2.
+checkpatch tells me:
 
->> +#define CAAM_BLOB_KEYMOD_LENGTH		16
-> The define isn't used here or on patch 3/3.
+WARNING: please write a paragraph that describes the config symbol fully
+#74: FILE: init/Kconfig:2205:
++config MODULE_SIG_SM3
 
-Will drop and adjust the function docs to note the maximum modifier length.
 
+so yes, it should have some help text there.
 
->> +#define CAAM_BLOB_OVERHEAD		(32 + 16)
->> +#define CAAM_BLOB_MAX_LEN		4096
->> +
->> +struct caam_blob_priv;
->> +
->> +/** caam_blob_gen_init - initialize blob generation
->> + *
->> + * returns either pointer to new caam_blob_priv instance
->> + * or error pointer
->> + */
->> +struct caam_blob_priv *caam_blob_gen_init(void);
->> +
->> +/** caam_blob_gen_init - free blob generation resources
->> + *
->> + * @priv: instance returned by caam_blob_gen_init
->> + */
->> +void caam_blob_gen_exit(struct caam_blob_priv *priv);
->> +
->> +/** caam_encap_blob - encapsulate blob
->> + *
->> + * @priv:   instance returned by caam_blob_gen_init
->> + * @keymod: string to use as key modifier for blob encapsulation
->> + * @input:  buffer which CAAM will DMA from
->> + * @output: buffer which CAAM will DMA to
-> Is it guaranteed that input, output can be DMA-mapped?
-
-It's expected callers ensure that this is the case. Trusted key buffers
-are allocated with kmalloc and can be DMA-mapped.
-
-Thanks for the review,
-Ahmad
-
+thanks.
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+~Randy
+
