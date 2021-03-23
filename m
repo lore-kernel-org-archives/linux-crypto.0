@@ -2,100 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D4E3C433DB
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 19:27:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E3BC433DB
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 00:51:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D0F8D61984
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Mar 2021 19:27:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 760926199F
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 00:51:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231965AbhCVT0w (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Mar 2021 15:26:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29004 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231676AbhCVT0d (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Mar 2021 15:26:33 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12MJ3bjF061866;
-        Mon, 22 Mar 2021 15:26:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=ZXzOB4AtbWH6ok2w4tbefXFbVHdFar+z3GCtgxuZ1R4=;
- b=tGgzK/ibORyg3Hbr6sj6NsfK3REKIDPR/W6JmfJOj4H/FCMO7W8HqMVdBGxZClQX/spz
- 5YcZd3NQm34+AnB3GheG/fe/oJ7RjMKarabESwym/v5bKh1wWRUT875+a2ttRxa1TiU6
- Rl8bmve3qCgoLguXagsIAHMmhJNYcRLiGsb6UNeWNXUBRHHzUjEvjKEEIk/oC8GqVmOh
- Dh/NO6ztWW++3HGsFIUpKKhsehs/4tsbOohjEGqYDu2ydnX3msyfCk8UNwpcVt+u4ExM
- w7uUw1xhgxaUCTmgWGoT+Lj7ZQD1TwbIS4khPYaclR0ss+5eAM+f6jkrY2R44qwM2yeS mg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37dxc9t8nv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Mar 2021 15:26:18 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12MJ3vSd062996;
-        Mon, 22 Mar 2021 15:26:17 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37dxc9t8nb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Mar 2021 15:26:17 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12MJNRlo019308;
-        Mon, 22 Mar 2021 19:26:16 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 37df68a85p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Mar 2021 19:26:15 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12MJQDw049021402
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 Mar 2021 19:26:13 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 076FB42041;
-        Mon, 22 Mar 2021 19:26:13 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 90F4942042;
-        Mon, 22 Mar 2021 19:26:12 +0000 (GMT)
-Received: from osiris (unknown [9.171.41.112])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 22 Mar 2021 19:26:12 +0000 (GMT)
-Date:   Mon, 22 Mar 2021 20:26:11 +0100
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        gor@linux.ibm.com, borntraeger@de.ibm.com,
-        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rdunlap@infradead.org
-Subject: Re: [PATCH] s390/crc32-vx: Couple of typo fixes
-Message-ID: <YFjvU0ocfwa9WLA7@osiris>
-References: <20210322130533.3805976-1-unixbhaskar@gmail.com>
+        id S231577AbhCWAvU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 Mar 2021 20:51:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52238 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231716AbhCWAvI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Mar 2021 20:51:08 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 04DC6619A0;
+        Tue, 23 Mar 2021 00:51:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616460668;
+        bh=0GU+mvpQ6KFpPVwE2ur3Erg8FSP3jRjW/eXtmRXCw7s=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SRAQIK6VlIa1BVXD5FgNvXzx34HBQ3nVMbX7leQvXvYXSMTtjgk6mWm4fxRtHdXrG
+         Sl+9cOPfdzkSxJI2g2QhbnigL6cSZfMkC0RXNulceHz9OmyPFHKGTbqAKxWTn8/twn
+         EMzv+hHcg9G2Xmp3tGlnPk4bdmyS+lwe3Zw5YlpwukFKZT4m6kIj5geuBLx+pQG1y4
+         1zJRcn7b5muK8qMSLrlEyTwhClWY39umEzKY43sl4UdqV3ngeHney4bbSaXcYlXV4m
+         SIGJroPcyjPLzcfqW6L4ifaGkbd5OjitKvwFa06caWIHybxlw6K6H+NmicgKjVof6X
+         xrNN0Gkawe9Ig==
+Date:   Mon, 22 Mar 2021 17:51:06 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Arnd Bergmann <arnd@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:MIPS" <linux-mips@vger.kernel.org>
+Subject: Re: [PATCH] crypto: poly1305: fix poly1305_core_setkey() declaration
+Message-ID: <YFk7erL3xBHoGNmj@gmail.com>
+References: <20210322170542.1791154-1-arnd@kernel.org>
+ <CAMj1kXGj+autwGM-Me7qNoORsux9Xz_1-P=7w4m-9vGMXwDq4Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210322130533.3805976-1-unixbhaskar@gmail.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-22_11:2021-03-22,2021-03-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=816
- lowpriorityscore=0 phishscore=0 spamscore=0 priorityscore=1501
- impostorscore=0 suspectscore=0 mlxscore=0 bulkscore=0 malwarescore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103220138
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMj1kXGj+autwGM-Me7qNoORsux9Xz_1-P=7w4m-9vGMXwDq4Q@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 22, 2021 at 06:35:33PM +0530, Bhaskar Chowdhury wrote:
+On Mon, Mar 22, 2021 at 07:51:47PM +0100, Ard Biesheuvel wrote:
+> On Mon, 22 Mar 2021 at 18:05, Arnd Bergmann <arnd@kernel.org> wrote:
+> >
+> > From: Arnd Bergmann <arnd@arndb.de>
+> >
+> > gcc-11 points out a mismatch between the declaration and the definition
+> > of poly1305_core_setkey():
+> >
+> > lib/crypto/poly1305-donna32.c:13:67: error: argument 2 of type ‘const u8[16]’ {aka ‘const unsigned char[16]’} with mismatched bound [-Werror=array-parameter=]
+> >    13 | void poly1305_core_setkey(struct poly1305_core_key *key, const u8 raw_key[16])
+> >       |                                                          ~~~~~~~~~^~~~~~~~~~~
+> > In file included from lib/crypto/poly1305-donna32.c:11:
+> > include/crypto/internal/poly1305.h:21:68: note: previously declared as ‘const u8 *’ {aka ‘const unsigned char *’}
+> >    21 | void poly1305_core_setkey(struct poly1305_core_key *key, const u8 *raw_key);
+> >
+> > This is harmless in principle, as the calling conventions are the same,
+> > but the more specific prototype allows better type checking in the
+> > caller.
+> >
+> > Change the declaration to match the actual function definition.
+> > The poly1305_simd_init() is a bit suspicious here, as it previously
+> > had a 32-byte argument type, but looks like it needs to take the
+> > 16-byte POLY1305_BLOCK_SIZE array instead.
+> >
 > 
-> s/defintions/definitions/
-> s/intermedate/intermediate/
-> 
-> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-> ---
->  arch/s390/crypto/crc32be-vx.S | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> This looks ok to me. For historical reasons, the Poly1305 integration
+> is based on an unkeyed shash, and both the Poly1305 key and nonce are
+> passed as ordinary input, prepended to the actual data.
+> poly1305_simd_init() takes only the key but not the nonce, so it
+> should only be passed 16 bytes.
 
-Applied, thanks.
+Well to be more precise, there are two conventions for using Poly1305.  One
+where it is invoked many times with the same 16-byte key and different 16-byte
+nonces.  And one where every invocation uses a unique key *and* nonce,
+interpreted as a 32-byte "one-time key".
+
+So that's why there's a mix of 16 and 32 byte "keys".
+
+The naming "POLY1305_KEY_SIZE" assumes the second convention, which is a bit
+confusing; it really should be called something like POLY1305_ONETIME_KEY_SIZE.
+I guess the idea was that the one-time key convention is the more common one.
+
+Anyway, the patch seems to be fine, as it uses the correct length in each
+location.  You can add:
+
+Reviewed-by: Eric Biggers <ebiggers@google.com>
+
+- Eric
