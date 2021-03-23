@@ -2,79 +2,138 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB0CC433C1
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 07:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02B76C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 08:36:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9E7C3619C0
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 07:42:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CED11619B6
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 08:36:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229632AbhCWHla (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Mar 2021 03:41:30 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:13666 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbhCWHlU (ORCPT
+        id S229897AbhCWIfm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 Mar 2021 04:35:42 -0400
+Received: from out30-44.freemail.mail.aliyun.com ([115.124.30.44]:37920 "EHLO
+        out30-44.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229972AbhCWIfe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Mar 2021 03:41:20 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4F4NXS2xtcznTX3;
-        Tue, 23 Mar 2021 15:38:48 +0800 (CST)
-Received: from [10.67.101.248] (10.67.101.248) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 23 Mar 2021 15:41:09 +0800
-Subject: Re: [PATCH -next] crypto: hisilicon/hpre: fix link error
-To:     Yang Yingliang <yangyingliang@huawei.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20210323072716.3146252-1-yangyingliang@huawei.com>
-CC:     <xuzaibo@huawei.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-From:   tanghui20 <tanghui20@huawei.com>
-Message-ID: <9194c58f-f240-b993-5fec-2a994b26f0eb@huawei.com>
-Date:   Tue, 23 Mar 2021 15:41:10 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        Tue, 23 Mar 2021 04:35:34 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0UT38Cws_1616488528;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UT38Cws_1616488528)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 23 Mar 2021 16:35:29 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Valentin Schneider <valentin.schneider@arm.com>,
+        Nick Terrell <terrelln@fb.com>, KP Singh <kpsingh@google.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Vlastimil Babka <vbabka@suse.cz>, keyrings@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Jia Zhang <zhang.jia@linux.alibaba.com>
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH] init/Kconfig: Support sign module with SM3 hash algorithm
+Date:   Tue, 23 Mar 2021 16:35:28 +0800
+Message-Id: <20210323083528.25678-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.19.1.3.ge56e4f7
 MIME-Version: 1.0
-In-Reply-To: <20210323072716.3146252-1-yangyingliang@huawei.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.101.248]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There is a patch similar to yours that was send in advance, as follows:
-https://www.spinics.net/lists/linux-crypto/msg54238.html
+The kernel module signature supports the option to use the SM3
+secure hash (OSCCA GM/T 0004-2012 SM3).
 
-On 2021/3/23 15:27, Yang Yingliang wrote:
-> Fix the follow link error by select config CRYPTO_ECC and CRYPTO_ECDH.
->
-> ERROR: modpost: "ecc_get_curve25519" [drivers/crypto/hisilicon/hpre/hisi_hpre.ko] undefined!
-> ERROR: modpost: "ecc_get_curve" [drivers/crypto/hisilicon/hpre/hisi_hpre.ko] undefined!
-> ERROR: modpost: "crypto_ecdh_decode_key" [drivers/crypto/hisilicon/hpre/hisi_hpre.ko] undefined!
->
-> Fixes: 90274769cf79 ("crypto: hisilicon/hpre - add 'CURVE25519' algorithm")
-> Fixes: 05e7b906aa7c ("crypto: hisilicon/hpre - add 'ECDH' algorithm")
-> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
-> ---
->  drivers/crypto/hisilicon/Kconfig | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-> index c45adb15ce8d..d87c89af2a7f 100644
-> --- a/drivers/crypto/hisilicon/Kconfig
-> +++ b/drivers/crypto/hisilicon/Kconfig
-> @@ -69,6 +69,8 @@ config CRYPTO_DEV_HISI_HPRE
->  	select CRYPTO_DEV_HISI_QM
->  	select CRYPTO_DH
->  	select CRYPTO_RSA
-> +	select CRYPTO_ECC
-> +	select CRYPTO_ECDH
->  	help
->  	  Support for HiSilicon HPRE(High Performance RSA Engine)
->  	  accelerator, which can accelerate RSA and DH algorithms.
->
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+---
+ Documentation/admin-guide/module-signing.rst | 5 +++--
+ crypto/asymmetric_keys/pkcs7_parser.c        | 7 +++++++
+ init/Kconfig                                 | 5 +++++
+ 3 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation/admin-guide/module-signing.rst
+index 7d7c7c8a545c..8d8980808b5b 100644
+--- a/Documentation/admin-guide/module-signing.rst
++++ b/Documentation/admin-guide/module-signing.rst
+@@ -30,8 +30,8 @@ This facility uses X.509 ITU-T standard certificates to encode the public keys
+ involved.  The signatures are not themselves encoded in any industrial standard
+ type.  The facility currently only supports the RSA public key encryption
+ standard (though it is pluggable and permits others to be used).  The possible
+-hash algorithms that can be used are SHA-1, SHA-224, SHA-256, SHA-384, and
+-SHA-512 (the algorithm is selected by data in the signature).
++hash algorithms that can be used are SHA-1, SHA-224, SHA-256, SHA-384, SHA-512,
++and SM3 (the algorithm is selected by data in the signature).
+ 
+ 
+ ==========================
+@@ -86,6 +86,7 @@ This has a number of options available:
+ 	``CONFIG_MODULE_SIG_SHA256``	:menuselection:`Sign modules with SHA-256`
+ 	``CONFIG_MODULE_SIG_SHA384``	:menuselection:`Sign modules with SHA-384`
+ 	``CONFIG_MODULE_SIG_SHA512``	:menuselection:`Sign modules with SHA-512`
++	``CONFIG_MODULE_SIG_SM3``	:menuselection:`Sign modules with SM3`
+         =============================== ==========================================
+ 
+      The algorithm selected here will also be built into the kernel (rather
+diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
+index 967329e0a07b..6cf6c4552c11 100644
+--- a/crypto/asymmetric_keys/pkcs7_parser.c
++++ b/crypto/asymmetric_keys/pkcs7_parser.c
+@@ -248,6 +248,9 @@ int pkcs7_sig_note_digest_algo(void *context, size_t hdrlen,
+ 	case OID_sha224:
+ 		ctx->sinfo->sig->hash_algo = "sha224";
+ 		break;
++	case OID_sm3:
++		ctx->sinfo->sig->hash_algo = "sm3";
++		break;
+ 	default:
+ 		printk("Unsupported digest algo: %u\n", ctx->last_oid);
+ 		return -ENOPKG;
+@@ -269,6 +272,10 @@ int pkcs7_sig_note_pkey_algo(void *context, size_t hdrlen,
+ 		ctx->sinfo->sig->pkey_algo = "rsa";
+ 		ctx->sinfo->sig->encoding = "pkcs1";
+ 		break;
++	case OID_SM2_with_SM3:
++		ctx->sinfo->sig->pkey_algo = "sm2";
++		ctx->sinfo->sig->encoding = "raw";
++		break;
+ 	default:
+ 		printk("Unsupported pkey algo: %u\n", ctx->last_oid);
+ 		return -ENOPKG;
+diff --git a/init/Kconfig b/init/Kconfig
+index 5f5c776ef192..fed9236078e4 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -2202,6 +2202,10 @@ config MODULE_SIG_SHA512
+ 	bool "Sign modules with SHA-512"
+ 	select CRYPTO_SHA512
+ 
++config MODULE_SIG_SM3
++	bool "Sign modules with SM3"
++	select CRYPTO_SM3
++
+ endchoice
+ 
+ config MODULE_SIG_HASH
+@@ -2212,6 +2216,7 @@ config MODULE_SIG_HASH
+ 	default "sha256" if MODULE_SIG_SHA256
+ 	default "sha384" if MODULE_SIG_SHA384
+ 	default "sha512" if MODULE_SIG_SHA512
++	default "sm3" if MODULE_SIG_SM3
+ 
+ config MODULE_COMPRESS
+ 	bool "Compress modules on installation"
+-- 
+2.19.1.3.ge56e4f7
+
