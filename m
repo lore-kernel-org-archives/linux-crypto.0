@@ -2,113 +2,165 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E3BC433DB
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 00:51:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 285D7C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 03:56:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 760926199F
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 00:51:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E91D5619AC
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 03:56:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231577AbhCWAvU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Mar 2021 20:51:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52238 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231716AbhCWAvI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Mar 2021 20:51:08 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 04DC6619A0;
-        Tue, 23 Mar 2021 00:51:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616460668;
-        bh=0GU+mvpQ6KFpPVwE2ur3Erg8FSP3jRjW/eXtmRXCw7s=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SRAQIK6VlIa1BVXD5FgNvXzx34HBQ3nVMbX7leQvXvYXSMTtjgk6mWm4fxRtHdXrG
-         Sl+9cOPfdzkSxJI2g2QhbnigL6cSZfMkC0RXNulceHz9OmyPFHKGTbqAKxWTn8/twn
-         EMzv+hHcg9G2Xmp3tGlnPk4bdmyS+lwe3Zw5YlpwukFKZT4m6kIj5geuBLx+pQG1y4
-         1zJRcn7b5muK8qMSLrlEyTwhClWY39umEzKY43sl4UdqV3ngeHney4bbSaXcYlXV4m
-         SIGJroPcyjPLzcfqW6L4ifaGkbd5OjitKvwFa06caWIHybxlw6K6H+NmicgKjVof6X
-         xrNN0Gkawe9Ig==
-Date:   Mon, 22 Mar 2021 17:51:06 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Arnd Bergmann <arnd@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>
-Subject: Re: [PATCH] crypto: poly1305: fix poly1305_core_setkey() declaration
-Message-ID: <YFk7erL3xBHoGNmj@gmail.com>
-References: <20210322170542.1791154-1-arnd@kernel.org>
- <CAMj1kXGj+autwGM-Me7qNoORsux9Xz_1-P=7w4m-9vGMXwDq4Q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMj1kXGj+autwGM-Me7qNoORsux9Xz_1-P=7w4m-9vGMXwDq4Q@mail.gmail.com>
+        id S229537AbhCWD4A (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 Mar 2021 23:56:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53622 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229574AbhCWDzz (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Mar 2021 23:55:55 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97992C061574;
+        Mon, 22 Mar 2021 20:55:55 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id j25so12891424pfe.2;
+        Mon, 22 Mar 2021 20:55:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=7xtegNsLq1BrppoFpeV19FwALB/ET7XzOcPVqqrlNjU=;
+        b=LAnagOQtR6OSecXobxKo5aH6LIwo34Q5YF2NxFUz/T/ScLdnJPjuaxppHlUhNENQFb
+         Zw9agxbeo29qCNWkR71Lx03Gfyu27jpS5DhloCobwGYJ1zAvMQFtV6nxfy9c69ngewYf
+         Y8eczQHzb5n/zu3EkdD5A24FKWuDSUvgKOXMFrwCcbI7uZL2dI9xJotBpViiEML4w5h1
+         iTcCUXFMDoqdMzvO+7jsnJ13RFix2TH/JsWJKOWNKt0L5WJ6HS/tHaCk66OhtK2qqdvA
+         gAoAjbrwepg5WAin/faMScd0RzN84xHJiVZg/hFN/MNTWx7b9fKTK9QJ7uBSe1FFYp80
+         u2zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=7xtegNsLq1BrppoFpeV19FwALB/ET7XzOcPVqqrlNjU=;
+        b=Bt/9xilR1PUsD2+dK+FGeW+kjwOqiTk9hh8wrZ49ixpMv/y5Yh9uXwsQ7BkLbCsSWx
+         AObzalSbIDVz8CPoLFTBE/rBO8VKLDWP6gdWklq9yVy7EmEDrxXqMST4Y0EC38RU8vXY
+         vTBner992lquHEMOhSb024pPkmMf6268gLFxMRNoAt/y2kqnAGFBAI1I7i+XuqdrkY3o
+         kmBBYMo1PGaXL7rlblbbEOQjf8cr/W+3mvz6plzWiwN9fRNAUAnk8jrRJhaxheu8osDA
+         BYGofIPyq/3p72C/hwDq9y3FHL7wz3imA0yojix98MZPnynXNgwdMLrxeh+ULIArTt4o
+         2pnQ==
+X-Gm-Message-State: AOAM533rV+kMH+ADbXsJfpMSoU2goH3FGR+r6aKeEi4Ti/dbkNP/pdqy
+        rNEaxUaDFGfjDW5R/0KIdxM=
+X-Google-Smtp-Source: ABdhPJwLeDHNOHF69RS1K7BEJgVhAn4UKH9nmPvD+PworcdCLSPxmEvvaxFwm+y9ze4cFA/jf49eCg==
+X-Received: by 2002:aa7:9431:0:b029:1f1:52fd:5444 with SMTP id y17-20020aa794310000b02901f152fd5444mr2800093pfo.47.1616471755208;
+        Mon, 22 Mar 2021 20:55:55 -0700 (PDT)
+Received: from linux-l9pv.suse ([124.11.22.254])
+        by smtp.gmail.com with ESMTPSA id z22sm14415630pfa.41.2021.03.22.20.55.52
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 22 Mar 2021 20:55:54 -0700 (PDT)
+From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ben Boeckel <me@benboeckel.net>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Malte Gell <malte.gell@gmx.de>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Lee, Chun-Yi" <jlee@suse.com>
+Subject: [PATCH 1/4] X.509: Add CodeSigning extended key usage parsing
+Date:   Tue, 23 Mar 2021 11:55:18 +0800
+Message-Id: <20210323035521.5843-2-jlee@suse.com>
+X-Mailer: git-send-email 2.12.3
+In-Reply-To: <20210323035521.5843-1-jlee@suse.com>
+References: <20210323035521.5843-1-jlee@suse.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 22, 2021 at 07:51:47PM +0100, Ard Biesheuvel wrote:
-> On Mon, 22 Mar 2021 at 18:05, Arnd Bergmann <arnd@kernel.org> wrote:
-> >
-> > From: Arnd Bergmann <arnd@arndb.de>
-> >
-> > gcc-11 points out a mismatch between the declaration and the definition
-> > of poly1305_core_setkey():
-> >
-> > lib/crypto/poly1305-donna32.c:13:67: error: argument 2 of type ‘const u8[16]’ {aka ‘const unsigned char[16]’} with mismatched bound [-Werror=array-parameter=]
-> >    13 | void poly1305_core_setkey(struct poly1305_core_key *key, const u8 raw_key[16])
-> >       |                                                          ~~~~~~~~~^~~~~~~~~~~
-> > In file included from lib/crypto/poly1305-donna32.c:11:
-> > include/crypto/internal/poly1305.h:21:68: note: previously declared as ‘const u8 *’ {aka ‘const unsigned char *’}
-> >    21 | void poly1305_core_setkey(struct poly1305_core_key *key, const u8 *raw_key);
-> >
-> > This is harmless in principle, as the calling conventions are the same,
-> > but the more specific prototype allows better type checking in the
-> > caller.
-> >
-> > Change the declaration to match the actual function definition.
-> > The poly1305_simd_init() is a bit suspicious here, as it previously
-> > had a 32-byte argument type, but looks like it needs to take the
-> > 16-byte POLY1305_BLOCK_SIZE array instead.
-> >
-> 
-> This looks ok to me. For historical reasons, the Poly1305 integration
-> is based on an unkeyed shash, and both the Poly1305 key and nonce are
-> passed as ordinary input, prepended to the actual data.
-> poly1305_simd_init() takes only the key but not the nonce, so it
-> should only be passed 16 bytes.
+This patch adds the logic for parsing the CodeSign extended key usage
+extension in X.509. The parsing result will be set to the eku flag
+which is carried by public key. It can be used in the PKCS#7
+verification.
 
-Well to be more precise, there are two conventions for using Poly1305.  One
-where it is invoked many times with the same 16-byte key and different 16-byte
-nonces.  And one where every invocation uses a unique key *and* nonce,
-interpreted as a 32-byte "one-time key".
+Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
+---
+ crypto/asymmetric_keys/x509_cert_parser.c | 24 ++++++++++++++++++++++++
+ include/crypto/public_key.h               |  1 +
+ include/linux/oid_registry.h              |  5 +++++
+ 3 files changed, 30 insertions(+)
 
-So that's why there's a mix of 16 and 32 byte "keys".
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index 52c9b455fc7d..65721313b265 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -497,6 +497,8 @@ int x509_process_extension(void *context, size_t hdrlen,
+ 	struct x509_parse_context *ctx = context;
+ 	struct asymmetric_key_id *kid;
+ 	const unsigned char *v = value;
++	int i = 0;
++	enum OID oid;
+ 
+ 	pr_debug("Extension: %u\n", ctx->last_oid);
+ 
+@@ -526,6 +528,28 @@ int x509_process_extension(void *context, size_t hdrlen,
+ 		return 0;
+ 	}
+ 
++	if (ctx->last_oid == OID_extKeyUsage) {
++		if (v[0] != ((ASN1_UNIV << 6) | ASN1_CONS_BIT | ASN1_SEQ) ||
++		    v[1] != vlen - 2)
++			return -EBADMSG;
++		i += 2;
++
++		while (i < vlen) {
++			/* A 10 bytes EKU OID Octet blob =
++			 * ASN1_OID + size byte + 8 bytes OID */
++			if (v[i] != ASN1_OID || v[i + 1] != 8 || (i + 10) > vlen)
++				return -EBADMSG;
++
++			oid = look_up_OID(v + i + 2, v[i + 1]);
++			if (oid == OID_codeSigning) {
++				ctx->cert->pub->eku |= EKU_codeSigning;
++			}
++			i += 10;
++		}
++		pr_debug("extKeyUsage: %d\n", ctx->cert->pub->eku);
++		return 0;
++	}
++
+ 	return 0;
+ }
+ 
+diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
+index 47accec68cb0..1ccaebe2a28b 100644
+--- a/include/crypto/public_key.h
++++ b/include/crypto/public_key.h
+@@ -28,6 +28,7 @@ struct public_key {
+ 	bool key_is_private;
+ 	const char *id_type;
+ 	const char *pkey_algo;
++	unsigned int eku : 9;      /* Extended Key Usage (9-bit) */
+ };
+ 
+ extern void public_key_free(struct public_key *key);
+diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
+index 4462ed2c18cd..e20e8eb53b21 100644
+--- a/include/linux/oid_registry.h
++++ b/include/linux/oid_registry.h
+@@ -113,9 +113,14 @@ enum OID {
+ 	OID_SM2_with_SM3,		/* 1.2.156.10197.1.501 */
+ 	OID_sm3WithRSAEncryption,	/* 1.2.156.10197.1.504 */
+ 
++	/* Extended key purpose OIDs [RFC 5280] */
++	OID_codeSigning,		/* 1.3.6.1.5.5.7.3.3 */
++
+ 	OID__NR
+ };
+ 
++#define EKU_codeSigning	(1 << 2)
++
+ extern enum OID look_up_OID(const void *data, size_t datasize);
+ extern int sprint_oid(const void *, size_t, char *, size_t);
+ extern int sprint_OID(enum OID, char *, size_t);
+-- 
+2.16.4
 
-The naming "POLY1305_KEY_SIZE" assumes the second convention, which is a bit
-confusing; it really should be called something like POLY1305_ONETIME_KEY_SIZE.
-I guess the idea was that the one-time key convention is the more common one.
-
-Anyway, the patch seems to be fine, as it uses the correct length in each
-location.  You can add:
-
-Reviewed-by: Eric Biggers <ebiggers@google.com>
-
-- Eric
