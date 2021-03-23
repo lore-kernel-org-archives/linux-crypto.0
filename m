@@ -2,58 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56383C433E2
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 03:56:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA9A2C433C1
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 03:57:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2BA25619AD
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 03:56:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2121619AB
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Mar 2021 03:57:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229692AbhCWDz7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Mar 2021 23:55:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53614 "EHLO
+        id S229898AbhCWD4c (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 Mar 2021 23:56:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbhCWDzw (ORCPT
+        with ESMTP id S229614AbhCWDz6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Mar 2021 23:55:52 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F121C061574;
-        Mon, 22 Mar 2021 20:55:52 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id n11so10376870pgm.12;
-        Mon, 22 Mar 2021 20:55:52 -0700 (PDT)
+        Mon, 22 Mar 2021 23:55:58 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C055C061574;
+        Mon, 22 Mar 2021 20:55:58 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id j25so12891511pfe.2;
+        Mon, 22 Mar 2021 20:55:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=/CvRWYjORCw8flby47H5HqIvyfw8yrJSz4E5Q321rKY=;
-        b=oP3QugZsARHuicP9Bg26t1dfWHywhPXHaALJqOojkEwJ/iujxOVkMqRGhGiXUaOMRG
-         OrUj++v6Sd52IkNczr9Kes+cRJTkle//IaYp3lL/EFwyXlEXOyVl19RoHGOO7eXkgoG+
-         Znb7BhgoAYEbk7csOp3ixyYN3GSjzbRlVRmu4Q0y/WFmt3EAuZiq7fGbWm5lfbaVWWGc
-         cSc5oAtc2K+wM70oemLc/RMcfhYQJ2TFh3WpBYoMcu47VtDGoamiaMuPoSdwnRGfn8JG
-         Y/YRgDag+cU8c39F6kPQ58PGzEsyhRq7q3xWUSMmCqtRJhvUK2mF0QFExtS4pf3jI12X
-         ytkA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=3jn01rfak00HumWqfPS+bL637Js5LvIW2OJzeMurQFU=;
+        b=QkjwxOMu48G0rNB9DuyGof5vlGstmavJYCB/+VQdvAM595uqyDsPQFkciK0HhNjHgA
+         Yp6HubUzxDN20L5GJcH3uFGI+Q7yhHU4KAmJVmUPN7oief0llOSpBUmaXLzGkmesM1hp
+         kAiBEROEVM3XZIzampgz99D7PslvQMzv7Y+wcAskqxNXioDw1Ry9RazM11E5q+/scOgq
+         OC1hMlzbHGFXnun+Vh4lNbzy0zJAf+ETIHKVFK9wBZLl3OKPgQQcD5mvzzzXJmTvtm/b
+         /5H5BISAtzlDuCK+VmGlEjPaBkODXjyS+pUd+5oeCA/c3CbYzqBk8xGPnMyOiIl3jooj
+         wx9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=/CvRWYjORCw8flby47H5HqIvyfw8yrJSz4E5Q321rKY=;
-        b=D+DJ8JikcetvDsOWfghhoF7Qqr0SjJjEl2XKmkNi5cMbjOv+xKhbsIEn5ixOBYmgY/
-         QSTtoUo9vHPd21zCLIM0P+9RCHBpu4Q9wiiqVsTekk9NWURaUVQfGADE64Du9A+U/fTC
-         p4Z5nQJyRDR23YPqOiU+NjGm5j8Z1svff0f2wO9/j6oeWTHNFdru3ptyUtZM68aDXhlw
-         yIRzVO31Wp97dEo3ABK7IoYExyYwv9I/nszMLRZhFJG7JjmtOQYmm9Wn8xVu5Qs8z88B
-         meZvb41wjVqJXaHBf1nppRBhS7XDszFN6p6P/YNRZC2GOwjsFYetQVa2ZOTvqCy6Jm81
-         TxcQ==
-X-Gm-Message-State: AOAM531Ujc0piEexTpHB4egSnIXsPNlLx+UZRv2TfQwNCvS/YxXp1J1V
-        fc0Pa0MgeAsTStHb0uwpec0wmrypMWo=
-X-Google-Smtp-Source: ABdhPJz7bPliC4trJh9fqTCx5sg8vrB15Qe7V5WYGLwGA1wWFP2t2D6WilPg0O2XUO0P//fSZZl5mw==
-X-Received: by 2002:a65:5cc2:: with SMTP id b2mr2272973pgt.280.1616471751866;
-        Mon, 22 Mar 2021 20:55:51 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=3jn01rfak00HumWqfPS+bL637Js5LvIW2OJzeMurQFU=;
+        b=n1+hzNSOkOhAkTk5ri9BJkrNZKRJupMzVDz3Eg58Pbx9sxngaKFR9T5VBvsu716k9Q
+         m0QfPKQh0KC/2LUn1U/NpXMh2qf97IIfeLGzY4xbY0ltqC2DNIsGe/PyW65wr01bIsY6
+         Ursj+rZCxkTISmyncQc+T1tEBx+RnOhGpSdKB84vniiQt4kvFezdhghOjZrFzHK+a4jK
+         ud2vytsY/FRe0D53PMSgd1NXZYhbMdj94C9KKD/YtIT6UnvulweKnWhvwq7Z7V/Z36Z0
+         EQI9GPmlpWjCfmc96xy4o5f6S3CHpSC/jvu79qCGdO5PKDnzYC3ijr2sdC2QrDRnKpOl
+         7kCw==
+X-Gm-Message-State: AOAM532YKbM2Vgp7P2VNDeHHfinHvDj3+3En5rs5RWnX6j25WLmbA/W7
+        s3uffPj7m85y2FUBXQnznJ4=
+X-Google-Smtp-Source: ABdhPJzX9V6pWRrvwRoO5KRrO8UHnbk259A5RNfdTTVDIiJWBOSjOaBSchUEJpr6pQVOg2Wt+YB6BQ==
+X-Received: by 2002:a62:1dcc:0:b029:209:7eef:b14e with SMTP id d195-20020a621dcc0000b02902097eefb14emr2917965pfd.3.1616471757814;
+        Mon, 22 Mar 2021 20:55:57 -0700 (PDT)
 Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id z22sm14415630pfa.41.2021.03.22.20.55.48
+        by smtp.gmail.com with ESMTPSA id z22sm14415630pfa.41.2021.03.22.20.55.55
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Mar 2021 20:55:51 -0700 (PDT)
+        Mon, 22 Mar 2021 20:55:57 -0700 (PDT)
 From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
 X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
 To:     David Howells <dhowells@redhat.com>
@@ -64,59 +66,147 @@ Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         Malte Gell <malte.gell@gmx.de>, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         "Lee, Chun-Yi" <jlee@suse.com>
-Subject: [PATCH v5 0/4] Check codeSigning extended key usage extension
-Date:   Tue, 23 Mar 2021 11:55:17 +0800
-Message-Id: <20210323035521.5843-1-jlee@suse.com>
+Subject: [PATCH 2/4] PKCS#7: Check codeSigning EKU for kernel module and kexec pe verification
+Date:   Tue, 23 Mar 2021 11:55:19 +0800
+Message-Id: <20210323035521.5843-3-jlee@suse.com>
 X-Mailer: git-send-email 2.12.3
+In-Reply-To: <20210323035521.5843-1-jlee@suse.com>
+References: <20210323035521.5843-1-jlee@suse.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-NIAP PP_OS certification requests that the OS shall validate the
-CodeSigning extended key usage extension field for integrity
-verifiction of exectable code:
+This patch adds the logic for checking the CodeSigning extended
+key usage when verifying signature of kernel module or
+kexec PE binary in PKCS#7.
 
-    https://www.niap-ccevs.org/MMO/PP/-442-/
-        FIA_X509_EXT.1.1
+Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
+---
+ certs/system_keyring.c               |  2 +-
+ crypto/asymmetric_keys/Kconfig       |  9 +++++++++
+ crypto/asymmetric_keys/pkcs7_trust.c | 37 +++++++++++++++++++++++++++++++++---
+ include/crypto/pkcs7.h               |  3 ++-
+ 4 files changed, 46 insertions(+), 5 deletions(-)
 
-This patchset adds the logic for parsing the codeSigning EKU extension
-field in X.509. And checking the CodeSigning EKU when verifying
-signature of kernel module or kexec PE binary in PKCS#7.
-
-v5:
-Fixed the wording in module-signing.rst.
-
-v4:
-Fixed the wording in patch description.
-
-v3:
-- Add codeSigning EKU to x509.genkey key generation config.
-- Add openssl command option example for generating CodeSign EKU to
-  module-signing.rst document. 
-
-v2:
-Changed the help wording in the Kconfig.
-
-Lee, Chun-Yi (4):
-  X.509: Add CodeSigning extended key usage parsing
-  PKCS#7: Check codeSigning EKU for kernel module and kexec pe
-    verification
-  modsign: Add codeSigning EKU when generating X.509 key generation
-    config
-  Documentation/admin-guide/module-signing.rst: add openssl command
-    option example for CodeSign EKU
-
- Documentation/admin-guide/module-signing.rst |  6 +++++
- certs/Makefile                               |  1 +
- certs/system_keyring.c                       |  2 +-
- crypto/asymmetric_keys/Kconfig               |  9 +++++++
- crypto/asymmetric_keys/pkcs7_trust.c         | 37 +++++++++++++++++++++++++---
- crypto/asymmetric_keys/x509_cert_parser.c    | 24 ++++++++++++++++++
- include/crypto/pkcs7.h                       |  3 ++-
- include/crypto/public_key.h                  |  1 +
- include/linux/oid_registry.h                 |  5 ++++
- 9 files changed, 83 insertions(+), 5 deletions(-)
-
+diff --git a/certs/system_keyring.c b/certs/system_keyring.c
+index 4b693da488f1..c9f8bca0b0d3 100644
+--- a/certs/system_keyring.c
++++ b/certs/system_keyring.c
+@@ -243,7 +243,7 @@ int verify_pkcs7_message_sig(const void *data, size_t len,
+ 			goto error;
+ 		}
+ 	}
+-	ret = pkcs7_validate_trust(pkcs7, trusted_keys);
++	ret = pkcs7_validate_trust(pkcs7, trusted_keys, usage);
+ 	if (ret < 0) {
+ 		if (ret == -ENOKEY)
+ 			pr_devel("PKCS#7 signature not signed with a trusted key\n");
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 1f1f004dc757..1754812df989 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -96,4 +96,13 @@ config SIGNED_PE_FILE_VERIFICATION
+ 	  This option provides support for verifying the signature(s) on a
+ 	  signed PE binary.
+ 
++config CHECK_CODESIGN_EKU
++	bool "Check codeSigning extended key usage"
++	depends on PKCS7_MESSAGE_PARSER=y
++	depends on SYSTEM_DATA_VERIFICATION
++	help
++	  This option provides support for checking the codeSigning extended
++	  key usage when verifying the signature in PKCS#7. It affects kernel
++	  module verification and kexec PE binary verification.
++
+ endif # ASYMMETRIC_KEY_TYPE
+diff --git a/crypto/asymmetric_keys/pkcs7_trust.c b/crypto/asymmetric_keys/pkcs7_trust.c
+index b531df2013c4..077bfef928b6 100644
+--- a/crypto/asymmetric_keys/pkcs7_trust.c
++++ b/crypto/asymmetric_keys/pkcs7_trust.c
+@@ -16,12 +16,36 @@
+ #include <crypto/public_key.h>
+ #include "pkcs7_parser.h"
+ 
++#ifdef CONFIG_CHECK_CODESIGN_EKU
++static bool check_codesign_eku(struct key *key,
++			     enum key_being_used_for usage)
++{
++	struct public_key *public_key = key->payload.data[asym_crypto];
++
++	switch (usage) {
++	case VERIFYING_MODULE_SIGNATURE:
++	case VERIFYING_KEXEC_PE_SIGNATURE:
++		return !!(public_key->eku & EKU_codeSigning);
++	default:
++		break;
++	}
++	return true;
++}
++#else
++static bool check_codesign_eku(struct key *key,
++			     enum key_being_used_for usage)
++{
++	return true;
++}
++#endif
++
+ /*
+  * Check the trust on one PKCS#7 SignedInfo block.
+  */
+ static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
+ 				    struct pkcs7_signed_info *sinfo,
+-				    struct key *trust_keyring)
++				    struct key *trust_keyring,
++				    enum key_being_used_for usage)
+ {
+ 	struct public_key_signature *sig = sinfo->sig;
+ 	struct x509_certificate *x509, *last = NULL, *p;
+@@ -112,6 +136,12 @@ static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
+ 	return -ENOKEY;
+ 
+ matched:
++	if (!check_codesign_eku(key, usage)) {
++		pr_warn("sinfo %u: The signer %x key is not CodeSigning\n",
++			sinfo->index, key_serial(key));
++		key_put(key);
++		return -ENOKEY;
++	}
+ 	ret = verify_signature(key, sig);
+ 	key_put(key);
+ 	if (ret < 0) {
+@@ -156,7 +186,8 @@ static int pkcs7_validate_trust_one(struct pkcs7_message *pkcs7,
+  * May also return -ENOMEM.
+  */
+ int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
+-			 struct key *trust_keyring)
++			 struct key *trust_keyring,
++			 enum key_being_used_for usage)
+ {
+ 	struct pkcs7_signed_info *sinfo;
+ 	struct x509_certificate *p;
+@@ -167,7 +198,7 @@ int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
+ 		p->seen = false;
+ 
+ 	for (sinfo = pkcs7->signed_infos; sinfo; sinfo = sinfo->next) {
+-		ret = pkcs7_validate_trust_one(pkcs7, sinfo, trust_keyring);
++		ret = pkcs7_validate_trust_one(pkcs7, sinfo, trust_keyring, usage);
+ 		switch (ret) {
+ 		case -ENOKEY:
+ 			continue;
+diff --git a/include/crypto/pkcs7.h b/include/crypto/pkcs7.h
+index 38ec7f5f9041..b3b48240ba73 100644
+--- a/include/crypto/pkcs7.h
++++ b/include/crypto/pkcs7.h
+@@ -30,7 +30,8 @@ extern int pkcs7_get_content_data(const struct pkcs7_message *pkcs7,
+  * pkcs7_trust.c
+  */
+ extern int pkcs7_validate_trust(struct pkcs7_message *pkcs7,
+-				struct key *trust_keyring);
++				struct key *trust_keyring,
++				enum key_being_used_for usage);
+ 
+ /*
+  * pkcs7_verify.c
 -- 
 2.16.4
 
