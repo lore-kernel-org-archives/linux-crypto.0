@@ -8,44 +8,44 @@ X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDA82C433EC
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 17:05:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E2CC4345C
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 17:05:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A92F261A13
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 17:05:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3015C61A36
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 17:05:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237106AbhCXRFZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Mar 2021 13:05:25 -0400
-Received: from mail-bn8nam11on2078.outbound.protection.outlook.com ([40.107.236.78]:50401
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        id S237155AbhCXRFj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Mar 2021 13:05:39 -0400
+Received: from mail-dm6nam11on2071.outbound.protection.outlook.com ([40.107.223.71]:41848
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S236999AbhCXRE7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Mar 2021 13:04:59 -0400
+        id S237053AbhCXRFH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Mar 2021 13:05:07 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f6xSxedJfOf5oQ06SwzmFNbO4M/+sF7DpKTbs2N+26k7QGpBBpgVQyO1TEFEXa80Un5bDVA9eNr0eJEzOZ2Z60q+vLdTwi2Fg3LXACmPQXtm5pmNh1TtcYOhSy3UhKwINWxY/CeMN96+iUoV3lb2+3jjrQTUoX3y9Ur/jqEf2rdERjBCbgER5VYu0AuqHLCt7X9yACyQA8B1SYwHOS0Q405ALODoAiG+cjnWx3f0hYyX+fZfSd+quk5KyrZJKs2tJtRGS4W02uwYfzke1cRHkjOBgs4LZ2O9PAxf44VH+KYfjOOwMdIjqeCKPU2rF3bjTa30h2PUJFbPlCxGvcR5fg==
+ b=EWIsyRFEZJ7KW6chubLFkfW0aZlnwfIYps+fkmwl7ef7mhSvwu3j4P212xwb7Cs3sYUfetxvc31taRsSrs/9UoaYqk19ZaLjXcsaSbiX4iPExaqBGxyKtoNDM+rkj713tqUY/J7T9JVr104mzaka+429o4w7iiYOk69NRJO9fakeInuSsy7KyUK3jSJA+7QE2uK1jr4EzcTgCprddJPxvlv/BD+Hv81Rf7DG6CBVKbQNTN3e3nx7TORUyxusTHtyd3VqXxTj4z/VmoLQKkiP9bOA4y5LVkUuvPPuuSLBrrsGcpOqhVqn3HoTzJewvoywLC63omrpNPb6JWOenMsZ2w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=do0UcJtGd1tsraFXZSOPOCjSYY6X2rNAIohoHuu/wmU=;
- b=HxI6EXvvNrwfgXI+dKXwKGViv4wBQeAXbVCqwTvp3wHYOr00MSAcamRQfDNInMq7LTk5hfwzSGxrZN8WCdthfyXx7IaR1AbQovxpzN95QTuu+PjB3o+h9lavQ1iSH0eojAMBvcYg9ksMdYjrNmxGXJZLjQ0eaFyY/1gYuhu/K/+4to4ZzrgccTcIrOerTd7Cl36pcgbjCMCw5XwlDY/FgT4nqlMIsGnyKdk2BhXLKw9QHC6FJ7lAI0HKbVt8WmUj5MT7aLzD0Yn6J+UT5EZce/bh8AOmgG5nEMGEr92IaO0ADSgbI7PO5wvBzagEwgfyzAw5pw3KYhP1T8gZOQEpQw==
+ bh=IXuxXQ4tqvmrxI/BUP7vB4cfLO5sTDWVRfqUI4qssOA=;
+ b=PuNRGCg92Lgpvdjt8UY9aKBciPGe3yYYmolW3plI1axQCQiekZWwe/BHStgWkrxFb45/3zs/Xkf75Yxwpae+jrdJepXtjbx/XfRKUc70bSVRi0Fawy2UD8sQqWEMD4Spcmg8dOf/z0yoDRt0IZ/IwpOi39DtjreP+EkNccyJBZjpO+5uCAeSnewGCA179YVsdXtTgWXCcIRi0vfaWYxDViCR0IRoB+6TdbR9lmSfDphAYwGICxPw6lDCDEWeu38Vv6b0Fw8z+FeuVCR823D9XjVyT+xLIZixQMjrM4J8z9ud2JR9EHImLcXJDyYsDaVN38hmSckldCAavyyKr/ygHQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=do0UcJtGd1tsraFXZSOPOCjSYY6X2rNAIohoHuu/wmU=;
- b=zvh/zJNlyIYMBQs+ddfM24s30Naz9H7fBfzKoO8QH/c8zs5ciKdxP81+9WFHr9FMSd0zH/y5g02tc/vlPkx/oWRzKCjWLyZYB7UHQh8sKljTm52Mk7TqNzy8OHSvGzwSQ+y3D48BntdRrohJhV4izL1KUIPmCoG9oS+Jor/dXE8=
+ bh=IXuxXQ4tqvmrxI/BUP7vB4cfLO5sTDWVRfqUI4qssOA=;
+ b=L8pBVHuS06oAW3EwFP/nzzd+RZKbOZsX5vwA6WswbEIOSJNvvWLljRvFltvpQGXWVg4nNVutAopb8sq5ZfwpJHas4hPOaNDBT7t5DpQNRChQex0E+4OmN77QhGRXS8G/Ji9PEOnISXmZUIC2F0oFG1MojrsQc1VfnQuEUMjtjec=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4557.namprd12.prod.outlook.com (2603:10b6:806:9d::10) with
+ by SA0PR12MB4382.namprd12.prod.outlook.com (2603:10b6:806:9a::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.24; Wed, 24 Mar
- 2021 17:04:56 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25; Wed, 24 Mar
+ 2021 17:05:04 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::30fb:2d6c:a0bf:2f1d]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::30fb:2d6c:a0bf:2f1d%3]) with mapi id 15.20.3955.027; Wed, 24 Mar 2021
- 17:04:56 +0000
+ 17:05:04 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
         linux-crypto@vger.kernel.org
@@ -60,10 +60,13 @@ Cc:     ak@linux.intel.com, herbert@gondor.apana.org.au,
         Paolo Bonzini <pbonzini@redhat.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: [RFC Part2 PATCH 07/30] mm: add support to split the large THP based on RMP violation
-Date:   Wed, 24 Mar 2021 12:04:13 -0500
-Message-Id: <20210324170436.31843-8-brijesh.singh@amd.com>
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: [RFC Part2 PATCH 16/30] KVM: SVM: add KVM_SNP_INIT command
+Date:   Wed, 24 Mar 2021 12:04:22 -0500
+Message-Id: <20210324170436.31843-17-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210324170436.31843-1-brijesh.singh@amd.com>
 References: <20210324170436.31843-1-brijesh.singh@amd.com>
@@ -74,75 +77,60 @@ X-ClientProxiedBy: SA0PR11CA0210.namprd11.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0210.namprd11.prod.outlook.com (2603:10b6:806:1bc::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25 via Frontend Transport; Wed, 24 Mar 2021 17:04:55 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0210.namprd11.prod.outlook.com (2603:10b6:806:1bc::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25 via Frontend Transport; Wed, 24 Mar 2021 17:05:03 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 19a39c8b-4a3c-4b70-e34d-08d8eee6f337
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4557:
+X-MS-Office365-Filtering-Correlation-Id: b1b7e277-f662-46ce-cc02-08d8eee6f79d
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4382:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB455789CACA2C28CBA6E84D7EE5639@SA0PR12MB4557.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:913;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4382842350C0FFFFF033ACE4E5639@SA0PR12MB4382.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FXch2kW+LV4YCVqStkMnPkE8+8fcPaHy+H34/FHIXDqkFxzWhUxzWBXKTOLj4oMXOckAaZPZ+53fG27q6/lTA4F202h1hXy7GSSg6bJ0ye3RyVkKBQ64J5DxAiIEu1drBos0L7BsgD8NzLB+ZA2W9l+UePHkTYJmD8Pj1e3GIuPDBiry9N+1Rchyw6fhzSrRbXhCv8ncXEhQxRKyS3cmH4wN3Q0bvvFKm8+pot+2Ap50hlYN2kVvZrLC4dyLto2fnB5K+2qijXgd5QCtmGSJy+XpeWQOBQB00RF2lO3VejgfOAWoP+nN8lXe9CcKWHsGzHAkaO1MYqmv95sBUpzGASuolW6Oc/urEL274H/AF3WCd3aeolJC7j7nbeivy2T9qgAw/OtxLrx8lOzX0nBYroDI0VokZf6B/UyCiqnBv+13iN1zKTtcWeXv33yl1VgIH6D1EbgHz6ElwTb3Y/fJ18EVNicZP6b1itgaq0BoXNzvjUpPGZlHCY98Xnf/NGJQkRRbEfaSC6OnAfcz4QDM34IHnzL4E5jag24qfBnnLQuOK1Mps0p0levRYNsk9oNW1R+w96G6A8CJQPJfaSwcmUF/BrC0AI2ksfi9C6L7N+h2aNiuCY1BFf0G3JFwAujPlpmxjNIbrMpzSGBADCwNJ9hFgocB4C96Qsv5jpzABpQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(396003)(346002)(136003)(39860400002)(86362001)(54906003)(186003)(44832011)(6666004)(4326008)(38100700001)(26005)(316002)(66476007)(8676002)(16526019)(1076003)(2616005)(83380400001)(5660300002)(6486002)(956004)(52116002)(8936002)(478600001)(7416002)(7696005)(66556008)(36756003)(66946007)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?CiutqyPj5xo6QsRvwHDeUthMliKzoNdDzYoBwbZNk/kF7iD9K45qVfAZnQq4?=
- =?us-ascii?Q?3IhlmSJmYhb+5LUca0WnXkuYgkb6b8NT9PEMK6BHSWM21/U0eElFvGbUotj8?=
- =?us-ascii?Q?OA5E1wmPMXrc0qQp31wBGV2Q7s8CMJ+5r1L7Qnw8uBZKYGzuP1ibVgPxHpas?=
- =?us-ascii?Q?F/guXeDA03UEP85yBvUfVrmGah1O7Qg58hM3c70CC2dZMerCGNCmGPdPgk6Z?=
- =?us-ascii?Q?JMS5tuhZsHHcnTKEdt4bl+m5lR7uNFPCHRfMEPzhZSfpki3cfcV73jRZxwFe?=
- =?us-ascii?Q?+Cjhzjfkp2Q9Liydu9spQKYc7YEC2Bs1Gxvvc3r4VUf6SiJOgWK8TxXdK3O6?=
- =?us-ascii?Q?6y0wZU5TcUEOFwtNqDN1x41bOz3zhrxy5vjYYOVvaRQ5WwInCF7d3jROJ4Mv?=
- =?us-ascii?Q?jmXKBdRkRaKd2BRzn2wHff/TQ5gFasMlTyaL+icLs2TacuM0+1IAwYgQ4IGc?=
- =?us-ascii?Q?GI28su/2LI6RgPiSmJol4fldqwtTHLFy/YYdUQGWjvXd9/OTHWUTehUPPNdP?=
- =?us-ascii?Q?h+CcmkfUWUHsPeRga4uhUXlnyJdNysokj3Ld2EC715f3q7Q/NoaqTxPxTBc6?=
- =?us-ascii?Q?ewLNtooFCabxb+uH9pYeTDu2o/AGgdaambeBNEgctdG3E0s8tzUx1lWus8MX?=
- =?us-ascii?Q?Y7qGNXJAkZTK4WIldvmwpzTuAsObixK9LCGa4+rHswPnMWpOqwUjaDMTW2c4?=
- =?us-ascii?Q?9aYowg/UbJnQx7X4CrMG8G1QuLIS3jsOJsHJSMwZ1CRFuXVfLqBoJ95s982q?=
- =?us-ascii?Q?nSCE6/iYNqLQAuhNmLvvrsjBh6Fu07+kuvgEDhUP6aO+GVnbw7FEDBGuxhxh?=
- =?us-ascii?Q?1BOSi7YQTUDnItzU7hCXIggbp5D9WhLzODfXUWxrT0JJXB7Rfx0r60P1LqkY?=
- =?us-ascii?Q?IPB9Z9Lp0duJ29J9i+2lzGJA1xNiQcQh+C8hXSrgz5Me/yxlL41wz5L40ddP?=
- =?us-ascii?Q?xM9QfJ6rk4iF4O0/+c3OABc1s77ieZMlxtt840q5eim98YE4y5/QcCdTrcHA?=
- =?us-ascii?Q?Le8hImTvVJEYvDP+DYqX7Ly3EGYG+uowLLQgza6wicCBkxKR8AP66AD6MnTE?=
- =?us-ascii?Q?lPDJd95Vtbv8E8tQ2TZhb96u6SLdBMGuZCWPCdg6wzjd2eI4pyIZExaHTGBU?=
- =?us-ascii?Q?mYF4xjBuk/u722wHi0PJzG+WNw0KU6XKcRu9r36CpW0/v+XUbWbbDUEJcC7I?=
- =?us-ascii?Q?27gt2EY6d8/QxKd1lztfrxlta6ruKEAfo+/OjHIEH/678CWmtMWJdqIxq4wF?=
- =?us-ascii?Q?dXhNt6AXWlj5d6v53RDA6y/bUfPP8NGlFS9Tt2KU25032gXh9uZYvzgPEJKf?=
- =?us-ascii?Q?/VypaW5duVRlNpUpyIaBYQW+?=
+X-Microsoft-Antispam-Message-Info: hOJhOxOYCFbSyB0NJebtuAea1MtoG2LJ7gp1PVTG3f0qObori1bcnVZowSrKgQz3oRM1OJ95cB0NJjwbj85Erbr0Da62lvK7cV2aIAZl/GnaWdJ3wHIP2yCxNQeOoiCa1RnDuEySu994cxaKnGlbO4EP4FX2+We4lPzBBGf3T6zv7s6dc5bZfvmpVuNGmxkIRcUnWlKjgBsLWW9hmt1ngE65kQnR60t5Y4d4BsDW9wVrxvGgSgpGtcN/mb9yC/QHW1cUxHX6rJUpOPmMz5yBe2ULSh3oThGjOQa9fAlSLC8OwnmxRVU5HrkPHy4hkpQO9pNfyq9IabnA4NeKeSpk/DGYlOP7Jiv+EgQ7PyrdDXfWICiUEl2+3pDLmmDiwI7u/0GRc8DDTuiCSttMFtFvV9E2FhWxwNtq27OZWmajPRfkYkKFkMXmNZvLSrs8SKJSJ6M05jRMthF776D0uB4zevYFbvsWgLTjp1t2P1JxI7Kx/80JcLNJ24ZvrupcxFudcQT2DLecLDol27H/qczUCFHoClN45J3mtWR/emxyhbNscUQZCchyb+f6+SrdciGqwG2+6Ep1URpALVT31QXWswDDN5XWNiXk1yZAE4kkmBQp+bZG+KxzaeTqXEKaYDFfV7IrHXeXR59KtPulx4xEiA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(376002)(346002)(366004)(39860400002)(6666004)(44832011)(66946007)(1076003)(66556008)(66476007)(956004)(36756003)(478600001)(2616005)(83380400001)(8676002)(2906002)(8936002)(26005)(86362001)(5660300002)(52116002)(7696005)(38100700001)(4326008)(54906003)(7416002)(16526019)(6486002)(316002)(186003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?oXafx1dIypzjScjtVqsXCyP/nJgg5663sHuYMltJtqCsUeVOa7J5SgPoXPNR?=
+ =?us-ascii?Q?dWN93Op8yMmMtnsQU069pYP0bpZYPmDFQ8yv44cWOD1Yv54GXINDPRmjjzvm?=
+ =?us-ascii?Q?KKvkPLuBGp9QvVcTqNJzGvwemOmMkHwkARGbwY7Q2lROHil1qvHjs68HwEgR?=
+ =?us-ascii?Q?67GuO0QjL1J+0uBbMrFliZmjinlazM+mmj2ajkLO8AWDr2Gs3kIwFIyst7Fl?=
+ =?us-ascii?Q?0Mws08gOn9gwm8+U08UuDl7t+ifvw9+9w6ke936k75etgW/VVL85SPonuzen?=
+ =?us-ascii?Q?C1RtvXW9+WfYqJJvr643Ks/6iuObQ1EIwcW16XAaBxVyQ+Ed42wPebQkbHjy?=
+ =?us-ascii?Q?m241QmhpaZdrQpVycIfNHhmjWm2+icDJ7kLIiet2g+bEKVETGZ6drL0gl5rZ?=
+ =?us-ascii?Q?qxxjYVDByYUllUTEcwHihoLim2iqRy2Ri8jlNJDszlLTJpmBL4AeVdj+sOXm?=
+ =?us-ascii?Q?LVgK3DXheuuwMSKv2rUa9ZYU1GEMTB9of+bAhyBYBT7CeroU1WOlGcNK8fWx?=
+ =?us-ascii?Q?V8onpLKz0IxWhxtdQDnwezpYaOWNLXdG6QHSZMPBHI2MQL2+RpZcUbkPn5At?=
+ =?us-ascii?Q?3uyNvZK6PIYKI0LH+wo56/iNcyZVpU1pJthx9jh7iyMVUWxBgqj6fZ2tJw5c?=
+ =?us-ascii?Q?NSmZrKVUpfbEZv/E3LnZiDPaCekCUGwQAHu2P3WVd6xA5nrvIdJ3QY8CYDg2?=
+ =?us-ascii?Q?H5IF2SV0e18xgWWrAN16ADCb+UKBVs4cSpXF3H6zEQxVhfwLKegSBctRJLot?=
+ =?us-ascii?Q?Yq3cS0rjy5R3iISN1Sv5N3Pjy4xd1v2SHnlTh48O3Zy5Q7SrmdyWJse6EqDN?=
+ =?us-ascii?Q?ZK6BKB+Y19y8HkakCE/hp82BojVi35+iAkvTsIf7L+UnZ/N03eqDnj8z+auO?=
+ =?us-ascii?Q?hJVr7JS2eCq9QLCtla4tuWTI0xcgZ7VPI4xwwVW5W1u37yYElm3r0FQGnpg4?=
+ =?us-ascii?Q?Volf+2pa0HODJAE/T+rdGhfgGb0jWjCFYJoIhdboQaWHfwNpw3ygYQ8XfAn3?=
+ =?us-ascii?Q?5yo+iETJL81y067qmces2EqnMrn7UqZWoR9Z9MEzSSEo7/JDpT6cV0Gby1eM?=
+ =?us-ascii?Q?0ZcjhZS7T1olE8hYhWXe+gijkbflmtiwl3lsb2ci+0zMiOb+Kyw+S0S8GbH1?=
+ =?us-ascii?Q?dqARGozbO+P460ugmnVGitc5EJ7kcQitDkARc+UtN8+3ieWbQw8T/hgo9nNE?=
+ =?us-ascii?Q?Q8nJLrEH9M8vbJyJx5cmgacmOA9gG8yf2yvvka90jFhSabQHmN3xx3AWAMC2?=
+ =?us-ascii?Q?2InzALYxjPG4wSQKCefJyNgYYSgTDLVaEZVqav4MmjKFXYLUzti1cHi0j2pk?=
+ =?us-ascii?Q?dhCtx7SOiQv1Br1gPw2s+WXF?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 19a39c8b-4a3c-4b70-e34d-08d8eee6f337
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1b7e277-f662-46ce-cc02-08d8eee6f79d
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2021 17:04:56.4629
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2021 17:05:03.8786
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pfqppQlQkuvub/Fc3lQyxJo6k5nWJPwxiwyBJgBsDDxn/aAGtHb5mhJM4LOYqR4EuQqYGv7ba/HP541ilruARw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4557
+X-MS-Exchange-CrossTenant-UserPrincipalName: jt2hguuXBGVTMl2wW9y5a2ojvstMtcpybB/swUuiV6ZMqrcMxJtSKsEZ0lB4F+Q7z+ED2QkDLMDpIYplUYJ6vw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4382
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When SEV-SNP is enabled globally in the system, a write from the hypervisor
-can raise an RMP violation. We can resolve the RMP violation by splitting
-the virtual address to a lower page level.
-
-e.g
-- guest made a page shared in the RMP entry so that the hypervisor
-  can write to it.
-- the hypervisor has mapped the pfn as a large page. A write access
-  will cause an RMP violation if one of the pages within the 2MB region
-  is a guest private page.
-
-The above RMP violation can be resolved by simply splitting the large
-page.
-
-The architecture specific code will read the RMP entry to determine
-if the fault can be resolved by splitting and propagating the request
-to split the page by setting newly introduced fault flag
-(FAULT_FLAG_PAGE_SPLIT). If the fault cannot be resolved by splitting,
-then a SIGBUS signal is sent to terminate the process.
+The KVM_SNP_INIT command is used by the hypervisor to initialize the
+SEV-SNP platform context. In a typical workflow, this command should be the
+first command issued. When creating SEV-SNP guest, the VMM must use this
+command instead of the KVM_SEV_INIT or KVM_SEV_ES_INIT.
 
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Ingo Molnar <mingo@redhat.com>
@@ -156,188 +144,146 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Tom Lendacky <thomas.lendacky@amd.com>
 Cc: David Rientjes <rientjes@google.com>
 Cc: Sean Christopherson <seanjc@google.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>
+Cc: Jim Mattson <jmattson@google.com>
 Cc: x86@kernel.org
 Cc: kvm@vger.kernel.org
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/mm/fault.c | 81 +++++++++++++++++++++++++++++++++++++++++++++
- include/linux/mm.h  |  6 +++-
- mm/memory.c         | 11 ++++++
- 3 files changed, 97 insertions(+), 1 deletion(-)
+ arch/x86/kvm/svm/sev.c   | 41 ++++++++++++++++++++++++++++++++++++++--
+ arch/x86/kvm/svm/svm.c   |  5 +++++
+ arch/x86/kvm/svm/svm.h   |  1 +
+ include/uapi/linux/kvm.h |  3 +++
+ 4 files changed, 48 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
-index 7605e06a6dd9..f6571563f433 100644
---- a/arch/x86/mm/fault.c
-+++ b/arch/x86/mm/fault.c
-@@ -1305,6 +1305,70 @@ do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,
- }
- NOKPROBE_SYMBOL(do_kern_addr_fault);
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 4d5be5d2b05c..36042a2b19b3 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -189,7 +189,10 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	if (asid < 0)
+ 		return ret;
  
-+#define RMP_FAULT_RETRY		0
-+#define RMP_FAULT_KILL		1
-+#define RMP_FAULT_PAGE_SPLIT	2
-+
-+static inline size_t pages_per_hpage(int level)
-+{
-+	return page_level_size(level) / PAGE_SIZE;
-+}
-+
-+/*
-+ * The RMP fault can happen when a hypervisor attempts to write to:
-+ * 1. a guest owned page or
-+ * 2. any pages in the large page is a guest owned page.
-+ *
-+ * #1 will happen only when a process or VMM is attempting to modify the guest page
-+ * without the guests cooperation. If a guest wants a VMM to be able to write to its memory
-+ * then it should make the page shared. If we detect #1, kill the process because we can not
-+ * resolve the fault.
-+ *
-+ * #2 can happen when the page level does not match between the RMP entry and x86
-+ * page table walk, e.g the page is mapped as a large page in the x86 page table but its
-+ * added as a 4K shared page in the RMP entry. This can be resolved by splitting the address
-+ * into a smaller page level.
-+ */
-+static int handle_rmp_page_fault(unsigned long hw_error_code, unsigned long address)
-+{
-+	unsigned long pfn, mask;
-+	int rmp_level, level;
-+	rmpentry_t *e;
-+	pte_t *pte;
-+
-+	/* Get the native page level */
-+	pte = lookup_address_in_mm(current->mm, address, &level);
-+	if (unlikely(!pte))
-+		return RMP_FAULT_KILL;
-+
-+	pfn = pte_pfn(*pte);
-+	if (level > PG_LEVEL_4K) {
-+		mask = pages_per_hpage(level) - pages_per_hpage(level - 1);
-+		pfn |= (address >> PAGE_SHIFT) & mask;
-+	}
-+
-+	/* Get the page level from the RMP entry. */
-+	e = lookup_page_in_rmptable(pfn_to_page(pfn), &rmp_level);
-+	if (!e) {
-+		pr_alert("SEV-SNP: failed to lookup RMP entry for address 0x%lx pfn 0x%lx\n",
-+			 address, pfn);
-+		return RMP_FAULT_KILL;
-+	}
-+
-+	/* Its a guest owned page */
-+	if (rmpentry_assigned(e))
-+		return RMP_FAULT_KILL;
-+
-+	/*
-+	 * Its a shared page but the page level does not match between the native walk
-+	 * and RMP entry.
-+	 */
-+	if (level > rmp_level)
-+		return RMP_FAULT_PAGE_SPLIT;
-+
-+	return RMP_FAULT_RETRY;
-+}
-+
- /* Handle faults in the user portion of the address space */
- static inline
- void do_user_addr_fault(struct pt_regs *regs,
-@@ -1315,6 +1379,7 @@ void do_user_addr_fault(struct pt_regs *regs,
- 	struct task_struct *tsk;
- 	struct mm_struct *mm;
- 	vm_fault_t fault;
+-	ret = sev_platform_init(&argp->error);
++	if (sev->snp_active)
++		ret = sev_snp_init(&argp->error);
++	else
++		ret = sev_platform_init(&argp->error);
+ 	if (ret)
+ 		goto e_free;
+ 
+@@ -206,12 +209,19 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ static int sev_es_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ {
 +	int ret;
- 	unsigned int flags = FAULT_FLAG_DEFAULT;
- 
- 	tsk = current;
-@@ -1377,6 +1442,22 @@ void do_user_addr_fault(struct pt_regs *regs,
- 	if (hw_error_code & X86_PF_INSTR)
- 		flags |= FAULT_FLAG_INSTRUCTION;
- 
-+	/*
-+	 * If its an RMP violation, see if we can resolve it.
-+	 */
-+	if ((hw_error_code & X86_PF_RMP)) {
-+		ret = handle_rmp_page_fault(hw_error_code, address);
-+		if (ret == RMP_FAULT_PAGE_SPLIT) {
-+			flags |= FAULT_FLAG_PAGE_SPLIT;
-+		} else if (ret == RMP_FAULT_KILL) {
-+			fault |= VM_FAULT_SIGBUS;
-+			mm_fault_error(regs, hw_error_code, address, fault);
-+			return;
-+		} else {
-+			return;
-+		}
-+	}
 +
- #ifdef CONFIG_X86_64
- 	/*
- 	 * Faults in the vsyscall page might need emulation.  The
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index ecdf8a8cd6ae..1be3218f3738 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -434,6 +434,8 @@ extern pgprot_t protection_map[16];
-  * @FAULT_FLAG_REMOTE: The fault is not for current task/mm.
-  * @FAULT_FLAG_INSTRUCTION: The fault was during an instruction fetch.
-  * @FAULT_FLAG_INTERRUPTIBLE: The fault can be interrupted by non-fatal signals.
-+ * @FAULT_FLAG_PAGE_SPLIT: The fault was due page size mismatch, split the region to smaller
-+ *   page size and retry.
-  *
-  * About @FAULT_FLAG_ALLOW_RETRY and @FAULT_FLAG_TRIED: we can specify
-  * whether we would allow page faults to retry by specifying these two
-@@ -464,6 +466,7 @@ extern pgprot_t protection_map[16];
- #define FAULT_FLAG_REMOTE			0x80
- #define FAULT_FLAG_INSTRUCTION  		0x100
- #define FAULT_FLAG_INTERRUPTIBLE		0x200
-+#define FAULT_FLAG_PAGE_SPLIT			0x400
+ 	if (!sev_es)
+ 		return -ENOTTY;
  
- /*
-  * The default fault flags that should be used by most of the
-@@ -501,7 +504,8 @@ static inline bool fault_flag_allow_retry_first(unsigned int flags)
- 	{ FAULT_FLAG_USER,		"USER" }, \
- 	{ FAULT_FLAG_REMOTE,		"REMOTE" }, \
- 	{ FAULT_FLAG_INSTRUCTION,	"INSTRUCTION" }, \
--	{ FAULT_FLAG_INTERRUPTIBLE,	"INTERRUPTIBLE" }
-+	{ FAULT_FLAG_INTERRUPTIBLE,	"INTERRUPTIBLE" }, \
-+	{ FAULT_FLAG_PAGE_SPLIT,	"PAGESPLIT" }
++	/* Must be set so that sev_asid_new() allocates ASID from the ES ASID range. */
+ 	to_kvm_svm(kvm)->sev_info.es_active = true;
  
- /*
-  * vm_fault is filled by the pagefault handler and passed to the vma's
-diff --git a/mm/memory.c b/mm/memory.c
-index feff48e1465a..c9dcf9b30719 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -4427,6 +4427,12 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
- 	return 0;
+-	return sev_guest_init(kvm, argp);
++	ret = sev_guest_init(kvm, argp);
++	if (ret)
++		to_kvm_svm(kvm)->sev_info.es_active = false;
++
++	return ret;
  }
  
-+static int handle_split_page_fault(struct vm_fault *vmf)
+ static int sev_bind_asid(struct kvm *kvm, unsigned int handle, int *error)
+@@ -1042,6 +1052,23 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	return ret;
+ }
+ 
++static int sev_snp_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
 +{
-+	__split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++	int rc;
++
++	if (!sev_snp)
++		return -ENOTTY;
++
++	rc = sev_es_guest_init(kvm, argp);
++	if (rc)
++		return rc;
++
++	sev->snp_active = true;
++
 +	return 0;
 +}
 +
- /*
-  * By the time we get here, we already hold the mm semaphore
-  *
-@@ -4448,6 +4454,7 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
- 	pgd_t *pgd;
- 	p4d_t *p4d;
- 	vm_fault_t ret;
-+	int split_page = flags & FAULT_FLAG_PAGE_SPLIT;
+ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+ {
+ 	struct kvm_sev_cmd sev_cmd;
+@@ -1092,6 +1119,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+ 	case KVM_SEV_LAUNCH_SECRET:
+ 		r = sev_launch_secret(kvm, &sev_cmd);
+ 		break;
++	case KVM_SEV_SNP_INIT:
++		r = sev_snp_guest_init(kvm, &sev_cmd);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		goto out;
+@@ -1955,6 +1985,13 @@ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in)
+ 				    svm->ghcb_sa, svm->ghcb_sa_len, in);
+ }
  
- 	pgd = pgd_offset(mm, address);
- 	p4d = p4d_alloc(mm, pgd, address);
-@@ -4504,6 +4511,10 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
- 				pmd_migration_entry_wait(mm, vmf.pmd);
- 			return 0;
++void sev_snp_init_vmcb(struct vcpu_svm *svm)
++{
++	struct vmcb_save_area *save = &svm->vmcb->save;
++
++	save->sev_features |= SVM_SEV_FEATURES_SNP_ACTIVE;
++}
++
+ void sev_es_init_vmcb(struct vcpu_svm *svm)
+ {
+ 	struct kvm_vcpu *vcpu = &svm->vcpu;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 13df2cbfc361..72fc1bd8737c 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1281,6 +1281,11 @@ static void init_vmcb(struct vcpu_svm *svm)
+ 			/* Perform SEV-ES specific VMCB updates */
+ 			sev_es_init_vmcb(svm);
  		}
 +
-+		if (split_page)
-+			return handle_split_page_fault(&vmf);
++		if (sev_snp_guest(svm->vcpu.kvm)) {
++			/* Perform SEV-SNP specific VMCB Updates */
++			sev_snp_init_vmcb(svm);
++		}
+ 	}
+ 
+ 	vmcb_mark_all_dirty(svm->vmcb);
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 9e8cd39bd703..9d41735699c6 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -604,6 +604,7 @@ void sev_es_vcpu_load(struct vcpu_svm *svm, int cpu);
+ void sev_es_vcpu_put(struct vcpu_svm *svm);
+ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+ struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
++void sev_snp_init_vmcb(struct vcpu_svm *svm);
+ 
+ /* vmenter.S */
+ 
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 374c67875cdb..e0e7dd71a863 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1594,6 +1594,9 @@ enum sev_cmd_id {
+ 	/* Guest certificates commands */
+ 	KVM_SEV_CERT_EXPORT,
+ 
++	/* SNP specific commands */
++	KVM_SEV_SNP_INIT,
 +
- 		if (pmd_trans_huge(orig_pmd) || pmd_devmap(orig_pmd)) {
- 			if (pmd_protnone(orig_pmd) && vma_is_accessible(vma))
- 				return do_huge_pmd_numa_page(&vmf, orig_pmd);
+ 	KVM_SEV_NR_MAX,
+ };
+ 
 -- 
 2.17.1
 
