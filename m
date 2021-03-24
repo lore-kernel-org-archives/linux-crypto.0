@@ -2,28 +2,28 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD54BC433E8
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 12:16:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A250EC433C1
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 12:16:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8E4FB61A0B
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 12:16:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62FF5619B4
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 12:16:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233113AbhCXMPk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Mar 2021 08:15:40 -0400
-Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:44713 "EHLO
-        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232529AbhCXMPa (ORCPT
+        id S233299AbhCXMQM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Mar 2021 08:16:12 -0400
+Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:38952 "EHLO
+        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233286AbhCXMQK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Mar 2021 08:15:30 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0UTAQEfH_1616588125;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UTAQEfH_1616588125)
+        Wed, 24 Mar 2021 08:16:10 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R761e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0UTAwqDS_1616588126;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UTAwqDS_1616588126)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 24 Mar 2021 20:15:25 +0800
+          Wed, 24 Mar 2021 20:15:26 +0800
 From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 To:     David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -43,10 +43,12 @@ To:     David Howells <dhowells@redhat.com>,
         linux-crypto@vger.kernel.org,
         Jia Zhang <zhang.jia@linux.alibaba.com>
 Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH v2 0/2] support sign module with SM2-with-SM3 algorithm
-Date:   Wed, 24 Mar 2021 20:15:23 +0800
-Message-Id: <20210324121525.16062-1-tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH v2 2/2] init/Kconfig: support sign module with SM2-with-SM3 algorithm
+Date:   Wed, 24 Mar 2021 20:15:25 +0800
+Message-Id: <20210324121525.16062-3-tianjia.zhang@linux.alibaba.com>
 X-Mailer: git-send-email 2.19.1.3.ge56e4f7
+In-Reply-To: <20210324121525.16062-1-tianjia.zhang@linux.alibaba.com>
+References: <20210324121525.16062-1-tianjia.zhang@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -58,8 +60,8 @@ hash (OSCCA GM/T 0004-2012 SM3). SM2 and SM3 always appear in pairs.
 The former is used for signing and the latter is used for hash
 calculation.
 
-To sign a kernel module, first, prepare openssl 3.0.0 alpha6 and a
-configuration file openssl.cnf with the following content:
+To sign a kernel module, first, prepare a configuration file
+openssl.cnf with the following content:
 
   [ req ]
   default_bits = 2048
@@ -112,20 +114,58 @@ algorithm combination:
 At this point, we should built the CA certificate into the kernel, and
 then we can load the SM2-with-SM3 signed module normally.
 
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 ---
-v2 change:
-  - split one patch into twos.
-  - richer commit log.
-
-Tianjia Zhang (2):
-  pkcs7: make parser enable SM2 and SM3 algorithms combination
-  init/Kconfig: support sign module with SM2-with-SM3 algorithm
-
  Documentation/admin-guide/module-signing.rst | 5 +++--
- crypto/asymmetric_keys/pkcs7_parser.c        | 7 +++++++
  init/Kconfig                                 | 5 +++++
- 3 files changed, 15 insertions(+), 2 deletions(-)
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
+diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation/admin-guide/module-signing.rst
+index 7d7c7c8a545c..8d8980808b5b 100644
+--- a/Documentation/admin-guide/module-signing.rst
++++ b/Documentation/admin-guide/module-signing.rst
+@@ -30,8 +30,8 @@ This facility uses X.509 ITU-T standard certificates to encode the public keys
+ involved.  The signatures are not themselves encoded in any industrial standard
+ type.  The facility currently only supports the RSA public key encryption
+ standard (though it is pluggable and permits others to be used).  The possible
+-hash algorithms that can be used are SHA-1, SHA-224, SHA-256, SHA-384, and
+-SHA-512 (the algorithm is selected by data in the signature).
++hash algorithms that can be used are SHA-1, SHA-224, SHA-256, SHA-384, SHA-512,
++and SM3 (the algorithm is selected by data in the signature).
+ 
+ 
+ ==========================
+@@ -86,6 +86,7 @@ This has a number of options available:
+ 	``CONFIG_MODULE_SIG_SHA256``	:menuselection:`Sign modules with SHA-256`
+ 	``CONFIG_MODULE_SIG_SHA384``	:menuselection:`Sign modules with SHA-384`
+ 	``CONFIG_MODULE_SIG_SHA512``	:menuselection:`Sign modules with SHA-512`
++	``CONFIG_MODULE_SIG_SM3``	:menuselection:`Sign modules with SM3`
+         =============================== ==========================================
+ 
+      The algorithm selected here will also be built into the kernel (rather
+diff --git a/init/Kconfig b/init/Kconfig
+index 5f5c776ef192..fed9236078e4 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -2202,6 +2202,10 @@ config MODULE_SIG_SHA512
+ 	bool "Sign modules with SHA-512"
+ 	select CRYPTO_SHA512
+ 
++config MODULE_SIG_SM3
++	bool "Sign modules with SM3"
++	select CRYPTO_SM3
++
+ endchoice
+ 
+ config MODULE_SIG_HASH
+@@ -2212,6 +2216,7 @@ config MODULE_SIG_HASH
+ 	default "sha256" if MODULE_SIG_SHA256
+ 	default "sha384" if MODULE_SIG_SHA384
+ 	default "sha512" if MODULE_SIG_SHA512
++	default "sm3" if MODULE_SIG_SM3
+ 
+ config MODULE_COMPRESS
+ 	bool "Compress modules on installation"
 -- 
 2.19.1.3.ge56e4f7
 
