@@ -2,161 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7C1C433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 14:08:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1909AC433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 14:33:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 89A44619F9
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 14:08:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E0C7A61A0A
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 14:33:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235964AbhCXOIF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Mar 2021 10:08:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45180 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235963AbhCXOHk (ORCPT
+        id S236333AbhCXOdW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Mar 2021 10:33:22 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:14861 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236337AbhCXOdA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Mar 2021 10:07:40 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82AE3C061763
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Mar 2021 07:07:40 -0700 (PDT)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1lP4AZ-0001d9-IF; Wed, 24 Mar 2021 15:07:35 +0100
-Subject: Re: [PATCH v1 3/3] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
-To:     Sumit Garg <sumit.garg@linaro.org>
-Cc:     Mimi Zohar <zohar@linux.ibm.com>,
-        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        James Bottomley <jejb@linux.ibm.com>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Udit Agarwal <udit.agarwal@nxp.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
- <319e558e1bd19b80ad6447c167a2c3942bdafea2.1615914058.git-series.a.fatoum@pengutronix.de>
- <01e6e13d-2968-0aa5-c4c8-7458b7bde462@nxp.com>
- <45a9e159-2dcb-85bf-02bd-2993d50b5748@pengutronix.de>
- <f9c0087d299be1b9b91b242f41ac6ef7b9ee3ef7.camel@linux.ibm.com>
- <63dd7d4b-4729-9e03-cd8f-956b94eab0d9@pengutronix.de>
- <CAFA6WYOw_mQwOUN=onhzb7zCTyYDBrcx0E7C3LRk6nPLAVCWEQ@mail.gmail.com>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-Message-ID: <557b92d2-f3b8-d136-7431-419429f0e059@pengutronix.de>
-Date:   Wed, 24 Mar 2021 15:07:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        Wed, 24 Mar 2021 10:33:00 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4F59dW2Q1Kz8ywv;
+        Wed, 24 Mar 2021 22:30:55 +0800 (CST)
+Received: from localhost.localdomain (10.175.102.38) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.498.0; Wed, 24 Mar 2021 22:32:45 +0800
+From:   'Wei Yongjun <weiyongjun1@huawei.com>
+To:     <weiyongjun1@huawei.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+        "Zaibo Xu" <xuzaibo@huawei.com>, Weili Qian <qianweili@huawei.com>,
+        Meng Yu <yumeng18@huawei.com>,
+        YueHaibing <yuehaibing@huawei.com>,
+        Shukun Tan <tanshukun1@huawei.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <kernel-janitors@vger.kernel.org>,
+        "Hulk Robot" <hulkci@huawei.com>
+Subject: [PATCH -next] crypto: hisilicon/hpre - fix build error without CONFIG_CRYPTO_ECDH
+Date:   Wed, 24 Mar 2021 14:42:39 +0000
+Message-ID: <20210324144239.997757-1-weiyongjun1@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <CAFA6WYOw_mQwOUN=onhzb7zCTyYDBrcx0E7C3LRk6nPLAVCWEQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Type:   text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+X-Originating-IP: [10.175.102.38]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Sumit,
+From: Wei Yongjun <weiyongjun1@huawei.com>
 
-On 24.03.21 11:47, Sumit Garg wrote:
-> On Wed, 24 Mar 2021 at 14:56, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->>
->> Hello Mimi,
->>
->> On 23.03.21 19:07, Mimi Zohar wrote:
->>> On Tue, 2021-03-23 at 17:35 +0100, Ahmad Fatoum wrote:
->>>> On 21.03.21 21:48, Horia Geantă wrote:
->>>>> caam has random number generation capabilities, so it's worth using that
->>>>> by implementing .get_random.
->>>>
->>>> If the CAAM HWRNG is already seeding the kernel RNG, why not use the kernel's?
->>>>
->>>> Makes for less code duplication IMO.
->>>
->>> Using kernel RNG, in general, for trusted keys has been discussed
->>> before.   Please refer to Dave Safford's detailed explanation for not
->>> using it [1].
->>
->> The argument seems to boil down to:
->>
->>  - TPM RNG are known to be of good quality
->>  - Trusted keys always used it so far
->>
->> Both are fine by me for TPMs, but the CAAM backend is new code and neither point
->> really applies.
->>
->> get_random_bytes_wait is already used for generating key material elsewhere.
->> Why shouldn't new trusted key backends be able to do the same thing?
->>
-> 
-> Please refer to documented trusted keys behaviour here [1]. New
-> trusted key backends should align to this behaviour and in your case
-> CAAM offers HWRNG so we should be better using that.
+GCC reports build error as following:
 
-Why is it better?
+x86_64-linux-gnu-ld: drivers/crypto/hisilicon/hpre/hpre_crypto.o: in function `hpre_ecdh_set_secret':
+hpre_crypto.c:(.text+0x269c): undefined reference to `crypto_ecdh_decode_key'
 
-Can you explain what benefit a CAAM user would have if the trusted key
-randomness comes directly out of the CAAM instead of indirectly from
-the kernel entropy pool that is seeded by it?
+Fix it by selecting CRYPTO_ECDH.
 
-> Also, do update documentation corresponding to CAAM as a trusted keys backend.
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+---
+ drivers/crypto/hisilicon/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-Yes. The documentation should be updated for CAAM and it should describe
-how the key material is derived. Will do so for v2.
+diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
+index c45adb15ce8d..bb327d6e365a 100644
+--- a/drivers/crypto/hisilicon/Kconfig
++++ b/drivers/crypto/hisilicon/Kconfig
+@@ -69,6 +69,7 @@ config CRYPTO_DEV_HISI_HPRE
+ 	select CRYPTO_DEV_HISI_QM
+ 	select CRYPTO_DH
+ 	select CRYPTO_RSA
++	select CRYPTO_ECDH
+ 	help
+ 	  Support for HiSilicon HPRE(High Performance RSA Engine)
+ 	  accelerator, which can accelerate RSA and DH algorithms.
 
-Cheers,
-Ahmad
-
-> 
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git/tree/Documentation/security/keys/trusted-encrypted.rst#n87
-> 
-> -Sumit
-> 
->> Cheers,
->> Ahmad
->>
->>>
->>> thanks,
->>>
->>> Mimi
->>>
->>> [1]
->>> https://lore.kernel.org/linux-integrity/BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com/
->>>
->>>
->>>
->>
->> --
->> Pengutronix e.K.                           |                             |
->> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
->> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
->> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
-> 
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
