@@ -2,164 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A838EC433E2
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 10:48:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A65AC433E3
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 12:16:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64B1661A1C
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 10:48:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40E8761A09
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 12:16:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231842AbhCXKsO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Mar 2021 06:48:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58042 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232376AbhCXKrq (ORCPT
+        id S232158AbhCXMPk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Mar 2021 08:15:40 -0400
+Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:55882 "EHLO
+        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232574AbhCXMPa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Mar 2021 06:47:46 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF8C5C0613DE
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Mar 2021 03:47:34 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id w37so31195740lfu.13
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Mar 2021 03:47:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Ey+2292BkH6x041fX3yRwofo+kD7iZk7X6ckEEcQYiM=;
-        b=wOpDYenTLNC5o8Rarb2OFmUczdkjNuWqZymzj6lBygep5Yd7GB2gh5V4iK5s09JlP6
-         yrGBhqkmBeK5d1pbDMSFFgsrPAZy3mE0skMAgab3K7copJacg2MO/0lfbvDl9pLGn5rr
-         5BkjddszhsrZCY3P2ZyhvTQ+//m8JOKbckvDK71Eu14aDkiGUgwPFlFcornRoc+Ut2sS
-         IBrxfX8eCVRlKa3D+BsNyrmFNi03KIH29UMMMiW0maebcG2AFLrpZ0LZPWWclW6Act8s
-         pyXZxz3WbZAIogJ0uMjCxkqr5kHcJOrQ6xsvKobcwu0WDXurBq/B0FmwrxLO73e2b0Nh
-         HeYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Ey+2292BkH6x041fX3yRwofo+kD7iZk7X6ckEEcQYiM=;
-        b=SalnIUMPl0hsot/pUxRPb3+vt3BIHNH03L3HnnjoSEzfsTlMx2zmbrISR+Bn3+PA31
-         a4930WEvOhDrxUtxSx6N1+xnsvB1vHESCuA1ZR539cVPCDWnMp4QOXDP/FEe+cEAGe3p
-         tGgvrcWVJPGe5Thr3hKS8a5ZAXHWmNJkn3PQU0SX7DDFbJRGjP8yFsioYJSXc39aUcsZ
-         VRO7qWkt+jvy9injdCh0KS2cpX2c+2+hhyDxySvk/J+lS4nzVoT95W5vYLS/P7qa9ABY
-         A36HVp6/oYYgFSf9f/P8MypuMRjRq7HaMtcBX7LKJp0q/dF6VAWrOGplaJtcrnb+XhlT
-         gXKQ==
-X-Gm-Message-State: AOAM531Eh24Mx21zvg3XVA/sa3F7jb+hTjuXf/0qHzNo1ckoXZ++DA5E
-        d/8CQvu3OTLcbVYRh2NUgnl4t5OS4Tnb7dPdkWT+oA==
-X-Google-Smtp-Source: ABdhPJzmEK8UFfoOBxPtEBmqPf6Hoc+0fs0j6LtMLq04iyal514Inhwtzy/LLK66UpNucjWsaSeaq6z/MCalVaqGZrM=
-X-Received: by 2002:a19:6109:: with SMTP id v9mr1632879lfb.546.1616582853107;
- Wed, 24 Mar 2021 03:47:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
- <319e558e1bd19b80ad6447c167a2c3942bdafea2.1615914058.git-series.a.fatoum@pengutronix.de>
- <01e6e13d-2968-0aa5-c4c8-7458b7bde462@nxp.com> <45a9e159-2dcb-85bf-02bd-2993d50b5748@pengutronix.de>
- <f9c0087d299be1b9b91b242f41ac6ef7b9ee3ef7.camel@linux.ibm.com> <63dd7d4b-4729-9e03-cd8f-956b94eab0d9@pengutronix.de>
-In-Reply-To: <63dd7d4b-4729-9e03-cd8f-956b94eab0d9@pengutronix.de>
-From:   Sumit Garg <sumit.garg@linaro.org>
-Date:   Wed, 24 Mar 2021 16:17:21 +0530
-Message-ID: <CAFA6WYOw_mQwOUN=onhzb7zCTyYDBrcx0E7C3LRk6nPLAVCWEQ@mail.gmail.com>
-Subject: Re: [PATCH v1 3/3] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc:     Mimi Zohar <zohar@linux.ibm.com>,
-        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        James Bottomley <jejb@linux.ibm.com>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Wed, 24 Mar 2021 08:15:30 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0UTB5p-b_1616588125;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UTB5p-b_1616588125)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 24 Mar 2021 20:15:26 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Udit Agarwal <udit.agarwal@nxp.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        David Woodhouse <dwmw2@infradead.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Valentin Schneider <valentin.schneider@arm.com>,
+        Nick Terrell <terrelln@fb.com>, KP Singh <kpsingh@google.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Vlastimil Babka <vbabka@suse.cz>, keyrings@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Jia Zhang <zhang.jia@linux.alibaba.com>
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH v2 1/2] pkcs7: make parser enable SM2 and SM3 algorithms combination
+Date:   Wed, 24 Mar 2021 20:15:24 +0800
+Message-Id: <20210324121525.16062-2-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.19.1.3.ge56e4f7
+In-Reply-To: <20210324121525.16062-1-tianjia.zhang@linux.alibaba.com>
+References: <20210324121525.16062-1-tianjia.zhang@linux.alibaba.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 24 Mar 2021 at 14:56, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->
-> Hello Mimi,
->
-> On 23.03.21 19:07, Mimi Zohar wrote:
-> > On Tue, 2021-03-23 at 17:35 +0100, Ahmad Fatoum wrote:
-> >> On 21.03.21 21:48, Horia Geant=C4=83 wrote:
-> >>> caam has random number generation capabilities, so it's worth using t=
-hat
-> >>> by implementing .get_random.
-> >>
-> >> If the CAAM HWRNG is already seeding the kernel RNG, why not use the k=
-ernel's?
-> >>
-> >> Makes for less code duplication IMO.
-> >
-> > Using kernel RNG, in general, for trusted keys has been discussed
-> > before.   Please refer to Dave Safford's detailed explanation for not
-> > using it [1].
->
-> The argument seems to boil down to:
->
->  - TPM RNG are known to be of good quality
->  - Trusted keys always used it so far
->
-> Both are fine by me for TPMs, but the CAAM backend is new code and neithe=
-r point
-> really applies.
->
-> get_random_bytes_wait is already used for generating key material elsewhe=
-re.
-> Why shouldn't new trusted key backends be able to do the same thing?
->
+Support parsing the message signature of the SM2 and SM3 algorithm
+combination. This group of algorithms has been well supported. One
+of the main users is module signature verification.
 
-Please refer to documented trusted keys behaviour here [1]. New
-trusted key backends should align to this behaviour and in your case
-CAAM offers HWRNG so we should be better using that.
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+---
+ crypto/asymmetric_keys/pkcs7_parser.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Also, do update documentation corresponding to CAAM as a trusted keys backe=
-nd.
+diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
+index 967329e0a07b..6cf6c4552c11 100644
+--- a/crypto/asymmetric_keys/pkcs7_parser.c
++++ b/crypto/asymmetric_keys/pkcs7_parser.c
+@@ -248,6 +248,9 @@ int pkcs7_sig_note_digest_algo(void *context, size_t hdrlen,
+ 	case OID_sha224:
+ 		ctx->sinfo->sig->hash_algo = "sha224";
+ 		break;
++	case OID_sm3:
++		ctx->sinfo->sig->hash_algo = "sm3";
++		break;
+ 	default:
+ 		printk("Unsupported digest algo: %u\n", ctx->last_oid);
+ 		return -ENOPKG;
+@@ -269,6 +272,10 @@ int pkcs7_sig_note_pkey_algo(void *context, size_t hdrlen,
+ 		ctx->sinfo->sig->pkey_algo = "rsa";
+ 		ctx->sinfo->sig->encoding = "pkcs1";
+ 		break;
++	case OID_SM2_with_SM3:
++		ctx->sinfo->sig->pkey_algo = "sm2";
++		ctx->sinfo->sig->encoding = "raw";
++		break;
+ 	default:
+ 		printk("Unsupported pkey algo: %u\n", ctx->last_oid);
+ 		return -ENOPKG;
+-- 
+2.19.1.3.ge56e4f7
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git/=
-tree/Documentation/security/keys/trusted-encrypted.rst#n87
-
--Sumit
-
-> Cheers,
-> Ahmad
->
-> >
-> > thanks,
-> >
-> > Mimi
-> >
-> > [1]
-> > https://lore.kernel.org/linux-integrity/BCA04D5D9A3B764C9B7405BBA4D4A3C=
-035F2A38B@ALPMBAPA12.e2k.ad.ge.com/
-> >
-> >
-> >
->
-> --
-> Pengutronix e.K.                           |                             =
-|
-> Steuerwalder Str. 21                       | http://www.pengutronix.de/  =
-|
-> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    =
-|
-> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 =
-|
