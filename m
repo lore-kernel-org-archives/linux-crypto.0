@@ -2,172 +2,256 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDFD5C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 16:15:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3101C433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 17:05:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B041161878
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 16:15:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DCF661A18
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 17:05:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233662AbhCXQPI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Mar 2021 12:15:08 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:12616 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231858AbhCXQOi (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Mar 2021 12:14:38 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12OG3dIZ191798;
-        Wed, 24 Mar 2021 12:14:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : content-transfer-encoding : mime-version; s=pp1;
- bh=0t/OKQ36CJXJBLoe5JRLA8HwwJpvzWj+By+MFOaovA4=;
- b=kqxW1qUXJuRuY+TNSLJjQDTZVRcY8hYloi1nEmclepvC0NKn4qXL07sVAtSScwn/EP0r
- l7l1fmb5rjshPeQQ39sLvo2jV0HbVemqecAYUdD/xeAaN8XNhopjm5lzRkv/2ft7Bdk4
- SIS+nStkYnVCoHyjZL82cbewGb5biXCRJjqmMwmPyecLMepu6uGYvTNyuIgu0xokKUvK
- VSbYndLKXzU2YRY8kICqynNsN59yUEIfKchoczq1wUV9PgWaYCAfD05ebcK3kA0WwVmd
- So8fcFoH9nVleCDccfyfyGpijvXfg/7Oiv/TMVQ6U74c42DT659ESwIsGFggrGG+w/7Y 3A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37g8gkgm08-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 24 Mar 2021 12:14:10 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12OG3ii2192402;
-        Wed, 24 Mar 2021 12:14:09 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37g8gkgkyc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 24 Mar 2021 12:14:09 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12OGDf0I022134;
-        Wed, 24 Mar 2021 16:14:08 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma03dal.us.ibm.com with ESMTP id 37d9bf6m3g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 24 Mar 2021 16:14:08 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12OGE7QM18022788
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 24 Mar 2021 16:14:07 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AA6E78060;
-        Wed, 24 Mar 2021 16:14:07 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CDD1F78067;
-        Wed, 24 Mar 2021 16:14:03 +0000 (GMT)
-Received: from jarvis.int.hansenpartnership.com (unknown [9.85.147.73])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed, 24 Mar 2021 16:14:03 +0000 (GMT)
-Message-ID: <9ba89168d8c4f1e3d6797a0b3713e152ac6388fd.camel@linux.ibm.com>
-Subject: Re: [PATCH v1 3/3] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
-From:   James Bottomley <jejb@linux.ibm.com>
-Reply-To: jejb@linux.ibm.com
-To:     Mimi Zohar <zohar@linux.ibm.com>,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        Horia =?UTF-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Udit Agarwal <udit.agarwal@nxp.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-Date:   Wed, 24 Mar 2021 09:14:02 -0700
-In-Reply-To: <f9c0087d299be1b9b91b242f41ac6ef7b9ee3ef7.camel@linux.ibm.com>
-References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
-         <319e558e1bd19b80ad6447c167a2c3942bdafea2.1615914058.git-series.a.fatoum@pengutronix.de>
-         <01e6e13d-2968-0aa5-c4c8-7458b7bde462@nxp.com>
-         <45a9e159-2dcb-85bf-02bd-2993d50b5748@pengutronix.de>
-         <f9c0087d299be1b9b91b242f41ac6ef7b9ee3ef7.camel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
-X-TM-AS-GCONF: 00
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        id S237072AbhCXRFT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Mar 2021 13:05:19 -0400
+Received: from mail-bn8nam11on2078.outbound.protection.outlook.com ([40.107.236.78]:50401
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S236851AbhCXREx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Mar 2021 13:04:53 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZZvBDWexa5v1FU31308h2/zr4IFm86O3LJEqP8RBSlXFFMLUnrGh+afGguTsD7xsDYtykybN0R1HqLKkxhgwr4U1fTx/ByND+zxDeG3PDWW8dUetynpmpiICV9bDjlSJFRZbKGpVYlF3LuOaBwOvUH73Yubupm/Pnoat3UyzCfk6W/2dC3MvpfRE9koXqciBhoXyxeMd7y93h5xA/JBb0w78jgcwOAZ5r7aAcNU1gBAoZt7UffhDpETXRjHmKhI2BT+MXdLoYCVuqKef0RCe/xv2NfRG0/mzB9Pk6l5WcB/rUoYtq1dN7GCv7rri0j3wXZoIDYvsRMvf9jRoxQPgGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xY4mybB65Bwr0RRpP4krujH7j0IBZK10R+a5m3zU3GI=;
+ b=ROg2W7ebSLh18QpHv6RHGPCd7I39e363e75Iqbis58felpfkK3OxT+iXP8cOoYmzvKS6GhHhBgpeFM12y1ElIy/wESHd4aTNw8FcV5BAeik46+KdNgxWDL2nhSDkCg5VYHs3n8nG/O+hJEYloVoOwLZyG8JAgGG5nY4eVtKvyKwqIoYiCV+FeLVz2FuskhnZvRNzhza1PNJdeRKej1flGy5mNifaFUNDQFTR0Oy7SdIu9qiWzYMHpXSnKyZiTt8usxcZzCliD7oTBTw/+jy6eOOVVWnemrCmfSqzAOppa39/ncRNdwM5wS6SgHX5iW/VzF2w01MB6tnztPQJKMmiTA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xY4mybB65Bwr0RRpP4krujH7j0IBZK10R+a5m3zU3GI=;
+ b=NlVgVRfPfxbKUyu9e1CCRtSwhtqVhR6bHUQdZNKoModmH1YYHdovZ12/FRz8F0uZSBlmO8c1DCUbWc//hfDqKREYfTEVjSFcIokDYTXHUvHzlKYkHTIBEtPIppKTfPJSyzkWcGUHpWrEPx12WIqXJgQq7mLbXeUzjsiFj0x50xw=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4557.namprd12.prod.outlook.com (2603:10b6:806:9d::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.24; Wed, 24 Mar
+ 2021 17:04:51 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::30fb:2d6c:a0bf:2f1d]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::30fb:2d6c:a0bf:2f1d%3]) with mapi id 15.20.3955.027; Wed, 24 Mar 2021
+ 17:04:51 +0000
+From:   Brijesh Singh <brijesh.singh@amd.com>
+To:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Cc:     ak@linux.intel.com, herbert@gondor.apana.org.au,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: [RFC Part2 PATCH 00/30] Add AMD Secure Nested Paging (SEV-SNP) Hypervisor Support
+Date:   Wed, 24 Mar 2021 12:04:06 -0500
+Message-Id: <20210324170436.31843-1-brijesh.singh@amd.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: SA0PR11CA0210.namprd11.prod.outlook.com
+ (2603:10b6:806:1bc::35) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-24_13:2021-03-24,2021-03-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- impostorscore=0 mlxlogscore=999 clxscore=1011 lowpriorityscore=0
- priorityscore=1501 malwarescore=0 mlxscore=0 bulkscore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103240117
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0210.namprd11.prod.outlook.com (2603:10b6:806:1bc::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25 via Frontend Transport; Wed, 24 Mar 2021 17:04:50 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 7f2a4352-e107-44e8-86e6-08d8eee6eff0
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4557:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB455728ADB70F9C869342AAA9E5639@SA0PR12MB4557.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2276;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /D2zOBnvASUuAL8Fyu4j1MapxBrSAUmDsQDX/az7qPtt9EhWOAJQdHWopriOWQZ4caltD5k8OJR44MrP90Sqwr0BMppqFY306qKyNdhIv1lCOTKZqwKJFmCrwVp+fqLHotf00CHR7gzUOY+/aJgwZYcoMx8+u+TZ3kSsMk43GJIqWDzuLkom3AcbP3N2+LcvcglgeNIhNfDlu1WcSM93tJyUAnn3HPsuVKxMWOh4Rdngf0QjiprXmIx/E4/V0bhHvd/p9BEO33vKkUVPy0UZCySgILnr6cZMcs4+IML7Tqt+nFtKGIW2mzvllu+pffA2m2u/+fairrRnmEKvjGWEFiKuwoTwj3VrzsTecpmv0kXywdzRnh7okyFVUDt6+8leX80GxftHJto59WmSuNU62vUetR/6rbt8c9GrtA4uqPbPdUBiSNb/5NqkEMrZDpe7T1vY+KNwmLdxLJAL9XiBaFcDa1k6uXaUYlEljG+9RYaJWGxK26jzQyqsFE31GDrLUpcGFz9ZBRwBXNuHFnXfBhp+MQHljM20JELd8qnO+tq/i05qAB7XcPvWkHATqhuwU1J8/xwIAsVdboKXVc7o+UVHfQBetZ4llMjPh59JxiHHbVYtwnLpvfOw9zcQojjJl42hv0ucxCLA5uf3K2O6uHlNp3FnhfRk2eb+hG3C2Zp8KKt/zN5H+nMe+Boze7eaiFkNBz/pzKLk+aAP7V/W04Nw0r2MbdRMml5GwLblmzjDKQBNhLz+Keays7AmuBmTKByjwMENIt6FVxPOlEjzig==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(396003)(346002)(136003)(39860400002)(86362001)(54906003)(186003)(44832011)(6666004)(4326008)(38100700001)(26005)(316002)(66476007)(8676002)(16526019)(1076003)(2616005)(83380400001)(5660300002)(6486002)(956004)(52116002)(8936002)(478600001)(7416002)(7696005)(66556008)(36756003)(966005)(66946007)(2906002)(6606295002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?8e71MTPzgYzIV2x7gBxkCPPPf8XHH9Zz5bPNL80hCJ5Ei9kA1nI0vg2zk+s3?=
+ =?us-ascii?Q?WUqCtBCUWTQpg7mQnoKee5JUs3uxCaa7mX1c0z9fC2DdUDb4uMVoGM4KQwdv?=
+ =?us-ascii?Q?bsKkux67Apu6o3oex5e+Muov6l/YDy2Nr2DXNTxH9ijTcKIavvTn803pTb4O?=
+ =?us-ascii?Q?nqZowLdX3fV/hyKhDm7mXRPi4aq2YKqVDUj7lJmWW02wJhFJqJC04qKhBNbR?=
+ =?us-ascii?Q?3ZlZ4RZgcPdMpEhCSOepFWt+CzVWOi9uRe01QNgpuVFws3frV1bRXnusV4u7?=
+ =?us-ascii?Q?1HPbHGZnCZKp68sQcIAAhR10FQymSHAOTkS/C9YNUN+lGMcOMPbV5nNzDQDh?=
+ =?us-ascii?Q?UZ1eG60zUoE0a4e2hU2RNveKm7HYrHZB+Ka403o2nDddbLiGL7NXGemDt+Or?=
+ =?us-ascii?Q?ce1T2rJ3vS7O43PQzdN9siGFRBIzE4PILVMrc6oz4hnaXFDy3j54yqMG2aZy?=
+ =?us-ascii?Q?FipMxSfpO+RqPsBTX5l2W9fNUXLnsnuNIv2H00/PXuMrBjkUBu63uki8aaNY?=
+ =?us-ascii?Q?lAYjcpEHYgeu/O/ybIO7Na2ySRxH+jw8Wy45o/T8OMG6/3ej331R4HvZXzMT?=
+ =?us-ascii?Q?kttVyKY1BVNbf2sCI+YMJqJ1ou1sfDlHWntNu5ZHhI7TOCDI/9omvyFlsbhU?=
+ =?us-ascii?Q?/UqrpuKsvUoJgmGsNeNpx+m+RM+IuH3f2WbYne5gNLzbi1iXKXaQML3nvHK2?=
+ =?us-ascii?Q?gpYfYY4CeNvFDvVB91rDNQZY+C8WwLyfh8S+KELSWbTxtb5CwH4hf5e7U7uw?=
+ =?us-ascii?Q?FrY8h898EqzHJXQvrS0cRpL8Hn6cltOudoLtkjynN5AAyJk1KOus10EaWHGI?=
+ =?us-ascii?Q?TFDjVcGdS43xoFjfxtVC9NlRNy684Ek6wt+iAlJbBw0KPRooIJ29/29+RXgJ?=
+ =?us-ascii?Q?FUn4ljmO8/GrbjHDTF3ki93uk1o2Ln5D12DOyocguy7imPcora0Rj/JamH7b?=
+ =?us-ascii?Q?Jn3Gd1Jt1EMz0abbniabM1+zv3PTkw/1AUjwRvMwikVkrcv42OYvreWxIGsm?=
+ =?us-ascii?Q?z7UOCfqJrZSJ1U4w+GZfbl41jUqptnBZIncr9o+tcaJeHNaJWu4gfpUPK512?=
+ =?us-ascii?Q?M96g9rcxL2G1O8Y3v/5jxBNwevkdO/sn2quL037pK7JslkbGGzmGg+e2CjIm?=
+ =?us-ascii?Q?gY5CKE30Ahc3Z/wQx+UNaKfBXO690VOU0nPytB92HJfPXXQ9ASUxvwvIeF84?=
+ =?us-ascii?Q?Hr60OJRSVuLZYyX7Z9WqJErSIQvkXJamZ62QX/jrp9Zl6pmDVHlC5rlOMJeW?=
+ =?us-ascii?Q?mynGvwKnwCWQ8ZrTHbt+69PS4C6WjvaDk0u1qpnnY0vOxfC3lXY+JcjCIF1B?=
+ =?us-ascii?Q?Wl8XkIgJJdtdV5S09PJi2A3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f2a4352-e107-44e8-86e6-08d8eee6eff0
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2021 17:04:50.9561
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sJxiLDRGmqu+c+vG2H0NT6sBWU90ruqFajMn7XPm72JWhpP7c742NZcSW+yuj+hep5jKd+Mfo5JkCOEhNw2jOQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4557
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 2021-03-23 at 14:07 -0400, Mimi Zohar wrote:
-> On Tue, 2021-03-23 at 17:35 +0100, Ahmad Fatoum wrote:
-> > Hello Horia,
-> > 
-> > On 21.03.21 21:48, Horia Geantă wrote:
-> > > On 3/16/2021 7:02 PM, Ahmad Fatoum wrote:
-> > > [...]
-> > > > +struct trusted_key_ops caam_trusted_key_ops = {
-> > > > +	.migratable = 0, /* non-migratable */
-> > > > +	.init = trusted_caam_init,
-> > > > +	.seal = trusted_caam_seal,
-> > > > +	.unseal = trusted_caam_unseal,
-> > > > +	.exit = trusted_caam_exit,
-> > > > +};
-> > > caam has random number generation capabilities, so it's worth
-> > > using that
-> > > by implementing .get_random.
-> > 
-> > If the CAAM HWRNG is already seeding the kernel RNG, why not use
-> > the kernel's?
-> > 
-> > Makes for less code duplication IMO.
-> 
-> Using kernel RNG, in general, for trusted keys has been discussed
-> before.   Please refer to Dave Safford's detailed explanation for not
-> using it [1].
-> 
-> thanks,
-> 
-> Mimi
-> 
-> [1] 
-> https://lore.kernel.org/linux-integrity/BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com/
+This part of the Secure Encrypted Paging (SEV-SNP) series focuses on the
+changes required in a host OS for SEV-SNP support. The series builds upon
+SEV-SNP Part-1 https://marc.info/?l=kvm&m=161660430125343&w=2 .
 
-I still don't think relying on one source of randomness to be
-cryptographically secure is a good idea.  The fear of bugs in the
-kernel entropy pool is reasonable, but since it's widely used they're
-unlikely to persist very long.  Studies have shown that some TPMs
-(notably the chinese manufactured ones) have suspicious failures in
-their RNGs:
+This series provides the basic building blocks to support booting the SEV-SNP
+VMs, it does not cover all the security enhancement introduced by the SEV-SNP
+such as interrupt protection.
 
-https://www.researchgate.net/publication/45934562_Benchmarking_the_True_Random_Number_Generator_of_TPM_Chips
+The CCP driver is enhanced to provide new APIs that use the SEV-SNP
+specific commands defined in the SEV-SNP firmware specification. The KVM
+driver uses those APIs to create and managed the SEV-SNP guests.
 
-And most cryptograhpers recommend using a TPM for entropy mixing rather
-than directly:
+The GHCB specification version 2 introduces new set of NAE's that is
+used by the SEV-SNP guest to communicate with the hypervisor. The series
+provides support to handle the following new NAE events:
+- Register GHCB GPA
+- Page State Change Request
 
-https://blog.cryptographyengineering.com/category/rngs/
+The RMP check is enforced as soon as SEV-SNP is enabled. Not every memory
+access requires an RMP check. In particular, the read accesses from the
+hypervisor do not require RMP checks because the data confidentiality is
+already protected via memory encryption. When hardware encounters an RMP
+checks failure, it raises a page-fault exception. If RMP check failure
+is due to the page-size mismatch, then split the large page to resolve
+the fault. See patch 4 and 7 for further details.
 
-The TPMFail paper also shows that in spite of NIST certification
-things can go wrong with a TPM:
+The series does not provide support for the following SEV-SNP specific
+NAE's yet:
 
-https://tpm.fail/
+* Query Attestation 
+* AP bring up
+* Interrupt security
 
-James
+The series is based on kvm/master commit:
+  87aa9ec939ec KVM: x86/mmu: Fix TDP MMU zap collapsible SPTEs
 
+The complete source is available at
+https://github.com/AMDESE/linux/tree/sev-snp-part-2-rfc1
+
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Joerg Roedel <jroedel@suse.de>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Tony Luck <tony.luck@intel.com>
+Cc: Dave Hansen <dave.hansen@intel.com>
+Cc: "Peter Zijlstra (Intel)" <peterz@infradead.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: x86@kernel.org
+Cc: kvm@vger.kernel.org
+
+Additional resources
+---------------------
+SEV-SNP whitepaper
+https://www.amd.com/system/files/TechDocs/SEV-SNP-strengthening-vm-isolation-with-integrity-protection-and-more.pdf
+ 
+APM 2: https://www.amd.com/system/files/TechDocs/24593.pdf
+(section 15.36)
+
+GHCB spec v2:
+  The draft specification is posted on AMD-SEV-SNP mailing list:
+   https://lists.suse.com/mailman/private/amd-sev-snp/
+
+  Copy of draft spec is also available at 
+  https://github.com/AMDESE/AMDSEV/blob/sev-snp-devel/docs/56421-Guest_Hypervisor_Communication_Block_Standardization.pdf
+
+GHCB spec v1:
+SEV-SNP firmware specification:
+ https://developer.amd.com/sev/
+
+Brijesh Singh (30):
+  x86: Add the host SEV-SNP initialization support
+  x86/sev-snp: add RMP entry lookup helpers
+  x86: add helper functions for RMPUPDATE and PSMASH instruction
+  x86/mm: split the physmap when adding the page in RMP table
+  x86: define RMP violation #PF error code
+  x86/fault: dump the RMP entry on #PF
+  mm: add support to split the large THP based on RMP violation
+  crypto:ccp: define the SEV-SNP commands
+  crypto: ccp: Add support to initialize the AMD-SP for SEV-SNP
+  crypto: ccp: shutdown SNP firmware on kexec
+  crypto:ccp: provide APIs to issue SEV-SNP commands
+  crypto ccp: handle the legacy SEV command when SNP is enabled
+  KVM: SVM: add initial SEV-SNP support
+  KVM: SVM: make AVIC backing, VMSA and VMCB memory allocation SNP safe
+  KVM: SVM: define new SEV_FEATURES field in the VMCB Save State Area
+  KVM: SVM: add KVM_SNP_INIT command
+  KVM: SVM: add KVM_SEV_SNP_LAUNCH_START command
+  KVM: SVM: add KVM_SEV_SNP_LAUNCH_UPDATE command
+  KVM: SVM: Reclaim the guest pages when SEV-SNP VM terminates
+  KVM: SVM: add KVM_SEV_SNP_LAUNCH_FINISH command
+  KVM: X86: Add kvm_x86_ops to get the max page level for the TDP
+  x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by SEV
+  KVM: X86: Introduce kvm_mmu_get_tdp_walk() for SEV-SNP use
+  KVM: X86: define new RMP check related #NPF error bits
+  KVM: X86: update page-fault trace to log the 64-bit error code
+  KVM: SVM: add support to handle GHCB GPA register VMGEXIT
+  KVM: SVM: add support to handle MSR based Page State Change VMGEXIT
+  KVM: SVM: add support to handle Page State Change VMGEXIT
+  KVM: X86: export the kvm_zap_gfn_range() for the SNP use
+  KVM: X86: Add support to handle the RMP nested page fault
+
+ arch/x86/include/asm/kvm_host.h  |  14 +
+ arch/x86/include/asm/msr-index.h |   6 +
+ arch/x86/include/asm/sev-snp.h   |  68 +++
+ arch/x86/include/asm/svm.h       |  12 +-
+ arch/x86/include/asm/trap_pf.h   |   2 +
+ arch/x86/kvm/lapic.c             |   5 +-
+ arch/x86/kvm/mmu.h               |   5 +-
+ arch/x86/kvm/mmu/mmu.c           |  76 ++-
+ arch/x86/kvm/svm/sev.c           | 925 ++++++++++++++++++++++++++++++-
+ arch/x86/kvm/svm/svm.c           |  28 +-
+ arch/x86/kvm/svm/svm.h           |  49 ++
+ arch/x86/kvm/trace.h             |   6 +-
+ arch/x86/kvm/vmx/vmx.c           |   8 +
+ arch/x86/mm/fault.c              | 157 ++++++
+ arch/x86/mm/mem_encrypt.c        | 163 ++++++
+ drivers/crypto/ccp/sev-dev.c     | 312 ++++++++++-
+ drivers/crypto/ccp/sev-dev.h     |   3 +
+ drivers/crypto/ccp/sp-pci.c      |  12 +
+ include/linux/mm.h               |   6 +-
+ include/linux/psp-sev.h          | 311 +++++++++++
+ include/uapi/linux/kvm.h         |  42 ++
+ include/uapi/linux/psp-sev.h     |  27 +
+ mm/memory.c                      |  11 +
+ 23 files changed, 2224 insertions(+), 24 deletions(-)
+
+-- 
+2.17.1
 
