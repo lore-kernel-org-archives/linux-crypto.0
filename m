@@ -2,203 +2,181 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3F05C433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 20:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7242C433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 20:50:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A187361A10
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 20:36:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90BE661A18
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 20:50:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238169AbhCXUfe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Mar 2021 16:35:34 -0400
-Received: from mail-dm3nam07on2065.outbound.protection.outlook.com ([40.107.95.65]:2145
-        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238128AbhCXUf2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Mar 2021 16:35:28 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AZmhpBCKP9+UZ4X/NQWswXGvtBCvU9I2M1gEgUKzF5Jr+Br/JwIyiIPT6oOv9RzYvIZ/uJpyOJvg/0gxv+a+18rgZocjK3X0CYprkSZpEvGV7GiqwpcOabqK1FaeK8IcT9LpkVHUYNYtMCrY5EgBR1bstvTVq6aruCKCUgBJi+JKIUKyGiUHKHbN90m0XlYWS9x/ge+xPDNAQcuHMoL3Fa867a+GwZddyOmN2heNeWEECFCh3qi7uKbxPXEdMDsdKgV99oNDhOiUpHH1UfM+T6uZJnRVSW5F3dEM5GVKA50b3uERjTMVloVjqQXPwfqwsdULyLPmzr96qECVvAUDcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G2wUj88OvbhRalxEeqL0O4smzOrZ3xStGCfjSwzUaek=;
- b=YEp+jtnAdpfT9sKoyYcuKRwp8IX4XUyTPJYZ4ogN4gXSScU1X/ezXWB8ykxPSMtwl8hkRboemGTZte+jZVM7FGWF+HVOlNJ6BRhHsztGL2UphfD+7EQ/8wzW8eh0ZarnspVNe+0JEBjJBgevYOjutZd/awwaH2xtLu2g8Ry3uxIpmqSMsd+wVKQW6RoWUY2TUlV5l0uGEZX7y/ajZZTzIfHS/hAJi85nj38Iw/If300M7jJamXfBhyGTZhylF9FzRZIUp8HU/pXjBSynOXZ+nEBHx8id01EPku0ztJaeMYX99fRlJnJjHJQO78jQatZ8bZDZOyvVJRAX3VJsHVQc2A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G2wUj88OvbhRalxEeqL0O4smzOrZ3xStGCfjSwzUaek=;
- b=05UqEbEfKKfjJKlEiQgSxo8dbcCtzlIriY2cywRnSpkCWeiUKn3IClnGcqDpnEDy2hXp5A81yLduXpOJblPKV1SnbO4XDc+QAyFT9DOtVfVMvVjQTCTfFaT062PGchZLNaZFCwxIMgdSKvsymUtSErb95B5ElK5YZcyDRDPbjG0=
-Authentication-Results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN1PR12MB2512.namprd12.prod.outlook.com (2603:10b6:802:31::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25; Wed, 24 Mar
- 2021 20:35:23 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::30fb:2d6c:a0bf:2f1d]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::30fb:2d6c:a0bf:2f1d%3]) with mapi id 15.20.3955.027; Wed, 24 Mar 2021
- 20:35:23 +0000
-Cc:     brijesh.singh@amd.com, LKML <linux-kernel@vger.kernel.org>,
-        X86 ML <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Andi Kleen <ak@linux.intel.com>,
+        id S238206AbhCXUuH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Mar 2021 16:50:07 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42388 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238108AbhCXUtk (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Mar 2021 16:49:40 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12OKWpqh157879;
+        Wed, 24 Mar 2021 16:49:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=oSk4ZvpIFfpvGW9vz/hLhm3l5dMxtXS4oNfyPDLD3r8=;
+ b=X9C83N0V6kwHaDns3tPOXthGbKVrxbHgyJjF4T8Oz1lzzyv0C8n0N0yOrfSmAGhvUytg
+ ZMshhOamMXbkMAiZRw9ceA/zcNsbum0UBtI1OlCaLWrf+xF+HdpzSAQWSohskcFZedLs
+ WlyyCAOkzPV5ThH+ku1bEIFXl9nnlmLE+qnSViMaTiJ+51kGyge3X8RRHFVhGefWQenG
+ LhCYm33xF52xUJxKQkUwhVBpn1ur6HVotFQXa4LrOnOeD5wvwnB6uxhNPkGzHqe7UuN6
+ QGG8peL7VJLzWibEZ78gWlB91IJj+qR+2/CzO18IoCGRxnHsl46h/4bimUwy0BKHimQt jg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37g865gaw0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Mar 2021 16:49:17 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12OKXi6w161283;
+        Wed, 24 Mar 2021 16:49:17 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37g865gavk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Mar 2021 16:49:17 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12OKnF15028449;
+        Wed, 24 Mar 2021 20:49:15 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06fra.de.ibm.com with ESMTP id 37d9a62fn6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Mar 2021 20:49:15 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12OKnCc942860938
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 24 Mar 2021 20:49:12 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BD3C7A404D;
+        Wed, 24 Mar 2021 20:49:12 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 54DF0A4059;
+        Wed, 24 Mar 2021 20:49:07 +0000 (GMT)
+Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.163.11.141])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 24 Mar 2021 20:49:07 +0000 (GMT)
+Message-ID: <df118419f28a04d2e711a55678c0149115606071.camel@linux.ibm.com>
+Subject: Re: [PATCH v1 3/3] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     jejb@linux.ibm.com, Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Horia =?UTF-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC Part2 PATCH 06/30] x86/fault: dump the RMP entry on #PF
-To:     Andy Lutomirski <luto@amacapital.net>
-References: <20210324170436.31843-1-brijesh.singh@amd.com>
- <20210324170436.31843-7-brijesh.singh@amd.com>
- <CALCETrWH4uPUQHSwgwz5PS8XngJyvjxgWZ85EV5s7VGJX=aa_Q@mail.gmail.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <1802222c-fb6e-3c71-13f0-691b91b83f5d@amd.com>
-Date:   Wed, 24 Mar 2021 15:35:20 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.8.1
-In-Reply-To: <CALCETrWH4uPUQHSwgwz5PS8XngJyvjxgWZ85EV5s7VGJX=aa_Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [70.112.153.56]
-X-ClientProxiedBy: SN4PR0501CA0050.namprd05.prod.outlook.com
- (2603:10b6:803:41::27) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        "David S. Miller" <davem@davemloft.net>,
+        Udit Agarwal <udit.agarwal@nxp.com>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Date:   Wed, 24 Mar 2021 16:49:05 -0400
+In-Reply-To: <9ba89168d8c4f1e3d6797a0b3713e152ac6388fd.camel@linux.ibm.com>
+References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
+         <319e558e1bd19b80ad6447c167a2c3942bdafea2.1615914058.git-series.a.fatoum@pengutronix.de>
+         <01e6e13d-2968-0aa5-c4c8-7458b7bde462@nxp.com>
+         <45a9e159-2dcb-85bf-02bd-2993d50b5748@pengutronix.de>
+         <f9c0087d299be1b9b91b242f41ac6ef7b9ee3ef7.camel@linux.ibm.com>
+         <9ba89168d8c4f1e3d6797a0b3713e152ac6388fd.camel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-14.el8) 
+X-TM-AS-GCONF: 00
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN4PR0501CA0050.namprd05.prod.outlook.com (2603:10b6:803:41::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.10 via Frontend Transport; Wed, 24 Mar 2021 20:35:21 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 80d430d2-b434-4b6b-e87f-08d8ef045924
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2512:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2512FF4936A0DCEE0967228BE5639@SN1PR12MB2512.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jG+xUl2ohqhzBoJrTSJRcAgmtDS9wgh9LH5UpjeRkF/bvI6OY5ElbmeDmiLn4PPblvzGxC2fKu4CZfo/XSEF+JUZ1muIBjZB+Ynk4FUr0w/fOS6RZJqpW8Msmtdx6MeO5dXY/tloRjtkR2310mIZ+C/xW6ET54ApHkTIjOzq7Jx2ib2eH/t2gguXu8LbMH5AF1w+yRvRFT3fOVswoqztmQEvWecY1VbEYR66cdEmpxDKYCPUb0bq+LvYUKfsv7RdtI7sVArb1K4MxbqV09rl/Z1I7wWUd1tS4HuN0CYkSsGxHM3+XDNkRXPyap6tW6PERctt+KD+i+joN650Q7TfTGHQVYHOfhekEPfUAgff45zKpLenYL8RlfX8p3+AY8REAktj6/kaVheAg2HYVKhWbP4J2tWbTODq3SLeW0hD8+A/S+n5vYz6vAdwhvTJC7bE9JGxmUUtUyoe/DhvOBp9+Uvf8kl7X5hVCXNfPPnWDMHyFzz1S+5oM3T/lzATM+lm1hRPFOIH1PhSqfDXbzLzkj843E/9CYt38HG00XQyaBuQaGs6me9VLSTr7X2CyDlGDnHgIuDpbsZZzrtq0rEOyk4CMaH9Bktne9/V2C12dYbevZR0yqViCxxFVr1euIEeapGgF9Yrv4yErupBi5mmxHf1OxZ3TsBz0A0UWmj9bebH+owLw4vpaerRGzcKhrRE2xLjBqqHJynFXYHlWfbitGlYFf2Y/XBygGFNq1x5OUY=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(136003)(366004)(39860400002)(376002)(66556008)(66476007)(86362001)(31686004)(38100700001)(2616005)(36756003)(956004)(8936002)(8676002)(83380400001)(66946007)(5660300002)(31696002)(53546011)(6506007)(6486002)(4326008)(478600001)(52116002)(2906002)(316002)(16526019)(6916009)(6512007)(26005)(44832011)(54906003)(7416002)(186003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?N0MwTDB2UFBWMFdhd3NxVEtVVmluMy9wdGZwN2FObDAxcEdWUjluZWJZbVBq?=
- =?utf-8?B?ZFE0L05iaXZ2MVZDQnlaQk5qMWFwVUJPb041RzFrWG8yQzRBU3RvcUpLdnJI?=
- =?utf-8?B?MEsxL3lBWW01UEpralJRK0JKdTI0dThXM3BoMG4zY1J2L3h5WVJGdE1XUXJo?=
- =?utf-8?B?R2xMUmdDWXowMGk5bDRDSDVxZWQ0K1BMZGxDdXVxUVNoZ2J1L2hadW50cGVY?=
- =?utf-8?B?WXVEb2pEMnh2b2lqaDhNZXBaZFhpSlY5S1dybTBGaVJpNkxMRUUyYWtxMDh0?=
- =?utf-8?B?dEJTeitrM2E5bDV2TURQUmtSZERNVmQ3dlhYMTVtTHZncWJMbDZzdXNvREhj?=
- =?utf-8?B?MGJaQ3lkMUxoanVtVTFhdThuS3BqZlBkS01WdHpDL1Q2ZnZQcXpKdjI2ek0v?=
- =?utf-8?B?eWNvdXcrVEY1UDdEN1J6MERydVdrcmlrUkRTLytsOXhwamxWMk9oS0hwaVpO?=
- =?utf-8?B?T0Z4b2RBc1B3Sjg1R3lnWnRkc25EQWwwLzZyaTcvV0VFNW1Od0hVaDVVdURx?=
- =?utf-8?B?YWhBQXBSbGM2NVF6MElJK0JiZWJyWTNyNWpydG5vQitId013T3V0SkhYaXRE?=
- =?utf-8?B?Q3BjaktmOEJJcmRuRzdLdU5mQmp1c256ZE5RejFtd3RCc1NKUXYzb0JubU5s?=
- =?utf-8?B?Y2diVExVM1pqQ00vQjFyd25oVEo4R2VXbnZWdmdpcEh4TTIvNVg1Umo1RkU4?=
- =?utf-8?B?ZkNZakZUTW5yTWdFay9RVlFocXNUbWlHRUM2QTlMa21Oalg5OGRBL3VEVnVX?=
- =?utf-8?B?Y2ZuRVhCVWV0aWJpZkxhQWJtVFROUVRMS1lrU3lCZk12SjRZTzR3YjNuRTFS?=
- =?utf-8?B?OVlUK2lVNTdwbktQZm9OVStlN0NWU0lYTVh2MU1zRGJqVXBzMU1kb0Z5am5x?=
- =?utf-8?B?RmIrZmdZS1FtK0V3cXZ0blBrUzZGSHlXZEdqUURiMDd6VzhLK0xQbDhWazZs?=
- =?utf-8?B?ZWFUcjFUc3dpUWFqRDc4bmhoR2R1d3ovK2ZrUlRONXRVVlV1d0hLOVdseXk3?=
- =?utf-8?B?Und0bjJrWHcrVjFKYS82UExEMFozU0trSEszSFVUMENIdEliUzdRdWJSNk04?=
- =?utf-8?B?a0dJbGhmYW54MnlNNUZ0bW1hR0pVQUs3WEQvWE43b2cwM2MrYzZ3ZzRWa3p4?=
- =?utf-8?B?V0pxNXpSWHN3ZHhnTUlIQjZ2aEhwNFc4VllLNGs5RWVnWjYvUWJZVFZ4cFI3?=
- =?utf-8?B?RW00eWxqZ1ZvaTgzV01DM20xM2NSQVRmRlNrVnJ3N1R3UlB0MmZHdW0wVWhp?=
- =?utf-8?B?ek5FbDdnQ2lMa2xtT25GUWJvVDhGQnV6MDEwam9DYkRJNVluTG1MNGk5YXFU?=
- =?utf-8?B?S0orYjRYZENkQU53RzVIbkxnSUJKd0dYRFQvMEFVTnlDUkEvSUlFNVZCWVZ2?=
- =?utf-8?B?elkvejlId2JGVGw0NjBBNE0yMkZqWC9WazZTMm0xdlpxS1ZuYllpYXdOWFNM?=
- =?utf-8?B?b2VRVCtjZVNpc1dod3RiNzRySWZCbDNlMGY5Wm5QU0pSczVBMVRZN3ZDVUZq?=
- =?utf-8?B?V2RyRW9hWDJ2NGN3VkJGMStINkN4S05EbExXbjhIRlJYd0RTS1J1SXQ1aENi?=
- =?utf-8?B?NEtETkZEOVlPWCtOZG9KZjVLY1B5emlBeEw5Y0VOdWlIcWRaUDRTU2t5QUh5?=
- =?utf-8?B?ZmQ3QVlDUnU3VDRVbzFxcGZxZ2cxS1pJQmdBSU1CR0pIWDZFWklja3BLSEZo?=
- =?utf-8?B?Z2d5OWJBdmcvdktVcXIwTmlYeEJSNkg2UXpwVkdUSzJpTVNmcS9VNit3Ym5L?=
- =?utf-8?Q?VaMXULJe4HeispPr39QAcHYqnd4Lq3YKl0j16qX?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80d430d2-b434-4b6b-e87f-08d8ef045924
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2021 20:35:23.1251
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ccwr/GEcLKOou/U/wN3GjwYuy7/lLNYatEsgOnv5+Ut+/WCIAEFekJyw4qMmDiTo4jtlrYkj4tklqw1iVUEF0w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2512
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-24_13:2021-03-24,2021-03-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
+ phishscore=0 priorityscore=1501 malwarescore=0 mlxscore=0 clxscore=1011
+ spamscore=0 adultscore=0 lowpriorityscore=0 impostorscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103240150
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, 2021-03-24 at 09:14 -0700, James Bottomley wrote:
+> On Tue, 2021-03-23 at 14:07 -0400, Mimi Zohar wrote:
+> > On Tue, 2021-03-23 at 17:35 +0100, Ahmad Fatoum wrote:
+> > > Hello Horia,
+> > > 
+> > > On 21.03.21 21:48, Horia Geantă wrote:
+> > > > On 3/16/2021 7:02 PM, Ahmad Fatoum wrote:
+> > > > [...]
+> > > > > +struct trusted_key_ops caam_trusted_key_ops = {
+> > > > > +	.migratable = 0, /* non-migratable */
+> > > > > +	.init = trusted_caam_init,
+> > > > > +	.seal = trusted_caam_seal,
+> > > > > +	.unseal = trusted_caam_unseal,
+> > > > > +	.exit = trusted_caam_exit,
+> > > > > +};
+> > > > caam has random number generation capabilities, so it's worth
+> > > > using that
+> > > > by implementing .get_random.
+> > > 
+> > > If the CAAM HWRNG is already seeding the kernel RNG, why not use
+> > > the kernel's?
+> > > 
+> > > Makes for less code duplication IMO.
+> > 
+> > Using kernel RNG, in general, for trusted keys has been discussed
+> > before.   Please refer to Dave Safford's detailed explanation for not
+> > using it [1].
+> > 
+> > [1] 
+> > https://lore.kernel.org/linux-integrity/BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com/
+> 
+> I still don't think relying on one source of randomness to be
+> cryptographically secure is a good idea.  The fear of bugs in the
+> kernel entropy pool is reasonable, but since it's widely used they're
+> unlikely to persist very long.  Studies have shown that some TPMs
+> (notably the chinese manufactured ones) have suspicious failures in
+> their RNGs:
+> 
+> https://www.researchgate.net/publication/45934562_Benchmarking_the_True_Random_Number_Generator_of_TPM_Chips
+> 
+> And most cryptograhpers recommend using a TPM for entropy mixing rather
+> than directly:
+> 
+> https://blog.cryptographyengineering.com/category/rngs/
+> 
+> The TPMFail paper also shows that in spite of NIST certification
+> things can go wrong with a TPM:
+> 
+> https://tpm.fail/
 
-On 3/24/21 12:47 PM, Andy Lutomirski wrote:
-> On Wed, Mar 24, 2021 at 10:04 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
->> If hardware detects an RMP violation, it will raise a page-fault exception
->> with the RMP bit set. To help the debug, dump the RMP entry of the faulting
->> address.
->>
->> Cc: Thomas Gleixner <tglx@linutronix.de>
->> Cc: Ingo Molnar <mingo@redhat.com>
->> Cc: Borislav Petkov <bp@alien8.de>
->> Cc: Joerg Roedel <jroedel@suse.de>
->> Cc: "H. Peter Anvin" <hpa@zytor.com>
->> Cc: Tony Luck <tony.luck@intel.com>
->> Cc: Dave Hansen <dave.hansen@intel.com>
->> Cc: "Peter Zijlstra (Intel)" <peterz@infradead.org>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Tom Lendacky <thomas.lendacky@amd.com>
->> Cc: David Rientjes <rientjes@google.com>
->> Cc: Sean Christopherson <seanjc@google.com>
->> Cc: x86@kernel.org
->> Cc: kvm@vger.kernel.org
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> ---
->>  arch/x86/mm/fault.c | 75 +++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 75 insertions(+)
->>
->> diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
->> index f39b551f89a6..7605e06a6dd9 100644
->> --- a/arch/x86/mm/fault.c
->> +++ b/arch/x86/mm/fault.c
->> @@ -31,6 +31,7 @@
->>  #include <asm/pgtable_areas.h>         /* VMALLOC_START, ...           */
->>  #include <asm/kvm_para.h>              /* kvm_handle_async_pf          */
->>  #include <asm/vdso.h>                  /* fixup_vdso_exception()       */
->> +#include <asm/sev-snp.h>               /* lookup_rmpentry ...          */
->>
->>  #define CREATE_TRACE_POINTS
->>  #include <asm/trace/exceptions.h>
->> @@ -147,6 +148,76 @@ is_prefetch(struct pt_regs *regs, unsigned long error_code, unsigned long addr)
->>  DEFINE_SPINLOCK(pgd_lock);
->>  LIST_HEAD(pgd_list);
->>
->> +static void dump_rmpentry(struct page *page, rmpentry_t *e)
->> +{
->> +       unsigned long paddr = page_to_pfn(page) << PAGE_SHIFT;
->> +
->> +       pr_alert("RMPEntry paddr 0x%lx [assigned=%d immutable=%d pagesize=%d gpa=0x%lx asid=%d "
->> +               "vmsa=%d validated=%d]\n", paddr, rmpentry_assigned(e), rmpentry_immutable(e),
->> +               rmpentry_pagesize(e), rmpentry_gpa(e), rmpentry_asid(e), rmpentry_vmsa(e),
->> +               rmpentry_validated(e));
->> +       pr_alert("RMPEntry paddr 0x%lx %016llx %016llx\n", paddr, e->high, e->low);
->> +}
->> +
->> +static void show_rmpentry(unsigned long address)
->> +{
->> +       struct page *page = virt_to_page(address);
-> This is an error path, and I don't think you have any particular
-> guarantee that virt_to_page(address) is valid.  Please add appropriate
-> validation or use one of the slow lookup helpers.
+We already had a lengthy discussion on replacing the TPM RNG with the
+kernel RNG for trusted keys, when TEE was being introduced [2,3].  I'm
+not interested in re-hashing that discussion here.   The only
+difference now is that CAAM is a new trust source.  I suspect the same
+concerns/issues persist, but at least in this case using the kernel RNG
+would not be a regression.
 
+[2] Pascal Van Leeuwen on mixing different sources of entropy and certification -
+ https://lore.kernel.org/linux-integrity/MN2PR20MB29732A856A40131A671F949FCA950@MN2PR20MB2973.namprd20.prod.outlook.com/
+[3] Jarrko on "regression" and tpm_asym.c - 
+https://lore.kernel.org/linux-integrity/20191014190033.GA15552@linux.intel.com/ 
 
-Noted, thanks for the quick feedback.
-
+Mimi
 
