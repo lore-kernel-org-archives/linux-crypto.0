@@ -2,123 +2,117 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC34C433DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 09:27:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6BD6C433E1
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 09:28:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DAF6361A06
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 09:27:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86A9A61A0D
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Mar 2021 09:28:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234751AbhCXJ0b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Mar 2021 05:26:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40396 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234743AbhCXJ01 (ORCPT
+        id S232320AbhCXJ1f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Mar 2021 05:27:35 -0400
+Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:65390 "EHLO
+        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234844AbhCXJ1V (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Mar 2021 05:26:27 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5878C061763
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Mar 2021 02:26:26 -0700 (PDT)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[IPv6:::1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1lOzmP-0001bV-VY; Wed, 24 Mar 2021 10:26:22 +0100
-Subject: Re: [PATCH v1 3/3] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
-To:     Mimi Zohar <zohar@linux.ibm.com>,
-        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        Wed, 24 Mar 2021 05:27:21 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R351e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0UT9Ta7E_1616578026;
+Received: from B-455UMD6M-2027.local(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UT9Ta7E_1616578026)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 24 Mar 2021 17:27:07 +0800
+Subject: Re: [PATCH] init/Kconfig: Support sign module with SM3 hash algorithm
+To:     Randy Dunlap <rdunlap@infradead.org>,
         David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        James Bottomley <jejb@linux.ibm.com>
-Cc:     "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jonathan Corbet <corbet@lwn.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Udit Agarwal <udit.agarwal@nxp.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
- <319e558e1bd19b80ad6447c167a2c3942bdafea2.1615914058.git-series.a.fatoum@pengutronix.de>
- <01e6e13d-2968-0aa5-c4c8-7458b7bde462@nxp.com>
- <45a9e159-2dcb-85bf-02bd-2993d50b5748@pengutronix.de>
- <f9c0087d299be1b9b91b242f41ac6ef7b9ee3ef7.camel@linux.ibm.com>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-Message-ID: <63dd7d4b-4729-9e03-cd8f-956b94eab0d9@pengutronix.de>
-Date:   Wed, 24 Mar 2021 10:26:14 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Valentin Schneider <valentin.schneider@arm.com>,
+        Nick Terrell <terrelln@fb.com>, KP Singh <kpsingh@google.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Vlastimil Babka <vbabka@suse.cz>, keyrings@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Jia Zhang <zhang.jia@linux.alibaba.com>
+References: <20210323083528.25678-1-tianjia.zhang@linux.alibaba.com>
+ <28d3a339-6210-ffd2-950f-ea5340ac23b7@infradead.org>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Message-ID: <f01f2b36-4978-1c8d-7b7b-f1f8fd49c6d1@linux.alibaba.com>
+Date:   Wed, 24 Mar 2021 17:27:06 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.1
 MIME-Version: 1.0
-In-Reply-To: <f9c0087d299be1b9b91b242f41ac6ef7b9ee3ef7.camel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <28d3a339-6210-ffd2-950f-ea5340ac23b7@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Mimi,
+Hi,
 
-On 23.03.21 19:07, Mimi Zohar wrote:
-> On Tue, 2021-03-23 at 17:35 +0100, Ahmad Fatoum wrote:
->> On 21.03.21 21:48, Horia Geantă wrote:
->>> caam has random number generation capabilities, so it's worth using that
->>> by implementing .get_random.
+On 3/24/21 12:43 AM, Randy Dunlap wrote:
+> On 3/23/21 1:35 AM, Tianjia Zhang wrote:
+>> The kernel module signature supports the option to use the SM3
+>> secure hash (OSCCA GM/T 0004-2012 SM3).
 >>
->> If the CAAM HWRNG is already seeding the kernel RNG, why not use the kernel's?
+>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>> ---
+>>   Documentation/admin-guide/module-signing.rst | 5 +++--
+>>   crypto/asymmetric_keys/pkcs7_parser.c        | 7 +++++++
+>>   init/Kconfig                                 | 5 +++++
+>>   3 files changed, 15 insertions(+), 2 deletions(-)
 >>
->> Makes for less code duplication IMO.
 > 
-> Using kernel RNG, in general, for trusted keys has been discussed
-> before.   Please refer to Dave Safford's detailed explanation for not
-> using it [1].
-
-The argument seems to boil down to:
-
- - TPM RNG are known to be of good quality
- - Trusted keys always used it so far
-
-Both are fine by me for TPMs, but the CAAM backend is new code and neither point
-really applies.
-
-get_random_bytes_wait is already used for generating key material elsewhere.
-Why shouldn't new trusted key backends be able to do the same thing?
-
-Cheers,
-Ahmad
-
+>> diff --git a/init/Kconfig b/init/Kconfig
+>> index 5f5c776ef192..fed9236078e4 100644
+>> --- a/init/Kconfig
+>> +++ b/init/Kconfig
+>> @@ -2202,6 +2202,10 @@ config MODULE_SIG_SHA512
+>>   	bool "Sign modules with SHA-512"
+>>   	select CRYPTO_SHA512
+>>   
+>> +config MODULE_SIG_SM3
+>> +	bool "Sign modules with SM3"
+>> +	select CRYPTO_SM3
+>> +
+>>   endchoice
+>>   
+>>   config MODULE_SIG_HASH
+>> @@ -2212,6 +2216,7 @@ config MODULE_SIG_HASH
+>>   	default "sha256" if MODULE_SIG_SHA256
+>>   	default "sha384" if MODULE_SIG_SHA384
+>>   	default "sha512" if MODULE_SIG_SHA512
+>> +	default "sm3" if MODULE_SIG_SM3
+>>   
+>>   config MODULE_COMPRESS
+>>   	bool "Compress modules on installation"
+>>
 > 
-> thanks,
+> checkpatch tells me:
 > 
-> Mimi
+> WARNING: please write a paragraph that describes the config symbol fully
+> #74: FILE: init/Kconfig:2205:
+> +config MODULE_SIG_SM3
 > 
-> [1] 
-> https://lore.kernel.org/linux-integrity/BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com/
->  
 > 
+> so yes, it should have some help text there.
+> 
+> thanks.
 > 
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+I noticed, but this is just a list of algorithms, this warning can be 
+ignored.
+
+Best regards,
+Tianjia
