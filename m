@@ -6,33 +6,33 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D2F4C433C1
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 15:52:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E94DC433C1
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 16:00:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C51661A1D
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 15:52:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D5A961A11
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 16:00:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229758AbhCYPwE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Mar 2021 11:52:04 -0400
-Received: from mga02.intel.com ([134.134.136.20]:48480 "EHLO mga02.intel.com"
+        id S229574AbhCYQAK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Mar 2021 12:00:10 -0400
+Received: from mga04.intel.com ([192.55.52.120]:21136 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230228AbhCYPvo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Mar 2021 11:51:44 -0400
-IronPort-SDR: +Hb5QyJEn954Y6zpaopSgrCZfNP02PdgOf7Fl09BUBZvCJLD87p7x+jAYM3su3B8+ld250YHL5
- V2z+UndWd5TQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9934"; a="178079080"
+        id S229533AbhCYP7x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Mar 2021 11:59:53 -0400
+IronPort-SDR: R3S4Nm4FQWv0vfhnWuU30uTvaZv4kTt8qJML42QMwWu0W5xDoAh6iQtdTr+lpJEZDf18bz+Uaf
+ 8cylNA5yOX6g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9934"; a="188663086"
 X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
-   d="scan'208";a="178079080"
+   d="scan'208";a="188663086"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 08:51:43 -0700
-IronPort-SDR: 6m8atIa7mAPD7OzC2EyPSszUjlu5y7Td/6SyOPKJes6UWU8wzfO3M0e0TtnyyY16fwE214R+fH
- G6WIdpj49ZgA==
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 08:59:52 -0700
+IronPort-SDR: /nZj8Nf7NEa+IfB4El49KWhSTYKLhykaGlZYp3an7m07X/5z2XD7W1qxi/GDT6SuaZ5DSmBR7d
+ jNMiZQF9hGhw==
 X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
-   d="scan'208";a="391789207"
+   d="scan'208";a="391792943"
 Received: from jeffche1-mobl.amr.corp.intel.com (HELO [10.209.73.71]) ([10.209.73.71])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 08:51:43 -0700
-Subject: Re: [RFC Part2 PATCH 01/30] x86: Add the host SEV-SNP initialization
- support
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 08:59:51 -0700
+Subject: Re: [RFC Part2 PATCH 07/30] mm: add support to split the large THP
+ based on RMP violation
 To:     Brijesh Singh <brijesh.singh@amd.com>,
         linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
         linux-crypto@vger.kernel.org
@@ -47,9 +47,9 @@ Cc:     ak@linux.intel.com, herbert@gondor.apana.org.au,
         David Rientjes <rientjes@google.com>,
         Sean Christopherson <seanjc@google.com>
 References: <20210324170436.31843-1-brijesh.singh@amd.com>
- <20210324170436.31843-2-brijesh.singh@amd.com>
- <696b8d42-8825-9df5-54a3-fa55f2d0f421@intel.com>
- <7cbafc72-f740-59b0-01f8-cd926ab7e010@amd.com>
+ <20210324170436.31843-8-brijesh.singh@amd.com>
+ <0edd1350-4865-dd71-5c14-3d57c784d62d@intel.com>
+ <86c9d9db-a881-efa4-c937-12fc62ce97e8@amd.com>
 From:   Dave Hansen <dave.hansen@intel.com>
 Autocrypt: addr=dave.hansen@intel.com; keydata=
  xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
@@ -94,12 +94,12 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
  ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
  z5cecg==
-Message-ID: <8411ae2b-1a4a-d124-ffcb-ff351adac90e@intel.com>
-Date:   Thu, 25 Mar 2021 08:51:42 -0700
+Message-ID: <f8bf7e26-26dc-e19a-007c-40b26e0a0a45@intel.com>
+Date:   Thu, 25 Mar 2021 08:59:51 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <7cbafc72-f740-59b0-01f8-cd926ab7e010@amd.com>
+In-Reply-To: <86c9d9db-a881-efa4-c937-12fc62ce97e8@amd.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -107,51 +107,46 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 3/25/21 8:31 AM, Brijesh Singh wrote:
-> 
-> On 3/25/21 9:58 AM, Dave Hansen wrote:
->>> +static int __init mem_encrypt_snp_init(void)
->>> +{
->>> +	if (!boot_cpu_has(X86_FEATURE_SEV_SNP))
->>> +		return 1;
->>> +
->>> +	if (rmptable_init()) {
->>> +		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
->>> +		return 1;
->>> +	}
->>> +
->>> +	static_branch_enable(&snp_enable_key);
->>> +
->>> +	return 0;
->>> +}
->> Could you explain a bit why 'snp_enable_key' is needed in addition to
->> X86_FEATURE_SEV_SNP?
-> 
-> 
-> The X86_FEATURE_SEV_SNP indicates that hardware supports the feature --
-> this does not necessary means that SEV-SNP is enabled in the host.
+On 3/25/21 8:24 AM, Brijesh Singh wrote:
+> On 3/25/21 9:48 AM, Dave Hansen wrote:
+>> On 3/24/21 10:04 AM, Brijesh Singh wrote:
+>>> When SEV-SNP is enabled globally in the system, a write from the hypervisor
+>>> can raise an RMP violation. We can resolve the RMP violation by splitting
+>>> the virtual address to a lower page level.
+>>>
+>>> e.g
+>>> - guest made a page shared in the RMP entry so that the hypervisor
+>>>   can write to it.
+>>> - the hypervisor has mapped the pfn as a large page. A write access
+>>>   will cause an RMP violation if one of the pages within the 2MB region
+>>>   is a guest private page.
+>>>
+>>> The above RMP violation can be resolved by simply splitting the large
+>>> page.
+>> What if the large page is provided by hugetlbfs?
+> I was not able to find a method to split the large pages in the
+> hugetlbfs. Unfortunately, at this time a VMM cannot use the backing
+> memory from the hugetlbfs pool. An SEV-SNP aware VMM can use either
+> transparent hugepage or small pages.
 
-I think you're confusing the CPUID bit that initially populates
-X86_FEATURE_SEV_SNP with the X86_FEATURE bit.  We clear X86_FEATURE bits
-all the time for features that the kernel turns off, even while the
-hardware supports it.
+That's really, really nasty.  Especially since it might not be evident
+until long after boot and the guest is killed.
 
-Look at what we do in init_ia32_feat_ctl() for SGX, for instance.  We
-then go on to use X86_FEATURE_SGX at runtime to see if SGX was disabled,
-even though the hardware supports it.
+It's even nastier because hugetlbfs is actually a great fit for SEV-SNP
+memory.  It's physically contiguous, so it would keep you from having to
+fracture the direct map all the way down to 4k, it also can't be
+reclaimed (just like all SEV memory).
 
->> For a lot of features, we just use cpu_feature_enabled(), which does
->> both compile-time and static_cpu_has().  This whole series seems to lack
->> compile-time disables for the code that it adds, like the code it adds
->> to arch/x86/mm/fault.c or even mm/memory.c.
-> 
-> Noted, I will add the #ifdef  to make sure that its compiled out when
-> the config does not have the AMD_MEM_ENCRYPTION enabled.
+I think the minimal thing you can do here is to fail to add memory to
+the RMP in the first place if you can't split it.  That way, users will
+at least fail to _start_ their VM versus dying randomly for no good reason.
 
-IS_ENABLED() tends to be nicer for these things.
+Even better would be to come up with a stronger contract between host
+and guest.  I really don't think the host should be exposed to random
+RMP faults on the direct map.  If the guest wants to share memory, then
+it needs to tell the host and give the host an opportunity to move the
+guest physical memory.  It might, for instance, sequester all the shared
+pages in a single spot to minimize direct map fragmentation.
 
-Even better is if you coordinate these with your X86_FEATURE_SEV_SNP
-checks.  Then, put X86_FEATURE_SEV_SNP in disabled-features.h, and you
-can use cpu_feature_enabled(X86_FEATURE_SEV_SNP) as both a
-(statically-patched) runtime *AND* compile-time check without an
-explicit #ifdefs.
+I'll let the other x86 folks chime in on this, but I really think this
+needs a different approach than what's being proposed.
