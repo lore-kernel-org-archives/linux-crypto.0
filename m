@@ -2,109 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8156C433C1
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 08:35:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34CE3C433E4
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 11:38:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB69B61A23
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 08:35:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1278A61A1F
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 11:38:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229533AbhCYIec (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Mar 2021 04:34:32 -0400
-Received: from mga17.intel.com ([192.55.52.151]:14194 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229461AbhCYIe1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Mar 2021 04:34:27 -0400
-IronPort-SDR: NhmSZ/rpfmsjlaG7Ybl0zgXV2fIMLHhSWyOr3EFSpHEe85okrC7hssojcw+fa2fvx25W3xWBW8
- l2u5Uxcq5Adw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9933"; a="170861340"
-X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
-   d="scan'208";a="170861340"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 01:34:26 -0700
-IronPort-SDR: +AtR+efb7w5frcaq4thFalw5Tgbb5cQu6cNrmBMrw4TvpU3xAWhwNfKAkn8i8juW/toCa7hIJ+
- GpXbh0YsndMQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
-   d="scan'208";a="608425586"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
-  by fmsmga005.fm.intel.com with ESMTP; 25 Mar 2021 01:34:25 -0700
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Marco Chiappero <marco.chiappero@intel.com>
-Subject: [PATCH] crypto: qat - fix error path in adf_isr_resource_alloc()
-Date:   Thu, 25 Mar 2021 08:34:18 +0000
-Message-Id: <20210325083418.153771-1-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.30.2
+        id S230347AbhCYLiQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Mar 2021 07:38:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41368 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231165AbhCYLfd (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Mar 2021 07:35:33 -0400
+Received: from smtp-8fa8.mail.infomaniak.ch (smtp-8fa8.mail.infomaniak.ch [IPv6:2001:1600:4:17::8fa8])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 700FAC0613DF
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Mar 2021 04:35:29 -0700 (PDT)
+Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
+        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4F5jhb2yFfzMq3tQ;
+        Thu, 25 Mar 2021 12:35:27 +0100 (CET)
+Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
+        by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4F5jhW3mRTzlh8V1;
+        Thu, 25 Mar 2021 12:35:23 +0100 (CET)
+Subject: Re: [PATCH v7 0/5] Enable root to update the blacklist keyring
+To:     David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Eric Snowberg <eric.snowberg@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <jmorris@namei.org>,
+        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+References: <20210312171232.2681989-1-mic@digikod.net>
+From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+Message-ID: <44ea1b45-1eca-89b2-34b5-e282f543cb99@digikod.net>
+Date:   Thu, 25 Mar 2021 12:36:04 +0100
+User-Agent: 
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+In-Reply-To: <20210312171232.2681989-1-mic@digikod.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The function adf_isr_resource_alloc() is not unwinding correctly in case
-of error.
-This patch fixes the error paths and propagate the errors to the caller.
+Hi David,
 
-Fixes: 7afa232e76ce ("crypto: qat - Intel(R) QAT DH895xcc accelerator")
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Marco Chiappero <marco.chiappero@intel.com>
----
- drivers/crypto/qat/qat_common/adf_isr.c | 29 ++++++++++++++++++-------
- 1 file changed, 21 insertions(+), 8 deletions(-)
+What is the status of this patchset? Could you please push it to -next?
 
-diff --git a/drivers/crypto/qat/qat_common/adf_isr.c b/drivers/crypto/qat/qat_common/adf_isr.c
-index c45853463530..e3ad5587be49 100644
---- a/drivers/crypto/qat/qat_common/adf_isr.c
-+++ b/drivers/crypto/qat/qat_common/adf_isr.c
-@@ -291,19 +291,32 @@ int adf_isr_resource_alloc(struct adf_accel_dev *accel_dev)
- 
- 	ret = adf_isr_alloc_msix_entry_table(accel_dev);
- 	if (ret)
--		return ret;
--	if (adf_enable_msix(accel_dev))
- 		goto err_out;
- 
--	if (adf_setup_bh(accel_dev))
--		goto err_out;
-+	ret = adf_enable_msix(accel_dev);
-+	if (ret)
-+		goto err_free_msix_table;
- 
--	if (adf_request_irqs(accel_dev))
--		goto err_out;
-+	ret = adf_setup_bh(accel_dev);
-+	if (ret)
-+		goto err_disable_msix;
-+
-+	ret = adf_request_irqs(accel_dev);
-+	if (ret)
-+		goto err_cleanup_bh;
- 
- 	return 0;
-+
-+err_cleanup_bh:
-+	adf_cleanup_bh(accel_dev);
-+
-+err_disable_msix:
-+	adf_disable_msix(&accel_dev->accel_pci_dev);
-+
-+err_free_msix_table:
-+	adf_isr_free_msix_entry_table(accel_dev);
-+
- err_out:
--	adf_isr_resource_free(accel_dev);
--	return -EFAULT;
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(adf_isr_resource_alloc);
--- 
-2.30.2
+Regards,
+ Mickaël
 
+On 12/03/2021 18:12, Mickaël Salaün wrote:
+> This new patch series is a rebase on David Howells's and Eric Snowberg's
+> keys-cve-2020-26541-v3.
+> 
+> I successfully tested this patch series with the 186 entries from
+> https://uefi.org/sites/default/files/resources/dbxupdate_x64.bin (184
+> binary hashes and 2 certificates).
+> 
+> The goal of these patches is to add a new configuration option to enable the
+> root user to load signed keys in the blacklist keyring.  This keyring is useful
+> to "untrust" certificates or files.  Enabling to safely update this keyring
+> without recompiling the kernel makes it more usable.
+> 
+> This can be applied on top of David Howells's keys-cve-2020-26541-branch:
+> https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-cve-2020-26541-branch
+> 
+> Previous patch series:
+> https://lore.kernel.org/lkml/20210210120410.471693-1-mic@digikod.net/
+> 
+> Regards,
+> 
+> Mickaël Salaün (5):
+>   tools/certs: Add print-cert-tbs-hash.sh
+>   certs: Check that builtin blacklist hashes are valid
+>   certs: Make blacklist_vet_description() more strict
+>   certs: Factor out the blacklist hash creation
+>   certs: Allow root user to append signed hashes to the blacklist
+>     keyring
+> 
+>  MAINTAINERS                                   |   2 +
+>  certs/.gitignore                              |   1 +
+>  certs/Kconfig                                 |  17 +-
+>  certs/Makefile                                |  17 +-
+>  certs/blacklist.c                             | 218 ++++++++++++++----
+>  crypto/asymmetric_keys/x509_public_key.c      |   3 +-
+>  include/keys/system_keyring.h                 |  14 +-
+>  scripts/check-blacklist-hashes.awk            |  37 +++
+>  .../platform_certs/keyring_handler.c          |  26 +--
+>  tools/certs/print-cert-tbs-hash.sh            |  91 ++++++++
+>  10 files changed, 346 insertions(+), 80 deletions(-)
+>  create mode 100755 scripts/check-blacklist-hashes.awk
+>  create mode 100755 tools/certs/print-cert-tbs-hash.sh
+> 
+> 
+> base-commit: ebd9c2ae369a45bdd9f8615484db09be58fc242b
+> 
