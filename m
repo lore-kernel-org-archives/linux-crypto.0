@@ -2,55 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34CE3C433E4
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 11:38:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2033C433E2
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 14:31:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1278A61A1F
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 11:38:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75D5D61A25
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 14:31:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230347AbhCYLiQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Mar 2021 07:38:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41368 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231165AbhCYLfd (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Mar 2021 07:35:33 -0400
-Received: from smtp-8fa8.mail.infomaniak.ch (smtp-8fa8.mail.infomaniak.ch [IPv6:2001:1600:4:17::8fa8])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 700FAC0613DF
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Mar 2021 04:35:29 -0700 (PDT)
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4F5jhb2yFfzMq3tQ;
-        Thu, 25 Mar 2021 12:35:27 +0100 (CET)
-Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
-        by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4F5jhW3mRTzlh8V1;
-        Thu, 25 Mar 2021 12:35:23 +0100 (CET)
-Subject: Re: [PATCH v7 0/5] Enable root to update the blacklist keyring
-To:     David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Eric Snowberg <eric.snowberg@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <jmorris@namei.org>,
-        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "Serge E . Hallyn" <serge@hallyn.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-References: <20210312171232.2681989-1-mic@digikod.net>
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-Message-ID: <44ea1b45-1eca-89b2-34b5-e282f543cb99@digikod.net>
-Date:   Thu, 25 Mar 2021 12:36:04 +0100
-User-Agent: 
+        id S231368AbhCYOat (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Mar 2021 10:30:49 -0400
+Received: from mga02.intel.com ([134.134.136.20]:40637 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231349AbhCYOak (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Mar 2021 10:30:40 -0400
+IronPort-SDR: ZcnnUDpgbt/UvPzV5i2kE5QG0yCwqzwgL+PUPoSBShmo8mYpL3GSHQ2pSGU/Saf9gQ3nDSuzMW
+ BqMwMFcJ6xVg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9934"; a="178059523"
+X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
+   d="scan'208";a="178059523"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 07:30:38 -0700
+IronPort-SDR: LRtMPgKm+RxTc8EC/mkI4ya+1Z9PuaUNwCu/kY+c1SP/1VlLkB3f0Dspx7CjpKTK1jYkDMs8TN
+ bSxDAcNa/IOA==
+X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
+   d="scan'208";a="391752222"
+Received: from jeffche1-mobl.amr.corp.intel.com (HELO [10.209.73.71]) ([10.209.73.71])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 07:30:38 -0700
+Subject: Re: [RFC Part2 PATCH 07/30] mm: add support to split the large THP
+ based on RMP violation
+To:     Brijesh Singh <brijesh.singh@amd.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Cc:     ak@linux.intel.com, herbert@gondor.apana.org.au,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <20210324170436.31843-1-brijesh.singh@amd.com>
+ <20210324170436.31843-8-brijesh.singh@amd.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <fdb37d54-f513-8928-ba5a-80427f02bfc1@intel.com>
+Date:   Thu, 25 Mar 2021 07:30:37 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210312171232.2681989-1-mic@digikod.net>
+In-Reply-To: <20210324170436.31843-8-brijesh.singh@amd.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -58,56 +106,25 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi David,
+On 3/24/21 10:04 AM, Brijesh Singh wrote:
+> @@ -1377,6 +1442,22 @@ void do_user_addr_fault(struct pt_regs *regs,
+>  	if (hw_error_code & X86_PF_INSTR)
+>  		flags |= FAULT_FLAG_INSTRUCTION;
+>  
+> +	/*
+> +	 * If its an RMP violation, see if we can resolve it.
+> +	 */
+> +	if ((hw_error_code & X86_PF_RMP)) {
+> +		ret = handle_rmp_page_fault(hw_error_code, address);
+> +		if (ret == RMP_FAULT_PAGE_SPLIT) {
+> +			flags |= FAULT_FLAG_PAGE_SPLIT;
+> +		} else if (ret == RMP_FAULT_KILL) {
+> +			fault |= VM_FAULT_SIGBUS;
+> +			mm_fault_error(regs, hw_error_code, address, fault);
+> +			return;
+> +		} else {
+> +			return;
+> +		}
+> +	}
 
-What is the status of this patchset? Could you please push it to -next?
-
-Regards,
- Mickaël
-
-On 12/03/2021 18:12, Mickaël Salaün wrote:
-> This new patch series is a rebase on David Howells's and Eric Snowberg's
-> keys-cve-2020-26541-v3.
-> 
-> I successfully tested this patch series with the 186 entries from
-> https://uefi.org/sites/default/files/resources/dbxupdate_x64.bin (184
-> binary hashes and 2 certificates).
-> 
-> The goal of these patches is to add a new configuration option to enable the
-> root user to load signed keys in the blacklist keyring.  This keyring is useful
-> to "untrust" certificates or files.  Enabling to safely update this keyring
-> without recompiling the kernel makes it more usable.
-> 
-> This can be applied on top of David Howells's keys-cve-2020-26541-branch:
-> https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-cve-2020-26541-branch
-> 
-> Previous patch series:
-> https://lore.kernel.org/lkml/20210210120410.471693-1-mic@digikod.net/
-> 
-> Regards,
-> 
-> Mickaël Salaün (5):
->   tools/certs: Add print-cert-tbs-hash.sh
->   certs: Check that builtin blacklist hashes are valid
->   certs: Make blacklist_vet_description() more strict
->   certs: Factor out the blacklist hash creation
->   certs: Allow root user to append signed hashes to the blacklist
->     keyring
-> 
->  MAINTAINERS                                   |   2 +
->  certs/.gitignore                              |   1 +
->  certs/Kconfig                                 |  17 +-
->  certs/Makefile                                |  17 +-
->  certs/blacklist.c                             | 218 ++++++++++++++----
->  crypto/asymmetric_keys/x509_public_key.c      |   3 +-
->  include/keys/system_keyring.h                 |  14 +-
->  scripts/check-blacklist-hashes.awk            |  37 +++
->  .../platform_certs/keyring_handler.c          |  26 +--
->  tools/certs/print-cert-tbs-hash.sh            |  91 ++++++++
->  10 files changed, 346 insertions(+), 80 deletions(-)
->  create mode 100755 scripts/check-blacklist-hashes.awk
->  create mode 100755 tools/certs/print-cert-tbs-hash.sh
-> 
-> 
-> base-commit: ebd9c2ae369a45bdd9f8615484db09be58fc242b
-> 
+Won't khugepaged come right back around and coalesce this page again?
