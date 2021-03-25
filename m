@@ -2,89 +2,208 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3E0FC433E0
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 02:08:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EBCFC433E2
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 05:27:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D072B61A1E
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 02:08:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DD8161A35
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 05:27:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233884AbhCYCH6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Mar 2021 22:07:58 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:13684 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233732AbhCYCHk (ORCPT
+        id S229592AbhCYF0g (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Mar 2021 01:26:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46292 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229861AbhCYF0W (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Mar 2021 22:07:40 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4F5T2V02q3znTV4;
-        Thu, 25 Mar 2021 10:05:06 +0800 (CST)
-Received: from [10.67.101.248] (10.67.101.248) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 25 Mar 2021 10:07:28 +0800
-Subject: Re: [PATCH -next] crypto: hisilicon/hpre - fix build error without
- CONFIG_CRYPTO_ECDH
-To:     'Wei Yongjun <weiyongjun1@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Weili Qian <qianweili@huawei.com>,
-        Meng Yu <yumeng18@huawei.com>,
-        YueHaibing <yuehaibing@huawei.com>,
-        Shukun Tan <tanshukun1@huawei.com>,
-        Stephen Rothwell <sfr@canb.auug.org.au>
-References: <20210324144239.997757-1-weiyongjun1@huawei.com>
-CC:     <linux-crypto@vger.kernel.org>, <kernel-janitors@vger.kernel.org>,
-        "Hulk Robot" <hulkci@huawei.com>
-From:   tanghui20 <tanghui20@huawei.com>
-Message-ID: <72f92d6b-8584-0891-827c-7f50311418dc@huawei.com>
-Date:   Thu, 25 Mar 2021 10:07:28 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        Thu, 25 Mar 2021 01:26:22 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7A1CC061760
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Mar 2021 22:26:20 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id z25so1577763lja.3
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Mar 2021 22:26:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=gFsXQtNcZc/jzBbc3KmHaNr8LuwlVaIo4tkNpXAhMCs=;
+        b=szUldggyNmVjxsrrTtlWnMRQPOMVT8cZCe5n98DB5e4AYjxCy/yawxRJYDhyjY6/HE
+         1zdQ2jBG3uJUxf4XjRDqgsZIjI/Zywasn9xRPTjryeG8OKkMdPujkQO4GFwQN4oyDFi6
+         o57TGNrEaoTRteOJ6W5ldogRM9nWPaTOxIpCyMiGsYB8nmVZ958quD6y0y3tWN2xtN0c
+         Ge2a1/y1yT3tD/qpV4vaIPTb089AVGdNEmBZ+xYZbA6zlapEXrvicmkhwUq7rM2dV1Vk
+         WnJ0YkTAlZVUzS3v5UkNOVRB6pTUtTAfpkqRIU76j8laN1/2CsRpNb8bW/Wr7tYlHzBj
+         l/xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=gFsXQtNcZc/jzBbc3KmHaNr8LuwlVaIo4tkNpXAhMCs=;
+        b=uA8+KfXQe5xoNpGYgGVfb0kJKulFP8sxkcIoUuxV2cNgjRneMbI/nebOu8bGcolqjy
+         ClQjzbJSho31BDLRrq/4IX7a62TJ6p4kgKVaRq07l7GaFYZ0c24J11R9cL1ASCTnyT2o
+         QkqWDIExJEdBSlAak3fiMgw67HYU/7wzgVX7Vkt/iBy6J9Uad5YGRAdgWwVEyqx6I8fU
+         aJOGj2fstZUNRarUGgVRivZAz/3pcQDQkL9ZAkElxHgHMy4nrb1piIZGcUK9adbSL0vL
+         wqEtu6MdoHr8E0qlzUwsOc+xMMeLtODiR7XC/GZ54nebv6ZRnygy5EHTm8+N3b/VYUKc
+         BrLg==
+X-Gm-Message-State: AOAM533m12BYthW1eGovay10hsm4SHdNMSHRb/aNAk4X+HmPv1ikSTNZ
+        PKl7vu1hcpAuVaXkZ7+Sa8kzem+0qSaqKQ99sdM8Og==
+X-Google-Smtp-Source: ABdhPJw0lZa1dN3iWsOiL7ok+NZMNVuTQq5qAq6ImnOTO2jdiouw6uWhb1mTAuET6Lx9AmotH317Ob91LGw7g0Kt1wE=
+X-Received: by 2002:a05:651c:481:: with SMTP id s1mr4183162ljc.152.1616649979216;
+ Wed, 24 Mar 2021 22:26:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210324144239.997757-1-weiyongjun1@huawei.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.101.248]
-X-CFilter-Loop: Reflected
+References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
+ <319e558e1bd19b80ad6447c167a2c3942bdafea2.1615914058.git-series.a.fatoum@pengutronix.de>
+ <01e6e13d-2968-0aa5-c4c8-7458b7bde462@nxp.com> <45a9e159-2dcb-85bf-02bd-2993d50b5748@pengutronix.de>
+ <f9c0087d299be1b9b91b242f41ac6ef7b9ee3ef7.camel@linux.ibm.com>
+ <63dd7d4b-4729-9e03-cd8f-956b94eab0d9@pengutronix.de> <CAFA6WYOw_mQwOUN=onhzb7zCTyYDBrcx0E7C3LRk6nPLAVCWEQ@mail.gmail.com>
+ <557b92d2-f3b8-d136-7431-419429f0e059@pengutronix.de>
+In-Reply-To: <557b92d2-f3b8-d136-7431-419429f0e059@pengutronix.de>
+From:   Sumit Garg <sumit.garg@linaro.org>
+Date:   Thu, 25 Mar 2021 10:56:07 +0530
+Message-ID: <CAFA6WYNE44=Y7Erfc-xNtOrf7TkJjh+odmYH5vzhEHR6KqBfeQ@mail.gmail.com>
+Subject: Re: [PATCH v1 3/3] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     Mimi Zohar <zohar@linux.ibm.com>,
+        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        James Bottomley <jejb@linux.ibm.com>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Udit Agarwal <udit.agarwal@nxp.com>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thinks, there is a similar patch to yours that was send in advance:
-https://www.spinics.net/lists/linux-crypto/msg54238.html
+On Wed, 24 Mar 2021 at 19:37, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>
+> Hello Sumit,
+>
+> On 24.03.21 11:47, Sumit Garg wrote:
+> > On Wed, 24 Mar 2021 at 14:56, Ahmad Fatoum <a.fatoum@pengutronix.de> wr=
+ote:
+> >>
+> >> Hello Mimi,
+> >>
+> >> On 23.03.21 19:07, Mimi Zohar wrote:
+> >>> On Tue, 2021-03-23 at 17:35 +0100, Ahmad Fatoum wrote:
+> >>>> On 21.03.21 21:48, Horia Geant=C4=83 wrote:
+> >>>>> caam has random number generation capabilities, so it's worth using=
+ that
+> >>>>> by implementing .get_random.
+> >>>>
+> >>>> If the CAAM HWRNG is already seeding the kernel RNG, why not use the=
+ kernel's?
+> >>>>
+> >>>> Makes for less code duplication IMO.
+> >>>
+> >>> Using kernel RNG, in general, for trusted keys has been discussed
+> >>> before.   Please refer to Dave Safford's detailed explanation for not
+> >>> using it [1].
+> >>
+> >> The argument seems to boil down to:
+> >>
+> >>  - TPM RNG are known to be of good quality
+> >>  - Trusted keys always used it so far
+> >>
+> >> Both are fine by me for TPMs, but the CAAM backend is new code and nei=
+ther point
+> >> really applies.
+> >>
+> >> get_random_bytes_wait is already used for generating key material else=
+where.
+> >> Why shouldn't new trusted key backends be able to do the same thing?
+> >>
+> >
+> > Please refer to documented trusted keys behaviour here [1]. New
+> > trusted key backends should align to this behaviour and in your case
+> > CAAM offers HWRNG so we should be better using that.
+>
+> Why is it better?
+>
+> Can you explain what benefit a CAAM user would have if the trusted key
+> randomness comes directly out of the CAAM instead of indirectly from
+> the kernel entropy pool that is seeded by it?
 
-On 2021/3/24 22:42, 'Wei Yongjun wrote:
-> From: Wei Yongjun <weiyongjun1@huawei.com>
+IMO, user trust in case of trusted keys comes from trusted keys
+backend which is CAAM here. If a user doesn't trust that CAAM would
+act as a reliable source for RNG then CAAM shouldn't be used as a
+trust source in the first place.
+
+And I think building user's trust for kernel RNG implementation with
+multiple entropy contributions is pretty difficult when compared with
+CAAM HWRNG implementation.
+
+-Sumit
+
 >
-> GCC reports build error as following:
+> > Also, do update documentation corresponding to CAAM as a trusted keys b=
+ackend.
 >
-> x86_64-linux-gnu-ld: drivers/crypto/hisilicon/hpre/hpre_crypto.o: in function `hpre_ecdh_set_secret':
-> hpre_crypto.c:(.text+0x269c): undefined reference to `crypto_ecdh_decode_key'
+> Yes. The documentation should be updated for CAAM and it should describe
+> how the key material is derived. Will do so for v2.
 >
-> Fix it by selecting CRYPTO_ECDH.
+> Cheers,
+> Ahmad
 >
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-> ---
->  drivers/crypto/hisilicon/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
+> >
+> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.=
+git/tree/Documentation/security/keys/trusted-encrypted.rst#n87
+> >
+> > -Sumit
+> >
+> >> Cheers,
+> >> Ahmad
+> >>
+> >>>
+> >>> thanks,
+> >>>
+> >>> Mimi
+> >>>
+> >>> [1]
+> >>> https://lore.kernel.org/linux-integrity/BCA04D5D9A3B764C9B7405BBA4D4A=
+3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com/
+> >>>
+> >>>
+> >>>
+> >>
+> >> --
+> >> Pengutronix e.K.                           |                          =
+   |
+> >> Steuerwalder Str. 21                       | http://www.pengutronix.de=
+/  |
+> >> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0 =
+   |
+> >> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-55=
+55 |
+> >
 >
-> diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-> index c45adb15ce8d..bb327d6e365a 100644
-> --- a/drivers/crypto/hisilicon/Kconfig
-> +++ b/drivers/crypto/hisilicon/Kconfig
-> @@ -69,6 +69,7 @@ config CRYPTO_DEV_HISI_HPRE
->  	select CRYPTO_DEV_HISI_QM
->  	select CRYPTO_DH
->  	select CRYPTO_RSA
-> +	select CRYPTO_ECDH
->  	help
->  	  Support for HiSilicon HPRE(High Performance RSA Engine)
->  	  accelerator, which can accelerate RSA and DH algorithms.
->
-> .
->
+> --
+> Pengutronix e.K.                           |                             =
+|
+> Steuerwalder Str. 21                       | http://www.pengutronix.de/  =
+|
+> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    =
+|
+> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 =
+|
