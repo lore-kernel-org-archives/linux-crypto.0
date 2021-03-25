@@ -2,208 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EBCFC433E2
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 05:27:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8156C433C1
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 08:35:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0DD8161A35
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 05:27:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB69B61A23
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Mar 2021 08:35:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbhCYF0g (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Mar 2021 01:26:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46292 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229861AbhCYF0W (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Mar 2021 01:26:22 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7A1CC061760
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Mar 2021 22:26:20 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id z25so1577763lja.3
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Mar 2021 22:26:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=gFsXQtNcZc/jzBbc3KmHaNr8LuwlVaIo4tkNpXAhMCs=;
-        b=szUldggyNmVjxsrrTtlWnMRQPOMVT8cZCe5n98DB5e4AYjxCy/yawxRJYDhyjY6/HE
-         1zdQ2jBG3uJUxf4XjRDqgsZIjI/Zywasn9xRPTjryeG8OKkMdPujkQO4GFwQN4oyDFi6
-         o57TGNrEaoTRteOJ6W5ldogRM9nWPaTOxIpCyMiGsYB8nmVZ958quD6y0y3tWN2xtN0c
-         Ge2a1/y1yT3tD/qpV4vaIPTb089AVGdNEmBZ+xYZbA6zlapEXrvicmkhwUq7rM2dV1Vk
-         WnJ0YkTAlZVUzS3v5UkNOVRB6pTUtTAfpkqRIU76j8laN1/2CsRpNb8bW/Wr7tYlHzBj
-         l/xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=gFsXQtNcZc/jzBbc3KmHaNr8LuwlVaIo4tkNpXAhMCs=;
-        b=uA8+KfXQe5xoNpGYgGVfb0kJKulFP8sxkcIoUuxV2cNgjRneMbI/nebOu8bGcolqjy
-         ClQjzbJSho31BDLRrq/4IX7a62TJ6p4kgKVaRq07l7GaFYZ0c24J11R9cL1ASCTnyT2o
-         QkqWDIExJEdBSlAak3fiMgw67HYU/7wzgVX7Vkt/iBy6J9Uad5YGRAdgWwVEyqx6I8fU
-         aJOGj2fstZUNRarUGgVRivZAz/3pcQDQkL9ZAkElxHgHMy4nrb1piIZGcUK9adbSL0vL
-         wqEtu6MdoHr8E0qlzUwsOc+xMMeLtODiR7XC/GZ54nebv6ZRnygy5EHTm8+N3b/VYUKc
-         BrLg==
-X-Gm-Message-State: AOAM533m12BYthW1eGovay10hsm4SHdNMSHRb/aNAk4X+HmPv1ikSTNZ
-        PKl7vu1hcpAuVaXkZ7+Sa8kzem+0qSaqKQ99sdM8Og==
-X-Google-Smtp-Source: ABdhPJw0lZa1dN3iWsOiL7ok+NZMNVuTQq5qAq6ImnOTO2jdiouw6uWhb1mTAuET6Lx9AmotH317Ob91LGw7g0Kt1wE=
-X-Received: by 2002:a05:651c:481:: with SMTP id s1mr4183162ljc.152.1616649979216;
- Wed, 24 Mar 2021 22:26:19 -0700 (PDT)
+        id S229533AbhCYIec (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Mar 2021 04:34:32 -0400
+Received: from mga17.intel.com ([192.55.52.151]:14194 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229461AbhCYIe1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Mar 2021 04:34:27 -0400
+IronPort-SDR: NhmSZ/rpfmsjlaG7Ybl0zgXV2fIMLHhSWyOr3EFSpHEe85okrC7hssojcw+fa2fvx25W3xWBW8
+ l2u5Uxcq5Adw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9933"; a="170861340"
+X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
+   d="scan'208";a="170861340"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 01:34:26 -0700
+IronPort-SDR: +AtR+efb7w5frcaq4thFalw5Tgbb5cQu6cNrmBMrw4TvpU3xAWhwNfKAkn8i8juW/toCa7hIJ+
+ GpXbh0YsndMQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
+   d="scan'208";a="608425586"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.51])
+  by fmsmga005.fm.intel.com with ESMTP; 25 Mar 2021 01:34:25 -0700
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Marco Chiappero <marco.chiappero@intel.com>
+Subject: [PATCH] crypto: qat - fix error path in adf_isr_resource_alloc()
+Date:   Thu, 25 Mar 2021 08:34:18 +0000
+Message-Id: <20210325083418.153771-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-References: <cover.56fff82362af6228372ea82e6bd7e586e23f0966.1615914058.git-series.a.fatoum@pengutronix.de>
- <319e558e1bd19b80ad6447c167a2c3942bdafea2.1615914058.git-series.a.fatoum@pengutronix.de>
- <01e6e13d-2968-0aa5-c4c8-7458b7bde462@nxp.com> <45a9e159-2dcb-85bf-02bd-2993d50b5748@pengutronix.de>
- <f9c0087d299be1b9b91b242f41ac6ef7b9ee3ef7.camel@linux.ibm.com>
- <63dd7d4b-4729-9e03-cd8f-956b94eab0d9@pengutronix.de> <CAFA6WYOw_mQwOUN=onhzb7zCTyYDBrcx0E7C3LRk6nPLAVCWEQ@mail.gmail.com>
- <557b92d2-f3b8-d136-7431-419429f0e059@pengutronix.de>
-In-Reply-To: <557b92d2-f3b8-d136-7431-419429f0e059@pengutronix.de>
-From:   Sumit Garg <sumit.garg@linaro.org>
-Date:   Thu, 25 Mar 2021 10:56:07 +0530
-Message-ID: <CAFA6WYNE44=Y7Erfc-xNtOrf7TkJjh+odmYH5vzhEHR6KqBfeQ@mail.gmail.com>
-Subject: Re: [PATCH v1 3/3] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc:     Mimi Zohar <zohar@linux.ibm.com>,
-        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        James Bottomley <jejb@linux.ibm.com>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Udit Agarwal <udit.agarwal@nxp.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 24 Mar 2021 at 19:37, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->
-> Hello Sumit,
->
-> On 24.03.21 11:47, Sumit Garg wrote:
-> > On Wed, 24 Mar 2021 at 14:56, Ahmad Fatoum <a.fatoum@pengutronix.de> wr=
-ote:
-> >>
-> >> Hello Mimi,
-> >>
-> >> On 23.03.21 19:07, Mimi Zohar wrote:
-> >>> On Tue, 2021-03-23 at 17:35 +0100, Ahmad Fatoum wrote:
-> >>>> On 21.03.21 21:48, Horia Geant=C4=83 wrote:
-> >>>>> caam has random number generation capabilities, so it's worth using=
- that
-> >>>>> by implementing .get_random.
-> >>>>
-> >>>> If the CAAM HWRNG is already seeding the kernel RNG, why not use the=
- kernel's?
-> >>>>
-> >>>> Makes for less code duplication IMO.
-> >>>
-> >>> Using kernel RNG, in general, for trusted keys has been discussed
-> >>> before.   Please refer to Dave Safford's detailed explanation for not
-> >>> using it [1].
-> >>
-> >> The argument seems to boil down to:
-> >>
-> >>  - TPM RNG are known to be of good quality
-> >>  - Trusted keys always used it so far
-> >>
-> >> Both are fine by me for TPMs, but the CAAM backend is new code and nei=
-ther point
-> >> really applies.
-> >>
-> >> get_random_bytes_wait is already used for generating key material else=
-where.
-> >> Why shouldn't new trusted key backends be able to do the same thing?
-> >>
-> >
-> > Please refer to documented trusted keys behaviour here [1]. New
-> > trusted key backends should align to this behaviour and in your case
-> > CAAM offers HWRNG so we should be better using that.
->
-> Why is it better?
->
-> Can you explain what benefit a CAAM user would have if the trusted key
-> randomness comes directly out of the CAAM instead of indirectly from
-> the kernel entropy pool that is seeded by it?
+The function adf_isr_resource_alloc() is not unwinding correctly in case
+of error.
+This patch fixes the error paths and propagate the errors to the caller.
 
-IMO, user trust in case of trusted keys comes from trusted keys
-backend which is CAAM here. If a user doesn't trust that CAAM would
-act as a reliable source for RNG then CAAM shouldn't be used as a
-trust source in the first place.
+Fixes: 7afa232e76ce ("crypto: qat - Intel(R) QAT DH895xcc accelerator")
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Marco Chiappero <marco.chiappero@intel.com>
+---
+ drivers/crypto/qat/qat_common/adf_isr.c | 29 ++++++++++++++++++-------
+ 1 file changed, 21 insertions(+), 8 deletions(-)
 
-And I think building user's trust for kernel RNG implementation with
-multiple entropy contributions is pretty difficult when compared with
-CAAM HWRNG implementation.
+diff --git a/drivers/crypto/qat/qat_common/adf_isr.c b/drivers/crypto/qat/qat_common/adf_isr.c
+index c45853463530..e3ad5587be49 100644
+--- a/drivers/crypto/qat/qat_common/adf_isr.c
++++ b/drivers/crypto/qat/qat_common/adf_isr.c
+@@ -291,19 +291,32 @@ int adf_isr_resource_alloc(struct adf_accel_dev *accel_dev)
+ 
+ 	ret = adf_isr_alloc_msix_entry_table(accel_dev);
+ 	if (ret)
+-		return ret;
+-	if (adf_enable_msix(accel_dev))
+ 		goto err_out;
+ 
+-	if (adf_setup_bh(accel_dev))
+-		goto err_out;
++	ret = adf_enable_msix(accel_dev);
++	if (ret)
++		goto err_free_msix_table;
+ 
+-	if (adf_request_irqs(accel_dev))
+-		goto err_out;
++	ret = adf_setup_bh(accel_dev);
++	if (ret)
++		goto err_disable_msix;
++
++	ret = adf_request_irqs(accel_dev);
++	if (ret)
++		goto err_cleanup_bh;
+ 
+ 	return 0;
++
++err_cleanup_bh:
++	adf_cleanup_bh(accel_dev);
++
++err_disable_msix:
++	adf_disable_msix(&accel_dev->accel_pci_dev);
++
++err_free_msix_table:
++	adf_isr_free_msix_entry_table(accel_dev);
++
+ err_out:
+-	adf_isr_resource_free(accel_dev);
+-	return -EFAULT;
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(adf_isr_resource_alloc);
+-- 
+2.30.2
 
--Sumit
-
->
-> > Also, do update documentation corresponding to CAAM as a trusted keys b=
-ackend.
->
-> Yes. The documentation should be updated for CAAM and it should describe
-> how the key material is derived. Will do so for v2.
->
-> Cheers,
-> Ahmad
->
-> >
-> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.=
-git/tree/Documentation/security/keys/trusted-encrypted.rst#n87
-> >
-> > -Sumit
-> >
-> >> Cheers,
-> >> Ahmad
-> >>
-> >>>
-> >>> thanks,
-> >>>
-> >>> Mimi
-> >>>
-> >>> [1]
-> >>> https://lore.kernel.org/linux-integrity/BCA04D5D9A3B764C9B7405BBA4D4A=
-3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com/
-> >>>
-> >>>
-> >>>
-> >>
-> >> --
-> >> Pengutronix e.K.                           |                          =
-   |
-> >> Steuerwalder Str. 21                       | http://www.pengutronix.de=
-/  |
-> >> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0 =
-   |
-> >> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-55=
-55 |
-> >
->
-> --
-> Pengutronix e.K.                           |                             =
-|
-> Steuerwalder Str. 21                       | http://www.pengutronix.de/  =
-|
-> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    =
-|
-> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 =
-|
