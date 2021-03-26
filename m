@@ -7,58 +7,57 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAE09C433DB
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Mar 2021 09:36:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B172C433C1
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Mar 2021 09:36:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8095761A48
+	by mail.kernel.org (Postfix) with ESMTP id B136C61A4A
 	for <linux-crypto@archiver.kernel.org>; Fri, 26 Mar 2021 09:36:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229904AbhCZJfg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Mar 2021 05:35:36 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:35608 "EHLO fornost.hmeau.com"
+        id S230259AbhCZJfh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 Mar 2021 05:35:37 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:35630 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230135AbhCZJfE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Mar 2021 05:35:04 -0400
+        id S230472AbhCZJfQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Mar 2021 05:35:16 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1lPirI-0003cX-LR; Fri, 26 Mar 2021 20:34:25 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Mar 2021 20:34:24 +1100
-Date:   Fri, 26 Mar 2021 20:34:24 +1100
+        id 1lPiro-0003ea-N5; Fri, 26 Mar 2021 20:34:57 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Mar 2021 20:34:56 +1100
+Date:   Fri, 26 Mar 2021 20:34:56 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Aditya Srivastava <yashsri421@gmail.com>
-Cc:     leitao@debian.org, lukas.bulwahn@gmail.com, corbet@lwn.net,
-        rdunlap@infradead.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
+Cc:     linux-kernel@vger.kernel.org, lukas.bulwahn@gmail.com,
+        corbet@lwn.net, rdunlap@infradead.org,
+        linux-kernel-mentees@lists.linuxfoundation.org, leitao@debian.org,
         nayna@linux.ibm.com, pfsmorigo@gmail.com, mpe@ellerman.id.au,
         benh@kernel.crashing.org, paulus@samba.org, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: vmx: fix incorrect kernel-doc comment syntax in
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH] crypto: nx: fix incorrect kernel-doc comment syntax in
  files
-Message-ID: <20210326093424.GP12658@gondor.apana.org.au>
-References: <20210320202525.12562-1-yashsri421@gmail.com>
+Message-ID: <20210326093456.GS12658@gondor.apana.org.au>
+References: <20210321123007.15505-1-yashsri421@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210320202525.12562-1-yashsri421@gmail.com>
+In-Reply-To: <20210321123007.15505-1-yashsri421@gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Mar 21, 2021 at 01:55:25AM +0530, Aditya Srivastava wrote:
+On Sun, Mar 21, 2021 at 06:00:07PM +0530, Aditya Srivastava wrote:
 > The opening comment mark '/**' is used for highlighting the beginning of
 > kernel-doc comments.
-> There are certain files in drivers/crypto/vmx, which follow this syntax,
+> There are certain files in drivers/crypto/nx, which follow this syntax,
 > but the content inside does not comply with kernel-doc.
 > Such lines were probably not meant for kernel-doc parsing, but are parsed
 > due to the presence of kernel-doc like comment syntax(i.e, '/**'), which
 > causes unexpected warnings from kernel-doc.
 > 
-> E.g., presence of kernel-doc like comment in the header line for
-> drivers/crypto/vmx/vmx.c causes this warning by kernel-doc:
-> 
-> "warning: expecting prototype for Routines supporting VMX instructions on the Power 8(). Prototype was for p8_init() instead"
+> E.g., presence of kernel-doc like comment in the header lines for
+> drivers/crypto/nx/nx-sha256.c at header causes these warnings:
+> "warning: Function parameter or member 'tfm' not described in 'nx_crypto_ctx_sha256_init'"
+> "warning: expecting prototype for SHA(). Prototype was for nx_crypto_ctx_sha256_init() instead"
 > 
 > Similarly for other files too.
 > 
@@ -69,13 +68,17 @@ On Sun, Mar 21, 2021 at 01:55:25AM +0530, Aditya Srivastava wrote:
 > ---
 > * Applies perfectly on next-20210319
 > 
->  drivers/crypto/vmx/aes.c     | 2 +-
->  drivers/crypto/vmx/aes_cbc.c | 2 +-
->  drivers/crypto/vmx/aes_ctr.c | 2 +-
->  drivers/crypto/vmx/aes_xts.c | 2 +-
->  drivers/crypto/vmx/ghash.c   | 2 +-
->  drivers/crypto/vmx/vmx.c     | 2 +-
->  6 files changed, 6 insertions(+), 6 deletions(-)
+>  drivers/crypto/nx/nx-aes-cbc.c  | 2 +-
+>  drivers/crypto/nx/nx-aes-ccm.c  | 2 +-
+>  drivers/crypto/nx/nx-aes-ctr.c  | 2 +-
+>  drivers/crypto/nx/nx-aes-ecb.c  | 2 +-
+>  drivers/crypto/nx/nx-aes-gcm.c  | 2 +-
+>  drivers/crypto/nx/nx-aes-xcbc.c | 2 +-
+>  drivers/crypto/nx/nx-sha256.c   | 2 +-
+>  drivers/crypto/nx/nx-sha512.c   | 2 +-
+>  drivers/crypto/nx/nx.c          | 2 +-
+>  drivers/crypto/nx/nx_debugfs.c  | 2 +-
+>  10 files changed, 10 insertions(+), 10 deletions(-)
 
 Patch applied.  Thanks.
 -- 
