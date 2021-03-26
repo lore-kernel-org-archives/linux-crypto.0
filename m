@@ -2,100 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8ED5C433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Mar 2021 02:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A8DC433C1
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Mar 2021 02:37:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6657161A43
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Mar 2021 02:22:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8119F61A38
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Mar 2021 02:37:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231740AbhCZCVu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Mar 2021 22:21:50 -0400
-Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:57676 "EHLO
-        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231643AbhCZCVa (ORCPT
+        id S230290AbhCZCgd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Mar 2021 22:36:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38936 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230128AbhCZCgY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Mar 2021 22:21:30 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R381e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0UTKgvox_1616725288;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0UTKgvox_1616725288)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 26 Mar 2021 10:21:28 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Mimi Zohar <zohar@linux.ibm.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Jia Zhang <zhang.jia@linux.alibaba.com>
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH] crypto: sm3 - use the more precise type u32 instead of unsigned int
-Date:   Fri, 26 Mar 2021 10:21:28 +0800
-Message-Id: <20210326022128.71727-1-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.19.1.3.ge56e4f7
+        Thu, 25 Mar 2021 22:36:24 -0400
+Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4888AC06174A;
+        Thu, 25 Mar 2021 19:36:20 -0700 (PDT)
+Received: by mail-qv1-xf2f.google.com with SMTP id q9so2263289qvm.6;
+        Thu, 25 Mar 2021 19:36:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9XY21P0oEzBo7moFwrTmpwbutbtWiFMXBtu5YZsX338=;
+        b=InsuXlpySPiUdsjPadjkZNWlF2zHYgiIFSPVL69nS3wDLsSGk483NF9S+CZ7Tc4LRk
+         YZB37YOLYf3vX3Yp/CYXPO2KWpoIl9V86gLIJ2+5Hc4sp95wK1jik83DbPst/gfFOoN0
+         ztDYufhiNAvF9S/9zGZHNttA5I0l5525piXBL7/zDpxcSicwfh70pFSAbV2I4QGaPLl/
+         bID3pzaUoIfrtobO1GNA51Cwghnmfr6RHJXsl76vxkcx+xKXeQUk9dI60HT+BzqxaLL7
+         VPApccogA3/U7jw/C6WjBwKWv0vfnblT9v41sqliNSrug+lGKuv10m7gwY8pLywJqpyL
+         LsJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9XY21P0oEzBo7moFwrTmpwbutbtWiFMXBtu5YZsX338=;
+        b=P5/DhH9+mArCiUn+lWaX3Jym2nRhicmtzFjSPmh/8H+I6cZyzEIcrKsQOxNO8rxFyi
+         Rgk+06eAVIjwVW+lKiK8DjefFCP84yDKkJDtSILXGUz5BRVtgQ2/3NGe/D69qEpk7dDB
+         JpTXx0Y/h8LjuPj96GEdbr4/p+8Il6Wzsn2WiXq4w2z0EFDbna0vr1w3DH67CSJ/MAtM
+         DJE6GzvuXfh7L8kptg7I3gQ747RsyzQcD6CwDCGcRLgsBQZJNvu+bfCIwY20GkGtGXb+
+         IZTtIkORgb21hZvg5g8vu4d+WGniZH+AAXvYtnFcTduMMocCQ0isz7BRGuUKFy6hxQed
+         sRAQ==
+X-Gm-Message-State: AOAM531FL5g1vm1vM+bSJU/xR6xi6/zLT9HuOnbq63hj+FjDWdD+LAn9
+        bnhd/BbG076nUZ37gby+giA=
+X-Google-Smtp-Source: ABdhPJyJeUUYTWDQemPerzsD1NXsJiHVLjCqWFhTrkCBuxyzPWbXgu2CY+kKm7ohBv8OamxV4+hNJg==
+X-Received: by 2002:a0c:8623:: with SMTP id p32mr11243517qva.23.1616726179632;
+        Thu, 25 Mar 2021 19:36:19 -0700 (PDT)
+Received: from localhost.localdomain ([37.19.198.107])
+        by smtp.gmail.com with ESMTPSA id 18sm5995694qkr.77.2021.03.25.19.36.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Mar 2021 19:36:18 -0700 (PDT)
+From:   Bhaskar Chowdhury <unixbhaskar@gmail.com>
+To:     dan.j.williams@intel.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, songliubraving@fb.com, yuyufen@huawei.com,
+        unixbhaskar@gmail.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     rdunlap@infradead.org
+Subject: [PATCH] crypto: async_tx/async_xor.c: Few mundane spello fixes
+Date:   Fri, 26 Mar 2021 08:04:06 +0530
+Message-Id: <20210326023406.11091-1-unixbhaskar@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In the process of calculating the hash, use the more accurate type
-'u32' instead of the original 'unsigned int' to avoid ambiguity.
 
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+s/eninges/engines/  ...two different places.
+s/explicity/explicitly/  ....two different places.
+
+Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
 ---
- crypto/sm3_generic.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ crypto/async_tx/async_xor.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/sm3_generic.c b/crypto/sm3_generic.c
-index 193c4584bd00..562e96f92f64 100644
---- a/crypto/sm3_generic.c
-+++ b/crypto/sm3_generic.c
-@@ -36,17 +36,17 @@ static inline u32 p1(u32 x)
- 	return x ^ rol32(x, 15) ^ rol32(x, 23);
- }
- 
--static inline u32 ff(unsigned int n, u32 a, u32 b, u32 c)
-+static inline u32 ff(u32 n, u32 a, u32 b, u32 c)
- {
- 	return (n < 16) ? (a ^ b ^ c) : ((a & b) | (a & c) | (b & c));
- }
- 
--static inline u32 gg(unsigned int n, u32 e, u32 f, u32 g)
-+static inline u32 gg(u32 n, u32 e, u32 f, u32 g)
- {
- 	return (n < 16) ? (e ^ f ^ g) : ((e & f) | ((~e) & g));
- }
- 
--static inline u32 t(unsigned int n)
-+static inline u32 t(u32 n)
- {
- 	return (n < 16) ? SM3_T1 : SM3_T2;
- }
-@@ -54,7 +54,7 @@ static inline u32 t(unsigned int n)
- static void sm3_expand(u32 *t, u32 *w, u32 *wt)
- {
- 	int i;
--	unsigned int tmp;
-+	u32 tmp;
- 
- 	/* load the input */
- 	for (i = 0; i <= 15; i++)
-@@ -123,8 +123,8 @@ static void sm3_compress(u32 *w, u32 *wt, u32 *m)
- 
- static void sm3_transform(struct sm3_state *sst, u8 const *src)
- {
--	unsigned int w[68];
--	unsigned int wt[64];
-+	u32 w[68];
-+	u32 wt[64];
- 
- 	sm3_expand((u32 *)src, w, wt);
- 	sm3_compress(w, wt, sst->state);
--- 
-2.19.1.3.ge56e4f7
+diff --git a/crypto/async_tx/async_xor.c b/crypto/async_tx/async_xor.c
+index a057ecb1288d..fee33f76cdd9 100644
+--- a/crypto/async_tx/async_xor.c
++++ b/crypto/async_tx/async_xor.c
+@@ -170,8 +170,8 @@ dma_xor_aligned_offsets(struct dma_device *device, unsigned int offset,
+  *
+  * xor_blocks always uses the dest as a source so the
+  * ASYNC_TX_XOR_ZERO_DST flag must be set to not include dest data in
+- * the calculation.  The assumption with dma eninges is that they only
+- * use the destination buffer as a source when it is explicity specified
++ * the calculation.  The assumption with dma engines is that they only
++ * use the destination buffer as a source when it is explicitly specified
+  * in the source list.
+  *
+  * src_list note: if the dest is also a source it must be at index zero.
+@@ -259,8 +259,8 @@ EXPORT_SYMBOL_GPL(async_xor_offs);
+  *
+  * xor_blocks always uses the dest as a source so the
+  * ASYNC_TX_XOR_ZERO_DST flag must be set to not include dest data in
+- * the calculation.  The assumption with dma eninges is that they only
+- * use the destination buffer as a source when it is explicity specified
++ * the calculation.  The assumption with dma engines is that they only
++ * use the destination buffer as a source when it is explicitly specified
+  * in the source list.
+  *
+  * src_list note: if the dest is also a source it must be at index zero.
+--
+2.26.2
 
