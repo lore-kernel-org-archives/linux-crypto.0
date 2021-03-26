@@ -5,35 +5,35 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95E9BC433DB
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Mar 2021 06:17:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFDC9C433DB
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Mar 2021 06:19:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6567561A0A
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Mar 2021 06:17:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93C2961A33
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Mar 2021 06:19:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229982AbhCZGQ2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Mar 2021 02:16:28 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:14483 "EHLO
+        id S229458AbhCZGTK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 Mar 2021 02:19:10 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:14484 "EHLO
         szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229929AbhCZGQN (ORCPT
+        with ESMTP id S229839AbhCZGSj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Mar 2021 02:16:13 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4F6BWP5H8SzyNk2;
-        Fri, 26 Mar 2021 14:14:09 +0800 (CST)
+        Fri, 26 Mar 2021 02:18:39 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4F6BZD5QVXzyNvF;
+        Fri, 26 Mar 2021 14:16:36 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.24) by
  DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 26 Mar 2021 14:16:03 +0800
+ 14.3.498.0; Fri, 26 Mar 2021 14:18:26 +0800
 From:   Meng Yu <yumeng18@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>, <yumeng18@huawei.com>,
         <linux-kernel@vger.kernel.org>, <shenyang39@huawei.com>
-Subject: [PATCH] crypto: hisilicon/hpre - rsa key should not be empty
-Date:   Fri, 26 Mar 2021 14:13:32 +0800
-Message-ID: <1616739212-7751-1-git-send-email-yumeng18@huawei.com>
+Subject: [PATCH] pkcs7: Use octal permissions '0444'
+Date:   Fri, 26 Mar 2021 14:15:56 +0800
+Message-ID: <1616739356-48848-1-git-send-email-yumeng18@huawei.com>
 X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
 Content-Type: text/plain
@@ -43,37 +43,28 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-We should ensure key is not empty before we set key.
+Fixed following checkpatch warning:
+Symbolic permissions 'S_IWUSR | S_IRUGO' are not preferred. Consider
+using octal permissions '0644'.
 
 Signed-off-by: Meng Yu <yumeng18@huawei.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre_crypto.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ crypto/asymmetric_keys/pkcs7_key_type.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index 53068d2..7cf7d80 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -1093,6 +1093,9 @@ static int hpre_rsa_setpubkey(struct crypto_akcipher *tfm, const void *key,
- 	struct hpre_ctx *ctx = akcipher_tfm_ctx(tfm);
- 	int ret;
+diff --git a/crypto/asymmetric_keys/pkcs7_key_type.c b/crypto/asymmetric_keys/pkcs7_key_type.c
+index b930d3b..55a5be7 100644
+--- a/crypto/asymmetric_keys/pkcs7_key_type.c
++++ b/crypto/asymmetric_keys/pkcs7_key_type.c
+@@ -18,7 +18,7 @@ MODULE_DESCRIPTION("PKCS#7 testing key type");
+ MODULE_AUTHOR("Red Hat, Inc.");
  
-+	if (!key || !keylen)
-+		return -EINVAL;
-+
- 	ret = crypto_akcipher_set_pub_key(ctx->rsa.soft_tfm, key, keylen);
- 	if (ret)
- 		return ret;
-@@ -1106,6 +1109,9 @@ static int hpre_rsa_setprivkey(struct crypto_akcipher *tfm, const void *key,
- 	struct hpre_ctx *ctx = akcipher_tfm_ctx(tfm);
- 	int ret;
+ static unsigned pkcs7_usage;
+-module_param_named(usage, pkcs7_usage, uint, S_IWUSR | S_IRUGO);
++module_param_named(usage, pkcs7_usage, uint, 0644);
+ MODULE_PARM_DESC(pkcs7_usage,
+ 		 "Usage to specify when verifying the PKCS#7 message");
  
-+	if (!key || !keylen)
-+		return -EINVAL;
-+
- 	ret = crypto_akcipher_set_priv_key(ctx->rsa.soft_tfm, key, keylen);
- 	if (ret)
- 		return ret;
 -- 
 2.8.1
 
