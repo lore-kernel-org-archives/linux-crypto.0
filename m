@@ -5,66 +5,66 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EC9BC433DB
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Mar 2021 01:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F077DC433C1
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Mar 2021 02:41:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D8EC26192A
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Mar 2021 01:52:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B48EE61968
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Mar 2021 02:41:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231197AbhC1Bvw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 27 Mar 2021 21:51:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53168 "EHLO
+        id S230517AbhC1CkM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 27 Mar 2021 22:40:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231182AbhC1Bv2 (ORCPT
+        with ESMTP id S230451AbhC1Cjs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 27 Mar 2021 21:51:28 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0478C0613B1;
-        Sat, 27 Mar 2021 18:51:27 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id 11so7479382pfn.9;
-        Sat, 27 Mar 2021 18:51:27 -0700 (PDT)
+        Sat, 27 Mar 2021 22:39:48 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AC7FC0613B1;
+        Sat, 27 Mar 2021 19:39:48 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id t20so2752816plr.13;
+        Sat, 27 Mar 2021 19:39:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Ltty5SJ2LY2RYq7s8cHOh4rUOt7Z1AfLLrBG/U0fphY=;
-        b=UlM83tvQDDWa5wui+K+jgGCOiCv01D8B6XsyjeHu9639KFwcbpPaUKcXqFU36e5A6F
-         6pNg6g+hjXRQNoYO5KRje5BXRN/TGEPgoNKHDNYxRageUsgFxZ+gRCAzEpneB8nGF8w/
-         YBplowRA+kQRyOfm/iqrz7Ap7NcLeOtBVGgNGGYDkFvm5WVp8irnODFfpap1MVvJL3mN
-         jaYbRYgD1ulIjVePyBiZVfnLNIaQQRzgibHPYCW78arI4qAwgz2qSPRr+urCXh7JakdQ
-         uQOcit5fwRXY8Ml9vqjzxMhvob2jPkx0QKviW0A9BYt7GcuWXdF9AMmAPz+mDS6wL8pt
-         Pk6A==
+        bh=KY07dtiSbQ3SbfmuZCvFR/go4sGKiptIa+i0kD0WZqc=;
+        b=tdjkd1nOHESNUMfs/T4ucw6BA6QQBvW/f5fplya6uOf0fq/Xmw3o38e5XnxDdwcsGb
+         Wf9pTIaUsK0LvpWrAlkwhOY2xG+5IRRq9tWRUJoyQHM+Q/SEJRfjKd1mrwlWpXeVf4PY
+         Kn5e9vs+FefkbLun0kGdJRUslQ+83PuitX2yMPl34WdFrUar2vsONQRicMiK9bafb+hm
+         ioTW9D4xG8XMC8uRQQk+pwI1B/wAZuTXGE6OhlAjGfi8lxaQqS1yyoeXtE2FDCb8+9/S
+         aenuPQGzaO1BOKM2/Qzwr0rxpD87QQDg8eJ93+w/B1AO3kcsJf1FHa11vgEEZzRJXmAT
+         FMyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Ltty5SJ2LY2RYq7s8cHOh4rUOt7Z1AfLLrBG/U0fphY=;
-        b=nZrhcHvmsBQCd2i8kARlp8JDVA25Flnlo7IjYgyO6TTHOjjLvPDzIzp9LvNrpazNnN
-         OBZRyZ8xqIMi+MggKKnDEjMU02QpVxbewhgEyH1aOrOAsegJkPhKG1JM33ZeLie/PMX+
-         QASiUQH646EeKE2IDMLBdIEjNGCEF6XKDxrM/yGeI+jOY0ngP9NA8n/aZXvr+25drIGM
-         nww829Xnb6/GX3fFkSkg7jAMWYG2aK5AxqMK+g81lwizytc1s/LmLoCYs4i+QnoRT5g+
-         dGaoETWqBBiVKYdnaRIzOk/RQLDOE+w8fl0vxDVUp0qAXFS1O6EESAGBYOoHCzwxsw9U
-         bRXA==
-X-Gm-Message-State: AOAM530NPCKa25vmR43N53pK4TZsVep/R9EQdvRjhR32fdq9raxJI0BV
-        S/eKQSe1wpfctKTUeKwA9/0=
-X-Google-Smtp-Source: ABdhPJzzRjxFW0V/4Q2VzWsjfy+WHrIEQfZHojCvDxfBeEZhqercxBhPI9onxsxq47z/1E82meXMHA==
-X-Received: by 2002:a62:2a83:0:b029:21a:d3a4:80f2 with SMTP id q125-20020a622a830000b029021ad3a480f2mr19013440pfq.47.1616896287260;
-        Sat, 27 Mar 2021 18:51:27 -0700 (PDT)
+        bh=KY07dtiSbQ3SbfmuZCvFR/go4sGKiptIa+i0kD0WZqc=;
+        b=Tig+vymru3jep8HgpkdDV17eqYNv77d0JSzWhDh0i6sInbEkG1SvLaHS4Y3fituOEp
+         D8QQuzonB5JlEx+4fgu7Xzq7ruLjOTG16XmQbeuK+iOrTMBHs52x09reSJETgZiyW7Z1
+         nf5W65eDTW40gkmdTOKKhWLv6jA2O4NgoO3qG1r4qBXSon837f7Wm6h789WMk8oUutJI
+         5DGpKa+oNsJcIYdVBxj5AyPGIE2U6rib8wC/N9eKgPE8p1cs3VnO8T3kRay93Jm19i2L
+         CD7fu2lgSiBebPK21tcaIoLk7EQLEpt25PbzeDfq0Q/LMbbV3QBrM1+V7heMIl69KqeL
+         N5Ng==
+X-Gm-Message-State: AOAM5329wumBNvudfABJS0O6xhZjHwNWenfGJkPjwBDHhv6KoUryLYYY
+        c+udtDNoMEFqLATmg1t964k=
+X-Google-Smtp-Source: ABdhPJxh7tUNCHZD2GFQe0k6tjBkNKtK98QJ158nUaZyll9zaON5o/PeyEk5/WE0c9bYkn7F7pZSwQ==
+X-Received: by 2002:a17:90a:2c4b:: with SMTP id p11mr21428264pjm.75.1616899187997;
+        Sat, 27 Mar 2021 19:39:47 -0700 (PDT)
 Received: from z640-arch.lan ([2602:61:7344:f100::678])
-        by smtp.gmail.com with ESMTPSA id 6sm13209028pfv.179.2021.03.27.18.51.26
+        by smtp.gmail.com with ESMTPSA id c128sm13209952pfc.76.2021.03.27.19.39.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Mar 2021 18:51:26 -0700 (PDT)
+        Sat, 27 Mar 2021 19:39:47 -0700 (PDT)
 From:   Ilya Lipnitskiy <ilya.lipnitskiy@gmail.com>
-To:     ilya.lipnitskiy@gmail.com
-Cc:     ardb@kernel.org, davem@davemloft.net, herbert@gondor.apana.org.au,
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mips@vger.kernel.org, tsbogend@alpha.franken.de
-Subject: [PATCH v2] crypto: mips: add poly1305-core.S to .gitignore
-Date:   Sat, 27 Mar 2021 18:50:52 -0700
-Message-Id: <20210328015052.10789-1-ilya.lipnitskiy@gmail.com>
+Cc:     ilya.lipnitskiy@gmail.com, ardb@kernel.org
+Subject: [PATCH v3] crypto: mips: add poly1305-core.S to .gitignore
+Date:   Sat, 27 Mar 2021 19:39:43 -0700
+Message-Id: <20210328023943.15540-1-ilya.lipnitskiy@gmail.com>
 X-Mailer: git-send-email 2.31.0
 In-Reply-To: <20210328014052.8645-1-ilya.lipnitskiy@gmail.com>
 References: <20210328014052.8645-1-ilya.lipnitskiy@gmail.com>
@@ -80,16 +80,17 @@ Fixes: a11d055e7a64 ("crypto: mips/poly1305 - incorporate OpenSSL/CRYPTOGAMS opt
 Signed-off-by: Ilya Lipnitskiy <ilya.lipnitskiy@gmail.com>
 Cc: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/mips/crypto/.gitignore | 1 +
- 1 file changed, 1 insertion(+)
+ arch/mips/crypto/.gitignore | 2 ++
+ 1 file changed, 2 insertions(+)
  create mode 100644 arch/mips/crypto/.gitignore
 
 diff --git a/arch/mips/crypto/.gitignore b/arch/mips/crypto/.gitignore
 new file mode 100644
-index 000000000000..4882ba199071
+index 000000000000..0d47d4f21c6d
 --- /dev/null
 +++ b/arch/mips/crypto/.gitignore
-@@ -0,0 +1 @@
+@@ -0,0 +1,2 @@
++# SPDX-License-Identifier: GPL-2.0-only
 +poly1305-core.S
 -- 
 2.31.0
