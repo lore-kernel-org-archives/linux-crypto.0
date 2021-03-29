@@ -2,114 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F546C433DB
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Mar 2021 20:28:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5088C433C1
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Mar 2021 09:31:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1140F61953
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Mar 2021 20:28:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B28C6195B
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Mar 2021 09:31:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231265AbhC1U1m (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 Mar 2021 16:27:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36802 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230187AbhC1U1U (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Mar 2021 16:27:20 -0400
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14351C061756;
-        Sun, 28 Mar 2021 13:27:20 -0700 (PDT)
-Received: by mail-yb1-xb36.google.com with SMTP id a143so11647272ybg.7;
-        Sun, 28 Mar 2021 13:27:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dGgxsKIZ3ZTl676JeHS4fOQwF1EPR3Hj3EDiz1utvk4=;
-        b=VS5q4VxiAS87vvfgBnL2SidrpAg/XELlQwKgngDhkEgMRpxGB39RnlEYeY8I7htT/a
-         hMrPZobTQbgpX29GLYdNvayQ+u/5sPEV0eCWwm5/pEDHuG6MpZE32jZcGcUOOwcrIT1o
-         9XvuWADd2LoVpLMVsJSRTy9SXnxXGV3Smn/hZ/6YBUWEmnMdsm8nxc0MUPOA2dvYf9bD
-         ezss+DucD2pifMU8obi+vgXy2JT2m6tjn1x07o1MmzmRSimmgfftTFvin+efdODqMBfN
-         ht/DkDR8ADwxGQ8/EvkS+qWY7szaPqsvGZiSUHqYVgVYi3QD/Gl+FVQQd84BU35qZt9n
-         uIug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dGgxsKIZ3ZTl676JeHS4fOQwF1EPR3Hj3EDiz1utvk4=;
-        b=QBo2maJM8fi1o5HQOpsha7MO36fgGb+nyk5c6wvEeLamWJst5J0C+mOU1NQG9Sn0do
-         /GsmxRsYGWrTwMdtph15mFIowRAx1aq6IyNP9S7sLjhe71nRmAnIbN9LX1uLkSpuZ8DL
-         Y3akQPGrHxfVZ8elAOLKImVlIc9H5w2oflD3wwusbICrtOFNXgVgmgAg38Mi48+wP6Jr
-         txsiZSUADoLd07s9sdZDHVfuvJ11expYTCX2KWDmxE8aw6Dgza1S6UpB4hLKLNh2nISj
-         Iv1lHHKIQHVrg5dKCYw9HlspDCkJ5lTBNLTtRrrMY5iRipsuC1aBwmbSZ4cSdv+moYGc
-         vi9A==
-X-Gm-Message-State: AOAM5301Yk2LRD4hZRQbkDhXndCZEwkQ9KByhENKWQZWlcG+7hWDn/Wa
-        RBmmC61xdYXIUXKsriEa2SIA+7leFLnAi4/0OcA=
-X-Google-Smtp-Source: ABdhPJxuAdjTDxc71Oy8C0UVXTHKXzlKnq6zWZH7sSY2imXDYAxH6YgtvPjubmyw3GMWCvW4SZXi9LBHNz2ZwdihP0c=
-X-Received: by 2002:a25:2d62:: with SMTP id s34mr30625290ybe.209.1616963239300;
- Sun, 28 Mar 2021 13:27:19 -0700 (PDT)
+        id S231929AbhC2Jao (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 29 Mar 2021 05:30:44 -0400
+Received: from elvis.franken.de ([193.175.24.41]:33856 "EHLO elvis.franken.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231882AbhC2JaY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Mar 2021 05:30:24 -0400
+Received: from uucp (helo=alpha)
+        by elvis.franken.de with local-bsmtp (Exim 3.36 #1)
+        id 1lQoE1-0003qb-06; Mon, 29 Mar 2021 11:30:21 +0200
+Received: by alpha.franken.de (Postfix, from userid 1000)
+        id 94A85C1D90; Mon, 29 Mar 2021 11:26:48 +0200 (CEST)
+Date:   Mon, 29 Mar 2021 11:26:48 +0200
+From:   Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+To:     Ilya Lipnitskiy <ilya.lipnitskiy@gmail.com>
+Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org, ardb@kernel.org
+Subject: Re: [PATCH v3] crypto: mips: add poly1305-core.S to .gitignore
+Message-ID: <20210329092648.GF8484@alpha.franken.de>
+References: <20210328014052.8645-1-ilya.lipnitskiy@gmail.com>
+ <20210328023943.15540-1-ilya.lipnitskiy@gmail.com>
 MIME-Version: 1.0
-References: <20210326191859.1542272-2-nickrterrell@gmail.com>
- <202103271719.VoxPHugN-lkp@intel.com> <20210327214810.ldijpbr2tnkh2gce@spock.localdomain>
-In-Reply-To: <20210327214810.ldijpbr2tnkh2gce@spock.localdomain>
-From:   Nick Terrell <nickrterrell@gmail.com>
-Date:   Sun, 28 Mar 2021 13:27:08 -0700
-Message-ID: <CANr2DbeAXeYRMAa1UjP5kNqniWQvt2nM93ZjmWioEuR4qZxf1g@mail.gmail.com>
-Subject: Re: [PATCH v8 1/3] lib: zstd: Add kernel-specific API
-To:     Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc:     kernel test robot <lkp@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        kbuild-all@lists.01.org, linux-crypto@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, squashfs-devel@lists.sourceforge.net,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-kernel@vger.kernel.org, Kernel Team <Kernel-team@fb.com>,
-        Chris Mason <chris.mason@fusionio.com>,
-        Petr Malat <oss@malat.biz>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210328023943.15540-1-ilya.lipnitskiy@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Mar 27, 2021 at 2:48 PM Oleksandr Natalenko
-<oleksandr@natalenko.name> wrote:
->
-> Hello.
->
-> On Sat, Mar 27, 2021 at 05:48:01PM +0800, kernel test robot wrote:
-> > >> ERROR: modpost: "ZSTD_maxCLevel" [fs/f2fs/f2fs.ko] undefined!
->
-> Since f2fs can be built as a module, the following correction seems to
-> be needed:
+On Sat, Mar 27, 2021 at 07:39:43PM -0700, Ilya Lipnitskiy wrote:
+> poly1305-core.S is an auto-generated file, so it should be ignored.
+> 
+> Fixes: a11d055e7a64 ("crypto: mips/poly1305 - incorporate OpenSSL/CRYPTOGAMS optimized implementation")
+> Signed-off-by: Ilya Lipnitskiy <ilya.lipnitskiy@gmail.com>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> ---
+>  arch/mips/crypto/.gitignore | 2 ++
+>  1 file changed, 2 insertions(+)
+>  create mode 100644 arch/mips/crypto/.gitignore
 
-Thanks Oleksandr! Looks like f2fs has been updated to use
-ZSTD_maxCLevel() since the first version of these patches. I'll put up
-a new version shortly with the fix, and update my test suite to build
-f2fs and other users as modules, so it can catch this.
+applied to mips-next.
 
-Best,
-Nick
+Thomas.
 
-> ```
-> diff --git a/lib/zstd/compress/zstd_compress.c b/lib/zstd/compress/zstd_compress.c
-> index 9c998052a0e5..584c92c51169 100644
-> --- a/lib/zstd/compress/zstd_compress.c
-> +++ b/lib/zstd/compress/zstd_compress.c
-> @@ -4860,6 +4860,7 @@ size_t ZSTD_endStream(ZSTD_CStream* zcs, ZSTD_outBuffer* output)
->
->  #define ZSTD_MAX_CLEVEL     22
->  int ZSTD_maxCLevel(void) { return ZSTD_MAX_CLEVEL; }
-> +EXPORT_SYMBOL(ZSTD_maxCLevel);
->  int ZSTD_minCLevel(void) { return (int)-ZSTD_TARGETLENGTH_MAX; }
->
->  static const ZSTD_compressionParameters ZSTD_defaultCParameters[4][ZSTD_MAX_CLEVEL+1] = {
-> ```
->
-> Not sure if the same should be done for `ZSTD_minCLevel()` since I don't
-> see it being used anywhere else.
->
-> --
->   Oleksandr Natalenko (post-factum)
+-- 
+Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
+good idea.                                                [ RFC1925, 2.3 ]
