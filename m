@@ -2,92 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 757ABC433C1
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Mar 2021 10:37:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F887C433C1
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Mar 2021 11:38:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3AA48619AB
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Mar 2021 10:37:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F14866195C
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Mar 2021 11:38:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231759AbhC3Kg3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Mar 2021 06:36:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45008 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231773AbhC3KgN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Mar 2021 06:36:13 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A4CAF619A6;
-        Tue, 30 Mar 2021 10:36:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617100573;
-        bh=vlejUKjTN3abqWjJfwmpRpsVi7zGnnH1VNzjwBkSdpA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Gn0F7rfpSJGa1lUn7RpxMmByH6rnRx0GkGAAOSQ9Mo2889QfJDudDHMrq6u19X7+p
-         ZOD+ZKii11jl2u6IO5tb0jJSG2cBlGPtsSUBHgq64doV+qVgGNQZUWgY5jrBVhE90H
-         dNr2jr/sgwn/MzxT1oem6Lsekm+J+9PjhaHhLk3AGAoxnVU/gq5CN5uhRgdCZok9yz
-         0lS6xeCBCckQSQ8Ed2lbYNJfgOHHVMCr/o3zDqgyBMrgDo+buzsMVIvxQwBVhmZa0D
-         do8Xpu5JFEp7BE7rN9o29obvSgyppymcMKn4/HW69Ehe4+HmYFprsP1aQ+pVJ0VQcy
-         mOKV6oi0K4cYw==
-Date:   Tue, 30 Mar 2021 11:36:07 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Dave Martin <dave.martin@arm.com>,
-        Mark Brown <broonie@kernel.org>,
+        id S231848AbhC3Lhe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Mar 2021 07:37:34 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:15823 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231719AbhC3LhY (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Mar 2021 07:37:24 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4F8nS304hpz9tNM;
+        Tue, 30 Mar 2021 19:35:15 +0800 (CST)
+Received: from ubuntu.huawei.com (10.67.174.117) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.498.0; Tue, 30 Mar 2021 19:37:12 +0800
+From:   Ruiqi Gong <gongruiqi1@huawei.com>
+To:     Zaibo Xu <xuzaibo@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Ingo Molnar <mingo@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>
-Subject: Re: [PATCH v2 3/9] arm64: fpsimd: run kernel mode NEON with softirqs
- disabled
-Message-ID: <20210330103605.GC5352@willie-the-truck>
-References: <20210302090118.30666-1-ardb@kernel.org>
- <20210302090118.30666-4-ardb@kernel.org>
+        "David S . Miller" <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Wang Weiyang" <wangweiyang2@huawei.com>,
+        Ruiqi GONG <gongruiqi1@huawei.com>
+Subject: [PATCH -next] crypto: hisilicon/hpre - fix a typo in hpre_crypto.c
+Date:   Tue, 30 Mar 2021 07:51:24 -0400
+Message-ID: <20210330115124.15508-1-gongruiqi1@huawei.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210302090118.30666-4-ardb@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-Originating-IP: [10.67.174.117]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 02, 2021 at 10:01:12AM +0100, Ard Biesheuvel wrote:
-> Kernel mode NEON can be used in task or softirq context, but only in
-> a non-nesting manner, i.e., softirq context is only permitted if the
-> interrupt was not taken at a point where the kernel was using the NEON
-> in task context.
-> 
-> This means all users of kernel mode NEON have to be aware of this
-> limitation, and either need to provide scalar fallbacks that may be much
-> slower (up to 20x for AES instructions) and potentially less safe, or
-> use an asynchronous interface that defers processing to a later time
-> when the NEON is guaranteed to be available.
-> 
-> Given that grabbing and releasing the NEON is cheap, we can relax this
-> restriction, by increasing the granularity of kernel mode NEON code, and
-> always disabling softirq processing while the NEON is being used in task
-> context.
-> 
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  arch/arm64/crypto/aes-modes.S      |  2 +-
->  arch/arm64/crypto/sha1-ce-core.S   |  2 +-
->  arch/arm64/crypto/sha2-ce-core.S   |  2 +-
->  arch/arm64/crypto/sha3-ce-core.S   |  4 +--
->  arch/arm64/crypto/sha512-ce-core.S |  2 +-
->  arch/arm64/include/asm/assembler.h | 28 +++++++++++++++-----
->  arch/arm64/kernel/asm-offsets.c    |  2 ++
->  arch/arm64/kernel/fpsimd.c         |  4 +--
->  8 files changed, 31 insertions(+), 15 deletions(-)
+Do a trivial typo fix.
+s/discribed/described
 
-Acked-by: Will Deacon <will@kernel.org>
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Ruiqi Gong <gongruiqi1@huawei.com>
+---
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Will
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index d743c540d602..9fbb573fdb1e 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -1758,7 +1758,7 @@ static int hpre_curve25519_src_init(struct hpre_asym_request *hpre_req,
+ 
+ 	/*
+ 	 * Src_data(gx) is in little-endian order, MSB in the final byte should
+-	 * be masked as discribed in RFC7748, then transform it to big-endian
++	 * be masked as described in RFC7748, then transform it to big-endian
+ 	 * form, then hisi_hpre can use the data.
+ 	 */
+ 	ptr[31] &= 0x7f;
+-- 
+2.17.1
+
