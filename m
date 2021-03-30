@@ -8,41 +8,41 @@ X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DB3AC433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A66FAC433E3
 	for <linux-crypto@archiver.kernel.org>; Tue, 30 Mar 2021 20:30:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4EE1C619D1
+	by mail.kernel.org (Postfix) with ESMTP id 7FA1461989
 	for <linux-crypto@archiver.kernel.org>; Tue, 30 Mar 2021 20:30:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232416AbhC3U34 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Mar 2021 16:29:56 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:29355 "EHLO
+        id S232401AbhC3U3z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Mar 2021 16:29:55 -0400
+Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:39391 "EHLO
         de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232417AbhC3U3Y (ORCPT
+        by vger.kernel.org with ESMTP id S232416AbhC3U3X (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Mar 2021 16:29:24 -0400
+        Tue, 30 Mar 2021 16:29:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1617136163;
+        t=1617136161;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=r+6EJYkY3DJmRZ9LdDbt9vKS6AxHnkSLOenV+lguZU8=;
-        b=NQl0cb0ToTHICp7bhp4IQuTQJTFPFgXEbox8YQ48Qg0K0XT7QQkt3hw3orWtPjH/VDX17H
-        jQyYU9ZbgBw8Wxa5sAQBdWL3v/RnNq1AxLWYP2XYXgnSyMdxVQ+NPrba8RpIo9I61I2Y1M
-        tjIThOiNVpMvcRrl9GTvpiNfBzxF4GM=
+        bh=0lVu0kNchvYW/X5Tf1wjeKmtDGbtUc56LRj2YTgqL/4=;
+        b=Gl3a/C2wRj1w8+5C9+TwO26XoMLhj0bhQI06H1llRYPDKtY9vn5UiXyZevJ2p/flf3+MZX
+        NY+WuiR9PIKtcx1b5EaKFl+82bO9WUaW2du8pHsVf/njFqFyLutXKc7TKIiJBDXa9ldWOq
+        0BVcjdzKjDivRed6DirH+zzomcCfmDc=
 Received: from EUR05-VI1-obe.outbound.protection.outlook.com
  (mail-vi1eur05lp2174.outbound.protection.outlook.com [104.47.17.174])
  (Using TLS) by relay.mimecast.com with ESMTP id
- de-mta-15-5KCAfHb_P7aq7e4kfaTKMA-1; Tue, 30 Mar 2021 22:29:22 +0200
-X-MC-Unique: 5KCAfHb_P7aq7e4kfaTKMA-1
+ de-mta-15-4wsP7MJpOj-Bt2tGbS0PSQ-1; Tue, 30 Mar 2021 22:29:20 +0200
+X-MC-Unique: 4wsP7MJpOj-Bt2tGbS0PSQ-1
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n1oFpvZIqpFjSHQXqKqidjeS5cLp/o+Y+dsDD2pBa/22u8K7155yDEIZYjPGsZ87Z4hC6px8OSO8rD8UHuL4kXDr/PPkKDPJr1Z4BE9Ubu9FYhQtVGoHjNdIVRg6wOQi49CuzuaoJWPHK4dAnAg7pqQETM9PZhc7mf+iE1pZ9lMgqS13NPxnkdh4/ubxXmZLQPbyXCLEK8OanHSFnZ2fwmrLbsxCMAdbzqgzkXCNhXjGWmhm6+Q3g7EHGC/OXSkiC02aMDkyV7/8aRiUL4qMveSaypiU70Ccl7vv7QgKjAL17DzL2XY3SKKdIaSbJGu/nqwFxZlzwVPHon+8m2Q1Gw==
+ b=QANK5DHrX3VqXZUFgIrEAM9gmNWRUnnO8j9jGOAasLyLwldEYy5RpRT3lGriwZCt4+ixcv7NNZg2FcO1eGP7q/Xg3bGn49EbalaSaHh9Q7LmEy0FhcrriwFCz2npZwk+sBX0kxO9fgLkTq8fBzWjHPn+/Vrs0cDO0FKxldIXvD/latSBqZPyaLHquAHlva3/JuVEaRGIYb69je71u2thwdbbOhp4rhvKZi1J8tIrRW+z2wRgJg51ZwbX1uduUvKsxXQ9yk9zQMSTlmW6fSPCR8VB68rXyFmv4/COjWMBXEKiNRLxvApUnVfzl+yNAtQlbsClkh0JSpVOvm7pLyzC/w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1Kv0YdnDPQSEZxBkUROBXfwJM6YFVXfQzy8db4DFyj4=;
- b=LjzQcDh5vbwfh3uukf1DoWQim/CccbZSv3KTl5t7QkZ+P2JCNy0+xqkFZxFLJBXP7Zipz0ls3AGMhCopLjzaFvqDJKbpocsrPWQ/wjVJ8sJz+5VK/U42dVYwKImvFIIza75KrShOxG1OpmBupEgf/NguyfH4rzzKguEm8Y/okc5K8RUQuinq9J23LirT3yhL4s7ZfOk/TY0tDjwvxSl3n5w8OWznfZBT6AhqTnYm14OnB8UI4hYSNHNatPwY1pRip8i8ytVC0HHfdbLnVTLReViqCdjVoZkAHgk7YcvmiRAjSnyzhI9TrhXRY5BEM1NggsBUEVaqxZwdyunbH0xovA==
+ bh=LxXb7YdJtc7JgFY0x+ZjWZpHV3wSedJnwe7QRQoiKWs=;
+ b=KVelIHL3NgUuyOi75T+gQoUhT8hUSEFgMF09t90QA5rlUluDx2C1pv6AkvgnNODZ07dWZd1oyLSMn/SHvv0EP9u0vAtO2SgSEUvjEJq4iAteTzBbA1tOmhWzJWD9s87mWcyBsIZ+HuhjjjmG9P34omhIAXGo+oYjudwYuTJ7RuN4IORt12goKPA5+jZuf28UbaZNzyDarjME0zc1bqxUWzu7wKA6ykWFEq6uH49jgMNRAH7ZZ4YvBX6Ik0GQUiFotv6gW5CsiTuW+ZlBuhSOrYqUz3HfeLIy9KtNMQ951VXJqGNJL2xP1ussbyOJgXaCBMbOCPUZcUTe8Of4kVBI+g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
  dkim=pass header.d=suse.com; arc=none
@@ -52,20 +52,20 @@ Received: from AM0PR04MB5650.eurprd04.prod.outlook.com (2603:10a6:208:128::18)
  by AM0PR0402MB3393.eurprd04.prod.outlook.com (2603:10a6:208:21::23) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.33; Tue, 30 Mar
- 2021 20:29:21 +0000
+ 2021 20:29:19 +0000
 Received: from AM0PR04MB5650.eurprd04.prod.outlook.com
  ([fe80::40bd:b7d7:74a7:5679]) by AM0PR04MB5650.eurprd04.prod.outlook.com
  ([fe80::40bd:b7d7:74a7:5679%3]) with mapi id 15.20.3977.033; Tue, 30 Mar 2021
- 20:29:21 +0000
+ 20:29:19 +0000
 From:   Varad Gautam <varad.gautam@suse.com>
 To:     linux-crypto@vger.kernel.org
 CC:     Varad Gautam <varad.gautam@suse.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH 05/18] crypto: rsa-pkcs1pad: Rename pkcs1pad_* structs to rsapad_*
-Date:   Tue, 30 Mar 2021 22:28:16 +0200
-Message-ID: <20210330202829.4825-6-varad.gautam@suse.com>
+Subject: [PATCH 04/18] crypto: rsa-pkcs1pad: Pull out child req processing code into helpers
+Date:   Tue, 30 Mar 2021 22:28:15 +0200
+Message-ID: <20210330202829.4825-5-varad.gautam@suse.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210330202829.4825-1-varad.gautam@suse.com>
 References: <20210330202829.4825-1-varad.gautam@suse.com>
@@ -77,283 +77,250 @@ X-ClientProxiedBy: AM3PR03CA0066.eurprd03.prod.outlook.com
  (2603:10a6:208:128::18)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from xps13.suse.de (95.90.93.216) by AM3PR03CA0066.eurprd03.prod.outlook.com (2603:10a6:207:5::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25 via Frontend Transport; Tue, 30 Mar 2021 20:29:20 +0000
+Received: from xps13.suse.de (95.90.93.216) by AM3PR03CA0066.eurprd03.prod.outlook.com (2603:10a6:207:5::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25 via Frontend Transport; Tue, 30 Mar 2021 20:29:18 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d25c2591-48d3-4b57-10c8-08d8f3ba7ff4
+X-MS-Office365-Filtering-Correlation-Id: 6be7db8c-d37c-496c-1768-08d8f3ba7f17
 X-MS-TrafficTypeDiagnostic: AM0PR0402MB3393:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM0PR0402MB33934FC8B968266772E788D5E07D9@AM0PR0402MB3393.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4502;
+X-Microsoft-Antispam-PRVS: <AM0PR0402MB339391CA2F3814AB79BB77A6E07D9@AM0PR0402MB3393.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: CVjWlE5fWcDrDscCtZE31AiHuNiDzfPWMljEbrARjXYjay0MRk3G97LUwQEJ11Rd1yi/SrUzj/e40XVc8gPNRGNUuEHLSo38+unYLVIi+MweyYgfmbqAvPhroaSyiYAYuCTtWE/ty0wN3a8P2N3JVIPlQ4/lvkxjaHU7sveiKxZ5w56UC3IGH48gRTRkHBV2Xh52i+G8despPKJIAyPwSsLwm7Ix9n63rSQufgU8XU551bZ0XFsa5Wx3MlSALAbgW9xYSN+Rexs6z7iuaS2ybcs4Re60/muMdpwDIxeCBdfXSMujldisHYGJ+kGRpp55QS+0N2Rj7rxkBzZxAOCzIjJaBa/tbjs2jmBfa02hD16nGNL9ApFZZKde9gBFp6A7uhxmXIQsLLhi6wNtmtASe/Kit/93ewMOjrmCn9dRDhkaKFeao8AcQ7sj1FDzoUBqNkGYjHfmiSrjmGfdC9LhLFOCREGD7SbBORYKJW3a3Iv4ZckUIsoz4E7EW1zygD06ajumiZHYzD0XZgewOybjHEUrxpLfgAYO8McoFs+cytU8/fBZVq0T4xmHCYE1LpguscY8QkSyvwk+ywD1j7jkLXrPJDCVYgFLPjCgs1T50QMLHytvXQ3Xglwn0vKRWm4tKaw9CpRQlaadviQHis+heQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5650.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(39850400004)(396003)(136003)(346002)(366004)(376002)(66476007)(66556008)(54906003)(66946007)(6666004)(83380400001)(8936002)(316002)(6506007)(6486002)(1076003)(52116002)(478600001)(6512007)(5660300002)(38100700001)(36756003)(4326008)(86362001)(6916009)(8676002)(2906002)(16526019)(2616005)(956004)(186003)(26005)(44832011);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?e/z7yu1K27nHIDnbEeNa2r5qDVqQU52gqQ0Kj7oZFVNx/oACK3n7pxBFQWIw?=
- =?us-ascii?Q?cU1fr0mpF5tucAgc7LetjbxWwcSa6+hmL3D9ldMvz3jNrUv3YvwIc1BnQ0Fk?=
- =?us-ascii?Q?SvAOKMZsgoHyj/VNOs/9qYuMmEDEWG7JRz2oRfrtnNEBk/ArBR2YES+Zt0Jn?=
- =?us-ascii?Q?1RzX3HYeZfzCuWcjGuW5JrdUkeCGP5uJH5+4D4qXsjkLs9o0dScKc5l2HKJi?=
- =?us-ascii?Q?sOYgXrFDBODshbURCq3ll9xCitem9R0ErHU05vlyWsTM1vSkmadMBpVPDd7X?=
- =?us-ascii?Q?0x9XCdZvIUV4DSrAUs3QZt3mnhllt3M5ODa+jM1tUG/sSG8Vz9B93fJUXAam?=
- =?us-ascii?Q?d9Rhud/iamznEfPxTC6ttXB1fzhLQ+NJuKELLcoJf0AL1nW5CNYmlDJ/o9gf?=
- =?us-ascii?Q?W0Y3r6OTnmH8yMT5AeLE1AdgEakJjCGce6fZtiuJqcyE7XMKmZV+1Pm4E+Ji?=
- =?us-ascii?Q?IXqGfaeLi4MIhV8uHLY1TKX6yGePGd2U5n7MFagjBv4uO2Mhwn9WRQKU8W2O?=
- =?us-ascii?Q?Gocfhn7an4ZDCQiyJ1/PEBB+uEJDAY88U0/FaU2iumKCmkm5H6y3h1kzKVZJ?=
- =?us-ascii?Q?8/GKmH0L/hcT/gdcsbSHbv1lLLN/x2yaoAD821a0nQVRm/qb1ILoKGDEkzHo?=
- =?us-ascii?Q?l3tWni2XWlAb/eoLKhhScbI9yHPfAA3XzN/yD3Y8SG+EkwfTxVwM2ZiuD9gI?=
- =?us-ascii?Q?zobssu4p/rq62V9ddc/Q8L/akJ/kCy8GVlDBT9j9YNga2+t2KBkCGHITlsOU?=
- =?us-ascii?Q?WFqzZQiWf9RSM/adwnx9t2U5ZPgXmG3JMCn37FoTOpcXikyTj5aa746sZco7?=
- =?us-ascii?Q?34Nyw0wPCd56pnqU8qf+xptKHQEUoFAbafC65zberLQ5AWQyTQVhEJf5zZC+?=
- =?us-ascii?Q?yYZraQnt6wRDAqGj1I9Ojl7lWypaRgmDyC8oG1I+DlS/Gjv/FsZTIBVBF6KW?=
- =?us-ascii?Q?ym+FQph7aZ18D71vCMEXJnne2wjXhdigzIMYVa2/+dNHtBWVa78mULB/UZoL?=
- =?us-ascii?Q?mMwagma0oyIUB/RXNAHvcnAjyKU/XEtJbyNZT69RkowVSrNK6EhWVhBPejB8?=
- =?us-ascii?Q?0IrKWC6f1jzT0i2rHB40tDixOxyFe3Wk6QeJ22OfnoSbgeKb7Ld5b8kNJQKb?=
- =?us-ascii?Q?qWr/Tm4x0lBdjuMEAXwbTtO0sQOwLQC8jTC4MUJxL4ixhdSWdUM8Azblocl9?=
- =?us-ascii?Q?3gUmBI7PEbnACh9+/VzGyCw/6dM767bo8wwtkYi9jYxA2ZHRul19gfy0f1dn?=
- =?us-ascii?Q?RAsmzpii2fxGFXQBlehSyLbE8D537jm+/82Qfb/Ma5NXD+GP1dmkiiLam9pS?=
- =?us-ascii?Q?If+WtQ26adUAkRWyNHO6xvCI?=
+X-Microsoft-Antispam-Message-Info: pDxp6y3WH67HsXJQ3V30naVbl6HJlq9jaE1VR+Ypn4MbDvKpxN3hovYXeYEWIK0Vmg8IldkFUGRhPtD8NVwZzz7OmLrP3FyyYqut2mpSYkSxbXS3HSEkfmzJq6FIPHRtw8FmJ/aWgZMFYM24aybCvg3wVmpe0+6nAxJWfE0C8OPvL6S5cq0kxpU5X3P0tnOChW63/Xt9I0iHpSZ0fZ65YY7W7p9/zf68RyJE/v0FcT4n5Qvfwk5sefK1YwE3oqI00iVj+8bq7luvMmufCj0s9vJVceQXTTI4pZPxtxgDsmCPxQtHuaVmqtum8j/Uu3Qkw1LVcbQxe1ceBppsUPq4PaxHSq+WuKW3pjeDbh3ngPftaEOGrXUqrr+sb2iHkV+1v02S/Q0KuW514mefgNI5o1PWpqklDophqtZ5p46VshIv1m0+yHogVNw4d2tinP1VRAQIKG9cshiTjx/1kheCdxWYCjqMmbhTVWdCItRUFI6g1PyPHSV9G/AkQ1e5CGlRVAc+mAgcacMO9Q5NwKfdfOueK3l/dfTFRqXl0woGM0sqkYrQgYDWHLDEXbtn/r8acZ0pRvqVSXm//cUPlJwjpPFUIo/W+Y5xEmm3zXtvaxaW140br5WTv6N+nnLZYmbemMoLuxZluvETNYPq7IO858nHRSJlb7OJoJ8IlUfRBR/8kNJ7qu99l9P4o0nQo/hu
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5650.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(39850400004)(396003)(136003)(346002)(366004)(376002)(66476007)(66556008)(54906003)(66946007)(6666004)(83380400001)(8936002)(316002)(6506007)(6486002)(1076003)(52116002)(478600001)(6512007)(5660300002)(38100700001)(36756003)(4326008)(86362001)(6916009)(8676002)(2906002)(16526019)(2616005)(956004)(186003)(26005)(44832011)(473944003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?9kFxzxq0DcVMPsRCBCKlEqLY0CbEe3mNYob44lM19sRQYhbi30AGbSZ1wxLK?=
+ =?us-ascii?Q?S71AQgT673xN7/SPAgUI5G5BvGlu281qJCDM5335XyftNmU8LlGqHMEC1mql?=
+ =?us-ascii?Q?Wh2Tql/syi7b+OLf441GxA2iHHvgJu58K/oGSwf++hwBEoWHJx2ySQNRYHVG?=
+ =?us-ascii?Q?t24awFt5K+ZlFY9IKb2EExgZi2re5aNAuotr5DDvPO1sq9ii3nNbpoMYW+fx?=
+ =?us-ascii?Q?4Wss+PRZkjfWKBsJQPVbKTwgEjUkUDeHqyi3PBfwU57HHCZlhXZMvqqAbxCU?=
+ =?us-ascii?Q?GLk61Ajv2s3REKWWX7nnMtWQLYb0qaRluLcdFD6G+c8B59dnvwlDRHyGDO4m?=
+ =?us-ascii?Q?d70XUTi/OS9cuQp5Ul7fZoKkvYI6q0nawEMxTVoS6Iu1OBycgVpFK8HIk86p?=
+ =?us-ascii?Q?jeGdKgzFH8vVp0NM/7oCYIfmgwHp7yWFv/3TZRZBT6eRiHvWUyEwz6in/bsM?=
+ =?us-ascii?Q?vkqkBxUXGhMzsKhP9MJDft8eBechPbJrGq8ySpon69oZTyAP+ZmwP4Cxj2mF?=
+ =?us-ascii?Q?oFQe55RNvBnNcySvZp1lG8Zos4zHy/6siJvuLej8/w7fK7tiNRwGD4EcTFVy?=
+ =?us-ascii?Q?ZKNuxsF5tafLhl3rHGyEtbg4RfJpxm5Bc5asmHA9D2Aj9+WK5Rs8oxni3VQv?=
+ =?us-ascii?Q?hwP7KpTS1MABZNRkdFBE5QpVcDSmHfD5aktsjQd1qY0p0UORmThJ5xAtuXzX?=
+ =?us-ascii?Q?ILvrsdzR5SX3jUZg36D3q8sU5s+iFiQqnhNy79Lg6BClhEpDYcWOcG7pn58u?=
+ =?us-ascii?Q?aFy4xkVfD7qHg+biQf9MMnH0gQYJ381mbSHDzTK58EVRYvM3H8+wdxPqOMO4?=
+ =?us-ascii?Q?6QV8v0DSCH0nlCEHiX29692w9lMHPck8OmoSwks+cFuv5m1Ivh8l2AwTaDz3?=
+ =?us-ascii?Q?O+1dw3qgnfxlwtW4l9pQDkSAm6hP6hvFopvIGeN70g1sw7TsYYt1K7vhzq17?=
+ =?us-ascii?Q?CXAo7oU1+evbVVX5uvp1Z7tWNRtd6X/GX86lr7D0pIpRf6D2WdGBZDbUeI/Z?=
+ =?us-ascii?Q?lh20ax3mJFdAaL5MH4d4N7M+OaNUU63zeo9QbaY7oKT1zraky1I4gbzc/qvE?=
+ =?us-ascii?Q?Tfkt3pjzSK/FbiYrR8hOoLIsuw03Q7DU1/djkIKCjOSdVpOJeTP0H8wtu5A9?=
+ =?us-ascii?Q?50uFAwQwsXWz+226iyRfO7+OZMsS+1j69xk7bw3P5Kfcn5hzp/pvJ2NudJrH?=
+ =?us-ascii?Q?lIp/lLz3okCijuIKVMU27qRwnCxlIbPPil84ZJUyuGzD7F7dfFt5HzT1+qN1?=
+ =?us-ascii?Q?4yOr5VRvuYjw4d4MwbO2Hm1YlT0CdMhVA85SXtzuZ6NCRp7qEzQlI94Y8UUz?=
+ =?us-ascii?Q?/jwOIqrFBbNqRZwkY2dBW1rj?=
 X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d25c2591-48d3-4b57-10c8-08d8f3ba7ff4
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6be7db8c-d37c-496c-1768-08d8f3ba7f17
 X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB5650.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2021 20:29:21.1961
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2021 20:29:19.8199
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0DDZZHnecR6yuoCtRdV+ZvvODgt4hr8BqJm9z6Np5pambYPtP18m40/Yjw2jTUms6xTnyBdnLUvAHIfm1nFLtQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: m1zyh2J0dZJhysxkrgg+s/VAt6xBKsxaYbtbSmXyiMIrWLeU7bZs3Rt4TfjBso5s1CjaxcVTDtRI0FTCVF+OKw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR0402MB3393
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use generic naming to share with other padding scheme implementations.
-These will be moved out of rsa-pkcs1pad.c.
+rsa-pkcs1pad operations that require using RSA primitives rely on
+creating an akcipher child RSA transform and processing the results
+in the operation-specific callback. Add helpers
+rsapad_akcipher_setup_child and rsapad_akcipher_req_complete for req
+setup and callback handling, and switch pkcs1pad operations to use
+these.
 
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 ---
- crypto/rsa-pkcs1pad.c | 62 +++++++++++++++++++++----------------------
- 1 file changed, 31 insertions(+), 31 deletions(-)
+ crypto/rsa-pkcs1pad.c | 106 +++++++++++++++++++-----------------------
+ 1 file changed, 49 insertions(+), 57 deletions(-)
 
 diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-index 6329c79316d2..e76fc98a537a 100644
+index 849573f6b44b..6329c79316d2 100644
 --- a/crypto/rsa-pkcs1pad.c
 +++ b/crypto/rsa-pkcs1pad.c
-@@ -88,17 +88,17 @@ static const struct rsa_asn1_template *rsa_lookup_asn1(=
-const char *name)
- 	return NULL;
+@@ -171,6 +171,38 @@ static void rsapad_akcipher_sg_set_buf(struct scatterl=
+ist *sg, void *buf,
+ 		sg_chain(sg, nsegs, next);
  }
 =20
--struct pkcs1pad_ctx {
-+struct rsapad_tfm_ctx {
- 	struct crypto_akcipher *child;
- 	unsigned int key_size;
- };
-=20
--struct pkcs1pad_inst_ctx {
-+struct rsapad_inst_ctx {
- 	struct crypto_akcipher_spawn spawn;
- 	const struct rsa_asn1_template *digest_info;
- };
-=20
--struct pkcs1pad_request {
-+struct rsapad_akciper_req_ctx {
- 	struct scatterlist in_sg[2], out_sg[1];
- 	uint8_t *in_buf, *out_buf;
- 	struct akcipher_request child_req;
-@@ -107,7 +107,7 @@ struct pkcs1pad_request {
- static int rsapad_set_pub_key(struct crypto_akcipher *tfm, const void *key=
-,
- 		unsigned int keylen)
- {
--	struct pkcs1pad_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-+	struct rsapad_tfm_ctx *ctx =3D akcipher_tfm_ctx(tfm);
- 	int err;
-=20
- 	ctx->key_size =3D 0;
-@@ -128,7 +128,7 @@ static int rsapad_set_pub_key(struct crypto_akcipher *t=
-fm, const void *key,
- static int rsapad_set_priv_key(struct crypto_akcipher *tfm, const void *ke=
-y,
- 		unsigned int keylen)
- {
--	struct pkcs1pad_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-+	struct rsapad_tfm_ctx *ctx =3D akcipher_tfm_ctx(tfm);
- 	int err;
-=20
- 	ctx->key_size =3D 0;
-@@ -148,7 +148,7 @@ static int rsapad_set_priv_key(struct crypto_akcipher *=
-tfm, const void *key,
-=20
- static unsigned int rsapad_get_max_size(struct crypto_akcipher *tfm)
- {
--	struct pkcs1pad_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-+	struct rsapad_tfm_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-=20
- 	/*
- 	 * The maximum destination buffer size for the encrypt/sign operations
-@@ -195,8 +195,8 @@ static void rsapad_akcipher_setup_child(struct akcipher=
-_request *req,
- 					crypto_completion_t cb)
- {
- 	struct crypto_akcipher *tfm =3D crypto_akcipher_reqtfm(req);
--	struct pkcs1pad_ctx *ctx =3D akcipher_tfm_ctx(tfm);
--	struct pkcs1pad_request *req_ctx =3D akcipher_request_ctx(req);
-+	struct rsapad_tfm_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-+	struct rsapad_akciper_req_ctx *req_ctx =3D akcipher_request_ctx(req);
-=20
- 	akcipher_request_set_tfm(&req_ctx->child_req, ctx->child);
- 	akcipher_request_set_callback(&req_ctx->child_req, req->base.flags, cb, r=
++typedef int (*rsa_akcipher_complete_cb)(struct akcipher_request *, int);
++static void rsapad_akcipher_req_complete(struct crypto_async_request *chil=
+d_async_req,
++					 int err, rsa_akcipher_complete_cb cb)
++{
++	struct akcipher_request *req =3D child_async_req->data;
++	struct crypto_async_request async_req;
++
++	if (err =3D=3D -EINPROGRESS)
++		return;
++
++	async_req.data =3D req->base.data;
++	async_req.tfm =3D crypto_akcipher_tfm(crypto_akcipher_reqtfm(req));
++	async_req.flags =3D child_async_req->flags;
++	req->base.complete(&async_req, cb(req, err));
++}
++
++static void rsapad_akcipher_setup_child(struct akcipher_request *req,
++					struct scatterlist *src_sg,
++					struct scatterlist *dst_sg,
++					unsigned int src_len,
++					unsigned int dst_len,
++					crypto_completion_t cb)
++{
++	struct crypto_akcipher *tfm =3D crypto_akcipher_reqtfm(req);
++	struct pkcs1pad_ctx *ctx =3D akcipher_tfm_ctx(tfm);
++	struct pkcs1pad_request *req_ctx =3D akcipher_request_ctx(req);
++
++	akcipher_request_set_tfm(&req_ctx->child_req, ctx->child);
++	akcipher_request_set_callback(&req_ctx->child_req, req->base.flags, cb, r=
 eq);
-@@ -206,8 +206,8 @@ static void rsapad_akcipher_setup_child(struct akcipher=
-_request *req,
++	akcipher_request_set_crypt(&req_ctx->child_req, src_sg, dst_sg, src_len, =
+dst_len);
++}
++
  static int pkcs1pad_encrypt_sign_complete(struct akcipher_request *req, in=
 t err)
  {
  	struct crypto_akcipher *tfm =3D crypto_akcipher_reqtfm(req);
--	struct pkcs1pad_ctx *ctx =3D akcipher_tfm_ctx(tfm);
--	struct pkcs1pad_request *req_ctx =3D akcipher_request_ctx(req);
-+	struct rsapad_tfm_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-+	struct rsapad_akciper_req_ctx *req_ctx =3D akcipher_request_ctx(req);
- 	unsigned int pad_len;
- 	unsigned int len;
- 	u8 *out_buf;
-@@ -252,8 +252,8 @@ static void pkcs1pad_encrypt_sign_complete_cb(
- static int pkcs1pad_encrypt(struct akcipher_request *req)
+@@ -213,17 +245,8 @@ static int pkcs1pad_encrypt_sign_complete(struct akcip=
+her_request *req, int err)
+ static void pkcs1pad_encrypt_sign_complete_cb(
+ 		struct crypto_async_request *child_async_req, int err)
  {
- 	struct crypto_akcipher *tfm =3D crypto_akcipher_reqtfm(req);
--	struct pkcs1pad_ctx *ctx =3D akcipher_tfm_ctx(tfm);
--	struct pkcs1pad_request *req_ctx =3D akcipher_request_ctx(req);
-+	struct rsapad_tfm_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-+	struct rsapad_akciper_req_ctx *req_ctx =3D akcipher_request_ctx(req);
- 	int err;
- 	unsigned int i, ps_end;
-=20
-@@ -297,8 +297,8 @@ static int pkcs1pad_encrypt(struct akcipher_request *re=
-q)
- static int pkcs1pad_decrypt_complete(struct akcipher_request *req, int err=
-)
- {
- 	struct crypto_akcipher *tfm =3D crypto_akcipher_reqtfm(req);
--	struct pkcs1pad_ctx *ctx =3D akcipher_tfm_ctx(tfm);
--	struct pkcs1pad_request *req_ctx =3D akcipher_request_ctx(req);
-+	struct rsapad_tfm_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-+	struct rsapad_akciper_req_ctx *req_ctx =3D akcipher_request_ctx(req);
- 	unsigned int dst_len;
- 	unsigned int pos;
- 	u8 *out_buf;
-@@ -357,8 +357,8 @@ static void pkcs1pad_decrypt_complete_cb(
- static int pkcs1pad_decrypt(struct akcipher_request *req)
- {
- 	struct crypto_akcipher *tfm =3D crypto_akcipher_reqtfm(req);
--	struct pkcs1pad_ctx *ctx =3D akcipher_tfm_ctx(tfm);
--	struct pkcs1pad_request *req_ctx =3D akcipher_request_ctx(req);
-+	struct rsapad_tfm_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-+	struct rsapad_akciper_req_ctx *req_ctx =3D akcipher_request_ctx(req);
- 	int err;
-=20
- 	if (!ctx->key_size || req->src_len !=3D ctx->key_size)
-@@ -386,10 +386,10 @@ static int pkcs1pad_decrypt(struct akcipher_request *=
-req)
- static int pkcs1pad_sign(struct akcipher_request *req)
- {
- 	struct crypto_akcipher *tfm =3D crypto_akcipher_reqtfm(req);
--	struct pkcs1pad_ctx *ctx =3D akcipher_tfm_ctx(tfm);
--	struct pkcs1pad_request *req_ctx =3D akcipher_request_ctx(req);
-+	struct rsapad_tfm_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-+	struct rsapad_akciper_req_ctx *req_ctx =3D akcipher_request_ctx(req);
- 	struct akcipher_instance *inst =3D akcipher_alg_instance(tfm);
--	struct pkcs1pad_inst_ctx *ictx =3D akcipher_instance_ctx(inst);
-+	struct rsapad_inst_ctx *ictx =3D akcipher_instance_ctx(inst);
- 	const struct rsa_asn1_template *digest_info =3D ictx->digest_info;
- 	int err;
- 	unsigned int ps_end, digest_size =3D 0;
-@@ -440,10 +440,10 @@ static int pkcs1pad_sign(struct akcipher_request *req=
-)
- static int pkcs1pad_verify_complete(struct akcipher_request *req, int err)
- {
- 	struct crypto_akcipher *tfm =3D crypto_akcipher_reqtfm(req);
--	struct pkcs1pad_ctx *ctx =3D akcipher_tfm_ctx(tfm);
--	struct pkcs1pad_request *req_ctx =3D akcipher_request_ctx(req);
-+	struct rsapad_tfm_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-+	struct rsapad_akciper_req_ctx *req_ctx =3D akcipher_request_ctx(req);
- 	struct akcipher_instance *inst =3D akcipher_alg_instance(tfm);
--	struct pkcs1pad_inst_ctx *ictx =3D akcipher_instance_ctx(inst);
-+	struct rsapad_inst_ctx *ictx =3D akcipher_instance_ctx(inst);
- 	const struct rsa_asn1_template *digest_info =3D ictx->digest_info;
- 	unsigned int dst_len;
- 	unsigned int pos;
-@@ -528,8 +528,8 @@ static void pkcs1pad_verify_complete_cb(
- static int pkcs1pad_verify(struct akcipher_request *req)
- {
- 	struct crypto_akcipher *tfm =3D crypto_akcipher_reqtfm(req);
--	struct pkcs1pad_ctx *ctx =3D akcipher_tfm_ctx(tfm);
--	struct pkcs1pad_request *req_ctx =3D akcipher_request_ctx(req);
-+	struct rsapad_tfm_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-+	struct rsapad_akciper_req_ctx *req_ctx =3D akcipher_request_ctx(req);
- 	int err;
-=20
- 	if (WARN_ON(req->dst) ||
-@@ -559,8 +559,8 @@ static int pkcs1pad_verify(struct akcipher_request *req=
-)
- static int rsapad_akcipher_init_tfm(struct crypto_akcipher *tfm)
- {
- 	struct akcipher_instance *inst =3D akcipher_alg_instance(tfm);
--	struct pkcs1pad_inst_ctx *ictx =3D akcipher_instance_ctx(inst);
--	struct pkcs1pad_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-+	struct rsapad_inst_ctx *ictx =3D akcipher_instance_ctx(inst);
-+	struct rsapad_tfm_ctx *ctx =3D akcipher_tfm_ctx(tfm);
- 	struct crypto_akcipher *child_tfm;
-=20
- 	child_tfm =3D crypto_spawn_akcipher(&ictx->spawn);
-@@ -573,14 +573,14 @@ static int rsapad_akcipher_init_tfm(struct crypto_akc=
-ipher *tfm)
-=20
- static void rsapad_akcipher_exit_tfm(struct crypto_akcipher *tfm)
- {
--	struct pkcs1pad_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-+	struct rsapad_tfm_ctx *ctx =3D akcipher_tfm_ctx(tfm);
-=20
- 	crypto_free_akcipher(ctx->child);
+-	struct akcipher_request *req =3D child_async_req->data;
+-	struct crypto_async_request async_req;
+-
+-	if (err =3D=3D -EINPROGRESS)
+-		return;
+-
+-	async_req.data =3D req->base.data;
+-	async_req.tfm =3D crypto_akcipher_tfm(crypto_akcipher_reqtfm(req));
+-	async_req.flags =3D child_async_req->flags;
+-	req->base.complete(&async_req,
+-			pkcs1pad_encrypt_sign_complete(req, err));
++	rsapad_akcipher_req_complete(child_async_req, err,
++				     pkcs1pad_encrypt_sign_complete);
  }
 =20
- static void rsapad_akcipher_free(struct akcipher_instance *inst)
+ static int pkcs1pad_encrypt(struct akcipher_request *req)
+@@ -259,13 +282,10 @@ static int pkcs1pad_encrypt(struct akcipher_request *=
+req)
+ 	rsapad_akcipher_sg_set_buf(req_ctx->in_sg, req_ctx->in_buf,
+ 			ctx->key_size - 1 - req->src_len, req->src);
+=20
+-	akcipher_request_set_tfm(&req_ctx->child_req, ctx->child);
+-	akcipher_request_set_callback(&req_ctx->child_req, req->base.flags,
+-			pkcs1pad_encrypt_sign_complete_cb, req);
+-
+ 	/* Reuse output buffer */
+-	akcipher_request_set_crypt(&req_ctx->child_req, req_ctx->in_sg,
+-				   req->dst, ctx->key_size - 1, req->dst_len);
++	rsapad_akcipher_setup_child(req, req_ctx->in_sg, req->dst,
++				    ctx->key_size - 1, req->dst_len,
++				    pkcs1pad_encrypt_sign_complete_cb);
+=20
+ 	err =3D crypto_akcipher_encrypt(&req_ctx->child_req);
+ 	if (err !=3D -EINPROGRESS && err !=3D -EBUSY)
+@@ -331,16 +351,7 @@ static int pkcs1pad_decrypt_complete(struct akcipher_r=
+equest *req, int err)
+ static void pkcs1pad_decrypt_complete_cb(
+ 		struct crypto_async_request *child_async_req, int err)
  {
--	struct pkcs1pad_inst_ctx *ctx =3D akcipher_instance_ctx(inst);
-+	struct rsapad_inst_ctx *ctx =3D akcipher_instance_ctx(inst);
- 	struct crypto_akcipher_spawn *spawn =3D &ctx->spawn;
+-	struct akcipher_request *req =3D child_async_req->data;
+-	struct crypto_async_request async_req;
+-
+-	if (err =3D=3D -EINPROGRESS)
+-		return;
+-
+-	async_req.data =3D req->base.data;
+-	async_req.tfm =3D crypto_akcipher_tfm(crypto_akcipher_reqtfm(req));
+-	async_req.flags =3D child_async_req->flags;
+-	req->base.complete(&async_req, pkcs1pad_decrypt_complete(req, err));
++	rsapad_akcipher_req_complete(child_async_req, err, pkcs1pad_decrypt_compl=
+ete);
+ }
 =20
- 	crypto_drop_akcipher(spawn);
-@@ -605,7 +605,7 @@ static int rsapad_akcipher_create(struct crypto_templat=
-e *tmpl, struct rtattr **
+ static int pkcs1pad_decrypt(struct akcipher_request *req)
+@@ -360,14 +371,10 @@ static int pkcs1pad_decrypt(struct akcipher_request *=
+req)
+ 	rsapad_akcipher_sg_set_buf(req_ctx->out_sg, req_ctx->out_buf,
+ 			    ctx->key_size, NULL);
+=20
+-	akcipher_request_set_tfm(&req_ctx->child_req, ctx->child);
+-	akcipher_request_set_callback(&req_ctx->child_req, req->base.flags,
+-			pkcs1pad_decrypt_complete_cb, req);
+-
+ 	/* Reuse input buffer, output to a new buffer */
+-	akcipher_request_set_crypt(&req_ctx->child_req, req->src,
+-				   req_ctx->out_sg, req->src_len,
+-				   ctx->key_size);
++	rsapad_akcipher_setup_child(req, req->src, req_ctx->out_sg,
++				    req->src_len, ctx->key_size,
++				    pkcs1pad_decrypt_complete_cb);
+=20
+ 	err =3D crypto_akcipher_decrypt(&req_ctx->child_req);
+ 	if (err !=3D -EINPROGRESS && err !=3D -EBUSY)
+@@ -418,13 +425,10 @@ static int pkcs1pad_sign(struct akcipher_request *req=
+)
+ 	rsapad_akcipher_sg_set_buf(req_ctx->in_sg, req_ctx->in_buf,
+ 			ctx->key_size - 1 - req->src_len, req->src);
+=20
+-	akcipher_request_set_tfm(&req_ctx->child_req, ctx->child);
+-	akcipher_request_set_callback(&req_ctx->child_req, req->base.flags,
+-			pkcs1pad_encrypt_sign_complete_cb, req);
+-
+ 	/* Reuse output buffer */
+-	akcipher_request_set_crypt(&req_ctx->child_req, req_ctx->in_sg,
+-				   req->dst, ctx->key_size - 1, req->dst_len);
++	rsapad_akcipher_setup_child(req, req_ctx->in_sg, req->dst,
++				    ctx->key_size - 1, req->dst_len,
++				    pkcs1pad_encrypt_sign_complete_cb);
+=20
+ 	err =3D crypto_akcipher_decrypt(&req_ctx->child_req);
+ 	if (err !=3D -EINPROGRESS && err !=3D -EBUSY)
+@@ -509,16 +513,8 @@ static int pkcs1pad_verify_complete(struct akcipher_re=
+quest *req, int err)
+ static void pkcs1pad_verify_complete_cb(
+ 		struct crypto_async_request *child_async_req, int err)
  {
- 	u32 mask;
- 	struct akcipher_instance *inst;
--	struct pkcs1pad_inst_ctx *ctx;
-+	struct rsapad_inst_ctx *ctx;
- 	struct akcipher_alg *rsa_alg;
- 	const char *hash_name;
- 	int err;
-@@ -661,7 +661,7 @@ static int rsapad_akcipher_create(struct crypto_templat=
-e *tmpl, struct rtattr **
- 	}
+-	struct akcipher_request *req =3D child_async_req->data;
+-	struct crypto_async_request async_req;
+-
+-	if (err =3D=3D -EINPROGRESS)
+-		return;
+-
+-	async_req.data =3D req->base.data;
+-	async_req.tfm =3D crypto_akcipher_tfm(crypto_akcipher_reqtfm(req));
+-	async_req.flags =3D child_async_req->flags;
+-	req->base.complete(&async_req, pkcs1pad_verify_complete(req, err));
++	rsapad_akcipher_req_complete(child_async_req, err,
++				     pkcs1pad_verify_complete);
+ }
 =20
- 	inst->alg.base.cra_priority =3D rsa_alg->base.cra_priority;
--	inst->alg.base.cra_ctxsize =3D sizeof(struct pkcs1pad_ctx);
-+	inst->alg.base.cra_ctxsize =3D sizeof(struct rsapad_tfm_ctx);
+ /*
+@@ -548,14 +544,10 @@ static int pkcs1pad_verify(struct akcipher_request *r=
+eq)
+ 	rsapad_akcipher_sg_set_buf(req_ctx->out_sg, req_ctx->out_buf,
+ 			    ctx->key_size, NULL);
 =20
- 	inst->alg.init =3D alg->init;
- 	inst->alg.exit =3D alg->exit;
-@@ -673,7 +673,7 @@ static int rsapad_akcipher_create(struct crypto_templat=
-e *tmpl, struct rtattr **
- 	inst->alg.set_pub_key =3D alg->set_pub_key;
- 	inst->alg.set_priv_key =3D alg->set_priv_key;
- 	inst->alg.max_size =3D alg->max_size;
--	inst->alg.reqsize =3D sizeof(struct pkcs1pad_request) + rsa_alg->reqsize;
-+	inst->alg.reqsize =3D sizeof(struct rsapad_akciper_req_ctx) + rsa_alg->re=
-qsize;
+-	akcipher_request_set_tfm(&req_ctx->child_req, ctx->child);
+-	akcipher_request_set_callback(&req_ctx->child_req, req->base.flags,
+-			pkcs1pad_verify_complete_cb, req);
+-
+ 	/* Reuse input buffer, output to a new buffer */
+-	akcipher_request_set_crypt(&req_ctx->child_req, req->src,
+-				   req_ctx->out_sg, req->src_len,
+-				   ctx->key_size);
++	rsapad_akcipher_setup_child(req, req->src, req_ctx->out_sg,
++				    req->src_len, ctx->key_size,
++				    pkcs1pad_verify_complete_cb);
 =20
- 	inst->free =3D rsapad_akcipher_free;
-=20
+ 	err =3D crypto_akcipher_encrypt(&req_ctx->child_req);
+ 	if (err !=3D -EINPROGRESS && err !=3D -EBUSY)
 --=20
 2.30.2
 
