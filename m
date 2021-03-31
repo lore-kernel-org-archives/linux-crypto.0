@@ -2,149 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D036EC433C1
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Mar 2021 22:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D257C433DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Mar 2021 01:44:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABE2C619D3
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Mar 2021 22:47:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C2DA5619A7
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Mar 2021 01:44:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232883AbhC3Wqs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Mar 2021 18:46:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40190 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233093AbhC3WqS (ORCPT
+        id S230145AbhCaBoA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Mar 2021 21:44:00 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:15109 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230160AbhCaBna (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Mar 2021 18:46:18 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6299AC061574;
-        Tue, 30 Mar 2021 15:46:18 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id cl21-20020a17090af695b02900c61ac0f0e9so2004390pjb.1;
-        Tue, 30 Mar 2021 15:46:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=JXAaMKABaV2jajtKsKxGYYT+hHSjapVgGR5gnAv4wPY=;
-        b=rpG4RHEUrKUL6vWLsoj95XHwN2l0nQLe4AAc8HhYTS8iauHIrun2MGyTAmgQbOhmJC
-         WZWrL/YFsAL6U1Gc7+PrZOfsRKKkkygUbOsLM0pChao5wo9Oy1r9tOQzPkVu4Rv9Rtnk
-         oABxDCZz+2hIQYOhZdZdVKFyOzGFLrDJ2dJMMkYryx6WBzGiXxbO6/2RYlHOF7UyRq8E
-         u1LZWOjVtmS9EZA6/onhpk99mJUYA1VCu0PYRjCaClpn5fDxNGDlDUO5PgNILTG/5gfY
-         xsz4T5W4nMnY2aX9NzMwdy5edsXDfOF6Xsc8tJH4mkkbxrzQWJrCLMARlM0HvIxgb64O
-         lGcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=JXAaMKABaV2jajtKsKxGYYT+hHSjapVgGR5gnAv4wPY=;
-        b=n8VPyHMhXbamZHBo5cOO3V8nrpQ4g8sLOQV23tkRExdgPw3ZnuWTjq4w5Sh438ySNl
-         MgII9sDWCQkYg7/JRhv1F3vmB8wDTfLRQsbklPKWVkjDWxxRaGUJ9HAxuLyryUqG2FI7
-         D+cbdftxJgyhL0DQaaa4X8DAk8056/0tliWHTOUIWhQvrZzNqtzfE9mBEkJkTUFu8g/o
-         tDG7SklfWlrksPffCb7/w0lJ3/icFgHRssNwXNNqFVoW/VP2vR69IlWYEUxrq67ZDDCP
-         7CTvozfIlN0D7H+l5mUgvQV/ihsFnWS1x5AYm/It6DdULHwWaq2PUBqi2Pc4vIKLjhBb
-         plaQ==
-X-Gm-Message-State: AOAM531PGwvtqVtMJepbTMVhK8UUAFUEg9R1m+4bZ7Qn8knBd2NE+puJ
-        DD2uEwKa8/4VXEQt7W+S2U8=
-X-Google-Smtp-Source: ABdhPJyGgru2+ezHpj1LM0whxIWM74Z/P76Hr1X70Q5Zuk8tI0sLvMZTLt5Q2qm8vHnHsPgLWsJMfQ==
-X-Received: by 2002:a17:902:8685:b029:e6:5ff6:f7df with SMTP id g5-20020a1709028685b02900e65ff6f7dfmr517568plo.40.1617144377869;
-        Tue, 30 Mar 2021 15:46:17 -0700 (PDT)
-Received: from nickserv.localdomain (c-98-33-101-203.hsd1.ca.comcast.net. [98.33.101.203])
-        by smtp.gmail.com with ESMTPSA id t12sm227780pga.85.2021.03.30.15.46.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Mar 2021 15:46:17 -0700 (PDT)
-From:   Nick Terrell <nickrterrell@gmail.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        squashfs-devel@lists.sourceforge.net,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-kernel@vger.kernel.org, Kernel Team <Kernel-team@fb.com>,
-        Nick Terrell <nickrterrell@gmail.com>,
-        Nick Terrell <terrelln@fb.com>, Chris Mason <clm@fb.com>,
-        Petr Malat <oss@malat.biz>, Johannes Weiner <jweiner@fb.com>,
-        Niket Agarwal <niketa@fb.com>, Yann Collet <cyan@fb.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
-        David Sterba <dsterba@suse.cz>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>
-Subject: [PATCH v9 2/3] lib: zstd: Add decompress_sources.h for decompress_unzstd
-Date:   Tue, 30 Mar 2021 15:51:11 -0700
-Message-Id: <20210330225112.496213-3-nickrterrell@gmail.com>
-X-Mailer: git-send-email 2.31.0
-In-Reply-To: <20210330225112.496213-1-nickrterrell@gmail.com>
-References: <20210330225112.496213-1-nickrterrell@gmail.com>
+        Tue, 30 Mar 2021 21:43:30 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4F98DL3NR9z19K7t;
+        Wed, 31 Mar 2021 09:41:22 +0800 (CST)
+Received: from ubuntu180.huawei.com (10.175.100.227) by
+ DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
+ 14.3.498.0; Wed, 31 Mar 2021 09:43:17 +0800
+From:   Tang Yizhou <tangyizhou@huawei.com>
+To:     <tangyizhou@huawei.com>, Tom Lendacky <thomas.lendacky@amd.com>,
+        "John Allen" <john.allen@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>, Hulk Robot <hulkci@huawei.com>
+Subject: [PATCH -next] crypto: ccp - Use DEFINE_SPINLOCK() for spinlock
+Date:   Wed, 31 Mar 2021 10:00:55 +0800
+Message-ID: <20210331020055.4631-1-tangyizhou@huawei.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type:   text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+X-Originating-IP: [10.175.100.227]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Nick Terrell <terrelln@fb.com>
+spinlock can be initialized automatically with DEFINE_SPINLOCK()
+rather than explicitly calling spin_lock_init().
 
-Adds decompress_sources.h which includes every .c file necessary for
-zstd decompression. This is used in decompress_unzstd.c so the internal
-structure of the library isn't exposed.
-
-This allows us to upgrade the zstd library version without modifying any
-callers. Instead we just need to update decompress_sources.h.
-
-Signed-off-by: Nick Terrell <terrelln@fb.com>
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Tang Yizhou <tangyizhou@huawei.com>
 ---
- lib/decompress_unzstd.c       |  6 +-----
- lib/zstd/decompress_sources.h | 23 +++++++++++++++++++++++
- 2 files changed, 24 insertions(+), 5 deletions(-)
- create mode 100644 lib/zstd/decompress_sources.h
+ drivers/crypto/ccp/ccp-crypto-main.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/lib/decompress_unzstd.c b/lib/decompress_unzstd.c
-index c88aad49e996..6e5ecfba0a8d 100644
---- a/lib/decompress_unzstd.c
-+++ b/lib/decompress_unzstd.c
-@@ -68,11 +68,7 @@
- #ifdef STATIC
- # define UNZSTD_PREBOOT
- # include "xxhash.c"
--# include "zstd/entropy_common.c"
--# include "zstd/fse_decompress.c"
--# include "zstd/huf_decompress.c"
--# include "zstd/zstd_common.c"
--# include "zstd/decompress.c"
-+# include "zstd/decompress_sources.h"
- #endif
+diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
+index 88275b4867ea..5976530c00a8 100644
+--- a/drivers/crypto/ccp/ccp-crypto-main.c
++++ b/drivers/crypto/ccp/ccp-crypto-main.c
+@@ -59,7 +59,7 @@ struct ccp_crypto_queue {
+ #define CCP_CRYPTO_MAX_QLEN	100
  
- #include <linux/decompress/mm.h>
-diff --git a/lib/zstd/decompress_sources.h b/lib/zstd/decompress_sources.h
-new file mode 100644
-index 000000000000..d82cea4316f5
---- /dev/null
-+++ b/lib/zstd/decompress_sources.h
-@@ -0,0 +1,23 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (c) Facebook, Inc.
-+ * All rights reserved.
-+ *
-+ * This source code is licensed under both the BSD-style license (found in the
-+ * LICENSE file in the root directory of this source tree) and the GPLv2 (found
-+ * in the COPYING file in the root directory of this source tree).
-+ * You may select, at your option, one of the above-listed licenses.
-+ */
-+
-+/*
-+ * This file includes every .c file needed for decompression.
-+ * It is used by lib/decompress_unzstd.c to include the decompression
-+ * source into the translation-unit, so it can be used for kernel
-+ * decompression.
-+ */
-+
-+#include "entropy_common.c"
-+#include "fse_decompress.c"
-+#include "huf_decompress.c"
-+#include "zstd_common.c"
-+#include "decompress.c"
--- 
-2.31.0
+ static struct ccp_crypto_queue req_queue;
+-static spinlock_t req_queue_lock;
++static DEFINE_SPINLOCK(req_queue_lock);
+ 
+ struct ccp_crypto_cmd {
+ 	struct list_head entry;
+@@ -410,7 +410,6 @@ static int ccp_crypto_init(void)
+ 		return ret;
+ 	}
+ 
+-	spin_lock_init(&req_queue_lock);
+ 	INIT_LIST_HEAD(&req_queue.cmds);
+ 	req_queue.backlog = &req_queue.cmds;
+ 	req_queue.cmd_count = 0;
 
